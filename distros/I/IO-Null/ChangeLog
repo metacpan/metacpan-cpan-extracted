@@ -1,0 +1,11 @@
+Revision history for Perl extension IO::Null
+                                        Time-stamp: "2004-12-29 19:10:26 AST"
+
+2004-12-29   Sean M. Burke  sburke@cpan.org
+
+	* Version 1.01 -- no code changes, just rebundling
+	
+2000-08-22   Sean M. Burke  sburke@cpan.org
+	
+	* Version 0.02 -- first release version.
+

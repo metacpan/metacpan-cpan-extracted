@@ -1,0 +1,12 @@
+Revision history for Perl extension Image::PNG::Rewriter.
+
+0.9  Sat Mar 12 20:21:15 2011
+	- fixed an improper `use` in 02gd.t. Thanks to the
+	  CPAN testers for noticing it and to Andreas Koenig
+	  for the fix. The bug report is available at
+	  https://rt.cpan.org/Ticket/Display.html?id=66575
+
+	- fixed initial version number in Changes file
+
+0.8  Sat Mar  5 00:21:15 2011
+	- original version; created by h2xs 1.23

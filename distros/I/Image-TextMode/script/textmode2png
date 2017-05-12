@@ -1,0 +1,144 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Image::TextMode::Loader;
+use Image::TextMode::Renderer::GD;
+use Getopt::Long ();
+use Pod::Usage   ();
+use Carp 'croak';
+
+my %options;
+my $result = Getopt::Long::GetOptions(
+    \%options,           'output|o=s',
+    'thumbnail|t',       'inputformat|if=s',
+    'outputformat|of=s', 'font=s',
+    'pal=s',             'readopt=s%',
+    'renderopt=s%',      'help|h|?'
+);
+my @files = @ARGV;
+
+if ( !@files || $options{ help } ) {
+    Pod::Usage::pod2usage;
+}
+
+my $read_options   = _clean_opts( $options{ readopt } );
+my $render_options = _clean_opts( $options{ renderopt } );
+my $method         = $options{ thumbnail } ? 'thumbnail' : 'fullscale';
+my $force_filename = ( @files > 1 || !$options{ output } ) ? 1 : 0;
+my $renderer       = Image::TextMode::Renderer::GD->new;
+
+$render_options->{ font    } ||= $options{ font };
+$render_options->{ palette } ||= $options{ pal };
+
+for my $file ( @files ) {
+    croak "file not found: '$file'"    if !-e $file;
+    croak "file not readable: '$file'" if !-r $file;
+
+    my $image;
+    if ( my $format = $options{ inputformat } ) {
+        my $package = "Image\::TextMode\::Format\::${format}";
+        my $return = eval "use $package;";
+
+        if( !$return && $@ ) {
+            croak "Unable to load format '$format'";
+        }
+
+        $image = $package->new;
+        $image->read( $file, $read_options );
+    }
+    else {
+        $image = Image::TextMode::Loader->load( [ $file, $read_options ] );
+    }
+
+    my $output = $options{ output };
+    if ( $force_filename ) {
+        $output
+            = $file
+            . ( $options{ thumbnail } ? q{.t} : '' ) . q{.}
+            . ( $options{ outputformat } || 'png' );
+    }
+
+    $output =~ s{[^.]+?$}{gif}s
+        if $output ne q{-}
+            && $image->isa( 'Image::TextMode::Format::ANSIMation' );
+
+    my $data = $renderer->$method( $image, $render_options );
+
+    if ( $output eq q{-} ) {
+        binmode STDOUT;
+        print $data;
+    }
+    else {
+        open( my $fh, '>', $output ) or croak "Unable to open file '$output': $!";
+        binmode( $fh );
+        print $fh $data;
+        close( $fh ) or croak "Unable to close file '$output': $!";
+    }
+}
+
+sub _clean_opts {
+    my $opts = shift;
+
+    for my $k ( keys %$opts ) {
+        $opts->{ $k } = 1 if lc $opts->{ $k } eq 'true';
+        $opts->{ $k } = 0 if lc $opts->{ $k } eq 'false';
+    }
+
+    return $opts;
+}
+
+__END__
+
+=head1 NAME 
+
+textmode2png - Convert text mode files to png
+
+=head1 SYNOPSIS
+
+    % textmode2png [OPTIONS] file.ext [file2.ext, ...]
+    
+    Available options:
+    -o, --output            output filename (- for STDOUT); ignored when
+                            more than one file is specified)
+    -if, --inputformat      force a textmode format
+    -of, --outputformat     specify the output format (default: png)
+    -t, --thumbnail         generate a thumbnail
+    --font                  specify a particular font (e.g. 8x8)
+    --pal                   specify a particular palette (e.g. ANSI)
+    --readopt key=val       set read options
+    --renderopt key=val     set rendering options
+    -h, -?, --help          this message
+
+    Read options:
+    width       force image with to this many columns
+
+    Render options:
+    crop        limit the display to this many rows (default: no limit)
+    blink_mode  when false, use the 8th bit of an attribute byte as part of the
+                background color (aka iCEColor) (default: differs by format)
+    truecolor   enable true color image output (default: false)
+    9th_bit     enable a ninth column in the font (default: false)
+    ced         CED mode (black text on gray background) (default: false)
+    format      set the output format (default: png)
+
+=head1 DESCRIPTION
+
+This is a simple command-line tool to help you convert text mode
+(ansi, bin, etc) files to png images. Use the -t switch to create a
+thumbnail.
+
+=head1 AUTHOR
+
+Brian Cassidy E<lt>bricas@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2008-2015 by Brian Cassidy
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+=cut
+

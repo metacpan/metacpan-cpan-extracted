@@ -1,0 +1,56 @@
+NAME
+
+    Imager::DTP - draw text with DTP app-like custom options
+
+DESCRIPTION.
+
+    Imager::DTP is a text drawing add-on for Imager, with ability to draw
+    text horizontally or vertically (from top to bottom), letter-based (not
+    word-based) text wrapping for multi-byte characters, line alignment, and
+    adjustment of distance between letters and lines. Vertical drawing and
+    letter-based text wrapping are for multi-byte character languages, such
+    as Japanese and Chinese.
+
+  MORE THAN WORDS
+
+    I've made an interactive sample viewer page, for quick and essential
+    understanding of what the output will look like, by using Imager::DTP.
+    You can make the output more complexing and fancy by making full use of
+    the module, but save that for later, and just take a glance at all the
+    basics.
+
+    English Page
+
+        http://iandeth.dyndns.org/mycpan/Imager-DTP/sample_viewer_en.html
+
+    Japanese Page
+
+        http://iandeth.dyndns.org/mycpan/Imager-DTP/sample_viewer_ja.html
+
+INSTALLATION PRE-REQUISITIES
+
+You will need
+
+    FreeType2
+    Imager module compiled with FreeType2 option enabled
+
+in order to use Imager::DTP.  Imager module is available at CPAN, and 
+FreeType2 at <http://freetype.sourceforge.net>.  Install FreeType2 first, 
+then check to see if Imager's FreeType2 option is enabled by running 
+Imager's Makefile.PL.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 Toshimasa Ishibashi
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

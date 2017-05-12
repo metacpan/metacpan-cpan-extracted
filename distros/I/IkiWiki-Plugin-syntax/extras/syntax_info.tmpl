@@ -1,0 +1,88 @@
+<DIV class="syntax_info">
+<TABLE>
+<THEAD>
+    <TR>
+        <TH COLSPAN=2>Syntax highligth engine information</TH>
+    </TH>
+</THEAD>
+<TBODY>
+    <TR>
+        <TD>Name</TD>
+        <TD><TMPL_VAR NAME=name></TD>
+    </TR>
+    <TR>
+        <TD>Version</TD>
+        <TD><TMPL_VAR NAME=version></TD>
+    </TR>    
+    <TR>
+        <TD>Description: </TD>
+        <TD><TMPL_VAR ESCAPE=1 NAME=description></TD>
+    </TR>
+    <TR>
+        <TD>Third party module</TD>
+        <TD><TMPL_VAR NAME=external></TD>
+    </TR>
+    <TR>
+        <TD>Special Features</TD>
+        <TD><TMPL_VAR ESCAPE=1 NAME=special></TD>
+    </TR>
+    <TR>
+        <TD>Bugs and missing features</TD>
+        <TD><TMPL_VAR ESCAPE=1 NAME=bugs></TD>
+    </TR>
+    <TR>
+        <TD>Line numbers</TD>
+        <TD>
+        <TMPL_IF NAME=linenumbers>
+        Yes
+        <TMPL_ELSE>
+        No
+        </TMPL_IF>
+        </TD>
+    </TR>
+    <TR>
+        <TD>Bars on lines</TD>
+        <TD>
+        <TMPL_IF NAME=bars>
+        Yes
+        <TMPL_ELSE>
+        No
+        </TMPL_IF>
+        </TD>
+    </TR>
+
+    <TR>
+    <TD></TD>
+    <TD>
+        <TABLE>
+        <THEAD>
+            <TR>
+                <TH COLSPAN=3>Supported language syntaxes</TH>
+            </TR>
+            <TR>
+                <TH>Syntax name</TH>
+                <TH>File extensions</TH>
+                <TH>Description</TH>
+            </TR>        
+        </THEAD>
+        <TBODY>
+
+        <TMPL_LOOP NAME=supported>
+        <TR>
+            <TD><TMPL_VAR NAME=language></TD>
+            <TD><TMPL_VAR NAME=fileext></TD>
+            <TD><TMPL_VAR ESCAPE=1 NAME=description></TD>
+        </TR>
+
+        </TMPL_LOOP>
+
+        </TBODY>
+        </TABLE>
+
+    </TD>
+    </tR>
+</TBODY>    
+</TABLE>
+
+
+</DIV>

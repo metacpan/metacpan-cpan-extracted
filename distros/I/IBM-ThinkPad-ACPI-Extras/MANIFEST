@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/IBM-ThinkPad-ACPI-Extras.t
+lib/IBM/ThinkPad/ACPI/Extras.pm

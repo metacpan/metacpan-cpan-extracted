@@ -1,0 +1,55 @@
+Imager-SkinDetector
+
+Have you ever needed to know if an image has some amount of
+skin tone color? Did you find some tool to do it?
+Free software? If so, please tell me which one!
+
+If not, welcome to Imager-SkinDetector. It uses Imager as
+processing engine, so it has a decent speed.
+Don't expect miracles, though.
+
+I'm planning to use this as part of a set of tools
+to automatically classify images as nudity or
+"containing skin". It's only a plan. I might succeed
+one day. Most probably I won't. :-)
+
+Feel free to provide feedback and code.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Imager::SkinDetector
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Imager-SkinDetector
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Imager-SkinDetector
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Imager-SkinDetector
+
+    Search CPAN
+        http://search.cpan.org/dist/Imager-SkinDetector
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Cosimo Streppone, <cosimo@cpan.org>
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

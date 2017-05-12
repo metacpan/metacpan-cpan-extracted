@@ -1,0 +1,40 @@
+---
+abstract: 'an alternative dependency-injection container'
+author:
+  - 'Dexter Tad-y <dtady@cpan.org>'
+build_requires:
+  Class::Load: 0
+  DBD::SQLite: 0
+  DateTime: 0
+  Moose: 0
+  Test::Exception: 0
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: IOC-Slinky-Container
+provides:
+  IOC::Slinky::Container:
+    file: lib/IOC/Slinky/Container.pm
+    version: 0.1001
+  IOC::Slinky::Container::Item::Constructed:
+    file: lib/IOC/Slinky/Container/Item/Constructed.pm
+    version: 0
+  IOC::Slinky::Container::Item::Native:
+    file: lib/IOC/Slinky/Container/Item/Native.pm
+    version: 0
+  IOC::Slinky::Container::Item::Ref:
+    file: lib/IOC/Slinky/Container/Item/Ref.pm
+    version: 0
+requires:
+  Carp: 0
+  Scalar::Util: 0
+  YAML: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.1001

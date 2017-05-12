@@ -1,0 +1,197 @@
+#!/usr/bin/env perl
+# PODNAME: installto
+# ABSTRACT: Install an 'installer' configuration file
+
+use strict;
+use warnings;
+use Getopt::Long;
+use App::Installer;
+use Installer::Target;
+use Installer::Software;
+
+my ( $url, $file, $installer_code );
+
+GetOptions(
+  "u=s" => \$url,
+  "f=s" => \$file,
+  "e=s" => \$installer_code,
+);
+
+my $target = shift @ARGV;
+
+die "You can't give file and url at once" if defined $url and defined $file;
+die "Need a target to deploy to" unless $target;
+
+App::Installer->new(
+  target => $target,
+  defined $url ? ( url => $url ) : (),
+  defined $file ? ( file => $file ) : (),
+  defined $installer_code ? ( installer_code => $installer_code ) : (),
+)->install_to_target;
+
+# TODO ####
+# # Directly usable without install via http://installer.pm
+# curl -s -L http://installer.pm | perl - ~/myprojectenv
+# TODO ####
+
+__END__
+
+=pod
+
+=head1 NAME
+
+installto - Install an 'installer' configuration file
+
+=head1 VERSION
+
+version 0.904
+
+=head1 SYNOPSIS
+
+  # Will use installer file in current directory
+  installto ~/myprojectenv
+
+  # Using a specific installer file
+  installto -f /other/installer_file ~/myprojectenv
+
+  # The .installer file can also be fetched by URL:
+  installto -u http://stardestroyer.de/postgis.installer ~/myprojectenv
+
+  # Giving installer code as string
+  installto -e "perl '5.18.1'; cpanm 'Plack';" ~/myprojectenv
+
+  # On shell do the following for using the environment after installation
+  . ~/myprojectenv/export.sh
+
+Sample .installer file might look like
+
+  perl "5.18.1";
+  url "http://ftp.postgresql.org/pub/source/v9.2.4/postgresql-9.2.4.tar.gz", with => {
+    pgport => 15432,
+  };
+  url "http://download.osgeo.org/gdal/1.10.1/gdal-1.10.1.tar.gz";
+  url "http://download.osgeo.org/geos/geos-3.4.2.tar.bz2";
+  url "http://download.osgeo.org/postgis/source/postgis-2.1.0.tar.gz";
+  cpanm "DBD::Pg";
+
+=head1 DESCRIPTION
+
+B<TOTALLY BETA, PLEASE TEST :D>
+
+This software is made for taking away the annoying task of installing a common
+specific bundle of requirements to a target directory. In the target directory
+B<installto> will generate a B<export.sh> which can be used to get all the
+environment loaded to use the installed programs.
+
+Bigger example for installer file options:
+
+  url "http://host/file.tar.gz",
+    with => {
+      key => "value",
+      other_key => undef,
+    },
+    enable => [qw( satan )],
+    disable => [qw( god )],
+    without => [qw( religion )],
+    testable => 1;
+
+Would endup with the following parameter on I<./configure>: B<--with-key=value
+--with-other_key --enable-satan --disable-god --without-religion>.
+
+You can give HashRef or ArrayRef at B<enable>, B<disable>, B<with> and
+B<without> to achieve whatever configure setup you need.
+
+Also it would run "make test" if there is a Makefile after configuration.
+Another options possible (so far):
+
+  url "http://host/file.tar.gz",
+    custom_test => sub {
+      $_[0]->run($_[0]->unpack_path,'testcommand','--args')
+    },
+    custom_configure => sub {
+      $self->run($self->unpack_path,'./Configure','-des','-Dprefix='.$self->target_directory);
+    },
+    post_install => sub {
+      $self->run(undef,'command'); # run in target directory after install
+    },
+    export_sh => sub {
+      return "# extra lines", "# for getting added to", "# export.sh";
+    };
+
+Same options can go towards a local file:
+
+  file "/some/local/file.tar.gz";
+
+You can also run a custom command (it will be run inside the target directory):
+
+  run "custom_command", "args", "args";
+
+Install specific perl (so far no options):
+
+  perl "5.8.8";
+
+Install specific postgresql (with all required step to have it all setup):
+
+  postgres "9.3.0", port => 15432, superuser_with_db => 'myapp';
+
+Or install packages via cpanm:
+
+  cpanm qw( Yeb Dist::Zilla );
+
+B<Be careful!> It doesn't care if you have installed a perl in the target
+directory or not, and just fire up cpanm, so it would install on your local
+perl installation, if you didn't installed perl before.
+
+Or install packages via pip:
+
+  pip qw( rtree imposm );
+
+B<Be careful!> It doesn't care if you have installed pip in the target
+directory or not, and just fire up pip, so it would install on your local
+python environment, if you didn't installed pip before.
+
+=head1 DEBUGGING
+
+B<installto> normally prints out the logfile of the output of the last
+procedure that fails. This allows easy fixing of those problems. You can
+then, after tuning the situation, restart the script and it retries the last
+comment (this might still a bit buggy, be warned).
+
+In the case of a download problem or any other big problem that requires you
+to restart the specific step (like when you changed the URL to get a
+different version), you might want to delete fitting B<.json> file in the
+B<installer> directory, created in your target directory, this will force
+installto to redownload the file and restart this step complete over.
+
+=head1 WARNING
+
+The generation of the B<export.sh> still has some problem, you might need to
+adapt it by hand (for now).
+
+=head1 SUPPORT
+
+IRC
+
+  Join #cindustries on irc.quakenet.org. Highlight Getty for fast reaction :).
+
+Repository
+
+  http://github.com/Getty/p5-installer
+  Pull request and additional contributors are welcome
+
+Issue Tracker
+
+  http://github.com/Getty/p5-installer/issues
+
+=head1 AUTHOR
+
+Torsten Raudssus <torsten@raudss.us>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by Torsten Raudssus.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

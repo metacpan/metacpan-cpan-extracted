@@ -1,0 +1,9 @@
+Build.PL
+Changes
+ignore.txt
+lib/Inline/JSON.pm
+MANIFEST			This list of files
+README
+t/main.t
+Makefile.PL
+META.yml

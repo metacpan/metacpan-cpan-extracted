@@ -1,0 +1,317 @@
+=head1 NAME
+
+Image::GeoTIFF::Tiled - Read data and extract shapes from tiled GeoTIFF rasters
+
+=head1 SYNOPSIS
+
+    use Image::GeoTIFF::Tiled;
+    
+    my $t = Image::GeoTIFF::Tiled->new( $image_file );
+    
+    # Dump meta info
+    $t->print_meta;
+    
+    # Dump last tile
+    $t->dump_tile( $t->number_of_tiles - 1 );
+    
+    # Get an iterator for an arbitrary shape
+    my $iter = $t->get_iterator_shape( $shape );
+    # Get a histogram of pixel values
+    my %c;
+    $c{$v}++ while ( defined( my $v = $iter->next ) );
+    
+=head1 DESCRIPTION
+
+Image::GeoTIFF::Tiled provides an interface to libtiff and libgeotiff for reading raster data stored in tiled TIFF format conforming to the GeoTIFF specification. Several additional functions are provided for ease of access to the underlying geodata.
+
+This library is only meant to process tiled GeoTIFF images, and in fact will fail during construction if the image isn't tiled. To create a tiled GeoTIFF from a non-tiled GeoTIFF, see the command-line utility gtifcp. Arbitrary raster data can be exported to the tiled GeoTIFF format with GIS software.
+
+=head1 METHODS
+
+=head2 CONSTRUCTOR
+
+=over
+
+=item new($image_file)
+
+Returns a new C<Image::GeoTIFF::Tiled> instance corresponding to the given TIFF filepath. Internally a filehandle to the image is stored along with some metadata.
+
+As of 0.06, this supports bits per sample (bps) rasters of 8, 16, and 32 bits, and both integer and floating-point rasters. A bps value other than these will yield an exception. There's a chance of lurking bugs dealing with untested combinations of data types.
+
+An exception will also be thrown if the filepath is invalid or if the image isn't tiled or if the samples per pixel isn't 1.
+
+=back
+
+=head2 IMAGE METADATA
+
+A zero-value on any attribute indicates the value could not be determined. In general this shouldn't happen.
+
+=over
+
+=item file
+
+The filepath of the image.
+
+=item length
+
+The length (height) of the image in pixels.
+
+=item width
+
+The width of the image in pixels.
+
+=item corners($proj)
+
+Returns the 4 corners of the image as a list of [$x,$y] arrayrefs. The corners are in the following order: upper left, upper right, lower right, lower left.
+
+Will be in projected coordinates if a L<Geo::Proj4> projection object isn't passed; otherwise geographic coordinates.
+
+=item constrain_boundary($xmin,$ymin,$xmax,$ymax)
+
+Returns a new (xmin,ymin,xmax,ymax) pixel boundary constrained to the image dimensions.
+
+=item tile_length
+
+The length (height) of a single tile in pixels.
+
+=item tile_width
+
+The width of a single tile in pixels.
+
+=item tile_area
+
+The number of pixels in a tile (tile_length * tile_width).
+
+=item tile_step
+
+The number of tiles in a row of the image. Computed as the tile number of the first tile in the second tile row.
+
+=item tiles_across
+
+The number of tiles in a row of the image. Computed as (ImageWidth + TileWidth - 1) / TileWidth.
+
+(This should equal C<tile_step> as a sanity check.)
+
+=item tiles_down
+
+The number of tiles in a column of the image. Computed as (ImageLength + TileLength - 1) / TileLength
+
+=item tiles_total
+
+The number of tiles in the image. Computed as TilesAcross * TilesDown.
+
+=item number_of_tiles
+
+The number of tiles in the image (libtiff function).
+
+(This should equal C<tiles_total> as a sanity check.)
+
+=item tile_size
+
+The total size (in bytes) of a tile of pixels (libtiff function).
+
+=item tile_row_size
+
+The number of bytes of a row of data in a tile (libtiff function).
+
+=item bits_per_sample
+
+Bits per cell of data.
+
+The following should be true: 
+
+    PixelsInTile
+        = tile_size * 8 / bits_per_sample 
+        = tile_width * tile_length
+
+=item sample_format
+
+Data type of cells. Returns one of:
+
+    *   1 = unsigned integer data
+    *   2 = two's complement signed integer data
+    *   3 = IEEE floating point data [IEEE]
+    *   4 = undefined data format
+
+When unpacking with L<get_tile> with an unknown value, uses 1 by default (as per the TIFF6 spec.).
+
+=item print_meta
+
+Prints image metadata to STDOUT.
+
+=back
+
+=head2 PIXEL-PROJECTION TRANSFORMATIONS
+
+These methods transform projection and pixel coordinates.    
+
+=over
+
+=item center_pixel($x, $y)
+
+Centers the given pixel coordinates to the middle of the pixel (mutative).
+
+=item proj2pix_m($x, $y)
+
+Transforms the given projection coordinate to its corresponding pixel coordinate (mutative).
+
+=item proj2pix($x, $y)
+
+Transforms the given projection coordinate, returning its corresponding pixel coordinate as a list.
+
+=item pix2proj_m($x, $y)
+
+Transforms the given pixel coordinate to its corresponding projection coordinate (mutative).
+
+=item pix2proj($x, $y)
+
+Transforms the given pixel coordinate, returning its corresponding projection coordinate as a list.
+
+=back
+
+=head2 PIXEL-TILE TRANSFORMATIONS
+
+=over
+
+=item pix2tile($x, $y)
+
+Returns the tile number of the given pixel coordinates.
+
+=item pix2tile_m($tile, $i_t, $x, $y)
+
+Given a tile number and the index into the tile, sets the corresponding pixel coordinates (mutative).
+
+=item tile2pix($tile, $i_t)
+
+Given a tile number and the index into the tile, returns the corresponding pixel coordinates as a list.
+
+=item pix2tileidx($x, $y)
+
+Given pixel coordinates, returns the index into its tile.
+
+=back
+
+=head2 DATA EXTRACTION
+
+B<**NOTE**>
+
+The get_* methods may include padded values outside of the image boundary, which may or may not be zero (the TIFF6 spec only states that data must be present, not what values they contain).
+
+=over
+
+=item get_raw_tile($tile)
+
+Returns the raw tile data as a packed string encoded by libtiff into the proper native format.
+
+=item get_tile($tile)
+
+Returns a reference to the tile data in an unpacked flat array.
+
+=item get_tiles($ul, $br)
+
+Returns a reference to a 3D array (a 2D grid of references to the flat tile arrays) containing the rectangular tile data between the upper left ($ul) and lower right ($ur) tiles. 
+
+=item tile2grid($tile | $tile_data)
+
+Transforms a flat tile arrayref into a 2D grid of data. 
+
+Passing the tile number calls L<get_tile> first.
+
+=item tiles2grid($ul, $br | $tile_data)
+
+Transforms a 3D tile array into a 2D grid of data. 
+
+Passing the upper-left/bottom-right tile numbers calls L<get_tiles> first.
+
+=item extract_grid($xmin, $ymin, $xmax, $ymax)
+
+Extracts only those values bounded by the parameters into a 2D grid.
+
+=item filter_shape($grid, $x0, $y0, $shape)
+
+Applies a mask on C<$grid> to the shape object by C<undef>-ing values in C<$grid> not in the C<$shape>. Returns C<$grid>.
+
+=item mask_shape($grid, $x0, $y0, $shape)
+
+Applies a mask on C<$grid> to the shape object by C<undef>-ing values in C<$grid> not in the C<$shape>. Returns a 2D mask of 0s and 1s corresponding to values in C<$grid>, where 0 values at (row,col) are outside the image in (row,col) of C<$grid>.
+
+=item dump_tile($tile)
+
+Pretty-prints the given tile to STDOUT (raw values).
+
+=back
+
+=head2 ITERATION
+
+These methods return a L<Image::GeoTIFF::Tiled::Iterator> object that automatically handles image boundaries and shape masks.
+
+All return C<undef> if the given area is completely outside the image. If part of the boundary is outside, only those pixels that are inside the image will be used.
+
+Note - these receive copies of data buffers, so start-up time and memory size may be an issue.
+
+=over
+
+=item get_iterator(...)
+
+Convenience entry method to all of the get_iterator_* methods. The special case of no arguments returns an interator on the entire image. Otherwise this method dies if the parameters don't make sense.
+
+=item get_iterator_tile($tile)
+
+Given a tile, returns an iterator constrained to the image boundary.
+
+=item get_iterator_tiles($ul, $br)
+
+Given a tile rectangle (upper-left,bottom-right), returns an iterator constrained to the image boundary.
+
+=item get_iterator_pix($x_min, $y_min, $x_max, $y_max)
+
+Given a rectangular pixel boundary, returns an iterator constrained to the image boundary.
+
+=item get_iterator_shape($shape, $proj)
+
+Given a shape, returns an iterator constrained to the image boundary. 
+
+Applies filter_shape to a buffer (so that values outside the shape are undef'ed).
+
+If not a L<Image::GeoTIFF::Tiled::Shape> object, tries to load one with the optional C<$proj> L<Geo::Proj4> projection object. This will die on failure.
+
+=item get_iterator_mask($shape, $proj, $buffer_size)
+
+Given a shape, returns an iterator constrained to the image boundary. Use C<undef> for C<$proj> if a projection isn't necessary.
+
+Applies mask_shape to a buffer with a $buffer_size pixel extension on all sides. All buffered valeus are preserved, and instead a masking buffer of 0 and 1 values define which values are in the shape. This allows adjacent values ($iter->adjacencies) to be preserved as well, even those outside the shape.
+
+If not a L<Image::GeoTIFF::Tiled::Shape> object, tries to load one with the optional C<$proj> L<Geo::Proj4> projection object. This will die on failure.
+
+=back
+
+=head1 TODO
+
+Lightweight iterator - only pulls the data once, as needed, instead of copying into a buffer. 
+Probably would be an anonymous sub that knows how to unpack data using a template that can apply shape masks.
+
+Better error handling.
+
+=head1 SEE ALSO
+
+Geo::Proj4, Geo::ShapeFile
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2010 Blake Willmarth.
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of either:
+
+=over 4
+
+=item * the GNU General Public License as published by the Free
+Software Foundation; either version 1, or (at your option) any
+later version, or
+
+=item * the Artistic License version 2.0.
+
+=back
+
+=cut
+

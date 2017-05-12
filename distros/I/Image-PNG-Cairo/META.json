@@ -1,0 +1,56 @@
+{
+   "abstract" : "extract PNG data from a Cairo::ImageSurface",
+   "author" : [
+      "Ben Bullock <bkb@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Image-PNG-Cairo",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::Depends" : "0.2",
+            "ExtUtils::MakeMaker" : "0",
+            "ExtUtils::PkgConfig" : "1"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Cairo" : "0",
+            "Image::PNG::Libpng" : "0.31",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/benkasminbullock/image-png-cairo/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/benkasminbullock/image-png-cairo.git",
+         "web" : "https://github.com/benkasminbullock/image-png-cairo"
+      }
+   },
+   "version" : "0.08",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

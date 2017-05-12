@@ -1,0 +1,16 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Image-Grab
+version:      1.4.2
+version_from: lib/Image/Grab.pm
+installdirs:  site
+requires:
+    Digest::MD5:                   2.07
+    HTML::HeadParser:              0
+    HTML::TreeBuilder:             0.51
+    HTTP::Cookies:                 0
+    LWP::UserAgent:                0
+    URI::URL:                      1
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

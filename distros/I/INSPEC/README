@@ -1,0 +1,83 @@
+README for INSPEC version 0.01, 31 Jan. 2001
+
+CHANGES
+01/31/2001: first release version 0.01
+
+PREREQUISITES
+
+Perl 5.000 or later
+
+libwww-perl (LWP::Simple package). This package has some prerequisits and all of 
+them are availible on CPAN.
+
+Text::ParseWords package Should come with Perl
+
+INSPEC service through AXIOM corp. visit http://axiom.iop.org/ to see if your 
+institution has a subscription.
+
+Only works with BibTeX databases.. so far.
+
+INSTALLATION
+
+This module is written entirely in Perl. There's nothing to build, and 
+installation should be as simple as
+
+perl Makefile.PL
+make
+make install
+
+To install this module by hand, simply copy retriever.pm and bibtex.pm to the 
+\perl\lib\INSPEC directory.
+
+You must make one small change to getCite.pl:
+
+open getCite.pl with an editor and find the following line
+$INSPEC::Retriever::AXIOM_code = "ARKAN" ; # ...
+
+You must change "ARKAN" to the code for your institution. To find your 
+insitutions code, visit http://axiom.iop.org/ and hit the Access Axiom -> 
+Standard Service link. Look at the URL in your browser. At the U of A the URL 
+looks like: http://axiom.iop.org/S/ARKAN/search . Your's will not contain ARKAN 
+but some other code. Replace ARKAN with whatever your code is in the getcite.pl 
+line above and save getcite.pl. You are all set.
+
+
+USAGE
+
+This is a command line tool. To add a reference to your database you need to 
+know three pieces of information:
+
+The CODEN or ISSN for the journal
+The volume number
+The starting page number
+
+A CODEN is designation assigned to a periodical title by the Chemical Abstracts 
+Service. Each CODEN consists of four mnemonic letters and a fifth letter, A, B, 
+C, or D. The sixth character, a check character, is alphabetic or numeric. To 
+find the CODEN of the journal you are interested in you can check the journal or 
+search for it through AXIOM.
+
+To add Physical Review Letters (CODEN=PRLTAO), Volume 83 Page 2989 to your 
+bibtex file called mybib.bib. You would type the following
+
+getcite PRLTAO 83 2989 --b mybib.bib
+
+
+CONTACTING THE AUTHOR
+
+The best way to reach me is by email to <vlabella@uark.edu>
+You will find additional contact information at 
+http://www.uark.edu/misc/vlabella
+
+COPYRIGHT
+
+Copyright (C) 2001 Vincent LaBella.
+All rights reserved.  This program is free software; you can 
+redistribute it and/or modify it under the same terms as Perl itself.
+
+WARRANTY
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR
+IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+PURPOSE.

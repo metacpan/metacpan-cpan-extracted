@@ -1,0 +1,75 @@
+Iterator::IO version 0.02
+=========================
+
+This module provides some file and filesystem iterators.
+
+See the "Iterator" module for more information on what an iterator
+is, and how to use it.
+
+
+EXAMPLES
+
+Read a file, line by line:
+
+    $fh = ifile ($filename);
+    while ($fh->isnt_exhausted)
+    {
+        $line = $fh->value;
+        # do something with $line
+    }
+
+Read a file, line by line, in reverse order:
+
+    $fh = ifile_reverse ($filename);
+    while ($fh->isnt_exhausted)
+    {
+        $line = $fh->value;
+        # do something with $line
+    }
+
+Read a directory listing, entry by entry:
+
+    $dh = idir_listing ($path);
+    while ($dh->isnt_exhausted)
+    {
+        $filename = $dh->value;
+        # do something with $filename
+    }
+
+DEVELOPMENT STATE
+
+This is a brand-new module.  It has a decent test suite, but has
+not been extensively field-tested.  Therefore, it should be considered
+"beta" software, and used with care.
+
+If you find any bugs, or if any behavior of Iterator surprises you,
+I would be grateful if you could send me an email message about it.
+Thanks.
+
+
+INSTALLATION
+
+To install this module, do the standard Perl module four-step:
+
+   perl Makefile.PL    or    perl Makefile.pl LIB='my/install/path'
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Iterator
+
+COPYRIGHT AND LICENSE
+
+Eric J. Roode, roode@cpan.org
+
+To avoid my spam filter, please include "Perl", "module", or this
+module's name in the message's subject line, and/or GPG-sign your
+message.
+
+Copyright (c) 2005 by Eric J. Roode. All Rights Reserved.
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

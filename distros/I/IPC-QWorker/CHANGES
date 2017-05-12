@@ -1,0 +1,45 @@
+==================================================
+Changes from 2012-08-22 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 0.07 at 2013-08-22 11:02:37 +0000
+-----------------------------------------
+
+  Change: 5ea6c10580868ce4c8247336ae88599ed3661f76
+  Author: Markus Benning <me@w3r3wolf.de>
+  Date : 2013-08-22 13:02:21 +0000
+
+    -add gitignore 
+
+  Change: 0f51f36c7576b8c1046248dd89d95b444c69ffdc
+  Author: Markus Benning <me@w3r3wolf.de>
+  Date : 2013-08-22 13:01:15 +0000
+
+    -remove prototypes 
+
+  Change: eea903dd1b48c147ef45096a3365195f0e8fd5c7
+  Author: Markus Benning <me@w3r3wolf.de>
+  Date : 2013-08-22 12:58:15 +0000
+
+    -dzil configuration 
+
+  Change: e62bb2abccbafddb4899bade5c04e4790c55658e
+  Author: Markus Benning <me@w3r3wolf.de>
+  Date : 2013-08-22 12:57:48 +0000
+
+    -dzilify distribution 
+
+-----------------------------------------
+version 0.06 at 2013-08-22 10:50:15 +0000
+-----------------------------------------
+
+  Change: eb1b94bc86108fdc14451d9a42480ada35109c3e
+  Author: Markus Benning <me@w3r3wolf.de>
+  Date : 2013-08-22 12:50:15 +0000
+
+    -initial commit 
+
+================
+End of releases.
+================

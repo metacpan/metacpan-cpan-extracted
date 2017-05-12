@@ -1,0 +1,136 @@
+# -*- Perl -*-
+
+use IBM::LoadLeveler;
+
+$query = ll_query(CLASSES);
+$return=ll_set_request($query,QUERY_ALL,undef,ALL_DATA);
+
+if ($return != 0 )
+{
+    print STDERR "ll_set_request failed Return = $return\n";
+}
+
+# $number will contain the number of objects returned
+
+$classes=ll_get_objs($query,LL_CM,NULL,$number,$err);
+while($classes)
+{
+    $class_name=ll_get_data($classes,LL_ClassName);
+    $class_prio=ll_get_data($classes,LL_ClassPriority);
+    @class_exc_users=ll_get_data($classes,LL_ClassExcludeUsers);
+    $class_exc_users=array2string(@class_exc_users);
+    @class_inc_users=ll_get_data($classes,LL_ClassIncludeUsers);
+    $class_inc_users=array2string(@class_inc_users);
+    @class_exc_group=ll_get_data($classes,LL_ClassExcludeGroups);
+    $class_exc_group=array2string(@class_exc_group);
+    @class_inc_group=ll_get_data($classes,LL_ClassIncludeGroups);
+    $class_inc_group=array2string(@class_inc_group);
+    @class_admin=ll_get_data($classes,LL_ClassAdmin);
+    $class_admin=array2string(@class_admin);
+#    $class_nqs_class=ll_get_data($classes,LL_ClassNqsClass);
+#    $class_nqs_submit=ll_get_data($classes,LL_ClassNqsSubmit);
+#    @class_nqs_query=ll_get_data($classes,LL_ClassNqsQuery);
+#    $class_nqs_query=array2string(@class_nqs_query);
+    $class_max_procs=ll_get_data($classes,LL_ClassMaxProcessors);
+    $class_max_jobs=ll_get_data($classes,LL_ClassMaxJobs);
+
+    $class_res_str = "";
+    $class_res_req=ll_get_data($classes,LL_ClassGetFirstResourceRequirement);
+    while($class_res_req)
+    {
+         $name=ll_get_data($class_res_req, LL_ResourceRequirementName);
+         $init_val=ll_get_data($class_res_req, LL_ResourceRequirementValue);
+         $class_res_str .= $name."(".$init_val.") ";
+         $class_res_req=ll_get_data($classes, LL_ClassGetNextResourceRequirement);
+    }
+    $class_comment=ll_get_data($classes,LL_ClassComment);
+    $class_ckpt_dir=ll_get_data($classes,LL_ClassCkptDir);
+    $class_ckpt_hlimit=ll_get_data($classes,LL_ClassCkptTimeHardLimit);
+    $class_ckpt_slimit=ll_get_data($classes,LL_ClassCkptTimeSoftLimit);
+    $class_wcl_hlimit=ll_get_data($classes,LL_ClassWallClockLimitHard);
+    $class_wcl_slimit=ll_get_data($classes,LL_ClassWallClockLimitSoft);
+    $class_jcpu_hlimit=ll_get_data($classes,LL_ClassCpuStepLimitHard);
+    $class_jcpu_slimit=ll_get_data($classes,LL_ClassCpuStepLimitSoft);
+    $class_cpu_hlimit=ll_get_data($classes,LL_ClassCpuLimitHard);
+    $class_cpu_slimit=ll_get_data($classes,LL_ClassCpuLimitSoft);
+    $class_data_hlimit=ll_get_data($classes,LL_ClassDataLimitHard);
+    $class_data_slimit=ll_get_data($classes,LL_ClassDataLimitSoft);
+    $class_core_hlimit=ll_get_data($classes,LL_ClassCoreLimitHard);
+    $class_core_slimit=ll_get_data($classes,LL_ClassCoreLimitSoft);
+    $class_file_hlimit=ll_get_data($classes,LL_ClassFileLimitHard);
+    $class_file_slimit=ll_get_data($classes,LL_ClassFileLimitSoft);
+    $class_stack_hlimit=ll_get_data($classes,LL_ClassStackLimitHard);
+    $class_stack_slimit=ll_get_data($classes,LL_ClassStackLimitSoft);
+    $class_rss_hlimit=ll_get_data($classes,LL_ClassRssLimitHard);
+    $class_rss_slimit=ll_get_data($classes,LL_ClassRssLimitSoft);
+
+    $class_nice=ll_get_data($classes,LL_ClassNice);
+    $class_free_slots=ll_get_data($classes,LL_ClassFreeSlots);
+    $class_max_slots=ll_get_data($classes,LL_ClassMaximumSlots);
+#    $class_exec_factor=ll_get_data($classes,LL_ClassExecutionFactor);
+    $class_max_total_tasks=ll_get_data($classes,LL_ClassMaxTotalTasks);
+    $class_max_proto_inst=ll_get_data($classes,LL_ClassMaxProtocolInstances);
+    $class_preempt_class=ll_get_data($classes,LL_ClassPreemptClass);
+    $class_start_class=ll_get_data($classes,LL_ClassStartClass);
+
+    $class_constraints=ll_get_data($classes,LL_ClassConstraints);
+  
+    print "=============== Class $class_name ===============\n";
+    print "                Name: $class_name\n";
+    print "            Priority: $class_prio\n";
+    print "       Exclude_Users: $class_exc_users\n";
+    print "       Include_Users: $class_inc_users\n";
+    print "      Exclude_Groups: $class_exc_group\n";
+    print "      Include_Groups: $class_inc_group\n";
+    print "               Admin: $class_admin\n";
+    print "           NQS_class: ", $class_nqs_class ? "T\n":"F\n";
+    print "          NQS_submit: $class_nqs_submit\n";
+    print "           NQS_query: $class_nqs_query\n";
+    print "      Max_processors: $class_max_procs\n";
+    print "             Maxjobs: $class_max_jobs\n";
+    print "Resource_requirement: $class_res_str\n";
+    print "       Class_comment: $class_comment\n";
+    print "      Class_ckpt_dir: $class_ckpt_dir\n";
+    print "          Ckpt_limit: $class_ckpt_hlimit, $class_ckpt_slimit\n";
+    print "    Wall_clock_limit: $class_wcl_hlimit, $class_wcl_slimit\n";
+    print "       Job_cpu_limit: $class_jcpu_hlimit, $class_jcpu_slimit\n";
+    print "           Cpu_limit: $class_cpu_hlimit, $class_cpu_slimit\n"; 
+    print "          Data_limit: $class_data_hlimit, $class_data_slimit\n";
+    print "          Core_limit: $class_core_hlimit, $class_core_slimit\n";
+    print "          File_limit: $class_file_hlimit, $class_file_slimit\n";
+    print "         Stack_limit: $class_stack_hlimit, $class_stack_slimit\n";
+    print "           Rss_limit: $class_rss_hlimit, $class_rss_slimit\n";
+    print "                Nice: $class_nice\n";
+    print "          Free_slots: $class_free_slots\n";
+    print "       Maximum_slots: $class_max_slots\n";
+    print "    Execution_factor: $class_exec_factor\n";
+    print "     Max_total_tasks: $class_max_total_tasks\n";
+    print " Max_proto_instances: $class_max_proto_inst\n";
+    print "       Preempt_class: $class_preempt_class\n";
+    print "         Start_class: $class_start_class\n";
+
+    if ( $class_constraints ) {
+      print "-------------------------------------------------------\n";
+    }
+    if ( $class_constraints & 1) {
+      print "\"Maximum Slots\" value of class \"$class_name\" is constrained by the MAX_STARTERS limit(s).\n";
+    }
+    if ($class_constraints & 2) {
+      print "\"Free Slots\" value of class \"$class_name\" is constrained by the MAX_STARTERS limit(s).\n";
+    }
+    if ($class_constraints & 4) {
+     print "\"Free Slots\" value of class \"$class_names\" is constrained by the MAXJOBS limit(s).\n";
+    }
+    $classes=ll_next_obj($query);
+}
+
+# Free up space allocated by LoadLeveler
+ll_free_objs($query);
+ll_deallocate($query);
+
+sub array2string {
+  my $entry;
+  my $return_str = "";
+  $return_str = join(" ", @_) if @_;
+  return $return_str;
+}

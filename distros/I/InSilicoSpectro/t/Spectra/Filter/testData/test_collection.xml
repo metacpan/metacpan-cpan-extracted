@@ -1,0 +1,73 @@
+<!--test for test_collection-->
+
+<ExpMsMsSpectrumFilter>
+
+       
+<oneExpMsMsSpectrumFilter spectrumType="msms" name="dummy">
+	        <level>peaks</level>	
+		<action type="algorithm">
+                </action>
+		<filterValue type="algorithm">							
+		        <name>banishNeighbors</name>
+                        <param name="selectStrongest">0.8</param>
+                        <param name="banishRange">0.5</param>
+                        <param name="banishLimit">0.9</param>
+                        <param name="rangeUnit">Da</param>
+                        <param name="skipSpectraBelow">100</param>
+		</filterValue>
+	</oneExpMsMsSpectrumFilter>
+
+
+
+        <oneExpMsMsSpectrumFilter spectrumType="msms" name="dummy">
+	        <level>peaks</level>	
+		<action type="removeOther">
+		       <threshold type="sort">	
+			   <relativeTo>quantile</relativeTo>							
+			   <thresholdValue>0.5</thresholdValue>
+			   <comparator>ge</comparator>						
+		       </threshold>
+                </action>
+		<filterValue type="algorithm">							
+			<name>smartPeaks</name>
+                        <param name="winSize">100</param>
+                        <param name="stepSize">20</param>
+			<param name="weightIntensity">1</param>
+                        <param name="weightDensity">2</param>				
+		</filterValue>
+	</oneExpMsMsSpectrumFilter>
+
+
+        <oneExpMsMsSpectrumFilter spectrumType="msms">
+                <level>peaks</level>
+                <action type="algorithm">
+                       <threshold type="sort">
+                       </threshold>
+                </action>
+                <filterValue type="algorithm">
+                        <name>selectPeakWindow</name>
+                        <param name="nrWindows">10</param>
+                        <param name="nrPeaksTotal">200</param>
+                </filterValue>
+         </oneExpMsMsSpectrumFilter>
+
+
+
+
+
+       <oneExpMsMsSpectrumFilter spectrumType="msms" name="dummy">
+	        <level>msmsCompounds</level>	
+		<action type="removeOther">
+		       <threshold type="sort">	
+			   <relativeTo>nFix</relativeTo>							
+			   <thresholdValue>10</thresholdValue>
+			   <comparator>ge</comparator>						
+		       </threshold>
+                </action>
+		<filterValue type="directValue">							
+			<name>precursor.intensity</name>						
+		</filterValue>
+      </oneExpMsMsSpectrumFilter>
+
+
+</ExpMsMsSpectrumFilter>

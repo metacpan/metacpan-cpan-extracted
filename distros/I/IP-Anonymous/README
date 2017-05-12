@@ -1,0 +1,42 @@
+IP-Anonymous version 0.04
+=========================
+This is IP::Anonymous version 0.04, a Perl module port of Crypto-PAn
+originally designed and implemented in C++ by Jinliang Fan.
+
+INSTALLATION
+
+To install this module type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DEPENDENCIES
+
+This module requires these other non-standard Perl modules and
+libraries:
+
+    Crypt::Rijndael
+
+NOTES
+
+Please see the inline module documentation for additional important
+information including detailed module usage.  Once installed, module
+documentation can be viewed by typing the following:
+
+    perldoc IP::Anonymous
+
+CONTACT
+
+Please send bug reports, patches, suggestions or comments to:
+
+    John Kristoff
+    jtk@northwestern.edu
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2005 by John Kristoff
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

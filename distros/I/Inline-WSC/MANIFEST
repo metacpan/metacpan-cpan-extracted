@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Inline-WSC.t
+lib/Inline/WSC.pm

@@ -1,0 +1,45 @@
+{
+   "abstract" : "supply F<termios(3)> methods to C<IO::Handle> objects",
+   "author" : [
+      "Paul Evans <leonerd@leonerd.org.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4216",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "IO-Termios",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "IO::Pty" : "0",
+            "IO::Tty" : "0",
+            "Test::LongString" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IO::Tty" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "IO::Termios" : {
+         "file" : "lib/IO/Termios.pm",
+         "version" : "0.05"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.05",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

@@ -1,0 +1,14 @@
+This directory contains the examples showing how to exploit the Image::BioChrome
+module.  The files are distributed with all the colors already updated.
+
+The examples require Template::Toolkit in order to rebuild them
+
+
+Building the examples
+
+ttree -f ttree.cfg
+
+
+Point your browser at the file
+
+html/example.html

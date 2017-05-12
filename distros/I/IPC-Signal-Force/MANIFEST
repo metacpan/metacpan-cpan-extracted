@@ -1,0 +1,12 @@
+.cvsignore
+Build.PL
+Changes
+MANIFEST
+META.yml
+Makefile.PL
+README
+lib/IPC/Signal/Force.pm
+t/pod_cvg.t
+t/pod_syn.t
+t/use.t
+SIGNATURE    Added here by Module::Build

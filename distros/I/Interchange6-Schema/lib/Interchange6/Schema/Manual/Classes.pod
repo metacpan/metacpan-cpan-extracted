@@ -1,0 +1,299 @@
+=head1 NAME
+
+Interchange6::Schema::Manual::Classes - Result, ResultSet and Populate classes for Interchange6::Schema
+
+=head1 DESCRIPTION
+
+The various L<result classes|DBIx::Class::Manual::Glossary/"Result class"> and resultset classes that make up the Interchange6 schema.
+
+=head1 RESULT CLASSES
+
+All Result classes inherit from L<Interchange6::Schema::Candy>
+
+=head2 Products, Pricing and Inventory
+
+=head3 Product
+
+L<Interchange6::Schema::Result::Product>
+
+=head3 ProductAttribute
+
+L<Interchange6::Schema::Result::ProductAttribute>
+
+=head3 ProductAttributeValue
+
+L<Interchange6::Schema::Result::ProductAttributeValue>
+
+=head3 PriceModifier
+
+Group, tier and promotion pricing.
+
+L<Interchange6::Schema::Result::PriceModifier>
+
+=head3 Inventory
+
+L<Interchange6::Schema::Result::Inventory>
+
+=head3 Tax
+
+L<Interchange6::Schema::Result::Tax>
+
+=head2 Attributes
+
+=head3 Attribute
+
+Generic attributes for other classes.
+
+L<Interchange6::Schema::Result::Attribute>
+
+=head3 AttributeValue
+
+Generic attribute values for other classes.
+
+L<Interchange6::Schema::Result::AttributeValue>
+
+=head2 Merchandising
+
+=head3 MerchandisingProduct
+
+L<Interchange6::Schema::Result::MerchandisingProduct>
+
+=head3 MerchandisingAttribute
+
+L<Interchange6::Schema::Result::MerchandisingAttribute>
+
+=head2 Navigation
+
+=head3 Navigation
+
+L<Interchange6::Schema::Result::Navigation>
+
+=head3 NavigationProduct
+
+L<Interchange6::Schema::Result::NavigationProduct>
+
+=head3 NavigationAttribute
+
+L<Interchange6::Schema::Result::NavigationAttribute>
+
+=head3 NavigationAttributeValue
+
+L<Interchange6::Schema::Result::NavigationAttributeValue>
+
+=head3 UriRedirect
+
+L<Interchange6::Schema::Result::UriRedirect>
+
+=head2 Media
+
+=head3 Media
+
+L<Interchange6::Schema::Result::Media>
+
+=head3 MediaDisplay
+
+L<Interchange6::Schema::Result::MediaDisplay>
+
+=head3 MediaType
+
+L<Interchange6::Schema::Result::MediaType>
+
+=head3 MediaProduct
+
+L<Interchange6::Schema::Result::MediaProduct>
+
+=head2 User, Roles and Permissions
+
+=head3 User
+
+L<Interchange6::Schema::Result::User>
+
+=head3 Role
+
+L<Interchange6::Schema::Result::Role>
+
+=head3 UserRole
+
+L<Interchange6::Schema::Result::UserRole>
+
+=head3 Permission
+
+L<Interchange6::Schema::Result::Permission>
+
+=head3 UserAttribute
+
+L<Interchange6::Schema::Result::UserAttribute>
+
+=head3 UserAttributeValue
+
+L<Interchange6::Schema::Result::UserAttributeValue>
+
+=head2 Address
+
+L<Interchange6::Schema::Result::Address>
+
+=head2 Messages
+
+=head3 Message
+
+Generic message class.
+
+L<Interchange6::Schema::Result::Message>
+
+=head3 MessageType
+
+Lookup table for L<Interchange6::Schema::Result::Message/type>
+
+L<Interchange6::Schema::Result::MessageType>
+
+=head3 OrderComment
+
+Link table between L<Order|Interchange6::Schema::Result::Order> and L<Message|Interchange6::Schema::Result::Message>
+
+L<Interchange6::Schema::Result::OrderComment>
+
+=head3 ProductReview
+
+Link table between L<Product|Interchange6::Schema::Result::Product> and L<Message|Interchange6::Schema::Result::Message>
+
+L<Interchange6::Schema::Result::ProductReview>
+
+=head2 Countries, States and Zones
+
+=head3 Country
+
+L<Interchange6::Schema::Result::Country>
+
+=head3 State
+
+L<Interchange6::Schema::Result::State>
+
+=head3 Zone
+
+L<Interchange6::Schema::Result::Zone>
+
+=head3 ZoneCountry
+
+Many-to-many link table between L<Zone|Interchange6::Schema::Result::Zone> and L<Country|Interchange6::Schema::Result::Country>
+
+L<Interchange6::Schema::Result::ZoneCountry>
+
+=head3 ZoneState
+
+Many-to-many link table between L<Zone|Interchange6::Schema::Result::Zone> and L<State|Interchange6::Schema::Result::State>
+
+L<Interchange6::Schema::Result::ZoneState>
+
+=head2 Carts
+
+=head3 Cart
+
+L<Interchange6::Schema::Result::Cart>
+
+=head3 CartProduct
+
+L<Interchange6::Schema::Result::CartProduct>
+
+=head2 Orders and Payment
+
+=head3 Order
+
+L<Interchange6::Schema::Result::Order>
+
+=head3 Orderline
+
+L<Interchange6::Schema::Result::Orderline>
+
+=head3 OrderlinesShipping
+
+L<Interchange6::Schema::Result::OrderlinesShipping>
+
+=head3 OrderStatus
+
+L<Interchange6::Schema::Result::OrderStatus>
+
+=head3 PaymentOrder
+
+L<Interchange6::Schema::Result::PaymentOrder>
+
+=head2 Shipments
+
+=head3 Shipment
+
+L<Interchange6::Schema::Result::Shipment>
+
+=head3 Carrier
+
+L<Interchange6::Schema::Result::ShipmentCarrier>
+
+=head3 Destination
+
+L<Interchange6::Schema::Result::ShipmentDestination>
+
+=head3 Method
+
+L<Interchange6::Schema::Result::ShipmentMethod>
+
+=head3 Rate
+
+L<Interchange6::Schema::Result::ShipmentRate>
+
+=head2 Session
+
+L<Interchange6::Schema::Result::Session>
+
+=head2 Setting
+
+L<Interchange6::Schema::Result::Setting>
+
+=head1 RESULTSET CLASSES
+
+All ResultSet classes inherit from L<Interchange6::Schema::ResultSet>
+
+=head2 Order
+
+L<Interchange6::Schema::ResultSet::Order>
+
+=head2 Product
+
+L<Interchange6::Schema::ResultSet::Product>
+
+=head2 Session
+
+L<Interchange6::Schema::ResultSet::Session>
+
+=head2 Tax
+
+L<Interchange6::Schema::ResultSet::Tax>
+
+=head2 UriRedirect
+
+L<Interchange6::Schema::ResultSet::UriRedirect>
+
+=head2 User
+
+L<Interchange6::Schema::ResultSet::User>
+
+=head1 POPULATE CLASSES
+
+=head2 CountryLocale
+
+L<Interchange6::Schema::Populate::CountryLocale>
+
+=head2 MessageType
+
+L<Interchange6::Schema::Populate::MessageType>
+
+=head2 Role
+
+L<Interchange6::Schema::Populate::Role>
+
+=head2 StateLocale
+
+L<Interchange6::Schema::Populate::StateLocale>
+
+=head2 Zone
+
+L<Interchange6::Schema::Populate::Zone>
+
+=cut

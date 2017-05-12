@@ -1,0 +1,20 @@
+--- #YAML:1.0
+name:                IPC-Cmd-Cached
+version:             0.01
+abstract:            Run expensive commands and cache their output
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.31
+distribution_type:   module
+requires:     
+    Cache::FileCache:              
+    File::Temp:                    0
+    Getopt::Std:                   0
+    IPC::Cmd:                      0.24
+    Log::Log4perl:                 1
+    Pod::Usage:                    1.14
+    Storable:                      0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Mike Schilli <cpan@perlmeister.com>

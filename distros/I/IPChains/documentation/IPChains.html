@@ -1,0 +1,470 @@
+    <HTML> 
+	<HEAD> 
+	    <TITLE>IPChains - Create and Manipulate ipchains via Perl
+
+</TITLE> 
+	</HEAD>
+
+	<BODY>
+
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#NAME">NAME</A>
+	<LI><A HREF="#SYNOPSIS">SYNOPSIS</A>
+	<LI><A HREF="#DESCRIPTION">DESCRIPTION</A>
+	<LI><A HREF="#METHODS">METHODS</A>
+	<LI><A HREF="#BUGS">BUGS</A>
+	<LI><A HREF="#AUTHOR">AUTHOR</A>
+	<LI><A HREF="#COPYRIGHT">COPYRIGHT</A>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="NAME">NAME
+
+</A></H1>
+IPChains - Create and Manipulate ipchains via Perl
+
+
+<P>
+
+<P>
+<HR>
+<H1><A NAME="SYNOPSIS">SYNOPSIS
+
+</A></H1>
+use IPChains;
+
+
+<P>
+
+<CODE>$fw</CODE> = IPChains-&gt;new(-option =&gt; value, ... );
+$fw-&gt;append('chain');
+
+
+<P>
+
+<P>
+<HR>
+<H1><A NAME="DESCRIPTION">DESCRIPTION
+
+</A></H1>
+This module acts as an interface to the <CODE>ipchains(8)</CODE> userspace
+utility by Paul ``Rusty'' Russell
+(http://www.rustcorp.com/linux/ipchains/). It attempts to include all the
+functionality of the original code with a simplified user interface via
+Perl. In addition, plans for log parsing facilities, an integrated
+interface to ipmasqadm, and possibly traffic shaping are slated for up and
+coming versions. 
+
+
+<P>
+
+The <CODE>new()</CODE> and <CODE>attribute()</CODE> methods support the
+following options:
+
+
+<P>
+
+<DL>
+<DT><STRONG><A NAME="item_Source">Source
+
+</A></STRONG><DD>
+Specifies origination address of packet. Appending hostmask to this address
+using a / is OK, as well as specifying it separately (see SourceMask).
+
+
+<P>
+
+<DT><STRONG><A NAME="item_SourceMask">SourceMask
+
+</A></STRONG><DD>
+Hostmask for origination address. Can either be in 24 or 255.255.255.0
+style. 
+
+
+<P>
+
+<DT><STRONG><A NAME="item_SourcePort">SourcePort
+
+</A></STRONG><DD>
+Specific port or port range (use xxx:xxx to denote range), requires
+specific protocol specification.
+
+
+<P>
+
+<DT><STRONG><A NAME="item_Dest">Dest
+
+</A></STRONG><DD>
+Specifies destination address of packet. Appending hostmask to this address
+using a / is OK, as well as specifying it separately (see DestMask)
+
+
+<P>
+
+<DT><STRONG><A NAME="item_DestMask">DestMask
+
+</A></STRONG><DD>
+Destination address, (see SourceMask).
+
+
+<P>
+
+<DT><STRONG><A NAME="item_DestPort">DestPort
+
+</A></STRONG><DD>
+Destination Port, (see SourcePort).
+
+
+<P>
+
+<DT><STRONG><A NAME="item_Prot">Prot
+
+</A></STRONG><DD>
+Protocol. Can be tcp, udp, icmp, or all. Required for specifying specific
+<CODE>port(s).</CODE>
+
+
+<P>
+
+<DT><STRONG><A NAME="item_ICMP">ICMP
+
+</A></STRONG><DD>
+ICMP Name/Code (in place of port when ICMP is specified as protocol).
+
+
+<P>
+
+Here is a small table of some of the most common ICMP packets:
+
+
+<P>
+
+<PRE>       Number  Name                     Required by
+</PRE>
+
+<P>
+
+<PRE>       0       echo-reply               ping
+       3       destination-unreachable  Any TCP/UDP traffic.
+       5       redirect                 routing if not running 
+                                        routing daemon
+       8       echo-request             ping
+       11      time-exceeded            traceroute
+</PRE>
+
+<P>
+
+<DT><STRONG><A NAME="item_Rule">Rule
+
+</A></STRONG><DD>
+Target. Can be ACCEPT, DENY, REJECT, MASQ, REDIRECT, RETURN, or a
+user-defined chain. Note: This is case sensitive.
+
+
+<P>
+
+<DT><STRONG><A NAME="item_Interface">Interface
+
+</A></STRONG><DD>
+Specify a specify interface as part of the criteria (ie, eth0, ppp0, etc.).
+
+
+<P>
+
+<DT><STRONG><A NAME="item_Fragment">Fragment
+
+</A></STRONG><DD>
+Rule only refers to second and further fragments of fragmented packets (1
+or 0).
+
+
+<P>
+
+<DT><STRONG><A NAME="item_Bidir">Bidir
+
+</A></STRONG><DD>
+Makes criteria effective in both directions (1 or 0).
+
+
+<P>
+
+<DT><STRONG><A NAME="item_Verbose">Verbose
+
+</A></STRONG><DD>
+Set verbose option for setting rules or <CODE>list()</CODE> (1 or 0).
+
+
+<P>
+
+<DT><STRONG><A NAME="item_Numeric">Numeric
+
+</A></STRONG><DD>
+Show output from <CODE>list()</CODE> in numeric format. No DNS lookups,
+etc.. (1 or 0).
+
+
+<P>
+
+<DT><STRONG><A NAME="item_Log">Log
+
+</A></STRONG><DD>
+Enable kernel logging (via syslog, kern.info) of matched packets (1 or 0).
+
+
+<P>
+
+<DT><STRONG><A NAME="item_Output">Output
+
+</A></STRONG><DD>
+Copy matching packets to the userspace device (advanced).
+
+
+<P>
+
+<DT><STRONG><A NAME="item_Mark">Mark
+
+</A></STRONG><DD>
+Mark matching packets with specified number (advanced).
+
+
+<P>
+
+<DT><STRONG><A NAME="item_TOS">TOS
+
+</A></STRONG><DD>
+Used for modifying the TOS field in the IP header. Takes 2 args, AND and
+XOR masks, (ie, (TOS =&gt; [``0x01'', ``0x10''])). This feature is highly
+untested.
+
+
+<P>
+
+The first mask is ANDed with the packet's current TOS, and the second mask
+is XORed with it. Use the following table for reference:
+
+
+<P>
+
+<PRE>       TOS Name                Value           Typical Uses
+</PRE>
+
+<P>
+
+<PRE>       Minimum Delay           0x01 0x10       ftp, telnet
+       Maximum Throughput      0x01 0x08       ftp-data
+       Maximum Reliability     0x01 0x04       snmp
+       Minimum Cost            0x01 0x02       nntp
+ 
+</PRE>
+
+<P>
+
+<DT><STRONG><A NAME="item_Exact">Exact
+
+</A></STRONG><DD>
+Display exact numbers in byte counters instead of numbers rounded in K's,
+M's, or G's (1 or 0).
+
+
+<P>
+
+<DT><STRONG><A NAME="item_SYN">SYN
+
+</A></STRONG><DD>
+Only match TCP packets with the SYN bit set and the ACK and FIN bits
+cleared (1 or 0).
+
+
+<P>
+
+</DL>
+<P>
+<HR>
+<H1><A NAME="METHODS">METHODS
+
+</A></H1>
+The following methods are available to you:
+
+
+<P>
+
+<DL>
+<DT><STRONG><A NAME="item_new">new()
+
+</A></STRONG><DD>
+<CODE>$fw</CODE> = IPChains-&gt;new(option =&gt; value, ...) create new fw
+object with options
+
+
+<P>
+
+<DT><STRONG><A NAME="item_attribute">attribute()
+
+</A></STRONG><DD>
+$fw-&gt;attribute(option, value) to set option to value, OR
+<CODE>$value</CODE> = $obj-&gt;attribute(option) to get current value of
+option.
+
+
+<P>
+
+<DT><STRONG><A NAME="item_clopts">clopts()
+
+</A></STRONG><DD>
+$fw-&gt;clopts() clears all option settings (do this before calling methods
+like <CODE>list(),</CODE> <CODE>flush(),</CODE> <CODE>delete(),</CODE> etc.
+that take only a few specific options).
+
+
+<P>
+
+<DT><STRONG><A NAME="item_append">append()
+
+</A></STRONG><DD>
+$fw-&gt;append(chain) appends current rule to end of chain
+
+
+<P>
+
+<DT><STRONG><A NAME="item_insert">insert()
+
+</A></STRONG><DD>
+$fw-&gt;insert(chain, rulenum) inserts rule at position rulenum in chain.
+If rulenum is omitted 1 is assumed.
+
+
+<P>
+
+<DT><STRONG><A NAME="item_replace">replace()
+
+</A></STRONG><DD>
+$fw-&gt;replace(chain, rulenum) replace rule at rulenum in chain with
+current rule.
+
+
+<P>
+
+<DT><STRONG><A NAME="item_delete">delete()
+
+</A></STRONG><DD>
+$fw-&gt;delete(chain, rulenum) deletes rule rulenum from chain.
+
+
+<P>
+
+<DT><STRONG><A NAME="item_check">check()
+
+</A></STRONG><DD>
+$fw-&gt;check(chain) check given packet against chain for testing.
+
+
+<P>
+
+<DT><STRONG><A NAME="item_flush">flush()
+
+</A></STRONG><DD>
+$fw-&gt;flush(chain) deletes all rules from chain.
+
+
+<P>
+
+<DT><STRONG><A NAME="item_list">list()
+
+</A></STRONG><DD>
+$fw-&gt;list(chain) lists all rules defined for chain.
+
+
+<P>
+
+<DT><STRONG><A NAME="item_zero">zero()
+
+</A></STRONG><DD>
+$fw-&gt;zero(chain) zero's all packet counters for chain. Cannot zero
+counters for chain policy.
+
+
+<P>
+
+<DT><STRONG><A NAME="item_masq">masq()
+
+</A></STRONG><DD>
+$fw-&gt;masq() lists current masqueraded connections.
+
+
+<P>
+
+<DT><STRONG><A NAME="item_new_chain">new_chain()
+
+</A></STRONG><DD>
+$fw-&gt;new_chain(chain) creates new user defined chain.
+
+
+<P>
+
+<DT><STRONG><A NAME="item_del_chain">del_chain()
+
+</A></STRONG><DD>
+$fw-&gt;del_chain(chain) delete user defined chain.
+
+
+<P>
+
+<DT><STRONG><A NAME="item_set_policy">set_policy()
+
+</A></STRONG><DD>
+$fw-&gt;set_policy(chain) set default policy for chain. Takes Rule option
+only.
+
+
+<P>
+
+</DL>
+<P>
+<HR>
+<H1><A NAME="BUGS">BUGS
+
+</A></H1>
+Much of this is highly untested. Masquerading timeout setting isn't yet
+implemented. Much of what's planned to be done hasn't been yet. This is to
+be considered nothing more than an early beta to work out bugs in the basic
+code, and get feedback on usefulness and improvements that could be made.
+
+
+<P>
+
+<P>
+<HR>
+<H1><A NAME="AUTHOR">AUTHOR
+
+</A></H1>
+Jessica Hutchison <A HREF="MAILTO:(j@splatlabs.com).">(j@splatlabs.com).</A> Please
+feel free to email me with feedback, questions, or comments (or indeed
+patches/additions).
+
+
+<P>
+
+<P>
+<HR>
+<H1><A NAME="COPYRIGHT">COPYRIGHT
+
+</A></H1>
+This package is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself, with the exception of the libipfwc.c,
+ipchains.c, and the files in include/ which have separate terms derived
+from those of the original ipchains sources. See COPYING for details of
+this license. Please see README.ipchains for the README that was included
+with the original source code for ipchains and contains copyrights and
+credits for such. 
+
+<P>
+
+</DL>
+    </BODY>
+
+    </HTML>

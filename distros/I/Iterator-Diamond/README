@@ -1,0 +1,55 @@
+Iterator::Diamond
+=================
+
+Iterator::Diamond provides a safe and customizable replacement for the
+<> (Diamond) operator.
+
+Just like <> it returns the records of all files specified in @ARGV,
+one by one, as if it were one big happy file. In-place editing of
+files is also supported. It does use @ARGV, $ARGV and ARGVOUT as
+documented in perlrun, though without magic.
+
+As opposed to the built-in <> operator, no magic is applied to the
+file names unless explicitly requested. This means that you're
+protected from file names that may wreak havoc to your system when
+processed through the magic of the two-argument open that Perl
+normally uses for <>.
+
+Perl as of version 5.22 supports a new double-diamond operator <<>>
+to get similar security.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Iterator::Diamond
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Iterator-Diamond
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Iterator-Diamond
+
+    Search CPAN
+        http://search.cpan.org/dist/Iterator-Diamond
+
+
+COPYRIGHT AND LICENCE
+
+Copyright 2016,2008 Johan Vromans
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

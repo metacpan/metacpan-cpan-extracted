@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+ppport.h
+README
+SafeFork.xs
+lib/IPC/SafeFork.pm
+t/00_compile.t
+t/01_pod.t
+t/02_pod_coverage.t
+t/10_fork.t
+META.yml                                 Module meta-data (added by MakeMaker)

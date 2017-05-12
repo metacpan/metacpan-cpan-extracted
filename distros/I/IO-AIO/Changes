@@ -1,0 +1,669 @@
+Revision history for IO::AIO
+
+TODO: scandir - some dirs mostly contain subdirs - invert logic?
+TODO: aio_cptree/mvtree
+TODO: reduce condvar fairness: schedule hot-cache-threads first?
+TODO: vmsplice? (http://kerneltrap.org/node/6505 http://lwn.net/Articles/178199/)
+TODO: aio_fcntl, at least for file-locking
+TODO: aio_mincore?
+TODO: getxattr etc.?
+TODO: F_DUPFD_CLOEXEC
+TODO: emulation for splice?
+TODO: eio_mmap|mlock|munmap|splice...
+TODO: syncfs/sync windows:
+TODO: F_SETPIPE_SZ, F_GETPIPE_SZ
+TODO: posix_fallocate when flags=0
+http://stackoverflow.com/questions/65170/how-to-get-name-associated-with-open-handle/5286888#5286888
+http://blogs.msdn.com/b/adioltean/archive/2005/04/16/408947.aspx
+http://msdn.microsoft.com/en-us/library/aa366789%28v=vs.85%29.aspx
+http://msdn.microsoft.com/en-us/library/windows/desktop/aa366789%28v=vs.85%29.aspx
+http://msdn.microsoft.com/en-us/library/windows/desktop/aa364425%28v=vs.85%29.aspx
+http://msdn.microsoft.com/en-us/library/windows/desktop/aa364963%28v=vs.85%29.aspx
+http://msdn.microsoft.com/en-us/library/windows/desktop/aa364996%28v=vs.85%29.aspx
+http://msdn.microsoft.com/en-us/library/windows/desktop/aa364994%28v=vs.85%29.aspx
+TODO: extra socket/tcp constants &c?
+TODO: getrandom, GRND_NONBLOCK, GRND_NONBLOCK
+TODO: http://lwn.net/Articles/593918/ SHMEM_SET_SEALS, SHMEM_GET_SEALS, SEAL_SHRINK, SEAL_GROW, SEAL_WRITE, int memfd_create(const char *name, u64 size, u64 flags);, MFD_CLOEXEC, int fd = open("/tmp", O_RDWR | O_TMPFILE | O_EXCL, S_IRWXU);
+TODO: O_TMPFILE
+TODO: FALLOC_FL_COLLAPSE_RANGE
+TODO: FALLOC_FL_ZERO_RANGE
+TODO: renameat RENAME_EXCHANGE, RENAME_NOREPLACE, RENAME_EXCHANGE
+TODO: fcntl F_GETLKP/F_SETLKP/F_SETLKPW, http://lwn.net/Articles/586904/
+TODO: flink + AT_EMPTY_PATH
+TODO: name_to_handle_At + open_by_handle_at = clone fds
+TODO: lchown
+
+TODO: rewrite rmtree et al. to support working directories (also speed them up)
+TODO: maybe IO::AIO leaks fds when requests are cancelled? maybe initialise result to -1?
+TODO: aio_wd should use O_PATH on linux, due to lacking O_SEARCH (http://comments.gmane.org/gmane.linux.file-systems/33611)
+      http://www.openwall.com/lists/musl/2013/02/23/4
+TODO: aio_fcntl/ioctl test.
+
+4.34  Sun May  1 19:18:24 CEST 2016
+	- def0.h was not properly generated during previous release, causing
+          compile errors on various platforms.
+	- major/minor were accidentally switched (reported by Alexander Lishenyuk).
+	- removed duplicate definition of MAP_HUGETLB, that was found due to
+          a bug in Perl::Tidy (testcase by alaska332@gmail.com).
+        - added (untested!) aio_fcntl, aio_ioctl requests.
+        - (libeio) names set via prctl are truncated to 15 chars + nul, not 16,
+          as manpages-dev originally claimed.
+
+4.33  Mon Jan 18 12:50:10 CET 2016
+	- add IO::AIO::pipe2 function.
+        - added support for FALLOC_FL_COLLAPSE_RANGE and FALLOC_FL_ZERO_RANGE
+          constants.
+        - added support for O_TMPFILE and O_PATH constants.
+        - added support for MAP_FIXED, MAP_GROWSDOWN,MAP_32BIT, MAP_HUGETLB, MAP_STACK
+          consdtants, whether they can be sensibly used or not.
+	- use NO_INIT where applicable.
+        - update libecb.
+        - added stability canary support.
+        - updated linux super magic table to 4.3.3.
+
+4.32  Wed Feb 11 20:32:11 CET 2015
+	- replace off_t by STRLEN where appropriate, should not result in
+          user-visible changes.
+        - update ecb.h for C11 compatibility.
+
+4.31  Tue Jun  3 03:29:27 CEST 2014
+	- work around more 5.20 bugs. backwards compatibility my ass.
+
+4.3   Fri Apr 11 06:22:38 CEST 2014
+	- perl5porters broke Async::Interrupt, BDB, EV, IO::AIO, OpenCL
+          without warning by switching the meaning of USE_SOCKETS_AS_HANDLES
+          in 5.18. What's so attractive about giving a shit about backwards
+          compatibility - I will never understand.
+
+4.2   Sat Jan 25 01:13:14 CET 2014
+	- aio_group could corrupt memory because it didn't restore
+          the stack after req_submit.
+        - be more careful on (e.g. permission) errors in bin/treescan.
+	- work around changes in ExtUtils::MakeMaker.
+	- (libeio) implement aio_realpath for win32.
+        - (xthread) work around compile time bugs in ptw32.
+        - added IO::AIO::pipesize.
+        - (libecb) insignificant update.
+
+4.19  Sun Jan  6 12:47:26 CET 2013
+	- avoid endless loop in fiemap with some XFS files.
+	- in aio_rename and aio_rmdir, specialcase the case of [$wd, "."]
+          and call rename/rmdir instead of renameat/unlinkat.
+
+4.18  Thu Oct 11 07:01:26 CEST 2012
+	- fix unintended xthread_create by intentionalising it :)
+
+4.17  Thu Oct 11 05:19:47 CEST 2012
+        - rename aio_fallocate to aio_allocate, to match documentation.
+	- add list of linux fsid values to aio_statvfs docs.
+        - work around a bug in btrfs' FIEMAP ioctl implementation.
+        - work around AIX bug: statvfs.f_fsid is a struct, not unsigned long
+          as per unix spec.
+
+4.16  Tue Aug 14 05:39:03 CEST 2012
+	- aio_statvfs was wromgly marked for wd emulation, causing
+          it to malfunction for paths.
+        - fix a crash in aio_fiemap, when used on ranges without any
+          extents.
+        - work around linux kernel bug (at least in 3.2): kernel might
+          trash fiemap input arguments.
+        - work around linux kernel bug (at least in 3.2): kernel does not
+          set FIEMAP_EXTENT_LAST on last segment.
+        - work around linux kernel bug (at least in 3.2): kernel silently
+          truncates segment count if a file.
+	- make fh argument of IO::AIO::mmap optional, also add mmap/munmap
+          to quick overview.
+        - splice can corrupt data.
+        - (libeio) remove pread/pwrite emulation.
+        - do not grow mmaped scalars in aio_read.
+        - add FALLOC_FL_PUNCH_HOLE and document fallocate.
+        - provide pread/pwrite for win32, making it link again on native win32.
+
+4.15  Tue Apr 10 06:59:00 CEST 2012
+	- always include linux/types.h for fiemap, for compatibility to
+          ancient systems (Paul Howarth).
+        - experimental support for IO::AIO::splice and ::tee (no aio_...).
+        - provide SEEK_HOLE and SEEK_DATA, if available.
+        - work around (again!) an immensely stupid bug in RHEL, defining
+          autoconf macros in linux system headers (analysed by Paul Howarth).
+
+4.14 Sat Apr  7 02:45:18 CEST 2012
+	- fix stat structure usage on windows, which caused bogus stat results.
+        - (libeio) make readahead emulation behave more like actual readahead by never failing.
+        - new request aio_seek.
+        - new request aio_fiemap.
+        - autogenerate the #ifdef/#define 0 blocks for symbols we export.
+
+4.12 Fri Dec 30 08:51:25 CET 2011
+	- realpath would return a random value if the name was too long,
+          instead of -1.
+        - port to c89.
+
+4.11 Mon Oct 10 00:24:11 CEST 2011
+	- libeio didn't compile on !linux (Paul Howarth).
+
+4.1  Sun Oct  9 10:24:11 CEST 2011
+        - IO::AIO did access uninitialised memory on unsuccessful stats.
+	- (libeio) added syncfs syscall wrapper.
+        - (libeio) set thread name on linux (ps -L/Hcx, top, gdb).
+        - (libeio) support multiple indepenent working directories.
+        - applied speling corrections by Nicholas Bamber.
+        - tune treescan #threads and #outstanding requests a bit.
+        - reduce the number of file descriptors in use at any one time
+          in treescan, to avoid running out of them (and using too much ram).
+        - take advantage of working directoriy abstractions
+          in aio_scandir and treescan.
+        - reduce compiled size by ~10% by not inlining some key functionality.
+        - added --progress switch to treescan.
+
+4.0   Mon Jul 18 05:01:10 CEST 2011
+	- INCOMPATIBLE CHANGE: fork is no longer supported (indeed, it never was),
+          see FORK BEHAVIOUR in manpage for details.
+	- passes testsuite on win32 now and may actually work
+          (activestate 5.10.1 / MSVC6, YMMV).
+	- (libeio) fix a deadlock where a wakeup signal could be missed when
+          a timeout occured at the same time.
+	- (libeio) added realpath.
+        - (libeio) added fallocate.
+	- (libeio) disabling sendfile on darwin unfortunately broke the emulation.
+        - (libeio) do not acquire any locks when forking.
+        - (libeio) use fewer time() syscalls when waiting for new requests.
+
+3.93  Wed Jun 29 23:44:18 CEST 2011
+	- ECB.H WAS MISSING.
+
+3.92  Wed Jun 29 14:45:41 CEST 2011
+	- ecb.h was missing.
+
+3.91  Wed Jun 29 13:24:42 CEST 2011
+        - (libeio) work around a Linux (and likely FreeBSD and other
+          kernels) bug where sendfile would not transfer all the requested
+          bytes on large transfers, using a heuristic.
+        - buggy sendfile caused aio_move/copy to sometimes fail for big
+          files (fortunately it checks that the whole file has been
+          transferred...)
+        - use libecb for higher performance and higher portability.
+        - (libeio) disable sendfile on darwin, it's too broken.
+        - disable fork tests on !linux, as only linux supports mixing
+          pthread and fork in perl.
+        - document the fact that fork doesn't work anymore when using
+          this module, on anything !GNU/Linux.
+        - increase timeout in t/04_fork.t, as too many CPAN-tester setups
+          run on a 0.1MHz cpu. Or so.
+
+3.9  Fri May 27 02:43:47 CEST 2011
+        - (libeio) fix memory corruption in aio_readdirx for the flags
+          combination READDIR_STAT_ORDER | READDIR_DIRS_FIRST.
+        - add lots of newer POSIX and GNU/Linux-specific open
+          flags.
+
+3.8  Sun Mar 27 12:25:33 CEST 2011
+	- use nonstandard but maybe-working-on-bsd fork technique.
+	- support a max_idle value of 0.
+	- support setting of idle timeout value (IO::AIO::idle_timeout).
+
+3.72 Fri Feb 11 04:25:38 CET 2011
+	- use _POSIX_MEMLOCK_RANGE to detect mlock/munlock.
+        - aio_mknod always used a dev_t value of 0.
+        - new treescan option: --grep.
+        - add more S_IF macros, and major/minor/makedev "macros".
+
+3.71 Thu Dec 30 08:18:46 CET 2010
+	- the numerical result value passed to callbacks did not stringify
+          correctly, due to internal reuse and failure to reset the sv flags.
+	- actually test for posix_[mf]advise, as at least uClibc defines
+          _POSIX_ADVISORY_INFO without actually having any of the required
+          funcitonality. ugh.
+
+3.7  Mon Nov  1 23:00:34 CET 2010
+        - implement/add madvise, mmap, munmap, aio_mlockall, munlockall,
+          aio_mlock, munlock, msync and mtouch to @EXPORT_OK.
+        - document the sad state of affairs w.r.t. pthread on many bsds.
+	- do not enable mmap on systems without _POSIX_MAPPED_FILES
+          (openbsd 4.8).
+        - do not leak memory in IO::AIO::mmap when the scalar already
+          had string-data.
+	- add O_RDWR, O_APPEND and O_EXCL symbols and semi-document
+          them.
+        - cache the result IV, for a minor speedup in the common case.
+        - croak when an mmapped-scalar changes location, to detect
+          user-errors better.
+        - fix aio_readlink prototype.
+
+3.65 Wed Mar 31 02:45:05 CEST 2010
+	- actually use PATH_MAX instead of NAME_MAX for readlink, as to not
+          cut off long pathnames in aio_readlink (based on patch by
+          Rasmus Andersson).
+	- a double fork partially killed the event pipe (great testcase
+          by dormando). affects IO::AIO, BDB and Async::Interrupt.
+        - suck steve's dick and rename our symbols to avoid colliding
+          with nonstandard identifier spam on the broken os x pseudo-os.
+          affects IO::AIO and BDB.
+
+3.6  Mon Jan 11 00:43:39 CET 2010
+	- (libeio) more fixes for the freebsd/apple sendfile - broken by
+          manpage standards, but apparently correct accoridng to actual
+          kernel sources.
+        - add IO::AIO::mmap/munmap support.
+        - add IO::AIO::m(un)lockall support.
+        - clean up manpage.
+
+3.5  Thu Jan  7 21:25:04 CET 2010
+	- (liebio) fix freebsd sendfile (Vanilla Hsu).
+        - (libeio) also fix darwin sendfile that suffered from a similar bug.
+        - add aio_statvfs as interface to statvfs/fstatvfs.
+        - work around buggy symlink() on cygwin in the testsuite.
+        - wtf. freebsd-8.0 actually passes the testsuite! I knew
+          they could implement fork and semaphores one day! cheers!
+
+3.4  Sat Jan  2 15:13:04 CET 2010
+	- (libeio) max_poll_time was not properly converted to ticks.
+        - clarify cancel_subs description.
+        - IO::AIO::sendfile did not actually return the return value
+          from the sendfile call.
+        - implement aio_msync, aio_mtouch.
+        - (libeio) tentatively support darwin in sendfile.
+
+3.31 Thu Nov 12 02:14:29 CET 2009
+	- fix result status documentation of aio_copy, aio_move.
+        - speed up object creation considerably by avoiding
+          hash lookups.
+
+3.3  Wed Aug  5 13:52:58 CEST 2009
+	- use common::sense.
+        - use common schmorp.h header.
+        - allow integers (file descriptors) in addition to file handles.
+        - take advantage of linux' eventfd (but it seems slower on smp?).
+        - use poll not select on posix platforms.
+
+3.261 Wed Jul  1 10:11:51 CEST 2009
+	- more 0S X workarounds (patch by Tokuhiro Matsuno).
+
+3.26 Tue Jun 30 09:33:26 CEST 2009
+        - 0S X of course claims to be posix 2008 but lacks posix_fadvise.
+          try to work around this horribly broken OS in a somewhat hackish
+          way. might help other os's too.
+
+3.25 Sat Jun 27 05:18:26 CEST 2009
+        - added IO::AIO::fadvise and IO::AIO::sendfile.
+        - (libeio) replaced quicksort+insertion sort by a tuned radix
+          sort + insertion sort, resulting in comparable runtime (usually
+          faster) to the old version, but without any ill side effects on
+          degenerated (for quicksort) data.
+        - (libeio) correctly sort dirs by inodes if we have perfect type
+          knowledge and DIRS_FIRST is used.
+        - (libeio) internally the wrong DT_* constants were used, but no
+          known system has differing EIO_DT_*/DT_* values, so not an issue.
+        - removed a (harmless) assert that was left over on the code
+          but should not have been.
+        - use more correct types (change IO length from IV to VAL64,
+          which makes a difference on systems without 64 bit perls).
+
+3.23 Sat Jun 13 16:57:58 CEST 2009
+	- fix off-by-one bug in aio_readdir that was introduced in the
+          rushed 3.22 release.
+
+3.22 Sat Jun 13 15:32:40 CEST 2009
+	- speed up readdirx sort algorithm slightly.
+        - bin/treescan was missing from distro tarball.
+
+3.21 Fri Jun 12 18:45:53 CEST 2009
+	- new options --dirs and --files for treescan.
+        - install bin/treescan by default.
+        - (libeio) aio_readdir can now be cancelled while executing.
+        - fix a printf format string for 64 bit systems (could lead
+          to problems on big endian 64 bit systems).
+        - do not use qsort() but our own algorithm: glibc initialises
+          the whole locale and I/O subsystem inside qsort, causing
+          a stack overflow on 32 bit machines. The new sort uses much less
+          stack and is more than twice as fast in typical situations.
+
+3.2  Sun Jun  7 20:30:05 CEST 2009
+	- (libeio) pwrite emulation was even more flawed than intended and did
+          not restore the file offset.
+        - add aio_readdirx, which can return inode and filetype and sort
+          the names in various ways.
+        - unfortunately, utime, chmod, chown on an open file that has just
+          been written can easily block, which caused aio_copy to block the
+          process. no more!
+        - no longer rely on dst path in aio_copy when futime is available.
+
+3.19 Tue Apr 21 22:05:21 CEST 2009
+	- more perl 5.10 workarounds for aio_read and write.
+        - aio_write no longer modifies the sv (if possible).
+        - aio_read now works correctly with magic values.
+
+3.18 Sun Apr 19 21:17:32 CEST 2009
+	- better diagnostics when some aio_* functions get passed an illegal fh.
+        - try to avoid crashes due to incompatible 5.10 API changes. grmbl.
+
+3.17 Thu Nov 20 08:45:36 CET 2008
+	- (libeio) added aio_sync_file_range (untested).
+        - add aio_busy to @IO::AIO::AIO_REQ.
+
+3.16 Wed Oct 22 18:28:01 CEST 2008
+	- use SvREFCNT_inc instead of SvREFCNT_inc_NN in a non-speed critical
+          part to improve portability to perl 5.8 (reported by szymon).
+
+3.15 Mon Oct 13 00:39:55 CEST 2008
+	- automatic removal of feeders was broken.
+	- (libeio) use a more robust method to detect whether a feeder
+          has added something to the group or not.
+
+3.1  Thu Oct  2 13:34:40 CEST 2008
+	- pre-deref the passed callback object, for increased speed
+          and decreased memory usage.
+	- call on_next_submit callback even for aio_group - impact unknown,
+          but seems more correct.
+        - $req->cb now returns the original callback.
+        - (libeio) pass EIO_GROUP/aio_group requests through the queue without
+          requiring a thread switch.
+        - (libeio) status code of aio_futime and aio_utime was always passed 0.
+        - do some other µ-optimisations.
+
+3.07 Sat Aug  2 16:06:13 CEST 2008
+	- do not include LIBS in autoconf tests.
+
+3.06 Tue Jul 15 12:41:32 CEST 2008
+	- move preadwritelock definition before it's first reference,
+          to make it compile again on broken platforms (they still exist)
+          or badly cofngiured perls (redhat...), reported by Rob Bloodgood.
+
+3.05 Thu Jun 19 23:23:52 CEST 2008
+	- work around perl overriding readdir etc. with thread-unsafe
+          (sic!) versions.
+
+3.04 Wed Jun 18 01:35:38 CEST 2008
+	- (libeio) fix eio_mknod, which confused it's arguments.
+	- (libeio) do not use readdir_r, as Ulrich Drepper pointed out that this
+          is stupid.
+        - (libeio) fix eio__readahead prototype, patch by Jost Krieger.
+        - (libeio) fix a bug that could potentially cause IO::AIO
+          not to get initialised properly.
+
+3.03 Thu May 29 05:33:30 CEST 2008
+	- (libeio) correctly call pthread_attr_destroy ().
+        - (libeio) work around broken bsd headers once more.
+        - reduce shared library size again by not including wrappers.
+        - max_outstanding could cause poll to enter a busy-waiting loop.
+        - document the new IO::AIO::poll_cb result value.
+
+3.02 Mon May 12 02:32:02 CEST 2008
+	- fix a memory leak on aio_readlink.
+        - bring back working fchmod.
+        - nop and busy now set result to 0.
+        - set errno to ENOMEM when allocation fails.
+
+3.01 Sun May 11 03:07:03 CEST 2008
+	- (libeio) make it compile on systems without readahead or readdir_r.
+        - (libeio) improve configure check for readahead availability.
+        - do not try to link against -lrt.
+	- use a separate configure script for IO::AIO (not the libeio one).
+
+3.0  Sun May 11 00:57:14 CEST 2008
+	- added bin/treescan to the distribution.
+        - switched to using libeio.
+	- LOTS OF INCOMPATIBLE CHANGES:
+          - remove signal functionality, it is not worth the effort.
+          - max_outstanding no longer returns the previous number of requests.
+          - poll_cb no longer returns number of requests.
+
+2.62 Sat Apr 26 13:59:33 CEST 2008
+	- port to solaris perls configured for old posix
+          (analysed by Jost Krieger).
+        - keep a reference to the perl filehandle object in aio_close,
+          so it doesn't get closed prematurely, leading to ugly races.
+
+2.61 Wed Apr 16 18:45:02 CEST 2008
+	- fix treescan output duplication and improve output ordering.
+          also display files given on the commandline.
+        - use a different algorithm for aio_close that is faster
+          and probably has even lower chances of blocking.
+        - do our own stack memory management for threads - linux
+          allocates outrageous amounts of VM (not so bad unless you
+          use mlockall...), which severely limits the number of threads
+          on 32-bit arches: stack size is the larger of PTHREAD_STACK_MIN
+          and 4096 * sizeof (long) (usually this is 16..64k).
+
+2.6  Sun Mar 30 08:28:11 CEST 2008
+	- added aio_sync.
+        - added aio_pathsync.
+        - fix prototypes of (void) functions.
+
+2.51 Sat Oct  6 16:04:54 CEST 2007
+	- perlio isn't generally threadsafe, so aio_close could not work reliably.
+          aio_close now tries a safe hack that might not be that asynchronous
+          (see the manpage for details).
+        - discard callback return values as to not grow the stack endlessly
+          when poll_cb handles many requests without returning.
+        - minor code cleanups.
+
+2.5  Thu Oct  4 14:49:08 CEST 2007
+	- replaced _fd2fh with faster xs code.
+        - aio_close will now try to do "the right thing" and thus might
+          work sensibly for the very first time.
+
+2.41 Mon Sep 24 21:28:21 CEST 2007
+	- after fork, invest some work to make sure that the poll_fileno
+          stays stable (by dup2'ing the new fd over the old one), to make
+          it easier for programs/libs that don't control their forking
+          behaviour and cannot recreate their watchers.
+
+2.4  Sun Aug  5 18:44:22 CEST 2007
+        - add aio_truncate, aio_chmod, aio_chown, aio_utime (linux
+          successfully demonstrated that you can block on futimes...).
+        - allow undef as fileoffset for aio_read/write and use read/write(2)
+          internally (useful for sockets or O_APPEND handles).
+        - allow undef for length in aio_write.
+        - negative dataoffsets work as expected now in aio_read/aio_write.
+        - use NV instead of UV for 32 bit perls and file offsets, as NVs
+          have a larger range then.
+	- shared code between BDB and IO::AIO.
+        - aio_busy was completely broken. now fixed.
+        - readahead emulation now returns something.
+        - correctly set errno to ENOSYS on unimplemented functions
+          (should never happen, though).
+        - large changes to make it partially compile and run on win32,
+          but win32 lacks too much functionality, and perl overrides way
+          too many functions with crashing versions.
+
+2.33 Tue Jan 23 23:55:41 CET 2007
+	- fix install path (Andreas J. Koenig).
+
+2.32 Mon Jan 22 16:56:23 CET 2007
+	- added aio_rmtree.
+        - wow, aio_mkdir was missing.
+        - aio_load did return undef on error, not -1.
+        - use prefixexp not prefix in autoconf.pm
+          (suggested by ... rt.cpan.org unreachable).
+        - avoid installing autoconf.pm.
+
+2.31 Sat Jan  6 03:46:02 CET 2007
+	- added aio_load.
+
+2.3  Sat Dec 23 05:48:07 CET 2006
+	- fix off-by-one bug in aio_read, causing memory corruption
+          or crashes.
+
+2.21  Fri Dec 22 05:03:38 CET 2006
+	- minor doc updates.
+	- minor cleanups.
+        - IO::AIO::poll returns request count.
+        - undocumented and unfinished async-signal-reporting.
+
+2.2  Tue Oct 31 00:31:00 CET 2006
+	- minor doc updates.
+        - added aio_readlink.
+        - properly zero-terminate aio_read buffer.
+        - fix aio_read/write with nonzero dataoffset.
+        - reduced size of aio request structure.
+        - better diagnostics when pathnames etc. are not byte-encoded;
+          do not leak request in that case, either.
+
+2.1  Sun Oct 29 02:01:57 CET 2006
+        - INCOMPATIBLE CHANGE: replace IO::AIO::poll_some by
+          IO::AIO::max_poll_reqs and IO::AIO::max_poll_time.
+	- fix a bug in aio_move where it would fail everytime
+          it would have to copy files manually.
+	- doc updates.
+	- start threads only on (very low) demand.
+        - end superfluous threads automatically after 10s idling.
+        - add IO::AIO::max_idle to control this.
+	- some tuning applied to random places.
+        - add aio_mknod.
+
+2.0  Thu Oct 26 18:27:58 CEST 2006
+	- minor incompatibility: max_outstanding semantics have changed.
+	- major rewrite, consider all functionality EXPERIMENTAL.
+        - aio requests can be cancelled.
+        - callbacks can be (re-)set later.
+        - aio requests can choose between 9 priorities.
+        - add aio_group: aio requests can be grouped
+          into composite requests.
+        - generator interface for groups.
+        - add IO::AIO::poll_some.
+        - major documentation improvements.
+        - very minor bugfixes.
+        - add aio_nop for dummy requests.
+        - add aio_busy mainly for benchmarking and debugging.
+        - use "fast" mutexes on linux.
+        - use dynamic (and larger) buffers instead of
+          putting them onto the stack.
+        - optimise x86 and amd64 a bit.
+        - better error checking when ENOMEM.
+        - hopefully fix mem and dirp leaks on fork.
+        - warn about broken perl malloc.
+        - compiles on cygwin (but pread is broken on cygwin
+          which is not detected by autoconf, so you have to
+          edit autoconf/config.h yourself to enable emulation).
+
+1.8  Sat Jun 24 22:20:44 CEST 2006
+	- add and/or document aio_rename, aio_link, aio_symlink and aio_move.
+
+1.73 Wed Mar  1 22:49:32 CET 2006
+	- codename "jost"
+        - AIX/Solaris(?) aren't being helpful again, hardcode a value
+          for NAME_MAX and drive with your eyes closed (reported by
+          wcooley@nakedape.cc).
+
+1.72 Thu Feb  2 00:40:44 CET 2006
+	- another minor bug in aio_scandir, again, the callback was called
+          twice when the directory can't be stat'ed.
+
+1.71 Mon Dec 26 20:20:03 CET 2005
+	- grr, another minor bug in aio_scandir, this time resulting
+          in a runtime error.
+
+1.7  Mon Dec 26 19:29:48 CET 2005
+        - aio_scandir errornously called callback twice in some cases.
+	- added AnyEvent example.
+
+1.61 Wed Sep  7 19:40:42 CEST 2005
+	- no longer include $Config{libs}, as distros include too much
+          garbage in there that is not installed on typical systems
+          (for example, debian links perl against -lgdbm and many more
+          libraries despite perl not needing it, slowing down startup and
+          wasting memory).
+
+1.6  Tue Aug 30 17:44:44 CEST 2005
+        - added aio_readdir, aio_scandir.
+        - added aio_sendfile, including sendfile emulation when sendfile
+          isn't available. Linux, FreeBSD and HP-UX might work (sendfilev
+          support is unavailable on my solaris 8 machine, but preliminary
+          code is there. What's lacking is configury stuff and testing...).
+
+1.5  Sat Aug 20 02:32:19 CEST 2005
+	- create the aio threads on demand only (good after forking).
+	- somebody nagged about C89 compatibility, so this release should
+          be C89 compatible, but no guarantees for future ones.
+        - abort when the configure script fails.
+
+1.4  Wed Aug 17 08:07:27 CEST 2005
+	- forgot to recreate the pipe after forking, this could cause
+          deadlocks.
+
+1.3  Wed Aug 17 07:25:54 CEST 2005
+	- properly propagate exceptions from callbacks, instead of silently
+          eating them.
+        - use a different fork algorithm that avoids recursive callback
+          invocations and reduces fork latency in busy processes.
+        - fix a bug where the buffer scalar in aio_read got assigned the wrong
+          length after reading.
+        - fix a bug where the child would process some outstanding requests
+          from the parent.
+        - make a copy of the callback scalar, to avoid some very uncommon
+          (but valid) usages where the callback scalar changes.
+        - the callback was never freed in aio_read/aio_write.
+        - aio_read/aio_write will now set the readonly flag on the data
+          scalar for better error reporting.
+
+1.2  Wed Aug 17 01:22:58 CEST 2005
+	- verified on cygwin, linux/amd64+ia32+alpha, solaris.
+        - use SvPVbyte for filenames now. You *need* to encode your strings to
+          the external filename encoding first.
+	- fix the bug where filehandles could leak (again).
+        - clarify freebsd situation: make it work and tell me how, or go away
+          with your underdocumented, broken and outdated OS.
+        - fork'ing should now be officially supported (where linux and
+          posix contradict each other, I followed posix).
+        - only call read() once per poll, not twice (speedup).
+        - new functions: aio_rmdir, aio_symlink.
+        - force callback arguments to be undef or a reference, for better
+          error catching.
+
+1.1  Sun Aug  7 05:27:23 CEST 2005
+	- added configure script to detect availability of some calls.
+          (imperfect, as we cannot detect things like -lrt due to missing
+          feedback yet).
+        - emulate fdatasync via fsync, pread/pwrite via unsafe read/write
+          and readahead via manual reading on platforms lacking those.
+	- ported t/03_errors.t+framework by Brad Fitzpatrick
+          from Linux::AIO.
+	- removed XOPEN_SOURCE because stupid solaris 9 doesn't
+          compile with it enabled. Probably breaks others. Oh well.
+        - try to be more careful with errno on non-threaded perls.
+        - cygwins perl insisted on a matching open mode when morphing
+          the fd to an fh.
+        - convert sv's to "byte" encoding in aio_read/aio_write. Might
+          do that for pathnames, too, in the future, so make sure you
+          properly encode your pathnames.
+
+1.0  Fri Jul 22 10:43:30 CEST 2005
+        - aio_open did not reliably deliver (open) filehandles.
+        - all aio_*-functions keep a reference to the filehandle so
+          it doesn't go away while the aio requests is working on it.
+	- disable warnings in AIO.pm.
+
+0.9  Wed Jul 20 23:55:04 CEST 2005
+        - allow recursive calls to poll_cb, use less locking calls, too.
+        - fix the Gtk2-example in the SYNOPSIS.
+	- use pread/pwrite not pread64/pwrite64. this was simply a leftover
+          from Linux::AIO.
+          (found by compiling on cygwin. Unfortunately, cygwin declares but
+          does not implement pread/pwrite).
+	- only include <sys/syscall.h> on linux.
+
+0.5  Tue Jul 12 13:03:09 CEST 2005
+	- removed #include <endian.h>, it's not portable, and we don't
+          need it anyway.
+        - link against -lrt, as it might contain goodies such as fdatasync,
+          and often aio_read, which we do not use yet, but it shouldn't hurt.
+
+0.4  Mon Jul 11 05:28:25 CEST 2005
+	- added IO::AIO::flush, IO::AIO::poll.
+        - make callback argument optional for all calls.
+
+0.3  Mon Jul 11 01:42:37 CEST 2005
+	- restructured manpage.
+        - added SYNOPSIS with examples for Event, Glib, Tk.
+        - remove explicit context support so I don't have to maintain
+          it for threaded perls (i.e. it should work now :).
+
+0.2  Sun Jul 10 22:57:12 CEST 2005
+	- return immediately from poll_wait if nreqs==0.
+        - get rid of the request pipe and use faster thread-thread
+          communications for most requests and responses.
+
+0.1
+	- cloned from Linux::AIO, which is very similar.
+

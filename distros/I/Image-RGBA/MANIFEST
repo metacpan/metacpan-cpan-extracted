@@ -1,0 +1,13 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/Image/RGBA.pm
+lib/Image/Photo.pm
+t/000_Load_Modules.t
+t/001_Load_Modules.t
+t/data/Monument.jpg
+examples/correct.pl
+examples/scale-magick.pl
+examples/scale-rgba.pl
+examples/sphere-slicer.pl

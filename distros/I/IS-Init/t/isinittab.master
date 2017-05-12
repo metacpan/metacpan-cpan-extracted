@@ -1,0 +1,27 @@
+# resourcegroup:unique_tag:runlevel(s):mode:command
+#
+# Long (multicharacter) runlevel lebels can be used -- separate them
+# with commas, as in the 'hellolong' entry below.  If you need only
+# one long runlabel in an entry, end it with a comma, as shown in the
+# 'hellolong3' entry below.
+# 
+# location of socket
+:::initstat:t/init.s
+# location of status file
+:::initstat:t/initstat
+hellogrp:hello1:1:wait:/bin/echo "hello world!" > t/out
+hellogrp:hello2:2:respawn:/bin/echo "hello world!" >> t/out
+hellogrp:hello3:3:wait:/bin/sleep 5; cat /dev/null > t/out
+hellogrp:hello4:4:once:/bin/echo 1 > t/out;/bin/sleep 4;/bin/echo 3 >> t/out
+hellogrp:hello4a:4:wait:/bin/sleep 2; /bin/echo 2 >> t/out
+hellogrp:hellolong:long1,long2,5:wait:/bin/echo long > t/out
+hellogrp:hellolong3:long3,:wait:/bin/echo long3 > t/out
+pidgrp:pid1:1:respawn:/bin/echo $$ > t/out; sleep 10
+foogrp:foo1:12:once:/bin/echo foo1start >t/out;sleep 6;/bin/echo foo1end >t/out
+foogrp:foo3:3:once:/bin/echo foo3 >t/out
+bargrp:bar1:1:once:/bin/echo bar1start >t/out;sleep 6;/bin/echo bar1end >t/out
+bazgrp:baz1:1:once:sleep 12; /bin/echo baz1 > t/out
+scramjet:scram1:1:wait:date > t/out
+hellogrp:test1:f:test:/bin/true
+hellogrp:test2:f:test:/bin/false
+hellogrp:test3:t:test:/bin/true

@@ -1,0 +1,113 @@
+---
+name: InSilicoSpectro
+version: 1.3.24
+author:
+  - 'Alexandre Masselot <alexandre.masselot@genebio.com>, Jacques Colinge <Jacques.Colinge@fh-hagenberg.at>'
+abstract: Open source Perl library for proteomics
+license: lgpl
+resources:
+  license: http://opensource.org/licenses/artistic-license.php
+requires:
+  Archive::Tar: 0
+  Archive::Zip: 0
+  Compress::Zlib: 0
+  Data::Serializer: 0
+  Digest::MD5: 0
+  File::Find::Rule: 0
+  File::Temp: 0
+  GD: 0
+  GD::Graph: 0
+  GD::Text: 0
+  Getopt::Long: 0
+  MIME::Base64: 0
+  XML::Parser: 0
+  XML::SemanticDiff: 0
+  XML::Twig: '>=3.14'
+  perl: 5.6.1
+recommends:
+  AI::NNFlex: 0
+  Bio::Perl: 1.4
+  Math::Derivative: 0
+  Math::FixedPrecision: 0
+  Math::Spline: 0
+  Statistics::Basic: 0
+  Statistics::Regression: 0
+  XML::Dumper: 0
+  XML::Merge: 0
+  XML::Parser::PerlSAX: 0
+provides:
+  InSilicoSpectro:
+    file: lib/InSilicoSpectro.pm
+    version: 1.3.24
+  InSilicoSpectro::InSilico::AASequence:
+    file: lib/InSilicoSpectro/InSilico/AASequence.pm
+  InSilicoSpectro::InSilico::CleavEnzyme:
+    file: lib/InSilicoSpectro/InSilico/CleavEnzyme.pm
+  InSilicoSpectro::InSilico::ExpCalibrator:
+    file: lib/InSilicoSpectro/InSilico/ExpCalibrator.pm
+  InSilicoSpectro::InSilico::InternIonSeries:
+    file: lib/InSilicoSpectro/InSilico/InternIonSeries.pm
+  InSilicoSpectro::InSilico::IonSeries:
+    file: lib/InSilicoSpectro/InSilico/IonSeries.pm
+  InSilicoSpectro::InSilico::IsoelPoint:
+    file: lib/InSilicoSpectro/InSilico/IsoelPoint.pm
+  InSilicoSpectro::InSilico::MSMSOutput:
+    file: lib/InSilicoSpectro/InSilico/MSMSOutput.pm
+  InSilicoSpectro::InSilico::MSMSTheoSpectrum:
+    file: lib/InSilicoSpectro/InSilico/MSMSTheoSpectrum.pm
+  InSilicoSpectro::InSilico::MassCalculator:
+    file: lib/InSilicoSpectro/InSilico/MassCalculator.pm
+  InSilicoSpectro::InSilico::ModRes:
+    file: lib/InSilicoSpectro/InSilico/ModRes.pm
+  InSilicoSpectro::InSilico::PMFMatch:
+    file: lib/InSilicoSpectro/InSilico/PMFMatch.pm
+  InSilicoSpectro::InSilico::Peptide:
+    file: lib/InSilicoSpectro/InSilico/Peptide.pm
+  InSilicoSpectro::InSilico::RetentionTimer:
+    file: lib/InSilicoSpectro/InSilico/RetentionTimer.pm
+  InSilicoSpectro::InSilico::RetentionTimer::Hodges:
+    file: lib/InSilicoSpectro/InSilico/RetentionTimer/Hodges.pm
+  InSilicoSpectro::InSilico::RetentionTimer::Petritis:
+    file: lib/InSilicoSpectro/InSilico/RetentionTimer/Petritis.pm
+  InSilicoSpectro::InSilico::Sequence:
+    file: lib/InSilicoSpectro/InSilico/Sequence.pm
+  InSilicoSpectro::InSilico::TermIonSeries:
+    file: lib/InSilicoSpectro/InSilico/TermIonSeries.pm
+  InSilicoSpectro::Spectra::ExpSpectrum:
+    file: lib/InSilicoSpectro/Spectra/ExpSpectrum.pm
+  InSilicoSpectro::Spectra::Filter::MSFilter:
+    file: lib/InSilicoSpectro/Spectra/Filter/MSFilter.pm
+    version: 0.9
+  InSilicoSpectro::Spectra::Filter::MSFilterAlgorithm:
+    file: lib/InSilicoSpectro/Spectra/Filter/MSFilterAlgorithm.pm
+    version: 0.9
+  InSilicoSpectro::Spectra::Filter::MSFilterCollection:
+    file: lib/InSilicoSpectro/Spectra/Filter/MSFilterCollection.pm
+    version: 0.9
+  InSilicoSpectro::Spectra::Filter::MSFilterDirectValue:
+    file: lib/InSilicoSpectro/Spectra/Filter/MSFilterDirectValue.pm
+    version: 0.9
+  InSilicoSpectro::Spectra::MSMSCmpd:
+    file: lib/InSilicoSpectro/Spectra/MSMSCmpd.pm
+  InSilicoSpectro::Spectra::MSMSSpectra:
+    file: lib/InSilicoSpectro/Spectra/MSMSSpectra.pm
+  InSilicoSpectro::Spectra::MSRun:
+    file: lib/InSilicoSpectro/Spectra/MSRun.pm
+  InSilicoSpectro::Spectra::MSSpectra:
+    file: lib/InSilicoSpectro/Spectra/MSSpectra.pm
+  InSilicoSpectro::Spectra::PeakDescriptor:
+    file: lib/InSilicoSpectro/Spectra/PeakDescriptor.pm
+  InSilicoSpectro::Spectra::PhenyxPeakDescriptor:
+    file: lib/InSilicoSpectro/Spectra/PhenyxPeakDescriptor.pm
+  InSilicoSpectro::Utils::FileCached:
+    file: lib/InSilicoSpectro/Utils/FileCached.pm
+  InSilicoSpectro::Utils::Files:
+    file: lib/InSilicoSpectro/Utils/Files.pm
+  InSilicoSpectro::Utils::XML::SaxIndexMaker:
+    file: lib/InSilicoSpectro/Utils/XML/SaxIndexMaker.pm
+  InSilicoSpectro::Utils::io:
+    file: lib/InSilicoSpectro/Utils/io.pm
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

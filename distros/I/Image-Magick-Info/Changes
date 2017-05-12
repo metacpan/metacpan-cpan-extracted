@@ -1,0 +1,11 @@
+Revision history for Perl extension Image::Magick::Info.
+
+0.03  Fri Aug  5 10:10:00 2005
+  - now handles IO::File and GLOB filehandles.
+
+0.02  Thr Aug  4 22:00:00 2005
+  - can now pass in a filehandle OR a filename to get_info().
+
+0.01  Wed May  4 12:51:50 2005
+	- original version;
+

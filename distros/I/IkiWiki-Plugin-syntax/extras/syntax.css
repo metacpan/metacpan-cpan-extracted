@@ -1,0 +1,28 @@
+/*
+ * A stylesheet designed to be used with the HTML output of the
+ * Perl module Text::Highlight::Vim.
+ */
+
+pre.syntax { 
+    color: black; 
+    background: white none 
+    clear: both;
+}
+
+.synComment    { color: #0000FF }
+.synConstant   { color: #FF00FF }
+.synIdentifier { color: #008B8B }
+.synStatement  { color: black;    font-weight: bold }
+.synPreProc    { color: #A020F0 }
+.synType       { color: green;    font-weight: bold }
+.synSpecial    { color: #6A5ACD }
+.synUnderlined { color: #000000 ; text-decoration: underline }
+.synError      { color: #FFFFFF ; background: #FF0000 none }
+.synTodo       { color: #0000FF ; background: #FFFF00 none }
+
+.synTitle      { font-weight: bolder; font-size: 80%; }
+.synEvenLine   { font-weight: bold; font-size: 90%; padding: 0 0.3em; background: gray}
+.synOddLine    { font-weight: bold; font-size: 90%; padding: 0 0.3em; }
+
+.synDescription { background: gray; font-size: 80%; width: 80%; }
+

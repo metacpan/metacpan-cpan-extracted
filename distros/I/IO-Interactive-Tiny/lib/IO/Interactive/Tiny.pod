@@ -1,0 +1,137 @@
+=encoding utf-8
+
+=head1 NAME
+
+IO::Interactive::Tiny - is_interactive() without large deps
+
+
+=head1 VERSION
+
+This document describes IO::Interactive::Tiny version 0.2
+
+
+=head1 SYNOPSIS
+
+    use IO::Interactive::Tiny;
+
+    if ( IO::Interactive::Tiny::is_interactive() ) {
+        print "I probably want text output.";
+    }
+    else {
+        print "I probably want HTML output."; 
+    }
+
+
+=head1 DESCRIPTION
+
+Provides the useful subset of L<IO::Interactive>’s functionality in the form of only having is_interactive().
+
+Also gains ::Tiny-ness by not using L<version>, L<Carp>, or L<Scalar::Util>
+
+=head1 INTERFACE 
+
+Nothing in exported or exportable, that helps keep it '::Tiny'.
+
+
+=head2 IO::Interactive::Tiny::is_interactive()
+
+Same functionality as L<IO::Interactive:/is_interactive()>.
+
+
+=head1 DIAGNOSTICS
+
+IO::Interactive::Tiny throws no warnings or errors of its own.
+
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+IO::Interactive::Tiny requires no configuration files or environment variables.
+
+
+=head1 DEPENDENCIES
+
+None.
+
+
+=head1 INCOMPATIBILITIES
+
+None reported.
+
+
+=head1 BUGS AND LIMITATIONS
+
+No bugs have been reported.
+
+Please report any bugs or feature requests to
+C<bug-io-interactive-tiny@rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org>.
+
+=head1 About the '::Tiny' status
+
+All info below is relative to IO::Interactive (v0.0.6).
+
+See L<Acme::Tiny> for information on the ::Tiny suffix.
+
+#3 is really really close:
+
+    [ -- RSS Memory -- ]
+      Baseline perl 1204
+      IO::Interactive 2464 (+1260)
+      IO::Interactive::Tiny 1332 (+128)
+    
+Even though "time" isn't really a ::Tiny factor, it does improve loading a bit:
+
+   [ -- time -- ]
+    Baseline perl
+      real  0m0.014s
+      user  0m0.004s
+      sys   0m0.008s
+    
+    IO::Interactive
+      real  0m0.023s
+      user  0m0.013s
+      sys   0m0.009s
+    
+    IO::Interactive::Tiny
+      real  0m0.013s
+      user  0m0.004s
+      sys   0m0.008s
+      
+Regarding tests: t/01.is_interactive.t i the same as t/is_interactive.t in IO::Interactive
+
+=head1 AUTHOR
+
+Daniel Muey  C<< <http://drmuey.com/cpan_contact.pl> >>
+
+
+=head1 LICENCE AND COPYRIGHT
+
+Copyright (c) 2011, Daniel Muey C<< <http://drmuey.com/cpan_contact.pl> >>. All rights reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+
+
+=head1 DISCLAIMER OF WARRANTY
+
+BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE
+LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL,
+OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE
+THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF
+SUCH DAMAGES.
+

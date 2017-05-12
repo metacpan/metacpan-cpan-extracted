@@ -1,0 +1,168 @@
+# -*- Perl -*-
+=pod
+
+=head1 Workload Management
+
+IBM::LoadLeveler Workload Management API
+
+=head1 SYNOPSIS
+
+  # Workload Management API
+
+  $rc=ll_control($control_op,\@host_list,\@user_list,\@job_list,\@class_list,$priority);
+
+  $rc=llctl(LL_CONTROL_RECYCLE| LL_CONTROL_RECONFIG| LL_CONTROL_START,LL_CONTROL_STOP|\
+            LL_CONTROL_DRAIN| LL_CONTROL_DRAIN_STARTD| LL_CONTROL_DRAIN_SCHEDD|\
+            LL_CONTROL_PURGE_SCHEDD| LL_CONTROL_FLUSH| LL_CONTROL_SUSPEND|\
+            LL_CONTROL_RESUME| LL_CONTROL_RESUME_STARTD| LL_CONTROL_RESUME_SCHEDD|\
+            LL_CONTROL_FAVOR_JOB| LL_CONTROL_UNFAVOR_JOB| LL_CONTROL_FAVOR_USER|\
+            LL_CONTROL_UNFAVOR_USER| LL_CONTROL_HOLD_USER| LL_CONTROL_HOLD_SYSTEM|\
+            LL_CONTROL_HOLD_RELEASE| LL_CONTROL_PRIO_ABS| LL_CONTROL_PRIO_ADJ|\
+            LL_CONTROL_START_DRAINED| LL_CONTROL_DUMP_LOGS\ 
+            ,\@host_list,\@class_list);
+
+  $rc=llfavorjob(LL_CONTROL_FAVOR_JOB|LL_CONTROL_UNFAVOR_JOB,\@job_list);
+
+  $rc=llfavoruser(LL_CONTROL_FAVOR_USER|LL_CONTROL_UNFAVOR_USER,\@user_list);
+
+  $rc=llhold(LL_CONTROL_HOLD_USER|LL_CONTROL_HOLD_SYSTEM|LL_CONTROL_HOLD_RELEASE,\@host_list,\@user_list,\@job_list);
+
+  $rc=llprio(LL_CONTROL_PRIO_ABS|LL_CONTROL_PRIO_ADJ,\@job_list,$priority);
+
+  $rc=ll_start_job($cluster,$proc,$from_host,\@node_list);
+  $rc=ll_terminate_job($cluster,$proc,$from_host,$msg);
+  $rc=ll_preempt($job_step_id, PREEMPT_STEP|RESUME_STEP|SYSTEM_PREEMPT_STEP);
+
+  $rc=ll_modify(EXECUTION_FACTOR|CONSUMABLE_CPUS|CONSUMABLE_MEMORY|WCLIMIT_ADD_MIN|JOB_CLASS|ACCOUNT_NO,\$value,$job_step);
+
+   $rc=ll_run_scheduler($obj);
+
+   $rc=ll_start_job_ext(\%Info);
+
+   $rc=ll_cluster(CLUSTER_SET|CLUSTER_UNSET,\@cluster_list);
+   $rc=ll_cluster_auth();
+
+   $rc=ll_move_job($cluster_name,$job_id);
+   $rc=ll_move_spool($schedd_host,$directory);
+
+=head1 DESCRIPTION
+
+The Workload Management API has the following functions:
+
+=over 4
+
+=item ll_control
+
+=item llctl
+
+=item llfavorjob
+
+=item llfavoruser
+
+=item llhold
+
+=item llprio
+
+=item ll_preempt
+
+=item ll_preempt_jobs
+
+=item ll_start_job
+
+=item ll_terminate_job
+
+=item ll_modify
+
+=item ll_run_scheduler
+
+=item ll_start_job_ext
+
+=item ll_cluster
+
+=item ll_cluster_auth
+
+=item ll_move_job
+
+=item ll_move_spool
+
+=back
+
+The C<llctl, llfavorjob, llfavoruser, llhold & llprio> functions are all really wrappers for ll_control.
+
+B<The functions ll_start_job & ll_terminate_job are designed for people wanting to produce an external scheduler, they are totally untested in this module.>
+
+=over 4
+
+=item ll_modify
+
+
+  $rc=ll_modify(EXECUTION_FACTOR|CONSUMABLE_CPUS|CONSUMABLE_MEMORY|WCLIMIT_ADD_MIN|JOB_CLASS|ACCOUNT_NO,\$value,$job_step);
+
+The following options are only available under LoadLeveler 3.2 or higher:
+
+ WCLIMIT_ADD_MIN
+ JOB_CLASS
+ ACCOUNT_NO
+
+This interface only supports one job step, the API also only allows one job step at present but is designed for expansion, therfore this interface may change in the future.
+
+=item ll_preempt_jobs
+
+  $rc=ll_preempt_jobs(\@param);
+
+This routine can either preempt or resume a set of running job steps.  The required parameter is an array of hashes, one element per job step:
+
+ my @preempt = [
+                    {
+                      "type"         => PREEMPT_STEP,
+                      "method"       => LL_PREMPT_SYS_HOLD,
+                      "host_list"    => (),
+                      "user_list"    => (),
+                      "jobstep_list" => (),
+                    },
+               ];
+
+ $rc=ll_preempt_jobs(\@preempt);
+
+The permitted types are
+
+ PREEMPT_STEP
+ RESUME_STEP
+
+and the permitted methods are:
+
+ LL_PREEMPT_SUSPEND
+ LL_PREEMPT_VACATE
+ LL_PREEMPT_REMOVE
+ LL_PREEMPT_SYS_HOLD
+ LL_PREEMPT_USER_HOLD
+
+
+=item ll_move_job
+
+  $rc=ll_move_job($cluster_name,$job_id);
+
+This function moves a single job from one cluster to another in a multi-cluster environment. The syntax has been simplified from the C version by removing the LL_move_job_param list and just supplying the parameters. On success API_OK is returned, anything else the $IBM::LoadLeveler::errObj is set and can be access using ll_error.
+ll_move_spool
+
+=item ll_move_spool
+
+  $rc=ll_move_spool($schedd_host,$directory);
+
+This is yet another function that has been simplified for ease of use. Instead of taking a list of LL_move_spool_param structs, the syntax has been simplified from the C version to only require the target schedd_host and the spool directory containing the job records to be moved.
+
+The user supplied function that this routine could take has been hardcoded with one that prints the error message if there is one.
+
+On success API_OK is returned, anything else the $IBM::LoadLeveler::errObj is set and can be access using ll_error.
+
+=back
+
+=head1 SEE ALSO
+
+L<LoadLeveler>
+L<DataAccess>
+L<perl>.
+
+IBM LoadLeveler for AIX 5L: Using and Administering
+
+=cut

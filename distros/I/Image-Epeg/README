@@ -1,0 +1,27 @@
+Epeg version 0.03
+=================
+
+Epeg is a perl extension for the The Enlightenment Project's Epeg
+library. It must be installed prior to installing this module.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Epeg library 0.9.0.
+  http://sourceforge.net/project/showfiles.php?group_id=2&package_id=125546
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 Michael Curtis
+
+But feel free to go ahead and use it. :)

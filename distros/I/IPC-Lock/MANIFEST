@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/IPC-Lock.t
+t/IPC-Lock-Memcached.t
+lib/IPC/Lock.pm
+lib/IPC/Lock/Memcached.pm
+META.yml                                 Module meta-data (added by MakeMaker)

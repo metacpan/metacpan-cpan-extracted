@@ -1,0 +1,39 @@
+NAME
+    Image::LibExif - Read EXIF. Efficiently
+
+SYNOPSIS
+        use Image::LibExif;
+    
+        my $exif = image_exif("source.jpg");
+        if (defined $exif) {
+            print Dumper $exif;
+        } else {
+            print "Exif not found\n";
+        }
+
+DESCRIPTION
+    Very simple and very fast (about 30 times faster than Image::ExifTool)
+    EXIF extractor, based on libexif.
+
+  EXPORT
+    image_exif
+
+SEE ALSO
+    *   Image::ExifTool - Very powerful EXIF manipulation module, but a bit
+        slow
+
+    *   Image::EXIF - Another EXIF reader, that is an implementation of
+        exiftags in XS. I've encounter a lot segfaults there.
+
+    *   Image::JpegTran - Lossless JPEG transformation utility. XS wrap of
+        jpegtran from libjpeg
+
+AUTHOR
+    Mons Anderson <<<mons@cpan.org>>>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2010 by Mons Anderson
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself
+

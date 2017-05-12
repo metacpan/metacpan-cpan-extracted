@@ -1,0 +1,30 @@
+--- #YAML:1.0
+name:               Image-Base-X11-Protocol
+version:            14
+abstract:           Image::Base drawing into X windows and pixmaps using X11::Protocol.
+author:
+    - Kevin Ryde <user42@zip.com.au>
+license:            gpl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Image::Base:          0
+    perl:                 5.004
+    Test:                 0
+    X11::Protocol:        0.56
+    X11::Protocol::Other:  3
+resources:
+    homepage:  http://user42.tuxfamily.org/image-base-x11-protocol/index.html
+    license:   http://www.gnu.org/licenses/gpl.html
+no_index:
+    directory:
+        - t
+        - inc
+        - devel
+generated_by:       ExtUtils::MakeMaker version 6.57_05
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

@@ -1,0 +1,9 @@
+Changes
+eg/t.ppm
+lib/Image/Magick/Iterator.pm
+lib/Image/Magick/Iterator/PPM.pm
+Makefile.PL
+MANIFEST
+README
+t/Image-Magick-Iterator.t
+META.yml                                 Module meta-data (added by MakeMaker)

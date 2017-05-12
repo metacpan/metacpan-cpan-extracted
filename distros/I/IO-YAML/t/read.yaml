@@ -1,0 +1,33 @@
+# Make sure comments at the beginning of the stream are ignored
+# (see <URL:http://rt.cpan.org/Public/Bug/Display.html?id=29483>)
+---
+hash:
+  bar: 456
+  baz:
+    - one
+    - two
+    - three
+# Make sure comments here
+# are also ignored
+---
+# And here too!
+# What a pain, huh?
+array:
+  - 789
+  - 012
+--- Test inline values, too!
+--- 1
+--- 2
+--- 3
+--- []
+--- {}
+--- ~
+--- !perl/IO::Handle
+what this is: a fake IO::Handle object
+why it exists: >-
+  to make sure Perl objects are loaded as they should be
+---
+# Ignore another comment
+fee: fie
+fo: fum
+# Please ignore this comment, too

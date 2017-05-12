@@ -1,0 +1,191 @@
+Image/Maps/Plot/FromLatLong version 0.1
+=======================================
+
+NAME
+    Image::Maps::Plot::FromLatLong
+    - plots points upon Mercator world/regional map
+
+SYNOPSIS
+            use Image::Maps::Plot::FromLatLong;
+
+            # Get ready
+            $m = new Image::Maps::Plot::FromLatLong (
+                    MAP=>"THE WORLD",
+                    PATH=>"C:/out.html",    # Extension is
+                    irrelevant
+                    FONT=>"C:/winnt/fonts/arial.ttf",
+            );
+
+            # Now, Create an HTML page with images:
+            $m->create_html;
+            # Or just the image
+            $m->create_imagefile;
+            # Or get a reference to an image blob:
+            $m->get_blob;
+
+            # Create HTML pages of all maps in the db, with
+            index
+            my $m = new Image::Maps::Plot::FromLatLong(
+                    FONT=>'c:/winnt/fonts/arial.ttf',
+            );
+            $m->all("C:/");
+
+            # Add a map
+            $Image::Maps::Plot::FromLatLong::MAPS{"LONDON
+            AREA"} = {
+                    FILE =>
+                    'C:\PhotoWebServer\Perl\site\lib\Image\M
+                    aps\Plot\london_bourghs.jpg',
+                    DIM      => [650,640],
+                    SPOTSIZE => 5,
+                    ANCHOR_PIXELS => [447,397],
+                    # Greenwich on the pixel map
+                    ANCHOR_LATLON => [51.466,0],    #
+                    Greenwich lat/lon
+                    ANCHOR_NAME       => 'Greenwich',
+                    ANCHOR_PLACE  => 'Observatory',
+                    ONEMILE         => 19.5,
+                    # 1 km = .6 miles  (10km=180px =
+                    # 10miles=108px)
+            };
+
+            # Create map content on the fly:
+            $maker = new Image::Maps::Plot::FromLatLong(
+                    MAP     => "THE WORLD",
+                    FONT=>'c:/winnt/fonts/arial.ttf',
+                    PATH    => "/Two.foo",
+                    DBFILE  => undef,
+                    LOCATIONS => {
+                      'Lee' => {
+                             'LAT' => '51.592423',
+                             'PLACE' => '#ffff44',
+                             'LON' => '-0.171996'
+                       },
+                      'Lee Again' => {
+                            'PLACE' => '#ffff77',
+                            'LAT' => 46,
+                            'LON' => 16
+                      },
+                    },
+            );
+
+            __END__
+
+DESCRIPTION
+    Plots points defined by latitude/longitude on JPEG
+    Mercator Projection  maps, optionally creating an HTML
+    page with image map to display the image.
+
+PREREQUISITES
+            Data::Dumper;
+            File::Basename;
+            strict;
+            warnings.
+
+            WWW::MapBlast 0.02
+            Image::Thumbnail 0.011
+
+DISTRIBUTION CONTENTS
+    In addition to this file, the distribution uses the
+    included files for default settings: they should be
+    placed in the same directory as the module itself only
+    if you wish to use default settings.
+
+            .earth.dat
+            london_postcodes.jpg
+            uk.jpg
+            world.jpg
+
+    And some other world images to replace world.jpg, if you
+    so choose.
+
+EXPORTS
+    None.
+
+
+NOTES ON LATITUDE AND LONGITUDE
+    After http://www.mapblast.com/myblast/helpFaq.mb#2:
+
+        Zero degrees latitude is the equator, with the North
+        pole at 90 degrees latitude and the South pole at
+        -90 degrees latitude. one degree is approximately 69
+        miles. Greenwich, England is at 51.466 degrees north
+        of the equator.
+
+        Zero degrees longitude goes through Greenwich,
+        England. Again, Each 69 miles from this meridian
+        represents approximately 1 degree of longitude.
+        East/West is plus/minus respectively.
+
+    Actually, latitude and longitude vary depending upon the
+    degree in hand: see The Compton Encyclopdedia for more
+    information.
+
+CAVEATS
+    The exmaple map, london_postcodes.jpg, is inaccurate.
+
+    Whilst degrees of latitude are accurate to two decimal
+    places, Degrees of longitude are taken to be 69 miles:
+    this isn't quite right - see the NOTES ON LATITUDE AND
+    LONGITUDE entry elsewhere in this document. This will be
+    adjusted in a later version.
+
+    All images must be JPEGs - PNG or other support could
+    easily be added.
+
+REVSIONS
+    1.2 Corrected a slight mis-positioning of points.
+
+        Replaced GD with Image::Magick as I was seeing
+        terrible JPEG output
+        with GD.
+
+        Replaced support for non-maintained
+        "Image::GD::Thumbnail" with "Image::Thumbnail";
+        evaluate a require of this at run time rather than
+        using the apparently still shakey pragmas.
+
+        Added methods to create just images and to return
+        references to image blobs.
+
+    1.0 Don't remember.
+
+    0.25
+        Clean IMG path and double-header bugs
+
+    0.23
+        Added more documentation; escaping of href text
+
+    0.22
+        Added thumbnail images to index page
+
+SEE ALSO
+    perl(1); Image::Magick ("http://www.ImageMagick.org");
+    the File::Basename manpage; the Acme::Pony manpage; the
+    Data::Dumper manpage; the WWW::MapBlast manpage; the
+    Image::Thumbnail manpage
+
+AUTHOR
+    Lee Goddard <lgoddard@cpan.org>
+
+COPYRIGHT
+    Copyright (C) Lee Goddard, 2001. All Rights Reserved.
+
+    This module is supplied and may be used under the same
+    terms as Perl itself.
+
+    The public domain maps provided with this distribution
+    are the property of their respective copyright holders.
+
+
+Tool completed successfully
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,4 @@
+
+yum -y install gcc perl-libxml-perl expat-devel openssl openssl-devel
+
+cpan Module::Build Test::Harness Test::Pod Devel::Symdump Test::Pod::Coverage Test::Cmd XML::NamespaceSupport XML::SAX XML::SAX::Expat XML::Parser XML::Simple Crypt::SSLeay Term::ReadKey Data::UUID Module::Starter Compress::Zlib HTML::Tagset HTML::Parser LWP::UserAgent Test::TAP::Model Method::Alias YAML

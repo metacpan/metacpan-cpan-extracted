@@ -1,0 +1,38 @@
+Revision history for IO-Any
+
+0.09    21 Sep 2014
+    - fix dist tests
+
+0.08    20 Sep 2014
+    - fix requires (thanks Przemek Wesołek)
+
+0.07    23 Jan 2013
+    - replace smartmatches
+
+0.06    12 Jan 2013
+    - disabled AnyEvent for MSWin32 (thanks Alexandr Ciornii and Gabor Szabo)
+    - Pod updates
+
+0.05    23 Dec 2012
+    - confess intead of croak for exceptions
+    - allow IO::Uncompress::Bunzip2
+
+0.04    25 Dec 2009
+    - empty string as $what
+    - passing undef as $what will croak
+    - allow typeglobs (*DATA, *STDIN, ...)
+    - file locking
+    - allow atomic writes using IO::AtomicFile
+    - use AnyEvent for slurp() and spew() if loaded
+
+0.03    21 Sep 2009
+    - fixed Pod rendering issues, added L<IO::All>,
+      added SEE ALSO and MOTIVATION sections
+      (RT #49860 - thanks to SREZIC [...] cpan.org) 
+
+0.02    20 Sep 2009
+    - croak open errors
+
+0.01    28 Aug 2009
+        First version, released on an unsuspecting world.
+

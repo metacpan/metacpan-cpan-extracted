@@ -1,0 +1,106 @@
+=head1 NAME
+
+Inline::Tcl - Write Perl subroutines in Tcl.
+
+=head1 SYNOPSIS
+
+   use Inline Tcl => <<END;
+   set asdf 2
+   proc dummy { val } {
+      puts "Dummy says \$::asdf + \$val = [expr \$::asdf + \$val]"
+      incr val
+      return [expr \$::asdf + \$val]
+   }
+   END
+
+   $result = dummy(1);
+   print "But returned $result\n";
+
+The output from this program is:
+   Dummy says 2 + 1 = 3
+   But returned 4
+
+=head1 DESCRIPTION
+
+The C<Inline::Tcl> module allows you to put Tcl source code
+directly "inline" in a Perl script or module. A Tcl interpreter
+is loaded and the Tcl code is interpreted, then Perl asks the
+Tcl interpreter which global procedures have been defined. Those 
+functions are made available to your Perl program as if they had 
+been written in Perl.
+
+The process of interrogating the Tcl interpreter for globals only
+occurs the first time you run your Tcl code. The namespace is
+cached, and subsequent calls use the cached version.
+
+=head1 Using the Inline::Tcl Module
+
+C<Inline::Tcl> is based primarily on the C<Inline::Python> module.
+
+This section will explain the different ways to C<use> Inline::Tcl.
+
+=head2 The Basics: Functions
+
+The most basic form for using C<Inline::Tcl> is:
+
+   use Inline Tcl => 'Tcl source code';
+
+Of course, you can use Perl's "here document" style of quoting to make 
+the code slightly easier to read:
+
+   use Inline Tcl => <<'END';
+
+     Tcl source code goes here.
+
+   END
+
+The source code can also be specified as a filename, a subroutine
+reference (sub routine should return source code), or an array
+reference (array contains lines of source code). This information
+is detailed in 'perldoc Inline'.
+
+=head1 SUPPORTED PLATFORMS
+
+This is an ALPHA release of Inline::Tcl. Further testing and
+expanded support for other operating systems and platforms will be a
+focus for future releases. It will probably only run on linux.  If it
+works for you, let me know.
+
+=head1 SEE ALSO 
+
+For information about using C<Inline>, see L<Inline>.
+
+For information about other Inline languages, see L<Inline-Support>.
+
+Inline::Tcl's mailing list is inline@perl.org
+
+The subscribe, send email to inline-subscribe@perl.org
+
+=head1 BUGS AND DEFICIENCIES
+
+When reporting a bug, please do the following:
+
+ - Put "use Inline REPORTBUG;" at the top of your code, or 
+   use the command line option "perl -MInline=REPORTBUG ...".
+ - Run your code.
+ - Follow the printed instructions.
+
+=head1 AUTHOR
+
+Ryan Sadler <RRS@cpan.org>
+
+Brian Ingerson <INGY@cpan.org> is the author of Inline, Inline::C and
+Inline::CPR.  Neil Watkiss <NEILW@cpan.org> is the author of 
+Inline::Python.
+
+=head1 COPYRIGHT
+
+Copyright (c) 2001, Ryan Sadler.
+
+All Rights Reserved. This module is free software. It may be used,
+redistributed and/or modified under the terms of the Perl Artistic
+License.
+
+(see http://www.perl.com/perl/misc/Artistic.html)
+
+=cut

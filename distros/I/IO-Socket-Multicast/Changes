@@ -1,0 +1,64 @@
+Revision history for Perl extension IO-Socket-Multicast
+1.12    - Wed Apr 28 20:38:53 EST 2010
+	Test adjustments thankyou Christian W. (BRAMBLE)
+	Documentation updates and corrections (BRAMBLE)
+
+1.11	- Wed Nov  4 13:48:18 EST 2009
+	More test adjustments /re Win32 (BRAMBLE)
+1.09
+	Refactored tests to prevent false negatives on Win32 (ADAMK)
+
+1.08	Mon Nov  2 11:23:33 EST 2009
+	Test fixes and spelling corrections (BRAMBLE)
+
+1.07	Tue Jul 14 12:54:46 EDT 2009
+        Patches to run correctly on Windows platforms under Perl 5.10
+		courtesy Andrew Bramble
+        Regression test fixes.
+
+1.06    Beta test
+
+1.05	Sat Aug 12 17:28:41 EDT 2006
+	Run correctly on Windows platforms under Perl 5.8.8.
+
+1.03-1.04 Fri Dec  2 10:44:35 EST 2005
+	Various fixes to compile cleanly on Windows platforms.
+
+1.02	Thu Nov 17 12:04:21 EST 2005
+	Skip regression test #4 (mcast_drop) because it always fails
+		on windows platforms. This
+		should not affect functionality, as the test asks
+		mcast_drop() to return a false value when dropping
+		an address twice.
+
+1.01	July 5, 2005
+	All symbols now in IO::Socket::Multicast package
+            (some were in IO::Socket in previous versions)
+	Incorporates patches to compile cleanly on Win32 systems,
+		contributed by Thomas Kratz.
+
+1.00	April 9, 2005
+	Reconstructed module after CVS server crash.
+	Fixed documentation errors
+
+0.25	August 25, 2001
+        Document ReuseAddr
+
+0.11	August 1, 2000
+	Fixed core dumps on some systems.
+	Added warnings about broken linuxes.
+	IO::Interface 0.94 is now a prerequisite.
+
+0.10  July 18, 2000
+	Documentation bug fixes
+
+0.03  July 18, 2000
+	Turned into a subclass of IO::Socket::INET
+
+0.02  July 17, 2000
+	First release
+
+0.01  Fri Mar 31 11:28:47 2000
+	- original version; created by h2xs 1.20 with options
+		-n Ioctl::Atmark -cf
+

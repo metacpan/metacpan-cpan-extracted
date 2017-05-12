@@ -1,0 +1,106 @@
+Note:  As of November 12, 2011 this list is outdated.  However, there seems
+to be no good reason to invest time in updating it, since the CPAN Testers
+Matrix is a more thorough, fully automated, and publically viewable resource
+for determining what works and what doesn't.
+
+If you have concerns over where Inline::CPP passes the smoke tests
+please have a look at the test matrix here:
+
+http://www.cpantesters.org/distro/I/Inline-CPP.html
+
+If you experience difficulty installing on your system, please do get in
+touch with David Oswald <davido@cpan.org>.  Your input might be just what's
+needed to improve the install experience for others.
+
+
+This list will be kept as-is for historical reasons, but do refer to the
+CPAN Testers Matrix for more up to date information.
+
+# ----------------- Outdated TESTED content follows -------------------------
+
+This is a list I try to keep as up-to-date as possible with the state
+of the module. This list is known to be up to date with Inline::CPP
+version 0.20.
+
+Key to reading this list:
+ACROSS: Arch/OS/Compiler    -or-    Arch/Compiler
+DOWN:   Perl Version
+CELLS:  PASS|FAIL(tester's initials)
+
+#============================================================================
+    Linux/Alpha/GCC Linux/x86/GCC   OpenBSD/x86/GCC Linux/PPC/GCC
+5.005   PASS(nw)    PASS(nw)
+5.6.0   PASS(nw)    PASS(nw)
+5.6.1   PASS(nw)                    PASS(sor)
+5.7.0   PASS(nw)
+5.7.1   PASS(nw)
+AP623   PASS(nw)
+AP626   PASS(nw)
+#============================================================================
+    Sun2.5.1/GCC    Sun2.5.1/Sun    SunOS5.6/GCC    SunOS5.6/Sun
+5.005                   PASS(nw)    PASS(nw)
+5.6.0
+5.6.1
+5.7.0
+#============================================================================
+    Sun5.7/GCC  Sun5.7/Sun  Sun5.8/GCC  Sun5.8/Sun
+5.005
+5.6.0
+5.6.1                           PASS(dsb)
+5.7.0
+#============================================================================
+    HPUX11/GCC  HPUX11/HP   HPUX10.20/GCC   HPUX10.20/HP
+5.005
+5.6.1
+5.7.0
+#============================================================================
+    AIX/GCC     AIX/IBM
+5.005
+5.6.1
+5.7.0
+#============================================================================
+    Win32/MS    Win32/Cyg
+AP623   PASS(nw)
+5.005
+5.6.1           PASS(nw)
+5.7.0
+#============================================================================
+
+Special Configurations:
+
+This section describes special settings needed to make Inline::CPP work on
+certain platforms.
+
+ o On Solaris using the SUNWspro compiler, you'll need to use these settings:
+     compiler: 'CC'
+     library:  '-lCrun'
+   Note that if you use any of the "special" C++ things like cout or cin,
+   you'll need to add other libraries (and I'm not sure what they are).
+   On my box, I needed these flags:
+     library:  '-lCrun -L/opt/SUNWspro/WS6/lib -lCstd'
+
+Things to watch out for:
+
+ o LD_LIBRARY_PATH: If your c++ compiler is intalled in /usr/local, the
+   libstdc++ library might not be found. You can export LD_LIBRARY_PATH on
+   most systems to extend the search to the nonstandard paths. See the
+   ldconfig manpage for more information.
+
+ o You need to make sure the c++ compiler you use is compatible with the
+   version of perl you are using. For instance, when using perl built with
+   gcc, you should use g++ as the c++ compiler. If your perl was built with
+   the SUNWspro compiler, it's probably best to use the SUNWspro compiler to
+   build your c++ extensions.
+
+ o If Inline::CPP fails to bind to valid C++ code and you're running Perl
+   5.005, check the Inline::CPP manpage to see if you've hit one of the known
+   cases where Inline::CPP needs Perl 5.6.0 or better. You may be able to
+   adjust your code slightly to make it match. Or you can upgrade your Perl
+   to the current version and forget all about it forever.
+
+Who are the testing people?
+nw  Neil Watkiss    NEILW@cpan.org
+bi  Brian Ingerson  INGY@cpan.org
+ks  Ken Simpson KenS@ActiveState.com
+dsb David Boyce dsb@world.std.com
+sor Sean O'Rourke   educated_foo@yahoo.com

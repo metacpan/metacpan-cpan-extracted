@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+    <mime-type type="image/ajpeg">
+        <comment>Animated JPEG Image</comment>
+        <icon name="image/ajpeg"/>
+        <glob-deleteall/>
+        <glob pattern="*.ajpeg"/>
+    </mime-type>
+</mime-info>

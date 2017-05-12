@@ -1,0 +1,135 @@
+DESCRIPTION
+    This is the guts of ICal::QuickAdd, of interest to developers. Most
+    users probably want the docs of iqa instead, which is a script which
+    uses this module.
+
+  new()
+      $iqa = ICal::QuickAdd->new('tomorrow at noon. Lunch with Bob') ;
+
+      # Default to expecting a email message with the SMS in body, On STDIN
+      $iqa = ICal::QuickAdd->new();
+
+  parse_date_and_summary()
+       $iqa->parse_date_and_summary($msg);
+
+    Takes a string, such as short SMS text, and parses out a date and event
+    summary from it.
+
+    Right now it's sort of dumb. It expects the event description to come
+    first, followed by a period, and then a summary. Example:
+
+     tomorrow at noon. Lunch with Bob
+
+    The dot was chosen as the delimiter because my cell phone allows me to
+    type it directly, using the "1" key.
+
+    Limitations: A future version should also return an "$is_date" flag, to
+    note if the date found was a date or a date and time.
+
+  inject_into_ics()
+        $iqa->inject_into_ics($filename);
+
+    Injects a valid ical event block into the env entry into the end of
+    $filename, which is assumed to be a valid iCalendar file. If that
+    assumption is wrong, the file could be corrupted. Use the is_ical_file()
+    to check first!
+
+    Bugs: Currently always injects a Unix newline. This could corrupt an ICS
+    file with with CRLF line entries.
+
+  parsed_string()
+     my $desc = $iqa->parsed_string;
+
+    Return a short description. Useful for confirming to the user how the
+    Quick Add string was parsed.
+
+    Limitations: the description returned currently always includes
+    hours/minute compontent and is in 24 hour time.
+
+  as_vevent()
+     my $vevent = $iqa->as_vevent;
+
+    Return a Data::ICal::Entry::Event object representing the event.
+
+    For now, hard-code a one hour duration
+
+  as_ical()
+     my $data_ical = $iqa->as_ical;
+
+    Returns a Data::ICal object with the "PUBLISH" method set.
+
+    The PUBLISH method is used when mailing iCalendar events.
+
+  as_ical_email()
+     my $email_simple_obj = $iqa->as_ical_email(
+            To    => $your_regular_email,
+            From  => $from_email, # Defaults to $iqa->from_email
+      );
+
+    Returns a ready-to-mail Email::Simple object with an iCalendar body.
+    Extra headers can be passed in.
+
+  from_email()
+    Returns the 'from' email address. It can also be used as a check to see
+    if the SMS came from an email at all, since will only be set in that
+    case.
+
+  from_email_obj()
+    If the input was an email, returns the object representing the incoming
+    message. Currently a Mail::Audit object.
+
+  get_msg()
+     Return the event name found in the SMS message.
+
+  get_dt()
+    Returns DateTime object found in SMS.
+
+CONTRIBUTING
+    This project is managed using the darcs source control system (
+    http://www.darcs.net/ ). My darcs archive is here:
+    http://mark.stosberg.com/darcs_hive/ICal-QuickAdd
+
+    Contributing a patch can be as easy as:
+
+     darcs get http://mark.stosberg.com/darcs_hive/ICal-QuickAdd
+     cd ICal-QuickAdd
+     # hack...
+     darcs record
+     darcs send
+
+AUTHOR
+    Mark Stosberg "mark@summersault.com"
+
+LICENSE AND COPYRIGHT
+    Copyright (c) 2007, Mark Stosberg "mark@summersault.com". All rights
+    reserved.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. See "perldoc perlartistic".
+
+DISCLAIMER OF WARRANTY
+    BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+    FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+    OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+    PROVIDE THE SOFTWARE ''AS IS'' WITHOUT WARRANTY OF ANY KIND, EITHER
+    EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+    ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+    YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+    NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+    IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+    WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+    REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE
+    TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR
+    CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE
+    SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+    RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+    FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+    SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+    DAMAGES.
+
+    1;
+
+    # vim: nospell
+

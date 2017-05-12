@@ -1,0 +1,17 @@
+#!/bin/sh
+
+find lib/ -name \*.pm|sort|awk '{
+    gen=$1;
+    gsub("lib", "gen/tmp", gen);
+    print "sdiff -w 200 "$1" "gen"|less";
+}'>sdiff-all
+
+find lib/ -name \*.pm|sort|awk '{
+    gen=$1;
+    gsub("lib", "gen/tmp", gen);
+    print "diff  "$1" "gen;
+}'>diff-all
+
+find lib/ -name \*.pm|sort|awk '{
+    print "pod2man "$1"|nroff -man|less -r";
+}'>pod-all

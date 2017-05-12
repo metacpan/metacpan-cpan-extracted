@@ -1,0 +1,35 @@
+
+=== version history for IOMux
+
+version 1.00: Wed 11 Nov 12:30:46 CET 2015
+
+	Changes:
+	- rename IO::Mux method names like mux_input, into muxInput.  Old
+	  names still work.
+
+	Fixes:
+	- also skip t/50* for Windows
+
+	Improvements:
+	- new documentation style
+	- rename examples/daemon.pl into examples/echo-daemon.pl
+	- remove immature examples/test.pl
+
+version 0.13: Tue Jul 21 14:01:51 CEST 2015
+	- manual documentation improvements.
+	- move comparison to other module into IOMux::Alternatives.
+	- remove eval{} from the examples, because Any::Daemon v0.12
+	  not has this by default.
+	- rarely, the regression test t/11* showed a race
+
+version 0.12: Thu Jan 27 12:34:17 CET 2011
+	- cpan namespace collission, moved IO::Mux -> IOMux
+	- missing dependency on Log::Report [cpantesters]
+
+version 0.11: Wed Jan 26 16:29:12 CET 2011
+	- bug-fixes and many extensions
+	- first public release, to see what cpantesters find.
+
+version 0.10: Fri Jan  7 09:47:16 CET 2011
+	- initial version (not released)
+

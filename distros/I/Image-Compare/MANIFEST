@@ -1,0 +1,29 @@
+Changes
+lib/Image/Compare.pm
+lib/Image/Compare/AVG_THRESHOLD.pm
+lib/Image/Compare/Comparator.pm
+lib/Image/Compare/EXACT.pm
+lib/Image/Compare/IMAGE.pm
+lib/Image/Compare/THRESHOLD.pm
+lib/Image/Compare/THRESHOLD_COUNT.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01_basic.t
+t/04_avg_threshold.t
+t/05_exact.t
+t/06_image.t
+t/07_threshold.t
+t/08_threshold_count.t
+t/09_matchmask.t
+t/helper.pm
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/sample.gif
+t/sample.jpeg
+t/sample.png
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

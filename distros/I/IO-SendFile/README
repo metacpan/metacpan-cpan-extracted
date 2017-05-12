@@ -1,0 +1,14 @@
+IO::SendFile - Perl extension that implements the sendfile() interface.
+
+use IO::SendFile qw( sendfile ); # import the senfile function
+sendfile( fileno(OUT), fileno(IN), $offset, $count );
+# Send file everything from filehandle IN from offset	
+# $offset and send $count bytes.
+
+IO::SendFile implements the sendfile() function call.  This version
+only works on linux and has only been tested on a kernel 2.2.16.
+
+If you have questions, comments or suggestions send to
+Arnar M. Hrafnkelsson, addi@umich.edu
+
+This module is released under the same terms as perl itself.

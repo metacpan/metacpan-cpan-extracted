@@ -1,0 +1,6 @@
+Revision history for Perl extension Insolation.
+
+0.01  Mon Sep 13 10:48:46 2010
+	- original version; created by h2xs 1.23 with options
+		-AX -n Insolation -b 5.8.0
+

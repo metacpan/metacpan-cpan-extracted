@@ -1,0 +1,6 @@
+Revision history for Perl extension IO::Language.
+
+0.01  Thu Sep 19 11:19:53 2002
+	- original version; created by h2xs 1.2 with options
+		-XAn IO::Language
+

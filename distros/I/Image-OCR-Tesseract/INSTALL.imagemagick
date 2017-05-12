@@ -1,0 +1,9 @@
+# INSTALL.imagemagick
+# ===================
+#
+# Installing the proper imagemagick deps can be tricky.
+
+yum -y install ImageMagick-perl
+cpan Image::Magick
+
+

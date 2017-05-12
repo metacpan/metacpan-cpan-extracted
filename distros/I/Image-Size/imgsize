@@ -1,0 +1,204 @@
+#!/usr/bin/env perl
+
+###############################################################################
+#
+# This file copyright (c) 2010-2012 by Randy J. Ray, all rights reserved
+#
+# Copying and distribution are permitted under the terms of the Artistic
+# License 2.0 (http://www.opensource.org/licenses/artistic-license-2.0.php) or
+# the GNU LGPL (http://www.opensource.org/licenses/lgpl-2.1.php).
+#
+###############################################################################
+#
+# No-brainer to size an image supplied on the command-line. All the real
+# work is done in Image::Size.
+
+use strict;
+use warnings;
+use vars qw($VERSION);
+
+use File::Basename 'basename';
+use Getopt::Std;
+
+use Image::Size qw(:all);
+
+$VERSION = '1.001';
+$VERSION = eval $VERSION; ## no critic(ProhibitStringyEval)
+
+my $cmd = basename $0;
+my ($rtn, %opts);
+
+getopts('hraf:', \%opts);
+
+# Usage reporting: if -h, or no @ARGV, or more than one of the rest...
+if ($opts{h} || (! @ARGV) ||
+    (($opts{a} && $opts{r}) || ($opts{a} && $opts{f}) ||
+     ($opts{r} && $opts{f})))
+{
+    die "Usage: $cmd [ -r | -a | -f fmt ] file ...\n";
+}
+
+$rtn = \&return_html;
+$opts{a} &&
+    ($rtn = \&return_attr);
+$opts{r} &&
+    ($rtn = \&return_imgsize);
+$opts{f} &&
+    ($rtn = \&return_fmt);
+
+if (@ARGV > 1)
+{
+    foreach (@ARGV)
+    {
+        printf "$_: %s\n", $rtn->($_);
+    }
+}
+else
+{
+    printf "%s\n", $rtn->($ARGV[0]);
+}
+
+exit 0;
+
+sub return_html
+{
+    my $file = shift;
+
+    my ($width, $height, $err) = imgsize($file);
+
+    return (defined $width) ?
+        qq(width="$width" height="$height") : "error: $err";
+}
+
+sub return_attr
+{
+    my $file = shift;
+
+    my ($width, $height, $err) = imgsize($file);
+
+    return (defined $width) ?
+        "(-width => $width, -height => $height)" : "error: $err";
+}
+
+sub return_imgsize
+{
+    my $file = shift;
+
+    my ($width, $height, $err) = imgsize($file);
+
+    return (defined $width) ? "$width $height" : "error: $err";
+}
+
+sub return_fmt
+{
+    my $file = shift;
+
+    my ($width, $height, $err) = imgsize($file);
+
+    return (defined $width) ?
+        sprintf($opts{f}, $width, $height, $err) : "error: $err";
+}
+
+__END__
+
+=head1 NAME
+
+imgsize - read the dimensions of an image in several popular formats
+
+=head1 USAGE
+
+ imgsize [ -r | -a | -f fmt ] file [ file ... ]
+
+=head1 DESCRIPTION
+
+No-brainer to size an image supplied on the command-line. All the real
+work is done in L<Image::Size|Image::Size>.
+
+=head1 REQUIRED ARGUMENTS
+
+B<imgsize> expects file names on the command-line. If more than one file is
+provided, the file name will be included in the output:
+
+    % imgsize dot.gif
+    width="16" height="16"
+    % imgsize dot.gif dash.gif
+    dot.gif: width="16" height="16"
+    dash.gif: width="32" height="8"
+
+=head1 OPTIONS
+
+By default, the width and height are returned as attributes for an IMG tag in
+HTML, essentially C<width="40" height="30"> or similar. The following options
+may be used to return alternate formats (all report width first, then height):
+
+=over
+
+=item C<-r>
+
+Return "raw" format data. Just the numbers separated by a single space.
+
+=item C<-a>
+
+Return a Perl-style list of attributes suitable for passing to the C<img()>
+method of the CGI module (see L<CGI|CGI>).
+
+=item C<-f> B<fmt>
+
+Pass the string specified in I<fmt> to C<sprintf> and thus use it to format
+the results to your taste. C<sprintf> will be passed two numbers, so any
+other formatting directives will be lost. The numbers are passed as width
+first, then height.
+
+=back
+
+=head1 EXIT STATUS
+
+B<imgsize> always exits
+
+=head1 BUGS
+
+Please report any bugs or feature requests to
+C<bug-image-size at rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Image-Size>. I will be
+notified, and then you'll automatically be notified of progress on
+your bug as I make changes.
+
+=head1 SUPPORT
+
+=over 4
+
+=item * RT: CPAN's request tracker
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Image-Size>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Image-Size>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Image-Size>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/Image-Size>
+
+=item * Project page on GitHub
+
+L<http://github.com/rjray/image-size>
+
+=back
+
+=head1 LICENSE AND COPYRIGHT
+
+Copying and distribution are permitted under the terms of the Artistic
+License 2.0 (L<http://www.opensource.org/licenses/artistic-license-2.0.php>) or
+the GNU LGPL 2.1 (L<http://www.opensource.org/licenses/lgpl-2.1.php>).
+
+=head1 SEE ALSO
+
+L<Image::Size|Image::Size>
+
+=head1 AUTHOR
+
+Randy J. Ray C<< <rjray@blackperl.com> >>.

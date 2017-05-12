@@ -1,0 +1,15 @@
+0.03 2013-11-07
+ - Add dependency for perl (based on Error::Pure).
+ - Update examples/ directory.
+
+0.02 2013-09-21
+ - Add LICENSE file.
+ - Add SIGNATURE file.
+ - Add Test::NoWarnings to tests.
+ - Fix tests.
+ - Indent::Word: Remove trailing whitespace on end of string.
+ - Rename CHANGES to Changes.
+ - Rewrite Changes file to CPAN::Changes::SPEC format.
+
+0.01 2012-08-23
+ - First version.

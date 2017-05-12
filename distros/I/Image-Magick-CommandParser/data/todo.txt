@@ -1,0 +1,13 @@
+TODO
+====
+
+o Input file formats:
+- Frames. E.g.: 'images.gif[0-3]'
+- Image regions. E.g.: -resize '@10000' or '10000@'
+- File name references such as image-%d.jpg[1-5]
+- Stream buffering
+- label:"Text" and text:-'[0]'
+
+o One day:
+- Split things like geometry. So 500x600 => 500, 600.
+

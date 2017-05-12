@@ -1,0 +1,44 @@
+--- #YAML:1.0
+name: IRC-Bot-Hangman
+version: 0.1
+license: perl
+distribution_type: module
+requires:
+  Bot::BasicBot: 0
+  Chatbot::Eliza: 0
+  Games::GuessWord: 0
+  Module::Find: 0
+  Regexp::Common: 0
+  perl: 5.6.0
+recommends: {}
+build_requires:
+  Test::More: 0
+  Test::Pod: 0
+  Test::Simple: 0
+conflicts: {}
+dynamic_config: 0
+provides:
+  IRC::Bot::Hangman:
+    file: lib/IRC/Bot/Hangman.pm
+    version: 0.1
+  IRC::Bot::Hangman::Command:
+    file: lib/IRC/Bot/Hangman/Command.pm
+  IRC::Bot::Hangman::Command::Default:
+    file: lib/IRC/Bot/Hangman/Command/Default.pm
+  IRC::Bot::Hangman::Command::Eliza:
+    file: lib/IRC/Bot/Hangman/Command/Eliza.pm
+  IRC::Bot::Hangman::Command::Profanity:
+    file: lib/IRC/Bot/Hangman/Command/Profanity.pm
+  IRC::Bot::Hangman::Response:
+    file: lib/IRC/Bot/Hangman/Response.pm
+  IRC::Bot::Hangman::Response::Default:
+    file: lib/IRC/Bot/Hangman/Response/Default.pm
+  IRC::Bot::Hangman::Response::Profanity:
+    file: lib/IRC/Bot/Hangman/Response/Profanity.pm
+  IRC::Bot::Hangman::WordList:
+    file: lib/IRC/Bot/Hangman/WordList.pm
+  IRC::Bot::Hangman::WordList::Default:
+    file: lib/IRC/Bot/Hangman/WordList/Default.pm
+  IRC::Bot::Hangman::WordList::TooEasy:
+    file: lib/IRC/Bot/Hangman/WordList/TooEasy.pm
+generated_by: Module::Build version 0.21

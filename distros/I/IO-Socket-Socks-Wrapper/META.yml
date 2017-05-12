@@ -1,0 +1,24 @@
+---
+abstract: 'Add SOCKS support for any perl object / package / program'
+author:
+  - 'Oleg G <oleg@cpan.org>'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '6.52'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: IO-Socket-Socks-Wrapper
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  IO::Socket::Socks: '0.73'
+resources:
+  repository: https://github.com/olegwtf/p5-IO-Socket-Socks-Wrapper
+version: '0.17'

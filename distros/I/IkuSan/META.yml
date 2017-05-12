@@ -1,0 +1,48 @@
+---
+abstract: 'IkuSan is IRC reaction bot framework.'
+author:
+  - 'mix3 <himachocost333@gmail.com>'
+build_requires:
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.11.0, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: IkuSan
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  IkuSan:
+    file: lib/IkuSan.pm
+    version: 0.01
+requires:
+  AnyEvent::ForkManager: 0
+  AnySan: 0
+  Encode: 0
+  Furl: 0
+  Getopt::Long: 0
+  Plack::Request: 0
+  Try::Tiny: 0
+  Twiggy::Server: 0
+  perl: v5.10.0
+resources:
+  bugtracker: https://github.com/mix3/p5-IkuSan/issues
+  homepage: https://github.com/mix3/p5-IkuSan
+  repository: https://github.com/mix3/p5-IkuSan.git
+version: 0.01
+x_contributors:
+  - 'mix3 <himachocost333@hotmail.co.jp>'

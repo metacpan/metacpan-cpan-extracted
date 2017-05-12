@@ -1,0 +1,49 @@
+# TODO: Add Troubleshooting.pm
+# TODO: Add FAQ.pm
+# TODO: Document examples
+
+0.10 20140907
+    . Documentation/installation hints, you need the dev versions of libpng and libjpg (ISYNC)
+    . Example programs now use 'warnings.pm'
+    . Sorry, no features included...
+
+0.09 20140322
+    . Clean up MANIFEST, some files were not packaged
+
+0.08 20130907
+    . New upstream release merged
+      Sorry, no features included...
+
+0.07 20130129
+    . New upstream release merged
+      Sorry, no features included...
+
+0.06 20120630
+    . New upstream release, as upstream has now a major version change (0.1)
+
+0.05 20120407
+    . Fixed URL for lightning talk
+    ! Updated to new version of (unstable) CCV library
+
+0.04 20120310
+    . Make test more resilient against floating point differences
+    . Make library header checking more specific
+
+0.03 20120308
+    . Fixed link to lightning talk presenting the module
+    . Use Devel::CheckLib to check for libpng, jpeglib and
+      (on non-Win32) alloca.h
+    . We always force -msse2 currently. This likely does not work on
+      MSVC.
+    . Added examples as Examples.pm
+
+0.02 20120306
+    . Try to fix build problem on Solaris x86
+      The CCFLAGS were not passed through but overwritten.
+    . Moved C code into .c file and only link to it from XS
+    . Add List::Util to the prerequisites
+    . Add tool for automatic extraction of face-thumbnails
+    . Removed images from distribution
+
+0.01 20120303
+    . Released unto an unsuspecting world

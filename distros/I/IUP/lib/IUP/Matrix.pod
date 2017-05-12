@@ -1,0 +1,1483 @@
+=for comment based on iup-3.5 - http://www.tecgraf.puc-rio.br/iup/en/ctrl/iupmatrix.html
+
+=head1 NAME
+
+IUP::Matrix - [GUI element] matrix of alphanumeric fields
+
+=head1 DESCRIPTION
+
+Creates a matrix of alphanumeric fields. Therefore, all values of the
+matrixs fields are strings. The matrix is not a grid container like
+many systems have.
+
+It has two modes of operation: normal and callback mode. In normal
+mode, string values are stored in attributes for each cell. In callback
+mode these attributes are ignored and the cells are filled with strings
+returned by the "VALUE_CB" callback. So the existence of this callback
+defines the mode the matrix will operate.
+
+=begin HTML
+
+<p><img src="http://kmx.github.io/perl-iup/img-3.9/ctrl/iupmatrix1.png"></p><p><img src="http://kmx.github.io/perl-iup/img-3.9/ctrl/iupmatrix2.png"></p>
+
+=end HTML
+
+=head1 USAGE
+
+=head2 CREATION - new() method
+
+ $matrix = IUP::Matrix->new( NUMCOL=>5, NUMCOL_VISIBLE=>2, NUMLIN=>8, NUMLIN_VISIBLE=>3 );
+
+B<Returns:> the identifier of the created element, or C<undef> if an error occurs.
+
+NOTE: You can pass to C<new()> other C<ATTRIBUTE=E<gt>'value'> or C<CALLBACKNAME=E<gt>\&func> pairs relevant
+to this element - see L<IUP::Manual::02_Elements|IUP::Manual::02_Elements/"new()">.
+
+=head2 Storage
+
+Before mapped to the native system, all attributes are stored in the
+hash table, independently from the size of the matrix or its operation
+mode. The action attributes like ADDLIN and DELCOL will NOT work.
+
+When the matrix is mapped, and it is NOT in callback mode, then the
+cell values and mark state are moved from the hash table to an internal
+storage at the matrix. Other cell attributes remains on the hash table.
+Cell values with indices greater than (NUMLIN,NUMCOL) are ignored. When
+in callback mode cell values stored in the hash table are ignored.
+
+=head2 Callback Mode
+
+Very large matrices must use the callback mode to set the values, and
+not the regular value attributes of the cells. The idea is the
+following:
+
+=over
+
+=item 1. Register the VALUE_CB callback
+
+=item 2. No longer set the value of the cells. They will be set one by one
+by the callback. Note that the values of the cells must now be stored
+by the user.
+
+=item 3. If the matrix is editable, set the VALUE_EDIT_CB callback.
+
+=item 4. When the matrix must be invalidated, use the REDRAW attribute to
+force a matrix redraw.
+
+=back
+
+A negative aspect is that, when VALUE_CB is defined, after it is mapped
+the matrix never verifies attributes of type L:C again.
+
+If callback VALUE_CB is defined and VALUE_EDIT_CB is not defined when the matrix
+is mapped then READONLY will be set to YES.
+
+=head2 Number of Cells
+
+If you do not plan to use ADDLIN nor ADDCOL, and plan to set sparse
+cell values, then you must set NUMLIN and NUMCOL before mapping.
+
+=head2 Titles
+
+A matrix might have titles for lines and columns. Titles are always non
+scrollable, non editable and presented with a different default
+background color. A matrix will have a line of titles if an attribute
+of the C<"(L):0"> type is defined, where L is a line number, or if the
+HEIGHT0 attribute is defined. It will have a column of titles if an
+attribute of the C<"0:(C)"> type is defined, where C is a column number,
+or if the WIDTH0 attribute is defined.
+
+When allowed the width of a column can be changed by holding and
+dragging its title right border, see RESIZEMATRIX.
+
+Any cell can have more than one text line, just use the \n control
+character. Multiple text lines will be considered when calculating the
+title cell size based on its contents. The contents of ordinary cells
+(not a title) do not affect the cell size.
+
+=head2 Natural Size
+
+The Natural size is calculated using only the title cells size plus the
+size of NUMCOL_VISIBLE and NUMLIN_VISIBLE cells, but it is also
+affected if SCROLBAR is enabled. The natural height is the sum of the
+line heights from line 0 to NUMLIN_VISIBLE (inclusive). The natural
+width is the sum of the column width from column 0 to NUMCOL_VISIBLE
+(inclusive). Notice that since NUMCOL_VISIBLE and NUMLIN_VISIBLE do not
+include the titles then NUMCOL_VISIBLE+1 columns and NUMLIN_VISIBLE+1
+lines are included in the sum.
+
+The height of a line L depends on several attributes, first it checks
+the HEIGHTI<L> attribute, then checks RASTERHEIGHTI<L>, then when
+USETITLESIZE=YES or not in callback mode the height of the title text
+for the line or if L=0 it searches for the highest column title, if
+still could not define a height then if L!=0 it will use HEIGHTDEF, if
+L=0 then height will be 0.
+
+A similar approach is valid for the column width. The width of a column
+C first checks the WIDTHI<C> attribute, then checks RASTERWIDTHI<C>,
+then when USETITLESIZE=YES or not in callback mode the width of the
+title text for the column or if C=0 it searches for the widest line
+title, if still could not define a width then if C!=0 it will use
+WIDTHDEF, if C=0 then height will be 0.
+
+=head2 Virtual Size
+
+When the scrollbars are enabled if the matrix area is greater than the
+visible area then scrollbars will be displayed so the cells can be
+scrolled to be visible area. When dragging the scrollbar the position
+of cells is free, when clicking on its buttons it will move in cell
+steps, aligning to the left border of the cell.
+
+By default EXPAND=Yes, so matrix will be automatically resized when the
+dialog is resized. So more columns and lines will be displayed. But the
+matrix Natural size will be used as minimum size. To remove the minimum
+size limitation set NUMCOL_VISIBLE and NUMLIN_VISIBLE to 0 after
+showing it for the first time.
+
+=head2 Keyboard Navigation
+
+Keyboard navigation through the matrix cells outside the edition mode
+is done by using the following keys:
+
+=over
+
+=item * B<Arrows>: Moves the focus to the next cell, according to the arrows direction.
+
+=item * B<Page Up> and B<Page Down>: Moves a visible page up or down.
+
+=item * B<Home>: Moves the focus to the fist column in the line.
+
+=item * B<Home> B<Home>: Moves the focus to the upper left corner of the visible page.
+
+=item * B<Home> B<Home> B<Home>: Moves the focus to the upper left corner of the first page of the matrix.
+
+=item * B<End>: Moves the focus to the last column in the line.
+
+=item * B<End> B<End>: Moves the focus to the lower right corner of the visible page.
+
+=item * B<End> B<End> B<End>: Moves the focus to the lower right corner of the last page in the matrix.
+
+=item * B<F2>, B<Enter> or B<Space>: enters editing mode.
+
+=item * B<Del>: remove the selected cells contents.
+
+=back
+
+When the matrix is outside the edition mode, pressing any character key
+makes the current key to enter in the edition mode, the old text is
+replaced by the new one being typed. If B<F2, Enter> or B<Space> is
+pressed, the current cell enters the edition mode with the current text
+of the cell. Double-clicking a cell also enters the edition mode (in
+Motif the user must click again to the edit control get the focus).
+
+When using the keyboard to change the focus cell if the limit of the
+visible area is reached then the cells are automatically scrolled. Also
+if a cell partially visible is edited then first it is scrolled to the
+visible area.
+
+Inside the B<edition mode>, the following keys are used for a text
+field:
+
+=over
+
+=item * B<Left>, B<Right>, B<Up> and B<Down arrows>: if the caret is at the
+extremes of the text being edited then leave the edition mode and moves
+the focus accordingly. The value is confirmed.
+
+=item * B<Ctrl + arrows>: leave the edition mode and moves the focus
+accordingly independent of caret position. The value is confirmed.
+
+=item * B<Enter>: leave the edition mode. The value is confirmed. Moves
+the focus to the cell below.
+
+=item * B<Esc>: leave the edition mode. The new value is ignored and
+the old value remains.
+
+=back
+
+The cell will also leave the edition mode if the user clicked in
+another cell or in another control, then the value will be confirmed.
+When pressing B<Enter> to confirm the value the focus goes to the cell
+below the current cell, if at the last line then the focus goes to the
+cell on the left. The value confirmation depends on the EDITION_CB
+callback return code.
+
+=head2 Marks
+
+When a mark mode is set the cells can be marked using mouse.
+
+A marked cell will have its background attenuated to indicate that it
+is marked. A title cell appears marked only when MARKMODE=LIN, COL or
+LINCOL.
+
+Cells can be selected individually or can be restricted to lines or
+columns. Also multiple cells can be marked simultaneously in continuous
+or in segmented areas. Lines and columns are marked only when the user
+clicks in their respective titles, if MARKMODE=CELL then all the cells
+of the line or column will be marked. Continuous areas are marked
+holding and dragging the mouse or holding the B<Shift> key when
+clicking at the end of the area. Segmented areas are marked or unmarked
+holding the B<Ctrl> key, the mark state is inverted. Clicking on the
+cell 0:0 will select all the items depending on MARKMODE, except for
+LINCOL.
+
+=head2 ATTRIBUTES
+
+For more info about concept of attributes (setting/getting values etc.)
+see L<IUP::Manual::03_Attributes|IUP::Manual::03_Attributes>. Attributes specific to this element:
+
+=head3 General Attributes
+
+=over
+
+=item B<CURSOR>
+
+Default cursor used by the matrix. The default
+cursor is a symbol that looks like a cross. If you need to refer to
+this default cursor, use the name "IUP::MatrixCrossCursor".
+
+=item B<EDIT_MODE>
+
+When set to YES, programmatically puts the
+current cell in edition mode, allowing the user to modify its value.
+When consulted informs if the the current cell is being edited.
+Possible values: "YES" or "NO".
+
+=item B<EDITNEXT>
+
+controls how the next cell after editing is
+chosen. Can be LIN, COL, LINCR, COLCR. Default: LIN. (since 3.4)
+
+ LIN - go to the next line, if at last line then go to the next column at the same line;
+ LINCR - go to the next line, if at last line then go to the next column at the first line;
+ COL - go to the next column, if at last column then go to the next line at the same column;
+ COLCR - go to the next column, if at last column then go to the next line at the first column;
+
+=item B<FOCUS_CELL>
+
+Defines the current cell. Two numbers in
+the "B<(L)>:B<(C)>" format, (B<(L)> E<gt> 0 and B<(C)> E<gt> 0, a title
+cell can NOT be the current cell). Default: "1:1".
+
+=item B<HIDEFOCUS>
+
+do not show the focus mark when drawing the
+matrix. Default is NO.
+
+=item B<HIDDENTEXTMARKS>
+
+when text is greater than cell
+space, it is normally cropped, but when set to YES a "..." mark will be
+added at the crop point to indicate that there is more text not
+visible. Default: NO. (since 3.1)
+
+=item B<LIMITEXPAND>
+
+limit expansion to the maximum size that shows all
+cells. (since 3.5)
+
+=item B<ORIGIN>
+
+Scroll the visible area to the given cell. Returns
+the cell at the upper left corner. To scroll to a line or a column, use
+a value such as "B<(L)>:*" or "*:B<(C)>" (where I<B<L>> E<gt> 0 and
+B<(C)> E<gt> 0). L and C can not be a non scrollable cell either.
+
+=item B<ORIGINOFFSET>
+
+complements the ORIGIN attribute by
+specifying the drag offset of the top left cell. Returns the current
+value. Has the format "XxY" or "%dx%d" in C. Used only the ORIGIN is
+set. (since 3.5)
+
+=item B<READONLY>
+
+disables the editing of all cells. EDITION_CB
+and VALUE_EDIT_CB will not be called anymore. The L:C attribute will
+still be able to change the cell value. 
+
+=item B<RESIZEMATRIX>
+
+Defines if the width of a column can be
+interactively changed. When this is possible, the user can change the
+size of a column by dragging the column title right border. Possible
+values: "YES" or "NO". Default: "NO" (does not allow interactive width
+change).
+
+=item B<USETITLESIZE>
+
+Use the title size to define the cell
+size if necessary. See WIDTHn and HEIGHTn. Default: NO. 
+
+=back
+
+The following L<common attributes|IUP::Manual::03_Attributes/Common Attributes> are also accepted:
+
+=over
+
+=item * L<ACTIVE|IUP::Manual::03_Attributes/ACTIVE>,
+L<EXPAND|IUP::Manual::03_Attributes/EXPAND>, L<FONT|IUP::Manual::03_Attributes/FONT>,
+L<SCREENPOSITION|IUP::Manual::03_Attributes/SCREENPOSITION>,
+L<POSITION|IUP::Manual::03_Attributes/POSITION>,
+L<MINSIZE|IUP::Manual::03_Attributes/MINSIZE>,
+L<MAXSIZE|IUP::Manual::03_Attributes/MAXSIZE>, L<WID|IUP::Manual::03_Attributes/WID>,
+L<TIP|IUP::Manual::03_Attributes/TIP>, L<SIZE|IUP::Manual::03_Attributes/SIZE>,
+L<RASTERSIZE|IUP::Manual::03_Attributes/RASTERSIZE>,
+L<ZORDER|IUP::Manual::03_Attributes/ZORDER>,
+L<VISIBLE|IUP::Manual::03_Attributes/VISIBLE>
+
+=back
+
+=head3 Cell Attributes (no redraw)
+
+These attributes are only updated in the display when you set the L<REDRAW|#REDRAW> attribute.
+
+=over
+
+=item B<(L):(C)>
+
+Text of the cell located in line L and column C, where L and C are integer numbers.
+Example C<< $m->GetAttribute("12:15") >>
+
+=item B<(L):0>
+
+Title of line L. Example C<< $m->GetAttribute("12:0") >>
+
+=item B<0:(C)>
+
+Title of column C. Example C<< $m->GetAttribute("0:15") >>
+
+=item B<0:0>
+
+Title of the area between the line and column titles.
+
+These are valid only in normal mode.
+
+=item B<BGCOLOR>
+
+Background color of the matrix. (inheritable)
+
+=item B<BGCOLOR*:(C)>
+
+Background color of column C.
+Example C<< $m->GetAttribute("BGCOLOR*:15") >>
+
+=item B<BGCOLOR(L):*>
+
+Background color of line L.
+Example C<< $m->GetAttribute("BGCOLOR12:*") >>
+
+=item B<BGCOLOR(L):(C)>
+
+Background color of the cell in line L and column C.
+Example C<< $m->GetAttribute("BGCOLOR12:15") >>
+
+When more than one attribute are defined, the background color will be
+selected following this priority: BGCOLOR(L):(C), BGCOLOR(L):*, BGCOLOR*:(C),
+and last BGCOLOR. (L or C E<gt>= 0)
+
+Default BGCOLOR is the global attribute TXTBGCOLOR for cells and the
+parent's BGCOLOR for titles.
+
+Since the matrix control can be larger than the matrix itself, the
+empty area will always be filled with the parent's BGCOLOR.
+
+=item B<FGCOLOR>
+
+Text color. (inheritable)
+
+=item B<FGCOLOR*:(C)>
+
+Text color of column C.
+Example C<< $m->GetAttribute("FGCOLOR*:15") >>
+
+=item B<FGCOLOR(L):*>
+
+Text color of line L.
+Example C<< $m->GetAttribute("FGCOLOR12:*") >>
+
+=item B<FGCOLOR(L):(C)>
+
+Text color of the cell in line L and column C.
+Example C<< $m->GetAttribute("BGCOLOR12:15") >>
+
+When more than one attribute are define, the text color of a cell will
+be selected following this priority: FGCOLOR(L):(C), FGCOLOR(L):*,
+FGCOLOR*:(C), and last FGCOLOR. (L or C E<gt>= 0)
+
+Default FGCOLOR is the global attribute TXTFGCOLOR for cells or the
+global attribute DLGFGCOLOR for titles.
+
+=item L<FONT|IUP::Manual::03_Attributes/FONT>
+
+Character font of the text. (inheritable)
+
+=item B<FONT(L):*>
+
+Text font of the cells in line L.
+
+=item B<FONT*:(C)>
+
+Text font of the cells in column C.
+
+=item B<FONT(L):(C)>
+
+Text font of the cell in line L and column C.
+
+This attribute must be set before the control is showed. It affects the
+calculation of the size of all the matrix cells. The cell size is
+always calculated from the base FONT attribute.
+
+=item B<FRAMECOLOR>
+
+Sets the color to be used in the frame
+lines. (inheritable)
+
+=item B<FRAMEVERTCOLOR(L):(C)>
+
+Color of the vertical right frame of the cell.
+When not defined the FRAMECOLOR is used. For a title cell defines right
+and left frames. If value is "BGCOLOR" the frame line is not drawn.
+
+=item B<FRAMEVERTCOLOR*:(C)>
+
+same as FRAMEVERTCOLORI<L:C> but for all the
+cells of the column C. (since 3.5)
+
+=item B<FRAMEHORIZCOLOR(L):(C)>
+
+Color of the horizontal bottom frame of the
+cell. When not defined the FRAMECOLOR is used. For a title cell defines
+bottom and top frames. If value is "BGCOLOR" the frame line is not
+drawn.
+
+=item B<FRAMEHORIZCOLOR(L):*>
+
+same as FRAMEHORIZCOLORI<L:C > but for all the cells of the line L. (since 3.5)
+
+=item B<VALUE>
+
+Allows setting or verifying the value of the current
+cell. Is the same as obtaining the current cell from FOCUS_CELL value
+and using it as the attribute name for "L:C". But when updated or
+retrieved during cell editing, the edit control will be updated or
+consulted instead of the matrix cell. When retrieved inside the
+EDITION_CB callback when mode is 0, then the return value is the new
+value that will be updated in the cell.
+
+=item B<CELLOFFSET(L):(C)>
+
+I<(read-only)> Returns the cell
+computed offset in pixels from the top-left corner of the matrix, in
+the format "XxY" or "%dx%d" in C. Returns C<undef> if the cell does not
+exists, or it is not visible, or the element is not mapped. It will
+only return a valid result if the cell has already been displayed. They
+are similar to the parameters of the DRAW_CB callback but they do NOT
+include the decorations. (since 3.5)
+
+=item B<CELLSIZE(L):(C)>
+
+I<(read-only)> Returns the cell computed
+size in pixels, in the format "WxH" or "%dx%d" in C. Returns C<undef> if
+the cell does not exists, or the element is not mapped. It will only
+return a valid result if the cell has already been displayed. They are
+similar to the parameters of the DRAW_CB callback but they do NOT
+include the decorations. (since 3.5)
+
+=back
+
+=head3 Column Attributes (no redraw)
+
+=over
+
+=item B<ALIGNMENT(C)>
+
+Alignment of the cells in column C (C E<gt>= 0). Possible values: "ALEFT", "ACENTER" or "ARIGHT". Default:
+"ALEFT" for n=0 and "ACENTER" for n E<gt> 0. Not used for the column
+title. The 0:0 corner is always ACENTER, and the other column titles
+are also centered but if they do not fit in the cell then the alignment
+is changed to ALEFT. Before checking the default value it will check
+the "B<ALIGNMENT>" attribute value.
+
+=item B<SORTSIGN(C)>
+
+Shows a sort sign (up or down arrow) in the
+column C title. Possible values: "UP", "DOWN" and "NO". Default: NO.
+
+=back
+
+=head3 Column Size Attributes
+
+For all columns if WIDTHn is not defined, then RASTERWIDTHn is used. If
+also not defined, then depending on the circumstances a logic is used
+to find the column width.
+
+If it is the title column (n=0), then if USETITLESIZE=YES or not in
+callback mode, it will search for the maximum width among the titles of
+all lines. Finally if the conditions are not true or the maximum width
+of the column is 0, then the column of line titles is hidden.
+
+If it is a regular column (n E<gt> 0), then if USETITLESIZE=YES, then it
+will use the width of the title of the column. Finally if the condition
+is not true or the width of the title of the column is 0, then the
+default value WIDTHDEF is used.
+
+=over
+
+=item B<RASTERWIDTH(n)>
+
+Same as WIDTHn but in pixels. Has lower
+priority than WIDTHn.
+
+=item B<WIDTH(n)>
+
+Width of column n in SIZE units, where n is the
+number of the column (n E<gt>= 0). If the width value is 0, the column
+will not be shown on the screen. It does not includes the decoration
+size occupied by the frame lines.
+
+=item B<WIDTHDEF>
+
+Default column width in SIZE units. Not used
+for the title column. Default: 80 (width corresponding to 20
+characters).
+
+=back
+
+=head3 Line Size Attributes
+
+For all lines if HEIGHTn is not defined, then RASTERHEIGHTn is used. If
+also not defined, then depending on the circumstances a logic is used
+to find the line height.
+
+If it is the title line (n=0), then if USETITLESIZE=YES or not in
+callback mode, it will search for the maximum height among the titles
+of all columns. Finally if the conditions are not true or the maximum
+height of the line is 0, then the line of column titles is hidden.
+
+If it is a regular line (n E<gt> 0), then if USETITLESIZE=YES, then it
+will use the height of the title of the line. Finally if the condition
+is not true or the height of the title of the line is 0, then the
+default value HEIGHTDEF is used.
+
+=over
+
+=item B<HEIGHT(n)>
+
+Height of line n in SIZE units, where n is the
+number of the line (n E<gt>= 0). If the height value is 0, the line will
+not be shown on the screen. It does not includes the decoration size
+occupied by the frame lines.
+
+=item B<HEIGHTDEF>
+
+Default line height in SIZE units. Not used
+for the title line. Default: 8 (height corresponding to 1 line).
+
+=item B<RASTERHEIGHT(n)>
+
+Same as HEIGHTn but in pixels. Has
+lower priority than HEIGHTn.
+
+=back
+
+=head3 Number of Cells Attributes
+
+=over
+
+=item B<ADDCOL>
+
+I<(write-only)> Adds a new column to the matrix after
+the specified column. To insert a column at the top of the spreadsheet,
+value 0 must be used. To add more than one column, use format
+"B<I<C-C>>", where the first number corresponds to the base column and
+the second number corresponds to the number of columns to be added. It
+is valid only in normal operation mode. Can NOT add a title column.
+Ignored if set before map.
+
+=item B<ADDLIN>
+
+I<(write-only)> Adds a new line to the matrix after
+the specified line. To insert a line at the top of the spreadsheet,
+value 0 must be used. To add more than one line, use format
+"B<I<L-L>>", where the first number corresponds to the base line and
+the second number corresponds to the number of lines to be added. It is
+valid only in normal operation mode. Can NOT add a title line. Ignored
+if set before map.
+
+=item B<DELCOL>
+
+I<(write-only)> Removes the given column from the
+matrix. To remove more than one column, use format "B<I<C-C>>", where
+the first number corresponds to the base column and the second number
+corresponds to the number of columns to be removed. It is valid only in
+normal operation mode. Can NOT remove a title column, B<(C)> E<gt> 0.
+Ignored if set before map.
+
+=item B<DELLIN>
+
+I<(write-only)> Removes the given line from the
+matrix. To remove more than one line, use format "B<I<L-L>>", where the
+first number corresponds to the base line and the second number
+corresponds to the number of lines to be removed. It is valid only in
+normal operation mode. Can NOT remove a title line, B<(L)> E<gt> 0.
+Ignored if set before map.
+
+=item B<NUMCOL>
+
+Defines the number of columns in the matrix. Must
+be an integer number. Default: "0". It does not include the title
+column. If changed after map will add empty cells or discard cells at
+the end.
+
+=item B<NUMCOL_VISIBLE>
+
+When set defines the number of
+visible columns to be counted when calculating the B<Natural> size, not
+counting the title column. Not used elsewhere. The B<Natural> size will
+always include the title column if any. Can be greater than the actual
+number of columns, so room will be reserved for adding new columns
+without the need to resize the matrix. Also it will always use the
+first columns of the matrix, except if B<NUMCOL_VISIBLE_LAST>=YES then
+it will use the last columns. The remaining columns will be accessible
+only by using the scrollbar. IMPORTANT: When retrieved returns the
+current number of visible columns, not including the non scrollable
+columns. Default: "4".
+
+=item B<NUMCOL_NOSCROLL>
+
+Number of columns that are non
+scrollable, not counting the title column. Default: "0". It does not
+affect the NUMCOL_VISIBLE attribute behavior nor Natural size
+computation. It will always use the first columns of the matrix. The
+cells appearance will be the same of ordinary cells, and they can also
+receive the focus and be edited. Must be less than the total number of
+columns. (since 3.5)
+
+=item B<NUMLIN>
+
+Defines the number of lines in the matrix. Must be
+an integer number. Default: "0". It does not include the title line. If
+changed after map will add empty cells or discard cells at the end.
+
+=item B<NUMLIN_VISIBLE>
+
+When set defines the number of
+visible lines to be counted when calculating the B<Natural> size, not
+counting the title line. Not used elsewhere. The B<Natural> size will
+always include the title line if any. Can be greater than the actual
+number of lines, so room will be reserved for adding new lines without
+the need to resize the matrix. Also it will always use the first lines
+of the matrix, except if B<NUMLIN_VISIBLE_LAST>=YES then it will use
+the last lines. The remaining lines will be accessible only by using
+the scrollbar. IMPORTANT: When retrieved returns the current number of
+visible lines, not including the non scrollable lines. Default: "3".
+
+=item B<NUMLIN_NOSCROLL>
+
+Number of lines that are non
+scrollable, not counting the title line. Default: "0". It does not
+affect the NUMLIN_VISIBLE attribute behavior nor Natural size
+computation. It will always use the first lines of the matrix. The
+cells appearance will be the same of ordinary cells, and they can also
+receive the focus and be edited. Must be less than the total number of
+lines. (since 3.5)
+
+=back
+
+=head3 Mark Attributes
+
+=over
+
+=item B<MARKAREA>
+
+Defines if the area to be B<interactively>
+marked by the user must be continuous or not, valid only if
+MARKMULTIPLE=YES. Possible values: "CONTINUOUS" or "NOT_CONTINUOUS".
+Default: "CONTINUOUS".
+
+=item B<MARKMODE>
+
+Defines the entity that can be marked: none,
+lines, columns, (lines or columns), and cells. Possible values: "NO",
+"LIN", "COL", "LINCOL" or "CELL". Default: "NO" (no mark).
+
+=item B<MARKI(L):(C)>
+
+marks a cell, a line or a column depending on
+MARKMODE, and returns cell, line or column mark state according to
+MARKMODE. Can be "1" or "0". If MARKMODE=LIN,COL,LINCOL use 0 to mark
+only the other element (ex: "0:3" set/get for column 3). Even when
+MARKMODE=LIN,COL,LINCOL you can specify a single cell address. (since
+3.0)
+
+=item B<MARKED>
+
+String of '0' or '1' characters, informing which
+cells are marked (indicated by value '1'). Use C<undef> to clear all marks,
+returns C<undef> if no marks. The format of this character vector depends
+on the value of the MARKMODE attribute: if its value is CELL, the
+vector will have NUMLIN x NUMCOL positions, corresponding to all the
+cells in the matrix starting with all the cells of the first line, then
+the second line and so on. If its value is LIN, the vector will begin
+with letter 'L' and will have further NUMLIN positions, each one
+corresponding to a line in the matrix. If its value is COL, the vector
+will begin with letter 'C' and will have further NUMCOL positions, each
+one corresponding to a column in the matrix. If its value is LINCOL,
+the first letter, which can be either 'L' or 'C', will indicate which
+of the above formats is being used. If you change the other mark
+attributes the marked cells are cleared. When setting the attribute the
+LIN and COL notation can be used even if MARKMODE=CELL. MULTIPLE and
+AREA are NOT considered when setting MARKED or MARKL:C.
+
+=item B<MARKMULTIPLE>
+
+Defines if more than one entity defined
+by MARKMODE can be B<interactively> marked. Possible values: "YES" or
+"NO". Default: "NO".
+
+=back
+
+=head3 Action Attributes
+
+=over
+
+=item B<FITTOSIZE>
+
+I<(write-only)> force lines and/or columns sizes
+so the matrix visible size fit in its current size. NUMCOL_VISIBLE and
+NUMLIN_VISIBLE are considered when fitting and they are not changed,
+only the RASTERWIDTHn and RASTERHEIGHTn attributes are changed. But if
+any of the RASTERWIDTHn and RASTERHEIGHTn attributes where already set,
+then they will not be changed. If the matrix is resized then it must be
+set again to obtain the same result, but before doing that set to C<undef>
+all the RASTERWIDTHn and RASTERHEIGHTn attributes that you want to be
+changed. Can be LINES, COLUMNS or YES (meaning both). (since 3.3)
+
+=item B<FITTOTEXT>
+
+I<(write-only)> set the RASTERWIDTHn or the
+RASTERHEIGHTn attribute for the given column or line, so that it will
+fit the largest text in the column or the highest text in the line. The
+number of the column or line must be preceded by a character
+identifying its type, "C" for columns and "L" for lines. For example
+"C5"=column 5 or "L3"=line 3. If FITMAXWIDTHn or FITMAXHEIGHTn are set
+for the column or line they are used as maximum limit for the size.
+(since 3.4)
+
+=item B<SHOW>
+
+I<(write-only)> If necessary scroll the visible area to
+make the given cell visible. To scroll to a line or a column, use a
+value such as "B<(L)>:*" or "*:B<(C)>" (where I<B<L>> E<gt> 0 and
+B<(C)> E<gt> 0). 
+
+=item B<REDRAW>
+
+I<(write-only)> The user can inform the matrix that
+the data has changed, and it must be redrawn. Values:
+
+ "ALL": Redraws the whole matrix.
+ "L%d": Redraws the given line (e. g.: "L3" redraws line 3)
+ "L%d:%d": Redraws the lines in the given region (e.g.: "L2:4" redraws lines 2, 3 and 4)
+ "C%d": Redraws the given column (e.g.: "C3" redraws column 3)
+ "C%d:%d": Redraws the columns in the given region (e.g: "C2:4" redraws columns 2, 3 and 4)
+
+No redraw is done when the application sets the attributes: L:C,
+ALIGNMENTn, BGCOLOR*, FGCOLOR*, FONT*, VALUE, FRAME*COLOR. Global and
+size attributes always automatically redraw the matrix.
+
+=back
+
+=head3 Text Editing Attributes
+
+=over
+
+=item B<CARET>
+
+Allows specifying and verifying the caret position of
+the text box in edition mode.
+
+=item B<MASK(L):(C)>
+
+Defines a mask that will filter text input.
+The L<MASK|IUP::Manual::03_Attributes/MASK> auxiliary attributes are also
+available adding the line and column at the end of the attribute name.
+
+=item B<MULTILINE>
+
+allows the edition of multiple lines. Use
+Shift+Enter to add lines. Enter will end the editing.
+
+=item B<SELECTION>
+
+Allows specifying and verifying selection
+interval of the text box in edition mode.
+
+=back
+
+=head3 Canvas Attributes (inheritable)
+
+=over
+
+=item B<BORDER>
+
+Changed to NO.
+
+=item B<SCROLLBAR>
+
+Changed to YES.
+
+=back
+
+=head2 CALLBACKS
+
+For more info about concept of callbacks (setting callback handlers etc.)
+see L<IUP::Manual::04_Callbacks|IUP::Manual::04_Callbacks>. Callbacks specific to this element:
+
+=head3 Interaction Callbacks
+
+=over
+
+=item B<ACTION_CB>
+
+Action generated when a keyboard event
+occurs.
+
+B<Callback handler prototype:>
+
+ sub action_cb_handler {
+   my ($self, $key, $lin, $col, $edition, $value) = @_;
+   #...
+ }
+
+=over
+
+B<$self:> reference to the element (IUP::Matrix) where the user typed something
+
+B<$key:> Identifier of the typed key. Please refer to the L<IUP::Manual::06_HandlingKeyboard> and L<IUP::Constants> for a list of possible values.
+
+B<$lin, $col:> Coordinates of the selected cell.
+
+B<$edition:> 1 if the cell is in edition mode, and 0 if it is not.
+
+B<$value:> When EDIT_MODE=NO is the cell current value, but if the type
+key is a valid character then contains a string with that character.
+When EDIT_MODE=Yes depends on the editing field type. If a dropdown,
+then it is an empty string (""). If a text, and the type key is a valid
+character then it is the future value of the text field, if not a valid
+character then it is the cell current value. Notice that this value can
+be C<undef> if the cell does not have a value and the key pressed is not a
+character.
+
+B<Returns:> IUP_DEFAULT validates the key, IUP_IGNORE ignores the key,
+IUP_CONTINUE forwards the key to IUPs conventional processing, or the
+identifier of the key to be treated by the matrix.
+
+=back
+
+=item B<CLICK_CB>
+
+Action generated when any mouse button is
+pressed over a cell. This callback is always called after other
+callbacks.
+
+B<Callback handler prototype:>
+
+ sub click_cb_handler {
+   my ($self, $lin, $col, $status) = @_;
+   #...
+ }
+
+=over
+
+B<$self:> reference to the element (IUP::Matrix) interacting with the user
+
+B<$lin, $col:> Coordinates of the cell where the mouse button was
+pressed. They can be -1 if the user click outside the matrix but inside
+the canvas that contains it.
+
+B<$status:> Status of the mouse buttons and some keyboard keys at the
+moment the event is generated. The same macros used for
+L<BUTTON_CB|IUP::Manual::04_Callbacks/BUTTON_CB> can be used for this status.
+
+B<Returns:> To avoid the display update return IUP_IGNORE.
+
+=back
+
+=item B<RELEASE_CB>
+
+Action generated when any mouse button is
+released over a cell. This callback is always called after other
+callbacks.
+
+B<Callback handler prototype:>
+
+ sub click_cb_handler {
+   my ($self, $lin, $col, $status) = @_;
+   #...
+ }
+
+=over
+
+B<$self:> reference to the element (IUP::Matrix) interacting with the user
+
+B<$lin, $col:> Coordinates of the cell where the mouse button was
+pressed. They can be -1 if the user click outside the matrix but inside
+the canvas that contains it.
+
+B<$status:> Status of the mouse buttons and some keyboard keys at the
+moment the event is generated. The same macros used for
+L<BUTTON_CB|IUP::Manual::04_Callbacks/BUTTON_CB> can be used for this status.
+
+B<Returns:> To avoid the display update return IUP_IGNORE.
+
+=back
+
+=item B<MOUSEMOVE_CB>
+
+Action generated to notify the
+application that the mouse has moved over the matrix.
+
+B<Callback handler prototype:>
+
+ sub mousemove_cb_handler {
+   my ($self, $lin, $col) = @_;
+   #...
+ }
+
+=over
+
+B<$self:> reference to the element (IUP::Matrix) interacting with the user
+
+B<$lin, $col:> Coordinates of the cell that the mouse cursor is
+currently on.
+
+=back
+
+=item B<ENTERITEM_CB>
+
+Action generated when a matrix cell is
+selected, becoming the current cell. Also called when matrix is getting
+focus.
+
+B<Callback handler prototype:>
+
+ sub enteritem_cb_handler {
+   my ($self, $lin, $col) = @_;
+   #...
+ }
+
+=over
+
+B<$self:> reference to the element (IUP::Matrix) interacting with the user
+
+B<$lin, $col:> Coordinates of the selected cell.
+
+=back
+
+=item B<LEAVEITEM_CB>
+
+Action generated when a cell is no
+longer the current cell. Also called when the matrix is losing focus.
+
+B<Callback handler prototype:>
+
+ sub leaveitem_cb_handler {
+   my ($self, $lin, $col) = @_;
+   #...
+ }
+
+=over
+
+B<$self:> reference to the element (IUP::Matrix) interacting with the user
+
+B<$lin, $col:> Coordinates of the cell which is no longer the current cell.
+
+B<Returns:> IUP_IGNORE prevents the current cell from changing, but this
+will not work when the matrix is losing focus. If you try to move to
+beyond matrix borders the cell will lose focus and then get it again,
+so leaveitem_cb and enteritem_cb will be called.
+
+=back
+
+=item B<SCROLLTOP_CB>
+
+Action generated when the matrix is
+scrolled with the scrollbars or with the keyboard. Can be used together
+with the ORIGIN and ORIGINOFFSET attributes to synchronize the movement
+of two or more matrices.
+
+B<Callback handler prototype:>
+
+ sub scrolltop_cb_handler {
+   my ($self, $lin, $col) = @_;
+   #...
+ }
+
+=over
+
+B<$self:> reference to the element (IUP::Matrix) interacting with the user
+
+B<$lin, $col:> Coordinates of the cell currently in the upper left
+corner of the matrix.
+
+=back
+
+=back
+
+
+=head3 Drawing Callbacks
+
+=over
+
+=item B<BGCOLOR_CB>
+
+Action generated to retrieve the background color of a cell when it needs to be redrawn.
+
+B<Callback handler prototype:>
+
+ sub bgcolor_cb_handler {
+   my ($self, $lin, $col) = @_;
+   my ($red, $green, $blue, $ret);
+   #...
+   return ($red, $green, $blue, $ret);  
+ }
+ #ZZZ-test-this
+
+=over
+
+B<$self:> reference to the element (IUP::Matrix) where the user typed something
+
+B<$lin, $col:> Coordinates of the cell.
+
+B<$red, $green, $blue:> the cell background color.
+
+B<Returns:> If IUP_IGNORE, the values are ignored and the attribute
+defined background color will be used. If returns IUP_DEFAULT the
+returned values will be used as the background color.
+
+=back
+
+=item B<FGCOLOR_CB>
+
+Action generated to retrieve the foreground color of a cell when it needs to be redrawn.
+
+B<Callback handler prototype:>
+
+ sub fgcolor_cb_handler {
+   my ($self, $lin, $col) = @_;
+   my ($red, $green, $blue, $ret);
+   #...
+   return ($red, $green, $blue, $ret);   
+ }
+ #ZZZ-test-this
+
+=over
+
+B<$self:> reference to the element (IUP::Matrix) where the user typed something
+
+B<$lin, $col:> Coordinates of the cell.
+
+B<$red, $green, $blue:> the cell foreground color.
+
+B<Returns:> If IUP_IGNORE, the values are ignored and the attribute
+defined foreground color will be used. If returns IUP_DEFAULT the
+returned values will be used as the foreground color.
+
+=back
+
+=item B<FONT_CB>
+
+Action generated to verify the font of a cell.
+Called both for common cells and for line and column titles. (since iup-3.0)
+
+B<Callback handler prototype:>
+
+ sub value_cb_handler {
+   my ($self, $lin, $col) = @_;
+   #...
+ }
+
+=over
+
+B<$self:> reference to the element (IUP::Matrix) interacting with the user
+
+B<$lin, $col:> Coordinates of the cell.
+
+B<Returns:> Must return a font or C<undef> to use the the attribute defined
+font.
+
+=back
+
+=item B<DRAW_CB>
+
+Action generated before a cell is drawn. Allows to draw a custom cell contents. You must use the
+L<IUP::Canvas> methods. The clipping is set for the bounding rectangle. The callback is called
+after the cell background has been filled with the background color.
+The focus feedback area is not included in the decoration size.
+
+B<Callback handler prototype:>
+
+ sub draw_cb_handler {
+   my ($self, $lin, $col, $x1, $x2, $y1, $y2, $cnv) = @_;
+   #...
+ }
+
+=over
+
+B<$self:> reference to the element (IUP::Matrix) interacting with the user
+
+B<$lin, $col:> Coordinates of the current cell.
+
+B<$x1, $x2, $y1, $y2:> Bounding rectangle of the current cell in pixels, excluding the decorations.
+
+B<$cnv:> reference to L<IUP::Cavnas> object used to draw the matrix
+
+B<Returns:> If IUP_IGNORE the normal text drawing will take place.
+
+=back
+
+=item B<DROPCHECK_CB>
+
+Action generated before the current
+cell is redrawn to determine if a dropdown feedback should be shown. If
+this action is not registered, no feedback will be shown.
+
+B<Callback handler prototype:>
+
+ sub dropcheck_cb_handler {
+   my ($self, $lin, $col) = @_;
+   #...
+ }
+
+=over
+
+B<$self:> reference to the element (IUP::Matrix) interacting with the user
+
+B<$lin, $col:> Coordinates of the cell.
+
+B<Returns:> IUP_DEFAULT will show a dropdown field feedback, or IUP_IGNORE
+to NOT draw the dropdown feedback.
+
+=back
+
+=back
+
+=head3 Editing Callback
+
+=over
+
+=item B<DROP_CB>
+
+Action generated before the current cell enters
+edition mode to determine if a text field or a dropdown will be shown.
+It is called after EDITION_CB. If this action is not registered, a text
+field will be shown. Its return determines what type of element will be
+used in the edition mode. If the selected type is a dropdown, the
+values appearing in the dropdown must be fulfilled in this callback,
+just like elements are added to any list (the drop parameter is the
+handle of the dropdown list to be shown). You should also set the lists
+current value ("VALUE"), the default is always "1". The previously cell
+value can be verified from the given drop Ihandle via the
+"PREVIOUSVALUE" attribute.
+
+B<Callback handler prototype:>
+
+ sub drop_cb_handler {
+   my ($self, $drop, $lin, $col) = @_;
+   #...
+ }
+
+=over
+
+B<$self:> reference to the element (IUP::Matrix) interacting with the user
+
+B<$drop:> reference to dropdown list element (IUP::List) which will be shown to the user.
+
+B<$lin, $col>: Coordinates of the current cell.
+
+B<Returns:> IUP_IGNORE to show a text-edition field, or IUP_DEFAULT to show a dropdown field.
+
+=back
+
+=item B<DROPSELECT_CB>
+
+Action generated when an element in
+the dropdown list is selected. If returns IUP_CONTINUE the value is
+accepted as a new value and the matrix leaves edition mode, else the
+item is selected and editing remains.
+
+B<Callback handler prototype:>
+
+ sub dropselect_cb_handler {
+   my ($self, $lin, $col, $drop, $t, $i, $v) = @_;
+   #...
+ } 
+
+=over
+
+B<$self:> reference to the element (IUP::Matrix) interacting with the user
+
+B<$lin, $col:> Coordinates of the current cell.
+
+B<$drop:> reference to the dropdown list element (IUP::List) shown to the user.
+
+B<$t:> Text of the item whose state was changed.
+
+B<$i:> Number of the item whose state was changed.
+
+B<$v:> Indicates if item was selected or unselected (1 or 0).
+
+=back
+
+=item B<EDITION_CB>
+
+Action generated when the current cell
+enters or leaves the edition mode. Not called if READONLY=YES.
+
+B<Callback handler prototype:>
+
+ sub edition_cb_handler {
+   my ($self, $lin, $col, $mode, $update) = @_;
+   #...
+ }
+
+=over
+
+B<$self:> reference to the element (IUP::Matrix) interacting with the user
+
+B<$lin, $col:> Coordinates of the current cell.
+
+B<$mode:> 1 if the cell has entered the edition mode, or 0 if the cell
+has left the edition mode.
+
+B<$update:> used when mode=0 to identify if the value will be updated
+whe the callback returns with IUP_DEFAULT. 
+
+B<Returns:> can be IUP_DEFAULT, IUP_IGNORE or IUP_CONTINUE.
+
+When B<mode>=1 editing is allowed if the callback returns IUP_DEFAULT,
+so to make the cell read-only return IUP_IGNORE.
+
+When B<mode>=0 the new value is accepted only if the callback returns
+IUP_DEFAULT. The VALUE attribute returns the new value that will be
+updated in the cell. If the callback returns IUP_CONTINUE the edit mode
+is ended and the new value will not be updated, so the application can
+set a different value during the callback (usefull to format the new
+value). If the callback returns IUP_IGNORE the editing is not ended.
+
+If the callback does not exists the value can always be edited and it
+is always accepted.
+
+If the control loses its focus the edition mode will be ended always
+even if the callback return IUP_IGNORE. In this case B<update> is 0.
+
+This callback is also called if the user cancel the editing with B<Esc>
+(in this case B<update> is 0)B<,> and when the user press B<Del> to
+validate the operation for each cell been cleared (in this case is
+called only with mode=1).
+
+=back
+
+=back
+
+=head3 Callback Mode
+
+=over
+
+=item B<VALUE_CB>
+
+Action generated to verify the value of a cell.
+Called both for common cells and for line and column titles.
+
+B<Callback handler prototype:>
+
+ sub value_cb_handler {
+   my ($self, $lin, $col) = @_;
+   #...
+ }
+
+=over
+
+B<$self:> reference to the element (IUP::Matrix) interacting with the user
+
+B<$lin, $col:> Coordinates of the cell.
+
+B<Returns:> the string to be redrawn.
+
+B<IMPORTANT>: The existance of this callback defines the callback
+operation mode of the matrix when it is mapped.
+
+=back
+
+=item B<VALUE_EDIT_CB>
+
+Action generated to notify the
+application that the value of a cell was edited. Since it is a
+notification, it cannot refuse the value modification (which can be
+done by the "EDITION_CB" callback). Not called if READONLY=YES. This
+callback is usually set in callback mode, but also works in normal
+mode.
+
+B<Callback handler prototype:>
+
+ sub value_edit_cb_handler {
+   my ($self, $lin, $col, $newval) = @_;
+   #...
+ }
+
+=over
+
+B<$self:> reference to the element (IUP::Matrix) interacting with the user
+
+B<$lin, $col:> Coordinates of the cell.
+
+B<$newval:> String containing the new cell value
+
+B<IMPORTANT>: if VALUE_CB is defined and VALUE_EDIT_CB is not defined
+when the matrix is mapped it will be read-only.
+
+=back
+
+=item B<MARK_CB>
+
+Action generated to verify the selection state of
+a cell. Called only for common cells, only when MARKMODE=CELL and only
+in callback mode.
+
+B<Callback handler prototype:>
+
+ sub mark_cb_handler {
+   my ($self, $lin, $col) = @_;
+   #...
+ }
+
+=over
+
+B<$self:> reference to the element (IUP::Matrix) interacting with the user
+
+B<$lin, $col:> Coordinates of the cell.
+
+B<Returns:> the selection state (marked=1, not marked 0). If not defined
+the attribute "B<MARKI<L>>B<:I<C>>" will be returned.
+
+=back
+
+=item B<MARKEDIT_CB>
+
+Action generated to notify the
+application that the selection state of a cell was changed. Since it is
+a notification, it cannot refuse the mark modification. Called only for
+common cells, only when MARKMODE=CELL and only in callback mode.
+
+B<Callback handler prototype:>
+
+ sub markedit_cb_handler {
+   my ($self, $lin, $col, $marked) = @_;
+   #...
+ }
+
+=over
+
+B<$self:> reference to the element (IUP::Matrix) interacting with the user
+
+B<$lin, $col:> Coordinates of the cell.
+
+B<$marked:> selection state (marked=1, not marked 0).
+
+If not defined the attribute "B<MARKI<L>:I<C>>" will be updated. So if
+you define the B<MARKEDIT_CB> the "B<MARKI<L>:I<C>>" will NOT be
+updated and the callback B<MARK_CB> must return the selection state of
+the cell. If you do not want to implement the B<MARK_CB> callback then
+set the "B<MARKI<L>:I<C>>" attribute inside the B<MARKEDIT_CB>
+callback.
+
+=back
+
+=back
+
+The following canvas callbacks are also supported on L<IUP::Matrix>
+
+=over
+
+=item * L<ACTION|IUP::Manual::04_Callbacks/ACTION>,
+L<SCROLL_CB|IUP::Manual::04_Callbacks/SCROLL_CB>,
+L<KEYPRESS_CB|IUP::Manual::04_Callbacks/KEYPRESS_CB>,
+L<MOTION_CB|IUP::Manual::04_Callbacks/MOTION_CB>,
+L<MAP_CB|IUP::Manual::04_Callbacks/MAP_CB>
+
+=item * L<RESIZE_CB|IUP::Manual::04_Callbacks/RESIZE_CB> and L<BUTTON_CB|IUP::Manual::04_Callbacks/BUTTON_CB> cannot be changed from perl IUP bindings.
+
+Use L<ConvertXYToPos|IUP::Manual::02_Elements/"ConvertXYToPos()"> to convert (x,y)
+coordinates in the cell position: C<pos = lin * numcol + col>
+
+See L<IUP::Canvas|IUP::Canvas>.
+
+=back
+
+=head2 Utility Functions
+
+These functions can be used to help set and get attributes from the matrix.
+
+=head3 MatAttribute()
+
+ # setting attribute value
+ $matrix->MatAttribute($name, $lin, $col, $value);
+ 
+ # getting attribute value
+ $value = $matrix->MatAttribute($name, $lin, $col);
+
+They work just like the respective traditional set and get functions.
+But the attribute string is complemented with the L and C values.
+
+For example:
+
+ $matrix->MatAttribute("BGCOLOR", 30, 10, $value) ~~ $matrix->SetAttribute("BGCOLOR30:10", $value)
+ $matrix->MatAttribute("ALIGNMENT", 10, $value) ~~ $matrix->SetAttribute("ALIGNMENT10", $value)
+ 
+ $v = $matrix->GetAttribute("BGCOLOR30:10") ~~ $v = $matrix->MatAttribute("BGCOLOR", 30, 10)
+
+But these functions are faster than the traditional functions because
+they do not need to parse the attribute name string and the application
+does not need to concatenate the attribute name with the id.
+
+=head3 MatCell()
+
+ # setting value
+ MatCell($lin, $col, $value);
+ # getting value
+ $value = MatCell($lin, $col);
+
+It is equivalent to the traditional set and get functions:
+
+  $matrix->MatCell(30, 10, $value) ~~ $matrix->SetAttribute("30:10", $value)
+  $v = $matrix->MatCell(30, 10) ~~ $v = $matrix->GetAttribute("30:10")
+  
+=head1 EXAMPLES
+
+
+The element B<IUP::Matrix> is used in the following sample scripts:
+
+=over
+
+=item * L<0-basic/cbox.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/cbox.pl> - IUP::Cbox example
+
+=item * L<0-basic/mask_matrix.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/mask_matrix.pl> - IUP::Matrix + MASK example
+
+=item * L<0-basic/matrix_basic.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/matrix_basic.pl> - IUP::Matrix example
+
+=item * L<0-basic/matrix_cbmode.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/matrix_cbmode.pl> - IUP::Matrix (callback mode) example
+
+=back 
+
+
+
+=head1 SEE ALSO
+
+L<IUP::Canvas|IUP::Canvas>
+
+The original doc: L<iupmatrix.html|http://www.tecgraf.puc-rio.br/iup/en/ctrl/iupmatrix.html>
+ 
+
+=cut

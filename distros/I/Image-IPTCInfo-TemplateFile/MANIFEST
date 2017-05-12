@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+TemplateFile.pm
+test.pl
+TemplateBlank.ipt
+TemplateTest1.ipt
+ThisIsTheCaption.ipt

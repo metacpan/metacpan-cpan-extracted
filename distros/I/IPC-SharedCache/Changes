@@ -1,0 +1,19 @@
+Revision history for Perl extension IPC::SharedCache.
+
+1.0 Fri February 17, 2000 12:00:00
+    - original version, broken off from HTML::Template and rewritten
+      from scratch.
+
+1.1 Wed February 23, 2000 12:00:00
+    - Bug Fix, load_callback was being called incorrectly the first
+      time - thanks to Roland Mas for the spot!
+    - Bug Fix, added workaround for "panic: POPSTACK", thanks to 
+      Drew Taylor.
+
+1.2 Sun March 05, 2000 12:00:00
+    - Bug Fix: validate_callback was effectively ignored!
+
+1.3 Fri March 24, 2000 12:00:00
+    - Bug Fix: missing _unlock() in DELETE rectified. (Ed Loehr)
+    - Bug Fix: callback array refs were being eaten on cache access. 
+               (Maverick)

@@ -1,0 +1,82 @@
+#! /usr/bin/env perl
+
+use warnings;
+use strict;
+
+use File::Spec;
+use SQL::Translator;
+
+use lib 'lib';
+use Interchange6::Schema;
+
+use Getopt::Long;
+use Pod::Usage;
+
+my $help = 0;
+my $man  = 0;
+
+GetOptions('help|?' => \$help, man => \$man) or pod2usage(2);
+pod2usage(1) if $help;
+pod2usage(-exitval => 0, -verbose => 2) if $man;
+
+eval "use DBD::SQLite";
+die "DBD::SQLite required" if $@;
+
+my $schema = Interchange6::Schema->connect(
+    "dbi:SQLite:dbname=:memory:", '', '',
+    { sqlite_unicode => 1, on_connect_call => 'use_foreign_keys' }
+);
+
+
+
+my $trans = SQL::Translator->new(
+    parser        => 'SQL::Translator::Parser::DBIx::Class',
+    parser_args   => { dbic_schema => $schema, },
+    producer      => 'GraphViz',
+    producer_args => {
+        out_file         => 'schema.png',
+        bgcolor          => 'lightgoldenrodyellow',
+        show_constraints => 1,
+        show_datatypes   => 1,
+        show_indexes     => 1,
+        show_sizes       => 1,
+        width            => 70,
+        height           => 50,
+    },
+) or die SQL::Translator->error;
+
+$trans->translate or die $trans->error;
+
+__END__
+
+=head1 NAME
+
+interchange6-create-schema-png - create PNG image graph of Interchange6::Schema
+
+=head1 SYNOPSIS
+
+interchange6-create-schema-png [options]
+
+ Options:
+   -help            brief help message
+   -man             full documentation
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-help>
+
+Print a brief help message and exits.
+
+=item B<-man>
+
+Prints the manual page and exits.
+
+=back
+
+=head1 DESCRIPTION
+
+B<interchange6-create-schema-png> loads the Interchange6::Schema definition and creates an output file C<schema.png> in the current directory. It will search for Interchange6::Schema in a subdir 'lib' from the current directory and then via @INC.
+
+=cut

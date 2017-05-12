@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                Inline-Java
+version:             0.53
+abstract:            Write Perl classes in Java.
+license:             ~
+author:              
+    - Patrick LeBoutillier <patl@cpan.org>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Inline:                        0.44
+    MIME::Base64:                  0
+    Test:                          1.13
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

@@ -1,0 +1,38 @@
+---
+abstract: 'IPv6 Address Manipulation Library'
+author:
+  - 'Athanasios Douitsis <aduitsis@cpan.org>'
+build_requires:
+  Module::Build: '0.28'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  Module::Build: '0.28'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: IPv6-Address
+provides:
+  IPv4Subnet:
+    file: lib/IPv6/Address.pm
+    version: '0.207'
+  IPv6::Address:
+    file: lib/IPv6/Address.pm
+    version: '0.207'
+requires:
+  Carp: '0'
+  Data::Dumper: '0'
+  Socket: '0'
+  Sub::Install: '0'
+  overload: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/aduitsis/IPv6-Address
+  repository: https://github.com/aduitsis/IPv6-Address.git
+version: '0.207'

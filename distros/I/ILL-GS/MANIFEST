@@ -1,0 +1,10 @@
+Changes
+lib/Biblio/ILL/GS.pm
+Makefile.PL
+MANIFEST
+README
+t/001_use.t
+t/010_write.t
+t/expected.txt
+t/011_mindata.t
+META.yml                                Module meta-data (added by MakeMaker)

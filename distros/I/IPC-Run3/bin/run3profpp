@@ -1,0 +1,103 @@
+#!/usr/local/bin/perl -w
+
+$VERSION = 0.048;
+
+=head1 NAME
+
+run3profpp - Report on IPC::Run3 profiling data
+
+=head1 SYNOPSIS
+
+    $ run3profpp [<profile_file_name>]
+
+=head1 DESCRIPTION
+
+IPC::Run3 may be run with profiling data enabled.  It may report as it runs
+or dump all of the data to a file.  This program reads that file and generates
+reports based on it.
+
+The default filename is run3.out.
+
+=cut
+
+use strict;
+use Getopt::Long;
+
+sub _program_name {
+    require File::Basename;
+    File::Basename::basename( $0 );
+}
+
+sub _usage {
+    my ( $message ) = @_;
+    ## Don't slow execution by always loading a rarely needed module.
+    ## At least, we hope it's rarely needed.
+    require Pod::Usage;
+
+    $message = "Unkown error (message not provided)"
+        if defined $message && ! length $message;
+
+    my $help_mode = ! defined $message;
+
+    my $exitval = $help_mode ? 0 : do {
+        # The "message" may be a simple number, in which case it's an
+        # exit value.
+        $message =~ s/\A(\d+)\z// ? $1 : 1
+    };
+
+    Pod::Usage::pod2usage(
+        -verbose => $help_mode ? 2 : 1,
+        defined $message && length $message
+            ? ( -message => $message )
+            : (),
+        -exitval => $exitval,
+    );
+}
+
+=head1 OPTIONS
+
+=over
+
+=item --help, -h, -?
+
+Print out full help text.
+
+=back
+
+=cut
+
+GetOptions(
+    "help|h|?" => sub { _usage },
+) or _usage 1;
+
+# _usage "Too few paramaters"  unless @ARGV > 0;
+# _usage "Too many paramaters" if     @ARGV > 0;
+
+###############################################################################
+#
+# Main program body
+#
+
+#
+# End of the main program body
+#
+###############################################################################
+
+=head1 LIMITATIONS
+
+=head1 COPYRIGHT
+
+    Copyright 2003, R. Barrie Slaymaker, Jr., All Rights Reserved
+
+=head1 LICENSE
+
+You may use this module under the terms of the BSD, Artistic, or GPL licenses,
+any version.
+
+=head1 AUTHOR
+
+Barrie Slaymaker <barries@slaysys.com>
+
+=cut
+
+1;

@@ -1,0 +1,20 @@
+---
+abstract: 'use C<IO::Async> with C<kqueue>'
+author:
+  - 'Squeeks <squeek@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200000, CPAN::Meta::Converter version 2.102400'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: IO-Async-Loop-KQueue
+requires:
+  IO::Async: 0
+  IO::Async::LoopTests: 0
+  IO::KQueue: 0.24
+  Test::More: 0
+version: 0.02

@@ -1,0 +1,83 @@
+{
+   "abstract" : "Import a set of modules into the calling module",
+   "author" : [
+      "Doug Bell <preaction@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Import-Base",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Import::Into" : "1.002005",
+            "Module::Runtime" : "0",
+            "mro" : "0",
+            "perl" : "5.010",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "Carp" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Import::Base" : {
+         "file" : "lib/Import/Base.pm",
+         "version" : "1.003"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/preaction/Import-Base/issues"
+      },
+      "homepage" : "https://github.com/preaction/Import-Base",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/preaction/Import-Base.git",
+         "web" : "https://github.com/preaction/Import-Base"
+      },
+      "x_IRC" : "irc://irc.perl.org/#beam"
+   },
+   "version" : "1.003",
+   "x_authority" : "cpan:PREACTION",
+   "x_contributors" : [
+      "Brian Medley <pub-github@bmedley.org>",
+      "Doug Bell <doug@preaction.me>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+}
+

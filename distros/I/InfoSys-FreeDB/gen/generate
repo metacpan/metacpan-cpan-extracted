@@ -1,0 +1,126 @@
+#!/usr/bin/perl
+
+use strict;
+use PerlBean;
+use PerlBean::Attribute::Factory;
+use PerlBean::Collection;
+use PerlBean::Described::ExportTag;
+use PerlBean::Symbol;
+
+@::bean_desc = ();
+
+foreach my $fn (<attr-*.pl>) {
+    require $fn;
+}
+
+my $collection = PerlBean::Collection->new ({
+    license => <<EOF,
+This file is part of the C<InfoSys::FreeDB> module hierarchy for Perl by
+Vincenzo Zocca.
+
+The InfoSys::FreeDB module hierarchy is free software; you can redistribute it
+and/or modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2 of
+the License, or (at your option) any later version.
+
+The InfoSys::FreeDB module hierarchy is distributed in the hope that it will
+be useful, but WITHOUT ANY WARRANTY; without even the implied
+warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with the InfoSys::FreeDB module hierarchy; if not, write to
+the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
+Boston, MA 02111-1307 USA
+EOF
+});
+my $factory = PerlBean::Attribute::Factory->new ();
+
+foreach my $bean_desc (@::bean_desc) {
+    # Set 'use 5.006' on all beans
+    $bean_desc->{bean_opt}{use_perl_version} = '5.006';
+
+    # Disable autoloading for development
+    #$bean_desc->{bean_opt}{autoloaded} = 0;
+
+    # Creat bean
+    my $bean = PerlBean->new ($bean_desc->{bean_opt});
+
+    # Add bean to collection
+    foreach my $attr_opt (@{$bean_desc->{attr_opt}}) {
+        my $attr = $factory->create_attribute ($attr_opt);
+        $bean->add_method_factory ($attr);
+    }
+
+    # Add attributes to bean
+    foreach my $meth_opt ( @{ $bean_desc->{meth_opt} } ) {
+        require PerlBean::Method;
+        my $meth = PerlBean::Method->new ($meth_opt);
+        $bean->add_method ($meth);
+    }
+
+    # Add methods to bean
+    foreach my $meth_opt (@{$bean_desc->{constr_opt}}) {
+        require PerlBean::Method::Constructor;
+        my $meth = PerlBean::Method::Constructor->new ($meth_opt);
+        $bean->add_method ($meth);
+    }
+    $collection->add_perl_bean ($bean);
+
+    # Add symbols to bean
+    foreach my $sym_opt ( @{ $bean_desc->{sym_opt} } ) {
+        my $sym = PerlBean::Symbol->new($sym_opt);
+        $bean->add_symbol($sym);
+    }
+
+    # Add tag descriptions to bean
+    foreach my $tag_opt ( @{ $bean_desc->{tag_opt} } ) {
+        my $tdesc = PerlBean::Described::ExportTag->new($tag_opt);
+        $bean->add_export_tag_description($tdesc);
+    }
+
+    # Add dependencies to bean
+    foreach my $use_opt ( @{ $bean_desc->{use_opt} } ) {
+        my $dep = PerlBean::Dependency::Use->new($use_opt);
+        $bean->add_dependency($dep);
+    }
+}
+
+# Revove the old tmp directory
+system ('rm -rf tmp');
+
+# Make a new tmp directory
+mkdir ('tmp');
+
+# Write the hierarch
+$collection->write ('tmp');
+
+# SUBROUTINES
+
+sub read_synopsis {
+    my $fn = shift;
+
+    my $ffn =undef;
+
+    foreach my $dir (@_) {
+        ( -f "$dir/$fn" ) || next;
+        $ffn = "$dir/$fn";
+    }
+
+    defined($ffn) || return('TODO');
+
+    use IO::File;
+    my $fh = IO::File->new("< $ffn");
+    my $syn = '';
+    my $prev = $fh->getline();
+    while (my $line = $fh->getline() ) {
+        $syn .= ' ' . $prev;
+        $prev = $line;
+    }
+    return($syn);
+}
+
+sub by_method_factory_name {
+    $a->{method_factory_name} cmp $b->{method_factory_name};
+}
+

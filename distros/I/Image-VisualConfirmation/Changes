@@ -1,0 +1,37 @@
+Revision history for Perl extension Image::VisualConfirmation.
+
+0.10007
+    - fix typos
+
+0.10006
+    - switch to Dist::Zilla
+    - new versioning scheme
+    - fix tests at last, hopefully (by setting a 'ft2' DEFAULT_FONT_TYPE
+      for vera.ttf (thanks Franck Perrot for pointing the problem out)
+    - added recommendation to pass font_type if using custom font_file
+    - added sample usage in examples directory
+
+0.05
+    - added the option to explictly specify font_type for
+      a font_file (RT bug #61901) 
+
+0.04
+    - fix tests to work with newer Imager
+
+0.03
+    - lotta more tests
+    - documentation improvements
+    - image method now forwards options to Imager write method
+      
+0.02  Thu May 25 2006
+    - background color is now random
+    - removed "bgcolor" useless attribute
+    - improved visibility of the text by limiting colors
+    - improved challenge by adding noise and sharpen filters to the
+      image
+    - added support for "code" parameter
+    - improved documentation
+    - code cleaning
+
+0.01  Thu May 25 2006
+    - original version

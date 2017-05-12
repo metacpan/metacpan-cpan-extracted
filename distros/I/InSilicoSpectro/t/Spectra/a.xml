@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<idi:header xmlns:idi="namespace/PeptSpectra.html">
+  <idi:instrument>n/a</idi:instrument>
+  <idi:spectrumType>msms</idi:spectrumType>
+  <idi:date>2004-21-13</idi:date>
+  <idi:time>05:21:21</idi:time>
+  <ple:ItemOrder  xmlns:ple="namespace/PeakListExport.html">
+    <ple:item type="mass"/>
+    <ple:item type="intensity"/>
+    <ple:item type="charge"/>
+  </ple:ItemOrder>
+
+  <ple:ItemOrder  xmlns:ple="namespace/PeakListExport.html">
+    <ple:item type="mass"/>
+    <ple:item type="intensity"/>
+    <ple:item type="charge"/>
+  </ple:ItemOrder>
+
+  <ple:ItemOrder  xmlns:ple="namespace/PeakListExport.html">
+    <ple:item type="mass"/>
+    <ple:item type="intensity"/>
+    <ple:item type="chargeXXXX"/>
+  </ple:ItemOrder>
+</idi:header>

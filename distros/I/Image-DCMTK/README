@@ -1,0 +1,99 @@
+NAME
+    Image::DCMTK - Interface to the DCMTK Dicom Toolkit
+
+VERSION
+    Version 0.05
+
+SYNOPSIS
+    Provides a set of interface functions to the Dicom Toolkit (dcmtk)
+
+    In most cases, the Dicom tags are treated as a hash to and from the
+    various functions.
+
+    There is an included Dicom Dictionary, but you are free to add your own
+    tags as well
+
+EXPORT
+SUBROUTINES/METHODS
+  openDicomFile
+    Read a Dicom File and generate a Dicom object
+
+  returnTagAsXML
+    Return an XML formatted string version of a given DICOM tag
+
+    You may use either a Group and Element type tag or a DICOM Dictionary
+    Common Name (PatientID for example)
+
+    This function really just calls open/closeXMLSequence open/closeXMLItem
+    or makeXMLElement as needed
+
+  makeXMLElement
+    Return an XML formatted string version of a given "normal" DICOM tag
+    (not a Item or a Sequence structure)
+
+  openXMLItem
+    Return an XML formatted string of the DICOM "Open Item" tag
+
+  closeXMLItem
+    Return an XML formatted string of the DICOM "Close Item" tag
+
+  openXMLSequence
+    Return an XML formatted string of an DICOM "Open Sequence" tag
+
+  closeXMLSequence
+    Return an XML formatted string of an DICOM "Close Sequence" tag
+
+  parseDCMXMLDumpForTagLists
+  parseDCMXMLDumpForSequences
+  parseDCMXMLDump
+  parseDCMDumpForSequences
+  parseDCMDumpForTagLists
+  parseDCMDump
+  modifyAnImage
+AUTHOR
+    Robert Haxton, "<robert.haxton at gmail.com>"
+
+BUGS
+    Please report any bugs or feature requests to "bug-dcmtk-dicomtags at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Image-DCMTK>. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Image::DCMTK
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker (report bugs here)
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Image-DCMTK>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Image-DCMTK>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Image-DCMTK>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Image-DCMTK/>
+
+    *   Code Repository
+
+        <https://code.google.com/p/Image-DCMTK/>
+
+ACKNOWLEDGEMENTS
+LICENSE AND COPYRIGHT
+    Copyright 2008-2012 Robert Haxton.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

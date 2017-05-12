@@ -1,0 +1,35 @@
+<!ELEMENT idi:PeptSpectraIdentifications ( idi:OneSample+ ) >
+  <!ATTLIST idi:PeptSpectraIdentifications xmlns:idi CDATA #FIXED "namespace/PeptSpectra.html">
+
+  <!ELEMENT idi:OneSample ( idi:header, idi:Identifications ) >
+
+    <!ELEMENT idi:header ( idi:instrument, idi:spectrumType, idi:date, idi:time, idi:autoExtraction, ple:ItemOrder ) >
+      <!ELEMENT idi:instrument ( #PCDATA ) >
+      <!ELEMENT idi:spectrumType ( #PCDATA ) >
+      <!ELEMENT idi:date ( #PCDATA ) >
+      <!ELEMENT idi:time ( #PCDATA ) >
+      <!ELEMENT idi:autoExtraction ( #PCDATA ) >
+      <!ELEMENT ple:ItemOrder ( ple:item+ ) >
+        <!ATTLIST ple:ItemOrder xmlns:ple CDATA #FIXED "namespace/PeakListExport.html">
+        <!ELEMENT ple:item EMPTY >
+          <!ATTLIST ple:item type CDATA #REQUIRED >
+
+    <!ELEMENT idi:Identifications ( idi:OneIdentification+ ) >
+      <!ELEMENT idi:OneIdentification ( idi:answer, idi:source?, ple:peptide ) >
+
+        <!ELEMENT idi:answer ( idi:sequence, idi:modif, idi:charge, idi:retentionTime? ) >
+          <!ELEMENT idi:sequence ( #PCDATA ) >
+          <!ELEMENT idi:modif ( #PCDATA ) >
+          <!ELEMENT idi:charge ( #PCDATA ) >
+          <!ELEMENT idi:retentionTime ( #PCDATA ) >
+
+        <!ELEMENT idi:source ( idi:file, idi:proteinId, idi:peptScore ) >
+          <!ELEMENT idi:file ( #PCDATA ) >
+          <!ELEMENT idi:proteinId ( #PCDATA ) >
+          <!ELEMENT idi:peptScore ( #PCDATA ) >
+
+        <!ELEMENT ple:peptide ( ple:PeptideDescr, ple:ParentMass, ple:peaks ) >
+          <!ATTLIST ple:peptide xmlns:ple CDATA #FIXED "namespace/PeakListExport.html">
+          <!ELEMENT ple:PeptideDescr ( #PCDATA ) >
+          <!ELEMENT ple:ParentMass ( #PCDATA ) >
+          <!ELEMENT ple:peaks ( #PCDATA ) >

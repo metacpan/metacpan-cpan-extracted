@@ -1,0 +1,5 @@
+lib/IPC/Command/Multiplex.pm
+Makefile.PL
+MANIFEST			This list of files
+t/use_ok.t
+META.yml                                 Module meta-data (added by MakeMaker)

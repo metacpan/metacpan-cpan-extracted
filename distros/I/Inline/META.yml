@@ -1,0 +1,31 @@
+---
+abstract: 'Write Perl Subroutines in Other Programming Languages'
+author:
+  - 'Ingy döt Net <ingy@cpan.org>'
+build_requires:
+  Test::More: '0.88'
+  Test::Warn: '0.23'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Inline
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+    - example
+requires:
+  Digest::MD5: '0'
+  File::Spec: '0.8'
+  perl: v5.8.1
+resources:
+  bugtracker: https://github.com/ingydotnet/inline-pm/issues
+  homepage: https://github.com/ingydotnet/inline-pm
+  repository: https://github.com/ingydotnet/inline-pm.git
+version: '0.80'

@@ -1,0 +1,10 @@
+Revision history for Perl extension IPDevice.
+
+0.03  Wed Jun 20 20:40:00 2004
+	- Huge update, practically all classes have been
+	  massively extended.
+
+0.01  Wed May 19 20:45:30 2004
+	- original version; created by h2xs 1.21 with options
+		-AX -n IPDevice
+

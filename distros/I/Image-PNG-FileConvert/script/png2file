@@ -1,0 +1,23 @@
+#!perl
+use warnings;
+use strict;
+use Image::PNG::FileConvert 'png2file';
+use Getopt::Long;
+my $infile = $ARGV[0];
+if ($infile) {
+    png2file ($infile);
+}
+else {
+    usage ();
+}
+exit;
+
+sub usage
+{
+    print "Usage:\n";
+    print "$0 <infile>\n";
+}
+
+# Local Variables:
+# mode: perl
+# End:

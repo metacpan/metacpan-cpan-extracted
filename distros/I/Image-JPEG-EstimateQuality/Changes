@@ -1,0 +1,11 @@
+Revision history for Perl extension Image-JPEG-EstimateQuality
+
+0.02 2014-01-29T00:43:25Z
+
+    - Fixed standalone script and document for it.
+      (benkasminbullock)
+
+0.01 2014-01-27T01:33:01Z
+
+    - original version
+

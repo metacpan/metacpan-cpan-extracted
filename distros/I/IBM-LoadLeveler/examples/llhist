@@ -1,0 +1,61 @@
+# -*- Perl -*-
+
+# Extract data from a history file
+
+use IBM::LoadLeveler;
+
+$query = ll_query(JOBS);
+
+$return=ll_set_request($query,QUERY_ALL,undef,ALL_DATA);
+
+if ($return != 0 )
+{
+    print STDERR "ll_set_request failed Return = $return\n";
+}
+
+$job=ll_get_objs($query,LL_HISTORY_FILE,"/home/mike/globalhist.200210290000",$number,$err);
+
+while ( $job)
+{
+    $JobName=ll_get_data($job,LL_JobName);
+    $SubmitTime=ll_get_data($job,LL_JobSubmitTime);
+    my @time=localtime($SubmitTime);
+    $submit=$time[4]+1 . "/$time[3] $time[2]:$time[1]";
+
+    # Get User Information
+
+    $cred=ll_get_data($job,LL_JobCredential);
+    $owner=ll_get_data($cred,LL_CredentialUserName);
+
+    $steps=ll_get_data($job,LL_JobStepCount);
+    $step=ll_get_data($job,LL_JobGetFirstStep);
+	
+    while ($step)
+    {
+	$class=ll_get_data($step,LL_StepJobClass);
+	$nodes=ll_get_data($step,LL_StepNodeCount);
+	$geometry=ll_get_data($step,LL_StepTaskGeometry);
+	$tasks=ll_get_data($step,LL_StepTaskInstanceCount);
+	$taskspernode=ll_get_data($step,LL_StepTasksPerNodeRequested);
+	$reqnodes=ll_get_data($step,LL_StepTotalNodesRequested);
+	$tasksreq=ll_get_data($step,LL_StepTotalTasksRequested);
+
+	print "----------------------------------------\n";
+	print "Job Name        : $JobName\n";
+	print "Owner           : $owner\n";
+	print "Submitted       : $submit\n";
+	print "Class           : $class\n";
+	print "Steps           : $steps\n";
+	print "Node Count      : $nodes\n";
+	print "Geometry        : $geometry\n";
+	print "Nodes Requested : $reqnodes\n";
+	print "Tasks per Node  : $taskspernode\n";
+	print "Tasks           : $tasks\n";
+	print "Tasks Requested : $tasksreq\n";
+	$step=ll_get_data($job,LL_JobGetNextStep);
+    }
+    $job=ll_next_obj($query);
+}
+ll_free_objs($query);
+ll_deallocate($query);
+

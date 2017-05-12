@@ -1,0 +1,24 @@
+---
+name: IO-All-SFTP
+version: 0.01
+author:
+  - 'Ryan Niebur <ryanryan52@gmail.com>'
+abstract: use sftp from IO::All
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  IO::All::LWP: 0
+  LWP::Protocol::sftp: 0
+build_requires:
+  IO::All::LWP: 0
+  LWP::Protocol::sftp: 0
+  Test::More: 0
+provides:
+  IO::All::SFTP:
+    file: lib/IO/All/SFTP.pm
+    version: 0.01
+generated_by: Module::Build version 0.33
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

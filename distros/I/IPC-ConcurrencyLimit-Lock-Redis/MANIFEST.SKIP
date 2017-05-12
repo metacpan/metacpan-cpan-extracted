@@ -1,0 +1,10 @@
+\..*\.sw[po]$
+\.gitignore
+pm_to_blib
+blib/
+Makefile$
+Makefile\.bak$
+\.git/
+MYMETA\.(?:yml|json)$
+redis_connect_data$
+dist.ini$

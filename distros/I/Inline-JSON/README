@@ -1,0 +1,45 @@
+Inline-JSON
+
+Embed JSON data structures directly into your Perl code
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Inline::JSON
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Inline-JSON
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Inline-JSON
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Inline-JSON
+
+    Search CPAN
+        http://search.cpan.org/dist/Inline-JSON/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2012 Kilna Companies
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

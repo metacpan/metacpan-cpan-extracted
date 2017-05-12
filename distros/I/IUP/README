@@ -1,0 +1,66 @@
+### IUP perl module ###
+
+The IUP module is a perl binding for cross-platform GUI toolkit designed to run
+on the following platforms: 
+ * Win32 native GUI (native Windows + Cygwin)
+ * GTK2+
+ * Motif-X11
+On all platform it uses native GUI widgets.
+
+It is based on the following libraries:
+ * iup library - see http://www.tecgraf.puc-rio.br/iup/
+ * im library  - see http://www.tecgraf.puc-rio.br/im/
+ * cd library  - see http://www.tecgraf.puc-rio.br/cd/
+There is no need to install them before installing IUP; they are handled by 
+separate Alien::IUP module - http://search.cpan.org/dist/Alien-IUP/
+
+See 'examples' folder to see how the perl programs using IUP module look like.
+
+CPAN RELEASE
+
+ The official releases of IUP 
+ - can be found at: http://search.cpan.org/dist/IUP/
+ - can be simply installed via CPAN client: cpan -i IUP
+
+INSTALLATION
+
+To install this module:
+
+ * get latest src tarball from https://github.com/kmx/perl-iup/tarball/master
+
+ * unpack src tarball and run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+    
+    note: you need to install Alien::IUP from CPAN before building IUP module
+    
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2010 KMX
+
+This program is distributed under the MIT License:
+http://www.opensource.org/licenses/mit-license.php
+
+Permission is hereby granted, free of charge, to any person
+obtaining a copy of this software and associated documentation
+files (the "Software"), to deal in the Software without
+restriction, including without limitation the rights to use,
+copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.

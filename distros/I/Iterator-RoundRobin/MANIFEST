@@ -1,0 +1,10 @@
+Makefile.PL
+Changes
+MANIFEST
+MANIFEST.skip
+META.yml
+README
+lib/Iterator/RoundRobin.pm
+t/00-load.t
+t/11-new.t
+t/12-functions.t

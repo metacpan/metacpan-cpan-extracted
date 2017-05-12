@@ -1,0 +1,39 @@
+#! /usr/local/bin/perl -w
+
+# Zoghbi and Stojmenovic
+# ZS1 algorithm for reverse lexographic integer partition generation
+#
+# Perl implementation (c) David Landgren 2007
+#
+# see www.site.uottawa.ca/~ivan/F49-int-part.pdf 
+
+use strict;
+use warnings;
+
+my $n = shift;
+print "$n\n";
+
+my @x = (1) x $n;
+$x[0] = $n;
+my $m = 0;
+my $h = 0;
+
+while ($x[0] != 1) {
+    if ($x[$h] == 2) {
+        ++$m;
+        $x[$h--] = 1;
+    }
+    else {
+        my $r = $x[$h] - 1;
+        $x[$h] = $r;
+
+        my $t = $m - $h + 1;
+        while ($t >= $r) {
+            $x[++$h] = $r;
+            $t -= $r;
+        }
+        $m = $h + ($t ? 1 : 0);
+        $t > 1 and $x[++$h] = $t;
+    }
+    print "@x[0..$m]\n";
+}

@@ -1,0 +1,29 @@
+--- #YAML:1.0
+name:               IO-Easy
+version:            0.16
+abstract:           ~
+author:
+    - Ivan Baktsheev <dot.and.thing@gmail.com>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Class::Easy:  0.15
+    Encode:       0
+    File::Spec:   0
+resources:
+    bugtracker:  http://rt.cpan.org/NoAuth/Bugs.html?Dist=IO-Easy
+    homepage:    http://perlhug.com
+    license:     http://dev.perl.org/licenses/
+    repository:  git://web-app.git.sourceforge.net/gitroot/perl-easy/perl-easy
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

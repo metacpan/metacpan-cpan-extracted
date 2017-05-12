@@ -1,0 +1,26 @@
+benchmark.pl
+Build.PL
+ChangeLog
+lib/IO/Buffered.pm
+lib/IO/Buffered/FixedSize.pm
+lib/IO/Buffered/HTTP.pm
+lib/IO/Buffered/Last.pm
+lib/IO/Buffered/Regexp.pm
+lib/IO/Buffered/Size.pm
+lib/IO/Buffered/Split.pm
+MANIFEST			This list of files
+t/00-use.t
+t/01-critic.t
+t/02-pod.t
+t/03-pod-coverage.t
+t/errors.t
+t/fixedsize.t
+t/http.t
+t/last.t
+t/perlcriticrc
+t/regexp.t
+t/size.t
+t/split.t
+Makefile.PL
+README
+META.yml

@@ -1,0 +1,10 @@
+Image::PNG::Simple
+
+Convert bitmap file to png file without C library dependency.
+
+INSTALLATION
+
+   perl Makefile.PL
+   make
+   make test
+   make install

@@ -1,0 +1,29 @@
+---
+abstract: 'read the "d" attribute of an SVG path'
+author:
+  - 'Ben Bullock <bkb@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Image-SVG-Path
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: '5.006001'
+resources:
+  bugtracker: https://github.com/benkasminbullock/Image-SVG-Path/issues
+  repository: https://github.com/benkasminbullock/Image-SVG-Path
+version: '0.30'
+x_contributors:
+  - 'Alessandro Ranellucci <aar@cpan.org>'
+  - 'Colin Kuskie <colink@cpan.org>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

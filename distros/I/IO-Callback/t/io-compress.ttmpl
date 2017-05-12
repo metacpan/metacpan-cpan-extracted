@@ -1,0 +1,66 @@
+<<< IF vary!!zip!!gzip,bzip2 == 'gzip';
+    unzip   = 'gunzip';
+    modpkg  = 'IO::Compress::Gzip';
+    modpkgu = 'IO::Uncompress::Gunzip';
+ELSE;
+    unzip   = 'bunzip2';
+    modpkg  = 'IO::Compress::Bzip2';
+    modpkgu = 'IO::Uncompress::Bunzip2';
+END ->>>
+# Check that IO::Callback inter-operates with <<< modpkg >>>
+
+use strict;
+use warnings;
+
+use Test::More;
+BEGIN {
+    eval 'use <<< modpkg >>> qw/<<< zip >>>/';
+    plan skip_all => '<<< modpkg >>> required' if $@;
+
+    eval 'use <<< modpkgu >>> qw/<<< unzip >>>/';
+    plan skip_all => '<<< modpkgu >>> required' if $@;
+
+    plan tests => 6;
+}
+use Test::NoWarnings;
+
+use Fatal qw/close/;
+use IO::Callback;
+
+sub is_zipped ($$;$) {
+    my ($zgot, $want, $comment) = @_;
+
+    my $got;
+    <<< unzip >>>(\$zgot, \$got) or die "<<< unzip >>> failed";
+    is( $got, $want, $comment );
+}
+
+my $test_data = "foo\n" x 100;
+
+my $lines = 0;
+my $coderef_read_fh = IO::Callback->new('<', sub {
+    return if $lines++ >= 100;
+    return "foo\n";
+});
+
+my $compressed;
+ok <<< zip >>>($coderef_read_fh, \$compressed), "<<< zip >>> from read coderef succeeded";
+is_zipped $compressed, $test_data, "<<< zip >>> from read coderef correct";
+
+my $got_close = 0;
+my $got_data = '';
+my $coderef_write_fh = IO::Callback->new('>', sub {
+    my $buf = shift;
+    if (length $buf) {
+        $got_close and die "write after close";
+        $got_data .= $buf;
+    } else {
+        ++$got_close;
+    }
+});
+
+ok <<< zip >>>(\$test_data, $coderef_write_fh), "<<< zip >>> to write coderef succeeded";
+close $coderef_write_fh;
+is $got_close, 1, "write fh got close";
+is_zipped $got_data, $test_data, "<<< zip >>> to write coderef correct";
+

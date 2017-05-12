@@ -1,0 +1,23 @@
+NAME
+    `IO::Async::Loop::EV' - use `IO::Async' with `EV'
+
+SYNOPSIS
+     use IO::Async::Loop::EV;
+
+     my $loop = IO::Async::Loop::EV->new();
+
+     $loop->add( ... );
+
+     $loop->add( IO::Async::Signal->new(
+           name => 'HUP',
+           on_receipt => sub { ... },
+     ) );
+
+     $loop->loop_forever();
+
+DESCRIPTION
+    This subclass of IO::Async::Loop uses EV to perform its work.
+
+AUTHOR
+    Paul Evans <leonerd@leonerd.org.uk>
+

@@ -1,0 +1,34 @@
+Revision history for IO-AIO-Util
+
+0.09  Wed Sep 16 06:39:23 UTC 2009
+    - Stopped creating parent and child directories asynchronously. The resulting
+      race condition was responsible for the sporadic "not found" errors that the
+      previous update intentionally ignored.
+
+0.08  Tue Sep 15 07:07:01 UTC 2009
+    - Updated behaviour to match that of `mkdir -p` from GNU coreutils.
+    - Fixed sporadically failing test cases under linux.
+
+0.07 Wed May 13 22:26:25 UTC 2009
+    - Used warnings and updated prereqs for higher kwalitee.
+    - Added link to repository.
+
+0.06 Sat May 24 03:37:38 UTC 2008
+    - Stopped using aio_block, as it disappeared from IO::AIO 3.
+
+0.05 Sat Dec 1 02:59:51 UTC 2007
+    - Used warnings for better kwalitee.
+
+0.04  Tue Aug 14 02:59:08 GMT 2007
+    - Allowed aio_mktree to be exported.
+
+0.03  Tue Aug 7 20:27:06 GMT 2007
+    - Skipped tests for permissions errors when run as root.
+
+0.02  Mon Aug 6 06:50:37 GMT 2007
+    - Used POSIX instead of %!.
+    - Set errno to ENOTDIR when appropriate.
+    - Added tests for errno.
+
+0.01  Sun Aug 5 18:40:44 GMT 2007
+    - Initial distribution.

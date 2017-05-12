@@ -1,0 +1,56 @@
+NAME
+    IO::Async::Loop::IO::Async - use "IO::Async" with "IO::Async"
+
+SYNOPSIS
+     use IO::Async::Loop::IO::Async;
+
+     my $loop = IO::Async::Loop::IO::Async->new();
+
+     $loop->add( ... );
+
+     $loop->add( IO::Async::Signal->new(
+           name => 'HUP',
+           on_receipt => sub { ... },
+     ) );
+
+     $loop->loop_forever();
+
+DESCRIPTION
+    This subclass of IO::Async::Loop uses another instance of an
+    "IO::Async::Loop" object as its underlying implementation. While this at
+    first appears to be pointless, this module distribution is not primarily
+    intended to serve a useful purpose for end-users. Rather, it stands as a
+    real code example, for authors of other modules to use for reference.
+
+  For "IO::Async::Loop::*" Authors
+    Authors of other subclasses to implement "IO::Async::Loop" subclasses
+    may find this distribution useful as a template. By copying the code and
+    replacing the contents of the various "watch_*" and "unwatch_*" methods,
+    a Loop implementation can be built making use of some other event system
+    or underlying kernel blocking primative.
+
+  For Authors of Other Event Systems
+    Authors of implementations in other event systems wishing to support
+    running their event system on top of IO::Async may find this
+    distribution useful to read a way to implement the various underlying
+    behaviours, such as watching filehandles and timers. Examples in each of
+    the "watch_*" and "unwatch_*" methods may be useful to demonstrate the
+    sort of code that might be required to attach some other event system on
+    top of "IO::Async".
+
+CONSTRUCTOR
+  $loop = IO::Async::Loop::IO::Async->new()
+    This function returns a new instance of a "IO::Async::Loop::IO::Async"
+    object.
+
+METHODS
+  $loop->parent_loop( $parent )
+  $parent = $loop->parent_loop
+    Accessor for the underlying "IO::Async::Loop" that this loop will use.
+    If one is not provided by the time that "loop_once" is first invoked,
+    one will be constructed using the normal "IO::Async::Loop->new"
+    constructor. This method may be used to access it after that.
+
+AUTHOR
+    Paul Evans <leonerd@leonerd.org.uk>
+

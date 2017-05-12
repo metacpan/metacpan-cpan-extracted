@@ -1,0 +1,386 @@
+=head1 NAME
+
+Inline::SLang::Config - How to configure Inline::SLang
+
+=head1 DESCRIPTION
+
+The L<Inline|Inline> documentation describes how you can
+configure the Inline-specific options. Please review that
+document if you are unfamiliar with the way Inline
+works (in particular the section on "Configuration
+Options"). This document describes the options that are 
+available to configure the S-Lang interface.
+
+=head2 Options
+
+=head3 BIND_NS - what namespaces should be searched?
+
+This option - which takes either a string or a reference to
+an array of strings - specifies the S-Lang namespaces which
+are searched for functions to bind to Perl. The accepted
+values are:
+
+=over 2
+
+=item "Global"
+
+Binds functions in the Global namespace only. This is the
+B<default> value.
+
+=item "All"
+
+Binds functions in all the namespaces that are defined at
+the time of compilation. You can not use the namespace
+renaming feature discussed below with this
+option (so "All=foo" does not work).
+
+=item Array reference
+
+If an array reference is given then it should contain
+the names of the namespaces to search for S-Lang
+functions. In most case you will want to ensure that
+"Global" is contained in this list.
+
+=back
+
+The default behaviour is for 
+functions in the "Global" namespace to be bound
+to the Perl C<main> package (so they can be used without
+any package specifier) while functions in other
+namespaces are placed into the Perl
+package whose name equals that of the S-Lang namespace
+(see below for examples). 
+This can be changed by supplying strings matching "foo=bar",
+which says to bind S-Lang functions from the C<foo> namespace
+into the Perl package C<bar>. Therefore,
+
+  BIND_NS => [ "Global=foo", "foo" ],
+
+will bind all S-Lang functions from the C<Global> and
+C<foo> namespaces into Perl's C<foo> package.
+
+Note that B<no> checks are made for over-writing functions
+when they are bound to Perl. Also, if you are using this
+functionality you should probably be using the 2-argument
+form of S-Lang's C<import> and C<evalfile> commands
+instead.
+
+The following examples are also available in the
+F<examples/> sub-directory of the source code (this directory
+is not installed by C<make install>).
+
+=over 2
+
+=item Example of using a single namespace:
+
+ use Inline 'SLang' => Config => BIND_NS => ["foo"];
+ use Inline 'SLang' => <<'EOS1';
+  define fn_in_global(x) { "in global"; }
+  implements( "foo" );
+  define fn_in_foo(x) { "in foo"; }
+ EOS1
+
+ # this works
+ printf "I am %s\n", foo::fn_in_foo("dummyval");
+
+ # this does not work since fn_in_global is in the
+ # Global namespace which was not given to the
+ # BIND_NS option
+ printf "I am %s\n", fn_in_global("dummyval");
+
+=item Example of using multiple namespaces:
+
+ use Inline 'SLang' => Config => BIND_NS => [ "Global", "foo" ];
+ use Inline 'SLang' => <<'EOS1';
+  define fn_in_global(x) { "in global"; }
+  implements( "foo" );
+  define fn_in_foo(x) { "in foo"; }
+ EOS1
+
+ # this works
+ printf "I am %s\n", foo::fn_in_foo("dummyval");
+
+ # as does this
+ printf "I am %s\n", fn_in_global("dummyval");
+
+=item Example of renaming a namespace:
+
+ use Inline 'SLang' => Config => BIND_NS => [ "Global", "foo=bar" ];
+ use Inline 'SLang' => <<'EOS1';
+  define fn_in_global(x) { "in global"; }
+  implements( "foo" );
+  define fn_in_foo(x) { "in foo"; }
+ EOS1
+
+ # this works
+ printf "I am %s\n", bar::fn_in_foo("dummyval");
+
+ # as does this
+ printf "I am %s\n", fn_in_global("dummyval");
+
+=item Example of using all namespaces:
+
+ use Inline 'SLang' => Config => BIND_NS => "All";
+ use Inline 'SLang' => <<'EOS1';
+  define fn_in_global(x) { "in global"; }
+  implements( "foo" );
+  define fn_in_foo(x) { "in foo"; }
+ EOS1
+
+ # this works
+ printf "I am %s\n", foo::fn_in_foo("dummyval");
+
+ # as does this
+ printf "I am %s\n", fn_in_global("dummyval");
+
+=back
+
+=head3 BIND_SLFUNCS - which S-Lang intrinsic functions to bind?
+
+This option is used to give a list of S-Lang I<intrinsic>
+functions which are to be bound to Perl. The default value
+is B<[]>, i.e. no functions.
+
+Note that there are B<no> checks on whether it makes sense
+to bind the specified function, or whether it conflicts
+with an existing Perl definition.
+
+=over 2
+
+=item Example of binding an intrinsic command into main:
+
+  use Inline 'SLang' => Config => BIND_SLFUNCS => ["typeof"];
+  use Inline 'SLang' => "define get_typeof(x) { typeof(x); }";
+
+  # both lines print
+  #  The S-Lang type of 'foo' is String_Type
+  printf "The S-Lang type of 'foo' is %s\n", get_typeof("foo");
+  printf "The S-Lang type of 'foo' is %s\n", typeof("foo");
+
+=item Example of binding an intrinsic command into the foo package:
+
+  use Inline 'SLang' => Config =>
+    BIND_NS => "Global=foo",
+    BIND_SLFUNCS => ["typeof"];
+  use Inline 'SLang' => " ";
+
+  # This also prints
+  #  The S-Lang type of 'foo' is String_Type
+  printf "The S-Lang type of 'foo' is %s\n", foo::typeof("foo");
+
+=back
+
+The reason for giving C<" "> as the S-Lang code in the
+last example is to stop C<Inline> from complaining about being
+sent no code.
+
+=head3 SETUP - how to configure the S-Lang interpreter?
+
+The C<SETUP> option can be set to one of:
+
+=over 2
+
+=item "slsh"
+
+This is the I<default> value. When set, the S-Lang interpreter
+is set up in a similar manner to that of the C<slsh> interpreter
+from the S-Lang distribution (v1.4.9):
+
+=over 2
+
+=item *
+
+The interpreter's load path - i.e. the path that can be accessed
+using the C<get_slang_load_path()> and C<set_slang_load_path()>
+routines from the S-Lang Run-Time Library - is set to the
+contents of the environment variable C<SLSH_PATH>.
+
+=item *
+
+The system configuration file F<slsh.rc> is evaluated. This file is
+looked for in one of:
+
+=over 2
+
+=item a
+
+The C<SLSH_CONF_DIR> environment variable.
+
+=item b
+
+The C<SLSH_LIB_DIR> environment variable.
+
+=item c
+
+The directories: C</usr/local/etc:/usr/local/slsh:/etc:/etc/slsh>.
+
+=back
+
+=item *
+
+The user's configuration file F<.slshrc> is evaluated. This file
+is searched for in the directory given by the environment variable
+C<HOME>.
+
+=back
+
+=item "none"
+
+No additional set up is made to the interpreter.
+
+=back
+
+At present the code used to support the C<slsh> option will
+only work for UNIX-style file systems/set ups.
+
+=head3 EXPORT - how to export Perl functions from Inline::SLang
+
+The L<Inline::SLang module|Inline::SLang> contains
+a number of utility routines that are - by default - only
+available using the fully-qualified package name. If you would
+rather use C<sl_array(...)> than C<Inline::SLang::sl_array(...)>
+then you can use the C<EXPORT> option.
+This resembles the standard Perl export mechanism but
+is not as feature rich.
+
+The available functions are (see
+L<Inline::SLang> for a detailed description):
+
+=over 4
+
+=item sl_array()
+
+A wrapper around the constructor for the C<Array_Type> class.
+Useful if you want to ensure that a Perl array reference is
+converted to the correct array type and size in S-Lang.
+
+=item sl_array2perl()
+
+Used to read or write the flag that controls how S-Lang arrays
+are converted to Perl. See L<Inline::SLang::Array>.
+
+=item sl_eval()
+
+Call S-Lang's C<eval()> routine and, on exit, convert the
+stack to Perl.
+
+=item sl_have_pdl()
+
+Determine if the module was compiled with support for
+L<PDL|PDL::Intro>.
+
+=item sl_setup_as_slsh()
+
+Sets up the interpreter in a similar manner to that used
+by C<slsh>. This routine should be rarely needed.
+
+=item sl_setup_called()
+
+Returns the number of times the C<sl_setup_as_slsh()>
+routine has been called.
+
+=item sl_typeof()
+
+A wrapper around S-Lang's C<typeof()> routine. It is more
+efficient than using S-Lang's typeof routine.
+
+=item sl_version()
+
+Returns the version of the S-Lang library used to compile
+the module.
+
+=item C<< <datatype name>() >>
+
+A function is created for each S-Lang datatype known about
+when the Perl code is executed (so this includes
+typedef-fed structures and any application-specific datatypes
+from imported modules). The name of the function matches the
+name of the S-Lang datatype and returns a Perl
+C<DataType_Type> object whose value matches the function
+name - so
+
+  Integer_Type()
+
+is just the same as calling
+
+  DataType_Type->new("Integer_Type");
+
+Note that - as of version 0.12 of C<Inline::SLang> - you can
+also use the name of I<synonyms> as well as the I<base>
+classes. For instance, C<Int32_Type()> will return
+the datatype that corresponds to the S-Lang
+C<Int32_Type> type.
+
+=back
+
+The C<EXPORT> option accepts a reference to an array that lists the
+names of the functions to export, e.g.
+
+  use Inline 'SLang' => Config => EXPORT => [ "sl_array" ];
+
+If you want to export the datatype functions then you
+can either list the names of the required functions in
+the C<EXPORT> array or give the value C<!types> which
+includes them all.
+
+Note that we do not accept the full syntax of the
+L<Exporter|Exporter> module: the C<EXPORT> option
+should be thought of as a toy car next to the 
+RV that is the C<Exporter> module.
+
+=head2 What functions and namespaces have been bound to Perl?
+
+The C<info> option of L<Inline|Inline> can be useful to see
+what has (and has not) been bound to Perl. As an example
+try the following (available as F<examples/info.pl> in the 
+source code of the module):
+
+  perl -MInline=info <<FOO
+  use Inline SLang;
+  # let's not actually do anything
+  __END__
+  __SLang__
+  typedef struct { foo, bar } FooBarStruct_Type;
+  variable foobar = "a string";
+  define foo()  { return foobar; }
+  define bar(x) { foobar = x; }
+  FOO
+
+The relevant part of the output (as of version 0.30) is:
+
+  Configuration details
+  ---------------------
+
+  Version of S-Lang: 1.4.9
+  Perl module version is 0.30 and supports PDL
+
+  The following S-Lang types are recognised:
+   Int32_Type UInteger_Type _IntegerP_Type
+   FooBarStruct_Type[Struct_Type] Int_Type Struct_Type ULong_Type
+   FD_Type Long_Type Float_Type Array_Type UInt32_Type File_Type
+   UInt_Type UChar_Type UShort_Type Double_Type Float64_Type
+   Float32_Type Int16_Type Null_Type Integer_Type BString_Type Char_Type
+   Undefined_Type Short_Type Any_Type Ref_Type Complex_Type Assoc_Type
+   String_Type UInt16_Type DataType_Type
+
+  The following S-Lang namespaces have been bound to Perl:
+
+    2 functions from namespace Global are bound to package main
+          bar()
+          foo()
+
+Any S-Lang intrinsic functions bound to Perl are indicated using
+the format C<< S-Lang name() -> Perl name() >>, even when the
+Perl and S-Lang names match (this may change).
+
+If you have a C<typedef> statement defining a "named" structure then
+the name of the structure will be followed by C<[Struct_Type]>, as with
+the C<FooBarStruct_Type> variable type in the example above.
+
+The format of this section is liable to change; any suggestions
+are I<very> welcome.
+
+=head1 SEE ALSO
+
+L<Inline::SLang>, L<Inline>
+

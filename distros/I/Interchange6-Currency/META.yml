@@ -1,0 +1,39 @@
+---
+abstract: 'Currency objects for Interchange 6'
+author:
+  - 'Peter Mottram (SysPete) <peter@sysnix.com>'
+build_requires:
+  Scalar::Util: '0'
+  Test::Exception: '0'
+  Test::More: '0.94'
+  Test::RequiresInternet: '0.05'
+  Test::Warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Interchange6-Currency
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  CLDR::Number: '0'
+  CLDR::Number::Format::Currency: '0'
+  Carp: '0'
+  Class::Load: '0'
+  Math::BigFloat: '1.60'
+  Moo: '2.000'
+  Safe::Isa: '0'
+  Sub::Quote: '1.004006'
+  namespace::clean: '0'
+resources:
+  IRC: irc://irc.freenode.net/#interchange
+  bugtracker: https://github.com/interchange/Interchange6-Currency/issues
+  repository: https://github.com/interchange/Interchange6-Currency.git
+version: '0.101'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

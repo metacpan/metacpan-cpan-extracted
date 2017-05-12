@@ -1,0 +1,62 @@
+NAME
+    IO::Handle::unread - Pushes string back into input filehandle
+
+VERSION
+    This document describes IO::Handle::unread version 0.02
+
+SYNOPSIS
+        use IO::Handle::unread;
+
+        *STDIN->unread("foo\n");
+        print scalar <STDIN>; # => "foo\n"
+
+DESCRIPTION
+    This module provides "IO::Handle" class with "unread()", a superset of
+    stdio's "ungetc()".
+
+    Since the unread() routines of some layers are unstable, do not use this
+    module for anything serious. There is NO WARRANTY.
+
+INTERFACE
+  *FILEHANDLE*->unread(string [, length])
+    Pushes string back into *FILEHANDLE*, which is available for subsequent
+    read operations.
+
+    This method returns the unreaded byte length.
+
+EXAMPLE
+    Here is an implementation of ungetc(), which deals with one-byte string.
+
+            sub ungetc{
+                    my($in, $char) = @_;
+                    $in->unread($char, 1) == 1 ? $char : undef;
+            }
+
+CONFIGURATION AND ENVIRONMENT
+    IO::Handle::unread requires no configuration files or environment
+    variables.
+
+DEPENDENCIES
+    Perl 5.8.1 or later.
+
+BUGS AND LIMITATIONS
+    No bugs have been reported.
+
+    Please report any bugs or feature requests to
+    "bug-io-handle-unread@rt.cpan.org/", or through the web interface at
+    <http://rt.cpan.org/>.
+
+SEE ALSO
+    IO::Handle.
+
+    perliol.
+
+AUTHOR
+    Goro Fuji <gfuji(at)cpan.org>.
+
+LICENSE AND COPYRIGHT
+    Copyright (c) 2008, Goro Fuji <gfuji(at)cpan.org>. Some rights reserved.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

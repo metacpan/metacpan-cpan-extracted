@@ -1,0 +1,39 @@
+@prefix :        <http://usefulinc.com/ns/doap#> .
+@prefix dcs:     <http://ontologi.es/doap-changeset#> .
+@prefix dc:      <http://purl.org/dc/terms/> .
+@prefix foaf:    <http://xmlns.com/foaf/0.1/> .
+@prefix my:      <http://purl.org/NET/cpan-uri/dist/Icon-FamFamFam-Silk/> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix toby:    <http://tobyinkster.co.uk/#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+
+my:project
+	a               :Project ;
+	:name           "Icon-FamFamFam-Silk" ;
+	:shortdesc      "embed these famous icons in your code"@en ;
+	:programming-language  "Perl" ;
+	:homepage       <https://metacpan.org/release/Icon-FamFamFam-Silk> ;
+	:download-page  <https://metacpan.org/release/Icon-FamFamFam-Silk> ;
+	:bug-database   <http://rt.cpan.org/Dist/Display.html?Queue=Icon-FamFamFam-Silk> ;
+	:repository     [ a :SVNRepository ; :browse <http://goddamn.co.uk/svn-web/perlmods/browse/Icon-FamFamFam-Silk/> ] ;
+	:license        <http://creativecommons.org/publicdomain/zero/1.0/> ;
+	:maintainer     toby:i ;
+	:developer      toby:i ;
+	:documenter     toby:i ;
+	:tester         toby:i ;
+	:created        "2010-05-10"^^xsd:date ;
+	rdfs:seeAlso    my:source-project ;
+	:category       [ rdfs:label "icon"@en ] .
+
+my:source-project
+	:name           "Silk" ;
+	:homepage       <http://famfamfam.com/lab/icons/silk/> ;
+	:developer      [ a foaf:Person ; foaf:name "Mark James" ; foaf:homepage <http://famfamfam.com/> ]  ;
+	:license        <http://creativecommons.org/licenses/by/3.0/> .
+
+toby:i
+	a               foaf:Person ;
+	foaf:name       "Toby Inkster" ;
+	foaf:homepage   <http://tobyinkster.co.uk/> ;
+	foaf:page       <https://metacpan.org/author/TOBYINK> ;
+	foaf:mbox       <mailto:tobyink@cpan.org> .

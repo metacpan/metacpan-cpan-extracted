@@ -1,0 +1,4 @@
+name = "Imager-LineTrace"
+# badges = ["travis"]
+module_maker="ModuleBuildTiny"
+

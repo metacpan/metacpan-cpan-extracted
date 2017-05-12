@@ -1,0 +1,19 @@
+Revision history for Perl extension Image::Magick::PixelMosaic.
+
+0.00_01  Sun Jun 22 02:33:18 2008
+  - original version; created by h2xs 1.23 with options
+    -B -X Image::Magick::PixelMosaic
+
+0.01 Thu Jun 26 2008 (JST)
+  - first release
+
+0.02 Fri Jun 27 2008 (JST)
+  - removed requirment for perl version.
+  - changed/fixed POD comment.
+  - appended POD test.
+
+0.03 Fri Jul 04 2008 (JST)
+  - fixed requested Image::Magick version (-> 6.2.4)
+  - append test case t/04_pod_coverage.t
+  - modify normalize parmaeter value for Image::Magick->getPixels
+  - change my email address (use cpan.org)

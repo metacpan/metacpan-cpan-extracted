@@ -1,0 +1,1069 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<rdf:RDF
+ xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+ xmlns="http://purl.org/rss/1.0/"
+ xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#"
+ xmlns:content="http://purl.org/rss/1.0/modules/content/"
+ xmlns:dcterms="http://purl.org/dc/terms/"
+ xmlns:syn="http://purl.org/rss/1.0/modules/syndication/"
+ xmlns:dc="http://purl.org/dc/elements/1.1/"
+ xmlns:taxo="http://purl.org/rss/1.0/modules/taxonomy/"
+ xmlns:admin="http://webns.net/mvcb/"
+ xmlns:atom="http://www.w3.org/2005/Atom"
+>
+
+<channel rdf:about="http://metacpan.org/">
+<title>Recent CPAN uploads by Kent Fredric - MetaCPAN</title>
+<link>http://metacpan.org/</link>
+<description></description>
+<items>
+ <rdf:Seq>
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/App-DH-0.001002" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/App-colourhexdump-0.01011318" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/App-cpanm-meta-checker-0.001000" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/CPAN-Changes-Markdown-0.2.2" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Catalyst-Authentication-Credential-RPX-0.10060100" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Catalyst-Plugin-Spark-Form-0.01000002" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Cave-Wrapper-0.01000004" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Color-Library-Dictionary-XKCD-0.1.0" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/DBIx-Class-InflateColumn-Serializer-JSYNC-0.001000" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Data-Couplet-0.02004314" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Data-Handle-0.02001003" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Data-Rx-Tools-ShareDirValidator-0.1.3" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Dist-Zilla-App-Command-dumpphases-0.6.0" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Dist-Zilla-App-Command-dumpwith-0.001000" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Dist-Zilla-App-Command-lsplugins-0.001000" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Dist-Zilla-Plugin-Author-KENTNL-Prereqs-Latest-Selective-0.1.2" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Dist-Zilla-Plugin-AutoVersion-Relative-0.03000002" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Dist-Zilla-Plugin-Bootstrap-ShareDir-Dist-0.3.0" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Dist-Zilla-Plugin-Bootstrap-ShareDir-Module-0.2.0" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Dist-Zilla-Plugin-Bootstrap-lib-0.04000002" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Dist-Zilla-Plugin-Git-NextRelease-0.002010" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Dist-Zilla-Plugin-Git-NextVersion-Sanitized-0.001000" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Dist-Zilla-Plugin-Git-Remote-Check-0.1.2" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Dist-Zilla-Plugin-LogContextual-0.001000" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Dist-Zilla-Plugin-MetaData-BuiltWith-0.04000002" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Dist-Zilla-Plugin-MetaProvides-2.000000" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Dist-Zilla-Plugin-MetaProvides-Class-1.14000001" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Dist-Zilla-Plugin-MetaProvides-FromFile-1.11060211" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Dist-Zilla-Plugin-MetaProvides-Package-2.000001" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Dist-Zilla-Plugin-ModuleInstall-0.02000000" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Dist-Zilla-Plugin-Prereqs-DarkPAN-0.2.4" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Dist-Zilla-Plugin-Prereqs-MatchInstalled-0.1.6" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Dist-Zilla-Plugin-Prereqs-MatchInstalled-All-0.1.2" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Dist-Zilla-Plugin-Prereqs-Plugins-0.1.3" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Dist-Zilla-Plugin-Prereqs-Recommend-MatchInstalled-0.001000" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Dist-Zilla-Plugin-Prereqs-Soften-0.004000" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Dist-Zilla-Plugin-Prereqs-SyncVersions-0.001001" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Dist-Zilla-Plugin-Test-Compile-PerFile-0.001001" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Dist-Zilla-PluginBundle-Author-KENTNL-2.012001" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Dist-Zilla-PluginBundle-Author-KENTNL-Lite-1.7.2" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Dist-Zilla-Role-Bootstrap-0.2.3" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Dist-Zilla-Role-BundleDeps-0.001001" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Dist-Zilla-Role-Tempdir-0.01053722" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Dist-Zilla-Role-Version-Sanitize-0.001002" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Dist-Zilla-Util-BundleInfo-0.1.3" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Dist-Zilla-Util-EmulatePhase-0.01025803" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Dist-Zilla-Util-Git-Branches-0.001000" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Dist-Zilla-Util-Git-Refs-0.002000" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Dist-Zilla-Util-Git-Tags-0.004000" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Dist-Zilla-Util-Git-Wrapper-0.003000" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Dist-Zilla-Util-RoleDB-0.001000" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Dist-Zilla-Util-SimpleMunge-0.2.2" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Dist-Zilla-Util-Test-KENTNL-1.000000" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Dist-Zilla-UtilRole-MaybeZilla-0.001000" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/ELF-Extract-Sections-0.03000101" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/ElasticSearchX-Model-Generator-0.1.8" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/File-ShareDir-ProjectDistDir-1.000001" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/File-Tempdir-ForPackage-0.1.1" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/File-Tempdir-ForPackage-FromArchive-0.1.0" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Gentoo-ChangeLog-Parser-Eventual-0.1.2" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Gentoo-Dependency-AST-0.001001" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Gentoo-MetaEbuild-Spec-Base-0.1.4" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Gentoo-MetaEbuild-Spec-MiniSpec-0.1.1" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Gentoo-MirrorList-1.0.2" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Gentoo-Overlay-1.0.5" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Gentoo-Overlay-Group-0.2.0" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Gentoo-Overlay-Group-INI-0.2.2" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Gentoo-Perl-Distmap-0.2.0" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Gentoo-Perl-Distmap-FromOverlay-0.1.0" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Gentoo-PerlMod-Version-0.6.0" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Gentoo-PerlMod-Version-FixEbuild-0.1.1" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Git-PurePerl-Walker-0.002000" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Git-Wrapper-Plus-0.004010" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/GraphViz2-Abstract-Edge-0.002000" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/GraphViz2-Abstract-Node-0.002000" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/GraphViz2-Abstract-Util-Constants-0.001000" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/HTTP-Tiny-Mech-0.2.1" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/IPC-Run-Fused-0.04000100" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Log-Contextual-LogDispatchouli-0.001000" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/MetaPOD-0.3.6" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/MetaPOD-Format-JSON-0.3.0" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/MetaPOD-Spec-0.4.1" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Minecraft-SectionFilter-0.002000" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Module-Data-0.007" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/MooseX-Attribute-ValidateWithException-0.3.1" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/MooseX-AttributeIndexes-1.0.3" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/MooseX-Has-Sugar-1.000000" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/MooseX-TypeArray-0.1.0" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/MooseX-Types-FakeHash-0.1.2" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Net-API-RPX-0.04" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Net-Minecraft-Login-0.002000" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Net-Travis-API-0.001000" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Net-TribalWarsMap-API-HTTP-0.1.1" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Net-TribalWarsMap-API-TribeLookup-0.1.0" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Package-Debug-0.2.2" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Package-Strictures-0.01001319" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Paludis-ResumeState-Serialization-0.01000410" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Paludis-UseCleaner-0.01000307" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Path-FindDev-0.5.0" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Path-IsDev-1.001000" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Path-IsDev-HeuristicSet-FromConfig-0.002000" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Path-ScanINC-0.011" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Perl-Build-Git-0.001000" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Pod-Eventual-Reconstruct-0.1.2" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/PortageXS-0.3.1" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Regexp-Grammars-Common-String-0.01000002" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Search-GIN-Extract-AttributeIndexes-1.0.2" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Search-GIN-Extract-ClassMap-0.01060817" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Set-Associate-0.003000" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Spark-Form-0.2102" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/String-Sections-0.3.2" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Task-Spark-Form-1.0.1" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Test-CPAN-Changes-ReallyStrict-0.2.0" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Test-File-ShareDir-1.000000" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/Test-StructuredObject-0.01000010" />
+  <rdf:li rdf:resource="http://metacpan.org/release/KENTNL/lib-byversion-0.001001" />
+ </rdf:Seq>
+</items>
+</channel>
+<item rdf:about="http://metacpan.org/release/KENTNL/App-DH-0.001002">
+<title>App-DH-0.001002</title>
+<link>http://metacpan.org/release/KENTNL/App-DH-0.001002</link>
+<description>Deploy your DBIx::Class Schema to DDL/Database via DBIx::Class::DeploymentHandler</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-04-07T22:13:45Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/App-colourhexdump-0.01011318">
+<title>App-colourhexdump-0.01011318</title>
+<link>http://metacpan.org/release/KENTNL/App-colourhexdump-0.01011318</link>
+<description>HexDump, but with character-class highlighting.</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-05-21T16:47:58Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/App-cpanm-meta-checker-0.001000">
+<title>App-cpanm-meta-checker-0.001000</title>
+<link>http://metacpan.org/release/KENTNL/App-cpanm-meta-checker-0.001000</link>
+<description>Verify and sanity check your installation verses cpanm meta files</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2014-03-15T23:25:37Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/CPAN-Changes-Markdown-0.2.2">
+<title>CPAN-Changes-Markdown-0.2.2</title>
+<link>http://metacpan.org/release/KENTNL/CPAN-Changes-Markdown-0.2.2</link>
+<description>Format your Changes file ( or a section of it ) in Markdown</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-09-25T02:08:40Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Catalyst-Authentication-Credential-RPX-0.10060100">
+<title>Catalyst-Authentication-Credential-RPX-0.10060100</title>
+<link>http://metacpan.org/release/KENTNL/Catalyst-Authentication-Credential-RPX-0.10060100</link>
+<description>Use JanRain&#x26;#39;s RPX service for Credentials</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2012-05-24T10:58:41Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Catalyst-Plugin-Spark-Form-0.01000002">
+<title>Catalyst-Plugin-Spark-Form-0.01000002</title>
+<link>http://metacpan.org/release/KENTNL/Catalyst-Plugin-Spark-Form-0.01000002</link>
+<description>A simple plug-in to make forms accessible quickly off the CTX.</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2012-11-29T18:58:29Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Cave-Wrapper-0.01000004">
+<title>Cave-Wrapper-0.01000004</title>
+<link>http://metacpan.org/release/KENTNL/Cave-Wrapper-0.01000004</link>
+<description>A Wrapper to the Paludis &#x26;#39;cave&#x26;#39; Client.</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-05-10T08:24:47Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Color-Library-Dictionary-XKCD-0.1.0">
+<title>Color-Library-Dictionary-XKCD-0.1.0</title>
+<link>http://metacpan.org/release/KENTNL/Color-Library-Dictionary-XKCD-0.1.0</link>
+<description>Colors determined by the XKCD Color Survey.</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-07-04T14:01:01Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/DBIx-Class-InflateColumn-Serializer-JSYNC-0.001000">
+<title>DBIx-Class-InflateColumn-Serializer-JSYNC-0.001000</title>
+<link>http://metacpan.org/release/KENTNL/DBIx-Class-InflateColumn-Serializer-JSYNC-0.001000</link>
+<description>Basic JSON Object Serialization Support for DBIx::Class.</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-02-17T20:03:50Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Data-Couplet-0.02004314">
+<title>Data-Couplet-0.02004314</title>
+<link>http://metacpan.org/release/KENTNL/Data-Couplet-0.02004314</link>
+<description>Yet another (But Hopefully Better) Key-Value Storage mechanism</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2011-10-28T14:56:10Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Data-Handle-0.02001003">
+<title>Data-Handle-0.02001003</title>
+<link>http://metacpan.org/release/KENTNL/Data-Handle-0.02001003</link>
+<description>A Very simple interface to the __DATA__  file handle.</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-07-26T09:12:02Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Data-Rx-Tools-ShareDirValidator-0.1.3">
+<title>Data-Rx-Tools-ShareDirValidator-0.1.3</title>
+<link>http://metacpan.org/release/KENTNL/Data-Rx-Tools-ShareDirValidator-0.1.3</link>
+<description>A Simple base class for generating simple validators based on Data::Rx</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-04-03T03:07:57Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Dist-Zilla-App-Command-dumpphases-0.6.0">
+<title>Dist-Zilla-App-Command-dumpphases-0.6.0</title>
+<link>http://metacpan.org/release/KENTNL/Dist-Zilla-App-Command-dumpphases-0.6.0</link>
+<description>Dump a textual representation of each phase&#x26;#39;s parts.</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-11-13T04:07:54Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Dist-Zilla-App-Command-dumpwith-0.001000">
+<title>Dist-Zilla-App-Command-dumpwith-0.001000</title>
+<link>http://metacpan.org/release/KENTNL/Dist-Zilla-App-Command-dumpwith-0.001000</link>
+<description>Dump all plugins that &#x26;#39;do&#x26;#39; a certain role</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-11-11T13:49:03Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Dist-Zilla-App-Command-lsplugins-0.001000">
+<title>Dist-Zilla-App-Command-lsplugins-0.001000</title>
+<link>http://metacpan.org/release/KENTNL/Dist-Zilla-App-Command-lsplugins-0.001000</link>
+<description>Show all dzil plugins on your system, with descriptions</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-11-12T02:18:57Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Dist-Zilla-Plugin-Author-KENTNL-Prereqs-Latest-Selective-0.1.2">
+<title>Dist-Zilla-Plugin-Author-KENTNL-Prereqs-Latest-Selective-0.1.2</title>
+<link>http://metacpan.org/release/KENTNL/Dist-Zilla-Plugin-Author-KENTNL-Prereqs-Latest-Selective-0.1.2</link>
+<description>[DEPRECATED] Selectively upgrade a few modules to depend on the version used.</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-11-20T03:07:14Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Dist-Zilla-Plugin-AutoVersion-Relative-0.03000002">
+<title>Dist-Zilla-Plugin-AutoVersion-Relative-0.03000002</title>
+<link>http://metacpan.org/release/KENTNL/Dist-Zilla-Plugin-AutoVersion-Relative-0.03000002</link>
+<description>Time-Relative versioning</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-04-09T02:50:43Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Dist-Zilla-Plugin-Bootstrap-ShareDir-Dist-0.3.0">
+<title>Dist-Zilla-Plugin-Bootstrap-ShareDir-Dist-0.3.0</title>
+<link>http://metacpan.org/release/KENTNL/Dist-Zilla-Plugin-Bootstrap-ShareDir-Dist-0.3.0</link>
+<description>Use a share directory on your dist during bootstrap</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-11-21T07:20:57Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Dist-Zilla-Plugin-Bootstrap-ShareDir-Module-0.2.0">
+<title>Dist-Zilla-Plugin-Bootstrap-ShareDir-Module-0.2.0</title>
+<link>http://metacpan.org/release/KENTNL/Dist-Zilla-Plugin-Bootstrap-ShareDir-Module-0.2.0</link>
+<description>Use a share directory on your dist for a module during bootstrap</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-11-21T07:25:07Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Dist-Zilla-Plugin-Bootstrap-lib-0.04000002">
+<title>Dist-Zilla-Plugin-Bootstrap-lib-0.04000002</title>
+<link>http://metacpan.org/release/KENTNL/Dist-Zilla-Plugin-Bootstrap-lib-0.04000002</link>
+<description>A minimal boot-strapping for Dist::Zilla Plug-ins.</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-11-18T07:24:00Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Dist-Zilla-Plugin-Git-NextRelease-0.002010">
+<title>Dist-Zilla-Plugin-Git-NextRelease-0.002010</title>
+<link>http://metacpan.org/release/KENTNL/Dist-Zilla-Plugin-Git-NextRelease-0.002010</link>
+<description>Use time-stamp from Git instead of process start time.</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2014-01-31T04:29:20Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Dist-Zilla-Plugin-Git-NextVersion-Sanitized-0.001000">
+<title>Dist-Zilla-Plugin-Git-NextVersion-Sanitized-0.001000</title>
+<link>http://metacpan.org/release/KENTNL/Dist-Zilla-Plugin-Git-NextVersion-Sanitized-0.001000</link>
+<description>Sanitize versions handed to you by Git::NextVersion</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-12-01T10:42:46Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Dist-Zilla-Plugin-Git-Remote-Check-0.1.2">
+<title>Dist-Zilla-Plugin-Git-Remote-Check-0.1.2</title>
+<link>http://metacpan.org/release/KENTNL/Dist-Zilla-Plugin-Git-Remote-Check-0.1.2</link>
+<description>Ensure no pending commits on a remote branch before release</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2012-03-26T19:48:41Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Dist-Zilla-Plugin-LogContextual-0.001000">
+<title>Dist-Zilla-Plugin-LogContextual-0.001000</title>
+<link>http://metacpan.org/release/KENTNL/Dist-Zilla-Plugin-LogContextual-0.001000</link>
+<description>Set up Log::Contextual for use with Dist::Zilla</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-12-14T10:40:55Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Dist-Zilla-Plugin-MetaData-BuiltWith-0.04000002">
+<title>Dist-Zilla-Plugin-MetaData-BuiltWith-0.04000002</title>
+<link>http://metacpan.org/release/KENTNL/Dist-Zilla-Plugin-MetaData-BuiltWith-0.04000002</link>
+<description>Report what versions of things your distribution was built against</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-11-25T08:37:29Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Dist-Zilla-Plugin-MetaProvides-2.000000">
+<title>Dist-Zilla-Plugin-MetaProvides-2.000000</title>
+<link>http://metacpan.org/release/KENTNL/Dist-Zilla-Plugin-MetaProvides-2.000000</link>
+<description>Generating and Populating &#x26;#39;provides&#x26;#39; in your META.yml</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2014-02-02T05:21:33Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Dist-Zilla-Plugin-MetaProvides-Class-1.14000001">
+<title>Dist-Zilla-Plugin-MetaProvides-Class-1.14000001</title>
+<link>http://metacpan.org/release/KENTNL/Dist-Zilla-Plugin-MetaProvides-Class-1.14000001</link>
+<description>Scans Dist::Zilla&#x26;#39;s .pm files and tries to identify classes using Class::Discover.</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-04-26T15:20:51Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Dist-Zilla-Plugin-MetaProvides-FromFile-1.11060211">
+<title>Dist-Zilla-Plugin-MetaProvides-FromFile-1.11060211</title>
+<link>http://metacpan.org/release/KENTNL/Dist-Zilla-Plugin-MetaProvides-FromFile-1.11060211</link>
+<description>In the event nothing else works, pull in hand-crafted metadata from a specified file.</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-04-08T09:50:17Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Dist-Zilla-Plugin-MetaProvides-Package-2.000001">
+<title>Dist-Zilla-Plugin-MetaProvides-Package-2.000001</title>
+<link>http://metacpan.org/release/KENTNL/Dist-Zilla-Plugin-MetaProvides-Package-2.000001</link>
+<description>Extract namespaces/version from traditional packages for provides</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2014-02-06T17:14:32Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Dist-Zilla-Plugin-ModuleInstall-0.02000000">
+<title>Dist-Zilla-Plugin-ModuleInstall-0.02000000</title>
+<link>http://metacpan.org/release/KENTNL/Dist-Zilla-Plugin-ModuleInstall-0.02000000</link>
+<description>Build Module::Install based Distributions with Dist::Zilla</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-04-06T06:46:30Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Dist-Zilla-Plugin-Prereqs-DarkPAN-0.2.4">
+<title>Dist-Zilla-Plugin-Prereqs-DarkPAN-0.2.4</title>
+<link>http://metacpan.org/release/KENTNL/Dist-Zilla-Plugin-Prereqs-DarkPAN-0.2.4</link>
+<description>Depend on things from arbitrary places-not-CPAN</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-11-22T09:52:26Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Dist-Zilla-Plugin-Prereqs-MatchInstalled-0.1.6">
+<title>Dist-Zilla-Plugin-Prereqs-MatchInstalled-0.1.6</title>
+<link>http://metacpan.org/release/KENTNL/Dist-Zilla-Plugin-Prereqs-MatchInstalled-0.1.6</link>
+<description>Depend on versions of modules the same as you have installed</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-11-29T14:53:15Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Dist-Zilla-Plugin-Prereqs-MatchInstalled-All-0.1.2">
+<title>Dist-Zilla-Plugin-Prereqs-MatchInstalled-All-0.1.2</title>
+<link>http://metacpan.org/release/KENTNL/Dist-Zilla-Plugin-Prereqs-MatchInstalled-All-0.1.2</link>
+<description>Upgrade ALL your dependencies to the ones you have installed.</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-09-25T13:44:25Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Dist-Zilla-Plugin-Prereqs-Plugins-0.1.3">
+<title>Dist-Zilla-Plugin-Prereqs-Plugins-0.1.3</title>
+<link>http://metacpan.org/release/KENTNL/Dist-Zilla-Plugin-Prereqs-Plugins-0.1.3</link>
+<description>Add all Dist::Zilla plugins presently in use as prerequisites.</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-09-25T16:21:41Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Dist-Zilla-Plugin-Prereqs-Recommend-MatchInstalled-0.001000">
+<title>Dist-Zilla-Plugin-Prereqs-Recommend-MatchInstalled-0.001000</title>
+<link>http://metacpan.org/release/KENTNL/Dist-Zilla-Plugin-Prereqs-Recommend-MatchInstalled-0.001000</link>
+<description>Advertise versions of things you have as soft dependencies</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2014-01-29T19:42:02Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Dist-Zilla-Plugin-Prereqs-Soften-0.004000">
+<title>Dist-Zilla-Plugin-Prereqs-Soften-0.004000</title>
+<link>http://metacpan.org/release/KENTNL/Dist-Zilla-Plugin-Prereqs-Soften-0.004000</link>
+<description>Downgrade listed dependencies to recommendations if present.</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2014-03-23T13:18:27Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Dist-Zilla-Plugin-Prereqs-SyncVersions-0.001001">
+<title>Dist-Zilla-Plugin-Prereqs-SyncVersions-0.001001</title>
+<link>http://metacpan.org/release/KENTNL/Dist-Zilla-Plugin-Prereqs-SyncVersions-0.001001</link>
+<description>Homogenize prerequisites so dependency versions are consistent</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-10-12T07:07:43Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Dist-Zilla-Plugin-Test-Compile-PerFile-0.001001">
+<title>Dist-Zilla-Plugin-Test-Compile-PerFile-0.001001</title>
+<link>http://metacpan.org/release/KENTNL/Dist-Zilla-Plugin-Test-Compile-PerFile-0.001001</link>
+<description>Create a single .t for each compilable file in a distribution</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-11-13T10:49:03Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Dist-Zilla-PluginBundle-Author-KENTNL-2.012001">
+<title>Dist-Zilla-PluginBundle-Author-KENTNL-2.012001</title>
+<link>http://metacpan.org/release/KENTNL/Dist-Zilla-PluginBundle-Author-KENTNL-2.012001</link>
+<description>BeLike::KENTNL when you build your distributions.</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2014-03-17T19:02:21Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Dist-Zilla-PluginBundle-Author-KENTNL-Lite-1.7.2">
+<title>Dist-Zilla-PluginBundle-Author-KENTNL-Lite-1.7.2</title>
+<link>http://metacpan.org/release/KENTNL/Dist-Zilla-PluginBundle-Author-KENTNL-Lite-1.7.2</link>
+<description>A Minimal Build-Only replacement for @Author::KENTNL for contributors.</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-04-09T22:46:04Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Dist-Zilla-Role-Bootstrap-0.2.3">
+<title>Dist-Zilla-Role-Bootstrap-0.2.3</title>
+<link>http://metacpan.org/release/KENTNL/Dist-Zilla-Role-Bootstrap-0.2.3</link>
+<description>Shared logic for bootstrap things.</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-11-18T17:51:50Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Dist-Zilla-Role-BundleDeps-0.001001">
+<title>Dist-Zilla-Role-BundleDeps-0.001001</title>
+<link>http://metacpan.org/release/KENTNL/Dist-Zilla-Role-BundleDeps-0.001001</link>
+<description>Automatically add all plugins in a bundle as dependencies</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-11-24T15:33:53Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Dist-Zilla-Role-Tempdir-0.01053722">
+<title>Dist-Zilla-Role-Tempdir-0.01053722</title>
+<link>http://metacpan.org/release/KENTNL/Dist-Zilla-Role-Tempdir-0.01053722</link>
+<description>Shell Out and collect the result in a DZ plug-in.</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-04-08T08:05:49Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Dist-Zilla-Role-Version-Sanitize-0.001002">
+<title>Dist-Zilla-Role-Version-Sanitize-0.001002</title>
+<link>http://metacpan.org/release/KENTNL/Dist-Zilla-Role-Version-Sanitize-0.001002</link>
+<description>Sanitize a version from a plugin</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-12-10T01:21:52Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Dist-Zilla-Util-BundleInfo-0.1.3">
+<title>Dist-Zilla-Util-BundleInfo-0.1.3</title>
+<link>http://metacpan.org/release/KENTNL/Dist-Zilla-Util-BundleInfo-0.1.3</link>
+<description>Load and interpret a bundle</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-09-25T18:04:33Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Dist-Zilla-Util-EmulatePhase-0.01025803">
+<title>Dist-Zilla-Util-EmulatePhase-0.01025803</title>
+<link>http://metacpan.org/release/KENTNL/Dist-Zilla-Util-EmulatePhase-0.01025803</link>
+<description>Nasty tools for probing &#x26;lt; C&#x26;lt;Dist::Zilla&#x26;#39;s|Dist::Zilla &#x26;gt;&#x26;gt; internal state.</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-10-31T12:46:16Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Dist-Zilla-Util-Git-Branches-0.001000">
+<title>Dist-Zilla-Util-Git-Branches-0.001000</title>
+<link>http://metacpan.org/release/KENTNL/Dist-Zilla-Util-Git-Branches-0.001000</link>
+<description>Extract branches from Git</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-12-10T07:42:58Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Dist-Zilla-Util-Git-Refs-0.002000">
+<title>Dist-Zilla-Util-Git-Refs-0.002000</title>
+<link>http://metacpan.org/release/KENTNL/Dist-Zilla-Util-Git-Refs-0.002000</link>
+<description>Work with refs</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-12-20T15:04:03Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Dist-Zilla-Util-Git-Tags-0.004000">
+<title>Dist-Zilla-Util-Git-Tags-0.004000</title>
+<link>http://metacpan.org/release/KENTNL/Dist-Zilla-Util-Git-Tags-0.004000</link>
+<description>Extract all tags from a repository</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-12-20T14:01:22Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Dist-Zilla-Util-Git-Wrapper-0.003000">
+<title>Dist-Zilla-Util-Git-Wrapper-0.003000</title>
+<link>http://metacpan.org/release/KENTNL/Dist-Zilla-Util-Git-Wrapper-0.003000</link>
+<description>Vivify a Git::Wrapper instance for Dist::Zilla</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-12-20T13:16:33Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Dist-Zilla-Util-RoleDB-0.001000">
+<title>Dist-Zilla-Util-RoleDB-0.001000</title>
+<link>http://metacpan.org/release/KENTNL/Dist-Zilla-Util-RoleDB-0.001000</link>
+<description>Shared code for things that communicate data about dzil roles.</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-11-12T22:00:41Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Dist-Zilla-Util-SimpleMunge-0.2.2">
+<title>Dist-Zilla-Util-SimpleMunge-0.2.2</title>
+<link>http://metacpan.org/release/KENTNL/Dist-Zilla-Util-SimpleMunge-0.2.2</link>
+<description>Make munging File::FromCode and File::InMemory easier.</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-05-15T15:32:35Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Dist-Zilla-Util-Test-KENTNL-1.000000">
+<title>Dist-Zilla-Util-Test-KENTNL-1.000000</title>
+<link>http://metacpan.org/release/KENTNL/Dist-Zilla-Util-Test-KENTNL-1.000000</link>
+<description>KENTNL&#x26;#39;s DZil plugin testing tool</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2014-02-02T07:21:01Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Dist-Zilla-UtilRole-MaybeZilla-0.001000">
+<title>Dist-Zilla-UtilRole-MaybeZilla-0.001000</title>
+<link>http://metacpan.org/release/KENTNL/Dist-Zilla-UtilRole-MaybeZilla-0.001000</link>
+<description>Soft-dependency on Dist::Zilla for Utilities.</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-12-14T12:05:15Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/ELF-Extract-Sections-0.03000101">
+<title>ELF-Extract-Sections-0.03000101</title>
+<link>http://metacpan.org/release/KENTNL/ELF-Extract-Sections-0.03000101</link>
+<description>Extract Raw Chunks of data from identifiable ELF Sections</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-05-07T08:57:34Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/ElasticSearchX-Model-Generator-0.1.8">
+<title>ElasticSearchX-Model-Generator-0.1.8</title>
+<link>http://metacpan.org/release/KENTNL/ElasticSearchX-Model-Generator-0.1.8</link>
+<description>Create a suite of ESX::Model classes from an existing mapping.</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-11-25T04:48:04Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/File-ShareDir-ProjectDistDir-1.000001">
+<title>File-ShareDir-ProjectDistDir-1.000001</title>
+<link>http://metacpan.org/release/KENTNL/File-ShareDir-ProjectDistDir-1.000001</link>
+<description>Simple set-and-forget using of a &#x26;#39;/share&#x26;#39; directory in your projects root</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2014-03-04T14:20:41Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/File-Tempdir-ForPackage-0.1.1">
+<title>File-Tempdir-ForPackage-0.1.1</title>
+<link>http://metacpan.org/release/KENTNL/File-Tempdir-ForPackage-0.1.1</link>
+<description>Easy temporary directories associated with packages.</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2012-07-26T14:45:17Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/File-Tempdir-ForPackage-FromArchive-0.1.0">
+<title>File-Tempdir-ForPackage-FromArchive-0.1.0</title>
+<link>http://metacpan.org/release/KENTNL/File-Tempdir-ForPackage-FromArchive-0.1.0</link>
+<description>Inflate any archive to a temporary directory and work in it.</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2012-07-26T14:05:32Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Gentoo-ChangeLog-Parser-Eventual-0.1.2">
+<title>Gentoo-ChangeLog-Parser-Eventual-0.1.2</title>
+<link>http://metacpan.org/release/KENTNL/Gentoo-ChangeLog-Parser-Eventual-0.1.2</link>
+<description>Rudimentary Event-Based ChangeLog format parser, inspired by Pod::Eventual.</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-04-06T05:36:37Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Gentoo-Dependency-AST-0.001001">
+<title>Gentoo-Dependency-AST-0.001001</title>
+<link>http://metacpan.org/release/KENTNL/Gentoo-Dependency-AST-0.001001</link>
+<description>Convert a canonicalized (R|P|)DEPEND into an Abstract Syntax Tree</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-10-23T12:39:43Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Gentoo-MetaEbuild-Spec-Base-0.1.4">
+<title>Gentoo-MetaEbuild-Spec-Base-0.1.4</title>
+<link>http://metacpan.org/release/KENTNL/Gentoo-MetaEbuild-Spec-Base-0.1.4</link>
+<description>A Base Class for Gentoo MetaEbuild Specifications.</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2012-01-04T05:17:22Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Gentoo-MetaEbuild-Spec-MiniSpec-0.1.1">
+<title>Gentoo-MetaEbuild-Spec-MiniSpec-0.1.1</title>
+<link>http://metacpan.org/release/KENTNL/Gentoo-MetaEbuild-Spec-MiniSpec-0.1.1</link>
+<description>Minimal Conforming spec for MetaEbuilds.</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-02-10T14:19:56Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Gentoo-MirrorList-1.0.2">
+<title>Gentoo-MirrorList-1.0.2</title>
+<link>http://metacpan.org/release/KENTNL/Gentoo-MirrorList-1.0.2</link>
+<description>A programmatic way to access Gentoo.org Mirror Metadata</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-04-06T04:49:23Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Gentoo-Overlay-1.0.5">
+<title>Gentoo-Overlay-1.0.5</title>
+<link>http://metacpan.org/release/KENTNL/Gentoo-Overlay-1.0.5</link>
+<description>Tools for working with Gentoo Overlays</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-04-29T00:33:47Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Gentoo-Overlay-Group-0.2.0">
+<title>Gentoo-Overlay-Group-0.2.0</title>
+<link>http://metacpan.org/release/KENTNL/Gentoo-Overlay-Group-0.2.0</link>
+<description>A collection of Gentoo::Overlay objects.</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-03-13T07:26:48Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Gentoo-Overlay-Group-INI-0.2.2">
+<title>Gentoo-Overlay-Group-INI-0.2.2</title>
+<link>http://metacpan.org/release/KENTNL/Gentoo-Overlay-Group-INI-0.2.2</link>
+<description>Load a list of overlays defined in a configuration file.</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-03-13T08:36:02Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Gentoo-Perl-Distmap-0.2.0">
+<title>Gentoo-Perl-Distmap-0.2.0</title>
+<link>http://metacpan.org/release/KENTNL/Gentoo-Perl-Distmap-0.2.0</link>
+<description>A reader/writer for the metadata/perl/distmap.json file.</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-05-06T03:57:18Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Gentoo-Perl-Distmap-FromOverlay-0.1.0">
+<title>Gentoo-Perl-Distmap-FromOverlay-0.1.0</title>
+<link>http://metacpan.org/release/KENTNL/Gentoo-Perl-Distmap-FromOverlay-0.1.0</link>
+<description>Scrape an Overlay to produce a Distmap</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-04-29T04:26:36Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Gentoo-PerlMod-Version-0.6.0">
+<title>Gentoo-PerlMod-Version-0.6.0</title>
+<link>http://metacpan.org/release/KENTNL/Gentoo-PerlMod-Version-0.6.0</link>
+<description>Convert arbitrary Perl Modules&#x26;#39; versions into normalised Gentoo versions.</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2012-10-27T12:27:55Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Gentoo-PerlMod-Version-FixEbuild-0.1.1">
+<title>Gentoo-PerlMod-Version-FixEbuild-0.1.1</title>
+<link>http://metacpan.org/release/KENTNL/Gentoo-PerlMod-Version-FixEbuild-0.1.1</link>
+<description>Automatically fix an old-style ebuild to a new style ebuild.</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2011-01-14T05:23:40Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Git-PurePerl-Walker-0.002000">
+<title>Git-PurePerl-Walker-0.002000</title>
+<link>http://metacpan.org/release/KENTNL/Git-PurePerl-Walker-0.002000</link>
+<description>Walk over a sequence of commits in a Git::PurePerl repo</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2012-05-30T02:59:03Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Git-Wrapper-Plus-0.004010">
+<title>Git-Wrapper-Plus-0.004010</title>
+<link>http://metacpan.org/release/KENTNL/Git-Wrapper-Plus-0.004010</link>
+<description>A Toolkit for working with Git::Wrapper in an Object Oriented Way.</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2014-01-31T02:58:24Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/GraphViz2-Abstract-Edge-0.002000">
+<title>GraphViz2-Abstract-Edge-0.002000</title>
+<link>http://metacpan.org/release/KENTNL/GraphViz2-Abstract-Edge-0.002000</link>
+<description>Deal with edges independent of a Graph</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-12-01T06:29:42Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/GraphViz2-Abstract-Node-0.002000">
+<title>GraphViz2-Abstract-Node-0.002000</title>
+<link>http://metacpan.org/release/KENTNL/GraphViz2-Abstract-Node-0.002000</link>
+<description>Deal with nodes independent of a Graph</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-12-01T05:49:03Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/GraphViz2-Abstract-Util-Constants-0.001000">
+<title>GraphViz2-Abstract-Util-Constants-0.001000</title>
+<link>http://metacpan.org/release/KENTNL/GraphViz2-Abstract-Util-Constants-0.001000</link>
+<description>Constants used by GraphViz2::Abstract::*</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-12-01T04:52:27Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/HTTP-Tiny-Mech-0.2.1">
+<title>HTTP-Tiny-Mech-0.2.1</title>
+<link>http://metacpan.org/release/KENTNL/HTTP-Tiny-Mech-0.2.1</link>
+<description>Wrap a WWW::Mechanize instance in an HTTP::Tiny compatible interface.</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-11-24T00:57:11Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/IPC-Run-Fused-0.04000100">
+<title>IPC-Run-Fused-0.04000100</title>
+<link>http://metacpan.org/release/KENTNL/IPC-Run-Fused-0.04000100</link>
+<description>Capture Stdout/Stderr simultaneously as if it were one stream, painlessly.</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-02-05T07:17:47Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Log-Contextual-LogDispatchouli-0.001000">
+<title>Log-Contextual-LogDispatchouli-0.001000</title>
+<link>http://metacpan.org/release/KENTNL/Log-Contextual-LogDispatchouli-0.001000</link>
+<description>A Log::Dispatchouli specific wrapper for Log::Contextual</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-12-14T08:38:22Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/MetaPOD-0.3.6">
+<title>MetaPOD-0.3.6</title>
+<link>http://metacpan.org/release/KENTNL/MetaPOD-0.3.6</link>
+<description>An evolution of POD</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2014-01-23T12:38:41Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/MetaPOD-Format-JSON-0.3.0">
+<title>MetaPOD-Format-JSON-0.3.0</title>
+<link>http://metacpan.org/release/KENTNL/MetaPOD-Format-JSON-0.3.0</link>
+<description>Reference implementation of a JSON based MetaPOD Format</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-11-23T06:57:29Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/MetaPOD-Spec-0.4.1">
+<title>MetaPOD-Spec-0.4.1</title>
+<link>http://metacpan.org/release/KENTNL/MetaPOD-Spec-0.4.1</link>
+<description>The Specification of the MetaPOD format</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2014-01-24T18:24:43Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Minecraft-SectionFilter-0.002000">
+<title>Minecraft-SectionFilter-0.002000</title>
+<link>http://metacpan.org/release/KENTNL/Minecraft-SectionFilter-0.002000</link>
+<description>Strip/Process magical &#xA7; characters from minecraft</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-04-07T21:27:56Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Module-Data-0.007">
+<title>Module-Data-0.007</title>
+<link>http://metacpan.org/release/KENTNL/Module-Data-0.007</link>
+<description>Introspect context information about modules in @INC</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-11-20T13:12:33Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/MooseX-Attribute-ValidateWithException-0.3.1">
+<title>MooseX-Attribute-ValidateWithException-0.3.1</title>
+<link>http://metacpan.org/release/KENTNL/MooseX-Attribute-ValidateWithException-0.3.1</link>
+<description>Cause validation failures to throw exception objects.</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2014-01-08T04:41:47Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/MooseX-AttributeIndexes-1.0.3">
+<title>MooseX-AttributeIndexes-1.0.3</title>
+<link>http://metacpan.org/release/KENTNL/MooseX-AttributeIndexes-1.0.3</link>
+<description>Advertise metadata about your Model-Representing Classes to Any Database tool.</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-04-06T05:11:08Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/MooseX-Has-Sugar-1.000000">
+<title>MooseX-Has-Sugar-1.000000</title>
+<link>http://metacpan.org/release/KENTNL/MooseX-Has-Sugar-1.000000</link>
+<description>Sugar Syntax for moose &#x26;#39;has&#x26;#39; fields</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2014-01-30T20:02:31Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/MooseX-TypeArray-0.1.0">
+<title>MooseX-TypeArray-0.1.0</title>
+<link>http://metacpan.org/release/KENTNL/MooseX-TypeArray-0.1.0</link>
+<description>Create composite types where all subtypes must be satisfied</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2011-06-18T22:29:21Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/MooseX-Types-FakeHash-0.1.2">
+<title>MooseX-Types-FakeHash-0.1.2</title>
+<link>http://metacpan.org/release/KENTNL/MooseX-Types-FakeHash-0.1.2</link>
+<description>Types for emulating Hash-like behaviours with ArrayRefs.</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-03-23T18:09:41Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Net-API-RPX-0.04">
+<title>Net-API-RPX-0.04</title>
+<link>http://metacpan.org/release/KENTNL/Net-API-RPX-0.04</link>
+<description>Perl interface to Janrain&#x26;#39;s RPX service</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2012-05-24T00:29:20Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Net-Minecraft-Login-0.002000">
+<title>Net-Minecraft-Login-0.002000</title>
+<link>http://metacpan.org/release/KENTNL/Net-Minecraft-Login-0.002000</link>
+<description>Basic implementation of the Minecraft Login Protocol.</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-12-31T05:24:50Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Net-Travis-API-0.001000">
+<title>Net-Travis-API-0.001000</title>
+<link>http://metacpan.org/release/KENTNL/Net-Travis-API-0.001000</link>
+<description>Low Level Plumbing for travis-ci.org&#x26;#39;s api</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2014-02-13T17:18:23Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Net-TribalWarsMap-API-HTTP-0.1.1">
+<title>Net-TribalWarsMap-API-HTTP-0.1.1</title>
+<link>http://metacpan.org/release/KENTNL/Net-TribalWarsMap-API-HTTP-0.1.1</link>
+<description>HTTP User Agent For &#x26;lt; C&#x26;lt;TribalWarsMap.com|http://tribalwarsmap.com &#x26;gt;&#x26;gt;</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-07-16T03:27:36Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Net-TribalWarsMap-API-TribeLookup-0.1.0">
+<title>Net-TribalWarsMap-API-TribeLookup-0.1.0</title>
+<link>http://metacpan.org/release/KENTNL/Net-TribalWarsMap-API-TribeLookup-0.1.0</link>
+<description>Query general information about tribes.</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-07-04T11:16:30Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Package-Debug-0.2.2">
+<title>Package-Debug-0.2.2</title>
+<link>http://metacpan.org/release/KENTNL/Package-Debug-0.2.2</link>
+<description>Add ENV/Config controlled debug tokens to your code</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-09-26T06:54:52Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Package-Strictures-0.01001319">
+<title>Package-Strictures-0.01001319</title>
+<link>http://metacpan.org/release/KENTNL/Package-Strictures-0.01001319</link>
+<description>Facilitate toggling validation code at users request, without extra performance penalties.</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2012-12-02T14:24:30Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Paludis-ResumeState-Serialization-0.01000410">
+<title>Paludis-ResumeState-Serialization-0.01000410</title>
+<link>http://metacpan.org/release/KENTNL/Paludis-ResumeState-Serialization-0.01000410</link>
+<description>Work with resume-files generated by Paludis</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-11-09T18:08:21Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Paludis-UseCleaner-0.01000307">
+<title>Paludis-UseCleaner-0.01000307</title>
+<link>http://metacpan.org/release/KENTNL/Paludis-UseCleaner-0.01000307</link>
+<description>Remove cruft from your use.conf</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2010-12-14T04:24:13Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Path-FindDev-0.5.0">
+<title>Path-FindDev-0.5.0</title>
+<link>http://metacpan.org/release/KENTNL/Path-FindDev-0.5.0</link>
+<description>Find a development path somewhere in an upper hierarchy.</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2014-03-04T11:04:24Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Path-IsDev-1.001000">
+<title>Path-IsDev-1.001000</title>
+<link>http://metacpan.org/release/KENTNL/Path-IsDev-1.001000</link>
+<description>Determine if a given Path resembles a development source tree</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2014-03-01T13:24:14Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Path-IsDev-HeuristicSet-FromConfig-0.002000">
+<title>Path-IsDev-HeuristicSet-FromConfig-0.002000</title>
+<link>http://metacpan.org/release/KENTNL/Path-IsDev-HeuristicSet-FromConfig-0.002000</link>
+<description>A Custom Heuristic Set from a configuration file</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-10-18T11:18:00Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Path-ScanINC-0.011">
+<title>Path-ScanINC-0.011</title>
+<link>http://metacpan.org/release/KENTNL/Path-ScanINC-0.011</link>
+<description>Emulate Perls internal handling of @INC.</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-11-20T12:28:29Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Perl-Build-Git-0.001000">
+<title>Perl-Build-Git-0.001000</title>
+<link>http://metacpan.org/release/KENTNL/Perl-Build-Git-0.001000</link>
+<description>Convenience extensions for Perl::Build for bulk git work</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-04-06T04:11:36Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Pod-Eventual-Reconstruct-0.1.2">
+<title>Pod-Eventual-Reconstruct-0.1.2</title>
+<link>http://metacpan.org/release/KENTNL/Pod-Eventual-Reconstruct-0.1.2</link>
+<description>Construct a document from Pod::Eventual events</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-06-05T19:10:31Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/PortageXS-0.3.1">
+<title>PortageXS-0.3.1</title>
+<link>http://metacpan.org/release/KENTNL/PortageXS-0.3.1</link>
+<description>Portage abstraction layer for perl</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-07-27T08:59:40Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Regexp-Grammars-Common-String-0.01000002">
+<title>Regexp-Grammars-Common-String-0.01000002</title>
+<link>http://metacpan.org/release/KENTNL/Regexp-Grammars-Common-String-0.01000002</link>
+<description>Some basic String parsing Rules for Regexp::Grammars</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2011-10-22T13:37:09Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Search-GIN-Extract-AttributeIndexes-1.0.2">
+<title>Search-GIN-Extract-AttributeIndexes-1.0.2</title>
+<link>http://metacpan.org/release/KENTNL/Search-GIN-Extract-AttributeIndexes-1.0.2</link>
+<description>Automatically collect index metadata from MooseX::AttributeIndexes consuming models.</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-04-06T04:33:34Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Search-GIN-Extract-ClassMap-0.01060817">
+<title>Search-GIN-Extract-ClassMap-0.01060817</title>
+<link>http://metacpan.org/release/KENTNL/Search-GIN-Extract-ClassMap-0.01060817</link>
+<description>Delegate Extraction based on class.</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-04-10T06:26:30Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Set-Associate-0.003000">
+<title>Set-Associate-0.003000</title>
+<link>http://metacpan.org/release/KENTNL/Set-Associate-0.003000</link>
+<description>Pick items from a data set associatively</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-03-09T18:57:56Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Spark-Form-0.2102">
+<title>Spark-Form-0.2102</title>
+<link>http://metacpan.org/release/KENTNL/Spark-Form-0.2102</link>
+<description>A simple yet powerful forms validation system that promotes reuse.</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2009-09-13T21:51:51Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/String-Sections-0.3.2">
+<title>String-Sections-0.3.2</title>
+<link>http://metacpan.org/release/KENTNL/String-Sections-0.3.2</link>
+<description>Extract labeled groups of sub-strings from a string.</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-09-26T07:44:15Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Task-Spark-Form-1.0.1">
+<title>Task-Spark-Form-1.0.1</title>
+<link>http://metacpan.org/release/KENTNL/Task-Spark-Form-1.0.1</link>
+<description>All you need to start with Spark::Form</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2012-11-29T20:53:40Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Test-CPAN-Changes-ReallyStrict-0.2.0">
+<title>Test-CPAN-Changes-ReallyStrict-0.2.0</title>
+<link>http://metacpan.org/release/KENTNL/Test-CPAN-Changes-ReallyStrict-0.2.0</link>
+<description>Ensure a Changes file looks exactly like it would if it was machine generated.</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-12-30T03:35:59Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Test-File-ShareDir-1.000000">
+<title>Test-File-ShareDir-1.000000</title>
+<link>http://metacpan.org/release/KENTNL/Test-File-ShareDir-1.000000</link>
+<description>Create a Fake ShareDir for your modules for testing.</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2014-01-30T15:34:03Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/Test-StructuredObject-0.01000010">
+<title>Test-StructuredObject-0.01000010</title>
+<link>http://metacpan.org/release/KENTNL/Test-StructuredObject-0.01000010</link>
+<description>Use a structured execution-graph to create a test object which runs your tests smartly.</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-02-05T07:57:20Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+<item rdf:about="http://metacpan.org/release/KENTNL/lib-byversion-0.001001">
+<title>lib-byversion-0.001001</title>
+<link>http://metacpan.org/release/KENTNL/lib-byversion-0.001001</link>
+<description>add paths to @INC depending on which version of perl is running.</description>
+<dc:creator>KENTNL</dc:creator>
+<dc:date>2013-11-20T06:56:12Z</dc:date>
+<content:encoded> </content:encoded>
+</item>
+</rdf:RDF>

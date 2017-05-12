@@ -1,0 +1,36 @@
+#!/usr/bin/perl -w
+#
+# face:
+# Simple Image::XFace demo script.
+#
+# Copyright (c) 2002 Chris Lightfoot. All rights reserved.
+# Email: chris@ex-parrot.com; WWW: http://www.ex-parrot.com/~chris/
+#
+
+my $rcsid = '$Id: face,v 1.1.1.1 2002/02/17 23:09:57 chris Exp $';
+
+use Image::XFace;
+use GD;
+
+@foo = <>;
+@res = Image::XFace::uncompface(join("", @foo));
+foreach (@res) {
+    my $i;
+    for ($i = 0; $i < 48; ++$i) {
+        use integer;
+        print vec($_, ($i / 16), 16) & (32768 >> ($i & 15)) ? " " : "*";
+    }
+    print "\n";
+}
+
+if (exists $ENV{DISPLAY}) {
+    $img = Image::XFace::uncompface_gd(join("", @foo));
+    open(PNGFILE, ">foo.png");
+    print PNGFILE $img->png;
+    close(PNGFILE);
+    system("ee", "foo.png");
+    unlink("foo.png");
+}
+
+$h = Image::XFace::compface(@res);
+print "$h\n";

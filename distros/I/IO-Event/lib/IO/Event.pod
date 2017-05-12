@@ -1,0 +1,660 @@
+
+=head1 NAME
+
+IO::Event - Tied Filehandles for Nonblocking IO with Object Callbacks
+
+=head1 SYNOPSIS
+
+ use IO::Event;
+ use IO::Event 'emulate_Event';
+ use IO::Event 'AnyEvent';
+
+ my $ioe = IO::Event->new($filehandle);
+
+ my $ioe = IO::Event::Socket::INET->new( [ARGS] )
+
+ my $ioe = IO::Event::Socket::UNIX->new( [ARGS] )
+
+ my $timer = IO::Event->timer(
+	[after => $seconds],
+	interval => $seconds,
+	cb => CODE);
+
+ my $idler = IO::Event->idle(
+	[min => $seconds], 
+	[max => $seconds],
+	[reentrant => 0],
+	cb => CODE);
+
+ IO::Event::loop();
+
+ IO::Event::unloop_all();
+
+=head1 DESCRIPTION
+
+IO::Event provides a object-based callback system for
+handling nonblocking IO.  The design goal is to provide a
+system that just does the right thing w/o the user needing
+to think about it much.
+
+All APIs are kept as simple as possible yet at the same time,
+all functionality is accesible if needed.  Simple things are
+easy.  Hard things are possible.
+
+Most of the time file handling syntax will work fine:
+C<< <$filehandle> >> and C<print $filehandle 'stuff'>.
+
+IO::Event provides automatic buffering of output (with a 
+callback to throttle).  It provides automatic line-at-a-time
+input.
+
+After initial setup, call C<IO::Event::loop()>.  
+
+IO::Event was originally written to use L<Event>.  IO::Event still 
+defaults to using L<Event> but it can now use L<AnyEvent> or its
+own event loop.
+
+=head1 CHOOSING AN EVENT HANDLER
+
+Until you create your first IO::Event object, you can choose
+which underlying event handler to use.  The default is L<Event>.
+To choose an event handler, use one of the following lines,
+import C<no_emulate_Event>, C<emulate_Event>, or C<AnyEvent>.
+
+ use IO::Event 'no_emulate_Event'
+ use IO::Event 'emulate_Event'
+ use IO::Event 'AnyEvent'
+
+The C<no_emulate_Event> option means: use L<Event>.  The C<emulate_Event>
+option means IO::Event should use its own event loop.
+
+Why?
+
+You should use L<AnyEvent> if you want to have compatibility with
+other event loops.  You should use C<emulate_Event> if you don't
+need compatibility with other event loops and you have missing-event
+bugs when using L<Event>.  You should use L<Event> if it works for you.
+
+The APIs are a bit different depending on which event loop you're using.
+
+=head2 L<Event>
+
+To use L<Event>'s event loop:
+
+ use IO::Event 'no_emulate_Event';
+
+or just:
+
+ use IO::Event
+
+IO::Event's definition for C<loop()>, C<timer()>, C<idle()> and 
+C<unloop_all()> all default to the L<Event> version unless
+C<emulate_Event> or C<AnyEvent> have been imported.  This allows you to
+easily switch back and forth between L<Event>'s API and
+the others.
+
+=head2 L<AnyEvent>
+
+To use L<AnyEvent>'s select loop, import C<AnyEvent>.
+
+ use IO::Event 'AnyEvent';
+
+You can use L<AnyEvent>'s API directly or you can use IO::Event's 
+emulated APIs: C<IO::Event::loop()>, C<IO::Event::unloop()>, C<IO::Event::timer()>,
+and C<IO::Event::idle()>.  These behave like L<Event>'s routines of the
+same name but use L<AnyEvent> underneath.
+
+During testing, using the pure-perl event loop of L<AnyEvent::Impl::Perl> from
+L<AnyEvent> version 5.271, some read events were dropped.  To work around this, a synthetic 
+read-ready event is dispatched for all connected read filehandles every two
+seconds.  Turn this off or adjust its frequency by changing 
+C<$IO::Event::AnyEvent::lost_event_hack>.  A numeric value is the time (in seconds)
+between dispatching read events.  A false value turns off this performance-sapping hack.
+
+L<AnyEvent> only provides basic support for idle() events: it promises to invoke
+them "every now and then".
+
+=head2 C<emulate_Event>
+
+To use IO::Event's own select loop, import C<emulate_Event>.
+
+ use IO::Event 'emulate_Event';
+
+IO::Event does not provide a complete emulation of everything that
+L<Event> does.  It provides the full timer API: 
+
+ my $timer = IO::Event::timer( [ARGS] )
+
+instead of
+
+ my $timer = Event::timer( [ARGS] )
+
+However it does not provide timer events on filehandles, nor does
+it provide events for signals, or variable accesses.
+
+Use C<IO::Event::loop()> instead of C<Event::loop()>.   Use 
+C<IO::Event::unloop_all()> instead of C<Event::unloop_all()>.
+Use C<IO::Event::idle()> instead of C<Event::idle()>.
+It does not provide any other methods or functions from
+L<Event>.   If you need them, please send a patch.
+
+=head1 CONSTRUCTORS
+
+=over 4
+
+=item IO::Event->new($filehandle, [ $handler, [ $options ]])
+
+The basic C<new> constructor takes a filehandle and returns
+a psuedo-filehandle.  Treat the IO::Event object as
+a filehandle.  Do not use the original filehandle without
+good reason (let us know if you find a good reason so we
+can fix the problem).
+
+The handler is the class or object where you provide callback
+functions to handle IO events.  It defaults to the package
+of the calling context. 
+
+If present, C<$options> is a hash reference with the following
+possible keys:
+
+=over 13
+
+=item description
+
+A text description of this filehandle.  Used for debugging and
+error messages.
+
+=item read_only
+
+Set to true if this is a read-only filehandle.  Do not accept output.
+
+=item write_only
+
+Set to true if this is a write-only filehandle.  Do not attept to read.
+
+=item autoread
+
+Set to 0 if this should not be an auto-read filehandle.
+
+=back
+
+=item IO::Event::Socket::INET->new( [ARGS] )
+
+This constructor uses IO::Socket::INET->new() to create a 
+socket using the ARGS provided.  It returns an 
+IO::Event object.
+
+The handler defaults as above or can be set with an
+additional pseudo-parameter for IO::Socket::UNIX->new(): 
+C<Handler>.  A description for the socket can be provided
+with an additional psuedo-parameter: C<Description>.
+
+=item IO::Event::Socket::UNIX->new( [ARGS] )
+
+This constructor uses IO::Socket::UNIX->new() to create a 
+socket using the ARGS provided.  It returns an 
+IO::Event object.
+
+The handler defaults as above or can be set with an
+additional pseudo-parameter for IO::Socket::UNIX->new(): 
+C<Handler>.  A description for the socket can be provided
+with an additional psuedo-parameter: C<Description>.
+
+=back
+
+=head1 MANDATORY HANDLERS
+
+These handler methods must be available in the handler
+object/class if the situation in which they would be
+called arises.
+
+=over 4
+
+=item ie_input($handler, $ioe, $input_buffer_reference)
+
+Invoked when there is fresh data in the input buffer.  The 
+input can be retrieved via directly reading it from
+C<$$input_buffer_reference> or via C<read()> from the
+$ioe filehandle, or by using a variety of standard
+methods for getting data: 
+	
+	<$ioe>			like IO::Handle
+	$ioe->get()		like Data::LineBuffer
+	$ioe->read()		like IO::Handle
+	$ioe->sysread()		like IO::Handle
+	$ioe->getline()		like IO::Handle
+	$ioe->getlines()	like IO::Handle
+	$ioe->getsome()		see below
+	$ioe->ungets()		like FileHandle::Unget
+
+At end-of-file, ie_input will only be invoked once.  There
+may or may not be data in the input buffer.  
+
+=item ie_connection($handler, $ioe)
+
+Invoked when a listen()ing socket is ready to accept().
+It should call accept:
+
+	sub ie_connection
+	{
+		my ($pkg, $ioe) = @_;
+		my $newfh = $ioe->accept()
+	}
+
+=item ie_read_ready($handler, $ioe, $underlying_file_handle)
+
+If autoreading is turned off then this will be invoked.
+
+=item ie_werror($handler, $ioe, $output_buffer_reference)
+
+A write error has occured when trying to drain the write
+buffer.  Provide an empty subroutine if you don't care.
+
+=back
+
+=head1 OPTIONAL HANDLERS
+
+These handler methods will be called if they are defined
+but it is not required that they be defined.
+
+=over 4
+
+=item ie_eof($handler, $ioe, $input_buffer_reference)
+
+This is invoked when the read-side of the filehandle has
+been closed by its source.  
+
+=item ie_output
+
+This is invoked when data has just been written to the 
+underlying filehandle.
+
+=item ie_outputdone
+
+This is invoked when all pending data has just been written
+to the underlying filehandle.
+
+=item ie_connected
+
+This is invoked when a C<connect()> completes.
+
+=item ie_connect_failed($handler, $ioe, $error_code)
+
+This is invoked when a C<connect()> fails.  For a timeout,
+the error code will be ETIMEOUT.
+
+=item ie_died($handler, $ioe, $method, $@)
+
+If another handler calls C<die> then ie_died will be called
+with the IO::Event object, the name of the method just
+invoked, and the die string.  If no ie_died() callback exists
+then execution will terminate.
+
+=item ie_timer
+
+This is invoked for timer events.  
+
+=item ie_exception
+
+Invoked when an exceptional condition arises on the 
+underlying filehandle
+
+=item ie_outputoverflow($handler, $ioe, $overflowing, $output_buffer_reference)
+
+Invoked when there is too much output data and the output buffers
+are overflowing.  You can take some action to generate less output.
+This will be invoked exactly once (with $overflowing == 1) when 
+there is too much data in the buffer and then exactly once again
+(with $overflowing == 0) when there is no longer too much data in the
+buffer.
+
+=back
+
+=head1 METHODS
+
+In addition to methods described in detail below, the following
+methods behave like their C<IO> (mostly C<IO::Socket>) counterparts
+(except for being mostly non-blocking...):
+
+	connect
+	listen
+	open
+	read
+	sysread
+	syswrite
+	print
+	eof
+	shutdown
+
+Through AUTOLOAD (see the SUBSTITUTED METHODS section) methods 
+are passed to underlying C<Event> objects:
+
+	loop
+	unloop
+	and many more...
+
+Through AUTOLOAD (see the SUBSTITUTED METHODS section) methods 
+are passed to underlying C<IO> objects:
+
+	fileno
+	stat
+	truncate
+	error
+	opened
+	untaint
+	and many more...
+
+IO::Event defines its own methods too:
+
+=over 4
+
+=item ->accept($handler, %options)
+
+accept() is nearly identical to the normal IO::Socket::accept()
+method except that instead of optionally passing a class
+specifier for the new socket, you optionally pass a 
+handler object or class.   The returned filehandle is an
+IO::Event object.
+
+Supported options:
+
+=over
+
+=item description
+
+Sets the description for the new socket
+
+=item autoread
+
+Set to 0 if you do not want auto-read
+
+=back
+
+=item ->can_read($amount)
+
+Returns true if C<$amount> bytes worth of input is available for
+reading.  Note: this does not return true at EOF so be careful not
+to hang forever at EOF.
+
+=item ->getsome($amount)
+
+Returns C<$amount> bytes worth of input or undef if the request
+can't be filled.  Returns what it can at EOF.
+
+=item ->get()
+
+get() is like getline() except that it pre-chomp()s the
+results and assumes the input_record_separator is "\n".
+This is like get() from L<Data::LineBuffer>.
+
+=item ->unget()
+
+Push chomp()ed lines back into the input buffer.
+This is like unget() from L<Data::LineBuffer>.
+
+=item ->ungetline(), ->xungetc(), ->ungets()
+
+This is what ungetc() should be: it pushes a string back into
+the input buffer.  This is unlike IO::Handle->ungetc which
+takes an ordinal and pushes one character back into the 
+the input buffer.  This is like L<FileHandle::Unget>.
+
+=item ->handler($new_handler)
+
+Sets the handler object/class if $new_handler is provided.
+Returns the old handler.
+
+=item ->filehandle()
+
+Returns the underlying C<IO::Handle>.
+
+=item ->event()
+
+Returns the underling C<Event>.
+
+=item ->listener($listening)
+
+Used to note that a filehandle is being used to listen
+for connections (instead of receiving data).  A passed
+parameter of 0 does the opposite.  Returns the old value.
+This is mostly used internally in IO::Event.
+
+=item ->input_record_separator($new_sep)
+
+IO::Handle doesn't allow input_record_separator's on a per filehandle
+basis.  IO::Event does.  If you don't ever set a filehandle's input
+record separator, then it contineously defaults to the current value
+of C<$/>.  If you set it, then it will use your value and never
+look at C<$/> again.
+
+=item ->readevents($readevents)
+
+Get/set listening for read-ready events on the underlying
+filehandle.  This could be used by ie_outputoverflow to
+control input flows.  
+
+=item ->output_bufsize($output_bufsize)
+
+Get/set the size of the output buffer.
+
+=item ->autoread($autoread)
+
+Get/set automatic reading if data when data can be read.
+Without autoread turned on, the input buffer ins't filled
+and none of the read methods will work.  The point of this
+is for working with non-data filehandles.  This is an
+experts-only method that kinda defeats the purpose of
+this module.  This would be necessary using recv() to get
+data.
+
+=item ->drain()
+
+Used to start looking for write-ready events on the underlying
+filehandle.  In normal operation this is handled automatically.
+Deprecated: use C<writeevents(1)> instead.
+
+=item ->reentrant($reentrant)
+
+Get/set reentrant callbacks.  By default, IO::Event avoids making
+reentrant callbacks.  This is good because your code is less likely
+to break.  This is bad because you won't learn about things right away.
+For example, you will not learn the the output buffer is overflowing
+during print().  You'll have to wait for the output buffer to begin
+draining to find out.  This could be a problem.
+
+=item ->close()
+
+If there is output buffered, close will be delayed until the output
+buffer drains.
+
+=item ->forceclose
+
+Close close immediately, even if there is output buffered.
+
+=back
+
+=item ->ie_desc([new description])
+
+Returns (and sets) the text description of the filehandle.  For debugging.
+
+=back
+
+=head1 TIMER API
+
+The following timer construction arguments are supported by IO::Event's
+emulated event loop and IO::Event's API on top of L<AnyEvent>:
+
+=over 4
+
+=item cb
+
+A callback to invoke when the timer goes off.  The callback can either be
+a CODE reference or an array reference.  If it's an array reference, the
+array should be a two element tuple: the first element is an object and the
+second object is a method to invoke on the object.  The only argument to
+the method call a reference to the timer object:
+
+ my ($object, $method) = @{$timer->{cb}}
+ $object->$method($timer)
+
+=item at
+
+A time at which to invoke the callback.
+
+=item interval
+
+An interval, in seconds between repeat invocations of the callback.
+
+=item after
+
+The interval until the first invocation of the callback.  After that,
+invoke every I<interval>.
+
+=back
+
+The following methods (from L<Event>) are supported on timer objects:
+start(), again(), now(), stop(), cancel(), is_cancelled(), is_running(),
+is_suspended(), pending.
+
+=head1 IDLE API
+
+The following idle construction arguments are supported by IO::Event's
+emulated event loop and IO::Event's API on top of L<AnyEvent>:
+
+=over 4
+
+=item cb
+
+A callback to invoke when the event loop is idle.  The callback can either be
+a CODE reference or an array reference.  If it's an array reference, the
+array should be a two element tuple: the first element is an object and the
+second object is a method to invoke on the object.  
+
+ my ($object, $method) = @{$timer->{cb}}
+ $object->$method();
+
+=item min
+
+The minimum time between invocations of the callback.
+
+=item max
+
+The maximum time between invocations of the callback.
+
+=back
+
+The following methods (from L<Event>) are supported on idle objects:
+start(), again(), now(), stop(), cancel(), is_cancelled(), is_running(),
+is_suspended(), pending.
+
+=head1 SUBSTITUED METHODS
+
+Any method invocations that fail because the method isn't defined
+in IO::Event will by tried twice more: once using trying for a
+method on the inner (hidden) filehandle and once more trying 
+for a method on the Event object that's used to create the select
+loop for this module.
+
+This dispatch is now deprecated with the choice of event handlers.
+
+=head1 EXAMPLE SERVER
+
+	# This is a tcp line echo server
+
+	my $listener = IO::Event::Socket::INET->new(
+		Listen => 10,
+		Proto => 'tcp',
+		LocalPort => 2821,
+	);
+
+	Event::loop();
+
+	sub ie_connection
+	{
+		my ($pkg, $lstnr) = @_;
+		my $client = $lstnr->accept();
+		printf "accepted connection from %s:%s\n",
+			$client->peerhost, $client->peerport;
+	}
+
+	sub ie_input
+	{
+		my ($pkg, $client, $ibufref) = @_;
+		print $client <$client>;
+	}
+
+=head1 SYSREAD and EOF
+
+sysread() is incompatible with eof() because eof() uses
+getc().  Most of the time this isn't a problem.  In other words,
+some of the time this is a problem: lines go missing.
+
+For this reason, IO::Event never uses sysread().  In fact,
+if you ask it to do a sysread() it does a read() for you instead.
+
+On the other hand, at the current time no problems with syswrite
+have come to light and IO::Event uses syswrite and never any other
+form of write/print etc.
+
+=head1 DESTRUCTION
+
+IO::Event keeps copies of all of its registered filehandles.  If
+you want to close a filehandle, you'll need to actually call close
+on it.
+
+=head1 DATA STRUCTURE
+
+The filehandle object itself is a funny kind of hash reference.
+If you want to use it to store your own data, you can.  Please 
+don't use hash keys that begin C<ie_> or C<io_> as those are the
+prefixes used by C<IO::Event> and C<IO::Socket>.  
+
+The syntax is kinda funny:
+
+	${*$filehandle}{'your_hash_key'}  
+
+=head1 SEE ALSO
+
+For a different API on top of IO::Event, 
+see L<IO::Event::Callback>.  It uses IO::Event but provides 
+a simpler and perhaps easier-to-use API.
+
+The following perl modules do something that is kinda similar
+to what is being done here:
+
+L<AnyEvent::Handle>,
+L<AnyEvent::AIO>,
+L<IO::AIO>,
+L<IO::Multiplex>,
+L<IO::NonBlocking>,
+L<IO::Select>
+L<Event>,
+L<POE>,
+L<POE::Component::Server::TCP>,
+L<Net::Socket::NonBlock>,
+L<Net::Server::Multiplex>,
+L<NetServer::Generic>
+
+The API borrows most heavily from IO::Multiplex.  IO::Event
+uses Event.pm and thus can be used in programs that are already
+using Event or POE.
+
+Since the original writing of IO::Event, L<AnyEvent> has been
+released and now L<AnyEvent::AIO> and L<AnyEvent:Handle> should be
+considered the only good alternatives to IO::Event.
+
+For an example program using IO::Event, see L<IO::Event::rinetd>
+which used to be included in this package.
+
+=head1 BUGS
+
+The test suite only covers 40% of the code.  The module is used
+by its author and seems solid.
+
+=head1 LICENSE
+
+Copyright (C) 2002-2009 David Muir Sharnoff <muir@idiom.org>.
+Copyright (C) 2011-2013 Google, Inc.
+This module may be used/copied/etc on the same terms as Perl itself.
+
+This module is packaged for Fedora by Emmanuel Seyman <emmanuel@seyman.fr>

@@ -1,0 +1,37 @@
+---
+abstract: 'Find images within other images'
+author:
+  - 'Adam Kennedy <adamk@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  File::Remove: 1.42
+  Test::File::Cleaner: 0.03
+  Test::More: 0.47
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.01'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Imager::Search
+name: Imager-Search
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  File::Slurp: 9999.12
+  IO::File: 1.14
+  Imager: 0.65
+  Imager::Screenshot: 0.007
+  Object::Tiny::XS: 1.01
+  Params::Util: 1.00
+  perl: 5.6.0
+resources:
+  ChangeLog: http://fisheye2.atlassian.com/changelog/cpan/trunk/Imager-Search
+  license: http://dev.perl.org/licenses/
+  repository: http://svn.ali.as/cpan/trunk/Imager-Search
+version: 1.01

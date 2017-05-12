@@ -1,0 +1,201 @@
+#!/usr/bin/perl -w
+
+=head1 NAME
+
+dnsd - IO::Socket::DNS::Server wrapper script
+
+=head1 SYNOPSIS
+
+  dnsd [ options ] <dns_suffix>
+
+=head1 DESCRIPTION
+
+dnsd is a DNS listener server intended for use with queries
+from the dnsc client. It is mainly just a convenience script
+for the IO::Socket::DNS::Server module.
+
+=head1 ARGUMENTS
+
+=head2 <dns_suffix>
+
+Specify domain ending to tunnel proxy dns requests through.
+If none is specified on commandline, then the DNS_SUFFIX
+environment variable is used.
+See the "INSTALL" section below for more details.
+This setting is required.
+
+=head2 --listen_ip <IP.AD.RE.SS>
+
+Which IP Address to start the name server listening on.
+Default is to pull the glue record from the live DNS
+authority IP (from <dns_suffix> above) and use that IP.
+It must be an IP on the machine running dnsd so it can
+bind to it in order to accept queries on this IP.
+If you use an IP other than the true DNS authority,
+then you'll need to setup a DNAT or Virtual Server rule
+or some kind of DNS forwarder from the true authority
+to this IP in order for it to be reached by the outside
+world.
+
+=head2 --listen_port <port>
+
+Default is port 53 but requires super user to bind.
+You can specify a high port >= 1024 if you do not wish
+to run dnsd as root, but then you'll need to setup some
+kind of forwarder to that same port as is required for the
+--listen_ip option since normal DNS traffic always uses
+port 53.
+
+=head2 --password <password>
+
+Use this to reduce chances of undesired proxy moochers.
+This can be any string up to 8 characters.
+Default is no password.
+
+=head2 --verbose
+
+Enable verbosity to monitor activity or help debugging.
+This may be specified multiple times to increase verbosity.
+
+=head1 EXAMPLES
+
+  sudo dnsd d.example.com
+
+  dnsd --listen_ip=127.0.0.1 --listen_port=5353 -v -v -v --password=GoAway d.example.com
+
+  export DNS_SUFFIX=d.example.com
+  dnsd </dev/null >/dev/null 2>/dev/null &
+
+=head1 INSTALL
+
+I admit that it is not a trivial task to properly configure dnsd,
+but I will try to outline the resources and steps required:
+
+Step 1. You must own or have control over a real domain or at
+least a subdomain name somewhere.
+To reduce bandwidth and maximize throughput across the DNS
+transport, shorter domains are best.
+But let's say, for this example, that you own "example.com".
+
+Step 2. You will need root access on a server that is connected
+to the Internet. This server should allow incoming traffic on
+port 53 from anywhere in the world and should allow all
+outbound TCP connections.
+
+Step 3. You will need to know the IP Address of the server
+from Step #2 in order to reach it from the outside Internet.
+It's best if you have a true Dedicated IP such as a Static IP
+with your ISP or a Virtual Private Server or even a full
+Dedicated Server co-located in a data center somewhere.
+But if you are too cheap for any of those options, I've also
+gotten it to work with a dynamic IP.
+You just need a free dyndns.org account with DynDNS Updater
+running or anything that automatically ensures that the
+forward lookup of some known name points back to this server.
+You may wish to contact your ISP or whoever is hosting or
+co-locating your server to find out what your domain name is.
+You'll need to know this magic word or IP for the Step #4.
+
+Step 4. Think of a subdomain below your domain from Step #1
+that you can use for the DNS Suffix for your transport.
+Again, you should choose a short subdomain (one character
+if possible) in order to maximize your throughput.
+Let's say, for this example, that you chose "d.example.com".
+
+Delegate this suffix subdomain to the IP from Step #3 by
+adding an NS entry to the "example.com" zone, i.e.:
+
+ ; If you have a DynDNS account:
+ d.example.com. 7200 IN NS rob.dyndns.org.
+
+ ; Or if you have a Static IP with your ISP:
+ d.example.com. 7200 IN NS username.comcast.com.
+
+ ; Or if you have a VPS:
+ d.example.com. 7200 IN NS myvps.slicehost.com.
+
+ ; Or if you are sure what the IP address is
+ ; and you don't want to use some other domain
+ ; then you can bootstrap it by also adding a
+ ; GLUE Record for your NS entry:
+ d.example.com. 7200 IN NS ns.d.example.com.
+ ns.d.example.com. 3600 IN A 66.172.33.88
+
+You may need to contact whoever is hosting your domain
+"example.com" and maybe even your registrar and ask them to
+add the NS entry if you aren't strong enough or if don't
+know how to do this yourself.
+
+Step 5. Launch dnsd
+
+At a root prompt on the server from Step #2, start the listener:
+
+ # cd ~/src
+ # tar -zxvf /tmp/IO-Socket-DNS-*.tar.gz
+ # cd IO-Socket-DNS*
+ # perl -e 'while (1) { system "bin/dnsd d.example.com"; sleep 1; }' &
+ #
+
+This infinite wrapper is nice in case dnsd crashes so it can
+automatically start up again.
+The stability of dnsd also depends on which version of Net::DNS
+you have installed.
+I've noticed certain versions crash more easily than others.
+You might want to run this directly from console or at least
+in a screen session so you can dettach from SSH and let it run.
+
+Step 6. Test it from the outside
+
+ $ dig NS d.example.com
+ (Hopefully, you'll see your dedicated IP from Step #3.)
+
+ $ dig TXT loader.d.example.com
+ (If all is good, it should show you some unzipper perl code.)
+
+ $ export DNS_SUFFIX=d.example.com
+ $ export DNS_PASSWORD=SeCrEt
+ $ bin/dnsssh 127.0.0.1
+ (If all is good, it will SSH into your server in Step #2.)
+
+=head1 SEE ALSO
+
+dnsc, IO::Socket::DNS::Server
+
+=head1 AUTHOR
+
+Rob Brown, E<lt>bbb@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2011-2012 by Rob Brown
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.9 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut
+
+use strict;
+use lib "lib";
+use IO::Socket::DNS::Server;
+use Getopt::Long qw(GetOptions);
+
+my %opt = ();
+GetOptions
+    \%opt,
+    "listen_ip:s",
+    "listen_port:i",
+    "password:s",
+    "verbose+",
+    ;
+
+my $suffix = shift || $ENV{DNS_SUFFIX} or die "Tunnel DNS Suffix must be specified\n";
+my $server = new IO::Socket::DNS::Server
+    Suffix    => $suffix,
+    Password  => $opt{password},
+    LocalAddr => $opt{listen_ip},
+    LocalPort => $opt{listen_port},
+    Verbose   => $opt{verbose},
+    or die "Unable to start DNS Server: $!\n";
+$server->main_loop;
+# Never returns

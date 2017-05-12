@@ -1,0 +1,11 @@
+Revision history for In-Korean-Numbers
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+
+0.02    Use Unicode codes to represent Hangul in module & test rather than UTF-8 strings.
+
+0.03    Changes to POD documentation to show Hangul using UTF-8 strings rather than Unicode codes for readability.
+        Reverted test so using utf8 characters for Hangul for readability.
+
+0.04    Fixed POD typos. (Several instances of getHangul -> getInt.)

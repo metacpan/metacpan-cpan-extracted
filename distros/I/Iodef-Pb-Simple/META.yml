@@ -1,0 +1,46 @@
+---
+abstract: 'Perl extension providing high level API access to Iodef::Pb. It takes simple key-pair hashes and maps them to the appropriate IODEF classes using a Module::Pluggable framework of plugins.'
+author:
+  - 'Wes Young, <wes@barely3am.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Iodef-Pb-Simple
+no_index:
+  directory:
+    - examples
+    - inc
+    - t
+  examples: []
+requires:
+  Class::Accessor: 0.34
+  Compress::Snappy: 0.18
+  DateTime: 0.61
+  DateTime::Format::DateParse: 0.05
+  Digest::SHA: 5.40
+  Encode: 2.35
+  Google::ProtocolBuffers: 0.08
+  HTML::Table: 2.08
+  JSON::XS: 2.29
+  MIME::Base64: 0.08
+  Module::Install: 1.00
+  OSSP::uuid: 1.0602
+  Parse::Range: 0.96
+  Regexp::Common::net: 2010010201
+  Regexp::Common::net::CIDR: 0.02
+  Snort::Rule: 1.07
+  Text::Table: 1.126
+  perl: 5.8.8
+resources:
+  bugtracker: https://github.com/collectiveintel/iodef-pb-simple-perl/issues
+  homepage: https://github.com/collectiveintel/iodef-pb-simple-perl
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/collectiveintel/iodef-pb-simple-perl.git
+version: 0.21

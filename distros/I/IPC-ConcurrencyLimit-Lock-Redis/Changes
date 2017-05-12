@@ -1,0 +1,11 @@
+Revision history for Perl extension IPC::ConcurrencyLimit::Lock::Redis
+
+0.03  Fri Sep 11 14:16 2015
+  - 0.02 upload failed because of PAUSE permissions issue
+
+0.02  Thu Sep 10 17:59 2015
+  - Bring up-to-speed with Redis::ScriptCache v0.03
+
+0.01  Fri Oct 12 15:00 2012
+  - original version
+

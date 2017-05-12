@@ -1,0 +1,91 @@
+Imager-File-JPEG 0.90
+=====================
+
+ - update the bundled/modified Devel::CheckLib to handle the gcc-4
+   symlink on Cygwin
+
+Imager-File-JPEG 0.89
+=====================
+
+ - added the jpeg_optimize parameter for writing JPEG files.  This can
+   significantly reduce file sizes, but uses more memory and time.
+   https://rt.cpan.org/Ticket/Display.html?id=94292
+
+Imager-File-JPEG 0.88
+=====================
+
+ - correct an internal documentation error.  No functional changes.
+
+Imager-File-JPEG 0.87
+=====================
+
+ - fix some mismatched format strings/types
+
+Imager-File-JPEG 0.86
+=====================
+
+ - correct 0.85 header below
+
+ - test code now reports the (compile-time) library version
+
+Imager-File-JPEG 0.85
+=====================
+
+ - avoid static variables when capturing IPTC data
+
+ - clean up .dSYM directories generated performing probes on OS X
+   Mountain Lion.
+
+ - pass the --verbose command-line option through to Imager::Probe in
+   Makefile.PL
+   https://rt.cpan.org/Ticket/Display.html?id=75878
+
+Imager-File-JPEG 0.84
+=====================
+
+ - allow compiling imexif.c with C89 compilers.
+
+Imager-File-JPEG 0.83
+=====================
+
+ - no longer fallback to using DynaLoader to load the XS code
+   https://rt.cpan.org/Ticket/Display.html?id=75560
+
+Imager-File-JPEG 0.82
+=====================
+
+ - modify to use the new buffered I/O functions instead of calling
+   I/O layer callbacks directly.
+
+ - handle I/O close errors properly
+
+Imager-File-JPEG 0.81
+=====================
+
+ - update the bundled (and still modified) Devel::CheckLib
+   https://rt.cpan.org/Ticket/Display.html?id=69170
+
+ - use snprintf() when imconfig.h indicates it's available
+   https://rt.cpan.org/Ticket/Display.html?id=69147
+
+Imager-File-JPEG 0.80
+=====================
+
+ - the big types cleanup
+
+ - fail writing an image that is too large for JPEG to support.
+
+Imager-File-JPEG 0.79
+=====================
+
+ - add progressive write support
+   https://rt.cpan.org/Ticket/Display.html?id=68691
+
+ - replace (imager|tony)@imager.perl.org in the doc, since I don't
+   plan to continue receiving mail at that address.
+   https://rt.cpan.org/Ticket/Display.html?id=68591
+
+Imager-File-JPEG 0.78
+=====================
+
+Split off from Imager.

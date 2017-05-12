@@ -1,0 +1,83 @@
+================================================================================
+NAME
+
+    Inline::Awk - Add awk code to your Perl programs.
+
+
+================================================================================
+SYNOPSIS
+
+    Call an awk function from a Perl program:
+
+        use Inline AWK;
+
+        hello("awk");
+
+        __END__
+        __AWK__
+
+        function hello(str) {
+            print "Hello " str
+        }
+
+    Or, call an entire awk program using the awk() function:
+
+        use Inline AWK;
+
+        awk(); # operates on @ARGV by default
+
+        __END__
+        __AWK__
+
+        # Count the number of lines in a file
+        END { print NR }
+
+
+================================================================================
+DESCRIPTION
+
+
+    The Inline::Awk module allows you to include awk code in your
+    Perl program. You can call awk functions or entire programs.
+
+    Inline::Awk works by converting the awk code into Perl code
+    using the a2p utility which comes as standard with Perl. This
+    means that you don't require awk to use the Inline::Awk module.
+
+
+================================================================================
+INSTALLATION
+
+    Use the standard installation procedure for any Perl module.
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+	ActivePerl users can use PPM as follows:
+
+		C:\ppm
+		PPM> set repository tmp http://homepage.eircom.net/~jmcnamara/perl
+		PPM> install Inline-Awk
+		PPM> quit
+		C:\>
+
+	If this fails try the following:
+
+		PPM>install http://homepage.eircom.net/~jmcnamara/perl/Inline-Awk.ppd
+
+
+================================================================================
+AUTHOR
+
+    John McNamara jmcnamara@cpan.org
+
+
+================================================================================
+COPYRIGHT
+
+    © MMI, John McNamara.
+
+    All Rights Reserved. This module is free software. It may be used,
+    redistributed and/or modified under the same terms as Perl itself.

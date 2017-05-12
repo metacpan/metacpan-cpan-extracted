@@ -1,0 +1,28 @@
+Image/Magick/Square version 0.01 
+=========================================
+
+This module will take an existing Image::Magick object and crop as needed
+to make a square. Useful for making square thumbnails together with 
+Image::Magick::Thumbnail
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Image::Magick
+  
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 Leo Charre
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

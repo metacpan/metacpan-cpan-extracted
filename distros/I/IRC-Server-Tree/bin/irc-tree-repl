@@ -1,0 +1,177 @@
+#!/usr/bin/env perl
+
+use strictures 1;
+use IRC::Server::Tree;
+use IRC::Server::Tree::Network;
+
+use Data::Dumper;
+
+{
+  local $@;
+  unless (eval { require Term::ReadLine;1 }) {
+    die "Could not load Term::ReadLine - try: cpan Term::ReadLine\n";
+  }
+
+  $@ = undef;
+
+  unless (eval { require Eval::WithLexicals;1 }) {
+    die(
+      "Could not load Eval::WithLexicals - ",
+      "try: cpan Eval::WithLexicals\n"
+    );
+  }
+}
+
+use Getopt::Long;
+
+my @plugins;
+GetOptions(
+  'plugin=s' => \@plugins
+);
+
+{
+  package
+    Data::Dumper;
+
+    no strict 'vars';
+    $Terse = $Indent = $Useqq = $Deparse = $Sortkeys = 1;
+    $Quotekeys = 0;
+}
+
+{
+  package
+    WithTrees;
+
+  sub create_tree {
+    IRC::Server::Tree->new(@_)
+  }
+
+  sub create_net {
+    IRC::Server::Tree::Network->new(@_)
+  }
+
+  sub create_random_net {
+    my $ref = [
+      hubA => [],
+      hubB => [],
+    ];
+
+    my $net = IRC::Server::Tree::Network->new($ref);
+
+    my @servers;
+
+    for my $i (1 .. 2) {
+      for my $trailing ('A' .. 'Z', 1 .. 9) {
+        push(@servers, 'server'.($trailing x $i));
+      }
+    }
+
+    require List::Util;
+    @servers = List::Util::shuffle(@servers);
+
+    my $add_to_rand; $add_to_rand = sub {
+      my ($this_ref, $name) = @_;
+      my $rand_idx = rand @$this_ref;
+      my $top_lev = ref $this_ref->[$rand_idx] eq 'ARRAY' ?
+        $this_ref->[$rand_idx]
+        : $net->tree->child_node_for($this_ref->[$rand_idx]);
+      die "expected ARRAY but got $top_lev"
+        unless ref $top_lev eq 'ARRAY';
+      if (@$top_lev) {
+        ## Maybe go another level.
+        (rand(5) < 3) ?
+          return $add_to_rand->($top_lev, $name)
+          : push(@$top_lev, $name => []);
+      } else {
+        push(@$top_lev, $name => []);
+      }
+    };
+
+    while (my $server = shift @servers) {
+      $add_to_rand->($net->tree, $server);
+    }
+
+    $net
+  }
+
+}  ## WithTrees
+
+my $eval;
+if (@plugins) {
+  $eval = Eval::WithLexicals->with_plugins(@plugins)->new(
+    in_package => 'WithTrees',
+  )
+} else {
+  $eval = Eval::WithLexicals->new(
+    in_package => 'WithTrees',
+  )
+}
+
+my $rl = Term::ReadLine->new('cobalt2-dbterm');
+my $fh = $rl->OUT || \*STDOUT;
+
+sub prompt {
+  my $line = $rl->readline('> ');
+  exit unless defined $line;
+
+  my @ret;
+  eval {
+    local $SIG{INT} = sub { die "SIGINT" };
+    @ret = $eval->eval($line);
+    1
+  } or @ret = ( 'error', $@ );
+  print Dumper @ret
+}
+
+print(
+  "This is a REPL instance (Eval::WithLexicals)\n",
+  "It has 'create_tree' and 'create_net' funcs for spawning a ",
+  "Tree or Network.\n",
+  "  my \$n = create_net;\n",
+  "The 'create_random_net' function builds a random Network.\n",
+  "Otherwise, it accepts any Perl expression.\n"
+);
+
+prompt() while 1;
+
+
+=pod
+
+=head1 NAME
+
+irc-tree-repl - A Tree-enabled Eval::WithLexicals instance
+
+=head1 SYNOPSIS
+
+  $ irc-tree-repl
+  > my $tree = create_tree();
+  > my $net  = create_net();
+
+  > my $random_net = create_random_net();
+
+  --> Speak perl as normal
+
+=head1 DESCRIPTION
+
+An L<Eval::WithLexicals> REPL that installs a couple simple methods 
+for creating an L<IRC::Server::Tree> or L<IRC::Server::Tree::Network>.
+
+See the documentation for those modules for usage details.
+
+=head2 create_tree
+
+Spawn an IRC::Server::Tree instance.
+
+=head2 create_net
+
+Spawn an IRC::Server::Tree::Network instance.
+
+=head2 create_random_net
+
+Create a randomized Network tree.
+
+=head1 AUTHOR
+
+Jon Portnoy <avenj@cobaltirc.org>
+
+=cut

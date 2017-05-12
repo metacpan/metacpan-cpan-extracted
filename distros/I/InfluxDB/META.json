@@ -1,0 +1,78 @@
+{
+   "abstract" : "Client library for InfluxDB",
+   "author" : [
+      "HIROSE Masaaki <hirose31@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.035, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "InfluxDB",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.039",
+            "perl" : "5.010_000"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.15"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Accessor::Lite" : "0",
+            "Data::Validator" : "0",
+            "Furl" : "0",
+            "JSON" : "2",
+            "Mouse::Util::TypeConstraints" : "0",
+            "URI::Escape" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Pod::Wordlist" : "0",
+            "Test::Fixme" : "0",
+            "Test::Kwalitee" : "0",
+            "Test::More" : "0",
+            "Test::Spelling" : "0.12"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/hirose31/p5-InfluxDB/issues"
+      },
+      "homepage" : "https://github.com/hirose31/p5-InfluxDB",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/hirose31/p5-InfluxDB.git",
+         "web" : "https://github.com/hirose31/p5-InfluxDB"
+      }
+   },
+   "version" : "1.005",
+   "x_contributors" : [
+      "Matthew Astley <mca@sanger.ac.uk>",
+      "Oriol Soriano <oriol.soriano@capside.com>",
+      "Will Bradley <zyphlar@users.noreply.github.com>"
+   ]
+}
+

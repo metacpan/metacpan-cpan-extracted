@@ -1,0 +1,36 @@
+---
+abstract: 'IO::Socket with read/write timeout'
+author:
+  - "Damien \"dams\" Krotkine"
+build_requires:
+  File::Spec: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  Test::More: 0
+  Test::TCP: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+  Module::Build::Tiny: 0.039
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.032, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: IO-Socket-Timeout
+provides:
+  IO::Socket::Timeout:
+    file: lib/IO/Socket/Timeout.pm
+    version: 0.32
+  IO::Socket::Timeout::Role::PerlIO:
+    file: lib/IO/Socket/Timeout.pm
+    version: 0.32
+  IO::Socket::Timeout::Role::SetSockOpt:
+    file: lib/IO/Socket/Timeout.pm
+    version: 0.32
+requires:
+  PerlIO::via::Timeout: 0.32
+resources:
+  bugtracker: https://github.com/dams/io-socket-timeout/issues
+  repository: git://github.com/dams/io-socket-timeout.git
+version: 0.32

@@ -1,0 +1,363 @@
+Revision history for Perl extension IOC.
+
+0.29 Thurs. April 26, 2007
+    * IOC::Service::Parameterized
+        - added docs and tests for this
+    
+    * IOC::Registry
+        - &locateService accepts additional args now 
+          to support the parameterized containers
+          
+    * IOC::Container
+        - &find and &get accepts additional args now 
+          to support the parameterized containers        
+          
+    * IOC::Visitor::ServiceLocator
+        - supports additional args now for
+          the parameterized containers    
+
+0.28 Wed May 4 2005
+    * IOC::Proxy
+    * IOC::Proxy::Interfaces    
+        - fixed a bug with newer perls and @_
+
+0.27 Wed Apr 13 2005
+    * IOC::Config::XML
+        - added some more documentation    
+        
+    * IOC::Config::SAX::Handler
+        - code refactor (no functional changes)
+        - added some more documentation
+
+0.26 Thurs Mar 31 2005
+    ~ removed XML::Simple dependency
+    - added XML::SAX dependency    
+
+    * IOC::Config::XML
+        - changed this to use the XML::SAX module
+          and the IOC::Config::XML::SAX::Handler
+          instead of XML::Simple
+
+    + Added IOC::Config::XML::SAX::Handler
+        - adapted tests from IOC::Config::XML 
+          (not many changes actually most things
+          stayed the same)
+
+0.25 Sat Feb 26 2005
+    - fixed an accidentatel dependency created in 
+      the 060_IOC_Config_XML_test.t test file. It
+      was looking for DBI, and specificall DBD::Mock.
+      I removed this and created a dummy package in
+      the test file as a substitute. It should work
+      fine now.
+
+0.24 Mon Feb 21 2004
+    * IOC::Service::ConstructorInjection
+    * IOC::Service::SetterInjection  
+        - improved the handling for loading 
+          classes automatically
+        
+    + Added IOC::Config::XML     
+        - added tests and documentation for this
+        - added XML::Simple as a dependency
+
+    * IOC::Exceptions
+        - added some expecptions for IOC::Config::XML
+            ~ IOC::ConfigurationError
+            
+0.23 Fri Jan 14 2005
+    * IOC::Registry
+        - added aliasService() method so that you
+          can alias one service path for another
+            - added tests for this
+            - added docs for this
+
+0.22 Mon Dec 27 2004
+    * IOC::Service::ConstructorInjection
+    * IOC::Service::SetterInjection    
+        - fixed class loading error in both, these
+          services will load your class if it is not
+          loaded already, and they were not doing
+          it correctly. 
+            - added tests to confirm fixes
+
+0.21 Sat Dec 25 2004 (Merry Christmas)
+    + Added IOC::Service::Literal
+        - this is an optimization to allow for literal
+          values to be held as services without them 
+          needing to be wrapped in subroutines.
+        - added documentation for this
+        - added tests for this
+        
+    * IOC::Container
+        - optmized this for IOC::Service::Literal objects
+          since they cannot have dependencies, and therefore
+          cannot have circular references there is no need to 
+          fuss with them (lock, deferred, etc). 
+
+0.20 Thurs Dec 23 2004
+    * IOC::Service::ConstructorInjection
+        - added support for getting constructor args
+          which are outside of the current container
+          and can be located with find()
+            - added tests for this
+            - added to the docs for this
+            
+    * IOC::Service::SetterInjection
+        - added support for getting setter args
+          which are outside of the current container
+          and can be located with find()
+            - added tests for this
+            - added to the docs for this
+
+0.19 Thurs Dec 23 2004
+    * IOC::Proxy
+        - fixed an issue with how overloaded
+          objects were handled. We no longer 
+          copy the '()' method. This will help
+          to deal with overloaded object in
+          a more consistent manner.
+
+0.18 Fri Dec 17 2004
+    * IOC::Container
+        - improved some diagnostic messages
+        
+    * IOC::Visitor::ServiceLocator
+        - improved some diagnostic messages
+            - added tests for these
+
+    * IOC::Exceptions
+        ~ added IOC::UnableToLocateService to help improve
+          the diagnostics in IOC::Visitor::ServiceLocator
+
+0.17 Wed Dec 15 2004
+    * IOC::Container
+        - added code to make sure that proxied instances
+          do not get re-proxied when they are retrieved
+          with get() again. 
+            - added tests for this
+
+0.16 Fri Nov 26 2004
+    * IOC::Service
+        - added the deferred() method, which will
+          return an IOC::Service::Deferred wrapper
+          around the given service instance. 
+
+    * IOC::Container
+        - removed the direct reference to the 
+          IOC::Service::Deferred class, and it
+          now calls the deferred() method on 
+          the IOC::Service instance itself.
+
+0.15 Sat Nov 20 2004
+    * IOC::Container
+        - adjusted how cyclical dependencies are
+          handled, so that they are now possible,
+          although still somewhat in their early 
+          stages.
+            - added tests for this
+        
+    * IOC::Service
+        - adjusted how cyclical dependencies are
+          handled, and created a sub-package called
+          IOC::Service::Deferred to facilitate this
+            - added tests for this
+
+0.14 Thurs Nov 18 2004
+    > now using Scalar::Util::blessed() instead of 
+      the convoluted UNIVERSAL::isa() stuff. This 
+      change affects a number of packages.
+      - added Scalar::Util as a dependency
+
+0.13 Wed Nov 17 2004
+    * IOC::Service::Prototype
+        - removed any reference to the prototypical
+          instance, so that complete lifecycle control
+          is given to the consumer of the service
+            ~ added tests and documentation for this
+
+0.12 Tues Nov 16 2004
+    + Added IOC::Proxy::Interfaces
+        - added tests and documentation for this 
+        
+    * IOC::Proxy
+        - broke out some more methods, so that subclasses
+          can really affect things on a granular level
+
+0.11 Thurs Nov 11 2004   
+    * IOC
+        - added the IOC::Proxy module to the module 
+          which get pre-loaded with this module
+        
+    * IOC::Proxy
+        - broke the main methods down into small methods
+          (in Strategy pattern fashion) to allow for 
+          variance of functionality in subclasses
+           
+    * IOC::Container
+        - now detects a cyclical relationship and will
+          throw an IOC::IllegalOperation exception if it
+          is found. I am currently working on how to 
+          allow for these types of relationships to exists
+          so this is really just a temporary solution.
+
+0.10 Tues Nov 9 2004
+    * IOC::Proxy
+        ~ fixed a warning about subroutine redefinition
+          when we add the auto-stringification 
+          functionality to an object
+
+0.09 Mon Nov 8 2004
+    + added IOC::Proxy
+        - added tests and documentation for this 
+    
+    * IOC::Exceptions
+        - added the IOC::OperationFailed exception
+        
+    * IOC::Container
+        - added the proxy related functions and all
+          the code to handle it
+            ~ added tests and documentation 
+              for this functionality
+
+0.08 Fri Nov 5 2004
+	* IOC::Container
+        - added the 'unregister' method to remove 
+          allow a IOC::Service to be removed
+            ~ added tests and documentation
+                      
+    * IOC::Service
+        - added the 'removeContainer' method to 
+          facilitate the IOC::Container->unregister
+          method
+            ~ added tests and documentation
+
+0.07 Thurs Oct 21 2004
+    > Improved documentation for all classes, however
+      I still have more to write
+
+    + added IOC::Service::Prototype
+    + added IOC::Service::Prototype::ConstructorInjection
+    + added IOC::Service::Prototype::SetterInjection 
+        - this allows services to dispense prototypes
+          rather then just singleton instances
+            ~ added tests for these new classes
+
+    * IOC::Exceptions
+        ~ added IOC::NotFound exception to handle
+          general cases
+
+    * IOC::Container
+        ~ added findRootContainer method
+          
+    * IOC::Container::MethodResolution
+        - now handles auto-finding of sub-containers
+          as well, and introduces a new pseduo-method
+          'root' which will allow you to go back to the
+          root of the container hierarchy.
+
+    * IOC::Service::ConstructorInjection
+        - fixed parameter handling so it works
+          with the Prototype:: classes 
+
+    * IOC::Visitor::ServiceLocator
+        - now uses findRootContainer method
+        
+    * IOC::Visitor::SearchForContainer
+        - removed redundant code (thanks Devel::Cover :)
+
+0.06 Tues Oct 19 2004
+    << NOTE: Some API Changes >>
+
+    * IOC::Registry
+        - changed names of methods, anything with 
+          the word 'Root' in it has now been changed
+          to 'Registered'.
+        - added unregisterContainer method
+        - added locateService method
+        - added locateContainer method
+        - added getRegisteredContainerList method
+        - added hasRegisteredContainer method
+        - added DESTORY method
+            ~ added tests and documentation for all new methods
+        
+    * IOC::Service
+        ~ removed optional $container argument to constructor
+        
+    * IOC::Service::ConstructorInjection
+        ~ removed optional $container argument to constructor
+        
+    * IOC::Service::SetterInjection
+        ~ removed optional $container argument to constructor 
+
+0.05 Tues Oct 19 2004
+    + added IOC::Registry
+        ~ created dependency with Class::StrongSingleton
+        ~ added tests for this
+    + added IOC::VisitorSearchForService
+        ~ added tests for this
+    + added IOC::VisitorSearchForContainer
+        ~ added tests for this
+
+    * IOC::Container
+        > added hasSubContainer method
+        > added hasService method
+
+0.04 Tues Oct 19 2004 
+    < No CODE changes>
+        - forgot to add Class::Interfaces to the dependency list
+        - forgot to include this changelog
+
+0.03 Mon Oct 18 2004
+    + added IOC::Interfaces
+        ~ created dependency with Class::Interfaces
+    + added IOC::Visitor::ServiceLocator
+        ~ added tests for this
+    
+    * IOC::Exceptions
+        > changed few names again, but I got it right now
+        
+    * IOC::Container
+        > added visitor support
+            - made IOC::Container inherit from the 
+              IOC::Visitable interface (see IOC::Interfaces) 
+                ~ added tests for this
+                ~ added documentation for this
+        > added support for sub-containers
+            - added example of this to SYNOPSIS
+            - added a number of methods to deal with
+              sub-containers and parent containers
+                ~ added tests for all these
+                ~ added documentation for all these
+        > added 'find' method which utilizes a Visitor
+          to locate a given service through a path-like syntax
+          (see the IOC::Visitor::ServiceLocator for more)
+        > changed names of exceptions 
+            ~ IOC::DuplicateServiceException to IOC::ServiceAlreadyExists
+        
+
+0.02 Fri Oct 15 2004
+    + added IOC::Container::MethodResultion
+        ~ added tests for this
+    + added IOC::Service::ConstructorInjection
+        ~ added tests for this
+    + added IOC::Service::SetterInjection
+        ~ added tests for this
+        
+    * IOC::Exceptions
+        > added a few more exceptions to IOC::Exceptions
+          and changed the names of a few as well
+      
+    * IOC::Container
+        > changed names of exceptions 
+            ~ IOC::MissingService to IOC::ServiceNotFound
+            
+    * IOC::Service
+        > when a container is passed to the IOC::Service
+          constructor, it will now cause the service to
+          be officially registered with the container
+
+
+0.01 Thu Oct 14 20:03:20 2004
+    - module created
+

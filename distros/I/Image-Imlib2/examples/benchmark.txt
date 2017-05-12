@@ -1,0 +1,7 @@
+Benchmark: running ellipse, ellipse_f, line, point, rect, rect_f, each for at least 5 CPU seconds...
+   ellipse:  6 wallclock secs ( 5.24 usr +  0.00 sys =  5.24 CPU) @ 32643.89/s (n=171054)
+ ellipse_f:  5 wallclock secs ( 5.18 usr +  0.00 sys =  5.18 CPU) @ 6162.93/s (n=31924)
+      line:  6 wallclock secs ( 5.29 usr +  0.00 sys =  5.29 CPU) @ 34200.95/s (n=180923)
+     point:  7 wallclock secs ( 5.24 usr +  0.00 sys =  5.24 CPU) @ 120843.51/s (n=633220)
+      rect:  7 wallclock secs ( 5.26 usr +  0.00 sys =  5.26 CPU) @ 36132.89/s (n=190059)
+    rect_f:  5 wallclock secs ( 5.36 usr +  0.00 sys =  5.36 CPU) @ 15042.72/s (n=80629)

@@ -1,0 +1,133 @@
+Revision history for Perl extension IPC::Shareable.
+
+0.01  Wed Jul 30 09:00:53 1997
+        - original version; created by h2xs 1.18.
+
+0.05  Wed Jul 30 15:02:31 EDT 1997
+        - scalars can now be tied; Ben Sugars.
+
+0.10  Fri Aug  1 13:32:52 EDT 1997
+        - can now tie both scalars and hashes of arbitrary length;
+          Ben Sugars.
+
+0.11  Wed Aug  6 10:14:49 EDT 1997
+        - initial implementation of semaphores for versioning and
+          caching; Ben Sugars.
+
+0.12  Thu Aug  7 14:47:42 EDT 1997
+        - various bug fixes; Ben Sugars.
+
+0.15  Fri Aug  8 15:45:29 EDT 1997
+        - implemented locking using semaphores; Ben Sugars.
+
+0.16  Mon Aug 11 16:10:54 EDT 1997
+        - new shared memory segments now initialized with null
+          values; Ben Sugars.
+
+0.17  Wed Aug 27 15:57:11 EDT 1997
+        - fixed some bugs in &parse_argument_hash; Ben Sugars.
+
+0.18  Thu Aug 28 09:12:30 EDT 1997
+        - fixed garbage collection bug; Ben Sugars.  Thanks to
+        Michael Stevens <michael@imaginet.co.uk> for the patch.
+
+0.20  Thu Aug 28 15:13:46 EDT 1997
+        - added ability to magically create ties to implicitly
+        referenced thingys; Ben Sugars.
+
+0.25  Tue Oct  7 14:41:49 EDT 1997
+        - added more checking of sem*() and shm*() return values;
+        Michael Stevens and Ben Sugars.
+        - added shlock and shunlock; Ben Sugars.
+        - fixed bug that would cause modifications of magically
+        referenced thingys to fail.  Thanks to Maurice Aubrey
+
+0.26  Mon Oct 20 10:06:43 EDT 1997
+        - fixed bug regarding assigning a reference to an empty
+        hash to a tied variable.  Thanks to Jason Stevens.
+
+0.28  Wed Oct 22 14:59:08 EDT 1997
+        - cleaned up the way thingys are magically tied; Ben Sugars.
+        - moved many subroutines so that they are auto-loaded; Ben
+        Sugars.
+        - updated man page; Ben Sugars.
+
+0.29  Mon Jan 12 13:49:42 EST 1998
+        - $MAXVER patch for when the version semaphore reaches its limit
+          and rolls back over to 0; Maurice Aubrey <maurice@hevanet.com>.
+        - patch to quieten things down under -w; Doug MacEachern
+          <dougm@telebusiness.co.nz>
+
+0.30 Mon Jan 19 11:13:41 EST 1998
+        - Added SEM_UNDO to semop() calls; Maurice Aubrey.
+        - Fixed some bugs in the locking code; Maurice Aubrey.
+        - Made calls to debug() conditional for efficency; Maurice Aubrey.
+        - Fixed a signal handler in test.pl; Maurice Aubrey.
+
+0.50 Tue Mar 21 11:56:32 EST 2000
+        - Complete rewrite incorporating the following changes.
+        - Requires 5.00503.  This allowed the module to get rid of the
+          global cache for shared memory segments; each Shareable
+          object now carries around its own data.
+        - 5.00503 also allowed tied arrays to be implemented
+        - Shared memory segments can no longer be of infinite length
+          thereby reducing the amount of code in the module by a
+          factor of 2.
+        - Uses IPC::Shareable::SharedMem class for accessing
+          shared memory.
+        - Uses IPC::Semaphore module for accessing semaphores.
+        - Completely revisited the way references are dealed with: all
+          referenced thingies are now automagically tied to shared
+          memory.
+        - Constants now imported from IPC::SysV; Shareable.xs is gone
+        - Rewrote test suite and moved into t subdirectory
+        - Updated man page
+
+0.51  Fri May  5 23:47:06 EDT 2000
+        - Fixed bug that would cause IPC::Shareable::BUF_SIZ to be
+          ignored; thanks to Robert Emmery <roberte@netscape.com> and
+          Mohammed J. Kabir <kabir@intevo.com> for reporting.
+        - Stopped tests from leaking shm segments
+        - Added test of argument parsing
+        - doc fixes
+
+0.52  Thu Sep 14 12:30:17 EDT 2000
+        - Now STORE, PUSH, POP, etc all call _thaw() before doing
+          their business.
+        - Refined SIGALRM handlers in test scripts
+        - Fixed concurrency issues affecting tied arrays and hashes;
+          thanks to thanks to Robert Emmery <roberte@netscape.com>,
+          Terry Ewing <terry@intevo.com>, Tim Fries
+          <timf@dicecorp.com>, and Joe Thomas <jthomas@women.com>.
+        - Doc fixes thanks to Paul Makepeace
+          <Paul.Makepeace@realprogrammers.com>
+
+0.53  Tue Nov 14 00:33:35 EST 2000
+        - Fixed race condition in test suite causing intermitent
+          failures.
+        - Better checking for success of calls to Storable::thaw();
+          thanks to Raphael Manfredi <Raphael_Manfredi@pobox.com>.
+
+0.54  Mon Jan  8 11:52:28 EST 2001
+        - Fix to allow IPC::Shareable to work with 1.0.* versions of
+          Storable
+
+0.60  Mon Mar  5 15:20:18 EST 2001
+        - Lee Lindley (lee.lindley@bigfoot.com) added the _was_changed
+          optimization, improved the locking functionality, fixed
+          numerous bugs, and generally cleaned things up; thanks.
+        - Removed support for "no" as a false value in arguments;
+          thanks to Dave Rolsky <autarch@urth.org>
+
+0.61  Mon Oct  8 00:27:39 2012
+        - Added patch from Frank Lichtenheld fixing IPC::Shareable's dependence
+          on the presence of a perl bug which is no longer present in perl >= 5.10
+        - Fixed bug reported by Dan Harbin where the FETCH operation on a tie()d
+          string containing HASH, ARRAY, or SCALAR fails because it was using
+          the stringification of the data to determine what kind of reference
+          it was.  Now using Scalar::Util::reftype
+        - Added missing dependency on IPC::Semaphore to Makefile.PL (reported
+          by Adrian Issott)
+        - Added a 'sleep 1' in a test that was hanging on certain systems
+          due (possibly) to two alarm signals coming too quickly to the
+          child process.  From Ton Voon.

@@ -1,0 +1,26 @@
+Revision history for Perl extension IPTables::Log.
+
+0.0005  Fri Dec 17 21:13:00 2010
+	- Fixes to tests
+
+0.0004  Mon Dec 21 01:27:00 2009
+	- Added ICMP type support.
+	- Added 'parsed' accessor to IPTables::Log::Set::Record to get parse status.
+	- Removed erroneous character in regex in Record.pm (make test now works).
+
+0.0003  Tue Dec 15 01:31:00 2009
+	- Fixed further dependency on NetAddr::IP.
+	- Added 'no_header' option to IPTables::Log::Set::Record.
+
+0.0002  Tue Oct 20 15:05:00 2009
+	- Fixed dependencies in Makefile.PL (Closes: 50585).
+	- Added get_by() to return a set indexes on a field.
+	- Modified IPTables::Log::Set::Record->_process_(value|present)
+		to *always* return a value.
+	- Written some proper tests.
+	- Other various bugfixes.
+
+0.0001  Wed Oct 14 18:00:44 2009
+	- original version; created by h2xs 1.23 with options
+		-X -n IPTables::Log
+

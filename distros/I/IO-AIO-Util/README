@@ -1,0 +1,29 @@
+IO-AIO-Util
+===========
+
+This module provides useful functions missing from IO::AIO.
+
+INSTALLATION
+
+To install this module type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    File::Spec
+    IO::AIO
+    POSIX
+    Test::More
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007-2009 by gray <gray@cpan.org>
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.

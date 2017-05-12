@@ -1,0 +1,11 @@
+name: IRCDHelp
+version: 0.1
+version_from lib/POE::Component::IRC::Plugin::IRCDHelp.pm
+installdirs: site
+requires:
+		POE
+		POE::Component::IRC
+		Config::Simple
+		DateTime
+
+		distribution_type: plugin

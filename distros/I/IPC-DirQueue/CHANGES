@@ -1,0 +1,250 @@
+------------------------------------------------------------------------
+r11113 | jmason | 2008-04-18 16:25:49 +0100 (Fri, 18 Apr 2008) | 1 line
+
+worker_still_working() is broken; it always claimed that the worker was no longer running.  Fix thanks to Brian Duggan <bduggan at mutatu dot org>
+------------------------------------------------------------------------
+r10389 | jmason | 2007-12-07 17:05:54 +0000 (Fri, 07 Dec 2007) | 1 line
+
+add extremely heavyweight test suite in long-tests; use with 'make test TEST_FILES=long-tests/*.t'
+------------------------------------------------------------------------
+r10388 | jmason | 2007-12-07 17:04:04 +0000 (Fri, 07 Dec 2007) | 1 line
+
+use buffered print instead of unbuffered syswrite() when creating data files using enqueue_sub()
+------------------------------------------------------------------------
+r9913 | jmason | 2007-09-04 12:08:23 +0100 (Tue, 04 Sep 2007) | 1 line
+
+oops. fix bug in previous commit; newline is \n, not \r
+------------------------------------------------------------------------
+r9911 | jmason | 2007-09-03 23:59:00 +0100 (Mon, 03 Sep 2007) | 1 line
+
+fix code to match POD documentation regarding the range of chars permitted in metadata during enqueueing, thanks to Brian Grossman for report
+------------------------------------------------------------------------
+r9865 | jmason | 2007-08-21 10:48:32 +0100 (Tue, 21 Aug 2007) | 1 line
+
+update POD docs: visit_all_jobs() does not return a value. thanks to Simon on AnnoCPAN: http://annocpan.org/%7eJMASON/IPC-DirQueue-0.09/lib/IPC/DirQueue.pm#note_1570
+------------------------------------------------------------------------
+r9467 | jmason | 2007-04-27 21:41:36 +0100 (Fri, 27 Apr 2007) | 1 line
+
+RELEASED VERSION 0.09
+------------------------------------------------------------------------
+r9298 | jmason | 2007-03-22 19:42:36 +0000 (Thu, 22 Mar 2007) | 1 line
+
+might as well dist the build instructions, too
+------------------------------------------------------------------------
+r9297 | jmason | 2007-03-22 19:31:16 +0000 (Thu, 22 Mar 2007) | 1 line
+
+added support to pickup a queued item by its data path, thanks to Brian Duggan <bduggan at matatu.org>
+------------------------------------------------------------------------
+r9296 | jmason | 2007-03-22 19:13:15 +0000 (Thu, 22 Mar 2007) | 1 line
+
+read_control_file() was always opening the control file for read twice, redundantly; fixed
+------------------------------------------------------------------------
+r8418 | jmason | 2006-12-21 19:00:03 +0000 (Thu, 21 Dec 2006) | 1 line
+
+add IPC::DirQueue::Job::get_data() API, to access queued job data directly as a string instead of as a filename, thanks to Collin Winter <collinw at gmail.com>
+------------------------------------------------------------------------
+r8417 | jmason | 2006-12-21 18:33:56 +0000 (Thu, 21 Dec 2006) | 1 line
+
+add IPC::DirQueue::Job::get_data() API, to access queued job data directly as a string instead of as a filename, thanks to Collin Winter <collinw at gmail.com>
+------------------------------------------------------------------------
+r8379 | jmason | 2006-12-11 20:32:13 +0000 (Mon, 11 Dec 2006) | 1 line
+
+fix documentation; it was unclear for beginners as to how job data got into and out of IPC::DirQueue, and that reading/writing files is required
+------------------------------------------------------------------------
+r8378 | jmason | 2006-12-11 20:31:45 +0000 (Mon, 11 Dec 2006) | 1 line
+
+fix documentation; it was unclear for beginners as to how job data got into and out of IPC::DirQueue, and that reading/writing files is required
+------------------------------------------------------------------------
+r8103 | jmason | 2006-11-24 14:27:37 +0000 (Fri, 24 Nov 2006) | 1 line
+
+fix platform-specific tests: must use 'use constant' in the conditional variables, otherwise the tests appear to be failing on win32 platforms when in fact we're just trying to skip them (see http://www.nntp.perl.org/group/perl.cpan.testers/377405 for example)
+------------------------------------------------------------------------
+r8095 | jmason | 2006-11-21 13:14:28 +0000 (Tue, 21 Nov 2006) | 1 line
+
+add a docu file to mark the release procedure
+------------------------------------------------------------------------
+r8094 | jmason | 2006-11-21 13:13:17 +0000 (Tue, 21 Nov 2006) | 1 line
+
+RELEASED VERSION 0.08
+------------------------------------------------------------------------
+r8093 | jmason | 2006-11-21 13:04:53 +0000 (Tue, 21 Nov 2006) | 1 line
+
+add t/12_no_dir.t, to test for bug 21312 (no queue directory causes die())
+------------------------------------------------------------------------
+r6840 | jmason | 2006-09-04 11:18:38 +0100 (Mon, 04 Sep 2006) | 1 line
+
+calling visit_all_jobs() with a nonexistent queue directory triggered some broken error-handling code, resulting in a die(); fixed.  thanks to Keith Amling, http://rt.cpan.org/Public/Bug/Display.html?id=21312
+------------------------------------------------------------------------
+r6839 | jmason | 2006-09-04 11:16:10 +0100 (Mon, 04 Sep 2006) | 1 line
+
+documentation clarification on queue structure; some of the grammar was poor
+------------------------------------------------------------------------
+r6694 | jmason | 2006-07-24 14:10:27 +0100 (Mon, 24 Jul 2006) | 1 line
+
+adding CHANGES file to svn
+------------------------------------------------------------------------
+r5887 | jmason | 2006-04-10 21:33:50 +0100 (Mon, 10 Apr 2006) | 1 line
+
+0.07 RELEASED
+------------------------------------------------------------------------
+r3565 | jmason | 2006-03-01 11:46:42 +0000 (Wed, 01 Mar 2006) | 1 line
+
+support running the tests with a perl that isn't /usr/bin/perl, e.g. after running '/usr/local/perl561/bin/perl Makefile.PL; make; make test'
+------------------------------------------------------------------------
+r3564 | jmason | 2006-03-01 11:45:54 +0000 (Wed, 01 Mar 2006) | 1 line
+
+The utime() idiom being used to touch files and directories was only added in perl 5.7.2.  Add backwards-compat code to deal with the 5.6.x callers
+------------------------------------------------------------------------
+r2480 | jmason | 2006-02-03 23:33:17 +0000 (Fri, 03 Feb 2006) | 1 line
+
+oops, indexd t scripts required POE, so the tests failed if that module wasn't installed.  make them optional and not run if POE isn't installed
+------------------------------------------------------------------------
+r2378 | jmason | 2006-01-10 02:47:28 +0000 (Tue, 10 Jan 2006) | 1 line
+
+0.06 RELEASED
+------------------------------------------------------------------------
+r2354 | jmason | 2006-01-03 02:07:51 +0000 (Tue, 03 Jan 2006) | 1 line
+
+make the 600-second active-lock timeout configurable; document it better; and reconcile code behaviour with what the documentation says it does re behaviour when a stale lock occurs on a task supposedly active on a remote system (doco wins)
+------------------------------------------------------------------------
+r2353 | jmason | 2006-01-03 01:38:35 +0000 (Tue, 03 Jan 2006) | 1 line
+
+patch from Anton Berezin <tobez.at.tobez.org>: return reference of sorted files list internally, and use built-in sort instead of a { $a cmp $b } callback.  Both are good for speed of ordered dequeuing
+------------------------------------------------------------------------
+r2303 | jmason | 2005-12-09 01:32:51 +0000 (Fri, 09 Dec 2005) | 1 line
+
+rename test
+------------------------------------------------------------------------
+r2301 | jmason | 2005-12-09 01:31:15 +0000 (Fri, 09 Dec 2005) | 1 line
+
+back_compat_0_05 setting not necessary; removed
+------------------------------------------------------------------------
+r2300 | jmason | 2005-12-09 01:30:43 +0000 (Fri, 09 Dec 2005) | 1 line
+
+add 'dq-indexd', an index daemon for use on heavily congested NFS networks, to offload indexing tasks away from NFS
+------------------------------------------------------------------------
+r2299 | jmason | 2005-12-09 01:25:03 +0000 (Fri, 09 Dec 2005) | 1 line
+
+increase timeouts so tests still work across very slow NFS links
+------------------------------------------------------------------------
+r2295 | jmason | 2005-12-03 01:50:42 +0000 (Sat, 03 Dec 2005) | 1 line
+
+add dq-indexd, an optional, experimental central server to maintain DQ indexes, instead of using readdir() filesystem APIs; fix race condition in wait_for_queued_job() that can result in missing jobs enqueued inside the same 1-second window; add code to test scripts to ensure that queue directories are empty at end-of-test, which is how this bug was caught
+------------------------------------------------------------------------
+r2294 | jmason | 2005-12-02 01:26:52 +0000 (Fri, 02 Dec 2005) | 1 line
+
+refactor queue-fanout code out of the mainline a little more cleanly
+------------------------------------------------------------------------
+r2293 | jmason | 2005-12-02 00:16:43 +0000 (Fri, 02 Dec 2005) | 1 line
+
+remove 'lastenq' flag file; turns out it's entirely unnecessary to maintain a separate file for the purpose, when the 'queue' directory itself works just as well, and will be in the buffer cache already
+------------------------------------------------------------------------
+r2290 | jmason | 2005-11-30 03:42:19 +0000 (Wed, 30 Nov 2005) | 1 line
+
+add tests
+------------------------------------------------------------------------
+r2289 | jmason | 2005-11-30 03:24:07 +0000 (Wed, 30 Nov 2005) | 1 line
+
+add 'queue_fanout' option, to work around NFS scalability issues with massive queue directories
+------------------------------------------------------------------------
+r2285 | jmason | 2005-11-28 21:32:53 +0000 (Mon, 28 Nov 2005) | 1 line
+
+add test scripts for that bug - namely ordering issues when starting from a fresh slate
+------------------------------------------------------------------------
+r2284 | jmason | 2005-11-28 19:44:47 +0000 (Mon, 28 Nov 2005) | 1 line
+
+bug in lastenq flag-file usage; the flag file may not exist, even if the clients support it, if the queue dir has not been enqueued-to yet
+------------------------------------------------------------------------
+r2259 | jmason | 2005-11-24 00:25:26 +0000 (Thu, 24 Nov 2005) | 1 line
+
+add test script for enqueue_fh()
+------------------------------------------------------------------------
+r2258 | jmason | 2005-11-24 00:23:32 +0000 (Thu, 24 Nov 2005) | 1 line
+
+API CHANGE: invalid metadata now causes die() to be called, instead of silent ignore.  also note that enqueue_fh() closes the FH
+------------------------------------------------------------------------
+r2257 | jmason | 2005-11-23 02:58:38 +0000 (Wed, 23 Nov 2005) | 1 line
+
+fixed a long-running bug; left-over control files in 'active'.   Turns out these were a side effect of qproc A completing a task before qproc B even started creating a lockfile; in that case, qproc B would get a lock on the now-complete task, then find that the queue control file was nonexistent and give up, attempting to remove the 'active' file, but instead unlinking the now-already-unlinked temporary filename, and leaving the real 'active' file behind.  Totally harmless, fixed anyway.
+------------------------------------------------------------------------
+r2256 | jmason | 2005-11-22 21:43:21 +0000 (Tue, 22 Nov 2005) | 1 line
+
+avoid silly misleading test failures caused by accidental sharing of DQ dirs, by removing the test-suite output dir at the start of each run
+------------------------------------------------------------------------
+r2255 | jmason | 2005-11-22 21:41:14 +0000 (Tue, 22 Nov 2005) | 1 line
+
+add flags file dir, and lastenq flags file, to support Reiserfs DQ dirs, which do not update directory mtimes when a file is creating within them.  Also rename enqueue_backend() to _enqueue_backend(), to emphasise its private API nature; and a couple of minor code readability improvements
+------------------------------------------------------------------------
+r2161 | jmason | 2005-10-21 23:25:26 +0100 (Fri, 21 Oct 2005) | 1 line
+
+explain what the 'active' dir is for; possible workaround for the lidnr errors, with more data-ful messages for working out what's going on
+------------------------------------------------------------------------
+r1014 | jmason | 2005-04-22 21:24:44 +0100 (Fri, 22 Apr 2005) | 1 line
+
+0.05 RELEASED
+------------------------------------------------------------------------
+r929 | jmason | 2005-03-15 23:12:28 +0000 (Tue, 15 Mar 2005) | 1 line
+
+more paranoid link_into_dir_no_retry implementation, hopefully will fix a bug that leaves tmp active files lying around
+------------------------------------------------------------------------
+r863 | jmason | 2005-02-09 00:58:22 +0000 (Wed, 09 Feb 2005) | 1 line
+
+redo the enqueue_sub() API; the read() style of string/empty-str/undef produced really messy, complex calling code, so just go with a more perlish string/undef/die() API instead
+------------------------------------------------------------------------
+r862 | jmason | 2005-02-09 00:16:50 +0000 (Wed, 09 Feb 2005) | 1 line
+
+bump version number; not yet ready for a release, but worth doing this before I forget
+------------------------------------------------------------------------
+r861 | jmason | 2005-02-09 00:12:08 +0000 (Wed, 09 Feb 2005) | 1 line
+
+added enqueue_sub() API, to enqueue data from a closure
+------------------------------------------------------------------------
+r857 | jmason | 2005-02-07 04:31:14 +0000 (Mon, 07 Feb 2005) | 1 line
+
+skip fork()-requiring tests on win32; failure log at http://www.nntp.perl.org/group/perl.cpan.testers/179567
+------------------------------------------------------------------------
+r663 | jmason | 2005-01-19 01:09:00 +0000 (Wed, 19 Jan 2005) | 1 line
+
+RELEASING 0.04
+------------------------------------------------------------------------
+r662 | jmason | 2005-01-13 02:26:40 +0000 (Thu, 13 Jan 2005) | 1 line
+
+add note about mailing list
+------------------------------------------------------------------------
+r661 | jmason | 2005-01-13 02:22:44 +0000 (Thu, 13 Jan 2005) | 2 lines
+
+bug: dqserver should run forever when --njobs is 0, or unset; instead, it was exiting immediately.  Patch from Jeffrey Wescott <jeff . binaryfeed . org>.
+
+------------------------------------------------------------------------
+r461 | jmason | 2004-09-17 12:06:57 +0100 (Fri, 17 Sep 2004) | 1 line
+
+added debugging; also, tracked down a mysterious condition that resulted in unused files being left in the active dir.
+------------------------------------------------------------------------
+r460 | jmason | 2004-09-17 12:05:35 +0100 (Fri, 17 Sep 2004) | 1 line
+
+MANIFEST fixes
+------------------------------------------------------------------------
+r453 | jmason | 2004-09-10 02:14:30 +0100 (Fri, 10 Sep 2004) | 1 line
+
+updated documentation on the directory structure used; readying release
+------------------------------------------------------------------------
+r449 | jmason | 2004-08-30 22:26:49 +0100 (Mon, 30 Aug 2004) | 1 line
+
+bump version to 0.03
+------------------------------------------------------------------------
+r448 | jmason | 2004-08-27 05:22:07 +0100 (Fri, 27 Aug 2004) | 1 line
+
+now up to the latest. added hashing of the data dir; long tests to measure speed effects of code changes; filenames are now significantly shortened using a hash instead of the raw string for the (hostname,pid) part
+------------------------------------------------------------------------
+r447 | jmason | 2004-08-27 05:19:25 +0100 (Fri, 27 Aug 2004) | 1 line
+
+version 0.02, for the record
+------------------------------------------------------------------------
+r446 | jmason | 2004-08-27 05:18:41 +0100 (Fri, 27 Aug 2004) | 1 line
+
+version 0.01, for the record
+------------------------------------------------------------------------
+r445 | robert | 2004-08-27 04:11:46 +0100 (Fri, 27 Aug 2004) | 1 line
+
+[perl #31356] new svn for IPC::DirQueue
+------------------------------------------------------------------------

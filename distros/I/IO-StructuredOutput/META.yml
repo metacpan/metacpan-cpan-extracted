@@ -1,0 +1,14 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         IO-StructuredOutput
+version:      1.008
+version_from: StructuredOutput.pm
+installdirs:  site
+requires:
+    Archive::Zip:                  0
+    IO::Scalar:                    0
+    Spreadsheet::WriteExcel:       0
+    Text::CSV_XS:                  0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30_01

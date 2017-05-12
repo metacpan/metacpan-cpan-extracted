@@ -1,0 +1,14 @@
+Revision history for IO-Async-Loop-linux
+
+0.04    CHANGES:
+         * Updated to look for IO::Async::Loop::Ppoll instead of ::IO_Ppoll
+
+0.03    CHANGES:
+         * Various updates to keep CPANTS happy
+
+0.02    CHANGES:
+         * Use Module::Build's "recommends" keyword to recommend
+           IO::Async::Loop::Epoll
+
+0.01    First version, released on an unsuspecting world.
+

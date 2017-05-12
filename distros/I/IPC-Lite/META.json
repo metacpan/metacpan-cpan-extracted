@@ -1,0 +1,43 @@
+{
+   "abstract" : "IPC shared variables using SQLite",
+   "author" : [
+      "Erik Aronesty <earonesty@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "IPC-Lite",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBD::SQLite" : 0,
+            "DBI" : "1.21",
+            "Test::Simple" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v0.5.40"
+}

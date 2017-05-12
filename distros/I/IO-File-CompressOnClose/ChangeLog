@@ -1,0 +1,58 @@
+2003-12-28 09:29  james
+
+	* MANIFEST (1.4), META.yml (1.4), lib/IO/File/CompressOnClose.pm
+	(1.3), t/10_subclass.t (1.1), t/11_esoteric.t (1.1) (utags: v0_11):
+
+	Fix a few POD typos
+	Add two new test suites for proper use of subclasses and esoteric filenames
+	Add check that subclasses use IO::File::CompressOnClose as their base
+	Support subclasses that do not live in a dedicated .pm file
+
+2003-12-27 18:19  james
+
+	* MANIFEST (1.3), META.yml (1.3):
+
+	Add Zip.pm to MANIFEST
+	Re-gen META yet again
+
+2003-12-27 18:16  james
+
+	* MANIFEST (1.2, v0_10):
+
+	Update MANIFEST with ChangeLogs
+
+2003-12-27 18:16  james
+
+	* ChangeLog (1.2), ChangeLog.xml (1.2) (utags: v0_10, v0_11):
+
+	Re-gen ChangeLogs
+
+2003-12-27 18:16  james
+
+	* ChangeLog (1.1), ChangeLog.xml (1.1), META.yml (1.2, v0_10):
+
+	Re-gen META.yml
+
+2003-12-27 18:15  james
+
+	* Build.PL (1.1, v0_11, v0_10), MANIFEST (1.1), META.yml (1.1),
+	Makefile.PL (1.1, v0_11, v0_10), README (1.1, v0_11, v0_10),
+	lib/IO/File/CompressOnClose.pm (1.2, v0_10),
+	lib/IO/File/CompressOnClose/Gzip.pm (1.2, v0_11, v0_10),
+	lib/IO/File/CompressOnClose/Zip.pm (1.1, v0_11, v0_10), t/01_use.t
+	(1.2, v0_11, v0_10), t/02_basic.t (1.2, v0_11, v0_10), t/03_pod.t
+	(1.2, v0_11, v0_10), t/04_accessors.t (1.1, v0_11, v0_10),
+	t/05_modes.t (1.1, v0_11, v0_10), t/06_gzip.t (1.1, v0_11, v0_10),
+	t/07_zip.t (1.1, v0_11, v0_10), t/08_coderef.t (1.1, v0_11, v0_10),
+	t/09_delete_after_compress.t (1.1, v0_11, v0_10):
+
+	Release v0.10 to CPAN
+
+2003-12-22 05:59  james
+
+	* lib/IO/File/CompressOnClose.pm (1.1),
+	lib/IO/File/CompressOnClose/Gzip.pm (1.1), t/01_use.t (1.1),
+	t/02_basic.t (1.1), t/03_pod.t (1.1):
+
+	Initial non-working stab at IO::File::CompressOnClose
+

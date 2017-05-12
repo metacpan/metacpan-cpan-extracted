@@ -1,0 +1,271 @@
+Revision history for Interchange6
+
+0.120 Mon May 23 10:19:42 2016 CEST
+
+    [ENHANCEMENTS]
+
+    * Improve arg checking in Cart->remove (Peter Mottram).
+    * Allow cart remove using id or index as well as sku (Peter Mottram).
+    * Extend cart update method to allow hashref args for index/id
+      (Peter Mottram).
+    * Add product_grep methot to cart class (Peter Mottram).
+    * Add combine attribute to product class (Hunter McMillen, GH #34).
+
+    [ENHANCEMENTS]
+
+    * Add product_class attribute to cart class (Peter Mottram).
+    * `after quantity` modifier in Product should be `after set_quantity`
+      (Peter Mottram).
+    * Remove cost_push handle from Role::Costs->costs (Peter Mottram).
+    * Use Carp::croak in Role::Cost (Peter Mottram).
+    * Reintroduce Interchange6::Types type library (Peter Mottram).
+    * Improve workaround for Type::Tiny::XS bug
+      (Peter Mottram, GH #28).
+    * Change Cart's find method to use HandlesVia Array's first
+      (Peter Mottram).
+    * Use PositiveOrZeroInt type check for quantity arg to update in cart
+      (Peter Mottram).
+
+0.103 Fri Feb 26 10:45:42 2016 CET
+
+    [ENHANCEMENTS]
+
+    * Product class attributes price/selling_price also allow
+      HasMethods["value"] to support Interchange6::Currency
+      (Peter Mottram).
+
+    [BUG FIXES]
+
+    * Bump prerequisite on Type::Tiny to force version that
+      includes Types::Common::Numeric.
+    * Make cart attribute of Product class a weak reference
+      (Peter Mottram).
+
+    [CLEANUPS]
+
+    * Replace map expressions that aren't doing list transformations
+      (Hunter McMillen, GH #30, #33).
+    * Cleanup imports as per Moo recommendations
+      (Hunter McMillen, GH #29, #31).
+
+    [COMPAT]
+
+    * Changes to lower minimum Perl version from 5.14 to 5.10
+      (Peter Mottram).
+
+    [TESTS]
+
+    * Travis updates (Peter Mottram, Stefan Hornburg/Racke)
+
+0.102 Tue Sep 29 08:20:58 2015 CEST
+
+    [TESTS]
+
+    * Add extra check of quantity in Cart->update (Peter Mottram, GH #28).
+
+    [DOCUMENTATION]
+
+    * Fix typo in Interchange6::Cart::Cost link (Stefan Hornburg).
+
+0.101 Sun Sep 27 16:50:07 2015 CEST
+
+    This release tries to fix the errors revealed by
+    the return of CPAN testers:
+
+    * Add debug code to t/unit/cart.t (Peter Mottram, GH #28).
+    * Set minimum Perl version to 5.14 (Peter Mottram).
+
+0.100 Sun Aug 30 09:21:27 2015 CEST
+
+    This release features a code and test overhaul by Peter Mottram.
+
+    [ENHANCEMENTS]
+
+    * Switch to Type::Tiny so types are Moose-compatible
+    * New public methods in Interchange6::Cart - product_delete, product_push,
+      product_set. These used to be 'private' methods.
+    * Interchange6::Cart sessions_id added isa Str
+    * Interchange6::Cart weight now returns zero instead of undef when there
+      are no products or if no products have weight defined
+    * Interchange6::Cart add, remove, seed and update methods have improved
+      argument checking
+    * Interchange6::Cart update always returns an array instead of
+      array/arrayref depending on context
+    * Interchange6::Cart::Product cart attribute isa added
+    * added clearer to Interchange6::Cart::Product discount_percent attribute
+    * move total attribute from Interchange6::Cart and
+      Interchange6::Cart::Product into Interchange6::Role::Costs
+    * clean up attribute clearer code into after modifiers for clarity
+    * make Interchange6::Role::Cost costs attribute immutable
+    * remove unnecessary code from Interchange6::Role::Cost apply_cost method
+    * move code from Interchange6::Role::Cost _calculate method into lazy
+      total attributes's builder method
+    * new cost_push method in Interchange6::Role::Cost replaces 'private' method
+
+    [BUG FIXES]
+
+    * Fix cost calculations using compound attribute
+
+    [DOCUMENTATION]
+
+    * Add reference to Interchange6::Cart::Product and
+      Interchangr6::Cart::Cost in Interchange6 pod
+    * Interchange6::Cart and Interchange6::Cart::Product pod now references
+      Interchange6::Role::Costs attributes and methods
+
+    [TESTS]
+
+    * Complete overhaul of tests: new unit and author subdirs. We now have
+      100% test coverage for the first time.
+
+0.086 Wed Jul  1 16:31:37 2015 CEST
+
+    [ENHANCEMENTS]
+
+    * Make all accessors read-only and add writers where appropriate.
+      This includes adding set_price to product (Peter Mottram, GH #23).
+
+0.080 Sun Mar 15 08:47:11 2015 CET
+
+    [FEATURES]
+
+    * add weight attribute to Cart::Product and Cart (Peter Mottram)
+
+    [ENHANCEMENTS]
+
+    * add canonical_sku attribute to Cart::Product (Peter Mottram)
+    * add is_canonical and is_variant methods to Cart::Product (Peter Mottram)
+
+    [API CHANGES]
+
+    * Change Cart::Product uri attribute to read-only (Peter Mottram)
+
+0.063 Wed Jan 21 22:05:56 2015 CET
+
+    [ENHANCEMENTS]
+
+    * Add use MooX::HandlesVia to Cart::Product class (Peter Mottram).
+    * Add extra attribute to Cart::Product class (Peter Mottram).
+
+    [BUG FIXES]
+
+    * Add version to prerequisite on Test::Warnings (GH #25, Stefan Hornburg).
+
+0.062 Sat Nov 29 10:04:20 2014 CET
+
+    [BUG FIXES]
+
+    * Remove Interchange6::Hook from cart test (GH #22, Peter Mottram).
+
+0.061 Fri Nov 28 10:57:47 2014 CET
+
+    [BUG FIXES]
+
+    * Add missing prerequisite on namespace::clean (Stefan Hornburg).
+    * Fix prerequisite on Moo (GH #21, Stefan Hornburg).
+
+0.060 Thu Nov 27 16:51:31 2014 CET
+
+    [API CHANGES]
+
+    * Move hooks to Dancer::Plugin::Interchange6 (Peter Mottram).
+
+    [ENHANCEMENTS]
+
+    * Add discount_percent to Cart::Product class (Peter Mottram).
+
+    [TESTS]
+
+    * Add test for zero value cost (GH #20, Peter Mottram).
+
+0.060_03 Thu Nov 27 14:45:31 2014 CET
+
+    [API CHANGES]
+
+    * Rename absolute_amount attribute to current_amount in Cart::Cost (Peter Mottram).
+    * Rename cart_costs_id attribute to id in Cart::Cost (Peter Mottram).
+    * Remove created and last_modified attributes from Cart (Peter Mottram).
+
+    [ENHANCEMENTS]
+
+    * Remove dependency on Interchange6::Schema (Peter Mottram).
+    * Add compound attribute to Cart::Cost (Peter Mottram).
+    * Move carts costs into Role::Costs (Peter Mottram).
+    * Remove Role::Errors (Peter Mottram).
+    * Add Role::Hookable to Cart::Product (Peter Mottram).
+    * Add selling_price attribute to Cart::Product (Peter Mottram).
+    * Add has_subtotal and has_total attributes to Cart (Peter Mottram).
+    * Change subtotal and total methods to attributes in Cart class (Peter Mottram).
+    * Remove set_users_id and get_users_id method from Cart class (Peter Mottram).
+    * Remove set_name and get_name method from Cart class (Peter Mottram).
+
+    [DOCUMENTATION]
+
+    * Fix typo in Interchange6::Cart::Cost's POD (Stefan Hornburg).
+    * Add discount example to Interchange6::Cart's POD (Stefan Hornburg).
+
+    [TESTS]
+
+    * Add product cost tests (Peter Mottram).
+
+0.040 Wed Jul  2 11:57:43 2014 CEST
+
+    [ENHANCEMENTS]
+
+    * Add Interchange::Cart::Cost class (Peter Mottram, GH #12).
+
+    [BUG FIXES]
+
+    * Remove set_products writer from Cart products attribute
+      (Peter Mottram, Sam Batschelet).
+
+    [TESTS]
+
+    * Add support for code coverage tests (Peter Mottram).
+
+0.030 Fri Apr  4 19:40:19 2014 CEST
+
+    [ENHANCEMENTS]
+
+    * Add cart_products_id attribute to Cart::Product
+      (Peter Mottram, GH #10).
+
+0.011 Thu Mar 13 03:02:13 2014 CET
+
+    [ENHANCEMENTS]
+
+    * Add subtotal method to Cart::Product class.
+
+0.010 Wed Mar 12 16:22:43 2014 CET
+
+    [ENHANCEMENTS]
+
+    * Remove Interchange6::Class (Peter Mottram, GH #8).
+
+    [BUG FIXES]
+
+    * Add Test::Most to build prerequisites.
+
+0.004 Tue Mar 11 18:36:30 2014 CET
+
+    [ENHANCEMENTS]
+
+    * Moo cart rewrite (Peter Mottram).
+    * Use DateTime for created and last_modified (Peter Mottram, GH #2)
+
+0.003 Thu Jan  2 12:09:12 2014 CET
+
+    [ENHANCEMENTS]
+
+    * Extend users_id method to allow setting the users id.
+    * Add sessions_id method to Interchange6::Cart.
+
+0.002 Fri Dec 27 09:46:06 2013 CET
+
+    [ENHANCEMENTS]
+
+    * Add users_id method to Interchange6::Cart.
+
+0.001 Sat Nov 30 16:40:37 2013 CET
+
+    * Initial release.

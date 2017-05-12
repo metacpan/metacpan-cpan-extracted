@@ -1,0 +1,175 @@
+----------------------------------------------------------------------
+    This is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License , or
+    (at your option) any later version.
+ 
+    This software is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+ 
+    You should have received a copy of the GNU General Public License
+    along with this software. If not, write to the Free Software
+    Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+----------------------------------------------------------------------
+
+	*** This is beta software -- use at your own risks ***
+
+
+Introduction
+------------
+IPC::Shareable allows you to tie a variable to shared memory making it
+easy to share the contents of that variable with other Perl processes.
+Scalars, arrays, and hashes can be tied.  The variable being tied may
+contain arbitrarily complex data structures - including references to
+arrays, hashes of hashes, etc.
+
+
+Installation
+------------
+0.  Prerequisites:
+	-Perl version 5.005_03 or more recent.
+	-System V IPC (shmget(2), shmctl(2), etc).
+	-Storable.pm, version 0.6 or more recent.
+
+1.  Installation steps:
+	-from the directory where this file is located, type:
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+Incompatibility Alert
+---------------------
+
+This version contains some incompatiblities from earlier versions of
+IPC::Shareable.  Here's a list of them.
+
+1. Earlier versions allowed you to use the word B<yes> for true and
+the word B<no> for false as elements in the options hash.  Support for
+this "feature" is being removed.  B<yes> will still act as true (since
+it is true, in the Perl sense), but use of the word B<no> now emits an
+(optional) warning and then revert to a false value.  This warning
+will become mandatory in a future release and then at some later date
+stop working altogether.
+
+2. Earlier versions used to accept upper-case values of YES/NO as
+elements in the options hash in addition to yes/no.  Support for this
+has been entirely removed.
+
+3. Earlier versions would try to allow data of arbitrary length to be
+tied to shared memory.  This well-intentioned (but misguided) approach
+convoluted the code.  Current versions of IPC::Shareable do not allow
+data of arbitrary length.  Each individual tied variable may not have
+a serialized length greater than the system's maximum shared memory
+segment size.
+
+4. This version of IPC::Shareable does not understand the format of
+shared memory segments created versions prior to 0.60.  If you try to
+tie to such segments, you will get an error.  The only work around is
+to clear the shared memory segments and start with a fresh set.
+
+The benefits afforded in terms of code simplication and performance on
+shorter segments more than make up for the above incompatibilities.
+
+Documentation
+-------------
+
+The man page for IPC::Shareable is embedded in IPC::Shareable.pm.
+Copies of this document in various formats can be found in the doc
+directory of the distribution.  In there will you find information
+about usage, pitfalls, etc.
+
+Known Problems
+--------------
+
+1. Running out of semaphores
+
+    make test may fail with the message
+
+	Could not create semaphore set: No space left on device
+
+    This is because the test suite has used up all of the allowed
+    number of semaphore sets and/or semaphores (SEMMNI and/or SEMMNS
+    respectively).  This seems to happen often on FreeBSD, where the
+    default value is rather low.  The only solution is to increase
+    SEMMNI and/or SEMMNS for the system.  Consult your system
+    documentation for how to do this.
+
+2. Running out of shared memory
+
+    make test may fail with the message
+
+	Munged shared memory segment (size exceeded?)
+
+    This is likely because the tests are exceeding the maximum size of
+    a shared memory segment (SHMMAX) or the system-wide limit on
+    shared memory size (SHMALL).  The only solution is to increase
+    SHMMAX and/or SHMALL for the system.  Consult your system
+    documentation for how to do this.
+
+    This failure could also mean that IPC::Shareable doesn't like your
+    version of Storable (IPC::Shareable makes some assumptions about
+    the structure of serialized data).  This message would happen, for
+    instance, when version 0.53 of IPC::Shareable was used in
+    conjunction with 1.0.x versions of Storable.  If you're having
+    problems, try using Storable 1.0.7 which is known to work with
+    IPC::Shareable 0.54.
+
+3. Array operations on references
+
+    Generally, when a reference is assigned to a shared variable, the
+    referenced data is also supposed to be shared.  However, this
+    currently is not the case for references assigned to an array via
+    push(), splice(), and such.  Suppose for example, you do
+
+	@shared = ();
+	push @shared, { %hv };
+
+    then the assignment
+
+	$shared->[0]->{foo} = "bar";
+
+    will not be shared with other processes since %hv is not shared.
+    As a workaround you'll have to use array index operations:
+
+	@shared = ();
+	$shared[0] = { %hv };
+	$shared->[0]->{foo} = "bar";
+
+    Note that push(), splice(), et al. work fine for non-references.
+
+    This bug will be fixed in a future release.
+
+Etc
+---
+
+I have tested this on Linux only. YMMV may vary on other systems.
+
+The two-year hiatus between releases of IPC::Shareable is symptomatic
+of the amount of time I have to contribute to this project.  Help save
+the world! Submit me patches and improvements.
+
+Also, don't be alarmed if I can't answer support emails.  If this
+bothers you, you can always ask for your money back :-)
+
+For a more light-weight, non-tie()-based interface to shared memory
+see Maurice Aubrey's IPC::ShareLite.
+
+--
+Ben Sugars (bsugars@canoe.ca)
+March 5, 2001
+
+New co-maintainer
+-----------------
+
+October 8, 2012
+
+I became co-maintainer so that I could apply some patches that had
+been sitting around on rt.cpan.org for a few years.  Let me know
+if there is some way I can help, but understand that I have little
+experience with the module itself.
+
+Mike South (msouth@gmail.com)

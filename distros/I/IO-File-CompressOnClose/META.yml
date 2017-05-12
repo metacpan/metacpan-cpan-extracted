@@ -1,0 +1,25 @@
+--- #YAML:1.0
+name: IO-File-CompressOnClose
+version: 0.11
+license: perl
+distribution_type: module
+requires:
+  Compress::Zlib: 0
+  IO::Zlib: 0
+recommends: {}
+build_requires:
+  Archive::Zip: 0
+  Compress::Zlib: 0
+  IO::Zlib: 0
+  Test::Exception: 0
+  Test::More: 0
+conflicts: {}
+provides:
+  IO::File::CompressOnClose:
+    file: lib/IO/File/CompressOnClose.pm
+    version: 0.11
+  IO::File::CompressOnClose::Gzip:
+    file: lib/IO/File/CompressOnClose/Gzip.pm
+  IO::File::CompressOnClose::Zip:
+    file: lib/IO/File/CompressOnClose/Zip.pm
+generated_by: Module::Build version 0.21

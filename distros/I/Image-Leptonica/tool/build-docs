@@ -1,0 +1,91 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use lib "$ENV{HOME}/sw_projects/doc-experiment/p5-Quiver/lib";
+use FindBin qw($Bin);
+use lib "$Bin/../lib";
+
+use Getopt::Long::Descriptive;
+
+use Quiver;
+use Quiver::Source;
+use Quiver::Schema;
+use Quiver::Backend::Ctags;
+use Quiver::Backend::RegexpCommon;
+use Quiver::Runner;
+use Path::Iterator::Rule;
+use Path::Class;
+use JSON::MaybeXS;
+
+my ($opt, $usage) = describe_options(
+	"$0 %o <source dir/files...>",
+	[ 'db|d=s',     "database file", { required => 1  } ],
+	[],
+	[ 'verbose|v',  "print extra stuff"                 ],
+	[ 'help|h|?',   "print usage message and exit"      ],
+);
+
+my $dir = dir($Bin)->subdir( qw(.. .. leptonica-1.70 src))->absolute->resolve->stringify;
+my $json = dir($Bin)->parent->file('doc.json');
+
+
+my $src = Quiver::Source->new();
+my $rule = Path::Iterator::Rule->new
+	->file
+	->and( sub { /\.c$/ } )
+	->not( sub { /stub/ } )
+	;
+
+$src->add( sub { $rule->all( $dir ) }  );
+
+
+my $schema = Quiver::Schema->connect('dbi:SQLite:dbname='. $opt->db,
+	'', '',
+	{},
+	{ on_connect_call => 'use_foreign_keys' });
+unless( -f $opt->db ) {
+	$schema->deploy;
+
+	## SCAN
+	my $symbols = Quiver::Backend::Ctags->new( source => $src );
+	my $comments = Quiver::Backend::RegexpCommon->new( source => $src );
+
+	my $runner = Quiver::Runner->new( schema => $schema );
+	$runner->add_backend($symbols, $comments);
+	$runner->scan;
+}
+
+## EXTRACT
+my $functions = [
+	map {
+		+{
+			comment => $_->comment_symbol->symboltext->symboltext,
+			function => $_->function_symbol->name,
+			file => file($_->filenameid->filename)->relative( dir($dir) )->stringify,
+		};
+	} $schema->resultset('DocumentationMatch')->search({})->all
+];
+#use DDP; p $functions;
+#my $not_bang = [ grep { $_->{comment} !~ m,^/\*!, } @$functions ];
+#use DDP; p $not_bang;
+
+my $json_obj = JSON::MaybeXS->new(utf8 => 1, pretty => 1);
+my $json_output = $json_obj->encode($functions);
+$json->spew( $json_output );
+
+
+# PODNAME: quiver-dump-docs
+# ABSTRACT: one line description TODO
+
+=pod
+
+=head1 SYNOPSIS
+
+  quiver-dump-docs /usr/include
+
+=head1 DESCRIPTION
+
+TODO
+

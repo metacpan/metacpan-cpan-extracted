@@ -1,0 +1,148 @@
+   ___                                    ______     ______       
+  |_ _|_ __ ___   __ _  __ _  ___   _ _  / ___\ \   / / ___|  _ _ 
+   | || '_ ` _ \ / _` |/ _` |/ _ \ (_|_) \___ \\ \ / / |  _  (_|_)
+   | || | | | | | (_| | (_| |  __/  _ _   ___) |\ V /| |_| |  _ _ 
+  |___|_| |_| |_|\__,_|\__, |\___| (_|_) |____/  \_/  \____| (_|_)
+                       |___/                                      
+   ____       _   _     
+  |  _ \ __ _| |_| |__  
+  | |_) / _` | __| '_ \ 
+  |  __/ (_| | |_| | | |
+  |_|   \__,_|\__|_| |_|
+                        
+
+
+This is the README for Image::SVG::Path version 0.30.
+
+Image::SVG::Path is a "module" for the Perl computer programming language,
+a library of computer code to install on a computer.  This document
+contains four sections:
+
+1. About - what the module does
+
+2. Documentation - how to learn more about the module
+
+3. Installation - how to install this module on a computer
+
+4. Help - what to do if you get stuck
+
+-----------------------------------------------------------------------------
+
+1. ABOUT
+
+Image::SVG::Path - read the "d" attribute of an SVG path
+
+This module extracts information contained in the "d" attribute of an
+SVG <path> element and turns it into a simpler series of steps. 
+
+For example, an SVG <path> element might take the form
+
+    <path d="M9.6,20.25c0.61,0.37,3.91,0.45,4.52,0.34c2.86-0.5,14.5-2.09,21.37-2.64c0.94-0.07,2.67-0.26,3.45,0.04"/>
+
+Using an XML parser, such as "XML::Parser",
+
+    
+    use FindBin '$Bin';
+    use XML::Parser;
+    use Image::SVG::Path 'extract_path_info';
+    my $file = "$Bin/Home_for_the_aged.svg";
+    my $p = XML::Parser->new (Handlers => {Start => \& start});
+    $p->parsefile ($file) or die "Error $file: ";
+    
+    sub start
+    {
+        my ($expat, $element, %attr) = @_;
+    
+        if ($element eq 'path') {
+            my $d = $attr{d};
+            my @r = extract_path_info ($d);
+            for (@r) {
+                if ($_->{svg_key} =~ /^[mM]$/i) {
+                    print "MOVE TO @{$_->{point}}.\n";
+                }
+            }
+        }
+    }
+
+
+produces output
+
+    MOVE TO 15 119.
+    MOVE TO 52 88.
+    MOVE TO 198 88.
+    MOVE TO 20 214.
+    MOVE TO 148 214.
+
+
+(This example is included as "xml-parser.pl" in the distribution.)
+
+
+SVG means "scalable vector graphics" and it is a standard of the W3
+consortium. See "SVG standards" for details.  Although SVG is a type
+of XML, the text in the "d" attribute of SVG paths is not XML but a
+condensed form using single letters and numbers. This module is a
+parser for that condensed format.
+
+-----------------------------------------------------------------------------
+
+2. DOCUMENTATION
+
+You can read the documentation for the module online at the following
+websites:
+
+    * http://search.cpan.org/perldoc?Image::SVG::Path
+    * http://metacpan.org/release/Image-SVG-Path
+
+(These links go to the latest version of the module.)
+
+After installing the module, you can read the documentation on your
+computer using
+
+    perldoc Image::SVG::Path
+
+-----------------------------------------------------------------------------
+
+3. INSTALLATION
+
+This module requires Perl version 5.6.1 or later.
+
+To install the module from CPAN, use
+
+    cpan Image::SVG::Path
+
+If you have the App::cpanminus installer, you may prefer
+
+    cpanm Image::SVG::Path
+
+To install the module from the source file, Image-SVG-Path-0.30.tar.gz,
+follow this sequence of commands:
+
+    tar xfz Image-SVG-Path-0.30.tar.gz
+    cd Image-SVG-Path-0.30
+    perl Makefile.PL
+    make
+    make install
+
+If you want to test the module before installing it, use "make test" after
+"make" and before "make install".
+
+-----------------------------------------------------------------------------
+
+4. HELP
+
+To get help with the module, you can email the author, Ben Bullock, at
+<bkb@cpan.org>. If you think there is a problem in the module, you can
+report a bug at 
+
+<https://github.com/benkasminbullock/Image-SVG-Path/issues>,
+
+or if you want to alter the source code of Image::SVG::Path, try the public
+repository on github at 
+
+<https://github.com/benkasminbullock/Image-SVG-Path>. 
+
+-----------------------------------------------------------------------------
+
+This README was written on Thu Dec 15 11:33:10 2016.
+
+-----------------------------------------------------------------------------

@@ -1,0 +1,481 @@
+Revision history for Perl extension Inline::CPP.
+
+0.74 2015-09-10
+  - Require ExtUtils::CppGuess v0.11 or newer.
+
+0.73 2015-08-08
+  - Better handling of spaces in filenames.
+
+0.72 2015-08-04
+  - Tweak compiler selection on some systems.
+
+0.71 2015-01-16
+  - Get more info out of eval falure.
+  - Be more idiomatic in checking class of object.
+
+0.70 2014-12-25
+  - Make t/grammar/00pod_coverage.t author-only.
+
+0.69 2014-12-11
+  - Moved CPP/Grammar.pm to CPP/Parser/RecDescent.pm to facilitate 'using'
+    option for pluggable parsers (INGY++).
+
+0.68 2014-10-25
+  - Found one more namespace test in need of relaxation.
+
+0.67 2014-10-24
+  - Relax namespace tests with respect to ref returning Foo or main::Foo.
+    The distinction is unimportant, and different Perls act differently.
+
+0.66 2014-10-24
+  - Package identifiers may be single character.
+
+0.65 2014-10-23
+  - Identifiers may start with _ (Pre-5.120 regression in 0.64).
+
+0.64 2014-10-23
+  - Fix GH Issue #24: Downgrade gracefully if \p{XID_Start} and
+    \p{XID_Continue} aren't available (pre-Perl 5.120).
+
+0.63 2014-09-13
+  - Merge pull request from William N. Braswell, Jr, fixing inheritance
+    for 'classes' config option.  (PR6 - wbraswell).
+
+0.62 2014-08-21
+  - Merge pull request from William N. Braswell, Jr. fixing a problem with
+    'classes' config option.
+    Problem is documented: https://github.com/daoswald/Inline-CPP/issues/18
+    Pull request: https://github.com/daoswald/Inline-CPP/pull/20
+  - Fix typos and spelling errors in POD (Suggested by wbraswell)
+    (Typo in copyright year for Neil, misspelling in CONTRIBUTING section.)
+
+0.61 2014-08-21
+  - POD refinement in CONTRIBUTING.
+
+0.60 2014-08-20
+  - Shift from Artistic 1.0 to Artistic 2.0 license.
+    Artistic 2 notes: http://www.perlfoundation.org/artistic_2_0_notes
+    Artistic 2 license: http://www.perlfoundation.org/artistic_license_2_0
+
+0.59 2014-08-14
+  - Restore logic to handle FreeBSD v10+ use of clang++
+    (Until EU::CG is fixed to handle this for us)
+
+0.58 2014-08-11
+  - main:: is no longer prepended to top level of single-level
+    classnames, per wbraswell's suggestion.
+  - Documentation for main:: quirk no longer needed; removed.
+  - Explicitly support Perl 5.8.1+ (was 5.6.1, but Inline now requires
+    a minimum version of 5.8.1, so we too must.
+
+0.57 2014-08-11
+  - Adapt and apply patches from William Braswell (wbraswell) implementing,
+    documenting, and testing new "classes" configuration option for control
+    over C++ => Perl class name mappings.
+
+0.56 2014-08-11
+  - Merge 0.54_001 changes into stable.
+
+0.55 2014-08-07
+  - Config options are case insensitive.
+
+0.54_001 2014-08-02
+  - Added TODO tests.
+  - New dependency: ExtUtils::CppGuess.
+  - Compiler configuration / default library configuration now provided by
+    ExtUtils::CppGuess.
+  - Test t/08cppguess.t updated to diagnose detection/configuration.
+
+0.54 2014-07-29
+  - Added LICENSE file (no change to licensing, however).
+  - Improved distribution version number consistency test.
+  - Require a modern Inline and Inline::C (>= 0.64, 0.62, respectively).
+  - Minor POD revisions and modernizations.
+  - Refactoring of Makefile.PL
+  - META information updated: GitHub repo, no more RT.
+  - Bug tracking now on GitHub Issues.
+
+0.53 2014-07-29
+  - lib/Inline/CPP/grammar.pm renamed to Grammar.pm.
+
+0.52 2014-07-29
+  - Reorganized distribution file heirarchy to conform to modern structure.
+  - Silence irrelevant ntype warnings from typeconv().
+
+0.51 2014-07-28
+  - Add NAMESPACE configuration option to override a class's base namespace
+    (Eliminates the need for the "Namespace Hack").
+  - Tests now run recursively from subdirectories.
+  - POD updates to explain NAMESPACE config option.
+  - Tests for NAMESPACE config option.
+
+0.50 2014-02-05
+  - Fix POD markup error.
+
+0.49 2014-02-03
+  - Eliminate some dead code.
+  - Better documentation of parallel compilation issues (which never show up
+    in real-world use).
+
+0.48 2014-01-31
+  - Previous patch got misapplied.  Fixed now.  Close RT92595 again. ;)
+
+0.47 2014-01-30
+  - Applied patch from Graham Ollis closing RT#92595:
+    FreeBSD v10 uses the clang++ compiler, and so do we.
+
+0.46 2013-10-29
+  - Add a newline before MODULE keyword to fix RT#89839(srezic).
+
+0.45 2013-09-17
+  - Fix POD syntax errors.
+  - Remove TODO list from POD.
+
+0.44 2013-05-17
+  - Add flocking to output file handling in CPP.pm and Makefile.PL to prevent
+    race conditions that might occur during parallel testing.
+    (Note: There are still race-condition issues in Inline that will affect
+    us until they're fixed.)
+
+0.43 2013-05-04
+  - Require Inline::C version 0.53 to mainstream the bug fix that addressed
+    Inline's RT # 11748, and Inline::CPP's RT#84762.
+  - No changes from 0.42_002 (dev) other than to bump the version number to a
+    'production' number.
+
+0.42_002 2013-04-24
+  - Require Inline::C version 0.52_02, to test a fix for the bug raised in
+    Inline's RT #11748, and Inline::CPP's RT #84762: Typemaps were causing INC
+    to be clobbered.  Though this may be an Inline::CPP bug, the simplest fix
+    turned out to be a patch to Inline::C.
+
+0.42_001 2013-04-24
+  - Added documentation on the Some::Foo::Foo problem (See the POD section,
+    "The Perl Namespace Hack").
+  - Removed version number from README; fewer places to make a mistake.
+
+0.42 2012-11-02
+  - POD enhancements: Explanation of what parts of C++11 do and don't map
+    to Perl.  Better explanation of why templates don't work for Perl
+    binding.
+  - POD enhancements: Example code for specifying compiler flags, and
+    compiler version: CC, CCFLAGS.
+  - Fixed an error in the AUTO_INCLUDE documentation.
+
+0.41 2012-09-05
+  - POD enhancements: Better description of compilation, _Inline/, and
+    code-reuse (modules, distributions).
+
+0.40_001 2012-08-24
+  [ DEVELOPER'S RELEASE -- Changes to CPP.pm require smoke testing. ]
+  - Added test to release test to test compile after wiping out pre-existing
+    Inline config file.
+  - Added test for consistent version numbering.
+  - Added test to ensure 'LIBS' configuration directive wraps in an array-ref
+  - Converted all "author" type tests to run only with RELEASE_TESTING (some
+    were already that way.  Just created better consistency).
+  - Bug-fix: library specification needed to be wrapped in an array-ref.
+    Reported and tracked down by Paul Grinberg++.
+
+0.40 2012-08-23
+  - Added META_MERGE => provides to Makefile.PL.
+  - Added another example to the POD (elipses, exceptions, overloading
+    work-arounds).
+  - Added a RATIONALE section to the POD.
+  - POD enhancements, and clarification on reasons for Template and
+    Overloading limitations.
+  - Added #define __INLINE_CPP 1 to all Inline::CPP generated code to
+    facilitate preprocessor logic that targets Inline::CPP code.
+
+0.39 2012-05-07
+  - All changes from 0.38_004 remain.
+  - Inline::CPP::Config is now the write target for Makefile.PL rather than
+    directly writing to CPP.pm.
+  - Added 09pod_coverage.t and 10kwalitee.t tests.
+  - Major refactor for Inline::CPP::validate() and
+    Inline::CPP::XS_bindings().
+  - Warnings added to all tests.
+  - Explicit mention of all dependencies (even core) in Makefile.PL.
+  - LICENSE tag added to Makefile.PL so that the license is properly
+    identified in the META.* files.
+  - MINIMUM_PERL_VERSION tag used in Makefile.PL to take advantage of
+    more modern META tags.
+
+0.38_004 2012-04-16
+  - Revert Makefile.PL to 0.38_002 logic
+    (remove ExtUtils::CppGuess dependency).
+  - Add Inline::CPP::Config.pm
+  - Makefile.PL now writes to Inline::CPP::Config.pm rather than
+    directly to CPP.pm.
+  - Modify Makefile.PL to write to new configuration location.
+  - Modify CPP.pm to utilize Inline::CPP::Config.pm rather than expecting
+    hard-coded defaults to be written directly to CPP.pm by Makefile.PL.
+  - Make t/08cppguess.t **optional**.
+  - Update MANIFEST.
+  - Improved how Makefile.PL specifies minimum Perl version.
+  - Makefile.PL now includes a CONFIGURE_REQUIRES directive for a version of
+    ExtUtils::MakeMaker that will support important meta tags.
+
+0.38_003 2012-03-24
+  - Makefile.PL rewritten to use ExtUtils::CppGuess.  THIS IS A PRELIMINARY
+    TEST.  EXPECT PROBLEMS.
+  - t/08cppguess.t to provide diagnostic info regarding Makefile.PL rewrite.
+
+0.38_002 2012-03-07
+  - Bug fix for a bug introduced in refactoring code within version 0.35:
+    A hash slice got (wrongly) refactored as something else.  Fixed now.
+  - Fine tuned a few other recent refactoring issues.
+
+0.38_001 2012-03-06
+  - Dropped in the re-written test suite that uses Test::More.  This more
+    modern test suite facilitates greater introspection for each segment of
+    C++ code, and should also be easier to extend and maintain.
+  - Removed Test.pm dependency from distribution.
+  - Shifted CPP.pm away from "use base 'Inline::C';" to "our @ISA =
+    qw( Inline::C );" to better deal with the fact that one cannot "use"
+    Inline::C.
+
+0.38 2012-03-06
+  - Added a minimum version of Test.pm under BUILD_REQUIRES in
+    Makefile.PL to get a good version of Test.pm for the test suite.
+    This fixes an issue where someone uploaded an empty distribution
+    to CPAN named Test as version 0.001.  The  minimum version set for
+    Test.pm was core for Perl 5.6.0.
+
+0.37 2012-03-05
+  - Backed 'strict' out of test suite; tests began failing randomly on
+    *some* minority of platforms (inexplicably).  May be a Test.pm fault.
+  - Test suite lacks Perl::Critic compliance on the single issue of 'strict'
+
+0.36 2012-03-04
+  - Some platforms were complaining from strictures in the test suite
+    conflicting with Test.pm's plan() function.  This issue should now be
+    resolved.
+
+0.35 2012-03-03
+  - Additional code cleanup and improvements in Perl::Critic compliance.
+  - All patches present in 0.34_004, including code formatting, cleanup
+    Perl::Critic compliance and escaping (where necessary), and Makefile.PL
+    fixes to allow NetBSD, Solaris, and Darwin platform install success.
+  - Explicitly require minimum Perl version of 5.6.0.
+
+0.34_004 2012-02-28
+  - Code formatting cleanup in CPP.pm and grammar.pm.
+  - All code now passes Perl::Critic level 5, including test suite.
+  - CPP.pm and grammar.pm are Perl::Critic level 4 compliant.
+  - New NetBSD patch from Chris Smith targeting better install success on
+    that platform.
+
+0.34_003 2012-02-24
+  - Add (untested) code to Makefile.PL to deal with NetBSD so that
+    we can get a clean NetBSD install. EXPERIMENTAL in this version.
+  - Add check to CPP.pm to avoid a noisy warning about undefined value
+    when user code includes a subroutine with 'void' as param list.
+    (Note: This does NOT add 'void' as a valid param list type.)
+  - POD refinements.
+
+0.34_002 2012-02-16
+  - Patch to Makefile.PL provided by smoke tester Steven Schubiger which
+    allows module to successfully install on MirBSD systems. Thanks!
+  - Patch to Makefile.PL by Dave Oswald to allow successful install for
+    Darwin OS by setting proper default libraries.
+
+0.34_001 2012-02-09
+  - Patched Makefile.PL (as suggested by sisyphus) to better detect proper
+    Solaris compiler (targeting Solaris 2.11 bug).
+
+
+0.34 2012-02-06
+  - Carry all updates current in 0.33_010(Dev) to 0.34(Stable) for release
+    to CPAN.
+  - Set minimum version for Inline and Inline::C dependency to 0.50 to
+    take advantage of Inline patch that resolves the issue where smoke
+    testers were unable to locate Parse::RecDescent dependency.
+  - POD revisions.
+  - Inline::CPP now needs minimum Perl version of 5.6.x
+
+0.33_010 2012-02-03
+  [ Patch applied by David Oswald ]
+  - *** NEVER RELEASED ***
+  - Update Makefile.PL to set v0.49_02 as the minimum Inline and Inline::C
+    dependency versions to further evalute smoke-tests.
+
+0.33_009 2012-02-02
+  [ Worked out patch between David Oswald and sisyphus ]
+  - Roll back early loading of Parse::RecDescent.
+  - Set PREREQ_PM to Inline 0.49_01 to take advantage of recent bugfix.
+  - Bump version number and push to CPAN for fresh round of smoke testing.
+
+0.33_008 2012-01-30
+  [ Patches by David Oswald ]
+  - Make sure that Parse::RecDescent loads ahead of Inline::C so that the
+    smoke-testers incompatible @INC modifications won't cause smoke failure.
+    - Add 17memberarray.t to the test suite to validate the new code that
+      allows Inline::CPP to recognize arrays as class/struct data members.
+
+0.33_007 2012-01-29
+  [ Test suite patches by David Oswald ]
+  - If 00load_prereqs.t does successfully load Parse::RecDescent (which it
+    always seems to do), output the location it was found so it can be
+    compared to @INC.
+
+0.33_006 2012-01-22
+  - *** NEVER RELEASED ***
+  [ Patches by David Oswald ]
+  - Set 00load_prereqs.t to BAIL_OUT if Parse::RecDescent can't be found.
+  - Tweaks to the distribution framework.
+
+0.33_005 2012-01-21
+  [ Added suggestion from sisyphus ]
+  - Created a 00load_prereqs.t test to provide better diagnostics when
+    confronted with the "Unable to find Parse::RecDescent" error.
+
+0.33_004 2012-01-11
+  [ Patches pushed out by David Oswald ]
+  - Developer release
+  - Tweaked compiler flags for Microsoft compilers (per sisyphus)
+  - Added github repo information to POD.
+  - Added inline mailing list information to POD.
+
+0.33_003 2011-12-22
+  [ Feature added by David Oswald ]
+  - Added two #define definitions to assist users in determining if the
+    target compiler supports namespaces and Standard headers.  This
+    will assist users in writing compiler-agnostic or portable code.
+
+0.33_002 2011-12-20
+  [ Patch submitted by BrowserUk, adapted by davido ]
+  - Better handling of the '.h' code in Makefile.PL with respect to
+    MS-flavor compilers.
+
+0.33_001 2011-12-19
+  [ Patch submitted by sysiphus, adapted by davido ]
+  - Developer release to verify smoke tests without upsetting v0.33 stable.
+  - Reworked Makefile.PL and CPP.pm to test-compile a C++ program containing
+    <iostream>.  On success we know that <iostream> style headers are ok.
+    On failure we assume that headers should be <iostream.h> instead.
+    Removed previous compiler-name based detection in favor of trial method.
+
+0.33 2011-12-08
+  [ Patches by David Oswald ]
+  - Fixed issue where grammar.pm wasn't able to deal with Parse::RecDescent
+    improper handling of "Developer Release" version numbers.
+  - Fixed issue with test suite where a test was failing due to C++
+    implementation dependent handling of floating point math.
+  - Updated version number to 0.33 in CPP.pm and grammar.pm.
+
+0.32 2011-12-07
+  [ Patches by David Oswald ]
+  - Version of Inline::CPP and grammar.pm updated to 0.32.
+  - Adjustments to the POD for clarity.
+  - Makefile.PL now requires Inline v0.49 to take advantage of the
+    patch there that eliminates M18 install errors for Inline plugins.
+    This should eliminate the bulk of the smoke test issues.
+
+0.31 2011-11-22
+  [ Patches by David Oswald - davido@cpan.org ]
+  - Updated Makefile.PL to include Parse::RecDescent to the PREREQ_PM
+    list.
+
+0.30 2011-11-13
+  [ Applied two patches contributed by sisyphus. ]
+  - Maintain backward compatibility with compilers that still require
+    the '.h' extension on <iostream>.
+
+0.29 2011-11-12
+  [ Patches applied by David Oswald - davido@cpan.org ]
+  - Added code to Makefile.PL so that it will install on Mac OS's.
+  - Applied a longstanding type-conversion patch by Sisyphus.
+
+0.28 2011-11-12
+  [ Patches applied by David Oswald - davido@cpan.org ]
+  - David Oswald takes over co-maintainership; blame me!
+  - CPP.pm - Stop appending '.h' to <iostream>
+  - Now it passes its test suite for Windows Vista 64 with Strawberry
+    Perl version 5.14.
+  - Now it passes its test suite for Ubuntu Linux 11.10 with
+    Perl 5.14.
+
+0.27 2003-08-12
+  - UNAUTHORIZED RELEASE (SHASSAN)
+  - Repaired the iostream(.h) issue.  A similar patch was later
+    applied to v0.28, listed above.
+  - This update is not part of the progress chain.
+
+0.26 2003-08-12
+  - UNAUTHORIZED RELEASE (SHASSAN)
+
+0.25 2003-08-12
+  [ Accepted two patches from Nicholas Clark ]
+  - works with Parse::RecDescent 1.90 and later
+  - use g++ in the same path as gcc, if perl was built with gcc
+  [ Reported by Anthony Bouvier ]
+  - fix a compile error in POD's example code
+
+0.24 2002-05-27
+  [ Accepted patch from Sean O'Rourke ]
+  - unhandled types ignored, rather than causing an error
+  - typenames and identifiers can now include more C++ noise
+  - operators are correctly recognized (and ignored)
+  - nested classes are ignored
+  - non-inline constructor bodies are ignored
+
+0.23 2001-07-15
+  - Allow declaration lists: int a, b;
+  - Allow initializer lists: Foo(double _o) : o(_o) { }
+  - Added a test case for both of these.
+
+0.23 2001-07-07
+  - Renamed subs to use Inline::C's new naming scheme. Refactored some
+    common code into a new sub named call_or_instantiate().
+
+0.23 2001-07-06
+  - Added smart-sense for Sun 2.6 (Solaris 6). Needed to include
+    libCrun.so.
+
+0.23 2001-06-20
+  - Fixed a grammar bug to allow modifiers on member variables.
+  - Added a test case for it.
+
+0.22 2001-06-11
+  - Compatible with Inline::0.42 (not backwards compatible).
+
+0.21 2001-06-06
+  - Compatible with Inline::0.40 (not backwards compatible).
+  - Documentation improvements.
+
+0.20 2001-05-02
+  - Made Inline::CPP a subclass of Inline::C. Moved most functionality
+    into Inline::C, and trimmed code a lot.
+  - Fixed bug in handling of 'LIBS' config option. Added a 'ALTLIBS'
+    config option which adds a new element to the list of alternate
+    libs.
+  - Added 'PRESERVE_ELLIPSIS' option, which prevents Inline::CPP from
+    replacing '...' arguments with nothing.
+  - Inline::CPP now works on Cygwin!
+  [ Grammar improvements ]
+  - Inline functions
+  - Inheritance
+  - Default parameters: void foo(int a=10, char *b="Hello");
+  - Unnamed parameters: void foo(int, char *);
+  - Support for public, private and protected scopes
+  - 'structs' are now bound just like classes, except the
+    default scope is public.
+  - Support for no fixed arguments: void foo(...);
+
+0.14 2001-03-13
+  - Moved the distribution module from CPP_pm to CPP.pm to get
+    Inline::CPP indexed properly.
+  - Fixed some minor bugs.
+
+0.13 2001-03-04
+  - Added Win32-specific configuration code to add '-TP' flag to compiler
+  - Special case for AIX ($Config{so})
+  - Added the following configuration options: 'CC', 'LD', 'CCFLAGS', 'LDDLFLAGS', 'MYEXTLIB', and 'MAKE': proxies for the MakeMaker options of the same name.
+
+0.12 2001-01-21
+  - Upgraded modules to conform to Inline-0.31
+  - Documentation upgrades
+
+0.11 2000-11-23
+  - Created Inline::CPP.

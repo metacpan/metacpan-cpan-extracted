@@ -1,0 +1,22 @@
+Changes
+lib/Image/Thumbnail.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/gdblob.t
+t/gdf.t
+t/gdo.t
+t/imagerf.t
+t/imagerfbmp.t
+t/imagero.t
+t/imagerobmp.t
+t/imblob.t
+t/imf.t
+t/imfa.t
+t/imo.t
+t/test.bmp
+t/test.gif
+t/test.jpg
+
+SIGNATURE                                Public-key signature (added by MakeMaker)

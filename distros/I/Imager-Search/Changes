@@ -1,0 +1,48 @@
+Changes for Perl extension Imager-Search
+
+1.01 Sun 29 May 2011
+	- Upgraded to Module::Install::DSL 1.01
+	- Upgraded from Object::Tiny to faster Object::Tiny::XS
+	- Fixed centre_x vs center_x problem
+	
+1.00 Mon  1 Sep 2008
+	- Further cleaning up of the driver codebase
+	- Documented the driver API
+	- Refactored away Imager::Search::Image::File
+	- Removed Imager::Search::Image::Cached
+	- Renamed Imager::Search::Screenshot
+	- Completed the main documentation
+
+0.12 Sun 31 Aug 2008
+	- Implemented the AWESOME BMP24 backend
+	- Cleaned up some of the documentation
+
+0.11 Sat 30 Aug 2008
+	- Wrote new documentation for the main Imager::Search module
+	- Refactoring the driver API to get closer to adding
+	  support for the native BMP24 driver.
+
+0.10 Wed 27 Aug 2008
+	- Redesigned the API from scratch to be more scalable
+	- This is a first basic attempt, things will get more
+	  maintainable in future releases.
+
+0.05 Mon 30 Jul 2007
+	- Adding a missing dependency
+
+0.04 Sun 29 Jul 2007
+	- Changed the calling semantics of the driver API to prevent several
+	  large needless memory copies.
+
+0.03 Sun 29 Jul 2007
+	- Adding the ->find method to return all matches
+	- Updated the test images to ensure the regex finds
+	- Multiple overlapping patterns
+
+0.02 Sun 29 Jul 2007
+	- Divide the match position by 7 to get the correct location
+	- Added proof of concept for using the @- and scalar //g with
+	  pos manipulation to allow multiple, overlapping, matches.
+
+0.01 Sun 29 Jul 2007
+	- Creating initial version

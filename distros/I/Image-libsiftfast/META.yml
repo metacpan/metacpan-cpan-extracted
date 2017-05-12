@@ -1,0 +1,27 @@
+---
+abstract: 'perl wrapper of siftfast (libsiftfast) command.'
+author:
+  - 'Takeshi Miki <miki@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.05'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Image-libsiftfast
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  File::Which: 0
+  Imager: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.03

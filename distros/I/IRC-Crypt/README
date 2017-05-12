@@ -1,0 +1,29 @@
+IRC-Crypt version 0.01
+======================
+
+This is a simple Perl wrapper for tri's irc-crypt library.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  irc-crypt-0.95 from http://people.ssh.fi/tri/irchat/index.html
+                 or   http://www.kivela.net/rpm/irc-crypt-0.95-1.i586.rpm
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 by Jaska Kivelä
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.3 or,
+at your option, any later version of Perl 5 you may have available.
+

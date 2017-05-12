@@ -1,0 +1,9 @@
+Revision history for ICal::QuickAdd
+
+1.00 Tue Mar  9 21:25:23 EST 2010
+    - No code changes, just declaring stable.
+
+0.5 Sat Mar 24 18:28:20 2007
+    - Initial release.  Created by ExtUtils::ModuleMaker 0.47.
+
+

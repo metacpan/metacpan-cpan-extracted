@@ -1,0 +1,37 @@
+==================================================
+Changes from 2012-08-12 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.005 at 2013-08-12 13:08:39 +0000
+------------------------------------------
+
+  Change: 7f5c663b5f275b84b2d3a02fcceb8569823b3270
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2013-08-12 09:08:07 +0000
+
+    Exclude more indirect perl dependencies from auto-versioning. 
+
+------------------------------------------
+version 0.004 at 2013-08-10 21:36:25 +0000
+------------------------------------------
+
+  Change: 5a8d613d6e9bbce08194158a3f4715a8a72c33af
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2013-08-10 17:36:25 +0000
+
+    Revising my workflow. Update dist.ini to support it. 
+
+------------------------------------------
+version 0.003 at 2013-08-04 19:15:09 +0000
+------------------------------------------
+
+  Change: 27d8c942881e34680cfa35e0182a5d3e03badeda
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2013-08-04 15:15:09 +0000
+
+    Copyright date overdue for an overhaul. 
+
+================================================
+Plus 2 releases after 2012-08-12 00:00:00 +0000.
+================================================

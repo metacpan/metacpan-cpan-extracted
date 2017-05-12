@@ -1,0 +1,203 @@
+=encoding utf8
+
+=head1 NAME
+
+IOMux::Pipe::Write - write to an external command
+
+=head1 INHERITANCE
+
+ IOMux::Pipe::Write
+   is a IOMux::Handler::Write
+   is a IOMux::Handler
+
+=head1 SYNOPSIS
+
+  my $mux = IOMux::Select->new;  # or ::Poll
+
+  use IOMux::Open '|-';
+  my $pipe = $mux->open('|-', $command, @cmd_options);
+
+  use IOMux::Pipe::Write;
+  my $pipe = IOMux::Pipe::Write->new
+    (command => [$command, @cmd_options]);
+  $mux->add($pipe);
+
+  $pipe->write($text);
+  $pipe->print($text);
+
+  write $pipe $text;
+  print $pipe $text;
+
+=head1 DESCRIPTION
+
+In an event driven program, you must be careful with every Operation
+System call, because it can block the event mechanism, hence the program
+as a whole. Often you can be lazy with writes, because its communication
+buffers are usually working quite asynchronous... but not always. You
+may skip the callbacks for small writes and prints.
+
+Extends L<"DESCRIPTION" in IOMux::Handler::Write|IOMux::Handler::Write/"DESCRIPTION">.
+ 
+=head1 METHODS
+
+Extends L<"METHODS" in IOMux::Handler::Write|IOMux::Handler::Write/"METHODS">.
+ 
+=head2 Constructors
+
+Extends L<"Constructors" in IOMux::Handler::Write|IOMux::Handler::Write/"Constructors">.
+ 
+=over 4
+
+=item IOMux::Pipe::Write-E<gt>B<bare>(%options)
+
+Creates a pipe, but does not start a process (yet). Used by
+L<IOMux::IPC|IOMux::IPC>, which needs three pipes for one process. Returned
+is not only a new pipe object, but also a read handle to be
+connected to the other side.
+
+All %options which are available to L<IOMux::Handler::Write::new()|IOMux::Handler::Write/"Constructors">
+can be used here as well.
+
+ -Option   --Default
+  read_size  4096
+
+=over 2
+
+=item read_size => INTEGER
+
+=back
+
+example: 
+
+  my ($in, $in_rh)
+      = IOMux::Pipe::Write->bare(name => 'stdin');
+
+=item IOMux::Pipe::Write-E<gt>B<new>(%options)
+
+ -Option    --Defined in           --Default
+  command                            <required>
+  fh          IOMux::Handler         <required>
+  name        IOMux::Handler         '|$cmd'
+  write_size  IOMux::Handler::Write  4096
+
+=over 2
+
+=item command => COMMAND|ARRAY
+
+The external command to be executed. Either the COMMAND needs to
+parameters, or you need to pass an ARRAY of the command name and
+all its parameters.
+
+=item fh => FILEHANDLE
+
+=item name => STRING
+
+=item write_size => INTEGER
+
+=back
+
+=item IOMux::Pipe::Write-E<gt>B<open>( $mode, <$cmd, $cmdopts>|<$cmdarray, %options> )
+
+Open the pipe to write. $mode is always C<< -| >>.  When you need to
+pass additional %options to the implied L<new()|IOMux::Pipe::Write/"Constructors">, then you must use
+an ARRAY for command name and its optional parameters.
+
+example: 
+
+  my $mux = IOMux::Poll->new;
+  $mux->open('|-', 'lpr', '-#4');  # no opts
+  $mux->open('|-', ['lpr', '-#4'], %opts);
+  $mux->open('|-', 'lpr');        # no opts
+  $mux->open('|-', ['lpr'], %opts);
+
+=back
+
+=head2 Accessors
+
+Extends L<"Accessors" in IOMux::Handler::Write|IOMux::Handler::Write/"Accessors">.
+ 
+=over 4
+
+=item $obj-E<gt>B<childPid>()
+
+The process id of the child on the other side of the pipe.
+
+=item $obj-E<gt>B<fh>()
+
+Inherited, see L<IOMux::Handler/"Accessors">
+
+=item $obj-E<gt>B<fileno>()
+
+Inherited, see L<IOMux::Handler/"Accessors">
+
+=item $obj-E<gt>B<mode>()
+
+The bits of the open mode.
+
+=item $obj-E<gt>B<mux>()
+
+Inherited, see L<IOMux::Handler/"Accessors">
+
+=item $obj-E<gt>B<name>()
+
+Inherited, see L<IOMux::Handler/"Accessors">
+
+=item $obj-E<gt>B<usesSSL>()
+
+Inherited, see L<IOMux::Handler/"Accessors">
+
+=item $obj-E<gt>B<writeSize>( [$integer] )
+
+Inherited, see L<IOMux::Handler::Write/"Accessors">
+
+=back
+
+=head2 User interface
+
+Extends L<"User interface" in IOMux::Handler::Write|IOMux::Handler::Write/"User interface">.
+ 
+=head2 Multiplexer
+
+Extends L<"Multiplexer" in IOMux::Handler::Write|IOMux::Handler::Write/"Multiplexer">.
+ 
+=head2 Helpers
+
+Extends L<"Helpers" in IOMux::Handler::Write|IOMux::Handler::Write/"Helpers">.
+ 
+=over 4
+
+=item $obj-E<gt>B<extractSocket>(HASH)
+
+=item IOMux::Pipe::Write-E<gt>B<extractSocket>(HASH)
+
+Inherited, see L<IOMux::Handler/"Helpers">
+
+=item $obj-E<gt>B<fdset>($state, $read, $write, $error)
+
+Inherited, see L<IOMux::Handler/"Helpers">
+
+=item $obj-E<gt>B<show>()
+
+Inherited, see L<IOMux::Handler/"Helpers">
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of IOMux distribution version 1.00,
+built on November 11, 2015. Website: F<http://perl.overmeer.net/>
+All modules in this suite:
+L</Any::Daemon>,
+L</IOMux>, and
+L</IOMux::HTTP>.
+
+Please post questions or ideas to F<perl@overmeer.net>
+
+=head1 LICENSE
+
+Copyrights 2011-2015 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

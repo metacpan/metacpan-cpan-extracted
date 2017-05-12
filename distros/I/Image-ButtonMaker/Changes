@@ -1,0 +1,23 @@
+Revision history for Perl extension Image::ButtonMaker.
+
+0.1.4 Mon Oct 24 2005
+        - added l10n features 
+        - added some features for prefixing, postfixing, uppercasing 
+          and lowercasing of text strings
+
+0.1.3 Fre May 21 2004
+        - fix for broken 0.1.2 release
+          added missing ColorCanvas.pm file to MANIFEST so that the
+          module actually can build.
+        - added TODO file
+
+0.1.2 Wed May 19 2004
+        - a lot of small bugfixes
+        - new type of canvas objects
+        - added a small example of usage
+        - changed version scheme
+
+0.01  Tue Jan 27 18:41:31 2004
+	- original version; created by h2xs 1.23 with options
+		-AX -n Image::ButtonMaker
+

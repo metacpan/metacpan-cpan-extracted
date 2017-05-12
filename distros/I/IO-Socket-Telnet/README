@@ -1,0 +1,59 @@
+IO-Socket-Telnet 0.03
+
+Telnet is a simple protocol that sits on top of TCP/IP. It handles the
+negotiation of various options, both about the connection itself (ECHO)
+and the setup of both sides of the party (NAWS, TTYPE).
+
+This is a wrapper around IO::Socket::INET that both strips out the telnet
+escape sequences and lets you handle the negotiation in a high-level manner.
+
+There is currently no interface for defining callbacks. This will be rectified
+very soon. The module as it stands is still useful for stripping out telnet
+escape sequences.
+
+This module is likely missing large parts of the telnet spec. Please let me
+know if you need particular things implemented. Failing test cases are the
+best bug reports!
+
+MAJOR CHANGES
+    0.03: socket creation failure propagated properly
+    0.02: negotiation gets better hooks, default port 23
+    0.01: first version
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc
+command.
+
+    perldoc IO::Socket::Telnet
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/IO-Socket-Telnet
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=IO-Socket-Telnet
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/IO-Socket-Telnet
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/IO-Socket-Telnet
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2007 Shawn M Moore
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

@@ -1,0 +1,74 @@
+NAME
+    Icon::FamFamFam::Silk - embed these famous icons in your code
+
+VERSION
+    0.002001003
+
+    (Version 0.002 of this module and version 1.3 of the icons.)
+
+SYNOPSIS
+     use Icon::FamFamFam::Silk;
+     my $wrench = Icon::FamFamFam::Silk->new('wrench_orange');
+     print $wrench->base64;
+
+    or
+
+     use Icon::FamFamFam::Silk;
+     print Icon::FamFamFam::Silk::base64('wrench_orange');
+
+DESCRIPTION
+    These methods can be called as functions taking the name of the icon (a
+    string) as their argument, or can be called as object methods on an
+    instantiated icon object. (See "SYNOPSIS".)
+
+    "Icon::FamFamFam::Silk->new($name)"
+        Returns a blessed icon object.
+
+    "Icon::FamFamFam::Silk->list"
+        Returns a list of all the icons.
+
+    "$icon->name"
+        Returns the name of the icon.
+
+    "$icon->base64"
+        Returns base64-encoded PNG data.
+
+    "$icon->raw"
+        Returns raw PNG data.
+
+    "$icon->uri"
+        Returns a "data:" URI for the icon.
+
+    "$icon->attribution_data" =item
+    "Icon::FamFamFam::Silk->attribution_data"
+        Returns a hash of data useful for giving credit to Mark James.
+
+        This is in a format suitable for passing to HTML::HTML5::Builder's
+        "CREATIVE_COMMONS" function, should you want to do something like
+        that.
+
+BUGS
+    Please report any bugs to <http://rt.cpan.org/>.
+
+SEE ALSO
+    <http://famfamfam.com/lab/icons/silk/>.
+
+AUTHOR
+    Icons by Mark James of <http://famfamfam.com/>.
+
+    Module by Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    Mark James distributes the icons themselves under the CC-BY 3.0 licence
+    <http://creativecommons.org/licenses/by/3.0/>. Applications using
+    Icon::FamFamFam::Silk (even indirectly via another module) must provide
+    credit. Including a link to <http://famfamfam.com/lab/icons/silk/> in
+    the documentation of the application is probably sufficient.
+
+    Toby Inkster releases the additional Perl coding into the Public Domain.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

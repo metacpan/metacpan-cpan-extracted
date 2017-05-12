@@ -1,0 +1,10 @@
+README
+InfoBrief.pm
+MANIFEST
+Makefile.PL
+infobrief.PL
+t/info.t
+t/should.ps
+t/test.adr
+
+

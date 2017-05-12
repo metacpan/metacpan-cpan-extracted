@@ -1,0 +1,11 @@
+Makefile
+Makefile.old
+*.tar.gz
+*.bak
+pm_to_blib
+blib/
+Image-JpegMinimal-*/
+Image-JpegMinimal-*
+.releaserc
+cover_db
+MYMETA.*

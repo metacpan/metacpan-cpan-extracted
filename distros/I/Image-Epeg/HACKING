@@ -1,0 +1,9 @@
+This is hacking note by tokuhirom.
+
+epeg/ directory got from enlightenment repo.
+
+    # checkout from repo
+    svn export http://svn.enlightenment.org/svn/e/trunk/OLD/epeg/
+    # remove c++ style comments
+    perl -i -pe 's/\/\/.+//' ./epeg/src/bin/epeg_main.c
+

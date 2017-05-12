@@ -1,0 +1,11 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Image/Ocrad.pm
+t/1.t
+t/a.pbm
+t/b.pbm
+t/c.pbm
+t/d.pbm
+t/e.pbm

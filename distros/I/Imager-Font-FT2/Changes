@@ -1,0 +1,112 @@
+Imager-Font-FT2 0.94
+====================
+
+ - fixed an uninitialized value usage caused when i_ft2_text() logged
+   the partially initialized color supplied by i_ft2_cp().
+
+Imager-Font-FT2 0.93
+====================
+
+ - update the bundled/modified Devel::CheckLib to handle the gcc-4
+   symlink on Cygwin
+
+Imager-Font-FT2 0.92
+====================
+
+ - drawing non-AA text is now done in alpha-combining mode
+   https://rt.cpan.org/Ticket/Display.html?id=73359
+
+ - use gsamp/psamp() to transfer pixels from the work image to the
+   output image instead of gpix/ppix.
+   https://rt.cpan.org/Ticket/Display.html?id=83478
+
+ - eliminate some initialized but otherwise unused variables detected
+   by GCC.
+
+Imager-Font-FT2 0.91
+====================
+
+ - depend on Imager 0.95.
+
+Imager-Font-FT2 0.90
+====================
+
+Released as part of Imager 0.94_02.
+
+ - fix some mismatched format strings/types
+
+ - enable the debug log for t/t90std.t
+
+Imager-Font-FT2 0.89
+====================
+
+ - update README
+
+ - drawing text to a channel drew with random coverage, since the
+   alpha channel used for the internal call to draw text wasn't
+   initialized.
+
+Imager-Font-FT2 0.88
+====================
+
+ - report the library version during testing
+
+Imager-Font-FT2 0.87
+====================
+
+Distributed with Imager 0.93_01
+
+ - improve thread safety
+
+Imager-Font-FT2 0.86
+====================
+
+ - previously the probe step for freetype-config would fail on cygwin
+
+ - clean up .dSYM directories generated performing probes on OS X
+   Mountain Lion.
+
+ - pass the --verbose command-line option through to Imager::Probe in
+   Makefile.PL
+   https://rt.cpan.org/Ticket/Display.html?id=75878
+
+Imager-Font-FT2 0.85
+====================
+
+ - no longer fallback to using DynaLoader to load the XS code
+   https://rt.cpan.org/Ticket/Display.html?id=75560
+
+Imager-Font-FT2 0.84
+====================
+
+ - update dependency to Imager 0.86
+   https://rt.cpan.org/Ticket/Display.html?id=72643
+
+Imager-Font-FT2 0.83
+====================
+
+ - has_chars() now returns perl's true and false values in list
+   context rather than integers, which should be more efficient.
+   https://rt.cpan.org/Ticket/Display.html?id=69158
+
+ - the default text color is no longer transparent.
+   https://rt.cpan.org/Ticket/Display.html?id=71469
+
+Imager-Font-FT2 0.82
+====================
+
+ - update the bundled (and still modified) Devel::CheckLib
+   https://rt.cpan.org/Ticket/Display.html?id=69170
+
+ - use snprintf() when imconfig.h indicates it's available
+   https://rt.cpan.org/Ticket/Display.html?id=69147
+
+Imager-Font-FT2 0.81
+====================
+
+ - the big types cleanup
+
+Imager-Font-FT2 0.78
+====================
+
+Split off from Imager.

@@ -1,0 +1,42 @@
+Copyright 2010, 2011, 2012 Kevin Ryde
+
+This file is part of Image-Base-PNGwriter.
+
+Image-Base-PNGwriter is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation; either version 3, or (at
+your option) any later version.
+
+Image-Base-PNGwriter is distributed in the hope that it will be
+useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with Image-Base-PNGwriter.  If not, see <http://www.gnu.org/licenses/>.
+
+
+Version 8, June 2012
+    - 1 and 3 digit hex colours too
+
+Version 7, July 2011
+    - new diamond()
+
+Version 6, February 2011
+    - fix Makefile.PL for perl 5.6 and earlier
+
+Version 5, November 2010
+    - ellipse() $fill parameter
+
+Version 4, October 2010
+    - use Image:Base 1.09 for ellipse() fixes to chain up to
+
+Version 3, July 2010
+    - lower a couple of stray "use 5.010"s
+
+Version 2, July 2010
+    - 4-digit hex colours too
+    - use pngwriter circle() when possible
+
+Version 1, June 2010
+    - the first version

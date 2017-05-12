@@ -1,0 +1,441 @@
+=head1 NAME
+
+IOMux::HTTP::Service - HTTP client handler
+
+=head1 INHERITANCE
+
+ IOMux::HTTP::Service
+   is a IOMux::HTTP
+   is a IOMux::Net::TCP
+   is a IOMux::Handler::Read
+   is a IOMux::Handler
+
+   IOMux::Net::TCP also extends IOMux::Handler::Write
+   is a IOMux::Handler::Write
+   is a IOMux::Handler
+
+=head1 SYNOPSIS
+
+  # created by an IOMux::HTTP::Server object
+
+  sub handler($$$$)
+  {   my ($conn, $request, $session, $callback) = @_;
+      $self->sendResponse(...);
+      $callback->();
+  }
+
+=head1 DESCRIPTION
+
+The managing L<IOMux::HTTP::Server|IOMux::HTTP::Server> object creates one
+C<IOMux::HTTP::Service> object per incoming connection.
+
+=head1 METHODS
+
+=head2 Constructors
+
+=over 4
+
+=item IOMux::HTTP::Service-E<gt>B<new>(OPTIONS)
+
+ -Option     --Defined in     --Default
+  add_headers  IOMux::HTTP      []
+  fh           IOMux::Handler   <required>
+  handler                       <required>
+  name         IOMux::Handler   'tcp $host:$port'
+  read_size    IOMux::Handler::Read  32768
+  socket       IOMux::Net::TCP  <required>
+  write_size   IOMux::Handler::Write  4096
+
+=over 2
+
+=item add_headers => ARRAY
+
+=item fh => FILEHANDLE
+
+=item handler => CODE
+
+This handler is called for each message.
+
+The CODE reference gets four parameters: this connection object,
+the received request, a free to use session object and a callback.
+Do not forget to call the callback at the end of your handler.
+
+=item name => STRING
+
+=item read_size => INTEGER
+
+=item socket => IO::Socket::INET
+
+=item write_size => INTEGER
+
+=back
+
+=item IOMux::HTTP::Service-E<gt>B<open>(MODE, WHAT, OPTIONS)
+See L<IOMux::Handler/"Constructors">
+
+=item IOMux::HTTP::Service-E<gt>B<open>(MODE, WHAT, OPTIONS)
+See L<IOMux::Handler/"Constructors">
+
+=back
+
+=head2 Accessors
+
+=over 4
+
+=item $obj-E<gt>B<client>
+
+Returns a HASH with some basic information about the client, not
+the socket itself.
+
+=item $obj-E<gt>B<fh>
+See L<IOMux::Handler/"Accessors">
+
+=item $obj-E<gt>B<fh>
+See L<IOMux::Handler/"Accessors">
+
+=item $obj-E<gt>B<fileno>
+See L<IOMux::Handler/"Accessors">
+
+=item $obj-E<gt>B<fileno>
+See L<IOMux::Handler/"Accessors">
+
+=item $obj-E<gt>B<msgsSent>
+
+=item $obj-E<gt>B<mux>
+See L<IOMux::Handler/"Accessors">
+
+=item $obj-E<gt>B<mux>
+See L<IOMux::Handler/"Accessors">
+
+=item $obj-E<gt>B<name>
+See L<IOMux::Handler/"Accessors">
+
+=item $obj-E<gt>B<name>
+See L<IOMux::Handler/"Accessors">
+
+=item $obj-E<gt>B<readSize>([INTEGER])
+See L<IOMux::Handler::Read/"Accessors">
+
+=item $obj-E<gt>B<socket>
+See L<IOMux::Net::TCP/"Accessors">
+
+=item $obj-E<gt>B<startTime>
+See L<IOMux::HTTP/"Accessors">
+
+=item $obj-E<gt>B<usesSSL>
+See L<IOMux::Handler/"Accessors">
+
+=item $obj-E<gt>B<usesSSL>
+See L<IOMux::Handler/"Accessors">
+
+=item $obj-E<gt>B<writeSize>([INTEGER])
+See L<IOMux::Handler::Write/"Accessors">
+
+=back
+
+=head2 User interface
+
+=head3 Connection
+
+=over 4
+
+=item $obj-E<gt>B<close>([CALLBACK])
+See L<IOMux::Handler/"Connection">
+
+=item $obj-E<gt>B<close>([CALLBACK])
+See L<IOMux::Handler/"Connection">
+
+=item $obj-E<gt>B<shutdown>((0|1|2))
+See L<IOMux::Net::TCP/"Connection">
+
+=item $obj-E<gt>B<timeout>([TIMEOUT])
+See L<IOMux::Handler/"Connection">
+
+=item $obj-E<gt>B<timeout>([TIMEOUT])
+See L<IOMux::Handler/"Connection">
+
+=back
+
+=head3 Reading
+
+=over 4
+
+=item $obj-E<gt>B<readline>(CALLBACK)
+See L<IOMux::Handler::Read/"Reading">
+
+=item $obj-E<gt>B<slurp>(CALLBACK)
+See L<IOMux::Handler::Read/"Reading">
+
+=back
+
+=head3 Writing
+
+=over 4
+
+=item $obj-E<gt>B<print>(STRING|SCALAR|LIST|ARRAY)
+See L<IOMux::Handler::Write/"Writing">
+
+=item $obj-E<gt>B<printf>(FORMAT, PARAMS)
+See L<IOMux::Handler::Write/"Writing">
+
+=item $obj-E<gt>B<say>(STRING|SCALAR|LIST|ARRAY)
+See L<IOMux::Handler::Write/"Writing">
+
+=item $obj-E<gt>B<write>(SCALAR, [MORE])
+See L<IOMux::Handler::Write/"Writing">
+
+=back
+
+=head2 Multiplexer
+
+=head3 Connection
+
+=over 4
+
+=item $obj-E<gt>B<mux_init>(MUX, [HANDLER])
+See L<IOMux::Handler/"Connection">
+
+=item $obj-E<gt>B<mux_init>(MUX, [HANDLER])
+See L<IOMux::Handler/"Connection">
+
+=item $obj-E<gt>B<mux_remove>
+See L<IOMux::Handler/"Connection">
+
+=item $obj-E<gt>B<mux_remove>
+See L<IOMux::Handler/"Connection">
+
+=item $obj-E<gt>B<mux_timeout>
+See L<IOMux::Handler/"Connection">
+
+=item $obj-E<gt>B<mux_timeout>
+See L<IOMux::Handler/"Connection">
+
+=back
+
+=head3 Reading
+
+=over 4
+
+=item $obj-E<gt>B<mux_eof>
+See L<IOMux::Net::TCP/"Multiplexer">
+
+=item $obj-E<gt>B<mux_except_flagged>(FILENO)
+See L<IOMux::Handler/"Reading">
+
+=item $obj-E<gt>B<mux_except_flagged>(FILENO)
+See L<IOMux::Handler/"Reading">
+
+=item $obj-E<gt>B<mux_input>(BUFFER)
+See L<IOMux::Handler::Read/"Reading">
+
+=item $obj-E<gt>B<mux_read_flagged>(FILENO)
+See L<IOMux::Handler/"Reading">
+
+=item $obj-E<gt>B<mux_read_flagged>(FILENO)
+See L<IOMux::Handler/"Reading">
+
+=back
+
+=head3 Writing
+
+=over 4
+
+=item $obj-E<gt>B<mux_outbuffer_empty>
+See L<IOMux::Handler::Write/"Writing">
+
+=item $obj-E<gt>B<mux_output_waiting>
+See L<IOMux::Handler::Write/"Writing">
+
+=item $obj-E<gt>B<mux_write_flagged>(FILENO)
+See L<IOMux::Handler/"Writing">
+
+=item $obj-E<gt>B<mux_write_flagged>(FILENO)
+See L<IOMux::Handler/"Writing">
+
+=back
+
+=head3 Service
+
+=head2 Helpers
+
+=over 4
+
+=item $obj-E<gt>B<extractSocket>(HASH)
+
+=item IOMux::HTTP::Service-E<gt>B<extractSocket>(HASH)
+See L<IOMux::Handler/"Helpers">
+
+=item $obj-E<gt>B<extractSocket>(HASH)
+
+=item IOMux::HTTP::Service-E<gt>B<extractSocket>(HASH)
+See L<IOMux::Handler/"Helpers">
+
+=item $obj-E<gt>B<fdset>(STATE, READ, WRITE, ERROR)
+See L<IOMux::Handler/"Helpers">
+
+=item $obj-E<gt>B<fdset>(STATE, READ, WRITE, ERROR)
+See L<IOMux::Handler/"Helpers">
+
+=item $obj-E<gt>B<show>
+See L<IOMux::Handler/"Helpers">
+
+=item $obj-E<gt>B<show>
+See L<IOMux::Handler/"Helpers">
+
+=back
+
+=head2 HTTP protocol
+
+=over 4
+
+=item $obj-E<gt>B<closeConnection>
+See L<IOMux::HTTP/"HTTP protocol">
+
+=item $obj-E<gt>B<errorResponse>(REQUEST, STATUS, [TEXT])
+
+=item $obj-E<gt>B<makeResponse>(REQUEST, STATUS, HEADER, [CONTENT])
+
+The STATUS code is used in the response, preferrable use the constants
+from HTTP::Status.
+
+The HEADER is an ARRAY of header line pairs to be used in the answer
+or an HTTP::Headers object.
+
+You can use a scalar CONTENT, which will be used as response body.
+In case the CONTENT parameter is a CODE reference, that CODE will
+be called until C<undef> is returned.  The result of every call will
+become a chunk in a chunked transfer encoded response.
+
+=item $obj-E<gt>B<redirectResponse>(REQUEST, STATUS, LOCATION, [CONTENT])
+
+=item $obj-E<gt>B<sendMessage>(MESSAGE, CALLBACK)
+See L<IOMux::HTTP/"HTTP protocol">
+
+=item $obj-E<gt>B<sendResponse>(RESPONSE, CALLBACK, [SESSION])
+
+=back
+
+=head1 DETAILS
+
+=head2 Coding examples
+
+=head3 simple example
+
+  sub incoming_first
+  {   my ($client, $req) = @_;
+
+      # create a response based on $req, an HTTP::Request object
+      my $resp1 = HTTP::Response->new(...);
+      $client->sendResponse($resp1, \&step2);
+  }
+
+  # step2 is called when the delivery of $status fails
+  sub step2
+  {   my ($client, $resp1, $status, $req2) = @_;
+
+      # Although we only plan to reply a single request, that
+      # sending can go wrong
+      if($status!=HTTP_OK)
+      {   # Some extra error logging, maybe?
+          # $resp1 is now not the $resp1 you intended to send, but
+          # the error which has been sent (if any)
+          return;
+      }
+
+      # Of course, the connection can be reused for a next request.
+      # Restart thread with this message.
+      incoming_first $client, $req2;
+  }
+
+  # cheapest implementation for step2
+  sub step2
+  {   my ($client, $resp1, $status, $req2) = @_;
+      incoming_first $client, $req2  # not for mee
+          if $status==HTTP_OK;
+  }
+
+=head3 more complex example
+
+  sub incoming_first
+  {   my ($client, $req) = @_;
+
+      # Create a response based on $req, an HTTP::Request object
+      my $resp1   = HTTP::Response->new(...);
+
+      # Lets have a session object
+      my $session = { sent => time() };
+
+      $client->sendResponse($resp1, \&step2, $session);
+  }
+
+  sub step2
+  {   my ($client, $resp1, $status, $req2, $session) = @_;
+      $status!=HTTP_OK or return;
+
+      print "ping time: ", time - $session->{sent}, "\n";
+
+      my $resp2 = $client->makeResponse(...);
+
+      # do not accept more request (there may be queued, which
+      # will get removed.
+      $client->closeConnection;
+
+      $client->sendReponse($resp2, \&step3, $session);
+  }
+
+  # Although the connection got closed, step3 will still be
+  # called in case of an error.
+  sub step3
+  {   my ($client, $resp2, $status, undef, $session) = @_;
+      # $status!=HTTP_OK
+  }
+
+The server is a daemon: a process which always runs. There are many
+deamon implementations available for Perl. See the F<examples/>
+directory for an example which uses L<Any::Daemon|Any::Daemon>.  The examples
+below should seamlessly fit in the C<run_multiplexer()> function
+shown there.
+
+The initiation looks much like that of a client.
+  use HTTP::Status 'HTTP_OK';
+
+  # You may also choose IOMux::Select or other
+  # multiplex instances (to be developed)
+  use IOMux::Poll;
+  my $mux    = IOMux::Poll->new;
+
+  my $server = "localhost:8081";
+  my $client = IOMux::HTTP::Server->new
+    ( LocalAddr => $server
+    , handler   => \&incoming_first
+    );
+  $mux->add($client);
+
+  # You may initiate multiple clients and start many different steps
+  # until you start the loop.
+  $mux->loop;
+
+  # The loop is left when all connections have closed
+  exit 0;
+
+  # Now here comes the implementation as shown in the examples below.
+
+=head1 SEE ALSO
+
+This module is part of IOMux-HTTP distribution version 0.11,
+built on January 27, 2011. Website: F<http://perl.overmeer.net/>
+All modules in this suite:
+L</Any::Daemon>,
+L</IOMux>, and
+L</IOMux::HTTP>.
+
+Please post questions or ideas to F<perl@overmeer.net>
+
+=head1 LICENSE
+
+Copyrights 2011 by Mark Overmeer. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

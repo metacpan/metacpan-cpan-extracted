@@ -1,0 +1,25 @@
+---
+abstract: 'push more than one character back onto a filehandle'
+author: []
+build_requires:
+  ExtUtils::CBuilder: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: IO-Unread
+provides:
+  IO::Unread:
+    file: lib/IO/Unread.pm
+    version: 1.04
+  IO::Unread::Tied:
+    file: lib/IO/Unread.pm
+requires:
+  perl: 5.008001
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/mauzo/IO-Unread
+version: 1.04

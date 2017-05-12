@@ -1,0 +1,4 @@
+#!include_default
+
+\B\.git\b
+.gitignore

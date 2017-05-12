@@ -1,0 +1,53 @@
+Revision history for Perl extension IO::Interface.
+1.09    Tue Dec  9 11:22:56 EST 2014
+	-Converted to use Module::Build
+
+1.08    Mon Dec  8 10:38:42 EST 2014
+	-First Git version
+	-Apply segfault patches for OpenBSD from Mikolaj Kucharski.	
+
+1.07    Sun Jun  8 21:29:58 EDT 2014
+	-Apply patch from Miolaj Kucharski to fix segfault on OpenBSD.	
+
+1.06    Thu Jul 21 13:40:49 EDT 2011
+        -Address test 5 failure on systems with aliases on loopback.        
+
+1.05    Fri Jun  6 11:53:21 EDT 2008
+        -Fix from Mitsuru Yoshida to compile on FreeBSD.
+
+1.04	Wed Dec 26 13:38:53 EST 2007
+	-Fix from John Lightsey to avoid dmesg warnings on BSD systems.	
+
+1.03	Mon Jan 22 16:38:24 EST 2007
+	-Fix to compile cleanly on solaris systems.	
+
+1.02	Thu Sep 14 08:54:04 EDT 2006
+	-More documentation fixes.
+
+1.01	Wed Sep 13 20:52:32 EDT 2006
+        -Documentation fix.
+
+1.00	Wed Sep 13 17:01:46 EDT 2006
+        -Introduced IO::Interface::Simple.
+        -Added index methods.
+	-Compiles on CygWin.
+
+0.98	Sep 03 18:20:20 EST 2003
+	-Fixed minor documentation error.
+
+0.97	May 14 16:50:46 EDT 2001
+	-BSD portability fixes from Anton Berezin <tobez@tobez.org> and Jan L. Peterson <jlp@flipdog.com>
+
+0.96    May  7 10:44:48 EDT 2001
+	-Documentation fixes
+
+0.94	July 17, 2000
+	-Added the addr_to_interface function, and the pseudo device "any"
+		which corresponds to INADDR_ANY
+
+0.90	First release
+
+0.01  Thu May  4 08:28:45 2000
+	- original version; created by h2xs 1.20 with options
+		-n IO::Interface /usr/include/net/if.h
+

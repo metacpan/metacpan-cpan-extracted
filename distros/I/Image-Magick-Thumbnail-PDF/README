@@ -1,0 +1,47 @@
+Image::Magick::Thumbnail::PDF - make thumbnail of a page in a pdf document
+==========================================================================
+
+
+I wanted a quick sub to make a thumbnail of a pdf.
+The goal of this module is to make a quick thumbnail of a page in a pdf.
+
+They give the viewer an idea of what is inside the document, but is not 
+meant as a replacement for the actual file.
+
+This module is a quick interface to a predetermined use of convert.
+There are a ton of ways to do this via ImageMagick and convert, etc. I 
+took what seemed to make most sense from various suggestions/ideas, and 
+slapped this together. If you think something can be better, please 
+contact leocharre at cpan dot org.
+
+
+
+
+INSTALLATION
+
+perl Makefile.PL
+make test
+make install
+
+
+DEPENDENCIES
+
+   Carp
+   Cwd
+   Exporter
+   File::Copy
+   File::Path
+   File::Which
+   Getopt::Std
+   Image::Magick::Thumbnail
+   Smart::Comments
+   Test::Simple
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 by Leo Charre leocharre at cpan dot org
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+   

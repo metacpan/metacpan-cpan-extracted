@@ -1,0 +1,202 @@
+#!/usr/bin/perl -w
+# See copyright, etc in below POD section.
+######################################################################
+
+require 5.004;
+use lib './blib/lib';        # testing
+use Getopt::Long;
+use Pod::Usage;
+use IPC::PidStat;
+use strict;
+
+######################################################################
+# globals
+
+use vars qw($Debug);
+
+######################################################################
+# main
+
+my %opt_new_params = (
+);
+my %opt_req_params = (
+    host => "localhost",
+);
+my $opt_silent;
+my @params;
+
+if (!GetOptions(
+		"help"		=> \&usage,
+		"debug"		=> \&debug,
+		"version"	=> \&version,
+		"port=i"	=> sub {$opt_new_params{port}   = $_[1];},
+		"host=s"	=> sub {$opt_req_params{host}   = $_[1];},
+		"silent!"	=> \$opt_silent,
+		"<>"		=> sub {push @params, shift;},
+		)) {
+    die "%Error: Bad usage, try 'pidstat --help'\n";
+}
+
+{
+    my $cmd = shift @params;
+    $cmd or die "%Error: No command specified, see --help\n";
+    if ($cmd eq "exists") {
+	cmd_exists(@params);
+    } else {
+	die "%Error: Unknown pidstat command: $cmd\n";
+    }
+}
+exit(0);
+
+######################################################################
+
+sub usage {
+    print "Version: $IPC::PidStat::VERSION\n";
+    pod2usage(-verbose=>2, -exitval=>2, -output=>\*STDOUT, -noperldoc=>1);
+    exit(1);
+}
+
+sub version {
+    print "Version: $IPC::PidStat::VERSION\n";
+    exit (1);
+}
+
+sub debug {
+    $Debug = 1;
+    $IPC::PidStat::Debug = 1;
+}
+
+######################################################################
+# Commands
+
+sub cmd_exists {
+    my @params = @_;
+
+    my $exister = new IPC::PidStat(%opt_new_params,);
+    my $exitvalue = 0;
+    foreach my $remotepid (@params) {
+	my $host = $opt_req_params{host};
+	my $pid;
+	if ($remotepid =~ /^(.*):([0-9]+)$/) {
+	    $host = $1 || "localhost";
+	    $pid = $2;
+	}
+	else {
+	    $pid = $remotepid;
+	}
+	my ($statpid, $status) = $exister->pid_request_recv(host=>$host, pid=>$pid);
+	if (defined $statpid) {
+	    print "$host:$pid ", ($status?"up":"down"), "\n" if (!$opt_silent);
+	    $exitvalue ||= 1 if (!$status);
+	}
+	else {
+	    print "$host:$pid ", ("host_down"), "\n" if (!$opt_silent);
+	    $exitvalue = 2;
+	}
+    }
+    exit ($exitvalue);
+}
+
+######################################################################
+__END__
+
+=pod
+
+=head1 NAME
+
+pidstat - Check the existence of a process on a remote machine
+
+=head1 SYNOPSIS
+
+B<pidstat>
+[ B<--help> ]
+[ B<--host=>I<host> ]
+[ B<--port=>I<port> ]
+[ B<--silent> ]
+[ B<--version> ]
+[ B<--debug> ]
+[ exists B<remotepids> ]
+
+=head1 DESCRIPTION
+
+Pidstat will contact the PID stat daemon (pidstatd, in the IPC::Locker
+distribution on CPAN) and perform the requested command(s).
+
+=head1 COMMANDS
+
+=over 4
+
+=item exists I<remotepids>
+
+Check the existence of a set of process IDs (potentially) on remote hosts.
+
+Takes a list of remote process IDs.  These process IDs are understood to be
+on the host specified by "--host" (default is "localhost").  Alternatively,
+the host may be overridden by specifying the process IDs in the form
+<hostname>:<pid>.
+
+The exit value is 0 if all the requested process IDs exist.  The exit value
+is 1 if any of the requested process IDs did not exist, or 2 if any hosts
+did not have a running daemon.  This is roughly the same as "kill -0
+<pid>".
+
+The following works well for shell scripts.
+
+ if pidstat exists 3459 host1:4220 host2:9821
+ then
+    print "All processes are up"
+ else
+    print "One of the processes is down"
+ fi
+
+=back
+
+=head1 ARGUMENTS
+
+=over 4
+
+=item --help
+
+Displays this message and program version and exits.
+
+=item --host
+
+Specifies host name to check for a process.
+
+=item --port
+
+Specifies the port number to contact the "pidstatd" on.  (default 1752)
+
+=item --silent
+
+Do not print out a line per process checked.
+
+=item --debug
+
+Turns on the debug flag for diagnostic output.
+
+=item --version
+
+Displays program version and exits.
+
+=back
+
+=head1 DISTRIBUTION
+
+The latest version is available from CPAN and from L<http://www.veripool.org/>.
+
+Copyright 2002-2017 by Wilson Snyder.  This package is free software; you
+can redistribute it and/or modify it under the terms of either the GNU
+Lesser General Public License Version 3 or the Perl Artistic License Version 2.0.
+
+=head1 AUTHORS
+
+Wilson Snyder <wsnyder@wsnyder.org>,
+Stephen Adkins <stephen.adkins@officevision.com>
+
+=head1 SEE ALSO
+
+L<IPC::Locker>, L<IPC::PidStat>, L<pidstatd>, L<pidwatch>, L<uriexec>
+
+=cut
+######################################################################

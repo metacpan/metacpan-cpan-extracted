@@ -1,0 +1,13 @@
+/Build
+/Makefile
+/_build
+/blib
+/META.json
+/META.yml
+/MYMETA.json
+/MYMETA.yml
+/Makefile.PL
+/SIGNATURE
+/IO-ExplicitHandle-*
+/lib/IO/ExplicitHandle.c
+/lib/IO/ExplicitHandle.o

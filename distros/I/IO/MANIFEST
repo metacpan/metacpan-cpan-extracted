@@ -1,0 +1,38 @@
+ChangeLog
+IO.pm				Top IO package 
+IO.xs
+lib/IO/Dir.pm			Directory reading package
+lib/IO/File.pm			File handle package
+lib/IO/Handle.pm		Base handle package
+lib/IO/Pipe.pm			Pipe package
+lib/IO/Poll.pm			System poll() interface
+lib/IO/Seekable.pm		Methods for Seekable handles
+lib/IO/Select.pm		System select() interface
+lib/IO/Socket.pm		Socket handle package
+lib/IO/Socket/INET.pm		INET specific Socket methods
+lib/IO/Socket/UNIX.pm		UNIX specific Socket methods
+Makefile.PL
+MANIFEST
+poll.c
+poll.h
+README
+t/IO.t
+t/io_const.t
+t/io_dir.t
+t/io_dup.t
+t/io_file.t
+t/io_linenum.t
+t/io_multihomed.t
+t/io_pipe.t
+t/io_poll.t
+t/io_sel.t
+t/io_sock.t
+t/io_taint.t
+t/io_tell.t
+t/io_udp.t
+t/io_unix.t
+t/io_utf8.t
+t/io_xs.t
+t/test.pl
+META.yml                                 Module meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

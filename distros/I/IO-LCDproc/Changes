@@ -1,0 +1,18 @@
+Revision history for Perl extension IO::Lcdproc.
+
+0.01  Thu Jul 21 08:34:24 2005
+	- original version; created by h2xs 1.22 with options
+		-A -X -n IO::Lcdproc
+
+0.3.2
+	bugfix: made test complete successfully
+
+0.3.4
+	logic fix.
+
+0.3.5 Tue Feb 26 15:54:57 EST 2008
+	Include patch by Helmut A. Bender <hab@helmut-bender.de>
+
+0.3.6 Thu Feb 28 20:33:34 EST 2008
+	Clean up package.
+

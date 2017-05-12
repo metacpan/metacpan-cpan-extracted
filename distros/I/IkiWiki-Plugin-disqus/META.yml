@@ -1,0 +1,24 @@
+---
+abstract: 'Add Disqus comments to IkiWiki pages'
+author:
+  - 'Randall Smith <perlstalker@vuser.org>'
+build_requires: {}
+configure_requires:
+  Module::Build: 0.4
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4, CPAN::Meta::Converter version 2.110440'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: IkiWiki-Plugin-disqus
+provides:
+  IkiWiki::Plugin::disqus:
+    file: lib/IkiWiki/Plugin/disqus.pm
+    version: 0.01
+requires:
+  IkiWiki: 3.00
+resources:
+  homepage: http://code.google.com/p/ikiwiki-plugin-disqus/
+  license: http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+version: 0.01

@@ -1,0 +1,29 @@
+Important things here and in code flagged with XXX
+
+0.35
+
+	Odd failure of test 11 under tcsh and win-bash because
+	*reference* has extra trailing newline.
+
+0.30
+	Create a tee sub-class/layer?
+	       recommend PerlIO::Util's :tee in the dox, but provide
+	       a simplified (single file?) pure-perl implementation too,
+	       via a maethod to wrap an existing IO::Pager handle? (0.32)
+
+	       Might simplify new/open 'procedural' arg-passing mess? (0.33+)
+
+	XXX Complete the ::less subclass to lump all non-interactive
+	fallback behavior together? (See pagerless branch in git)
+
+0.20
+	"Fix" multi-pseudo-STDOUT disabled in 09-open.t implementation?
+
+	Alter tests to cover all invocation schemes,
+	and document location of each in matrix OR use table-driven tests?
+		new/open each class
+		scalar vs. glob vs. OO
+		(non-)fully qualified subclass name
+
+0.02
+	Implement IO::Pager::Callback, just because it sounds cool?

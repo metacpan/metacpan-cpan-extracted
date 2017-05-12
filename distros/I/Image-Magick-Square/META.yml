@@ -1,0 +1,11 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Image-Magick-Square
+version:      1.003
+version_from: lib/Image/Magick/Square.pm
+installdirs:  site
+requires:
+    Image::Magick:                 4
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

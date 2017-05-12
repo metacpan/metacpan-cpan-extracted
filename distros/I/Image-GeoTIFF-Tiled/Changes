@@ -1,0 +1,64 @@
+Revision history for Perl extension Image::GeoTIFF::Tiled.
+
+0.08  Tue Aug 31 00:00:00 2010
+    - Replaced natatime with slices due to its horrible memory leaks
+    - Removed bounds(), added corners() + tests in Tiled.pm
+    - Changed boundary() and corners() in Shape.pm to be consistent with other classes. Updated pod + tests.
+    - Changed order of parameters in load_shape to have $proj at the end
+
+0.07  Wed Jul 21 00:00:00 2010
+    - Smaller usgs samples
+    - Added more tests
+    - Iterator null value now undef, not -1 (some rasters can have negative
+      values).
+    - Moved get_* and extract_* methods out of C and into Perl. Data is unpacked
+      with unpack() and a template and extract_grid and filter_shape no longer
+      suffer from memory errors (obviously).
+    - Fixed bug in Shape.pm get_parts() where given latitude was not
+      being transformed to the middle of the pixel. This caused some latitudes
+      to erronously return only 1 vertex when ray-casting. An additional clause
+      is now in place in filter_shape() to test for this situation.
+    - Renamed many methods to make naming more standardized and sensical
+    - Updated pod
+
+0.06  Wed Jul 14 02:24:00 2010
+    - Now handles floating-point rasters and bps > 8
+    - Added get_iterator_tile[s] methods
+    - Exposed constrain_boundary method, which now copies its 
+      inputs
+    - Added lots of new metadata and sanity checks
+    - Added statistics test with new test image (dem)
+    - Updated pod
+    - Not released to CPAN (passed tests but too many lingering issues)
+
+0.05  Mon Jul 12 15:38:00 2010
+    - return value of coordinates are lists
+    - removed image reference from Iterator.pm to prevent 
+      circular references
+    - added adjacencies() to Iterator.pm (adjacent values)
+    - added bounds() to Tiled.pm (image boundary)
+    - soft-coded null value (-1) to $NULL package variable in 
+      Iterator.pm
+    - added convenince method get_iterator() to Tiled.pm
+
+0.04  Wed Sep 30 00:00:00 2009
+    - improved get_x() efficiency by using part sorting
+    - fixed pod code (ticket #51743)
+    - lazy test plans in test scripts that require optional
+      modules to prevent failed tests
+
+0.03  Wed Sep 02 04:27:00 2009
+    - fixed bug where x values during ray-casting were being
+      sorted lexically instead of numerically
+        --changed get_x() in Shape.pm
+
+0.02  Mon Aug 31 04:10:00 2009
+    - allow loading of all multi-part ShapeFile types
+        --added reset_points() method in Shape.pm
+    - cleaned up distribution
+        --removed Tiled.pm from lib/ in make
+
+0.01  Tue Aug 18 17:32:36 2009
+	- original version; created by h2xs 1.23 with options
+		--compat-version=5.6.0 -PAXn Image::GeoTIFF::Tiled
+

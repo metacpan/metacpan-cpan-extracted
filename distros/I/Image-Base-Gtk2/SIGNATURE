@@ -1,0 +1,69 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 842745cb706f8f2126506f544492f7a80dbe29b3 COPYING
+SHA1 43eef29dbe2533c2273c30a7041b1d1699416e6e Changes
+SHA1 2ae059d10a9321827d856ba73677ddea6a911c86 MANIFEST
+SHA1 6e3dfa4a933a1a5da6c934cca324fc40495b2f5d MANIFEST.SKIP
+SHA1 5a4f2944b423f96cd34f6bfb15d99864af5d39c4 META.yml
+SHA1 37937e9eae92546a7a2c4b6a7574aa02a6be5b90 Makefile.PL
+SHA1 45d19ef3639a9d51a425bab4ac222d051caa2fab debian/changelog
+SHA1 ac3478d69a3c81fa62e60f5c3696165a4e5e6ac4 debian/compat
+SHA1 6a91e0d0cc09437919a8fd909a5bb4f587ebc4df debian/control
+SHA1 d794a2a640140ceb5aa3b8520be180b29e87e051 debian/copyright
+SHA1 678859b6001093fdbecb2dd55000d308152448c0 debian/rules
+SHA1 61652cd1568dcf2614df833eba241755eee34e89 debian/source/format
+SHA1 a506591d96c8ca055ae8d80da48bf0d6e2d476b1 debian/watch
+SHA1 bd60c17459dadff4d62e1d76e430a5c0c8e51877 devel/Makefile
+SHA1 e537d2290ed1feeda0c25ff337ec8e5c68b8e863 devel/ellipse-tangent.pl
+SHA1 1ca76cbfe45825d1808fba48f87ce4c639360ca7 devel/ellipse.pl
+SHA1 919d8bea6bfec38ed5e7b59be6a79128226a05cd devel/exe-misc.c
+SHA1 94c8bf915ea5e1224ebc9bc3b0614f689c0032b2 devel/gdk-drawable.pl
+SHA1 16f955e9836deabca01ce7694bc82e469889a6cd devel/gdk-image.pl
+SHA1 d5658175b586ae739affd498bddb3a98be430f0a devel/pixbuf-get-pixels.pl
+SHA1 10dd946e3e897525d95c992b066037d3392648d7 devel/pixbuf.pl
+SHA1 f92316e4865f19cd60dfda684fae614132420504 devel/unused.pl
+SHA1 ce6e51f801a3105a8f1b204b311aeb147c37058e inc/MyMakeMakerExtras.pm
+SHA1 7a988b2aa7ed09f1cb9029a1ef3f0e2139dca0cf inc/my_pod2html
+SHA1 d656d85754619b5afce4dcb29ed004f16075a7a8 lib/Image/Base/Gtk2/Gdk/Drawable.pm
+SHA1 1b21a96e7e22a6ef20581a84d97cccc11702d1e1 lib/Image/Base/Gtk2/Gdk/Image.pm
+SHA1 8265f3b543fc9cada7513777d468aa0cff6d8508 lib/Image/Base/Gtk2/Gdk/Pixbuf.pm
+SHA1 5a8d76a9fbdb874170f57e40c786cd703b0cde67 lib/Image/Base/Gtk2/Gdk/Pixmap.pm
+SHA1 89ed38544ca1da08cbff0124f541c8c23e603df4 lib/Image/Base/Gtk2/Gdk/Window.pm
+SHA1 140eb5a4ef9b52889dda1512c13f630a3e8f6888 t/Drawable.t
+SHA1 29d824d5a625cf512287d025a9dbffe6d2662d9d t/Image-weaken.t
+SHA1 ba83fff7589cc48c772ea8fa0589edd3b1574fe4 t/Image.t
+SHA1 969664973af9de9d898008e3ef280892b8d63244 t/MyTestHelpers.pm
+SHA1 f0fb4938250b2c5be37363f238c5130fd583df84 t/MyTestImageBase.pm
+SHA1 47933ad0460cde6940b79f25386d00082c8bee1e t/Pixbuf-weaken.t
+SHA1 bd1712ab4b4c4b8e8df4d57bc6c6003307036e76 t/Pixbuf.t
+SHA1 b7ed1c260ce100af78fe7ad3e9be0106cf965aa2 t/Pixmap.t
+SHA1 ac276300a2d17c9326b4250ffbd577198812b440 t/Window.t
+SHA1 811028548aa4b360b5086d1af3150f9dde348aa6 xt/0-META-read.t
+SHA1 c9e7a47e1f397eb5f46d7e4ef21754d9df76e36e xt/0-Test-ConsistentVersion.t
+SHA1 d9e7f38a8dcfdb76c56951e4214be8eeda2e2289 xt/0-Test-DistManifest.t
+SHA1 9496e4a2a2734c7093ab6961900dd7a55800976e xt/0-Test-Pod.t
+SHA1 083242d959c1a9242c874982e4585872a95bec93 xt/0-Test-Synopsis.t
+SHA1 ec454b1b524d2d0b35e5a7d8292ad13d82becab5 xt/0-Test-YAML-Meta.t
+SHA1 d1d6dc2ff925e7ba5c014ce1361e6d097d061f2a xt/0-file-is-part-of.t
+SHA1 daba2840c7f128371d42516619a0e04fee2f5ff4 xt/0-no-debug-left-on.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iD8DBQFPKwKHLFMCIV9q3ToRApYBAJ0fAyVwr/EQ9YxyOgTsZXw3cMzfIQCgks1a
+zVKCS3yOobqk0LQsp1mZrnQ=
+=fqsq
+-----END PGP SIGNATURE-----

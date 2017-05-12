@@ -1,0 +1,6 @@
+Module::Build           libmodule-build-perl
+Exception::Class        libexception-class-perl
+URI::Escape             liburi-perl
+HTML::Entities          libhtml-parser-perl
+HTML::Template          libhtml-template-perl
+Class::Accessor::Fast   libclass-accessor-perl

@@ -1,0 +1,22 @@
+Revision history for IO-Stream-Proxy-HTTPS
+
+v2.0.0  2016-02-20 14:53:06 EET
+	- Switch to Dist::Milla.
+
+1.0.5   2013-10-03 16:58:07 EEST
+	- Remove MYMETA.*
+
+1.0.4	2012-05-13 06:01:33 EEST
+	- Fix requirements.
+
+1.0.3	2009-04-04 05:54:44 EEST
+	- Fixed bug: 100% CPU usage on unexpected EOF
+
+1.0.2	2009-03-21 15:28:16 EET
+	- Fixed bug: I/O object wasn't destroyed on close()
+
+1.0.1	2008-11-19 05:12:24 EET
+	- Added compatibility with Win32.
+
+1.0.0	2008-11-16 02:59:21 EET
+	- Initial release.

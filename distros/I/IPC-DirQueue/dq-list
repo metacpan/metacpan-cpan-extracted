@@ -1,0 +1,119 @@
+#!/usr/bin/perl -w
+=head1 NAME
+
+dq-list - list the tasks queued in an IPC::DirQueue queue
+
+=head1 SYNOPSIS
+
+B<dq-list> --dir I<qdirectory>
+
+=head1 DESCRIPTION
+
+B<dq-list> will list the current tasks in an C<IPC::DirQueue> directory,
+
+=head1 SEE ALSO
+
+IPC::DirQueue(3)
+dq-deque(1)
+dq-list(1)
+dq-server(1)
+dq-submit(1)
+
+=cut
+
+use strict;
+use lib 'lib';
+use IPC::DirQueue;
+use Getopt::Long;
+
+sub usage {
+  die "usage: dq-list --dir qdirectory\n";
+}
+
+our $dir;
+our $opt_count = 0;
+our $opt_fanout = 0;
+
+GetOptions(
+  'count|c' => \$opt_count,
+  'fanout' => \$opt_fanout,
+  'dir=s'   => \$dir
+) or usage();
+$dir or usage();
+
+my $dq = IPC::DirQueue->new({
+        dir => $dir,
+        ordered => $opt_count ? 0 : 1,
+        queue_fanout => $opt_fanout
+      });
+
+my @active = ();
+my @queued = ();
+my $hostname = $dq->gethostname();
+$dq->visit_all_jobs (\&wanted, undef);
+
+printf "Jobs: active: %d  queued: %d\n",
+        scalar @active, scalar @queued;
+
+if ($opt_count) { exit; }
+
+print "\n";
+
+my $count = 1;
+if (scalar @active) {
+  print "active:\n";
+  foreach my $job (@active) {
+    print "- ACTIVE $count: ", $job;
+    $count++;
+  }
+  print "\n";
+}
+
+$count = 1;
+if (scalar @queued) {
+  print "queued:\n";
+  foreach my $job (@queued) {
+    print "- $count: ", $job;
+    $count++;
+  }
+  print "\n";
+}
+exit;
+
+sub wanted {
+  my ($visitcontext, $job) = @_;
+
+  my $data = $job->get_data_path();
+  my $nbytes = $job->get_data_size_bytes();
+  my $timet = $job->get_time_submitted_secs();
+  my $hname = $job->get_hostname_submitted();
+  my $jobid = $job->{jobid};
+
+  my $text = sprintf (
+            "%s (%d bytes)\n  Submitted: %s on %s\n",
+            $jobid, $nbytes, scalar localtime $timet, $hname);
+
+  if ($job->{active_pid})
+  {
+    if ($hostname eq $job->{active_host}
+        && !kill (0, $job->{active_pid}))
+    {
+      $text = sprintf (
+            "(dead lockfile)\n  %s",
+            $text);
+    }
+    else {
+      $text = sprintf (
+            "(pid: %d\@%s)\n  %s",
+            $job->{active_pid}, $job->{active_host}, $text);
+    }
+
+    push (@active, $text);
+  }
+  else {
+    push (@queued, $text);
+  }
+
+  $job->finish();
+}
+

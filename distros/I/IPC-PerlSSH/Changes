@@ -1,0 +1,59 @@
+Revision history for IPC-PerlSSH
+
+0.17    2016/12/11 23:21:32
+        [CHANGES]
+         * Make pread buffer size parametric
+         * Fix typo in docs - s/load_library/use_library/
+         * Updated documentation to  =head2 barename  style
+
+        [BUGFIXES]
+         * Add 'use lib "."' to unit tests for perl 5.24
+
+0.16    CHANGES:
+         * Provide a nicer ->build_command_from() method in Base that deletes
+           hashref keys
+         * Allow arguments or return values to include undef
+         * Added a small example script
+
+0.15    CHANGES:
+         * Added Library::FS::remove, mkpath, rmtree
+         * Added 'Port' and 'SshOptions' constructor arguments
+         * Added 'Readh'+'Writeh' constructor form
+         * Use Test::Fatal instead of Test::Exception
+         * Various documentation updates
+
+0.14    CHANGES:
+         * Provide STDERR-capturing versions of Library::Run functions
+           (fixes https://rt.cpan.org/Ticket/Display.html?id=49440)
+
+0.13    BUGFIXES:
+         * Avoid fchmod/fchown on perls before 5.8.8
+
+0.12    BUGFIXES:
+         * Handle SIGPIPE in Run::system_inout, handle exec() failures
+         * Always load library initialisation, even with partial load lists
+         * Fix tests/libraries to work on perl versions prior to 5.10 -
+           package variables need re-declaring
+
+0.11    CHANGES:
+         * Added 'use warnings'
+         * Created Run and IO libraries
+         * Apply 'package' statements to remote stored code and libraries;
+           allow libaries to persist package variables
+         * Report the offending line of code in remote compile errors
+         * Various other code and documentation updates
+
+0.10    CHANGES:
+         * Documentation fix to Library::FS::writefile()
+         * Neater behaviour in Base.pm for subclasses when parse_message()
+           fails
+
+0.09    CHANGES:
+         * Neater cleanup behaviour on unref
+         * Added 'rename' FS library function
+
+0.08    CHANGES:
+         * Added Changes notes file
+         * Added ->use_library() functionallity
+         * Created FS library
+         * Allow alternate path to SSH binary

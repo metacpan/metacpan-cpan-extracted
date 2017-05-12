@@ -1,0 +1,16 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use feature qw( say );
+
+use Scalar::Util qw( refaddr );
+
+use IPC::PerlSSH;
+
+my $ips = IPC::PerlSSH->new( Host => $ARGV[0] );
+
+$ips->eval( "use POSIX qw( uname )" );
+my @remote_uname = $ips->eval( "uname()" );
+
+say for @remote_uname;

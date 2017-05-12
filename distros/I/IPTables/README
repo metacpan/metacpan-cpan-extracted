@@ -1,0 +1,34 @@
+ *** This is _alpha_ software -- use at your own risks ***
+
+Introduction
+------------
+IPTables module allows you to manipulate netfilter rules from the comfort
+perl.  It does this by interacting directly with libiptc.
+
+IT *may* work for you, may not.  I'm still developing it and it quiet a
+hack right now.  If you do have problems getting it workign however, let 
+me know and i'll try and fix ASAP ;)
+
+Installation
+------------
+0.  Prerequisites:
+        - Perl version 5.005_03 or more recent.
+	- Linux 2.4 or greater
+        - libiptc.a in /usr/lib/.
+	- ip_tabled support in kernel ;)
+
+1.  Installation steps:
+	- If you have libiptc.a (developemtn files from iptables source) in
+	  a place other than /usr/lib, then edit Makefile.PL before following these instructions.
+
+        -from the directory where this file is located, type:
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+
+Problems, Comments, Etc
+-----------------------
+Mail to me at theo@crazygreek.co.uk.
+

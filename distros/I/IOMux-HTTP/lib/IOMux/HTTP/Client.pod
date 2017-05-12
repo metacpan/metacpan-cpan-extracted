@@ -1,0 +1,331 @@
+=head1 NAME
+
+IOMux::HTTP::Client - HTTP client implementation
+
+=head1 INHERITANCE
+
+ IOMux::HTTP::Client
+   is a IOMux::HTTP
+   is a IOMux::Net::TCP
+   is a IOMux::Handler::Read
+   is a IOMux::Handler
+
+   IOMux::Net::TCP also extends IOMux::Handler::Write
+   is a IOMux::Handler::Write
+   is a IOMux::Handler
+
+=head1 SYNOPSIS
+
+  my $socket = IO::Socket::INET->new(@sock_params);
+  my $socket = IO::Socket::SSL->new(@sock_params);
+  my $client = IOMux::HTTP::Client->new(socket => $socket);
+  $mux->add($client);
+
+  # or in one go:
+  my $client = $mux->add(IOMux::HTTP::Client->new(@sock_params));
+
+=head1 DESCRIPTION
+
+Handles a HTTP/1.1 connection to a HTTP server, for L<IOMux|IOMux> based
+applications B<only>. The multiplexer allows one application to sent
+requests and receive answers from multiple servers in parallel in one
+single process.
+
+B<WARNING>: Writing event driven programs in a challenge.
+
+=head1 METHODS
+
+=head2 Constructors
+
+=over 4
+
+=item IOMux::HTTP::Client-E<gt>B<new>(OPTIONS)
+See L<IOMux::HTTP/"Constructors">
+
+=item IOMux::HTTP::Client-E<gt>B<open>(MODE, WHAT, OPTIONS)
+See L<IOMux::Handler/"Constructors">
+
+=item IOMux::HTTP::Client-E<gt>B<open>(MODE, WHAT, OPTIONS)
+See L<IOMux::Handler/"Constructors">
+
+=back
+
+=head2 Accessors
+
+=over 4
+
+=item $obj-E<gt>B<fh>
+See L<IOMux::Handler/"Accessors">
+
+=item $obj-E<gt>B<fh>
+See L<IOMux::Handler/"Accessors">
+
+=item $obj-E<gt>B<fileno>
+See L<IOMux::Handler/"Accessors">
+
+=item $obj-E<gt>B<fileno>
+See L<IOMux::Handler/"Accessors">
+
+=item $obj-E<gt>B<msgsSent>
+
+=item $obj-E<gt>B<mux>
+See L<IOMux::Handler/"Accessors">
+
+=item $obj-E<gt>B<mux>
+See L<IOMux::Handler/"Accessors">
+
+=item $obj-E<gt>B<name>
+See L<IOMux::Handler/"Accessors">
+
+=item $obj-E<gt>B<name>
+See L<IOMux::Handler/"Accessors">
+
+=item $obj-E<gt>B<readSize>([INTEGER])
+See L<IOMux::Handler::Read/"Accessors">
+
+=item $obj-E<gt>B<socket>
+See L<IOMux::Net::TCP/"Accessors">
+
+=item $obj-E<gt>B<startTime>
+See L<IOMux::HTTP/"Accessors">
+
+=item $obj-E<gt>B<usesSSL>
+See L<IOMux::Handler/"Accessors">
+
+=item $obj-E<gt>B<usesSSL>
+See L<IOMux::Handler/"Accessors">
+
+=item $obj-E<gt>B<writeSize>([INTEGER])
+See L<IOMux::Handler::Write/"Accessors">
+
+=back
+
+=head2 User interface
+
+=head3 Connection
+
+=over 4
+
+=item $obj-E<gt>B<close>([CALLBACK])
+See L<IOMux::Handler/"Connection">
+
+=item $obj-E<gt>B<close>([CALLBACK])
+See L<IOMux::Handler/"Connection">
+
+=item $obj-E<gt>B<shutdown>((0|1|2))
+See L<IOMux::Net::TCP/"Connection">
+
+=item $obj-E<gt>B<timeout>([TIMEOUT])
+See L<IOMux::Handler/"Connection">
+
+=item $obj-E<gt>B<timeout>([TIMEOUT])
+See L<IOMux::Handler/"Connection">
+
+=back
+
+=head3 Reading
+
+=over 4
+
+=item $obj-E<gt>B<readline>(CALLBACK)
+See L<IOMux::Handler::Read/"Reading">
+
+=item $obj-E<gt>B<slurp>(CALLBACK)
+See L<IOMux::Handler::Read/"Reading">
+
+=back
+
+=head3 Writing
+
+=over 4
+
+=item $obj-E<gt>B<print>(STRING|SCALAR|LIST|ARRAY)
+See L<IOMux::Handler::Write/"Writing">
+
+=item $obj-E<gt>B<printf>(FORMAT, PARAMS)
+See L<IOMux::Handler::Write/"Writing">
+
+=item $obj-E<gt>B<say>(STRING|SCALAR|LIST|ARRAY)
+See L<IOMux::Handler::Write/"Writing">
+
+=item $obj-E<gt>B<write>(SCALAR, [MORE])
+See L<IOMux::Handler::Write/"Writing">
+
+=back
+
+=head2 Multiplexer
+
+=head3 Connection
+
+=over 4
+
+=item $obj-E<gt>B<mux_init>(MUX, [HANDLER])
+See L<IOMux::Handler/"Connection">
+
+=item $obj-E<gt>B<mux_init>(MUX, [HANDLER])
+See L<IOMux::Handler/"Connection">
+
+=item $obj-E<gt>B<mux_remove>
+See L<IOMux::Handler/"Connection">
+
+=item $obj-E<gt>B<mux_remove>
+See L<IOMux::Handler/"Connection">
+
+=item $obj-E<gt>B<mux_timeout>
+See L<IOMux::Handler/"Connection">
+
+=item $obj-E<gt>B<mux_timeout>
+See L<IOMux::Handler/"Connection">
+
+=back
+
+=head3 Reading
+
+=over 4
+
+=item $obj-E<gt>B<mux_eof>
+See L<IOMux::Net::TCP/"Multiplexer">
+
+=item $obj-E<gt>B<mux_except_flagged>(FILENO)
+See L<IOMux::Handler/"Reading">
+
+=item $obj-E<gt>B<mux_except_flagged>(FILENO)
+See L<IOMux::Handler/"Reading">
+
+=item $obj-E<gt>B<mux_input>(BUFFER)
+See L<IOMux::Handler::Read/"Reading">
+
+=item $obj-E<gt>B<mux_read_flagged>(FILENO)
+See L<IOMux::Handler/"Reading">
+
+=item $obj-E<gt>B<mux_read_flagged>(FILENO)
+See L<IOMux::Handler/"Reading">
+
+=back
+
+=head3 Writing
+
+=over 4
+
+=item $obj-E<gt>B<mux_outbuffer_empty>
+See L<IOMux::Handler::Write/"Writing">
+
+=item $obj-E<gt>B<mux_output_waiting>
+See L<IOMux::Handler::Write/"Writing">
+
+=item $obj-E<gt>B<mux_write_flagged>(FILENO)
+See L<IOMux::Handler/"Writing">
+
+=item $obj-E<gt>B<mux_write_flagged>(FILENO)
+See L<IOMux::Handler/"Writing">
+
+=back
+
+=head3 Service
+
+=head2 Helpers
+
+=over 4
+
+=item $obj-E<gt>B<extractSocket>(HASH)
+
+=item IOMux::HTTP::Client-E<gt>B<extractSocket>(HASH)
+See L<IOMux::Handler/"Helpers">
+
+=item $obj-E<gt>B<extractSocket>(HASH)
+
+=item IOMux::HTTP::Client-E<gt>B<extractSocket>(HASH)
+See L<IOMux::Handler/"Helpers">
+
+=item $obj-E<gt>B<fdset>(STATE, READ, WRITE, ERROR)
+See L<IOMux::Handler/"Helpers">
+
+=item $obj-E<gt>B<fdset>(STATE, READ, WRITE, ERROR)
+See L<IOMux::Handler/"Helpers">
+
+=item $obj-E<gt>B<show>
+See L<IOMux::Handler/"Helpers">
+
+=item $obj-E<gt>B<show>
+See L<IOMux::Handler/"Helpers">
+
+=back
+
+=head2 HTTP protocol
+
+=over 4
+
+=item $obj-E<gt>B<closeConnection>
+See L<IOMux::HTTP/"HTTP protocol">
+
+=item $obj-E<gt>B<sendMessage>(MESSAGE, CALLBACK)
+See L<IOMux::HTTP/"HTTP protocol">
+
+=item $obj-E<gt>B<sendRequest>(REQUEST, CALLBACK, SESSION)
+
+Send the request to the server. When the whole message has been sent,
+the CALLBACK will be called. You may send more REQUESTS in a row, which
+will be handled in-order by the server.
+
+See a detailed example farther below in this man-page.
+
+=back
+
+=head1 DETAILS
+
+=head2 Coding examples
+
+Often, HTTP interactions are rather stateless: simply requesting
+some files to be downloaded. However, more and more applications
+use HTTP as generic transport protocol with more complex message
+interchange. This module cleanly supports state transitions. See
+them as tasks to perform.
+
+Any client implementation starts off like this
+
+  my $server = "localhost:8081";
+
+  # You may also choose IOMux::Select or other
+  # multiplex instances (to be developed)
+  use IOMux::Poll;
+  my $mux    = IOMux::Poll->new;
+
+  use IOMux::HTTP::Client;
+  my $client = IOMux::HTTP::Client->new(PeerAddr => $server);
+  $mux->add($client);
+
+  # A session HASH (you may create a nice object around it)
+  # will be passed from step to step.
+  my $session = {};
+
+  # Take the first step
+  step1($client, $session);
+
+  # You may initiate multiple clients and start many different steps
+  # until you start the loop.
+  $mux->loop;
+
+  # The loop is left when all connections have closed
+  exit 0;
+
+  # Now here comes the implementation as shown in the examples below.
+
+=head1 SEE ALSO
+
+This module is part of IOMux-HTTP distribution version 0.11,
+built on January 27, 2011. Website: F<http://perl.overmeer.net/>
+All modules in this suite:
+L</Any::Daemon>,
+L</IOMux>, and
+L</IOMux::HTTP>.
+
+Please post questions or ideas to F<perl@overmeer.net>
+
+=head1 LICENSE
+
+Copyrights 2011 by Mark Overmeer. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

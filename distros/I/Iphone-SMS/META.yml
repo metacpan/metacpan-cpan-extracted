@@ -1,0 +1,24 @@
+---
+abstract: 'extract sms from itunes backup files'
+author:
+  - 'Nianhua Wei <willian.wnh@gmail.com>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Iphone-SMS
+provides:
+  Iphone::SMS:
+    file: lib/Iphone/SMS.pm
+    version: 0.03
+requires:
+  DBI: 1.611
+resources:
+  license: http://www.perlfoundation.org/artistic_license_2_0
+version: 0.03

@@ -1,0 +1,89 @@
+Revision history for IO-Die
+
+0.057   2015-10-22
+        Lazy-load functions by default
+
+0.056   2015-07-06
+        Socket and kill() test fixes against DragonflyBSD
+
+0.055   2015-06-30
+        Socket test fixes against OpenBSD
+
+0.054   2015-06-26
+        Socket test fixes against Cygwin
+        remove Capture::Tiny as testing requirement
+        Fcntl errors to get parameters
+
+0.053   2015-06-25
+        More test fixes, esp. Linux socket tests
+
+0.051   2015-06-24
+        fix careless exec() arguments mis-parse
+
+0.050   2015-06-24
+        tests: Cygwin sockopt option accommodation
+
+0.049   2015-06-23
+        tests: NetBSD shutdown() bug/quirk accommodation
+
+0.048   2015-06-23
+        Add tests for “outlier” functions
+
+0.047   2015-06-22
+        Fix socket tests for Linux and other platforms
+
+0.046   2015-06-22
+        Add tests for socket functions
+        Fix accept() so that it autovivifies correctly
+
+0.045
+        Fix tests for pre-PerlIO perls (can’t chmod() a file handle)
+
+0.044
+        Fix race condition in tests
+        Missing local($!, $^E) around File::Temp
+        preload all of Test::Deep
+
+0.043
+        Solaris test fix
+
+0.042
+        Include test suite with distribution.
+        Fix test failures on Cygwin and pre-5.8.9 perls.
+
+0.04
+        make Devel::Cover *sort* of work nicely with this;
+        test coverage is actually much higher, but for some
+        reason Devel::Cover thinks it’s around 22%.
+
+        Ensure that, if exceptions aren’t thrown, the functions return
+        as they should.
+
+0.033
+        chdir() fallback on VMS (UNTESTED!)
+
+0.03
+        chdir() added
+
+0.026
+        Test suite compatibility: 5.8 - 5.22
+        The module should also work in 5.6, but the tests can't verify that.
+
+0.025
+        Version bump
+
+0.024
+        More cleanup
+
+0.022
+        Reference GitHub repository in docs
+
+0.021
+        Update dependencies in build file
+
+0.02
+        Fix docs
+        Remove cPanel references in tests
+
+0.01
+        First version, released on an unsuspecting world.

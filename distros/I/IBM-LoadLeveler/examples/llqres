@@ -1,0 +1,56 @@
+# -*- Perl -*-
+
+use IBM::LoadLeveler;
+
+# Display all reservations much line llqres -l
+
+$query = ll_query(RESERVATIONS);
+$return = ll_set_request($query, QUERY_ALL, undef, ALL_DATA);
+
+$reservation = ll_get_objs($query, LL_CM, NULL, $number, $err);
+
+if ($reservation == NULL )
+{
+    print "ll_get_objs returned a NULL object. Error $err\n";
+}
+else
+{
+    while ($reservation)
+    {
+	my $id       = ll_get_data($reservation,LL_ReservationID);
+	my $start    = ll_get_data($reservation,LL_ReservationStartTime);
+	my $duration = ll_get_data($reservation,LL_ReservationDuration);
+	my @machines = ll_get_data($reservation,LL_ReservationMachines);
+	my @jobs     = ll_get_data($reservation,LL_ReservationJobs);
+	my $shared   = ll_get_data($reservation,LL_ReservationModeShared);
+	my $idle     = ll_get_data($reservation,LL_ReservationModeRemoveOnIdle);
+	my $status   = ll_get_data($reservation,LL_ReservationStatus);
+	my $owner    = ll_get_data($reservation,LL_ReservationOwner);
+	my $group    = ll_get_data($reservation,LL_ReservationGroup);
+	my $create   = ll_get_data($reservation,LL_ReservationCreateTime);
+	my $modby    = ll_get_data($reservation,LL_ReservationModifiedBy);
+	my $modtime  = ll_get_data($reservation,LL_ReservationModifyTime);
+	my @users    = ll_get_data($reservation,LL_ReservationUsers);
+	my @groups   = ll_get_data($reservation,LL_ReservationGroups);
+	print "Reservation : $id\n";
+	print "-----------------------------------\n";
+	print "Start          : ",scalar localtime($start),"\n";
+	print "Duration       : $duration\n";
+	print "Shared         : $shared\n";
+	print "Remove on Idle : $idle\n";
+	print "Status         : $status\n";
+	print "Owner          : $owner\n";
+	print "Group          : $group\n";
+	print "Created On     : ",scalar localtime($create),"\n";
+	print "Modified By    : $modby\n";
+	print "Modified On    : ",scalar localtime($modtime),"\n";
+	print "JOBS           : @jobs\n";
+	print "Machines       : @machines\n";
+	print "Users          : @users\n";
+	print "Groups         : @groups\n";
+	
+	$reservation = ll_next_obj($query);
+    }
+}
+ll_free_objs($query);
+ll_deallocate($query);

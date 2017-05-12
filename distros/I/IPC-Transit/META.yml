@@ -1,0 +1,48 @@
+---
+abstract: 'A framework for high performance message passing'
+author:
+  - 'Dana M. Diederich <dana@realms.org>'
+build_requires:
+  Test::More: '0'
+  lib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: IPC-Transit
+requires:
+  Alien::Sodium: '0'
+  Crypt::Sodium: '0'
+  Dancer2::Core::Route: '0'
+  Data::Dumper: '0'
+  File::Slurp: '0'
+  File::Temp: '0'
+  Getopt::Std: '0'
+  HTTP::Lite: '0'
+  IPC::Msg: '0'
+  IPC::SysV: '0'
+  IPC::Transit::Remote: '0'
+  JSON: '0'
+  MIME::Base64: '0'
+  POE: '0'
+  POSIX: '0'
+  Plack: '0'
+  Plack::Request: '0'
+  Sereal::Decoder: '0'
+  Sereal::Encoder: '0'
+  Storable: '0'
+  Sys::Hostname: '0'
+  Tie::DNS: '0'
+  perl: '5.006'
+  strict: '0'
+  vars: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/dana/perl-IPC-Transit/issues
+  homepage: https://github.com/dana/perl-IPC-Transit
+  repository: https://github.com/dana/perl-IPC-Transit.git
+version: '1.162230'

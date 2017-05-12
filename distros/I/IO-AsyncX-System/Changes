@@ -1,0 +1,16 @@
+Revision history for IO-AsyncX-System
+
+0.003     2015-05-12 02:47:48+01:00 Europe/London
+	No new features.
+
+	Bugs fixed:
+	* RT104323 (STDIN handling was broken), thanks to SJM for report + patch
+
+0.002     2015-02-17 04:43:22+00:00 Europe/London
+	No new features.
+
+	Dependencies:
+	* Try to disable win32 install
+
+0.001     2015-02-14 20:53:13+00:00 Europe/London
+	Initial CPAN release

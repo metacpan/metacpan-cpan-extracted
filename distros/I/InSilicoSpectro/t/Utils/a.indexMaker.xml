@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<xmlIndexMaker>
+  <elementToIndex path="/idr:IdentificationResult/idl:IdentificationList/idl:header"/>
+  <elementToIndex path="/idr:IdentificationResult/idl:IdentificationList/idl:failedJob"/>
+  <elementToIndex path="/idr:IdentificationResult/idl:IdentificationList/idl:PeptideMatchesDefDictionary/idl:PeptideMatchDef">
+    <key type="attribute" name="matchType"/>
+    <key type="attribute" name="key"/>
+  </elementToIndex>
+  <elementToIndex path="/idr:IdentificationResult/idl:IdentificationList/idl:PeptideMatchesDefDictionary/idl:PeptideMatchDef/idl:peptZScore">
+    <key type="contents"/>
+  </elementToIndex>
+  <elementToIndex path="/idr:IdentificationResult/idl:IdentificationList/idl:PeptideMatchesDefDictionary/idl:PeptideMatchDef/idl:sequence">
+    <key type="contents"/>
+  </elementToIndex>
+ <elementToIndex path="/idr:IdentificationResult/idl:IdentificationList/idl:PeptideMatchesDefDictionary/idl:PeptideMatchDef/idl:peptZScoreonechild">
+    <key type="contents"/>
+  </elementToIndex>
+  <elementToIndex path="/idr:IdentificationResult/idl:IdentificationList/idl:DatabaseResults/idl:OneDatabaseResult">
+    <key type="attribute" name="name"/>
+    <key type="attribute" name="release"/>
+    <key type="attribute" name="taxoCriterion"/>
+  </elementToIndex>
+  <elementToIndex path="/idr:IdentificationResult/idl:IdentificationList/idl:DatabaseResults/idl:OneDatabaseResult/idl:IdentificationAlg/idl:DBMatches/idl:DBMatch">
+    <key type="attribute" name="key"/>
+  </elementToIndex>
+
+  <elementToIndex path="/idr:IdentificationResult/idl:IdentificationList/idl:DatabaseResults/idl:OneDatabaseResult/idl:IdentificationAlg/idl:DBMatches/idl:DBMatch/idl:AC">
+    <key type="contents"/>
+  </elementToIndex>
+  <elementToIndex path="/idr:IdentificationResult/idl:IdentificationList/idl:DatabaseResults/idl:OneDatabaseResult/idl:IdentificationAlg/idl:DBMatches/idl:DBMatch/idl:score">
+    <key type="contents"/>
+  </elementToIndex>
+  <elementToIndex path="/idr:IdentificationResult/idl:IdentificationList/idl:DatabaseResults/idl:OneDatabaseResult/idl:IdentificationAlg/idl:DBMatches/idl:DBMatch/idl:PeptideMatches">
+  </elementToIndex>
+  <elementToIndex path="/idr:IdentificationResult/idl:IdentificationList/idl:DatabaseResults/idl:OneDatabaseResult/idl:IdentificationAlg/idl:DBMatches/idl:DBMatch/idl:PeptideMatches/idl:PeptideMatch">
+    <key type="attribute" name="ref"/>
+  </elementToIndex>
+</xmlIndexMaker>

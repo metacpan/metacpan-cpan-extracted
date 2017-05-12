@@ -1,0 +1,11 @@
+Revision history for Perl extension IO::Socket::SecureSocks.
+
+0.1  Thu Aug 10 03:16:46 2006
+	- switched to Module::Build
+
+0.1  Thu Dec  1 01:54:45 2005
+	- directory structure fixed
+	- POD fixed
+	- Revision history added
+
+

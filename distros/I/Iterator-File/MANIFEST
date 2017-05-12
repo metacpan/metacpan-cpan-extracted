@@ -1,0 +1,25 @@
+Changes
+lib/Iterator/File.pm
+lib/Iterator/File/Source/FlatFile.pm
+lib/Iterator/File/Source/Interface.pm
+lib/Iterator/File/State/Interface.pm
+lib/Iterator/File/State/IPCShareable.pm
+lib/Iterator/File/State/TempFile.pm
+lib/Iterator/File/Status.pm
+lib/Iterator/File/Utility.pm
+Makefile.PL
+MANIFEST
+t/00-compile.t
+t/01-basic.t
+t/02a-resume1.t
+t/02b-resume2.t
+t/03a-shm-resume1.t
+t/03b-shm-resume2.t
+t/04-status.t
+t/05-increment-overload.t
+t/data/status-fixed-interval.txt
+t/data/status-logarithmic.txt
+t/data/ten_lines.txt
+t/data/three_lines.txt
+t/util.pl
+META.yml                                 Module meta-data (added by MakeMaker)

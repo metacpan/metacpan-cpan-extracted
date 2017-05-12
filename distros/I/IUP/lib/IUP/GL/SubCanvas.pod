@@ -1,0 +1,14 @@
+=head1 NAME
+
+IUP::GL::SubCanvas - [GUI element] GL-based subcanvas
+
+=head1 DESCRIPTION
+
+XXX-TODO: missing doc
+
+=head1 SEE ALSO
+
+The original doc: L<iupglsubcanvas.html|http://www.tecgraf.puc-rio.br/iup/en/gl/iupglsubcanvas.html>
+
+
+=cut

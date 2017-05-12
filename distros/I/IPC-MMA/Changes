@@ -1,0 +1,145 @@
+Revision history for IPC::MMA
+
+0.81  Feb 27 2010
+      * Added an Example to the pod documentation (a user suggested 
+        this, it should also raise IPC::MMA's Qwalitee level :-)
+      * Undid some changes to C compiler testing in Makefile.PL,
+        that were a bad idea.
+
+0.7   Feb 21 2010
+      * Improved Makefile.PL to check more deeply for the presence 
+        and completeness of the mm library, to work around an Unknown 
+        test result on one CPAN tester's system.
+      * Improved C compiler testing in Makefile.PL to deal with 
+        compound names like 'ccache cc'. 
+      * Corrected two method names in .pod docs from 'mm[a]_hash_' to 
+        'mm[a]_array_'.
+
+0.6   Nov 23 2009
+      * Added NaN filter to random DOUBLE generation in 04_fixedArray.t.
+      * Improved reliability/consistency of 09_lock.t operation by 
+        ** reworking delays/timeouts for slow/heavily-loaded systems,
+        ** using a local copy of the global variable, and 
+        ** always checking the expected value of the local copy, 
+           as a condition for setting the next global value.
+
+0.59009 Nov 19 2009
+      * Reworked test 09_lock.t to try to eliminate a FAIL on a CPAN 
+        tester's slow system.
+      * Reworked optimization selection in Makefile.PL to be more 
+        compatible with various toolsets.
+      * Eliminated error messages when NaN or inf values are stored 
+        in DOUBLE_ARRAYs.  Random number generation in test 
+        04_fixedArray.t will occasionally produce NaNs and infs.
+
+0.59007 Nov 17 2009
+      * Modified Makefile.PL to work around some problems with the 
+        'inline' keyword under the Sun C compiler.
+      * Built a Perl 5.6.2 with 64-bit integers and worked thru test 
+        problems using it.
+      * Improved test 04_fixedArray to test option MM_CSTRING as well 
+        as MM_FIXED_REC.
+      * Updated Makefile.PL prerequisites, abstract, author.
+      * Added test for .pod file.
+
+0.59005 Nov 13 2009
+      * Found/fixed a nasty problem involving list operands of array 
+        push, unshift, splice.
+      * Improved UINT value-testing mechanism for perl 5.6.
+      * Revised test 4_fixedArray to use proper equality operator (== 
+        or eq) based on the type of array (perl 5.6 again)
+
+0.59004 Nov 11 2009
+      * Another try to fix the problem under perl 5.6, wherein storing 
+        into UINT arrays gives unwarranted errors for large values.
+      * Improved the mechanism for eliminating 'inline' on cc's that 
+        don't support it.
+      * Yet another tweak to t/9_lock.t, which has still had some 
+        "hang at state 23" errors on some smoke-testers' systems.
+
+0.59003 Nov 6 2009
+      * Fixed numerous C warnings in MMA.xs, that were revealed by 
+        smoke-test systems with more rigorous C compilers than gcc-x86.
+      * Tried to fix a problem under perl 5.6, wherein storing into 
+        UINT arrays gave unwarranted errors for values with the MS bit 
+        set.
+      * Removed -s option from 'which mm-config' command in Makefile.PL.
+        Some which'es don't implement -s.
+      * Restricted cc '-Os' option (optimize for size) to those systems 
+        that can handle it (e.g., gcc).
+      * Restricted 'inline' functions to compilers that can handle them.
+
+0.58001 Oct 23 2009
+      * Changed tests 5, 7, 8 to use /dev/urandom (or perl rand) rather 
+        than /dev/random to avoid entropy delays on newly-started Linux 
+        systems.  Thanks to Oliver Paukstadt for this suggestion.
+      * Extended final timeout in test 9 to accomodate heavily-loaded 
+        smoke-test systems.
+      * Reworked detection of mm library in Makefile.PL.  New version 
+        tries to balance the needs of smoke-testers vs. regular users.
+        Thanks to David Golden for his advice on this.
+      * Added license=>perl to Makefile.PL to make YAML reviewers happy
+
+0.58  Aug 15 2009
+      Included revised t/2_mmArray.t to try to fix 0.54 failure 
+      (inadvertently omitted from 0.55-57)
+
+0.57  Aug 13 2009
+      * Used Devel::PPPort to add ppport.h file to distribution
+      * Included (in C preprocessor sense) ppport.h in MMA.xs
+      * With help of script in ppport.h, defined two symbols in MMA.xs 
+        that make ppport.h define required "IS_NUMBER..." symbols when 
+        they're not provided by an older Perl
+      * Added prerequisite for latest version of ExtUtils::ParseXS, an 
+        attempt to avoid some nasty-looking warnings in 'make' step, 
+        that I had just battled through on my own system
+      * revised t/9_lock.t in response to FAIL on 0.56
+      * added Devel::CheckOS to distribution and Makefile.PL, to 
+        restrict IPC::MMA install to OSes that mm runs on
+      (Still no change to IPC::MMA itself since 0.54)
+
+0.56  Aug 11 2009:
+      Fixed some bad code in Makefile.PL of 0.55
+      It shouldn't have worked but it seemed to for me.  Forget 0.55!
+
+0.55  Aug 10 2009:
+      Tests changed to avoid some problems found by CPAN testers
+      Improved Makefile.PL to ask for mm library (to reduce UNKNOWN tests)
+      (No change to IPC::MMA)
+
+0.54  Feb 26 2009:
+      * Fixed boolean array operation on platforms with 64 bit integers
+      * Corrected the .pod docs some more
+
+0.53  Feb 23 2009:
+      * Fixed 2 bugs introduced with the "minor improvement" in 0.51:
+        ** the mm_sizeof routine wrongly computed when an allocated 
+           block could remain in place
+        ** mm_hash_store used its return value in the wrong polarity 
+      * Revised installation tests and the mm_alloc_size function
+        so that they should succeed on more platforms.  
+      * Also for CPAN testers, include Test::Warn as a prerequisite.
+      * Further tweaking of return values in functions that return lists.  
+      * Documentation updated in several places.
+
+0.52  Feb 15 2009: 
+      * Set cc Optimize flag in Makefile.PL to optimize (0.51 was 
+        set for debugging).
+      * Return empty lists for exceptional conditions in functions 
+        that return lists.
+
+0.51  Feb 14 2009: 
+      * Added use tags (:basic :scalar etc) to .pod doc.
+      * Minor improvement in keeping shared memory blocks in place,
+        when they don't have to be re-allocated.
+
+0.5   Feb 13 2009: New package with largely IPC::MM compatible names.
+      Retains direct call and tied interfaces for scalars and hashes.
+      Adds direct-call and tied array functions with multiple storage
+      types, including general purpose, signed and unsigned integer,
+      floating point, boolean, and fixed-length records
+      (a.k.a. maximum-length strings).
+
+      BTree functions are retained as aliases for Hash functions.
+      Hash functions return keys in sorted order, which was the
+      main difference of IPC::MM's BTree mode compared to Hash mode.

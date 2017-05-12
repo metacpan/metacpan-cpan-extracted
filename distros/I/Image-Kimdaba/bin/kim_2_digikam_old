@@ -1,0 +1,189 @@
+#!/usr/bin/perl -w
+# Copyright 2005 Jean-Michel Fayard jmfayard_at_gmail.com
+#
+#   This program is free software; you can redistribute it and/or
+#   modify it under the terms of the GNU General Public
+#   License as published by the Free Software Foundation; either
+#   version 2 of the License, or (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#   General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License
+#   along with this program; see the file COPYING.  If not, write to
+#   the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+#   Boston, MA 02111-1307, USA.
+
+# Changelog:
+#	17/01/2005  Initial version
+
+use strict;
+use Image::Kimdaba;
+
+my $folder=getRootFolder();
+parseDB( "$folder" );
+    # parse the xml file and create two hashes:
+    # %imageattributes	: HASH OF (url of the picture, REF. HASH OF (attribute, value) )
+    # %imageoptions	: HASH of (url, REF. HASH OF (optoin, REF. LIST OF value) )
+my $nb1= scalar keys %imageattributes;
+my $nb2= scalar keys %imageoptions;
+print "I've found $nb1 pictures with attributes, and $nb2 with options\n";
+
+open(SQL, ">$folder/kimdaba2digikam.sql") || die "Cannot write SQL file";
+my %dirs;
+my %images;
+&create_table;
+&dump_albums;
+&dump_tags;
+&dump_images;
+close(SQL);
+
+my $nb=0;
+$nb++ while (-e "$folder/digikam.db.$nb" );
+if (-e "$folder/digikam.db" ) {
+    print "Old digikam database saved to \'$folder/digikam.db.$nb\'\n";
+    rename "$folder/digikam.db","$folder/digikam.db.$nb";
+}
+open( SQLITE, "| sqlite $folder/digikam.db")
+|| die "You need the program sqlite to create a digikam database";
+print SQLITE ".read $folder/kimdaba2digikam.sql\n" ;
+print SQLITE ".quit\n";
+close( SQLITE );
+print "That's it, you can start digiKam\n";
+
+
+sub create_table
+{
+    print SQL  <<FIN    
+CREATE TABLE Albums (id INTEGER PRIMARY KEY,  url TEXT NOT NULL UNIQUE,  date DATE NOT NULL,  caption TEXT,  collection TEXT,  ignoreprops BOOLEAN,  icon TEXT);
+CREATE TABLE ImageTags (name TEXT NOT NULL,  dirid INTEGER NOT NULL,  tagid INTEGER NOT NULL,  UNIQUE (name, dirid,tagid));
+CREATE TABLE Images (name TEXT NOT NULL,  dirid INTEGER NOT NULL,  caption TEXT,  datetime DATETIME,  UNIQUE (name,dirid));
+CREATE TABLE Tags (id INTEGER PRIMARY KEY,  pid INTEGER,  name TEXT NOT NULL,  icon TEXT,  UNIQUE (name, pid));
+
+CREATE INDEX dir_index ON Images    (dirid);
+CREATE INDEX tag_index ON ImageTags (tagid);
+CREATE TRIGGER delete_album DELETE ON Albums
+BEGIN
+ DELETE FROM Images     WHERE dirid = old.id;
+ DELETE FROM ImageTags  WHERE dirid = old.id;
+END;
+CREATE TRIGGER delete_tag DELETE ON Tags
+BEGIN
+ DELETE FROM ImageTags WHERE tagid = old.id;
+ DELETE FROM Tags       WHERE pid   = old.id;
+END;
+FIN
+}
+
+sub esc
+{
+    my ($s) = @_;
+    $s =~ s/'/''/g;
+    return "'$s'";
+}
+sub dump_tags 
+{
+    my $image=0;
+
+print SQL<<FIN;    
+INSERT INTO Tags VALUES ( 1,  0, "Keywords",  'tag-events' );
+INSERT INTO Tags VALUES ( 2,  0, "Persons",  'tag-people' );
+INSERT INTO Tags VALUES ( 3,  0, "Locations",  'tag-places' );
+FIN
+    my %categories=(
+	    "Keywords"	=>  [ 1, 0, "Keywords",  "'tag-events'" ],
+	    "Persons"	=>  [ 2, 0, "Persons",   "'tag-people'" ],
+	    "Locations"	=>  [ 3, 0, "Locations", "'tag-places'" ]
+	    ); 
+    my %tags=();
+    my $id=4;
+    for my $url (keys %imageoptions) 
+    {
+	my $dir= base($url);
+	next if ($dir eq "'/'") ;
+	$dir	    = $dirs{ base($url) };
+	( my $filename =  $url  ) =~ s#^.*/## ;
+
+	my %options = %{ $imageoptions{$url} };
+	for my $option ( sort keys %options ) 
+	{
+	    unless (exists $categories{$option})
+	    {
+		$categories{$option} = [ $id, 0, $option, "''" ];
+print SQL "INSERT INTO Tags VALUES ( $id,  0, \'$option\',  '' ); \n";
+		$id++;
+	    }
+	    my $pid = $categories{$option}[0];
+		
+	    for my $tag (@{ $options{$option} } )
+	    {
+		my $tagid;
+		unless (exists $tags{"$option-$tag"})
+		{
+		    my $icon = $categories{$option}[3] ;
+		    $tags{"$option-$tag"} = $id;
+print SQL "INSERT INTO Tags VALUES ($id, $pid, ", esc($tag), ", $icon ) ;\n";
+		    $id++;
+		}
+		$tagid = $tags{"$option-$tag"};
+print SQL "INSERT  INTO ImageTags VALUES (",esc($filename),", $dir, $tagid);\n";		
+	    }	
+	}
+    }
+}
+sub dump_images
+{
+    my $image=0;
+    for my $url (keys %imageoptions) 
+    {
+	my $dir= base($url);
+	next if ($dir eq "'/'") ;
+	$dir	    = $dirs{ base($url) };
+	my $caption = $imageattributes{$url}{"label"} ;
+	my $date    = date( $url ) ;
+	( my $filename =  $url  ) =~ s#^.*/## ;
+print SQL "INSERT INTO Images VALUES ( ",esc($filename), ", $dir, ",esc($caption)," ,$date );\n" ;
+    }
+}
+
+
+sub dump_imagetags
+{
+
+}
+sub dump_albums
+{
+    my $id=1;
+    for my $url (keys %imageoptions) 
+    {
+	my $dir= base($url);
+	next if ($dir eq "'/'");	
+	unless (exists $dirs{$dir})
+	{
+	    my $date=date( $url );
+	    $dirs{$dir} = $id;
+print SQL "INSERT INTO Albums VALUES ( $id, $dir, $date, \"\", \"\", 0, \"\" );\n" ;
+	    $id++;
+	}
+    }
+}
+sub date()
+{
+    my ($url)=@_;
+    return "\'1970-01-01\'" unless (exists $imageattributes{$url} );
+    my $year=	$imageattributes{$url}{"yearFrom"};
+    my $month=	$imageattributes{$url}{"monthFrom"};
+    my $day=	$imageattributes{$url}{"dayFrom"};
+    return "\'$year-$month-$day\'";
+}
+sub base()
+{
+    my ($file)=@_;
+    my $res="'/'";
+    if ($file =~ m#(^.*)/#) {
+	$res=esc("/$1") ;
+    }
+    return $res
+}

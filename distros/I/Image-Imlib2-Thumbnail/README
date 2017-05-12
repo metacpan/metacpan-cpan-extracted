@@ -1,0 +1,98 @@
+NAME
+    Image::Imlib2::Thumbnail - Generate a set of thumbnails of an image
+
+SYNOPSIS
+      use Image::Imlib2::Thumbnail;
+      my $thumbnail = Image::Imlib2::Thumbnail->new();
+  
+      # generates a set of thumbnails for $source image in $directory
+      my @thumbnails = $thumbnail->generate( $source, $directory );
+      foreach my $thumbnail (@thumbnails) {
+        my $name = $thumbnail->{name};
+        my $width = $thumbnail->{width};
+        my $height = $thumbnail->{height};
+        my $type = $thumbnail->{type};
+        my $filename = $thumbnail->{filename};
+        my $mime_type = $thumbnail->{mime_type};
+        print "$name/$type/$mime_type is $width x $height at $filename\n";
+      }
+
+DESCRIPTION
+    This module generates a series of thumbnails of an image using
+    Image::Imlib2. If you want to generate a single thumbnail, you should
+    look at Image::Imlib2's create_scaled_image method.
+
+    Digital cameras take photos in many different sizes and aspect ratios.
+    Photo websites need to display thumbnails of different sizes of these
+    photos. This module makes it easy to generate a series of thumbnails of
+    an image of the right sizes. It resizes and crops images to match the
+    requires size.
+
+    What sizes does it generate? By default it generates thumbnails of the
+    same dimension that Flickr generates:
+
+      Type       Name       Width  Height
+      Landscape  Square     75     75
+      Landscape  Thumbnail  100    75
+      Landscape  Small      240    180
+      Landscape  Medium     500    375
+      Landscape  Large      1024   768
+      Portrait   Square     75     75
+      Portrait   Thumbnail  75     100
+      Portrait   Small      180    240
+      Portrait   Medium     375    500
+      Portrait   Large      768    1024
+
+    The test suite contains images of every size mentioned on the Wikipedia
+    "Digital camera" article:
+
+      http://en.wikipedia.org/wiki/Digital_camera#Image_resolution
+
+METHODS
+  new
+    The constructor:
+
+      my $thumbnail = Image::Imlib2::Thumbnail->new();
+
+  generate
+    Generates a set of thumbnails for $source image in $directory. Will also
+    include the original image:
+
+      my @thumbnails = $thumbnail->generate( $source, $directory );
+      foreach my $thumbnail (@thumbnails) {
+        my $name = $thumbnail->{name};
+        my $width = $thumbnail->{width};
+        my $height = $thumbnail->{height};
+        my $type = $thumbnail->{type};
+        my $filename = $thumbnail->{filename};
+        my $mime_type = $thumbnail->{mime_type};
+        print "$name/$type/$mime_type is $width x $height at $filename\n";
+      }
+
+  add_size
+    Add an extra size:
+
+      $thumbnail->add_size(
+          {   type    => 'landscape',
+              name    => 'header',
+              width   => 350,
+              height  => 200,
+              quality => 80,
+          }
+      );
+
+    If width or height are 0, then this retains the aspect ratio and
+    performs no cropping.
+
+    The quality is the JPEG quality compression ratio. This defaults to 75.
+
+AUTHOR
+    Leon Brocard, acme@astray.com
+
+COPYRIGHT
+    Copyright (c) 2007-8 Leon Brocard. All rights reserved.
+
+LICENSE
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

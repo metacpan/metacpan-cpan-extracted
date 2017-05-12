@@ -1,0 +1,260 @@
+=encoding utf8
+
+=head1 NAME
+
+IOMux::Handler::Read - any mux reader
+
+=head1 INHERITANCE
+
+ IOMux::Handler::Read
+   is a IOMux::Handler
+
+ IOMux::Handler::Read is extended by
+   IOMux::Bundle
+   IOMux::File::Read
+   IOMux::Net::TCP
+   IOMux::Pipe::Read
+
+=head1 SYNOPSIS
+
+  # only use extensions
+
+=head1 DESCRIPTION
+
+This base-class defines the interface which every reader offers.
+
+Extends L<"DESCRIPTION" in IOMux::Handler|IOMux::Handler/"DESCRIPTION">.
+ 
+=head1 METHODS
+
+Extends L<"METHODS" in IOMux::Handler|IOMux::Handler/"METHODS">.
+ 
+=head2 Constructors
+
+Extends L<"Constructors" in IOMux::Handler|IOMux::Handler/"Constructors">.
+ 
+=over 4
+
+=item IOMux::Handler::Read-E<gt>B<new>(%options)
+
+ -Option   --Defined in     --Default
+  fh         IOMux::Handler   <required>
+  name       IOMux::Handler   <stringified handle>
+  read_size                   32768
+
+=over 2
+
+=item fh => FILEHANDLE
+
+=item name => STRING
+
+=item read_size => INTEGER
+
+=back
+
+=item IOMux::Handler::Read-E<gt>B<open>($mode, $what, %options)
+
+Inherited, see L<IOMux::Handler/"Constructors">
+
+=back
+
+=head2 Accessors
+
+Extends L<"Accessors" in IOMux::Handler|IOMux::Handler/"Accessors">.
+ 
+=over 4
+
+=item $obj-E<gt>B<fh>()
+
+Inherited, see L<IOMux::Handler/"Accessors">
+
+=item $obj-E<gt>B<fileno>()
+
+Inherited, see L<IOMux::Handler/"Accessors">
+
+=item $obj-E<gt>B<mux>()
+
+Inherited, see L<IOMux::Handler/"Accessors">
+
+=item $obj-E<gt>B<name>()
+
+Inherited, see L<IOMux::Handler/"Accessors">
+
+=item $obj-E<gt>B<readSize>( [$integer] )
+
+The number of bytes requested at each read.
+
+=item $obj-E<gt>B<usesSSL>()
+
+Inherited, see L<IOMux::Handler/"Accessors">
+
+=back
+
+=head2 User interface
+
+Extends L<"User interface" in IOMux::Handler|IOMux::Handler/"User interface">.
+ 
+=head3 Connection
+
+Extends L<"Connection" in IOMux::Handler|IOMux::Handler/"Connection">.
+ 
+=over 4
+
+=item $obj-E<gt>B<close>( [$callback] )
+
+Inherited, see L<IOMux::Handler/"Connection">
+
+=item $obj-E<gt>B<timeout>( [$timeout] )
+
+Inherited, see L<IOMux::Handler/"Connection">
+
+=back
+
+=head3 Reading
+
+=over 4
+
+=item $obj-E<gt>B<readline>($callback)
+
+Read a single line (bytes upto a LF or CRLF). After the whole line
+has arrived, the $callback will be invoked with the received line as
+parameter. that line is terminated by a LF (\n), even when the file
+contains CRLF or CR endings.
+
+At end of file, the last fragment will be returned.
+
+=item $obj-E<gt>B<slurp>($callback)
+
+Read all remaining data from a resource. After everything has been
+read, it will be returned as SCALAR (string reference)
+
+example: 
+
+  my $pwd  = $mux->open('<', '/etc/passwd');
+  my $data = $pwd->slurp;
+  my $size = length $$data;
+
+=back
+
+=head2 Multiplexer
+
+Extends L<"Multiplexer" in IOMux::Handler|IOMux::Handler/"Multiplexer">.
+ 
+=head3 Connection
+
+Extends L<"Connection" in IOMux::Handler|IOMux::Handler/"Connection">.
+ 
+=over 4
+
+=item $obj-E<gt>B<muxInit>( $mux, [$handler] )
+
+Inherited, see L<IOMux::Handler/"Connection">
+
+=item $obj-E<gt>B<muxRemove>()
+
+Inherited, see L<IOMux::Handler/"Connection">
+
+=item $obj-E<gt>B<muxTimeout>()
+
+Inherited, see L<IOMux::Handler/"Connection">
+
+=back
+
+=head3 Reading
+
+Extends L<"Reading" in IOMux::Handler|IOMux::Handler/"Reading">.
+ 
+=over 4
+
+=item $obj-E<gt>B<muxEOF>($input)
+
+This is called when an end-of-file condition is present on the handle.
+Like L<muxInput()|IOMux::Handler::Read/"Reading">, it is also passed a reference to the input
+buffer. You should consume the entire buffer or else it will just be lost.
+
+=item $obj-E<gt>B<muxExceptFlagged>($fileno)
+
+Inherited, see L<IOMux::Handler/"Reading">
+
+=item $obj-E<gt>B<muxInput>($buffer)
+
+Called when new input has arrived on the input. It is passed a
+B<reference> to the input $buffer. It must remove any input that
+it you have consumed from the $buffer, and leave any partially
+received data in there.
+
+example: 
+
+  sub muxInput
+  {   my ($self, $inbuf) = @_;
+
+      # Process each whole line in the input, leaving partial
+      # lines in the input buffer for more.
+      while($$inbuf =~ s/^(.*?)\r?\n// )
+      {   $self->process_command($1);
+      }
+  }
+
+=item $obj-E<gt>B<muxReadFlagged>($fileno)
+
+Inherited, see L<IOMux::Handler/"Reading">
+
+=back
+
+=head3 Writing
+
+Extends L<"Writing" in IOMux::Handler|IOMux::Handler/"Writing">.
+ 
+=over 4
+
+=item $obj-E<gt>B<muxWriteFlagged>($fileno)
+
+Inherited, see L<IOMux::Handler/"Writing">
+
+=back
+
+=head3 Service
+
+Extends L<"Service" in IOMux::Handler|IOMux::Handler/"Service">.
+ 
+=head2 Helpers
+
+Extends L<"Helpers" in IOMux::Handler|IOMux::Handler/"Helpers">.
+ 
+=over 4
+
+=item $obj-E<gt>B<extractSocket>(HASH)
+
+=item IOMux::Handler::Read-E<gt>B<extractSocket>(HASH)
+
+Inherited, see L<IOMux::Handler/"Helpers">
+
+=item $obj-E<gt>B<fdset>($state, $read, $write, $error)
+
+Inherited, see L<IOMux::Handler/"Helpers">
+
+=item $obj-E<gt>B<show>()
+
+Inherited, see L<IOMux::Handler/"Helpers">
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of IOMux distribution version 1.00,
+built on November 11, 2015. Website: F<http://perl.overmeer.net/>
+All modules in this suite:
+L</Any::Daemon>,
+L</IOMux>, and
+L</IOMux::HTTP>.
+
+Please post questions or ideas to F<perl@overmeer.net>
+
+=head1 LICENSE
+
+Copyrights 2011-2015 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

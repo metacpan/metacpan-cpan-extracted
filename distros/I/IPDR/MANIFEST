@@ -1,0 +1,16 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+ipdr.pdf
+lib/IPDR.pm
+lib/IPDR/Collection/Client.pm
+lib/IPDR/Collection/CiscoSSL.pm
+lib/IPDR/Collection/Cisco.pm
+examples/pubhostcert.pem
+examples/pubhostkey.pem
+examples/generic_collect_tcp_reconnect.pl
+examples/new_cisco_collect_tcp.pl
+examples/new_cisco_collect_tcp_ssl.pl
+t/64bitTest.t

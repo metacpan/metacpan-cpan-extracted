@@ -1,0 +1,29 @@
+---
+abstract: unknown
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Inline-Ruby
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Inline::Ruby:
+    file: Ruby.pm
+    version: '0.07'
+requires:
+  Inline: '0.42'
+  perl: '5.008'
+resources:
+  repository: git://github.com/shlomif/Inline-Ruby.git
+version: '0.07'

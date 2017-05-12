@@ -1,0 +1,9 @@
+requires 'IO::Async', '>= 0.70';
+requires 'Linux::FD', '>= 0.011';
+requires 'curry', '>= 1.000';
+requires 'mro', '>= 1.00';
+
+on 'test' => sub {
+	requires 'Test::Fatal', 0;
+	requires 'Test::More', '>= 0.98';
+};

@@ -1,0 +1,103 @@
+=head1 NAME
+
+Inline::Select - Dynamic selection of ILSM for a package
+
+
+=head1 SYNOPSIS
+
+  use Inline::Select::Register (
+     PACKAGE => 'Calc',
+     Inline => [ Perl => sub {require 't/Calc.pm'} ]
+  ) ;
+  use Inline::Select::Register (
+     PACKAGE => 'Calc',
+     Inline => [ CPP => 't/Calc.cpp' ]
+  ) ;
+  use Inline::Select::Register (
+     PACKAGE => 'Calc',
+     Inline => [ Java => 't/Calc.java' ]
+  ) ;
+  use Inline::Select::Register (
+     PACKAGE => 'Calc',
+     Inline => [ Python => 't/Calc.py' ]
+  ) ;
+
+  use Inline::Select (
+     PACKAGE => 'Calc',
+     Inline => $ARGV[0] # one of 'Perl', 'CPP', 'Java', 'Python'
+  ) ;
+
+  my $c = new Calc() ;
+  ok($c->add(2, 3), 5) ;
+
+
+=head1 DESCRIPTION
+
+C<Inline::Select> provides an easy way to select between implementations of
+an API written in different programming languages. The original idea is to
+use your existing the Perl test suite to test the implementations in the 
+other languages.
+
+=head1 USAGE
+
+Usage of C<Inline::Select> is pretty simple. For each programming language, 
+you must speficy a 'use Inline::Select::Register' (or 
+Inline::Select->register() at runtime) statement to register the use of
+C<Inline> for that language. All the Inline parameters are saved and that 
+C<Inline> block will only be evaluated if that language is selected later on.
+
+When you are done registering C<Inline> blocks, you then spefify a 
+'use Inline::Select' (or Inline::Select->bind() at runtime) to actually load
+(in the caller package) the C<Inline> block for the selected language.
+
+
+=head1 C<Inline::Select::Register> CONFIGURATION OPTIONS
+
+=over 4
+
+=item PACKAGE
+
+The C<PACKAGE> option is used to associate the different 
+'use Inline::Select::Register' and 'use Inline::Select' declarations together.
+
+=item Inline
+
+The C<Inline> option is an ARRAY reference that contains the parameters that will
+be passed to 'use Inline' if that language is selected. 
+
+However, there is one exception to this rule. If the first element if the array
+matches /perl/i, the second element must be a CODE reference that will be used 
+to load the Perl code.
+
+=back
+
+
+=head1 C<Inline::Select> CONFIGURATION OPTIONS
+
+=over 4
+
+=item PACKAGE
+
+The C<PACKAGE> option is used to associate the different 
+'use Inline::Select::Register' and 'use Inline::Select' declarations together.
+
+=item Inline
+
+The C<Inline> option is SCALAR that specifies contains the selected language.
+
+=back
+
+
+=head1 AUTHOR
+
+Patrick LeBoutillier, E<lt>patl@cpan.orgE<gt>
+
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2005 by Patrick LeBoutillier
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+=cut

@@ -1,0 +1,16 @@
+Revision history for Perl extension IPC::ScoreBoard.
+
+0.05  Sat Jun 26 18:48:21 CEST 2010
+      - yet another try to do the right check for atomic operations
+      	special check for bsd-386
+
+0.03  Wed Jun 23 08:57:45 CEST 2010
+      - another try to do the right check for atomic operations
+
+0.02  Tue Jun 22 11:54:22 CEST 2010
+      - add util/check.c to check if long long atomics are available
+
+0.01  Tue Jun  8 14:51:45 2010
+	- original version; created by h2xs 1.23 with options
+		-A -b 5.8.8 -n IPC::ScoreBoard
+

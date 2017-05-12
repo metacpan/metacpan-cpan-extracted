@@ -1,0 +1,6 @@
+Revision history for Perl extension Imager::Chart::Radial.
+
+0.01  Sun Mar 16 00:06:31 2003
+	- original version; created by h2xs 1.21 with options
+		-X Imager::Chart::Radial
+

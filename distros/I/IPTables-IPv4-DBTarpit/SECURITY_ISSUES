@@ -1,0 +1,137 @@
+From coreteam@netfilter.org Sat Aug  2 16:33:41 2003
+Date: Sat, 2 Aug 2003 16:33:41 +0200
+To: Netfilter Announcement List 
+Cc: vendor-sec@lst.de, bugtraq@securityfocus.com, lwn@lwn.net
+Subject: [SECURITY] Netfilter Security Advisory: Conntrack list_del() DoS
+
+                  Netfilter Core Team Security Advisory
+                  
+                           CVE: CAN-2003-0187
+
+Subject:
+
+  Netfilter / Connection Tracking Remote DoS
+
+Released:
+
+  01 Aug 2003
+
+Effects:
+
+  Any remote user may be able to DoS a machine with netfilter connection
+  tracking when running a specific version of the Linux kernel.
+
+Estimated Severity:
+  High.
+
+Systems Affected:
+
+  Linux 2.4.20 kernels (kernels <= 2.4.19 and >= 2.4.21 NOT affected)
+  CONFIG_IP_NF_CONNTRACK enabled, or the ip_conntrack module loaded.
+
+Solution:
+
+  BEST: Upgrade to Linux kernels 2.4.21 (stable), or apply the patch below.
+
+  OR: Do not use connection tracking on 2.4.20 based systems.
+
+Details:
+
+  The 2.4.20 kernel introduced a change in the behaviour of the generic
+  linked list support.  The connection tracking core relies on the old
+  behaviour to identify 'UNCONFIRMED' connections.  
+  
+  'UNCONFIRMED' means we've seen traffic only in one direction, but not
+  in the other.  Since connection tracking was unable to identify such
+  connections correctly anymore, they've been assigned a very high
+  timeout.
+
+
+Date: Sat, 2 Aug 2003 16:34:17 +0200
+From: Netfilter Core Team 
+To: Netfilter Announcement List 
+Cc: vendor-sec@lst.de, bugtraq@securityfocus.com, lwn@lwn.net
+Subject: [SECURITY] Netfilter Security Advisory: NAT Remote DOS (SACK
+mangle)
+
+                  Netfilter Core Team Security Advisory
+                  
+                           CVE: CAN-2003-0467
+
+Subject:
+
+  Netfilter / NAT Remote DoS
+
+Released:
+
+  01 Aug 2003
+
+Effects:
+
+  Under limited circumstances, a remote user may be able to crash a
+  machine doing Network Address Translation (NAT).
+
+Estimated Severity:
+
+  Medium.
+
+Systems Affected:
+
+  Linux 2.4.20 kernels and recent 2.5 kernels with
+  CONFIG_IP_NF_NAT_FTP or CONFIG_IP_NF_NAT_IRC enabled, or the
+  ip_nat_ftp or ip_nat_irc modules loaded, on which ftp and irc users
+  are not packet filtered out.
+
+Solution:
+
+  BEST: Upgrade to Linux kernels 2.4.21 (stable), or apply the patch below.
+
+  OR: As a workaround, the modules can be removed, or iptables can
+  be used to block untrusted users from initiating ftp or irc
+  connections through the NAT machine.
+
+Details:
+
+  This was verified by Rusty Russell on 2.4.20, and verified fixed
+  with this patch.
+
+Vendor Statement:
+
+  Red Hat: All of the 2.4.20-based kernels shipped by Red Hat already
+           contain the patch and are not vulnerable to this issue.
+  Others:  unknown
+
+
+----------------------------------------------------------------------
+               Cartel Sécurité --- Security Advisory
+
+Advisory Number: CARTSA-20020402
+Subject:         Linux Netfilter NAT/ICMP code information leak
+Author:		 Philippe Biondi 
+Discovered:      2002, April 2
+Published:       Not yet
+----------------------------------------------------------------------
+
+NOTE: Do not release in public before May 8, 2002.
+
+Problem description
+===================
+
+The following bug exists in the netfilter NAT implementation: When the
+first packet of a connection is hitting a NAT rule, and this packet
+causes the NAT box itself to reply with an ICMP error message, the
+inner IP packet inside the ICMP error message is not un-NAT'ed
+correctly.  This leads to the ability to discover which ports of a
+host are NATed and where the packet will really go. This can also lead to
+those ICMP error packets being dropped by stateful firewalls not
+recognizing
+the related connection.
+
+
+Vulnerable versions
+===================
+
+All kernel patches from iptables package < ipables-1.2.6a are vulnerable.
+All versions of kernel >= 2.4.4 and up to (at least) 2.4.19-pre6 use a
+vulnerable version.
+

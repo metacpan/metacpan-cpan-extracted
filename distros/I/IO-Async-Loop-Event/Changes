@@ -1,0 +1,8 @@
+Revision history for IO-Async-Loop-Event
+
+0.02    CHANGES:
+         * Croak on unrecognised signal names, because Event on Solaris for
+           some reason doesn't check them
+
+0.01    First version, released on an unsuspecting world.
+

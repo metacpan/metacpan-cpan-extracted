@@ -1,0 +1,4 @@
+
+apt-get install gcc build-essential libxml-perl libexpat1-dev libssl-dev
+
+cpan Module::Build Test::Harness Test::Pod Devel::Symdump Test::Pod::Coverage Test::Cmd XML::NamespaceSupport XML::SAX XML::SAX::Expat XML::Parser XML::Simple Crypt::SSLeay Term::ReadKey Data::UUID Module::Starter Compress::Zlib HTML::Tagset HTML::Parser LWP::UserAgent Test::TAP::Model Method::Alias YAML

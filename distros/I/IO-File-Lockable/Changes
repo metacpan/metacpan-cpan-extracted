@@ -1,0 +1,25 @@
+Revision history for Perl extension IO::File::Lockable.
+
+0.34 - 2007/05/11
+	* fixed problem on cygwin, thanks to Eric Rybski.
+0.31 - 2004/07/16
+	* fixed pod
+0.30 - 2004/07/16
+	* create base class IO::File::Lockable.
+	* The base class of IO::File::flock is changed into IO::File::Lockable.
+	* adding IO::File::fctrl.
+
+** IO::File::flock
+0.10 - 2004/04/26
+	* Fixed issue with the alerm cleared when a file opened.
+0.09 - 2003/08/04
+	* any bug fixed and fixed methods arguments.
+0.06 -  2003/06/09
+	* open mode '+<' then lock_sh -> lock_ex
+0.05 - 2003/02/25
+	* document rewrite.
+0.04 - 2003/02/21
+	* bug fix
+	* add timeout parameter
+0.03 - 2003/02/21
+	* beta release

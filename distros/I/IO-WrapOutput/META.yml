@@ -1,0 +1,28 @@
+---
+abstract: 'Wrap your output filehandles with minimal fuss'
+author:
+  - 'Hinrik Örn Sigurðsson <hinrik.sig@gmail.com>'
+build_requires:
+  Test::More: 0.61
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200006, CPAN::Meta::Converter version 2.110440'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: IO-WrapOutput
+no_index:
+  directory:
+    - t
+    - utils
+requires:
+  perl: 5.006
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=IO-WrapOutput
+  homepage: http://search.cpan.org/dist/IO-WrapOutput/
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/hinrik/io-wrapoutput.git
+version: 0.07
+x_authority: cpan:HINRIK

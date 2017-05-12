@@ -1,0 +1,6 @@
+Revision history for Perl extension Ipmitool.
+
+0.01  Sat Jan 23 13:49:02 2010
+	- original version; created by h2xs 1.23 with options
+		-XA -n Ipmitool
+

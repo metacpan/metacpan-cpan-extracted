@@ -1,0 +1,13 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Iterator-DBI
+version:      0.02
+version_from: DBI.pm
+installdirs:  site
+requires:
+    Exception::Class:              1.21
+    Iterator:                      0.01
+    Test::Simple:                  0.40
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

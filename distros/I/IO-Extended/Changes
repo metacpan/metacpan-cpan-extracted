@@ -1,0 +1,47 @@
+Revision history for Perl extension IO::Extended.
+
+0.01  Tue Feb 20 15:39:58 2001
+	- original version; created by h2xs 1.20 with options
+		-A -X -a -n IO::Extended
+
+0.02 22.06.2001 00:52
+	- deleted test1.pl
+	- README added to MANIFEST
+
+0.03 13.05.2002 18:25
+	- now ind() "history" is only collecting changing values
+
+		.i.e. 0 1 1 1 1 1 2 2 2 3 3 3 3 3
+
+			becomes
+
+			  0 1 2 3
+
+	- ind() "history" fix also fixes some misbehaviour|bug of indb()
+
+0.04 22.06.2002 18:40
+	- some changes in the documentation
+
+0.05 22.06.2002 18:49
+	- some changes in the documentation
+	
+0.06 20.07.2003 12:00
+        - added warnfln and diefln
+        - fixed a bug in test.pl
+
+0.07 23.01.2004 08:00
+	- [EXPERIMENTAL] added format feature: %S in the format string will get
+        translated to '%s'. It should help writing
+
+         printfln "Your given string %S is broken.", $string;
+
+        $string could contains confusing whitespaces, for example.
+
+0.11 09.05.2006 08:00
+	- added indreset()
+
+0.15
+        - small bug indstr() was not qualified in IO::Handle package 
+
+0.16	
+	- support for %-34S extra format identifiers

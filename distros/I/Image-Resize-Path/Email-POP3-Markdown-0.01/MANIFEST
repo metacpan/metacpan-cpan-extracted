@@ -1,0 +1,14 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+dist.ini
+lib/Image/Resize/Path.pm
+t/00_use.t
+t/01_accessors.t
+t/02_public_methods.t
+t/03_resize_test_images.t
+test_data/dest/test_dir
+test_data/test.gif
+test_data/test.jpg
+test_data/test.png

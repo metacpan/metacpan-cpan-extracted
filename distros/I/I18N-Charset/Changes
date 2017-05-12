@@ -1,0 +1,219 @@
+2015-02-02  Kingpin  <Martin@EV-9D9>
+
+	* lib/I18N/Charset.pm: removed 'use blib' (no idea why it was in here)
+
+2011-10-31  Kingpin  <Martin@BLUEMAX>
+
+	* lib/I18N/Charset.pm (_init_data): new IANA charset list
+
+2010-11-06  Kingpin  <Martin@BLUEMAX>
+
+	* lib/I18N/Charset.pm (_init_data): new IANA charset list (one new charset defined)
+
+2010-09-17  Kingpin  <Martin@BLUEMAX>
+
+	* lib/I18N/Charset.pm (_init_data): new IANA charset list (one new charset defined)
+
+2008-07-05  Kingpin  <Martin@BLUEMAX>
+
+	* lib/I18N/Charset.pm: overhauled the U::Map8 initialization
+	(_init_data_extra): added aliases listed in RT#18802
+
+2008-02-15    <Daddy@C-3PO>
+
+	* lib/I18N/Charset.pm: initialize also from Unicode::Map8 .bin files
+
+2007-05-18    <Daddy@C-3PO>
+
+	* lib/I18N/Charset.pm (mib_charset_name): added pod
+
+2007-05-17    <Daddy@C-3PO>
+
+	* lib/I18N/Charset.pm (_init_data): new char-sets document from IANA (maybe no net change, just re-ordered?)
+	(mib_charset_name): added pod
+
+2006-12-08    <Daddy@C-3PO>
+
+	* lib/I18N/Charset.pm (_init_data): new IANA charset list (three new charsets defined)
+
+2006-05-02    <Daddy@C-3PO>
+
+	* lib/I18N/Charset.pm (_init_data): fix typo in IANA website
+
+2005-11-12    <Daddy@C-3PO>
+
+	* t/*.t: stop using deprecated IO::Capture::ErrorMessages
+
+2005-08-31    <Daddy@C-3PO>
+
+	* lib/I18N/Charset.pm (_strip): do not pollute IANA charset list with Unicode::Map charset names
+
+2005-01-29  Kingpin  <mthurn@verizon.net>
+
+	* lib/I18N/Charset.pm (_init_data): new IANA charset list (only comments changed)
+
+2004-10-25  Kingpin  <mthurn@verizon.net>
+
+	* lib/I18N/Charset.pm (_init_data_extra): added aliases for Encode;
+	fixed some typos in debug messages
+
+2004-02-10  Kingpin  <mthurn@verizon.net>
+
+	* lib/I18N/Charset.pm (_init_data): undo bug in IANA's document
+	(_init_data_extra): undo our workaround
+
+2004-02-07  Kingpin  <mthurn@verizon.net>
+
+	* t/bug1.t: skip if Encode is not installed
+
+	* lib/I18N/Charset.pm: new IANA document (one alias added)
+
+2004-01-30  Kingpin  <mthurn@verizon.net>
+
+	* lib/I18N/Charset.pm (_init_data): new IANA document (typos fixed)
+
+2004-01-24  Kingpin  <mthurn@verizon.net>
+
+	* lib/I18N/Charset.pm (_init_data): new IANA document (5 new charsets)
+
+2004-01-15  Kingpin  <mthurn@verizon.net>
+
+	* lib/I18N/Charset.pm (enco_charset_name): BUGFIX: encoding names were not initialized sometimes
+
+2003-03-28  Kingpin  <mthurn@megapipe.net>
+
+	* t/enco.t: new file
+
+	* lib/I18N/Charset.pm (enco_charset_name): new methods for Encode encoding names
+
+2002-10-11  Kingpin  <mthurn@copper.dulles.tasc.com>
+
+	* t/libi.t: use App::Info::Lib::Iconv instead of File::Which
+
+	* lib/I18N/Charset.pm: check iconv version before running it
+	(libi_charset_name): load iconv tables not at startup, but only when needed
+
+2002-10-10  Kingpin  <mthurn@copper.dulles.tasc.com>
+
+	* lib/I18N/Charset.pm: make sure iconv exists before executing it
+
+	* t/libi.t: new test file
+
+	* lib/I18N/Charset.pm (libi_charset_name): added support for iconv names
+
+2002-10-07  Kingpin  <mthurn@copper.dulles.tasc.com>
+
+	* t/utf8.t: typo, and require Unicode::MapUTF8 version 1.09
+
+2002-10-02  Kingpin  <mthurn@copper.dulles.tasc.com>
+
+	* lib/I18N/Charset.pm (_init_data): new charset list from IANA
+
+	* t/iana.t: two new tests for new data
+
+2002-09-05  Kingpin  <mthurn@copper.dulles.tasc.com>
+
+	* lib/I18N/Charset.pm: new function mime_charset_name()
+
+2002-08-09  Kingpin  <mthurn@copper.dulles.tasc.com>
+
+	* lib/I18N/Charset.pm (_init_data): use IO::String instead of __DATA__ mechanism
+
+2002-06-17  Kingpin  <mthurn@copper.dulles.tasc.com>
+
+	* lib/I18N/Charset.pm: new charset list from IANA
+
+2002-05-29  Kingpin  <mthurn@copper.dulles.tasc.com>
+
+	* lib/I18N/Charset.pm: new charset list from IANA
+
+2002-05-01  Kingpin  <mthurn@copper.dulles.tasc.com>
+
+	* lib/I18N/Charset.pm: added support for Unicode::MapUTF8
+	* updated several of the tests
+
+2002-04-15  Kingpin  <mthurn@copper.dulles.tasc.com>
+
+	* lib/I18N/Charset.pm: new IANA charset list
+
+2002-02-07  Kingpin  <mthurn@copper.dulles.tasc.com>
+
+	* lib/I18N/Charset.pm (short_to_mib): short-circuit on positive answer
+	(body): BUGFIX for processing Unicode::Map's REGISTRY
+
+2002-02-05  Kingpin  <mthurn@copper.dulles.tasc.com>
+
+	* t/utf8.t: new file
+
+	* t/umap.t: now uses Test::More
+
+	* t/map8.t: now uses Test::More
+
+	* t/mib.t: new file
+
+	* lib/I18N/Charset.pm (mib_to_charset_name): renamed function
+
+2002-01-10  Kingpin  <mthurn@copper.dulles.tasc.com>
+
+	* lib/I18N/Charset.pm (charset_name_to_mib): new function (thanks to François)
+
+2001-11-30  Kingpin  <mthurn@copper.dulles.tasc.com>
+
+	* lib/I18N/Charset.pm (strip): localize $/
+
+2001-09-04  Kingpin  <mthurn@copper.dulles.tasc.com>
+
+	* lib/I18N/Charset.pm (strip): handle whitespace in blank lines of Unicode::Map/REGISTRY
+
+2001-08-24  Kingpin  <mthurn@tasc.com>
+
+	* lib/I18N/Charset.pm: new IANA charset list
+
+2001-06-05  Kingpin  <mthurn@tasc.com>
+
+	* 1.09 released
+
+2001-06-04  Kingpin  <mthurn@tasc.com>
+
+	* lib/I18N/Charset.pm: new IANA charset list in __DATA__; update code & tests to match
+
+2001-04-19  Kingpin  <mthurn@tasc.com>
+
+	* lib/I18N/Charset.pm: removed some incorrect aliases (thanks to Liam Quinn)
+
+2001-03-08  Kingpin  <mthurn@tasc.com>
+
+	* 1.07 released
+
+2001-03-07  Kingpin  <mthurn@tasc.com>
+
+	* README: mention maputf8 tests are skipped
+
+	* lib/I18N/Charset.pm (try_list): be more forgiving during ALL lookups
+
+2001-03-06  Kingpin  <mthurn@tasc.com>
+
+	* 1.06 released
+
+2001-03-05  Kingpin  <mthurn@tasc.com>
+
+	* lib/I18N/Charset.pm: added support for Unicode::Map
+
+2001-01-08  Kingpin  <mthurn@tasc.com>
+
+	* 1.05 released (fixed pod)
+
+1999-07-09  Kingpin  <mthurn@tasc.com>
+
+	* 1.03 released (no code changes, just cleaned up the distribution)
+
+1998-07-29  Kingpin  <mthurn@tasc.com>
+
+	* 1.02 tests don't complain if Unicode::Map8 is not installed;
+		a few tiny documentation changes
+
+1998-07-16  Kingpin  <mthurn@tasc.com>
+
+	* 1.01 first released version
+
+

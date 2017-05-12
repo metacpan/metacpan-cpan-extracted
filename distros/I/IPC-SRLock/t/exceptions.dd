@@ -1,0 +1,6 @@
+do { my $x = {
+       'cvrsnica-freebsd-101.herceg.de' => '23ecac40-d03c-11e5-9846-d09bfbd2507e',
+       'virtua.com.br' => 'efe5df0c-7095-11e6-b0d4-db1a5d222160'
+     };
+  $x;
+ }

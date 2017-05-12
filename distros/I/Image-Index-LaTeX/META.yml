@@ -1,0 +1,23 @@
+--- #YAML:1.0
+name:               Image-Index-LaTeX
+version:            0.01
+abstract:           Create an image index document using LaTeX
+author:
+    - Tom Kirchner <tk@local>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    File::Find:   0
+    Image::Size:  0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

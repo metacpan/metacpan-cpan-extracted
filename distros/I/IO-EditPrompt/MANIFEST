@@ -1,0 +1,21 @@
+.gitignore
+Changes
+lib/IO/EditPrompt.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/00.load.t
+t/new.t
+t/private_create_tmp_file.t
+t/private_format_prompt.t
+t/private_get_output.t
+t/private_normalize_editor.t
+t/prompt.t
+xt/critic.t
+xt/hasversion.t
+xt/minimumversion.t
+xt/pod.t
+xt/podcoverage.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

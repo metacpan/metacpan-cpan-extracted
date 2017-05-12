@@ -1,0 +1,13 @@
+Revision history for Perl extension MM.
+
+0.01  Sun Jul 11 11:43:57 1999
+	- original version; created by h2xs 1.18
+
+0.02  Sun Jul 16 11:24:51 2000
+	- patch from Matthew Reimer <mreimer@vpop.net>; adds hashes
+
+0.03  Fri Aug 11 1:14:11 2000
+	- patch from Matthew Reimer <mreimer@vpop.net>; includes documentation
+          and a bug fix that makes mm_lock() and mm_unlock() work
+	- replaced deprecated sv_* with recommended PL_sv_*
+

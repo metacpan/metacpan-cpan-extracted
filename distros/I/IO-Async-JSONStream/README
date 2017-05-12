@@ -1,0 +1,75 @@
+NAME
+    `IO::Async::JSONStream' - send or receive lines of JSON data in
+    `IO::Async'
+
+SYNOPSIS
+     use IO::Async::JSONStream;
+
+     use IO::Async::Loop;
+     my $loop = IO::Async::Loop->new;
+
+     my $jsonstream = IO::Async::JSONStream->new;
+     $loop->add( $jsonstream );
+
+     $jsonstream->connect(
+        host    => "my.server",
+        service => 12345,
+     )->then( sub {
+        $jsonstream->write_json( [ data => { goes => "here" } ] );
+        $jsonstream->read_json
+     })->on_done( sub {
+        my ( $data ) = @_;
+
+        print "Received the data $data\n";
+     })->get;
+
+DESCRIPTION
+    This subclass of IO::Async::Stream implements a simple JSON-encoded data
+    stream, sending and receiving Perl data structures by JSON-encoded lines
+    of text.
+
+EVENTS
+    The following events are invoked, either using subclass methods or CODE
+    references in parameters:
+
+  on_json $data
+    Invoked when a line of JSON-encoded data is received. It is passed the
+    decoded data as a regular Perl data structure.
+
+  on_json_error $error
+    Invoked when a line is received but JSON decoding fails. It is passed
+    the failure exception from the JSON decoder.
+
+PARAMETERS
+    The following named parameters may be passed to `new' or `configure':
+
+    on_json => CODE
+    on_json_error => CODE
+            CODE references for event handlers.
+
+    eol => STRING
+            Optional. Sets the string used for the line ending on the stream
+            when writing JSON. Defaults to `\n' if not given.
+
+METHODS
+  $jsonstream->write_json( $data, %args )
+    Writes a new line of JSON-encoded data from the given Perl data
+    structure.
+
+    Other arguments are passed to the `write' method. Returns a `Future'
+    which will complete when the line is flushed.
+
+  $jsonstream->read_json ==> $data
+    Returns a Future that will yield the next line of JSON-encoded data to
+    be read from the stream. This takes place instead of the `on_json'
+    event.
+
+    If a JSON decoding error occurs it will result in a failed Future with
+    the operation name `json' and the line on which decoding failed as its
+    argument.
+
+AUTHOR
+    Paul Evans <leonerd@leonerd.org.uk>
+
+    Incremental parsing support added by Frew Schmidt
+

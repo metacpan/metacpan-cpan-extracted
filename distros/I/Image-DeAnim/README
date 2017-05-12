@@ -1,0 +1,29 @@
+Image::DeAnim
+
+Tired of all those animated GIF images that cause your browser to
+freak out and your machine to slow down?  Image::DeAnim, when used
+with a proxy server, will stop GIF animation.
+
+INSTALLATION
+
+The regular
+
+    perl Makefile.PL
+    make
+    make install
+
+should work.  "make test" should also work, except there isn't a test suite.
+
+PROXY SERVICE
+
+This module does not provide the proxy server, you'll need your own.
+I personally use a derivitave of the proxy server available at
+
+    http://language.perl.com/misc/abiprox/
+
+This module probably isn't of much use without proxy service, but if
+someone comes up with a new use, I'd be curious to hear about it.
+
+
+Ken MacFarlane, <ksm+cpan@universal.dca.net>
+

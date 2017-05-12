@@ -1,0 +1,130 @@
+0.9.11  2017-01-13 (PERLANCAR)
+
+        - Introduce !none encoding.
+
+        - [Experimental] Allow '~' first character of value to implicitly turn
+          on !path encoding. This is to avoid a potentially common trap because
+          a configuration often contains paths. To disable path encoding
+          interpretation of '~foo', one can quote using double quote, e.g.
+          "~foo" or use the newly introduced !none encoding.
+
+
+0.9.10  2016-02-24 (PERLANCAR)
+
+	- [Experimental] Introduce encodings !path and !paths which are
+	  literal string/array of strings but with some
+	  substitution/wildcard expansion.
+
+
+0.9.9   2015-03-18 (PERLANCAR)
+
+        - Be more strict about directive line: it must not be indented
+          (otherwise it becomes a normal comment line).
+
+        - Fix wordings and minor updates.
+
+
+0.9.8   2015-01-03 (PERLANCAR)
+
+	- No spec changes.
+
+	- Rebuild (Generate TODO.md).
+
+
+0.9.7    2014-09-18 (PERLANCAR)
+
+         - No spec changes.
+
+         - Wording and fix example for !merge.
+
+
+0.9.6    2014-08-28 (PERLANCAR)
+
+         - For convenience, allow value that starts with '[' and '{' to be
+           interpreted as JSON (array and hash, respectively).
+
+
+0.9.5    2014-08-18 (SHARYANTO)
+
+         - Fix grammars and typos.
+
+         - Officially allow bang-only directive ('!foo').
+
+
+0.9.4    2014-08-18 (SHARYANTO)
+
+         - No spec changes.
+
+         - Tweak Abstract.
+
+         - Fix typo.
+
+
+0.9.3    2014-08-17 (SHARYANTO)
+
+         - Add directive: !noop (does nothing, for testing).
+
+         - To catch common errors of directive syntax, implementation is now
+           encouraged to allow: '!noop' (bang only), '! noop', '; !noop', '; !
+           noop' (whitespaces).
+
+
+0.9.2    2014-08-17 (SHARYANTO)
+
+         [REMOVED FEATURES]
+
+         - Remove '!nomerge' directive. To stop merging, specify '!merge' with
+           no arguments.
+
+
+0.9.1    2014-08-13 (SHARYANTO)
+
+         - Use JSON rule for double-quoted string (in key value as well as
+           directive argument), this way we don't have to define our own string
+           rule.
+
+         - Introduce key value encoding. This is the more extensible way.
+           Currently known encodings: !j (!json), !e (!expr), !base64, !h
+           (!hex).
+
+         - Remove !defaults directive, its function can be replaced by !merge.
+
+         - Remove mode merging for now.
+
+         - !merge can merge multiple sections.
+
+         - Expression is left undefined for now, no longer defined as using the
+           Xslate/Kolon syntax. Change syntax of expression to use value
+           encoding.
+
+         - Add TODO section.
+
+         - Remove mention of nested section. Implementation is now left to do it
+           (or not).
+
+         - Remove encoding/quoting in section name and key name for now.
+
+         - Remove !sectionpath and !nosectionpath for now.
+
+         - Other tweaks.
+
+
+0.9.0    2012-10-14 (SHARYANTO)
+
+         - First release. Split from implementation Config-Ini-OnDrugs.
+
+         - Some rewording and reorganization.
+
+         - Change nested section syntax, from using indented section line to
+           using [foo/bar], in an effort to prevent users getting confused with
+           significant indentation.
+
+         - Expression now uses Text::Xslate::Syntax::Kolon instead of
+           Language::Expr (probably temporary? due to slow implementation of
+           Language::Expr).
+
+         - Add directives: !sectionpath, !no{merge,defaults,sectionpath}
+
+         - Now only one argument is allowed for !defaults.
+
+         - Some rewording and reorganization.

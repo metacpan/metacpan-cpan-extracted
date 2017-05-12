@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/01-capture_of_stdout_and_stderr.t
+t/bin/yammer_to_stderr_and_stdout
+lib/IPC/Capture.pm
+
+
+META.yml                                 Module meta-data (added by MakeMaker)

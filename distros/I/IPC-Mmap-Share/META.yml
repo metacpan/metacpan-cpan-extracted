@@ -1,0 +1,13 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         IPC-Mmap-Share
+version:      0.03
+version_from: lib/IPC/Mmap/Share.pm
+installdirs:  site
+requires:
+    IPC::Mmap:                     0
+    Storable:                      0
+    Test::Simple:                  0.44
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

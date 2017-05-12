@@ -1,0 +1,13 @@
+[%- DEFAULT outfile = file -%]
+[%- 
+     USE bio = BioChrome("${image_src}/$file");
+     IF color;
+   	  bio.colors(color);
+     END;
+     IF alpha;
+      bio.alphas(alpha);
+     END;
+     bio.write_file("${image_dest}/$outfile");
+-%]
+<img src="[% images %]/[% outfile %]">
+

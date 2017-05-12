@@ -1,0 +1,27 @@
+Revision history for IO-Async-Resolver-DNS
+
+0.06    2015/07/31 18:26:51
+        [CHANGES]
+         * Make use of (upcoming) IO::Async 0.68's extended failure reporting
+           to provide information about the nature of resolver failures
+
+0.05    2015/07/22 18:15:22
+        [CHANGES]
+         * Have new resolver methods return Futures
+         * Updated documentation style
+
+0.04    2013/09/01 01:18:37
+        [CHANGES]
+         * Needs 'use Net::DNS::Resolver'
+
+0.03    CHANGES:
+         * Extract extra information from A, AAAA and PTR lookups
+         * Updated for IO::Async 0.47 - ->run and ->stop methods
+
+0.02    CHANGES:
+         * Extract extra information from MX and SRV lookups
+         * Some attempt at error detection and reporting
+         * General code neatening and rearrangement
+
+0.01    First version, released on an unsuspecting world.
+

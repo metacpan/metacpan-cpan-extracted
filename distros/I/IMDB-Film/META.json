@@ -1,0 +1,49 @@
+{
+   "abstract" : "OO Perl interface to the movies database IMDB.",
+   "author" : [
+      "Michael Stepanov <stepanov.michael@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "IMDB-Film",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Cache::FileCache" : "0",
+            "Carp" : "0",
+            "Digest::SHA1" : "0",
+            "Error" : "0",
+            "HTML::Entities" : "0",
+            "HTML::TokeParser" : "2.28",
+            "LWP::Simple" : "1.41",
+            "Pod::Checker" : "0",
+            "Text::Unidecode" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.53"
+}

@@ -1,0 +1,14 @@
+=head1 NAME
+
+IUP::GL::ScrollBox - [GUI element] GL-based scroll box
+
+=head1 DESCRIPTION
+
+XXX-TODO: missing doc
+
+=head1 SEE ALSO
+
+The original doc: L<iupglscrollbox.html|http://www.tecgraf.puc-rio.br/iup/en/gl/iupglscrollbox.html>
+
+
+=cut

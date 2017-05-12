@@ -1,0 +1,13 @@
+mysql\.dat
+IPC-ConcurrencyLimit-Lock-MySQL-.*\.tar\.gz
+Makefile\z
+Makefile\.old
+Makefile\.bak
+MANIFEST\.bak
+\.gitignore\z
+\.git\b
+\..*\.swp
+\..*\.swo
+\bblib\b
+pm_to_blib
+MYMETA\.(?:yml|json)$

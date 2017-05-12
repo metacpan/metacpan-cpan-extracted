@@ -1,0 +1,12 @@
+Build.PL
+lib/IO/Async/Resolver/LibAsyncNS.pm
+MANIFEST			This list of files
+t/00use.t
+t/01getaddrinfo.t
+t/02getnameinfo.t
+t/99pod.t
+Makefile.PL
+README
+LICENSE
+META.yml
+META.json

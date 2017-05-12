@@ -1,0 +1,44 @@
+Revision history for Perl module IO::Framed
+
+0.01 Fri Mar 31 2017
+    - first release
+
+0.011 Sat Apr 1 2017
+    - Compile/sanity fixes
+
+0.012 Sat Apr 1 2017
+    - instead of “input”/“output” in accessors,
+      use “read”/“write” since those are the module and method names
+      and should thus be easier to remember.
+
+0.013 Sat Apr 1 2017
+    - Fix ReadWrite modules to actually work. :-/
+
+0.014 Sat Apr 1 2017
+    - Add no-op stub queue methods to Write::Blocking so that
+      applications don’t need to care whether a given IO object
+      is blocking or not.
+
+0.015 Sat Apr 1 2017
+    - Fixes for tests on Linux
+
+0.016 Wed Apr 5 2017
+    - Thanks to CHORNY: Fixes for Strawberry Perl and other OSes that
+      treat EWOULDBLOCK as a separate error from EAGAIN.
+
+0.017 Wed Apr 5 2017
+    - Require the most recent IO::SigGuard in the MakeFile, which
+      hopefully will fix some CPAN Testers test reports.
+
+0.018 Wed Apr 5 2017
+    - Tests: avoid blocking() on normally-created file handles since only
+      Perl 5.14+ automatically upgrades file handles to IO::File.
+
+0.02 Wed Apr 5 2017
+    - Deprecate the Blocking/NonBlocking write classes. This radically
+      simplifies the usage and allows clean switching back and forth between
+      blocking (“unqueued”) and non-blocking (“queued”) writes.
+
+0.021 Sun Apr 9 2017
+    - Again tweak the tests for MSWin: drop new_from_fd() since it hangs.
+      (thank you to CHORNY for pointing out the problem!)

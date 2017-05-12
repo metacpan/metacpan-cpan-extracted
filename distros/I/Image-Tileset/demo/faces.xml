@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     The graphic for this, faces.png, was taken from RPG Maker 2003 for
+     demonstration purposes only. RPG Maker 2003 is copyright
+     (C) Enterbrain, Inc.
+-->
+<tileset>
+	<layout type="tiles" size="48x48">
+		<tile x="0" y="0" id="hero-male" />
+		<tile x="1" y="0" id="hero-female" />
+		<tile x="2" y="0" id="guard-male" />
+		<tile x="3" y="0" id="guard-female" />
+
+		<tile x="0" y="1" id="mage-male" />
+		<tile x="1" y="1" id="mage-female" />
+		<tile x="2" y="1" id="priest-male" />
+		<tile x="3" y="1" id="priest-female" />
+
+		<tile x="0" y="2" id="monk-male" />
+		<tile x="1" y="2" id="monk-female" />
+		<tile x="2" y="2" id="pilot-male" />
+		<tile x="3" y="2" id="pilot-female" />
+
+		<tile x="0" y="3" id="pirate-male" />
+		<tile x="1" y="3" id="pirate-female" />
+		<tile x="2" y="3" id="elf-male" />
+		<tile x="3" y="3" id="elf-female" />
+	</layout>
+</tileset>

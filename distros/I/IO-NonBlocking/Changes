@@ -1,0 +1,14 @@
+Revision history for Perl extension IO::NonBlocking.
+
+1.021 Complete some documents
+
+1.020 Add add_socket method - add a socket to the non-blocking loop
+
+1.011 Fix some documents
+
+1.010 First release
+
+0.01  Tue Jul  9 17:25:23 2002
+	- original version; created by h2xs 1.21 with options
+		-A -X -n IO::NonBlocking
+

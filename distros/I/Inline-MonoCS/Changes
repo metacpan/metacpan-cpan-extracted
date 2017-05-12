@@ -1,0 +1,20 @@
+
+2009-12-17  v1.000
+  * Everything looks good and works fine.
+
+2009-12-16  v0.000_05
+  * Sometimes `which gmcs` can't find gmcs (because someone messed with %ENV)
+    so now if we can't find gmcs we default to 'gmcs' and hope that works.
+
+2009-12-16  v0.000_04
+  * Fixed typo in `which` command.
+
+2009-12-16  v0.000_03
+  * Added this file (Changes) to the MANIFEST
+
+2009-12-16  v0.000_02
+  * Changed compiler from `mcs` to `gmcs` to target the .Net 2.0 runtime.
+
+2009-12-16  v0.000_01
+  * Initial release
+

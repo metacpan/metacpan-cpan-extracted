@@ -1,0 +1,2 @@
+perl_libpng_t * T_PTROBJ
+Image::PNG::Libpng T_PTROBJ

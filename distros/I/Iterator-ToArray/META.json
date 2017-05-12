@@ -1,0 +1,81 @@
+{
+   "abstract" : "create array or arrayref from iterator",
+   "author" : [
+      "Yoshihiro Sasaki <ysasaki {at} cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.5.3",
+   "license" : "perl_5",
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Iterator-ToArray",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Scalar::Util" : "1.25",
+            "perl" : "5.008008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0.32",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Iterator::ToArray" : {
+         "file" : "lib/Iterator/ToArray.pm",
+         "version" : "0.04"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ysasaki/p5-iterator-toarray/issues"
+      },
+      "homepage" : "https://github.com/ysasaki/p5-iterator-toarray",
+      "repository" : {
+         "url" : "git://github.com/ysasaki/p5-iterator-toarray.git",
+         "web" : "https://github.com/ysasaki/p5-iterator-toarray"
+      }
+   },
+   "version" : "0.04",
+   "x_contributors" : [
+      "ysasaki <ysasaki@idac.co.jp>",
+      "ysasaki <aloelight@gmail.com>"
+   ]
+}

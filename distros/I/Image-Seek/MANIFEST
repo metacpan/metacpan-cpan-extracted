@@ -1,0 +1,16 @@
+Changes
+Makefile.PL
+MANIFEST
+ppport.h
+README
+Seek.xs
+t/Image-Seek.t
+fallback/const-c.inc
+fallback/const-xs.inc
+lib/Image/Seek.pm
+META.yml                                 Module meta-data (added by MakeMaker)
+haar.cpp
+haar.h
+imgdb.cpp
+imgdb.h
+META.json                                Module JSON meta-data (added by MakeMaker)

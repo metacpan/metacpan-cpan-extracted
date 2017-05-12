@@ -1,0 +1,630 @@
+
+# ABSTRACT: IOD (INI On Drugs) file format specification
+#PODNAME: IOD
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+IOD - IOD (INI On Drugs) file format specification
+
+=head1 SPECIFICATION VERSION
+
+0.9
+
+=head1 VERSION
+
+This document describes version 0.9.11 of IOD (from Perl distribution IOD), released on 2017-01-13.
+
+=head1 STATUS
+
+Specification is still rather in flux. Backwards compatibility is not guaranteed
+between 0.9.x releases.
+
+=head1 ABSTRACT
+
+IOD (short for INI On Drugs) is a configuration file format that is mostly
+backward-compatible with the popular INI format. It adds a few extensions to
+make configuration more powerful but still lets the configuration parseable by a
+regular INI parser (albeit the parse result might differ, sometimes
+significantly so, but it can be exactly the same for simple cases). An
+implementation can turn off some or all of these extensions to make the
+configuration closer to a regular INI file.
+
+IOD is meant to be a general configuration format for applications.
+
+=head1 NOTATION
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
+"SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be
+interpreted as described in RFC 2119.
+
+=head1 RATIONALE
+
+A general configuration file format needs to be simple for computers as well as
+users to read and write. Users mostly need to write configuration, while
+computers need to read but increasingly nowadays also write to configuration
+(for automation tasks). INI is chosen as the basis format for several reasons:
+popularity, simplicity, and ease of round-trip parsing. These features satisfy
+the aforementioned requirements.
+
+Popularity: INI format is popular on Windows as well as Unix. This makes it easy
+for new users to get started with the configuration.
+
+Simplicity: INI format is simple and very straightforward. It is essentially
+assignments of key names and values, with sections.
+
+Round-trip parsing: Round-trip parsing means preserving everything in the file
+through the parsing process, including comments and formatting (indentations,
+whitespaces). Most serialization format do not have round-trip parsers: after a
+read and write process, original formatting and comments are lost. Round-trip
+parsing means that if one loads an INI file, modifies a key value, and saves it
+again, everything that is not modified will still be the same (including
+whitespaces and comments). If no keys are modified, the saved file will be
+identical with the original.
+
+Round-trip parsing is desirable in a configuration because oftentimes valuable
+information is contained in the formatting/indentation (grouping of keys) as
+well as comments (user explaining why she sets a key to a certain value, dates,
+other notes). Software modifying a configuration should not destroy all these.
+
+=head2 INI vs ...
+
+B<YAML>. Although YAML looks nice and has many features, it lacks round-trip
+parsers and has complex rules that can trip beginners or non-programmers, e.g.
+significant indentation, significant whitespace in some places (for example
+after colon in mapping), etc.
+
+B<JSON>. Although JSON is popular and simple, it lacks round-trip parsers and
+some important features (e.g. comments). (Note: The documentation for L<JSON>
+Perl module mentions the phrase "round-trip", but it uses the phrase to mean
+integrity of values, not preserving comments/whitespaces.)
+
+But note that IOD uses JSON in places.
+
+B<Apache-webserver-style> lacks round-trip parsers.
+
+B<XML> lacks round-trip parsers and is not convenient for humans to read and
+write.
+
+=head2 Why not plain INI?
+
+First, INI format is ill-defined. There is no single standard, thus various
+implementations behave differently and there are various variants of the format.
+This specification intends to describe the IOD format more precisely.
+
+Second, INI lacks some features that I like/need, like: variable
+substitution/expression, inclusion of other files, and merging between sections.
+Most of these features make writing configuration less repetitive.
+
+=head1 SPECIFICATION
+
+A configuration is a text file containing a sequence of lines. Encoding MUST be
+UTF-8. Each line is either a blank line, a comment line, a key line, a section
+line, or a directive line. Parsing is done line-by-line and in a single pass.
+
+=head2 Blank line
+
+A blank line is a line containing zero or more whitespaces only. It is ignored.
+
+=head2 Comment line
+
+A comment line begins with C<;> or C<#> as it's first nonblank character (note
+that some INI parsers do not allow indented comment; some only recognizes C<;>
+as the comment starter character). The use of C<;> is preferred.
+
+ <ws>* ";"|"#" <COMMENT>
+
+Examples:
+
+ ; this is a comment
+ # this is also a comment
+
+=head2 Key line
+
+This line sets key name and value:
+
+ <ws>* <NAME> <ws>* "=" <ws>* <VALUE> [<ws>* ";"|"#" <COMMENT>]
+
+C<NAME> can contain anything but newline or the equal sign (C<=>). C<VALUE> is
+either: 1) zero or more non-newline characters with optional encoding prefix, or
+a JSON string with double quotes, or a JSON array started with "[", or a JSON
+hash (object) started with "{". Encoding prefix is C<!> followed by encoding
+name, followed by at least one space. Known encodings are: C<j> or C<json>, C<h>
+or C<hex>, C<base64>, C<e> or C<expr>, C<path>, C<paths>, and C<none>. See
+L</"Encoding"> for more details about encoding.
+
+Examples:
+
+ foo=bar
+ foo bar=baz
+ foo = bar baz ; whitespace around the equal sign will be removed
+ foo=!base64 YmFyIGJheg== ; bar baz
+ foo=!hex 00ff00 ; 3-byte binary data
+ foo="a JSON string\nwith newline" ; comment
+ foo=!j "a JSON string\nwith newline"
+ foo=["a json array", "because it's started", "with ["]
+ foo=!json [1,2,3]
+ foo={"a json hash":1, "because it's started":2, "with {":3}
+ foo=!json {"a":1,"b":2}
+ foo=~/logs              ; will become e.g. /home/ujang/logs
+ foo=~budi/Pictures      ; will become e.g. /home/budi/Pictures
+ foo="~/logs"            ; a JSON-encoded string with value "~/logs"
+ foo=!none [             ; a single open brace character
+
+Specifying several keys with the same name will create an array value. Example:
+
+ a=1
+ a=2
+
+will result in (in JSON):
+
+ {"a": [1,2]}
+
+To specify expression, use the C<!e> or C<!expr> encoding. Example:
+
+ x=3
+ y=5
+ z=!e $x+$y ; 8
+
+See L</"Expression"> for more details on expressions.
+
+Normally a key line should occur below section line, so that key belongs to the
+section. But a key line is also allowed before section line, in which it will
+belong to section called C<GLOBAL> (configurable via the parser's
+B<default_section> attribute).
+
+=head2 Section line
+
+A section line introduces a section:
+
+ <ws>* "[" <ws>* <NAME> <ws>* "]" [<ws>* ";"|"#" <COMMENT>]
+
+C<NAME> is one or more non-newline characters that are not C<]>.
+
+Examples:
+
+ [foo]
+ [Section Name]
+ [foo.bar.baz]  ; a comment
+
+Non-contiguous sections are allowed, they will be assumed to be set/add keys as
+if the section were written contiguously, e.g.:
+
+ [sect1]
+ a=1
+
+ [sect2]
+ a=1
+
+ [sect1]
+ a=2
+ b=3
+
+will result in C<sect1> containing C<a> as C<[1, 2]> and C<b> as C<3>. However,
+note:
+
+ [sect1]
+ a=1
+
+ ;!merge sect1
+ [sect2]
+ d=4
+
+ [sect1]
+ b=2
+
+ [sect3]
+ c=3
+
+C<sect2> will contain C<< {"a":1, "d":4} >> since at the point of parsing
+C<sect2>, C<sect1> only contains C<< {"a":1} >>. However, C<sect3> will contain
+C<< {"a":1, "b":2, "c":3} >> since at the point of parsing C<sect3>, C<sect1>
+already becomes C<< {"a":1, "b":2} >>.
+
+=head2 Directive line
+
+A directive line is an unindented comment line using the C<;> comment character.
+The comment starts with an exclamation mark (C<!>), a directive name (a word
+matching regular expression C</\w+/>, and zero or more arguments separated by
+whitespaces. Since it is a common error to write C<!> instead of C<:!>, the
+parser can have a configuration to allow C<;> to become optional (though note
+that this will result in an invalid INI file).
+
+ (";")? <ws>* "!" <ws>* <NAME> <ws>+ [ARGUMENTS]
+
+An invalid directive will cause parsing to fail.
+
+Examples of valid directives:
+
+ ;!include somefile.iod
+
+This directive is invalid because it uses C<#> instead of C<;>:
+
+ #!include blah
+
+This directive is invalid because it is indented:
+
+ ;start of line
+   ;!include foo
+
+This directive is invalid because of invalid directive name:
+
+ ;!include! somefile.iod
+
+This directive is invalid because it is unknown:
+
+ ;!foo
+
+This directive is invalid because of unbalanced quotes:
+
+ ;!include "somefile.ini
+
+This directive is invalid because of missing required argument:
+
+ ;!include
+
+B<Argument>. An argument is a sequence of one or more non-whitespace,
+non-newline characters, or a JSON string. Examples:
+
+ word
+ argument2
+ yet-another-argument!
+ "argument as JSON string"
+ ""
+ "line1\nline2"
+
+Below is the list of known directives (C<< <foo> >> signifies required
+arguments, C<[foo]> signifies optional arguments):
+
+=head3 !include <PATH>
+
+Include another file, as if the content of the included file is the next lines
+in the current file. An included file might contain another C<!include>
+directive. If C<PATH> is not absolute, it is assumed to be relative to the
+current file. A circular include will cause the parser to die with an error.
+Example:
+
+File C<dir1/a.ini>:
+
+ [sectionA.sub1]
+ a=1
+ ;!include ../dir2/b.ini
+ ;!include ../dir2/b3.ini
+
+File C<dir2/b.ini>:
+
+ b=2
+ ;!include b2.ini
+
+File C<dir2/b2.ini>:
+
+ c = 3
+ ;!include b3.ini
+
+File C<dir2/b3.ini>:
+
+ c=4
+ [sectionB]
+ c=1
+
+When C<dir1/a.ini> is parsed, the result will be (in JSON):
+
+ {
+   "sectionA": {
+     "sub1": {
+       "a": 1,
+       "b": 2,
+       "c": [3, 4]
+     },
+   },
+   "sectionB": {
+     "c": 1
+   },
+ }
+
+=head3 !merge [SECTION] ...
+
+Specify that from now on (meaning, from the I<current> section, not the I<next>
+session), section will merge the specified section(s), in order. The specified
+sections to be merged must be predeclared. To stop merging, specify the
+directive without any argument.
+
+Example:
+
+ [defaults]
+ d=4
+
+ [s1]
+ a=1
+ b=2
+
+ [s2]
+ !merge defaults s1
+ a=10
+ c=30
+
+ [s3]
+
+ [s4]
+ !merge
+ a=20
+
+will result in (in pseudo-JSON):
+
+ {
+   "defaults": {"d":4},
+   "s1"      : {"a":1,  "b":2},
+   "s2"      : {"a":10, "b":2, "c":30, "d":4},
+   "s3"      : {"a":1,  "b":2,         "d":4},
+   "s4"      : {"a":20}, // no more merging
+ }
+
+=head3 !noop ...
+
+Directive that does nothing and will be ignored. For testing.
+
+=head2 Encoding
+
+=over
+
+=item * json (j)
+
+JSON encoding.
+
+This encoding will automatically be assumed when the value starts with C<">
+(double quote, signifying a JSON string), C<[> (opening brace parenthesis,
+signifying a JSON array), C<{> (opening curly brace parenthesis, signifying a
+JSON hash (object).
+
+=item * hex (h)
+
+Hex encoding, e.g.:
+
+ key = !hex 48
+
+will set C<key> to a literal C<H> (ASCII code for C<H> is 0x48). Another
+example:
+
+ key = !h 480a
+
+will set C<key> to C<"H\n"> (a literal C<H> followed by newline character).
+
+=item * base64
+
+Base64 encoding, e.g.:
+
+ foo = !base64 YmFyIGJheg==
+
+will set C<foo> to C<bar baz>.
+
+=item * expr (e)
+
+Currently not specified.
+
+=item * path
+
+EXPERIMENTAL. A literal string, except that C<~> or C<~USER> prefix will be
+replaced with the home directory of current user, or specified user,
+respectively. An extra C</> suffix is also allowed for directory and will be
+stripped.
+
+When an unknown user is specified, the parser should die.
+
+For example:
+
+ log_dir = !path ~/logs
+
+C<log_dir> will be set to e.g C</home/ujang/logs>.
+
+If the first character of the value is C<~> (tilde), the path encoding is
+implicitly assumed unless there is an explicit encoding specification. So
+actually the previous example could just be written as:
+
+ log_dir = ~/logs
+
+To prevent the translation of C<~>, you can use C<!none> or double quote (JSON
+string):
+
+ log_dir = !none ~/logs
+ log_dir = "~/logs"
+
+=item * paths
+
+EXPERIMENTAL. A literal string, except that like in C<!path> C<~> or C<USER>
+prefix will be substituted with user home directory. In addition to that,
+wildcard characters like C<*>, C<?> will be interpreted. Wildcard expansion is
+currently left to the implementation. The result will be an array of strings.
+
+When wildcard does not match any file (e.g. C<!paths foo*> where there are no
+files in the current directory that begins with C<foo>), an empty array should
+be returned. When an unknown user or unknown path is given (e.g. C<!paths
+/var/zzz/*> when there is no directory named C</var/zzz/>) or there is an error
+during expansion (e.g. C<!paths /root/a*> when the current user does not have
+sufficient permission to look into C</root>), the parser should die.
+
+Example:
+
+ dist_dirs = !paths ~/repos/perl-*
+
+Without the C<!paths> encoding, C<dist_dirs> will be set to a literal string
+C<~/repos/perl-*> without the C<~> translated and wildcard expanded. With the
+C<!paths> encoding, C<dist_dirs> will be set to an array of strings.
+
+=item * none
+
+This explicitly turns off encoding and is useful when you want to disable
+implicit encoding detection. For example:
+
+ ; error, unclosed JSON string
+ a = "
+
+ ; ok, a single double-quote
+ b = !none "
+
+ ; translated to current paths under user's home directory, e.g. "/home/ujang"
+ ; and "/home/ujang/Pictures"
+ c = ~
+ d = ~/Pictures/
+
+ ; literal "~" and "~/Pictures"
+ e = !none ~
+ f = !none ~/Pictures/
+
+=back
+
+=head2 Expression
+
+Currently expression is not fully defined and left to the implementation. The
+goal is to have a simple syntax that allows variable substitution using the C<$>
+syntax and some arithmetics/string operations.
+
+=head2 Unsupported features
+
+Some INI implementations support other features, and listed below are those
+unsupported by IOD, usually because the features are not popular or too
+incompatible with regular INI syntax:
+
+=over 4
+
+=item * Line continuation for multiline value
+
+ key=line 1 \
+ line 2\
+ line 3
+
+Supported by L<Config::IniFiles>. In IOD, use JSON string or encoding:
+
+ key="line 1 \nline 2\nline 3"
+
+=item * Heredoc syntax for array
+
+ key=<<EOT
+ value1
+ value2
+ EOT
+
+Supported by L<Config::IniFiles>. In IOD, use multiple assignment or JSON
+encoding:
+
+ key=value1
+ key=value2
+
+or:
+
+ key=!j ["value1", "value2"]
+
+=back
+
+=head1 GUIDELINES FOR IMPLEMENTATIONS
+
+Implementation can provide options to turn off some features. In general, to
+make an IOD configuration file not context-dependent, a turned off feature
+should cause parsing to fail to notify users that certain features are not
+available. A turned off feature should not just silently makes parsing behave
+differently. For example, if file inclusion is turned off, this line:
+
+ !include somefile.ini
+
+should make parsing fail instead of continuing (without including the file).
+
+An exception is when an implementation provides explicit option to ignore
+certain features. For example, an implementation might provide an option to
+forbid expressions, or turn off expression parsing and parse it as literal.
+
+Below are guidelines on what parsing options an implementation can provide:
+
+=over 4
+
+=item * whether certain encodings are recognized
+
+=item * whether expression is allowed
+
+=item * whether the !include directive is allowed
+
+=item * whether the !merge directive is allowed
+
+=item * whether discontiguous section is allowed
+
+=back
+
+=head1 FAQ
+
+=head2 Summary of differencess between INI and IOD?
+
+IOD has more features:
+
+=over
+
+=item * various encoding for key values
+
+Using the including base64 and variable substitution/expression.
+
+=item * merge between sections
+
+=item * include other files
+
+=back
+
+=head2 Why are blank lines allowed in IOD?
+
+They aid reading by human. This is in line with the goal of making it easy for
+human to read. Note that many INI parsers also allow blank lines.
+
+=head2 What are the downsides of IOD format?
+
+=over
+
+=item * Currently only has Perl parser (L<Config::IOD>, L<Config::IOD::Reader>)
+
+INI parsers exist everywhere though, so some of the time you can fallback to
+INI. Also, because the specification is simple, it is also relatively easy to
+write implementations in other languages. The default Perl implementations
+themselves are only about 400-600 lines (including blank lines, not counting
+POD).
+
+=back
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/IOD>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/sharyanto/perl-IOD>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=IOD>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+INI format specification, L<http://en.wikipedia.org/wiki/INI_file>
+
+TOML, a minimal configuration file format that looks like INI, but diverges
+more, https://github.com/toml-lang/toml. This is similar in goal and principles
+to IOD, with a few differences: more types and literals (boolean, datetime),
+array and strings can span lines, section can be nested using indentation. There
+are already implementations in multiple languages, and a few of them are already
+round-tripping.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

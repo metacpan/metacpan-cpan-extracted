@@ -1,0 +1,16 @@
+Build.PL
+Changes
+lib/IO/Any.pm
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/01_IO-Any.t
+t/02_IO-Any_AnyEvent.t
+t/03_DATA.t
+t/stock/01.txt
+xt/distribution.t
+xt/fixme.t
+xt/pod-coverage.t
+xt/pod-spell.t
+xt/pod.t

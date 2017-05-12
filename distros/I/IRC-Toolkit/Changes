@@ -1,0 +1,224 @@
+Revision history for Perl module IRC::Toolkit
+
+0.092002 2016-07-31
+
+  - Samuel Hoffman (SJHOFFMAN / miniCruzer) reported that
+    IRC::Message::Object's ->raw_line generator was broken as the 'has_command'
+    predicate had been previously removed.
+
+    Related fixes include proper ->colonify checks.
+
+0.092001 2015-08-29
+
+  - Minor incompatible change in 'ctcp_extract'; return explicit undef (rather
+    than the empty list) if there is no CTCP to extract
+
+  - Various optimizations, including MooX::TypeTiny for IRC::Message::Object
+
+  - Fixes and documentation regarding overriding IRC::Toolkit::Numerics
+
+  - Expanded tests and documentation
+
+0.091001 2015-06-07
+
+  - IRC::Message::Object now defaults to using a 'colonify => 0' filter
+
+  - IRC::Message::Object provides has_colonify / has_filter predicates
+
+  - normalize_mask fixes regarding irregular nick-only/user-only masks
+
+0.090003 2015-05-17
+
+  - Various cleanups & optimizations
+
+0.090002 2015-05-15
+
+  - Minor IRC::Message::Object & IRC::Toolkit::Case optimizations
+
+  - Require Moo-2+ and drop MooX::late dependency
+
+  - 'use strictures 2;' for saner fatal warnings behavior
+
+  - Kill stale Test::Exception dependency
+
+  - Switch to cpanfile packaging
+
+0.090001 2015-01-10
+
+  - IRC::Toolkit::TS6; add CODE overload that calls ->next
+
+  - Minor optimizations & cleanups
+
+  - Drop namespace::clean dependency
+
+0.089001 2015-01-03
+
+  - IRC::Message::Object;
+    add TO_JSON method
+    drop unnecessary ->has_command predicate
+
+0.088002 2014-08-16
+
+  - Fix $isupport->can()
+
+  - Happy CPAN Day!
+
+0.088001 2014-01-19
+
+  - IRC::Toolkit::Modes;
+    array_to_mode supports IRC::Mode::Set objects
+    mode_to_array accepts IRC::Toolkit::ISupport ->chanmodes objects
+
+  - IRC::Toolkit::Colors;
+    Add has_color / strip_color
+
+  - IRC::Toolkit::Numerics;
+    Add charybdis QUIETLIST numerics
+
+  - IRC::Mode::Set;
+    Remove deprecated new_from_* methods (went away in 0.08)
+
+0.087000 2013-10-26
+
+  - IRC::Toolkit::Case;
+    Add |rfc1459| infix comparison operator
+    Add overloaded IRC::Toolkit::Case::MappedString objects
+    (and an 'irc_str()' function to construct them)
+
+0.086000 2013-10-23
+
+  - Use List::Objects::WithUtils list objects for IRC::Message::Object
+    attributes
+
+0.085000 2013-09-12
+
+  - Switch to Exporter::Tiny
+
+  - Warn on unknown casemaps in lc/uc/eq
+
+  - Minor cleanups & optimizations
+
+0.084002 2013-08-11
+
+  - perl-5.8.9 compatible release
+
+0.084001 2013-08-10
+
+  - Minor cleanups & optimizations
+
+  - Fix 'Changes' to be in line with CPAN::Changes::Spec
+
+0.084000 2013-03-15
+
+  - ISupport array-type retvals are now List::Objects::WithUtils::Arrays
+
+  - Prefer ratbox label for numeric '010'
+
+0.083000 2013-03-14
+
+  - Add OO interface to IRC::Toolkit::Numerics
+
+0.082000 2013-03-14
+
+  - Add IRC::Toolkit::Numerics
+
+  - Documentation fixes
+
+0.081001 2013-03-03
+
+  - Missing dependency on namespace::clean
+
+0.081000 2013-03-01
+
+  - Add IRC::Toolkit::Role::CaseMap
+
+  - Add ISupport->extban->as_string & ->chanmodes->as_string
+
+  - Import parse_isupport() by default on 'use IRC::Toolkit'
+
+0.080000 2013-02-23
+
+  - Incompatible change:
+    IRC::Mode::Set->new_from_params renamed ->clone_from_params
+    IRC::Mode::Set->new_from_mode   renamed ->clone_from_mode
+
+  - Add IRC::Mode::Set->clone() and ->export()
+
+  - IRC::Message::Object;
+    Fix filter + raw_line combination at construction-time
+
+0.075000 2013-02-23
+
+  - Add IRC::Message::Object->truncate
+  
+  - Expose ->filter and ->colonify attribs
+
+0.074000 2013-02-22
+
+  - Add IRC::Toolkit::Modes::array_to_mode()
+
+  - Document ISUPPORT EXTBAN parser
+
+0.073000 2013-02-22
+
+  - Add ELIST, EXTBAN, and TARGMAX support to ISupport parser
+
+0.072000 2013-02-22
+
+  - Add IRC::Toolkit::ISupport
+
+0.071001 2013-02-21
+
+  - Fix 'use IRC::Toolkit qw/ ... /' imports
+
+  - Documentation fixes
+
+0.071000 2013-02-10
+
+  - Add IRC::Toolkit::TS6 ID generator
+
+0.070003 2013-02-09
+
+  - Missing dependency on namespace::clean
+
+0.070002 2013-02-09
+
+  - Documentation updates
+
+0.070001 2013-02-09
+
+  - Add IRC::Mode::Single, IRC::Mode::Set objects
+    (extracted from IRC::Server::Pluggable)
+
+0.06 2013-02-01
+
+  - Fix bad test (wrt 5.17 hash ordering changes)
+
+  - Explicitly require Test::More 0.88
+
+0.05 2013-01-28
+
+  - IRC::Toolkit::Modes; Kill use of '...'
+
+0.04 2013-01-28
+
+  - IRC::Message::Object; kill attribute writers
+  
+  - IRC::Toolkit::Parser;
+    irc_line_from_ref also accepts IRC::Message::Object instances
+
+0.03 2013-01-27
+
+  - POD tweaks
+  
+  - Move dist to dzil
+
+0.02 2013-01-27
+
+  - POD/test tweaks
+
+  - Fix repo metadata
+
+0.01 2013-01-27
+
+  - Initial release

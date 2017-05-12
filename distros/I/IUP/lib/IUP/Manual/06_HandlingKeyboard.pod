@@ -1,0 +1,255 @@
+=pod
+
+=head1 NAME
+
+IUP::Manual::06_HandlingKeyboard - Handling keyboard in IUP applications
+
+=head1 IUP MANUAL
+
+=over
+
+=item * L<IUP::Manual::01_Introduction|IUP::Manual::01_Introduction>
+
+=item * L<IUP::Manual::02_Elements|IUP::Manual::02_Elements>
+
+=item * L<IUP::Manual::03_Attributes|IUP::Manual::03_Attributes>
+
+=item * L<IUP::Manual::04_Callbacks|IUP::Manual::04_Callbacks>
+
+=item * IUP::Manual::06_HandlingKeyboard E<nbsp>E<nbsp>E<nbsp>E<nbsp>E<nbsp> B<E<lt>E<lt>E<lt> this document>
+
+=item * L<IUP::Manual::05_DialogLayout|IUP::Manual::05_DialogLayout>
+
+=item * L<IUP::Manual::07_UsingImageLibrary|IUP::Manual::07_UsingImageLibrary>
+
+=item * L<IUP::Manual::08_DragAndDrop|IUP::Manual::08_DragAndDrop>
+
+=back
+
+=head1 INTRODUCTION
+
+This manual deals with keyboard handling in IUP based applications.
+
+=head1 Keyboard
+
+The application can control the focus using the functions
+L<GetFocus|IUP/"GetFocus()"> and L<SetFocus|IUP::Manual::02_Elements/"SetFocus()">. When the focus is changed the
+application is notified trough the callbacks GETFOCUS_CB and
+KILLFOCUS_CB.
+
+Keyboard navigation in the dialog uses the "Tab" and "Shilf+Tab" keys
+to change the keyboard focus from one control to another. The exception
+is when the focus is at a multiline L<IUP::Text> control, to change focus the
+combination "Ctrl+Tab" must be used, because "Tab" is a valid input for
+the text. All IUP interactive controls have Tab stops, but the
+navigation order is related to the order the controls are placed in the
+dialog and can not be changed. The order is the same implemented by the
+functions L<NextField|IUP::Manual::02_Elements/"NextField()"> and L<PreviousField|IUP::Manual::02_Elements/"PreviousField()">. To remove the Tab
+stop from a control use the CANFOCUS attribute.
+
+Arrows can also be used for navigation between buttons and toggles.
+This is necessary because when an L<IUP::Toggle|IUP::Toggle> is inside an L<IUP::Radio|IUP::Radio>
+the "Tab" keys will navigate only to the selected toggle.
+
+In Windows, the focus feedback only appears after the user presses a
+key (except for the L<IUP::Text|IUP::Text> where the feedback is the caret). Before
+pressing a key if you click in a control the focus feedback will be NOT
+be shown although it will be in focus. L<IUP::Matrix|IUP::Matrix> and other
+additional controls will always show their focus feedback. In GTK and
+Motif the focus feedback is always shown for the control that has the
+focus.
+
+Two keys are also important in keyboard navigation: "Enter" and "Esc".
+But they are only effective if the application register the attributes
+DEFAULTENTER and DEFAULTESC of the L<IUP::Dialog|IUP::Dialog>.
+These attributes configure buttons to be activated when the respective
+key is pressed. Again "Enter" is a valid key for the Multiline so the
+combination "Ctrl+Enter" must be used instead. If the focus is at a
+button then the Enter key will activate that button independent from
+the DEFAULTENTER attribute.
+
+Usualy the application will process keyboard input in the L<IUP::Canvas|IUP::Canvas>
+using the L<KEYPRESS_CB|elem/iupcanvas.html#Callbacks> callback. But
+there is also the L<K_ANY|call/iup_k_any.html> callback that can be
+used for all the controls, but it does not have control of the press
+state, it is called only when the key is pressed. Both callbacks use
+the key codification explained in L<Keyboard Codes|attrib/key.html>.
+These codes are also used in the ACTION callbacks of L<IUP::Text|IUP::Text> and
+L<IUP::Multiline|IUP::Multiline>, and in shortcuts using the KEY attribute of L<IUP::Item|IUP::Item>
+and L<IUP::Submenu|IUP::Submenu>. Finally all the keyboard codes can be used as
+callback names to implement application hot keys.
+
+=head1 B<Keyboard Codes>
+
+The table below shows the IUP codification of every key in the
+keyboard. Each key is represented by an integer value, defined in the
+"iupkey.h" file header, which should be included in the application to
+use the key definitions. These keys are used in K_ANY and KEYPRESS_CB
+callbacks to inform the key that was pressed in the keyboard.
+
+IUP uses the US default codification this means that if you installed a
+keyboard specific for your country the key codes will be different from
+the real keys for a small group of keys. Except for the Brazilian ABNT
+keyboard which works in Windows and Linux. This does not affect the
+L<IUP::Text|IUP::Text> and L<IUP::Multiline|IUP::Multiline> text input.
+
+Notice that somes key combinations are not available because they are
+restricted by the system.
+
+=over
+
+=item * C<IUP-E<gt>isprint($key)> function informs if a key can be directly used as a printable character
+
+=item * C<IUP-E<gt>isXkey($key)> function informs if a given key is an extended code
+
+=item * C<IUP-E<gt>isShiftXkey($key)> function informs if a given key is an extended code using the Shift modifier
+
+=item * C<IUP-E<gt>isCtrlXkey($key)> function for the Ctrl modifier
+
+=item * C<IUP-E<gt>isAltXkey($key)> function for the Alt modifier
+
+=item * C<IUP-E<gt>isSysXkey($key)> function for the Sys modifier
+
+=back
+
+In the table bellow there are the most common definitions. Change the
+definition to K_s*, K_c*, K_m* and K_y* when the respective modifier is
+pressed (Shift, Control, Alt and Sys). Sys in Windows is the Windows
+key and in Mac is the Apple key. Check the "iupkey.h" file header for
+all the definitions. To detect the combination of two or more modifiers
+use global attribute "MODKEYSTATE".
+
+Note: GTK in Windows does not generates the Win modifier key, the
+K_Print and the K_Pause keys (up to GTK version 2.8.18).
+
+ KEY            KEYCODE CONSTANT (from IUP::Constants)
+ -------------- ---------------------------------------
+ Space          K_SP
+ !              K_exclam
+ "              K_quotedbl
+ #              K_numbersign
+ $              K_dollar
+ %              K_percent
+ &              K_ampersand
+ '              K_apostrophe
+ (              K_parentleft
+ )              K_parentright
+ *              K_asterisk
+ +              K_plus
+ ,              K_comma
+ -              K_minus
+ .              K_period
+ /              K_slash
+ 0              K_0
+ 1              K_1
+ 2              K_2
+ 3              K_3
+ 4              K_4
+ 5              K_5
+ 6              K_6
+ 7              K_7
+ 8              K_8
+ 9              K_9
+ :              K_colon
+ ;              K_semicolon
+ <              K_less
+ =              K_equal
+ >              K_greater
+ ?              K_question
+ @              K_at
+ A              K_A
+ B              K_B
+ C              K_C
+ D              K_D
+ E              K_E
+ F              K_F
+ G              K_G
+ H              K_H
+ I              K_I
+ J              K_J
+ K              K_K
+ L              K_L
+ M              K_M
+ N              K_N
+ O              K_O
+ P              K_P
+ Q              K_Q
+ R              K_R
+ S              K_S
+ T              K_T
+ U              K_U
+ V              K_V
+ W              K_W
+ X              K_X
+ Y              K_Y
+ Z              K_Z
+ [              K_bracketleft
+ \              K_backslash
+ ]              K_bracketright
+ ^              K_circum
+ _              K_underscore
+ `              K_grave
+ a              K_a
+ b              K_b
+ c              K_c
+ d              K_d
+ e              K_e
+ f              K_f
+ g              K_g
+ h              K_h
+ i              K_i
+ j              K_j
+ k              K_k
+ l              K_l
+ m              K_m
+ n              K_n
+ o              K_o
+ p              K_p
+ q              K_q
+ r              K_r
+ s              K_s
+ t              K_t
+ u              K_u
+ v              K_v
+ w              K_w
+ x              K_x
+ y              K_y
+ z              K_z
+ {              K_braceleft
+ |              K_bar
+ }              K_braceright
+ ~              K_tilde
+ Esc            K_ESC
+ Enter          K_CR
+ BackSpace      K_BS
+ Insert         K_INS
+ Del            K_DEL
+ Tab            K_TAB
+ Home           K_HOME
+ Up Arrow       K_UP
+ PgUp           K_PGUP
+ Left Arrow     K_LEFT
+ Middle         K_MIDDLE
+ Right Arrow    K_RIGHT
+ End            K_END
+ Down Arrow     K_DOWN
+ PgDn           K_PGDN
+ Pause          K_PAUSE
+ Print Screen   K_Print
+ Context Menu   K_Menu
+ acute          K_acute
+ cedilla        K_ccedilla
+ F1             K_F1
+ F2             K_F2
+ F3             K_F3
+ F4             K_F4
+ F5             K_F5
+ F6             K_F6
+ F7             K_F7
+ F8             K_F8
+ F9             K_F9
+ F10            K_F10
+ F11            K_F11
+ F12            K_F12
+
+=cut

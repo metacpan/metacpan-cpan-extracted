@@ -1,0 +1,417 @@
+<-------------- THE SEVENTY-TWO CHARACTER COLUMN-OMETER --------------->
+<--------1---------2---------3---------4---------5---------6---------7->
+
+
+IP-Country-2.28, 2013.05.15
+---------------------------
+Thanks to ANDK for bug report.
+BUGFIX: http://rt.cpan.org/Public/Bug/Display.html?id=74843
+  minor robustness suggestion to work with CPAN::Reporter
+Database update (thx NHORNE and darrenrh-at-gmail for reminder)
+
+
+IP-Country-2.27, 2009.07.25
+---------------------------
+Added dependency for Geography::Countries (thx Otto Hirr)
+Database update (thx Aaron K Dancygier for reminder)
+
+
+IP-Country-2.26, 2009.01.01
+---------------------------
+Database update
+  Thanks to Brad Fetter for the reminder
+
+
+IP-Country-2.25, 2008.06.25
+---------------------------
+Database update:
+  Jun 25 03:01 delegated-afrinic-latest
+  Jun 24 22:05 delegated-apnic-latest
+  Jun 25 09:01 delegated-arin-latest
+  Jun 25 04:50 delegated-lacnic-latest
+  Jun 25 04:39 ripe.db.inetnum
+
+
+IP-Country-2.24, 2008.03.04
+---------------------------
+Database update:
+  Mar  3 23:19 delegated-afrinic-latest
+  Mar  3 18:06 delegated-apnic-latest
+  Mar  4 06:02 delegated-arin-latest
+  Mar  4 00:50 delegated-lacnic-latest
+  Mar  4 01:38 ripe.db.inetnum
+
+
+IP-Country-2.23, 2007.02.02
+---------------------------
+Thanks to mropp for bug report.
+BUGFIX: http://rt.cpan.org/Public/Bug/Display.html?id=21036
+  lower case country codes when using IP::Country::Medium
+Database update:
+  Feb  2 02:43 delegated-afrinic-latest
+  Feb  1 21:17 delegated-apnic-latest
+  Feb  2 09:03 delegated-arin-latest
+  Feb  2 02:50 delegated-lacnic-latest
+  Feb  2 04:06 ripe.db.inetnum
+
+
+IP-Country-2.22, 2006.12.17
+---------------------------
+Database update:
+  Dec 17 01:11 ripe.db.inetnum.gz
+  Dec 17 02:50 delegated-afrinic-latest
+  Dec 16 21:17 delegated-apnic-latest
+  Dec 17 09:03 delegated-arin-latest
+  Dec 17 02:50 delegated-lacnic-latest
+
+
+IP-Country-2.21, 2006.04.06
+---------------------------
+Thanks to jhe and SAPER for bug reports.
+BUGFIX: http://rt.cpan.org/Public/Bug/Display.html?id=16068
+  Can you replace the deprecated "$^W = 1" in IP::Country::Fast with
+  "use warnings" ? Thanks.
+BUGFIX: http://rt.cpan.org/Public/Bug/Display.html?id=12724
+Database update:
+  Apr  6 01:20 ripe.db.inetnum.gz
+  Apr  6 00:18 delegated-afrinic-20060406
+  Apr  5 18:16 delegated-apnic-20060406
+  Apr  6 05:03 delegated-arin-20060406
+  Apr  6 03:50 delegated-lacnic-20060405
+
+
+IP-Country-2.20, 2005.05.08
+---------------------------
+BUGFIX: doesn't install cleanly with new MakeMaker (thx Mike Castle, 
+  MSCHWERN, Saul Jaffe):
+  http://www.nntp.perl.org/group/perl.makemaker/2271
+  rt.cpan.org ID #12704
+Reverted LACNIC license after clarification:
+> Hello Sir.
+>
+> If we are not wrong, the data you use in our module is the we publish
+> in daily base in our ftp site, where it is possible to identify,
+> among other things, the country of an allocated resource.
+>
+> More specifically the:
+> ftp://ftp.lacnic.net/pub/stats/lacnic/delegated-lacnic-latest
+>
+> There is no problem in redistributing this information.
+>
+> We actually have a agreement to grant access to a more detailed set of
+> information (almost the same info available via whois interface),
+> which requires an special permission and could not be
+> redistribute. But this is not the case of the above mentioned ftp file.
+>
+> Regards,
+> --
+> Hostmaster :: LACNIC Registration Group
+
+
+IP-Country-2.19, 2005.04.27
+---------------------------
+Congratulations to AfriNIC, which has become the fifth Regional
+  Internet Registry, serving Africa and the Indian Ocean.
+Amended LACNIC acceptable use. Contacted LACNIC to check I'm still OK.
+Removed dependency for Geography::Countries (but *not* from ip2cc)
+Removed MaxMind tests, as I have no time to fix.
+Database update:
+  /ripe/dbase/split/ripe.db.inetnum.gz
+  /pub/stats/arin/delegated-arin-latest (Apr 27)
+  /public/apnic/stats/apnic/delegated-apnic-latest (Apr 27)
+  /pub/stats/lacnic/delegated-lacnic-latest (Apr 27)
+  /pub/stats/afrinic/delegated-afrinic-latest (Apr 27)
+
+
+IP-Country-2.18, 2004.10.22
+---------------------------
+Fixed BUG in testsuite (thx k.heinz-cpan at onlinehome.de):
+  rt.cpan.org IDs 4454 and 7840
+More than a year since a DB update, and people are complaining.
+Database update:
+  /ripe/dbase/split/ripe.db.inetnum.gz (Oct 22)
+  /pub/stats/arin/delegated-arin-20041022
+  /public/apnic/stats/apnic/delegated-apnic-20041022
+  /pub/stats/lacnic/delegated-lacnic-20041021
+
+
+IP-Country-2.17, 2003.09.15
+---------------------------
+IP::Country::MaxMind added
+IP::Country::Fast no longer uses top-level domains from hostnames.
+
+
+IP-Country-2.16, 2003.09.12
+---------------------------
+IMPORTANT CHANGE!!!
+UK now stored as GB to follow standard.
+
+Less important changes:
+I've changed my name.
+Database update:
+  apnic-2003-09-12
+  arin.20030912
+  lacnic.20030912
+  ripe.db.inetnum
+  ripencc.20030911
+Note that aup_dump.txt has disappeared.
+
+
+IP-Country-2.15, 2003.08.04
+---------------------------
+Database update:
+  apnic-2003-08-04
+  arin.20030804
+  aup_dump.txt
+  lacnic.20030804
+  ripe.db.inetnum
+  ripencc.20030803
+
+
+IP-Country-2.14, 2003.07.07
+---------------------------
+Database update:
+  apnic-2003-07-07
+  arin.20030701
+  aup_dump.txt (Jul  6 20:49)
+  lacnic.20030701
+  ripe.db.inetnum (Jul  7 03:40)
+
+
+IP-Country-2.13, 2003.04.08
+---------------------------
+Slight documentation changes.
+
+Added a CLI to IP::Country, named ip2cc (thanks, Lin Yung-Chung <XERN>).
+
+
+IP-Country-2.12, 2003.04.07
+---------------------------
+Slight documentation change.
+
+Monthly database update:
+  apnic-2003-04-01
+  aup_dump.txt (Apr  6 23:46) 
+  arin.20030401
+  lacnic.20030401
+  ripe.db.inetnum (Apr  7 01:38)
+  ripencc.20030406
+
+
+IP-Country-2.11, 2003.02.04
+---------------------------
+Skipped two point versions to sync with Java version numbers. Email me
+if you're interested in the java version.
+
+Added method to find revision date of database (thx Paul Gampe). Date
+is stored as first four bytes of database.
+
+Unbundled Geography::Countries, as it screws the indexing of abigail's
+version on http://search.cpan.org/
+
+Monthly database update:
+  apnic-2003-02-01
+  arin.20030201
+  aup_dump.txt (Feb  4 05:37)
+  lacnic.20030201
+  ripe.db.inetnum (Feb  4 01:37)
+  ripencc.20030203
+
+
+IP-Country-2.08, 2003.01.08
+---------------------------
+Bundled Geography::Countries (thx Abigail).
+
+First release to use full arin data, and all summary files (they
+probably can't do any harm with the new handicapping code):
+  apnic-2003-01-01
+  arin.20030101
+  lacnic.20030101
+  ripencc.20030101
+  aup_dump.txt.gz (Jan  7 20:34)
+  ripe.db.inetnum (Jan  7 23:52)
+
+
+IP-Country-2.07, 2003.01.01
+---------------------------
+First release of IP::Authority, a module that performs fast lookup of
+Internet authority by IP address.
+
+Monthly database update:
+  apnic-2003-01-01
+  arin.20030101
+  lacnic.20030101
+  ripe.db.inetnum (31/12/02  23:52:00)
+
+
+IP-Country-2.06, 2002.12.30
+---------------------------
+After a conversation with Katie Petrusha (RIPE Database Administration),
+I've now switched to using the full RIPE database, rather than the 
+statistics. Many, many thanks to her for her expert advice. The database
+is now based on around 750,000 separate IP ranges.
+  So, the database is now bigger and slightly slower (but not to the 
+extent that anyone should notice). I think the performance hit is 
+worthwhile considering the benefit of the increased accuracy. Again,
+thank you Katie for the hints. If anyone from ARIN, APNIC or LACNIC is 
+in a similar position to help me out with their databases, please let 
+me know.
+  Also, requested confirmation from the RIRs that their copyright
+notices were correct, and have altered the copyright appropriately.
+
+
+IP-Country-2.05, 2002.12.18
+---------------------------
+Jump distance to next node now stored as variable-length, which reduces
+database size to 73KB.
+
+
+IP-Country-2.04, 2002.12.17
+---------------------------
+Removed raw files. Fixed minor bug that affected *one* IP address!
+
+
+IP-Country-2.03, 2002.12.16
+---------------------------
+Documentation upgrade.
+
+
+IP-Country-2.02, 2002.12.16
+---------------------------
+Oops! Forgot to make clean before zipping up the distribution. My bad!
+
+
+IP-Country-2.01, 2002.12.15
+---------------------------
+Switched to a more efficient storage mechanism, based on a binary tree.
+Have already optimized the country code storage. In future revisions,
+will reduce storage requirements again, so that the whole database 
+occupies only (70KB). At the moment, it's around 142KB, which is a lot
+smaller than the 512KB it had previously occupied when using DBM files.
+
+Memory usage during execution is minimal (<200KB), and will reduce as 
+the database size reduces.
+
+Seems to work on Macintosh, which was a worry about bundling the built
+database. The database has a .gif extension, which may help prevent
+munging when transferring between non-sane systems.
+
+Within the next few revisions, I will publish the database schematics, 
+and build a C++ interface for reading the database. Hence the avoidance
+of hashes in the code. Remaining hash (%cc) may or may not be replaced
+depending on speed implications.
+
+All manipulation of binary file data is now through some form of
+pack('N',$foo) or unpack('N',$bar), which seem to be reliably cross
+platform.
+
+
+IP-Country-2.00, 2002.12.13
+---------------------------
+No longer relies on AnyDBM_File. Memory usage has been halved and module
+loading time has been shortened. Now bundled with built database, which
+reduces complexity of Makefile.PL.
+
+
+IP-Country-1.99, 2002.12.12
+---------------------------
+Updated arin and lacnic database. Have now preprocessed raw files.
+Laid foundations for version 2, which will have much smaller database,
+based on a binary tree. 'GB' country codes changed to 'UK'. Private
+IP addresses (RFC1918) now have country of '**'.
+
+
+IP-Country-1.70, 2002.12.02
+---------------------------
+December 2002 update of ripe database.
+
+
+IP-Country-1.69, 2002.11.19
+---------------------------
+LACNIC added.
+
+
+IP-Country-1.68, 2002.11.19
+---------------------------
+Added non-allocated areas to database as undef - 20% speedup.
+
+
+IP-Country-1.67, 2002.11.13
+---------------------------
+Combined IP::Registry with IP::Country. From tests, previous IP::Country
+has no significant advantage over IP::Registry, and so has been 
+relegated to the IP::Country::Slow class. New class has been introduced
+named IP::Country::Medium, which caches nameserver lookups, but which
+tries to find country from database before performing nameserver lookup.
+
+CHANGES for IP::Registry have been incorporated into this file.
+
+
+IP-Registry-0211.007, 2002.11.12 - vacation release
+--------------------------------
+BUGFIX: weird IP range problem has been fixed by chopping ranges into
+smaller ranges that are exact powers of two. Coverage of random IP 
+addresses has now jumped from around 40% to around 43%.
+
+Reduced size of IP range hash by about 28,000 ranges. Lookup now 
+proceeds acording to distribution of IP addresses within each range.
+The associated performace boost is about 40% :)
+
+
+IP-Country-1.66, 2002.11.08
+---------------------------
+Returns undef for private nets (RFC1918).
+
+
+IP-Country-1.65, 2002.11.08
+---------------------------
+First attempt at producing a combined interface to the internet address
+registries and domain name system. Seems to work.
+
+Yes, I know the version number is a joke.
+
+
+IP-Registry-0211.006, 2002.11.08
+--------------------------------
+Performance boost. Now looks up about 10,000 IP addresses per second.
+This is on 730MHz Pentium III (Coppermine) with 512MB RAM. I think
+I'll stop optimizing now. w00t!
+Tests switched from Test::More to Test, as people complained about 
+downloading modules.
+
+
+IP-Registry-0211.005, 2002.11.08
+--------------------------------
+If hostname ends in two-letter top-level domain, this is changed to 
+upper case and returned, with no further processing (thx, Rob Knobben,
+Rivals Digital Media).
+
+
+IP-Registry-0211.004, 2002.11.08
+--------------------------------
+Tweak to Makefile.PL that should shorten installation time.
+Documented the weird IP range problem.
+
+
+IP-Registry-0211.003, 2002.11.08
+--------------------------------
+Performance boost. On my machine, was looking up one IP address every
+17 seconds. Now looks up more than 256 IPs per second! Like the old
+programming adage goes - "make it work, then make it fast".
+
+
+IP-Registry-0211.002, 2002.11.07
+--------------------------------
+Now uses AnyDBM_File, which should be a bit more compatible.
+A couple of typos have been fixed in the POD.
+README added.
+
+
+IP-Registry-0211.001, 2002.11.07
+--------------------------------
+First attempt at producing a combined interface to the internet address
+registries. Seems to work.
+
+
+<--------1---------2---------3---------4---------5---------6---------7->
+<-------------- THE SEVENTY-TWO CHARACTER COLUMN-OMETER --------------->

@@ -1,0 +1,118 @@
+{
+   "abstract" : "IRC network indexing system",
+   "author" : [
+      "Jon Portnoy <avenj@cobaltirc.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "IRC-Indexer",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Cmd" : 0,
+            "Test::More" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : 0,
+            "Compress::Zlib" : 0,
+            "Config" : 0,
+            "DB_File" : 0,
+            "Data::Dumper" : 0,
+            "Digest::SHA" : 0,
+            "Fcntl" : 0,
+            "File::Find" : 0,
+            "File::Path" : "2.00",
+            "File::Spec" : 0,
+            "Getopt::Long" : 0,
+            "IRC::Utils" : "0.11",
+            "JSON::XS" : 0,
+            "Log::Handler" : 0,
+            "POE" : "1.311",
+            "POE::Component::IRC" : "6.74",
+            "POEx::HTTP::Server" : 0,
+            "POSIX" : 0,
+            "Scalar::Util" : 0,
+            "Storable" : 0,
+            "Time::HiRes" : 0,
+            "URI" : 0,
+            "YAML::XS" : 0,
+            "perl" : "v5.10.1"
+         }
+      }
+   },
+   "provides" : {
+      "IRC::Indexer" : {
+         "file" : "lib/IRC/Indexer.pm",
+         "version" : "0.06"
+      },
+      "IRC::Indexer::Conf" : {
+         "file" : "lib/IRC/Indexer/Conf.pm",
+         "version" : 0
+      },
+      "IRC::Indexer::Logger" : {
+         "file" : "lib/IRC/Indexer/Logger.pm",
+         "version" : 0
+      },
+      "IRC::Indexer::Output" : {
+         "file" : "lib/IRC/Indexer/Output.pm",
+         "version" : 0
+      },
+      "IRC::Indexer::Output::Dumper" : {
+         "file" : "lib/IRC/Indexer/Output/Dumper.pm",
+         "version" : 0
+      },
+      "IRC::Indexer::Output::JSON" : {
+         "file" : "lib/IRC/Indexer/Output/JSON.pm",
+         "version" : 0
+      },
+      "IRC::Indexer::Output::YAML" : {
+         "file" : "lib/IRC/Indexer/Output/YAML.pm",
+         "version" : 0
+      },
+      "IRC::Indexer::Process::JSONify" : {
+         "file" : "lib/IRC/Indexer/Process/JSONify.pm",
+         "version" : 0
+      },
+      "IRC::Indexer::Process::Trawler" : {
+         "file" : "lib/IRC/Indexer/Process/Trawler.pm",
+         "version" : 0
+      },
+      "IRC::Indexer::Report::Network" : {
+         "file" : "lib/IRC/Indexer/Report/Network.pm",
+         "version" : 0
+      },
+      "IRC::Indexer::Report::Server" : {
+         "file" : "lib/IRC/Indexer/Report/Server.pm",
+         "version" : 0
+      },
+      "IRC::Indexer::Trawl::Bot" : {
+         "file" : "lib/IRC/Indexer/Trawl/Bot.pm",
+         "version" : 0
+      },
+      "IRC::Indexer::Trawl::Forking" : {
+         "file" : "lib/IRC/Indexer/Trawl/Forking.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.06"
+}

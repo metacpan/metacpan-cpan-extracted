@@ -1,0 +1,75 @@
+{
+   "abstract" : "return the color name of the image file as a string",
+   "author" : [
+      "libitte <libitte3@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.11.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Image-ColorDetector",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Image::Magick" : "6.87",
+            "List::Util" : "1.35",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Image::ColorDetector" : {
+         "file" : "lib/Image/ColorDetector.pm",
+         "version" : "0.04"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/libitte/Image-ColorDetector/issues"
+      },
+      "homepage" : "https://github.com/libitte/Image-ColorDetector",
+      "repository" : {
+         "url" : "git://github.com/libitte/Image-ColorDetector.git",
+         "web" : "https://github.com/libitte/Image-ColorDetector"
+      }
+   },
+   "version" : "0.04"
+}

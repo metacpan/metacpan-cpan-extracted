@@ -1,0 +1,28 @@
+What to do about crypto and defaults.
+
+IPC::Transit::receive will throw if it gets a crypto message that it can't decrypt/sign.
+$message->{'.ipc_transit_meta'}->{encrypt_source} will contain the key in $IPC::Transit::public_keys that contains the public key that is the pair to the private key that encrypted the message.  Note, this MIGHT be 'default', which is the default keypair.
+
+
+$message->{'.ipc_transit_meta'}->{signed_destination} will contain either 'my_private' or 'default', the latter being the default keypair.
+
+
+IPC::Transit::send will use the destination key to find a public key to encrypt the message with.  If none are found, then it will encrypt with the default public.
+
+Further, ::send will look in $IPC::Transit::my_keys->{private} for a private key to sign the message.  If that does not exist, then it will use the default private.
+
+So we need to put both of these things into .ipc_transit_meta before we serialize and encrypt, and I guess should put them into the wire headers too, so there isn't any guesswork on the receiving end.
+
+
+Ok, so this is pretty nifty, though care needs to be taken.  It means that we can always send/receiving encrypted/signed message, even if no keys have been exchanged, since it will automatically fall back to default/default.  It's up to the receiver to look at the value of $message->{'.ipc_transit_meta'}->{encrypt_source}...if that value is 'default' then the message could have been sent by anybody.
+
+
+We should also change remote transit to return the public key of the receiving server after every message is delivered, to most quickly distribute public keys.
+
+So we can bake into the distribution the public key associated with various centrals.
+
+We also need the ability to have more than one public key for a given slot, to allow for key rotation.  That is, in a given slot, check all of the entries and use the one that works.
+
+Assuming that there will be a valid cert for https://toolsx.central/, that means the agent should be able to securely transfer its public key to the central, eliminating MITM risk.
+
+

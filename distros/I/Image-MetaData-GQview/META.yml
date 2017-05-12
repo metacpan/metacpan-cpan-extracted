@@ -1,0 +1,17 @@
+--- #YAML:1.0
+name:                Image-MetaData-GQview
+version:             v2.0.0
+abstract:            Perl extension for GQview image metadata
+license:             GPL v2
+author:              
+    - Klaus Ethgen <Klaus@Ethgen.de>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Carp:                          0
+    Cwd:                           0
+    Fatal:                         0
+    version:                       0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

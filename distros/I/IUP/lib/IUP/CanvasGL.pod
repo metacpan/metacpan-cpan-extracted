@@ -1,0 +1,275 @@
+=for comment based on iup-3.2 - http://www.tecgraf.puc-rio.br/iup/en/ctrl/iupglcanvas.html
+
+=head1 NAME
+
+IUP::CanvasGL - [GUI element] 2D canvas based on OpenGL (co-operates with OpenGL module)
+
+=head1 DESCRIPTION
+
+Creates an OpenGL canvas (drawing area for OpenGL).
+
+=begin HTML
+
+<p><img src="http://kmx.github.io/perl-iup/img-3.9/ctrl/iupglcanvas.png"></p>
+
+=end HTML
+
+B<IMPORTANT:> For using L<IUP::CanvasGL> you also need to have module L<OpenGL|OpenGL> installed.
+
+Example:
+
+ use IUP ':all';
+ use OpenGL ':all';
+ 
+B<Callback handler prototype:>
+
+ sub action_callback {
+   my ($self, $x, $y) = @_;
+   $self->GLMakeCurrent();
+   glViewport(0, 0, 300, 300);
+   glClearColor(1.0, 1.0, 1.0, 1.0);
+   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+   glColor3f(1.0,0.0,0.0);
+   glBegin(GL_QUADS); 
+     glVertex2f( 0.9,  0.9); 
+     glVertex2f( 0.9, -0.9); 
+     glVertex2f(-0.9, -0.9); 
+     glVertex2f(-0.9,  0.9); 
+   glEnd();
+   $self->GLSwapBuffers();
+   return IUP_DEFAULT;
+ }
+
+ my $dlg = IUP::Dialog->new( 
+             TITLE=>"Example",
+             MINSIZE=>"300x300",
+             child=>IUP::CanvasGL->new( BUFFER=>"DOUBLE", RASTERSIZE=>"300x300", ACTION=>\&action_callback ),
+           );
+
+ $dlg->Show();
+ IUP->MainLoop();
+
+
+=head1 USAGE
+
+=head2 CREATION - new() method
+
+ my $canvas_gl = IUP::CanvaGL->new( BUFFER=>"DOUBLE", RASTERSIZE=>"300x300" );
+
+B<Returns:> the identifier of the created element, or C<undef> if an error occurs.
+
+NOTE: You can pass to C<new()> other C<ATTRIBUTE=E<gt>'value'> or C<CALLBACKNAME=E<gt>\&func> pairs relevant
+to this element - see L<IUP::Manual::02_Elements|IUP::Manual::02_Elements/"new()">.
+
+=head2 ATTRIBUTES
+
+For more info about concept of attributes (setting/getting values etc.)
+see L<IUP::Manual::03_Attributes|IUP::Manual::03_Attributes>. Attributes specific to this element:
+
+The L<IUP::CanvasGL|IUP::CanvasGL> element handles all attributes defined for a
+conventional canvas, see L<IUP::Canvas|IUP::Canvas>.
+
+Apart from these attributes, L<IUP::CanvasGL|IUP::CanvasGL> handles specific attributes
+used to define the kind of buffer to be instanced. Such attributes are
+all B<creation only> attributes and must be set before the element is
+mapped on the native system. After the mapping, specifying these
+special attributes has no effect.
+
+=over
+
+=item B<ACCUM_RED_SIZE>, B<ACCUM_GREEN_SIZE>, B<ACCUM_BLUE_SIZE> and B<ACCUM_ALPHA_SIZE>
+
+Indicate the number of bits for representing the
+color components in the accumulation buffer. Value 0 means the
+accumulation buffer is not necessary. Default is 0.
+
+=item B<ALPHA_SIZE>
+
+Indicates the number of bits for representing each
+colors alpha component (valid only for RGBA and for hardware that store
+the alpha component). Default is "0".
+
+=item B<BUFFER>
+
+Indicates if the buffer will be single "SINGLE" or double
+"DOUBLE". Default is "SINGLE".
+
+=item B<BUFFER_SIZE>
+
+Indicates the number of bits for representing the color
+indices (valid only for INDEX). The system default is 8 (256-color
+palette).
+
+=item B<COLOR>
+
+Indicates the color model to be adopted: "INDEX" or "RGBA".
+Default is "RGBA".
+
+=item B<COLORMAP>
+
+I<(read-only)>
+
+Returns "Colormap" in UNIX and "HPALETTE"
+in Win32, if COLOR=INDEX.
+
+=item B<CONTEXT>
+
+I<(read-only)>
+
+Returns "GLXContext" in UNIX and "HGLRC" in Win32.
+
+=item B<DEPTH_SIZE>
+
+Indicates the number of bits for representing the I<z>
+coordinate in the z-buffer. Value 0 means the z-buffer is not
+necessary.
+
+=item B<ERROR>
+
+I<(read-only)>
+
+If an error is found, returns a string containing
+a description of the error in English.
+
+=item B<RED_SIZE>, B<GREEN_SIZE> and B<BLUE_SIZE>
+
+Indicate the number of
+bits for representing each color component (valid only for RGBA). The
+system default is usually 8 for each component (True Color support).
+
+=item B<REFRESHCONTEXT> (write-only) [Windows Only]
+
+Action attribute to
+refresh the internal device context when it is not owned by the window
+class. The L<IUP::Canvas> of the Win32 driver will always create a window
+with an owned DC, but GTK in Windows will not. 
+
+=item B<STENCIL_SIZE>
+
+Indicates the number of bits in the stencil buffer.
+Value 0 means the stencil buffer is not necessary. Default is 0.
+
+=item B<STEREO>
+
+Creates a stereo GL canvas (special glasses are required to
+visualize it correctly). Possible values: "YES" or "NO". Default: "NO".
+
+=item B<SHAREDCONTEXT>
+
+Name of another IUP::GLCanvas that will share its
+display lists and textures. That canvas must be mapped before this
+canvas.
+
+=item B<VISUAL>
+
+I<(read-only)>
+
+Returns "XVisualInfo*" in UNIX and "HDC" in Win32.
+
+=back
+
+=head2 CALLBACKS
+
+For more info about concept of callbacks (setting callback handlers etc.)
+see L<IUP::Manual::04_Callbacks|IUP::Manual::04_Callbacks>. Callbacks specific to this element:
+
+
+The L<IUP::CanvasGL|IUP::CanvasGL> element understands all callbacks defined for a
+conventional canvas, see L<IUP::Canvas|IUP::Canvas> section L<callbacks|IUP::Canvas/CALLBACKS>.
+
+Additionally:
+
+=over
+
+=item L<RESIZE_CB|IUP::Manual::03_Attributes/RESIZE_CB>
+
+B<Callback handler prototype:>
+
+ sub resize_cb_handler {
+   my ($self, $width, $heght) = @_;
+   #...
+ }
+
+By default the resize callback sets:
+
+ glViewport(0,0,$width,height);
+
+=back
+
+=head2 Auxiliary Functions
+
+These are auxiliary functions based on the WGL and XGL extensions.
+Check the respective documentations for more information.
+
+=head3 GLMakeCurrent()
+
+ $canvas_gl->GLMakeCurrent();
+
+Activates the given canvas as the current OpenGL context. All
+subsequent OpenGL commands are directed to such canvas.
+
+=head3 GLIsCurrent()
+
+ $canvas_gl->GLIsCurrent();
+
+Returns a non zero value if the given canvas is the current OpenGL
+context.
+
+=head3 GLSwapBuffers()
+
+ $canvas_gl->GLSwapBuffers();
+
+Makes the BACK buffer visible. This function is necessary when a double
+buffer is used.
+
+=head3 GLPalette()
+
+ $canvas_gl->GLPalette($index, $r, $g, $b);
+
+Defines a color in the color palette. This function is necessary when
+INDEX color is used.
+
+=head3 GLUseFont()
+
+ $canvas_gl->GLUseFont($first, $count, $list_base);
+
+Creates a bitmap display list from the current FONT attribute. See the
+documentation of the wglUseFontBitmaps and glXUseXFont functions.
+
+=head3 GLWait()
+
+ $canvas_gl->GLWait($gl);
+
+If B<gl> is non zero it will call B<glFinish> or B<glXWaitGL>, else will call
+B<GdiFlush> or B<glXWaitX>. 
+
+=head1 NOTES
+
+In Windows XP, if the COMPOSITED attribute on the the main dialog (L<IUP::Dialog>) is enabled then the hardware
+acceleration will be disabled.
+
+The L<IUP::CanvasGL|IUP::CanvasGL> works with the GTK base driver in UNIX (X-Windows).
+
+=head1 EXAMPLES
+
+
+The element B<IUP::CanvasGL> is used in the following sample scripts:
+
+=over
+
+=item * L<0-basic/glcanvas1.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/glcanvas1.pl> - IUP::CanvasGL example
+
+=item * L<0-basic/glcanvas2.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/glcanvas2.pl> - IUP::CanvasGL example
+
+=back 
+
+
+
+=head1 SEE ALSO
+
+L<IUP::Canvas|IUP::Canvas>
+
+The original doc: L<iupcanvasgl.html|http://www.tecgraf.puc-rio.br/iup/en/ctrl/iupglcanvas.html>
+ 
+
+=cut

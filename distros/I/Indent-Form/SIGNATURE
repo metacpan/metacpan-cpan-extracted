@@ -1,0 +1,51 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.70.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 7203e213910af0a8c1b2fb57740b9f4625c9bc1e Changes
+SHA1 9daf712acd38e68d1a09b342aa476eae8b879f16 Form.pm
+SHA1 8c3dc421056515d6b3fc4e0e59d281288cec9c7e MANIFEST
+SHA1 75d305677c18cfbe5fbada6174e92dbcf923e82a META.yml
+SHA1 9ed1e3f2c994abfab38b69187ca98d850fa1c943 Makefile.PL
+SHA1 edcfc8db1f84188d8104b2f8ca0879ecfe48181a README
+SHA1 812c9eebf216452993668b2816ee426987e12894 examples/ex1.pl
+SHA1 5c3445fbda20a2c3ea1b45c00a4009626d7b7909 examples/ex2.pl
+SHA1 e85274b116da70a84eccc84ac27c11b1a6e474a1 examples/ex3.pl
+SHA1 dc13ce0dbb488a5de81c3f6519ee31acda17397a inc/Module/Install.pm
+SHA1 91c20cbda8ca41b4e8f9e0390faff635c2ebe839 inc/Module/Install/Base.pm
+SHA1 eaf50ccbacecb797f0527deb0221c8264f6c8bd8 inc/Module/Install/Can.pm
+SHA1 363c8931cc183444907684b71d6a379e4fc8edcb inc/Module/Install/Fetch.pm
+SHA1 26ae1c0f5f352037b560414f216d7e3ac682f936 inc/Module/Install/Makefile.pm
+SHA1 ff97eb025b44c343d026c2a56a73d50c65319e95 inc/Module/Install/Metadata.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 4c5ce519d404e242418f51dfe761287469e18e3a inc/Module/Install/Win32.pm
+SHA1 47a52cf8719a283c0efa2edab0088b5d67e0f23a inc/Module/Install/WriteAll.pm
+SHA1 799d40cbf99470bc322c2340b780d70df8b97a17 t/Indent-Form/00-use.t
+SHA1 db63a8f1c2823c36adf64c90b9126cc1804d1281 t/Indent-Form/01-version.t
+SHA1 13e314175b1ab9c98904356881cd7f4a525b7f1a t/Indent-Form/02-pod_coverage.t
+SHA1 7f8ef816da4fa68e22fed334a75368c957e889aa t/Indent-Form/03-pod.t
+SHA1 ae73e152b78d0756510657689934e6c6811a2d72 t/Indent-Form/04-new.t
+SHA1 69bd832f05e2fd8a45671d9346d26744a3c7a004 t/Indent-Form/05-indent.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iQEcBAEBAgAGBQJTO/+oAAoJEAwa+cf4dLBao2YIAMHducHAlcue2KRRd/Ee4GkF
+dhrpvJRpDwLef9iKdvV4xv8JVOfjQuXT4rGvIMA/SkTm8M69y9DGMQuJLtuxuv2Q
+4YIInha/lBqrbqMxvewQYcfWaNqNLUlp2PSjfBDyJc6b8hsuIv6ALnT9LWX+Dl6K
+e8i7Xt3/xWjR4KTOCmlb2UJ9CjgCIEcc7Rmadfv9AuJtVopJujQw2WLaOnRNQwB0
+NCVimncsRI88lj7DPLHRP65MxpbGktYhbkQ4r8k9TQW190HtDii7nprks9CPKneK
+l5WuEka7ffRrRbSnnpP+U2TYI+oAN2N1NybMc9riggm5s9wXhLhp4Avs4NVWdeA=
+=HLE5
+-----END PGP SIGNATURE-----

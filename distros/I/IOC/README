@@ -1,0 +1,41 @@
+IOC version 0.29
+===========================
+
+This module provide a lightweight IOC or Inversion of Control framework. 
+Inversion of Control, sometimes called Dependency Injection, is a 
+component management style which aims to clean up component configuration 
+and provide a cleaner, more flexible means of configuring a large 
+application.
+
+See the individual module documentation for more information
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+	Class::Interfaces
+    Class::Throwable
+    Class::StrongSingleton
+    
+    XML::SAX (for IOC::Config::XML)
+    
+    Test::Exception (for testing)
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 Infinity Interactive, Inc.
+
+http://www.iinteractive.com
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

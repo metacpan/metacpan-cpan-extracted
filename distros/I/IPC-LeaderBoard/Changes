@@ -1,0 +1,9 @@
+0.02      2017-02-21 02:13:25+00:00 UTC
+  -  Switch to dzil
+
+0.02 2016-07-30 binary.com <perl@binary.com>
+  - Bugfix: $sb->get() is not atomic, use $sb->incr() for actual record generation fetch.
+    The bug might lead to possible slot rewrite, being invoked from parallel processes
+
+0.01 2016-05-11 binary.com <perl@binary.com>
+ - Initial version.

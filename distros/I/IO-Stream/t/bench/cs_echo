@@ -1,0 +1,105 @@
+#!/usr/bin/perl
+# Test configuration: IP, 1/100 simultaneous connections
+#   WHAT                            THREADS     SPEED       CPU:
+# IO::Stream                        1           2919/sec    100%
+# IO::Stream                        100         2938/sec
+# POWER::Event::IO                  1           1896/sec
+# POWER::Event::IO                  100         2209/sec
+use warnings;
+use strict;
+use Carp;
+
+use Socket;
+use Fcntl;
+use Errno qw( EAGAIN );
+
+use blib;
+use EV;
+use IO::Stream;
+
+use Carp::Heavy;
+$SIG{PIPE}  = 'IGNORE';
+$EV::DIED   = sub { warn $@; exit 255 };
+
+warn "Testing IO::Stream-$IO::Stream::VERSION\n";
+
+sub tcp_server {
+    my ($host, $port) = @_;
+    socket my $sock, AF_INET, SOCK_STREAM, 0        or croak qq{socket: $!};
+    setsockopt $sock, SOL_SOCKET, SO_REUSEADDR, 1   or croak qq{setsockopt: $!};
+    bind $sock, sockaddr_in($port, inet_aton($host))or croak qq{bind: $!};
+    listen $sock, SOMAXCONN                         or croak qq{listen: $!};
+    fcntl $sock, F_SETFL, O_NONBLOCK                or croak qq{fcntl: $!};
+    return $sock;
+}
+
+my $srv_sock = tcp_server('127.0.0.1', 1234);
+my $srv_w = EV::io($srv_sock, EV::READ, sub {
+    if (accept my $sock, $srv_sock) {
+        IO::Stream->new({
+            fh          => $sock,
+            cb          => \&server,
+            wait_for    => EOF|SENT,
+            in_buf_limit=> 1024000,
+        });
+    }
+    elsif ($! != EAGAIN) {
+        die "accept: $!\n";
+    }
+});
+
+sub new_client {
+    IO::Stream->new({
+        host        => '127.0.0.1',
+        port        => 1234,
+        cb          => \&client,
+        wait_for    => EOF|SENT,
+        out_buf     => 'Hello, World!',
+        out_pos     => 0,
+        in_buf_limit=> 1024000,
+    });
+}
+
+new_client() for 1 .. 1;
+
+my $RUNS = 0;
+my $alarm = 5;
+my $t = EV::timer $alarm, 0, sub {
+    warn sprintf "RUNS=%d (%d/sec)\n", $RUNS, $RUNS/$alarm;
+    EV::unloop;
+};
+EV::loop;
+
+
+sub server {
+    my ($io, $e, $err) = @_;
+    if ($err) {
+        $io->close();
+        die "server: $err\n";
+    }
+    if ($e == EOF) {
+        $io->write("echo: $io->{in_buf}");
+    }
+    if ($e == SENT) {
+        $io->close();
+    }
+}
+
+sub client {
+    my ($io, $e, $err) = @_;
+    if ($err) {
+        $io->close();
+        die "client: $err\n";
+    }
+    if ($e == EOF) {
+        die "client: bad answer=$io->{in_buf}\n"
+            if $io->{in_buf} ne 'echo: '.$io->{out_buf};
+        $io->close();
+        new_client();
+        $RUNS++;
+    }
+    if ($e == SENT) {
+        shutdown $io->{fh}, 1;
+    }
+}
+

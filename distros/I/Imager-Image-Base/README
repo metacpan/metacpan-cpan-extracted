@@ -1,0 +1,10 @@
+An Image::Base to Imager converter.
+
+Example scripts for xpm-to-png and xbm-to-png conversion are in the
+examples/ directory.
+
+For module usage check Imager::Image::Xpm or Imager::Image::Xbm. Any
+Image::Base-compatible objects may be handled with
+Imager::Image::Base.
+
+Author: Slaven Rezic

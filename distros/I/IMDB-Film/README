@@ -1,0 +1,57 @@
+IMDB-Film
+======================
+
+IMDB::Film is OO Perl interface to the database of films
+IMDB (www.imdb.com). It allows to retrieve information
+about movies by its IMDB code or title. Also, there is a 
+possibility to get information about IMDB persons (actors,
+actresses, directors etc) by their name of code.
+
+For more details please read POD of that module.
+
+INSTALLATION
+
+To install this module type the following:
+
+   	perl Makefile.PL
+   	make
+   	make test
+   	make install
+
+To install this module in the specific path use:
+	
+	perl Makefile.PL PREFIX=/path/to/your/lib
+
+To install the module in your home directory use that command:
+
+	perl Makefile.PL PREFIX=YOU_HOME/path/to/your/lib
+
+Note: you don't need to have a root privileges to do that!	
+
+Also, you can use CPAN shell:
+
+	> perl -MCPAN -e shell
+	cpan> install IMDB::Film
+
+or use command 'cpan':
+
+	> cpan install IMDB::Film
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  	HTML::TokeParser
+	LWP::Simple
+    Cache::Cache	  
+
+AUTHOR
+
+Michael Stepanov (stepanov.michael@gmail.com)
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 - 2010 by Michael Stepanov. 
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

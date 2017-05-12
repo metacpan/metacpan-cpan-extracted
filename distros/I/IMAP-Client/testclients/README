@@ -1,0 +1,4 @@
+This testclients folder contains test scripts that can be run on your favorite IMAP server as an example of how to execute functions.
+
+admintest.pl - runs various administrative functions.  Creates an account called asdfasdf, renames it to foobar, deletes it, and does everything inbetween.
+runtests.pl - simply runs all the tests in the t/ folder

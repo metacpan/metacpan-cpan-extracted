@@ -1,0 +1,61 @@
+{
+   "abstract" : "Interchange6 Open Source Shop Machine",
+   "author" : [
+      "Stefan Hornburg (Racke) <racke@linuxia.de>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.16, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Interchange6",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "Test::Warnings" : "0.005",
+            "aliased" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Module::Runtime" : "0",
+            "Moo" : "1.004005",
+            "MooX::HandlesVia" : "0",
+            "MooseX::CoverableModifiers" : "0.3",
+            "Safe::Isa" : "0",
+            "Type::Tiny" : "0.038",
+            "namespace::clean" : "0",
+            "perl" : "5.010000"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/interchange/Interchange6/issues"
+      },
+      "repository" : {
+         "url" : "https://github.com/interchange/Interchange6.git"
+      },
+      "x_IRC" : "irc://irc.freenode.net/#interchange"
+   },
+   "version" : "0.120",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

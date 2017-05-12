@@ -1,0 +1,446 @@
+# Revision history for Inline::SLang
+
+--
+version: 1.00
+date:    Tue Jan  4 12:02:37 EST 2005
+changes:
+
+There has been only one minor change to the previous version (v0.30).
+
+- The initialisation of the S-lang interpreter now more-closely mirrors
+  that used by the slsh application. This means that:
+    - The interpreter's load path is set to the SLSH_PATH environment
+      variable (if set). This path can be read/set using the S-Lang
+      intrinsics get_slang_load_path() and set_slang_load_path().
+    - The "system" slsh.rc file is processed. This file is looked for
+      (in order), the SLSH_CONF_DIR and SLSH_LIB_DIR environment
+      variables and, if they do not exist, in one of
+        /usr/local/etc:/usr/local/slsh:/etc:/etc/slsh
+    - The "user" ~/.slshrc file is processed. This file is looked for
+      in the directory given by the HOME environemnt variable.
+
+   This was primarily added to support the changes made to the S-Lang
+   support in CIAO 3.2 - e.g. the use of require() to load modules - but
+   may be useful elsewhere.
+
+   This support is on by default but can be turned off by adding
+     use Inline SLang => CONFIG => 'none';
+   to your script.
+
+   The function sl_setup_called() can be used to determine if the
+   slsh support was loaded (a value other than 0). The routine
+   sl_setup_as_slsh() can be used to call this initialisation code
+   after the S-Lang code has been processed (in the unlikely event this
+   is needed).
+
+   Unfortunately the support is currently only for UNIX systems so there
+   may be problems when the module is compiled.
+
+- The documentation has been updated to better match the module and
+  to clean up a few areas. The list of previous changes can now be
+  found in the Inline::SLang::Changes documentation, with Inline::SLang
+  only listing the changes in the current version.
+
+- Improvements to the test suite.
+
+- A copyright statement has been added to the source files.
+
+--
+version: 0.30
+date:    Tue Jun  8 21:00:16 EDT 2004
+changes:
+
+This is intended to be the last release before the 1.00 version (which will
+hopefully be identical to this one bar the change in version number).
+
+- PDL support:
+  - arrays are converted "as is", so that what is a 2x3 array in S-Lang will
+    be converted to a 3x2 piddle (and vice versa).
+  - Removed the warning messages that were in the code and documentation.
+  - added support for "virtual" piddles (see the description of the
+    make_physical() routine in PDL::Core). The current system is not ideal
+    since it calls make_physical() on any virtual piddle sent to a S-Lang
+    routine, which is a waste of memory. We may want to extend the PDL C
+    API to allow 'easy' read access to data from a virtual piddle (since I
+    do not want to be messing around with the internals of a piddle in this
+    code).
+
+- fixed minor bugs in Makefile.PL:
+    - when multiple S-Lang libraries were found on the system they were all
+      labelled as number 1 (when asking which to use).
+    - the list of paths searched for S-Lang was not displayed correctly in
+      the --help option
+    - improvement to a regexp used to find the size of S-Lang datatypes
+  - Removed the warning message when compiling the PDL support.
+
+- minor enhancements to test suite to check support for n-dimensional
+  piddles. Removed a warning message about the re-definition of the all/any
+  functions.
+
+- fixed minor bug in examples/array_conversion.pl and the documentation
+  (Inline::SLang::Arrays).
+
+- added to the Inline::SLang::Details documentation.
+  - added examples/order.pl which is referenced in Inline::SLang::Details
+
+--
+version: 0.26
+date:    Fri Apr 16 00:07:13 EDT 2004
+changes:
+
+- Fixed bug in datatype initialisation introduced in the 0.22 version
+  of the code that manifested itself by failures in the test
+  t/11type_synonyms.t
+
+- The SLang_init_array_extra() routine is called when the S-Lang
+  interpreter is initialised. This adds the sum, min, max functions
+  (and cumsum for version 1.4.9) to the S-Lang run-time library.
+  Updated tests to remove my own version of sum. This change is
+  needed to allow importing of the ChIPS and Sherpa modules
+  from CIAO 3.1.
+
+- Minor updates to README to match recent changes.
+
+--
+version: 0.25
+date:    Tue Apr 13 22:56:06 EDT 2004
+changes:
+
+- Another one-line fix and we have PDL support working on OS-X.
+  PDL support is now on by default during building (that is if PDL
+  is available).
+
+--
+version: 0.24
+date:    Tue Apr 13 22:16:12 EDT 2004
+changes:
+
+- A one-line fix means that PDL support now works on Linux as well as
+  Solaris. It works on OS-X until you try to convert a S-Lang array
+  to a piddle. PDL support is now on by default for Solaris and Linux
+  machines.
+
+--
+version: 0.23
+date:    Wed Apr  7 21:32:07 EDT 2004
+changes:
+
+- This is a fix to 'make test' in version 0.22, which failed on systems
+  which did not already have a version of Inline::SLang installed.
+
+--
+version: 0.22
+date:    Wed Apr  7 16:29:05 EDT 2004
+changes:
+
+- This is a minor release over 0.21.
+
+- The major change is in the details of the build process: we now use
+  Inline::C to embed the C code - which is used to interrogate the
+  S-Lang interpreter - within Makefile.PL rather than having it in a
+  separate file (slfconfig.c) which we have to compile ourselves. This
+  should make the build process more portable.
+
+- One really minor documentation fix to the "CHANGES" section of
+  Inline::SLang.
+
+--
+version: 0.21
+date:    Mon Apr  5 15:15:51 EDT 2004
+changes:
+
+- This is a minor release over version 0.20. The main user-visible changes
+  are:
+    o The module will now build on OS-X.
+    o Support for PDL has been turned off by default since it does not
+      work on Linux and OS-X machines.
+    o The dump() method has been added to the Struct_Type class. This
+      should be considered an experimental feature (which is why it has
+      not been documented) and not relied upon.
+    o Inline::SLang::Details has been added to document the design and
+      implementation of the module. It is not intended to be read by the
+      average user, unless there is a problem. Currently it is little more
+      than a place holder.
+
+- The code has been re-organised: the single file util.c has been
+  split into sl2pl.c, pl2sl.c, and pdl.c.
+
+--
+version: 0.20
+date:    Wed May 21 00:37:07 EDT 2003
+changes:
+
+- Support for conversion of S-Lang arrays to piddles (PDL):
+    o requires v2.4.0 of PDL which isn't actually released
+      (a fairly-recent CVS build should do the trick)
+    o conversion betweed 1D arrays and piddles works
+    o should 0D piddles be converted to a scalar or a 1-element 1D array?
+      (currently the code croaks)
+    o > 1D arrays is a mess since a 2x3 array in S-Lang maps to a
+      3x2 piddle. The first time this happens a warning is printed to
+      STDERR as a precaution. Not sure what the best approach is.
+    o it has only been tested on 32-bit machines
+
+- Remove some warnings from the test suite seen on an Alpha
+
+- Tie::ExtraHash appears to have been added to Tie::Hash after 5.6.0
+  so copy the code for this package rather than import it.
+
+--
+version: 0.12
+date:    Sun May 11 23:33:38 EDT 2003
+changes:
+
+- Added support for type "synonyms": you can now create DataType_Type
+  objects of type Int16_Type, UInt16_Type, Int32_Type, UInt32_Type,
+  Float32_Type, Float64_Type, Short_Type, Long_Type and possibly
+  Int64_Type, UInt64_Type. The return value of Inline::SLang::Int32_Type()
+  - or whatever - is the actual type usedf by S-Lang rather than the
+  type synonym. Note that Short/Long types may not actually be synonyms.
+ 
+- The build process now checks that the S-Lang interpreter was built with
+  support for floats and complex types; if not it exits with an error.
+
+- Added a brief section to the Inline::SLang document describing how
+  S-Lang are handled.
+
+--
+version: 0.11
+date:    Wed May  7 00:39:17 EDT 2003
+changes:
+
+- S-Lang arrays can now be converted to Array_Type objects as well
+  as array references. Use the Inline::SLang::sl_array2perl()
+  function (described in the Inline::SLang manpage) to control how
+  arrays are converted.
+
+- Added functions called Inline::SLang::<datatype name>() that return
+  a DataType_Type object whose value matches the given datatype. These
+  can be imported via the EXPORT array individually or by using '!types'.
+  This means you can say
+    Integer_Type()
+  rather than
+    DataType_Type->new("Int_Type")
+  [unfortunately there are no functions for type "synonyms" like 'Int_Type'].
+
+- DataType_Type objects can now be compared for equality and inequality
+  (i.e. the ==, eq, !=, and ne operators).
+
+- Added Inline::SLang::sl_have_pdl() and Inline::SLang::sl_version()
+  functions that return information about how the module was compiled.
+
+- changed storage mechanism for "opaque" types; should be better behaved
+  when converting a large array of such items.
+
+- re-arranged some of the internals to take advantage of recent changes
+  or make them more robust/maintainable. Should be no user-visible changes.
+
+- we no longer allow the S-Lang namespace "_inline" to be bound to Perl
+  (this namespace is for use only by the module).
+
+--
+version: 0.10
+date:    Sat May  3 19:39:00 EDT 2003
+changes:
+
+Since there have been a number of significant changes over 0.06 the 
+version number has been pushed to 0.10.
+
+ - Support for S-Lang libraries earlier than 1.4.7 has been discontinued.
+
+ - Perl class names have been changed from Inline::SLang::XXX to
+   XXX. This reduces the amount of typing, but it doesn't fit in
+   with standard Perl module/namespace policy. There's also the (rare?)
+   possibility that a data type name will clash with an extant
+   Perl module. A compromise would be to use SLang::XXX?
+
+ - S-Lang structs (both Struct_Type and named structs) are now handled
+   using a tied hash. What this means is that you get back a hash
+   reference and so can use it as any other hash (e.g. $$foo{x}) with
+   the caveat that you can not create new keys and the iteration order
+   - eg the value from keys(%$foo) and each(%$foo) - is fixed to match
+   that of the struct's fields. The returned value is still a member
+   of the Struct_Type class (or derived from it if it's a named struct).
+
+ - S-Lang Assoc_Type arrays are now converted to the Perl Assoc_Type
+   class (and vice-versa). This is a reference to a hash array (as with
+   Struct_Type) but you can add and delete keys. Note that when iterating
+   through the key names of the array [eg via Perl's keys/values/each or
+   the get_keys/values method calls] you are NOT guaranteed to get
+   the same order as S-Lang's assoc_get_keys/values/foreach construct.
+   If a user supplies a hash reference (ie not an Assoc_Type object)
+   then this gets converted to an 'Assoc_Type [Any_Type]' array.
+
+ - Have created a Perl Array_Type class to handle S-Lang arrays. This
+   will not use a tied interface, instead using methods as mutators.
+   It is expected that piddles will be used for numeric arrays - at least
+   once the PDL support is added! - and so this will only really be
+   used for arrays of non-numeric data types (and even then you will
+   probably want to use a normal Perl array reference as discussed below).
+
+ - Perl array references are converted to S-Lang arrays with the
+   type and dimensionality guessed at based on the first element in the
+   array. Note that it's not too hard to confuse the poor computer; for
+   such cases you can use the Inline::SLang::sl_array() function to 
+   specify the data type and/or dimensionality.
+
+ - Conversion of S-Lang arrays to Perl now accomdates all dimensions
+   (previously only 1 and 2D) and all variable types (previously only
+   numeric, string, and a couple of other ones such as DataType_Type).
+   Still use Perl array references to represent this data (and not
+   Array_Type objects). This will be configurable.
+
+ - Several Inline::SLang::XXX routines can now be exported to Perl's
+   main package by use of the EXPORT configuration option (rather than
+   the standard Perl way of using 'use foo qw( ... );'. This can be
+   looked at as something of a hack.
+ - Handling of S-Lang errors has been improved: they are now caught
+   and then converted into Perl errors. So, calls to sl_eval() can
+   now be wrapped in an eval block and the S-Lang error message will
+   appear in $@. Needs more testing to see if this is really what is
+   wanted (I don't really grok Perl's error handling). For instance the
+   lack of line numbers can be annoying.
+   This means that calling DataType_Type->new() with an unknown type
+   name no longer results in S-Lang error messages printed to STDERR
+   (which it did in 0.06).
+ - fixed mem leak when converting structs from Perl to S-Lang. Note that
+   the code used *may* trigger a mem leak in the S-Lang library if you
+   are using a version < 1.4.9.
+
+--
+version: 0.06
+date:    Thu Apr  3 22:36:54 EST 2003
+changes:
+ - big improvement in amount of S-Lang scalar types that can be converted
+   to Perl (and vice versa). If a S-Lang type is not recognised then
+   it is converted into an Inline::SLang::XXX object, where XXX matches
+   the S-Lang type. These objects do not do much in Perl, but will
+   convert back to the S-Lang type. Types handled like this are
+     Ref_Type (removes hacky handling of this type 0.05); Any_Type; and
+     any module-defined types
+ - named/type-deffed structures - ie those created via 'typedef struct ...'
+   - are now handled as Inline::SLang::XXX objects, where XXX is
+   the S-Lang type name. These objects are sub-classes of the
+   Inline::SLang::Struct_type class.
+ - Inline::SLang::DataType_Type->new() now verifies that the type is
+   recognised by S-Lang. This means that type synonyms (eg 'Int_Type'
+   for 'Integer_Type' are recognised and converted to the 'base' type),
+   but it does mean that unrecognised values result in several lines of
+   S-Lang error messages being printed to STDERR. This could be stopped
+   by installing an error hook, but that's for later.
+
+ - fixed BIND_NS => "All"
+ - added examples/ directory (not too different from those in the tests
+   and in the Inline::SLang::Types documentation)
+
+Note that in the next release the class names for objects will be
+shortened from Inline::SLang::Foo_Type to Foo_Type.
+
+--
+version: 0.05
+date:    Fri Mar 14 11:57:31 EST 2003
+changes:
+ - Removed the namespace tests (t/20bind_foo|many.t) if S-Lang version is
+   less than 1.4.3. This should remove the CPAN testing failure.
+   If you wish to use the BIND_NS option then make sure you have at least
+   this version of S-Lang (you gain further benefits if you upgrade to
+   at least v1.4.7).
+ - Can specify the Perl package name for each S-Lang namespace to be bound
+   to (by specifying "foo=bar" in the BIND_NS config option to get S-Lang
+   namespace "foo" to be bound to the "bar" Perl package). I can't actually
+   think of a need for this.
+ - BIND_NS = "All" will bind all namespaces without having to specify them
+   individually (only available if you use v1.4.7 or higher of S-Lang)
+ - Added the BIND_SLFUNCS option to allow binding of selected S-Lang
+   intrinsic functions. We allow these functions to use a different function
+   name in Perl to that in S-Lang (specified as "slang_name=perl_name").
+ - The output of 'perl -MInline=info' has been updated to account for the
+   inproved binding schemes.
+
+ - added support for Ref_Type (both from and to S-Lang) variables (scalar
+   only). This makes use of "private" routines/structures and so should
+   be considered a hack.
+ - handling of S-Lang structs has changed to more closely match the S-Lang
+   API (in that the method names match the S-Lang function names without
+   the 'slang_')
+ - Support for "non native" types (those that are represented by an object
+   from an Inline::SLang::* class) has been standardised to use the name
+   of the S-Lang datatype: at present we have Inline::SLang::DataType_Type,
+   Inline::SLang::Struct_Type, and Inline::SLang::Ref_Type. All classes
+   provide several common methods (all classes are sub-classes of a
+   hidden base class).
+   This has the side effect of making the class names even more verbose.
+
+ - Documentation for configuration of Inline::SLang has been moved from
+   Inline::SLang to Inline::SLang::Config. 
+
+--
+version: 0.04
+date:    Fri Mar  7 00:14:47 EST 2003
+changes:
+ - The copyright holder is now the Smithsonian Astrophysical Observatory.
+ - The license changed to GNU General Public License only (prior to v0.04
+   it was distributed under a dual "perl or GNU GPL license" scheme)
+
+ - S-Lang's Struct_Type variables are converted to Inline::SLang::struct
+   objects, assuming the types of the fields are also supported.
+   The conversion leaks memory.
+ - 1D and 2D support for DataType variables (S-Lang to Perl)
+ - Fixed mem leaks in the code converting associative-array
+ - improvement to access 1D/2D arrays of Complex_Type values; users
+   should see no change because of this
+ - internal function added to access S-Lang version module was compiled
+   against. This is almost-certainly not needed.
+ - Conversion of perl types to S-Lang is still very limited.
+
+ - added the configuration option BIND_NS: only functions in namespaces
+   in this list are bound to Perl. Note that S-Lang intrinsic functions
+   are not bound to Perl and that S-Lang functions in namespace foo
+   (ie that would be evaluated via foo->function_name() in S-Lang)
+   are accessed via foo::function_name() in Perl. See the TODO file for
+   possible future upgrades.
+ - improved the build/load functions used when evaluating/loading the
+   S-Lang code. This stops the S-Lang code being evaluated twice the
+   first time a file was evaluated.
+
+ - further separation (and improvement) of test cases
+
+--
+version: 0.03
+date:    Tue Jan 28 12:01:49 EST 2003
+changes:
+ - Initial CPAN release (for feedback/comments as still pre-alpha)
+ - S-Lang's associative arrays are supported (in so far as there is
+   1D array support for the data type of the stored data)
+ - S-Lang's Complex_Type is stored as a Math::Complex object in Perl
+   and can convert between the two languages (scalars only)
+ - S-Lang's Datatype_Type is represented as an Inline::SLang::datatype
+   object (scalars only).
+ - 1/2D array support (S-Lang to Perl) no longer lumps together similar
+   datatypes (eg char, short, int, long) into the code (should we just
+   typecast them to long in S-Lang scope instead?)
+ - Complex types are supported in 1 & 2D arrays
+ - documentation split: data type information is now in a separate pod,
+   Inline::SLang::Types.
+ - 'perl Makefile.PL' now supports the --gdb(=string) flag (--help for 
+   help)
+   Initial support for both static and dynamically-loaded forms of the 
+   S-Lang library.
+   Added Test::More as a requirement.
+
+--
+version: 0.02
+date:    Sun Jan 19 10:56:10 EST 2003
+changes:
+ - now correctly accesses elements from String_Type (thanks to John Davis)
+ - started support for > 1D arrays (S-Lang to Perl only)
+ - added some necessary files for a perl module
+
+--
+version: 0.01
+date:    Thu Jan 16 23:59:59 EST 2003
+changes:
+ - initial version
+ - the fact it works is thanks to Neil Watkiss' Ruby & Python Inline modules
+
+--

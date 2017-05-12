@@ -1,0 +1,75 @@
+NAME
+    Imager::Bing::MapLayer - create a map layer for Bing Maps
+
+SYNOPSIS
+        my $layer = Imager::Bing::MapLayer->new(
+          base_dir           => $dir,     # base directory (default '.')
+          overwrite          => 1,        # overwrite existing (default)
+          autosave           => 1,        # save on exit (default)
+          in_memory          => 0,        # keep tiles in memory (default false)
+          min_level          => 1,        # min zoom level (default)
+          max_level          => 19,       # max zoom level (default)
+          combine            => 'darken', # tile composition method (default)
+        );
+
+        # Plot polygons (e.g. geographic boundaries)
+
+        $layer->polygon(
+           points => $points,                  # listref to [ lat, lon ] points
+           fill   => Imager::Fill->new( ... ), #
+        );
+
+        # Plot greyscale gradient circles for heatmaps
+
+        $layer->radial_circle(
+            r      => 100,              # radius in meters
+            -min_r => 1,                # minimum pixel radius for any zoom level
+            x      => $longitude,       # longitude (x = east-west)
+            y      => $latitude,        # latitude  (y = north-south)
+        );
+
+        # Blur filter
+
+        $layer->filter( type => 'gaussian', stddev => 1 );
+
+        # Colourise greyscale heatmaps
+
+        $layer->colourise();
+
+DESCRIPTION
+    This module is a wrapper around the Imager::Draw module, which allows
+    you to create Bing map layers using longitude and latitude coordinates.
+
+    The module will automatically map them to the appropriate points on tile
+    files.
+
+SEE ALSO
+        * Bing Maps Tile System
+
+        http://msdn.microsoft.com/en-us/library/bb259689.aspx
+
+AUTHOR
+    Robert Rothenberg, `<rrwo at cpan.org>'
+
+BUGS
+    Please report any bugs or feature requests to the author, or through the
+    web interface at https://github.com/robrwo/Imager-Bing-MapLayer/issues.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Imager::Bing::MapLayer
+
+    You can also look for information at:
+
+    * GitHub
+        https://github.com/robrwo/Imager-Bing-MapLayer
+
+ACKNOWLEDGEMENTS
+    *   Foxtons, Ltd.
+
+LICENSE AND COPYRIGHT
+    Copyright 2013-2014 Robert Rothenberg.
+
+    This program is released under the following license: atistic2
+

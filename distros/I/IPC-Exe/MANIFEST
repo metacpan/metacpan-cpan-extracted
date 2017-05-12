@@ -1,0 +1,14 @@
+Changes
+LICENSE
+Makefile.PL
+MANIFEST
+README
+examples/interactive1.pl
+examples/interactive2.pl
+examples/synopsis.pl
+lib/IPC/Exe.pm
+t/00_pod.t
+t/01_pod-coverage.t
+t/02_IPC-Exe.t
+t/03_taint.t
+META.yml                                 Module meta-data (added by MakeMaker)

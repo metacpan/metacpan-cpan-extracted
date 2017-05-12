@@ -1,0 +1,14 @@
+--- #YAML:1.0
+
+# This is a comment
+
+foo: &bar bar
+baz:
+  name: Ulysses K. Fishwick
+  age: 97
+  favorite metavariable: *bar
+
+...
+
+This text should be ignored.
+

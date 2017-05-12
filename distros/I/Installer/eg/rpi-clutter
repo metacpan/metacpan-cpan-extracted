@@ -1,0 +1,38 @@
+#
+# based on http://wayland.freedesktop.org/
+#
+
+debian qw(
+  build-essential automake libtool bison flex xutils-dev libcairo2-dev libffi-dev
+  libmtdev-dev libjpeg-dev libudev-dev libxcb-xfixes0-dev libxcursor-dev
+  libraspberrypi-dev libxkbcommon-dev libxcb-composite0-dev libpam-dev
+  gtk-doc-tools gnome-common
+);
+my $xdg_runtime = '/run/shm/wayland';
+run mkdir => '-p', $xdg_runtime;
+run mkdir => '-p', 'share/pkgconfig';
+run mkdir => '-p', 'share/aclocal';
+run chmod => "0700", $xdg_runtime;
+for (qw( bcm_host.pc egl.pc glesv2.pc )) {
+  copy 'http://cgit.collabora.com/git/user/pq/android-pc-files.git/tree/pkgconfig/'.$_.'?h=raspberrypi', 'share', 'pkgconfig', $_;
+}
+export 'XDG_RUNTIME_DIR="'.$xdg_runtime.'"';
+export 'XDG_CONFIG_HOME="'.target_path('etc').'"';
+export 'XORGONFIG="'.target_path('etc','xorg.conf').'"';
+export 'LD_LIBRARY_PATH="$LD_LIBRARY_PATH${LD_LIBRARY_PATH+:}/opt/vc/lib"';
+git 'git://anongit.freedesktop.org/wayland/wayland',
+  disable => [qw( documentation )], no_configure => 1;
+git 'git://anongit.freedesktop.org/wayland/weston',
+  disable => [qw(
+    x11-compositor drm-compositor wayland-compositor simple-egl-client
+    egl libunwind colord resize-optimization xwayland-test
+  )],
+  enable => [qw( weston-launch )],
+  with => { cairo => 'image' },
+  extra_args => [qw( WESTON_NATIVE_BACKEND="rpi-backend.so" )];
+git 'git://git.gnome.org/glib';
+git 'git://git.gnome.org/atk';
+git 'git://git.gnome.org/cogl',
+  enable => [qw( wayland-egl-platform=yes gl )];
+git 'git://git.gnome.org/clutter',
+  enable => [qw( wayland-backend )];

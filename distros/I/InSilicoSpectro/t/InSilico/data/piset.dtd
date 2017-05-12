@@ -1,0 +1,5 @@
+ <!ELEMENT pisettings (pK*)>
+  <!ELEMENT pK (coef*)>
+  <!ATTLIST pK author CDATA "Unknown">
+    <!ELEMENT coef  (#PCDATA)>
+    <!ATTLIST coef data (A|C|D|E|F|G|H|I|K|L|M|N|P|Q|R|S|T|V|W|Y|Carboxyl|Amino) "Undefined">

@@ -1,0 +1,53 @@
+{
+   "abstract" : "IP address search whith baidu,taobao,sina,pconlie public IP API!",
+   "author" : [
+      "Orange <bollwarm@ijz.me>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.16, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "IP-IPwhere",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "Encode" : "0",
+            "JSON" : "0",
+            "LWP::Simple" : "0",
+            "POSIX" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/bollwarm/IP-IPwhere",
+         "web" : "http://ijz.me"
+      }
+   },
+   "version" : "0.05"
+}

@@ -1,0 +1,6 @@
+Revision history for Perl extension Image::Ocrad.
+
+0.01  Wed Aug 17 17:51:28 2005
+	- original version; created by h2xs 1.22 with options
+		-Xn Image::Ocrad
+

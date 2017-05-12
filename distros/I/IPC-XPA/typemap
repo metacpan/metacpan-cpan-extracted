@@ -1,0 +1,34 @@
+TYPEMAP
+IPC_XPA_RAW	T_PTROBJ_SPECIAL
+HV*	T_HvRV
+
+INPUT
+T_PTROBJ_SPECIAL
+	if (sv_derived_from($arg, \"${(my $ntt=$ntype)=~s/_/::/g;\$ntt}\"))
+	{
+	IV tmp = ( &PL_sv_undef == (SV*) SvIV((SV*)SvRV($arg))  ) ?
+	                  (IV) NULL : SvIV((SV*)SvRV($arg)); 
+	  $var = ($type) tmp;
+	}
+	else
+          croak( \"${Package}::$func_name() -- $var is not of type ${(my $ntt=$ntype)=~s/_/::/g;\$ntt}\")
+
+T_HvRV
+        if( SvROK($arg) && (SvTYPE(SvRV($arg)) == SVt_PVHV) )
+                $var = (HV*)SvRV( $arg );
+        else {
+                croak( \"${Package}::$func_name() -- $var is not an HV reference\" );
+        }
+
+
+
+OUTPUT
+T_PTROBJ_SPECIAL
+	sv_setref_pv($arg, \"${(my $ntt=$ntype)=~s/_/::/g;\$ntt}\",
+	 $var ? (void*)$var : &PL_sv_undef );
+
+# Cannot use sv_setref_pv() because that will destroy
+# the HV-ness of the object.  Remember that newRV() will increment
+# the refcount.
+T_HvRV
+        $arg = newRV((SV*)$var);

@@ -1,0 +1,10 @@
+Revision history for Perl extension IO::CVSHeaderFile.
+
+0.01  Wed Aug 21 09:38:51 2002
+	- original version; created by h2xs 1.21 with options
+		-X -A IO::CSVHeaderFile
+0.03 Sat Nov 20 23:10:05 CET 2004
+	- added support for array read/write
+
+0.04 Fri Jul  6 10:49:11 CEST 2007
+	- fix problem with newer TEXT_XS arguments passing

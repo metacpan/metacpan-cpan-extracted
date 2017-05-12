@@ -1,0 +1,33 @@
+NAME
+    IO::Socket::SecureSocks - Doing socks over a secure wire (sockss)
+
+SYNOPSIS
+      use strict;
+      use IO::Socket::SecureSocks;
+
+      my $sock = IO::Socket::SecureSocks->new(
+        ProxyAddr   => 'some.ssl.socks.server',
+        ProxyPort   => 1081, # default sockss port
+        Username    => 'socksuser',
+        Password    => 'sockspassword',
+        ConnectAddr => 'server.to.connect.to',
+        ConnectPort => 80,
+        Timeout     => 60
+      ) or die;
+
+DESCRIPTION
+    IO::Socket::SecureSocks connects to a SOCKS v5 proxy over a secure line
+    (SSL), tells it to open a connection to a remote host/port when the
+    object is created. The object you receive can be used directly as a
+    socket for sending and receiving data from the remote host.
+
+SEE ALSO
+    IO::Socket::Socks, IO::Socket::SSL
+
+AUTHOR
+    Sascha Kiefer, "esskar@cpan.org"
+
+COPYRIGHT
+    This program is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -1,0 +1,110 @@
+#!perl
+
+use warnings;
+use strict;
+use 5.014;
+
+use bytes ();
+
+use File::Slurp;
+use Getopt::Long;
+use Time::HiRes qw/ gettimeofday tv_interval /;
+
+use IO::Compress::Brotli;
+use IO::Uncompress::Brotli;
+
+GetOptions(
+    'c|custom-dictionary=s' => \(my $DICTIONARY),
+    'd|decompress'          => \(my $DECOMPRESS),
+    'f|force'               => \(my $FORCE),
+    'h|help'                => \(my $HELP),
+    'i|input=s'             => \(my $INPUT),
+    'o|output=s'            => \(my $OUTPUT),
+    'q|quality=i'           => \(my $QUALITY = 11),
+    'r|repeat=i'            => \(my $REPEAT = 1),
+    's|stream=i'            => \(my $STREAM),
+    'v|verbose'             => \(my $VERBOSE),
+    'w|window=i'            => \(my $WINDOW = 22),
+);
+
+if( $HELP ) {
+    say "Usage: $0 [--force] [--quality n] [--decompress] [--input filename] [--output filename]".
+        " [--repeat iters] [--verbose] [--window n] [--custom-dictionary filename] [--stream size]";
+    exit 1;
+}
+
+if( $REPEAT > 1 && !($INPUT && $OUTPUT) ) {
+    say "You can only run a benchmark on files specifying --input and --output";
+    exit 1;
+}
+
+my $t0 = [gettimeofday];
+my $total_size = 0;
+my ($encoded, $decoded);
+
+for ( 1..$REPEAT ) {
+    my $ifh;
+    if( $INPUT ) {
+        open $ifh, "<", $INPUT
+            or die "Cannot open input file $INPUT.\n";
+    }
+    $ifh //= \*STDIN;
+    binmode $ifh;
+
+    my $ofh;
+    if( $OUTPUT ) {
+        die "Output file exists\n"
+            if( -e $OUTPUT && $REPEAT == 1 && !$FORCE );
+        open $ofh, ">", $OUTPUT
+            or die "Cannot open output file $OUTPUT.\n";
+    }
+    $ofh //= \*STDOUT;
+    binmode $ofh;
+
+    if( $DECOMPRESS ) {
+        if( $STREAM ) {
+            my $bro = IO::Uncompress::Brotli->create();
+            while( read $ifh, (my $buf), $STREAM ) {
+                $decoded = $bro->decompress($buf);
+                $total_size += bytes::length( $decoded );
+                print $ofh $decoded;
+            }
+        }
+        else {
+            $encoded = read_file( $ifh );
+            $decoded = unbro( $encoded );
+            $total_size += bytes::length( $decoded );
+            write_file( $ofh, $decoded );
+        }
+    }
+    else {
+        if( $STREAM ) {
+            my $bro = IO::Compress::Brotli->create();
+            $bro->quality( $QUALITY );
+            $bro->window( $WINDOW );
+            while( read $ifh, (my $buf), $STREAM ) {
+                $encoded = $bro->compress($buf);
+                $total_size += bytes::length( $buf );
+                print $ofh $encoded;
+            }
+            $encoded = $bro->finish();
+            print $ofh $encoded;
+        }
+        else {
+            my $decoded = read_file( $ifh );
+            my $encoded = bro( $decoded, $QUALITY, $WINDOW );
+            $total_size += bytes::length( $decoded );
+            write_file( $ofh, $encoded );
+        }
+    }
+}
+
+if( $VERBOSE ) {
+    my $elapsed = tv_interval ( $t0 );
+    say "Ran $REPEAT iterations in a total of $elapsed seconds";
+    say sprintf(
+        "Brotli %s speed: %.6f MB/s",
+        ( $DECOMPRESS ? "decompression" : "compression" ),
+        $total_size / 1024 / 1024 / $elapsed
+    );
+}

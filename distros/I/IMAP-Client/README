@@ -1,0 +1,16 @@
+IMAP-Client - Perl module for IMAP manipulation
+  Copyright 2005-2006, Brenden Conte <conteb at cpan dot org>  All rights reserved.
+  This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+Prerequisites
+  IO::Socket, IO::Socket::SSL, MIME::Base64, URI, URI::imap, URI::Escape
+
+Build Instructions
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+See Changelog file for information on changes between versions.
+
+See TODO file for information on future development points.

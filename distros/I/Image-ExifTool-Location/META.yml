@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                Image-ExifTool-Location
+version:             v0.0.4
+abstract:            Easy setting, getting of an image's location information
+license:             perl
+generated_by:        ExtUtils::MakeMaker version 6.32
+distribution_type:   module
+requires:     
+    Image::ExifTool:               6.76
+    Test::More:                    0
+    version:                       0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Andy Armstrong <andy@hexten.net>

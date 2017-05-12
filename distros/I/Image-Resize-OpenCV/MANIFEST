@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+OpenCV.xs
+ppport.h
+README
+t/Image-Resize-OpenCV.t
+lib/Image/Resize/OpenCV.pm
+META.yml                                 Module meta-data (added by MakeMaker)

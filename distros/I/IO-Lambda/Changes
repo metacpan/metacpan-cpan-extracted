@@ -1,0 +1,201 @@
+1.26  - 4 Jan 2016
+        https bug fixes
+
+1.25  - 14 Nov 2015
+        works with Net::DNS 1.03
+
+1.24  - 5 Aug 2015
+        fixes in Signal::pid and Mutex
+
+1.23  - 18 Mar 2012
+	small http fixes
+
+1.22  - 13 Jan 2012
+	small http fixes
+
+1.21  - 7 Jul 2011
+	fixes for perl 5.14
+
+1.20  - 6 Apr 2010
+	bug fixes
+
+1.19  - 27 Mar 2010
+	polish POE backend some more
+
+1.18  - 24 Mar 2010
+	add POE loop backend
+
+1.17  - 12 Mar 2010
+	add Throttle module (rate-limiter)
+
+1.16  - 7 Feb 2010
+	bugfix in HTTP redirect code (Szymon Swierkosz)
+
+1.15  - 6 Dec 2009
+	implement spawn() and new_process() using threads on win32
+
+1.14  - 2 Dec 2009
+	extend catch/throw API
+
+1.13  - 18 Sep 2009
+	bugfixes in SNMP
+
+1.12  - 3 Aug 2009
+	bugfixes in http stack
+
+1.11  - 2 Jul 2009
+	rewrite HTTPS stack to be fully non-blocking
+	adapt tests for AnyEvent
+
+1.10  - 21 Apr 2009
+	make catch() survive restartable calls; remove finally() as
+        it gets too complex if it needs to be restartable
+	minor SNMP fixes
+
+1.09  - 14 Feb 2009
+	implement finally() for exceptions
+
+1.08  - 31 Jan 2009
+	implement exceptions with throw/catch
+	enhance backtracing and move it out to IO::Lambda::Backtrace
+
+1.07  - 30 Jan 2009
+	add backtrace() and enhance execution tracing with debug flag "caller"
+
+1.06  - 29 Jan 2009
+	add catch(), the predicate-level exception handler
+	rewrite Mutex so that cancelling waiter() works as expected
+
+1.05  - 21 Jan 2009
+	fix minor problems with http/1.1 redirects
+
+1.04  - 16 Jan 2009
+	critical fixes in core (bugs in cancel_event, any_tail, and wait)
+	add mutex(&) condition
+
+1.03  - 15 Jan 2009
+	add IO::Lambda::Mutex
+
+1.02  - 11 Jan 2009
+	fix "invalid handle" exceptions caused by bugs in SNMP code
+	implement DBI::prepare and DBI call grouping
+
+1.01  - 8 Jan 2009
+	rename read to readable, write to writable, readwrite to rwx, sleep to timeout.
+
+1.00  - 18 Dec 2008
+	add higher-order functions: seq, par, mapcar, filter, fold, curry
+
+0.46  - 17 Dec 2008
+	documentation proof-reading
+
+0.45  - 4 Dec 2008
+	added minor safeguards in tests here and there against bizarre perls and platforms
+
+0.42-4 - 23 Nov 2008
+	cosmetic changes
+
+0.41 - 17 Nov 2008
+	rename Loop::Poll to Poll, add generic poller(&)
+
+0.40 - 14 Nov 2008
+	add Loop::Poll and Flock
+
+0.39 - 7 Nov 2008
+	finalize thread and fork API
+
+0.38 - 7 Nov 2008
+	fix bad race conditions in signal waiting routines
+
+0.36,0.37 - 6 Nov 2008
+	portability fixes
+
+0.35 - 5 Nov 2008
+	add Thread,Fork,Message,DBI modules
+
+0.34 - 31 Oct 2008
+	add "apologetics" section in pod
+
+0.33 - 28 Oct 2008
+	fixes for solaris
+
+0.31 - 25 Oct 2008
+	handle nasty win32 non-blocking connects gracefully
+
+0.30 - 17 Oct 2008
+	implement http proxy
+
+0.29 - 10 Oct 2008
+	use Sub::Name's magick
+
+0.28 - 25 Sep 2008
+	style changes, optimize tailo()
+
+0.27 - 15 Aug 2008
+	add spawn() in Signal.pm
+
+0.26 - 14 Aug 2008
+	fixed some bugs in documentation and code
+
+0.25 - 11 Aug 2008
+	any_tail() added 
+
+0.24 - 7 Aug 2008
+	standartize predicate functions wrappers
+
+0.23 - 6 Aug 2008
+	add IO::Lambda::Socket and webserver example
+
+0.22 - 5 Aug 2008
+	add intercept()	
+
+0.21 - 31 Jul 2008
+	smarter getline(), io() is alias to lambda()
+
+0.18 - 25 May 2008
+	simplify yield()/wait(), facilitate override() with state()
+
+0.15 - 18 May 2008
+	add watch_* override()
+
+0.14 - 13 May 2008
+	minor changes
+
+0.13 - 9 May 2008
+	add http authentication
+
+0.12 - 7 May 2008
+	add signal handling
+
+0.11 - 6 May 2008
+	add asynchronous dns
+
+0.10 - 18 Feb 2008
+	minor fixes to http
+
+0.09 - 1 Feb 2008
+	rewrite SNMP support to work with these
+	add Prima and AnyEvent event loops
+
+0.08 - Jan 25 2008
+	add stream I/O
+	rewrite insides of http protocol in lambda style
+
+0.07 - Jan 09 2008
+	improve http handler versatility
+
+0.06 - Dec 28 2007
+	add some documentation
+
+0.04 - Dec 15 2007
+	add condvars and interfaces for additional event loops
+
+0.03 - Dec 14 2007
+	document everything
+
+0.02 - Dec 13 2007
+	cleaned up the concept
+
+0.01 - Dec 11 2007
+	initial
+

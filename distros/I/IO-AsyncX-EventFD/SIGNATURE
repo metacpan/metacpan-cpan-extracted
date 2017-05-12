@@ -1,0 +1,59 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 ec7a16b68af88f7d35df7c676f7c2e3e6c181bdb Changes
+SHA1 fa215b3d2493720342e03b35cd893b36958a7a4e INSTALL
+SHA1 43dae1e8e65629a90df93c4d1230c0dacaef8ffc LICENSE
+SHA1 1098db42efe3ab146188ce0bdfe381cf20856752 MANIFEST
+SHA1 20837e83e167e1e58b29baeeb776d797cc106f7e META.json
+SHA1 c4945a3aed54b8ee6d7190d40bbbb645231c21eb META.yml
+SHA1 e1c40411304b901dbda7febc7a473a72c6628bf9 Makefile.PL
+SHA1 8d3258854560b8ccca38e2a5b5b91ecfe6ec798d README
+SHA1 b9fef67f565ac25d2219b8034854f1cdcd65db7f cpanfile
+SHA1 b168db9be56161943b9b7f9047933edbacc2256e dist.ini
+SHA1 fc2fb4ce4e995dd7ce387629d7b9bc5d245595ef examples/synopsis.pl
+SHA1 1b7d4632976d250956d49d509b30bdd2ac5f48e5 inc/Devel/AssertOS.pm
+SHA1 2283c48e73b1e81e157b325618605178f8ab11e6 inc/Devel/AssertOS/Android.pm
+SHA1 03930e5fb644ac12321f9db0554a0a7b0a3d7adf inc/Devel/AssertOS/Linux.pm
+SHA1 4451b3c7db67d260722f595ac36f61ffb5f94a86 inc/Devel/CheckOS.pm
+SHA1 cf196eedda5c53c47dd6bde7855bc24c68ce123b lib/IO/AsyncX/EventFD.pm
+SHA1 7217af7ee03c0952a6426dfe86d12ef8f9fe14eb t/00-check-deps.t
+SHA1 1ee99d19247820fb2978e5094032dad14e041067 t/00-compile.t
+SHA1 d48ea6aa7cb9f470365569acd226114b1501d792 t/00-report-prereqs.dd
+SHA1 d102b9c45639416472b593947cb72390e24f8e93 t/00-report-prereqs.t
+SHA1 dc8642504eb96705d341464653fe99106803ba02 t/basic.t
+SHA1 f2c40e917e02088703731272f86cbb906ab19eb3 xt/author/mojibake.t
+SHA1 f0c18c75922a1516ae7a5ec5d391b31fd757f0bd xt/author/pod-syntax.t
+SHA1 34513f89a70b96f6412fe2ef0ad4d475e8cac66c xt/author/synopsis.t
+SHA1 187e6d98759176eb6fd4fb386871b0ebc51cf289 xt/author/test-version.t
+SHA1 198d1665317c3d91e3bb81f0a3b8dad8d4d66f20 xt/release/common_spelling.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBAgAGBQJYX8g8AAoJEG2WkcbynxAlJT4P/08sJPlVWOwb1DlUs3jwT3Vi
+DK5xURRbCHO9v+jdKvHdVgYddCW5evLkCGgq8wLRb7169xXX4+53Dx47WxQ6rNHm
+0Ekb6Bu92UEQlfVhgZ40Knh3NgwFb4cLvbeCBVtN0J3gX338efzQGofyZZkQwl2u
+V4uA+l1jjRIlRfP+fgtpltZG+pD/hYEF1jP6JfqHym6oD+zME3xeOilSpynbOhtC
+RRVBv1tMhoTPvbDEljFH8mNdp2hFNrbUFHWe+KDM6fJcJ2sfC/ZaJ5Ipz18xuvZl
+nHZgmIROWKhnUjgaq5VE6QDrqc10w00se4Ntowo7ScmGTWqEtEl3MyLPx4JWJP1k
+arszxUGFieMxyLlnPBjCE/rsKq7MlZkPu8qnmvxQ1cZLGkWSaIoKfai0+we/mU4j
+Pdlu63593aOEOWf5mfPFeO6RUAvh0uFuIE0JcraJB516D2Ts4N2DIOTnPBxIkfuc
+ATUc+8jRBRvzFgVLk/0qTn++QmqBzfCvaYpLlyjc07zmEtr3YbSu6UG1mGKKe6ME
+SXWk3511JeK9cB+FB0fphOl0QvjnJsO6f6mgy1LIcm1B5jgX6JKLqnqQ3HeoLlK8
+UlEqVmCXTi7V2Gs5Cjphh9d8y63H/NJSIHTre3aZEKNwDXPbbkGE1AgO/ntKBxP8
+hRw3rDZYttCa7GHOlEbB
+=72Ha
+-----END PGP SIGNATURE-----

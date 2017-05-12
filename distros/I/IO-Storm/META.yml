@@ -1,0 +1,35 @@
+---
+abstract: 'IO::Storm allows you to write Bolts and Spouts for Storm in Perl.'
+author:
+  - 'Dan Blanchard <dblanchard@ets.org>'
+  - 'Cory G Watson <gphat@cpan.org>'
+build_requires:
+  Test::MockObject: '0'
+  Test::More: '0'
+  Test::Output: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: IO-Storm
+requires:
+  Data::Dumper: '0'
+  IO::File: '0'
+  IO::Handle: '0'
+  JSON::XS: '0'
+  Log::Log4perl: '0'
+  Moo: '0'
+  Try::Tiny: '0'
+  namespace::clean: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/dan-blanchard/io-storm/issues
+  homepage: https://github.com/dan-blanchard/io-storm
+  repository: https://github.com/dan-blanchard/io-storm.git
+version: '0.17'

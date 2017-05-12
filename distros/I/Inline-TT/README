@@ -1,0 +1,35 @@
+Inline-TT2 version 0.01
+=======================
+
+Inline::TT2 is a member of the Inline family of modules which allow you
+to included other languages directly in a Perl program or module.
+Inline::TT2 provides inline support for the Template Toolkit versions 2.0
+and higher (there is another CPAN module: Inline::TT, but it is not compatible
+with current versions).
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Inline 0.44 or higher
+Storable
+Template
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 by Phil Crow
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.5 or,
+at your option, any later version of Perl 5 you may have available.
+
+

@@ -1,0 +1,20 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Image-Pngslimmer.t
+t/01-ispng.t
+t/02-slimnoncrit.t
+t/03-analyze.t
+t/04-zlibcompress.t
+t/05-filter.t
+t/06-palettize.t
+t/07-mediancut.t
+t/08-dither.t
+t/test1.gif
+t/test1.png
+t/test2.png
+t/test3.png
+t/test6.png
+lib/Image/Pngslimmer.pm
+META.yml                                 Module meta-data (added by MakeMaker)

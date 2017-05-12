@@ -1,0 +1,10 @@
+Changes
+MANIFEST
+MM.pm
+MM.xs
+Makefile.PL
+typemap
+test.pl
+example/load.sh
+example/mm_client.pl
+example/mm_server.pl

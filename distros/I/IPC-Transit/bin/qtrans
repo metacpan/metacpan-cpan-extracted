@@ -1,0 +1,37 @@
+#!perl
+
+use strict;use warnings;
+use IPC::Transit;
+use Getopt::Std;
+
+my $opts = {};
+getopts('aP:', $opts);
+if($opts->{P}) {
+    $IPC::Transit::config_dir = $opts->{P};
+    print "Using alternative Transit config dir: $IPC::Transit::config_dir\n";
+}
+
+my $format = '%-40s%-8s%-10s%-10s%-8s';
+my $info = IPC::Transit::stats();
+my $raw_info = {};
+open my $fh, '<', '/proc/sysvipc/msg' or die "failed to open /proc/sysvipc/msg for reading: $!";
+while(my $line = <$fh>) {
+    chomp $line;
+    if($line =~ /(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)$/) {
+        $raw_info->{$1} = {
+            cbytes => $4
+        };
+    }
+}
+close $fh;
+foreach my $queue (sort { $a->{qname} cmp $b->{qname} } @{$info}) {
+    my $percent_full = int($raw_info->{$queue->{qid}}->{cbytes} / $queue->{qbytes} * 1000)/10;
+    $percent_full .= '%';
+    my @out = ($queue->{qname}, $queue->{qnum}, $raw_info->{$queue->{qid}}->{cbytes}, $queue->{qbytes}, $percent_full);
+    if($opts->{a}) {
+        printf("$format\n", @out);
+    } else {
+        printf("$format\n", @out)
+            if $queue->{qnum};
+    }
+}

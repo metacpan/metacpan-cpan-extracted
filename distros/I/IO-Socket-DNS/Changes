@@ -1,0 +1,68 @@
+Revision history for Perl extension IO::Socket::DNS.
+
+0.021  Thu Jul 19 2012
+ - Implement password access functionality
+
+0.020  Thu May 03 2012
+ - Compatibilty with CentOS 6 installation paths.
+
+0.019  Sat Jul 30 2011
+ - Compatibilty fixes for various versions of Perl and
+   various platforms, such as Linux, Mac, Windows.
+ - Allow client to function even without Net::DNS.
+ - Add "nslookup" emergency spawn support so the client
+   IO::Socket::DNS no longer requires Net::DNS.
+ - Bootstrap all downloaded client software with its
+   specified DNS Suffix burnt into the program.
+ - Can now import Net::DNS from the server side via the
+   nslookup command: nslookup -type=TXT nslookup.SUFFIX
+ - For convenience, IO::Socket::DNS->resolver will now
+   automatically import Net::DNS on demand.
+ - Add dnsnetcat utility much like dnstelnet but allows
+   direct TCP I/O by using the real "nc" program.
+ - For security reasons, dnsssh now honors the normal
+   known_hosts and allows StrictHostKeyChecking again.
+ - Add download progress status to Menu so you don't
+   get as confused or bored waiting that first time.
+
+0.018  Wed Jul 13 2011
+ - Minor tweaks to get the distro to PASS.
+ - Rename dnsvpnc to dnsc.
+ - Rename dnsvpnd to dnsd.
+ - Add TXT entry for master dns suffix to help provide
+   easier instructions for those poor people that don't
+   yet have Internet access due to their crippled WiFi.
+ - Add an interactive menu asking what to do.
+ - Add the common "ssh" functionality to the loader menu.
+
+0.017  Sun Jul 11 2011
+ - Documental changes.
+ - Cleaned up some heavy debugging.
+ - Replace shebang in download script with actual $^X
+ - Fix TIEHANDLE definitions to allow I/O methods to
+   operate on the object more directly instead of
+   having to glob hash de-reference every time.
+ - Reduce exponential backoff rate to speed responsiveness.
+ - Initial add of awesome dnsssh convenience utility.
+
+0.016  Fri Jun 24 2011
+ - Convert dnstelnet to just be a wrapper around dnsc and
+   just run the real telnet program instead.
+
+0.015  Thu Jun 23 2011
+ - Allow bootstrap importation of dnsc from server so this
+   can still be used on the client without even having to
+   install IO::Socket::DNS on the client.
+
+0.013  Thu Jun 23 2011
+ - Handle large response packets upon initial port connection.
+
+0.012  Wed Jun 22 2011
+  - IO::Socket::DNS::Server can now autodetect authority IP.
+  - Created dnsc and dnsd convenience scripts.
+
+0.011  Sat Jun 18 2011
+  - Barely functioning version for proof or concept.
+
+0.01   Tue Jun 14 2011
+  - Original version; created by h2xs 1.23

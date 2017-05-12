@@ -1,0 +1,49 @@
+version 0.003; 2010-07-23
+
+  * use simpler "parent" pragma in place of "base"
+
+  * check for required Perl version at runtime
+
+  * use full stricture in test suite
+
+  * use full stricture in Build.PL
+
+  * in Build.PL, explicitly declare configure-time requirements
+
+  * remove bogus "exit 0" from Build.PL
+
+  * add MYMETA.yml to .cvsignore
+
+version 0.002; 2007-09-27
+
+  * use "base" pragma to import Exporter behaviour
+
+  * test POD syntax and coverage
+
+  * build with Module::Build instead of ExtUtils::MakeMaker
+
+  * complete dependency list
+
+  * include signature in distribution
+
+  * in documentation, separate "license" section from "copyright" section
+
+version 0.001; 2004-10-18
+
+  * minimal test suite
+
+  * shorter one-line description in README and man page, to fit module
+    list
+
+  * BUGS entry in documentation, warning about the effects of asynchronous
+    signal delivery
+
+  * versioned dependencies in .pm
+
+  * declare module dependencies in Makefile.PL
+
+  * include Changes file
+
+version 0.000; 2004-03-11
+
+  * initial released version

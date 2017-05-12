@@ -1,0 +1,26 @@
+IO::Socket::Socks::Wrapper
+===========================================
+
+IO::Socket::Socks::Wrapper allows to wrap up the network connections into socks proxy.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  IO::Socket::Socks
+
+COPYRIGHT AND LICENCE
+
+Oleg G
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

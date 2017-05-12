@@ -1,0 +1,27 @@
+---
+abstract: 'Access and modify network interface card configuration'
+author:
+  - 'Lincoln Stein <lincoln.stein@gmail.com>'
+build_requires:
+  ExtUtils::CBuilder: '0'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4205, CPAN::Meta::Converter version 2.120351'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: IO-Interface
+provides:
+  IO::Interface:
+    file: lib/IO/Interface.pm
+    version: '1.09'
+  IO::Interface::Simple:
+    file: lib/IO/Interface/Simple.pm
+    version: 0
+requires:
+  perl: '5.005'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '1.09'

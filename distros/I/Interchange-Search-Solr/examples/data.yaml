@@ -1,0 +1,317 @@
+-  sku: 1111200
+   title: shirt colors
+   category: shirts
+   manufacturer: manu
+   suchbegriffe: asdf
+   description: description of a shirt Ärmelbündchen
+   comment: comment for a shirt
+   size: XL
+   color: blue
+   inactive: 0
+-  sku: 1111300
+   title: shirt
+   category: shirts
+   manufacturer: piko
+   suchbegriffe: asdf
+   description: description of a shirt
+   comment: comment for a shirt
+   size: M
+   color: rose
+   inactive: 0
+
+-  sku: 1111301
+   title: shirt
+   category: shirts
+   manufacturer: piko
+   suchbegriffe: asdf
+   description: description of a shirt
+   comment: comment for a shirt
+   size: M
+   color: rose
+   inactive: 0
+-  sku: 1111302
+   title: shirt
+   category: shirts
+   manufacturer: piko
+   suchbegriffe: asdf
+   description: description of a shirt
+   comment: comment for a shirt
+   size: M
+   color: rose
+   inactive: 0
+-  sku: 1111303
+   title: shirt
+   category: shirts
+   manufacturer: piko
+   suchbegriffe: asdf
+   description: description of a shirt
+   comment: comment for a shirt
+   size: M
+   color: rose
+   inactive: 0
+-  sku: 1111304
+   title: shirt
+   category: shirts
+   manufacturer: piko
+   suchbegriffe: asdf
+   description: description of a shirt
+   comment: comment for a shirt
+   size: M
+   color: rose
+   inactive: 0
+-  sku: 1111305
+   title: shirt
+   category: shirts
+   manufacturer: piko
+   suchbegriffe: asdf
+   description: description of a shirt fashion
+   comment: comment for a shirt
+   size: M
+   color: rose
+   inactive: 0
+
+
+
+-  sku: 1111400
+   title: hat
+   category: hats
+   manufacturer: piko
+   suchbegriffe: asdf
+   description: description of a hat
+   comment: comment for a hat
+   size: M
+   color: blue
+   inactive: 0
+-  sku: 1111500
+   title: boot
+   category: boots
+   manufacturer: piko
+   suchbegriffe: asdf
+   description: description of a boot Ärmelbündchen
+   comment: comment for a boot
+   size: XL
+   color: rose
+   inactive: 0
+-  sku: 1111600
+   title: hat
+   category: hats
+   manufacturer: piko
+   suchbegriffe: asdf
+   description: description of a hat
+   comment: comment for a hat
+   size: XL
+   color: blue
+   inactive: 0
+-  sku: 1111700
+   title: hat
+   category: hats
+   manufacturer: piko
+   suchbegriffe: asdf
+   description: description of a hat
+   comment: comment for a hat
+   size: XL
+   color: rose
+   inactive: 0
+-  sku: 1111800
+   title: hat
+   category: hats
+   manufacturer: manu
+   suchbegriffe: asdf
+   description: description of a hat
+   comment: comment for a hat color and size
+   size: XL
+   color: blue
+   inactive: 0
+-  sku: 1111900
+   title: hat
+   category: hats
+   manufacturer: manu
+   suchbegriffe: asdf
+   description: description of a hat
+   comment: comment for a hat
+   size: XL
+   color: rose
+   inactive: 0
+-  sku: 1113200
+   title: hat
+   category: hats
+   manufacturer: manu
+   suchbegriffe: asdf
+   description: description of a hat
+   comment: comment for a hat
+   size: XL
+   color: blue
+   inactive: 0
+-  sku: 1114200
+   title: hat
+   category: hats
+   manufacturer: manu
+   suchbegriffe: asdf
+   description: another boot with the hat
+   comment: comment for a hat
+   size: XL
+   color: yellow
+   inactive: 0
+-  sku: 1115200
+   title: hat
+   category: hats
+   manufacturer: manu
+   suchbegriffe: asdf
+   description: the nice boot 
+   comment: comment for a hat
+   size: XL
+   color: yellow
+   inactive: 0
+-  sku: 1116200
+   title: boot
+   category: boots
+   manufacturer: manu
+   suchbegriffe: asdf
+   description: the boot 
+   comment: comment for a hat
+   size: XL
+   color: yellow
+   inactive: 0
+-  sku: 1116200
+   title: hat
+   category: hats
+   manufacturer: manu
+   suchbegriffe: asdf
+   description: description of a hat
+   comment: comment for a hat
+   size: XL
+   color: yellow
+   inactive: 0
+-  sku: 1118200
+   title: hat
+   category: hats
+   manufacturer: manu
+   suchbegriffe: asdf
+   description: description of a hat
+   comment: comment for a hat
+   size: XL
+   color: yellow
+   inactive: 0
+-  sku: 1119200
+   title: hat
+   category: hats
+   manufacturer: manu
+   suchbegriffe: asdf
+   description: description of a hat
+   comment: comment for a hat
+   size: XL
+   color: yellow
+   inactive: 0
+-  sku: 1121200
+   title: hat
+   category: hats
+   manufacturer: manu
+   suchbegriffe: asdf
+   description: description of a hat
+   comment: comment for a hat
+   size: XL
+   color: blue
+   inactive: 0
+-  sku: 1131200
+   title: hat
+   category: hats
+   manufacturer: manu
+   suchbegriffe: asdf
+   description: description of a hat
+   comment: comment for a hat
+   size: XL
+   color: blue
+   inactive: 0
+-  sku: 1141200
+   title: hat
+   category: hats
+   manufacturer: manu
+   suchbegriffe: asdf
+   description: description of a hat
+   comment: comment for a hat
+   size: XL
+   color: blue
+   inactive: 0
+-  sku: 1151200
+   title: hat
+   category: hats
+   manufacturer: manu
+   suchbegriffe: asdf
+   description: description of a hat
+   comment: comment for a hat
+   size: XL
+   color: blue
+   inactive: 0
+-  sku: 1161200
+   title: hat
+   category: hats
+   manufacturer: manu
+   suchbegriffe: asdf
+   description: description of a hat
+   comment: comment for a hat
+   size: XL
+   color: blue
+   inactive: 0
+-  sku: 1171200
+   title: hat
+   category: hats
+   manufacturer: manu
+   suchbegriffe: asdf
+   description: description of a hat
+   comment: comment for a hat
+   size: XL
+   color: blue
+   inactive: 0
+-  sku: 1181200
+   title: hat
+   category: hats
+   manufacturer: manu
+   suchbegriffe: asdf
+   description: description of a hat
+   comment: comment for a hat
+   size: XL
+   color: blue
+   inactive: 0
+-  sku: 1191200
+   title: hat
+   category: hats
+   manufacturer: manu
+   suchbegriffe: asdf
+   description: description of a hat
+   comment: comment for a hat
+   size: L
+   color: blue
+   inactive: 1
+-  sku: 1211200
+   title: hat
+   category: hats
+   manufacturer: manu
+   suchbegriffe: asdf
+   description: description of a hat
+   comment: comment for a hat Ärmelbündchen
+   size: XL
+   color: blue
+   inactive: 1
+
+-  sku: 1211201
+   title: knitted hat
+   category: hats
+   manufacturer: manu
+   suchbegriffe: asdf
+   description: description of a hat
+   comment: comment for a hat Ärmelbündchen und knitted hat
+   size: XL
+   color: blue
+   inactive: 0
+
+-  sku: 1211202
+   title: knitted hat
+   category: hats
+   manufacturer: manu
+   suchbegriffe: asdf
+   description: description of a hat
+   comment: comment for a hat Ärmelbündchen und knitted hat
+   size: XL
+   color: blue
+   inactive: 1
+

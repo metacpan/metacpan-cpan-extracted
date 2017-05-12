@@ -1,0 +1,47 @@
+Image-MetaData-JPEG
+===================
+
+A Perl package for accessing and modifying JPEG meta-data.
+
+This package provides an interface for reading and interpreting the
+content of JPEG segments, in particular of those segments containing
+metadata (like TIFF headers, thumbnails, Exif info, IPTC info, comments
+...). Some segments can even be modified and rewritten to disk. Maybe,
+it will be extended to TIFF files in the future. I am too lazy to
+describe the module again here, so have a look at the accompanying
+documentation. This module is still EXPERIMENTAL: use it at your own risk.
+
+There is a small script in the distribution, named read_JPEG_metadata, 
+which you can use to take a quick glance to the content of JPEG files:
+	Usage: ./read_JPEG_metadata file [files]
+
+The author can be contacted at: Stefano Bettelli <bettelli@cpan.org>
+
+INSTALLATION
+============
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+RELEASE NOTES
+=============
+The first lines of the ChangeLog file are a summary of the main
+changes from the last public release.
+
+DEPENDENCIES
+============
+This module was designed in order to depend on the least possible number
+of modules. Currently, it only requires "integer" (in addition to, of
+course, "strict" and "warnings"). It was developed with Perl ~ 5.8,
+on a Debian/Linux box.
+
+COPYRIGHT AND LICENCE
+=====================
+Copyright (C) 2004,2005,2006 by Stefano Bettelli
+
+This library is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License. See the COPYING
+and LICENSE file for the license terms.

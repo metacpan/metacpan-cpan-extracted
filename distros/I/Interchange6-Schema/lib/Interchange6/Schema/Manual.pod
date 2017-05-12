@@ -1,0 +1,23 @@
+=head1 NAME
+
+Interchange6::Schema::Manual - Index of the Manual
+
+=head1 DESCRIPTION
+
+This is the L<Interchange6::Schema> users manual.
+
+=head1 SECTIONS
+
+=head2 L<Interchange6::Schema::Manual::Classes>
+
+The various classes provided by L<Interchange6::Schema>.
+
+=head2 L<Interchange6::Schema::Manual::DatabaseSupport>
+
+Details of database engines we support and recommended connect arguments.
+
+=head2 L<Interchange6::Schema::Manual::Cookbook>
+
+Miscellaneous recipes, e.g. for local schema modifications.
+
+=cut

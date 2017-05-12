@@ -1,0 +1,114 @@
+
+This file contains random musings on the past, present, and future
+state of Inline::SLang. Just because an item has made it here does not
+mean it is going to be worked on in the near (or far) future.
+
+PDL Support
+-----------
+
+- need to test on a 64-bit machine to check that the assumptions I've made
+  about sizes of the various types is sensible. Or improve the code that
+  compares PDL and S-Lang datatype sizes.
+
+- Should we convert 0D piddles to S-Lang scalars or 1D, 1-element arrays?
+
+Other data types
+----------------
+
+- Structs: need to improve checking of valid field names in Perl
+  eg in Perl can use 1x3, but this is not a valid field name in S-Lang
+
+Configuration
+-------------
+
+- do we need a way to say 'bind all the functions EXCEPT blah'?
+
+- provide a means of querying the package to find out what namespaces
+  and functions have been bound.
+
+- The PDL code could be conditionally loaded by Inline::SLang - either
+  via "use Inline::SLang => Config => PDL => 1;" or a separate
+  "Use Inline::SLang::PDL;". Inline::Slang would have a struct (like
+  PDL's Core struct) with function pointers set to NULL. When the PDL
+  support is loaded these get set to the necessary code to convert
+  from/to piddles.
+  
+  The question is, is having PDL support in Inline::SLang proper that
+  much of a pain?
+
+Tests
+-----
+
+- check that S-Lang "opaque" variables passed through Perl and back to
+  S-Lang still exist once the perl variable that referenced them
+  has called it's DESTROY method.
+
+General
+-------
+
+- Support version 2 of the S-Lang library. From a quick look at the
+  development snapshots it appears that changes will be needed in
+  (not a complete list):
+
+  = error handling (access to the error variable has changed and
+      need to look at new hooks to see how to handle passing the
+      error back to Perl)
+  = support for the new List_Type variable; this can be converted
+    into a normal Perl list, but we may want to re-think the conversion
+    of Perl lists into S-Lang.
+  = the SLtype variable has changed from 'unsigned int' (or char)
+    and some internal changes to the library and/or interpreter API may
+    make the type support easier (it will definitely need looking at
+    whatever).
+  = will the UTF-8 support in S-Lang v2 support cause problems?
+
+Compilation
+-----------
+
+If a user says
+
+  use Inline 'SLang' => <<'EOS1';
+  ..
+  EOS1
+
+  use Inline 'SLang' => <<'EOS2';
+  ..
+  EOS2
+
+perhaps with some configuration changes in between,
+do we create 2 files, and does the second one include those
+functions bound from the first code (EOS1) ?
+
+Previous thoughts that are unlikely to be implemented
+-----------------------------------------------------
+
+- we *could* try and ensure that changes made (in PDL) to an array sent
+  from S-Lang to PDL are propogated back to S-Lang [ie use the same memory
+  for the two arrays]. I am not convinced it would really help things,
+  and would definitely complicate the internal code.
+
+- S-Lang has support for byte-compiled code. The module could
+  save the byte-compiled code instead of (or as well as) the
+  text version of the code. It may provide a slight performance
+  gain when loading?
+  Have decided not to try and support this, since it would mean
+  more-complicated build()/load() routines for a (I'm guessing)
+  effectively negligible speed increase
+
+- *could* steal the PDL::NiceSlice approach and provide a syntax
+  to access Perl versions of S-lang's arrays/structs - eg
+    $a(0,2,1) gets translated to $a->get(0,2,3)
+    $b.foo                       $$b{foo}
+  BUT this is
+    hard
+    going to clash with PDL
+    going to clash with Perl 6
+  So *very unlikely* to do
+
+Variables:
+ - do we want to allow access to S-Lang variables (ie have them
+   bound to a perl 'lvalue' routine)? I think this would be hard
+   to do properly and we can work around things by the somewhat
+   ugly
+     my $var = sl_eval( "slang_variable_name" );
+

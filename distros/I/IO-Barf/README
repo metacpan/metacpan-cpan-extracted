@@ -1,0 +1,125 @@
+NAME
+    IO::Barf - Barfing content to output file.
+
+SYNOPSIS
+     use IO::Barf qw(barf);
+     barf($file_or_handler, 'CONTENT');
+
+SUBROUTINES
+    "barf($file_or_handler, $content)"
+             Barf content to file or handler.
+
+ERRORS
+     barf():
+             Cannot open file '%s'.
+             Cannot close file '%s'.
+             Unsupported reference '%s'.
+
+EXAMPLE1
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Module.
+     use File::Temp;
+     use IO::Barf;
+
+     # Content.
+     my $content = "foo\nbar\n";
+
+     # Temporary file.
+     my $temp_file = File::Temp->new->filename;
+
+     # Barf out.
+     barf($temp_file, $content);
+
+     # Print tempory file.
+     system "cat $temp_file";
+
+     # Unlink temporary file.
+     unlink $temp_file;
+
+     # Output:
+     # foo
+     # bar
+
+EXAMPLE2
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Module.
+     use IO::Barf;
+
+     # Content.
+     my $content = "foo\nbar\n";
+
+     # Barf out.
+     barf(\*STDOUT, $content);
+
+     # Output:
+     # foo
+     # bar
+
+EXAMPLE3
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Module.
+     use Benchmark qw(cmpthese);
+     use IO::Any;
+     use IO::Barf;
+     use File::Slurp qw(write_file);
+     use File::Temp;
+
+     # Temporary files.
+     my $temp1 = File::Temp->new->filename;
+     my $temp2 = File::Temp->new->filename;
+     my $temp3 = File::Temp->new->filename;
+
+     # Some data.
+     my $data = 'x' x 1000;
+
+     # Benchmark (10s).
+     cmpthese(-10, {
+             'File::Slurp' => sub {
+                     write_file($temp3, $data);
+                     unlink $temp3;
+             },
+             'IO::Any' => sub {
+                     IO::Any->spew($temp2, $data);
+                     unlink $temp2;
+             },
+             'IO::Barf' => sub {
+                     barf($temp1, $data);
+                     unlink $temp1;
+             },
+     });
+
+     # Output like this:
+     #                Rate     IO::Any File::Slurp    IO::Barf
+     # IO::Any      6382/s          --        -24%        -48%
+     # File::Slurp  8367/s         31%          --        -32%
+     # IO::Barf    12268/s         92%         47%          --
+
+DEPENDENCIES
+    Error::Pure, Exporter, Readonly, Scalar::Util.
+
+SEE ALSO
+    IO::Any, File::Slurp, Perl6::Slurp.
+
+REPOSITORY
+    <https://github.com/tupinek/IO-Barf>
+
+AUTHOR
+    Michal Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    BSD license.
+
+VERSION
+    0.07
+

@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/IPC-Notify.t
+lib/IPC/Notify.pm
+META.yml                                 Module meta-data (added by MakeMaker)

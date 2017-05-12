@@ -1,0 +1,115 @@
+=head1 NAME
+
+Inline::Java::PerlInterpreter - Call Perl directly from Java using Inline::Java.
+
+=head1 SYNOPSIS
+
+=for comment
+
+   import org.perl.inline.java.* ;
+
+   class HelpMePerl {
+      static private InlineJavaPerlInterpreter pi = null ;
+
+      public HelpMePerl() throws InlineJavaException {
+      }
+
+      static private boolean matches(String target, String pattern)
+      	throws InlineJavaPerlException, InlineJavaException {
+        Boolean b = (Boolean)pi.eval("'" + target + "' =~ /" + pattern + "/", Boolean.class) ;
+        return b.booleanValue() ;
+      }
+
+      public static void main(String args[])
+	     throws InlineJavaPerlException, InlineJavaException {
+         pi = InlineJavaPerlInterpreter.create() ;
+
+         String target = "aaabbbccc" ;
+         String pattern = "ab+" ;
+         boolean ret = matches(target, pattern) ;
+
+         System.out.println(
+           target + (ret ? " matches " : " doesn't match ") + pattern) ;
+           
+         pi.destroy() ;
+      }
+   }
+
+=for comment
+
+
+=head1 DESCRIPTION
+
+WARNING: C<Inline::Java::PerlInterpreter> is still experimental.
+
+The C<org.perl.inline.java.InlineJavaPerlInterpreter> Java class allows
+you to load a Perl interpreter directly from Java. You can then perform
+regular callbacks to call into Perl.
+   Z<>
+
+
+=head1 USING THE org.perl.inline.java.InlineJavaPerlInterpreter CLASS
+
+B<Installation>
+
+Before using C<org.perl.inline.java.InlineJavaPerlInterpreter>, you must
+have installed C<Inline::Java> as well as the JNI extension. Additionally,
+the PerlInterpreter extension must also have been installed.
+
+B<Finding the jar>
+
+To be able to use the C<org.perl.inline.java.InlineJavaPerlInterpreter> 
+class, you must use the jar file provided by C<Inline::Java>. You can 
+easily locate this jar file using the following command:
+
+   % perl -MInline::Java=jar
+      
+You must then add this jar file to your CLASSPATH as you would any jar
+file.
+
+B<Basic Usage>
+
+C<org.perl.inline.java.InlineJavaPerlInterpreter> itself extends
+C<org.perl.inline.java.InlineJavaPerlCaller>. See L<Inline::Java::Callback>
+for information on the callback API.
+
+Besides that API, C<org.perl.inline.java.InlineJavaPerlInterpreter> provides
+only 2 other public methods:
+
+=over 4
+
+=item public InlineJavaPerlInterpreter create() 
+throws InlineJavaPerlException, InlineJavaException 
+    
+Creates a new org.perl.inline.java.InlineJavaPerlInterpreter object.
+This class in a singleton.
+     
+=item public void destroy()
+  
+Destroys the Perl interpreter.
+
+=back
+
+
+=head1 SEE ALSO
+
+L<Inline::Java>, L<Inline::Java::Callback>, L<Inline::Java::PerlNatives>.
+   Z<>
+
+
+=head1 AUTHOR
+
+Patrick LeBoutillier <patl@cpan.org> is the author of Inline::Java.
+   Z<>
+
+
+=head1 COPYRIGHT
+
+Copyright (c) 2001-2004, Patrick LeBoutillier.
+
+All Rights Reserved. This module is free software. It may be used,
+redistributed and/or modified under the terms of the Perl Artistic
+License. See http://www.perl.com/perl/misc/Artistic.html for more
+details.
+
+=cut

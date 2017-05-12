@@ -1,0 +1,21 @@
+Revision history for IP-IPwhere
+
+0.05 2016-12-29 19
+* bug fixes
+
+0.04 2016-12-28 19
+* add PRIVATE address judgment
+
+0.03 2016-11-24 19
+*tidy code add fixes doc
+
+0.02 2016-11-18 16
+* add qqwry local database search.
+* add sina,baidu,pconline database.
+
+0.01 2016-11-08 19  
+*新增加纯真数据,使用方法
+*需要安装perl及扩展LWP::Simple ,JSON;
+*修正地址显示乱码,增加多ip查询
+
+

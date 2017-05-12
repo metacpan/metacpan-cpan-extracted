@@ -1,0 +1,105 @@
+Revision history for IO-Async-SSL
+
+0.19    2015/10/15 16:44:06
+        [BUGFIXES]
+         * Catch ->start_SSL throwing errors, rather than expecting it to
+           return undef
+         * Swallow SSL errors if 'on_ssl_error' handles them
+
+0.18    2015/06/29 23:52:36
+        [BUGFIXES]
+         * Apply utf8::downgrade() inplace to strings before we ->syswrite
+           them, ensuring that IO::Socket::SSL doesn't double-encode UTF-8
+           (related to RT98372).
+
+0.17    2015/05/29 19:52:02
+        [BUGFIXES]
+         * Tell openssl s_server to be -quiet so its verbose junk doesn't
+           upset the test script (RT104757)
+         * No need to even unpack $buf from @_ in sslwrite when it's not
+           passed to the underlying _syswrite (RT103774)
+
+0.16    2015/04/17 20:52:35
+        [BUGFIXES]
+         * Declare required version of IO::Socket::SSL to get default_ca()
+         * Explicitly set $! to EINVAL when unit-test mocking methods fail
+         * Declare requirement on IO::Async 0.66 for various bugfixes
+
+0.15    2015/04/04 14:52:23
+        [CHANGES]
+         * Use IO::Async::Stream reader/writer functions instead of SSLStream
+           subclass
+         * Use hints provided by IO::Socket::SSL::default_ca (RT96474)
+
+        [BUGFIXES]
+         * Remember about EWOULDBLOCK on MSWin32
+         * Handle EAGAIN from acceptor (RT102403)
+         * Don't invoke on_ssl_error handler for cleartext acceptor failures
+           (RT102405)
+
+0.14    2014/03/27 11:24:08
+        [BUGFIXES]
+         * Avoid relying on strong forward references in Future, by creating
+           intentional cycles on pending Futures. Workaround for bugfix in
+           upcoming Future release.
+
+0.13    2013/10/03 19:49:20
+        [BUGFIXES]
+         * Support new IO::Async::Loop 0.61 listen API
+         * Listen via futures
+
+0.12    2013/09/10 01:17:16
+        [BUGFIXES]
+         * Ensure that ->connect with a 'handle' works, by deferring setting
+           the socket on the given stream until it has been SSL_upgrade'd.
+
+0.11    2013/09/09 13:32:49
+        [CHANGES]
+         * Perform SSL_upgrade and SSL_connect primarily on futures
+         * Allow SSL_connect on an existing Stream object, by using
+           reader/writer functions of IaStream 0.59
+
+        [BUGFIXES]
+         * No point waiting on writeready when syswrite already said it wants
+           readready
+         * Fix "on_accept" typo in docs (RT86867)
+
+0.10    BUGFIXES:
+         * Allocate port numbers for external binary tests dynamically so that
+           concurrent unit tests can proceed (RT85301)
+         * Added a unit test that tests listening for openssl s_client
+
+0.09    BUGFIXES:
+         * Use IO::Async::OS->socketpair instead of $loop->socketpair
+           (thanks Tom Molesworth) (RT84638)
+
+0.08    CHANGES:
+         * Prefer the /etc/ssl/certs directory if it exists, for SSL_ca_path.
+
+0.07    CHANGES:
+         * Updated for IO::Async 0.54 - use Futures instead of IaMergePoint
+         * Attempt to use Mozilla::CA to set SSL_verify_mode and SSL_ca_file
+
+0.06    BUGFIXES:
+         * Make sure to pass 'socktype' hint to ->connect or ->listen during
+           testing
+
+0.05    BUGFIXES:
+         * Ensure clean shutdown on SSL upgrade failure
+         * Explicitly set family => "inet" in tests against socat
+
+0.04    CHANGES:
+         * New SSL_upgrade method on Loop and Protocol::Stream
+         * Support on_stream continuation for SSL_connect and SSL_listen
+
+0.03    BUGFIXES:
+         * Don't is() test directly on socket addresses; unpack them and use
+           is_deeply()
+         * Supply a hostname to $loop->listen()
+
+0.02    CHANGES:
+         * Added Test::Pod testing
+         * Make sure tests don't fail on machines without socat or openssl
+
+0.01    First version, released on an unsuspecting world.
+

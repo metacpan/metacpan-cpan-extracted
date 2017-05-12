@@ -1,0 +1,21 @@
+Imager-Filter-Sepia version 0.0.1
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DEPENDENCIES
+
+None.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006, Yoshiki KURIHARA
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

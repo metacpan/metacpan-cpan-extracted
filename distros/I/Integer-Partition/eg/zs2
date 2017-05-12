@@ -1,0 +1,46 @@
+#! /usr/local/bin/perl -w
+
+# Zoghbi and Stojmenovic
+# ZS2 algorithm for lexographic integer partition generation
+#
+# Perl implementation (c) David Landgren 2007
+#
+# see www.site.uottawa.ca/~ivan/F49-int-part.pdf 
+
+use strict;
+use warnings;
+
+my $n = shift;
+my @x = (1) x ($n+1);
+print "@x[1..$#x]\n";
+
+$x[0] = -1;
+$x[1] = 2;
+my $h = 1;
+my $m = $n - 1;
+
+print "@x[1..$m]\n";
+
+while ($x[1] != $n) {
+    if ($m - $h > 1) {
+        ++$h;
+        $x[$h] = 2;
+        --$m;
+    }
+    else {
+        my $j = $m - 2;
+        while ($x[$j] == $x[$m-1]) {
+            $x[$j] = 1;
+            --$j;
+        }
+        $h = $j + 1;
+        $x[$h] = $x[$m-1] + 1;
+        my $r = $x[$m] + $x[$m - 1] * ($m - $h - 1);
+        $x[$m] = 1;
+        if ($m - $h > 1) {
+            $x[$m-1] = 1;
+        }
+        $m = $h + $r - 1;
+    }
+    print "@x[1..$m]\n";
+}

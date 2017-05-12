@@ -1,0 +1,16 @@
+Changes
+MANIFEST
+Makefile.PL
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+inc/Module/Install.pm
+lib/Iterator/Paged.pm
+t/lib/My/CPANAuthors.pm
+t/010-basic/010-compile.t
+t/020-subclass/010-cpan-authors.t
+

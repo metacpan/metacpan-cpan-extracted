@@ -1,0 +1,42 @@
+---
+abstract: 'SOCKSv4 proxy plugin for IO::Stream'
+author:
+  - 'Alex Efros <powerman@cpan.org>'
+build_requires:
+  EV: '0'
+  File::Temp: '0'
+  Socket: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: IO-Stream-Proxy-SOCKSv4
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  IO::Stream::Proxy::SOCKSv4:
+    file: lib/IO/Stream/Proxy/SOCKSv4.pm
+    version: v2.0.0
+requires:
+  IO::Stream: '0'
+  IO::Stream::EV: '0'
+  IO::Stream::const: '0'
+  Scalar::Util: '0'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/powerman/perl-IO-Stream-Proxy-SOCKSv4/issues
+  homepage: https://github.com/powerman/perl-IO-Stream-Proxy-SOCKSv4
+  repository: https://github.com/powerman/perl-IO-Stream-Proxy-SOCKSv4.git
+version: v2.0.0

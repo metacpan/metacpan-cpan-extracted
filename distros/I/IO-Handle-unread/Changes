@@ -1,0 +1,9 @@
+Revision history for IO-Handle-unread
+
+0.02
+	- fix tests for Win32
+	- add warnings about unstability to the pod
+
+0.01  Wed Jul 23 11:06:37 2008
+	- original version; created by Module::Starter
+

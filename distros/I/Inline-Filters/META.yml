@@ -1,0 +1,27 @@
+---
+abstract: 'Common source code filters for Inline Modules'
+author:
+  - 'Neil Watkiss, Reini Urban, Will Braswell'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 8.0403, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Inline-Filters
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Inline: '0.42'
+  Inline::C: '0.76'
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/perl11/Inline-Filters
+version: '0.20'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

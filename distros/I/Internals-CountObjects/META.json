@@ -1,0 +1,38 @@
+{
+   "abstract" : "Report all allocated perl objects",
+   "author" : [
+      "Josh Jore <jjore@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200000, CPAN::Meta::Converter version 2.102400",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Internals-CountObjects",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Internals-CountObjects@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Internals-CountObjects"
+      },
+      "homepage" : "http://search.cpan.org/dist/Internals-CountObjects",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/jbenjore/Internals-CountObjects.git",
+         "web" : "http://github.com/jbenjore/Internals-CountObjects"
+      }
+   },
+   "version" : "0.05"
+}
+

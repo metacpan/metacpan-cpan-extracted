@@ -1,0 +1,120 @@
+=for comment based on iup-3.5 - http://www.tecgraf.puc-rio.br/iup/en/elem/iupradio.html
+
+=head1 NAME
+
+IUP::Radio - [GUI element] container for grouping mutual exclusive toggles (radiobutton)
+
+=head1 DESCRIPTION
+
+Creates a void container for grouping mutual exclusive toggles. Only
+one of its descendent toggles will be active at a time. The toggles can
+be at any composition.
+
+It does not have a native representation.
+
+=head1 USAGE
+
+=head2 CREATION - new() method
+
+ $radio = IUP::Radio->new( child=>$box );
+
+B<child:> (named parameter) Reference to an interface element. Usually it is a L<IUP::Vbox> or
+an L<IUP::Hbox> containing the toggles associated to the radio. It can be C<undef>.
+
+B<Returns:> the identifier of the created element, or C<undef> if an error occurs.
+
+NOTE: You can pass to C<new()> other C<ATTRIBUTE=E<gt>'value'> or C<CALLBACKNAME=E<gt>\&func> pairs relevant
+to this element - see L<IUP::Manual::02_Elements|IUP::Manual::02_Elements/"new()">.
+
+=head2 ATTRIBUTES
+
+For more info about concept of attributes (setting/getting values etc.)
+see L<IUP::Manual::03_Attributes|IUP::Manual::03_Attributes>. Attributes specific to this element:
+
+=over
+
+=item L<EXPAND|IUP::Manual::03_Attributes/EXPAND>
+
+I<(non inheritable)>
+
+The default value is "YES".
+
+=item B<VALUE>
+
+I<(non inheritable)>
+
+Name identifier or reference to the active toggle element.
+When consulted if the toggles are not mapped into the native system the return value may be C<undef> or invalid.
+
+ZZZ-test-this(reading the value)
+
+=item B<VALUE_HANDLE>
+
+I<(non inheritable)>
+
+Changes the active toggle. The value
+passed must be the handle of a child contained in the radio. When
+consulted if the toggles are not mapped into the native system the
+return value may be C<undef> or invalid. 
+
+=item B<WID>
+
+I<(read-only)>
+
+Returns -1 if mapped.
+
+=back
+
+The following L<common attributes|IUP::Manual::03_Attributes/Common Attributes> are also accepted:
+
+=over
+
+=item * L<FONT|IUP::Manual::03_Attributes/FONT>,
+L<CLIENTSIZE|IUP::Manual::03_Attributes/CLIENTSIZE>,
+L<CLIENTOFFSET|IUP::Manual::03_Attributes/CLIENTOFFSET>,
+L<POSITION|IUP::Manual::03_Attributes/POSITION>,
+L<MINSIZE|IUP::Manual::03_Attributes/MINSIZE>,
+L<MAXSIZE|IUP::Manual::03_Attributes/MAXSIZE>,
+L<VISIBLE|IUP::Manual::03_Attributes/VISIBLE>
+
+=back
+
+=head1 NOTES
+
+The radio can be created with no elements and be dynamic filled using
+L<Append|IUP::Manual::02_Elements/"Append()"> or
+L<Insert|IUP::Manual::02_Elements/"Insert()">.
+
+=head1 EXAMPLES
+
+
+The element B<IUP::Radio> is used in the following sample scripts:
+
+=over
+
+=item * L<0-basic/cbox.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/cbox.pl> - IUP::Cbox example
+
+=item * L<0-basic/image.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/image.pl> - IUP::Image example
+
+=item * L<0-basic/layoutdialog.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/layoutdialog.pl> - IUP::LayoutDialog example
+
+=item * L<0-basic/radio.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/radio.pl> - IUP::Radio example
+
+=item * L<0-basic/toggle.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/toggle.pl> - IUP::Toggle example
+
+=item * L<1-apps/app-mdi.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/1-apps/app-mdi.pl> - IUP app example
+
+=item * L<1-apps/app-sample1.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/1-apps/app-sample1.pl> - example used for screenshot - IUP.pod
+
+=item * L<1-apps/app-sample2.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/1-apps/app-sample2.pl> - example based on the original sample.c
+
+=item * L<1-apps/app-simple-demo.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/1-apps/app-simple-demo.pl> - example used for screenshot - IUP.pod
+
+=back 
+
+
+
+The original doc: L<iupradio.html|http://www.tecgraf.puc-rio.br/iup/en/elem/iupradio.html>
+ 
+
+=cut

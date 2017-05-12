@@ -1,0 +1,18 @@
+# -*- Perl -*-
+
+use IBM::LoadLeveler;
+
+$modify_op = $ARGV[0];
+$op_value  = $ARGV[1];
+$job_step  = $ARGV[2];
+
+#    0 - EXECUTION_FACTOR,       /* use int for data      */
+#    1 - CONSUMABLE_CPUS,        /* use int for data      */
+#    2 - CONSUMABLE_MEMORY,      /* use int64 for data    */
+#    3 - WCLIMIT_ADD_MIN,        /* use int for data      */
+#    4 - JOB_CLASS,              /* use char for data     */
+#    5 - ACCOUNT_NO              /* use char for data     */
+
+$rc = ll_modify($modify_op,\$op_value,$job_step);
+print "Return : $rc\n";
+ll_error(1) if ($rc != 0)

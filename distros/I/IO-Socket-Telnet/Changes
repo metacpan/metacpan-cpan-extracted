@@ -1,0 +1,18 @@
+Revision history for IO-Socket-Telnet
+
+0.04    Thu Aug 19 17:28:27 2010
+        Add missing 1; reported by Peter Markmann
+
+0.03    Thu Jun 04 04:44:27 2009
+        Propagate socket creation failure properly
+        The complex callback now correctly receives the subnegotiation buffer
+        Modernize the distribution
+
+0.02    Sun Nov 04 02:09:56 2007
+        Support for simple callbacks
+        Support for declarative active negotiation: $socket->do('ECHO')
+        PeerPort is now defaulted to 23
+
+0.01    Sat Sep 15 00:05:55 2007
+        First version, released on an unsuspecting world.
+

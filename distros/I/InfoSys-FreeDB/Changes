@@ -1,0 +1,45 @@
+Revision history for Perl extension InfoSys::FreeDB.
+
+0.91 Tue Dec 16 22:24:30 CET 2003
+    - Thanks to David Byers for reporting most of these bugs.
+    - Chose a version number that is string-wise higher than 0.9.
+    - Corrected description in REDME file.
+    - Fixed discid format bug in InfoSys::FreeDB::Entry::mk_discid().
+    - Let InfoSys::FreeDB::Response::* classes report non-supported
+      codes returned by CDDB commands.
+    - Minor bug in InfoSys::FreeDB::Connection::CDDBP.
+    - Added support for code 210 on query in InfoSys::FreeDB::Connection.
+    - Added support for code 211 on read in InfoSys::FreeDB::Connection.
+    - For InfoSys::FreeDB::Connection::HTTP automatic maximal protocol
+      level detection is switched off for freedb_host "freedb.freedb.org"
+      because:.
+      1) HTTP is not connection oriented
+      2) "freedb.freedb.org" selects a random freedb server for each
+         request.
+      3) During software upgrade different servers may support different
+         maximal protocol levels which may lead to errors.
+
+0.12 Thu Nov 13 21:02:14 CET 2003
+    - Fixed DISCID bug in InfoSys::FreeDB::Entry::write_array_ref.
+      Thanks to Heikki Lindholm for reporting this.
+    - Fixed InfoSys::FreeDB::Response::Query::new_from_content_ref to
+      support code 210 which I overlooked during development.
+      Thanks again to Heikki Lindholm for reporting this.
+    - Allowed in InfoSys::FreeDB::Entry # Disc length: <length> secs
+      Thanks to Kevin J Walters for reporting this.
+    - Replaced symlink() with File::Copy::copy() in Makefile.PL to
+      make it a bit more Win32 friendly.
+
+0.11 Wed Oct 22 22:19:13 CEST 2003
+    - Fixed pod bugs in isfdlscat.PL and gen/attr-InfoSys_FreeDB.pl
+    - Switched on autoload
+
+0.10 Mon Oct  6 20:24:00 CEST 2003
+    - Fixed bugs in isfdlscat.PL
+
+0.9 Sun Oct  5 21:38:04 CEST 2003
+    - First release
+
+Prior to version 0.9 there was Net::FreeDB2 0.8.2.6. All experience
+gained from that project is put in this one. The structure is copied
+almost 1 to 1 and a large part of the coding is restyled and reused.

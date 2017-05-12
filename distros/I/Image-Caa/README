@@ -1,0 +1,32 @@
+Image::Caa
+==========
+
+Color ASCII Art library
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Test::More
+  Curses;
+
+To get the most out of this module you might want:
+
+  Image::Magick
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 Cal Henderson <cal@iamcal.com>
+License: Perl Artistic License

@@ -1,0 +1,39 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.28.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It would check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 70c5a887d173238ce8024cd09c9d8f20c0870b8e Build.PL
+SHA1 4dc2296228954b9f879568d03b884ab9eba22a36 Changes
+SHA1 d7eb274064cda6dc03aad11cefdb1f95e7008725 MANIFEST
+SHA1 d56d84506d28c786ce75bddd9cd1a767d234e88d META.yml
+SHA1 5dfb21612ad70b170122800d70deee3f0bfc566c Makefile.PL
+SHA1 ebc6ede02e4362e8b4daa56c4c813a0ce4b53664 README
+SHA1 0882b06e3d31070e91173b230d71bc0adfa8f420 Timeline.pm
+SHA1 5330b0c7319b7a4658cbb655f43cff15370e19ea t/common.pl
+SHA1 e78454bb296f0f72dec8262a76593eddf254d232 t/date_format.t
+SHA1 b7ec3db8a4ea63512c5aa5999928abd20c42d228 t/gif.t
+SHA1 1fadef03abfe6d736c2564bef59535929f127329 t/png.t
+SHA1 7fe595261db1e1755eb28a491188fb9545df5b81 t/testdata.txt
+SHA1 9ba9052e4c68d850d2cb2f9b414bda2261a2473e t/truth.gif
+SHA1 09c7351148529a0780b11cfbe98c5c8d78b82904 t/truth.png
+SHA1 9b110509d9ec94bfe686348e021b3da0747f896b t/truth_format.gif
+SHA1 f5f799ab06130db4043d510aa333aae917a00cc2 t/truth_format.png
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.0.7 (Darwin)
+
+iD8DBQFAPXf6grvMBLfvlHYRAn9rAJ97ukyTHHyUiMzN3VLNetEmgOOLUwCdFFwd
+HHUPG8cwYlcV21Tl/X/zNOM=
+=zxcc
+-----END PGP SIGNATURE-----

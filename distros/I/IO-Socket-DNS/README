@@ -1,0 +1,166 @@
+NAME
+    IO::Socket::DNS - IO::Socket like interface using DNS to access an
+    IO::Socket::DNS::Server backend.
+
+SYNOPSIS
+      use IO::Socket::DNS;
+
+      my $sock = new IO::Socket::DNS
+        PeerAddr => $ip,
+        PeerPort => $port,
+        Suffix   => $dns_suffix,
+        Password => $secret,
+        Verbose  => 1,
+          or die "Unable to connect to $ip:$port";
+
+DESCRIPTION
+    I originally used this module for my own purposes and never intended to
+    show anyone, but there have been so many requests that I've decided to
+    release it to the public.
+
+    Have you ever been away from your home with your computer and needed to
+    use the Internet, but all you can find is a crippled WiFi Access Point
+    that doesn't give full Internet? When you try to visit a website, it
+    asks for an annoying login or asks you to pay money or some other silly
+    thing in order to be able to use the Internet. However, usually if you
+    actually try a dig or nslookup, you'll notice that DNS is working
+    perfectly fine. If so, then this is exactly what you need!
+
+    It translates TCP connection packets into DNS queries. So now you can
+    finally reach that external SSH server you've been needing to reach,
+    even though your Internet connection is too crippled to connect to it
+    directly. Actually, you can connect to any TCP server, such as a Web
+    server or an SMTP server or a Squid proxy or even a remote SOCKS server.
+    This client module IO::Socket::DNS communicates with the server module
+    IO::Socket::DNS::Server to tunnel the connection for the client using
+    only DNS queries as its transport. The only thing that the Internet
+    Service Provider will see is a bunch of DNS queries.
+
+    Be aware that this is much slower than full Internet access. This is
+    only intended for proof of concept or emergency use.
+
+SOCKS
+    SOCKS is a popular protocol used for proxying connections which works
+    very well in conjuction with this module. Here is one simple way to
+    utilize SOCKS using "dnsc", which comes with this distribution.
+
+  1. Start SSH proxy
+    Note that you need an SSH account somewhere, say $USER@server.com
+
+      dnsc --suffix=d.example.com --listen_port=2222 server.com:22
+
+    But if you have SSH access directly to d.example.com, the DNS authority,
+    it is recommended to connect to "127.0.0.1" for better performance,
+    i.e.:
+
+      dnsc --suffix=d.example.com --listen_port=2222 127.0.0.1:22
+
+  2. Start SOCKS tunnelling server
+    The ssh option "-D" implements a tunnelled SOCKS server. Make sure that
+    $USER is a valid SSH account whatever destination you chose in step 1,
+    then connect:
+
+      ssh -D127.0.0.1:1080 -p2222 $USER@127.0.0.1
+
+    Or if you have lots of other people on your client network that don't
+    like the crippled Internet and also want to use your SOCKS server, then
+    you'll need to know the IP address of your computer and bind to that
+    instead of the 127.0.0.1 default, i.e.:
+
+      ssh -D192.168.0.101:1080 -p2222 $USER@127.0.0.1
+
+  3. Configure Network Settings on browser
+    On Firefox:
+
+      => Options
+      => Advanced
+      => Network
+      => Settings
+      => [X] Manual proxy configuration
+      => SOCKS Host: 192.168.0.101 Port: 1080 (or whatever IP:Port used for -D in step 2)
+      => [OK]
+
+    Then surf away.
+
+CONSTRUCTOR
+    The "new" constructor takes arguments in key-value pairs:
+
+      PeerAddr     Remote host address      <hostname>[:<port>]
+      PeerHost     Synonym for PeerAddr     <hostname>[:<port>]
+      PeerPort     Remote port              <port>
+      Suffix       Proxy DNS Suffix         <domain>
+      Password     Access password          <password>
+      Verbose      Used for debugging       <level>
+
+    If only one argument is passed, it is considered to be "PeerAddr". The
+    "PeerAddr" can be a hostname or IP-Address.
+
+    The "PeerPort" specification can also be embedded in the "PeerAddr" by
+    preceding it with a ":". The "PeerPort" must be in numeric form.
+
+    The "Password" setting is to prove to the server that you are authorized
+    to use it. The environment variable DNS_PASSWORD may also be used to
+    define this setting. Default is no password.
+
+    If "Verbose" is specified, additional diagnostic information will be
+    sent to STDERR.
+
+    The "Suffix" argument must be a real domain name or subdomain that is
+    delegated to an IP running the IO::Socket::DNS::Server instance. The
+    environment variable DNS_SUFFIX may also be used to define this setting.
+    This is required.
+
+EXAMPLES
+      my $sock = IO::Socket::DNS->new(
+        PeerAddr => "www.perl.org",
+        PeerPort => 80,
+        Verbose  => 1,
+        Suffix   => "d.example.com",
+      ) or die "connect: $!";
+
+      $ENV{DNS_SUFFIX} = "d.example.com";
+      my $sock = new IO::Socket::DNS "www.perl.org:80";
+
+KNOWN ISSUES
+    It is still very slow. There are several optimizations that can be done
+    in order to improve the performance to make it faster, but none of these
+    have been implemented yet.
+
+    The Password setting is not implemented yet. So anyone can use your
+    server without your permission fairly easily and you could be blamed for
+    any malicious traffic tunnelled through it.
+
+    Sockets idle for more than 120 are automatically closed on the server
+    side. You have to keep probing to keep the connection alive.
+
+    Since DNS, for the most part, is UDP, which is a "connectionless"
+    protocol, IO::Socket::DNS does not implement the FILENO hook for its
+    TIEHANDLE, so things like IO::Select won't work as expected.
+
+    Only TCP protocol is supported at this time.
+
+    Patches are welcome, or if you have other ideas for improvements, let me
+    know.
+
+DISCLAIMER
+    This software is provided AS-IS for proof of concept purposes only. I
+    can not be held liable for any loss or damages due to misuse or illegal
+    or unlawful violations in conjunction with this software. Use at your
+    own risk of punishing condemnation of all types of ISPs and law
+    enforcement everywhere. If you do get in trouble, just DON'T BLAME ME!
+    And please don't abuse this too much or else hotspot admins everywhere
+    will wise up and start locking out all DNS queries!
+
+SEE ALSO
+    Net::DNS, IO::Socket, dnsc, iodine
+
+AUTHOR
+    Rob Brown, <bbb@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2011 by Rob Brown
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.9 or, at
+    your option, any later version of Perl 5 you may have available.
+

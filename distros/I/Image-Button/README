@@ -1,0 +1,120 @@
+NAME
+    Image::Button - Base class for building PNG buttons using GD.
+
+SYNOPSIS
+      use Image::Button::Rect;
+
+      my $b1 = new Image::Button::Rect(text     => 'text b1',
+                                       font     => 'newsgotn.ttf',
+                                       fontsize => 20,
+                                       file     => 'b1.png');
+
+      # $b2 is like $b1, but with different text and going to another file
+      my $b2 = $b1->copy(text => 'text b2',
+                         file => 'b2.png');
+
+      $b1->print;
+      $b2->print;
+
+DESCRIPTION
+    Image::Button builds simple PNG buttons of the type you would use in an
+    on-line application. It provides facilities to build several of them,
+    possibly related (same width and/or height). Modules to create different
+    types of buttons can be easily integrated. The buttons it can create so
+    far would not cause a graphic designer to jump from his chair, drooling
+    with excitement. But he wouldn't fall from his chair in disgust either
+    (I hope).
+
+  Fonts
+    Image::Button uses GD with TrueType support, which requires freetype
+    (http://www.freetype.org). It also requires true type fonts. It's
+    remarkably difficult to find free fonts out there that can be used to
+    make decent buttons (clean, non-pretentious, ideally sans-serif). Let me
+    know if you find any.
+
+    The TrueType fonts should be located either in the current directory or
+    in the directory pointed at by the environment variable *TTFONTS*.
+
+  Adding new button types
+    Image::Button is a base class intended to be derived by classes
+    implementing different types of buttons. Available so far are:
+
+    Image::Button::Plain,
+        plain rectangular buttons with an optional border,
+
+    Image::Button::Rect,
+        rectangular three dimensional buttons.
+
+    If you want to implement a new type of button (say, oval) you can take
+    advantage of the existing infrastructure by deriving from Image::Button,
+    and overriding the *print*, *getSize* and *textSize* functions, as
+    Image::Button::Plain does.
+
+FUNCTIONS
+    There is only OO interface to the packages, and all function calls
+    require named parameters.
+
+  Constructor
+    The way to construct the button will depend on the button type being
+    constructed, but it will generally be of the form:
+
+      my $b = new Image::Button::Rect(text     => 'text',
+                                      font     => 'newsgotn.ttf',
+                                      fontsize => 20,
+                                      fgcolor  => [ 85, 85, 136 ], # text
+                                      btcolor  => [ 238, 238, 204 ],
+                                      bgcolor  => [ 255, 255, 255 ],
+                                      file     => 'file.png');
+
+    See the man page of the button you are trying to construct for a
+    description of the arguments.
+
+  Print the button
+        $b->print(file    => 'button.png',
+                  prefix  => '',
+                  postfix => '');
+
+    Prints the button to a file. If the *file* argument is not set it will
+    print to the one specified in the button constructor. The *prefix* and
+    *postfix* arguments are prepended and appended to the file name,
+    respectively. They are useful when printing sets of buttons, where you
+    might want to print them several times, with small modifications, to
+    different file names (for example, changing the color).
+
+  Copy the button
+        $b2 = $b->copy(text     => 'new text',
+                       file     => 'button2.png',
+                       fontsize => 21);
+
+    Copy constructor. If no arguments are specified returns an exact copy of
+    the original button. If called with any of the arguments of the original
+    button constructor it will override the original button's values. Use it
+    to build sets of related buttons; for example, same font and colors, but
+    different texts and output files.
+
+  Change the button
+      $b->override(self => { btcolor  => [10, 10, 10],
+                             fontsize => 12 });
+
+    Accepts a dictionary reference *self* with new parameters. Any parameter
+    that the button's constructor understands can be reset here.
+
+SEE ALSO
+    Image::Button::Plain for specifics on plain rectangular buttons.
+
+    Image::Button::Rect for specifics on 3D rectangular buttons.
+
+    Image::Button::Set for building sets of related buttons.
+
+TODO
+    Add tests. Oval buttons. Triangular buttons (arrow type).
+
+AUTHOR
+    Juan M. García-Reyero <joanmg@twostones.org>
+
+COPYRIGHT
+    Copyright (C) 2003 Juan M. García-Reyero. All Rights Reserved.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

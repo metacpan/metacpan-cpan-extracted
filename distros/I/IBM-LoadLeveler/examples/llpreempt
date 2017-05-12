@@ -1,0 +1,17 @@
+# -*- Perl -*-
+
+use IBM::LoadLeveler;
+
+$job_step = @ARGV[0];
+$type = @ARGV[1];
+
+# $type : 0 - preempt step, 1 - resume step
+
+$rc= ll_preempt($job_step, $type);
+print "Return : $rc\n";
+if ($rc != 0)
+{
+  ll_error(1);
+} else {
+  print "Successful - $job_step was ", $type ? "resumed\n":"preempted\n";
+}

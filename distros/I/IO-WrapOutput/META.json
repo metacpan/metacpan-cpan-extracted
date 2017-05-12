@@ -1,0 +1,58 @@
+{
+   "abstract" : "Wrap your output filehandles with minimal fuss",
+   "author" : [
+      "Hinrik \u00c3\u0096rn Sigur\u00c3\u00b0sson <hinrik.sig@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200006, CPAN::Meta::Converter version 2.110440",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "IO-WrapOutput",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "utils"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.61"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-IO-WrapOutput@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=IO-WrapOutput"
+      },
+      "homepage" : "http://search.cpan.org/dist/IO-WrapOutput/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/hinrik/io-wrapoutput.git",
+         "web" : "http://github.com/hinrik/io-wrapoutput"
+      }
+   },
+   "version" : "0.07",
+   "x_authority" : "cpan:HINRIK"
+}
+

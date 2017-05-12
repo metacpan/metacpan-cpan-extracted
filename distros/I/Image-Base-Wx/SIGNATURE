@@ -1,0 +1,76 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 842745cb706f8f2126506f544492f7a80dbe29b3 COPYING
+SHA1 ea7a42350038b59f820d1d0ef3902815650dd521 Changes
+SHA1 1dac7aa3441946faeb5f527c966ef83cc394dbe5 MANIFEST
+SHA1 b758f740af57256154bbf4e1f8a760a1b9f9dfe1 MANIFEST.SKIP
+SHA1 5d2a280f040ab021894b8ded343f076a998beade META.yml
+SHA1 06d02651f8cfedee36fec2ea32ca6d1432a64108 Makefile.PL
+SHA1 6183b5f8cfc657db704dc472f756d762952f65f3 debian/changelog
+SHA1 ac3478d69a3c81fa62e60f5c3696165a4e5e6ac4 debian/compat
+SHA1 01ba5728a7db4d1dd361f17f98e27ff487c1fcab debian/control
+SHA1 ef0538410e105aa87c20ddd36eb92d097d898b99 debian/copyright
+SHA1 75371ace64ff775e92d63fd5250cbe4bab487e48 debian/rules
+SHA1 61652cd1568dcf2614df833eba241755eee34e89 debian/source/format
+SHA1 c936fc0ab0ffc461a37f1d4ce014829bdef17202 debian/watch
+SHA1 3c7527faa611abb4fee689489dd37bfd3a0a81d5 devel/GNUmakefile
+SHA1 5fd35880152388d4ebf372142580eaae5b248b45 devel/LogCapture.pm
+SHA1 337a96b40cd579a65266ced3fdab94f33d7ff74a devel/LogSaver.pm
+SHA1 8feafbd222f50dbc7a884f1537e6e7c8c9808dcd devel/bitmap.pl
+SHA1 367c4e4a54cbab56a028cbf4f48beaa4b1aff7f3 devel/dc.pl
+SHA1 67223ca3c33d9759fd3569d90a580ab16ac5bf7d devel/exe-bitmap-load-xpm.cc
+SHA1 9a5c57bfacf74be70a80dc6bd3d2e3bb26f5f384 devel/image.pl
+SHA1 7490c21419a5c0094e62b70870f22e3ec38dc776 devel/log.pl
+SHA1 73b45edd7c7675a9793ad4cb3232002b1af9435e devel/magick.pl
+SHA1 063a45b93598c60ce7b2d6bcd7925210d6096779 lib/Image/Base/Wx/Bitmap.pm
+SHA1 df789b25f2a8629bf37fb2504a2bbc7f4a255ce3 lib/Image/Base/Wx/DC.pm
+SHA1 2c1efa3659de4a6152c29bdf390e33dd31918517 lib/Image/Base/Wx/Image.pm
+SHA1 981f2c75dad47cecbfb663268d941459aa2842af t/Bitmap-weaken.t
+SHA1 c4830b1155b6e6453131d39606ce703c09dd2d8e t/Bitmap.t
+SHA1 b3a95d4317bbeee03fa9acf166cbf5c6a9d1adee t/DC.t
+SHA1 e556fdb03f27b18dc28a8b7fb066c9ef4fc22d1a t/Image-weaken.t
+SHA1 e0a4df1faa4353acdd704f43821f993b479cadb6 t/Image.t
+SHA1 3855de075da37f5bc4e6a5534b2f00cc14872a98 t/MyTestHelpers.pm
+SHA1 d176409a7bac83bd32e3c50b1d994ecafb771c90 t/MyTestImageBase.pm
+SHA1 811028548aa4b360b5086d1af3150f9dde348aa6 xt/0-META-read.t
+SHA1 c9e7a47e1f397eb5f46d7e4ef21754d9df76e36e xt/0-Test-ConsistentVersion.t
+SHA1 d9e7f38a8dcfdb76c56951e4214be8eeda2e2289 xt/0-Test-DistManifest.t
+SHA1 9496e4a2a2734c7093ab6961900dd7a55800976e xt/0-Test-Pod.t
+SHA1 083242d959c1a9242c874982e4585872a95bec93 xt/0-Test-Synopsis.t
+SHA1 ec454b1b524d2d0b35e5a7d8292ad13d82becab5 xt/0-Test-YAML-Meta.t
+SHA1 2fb2ce60ce5c740d1eb7e3b55a96f3ccb84d38c3 xt/0-file-is-part-of.t
+SHA1 aeb6f41dfae96d04459448f6c3e3dee44691e722 xt/0-no-debug-left-on.t
+SHA1 059ac2607e7df40ff278d5ae0a0d483a4847b4b5 xt/display/Bitmap-use.t
+SHA1 3468d8e9105f30cc353cc7e90a6ad4be47fe16fa xt/display/DC-use.t
+SHA1 da9e4d6a66b0e425818679435de0236d59fa3b13 xt/display/Image-use.t
+SHA1 84a47c1d71fd58797a2754030998dfb673b62811 xtools/my-check-copyright-years.sh
+SHA1 bfb75ffb7a834c345288e01f561b12695f191d12 xtools/my-check-file-part-of.sh
+SHA1 1f28ea8151b0f8554e5ab4e5bbcf1c5371f788eb xtools/my-check-spelling.sh
+SHA1 89f7cb24bd2da7e994c3b239b2f4dc3b0380aed8 xtools/my-deb.sh
+SHA1 2db0a23176de55a8ee8f1643f239aeaa2bcf4fa1 xtools/my-diff-prev.sh
+SHA1 6c48137d49c3619eca39796d49f26332eea55d4a xtools/my-kwalitee.sh
+SHA1 e4a15f9b4bcf1d087de2d9ed8e87bf92b0469a6c xtools/my-manifest.sh
+SHA1 4db9c30b1fc96b04a794218ca19561b368f59679 xtools/my-pc.sh
+SHA1 7b1e948c88915689b3782d872ef9b92a2912c593 xtools/my-tags.sh
+SHA1 631dabf52c65a7b8613d6565fef2c2416ebba7e9 xtools/my-wunused.sh
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iD8DBQFQlXEOLFMCIV9q3ToRAmASAJ0UYiSwMz30Tn/D8XF3YqfaNG3fSQCfZ+GC
+L+igD0RpGLgdqZm+jcPoVIc=
+=ziN+
+-----END PGP SIGNATURE-----

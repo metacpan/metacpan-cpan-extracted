@@ -1,0 +1,52 @@
+--- #YAML:1.0
+name:               Image-Base-Imlib2
+version:            1
+abstract:           Image::Base on files using Image::Imlib2.
+author:
+    - Kevin Ryde <user42@zip.com.au>
+license:            gpl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Image::Base:    0
+    Image::Imlib2:  0
+    perl:           5
+    Test:           0
+resources:
+    homepage:  http://user42.tuxfamily.org/image-base-imlib2/index.html
+    license:   http://www.gnu.org/licenses/gpl.html
+no_index:
+    directory:
+        - t
+        - inc
+        - xt
+        - devel
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4
+optional_features:
+    maximum_devel:
+        description:  Stuff used variously for development.
+        requires:
+            File::Spec:          0
+            FindBin:             0
+            Parse::CPAN::Meta:   0
+            Pod::Simple::HTML:   0
+            Smart::Comments:     0
+            Test::DistManifest:  0
+            Test::Pod:           1.00
+            Test::Synopsis:      0
+            Test::YAML::Meta:    0.15
+            warnings::unused:    0
+            YAML:                0
+            YAML::Syck:          0
+            YAML::Tiny:          0
+            YAML::XS:            0
+    maximum_tests:
+        description:  Have "make test" do as much as possible.
+        requires:
+            Test::Weaken:  2.000

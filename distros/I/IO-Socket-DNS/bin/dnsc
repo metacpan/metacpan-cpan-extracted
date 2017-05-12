@@ -1,0 +1,220 @@
+#!/usr/bin/perl -w
+
+=head1 NAME
+
+dnsc - IO::Socket::DNS wrapper script
+
+=head1 SYNOPSIS
+
+  dnsc --suffix=DNS_Suffix [ options ] <remote_host> [<remote_port>]
+
+=head1 DESCRIPTION
+
+dnsc is intended as a demo script for the IO::Socket::DNS module.
+It creates a TCP tunnel to a dnsd server using only DNS queries.
+Note that this software is useless without a properly installed
+dnsd server running somewhere.
+
+=head1 ARGUMENTS
+
+=head2 <remote_host>
+
+The PeerAddr to connect to. This connection will be proxied out
+through the IO::Socket::DNS::Server server.
+This setting is required.
+
+=head2 <remote_port>
+
+The PeerPort to connect to.
+This <remote_port> specification can also be embedded in the
+<remote_host> argument after a ":", i.e., www.google.com:80.
+If none is specified, then it will just use the listen_port
+by default.
+You must specify either remote_port or listen_port.
+
+=head2 --suffix <dns_suffix>
+
+Specify domain ending for proxy queries.
+You can also use the DNS_SUFFIX environment variable instead of
+commandline option.
+This setting has no default so must be specified.
+
+=head2 --listen_ip <IP.AD.RE.SS>
+
+Which IP Address to listen for incoming connections on listen_port.
+If none is speficied, then all interfaces (0.0.0.0) will be bound.
+
+=head2 --listen_port <port>
+
+Specify which port to forward to <remote_host>:<remote_port>.
+The <listen_ip> specification can also be embedded here by
+preceding it with a ":", i.e., --listen_port=127.0.0.1:2000
+If none is specified, then it will just default to <remote_port>.
+
+=head2 --loop
+
+Loop forever.
+Without this option, it just accepts one connection and exits.
+You can think of it like this:
+  nc -l <listen_port> -e "nc <remote_host> <remote_port>"
+
+But with --loop enabled, it behaves like the ssh "-L" option, i.e.:
+
+  ssh -L<listen_port>:<remote_host>:<remote_port> ...
+
+And allows multiple connections to be forwarded.
+Just hit CTRL-C when you want to break out of the --loop
+and stop forwarding connections.
+
+=head2 --password <password>
+
+Use this to connect to a password protected dnsd.
+None by default.
+
+=head2 --verbose
+
+Enable verbosity to monitor activity or help debugging.
+This may be specified multiple times to increase verbosity.
+
+=head1 EXAMPLES
+
+Here are some various independent usage examples:
+
+1. Forward a local connection 0.0.0.0:8080 to someproxy.com:8080
+out through the dnsd tunnel running on d.example.com:
+  dnsc --suffix d.example.com someproxy.com 8080
+
+2. One connection to 127.0.0.1:8000 will forward to www.google.com
+on port 80 through the tunnel:
+  dnsc --suffix d.example.com --listen 127.0.0.1:8000 www.google.com 80
+
+3. Forward a connection on port 8888 through a password protected
+dnsd tunnel:
+  dnsc --suffix=d.example.com --listen=8888 --password=LetMeIn google.com 80
+
+4. Assuming there is a SOCKS server running on socks.server.com
+that d.example.com is permitted to connect to, this will behave as
+if the SOCKS server is running locally on port 1080.
+It will continue looping forever (until you hit CTRL-C) waiting for
+SOCKS clients to connect:
+  dnsc --suffix=d.example.com --loop socks.server.com 1080
+
+5. Forward one connection to port 2222 on localhost to the SSH
+server on the dnsd machine tunnelled through DNS.
+And enable verbosity for fun:
+  dnsc --suffix=d.example.com -v -v -v --listen=127.0.0.1:2222 127.0.0.1:22
+
+6. Act like there is an SSH server running here, but when someone
+connects to it, they end up on sshserver.com instead:
+  export DNS_SUFFIX=d.example.com
+  export DNS_PASSWORD=SeCrEt
+  sudo dnsc sshserver.com 22
+
+=head1 SEE ALSO
+
+dnsd, IO::Socket::DNS
+
+=head1 AUTHOR
+
+Rob Brown, E<lt>bbb@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2011-2012 by Rob Brown
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.9 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut
+
+use strict;
+use lib "lib";
+use IO::Select;
+use IO::Socket;
+use IO::Socket::DNS;
+use Getopt::Long qw(GetOptions);
+
+my %opt = ();
+GetOptions
+    \%opt,
+    "suffix:s",
+    "listen_ip:s",
+    "listen_port|listen:s",
+    "loop",
+    "password:s",
+    "verbose+",
+    ;
+
+$ENV{DNS_SUFFIX} ||= do { my $try = "DNS_Suffix"; $try =~ /\./ ? $try : ""; };
+my $suffix = $opt{suffix} || $ENV{DNS_SUFFIX} or die "Usage> $0 --suffix=DNS_Suffix [options] --listen=[listen_ip:]listen_port remote_host [remote_port]\n";
+my $peerhost = shift or die "Specify the host or IP (and port) to connect to.\n";
+my $peerport = shift;
+$peerport = $1 if !$peerport && $peerhost =~ s/:(\d+)$//;
+my $local_port = $opt{listen_port} || $peerport or die "Remote port is required\n";
+my $local_host = $opt{listen_host} || ($local_port =~ s/^([\d\.]+)://) ? $1 : "0.0.0.0";
+if (!$peerport) {
+    $peerport ||= $local_port;
+}
+
+my $listen = new IO::Socket::INET
+    LocalAddr => $local_host,
+    LocalPort => $local_port,
+    ReuseAddr => 1,
+    Listen => 1,
+        or die "bind: Failed $!\nTry specifying other than --listen_port $local_host:$local_port?\n";
+
+ACCEPT:
+while (1) {
+    print "Waiting for connection on $local_host:$local_port ...\n";
+    my $server = $listen->accept;
+
+    print "Connection detected from ".$server->peerhost.":".$server->peerport.".\n";
+    if ($opt{loop}) {
+        if (fork) {
+            # Parent
+            close $server;
+            sleep 1;
+            next;
+        }
+    }
+    else {
+        close $listen;
+    }
+    print "Trying $peerhost port $peerport...\n";
+    my $io = new IO::Socket::DNS
+        PeerHost => $peerhost,
+        PeerPort => $peerport,
+        Password => $opt{password},
+        Suffix => $suffix,
+            or die "connect: $peerhost:$peerport: Failed $!\n";
+    print "Connected to $peerhost.\n";
+
+    my $sel = new IO::Select $server;
+    print "Proxying connection from port $local_port to $peerhost ...\n";
+  INPUT:
+    while (1) {
+        my $buffer = undef;
+        if ($sel->can_read(1)) {
+            $buffer = "";
+            if (sysread($server, $buffer, 8192)) {
+                $io->syswrite($buffer);
+            }
+            else {
+                last INPUT;
+            }
+        }
+        while ($io->pending) {
+            $buffer = "";
+            if (sysread($io, $buffer, 8192)) {
+                print $server $buffer;
+            }
+            else {
+                last INPUT;
+            }
+        }
+    }
+    last ACCEPT;
+}
+
+exit;

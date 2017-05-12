@@ -1,0 +1,24 @@
+# http://module-build.sourceforge.net/META-spec.html
+name:         Image-Identicon
+version:      0.03
+version_from: lib/Image/Identicon.pm
+installdirs:  site
+author:       YAMASHINA Hio <hio@cpan.org>
+abstract: Generate Identicon image
+license: Perl
+requires:
+  Digest::SHA:    0
+  GD:          2.05
+build_requires:
+  Test::More: 0
+no_index:
+  directory:
+    - inc
+    - t
+    - example
+
+distribution_type: module
+generated_by: ExtUtils::MY_Metafile version 0.07, EUMM-6.30.
+meta-spec:
+  version: 1.2
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html

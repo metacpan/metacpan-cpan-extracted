@@ -1,0 +1,20 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+SIGNATURE
+example/identicon.cgi
+example/index.cgi
+example/index.tmpl.html
+example/patch_list.pl
+example/patch_list.png
+inc/ExtUtils/MY_Metafile.pm
+lib/Image/Identicon.mlpod
+lib/Image/Identicon.pm
+lib/Image/Identicon_ja.pod
+t/00-load.t
+t/01-run.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

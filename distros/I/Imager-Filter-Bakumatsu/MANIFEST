@@ -1,0 +1,16 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Imager/Filter/Bakumatsu.pm
+share/BakumatsuTexture.png
+t/00_compile.t
+t/01_filter.t
+t/sample-filterd.png
+t/sample.png
+xt/critic.t
+xt/podcoverage.t
+META.yml
+MANIFEST

@@ -1,0 +1,54 @@
+{
+   "abstract" : "Tools for writing InterMine-Items-XML files",
+   "author" : [
+      "InterMine <dev@intermine.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "InterMine-Item",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "Test::Warn" : "0",
+            "Test::XML" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "InterMine::Model" : "0.94",
+            "XML::Writer" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "InterMine::Item" : {
+         "file" : "lib/InterMine/Item.pm",
+         "version" : "0.991"
+      },
+      "InterMine::Item::Document" : {
+         "file" : "lib/InterMine/Item/Document.pm",
+         "version" : "0.991"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.991"
+}

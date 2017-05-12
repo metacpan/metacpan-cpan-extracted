@@ -1,0 +1,60 @@
+Image/IPTCInfo/RasterCaption version 0.01
+=========================================
+
+DESCRIPTION
+
+Add to "Image::IPTCInfo" support for the IPTC IIM4 Dataset 2:125
+Rasterized Caption.
+
+This module sub-classes Josh Carter's "Image::IPTCInfo", and you should
+consult the the Image::IPTCInfo manpage for details of how to use it
+before proceding with this documentation.
+
+BACKGROUND
+
+The IPTC is the International Press & Telecommunications Council. The
+IIM4 is version four of the Information Interchange Model, which amongst
+other things allows the embedding of text (and now XML) within images
+(though XML support is not yet provided by the Perl modules in this
+namespace).
+
+The IPTC IIM4 specification describes a rasterized caption as containing
+"...the rasterized object data description and is used where characters
+that have not been coded are required for the caption."
+
+		Not repeatable, 7360 octets, consisting of binary data,one bit
+		per pixel,two value bitmap where 1 (one) represents black and
+		0 (zero) represents white.
+
+		-- IPTC-NAA Information Interchange Model Version No. 4,
+		   http://www.iptc.org, October 1997, Page 41
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+The tests are pretty basic, since I'm not giving
+away image recognition technology ;)
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Image::IPTCInfo
+  Image::Magick
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2003 Lee Goddard
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

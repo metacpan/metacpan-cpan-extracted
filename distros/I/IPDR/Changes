@@ -1,0 +1,278 @@
+Revision history for IPDR
+
+Please see the examples directory on how to use the module.
+
+IP ownership has now been resolved. This code is released under
+artistic_2 license and any changes made,bugs found, general information
+
+
+additions should be presented back to the author.
+0.39	25/05/2011
+	Added initiator_id tag InitiatorID => '10.1.1.1' so you can set
+	the initiator to an IP address of your choice. Not too 
+	useful except for multi homed servers with one gateway 
+	defined.
+0.38	25/05/2011
+	Fixed Warning64BitOff properly. 
+	Fixed use if BigInt, some strange merging of code resulting in 
+	failing encode/decode of 64bit numbers
+	ACK sending.
+0.37	24/05/2011
+	Changed the 64BitWarningOff to Warning64BitOff, aparently you can not
+	use a number at the beginning of a variable name (weird).
+0.36	22/05/2011
+	Added LocalAddr to new setup. If you have multiple interfaces
+	then set this to the IP of the interface you wish to use, ie.
+
+	LocalAddr => '10.1.1.1'
+
+	Would use the interface with the IP 10.1.1.1
+0.35	18/05/2011
+	Added more debugging output when DEBUG is set.
+0.34	16/05/2011
+	PacketDirectory code changed so you do not actually have to capture
+	packets, small but important element !
+0.33	16/05/2011
+	Added Variable hexBinarySingle. This forces the module to ingest
+	hexBinary data as single bytes not 16bit wide bytes. Default
+	this is set to off.
+0.32	12/05/2011
+	Released as confirmed working
+0.31_3	10/05/2011
+	Dots, dashes, equals missing in places they should not have been. You
+	can tell I havent looked at IPDR for quite a while.
+0.31_2	10/05/2011
+	Final fix for list extract(not really list), multiple typos and overall
+	stupid coding fixed.
+0.31	9/05/2011
+	Thanks to Rui Dias dias < dot> rp <at > gmail <dot > com for helping in debug
+	in a live environment.
+	Fixed IPV6 length problem which caused other issues
+	Changed the type IPList to handle provided data correctly. Each element is two
+	bytes 
+	Added support for different field names, but the same field type (number)
+0.30    4/04/2011
+        Fixed a double $$ typo for file creation
+        Added (as a temp test) Math::BigInt support for 32bit systems for the
+        Client.pm module, for Cisco*.pm you are out of luck.
+        Math::BigInt 1.77 is now a requirement.
+0.29	6/04/2010
+	Added SessionName so that you can specify by name the session
+	you wish to use on the remote server. This allows multiple
+	sessions configured on the remote side to be chosen. If the name
+	is not found  the first session on the remote side is used.
+	All values are now unsigned. If you want signed, pack, unpack
+	in your own code as part of the DataHandler pointer.
+0.28	4/04/2010
+	Added full template support for XDR datatypes. Signed values
+	may be problematic on the platform due to endianess.
+	Started support for Logging output
+	Started to add support for Endianess changes.
+0.27	31/03/2010
+	Added MACFormat to the Client.pm as an option. This has two values
+	1 and 2. Default 1 if omitted and determines how the MAC address
+	will be formatted. The default is aabb.ccdd.eeff however when set 
+	to 2 the format is AA-BB-CC-DD-EE-FF
+0.26	30/03/2010
+	Added serviceActiveTime into XML parser.
+	Added PollTime as an option into new object ( default 900 seconds )
+	Added ReturnPollTime as a function to return PollTime set
+	Fixed DataHandler call to include $self object
+0.25    17/01/2010
+	SessionID finally fixed ( case sensitive typo ).
+	Change network write and reads to include timeouts
+	Added variables
+
+	AckTimeOverride
+	AckSequenceOverride
+
+	Allows you to set the AckTimer and AckSequence numbers should
+	you wish to.
+ 
+	Added a new example which allows the IPDR client to reconnect
+ 	if the network or tcp connection timeouts/fails. 
+
+0.24    15/01/2010
+	SessionID again and also session specific Ack and Sequence
+        handling
+0.23.04 13/01/2010
+	SessionID again
+0.23.03	12/01/2010
+	SessionID again
+0.23.02 10/01/2010
+	SessionID again previously coded to spec, now coded to an implementation
+	lets see how it goes ( tears will ensue I suspect )
+
+0.23.01	9/01/2010
+	SessionID was not fixed correctly should be now
+	MaxRecords appeared to be doing something odd. Removed the data
+	ack sending as not required and added a purge of the data set
+	from memory.
+
+0.23	8/01/2010
+	Beta version for fixing and implementation several features
+
+	AckTime  - Implementation where data flows longer than a Timeout
+	period and requires ACK during receiving.
+	SessionID - Set properly rather than to 0. This is quite important
+	and appears one or two vendor implementations like it to be correct.
+	MaxRecords - Will send a data ack and call the external function
+	after each amount of data records received.
+
+0.22	15/12/2009
+	Added XML writing and relating to the Client.pm using the
+	XMLDirectory attribute
+
+0.21	20/11/2009
+	Added
+
+	RemoteMulti tag to send to multiple destinations
+
+	Example would be
+
+	RemoteMulti => '10.1.1.1:9000:10,20.1.1.1:9000:10'
+
+	This will send to multiple destinations at the same time for the
+	same data. This is effectively a unicast repeater.
+
+	Added
+
+	RemoteSecure
+
+	This is a simple 0 or 1 flag, default is 0. If set the 
+	destination should be ready to accept a SSL connection as the 
+	client tries to setup a SSL call. SSLKeyFile and SSLHostFile
+	must be present otherwise the client setup will fail.
+
+	Added the Client.pm module to convert XDR into XML and also
+	relay this remotely.
+
+	PDF started with examples on how to use the module and collect
+	data. 
+
+0.20	11/11/2009
+	Fixed the really bad TCP handler, not sure how or why i did the
+	previous way but should now work correctly.
+
+	Added TCP relaying. New options are
+
+	RemoteAddr		IP address
+	RemotePort		Port
+	RemoteTimeOut		In Seconds
+	RemoteSpeed		In Mbps. ie. 40 or 100 will send at 40mbps or
+					100mbps. Useful for managing network
+					or server utilisation. Default is 10.
+
+	Any data received is then sent on to the remote IP and Port using
+	a clear channel TCP connection accepted by the Cisco module. SSL
+	sending may be added in the future release
+
+	Currently the remote sending is only supported on the Cisco and 
+	CiscoSSL modules.
+
+	Added CiscoSSL module. Really this is the Cisco module but using
+	IO::Socket::SSL and pointers to a CA and Host key with
+
+	SSLKeyFile
+	SSLHostFile
+
+	Example keys are included in the distribution TO GET YOU GOING BUT
+	DO NOT USE THEM IN ANY PRODUCTION ENVIRONMENT!! YOU HAVE BEEN WARNED
+
+	See CiscoSSL on how to create a key using openssl and how to apply
+	it to the router side.
+
+	Added 
+
+	Force32BitMode
+
+	This defaults to 0 and is only applicable to the Cisco and CiscoSSL
+	modules. The 'make test' will still fail/skip, however if collecting
+	from Cisco7200 series UBRs 64bit is not required and setting this
+	to 1 will allow the Cisco/CiscoSSL to still work.
+
+0.19	02/09/2009
+	Added attributes to document level which are
+
+	xmlns
+	count
+	version
+	creationTime
+	xsi:schemaLocation
+	IPDRRecorderInfo
+	xmlns:xsi
+	endTime
+	docId
+
+	Added
+
+	IPDRcreationTime
+	RecType
+
+	The version 3.5 template being used.
+
+	Changed the 'DataHandler' function to also return a pointer to
+	the module object to provide hooks to internal functions.
+
+0.18	28/08/2009
+	Added document to the sequences returned
+0.17	26/08/2009
+	Another bug in the Cisco module (you probably do not believe I 
+	tested this extensively)
+0.16	24/08/2009
+	Bug in the Cisco module causing the DOCSIS parser to fail
+	Thanks to Rui Dias for providing debug and comms to track it down
+0.15	20/07/2009
+	IP ownership resolved and now release under the artistic_2 license.
+0.14	17/07/2009
+	Made DataHandler fork when processing data. The time between
+	pass off to external function and keep alive timeout could be
+	exceeded, so to prevent stall fork applied.
+0.13	16/07/2009
+	Added keep alive to after session stop, otherwise IPDR exporter
+	reported timeout. Session stop is not a disconnect state, so
+	collector needs to send keepalive to maintain an open session.
+	Fixed CMcpeIpv4List so at LEAST the first entry in the list is
+	shown. Checking for more entries should work however there is
+	no data available to be 100%
+0.12	12/07/2009
+	Changed some of the debug error messages to be more meaningful.
+	template_value_definitions needs some work. Getting a clearly defined
+	valueset is proving very difficult so more vendors required.
+	Added some attributes for TCP extensions, so the data is sent to
+	third party servers, if needed.
+0.11	03/02/2009
+	Fixed a typo to pass correct information to IO::Select
+0.10	21/11/2008
+	Modified some of the DATA_ACK messaging so large sequence sets
+	of data are ACKd correctly. ( in someways a bug previously )
+	Added 64bit check upon start up. Important as some users reported
+	problems with the data but in fact turned out to be non 64bit
+	OS or installations of Perl ( make test anyone? )
+0.09	9/11/2008
+	Added support for 5.1 series software for Motorola BSR
+	Some TCP and packet handling changes cause 0.08 to break
+	Added nice connection failure state
+0.08	3/11/2008
+	DOCSIS 1.1 & 3 supported properly now.
+	Multiple flows caused issues with session counting. This is
+	now resolved.
+	Added additional feature to XDR handler to return the RAW data
+	before processing to allow independent debugging.
+	Tidied up some memory leak issues
+	Started work on an IPDR relay function. This module will connect/get
+	IPDR data then allow other clients to connect to it for relay. Useful
+	to allow vendors/third parties access to the data but not access to
+	the original source due to security.
+0.07    16/10/2008
+        All module versions brought into line for the distribution
+        Makes it easier to maintain one version across the board.
+0.06	16/10/2008
+	Released into the real world after testing completed
+	License out under per unit fee.
+0.05	Made client and cisco have the same construct names
+0.04	Reworked the XDR handler
+0.03	Alpha state mark 2
+0.02	Alpha state
+0.01    01/09/2007
+

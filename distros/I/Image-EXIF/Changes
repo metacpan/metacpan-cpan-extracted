@@ -1,0 +1,118 @@
+Revision history for Perl extension Image::EXIF.
+
+2.01    Fri May 11 18:04:11 BST 2012
+        - Fix building under Perl 5.8.8 (including Red Hat 5.6)
+
+2.00    Sun May  6 16:22:04 BST 2012
+        - New maintainer Aaron Crane <arc@cpan.org>
+        - New versioning scheme: don't encode exiftags version number in
+          Perl module version
+        - Upgrade embedded exiftags library to 1.01
+        - Require Perl 5.8
+        - Fix build on case-insensitive filesystems, as typically found
+          under Mac OS, Windows, Cygwin, etc (RT#4353, RT#4973, RT#76281)
+        - Fix broken dists (RT#4353, RT#32641)
+        - Fix: allow multiple Image::EXIF objects to exist simultaneously
+        - Fix: no more fixed-size buffers (and potential buffer overflows)
+        - Use exceptions to report errors, not a mixture of exit() and
+          return-value checking (RT#26094)
+
+1.00.4 Thu Jul 14 15:03:03 MSD 2011
+        Fixed bugs:45085, 26094
+        Dmitry Kosenkov <junker@front.ru>
+
+1.00.3 Mod Apr 25 16:56 PST 2005
+        Mr Eric Johnston released new version of his library which is 1.00.
+        So did we!
+
+99.4  Thu Aug 12 21:42 PST 2004
+(-)     Fix
+        Martijn van de Streek found a bug and sent a patch. Below his note:
+        >In the current version of Image::EXIF there's a bug: when reading a
+        >non-EXIF JPEG file after reading an EXIF JPEG file, the module generates
+        >a Segmentation Fault.
+        >
+        >The attached patch fixes this bug by re-setting the "et" to NULL after
+        >exiffree()ing it.
+
+(-)     Fix
+        One more issue. If file which is kinda jpeg is a wrong one, then
+        package gets stuck.
+        Fixed
+
+
+99.1  Fri May 21 14:40 PST 2004
+        Mr Eric Johnston released new version of his library which is 0.99.1
+        So did we!
+
+        From now I'm gonna rename exif.c to _exif.c to allow compile and use
+        this package for Win & Mac perl cookers.
+
+        And just small note from Blair Zajac:
+        >Hello,
+
+        >I'm looking to use the Image::EXIF module and noticed that the
+        >'unknown' hash key is actually spelled 'unknow'.  Since all
+        >occurrences of the word are misspelled in the package, is this
+        >deliberate?
+
+        >I'm attaching a patch to fix this and a couple of other spelling
+        >mistakes.
+
+        >Best,
+        >Blair
+
+        Thanks Blair for your note.
+        Fixed.
+
+98.6  Wed Jan 14 13:53:48 PST 2004
+        HONY (OldNewYear Crazy Russian Custom)
+        * small change in EXIF.xs
+                78c78
+                <                       break;
+                ---
+                >                       ;
+                -
+
+        From Rolf Dignatz:
+
+                using the original Image-EXIF-0.98.5:
+
+                file: nikon0001.JPG
+
+                rd debug: read_data: mark = 0xe1    (JPEG_M_APP1)
+                rd debug: exifscan: header='Exif'
+                rd debug: read_data: mark = 0xe1    (JPEG_M_APP1)
+                rd debug: exifscan: header='http://ns.adobe.com/xap/1.0/'
+
+                (null): couldn't find Exif data
+
+                As you see in my first debug output there are two
+                JPEG_M_APP1-marked sections in the nikon jpeg-file
+                and only the first one is the 'real' EXIF section.
+                So I decided to break after the first legal EXIF section.
+
+                Another way might be to read all possibly EXIF sections
+                and process them all?
+                Similar is the original exiftags-0.98::exiftags.c::doit()
+                (code in line ~ 182) which processes each JPEG_M_APP1-section
+                which leads in a true expression
+
+
+
+        * small fix in create_web_gallery.pl
+
+98.5  Mon Jan 5 11:28:48 PST 2004
+        HNY
+        * exifgps.c file was missing in package
+        + also I added script create_web_galley.pl
+          where you can see how I deal with the package
+
+98.3  Mon Nov 10 11:28:48 PST 2003
+        * bugfix.
+          EXIF got core dump if jpeg didn't have exif section.
+           based on comment from Sebastien Gross (tnku)
+
+0.02  Tue Aug  5 10:33:19 PST 2003
+        - original version; created by h2xs 1.21 with options
+                -n Image::EXIF

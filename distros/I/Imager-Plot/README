@@ -1,0 +1,34 @@
+The source code in this Perl Module is copyright by
+Arnar M. Hrafnkelsson (addi@umich.edu) 2001, 2002 (C)
+
+This source is released under the same terms as Perl, that is GPL and
+Artistic licenses.  For details see the Perl License information and
+the files Copying and Artistic in this Distribution.
+
+This module usually requires the latest release version of Imager to
+be installed on the target machine and be capable to use some of the
+font renderers that Imager supports, see Imager::Files manpage on
+querying what file formats your installation supports.
+
+The pod Documentation is getting better but is not finished.  It may
+be a good idea to look in the samples diretory and pick things up from
+there.  The samples are designed to run from the toplevel directory of
+the distribution like so:
+
+$ samples/sample1.pl 
+
+
+There is also a small DWIM (do what I mean) plot app named plot.pl in
+the distribution.
+
+Thanks to Mengwong (Freeside) for providing the Tufte trilogy of books
+on visual presentation.  Tufte is a genius on the subject and the
+books rock!
+
+
+Enjoy!
+
+-- Arnar
+
+
+

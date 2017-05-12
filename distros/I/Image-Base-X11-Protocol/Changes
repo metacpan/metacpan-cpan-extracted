@@ -1,0 +1,67 @@
+Copyright 2010, 2011, 2012, 2013 Kevin Ryde
+
+This file is part of Image-Base-X11-Protocol.
+
+Image-Base-X11-Protocol is free software; you can redistribute it
+and/or modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation; either version 3, or (at
+your option) any later version.
+
+Image-Base-X11-Protocol is distributed in the hope that it will be
+useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You can get a copy of the GNU General Public License online at
+<http://www.gnu.org/licenses/>.
+
+
+
+Version 14, August 2013
+    - Drawable line() clip to 2^16 rather than the Image::Base default code
+    - Drawable diamond() clip to 2^16 rather than wrap-around
+
+Version 13, February 2012
+    - Drawable clip to 0,0,32767,32767 which is maximum drawable
+    - Window fix for ellipse() transparent "None"
+
+Version 12, August 2011
+    - fix Drawable diamond() coordinates
+
+Version 11, August 2011
+    - Drawable ellipse() use rectangle for 2-high too
+
+Version 10, July 2011
+    - diamond() using PolyLine/FillPoly
+    - Window line() fix some of the experimental "None" drawing
+
+Version 9, March 2011
+    - 1 and 3 digit hex colours too
+
+Version 8, March 2011
+    - use X11::Protocol::Other
+    - fix for unknown colour handling
+
+Version 7, February 2011
+    - tests allow for window becoming obscured during testing
+
+Version 6, February 2011
+    - fix Makefile.PL for perl 5.6 and earlier
+    - hex white lower case #ffffff and #ffffffffffff too
+
+Version 5, December 2010
+    - add_colours() fix dispatch to prev error handler, and use a sliding
+      window instead of batches
+
+Version 4, November 2010
+    - xy() fetching mask out GetImage possible garbage in extra bits/bytes
+
+Version 3, November 2010
+    - ellipse() new $fill parameter
+    - Window rectangle() fix unfilled colour "None" shaping
+
+Version 2, October 2010
+    - test manifest only as an author test
+
+Version 1, July 2010
+    - the first version

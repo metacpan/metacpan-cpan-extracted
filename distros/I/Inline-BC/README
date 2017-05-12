@@ -1,0 +1,63 @@
+Inline::BC
+==========
+
+    Copyright (c) 2002 Piers Harding.
+    All rights reserved.
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of either:
+        a) the GNU General Public License as published by the Free
+        Software Foundation; either version 1, or (at your option) any
+        later version, or
+        b) the "Artistic License"
+    Please be mindful of the terms and conditions of the Gnu bc source code itself,
+    as this is covered by a seperate License.  The Gnu bc source code associated
+    with Inline::BC is found in the mylib/ directory of this distibution.
+
+
+Inline::BC is an ILSM (Inline Support Language Module ) for Gnu bc, the arbitrary
+precision numeric processing language.  Inline::BC - like other ILSMs - allows you
+compile (well - render to byte code ), and run Gnu bc code within your Perl
+program.
+
+From the Gnu BC README:
+
+bc is an arbitrary precision numeric processing language.  Syntax is
+similar to C, but differs in many substantial areas.  It supports
+interactive execution of statements.  bc is a utility included in the
+POSIX P1003.2/D11 draft standard.
+
+This version was written to be a POSIX compliant bc processor with
+several extensions to the draft standard.  Option flags are available
+to cause warning or rejection of the extensions to the POSIX standard.
+For those who want only POSIX bc with no extensions, a grammar is
+provided for exactly the language described in the POSIX document.
+The grammar (sbc.y) comes from the POSIX document.  The Makefile
+contains rules to make sbc.  (for Standard BC)
+
+"end of quote"
+
+Further documentation about Gnu bc can be found at:
+  http://www.gnu.org/software/bc/bc.html
+  http://www.gnu.org/manual/bc/html_mono/bc.html
+
+
+To build you first need to install Inline ( and Inline::C ),
+and the do the usual:
+
+perl Makefile.PL
+make 
+make test
+make install
+
+Dance.
+
+for more details:
+
+perldoc Inline::BC
+
+and
+
+man bc
+
+Piers Harding - piers@cpan.org
+Somewhere arround: Fri Oct 18 07:47:29 BST 2002

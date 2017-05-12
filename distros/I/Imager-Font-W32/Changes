@@ -1,0 +1,74 @@
+Imager-Font-W32 0.89
+====================
+
+ - update the bundled/modified Devel::CheckLib to handle the gcc-4
+   symlink on Cygwin
+
+Imager-Font-W32 0.88
+====================
+
+ - add a missing head1 AUTHORS to the old Win32.pm
+   https://rt.cpan.org/Ticket/Display.html?id=86658
+
+Imager-Font-W32 0.87
+====================
+
+ - depend on Imager 0.95.
+
+Imager-Font-W32 0.86
+====================
+
+Released as part of a development release of Imager.
+
+ - add standard font tests
+
+Imager-Font-W32 0.85
+====================
+
+ - clean up .dSYM directories generated performing probes on OS X
+   Mountain Lion.
+
+ - pass the --verbose command-line option through to Imager::Probe in
+   Makefile.PL
+   https://rt.cpan.org/Ticket/Display.html?id=75878
+
+Imager-Font-W32 0.84
+====================
+
+ - no longer fallback to using DynaLoader to load the XS code
+   https://rt.cpan.org/Ticket/Display.html?id=75560
+
+Imager-Font-W32 0.83
+====================
+
+ - update dependency to Imager 0.86
+   https://rt.cpan.org/Ticket/Display.html?id=72643
+
+Imager-Font-W32 0.82
+====================
+
+ - the default text color is no longer transparent.
+   https://rt.cpan.org/Ticket/Display.html?id=71469
+
+ - fix library detection under MSVC
+   https://rt.cpan.org/Ticket/Display.html?id=71735
+
+ - added better tracing of the font resource helpers
+
+ - improve error reporting for test failures
+
+Imager-Font-W32 0.81
+====================
+
+ - update the bundled (and still modified) Devel::CheckLib
+   https://rt.cpan.org/Ticket/Display.html?id=69170
+
+Imager-Font-W32 0.80
+====================
+
+ - the big types cleanup
+
+Imager-Font-W32 0.78
+====================
+
+Split off from Imager.

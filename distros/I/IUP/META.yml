@@ -1,0 +1,221 @@
+---
+abstract: 'IUP bindings to Perl'
+author:
+  - 'KMX <kmx@cpan.org>'
+build_requires:
+  Alien::IUP: '0.709'
+  ExtUtils::CBuilder: '0'
+  Module::Build: '0.36'
+  Test::More: '0'
+  perl: '5.008008'
+configure_requires:
+  Alien::IUP: '0.709'
+  Module::Build: '0.36'
+  perl: '5.008008'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - IUP
+  - portable
+  - toolkit
+  - graphical
+  - user
+  - interfaces
+  - tecgraf
+  - cross-platform
+  - GUI
+  - Windows
+  - GTK
+  - Motif
+  - X11
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: IUP
+provides:
+  IUP:
+    file: lib/IUP.pm
+    version: '0.305'
+  IUP::AnimatedLabel:
+    file: lib/IUP/AnimatedLabel.pm
+  IUP::BackgroundBox:
+    file: lib/IUP/BackgroundBox.pm
+  IUP::Button:
+    file: lib/IUP/Button.pm
+  IUP::Calendar:
+    file: lib/IUP/Calendar.pm
+  IUP::Canvas:
+    file: lib/IUP/Canvas.pm
+  IUP::Canvas::Bitmap:
+    file: lib/IUP/Canvas.pm
+  IUP::Canvas::FileBitmap:
+    file: lib/IUP/Canvas/FileBitmap.pm
+  IUP::Canvas::FileVector:
+    file: lib/IUP/Canvas/FileVector.pm
+  IUP::Canvas::Palette:
+    file: lib/IUP/Canvas.pm
+  IUP::Canvas::Pattern:
+    file: lib/IUP/Canvas.pm
+  IUP::Canvas::Stipple:
+    file: lib/IUP/Canvas.pm
+  IUP::CanvasGL:
+    file: lib/IUP/CanvasGL.pm
+  IUP::Cbox:
+    file: lib/IUP/Cbox.pm
+  IUP::Cells:
+    file: lib/IUP/Cells.pm
+  IUP::Clipboard:
+    file: lib/IUP/Clipboard.pm
+  IUP::ColorBar:
+    file: lib/IUP/ColorBar.pm
+  IUP::ColorBrowser:
+    file: lib/IUP/ColorBrowser.pm
+  IUP::ColorDlg:
+    file: lib/IUP/ColorDlg.pm
+  IUP::Constants:
+    file: lib/IUP/Constants.pm
+  IUP::DatePick:
+    file: lib/IUP/DatePick.pm
+  IUP::DetachBox:
+    file: lib/IUP/DetachBox.pm
+  IUP::Dial:
+    file: lib/IUP/Dial.pm
+  IUP::Dialog:
+    file: lib/IUP/Dialog.pm
+  IUP::ElementPropertiesDialog:
+    file: lib/IUP/ElementPropertiesDialog.pm
+  IUP::Expander:
+    file: lib/IUP/Expander.pm
+  IUP::FileDlg:
+    file: lib/IUP/FileDlg.pm
+  IUP::Fill:
+    file: lib/IUP/Fill.pm
+  IUP::FlatButton:
+    file: lib/IUP/FlatButton.pm
+  IUP::FontDlg:
+    file: lib/IUP/FontDlg.pm
+  IUP::Frame:
+    file: lib/IUP/Frame.pm
+  IUP::GL:
+    file: lib/IUP/GL.pm
+  IUP::GL::BackgroundBox:
+    file: lib/IUP/GL/BackgroundBox.pm
+  IUP::GL::Button:
+    file: lib/IUP/GL/Button.pm
+  IUP::GL::CanvasBox:
+    file: lib/IUP/GL/CanvasBox.pm
+  IUP::GL::Expander:
+    file: lib/IUP/GL/Expander.pm
+  IUP::GL::Frame:
+    file: lib/IUP/GL/Frame.pm
+  IUP::GL::Label:
+    file: lib/IUP/GL/Label.pm
+  IUP::GL::Link:
+    file: lib/IUP/GL/Link.pm
+  IUP::GL::ProgressBar:
+    file: lib/IUP/GL/ProgressBar.pm
+  IUP::GL::ScrollBox:
+    file: lib/IUP/GL/ScrollBox.pm
+  IUP::GL::Separator:
+    file: lib/IUP/GL/Separator.pm
+  IUP::GL::SizeBox:
+    file: lib/IUP/GL/SizeBox.pm
+  IUP::GL::SubCanvas:
+    file: lib/IUP/GL/SubCanvas.pm
+  IUP::GL::Text:
+    file: lib/IUP/GL/Text.pm
+  IUP::GL::Toggle:
+    file: lib/IUP/GL/Toggle.pm
+  IUP::GL::Val:
+    file: lib/IUP/GL/Val.pm
+  IUP::Gauge:
+    file: lib/IUP/Gauge.pm
+  IUP::GridBox:
+    file: lib/IUP/GridBox.pm
+  IUP::Hbox:
+    file: lib/IUP/Hbox.pm
+  IUP::Image:
+    file: lib/IUP/Image.pm
+  IUP::Internal::Callback:
+    file: lib/IUP/Internal/Callback.pm
+  IUP::Internal::Canvas:
+    file: lib/IUP/Internal/Canvas.pm
+  IUP::Internal::Element:
+    file: lib/IUP/Internal/Element.pm
+  IUP::Internal::LibraryIup:
+    file: lib/IUP/Internal/LibraryIup.pm
+  IUP::Item:
+    file: lib/IUP/Item.pm
+  IUP::Label:
+    file: lib/IUP/Label.pm
+  IUP::LayoutDialog:
+    file: lib/IUP/LayoutDialog.pm
+  IUP::Link:
+    file: lib/IUP/Link.pm
+  IUP::List:
+    file: lib/IUP/List.pm
+  IUP::Matrix:
+    file: lib/IUP/Matrix.pm
+  IUP::MatrixList:
+    file: lib/IUP/MatrixList.pm
+  IUP::Menu:
+    file: lib/IUP/Menu.pm
+  IUP::MessageDlg:
+    file: lib/IUP/MessageDlg.pm
+  IUP::MglPlot:
+    file: lib/IUP/MglPlot.pm
+  IUP::Normalizer:
+    file: lib/IUP/Normalizer.pm
+  IUP::PPlot:
+    file: lib/IUP/PPlot.pm
+  IUP::Plot:
+    file: lib/IUP/Plot.pm
+  IUP::ProgressBar:
+    file: lib/IUP/ProgressBar.pm
+  IUP::ProgressDlg:
+    file: lib/IUP/ProgressDlg.pm
+  IUP::Radio:
+    file: lib/IUP/Radio.pm
+  IUP::Sbox:
+    file: lib/IUP/Sbox.pm
+  IUP::Scintilla:
+    file: lib/IUP/Scintilla.pm
+  IUP::ScrollBox:
+    file: lib/IUP/ScrollBox.pm
+  IUP::Separator:
+    file: lib/IUP/Separator.pm
+  IUP::Spin:
+    file: lib/IUP/Spin.pm
+  IUP::SpinBox:
+    file: lib/IUP/SpinBox.pm
+  IUP::Split:
+    file: lib/IUP/Split.pm
+  IUP::Submenu:
+    file: lib/IUP/Submenu.pm
+  IUP::Tabs:
+    file: lib/IUP/Tabs.pm
+  IUP::Text:
+    file: lib/IUP/Text.pm
+  IUP::Timer:
+    file: lib/IUP/Timer.pm
+  IUP::Toggle:
+    file: lib/IUP/Toggle.pm
+  IUP::Tree:
+    file: lib/IUP/Tree.pm
+  IUP::User:
+    file: lib/IUP/User.pm
+  IUP::Val:
+    file: lib/IUP/Val.pm
+  IUP::Vbox:
+    file: lib/IUP/Vbox.pm
+  IUP::Zbox:
+    file: lib/IUP/Zbox.pm
+requires:
+  perl: '5.008008'
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=IUP
+  license: http://opensource.org/licenses/mit-license.php
+  repository: https://github.com/kmx/perl-iup
+version: '0.305'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

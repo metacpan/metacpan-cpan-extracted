@@ -1,0 +1,1502 @@
+=pod
+
+=head1 NAME
+
+IUP::Manual::02_Elements - GUI elements guide, methods common for all IUP elements
+
+=head1 IUP MANUAL
+
+=over
+
+=item * L<IUP::Manual::01_Introduction|IUP::Manual::01_Introduction>
+
+=item * IUP::Manual::02_Elements E<nbsp>E<nbsp>E<nbsp>E<nbsp>E<nbsp> B<E<lt>E<lt>E<lt> this document>
+
+=item * L<IUP::Manual::03_Attributes|IUP::Manual::03_Attributes>
+
+=item * L<IUP::Manual::04_Callbacks|IUP::Manual::04_Callbacks>
+
+=item * L<IUP::Manual::06_HandlingKeyboard|IUP::Manual::06_HandlingKeyboard>
+
+=item * L<IUP::Manual::05_DialogLayout|IUP::Manual::05_DialogLayout>
+
+=item * L<IUP::Manual::07_UsingImageLibrary|IUP::Manual::07_UsingImageLibrary>
+
+=item * L<IUP::Manual::08_DragAndDrop|IUP::Manual::08_DragAndDrop>
+
+=back
+
+=head1 INTRODUCTION
+
+This document is intended as a reference list for common methods used by all IUP elements.
+
+For more information about using elemets see L<Elements Concept|IUP::Manual::01_Introduction/"Elements Concept">
+in L<IUP::Manual::01_Introduction|IUP::Manual::01_Introduction>.
+
+Currently available interface elements can be categorized as follows:
+
+=over
+
+=item * B<Primitives> (effective user interaction): B<dialog, label,
+button, text, multi-line, list, toggle, canvas, frame, image>.
+
+=item * B<Composition> (ways to show the elements): B<hbox, vbox,>
+B<zbox, fill>.
+
+=item * B<Grouping> (definition of a common functionality for a group
+of elements): B<radio>.
+
+=item * B<Menu> (related both to menu bars and to pop-up menus):
+B<menu, submenu, item, separator>.
+
+=item * Additional (elements built outside the main library): B<dial,
+gauge, matrix, tabs, valuator, OpenGL canvas, color chooser, color
+browser>.
+
+=item * B<Dialogs> (useful predefined dialogs): B<file selection,
+message, alarm, data input, list selection>.
+
+=back
+
+=head1 CREATING ELEMENTS
+
+=head3 new()
+
+Basic method for creating new element (constructor):
+
+ $elem = IUP::Button->new();
+ 
+ #or you can specify also some attribute values:
+ $elem = IUP::Button->new( TITLE=>"b1", SIZE=>"30x30");
+
+ #or you can specify also some callback handlers:
+ $elem = IUP::Button->new( TITLE=>"b1", SIZE=>"30x30",
+                           ACTION=>\&func1, BUTTON_CB=>\&func2 );
+
+ #some elements accept 'child' (lowercase!!) parameter
+ $elem = IUP::Vbox->new( MARGIN=>10, child=>[$elem1, $elem2] );
+
+ #you can also assign a name (alias) to created element via 'name' parameter
+ $elem = IUP::Button->new( TITLE=>"b1", name=>"mybutton");
+ #...later in your code
+ $button = IUP->GetByName("mybutton");
+
+=head3 new_no_ihandle()
+
+ $elem = IUP::Button->new_no_ihandle();
+ 
+BEWARE: just for experts, you very likely do not need this at all!
+
+=head3 new_from_ihandle()
+
+ $elem = IUP::Button->new_from_ihandle($ihandle);
+ 
+BEWARE: just for experts, you very likely do not need this at all!
+
+=head1 COMMON METHODS
+
+=head3 Append()
+
+=over
+
+Inserts an interface element at the end of the container, B<after> the
+last element of the container. Valid for any element that contains
+other elements like dialog, frame, hbox, vbox, zbox or menu.
+
+ $element->Append($new_child);
+
+B<$ih:> Identifier of a container like hbox, vbox, zbox and menu.
+
+B<$new_child>: Identifier of the element to be inserted.
+
+B<Returns:> the actual B<parent> if the interface element was successfully
+inserted. Otherwise returns C<undef>. Notice that the desired
+parent can contains a set of elements and containers where the child
+will be actually attached so the function returns the actual parent of
+the element.
+
+B<Notes:>
+
+This function can be used when elements that will compose a container
+are not known a priori and should be dynamically constructed.
+
+The new child can NOT be mapped. It will NOT map the new child into the
+native system. If the parent is already mapped you must explicitly call
+L<Map|/"Map()">, for the appended child.
+
+If the actual parent is a layout box (L<IUP::Vbox|IUP::Vbox>, L<IUP::Hbox|IUP::Hbox>
+or L<IUP::Zbox|IUP::Zbox>) and you try to append a child that it is already at the
+parent child list, then the child is moved to the last child position.
+
+The elements are NOT immediately repositioned. Call L<Refresh|/"Refresh()"> for
+the container (or any other element in the dialog) to update the dialog
+layout.
+
+B<See Also:>
+L<Detach|/"Detach()">,
+L<Insert|/"Insert()">,
+L<Map|/"Map()">,
+L<Unmap|/"Unmap()">,
+L<Refresh|/"Refresh()">,
+L<IUP::Hbox|IUP::Hbox>,
+L<IUP::Vbox|IUP::Vbox>,
+L<IUP::Zbox|IUP::Zbox>,
+L<IUP::Menu|IUP::Menu>.
+
+=back
+
+=head3 ConvertXYToPos()
+
+=over
+
+Converts a (x,y) coordinate in an item position.
+
+ my $position = $element->ConvertXYToPos($x, $y);
+
+B<$ih:> Identifier of the element.
+
+B<$x:> X coordinate of the left corner of the interface element.
+
+B<$y:> Y coordinate of the upper part of the interface element.
+
+B<Returns:> the position starting at 0 (except for L<IUP::List|IUP::List> that starts
+at 1). If fails returns -1.
+
+B<Notes:>
+
+It can be used for L<IUP::Text|IUP::Text> (returns a position in the string),
+L<IUP::List|IUP::List> (returns an item) or L<IUP::Tree|IUP::Tree> (returns a node identifier).
+
+B<See Also:>
+L<IUP::Text|IUP::Text>,
+L<IUP::List|IUP::List>,
+L<IUP::Tree|IUP::Tree>.
+
+=back
+
+=head3 Destroy()
+
+=over
+
+Destroys an interface element and all its children. Only dialogs,
+timers, popup menus and images should be normally destroyed, but
+B<detached> controls can also be destroyed.
+
+ $element->Destroy();
+
+B<Notes:>
+
+It will automatically B<unmap> and B<detach> the element if necessary,
+and then B<destroy> the element.
+
+This function also deletes the main names associated to the interface
+element being destroyed, but if it has more than one name then some
+names may be left behind.
+
+B<Menu> bars associated with dialogs are automatically destroyed when
+the dialog is destroyed.
+
+B<Images> associated with controls are NOT automatically destroyed,
+because images can be reused in several controls the application must
+destroy them when they are not used anymore.
+
+All dialogs and all elements that have names are automatically
+destroyed in L<Close|IUP/"Close()">.
+
+B<See Also:>
+L<Append|/"Append()">,
+L<Detach|/"Detach()">,
+L<Map|/"Map()">,
+L<Unmap|/"Unmap()">,
+L<Create|/"Create()">.
+
+=back
+
+=head3 Detach()
+
+=over
+
+B<Detaches> an interface element from its parent.
+
+ $element->Detach();
+
+B<Notes:>
+
+It will automatically call L<Unmap|/"Unmap()"> to B<unmap> the element if
+necessary, and then B<detach> the element.
+
+If left B<detached> it is still necessary to call L<Destroy|/"Destroy()"> to B<destroy> the IUP element.
+
+The elements are NOT immediately repositioned. Call L<Refresh|/"Refresh()"> for
+the container (or any other element in the dialog) to update the dialog
+layout.
+
+When the element is mapped some attributes are stored only in the
+native system. If the element is B<unmaped> those attributes are lost.
+Use the function L<SaveClassAttributes|/"SaveClassAttributes()">
+when you want to B<unmap> the element and keep its attributes.
+
+B<See Also:>
+L<Append|/"Append()">,
+L<Insert|/"Insert()">,
+L<Refresh|/"Refresh()">,
+L<Unmap|/"Unmap()">,
+L<Create|/"Create()">,
+L<Destroy|/"Destroy()">.
+
+=back
+
+=head3 GetAllAttributes()
+
+=over
+
+Returns the names of all attributes of an element that are defined in
+its internal hash table only.
+
+ my @attr_names1 = $element->GetAllAttributes();
+ #or
+ my @attr_names2 = $element->GetAllAttributes($max_n);
+
+B<$max_n:> maximum number of names the table can receive. Can be omitted.
+
+B<Returns:> reference to array with names. If $max_n is C<undef> or $max_n is 0 then returns all names.
+
+B<See Also:>
+L<GetAttribute|/"GetAttribute()">,
+L<SetAttribute|/"SetAttribute()">.
+
+=back
+
+=head3 GetAttribute()
+
+=over
+
+Returns the value of an interface element attribute.
+
+ my $val = $element->GetAttribute($name);
+ #or
+ my @values = $element->GetAttribute(@names);
+
+B<$name:> name of the attribute.
+
+B<$id:> used when the attribute has an additional id.
+
+B<Returns:> the attribute value or C<undef> if the attribute is
+not defined or does not exist.
+
+B<Notes:>
+
+B<Examples:>
+
+L<Browse for Example Files|../../examples/>
+
+B<See Also:>
+
+L<SetAttribute|/"SetAttribute()">.
+
+=back
+
+=head3 GetAttributeAsElement()
+
+=over
+
+Returns the reference to IUP element stored into an attribute of given name.
+
+ my $elem = $element->GetAttribute($name);
+ #or
+ my @elems = $element->GetAttribute(@names);
+
+B<$name:> name of the attribute.
+
+B<Returns:> reference to iup element
+
+=back
+
+=head3 GetAttributeId()
+
+=over
+
+ my $val = $element->GetAttributeId($name, $id);
+ 
+Equivalent (just little bit faster) to:
+
+  my $val = $element->GetAttribute("$name$id");
+
+=back
+
+=head3 GetAttributeId2()
+
+=over
+
+ my $val = $element->GetAttributeId2($name, $lin, $col);
+
+Equivalent (just little bit faster) to:
+
+ my $val = $element->GetAttribute("$name$lin$col");
+
+=back
+
+=head3 GetAttributes()
+
+=over
+
+Returns all attributes of a given element that are in the internal hash
+table. The known attributes that are pointers (not strings) are
+returned as integers.
+
+The internal attributes are not returned (attributes prefixed with
+"_IUP").
+
+Before calling this function the application must ensure that there is
+no pointer attributes set for that element, although some known
+pointers are handled.
+
+This function should be avoided. Use L<GetAllAttributes|/"GetAllAttributes()"> instead.
+
+ my $attr = $element->GetAttributes();
+ #later on
+ print "Title=", $attr->{TITLE}, "\n";
+ print "Color=", $attr->{FGCOLOR}, "\n";
+
+B<Returns:> a hash of C<< ATTRIBUTE => VALUE >> pairs for all attributes of given element.
+
+B<See Also:>
+L<GetAttribute|/"GetAttribute()">,
+L<GetAllAttributes|/"GetAllAttributes()">,
+L<SetAttribute|/"SetAttribute()">.
+
+=back
+
+=head3 GetBrother()
+
+=over
+
+Returns the brother of a control or C<undef> if there is none.
+
+ my $brother_elem = $element->GetBrother();
+
+B<Returns:> reference to iup element
+
+B<See Also:>
+L<GetChild|/"GetChild()">,
+L<GetNextChild|/"GetNextChild()">,
+L<GetParent|/"GetParent()">.
+
+=back
+
+=head3 GetChild()
+
+=over
+
+Returns the a child of the given control given its position.
+
+ my $child_elem = $element->GetChild($position);
+
+B<$position:> position of the desire child.
+
+B<Notes:>
+
+This function will return the children of the control in the exact same
+order in which they were assigned.
+
+B<See Also:>
+L<GetChildPos|/"GetChildPos()">,
+L<GetNextChild|/"GetNextChild()">,
+L<GetBrother|/"GetBrother()">,
+L<GetParent|/"GetParent()">.
+
+=back
+
+=head3 GetChildCount()
+
+=over
+
+Returns the number of children of the given control.
+
+ my $count = $element->GetChildCount();
+
+B<See Also:>
+L<GetChildPos|/"GetChildPos()">,
+L<GetChild|/"GetChild()">,
+L<GetNextChild|/"GetNextChild()">,
+L<GetBrother|/"GetBrother()">,
+L<GetParent|/"GetParent()">.
+
+=back
+
+=head3 GetChildPos()
+
+=over
+
+Returns the position of a child of the given control.
+
+ my $position = $elmenet->GetChildPos($child_element);
+
+B<$child_element:> reference to child element
+
+B<Returns:> position of the desire child or -1 if child not found.
+
+B<Notes:>
+
+This function will return the children of the control in the exact same
+order in which they were assigned.
+
+B<See Also:>
+L<GetChild|/"GetChild()">,
+L<GetChildCount|/"GetChildCount()">,
+L<GetNextChild|/"GetNextChild()">,
+L<GetBrother|/"GetBrother()">,
+L<GetParent|/"GetParent()">.
+
+=back
+
+=head3 GetClassName()
+
+=over
+
+Returns the name of the class of an interface element.
+
+ my $name = $element->GetClassName();
+
+B<Notes:>
+
+The following names are known:
+
+ "image"
+ "button"
+ "canvas"
+ "dialog"
+ "fill"
+ "frame" 
+ "hbox"
+ "item"
+ "separator"
+ "submenu"
+ "label"
+ "list"
+ "menu"
+ "radio"
+ "text" 
+ "toggle"
+ "vbox"
+ "zbox"
+ "multiline"
+ "user"
+ "matrix"
+ "tree"
+ "dial"
+ "gauge"
+ "val"
+ "glcanvas"
+ "tabs"
+ "cells"
+ "colorbrowser"
+ "colorbar"
+ "spin"
+ "sbox"
+ "cbox"
+ "progressbar"
+ "olecontrol"
+
+B<See Also:>
+L<GetClassType|/"GetClassType()">,
+L<GetClassAttributes|IUP/"GetClassAttributes()">.
+
+=back
+
+=head3 GetClassType()
+
+=over
+
+Returns the name of the native type of an interface element.
+
+ my $type = $element->GetClassType();
+
+B<Notes:>
+
+There are only a few pre-defined class types:
+
+ "void" - No native representation - HBOX, VBOX, ZBOX, FILL, RADIO
+ "control" - Native controls - BUTTON, LABEL, TOGGLE, LIST, TEXT, MULTILINE, ITEM, SEPARATOR, SUBMENU, FRAME, others
+ "canvas" - Drawing canvas, also used as a base control for custom controls.
+ "dialog"
+ "image"
+ "menu"
+
+B<See Also:>
+L<GetClassName|/"GetClassName()">,
+L<GetClassAttributes|IUP/"GetClassAttributes()">.
+
+=back
+
+=head3 GetDialog()
+
+=over
+
+Returns the handle of the dialog that contains that interface element.
+Works also for children of a menu that is associated with a dialog.
+
+ my $dialog = $element->GetDialog();
+
+B<$ih:> Identifier of an interface element.
+
+B<Returns:> the handle of the dialog or C<undef> if not found.
+
+=back
+
+=head3 GetDialogChild()
+
+=over
+
+Returns the identifier of the child element that has the NAME attribute
+equals to the given value on the same dialog hierarchy. Works also for
+children of a menu that is associated with a dialog.
+
+ my $child_elem = $element->GetDialogChild($name);
+
+B<$ih:> Identifier of an interface element that belongs to the
+hierarchy.
+
+B<$name:> name of the control to be found
+
+B<Returns:> reference to iup element, C<undef> if not found
+
+B<Notes:>
+
+This function will only found the child if the NAME attribute is set at
+the control.
+
+Before the dialog is mapped the function searches the hierarchy, even
+if the hierarchy does not belongs to a dialog yet, but after the child
+is mapped the result is immediate (the hierarchy is not searched).
+
+B<See Also:>
+L<NAME|IUP::Manual::03_Attributes/NAME>.
+
+=back
+
+=head3 GetName()
+
+=over
+
+Returns the name of an interface element, if the element has an associated name using 
+L<SetName|/"SetName()"> or by C<< name=>'ElemName' >> named parameter of L<new()|/"new()"> constructor or using LED.
+
+ my $name = $element->GetName();
+
+B<Returns:> the name.
+
+B<See Also:>
+L<SetName|/"SetName()"> (element method),
+L<GetByName|IUP/"GetByName()"> (global function),
+L<GetAllNames|IUP/"GetAllNames()"> (global function).
+
+=back
+
+=head3 GetNextChild()
+
+=over
+
+Returns the a child of the given control given its brother.
+
+ my $child_elem = $element->GetNextChild($child);
+
+B<$child:> Identifier of the child brother to be used as reference. To
+get the first child use C<undef>.
+
+B<Returns:> the handle of the child or C<undef>.
+
+B<Notes:>
+
+This function will return the children of the control in the exact same
+order in which they were assigned. If child in not C<undef> then it returns
+exactly the same result as L<GetBrother|/"GetBrother()">.
+
+B<Examples:>
+
+ my $bt = IUP::Button->new( TITLE=>"Button" );
+ my $lb = IUP::Label->new( TITLE=>"Label" );
+ my $vbox = IUP::Vbox->new( child=>[$bt, $lb] );
+ my $dialog = IUP::Dialog->new( child=>$vbox );
+ 
+ $dialog->Show();
+ 
+ my $child = undef; #passing undef to GetNextChild gives the first child
+ 
+ while($child = $vbox->GetNextChild($child)) {
+   print "vbox has a child of type ", ref($child), "\n";
+ }
+ 
+ IUP->MainLoop;
+ return 0;
+
+B<See Also:>
+L<GetBrother|/"GetBrother()">,
+L<GetParent|/"GetParent()">,
+L<GetChild|/"GetChild()">.
+
+=back
+
+=head3 GetParamParam()
+
+=over
+
+To retrieve a parameter of IUP->GetParam dialog 
+you must use the following function:
+
+ my $element = $dialog->GetParamParam($param_index);
+
+B<$dialog:> Reference to IUP::Dialog object.
+
+B<$param_index:> Parameter to be retrieved.
+
+=back
+
+=head3 GetParamValue()
+
+=over
+
+Helper method related to GetParamParam, nicer way for getting item values than calling GetParamParam()
+
+  $value = $self->GetParamValue($index)
+
+GetParamValue can be also used as a setter:
+
+  $self->GetParamValue($index, $value)
+
+=back
+
+=head3 GetParent()
+
+=over
+
+Returns the parent of a control.
+
+ my $parent_elem = $element->GetParent();
+
+B<Returns:> the handle of the parent or C<undef> if does not have a parent.
+
+B<See Also:>
+L<GetChild|/"GetChild()">,
+L<GetNextChild|/"GetNextChild()">,
+L<GetBrother|/"GetBrother()">.
+
+=back
+
+=head3 HasValidClassName()
+
+=over
+
+ $element->HasValidClassName()
+
+Checks whether internal iup classname of given element is consistent with perl class name - e.g. C<button> vs. C<IUP::Button>
+
+B<Returns:> 1 (if element internal iup classname corresponds to perl class), 0 otherwise
+
+=back
+
+=head3 Insert()
+
+=over
+
+Inserts an interface element B<before> another child of the container.
+Valid for any element that contains other elements like dialog, frame,
+hbox, vbox, zbox, menu, etc.
+
+ my $parent = $element->Insert($ref_child, $new_child);
+
+B<$ih:> Identifier of a container like hbox, vbox, zbox and menu.
+
+B<$ref_child:> Identifier of the element to be used as reference. Can be
+C<undef> to insert as the first element.
+
+B<$new_child:> Identifier of the element to be inserted before the
+reference.
+
+B<Returns:> the actual B<parent> if the interface element was successfully
+inserted. Otherwise returns C<undef>. Notice that the desired
+parent can contains a set of elements and containers where the child
+will be actually attached so the function returns the actual parent of
+the element.
+
+B<Notes:>
+
+This function can be used when elements that will compose a container
+are not known I<a priori> and should be dynamically constructed.
+
+The new child can NOT be mapped. It will NOT map the new child into the
+native system. If the parent is already mapped you must explicitly call
+L<Map|/"Map()"> for the appended child.
+
+If the actual parent is a layout box (L<IUP::Vbox|IUP::Vbox>, L<IUP::Hbox|IUP::Hbox> or
+L<IUP::Zbox|IUP::Zbox>) and you try to insert a child that it is already at the
+parent child list, then the child is moved to the insert position.
+
+The elements are NOT immediately repositioned. Call L<Refresh|/"Refresh()"> for
+the container* to update the dialog layout (* or any other element in
+the dialog).
+
+B<See Also:>
+L<Append|/"Append()">,
+L<Detach|/"Detach()">,
+L<IUP::Hbox|IUP::Hbox>,
+L<IUP::Vbox|IUP::Vbox>,
+L<IUP::Zbox|IUP::Zbox>,
+L<IUP::Menu|IUP::Menu>,
+L<Map|/"Map()">,
+L<Unmap|/"Unmap()">,
+L<Refresh|/"Refresh()">.
+
+=back
+
+=head3 IsValidCallbackName()
+
+=over
+
+Checks whether callback_name is valid for given element.
+
+ $element->IsValidCallbackName($callback_name);
+
+B<$callback_name:> call back name - e.g. "ACTION"
+ 
+B<Returns:> 1 (valid) or 0 (invalid)
+ 
+=back
+
+=head3 Map()
+
+=over
+
+Creates (B<maps>) the native interface objects corresponding to the
+given IUP interface elements.
+
+It will also create the native element of all the children in the
+element's tree.
+
+The element must be already B<attached> to a container if not a dialog.
+
+ my $retval = $element->Map();
+
+B<Returns:> IUP_NOERROR if successful. If the element was already mapped
+returns IUP_NOERROR. If the native creation failed returns IUP_ERROR.
+
+B<Notes:>
+
+If the element is a dialog then the abstract layout will be updated
+even if the element is already mapped. If the dialog is visible the
+elements will be immediately repositioned. Calling L<Map|/"Map()"> for an
+already mapped dialog is the same as only calling L<Refresh|/"Refresh()"> for the
+dialog.
+
+If you add new elements to an already mapped dialog you must call
+L<Map|/"Map()"> for that elements. And then call L<Refresh|/"Refresh()"> to update the
+dialog layout.
+
+If the WID attribute is C<undef>, it means the element was not already
+mapped. Some containers do not have a native element associated, like
+VBOX and HBOX. In this case their WID is a fake (-1) value.
+
+A child is only mapped if its parent is already mapped.
+
+This function is automatically called before the dialog is shown in
+L<Show|/"Show()">, L<ShowXY|/"ShowXY()"> or L<Popup|/"Popup()">.
+
+It is usefull for the application to call L<Map|/"Map()"> when the value of
+the WID attribute must be known, or the native element must exist,
+before a dialog is made visible.
+
+The MAP_CB callback is called just after the native element is created
+and the dialog layout updated, so it can also be used to create other
+things that depend on the WID attribute.
+
+B<See Also:>
+L<Append|/"Append()">,
+L<Detach|/"Detach()">,
+L<Unmap|/"Unmap()">,
+L<Create|/"Create()">,
+L<Destroy|/"Destroy()">,
+L<ShowXY|/"ShowXY()">,
+L<Show|/"Show()">,
+L<Popup|/"Popup()">,
+L<MAP_CB|IUP::Manual::04_Callbacks/MAP_CB>.
+
+=back
+
+=head3 NextField()
+
+=over
+
+Shifts the focus to the next element that can have the focus. It is
+relative to the given element and does not depend on the element
+currently with the focus.
+
+It will search for the next element first in the children, then in the
+brothers, then in the uncles and their children, and so on.
+
+This sequence is not the same sequence used by the Tab key, which is
+dependent on the native system.
+
+ my $next_elem = $element->NextField();
+
+B<Returns:> the element that received the focus or C<undef> if not found.
+
+B<See Also:>
+L<PreviousField|/"PreviousField()">.
+
+=back
+
+=head3 PreviousField()
+
+=over
+
+Shifts the focus to the previous element that can have the focus. It is
+relative to the given element and does not depend on the element
+currently with the focus.
+
+ my $prev_elem = $element->PreviousField();
+
+B<Returns:> the element that received the focus or C<undef> if not found.
+
+B<See Also:>
+
+L<NextField|/"NextField()">.
+
+=back
+
+=head3 Redraw()
+
+=over
+
+Force the element and its children to be redraw immediately.
+
+ $element->Redraw($children);
+
+B<$children:> flag to update its children (0 or 1)
+
+=back
+
+=head3 Refresh()
+
+=over
+
+Updates the size and layout of controls after changing size attributes.
+Can be used for any element inside a dialog, the layout of the dialog
+will be updated. It can change the layout of all the controls inside
+the dialog because of the dynamic layout positioning.
+
+ $element->Refresh();
+
+B<Notes:>
+
+Can be used for any control, but it will always affect the whole
+dialog. Can be called even if the dialog is not mapped.
+
+The elements are immediately repositioned, if the dialog is visible
+then the change will be immediately reflected on the display.
+
+This function will NOT change the size of the dialog, except when the
+SIZE or RASTERSIZE attributes of the dialog where changed before the
+call.
+
+If you also want to change the size of the dialog use:
+
+ $dialog->SetAttribute("SIZE", $newsize);
+ $dialog->Refresh();
+
+So the dialog will be resized for the new B<User> size, if the new size
+is C<undef> the dialog will be resized to the B<Natural> size that include
+all the elements.
+
+Changing the size of elements without changing the dialog size may
+position some controls outside the dialog area at the left or bottom
+borders (the elements will be cropped at the dialog borders by the
+native system).
+
+L<Map|/"Map()"> also updates the dialog layout even if the control is already
+mapped, so using it or using L<Show|/"Show()">, L<ShowXY|/"ShowXY()"> or L<Popup|/"Popup()">
+(they all call L<Map|/"Map()">) will also update the dialog layout.
+
+B<See Also:>
+L<SIZE|IUP::Manual::03_Attributes/SIZE>,
+L<Map|/"Map()">,
+L<RefreshChildren|/"RefreshChildren()">.
+
+=back
+
+=head3 RefreshChildren()
+
+=over
+
+Updates the size and layout of controls after changing size attributes.
+Can be used for any element inside a dialog, only its children will be
+updated. It can change the layout of all the controls inside the given
+element because of the dynamic layout positioning.
+
+ $element->RefreshChildren();
+
+B<Notes:>
+
+The given element must be a container. It must be inside a dialog
+hierarchy and must be mapped. It can not be a dialog. For dialogs use
+L<Refresh|/"Refresh()">.
+
+The children are immediately repositioned, if the dialog is visible
+then the change will be immediately reflected on the display.
+
+This function will NOT change the size of the given element, even if
+the natural size of its children would increase its natural size.
+
+If your dialog has too many controls and you want to hide or destroy
+some, then add some other in the same place, so you actually know that
+the dialog layout would not change, this is a much faster function than
+L<Refresh|/"Refresh()">.
+
+B<See Also:>
+L<Refresh|/"Refresh()">.
+
+=back
+
+=head3 Reparent()
+
+=over
+
+Moves an interface element from one position in the hierarchy tree to
+another.
+
+ my $retval = $element->Reparent($new_parent, $ref_child);
+
+B<$element:> Reference to the element to be moved.
+
+B<new_parent:> Identifier of the new parent.
+
+B<ref_child:> Identifier of the element to be used as reference, where
+the child will be inserted before it. Can be C<undef>.
+
+B<Returns:> IUP_NOERROR if successfully, IUP_ERROR if failed.
+
+Both B<$new_parent> and B<$element> must be mapped or unmapped at the same
+time.
+
+If B<$ref_child> is C<undef>, then it will B<append> the B<$child> to the
+B<$new_parent>. If B<$ref_child> is NOT C<undef> then it will B<insert>
+B<$element> before B<$ref_child> inside the B<$new_parent>.
+
+B<Notes:>
+
+This function is faster and easier than doing the sequence B<unmap>, B<detach>, B<append/insert> and B<map>.
+
+The elements are NOT immediately repositioned. Call L<Refresh|/"Refresh()"> for
+the container (or any other element in the dialog) to update the dialog
+layout.
+
+Motif does not support the re-parent function, but we simulate a
+re-parent doing a B<unmap>/B<map> sequence. But some attributes may be
+lost during the operation, mostly attributes that are id dependent.
+
+B<See Also:>
+L<Append|/"Append()">,
+L<Insert|/"Insert()">,
+L<Detach|/"Detach()">,
+L<Map|/"Map()">,
+L<Unmap|/"Unmap()">,
+L<Refresh|/"Refresh()">
+
+=back
+
+=head3 ResetAttribute()
+
+=over
+
+Removes an attribute from the hash table of the element, and its
+children if the attribute is inheritable. It is useful to reset the
+state of inheritable attributes in a tree of elements.
+
+ $element->ResetAttribute($name);
+
+B<$name:> name of the attribute.
+
+B<See Also:>
+L<GetAttribute|/"GetAttribute()">,
+L<SetAttribute|/"SetAttribute()">.
+
+=back
+
+=head3 SaveClassAttributes()
+
+=over
+
+Saves all registered attributes on the internal hash table.
+
+ $element->SaveClassAttributes();
+
+B<Notes:>
+
+When the element is mapped some attributes are stored only in the
+native system. If the element is B<unmaped> those attributes are lost.
+So this function is useful when you want to B<unmap> the element and
+keep its attributes.
+
+It will not save id dependent attributes, like those which has a
+complementary number. For example: items in a L<IUP::List|IUP::List>, L<IUP::Tree|IUP::Tree>
+or L<IUP::Matrix|IUP::Matrix>.
+
+B<See Also:>
+L<GetClassAttributes|IUP/"GetClassAttributes()">,
+L<GetClassName|/"GetClassName()">,
+L<GetClassType|/"GetClassType()">,
+L<GetAllAttributes|/"GetAllAttributes()">,
+L<CopyClassAttributes|IUP/"CopyClassAttributes()">.
+
+=back
+
+=head3 SetAttribute()
+
+=over
+
+Defines an attribute for an interface element. See also the
+L<Attributes Guide|../attrib_guide.html> section.
+
+ $element->SetAttribute($name, $value);
+ #or
+ $element->SetAttribute( $name1=>$value1, $name2=>$value2, $name3=>$value3 );
+ #or
+ my %attr_values = ( $name1=>$value1, $name2=>$value2, $name3=>$value3 );
+ $element->SetAttribute( %attr_values );
+
+B<$name:> name of the attribute.
+
+B<$value:> value of the attribute. If C<undef>, the default value will be used.
+
+=back
+
+=head3 SetAttributeId()
+
+=over
+
+ $element->SetAttributeId($name, $id, $value);
+ 
+Equivalent (just little bit faster) to:
+
+ $element->GetAttribute("$name$id", $value);
+
+=back
+
+=head3 SetAttributeId2()
+
+=over
+
+ $element->SetAttributeId2($name, $lin, $col, $value);
+
+Equivalent (just little bit faster) to:
+
+ $element->GetAttribute("$name$lin$col", $value);
+
+=back
+
+=head3 SetCallback()
+
+=over
+
+Associates a callback to an event.
+
+B<Callback handler prototype:>
+
+ sub cb_handler {
+   #...
+ }
+ 
+ $element->SetCallback($cb_name, \&cb_handler);
+ #or
+ $element->SetCallback( $cb_name1=>\&cb_handler, $cb_name2=>\&cb_handler, $cb_name3=>\&cb_handler );
+ #or
+ my %callbacks = ( $cb_name1=>\&cb_handler, $cb_name2=>\&cb_handler, $cb_name3=>\&cb_handler );
+ $element->SetCallback( %callbacks );
+ 
+
+B<$cb_name:> attribute name of the callback.
+
+B<$cb_handler:> reference to perl function. If C<undef> removes the association.
+
+=back
+
+=head3 SetFocus()
+
+=over
+
+Defines the interface element that will receive the keyboard focus,
+i.e., the element that will receive keyboard events. But this will be
+processed only after the con
+
+ my $focused_elem = $element->SetFocus();
+
+B<$element:> identifier of the interface element that will receive the
+keyboard focus. Only elements that can have the keyboard focus, are
+mapped, active and visible can be used, other elements are ignored.
+
+B<Returns:> reference to iup element that previously had the keyboard focus.
+
+B<Notes:>
+
+The value returned by L<GetFocus|IUP/"GetFocus()"> will be updated only after the
+main loop regain the control and the control actually receive the
+focus. So if you call L<GetFocus|IUP/"GetFocus()"> right after L<SetFocus|/"SetFocus()"> the
+return value will be different. You could call L<Flush|/"Flush()Flush()"> between the
+two functions to obtain the same value.
+
+B<See Also:>
+L<GetFocus|IUP/"GetFocus()">. 
+
+=back
+
+=head3 SetName()
+
+=over
+
+Associates a name with an interface element. This name can be later used for
+element lookup via global function L<GetByName|IUP/"GetByName()">.
+
+ $element->SetName($name);
+
+B<$name:> name of the interface element.
+
+B<Returns:> reference to iup element previously associated to the parameter B<$name>.
+
+B<Notes:>
+
+Also L<SetName|/"SetName()"> can be called several times with the same element
+and different names. There is no restriction for the number of names a
+element can have, but L<GetName|/"GetName()"> will return the first name found.
+
+B<See Also:>
+L<GetName|/"GetName()"> (element method),
+L<GetByName|IUP/"GetByName()"> (global function).
+
+=back
+
+=head3 Unmap()
+
+=over
+
+B<Unmap> the element from the native system. It will also unmap all its
+children.
+
+It will NOT B<detach> the element from its parent, , and it will NOT
+B<destroy> the IUP element.
+
+ $element->Unmap();
+
+B<$ih:> Identifier of an interface element.
+
+B<Notes:>
+
+When the element is mapped some attributes are stored only in the
+native system. If the element is B<unmaped> those attributes are lost.
+Use the function L<SaveClassAttributes|/"SaveClassAttributes()">
+when you want to B<unmap> the element and keep its attributes.
+
+B<See Also:>
+L<Append|/"Append()">,
+L<Detach|/"Detach()">,
+L<Map|/"Map()">,
+L<Create|/"Create()">,
+L<Destroy|/"Destroy()">.
+
+=back
+
+=head3 Update()
+
+=head3 UpdateChildren()
+
+=over
+
+Mark the element to be redraw when the control returns to the system.
+
+ $element->Update;
+
+=back
+
+=head3 UpdateChildren()
+
+=over
+
+Mark the element or its children to be redraw when the control returns
+to the system.
+
+ $element->UpdateChildren;
+
+=back
+
+=head3 Hide()
+
+=over
+
+Hides an interface element. This function has the same effect as
+attributing value "NO" to the interface element's VISIBLE
+attribute.
+
+ $element->Hide();
+
+B<Returns:> IUP_NOERROR always.
+
+B<Notes:>
+
+Once a dialog is hidden, either by means of L<Hide|/"Hide()"> method or by changing
+the VISIBLE attribute or by means of a click in the window close
+button, the elements inside this dialog are not destroyed, so that you
+can show them again. To destroy dialogs, the L<Destroy|/"Destroy()"> method
+must be called.
+
+B<See Also:>
+L<ShowXY|/"ShowXY()">,
+L<Show|/"Show()">,
+L<Popup|/"Popup()">,
+L<Destroy|/"Destroy()">.
+ 
+=back
+
+=head3 Popup()
+
+=over
+
+Shows a dialog or menu and restricts user interaction only to the
+specified element. It is equivalent of creating a Modal dialog is some
+tooklits.
+
+If another dialog is shown after L<Popup|/"Popup()"> using L<Show|/"Show()">, then its
+interaction will not be inhibited. Every L<Popup|/"Popup()"> call creates a new
+popup level that inhibits all previous dialogs interactions, but does
+not disable new ones. IMPORTANT: The popup levels must be closed in the
+reverse order they were created or unpredictable results will occur.
+
+For a dialog this function will only return the control to the
+application after a callback returns IUP_CLOSE, L<ExitLoop|IUP/"ExitLoop()"> is
+called, or when the popup dialog is hidden, for exemple using
+L<Hide|/"Hide()">. For a menu it returns automatically after a menu item is
+selected. IMPORTANT: If a menu item callback returns IUP_CLOSE, it will
+ends the current popup level dialog.
+
+ $dialog->Popup($x, $y);
+ #or
+ $dialog->Popup();
+
+B<$ih:> Identifier of a dialog or a menu.
+
+B<$x>: horizontal position of the dialog or menu relative to the origin
+of the main screen. The following constants (see L<IUP::Constants|IUP::Constants>)
+are valid:
+
+=over
+
+=item * IUP_LEFT: Positions the element on the left corner of the
+screen
+
+=item * IUP_CENTER: Centers the element on the screen
+
+=item * IUP_RIGHT: Positions the element on the right corner of the
+screen
+
+=item * IUP_MOUSEPOS: Positions the element on the mouse cursor
+
+=item * IUP_CENTERPARENT: Horizontally centralizes the dialog relative
+to its parent. Not valid for menus.
+
+=item * IUP_CURRENT: use the current position of the dialog. This is
+the B<default value> if the parameter is not defined. Not valid for
+menus.
+
+=back
+
+B<$y:> vertical position of the dialog or menu relative to the origin of
+the main screen. The following constants (see L<IUP::Constants|IUP::Constants>)
+are valid:
+
+=over
+
+=item * IUP_TOP: Positions the element on the top of the screen
+
+=item * IUP_CENTER: Vertically centers the element on the screen
+
+=item * IUP_BOTTOM: Positions the element on the base of the screen
+
+=item * IUP_MOUSEPOS: Positions the element on the mouse cursor
+
+=item * IUP_CENTERPARENT: Vertically centralizes the dialog relative to
+its parent. Not valid for menus.
+
+=item * IUP_CURRENT: use the current position of the dialog. This is
+the B<default value> if the parameter is not defined. Not valid for
+menus.
+
+=back
+
+B<Returns:> IUP_NOERROR if sucessful. Returns IUP_INVALID if not a dialog
+or menu. If there was an error returns IUP_ERROR.
+
+B<Notes:>
+
+Will call L<Map|/"Map()"> for the element.
+
+See the L<PLACEMENT|IUP::Manual::03_Attributes/PLACEMENT> attribute for other position and show options.
+
+When IUP_CENTERPARENT is used but PARENTDIALOG is not defined then it
+is replaced by IUP_CENTER.
+
+When IUP_CURRENT is used at the first time the dialog is shown then it
+will be replaced by IUP_CENTERPARENT.
+
+The main screen size does not include additional monitors.
+
+L<Popup|/"Popup()"> works just like L<Show|/"Show()"> and L<ShowXY|/"ShowXY()">, but it
+inhibits interaction with other dialogs and interrupts the processing
+until IUP_CLOSE is returned in a callback or the dialog is hidden.
+Althougth it interrupts the processing, it does not destroy the dialog
+when it ends. To destroy the dialog, L<Destroy|/"Destroy()"> must be called.
+
+IMPORTANT: Calling L<Popup|/"Popup()"> for an already visible dialog will only
+update its position and/or size on screen, will NOT change its modal
+state and will NOT interrupt processing.
+
+In GTK and Motif the inactive dialogs will still be able to move,
+resize and change their Z-order. Although their contents will be
+inactive, keyboard will be disabled, and they can not be closed from
+the close box.
+
+B<See Also:>
+L<ShowXY|/"ShowXY()">,
+L<Show|/"Show()">,
+L<Hide|/"Hide()">,
+L<Map|/"Map()">.
+
+=back
+
+=head3 Show()
+
+=over
+
+Displays a dialog in the current position, or changes a control VISIBLE
+attribute. If the dialog needs to be mapped and the current position is
+not known then the dialog is centered.
+
+For a dialog to set the attribute VISIBLE=YES is the same as calling
+L<Show|"/Show()">. For other controls, to call IUP::Show is the same as setting
+VISIBLE=YES.
+
+ $dialog->Show();
+
+B<Returns:> IUP_NOERROR if sucessful. If there was an error returns IUP_ERROR.
+
+B<Notes:>
+
+For dialogs it is equivalent to L<ShowXY|/"ShowXY()"> using IUP_CURRENT (or
+IUP_CENTER if not mapped).
+
+Will call L<Map|/"Map()"> for the element.
+
+See the L<PLACEMENT|IUP::Manual::03_Attributes/PLACEMENT> attribute for other position and show options.
+
+This function can be executed more than once for the same dialog. This
+will make the dialog be placed above all other dialogs in the
+application, changing its Z-order, and update its position and/or size
+on screen.
+
+IMPORTANT: Calling L<Show|/"Show()"> for a visible dialog shown with
+L<Popup|/"Popup()"> does nothing.
+
+B<See Also:>
+L<ShowXY|/"ShowXY()">,
+L<Hide|/"Hide()">,
+L<Popup|/"Popup()">,
+L<Map|/"Map()">.
+
+=back
+
+=head3 ShowXY()
+
+=over
+
+Displays a dialog in a given position on the screen.
+
+ $dialog->ShowXY($x, $y);
+ #or
+ $dialog->ShowXY();
+
+B<$ih:> identifier of the dialog.
+
+B<$x:> horizontal position of the dialog relative to the origin of the
+main screen. The following constants (see L<IUP::Constants|IUP::Constants>)
+are valid:
+
+=over
+
+=item * IUP_LEFT: Positions the dialog on the left corner of the screen
+
+=item * IUP_CENTER: Horizontally centralizes the dialog on the screen
+
+=item * IUP_RIGHT: Positions the dialog on the right corner of the
+screen
+
+=item * IUP_MOUSEPOS: Positions the dialog on the mouse position
+
+=item * IUP_CENTERPARENT: Horizontally centralizes the dialog relative
+to its parent
+
+=item * IUP_CURRENT: use the current position of the dialog. This is
+the B<default value> if the parameter is not defined.
+
+=back
+
+B<$y:> vertical position of the dialog relative to the origin of the
+main screen. The following constants (see L<IUP::Constants|IUP::Constants>)
+are valid:
+
+=over
+
+=item * IUP_TOP: Positions the dialog on the top of the screen
+
+=item * IUP_CENTER: Vertically centralizes the dialog on the screen
+
+=item * IUP_BOTTOM: Positions the dialog on the base of the screen
+
+=item * IUP_MOUSEPOS: Positions the dialog on the mouse position
+
+=item * IUP_CENTERPARENT: Vertically centralizes the dialog relative to
+its parent
+
+=item * IUP_CURRENT: use the current position of the dialog. This is
+the B<default value> if the parameter is not defined.
+
+=back
+
+B<Returns:> IUP_NOERROR if sucessful. Returns IUP_INVALID if not a dialog.
+If there was an error returns IUP_ERROR.
+
+B<Notes:>
+
+Will call L<Map|/"Map()"> for the element.
+
+See the L<PLACEMENT|IUP::Manual::03_Attributes/PLACEMENT> attribute for other position and show options.
+
+When IUP_CENTERPARENT is used but PARENTDIALOG is not defined then it
+is replaced by IUP_CENTER.
+
+When IUP_CURRENT is used at the first time the dialog is shown then it
+will be replaced by IUP_CENTERPARENT.
+
+The main screen size does not include additional monitors.
+
+This function can be executed more than once for the same dialog. This
+will make the dialog be placed above all other dialogs in the
+application, changing its Z-order, and update its position and/or size
+on screen.
+
+IMPORTANT: Calling L<ShowXY|/"ShowXY()"> for a visible dialog shown with
+L<Popup|/"Popup()"> does nothing.
+
+B<See Also:>
+L<Show|/"Show()">,
+L<Hide|/"Hide()">,
+L<Popup|/"Popup()">,
+L<Map|/"Map()">.
+
+=back
+

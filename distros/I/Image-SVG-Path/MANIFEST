@@ -1,0 +1,20 @@
+Changes
+examples/extract-path-info.pl
+examples/Home_for_the_aged.svg
+examples/synopsis.pl
+examples/test-reverse.pl
+examples/xml-parser.pl
+lib/Image/SVG/Path.pm
+lib/Image/SVG/Path.pod
+make-pod.pl
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/doubled-path-commands.t
+t/Image-SVG-Path.t
+t/number-paths.t
+t/regex-export.t
+t/svg-signs.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

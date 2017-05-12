@@ -1,0 +1,12 @@
+Changes
+Processor.pm
+Processor/Base.pm
+Processor/CD.pm
+Processor/Create/HTML.pm
+Processor/Interface/Console.pm
+Processor/Mail/GetImages.pm
+Processor/Store/File.pm
+MANIFEST
+Makefile.PL
+README
+test.pl

@@ -1,0 +1,27 @@
+Revision history for Perl extension Integer::Partition
+
+0.05 2013-06-23 14:20:00 UTC
+    - No code changes.
+    - Moved repo to github.
+    - Minimum perl version set to 5.8, modernised the build process.
+
+0.04 2009-10-04 20:17:32 UTC
+    - This time, actually add the eg/zs? programs to the MANIFEST
+      instead of just talking about it.
+
+0.03 2007-10-12 14:44:06 UTC
+    - The documentation snippet showing how to use the module was
+      incorrect, which was confusing. (CPAN bug #29927)
+
+0.02 2007-06-02 13:10:40 UTC
+    - implemented ZS2 algorithm to allow lexicographic (forward)
+      ordering.
+    - added eg/zs1 and eg/zs2 programs that offer a
+      non-object-oriented approach to generating integer
+      partitions.
+    - enhanced eg/ipart (command-line switches).
+    - improved documentation.
+
+0.01 2007-05-30 21:43:57
+    - initial version.
+

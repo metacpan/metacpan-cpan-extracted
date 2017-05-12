@@ -1,0 +1,263 @@
+=for comment based on iup-3.5 - http://www.tecgraf.puc-rio.br/iup/en/elem/iuplabel.html
+
+=head1 NAME
+
+IUP::Label - [GUI element] displays a separator, a text or an image
+
+=head1 DESCRIPTION
+
+Creates a label interface element, which displays a separator, a text
+or an image.
+
+=begin HTML
+
+<p><img src="http://kmx.github.io/perl-iup/spec/iuplabel1.png"></p>
+
+=end HTML
+
+=head1 USAGE
+
+=head2 CREATION - new() method
+
+ $label = IUP::Label->new( TITLE=>"Text" );
+
+B<Returns:> the identifier of the created element, or C<undef> if an error occurs.
+
+NOTE: You can pass to C<new()> other C<ATTRIBUTE=E<gt>'value'> or C<CALLBACKNAME=E<gt>\&func> pairs relevant
+to this element - see L<IUP::Manual::02_Elements|IUP::Manual::02_Elements/"new()">.
+
+=head2 ATTRIBUTES
+
+For more info about concept of attributes (setting/getting values etc.)
+see L<IUP::Manual::03_Attributes|IUP::Manual::03_Attributes>. Attributes specific to this element:
+
+=over
+
+=item B<ACTIVE>
+
+The only difference between an active label and an inactive
+one is its visual feedback. Possible values: "YES, "NO". Default:
+"YES".
+
+=item B<ALIGNMENT>
+
+I<(non inheritable)>
+
+Horizontal and vertical alignment.
+Possible values: "ALEFT", "ACENTER" and "ARIGHT", combined to "ATOP",
+"ACENTER" and "ABOTTOM". Default: "ALEFT:ACENTER". Partial values are
+also accepted, like "ARIGHT" or ":ATOP", the other value will be used
+from the current alignment. In Motif, vertical alignment is restricted
+to "ACENTER". (vertical alignment since iup-3.0)
+
+=item L<BGCOLOR|IUP::Manual::03_Attributes/BGCOLOR>
+
+Ignored, transparent in all
+systems. Will use the background color of the native parent.
+
+=item B<ELLIPSIS>
+
+I<[Windows and GTK only]>
+
+Add an ellipsis: "..." to the text
+if there is not enough space to render the entire string. Can be "YES"
+or "NO". Default: "NO".  (GTK 2.6)
+
+=item L<FGCOLOR|IUP::Manual::03_Attributes/FGCOLOR>
+
+Text color. Default: the global
+attribute DLGFGCOLOR.
+
+=item B<IMAGE>
+
+I<(non inheritable)>
+
+Image name or L<IUP::Image> reference. If set before map defines the
+behavior of the label to contain an image. The natural size will be
+size of the image in pixels.
+
+See - L<Using Images in Other Elements (via IMAGE Attribute)|IUP::Image/"Using Images in Other Elements (via IMAGE Attribute)">
+
+B<IMINACTIVE> (non inheritable) [GTK and Motif only]
+
+Image name of the element when inactive. If it is not defined then the IMAGE is used and
+the colors will be replaced by a modified version of the background
+color creating the disabled effect. GTK will also change the inactive
+image to look like other inactive objects.
+
+=item B<MARKUP>
+
+I<[GTK only]>
+
+Allows the title string to contains pango markup
+commands. Works only if a mnemonic is NOT defined in the title. Can be
+"YES" or "NO". Default: "NO".
+
+=item B<PADDING>
+
+Internal margin. Works just like the MARGIN attribute of
+the L<IUP::Hbox> and <IUP::Vbox> containers, but uses a different name to avoid
+inheritance problems. Not used when SEPARATOR is used. Default value:
+"0x0". 
+
+=item B<SEPARATOR>
+
+I<(creation only, non inheritable)>
+
+Turns the label into a
+line separator. Possible values: "HORIZONTAL" or "VERTICAL". When
+changed before mapping the EXPAND attribute is set to "HORIZONTAL" or
+"VERTICAL" accordingly.
+
+=item L<TITLE|IUP::Manual::03_Attributes/TITLE>
+
+I<(non inheritable)>
+
+Label's text. If
+SEPARATOR or IMAGE are not defined before map, then the default
+behavior is to contain a text. The label behavior can not be changed
+after map. The natural size will be larger enough to include all the
+text in the selected font, even using multiple lines. The '\n'
+character is accepted for line change. The "&" character can be used to
+define a mnemonic, the next character will be used as key. Use "&&" to
+show the "&" character instead of defining a mnemonic. The next control
+from the label will be activated from any control in the dialog using
+the "Alt+key" combination. (mnemonic support since iup-3.0)
+
+=item B<WORDWRAP>
+
+I<[Windows and GTK only]>
+
+Enables or disable the wrapping of
+lines that does not fits in the label. Can be "YES" or "NO". Default:
+"NO". Can only set WORDWRAP=YES if ALIGNMENT=ALEFT. 
+
+=back
+
+The following L<common attributes|IUP::Manual::03_Attributes/Common Attributes> are also accepted:
+
+=over
+
+=item * L<FONT|IUP::Manual::03_Attributes/FONT>, L<EXPAND|IUP::Manual::03_Attributes/EXPAND>,
+L<SCREENPOSITION|IUP::Manual::03_Attributes/SCREENPOSITION>,
+L<POSITION|IUP::Manual::03_Attributes/POSITION>,
+L<MINSIZE|IUP::Manual::03_Attributes/MINSIZE>,
+L<MAXSIZE|IUP::Manual::03_Attributes/MAXSIZE>, L<WID|IUP::Manual::03_Attributes/WID>,
+L<TIP|IUP::Manual::03_Attributes/TIP>, L<SIZE|IUP::Manual::03_Attributes/SIZE>,
+L<RASTERSIZE|IUP::Manual::03_Attributes/RASTERSIZE>,
+L<ZORDER|IUP::Manual::03_Attributes/ZORDER>,
+L<VISIBLE|IUP::Manual::03_Attributes/VISIBLE>
+
+=back
+
+=head2 CALLBACKS
+
+For more info about concept of callbacks (setting callback handlers etc.)
+see L<IUP::Manual::04_Callbacks|IUP::Manual::04_Callbacks>. Callbacks specific to this element:
+
+=over
+
+=item L<BUTTON_CB|IUP::Manual::04_Callbacks/BUTTON_CB>
+
+Action generated when any mouse button is pressed or released. (since iup-3.3)
+
+=item L<DROPFILES_CB|IUP::Manual::04_Callbacks/DROPFILES_CB>
+
+I<[Windows and GTK Only]>
+
+Action generated when one or more files are dropped in the element. (since iup-3.3)
+
+=back
+
+The following L<common callbacks|IUP::Manual::04_Callbacks/Common Callbacks> are also accepted:
+
+=over
+
+=item * L<MAP_CB|IUP::Manual::04_Callbacks/MAP_CB>,
+L<UNMAP_CB|IUP::Manual::04_Callbacks/UNMAP_CB>,
+L<ENTERWINDOW_CB|IUP::Manual::04_Callbacks/ENTERWINDOW_CB>,
+L<LEAVEWINDOW_CB|IUP::Manual::04_Callbacks/LEAVEWINDOW_CB>
+
+=back
+
+=head1 NOTES
+
+Labels with images, texts or line separator can not change its behavior
+after mapped. But after map the image can be changed for another image,
+and the text for another text.
+
+=head1 EXAMPLES
+
+
+The element B<IUP::Label> is used in the following sample scripts:
+
+=over
+
+=item * L<0-basic/canvas2.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/canvas2.pl> - IUP::Canvas example
+
+=item * L<0-basic/cbox.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/cbox.pl> - IUP::Cbox example
+
+=item * L<0-basic/dial.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/dial.pl> - IUP::Dial example
+
+=item * L<0-basic/dialog1.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/dialog1.pl> - IUP::Dialog example
+
+=item * L<0-basic/frame1.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/frame1.pl> - IUP::Frame Example
+
+=item * L<0-basic/gridbox.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/gridbox.pl> - IUP::GridBox example
+
+=item * L<0-basic/idle.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/idle.pl> - IUP->SetIdle Example
+
+=item * L<0-basic/image.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/image.pl> - IUP::Image example
+
+=item * L<0-basic/label.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/label.pl> - IUP::Label and IUP::Link example
+
+=item * L<0-basic/layoutdialog.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/layoutdialog.pl> - IUP::LayoutDialog example
+
+=item * L<0-basic/list2.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/list2.pl> - IUP::List example
+
+=item * L<0-basic/message_clone.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/message_clone.pl>
+
+=item * L<0-basic/plot_advanced.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/plot_advanced.pl> - Plot controls
+
+=item * L<0-basic/sbox1.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/sbox1.pl> - IUP::Sbox example
+
+=item * L<0-basic/sbox2.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/sbox2.pl> - IUP::Sbox example
+
+=item * L<0-basic/tabs1.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/tabs1.pl> - IUP::Tabs example 
+
+=item * L<0-basic/tabs3.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/tabs3.pl> - IUP::Tabs example 
+
+=item * L<0-basic/text_format.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/text_format.pl> - IUP::Text (formating) example
+
+=item * L<0-basic/timer.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/timer.pl> - IUP::Timer example
+
+=item * L<0-basic/tray.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/tray.pl> - IUP::Dialog + TRAY / TRAYTIP / TRAYIMAGE example
+
+=item * L<0-basic/tree_set_attrs.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/tree_set_attrs.pl> - IUP::Tree example (attributes)
+
+=item * L<0-basic/val.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/val.pl> - IUP::Val example
+
+=item * L<0-basic/zbox.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/zbox.pl> - IUP::Zbox example
+
+=item * L<1-apps/app-mdi.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/1-apps/app-mdi.pl> - IUP app example
+
+=item * L<1-apps/app-plot-demo.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/1-apps/app-plot-demo.pl> - dials for zooming
+
+=item * L<1-apps/app-sample1.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/1-apps/app-sample1.pl> - example used for screenshot - IUP.pod
+
+=item * L<1-apps/app-sample2.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/1-apps/app-sample2.pl> - example based on the original sample.c
+
+=item * L<1-apps/app-simple-demo.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/1-apps/app-simple-demo.pl> - example used for screenshot - IUP.pod
+
+=back 
+
+
+
+=head1 SEE ALSO
+
+L<IUP::Image|IUP::Image>, L<IUP::Button|IUP::Button>.
+
+The original doc: L<iuplabel.html|http://www.tecgraf.puc-rio.br/iup/en/elem/iuplabel.html>
+ 
+
+=cut

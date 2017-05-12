@@ -1,0 +1,70 @@
+INTRODUCTION
+
+Inline::Struct -- Manipulate C structs directly from Perl.
+
+Inline::Struct lets you bind C structs to Perl. No special work required, you
+just tell Inline that you want to bind to structs as well as functions.
+
+Example:
+
+  use Inline C => 'DATA', structs => ['JA_H'];
+
+  my $o = Inline::Struct::JA_H->new("Perl");
+  print JAxH($o), "\n";
+  $o->x("Inline");
+  print JAxH($o), "\n";
+
+  __END__
+  __C__
+  struct JA_H {
+    char *x;
+  };
+  typedef struct JA_H JA_H;
+
+  SV *JAxH(JA_H *f) {
+    return newSVpvf("Just Another %s Hacker", f->x);
+  }
+
+When run, this complete program prints:
+
+   Just Another Perl Hacker
+   Just Another Inline Hacker
+
+-----------------------------------------------------------------------------
+FEATURES:
+
+Inline::Struct includes:
+
++ Preliminary support for C structs.
++ Supported in Inline::C and Inline::CPP.
+
+-----------------------------------------------------------------------------
+INSTALLATION:
+
+This module requires Inline version >=0.66 and Inline::C >=0.62.
+
+To install Inline::Struct do this:
+
+perl Makefile.PL
+make
+make test
+make install
+
+(On ActivePerl for MSWin32, use nmake instead of make.)
+
+You have to 'make install' before you can run it successfully.
+
+-----------------------------------------------------------------------------
+INFORMATION:
+
+- For more information on Inline::C see 'perldoc Inline::C'.
+- For more information on Inline::CPP see 'perldoc Inline::CPP'.
+- For information about Inline.pm, see 'perldoc Inline'.
+- For information on using Perl with C or C++, see 'perldoc perlapi'.
+
+The Inline mailing list in inline@perl.org. Send mail to 
+inline-subscribe@perl.org to subscribe.
+
+The github repository is at https://github.com/mohawk2/Inline-Struct
+
+Copyright (c) 2001, Neil Watkiss. All Rights Reserved.

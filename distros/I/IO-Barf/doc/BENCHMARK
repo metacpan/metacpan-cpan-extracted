@@ -1,0 +1,11 @@
+BENCHMARK
+=========
+Lenovo Thinkpad T430
+--------------------
+Linux think 3.2.0-4-amd64 #1 SMP Debian 3.2.35-2 x86_64 GNU/Linux
+HITACHI HTS725050A7E630, GH2ZB390, max UDMA/133
+
+               Rate     IO::Any File::Slurp    IO::Barf
+IO::Any     16788/s          --        -26%        -46%
+File::Slurp 22805/s         36%          --        -27%
+IO::Barf    31344/s         87%         37%          --

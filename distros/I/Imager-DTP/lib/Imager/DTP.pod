@@ -1,0 +1,129 @@
+# distribution version
+$VERSION = '0.06';
+
+=pod
+
+=head1 NAME
+
+Imager::DTP - draw text with DTP app-like custom options
+
+=head1 SYNOPSIS
+
+   use Imager::DTP::Textbox::Horizontal;  # or Vertical
+   
+   # first, define font & text string
+   my $font  = Imager::Font->new(file=>'path/to/foo.ttf',type=>'ft2',
+               size=>16,color=>'#000000',aa=>1);
+   my $text  = "Brother will kill brother, \n";
+      $text .= "spilling blood across the land.\n";
+      $text .= "Killing for religion, \n"; 
+      $text .= "something I don't understand.";
+   # with multi-byte characters, encode it to UTF8, with internal
+   # utf-8 flag enabled (using utf8::decode()).
+   
+   # create textbox instance
+   my $tb = Imager::DTP::Textbox::Horizontal->new(
+            text=>$text,font=>$font);
+   
+   # draw the text string on target image
+   my $target = Imager->new(xsize=>250,ysize=>250);
+   $target->box(filled=>1,color=>'#FFFFFF'); # with white background
+   $tb->draw(target=>$target,x=>10,y=>10);
+   
+   # and write out image to file
+   $target->write(file=>'result.jpg',type=>'jpeg');
+
+=head1 DESCRIPTION.
+
+Imager::DTP is a text drawing add-on for L<Imager>, with ability to draw text horizontally or vertically (from top to bottom), letter-based (not word-based) text wrapping for multi-byte characters, line alignment, and adjustment of distance between letters and lines.  Vertical drawing and letter-based text wrapping are for multi-byte character languages, such as Japanese and Chinese.
+
+=head2 MORE THAN WORDS
+
+I've made an interactive sample viewer page, for quick and essential understanding of what the output will look like, by using Imager::DTP.  You can make the output more complexing and fancy by making full use of the module, but save that for later, and just take a glance at all the basics.
+
+=over
+
+=item English Page
+
+F<http://iandeth.dyndns.org/mycpan/Imager-DTP/sample_viewer_en.html>
+
+=item Japanese Page
+
+F<http://iandeth.dyndns.org/mycpan/Imager-DTP/sample_viewer_ja.html>
+
+=back
+
+=head2 UTF8 ENCODING
+
+With multi-byte characters, text must be encoded to utf8, with it's internal utf8-flag ENABLED.  This could be done by using utf8::decode() method, or with Perl5.8 and above, by using Encode::decode() method.
+
+=head2 FULL DESCRIPTION
+
+The main module (the most useful one) of Imager::DTP distribution will be Imager::DTP::Textbox.  So see L<Imager::DTP::Textbox>'s documentation for full description on how to use.
+
+=head1 CLASS RELATION
+
+Imager::DTP consists of three basic modules (classes).  These are:
+
+=over
+
+=item L<Imager::DTP::Letter>
+
+Module for handling each letter/character that construct words.  One Imager::Letter instance represents/holds one letter/character.
+
+=item L<Imager::DTP::Line>
+
+Module for handling chunk of Letters, lined-up in a single vector.  The word "Line" means "a single row in a text-wrapped textbox".
+
+=item L<Imager::DTP::Textbox>
+
+A box to store all Lines and Letters in order.  Calculation for text wrapping and line alignment are done within this module.
+
+=back
+
+The class relation of these modules (classes) is as follows:
+
+   Imager::DTP::Textbox = [
+       Imager::DTP::Line = [
+           Imager::DTP::Letter,
+           Imager::DTP::Letter,
+           Imager::DTP::Letter
+           ...
+       ],
+       Imager::DTP::Line = [
+           Imager::DTP::Letter,
+           Imager::DTP::Letter,
+           Imager::DTP::Letter
+           ...
+       ],
+       ...
+   ];
+
+So there is no actuall Imager::DTP module (Imager::DTP.pm doesn't exist).  The name space is for bundling all these modules under one package name.
+
+=head1 BUGS
+
+Currently, there is one un-solved problem in Imager::DTP::Line, with drawing multi-byte letters vertically.  See L<Imager::DTP::Line>'s BUGS section for details.
+
+Please report any bugs or feature requests to C<bug-imager-dtp@rt.cpan.org>, or through the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Imager-DTP>.  I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
+
+=head1 TODO
+
+See each basic module's TODO section.
+
+=head1 AUTHOR
+
+Toshimasa Ishibashi, C<< <iandeth99@ybb.ne.jp> >>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2005 Toshimasa Ishibashi, all rights reserved.
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<Imager>, L<Imager::DTP::Textbox>, L<Imager::DTP::Line>, L<Imager::DTP::Letter>
+
+=cut

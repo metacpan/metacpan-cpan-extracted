@@ -1,0 +1,44 @@
+{
+   "abstract" : "use C<IO::Async> with C<ppoll(2)>",
+   "author" : [
+      "Paul Evans <leonerd@leonerd.org.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4001, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "IO-Async-Loop-Ppoll",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "IO::Async::LoopTests" : "0.24",
+            "Test::More" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IO::Async" : "0.24",
+            "IO::Async::Loop::Poll" : "0.2",
+            "IO::Ppoll" : "0.05"
+         }
+      }
+   },
+   "provides" : {
+      "IO::Async::Loop::Ppoll" : {
+         "file" : "lib/IO/Async/Loop/Ppoll.pm",
+         "version" : "0.09"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.09"
+}

@@ -1,0 +1,7 @@
+Revision history for Perl extension Image::Nikon::Index.
+
+0.01  Fri Aug 21 06:01:34 2015
+	- first release
+	- assumes a folder does not contain more than 999 
+	  image files taken in a single day.
+

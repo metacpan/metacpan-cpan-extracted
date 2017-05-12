@@ -1,0 +1,262 @@
+=for comment based on iup-3.9 - http://www.tecgraf.puc-rio.br/iup/en/elem/iupgridbox.html
+
+=head1 NAME
+
+IUP::GridBox - [GUI element] container for composing elements in a regular grid
+
+=head1 DESCRIPTION
+
+Creates a void container for composing elements in a regular grid. It
+is a box that arranges the elements it contains from top to bottom and
+from left to right, but can distribute the elements in lines or in
+columns.
+
+The child elements are added to the control just like a L<IUP::Vbox> and L<IUP::Hbox>,
+sequentially. Then they are distributed accordingly the attributes
+ORIENTATION and NUMDIV. When ORIENTATION=HORIZONTAL children are
+distributed from left to right on the first line until NUMDIV, then on
+the second line, and so on. When ORIENTATION=VERTICAL children are
+distributed from top to bottom on the first column until NUMDIV, then
+on the second column, and so on. The number of lines and the number of
+columns can be easily obtained from the combination of these
+attributes:
+
+  if ($g->ORIENTATION eq 'HORIZONTAL') {
+    $num_lin = $child_count / $g->NUMDIV;
+    $num_col = $g->NUMDIV;
+  }
+  else {
+    $num_lin = $g->NUMDIV;
+    $num_col = $child_count / $g->NUMDIV;
+  }
+
+Notice that the total number of spaces can be larger than the number of
+actual children, the last line or column can be incomplete.
+
+The column sizes will be based only on the width of the children of the
+reference line, usually line 0. The line sizes will be based only on
+the height of the children of the reference column, usually column 0.
+
+It does not have a native representation.
+
+=begin HTML
+
+<p>
+  <table border="1">
+    <tbody align="center">
+      <tr>
+        <td>DEFAULT</td>
+        <td>NORMALIZE=BOTH</td>
+        <td>EXPANDCHILDREN=YES</td>
+      </tr>
+      <tr>
+        <td><img src="http://kmx.github.io/perl-iup/img-3.9/elem/iupgridbox.png"></td>
+        <td><img src="http://kmx.github.io/perl-iup/img-3.9/elem/iupgridbox_normalize.png"></td>
+        <td><img src="http://kmx.github.io/perl-iup/img-3.9/elem/iupgridbox_expandchild.png"></td>
+      </tr>
+    </tbody>
+  </table>
+</p>
+
+=end HTML
+
+=head1 USAGE
+
+=head2 CREATION - new() method
+
+ #standard way
+ my $gridbox = IUP::GridBox->new( child=>[$elem1, $elem2], ANYATTRIBUTE=>'any value' );
+  
+ #or with just 1 parameter (arrayref)
+ my $gridbox = IUP::GridBox->new( [$elem1, $elem2] );
+
+B<child:> (named parameter) List of the references to elements (or just a single element) that 
+will be placed in the box. 
+
+B<Returns:> the identifier of the created element, or C<undef> if an error occurs.
+
+NOTE: You can pass to C<new()> other C<ATTRIBUTE=E<gt>'value'> or C<CALLBACKNAME=E<gt>\&func> pairs relevant
+to this element - see L<IUP::Manual::02_Elements|IUP::Manual::02_Elements/"new()">.
+
+=head2 ATTRIBUTES
+
+For more info about concept of attributes (setting/getting values etc.)
+see L<IUP::Manual::03_Attributes|IUP::Manual::03_Attributes>. Attributes specific to this element:
+
+=over
+
+=item B<ALIGNMENTLIN>
+
+I<(non inheritable)> Vertically aligns the elements
+within each line. Possible values: "ATOP", "ACENTER", "ABOTTOM".
+Default: "ATOP". The alignment of a single line can also be set using
+B<"ALIGNMENTLIN(n)">, where "n" is the line index, starting at 0
+from top to bottom.
+
+=item B<ALIGNMENTCOL>
+
+I<(non inheritable)> Horizontally aligns the elements
+within each column. Possible values: "ALEFT", "ACENTER", "ARIGHT".
+Default: "ALEFT". The alignment of a single column can also be set
+using B<"ALIGNMENTCOL(n)">, where "n" is the column index, starting
+at 0 from left to right.
+
+=item L<EXPAND|IUP::Manual::03_Attributes/EXPAND>
+
+I<(non inheritable*)> The default value is "YES". See the documentation of the attribute for EXPAND
+inheritance.
+
+=item B<EXPANDCHILDREN>
+
+I<(non inheritable)> forces all children to expand in
+the given direction and to fully occupy its space available inside the
+box. Can be YES (both directions), HORIZONTAL, VERTICAL or NO. Default:
+"NO". This has the same effect as setting EXPAND on each child, but the
+box expansion will not be affected.
+
+=item B<GAPLIN>, B<CGAPLIN>
+
+Defines a vertical space in pixels between lines, B<CGAPLIN> is in the same units of the B<SIZE> attribute for the height. Default "0".
+
+=item B<GAPCOL>, B<CGAPCOL>
+
+Defines a horizontal space in pixels between columns, B<CGAPCOL> is in the same units of the B<SIZE> attribute for the height. Default: "0".
+
+=item B<NGAPLIN>, B<NCGAPLIN>, B<NGAPCOL>, B<NCGAPCOL>
+
+I<(non inheritable)> Same as B<*GAP*> but are non inheritable.
+
+=item B<HOMOGENEOUSLIN>
+
+I<(non inheritable)> forces all lines to have the same
+vertical space, or height. The line height will be based on the highest
+child of the reference line (See B<SIZELIN>). Default: "NO". Notice
+that this does not changes the children size, only the available space
+for each one of them to expand.
+
+=item B<HOMOGENEOUSCOL>
+
+I<(non inheritable)> forces all columns to have the
+same horizontal space, or width. The column width will be based on the
+largest child of the reference column (See B<SIZECOL>). Default: "NO".
+Notice that this does not changes the children size, only the available
+space for each one of them to expand.
+
+=item B<MARGIN>, B<CMARGIN>
+
+Defines a margin in pixels, B<CMARGIN >is in the
+same units of the B< SIZE> attribute. Its value has the format
+"I<width>xI<height>", where I< width> and I<height> are integer values
+corresponding to the horizontal and vertical margins, respectively.
+Default: "0x0" (no margin).
+
+=item B<NMARGIN>, B<NCMARGIN>
+
+I<(non inheritable)> Same as B<MARGIN> but are non
+inheritable.
+
+=item B<NUMDIV>
+
+controls the number of divisions along the distribution
+according to ORIENTATION. When ORIENTATION=HORIZONTAL, NUMDIV is the
+number of columns, when ORIENTATION=VERTICAL, NUMDIV is the number of
+lines. When value is AUTO, its actual value will be calculated to fit
+the maximum number of elements in the orientation direction. Default:
+AUTO.
+
+=item B<NUMCOL>
+
+I<(read-only)> returns the number of columns.
+
+=item B<NUMLIN>
+
+I<(read-only)> returns the number of lines.
+
+=item B<NORMALIZESIZE>
+
+I<(non inheritable)> normalizes all children natural
+size to be the biggest natural size among the reference line and the
+reference column. All natural width will be set to the biggest width,
+and all natural height will be set to the biggest height according to
+is value. Can be NO, HORIZONTAL, VERTICAL or BOTH. Default: "NO". Same
+as using L<IUP::Normalizer|IUP::Normalizer>.
+
+=item B<ORIENTATION>
+
+I<(non inheritable)> controls the distribution of the
+children in lines or in columns. Can be: HORIZONTAL or VERTICAL.
+Default: HORIZONTAL.
+
+=item B<SIZECOL>
+
+I<(non inheritable)> index of the column that will be used as
+reference when calculating the height of the lines. Default: 0.
+
+=item B<SIZELIN>
+
+I<(non inheritable)> index of the line that will be used as
+reference when calculating the width of the columns. Default: 0.
+
+=item B<WID>
+
+I<(read-only)> returns -1 if mapped.
+
+=back
+
+The following L<common attributes|IUP::Manual::03_Attributes/Common Attributes> are also accepted:
+
+=over
+
+=item * L<SIZE|IUP::Manual::03_Attributes/SIZE>,
+L<RASTERSIZE|IUP::Manual::03_Attributes/RASTERSIZE>,
+L<FONT|IUP::Manual::03_Attributes/FONT>,
+L<CLIENTSIZE|IUP::Manual::03_Attributes/CLIENTSIZE>,
+L<CLIENTOFFSET|IUP::Manual::03_Attributes/CLIENTOFFSET>,
+L<POSITION|IUP::Manual::03_Attributes/POSITION>,
+L<MINSIZE|IUP::Manual::03_Attributes/MINSIZE>,
+L<MAXSIZE|IUP::Manual::03_Attributes/MAXSIZE>
+
+=back
+
+Attributes B<at children only>:
+
+=over
+
+=item L<FLOATING|IUP::Manual::03_Attributes/FLOATING>
+
+I<(non inheritable)> If a child has FLOATING=YES then its size and position
+will be ignored by the layout processing. Default: "NO".
+
+=back
+
+=head1 NOTES
+
+The box can be created with no elements and be dynamic filled using
+L<Append|IUP::Manual::02_Elements/"Append()"> or L<Insert|IUP::Manual::02_Elements/"Insert()">.
+
+The box will NOT expand its children, it will allow its children to
+expand according to the space left in the box parent. So for the
+expansion to occur, the children must be expandable with EXPAND!=NO,
+and there must be room in the box parent.
+
+=head1 EXAMPLES
+
+
+The element B<IUP::GridBox> is used in the following sample scripts:
+
+=over
+
+=item * L<0-basic/gridbox.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/gridbox.pl> - IUP::GridBox example
+
+=back 
+
+
+
+=head1 SEE ALSO
+
+L<IUP::Vbox|IUP::Vbox>, L<IUP::Hbox|IUP::Hbox>
+
+The original doc: L<iupgridbox.html|http://www.tecgraf.puc-rio.br/iup/en/elem/iupgridbox.html>
+ 
+
+=cut

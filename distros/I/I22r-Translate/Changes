@@ -1,0 +1,22 @@
+Revision history for I22r-Translate
+
+0.96	2016-11-16
+	Regex fixes for perl 5.25 compatibility (RT#115041)
+	Replace JSON::Any with JSON::MaybeXS (RT#116635)
+
+0.95	2016-04-19
+	Factor out deprecated  my $_, ~~  constructions
+
+0.94	2013-01-15
+	Rewrite Makefile.PL to use Module::Install and include
+	dependencies.
+
+0.92	2012-12-02
+	Implement logging.
+
+0.91	2012-12-01
+	Efficiency improvement to I22r::Translate::Google.
+	Include Request object in callbacks.
+
+0.90	2012-10-06
+	First version, released on an unsuspecting world.

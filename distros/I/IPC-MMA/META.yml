@@ -1,0 +1,28 @@
+--- #YAML:1.0
+name:               IPC-MMA
+version:            0.81
+abstract:           Shared Memory using Ralf Engelschall's mm library
+author:
+    - Craig MacKenna <craig@animalhead.com>
+license:            perl
+distribution_type:  module
+configure_requires:
+    Config:               0
+    Devel::AssertOS:      0
+    ExtUtils::MakeMaker:  6.52
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Carp:               0
+    ExtUtils::ParseXS:  2.200401
+    Test::More:         0
+    Test::Warn:         0.11
+    Time::HiRes:        0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

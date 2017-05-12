@@ -1,0 +1,110 @@
+WHAT'S EVEN NEWER
+
+I received another patch from Matthew Reimer <mreimer@vpop.net> which
+includes docs and a bug fix that makes mm_lock() and mm_unlock() work.
+
+I also replaced references to the deprecated sv_* with the recommended
+PL_sv_*.
+
+--
+Arthur Choung
+August 11, 2000
+
+----------
+
+WHAT'S NEW
+
+I received an email from Matthew Reimer <mreimer@vpop.net> containing a patch
+which adds a shared-memory hash, because they "wanted to avoid the inefficiency
+of unbalanced binary trees." I can't really blame them. I mean, if I had a
+nickel every time I heard that... well...  you know.
+
+Anyway, here is the patched version of IPC::MM. I haven't tried it myself, so
+use it at your own risk. Unfortunately, the POD-style documentation hasn't been
+updated to reflect the additional code, and the same goes for the example and
+test scripts.
+
+Thanks for the patch!
+
+--
+Arthur Choung
+July 16, 2000
+
+----------
+
+DESCRIPTION
+
+  IPC::MM provides an interface to Ralf Engelschall's mm library, allowing
+  data to be shared between multiple processes in a relatively convenient
+  way.
+
+COPYRIGHT & TERMS
+
+  Copyright (C) 1999, Arthur Choung <arthur@etoys.com>.
+  All rights reserved.
+
+  This module is free software; you may redistribute it and/or
+  modify it under the same terms as Perl itself.
+
+  THIS SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRENTY OF ANY KIND, EITHER
+  EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DAMAGES RESULTING FROM
+  THE USE OF THIS SOFTWARE.
+
+PREREQUISITES
+
+  This module requires Ralf Engelschall's mm library.
+  I have tested it with version 1.0.9.
+  http://www.engelschall.com/sw/mm/
+
+  This module requires perl 5.004 or later.
+
+INSTALLATION
+
+  Before installing this module, you must first install the mm library.
+  Please refer to the instructions therein for details.
+
+  To install this module, move into the directory where this file is
+  located and type the following:
+
+       perl Makefile.PL
+       make
+       make test        (optional)
+       make install
+
+  This will install the module into the Perl library directory.
+
+  See the POD documentation for further details. Once the module
+  is installed, you should be able to read the documentation by
+  typing the following from the command-line:
+
+       perldoc IPC::MM
+
+EXAMPLE
+
+  The example/ directory contains a few files to serve as a demonstration and
+  example of IPC::MM.
+
+  mm_server.pl is a forking server that maintains a shared hash. It accepts
+  connections from clients and forks, so that a child process is making the
+  changes to the shared hash.
+
+  mm_client.pl is the client for mm_server.pl. It sends a command to the
+  server over a specified socket, and prints the results.
+
+  load.sh is a convenience shell script that calls mm_client.pl a bunch o'
+  times in order to populate the shared hash maintained by mm_server.pl
+
+NOTES
+
+  This module has not been extensively tested, so it should be considered
+  alpha software at best.
+
+  This is probably the first and only release of this module that I will
+  make. Anybody is welcome to make improvements to this module and to
+  take ownership of it as well.
+
+--
+Arthur Choung <arthur@etoys.com>
+September 13, 1999

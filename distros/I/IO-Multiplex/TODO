@@ -1,0 +1,13 @@
+Things still TODO
+=================
+
+Fix a few broken semantics (shutdown semantics are wrong, for one)
+Limits on the size of the buffers
+Maybe rewrite to use Event module at the core
+Make it work with SSL sockets (difficult)
+Benchmarking stats.
+More optimizations.
+More examples.
+Feature to let output buffer to switch to a file
+  after certain limits in order to save memory
+  and extend the buffer size.

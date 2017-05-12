@@ -1,0 +1,67 @@
+Revision history for Perl module IP::Country::DB_File
+
+3.03  Aug 25 2014
+        - Skip db_time test on Windows
+        - More conservative check for broken Socket
+        - Minor documentation fixes
+        - Minor Dist::Zilla fixes
+
+3.02  Aug 22 2014
+        - Disable IPv6 if it's not supported
+        - Try to fix failing test on Windows
+
+3.01  Aug 21 2014
+        - Require Socket version 1.94
+        - Fix for Socket versions below 2.005
+        - Support platforms without inet_pton
+
+3.00  Aug 21 2014
+        - Try to fix failing test on Windows
+        - Strict validation of country codes
+        - Minor optimizations
+        - Fix documentation
+        - Fix, test, and document statistics methods
+
+2.99_01 Aug 20 2014
+        - Major rewrite
+        - IPv6 support
+        - build_ipcc.pl script to build the database
+        - Incompatible changes to Builder
+
+2.10  Aug 20 2014
+        - Update locations of RIR statistics files
+        - Add diagnostic output to db_time test
+        - Add Perl 5.8 to prereqs
+        - Use warnings
+
+2.01  Jan 20 2011
+        - Some registries publish unsorted files, so always sort them
+        - Dist::Zilla updates
+
+2.00  Dec 19 2009
+        - Add Pod tests
+
+1.99_03  Dec 15 2009
+        - Add back DB_File as prereq
+
+1.99_02  Dec 15 2009
+        - Move to Dist::Zilla
+	- Add -v option to command function
+	- Remove statistics files when -f or -b fails and -r is also given to
+	  command function
+
+1.99_01  Nov 29 2009
+	- Move DB builder to own package
+	- Support private address ranges
+	- Minor cleanups
+
+1.03  Nov 3 2009
+	- Use 2-argument form of open to support Perl 5.6
+
+1.02  Oct 27 2009
+	- Better error checking during DB build
+	- Use mode 0666 and O_RDWR for DB create
+	- Documentation fix
+
+1.01  Oct 26 2009
+	- Initial version

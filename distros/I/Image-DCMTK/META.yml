@@ -1,0 +1,25 @@
+---
+abstract: 'Interface to the DCMTK Dicom Toolkit'
+author:
+  - 'q{Robert Haxton <robert.haxton@gmail.com>}'
+build_requires: {}
+configure_requires:
+  Module::Build: 0.40
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Image-DCMTK
+provides:
+  Image::DCMTK:
+    file: lib/Image/DCMTK.pm
+    version: 0.05
+requires:
+  Data::PrintUtils: 0
+  Getopt::CommandLineExports: 0
+  IO::All: 0
+  Test::More: 0
+  XML::Simple: 0
+version: 0.05

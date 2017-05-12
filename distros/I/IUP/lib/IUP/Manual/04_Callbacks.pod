@@ -1,0 +1,767 @@
+=pod
+
+=head1 NAME
+
+IUP::Manual::04_Callbacks - Callbacks concept, using callbacks, common + global callbacks
+
+=head1 IUP MANUAL
+
+=over
+
+=item * L<IUP::Manual::01_Introduction|IUP::Manual::01_Introduction>
+
+=item * L<IUP::Manual::02_Elements|IUP::Manual::02_Elements>
+
+=item * L<IUP::Manual::03_Attributes|IUP::Manual::03_Attributes>
+
+=item * IUP::Manual::04_Callbacks E<nbsp>E<nbsp>E<nbsp>E<nbsp>E<nbsp> B<E<lt>E<lt>E<lt> this document>
+
+=item * L<IUP::Manual::06_HandlingKeyboard|IUP::Manual::06_HandlingKeyboard>
+
+=item * L<IUP::Manual::05_DialogLayout|IUP::Manual::05_DialogLayout>
+
+=item * L<IUP::Manual::07_UsingImageLibrary|IUP::Manual::07_UsingImageLibrary>
+
+=item * L<IUP::Manual::08_DragAndDrop|IUP::Manual::08_DragAndDrop>
+
+=back
+
+=head1 INTRODUCTION
+
+This document is intended as a reference list for common callbacks used by several
+or all GUI elements + global B<IDLE_ACTION> callback.
+
+For more information about using callbacks see L<Callbacks Concept|IUP::Manual::01_Introduction/"Callbacks Concept">
+in L<IUP::Manual::01_Introduction|IUP::Manual::01_Introduction>.
+
+Callbacks described in this document:
+
+=over
+
+L<ACTION|/"ACTION">,
+L<BUTTON_CB|/"BUTTON_CB">,
+L<CLOSE_CB|/"CLOSE_CB">,
+L<DESTROY_CB|/"DESTROY_CB">,
+L<DROPFILES_CB|/"DROPFILES_CB">,
+L<ENTERWINDOW_CB|/"ENTERWINDOW_CB">,
+L<GETFOCUS_CB|/"GETFOCUS_CB">,
+L<HELP_CB|/"HELP_CB">,
+L<HIGHLIGHT_CB|/"HIGHLIGHT_CB">,
+L<IDLE_ACTION|/"IDLE_ACTION">,
+L<KEYPRESS_CB|/"KEYPRESS_CB">,
+L<KILLFOCUS_CB|/"KILLFOCUS_CB">,
+L<K_ANY|/"K_ANY">,
+L<LEAVEWINDOW_CB|/"LEAVEWINDOW_CB">,
+L<MAP_CB|/"MAP_CB">,
+L<MENUCLOSE_CB|/"MENUCLOSE_CB">,
+L<MOTION_CB|/"MOTION_CB">,
+L<OPEN_CB|/"OPEN_CB">,
+L<RESIZE_CB|/"RESIZE_CB">,
+L<SCROLL_CB|/"SCROLL_CB">,
+L<SHOW_CB|/"SHOW_CB">,
+L<UNMAP_CB|/"UNMAP_CB">,
+L<WHEEL_CB|/"WHEEL_CB">,
+L<WOM_CB|/"WOM_CB">
+
+=back
+
+=head1 CALLBACKS
+
+=over
+
+=item B<ACTION>
+
+Action generated when the element is activated. Affects each element
+differently.
+
+B<Callback handler prototype:>
+
+ sub action_handler {
+   my ($self) = @_;
+   #...
+ }
+
+B<$self:> reference to the element that activated the event.
+
+In some elements, this callback may receive more parameters, apart from
+B<$self>. Please refer to each element's documentation.
+
+B<Affects:> L<IUP::Button|IUP::Button>, L<IUP::Item|IUP::Item>,
+L<IUP::List|IUP::List>, L<IUP::Text|IUP::Text>,
+L<IUP::Canvas|IUP::Canvas>,
+L<IUP::Multiline|IUP::Multiline>,
+L<IUP::Toggle|IUP::Toggle>
+
+=item B<BUTTON_CB>
+
+Action generated when a mouse button is pressed or released.
+
+B<Callback handler prototype:>
+
+ sub button_cb_handler {
+   my ($self, $button, $pressed, $x, $y, $status) = @_;
+   #...
+ }
+
+B<$self:> reference to the element that activated the event.
+
+B<$button:> identifies the activated mouse button:
+
+=over
+
+ IUP_BUTTON1 or "1" ... left mouse button (button 1)
+ IUP_BUTTON2 or "2" ... middle mouse button (button 2)
+ IUP_BUTTON3 or "3" ... right mouse button (button 3)
+ 
+Note: C<IUP_BUTTON?> constants are defined in L<IUP::Constants|IUP::Constants>.
+ 
+=back
+
+B<$pressed:> boolean that indicates the state of the button:
+
+=over
+
+ 0 ... mouse button was released;
+ 1 ... mouse button was pressed.
+
+=back
+
+B<$x>, B<$y:> position in the canvas where the event has occurred, in
+pixels.
+
+B<$status:> status of the mouse buttons and some keyboard keys at the
+moment the event is generated. The following macros must be used for
+verification:
+
+=over
+
+ IUP->isshift($status)
+ IUP->iscontrol($status)
+ IUP->isbutton1($status)
+ IUP->isbutton2($status)
+ IUP->isbutton3($status)
+ IUP->isbutton4($status)
+ IUP->isbutton5($status)
+ IUP->isdouble($status)
+ IUP->isalt($status)
+ IUP->issys($status)
+
+They return 1 if the respective key or button is pressed, and 0
+otherwise.
+
+=back
+
+B<Returns:> IUP_CLOSE will be processed. On some controls if IUP_IGNORE is
+returned the action is ignored (this is system dependent).
+
+B<Notes:>
+
+This callback can be used to customize a button behavior. For a
+standard button behavior use the ACTION callback of the L<IUP::Button|IUP::Button>.
+
+A double click is preceded by two single clicks, one for pressed=1 and
+one for pressed=0, and followed by a press=0, all three without the
+double click flag set. In GTK, it is preceded by an additional two
+single clicks sequence. For example, for one double click all the
+following calls to BUTTON_CB callback handler are made:
+
+  BUTTON_CB($but=1, $pressed=1, $x=154, $y=83, $status='[  1       ]')
+  BUTTON_CB($but=1, $pressed=0, $x=154, $y=83, $status='[  1       ]')
+  BUTTON_CB($but=1, $pressed=1, $x=154, $y=83, $status='[  1       ]') (in GTK only)
+  BUTTON_CB($but=1, $pressed=0, $x=154, $y=83, $status='[  1       ]') (in GTK only)
+  BUTTON_CB($but=1, $pressed=1, $x=154, $y=83, $status='[  1  D    ]')
+  BUTTON_CB($but=1, $pressed=0, $x=154, $y=83, $status='[  1       ]')
+
+B<Affects:> L<IUP::Canvas|IUP::Canvas>,
+L<IUP::Button|IUP::Button>, L<IUP::Text|IUP::Text>,
+L<IUP::List|IUP::List>,
+L<IUP::CanvasGL|IUP::CanvasGL>
+
+=item B<CLOSE_CB>
+
+Called just before a dialog is closed when the user clicks the close
+button of the title bar or an equivalent action.
+
+B<Callback handler prototype:>
+
+ sub close_cb_handler {
+   my ($self) = @_;
+   #...
+ }
+
+B<$self:> reference to the element that activated the event.
+
+B<Returns:> if IUP_IGNORE, it prevents the dialog from being closed. If
+you destroy the dialog in this callback, you must return IUP_IGNORE.
+IUP_CLOSE will be processed.
+
+B<Affects:> L<IUP::Dialog|IUP::Dialog>
+
+=item B<DESTROY_CB>
+
+Called right before an element is destroyed.
+
+B<Callback handler prototype:>
+
+ sub destroy_cb_handler {
+   my ($self) = @_;
+   #...
+ }
+
+B<$self:> reference to the element that activated the event.
+
+B<Affects:> All.
+
+=item B<DROPFILES_CB>
+
+Action called when a file is "dragged" to the application. When several
+files are dragged, the callback is called several times, once for each
+file.
+
+If defined after the element is mapped then the attribute DRAGDROP must
+be set to YES.
+
+[Windows and GTK Only] (GTK 2.6)
+
+B<Callback handler prototype:>
+
+ sub dropfiles_cb_handler {
+   my ($self, $filename, $num, $x, $y) = @_;
+   #...
+ }
+
+B<$self:> reference to the element that activated the event.
+
+B<$filename:> Name of the dragged file.
+
+B<$num:> Number of the dragged file. If several files are dragged, num
+counts the number of dragged files starting from "total-1" to "0".
+
+B<$x:> X coordinate of the point where the user released the mouse
+button.
+
+B<$y:> Y coordinate of the point where the user released the mouse
+button.
+
+B<Returns:> If IUP_IGNORE is returned the callback will NOT be called for
+the next dropped files, and processing of dropped files will be
+interrupted.
+
+B<Affects:> L<IUP::Dialog|IUP::Dialog>,
+L<IUP::Canvas|IUP::Canvas>,
+L<IUP::CanvasGL|IUP::CanvasGL>,
+L<IUP::Text|IUP::Text>, L<IUP::List|IUP::List>
+
+=item B<ENTERWINDOW_CB>
+
+Action generated when the mouse enters the canvas or button.
+
+B<Callback handler prototype:>
+
+ sub enterwindow_cb_handler {
+   my ($self) = @_;
+   #...
+ }
+
+B<$self:> reference to the element that activated the event.
+
+B<Affects:> All controls with user interaction.
+
+=item B<GETFOCUS_CB>
+
+Action generated when an element is given keyboard focus. This callback
+is called after the KILLFOCUS_CB of the element that loosed the focus.
+The IUP::GetFocus function during the callback returns the element that
+loosed the focus.
+
+B<Callback handler prototype:>
+
+ sub getfocus_cb_handler {
+   my ($self) = @_;
+   #...
+ }
+
+B<$self:> reference to the the element that received keyboard focus.
+
+B<Affects:> All elements with user interaction, except menus.
+
+B<See Also:> L<KILLFOCUS_CB|iup_killfocus_cb.html>,
+L<GetFocus|IUP/"GetFocus()">,
+L<SetFocus|IUP::Manual::02_Elements/"SetFocus()">
+
+=item B<HELP_CB>
+
+Action generated when the user press F1 at a control. In Motif is also
+activated by the Help button in some workstations keyboard.
+
+B<Callback handler prototype:>
+
+ sub help_cb_handler {
+   my ($self) = @_;
+   #...
+ }
+
+B<$self:> reference to the element that activated the event.
+
+B<Returns:> IUP_CLOSE will be processed.
+
+B<Affects:> All elements with user interaction.
+
+=item B<HIGHLIGHT_CB>
+
+Callback triggered every time the user selects an L<IUP::Item|IUP::Item> or
+L<IUP::Submenu|IUP::Submenu>.
+
+B<Callback handler prototype:>
+
+ sub highlight_cb_handler {
+   my ($self) = @_;
+   #...
+ }
+
+B<$self:> reference to the element that activated the event.
+
+B<Affects:> L<IUP::Item|IUP::Item>, L<IUP::Submenu|IUP::Submenu>
+
+=item B<IDLE_ACTION>
+
+Predefined IUP action, generated when there are no events or messages
+to be processed. Often used to perform background operations.
+
+B<Callback handler prototype:>
+
+ sub idle_handler() {
+   # no parameters
+   #...
+ }
+ int function(void); [in C]
+
+B<Returns:> if IUP_CLOSE is returned the current loop will be closed and
+the callback will be removed. If IUP_IGNORE is returned the callback is
+removed and normal processing continues.
+
+B<Notes:>
+
+The Idle callback will be called whenever there are no messages left to
+be processed. But this occurs more frequent than expected, for example
+if you move the mouse over the application the idle callback will be
+called many times because the mouse move message is processed so fast
+that the Idle will be called before another mouse move message is
+schedule to processing.
+
+So this callback changes the message loop to a more CPU consuming one.
+It is important that you set it to C<undef> when not using it. Or the
+application will be consuming CPU even if the callback is doing
+nothing.
+
+To set this action use the function C<L<< IUP->SetIdle(\&myfunction)|IUP/"SetIdle" >>>.
+Using C<undef> as a parameter to remove the association.
+
+B<Long Time Operations:>
+If you create a loop or an operation that takes a long time to complete
+inside a callback of your application then the user interface message
+loop processing is interrupted until the callback returns, so the user
+can not click on any control of the application. But there are ways to
+handle that:
+
+=over
+
+=item * call L<IUP-E<gt>LoopStep|IUP/LoopStep> or L<IUP-E<gt>Flush|IUP/Flush> inside the application
+callback when it is performing long time operations. This will allow
+the user to click on a cancel button for instance, because the user
+interface message loop will be processed.
+
+=item * split the operation in several parts that are processed by the
+L<IUP-E<gt>Idle|IUP/Idle> XXX-CHECKTHIS
+function when no messages are left to be processed for the
+user interface message loop. This will make a heavy use of the CPU,
+even if the callback is doing nothing.
+
+=item * split the operation in several parts but use a L<IUP::Timer|IUP::Timer>
+to process each part.
+
+=back
+
+If you just want to do something simple as a background redraw of an B<IUP::Canvas>, 
+then a better idea is to handle the "idle" state yourself.
+For example, register a timer for a small time like 500ms, and reset
+the timer in all the mouse and keyboard callbacks of the L<IUP::Canvas|IUP::Canvas>.
+If the timer is trigged then you are in idle state. If the L<IUP::Canvas|IUP::Canvas>
+loses its focus then stop the timer.
+
+B<See Also:> L<SetFunction|IUP::Manual::02_Elements/"SetFunction()">,
+L<IUP::Timer|IUP::Timer>.
+
+=item B<KEYPRESS_CB>
+
+Action generated when a key is pressed or released. If the key is
+pressed and held several calls will occur. It is called after the
+callback B<K_ANY> is processed.
+
+B<Callback handler prototype:>
+
+ sub keypress_cb_handler {
+   my ($self, $c, $press) = @_;
+   #...
+ }
+
+B<$self:> reference to the element that activated the event.
+
+B<$c:> identifier of typed key. Please refer to the L<Keyboard Codes|IUP::Constants/"Export tag ':keys'"> table for a list of possible values.
+
+B<$press:> 1 is the user pressed the key or 0 otherwise.
+
+B<Returns:> If IUP_IGNORE is returned the key is ignored by the system.
+IUP_CLOSE will be processed.
+
+B<Affects:> L<IUP::Canvas|IUP::Canvas>
+
+=item B<KILLFOCUS_CB>
+
+Action generated when an element loses keyboard focus. This callback is
+called before the GETFOCUS_CB of the element that gets the focus.
+
+B<Callback handler prototype:>
+
+ sub killfocus_cb_handler {
+   my ($self) = @_;
+   #...
+ }
+
+B<$self:> reference to the element that activated the event.
+
+B<Affects:> All elements with user interaction, except menus.
+
+B<See Also:> L<GETFOCUS_CB|/"GETFOCUS_CB">,
+L<IUP->GetFocus|IUP/GetFocus>,
+L<IUP->SetFocus|IUP/SetFocus>
+
+=item B<K_ANY>
+
+Action generated when a keyboard event occurs.
+
+B<Callback handler prototype:>
+
+ sub k_any_handler {
+   my ($self, $c) = @_;
+   #...
+ }
+
+B<$self:> reference to the element that activated the event.
+
+B<$c:> identifier of typed key. Please refer to the 
+L<Keyboard Codes|IUP::Constants/"Export tag ':keys'">
+table for a list of possible values.
+
+B<Returns:> If IUP_IGNORE is returned the key is ignored and not processed
+by the control and not propagated. If returns IUP_CONTINUE, the key
+will be processed and the event will be propagated to the parent of the
+element receiving it, this is the default behavior. If returns
+IUP_DEFAULT the key is processed but it is not propagated. IUP_CLOSE
+will be processed.
+
+B<Notes:>
+
+Keyboard callbacks depend on the keyboard usage of the control with the
+focus. So if you return IUP_IGNORE the control will usually not process
+the key. But be aware that sometimes the control process the key in
+another event so even returning IUP_IGNORE the key can get processed.
+Although it will not be propagated.
+
+IMPORTANT: The callbacks "K_*" of the dialog or native containers
+depend on the IUP_CONTINUE return value to work while the control is in
+focus.
+
+If the callback does not exists it is automatically propagated to the
+parent of the element.
+
+B<Affects:> All elements with keyboard interaction.
+
+=item B<LEAVEWINDOW_CB>
+
+Action generated when the mouse leaves a canvas or button.
+
+B<Callback handler prototype:>
+
+ sub leavewindow_cb_handler {
+   my ($self) = @_;
+   #...
+ }
+
+B<$self:> reference to the element that activated the event.
+
+B<Affects:> All controls with user interaction.
+
+=item B<MAP_CB>
+
+Called right after an element is mapped and its layout updated.
+
+B<Callback handler prototype:>
+
+ sub map_cb_handler {
+   my ($self) = @_;
+   #...
+ }
+
+B<$self:> reference to the element that activated the event.
+
+B<Affects:> All that have a native representation.
+
+=item B<MENUCLOSE_CB>
+
+Called just after the menu is closed.
+
+B<Callback handler prototype:>
+
+ sub menuclose_cb_handler {
+   my ($self) = @_;
+   #...
+ }
+
+B<$self:> reference to the element that activated the event.
+
+B<Affects:> L<IUP::Menu|IUP::Menu>
+
+=item B<MOTION_CB>
+
+Action generated when the mouse moves.
+
+B<Callback handler prototype:>
+
+ int function(Ihandle *ih, int x, int y, char *status); [in C]
+ elem:motion_cb(x, y: number, status: string) -> (ret: number) [in Lua]
+ sub motion_cb_handler {
+   my ($self, $x, $y, $number, $status) = @_;
+   #...
+ }
+
+B<$self:> reference to the element that activated the event.
+
+B<$x>, B<$y:> position in the canvas where the event has occurred, in
+pixels.
+
+B<$status:> status of mouse buttons and certain keyboard keys at the
+moment the event was generated. The same macros used for
+L<BUTTON_CB|/"BUTTON_CB"> can be used for this status.
+
+B<Affects:> L<IUP::Canvas|IUP::Canvas>,
+L<IUP::CanvasGL|IUP::CanvasGL>
+
+=item B<OPEN_CB>
+
+Called just before the menu is opened.
+
+B<Callback handler prototype:>
+
+ sub open_cb_handler {
+   my ($self) = @_;
+   #...
+ }
+
+B<$self:> reference to the element that activated the event.
+
+B<Affects:> L<IUP::Menu|IUP::Menu>
+
+=item B<RESIZE_CB>
+
+Action generated when the element size is changed.
+
+B<Callback handler prototype:>
+
+ sub resize_cb_handler {
+   my ($self, $width, $height) = @_;
+   #...
+ }
+
+B<$self:> reference to the element that activated the event.
+
+B<$width:> the width of the internal element size in pixels not
+considering the decorations (client size) XXX-ADD-LINK description in layout.pod
+
+B<$height:> the height of the internal element size in pixels not
+considering the decorations (client size) XXX-ADD-LINK description in layout.pod
+
+B<Notes:>
+
+This action is also generated when the dialog is mapped, after the map
+and before the show.
+
+B<Affects:> L<IUP::Canvas|IUP::Canvas>,
+L<IUP::CanvasGL|IUP::CanvasGL>,
+L<IUP::Dialog|IUP::Dialog>
+
+=item B<SCROLL_CB>
+
+Called when some manipulation is made to the scrollbar. The canvas is
+automatically redrawn only if this callback is NOT defined.
+
+(GTK 2.8)
+
+B<Callback handler prototype:>
+
+ sub scroll_cb_handler {
+   my ($self, $op, $posx, $posy) = @_;
+   #...
+ }
+
+B<$self:> reference to the element that activated the event.
+
+B<$op:> indicates the operation performed on the scrollbar.
+
+=over
+
+If the manipulation was made on the vertical scrollbar, it can have the
+following values:
+
+ IUP_SBUP    ... line up
+ IUP_SBDN    ... line down
+ IUP_SBPGUP  ... page up
+ IUP_SBPGDN  ... page down
+ IUP_SBPOSV  ... vertical positioning
+ IUP_SBDRAGV ... vertical drag 
+
+If it was on the horizontal scrollbar, the following values are valid:
+
+ IUP_SBLEFT    ... column left
+ IUP_SBRIGHT   ... column right
+ IUP_SBPGLEFT  ... page left
+ IUP_SBPGRIGHT ... page right
+ IUP_SBPOSH    ... horizontal positioning
+ IUP_SBDRAGH - horizontal drag
+
+=back
+
+B<$posx>, B<posy:> the same as the B<ACTION> canvas callback
+(corresponding to the values of attributes POSX and POSY).
+
+B<Notes:>
+
+IUP_SBDRAGH and IUP_SBDRAGV are not supported in GTK.
+
+B<Affects:> L<IUP::Canvas|IUP::Canvas>,
+L<IUP::CanvasGL|IUP::CanvasGL>,
+L<SCROLLBAR|IUP::Manual::03_Attributes/SCROLLBAR>
+
+=item B<SHOW_CB>
+
+Called right after the dialog is opened, minimized or restored from a
+minimization. This callback is called when those actions were performed
+by the user or programmatically by the application.
+
+B<Callback handler prototype:>
+
+ sub show_cb_handler {
+   my ($self, $state) = @_;
+   #...
+ }
+
+B<$self:> reference to the element that activated the event.
+
+B<$state:> indicates which of the following situations generated the
+event:
+
+=over
+
+ IUP_HIDE
+ IUP_SHOW
+ IUP_RESTORE  (was minimized or maximized)
+ IUP_MINIMIZE
+ IUP_MAXIMIZE
+
+Note: IUP_MAXIMIZE is not received in Motif when activated from the maximize
+button.
+
+=back
+
+B<Returns:> IUP_CLOSE will be processed.
+
+B<Affects:> L<IUP::Dialog|IUP::Dialog>
+
+=item B<UNMAP_CB>
+
+Called right before an element is unmapped.
+
+B<Callback handler prototype:>
+
+ sub unmap_cb_handler {
+   my ($self) = @_;
+   #...
+ }
+
+B<$self:> reference to the element that activated the event.
+
+B<Affects:> All that have a native representation.
+
+=item B<WHEEL_CB>
+
+Action generated when the mouse wheel is rotated. If this callback is
+not defined the wheel will automatically scroll the canvas in the
+vertical direction by some lines, the SCROLL_CB callback if defined
+will be called with the IUP_SBDRAGV operation.
+
+B<Callback handler prototype:>
+
+ sub wheel_cb_handler {
+   my ($self, $delta, $x, $y, $status) = @_;
+   #...
+ }
+
+B<$self:> reference to the element that activated the event.
+
+B<$delta:> the amount the wheel was rotated in notches.
+
+B<$x>, B<$y:> position in the canvas where the event has occurred, in
+pixels.
+
+B<$status:> status of mouse buttons and certain keyboard keys at the
+moment the event was generated. The same macros used for
+L<BUTTON_CB|/"BUTTON_CB"> can be used for this status.
+
+B<Notes:>
+
+In Motif and GTK delta is always 1 or -1. In Windows is some situations
+delta can reach the value of two. In the future with more precise
+wheels this increment can be changed.
+
+The wheel will only work if the focus is at the canvas.
+
+B<Affects:> L<IUP::Canvas|IUP::Canvas>,
+L<IUP::CanvasGL|IUP::CanvasGL>
+
+=item B<WOM_CB>
+
+Action generated when an audio device receives an event.
+
+[Windows Only]
+
+B<Callback handler prototype:>
+
+ sub wom_cb_handler {
+   my ($self, $state) = @_;
+   #...
+ }
+
+B<$self:> reference to the element that activated the event.
+
+B<$state:> can be opening=1, done=0, or closing=-1.
+
+B<Notes:>
+
+This callback is used to syncronize video playback with audio. It is
+sent when the audio device:
+
+ MESSAGE     DESCRIPTION
+ opening     is opened by using the waveOutOpen function.
+ done        is finished with a data block sent by using the waveOutWrite function.
+ closing     is closed by using the B<waveOutClose> function.
+
+You must use the HWND attribute when calling B<waveOutOpen> in the
+I<dwCallback> parameter and set I<fdwOpen> to CALLBACK_WINDOW.
+
+B<Affects:> L<IUP::Dialog|IUP::Dialog>,
+L<IUP::Canvas|IUP::Canvas>,
+L<IUP::CanvasGL|IUP::CanvasGL>
+
+=back
+
+=cut

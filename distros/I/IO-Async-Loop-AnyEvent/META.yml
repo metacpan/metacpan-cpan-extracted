@@ -1,0 +1,24 @@
+---
+abstract: 'use C<IO::Async> with C<AnyEvent>'
+author:
+  - 'Paul Evans <leonerd@leonerd.org.uk>'
+build_requires:
+  IO::Async::LoopTests: 0.43
+  Test::More: 0
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.110930'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: IO-Async-Loop-AnyEvent
+provides:
+  IO::Async::Loop::AnyEvent:
+    file: lib/IO/Async/Loop/AnyEvent.pm
+    version: 0.03
+requires:
+  AnyEvent: 0
+  IO::Async: 0.24
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.03

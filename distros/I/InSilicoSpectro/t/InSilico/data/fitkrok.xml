@@ -1,0 +1,41 @@
+<calibrator>	<train>
+		<preprocess>1</preprocess>
+		<fitting>linear</fitting>
+		<gamma>1e-06</gamma>
+	</train>
+	<data>
+		<value seq="RDLSPR" time="1284">
+		9.81
+		</value>
+		<value seq="HPGDFGADAQGAMTK" time="1182">
+		19.4888593057439
+		</value>
+		<value seq="HPGDFGADAQAAMSK" time="1182">
+		19.6299341373586
+		</value>
+		<value seq="LFTGHPETLEK" time="1224">
+		23.0809788073591
+		</value>
+		<value seq="LFTGHPETLEK" time="1230">
+		23.0809788073591
+		</value>
+		<value seq="VEADIAGHGQEVLIR" time="1380">
+		28.9453002873829
+		</value>
+		<value seq="VEADIAGHGQEVLIR" time="1374">
+		28.9453002873829
+		</value>
+		<value seq="VEADLAGHGQEVLIR" time="1380">
+		29.900987019053
+		</value>
+		<value seq="VEADLAGHGQEVLIR" time="1374">
+		29.900987019053
+		</value>
+		<value seq="HGTVVLTALGGILK" time="1740">
+		36.5992
+		</value>
+		<value seq="YLEFISDAIIHVLHSK" time="2094">
+		41.9181
+		</value>
+	</data>
+</calibrator>

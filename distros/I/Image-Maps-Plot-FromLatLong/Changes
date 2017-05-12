@@ -1,0 +1,8 @@
+Revision history for Perl extension
+Image::Maps::Plot::FromLatLong.
+
+0.1	25 February 2003 11:08
+
+Based on code in FromPostcode.pm in same namespace,
+which is not needed to run this module.
+

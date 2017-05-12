@@ -1,0 +1,17 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+Util.pm
+Iterator-Util.ppd
+Iterator-Util-ppm.tar.gz
+t/doc.t
+t/iappend.t
+t/iarray.t
+t/ihead.t
+t/ilist.t
+t/imap.t
+t/ipairwise.t
+t/irange.t
+t/iskip.t
+META.yml                                 Module meta-data (added by MakeMaker)

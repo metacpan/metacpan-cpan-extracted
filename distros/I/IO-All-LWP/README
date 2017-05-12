@@ -1,0 +1,33 @@
+IO-All-LWP version 0.14
+=======================
+
+This module acts as glue between IO::All and LWP, so that files can be read and
+written through the network using the convenient IO:All interface.  Note that
+this module is not "use"d directly: you just use IO::All, which knows when to
+autoload IO::All::HTTP, IO::All::HTTPS, IO::All::FTP, or IO::All::Gopher, which
+implement the specific protocols based on IO::All::LWP.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+    perl 5.8.0
+    IO::All 0.30
+    LWP 0
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2007 Ivan Tubert-Brohman <itub@cpan.org> and Brian Ingerson
+<ingy@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

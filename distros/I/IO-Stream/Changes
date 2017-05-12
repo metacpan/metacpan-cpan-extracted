@@ -1,0 +1,57 @@
+Revision history for IO-Stream
+
+v2.0.2  2016-03-05 01:39:23 EET
+	- Fixed tests for portability.
+
+v2.0.1  2016-03-01 04:07:24 EET
+	- Reformat doc.
+	- Fixed tests for portability.
+
+v2.0.0  2016-02-20 10:27:47 EET
+	- Switch to Dist::Milla.
+	- Switch from EV::ADNS to AnyEvent::DNS.
+	- Fixed tests for portability.
+
+1.0.10  2016-01-21 14:42:34 EET
+	- Fixed resolving to IPv6 instead of IPv4, thanks Tom Belfort.
+
+1.0.9   2014-12-24 11:54:43 EET
+	- Fixed tests for portability.
+
+1.0.8   2014-11-26 06:03:40 EET
+	- Fixed tests for portability.
+
+1.0.7	2012-05-25 07:01:53 EEST
+	- Export EREQINEOF and EREQINBUFLIMIT.
+
+1.0.6	2012-05-14 16:46:48 EEST
+	- Fixed tests for portability.
+
+1.0.5	2010-07-29 16:20:34 EEST
+	- Fixed timeout on write.
+
+1.0.4	2008-11-22 15:47:23 EET
+	- Fixed t/extra_fields.t on Freebsd-6.1.
+
+1.0.3	2008-11-21 16:00:03 EET
+	- Fixed typo in Makefile.PL.
+
+1.0.2	2008-11-19 03:33:16 EET
+	- Added compatibility with Win32.
+
+1.0.1	2008-11-18 14:37:35 EET
+	- Fixed bugs in tests on FreeBSD.
+
+1.0.0   2008-11-16 02:16:54 EET
+	- Added tests for timeouts and read/write errors. Test suite complete.
+	- Added documentation.
+
+0.2.0	2008-11-15 04:51:41 EET
+	- Added a lot of tests, test suite nearly complete.
+	- Added plugin examples: IO::Stream::Noop and IO::Stream::NoopAlias.
+
+0.1.0	2008-11-11 00:02:30 EET
+	- Interface stabilization.
+
+0.0.1	2008-11- 3 18:31:29
+	- Initial release.

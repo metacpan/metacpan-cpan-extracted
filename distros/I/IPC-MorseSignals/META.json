@@ -1,0 +1,69 @@
+{
+   "abstract" : "Communicate between processes with Morse signals.",
+   "author" : [
+      "Vincent Pit <perl@profvince.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.72, CPAN::Meta::Converter version 2.132140",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "IPC-MorseSignals",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Bit::MorseSignals" : "0.05",
+            "Carp" : "0",
+            "Config" : "0",
+            "Data::Dumper" : "0",
+            "Exporter" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "POSIX" : "0",
+            "Test::More" : "0",
+            "Time::HiRes" : "0",
+            "base" : "0",
+            "utf8" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Config" : "0",
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Bit::MorseSignals" : "0.05",
+            "Carp" : "0",
+            "POSIX" : "0",
+            "Time::HiRes" : "0",
+            "base" : "0",
+            "perl" : "5.008"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Name=IPC-MorseSignals"
+      },
+      "homepage" : "http://search.cpan.org/dist/IPC-MorseSignals/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://git.profvince.com/?p=perl%2Fmodules%2FIPC-MorseSignals.git"
+      }
+   },
+   "version" : "0.16"
+}

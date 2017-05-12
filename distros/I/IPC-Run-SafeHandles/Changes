@@ -1,0 +1,15 @@
+Revision history for IPC-Run-SafeHandles
+
+0.04    Aug 21, 2012
+        fix deps.
+
+0.03    Aug 20, 2012
+        enable wrapper if stdout/stderr has any "via" layer.
+
+0.02    Jun 11, 2008
+        Fix Makefile.PL warnings.
+        Fix typo in import warnings.
+
+0.01    Oct 15, 2007
+        Initial CPAN release.
+

@@ -1,0 +1,61 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 842745cb706f8f2126506f544492f7a80dbe29b3 COPYING
+SHA1 75c920ccb7f806a744955cebeedbd0fbd2f77afc Changes
+SHA1 1f1d4b5d08054b7064b82d843e47cf9de4468a46 MANIFEST
+SHA1 6e3dfa4a933a1a5da6c934cca324fc40495b2f5d MANIFEST.SKIP
+SHA1 339e85f614c8404ba82f680cac39753cbc03fa1c META.yml
+SHA1 75ceaf8791ad0d6e3f15313b4ca45c15ef28e546 Makefile.PL
+SHA1 a8dbe815057a7249e624be7a31c0821402e47d7c debian/changelog
+SHA1 ac3478d69a3c81fa62e60f5c3696165a4e5e6ac4 debian/compat
+SHA1 55420e49d78dbe5485c7b8afd08a4a0b51ae9e84 debian/control
+SHA1 b822069cea0b819c047d002cc39d7929b31afbda debian/copyright
+SHA1 d7a4211957ac9a577ac022d6aaede1bbb8430d45 debian/rules
+SHA1 61652cd1568dcf2614df833eba241755eee34e89 debian/source/format
+SHA1 54f91834db18d5cce10e8c07443948f514aca406 debian/watch
+SHA1 a89b3435670241800eae049fcb7348ea0ddb29c7 devel/tk-canvas-eps.pl
+SHA1 81cfb3ef0096817bf8d3876d36499f23a575c3d1 devel/tk-canvas-fig.pl
+SHA1 e13094c731dd9f574d76ec57589e809fb8f3d5a7 devel/tk-canvas.pl
+SHA1 86612aa5382ee1aae3b84d8335ed656111fb832b devel/tk-photo-leak.pl
+SHA1 5217dd387d139d4b2f03f8d20bf1ad14be9863cb devel/tk-photo.pl
+SHA1 9541a4db39a8841641211480116fc9a701270012 devel/tk-winphoto.pl
+SHA1 ce6e51f801a3105a8f1b204b311aeb147c37058e inc/MyMakeMakerExtras.pm
+SHA1 7a988b2aa7ed09f1cb9029a1ef3f0e2139dca0cf inc/my_pod2html
+SHA1 9255aefd0d904016e991d2dc8ce8cb221533de5d lib/Image/Base/Tk/Canvas.pm
+SHA1 362e310f84d8b0eb704f168aae18480973b82bf8 lib/Image/Base/Tk/Photo.pm
+SHA1 e4ec32a7370628b14ea2450d2333d492f468e23e t/Canvas-fig.t
+SHA1 06320e205f56eba130057080a1995597eca3005b t/Canvas-use.t
+SHA1 ff6e15f20a07d4a101579d6adf126bde177d8ee6 t/Canvas.t
+SHA1 969664973af9de9d898008e3ef280892b8d63244 t/MyTestHelpers.pm
+SHA1 f0fb4938250b2c5be37363f238c5130fd583df84 t/MyTestImageBase.pm
+SHA1 3ceae5bfa6ebc5fd18d56216257fdd2a159e6192 t/Photo-use.t
+SHA1 b77e987bd788dc7b662a68b2850fb56206258e66 t/Photo.t
+SHA1 811028548aa4b360b5086d1af3150f9dde348aa6 xt/0-META-read.t
+SHA1 c9e7a47e1f397eb5f46d7e4ef21754d9df76e36e xt/0-Test-ConsistentVersion.t
+SHA1 d9e7f38a8dcfdb76c56951e4214be8eeda2e2289 xt/0-Test-DistManifest.t
+SHA1 9496e4a2a2734c7093ab6961900dd7a55800976e xt/0-Test-Pod.t
+SHA1 083242d959c1a9242c874982e4585872a95bec93 xt/0-Test-Synopsis.t
+SHA1 ec454b1b524d2d0b35e5a7d8292ad13d82becab5 xt/0-Test-YAML-Meta.t
+SHA1 d1d6dc2ff925e7ba5c014ce1361e6d097d061f2a xt/0-file-is-part-of.t
+SHA1 daba2840c7f128371d42516619a0e04fee2f5ff4 xt/0-no-debug-left-on.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iD8DBQFPKu7WLFMCIV9q3ToRAganAJ9/ZqQRFWUjM+vfRQm6UpRf0r4LMQCgpfWm
+/sH8tIdjZgPlBkuK5//LyV8=
+=nbP6
+-----END PGP SIGNATURE-----

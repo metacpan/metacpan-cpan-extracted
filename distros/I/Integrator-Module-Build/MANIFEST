@@ -1,0 +1,27 @@
+.cvsignore
+Build.PL
+Changes
+lib/Integrator/Module/Build.pm
+lib/Integrator/Test/ConfigData.pm
+lib/Integrator/Test/TAP/Model/Patch.pm
+MANIFEST			This list of files
+META.yml
+pre_config_debian
+pre_config_fedora
+pre_config_ubuntu
+README
+t/00-load.t
+t/01-load-integrator-test-configdata.t
+t/01-load-integrator-test-tap-model-patch.t
+t/10persist.t
+t/11persist.t
+t/12persist.t
+t/can_pass_through_other.t
+t/can_use_own.t
+t/configdata.t
+t/data_check_deep.t
+t/integrator_deep.t
+t/measurement.t
+t/pod-coverage.t
+t/pod.t
+t/toto.txt

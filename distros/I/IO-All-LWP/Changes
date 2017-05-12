@@ -1,0 +1,19 @@
+Revision history for IO-All-LWP
+
+0.14  2007-03-29
+        - Fixed an "Oops" in yesterday's release (0.13), which passed the
+          compilation tests but didn't actually work.
+
+0.13  2007-03-28
+        - Updated for new version of IO::All. Thanks to MAREKR for sending a
+          patch!
+
+0.12  2004-11-02
+        - Added IO::All::LWP module. Thanks Richard Soderberg!
+
+0.11  2004-10-1
+        - Added ua method.
+        - Fixed error in the docs.
+
+0.10  2004-07-20
+	- First release

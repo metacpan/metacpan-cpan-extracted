@@ -1,0 +1,65 @@
+Image::Tileset Demonstrations
+-----------------------------
+
+There are two scripts here and a handful of png and xml files.
+
+PNG Files:
+* charsets.png
+* faces.png
+* hero-battle.png
+  These are all stock graphics from RPG Maker 2003 and are copyright (C)
+  Enterbrain. These images are all indexed (256-color) PNG images.
+* testtiles.png
+  This is the first very early test image. It features one "sprite" with an
+  alpha drop shadow, and a few static "tiles"
+* charset-alpha.png
+  This is a modified charsets.png: this one is a PNG-24 image with alpha
+  channels. All characters have alpha dropped shadows.
+
+XML Files:
+* charsets.xml
+* faces.xml
+* hero-battle.xml
+* testtiles.xml
+* charset-alpha.xml
+  These are the tileset spec files for all the tilesets.
+
+-== extract.pl - Simple Tileset Extraction Demo ==-
+
+This script loads a tileset and extracts each tile to an individual image in the
+"./out" directory (it will create this directory if it doesn't exist).
+
+  Usage:   perl extract.pl <tileset w/ no file extensions>
+  Example: perl extract.pl charset-alpha
+           (uses charset-alpha.png and charset-alpha.xml)
+
+-== blobextract.pl - Simple Tileset Extraction Demo #2 ==-
+
+This is the same as extract.pl, but the script reads the PNG's binary data first
+and loads the tileset engine with that, instead of giving the tileset engine the
+file name directly.
+
+This shows you how to use Image::Tileset in an environment where your application
+gets image data as binary and it isn't saved to disk.
+
+-== tk-animate.pl - Simple Animation Demo with Perk/Tk ==-
+
+This script works with tilesets that have animations (charsets, hero-battle,
+and charset-alpha). It displays all the animations in the tileset spec, looping
+each animation 5 times before going to the next animation.
+
+You can also provide a "scale" as the second argument. If a single number (i.e.
+2 or 0.5) it uses it as a scale factor; if a dimension string (i.e. 96x96), it
+resizes the tiles to exactly this dimension.
+
+For example, "perl tk-animate.pl hero-battle 4" will show all tiles at 4X their
+original size.
+
+Left click with your mouse to make it skip to the next animation.
+
+The escape key terminates the program.
+
+  Usage:   perl tk-animate.pl <tileset w/ no file extensions> <scale>
+  Example: perl tk-animate.pl charset-alpha
+           perl tk-animate.pl charset-alpha 2
+           perl tk-animate.pl charset-alpha 96x96

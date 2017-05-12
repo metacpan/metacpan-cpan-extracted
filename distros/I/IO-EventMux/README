@@ -1,0 +1,410 @@
+NAME
+    IO::EventMux - Multiplexer for sockets, pipes and any other types of
+    filehandles that you can set O_NONBLOCK on and does buffering for the
+    user.
+
+SYNOPSIS
+      use IO::EventMux;
+
+      my $mux = IO::EventMux->new();
+
+      $mux->add($my_fh);
+
+      while (1) {
+        my $event = $mux->mux();
+
+        # ... do something with $event->{type} and $event->{fh}
+      }
+
+DESCRIPTION
+    This module provides multiplexing for any set of sockets, pipes, or
+    whatever you can set O_NONBLOCK on. It can be useful for both server and
+    client processes, but it works best when the application's main loop is
+    centered around its "mux()" method.
+
+    The file handles it can work with are either perl's own typeglobs or
+    IO::Handle objects (preferred).
+
+METHODS
+  new([%options])
+    Constructs an IO::EventMux object.
+
+    The optional parameters for the handle will be taken from the
+    IO::EventMux object if not given here:
+
+   EventLoop
+    Defines what mechanism to use for the event loop, currently only two
+    build in are available; IO::Epoll and IO::Select. IO::Select being the
+    default.
+
+      my $mux = new IO::EventMux(EventLoop => [$mechanism, $args]);
+
+    IO::Epoll example for holding 1024 file handles:
+
+      my $mux = new IO::EventMux(EventLoop => ["IO::Epoll", 1024]);
+
+    It's also possible to define your own, this is done by creating a hash
+    that implements the following structure:
+
+      my $mux = new IO::EventMux(EventLoop => {
+          Add => sub { 
+            my($self, $list, $fh) = @_;
+            ...
+          },
+          Wait => sub {
+            my($self, $timeout) = @_;
+            ...
+            return {
+                can_read => [$fh, ...],
+                can_write => [$fh, ...],
+            };
+            
+      },
+          Remove => sub {
+            my($self, $list, $fh) = @_;
+            ...
+          },
+          Handles => sub {
+            my($self) = @_;
+            ...
+          },
+      });
+
+  mux([$timeout])
+    This method will block until ether an event occurs on one of the file
+    handles or the $timeout (floating point seconds) expires. If the
+    $timeout argument is not present, it waits forever. If $timeout is 0, it
+    returns immediately.
+
+    The return value is always a hash, which always has the key 'type',
+    indicating what kind it is. It will also usually carry the 'fh' key,
+    indicating what file handle the event happened on.
+
+    The 'type' key can have the following values:
+
+    timeout
+        Nothing happened and timeout occurred.
+
+    error
+        An error occurred in connection with the file handle, such as
+        "connection refused", etc.
+
+    accepted
+        A new client connected to a listening socket and the connection was
+        accepted by EventMux. The listening socket file handle is in the
+        'parent_fh' key. If the file handle is a unix domain socket the
+        credentials of the user connection will be available in the keys;
+        'pid', 'uid' and 'gid'.
+
+    ready
+        A file handle is ready to be written to, this can be use full when
+        working with nonblocking connects so you know when the remote
+        connection accepted the connection.
+
+    accepting
+        A new client is trying to connect to a listening socket, but the
+        user code must call accept manually. This only happens when the
+        ManualAccept option is set.
+
+    read
+        A socket has incoming data. If the socket's Buffered option is set,
+        this will be what the buffering rule define.
+
+        The data is contained in the 'data' key of the event hash. If recv()
+        returned a sender address, it is contained in the 'sender' key and
+        must be manually unpacked according to the socket domain, e.g. with
+        "Socket::unpack_sockaddr_in()".
+
+    read_last
+        A socket last data before it was closed did not match the buffering
+        rules, as defined by the IO::Buffered type given. he read_last type
+        contains the result of a call to "read_last()" on the chosen buffer
+        type.
+
+        The default is not to return read_last and if no buffer is set read
+        will contain this information.
+
+    sent
+        A socket has sent all the data in it's queue with the send call.
+        This however does not indicate that the data has reached the other
+        end, normally only that the data has reached the local buffer of the
+        kernel.
+
+    closing
+        A file handle was detected to be have been closed by the other end
+        or the file handle was set to be closed by the user. So EventMux
+        stooped listening for events on this file handle. Event data like
+        'Meta' is still accessible.
+
+        The 'missing' key indicates the amount of data or packets left in
+        the user space buffer when the file handle was closed. This does not
+        indicate the amount of data received by the other end, only that the
+        user space buffer left.
+
+    closed
+        A socket/pipe was disconnected/closed, the file descriptor, all
+        internal references, and data store with the file handle was
+        removed.
+
+    can_write
+        The ManualWrite option is set for the file handle, and "select()"
+        has indicated that the handle can be written to.
+
+    can_read
+        The ManualRead option is set for the file handle, and "select()" has
+        indicated that the handle can be read from.
+
+  add($handle, [ %options ])
+    Add a socket to the internal list of handles being watched.
+
+    The optional parameters for the handle will be taken from the
+    IO::EventMux object if not given here:
+
+   Listen
+    Defines if the file handle should be treated as a listening socket, the
+    default is to auto detect this. I should not be necessary to set this
+    value.
+
+    The socket must be set up for listening, which is easily done with
+    IO::Socket::INET:
+
+      my $listener = IO::Socket::INET->new(
+        Listen    => 5,
+        LocalPort => 7007,
+        ReuseAddr => 1,
+      );
+
+      $mux->add($listener);
+
+   Type
+    Either "stream" or "dgram". Should be auto detected in most cases.
+
+    Defaults to "stream".
+
+   ManualAccept
+    If a connection comes in on a listening socket, it will by default be
+    accepted automatically, and "mux()" will return a 'connect' event. If
+    ManualAccept is set an 'accepting' event will be returned instead, and
+    the user code must handle it itself.
+
+      $mux->add($my_fh, ManualAccept => 1);
+
+   ManualWrite
+    By default EventMux handles nonblocking writing and you should use
+    "$mux-"send($fh, $data)> or "$mux-"sendto($fh, $addr, $data)> to send
+    your data, but if for some reason you send data yourself you can tell
+    EventMux not to do writing for you and generate a 'can_write' event
+    instead.
+
+      $mux->add($my_fh, ManualWrite => 1);
+
+    In both cases you can use "send()" to write data to the file handle.
+
+    Note: If both ManualRead and ManualWrite is set, EventMux will not set
+    the socket to nonblocking.
+
+   ManualRead
+    By default EventMux will handle nonblocking reading and generate a read
+    event with the data, but if some reason you would like to do the reading
+    yourself you can have EventMux generate a 'can_read' event for you
+    instead.
+
+      $mux->add($my_fh, ManualRead => 1);
+
+    Never read or recv on the file handle. When the socket becomes readable,
+    a "can_read()" event is returned.
+
+    Note: If both ManualRead and ManualWrite is set, EventMux will not set
+    the socket to nonblocking.
+
+   ReadSize
+    By default IO::EventMux will try to read 65536 bytes from the file
+    handle, setting this options to something smaller might help make it
+    easier for EventMux to be fair about how it returns it's event, but will
+    also give more overhead as more system calls will be required to empty a
+    file handle.
+
+   Errors
+    By default IO::EventMux will not deal with socket errors on non
+    connected sockets such as a UDP socket in listening mode or where no
+    peer has been defined. Or in other words whenever you use "sendto()" on
+    socket. When enabling error handling, IO::EventMux sets the socket to
+    collect errors with the MSG_ERRQUEUE option and collect errors with
+    "recvmsg()" call.
+
+    Errors are sent as error events with a little more information than
+    normal, eg:
+
+      $event = {
+        data     => 'packet data',
+        dst_port => 'destination port',
+        from     => 'ip where the error is from',
+        dst_ip   => 'destination ip',
+      }
+
+   Meta
+    An optional scalar piece of metadata for the file handle. Can be
+    retrieved and manipulated later with meta()
+
+   Buffered
+    IO::EventMux supports buffering of data before generating events, this
+    can be used to only return events when a "complete" event is done. For
+    this IO::EventMux uses IO::Buffered.
+
+      # Would only return when a complete line 
+      $mux->add($goodfh, Buffered => new IO::Buffered(Split => qr/\n/));
+
+    Read more here: IO::Buffered
+
+  listen()
+    Wrapper around connect() with option (Listen => SOMAXCONN) set
+
+  connect()
+    Connect and add a socket to IO::EventMux, by using either URL syntax or
+    IO::Socket Syntax. All options related to IO::EventMux is passed when
+    calling add() on the new socket. Connect returns the new socket on
+    completion.
+
+    URL Syntax supports this format:
+
+     * (tcp|udp)://HOST:PORT, Returns a udp of tcp socket.
+     * (unix|unix_dgram)://path/file.sock, Returns a unix domain socket connection.
+
+    For more information on how to use IO::Socket syntax look in
+    IO::Socket::INET and IO::Socket::UNIX.
+
+    Example of URL syntax; making a connection to localhost port 22
+
+      my $fh = $mux->connect("tcp://127.0.0.1:22");
+
+    Example of the same thing in IO::Socket Syntax;
+
+      my $fh = $mux->connect(
+        Proto => 'tcp',
+        PeerAddr => '127.0.0.1',
+        PeerPort => 22,
+      );
+
+  set()
+    Set new options on a fh in IO::EventMux, currently only Buffered options
+    is handled
+
+  handles()
+    Returns a list of file handles managed by this object.
+
+  has_events()
+    Returns true if there are pending events, or false otherwise
+
+  type()
+    Returns the socket type for a file handle
+
+  class()
+    Returns the socket class for a file handle
+
+  meta($fh, [$newval])
+    Set or get a piece of metadata on the filehandle. This can be any scalar
+    value.
+
+  remove($fh)
+    Make EventMux forget about a file handle. The caller will then take over
+    the responsibility of closing it.
+
+  close($fh)
+    Close a file handle. IO::EventMux will stop listing to both reads and
+    writes on the file handle and return a "closing" event and on next "mux"
+    call kill will be called, returning "closed" for the file handle.
+
+    Note: All 'Meta' data associated with the file handle will be kept until
+    the final 'closed' event is returned.
+
+  kill($fh)
+    Closes a file handle without giving time to finish any outstanding
+    operations. Returns a 'closed' event, deletes all buffers and does not
+    keep 'Meta' data.
+
+    Note: Does not return the 'read_last' event.
+
+  buflen($fh)
+    Queries the length of the output buffer for this file handle. This only
+    applies if ManualWrite is turned off, which is the default. For
+    Type="dgram" sockets, it returns the number of datagrams in the queue.
+
+    An application can use this method to see whether it should send more
+    data or wait until the buffer queue is a bit shorter.
+
+  recvdata($fh, $length)
+    TODO: Queues @data to be written to the file handle $fh. Can only be
+    used when ManualWrite is off (default).
+
+  send($fh, @data)
+    Queues @data to be written to the file handle $fh. Can only be used when
+    ManualWrite is off (default).
+
+    If the socket is of Type="stream"
+        Returns true on success, undef on error. The data is sent when the
+        socket becomes unblocked and a 'sent' event is posted when all data
+        is sent and the buffer is empty. Therefore the socket should not be
+        closed until "buflen($fh)" returns 0 or a sent request has been
+        posted.
+
+    If the socket is of Type="dgram"
+        Each item in @data will be sent as a separate packet. Returns true
+        on success and undef on error.
+
+  sendto($fh, $to, @data)
+    Like "send()", but with the recepient $to as a packed sockaddr
+    structure, such as the one returned by "Socket::pack_sockaddr_in()".
+    Only for Type="dgram" sockets.
+
+      $mux->sendto($my_fh, pack_sockaddr_in($port, inet_aton($ip)), $data);
+
+  push_event($event)
+    Push event on queue
+
+  nonblock($fh)
+    Puts socket into nonblocking mode.
+
+  socket_creds($fh)
+    Return credentials on UNIX domain sockets.
+
+  socket_type($fh)
+    Return socket type.
+
+  socket_listening($fh)
+    Check if the socket is set to listening mode
+
+  recroak()
+    Helper function to rethrow croaks
+
+  socket_errors
+    Dummy sub that casts an error if the IO::EventMux::Socket::MsgHdr is not
+    installed and the Errors option is used
+
+  NOTES
+    Working with PIPE's: When the other end of a pipe closes it's end,
+    signals can get thrown. To handle this a signal handler needs to be
+    defined:
+
+      # Needed when writing to a broken pipe 
+      $SIG{PIPE} = sub { # SIGPIPE
+         croak "Broken pipe";
+     };
+
+    Getting rid of 'Filehandle ... opened only for output'
+
+      # Needed as sysread() throws warnings when STDIN gets closed by the child
+      $SIG{__WARN__} = sub {
+         croak @_;    
+      };
+
+AUTHOR
+    Jonas Jensen <jonas@infopro.dk>, Troels Liebe Bentsen
+    <troels@infopro.dk>
+
+COPYRIGHT AND LICENCE
+    Copyright 2006-2008: Troels Liebe Bentsen Copyright 2006-2007: Jonas
+    Jensen
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

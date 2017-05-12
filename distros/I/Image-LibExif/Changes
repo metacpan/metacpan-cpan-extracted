@@ -1,0 +1,14 @@
+Revision history for Perl extension Image::LibExif.
+
+0.04	Sat Nov 27 02:39:16 2010
+		Added license
+
+0.03	Mon Nov  1 16:10:05 2010
+		Replace checklib with EU::PkgConfig
+
+0.02	Fri Oct 29 17:27:12 2010
+		Correct name extraction by section.
+
+0.01	Thu Oct 21 02:03:36 2010
+		Initial revision.
+

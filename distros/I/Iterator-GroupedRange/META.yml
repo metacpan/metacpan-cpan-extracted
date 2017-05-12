@@ -1,0 +1,40 @@
+---
+abstract: 'Iterates retrieving a set of specified number rows'
+author:
+  - 'Toru Yamaguchi <zigorou@cpan.org>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  CPAN::Meta: '0'
+  CPAN::Meta::Prereqs: '0'
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v0.12.0, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Iterator-GroupedRange
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Iterator::GroupedRange:
+    file: lib/Iterator/GroupedRange.pm
+    version: '0.08'
+resources:
+  bugtracker: https://github.com/zigorou/p5-iterator-groupedrange/issues
+  homepage: https://github.com/zigorou/p5-iterator-groupedrange
+  repository: git://github.com/zigorou/p5-iterator-groupedrange.git
+version: '0.08'
+x_contributors:
+  - 'Toru Yamaguchi <yamaguchi.toru@51547-mac.dena.local>'
+  - 'Syohei YOSHIDA <syohex@gmail.com>'
+  - 'Yuji Shimada <xaicron@gmail.com>'

@@ -1,0 +1,14 @@
+^build\.pl$
+blib/.*
+.gitignore
+.git/.*
+Makefile$
+pm_to_blib
+MYMETA..*
+.*\.bak
+^Image-PNG-Cairo-[0-9\.]+/$
+^Image-PNG-Cairo-[0-9\.]+\.tar\.gz$
+^Cairo.(?:c|o|bs)$
+^lib/Image/PNG/Cairo\.pod\.tmpl$
+^make-pod\.pl$
+^examples/.*-out\.txt$

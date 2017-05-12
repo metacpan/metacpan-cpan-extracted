@@ -1,0 +1,15 @@
+		CHANGELOG
+ v. 0.1
+	Initial Release
+ v. 0.2
+	New hash %alloptions
+	new hash %kimdabaconfig (to access the size of the thumbnails, or such things)
+	new hash %membergroups
+ v. 0.3
+	askforpictures() wonderful embedded perl interpretor
+	little bug in match*()
+	makekimfile : we don't update the db directly, but create a .kim file
+	let_me_draganddrop_pictures();	<== good integration with Kimdaba.
+ v. 0.4
+	lot of changes to clean up it all before entering CPAN
+	First version on CPAN

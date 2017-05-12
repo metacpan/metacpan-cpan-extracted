@@ -1,0 +1,35 @@
+IPDevice version 0.01
+=====================
+IPDevice provides modules for holding informations regarding IP devices;
+currently, Cisco and Juniper routers are supported.
+
+If you are lucky, I have been sedulous enough to create a project page
+on my homepage. Have a look at http://www.debain.org.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEVELOPMENT
+
+Development is primarily done in an environment where CVS access to
+public internet severs does exist. Thus, the code in CVS may be
+outdated. If you are interested in development, contact one of the
+authors (see AUTHORS).
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  -none-
+
+COPYRIGHT AND LICENCE
+
+License: See the COPYING file shipped along with this package.
+
+Copyright (C) 2004 Samuel Abels

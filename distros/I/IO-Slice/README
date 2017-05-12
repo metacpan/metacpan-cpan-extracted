@@ -1,0 +1,203 @@
+NAME
+    IO::Slice - restrict reads to a range in a file
+
+VERSION
+    version 0.2
+
+SYNOPSIS
+       use IO::Slice;
+
+       # Define a slice based on a file
+       my $sfh = IO::Slice->new(
+          filename => '/path/to/file',
+          offset   => 13,
+          length   => 16,
+       );
+
+       # Ditto, based on a previously available filehandle $fh. The
+       # filehandle MUST be seekable.
+       my $sfh = IO::Slice->new(
+          fh     => $fh,
+          offset => 13,
+          length => 16,
+       );
+
+       # Both the filehandle and the filename can be provided. The
+       # filehandle will win.
+       my $sfh = IO::Slice->new(
+          fh       => $fh,
+          filename => '/path/to/file',
+          offset   => 13,
+          length   => 16,
+       );
+
+       # Whatever, you can use $sfh as any other filehandle, mostly.
+
+DESCRIPTION
+    This module allows the definition of a filehandle that only works on a
+    slice of an input file. The "new" method provides back a GLOB that can
+    be used as any other filehandle, mostly, with the notable exception of
+    some methods like "stat", "fileno" and the tracking of the input lines.
+
+       my $sfh = IO::Slice->new(
+          filename => '/path/to/file',
+          offset   => 13,
+          length   => 16,
+       );
+
+    The provided handle works only for reading, not for writing.
+
+    The parameters that you can pass to the constructor are:
+
+    *   the source of data. This can be provided by either a filename
+        (through the "filename" key) or a filehandle (through the "fh" key).
+        If both are provided, the filehandle will take precedence for
+        getting the data.
+
+    *   the "offset", specifying an offset where the slice starts. 0 means
+        the start of the file
+
+    *   the "length", specifying the number of bytes in the slice
+
+METHODS
+  new
+    create a new IO::Slice object.
+
+    Parameters can be passed either as an hash reference or key-value pairs.
+    Useful parameters are:
+
+    "offset"
+        set the offset of the slice from the start of file. This is
+        mandatory
+
+    "length"
+        set the length of the slice. This is mandatory.
+
+    Neither "offset" nor "length" are tested for correctness against the
+    file.
+
+    You have to provide at least one of "fh" and "filename" so that the data
+    source can be reached. If you provide both, "fh" will used for taking
+    the data.
+
+    Returns the object. Throws an exception in case of errors.
+
+  open
+    open a slice. Parameters are the same as the "new" method.
+
+  close
+    close the tied handle and the associated object.
+
+  opened
+    assess whether the object is associated to an opened file
+
+  binmode
+    support the binmode method... but in a fake way, does not accept
+    anything actually.
+
+  getc
+    get one byte from the input stream.
+
+  ungetc
+    release one byte back into the input stream
+
+  eof
+    test whether there are still bytes to read or we are at the end of the
+    file
+
+  pos
+    accessor for the position. It allows you to set the position by passing
+    an input parameter, and to retrieve the current position.
+
+  seek
+    set current position in the stream. Two positional parameters are
+    accepted:
+
+    *   offset
+
+        specifies the offset to use
+
+    *   whence
+
+        specifies the reference point for applying the offset
+
+    Both are consistent with what you find in CORE::seek documentation.
+
+  tell
+    get current position in the stream.
+
+  do_read
+    convenience function around "read". Takes as input the count of needed
+    bytes and outputs a string that is the result of the underlying "read",
+    without requiring you to provide a buffer.
+
+  getline
+    get a line from the input. Returns a single scalar with one line.
+
+    This honors $/ (aka $INPUT_RECORD_SEPARATOR), so *line* might not be
+    what you generally consider a line.
+
+  getlines
+    list-version for getting lines, propedeutic to READLINE
+
+  read
+    read bytes from the stream. The interface is the same as the CORE::read
+    function, with the following positional parameters:
+
+    *   filehandle
+
+        mandatory parameter
+
+    *   buffer
+
+        mandatory parameter
+
+    *   offset
+
+        optional parameter, used for putting data into the buffer
+
+    Returns undef if errors arise or end of file. Returns number of read
+    characters otherwise (0 if end of file).
+
+  sysseek
+    alias of "seek"
+
+  sysread
+    alias for "read"
+
+  Nullified Functions
+    The following functions are defined but don't actually do anything.
+
+    print
+    printflush
+    printf
+    fileno
+    error
+    clearerr
+    sync
+    write
+    setbuf
+    setvbuf
+    untaint
+    autoflush
+    fcntl
+    ioctl
+    input_line_number
+
+SEE ALSO
+    This module is heavily inspired (and in some places based) on code from
+    "IO::String" 1.08 by Gisle Aas.
+
+AUTHOR
+    Flavio Poletti <polettix@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2014 by Flavio Poletti <polettix@cpan.org>
+
+    This module is free software. You can redistribute it and/or modify it
+    under the terms of the Artistic License 2.0.
+
+    This program is distributed in the hope that it will be useful, but
+    without any warranty; without even the implied warranty of
+    merchantability or fitness for a particular purpose.
+

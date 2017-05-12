@@ -1,0 +1,9 @@
+\.git/
+cover_db/
+.*\.bak
+blib/
+pm_to_blib
+\..*\.swp
+MYMETA.yml
+MYMETA.json
+Makefile$

@@ -1,0 +1,134 @@
+ikiwiki-plugin-syntax (0.25) unstable; urgency=low
+
+  * Added a class directive to the code injected into the html. Thanks to
+    Manoj Srivastava for the suggestion.
+  * Fix a warning in the Debian copyright file. 
+
+ -- Victor Moral <victor@taquiones.net>  Fri, 24 Apr 2009 12:01:37 +0200
+
+ikiwiki-plugin-syntax (0.24) unstable; urgency=low
+
+  * Add a new global option named syntax_use_template for enable the
+    HTML::Template module. 
+  * Fixed several bugs. 
+
+ -- Victor Moral <victor@taquiones.net>  Fri, 31 Oct 2008 09:42:44 +0100
+
+ikiwiki-plugin-syntax (0.23) unstable; urgency=low
+
+  * Fix a bug with the closed tags in Kate engine.
+
+ -- Victor Moral <victor@taquiones.net>  Wed, 29 Oct 2008 14:33:35 +0100
+
+ikiwiki-plugin-syntax (0.22) unstable; urgency=low
+
+  * Add a new global parameter for not use HTML::Template. By
+    default is disabled.
+
+ -- Victor Moral <victor@taquiones.net>  Wed, 29 Oct 2008 11:28:21 +0100
+
+ikiwiki-plugin-syntax (0.21) unstable; urgency=high
+
+  * Add a new test for check direct calls to the plugin functions.
+  * Fix a fatal bug in the preprocess function. It always returns a exception.
+  * Fix a bug in the detect language mechanism.
+  * Add a empty parameter in the first call to gettext. 
+  * The preprocess function can change the engine at runtime. Not documented
+    parameter yet.
+  * Fixed a bug in the templates.
+
+ -- Victor Moral <victor@taquiones.net>  Thu, 03 Apr 2008 10:31:03 +0200
+
+ikiwiki-plugin-syntax (0.20) unstable; urgency=low
+
+  * New features:
+    + Don't need external modules for a minimal installation
+    + The third party module can be selected on runtime.
+    + New templates:
+        - syntax for syntax highlight block text.
+        - syntax_info for build a informational table about the external
+        module capabilities.
+
+ -- Victor Moral <victor@taquiones.net>  Mon, 31 Mar 2008 19:37:59 +0200
+
+ikiwiki-plugin-syntax (0.14) unstable; urgency=high
+
+  * Remove the last call to the gettext library.
+  * Updated the debian/copyright file to the UTF-8 character set and the new
+    FSF postal address.
+
+ -- Victor Moral <victor@taquiones.net>  Tue, 29 Jan 2008 12:36:50 +0100
+
+ikiwiki-plugin-syntax (0.13) unstable; urgency=low
+
+  * Add a minimal ikiwiki setup in the test program.
+  * Changes in htmllink call: add a hash with the last parameters
+  * Minor bugfixes in select syntax language
+
+ -- Victor Moral <victor@taquiones.net>  Fri, 30 Mar 2007 08:53:27 +0200
+
+ikiwiki-plugin-syntax (0.12) unstable; urgency=low
+
+  * Remove the use of gettext functions because the debian testing versions is
+    too old
+  * Try with some variations of the language parameter for easy use of the
+    plugin
+
+ -- Victor Moral <victor@taquiones.net>  Thu, 15 Feb 2007 10:23:35 +0100
+
+ikiwiki-plugin-syntax (0.11) unstable; urgency=low
+
+  * Added a minor support for old sintax
+  * Disable the gettext mechanism for use with Debian testing
+
+ -- Victor Moral <victor@taquiones.net>  Mon, 19 Mar 2007 16:26:11 +0100
+
+ikiwiki-plugin-syntax (0.10) unstable; urgency=low
+
+  * Switch to the new syntax highlight engine based in Kate program.
+
+ -- Victor Moral <victor@taquiones.net>  Mon, 29 Jan 2007 16:35:17 +0100
+
+ikiwiki-plugin-syntax (0.9) unstable; urgency=low
+
+  * Add a force_subpage parameter for link build
+  * Fix a bug in syntax page link
+  * Documented a bug with markdown indented text
+  * Documented the syntax directive 
+
+ -- Victor Moral <victor@taquiones.net>  Tue, 14 Nov 2006 12:10:21 +0100
+
+ikiwiki-plugin-syntax (0.8) unstable; urgency=low
+
+  * Minor corrections on file/page dependencies
+  * Add a few tests
+
+ -- Victor Moral <victor@taquiones.net>  Tue, 14 Nov 2006 08:54:36 +0100
+
+ikiwiki-plugin-syntax (0.7) unstable; urgency=low
+
+  * Change license to GPL
+  * Minor corrections about numering lines
+  * The file parameter is now limited to ikiwiki source pages
+
+
+ -- Victor Moral <victor@taquiones.net>  Tue, 24 Oct 2006 11:56:41 +0200
+
+ikiwiki-plugin-syntax (0.6) unstable; urgency=low
+
+  * Added a line number parameter and a new style 'synLineNumber'
+
+ -- Victor Moral <victor@taquiones.net>  Fri, 20 Oct 2006 11:50:59 +0200
+
+ikiwiki-plugin-syntax (0.5) unstable; urgency=low
+
+  * Convert source code to UTF 8
+
+ -- Victor Moral <victor@taquiones.net>  Thu, 19 Oct 2006 10:24:30 +0200
+
+ikiwiki-plugin-syntax (0.4) unstable; urgency=low
+
+  * First version packaged.
+
+ -- Victor Moral <victor@taquiones.net>  Wed, 18 Oct 2006 12:31:51 +0200
+

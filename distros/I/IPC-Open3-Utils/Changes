@@ -1,0 +1,54 @@
+Revision history for IPC-Open3-Utils
+
+0.91 Sun Dec  1 12:38:58 2013
+    - rt 67389: remove handles from IO::Select when we hit their eof and close them (thanks SCOTT)
+
+0.9  Sun Dec  1 12:00:55 2013
+    - rt 91094
+        - fixed $! errouneously set to 9
+        - child_error_exit_value() factor in child_error_failed_to_execute()
+        - open3 error is from eval so we can't avoid “ … at …”
+        - avoid uninit warning
+        
+0.8  Fri May 21 05:33:21 2010
+    - catch open3 fatalities better (prompted by CPAN reports)
+    - POD typo
+
+0.7  Tue May 18 23:17:12 2010
+    - rt 57609: add 'timeout' attributes
+    - handler fatalities caught and put in $@
+    - rt 57612: support array and code ref in pre_read_print_to_stdin
+    
+0.6  Wed May  5 23:15:58 2010
+    - drop wrapper script (and related child_error[_] args hr keys), it is not needed to get $? and $! properly
+    - document pre_read_print_to_stdin
+    - perltidy
+    - when cmd is empty set $? to 65280 like system()
+
+0.5  Mon May 18 21:23:49 2009
+    - check for "stderr weirdness" situation and skip tests for now, added TODO for more investigation
+    - moved 'ignore_handle' logic to after the read to eliminate possibility it'd block (but it's still ignored of course)
+    - added 'pre_read_print_to_stdin' key
+    - do locale SIG PIPE to be able to close handles when the command does SIG PIPE to avoid silently killing your script via race 
+        (print to command's stdin after it's exited)
+
+0.4  Sat May 16 14:21:57 2009
+    - tests, use $^X instead of hardcoded path, hack to fix timing issue on certain systems
+    - waitpid() call to after close()
+    - Added TODO list
+
+0.3  Thu Dec 11 19:27:53 CST 2008
+    - 00.load.t - just skip all when unprivileged to avoid mis calculation/run of tests
+    - 00.load.t - try and account for IO::Select behavior and single output ref results in tests
+    - 00.load.t - invoke perl in tests as $^X to address 'Can't locate Devel/Autoflush.pm in @INC' and friends
+    - 00.load.t - comment out unnecessary (for now) eval/skip just to be on the safe side
+    - 00.load.t - add ';' to end of a SKIP block w/out one just to be on the safe side
+    
+0.2  Tue Dec  9 22:49:42 2008
+    - EXPORT info to POD
+    - run_cmd() and put_cmd_in() exported by default
+    - change BAIL_OUT to SKIP in tests
+    
+0.1  Tue Nov  4 16:53:48 2008
+       Initial release.
+

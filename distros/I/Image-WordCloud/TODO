@@ -1,0 +1,46 @@
+2/9/2012
+* [TESTS] Add tests for _collision_sides()
+
+2/7/2012
+* [BUG] Now that we are "nicely" choosing the max font size with
+  _max_font_size(), words aren't completely fitting within the bounds of the
+  image. We need to somehow scale the words down to fill the total area we
+  have to play with.
+
+2/6/2012
+* [FEATURE] Add padding around edges of image so words don't border up against
+  it. [done]
+* [FEATURE] Add test for 'border_padding' option [done]
+* [FEATURE] Need to alter number of words shown on an image based on the image
+	size and bounds. We can't fit 70 words in a 200x200
+* [OPTIMIZATION] Run time of cloud() increases as the image size increases.  In
+  fact the run time of M::P::TheodorusSpiral::n_to_xy() doubles when the image
+  doubles. This is because M::P::TheodorusSpiral has to cover a much larger
+  area and thus gets more iterations (calls). A 500x500 image makes 6709
+  calls n_to_xy(), a 1000x1000 image makes 22,987 calls, and a 2000x2000 image
+  makes 44,261 calls.
+  - Can't fix this! Internally n_to_xy() has to run over each iteration.
+    Increasing our incrementer just makes the internals spin MILLIONS of times
+    to catch up, rather than just keeping in line with the calls we make. It
+    actually takes LONGER to call it less, if we increment by more than 1.
+
+2/3/2012
+* Add untaint options to validate() for file and dir paths
+* Put test scripts in proper order. Util methods needs to be
+  tested before the methods they're used in.
+* Add an optional "color_guard" option (exact name to be decided)
+  to new() that will prevent colors/hues from being used that will
+  be very close to the background color and cause it to look bad.
+  Like right now with the background of 40,40,40 dark blues and
+  purples don't look good.
+
+2/2/2012
+* A words' font size needs to be scaled to fit inside the
+  image (long words) [done]
+
+1/30/2012
+* Allow font_path to take a list of paths
+
+1/27/2012
+* Use hierarchical bounding boxes for word collisions
+* Allow a Color::Scheme object to be passed in for colors

@@ -1,0 +1,29 @@
+[Changes for 0.05 - June 13, 2004]
+
+Adapt to Language::MzScheme 0.05's auto-context -- now we don't
+need to use (car ...) on perl calls that returns one value.
+
+[Changes for 0.04 - June 11, 2004]
+
+Improved documentations and tests.
+
+Now exports all global user-defined symbols into Perl.
+
+Perl objects and subroutines may also be imported into Scheme.
+
+Invoking Perl object methods from Scheme now works.
+
+[Changes for 0.03 - June 9, 2004]
+
+Change to adapt to 0.03's API.
+
+[Changes for 0.02 - June 7, 2004]
+
+Uses Language::MzScheme 0.02's new functions, like SCHEME_PROCP(),
+to speed up procedure mapping process.
+
+Fixed documentations.
+
+[Changes for 0.01 - June 7, 2004]
+
+Initial CPAN Release.

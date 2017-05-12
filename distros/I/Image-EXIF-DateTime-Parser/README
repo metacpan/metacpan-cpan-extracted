@@ -1,0 +1,38 @@
+Image::EXIF::DateTime::Parser
+=============================
+
+Purpose
+-------
+
+This module provides a parser for "DateTime" strings as defined in
+Exchangeable image file format for digital still cameras:
+  Exif Version 2.2
+  Section 4.6.4 "TIFF Revision 6.0 Attribute information"
+  Subsection D. "Other Tags", DateTime
+
+Apart from parsing the strings that conform to the specification, this
+module tries to decipher some non-compliant strings which certain
+implementations produce.  Examples of supported deviations can be
+found in the unit tests for this module.
+
+Installation
+------------
+
+Please follow the procedure described in the perlmodinstall(1) manual
+page.
+
+Copyright
+---------
+
+Copyright 2009 Marcin Owsiany <marcin@owsiany.pl>
+
+License
+-------
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or (at
+your option) any later version.
+
+
+ vim: tw=70

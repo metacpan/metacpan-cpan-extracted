@@ -1,0 +1,95 @@
+#!/usr/bin/perl -w
+###########################################
+# run-cached
+# Mike Schilli, 2007 (m@perlmeister.com)
+###########################################
+use strict;
+
+use IPC::Cmd::Cached;
+use Getopt::Std;
+use Log::Log4perl qw(:easy);
+use Pod::Usage;
+
+getopts("cv", \my %opts);
+
+if(!@ARGV) {
+    pod2usage("No command given");
+}
+
+my $level = $INFO;
+
+if($opts{v}) {
+    $level = $DEBUG;
+}
+Log::Log4perl->easy_init($level);
+
+my $runner = IPC::Cmd::Cached->new();
+my $cmd    = "@ARGV";
+
+my ($success, $error_code, $full_buf, $stdout_buf, $stderr_buf);
+
+if($opts{c}) {
+    ($success, $error_code, $full_buf, $stdout_buf, $stderr_buf) =
+      $runner->run_cached(command => $cmd);
+    if(defined $success) {
+        print @$stdout_buf;
+        exit 0;
+    } else {
+        die "No cached result found";
+    }
+} 
+
+($success, $error_code, $full_buf, $stdout_buf, $stderr_buf) =
+  $runner->run(command => $cmd);
+
+if(defined $success) {
+    print @$stdout_buf;
+}
+
+__END__
+
+=head1 NAME
+
+    run-cached - Run commands cached and uncached
+
+=head1 SYNOPSIS
+
+    run-cached unix command
+    run-cached -c unix command
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-c>
+
+Print a cached result of the given command if available
+
+=back
+
+=head1 DESCRIPTION
+
+If called without the C<-c> option, C<run-cached> just runs the command
+passed to it and caches its result.
+
+Called with the C<-c> option afterwards, it will I<not> run the command
+given, but print its cached results, given that the cache hasn't 
+expired (which typically happens after 24 hours).
+
+=head1 EXAMPLES
+
+    # Fill the cache:
+  $ run-cached find /tmp -type f -print
+
+    # Print the cached results:
+  $ run-cached -c find /tmp -type f -print
+
+=head1 LEGALESE
+
+Copyright 2007 by Mike Schilli, all rights reserved.
+This program is free software, you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+2007, Mike Schilli <cpan@perlmeister.com>

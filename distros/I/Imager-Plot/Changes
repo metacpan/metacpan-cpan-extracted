@@ -1,0 +1,40 @@
+Revision history for Perl extension Imager::CoolPlot.
+
+0.01  Sat Jan  1 06:17:24 2000
+      - original version; created by h2xs 1.19
+	Basic code done - font handling and many 
+	other things are broken.
+
+0.02  Mon Jan  3 22:28:40 2000
+      - minor fixes - added number formatting capabilities.
+
+0.03  Wed Jun 13 02:30:30 EDT 2001
+      - Added The classes, multiple plots on image, render
+	axis at arbitrary location.  Line styles (which only support
+	normal colored lines antialiased or not.  Work to 
+	implement grids and ticsk has been done but not finalized.
+	Currently only one very poor test case exists.
+
+0.04  Tue Nov 20 19:26:36 EST 2001
+      - Seperated the data into files.  Removed the multiplot option
+        for now.  Better modularity.  Lots of API still incomplete.
+
+0.05  Tue Jan 29 13:52:29 EST 2002
+      - Fixed some axis flipping - thanks to John Reuning and 
+	Theo Van Dinter for sending patches.
+
+0.06  Tue May 14 06:00:28 EDT 2002
+	- Corrected many things which gave warnings due to typos in
+	hash member names.
+
+0.07  
+	- Lots of large fixes, mostly rewriten documentation,
+	new samples in samples/*.pl.  Callback capabilities for
+	ticklabels.
+
+0.08   Sat Jul 13 13:38:09 2002
+	- Extra samples, minor fixes, improved font handling,
+	better installation code.
+
+0.09
+	- New filled drawing style. (from simon).   

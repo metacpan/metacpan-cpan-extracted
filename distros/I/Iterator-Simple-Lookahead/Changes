@@ -1,0 +1,32 @@
+0.07	2015-05-27
+
+	Other
+	* Converted archive to git
+
+0.06	2014-04-29
+
+	Bug Fixes
+	* RT #95114: Requires Perl 5.16.1?
+	  Requirement for Perl 5.16.1 was not necessary, decreased to 5.8.0
+	  (needed by Class::XSAccessor)
+
+0.05	2013-07-26
+	Other
+	* Benchmark implementations and revert to fastest that allows subclassing, version 0.02
+
+0.04	2013-07-24
+	Other
+	* Only call unget() from new() if needed
+
+0.03	2013-07-19
+	Other
+	* Simplified peek() by moving logic to the iterator created in unget()
+	* More tests
+
+0.02	2013-07-17
+	Feature Changes
+	* Implement as blessed hash to allow sub-classing
+
+0.01  2013-07-15
+	* original version
+

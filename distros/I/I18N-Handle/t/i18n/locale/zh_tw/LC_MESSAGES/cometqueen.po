@@ -1,0 +1,976 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: lib/CometQueen/View/Admin/Bot.pm:28
+msgid " (NONE) "
+msgstr ""
+
+#: lib/CometQueen/View/Admin/SurveyStat.pm:103 lib/CometQueen/View/Admin/SurveyStat.pm:159 lib/CometQueen/View/Admin/SurveyStat.pm:83
+msgid " pt"
+msgstr " 分"
+
+#: lib/CometQueen/Handler.pm:126 lib/CometQueen/Handler.pm:127 lib/CometQueen/Handler/AdminView.pm:14 lib/CometQueen/Handler/AdminView.pm:15
+msgid "Access Denied."
+msgstr ""
+
+#: lib/MovieMana/View.pm:110 lib/MovieMana/View.pm:21
+msgid "Add"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Bot.pm:73
+msgid "Add Class"
+msgstr ""
+
+#: lib/Survey/Templates.pm:664
+msgid "Add Topic"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/User.pm:144
+msgid "Address:"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Chatlog.pm:59
+msgid "All"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Chatlog.pm:113
+msgid "All Chatlog"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Sentence.pm:103 lib/CometQueen/View/Admin/Sentence.pm:275
+msgid "Answer"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/SentenceResponse.pm:183
+msgid "Approve"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/SentenceResponse.pm:169
+msgid "Approved"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Bot.pm:142
+msgid "Assign Channel"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Bot.pm:108 lib/CometQueen/View/Admin/Channel.pm:94 lib/CometQueen/View/Admin/User.pm:81
+msgid "Assign Group"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Bot.pm:113
+msgid "Assign channel"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Bot.pm:86 lib/CometQueen/View/Admin/Channel.pm:72 lib/CometQueen/View/Admin/User.pm:56
+msgid "Assign group"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/SurveyStat.pm:59
+msgid "Average"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/SurveyStat.pm:27
+msgid "Back"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Config.pm:52
+msgid "Backlog"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Group.pm:84
+msgid "Belongs to:"
+msgstr ""
+
+#: lib/CometQueen/View/Admin.pm:124 lib/CometQueen/View/Admin/BotTrigger.pm:36
+msgid "Bot"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Config.pm:84
+msgid "Bot BackEnd"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Bot.pm:194
+msgid "Bot Ident:"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Bot.pm:201
+msgid "Bot Name:"
+msgstr ""
+
+#: lib/CometQueen/View/Admin.pm:131
+msgid "Bot Triggers"
+msgstr ""
+
+#: lib/CometQueen/Dispatcher.pm:14
+msgid "Bot mode has changed to "
+msgstr ""
+
+#: lib/CometQueen/View/Admin/BotTrigger.pm:117
+msgid "Bot:"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Chatlog.pm:106
+msgid "By Channel: "
+msgstr ""
+
+#: lib/CometQueen/View/Admin/BotTrigger.pm:153
+msgid "Callback Name"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/BotTrigger.pm:122
+msgid "Callback:"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/BotTrigger.pm:37
+msgid "Callbacks"
+msgstr ""
+
+#: lib/Automan.pm:342
+msgid "Can not connect to zhapi"
+msgstr ""
+
+#: lib/Automan/Sentence.pm:168
+msgid "Can not connect to zhapi."
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Sentence.pm:167
+msgid "Cancel"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Sentence.pm:232 lib/CometQueen/View/Admin/SentenceResponse.pm:85
+msgid "Category"
+msgstr ""
+
+#: lib/CometQueen/View/Admin.pm:122 lib/CometQueen/View/Admin/Chatlog.pm:123 lib/CometQueen/View/Admin/Chatlog.pm:88
+msgid "Channel"
+msgstr ""
+
+#: lib/CometQueen/View.pm:45
+msgid "Channel List"
+msgstr ""
+
+#: lib/CometQueen/View.pm:53 lib/CometQueen/View/Admin/Channel.pm:40
+msgid "Channel Name"
+msgstr ""
+
+#: lib/CometQueen/Handler/ChatRoom.pm:76 lib/CometQueen/Handler/ChatRoom.pm:77
+msgid "Channel is not available."
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Channel.pm:119 lib/CometQueen/View/Admin/Channel.pm:158
+msgid "Channel name:"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Config.pm:51
+msgid "ChannelFree"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Config.pm:77
+msgid "Chat client scan interval"
+msgstr ""
+
+#: lib/CometQueen/Handler/ChatRoom.pm:16
+msgid "Chat: "
+msgstr ""
+
+#: lib/Survey/Templates.pm:652
+msgid "Chatbot Admin Page"
+msgstr ""
+
+#: lib/CometQueen/View/Admin.pm:137
+msgid "Chatlog"
+msgstr ""
+
+#: lib/CometQueen/View.pm:142
+msgid "Chatroom"
+msgstr ""
+
+#: lib/CometQueen/View.pm:170
+msgid "Chatroom page for PDA."
+msgstr ""
+
+#: lib/CometQueen/View/Admin/ZhAPI.pm:17
+msgid "Checking ZH API connection ..."
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Sentence.pm:126 lib/CometQueen/View/Admin/Sentence.pm:283 lib/CometQueen/View/Admin/Sentence.pm:38
+msgid "Class"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/SentenceClass.pm:20
+msgid "Class Description"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/SentenceClass.pm:16
+msgid "Class Name"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Bot.pm:31
+msgid "Classes"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Config.pm:54
+msgid "ClientScanInt"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Config.pm:53
+msgid "ClientTimeout"
+msgstr ""
+
+#: lib/CometQueen/View.pm:210
+msgid "Close"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Channel.pm:178
+msgid "Close Time"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Channel.pm:62
+msgid "Close time"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Bot.pm:224 lib/CometQueen/View/Admin/Bot.pm:26 lib/CometQueen/View/Admin/EmotionType.pm:44
+msgid "Color"
+msgstr ""
+
+#: lib/MovieMana/View.pm:102
+msgid "Comment"
+msgstr ""
+
+#: lib/CometQueen/View/Admin.pm:119
+msgid "Config"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Sentence.pm:154 lib/CometQueen/View/Admin/Sentence.pm:159 lib/CometQueen/View/Admin/Sentence.pm:297
+msgid "Confirmed"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Emotion.pm:58
+msgid "Contains"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/CRUD.pm:120 lib/CometQueen/View/Admin/Emotion.pm:79 lib/CometQueen/View/Admin/Sentence.pm:185
+msgid "Create "
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Channel.pm:115 lib/CometQueen/View/Admin/Channel.pm:33
+msgid "Create Channel"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Channel.pm:24 lib/CometQueen/View/Admin/User.pm:20
+msgid "Create One?"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/User.pm:102 lib/CometQueen/View/Admin/User.pm:29
+msgid "Create User"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Bot.pm:24
+msgid "Created On"
+msgstr ""
+
+#: lib/CometQueen/View.pm:65 lib/CometQueen/View/Admin/Channel.pm:52
+msgid "Created on"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/File.pm:24
+msgid "Created time"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/SurveyStat.pm:111
+msgid "Custom Questions"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/BotTrigger.pm:35
+msgid "Data"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Bot.pm:152 lib/CometQueen/View/Admin/BotTrigger.pm:54 lib/CometQueen/View/Admin/BotTrigger.pm:76 lib/CometQueen/View/Admin/Channel.pm:103 lib/CometQueen/View/Admin/Emotion.pm:30 lib/CometQueen/View/Admin/EmotionType.pm:25 lib/CometQueen/View/Admin/File.pm:34 lib/CometQueen/View/Admin/Group.pm:40 lib/CometQueen/View/Admin/Sentence.pm:54 lib/CometQueen/View/Admin/SentenceClass.pm:30 lib/CometQueen/View/Admin/SentenceResponse.pm:178 lib/CometQueen/View/Admin/User.pm:90
+msgid "Delete"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/SentenceClass.pm:48
+msgid "Description"
+msgstr ""
+
+#: lib/CometQueen/View.pm:56 lib/CometQueen/View.pm:58 lib/CometQueen/View/Admin/Channel.pm:43 lib/CometQueen/View/Admin/Channel.pm:45
+msgid "Disabled"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/SurveyStat.pm:38
+msgid "Downlaod CSV"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/User.pm:50
+msgid "E-mail"
+msgstr ""
+
+#: lib/CometQueen/View.pm:186
+msgid "ERROR"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Bot.pm:156 lib/CometQueen/View/Admin/BotTrigger.pm:61 lib/CometQueen/View/Admin/BotTrigger.pm:80 lib/CometQueen/View/Admin/Channel.pm:107 lib/CometQueen/View/Admin/Emotion.pm:35 lib/CometQueen/View/Admin/EmotionType.pm:30 lib/CometQueen/View/Admin/Group.pm:35 lib/CometQueen/View/Admin/Sentence.pm:59 lib/CometQueen/View/Admin/SentenceClass.pm:35 lib/CometQueen/View/Admin/User.pm:94
+msgid "Edit"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Channel.pm:151
+msgid "Edit Channel"
+msgstr ""
+
+#: lib/CometQueen/View.pm:285
+msgid "Edit Response"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/User.pm:137
+msgid "Email:"
+msgstr ""
+
+#: lib/CometQueen/View/Admin.pm:125 lib/CometQueen/View/Admin/EmotionType.pm:39
+msgid "Emotion"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/EmotionType.pm:18
+msgid "Emotion Color"
+msgstr ""
+
+#: lib/CometQueen/View/Admin.pm:126 lib/CometQueen/View/Admin/Emotion.pm:16 lib/CometQueen/View/Admin/Emotion.pm:45 lib/CometQueen/View/Admin/EmotionType.pm:17
+msgid "Emotion Type"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Config.pm:72
+msgid "Enable Crontab events"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Config.pm:81
+msgid "Enable Error Report"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Config.pm:80
+msgid "Enable ReCaptcha Authentication"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Config.pm:73
+msgid "Enable ZhAPI parsing"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Config.pm:70
+msgid "Enable bots"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Config.pm:75
+msgid "Enable channel backlog"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Config.pm:47
+msgid "EnableBots"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Config.pm:48
+msgid "EnableChatlog"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Config.pm:49
+msgid "EnableCron"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Config.pm:50
+msgid "EnableZhAPI"
+msgstr ""
+
+#: lib/Automan/Sentence.pm:168
+msgid "Error."
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Config.pm:58
+msgid "ErrorReport"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/BotTrigger.pm:33
+msgid "Event"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/BotTrigger.pm:108
+msgid "Event data:"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/BotTrigger.pm:102
+msgid "Event name:"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/BotTrigger.pm:104
+msgid "Event type:"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Chatlog.pm:101 lib/CometQueen/View/Admin/Emotion.pm:85 lib/CometQueen/View/Admin/Sentence.pm:204
+msgid "Export CSV"
+msgstr ""
+
+#: lib/CometQueen/View.pm:264
+msgid "Fallacious"
+msgstr ""
+
+#: lib/CometQueen/View/Admin.pm:136 lib/MovieMana/View.pm:84
+msgid "File"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/File.pm:15
+msgid "File List"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/File.pm:19
+msgid "Filename"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Sentence.pm:221
+msgid "Filtering"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/User.pm:150
+msgid "First Name:"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/User.pm:48
+msgid "First name"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Config.pm:83
+msgid "Footer HTML"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/BotTrigger.pm:112
+msgid "For Join event type, data is the joined channel."
+msgstr ""
+
+#: lib/CometQueen/View/Admin/BotTrigger.pm:114
+msgid "For Match text event type, data is the pattern."
+msgstr ""
+
+#: lib/CometQueen/View/Admin/BotTrigger.pm:113
+msgid "For Time event type, data is the time."
+msgstr ""
+
+#: lib/CometQueen/View/Admin/BotTrigger.pm:189
+msgid "For message type callbacks, set prefix \"#channel_name:\" in data to send message to specified channel."
+msgstr ""
+
+#: lib/CometQueen/View/Admin.pm:121 lib/CometQueen/View/Admin/Bot.pm:80 lib/CometQueen/View/Admin/User.pm:52 lib/MovieMana/View.pm:96
+msgid "Group"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Group.pm:63
+msgid "Group Name"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Group.pm:83
+msgid "Group name:"
+msgstr ""
+
+#: lib/CometQueen/View.pm:69 lib/CometQueen/View/Admin/Channel.pm:67
+msgid "Groups"
+msgstr ""
+
+#: lib/I18N/Handle.pm:143 lib/I18N/Handle.pm:157
+msgid "Hello world"
+msgstr ""
+
+#: lib/Automan.pm:557
+msgid "I dont know what to say"
+msgstr ""
+
+#: lib/CometQueen/View.pm:52 lib/CometQueen/View/Admin/Bot.pm:21 lib/CometQueen/View/Admin/BotTrigger.pm:32 lib/CometQueen/View/Admin/Channel.pm:39 lib/CometQueen/View/Admin/User.pm:46
+msgid "Id"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Bot.pm:23
+msgid "Ident"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/BotTrigger.pm:105
+msgid "Join"
+msgstr ""
+
+#: lib/CometQueen/View.pm:364 lib/CometQueen/View/Admin/SentenceResponse.pm:160
+msgid "K"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Emotion.pm:20
+msgid "Keyword"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Emotion.pm:107
+msgid "Keyword:"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/User.pm:156
+msgid "Last Name:"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/User.pm:49
+msgid "Last name"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/SurveyStat.pm:49
+msgid "Likert Questions"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Chatlog.pm:27
+msgid "List Channel Log"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/SurveyStat.pm:188
+msgid "List Topic"
+msgstr ""
+
+#: lib/CometQueen/View.pm:104 lib/CometQueen/View.pm:126 lib/CometQueen/View/Admin.pm:72
+msgid "Login"
+msgstr ""
+
+#: lib/CometQueen/View.pm:97 lib/CometQueen/View/Admin.pm:61 lib/CometQueen/View/Admin.pm:64
+msgid "Login failed."
+msgstr ""
+
+#: lib/CometQueen/View/Admin.pm:93 lib/Survey/Templates.pm:655
+msgid "Logout"
+msgstr ""
+
+#: lib/MovieMana/View.pm:15
+msgid "Manage Movie"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Config.pm:82
+msgid "Max Message Length"
+msgstr ""
+
+#: lib/CometQueen/View.pm:55 lib/CometQueen/View/Admin/Channel.pm:131 lib/CometQueen/View/Admin/Channel.pm:186 lib/CometQueen/View/Admin/Channel.pm:42
+msgid "Max Users"
+msgstr ""
+
+#: lib/CometQueen/View.pm:239 lib/CometQueen/View.pm:246 lib/CometQueen/View.pm:253
+msgid "More"
+msgstr ""
+
+#: lib/MovieMana/View.pm:159
+msgid "Movie Uploaded"
+msgstr ""
+
+#: lib/MovieMana/View.pm:146
+msgid "Movie not found."
+msgstr ""
+
+#: lib/CometQueen/View.pm:151 lib/CometQueen/View/Admin/Bot.pm:22 lib/CometQueen/View/Admin/Chatlog.pm:121 lib/CometQueen/View/Admin/Chatlog.pm:86 lib/CometQueen/View/Admin/SentenceClass.pm:43
+msgid "Name"
+msgstr ""
+
+#: lib/MovieMana/View.pm:95
+msgid "Only Self"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Channel.pm:170
+msgid "Open Time"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Config.pm:74
+msgid "Open channel"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Channel.pm:57
+msgid "Open time"
+msgstr ""
+
+#: lib/CometQueen/View.pm:111 lib/CometQueen/View/Admin.pm:79
+msgid "Password"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/User.pm:134
+msgid "Password Confirm:"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/User.pm:131
+msgid "Password:"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Sentence.pm:150 lib/CometQueen/View/Admin/Sentence.pm:153 lib/CometQueen/View/Admin/Sentence.pm:158 lib/CometQueen/View/Admin/Sentence.pm:294 lib/CometQueen/View/Admin/Sentence.pm:296 lib/CometQueen/View/Admin/SentenceResponse.pm:164 lib/CometQueen/View/Admin/SentenceResponse.pm:188 lib/CometQueen/View/Admin/SentenceResponse.pm:99
+msgid "Pending"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/BotTrigger.pm:111
+msgid "Please insert time or text in data field."
+msgstr ""
+
+#: lib/MovieMana/View.pm:91
+msgid "Privacy"
+msgstr ""
+
+#: lib/CometQueen/View.pm:60 lib/CometQueen/View.pm:62 lib/CometQueen/View/Admin/Channel.pm:135 lib/CometQueen/View/Admin/Channel.pm:190 lib/CometQueen/View/Admin/Channel.pm:47 lib/CometQueen/View/Admin/Channel.pm:49
+msgid "Private"
+msgstr ""
+
+#: lib/CometQueen/View.pm:62 lib/CometQueen/View/Admin/Channel.pm:49 lib/MovieMana/View.pm:97
+msgid "Public"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Config.pm:79
+msgid "Push Ping event to clients from server."
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Sentence.pm:268 lib/CometQueen/View/Admin/Sentence.pm:94
+msgid "Question"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Config.pm:55
+msgid "RandomAnswer"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Config.pm:57
+msgid "ReCaptcha"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/SentenceResponse.pm:136
+msgid "Relation Id"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Sentence.pm:210
+msgid "Reload Setence Cache"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Bot.pm:46
+msgid "Remove"
+msgstr ""
+
+#: lib/CometQueen/View.pm:259
+msgid "Report for fallacious response."
+msgstr ""
+
+#: lib/CometQueen/View/Admin/SentenceResponse.pm:137
+msgid "Request Text"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/SentenceResponse.pm:193
+msgid "Reset K"
+msgstr ""
+
+#: lib/CometQueen/View.pm:249 lib/CometQueen/View.pm:357
+msgid "Response"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/SentenceResponse.pm:123
+msgid "Response Contains"
+msgstr ""
+
+#: lib/CometQueen/View.pm:235
+msgid "Response For"
+msgstr ""
+
+#: lib/CometQueen/View.pm:289
+msgid "Response Text"
+msgstr ""
+
+#: lib/CometQueen/View.pm:212
+msgid "Response Type"
+msgstr ""
+
+#: lib/CometQueen/View.pm:231
+msgid "Response detail"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Config.pm:78
+msgid "Response random answer"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/User.pm:162 lib/CometQueen/View/Admin/User.pm:51
+msgid "Role"
+msgstr ""
+
+#: lib/CometQueen/View/Admin.pm:108
+msgid "Role:"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/SentenceResponse.pm:152
+msgid "Satisfication"
+msgstr ""
+
+#: lib/CometQueen/View.pm:325 lib/CometQueen/View/Admin/Sentence.pm:165 lib/CometQueen/View/Admin/Sentence.pm:303
+msgid "Save"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Config.pm:71
+msgid "Save Chat log to database."
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Sentence.pm:112
+msgid "Score"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Sentence.pm:119
+msgid "Score by"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Chatlog.pm:18 lib/CometQueen/View/Admin/Emotion.pm:64 lib/CometQueen/View/Admin/Sentence.pm:252 lib/CometQueen/View/Admin/SentenceResponse.pm:127
+msgid "Search"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Chatlog.pm:78
+msgid "Search Result"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/BotTrigger.pm:182
+msgid "Select Survey Topic"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/BotTrigger.pm:177
+msgid "Send Text"
+msgstr ""
+
+#: lib/CometQueen/View.pm:242 lib/CometQueen/View.pm:350 lib/CometQueen/View/Admin.pm:132
+msgid "Sentence"
+msgstr ""
+
+#: lib/CometQueen/View/Admin.pm:133
+msgid "Sentence Class"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/SentenceResponse.pm:119
+msgid "Sentence Contains"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Bot.pm:209
+msgid "Sentence class:"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Config.pm:56
+msgid "ServerPushPing"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Bot.pm:169
+msgid "Start"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/SentenceResponse.pm:161
+msgid "Status"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/BotTrigger.pm:132
+msgid "Step 1: Create trigger"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/BotTrigger.pm:143
+msgid "Step 2: Create callback"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Bot.pm:164
+msgid "Stop"
+msgstr ""
+
+#: lib/CometQueen/View.pm:371
+msgid "Submit"
+msgstr ""
+
+#: lib/CometQueen/View.pm:276
+msgid "Suggest"
+msgstr ""
+
+#: lib/CometQueen/View.pm:269
+msgid "Suggest Response:"
+msgstr ""
+
+#: lib/CometQueen/View/Admin.pm:138 lib/CometQueen/View/Admin/BotTrigger.pm:178
+msgid "Survey"
+msgstr ""
+
+#: lib/CometQueen/View/Admin.pm:139
+msgid "Survey Static"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Sentence.pm:42
+msgid "Syntax data"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Chatlog.pm:124 lib/CometQueen/View/Admin/Chatlog.pm:89
+msgid "Text"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Sentence.pm:245
+msgid "Text Contains"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/BotTrigger.pm:105
+msgid "Text Match"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/BotTrigger.pm:105 lib/CometQueen/View/Admin/Chatlog.pm:125 lib/CometQueen/View/Admin/Chatlog.pm:90
+msgid "Time"
+msgstr ""
+
+#: lib/CometQueen.pm:215
+msgid "Time is not available"
+msgstr ""
+
+#: lib/MovieMana/View.pm:77
+msgid "Title"
+msgstr ""
+
+#: lib/CometQueen/View.pm:54 lib/CometQueen/View/Admin/Channel.pm:125 lib/CometQueen/View/Admin/Channel.pm:164 lib/CometQueen/View/Admin/Channel.pm:41 lib/CometQueen/View/Admin/SurveyStat.pm:119 lib/CometQueen/View/Admin/SurveyStat.pm:55
+msgid "Topic"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/CRUD.pm:97 lib/CometQueen/View/Admin/SentenceResponse.pm:62
+msgid "Total:"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/BotTrigger.pm:148
+msgid "Triggers"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/BotTrigger.pm:34 lib/CometQueen/View/Admin/Chatlog.pm:122 lib/CometQueen/View/Admin/Chatlog.pm:87
+msgid "Type"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/BotTrigger.pm:161
+msgid "Type and Data"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Emotion.pm:96
+msgid "Type:"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Sentence.pm:216
+msgid "Update Sentence Syntatics"
+msgstr ""
+
+#: lib/CometQueen/Do/UpdateSentenceData.pm:13
+msgid "Updated"
+msgstr ""
+
+#: lib/MovieMana/View.pm:73
+msgid "Upload Movie"
+msgstr ""
+
+#: lib/CometQueen/View/Admin.pm:116
+msgid "User"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Config.pm:76
+msgid "User connection timeout"
+msgstr ""
+
+#: lib/CometQueen/View.pm:107 lib/CometQueen/View/Admin.pm:75 lib/CometQueen/View/Admin/User.pm:47
+msgid "Username"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/User.pm:124
+msgid "Username:"
+msgstr ""
+
+#: lib/MovieMana/View.pm:61
+msgid "View"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Channel.pm:23
+msgid "We dont have channel now."
+msgstr ""
+
+#: lib/CometQueen/View/Admin/User.pm:19
+msgid "We dont have user now."
+msgstr ""
+
+#: lib/CometQueen/View/Admin/SurveyStat.pm:154
+msgid "Wrong Answer"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Config.pm:60
+msgid "ZHAPI_Port"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Config.pm:59
+msgid "ZHAPI_Server"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Config.pm:62
+msgid "Zh API"
+msgstr ""
+
+#: lib/CometQueen/View/Admin.pm:127
+msgid "ZhAPI"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Config.pm:64
+msgid "ZhAPI Service Host"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Config.pm:65
+msgid "ZhAPI Service Port"
+msgstr ""
+
+#: lib/Automan.pm:499 lib/Automan.pm:502
+msgid "[Event Triggered] [Empty Message]"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Emotion.pm:99
+msgid "anger"
+msgstr ""
+
+#: lib/CometQueen/View.pm:216
+msgid "basic"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/BotTrigger.pm:191
+msgid "e.g.    #room1: Hello world"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Emotion.pm:98
+msgid "love"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Emotion.pm:101
+msgid "peace"
+msgstr ""
+
+#: lib/CometQueen/View.pm:214
+msgid "random"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Emotion.pm:100
+msgid "sadness"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/Sentence.pm:248
+msgid "use % to match part of sentences. eg:  %test% "
+msgstr ""
+
+#: lib/CometQueen/View.pm:215
+msgid "zhi"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/SentenceResponse.pm:111
+msgid "大於"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/SentenceResponse.pm:112
+msgid "小於"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/SentenceResponse.pm:109
+msgid "權值"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/SentenceResponse.pm:113
+msgid "等於"
+msgstr ""
+
+#: lib/CometQueen/View/Admin/SentenceResponse.pm:104
+msgid "謬誤"
+msgstr ""

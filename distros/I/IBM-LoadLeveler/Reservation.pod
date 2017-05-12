@@ -1,0 +1,145 @@
+# -*- Perl -*-
+=pod
+
+=head1 Reservation
+
+IBM::LoadLeveler Reservation API
+
+=head1 SYNOPSIS
+
+  # Reservation API
+
+  $resid = ll_make_reservation($start_time,$duration,RESERVATION_BY_NODE|RESERVATION_BY_HOSTLIST|RESERVATION_BY_JOBSTEP|RESERVATION_BY_JCF,$data,$options,\@users,\@groups,$group);
+
+  $result = ll_change_reservation($ID,%param);
+
+  $result = ll_bind(\@jobsteplist,$ID,$unbind)
+
+  $result = ll_remove_reservation(\@IDs,\@user_list,\@host_list,\@group_list)
+
+  $result = ll_remove_reservation_xtnd(\@IDs,\@user_list,\@group_list,\@host_list,\@base_partition_list,$begin,$end)
+
+=head1 DESCRIPTION
+
+The Reservation API has the following functions:
+
+=over 4
+
+=item ll_make_reservation
+
+=item ll_change_reservation
+
+=item ll_bind
+
+=item ll_remove_reservation
+
+=item ll_remove_reservation_xtnd
+
+=back
+
+This API is only available for LoadLeveler versions 3.3.0.0 and higher.
+
+=over 4
+
+=item ll_make_reservation
+
+  $resid = ll_make_reservation($start_time,$duration,RESERVATION_BY_NODE|RESERVATION_BY_HOSTLIST|RESERVATION_BY_JOBSTEP|RESERVATION_BY_JCF,$data,$options,\@users,\@groups,$group);
+
+Surprise! This function allows you to create a LoadLeveler reservation.  The type and content of the $data variable depends on the reservation type you are creating:
+
+
+	Reservation Data Type		How the nodes are reserved	 Perl variable
+	--------------------------------------------------------------------------------
+	RESERVATION_BY_NODE		    By number of nodes		 $integer
+	RESERVATION_BY_HOSTLIST		By specifying a host list	 \@hosts
+	RESERVATION_BY_JOBSTEP		By specifying a job step	 $jobstep
+	RESERVATION_BY_JCF		    By specifying a job command file $jcf
+    RESERVATION_BY_BG_CNODE     By number of Blue Gene c-nodes   $integer
+    RESERVATION_BY_HOSTFILE     By specifying a host file        $string
+
+
+If $resid is not undef then it is a string containing the reservation ID.
+
+B<NOTE:>
+1. This function makes it's own call to ll_init_reservation_param, hence it is not available via this module.
+2. The return of this function changed in 1.07 from ($result,$resid)
+
+=item ll_change_reservation
+
+  $result = ll_change_reservation($ID,%param);
+
+The ll_change_reservation call is quite complicated and slightly different from the C version.  In addition since the current version only allows one reservation to be modified the call takes an ID string of a reservation and not an array of IDs.
+
+The %param uses the following keys and data types:
+
+ To modify	     Specify			     Type of New Data
+ -----------------------------------------------------------------
+ start_time	     RESERVATION_START_TIME	     $string
+ start_time	     RESERVATION_ADD_START_TIME	     $int
+ duration	     RESERVATION_DURATION	     $int
+ duration	     RESERVATION_ADD_DURATION	     $int
+ number_of_nodes     RESERVATION_BY_NODE             $int
+ number_of_nodes     RESERVATION_ADD_NUM_NODE 	     $int
+ hostlist	     RESERVATION_BY_HOSTLIST	     \@hostlist
+ hostlist	     RESERVATION_ADD_HOSTS	     \@hostlist
+ hostlist	     RESERVATION_DEL_HOSTS	     \@hostlist
+ jobstep	     RESERVATION_BY_JOBSTEP	     $string
+ job_command_file    RESERVATION_BY_JCF		     $string
+ userlist	     RESERVATION_USERLIST	     \@userlist
+ userlist	     RESERVATION_ADD_USERS	     \@userlist
+ userlist	     RESERVATION_DEL_USERS	     \@userlist
+ grouplist 	     RESERVATION_GROUPLIST	     \@grouplist
+ grouplist	     RESERVATION_ADD_GROUPS	     \@grouplist
+ grouplist	     RESERVATION_DEL_GROUPS	     \@grouplist
+ shared mode	     RESERVATION_MODE_SHARED	     $int
+ remove on idle mode RESERVATION_MODE_REMOVE_ON_IDLE $int
+ owner		     RESERVATION_OWNER		     $string
+ group		     RESERVATION_GROUP		     $string
+ hostfile            RESERVATION_BY_HOSTFILE         $string
+ number_of_bg_cnodes RESERVATION_BY_BG_CNODE         $int
+
+eg:
+
+	my $res="f96n012g.123.r"
+	my %RES=();
+	$RES{"RESERVATION_START_TIME"}="23:01";
+	$RES{"RESERVATION_DURATION"}=30;
+	$rc=ll_change_reservation($res,\%RES);
+
+If $result != 0 then $IBM::LoadLeveler::errObj contains an error object that may be passed to ll_error
+
+=item ll_bind
+
+  $result = ll_bind(\@jobsteplist,$ID,$unbind)
+
+Bind or unbind a list of job steps to a reservation ID.  If $unbind == 1 then the jobs steps are unbound from the reervation otherwise they will be bound to the reservation.
+
+If $result != 0 then $error contains an error object that may be passed to ll_error
+
+=item ll_remove_reservation
+
+	$result = ll_remove_reservation(\@IDs,\@user_list,\@host_list,\@group_list)
+
+This function allows you to cancel one or more reservations.
+
+If $result != 0 then $error contains an error object that may be passed to ll_error
+
+=item ll_remove_reservation_xtnd
+
+        $result = ll_remove_reservation_xtnd(\@IDs,\@user_list,\@group_list,\@host_list,\@base_partition_list,$begin,$end)
+
+This function allows you to cancel one or more reservations and is only available in version 3.5 or higher, it should be used in preference to ll_remove_reservation.
+
+If $result != 0 then $error contains an error object that may be passed to ll_error
+
+=back
+
+=head1 SEE ALSO
+
+L<LoadLeveler>
+L<DataAccess>
+L<perl>.
+
+IBM LoadLeveler for AIX 5L: Using and Administering
+
+=cut

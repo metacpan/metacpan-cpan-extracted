@@ -1,0 +1,64 @@
+{
+   "abstract" : "Fast IP-address to country-code translation using multiple databases",
+   "author" : [
+      "Craig MacKenna <craig@animalhead.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "license" : [
+      "perl_5",
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "IP-World",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : "0",
+            "File::Copy" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "CPAN::DistnameInfo" : "0",
+            "Config" : "0",
+            "Module::Build" : "0.3607",
+            "Probe::Perl" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "File::ShareDir" : "0",
+            "HTTP::Status" : "5.817",
+            "LWP::UserAgent" : "5.817",
+            "Test::More" : "0.88",
+            "Time::HiRes" : "0",
+            "perl" : "v5.7.3"
+         }
+      }
+   },
+   "provides" : {
+      "IP::World" : {
+         "file" : "lib/IP/World.pm",
+         "version" : "0.39"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/DrHyde/perl-modules-IP-World/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/DrHyde/perl-modules-IP-World"
+      }
+   },
+   "version" : "0.39"
+}

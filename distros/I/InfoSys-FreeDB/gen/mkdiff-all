@@ -1,0 +1,5 @@
+#!/bin/sh
+
+find tmp/ -name \*.pm|sort|awk '{
+    print "pod2man "$1"|nroff -man|less -r";
+}'>pod-all

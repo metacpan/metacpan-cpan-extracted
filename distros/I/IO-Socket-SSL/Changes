@@ -1,0 +1,1438 @@
+2.048 2017/04/16
+- fixed small memory leaks during destruction of socket and context, RT#120643
+2.047 2017/02/16
+- better fix for problem which 2.046 tried to fix but broke LWP this way
+2.046 2017/02/15
+- cleanup everything in DESTROY and make sure to start with a fresh %{*self}
+  in configure_SSL because it can happen that a GLOB gets used again without
+  calling DESTROY (https://github.com/noxxi/p5-io-socket-ssl/issues/56)
+2.045 2017/02/13
+- fixed memory leak caused by not destroying CREATED_IN_THIS_THREAD for SSL
+  objects -> github pull#55
+- optimization: don't track SSL objects and CTX in *CREATED_IN_THIS_THREAD
+  if perl is compiled w/o thread support
+- small fix in t/protocol_version.t to use older versions of Net::SSLeay
+  with openssl build w/o SSLv3 support
+- when setting SSL_keepSocketOnError to true the socket will not be closed
+  on fatal error. This is a modified version of
+  https://github.com/noxxi/p5-io-socket-ssl/pull/53/
+2.044 2017/01/26
+- protect various 'eval'-based capability detections at startup with a localized
+  __DIE__ handler. This way dynamically requiring IO::Socket::SSL as done by
+  various third party software should cause less problems even if there is a
+  global __DIE__ handler which does not properly deal with 'eval'.
+2.043 2017/01/06
+- make t/session_ticket.t work with OpenSSL 1.1.0. With this version the
+  session does not get reused any longer if it was not properly closed which
+  is now done using an explicit close by the client which causes a
+  proper SSL_shutdown
+2.042 2017/01/05
+- enable session ticket callback with Net::SSLeay>=1.80
+2.041 2017/01/04
+- leave session ticket callback off for now until the needed patch is
+  included in Net::SSLeay. See
+  https://rt.cpan.org/Ticket/Display.html?id=116118#txn-1696146
+2.040 2016/12/17
+- fix detection of default CA path for OpenSSL 1.1.x
+- Utils::CERT_asHash now includes the signature algorithm used
+- Utils::CERT_asHash can now deal with large serial numbers
+2.039 2016/11/20
+- OpenSSL 1.1.0c changed the behavior of SSL_read so that it now returns -1 on
+  EOF without proper SSL shutdown. Since it looks like that this behavior will
+  be kept at least for 1.1.1+ adapt to the changed API by treating errno=NOERR
+  on SSL_ERROR_SYSCALL as EOF.
+2.038 2016/09/17
+- restrict session ticket callback to Net::SSLeay 1.79+ since version before
+  contains bug. Add test for session reuse
+- extend SSL fingerprint to pubkey digest, i.e. 'sha1$pub$xxxxxx....'
+- fix t/external/ocsp.t to use different server (under my control) to check 
+  OCSP stapling
+2.037 2016/08/22
+- fix session cache del_session: it freed the session but did not properly
+  remove it from the cache. Further reuse causes crash.
+2.036 2016/08/11
+- disable OCSP support when Net::SSLeay 1.75..1.77 is used, see RT#116795
+2.035 2016/08/11
+- fixes for issues introduced in 2.034
+  - return with error in configure_SSL if context creation failed. This
+    might otherwise result in a segmentation fault later.
+  - apply builtin defaults before any (user configurable) global settings
+    (i.e. done with set_defaults, set_default_context...) so that builtins
+    don't replace user settings
+    Thanks to joel[DOT]a[DOT]berger[AT]gmail[DOT]com for reporting
+2.034 2016/08/08
+- move handling of global SSL arguments into creation of context, so that these
+  get also applied when creating a context only.
+2.033 2016/07/15
+- support for session ticket reuse over multiple contexts and processes
+  (if supported by Net::SSLeay)
+- small optimizations, like saving various Net::SSLeay constants into variables
+  and access variables instead of calling the constant sub all the time
+- make t/dhe.t work with openssl 1.1.0
+2.032 2016/07/12
+- Set session id context only on the server side. Even if the documentation for
+  SSL_CTX_set_session_id_context makes clear that this function is server side
+  only it actually affects hndling of session reuse on the client side too and
+  can result in error "SSL3_GET_SERVER_HELLO:attempt to reuse session in
+  different context" at the client.
+2.031 2016/07/08
+- fix for bug in session handling introduced in 2.031, RT#115975
+  Thanks to paul[AT]city-fan[DOT]org for reporting
+2.030 2016/07/08
+- Utils::CERT_create - don't add given extensions again if they were already
+  added. Firefox croaks with sec_error_extension_value_invalid if (specific?)
+  extensions are given twice.
+- assume that Net::SSLeay::P_PKCS12_load_file will return the CA certificates
+  with the reverse order as in the PKCS12 file, because that's what it does.
+- support for creating ECC keys in Utils once supported by Net::SSLeay
+- remove internal sub session_cache and access cache directly (faster)
+2.029 2016/06/26
+- fix del_session method in case a single item was in the cache
+- use SSL_session_key as the real key for the cache and not some derivate of it,
+  so that it works to remove the entry using the same key
+2.028 2016/06/26
+- add del_session method to session cache
+2.027 2016/04/20
+- only added Changes for 2.026
+2.026 2016/04/20
+- update default server and client ciphers based on recommendation of
+  Mozilla and what the current browsers use. Notably this finally disables
+  RC4 for the client (was disabled for server long ago) and adds CHACHA20.
+2.025 2016/04/04
+- Resolved memleak if SSL_crl_file was used: RT#113257, RT#113530
+  Thanks to avi[DOT]maslati[AT]forescout[DOT]com and
+  mark[DOT]kurman[AT]gmail[DOT]com for reporting the problem
+2.024 2016/02/06
+- Work around issue where the connect fails on systems having only a loopback
+  interface and where IO::Socket::IP is used as super class (default when
+  available). Since IO::Socket::IP sets AI_ADDRCONFIG by default connect to
+  localhost would fail on this systems. This happened at least for the tests,
+  see https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=813796
+  Workaround is to explicitly set GetAddrInfoFlags to 0 if no GetAddrInfoFlags
+  is set but the Family/Domain is given. In this case AI_ADDRCONFIG would not
+  be useful anyway but would cause at most harm.
+2.023 2016/01/30
+- OpenSSL 1.0.2f changed the behavior of SSL shutdown in case the TLS connection
+  was not fully established (commit: f73c737c7ac908c5d6407c419769123392a3b0a9).
+  This somehow resulted in Net::SSLeay::shutdown returning 0 (i.e. keep trying)
+  which caused an endless loop. It will now ignore this result in case the TLS
+  connection was not yet established and consider the TLS connection closed
+  instead.
+2.022 2015/12/10
+- fix stringification of IPv6 inside subjectAltNames in Utils::CERT_asHash.
+  Thanks to Mark.Martinec[AT]ijs[DOT]si for reporting in #110253
+2.021 2015/12/02
+- Fixes for documentation and typos thanks to DavsX and jwilk.
+- Update PublicSuffix with latest version from publicsuffix.org
+2.020 2015/09/20
+- support multiple directories in SSL_ca_path as proposed in RT#106711
+  by dr1027[AT]evocat[DOT]ne. Directories can be given as array or as string
+  with a path separator, see documentation.
+- typos fixed thanks to jwilk https://github.com/noxxi/p5-io-socket-ssl/pull/34
+2.019 2015/09/01
+- work around different behavior of getnameinfo from Socket and Socket6 by
+  using a different wrapper depending on which module I use for IPv6.
+  Thanks to bluhm for reporting.
+2.018 2015/08/27
+- RT#106687 - startssl.t failed on darwin with old openssl since server 
+  requested client certificate but offered also anon ciphers
+2.017 2015/08/24
+- checks for readability of files/dirs for certificates and CA no longer use
+  -r because this is not safe when ACLs are used. Thanks to BBYRD, RT#106295
+- new method sock_certificate similar to peer_certificate based on idea of
+  Paul Evans, RT#105733
+- get_fingerprint can now take optional certificate as argument and compute
+  the fingerprint of it. Useful in connection with sock_certificate.
+- check for both EWOULDBLOCK and EAGAIN since these codes are different on
+  some platforms. Thanks to Andy Grundman, RT#106573
+- enforce default verification scheme if none was specified, i.e. no longer
+  just warn but accept. If really no verification is wanted a scheme of 
+  'none' must be explicitly specified.
+- support different cipher suites per SNI hosts
+2.016 2015/06/02
+- add flag X509_V_FLAG_TRUSTED_FIRST by default if available in OpenSSL 
+  (since 1.02) and available with Net::SSLeay. RT#104759 (thanks GAAS)
+- work around hanging prompt() with older perl in Makefile.PL RT#104731
+- make t/memleak_bad_handshake.t work on cygwin and other systems having 
+  /proc/pid/statm, see RT#104659
+- add better debugging based on patch from H.Merijn Brand
+2.015 2015/05/13
+- work around problem with IO::Socket::INET6 on windows, by explicitly using
+  Domain AF_INET in the tests. 
+  Fixes RT#104226 reported by CHORNY
+2.014 2015/05/05
+- Utils::CERT_create - work around problems with authorityInfoAccess, where
+  OpenSSL i2v does not create the same string as v2i expects
+- Intercept - don't clone some specific extensions which make only sense with
+  the original certificate
+2.013 2015/05/01
+- assign severities to internal error handling and make sure that follow-up
+  errors like "configuration failed" or "certificate verify error" don't
+  replace more specific "hostname verification failed" when reporting in
+  sub errstr/$SSL_ERROR. see also RT#103423
+- enhanced documentation thanks to Chase Whitener 
+  https://github.com/noxxi/p5-io-socket-ssl/pull/26
+2.012 2015/02/02
+- fix t/ocsp.t in case no HTTP::Tiny is installed
+2.011 2015/02/01
+- fix t/ocsp.t - don't count on revoked.grc.com using OCSP stapling #101855
+- added option 'purpose' to Utils::CERT_create to get better control of the
+  certificates purpose. Default is 'server,client' for non-CA (contrary to
+  only 'server' before)
+- removed RC4 from default cipher suites on the server site
+  https://github.com/noxxi/p5-io-socket-ssl/issues/22
+- refactoring of some tests using Test::More thanks to Sweet-kid and the
+  2015 Pull Request Challenge
+2.010 2015/01/14
+- new options SSL_client_ca_file and SSL_client_ca to let the server send
+  the list of acceptable CAs for the client certificate.
+- t/protocol_version.t - fix in case SSLv3 is not supported in Net::SSLeay. 
+  RT#101485, thanks to TEAM.
+2.009 2015/01/12
+- remove util/analyze.pl. This tool is now together with other SSL tools in
+  https://github.com/noxxi/p5-ssl-tools
+- added ALPN support (needs OpenSSL1.02, Net::SSLeay 1.56+) thanks to TEAM,
+  RT#101452
+2.008 2014/12/16
+- work around recent OCSP verification errors for revoked.grc.com (badly signed
+  OCSP response, Firefox also complains about it) in test t/external/ocsp.t.
+- util/analyze.pl - report more details about preferred cipher for specific TLS
+  versions
+2.007 2014/11/26
+- make getline/readline fall back to super class if class is not sslified yet,
+  i.e. behave the same as sysread, syswrite etc.
+  This fixes RT#100529
+2.006 2014/11/22
+- Make (hopefully) non-blocking work on windows by using EWOULDBLOCK instead of
+  EAGAIN. While this is the same on UNIX it is different on Windows and socket
+  operations return there (WSA)EWOULDBLOCK and not EAGAIN. Enable non-blocking
+  tests on Windows too.
+- make PublicSuffix::_default_data thread safe
+- update PublicSuffix with latest list from publicsuffix.org
+2.005 2014/11/15
+- next try to fix t/protocol_version.t for OpenSSL w/o SSLv3 support
+2.004 2014/11/15
+- only test fix: fix t/protocol_version.t to deal with OpenSSL installations
+  which are compiled without SSLv3 support.
+2.003 2014/11/14
+- make SSLv3 available even if the SSL library disables it by default in
+  SSL_CTX_new (like done in LibreSSL). Default will stay to disable SSLv3,
+  so this will be only done when setting SSL_version explicitly.
+- fix possible segmentation fault when trying to use an invalid certificate,
+  reported by Nick Andrew.
+- Use only the ICANN part of the default public suffix list and not the
+  private domains. This makes existing exceptions for s3.amazonaws.com and
+  googleapis.com obsolete. Thanks to Gervase Markham from mozilla.org.
+2.002 2014/10/21
+- fix check for (invalid) IPv4 when validating hostname against certificate. Do
+  not use inet_aton any longer because it can cause DNS lookups for malformed
+  IP. RT#99448, thanks to justincase[AT]yopmail[DOT]com.
+- Update PublicSuffix with latest version from publicsuffix.org - lots of new
+  top level domains.
+- Add exception to PublicSuffix for s3.amazonaws.com - RT#99702, thanks to
+  cpan[AT]cpanel[DOT]net.
+2.001 2014/10/21
+- Add SSL_OP_SINGLE_(DH|ECDH)_USE to default options to increase PFS security.
+  Thanks to Heikki Vatiainen for suggesting.
+- Update external tests with currently expected fingerprints of hosts.
+- Some fixes to make it still work on 5.8.1.
+2.000 2014/10/15
+- consider SSL3.0 as broken because of POODLE and disable it by default.
+- Skip live tests without asking if environment NO_NETWORK_TESTING is set.
+  Thanks to ntyni[AT]debian[DOT]org for suggestion.
+- skip tests which require fork on non-default windows setups without proper
+  fork. Thanks to SHAY for https://github.com/noxxi/p5-io-socket-ssl/pull/18
+1.999 2014/10/09
+- make sure we don't use version 0.30 of IO::Socket::IP
+- make sure that PeerHost is checked on all places where PeerAddr is
+  checked, because these are synonyms and IO::Socket::IP prefers PeerHost
+  while others prefer PeerAddr. Also accept PeerService additionally to
+  PeerPort.
+  See https://github.com/noxxi/p5-io-socket-ssl/issues/16 for details.
+- add ability to use client certificates and to overwrite hostname with
+  util/analyze-ssl.pl.
+1.998 2014/09/07
+- make client authentication work at the server side when SNI is in by use
+  having CA path and other settings in all SSL contexts instead of only the main
+  one.  Based on code from lundstrom[DOT]jerry[AT]gmail[DOT]com,
+  https://github.com/noxxi/p5-io-socket-ssl/pull/15
+1.997 2014/07/12
+- thanks to return code 1 from Net::SSLeay::library_init if the library needed
+  initialization and 0 if not we can now clearly distinguish if initialization
+  was needed and do not need any work-arounds for perlcc by the user.
+1.996 2014/07/12
+- move initialization of OpenSSL-internals out of INIT again because this
+  breaks if module is used with require. Since there is no right place to
+  work in all circumstances just document the work-arounds needed for
+  perlcc. RT#97166
+1.995 2014/07/11
+- RT#95452 - move initialization and creation of OpenSSL-internals into INIT
+  section, so they get executed after compilation and perlcc is happy.
+- refresh option for peer_certificate, so that it checks if the certificate
+  changed in the mean time (on renegotiation)
+- fix fingerprint checking - now applies only to topmost certificate
+- IO::Socket::SSL::Utils - accept extensions within CERT_create
+- documentations fixes thanks to frioux
+- fix documentation bug RT#96765, thanks to Salvatore Bonaccorso.
+1.994 2014/06/22
+- IO::Socket::SSL can now be used as dual-use socket, e.g. start plain, upgrade
+  to SSL and downgrade again all with the same object. See documentation of
+  SSL_startHandshake and chapter Advanced Usage.
+- try to apply SSL_ca* even if verify_mode is 0, but don't complain if this
+  fails. This is needed if one wants to explicitly verify OCSP lookups even if
+  verification is otherwise off, because otherwise the signature check would
+  fail. This is mostly useful for testing.
+- reorder documentation of attributes for new, so that the more important ones
+  are at the top.
+1.993 2014/06/13
+- major rewrite of documentation, now in separate file
+- rework error handling to distinguish between SSL errors and internal errors
+  (like missing capabilities).
+- fix handling of default_ca if given during the run of the program (Debian#750646)
+- util/analyze-ssl.pl - fix hostname check if SNI does not work
+1.992 2014/06/01
+- set $! to undef before doing IO (accept, read..). On Windows a connection
+  reset could cause SSL read error without setting $!, so make sure we don't
+  keep the old value and maybe thus run into endless loop.
+1.991 2014/05/27
+- new option SSL_OCSP_TRY_STAPLE to enforce staple request even if
+  VERIFY_NONE
+- work around for RT#96013 in peer_certificates
+1.990 2014/05/27
+- added option SSL_ocsp_staple_callback to get the stapled OCSP response
+  and verify it somewhere else
+- try to fix warnings on Windows again (#95967)
+- work around temporary OCSP error in t/external/ocsp.t
+1.989 2014/05/24
+- fix #95881 (warnings on windows), thanks to TMHALL
+1.988 2014/05/17
+- add transparent support for DER and PKCS#12 files to specify cert and key,
+  e.g. it will autodetect the format
+- if SSL_cert_file is PEM and no SSL_key_file is given it will check if
+  the key is in SSL_cert_file too
+1.987 2014/05/17
+- fix t/verify_hostname_standalone.t on systems without usable IDNA or IPv6
+  #95719, thanks srchulo
+- enable IPv6 support only if we have a usable inet_pton
+- remove stale entries from MANIFEST (thanks seen[AT]myfairpoint[DOT]net)
+1.986 2014/05/16
+- allow IPv4 in common name, because browsers allow this too. But only for
+  scheme www/http, not for rfc2818 (because RC2818 does not allow this).
+  In default scheme IPv6 and IPv4 are allowed in CN.
+  Thanks to heiko[DOT]hund[AT]sophos[DOT]com for reporting the problem.
+- Fix handling of public suffix. Add exemption for *.googleapis.com
+  wildcard, which should be better not allowed according to public suffix
+  list but actually is used.
+- Add hostname verification test based on older test of chromium. But change
+  some of the test expectations because we don't want to support IP as SAN
+  DNS and because we enforce a public suffix list (and thus *.co.uk should
+  not be allowed)
+1.985 2014/05/15
+- make OCSP callback return 1 even if it was called on the server side
+  because of bad setup of the socket. Otherwise we get an endless calling
+  of the OCSP callback.
+- consider an OCSP response which is not yet or no longer valid a soft error
+  instead of a hard error
+- fix skip in t/external/ocsp.t in case fingerprint does not match
+- RT#95633 call EVP_PKEY_free not EVP_KEY_free in
+  IO::Socket::SSL::Utils::KEY_free. Thanks to paul[AT]city-fan[DOT]org
+- util/analyze.pl - with --show-chain check if chain with SNI is different
+  from chain w/o SNI. 
+1.984 2014/05/10
+- added OCSP support:
+  - needs Net::SSLeay >=1.59
+  - for usage see documentation of IO::Socket::SSL (examples and anything with
+    OCSP in the name)
+- new tool util/analyze-ssl.pl which is intended to help in debugging of SSL
+  problems and to get information about capabilities of server. Works also
+  as en example of how to use various features (like OCSP, SNI..)
+- fix peer_certificates (returns leaf certificate only once on client side)
+- added timeout for stop_SSL (either with Timeout or with the default
+  timeout for IO::Socket)
+- fix IO::Socket::SSL::Utils mapping between ASN1_TIME and time_t when local
+  time is not GMT. Use Net::SSLeay::ASN1_TIME_timet if available.
+- fix t/external/usable_ca.t for system with junk in CA files
+1.983 2014/05/03
+- fix public suffix handling: ajax.googleapis.com should be ok even if googleapis.com
+  is in public suffix list (e.g. check one level less)
+  #95317, thanks to purification[AT]ukr[DOT]net
+- usable_ca.t - update fingerprints after heartbleed attack
+- usable_ca.t - make sure we have usable CA for tested hosts in CA store
+1.982 2014/04/24
+- fix for using subroutine as argument to set_args_filter_hack
+1.981 2014/04/08
+- #95432 fix ecdhe Test for openssl1.0.1d, thanks to  paul[AT]city-fan[DOT]org
+- fix detection of openssl1.0.1d (detected 1.0.1e instead)
+- new function can_ecdh in IO::Socket::SSL
+1.980 2014/04/08
+- fixed incorrect calculation of certificate fingerprint in get_fingerprint*
+  and comparison in SSL_fingerprint. Thanks to
+  david[DT]palmer[AT]gradwell[DOT]com for reporting.
+- disable elliptic curve support for openssl 1.0.1d on 64bit because of
+  openssl rt#2975
+1.979 2014/04/06
+- hostname checking: 
+  - configuration of 'leftmost' is renamed to 'full_label', but the old
+    version is kept for compatibility reasons.
+  - documentation of predefined schemes fixed to match reality
+1.978 2014/04/04
+- RT#94424 again, fix test on older openssl version with no SNI support
+1.977 2014/04/04
+- fix publicsuffix for IDNA, more tests with various IDNA libs
+  RT#94424. Thanks to paul[AT]city-fan[DOT]org
+- reuse result of IDN lib detection from PublicSuffix.pm in SSL.pm
+- add more checks to external/usable_ca.t. Now it is enough that at least
+  one of the hosts verifies against the builtin CA store
+- add openssl and Net::SSleay version to diagnostics in load test
+1.976 2014/04/03
+- added public prefix checking to verification of wildcard certificates,
+  e.g. accept *.foo.com but not *.co.uk.
+  See documentation of SSL_verifycn_publicsuffix and
+  IO::Socket::SSL::PublicSuffix
+  Thanks to noloader for pointing out the problem.
+1.975 2014/04/02
+- BEHAVIOR CHANGE: work around TEA misfeature on OS X builtin openssl, e.g.
+  guarantee that only the explicitly given CA or the openssl default CA will
+  be used. This means that certificates inside the OS X keyring will no
+  longer be used, because there is no way to control the use by openssl
+  (e.g. certificate pinning etc)
+- make external tests run by default to make sure default CA works on all
+  platforms, it skips automatically on network problems like timeouts or ssl
+  interception, can also use http(s)_proxy environment variables
+1.974 2014/04/02
+- new function peer_certificates to get the whole certificate chain, needs
+  Net::SSLeay>=1.58
+- extended IO::Socket::Utils::CERT_asHash to provide way more information,
+  like issuer information, cert and pubkey digests, all extensions, CRL
+  distributions points and OCSP uri
+1.973 2014/03/25
+- with SSL_ca certificate handles can now be used additionally to
+  SSL_ca_file and SSL_ca_path
+- do not complain longer if SSL_ca_file and SSL_ca_path are both given,
+  instead add both as options to the CA store
+- Shortcut 'issuer' to give both issuer_cert and issuer_key in CERT_create.
+1.972 2014/03/23
+- make sure t/external/usable_ca.t works also with older openssl without
+  support for SNI. RT#94117. Thanks to paul[AT]city-fan[DOT]org
+1.971 2014/03/22
+- try to use SSL_hostname for hostname verification if no SSL_verifycn_name
+  is given. This way hostname for SNI and verification can be specified in
+  one step.
+- new test program example/simulate_proxy.pl
+1.970 2014/03/19
+- fix rt#93987 by making sure sub default_ca does use a local $_ and not a
+  version of an outer scope which might be read-only.  Thanks to gshank
+1.969 2014/03/13
+- fix set_defaults to match documentation regarding short names
+- new function set_args_filter_hack to make it possible to override bad SSL
+  settings from other code at the last moment.
+- determine default_ca on module load (and not on first use in each thread)
+- don't try default hostname verification if verify_mode 0
+- fix hostname verification when reusing context
+1.968 2014/03/13
+- BEHAVIOR CHANGE: removed implicit defaults of certs/server-{cert,key}.pem
+  for SSL_{cert,key}_file and ca/,certs/my-ca.pem for SSL_ca_file.
+  These defaults were depreceated since 1.951 (2013/7/3).
+- Usable CA verification path on Windows etc:
+  Do not use Net::SSLeay::CTX_set_default_verify_paths any longer to set
+  system/build dependent default verification path, because there was no
+  way to retrieve these default values and check if they contained usable
+  CA. Instead re-implement the same algorithm and export the results with
+  public function default_ca() and make it possible to overwrite it.
+  Also check for usable verification path during build.
+  If no usable path are detected require Mozilla::CA at build and try to
+  use it at runtime.
+1.967 2014/02/06
+- verify the hostname inside a certificate by default with a superset of
+  common verification schemes instead of not verifying identity at all.
+  For now it will only complain if name verification failed, in the future
+  it will fail certificate verification, forcing you to set the expected
+  SSL_verifycn_name if you want to accept the certificate.
+- new option SSL_fingerprint and new methods get_fingerprint and
+  get_fingerprint_bin. Together they can be used to selectively accept
+  specific certificates which would otherwise fail verification, like
+  self-signed, outdated or from unknown CAs.
+  This makes another reason to disable verification obsolete.
+- Utils:
+  - default RSA key length 2048
+  - digest algorithm to sign certificate in CERT_create can be given,
+    defaults to SHA-256
+  - CERT_create can now issue non-CA selfsigned certificate
+  - CERT_create add some more useful constraints to certificate
+- spelling fixes, thanks to ville[dot]skytta[at]iki[dot]fi
+1.966 2014/01/21
+- fixed bug introduced in 1.964 - disabling TLSv1_2 worked no longer with
+  specifying !TLSv12, only !TLSv1_2 worked
+- fixed leak of session objects in SessionCache, if another session 
+  replaced an existing session (introduced in 1.965)
+1.965 2014/01/16
+- new key SSL_session_key to influence how sessions are inserted and looked
+  up in the clients session cache. This makes it possible to share sessions
+  over different ip:host (like required with some FTPS servers)
+- t/core.t - handle case, were default loopback source is not 127.0.0.1, like
+  in FreeBSD jails
+1.964 2014/01/15
+- Disabling TLSv1_1 did not work, because the constant was wrong. Now it gets
+  the constants from calling Net::SSLeay::SSL_OP_NO_TLSv1_1 etc
+- The new syntax for the protocols is TLSv1_1 instead of TLSv11. This matches
+  the syntax from OpenSSL. The old syntax continues to work in SSL_version.
+- New functions get_sslversion and get_sslversion_int which get the SSL version
+  of the establish session as string or int.
+- disable t/io-socket-inet6.t if Acme::Override::INET is installed
+1.963 2014/01/13
+- fix behavior of stop_SSL: for blocking sockets it now enough to call it
+  once, for non-blocking it should be called again as long as EAGAIN and
+  SSL_ERROR is set to SSL_WANT_(READ|WRITE).
+- don't call blocking if start_SSL failed and downgraded socket has no 
+  blocking method, thanks to tokuhirom
+- documentation enhancements:
+  - special section for differences to IO::Socket
+  - describe problem with blocking accept on non-blocking socket
+  - describe arguments to new_from_fd and make clear, that for upgrading an
+    existing IO::Socket start_SSL should be used directly
+1.962 2013/11/27
+- work around problems with older F5 BIG-IP by offering fewer ciphers on the
+  client side by default, so that the client hello stays below 255 byte
+1.961 2013/11/26
+- IO::Socket::SSL::Utils::CERT_create can now create CA-certificates which
+  are not self-signed (by giving issuer_*)
+1.960 2013/11/12
+only documentation enhancements:
+- clarify with text and example code, that within event loops not only
+  select/poll should be used, but also pending has to be called.
+- better introduction into SSL, at least mention anonymous authentication as
+  something you don't want and should take care with the right cipher
+- make it more clear, that user better does not change the cipher list, unless
+  he really know what he is doing
+1.959 2013/11/12
+- bugfix test core.t windows only
+1.958 2013/11/11
+- cleanup: remove workaround for old IO::Socket::INET6 but instead require at
+  least version 2.55 which is now 5 years old
+- fix t/session.t #RT90240, thanks to  paul[AT]city-fan[DOT]org
+1.957 2013/11/11
+- fixed t/core.t: test uses cipher_list of HIGH, which includes anonymous
+  authorization. With the DH param given by default since 1.956 old versions of
+  openssl (like 0.9.8k) used cipher ADH-AES256-SHA (e.g. anonymous
+  authorization) instead of AES256-SHA and thus the check for the peer
+  certificate failed (because ADH does not exchanges certificates).
+  Fixed by explicitly specifying HIGH:!aNULL as cipher
+  RT#90221, thanks to  paul[AT]city-fan[DOT]org
+- cleaned up tests: 
+  - remove ssl_settings.req and 02settings.t, because all tests now create a
+    simple socket at 127.0.0.1 and thus global settings are no longer needed.
+  - some tests did not have use strict(!), fixed it.
+  - removed special handling for older Net::SSLeay versions, which are less than
+    our minimum requirement
+  - some syntax enhancements, removed some SSL_version and SSL_cipher_list
+    options where they were not really needed
+1.956 2013/11/10
+lots of behavior changes for more secure defaults:
+- BEHAVIOR CHANGE: make default cipher list more secure, especially
+  - no longer support MD5 by default (broken)
+  - no longer support anonymous authentication by default (vulnerable to man in
+    the middle attacks)
+  - prefer ECDHE/DHE ciphers and add necessary ECDH curve and DH keys, so that
+    it uses by default forward secrecy, if underlying Net::SSLeay/openssl
+    supports it
+  - move RC4 at the end, e.g. 3DES is preferred (BEAST attack should hopefully
+    been fixed and now RC4 is considered less safe than 3DES)
+  - default SSL_honor_cipher_order to 1, e.g. when used as server it tries to
+    get the best cipher even if client prefers other ciphers
+  PLEASE NOTE that this might break connections with older, less secure
+  implementations. In this case revert to 'ALL:!LOW:!EXP:!aNULL' or so.
+- BEHAVIOR CHANGE: SSL_cipher_list now gets set on context not SSL object and
+  thus gets reused if context gets reused. PLEASE NOTE that using
+  SSL_cipher_list together with SSL_reuse_ctx has no longer effect on the
+  ciphers of the context.
+- rework hostname verification schemes
+  - add rfc names as scheme (e.g. 'rfc2818',...)
+  - add SIP, SNMP, syslog, netconf, GIST
+  - BEHAVIOR CHANGE: fix SMTP - now accept wildcards in CN and subjectAltName
+  - BEHAVIOR CHANGE: fix IMAP, POP3, ACAP, NNTP - now accept wildcards in CN
+- BEHAVIOR CHANGE: anywhere wildcards like www* now match only 'www1', 'www2'..
+  but not 'www'
+- anywhere wildcards like x* are no longer applied to IDNA names (which start
+  with 'xn--')
+- fix crash of Utils::CERT_free
+- support TLSv11, TLSv12 as handshake protocols
+1.955 2013/10/11
+- support for forward secrecy using ECDH, if the Net::SSLeay/openssl version
+  supports it.
+1.954 2013/9/15
+- accept older versions of ExtUtils::MakeMaker and add meta information
+  like link to repository only for newer versions.
+1.953 2013/7/22
+- fixes to IO::Socket::SSL::Utils, thanks to rurban[AT]x-ray[DOT]at,
+  RT#87052
+1.952 2013/7/11
+- fix t/acceptSSL-timeout.t on Win32, RT#86862
+1.951 2013/7/3 
+- better document builtin defaults for key,cert,CA and how they are depreceated
+- use Net::SSLeay::CTX_set_default_verify_paths to use openssl's builtin
+  defaults for CA unless CA path/file was given (or IO::Socket::SSL builtins
+  used)
+1.950 2013/7/3 
+- MAJOR BEHAVIOR CHANGE:
+  ssl_verify_mode now defaults to verify_peer for client.
+  Until now it used verify_none, but loudly complained since 1.79 about it.
+  It will not complain any longer, but the connection might probably fail.
+  Please don't simply disable ssl verification, but instead set SSL_ca_file
+  etc so that verification succeeds!
+- MAJOR BEHAVIOR CHANGE:
+  it will now complain if the builtin defaults of certs/my-ca.pem or ca/
+  for CA and certs/{server,client}-{key,cert}.pem for cert and key are used,
+  e.g. no certificates are specified explicitly.
+  In the future these insecure (relative path!) defaults will be removed
+  and the CA replaced with the system defaults.
+v1.94 2013.06.01
+- Makefile.PL reported wrong version of openssl, if Net::SSLeay was not
+  installed instead of reporting missing dependency to Net::SSLeay.
+v1.93 2013.05.31
+- need at least OpenSSL version 0.9.8 now, since last 0.9.7 was released 6
+  years ago. Remove code to work around older releases.
+- changed AUTHOR in Makefile.PL from array back to string, because the
+  array feature is not available in MakeMaker shipped with 5.8.9 (RT#85739)
+v1.92 2013.05.30
+- Intercept: use sha1-fingerprint of original cert for id into cache unless 
+  otherwise given
+- Fix pod error in IO::Socket::SSL::Utils RT#85733
+v1.91 2013.05.30
+- added IO::Socket::SSL::Utils for easier manipulation of certificates and keys
+- moved SSL interception into IO::Socket::SSL::Intercept and simplified it 
+  using IO::Socket::SSL::Utils
+- enhance meta information in Makefile.PL
+v1.90 2013.05.27
+- RT#85290, support more digest, especially SHA-2.
+  Thanks to ujvari[AT]microsec[DOT]hu
+- added support for easy SSL interception (man in the middle) based
+  on ideas found in mojo-mitm proxy (which was written by Karel Miko)
+- make 1.46 the minimal required version for Net::SSLeay, because it 
+  introduced lots of useful functions.
+v1.89 2013.05.14
+- if IO::Socket::IP is used it should be at least version 0.20, otherwise
+  we get problems with HTTP::Daemon::SSL and maybe others (RT#81932)
+- Spelling corrections, thanks to dsteinbrunner
+v1.88 2013.05.02
+- consider a value of '' the same as undef for SSL_ca_(path|file), SSL_key*
+  and SSL_cert* - some apps like Net::LDAP use it that way.
+  Thanks to alexander[AT]kuehn[AT]nagilum[DOT]de for reporting the problem.
+v1.87 2013.04.24
+- RT#84829 - complain if given SSL_(key|cert|ca)_(file|path) do not exist or
+  if they are not readable. Thanks to perl[AT]minty[DOT]org 
+- fix use of SSL_key|SSL_file objects instead of files, broken with 1.83
+v1.86 2013.04.17
+- RT#84686 - don't complain about SSL_verify_mode is SSL_reuse_ctx,
+  thanks to CLEACH
+v1.85 2013.04.14
+- probe for available modules with local __DIE__ and __WARN__handlers.
+  fixes RT#84574, thanks to FRAZER
+- fix warning, when IO::Socket::IP is installed and inet6 support gets explicitly
+  requested. RT#84619, thanks to Prashant[DOT]Tekriwal[AT]netapp[DOT]com
+v1.84 2013.02.15
+- disabled client side SNI for openssl version < 1.0.0 because of RT#83289
+- added functions can_client_sni, can_server_sni, can_npn to check availability
+  of SNI and NPN features. Added more documentation for SNI and NPN.
+v1.83_1 2013.02.14
+- separated documentation of non-blocking I/O from error handling
+- changed and documented behavior of readline to return the read
+  data on EAGAIN/EWOULDBLOCK in case of non-blocking socket.
+  See https://github.com/noxxi/p5-io-socket-ssl/issues/1, thanks to
+  mytram
+v1.83 2013.02.03
+- Server Name Indication (SNI) support on the server side, inspired by
+  patch provided by karel[DOT]miko[AT]gmail[DOT]com.
+  https://rt.cpan.org/Ticket/Display.html?id=82761
+- reworked part of the documentation, like providing better examples.
+v1.82 2013.01.28
+- sub error sets $SSL_ERROR etc only if there really is an error, 
+  otherwise it will keep the latest error. This causes 
+  IO::Socket::SSL->new.. to report the correct problem, even if
+  the problem is deeper in the code (like in connect)
+- correct spelling, rt#8270. Thanks to ETHER
+v1.81 2012.12.06
+- deprecated set_ctx_defaults, new name ist set_defaults (but old name
+  still available)
+- changed handling of default path for SSL_(ca|cert|key)* keys: either
+  if one of these keys is user defined don't add defaults for the
+  others, e.g.  don't mix user settings and defaults
+- cleaner handling of module defaults vs. global settings vs. socket
+  specific settings. Global and socket specific settings are both
+  provided by the user, while module defaults not.
+- make IO::Socket::INET6 and IO::Socket::IP specific tests run both,
+  even if both modules are installed by faking a failed load of the
+  other module.
+v1.80 2012.11.30
+- removed some warnings in test (missing SSL_verify_mode => 0) which
+  caused tests to hang on Windows.
+  https://rt.cpan.org/Ticket/Display.html?id=81493
+v1.79 2012.11.25
+- prepare transition to a more secure default for SSL_verify_mode.
+  The use of the current default SSL_VERIFY_NONE will cause a big warning
+  for clients, unless SSL_verify_mode was explicitly set inside the 
+  application to this insecure value.
+  In the near future the default will be SSL_VERIFY_PEER, and thus 
+  causing verification failures in unchanged applications.
+v1.78 2012.11.25
+- use getnameinfo instead of unpack_sockaddr_in6 to get PeerAddr and 
+  PeerPort from sockaddr in _update_peer, because this provides scope
+  too. Thanks to bluhm[AT]genua[DOT]de.
+- work around systems which don't defined AF_INET6
+  https://rt.cpan.org/Ticket/Display.html?id=81216
+  Thanks to GAAS for reporting
+v1.77 2012.10.05
+- update_peer for IPv6 also, applied fix to 
+  https://rt.cpan.org/Ticket/Display.html?id=79916 by
+  tlhackque[AT]yahoo[DOT]com
+v1.76 2012.06.18
+- no longer depend on Socket.pm 1.95 for inet_pton, but use Socket6.pm if 
+  no current Socket.pm is available. Thanks to paul[AT]city-fan[DOT]org
+  for pointing out the problem and providing first patch
+v1.75 2012.06.15
+- made it possible to explicitly disable TLSv11 and TLSv12 in SSL_version
+v1.74_2 2012.06.07
+- fixed documentation errors, reported by MARSCHAP
+  https://rt.cpan.org/Ticket/Display.html?id=77690
+v1.74_1 2012.06.07
+- add support to IO::Socket::IP which support inet6 and inet4 by
+  integrating patch from PEVANS
+  for https://rt.cpan.org/Ticket/Display.html?id=75218
+v1.74 2012.05.13
+- accept a version of SSLv2/3 as SSLv23, because older documentation
+  could be interpreted like this
+v1.73 2012.05.11
+- make test t/dhe.t hopefully work for more version of openssl
+  Thanks to paul[AT]city-fan[DOT]org for providing bug reports and
+  testing environment
+v1.72 2012.05.10
+- set DEFAULT_CIPHER_LIST to ALL:!LOW instead of HIGH:!LOW
+  Thanks to dcostas[AT]gmail[DOT]com for problem report
+v1.71 2012.05.09
+- 1.70 done right. Also don't disable SSLv2 ciphers, SSLv2 support is better
+  disabled by the default SSL_version of 'SSLv23:!SSLv2'
+v1.70 2012.05.08
+- make it possible to disable protocols using SSL_version, make SSL_version
+  default to 'SSLv23:!SSLv2'
+v1.69 2012.05.08
+- re-added workaround in t/dhe.t
+v1.68 2012.05.07
+- remove SSLv2 from default cipher list, which makes failed tests after last
+  change work again, fix behavior for empty cipher list (use default)
+v1.67 2012.05.07
+- https://rt.cpan.org/Ticket/Display.html?id=76929
+  thanks to d[DOT]thomas[AT]its[DOT]uq[DOT]edu[DOT]au for reporting
+  - if no explicit cipher list is given it will now default to ALL:!LOW instead 
+    of the openssl default, which usually includes weak ciphers like DES.
+  - new config key SSL_honor_cipher_order and documented how to use it to fight
+    BEAST attack. 
+v1.66 2012.04.16
+- make it thread safer, thanks to bug report from vega[DOT]james[AT]gmail
+  [DOT]com, https://rt.cpan.org/Ticket/Display.html?id=76538
+v1.65 2012.04.16
+- added NPN (Next Protocol Negotiation) support based on patch from kmx
+  https://rt.cpan.org/Ticket/Display.html?id=76223
+v1.64 2012.04.06
+- clarify some behavior regarding hostname verification.
+  Thanks to DOHERTY for reporting.
+v1.63 2012.04.06
+- applied patch of DOUGDUDE to ignore die from within eval to make tests 
+  more stable on Win32, https://rt.cpan.org/Ticket/Display.html?id=76147
+v1.62 2012.03.28
+- small fix to last version
+v1.61 2012.03.27
+- call CTX_set_session_id_context so that servers session caching works with
+  client certificates too. 
+  https://rt.cpan.org/Ticket/Display.html?id=76053
+v1.60 2012.03.20
+- don't make blocking readline if socket was set nonblocking, but return as
+  soon no more data are available
+  https://rt.cpan.org/Ticket/Display.html?id=75910
+- fix BUG section about threading so that it shows package as thread safe
+  as long as Net::SSLeay >= 1.43 is used
+  https://rt.cpan.org/Ticket/Display.html?id=75749
+v1.59 2012.03.08
+- if SSLv2 is not supported by Net::SSLeay set SSL_ERROR with useful 
+  message when attempting to use it. 
+- modify constant declarations so that 5.6.1 should work again
+v1.58 2012.02.26
+- fix t/dhe.t again to enable the workaround only for newer openssl
+  versions, because this would cause failures on older versions
+v1.57 2012.02.26
+- fix t/dhe.t for openssl 1.0.1 beta by forcing tlsv1, so that it does
+  not complain about the too small rsa key which it should not use anyway.
+  Thanks to paul[AT]city-fan[DOT]org  for reporting.
+  https://rt.cpan.org/Ticket/Display.html?id=75165
+v1.56 2012.02.22
+- add automatic or explicit (via SSL_hostname) SNI support, needed for
+  multiple SSL hostnames with same IP. Currently only supported for the 
+  client.
+v1.55 2012.02.20
+- work around IO::Sockets work around for systems returning EISCONN etc
+  on connect retry for non-blocking sockets by clearing $! if SUPER::connect
+  returned true.
+  https://rt.cpan.org/Ticket/Display.html?id=75101
+  Thanks for Manoj Kumar for reporting.
+v1.54 2012.01.11
+- return 0 instead of undef in SSL_verify_callback to fix uninitialized
+  warnings.  Thanks to d[DOT]thomas[AT]its[DOT]uq[DOT]edu[DOT]au for 
+  reporting the bug and MIKEM for the fix.
+  https://rt.cpan.org/Ticket/Display.html?id=73629
+v1.53 2011.12.11
+- kill child in t/memleak_bad_handshake.t if test fails
+  https://rt.cpan.org/Ticket/Display.html?id=73146
+  Thanks to CLEACH ofr reporting
+v1.52 2011.12.07
+- fix syntax error in t/memleak_bad_handshake.t
+  thanks to cazzaniga[DOT]sandro[AT]gmail[DOT]com for reporting
+v1.51 2011.12.06
+- disable t/memleak_bad_handshake.t on AIX, because it might hang
+  https://rt.cpan.org/Ticket/Display.html?id=72170
+v1.50 2011.12.06
+  Thanks to HMBRAND for reporting and Rainer Tammer tammer[AT]tammer[DOT]net for
+  providing access to AIX system
+v1.49 2011.10.28 
+- another regression for readline fix, this time it failed to return lines
+  at eof which don't end with newline. Extended t/readline.t to catch this
+  case and the fix for 1.48
+  Thanks to christoph[DOT]mallon[AT]gmx[DOT]de for reporting
+v1.48 2011.10.26
+- bugfix for readline fix in 1.45. If the pending data where false
+  (like '0') it failed to read rest of line.
+  Thanks to Victor Popov for reporting
+  https://rt.cpan.org/Ticket/Display.html?id=71953
+v1.47 2011.10.21
+- fix for 1.46 - check for mswin32 needs to be /i. Thanks to
+  Alexandr Ciornii for reporting
+v1.46 2011.10.18
+- disable test t/signal-readline.t on windows, because signals are
+  not relevant for this platform and test does not work.
+  https://rt.cpan.org/Ticket/Display.html?id=71699
+v1.45 2011.10.12
+- fix readline to continue when getting interrupt waiting for more
+  data. Thanks to kgc[AT]corp[DOT]sonic[DOT]net for reporting problem
+v1.44 2011.05.27
+- fix invalid call to inet_pton in verify_hostname_of_cert when 
+  identity should be verified as ipv6 address, because it contains
+  colon.
+v1.43_1 2011.05.12
+- try to make t/nonblock.t more stable, especially on Mac OS X
+v1.43 2011.05.11
+- fix t/nonblock.t
+- stability improvements t/inet6.t
+v1.42 2011.05.10
+- add SSL_create_ctx_callback to have a way to adjust context on
+  creation. https://rt.cpan.org/Ticket/Display.html?id=67799
+- describe problem of fake memory leak because of big session cache
+  and how to fix it, see https://rt.cpan.org/Ticket/Display.html?id=68073
+v1.41 2011.05.09
+- fix issue in stop_SSL where it did not issue a shutdown of the 
+  SSL connection if it first received the shutdown from the other
+  side. Thanks to fencingleo[AT]gmail[DOT]com for reporting
+- try to make t/nonblock.t more reliable, at least report the real
+  cause of ssl connection errors
+v1.40 2011.05.02
+- integrated patch from GAAS to get IDN support from URI.
+  https://rt.cpan.org/Ticket/Display.html?id=67676
+v1.39_1 2011.05.02
+- fix in exampel/async_https_server.
+  Thanks to DetlefPilzecker[AT]web[DOT]de for reporting
+v1.39 2011.03.03
+- fixed documentation of http verification: wildcards in cn is allowed
+v1.38_1 2011.01.24
+- close should undef _SSL_fileno, because the fileno is no longer
+  valid (SSL connection and socket are closed)
+v1.38 2011.01.18
+- fixed wildcards_in_cn setting for http (wrongly set in 1.34 to 1
+  instead of anywhere). Thanks to dagolden[AT]cpan[DOT]org for
+  reporting
+  https://rt.cpan.org/Ticket/Display.html?id=64864
+v1.37 2010.12.09
+- don't complain about invalid certificate locations if user explicitly 
+  set SSL_ca_path and SSL_ca_file to undef. Assume that user knows what
+  he is doing and will work around the problems by itself.
+  http://rt.cpan.org/Ticket/Display.html?id=63741
+v1.36 2010.12.08
+- update documentation for SSL_verify_callback based on 
+  https://rt.cpan.org/Ticket/Display.html?id=63743
+  https://rt.cpan.org/Ticket/Display.html?id=63740
+v1.35 2010.12.06
+- if verify_mode is not VERIFY_NONE and the ca_file/ca_path cannot be
+  verified as valid it will no longer fall back to VERIFY_NONE but throw
+  an error. Thanks to Salvatore Bonaccorso and Daniel Kahn Gillmor for
+  pointing out the problem, see also 
+  http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=606058
+v1.34 2010.11.01
+- scheme http for certificate verification changed to 
+  wildcards_in_cn=1, because according to rfc2818 this is valid and
+  also seen in the wild
+- if upgrading socket from inet to ssl fails due to handshake problems
+  the socket gets downgraded, but is still open.
+  See https://rt.cpan.org/Ticket/Display.html?id=61466
+- deprecate kill_socket, just use close()
+v1.33 2010.03.17
+- attempt to make t/memleak_bad_handshake.t more stable, it fails 
+  for unknown reason on various systems
+- fix hostname checking: an IP should only be checked against 
+  subjectAltName GEN_IPADD, never against GEN_DNS or CN.
+  Thanks to rusch[AT]genua[DOT]de for bug report
+v1.32 2010.02.22
+- Makefile.PL: die if Scalar::Util has no dualvar support instead of
+  only complaining. Thanks to w[DOT]phillip[DOT]moore[AT]gmail[DOT]com
+  for reporting.
+v1.31 2009.09.25
+- add and export constants for SSL_VERIFY_* 
+- set SSL_use_cert if cert is given and not SSL_server
+- support alternative CRL file with SSL_crl_file thanks to patch of
+  w[DOT]phillip[DOT]moore[AT]gmail[DOT]com
+v1.30_3 2009.09.03
+- make t/memleak_bad_handshake.t more stable (increase listen queue,
+  ignore errors on connect, don't run on windows..)
+v1.30_2 2009.09.01
+- t/memleak_bad_handshake.t don't write errors with ps to stderr,
+  -o vsize argument is not supported on all platforms, just skip
+  test then
+v1.30_1 2009.08.31
+- make sure that idn_to_ascii gets no \0 bytes from identity, because
+  it simply cuts the string their (using C semantics). Not really a
+  security problem because IDN like identity is provided by user in
+  hostname, not by certificate.
+
+v1.30 2009.08.19
+- fix test t/memleak_bad_handshake.t
+v1.29 2009.08.19
+- fixed thanks for version 1.28
+v1.28 2009.08.19
+- fix memleak when SSL handshake failed.
+  Thanks richardhundtu[AT]gmail[DOT]com
+
+v1.27 2009.07.24
+- changed possible local/utf-8 depended \w in some regex against more
+  explicit [a-zA-Z0-9_]. Fixed one regex, where it assumed, that service
+  names can't have '-' inside
+- fixed bug https://rt.cpan.org/Ticket/Display.html?id=48131
+  where eli[AT]dvns[DOT]com reported warnings when perl -w was used.
+  While there made it more aware of errors in Net::ssl_write_all (return
+  undef not 0 in generic_write)
+v1.26 2009.07.03
+- SECURITY BUGFIX! 
+  fix Bug in verify_hostname_of_cert where it matched only the prefix for 
+  the hostname when no wildcard was given, e.g. www.example.org matched
+  against a certificate with name www.exam in it
+  Thanks to MLEHMANN for reporting
+
+v1.25 2009.07.02
+- t/nonblock.t: increase number of bytes written to fix bug with OS X 10.5
+  https://rt.cpan.org/Ticket/Display.html?id=47240
+
+v1.24 2009.04.01
+- add verify hostname scheme ftp, same as http
+- renew test certificates again (root CA expired, now valid for 10 years)
+
+v1.23 2009.02.23
+- if neither SSL_ca_file nor SSL_ca_path are known (e.g. not given and the
+  default values have no existing file|path) disable checking of
+  certificates, but carp about the problem
+- new test certificates, the old ones expired and caused tests to fail
+
+v1.22 2009.01.24
+- Net::SSLeay stores verify callbacks inside hash and never clears them, so
+  set verify callback to NULL in destroy of context
+
+v1.21 2009.01.22
+- auto verification of name in certificate created circular reference between
+  SSL and CTX object with the verify_callback, which caused the objects to be
+  destroyed only at program end. Fix it be no longer access $self from inside
+  the callback.
+  Thanks to odenbach[AT]uni-paderborn[DOT]de for reporting
+
+v1.20 2009.01.15
+- only changes on test suite to make it ready for win32
+  (tested with strawberry perl 5.8.8)
+
+v1.19 2008.12.31
+- fix verifycn_name autodetection from PeerAddr/PeerHost
+
+v1.18 2008.11.17
+- fixed typo in argument: wildcars_in_cn -> wildcards_in_cn
+  http://rt.cpan.org/Ticket/Display.html?id=40997
+  thanks to ludwig[DOT]nussel[AT]suse[DOT]de for reporting
+
+v1.17 2008.10.13
+- no code changes, publish v.16_3 as v.17 because it looks better 
+  than v.16
+- document win32 behavior regarding non-blocking and timeouts
+
+v1.16_3   2008.09.25
+- fix t/nonblock.t with workaround for problems with 
+  IO::Socket::INET on some systems (Mac,5.6.2) where it cannot do 
+  nonblocking connect and leaves socket blocked.
+- make some tests less verbose by fixing diag in t/testlib.t 
+  (send output to STDOUT not STDERR and prefix with '#')
+
+v1.16_2   2008.09.24
+- work around Bug in IO::Socket::INET6 on BSD systems
+  http://rt.cpan.org/Ticket/Display.html?id=39550
+  by setting Domain based on PeerAddr
+  Thanks to srezic for report and support
+- remove tests of recv/send from t/core.t. Might badly interact
+  with SSL handshake and cause crashes as seen on OS X 10.4
+
+v1.16_1   2008.09.19
+- better support for IPv6:
+  - IPv6 is enabled by default if IO::Socket::INET6 is available
+  - t/inet6.t for basic tests
+
+v1.16    2008.09.19
+- change code for SSL_check_crl to use X509_STORE_set_flags instead of
+  X509_STORE_CTX_set_flags based on bug report from 
+  <tjtoocool[AT]phreaker[DOT]net >
+- change opened() to report -1 if the IO::Handle is open, but the
+  SSL connection failed, needed with HTTP::Daemon::SSL which will send
+  an error message over the unencrypted socket
+
+v1.15
+- change internal behavior when SSL handshake failed (like when verify
+  callback returned an error) in the hope to fix spurious errors in
+  t/auto_verify_hostname.t
+
+v1.14
+- added support for verification of hostname from certificate
+  including subjectAltNames, support for IDN etc based on patch and
+  input from christopher[AT]odenbachs[DOT]de and 
+  achim[AT]grolmsnet[DOT]de.
+  It is also possible to get more information from peer_certificate
+  based on this patch. See documentation for peer_certificate and
+  verify_hostname
+- automatic verification of hostnames with SSL_verifycn_scheme and
+  SSL_verifycn_name
+- global setting of default context options like SSL_verifycn_scheme,
+  SSL_verify_mode with set_ctx_defaults
+- fix import of inet4,inet6 which got broken within 1.13_X.
+  Thanks to <at[AT]altlinux[DOT]ru> for bugreport and patch
+- clarified and enhanced debugging support based on bugreport
+  http://rt.cpan.org/Ticket/Display.html?id=32960
+- put information into README regarding the supported and recommended
+  version of Net::SSLeay
+
+v1.13
+- removed CLONE_SKIP which was added in 1.03 because this breaks
+  windows forking. Handled threads/windows forking better by making
+  sure that CTX from Net::SSLeay gets not freed multiple times from 
+  different threads after cloning/forking
+- removed setting LocalPort to 0 in tests, instead leave it undef
+  if a random port should be allocated. This should fix build problems 
+  with 5.6.1. Thanks to <andrew[DOT]benham[AT]thus[DOT]net>
+
+v1.12
+- treat timeouts of 0 for accept_SSL and connect_SSL like no timeout,
+  like IO::Socket does.
+
+v1.11
+- fixed errors in accept_SSL which would work when called from start_SSL
+  but not from accept
+
+v1.10
+- start_SSL, accept_SSL and connect_SSL have argument for Timeout
+  so that the SSL handshake will not block forever. Only used if the
+  socket is blocking. If not set the Timeout value from the underlying
+  IO::Socket is used
+
+v1.09
+- new method stop_SSL as opposite of start_SSL based on an idea
+  of Bron Gondwana <brong[AT]fastmail[DOT]fm>
+  To support this method the SSL_shutdown handling had to be
+  fixed, e.g. in close a proper unidirectional shutdown
+  should be done while in stop_SSL a bidirectional shutdown
+- try to make it clearer that thread support is buggy
+
+v1.08
+- make sure that Scalar::Util has support for dualvar
+  (Makefile.PL,SSL.pm) because the perl-only version has
+  has no dualvar
+
+v1.07
+- fix t/nonblock.t on systems which have by default a larger
+  socket buffer. Set SO_SNDBUF explicitly with setsockopt
+  to force smaller writes on the socket
+
+v1.06
+- instead of setting undef args to '' in configure_SSL drop
+  them. This makes Net::SMTP::SSL working again because it
+  does not give LocalPort of '' to IO::Socket::INET any more
+
+v1.05
+- make session cache working even if the IO::Socket::SSL object
+  was not created with IO::Socket::SSL->new but with
+  IO::Socket::SSL->start_SSL on an established socket
+
+v1.04
+- added way to create SSL object with predefined session
+  cache, thus making it possible to share the cache between
+  objects even if the rest of the context is not shared
+  key SSL_session_cache
+  Note that the arguments of IO::Socket::SSL::SessionCache::new
+  changed (but you should never have used this class directly
+  because it's internal to IO::Socket::SSL)
+
+v1.03
+- add CLONE_SKIP as proposed by 
+  Jarrod Johnson jbjohnso at us dot ibm dot com
+
+v1.02
+- added some info to BUGS and to BUGS section of pod
+- added TELL and BINMODE to IO::Socket::SSL::SSL_HANDLE, even
+  if they do nothing useful.
+- all tests allocate now the ports dynamically, so there should
+  be no longer a conflict with open ports on the system where
+  the tests run
+
+v1.01
+- work around Bug in Net::HTTPS where it defines sub blocking
+  as {}, e.g. force scalar context when calling sub blocking
+  (in IO::Socket::SSL::write)
+  see http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=383106
+
+v1.0
+- fix deprecated and practically undocumented function 
+  get_peer_certificate so that LWP Net::HTTPS works again
+- set arg 'Blocking' while calling SUPER::configure only
+  if it was set by the caller to work around Problem in LWP
+  Net::HTTPS
+
+v0.999
+- If SSL_cipher_list is not given it uses the openssl
+  default instead of setting it to 'ALL:!LOW:!EXP' like
+  before. The old value included ADH and this might be
+  a bad idea, see BUGS why.
+
+v0.998
+- declare socket as opened before calling fatal_ssl_error
+  because the SSL_error_trap set up from HTTP::Daemon
+  needs this
+- accept_SSL sets errors on $socket (the accepted socket)
+  not $self (the listening socket if called from accept)
+  so it can be queried from SSL_error_trap
+- note in BUGS section that IO::Socket::SSL is not thread-safe
+
+v0.997
+- fix readline (e.g. getline,getlines,<>) so that it behaves
+  regarding $/ like written in the $/ documentation.
+
+v0.996
+- removed links and comments to unofficial release of
+  Net::SSLeay, because there is a newer version already
+
+v0.995
+- add support for Diffie Hellman Key Exchange.
+  See parameter SSL_dh_file and SSL_dh.
+
+v0.994
+- hide DEBUG statements and remove test to load Debug.pm
+  because packages like SpamAssassin cannot cope with it
+  (at least the OpenBSD port)
+
+v0.993
+- added SSL_cert and SSL_key parameter which do not take
+  a file name like SSL_cert_file and SSL_key_file but
+  an internal X509* resp. EVP_PKEY* value. Useful for
+  dynamically created certificates and keys.
+- added test for sysread/syswrite behavior (which was changed
+  in v0.991)
+
+v0.992
+- _set_rw_error does $!||=EAGAIN only if error is one of 
+  SSL_WANT_READ|SSL_WANT_WRITE (patch from Mike Smith 
+  <mike at mailchannels dot com>)
+- Fix Makefile.PL to allow detection of failures in PREREQ_PM
+  (http://rt.cpan.org/Public/Bug/Display.html?id=20563, patch 
+  by alexchorny at gmail dot com)
+
+v0.991
+- sysread and syswrite ar no longer the same as read and write,
+  but can return already if only parts of the data are read
+  or written (which is the usual semantic for sysread and syswrite)
+  This should fix problems with HTTP::Daemon::SSL
+
+v0.99
+- just upgrade Version number because I've screwed up upload
+  of v0.98 to cpan
+
+v0.98
+- Maintainer changed to <Steffen_Ullrich at genua dot de>
+- Better support for nonblocking sockets:
+  . exports $SSL_ERROR which contains the latest error from
+    the openssl library. Exports constants SSL_WANT_READ and
+    SSL_WANT_WRITE es special errors which will be set if
+    openssl wants to write or read during nonblocking connects,
+    accepts, reads or writes.
+  . accept,accept_SSL,connect and connect_SSL don't block
+    anymore if the socket is nonblocking.
+    Instead $! will be set from the underlying IO::Socket::INET
+    connect or accept if it failed there (usually EAGAIN or 
+    EINPROGRESS) or if the underlying openssl needs to read or
+    write $! will be set to EAGAIN and $SSL_ERROR will be set
+    to SSL_WANT_READ or SSL_WANT_WRITE
+  . syswrite returns undef and sets $!,$SSL_ERROR if it fails 
+    to write instead of returning 0.
+- Bugfixes (http://rt.cpan.org/Public/Bug/Display.html?id=Bugid)
+  . Bug 18439: fileno 0 should be valid
+  . Bug 15001: sysread interprets buffer "0" as ""
+- peer_certificate returns X509 struct string if no field
+  for extraction was specified 
+- get_peer_certificate returns the certificate instead of the
+  IO::Socket::SSL object
+
+   
+v0.97
+- Writes now correctly return errors.  (Problem noted by
+  Dominique Quatravaux <dom at idealx.com>).
+- CA paths now work without passing an empty SSL_ca_file
+  argument.  (Problem found by Phil Pennock, <phil.pennock
+  at globnix.org>).
+- IO::Socket::SSL now automatically passes Proto => tcp (if
+  not already specified) to IO::Socket::INET to work around
+  /etc/services files with udp entries listed first.  (Fix
+  suggested by Phil Pennock).
+- $socket->accept() now returns the peer address in array
+  context for better conformance with IO::Socket::INET.
+  However, if you were doing "map { $_->accept } (@sockets)",
+  or similar tricks, you will need to use "scalar" to get the
+  old behavior back.  (Problem noted by Nils Sowen, <n.sowen
+  at kon.de>).
+- IO::Socket::SSL should now properly block on reads larger
+  than the buffer size of Net::SSLeay.  (Problem found by Eric
+  Jergensen, <eric at dvns.com>).
+- IO::Socket::SSL should now send CA Certs (if necessary)
+  along with certificates.  (Problem found by <roy at
+  momentous.ca>).
+- Timeouts should now work, but be aware that if multiple
+  reads/writes are necessary to complete a connection, then
+  each one may have a separate timeout.  (Request from
+  Dominique Quatravaux <dom at idealx.com>).
+- In certain cases, start_SSL() would misplace a socket's
+  fileno, causing problems with starting SSL.  This should now
+  be fixed.  (Problem found by <russ at zerotech.net>).
+- IO::Socket::SSL now requires a minimum of Net::SSLeay 1.21.
+
+--- Old Versions --------------------------------------------------
+
+v0.96  2004.4.30
+- Makefile's error messages now correct if output is
+  redirected (patch from Ilya Zakharevich <ilya at
+  math.berkeley.edu>).
+- Non-blocking connects/accepts now work (Problem found by
+  Uri Guttman <uri at stemsystems.com>).
+- new_from_fd() now works.
+- getline() and <> in scalar context now return undef
+  instead of '' if the read failed.  (Problem found by
+  Christian Gilmore <cag at us.ibm.com>).
+- Broken pipe signals are now ignored during socket close
+  to prevent a SSL shutdown message from killing the parent
+  program.  (Problem found by Christian Gilmore).
+- Tests should proceed much more quickly, and a semi-race was
+  fixed, meaning that on slow machines the tests should be
+  more reliable.
+- Check for Scalar::Util and Weakref now uses default
+  $SIG{__DIE__} instead of a potentially user-altered one
+  (suggestion from Olaf Schneider <Olaf.Schneider at
+  iwr.fzk.de>).  This only applies to Perl 5.6.0 & above.
+- Session caching support (patch from Marko Asplund
+  <marko.asplund at kronodoc.fi>).
+- set_default_context() added to alter the behavior of
+  modules that use IO::Socket::SSL from the main program.
+- get_ssl_object() renamed to _get_ssl_object() to reflect
+  the fact that it's only supposed to be used internally
+  (not that you should have cared, of course).
+- Added patch for Net::SSLeay to take advantage of
+  client-side session caching.
+
+v0.95  2003.8.25
+- Changed PeerAddr in example/ssl_client.pl back to localhost.
+- Update of examples to automatically switch to the proper
+  directory if they cannot find the necessary SSL certificates.
+- Minor documentation update with more INET6 info.
+- Corrected some error messages for IO::Socket::INET6.
+- Better opened() behavior when sockets close unexpectedly.
+- Added note about random number generators for Solaris users
+  (Problem found by Christian Gilmore <cag at us.ibm.com>).
+- Added support for WeakRef and Scalar::Util to allow
+  IO::Socket::SSL objects to auto-destroy themselves when 
+  they go out of scope.
+- Added croak()ing for unimplemented send() and recv() methods
+  so they are not accidentally used to transmit unencrypted
+  data.  The Perl builtin functions cannot be reliably trapped
+  and are still dangerous, a fact that the POD now reflects
+  (Problem noted by Michal Ludvig <michal at logix.cx>).
+
+v0.94  2003.6.26
+- Changed accept() to use inherited accept() instead of
+  IO::Socket::accept, so that IPv6 inheritance is possible.
+- Added options to import() so that a user could specify
+  IPv6 or IPv4 mode of operation.
+- Documentation fixes, esp. e-mail address.
+
+v0.93  2003.6.24
+- Fixed error-checking slip in connect_SSL() (Problem found by
+  Uri Guttman <uri at stemsystems.com>).
+- All functions now return the empty list () on errors.
+- Added note about the above change to appease Graham Barr
+  <gbarr at pobox.com>.
+- Fixed Net::SSLeay giving warnings when arguments are undef;
+  in all cases, undef arguments may be set to '' without any
+  change in behavior except for removing the warnings.
+  (Problem found by Dominique Quatravaux <dom at idealx.com>)
+- If accept() or connect() fails in SSL negotiation, the user
+  now has the option to print something to the failed socket
+  before it is closed.  (error_trap option in new())
+- Added support for CRLs (SSL_check_crl option in new()) for
+  versions of OpenSSL >= 0.9.7b (Original patch from
+  Brian Lindauer <jbl at sysd.com>)
+- Finally added decent support for certificate callbacks.
+  (SSL_verify_callback option in new(), suggestion from
+  Dariush Pietrzak <eyck at ghost.anime.pl>).
+- accept()/connect()/socket_to_SSL() now fail immediately if
+  the socket in question does not have a fileno.
+- Added the kill_socket() method to guarantee that a socket dies.
+- Fixed extra warning when printing errors in debug mode.
+- Deprecated socket_to_SSL() in favor of the class method
+  start_SSL() (Class method suggestion from Graham Barr
+  <gbarr at pobox.com>).
+- Added the class method start_SSL() to allow for cases when
+  the desired class of the socket is not IO::Socket::SSL
+  (Request from Dariush Pietrzak <eyck at ghost.anime.pl>)
+- Changed socket_to_SSL to rebless socket to original class
+  if SSL negotiation failed (Request from Graham Barr
+  <gbarr at pobox.com>)
+- Removed the daemon.pl example, as it did not work with the
+  standard distribution of HTTP::Daemon (use HTTP::Daemon::SSL
+  instead).
+
+v0.92   2002.10.22
+- Changed the fileno() function to support returning the fileno
+  of server sockets.  (Problem found by Roland Giersig
+  <RGiersig at cpan.org>).
+- Fixed SSL_version incorrectly defaulting to SSLv2 (patch from
+  Roland Alder <roland.alder at celeris.ch>).
+
+v0.91   2002.08.31
+- Added support for SSL_peek and SSL_pending (peek() and
+  pending()).  Updated documentation, tests, etc. to reflect
+  this.
+
+v0.901  2002.08.19
+- Fixed the warning that happens when sockets are not explicitly
+  closed() before the program terminates.
+
+
+v0.90   2002.08.13
+- This version is a complete rewrite of IO::Socket::SSL.  It now
+  has about half the lines of code, twice the amount of documentation,
+  and a slightly more polished interface.
+- IO::Socket::SSL now works properly with mod_perl and taint mode.
+- Major documentation update.
+- Update of the BUGS file to reflect changes made in the rewrite.
+- Update of the test suite for Perl v5.8.0 (or, more precisely,
+  for Scalar::Util).
+- Update of the test suite for Perl v5.00503 (or, more precisely,
+  for the lack of several nice features added in v5.6.0) (Marko
+  Asplund <aspa at kronodoc.fi>).
+- New test suite that does not need the Internet to function.
+- Update of all the files in example/ to use more current features
+  of IO::Socket::SSL.
+- Removal of SSL_SSL and X509_Certificate classes.
+- There have been a few name changes (like socketToSSL ->
+  socket_to_SSL) for better consistency.
+- The functionality of get_peer_certificate() and friends is deprecated.
+- The functionality of want_write() and want_read() is deprecated.
+- The functionality of context_init() is deprecated for normal use.
+- Support for all SSL context options in the new() call.
+- SSL contexts are no longer global.  The SSL_reuse_ctx option
+  is provided for those who want to re-use a context.
+- The default verify mode is now VERIFY_NONE.
+- IO::Socket::SSL::DEBUG is now linked to Net::SSLeay::trace to
+  provide different levels of debugging information.
+- There is a uniform interface for error reporting, so on error
+  all functions will return undef and the error will be available
+  by calling errstr().
+- The dump_peer_certificate() and peer_certificate() functions
+  have been added.
+- sysread() will now behave correctly if the offset argument is
+  greater than the length of the read buffer.  It also will truncate
+  the read buffer properly, according to the Perl documentation for
+  sysread().
+- getline(), getlines(), and getc() have been added.
+- syswrite() now uses references to avoid copying large	amounts of data.
+- readline() uses ssl_read_all in array context for improved speed.
+- close() now uses SSL_shutdown() to properly close an SSL connection,
+  unless you tell it not to.
+- If you have Net::SSLeay version 1.18 or greater, X509 certificates
+  will be properly freed.
+- All other known bugs have been fixed.
+
+
+v0.81a (Not publicly released)
+- Added support for SSL_passwd_cb.
+- Added accept() server socket support to socketToSSL().
+
+v0.81   2002.04.10
+- calling context_init twice destroyed global context. fix from
+  Jason Heiss <jheiss at ofb.net>.
+- file handle tying interface implementation moved to a separate
+  class to prevent problems resulting from self-tying filehandles.
+  Harmon S. Nine <hnine at netarx.com>.
+- docs/debugging.txt file added
+- require Net::SSLeay v1.08
+- preliminary support for non-blocking read/write
+- socketToSSL() now respects context's SSL verify setting
+  reported by Uri Guttman <uri at stemsystems.com>.
+
+v0.80	2001.08.19
+- fixed startTLS support (socketToSSL) (Graham Barr <gbarr at pobox.com>)
+- make accept() set fileno attribute on newly created IO::Socket::SSL
+  object (Martin Oldfield <m at mail.tc>).
+- certificate updates.
+- use SSL_CTX_use_PrivateKey_file in SSL_Context::new.
+
+v0.79	2001.06.04
+- angle bracket readline operator support
+  (David Darville <david at dark.x.dtu.dk>).
+- eliminate warnings in choosing SSL protocol version.
+- implement our own opened method and make length parameter optional
+  in syswrite (Robert Bihlmeyer <robbe at orcus.priv.at>).
+
+v0.78	2001.04.24
+- test script targets changed, certificate setup fixed
+- support for TLS in SSL_version. SSL_version parameter values
+  changed from integer to string. NB: this is an incompatible change.
+  all SSL_version parameter values have to be changed. valid values
+  include: 'sslv2', 'sslv3', 'sslv23'. Stephen C. Koehler
+  <koehler at securecomputing.com>.
+- enable selecting SSL version for connections. patch from
+  Takanori Ugai <ugai at jp.fujitsu.com>.
+- allow setting SSL_ca_file to ''. this is needed for being
+  able to use SSL_ca_path (Robert Bihlmeyer <robbe at orcus.priv.at>).
+- include the Apache CA bundle file in the distribution (my-ca.pem).
+- BUGS file added.
+
+v0.77	2001.01.15
+- don't setup SSL CA verification unless cert verification is
+  actually used for the connections.
+- default SSL protocol version selection in SSL.pm.
+
+v0.76	2000.11.17
+- patch from Kwok Chern Yue <chernyue at post1.com> for
+  making IO::Socket::SSL work with HTTP::Daemon.
+
+v0.75	2000.07.26
+- IO::Socket::SSL should now work with perl v5.6.0
+- demo/*.pl and t/*.t now turn module debugging on if
+  DEBUG command line argument is given
+- default certificates changed
+
+v0.74	2000.07.05
+- Changes file added
+- bugfix in IO::Socket::SSL::sysread() (zliu2 at acsu.buffalo.edu)
+- libwww-perl and IO::Socket::SSL UML models added in docs
+- URL changes in test scripts
+- preliminary support for startTLS in IO::Socket::SSL::socketToSSL()
+- miscellaneous patches for Net::SSLeay added in diffs

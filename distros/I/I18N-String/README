@@ -1,0 +1,81 @@
+NAME
+    I18N::String - Delay I18N translation until a variable is stringified
+
+VERSION
+    version 0.03
+
+SYNOPSIS
+        use I18N::String qw('_');
+
+        I18N::String->localize_via( \&localize );
+
+        my @Days = (
+            _('Monday'),   _('Tuesday'),  _('Wednesday'),
+            _('Thursday'), _('Friday'),   _('Saturday'),
+            _('Sunday')
+        );
+
+        sub day_of_week {
+            my $day = shift;
+            return $Days[$day]
+        }
+
+DESCRIPTION
+    Sometimes it is useful to store I18N'able strings in variables, but
+    delay their translation until the point that they are actually used.
+    I18N::String does this for you.
+
+USAGE
+  Importing
+        use I18N::String;           # exports loc()
+        use I18N::String 'foo'      # exports a func named foo()
+
+
+        my $str = foo('String');
+
+        print $str;                 # localized version of 'String'
+
+  localize_via()
+        I18N::String->localize_via( $coderef );
+
+    You need to set this once, and it is global. This is the function that
+    will be called when your variable is stringified, to return the
+    localized version.
+
+  loc()
+    You can also store strings that require arguments, eg:
+
+        $str = _('I found [quant,_1,file,files]');
+
+    And stringify them via:
+
+        $str->loc(@args);
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc I18N::String
+
+    You can also look for information at:
+
+    *   GitHub
+
+        <http://github.com/clintongormley/I18N-String>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/I18N-String>
+
+    *   Search MetaCPAN
+
+        <https://metacpan.org/module/I18N-String>
+
+AUTHOR
+    Clinton Gormley <drtech@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Clinton Gormley.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

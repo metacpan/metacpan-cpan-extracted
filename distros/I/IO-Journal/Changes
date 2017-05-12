@@ -1,0 +1,98 @@
+2009-07-25  Jonathan Yu <frequency@cpan.org>
+
+	Added some more documentation. POD coverage is still abysmal, Test-Pod-Coverage complains quite loudly.
+
+2009-07-25  Jonathan Yu <frequency@cpan.org>
+
+	Add the IO-Journal temp (xs|c|o) files to MANIFEST.SKIP
+
+2009-07-25  Jonathan Yu <frequency@cpan.org>
+
+	- Added new files to MANIFEST
+	- Added .tmp files and Build.bat to MANIFEST.SKIP
+
+2009-07-25  Jonathan Yu <frequency@cpan.org>
+
+	- Remove all the libjio files, since they should be installed with Alien now
+	- Add Alien::Libjio to build_requires and requires
+
+2009-07-25  Jonathan Yu <frequency@cpan.org>
+
+	Added a bunch of standard author tests
+
+2009-07-25  Jonathan Yu <frequency@cpan.org>
+
+	Some other minor oopsies
+
+2009-07-25  Jonathan Yu <frequency@cpan.org>
+
+	Oops, typo'd $self should have been $class
+
+2009-07-25  Jonathan Yu <frequency@cpan.org>
+
+	- Added ppport.h for portability
+	- Cleaned up POD
+
+2009-06-02  Jonathan Yu <frequency@cpan.org>
+
+	- Added example directory
+	- Moved libjio source out of src
+
+2009-06-02  Jonathan Yu <frequency@cpan.org>
+
+	Fixed typo
+
+2009-06-02  Jonathan Yu <frequency@cpan.org>
+
+	- Added libjio source files (this probably breaks build; we'll see)
+	- Minor changes to Build.PL
+	- Mostly documentation changes in Journal.pm
+	- Formatting changes in Journal.xs; fixed a typo
+
+2009-04-15  Jonathan Yu <frequency@cpan.org>
+
+	Moved syswrite from Transaction to Journal
+
+2009-04-15  Jonathan Yu <frequency@cpan.org>
+
+	- Added bootstrapper for IO::Transaction::Journal module
+	- Changed IO::Journal's flag parameter to mode, to better represent what it's supposed to be - an Fcntl mode
+	- Set up jopen'ed files properly when O_APPEND mode is chosen
+	- Provide a typedef shortcut for transaction struct
+	- Updated Transaction.xs to implement syswrite and sysread
+	- Updated svn:keyword property
+
+2009-04-15  Jonathan Yu <frequency@cpan.org>
+
+	- Added a common model.h file for storing data structure models (ie the journal struct)
+	- Implemented a few functions for Transaction, including sysread and syswrite
+	- Added option for sysopen to change permissions (defaults to 0666)
+
+2009-04-12  Jonathan Yu <frequency@cpan.org>
+
+	- Added a typemap file
+	- Wrote some of the code for IO::Journal and IO::Journal::Transaction. Some basic stuff can be done now, including opening a file and beginning a transaction. It's not very useful right now since the write functionality hasn't been implemented yet, though.
+	- Added a wrapper for sysopen() to provide a common open()-like interface (ie to convert '>' flags to the Fcntl style flags)
+	- TODO: write a bootstrapper for IO::Journal::Transaction
+	- Added Build.PL code to set up the build environment using getconf, with defaults if getconf is not installed
+	- Set dynamic_config to 1, since special stuff needs to be done now (setting up the build environment)
+	- These bindings rely on a system-wide installation of libjio. A second module is forthcoming (proposed name IO::Journal::Amalgamation) which will include the libjio files in the src tree
+
+2009-04-11  Jonathan Yu <frequency@cpan.org>
+
+	- Added skeleton code
+	- Made Test::NoWarnings a required build prerequisite
+	- Set up svn:keywords for everything
+	- Updated MANIFEST file
+
+2009-04-10  Jonathan Yu <frequency@cpan.org>
+
+	Creation of IO-Journal stub package
+
+2009-04-10  Jonathan Yu <frequency@cpan.org>
+
+	Creation of IO-Journal stub directory - for a module providing transaction-oriented journalling I/O :-)
+
+;; Local Variables:
+;; coding: utf-8
+;; End:

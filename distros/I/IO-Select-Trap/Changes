@@ -1,0 +1,11 @@
+Revision history for Perl extension IO::Select::Trap.
+
+0.03  Mon Apr 15 10:56:00 2002
+	- Replaced the "default" README
+
+0.02  Fri Apr 12 14:12:00 2002
+	- Removed PC line endings
+	
+0.01  Fri Oct  5 13:55:30 2001
+	- First release
+

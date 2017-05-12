@@ -1,0 +1,26 @@
+Revision history for Iterator-Diamond
+
+1.01	2016-02-28
+	- Fix some packaging issues.
+
+1.00	2016-02-27
+	- Some more fixes by Martin Becker.
+
+0.04	2012-10-02
+        Suggestions by Martin Becker (rt-79486):
+        - read from STDIN if @ARGV is empty
+        - explicitly enable $^I feature
+        - read from pipes (inadequate size check hampered this)
+        - document that suffix must be non-empty
+        - fix failed test rt-56053
+
+0.03	2008-08-07
+	Fixes.
+
+0.02	2008-08-04
+	Split functionality into Iterator::Files and
+	Iterator::Diamond.
+
+0.01    2008-08-04
+        First version, released on an unsuspecting world.
+

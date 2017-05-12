@@ -1,0 +1,28 @@
+NAME
+
+IPC::Signal::Force - force default handling of a signal
+
+DESCRIPTION
+
+This module exports one function, "force_raise", which invokes a default
+signal handler regardless of the signal's current handling.
+
+INSTALLATION
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+AUTHOR
+
+Andrew Main (Zefram) <zefram@fysh.org>
+
+COPYRIGHT
+
+Copyright (C) 2004, 2007, 2010 Andrew Main (Zefram) <zefram@fysh.org>
+
+LICENSE
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

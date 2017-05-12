@@ -1,0 +1,24 @@
+Revision history for perl module Input::Validator
+
+0.001005 2012-02-13
+
+ - Do not clear other messages when calling messages method on a field
+   (reported by Marcus Ramberg)
+
+0.001004 2011-07-05
+
+ - Do not keep wrong values, there is a separate method "all_values" now
+
+0.001003 2011-07-05
+
+ - Fixed callback custom error setting
+ - Keep wrong field's value
+ - Set custom error messages per field
+
+0.001002 2011-05-26
+
+ - Fixed conditions inflate bug (found by Alex Voronov)
+
+0.001001 2011-05-05
+
+ - Initial release

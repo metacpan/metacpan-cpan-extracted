@@ -1,0 +1,14 @@
+CODE:
+- Localize $@ where required
+- Finish PerlInterpreter test suite
+- Finish PerlHandle stuff and document
+
+DOCUMENTATION:
+- Document new Callback Interface
+- Document InlineJavaPerlObject when finished
+
+TEST:
+- Alpha
+- Cygwin
+
+

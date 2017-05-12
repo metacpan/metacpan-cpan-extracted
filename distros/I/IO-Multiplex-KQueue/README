@@ -1,0 +1,12 @@
+README for IO::Multiplex::KQueue
+
+IO::Multiplex::KQueue is kqueue(2) IO::Multiplex implementation with
+compatible interface to IO::Multiplex (version 1.08). Please refer
+IO::Multiplex for details.
+
+Just install IO::KQueue and replace IO::Multiplex with
+IO::Multiplex::KQueue in your source code.
+
+Note: IO::KQueue 0.29 has a bug to handle timeout. please install
+http://www.in2home.org/download/IO-KQueue-0.30.tar.gz or you
+will fail t/110_ntest.t.

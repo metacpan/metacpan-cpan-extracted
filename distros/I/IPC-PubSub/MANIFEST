@@ -1,0 +1,28 @@
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/IPC/PubSub.pm
+lib/IPC/PubSub/Cache.pm
+lib/IPC/PubSub/Cache/DBM_Deep.pm
+lib/IPC/PubSub/Cache/JiftyDBI.pm
+lib/IPC/PubSub/Cache/JiftyDBI/Stash.pm
+lib/IPC/PubSub/Cache/JiftyDBI/Stash/Item.pm
+lib/IPC/PubSub/Cache/JiftyDBI/Stash/Publisher.pm
+lib/IPC/PubSub/Cache/Memcached.pm
+lib/IPC/PubSub/Cache/PlainHash.pm
+lib/IPC/PubSub/Cacheable.pm
+lib/IPC/PubSub/Publisher.pm
+lib/IPC/PubSub/Subscriber.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+SIGNATURE			Public-key signature (added by MakeMaker)
+t/basic.t
+t/publisher.t

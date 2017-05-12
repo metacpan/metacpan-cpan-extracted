@@ -1,0 +1,33 @@
+NAME
+    IO::Select::Trap - IO::Select() functionality on Scalar-based
+    Filehandles
+    
+INSTALLATION
+            perl Makefile.PL
+            make
+            make test
+            make install
+
+SYNOPSIS
+     use IO::Select::Trap;
+     use IO::String;
+ 
+     my $ios = new IO::String();
+     my $sock = new IO::Socket();
+     my $rb = new IO::Select::Trap(<{ trap=>'Scalar|String' }>, $ios, $sock);
+     my $wb = new IO::Select::Trap(<{ trap=>'Scalar|String' }>, $ios, $sock);
+     my ($rready, $wready) = IO::Select::Trap->select($rb, $wb);
+
+DESCRIPTION
+    IO::Select::Trap is a wrapper for "IO::Select" which enables use of the
+    "IO::Select->select()" method on IO::Scalar or IO::String
+    object/filehandles. Other filehandle object types (ie IO::Socket) are
+    passed through to IO::Select for processing. Most of the IO::Select
+    interface is supported.
+
+AUTHOR & COPYRIGHT
+    Scott Scecina, <scotts@inmind.com>
+
+    Except where otherwise noted, IO::Select::Trap is Copyright 2001 Scott
+    Scecina. All rights reserved. IO::Select::Trap is free software; you may
+    redistribute it and/or modify it under the same terms as Perl itself.

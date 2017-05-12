@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+TODO
+t/IP-Anonymous.t
+lib/IP/Anonymous.pm

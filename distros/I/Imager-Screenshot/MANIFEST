@@ -1,0 +1,28 @@
+Changes				History
+examples/win32_fw.pl		Example - get a window by name on win32 and grab it
+imss.h				Declarations of the functions the XS gives access to
+inc/Devel/CheckLib.pm
+Makefile.PL			Build script
+MANIFEST			This list of files
+MANIFEST.SKIP			Files not to include in the MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+ppport.h			Support older perls
+README
+scdarwin.c			Darwin implementation
+scdarwin2.c
+Screenshot.pm			Main perl implementation
+Screenshot.xs			Interface to C code
+scwin32.c			Win32 implementation
+scx11.c				X11 implementation
+svwin32.c			Win32 translate SV to HWND
+svwin32.h			Win32 translate SV to HWND (header)
+t/00load.t			Test - can we load the modules
+t/10win32.t			Test - win32 implementation
+t/20x11.t			Test - X11 implementation
+t/30tkx11.t			Test - X11 implementation via Tk
+t/40tkwin32.t			Test - Win32 implementation via Tk
+t/50darwin.t			Test - Darwin implementation
+t/90pod.t			Test - check POD is valid
+t/91podcover.t			Test - check all functions are covered by POD
+t/92manifest.t			Test - check we match the MANIFEST
+typemap				Type conversion

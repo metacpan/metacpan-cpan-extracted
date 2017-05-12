@@ -1,0 +1,92 @@
+			       ========
+			       IPC::XPA
+			       ========
+
+NAME
+
+    IPC::XPA - Interface to the XPA messaging system
+
+
+DESCRIPTION
+
+    IPC::XPA is an interface to the xpa library developed by the
+    Smithsonian Astrophysical Observatory's High Energy Astrophysics
+    R&D Group.  The library provides simple inter-process
+    communication via calls to the C<xpa> library as well as via
+    supplied user land programs.
+
+    For details on what the library offers, as well as the library
+    itself, please refer to
+
+	http://hea-www.harvard.edu/RD/xpa/
+
+
+    This release provides an interface to most of the client side
+    routines.  Eventually the rest will be provided.
+
+
+DEPENDENCIES
+
+    You will need the XPA library (mentioned above), as well
+    as the following perl packages:
+
+       Test::More
+       Data::Dumper
+       PDL (supported, but not necessary)
+
+INSTALLATION
+
+    You will need to edit Makefile.PL to point to the xpa library and
+    includes.
+
+    To perform the tests, you'll need ds9 and xpans running.  ds9 is
+    available from
+
+	http://hea-www.harvard.edu/RD/ds9/
+
+    xpans is part of the xpa package.  note that ds9 will
+    automatically start xpans if it's in your path.
+
+    If you've got PDL, the test will use that to send an image to ds9.
+
+    To compile, test and install IPC::XPA,
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+CHANGES
+
+    See the Changes file for more details
+
+COPYRIGHT
+
+--8<--8<--8<--8<--
+
+Copyright (C) 2000-2009 Smithsonian Astrophysical Observatory
+
+This file is part of IPC-XPA
+
+IPC-XPA is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or (at
+your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+-->8-->8-->8-->8--
+
+
+
+AUTHOR
+
+    Diab Jerius ( djerius@cfa.harvard.edu )
+

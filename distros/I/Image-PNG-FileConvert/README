@@ -1,0 +1,110 @@
+   ___                                    ____  _   _  ____       
+  |_ _|_ __ ___   __ _  __ _  ___   _ _  |  _ \| \ | |/ ___|  _ _ 
+   | || '_ ` _ \ / _` |/ _` |/ _ \ (_|_) | |_) |  \| | |  _  (_|_)
+   | || | | | | | (_| | (_| |  __/  _ _  |  __/| |\  | |_| |  _ _ 
+  |___|_| |_| |_|\__,_|\__, |\___| (_|_) |_|   |_| \_|\____| (_|_)
+                       |___/                                      
+   _____ _ _       ____                          _   
+  |  ___(_) | ___ / ___|___  _ ____   _____ _ __| |_ 
+  | |_  | | |/ _ \ |   / _ \| '_ \ \ / / _ \ '__| __|
+  |  _| | | |  __/ |__| (_) | | | \ V /  __/ |  | |_ 
+  |_|   |_|_|\___|\____\___/|_| |_|\_/ \___|_|   \__|
+                                                     
+
+
+This is the README for Image::PNG::FileConvert version 0.09.
+
+Image::PNG::FileConvert is a "module" for the Perl computer programming
+language, a library of computer code to install on a computer.  This
+document contains four sections:
+
+1. About - what the module does
+
+2. Documentation - how to learn more about the module
+
+3. Installation - how to install this module on a computer
+
+4. Help - what to do if you get stuck
+
+-----------------------------------------------------------------------------
+
+1. ABOUT
+
+Image::PNG::FileConvert - convert a file to or from a PNG image
+
+This module can convert any arbitrary data file, either binary or
+text, into a PNG image. PNG (Portable Network Graphics) is a lossless
+image format. (See "Image::PNG::Libpng/SEE ALSO" for details about
+the PNG format.)  Lossless means that there is no loss of data;
+whatever data is put into the original image can always be recovered
+exactly. This module takes advantage of that to use PNG image format
+to store arbitrary data under the guise of a PNG image.
+
+This module is very simplistic, and should be considered an example of
+the use of "Image::PNG::Libpng". If you need to do more complex
+things than this module provides, please consider reading the source
+code of this module as a starting point for making your own functions.
+
+-----------------------------------------------------------------------------
+
+2. DOCUMENTATION
+
+You can read the documentation for the module online at the following
+websites:
+
+    * http://search.cpan.org/perldoc?Image::PNG::FileConvert
+    * http://metacpan.org/release/Image-PNG-FileConvert
+
+(These links go to the latest version of the module.)
+
+After installing the module, you can read the documentation on your
+computer using
+
+    perldoc Image::PNG::FileConvert
+
+-----------------------------------------------------------------------------
+
+3. INSTALLATION
+
+This module requires Perl version 5.8.1 or later.
+
+To install the module from CPAN, use
+
+    cpan Image::PNG::FileConvert
+
+If you have the App::cpanminus installer, you may prefer
+
+    cpanm Image::PNG::FileConvert
+
+To install the module from the source file,
+Image-PNG-FileConvert-0.09.tar.gz, follow this sequence of commands:
+
+    tar xfz Image-PNG-FileConvert-0.09.tar.gz
+    cd Image-PNG-FileConvert-0.09
+    perl Makefile.PL
+    make
+    make install
+
+If you want to test the module before installing it, use "make test" after
+"make" and before "make install".
+
+-----------------------------------------------------------------------------
+
+4. HELP
+
+To get help with the module, you can email the author, Ben Bullock, at
+<bkb@cpan.org>. If you think there is a problem in the module, you can
+report a bug at 
+
+<https://github.com/benkasminbullock/Image-PNG-FileConvert/issues>,
+
+or if you want to alter the source code of Image::PNG::FileConvert, try the
+public repository on github at 
+
+<https://github.com/benkasminbullock/Image-PNG-FileConvert>. 
+
+-----------------------------------------------------------------------------
+
+This README was written on Thu Jan  5 10:43:47 2017.
+
+-----------------------------------------------------------------------------

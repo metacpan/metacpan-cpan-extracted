@@ -1,0 +1,471 @@
+.rn '' }`
+''' $RCSfile$$Revision$$Date$
+'''
+''' $Log$
+'''
+.de Sh
+.br
+.if t .Sp
+.ne 5
+.PP
+\fB\\$1\fR
+.PP
+..
+.de Sp
+.if t .sp .5v
+.if n .sp
+..
+.de Ip
+.br
+.ie \\n(.$>=3 .ne \\$3
+.el .ne 3
+.IP "\\$1" \\$2
+..
+.de Vb
+.ft CW
+.nf
+.ne \\$1
+..
+.de Ve
+.ft R
+
+.fi
+..
+'''
+'''
+'''     Set up \*(-- to give an unbreakable dash;
+'''     string Tr holds user defined translation string.
+'''     Bell System Logo is used as a dummy character.
+'''
+.tr \(*W-|\(bv\*(Tr
+.ie n \{\
+.ds -- \(*W-
+.ds PI pi
+.if (\n(.H=4u)&(1m=24u) .ds -- \(*W\h'-12u'\(*W\h'-12u'-\" diablo 10 pitch
+.if (\n(.H=4u)&(1m=20u) .ds -- \(*W\h'-12u'\(*W\h'-8u'-\" diablo 12 pitch
+.ds L" ""
+.ds R" ""
+'''   \*(M", \*(S", \*(N" and \*(T" are the equivalent of
+'''   \*(L" and \*(R", except that they are used on ".xx" lines,
+'''   such as .IP and .SH, which do another additional levels of
+'''   double-quote interpretation
+.ds M" """
+.ds S" """
+.ds N" """""
+.ds T" """""
+.ds L' '
+.ds R' '
+.ds M' '
+.ds S' '
+.ds N' '
+.ds T' '
+'br\}
+.el\{\
+.ds -- \(em\|
+.tr \*(Tr
+.ds L" ``
+.ds R" ''
+.ds M" ``
+.ds S" ''
+.ds N" ``
+.ds T" ''
+.ds L' `
+.ds R' '
+.ds M' `
+.ds S' '
+.ds N' `
+.ds T' '
+.ds PI \(*p
+'br\}
+.\"	If the F register is turned on, we'll generate
+.\"	index entries out stderr for the following things:
+.\"		TH	Title 
+.\"		SH	Header
+.\"		Sh	Subsection 
+.\"		Ip	Item
+.\"		X<>	Xref  (embedded
+.\"	Of course, you have to process the output yourself
+.\"	in some meaninful fashion.
+.if \nF \{
+.de IX
+.tm Index:\\$1\t\\n%\t"\\$2"
+..
+.nr % 0
+.rr F
+.\}
+.TH IPChains 3 "perl 5.004, patch 04" "23/Feb/99" "User Contributed Perl Documentation"
+.UC
+.if n .hy 0
+.if n .na
+.ds C+ C\v'-.1v'\h'-1p'\s-2+\h'-1p'+\s0\v'.1v'\h'-1p'
+.de CQ          \" put $1 in typewriter font
+.ft CW
+'if n "\c
+'if t \\&\\$1\c
+'if n \\&\\$1\c
+'if n \&"
+\\&\\$2 \\$3 \\$4 \\$5 \\$6 \\$7
+'.ft R
+..
+.\" @(#)ms.acc 1.5 88/02/08 SMI; from UCB 4.2
+.	\" AM - accent mark definitions
+.bd B 3
+.	\" fudge factors for nroff and troff
+.if n \{\
+.	ds #H 0
+.	ds #V .8m
+.	ds #F .3m
+.	ds #[ \f1
+.	ds #] \fP
+.\}
+.if t \{\
+.	ds #H ((1u-(\\\\n(.fu%2u))*.13m)
+.	ds #V .6m
+.	ds #F 0
+.	ds #[ \&
+.	ds #] \&
+.\}
+.	\" simple accents for nroff and troff
+.if n \{\
+.	ds ' \&
+.	ds ` \&
+.	ds ^ \&
+.	ds , \&
+.	ds ~ ~
+.	ds ? ?
+.	ds ! !
+.	ds /
+.	ds q
+.\}
+.if t \{\
+.	ds ' \\k:\h'-(\\n(.wu*8/10-\*(#H)'\'\h"|\\n:u"
+.	ds ` \\k:\h'-(\\n(.wu*8/10-\*(#H)'\`\h'|\\n:u'
+.	ds ^ \\k:\h'-(\\n(.wu*10/11-\*(#H)'^\h'|\\n:u'
+.	ds , \\k:\h'-(\\n(.wu*8/10)',\h'|\\n:u'
+.	ds ~ \\k:\h'-(\\n(.wu-\*(#H-.1m)'~\h'|\\n:u'
+.	ds ? \s-2c\h'-\w'c'u*7/10'\u\h'\*(#H'\zi\d\s+2\h'\w'c'u*8/10'
+.	ds ! \s-2\(or\s+2\h'-\w'\(or'u'\v'-.8m'.\v'.8m'
+.	ds / \\k:\h'-(\\n(.wu*8/10-\*(#H)'\z\(sl\h'|\\n:u'
+.	ds q o\h'-\w'o'u*8/10'\s-4\v'.4m'\z\(*i\v'-.4m'\s+4\h'\w'o'u*8/10'
+.\}
+.	\" troff and (daisy-wheel) nroff accents
+.ds : \\k:\h'-(\\n(.wu*8/10-\*(#H+.1m+\*(#F)'\v'-\*(#V'\z.\h'.2m+\*(#F'.\h'|\\n:u'\v'\*(#V'
+.ds 8 \h'\*(#H'\(*b\h'-\*(#H'
+.ds v \\k:\h'-(\\n(.wu*9/10-\*(#H)'\v'-\*(#V'\*(#[\s-4v\s0\v'\*(#V'\h'|\\n:u'\*(#]
+.ds _ \\k:\h'-(\\n(.wu*9/10-\*(#H+(\*(#F*2/3))'\v'-.4m'\z\(hy\v'.4m'\h'|\\n:u'
+.ds . \\k:\h'-(\\n(.wu*8/10)'\v'\*(#V*4/10'\z.\v'-\*(#V*4/10'\h'|\\n:u'
+.ds 3 \*(#[\v'.2m'\s-2\&3\s0\v'-.2m'\*(#]
+.ds o \\k:\h'-(\\n(.wu+\w'\(de'u-\*(#H)/2u'\v'-.3n'\*(#[\z\(de\v'.3n'\h'|\\n:u'\*(#]
+.ds d- \h'\*(#H'\(pd\h'-\w'~'u'\v'-.25m'\f2\(hy\fP\v'.25m'\h'-\*(#H'
+.ds D- D\\k:\h'-\w'D'u'\v'-.11m'\z\(hy\v'.11m'\h'|\\n:u'
+.ds th \*(#[\v'.3m'\s+1I\s-1\v'-.3m'\h'-(\w'I'u*2/3)'\s-1o\s+1\*(#]
+.ds Th \*(#[\s+2I\s-2\h'-\w'I'u*3/5'\v'-.3m'o\v'.3m'\*(#]
+.ds ae a\h'-(\w'a'u*4/10)'e
+.ds Ae A\h'-(\w'A'u*4/10)'E
+.ds oe o\h'-(\w'o'u*4/10)'e
+.ds Oe O\h'-(\w'O'u*4/10)'E
+.	\" corrections for vroff
+.if v .ds ~ \\k:\h'-(\\n(.wu*9/10-\*(#H)'\s-2\u~\d\s+2\h'|\\n:u'
+.if v .ds ^ \\k:\h'-(\\n(.wu*10/11-\*(#H)'\v'-.4m'^\v'.4m'\h'|\\n:u'
+.	\" for low resolution devices (crt and lpr)
+.if \n(.H>23 .if \n(.V>19 \
+\{\
+.	ds : e
+.	ds 8 ss
+.	ds v \h'-1'\o'\(aa\(ga'
+.	ds _ \h'-1'^
+.	ds . \h'-1'.
+.	ds 3 3
+.	ds o a
+.	ds d- d\h'-1'\(ga
+.	ds D- D\h'-1'\(hy
+.	ds th \o'bp'
+.	ds Th \o'LP'
+.	ds ae ae
+.	ds Ae AE
+.	ds oe oe
+.	ds Oe OE
+.\}
+.rm #[ #] #H #V #F C
+.SH "NAME"
+IPChains \- Create and Manipulate ipchains via Perl
+.SH "SYNOPSIS"
+use IPChains;
+.PP
+$fw = IPChains->\fInew\fR\|(\-option => value, ... );
+\f(CW$fw\fR\->\fIappend\fR\|('chain');
+.SH "DESCRIPTION"
+This module acts as an interface to the \fIipchains\fR\|(8) userspace utility by
+Paul \*(L"Rusty\*(R" Russell (http://www.rustcorp.com/linux/ipchains/). It attempts 
+to include all the functionality of the original code with a simplified 
+user interface via Perl. In addition, plans for log parsing facilities, an
+integrated interface to ipmasqadm, and possibly traffic shaping are slated
+for up and coming versions. 
+.PP
+The \fInew()\fR and \fIattribute()\fR methods support the following options:
+.Ip "\fBSource\fR" 4
+Specifies origination address of packet. Appending hostmask to this address using a / is 
+\s-1OK\s0, as well as specifying it separately (see SourceMask).
+.Ip "\fBSourceMask\fR" 4
+Hostmask for origination address. Can either be in 24 or 255.255.255.0 style. 
+.Ip "\fBSourcePort\fR" 4
+Specific port or port range (use xxx:xxx to denote range), requires specific 
+protocol specification.
+.Ip "\fBDest\fR" 4
+Specifies destination address of packet. Appending hostmask to this address using a / is
+\s-1OK\s0, as well as specifying it separately (see DestMask)
+.Ip "\fBDestMask\fR" 4
+Destination address, (see SourceMask).
+.Ip "\fBDestPort\fR" 4
+Destination Port, (see SourcePort).
+.Ip "\fBProt\fR" 4
+Protocol. Can be tcp, udp, icmp, or all. Required for specifying specific \fIport\fR\|(s).
+.Ip "\fB\s-1ICMP\s0\fR" 4
+\s-1ICMP\s0 Name/Code (in place of port when \s-1ICMP\s0 is specified as protocol).
+.Sp
+Here is a small table of some of the most common \s-1ICMP\s0 packets:
+.Sp
+.Vb 1
+\&       Number  Name                     Required by
+.Ve
+.Vb 6
+\&       0       echo-reply               ping
+\&       3       destination-unreachable  Any TCP/UDP traffic.
+\&       5       redirect                 routing if not running 
+\&                                        routing daemon
+\&       8       echo-request             ping
+\&       11      time-exceeded            traceroute
+.Ve
+.Ip "\fBRule\fR" 4
+Target. Can be \s-1ACCEPT\s0, \s-1DENY\s0, \s-1REJECT\s0, \s-1MASQ\s0, \s-1REDIRECT\s0, \s-1RETURN\s0, or a user-defined chain.
+Note: This is case sensitive.
+.Ip "\fBInterface\fR" 4
+Specify a specify interface as part of the criteria (ie, eth0, ppp0, etc.).
+.Ip "\fBFragment\fR" 4
+Rule only refers to second and further fragments of fragmented packets (1 or 0).
+.Ip "\fBBidir\fR" 4
+Makes criteria effective in both directions (1 or 0).
+.Ip "\fBVerbose\fR" 4
+Set verbose option for setting rules or \fIlist()\fR (1 or 0).
+.Ip "\fBNumeric\fR" 4
+Show output from \fIlist()\fR in numeric format. No \s-1DNS\s0 lookups, etc.. (1 or 0).
+.Ip "\fBLog\fR" 4
+Enable kernel logging (via syslog, kern.info) of matched packets (1 or 0).
+.Ip "\fBOutput\fR" 4
+Copy matching packets to the userspace device (advanced).
+.Ip "\fBMark\fR" 4
+Mark matching packets with specified number (advanced).
+.Ip "\fB\s-1TOS\s0\fR" 4
+Used for modifying the \s-1TOS\s0 field in the \s-1IP\s0 header. Takes 2 args, \s-1AND\s0 and \s-1XOR\s0 masks,
+(ie, (\s-1TOS\s0 => ["0x01\*(R", \*(L"0x10"])). This feature is highly untested.
+.Sp
+The first mask is ANDed with the packet's current \s-1TOS\s0, and the
+second mask is XORed with it. Use the following table for reference:
+.Sp
+.Vb 1
+\&       TOS Name                Value           Typical Uses
+.Ve
+.Vb 5
+\&       Minimum Delay           0x01 0x10       ftp, telnet
+\&       Maximum Throughput      0x01 0x08       ftp-data
+\&       Maximum Reliability     0x01 0x04       snmp
+\&       Minimum Cost            0x01 0x02       nntp
+\& 
+.Ve
+.Ip "\fBExact\fR" 4
+Display exact numbers in byte counters instead of
+numbers rounded in K's, M's, or G's (1 or 0).
+.Ip "\fB\s-1SYN\s0\fR" 4
+Only match \s-1TCP\s0 packets with the \s-1SYN\s0 bit set and the 
+\s-1ACK\s0 and \s-1FIN\s0 bits cleared (1 or 0).
+.SH "METHODS"
+The following methods are available to you:
+.Ip "\fBnew()\fR" 4
+$fw = IPChains->\fInew\fR\|(option => value, ...) create new fw object with 
+options
+.Ip "\fBattribute()\fR" 4
+$fw->\fIattribute\fR\|(option, value) to set option to value, \s-1OR\s0
+\f(CW$value\fR = \f(CW$obj\fR\->\fIattribute\fR\|(option) to get current value of option.
+.Ip "\fBclopts()\fR" 4
+$fw->\fIclopts()\fR clears all option settings (do this before
+calling methods like \fIlist()\fR, \fIflush()\fR, \fIdelete()\fR, etc. that
+take only a few specific options).
+.Ip "\fBappend()\fR" 4
+$fw->\fIappend\fR\|(chain) appends current rule to end of chain
+.Ip "\fBinsert()\fR" 4
+$fw->\fIinsert\fR\|(chain, rulenum) inserts rule at position rulenum
+in chain. If rulenum is omitted 1 is assumed.
+.Ip "\fBreplace()\fR" 4
+$fw->\fIreplace\fR\|(chain, rulenum) replace rule at rulenum in chain with 
+current rule.
+.Ip "\fBdelete()\fR" 4
+$fw->\fIdelete\fR\|(chain, rulenum) deletes rule rulenum from chain.
+.Ip "\fBcheck()\fR" 4
+$fw->\fIcheck\fR\|(chain) check given packet against chain for testing.
+.Ip "\fBflush()\fR" 4
+$fw->\fIflush\fR\|(chain) deletes all rules from chain.
+.Ip "\fBlist()\fR" 4
+$fw->\fIlist\fR\|(chain) lists all rules defined for chain.
+.Ip "\fBzero()\fR" 4
+$fw->\fIzero\fR\|(chain) zero's all packet counters for chain. Cannot zero 
+counters for chain policy.
+.Ip "\fBmasq()\fR" 4
+$fw->\fImasq()\fR lists current masqueraded connections.
+.Ip "\fBnew_chain()\fR" 4
+$fw->\fInew_chain\fR\|(chain) creates new user defined chain.
+.Ip "\fBdel_chain()\fR" 4
+$fw->\fIdel_chain\fR\|(chain) delete user defined chain.
+.Ip "\fBset_policy()\fR" 4
+$fw->\fIset_policy\fR\|(chain) set default policy for chain. Takes
+Rule option only.
+.SH "EXAMPLES"
+To set the default policy for the \*(L"forward\*(R" chain to DENY:
+.PP
+.Vb 1
+\& use IPChains;
+.Ve
+.Vb 2
+\& $fw = IPChains->new(Rule => "DENY");
+\& $fw->set_policy("forward");
+.Ve
+To list current rules in \*(L"input\*(R" chain to stdout (without parsing through /proc/net/ip_fw*):
+.PP
+.Vb 1
+\& use IPChains;
+.Ve
+.Vb 2
+\& $fw = IPChains->new(Verbose => 1);
+\& $fw->list("input");
+.Ve
+To create a rule that would allow all traffic on an internal lan, and deny
+all tcp traffic from external hosts on relevant ports, and log it,you could 
+use something like:
+.PP
+.Vb 1
+\& use IPChains;
+.Ve
+.Vb 9
+\& $internal = IPChains->new(Source    => "192.168.100.0/24",
+\&                           Rule      => "ACCEPT",
+\&                           Interface => "eth0");
+\& $external = IPChains->new(Interface => "ppp0",
+\&                           Prot      => "tcp",
+\&                           DestPort  => "0:1024",
+\&                           Log       => 1);
+\& $internal->append("input");
+\& $external->append("input");
+.Ve
+You could also create one object, set up the attributes, \fIappend()\fR it, then
+use \fIclopts()\fR to clear it's options, then use \fIattribute()\fR to individually
+specify it's next set of options, then \fIappend()\fR it again with the new rule.
+See the examples/ subdirectory in the IPChains.pm source for more examples.
+.SH "BUGS"
+Much of this is highly untested. Masquerading timeout setting and negative
+attributes (!) aren't yet implemented.
+Much of what's planned to be done hasn't been yet. This is
+to be considered nothing more than an early beta to work out bugs in the
+basic code, and get feedback on usefulness and improvements that could
+be made.
+.SH "AUTHOR"
+Jessica Hutchison (j@splatlabs.com). Please feel free to email me with
+feedback, questions, or comments (or indeed patches/additions).
+.SH "COPYRIGHT"
+This package is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself, with the exception
+of the libipfwc.c, ipchains.c, and the files in include/ which 
+have separate terms derived from those of the original ipchains 
+sources. See COPYING for details of this license. Please see
+README.ipchains for the README that was included with the
+original source code for ipchains and contains copyrights and
+credits for such. 
+
+.rn }` ''
+.IX Title "IPChains 3"
+.IX Name "IPChains - Create and Manipulate ipchains via Perl"
+
+.IX Header "NAME"
+
+.IX Header "SYNOPSIS"
+
+.IX Header "DESCRIPTION"
+
+.IX Item "\fBSource\fR"
+
+.IX Item "\fBSourceMask\fR"
+
+.IX Item "\fBSourcePort\fR"
+
+.IX Item "\fBDest\fR"
+
+.IX Item "\fBDestMask\fR"
+
+.IX Item "\fBDestPort\fR"
+
+.IX Item "\fBProt\fR"
+
+.IX Item "\fB\s-1ICMP\s0\fR"
+
+.IX Item "\fBRule\fR"
+
+.IX Item "\fBInterface\fR"
+
+.IX Item "\fBFragment\fR"
+
+.IX Item "\fBBidir\fR"
+
+.IX Item "\fBVerbose\fR"
+
+.IX Item "\fBNumeric\fR"
+
+.IX Item "\fBLog\fR"
+
+.IX Item "\fBOutput\fR"
+
+.IX Item "\fBMark\fR"
+
+.IX Item "\fB\s-1TOS\s0\fR"
+
+.IX Item "\fBExact\fR"
+
+.IX Item "\fB\s-1SYN\s0\fR"
+
+.IX Header "METHODS"
+
+.IX Item "\fBnew()\fR"
+
+.IX Item "\fBattribute()\fR"
+
+.IX Item "\fBclopts()\fR"
+
+.IX Item "\fBappend()\fR"
+
+.IX Item "\fBinsert()\fR"
+
+.IX Item "\fBreplace()\fR"
+
+.IX Item "\fBdelete()\fR"
+
+.IX Item "\fBcheck()\fR"
+
+.IX Item "\fBflush()\fR"
+
+.IX Item "\fBlist()\fR"
+
+.IX Item "\fBzero()\fR"
+
+.IX Item "\fBmasq()\fR"
+
+.IX Item "\fBnew_chain()\fR"
+
+.IX Item "\fBdel_chain()\fR"
+
+.IX Item "\fBset_policy()\fR"
+
+.IX Header "EXAMPLES"
+
+.IX Header "BUGS"
+
+.IX Header "AUTHOR"
+
+.IX Header "COPYRIGHT"
+

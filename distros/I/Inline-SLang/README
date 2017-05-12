@@ -1,0 +1,104 @@
+
+INTRODUCTION
+
+Inline::SLang -- Write Perl subroutines in S-Lang.
+
+Inline::SLang lets you write Perl subroutines in S-Lang. It dynamically 
+translates the parameters and return values into native data types for 
+both languages (or into Perl classes that are used to represent
+S-Lang types with no direct translation to Perl).
+
+From the S-Lang library home page at http://www.s-lang.org/
+
+S-Lang is a multi-platform programmer's library designed to allow a
+developer to create robust multi-platform software. It provides
+facilities required by interactive applications such as display/screen
+management, keyboard input, keymaps, and so on. The most exciting
+feature of the library is the slang interpreter that may be easily
+embedded into a program to make it extensible. 
+
+Example:
+
+   use Inline SLang => <<'END';
+   define JAxH(x) {
+     return sprintf( "Just Another %S Hacker!", x );
+   }
+   END
+   print JAxH('Inline'), "\n";
+
+When run, this complete program prints:
+
+   Just Another Inline Hacker!
+
+==============================================================================
+
+INSTALLATION
+
+Perl requirements (see CPAN at http://search.cpan.org/):
+  Perl v5.6.0 or higher.
+  Test::More module (comes with perl 5.8.0)
+  Inline module version 0.42 or higher.
+  PDL v2.4.0 or higher will be used if installed
+
+S-Lang requirements:
+  Version 1.4.7 or higher of the S-Lang library. It has *NOT* been tested
+  against version 2 of the library (and I am 100% certain it will not
+  work).
+  The code requires that S-Lang has been compiled with support for
+  floating-point and complex numbers.
+
+The module has only been tested on Solaris, Linux, and OS-X (10.3) 
+machines.
+
+To install Inline::SLang do this:
+
+  $ perl Makefile.PL
+  $ make
+  $ make test
+  $ make install
+
+For configuration options, enter
+
+  $ perl Makefile.PL -help
+
+The main options of interest are -slangdir or -slanglib/inc to specify
+the location of the library and its include file. The program looks in
+/usr, /usr/local, and - if installed - the ots directory within the
+CIAO directory structure (http:://cxc.harvard.edu/ciao/).
+
+Note that you have to 'make install' before you can run it successfully.
+
+==============================================================================
+
+INFORMATION
+
+- For more information on Inline::SLang see 'perldoc Inline::SLang'
+- For more information about Inline.pm, see 'perldoc Inline'
+- For information on SLang visit http://www.s-lang.org/
+
+Please send questions and comments to "Doug Burke" <djburke@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+This software is Copyright (C) 2003, 2004, 2005 Smithsonian
+Astrophysical Observatory. All rights are reserved.
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation; either version 2 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+02111-1307 USA
+
+Or, surf on over to
+
+  http://www.fsf.org/copyleft/gpl.html
+

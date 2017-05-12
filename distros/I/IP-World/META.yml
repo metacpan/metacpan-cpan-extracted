@@ -1,0 +1,37 @@
+---
+abstract: 'Fast IP-address to country-code translation using multiple databases'
+author:
+  - 'Craig MacKenna <craig@animalhead.com>'
+build_requires:
+  ExtUtils::CBuilder: '0'
+  File::Copy: '0'
+  Test::More: '0'
+configure_requires:
+  CPAN::DistnameInfo: '0'
+  Config: '0'
+  Module::Build: '0.3607'
+  Probe::Perl: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150001'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: IP-World
+provides:
+  IP::World:
+    file: lib/IP/World.pm
+    version: '0.39'
+requires:
+  Carp: '0'
+  File::ShareDir: '0'
+  HTTP::Status: '5.817'
+  LWP::UserAgent: '5.817'
+  Test::More: '0.88'
+  Time::HiRes: '0'
+  perl: v5.7.3
+resources:
+  bugtracker: https://github.com/DrHyde/perl-modules-IP-World/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/DrHyde/perl-modules-IP-World
+version: '0.39'

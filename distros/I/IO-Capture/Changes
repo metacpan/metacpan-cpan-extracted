@@ -1,0 +1,31 @@
+Revision history for Perl extension Capture.
+
+0.01    Wed Mar 12 15:11:37 2003
+
+        - original version; created by h2xs 1.1
+
+0.02    Sat Dec 20 08:23:00 EST 2003
+
+	- Fixed bug that caused messages to be printed if nothing was captured.  
+	  Thanks to Robb Canfield.
+	- Some changes to documentation
+
+0.04    Apr 29 13:18:39 EDT 2005 
+
+        I found a couple of problems that made me re-think the module
+        IO::Capture::ErrorMessages.  As a result, I am  removing this
+        module from the distribution.  It is  now depreciated and will
+        be remove in the next release.   IO::Capture::Stderr now has
+        has the same functionality that IO::Capture::Stderr did previously,
+        and can be used instead.
+
+        I have changed the base class so that you can now pass arguments
+	to derived classes. 
+
+        I have added a new parameter to IO::Capture::Stderr, "FORCE_CAPTURE_WARN".
+        It controls capturing text sent via warn(), if $SIG{__WARN__} has been 
+        changed.  The default is to let the text go to the handler set in 
+        $SIG{__WARN__}.  If you want to override this, set FORCE_CAPTURE_WARN
+        to a 1. 
+
+	

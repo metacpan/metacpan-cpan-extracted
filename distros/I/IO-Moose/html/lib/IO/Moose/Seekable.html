@@ -1,0 +1,229 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>IO::Moose::Seekable - Reimplementation of IO::Seekable with improvements</title>
+<link rel="stylesheet" href="../../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:support@ActiveState.com" />
+</head>
+
+<body>
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="block" valign="middle">
+<big><strong><span class="block">&nbsp;IO::Moose::Seekable - Reimplementation of IO::Seekable with improvements</span></strong></big>
+</td></tr>
+</table>
+
+
+<!-- INDEX BEGIN -->
+<div name="index">
+<p><a name="__index__"></a></p>
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#inheritance">INHERITANCE</a></li>
+	<li><a href="#exceptions">EXCEPTIONS</a></li>
+	<li><a href="#methods">METHODS</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+	<li><a href="#bugs">BUGS</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#license">LICENSE</a></li>
+</ul>
+
+<hr name="index" />
+</div>
+<!-- INDEX END -->
+
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>IO::Moose::Seekable - Reimplementation of IO::Seekable with improvements</p>
+<p>
+<a href="#__index__"><small>Back to Top</small></a>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+  <span class="keyword">package</span> <span class="variable">My::IO</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">Moose</span><span class="operator">;</span>
+  <span class="variable">extends</span> <span class="string">'IO::Moose::Handle'</span><span class="operator">;</span>
+  <span class="variable">with</span> <span class="string">'IO::Moose::Seekable'</span><span class="operator">;</span>
+</pre>
+<pre>
+  <span class="keyword">package</span> <span class="variable">main</span><span class="operator">;</span>
+  <span class="keyword">my</span> <span class="variable">$stdin</span> <span class="operator">=</span> <span class="variable">My::IO</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span> <span class="string">file</span> <span class="operator">=&gt;</span> <span class="operator">\</span><span class="variable">*STDIN</span><span class="operator">,</span> <span class="string">mode</span> <span class="operator">=&gt;</span> <span class="string">'r'</span> <span class="operator">);</span>
+  <span class="keyword">print</span> <span class="variable">$stdin</span><span class="operator">-&gt;</span><span class="variable">slurp</span><span class="operator">;</span>
+  <span class="keyword">print</span> <span class="variable">$stdin</span><span class="operator">-&gt;</span><span class="variable">tell</span><span class="operator">,</span> <span class="string">"\n"</span><span class="operator">;</span>
+</pre>
+<p>
+<a href="#__index__"><small>Back to Top</small></a>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>This class provides an interface mostly compatible with <a href="../../../../site/IO/Seekable.html">the IO::Seekable manpage</a>.  The
+differences:</p>
+<ul>
+<li>
+<p>It is based on <a href="../../../../site/lib/IO/Moose.html">the Moose manpage</a> object framework.</p>
+</li>
+<li>
+<p>It uses <a href="../../../../site/Exception/Base.html">the Exception::Base manpage</a> for signaling errors. Most of methods are throwing
+exception on failure.</p>
+</li>
+<li>
+<p>It doesn't export any constants.  Use <em>Fcntl</em> instead.</p>
+</li>
+</ul>
+<p>
+<a href="#__index__"><small>Back to Top</small></a>
+</p>
+<hr />
+<h1><a name="inheritance">INHERITANCE</a></h1>
+<ul>
+<li>
+<p>extends <a href="../../../../site/lib/IO/Moose/Handle.html">the IO::Moose::Handle manpage</a></p>
+<ul>
+<li>
+<p>extends <a href="../../../../site/MooseX/GlobRef/Object.html">the MooseX::GlobRef::Object manpage</a></p>
+<ul>
+<li>
+<p>extends <a href="../../../../site/Moose/Object.html">the Moose::Object manpage</a></p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>extends <a href="../../../../site/IO/Seekable.html">the IO::Seekable manpage</a></p>
+<ul>
+<li>
+<p>extends <a href="../../../../site/IO/Handle.html">the IO::Handle manpage</a></p>
+</li>
+</ul>
+</li>
+</ul>
+<p>
+<a href="#__index__"><small>Back to Top</small></a>
+</p>
+<hr />
+<h1><a name="exceptions">EXCEPTIONS</a></h1>
+<dl>
+<dt><strong><a name="exception_argument2" class="item"><a href="../../../../site/Exception/Argument.html">the Exception::Argument manpage</a></a></strong></dt>
+
+<dd>
+<p>Thrown whether method is called with wrong argument.</p>
+</dd>
+<dt><strong><a name="exception_fatal2" class="item"><a href="../../../../site/Exception/Fatal.html">the Exception::Fatal manpage</a></a></strong></dt>
+
+<dd>
+<p>Thrown whether fatal error is occurred by core function.</p>
+</dd>
+</dl>
+<p>
+<a href="#__index__"><small>Back to Top</small></a>
+</p>
+<hr />
+<h1><a name="methods">METHODS</a></h1>
+<dl>
+<dt><strong><a name="seek" class="item">seek( <em>pos</em> : Int, <em>whence</em> : Int ) : Self</a></strong></dt>
+
+<dd>
+<p>Seek the file to position <em>pos</em>, relative to <em>whence</em>:</p>
+<dl>
+<dt><strong><a name="0" class="item"><em>whence</em>=0 (SEEK_SET)</a></strong></dt>
+
+<dd>
+<p><em>pos</em> is absolute position. (Seek relative to the start of the file)</p>
+</dd>
+<dt><strong><a name="1" class="item"><em>whence</em>=1 (SEEK_CUR)</a></strong></dt>
+
+<dd>
+<p><em>pos</em> is an offset from the current position. (Seek relative to current)</p>
+</dd>
+<dt><strong><a name="2" class="item"><em>whence</em>=2 (SEEK_END)</a></strong></dt>
+
+</dl>
+<p><em>pos</em> is an offset from the end of the file. (Seek relative to end)</p>
+<p>The SEEK_* constants can be imported from the <em>Fcntl</em> module if you don't
+wish to use the numbers 0, 1 or 2 in your code.  The SEEK_* constants are more
+portable.</p>
+<p>Returns self object on success or throws an exception.</p>
+<pre>
+  <span class="keyword">use</span> <span class="variable">Fcntl</span> <span class="string">':seek'</span><span class="operator">;</span>
+  <span class="variable">$file</span><span class="operator">-&gt;</span><span class="variable">seek</span><span class="operator">(</span><span class="number">0</span><span class="operator">,</span> <span class="variable">SEEK_END</span><span class="operator">);</span>
+  <span class="variable">$file</span><span class="operator">-&gt;</span><span class="variable">say</span><span class="operator">(</span><span class="string">"*** End of file"</span><span class="operator">);</span>
+</pre>
+</dd>
+<dt><strong><a name="sysseek" class="item">sysseek( <em>pos</em> : Int, <em>whence</em> : Int ) : Int</a></strong></dt>
+
+<dd>
+<p>Uses the system call <code>lseek(2)</code> directly so it can be used with <strong>sysread</strong> and
+<strong>syswrite</strong> methods.</p>
+<p>Returns the new position or throws an exception.</p>
+</dd>
+<dt><strong><a name="tell" class="item">tell(<em></em>) : Int</a></strong></dt>
+
+<dd>
+<p>Returns the current file position, or throws an exception on error.</p>
+</dd>
+<dt><strong><a name="getpos" class="item">getpos(<em></em>) : Int</a></strong></dt>
+
+<dd>
+<p>Returns a value that represents the current position of the file.  This method
+is implemented with <strong>tell</strong> method.</p>
+</dd>
+<dt><strong><a name="setpos" class="item">setpos( <em>pos</em> : Int ) : Self</a></strong></dt>
+
+<dd>
+<p>Goes to the position stored previously with <strong>getpos</strong> method.  Returns this
+object on success, throws an exception on failure.  This method is implemented
+with <strong>seek</strong> method.</p>
+<pre>
+  <span class="variable">$pos</span> <span class="operator">=</span> <span class="variable">$file</span><span class="operator">-&gt;</span><span class="variable">getpos</span><span class="operator">;</span>
+  <span class="variable">$file</span><span class="operator">-&gt;</span><span class="variable">print</span><span class="operator">(</span><span class="string">"something\n"</span><span class="operator">);</span>
+  <span class="variable">$file</span><span class="operator">-&gt;</span><span class="variable">setpos</span><span class="operator">(</span><span class="variable">$pos</span><span class="operator">);</span>
+  <span class="keyword">print</span> <span class="variable">$file</span><span class="operator">-&gt;</span><span class="variable">readline</span><span class="operator">;</span>  <span class="comment"># prints "something"</span>
+</pre>
+</dd>
+</dl>
+<p>
+<a href="#__index__"><small>Back to Top</small></a>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p><a href="../../../../site/IO/Seekable.html">the IO::Seekable manpage</a>, <a href="../../../../site/lib/IO/Moose.html">the IO::Moose manpage</a>, <a href="../../../../site/lib/IO/Moose/Handle.html">the IO::Moose::Handle manpage</a>.</p>
+<p>
+<a href="#__index__"><small>Back to Top</small></a>
+</p>
+<hr />
+<h1><a name="bugs">BUGS</a></h1>
+<p>The API is not stable yet and can be changed in future.</p>
+<p>
+<a href="#__index__"><small>Back to Top</small></a>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Piotr Roszatycki &lt;<a href="mailto:dexter@cpan.org">dexter@cpan.org</a>&gt;</p>
+<p>
+<a href="#__index__"><small>Back to Top</small></a>
+</p>
+<hr />
+<h1><a name="license">LICENSE</a></h1>
+<p>Copyright 2008, 2009 by Piotr Roszatycki &lt;<a href="mailto:dexter@cpan.org">dexter@cpan.org</a>&gt;.</p>
+<p>This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.</p>
+<p>See <a href="http://www.perl.com/perl/misc/Artistic.html">http://www.perl.com/perl/misc/Artistic.html</a></p>
+<p><a href="#__index__"><small>Back to Top</small></a></p>
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="block" valign="middle">
+<big><strong><span class="block">&nbsp;IO::Moose::Seekable - Reimplementation of IO::Seekable with improvements</span></strong></big>
+</td></tr>
+</table>
+
+</body>
+
+</html>

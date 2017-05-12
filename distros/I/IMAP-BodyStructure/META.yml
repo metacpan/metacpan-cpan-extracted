@@ -1,0 +1,39 @@
+---
+abstract: 'IMAP4-compatible BODYSTRUCTURE and ENVELOPE parser'
+author:
+  - 'Alex Kapranoff <alex@kapranoff.ru>'
+build_requires:
+  Test::NoWarnings: '0'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.5.0, CPAN::Meta::Converter version 2.150005'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: IMAP-BodyStructure
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  IMAP::BodyStructure:
+    file: lib/IMAP/BodyStructure.pm
+    version: '1.03'
+  IMAP::BodyStructure::Envelope:
+    file: lib/IMAP/BodyStructure.pm
+requires:
+  perl: 5.008_001
+resources:
+  bugtracker: https://github.com/kappa/IMAP-BodyStructure/issues
+  homepage: https://github.com/kappa/IMAP-BodyStructure
+  repository: git://github.com/kappa/IMAP-BodyStructure.git
+version: '1.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

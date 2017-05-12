@@ -1,0 +1,64 @@
+#!/usr/bin/perl
+use Getopt::Long;
+use I18NFool;
+use warnings;
+use strict;
+
+main();
+
+sub main
+{
+    my $target = undef;
+    my $help   = undef;
+
+    GetOptions (
+        "target:s" => \$target,
+        "help"     => \$help,
+    ) || return usage();
+
+    $help && return help();
+
+    $target    ||= '.';
+    -d $target || die "$target is not a directory";
+
+    scalar @ARGV or return help();
+
+    I18NFool->create_potfiles (
+        target => $target,
+        files  => \@ARGV,
+    );
+}
+
+
+sub help
+{
+    print STDERR <<"EOF";
+
+Usage: $0 [--target=<potfiles_dir>] file1 file2 ... fileN
+
+  $0 takes a list of TAL templates as argument, parses them
+  and extracts i18n strings. It then writes a series of .pot
+  files (one per domain).
+
+Options are:
+
+--target=<potfiles_dir>
+
+  Generates the .pot files in <potfiles_dir>. If unspecified, it
+  defaults to '.'
+
+file1 file2 ... fileN
+
+  The files which you want $0 to extract the i18n strings from.
+  At the moment $0 assumes those files are encoded as UTF-8. An
+  option will be added in the future to make it possible to use
+  files with alternative encodings.
+
+EOF
+}
+
+
+1;
+
+
+__END__

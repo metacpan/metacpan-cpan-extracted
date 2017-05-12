@@ -1,0 +1,58 @@
+"IO::Callback" provides an easy way to produce a phoney read-only filehandle
+that calls back to your own code when it needs data to satisfy a read. This
+is useful if you want to use a library module that expects to read data from
+a filehandle, but you want the data to come from some other source and you
+don't want to read it all into memory and use IO::String.
+
+    use IO::Callback;
+
+    my $fh = IO::Callback->new('<', sub { ... ; return $data });
+    my $object = Some::Class->new_from_file($fh);
+
+Similarly, IO::Callback allows you to wrap up a coderef as a write-only
+filehandle, which you can pass to a library module that expects to write its
+output to a filehandle.
+
+    my $fh = IO::Callback->new('>', sub { my $data = shift ; ... });
+    $object->dump_to_file($fh);
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc IO::Callback
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=IO::Callback
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/IO::Callback
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/IO::Callback
+
+    Search CPAN
+        http://search.cpan.org/dist/IO::Callback
+
+
+COPYRIGHT AND LICENCE
+
+Copyright 1998-2005 Gisle Aas.
+
+Copyright 2009-2010 Dave Taylor.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

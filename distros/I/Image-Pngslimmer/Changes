@@ -1,0 +1,82 @@
+Revision history for Perl extension Image::Pngslimmer.
+(Times are UTC)
+
+0.30  Sun Sep 07 13:15:00 2008
+	- various small optimizations
+
+0.29  Sat Aug 30 12:33:00 2008
+	- code tidy, runs a bit faster now
+
+0.28  Sun Aug 24 18:24:00 2008
+	- general code cleanup
+
+0.27  Sun Aug 24 11:23:00 2008
+	- huge speed up in dithering
+
+0.26  Tue Aug 19 22:33:00 2008
+	- handles alpha, generally better performance
+
+0.25  Sat Jul 26 18:00:00 2008
+	- working to opimise performance
+
+0.24  Mon Jul 21 20:40:00 2008
+	- further clean up
+
+0.23  Mon Jul 21 19:42:00 2008
+	- cleaned up code
+
+0.22  Tue Apr 03 22:57:00 2007
+	- more performance enhancements
+
+0.21  Sun Mar 25 22:01:00 2007
+	- various performance enhancements
+
+0.20  Wed Mar 21 22:51:00 2007
+	- replaced Math:NumberCruncher for much better performance
+
+0.16  Sun Mar 11 16:08:00 2007
+	- bug fix for 0.15 dithering
+
+0.15  Sat Mar 10 17:02:00
+	- adds very slow dithering
+
+0.14  Sun Mar 04 17:11:00
+	- will colour index many images
+
+0.13  Sat Feb 24 12:40:00
+	- will now colour index some images
+
+0.12  Sun Feb 18 18:32:00
+	- support multiple IDATs
+
+0.11  Mon Feb 12 19:16:00
+	- filtering heuristic improved
+
+0.1   Mon Feb 12 11:29:00
+	- all filter types supported
+
+0.08  Sun Feb 11 23:40:00
+	- filtering added
+
+0.07  Thu Feb 01 21:30:00
+	- further changes to compression code
+
+0.06  Tue Jan 30 23:30:00
+	- changes to deflate code
+
+0.05  Mon Jan 29 00:00:09
+	- simple zlib compression supported
+
+0.04  Sun Jan 28 19:33:00 2007
+	- fixed minor breakages in 0.03
+
+0.03  Fri Jan 26 15:30:00 2007
+	- added CRC checking
+
+0.02  Sat Jan 20 19:52:00 2007
+	- corrected documentation etc
+
+0.01  Fri Dec 22 21:08:01 2006
+	- original version; created by h2xs 1.23 with options
+		-XA -n Image::Pngslimmer
+

@@ -1,0 +1,9 @@
+#!/usr/local/bin/perl
+
+use strict ;
+use warnings ;
+use IO::Compress::Lzma qw(:all);
+
+lzma '-' => '-'
+  or die "lzstream: $LzmaError\n" ;
+

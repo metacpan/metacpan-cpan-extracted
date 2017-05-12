@@ -1,0 +1,97 @@
+Revision history for IO-Prompt
+
+0.0.1  Tue May 24 21:56:09 2005
+       Initial release.
+
+
+0.99.1  Wed May 25 02:38:58 2005
+
+    - Added -menu option
+
+
+
+0.99.2  Mon Aug  1 23:55:45 2005
+
+    - Fixed setting of $_ using Want.pm (thanks Robin!)
+
+
+0.99.3  Mon Aug  1 23:56:57 2005
+
+
+
+0.99.4  Fri Feb 17 15:59:21 2006
+
+    - Fixed -menu to handle nested arrays as well as nested hashes
+
+    - Removed spurious -wipe and -wipefirst options, by 
+      renaming them -clear and -clearfirst
+
+    - Fixed cuddling behaviour
+
+    - Added special <esc> handling
+      (principally to allow navigation back up a menu level under -menu)
+
+    - Added dependencies to Build.pl and Makefile.PL (thanks to the many
+      people who reported this oversight)
+
+    - Made all underscores in flags optional
+
+
+0.99.5  Tue Sep  5 14:48:40 2006
+
+    - Fixed underscore bug in -failif and -okayif (thanks Uwe)
+
+    - Added -raw option (thanks Uwe)
+
+    - Remove spurious context attribute from return value objects
+
+    - Localized $\ within prompt() to prevent bad
+      input echoing (thanks Smylers)
+
+    - Disallowed negative exponents in -integer values (thanks Smylers)
+
+    - Documented incompatibility with systems not having /dev/tty
+      (thanks Mischa)
+
+
+0.996  Sun Jan 10 20:20:24 2010
+
+    - Added dependency check and FAQ entry for /dev/tty (thanks Miller)
+
+    - Removed spurious warning for undefined inputs
+
+    - Changed versioning system
+
+
+0.997  Sat Jan 30 07:17:07 2010
+
+    - Removed another spurious warning for undefined inputs
+    
+
+
+0.997001  Sat Apr 24 12:00:19 2010
+
+    - More warning cleanup and also made backspaces work right at the
+      start of a line (thanks Ingmar)
+
+
+
+0.997002  Wed Nov  7 07:50:49 2012
+
+    - Fixed ->opened bug under 5.14 (thanks GFUGI!)
+
+    - Documented unmaintained status
+
+
+0.997003  Wed Aug 19 10:47:34 2015
+
+    - Removed dependencies check for /dev/tty because it was
+      messing up smoke testing (thanks, Jarkko!)
+
+
+0.997004  Fri Nov 25 09:02:47 2016
+
+    - Removed dependency on version.pm (thanks Petr)
+
+    - Removed dependency on deprecated POSIX isprint()
+      (thanks Slaven)

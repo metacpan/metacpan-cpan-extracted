@@ -1,0 +1,768 @@
+Revision history for Image::Info
+
+2017-03-21  Slaven Rezic  <slaven@rezic.de>
+
+    Release 1.40
+
+    Stable release with the change in 1.39_50
+
+2017-03-19  Slaven Rezic  <slaven@rezic.de>
+
+    Release 1.39_50
+
+    Rational values work again (RT #117480)
+
+    Fix warnings while processing PNGs (RT #118495) (by Johan Vromans)
+
+    Pod spelling fixes (by Salvatore Bonaccorso and Slaven Rezic)
+
+2016-10-08  Slaven Rezic  <slaven@rezic.de>
+
+    Release 1.39
+
+    Stable release with all changes in 1.38_50..1.38_51
+
+2016-10-01  Slaven Rezic  <slaven@rezic.de>
+
+    Release 1.38_51
+
+    Just recreated distribution with a changed SIGNATURE.
+
+    Release 1.38_50
+
+    Don't allow XXE (XML External Entities) processing while parsing
+    SVG files. Addresses RT #118205. This is a potentially
+    incompatible change; however usually SVG files do not rely on XXE.
+
+2015-04-19  Slaven Rezic  <slaven@rezic.de>
+
+    Release 1.38
+
+    Pod typo fixes (by hatorikibble)
+
+    New xt tests (synopsis, strict, kwalitee, by hatorikibble)
+
+2014-12-31  Slaven Rezic  <slaven@rezic.de>
+
+    Release 1.37
+
+    Stable release with all changes in 1.36_51..1.36_52
+
+2014-12-29  Slaven Rezic  <slaven@rezic.de>
+
+    Release 1.36_52
+
+    Handle invalid TIFF chunks: stop processing if an unrecognized
+    fieldtype is encountered. This is an additional fix for RT #100847.
+
+2014-12-19  Slaven Rezic  <slaven@rezic.de>
+
+    Release 1.36_51
+
+    Use IO::Scalar instead of opening a scalar, for all
+    perls < 5.21.7. This is to prevent possible segmentation faults
+    with faulty images. See RT #100847 and
+    https://rt.perl.org/Ticket/Display.html?id=123443
+
+    Fix a "Variable declared in conditional statement" error.
+
+    Fix a couple of typos.
+
+2012-07-05  Slaven Rezic  <slaven@rezic.de>
+
+    Release 1.36
+
+    Stable release with all changes in 1.35_50..1.35_51
+
+2013-06-28  Slaven Rezic  <slaven@rezic.de>
+
+    Release 1.35_51
+
+    Ignore reading jpeg thumbnail image with no content, patch
+    provided by Kosei Moriyama,
+    https://github.com/eserte/image-info/pull/2)
+
+2013-05-06  Slaven Rezic  <slaven@rezic.de>
+
+    Release 1.35_50
+
+    Fixed pod_cov.t test.
+
+2013-04-10  Slaven Rezic  <slaven@rezic.de>
+
+    Release 1.35
+
+    Stable release with the change in 1.34_50
+
+2013-04-03  Slaven Rezic  <slaven@rezic.de>
+
+    Release 1.34_50
+
+    image_info on Jpeg with bad EXIF data produced "substr outside of
+    string" exception in Image::TIFF (RT #84122, patch provided by
+    Steve Purkis)
+
+2013-02-29  Slaven Rezic  <slaven@rezic.de>
+
+    Release 1.34
+
+    Stable release with all changes in 1.33_50..1.33_51
+
+2013-01-28  Slaven Rezic  <slaven@rezic.de>
+
+    Release 1.33_51
+
+    Handle corrupt JPEG files with extraneous bytes
+
+2013-01-25  Slaven Rezic  <slaven@rezic.de>
+
+    Release 1.33_50
+
+    Limited support for WBMP files.
+
+2012-11-03  Slaven Rezic  <slaven@rezic.de>
+
+    Release 1.33
+
+    Added test image for RT #78471.
+
+2012-10-25  Slaven Rezic  <slaven@rezic.de>
+
+    Release 1.32_52
+
+    Handle BMP files with negative heights (RT #78471).
+
+2012-10-24  Slaven Rezic  <slaven@rezic.de>
+
+    Release 1.32_51
+
+    Signature fix.
+
+2012-10-23  Slaven Rezic  <slaven@rezic.de>
+
+    Release 1.32_50
+
+    Repacked because of Module::Install 1.04 problems (see mail from
+    Miyagawa). Now Image::Info is again using good old EUMM.
+
+2012-02-21  Slaven Rezic  <slaven@rezic.de>
+
+    Release 1.32
+
+    Stable release with all changes in 1.31_50..1.31_51
+
+2011-12-28  Slaven Rezic  <slaven@rezic.de>
+
+    Release 1.31_51
+
+    Release 1.31_50
+
+    SVG files without XML preamble are now also recognized.
+
+    Bundled Module::Install 1.04.
+
+2010-09-25  Slaven Rezic  <slaven@rezic.de>
+
+    Release 1.31
+
+    Stable release with all changes in 1.30_50..1.30_53
+
+    Patch by Tony Hook to fix handling of PPM files with 2
+    bytes/sample.
+
+2010-02-09  Slaven Rezic  <slaven@rezic.de>
+
+    Release 1.30_53
+
+    Repacked because Module::Install 0.93 does not ignore xt tests.
+    See https://rt.cpan.org/Ticket/Display.html?id=54450
+
+2010-02-09  Slaven Rezic  <slaven@rezic.de>
+
+    Release 1.30_52
+
+    Force using libxml's SAX parser.
+
+    Fixed some PPM issues (e.g. incomplete header, numify
+    width/height...)
+
+2009-11-22  Slaven Rezic  <slaven@rezic.de>
+
+    Release 1.30_51
+
+    Fixes in GIF reader (unknown intro codes are now only warnings,
+    application chunks are forced into the first image data)
+
+    Added some test images for previous fixes.
+
+2009-11-14  Slaven Rezic  <slaven@rezic.de>
+
+    Release 1.30_50
+
+    Support for Microsoft .ico files (Image::Info::ICO).
+
+    Fixes in JPEG parsing (skip pad 0xFF in markers).
+
+    Fixes in GIF reader ("trailer" seems to be optional).
+
+    Somewhat better recognition of XBM files.
+
+    XPM handling: Corrected color parsing. Try harder to find X11's
+    rgb.txt. Ignore comments in rgb.txt.
+
+    Reordered magic checks to have more common image formats first.
+
+    Introduced Bundles.
+
+    Some Pod cleanups.
+
+    Additional author tests in xt.    
+
+2009-10-31  Slaven Rezic  <srezic@cpan.org>
+
+    Release 1.30
+
+    Stable release with all changes in 1.29_51..1.29_53
+
+2009-09-23  Slaven Rezic  <srezic@cpan.org>
+
+    Release 1.29_53
+
+    SVG parsing: load_ext_dtd is now set to false, to avoid unnecessary
+    possible network connections; this is also ceasing errors with
+    libxml 2.7.x.
+
+2009-09-16  Slaven Rezic  <srezic@cpan.org>
+
+    Release 1.29_52
+
+    More diagnostics in failing tests.
+    Added tests cases for RT #49546.
+
+2009-09-14  Slaven Rezic  <srezic@cpan.org>
+
+    Release 1.29_51
+
+    Fixed "substr outside of string" problem with Fujifilm FinePix S1000fd
+    images (RT #49546)
+
+2009-08-14  Slaven Rezic  <srezic@cpan.org>
+
+    Release 1.29_50
+
+    Marked Compress::Zlib as recommended module and skip a test if it is
+    not installed (RT #48415)
+
+2009-07-31  Slaven Rezic  <srezic@cpan.org>
+
+    Release 1.29
+
+    SVG parsing is now done by XML::LibXML::Reader, if available,
+    otherwise the old XML::Simple-based code is used. Using the
+    new code is much more memory efficient and faster. The old
+    module can still be used by setting
+    @Image::Info::SVG::PREFER_MODULE
+
+    Removed deprecation notice.
+
+    Bundled Module::Install 0.91.
+
+    Ceased a warning in the JPEG parsing code with perl 5.6.x.
+
+    Lowered minimum required Perl version to 5.6.0 (There's no
+    evidence that it does not work with that Perl version).
+
+    Ceased warnings when reading PNG files with ztxt (compressed
+    comment) chunk (RT #28054)
+
+2008-03-30 v1.28 Tels 128 tests
+  * raise minimum required Perl version to v5.6.2
+    (it doesn't work on 5.005 anyway, open() with three arguments
+     is not supported there and I don't have time to rewrite the code
+     for outdated Perl versions. If you need it to run on 5.005, write
+     a patch and file a bug report please.)
+  * fix bug #15167: Incorrect width and height for JPG files
+    (the fix now keeps the highest value for width/height, instead of
+     creating an array ref with all the values)
+  * remove Build.PL (bundle Module::Install 0.71)
+
+2007-12-15 v1.27 Tels 128 tests
+  * add both main authors to META.yml (does not work yet due to bug
+    in Module::Install)
+  * fix bug #30890: [PATCH] Transposed lines in documentation
+  * fix bug #31165: Add attribute for parsing TIFF images (Thanx Adam Witney!)
+
+2007-09-09 v1.26 Tels 128 tests
+  * clarify the license by adding "v5.8.8" (otherwise it is quite unclear
+    which Perl version, release or product the license text refers to)
+  * fix bug #29088 - Another hanging image
+  * fix bug #29243 - Exiftext fields (like UserComment) not parsed correctly
+
+2007-05-25 v1.25 Tels 127 tests
+  * fix bug #26130 - hang in parsing JPG/TIFF images with repeating
+    block numbers
+
+2007-02-24 v1.24 Tels 125 tests
+  * fix bug #22507: add missing compression modes for TIFF
+  * fix bug #25032: fix TIFF ASCII text field handling (Thanx BJWHEELER!)
+    (This enables, among other things the ImageDescription tag for TIFF
+     files)
+
+2006-09-30 v1.23 Tels 122 tests
+  * regenerate the stale META.yml file
+  * fix svg.t failing if no XML::Simple was installed (bug #21166)
+  * fix _process_ifds call (missing underscore) (Thanx to Dermot Paikkos!)
+
+2006-07-16 v1.22 Tels 123 tests
+  * fix bug #19071: byteorder for TIFF on 64-bit systems broken
+  * better error message in case SOI is missing in a JPEG
+    (still no fix for #20183)
+  * SVG:
+    + use the correct MIME type "image/svg+xml"
+    + version extraction was broken
+    + comments had too much whitespace at front/end (these should be
+      ignored and not extracted anyway)
+  * add svg.t
+  * resize test.jpg and test.png to make dist smaller
+  * add interlace.png and beef up t/png.t
+
+2006-05-01 v1.21 Tels 96 tests
+  * move the code to build Info.pm to dev/build.pl
+  * include a pre-generated Info.pm into MANIFEST
+    (fixes the indexing issue with CPAN)
+  * dont use Symbol(), it is required before its usage anyway
+  * allow exporting of determine_file_type and image_type
+  * remove a needless diag message in string.t (Thanx jpo!)
+  * add two test TIFFs (little/big endian) and a test file (Thanx jpo!)
+  * create a new, much smaller test.rle file
+  * more tests in t/bmp.t
+
+2006-03-13 v1.20 Tels 74 tests
+  * a few additions to Panasonic MakerNote in EXIF parsing
+  * use Module::Install 0.60 to fix breakage from 0.58
+  * fix bug #8193: Adds direct access to the determine_file_format logic
+    With the following changes:
+    + read only 11 bytes to determine file format (tiny.pgm is 11 bytes long)
+    + fix provided patch to really work
+  * fix bug #18147: 
+    + new TIFF code failed if the system endianness didn't match the TIFF
+       image endianness - thanx jpo!
+  * replace the link to the TIFF spec with a public link - thanx jpo!
+
+2006-03-05 v1.19 Tels 74 tests
+  * finally fix bug #6558: (Thanx jpo!)
+    + fix typos: Image::X(B|P)M must be Image::X(p|b)m (Thanx jpo!)
+    + fix missing semicolon in Image/Info/XPM.pm
+    + Image::Info::XPM and Image::Info::XBM: add -width and -height to new()
+  * add POD for process_file() into SVG, Xbm and Xpm
+  * a few additions to Panasonic MakerNote in EXIF parsing
+  * add doc about EXIF being wholly incomplete and using Image::ExifTool
+  * apply patch, tests and add test.tif from Ben Wheeler, Thanx!:
+    + fix bug #7442 Infinite loop of errors in Image::Info::TIFF 
+    + fix bug #3698 Broken BitsPerSample handling in TIFFs
+
+2006-03-03 v1.18 Tels 61 tests
+  * fix bug #6558: Image::Info 1.16 -> fails two tests (Thanx jpo!)
+    + make string.t use strict, Test::More and simplify it
+    + let string.t skip tests if Image::Xpm, Image::Xbm or XML::Simple
+      are not installed (these would formerly silently fail)
+    + Image::Info::XPM and Image::Info::XBM now handle in-memory files better
+    + fix also pod_cov.t warnings (was "Image::Info.pm" vs "Image::Info")
+  * reduce img/test.gif in size, it did eat up 1/3 of the entire dist size
+  * reducing test.jpg with GIMP reveals a bug in EXIF parsing (not yet fixed)
+  * MakerNote parsing:
+    + add support for Panasonic cameras
+    + for the following manufacturers we do not check the camera model, this
+      gets all cameras, even yet unreleased ones to work:
+      + Canon
+      + Panasonic
+      + Casio
+      + Olympus
+      + Fujifilm
+    + UNDEFINED/ASCII strings from MakeNotes might have wrong length due to
+      trailing \x00 chars, so we remove them and set the correct length
+  * update one more URL for EXIF specs
+  * imgdump uses Data::Dumper (not Data::Dump)
+  * Install/build:
+    + use Module::Install and bundle it, clean Makefile.PL up
+    + add a compat Build.PL file
+  * add a CREDITS file
+  * PPM.pm: add VERSION, and POD
+  * various POD fixes and additions
+  * various small code cleanups
+
+2006-01-28 v1.17 Tels 48 tests
+  * new maintainer: TELS
+  * signed with my key
+  * convert tests to Test::More
+  * add pod.t and pod_cover.t
+  * fix all POD errors
+  * use strict in Makefile.PL and generate custom META.yml
+  * don't include lib/Image/Info.pm - it is autogenerated anyway
+  * html_dim() returns lowercase and properly quoted, for SVG/XHTML etc.,
+    e.g. you get now 'width="900" height="800"'
+  * fix bug #8136: update URL for EXIF standard
+  * fix bug #8522 - dies at JPEGInterchangeFormatLngth (Thanx srezic@cpan.org)
+  * fix also: EXIF says it is "JPEGInterchangeFormatLength", and not "...Lngth"
+  * fix bug #5165: (duplicate of #8522)
+  * fix bug #6018: FocalPlaneResolutionUnit decoded wrongly
+  * fix bug #6083: add support for MakerNote for Nikon D70/D100 
+  * fix bug #16161: netpbm images may have more than 8bit/channel
+
+
+2004-01-07   Gisle Aas <gisle@ActiveState.com>
+
+    Release 1.16
+
+    Support for Canon 300D/Digital Rebel.  Patch contributed
+    by Karl Palsson <kpalsson@cisco.com>.
+
+    Cleaned up SVG/XPM/XBM implementations so that they
+    don't try to override carp/croak in other modules.
+
+
+
+2003-10-06   Gisle Aas <gisle@ActiveState.com>
+
+    Release 1.15
+
+    Avoid IO::String dependency for perl-5.8.  It was supposed to
+    work but did not.
+
+
+
+2003-10-06   Gisle Aas <gisle@ActiveState.com>
+
+    Release 1.14
+
+    Support TIFF/Exif GPS tags.
+
+
+
+2003-10-06   Gisle Aas <gisle@ActiveState.com>
+
+    Release 1.13
+
+    The module reported the SamplesPerPixel field as SamlesPerPixel
+    for PPM files.  Patch contributed by Geoff Richards <qef@ungwe.org>.
+
+    Image::Info was not able to handle files smaller than 32 bytes.
+
+    Support for Olympus C-700UZ and fix for the Olympus-JpegQual
+    attribute contributed by Nick Hibma <n_hibma@van-laarhoven.org>.
+
+    Support for Canon makernote.  Contributed by John Cavanaugh
+    <john-cavanaugh@attbi.com>.
+
+    IO::String v1.02 core dumps fixed by depending on v1.03.
+
+
+
+2002-12-30   Gisle Aas <gisle@ActiveState.com>
+
+    Release 1.12
+
+    Don't require IO::String for perl-5.8 as
+    it has that feature built in.  Based on patch
+    by Slaven Rezic <slaven.rezic@berlin.de>.
+
+    Looks like the TIFF support that was really
+    functional because I forgot to add
+    lib/Image/Info/TIFF.pm to the MANIFEST :-(
+
+    Support for Exif 2.2 tags contributed by
+    Stephane Bailliez <sbailliez@apache.org>.
+
+    Support Olympus C4000Z MakerNote also from
+    Stephane Bailliez.
+
+
+
+2002-07-04   Gisle Aas <gisle@ActiveState.com>
+
+    Release 1.11
+
+    More robust TIFF parser that keeps on going if some of the
+    fields appears to be garbage.
+
+    Workaround for "Samsung Digimax 200"'s brain-dead resolution
+    values.
+
+    Updated some tags based on the Exif 1.2 spec.
+
+    Minor fix to exifdump example program so that it can actually
+    dump the test.jpg
+
+
+
+2002-05-28   Gisle Aas <gisle@ActiveState.com>
+
+    Release 1.10
+
+    Support for "FUJIFILM FinePix6900ZOOM" and "Canon Canon EOS D60".
+    The Fuji support was contributed by Cyril L. Pertsev <kika@kika.ru>
+    and also included infrastructure for decoding of EXIF tags with
+    UNKNOWN value types.
+
+    Deal with signed TIFF values.
+
+
+
+2001-12-14   Gisle Aas <gisle@ActiveState.com>
+
+    Release 1.09
+
+    Use File::Spec in Makefile.PL to improve portability.
+    Patch by Chris Nandor <pudge@pobox.com>.
+
+    Extended support for decoding of maker specific tags
+    for Nikon E995 and Olympus 3040Z.
+
+    TIFF support contributed by <clarsen@emf.net>.
+
+    Decoding of JPEG color components by <tkil@scrye.com>.
+
+
+
+2001-08-24   Gisle Aas <gisle@ActiveState.com>
+
+    Release 1.08
+
+    The html_dim() function did not work at all.
+    Patch by Hans-Georg <hgf@berlin.snafu.de>.
+
+    Removed ASCII image support.
+
+    TIFF rational numbers are now blessed and use overloading to
+    convert themselves to strings and numbers in a more sensible way.
+    They are still references to arrays containing 2 numbers.
+
+    GIF global color table reading fix.
+    Patch by Tom Hargreaves <admin@traderwebs.co.uk>.
+
+    Support for zTXt chunks in PNG.  This only works when the Compress::Zlib
+    module is available.  Contributed by Chip Marshall <chip@setzer.chocobo.cx>
+
+    Updated Exif URIs in documentation
+
+
+
+2001-04-10   Gisle Aas <gisle@ActiveState.com>
+
+    Release 1.07
+
+    Image::Info::BMP should not use architecture-dependent
+    unpack descriptors.  Fix by <Jost.Krieger@ruhr-uni-bochum.de>.
+
+
+
+2001-03-26   Gisle Aas <gisle@ActiveState.com>
+
+    Release 1.06
+
+    Avoid using sysread in Image::Info::BMP.  Avoids failures because
+    of mixing of hi- and low-level file reading operations.
+
+
+
+2001-03-24   Gisle Aas <gisle@ActiveState.com>
+
+    Release 1.05
+
+    Exif MakerNote decoding implemented by Jay Soffian <jay@loudcloud.com>.
+    His patch support the following camera models:
+
+       NIKON E700
+       NIKON E800
+       NIKON E900
+       NIKON E900S
+       NIKON E910
+       NIKON E950
+       NIKON E880
+       NIKON E990
+       NIKON CORPORATION NIKON D1
+       OLYMPUS OPTICAL CO.,LTD C2000Z
+       OLYMPUS OPTICAL CO.,LTD C2100UZ
+       OLYMPUS OPTICAL CO.,LTD C2500L
+       OLYMPUS OPTICAL CO.,LTD C3030Z
+       OLYMPUS OPTICAL CO.,LTD E-10
+       FUJIFILM FinePix4900ZOOM
+       FUJIFILM FinePix40i
+       FUJIFILM FinePix4700 ZOOM
+       FUJIFILM FinePixS1Pro
+       CASIO QV-3000EX
+       Canon Canon EOS D30
+       Canon Canon DIGITAL IXUS
+       Canon Canon DIGITAL IXUS 300
+       Canon Canon PowerShot G1
+       Canon Canon PowerShot Pro90 IS
+       Canon Canon PowerShot S10
+       Canon Canon PowerShot S20
+
+    Jay's exifdump program included.
+
+
+
+2000-11-30   Gisle Aas <gisle@ActiveState.com>
+
+    Release 1.04
+
+    Allow extra image_info() arguments to pass through to the
+    image format handlers.  This make the histogram and
+    color palette returns functional again.
+
+    Distribute a copy of lib/Image/Info.pm so that search.cpan.org
+    finds it.
+
+
+
+2000-11-13   Gisle Aas <gisle@ActiveState.com>
+
+    Release 1.03
+
+    Support for even more image formats added by Jerrad Pierce:
+
+       - Added support for ASCII and BMP/DIB/RLE
+
+       - Palettes are only returned if requested (see documentation)
+
+       - Added Luminance Histogram for ASCII, XBM, XPM
+
+
+
+2000-11-10   Gisle Aas <gisle@ActiveState.com>
+
+    Release 1.02
+
+    Avoid direct hardcoding of image file magic and doc by
+    generating lib/Image/Info.pm in Makefile.PL
+
+    XBM/XPM/SVG support contributed by
+    Jerrad Pierce <belg4mit@mit.edu>/<webmaster@pthbb.org>
+
+
+
+
+2000-10-31   Gisle Aas <gisle@ActiveState.com>
+
+    Release 1.01
+
+    GIF parsing fixes from Ralf Steines <metamonk@yahoo.com>:
+
+      - GIF 'DisposalMethod' and 'UserInput' now show proper values.
+
+      - GIF 'TransparencyIndex' now appears in the info hash.
+
+      - GIF anims with local color tables don't fail anymore
+        (table size calculation bug).
+
+      - Added: GIFs marked as 87a which contain graphics control
+        extension blocks don't fail anymore, GIF is parsed anyway
+        but $info->{warn} contains 'GIF 89a extensions in 87a'.
+
+
+
+2000-10-18   Gisle Aas <gisle@ActiveState.com>
+
+    Release 1.00
+
+    IO::String is now a PREREQ module.
+
+    Added PPM/PGM/PBM support
+
+    Improved documentation.
+
+    Standardized on how "resolution" is expressed.  The field in
+    now mandatory.
+
+    All comments are now found as "Comment" tag.
+
+    Pick up data about thumbnails embedded in JPEG Exif files.
+
+
+
+2000-08-24   Gisle Aas <gisle@ActiveState.com>
+
+    Release 0.05
+
+    Passing a reference to a scalar as argument to img_info()
+    indicates that this scalar contains raw image data.  If you
+    want to use this feature, you need to install the IO::String
+    module first.
+
+
+
+2000-01-04   Gisle Aas <gisle@aas.no>
+
+    Release 0.04
+
+    Renaming of keys for things that are common across file
+    formats.  Common things now use lowercase keys.
+
+    Better support for JPEG JFXX chunks
+
+    Better determination of color_type for JPEG
+
+    Partial support for App14-Adobe chunks in JPEG
+
+    Support sBIT chunks for PNG
+
+
+
+1999-12-25   Gisle Aas <gisle@aas.no>
+
+    Release 0.03
+
+    Eliminated Image::TIFF::Exif.  The TIFF module now knows about
+    the Exif tags by itself.
+
+    Errors are returned as a hash too.
+
+    Start on Image::Info POD
+
+    Various tweaks to the reported info keys for JPEG/PNG/GIF.
+
+    Support Netscape's Loop extension to GIF.
+
+    Support ColorTable dump for GIF and PNG.
+
+    Support FileMediaType/FileExt for all image formats.
+
+    Report number of repeated chunks in PNG_Chunks values.
+
+
+
+1999-12-22   Gisle Aas <gisle@aas.no>
+
+    Release 0.02
+
+    Removed external OO interface.  The main interface is now
+    an plain function called image_info() that returns one or
+    more hashes.  One hash per image found in the file.
+
+    Exif/TIFF integer that are codes representing something else
+    are now expaned.
+
+    TIFF Rational values are reduced to plain integers when
+    possible.
+
+    Added GIF support
+
+    Added some test scripts
+
+
+1999-12-19   Gisle Aas <gisle@aas.no>
+
+    Release 0.01 (now Image-Info)
+
+    New common framwork that can support many image formats.
+
+    Added JPEG support
+
+    Added PNG support
+
+
+
+1999-12-14   Gisle Aas <gisle@aas.no>
+
+    First try, released as Image-Exif-0.01

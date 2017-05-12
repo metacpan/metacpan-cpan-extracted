@@ -1,0 +1,163 @@
+# -*- Perl -*-
+=pod
+
+=head1 Submit API
+
+IBM::Loadleveler Submit API
+
+=head1 SYNOPSIS
+
+  use IBM::Loadleveler
+
+  # Submit API function
+
+  ($job_name,$owner,$groupname,$uid,$gid,$submit_host,$numsteps,$ref)=llsubmit($job_cmd_file,$monitor_program,$monitor_args);
+
+=head1 DESCRIPTION
+
+On successful submission this function returns a `perlised' version of the LL_job structure. See the llsubmit example and the LoadLeveler API header file llapi.h for full information on how to use it.  Currently the following LL_job_step structure members are not returned:
+
+	usage_info64
+	adapter_req
+
+llfree_job_info is not implemented because it is done by in the llsubmit call after the data has been transfered to Perl.
+
+A minimal example of using the Submit API is:
+
+	use IBM::LoadLeveler;
+
+	my ($job_name,$owner,$group,$uid,$gid,$host,$steps,$job_step)=llsubmit("/home/mike/test_job/test_job.cmd",NULL,NULL);
+
+	print "Job Name   = $job_name\n";
+	print "Owner      = $owner\n";
+	print "Group      = $group\n";
+	print "UID        = $uid\n";
+	print "GID        = $gid\n";
+	print "HOST       = $host\n";
+	print "STEPS      = $steps\n";
+	print "JOB_STEP   = $job_step\n";
+	@steps=@{$job_step};
+	print "JOB_STEP   = $#{$job_step}\n";
+	foreach $stepref  (@steps)
+	{
+		%step=%{$stepref};
+		print "STEP_NAME      = $step{'step_name'}\n";
+		print "REQUIREMENTS   = $step{'requirements'}\n";
+		%usage_info = %{$step{'usage_info'}};
+		print "USAGE INFO     = --------------------\n";
+		print "	STARTER_RUSAGE = $usage_info{'starter_rusage'}\n";
+		%rusage=%{$usage_info{'starter_rusage'}};
+		print "		RU_UTIME  = $rusage{'ru_utime'}\n";
+		print "		RU_MAXRSS = $rusage{'ru_maxrss'}\n";
+		print "	STEP_RUSAGE    = $usage_info{'step_rusage'}\n";
+		print "	MACH_USAGE ITEMS = $#{$usage_info{'mach_usage'}}\n";
+	}
+
+=over 4
+
+=item llsubmit
+
+	($job_name,$owner,$groupname,$uid,$gid,$submit_host,$numsteps,$ref)=llsubmit($job_cmd_file,$monitor_program,$monitor_args);
+
+B<Parameters>
+
+=over 4
+
+=item * $job_cmd_file
+
+A string containing the name of the Job Command File
+
+=item * $monitor_program
+
+Is a pointer to a string containing the name of the monitor program to be invoked when the state of the job is changed. Set to NULL if a monitoring program is not provided.
+
+An example of a basic monitor program is:
+
+	#!/usr/bin/perl
+
+	open(MAILOUT,"|mail -s '$jobstep Changed State' guest");
+	print MAILOUT "\n";
+	print MAILOUT "@ARGV\n";
+	print MAILOUT "\n";
+	close(MAILOUT);
+
+This will get called when the job changes to one of the following states:
+
+=over 4
+
+=item * JOB_STARTED
+
+The job step has started.
+
+=item * JOB_COMPLETED
+
+The job step has completed.
+
+=item * JOB_VACATED
+
+The job step has been vacated. The job step will be rescheduled if the job step is restartable or if it is checkpointable.
+
+=item * JOB_REJECTED
+
+A startd daemon has rejected the job. The job will be rescheduled to another machine if possible.
+
+=item * JOB_REMOVED
+
+The job step was canceled or could not be started.
+
+=item * JOB_NOTRUN
+
+The job step cannot be run because a dependency cannot be met.
+
+=back
+
+=item * $monitor_args
+
+Is a pointer to a string which is stored in the job object and is passed to the monitor program. The maximum length of the string is 1023 bytes. If the length exceeds this value, it is truncated to 1023 bytes. Set to NULL if an argument is not provided.
+
+=back
+
+B<Return>
+
+=over 4
+
+=item * $job_name
+
+=item * $owner
+
+=item * $groupname
+
+=item * $uid
+
+=item * $gid
+
+=item * $submit_host
+
+=item * $numsteps
+
+=item * $ref
+
+$ref is a reference to an array of job step information, each job step is a hash, the key is the name of the element in the LL_job_step structure, eg:
+
+	@steps = @{$ref};
+	foreach $stepref ( @steps )
+	{
+		%step=%{stepref};
+		print "STEP_NAME      = $step{'step_name'}\n";
+		print "REQUIREMENTS   = $step{'requirements'}\n";
+		print "PREFERENCES    = $step{'preferences'}\n";
+	}
+
+=back
+
+=back
+
+=head1 SEE ALSO
+
+L<LoadLeveler>
+L<DataAccess>
+L<perl>.
+
+IBM LoadLeveler for AIX 5L: Using and Administering
+
+=cut

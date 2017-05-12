@@ -1,0 +1,29 @@
+CREDITS
+
+This project was initiated by myself (Ben Sugars) in August, 1997.
+After a prolonged absence, I returned to the project in the winter of
+2000.
+
+Maurice Aubrey <maurice@hevanet.com> co-authored some earlier versions
+with me.  Thanks!
+
+Thanks to all others with comments or bug fixes, especially:
+
+Stephane Bortzmeyer <bortzmeyer@pasteur.fr>
+Doug MacEachern <dougm@telebusiness.co.nz>
+Robert Emmery <roberte@netscape.com>
+Mohammed J. Kabir <kabir@intevo.com>
+Terry Ewing <terry@intevo.com>
+Tim Fries <timf@dicecorp.com>
+Joe Thomas <jthomas@women.com>
+Paul Makepeace <Paul.Makepeace@realprogrammers.com>
+Raphael Manfredi <Raphael_Manfredi@pobox.com>
+Lee.Lindley@bigfoot.com
+Dave Rolsky <autarch@urth.org>
+
+If you notice any problems, create any patches, or add any features,
+be sure to let me know so your name can be in the above list!
+
+--
+Ben Sugars <bsugars@canoe.ca>
+March 5, 2001

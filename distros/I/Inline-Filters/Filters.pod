@@ -1,0 +1,228 @@
+=head1 NAME
+
+Inline::Filters - Common source code filters for Inline Modules.
+
+=head1 DESCRIPTION
+
+C<Inline::Filters> provides common source code filters to Inline Language 
+Modules. Unless you're an Inline module developer, you can just read the 
+next section.
+
+=head1 Supported Filters
+
+This section describes each filter in Inline::Filters.
+
+=head2 Strip_POD
+
+Strips embedded POD from a block of code in any language. This is implemented 
+as a regular expression:
+
+   $code =~ s/^=\w+[^\n]*\n\n(.*?)(^=cut\n\n|\Z)//gsm;
+
+That means if you have a language which contains POD-like syntax, it will be 
+stripped by this filter (i.e. don't use this filter with such a language). 
+This filter is useful for making code like this compile:
+
+   use Inline C => <<'END', FILTERS => 'Strip_POD';
+   =head1 add
+
+   Returns the sum of two integers.
+
+   =cut
+
+   int add(int x, int y) { return x + y; }
+   END
+
+=head2 Strip Comments
+
+Strips comments from a block of code in whatever language you are using. 
+The comment stripper is string-safe -- i.e. it will not strip comments 
+embedded in strings. 
+
+The feature is useful because both the C and C++ grammars cannot deal with
+comments at arbitrary points in the source code; to do so would bloat the
+grammar. Instead, code like this should have its comments stripped before
+parsing:
+
+   use Inline C => <<'END', FILTERS => 'Strip_Comments';
+
+   int md5_block(char *block,   /* the block to operate on */
+		 long length,   /* the number of bytes */
+		 char **result) /* the resulting 128-bit sum */
+   {
+	/* some code here */
+   }
+
+   END
+
+Strip_Comments is available for the following languages:
+
+=over 4
+
+=item Strip_C_Comments
+
+=item Strip_CPP_Comments
+
+=item Strip_Python_Comments
+
+=item Strip_TCL_Comments
+
+=item Java via Strip_CPP_Comments
+
+=back
+
+The Python and Java filters are available for convenience only. There is little
+need for them, since Inline::Python and Inline::Java use the official language
+compilers to parse the code, and these compilers know about comments. 
+
+=head2 Preprocess
+
+Now available for all languages. Uses the C pre-processor ($Config{cpprun}) to 
+pre-process a block of code. This is useful if you want to expand macros 
+and conditional code before parsing. For example:
+
+   use Inline CPP => <<'END', FILTERS => 'Preprocess';
+   class Foo
+   #ifdef FOO_INHERITS_BAR
+      : public Bar
+   #endif
+   {
+
+   };
+   END
+
+The code shown above will not parse correctly without the Preprocess filter,
+since the Inline::CPP grammar can't understand preprocessor directives.
+
+=head3 CPPFLAGS Argument
+
+Also available is the CPPFLAGS argument, to specify C preprocessor directives.
+
+    use Inline C => <<'END' => CPPFLAGS => ' -DPREPROCESSOR_DEFINE' => FILTERS => 'Preprocess';
+    #ifdef PREPROCESSOR_DEFINE
+    int foo() { return 4321; }
+    #else
+    int foo() { return -1; }
+    #endif
+    END
+
+The code shown above will return 4321 when foo() is called.
+
+=head3 CLEAN_AFTER_BUILD Argument
+
+By default, the Preprocess filter deletes all F<Filters*.c> files it creates.
+If you set the CLEAN_AFTER_BUILD flag to false, then the C<Filters*.c> files
+will not be deleted; this is necessary when using C<gdb> to debug Inline::C
+and Inline::CPP programs which utilize the Preprocess filter.
+
+If you do not set the CLEAN_AFTER_BUILD flag to false, you will likely end up
+with a "No such file or directory" error in gdb:
+
+    use Inline C => <<'END' => FILTERS => 'Preprocess';
+    // your code here
+    END
+
+$ gdb /usr/bin/perl
+(gdb) run ./my_script.pl arg0 arg1
+...
+Thread 1 "perl" received signal SIGSEGV, Segmentation fault.
+MyPackage::my_method (this=this@entry=0x1234567, my_arg=my_arg@entry=23)
+    at /.../_Inline/build/eval_XXX_YYYY/FiltersZZZZ.c:42
+42    /.../_Inline/build/eval_XXX_YYYY/FiltersZZZZ.c: No such file or directory.
+
+If you do set the CLEAN_AFTER_BUILD flag to false, you should see the actual
+offending C or C++ code in gdb:
+
+    use Inline C => <<'END' => CLEAN_AFTER_BUILD => 0 => FILTERS => 'Preprocess';
+    // your code here
+    END
+
+$ gdb /usr/bin/perl
+(gdb) run ./my_script.pl arg0 arg1
+...
+Thread 1 "perl" received signal SIGSEGV, Segmentation fault.
+MyPackage::my_method (this=this@entry=0x1234567, my_arg=my_arg@entry=23)
+    at /.../_Inline/build/eval_XXX_YYYY/FiltersZZZZ.c:42
+42    YOU SHOULD SEE YOUR ACTUAL OFFENDING CODE HERE
+
+=head1 DETAILS
+
+=head2 Built-in Filters
+
+Built-in source code filters are implemented as a blessed reference to a
+hash containing two elements: 'filter' is the name of the filter, and 'coderef'
+is a code reference to the appropriate filter. The object has a filter() 
+method, which should be called with the ILSM object as the first parameter,
+and source code as the second parameter. The filters always return the filtered
+code. 
+
+=head2 User-supplied Filters
+
+As of Inline 0.42, you can supply your own filters to Inline by passing a
+code reference to the FILTERS option, like this:
+
+   sub my_filter { };
+   use Inline C => DATA => FILTERS => [\&my_filter];
+
+The filter sub is passed one argument: the unfiltered code. It must return
+the filtered code as its only return value. If something goes wrong and you
+need to pass inform the user, just croak.
+
+Note: in some circumstances, you I<must> put your filter subroutine I<above> 
+the C<use Inline> statement. When possible, Inline compiles your code
+at compile time, meaning the subroutine must be defined. If you're reading 
+code from the 'DATA' filehandle, you can put the filter anywhere in your
+script, since Inline delays compilation until runtime.
+
+=head2 Applying Filters
+
+C<Inline> provides a filter() method which applies the requested filters one
+after the other on the source code. All ILSMs should save the result of 
+$o->filter() and consider it the source code. If no filters have been 
+requested, this just returns the unfiltered source code.
+
+=head2 filter (object, coderef) METHOD
+
+=head2 new (filter, coderef) METHOD
+
+=head2 get_filters (language) FUNCTION
+
+returns all supported languages
+
+=head1 SEE ALSO
+
+For more information about specifying Inline source code filters, see
+L<Inline::C> or L<Inline::CPP>.
+
+For more information about using other languages inside Perl, see L<Inline>.
+For more information about using C from Perl, see L<Inline::C>.
+
+=head1 BUGS OR OMISSIONS
+
+You can pass in arbitrary subroutine references as filters. However, if you
+find yourself using a filter on a regular basis and you'd like to see it 
+included in Inline::Filters, please file a bug report.
+
+If you wish to report a bug, please refer to L<Inline> for instructions on 
+how to submit a bug report.
+
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Inline-Filters>
+
+=head1 AUTHOR
+
+Neil Watkiss (NEILW@cpan.org)
+Reini Urban (RURBAN@cpan.org)
+Will Braswell (WBRASWELL@cpan.org)
+
+Maintained now by the perl11 team: https://github.com/perl11/Inline-Filters
+
+=head1 COPYRIGHT
+
+Copyright (C) 2001, Neil Watkiss.
+Copyright (C) 2014, 2015 Reini Urban & Will Braswell.
+
+This module is free software. It may be used, redistributed and/or modified
+under the same terms as Perl itself.
+
+See L<http://dev.perl.org/licenses/>.
+

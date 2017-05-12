@@ -1,0 +1,11 @@
+IkiWiki::Plugins::syntax BUGS
+=============================
+
+- lib/IkiWiki/Plugin/syntax.pm:
+    - The file parameter isn't working when doesn't contain a full path.
+    - Breaks the markdown indented chain. It can't be used between paragraphs
+      of one list item. Use it after the item text. 
+
+- templates/syntax.tmpl:
+    - Use the description field as the documentation says.
+    

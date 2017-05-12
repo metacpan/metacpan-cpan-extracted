@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!-- Additional settings file for the isoelectric point predictor -->
+<!DOCTYPE ipsettings SYSTEM "piset.dtd">
+<pisettings>
+  <pK author="Lehninger">
+    <coef data="~Carboxyl">3.1</coef>
+    <coef data="D">4</coef>
+    <coef data="E">4.4</coef>
+    <coef data="~Amino">8.0</coef>
+    <coef data="K">10.0</coef>
+    <coef data="R">12.0</coef>
+    <coef data="H">6.5</coef>
+    <coef data="C">8.5</coef>
+    <coef data="Y">10.0</coef>
+  </pK>
+</pisettings>

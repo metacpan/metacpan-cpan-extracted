@@ -1,0 +1,13 @@
+Revision history for Perl extension Image::SubImageFind.
+
+0.03  Fri Sep 10 15:30:00 2011
+    - added object oriented use capability
+    - added multiple comparison methods
+    - enhanced documentation
+
+0.02  Fri Mar  4 00:50:00 2011
+    - readme update
+
+0.01  Sat Sep  4 10:17:39 2010
+    - original version
+

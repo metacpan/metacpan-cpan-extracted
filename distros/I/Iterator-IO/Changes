@@ -1,0 +1,8 @@
+Revision history for Perl extension Iterator.
+
+0.01  2005 August 18
+    - First version
+
+0.01  2005 August 23
+    - Changed the way options are handled in ifile and ifile_reverse.
+    - Fix up some documentation typos.

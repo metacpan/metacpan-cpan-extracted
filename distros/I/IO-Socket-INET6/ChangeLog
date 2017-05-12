@@ -1,0 +1,191 @@
+2013-06-23 Shlomi Fish <shlomif@shlomifish.org>
+	* Add minimum version of perl to 5.8.x (CPANTS Kwalitee).
+	* Add LICENSE file. (CPANTS).
+	* New Release IO-Socket-INET6-2.72
+
+2013-06-23 Shlomi Fish <shlomif@shlomifish.org>
+	* Correct typos.
+		- https://rt.cpan.org/Public/Bug/Display.html?id=86344
+	* New Release IO-Socket-INET6-2.71
+
+2013-05-21 Shlomi Fish <shlomif@shlomifish.org>
+	* Fix a typo:
+		- https://rt.cpan.org/Ticket/Display.html?id=73143
+	* Add t/style-trailing-space.t and got rid of trailing space.
+	* New Release IO-Socket-INET6-2.70
+
+2011-11-28 Shlomi Fish <shlomif@shlomifish.org>
+	* Fix the imports on t/io_multihomed6.t .
+		- Fixes https://rt.cpan.org/Ticket/Display.html?id=72769 again.
+	* Update the link to the repository in Build.PL.
+	* New Release IO-Socket-INET6-2.69
+
+2011-11-28 Shlomi Fish <shlomif@shlomifish.org>
+	* Solved symbol clashes in t/io_multihomed6.t .
+		- Fixes https://rt.cpan.org/Ticket/Display.html?id=72769
+	* New Release IO-Socket-INET6-2.68
+
+2011-01-21 Shlomi Fish <shlomif@shlomifish.org>
+	* IO-Socket is doing some imports so we now do use IO::Socket ().
+		- Fixed the rest of the imports.
+	* Thanks to LeoNerd
+	* New Release IO-Socket-INET6-2.67
+
+2011-01-13 Shlomi Fish <shlomif@shlomifish.org>
+	* Made the use Socket call import constants selectively, and not rely
+	on @EXPORT's whims:
+		- http://www.cpantesters.org/cpan/report/d6e547be-19b5-11e0-bbdc-e5c0d6c987b5
+	* New Release IO-Socket-INET6-2.66
+
+2010-06-11 Shlomi Fish <shlomif@shlomifish.org>
+	* Add a fix for t/io_multihomed6.t to make sure
+	ok 3 will be printed before ok 4. due to many failures in the tests.
+	Such as:
+		- http://www.cpantesters.org/cpan/report/07413426-b19f-3f77-b713-d32bba55d77f
+	* New Release IO-Socket-INET6-2.65
+
+2010-06-08 Shlomi Fish <shlomif@shlomifish.org>
+	* Applied a patch to fix t/io_multihomed6.t on old Perls / old Linux
+	distributions:
+		- https://rt.cpan.org/Ticket/Display.html?id=58198
+		- Thanks to Paul.
+	* New Release IO-Socket-INET6-2.64
+
+2010-05-29 Shlomi Fish <shlomif@shlomifish.org>
+	* Applied a modified patch to t/io_multihomed6.t to correct the test
+	on Fedora 10 and others:
+		- https://rt.cpan.org/Public/Bug/Display.html?id=57676
+	* New Release IO-Socket-INET6-2.63
+
+2010-05-20 Shlomi Fish <shlomif@shlomifish.org>
+	* Solved "problems with multihomed and family order"
+		- https://rt.cpan.org/Ticket/Display.html?id=57676
+		- Thanks to Steffen Ullrich
+	* New Release IO-Socket-INET6-2.62
+
+2010-03-25 Shlomi Fish <shlomif@shlomifish.org>
+	* Fix the inet_pton / inet_ntop import warnings:
+		- https://rt.cpan.org/Ticket/Display.html?id=55901
+		- Thanks to Todd Rinaldo for the patch.
+	* Fix listening on :: or 0.0.0.0 - a random address instead of
+		the specified would be used. Added test listen_port_only.t
+		- Regression from 2.57:
+		- https://rt.cpan.org/Ticket/Display.html?id=54656
+		- Thanks to Steffen Ullrich for the patch.
+	* New Release IO-Socket-INET6-2.60
+	* Fixes to t/listen_port_only.t.
+	* New Release IO-Socket-INET6-2.61
+
+2010-03-19 Shlomi Fish <shlomif@shlomifish.org>
+	* Syntax change to adapt for older Perls:
+		- https://rt.cpan.org/Ticket/Display.html?id=54656
+		- Thanks to paul.
+	* New Release IO-Socket-INET6-2.59
+
+2010-03-18 Shlomi Fish <shlomif@shlomifish.org>
+	* Applied a patch by Steffen Ullrich, fixing:
+	https://rt.cpan.org/Ticket/Display.html?id=54656
+	* New Release IO-Socket-INET6-2.58
+
+2009-11-23 Shlomi Fish <shlomif@shlomifish.org>
+	* Applied a modified version of a patch by Matthew Horsfall
+	<wolfsage@gmail.com> in order to add t/blocking.t and deal with the
+	blocking sockets properly.
+	* New Release IO-Socket-INET6-2.57
+
+2008-10-06 Shlomi Fish <shlomif@shlomifish.org>
+	* Applied a modified version of a patch by Anicka Bernathova
+	<anicka@suse.cz>:
+	{{{
+	Previously IO-Socket-INET6 tried to bind even when one side
+	is AF_INET and the other AF_INET6 and this cannot work.
+
+	The FAMILY_CHECK loop is meant to make sure both sides have
+	the same family.
+	}}}
+	* New Release IO-Socket-INET6-2.56
+
+2008-09-24 Shlomi Fish <shlomif@shlomifish.org>
+	* Fixed: http://rt.cpan.org/Ticket/Display.html?id=39550 :
+	Problem with connect to IPv4 w/o given domain on FreeBSD6.1 (and
+	other BSD systems). (Thanks to Steffen Ullrich)
+	* New Release IO-Socket-INET6-2.55
+
+2008-02-22 Shlomi Fish <shlomif@shlomifish.org>
+	* Added pack_sockaddr_in6_all to the imports from Socket6 to fix
+	the "configure" sub in several cases. Added t/configure6.t to test it.
+	* New Release IO-Socket-INET6-2.54
+
+2008-02-21 Shlomi Fish <shlomif@shlomifish.org>
+	* Converted to Build.PL and placed INET6.pm under lib/.
+	* Added a "repository" URL to the POD.
+	* Added the pod.t and pod-coverage.t files and we now have full POD
+	coverage.
+	* Added more dependencies to the Build.PL.
+	* Added the credit of "Shlomi Fish".
+	* Changed the email address of Rafael to the new one in the ChangeLog
+	and README files.
+	* Someone reported that sockflow() and peerflow() were broken. The reason
+	for that was that unpack_sockaddr_in6_all was not imported from Socket6.
+	This release fixes it (with tests in t/host6.t).
+	* New Release IO-Socket-INET6-2.53
+
+2008-02-05 Shlomi Fish <shlomif@shlomifish.org>
+
+	* New Release IO-Socket-INET6-2.52
+	* Added a test for peerhost() too.
+	* Fixed sockhost() with the fact that inet_ntop() was not imported.
+		- Added a test.
+	* Added "use warnings" to IO::Socket::INET6.
+	* Added a modified version of my patch (with more comments) to patch
+	the problems I found in IO-Socket-INET6. (generating
+	warnings upon using and failed tests.).
+
+2004-18-10  Rafael Martinez Torres <rmartine@fdi.ucm.es>
+
+	* New Release INET6-2.51 .
+	* Patch from David Town <David.Town@marconi.com>
+	  - peeraddr(), sockaddr() methods implemented.
+	  - peerhost(), peerport(), sockhost(), sockport() improved efficiency.
+	  - New optional parameters: Local(Peer)Flow,Local(Peer)Scopeid. (Only for IPv6)
+	  - Local hack for MSWin32 platforms.
+
+2003-12-12  Rafael Martinez Torres <rmartine@fdi.ucm.es>
+
+	* New Release INET6-2.01 .
+	* Patch from Wouter de Jong <wouter@widexs.nl>
+	  - fixing the parser on regexp at sock_info()
+	* Patch from Olaf M.Kolkman <olaf@ripe.net>
+	  - Toggle the -w flag to avoid some warning messages around tests
+	* fixing peerhost method.
+
+2003-11-24  Rafael Martinez Torres <rmartine@fdi.ucm.es>
+
+	* New Release INET6-2.00 . Protocol independent IPv4-IPv6.
+	* New paramter: Domain => AF_UNSPEC(def.),AF_INET,AF_INET6
+	* Replace _get_addr by getnameinfo()
+		 (RFC3493 deprecates getipnodeby() )
+	* sockaddr,peeraddr methods eliminated, (non IP-independent)
+	* Improved test.
+
+2003-07-24  Rafael Martinez Torres <rmartine@fdi.ucm.es>
+
+	* New Release INET6-1.28
+	* Makefile.PL includes prerequisites: (min.) Socket6 0.12
+	* Fix _get_addr in INET6.pm to use Socket6::getipnodebyname.
+
+2003-06-24  Rafael Martinez Torres <rmartine@fdi.ucm.es>
+
+	* New Release INET6-1.27.
+	* t/io_sock_inet6.t: New file for 'make test'.
+
+2003-06-14  Rafael Martinez Torres <rmartine@fdi.ucm.es>
+
+	* Patch from Masahito Omote <omote@debian.org>.
+	  - Fix IPv6 address and port splitt bug.
+	  - Fix _get_addr in INET6.pm to use Socket6::getaddrinfo.
+
+2003-06-05  Rafael Martinez Torres <rmartine@fdi.ucm.es>
+
+	* Initial CPAN release.
+

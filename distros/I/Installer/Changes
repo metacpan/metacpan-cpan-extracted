@@ -1,0 +1,251 @@
+==================================================
+Changes from 1742-05-11 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.904 at 2016-02-23 05:11:26 +0000
+------------------------------------------
+
+  Change: 42b8c1f5c575c33bc94c8c811985f42a60ee82cd
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2016-02-23 06:09:55 +0000
+
+    New .travis.yml, some examples, included cpanm complete, fixed
+    postgresql handling 
+
+------------------------------------------
+version 0.903 at 2014-07-05 19:34:00 +0000
+------------------------------------------
+
+  Change: a1aa19b2bd19540b4cb768a2bf08254ee3ae1f79
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-07-05 21:34:00 +0000
+
+    Adapting to new version of pluginbundle 
+
+------------------------------------------
+version 0.902 at 2014-05-20 19:58:33 +0000
+------------------------------------------
+
+  Change: 6c0420dd4beb9b1ad78fd1ff787d7ced21bd8e06
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-05-20 21:58:33 +0000
+
+    Removed Test::LoadAllModules 
+
+  Change: f8485863e1df3a5ef35294bcc26dd8ca14baaf44
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-05-20 21:49:59 +0000
+
+    Merge pull request #1 from crazedpsyc/master
+
+    'Fix' the export.sh 
+
+  Change: 89a87d6a81d865ad3f70aca13ae7e831193b6431
+  Author: Michael Smith <crazedpsyc@duckduckgo.com>
+  Date : 2014-04-11 17:17:28 +0000
+
+    New .travis.yml 
+
+  Change: 63128bae74bcdebce7e306068892e5530c396300
+  Author: Michael Smith <crazedpsyc@duckduckgo.com>
+  Date : 2014-04-11 17:16:04 +0000
+
+    Avoid appending previously-empty variables with : 
+
+  Change: fc65bf6007e47fa794975329746821fc66abcdd7
+  Author: Michael Smith <crazedpsyc@duckduckgo.com>
+  Date : 2014-04-07 22:32:19 +0000
+
+    Nicer error message for an unknown Perl version 
+
+------------------------------------------
+version 0.901 at 2013-12-30 04:10:15 +0000
+------------------------------------------
+
+  Change: bc167fb551ba5a1a8280b07a2f7098ae19719655
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-12-30 05:10:15 +0000
+
+    Fixed 5.1 5.12 bug 
+
+------------------------------------------
+version 0.900 at 2013-12-30 03:21:15 +0000
+------------------------------------------
+
+  Change: 3a7e64f62d496f9c5040a3ec8368e632efb01e73
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-12-30 04:21:15 +0000
+
+    More documentation, some fixes, still some bugs... but it runs better
+    for now 
+
+  Change: 5b132b256ec398d47a1f662c4cfa927c6d281890
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-09-15 01:04:55 +0000
+
+    Lost of changes.. still a bug 
+
+  Change: c6cb0830e7b2a43345be8bab10087767d0485b12
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-09-11 05:06:57 +0000
+
+    Added CURRENT_INSTALLER_ENV to export.sh 
+
+------------------------------------------
+version 0.007 at 2013-09-11 02:37:07 +0000
+------------------------------------------
+
+  Change: 5aa4b60cf0cdf822123c05f28a09ba9332fdcc7b
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-09-11 04:37:07 +0000
+
+    Another .travis.yml change... 
+
+  Change: 5cedb318fa3fa623cafebdeab0c14083ef6e43a6
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-09-11 04:36:32 +0000
+
+    Ok finally solved the base problem 
+
+  Change: 23d5ba5ef7efaa46da509d2116af85ee56efebe9
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-09-09 06:43:07 +0000
+
+    Renamed main binary to avoid collides with macosx users... <facepalm> 
+
+------------------------------------------
+version 0.006 at 2013-09-09 03:12:36 +0000
+------------------------------------------
+
+  Change: d7eda661097ea966d637829fd1c3f8b22cf79e9f
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-09-09 05:12:36 +0000
+
+    More stuff for fatpack.... I think ;) 
+
+------------------------------------------
+version 0.005 at 2013-09-09 02:10:00 +0000
+------------------------------------------
+
+  Change: 5385efb2347b40459cf679f404c5ab443f0a6b90
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-09-09 04:10:00 +0000
+
+    Added -e option 
+
+------------------------------------------
+version 0.004 at 2013-09-09 02:01:49 +0000
+------------------------------------------
+
+  Change: 29948021573502452a19afac66ebbd8925cd5ac3
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-09-09 04:01:49 +0000
+
+    Added reference to http://installer.pm on documentation 
+
+  Change: 8ff22e8ea057c2e036201e6351fb3b911006f159
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-09-09 03:59:13 +0000
+
+    Added fatpack for release process, removed old requirement 
+
+  Change: 07094ff3aa499c65c18dfb1bf08c162254230a87
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-09-09 03:48:35 +0000
+
+    Switched from Path::Tiny to Path::Class to be fatpackable 
+
+  Change: ef5fae80f17a3e8b5f08bfad24e3c472f0222b7f
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-09-09 01:39:41 +0000
+
+    Doc tuning 
+
+------------------------------------------
+version 0.003 at 2013-09-08 23:35:50 +0000
+------------------------------------------
+
+  Change: 80c59120eb3814b32adf9ddf83b07d1ab2658d30
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-09-09 01:35:50 +0000
+
+    Added URL support and a bit more documentation about OO usage 
+
+------------------------------------------
+version 0.002 at 2013-09-08 23:11:50 +0000
+------------------------------------------
+
+  Change: 23a1aae1676d025aee32d37b8ab850cdb2fce0af
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-09-09 01:11:50 +0000
+
+    More documentation and warnings and an OO example 
+
+  Change: e0daed321dd2f1fb5b1a24b4f4e7e2ec71a1225f
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-09-09 00:15:41 +0000
+
+    Python setup.py support and pip install option 
+
+  Change: dc4e703a4fbe1f9267abd8b02f7d306cec187c21
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-09-08 23:21:02 +0000
+
+    Small typo 
+
+------------------------------------------
+version 0.001 at 2013-09-08 21:03:10 +0000
+------------------------------------------
+
+  Change: d4ecfeb6ec19f17041c299f7391a7d19f1ab20da
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-09-08 23:03:10 +0000
+
+    More documentation 
+
+  Change: 579be33ec206ac4816b95aebd17b6d4f192517ba
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-09-08 22:48:30 +0000
+
+    Finished up file support 
+
+  Change: 12ae0b9a6fe51c7d33f61d72ee0063f6bd4e895f
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-09-08 22:35:47 +0000
+
+    Tuned requirements 
+
+  Change: 2f58cb9a4c1b39209b55a2d9c204eea9d3beca5a
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-09-08 21:14:34 +0000
+
+    Oh yeah... now with app 
+
+  Change: 4ef23beebd0b76eaedaf2e5ba3e03ab0af859691
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-09-08 01:42:23 +0000
+
+    Better output on failure 
+
+  Change: d72d27adaeaaafdcce0de3e1987903a2681b8693
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-09-07 23:32:19 +0000
+
+    Added .travis.yml 
+
+  Change: 71106369905e65af72d15cf6e32e64f5105fc238
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-09-07 23:31:40 +0000
+
+    More stuff... and making it now live 
+
+  Change: 6b6d39460da02b82f93fd8182dd22a24bf736654
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-09-06 03:55:08 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

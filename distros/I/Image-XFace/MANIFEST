@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+test.pl
+XFace.pm
+README
+swig/faces.i
+faces.c
+faces_wrap.c
+face
+xfaceimg

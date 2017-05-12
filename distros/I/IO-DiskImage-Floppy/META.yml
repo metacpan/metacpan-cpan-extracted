@@ -1,0 +1,21 @@
+# http://module-build.sourceforge.net/META-spec.html
+name:         IO-DiskImage-Floppy
+version:      0.01
+version_from: lib/IO/DiskImage/Floppy.pm
+installdirs:  site
+author:       YAMASHINA Hio <hio@cpan.org>
+abstract: manipulate fdd (FAT12) image.
+license: Perl
+#requires:
+build_requires:
+  Test::More: 0
+no_index:
+  directory:
+    - inc
+    - t
+
+distribution_type: module
+generated_by: ExtUtils::MY_Metafile version 0.07, EUMM-6.30.
+meta-spec:
+  version: 1.2
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html

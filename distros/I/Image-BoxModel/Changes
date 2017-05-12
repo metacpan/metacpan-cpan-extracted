@@ -1,0 +1,49 @@
+Revision history for Perl extension Image::BoxModel:
+
+0.50	Son Aug 2 2009 
+	- many bugfixes, Chart improved. Going beta.
+
+0.15	Mit Jul 29 2009 
+	- ::Chart has point and line charts, bug fixes
+
+0.14	Son Jul 26 2009 
+	- debug, ::Chart has points
+
+0.13	Fre Aug 1 2008 
+	- Chart: many bugs fixed, does bars and points now
+
+0.12	Son Jun 1 2008 
+	- Chart: improved, has legend; IM-image-size bug fixed
+
+0.11	Mit Apr 30 2008 
+	- color support for GD, pod improved
+
+0.10	Die Apr 15 2008 
+	- add ChartBars (naked), add Chart (incomplete)
+
+0.09	Fre Apr 11 2008 
+	- remove .svn from tar.gz
+
+0.08	Mit Apr 9 2008 
+	- repair pod
+
+0.07	Mon Apr 7 2008 
+	- rename into Image::BoxModel, update all files & structure
+
+0.06	Don Apr 3 2008 
+	- fix filerights
+
+0.05	Sat Mar 29 2008
+	- bugsquash
+
+0.04  Sun Mar 23 2008
+	- improve POD
+
+0.02	Sat Mar 22 2008
+	- clean up version
+
+0.01  Fri Mar 21 2008
+	- original version; created by mb
+		-AX MNNM
+
+

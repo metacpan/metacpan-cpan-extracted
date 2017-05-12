@@ -1,0 +1,37 @@
+Imager::Screenshot is a module that grabs an image from a window under
+X11 or Win32.
+
+Requires:
+  Imager 0.54 or later.
+  Either:
+    SDK header files and libraries for Win32 support
+  and/or
+    X11 header files and libraries for X11 support.
+  and/or
+    OS X header files and libraries (supplied with Xcode)
+  A C compiler compatible with that used to build perl itself.
+
+Optional:
+  Perl/Tk
+
+Installation:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+  (nmake or dmake on Win32)
+
+Tested under:
+
+ - Win32 (VC++ 6.0)
+ - Win32 (mingw)
+ - Win32/X11 (cygwin as of Jan 1 2007)
+ - X11 (Debian Linux)
+ - Mac OS X 10.6.4.
+
+License:
+
+Imager::Screenshot is distributed under the same terms as perl itself.
+
+Warning: make test on X11 over a remote connection will be slow.

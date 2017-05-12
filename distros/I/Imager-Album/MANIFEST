@@ -1,0 +1,9 @@
+Album.pm
+Changes
+MANIFEST
+README
+Makefile.PL
+test.pl
+album.pl
+lib/Imager/Album/GUI.pm
+scale.tga

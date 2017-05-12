@@ -1,0 +1,26 @@
+---
+abstract: unknown
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.140640'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: IO-Ftp
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  File::Basename: '2.6'
+  Net::FTP: '2.67'
+  Symbol: '1.02'
+  URI: '1.25'
+version: 0.06
+x_deprecated: 1

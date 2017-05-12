@@ -1,0 +1,119 @@
+NAME
+    IPC::PubSub - Interprocess Publish/Subscribe channels
+
+SYNOPSIS
+        # A new message bus with the DBM::Deep backend
+        # (Other possible backends include Memcached and PlainHash)
+        my $bus = IPC::PubSub->new(DBM_Deep => '/tmp/pubsub.db');
+
+        # A channel is any arbitrary string
+        my $channel = '#perl6';
+
+        # Register a new publisher (you can publish to multiple channels)
+        my $pub = $bus->new_publisher("#perl6", "#moose");
+
+        # Publish a message (may be a complex object) to those channels
+        $pub->msg("This is a message");
+
+        # Register a new subscriber (you can subscribe to multiple channels)
+        my $sub = $bus->new_subscriber("#moose");
+
+        # Publish an object to channels
+        $pub->msg("This is another message");
+
+        # Set all subsequent messages from this publisher to expire in 30 seconds
+        $pub->expiry(30);
+        $pub->msg("This message will go away in 30 seconds");
+
+        # Simple get: Returns the messages sent since the previous get,
+        # but only for the first channel.
+        my @msgs = $sub->get;
+
+        # Simple get, with an explicit channel key (must be among the ones
+        # it initially subscribed to)
+        my @moose_msgs = $sub->get("#moose");
+
+        # Complex get: Returns a hash reference from channels to array
+        # references of [timestamp, message].
+        my $hash_ref = $sub->get_all;
+
+        # Changing the list of channels we subscribe to
+        $sub->subscribe('some-other-channel');
+        $sub->unsubscribe('some-other-channel');
+
+        # Changing the list of channels we publish to
+        $pub->publish('some-other-channel');
+        $pub->unpublish('some-other-channel');
+
+        # Listing and checking if we are in a channel
+        my @sub_channels = $sub->channels;
+        my @pub_channels = $pub->channels;
+        print "Sub is in #moose" if $sub->channels->{'#moose'};
+        print "Pub is in #moose" if $pub->channels->{'#moose'};
+
+        # Raw cache manipulation APIs (not advised; use ->modify instead)
+        $bus->lock('channel');
+        $bus->unlock('channel');
+        my @timed_msgs = $bus->fetch('key1', 'key2', 'key3');
+        $bus->store('key', 'value', time, 30);
+
+        # Atomic updating of cache content; $_ is stored back on the
+        # end of the callback.
+        my $rv = $bus->modify('key' => sub { delete $_->{foo} });
+
+        # Shorthand for $bus->modify('key' => sub { $_ = 'val' });
+        $bus->modify('key' => 'val');
+
+        # Shorthand for $bus->modify('key' => sub { $_ });
+        $bus->modify('key');
+
+        # Disconnect the backend connection explicitly
+        $bus->disconnect;
+
+DESCRIPTION
+    This module provides a simple API for publishing messages to *channels*
+    and for subscribing to them.
+
+    When a *message* is published on a channel, all subscribers currently in
+    that channel will get it on their next "get" or "get_all" call.
+
+    Currently, it offers three backends: "DBM_Deep" for on-disk storage,
+    "Memcached" for possibly multi-host storage, and "PlainHash" for
+    single-process storage.
+
+    Please see the tests in t/ for this distribution, as well as "SYNOPSIS"
+    above, for some usage examples; detailed documentation is not yet
+    available.
+
+SEE ALSO
+    IPC::DirQueue, where the subscribers divide the published messages among
+    themselves, so different subscribers never see the same message.
+
+AUTHORS
+    Audrey Tang <cpan@audreyt.org>
+
+COPYRIGHT
+    Copyright 2006, 2007 by Audrey Tang <cpan@audreyt.org>.
+
+    This software is released under the MIT license cited below.
+
+  The "MIT" License
+    Permission is hereby granted, free of charge, to any person obtaining a
+    copy of this software and associated documentation files (the
+    "Software"), to deal in the Software without restriction, including
+    without limitation the rights to use, copy, modify, merge, publish,
+    distribute, sublicense, and/or sell copies of the Software, and to
+    permit persons to whom the Software is furnished to do so, subject to
+    the following conditions:
+
+    The above copyright notice and this permission notice shall be included
+    in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+    IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+    CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+

@@ -1,0 +1,5 @@
+Revision history for Perl extension Image-Processor.
+
+0.05 - Initial release, bad make package don't use
+0.06 - Corrected make package
+

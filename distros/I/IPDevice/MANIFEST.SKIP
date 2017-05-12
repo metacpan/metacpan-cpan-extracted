@@ -1,0 +1,6 @@
+CVS/.*
+\.tar$
+\.bak$
+\.tgz$
+\.tar\.gz$
+^Makefile\.[a-z]+$

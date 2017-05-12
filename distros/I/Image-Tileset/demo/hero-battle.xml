@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     The graphic for this, hero-battle.png, was taken from RPG Maker 2003 for
+     demonstration purposes only. RPG Maker 2003 is copyright
+     (C) Enterbrain, Inc.
+-->
+<tileset>
+	<!-- Tile Definitions -->
+	<layout type="tiles" size="48x48">
+		<!-- Using a magic spell or item -->
+		<tile x="0" y="0" id="magic-1" />
+		<tile x="1" y="0" id="magic-2" />
+		<tile x="2" y="0" id="magic-3" />
+
+		<!-- Defending -->
+		<tile x="0" y="1" id="defend-1" />
+		<tile x="1" y="1" id="defend-2" />
+		<tile x="2" y="1" id="defend-3" />
+
+		<!-- Being hit -->
+		<tile x="0" y="2" id="hit-1" />
+		<tile x="1" y="2" id="hit-2" />
+		<tile x="2" y="2" id="hit-3" />
+
+		<!-- Dead -->
+		<tile x="0" y="3" id="dead-1" />
+		<tile x="1" y="3" id="dead-2" />
+		<tile x="2" y="3" id="dead-3" />
+
+		<!-- Poisoned -->
+		<tile x="0" y="4" id="sick-1" />
+		<tile x="1" y="4" id="sick-2" />
+		<tile x="2" y="4" id="sick-3" />
+
+		<!-- Victory -->
+		<tile x="0" y="5" id="win-1" />
+		<tile x="1" y="5" id="win-2" />
+		<tile x="2" y="5" id="win-3" />
+
+		<!-- Walking Left -->
+		<tile x="0" y="6" id="left-1" />
+		<tile x="1" y="6" id="left-2" />
+		<tile x="2" y="6" id="left-3" />
+
+		<!-- Walking Right -->
+		<tile x="0" y="7" id="right-1" />
+		<tile x="1" y="7" id="right-2" />
+		<tile x="2" y="7" id="right-3" />
+	</layout>
+
+	<!-- Animation Definitions -->
+	<layout type="animation" id="magic" speed="200">
+		<tile>magic-1</tile>
+		<tile>magic-2</tile>
+		<tile>magic-3</tile>
+	</layout>
+	<layout type="animation" id="defending" speed="200">
+		<tile>defend-1</tile>
+		<tile>defend-2</tile>
+		<tile>defend-3</tile>
+	</layout>
+	<layout type="animation" id="hit" speed="200">
+		<tile>hit-1</tile>
+		<tile>hit-2</tile>
+		<tile>hit-3</tile>
+	</layout>
+	<layout type="animation" id="dead" speed="200">
+		<tile>dead-1</tile>
+		<tile>dead-2</tile>
+		<tile>dead-3</tile>
+	</layout>
+	<layout type="animation" id="sick" speed="200">
+		<tile>sick-1</tile>
+		<tile>sick-2</tile>
+		<tile>sick-3</tile>
+	</layout>
+	<layout type="animation" id="win" speed="200">
+		<tile>win-1</tile>
+		<tile>win-2</tile>
+		<tile>win-3</tile>
+	</layout>
+	<layout type="animation" id="left" speed="200">
+		<tile>left-1</tile>
+		<tile>left-2</tile>
+		<tile>left-3</tile>
+	</layout>
+	<layout type="animation" id="right" speed="200">
+		<tile>right-1</tile>
+		<tile>right-2</tile>
+		<tile>right-3</tile>
+	</layout>
+</tileset>

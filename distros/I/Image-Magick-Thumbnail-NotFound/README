@@ -1,0 +1,32 @@
+Image-Magick-Thumbnail-NotFound version 1.008
+=========================
+
+This module creates thumbnails as http requests fail for them.
+The requesting entity is sent an automatically created and 
+saved thumbnail, so that subsequent requests will not fail.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Image::Magick, 
+  Image::Magick::Thumbnail
+  Image::Magick::Thumbnail::Square
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 by Leo Charre
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.
+

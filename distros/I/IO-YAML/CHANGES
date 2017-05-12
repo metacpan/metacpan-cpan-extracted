@@ -1,0 +1,75 @@
+---
+
+# Change log for Perl module IO-YAML
+
+# This file is in YAML format; see <URL:http://www.yaml.org/>
+# for more information
+
+- date: 2017-03-03
+  version: 0.10
+  changes:
+    - Fix selection of a suitable YAML module
+
+- date: 2017-02-28
+  version: 0.09
+  changes:
+    - Use code from YAML::Any to pick a YAML implementation to use
+    - Thanks to Ian Stuart for the tip
+
+- date: 2009-10-03
+  version: 0.08
+  changes:
+    - Added UNTIE() to prevent warnings (rt.cpan.org #50151) -- reported by J. J. Merelo Guervos
+
+- date: 2007-09-22
+  version: 0.07
+  changes:
+    - use {strict,warnings} -- d'oh!
+    - Ignore comments at beginning/end of documents (rt.cpan.org #29483)
+
+- date: 2006-08-17
+  version: 0.06
+  changes:
+    - Make tests in t/07-write-beyond.t work under multiple versions of YAML
+
+- date: 2006-08-16
+  version: 0.05
+  changes:
+    - Handle single document terminators correctly when reading
+    - Added auto_terminate()
+    - Fixed precedence bug in seek()
+    - Rewrote documentation of handle()
+
+- date: 2006-06-05
+  version: 0.04
+  changes:
+    - Fixed eof handling
+    - Added tests for reading and writing beyond end of YAML stream
+    - Fixed documentation of writing beyond end of YAML stream
+    - Document seek, tell, truncate, and eof methods
+
+- date: 2006-03-26
+  version: 0.03
+  changes:
+    - Cleaned up for CPAN release
+    - Fixed argument handling in constructor (reported by Hakim Cassimally)
+    - Documented reading past end of YAML stream
+    - Added ability to write past end of YAML stream
+    - Allow arbitrary seeks, as long as it's to the beginning of a YAML document
+    - Allow modes +<, +>, r+, and w+
+
+- date: 2005-05-11
+  changes:
+    - Set EOF flag upon encountering `...'
+    - Fixed handling of IO::YAML->new($glob)
+    - Added ability to read/write data past end of YAML stream using $io->handle
+
+- date: 2004-12-07
+  version: 0.02
+  changes:
+    - Tidied up for release
+
+- date: 2004-11-17
+  version: 0.01
+  note: Initial implementation
+

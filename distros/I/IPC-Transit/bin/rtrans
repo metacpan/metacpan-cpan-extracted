@@ -1,0 +1,36 @@
+#!perl
+
+use strict;use warnings;
+use IPC::Transit;
+use Data::Dumper;
+use Getopt::Std;
+use JSON;
+
+$| = 1;
+
+my $opts = {};
+getopts('srP:c:', $opts);
+if($opts->{P}) {
+    $IPC::Transit::config_dir = $opts->{P};
+    print "Using alternative Transit config dir: $IPC::Transit::config_dir\n";
+}
+
+$opts->{c} = 1 if $opts->{s};
+
+my $qname = shift or die 'qname required';
+while(1) {
+    if(defined $opts->{c}) {
+        last unless $opts->{c};
+        $opts->{c}--;
+    }
+    eval {
+        if($opts->{r}) {
+            my $m = IPC::Transit::receive(qname => $qname, raw => 1);
+            print JSON->new->canonical(1)->pretty->encode($m);
+        } else {
+            my $m = IPC::Transit::receive(qname => $qname);
+            print JSON->new->canonical(1)->pretty->encode($m);
+        }
+    };
+    print STDERR "Exception: $@" if $@;
+}

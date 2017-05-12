@@ -1,0 +1,210 @@
+#!/usr/bin/perl
+# vim: nospell
+use strict;
+use warnings;
+use lib './lib';
+use ICal::QuickAdd;
+use Getopt::Long;
+
+my $to_email;
+my $to_ics;
+my $smtp_host;
+my $reply_p;
+my $DEBUG;
+GetOptions(
+    "to-email=s"  => \$to_email,
+    "to-ics=s"    => \$to_ics,
+    "smtp-host=s" => \$smtp_host,
+    "reply!"      => \$reply_p,
+    "debug"       => \$DEBUG,
+);
+unless ($to_email or $to_ics) {
+    die "You must specific --to-email or --to-ics";
+}
+
+=pod
+
+=head1 SYNOPSIS
+
+  iqa [options] ['message']
+      --to-email   'you@yourdomain.com'
+      --to-ics     'path/to/local/ics'
+      --smtp-host  'mail.yourisp.com'
+      --no-reply   Don't send back a confirmation reply.
+                   (Only applies when messages come in via e-mail)
+
+=head1 USAGE
+
+Process short natural, SMS-style descriptions of events
+and get them into the standard iCalendar format (aka "ICS" files).
+
+=head2 Example of Quick-Add Event Expression
+
+ Tomorrow at noon. Lunch with Bob
+
+The format currently must be a date description followed by a period ("."),
+followed the event summary. See L<DateTime::Format::Natural> for the kind of
+dates descriptions it can understand.
+
+=head2 From a cell phone, Quick-Add an event by email (SMS)
+
+In an email file, like C<.qmail-yourname-cal>:
+
+ iqa --to-email 'you@yourdomain.com' --smtp-host 'mail.yourisp.com'
+
+Now send a text message to this address in the style above. It will receive the
+message, convert the message to a date and summary and forward on a new message
+to your regular email address with ICS data. A number of systems will allow you
+to just click on the resulting message to add it your calendar, where you can
+possibly add it later.  You will be sent back a short confirmation message,
+showing how the date and time were translated.
+
+There is also a C<--no-reply> if you don't want a confirmation reply.
+
+=head2 From a console, Quick-Add an event to a local calendar
+
+    qae 'Tomorrow at noon. Lunch with Bob'
+
+For this example, You need to create a shell alias that makes
+a shortcut with the standard options you would use. For example,
+this might go in C<.profile> file:
+
+ # qae = "Quick Add Event"
+ # Here the default location of the Evolution groupware calander is used
+ alias qae='iqa --to-ics ~/.evolution/calendar/local/system/calendar.ics';
+
+=head2 From a console, Quick-Add an event by email (SMS)
+
+ qar 'Tomorrow at noon. Lunch with Bob'
+
+You are at your work computer but want to quickly add an event to a desktop
+calendar accessible only from another computer. Use this tool to generate
+an iCal event e-mail to yourself, which you can just click on to accept when
+you get home.
+
+ # qar = "Quick Add Remote"
+ alias qar='iqa --to-email 'you@yourdomain.com' --smtp-host 'mail.yourisp.com'
+
+=cut
+
+
+
+my $iqa = ICal::QuickAdd->new( $ARGV[0] );
+
+if ($to_email) {
+  require Email::Send;
+  my $args_to_new;
+  if ($smtp_host) {
+      $args_to_new =  {
+          mailer => 'SMTP',
+          mailer_args => [ Host => $smtp_host ],
+      };
+  }
+
+  my $msg = $iqa->as_ical_email( To => $to_email );
+
+  if ($DEBUG) {
+      print "DEBUG: Would send this message:\n\n".$msg->as_string."\n" if $DEBUG;
+  }
+  else  {
+      Email::Send
+        ->new($args_to_new)
+        ->send($msg);
+  }
+}
+elsif ($to_ics) {
+  $iqa->inject_into_ics($to_ics);
+}
+else {
+    # this case is handled above. No action needed.
+}
+
+if ($iqa->from_email) {
+    if ($reply_p) {
+        $iqa->from_email_obj->reply(
+            # SMS seems to want the content in the body. Supress adding a subject
+            subject => '',
+            body    => $iqa->parsed_string ,
+        );
+    }
+    # We're done with the original incoming mail now.
+    $iqa->from_email_obj->noexit(1);
+    $iqa->from_email_obj->ignore;
+}
+
+=head1 Compatibility with desktop calendar software.
+
+It may not be safe to inject an event into an ICS file that another program is
+currently using.  For example, if you inject an event an ICS file that
+evolution is managing while it is running. Also, these changes might not show
+up right away in the running program, either.
+
+=head2 Evolution
+
+With Evolution, a safer option is to use the C<< --to-email >> option, and open
+the message in Evolution. It will recognize it as a special kind of event
+message, and offer to add it to your calendar.
+
+You can save an extra step in the work flow by having the email automatically
+deleted after you add it your calendar. Look under I<Edit: Preferences: Mail: Calendar and Tasks>
+and check the box for "Delete message after acting".
+
+=head1 TODO
+
+ * Find out if it's possible to cause Evolution to reload the ICS file, so the
+   event appears.
+
+ * Support end times (example: 1pm - 3pm )
+
+ * Support alarms (examples:  +1d, +15m )
+
+ * Make it easier to install the script and all the dependencies.
+
+ * Support for other languages besides English (Needs volunteers!)
+
+ * Gracefully handle the case when we are emailed a date description we don't
+   understand. I think we should reply with a "sorry" message, but right now
+   we just bomb out.
+
+=cut
+
+=head1 STATUS
+
+This software is currently considered I<alpha>. What's here should generally
+work, but is subject to change. Note all the L<TODO> items above.
+
+=head1 AUTHOR
+
+Mark Stosberg  C<< mark@summersault.com >>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2007, Mark Stosberg C<< mark@summersault.com >>.
+All rights reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See C<perldoc perlartistic>.
+
+
+=head1 DISCLAIMER OF WARRANTY
+
+BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+PROVIDE THE SOFTWARE ''AS IS'' WITHOUT WARRANTY OF ANY KIND, EITHER
+EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE
+LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL,
+OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE
+THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF
+SUCH DAMAGES.

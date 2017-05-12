@@ -1,0 +1,39 @@
+---
+name: IO-Buffered
+version: 1.00
+author:
+  - 'Troels Liebe Bentsen <troels@infopro.dk>'
+abstract: A simple buffer class for dealing with different data types
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  perl: '>= 5.8.0'
+build_requires:
+  Test::More: 0
+provides:
+  IO::Buffered:
+    file: lib/IO/Buffered.pm
+    version: 1.00
+  IO::Buffered::FixedSize:
+    file: lib/IO/Buffered/FixedSize.pm
+    version: 1.00
+  IO::Buffered::HTTP:
+    file: lib/IO/Buffered/HTTP.pm
+    version: 1.00
+  IO::Buffered::Last:
+    file: lib/IO/Buffered/Last.pm
+    version: 1.00
+  IO::Buffered::Regexp:
+    file: lib/IO/Buffered/Regexp.pm
+    version: 1.00
+  IO::Buffered::Size:
+    file: lib/IO/Buffered/Size.pm
+    version: 1.00
+  IO::Buffered::Split:
+    file: lib/IO/Buffered/Split.pm
+    version: 1.00
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

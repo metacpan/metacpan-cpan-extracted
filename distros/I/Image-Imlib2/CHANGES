@@ -1,0 +1,120 @@
+Revision history for Perl extension Image::Imlib2.
+
+2.03 Tue Nov 24 21:40:49 GMT 2009
+    - add a new_transparent method
+    - add a create_rotated_image method
+    - add a human-readable license
+
+2.02 Mon Dec  1 11:55:06 GMT 2008
+    - update documentation to clarify cache_size
+    - note that new images have undefined content (thanks to barbie)
+
+2.01 Sun Jun  8 10:05:46 BST 2008
+    - in Build.PL, exit 0 when we can't find libimlib2
+
+2.00 Fri Dec  7 11:29:47 GMT 2007
+    - make the cache size 0 by default
+
+1.13 Fri Oct 13 19:08:41 BST 2006
+    - optimise autocropping (thanks to Sergey Mende)
+    - find_colour now returns undef if it doesn't find the colour
+
+1.12 Tue Aug 15 10:14:55 BST 2006
+    - added find_colour method
+    - added fill method
+
+1.11 Thu Aug  3 10:53:33 BST 2006
+    - endianness fixes for new_using_data (thanks to Chris Dolan)
+    - added autocrop method
+    
+1.10 Wed Jun 28 12:11:47 BST 2006
+    - added new_using_data and will_blend (thanks to Chris Dolan) -
+      new_using_data is endianness specific
+    - fixed documentation bug, it's called get_text_size not get_font_size
+    - added create_transparent_image method
+    - added create_blended_image
+    - added POD tests
+    - added width/height as synonyms to get_width/get_height
+    - disable buggy imlib_image_draw_pixel wrapper - if you have
+      a version of imlib2 1.0.5 or earlier you will now see the bug
+
+1.09 Thu Jun 15 16:43:10 GMT 2006
+    - lose AUTOLOAD and define the constants in their own right
+      code by Mark Fowler. this also means that random calls for
+      non-existant methods fail properly now
+
+1.08 Wed Mar  1 19:10:05 GMT 2006
+    - fix build instructions (noticed by JPIERCE)
+
+1.07 Fri Apr 15 11:57:47 BST 2005
+    - Add clone, sharpen and blur (thanks to Christian Hansen)
+
+1.06 Fri Apr  8 22:58:26 CST 2005
+    - added missing test file to MANIFEST
+
+1.05 Thu Apr  7 16:55:01 GMT 2005
+    - added support for defeating caching, namely:
+          set_cache_size
+          get_cache_size
+          set_changed_on_disk
+      (Thanks to Tom Insam and Mark Fowler)
+
+1.04 Thu Feb  3 15:27:41 GMT 2005
+	- Imlib2 1.1.2 broke our tests as it doesn't enable alpha by
+          default (for optimisation purposes). The module now enables
+          alpha by default when you create an image, but you can turn
+          it off with has_alpha (thanks to Don Armstrong)
+	- tested with Imlib2 1.2.0
+
+1.03 Tue Jul 13 11:30:47 IST 2004
+	- fixed minor POD tyop
+	- new flip_horizontal, flip_vertical, flip_diagonal (thanks to
+	Tuomas Jormola)
+
+1.02 Tue May 25 22:18:32 BST 2004
+	- renamed Changes to CHANGES 
+	- new set_quality function (thanks to Andreas Plesner)
+
+1.01 Mon Nov  3 19:18:14 GMT 2003
+	- document get_width and get_height methods (thanks to Andreas
+	Plesner)
+	- added NINJA support
+
+1.00 Sun Sep 14 09:47:42 BST 2003
+	- applied patch to make the module work under threaded perls
+	  (thanks to Mathieu Jondet, Andreas Plesner Jacobsen, zak3)
+	- applied patch to make the module work without X (spotted by
+	  Mike Castle, Jens Gassmann)
+	- applied patch to pass the correct compiler flags (thanks to
+	  Christian Laursen)
+	- bumped up to version 1.00
+
+0.12 Sun Aug 31 16:07:52 BST 2003
+	- now use c_source to find ppport.h thanks to Mathieu Jondet
+	- use Build.PL's passthrough mechanism to generate the
+	  Makefile.PL
+	- now report loading and saving errors, as suggested by
+	  michael j pan
+	- added image_set_format thanks to Joel Rowbottom
+
+0.11 Sun Mar 23 19:06:29 GMT 2003
+        - Added query_pixel thanks to Sebastian BoeBhm
+	- Changed test suite to use Test::More
+	- The module is now built with Module::Build
+
+0.10 Mon Sep 16 15:57:04 BST 2002
+	- Added image_orientate, create_scaled_image
+	  thanks to Joel Rowbottom
+
+0.03  Sat Sep  7 10:00:06 BST 2002
+        - incorporate color ranges, polygons and updated docs
+	  thanks to Theo Schlossnagle
+	- better warning if imlib2 hasn't been installed
+
+0.02  Wed Aug 29 10:40:56 BST 2001
+	- mention that imlib2 is out. I intend to rewrite this with
+	  Inline::C to make it more maintainable
+
+0.01  Thu Oct  5 16:58:52 BST 2000
+	- released initial version
+

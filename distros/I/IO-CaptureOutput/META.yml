@@ -1,0 +1,53 @@
+---
+abstract: 'capture STDOUT and STDERR from Perl code, subprocesses or XS'
+author:
+  - 'Simon Flack <simonflk@cpan.org>'
+  - 'David Golden <dagolden@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '3.27'
+  IO::File: '0'
+  Test::More: '0.62'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+  perl: '5.006'
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: IO-CaptureOutput
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  IO::CaptureOutput:
+    file: lib/IO/CaptureOutput.pm
+    version: '1.1104'
+requires:
+  Carp: '0'
+  Exporter: '0'
+  File::Basename: '0'
+  File::Temp: '0.16'
+  Symbol: '0'
+  perl: '5.006'
+  strict: '0'
+  vars: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/dagolden/IO-CaptureOutput/issues
+  homepage: https://github.com/dagolden/IO-CaptureOutput
+  repository: https://github.com/dagolden/IO-CaptureOutput.git
+version: '1.1104'
+x_authority: cpan:DAGOLDEN
+x_contributors:
+  - 'Mike Latimer <mlatimer@suse.com>'
+  - 'Olivier Mengué <dolmen@cpan.org>'
+  - 'Tony Cook <tony@develop-help.com>'

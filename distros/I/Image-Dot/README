@@ -1,0 +1,33 @@
+
+Image::Dot v1.1
+===============
+
+This package provides 1x1 pixel PNG images of a certain RGB color
+(also with transparency) without relying on any external modules like
+GD, libpng or Compress::Zlib.  These pixel dots can be useful in a
+pure-perl HTTP server to be able to create colored dots on-the-fly,
+e.g. for formatting or drawing purposes.
+
+Additionally, a transparent GIF dot is provided (PNG transparency
+support in some common browsers is bad to non-existent).
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make install
+
+
+DEPENDENCIES
+
+None.  That's why this module was written...
+
+
+COPYRIGHT AND LICENCE
+
+(c) 2002 Roland Giersig <RGIERSIG@cpan.org>
+
+This module can be used under the same license as perl itself.

@@ -1,0 +1,280 @@
+=encoding utf8
+
+=head1 NAME
+
+IOMux::Handler::Write - any mux writer
+
+=head1 INHERITANCE
+
+ IOMux::Handler::Write
+   is a IOMux::Handler
+
+ IOMux::Handler::Write is extended by
+   IOMux::Bundle
+   IOMux::File::Write
+   IOMux::Net::TCP
+   IOMux::Pipe::Write
+
+=head1 SYNOPSIS
+
+  # only use extensions
+
+=head1 DESCRIPTION
+
+In an event driven program, you must be careful with every Operation
+System call, because it can block the event mechanism, hence the program
+as a whole. Often you can be lazy with writes, because its communication
+buffers are usually working quite asynchronous... but not always. You
+may skip the callbacks for small writes and prints.
+
+Extends L<"DESCRIPTION" in IOMux::Handler|IOMux::Handler/"DESCRIPTION">.
+ 
+=head1 METHODS
+
+Extends L<"METHODS" in IOMux::Handler|IOMux::Handler/"METHODS">.
+ 
+=head2 Constructors
+
+Extends L<"Constructors" in IOMux::Handler|IOMux::Handler/"Constructors">.
+ 
+=over 4
+
+=item IOMux::Handler::Write-E<gt>B<new>(%options)
+
+ -Option    --Defined in     --Default
+  fh          IOMux::Handler   <required>
+  name        IOMux::Handler   <stringified handle>
+  write_size                   4096
+
+=over 2
+
+=item fh => FILEHANDLE
+
+=item name => STRING
+
+=item write_size => INTEGER
+
+=back
+
+=item IOMux::Handler::Write-E<gt>B<open>($mode, $what, %options)
+
+Inherited, see L<IOMux::Handler/"Constructors">
+
+=back
+
+=head2 Accessors
+
+Extends L<"Accessors" in IOMux::Handler|IOMux::Handler/"Accessors">.
+ 
+=over 4
+
+=item $obj-E<gt>B<fh>()
+
+Inherited, see L<IOMux::Handler/"Accessors">
+
+=item $obj-E<gt>B<fileno>()
+
+Inherited, see L<IOMux::Handler/"Accessors">
+
+=item $obj-E<gt>B<mux>()
+
+Inherited, see L<IOMux::Handler/"Accessors">
+
+=item $obj-E<gt>B<name>()
+
+Inherited, see L<IOMux::Handler/"Accessors">
+
+=item $obj-E<gt>B<usesSSL>()
+
+Inherited, see L<IOMux::Handler/"Accessors">
+
+=item $obj-E<gt>B<writeSize>( [$integer] )
+
+The number of bytes written at each write.
+
+=back
+
+=head2 User interface
+
+Extends L<"User interface" in IOMux::Handler|IOMux::Handler/"User interface">.
+ 
+=head3 Connection
+
+Extends L<"Connection" in IOMux::Handler|IOMux::Handler/"Connection">.
+ 
+=over 4
+
+=item $obj-E<gt>B<close>( [$callback] )
+
+Inherited, see L<IOMux::Handler/"Connection">
+
+=item $obj-E<gt>B<timeout>( [$timeout] )
+
+Inherited, see L<IOMux::Handler/"Connection">
+
+=back
+
+=head3 Writing
+
+=over 4
+
+=item $obj-E<gt>B<print>(STRING|SCALAR|LIST|ARRAY)
+
+Send one or more lines to the output. The data is packed into a
+single string first. The ARRAY (of strings) and SCALAR (ref string)
+choices are available for efficiency.
+
+example: 
+
+  $conn->print($some_text);
+  $conn->print(\$some_text);
+
+  my $fh = $conn->fh;
+  print $fh "%s%d%X", $foo, $bar, $baz;
+
+=item $obj-E<gt>B<printf>($format, $params)
+
+example: 
+
+    $conn->printf("%s%d%X", $foo, $bar, $baz);
+
+    my $fh = $conn->fh;
+    $fh->printf("%s%d%X", $foo, $bar, $baz);
+
+=item $obj-E<gt>B<say>(STRING|SCALAR|LIST|ARRAY)
+
+Like L<print()|IOMux::Handler::Write/"Writing"> but adding a newline at the end.
+
+=item $obj-E<gt>B<write>( SCALAR, [$more] )
+
+Send the content of the string, passed as reference in SCALAR. You
+probably want to use L<print()|IOMux::Handler::Write/"Writing"> or L<printf()|IOMux::Handler::Write/"Writing">.  You may provide
+a code reference to produce $more info when the output buffer get
+empty.
+
+=back
+
+=head2 Multiplexer
+
+Extends L<"Multiplexer" in IOMux::Handler|IOMux::Handler/"Multiplexer">.
+ 
+=head3 Connection
+
+Extends L<"Connection" in IOMux::Handler|IOMux::Handler/"Connection">.
+ 
+=over 4
+
+=item $obj-E<gt>B<muxInit>( $mux, [$handler] )
+
+Inherited, see L<IOMux::Handler/"Connection">
+
+=item $obj-E<gt>B<muxRemove>()
+
+Inherited, see L<IOMux::Handler/"Connection">
+
+=item $obj-E<gt>B<muxTimeout>()
+
+Inherited, see L<IOMux::Handler/"Connection">
+
+=back
+
+=head3 Reading
+
+Extends L<"Reading" in IOMux::Handler|IOMux::Handler/"Reading">.
+ 
+=over 4
+
+=item $obj-E<gt>B<muxExceptFlagged>($fileno)
+
+Inherited, see L<IOMux::Handler/"Reading">
+
+=item $obj-E<gt>B<muxReadFlagged>($fileno)
+
+Inherited, see L<IOMux::Handler/"Reading">
+
+=back
+
+=head3 Writing
+
+Extends L<"Writing" in IOMux::Handler|IOMux::Handler/"Writing">.
+ 
+=over 4
+
+=item $obj-E<gt>B<muxOutbufferEmpty>()
+
+Called after all pending output has been written to the file descriptor.
+You may use this callback to produce more data to be written.
+
+When this method is not overruled, the multiplexer will stop listening
+to the write flag until an explicit L<write()|IOMux::Handler::Write/"Writing"> gets executed.
+
+example: 
+
+  package My::Service;
+  use base 'IOMux::Net::TCP';
+
+  sub muxOutbufferEmpty()
+  {   my $self = shift;
+      if(my $data = $self->produce_more_data)
+      {   $self->write(\$data);
+      }
+      else
+      {   $self->SUPER::muxOutbufferEmpty;
+      }
+  }
+
+=item $obj-E<gt>B<muxOutputWaiting>()
+
+Returns true is there is output queued.
+
+=item $obj-E<gt>B<muxWriteFlagged>($fileno)
+
+Inherited, see L<IOMux::Handler/"Writing">
+
+=back
+
+=head3 Service
+
+Extends L<"Service" in IOMux::Handler|IOMux::Handler/"Service">.
+ 
+=head2 Helpers
+
+Extends L<"Helpers" in IOMux::Handler|IOMux::Handler/"Helpers">.
+ 
+=over 4
+
+=item $obj-E<gt>B<extractSocket>(HASH)
+
+=item IOMux::Handler::Write-E<gt>B<extractSocket>(HASH)
+
+Inherited, see L<IOMux::Handler/"Helpers">
+
+=item $obj-E<gt>B<fdset>($state, $read, $write, $error)
+
+Inherited, see L<IOMux::Handler/"Helpers">
+
+=item $obj-E<gt>B<show>()
+
+Inherited, see L<IOMux::Handler/"Helpers">
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of IOMux distribution version 1.00,
+built on November 11, 2015. Website: F<http://perl.overmeer.net/>
+All modules in this suite:
+L</Any::Daemon>,
+L</IOMux>, and
+L</IOMux::HTTP>.
+
+Please post questions or ideas to F<perl@overmeer.net>
+
+=head1 LICENSE
+
+Copyrights 2011-2015 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

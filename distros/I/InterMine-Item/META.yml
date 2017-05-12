@@ -1,0 +1,31 @@
+---
+abstract: 'Tools for writing InterMine-Items-XML files'
+author:
+  - 'InterMine <dev@intermine.org>'
+build_requires:
+  Test::Exception: '0'
+  Test::More: '0'
+  Test::Warn: '0'
+  Test::XML: '0'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: InterMine-Item
+provides:
+  InterMine::Item:
+    file: lib/InterMine/Item.pm
+    version: '0.991'
+  InterMine::Item::Document:
+    file: lib/InterMine/Item/Document.pm
+    version: '0.991'
+requires:
+  InterMine::Model: '0.94'
+  XML::Writer: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.991'

@@ -1,0 +1,28 @@
+---
+abstract: 'Perl binding for Automatic License Plate Recognition library'
+author:
+  - 'Marius Gavrilescu <marius@ieval.ro>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  Devel::CheckLib: '0'
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Image-OpenALPR
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Class::Accessor::Fast: '0'
+  JSON::MaybeXS: '0'
+  perl: '5.014000'
+resources:
+  repository: https://git.ieval.ro/?p=image-openalpr.git
+version: '0.001001'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

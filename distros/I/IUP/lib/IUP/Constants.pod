@@ -1,0 +1,177 @@
+=for comment based on iup-3.5
+
+=head1 NAME
+
+IUP::Constants - [special] IUP related constants
+
+=head1 DESCRIPTION 
+
+This modules contains just constants related to general L<IUP|IUP> usage
+as well as a set of L<IUP::Canvas> specific constants.
+
+ use IUP::Constants;  #equivalent to ':basic' tag
+ #or
+ use IUP::Constants ':basic';
+ #or
+ use IUP::Constants ':cd';
+ #or
+ use IUP::Constants ':keys';
+ #or
+ use IUP::Constants ':all';  # imports  :basic + :cd + :keys
+ #or
+ use IUP::Constants qw/:basic :keys/;
+ 
+B<IMPORTANT:> All IUP related constants (e.g. C<IUP_CLOSE>, C<IUP_ERROR>, ...)
+are usable as barewords therefore they do not
+interpolate in interpolation contexts such as double-quoted strings
+
+  use IUP::Constants;
+  
+  # CORRECT WAY: this is probably what you want
+  print "color is - " . IUP_GREEN; # prints: color is - 0 255 0
+
+  # DO NOT DO THIS: beware!!!
+  print "color is - IUP_GREEN";    # prints: color is - IUP_GREEN 
+  
+  # DO NOT DO THIS: this is completely WRONG!!!
+  print "color is - " . $IUP_GREEN;
+
+B<NOTE:> Keep in mind that
+
+ use IUP ':all';
+
+does for you automatically also:
+
+ use IUP::Constants ':all';
+  
+=head1 TAGS
+
+=head2 Export tag ':basic'
+
+ IUP_ERROR        IUP_CENTERPARENT IUP_DEFAULT      IUP_SBLEFT       IUP_MAXIMIZE     IUP_BLUE         
+ IUP_NOERROR      IUP_TOP          IUP_CLOSE        IUP_SBRIGHT      IUP_HIDE         IUP_BLACK        
+ IUP_OPENED       IUP_BOTTOM       IUP_CONTINUE     IUP_SBPGLEFT     IUP_MASK_FLOAT   IUP_WHITE        
+ IUP_INVALID      IUP_BUTTON1      IUP_SBUP         IUP_SBPGRIGHT    IUP_MASK_UFLOAT  IUP_YELLOW       
+ IUP_CENTER       IUP_BUTTON2      IUP_SBDN         IUP_SBPOSH       IUP_MASK_EFLOAT  IUP_PRIMARY      
+ IUP_LEFT         IUP_BUTTON3      IUP_SBPGUP       IUP_SBDRAGH      IUP_MASK_INT     IUP_SECONDARY    
+ IUP_RIGHT        IUP_BUTTON4      IUP_SBPGDN       IUP_SHOW         IUP_MASK_UINT                     
+ IUP_MOUSEPOS     IUP_BUTTON5      IUP_SBPOSV       IUP_RESTORE      IUP_RED                           
+ IUP_CURRENT      IUP_IGNORE       IUP_SBDRAGV      IUP_MINIMIZE     IUP_GREEN                         
+
+=head2 Export tag ':cd'
+
+See L<IUP::Canvas>
+
+ CD_QUERY               CD_PATH_FILLSTROKE     CD_CROSS               CD_CAP_RECT            CD_SIM_POLYGON         
+ CD_RGB                 CD_PATH_CLIP           CD_DIAGCROSS           CD_CAP_CHORD           CD_SIM_TEXT            
+ CD_MAP                 CD_EVENODD             CD_SOLID               CD_CAP_IMAGERGB        CD_SIM_ALL             
+ CD_RGBA                CD_WINDING             CD_HATCH               CD_CAP_IMAGERGBA       CD_SIM_LINES           
+ CD_IRED                CD_MITER               CD_STIPPLE             CD_CAP_IMAGEMAP        CD_SIM_FILLS           
+ CD_IGREEN              CD_BEVEL               CD_PATTERN             CD_CAP_GETIMAGERGB     CD_RED                 
+ CD_IBLUE               CD_ROUND               CD_HOLLOW              CD_CAP_IMAGESRV        CD_DARK_RED            
+ CD_IALPHA              CD_CAPFLAT             CD_NORTH               CD_CAP_BACKGROUND      CD_GREEN               
+ CD_INDEX               CD_CAPSQUARE           CD_SOUTH               CD_CAP_BACKOPACITY     CD_DARK_GREEN          
+ CD_COLORS              CD_CAPROUND            CD_EAST                CD_CAP_WRITEMODE       CD_BLUE                
+ CD_ERROR               CD_OPAQUE              CD_WEST                CD_CAP_LINESTYLE       CD_DARK_BLUE           
+ CD_OK                  CD_TRANSPARENT         CD_NORTH_EAST          CD_CAP_LINEWITH        CD_YELLOW              
+ CD_CLIPOFF             CD_REPLACE             CD_NORTH_WEST          CD_CAP_FPRIMTIVES      CD_DARK_YELLOW         
+ CD_CLIPAREA            CD_XOR                 CD_SOUTH_EAST          CD_CAP_HATCH           CD_MAGENTA             
+ CD_CLIPPOLYGON         CD_NOT_XOR             CD_SOUTH_WEST          CD_CAP_STIPPLE         CD_DARK_MAGENTA        
+ CD_CLIPREGION          CD_POLITE              CD_CENTER              CD_CAP_PATTERN         CD_CYAN                
+ CD_UNION               CD_FORCE               CD_BASE_LEFT           CD_CAP_FONT            CD_DARK_CYAN           
+ CD_INTERSECT           CD_CONTINUOUS          CD_BASE_CENTER         CD_CAP_FONTDIM         CD_WHITE               
+ CD_DIFFERENCE          CD_DASHED              CD_BASE_RIGHT          CD_CAP_TEXTSIZE        CD_BLACK               
+ CD_NOTINTERSECT        CD_DOTTED              CD_PLAIN               CD_CAP_TEXTORIENTATION CD_DARK_GRAY           
+ CD_FILL                CD_DASH_DOT            CD_BOLD                CD_CAP_PALETTE         CD_GRAY                
+ CD_OPEN_LINES          CD_DASH_DOT_DOT        CD_ITALIC              CD_CAP_LINECAP         CD_MM2PT               
+ CD_CLOSED_LINES        CD_CUSTOM              CD_UNDERLINE           CD_CAP_LINEJOIN        CD_RAD2DEG             
+ CD_CLIP                CD_PLUS                CD_STRIKEOUT           CD_CAP_PATH            CD_DEG2RAD             
+ CD_BEZIER              CD_STAR                CD_BOLD_ITALIC         CD_CAP_BEZIER          CD_A0                  
+ CD_REGION              CD_CIRCLE              CD_SMALL               CD_CAP_ALL             CD_A1                  
+ CD_PATH                CD_X                   CD_STANDARD            CD_ABORT               CD_A2                  
+ CD_POLYCUSTOM          CD_BOX                 CD_LARGE               CD_CONTINUE            CD_A3                  
+ CD_PATH_NEW            CD_DIAMOND             CD_CAP_NONE            CD_SIM_NONE            CD_A4                  
+ CD_PATH_MOVETO         CD_HOLLOW_CIRCLE       CD_CAP_FLUSH           CD_SIM_LINE            CD_A5                  
+ CD_PATH_LINETO         CD_HOLLOW_BOX          CD_CAP_CLEAR           CD_SIM_RECT            CD_LETTER              
+ CD_PATH_ARC            CD_HOLLOW_DIAMOND      CD_CAP_PLAY            CD_SIM_BOX             CD_LEGAL               
+ CD_PATH_CURVETO        CD_HORIZONTAL          CD_CAP_YAXIS           CD_SIM_ARC                                    
+ CD_PATH_CLOSE          CD_VERTICAL            CD_CAP_CLIPAREA        CD_SIM_SECTOR                                 
+ CD_PATH_FILL           CD_FDIAGONAL           CD_CAP_CLIPPOLY        CD_SIM_CHORD                                  
+ CD_PATH_STROKE         CD_BDIAGONAL           CD_CAP_REGION          CD_SIM_POLYLINE                               
+
+=head2 Export tag ':keys'
+
+See L<IUP::Manual::06_HandlingKeyboard>
+
+ K_SP             K_d              K_sPGDN          K_mTAB           K_cK             K_m6             
+ K_exclam         K_e              K_sINS           K_mCR            K_cL             K_m7             
+ K_quotedbl       K_f              K_sDEL           K_mBS            K_cM             K_m8             
+ K_numbersign     K_g              K_sSP            K_mPAUSE         K_cN             K_m9             
+ K_dollar         K_h              K_sTAB           K_mESC           K_cO             K_m0             
+ K_percent        K_i              K_sCR            K_mCcedilla      K_cP             K_mPlus          
+ K_ampersand      K_j              K_sBS            K_mF1            K_cQ             K_mComma         
+ K_apostrophe     K_k              K_sPAUSE         K_mF2            K_cR             K_mMinus         
+ K_parentleft     K_l              K_sESC           K_mF3            K_cS             K_mPeriod        
+ K_parentright    K_m              K_Ccedilla       K_mF4            K_cT             K_mSlash         
+ K_asterisk       K_n              K_sF1            K_mF5            K_cU             K_mSemicolon     
+ K_plus           K_o              K_sF2            K_mF6            K_cV             K_mEqual         
+ K_comma          K_p              K_sF3            K_mF7            K_cW             K_mBracketleft   
+ K_minus          K_q              K_sF4            K_mF8            K_cX             K_mBracketright  
+ K_period         K_r              K_sF5            K_mF9            K_cY             K_mBackslash     
+ K_slash          K_s              K_sF6            K_mF10           K_cZ             K_mAsterisk      
+ K_0              K_t              K_sF7            K_mF11           K_c1             K_yA             
+ K_1              K_u              K_sF8            K_mF12           K_c2             K_yB             
+ K_2              K_v              K_sF9            K_mPrint         K_c3             K_yC             
+ K_3              K_w              K_sF10           K_mMenu          K_c4             K_yD             
+ K_4              K_x              K_sF11           K_yHOME          K_c5             K_yE             
+ K_5              K_y              K_sF12           K_yUP            K_c6             K_yF             
+ K_6              K_z              K_sPrint         K_yPGUP          K_c7             K_yG             
+ K_7              K_braceleft      K_sMenu          K_yLEFT          K_c8             K_yH             
+ K_8              K_bar            K_cHOME          K_yMIDDLE        K_c9             K_yI             
+ K_9              K_braceright     K_cUP            K_yRIGHT         K_c0             K_yJ             
+ K_colon          K_tilde          K_cPGUP          K_yEND           K_cPlus          K_yK             
+ K_semicolon      K_BS             K_cLEFT          K_yDOWN          K_cComma         K_yL             
+ K_less           K_TAB            K_cMIDDLE        K_yPGDN          K_cMinus         K_yM             
+ K_equal          K_LF             K_cRIGHT         K_yINS           K_cPeriod        K_yN             
+ K_greater        K_CR             K_cEND           K_yDEL           K_cSlash         K_yO             
+ K_question       K_HOME           K_cDOWN          K_ySP            K_cSemicolon     K_yP             
+ K_at             K_UP             K_cPGDN          K_yTAB           K_cEqual         K_yQ             
+ K_A              K_PGUP           K_cINS           K_yCR            K_cBracketleft   K_yR             
+ K_B              K_LEFT           K_cDEL           K_yBS            K_cBracketright  K_yS             
+ K_C              K_MIDDLE         K_cSP            K_yPAUSE         K_cBackslash     K_yT             
+ K_D              K_RIGHT          K_cTAB           K_yESC           K_cAsterisk      K_yU             
+ K_E              K_END            K_cCR            K_yCcedilla      K_mA             K_yV             
+ K_F              K_DOWN           K_cBS            K_yF1            K_mB             K_yW             
+ K_G              K_PGDN           K_cPAUSE         K_yF2            K_mC             K_yX             
+ K_H              K_INS            K_cESC           K_yF3            K_mD             K_yY             
+ K_I              K_DEL            K_cCcedilla      K_yF4            K_mE             K_yZ             
+ K_J              K_PAUSE          K_cF1            K_yF5            K_mF             K_y1             
+ K_K              K_ESC            K_cF2            K_yF6            K_mG             K_y2             
+ K_L              K_ccedilla       K_cF3            K_yF7            K_mH             K_y3             
+ K_M              K_F1             K_cF4            K_yF8            K_mI             K_y4             
+ K_N              K_F2             K_cF5            K_yF9            K_mJ             K_y5             
+ K_O              K_F3             K_cF6            K_yF10           K_mK             K_y6             
+ K_P              K_F4             K_cF7            K_yF11           K_mL             K_y7             
+ K_Q              K_F5             K_cF8            K_yF12           K_mM             K_y8             
+ K_R              K_F6             K_cF9            K_yPrint         K_mN             K_y9             
+ K_S              K_F7             K_cF10           K_yMenu          K_mO             K_y0             
+ K_T              K_F8             K_cF11           K_sPlus          K_mP             K_yPlus          
+ K_U              K_F9             K_cF12           K_sComma         K_mQ             K_yComma         
+ K_V              K_F10            K_cPrint         K_sMinus         K_mR             K_yMinus         
+ K_W              K_F11            K_cMenu          K_sPeriod        K_mS             K_yPeriod        
+ K_X              K_F12            K_mHOME          K_sSlash         K_mT             K_ySlash         
+ K_Y              K_Print          K_mUP            K_sAsterisk      K_mU             K_ySemicolon     
+ K_Z              K_Menu           K_mPGUP          K_cA             K_mV             K_yEqual         
+ K_bracketleft    K_acute          K_mLEFT          K_cB             K_mW             K_yBracketleft   
+ K_backslash      K_sHOME          K_mMIDDLE        K_cC             K_mX             K_yBracketright  
+ K_bracketright   K_sUP            K_mRIGHT         K_cD             K_mY             K_yBackslash     
+ K_circum         K_sPGUP          K_mEND           K_cE             K_mZ             K_yAsterisk      
+ K_underscore     K_sLEFT          K_mDOWN          K_cF             K_m1                              
+ K_grave          K_sMIDDLE        K_mPGDN          K_cG             K_m2                              
+ K_a              K_sRIGHT         K_mINS           K_cH             K_m3                              
+ K_b              K_sEND           K_mDEL           K_cI             K_m4                              
+ K_c              K_sDOWN          K_mSP            K_cJ             K_m5                              
+
+=head1 SEE ALSO
+
+L<IUP|IUP>, L<IUP::Canvas>, L<IUP::Manual::06_HandlingKeyboard>

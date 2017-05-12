@@ -1,0 +1,52 @@
+{
+   "abstract" : "Automatic crop filter for Imager.",
+   "author" : [
+      "Alexander Yezhov <leader@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Imager-Filter-Autocrop",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "MIME::Base64" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Imager" : "0.91",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Imager::Filter::Autocrop" : {
+         "file" : "lib/Imager/Filter/Autocrop.pm",
+         "version" : "1.23"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://do-know.com",
+      "license" : [
+         "http://www.perlfoundation.org/artistic_license_2_0"
+      ],
+      "repository" : {
+         "url" : "https://github.com/do-know"
+      }
+   },
+   "version" : "1.23"
+}

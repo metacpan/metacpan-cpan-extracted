@@ -1,0 +1,18 @@
+NAME
+    `IO::Async::Loop::Event' - use `IO::Async' with `Event'
+
+SYNOPSIS
+     use IO::Async::Loop::Event;
+
+     my $loop = IO::Async::Loop::Event->new();
+
+     $loop->add( ... );
+
+     $loop->run;
+
+DESCRIPTION
+    This subclass of IO::Async::Loop uses Event to perform its work.
+
+AUTHOR
+    Paul Evans <leonerd@leonerd.org.uk>
+

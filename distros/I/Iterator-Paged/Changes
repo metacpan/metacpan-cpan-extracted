@@ -1,0 +1,19 @@
+Revision history for Perl extension Iterator::Paged.
+
+1.001   2009-08-17
+  - Added _init() method for instance initialization.
+  - This module is stable and ready for production use - hence the 1.0+ version.
+
+0.003   2009-03-17
+  - Added POD.
+  - Updated method next() to be capable of working with an infinite set of pages,
+    by replacing $s->{data} with the next resultset, rather than appending the
+    next resultset onto $s->{data}.
+
+0.002   2009-03-17
+  - Updated Makefile.PL to list LWP::UserAgent as a testing dependency.
+  - Removed dependency on Carp.
+
+0.001  2009-03-17
+  - Initial release.
+

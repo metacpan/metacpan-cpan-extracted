@@ -1,0 +1,82 @@
+20160412 2016-04-27
+
+* Data update
+
+20151105 2015-11-05
+
+* Data update
+
+20151006 2015-10-07
+
+* Data update
+
+20150901 2015-09-08
+
+* Data update
+* Remove dependence on IP::Tools (now deleted from CPAN)
+* Note on removal of Google IP block from results in documentation.
+
+20150804 2015-08-27
+
+* Data update
+
+20140806 2014-08-09
+
+* Data update
+
+20140507 2014-05-22
+
+* Data update
+
+20140206 2014-02-21
+
+* Data update
+
+20140109 2014-01-25
+
+* Data update
+
+20131206 2013-12-11
+
+* Data update
+
+20131106 2013-11-30
+
+* Change to version which is the date of the data.
+
+0.08 2013-05-29
+
+* Data update
+
+0.07 2013-04-01
+
+* Use "GeoLite Country" database for April 2013.
+
+0.06 2013-03-01
+
+* Compilation changes which only affect Microsoft Windows.
+* Use "GeoLite Country" database for March 2013.
+
+0.05 2013-02-28
+
+* Introduce dependency on IP::Tools.
+
+0.04 2013-02-24
+
+* Addresses a bug which only affects Microsoft Windows.
+
+0.03 2013-02-22
+
+* Improves documentation
+* Addresses an error in the MaxMind IP data.
+
+0.02 2013-02-10
+
+* This is the initial version of the module. Version 0.01 is empty.
+
+0.01 2013-02-10
+
+* This version of the module was accidentally uploaded without the
+  content files. It is completely empty.
+
+

@@ -1,0 +1,22 @@
+Revision history for IO-TieCombine
+
+1.005     2015-10-30 22:18:10-04:00 America/New_York
+        - fileno on a IO::TieCombine::Handle now returns a negative value
+          so they can be known to be artificial
+
+1.004     2014-02-01 19:15:17-05:00 America/New_York
+        - update bugtracker link
+
+1.003     2013-09-21 15:11:30 Asia/Tokyo
+        - "say" to a tied fh on 5.12, 5.14, and 5.16 is broken, too;
+          we'll test it, but leave the test broken, for now
+
+1.002     2012-02-26 15:26:49 America/New_York
+        - "say" to a tied fh on 5.10.0 is broken; we will not test it
+
+1.001     2011-12-09 10:52:01 America/New_York
+        - TieCombine filehandles now respect $\ so that "say $tied" will work;
+          this fixes [rt.cpan.org #73131]
+
+1.000     2008-10-16
+        - first release

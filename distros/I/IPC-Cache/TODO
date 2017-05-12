@@ -1,0 +1,12 @@
+Short term
+
+- come up with some decent benchmarks
+
+
+Long term
+
+- figure out a good mechanism for automatically and periodically 
+  purging the cache of expired objects
+
+- figure out a way to determine the current shared memory usage, and
+  implement a way of keeping it under some constant

@@ -1,0 +1,7 @@
+If I get around to it...
+
+  - Remove tabs
+  - Remove direct calls to C functions like fwrite
+  - Fix up XS style
+    - Brace style
+    - All blocks should have braces

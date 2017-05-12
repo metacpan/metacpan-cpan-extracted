@@ -1,0 +1,47 @@
+Revision history for IPsonar
+
+0.0    Date/time
+        First version, released on an unsuspecting world.
+
+0.01    Date/time
+        Start adding POD, clean up module name
+
+0.15    Correct the code snippet.
+
+0.16    Change the tests so that we skip the ones that require
+        access to a report server when one isn't available.
+        Also tweak the example and note that "Lumeta" and 
+        "IPsonar" are registered marks of the Lumeta Corporation.
+
+0.17    Fix the Makefile to reflect "MIME::Base64" instead of "Mime::Base64"
+
+0.18    Add a usage section to the POD, start fleshing out the method
+        documentation.
+
+0.19    Clean up the POD directives to make pod2html happy.
+
+0.22    Fix cpantesters errors about //= and the connection
+        refused message under windows.
+
+0.23    Fix the same connection refused message in 001a_setup.t
+
+0.24    Adds a function to setup a connection to a local report server (which doesn't need a password)
+        Fixes paging in cases where IPsonar doesn't return the number of rows it says it will.
+        Also allow us to run under XML::Simple qw(:strict)
+
+0.25    Fix a bug (introduced on 0.24) that caused the module to return array refs
+        everywhere.
+
+0.27    Add "reports" convenience method to quickly get a list of reports
+
+0.28    Fix the reports unit test around timestamps (use gmtime, not localtime which obviously failed
+        tests everywhere but this timezone).
+
+0.29    Make fixes to how I handle test data to properly work in the face of the effectively random
+        hash order introduced in perl 5.18
+
+0.30    Change test for connecting to non-existent RSN to make the test pass as long as we croak.
+        I'm not trying to match on the error message as it's OS dependent.
+
+0.31    Make the above change for 001a_setup.t where it's also needed.
+

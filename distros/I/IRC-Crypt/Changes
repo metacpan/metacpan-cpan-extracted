@@ -1,0 +1,6 @@
+Revision history for Perl extension IRC::Crypt.
+
+0.01  Sun Oct 31 15:47:44 2004
+	- original version; created by h2xs 1.23 with options
+		-b 5.0.0 -n IRC::Crypt irc_crypt.h -lirccrypt
+

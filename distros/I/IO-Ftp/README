@@ -1,0 +1,34 @@
+IO::Ftp is a wrapper for Net::FTP to simplify its use when
+using its stor and retr methods.
+
+AVAILABILITY
+
+The lastest version of IO::Ftp is availble from the Comprehensive
+Perl Archive Network (CPAN) at http://www.cpan.org.
+
+INSTALLATION
+
+IO::Ftp follows the standard perl module installation procedure:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+  
+DOCUMENTATION
+ 
+POD documentation is included in the module. See the file Changes 
+for recent updates.
+
+SUPPORT
+
+Bug reports and suggestions for improvements can be sent to me
+at mikeb@cpan.org.
+
+COPYRIGHT
+
+  (c) 2003 Mike Blackwell.  All rights reserved.
+  
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

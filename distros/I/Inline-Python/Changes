@@ -1,0 +1,204 @@
+Revision history for Perl extension Inline::Python.
+
+0.52 Thu  Dec 01 20:31:00 CET 2016 (Stefan Seifert)
+	- Fix test failing on lots of machines
+	  by Linas Valiukas
+
+0.51 Thu  Nov 09 08:45:00 CET 2016 (Stefan Seifert)
+	- Fix memory leak when passing dict with Unicode keys to Perl
+	  by Linas Valiukas
+
+0.50 Thu  Jun 30 14:30:00 CEST 2016 (Stefan Seifert)
+	- Fix memory corruption after passing a dict with a non-string key to Perl
+
+0.49 Tue  Apr 21 08:30:00 CEST 2015 (Stefan Seifert)
+	- Fix crash during perl's shutdown when env variables were modified by Python
+
+0.48 Sat  Jan 24 10:00:00 CET 2015 (Stefan Seifert)
+	- Fix compatibility with perl < 5.14
+	- Allow shutting down Python
+
+0.47 Thu  Jan 22 19:35:00 CET 2015 (Stefan Seifert)
+	- Translate Perl exceptions into Python exceptions and make them catchable.
+	- fix some POD errors by Gregor Herrmann
+
+0.46 Sun  Dec 07 12:30:00 CET 2014 (Stefan Seifert)
+	- Python 3 support by Laurent Mazuel!
+	- Correcting KeyError to AttributeError in __getattr__ by Laurent Mazuel
+
+0.45 Sat  Sep 06 10:30:00 CEST 2014 (Stefan Seifert)
+	- Support implementing __cmp__ in Perl
+	- Skip test requiring Parse::RecDescent if the module is not installed
+
+0.44 Tue  Sep 02 11:00:00 CEST 2014 (Stefan Seifert)
+	- Fix memory corruption introduced with boolean support
+	- Document the usage of Inline::Python::Boolean
+	- Minor doc fixes by Zakariyya Mughal
+	- Allow non-interactive installation in Makefile.PL
+	- Add links to the github repo by mohawk2
+
+0.43 Thu Sep 12 23:00:00 CEST 2013 (Stefan Seifert)
+        - Fixed converting floats from Perl to Python with different locale
+        - Fixed RT #87962
+
+0.42  Fri May 31 20:20:00 CEST 2013 (Stefan Seifert)
+	- Python booleans passed through Perl make it back to Python as Booleans
+	  instead of Integers.
+	- Fix segfaults on Perl 5.18.0 caused by uninitialized fields in a data
+	  structure. Should help performance as well.
+
+0.41  Thu Nov 08 20:15:00 CET 2012 (Stefan Seifert)
+	- Fixed installation on systems only having a shared libpython
+	- Code cleanup
+
+0.40  Fri Jul 29 16:30:00 CEST 2011 (Stefan Seifert)
+	- Finally fixed t/06dict.t allowing installation on many more machines
+
+0.39  Wed Mar 09 13:00:00 CET 2011 (Stefan Seifert)
+	- Added py_is_tuple and made Pl2Py recognize an array ref that has
+	  been a tuple before in Python.
+	- Fixed memory corruption on a Python function calling a Perl function
+	  that changed the stack pointer.
+	- Fixed several memory leaks (scalars and dict keys).
+	- Fixed wrong refcount of return values in py_eval (RT #48081)
+	- Fixed accessing Unicode keys in a dict passed from Perl.
+	- Fixed compatability of t/30floats.t with Python 2.7.
+
+0.38  Thu Dec 02 14:00:00 CEST 2010 (Stefan Seifert)
+	- Fix Perl assertion fail if __getitem__ called multiple times
+	- Fix "Attempt to free unreferenced scalar" sometimes happening when
+	  calling a Perl sub with named parameters from Python.
+	- Fix several memory leaks found using valgrind
+	- Add py_finalize to be able to shut down the Python interpreter.
+
+0.37  Thu Sep 30 09:30:00 CEST 2010 (Stefan Seifert)
+	- Added line numbers to Python exception messages.
+	- Fixed passing of a perl code ref through Python space.
+	- Allow passing references to methods from Python to Perl.
+	- Implemented py_has_attr complementing py_get_attr.
+	- We now support stringification of Python objects via __str__ methods.
+	- Fixed segfault when accessing a Python object's attributes throws an
+	  exception.
+	- Fixed some problems with the test suite, hopefully making installation
+	  work on more machines.
+	- Fixed compilation on Win32, linking still seems broken though :(
+
+0.36  Mon Jun 23 12:45:00 CEST 2010 (Stefan Seifert)
+	- Fixed a segfault when passing dicts with Unicode keys to Perl
+	- Pass Python exceptions to Perl instead of just printing to STDERR
+
+0.35  Wed Mar 31 11:00:00 CET 2010 (Stefan Seifert)
+	- Fixed floats sometimes getting converted to int when transfered from Perl
+	  to Python. Thanks to John McCullough for a great bug report.
+
+0.34  Fri Mar 12 12:20:00 CET 2010 (Stefan Seifert)
+	- Fixed refcounting of positional arguments in named argument calls to Perl
+	  subs.
+
+0.33  Mon Feb 22 10:30:00 CET 2010 (Stefan Seifert)
+	- Added support for named arguments for Perl subs
+
+0.32  Fri Jan 29 20:00:00 CET 2010 (Stefan Seifert)
+	- Perl UTF-8 strings now get converted to Python Unicode strings and vice
+	  versa. This could potentially lead to incompatibilities with existing code.
+	- Return lists of Perl subs no longer get reversed before passing to Python.
+
+0.31  Sun Dec 06 15:30:00 CET 2009 (Stefan Seifert)
+	- Implement access to Inline::Python::Object data
+
+0.30  Sun Nov 29 19:45:00 CET 2009 (Stefan Seifert)
+	- Convert Perl arrays to Python arrays instead of tuples
+	- First look for methods before looking for attributes in PerlObj_getattr
+
+0.29  Tue Jul 07 17:00:00 CEST 2009 (Stefan Seifert)
+	- Implemented passing of subroutine references and lambda expressions from
+	  Python to Perl space.
+	- Implemented Python's __getitem__ protocol for perl objects. Perl objects
+	  can thus be used like dictionaries if they support a __getitem__ sub.
+	- Fixed a bug in Pl2Py sometimes segfaulting on undefs in arrays.
+
+0.28  Tue Dec 16 19:00:00 CET 2008 (Stefan Seifert)
+	- Fixed pushing integers from Python to Perl space. They now retain their
+	  integer-ness instead of silently converting them to strings.
+	- PerlObj objects now have a comparison function which asserts if the _same_
+	  perl object is contained.
+	- implemented Python's __getattr__ protocol for perl objects. Attributes can
+	  now be accessed with my_perl_object.my_attribute same as Python objects.
+	  The perl object just has to implement a __getattr__ sub.
+	- __getattr__ now raises a KeyError if a PerlObj object does not have the
+	  requested attribute instead of silently assuming that a method is being
+	  called.
+	- Added testcases for all these and for the Unicode fix in 0.27
+
+0.27  Thu Nov 20 19:00:00 CET 2008 (Stefan Seifert)
+	- Fixed a segfault in py2pl.c when converting Unicode strings from Python to
+	  Perl.
+	- Attempt to check for Python.h in Makefile.pl to make it more visible to
+	  the user.
+
+0.26  Mon Nov 10 13:20:00 CET 2008 (Stefan Seifert)
+	- Fixed compatibility with Python 2.5: all tests run successfully.
+	- Documented the --enable-shared requirement
+
+0.25  Thu Oct 02 22:20:00 CEST 2008 (Stefan Seifert)
+	- Added missing changes and updated documentation to reflect current
+	  status. No code changes.
+
+0.24  Thu Oct 02 22:05:00 CEST 2008 (Stefan Seifert)
+	- fixed many wrong refcounts leading to memory leaks and too early freed
+	  objects. Most notably when returning more than one result from a perl
+	  sub to python.
+	- fixed segfaults in perlSub_getattr and perlSub_setattr for invalid
+	  attribute names on non-methods.
+	- added many testcases for refcounting
+
+0.23  Mon Sep 29 11:50:00 CEST 2008 (Stefan Seifert)
+	- fixed segfault when returing perl objects from python functions and methods
+	- fixed uninitialized member variables of perl subs
+	- updated documentation to reflect new co-maintainer
+
+0.22  Sun Jan  9 22:29:54 PST 2005
+	[Bug reported by David Dyck]
+	- removed some declarations after statements
+	- newer versions of gcc seem to accept this by default, while older
+	  versions just croak. Of course, the older versions also don't
+	  support -Wdeclaration-after-statement.
+
+0.21  Mon Jul 26 13:40:57 CDT 2004
+	[Patch from Eric Wilhelm]
+	- Added support for 'new-style' python classes which subtype builtin
+	  types per PEP's 252 and 253.
+
+0.20  Mon Jul  9 16:46:56 PDT 2001
+	- Made the Makefile.PL more clever about how it picks debugging 
+	  information. It accepts an optional argument, too, so it's
+	  easy to correct the mistakes.
+
+0.20  Wed Jun 20 16:27:23 PDT 2001
+	- Lots of testing with different versions of Perl & Python
+	- Makefile.PL auto-detects configuration for python >= 2.0
+
+0.20  Sun Jun 17 19:57:18 PDT 2001
+	- Made eval_python return results of running code
+	- py_bind_class(), py_bind_function(), and py_study_package()
+	- py_eval() and py_call_function()
+	- py_new_object() and py_call_method()
+	- Many new test cases
+	- Updated documentation
+	- New language alias 'PYTHON' for Inline::Files support
+	- 'FILTERS' Config option
+	- Removed 'PRIVATE_PRIFIXES' Config option
+	- Added new base class Inline::Python::Object for all objects.
+
+0.15  Sun Jun 10 18:39:23 PDT 2001
+	- Ported to Inline 0.42.
+
+0.14  Thu Mar 22 08:50:33 PST 2001
+	- Added support for passing binary strings between Python & Perl.
+
+0.13  Sun Mar  4 22:09:35 PST 2001
+	- Added Win32 code to search for Python installations on Win32
+	- Eliminated GNU-specific preprocessor macro syntax
+
+0.10  Thu Nov 23 16:46:27 PST 2000
+	- Created Inline::Python.

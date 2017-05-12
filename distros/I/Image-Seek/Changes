@@ -1,0 +1,30 @@
+Revision history for Perl extension Image::Seek.
+
+0.06  Wen Dec 30 17:40:00
+    - improve test coverage
+
+0.05  Mon Dec 21 20:30:00 2015
+    - add Image::Magick support
+    - use ExtUtils::CppGuess
+
+0.04  Tue Dec  8 19:30:00 2015
+    - documentation and packaging improvements
+    - improved test coverage
+
+0.03  Tue Dec  8 12:40:00 2015
+    - patch from Andrew Chadwick (ANDREWC) solving issue
+      https://rt.cpan.org/Public/Bug/Display.html?id=21163
+      cleardb() double-free segv
+    - support clang
+      https://rt.cpan.org/Ticket/Display.html?id=110008
+      
+0.02  SAT Feb  9 23:22:12 2008
+    - modify version; modified by LiloHuang
+	    add: 
+		    1. add GD Library to resize image.
+			2. remove_id() function.
+
+0.01  Thu Dec  8 19:51:22 2005
+	- original version; created by h2xs 1.23 with options
+		-b 5.6.0 -n Image::Seek
+

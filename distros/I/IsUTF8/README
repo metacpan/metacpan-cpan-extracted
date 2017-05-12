@@ -1,0 +1,43 @@
+IsUTF8 version 0.2
+==================
+
+The IsUTF8 modules provides a simple function to check if some given
+string contains at least one UTF8 character sequence.  If you're looking
+for something like UTF8 autodetection, then it's for you :)
+
+It has smaller footprint than other Encode:: packages.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+
+or
+   perl Makefile.PL PREFIX=$HOME
+
+	But being useful at this place ($HOME) you've to point your Perl
+	@INC to your $HOME later. E.g. by setting the environment
+	variable PERL5LIB to "$HOME/share/perl".
+
+
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module does not require other modules and libraries.
+
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2006 by Heiko Schlittermann <hs@schlittermann.de>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

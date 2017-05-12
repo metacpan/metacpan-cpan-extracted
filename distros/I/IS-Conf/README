@@ -1,0 +1,5 @@
+pod2text lib/IS/Conf.pm > README
+
+If this is still here it means the programmer was too lazy to create the readme file.
+
+You can create it now by using the command shown above from this directory.

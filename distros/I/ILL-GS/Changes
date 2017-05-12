@@ -1,0 +1,23 @@
+Revision history for Perl extension ILL_GS.
+
+0.05  Tue Dec 09 16:43:17 2003
+        - Added ABSTRACT to Makefile.PL, to have the abstract
+	  show up properly on CPAN.
+
+0.04  Wed May 21 10:00:00 2003
+	- fixed POD example code (replacing $self->set with $gs->set)
+
+0.03  Wed May 15 15:12:00 2003
+        - as_string() now returns undef if missing mandatory fields
+	- added test 011_mindata.t
+
+0.02  Tue May 14 02:31:00 2003
+	- updated to use object oriented interface
+	- added tests 001_use.t and 010_write.t
+
+0.01  Tue May 13 15:34:45 2003
+	- original version; created by h2xs 1.22 with options
+		-X ILL_GS
+	- ability to generate rudimentary Generic Script interlibrary
+	loan requests.
+

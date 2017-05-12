@@ -1,0 +1,6 @@
+#!/usr/bin/perl
+
+use IPC::Shm;
+
+IPC::Shm->cleanup;
+

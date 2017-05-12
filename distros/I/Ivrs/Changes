@@ -1,0 +1,40 @@
+Revision history for Perl extension Ivrs.pm
+
+0.01  Sat Jan 03 11:32:59 2001
+        - First release with SerialPort.pm 
+
+0.03  Sat Jan 27 11:32:59 2001
+	- part of SerialPort.pm merged with Ivrs.pm
+
+0.04  Thu Feb 8 15:21:29 2001
+        - Some bugs were corrected, Added Documentation, 
+
+0.06  Thu Feb 17 11:31:00 2001
+        - All files in sfiles/ are now header less raw modem data (RockWell)
+        - Use of pvftools avoided. However it is still required to convert
+          new wav files to rmd files.
+        - Script wavtorock added for conversion of new wav file to Rockwell 
+          chip set files. In future support for other chipset like USR, 
+          Motorola, Cirrus logic will be added.
+        - Same module (IvrsWin32.pm) is being ported to Window/NT.
+0.07  Mon Feb 26 
+	- List of supported modem included.
+	- Improved documentation. 
+0.10  Fri Mar 22 2002
+	- US Robotics modem support included.
+	- CPU usage is reduced.
+	- Response time to DTMF is improved.
+	- Dial out and Call Transfer added on experimental basis.
+0.20  Fri Jul 25 2003
+	- Dial out code is improved.
+	- Additional DTMF like * and # are used get the variable length DTMF
+        - codes.
+	- Required perl header files included in perlheader/asm. Copy these
+          files to top level directory of perl distribution /usr/lib/perl/<perl
+	  version>/asm/ ,if you get "disabling ioctl methods - ..." error.
+0.24  Mon Jan 05 2004
+        - Many people repored that they could not find asm/ directory, hence
+	- it is now included in current directory.
+
+   
+ 	      

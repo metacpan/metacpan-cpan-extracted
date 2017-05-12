@@ -1,0 +1,40 @@
+NAME
+
+    Inline::Befunge - write Perl subs in Befunge
+
+
+DESCRIPTION
+
+    The C<Inline::Befunge> module allows you to put Befunge source
+    code directly "inline" in a Perl script or module.
+
+    This allows you to write cool stuff with all the power of Befunge!
+
+
+INSTALLATION
+
+    To install this module type the following (you should be familiar
+    with those instructions ;) ):
+
+       perl Makefile.PL
+       make
+       make test
+       make install
+
+
+DEPENDENCIES
+
+    This module requires Language::Befunge in order to run properly.
+
+
+AUTHOR
+
+    Jerome Quelin, <jquelin@cpan.org>
+
+
+COPYRIGHT AND LICENCE
+
+    Copyright (c) 2001-2007 Jerome Quelin, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify
+    it under the same terms as Perl itself.

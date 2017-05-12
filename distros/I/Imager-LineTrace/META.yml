@@ -1,0 +1,41 @@
+---
+abstract: 'Line tracer'
+author:
+  - 'neko <techno.cat.miau@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.1.1, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Imager-LineTrace
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Imager::LineTrace:
+    file: lib/Imager/LineTrace.pm
+    version: '0.06'
+  Imager::LineTrace::Algorithm:
+    file: lib/Imager/LineTrace/Algorithm.pm
+  Imager::LineTrace::Figure:
+    file: lib/Imager/LineTrace/Figure.pm
+requires:
+  Imager: '0.99'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/techno-cat/p5-Imager-LineTrace/issues
+  homepage: https://github.com/techno-cat/p5-Imager-LineTrace
+  repository: git://github.com/techno-cat/p5-Imager-LineTrace.git
+version: '0.06'

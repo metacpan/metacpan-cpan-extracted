@@ -1,0 +1,7 @@
+Revision history for IO-EditPrompt
+
+0.02  2015-04-10
+  - Correct unit test for running on Windows.
+  - Correct unit test dependencies.
+0.01  2015-04-09
+  - Initial release.

@@ -1,0 +1,8 @@
+0.002     2012-06-06 13:27:24 Europe/London
+
+        Add Iterator::Simple::Util::CSV. This provides the icsv()
+        function to consturct an iterator over CSV data.
+
+0.001     2012-06-06 12:21:33 Europe/London
+
+        Initial release

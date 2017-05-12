@@ -1,0 +1,24 @@
+Build.PL
+Changes
+examples/lookup-IP.pl
+examples/lookup-MX.pl
+examples/lookup-PTR.pl
+examples/lookup-SRV.pl
+lib/IO/Async/Resolver/DNS.pm
+lib/IO/Async/Resolver/DNS/Constants.pm
+lib/IO/Async/Resolver/DNS/LibResolvImpl.pm
+lib/IO/Async/Resolver/DNS/NetDNSImpl.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00use.t
+t/01libresolv-impl.t
+t/02netdns-impl.t
+t/10resolve.t
+t/20extract-mx.t
+t/21extract-srv.t
+t/90dns.t
+t/99pod.t

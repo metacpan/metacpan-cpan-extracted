@@ -1,0 +1,20 @@
+---
+name: IO-Socket-SecureSocks
+version: 0.2
+author:
+  - 'Sascha Kiefer, C<esskar@cpan.org>'
+abstract: Doing socks over a secure wire (sockss)
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  IO::Socket::SSL: 0
+  IO::Socket::Socks: 0
+provides:
+  IO::Socket::SecureSocks:
+    file: lib/IO/Socket/SecureSocks.pm
+    version: 0.2
+generated_by: Module::Build version 0.2801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

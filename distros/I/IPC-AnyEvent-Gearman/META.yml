@@ -1,0 +1,35 @@
+---
+abstract: 'IPC through gearmand.'
+author:
+  - 'KHS, HyeonSeung Kim <sng2nara@hanmail.net>'
+build_requires:
+  EV: 0
+  IO::Socket::INET: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300015, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: IPC-AnyEvent-Gearman
+requires:
+  Any::Moose: 0
+  AnyEvent: 0
+  AnyEvent::Gearman: 0
+  AnyEvent::Gearman::Worker::Connection: 0
+  AnyEvent::Handle: 0
+  AnyEvent::Socket: 0
+  Data::Dumper: 0
+  Devel::GlobalDestruction: 0
+  Gearman::Server: 0
+  Log::Log4perl: 0
+  Scalar::Util: 0
+  UUID::Random: 0
+  namespace::autoclean: 0
+resources:
+  homepage: https://github.com/sng2c/IPC-AnyEvent-Gearman
+  repository: git://github.com/sng2c/IPC-AnyEvent-Gearman.git
+version: 0.8

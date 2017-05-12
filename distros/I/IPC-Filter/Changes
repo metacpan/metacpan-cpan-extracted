@@ -1,0 +1,53 @@
+version 0.004; 2011-07-17
+
+  * revise signal test to avoid shell signal trapping
+
+  * include META.json in distribution
+
+  * add MYMETA.json to .cvsignore
+
+version 0.003; 2010-07-23
+
+  * revise tests to work with funny SysV tr and false
+
+  * use simpler "parent" pragma in place of "base"
+
+  * check for required Perl version at runtime
+
+  * use full stricture in test suite
+
+  * use full stricture in Build.PL
+
+  * in Build.PL, explicitly declare configure-time requirements
+
+  * remove bogus "exit 0" from Build.PL
+
+  * add MYMETA.yml to .cvsignore
+
+version 0.002; 2007-09-17
+
+  * bugfix: override any ambient $SIG{__DIE__} handler when using eval { }
+
+  * use "base" pragma to import Exporter behaviour
+
+  * on non-Unix OSes, skip tests that rely on Unix commands
+
+  * test POD syntax and coverage
+
+  * corrected synopsis
+
+  * build with Module::Build instead of ExtUtils::MakeMaker
+
+  * complete dependency list
+
+  * include signature in distribution
+
+  * in documentation, separate "license" section from "copyright" section
+
+version 0.001; 2004-10-29
+
+  * include copyright notice in lib/IPC/Filter.pm
+
+version 0.000; 2004-10-29
+
+  * initial released version

@@ -1,0 +1,12 @@
+Revision history for Image-Simple-Gradient
+
+0.05    Oct 15, 2010
+        Fixed Added some extra POD.
+
+0.04    Oct 15, 2010
+        Added some POD documentation.
+
+0.01    Oct 15, 2010
+        First version released.
+        Should help your needs to create simple image gradients for use in web sites and applications.
+

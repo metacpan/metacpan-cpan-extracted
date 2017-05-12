@@ -1,0 +1,11 @@
+Changes
+LICENSE
+MANIFEST
+Makefile.PL
+inc/TyeTest.pm
+lib/IPC/Semaphore/SmokeSignals.pm
+t/basic.t
+t/fifo.t
+t/fifo.t.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

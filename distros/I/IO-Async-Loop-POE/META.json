@@ -1,0 +1,43 @@
+{
+   "abstract" : "use C<IO::Async> with C<POE>",
+   "author" : [
+      "Paul Evans <leonerd@leonerd.org.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4001, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "IO-Async-Loop-POE",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "IO::Async::LoopTests" : "0.32",
+            "Test::More" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IO::Async" : "0.49",
+            "POE" : "1.293"
+         }
+      }
+   },
+   "provides" : {
+      "IO::Async::Loop::POE" : {
+         "file" : "lib/IO/Async/Loop/POE.pm",
+         "version" : "0.05"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.05"
+}

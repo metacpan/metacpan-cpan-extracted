@@ -1,0 +1,11 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+bin/placeholder
+lib/Image/Placeholder.pm
+t/00.use.t
+t/01.text.t
+t/02.hex.t
+t/03.sizes.t
+META.yml                                 Module meta-data (added by MakeMaker)

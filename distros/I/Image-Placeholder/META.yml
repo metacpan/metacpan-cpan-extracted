@@ -1,0 +1,20 @@
+--- #YAML:1.0
+name:                Image-Placeholder
+version:             v1.0.0
+abstract:            generate images for use as placeholders
+license:             ~
+author:              
+    - Mark Norman Francis <norm@cackhanded.net>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    GD:                            0
+    Modern::Perl:                  0
+    Moose:                         0
+    MooseX::FollowPBP:             0
+    MooseX::Method::Signatures:    0
+    Test::More:                    0
+    version:                       0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

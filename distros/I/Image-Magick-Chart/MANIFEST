@@ -1,0 +1,16 @@
+Changelog.ini
+Changes
+examples/image-1.png
+examples/image-2.png
+examples/test-chart.pl
+lib/Image/Magick/Chart.pm
+lib/Image/Magick/Chart/HorizontalBars.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/test.t
+xt/author/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST			This list of files
+README
+source.jpg
+test.pl
+Thumbnail.pm
+META.yml                                 Module meta-data (added by MakeMaker)

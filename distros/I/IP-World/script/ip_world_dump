@@ -1,0 +1,60 @@
+#!/usr/local/bin/perl
+
+# program to print/dump the IP-World database
+
+use strict;
+use warnings;
+use Socket;
+use File::ShareDir qw(dist_dir module_dir);
+use IP::World;
+
+use constant INFN => "ipworld.dat";
+
+my $path = 'blib/lib/auto/IP/World/';
+if (!-e $path) {
+  $path = module_dir('IP::World') && -e $path
+    or die "Can't find the IP::World directory";
+}
+$path .= '/' . INFN;
+
+my $filesize = -s $path or die "$path is empty";
+my $entries = $filesize * 3 >> 4;
+my ($ips, $codes, $i, $pip, $word, $code);
+
+my $bigend = pack('L', 1) eq pack('N', 1);
+
+open (IN, "<$path") or die "Can't open $path: $!";
+read (IN, $ips, $entries<<2) == $entries<<2 or die "Can't read IP addresses from $path";
+read (IN, $codes, $filesize - ($entries<<2)) == $filesize - ($entries<<2)
+  or die "Can't read country codes from $path";
+close IN;
+
+print "starting IP ad   code\n";
+#      123.456.789.012  ??
+#      internal error   er
+
+for ($i = 0; $i < $entries; $i++) {
+  
+  my $ip = substr($ips, 0, 4, '');
+  if ($ip && length($ip)==4) {
+    my @a = unpack 'C4', $ip;
+    $pip = sprintf("%3d.%3d.%3d.%3d", $bigend ? @a : reverse @a);
+  } else {$pip =   'internal error '}
+  
+  my $im3 = $i % 3;
+  if (!$im3) {
+    $word = substr($codes, 0, 4, '');
+    if ($word && length($word) == 4) {
+      $word = unpack 'L', $word;
+      $code = $word>>20;
+    } else {$word = -1}
+  } elsif ($word >= 0 && $im3 == 1) {$code = $word>>10 & 0x3FF}
+    elsif ($word >= 0)              {$code = $word     & 0x3FF}
+  
+  if ($word < 0) {print "$pip  er\n"}
+  else {
+    $code = $code == 26*26 ? 'not covered'
+                           : chr(ord('A') + int($code/26)) 
+                           . chr(ord('A') + $code % 26);
+    print "$pip  $code\n";
+} }

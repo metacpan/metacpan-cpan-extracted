@@ -1,0 +1,17 @@
+Revision history for Perl extension Imager::Filter::FishEye
+
+0.04
+
+        - fixed manifest file
+
+0.03
+
+        - modernize package
+
+0.02
+
+        - remove cutoff feature
+        - only use public api
+
+0.01    Tue Nov  4 23:01:08 2008
+        - original version

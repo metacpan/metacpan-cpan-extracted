@@ -1,0 +1,20 @@
+Revision history for Perl extension Imager::Filter::Bakumatsu
+
+0.05 2016-09-08T05:30:17Z
+        - move author test to xt/
+        - update pod to pass coverage
+
+0.04 2016-09-07T16:09:56Z
+        - test fixed (use png instead of jpg)
+        - re packaging, fix https://rt.cpan.org/Public/Bug/Display.html?id=117506
+
+0.03  Mon May 17 19:16:53 JST 2010
+        - Fix install_share
+
+0.02  Tue Jul  8 21:37:53 JST 2008
+        - fixed dependencies
+        - fixed typo
+        - whitespace
+
+0.01  Mon Apr  7 21:57:33 JST 2008
+        - original version

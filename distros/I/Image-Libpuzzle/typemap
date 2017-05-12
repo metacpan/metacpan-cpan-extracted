@@ -1,0 +1,5 @@
+TYPEMAP
+
+Image::Libpuzzle	T_PTROBJ
+Image::Libpuzzle::Context	T_PTROBJ
+Image::Libpuzzle::Cvec	T_PTROBJ

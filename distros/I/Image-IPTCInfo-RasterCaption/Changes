@@ -1,0 +1,6 @@
+Revision history for Perl extension Image::IPTCInfo::RasterCaption.
+
+0.01  Mon Feb  3 20:11:42 2003
+	- original version; created by h2xs 1.21 with options
+		-X -n Image::IPTCInfo::RasterCaption
+

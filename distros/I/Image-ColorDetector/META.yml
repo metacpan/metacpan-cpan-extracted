@@ -1,0 +1,40 @@
+---
+abstract: 'return the color name of the image file as a string'
+author:
+  - 'libitte <libitte3@gmail.com>'
+build_requires:
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.11.0, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Image-ColorDetector
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Image::ColorDetector:
+    file: lib/Image/ColorDetector.pm
+    version: 0.04
+requires:
+  Image::Magick: 6.87
+  List::Util: 1.35
+  perl: 5.008005
+resources:
+  bugtracker: https://github.com/libitte/Image-ColorDetector/issues
+  homepage: https://github.com/libitte/Image-ColorDetector
+  repository: git://github.com/libitte/Image-ColorDetector.git
+version: 0.04

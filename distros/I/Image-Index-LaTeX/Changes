@@ -1,0 +1,6 @@
+Revision history for Perl extension Image::Index::LaTeX.
+
+0.01  Mon Feb 28 13:52:40 2011
+	- original version; created by h2xs 1.23 with options
+		-A -X -n Image::Index::LaTeX
+

@@ -1,0 +1,132 @@
+2011-09-19
+
+   Removed old test and test file.
+
+2009-08-29 21:07  cvs
+
+	* Image-Magick-Thumbnail-PDF-1.07.tar.gz,
+	  Image-Magick-Thumbnail-PDF-1.08.tar.gz,
+	  Image-Magick-Thumbnail-PDF-1.10.tar.gz,
+	  Image-Magick-Thumbnail-PDF-1.11.tar.gz, MANIFEST, META.yml,
+	  Makefile.PL, lib/Image/Magick/Thumbnail/PDF.pm: Updated docs,
+	  made sure that license gpl perl shows up in meta and docs.  Made
+	  sure dependencies show up properly.
+
+2007-06-28 11:29  cvs
+
+	* Image-Magick-Thumbnail-PDF-1.10.tar.gz: added dist
+
+2007-06-28 11:28  cvs
+
+	* lib/Image/Magick/Thumbnail/PDF.pm: cleaned up and  added
+	  documentation added quality option
+
+2007-06-28 11:27  cvs
+
+	* t/2.t: added some testing
+
+2007-06-26 09:54  cvs
+
+	* lib/Image/Magick/Thumbnail/PDF.pm: updated prereqs
+
+2007-06-26 09:54  cvs
+
+	* Makefile.PL: changes, updated prereqs
+
+2007-06-05 12:20  cvs
+
+	* Image-Magick-Thumbnail-PDF-1.08.tar.gz: adde
+
+2007-06-05 12:19  cvs
+
+	* Image-Magick-Thumbnail-PDF-1.01.tar.gz,
+	  Image-Magick-Thumbnail-PDF-1.03.tar.gz,
+	  Image-Magick-Thumbnail-PDF-1.04.tar.gz,
+	  Image-Magick-Thumbnail-PDF-1.05.tar.gz,
+	  Image-Magick-Thumbnail-PDF-1.06.tar.gz: taken out
+
+2007-06-05 12:18  cvs
+
+	* t/0.t: test for naming outfil
+
+2007-06-05 12:18  cvs
+
+	* lib/Image/Magick/Thumbnail/PDF.pm: made so user can provide
+	  outfilename argument again
+
+2007-06-05 12:03  cvs
+
+	* Image-Magick-Thumbnail-PDF-1.07.tar.gz: added dist
+
+2007-06-05 11:30  cvs
+
+	* MANIFEST, t/1all.t: changes
+
+2007-06-05 11:24  cvs
+
+	* MANIFEST, Makefile.PL, lib/Image/Magick/Thumbnail/PDF.pm, t/0.t,
+	  t/2.t, t/linux_quickref.pdf: big changes, not using system calls
+	  anymore
+
+2007-05-03 09:33  cvs
+
+	* Image-Magick-Thumbnail-PDF-1.05.tar.gz,
+	  lib/Image/Magick/Thumbnail/PDF.pm,
+	  Image-Magick-Thumbnail-PDF-1.06.tar.gz: added dist
+
+2007-05-03 09:32  cvs
+
+	* t/0.t: correct
+
+2007-05-03 09:30  cvs
+
+	* lib/Image/Magick/Thumbnail/PDF.pm, t/0.t: updated look for
+	  convert bin
+
+2007-05-02 11:11  cvs
+
+	* Image-Magick-Thumbnail-PDF-1.04.tar.gz: dded dist
+
+2007-05-02 10:59  cvs
+
+	* lib/Image/Magick/Thumbnail/PDF.pm: changes.. nice changes.
+
+2007-05-02 10:12  cvs
+
+	* Image-Magick-Thumbnail-PDF-1.03.tar.gz: added dist
+
+2007-05-02 09:35  cvs
+
+	* lib/Image/Magick/Thumbnail/PDF.pm: cleaned up doc
+
+2007-05-01 18:15  cvs
+
+	* Makefile.PL, t/big.jpg: made changes
+
+2007-05-01 18:13  cvs
+
+	* Image-Magick-Thumbnail-PDF-1.01.tar.gz: added dist
+
+2007-05-01 18:12  cvs
+
+	* lib/Image/Magick/Thumbnail/PDF.pm: changes
+
+2007-05-01 18:03  cvs
+
+	* MANIFEST, Makefile.PL, bin/imtpdf,
+	  lib/Image/Magick/Thumbnail/.PDF.pm.swp,
+	  lib/Image/Magick/Thumbnail/PDF.pm, t/0.t, t/big.jpg,
+	  t/linux_quickref.pdf, t/test/big.png, t/test/bigger.png,
+	  t/test/haha.gif, t/test/haha.png, t/test/linux_quickref-0.png,
+	  t/test/linux_quickref-5.png, t/test/linux_quickref.pdf: Initial
+	  revision
+
+2007-05-01 18:03  cvs
+
+	* MANIFEST, Makefile.PL, bin/imtpdf,
+	  lib/Image/Magick/Thumbnail/.PDF.pm.swp,
+	  lib/Image/Magick/Thumbnail/PDF.pm, t/0.t, t/big.jpg,
+	  t/linux_quickref.pdf, t/test/big.png, t/test/bigger.png,
+	  t/test/haha.gif, t/test/haha.png, t/test/linux_quickref-0.png,
+	  t/test/linux_quickref-5.png, t/test/linux_quickref.pdf: init
+

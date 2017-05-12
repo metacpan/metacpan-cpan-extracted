@@ -1,0 +1,37 @@
+---
+abstract: 'bindings to the Leptonica image processing library'
+author:
+  - 'Zakariyya Mughal <zmughal@cpan.org>'
+build_requires:
+  Module::Load: 0
+  Test::More: 0
+configure_requires:
+  Alien::Leptonica: 0
+  ExtUtils::MakeMaker: 0
+  Inline: 0.67
+  Inline::C: 0.62
+  Inline::MakeMaker: 0.45
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Image-Leptonica
+recommends:
+  PDL: 0
+requires:
+  Alien::Leptonica: 0
+  ExtUtils::Depends: 0
+  ExtUtils::MakeMaker: 6.52
+  File::Spec::Functions: 0
+  Inline: 0.67
+  Inline::C: 0.62
+  Inline::MakeMaker: 0.45
+  Path::Class: 0
+  strict: 0
+  warnings: 0
+resources:
+  homepage: https://github.com/zmughal/p5-Image-Leptonica
+  repository: https://github.com/zmughal/p5-Image-Leptonica.git
+version: 0.04

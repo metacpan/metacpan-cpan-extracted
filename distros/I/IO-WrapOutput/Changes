@@ -1,0 +1,25 @@
+Revision history for IO-WrapOutput
+
+0.07  Fri Jun 10 07:07:56 GMT 2011
+    - I wrote 'Win32' instead of 'MSWin32', so tests weren't skipped. Doh.
+    - Add some diagnostics to the POE test to troubleshoot a CPAN tester
+
+0.06  Thu Jun 9 13:14:20 GMT 2011
+    - Skip tests on Win32 for now, due to a newline/pipe issue (I think)
+
+0.05  Tue Jun 7 00:11:20 GMT 2011
+    - Try to work around a potential 3-arg open() issue on Perl 5.6
+
+0.04  Sun Jun 5 22:28:05 GMT 2011
+    - Fix Perl 5.6 compatibility
+    - Make the POE test a TODO test due to Term::ReadKey issue (#56486)
+
+0.03  Fri Jun 3 04:00:57 GMT 2011
+    - Skip POE test when there's no Term::Cap or Term::ReadKey
+
+0.02  Wed May 25 06:16:28 GMT 2011
+    - Load IO::Handle so we can call ->autoflush(1) on older Perls
+
+0.01  Mon May 23 05:47:55 GMT 2011
+    - Initial release
+

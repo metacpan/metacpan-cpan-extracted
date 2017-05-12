@@ -1,0 +1,15 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+INSTALL
+t/01_client.t
+t/02_server.t
+bin/dnsc
+bin/dnsd
+bin/dnstelnet
+bin/dnsnetcat
+bin/dnsssh
+lib/IO/Socket/DNS.pm
+lib/IO/Socket/DNS/Server.pm
+META.yml                                 Module meta-data (added by MakeMaker)

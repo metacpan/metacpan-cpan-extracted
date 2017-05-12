@@ -1,0 +1,7 @@
+Makefile.PL
+MANIFEST
+README
+TimelineDiagram.pm
+t/1.t
+t/2.t
+t/ImUgly.ttf

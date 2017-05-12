@@ -1,0 +1,19 @@
+El complemento Text::VimColor emplea la siguiente lista de 
+parámetros cuando invoca al programa Vim:
+
+-RXZ -i NONE -u NONE -N "+set nomodeline"
+
+que viene a ser:
+
+-R  Habilitar el modo sólo lectura.
+-X  No conectar con el servidor X. Ahorra tiempo de carga.
+-Z  Usar el modo restringido.
+
+-i NONE
+    No emplear el archivo .viminfo.
+-u NONE 
+    No inicializar nada.
+
+-N Habilitar el modo "no compatible".
+
+

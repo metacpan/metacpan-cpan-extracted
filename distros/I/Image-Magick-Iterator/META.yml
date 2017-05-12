@@ -1,0 +1,12 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Image-Magick-Iterator
+version:      0.01
+version_from: lib/Image/Magick/Iterator.pm
+installdirs:  site
+requires:
+    Image::Magick:                 5.56
+    Image::PBMlib:                 1.05
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

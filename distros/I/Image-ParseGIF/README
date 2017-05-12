@@ -1,0 +1,53 @@
+
+README for the Perl module Image::ParseGIF
+
+	Copyright (c) 1999/2000 University of New South Wales 
+	Benjamin Low <b.d.low@unsw.edu.au>. All rights reserved.
+
+	This program is free software; you can redistribute it and/or
+	modify it under the same terms as Perl itself.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	Artistic License for more details.
+
+
+DESCRIPTION
+-----------
+
+This module parses a Graphics Interchange Format (GIF) image into
+its component 'parts' (a GIF is essentially made up of one or more 
+images - multiple images typically are used for animated gifs).
+
+Why, oh why?
+
+- this module can be used by a WWW/CGI application to provide 'real-time'
+feedback to a client without using client-side scripts or undue network
+inefficiencies. An example application is provided.
+
+- animated GIFs can be de-animated by simply extracting one frame (typically
+the first or last).
+
+- thanks to the colour table filters contributed by Ed Halley, 
+'printer-friendly' (greyscale, deanimated) images can easily be generated.
+
+I'm sure other uses could be found...
+
+See perldoc Image::ParseGIF for full documentation.
+
+INSTALLATION
+------------
+
+To install, unpack the archive and in the newly created directory type:
+
+        perl Makefile.PL
+        make
+        make install
+
+Use
+        perl Makefile.PL PREFIX=<location>
+
+to install somewhere other than the default.
+
+

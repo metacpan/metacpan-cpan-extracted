@@ -1,0 +1,29 @@
+IO::Util README File
+====================
+
+
+Description
+-----------
+
+This is a micro-weight module that exports a few functions of general utility in IO operations.
+  
+    
+Installation
+------------
+
+1. CPAN installation
+
+    perl -MCPAN -e 'install IO::Util'
+
+
+2. Standard installation
+- from the directory where this file is located, type:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+--
+Domizio Demichelis - perl.4pro.net
+2004-12-02

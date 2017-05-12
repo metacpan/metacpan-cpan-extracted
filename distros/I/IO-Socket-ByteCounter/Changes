@@ -1,0 +1,9 @@
+Revision history for Perl extension IO::Socket::ByteCounter.
+
+0.0.2  Tue Jan 16 17:55:55 2007
+	- fixed up Makefile.PL
+
+0.0.1  Tue Aug  8 21:03:39 2006
+	- original version; created by h2xs 1.23 with options
+		-AXc -n IO::Socket::ByteCounter
+

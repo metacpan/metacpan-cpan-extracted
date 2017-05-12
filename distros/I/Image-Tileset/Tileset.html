@@ -1,0 +1,339 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Image::Tileset - A tileset loader.</title>
+<link rel="stylesheet" href="pod.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body>
+
+
+<!-- INDEX BEGIN -->
+<div name="index">
+<p><a name="__index__"></a></p>
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#specification_file">SPECIFICATION FILE</a></li>
+	<li><a href="#methods">METHODS</a></li>
+	<ul>
+
+		<li><a href="#new__hash_options_">new (hash options)</a></li>
+		<li><a href="#void_error___">void error ()</a></li>
+		<li><a href="#bool_image__string_filepath_">bool image (string filepath)</a></li>
+		<li><a href="#bool_data__bin_data_">bool data (bin data)</a></li>
+		<li><a href="#void_clear___">void clear ()</a></li>
+		<li><a href="#bool_xml__string_xmldata___string_specfile_">bool xml (string xmldata | string specfile)</a></li>
+		<li><a href="#bool_refine__array_spec_">bool refine (array spec)</a></li>
+		<li><a href="#data_tiles___">data tiles ()</a></li>
+		<li><a href="#data_animations___">data animations ()</a></li>
+		<li><a href="#bin_tile__string_id___hash_options__">bin tile (string id[, hash options])</a></li>
+		<li><a href="#data_animation__string_id_">data animation (string id)</a></li>
+		<li><a href="#imagemagick_slice__string_id_">ImageMagick slice (string id)</a></li>
+	</ul>
+
+	<li><a href="#see_also">SEE ALSO</a></li>
+	<li><a href="#changes">CHANGES</a></li>
+	<li><a href="#copyright">COPYRIGHT</a></li>
+</ul>
+
+<hr name="index" />
+</div>
+<!-- INDEX END -->
+
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>Image::Tileset - A tileset loader.</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+  use Image::Tileset;</pre>
+<pre>
+  my $ts = new Image::Tileset (
+    image =&gt; &quot;my-tileset.png&quot;,
+    xml   =&gt; &quot;my-tileset.xml&quot;,
+  );</pre>
+<pre>
+  open (OUT, &quot;&gt;grass.png&quot;);
+  binmode OUT;
+  print OUT $ts-&gt;tile(&quot;grass&quot;);
+  close (OUT);</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>Image::Tileset is a simple tileset image loader. The preferred usage is to have
+an XML description file alongside the tileset image that describes how the
+tiles are to be sliced up.</p>
+<p>The module supports &quot;simple&quot; tilesets (where all tiles have a uniform width and
+height, though they don't need to begin at the top left corner of the image)
+as well as &quot;fixed&quot; tilesets (where you need to specify the exact pixel coords
+of every tile).</p>
+<p>It also supports the management of animations for your tiles (but not the means
+to display them; this is left up to your front-end code. There is a demo that
+uses Perl/Tk to give you an idea how to do this).</p>
+<p>
+</p>
+<hr />
+<h1><a name="specification_file">SPECIFICATION FILE</a></h1>
+<p>Tileset images are paired with a &quot;specification file,&quot; which describes how the
+image is to be sliced up into the different tiles.</p>
+<p>The spec file is usually an XML document, and it's read with <a href="/XML/Simple.html">XML::Simple</a>.
+If you wish, you can also send the spec data as a Perl data structure, skipping
+the XML part.</p>
+<p>An example XML file is as follows, and shows all the capabilities of the
+spec file markup:</p>
+<pre>
+  &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+  &lt;tileset&gt;
+    &lt;!--
+      The simplest form: the uniform tile set. In this case, all the tiles are
+      32x32 pixels large and the first tile is in the top left corner of the
+      image, at pixel coordinate 0,0
+    --&gt;
+    &lt;layout type=&quot;tiles&quot; size=&quot;32x32&quot; x=&quot;0&quot; y=&quot;0&quot;&gt;
+      &lt;!--
+        Within a &quot;tiles&quot; layout, X and Y refer to the &quot;tile coordinate&quot;, not
+        the &quot;pixel coordinate&quot;. So, the top left tile is 0,0 and the one to
+        the right of it is 1,0 (even though its pixel coordinate would be 32,0).
+        The module takes care of this all for you!)</pre>
+<pre>
+        Each tile needs a unique ID, called the &quot;tile id&quot;.
+      --&gt;
+      &lt;tile x=&quot;0&quot; y=&quot;0&quot; id=&quot;grass&quot; /&gt;
+      &lt;tile x=&quot;1&quot; y=&quot;0&quot; id=&quot;sand&quot;  /&gt;
+      &lt;tile x=&quot;2&quot; y=&quot;0&quot; id=&quot;dirt&quot;  /&gt;</pre>
+<pre>
+      &lt;!--
+        We have three &quot;water&quot; tiles that we intend to animate later, but
+        each one still needs its own unique ID!
+      --&gt;
+      &lt;tile x=&quot;0&quot; y=&quot;1&quot; id=&quot;water-1&quot; /&gt;
+      &lt;tile x=&quot;1&quot; y=&quot;1&quot; id=&quot;water-2&quot; /&gt;
+      &lt;tile x=&quot;2&quot; y=&quot;1&quot; id=&quot;water-3&quot; /&gt;
+    &lt;/layout&gt;</pre>
+<pre>
+    &lt;!--
+      In addition to simple grid-based tiles, you can also specify pixel
+      coordinates directly. Use the &quot;fixed&quot; layout for this.
+    --&gt;
+    &lt;layout type=&quot;fixed&quot;&gt;
+      &lt;!--
+        In fixed layout, you need to specify 4 pixel coordinates for where
+        the tile appears in the image: x1,y1,x2,y2.
+      --&gt;
+      &lt;tile x1=&quot;96&quot; y1=&quot;0&quot; x2=&quot;128&quot; y2=&quot;96&quot; id=&quot;avatar&quot; /&gt;
+    &lt;/layout&gt;</pre>
+<pre>
+    &lt;!--
+      For animations, you need to give the animation a unique ID and then
+      tell it which tiles (by their IDs) go into the animation. The &quot;speed&quot;
+      attribute controls how fast the animation plays by setting the delay
+      (in milliseconds) until the next tile should be shown.
+    --&gt;
+    &lt;layout type=&quot;animation&quot; id=&quot;water&quot; speed=&quot;200&quot;&gt;
+      &lt;tile&gt;water-1&lt;/tile&gt;
+      &lt;tile&gt;water-2&lt;/tile&gt;
+      &lt;tile&gt;water-3&lt;/tile&gt;
+      &lt;tile&gt;water-2&lt;/tile&gt;
+    &lt;/layout&gt;
+  &lt;/tileset&gt;</pre>
+<p>Your application can also provide spec data as a Perl structure instead of as
+XML. Here is an example of the above XML as a Perl structure:</p>
+<pre>
+  $ts-&gt;spec( [
+    {
+      type =&gt; 'tiles',
+      size =&gt; '32x32',
+      x    =&gt; 0,
+      y    =&gt; 0,
+      tile =&gt; [
+        { x =&gt; 0, y =&gt; 0, id =&gt; 'grass'   },
+        { x =&gt; 1, y =&gt; 0, id =&gt; 'sand'    },
+        { x =&gt; 2, y =&gt; 0, id =&gt; 'dirt'    },
+        { x =&gt; 0, y =&gt; 1, id =&gt; 'water-1' },
+        { x =&gt; 1, y =&gt; 1, id =&gt; 'water-2' },
+        { x =&gt; 2, y =&gt; 1, id =&gt; 'water-3' },
+      },
+    },
+    {
+      type =&gt; 'fixed',
+      tile =&gt; [
+        { x1 =&gt; 96, y1 =&gt; 0, x2 =&gt; 128, y2 =&gt; 96, id =&gt; 'avatar' },
+      ],
+    },
+    {
+      type  =&gt; 'animation',
+      id    =&gt; 'water',
+      speed =&gt; 200,
+      tile  =&gt; [ 'water-1', 'water-2', 'water-3', 'water-2' ],
+    },
+  ]);</pre>
+<p>See the examples in the <code>demo/</code> folder for more information.</p>
+<p>
+</p>
+<hr />
+<h1><a name="methods">METHODS</a></h1>
+<p>
+</p>
+<h2><a name="new__hash_options_">new (hash options)</a></h2>
+<p>Create a new <code>Image::Tileset</code> object. Options include:</p>
+<pre>
+  bool   debug:  Debug mode (prints stuff to the terminal on STDERR)
+  string xml:    Path to an XML spec file that describes the image.
+  hash   spec:   Spec data in Perl data structure form (skip XML file).
+  string image:  Path to the image file.</pre>
+<p>If you provide <code>xml</code>, the XML will be parsed and refined immediately. If you
+provide <code>spec</code>, it will be refined immediately. If you provide <code>image</code>, the
+image will be loaded immediately.</p>
+<p>
+</p>
+<h2><a name="void_error___">void error ()</a></h2>
+<p>Print the last error message given. Example:</p>
+<pre>
+  $tileset-&gt;image(&quot;myfile.png&quot;) or die $tileset-&gt;error;</pre>
+<p>
+</p>
+<h2><a name="bool_image__string_filepath_">bool image (string filepath)</a></h2>
+<p>Load an image file with <code>Image::Magick</code>. The object is just kept in memory for
+when you actually want to get a tile from it.</p>
+<p>Returns 1 on success, undef on error.</p>
+<p>
+</p>
+<h2><a name="bool_data__bin_data_">bool data (bin data)</a></h2>
+<p>If your program already has the image's binary data in memory, it can send it
+directly to this function. It will create an <code>Image::Magick</code> object based off
+the binary data directly, instead of needing to read a file from disk.</p>
+<p>Returns 1 on success, undef on error.</p>
+<p>
+</p>
+<h2><a name="void_clear___">void clear ()</a></h2>
+<p>Clear the internal <code>Image::Magick</code> object, unloading the tileset.</p>
+<p>
+</p>
+<h2><a name="bool_xml__string_xmldata___string_specfile_">bool xml (string xmldata | string specfile)</a></h2>
+<p>Load a specification file from XML. Pass either XML data or the path to a
+file name.</p>
+<p>If the data sent to this command begins with a left chevron, &lt;, or contains
+newlines, it is assumed to be XML data; otherwise the filesystem is queried.</p>
+<p>Returns 1 on success, undef on error.</p>
+<p>
+</p>
+<h2><a name="bool_refine__array_spec_">bool refine (array spec)</a></h2>
+<p>Refines the specification data. The spec describes how the image is cut up;
+<code>refine()</code> goes through that and stores the exact pixel coordinates of every
+tile named in the spec, for quick extraction when the tile is wanted.</p>
+<p>This method is called automatically when an XML spec file is parsed. If you
+pass in a <code>spec</code> during the call to <code>new()</code>, this method will be called
+automatically for your spec. If you want to load a spec directly after you've
+created the object, you can call <code>refine()</code> directly with your new spec.</p>
+<p>
+</p>
+<h2><a name="data_tiles___">data tiles ()</a></h2>
+<p>Return the tile coordinate information. In array context, returns a list of the
+tile ID's. In scalar context, returns a hash reference in the following format:</p>
+<pre>
+  {
+    'tile-id' =&gt; [
+      x1, y1,
+      x2, y2
+    ],
+    ...
+  };</pre>
+<p>
+</p>
+<h2><a name="data_animations___">data animations ()</a></h2>
+<p>Return the animation information. In array context, returns a list of the
+animation ID's. In scalar context, returns a hash reference in the following
+format:</p>
+<pre>
+  {
+    'animation-id' =&gt; {
+      speed =&gt; '...',
+      tiles =&gt; [
+        'tile-id',
+        ...
+      ],
+    },
+  };</pre>
+<p>
+</p>
+<h2><a name="bin_tile__string_id___hash_options__">bin tile (string id[, hash options])</a></h2>
+<p>Get the binary data of one of the tiles, named <code>id</code>, from the original
+tileset.</p>
+<p>You can optionally pass in a hash of named options. The following options are
+supported:</p>
+<pre>
+  int scale:   Scale the tile before returning its data. This is a number to
+               scale it by, for example '2' returns it at 200% its original size,
+               while '0.5' returns it at 50% its original size.
+  str size:    Resize the tile to this exact size before returning it, for
+               example '64x64'.
+  bool magick: If true, returns the Image::Magick object instead of the binary
+               data. If you want to make additional modifications to the image
+               (i.e. edit its colors, apply special effects), use the 'magick'
+               option and then apply the effects yourself.</pre>
+<p>The options <code>scale</code> and <code>size</code> are mutually exclusive.</p>
+<p>Examples:</p>
+<pre>
+  # The tiles are 32x32, but lets scale it 2X so we get back a 64x64 tile
+  my $tile = $ts-&gt;tile(&quot;grass&quot;, scale =&gt; 2);</pre>
+<pre>
+  # Get it at 1/2 its original size, or 16x16
+  my $tile = $ts-&gt;tile(&quot;grass&quot;, scale =&gt; 0.5);</pre>
+<pre>
+  # Get it at 24x24 pixels
+  my $tile = $ts-&gt;tile(&quot;grass&quot;, size =&gt; &quot;24x24&quot;);</pre>
+<p>Returns undef on error.</p>
+<p>
+</p>
+<h2><a name="data_animation__string_id_">data animation (string id)</a></h2>
+<p>Get the animation information about a specific animation ID.</p>
+<p>Returns data in the format:</p>
+<pre>
+  {
+    speed =&gt; '...',
+    tiles =&gt; [ ... ],
+  };</pre>
+<p>Returns undef on error.</p>
+<p>
+</p>
+<h2><a name="imagemagick_slice__string_id_">ImageMagick slice (string id)</a></h2>
+<p>Returns an <code>Image::Magick</code> object that contains the sliced tile from the
+original tileset. This is mostly for internal use only.</p>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p><a href="/Image/Magick.html">Image::Magick</a>, which powers this module's graphics handling.</p>
+<p><a href="/XML/Simple.html">XML::Simple</a>, which powers this module's XML parsing.</p>
+<p>
+</p>
+<hr />
+<h1><a name="changes">CHANGES</a></h1>
+<pre>
+  0.01  Fri Jan 15 2010
+  - Initial release.</pre>
+<p>
+</p>
+<hr />
+<h1><a name="copyright">COPYRIGHT</a></h1>
+<p>The tileset graphics included for demonstration purposes are from RPG Maker
+2003 and are copyright (C) Enterbrain.</p>
+<p>Code written by Noah Petherbridge, <a href="http://www.kirsle.net/">http://www.kirsle.net/</a></p>
+<p>This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself, either Perl version 5.10.0 or, at your option,
+any later version of Perl 5 you may have available.</p>
+
+</body>
+
+</html>

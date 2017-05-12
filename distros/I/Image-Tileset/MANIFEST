@@ -1,0 +1,22 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+Tileset.html
+t/Image-Tileset.t
+lib/Image/Tileset.pm
+demo/blobextract.pl
+demo/charset-alpha.png
+demo/charset-alpha.xml
+demo/charsets.png
+demo/charsets.xml
+demo/extract.pl
+demo/faces.png
+demo/faces.xml
+demo/hero-battle.png
+demo/hero-battle.xml
+demo/README.demo
+demo/testtiles.png
+demo/testtiles.xml
+demo/tk-animate.pl
+META.yml                                 Module meta-data (added by MakeMaker)

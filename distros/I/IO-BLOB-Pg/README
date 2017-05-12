@@ -1,0 +1,22 @@
+IO::PgLoFile is an IO::File (and IO::Handle) compatible class that
+reads or writes data to Postgresql's large objects (aka BLOBs).  I
+built this on top of Gisle Aas' IO::String, so he did most of the work
+here.  I just tweaked it to do the Blobs.
+
+This module requires perl5.005_03 or better because it works best with
+Chip's no-memory-leak-on-self-tie-patch.
+
+Installation as usual:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Documentation is embedded in the module.
+
+
+Copyright 2000 Mark A. Hershberger.  <mah@everybody.org>
+
+This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.

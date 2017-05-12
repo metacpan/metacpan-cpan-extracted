@@ -1,0 +1,96 @@
+NAME
+    IS::Init - Clusterwide "init", spawn cluster applications
+
+SYNOPSIS
+      use IS::Init;
+
+      my $init = new IS::Init;
+
+      # spawn all apps for resource group "foo", runlevel "run"
+      $init->tell("foo","run");
+
+      # spawn all apps for resource group "foo", runlevel "runmore"
+      # (this stops everything started by runlevel "run")
+      $init->tell("foo","runmore");
+
+DESCRIPTION
+    This module provides basic "init" functionality, giving you a single
+    inittab-like file to manage initialization and daemon startup across a
+    cluster or collection of machines.
+
+USAGE
+    This module's package includes a script 'isinit', which is intended to
+    be a bolt-in cluster init tool, calling IS::Init. The script is called
+    like 'init', with the addition of a new "resource group" argument.
+
+    This module is intended to be used like 'init' and 'telinit' -- the
+    first execution runs as a daemon, spawning and managing processes. Later
+    executions talk to the first, requesting it to switch to different
+    runlevels.
+
+    The module references a configuration file, /etc/isinittab by default,
+    which is identical in format to /etc/inittab, with a new "resource
+    group" column added. This file must be replicated across all hosts in
+    the cluster by some means.
+
+    A "resource group" is a collection of applications and physical
+    resources which together make up a coherent function. For example,
+    sendmail, /etc/sendmail.cf, and the /var/spool/mqueue directory might
+    make up a resource group. From /etc/isinittab you could spawn the
+    scripts which update sendmail.cf, mount mqueue, and then start sendmail
+    itself.
+
+PUBLIC METHODS
+  new
+
+    The constructor accepts an optional hash containing the paths to the
+    configuration file and to the socket, like this:
+
+      my $init = new IS::Init (
+          'config' => '/etc/isinittab',
+          'socket' => '/var/run/is/init.s'
+                              );
+
+    The first time this method is executed on a machine, it opens a UNIX
+    domain socket, /var/run/is/init.s by default. Subsequent executions
+    communicate with the first via this socket.
+
+  tell($resource_group,$runlevel)
+
+    This method talks to a running IS::Init daemon, telling it to switch the
+    given resource group to the given runlevel.
+
+    All processes listed in the configuration file (normally /etc/isinittab)
+    which belong to the new runlevel will be started if they aren't already
+    running.
+
+    All processes in the resource group which do not belong to the new
+    runlevel will be killed.
+
+    Other resource groups will not be affected.
+
+PRIVATE METHODS
+    These methods and functions are considered private and are intended for
+    internal use by this module. They are not considered part of the public
+    interface and are described here for documentation purposes only.
+
+  _open_socket
+
+BUGS
+AUTHOR
+            Steve Traugott
+            CPAN ID: STEVEGT
+            stevegt@TerraLuna.Org
+            http://www.stevegt.com
+
+COPYRIGHT
+    Copyright (c) 2001 Steve Traugott. All rights reserved. This program is
+    free software; you can redistribute it and/or modify it under the same
+    terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+
+SEE ALSO
+    perl(1).
+

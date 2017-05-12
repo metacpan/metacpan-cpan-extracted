@@ -1,0 +1,171 @@
+
+
+=encoding UTF-8
+
+=head1 NAME
+
+Image::PNG::Cairo - extract PNG data from a Cairo::ImageSurface
+
+=head1 SYNOPSIS
+
+    
+    use Image::PNG::Cairo 'cairo_to_png';
+    use Cairo;
+    my $surface = Cairo::ImageSurface->new ('argb32', 100, 100);
+    # Draw something on surface.
+    my $png = cairo_to_png ($surface);
+    # Now can use the methods of Image::PNG::Libpng on the PNG,
+    # e.g. write to file.
+
+(This example is included as L<F<synopsis.pl>|https://api.metacpan.org/source/BKB/Image-PNG-Cairo-0.08/examples/synopsis.pl> in the distribution.)
+
+=head1 VERSION
+
+This documents Image::PNG::Cairo version 0.08
+corresponding to git commit L<6dac994ae861f911552dff8628656eb29629697d|https://github.com/benkasminbullock/image-png-cairo/commit/6dac994ae861f911552dff8628656eb29629697d> released on Fri Feb 3 13:56:41 2017 +0900.
+
+=head1 DESCRIPTION
+
+This is a bridge between L<Cairo> and L<Image::PNG::Libpng> which
+allows the user to extract the image data from a Cairo::ImageSurface
+into a structure which can then be manipulated to add other kinds of
+data.
+
+=head1 FUNCTIONS
+
+=head2 cairo_to_png
+
+    my $png = cairo_to_png ($surface);
+
+The input, C<$surface>, is a L<Cairo::ImageSurface> object. Only Cairo
+surfaces of type 'argb32' are supported. The return value is an
+L<Image::PNG::Libpng> object, with its image dimensions, bit depth,
+colour type, and image data taken from C<$surface>. C<$png>
+corresponds to the return value of the L<Image::PNG::Libpng> method
+C<create_write_struct> with the methods C<set_IHDR> and C<set_rows>
+and C<set_transforms> applied to it using data extracted from
+C<$surface>.
+
+C<$png> is set up using the Image::PNG::Libpng method
+C<set_transforms> such that the PNG image data is transformed on
+writing from the Cairo image data format to the PNG format.
+
+=head1 EXAMPLES
+
+=head2 Captcha
+
+This example CGI program makes a captcha from random letters. It also
+includes the captcha text and the date and time of creation of the
+image in the PNG.
+
+    
+    use lib '/home/protected/lib';
+    use CGI::Carp 'fatalsToBrowser';
+    use Cairo;
+    use Image::PNG::Cairo 'cairo_to_png';
+    use Image::PNG::Libpng ':all';
+    use Image::PNG::Const ':all';
+    use constant { M_PI => 3.14159265 };
+    my $xsize = 200;
+    my $ysize = 50;
+    my $surface = Cairo::ImageSurface->create ('argb32', $xsize, $ysize);
+    my $cr = Cairo::Context->create ($surface);
+    
+    # Make a background
+    
+    $cr->set_source_rgb (0, 0, 0);
+    $cr->rectangle (0, 0, $xsize, $ysize);
+    $cr->fill ();
+    
+    # Get six randomly-chosen letters
+    
+    my $captcha = random_letters (6);
+    
+    # Draw the captcha text in white
+    my $gap = 10;
+    $cr->set_source_rgb (1, 1, 1);
+    $cr->set_font_size ($ysize - $gap);
+    $cr->move_to ($gap, $ysize - $gap);
+    $cr->show_text ($captcha);
+    $cr->fill ();
+    
+    # Obscure the text with translucent circles in random colours.
+    
+    for (0..50) {
+        $cr->set_source_rgba (random_colours (), 0.4);
+        $cr->arc (rand ($xsize), rand ($ysize), rand (25), 0, 2 * M_PI);
+        $cr->fill ();
+    }
+    
+    # Get the PNG data out of it.
+    
+    my $png = cairo_to_png ($surface);
+    
+    # Put the captcha into the PNG itself, and set a modification time.
+    
+    $png->set_text ([{compression => PNG_TEXT_COMPRESSION_NONE,
+                      key => 'captcha', text => $captcha}]);
+    $png->set_tIME ();
+    
+    # Get the PNG data from $png and print it out.
+    
+    my $data = write_to_scalar ($png);
+    binmode STDOUT;
+    print "Content-Type: image/png\r\n\r\n$data";
+    exit;
+    
+    sub random_colours
+    {
+        my @r;
+        for (1..3) {
+            push @r, rand (1);
+        }
+        return @r;
+    }
+    
+    sub random_letters
+    {
+        my ($length) = @_;
+        my @letters = ('0' .. '9', 'a' .. 'z', 'A' .. 'Z');
+        my $r = '';
+        for (1..$length) {
+            $r .= $letters[rand (@letters)];
+        }
+        return $r;
+    } 
+
+(This example is included as L<F<captcha.pl>|https://api.metacpan.org/source/BKB/Image-PNG-Cairo-0.08/examples/captcha.pl> in the distribution.)
+
+Please do not use this example program in the stead of a real captcha.
+
+=head1 SEE ALSO
+
+=over
+
+=item Cairo
+
+L<Cairo> is a general-purpose drawing program.
+
+=item Image::PNG::Libpng
+
+L<Image::PNG::Libpng> is a Perl wrapper to the C PNG library libpng.
+
+=back
+
+
+=head1 AUTHOR
+
+Ben Bullock, <bkb@cpan.org>
+
+=head1 COPYRIGHT & LICENCE
+
+This package and associated files are copyright (C) 
+2014-2017
+Ben Bullock.
+
+You can use, copy, modify and redistribute this package and associated
+files under the Perl Artistic Licence or the GNU General Public
+Licence.
+
+
+

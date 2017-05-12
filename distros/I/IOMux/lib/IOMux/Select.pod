@@ -1,0 +1,202 @@
+=encoding utf8
+
+=head1 NAME
+
+IOMux::Select - simplify use of select()
+
+=head1 INHERITANCE
+
+ IOMux::Select
+   is a IOMux
+
+=head1 SYNOPSIS
+
+  use IOMux::Select;
+
+  my $mux    = IOMux::Select->new;
+  my $server = IOMux::Service::TCP->new(...);
+  $mux->add($server);
+  $mux->loop;
+
+=head1 DESCRIPTION
+
+Multiplexer implemented around the C<select()> system call. This C<select()>
+is usually less powerful and slower than the C<poll()> call (implemented
+in L<IOMux::Poll|IOMux::Poll>) however probably available on more systems.
+
+Extends L<"DESCRIPTION" in IOMux|IOMux/"DESCRIPTION">.
+ 
+=head1 METHODS
+
+Extends L<"METHODS" in IOMux|IOMux/"METHODS">.
+ 
+=head2 Constructors
+
+Extends L<"Constructors" in IOMux|IOMux/"Constructors">.
+ 
+=over 4
+
+=item IOMux::Select-E<gt>B<new>(%options)
+
+Inherited, see L<IOMux/"Constructors">
+
+=back
+
+=head2 Accessors
+
+Extends L<"Accessors" in IOMux|IOMux/"Accessors">.
+ 
+=head2 User interface
+
+Extends L<"User interface" in IOMux|IOMux/"User interface">.
+ 
+=over 4
+
+=item $obj-E<gt>B<add>($handler|$bundle)
+
+Inherited, see L<IOMux/"User interface">
+
+=item $obj-E<gt>B<endLoop>(BOOLEAN)
+
+Inherited, see L<IOMux/"User interface">
+
+=item $obj-E<gt>B<loop>( [$heartbeat] )
+
+Inherited, see L<IOMux/"User interface">
+
+=item $obj-E<gt>B<open>($mode, $params)
+
+Inherited, see L<IOMux/"User interface">
+
+=item $obj-E<gt>B<showFlags>( [$flags|<$rdflags,$wrflags,$exflags>] )
+
+Display the select $flags (one of the values received from L<selectFlags()|IOMux::Select/"For internal use">)
+or all of these flags. You may also specify three sets of $flags explicitly.
+
+When three sets of $flags are passed, it will result in three lines
+preceeded with labels. With only one set, no label will be used.
+
+The flagged filenos are shown numerically (modulo 10) and positionally.
+For instance, if both filehandle 1 and 4 are flagged, the output string
+will be C<-1--4>.
+
+example: 
+
+  my ($rd, $wr, $er) = $client->selectFlags;
+  print "read flags: ",$client->showFlags($rd);
+
+  print $client->showFlags(rd, $wr, $er);
+  print $client->showFlags;   # saem result
+
+  print $client->showFlags($client->waitFlags);
+
+=back
+
+=head2 For internal use
+
+Extends L<"For internal use" in IOMux|IOMux/"For internal use">.
+ 
+=over 4
+
+=item $obj-E<gt>B<changeTimeout>($fileno, $oldtimeout, $newtimeout)
+
+Inherited, see L<IOMux/"For internal use">
+
+=item $obj-E<gt>B<fdset>($fileno, $state, $read, $write, $except)
+
+Inherited, see L<IOMux/"For internal use">
+
+=item $obj-E<gt>B<handler>( $fileno, [$handler] )
+
+Inherited, see L<IOMux/"For internal use">
+
+=item $obj-E<gt>B<handlers>()
+
+Inherited, see L<IOMux/"For internal use">
+
+=item $obj-E<gt>B<remove>($fileno)
+
+Inherited, see L<IOMux/"For internal use">
+
+=item $obj-E<gt>B<selectFlags>()
+
+Returns a list of three: respectively the read, write and error flags
+which show the file numbers that the internal C<select()> call has
+flagged as needing inspection.
+
+This method can, for instance, be used from within the heartbeat routine.
+
+example: 
+
+  $mux->loop(\&heartbeat);
+  sub heartbeat($$$)
+  {   my ($mux, $numready, $timeleft) = @_;
+      my ($rd, $rw, $ex) = $mux->selectFlags;
+      if(vec($rd, $fileno, 1)==1) {...}
+  }
+
+=item $obj-E<gt>B<waitFlags>()
+
+Returns a list of three: respectively the read, write and error flags
+which show how the files are enlisted.
+
+=back
+
+=head1 DETAILS
+
+Extends L<"DETAILS" in IOMux|IOMux/"DETAILS">.
+ 
+=head2 Installation
+
+Extends L<"Installation" in IOMux|IOMux/"Installation">.
+ 
+=head2 Event managers
+
+Extends L<"Event managers" in IOMux|IOMux/"Event managers">.
+ 
+=head2 File handles
+
+Extends L<"File handles" in IOMux|IOMux/"File handles">.
+ 
+=head2 Implementation limitations
+
+The C<select> system call is very powerful, however the (UNIX) standard
+specifies quite a weak subset of the features usually offered. The
+standard only requires sockets to be supported. The Windows/cygwin
+implementation limits itself to that. Modern UNIX dialects usually
+also support normal pipes and file handlers to be attached.
+
+Please help extending the list of OS specific limitations below!
+
+=head3 Limitations on Windows
+
+The C<select()> system call is very limited: it only works on sockets,
+not on files or pipes. This means that the process will stall on each
+file access and pipe activity.
+
+=head3 Limitations on UNIX/Linux
+
+Be careful with the use of files. You should open files with the
+non-stdio version of C<open()>, with option C<O_NONBLOCK>. But even
+then, asynchronous support for reading and writing files and pipes
+may be lacking on your UNIX dialect.
+
+=head1 SEE ALSO
+
+This module is part of IOMux distribution version 1.00,
+built on November 11, 2015. Website: F<http://perl.overmeer.net/>
+All modules in this suite:
+L</Any::Daemon>,
+L</IOMux>, and
+L</IOMux::HTTP>.
+
+Please post questions or ideas to F<perl@overmeer.net>
+
+=head1 LICENSE
+
+Copyrights 2011-2015 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

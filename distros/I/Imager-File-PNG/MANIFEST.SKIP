@@ -1,0 +1,32 @@
+# build products
+\.o$
+\.bs$
+^PNG\.c$
+^blib/
+^pm_to_blib$
+^Makefile$
+^Makefile\.old$
+^MANIFEST\.bak$
+
+# test products
+^testout
+\.gcov$
+\.gcda$
+\.gcno$
+
+
+# system
+^\.svn/
+/\.svn/
+
+# editor
+^#
+~$
+
+^\.gitignore$
+
+# Win32 junk
+\.exe$
+^dll\.(base|exp)$
+^PNG\.def$
+^PNG_def\.old$

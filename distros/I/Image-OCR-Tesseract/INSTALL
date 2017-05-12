@@ -1,0 +1,14 @@
+# INSTALL
+# ======
+#
+# You will need to have accessible to perl the paths to executables: tesseract and convert
+# You will need ImageMagick installed.
+# If the executables are not installed, testing will be incomplete, installation will still take place.
+
+
+
+perl Makefile.PL
+make test
+make install
+make realclean
+

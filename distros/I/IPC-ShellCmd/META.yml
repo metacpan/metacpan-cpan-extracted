@@ -1,0 +1,30 @@
+---
+abstract: 'Run a command with a given environment and capture output'
+author:
+  - 'Matthew Byng-Maddick <matthew.byng-maddick@bbc.co.uk> <mbm@colondot.net>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.910'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: IPC::ShellCmd
+name: IPC-ShellCmd
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  IO::Pipe: 0
+  Scalar::Util: 0
+  String::ShellQuote: 0
+  perl: 5.8.4
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://goatse.co.uk/~bobtfish/IPC-ShellCmd/.git
+version: 0.001

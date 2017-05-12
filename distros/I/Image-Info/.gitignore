@@ -1,0 +1,14 @@
+*~
+/.prove
+/blib
+/cover_db
+/Image-Info-*.tar.gz
+/MANIFEST.bak
+/MYMETA.json
+/MYMETA.yml
+/Makefile
+/Makefile.old
+/pm_to_blib
+/nytprof.out
+\#*\#
+

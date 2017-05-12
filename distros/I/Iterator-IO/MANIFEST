@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+IO.pm
+Iterator-IO.ppd
+Iterator-IO-ppm.tar.gz
+t/idir.t
+t/ifile.t
+t/test_data.txt
+META.yml                                 Module meta-data (added by MakeMaker)

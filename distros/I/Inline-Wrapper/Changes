@@ -1,0 +1,36 @@
+Revision history for Inline-Wrapper
+------------------------------------------------------------
+Legend:
+BUG:    An actual found or reported bug fix.
+FIX:    Change toward correct behavior, but unreported.
+DOC:    Changes to documentation.
+NEW:    New, previously non-existent feature.
+------------------------------------------------------------
+
+0.05    Mar 10, 2010
+        BUG: New package stash format contains reference to own module;
+            needed to grep it out of the package.
+            Example: http://www.cpantesters.org/cpan/report/6914196
+        DOC: Cleaned up 2 bad links in generated POD documentation
+        DOC: Corrected wrong year (2008) on below 0.04 release.  Silly.
+
+0.04    Jan 09, 2009
+        DOC: Cleaned up and clarified documentation throughout.
+
+0.03    Dec 27, 2008
+        NEW: Added Inline::Wrapper->unload() method to unload modules, and
+            corresponding tests.
+        FIX: Corrected behaviour whereby if you load()ed a module, then used
+            add_language() to change the file extension, AND the module had
+            been set to auto_reload, unless you renamed the underlying file
+            also, The Bad Thing(tm) happened.  Phew.
+        FIX: Inline::Wrapper::Module->_delete_namespace didn't work.  Fixed.
+        FIX: Changed all warn()s to carp()s.  Duh.
+        DOC: Updated all docs to new POD style.  Better and easier to follow.
+
+0.02    Dec 27, 2008
+        DOC: Put in correct SYNOPSIS ;)  D'oh!
+
+0.01    Dec 27, 2008
+        First version, released on an unsuspecting world.
+

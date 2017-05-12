@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/IO-File-WithFilename.t
+lib/IO/File/WithFilename.pm
+META.yml                                 Module meta-data (added by MakeMaker)

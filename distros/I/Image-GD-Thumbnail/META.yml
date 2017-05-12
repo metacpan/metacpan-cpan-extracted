@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name:                Image-GD-Thumbnail
+version:             0.041
+abstract:            produce thumbnail images with GD
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.3201
+distribution_type:   module
+requires:     
+    GD:                            
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Lee Goddard <cpan-at-leegoddard.net>

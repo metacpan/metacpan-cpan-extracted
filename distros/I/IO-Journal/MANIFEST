@@ -1,0 +1,25 @@
+Build.PL
+Changes
+LICENSE
+Makefile.PL
+MANIFEST                        This list of files
+MANIFEST.SKIP
+META.yml
+README
+SIGNATURE
+lib/IO/Journal.pm
+lib/IO/Journal/Transaction.pm
+src/Journal.xs
+src/Transaction.xs
+src/ppport.h
+src/model.h
+t/00signature.t
+t/01compile.t
+t/01kwalitee.t
+t/01manifest.t
+t/01meta.t
+t/01min-perl.t
+t/01pod.t
+t/01pod-coverage.t
+t/01portability.t
+typemap

@@ -1,0 +1,18 @@
+<!--keep the MSMS-Compounds with more than 100 fragments -->
+
+
+<ExpMsMsSpectrumFilter>
+<oneExpMsMsSpectrumFilter spectrumType="msms" name="dummy">
+	        <level>msmsCompounds</level>	
+		<action type="removeOther">		
+		       <threshold type="sort">	
+			   <relativeTo>absValue</relativeTo>							
+			   <thresholdValue>4</thresholdValue>
+			   <comparator>gt</comparator>						
+		       </threshold>
+                </action>
+		<filterValue type="directValue">							
+			<name>log.size</name>						
+		</filterValue>
+	</oneExpMsMsSpectrumFilter>
+</ExpMsMsSpectrumFilter>

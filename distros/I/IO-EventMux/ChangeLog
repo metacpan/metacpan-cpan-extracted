@@ -1,0 +1,35 @@
+Version 2.01 (Sun Apr 15 2009)
+ * Remove IO::Epoll as default mistake
+
+Version 2.01 (Sun Apr 15 2009)
+ * Added pluggable EventLoop mechanism and added support for IO::Epool 
+ * Fixed tests so there is no more hard dependence on IO::Buffered
+ * Small fix for IO::EventMux::Dump eating options.
+
+Version 2.00 (Sun Mar 22 2009)
+ * Added IO::EventMux::Dump from José Micó
+ * Added new function has_events as suggested by José Micó
+ * Added new connect() call as shorthand for creating socket/adding it
+ * Use Errno instead of POSIX as this takes less mem and is faster to load.
+ * Added support for auto detecting if a socket is in listening mode or not.
+   Listen => 1 on add() is no longer needed.
+ * Rename "error_num" to "errno" in error events
+ * Add new "Errors" options to add() that returns ICMP errors as error events.
+ * Close no longer waits for send buffer to empty
+ * Drop support for timeouts pr. file handle
+ * Convert to new IO::Buffered and drop support for old Buffered API.
+ * Added a lot more error handling, IO::EventMux now croaks when given wrong
+   in a lot of cases.
+ * Add credential information to unix sockets on accepted event.
+ * Mux now croaks on negativ timeout value
+
+Version 1.02 (Sun Dec 30 2007)
+ * Make push_event public, so fake events can be pushed to the queue.
+ * Fixed bug in fixed size buffering
+ * Fix all Perl::Critic warning
+ * Add experimental HTTP buffer type
+ * Fixed bug in socket type detection
+ * Croak when sending to a $fh that is not ours
+
+Version 1.01 (Tue Sep 4 2007)
+ * Fixed test that was time dependent

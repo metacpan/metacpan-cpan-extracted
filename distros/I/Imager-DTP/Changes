@@ -1,0 +1,36 @@
+Revision history for Perl extension Imager::DTP.
+
+0.01 Wed Sep 28 16:46:00 2005
+	- original version
+
+0.02 Tue Oct 04 15:54:00 2005
+	- Imager + FreeType2 pre-req check added to Makefile.PL
+	- changes in pod documentation and README
+	- changes in t/*.t script
+
+0.03 Mon Oct 24 18:11:00 2005
+	- Letter transformation (x/y scaling) methods added.
+	      * Imager::DTP::Letter->setScale()
+	      * Imager::DTP::Line->setLetterScale()
+	      * Imager::DTP::Textbox->setLetterScale()
+	- changes in pod documentation and README
+
+0.04 Wed Nov 16 23:49:00 2005
+	- fix bug on setText method, where add=>1 to empty textbox didn't work.
+	- fix bug on setText method, where pre&post \n characters disappeared.
+	- changes in pod documentation and README
+
+0.05 Wed Jan 11 21:41:00 2006
+	- major update on Imager::DTP::Letter
+	      * more precise bounding box calculation.
+	      * friendlier debug view.
+	      * added getter methods - getLeftBearing, getRightBearing, getGlobalAscent, getGlobalDescent, getEndOffset.
+	- update on Imager::DTP::Line
+	      * better alignment calculation - the output looks much better now.
+	- update on Imager::DTP::Textbox
+	      * better alignment calculation - the output looks much better now.
+	      * leading will get a bit wider due to the change.
+
+0.06 Fri Jan 19 15:00:00 2007
+	- negative integers now available for space between letters.
+	      * Imager::DTP::Line->setWspace( pixel=>-5 )

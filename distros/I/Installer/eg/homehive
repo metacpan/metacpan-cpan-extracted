@@ -1,0 +1,5 @@
+perl "5.18.1";
+url "http://ftp.postgresql.org/pub/source/v9.3.2/postgresql-9.3.2.tar.gz", with => {
+  pgport => $ENV{HOMEHIVE_DB_PORT} ? $ENV{HOMEHIVE_DB_PORT} : 17771,
+};
+cpanm qw( --notest DBD::Pg Net::SSL Net::Server );

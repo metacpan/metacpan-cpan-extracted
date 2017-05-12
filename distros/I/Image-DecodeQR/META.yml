@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name:                Image-DecodeQR
+version:             0.01
+abstract:            ~
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.32
+distribution_type:   module
+requires:     
+    Test::More:                    0.32
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Jiro Nishiguchi <jiro@cpan.org>

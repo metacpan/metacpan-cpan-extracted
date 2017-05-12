@@ -1,0 +1,44 @@
+{
+   "abstract" : "use F<libasyncns> for C<IO::Async> resolver queries",
+   "author" : [
+      "Paul Evans <leonerd@leonerd.org.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4204",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "IO-Async-Resolver-LibAsyncNS",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Future" : "0",
+            "IO::Async::Handle" : "0",
+            "IO::Async::Resolver" : "0",
+            "Net::LibAsyncNS" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "IO::Async::Resolver::LibAsyncNS" : {
+         "file" : "lib/IO/Async/Resolver/LibAsyncNS.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.01"
+}

@@ -1,0 +1,24 @@
+---
+abstract: 'use C<IO::Async> with C<EV>'
+author:
+  - 'Paul Evans <leonerd@leonerd.org.uk>'
+build_requires:
+  IO::Async::LoopTests: 0.24
+  Test::More: 0
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4001, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: IO-Async-Loop-EV
+provides:
+  IO::Async::Loop::EV:
+    file: lib/IO/Async/Loop/EV.pm
+    version: 0.02
+requires:
+  EV: 0
+  IO::Async::Loop: 0.49
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02

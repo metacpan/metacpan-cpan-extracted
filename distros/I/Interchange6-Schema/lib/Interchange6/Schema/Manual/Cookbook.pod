@@ -1,0 +1,77 @@
+=head1 NAME
+
+Interchange6::Schema::Manual::Cookbook - Miscellaneous recipes
+
+=head1 Local schema modifications
+
+We expect Interchange6 developers will feel the need for local changes to
+the schema that they do not wish to push upstream so here is a quick guide.
+
+Assuming your application is C<MyApp> then we create a package to store the
+changes in lib/MyApp/Interchange6/Schema.pm:
+
+    package MyApp::Interchange6::Schema;
+
+    # here in the new package's namespace we use the result classes we want to 
+    # modify as these must be loaded before we make changes and before
+    # Interchange6::Schema gets loaded
+
+    use Interchange6::Schema::Result::Product;
+    use Interchange6::Schema::Result::Media;
+
+    # now we change our namespace to one we wish to modify
+
+    package Interchange6::Schema::Result::Product;
+
+    # add a column
+
+    __PACKAGE__->add_columns(
+        manufacturer_sku => {
+            data_type => 'varchar',
+            size      => 64,
+        },
+        wibble => {
+            data_type => 'text',
+        }
+    );
+
+    # we're going to add a new method to Media
+
+    package Interchange6::Schema::Result::Media;
+
+    sub foobar {
+        my $self = shift;
+        return $self->pling($self->buzz);
+    }
+
+    # finally switch back to our schema class and load Interchange6::Schema
+
+    package MyApp::Interchange6::Schema;
+
+    use base 'Interchange6::Schema';
+
+    1;
+    
+If you are using Dancer::Plugin::DBIC to set your schema class then instead of
+the expected config.yml setting:
+
+    plugins:
+      DBIC:
+        default:
+          schema_class: Interchange6::Schema
+
+We now use:
+
+    plugins:
+      DBIC:
+        default:
+          schema_class: Myapp::Interchange6::Schema
+
+Now your new method is available and you can run C<<$schema->deploy>> and your
+new columns will be added.
+
+If you are using L<DBIx::Class> directly then you'll need to be doing something
+along the lines of:
+
+    use MyApp::Interchange::Schema;
+    my $schema = MyApp::Interchange::Schema->connect;

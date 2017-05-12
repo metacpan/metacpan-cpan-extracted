@@ -1,0 +1,15 @@
+requires "Carp" => "0";
+requires "Scalar::Util" => "0";
+requires "perl" => "5.008005";
+
+on 'test' => sub {
+  requires "Test2::Suite" => "0.000060";
+};
+
+on 'configure' => sub {
+  requires "ExtUtils::MakeMaker" => "0";
+};
+
+on 'develop' => sub {
+  requires "Test::Pod" => "1.41";
+};

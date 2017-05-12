@@ -1,0 +1,21 @@
+Revision history for IO-Async-Loop-POE
+
+0.05    CHANGES:
+         * Implement the IO::Async 0.49 Loop API - watch_time, unwatch_time
+
+0.04    BUGFIXES:
+         * Fix timer fail bug on POE 1.299 - rt65706
+
+0.03    CHANGES:
+         * Move all POE::Kernel-adjusting code into state functions to invoke
+           directly, rather than building temporary closures
+         * Updated for IO::Async 0.33
+         * More unit tests on shared cooperation between POE
+
+0.02    CHANGES:
+         * IO::Async::LoopTests 0.32 no longer requires exact timing
+           immediately after constructor, so no need for ->run_one_timeslice
+           workaround
+
+0.01    First version, released on an unsuspecting world.
+

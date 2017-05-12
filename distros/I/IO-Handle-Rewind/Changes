@@ -1,0 +1,13 @@
+Revision history for IO-Handle-Rewind
+
+0.01    First version, released on an unsuspecting world.
+
+0.02    Fix META.yml.
+
+0.03    Add AUTHOR and LICENSE to Rewind.pm.
+
+0.04	More packaging problems.
+
+0.05	Remove bogus test dependency; remove META.yml
+
+0.06    Tests referred to an old version of the module name.

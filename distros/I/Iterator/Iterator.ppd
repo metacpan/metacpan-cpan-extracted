@@ -1,0 +1,12 @@
+<SOFTPKG NAME="Iterator" VERSION="0,03,0,0">
+    <TITLE>Iterator</TITLE>
+    <ABSTRACT>A general-purpose iterator class.</ABSTRACT>
+    <AUTHOR>Eric Roode &lt;roode@cpan.org&gt;</AUTHOR>
+    <IMPLEMENTATION>
+        <DEPENDENCY NAME="Exception-Class" VERSION="1,21,0,0" />
+        <DEPENDENCY NAME="Test-Simple" VERSION="0,40,0,0" />
+        
+        
+        <CODEBASE HREF="" />
+    </IMPLEMENTATION>
+</SOFTPKG>

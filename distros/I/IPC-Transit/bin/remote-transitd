@@ -1,0 +1,89 @@
+#!perl
+
+use strict;use warnings;
+use IPC::Transit;
+use IPC::Transit::Remote;
+use Data::Dumper;
+use Getopt::Std;
+use Sys::Hostname;
+
+$| = 1;
+
+{   #all of the gnarly debugging stuff
+    my $opts = {};
+    getopts('P:d:r', $opts);
+    my $debug = 0;
+    if($opts->{P}) {
+        $IPC::Transit::config_dir = $opts->{P};
+    }
+    if($opts->{d}) {
+        $debug = $opts->{d};
+    }
+    if($opts->{r}) {
+        #remote testing
+        $IPC::Transit::Remote::config->{proxy_callback} = sub {
+            my $dest = shift;
+            return 1 if $dest eq '127.0.0.1';
+            return 0;
+        };
+
+        my $all_possible_mes = eval {
+            $ENV{PATH}="/sbin:$ENV{PATH}" unless $ENV{PATH} =~ m|/sbin|;
+            my $ret = {};
+            foreach (`ifconfig -a` =~ /inet addr:(\S+)/g) {
+                $ret->{$_} = 1;
+            }
+            $ret->{'127.0.0.1'} = 1;
+            {   my $hostname = 1;
+                $ret->{$hostname} = 1;
+            }
+            $ENV{PATH}="/bin:$ENV{PATH}" unless $ENV{PATH} =~ m|/bin|;
+            {   my $fqdn = `hostname --fqdn`;
+                chomp $fqdn;
+                $ret->{$fqdn} = 1;
+            }
+            return $ret;
+        };
+
+        $IPC::Transit::Remote::config->{is_me} = sub {
+            my $dest = shift;
+            return undef unless $dest;
+            return $all_possible_mes->{$dest};
+        };
+        $IPC::Transit::Remote::config->{transit_sending_host} = '127.0.0.1';
+        $IPC::Transit::max_message_size = 200;
+    }
+}
+
+my $from_queue = IPC::Transit::Internal::_initialize_queue(qname => 'transitd');
+my $flags = IPC::Transit::Internal::_get_flags('nowait');
+
+sub get_data {
+    my $ref = shift;
+    $ref->{serialized_wire_data} = '';
+    $from_queue->rcv($ref->{serialized_wire_data}, 102400000, 0, $flags);
+    return 1 if $ref->{serialized_wire_data};
+    return 0;
+}
+
+while(1) {
+    eval {
+        local $SIG{ALRM} = sub { die "timed out\n"; };
+        alarm 5;
+        my $ref = {
+            serialized_wire_data => '',
+        };
+        while(get_data($ref)) {
+            my ($header_length, $wire_headers) = IPC::Transit::_parse_wire_header($ref);
+            IPC::Transit::sync_serialized_wire_data($wire_headers, $ref);
+            my $dest = $wire_headers->{d} || 'unknown';
+            IPC::Transit::Remote::add_to_destination($dest, $ref);
+            IPC::Transit::Remote::handle_interval();
+        }
+    };
+    print "error: $@\n" if $@;
+    alarm 0;
+    select undef, undef, undef, 0.1;
+    IPC::Transit::Remote::handle_interval();
+}
+

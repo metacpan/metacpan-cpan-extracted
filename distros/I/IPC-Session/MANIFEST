@@ -1,0 +1,7 @@
+ChangeLog
+MANIFEST
+Makefile.PL
+Session.pm
+t/csh.t
+t/sh.t
+t/timeout.t

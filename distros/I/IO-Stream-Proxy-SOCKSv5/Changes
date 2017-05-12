@@ -1,0 +1,13 @@
+Revision history for IO-Stream-Proxy-SOCKSv5
+
+v2.0.0  2016-02-20 15:19:08 EET
+	- Switch to Dist::Milla.
+
+1.0.2   2013-10-03 17:02:13 EEST
+	- Remove MYMETA.*
+
+1.0.1	2012-05-13 06:01:33 EEST
+	- Fix requirements.
+
+1.0.0	2010-06-27 17:53:32 EEST
+	- Initial release.

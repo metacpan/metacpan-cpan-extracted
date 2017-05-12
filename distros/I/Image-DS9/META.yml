@@ -1,0 +1,33 @@
+---
+abstract: 'interface to the DS9 image display and analysis program'
+author:
+  - 'Diab Jerius ( djerius@cfa.harvard.edu )'
+build_requires:
+  ExtUtils::MakeMaker: '6.36'
+  Test::Deep: '0'
+  Test::Fatal: '0'
+  Test::More: '0.31'
+configure_requires:
+  CPAN::Meta: '0'
+  ExtUtils::MakeMaker: '6.36'
+dynamic_config: '0'
+generated_by: 'Module::Install version 1.16, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Image-DS9
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  IPC::XPA: '0.08'
+  Module::Runtime: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Image-DS9
+  license: http://www.gnu.org/licenses/gpl-3.0.html
+  repository: https://github.com/djerius/image-ds9
+version: '0.186'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

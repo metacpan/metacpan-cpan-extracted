@@ -1,0 +1,24 @@
+#!/bin/bash
+# Simple script to check if a header file exists
+
+CC=gcc
+TMPFILE=tmp_$$.c
+TMPO=tmp_$$.o
+trap 'rm -f $TMPFILE $TMPO' EXIT
+
+if [ -z "$1" ]; then
+    echo "ERROR: $0 -- Please specifiy the header file to include"
+    exit 1;
+fi
+INCLUDE=$1
+
+if [ -n "$2" ]; then
+    CFLAGS="$2"
+else
+    echo "WARN: $0 -- Please specifiy the CFLAGS to use"
+fi
+
+cat <<EOF >$TMPFILE && $CC -o $TMPO $CFLAGS $TMPFILE
+#include "$INCLUDE"
+int main() { return 0; }
+EOF

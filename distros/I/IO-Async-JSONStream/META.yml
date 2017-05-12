@@ -1,0 +1,25 @@
+---
+abstract: 'send or receive lines of JSON data in C<IO::Async>'
+author:
+  - 'Paul Evans <leonerd@leonerd.org.uk>'
+build_requires:
+  IO::Async::OS: '0'
+  IO::Async::Test: '0.14'
+  Test::More: '0.88'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4206, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: IO-Async-JSONStream
+provides:
+  IO::Async::JSONStream:
+    file: lib/IO/Async/JSONStream.pm
+    version: '0.02'
+requires:
+  IO::Async::Stream: '0.57'
+  JSON: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.02'

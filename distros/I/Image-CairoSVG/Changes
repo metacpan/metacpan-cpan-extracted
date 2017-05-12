@@ -1,0 +1,36 @@
+Revision log for Perl module "Image::CairoSVG"
+
+0.07 2016-12-15
+
+- Add svg2png script
+- Fix bug about reading viewBox attribute values for width and height
+
+0.06 2016-09-22
+
+- Use black as default colour for fills
+- Get image width and height from the SVG file
+- "render" now returns a value, the surface drawn into
+
+0.05 2016-09-15
+
+- Fix documentation errors
+- Add a better example including an image for HTML rendering.
+
+0.04 2016-01-07
+
+- Additional entries in SEE ALSO
+- Tidy
+
+0.03 2015-11-06
+
+- Clean up tests and documentation
+- Image diff disabled due to changes in Cairo rendering
+
+0.02 2014-05-22
+
+- Arc rotation (x axis rotation) added
+- "See also" expanded
+
+0.01 2014-05-21
+
+- Initial version

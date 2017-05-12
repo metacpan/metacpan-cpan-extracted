@@ -1,0 +1,58 @@
+
+2012/07/01 version 1.17
+
+Document -file_format, -quality_percent common attributes.
+
+2011/07/10 version 1.16
+
+New diamond() method.
+
+2011/02/15 version 1.15
+
+Tests use plain Test.pm
+
+2011/01/26 version 1.14
+
+Oops, actual add_colours() code, not just docs.
+
+2011/01/23 version 1.13
+
+Add add_colours() base method.
+Document some common attributes like -file.
+
+2010/11/17 version 1.12
+
+Add ellipse() $fill parameter.
+
+2010/10/22 version 1.11
+
+Tweak ellipse() discriminator changeover, use rectangle() for smalls.
+
+2010/10/08 version 1.10
+
+Enhance rectangle() unfilled to not overlap drawn pixels.
+
+2010/10/04 version 1.09
+
+Fix ellipse() on even width or height.
+    - avoid calling xy() with 0.5 fractional position
+    - helps drawing of right/bottom edges depending how subclasses rounded
+Fix ellipse() horizontal ends when small height and big width.
+Docs cross reference modules extending Image::Base.
+
+2010/09/18 version 1.08
+
+Fix line() for shallow slope rounding.
+Fix line() for steep slope pixel spacing.
+
+
+2000/05/05
+
+Added some basic drawing methods. Minor documentation changes.
+
+
+2000/05/04
+
+Created. 
+
+

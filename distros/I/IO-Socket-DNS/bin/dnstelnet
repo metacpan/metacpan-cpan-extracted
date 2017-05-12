@@ -1,0 +1,110 @@
+#!/usr/bin/perl -w
+
+=head1 NAME
+
+dnstelnet - Wrapper script for IO::Socket::DNS
+
+=head1 SYNOPSIS
+
+  dnstelnet --suffix=DNS_Suffix --password=<PASSWORD> <host> <port>
+
+=head1 DESCRIPTION
+
+This is mostly just a tester utility to make sure that dnsd is
+configured and running properly. This will tunnel a TCP
+connection through the DNS proxy server to any TCP server
+using the telnet command.
+
+=head1 EXAMPLE
+
+  dnstelnet --suffix=d.example.com --password=SeCrEt cpan.mx.develooper.com 25
+
+=head1 SEE ALSO
+
+dnsc, dnsd, telnet
+
+=head1 AUTHOR
+
+Rob Brown, E<lt>bbb@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2011-2012 by Rob Brown
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.9 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut
+
+use strict;
+use IO::Socket;
+
+$ENV{DNS_SUFFIX} ||= do { my $try = "DNS_Suffix"; $try =~ /\./ ? $try : ""; };
+my $suffix = $ENV{DNS_SUFFIX};
+my $passwd = $ENV{DNS_PASSWORD};
+my @args = @ARGV;
+
+for (my $i = 0; $i < @args; $i++) {
+    if ($args[$i] =~ /^\-\-?su[^=]*=?(.*)/) {
+        # Detect option --suffix=...
+        my $s = $1;
+        splice(@args, $i, 1);
+        if (!length $s) {
+            ($s) = splice(@args, $i, 1);
+        }
+        $suffix = $s;
+        $i--;
+    }
+    if ($args[$i] =~ /^\-\-?pa[^=]*=?(.*)/) {
+        # Detect option --password=...
+        my $s = $1;
+        splice(@args, $i, 1);
+        if (!length $s) {
+            ($s) = splice(@args, $i, 1);
+        }
+        $passwd = $s;
+        $i--;
+    }
+}
+
+$ENV{DNS_SUFFIX} = $suffix or die "Tunnel DNS Suffix must be specified\n";
+$ENV{DNS_PASSWORD} = $passwd if $passwd;
+my $host = shift @args or die "Specify the host or IP to connect to.\n";
+my $port = shift @args;
+if (!$port) {
+    $port = $1 if $host =~ s/:(\d+)$//;
+}
+$port or die "Unable to determine which port you want to connect to.\n";
+
+my $dnsc = $0;
+if ($dnsc =~ s/dnstelnet/dnsc/) {
+    if (-x $dnsc) {
+        warn "Using proxy program: $dnsc ...\n";
+    }
+    else {
+        die "Unable to find dnsc client proxy software\n";
+    }
+}
+else {
+    die "$dnsc: Unimplemented invocation.\n";
+}
+
+# Just choose any available ephemeral port and reuse it
+my $proxy_port = IO::Socket::INET->new(Listen => 1)->sockport
+    or die "Unable to choose a proxy port: $!\n";
+warn "Using proxy_port $proxy_port ...\n";
+my $proxy_pid = fork;
+if (!$proxy_pid) {
+    # Child process #1
+    # Start up the proxy client invisibly
+    open STDIN,  "</dev/null";
+    open STDOUT, ">/dev/null";
+    open STDERR, ">/dev/null";
+    exec $dnsc, "--suffix",$suffix, "--listen",$proxy_port, $host, $port or die "exec: $dnsc: $!";
+}
+
+# Wait a bit for the proxy server to turn on
+sleep 2;
+# Run the actual telnet program
+exec telnet => localhost => $proxy_port;

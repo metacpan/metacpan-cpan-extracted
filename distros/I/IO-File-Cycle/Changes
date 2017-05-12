@@ -1,0 +1,8 @@
+Revision history for IO-File-Cycle
+
+0.01    18 Sep 2012
+        First version, released on an unsuspecting world.
+
+0.02    4 Oct 2012
+        Archive with GNU tar so old Archive::Tar doesn't blow chunks
+

@@ -1,0 +1,33 @@
+Revision history for Perl extension IO::LockedFile.
+
+0.23  Thu Feb 20 13:15:33 CET 2003
+	- Removed a croak when failing to unlock in Flock.pm. I 
+	  removed it in order to avoid from that croak in the wrong
+	  time when running on cygwin. It seems that beside this 
+	  problem it runs correctly on cygwin. If someone can clear 
+          this issue for me - please do.
+
+0.22  Tue Sep 24 14:11:39 CEST 2002
+	- Just fixed the copyright notice.  
+
+0.21  Thu May 16 09:40:16 CEST 2002
+	- Thanks to Ho Ming Shun who found and patched a bug in the open
+          method. The bug occured when numeric mode was used, the opened 
+          file would be locked exclusively always. 
+        - The test.pl was re-written to add some more tests.
+
+0.2   Mon Apr  2 14:30:31 CEST 2001
+	- Many changes due to the great contribution of Rob Napier: 
+	  The class became abstract where classes in the directory
+	  LockedFile implements it. This way new schemes other then
+	  Flock can be introduced. The interface was extended as a
+	  result of that, and the options hash was introduced. Among
+	  the new features: opening a file that is not yet locked,
+	  blocking & unblocking locks, checking if the file is opened
+	  to write and supplying this information to the lock method
+	  (so for example shared lock can be used on files that are
+	  read), print method, and truncate method.
+
+0.1   Fri Feb  9 15:21:28 CET 2001
+	- First distribution on CPAN
+

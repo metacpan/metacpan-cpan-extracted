@@ -1,0 +1,31 @@
+Copyright 2011 Kevin Ryde
+
+This file is part of Image-Base-SVG.
+
+Image-Base-SVG is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3, or (at your option)
+any later version.
+
+Image-Base-SVG is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You can get a copy of the GNU General Public License online at
+<http://www.gnu.org/licenses/>.
+
+
+
+Version 4, July 2011
+    - tests avoid XML::Parser::Expat warnings from perl 5.14 tied
+      handle incompatible change
+
+Version 3, July 2011
+    - new diamond() method
+
+Version 2, June 2011
+    - tests allow for no add_colours()
+
+Version 1, June 2011
+    - the first version

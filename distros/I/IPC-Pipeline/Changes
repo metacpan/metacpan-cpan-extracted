@@ -1,0 +1,83 @@
+Version 1.0
+
+    * Resolve ticket https://rt.cpan.org/Public/Bug/Display.html?id=95917 --
+      LANG-related CPANTs failures in t/pipeline.t
+
+Version 0.9
+
+    * Resolve ticket https://rt.cpan.org/Public/Bug/Display.html?id=88229
+
+    * Fix functionality with 5.19+
+
+Version 0.8
+
+    * Resolve ticket https://rt.cpan.org/Ticket/Display.html?id=82824
+
+Version 0.7
+
+    * No functional changes
+
+    * Improve documentation
+
+    * Prevent building on MSWin32, due to lack of dup2() availability
+
+    * Require 5.8.1, not 5.8.0
+
+Version 0.6
+
+    * Ensure unit tests pass on Perl 5.8; declare a dependency on that version
+      of Perl in Makefile.PL
+
+    * Fix incorrect LICENSE declaration in Makefile.PL
+
+    * die() when standard input, output, or error arguments, even placeholders,
+      are not specified
+
+    * Always dup2() child process stderr fds to a standard error pipe, whether
+      or not an lvalue is passed for the stderr reader
+
+    * Will now return an ARRAY ref of pids in scalar context
+
+    * Remove dependency on Test::Exception in unit tests to allow for possible
+      future Perl 5.6 support, as Test::Exception does not build under those
+      circumstances currently
+
+Version 0.5
+
+    * Reassigned to the Perl artistic license under the cPanel copyright.
+
+Version 0.4
+
+    * Pare down superfluous bits of IPC::Pipeline
+
+    * Maximize unit test coverage, excluding any portions which test code
+      that would run in a subprocess
+
+    * Implicitly use POSIX module without an import() call
+
+    * Only list Test:: dependencies as build-time dependencies in
+      Makefile.PL
+
+    * Minor tweaks to code for style, consistency, and a small unchecked
+      exec() bug
+
+    * Implement support for executing CODE refs as parts of a pipeline
+
+    * Improve and reorganize documentation into smaller sections
+
+Version 0.3
+
+    A release to fix documentation which was inconsistent with the previous
+    implementation regarding the way the file handle positional parameters
+    were being handled.  This also fixes the code to allow receipt of file
+    typeglobs, numeric file descriptors, and the usual positional scalar
+    substitution method.  Note that an implicit dependency upon POSIX::dup2()
+    is now made if numeric file descriptors are passed, as a workaround to
+    undesirable multiple calls to the dup2() system call by Perl's open()
+    when used in the expected (but unexpectedly resultant) manner.
+
+    Some 80-column comment tweaks are also made in this release.
+
+Version 0.2
+
+    Initial release, 2 June 2010.

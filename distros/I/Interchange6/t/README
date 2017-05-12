@@ -1,0 +1,7 @@
+Tests are split up as follows:
+
+t/author - tests are only run if RELEASE_TESTING is set
+t/unit   - each test script tests an individual class *excluding* any
+           functionality imported from roles
+t        - top-level tests cover all remaining functionality
+           

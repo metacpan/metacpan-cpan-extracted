@@ -1,0 +1,242 @@
+# NAME
+
+Image::JpegMinimal - create JPEG previews without headers
+
+# SYNOPSIS
+
+    my $compressor = Image::JpegMinimal->new(
+        xmax => 42,
+        ymax => 42,
+        jpegquality => 20,
+    );
+
+    sub gen_img {
+        my @tags;
+        for my $file (@_) {
+            my $imager = Imager->new( file => $file );
+            my $preview = $compressor->data_preview( $file );
+            my ($w, $h ) = ($imager->getwidth,$imager->getheight);
+        
+            my $html = <<HTML;
+    <img width="${w}px" height="${h}px"
+       data-preview="$preview"
+       src="$file"
+       />
+    HTML
+            push @tags, $html;
+        };
+        
+        return @tags
+    }
+
+    # This goes into your HTML
+    print join "\n", gen_img(@ARGV);
+
+    # The headers accumulate in $compressor
+    my %headers = $compressor->headers;
+    
+    # This goes into your Javascript
+    print $headers{l};
+    print $headers{p};
+
+# DESCRIPTION
+
+This module implements the ideas from
+[https://code.facebook.com/posts/991252547593574](https://code.facebook.com/posts/991252547593574)
+to create the data needed for inline previews of images that can be served
+within the HTML page while keeping a low overhead of around 250 bytes per
+image preview. This is achieved by splitting up the preview image into
+a JPEG header which is common to all images and the JPEG image data.
+With a Javascript-enabled browser, these previews will be shown until
+the request for the real image has finished loading the data. This reduces
+the latency and bandwidth needed until the user sees an image.
+
+It turns the following image
+
+<div>
+
+      <img width="285" height="427" src="t/data/IMG_7468.JPG" />
+      <img width="285" height="427" src="../../t/data/IMG_7468.JPG" />
+</div>
+
+into 250 bytes of image data representing this image:
+
+<div>
+
+      <img width="28" height="42" src="t/data/IMG_7468_preview.JPG" />
+      <img width="28" height="42" src="../../t/data/IMG_7468_preview.JPG" />
+</div>
+
+The Javascript on the client side then scales and blurs that preview
+image to create a very blurry placeholder until the real image data
+arrives from the server.
+
+<div>
+
+      <img width="285" height="427" src="t/data/IMG_7468_blurred.JPG" />
+      <img width="285" height="427" src="../../t/data/IMG_7468_blurred.JPG" />
+</div>
+
+See below for the Javascript needed to reassemble the image data
+from the split header and scan data.
+
+# METHODS
+
+## `Image::JpegMinimal->new( %OPTIONS )`
+
+    my $compressor = Image::JpegMinimal->new(
+        xmax => 42,
+        ymax => 42,
+        jpegquality => 20,
+    );
+
+Creates a new compressor object. The `xmax` and `ymax` values
+give the maximum dimensions for the size of the preview image.
+It is suggested that the preview image is heavily blurred when
+presenting the preview image to the user to hide the JPEG artifacts.
+
+## `$compressor->data_preview`
+
+    my $data_preview = $compressor->data_preview( $file );
+
+Reads the JPEG data from a file and returns a base64 encoded string of
+the reduced image data. You stuff this into the `data-preview`
+attribute of the `img` tag in your HTML.
+
+## `$compressor->headers`
+
+    my %headers = $compressor->headers;
+
+After processing all files, this method
+returns the headers that are common to the images.
+You need to pass this to your Javascript.
+
+# HTML
+
+Each image that has a pre-preview placeholder will need to store the
+placeholder data in the `data-preview` attribute. That is all
+the modification you need. You should also set the `width`
+and `height` attributes of the image so that no ugly image-popping
+occurs when the real data arrives. The `$payload64` is the data
+that is returned from the `->data_preview` call.
+
+    <img width="${final_width}px" height="${final_height}px"
+       data-preview="$payload64"
+       src="$file"
+       />
+
+# JAVASCRIPT
+
+You will need to include some Javascript like the following in your
+page, preferrably near the end so the code runs right after
+the HTML has loaded completely but image loading has not yet fired.
+
+The hash `%headers` should be set to the base64
+encoded fixed headers as returned by the `->headers( $file )` call.
+The image HTML should have been constructed as outlined above.
+
+    "use strict";
+
+    var header = {
+        l : atob("$headers{l}"),
+        h : atob("$headers{p}"),
+    };
+    function reconstruct(data) {
+        // Reconstruct a JPEG header from our special data structure
+        var raw = atob(data);
+        // Keep as "char" so we don't have to bother with Unicode vs. ASCII
+        var width  = raw.charAt(0);
+        var height = raw.charAt(1);
+        var payload = raw.substring(2,raw.length);
+        var head;
+        if( width < height ) {
+            head = header["p"]
+        } else {
+            head = header["l"]
+        };
+        var dimension_patch = width+height;
+        var patched_header = head.substring(0,head.length-13)
+                           + width
+                           + head.substring(head.length-12,head.length-11)
+                           + height
+                           + head.substring(head.length-10,head.length);
+        var reconstructed = patched_header+payload;
+        var encoded = "data:image/jpeg;base64,"+btoa(reconstructed);
+        return encoded;
+    }
+
+    var image_it = document.evaluate("//img[\@data-preview]",document, null, XPathResult.ANY_TYPE, null);
+    var images = [];
+    var el = image_it.iterateNext();
+    while( el ) {
+        images.push(el);
+        el = image_it.iterateNext();
+    };
+
+    for( var i = 0; i < images.length; i++ ) {
+        var el = images[ i ];
+        if( !el.complete || el.naturalWidth == 0 || el.naturalHeight == 0) {
+        
+            var fullsrc = el.src;
+            var loadsrc = reconstruct( el.getAttribute("data-preview"));
+            var container = document.createElement('div');
+            container.style.overflow = "hidden";
+            container.style.display = "inline";
+            container.style.position = "relative";
+
+            var parent = el.parentNode;
+            parent.insertBefore(container, el);
+            container.appendChild(el);
+
+            // Set up the placeholder data
+            el.src = loadsrc;
+            el.style.filter = "blur(8px)";
+            var img = document.createElement('img');
+            img.width = el.width;
+            img.height = el.height;
+            // Shouldn't we also copy the style and maybe even some events?!
+            // img = el.cloneNode(true); // except this doesn't copy the eventListeners etc. Duh.
+            (function(img,container,src) {
+                img.onload = function() {
+                    // Put the loaded child in the place of the preloaded data
+                    parent.replaceChild(img,container);
+                };
+                var timeout = 1000+Math.random()*3000;
+                // Kick off the loading
+                // The timeout is just for demonstration purposes
+                // window.setTimeout(function() {
+                    img.src = src;
+                //}, timeout);
+            }(img,container,fullsrc));
+        } else {
+            // Image has already been loaded (from cache), nothing to do here
+        };
+    };
+
+# REPOSITORY
+
+The public repository of this module is 
+[http://github.com/Corion/image-jpegminimal](http://github.com/Corion/image-jpegminimal).
+
+# SUPPORT
+
+The public support forum of this module is
+[https://perlmonks.org/](https://perlmonks.org/).
+
+# BUG TRACKER
+
+Please report bugs in this module via the RT CPAN bug queue at
+[https://rt.cpan.org/Public/Dist/Display.html?Name=Image-JpegMinimal](https://rt.cpan.org/Public/Dist/Display.html?Name=Image-JpegMinimal)
+or via mail to [jpeg-minimal-Bugs@rt.cpan.org](https://metacpan.org/pod/jpeg-minimal-Bugs@rt.cpan.org).
+
+# AUTHOR
+
+Max Maischein `corion@cpan.org`
+
+# COPYRIGHT (c)
+
+Copyright 2015 by Max Maischein `corion@cpan.org`.
+
+# LICENSE
+
+This module is released under the same terms as Perl itself.

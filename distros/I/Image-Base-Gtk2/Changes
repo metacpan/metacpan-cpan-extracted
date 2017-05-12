@@ -1,0 +1,53 @@
+Copyright 2010, 2011, 2012 Kevin Ryde
+
+This file is part of Image-Base-Gtk2.
+
+Image-Base-Gtk2 is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3, or (at your option)
+any later version.
+
+Image-Base-Gtk2 is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You can get a copy of the GNU General Public License online at
+<http://www.gnu.org/licenses/>.
+
+
+
+Version 11, February 2012
+    - Pixbuf,Image clip drawing to 0,0,width,height
+
+Version 10, August 2011
+    - fix Drawable diamond() coordinates
+
+Version 9, August 2011
+    - fix Drawable ellipse() use rectangle for 2 wide or high
+
+Version 8, July 2011
+    - new -quality_percent option for JPEG
+    - Drawable diamond() using draw_polygon
+
+Version 7, June 2011
+    - Pixbuf fix blue/green wrong way around!
+
+Version 6, December 2010
+    - hex colours in lower case too
+    - new Image::Base::Gtk2::Gdk::Image
+
+Version 5, November 2010
+    - ellipse() $fill parameter
+
+Version 4, September 2010
+    - test manifest only as an author test
+
+Version 3, August 2010
+    - new Image::Base::Gtk2::Gdk::Pixbuf
+
+Version 2, July 2010
+    - lower some stray "use 5.010"s
+
+Version 1, July 2010
+    - the first version

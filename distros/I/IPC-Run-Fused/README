@@ -1,0 +1,45 @@
+IPC::Run::Fused
+
+Have you ever tried to do essentially the same as you would in bash do
+to this:
+
+  parentapp <( app 2>&1  )
+
+And found massive road works getting in the way.
+
+Sure, you can always do this style syntax:
+
+  open my $fh, 'someapp --args foo 2>&1 |';
+
+But that's not very nice, because
+
+1. you're relying on a sub-shell to do that for you
+2. you have to manually escape everything
+3. you can't use list context.
+
+And none of this is very Modern or Nice
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Kent Fredric
+<kentfredric@gmail.com>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,28 @@
+Copyright 2011, 2012 Kevin Ryde
+
+This file is part of Image-Base-Tk.
+
+Image-Base-Tk is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3, or (at your option)
+any later version.
+
+Image-Base-Tk is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You can get a copy of the GNU General Public License online at
+<http://www.gnu.org/licenses/>.
+
+
+
+
+Version 3, October 2011
+    - Photo clip to 0,0,width,height
+
+Version 2, August 2011
+    - fix diamond() coordinates and filled outline
+
+Version 1, August 2011
+    - the first version

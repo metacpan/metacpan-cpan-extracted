@@ -1,0 +1,16 @@
+Build.PL
+Changes
+lib/IO/Ppoll.pm
+lib/IO/Ppoll.xs
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00use.t
+t/01handles.t
+t/02sigmask.t
+t/03poll.t
+t/04poll-sigmask.t
+t/99pod.t

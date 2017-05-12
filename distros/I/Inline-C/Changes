@@ -1,0 +1,277 @@
+0.76 Wed Jul  1 08:09:50 PDT 2015
+ - Support for cppflags
+
+0.75 Fri Mar 13 18:41:18 PDT 2015
+ - Doc fixes - links from Inline::C to Cookbook
+
+0.74 Tue Feb 17 16:19:00 PST 2015
+ - Windows fixes. Mithaldu++
+
+0.73 Thu Jan  1 17:10:15 PST 2015
+ - Fix Swim plugins and Meta to include Sisyphus in Authors and Copyright
+
+0.72 Thu Jan  1 15:43:37 PST 2015
+ - Support for Inline::Filters::* plug-ins. Fractal++
+ - Complete doc refactoring
+
+0.71 Sat Dec 27 00:44:20 PST 2014
+ - Make tests pass on Win32
+
+0.70 Fri Dec 26 21:43:44 PST 2014
+ - Windows depends on Win32::Mutex now
+
+0.69 Fri Dec 26 23:13:52 GMT 2014
+ - 27inline_maker.t - remove install-dir after each module, to help Win32
+
+0.68 Wed Dec 24 09:14:31 GMT 2014
+ - Fixups for Windows test 27, skip 26 on WinXP for now
+
+0.67 Tue Nov 25 16:59:41 GMT 2014
+ - Skip test/pegex-parser.t unless env PERL_INLINE_DEVELOPER_TEST set
+
+0.66 Mon Nov 17 06:09:54 GMT 2014
+ - Make test/pegex-parser.t less fragile on fail
+ - No CPAN index of Inline::C::Parser classes
+
+0.65 Tue Nov  4 04:23:45 GMT 2014
+ - Changes to example modules' tests
+ - Updates for EUMM 7.00's support for PERL IN SPACE
+ - Cookbook addition to use autowrap to replace h2xs
+
+0.64 Fri Sep 19 23:22:49 UTC 2014
+ - Major release for all the work since 0.62
+ - Renamed the parser modules
+ - Adjusted the `using` paramater
+ - Updated docs
+
+0.62_13 Thu Sep 11 17:37:28 PDT 2014
+ - Remove XXX debugging
+
+0.62_12 Sun Sep  7 00:37:23 MDT 2014
+ - Add issue/27 TODO test
+ - Switch back to Parse::Recdescent for now
+
+0.62_11 Tue Aug 19 16:14:10 PDT 2014
+ - Replace tabs with spaces
+
+0.62_10 Tue Aug 19 15:54:05 PDT 2014
+ - Doc fix from Jin++
+
+0.62_09 Sat Aug 16 16:38:38 PDT 2014
+ - Remove $testdir vars from tests
+
+0.62_08 Sat Aug 16 15:00:53 PDT 2014
+ - Remove .gitignore
+
+0.62_07 Sat Aug 16 11:13:27 PDT 2014
+ - Meta 0.0.2
+
+0.62_06 Sat Aug 16 01:25:40 PDT 2014
+ - Clean up test code
+
+0.62_05 Fri Aug 15 19:58:53 PDT 2014
+ - Add t/000-require-modules.t
+
+0.62_04 Fri Aug 15 18:24:39 PDT 2014
+ - Add t/000-compile-modules.t
+
+0.62_03 Fri Aug  1 21:10:35 PDT 2014
+ - Fix test/requires
+
+0.62_02 Fri Aug  1 18:00:01 PDT 2014
+ - Pegex replaces Parse::RecDescent as the default parser
+
+0.62_01 Tue Jul 29 02:22:12 BST 2014
+ - version-parsing improvements
+ - Test module build in dir with space.
+ - Perl licence on Cookbook
+ - t/TestInlineSetup.pm fixes for Windows DLLs, tainting
+
+0.62 Sat Jul 19 22:43:12 BST 2014
+ - eg/modules moved to here as they're C
+ - tests each use own dir, and all use Test::More and
+   test/TestInlineSetup.pm.
+ - doc/Inline/C/Cookbook.swim mention strings can be UTF-8.
+
+0.61 Thu Jul 17 07:50:43 PDT 2014
+ - Add mailing list info to Meta and Contributing
+
+0.60 Sun Jul 13 21:41:36 PDT 2014
+ - Add Contributing file
+ - Fix Metadata
+
+0.59 Sat Jul 12 12:09:19 PDT 2014
+ - Finish migrating and updating docs
+
+0.58 Fri Jul 11 07:02:53 BST 2014
+ - Fix prereqs
+
+0.57 Fri Jul 11 01:51:14 BST 2014
+ - Inline::C separated from Inline
+
+0.56_03 Fri Jul 11 01:20:18 BST 2014
+ - Test of release system.
+
+0.56_02 Thu Jul 10 04:13:56 BST 2014
+ - Make depend on Inline 0.56.
+ - Tidy up after tests.
+
+0.56_01 Thu Jul 10 01:21:08 BST 2014
+ - Merge in changes to inline-pm repo since this was split off.
+
+0.54 Thu Jun 26 10:22:29 PDT 2014
+ - First release of Inline::C as its own distribution.
+
+0.53_01 Thurs 15 Aug 2013
+ - Add C/t/24prefix.t
+
+0.53 Wed 1 May 2013
+ - Version 0.53 released to CPAN
+ - Add C/t/23validate.t test script.
+
+0.52_02 Wed 24 Apr 2013
+ - Version 0.52_02 released to CPAN
+ - C.pm - Small tweak to setting of $o->{ILSM}{MAKEFILE}{INC} in validate()
+   sub. Thanks, Ian Goodacre. (Ticket
+
+0.52_01 Thurs 11 Apr 2013
+ - Version 0.52_01 released to CPAN
+
+0.52 Thurs 07 Mar 2013
+ - Version 0.52 released to CPAN.
+ - C-Cookbook.pod - Change the "Object Oriented Inline" example so that it
+   doesn't emit a "print (...) interpreted as function" warning if it's run
+   with warnings enabled.
+
+0.51_03 Wed 28 Nov 2012
+ - Version-0.51_03 released to CPAN.
+ - C-Cookbook.pod - Add additional example ("Providing a pure perl
+   alternative").
+ - C.pm - Change sub compile so that it chdirs back to the original cwd
+   before it dies (if the build fails). (Ticket
+
+0.51_02 Tues 20 Nov 2012
+ - Version-0.51_02 released to CPAN.
+ - Makefile.PL - correct typo.
+
+0.51_01 20 Nov 2012
+ - Version-0.51_01 released to CPAN.
+ - C.pm - setting $ENV{NO_INSANE_DIRNAMES} turns quote_space() into a
+   no-op. (This is just an undocumented fallback option in case the
+   quote_space() handling  of spaces breaks something for someone who has
+   no need of "space handling" anyway.)
+ - additional tweaks to quote_space sub [Ticket
+ - Makefile.PL - Set EU::MM PREREQ_PM to 6.62, but only if the current
+   version of EU::MM is 6.57_x, and even then only if building with
+   INSTALL_BASE. (Ticket
+
+0.51 Sat 13 Oct 2012
+ - Version 0.51 released to CPAN.
+
+0.50_03 Mon 8 Oct 2012
+ - Fix Reini's patch (#67053). The original version of quote_space() caused
+   a breakage whenever the INC Config argument contained more than one -I
+   switch. (See
+
+0.50_02 Tues 14 Feb 2012
+ - C.pm - Bump version number to 0.50_02
+
+0.50_01 Wed 8 Feb 2012
+ - C.pm - Bump version number to 0.50_01
+
+0.50 Tues 7 Feb 2012
+ - Version 0.50 released to CPAN
+ - C.pm - Bump version number to 0.50
+
+0.49_02 Fri 3 Feb 2012
+ - Version 0.49_02 released to CPAN
+ - C.pm - Bring version numbering into line with recommendations made in
+ - http://perldoc.perl.org/perlmodstyle.html#Version-numbering
+
+0.49_01 Sun 25 Dec 2011
+ - C.pm - Bump version to 0.49_01
+ - C.pod - Fix typo. (Ticket 73108)
+
+0.49 Thurs 8 Dec 2011
+ - Version 0.49 released to CPAN. (No changes from 0.48_02).
+
+0.48_02 Thurs 25 Aug 2011
+ - Add example for accessing fortran code to C-Cookbook.
+
+0.48_01 Mon 11 Apr 2011
+ - Version 0.48_01 released to CPAN.
+ - C/C.pm - [cpan #67053] Space in pwd. Patch from Reini Urban to work with
+   spaces in the current dir.
+
+0.48 Mon 21 Feb 2011
+ - Version 0.48 released to CPAN. (No changes from 0.47_02.)
+
+0.47_02 Tues 1 Feb 2011
+ - Version 0.47_02 released to CPAN.
+ - Change the Test::Warn dependency from 0.22 to 0.21 and specify it in
+   top-level Makefile.PL instead of in C/Makefile.PL.
+
+0.47_01 Sun 30 January 2011
+ - Version 0.47_01 released to CPAN.
+ - Use Test::Warn (on perl-5.8 and later) to check and suppress the
+   warnings produced by C/t/08taint.t during 'make test'. (Ticket
+
+0.47 Fri 21 January 2011
+ - Version 0.47 released to CPAN. No changes from 0.46_02
+
+0.46_02 Sat 17 Apr 2010
+ - C-Cookbook.pod - Fix callback example. (RT ticket 56652)
+
+0.46_01 Sun 14 Feb 2010
+ - Second attempt at accommodating 'ccache cc' compiler (RT ticket 40140)
+
+0.46 Fri 12 Feb 2010
+ - Same as 0.45_02.
+
+0.45_02 Fri 5 Feb 2010
+ - Add C/t/08taint.t as part of RT ticket 13084 fix. See top level
+   "Changes" file.
+
+0.45_01 Thurs 28 Jan 2010
+ - Fix Rt tickets 40140, 45417 and 49419. See top level "Changes" file.
+
+0.45 Sat Nov 22 2008
+ - No changes from 0.44_01
+
+0.44_01 Tues Oct 11 2008
+ - In C/C.pm, allow for the calling of multiple typemaps (RT ticket 5639),
+   and have the "No Inline C functions bound to Perl" warning specify the
+   file for which no bindings were found (RT ticket 17774).
+
+0.43 Sat Jul  7 12:53:33 PDT 2001
+ - Break up the generation of XS code into smaller stages which can be
+   overridden in Inline::CPP. Makes the code somewhat longer, but more
+   clear. (NEILW)
+
+0.42 Sun Jun 10 18:34:36 PDT 2001
+ - Patch that prevents Inline from creating a nonexistent sitelib. Thanks
+   Joey Hess.
+
+0.41 Tue Jun  5 01:49:32 PDT 2001
+ - Added AUTOWRAP config option
+
+0.40 Wed May 23 20:21:32 PDT 2001
+ - 0.40 integration
+ - Changed object references
+ - Account for no trailing '/' in paths
+
+0.34 Tue May  1 00:05:58 PDT 2001
+ - Fixed compiler detection bugs in Makefile.PL
+
+0.33 Sat Apr 28 20:20:29 PDT 2001
+ - Rearranged test harness. Moved all C tests from Inline to Inline::C
+
+0.32 Fri Feb 23 03:16:27 PST 2001
+ - Special case for AIX ($Config{so})
+
+0.31 Sat Jan 13 12:41:38 PST 2001
+ - Changed over to new Inline DIRECTORY structure.
+
+0.30 Fri Dec  8 01:55:43 PST 2000
+ - Created Inline::C. Separated C code from Inline 0.26
+

@@ -1,0 +1,52 @@
+ImageMagick-Iterator version 0.01
+=============================
+
+These modules add iteration support to Image::Magick.  This means that
+if you have a stream of concatenated images, you can access each image
+in the stream as an independent Image::Magick object.
+
+Iteration functionality is not present in Image::Magick itself as of
+version 5.56.  Passing a stream of concatenated images would result in
+essentially a "stack" of images which would all be manipulated in
+parallel by any Image::Magick calls.  Calls to Write() either output
+an animated series of image (a la animated GIFs), or the first image in
+the series.
+
+Image::Magick::Iterator is extensible to support many different
+image filetypes.  Currently only PPM support is implemented.  To iterate
+over a PPM stream, the code would look something like:
+
+  my $iter = Image::Magick::Iterator->new();
+
+  #assume PPM stream is coming from STDIN;
+  $iter->handle(\*STDIN);
+
+  #explicitly set format to PPM, there is no auto-detection built in
+  $iter->format('PPM');
+
+  while(my $image = $iter->next){
+    print $image->Get('height'),"\n"; #access height attribute of each
+                                      #Image::Magick object
+  }
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Image::Magick 5.56
+  Image::PBMlib 1.05
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 by Allen Day, allenday@ucla.edu
+
+This library is released under GPL, the GNU General Public License

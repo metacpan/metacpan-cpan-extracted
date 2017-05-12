@@ -1,0 +1,6 @@
+Revision history for Perl extension Image::Xbm2bmp.
+
+0.0.2  Fri Dec 10 03:21:53 2004
+	- original version; created by h2xs 1.23 with options
+		-n Image::Xbm2bmp -v 0.0.2
+

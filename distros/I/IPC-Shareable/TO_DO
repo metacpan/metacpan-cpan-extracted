@@ -1,0 +1,24 @@
+Feel free to tackle any of these or any other problems you find.  All
+I ask is that you send me your changes so that they can be
+incorporated into a common codebase for everyone to benefit from
+(also, so you can get credit for your work!).
+
+- rewriting the core of Shareable in C to gain speed and memory
+efficiency.  (Update as of January, 1998: I am presently working on
+this.  If anybody else has made progress in this area, please let me
+know so our efforts can be coordinated.) (Update as of March, 2000: I
+quickly ran out of tuits to complete the rewrite in C.  Maybe some
+other time)
+
+- perhaps add news ways to share data in addition to shared memory so
+that the module becomes portable
+
+- have Shareable print proper error messages when system calls fail
+
+- really blue sky: could the module overload some operators so that
+their use will automatically invoke locking and unlocking of a tie()d
+variable?
+
+--
+Ben Sugars <bsugars@canoe.ca>
+March 5, 2001

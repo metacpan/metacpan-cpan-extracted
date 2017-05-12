@@ -1,0 +1,25 @@
+#!/usr/bin/perl -w
+#
+use strict;
+use warnings;
+use Image::MetaData::JPEG;
+
+sub do_file {
+    my ($filename) = @_;
+    print '=' x 80 . "\nProcessing $filename ...\n";
+
+    # opening file and retrieving information
+    my $file = new Image::MetaData::JPEG($filename);
+    return print "Error: " . Image::MetaData::JPEG::Error() unless $file;
+    
+    # get description
+    print $file->get_description(); # this shows all parsed JPEG records
+    
+    # save file
+#    (my $basename = $filename) =~ s-^.*/([^/]+)$-$1-;
+#    $file->save("copy-$basename");
+}
+
+### the main body starts here
+if ($#ARGV < 0) { printf "Usage: $0 file [files]\n"; exit 2; }
+while (my $filename = shift @ARGV) { do_file $filename ; }

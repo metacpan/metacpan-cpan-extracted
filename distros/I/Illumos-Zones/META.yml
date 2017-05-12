@@ -1,0 +1,29 @@
+--- #YAML:1.0
+name:               Illumos-Zones
+version:            0.1.4
+abstract:           A Perl Module to administrate Illumos Zones.
+author:
+    - Dominik Hassler <hadfl@cpan.org>
+license:            gpl_3
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    Data::Processor:  0
+    Test::More:       0
+requires:
+    perl:  5.010001
+resources:
+    bugtracker:  https://github.com/hadfl/Illumos-Zones/issues
+    license:     http://opensource.org/licenses/GPL-3.0
+    repository:  https://github.com/hadfl/Illumos-Zones
+no_index:
+    directory:
+        - t
+        - inc
+        - t
+        - setup
+generated_by:       ExtUtils::MakeMaker version 6.57_05
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

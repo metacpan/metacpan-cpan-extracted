@@ -1,0 +1,78 @@
+Revision history for IO-Async-Loop-Epoll
+
+0.17    2015/11/09 17:59:19
+        [CHANGES]
+         * Provide a more meaningful error message if the fd->filehandle
+           mapping changes without the module being told
+
+        [BUGFIXES]
+         * Bugfix for Linux::Epoll API - functions return undef on error, not
+           -1
+         * Fix typo (RT88845)
+
+0.16    BUGFIXES:
+         * Remmeber to set zero timeout when there are fakeevents to use
+
+0.15    BUGFIXES:
+         * Add support for IO_ASYNC_WATCHDOG
+
+0.14    BUGFIXES:
+         * Fix for unwatch/rewatch IO case (RT78175)
+
+0.13    CHANGES:
+         * Rewrite to use Linux::Epoll instead, which has nicer scaling than
+           IO::Epoll
+
+0.12    BUGFIXES:
+         * Only declare known support for on_hangup on Linux just on the
+           offchance that some non-Linux OS ever gains epoll
+         * Fix timing-related bugs by rounding epoll_pwait() timeout up to the
+           next milisecond (RT73498)
+         * on_hangup also needs to test for EPOLLERR condition
+
+0.11    CHANGES:
+         * Dynamically scale epoll_pwait() maxevents parameter to avoid
+           stalling higher-numbered FDs during high load
+         * Emulate non-epoll'able filehandles (e.g. regular files) as always
+           read/write-ready
+
+0.10    BUGFIXES:
+         * Try to workaround perl blobk/unblock signals bug by using an unsafe
+           POSIX::SigAction handler
+
+0.09    CHANGES:
+         * Updated API version for IO::Async 0.33
+
+0.08    CHANGES:
+         * Full example in SYNOPSIS section
+
+        BUGFIXES:
+         * Handle EPOLLERR as on_read_ready
+
+0.07    CHANGES:
+         * Updated for IO-Async 0.24
+         * Use shared acceptance testing provided by IO::Async::LoopTests
+
+0.06    CHANGES:
+         * Various small updates to keep CPANTS happy
+
+0.05    CHANGES:
+         * Added 'use warnings'
+
+        BUGFIXES:
+         * Don't rely on writability of STDOUT during test scripts
+
+0.04    CHANGES:
+         * Updated for IO-Async 0.20
+
+0.03    BUGFIXES:
+         * Better handling of write-only Notifiers
+
+0.02    CHANGES:
+         * Use low-level IO::Epoll interface (epoll_ctl() etc..) instead of
+           high-level IO::Poll-alike object wrapper. Should be better
+           performance, and less buggy - doesn't depend on poor IO::Poll-like
+           emulation details.
+
+0.01    First version, released on an unsuspecting world.
+

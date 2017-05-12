@@ -1,0 +1,292 @@
+=head1 NAME
+
+Inline::ASM - Write Perl Subroutines in assembler.
+
+=head1 SYNOPSIS
+
+   print "9 + 16 = ", add(9, 16), "\n";
+   print "9 - 16 = ", subtract(9, 16), "\n";
+
+   use Inline ASM => 'DATA', 
+	      AS => 'as',
+	      PROTO => {add => 'int(int,int)'};
+
+   use Inline ASM => 'DATA',
+	      AS => 'nasm',
+	      ASFLAGS => '-f elf',
+	      PROTO => {subtract => 'int(int,int)'};
+
+   __END__
+   __ASM__
+
+   .text
+   .globl    add
+
+   add:      movl 4(%esp),%eax
+             addl 8(%esp),%eax
+             ret
+   __ASM__
+	     GLOBAL subtract
+	     SECTION .text
+
+   subtract: mov eax,[esp+4]
+             sub eax,[esp+8]
+             ret
+
+=head1 DESCRIPTION
+
+Inline::ASM allows you to write Perl subroutines in assembly
+language. Of course, many C compilers allow you to put assembly right
+in your C code, so this module does not provide any new functionality.
+It does, however, provide a feature most C compilers don't: you can
+mix different assembler syntaxes in the same file!
+
+=head1 Using Inline::ASM
+
+Inline::ASM is almost exactly the same as Inline::C. It makes sure the
+globals you requested are declared global, compiles the source code
+and the XS wrappers, and then creates one loadable module for each
+code segment.
+
+There are some shortcomings of extending Perl with assembly. Perl is
+written in C (and Perl), and makes heavy use of macros to provide a
+consistent API when it's compiled with different options. For example,
+the C programmer usually doesn't care if Perl is compiled with threads
+or without, because the all API calls are resolved to a particular
+Perl interpreter using macros. 
+
+Inline::ASM tries to make your life simpler by overloading the PROTO
+or PROTOTYPE hints to do some menial macro processing for you. See ASM
+Configuration Options, below.
+
+=head1 Function Definitions
+
+Inline::C uses a Parse::RecDescent grammar to find function
+definitions in C code. Because assembler is a much simpler syntax, and
+both NASM and GNU AS have pseudo-ops for declaring global symbols,
+Inline::ASM runs your code through a regular expression to search for
+the pseudo-ops. 
+
+For example, in NASM, you declare global symbols like so:
+
+           GLOBAL myfunction
+   myfunction:
+	   mov eax,10
+
+In GNU AS, you declare global symbols like so:
+
+   .globl myfunction
+   myfunction:
+           mov $10,%eax
+
+Inline::C gets all the information it needs from your C code. In
+particular, it's easy to find out what to pass a function, because the
+function header tells you:
+
+   void foo(int a, char *b) { ... }
+
+The corresponding assembler code doesn't tell you very much:
+
+   foo:
+
+So Inline::ASM will only bind to symbols you ask for via the PROTO
+option. PROTO simply gives Inline::ASM the rest of the information about
+the symbol. It won't make any difference to the assembler code, but it
+will allow Perl to bind to it.
+
+=head1 ASM Configuration Options
+
+For information on how to specify Inline configuration options, see
+L<Inline>. This section describes the configuration options only
+available for Inline::ASM. All Inline and Inline::C options are also
+supported. See L<Inline::C> for additional information.
+
+=head2 AS
+
+Specifies the assembler command to use. Can also be used to specify flags;
+in the case of the GASP assembler, you B<must> specify flags here. Any flags
+in ASFLAGS will be passed to GNU as, rather than GASP.
+
+=head2 ASFLAGS
+
+Specifies flags to pass to the assembler. 
+
+=head1 Supported Assemblers
+
+These assemblers have been tested with Inline::ASM:
+
+=over 4
+
+=item 1
+
+GNU AS
+
+GNU AS is a bare-bones assembler with no macro support. It works fine.
+
+=item 2
+
+GASP (GNU Assembler Preprocessor)
+
+GASP is a macro preprocessor designed to emit code for AS to assembler. This 
+system works fine, except that in order to pass options to 'gasp' you must
+specify them in the AS configuration option, rather than ASFLAGS. The
+ASFLAGS are passed only to GNU as, which is automatically invoked on the
+output of running the GASP preprocessor.
+
+=item 3
+
+NASM (Netwide Assembler)
+
+NASM is an assembler with Intel syntax which works in Linux and Windows.
+Unfortunately, 
+
+=back
+
+=head1 ASM-Perl Bindings
+
+This section describes how the `Perl' variables get mapped to `ASM' 
+variables and back again.
+
+Brian Ingersion (INGY@cpan.org) gives a very good description of how
+Perl types are translated to C types and back. That discussion is
+relevant to the way Inline::ASM works too, since all your variables
+pass through a C layer (XS) before getting to Assembler, and again on
+their way back to Perl. See L<Inline::C> for that diatribe.
+
+The biggest difference between Inline::C and Inline::ASM is that you
+don't get the luxury of sitting in a macro-rich C environment. You
+have to do some work.
+
+=head2 The Perl API in Assembler (EXPERIMENTAL)
+
+If you're using any Perl API calls, you need to pass a special
+variable to your assembler function: pTHX. This is actually a macro
+in C land, magically passed to all API calls. For example, this harmless
+snippet of C code:
+
+   return newSVpv("Hello, World!", 0);
+
+is really doing this:
+
+   return Perl_newSVpv(aTHX_ "Hello, World!", 0);
+
+Depending on your setup, aTHX_ might be undefined, empty, or a
+PerlInterpreter structure. In the perl that ships with RedHat Linux
+6.2, this becomes:
+
+   return Perl_newSVpv("Hello, World!", 0);
+
+C<aTHX_> is a C macro which, depending on your setup, defines either a
+Perl interpreter or nothing. On perl 5.005_03 on my RedHat 6.2 box,
+aTHX_ is resolved to "". With ActivePerl 623, aTHX_ resolves to some
+pthreads calls which get the currently running interpeter.
+
+Your assembler code doesn't know anything about Perl, so the
+user-level API is not available. You need to explicitly call
+C<Perl_newSVpv>, passing it a Perl interpreter if your Perl expects
+one.
+
+You can test if Perl wants a parameter running this code:
+
+   use Inline C => <<END;
+   void foo(pTHX_ int a) {
+      printf("This perl interpreter is defined: %p\n", aTHX);
+      return Perl_newSViv(aTHX_ a);
+   };
+   END
+
+If the code I<compiles>, Perl has been configured to pass a
+PerlInterpreter using the macros aTHX and pTHX. If the code fails
+because the macros weren't defined, or because of a parse error on the
+C<printf> line, then the Perl interpreter is kept in a global
+variable and the macros aren't required.
+
+You can get Inline::ASM to pass the Perl parameter to your assembler
+function by asking for it like this:
+
+   print "9 + 16 = ", add(9, 16), "\n";
+
+   use Inline ASM => 'DATA',
+	      AS => 'as',
+	      PROTO => {add => 'SV*(pTHX,int,int)};
+
+   __END__
+
+   .text
+   .globl    add
+   .extern   Perl_newSViv
+
+   add:      movl 4(%esp),%ebx
+             movl 8(%esp),%eax
+             addl 12(%esp),%eax
+	     pushl %eax
+	     pushl %ebx
+	     call Perl_newSViv
+	     leave
+             ret
+
+Note that if your Perl configuration doesn't define the pTHX macro, this
+will cause a compile error. So basically you can't write portable assembler
+extensions.
+
+Of course, if you want a portable solution, use L<Inline::C>.
+
+=head1 Examples
+
+=head2 Example #1 - Greetings
+
+This example takes a string argument (a name) and prints a
+greeting. The function is called with a string, then a number. Perl
+forces the number to a string.
+
+   greet('Ingy');
+   greet(42);
+
+   use Inline ASM => <<'END', PROTO => { greet => 'void(char*)'};
+
+   .data
+   gstr:   .string "Hello %s!\n"
+
+   .text
+   .globl  greet
+
+   greet:  movl 4(%esp),%eax
+	   pushl %eax
+	   pushl $gstr
+	   call printf
+	   leave
+	   ret
+   END
+
+=head1 SEE ALSO
+
+For general information about Inline see L<Inline>.
+
+For information on supported languages and platforms see
+L<Inline::Support>.
+
+For information on writing your own Inline Language Support Module, 
+see L<Inline-API>.
+
+Inline's mailing list is inline@perl.org
+
+To subscribe, send email to inline-subscribe@perl.org
+
+=head1 WARNING
+
+Do NOT use assembler to write Perl extensions! It's sick and wrong!
+
+=head1 AUTHOR
+
+Neil Watkiss <NEILW@cpan.org>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2001, Neil Watkiss.
+
+All Rights Reserved. This module is free software. It may be used,
+redistributed and/or modified under the same terms as Perl itself.
+
+(see http://www.perl.com/perl/misc/Artistic.html)
+
+=cut

@@ -1,0 +1,54 @@
+NAME
+    IPC::Run::SafeHandles - Use IPC::Run and IPC::Run3 safely
+
+SYNOPSIS
+        use IPC::Run::SafeHandles;
+
+DESCRIPTION
+    IPC::Run and IPC::Run3 are both very upset when you try to use them
+    under environments where you have STDOUT and/or STDERR tied to something
+    else, such as under fastcgi.
+
+    The module adds safe-guarding code when you call IPC::Run or IPC::Run3
+    under such environment to make sure it always works.
+
+    If you intend to release your code to work under normal envionrment as
+    well as under fastcgi, simply use this module *after* the "IPC" modules
+    are loaded in your code.
+
+AUTHOR
+    Chia-liang Kao, "<clkao at bestpractical.com>"
+
+BUGS
+    Please report any bugs or feature requests to "bug-ipc-run-safehandles
+    at rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=IPC-Run-SafeHandles>. I
+    will be notified, and then you'll automatically be notified of progress
+    on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc IPC::Run::SafeHandles
+
+    You can also look for information at:
+
+    * AnnoCPAN: Annotated CPAN documentation
+        <http://annocpan.org/dist/IPC-Run-SafeHandles>
+
+    * CPAN Ratings
+        <http://cpanratings.perl.org/d/IPC-Run-SafeHandles>
+
+    * RT: CPAN's request tracker
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=IPC-Run-SafeHandles>
+
+    * Search CPAN
+        <http://search.cpan.org/dist/IPC-Run-SafeHandles>
+
+ACKNOWLEDGEMENTS
+COPYRIGHT & LICENSE
+    Copyright 2007 Chia-liang Kao, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

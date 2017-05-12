@@ -1,0 +1,63 @@
+0.32      2015-09-29 12:04:23CEST+0200 Europe/Paris
+        . Remove test that comes from IO::Socket, is outdated and doesn't server anything. Fixes github issue #5
+
+0.31      2015-08-03 16:06:26CEST+0200 Europe/Paris
+        . Requires PerlIO::via::Timeout 0.32, that reverts the previous fix that was broken
+
+0.30      2015-07-29 08:03:13CEST+0200 Europe/Paris
+        . Requires PerlIO::via::Timeout 0.31, that contains a race condition fix
+
+0.29      2015-05-13 20:44:41CEST+0200 Europe/Amsterdam
+
+0.28      2015-05-12 20:36:28CEST+0200 Europe/Amsterdam
+
+0.27      2014-07-30 11:37:59 Europe/Amsterdam
+
+0.26      2014-07-30 11:36:41 Europe/Amsterdam
+        . Fix tests ( gcs )
+
+0.25      2014-07-04 14:01:19 Europe/Amsterdam
+        . FreeBSD compatibility ( Eric Cholet, GH#1 )
+
+0.24      2014-03-11 15:16:25 Europe/Amsterdam
+        . minor doc fix
+
+0.23      2014-01-20 16:50:19 Europe/Amsterdam
+        . add a preload option in import
+
+0.22      2013-12-28 22:31:18 Europe/Paris
+        . change the API so that it's less magic.
+
+0.21      2013-12-24 04:00:00 Europe/Paris
+        . fix tests on non (linux or mac) OS
+
+0.20      2013-12-24 03:55:49 Europe/Paris
+        . fix perl 5.8 compatibility
+
+0.19      2013-12-24 03:54:20 Europe/Paris
+
+0.18      2013-12-19 01:13:42 Europe/Paris
+
+0.17      2013-12-01 23:47:28 Europe/Paris
+        . now timeout supported for sysread and syswrite as well
+        . better OO API using Role::Tiny
+
+0.16      2013-10-28 21:04:49 Europe/Paris
+
+0.15      2013-10-10 14:53:41 Europe/Paris
+        . refactor based on new PerlIO::via::Timeout
+
+0.14      2013-10-01 16:37:09 Europe/Paris
+        . more documentation. update prereqs
+
+0.13      2013-10-01 13:00:38 Europe/Paris
+        . fixed setsockopt operation when disabling timeout
+
+0.12      2013-09-27 12:06:48 Europe/Paris
+        . removed useless Test::Exception
+
+0.11      2013-09-25 22:12:08 Europe/Paris
+
+0.10      2013-09-24 18:30:07 Europe/Paris
+        . first implementation
+        . actually rewrote it based on PerlIO::via::Timeout

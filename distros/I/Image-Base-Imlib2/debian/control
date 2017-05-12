@@ -1,0 +1,31 @@
+# Copyright 2011 Kevin Ryde
+#
+# This file is part of Image-Base-Imlib2.
+#
+# Image-Base-Imlib2 is free software; you can redistribute it
+# and/or modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 3, or
+# (at your option) any later version.
+#
+# Image-Base-Imlib2 is distributed in the hope that it will be
+# useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+# of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with Image-Base-Imlib2.  If not, see <http://www.gnu.org/licenses/>.
+
+Source: libimage-base-imlib2-perl
+Section: perl
+Priority: optional
+Build-Depends: libtest-more-perl | perl (>= 5.6.2), cdbs, debhelper (>= 5)
+Maintainer: Kevin Ryde <user42@zip.com.au>
+Standards-Version: 3.9.2
+Homepage: http://user42.tuxfamily.org/image-base-imlib2/index.html
+Bugs: mailto:user42@zip.com.au
+
+Package: libimage-base-imlib2-perl
+Architecture: all
+Depends: perl (>= 5), libimage-base-perl | libimage-base-bundle-perl, libimage-imlib2-perl, ${perl:Depends}, ${misc:Depends}
+Description: Create or update image files using Imlib2
+ An Image::Base extension to operate on files using Image::Imlib2.

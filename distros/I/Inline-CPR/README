@@ -1,0 +1,77 @@
+INTRODUCTION:
+
+CPR - C Perl Run
+
+A Perl interpreter 'embedded' in your C?
+A C interpreter using Perl?
+A new API for the Perl5 internals?
+
+Welcome to the wacky world of CPR!
+
+To take a test drive, just put a CPR hashbang at the top of your C program 
+and run it like a Perl script.
+
+Here is an example:
+
+    #!/usr/bin/cpr
+
+    /* hello.cpr - Just say "Hello" */
+
+    int main(void) {
+        printf("Hello, world\n");
+        return 0;
+    }
+
+Or (if your chitty hashbang is out for repairs) just run:
+
+    cpr hello.cpr
+
+After a few seconds, your CPR program will greet the Earth in the standard
+fashion. Run it again for a faster response.
+
+-------------------------------------------------------------------------------
+FEATURES:
+
+Inline::CPR version 0.12 is a minor release:
+
++ Made compatible with Inline 0.41
+
+-------------------------------------------------------------------------------
+INSTALLATION:
+
+This module requires Inline.pm version 0.30 or higher, and the appropriate 
+C compiler. (Where appropriate means the one referred to in your Config.pm)
+
+To install Inline::CPR do this:
+
+perl Makefile.PL
+make
+make test
+make install
+
+(On ActivePerl for MSWin32, use nmake instead of make.)
+
+This will not only install Inline::CPR, but will also install a binary 
+program: 'cpr'. This is the CPR interpreter. Inline::CPR is just a support
+module for the CPR interpreter. (You don't actually use it directly.)
+
+The installation process will also generate a sample CPR program:
+
+    ./examples/synopsis.cpr
+
+You have to 'make install' before you can run it successfully.
+
+-------------------------------------------------------------------------------
+INFORMATION:
+
+- For more information on CPR, see 'perldoc Inline::CPR'.
+- For information about Inline.pm, see 'perldoc Inline'.
+- For information about the Perl5 internal C API, see 'perldoc perlapi' or
+try http://www.perldoc.com/perl5.6/pod/perlapi.html
+
+The CPR mailing list is inline@perl.org. Send mail to inline-subscribe@perl.org
+to subscribe.
+
+Please send questions and comments to "Brian Ingerson" <INGY@cpan.org>
+
+Copyright (c) 2001, Brian Ingerson. All Rights Reserved.  

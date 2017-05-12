@@ -1,0 +1,53 @@
+{
+   "abstract" : "Read and write PNG files",
+   "author" : [
+      "Ben Bullock <bkb@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Image-PNG",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "tmpl",
+         "build"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Image::PNG::Libpng" : "0.39",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/benkasminbullock/Image-PNG/issues"
+      },
+      "repository" : {
+         "url" : "https://github.com/benkasminbullock/Image-PNG"
+      }
+   },
+   "version" : "0.23",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

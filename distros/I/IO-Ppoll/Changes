@@ -1,0 +1,56 @@
+Revision history for IO-Ppoll
+
+0.12    2015/08/31 19:11:45
+        [CHANGES]
+         * Added ->mask_add and ->mask_del methods
+         * "use strict; use warnings" in all unit tests
+         * Miscellaneous updates to build system and documentation style
+            + Use M::B's test_requires
+            + Barename method documentation
+
+0.11    BUGFIXES:
+         * Apply Nicholas Clark's patch to fix for current bleadperl (5.15.3)
+           (RT73665)
+
+0.10    CHANGES:
+         * Use XSLoader instead of DynaLoader
+         * import Exporter::import instead of @ISAing it
+         * Use ExtUtils::CChecker for build checking
+
+0.09    CHANGES:
+         * Added 'use warnings'
+         * Some documentation fixes
+         * Varions small updates to keep CPANTS happy
+
+0.08    BUGFIXES:
+         * Fix off-by-one error when removing an fd which causes an
+           uninitialised pollfd element to enter the set instead
+         * Use dedicated pipe in test script rather than STDIN/STDOUT, which
+           the containing test system may have altered in ways that make our
+           test fail
+
+0.07    BUGFIXES:
+         * Support perls older than 5.8 which don't have mPUSHi by #defining
+           it
+
+0.06    BUGFIXES:
+         * Better compatibility with IO::Poll; return false from ->events when
+           given an unknown handle, rather than undef
+
+0.05    BUGFIXES:
+         * Make sure that ->poll( undef ) works and doesn't throw a warning
+
+0.04    BUGFIXES:
+         * Avoid three-arg open in Build.PL to keep perl 5.5 happy
+
+0.03    BUGFIXES:
+         * Changes to build system to detect Linux kernel version and Glibc
+           suitability.
+         * Get Module::Build to create Makefile.PL.
+
+0.02    BUGFIXES:
+         * Don't upset perl 5.6.2's POSIX::sigprocmask() by passing 'undef'
+           as oldsigmask
+
+0.01    First version, released on an unsuspecting world.
+

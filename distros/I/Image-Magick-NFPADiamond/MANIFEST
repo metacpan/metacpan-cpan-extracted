@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Image-Magick-NFPADiamond.t
+lib/Image/Magick/NFPADiamond.pm

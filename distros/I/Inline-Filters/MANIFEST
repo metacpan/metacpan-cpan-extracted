@@ -1,0 +1,18 @@
+Changes
+LICENSE
+MANIFEST
+Makefile.PL
+Filters.pm
+Filters.pod
+README
+t/Preprocess.t
+t/Strip_Comments.t
+t/Strip_POD.t
+t/z_kwalitee.t
+t/z_meta.t
+t/z_perl_minimum_version.t
+t/z_pod-coverage.t
+t/z_pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

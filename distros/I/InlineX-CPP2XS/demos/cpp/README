@@ -1,0 +1,34 @@
+Inherit.xs, Inherit.pm, Makefile.PL, INLINE.h and CPP.map were produced by
+cd'ing to this (ie demos/cpp) directory and running the following one liner:
+
+perl -MInlineX::CPP2XS -e "InlineX::CPP2XS::cpp2xs('Math::Geometry::Planar::GPC::Inherit', 'main',  '.', {WRITE_MAKEFILE_PL => 1, VERSION => 0.11, WRITE_PM => 1})"
+
+The assumption is that you're using 'g++' as your cpp compiler. If that's not
+the case then you need to amend the CC entry in the above command appropriately.
+
+That one liner is as run in a typical Windows shell. For a typical nix shell you'll
+need to interchange the double-quotes and the single-quotes.
+
+For the purposes of providing a complete example of what is needed, I've
+also included, in this directory (ie 'demos/cpp'), a MANIFEST, a README (this file)
+and a test file (test.pl).
+
+Probably worth removing Inherit.pm, Inherit.xs, Makefile.PL, CPP.map and INLINE.h,
+then running the above one liner for yourself - just to verify that everything
+works properly for you.
+
+Then simply run:
+
+perl Makefile.PL
+make test
+
+You've now created, from the C++ code in demos/cpp/src/Inherit.cpp, a normal
+module that has no dependence on Inline.
+
+You would even be able to then successfully run 'make install' - though,
+given that this module doesn't really do anything useful, I don't know why
+anyone would want to install it. It's also quite ludicrous to be creating
+Inherit.pm in the Math::Geometry::Planar::GPC namespace.
+
+Cheers,
+Rob

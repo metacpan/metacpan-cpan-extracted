@@ -1,0 +1,252 @@
+First things first
+
+I approach this topic with a great deal of humility
+
+Seriously
+
+For me, this has worked very well
+
+One of the best things that can happen to me
+
+Being wrong about something
+
+So,
+
+This is a discussion!
+
+Message Based Programming
+
+Dana's Way
+
+There are many like it, but this one is mine
+
+IPC::Transit
+
+Simple?
+
+Simple!!
+
+Version 0.1 has 461 lines of code
+
+A little bit of history
+
+First written some time in the mid 90s
+
+Uploaded to friend's web server
+
+Nobody downloaded it
+
+Probably for the best
+
+Re-implement it every job I've landed at
+
+Only takes a few days each time
+
+Wasn't super clean though
+
+Somebody asked me to give a talk
+
+Damn
+
+Time to write from scratch
+
+Clean and CPAN worthy
+
+(more or less)
+
+ONWARD!
+
+Basic Tenents of Message Based Programming
+
+(Strictly in the context of this talk)
+
+Message Defined:
+
+Arbitrarily complex
+
+'normal'
+
+Starts with hash reference
+
+Normal is defined as scalars, arrays and hashes.
+
+Like this:
+
+#{   this => 'thing',
+    stuff => ['x', 10, 'y']
+}
+
+Works with all serialization methods.
+
+BUT
+
+#{   this => 'thing',
+    stuff => sub {
+        return ['x', $main::foo++, qr/^x$/],
+    }
+}
+
+Is fun too!
+
+Bless you Data::Dumper
+
+Be aware of the limitations.
+
+Keep it this simple if possible, because it maps well to other languages.
+
+YAD
+
+(Yet Another Diversion)
+
+How I think about things
+
+Decouple first, ask questions later
+
+Not always a good move
+
+But it's where I usually start
+
+Performant designs
+
+Perl is a fairly performant language
+
+Design is the key to performance
+
+Reliable systems
+
+Best way to make a flaky system?
+
+Try to make it 100% reliable!
+
+Reliability by embracing non-reliability
+
+We'll get back to that!
+
+OOP rocks
+
+Functional Programming rocks
+
+Be like Perl: multi-paradigm
+
+UNIX Philosophy
+
+Doug McIlroy: the inventor of Unix pipes
+
+One of the founders of the Unix tradition
+
+Make each program do one thing well.
+
+To do a new job, build afresh rather than complicate old programs by adding new features.
+
+Expect the output of every program to become the input to another
+
+How about some code?
+
+IPC::Transit::send(qname => 'prog2', message => { a => 'b' });
+
+my $m = IPC::Transit::receive(qname => 'prog2');
+
+The first line can be any process on any box.
+
+The second line can be any process on any box.
+
+Think of it as a dynamic pipeline.
+
+#producer1.pl:
+while(my $work = get_slow_work()) {
+    IPC::Transit::send(qname => 'slow_worker1.pl', message => $work);
+}
+
+#slow_worker1.pl:
+while(my $work = IPC::Transit::receive(qname => 'slow_worker1.pl')) {
+    do_slow_work($work);
+    IPC::Transit::send(qname => 'reporting.pl', message => $work);
+}
+
+To do slow work faster:
+
+Run more copies of slow_worker1.pl
+
+Maybe on different boxes
+
+State coherence?
+
+The message is the state!*
+
+*Yes, overall.
+
+Sometimes, we keep 'side effects', often for caching.
+
+Try to keep that to a minimum
+
+When all state is in the message,
+
+Transparent core scalability
+
+Transparent box scalability
+
+Complex system is VERY easy to reason about
+
+Core Concept:
+
+Return what you get
+
+Just add your own stuff
+
+Or maybe change some stuff
+
+Neat, but:
+
+Every program is doing its own routing
+
+NOT like a UNIX pipeline
+
+$abstraction++;
+
+'Centralize' the routing
+
+#producer1.pl:
+use IPC::Transit::Router qw(route_trans);
+while(my $work = get_slow_work()) {
+    route_trans($work);
+}
+
+#slow_worker1.pl:
+use IPC::Transit::Router qw(route_trans);
+while(my $work = IPC::Transit::receive(qname => 'slow_worker1.pl')) {
+    do_slow_work($work);
+    route_trans($work);
+}
+
+Wait, what?
+
+Secret sauce:
+
+#{   routes => [
+        {   match => { source => 'producer1.pl' },
+            forwards => [
+                { qname => 'slow_worker1.pl' }
+            ]
+        },{ match => { source => 'slow_worker1.pl' },
+            forwards => [
+                { qname => 'reporting.pl' }
+            ]
+        }
+    ]
+}
+
+I tend to use a single, global routing config
+
+This is *slightly* simplified
+
+Fully functional examples in the demo!
+
+This methodology is weak at first
+
+Its power grows as more things use it
+
+More in the demos
+
+http://www.realms.org/
+
+

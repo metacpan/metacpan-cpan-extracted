@@ -1,0 +1,46 @@
+I18NFool - i18n Toolkit for ZPT, PHPTAL, Petal, and other TAL processors
+========================================================================
+
+I18NFool stands for "Internationalization File Object Oriented Leech".  It
+inspects a list of internationalized templates and sucks out internationalized
+strings to produce a series of .pot files.
+
+It also comes with a couple of scripts to easily manage a collection of .pot
+and .po files.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+Or better, use CPAN.pm
+
+  perl -MCPAN -e 'install I18NFool'
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Getopt::Long
+  MKDoc::XML::Parser
+  Locale::PO
+
+
+AUTHORS & LICENSE
+
+  (C) Copyright 2004 MKDoc Ltd. and Laurent Bedubourg
+
+  Authors Jean-Michel Hiver and
+      Laurent Bedubourg <lbedubourg@motion-twin.com>.
+
+  All rights reserved.
+
+  This module free software and is distributed under the
+  same license as Perl itself.
+

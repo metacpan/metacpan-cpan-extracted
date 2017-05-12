@@ -1,0 +1,8 @@
+Revision history for IO-Async-Loop-KQueue
+
+0.02	2010-12-24
+	Critical API version mismatch and documentation cleanup
+
+0.01    2010-12-23
+        First version, released on an unsuspecting world.
+

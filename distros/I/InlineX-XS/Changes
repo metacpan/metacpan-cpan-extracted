@@ -1,0 +1,8 @@
+Revision history for Perl extension InlineX::XS.
+
+0.02  Wed Dec  6 16:11 2006
+  - Add pod correctness test.
+
+0.01  Thu Nov 16 19:19 2006
+  - original version
+

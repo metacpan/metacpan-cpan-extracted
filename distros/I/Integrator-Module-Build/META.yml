@@ -1,0 +1,48 @@
+---
+name: Integrator-Module-Build
+version: 1.057
+author:
+  - 'Francois Perron <fxfx@cydone.com>'
+abstract: Gather and synchronize Test::More results in Cydone's Integrator
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Crypt::SSLeay: 0
+  Data::UUID: 0
+  Devel::Symdump: 0
+  Term::ReadKey: 0
+  Test::Cmd: 0
+  Test::Harness: 2.64
+  Test::Pod: 0
+  Test::Pod::Coverage: 0
+  XML::NamespaceSupport: 0
+  XML::Parser: 0
+  XML::SAX: 0
+  XML::SAX::Expat: 0
+  XML::Simple: 0
+  YAML: 0
+  perl: '>= 5.8.8'
+build_requires:
+  Compress::Zlib: 0
+  HTML::Parser: 0
+  HTML::Tagset: 0
+  LWP::UserAgent: 0
+  Method::Alias: 0
+  Module::Starter: 0
+  Test::TAP::Model: 0.06666
+  URI: 0
+provides:
+  Integrator::Module::Build:
+    file: lib/Integrator/Module/Build.pm
+    version: 1.057
+  Integrator::Test::ConfigData:
+    file: lib/Integrator/Test/ConfigData.pm
+    version: 1.011
+  Integrator::Test::TAP::Model::Patch:
+    file: lib/Integrator/Test/TAP/Model/Patch.pm
+    version: 1.002
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

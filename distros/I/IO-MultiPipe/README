@@ -1,0 +1,59 @@
+IO-MultiPipe
+
+Normally if a part of a pipe fails, depending on the location, it won't be
+detected. This breaks down a command involving pipes and runs each command
+seperately.
+
+It uses open3 to run each chunk of the pipe.
+
+    use IO::MultiPipe;
+
+    my $pipes = IO::MultiPipe->new();
+    
+    #This sets the pipe that will be run.
+    $pipes->set('sed s/-// | sed s/123/abc/ | sed s/ABC/abc/');
+    if ($pipes->{error}){
+        print "Error!\n";
+    }
+    
+    #'123-ABCxyz' through the command set above.
+    my $returned=$pipes->run('123-ABCxyz');
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc IO::MultiPipe
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=IO-MultiPipe
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/IO-MultiPipe
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/IO-MultiPipe
+
+    Search CPAN
+        http://search.cpan.org/dist/IO-MultiPipe
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Zane C. Bowers
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

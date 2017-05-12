@@ -1,0 +1,32 @@
+Revision history for Perl extension Imager::Album.
+
+0.01  Wed Jun 26 15:12:30 2002
+	- original version; created by h2xs 1.20 with options
+		-X -c -n Imager::Album
+
+0.02	Fri Jun 28 07:53:50 2002
+	- Initial conversion from a hacky script to
+	a modularized framework.
+
+0.03	Mon Jul  1 02:05:54 2002
+	- Fixed image selection and list maintenance code.
+	Added a command list to Album.pm and a gui hook 
+	for calling the commands.
+
+0.04  Mon Jul  8 01:46:57 2002
+	- Added storing current captions and rotations.
+	Added a caption editing thing too.
+
+0.05
+	- Images can now be reordered by dragging them in the list.
+	Some export is possible too, but needs a real framework
+	to be extendible.
+
+0.06	Wed Aug 14 09:18:43 EDT 2002
+	- Added a quit button, fixed export so you can name
+	galleries and give an output directory.  Moved image
+	export into Album.pm instead of GUI.pm.  Still rough
+	around the edges.
+
+
+

@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution IPC-OpenAny,
+version 0.005:
+
+  Run a process with control over any FDs it may use.
+
+This software is copyright (c) 2012 by Stephen R. Scaffidi.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

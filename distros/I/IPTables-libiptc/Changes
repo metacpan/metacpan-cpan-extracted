@@ -1,0 +1,192 @@
+Revision history for Perl extension IPTables::libiptc.
+
+Recent changes
+
+0.52    Wed Nov 30 11:21:52 CET 2011
+
+	- This is a bugfix release, fixing memory leaks.
+
+	- This release is only relevant for people using this module
+	  under a daemon or other long lived programs.
+
+	- Newer version of iptables/libiptc support doing several
+	  commits on the same handle.  This module, chooses to not to
+	  use this option, and instead release/free the handle after a
+	  commit.
+
+
+0.51    Wed Jun 29 11:37:42 EDT 2011
+
+	- Support for iptables v1.4.3 until v1.4.10.
+
+	- This is a significant change release, in-order to adapt to
+          iptables ABI/API changes in release 1.4.3, which introduced
+          dynamic shared libs.
+
+	- Using the dynamic shared libs libiptc.so and libxtables.so,
+          available on target system, instead of maintaining this code
+          locally.
+
+	- This version requires that the system provides a correct
+          "xtables.h" header file, which corrosponds to the systems
+          libxtables.so shared library.
+
+	- To keep the iptables.c file easy maintainable, several
+          original versions are included in this package.  The choosen
+          versions corrospond to the API/ABI changes in libxtables.
+
+
+0.18	Mon Oct 26 14:23:51 CET 2009
+
+	- This version is compatible with iptables 1.4.1 and 1.4.2.
+
+	- Significant changes when into 1.4.3, which thus cannot be
+	  kept binary compatible with this release.  Expect to see the
+	  following error "undefined symbol: xt_params" if using this
+	  release anyhow.
+
+	- The segfault issues when comparing the IPTABLES_VERSION
+	  variable is handled, and is based upon the iptables detected
+	  by the Makefile.PL script.  And some compile time hacks to
+	  include/xtables.h
+
+
+0.17	Fri Oct 23 17:21:23 CEST 2009
+
+	- This version is only compatible with iptables 1.4.1.
+
+	- Its not compatible with 1.4.2 and 1.4.3, because there are
+	  some segfault issues when comparing the IPTABLES_VERSION
+	  variable (in the dynamic loadable modules) between iptables
+	  versions, 1.4.1 and 1.4.2, and also between 1.4.2 and 1.4.3.
+	  It has been fixed from version 1.4.3.2 and beyond (see
+	  iptables upstream git commit c4edfa63eda06).
+
+	- This is the first version to support iptables 1.4.x, more
+	  will be created shortly, for supporting 1.4.2 and 1.4.3.
+
+	- This version also removes the work around for exit()
+	  problem, done in release 0.13.  Its still a problem, but
+	  its too intrusive to the iptables.c code.
+
+
+0.15  Fri Jul 10 11:58:47 CEST 2009
+
+	- Problem with list_rules_IPs() on 64-bit platforms.
+	  Fixed by Colm Dougan <colm.dougan(at)replify(dot)com>
+
+
+0.14  Thu Apr 16 11:37:16 CEST 2009
+
+	- Auto-detect iptables version, but this release is only
+	  compatible with all iptables 1.3.x versions.
+
+	- This version is up-to-date with iptables 1.3.8.
+
+
+0.13  Wed Apr 15 14:59:42 CEST 2009
+
+	- Work around for exit() problem, by Alexandre Simon.
+	  The C-code in iptables.c calls exit() on all errors, this
+	  results in the Perl program dying.  This is now avoided by a
+	  setjmp/longjmp hack by Alexandre(dot)Simon(at)ciril(dot)fr.
+
+
+0.12  Tue Apr 14 15:11:32 CEST 2009
+
+	- This version is compatible with iptables 1.3.6.
+
+	- Use iptables.c command interface from 1.3.6.
+
+	- Backport one of my own mainline bugfixes to chain rename
+	  (upstream commit 64ff47cd, Author: Jesper Dangaard Brouer).
+
+	- Backport bugfix "Fix /etc/network usage"
+	  (upstream commit 267a5700, Author: Pablo Neira Ayuso).
+
+	- Backport bugfix for rename command line option -E.
+	  (upstream commit 2ac1fada, Author: Krzysztof Piotr Oledzki).
+
+
+0.11  Thu Jul 10 10:22:39 CEST 2008
+
+	- Skip test if not run as root user.  As I cannot make CPAN
+	  tester run 'make test' as root, I simply skip these tests.
+	  Credit goes to Brian D Foy, for the idea.
+
+0.10  Tue Jul  1 13:38:56 CEST 2008
+
+	- Add a -fPIC option to compile code as "position independent code".
+	  As suggested by Matthew "Cheetah" Gabeler-Lee.  This also
+	  caused problems for CPAN tester reports trying to compile it
+	  on a 64-bit platform.
+
+	- The local libiptc has been updated, to keep it up-to-date
+	  with iptables libiptc 1.4.1, except for the xtables.h
+	  include. But the iptables.c command interface is still from 1.3.4.
+
+0.09  Tue Jun 17 16:06:33 CEST 2008
+	- Fix output for unspecified proto was "0" change back to
+	  original behaviour "all".
+
+	- iptables-blocking: link explicit with local library
+	  libiptc.a.  Install in sbin/.
+
+0.08  Mon Jun 16 17:11:51 CEST 2008
+	- New implementaion of the the "init" scalability fix, which
+	  is 64-bit compatible.  This implementation is based on binary
+	  search (time complexity has gone from O(n^2) to O(log(n)).
+
+	- Revert the not accepted "init" scalability fix.
+
+0.07  Mon Jun 16 07:08:33 CEST 2008
+	- Includes the "init" scalability fix, NOT accepted upstream,
+          because its not 64-bit compatible.  The initial parsing of
+          the ruleset, during pull-out from kernel, is suboptimal.
+	  Its gets slower when the number of chains and jump rules
+	  increase.
+
+	http://thread.gmane.org/gmane.comp.security.firewalls.netfilter.devel/21458
+
+0.06  Fri Jun 13 17:13:21 CEST 2008
+	- Matthew "Cheetah" Gabeler-Lee <cheetah(at)fastcat.org>:
+		Make it compile even if iptables libiptc is not on the
+		system, by linking with local library object libiptc in
+		library_iptc/libiptc.a.
+
+	- libiptc: Integrated scalability fixes. Most of which has
+	  been accepted upstream in 1.4.1.  Most significant
+	  scalability fix is for chain name searching, used in
+	  function is_chain() and iptables_do_command().
+
+	- The local libiptc has been keept up-to-date with iptables
+	  1.4.0. But the iptables.c command interface is still from 1.3.4.
+
+	- iptables-blocking: Add an iptables command that does uses a
+	  simple file lock. Can be used to replace the iptables
+	  command to avoid race conditions between two iptables commands.
+
+
+0.05  Tue Nov 20 12:47:11 2007
+	- Bugfix: Include all files in tarball by updating MANIFEST.
+	  Version 0.04 could not compile, because the tarball did not
+	  contain all the relevant files (ups, didn't keep MANIFEST in
+	  sync).
+
+0.04  Thu Nov 15 16:01:16 2007
+	- First CPAN release.
+	  Primarily documentation updates.
+
+0.03  Thu Jul 13 16:24:07 2006
+	- Because libiptc.c contained some bugs, it has been
+          necessary to include it the module and compile libiptc.a our
+          self.  The module still depends on the iptables extensions
+          being available on the system.
+
+0.02  Tue Jul 4 13:17:16 2006
+	- First initial working version.
+
+0.01  Thu Jun 22 14:01:55 2006
+	- original version; created by h2xs 1.23 with options
+		-n IPTables::libiptc include/libiptc/libiptc.h
+

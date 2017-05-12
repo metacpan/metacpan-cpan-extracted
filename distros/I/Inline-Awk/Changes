@@ -1,0 +1,19 @@
+Revision history for Perl extension Inline::Awk.
+
+0.04 2016-06-07
+
+    * Fixed RT 115140 regex error.
+
+0.03 2001-11-15
+
+    * First CPAN release.
+
+0.02 2001-11-13
+
+    * First fully functional version.
+    * Added awk() functions.
+    * Tested with regression test.
+
+0.01 2001-08-09
+
+    * Original version.

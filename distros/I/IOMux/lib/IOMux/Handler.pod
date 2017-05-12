@@ -1,0 +1,245 @@
+=encoding utf8
+
+=head1 NAME
+
+IOMux::Handler - handle a connection
+
+=head1 INHERITANCE
+
+ IOMux::Handler is extended by
+   IOMux::Handler::Read
+   IOMux::Handler::Service
+   IOMux::Handler::Write
+
+=head1 SYNOPSIS
+
+ # only extensions can be instantiated
+
+=head1 DESCRIPTION
+
+This is the generic base class for all kinds of connections, both the
+readers and the writers.  It is used to administer which file descriptors
+are in use in the mux.
+
+=head1 METHODS
+
+=head2 Constructors
+
+=over 4
+
+=item IOMux::Handler-E<gt>B<new>(%options)
+
+ -Option--Default
+  fh      <required>
+  name    <stringified handle>
+
+=over 2
+
+=item fh => FILEHANDLE
+
+=item name => STRING
+
+Nice name, most useful in error messages.
+
+=back
+
+=item IOMux::Handler-E<gt>B<open>($mode, $what, %options)
+
+Most handlers provide an easy way to instantiate them via the
+L<IOMux::Open|IOMux::Open> module.
+
+=back
+
+=head2 Accessors
+
+=over 4
+
+=item $obj-E<gt>B<fh>()
+
+Returns the filehandle.
+
+=item $obj-E<gt>B<fileno>()
+
+The sequence number of the filehandle, UNIX style.  See C<man 3 fileno>
+
+=item $obj-E<gt>B<mux>()
+
+=item $obj-E<gt>B<name>()
+
+=item $obj-E<gt>B<usesSSL>()
+
+=back
+
+=head2 User interface
+
+=head3 Connection
+
+=over 4
+
+=item $obj-E<gt>B<close>( [$callback] )
+
+Close the handler. When the $callback is provided, it will be called
+after the filehandle has been closed and the object disconnected from
+the multiplexer.
+
+=item $obj-E<gt>B<timeout>( [$timeout] )
+
+Set (or get) the timer. The $timeout value is a certain number of seconds
+in the future, after which the C<mux_timeout> callback is called.  When
+$timeout is not defined or zero, the timer is cancelled.  Timers are not
+reset automatically.
+
+When the timeout value is very large (larger then C<time> when the
+program started), it is considered absolute, not relative. This is
+very useful when you wish a timeout to appear on some exact moment.
+
+When the timeout is very small (but larger than 0), then still at
+least one C<select> loop will be used for this timeout is handled.
+
+example: 
+
+  $conn->timeout(23.6);   # over 23 seconds
+  print $conn->timeout;   # moment in epoc
+  $conn->timeout(0);      # cancel
+
+  use Time::HiRes 'time';
+  BEGIN {$begin = time}
+  $conn->timeout($begin+2.5);
+
+=back
+
+=head2 Multiplexer
+
+=head3 Connection
+
+The I<user interface> provides a higher level interaction then the
+raw interface. These methods may be extended by users, but there
+are usually simpler methods to achieve that.
+
+=over 4
+
+=item $obj-E<gt>B<muxInit>( $mux, [$handler] )
+
+Called after the multiplexer has added this handler to its
+administration.
+
+In rare cases, it may happen that an other $handler needs to
+be called when this filehandle get tickled, especially for
+tricks with bundles.
+
+=item $obj-E<gt>B<muxRemove>()
+
+Remove the handler from the multiplexer.
+
+=item $obj-E<gt>B<muxTimeout>()
+
+Called when a timer expires on the FILEHANDLE.
+
+Use L<timeout()|IOMux::Handler/"Connection"> to set (or clear) a timeout.
+When new data is sent or received on the FILEHANDLE, that will B<not>
+expire the timeout.
+
+=back
+
+=head3 Reading
+
+=over 4
+
+=item $obj-E<gt>B<muxExceptFlagged>($fileno)
+
+Called (in the rare case) that an exception event if flagged. This
+means that the socket needs urgent inspection.
+
+According to the Linux manual page for C<select()>, these exceptions
+only happen when out-of-band (OOB) data arrives over udp or tcp.
+
+=item $obj-E<gt>B<muxReadFlagged>($fileno)
+
+Called when the read flag is set for this handler.
+
+When you extend this module, you probably want to override
+C<muxConnection()> or C<muxInput()>, not this "raw" method.
+
+=back
+
+=head3 Writing
+
+=over 4
+
+=item $obj-E<gt>B<muxWriteFlagged>($fileno)
+
+Called when the write flag is set for this handler; this indicates
+that the output buffer is empty hence more data can be sent.
+
+When you extend this module, you probably want to override
+C<muxOutputbufferEmpty()>, not this "raw" method.
+
+=back
+
+=head3 Service
+
+=head2 Helpers
+
+=over 4
+
+=item $obj-E<gt>B<extractSocket>(HASH)
+
+=item IOMux::Handler-E<gt>B<extractSocket>(HASH)
+
+Extract IO::Socket::INET (or ::SSL) parameters from the HASH and
+construct a socket from it. The used options are all starting with
+a capital and removed from the HASH. Additionally, some controlling
+options are used.
+
+ -Option --Default
+  socket   <created>
+  use_ssl  <false>
+
+=over 2
+
+=item socket => IO::Socket object
+
+You may pre-initialize an IO::Socket.
+
+=item use_ssl => BOOLEAN
+
+When true, a IO::Socket::SSL object will be created, otherwise a
+IO::Socket::INET object.
+
+=back
+
+=item $obj-E<gt>B<fdset>($state, $read, $write, $error)
+
+Change the flags for the $read, $write and/or $error acceptance by the
+mux to $state.
+
+=item $obj-E<gt>B<show>()
+
+Returns a textblock with some info about the filehandle, for
+debugging purposes.
+
+example: 
+
+  print $conn->show;
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of IOMux distribution version 1.00,
+built on November 11, 2015. Website: F<http://perl.overmeer.net/>
+All modules in this suite:
+L</Any::Daemon>,
+L</IOMux>, and
+L</IOMux::HTTP>.
+
+Please post questions or ideas to F<perl@overmeer.net>
+
+=head1 LICENSE
+
+Copyrights 2011-2015 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

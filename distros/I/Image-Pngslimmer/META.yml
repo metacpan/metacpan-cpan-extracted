@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                Image-Pngslimmer
+version:             0.30
+abstract:            slims (dynamically created) PNGs
+license:             perl
+author:              
+    - Adrian McMenamin <adrian@mcmen.demon.co.uk>
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    Compress::Raw::Zlib:           2.003
+    Compress::Zlib:                2.003
+    POSIX:                         1.08
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

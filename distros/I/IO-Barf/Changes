@@ -1,0 +1,33 @@
+0.07 2014-06-04T08:14:12+02:00
+ - Add 'readme_from' directive to Makefile.PL.
+ - Add test dependency to Digest::SHA, which is not in perl 5.8.9 base.
+ - Fix LICENSE file.
+ - Update Module::Install to 1.08 version.
+
+0.06 2013-11-07
+ - Add dependency for perl (based on Error::Pure).
+
+0.05 2013-09-21
+ - Add Test::NoWarnings to tests.
+ - Add LICENSE file.
+ - Add SIGNATURE file.
+ - Rename CHANGES to Changes.
+ - Rewrite Changes file to CPAN::Changes::SPEC format.
+
+0.04 2012-11-23
+ - Add missing messages to tests.
+ - Improve error message.
+ - Remove obsolete UNIVERSAL::isa().
+
+0.03 2012-08-23
+ - Fix doc example.
+ - Fix tests.
+ - Implement output to handler, IO::Handler.
+ - Add error for unsupported objects to barf.
+
+0.02 2012-08-05
+ - Change exporting of barf() from explicit to implicit exporting.
+ - Fix doc example. Add unlink of temporary file.
+
+0.01 2012-08-05
+ - First version.

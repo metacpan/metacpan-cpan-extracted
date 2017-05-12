@@ -1,0 +1,419 @@
+NAME
+
+    Interchange::Search::Solr -- Solr query encapsulation
+
+VERSION
+
+    Version 0.13
+
+DESCRIPTION
+
+    Exposes Solr search API in a programmer-friendly way.
+
+SYNOPSIS
+
+    Quick summary of what the module does.
+
+    Perhaps a little code snippet.
+
+        use Interchange::Search::Solr;
+        my $solr = Interchange::Search::Solr->new(solr_url => $url);
+        $solr->rows(10);
+        $solr->start(0);
+        $solr->search('shirts');
+        $results = $solr->results;
+
+ACCESSORS
+
+ solr_url
+
+    Url of the solr instance. Read-only.
+
+ input_encoding [DEPRECATED]
+
+    Assume the urls to be in this encoding, so decode it before parsing it.
+    This is basically a (probably bugged) workaround when you have all the
+    shop in latin1. If the search keep crashing on non-ascii characters,
+    try to set this to iso-8859-1.
+
+ rows
+
+    Number of results to return. Read-write (so you can reuse the object).
+
+ page_scope
+
+    The number of paging items for the paginator
+
+ search_fields
+
+    An arrayref with the indexed fields to search. Defaults to:
+
+      [qw/sku name description/]
+
+    You can add boost to fields appending a float with a caret.
+
+      [qw/ sku^5.0 name^1.0 description^0.4 /]
+
+ return_fields
+
+    An arrayref of indexed fields to return. All by default.
+
+ facets
+
+    A string or an arrayref with the fields which will generate a facet.
+    Defaults to
+
+     [qw/suchbegriffe manufacturer/]
+
+ start
+
+    Start of pagination. Read-write.
+
+ page
+
+    Current page. Read-write.
+
+ filters
+
+    An hashref with the filters. E.g.
+
+     {
+      suchbegriffe => [qw/xxxxx yyyy/],
+      manufacturer => [qw/pikeur/],
+     }
+
+    The keys of the hashref, to have any effect, must be one of the facets.
+
+ response
+
+    Read-only accessor to the response object of the current search.
+
+ facets_found
+
+    After a search, the structure with the facets can be retrieved with
+    this accessor, with this structure:
+
+     {
+       field => [ { name => "name", count => 11 }, { name => "name", count => 9 }, ...  ],
+       field2 => [ { name => "name", count => 7 }, { name => "name", count => 6 }, ...  ],
+       ...
+     }
+
+    Each hashref in each field's arrayref has the following keys:
+
+    name
+
+      The name to display
+
+    count
+
+      The count of item
+
+    query_url
+
+      The url fragment to toggle this filter.
+
+    active
+
+      True if currently in use (to be used for, e.g., checkboxes)
+
+ search_string
+
+    Debug only. The search string produced by the query.
+
+ search_terms
+
+    The terms used for the current search.
+
+ search_structure
+
+    The perl data structure used for the current search. It's passed to
+    Webservice::Solr::Query for stringification.
+
+ sorting
+
+    The field used to sort the result (optional and defaults to score, as
+    per Solr doc).
+
+    You can set it to a scalar with a field name or instead you can use the
+    SQL::Abstract syntax (all the cases documented there are supported).
+    E.g.
+
+     $solr->sorting([{ -asc => 'created_date' }, {-desc => [qw/updated_date sku/] }]);
+
+    If you pass a reference, the sorting_direction setting is ignored.
+
+ sorting_direction
+
+    The direction used by the sorting, when sorting is specified and is a
+    plain scalar. Default to 'desc'.
+
+ wild_matching
+
+    By default, a search term produce a query with a wildcard appended. So
+    searching for 1234 will query 1234*. With this option set to true, a
+    wildcard is prepended as well, querying for *1234* instead).
+
+ stop_words_langs
+
+    The languages for which we should build the stop word list. It defaults
+    to:
+
+     [ 'en' ]
+
+    New in 0.10. To revert to the old behaviour (no filtering of
+    stopwords), pass an empty arrayref.
+
+ min_chars
+
+    Minimum characters for filtering the search terms. Default to 3.
+
+    New in 0.10. To revert to the old behaviour, set it to 0.
+
+ permit_empty_search
+
+    By default, empty searches are not executed. You can permit them
+    setting this accessor to 1. The module will reset it to 0 when the
+    search is executed.
+
+INTERNAL ACCESSORS
+
+ solr_object
+
+    The WebService::Solr instance.
+
+ builder_object(\@terms, \%filters, $page)
+
+    Creates Interchange::Search::Solr::Builder instance.
+
+METHODS
+
+ search( [ $string_or$structure ] ])
+
+    Run a search and return a WebService::Solr::Response object.
+
+    The method accept zero or one argument.
+
+    With no arguments, run a full wildcard search.
+
+    With one argument, if it's a string, run the search against all the
+    indexed fields. If it's a structure, build a query for it. The syntax
+    of the structure is described at WebService::Solr::Query.
+
+    After calling this method you can inspect the response using the
+    following methods:
+
+ results
+
+    Returns reference to list of results, each result is a hash reference.
+
+ skus_found
+
+    Returns just a plain list of skus.
+
+ num_found
+
+    Return the number of items found
+
+ has_more
+
+    Return true if there are more pages
+
+ execute_query($query)
+
+    Accept either a raw string with the query or a WebService::Solr::Query
+    object and run the query against the Solr service.
+
+    If no query is provided, a wildcard search is performed.
+
+ construct_params
+
+    Constructs parameters for the search.
+
+ maintainer_update($mode)
+
+    Perform a maintainer update and return a WebService::Solr::Response
+    object.
+
+ reset_object
+
+    Reset the leftovers of a possible previous search.
+
+ search_from_url($url)
+
+    Parse the url provided and do the search.
+
+ add_terms_to_url($url, $string)
+
+    Parse the url, and return a new one with the additional words added.
+    The page is discarded, while the filters are retained.
+
+ current_search_to_url
+
+    Return the url for the current search.
+
+ paginator
+
+    Return an hashref suitable to be turned into a paginator, undef if
+    there is no need for a paginator.
+
+    Be careful that a defined empty string in the first/last/next/previous
+    keys is perfectly legit and points to an unfiltered search which will
+    return all the items, so concatenating it to the prefix is perfectly
+    fine (e.g. "products/" . ''). When rendering this structure to HTML,
+    just check if the value is defined, not if it's true.
+
+    The structure looks like this:
+
+     {
+       first => 'words/bla' || undef,
+       first_page => 1 || undef,
+       last  => 'words/bla/page/5' || undef,
+       last_page => 5 || undef,
+       next => 'words/bla/page/5' || undef,
+       next_page => 5 || undef
+       previous => 'words/bla/page/3' || undef,
+       previous_page => 3 || undef,
+       pages => [
+                 {
+                  name => 1,
+                  url => 'words/bla/page/1',
+                 },
+                 {
+                  name => 2,
+                  url => 'words/bla/page/2',
+                 },
+                 {
+                  name => 3,
+                  url => 'words/bla/page/3',
+                 },
+                 {
+                  name => 4,
+                  url => 'words/bla/page/4',
+                  current => 1,
+                 },
+                 {
+                  name => 5,
+                  url => 'words/bla/page/5',
+                 },
+                ]
+       total_pages => 5
+     }
+
+ terms_found
+
+    Returns an hashref suitable to build a widget with the terms used and
+    the links to toggle them. Return undef if no terms were used in the
+    search.
+
+    The structure looks like this:
+
+     {
+      reset => '',
+      terms => [
+                { term => 'first', url => 'words/second' },
+                { term => 'second', url => 'words/first' },
+               ],
+     }
+
+    See also:
+
+    clear_words_link
+
+      Which return the reset link
+
+    remove_word_links
+
+      Which returns a list of hashrefs with uri and label for each word to
+      remove.
+
+ version
+
+    Return the version of this module.
+
+ breadcrumbs
+
+    Return a list of hashrefs with uri and label suitable to compose a
+    breadcrumb for the current search.
+
+    If the breadcrumb points to a facet, the facet name is stored in the
+    facet key.
+
+AUTHOR
+
+    Marco Pessotto, <melmothx at gmail.com>
+
+BUGS
+
+    Please report any bugs or feature requests to
+    https://github.com/interchange/Interchange-Search-Solr/issues.
+
+SUPPORT
+
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Interchange::Search::Solr
+
+    You can also look for information at:
+
+      * Github
+
+      https://github.com/interchange/Interchange-Search-Solr
+
+      * AnnoCPAN: Annotated CPAN documentation
+
+      http://annocpan.org/dist/Interchange-Search-Solr
+
+      * CPAN Ratings
+
+      http://cpanratings.perl.org/d/Interchange-Search-Solr
+
+      * META CPAN
+
+      https://metacpan.org/pod/Interchange::Search::Solr
+
+ACKNOWLEDGEMENTS
+
+    Mohammad S Anwar (GH #14).
+
+LICENSE AND COPYRIGHT
+
+    Copyright 2014-2016 Marco Pessotto.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the the Artistic License (2.0). You may obtain a
+    copy of the full license at:
+
+    http://www.perlfoundation.org/artistic_license_2_0
+
+    Any use, modification, and distribution of the Standard or Modified
+    Versions is governed by this Artistic License. By using, modifying or
+    distributing the Package, you accept this license. Do not use, modify,
+    or distribute the Package, if you do not accept this license.
+
+    If your Modified Version has been derived from a Modified Version made
+    by someone other than you, you are nevertheless required to ensure that
+    your Modified Version complies with the requirements of this license.
+
+    This license does not grant you the right to use any trademark, service
+    mark, tradename, or logo of the Copyright Holder.
+
+    This license includes the non-exclusive, worldwide, free-of-charge
+    patent license to make, have made, use, offer to sell, sell, import and
+    otherwise transfer the Package with respect to any patent claims
+    licensable by the Copyright Holder that are necessarily infringed by
+    the Package. If you institute patent litigation (including a
+    cross-claim or counterclaim) against any party alleging that the
+    Package constitutes direct or contributory patent infringement, then
+    this Artistic License to you shall terminate on the date that such
+    litigation is filed.
+
+    Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
+    AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
+    THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+    PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
+    YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
+    CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
+    CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
+    EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+

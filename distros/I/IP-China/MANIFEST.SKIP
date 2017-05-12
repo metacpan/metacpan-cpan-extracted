@@ -1,0 +1,14 @@
+build\.pl
+blib/.*
+.gitignore
+Makefile$
+pm_to_blib
+MYMETA.*
+.*.bak
+\.(?:o|bs|~\d+~|tmpl)$
+# Output of XS compilation.
+China\.c
+# Distribution files.
+IP-China-[0-9\.]+\.tar\.gz$
+IP-China-[0-9\.]+\/
+^makeitfile$

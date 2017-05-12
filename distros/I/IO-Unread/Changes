@@ -1,0 +1,25 @@
+Revision history for Perl extension IO::Unread.
+
+1.04 2010-12-20
+    Minor portability fixes, mostly from ikegami [RT#57775].
+
+1.03 2008-03-11
+    Fixed a stupid error in Unread.pm (does anyone actually use this?)
+
+1.02 2004-04-19
+    Added ppport.h to MANIFEST (d'oh!)
+
+1.00 2004-04-18
+    Added IO::Unread::Tied for when PerlIO isn't available
+
+0.03 2003-12-05
+    Signed
+
+0.02 2003-11-10
+    Removed Exporter
+    Fixed tests to skip IO::File if not available
+
+0.01 2003-11-10
+	- original version; created by h2xs 1.22 with options
+		-PAXn IO::Unread
+        Created Inline C code, tests

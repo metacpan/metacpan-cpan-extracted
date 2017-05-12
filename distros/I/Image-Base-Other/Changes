@@ -1,0 +1,45 @@
+Copyright 2010, 2011, 2012 Kevin Ryde
+
+This file is part of Image-Base-Other.
+
+Image-Base-Other is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3, or (at your option)
+any later version.
+
+Image-Base-Other is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You can get a copy of the GNU General Public License online at
+<http://www.gnu.org/licenses/>.
+
+
+Version 9, May 2012
+    - fix line() text clip horizontal
+
+Version 8, February 2012
+    - Text clip drawing to 0,0,width,height
+
+Version 7, July 2011
+    - SVGout,Multiplex new diamond()
+
+Version 6, July 2011
+    - Text allow filenames with leading spaces
+    - new Image::Base::SVGout
+
+Version 5, February 2011
+    - fixes for perl 5.6 and earlier
+
+Version 4, November 2010
+    - ellipse() new $fill parameter
+
+Version 3, October 2010
+    - use Image:Base 1.09 for ellipse() fixes to chain up to
+
+Version 2, September 2010
+    - test manifest only as an author test
+
+Version 1, July 2010
+    - the first version

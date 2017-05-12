@@ -1,0 +1,188 @@
+NAME
+    Image::Select - Selecting image from images directory.
+
+SYNOPSIS
+     use Image::Select;
+     my $obj = Image::Select->new(%parameters);
+     my $type = $obj->create($output_path);
+     my ($width, $height) = $obj->sizes($new_width, $new_height);
+     my $type = $obj->type($new_type);
+
+METHODS
+    "new(%parameters)"
+             Constructor.
+
+            *       "debug"
+
+                     Debug mode.
+                     Default value is 0.
+
+            *       "height"
+
+                     Height of image.
+                     Default value is 1920.
+
+            *       "loop"
+
+                     Returns images in loop.
+                     Default value is 0.
+
+            *       "path_to_images"
+
+                     Path to images.
+                     It is required.
+                     Default value is undef.
+
+            *       "type"
+
+                     Image type.
+                     List of supported types: bmp, gif, jpeg, png, pnm, raw, sgi, tga, tiff
+                     Default value is undef.
+
+            *       "width"
+
+                     Width of image.
+                     Default value is 1080.
+
+    "create($path)"
+             Create image.
+             Returns scalar value of supported file type.
+
+    "sizes([$width, $height])"
+             Set/Get image sizes.
+             Returns actual width and height.
+
+    "type([$type])"
+             Set/Get image type.
+             Returns actual type of image.
+
+ERRORS
+     new():
+             No images.
+             Parameter 'path_to_images' is required.
+             Image type '%s' doesn't supported.
+             Class::Utils:
+                     Unknown parameter '%s'.
+
+     create():
+             Cannot read file '%s'.
+                     Error, %s
+             Cannot resize image from file '%s'.
+                     Error, %s
+             Cannot write file to '$path'.
+                     Error, %s
+             No file '%s'.
+             Image type '%s' doesn't supported.
+
+EXAMPLE1
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use File::Spec::Functions qw(catfile);
+     use File::Temp qw(tempfile tempdir);
+     use Image::Random;
+     use Image::Select;
+
+     # Temporary directory to random images.
+     my $tempdir = tempdir(CLEANUP => 1);
+
+     # Create temporary images.
+     my $rand = Image::Random->new;
+     for my $i (1 .. 5) {
+             $rand->create(catfile($tempdir, $i.'.png'));
+     }
+
+     # Object.
+     my $obj = Image::Select->new(
+             'path_to_images' => $tempdir,
+     );
+
+     # Temporary file.
+     my (undef, $temp) = tempfile();
+
+     # Create image.
+     my $type = $obj->create($temp);
+
+     # Print out type.
+     print $type."\n";
+
+     # Unlink file.
+     unlink $temp;
+
+     # Output:
+     # bmp
+
+EXAMPLE2
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use File::Spec::Functions qw(catfile);
+     use File::Temp qw(tempfile tempdir);
+     use Image::Random;
+     use Image::Select;
+
+     # Temporary directory for random images.
+     my $tempdir = tempdir(CLEANUP => 1);
+
+     # Create temporary images.
+     my $rand = Image::Random->new;
+     for my $i (1 .. 5) {
+             $rand->create(catfile($tempdir, $i.'.png'));
+     }
+
+     # Object.
+     my $obj = Image::Select->new(
+             'loop' => 0,
+             'path_to_images' => $tempdir,
+     );
+
+     # Temporary file.
+     my (undef, $temp) = tempfile();
+
+     # Create image.
+     while (my $type = $obj->create($temp)) {
+
+             # Print out type.
+             print $type."\n";
+     }
+
+     # Unlink file.
+     unlink $temp;
+
+     # Output:
+     # bmp
+     # bmp
+     # bmp
+     # bmp
+     # bmp
+
+DEPENDENCIES
+    Class::Utils, Error::Pure, File::Basename, File::Find::Rule,
+    File::Find::Rule::MMagic, Imager, List::MoreUtils.
+
+SEE ALSO
+    Image::Random
+        Perl class for creating random image.
+
+    Image::Select::Array
+        Selecting image from list with checking.
+
+REPOSITORY
+    <https://github.com/tupinek/Image-Select>
+
+AUTHOR
+    Michal Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+     © 2014-2015 Michal Špaček
+     BSD 2-Clause License
+
+VERSION
+    0.04
+

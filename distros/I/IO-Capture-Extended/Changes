@@ -1,0 +1,61 @@
+Revision history for Perl extension IO-Capture-Extended
+
+0.13 Wed Mar 11 19:06:32 EDT 2015
+    - Add metadata to Makefile.PL.
+
+0.12 Sat May 17 21:57:55 EDT 2014
+    - Updated LICENSE file in response to
+      https://rt.cpan.org/Ticket/Display.html?id=73197.
+    - Repository established at:
+      https://github.com/jkeenan/IO-Capture-Extended.
+
+0.11 Wed Sep  6 21:39:43 EDT 2006
+    - Added 'use strict;' to lib/ IO/Capture/Extended/Overview.pm.  No change
+      in functionality.
+
+0.10 Tue May 23 22:08:06 EDT 2006
+    - Added 'use strict;' and 'use warnings;' to lib/IO/Capture/Extended.pm.
+      No change in functionality.  Removed 'Todo' from distribution.
+
+0.09 Fri May 13 22:33:00 EDT 2005
+    - MANIFEST in v0.08 lacked t/testlib/_Auxiliary.pm.  Hence, it 
+didn't get packed in distribution by 'make dist'.  Hence, when I 
+installed distro from CPAN, everything went kaflooey!
+
+0.08 Thu May 12 21:30:00 EDT 2005
+    - Correcting flaw in packaging of distribution.
+
+0.07 Wed May 11 21:53:14 EDT 2005
+    - Initiated work on IO-Capture-Extended to supersede
+IO-Capture-Stdout-Extended and extend functionality to capturing
+standard error in addition to standard output.
+
+0.06 Sun Mar 13 17:37:19 EST 2005
+    - Corrected one documentation error: 'unchomped' -> 'chomped'.
+
+0.05 Sun Mar 13 17:01:21 EST 2005
+    - Corrected logical flaw in all_screen_lines so that print
+statements which contain more than one newline character are 
+correctly counted as more than one screen line.
+
+0.04 Sun Mar 13 13:37:24 EST 2005
+    - Added method all_screen_lines() so that accurate tests of the 
+number of lines normally observed by eye on STDOUT can be conducted.  
+(Avoids pitfall of multiple 'print' statements per screen line buried 
+inside subroutines which print to STDOUT.)  Added appropriate tests.
+
+0.03 Tue Mar  1 14:50:01 EST 2005
+    - Following correspondence with Mark Reynolds, co-author and CPAN 
+maintainer of IO::Capture, this version is first uploaded to CPAN.
+Slight changes to documentation.
+
+0.02 Sun Feb 13 17:02:15 EST 2005
+    - Renamed IO::Capture::Stdout::Extended.  Based on suggestions made 
+on perl.qa newsgroup and study of IO::Capture documentation, interface 
+was revised and made object-oriented.  Tests and documentation 
+extensively revised.
+
+0.01 Thu Feb 10 18:37:00 2005
+    - original version; created by ExtUtils::ModuleMaker 0.3207
+
+

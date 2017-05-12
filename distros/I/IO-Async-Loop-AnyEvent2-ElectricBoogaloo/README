@@ -1,0 +1,41 @@
+IO-Async-Loop-AnyEvent2-ElectricBoogaloo
+
+load IO::Async::Loop::AnyEvent
+
+INSTALLATION
+
+Normally you'd use a CPAN client such as cpan or cpanm:
+
+  % cpan IO::Async::Loop::AnyEvent2::ElectricBoogaloo
+  - or -
+  % cpanm IO::Async::Loop::AnyEvent2::ElectricBoogaloo
+
+This will likely fail because one of the prerequisites (AnyEvent) is
+sabotaging the other (IO::Async::Loop::AnyEvent).
+
+The workaround: Install IO::Async::Loop::AnyEvent without running its
+tests first:
+
+  % cpan -T IO::Async::Loop::AnyEvent 
+  - or -
+  % cpanm --notest IO::Async::Loop::AnyEvent
+
+After that, this module should build and install without problems.
+
+To install it manually, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+COPYRIGHT AND LICENCE
+
+Written by Lukas Mai, 2011, 2016.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

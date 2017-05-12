@@ -1,0 +1,11 @@
+Revision history for Perl extension Puzzle.
+
+0.05 2015-??-?? ESTRABD
+    - Added github repo to metadata
+    - Dropped the check on $] >= 5.005 around ABSTRACT_FROM and AUTHOR
+      in Makefile.PL, since the first line is requiring Perl 5.014004.
+
+0.01  Tue Apr 28 15:03:31 2015
+	- original version; created by h2xs 1.23 with options
+		-A -n Puzzle
+

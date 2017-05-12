@@ -1,0 +1,15 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Image::JPEG::EstimateQuality;
+
+my $q;
+if (@ARGV) {
+    $q = jpeg_quality($ARGV[0]);
+} else {
+    my $data = do { local $/; <> };
+    $q = jpeg_quality(\$data);
+}
+
+print $q, "\n";

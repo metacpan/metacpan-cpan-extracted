@@ -1,0 +1,29 @@
+NAME
+
+IPC::Filter - filter data through an external process
+
+DESCRIPTION
+
+The "filter" function provided by this module passes data through an
+external command, thus providing filtering in non-pipeline situations.
+
+INSTALLATION
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+AUTHOR
+
+Andrew Main (Zefram) <zefram@fysh.org>
+
+COPYRIGHT
+
+Copyright (C) 2004, 2007, 2010, 2011
+Andrew Main (Zefram) <zefram@fysh.org>
+
+LICENSE
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

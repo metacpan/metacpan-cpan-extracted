@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<tileset>
+	<layout type="tiles" size="32x32" x="0" y="0">
+		<tile x="0" y="0" id="grass" />
+		<tile x="1" y="0" id="sand" />
+		<tile x="2" y="0" id="bush" />
+
+		<tile x="0" y="1" id="grid-blue" />
+		<tile x="1" y="1" id="grid-yellow" />
+	</layout>
+	<layout type="fixed">
+		<tile x1="0" y1="0" x2="32" y2="32" id="grass-fixed" />
+		<tile x1="0" y1="0" x2="64" y2="32" id="grass-and-sand" />
+	</layout>
+</tileset>

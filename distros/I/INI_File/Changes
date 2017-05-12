@@ -1,0 +1,29 @@
+==================================================
+Changes from 1740-11-27 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.001 at 2014-09-11 19:50:30 +0000
+------------------------------------------
+
+  Change: d14b1ecd63b055f6a518611badcc395c82a808d3
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-09-11 21:49:23 +0000
+
+    Added travis yml 
+
+  Change: a14aa5601a20122c93d3987188b3c0e8abd89e73
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-09-11 21:49:00 +0000
+
+    First working version 
+
+  Change: 8a267894e12d551934c9ffb92525a8585f0de73a
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-09-11 20:59:16 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

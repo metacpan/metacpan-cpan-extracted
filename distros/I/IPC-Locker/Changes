@@ -1,0 +1,259 @@
+Revision history for Perl extension IPC::Locker
+
+The contributors that suggested a given feature are shown in [].
+
+
+* IPC::Locker 1.496 2017-04-26
+
+****	Fix tests '.' for Perl 5.26.0, rt121025.  [Dan Collins]
+
+
+* IPC::Locker 1.494 2017-01-20
+
+***     Fix debug message.
+
+
+* IPC::Locker 1.492 2013-01-31
+
+***     Add --host option to lockerd.  [Victor Gamov]
+
+
+* IPC::Locker 1.491 2012-03-16
+
+****	Fix cpan-testers' tests on systems without perldoc.
+
+
+* IPC::Locker 1.489 2012-01-12
+
+****	Fix some false CPAN test failures.
+
+
+* IPC::Locker 1.488 2010-08-04
+
+****	Fix some false CPAN test failures with pidstat on slow systems.
+
+
+* IPC::Locker 1.487 2010-07-01
+
+****	Fix documentation on ::Server, bug252.  [Dennis McCoy]
+
+****	Use Test::More to simplify test failure debugging.
+
+
+* IPC::Locker 1.486 2010-04-20
+
+**	Add 3 automatic retries on connection failures.  [Krishna Subramanian]
+	Override using IPC::Locker->new()'s connect_tries and connect_sleep.
+
+***	Fix repeating locks to one client, bug237.  [by Krishna Subramanian]
+
+****	Fix "waiting" messages to show first lock name, not last.
+
+
+* IPC::Locker 1.485 2010-03-04
+
+****	Fix Pod::Usage dependency, rt51024.  [Andreas Koenig]
+
+
+* IPC::Locker 1.484 2009-05-08
+
+**	This package is now licensed under LGPL v3 and/or Artistic v2.0.
+
+
+* IPC::Locker 1.483 2008-07-28
+
+****	Fix pidwatch --killer --signal to prepend dash.  [Bryce Denney]
+
+****	Fix locker ignoring remote PidWatch process death.
+
+
+* IPC::Locker 1.482 2008-07-01
+
+***	Don't require pidstatd for pidwatch'es on localhost. [Bryce Denney]
+
+
+* IPC::Locker 1.481 2008-02-09
+
+****	Fix Perl 5.6.2 compile warnings.  [cpan-testers]
+
+
+* IPC::Locker 1.480 2008-02-01
+
+****	Added return type suppression to IPC::PidStat::pid_request.
+
+****	Fix server to support over 1024 client connections.  [Bryce Denney]
+
+****	Lockerd performance enhancements to support > 3000 requests/second.
+
+
+* IPC::Locker 1.472 2007-07-16
+
+****	Fix locker test.  [cpan-testers]
+
+
+* IPC::Locker 1.471 2007-07-05
+
+****	Fix loosing $@ in evals due to IO::Socket::INET bug.  [Bryce Denney]
+
+
+* IPC::Locker 1.470 2007-05-04
+
+**	Add uriexec.  [by Jeff Dutton]
+
+****	Scripts are now distributed under the script directory.
+
+
+* IPC::Locker 1.463 2007-04-05
+
+****	Fix 'make test' issues on systems without Nagios.  [cpan-testers]
+
+
+* IPC::Locker 1.462 2007-04-03
+
+***	Fix requested pid not being passed down to server.  [Vasu Arasanipalai]
+
+****	Fix --help to use Pod::Usage instead of depreciated pod2text.
+
+
+* IPC::Locker 1.461 2007-01-24
+
+****	Pass full hostname through IPC::PidStat daemons.
+	This allows lockerd to process returns from hosts with aliased names.
+
+
+* IPC::Locker 1.460 2007-01-23
+
+**	Support locking across multiple domains.  [Daniel DeFolo]
+
+***	Use fully qualified domain name instead of hostname. [Daniel DeFolo]
+
+
+* IPC::Locker 1.452 2006-08-07
+
+***	Destroy_unlock now only unlocks when the current pid matches the pid
+	that requested the lock, to prevent forked processes from unlocking
+	the lock.  [Jeff Dutton]
+
+***	Add pidwatch --foreground switch.
+
+
+* IPC::Locker 1.451 2006-05-23
+
+****	Cache IP addresses to avoid name server traffic. [by Greg Waters]
+
+
+* IPC::Locker 1.450 (Alpha release only)
+
+**	Created lockersh program for adding locks around other programs.
+
+***	Add IPCLOCKER_HOST and IPCLOCKER_PORT environment variables.
+
+
+* IPC::Locker 1.440 2006-03-13
+
+***	Add Nagios plugins check_lockerd and check_pidstatd.
+
+***	Fix pidwatch dieing due to SIGCHILD race. [by Greg Waters]
+
+
+* IPC::Locker 1.434 2005-10-13
+
+**	NEWS is now renamed Changes, to support CPAN indexing. [Offer Kaye]
+
+****	Fixed initalization scripts.
+
+
+* IPC::Locker 1.433 2004-12-01
+
+***	Fix filename conflict on Windows
+
+
+* IPC::Locker 1.431 2004-09-13
+
+***	Disassociate pidstatd from stdout so runs better as deamon.
+
+
+* IPC::Locker 1.430 2004-01-27
+
+****	Warn about non-root pidstatd initialization.
+
+
+* IPC::Locker 1.420 2003-07-24
+
+**	Added pidstat tool for querying the daemon. [by Stephen Adkins]
+
+***	Added pid_request_recv method.
+
+***	Added pid=># parameter for setting PID to track. [Stephen Adkins]
+
+
+* IPC::Locker 1.410 2003-01-31
+
+***	Added lock_list() method.  [by Anton Berezin]
+
+
+* IPC::Locker 1.401 2002-08-22
+
+****	Fix tests to start the servers automatically.
+
+
+* IPC::Locker 1.400 2002-08-01
+
+**	Added pidstatd deamon and pidwatch program.
+	Optional.  If running, allows for autounlocking across any hosts,
+	and for any generic application to determine if a PID exists on the
+	server's machine.
+
+***	Added ping() method for determining if a server is up.
+
+***	Added example init.d/lockerd file.
+
+
+* IPC::Locker 1.300 2002-04-03
+
+**	Added autounlock switch to locks.  This records the host
+	and pid which obtained the lock, and if that PID disappears
+	the lock is released to a new host.  [Stephen Adkins]
+
+***	Fixed bug which made lockerd --port option not work.
+
+***	Allow colon separated hostnames for fallback hosting.
+
+
+* IPC::Locker 1.200 2001-11-15
+
+**	Allow multiple lock names on lock requests,
+	and return the first one which becomes free. [Mike Lopresti]
+
+**	A zero timeout will disable timeouts.  [James FitzGibbon]
+
+
+* IPC::Locker 1.14 2000-02-13
+
+**	Changed default port to 'lockerd' which will look up the port
+	number in /etc/services.  If not found defaults to old 1751.
+
+***	Improved detection and recovery of daemon failures.
+
+
+* IPC::Locker 1.12 2000-05-24
+
+**	Added support for Unix named sockets
+	[Written by kaspar@lifosa.com]
+
+***	Fixed bug where lock expiration timer would fire at wrong time
+
+----------------------------------------------------------------------
+DESCRIPTION: Documentation on change history for this package
+----------------------------------------------------------------------
+
+This uses outline mode in Emacs.  See C-h m [M-x describe-mode].
+
+Copyright 1999-2017 by Wilson Snyder.  This program is free software;
+you can redistribute it and/or modify it under the terms of either the GNU
+Lesser General Public License Version 3 or the Perl Artistic License Version 2.0.
+
+Local variables:
+mode: outline
+paragraph-separate: "[ 	\f\n]*$"
+end:

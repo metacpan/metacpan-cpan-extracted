@@ -1,0 +1,70 @@
+Revision history for Inline::Befunge.
+
+High-level changelog
+====================
+
+1.1.x   language::befunge 3.x support
+1.0.x   working release
+0.5.x   keeping cpan happy
+0.1.x   kwalitee release
+0.0x    initial work
+
+
+Low-level changelog
+===================
+
+1.1.1 Mon Nov 26 13:18:10 CET 2007
+ - kwalitee/cpants release
+
+1.1.0 Wed Oct 24 15:21:06 CEST 2007
+ - fixed to work with Language::Befunge 3.00 semantics (vectors)
+
+**
+
+1.0.0 Fri May 25 19:26:10 CEST 2007
+ - ditto (why oh why 0.04 is higher than 0.5?). anyway, since it's
+   working now, i can bump to 1.0.0
+
+**
+
+0.5.0 Fri May 25 18:40:25 CEST 2007
+ - bump in version in order to make cpan happy (stupid versioning using 2
+   digits).
+
+**
+
+0.1.1 Fri May 25 17:20:46 CEST 2007
+ - changed license back to perl
+
+0.1.0 Thu May 24 17:54:53 CEST 2007
+ - changed license to gpl
+ - fixed bug (hopefully) that made the tests to fail
+ - fixed bug in Makefile.PL missing prereq
+ - using standard lib/ layout
+ - change versioning to x.y.z
+ - provide build.pl as an alternative to makemaker
+ - docs & pod overhaul
+
+**
+
+0.04 Mon Apr 22 20:49:29 CEST 2002
+ - Minor pod update.
+ - Minor tweak in Makefile.PL (should not be necessary, but...)
+ - Taking advantage of IP::spush_args
+
+0.03 Tue Apr 16 18:43:13 CEST 2002
+ - Fixed a bug in the build() incantations, so that an object
+   file will be created.
+ - New options DEBUG accepted, to follow the IP(s) as they are
+   parsing the funge-space.
+
+0.02 Tue Apr 16 17:44:52 CEST 2002
+ - Thanks to Sean O'Rourke, there is now a more natural and
+   powerful method to fetch the subnames.
+ - tests update to reflect those changes.
+ - info now return the names of the subs defined.
+ - POD update.
+
+0.01 Mon Apr 15 18:00:43 CEST 2002
+ - Original, working version.
+

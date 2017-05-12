@@ -1,0 +1,42 @@
+Image::XFace
+
+This is a very simple interface to the libcompface library used for encoding
+and decoding `X-Face' images used in email headers.
+
+Many versions of libcompface are broken and don't contain the compface
+function. This is fine if you don't want to create X-Face data, less so
+otherwise. I fixed this in faces-1.6.1 with the following patch:
+
+diff -urN faces-orig/compface/Makefile faces/compface/Makefile
+--- faces-orig/compface/Makefile        Thu Oct 24 03:28:06 1991
++++ faces/compface/Makefile     Sun Feb 17 20:14:35 2002
+@@ -34,7 +34,7 @@
+ LIBRARY                = $(LIBDIR)/$(LIBNAME)
+ MAN1DIR                = $(MANDIR)/man1
+ MAN3DIR                = $(MANDIR)/man3
+-OBJECTS                = arith.o file.o compress.o gen.o uncompface.o
++OBJECTS                = arith.o file.o compress.o gen.o uncompface.o compface.o
+ SOURCES                = compface.c uncompface.o arith.c file.c compress.c gen.c \
+                  cmain.c uncmain.c
+ HDRS           = compface.h data.h
+diff -urN faces-orig/compface/compface.c faces/compface/compface.c
+--- faces-orig/compface/compface.c      Wed Jun 19 07:29:12 1991
++++ faces/compface/compface.c   Sun Feb 17 22:59:49 2002
+@@ -13,7 +13,7 @@
+  *  to me, then an attempt will be made to fix them.
+  */
+ 
+-#define MAIN
++/* #define MAIN */
+ 
+ #include "compface.h"
+ 
+--- patch ends
+
+The interface code was written by SWIG, because I am too lazy to write XS
+code myself. However, I have modified the results of the SWIG stuff, so you
+can't simply re-run it from the interface definition in swig/. In particular,
+the version of SWIG I used didn't like to make modules in subdirectories and
+I couldn't see a nice way to combine perl and C code in the generated pm file.
+So I just cobbled it together manually. 
+

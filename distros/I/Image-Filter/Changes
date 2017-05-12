@@ -1,0 +1,29 @@
+Revision history for Perl extension Image::Filter.
+
+0.01  Wed Jun 26 14:00:00 2002
+	- original version
+
+0.02  Wed Jun 26 15:00:00 2002
+	- minor tweaks and fixes
+	- Added Edge filter
+
+0.03  Fri Jun 28 18:00:00 2002
+	- Implemented OO and Module loading
+	- Added Invert, Posterize and Sharpen filter
+	
+0.04  Sat Jun 29 18:00:00 2002
+	- Added parameter handling for a few modules
+	- Added Eraseline, Greyscale, Level, Pixelizea and Rotate filter
+
+0.05  Sat Nov 23 23:00:00 2002
+	- Added Color handling for a few modules
+	- Tweaked for TrueColor (libgd 2)
+	- Added Floyd-Steinberg filter
+
+0.06  Thu Jan 16 23:00:00 2003
+        - Added Ripple, Gaussian Blur, Swirl and Twirl filter  
+	- Included Channel filter (was left out for some reason)
+
+0.07  Thu Jan 18 02:00:00 2003
+        - Added Oilify and Solarize
+	- Minor tweaks and fixes

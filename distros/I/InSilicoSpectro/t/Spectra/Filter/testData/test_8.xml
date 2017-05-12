@@ -1,0 +1,17 @@
+<!--only leave the msmsCompounds with a higher or equal intensity  as the quantil of 90%-->
+
+<ExpMsMsSpectrumFilter>
+<oneExpMsMsSpectrumFilter spectrumType="msms" name="dummy">
+	        <level>msmsCompounds</level>	
+		<action type="removeOther">		
+		       <threshold type="sort">	
+			   <relativeTo>quantile</relativeTo>							
+			   <thresholdValue>0.9</thresholdValue>
+			   <comparator>ge</comparator>						
+		       </threshold>
+                </action>
+		<filterValue type="directValue">							
+			<name>precursor.intensity</name>						
+		</filterValue>
+	</oneExpMsMsSpectrumFilter>
+</ExpMsMsSpectrumFilter>

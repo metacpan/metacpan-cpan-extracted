@@ -1,0 +1,23 @@
+Makefile.PL
+MANIFEST
+README
+t/01_basic.t
+t/02_create.t
+t/03_dither.t
+lib/Image/Caa.pm
+lib/Image/Caa/DitherNone.pm
+lib/Image/Caa/DitherOrdered2.pm
+lib/Image/Caa/DitherOrdered4.pm
+lib/Image/Caa/DitherOrdered8.pm
+lib/Image/Caa/DitherRandom.pm
+lib/Image/Caa/DriverANSI.pm
+lib/Image/Caa/DriverCurses.pm
+lib/Image/Caa/DriverTest.pm
+demos/kitten.pl
+demos/kitten.jpg
+demos/portrait.pl
+demos/portrait.jpg
+demos/sunset.pl
+demos/sunset.jpg
+demos/curses.pl
+META.yml                                 Module meta-data (added by MakeMaker)

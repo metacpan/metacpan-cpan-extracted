@@ -1,0 +1,10 @@
+Build.PL
+Changes
+lib/IO/Unread.pm
+lib/IO/Unread.xs
+MANIFEST			This list of files
+META.yml
+ppport.h
+README
+t/1.t
+typemap

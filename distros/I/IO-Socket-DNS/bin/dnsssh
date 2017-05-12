@@ -1,0 +1,96 @@
+#!/usr/bin/perl -w
+
+=head1 NAME
+
+dnsssh - Wrapper script for dnsc and ssh
+
+=head1 SYNOPSIS
+
+  dnsssh --suffix=DNS_Suffix [ssh_options] [user@]hostname [command]
+
+=head1 DESCRIPTION
+
+The --suffix is the DNS Suffix delegated to the dnsd server.
+If none is specified from commandline, then the DNS_SUFFIX
+environment variable is used.
+This setting is required.
+
+The optional [ssh_options] are passed to the real ssh command.
+
+Special attention has been taken for the "-p" option and the
+"hostname" arguments in order to tunnel properly, but everything
+should function like the normal ssh program.
+
+=head1 CAVEATS
+
+The "ssh" client must exist in the path.
+This utility does not re-implement the entire SSH protocol.
+It just calls dnsc and ssh with the proper arguments for you.
+
+I disabled Strict Host Checking to avoid conflicts with
+previous invocations and to reduce bloating up of useless
+entries into your known_hosts file.
+But it will always claim it "Permanently added" the host.
+
+=head1 SEE ALSO
+
+dnsc, dnsd, ssh
+
+=head1 AUTHOR
+
+Rob Brown, E<lt>bbb@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2011-2012 by Rob Brown
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.9 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut
+
+use strict;
+use IO::Socket;
+
+$ENV{DNS_SUFFIX} ||= do { my $try = "DNS_Suffix"; $try =~ /\./ ? $try : ""; };
+my $suffix = $ENV{DNS_SUFFIX};
+
+my @args = @ARGV;
+
+for (my $i = 0; $i < @args; $i++) {
+    if ($args[$i] =~ /^\-\-?su[^=]*=?(.*)/) {
+        # Detect option --suffix=...
+        my $s = $1;
+        splice(@args, $i, 1);
+        if (!length $s) {
+            ($s) = splice(@args, $i, 1);
+        }
+        $suffix = $s;
+        $i--;
+    }
+}
+
+$suffix or die "Tunnel DNS Suffix must be specified\n";
+@args or exec "ssh" or die "exec: ssh: $!";
+
+my $dnsnc = $0;
+if ($dnsnc =~ s/dnsssh/dnsnetcat/) {
+    if (-e $dnsnc) {
+        print "Using proxy program: $dnsnc ...\n";
+    }
+    else {
+        die "$dnsnc: Unable to find dnsnetcat client proxy software\n";
+    }
+}
+else {
+    die "$dnsnc: Unimplemented invocation.\n";
+}
+
+# Run the actual ssh program
+my @run = ("ssh",
+    -o => "ProxyCommand $dnsnc --suffix=$suffix %h %p",
+    @args,
+);
+warn "[$$] RUNNING [@run] ...\n";
+exec @run or die "exec: ssh: $!";

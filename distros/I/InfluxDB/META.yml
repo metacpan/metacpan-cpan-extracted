@@ -1,0 +1,45 @@
+---
+abstract: 'Client library for InfluxDB'
+author:
+  - 'HIROSE Masaaki <hirose31@gmail.com>'
+build_requires:
+  Pod::Wordlist: 0
+  Test::Fixme: 0
+  Test::Kwalitee: 0
+  Test::More: 0
+  Test::Spelling: 0.12
+configure_requires:
+  Module::Build::Tiny: 0.039
+  perl: 5.010_000
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.035, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: InfluxDB
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  Class::Accessor::Lite: 0
+  Data::Validator: 0
+  Furl: 0
+  JSON: 2
+  Mouse::Util::TypeConstraints: 0
+  URI::Escape: 0
+  perl: 5.010
+resources:
+  bugtracker: https://github.com/hirose31/p5-InfluxDB/issues
+  homepage: https://github.com/hirose31/p5-InfluxDB
+  repository: https://github.com/hirose31/p5-InfluxDB.git
+version: 1.005
+x_contributors:
+  - 'Matthew Astley <mca@sanger.ac.uk>'
+  - 'Oriol Soriano <oriol.soriano@capside.com>'
+  - 'Will Bradley <zyphlar@users.noreply.github.com>'

@@ -1,0 +1,95 @@
+========
+Read also the wiki page
+http://wiki.kde.org/tiki-index.php?page=Image%3A%3AKimdaba
+=======
+
+
+
+This is a perl module Image::Kimdaba.pm which allows quick extensions
+to kimdaba, and some scripts that use this.
+
+To install it :
+	
+	$ perl -MCPAN -e shell
+	follow the instructions. 
+	then type :
+	install Image::Kimdaba
+
+(Note: if you want to install it all locally, say "PREFIX=~/local"
+and set the environment variable :
+
+	$ export PERL5LIB=~
+
+
+This is a perl module Image::Kimdaba.pm which allows quick extensions
+to kimdaba, and some scripts that use this.
+
+To install it :
+	
+	$ perl -MCPAN -e shell
+	follow the instructions. 
+	then type :
+	install Image::Kimdaba
+
+(Note: if you want to install it all locally, say "PREFIX=~/local"
+and set the environment variable :
+
+	$ export PERL5LIB=~/local/lib/perl5/site_perl/5.8.3:~/local/lib/perl5/5.8.3
+
+see ~/local/lib/perl5/ to know how to adapt it to your version of perl)
+
+To make your own extensions, see 
+    - "kim_example.pl"
+    - "kim_example_modifydb.pl"
+
+Here we describe scripts already made that you may find useful.
+
+    The first time, do :
+$ ./kim_2_digikam <rootfolder>
+    it will create the digikam.db database used by digikam >= 0.7
+
+    Launch kimdaba, do some changes, relaunch the script
+$ ./kim_2_digikam <rootfolder>
+    it will update the digikam.db database
+    (you have to restart digikam to see the changes, though)
+
+    Add some categories in Digikam to some pictures
+    and relaunch the script
+$ ./kim_2_digikam <rootfolder>
+    Then you can import the modications you made with Digikam
+    by doing in Kimdaba :
+	File -> import : /tmp/digikam_export.kim	
+
+The good thing with synchroniyzing with digikam.db
+is that you can then use the "digikamtags:/" KIOSlave
+to browse by Persons/Keywords/Locations in every KDE app.
+(And add a tab "Kimdaba" => url=digikamtags:/ in Konqueror slidebar
+for example).
+
+
+    * Auto-assign categoryimages (for the "see by icons view" in Kimdaba's browser)
+$ ./kim_category_images  <rootfolder>
+    It's faster than to set the 500 pictures by hand, isn't it ?
+    You can still use the category editor to choose a better picture for
+    this person or that keyword, the script will not overwrite it.
+
+    * Really rotate your pictures
+(needs the jpegtran tool)
+$ ./kim_rotate.pl <rootfolder>
+
+PS: someone to convert also the persons/keywords/locations, the date
+if it has changed, the comment ? perhaps imagemagick would help.
+
+    * kim_bestof (see the script to customize it)
+I put the keyword "+++" on my best pictures, this allows me to always
+show to my friends a beautiful diaporama. This very small script does
+symbolic links of all those pictures in one directory. Then I configured 
+KDE control > look and feel > Wallpaper to do a diaporama of the 
+pictures contained in this folder.
+    
+    * Export a hierarchy of symbolic links 
+    (a bit proof-of-concept for Kimdaba.pm, but could be useful when using
+     non kde apps (see kim_2_digikam ))
+Edit the first line of the script, then     
+$ ./kim_2_filesystem <rootfolder>    
+

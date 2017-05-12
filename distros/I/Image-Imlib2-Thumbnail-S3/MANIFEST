@@ -1,0 +1,9 @@
+CHANGES
+lib/Image/Imlib2/Thumbnail/S3.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/2048x1536.png
+t/pod.t
+t/pod_coverage.t
+META.yml                                 Module meta-data (added by MakeMaker)

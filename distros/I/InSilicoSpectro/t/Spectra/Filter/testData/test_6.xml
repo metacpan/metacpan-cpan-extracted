@@ -1,0 +1,17 @@
+<!--keep the MSMS-Compounds above a absolute intesity value of 20'000-->
+
+<ExpMsMsSpectrumFilter>
+<oneExpMsMsSpectrumFilter spectrumType="msms" name="dummy">
+	        <level>msmsCompounds</level>	
+		<action type="removeOther">		
+		       <threshold type="sort">	
+			   <relativeTo>absValue</relativeTo>							
+			   <thresholdValue>20000</thresholdValue>
+			   <comparator>gt</comparator>						
+		       </threshold>
+                </action>
+		<filterValue type="directValue">							
+			<name>precursor.intensity</name>						
+		</filterValue>
+	</oneExpMsMsSpectrumFilter>
+</ExpMsMsSpectrumFilter>

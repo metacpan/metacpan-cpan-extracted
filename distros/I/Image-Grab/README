@@ -1,0 +1,50 @@
+NAME
+    Image::Grab - Perl module to easily grab images from the 'net.
+
+Behavior Changes:
+    Since 1.1, I've made Image::Grab look for background images. This could
+    cause you problems if the background images match your regexps or if you use
+    indexes.
+
+    Since 0.9.5, I've added the search_url method in lieu of overloading regexp.
+    This means that you'll have to check your scripts.
+
+    Since 0.9.3, I've added the do_posix method and changed the behavior so that
+    POSIX date substitution is only done if do_posix is set. This is because
+    strftime appears to garble the 128th character and on in long string
+    substitutions. I've seen this in Digital Unix, Linux and Solaris.
+
+Installation:
+    You must have the following modules already installed:
+
+      Digest::MD5 2.07
+      HTML::Parser 2.20
+      HTML::Tree 0.51
+      MIME::Base64 2.11
+      URI 1.02
+      libnet 1.0606
+      libwww-perl 5.43
+
+    (Earlier versions of some packages may work, but I haven't tested them.)
+
+      $ perl Makefile.PL
+      $ make test
+      $ make install
+
+    And that should do it. Let me know of any problems (<mah@everybody.org>)
+
+Testing:
+    Unless you have cookies for www.chron.com, the cookies.t test will be
+    skipped. The tests rely on cookies being set in your ~/.netscape/cookies
+    file. You could set these yourself by visiting the Huston Chronicle website
+    (http://www.chron/content/comics) and getting an account. If you don't do
+    this, these tests won't even run.
+
+    If you are testing this from behind a firewall, be sure that your proxy
+    environment variables are set correctly (e.g.
+    http_proxy=http://wwwproxy:80/).
+
+Response:
+    If you care to, let me know how you are using this module. It's nice to know
+    what different people are using this for.
+

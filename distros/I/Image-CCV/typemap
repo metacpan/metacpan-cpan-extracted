@@ -1,0 +1,4 @@
+TYPEMAP
+ccv_sift_param_t*	T_PTROBJ
+ccv_array_t*	T_PTROBJ
+ccv_bbf_classifier_cascade_t*	T_PTROBJ

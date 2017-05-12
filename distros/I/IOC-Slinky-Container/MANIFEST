@@ -1,0 +1,16 @@
+Build.PL
+Changes
+lib/IOC/Slinky/Container.pm
+lib/IOC/Slinky/Container/Item/Constructed.pm
+lib/IOC/Slinky/Container/Item/Native.pm
+lib/IOC/Slinky/Container/Item/Ref.pm
+MANIFEST			This list of files
+README
+t/00-conf.t
+t/10-basic.t
+t/20-objects.t
+t/21-dbi.t
+t/objects1.pm
+Makefile.PL
+META.yml
+META.json

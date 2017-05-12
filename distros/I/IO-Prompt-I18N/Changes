@@ -1,0 +1,36 @@
+Revision history for IO-Prompt-I18N
+
+0.80    2015-01-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- Rebuild (Generate TODO.md).
+
+
+0.79    2014-12-11 (PERLANCAR)
+
+	- [ux] Uppercase all yes words (or no words).
+
+
+0.78    2014-12-11 (PERLANCAR)
+
+	- [ux] Tweak condition for showing choice of words.
+
+	- [Bugfix] Forgot to add confirm()'s default texts.
+
+
+0.77    2014-12-11 (PERLANCAR)
+
+        - Rename module/dist from SHARYANTO-Text-Prompt to IO-Prompt-I18N.
+
+        - confirm(): Add options 'lang', 'yes_words', 'no_words'. Support
+          several languages: en, fr, id.
+
+        - prompt(): Add option 'show_default'.
+
+
+0.76    2014-10-11 (PERLANCAR)
+
+        - First release, split from SHARYANTO-Utils to reduce dependencies.
+
+        - Add function: confirm().

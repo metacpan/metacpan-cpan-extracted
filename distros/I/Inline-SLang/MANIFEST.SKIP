@@ -1,0 +1,16 @@
+_Inline
+Makefile$
+Makefile\.old$
+MANIFEST\.bak$
+^blib
+pm_to_blib
+RCS
+\.o$
+~$
+^SLang.(c|bs)
+^test
+\.tar\.gz$
+^t/memtest$
+slconfig.(o|dat)$
+slconfig$
+(stf|topdl|toslang).h$

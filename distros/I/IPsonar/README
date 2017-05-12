@@ -1,0 +1,64 @@
+IPsonar
+
+The IPsonar module is intended to make it easier to interact with 
+Lumeta's IPsonar application.
+
+In a nutshell IPsonar is a large-scale network mapping and discovery
+tool.  It has a reporting engine and this library helps to wrap that
+API.
+
+At the moment you'll want to have access to an IPsonar report server
+to run the included tests.  They will assume that you have the following
+environment variables set:
+
+TEST_RSN = The report server DNS name or IP address.
+TEST_REPORT = The report that you'll be using to test against.
+
+If you don't have access to a report server those tests will be skipped.
+
+There are currently a number of dependencies around XML and the
+modules required to communicate with a RESTful https server.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc IPsonar
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=IPsonar
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/IPsonar
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/IPsonar
+
+    Search CPAN
+        http://search.cpan.org/dist/IPsonar/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2011 George Budd
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+Both "Lumeta" and "IPsonar" are registered marks of the Lumeta Corporation
+

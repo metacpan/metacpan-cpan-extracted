@@ -1,0 +1,5 @@
+.arch-ids
+{arch}
+blib/
+.svn
+patches

@@ -1,0 +1,17 @@
+0.03 2015-10-13T11:39:00+02:00
+ - Add tests for constructor.
+ - Fix 'type' parameter check.
+ - Improve SEE ALSO section in doc.
+ - Improve type constructor parameter doc.
+ - Improve width of output image for EXAMPLE section in doc.
+ - Move author tests to xt/ directory.
+ - Rewrite error message for 'type' parameter to same way as Image::Random.
+ - Update Module::Install to 1.16 version.
+ - Update copyright years.
+
+0.02 2014-12-23T14:57:31+01:00
+ - Add output image for EXAMPLE section in doc to html doc.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+
+0.01 2014-11-15T02:15:10+01:00
+ - First version.

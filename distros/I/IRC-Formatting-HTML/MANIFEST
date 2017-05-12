@@ -1,0 +1,14 @@
+Changes
+IRC-Formatting-HTML-0.20.tar.gz
+lib/IRC/Formatting/HTML.pm
+lib/IRC/Formatting/HTML/Common.pm
+lib/IRC/Formatting/HTML/Input.pm
+lib/IRC/Formatting/HTML/Output.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-output.t
+t/02-empty.t
+t/03-input.t
+META.yml                                 Module meta-data (added by MakeMaker)

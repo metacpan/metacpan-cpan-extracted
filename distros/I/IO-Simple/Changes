@@ -1,0 +1,6 @@
+Revision history for Perl extension IO::Simple.
+
+0.01  Wed Feb 28 16:20:13 2007
+	- original version; created by h2xs 1.23 with options
+		-A -X -n IO::Simple
+

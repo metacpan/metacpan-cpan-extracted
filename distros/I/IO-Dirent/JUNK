@@ -1,0 +1,90 @@
+/* this file contains experimental XS stuff I'm working on */
+/*
+  I'd like to be able to grab the dir handle coming in and get its
+  fileno (IO::Dir::Dirfd has some sample code that might be useful).
+
+  The reason I'd like to do that is so I can stat each entry in the
+  dir (and get the file type) if DT_DIR is not implemented.
+ */
+
+#include "EXTERN.h"
+#include "perl.h"
+#include "XSUB.h"
+
+#include <sys/types.h>
+#include <dirent.h>
+
+MODULE = IO::Dirent          PACKAGE = IO::Dirent
+
+#ifdef  DT_DIR2
+#define USE_D_NAME
+#endif
+
+SV *
+readdirent(dirh)
+        SV              *dirh = ST(0);
+  PROTOTYPE: *
+  PREINIT:
+        IO              *io;
+  INIT:
+        DIR             *dirp = IoDIRP(sv_2io(dirh));
+        Direntry_t      *dent;
+#ifndef USE_D_NAME
+        int             dirfp = fileno(dirfd(IoDIRP(sv_2io(dirh))));
+        int             fdsave;  /* cwd to return to */
+        struct stat     sb;
+#endif
+  PPCODE:
+#ifndef USE_D_NAME
+        /* save an fd of our current working directory */
+        if( fdsave = open(".", O_RDONLY) < 0 ) {
+            XSRETURN_UNDEF;
+        }
+
+        if( dirfp ) {
+            fprintf(stderr, "ok!\n");
+        }
+        else {
+            fprintf(stderr, "not ok!\n");
+        }
+        /* chdir to directory we're reading */
+        if( fchdir(dirfp) == 0 ) {
+            fprintf(stderr, "Hi!\n");
+#endif
+	while ((dent = (Direntry_t *)readdir(dirp))) {
+            HV *hdent;
+	    hdent = (HV *)sv_2mortal((SV *)newHV());
+#ifdef DIRNAMLEN
+	    hv_store(hdent, "name",    4, newSVpv(dent->d_name, dent->d_namlen), 0);
+#else
+	    hv_store(hdent, "name",    4, newSVpv(dent->d_name, 0), 0);
+#endif /* DIRNAMLEN */
+#ifdef USE_D_NAME
+            hv_store(hdent, "type",    4, newSVnv(dent->d_type),                 0);
+#else
+            if( lstat(dent->d_name, &sb) == 0 ) {
+                hv_store(hdent, "type", 4, newSVnv( ( ((sb.st_mode) & 0170000) >> 12) ), 0);
+            }
+#endif
+            XPUSHs(sv_2mortal(newRV((SV *) hdent))); /* test this w/o newRV */
+        }
+#ifndef USE_D_NAME
+        fclose(fdsave);
+        }
+        else {
+            switch(errno) {
+                case EACCES:
+                    fprintf(stderr, "Access denied.\n");
+                    break;
+                case ENOTDIR:
+                    fprintf(stderr, "Directory does not exist.\n");
+                    break;
+                case EBADF:
+                    fprintf(stderr, "Not a valid file descriptor.\n");
+                    break;
+                default:
+                    fprintf(stderr, "Some other error.\n");
+                    break;
+            }
+        }
+#endif

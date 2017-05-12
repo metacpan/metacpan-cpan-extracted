@@ -1,0 +1,79 @@
+=head1 NAME
+
+ TODO - other things to be done for Imager::Graph
+
+=head1 DESCRIPTION
+
+=over
+
+=item *
+
+other graph types
+
+=item *
+
+better scaling support in the default styles
+
+=item *
+
+some sort of support for handling rounding issues nicely, eg. if the
+user supplies 3 equal values then the percentages shown all be "33%"
+which doesn't add up to 100%.  I'm not sure what can be done about
+that though.
+
+=item *
+
+better space management - the current blocking system is a bit crude
+(low priority).  This would probably require some iterative method of
+checking for overlaps for different graph elements rather than
+blocking down to a box.
+
+=item *
+
+shortcuts for fountain fill segments, ie. instead of having to call:
+
+        Imager::Fountain->simple(positions=>[0, 1], 
+                colors=>[ NC('000000'), NC('FFFFF') ])
+
+allow the entry to contain:
+
+       segments=>[ '000000', 'FFFFFF' ]
+
+or even more colors, and provide positions equally spaced from 0 to 1.
+
+=item *
+
+popped out segments (pie charts)
+
+=item *
+
+backgrounds for pie labels
+
+=item *
+
+backgrounds for pie callouts
+
+=item *
+
+break up Imager::Graph::Pie::draw() - too big
+
+=item *
+
+implement label.hpad and label.vpad
+
+=item *
+
+some way to get to the layout of the data, eg. so the user can build
+an image map, or possibly an image map generator.
+
+=item *
+
+handle small segments in the pie by making the leaders non-radial
+
+=item *
+
+move more construction to the constructor
+
+=back
+
+=cut

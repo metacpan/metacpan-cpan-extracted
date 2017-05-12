@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/IsUTF8.t
+t/data1
+t/data2
+t/data3
+t/data4
+lib/IsUTF8.pm
+META.yml                                 Module meta-data (added by MakeMaker)

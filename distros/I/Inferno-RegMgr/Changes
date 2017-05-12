@@ -1,0 +1,29 @@
+Revision history for Inferno::RegMgr
+
+v1.0.0  2016-02-16 12:05:04 EET
+	- Switch from Perl6::Export::Attrs to Export::Attrs.
+	- Switch to Dist::Milla.
+
+0.1.7	2012-11-25 08:28:49 EET
+	- update Module::Install
+
+0.1.5	2011-12-10 09:07:32 EET
+	- fix $VERSION for PAUSE compatibility
+
+0.1.4	2011-12-10 08:30:39 EET
+	- test fix
+
+0.1.3	2010-12-05 22:29:35 EET
+	[INCOMPATIBLE CHANGE]
+	- default ports changed to avoid possible
+	  conflicts with dynamically allocated ports (>32768)
+
+0.1.2	2009-10-27 01:09:32 EET
+	- doc fix
+	- test fix
+
+0.1.1	2009-07-07 17:59:08 EEST
+	- doc fix
+
+0.1.0	2009-06-25 19:45:35 EEST
+	- Initial release.

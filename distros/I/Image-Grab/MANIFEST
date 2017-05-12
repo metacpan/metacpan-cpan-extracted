@@ -1,0 +1,18 @@
+ChangeLog
+MANIFEST
+Makefile.PL
+README
+lib/Image/Grab.pm
+lib/Image/Grab.pod
+lib/Image/Grab/RequestAgent.pm
+t/background.t
+t/comics.t
+t/cookies.t
+t/manpage.t
+t/direct_grab.t
+t/easy.t
+t/md5.t
+t/type.t
+t/data/perl.gif
+t/data/bkgrd.html
+META.yml                                 Module meta-data (added by MakeMaker)

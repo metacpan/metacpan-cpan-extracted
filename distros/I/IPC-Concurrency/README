@@ -1,0 +1,50 @@
+IPC-Concurrency
+
+This module was written as an alternative to lockfiles method
+for providing concurrency check for processes.
+
+Requirements:
+
+	IPC::ShereLite
+
+Your system must support SysV IPC shared memory and semaphores.
+Almost every Linux supports it.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc IPC::Concurrency
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=IPC-Concurrency
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/IPC-Concurrency
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/IPC-Concurrency
+
+    Search CPAN
+        http://search.cpan.org/dist/IPC-Concurrency
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Pawel bbkr Pabian
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

@@ -1,0 +1,54 @@
+IO-Infiles version 0.02
+=======================
+
+This module adds more token sections at the end of your code. The
+first token must be named __END__ ; as before, its data are available
+through the END handler. If there are more token sections with other names,
+handlers of the same name are pre-opened.
+
+
+EXAMPLE:
+---------
+use IO::Infiles;
+
+
+say <FOO>;
+say <END>;
+say <SUN2>;
+
+
+__END__ 
+this is it!
+__FOO__ 
+apple orange
+__SUN1__
+__SUN2__
+Florida
+Oregon
+Nevada
+
+
+INSTALLATION
+------------
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+None
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 by Ioannis Tambouras
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.4 or,
+at your option, any later version of Perl 5 you may have available.
+
+

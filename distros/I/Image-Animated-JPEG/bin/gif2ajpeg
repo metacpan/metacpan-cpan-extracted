@@ -1,0 +1,161 @@
+#!/usr/bin/perl
+
+# convert an animated GIF to an Animated JPEG
+
+use strict;
+use warnings;
+
+use lib 'lib';
+use Data::Dumper;
+use Data::HexDump;
+use Encode;
+use File::Path ();
+use Getopt::Long;
+use Image::Animated::JPEG;
+use Image::MetaData::JPEG;
+use Pod::Usage;
+
+my $imager = eval "use Imager; 1";
+
+Getopt::Long::Configure('no_ignore_case');
+GetOptions(
+	'quality|q:s'		=> \(my $quality = 75),
+	'keep-mtime'		=> \my $keep_mtime,
+	'debug|d'		=> \my $debug,
+	'force|f'		=> \my $force,
+	'help'			=> \my $help,
+) or pod2usage(-verbose => 99, -sections => ['SYNOPSIS','OPTIONS','EXAMPLES']);
+
+pod2usage(-verbose => 99, -sections => ['SYNOPSIS','OPTIONS','EXAMPLES']) if $help;
+pod2usage( -message => "\n Please supply an input-file on command-line.\n", -verbose => 99, -sections => ['SYNOPSIS','OPTIONS','EXAMPLES'], -exitval => 2 ) unless @ARGV == 1;
+
+my $input_file = shift;
+my $output_file = shift || basename($input_file) . '.ajpeg';
+my $temp_dir = '/tmp/' . time();
+
+die " Could not find file $input_file!\n" unless -f $input_file;
+die " Input-file is not a GIF file!\n" unless $input_file =~ /\.gif$/i; # todo: probe magic-number
+die " Output-file $output_file exists! (Use --force to overwrite)\n" if -f $output_file && !$force;
+
+# todo: for each frame, also repeat value, etc.
+print "Probing input-file for delay(s) and repeat setting \n" if $debug;
+my $img = Imager->new();
+$img->read(file => $input_file) or die "Imager can't read input-file: ",$img->errstr,"\n";
+
+my $delay = $img->tags(name => 'gif_delay');
+$delay *= 10; # GIF delays are in fractions of 1/100sec (8 => 80ms)
+if($delay < 20){
+	# Mozilla never displays faster than 2/100 or 20ms or 50fps, lower
+	# values are rounded up to 100ms - so do we, as most users creating
+	# GIFs with frame delay 0 probably expect this playback rate
+	$delay = 100;
+	print " Setting override frame delay of $delay (was ". $img->tags(name => 'gif_delay') .")\n" if $debug;
+}else{
+	print " Setting frame delay to $delay \n" if $debug;
+}
+
+my $repeat = $img->tags(name => 'gif_loop'); # 0 means continuous play, the default in AJPEG
+print " Setting repeat to $repeat \n" if $debug;
+
+print "Using ImageMagick's convert to extract individual frames from input-file $input_file\n" if $debug;
+mkdir($temp_dir) or die $!;
+my $error = system('convert', '-coalesce', '-quality', $quality, $input_file, $temp_dir .'/frame_%05d.jpg' );
+die " Exiting: convert returned an error: $error \n" if $error;
+
+opendir(my $dh, $temp_dir) or die "can't opendir temp dir: $!";
+my @files = readdir($dh);
+closedir($dh);
+
+my @frames;
+for(sort @files){ next if $_ =~ /^\./; push(@frames, $temp_dir .'/'. $_); }
+
+if($keep_mtime){
+	print "Adjusting mtime of first frame temp file (for makeajpeg)\n" if $debug;
+	my @stat = stat($input_file);
+	utime(0, $stat[9], $frames[0]);
+}
+
+print "Using makeajpeg to produce AJPEG output-file $output_file\n" if $debug;
+
+my @command;
+if(-f 'bin/makeajpeg'){ @command = ('perl', 'bin/makeajpeg'); }else{ @command = ('makeajpeg') } # installed or relative?
+push(@command, '--force') if $force;
+push(@command, '--debug') if $debug;
+push(@command, '--keep-mtime') if $keep_mtime;
+push(@command, '--delay', $delay) if defined($delay);
+push(@command, '--repeat', $repeat) if defined($repeat);
+push(@command, '-o', $output_file, @frames);
+system(@command);
+
+print "Removing temporary files and dir $temp_dir\n" if $debug;
+File::Path::remove_tree( $temp_dir ) or die "Error deleting temporary directory $temp_dir: $!";
+
+sub basename {
+	my $filename = shift;
+	$filename =~ s/\.gif//i;
+	return $filename;
+}
+
+__END__
+
+=head1 NAME
+
+gif2ajpeg - Convert an animated GIF to an Animated JPEG (AJPEG) on command-line
+
+=head1 SYNOPSIS
+
+  gif2ajpeg [options] <input-file> [output-file]
+
+=head1 OPTIONS
+
+=over
+
+=item B<--quality, -q>
+
+When frames are extracted from the animated GIF, gif2ajpeg converts them to
+JPEGs. The quality setting allows to control the per-frame JPEG compression
+quality. Defaults to 75, but lower values usually yield good results.
+
+=item B<--keep-mtime>
+
+Flag. Tells gif2ajpeg to adjust the file modification timestamp (mtime) of the
+output-file to be the same as the mtime of the input-file.
+
+=item B<--force, -f>
+
+Flag. Force overwriting of an existing output file.
+
+=item B<--debug, -d>
+
+Flag. Switch debug output on.
+
+=back
+
+=head1 EXAMPLES
+
+  $ gif2ajpeg input.gif output.ajpeg
+
+When the output file is omitted, gif2ajpeg will write to a file with the suffix
+.ajpeg and the input file's basename:
+
+  $ gif2ajpeg --keep-mtime --quality=72 ~/some/animated.gif
+
+To batch convert a number of animated GIFs, you can use simple shell scripting:
+
+  $ for i in ~/some/*.gif; do gif2ajpeg --keep-mtime --quality=72 "$i"; done
+
+=head1 SEE ALSO
+
+More information about what this script does can be found in the documentation
+of the backend module L<Image::Animated::JPEG>.
+
+=head1 AUTHOR
+
+Clipland GmbH L<http://www.clipland.com/>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2012-2017 Clipland GmbH. All rights reserved.
+
+This library is free software, dual-licensed under L<GPLv3|http://www.gnu.org/licenses/gpl>/L<AL2|http://opensource.org/licenses/Artistic-2.0>.
+You can redistribute it and/or modify it under the same terms as Perl itself.

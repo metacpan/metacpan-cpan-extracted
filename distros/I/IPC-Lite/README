@@ -1,0 +1,98 @@
+NAME
+    IPC::Lite - Share variables between processes
+
+SYNOPSIS
+    Simple example creates package global shared variables named "count" and
+    "stack".
+
+     use IPC::Lite qw($count, @stack);
+
+    Example of a shared variable "temp", with a 5 second timeout. Uses
+    'globaltemp-v1' as the program key, so other programs with this key will
+    also be able to access $temp.
+
+     use IPC::Lite Key=>'globaltemp-v1', Timeout=>5, qw($temp);
+
+     $temp = $ARGV[0] if $ARGV[0];
+
+     print "temp is: $temp\n";
+
+    This example shows the power of using this module for IPC:
+
+     use IPC::Lite qw($c);
+     $c = undef;
+
+     my $pid = fork;
+
+     if ($pid) {
+            wait;
+            print "Child told me $c\n";
+     } else {
+            $c = "hello!";
+     }
+
+METHODS
+    use IPC::Lite [opt1=>value1[, opt2=>value2 ...],] qw(var1[ var2]...);
+        Possible options are:
+
+                Key=>NAME - Unique name of your data store, if not set then one is created for you
+                Timeout=>VALUE - Specifies timeout in seconds or in days if "d[ays]" is appended to the VALUE
+                Ttl=>VALUE - Alias for timeout
+                Path=>PATH - Path to the data store used.  IPC will fail if the path cannot be written to
+
+        Option names are case insensitive.
+
+        If no "vars" are specified, the options are saved as package-level
+        defaults.
+
+        If "vars" are specified, then the options are used for *those vars
+        only*, and are not saved as defaults.
+
+        For example, this creates 2 package-global variables with different
+        timeouts:
+
+         use IPC::Lite Key=>'myuniquekey', 
+                       Timeout=>5, qw($fleeting), 
+                       Timeout=>'10d', qw($lasting);
+
+    tie $var, 'IPC::Lite', %options
+        Makes the variable shared as above, but the variable can be a proper
+        lexical. Uses package defaults if any are set.
+
+        Same options described in "use" above, but must also chose one of
+        these two required binding methods:
+
+                Sym=>SYMBOL - Name of the symbol tied to (valid for any variable)
+                Table=>NAME - Name of the table to store the variable in (valid ONLY for hash or array).
+
+        NOTE:
+
+        The "use" method above merely calls the "tie" method (here) with the
+        Sym option set to the name of the symbol passed in. The caller's
+        package is added to the symbol name for storage only if the caller's
+        package is not "main". You shouldn't need to know this.
+
+    path()
+        Prints the path of the data store.
+
+         tied($var)->path();
+
+    db()
+        Returns the active database handle. Probably shouldn't use it to
+        mess with internals, unless that's your intention.
+
+         tied($var)->db();
+
+SEE ALSO
+    DBD::SQLite
+
+AUTHOR
+    Erik Aronesty "earonesty@cpan.org"
+
+LICENSE
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See <http://www.perl.com/perl/misc/Artistic.html> or the included
+    LICENSE file.
+

@@ -1,0 +1,7 @@
+0.03    2012-08-06
+        Renamed Changes.txt to Changes
+0.02    2012-07-25
+        Added method loc() to allow $str->loc(@args)
+
+0.01    2012-07-25
+        First release

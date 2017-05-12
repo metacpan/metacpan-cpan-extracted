@@ -1,0 +1,13 @@
+Revision history for IPC-Lock-WithTTL
+
+0.02      2017-01-12 10:17:24+00:00 UTC
+
+0.02      2017-01-12 07:18:24+00:00 UTC
+    [IMPROVEMENTS]
+        - Use temporary file name in test cases
+          ref: https://rt.cpan.org/Ticket/Display.html?id=119775
+
+0.01     2013-03-07
+    [NEW FEATURES]
+        - Initial version
+ 

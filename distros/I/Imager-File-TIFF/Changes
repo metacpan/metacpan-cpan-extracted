@@ -1,0 +1,99 @@
+Imager-File-TIFF 0.89
+=====================
+
+ - update the bundled/modified Devel::CheckLib to handle the gcc-4
+   symlink on Cygwin
+
+Imager-File-TIFF 0.88
+=====================
+
+ - handle SampleFormat = 2 by translating the signed integer values to
+   unsigned by flipping their sign bits.
+
+   Handle SampleFormat = 3 where possible.
+
+   SampleFormat is ignored for paletted images.
+
+   Mixed SampleFormat are be handled incorrectly, since libtiff
+   returns only the first SampleFormat value, and an image with both
+   an alpha channel and SampleFormat = 2 for color channels probably
+   has a different SampleFormat for the alpha channel.
+
+   https://rt.cpan.org/Ticket/Display.html?id=74540
+
+ - eliminate some warnings produced by GCC 4.7.2:
+
+    - a set but otherwise unused variable,
+
+    - an incompletely bracketed array of structures initialization, and
+
+    - a format string error (with no security implications)
+
+Imager-File-TIFF 0.87
+=====================
+
+ - fix some mismatched format strings/types
+
+Imager-File-TIFF 0.86
+=====================
+
+ - update README
+
+Imager-File-TIFF 0.85
+=====================
+
+ - for libtiff versions that support extended warning handlers (3.8.0
+   or later), use them to avoid some global variables.
+
+ - clean up .dSYM directories generated performing probes on OS X
+   Mountain Lion.
+
+ - pass the --verbose command-line option through to Imager::Probe in
+   Makefile.PL
+   https://rt.cpan.org/Ticket/Display.html?id=75878
+
+Imager-File-TIFF 0.83
+=====================
+
+ - no longer fallback to using DynaLoader to load the XS code
+   https://rt.cpan.org/Ticket/Display.html?id=75560
+
+Imager-File-TIFF 0.82
+=====================
+
+ - modify to use the new buffered I/O functions instead of calling
+   I/O layer callbacks directly.
+   https://rt.cpan.org/Ticket/Display.html?id=69912
+
+ - handle I/O close errors properly
+
+Imager-File-TIFF 0.81
+=====================
+
+ - check image file limits set by set_file_limits()
+
+ - use TIFFReadDirectory() instead of TIFFSetDirectory() to step
+   through IFDs, since that handles IFD loops.
+
+ - update the bundled (and still modified) Devel::CheckLib
+   https://rt.cpan.org/Ticket/Display.html?id=69170
+
+Imager-File-TIFF 0.80
+=====================
+
+ - the big types cleanup
+
+Imager-File-TIFF 0.79
+=====================
+
+ - handle slightly different warning from libtiff 4.x
+   https://rt.cpan.org/Ticket/Display.html?id=65268
+
+ - replace (imager|tony)@imager.perl.org in the doc, since I don't
+   plan to continue receiving mail at that address.
+   https://rt.cpan.org/Ticket/Display.html?id=68591
+
+Imager-File-TIFF 0.78
+=====================
+
+Split out from Imager.

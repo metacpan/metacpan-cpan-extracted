@@ -1,0 +1,758 @@
+=for comment based on iup-3.5 - http://www.tecgraf.puc-rio.br/iup/en/ctrl/iup_pplot.html
+
+=head1 NAME
+
+IUP::Plot - [GUI element] canvas-like element for creating 2D plots
+
+=head1 DESCRIPTION
+
+Creates a PPlot-based plot. PPlot is a library for creating plots that is system independent. 
+
+It is available at SourceForge L<http://pplot.sourceforge.net|http://pplot.sourceforge.net/>.
+However the standard PPlot distribution source code was changed for iup_pplot library 
+(to improve features and visual appearance).
+
+=begin HTML
+
+<p>
+  <table border="1">
+    <tbody>
+    <tr>
+      <td><img src="http://kmx.github.io/perl-iup/img-3.9/ctrl/iup_pplot0.gif" border="0"></td>
+      <td><img src="http://kmx.github.io/perl-iup/img-3.9/ctrl/iup_pplot1.gif" border="0"></td>
+    </tr>
+    <tr>
+      <td><img src="http://kmx.github.io/perl-iup/img-3.9/ctrl/iup_pplot2.gif" border="0"></td>
+      <td><img src="http://kmx.github.io/perl-iup/img-3.9/ctrl/iup_pplot3.gif" border="0"></td>
+    </tr>
+    <tr>
+      <td><img src="http://kmx.github.io/perl-iup/img-3.9/ctrl/iup_pplot4.gif" border="0"></td>
+      <td><img src="http://kmx.github.io/perl-iup/img-3.9/ctrl/iup_pplot5.gif" border="0"></td>
+    </tr>
+  </table>
+</p>
+
+=end HTML
+
+=head1 USAGE
+
+=head2 CREATION - new() method
+
+ $pplot = IUP::PPlot->new( TITLE=>"Simple Data", GRID=>"YES" );
+
+B<Returns:> the identifier of the created element, or C<undef> if an error occurs.
+
+NOTE: You can pass to C<new()> other C<ATTRIBUTE=E<gt>'value'> or C<CALLBACKNAME=E<gt>\&func> pairs relevant
+to this element - see L<IUP::Manual::02_Elements|IUP::Manual::02_Elements/"new()">.
+
+=head2 Guide
+
+Each plot can contain 2 B<axis> (X and Y), a B<title>, a B<legend>
+B<box>, a B<grid>, a B<dataset> B<area> and as many B<datasets> you
+want.
+
+Each data set is added using the L<IUP::PPlotAdd |IUP::PPlotAdd> function. All other plot
+parameters are configured by attributes.
+
+If no attribute is set, the default values were selected to best
+display the plot.
+
+When setting attributes the plot is NOT redrawn until the REDRAW
+attribute is set or a redraw event occurs.
+
+The B<dataset area> is delimited by a margin. Data is only plotted
+inside the dataset area. Axis and main title are positioned independent
+of this margin. It is very important to set the margins when using axis
+automatic scaling or the axis maybe hidden.
+
+The B<legend box> is a list of the dataset names, each one drawn with
+the same color of the correspondent dataset. The box is located in one
+of the four corners of the dataset area.
+
+The B<grid> is automatically spaced accordingly the current axis
+displayed values.
+
+The B<title> is always centered in the top of the plot.
+
+The B<axis> are always positioned at the origin, except when
+CrossOrigin is disabled, then it is positioned at the left-bottom. If
+values are only positive then the origin will be placed in left bottom
+position. If values are negative and positive then origin will be
+placed inside the plot. The ticks in the axis are also automatically
+distributed.
+
+PPlot implementation demands that the MARGIN* attributes must be set so
+the plot is not cropped.
+
+=head2 Interaction
+
+=head2 Zoom
+
+Zoom in can be done selecting a region using the left mouse button.
+Zoom out is done with a single click of the left mouse button. If the
+B<Ctrl+X> key combination is pressed the zoom selection is restricted
+to the X axis, the Y axis will be left unchanged. If the B<Ctrl+Y> key
+combination is pressed the zoom selection is restricted to the Y axis,
+the X axis will be left unchanged. If the B<Ctrl+R> key combination is
+pressed the zoom selection is restored to a free rectangle.
+
+Each zoom in operation is stacked, so each zoom out operation goes back
+the the previous zoom selection.
+
+Zoom operates on B<AXS_XMAX, AXS_XMIN, AXS_YMAX, AXS_YMIN> even 
+if B<AUTOMIN/MAX> is enabled. The axis may be hidden depending on the
+selected rectangle.
+
+=head2 CrossHair Cursor
+
+If you press the B<Ctrl+Shift> key combination, while holding the left
+mouse button down, a cross hair cursor will be displayed for each
+dataset in the plot. The X coordinate will control the cursor, the Y
+coordinate will reflect each dataset correspondent value.
+
+=head2 Selection and Editing
+
+Selection and editing of a dataset can be enabled using the B<DS_EDIT>
+attribute.
+
+To select all the samples in the dataset press the B<Shift> key while
+clicking with the left mouse button near a sample in the dataset. To
+deselect all samples press the B<Shift> key while clicking with the
+left mouse button in the background.
+
+To select or deselect individual samples press the B<Ctrl> key while
+clicking with the left mouse button near the sample in the dataset.
+
+After selecting samples use the B<Del> key to remove the selected
+samples. Also use the arrow keys to move the Y coordinate of the
+selected samples. Press the B<Ctrl> key to increase the step size when
+moving the Y coordinate.
+
+=head2 Auxiliary Functions
+
+=head3 PlotBegin()
+
+ $plot->PlotBegin($dim);
+ # $dim = 1 (for 1D) or 2 (for 2D)
+
+Prepares a dataset to receive samples. The dimension of the data can be 1, 2 or 3.
+
+=head3 PlotEnd()
+
+ $index = $plot->PlotEnd();
+
+Adds a 2D dataset to the plot and returns the dataset B<index>. The
+data set can be empty. Redraw is NOT done until the REDRAW attribute is
+set. Also it will change the current dataset index to the return value.
+You can only set attributes of a dataset AFTER you added the dataset.
+Can only be called if L<PlotBegin|IUP::PPlot/"PlotBegin()"> was called. Whenever you create a
+dataset all its "DS_*" attributes will be set to the default values.
+Notice that DS_MODE must be set before other "DS_*" attributes.
+
+=head3 PlotNewDataSet()
+
+  $plot->PlotNewDataSet($dim);
+  # $dim = 1 (for 1D) or 2 (for 2D)
+  
+Creates an empty dataset to receive samples. The dimension of the data can be 1 or 2.
+
+=head3 PlotAdd1D()
+
+ $plot->PlotAdd1D($name, $y);
+ #or
+ $plot->PlotAdd1D(\@name, \@y);
+ #or
+ $plot->PlotAdd1D($y);
+ #or
+ $plot->PlotAdd1D(\@y);
+
+Adds a sample to the dataset. Can only be called if L<PlotBegin|/"PlotBegin()">
+was called with dim=1. B<name> is an optional string used for tick
+labels in the X axis, and it can be C<undef>. Names are
+allowed only for the first dataset and when set ticks configuration for
+the X axis is ignored, all the names are shown.
+
+=head3 PlotAdd2D()
+
+ $plot->PlotAdd2D($x, $y);
+ #or
+ $plot->PlotAdd2D(\@x, \@y);
+
+=head3 PlotInsert1D()
+
+ $plot->PlotInsert1D($index, $sample_index, \@name, \@y);
+ #or
+ $plot->PlotInsert1D($index, $sample_index, \@y);
+
+See L<PlotInsert2D|/"PlotInsert2D()">.
+
+=head3 PlotInsert2D()
+
+ $plot->PlotInsert2D($index, $sample_index, \@x, \@y);
+
+Inserts an array of samples in the dataset B<ds_index> at the given
+B<sample_index>. Can be used only after the dataset is added to the plot
+(after L<PlotBegin|/"PlotBegin()">). B<sample_index> can be after the
+last sample so data is appended to the array. Current data is shifted if necessary.
+
+=head3 PlotTransform()
+
+ ($ix, $iy) = $plot->PlotTransform($x, $y);
+
+Converts coordinates in plot units to pixels. It should be used in
+PREDRAW_CB and POSTDRAW_CB callbacks only. Output variables can be C<undef>
+if not used. It can be used inside other callbacks, but make sure that
+the drawing after a resize is done.
+
+=head3 PlotPaintTo()
+
+ $plot->PlotPaintTo($canvas);
+ 
+Plots to the given canvas instead of the display canvas.
+
+Handy if you want to save the plot into L<IUP::Canvas::SVG> or L<IUP::Canvas::EMF> like this:
+
+  my $cnv = IUP::Canvas::SVG->new(filename=>"output.svg", width=>300, height=>210, resolution=>4);
+  $mainplot->PlotPaintTo($cnv);
+  $cnv->cdKillCanvas();
+
+=head2 ATTRIBUTES
+
+For more info about concept of attributes (setting/getting values etc.)
+see L<IUP::Manual::03_Attributes|IUP::Manual::03_Attributes>. Attributes specific to this element:
+
+=head3 Basic
+
+=over
+
+=item B<REDRAW>
+
+I<(write-only, non inheritable)> Redraw the plot and update
+the display. Value is ignored. All other attributes will B<NOT> update
+the display, so you can set many attributes without visual output.
+
+=item B<USE_IMAGERGB>
+
+I<(non inheritable)> Defines if the double buffer will
+use standard driver image (NO - faster) or an RGB image (YES - slower).
+Default: NO. The IMAGERGB driver has anti-aliasing which can improve
+the line drawing.
+
+=item B<USE_GDI+>
+
+I<[Windows Only] (non inheritable)> Defines if the double
+buffer will use GDI+ (YES) for drawing or standard GDI (NO). Default:
+NO. The GDI+ driver has anti-aliasing which can improve the line
+drawing.
+
+=item B<L<FONT|IUP::Manual::03_Attributes/FONT>>
+
+The font used in all text elements
+of the plot: title, legend and labels.
+
+=item B<L<BGCOLOR|IUP::Manual::03_Attributes/BGCOLOR>>
+
+The background color. The
+default value is white "255 255 255".
+
+=item B<L<FGCOLOR|IUP::Manual::03_Attributes/FGCOLOR>>
+
+The title color. The default
+value is black "0 0 0".
+
+=item B<TITLE>
+
+I<(non inheritable)> The title. Located always at the top center area.
+
+=item B<TITLEFONTSIZE, TITLEFONTSTYLE>
+
+I<(non inheritable)> The title font size
+and style. The default values depends on the FONT attribute and the
+returned value is C<undef>. Set to C<undef>, to use the FONT attribute values.
+Style can be "PLAIN", "BOLD", "ITALIC" or "BOLDITALIC".
+
+=item B<MARGINLEFT, MARGINRIGHT, MARGINTOP, MARGINBOTTOM>
+
+I<(non inheritable)> Margin of the dataset area. PPlot implementation demands that margins
+must be set so the plot is not cropped. Default: "15", "15", "30", "15".
+
+=back
+
+=head3 Legend Configuration (non inheritable)
+
+=over
+
+=item B<LEGENDSHOW>
+
+Shows or hides the legend box. Can be YES or NO.
+Default: NO.
+
+=item B<LEGENDPOS>
+
+Legend box position. Can be: "TOPLEFT", "TOPRIGHT",
+"BOTTOMLEFT", or "BOTTOMRIGHT. Default: "TOPRIGHT".
+
+=item B<LEGENDFONTSIZE, LEGENDFONTSTYLE>
+
+The legend box text font size and style.
+
+=back
+
+=head3 Grid Configuration (non inheritable)
+
+=over
+
+=item B<GRIDLINESTYLE>
+
+Line style of the grid. Can be: "CONTINUOUS",
+"DASHED", "DOTTED", "DASH_DOT", "DASH_DOT_DOT". Default is
+"CONTINUOUS".
+
+=item B<GRIDCOLOR>
+
+Grid color. Default: "200 200 200".
+
+=item B<GRID>
+
+Shows or hides the grid in both or a specific axis. Can be:
+YES (both), HORIZONTAL, VERTICAL or NO. Default: NO.
+
+=back
+
+=head3 Dataset Management (non inheritable)
+
+=over
+
+=item B<REMOVE>
+
+I<(write-only)> Removes a dataset given its index.
+
+=item B<CLEAR>
+
+I<(write-only)> Removes all datasets. Value is ignored.
+
+=item B<COUNT>
+
+I<[read-only]> Total number of datasets.
+
+=item B<CURRENT>
+
+Current dataset index. Default is -1. When a dataset is
+added it becomes the current dataset. The index starts at 0. All "DS_*"
+attributes are dependent on this value.
+
+=item B<DS_LEGEND>
+
+Legend text of the current dataset. Default is
+dynamically generated: "plot 0", "plot 1", "plot 2", ...
+
+=item B<DS_COLOR>
+
+Color of the current dataset and it legend text. Default
+is dynamically generated for the 6 first datasets, others are default
+to black "0 0 0". The first 6 are: 0="255 0 0", 1="0 0 255", 2="0 255
+0", 3="0 255 255", 4="255 0 255", 5="255 255 0".
+
+=item B<DS_MODE>
+
+Drawing mode of the current dataset. Can be: "LINE", "BAR",
+"MARK" or "MARKLINE". Default: "LINE". This must be set before other
+"DS_*" attributes.
+
+=item B<DS_LINESTYLE>
+
+Line style of the current dataset. Can be:
+"CONTINUOUS", "DASHED", "DOTTED", "DASH_DOT", "DASH_DOT_DOT". Default
+is "CONTINUOUS".
+
+=item B<DS_LINEWIDTH>
+
+Line width of the current dataset. Default: 1.
+
+=item B<DS_MARKSTYLE>
+
+Mark style of the current dataset. Can be: "PLUS",
+"STAR", "CIRCLE", "X", "BOX", "DIAMOND", "HOLLOW_CIRCLE", "HOLLOW_BOX",
+"HOLLOW_DIAMOND". Default is "X".
+
+=item B<DS_MARKSIZE>
+
+Mark size of the current dataset. Default: 7.
+
+=item B<DS_SHOWVALUES>
+
+Enable or disable the display of the values near each
+sample. Can be YES or NO. Default: NO.
+
+=item B<DS_REMOVE>
+
+I<(write-only)> Removes a sample from the current dataset given its index.
+
+=item B<DS_EDIT>
+
+Enable or disable the current dataset selection and
+editing. Can be YES or NO. Default: NO.
+
+=back
+
+=head3 Axis Configuration (non inheritable)
+
+=over
+
+=item B<AXS_XCOLOR, AXS_YCOLOR>
+
+Axis, ticks and label color. Default: "0 0 0".
+
+=item B<AXS_XMAX, AXS_XMIN, AXS_YMAX, AXS_YMIN>
+
+Minimum and maximum
+displayed values of the respective axis. Automatically calculated
+values when AUTOMIN or AUTOMAX are enabled.
+
+=item B<AXS_XAUTOMIN, AXS_XAUTOMAX, AXS_YAUTOMIN, AXS_YAUTOMAX>
+
+Configures the automatic scaling of the minimum and maximum display values. Can be
+YES or NO. Default: YES.
+
+=item B<AXS_XLABEL, AXS_YLABEL>
+
+Text label of the respective axis.
+
+=item B<AXS_XLABELCENTERED>, B<AXS_YLABELCENTERED>
+
+Text label position at
+center (YES) or at top/right (NO). Default: YES.
+
+=item B<AXS_XREVERSE, AXS_YREVERSE>
+
+Reverse the axis direction. Can be YES
+or NO. Default: NO. Default is Y oriented bottom to top, and X oriented
+from left to right.
+
+=item B<AXS_XCROSSORIGIN, AXS_YCROSSORIGIN>
+
+Allow the axis to cross the
+origin and to be placed inside the dataset area. Can be YES or NO.
+Default: YES.
+
+=item B<AXS_XSCALE, AXS_YSCALE>
+
+Configures the scale of the respective axis.
+Can be: LIN (liner), LOG10 (base 10), LOG2 (base 2) and LOGN (base e).
+Default: LIN.
+
+=item B<AXS_XFONTSIZE, AXS_YFONTSIZE, AXS_XFONTSTYLE, AXS_YFONTSTYLE>
+
+Axis label text font size and style. See TITLEFONTSIZE and TITLEFONTSTYLE.
+
+=item B<AXS_XTICK, AXS_YTICK>
+
+Enable or disable the axis tick display. Can
+be YES or NO. Default: YES.
+
+=item B<AXS_XTICKFORMAT, AXS_YTICKFORMAT>
+
+Axis tick number C format string.
+Default: "%.0f".
+
+=item B<AXS_XTICKFONTSIZE, AXS_YTICKFONTSIZE, AXS_XTICKFONTSTYLE, AXS_YTICKFONTSTYLE>
+
+Axis tick number font size and style. See
+TITLEFONTSIZE and TITLEFONTSTYLE.
+
+=item B<AXS_XAUTOTICK>, B<AXS_YAUTOTICK>
+
+Configures the automatic tick
+spacing. Can be YES or NO. Default: YES.
+
+=item B<AXS_XTICKMAJORSPAN>, B<AXS_YTICKMAJORSPAN>
+
+The spacing between major
+ticks. Default is 1 when AUTOTICK is disabled.
+
+=item B<AXS_XTICKDIVISION>, B<AXS_YTICKDIVISION>
+
+Number of ticks between
+each major tick. Default is 5 when AUTOTICK is disabled.
+
+=item B<AXS_XAUTOTICKSIZE, AXS_YAUTOTICKSIZE>
+
+Configures the automatic tick
+size. Can be YES or NO. Default: YES.
+
+=item B<AXS_XTICKSIZE, AXS_YTICKSIZE>
+
+Size of ticks in pixels. Default is 5
+when AUTOTICKSIZE is disabled.
+
+=item B<AXS_XTICKMAJORSIZE, AXS_YTICKMAJORSIZE>
+
+Size of major ticks in
+pixels. Default is 8 when AUTOTICKSIZE is disabled.
+
+=back
+
+The following L<common attributes|IUP::Manual::03_Attributes/Common Attributes> are also accepted:
+
+=over
+
+=item * L<ACTIVE|IUP::Manual::03_Attributes/ACTIVE>,
+L<SCREENPOSITION|IUP::Manual::03_Attributes/SCREENPOSITION>,
+L<POSITION|IUP::Manual::03_Attributes/POSITION>,
+L<MINSIZE|IUP::Manual::03_Attributes/MINSIZE>,
+L<MAXSIZE|IUP::Manual::03_Attributes/MAXSIZE>, L<WID|IUP::Manual::03_Attributes/WID>,
+L<TIP|IUP::Manual::03_Attributes/TIP>, L<SIZE|IUP::Manual::03_Attributes/SIZE>,
+L<RASTERSIZE|IUP::Manual::03_Attributes/RASTERSIZE>,
+L<ZORDER|IUP::Manual::03_Attributes/ZORDER>,
+L<VISIBLE|IUP::Manual::03_Attributes/VISIBLE>
+
+=back
+
+=head2 CALLBACKS
+
+For more info about concept of callbacks (setting callback handlers etc.)
+see L<IUP::Manual::04_Callbacks|IUP::Manual::04_Callbacks>. Callbacks specific to this element:
+
+=over
+
+=item B<DELETE_CB>
+
+Action generated when the Del key is pressed to removed a
+sample from a dataset. If multiple points are selected it is called
+once for each selected point.
+
+B<Callback handler prototype:>
+
+ sub delete_cb_handler {
+   my ($self, $index, $sample_index, $x, $y) = @_;
+   #...
+ }
+
+=over
+
+B<$index:> index of the dataset
+
+B<$sample_index:> index of the sample in the dataset
+
+B<$x:> X coordinate value of the sample
+
+B<$y:> Y coordinate value of the sample
+
+B<Returns:> If IUP_IGNORE then the sample is not deleted.
+
+=back
+
+=item B<DELETEBEGIN_CB, DELETEEND_CB>
+
+Actions generated when a delete
+operation will begin or end. But they are called only if DELETE_CB is
+also defined.
+
+B<Callback handler prototype:>
+
+ sub deletebegin_cb_handler {
+   my ($self) = @_;
+   #...
+ }
+
+B<Callback handler prototype:>
+
+ sub deleteend_cb_handler {
+   my ($self) = @_;
+   #...
+ }
+
+=over
+
+B<Returns:> If DELETEBEGIN_CB returns IUP_IGNORE the delete operation for
+all the selected samples are aborted.
+
+=back
+
+=item B<SELECT_CB>
+
+Action generated when a sample is selected. If multiple
+points are selected it is called once for each new selected point. It
+is called only if the selection state of the sample is about to be
+changed.
+
+B<Callback handler prototype:>
+
+ sub select_cb_handler {
+   my ($self, $index, $sample_index, $x, $y, $select) = @_;
+   #...
+ }
+
+=over
+
+B<$index> - index of the dataset
+
+B<$sample_index> - index of the sample in the dataset
+
+B<$x:> X coordinate value of the sample
+
+B<$y:> Y coordinate value of the sample
+
+B<$select:> boolean value that a non zero value indicates if the point
+is to be selected.
+
+B<Returns:> If IUP_IGNORE then the sample is not selected.
+
+=back
+
+=item B<SELECTBEGIN_CB, SELECTEND_CB>
+
+Actions generated when a selection
+operation will begin or end. But they are called only if SELECT_CB is
+also defined.
+
+B<Callback handler prototype:>
+
+ sub seletebegin_cb_handler {
+   my ($self) = @_;
+   #...
+ }
+
+B<Callback handler prototype:>
+
+ sub selectend_cb_handler {
+   my ($self) = @_;
+   #...
+ }
+
+=over
+
+B<Returns:> If SELECTBEGIN_CB returns IUP_IGNORE the selection operation
+is aborted.
+
+=back
+
+=item B<EDIT_CB>
+
+Action generated when a sample is selected. If multiple
+points are selected it is called once for each new selected point. It
+is called only if the selection state of the sample is about to be
+changed.
+
+B<Callback handler prototype:>
+
+ sub edit_cb_handler {
+   my ($self, $index, $sample_index, $x, $y) = @_;
+   my $new_x, $new_y, $retval;
+   #...
+   return ($new_x, $new_y, $retval);
+ }
+ #ZZZ-test-this
+
+=over
+
+B<$index:> index of the dataset
+
+B<$sample_index:> index of the sample in the dataset
+
+B<$x:> X coordinate value of the sample
+
+B<$y:> Y coordinate value of the sample
+
+B<$new_x:> (return value) the new X coordinate value of the sample
+
+B<$new_y:> (return value) the new Y coordinate value of the sample
+
+B<$retval:> (return value) If IUP_IGNORE then the sample is not edited. The application
+can changed the new value before it is edited.
+
+=back
+
+=item B<EDITBEGIN_CB, EDITEND_CB>
+
+Actions generated when an editing
+operation will begin or end. But they are called only if EDIT_CB is
+also defined.
+
+B<Callback handler prototype:>
+
+ sub editbegin_cb_handler {
+   my ($self) = @_;
+   #...
+ }
+
+B<Callback handler prototype:>
+
+ sub editend_cb_handler {
+   my ($self) = @_;
+   #...
+ }
+
+=over
+
+B<Returns:> If EDITBEGIN_CB returns IUP_IGNORE the editing operation is
+aborted.
+
+=back
+
+=item B<PREDRAW_CB, POSTDRAW_CB>
+
+Actions generated before and after the
+redraw operation. Predraw can be used to draw a different background
+and Postdraw can be used to draw additional information in the plot.
+Predraw has no restrictions, but Postdraw is clipped to the dataset
+area. To position elements in plot units, use the L<PlotTransform|IUP::PPlot/"PlotTransform()">
+function.
+
+B<Callback handler prototype:>
+
+ sub predraw_cb_handler {
+   my ($self, $canvas) = @_;
+   #...
+ }
+
+B<Callback handler prototype:>
+
+ sub postdraw_cb_handler {
+   my ($self, $canvas) = @_;
+   #...
+ }
+
+=over
+
+B<$cnv:> reference to L<IUP::Canvas> where the draw operation occurs.
+
+=back
+
+=back
+
+The following L<common callbacks|IUP::Manual::04_Callbacks/Common Callbacks> are also accepted:
+
+=over
+
+=item * L<MAP_CB|IUP::Manual::04_Callbacks/MAP_CB>,
+L<UNMAP_CB|IUP::Manual::04_Callbacks/UNMAP_CB>,
+L<GETFOCUS_CB|IUP::Manual::04_Callbacks/GETFOCUS_CB>,
+L<KILLFOCUS_CB|IUP::Manual::04_Callbacks/KILLFOCUS_CB>,
+L<ENTERWINDOW_CB|IUP::Manual::04_Callbacks/ENTERWINDOW_CB>,
+L<LEAVEWINDOW_CB|IUP::Manual::04_Callbacks/LEAVEWINDOW_CB>,
+L<K_ANY|IUP::Manual::04_Callbacks/K_ANY>, L<HELP_CB|IUP::Manual::04_Callbacks/HELP_CB>
+
+=back
+
+=head1 EXAMPLES
+
+
+The element B<IUP::PPlot> is used in the following sample scripts:
+
+=over
+
+=item * L<1-apps/app-plot-demo.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/1-apps/app-plot-demo.pl> - dials for zooming
+
+=back 
+
+
+
+=head1 SEE ALSO
+
+L<IUP::Canvas|IUP::Canvas>
+
+The original doc: L<iup_pplot.html|http://www.tecgraf.puc-rio.br/iup/en/ctrl/iup_pplot.html>
+ 
+
+=cut

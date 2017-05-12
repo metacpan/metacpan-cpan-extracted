@@ -1,0 +1,55 @@
+Revision history for Perl extension Inline::TT.
+
+0.07 Sat Feb  4 08:57:50 CST 2006
+    - Traded tabs for spaces in the source code.
+    - Accepted patch from Stephen Howard which allows for block nesting
+      (so one block can PROCESS another).
+
+0.06 Mon Sep 19 14:18:03 CDT 2005
+    - Warning: Changed defaults for PRE_CHOMP and POST_CHOMP to be the
+      same as they are in TT.  This could affect whitespace surrounding
+      your results.  To go back to The Old Way, use PRE_CHOMP => 1,
+      POST_CHOMP => 1.  Note that leading and trailing space is still
+      removed by default, but see the next item.
+    - Added TRIM_LEADING_SPACE and TRIM_TRAILING_SPACE as options to
+      Inline::TT.  Use these to remove all leading and/or trailing space.
+      These are on by default for consistency with prior versions of
+      Inline::TT.
+
+0.05  Mon May 16 10:04:05 CDT 2005
+	- removed requirements for a minimum perl version and lowered
+	  the required template toolkit version to 2.0.  I should probably
+	  have stuck with a minimum of perl 5.6.1, but I just took it out.
+	  Early versions will fail on things like our.
+	- cleaned documentation slightly
+	- cleaned MANIFEST
+	- resubmitted to CPAN since 0.04 was not indexed due to ownership
+	  conflict (I sent 0.04 up before being made co-maintainer).
+
+0.04  Fri May 13 13:04:38 CDT 2005
+	- added tests to verify that INCLUDE directive works, PROCESS was not
+	  tested, but persumably works since the differences are inside TT
+	- added examples directory and the simple example.  Not coincidentally
+	  it looks a lot like t/02_simple.t
+	- added info support, so using perl -MInline=INFO program returns
+	  a list of bound subs extracted from tt2 blocks (this only works
+	  if a good _Inline or equivalent directory exists, otherwise callers
+	  are instructed to rerun).
+
+0.03  Mon Apr 11 10:46:02 2005
+	- since I could not make Inline-TT-0.02 work, I started from scratch
+	  as I worked, I looked at the original version frequently, so I
+	  say thanks to Tatsuhiko Miyagawa for the original
+	- my version was created by h2xs 1.23 with options
+		-AXn Inline::TT
+
+After version 0.02, Phil Crow took over maintanence from Tatsuhiko Miyagawa.
+
+Revision history for Perl extension Inline::TT from the original
+
+0.02  Thu Aug 22 19:17:36 JST 2002
+	- Turned POST_CHOMP off
+	  (Thanks to Mark Fowler <mark@twoshortplanks.com>)
+
+0.01  Fri Apr 26 03:47:25 2002
+	- original version

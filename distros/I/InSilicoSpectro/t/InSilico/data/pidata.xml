@@ -1,0 +1,51 @@
+<computePI>
+	<calibrator>	<train>
+			<preprocess>1</preprocess>
+			<fitting>linear</fitting>
+			<gamma>1e-06</gamma>
+		</train>
+		<data>
+			<value time="302">8.00102999566398</value>
+			<value time="527">8.00102999566398</value>
+			<value time="250">8.00102999566398</value>
+			<value time="376">8.00102999566398</value>
+			<value time="434">8.00102999566398</value>
+			<value time="523">8.00102999566398</value>
+			<value time="477">8.00102999566398</value>
+			<value time="531">8.00102999566398</value>
+			<value time="851">8.00102999566398</value>
+			<value time="468">8.00102999566398</value>
+			<value time="366">10.2969120976141</value>
+			<value time="330">10.4218497919212</value>
+			<value time="492">10.4218497919212</value>
+			<value time="447">10.4218497919212</value>
+			<value time="143">10.4218497919212</value>
+			<value time="445">10.4218497919212</value>
+			<value time="443">10.4218497919212</value>
+			<value time="445">10.4218497919212</value>
+			<value time="479">10.4218497919212</value>
+			<value time="441">10.4218497919212</value>
+			<value time="445">10.4218497919212</value>
+			<value time="479">10.4218497919212</value>
+			<value time="369">10.501030647105</value>
+			<value time="391">10.5979403561074</value>
+			<value time="481">10.5979403561074</value>
+			<value time="245">10.5979403561074</value>
+			<value time="369">10.6771214477394</value>
+			<value time="518">10.6771214477394</value>
+			<value time="306">10.6771214477394</value>
+			<value time="306">10.6771214477394</value>
+			<value time="586">10.7228788755687</value>
+			<value time="503">10.7740313449356</value>
+			<value time="264">10.8020600456148</value>
+			<value time="427">11.0750616108269</value>
+			<value time="341">11.3760913748675</value>
+			<value time="561">11.3760913748675</value>
+			<value time="508">11.3760913748675</value>
+			<value time="488">11.3760913748675</value>
+			<value time="488">11.3760913748675</value>
+			<value time="122">11.3760913748675</value>
+			<value time="873">11.3760913748675</value>
+		</data>
+	</calibrator>
+</computePI>

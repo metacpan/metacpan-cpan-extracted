@@ -1,0 +1,60 @@
+{
+   "abstract" : "IO::Storm allows you to write Bolts and Spouts for Storm in Perl.",
+   "author" : [
+      "Dan Blanchard <dblanchard@ets.org>",
+      "Cory G Watson <gphat@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "IO-Storm",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "IO::File" : "0",
+            "IO::Handle" : "0",
+            "JSON::XS" : "0",
+            "Log::Log4perl" : "0",
+            "Moo" : "0",
+            "Try::Tiny" : "0",
+            "namespace::clean" : "0",
+            "perl" : "5.010",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::MockObject" : "0",
+            "Test::More" : "0",
+            "Test::Output" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/dan-blanchard/io-storm/issues"
+      },
+      "homepage" : "https://github.com/dan-blanchard/io-storm",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/dan-blanchard/io-storm.git",
+         "web" : "https://github.com/dan-blanchard/io-storm"
+      }
+   },
+   "version" : "0.17"
+}
+

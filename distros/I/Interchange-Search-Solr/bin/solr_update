@@ -1,0 +1,54 @@
+#! /usr/bin/env perl
+#
+# Script to update Solr Index from commandline
+#
+# Copyright 2013 Stefan Hornburg (Racke) <racke@linuxia.de>
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+
+use Interchange::Search::Solr::UpdateIndex;
+
+# commandline options
+my (%opts, $mode);
+
+my $whandler = $SIG{__WARN__};
+$SIG{__WARN__} = sub {print STDERR "$0: @_";};
+unless (GetOptions (\%opts, 'delta', 'full', 'clear')) {
+    exit 1;
+}
+
+my ($solr_url) = @ARGV;
+
+unless ($solr_url) {
+    if ($ENV{SOLR_URL}) {
+        $solr_url = $ENV{SOLR_URL};
+        print "Using solr url $solr_url from environment\n";
+    }
+    else {
+        die "$0: need Solr url or SOLR_URL's environment\n";
+    }
+}
+
+# determine mode
+if ($opts{delta}) {
+    $mode = 'delta';
+}
+elsif ($opts{full}) {
+    $mode = 'full';
+}
+elsif ($opts{clear}) {
+    $mode = 'clear';
+}
+else {
+    $mode = 'full';
+}
+
+my $ui = Interchange::Search::Solr::UpdateIndex->new(url => $solr_url);
+my $response;
+unless ($response = $ui->update($mode)) {
+    die "Index update failed: " . $ui->status_line . ".\n";
+}
+print "Index  ". $mode  ." response: " . $response->content . ".\n";

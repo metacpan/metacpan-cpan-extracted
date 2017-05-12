@@ -1,0 +1,50 @@
+Iterator::Misc version 0.03
+===========================
+
+This module provides various miscellaneous iterator functions
+which are not important enough to include in Iterator::Util.
+
+An "iterator" is an object, represented as a code block that generates
+the "next value" of a sequence, and generally implemented as a
+closure. 
+
+See the Iterator module for more information on Iterators.
+
+
+DEVELOPMENT STATE
+
+This is a brand-new module.  It has a decent test suite, but has
+not been extensively field-tested.  Therefore, it should be considered
+"beta" software, and used with care.
+
+If you find any bugs, or if any behavior of Iterator surprises you,
+I would be grateful if you could send me an email message about it.
+Thanks.
+
+
+INSTALLATION
+
+To install this module, do the standard Perl module four-step:
+
+   perl Makefile.PL    or    perl Makefile.pl LIB='my/install/path'
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Iterator
+
+COPYRIGHT AND LICENSE
+
+Eric J. Roode, roode@cpan.org
+
+To avoid my spam filter, please include "Perl", "module", or this
+module's name in the message's subject line, and/or GPG-sign your
+message.
+
+Copyright (c) 2005 by Eric J. Roode. All Rights Reserved.
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

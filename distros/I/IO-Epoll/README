@@ -1,0 +1,33 @@
+IO-Epoll version 0.01
+=====================
+
+The epoll(4) subsystem is a new, (currently) Linux-specific variant of
+poll(2).  It is designed to offer O(1) scalability over large numbers of
+watched file descriptors.  You will need at least version 2.5.44 of Linux
+to use this module, and you might need to upgrade your C library.
+
+The epoll(2) API comprises three system calls: epoll_create(2),
+epoll_ctl(2) and epoll_wait(2).  IO::Epoll provides a low-level
+API which closely matches the underlying system calls.  It also provides
+a higher-level layer designed to emulate the behavior of IO::Poll>.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 by Bruce J. Keeler
+Portions derived from IO::Poll, Copyright (c) 1997-8 Graham Barr
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+

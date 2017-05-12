@@ -1,0 +1,25 @@
+dists/.*
+libpng-tests/.*
+^oneoff/.*
+.cleanok
+.git
+^xt/.*
+.*\.o$
+blib/.*
+build/.*
+^Libpng\.c$
+^Makefile$
+.*\.bak$
+^build\.pl$
+^.*\.bs$
+tmpl/.*
+Image-PNG-[\d\.]+
+Image-PNG-[\d\.]+\.tar\.gz
+lib/Image/PNG/Const\.pm
+MYMETA\..*
+makeitfile$
+doc/.*
+^pm_to_blib$
+junk/.*
+# Author tests
+xt/.*

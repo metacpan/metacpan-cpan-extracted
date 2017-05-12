@@ -1,0 +1,54 @@
+IfLoop version 0.03
+===================
+
+IfLoop --- Add loop constructs to the if-elsif-else chain syntax.
+
+IfLoop allows the syntax 
+if( A )
+{
+    do
+    {
+      #statements...
+    }while( A )
+}
+else
+{
+    #default statments...
+}
+
+to be replaced by 
+
+ifwhile(A)
+{
+    #statments...
+}
+else
+{
+    #default statements...
+}
+
+This condensed syntax is extendible just like the normal if-elsif-else
+syntax.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+1) Filter::Util::Call
+2) Text::Balanced 
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2003, Brandon Willis. All Rights Reserved.
+This module is free software. It may be used, redistributed
+and/or modified under the same terms as Perl itself.

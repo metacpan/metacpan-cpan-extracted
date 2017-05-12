@@ -1,0 +1,52 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.70.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 7c04d94bf517568d7a909bb9170a46d357ac5a84 Changes
+SHA1 d32d1b957eb6d99bd7b76fd8c33dac3bed505f96 LICENSE
+SHA1 291e6a2f7d6a38fa49513d8d30547be0dd85b5bd MANIFEST
+SHA1 d5c89dd7ec74a5db19edc73e3358e842b4eaa95f META.yml
+SHA1 8b93dc39ee3499cbb2cff738f574b1f1b58b86e3 Makefile.PL
+SHA1 6cc8867255e90e0cb296d2460b0a0b5f2af93d3f README
+SHA1 7079e3f6969d22ea45077cdefab74c1a0afe7407 Random.pm
+SHA1 ff3bf5193c2a7dbdec49b17a26e1fcc849ac16e2 examples/ex1.pl
+SHA1 9b5001bfa9cf8607b3b3935284d9253e0391c9f1 inc/Module/Install.pm
+SHA1 cab0e564f9bdf658535f683aa197157e06d0dcea inc/Module/Install/Base.pm
+SHA1 a1559b5b3b40f68efbbd256f4fef85970891b3ae inc/Module/Install/Can.pm
+SHA1 f15c1ba85f6d52e70c48c64bf0752c90a4ad66f9 inc/Module/Install/Fetch.pm
+SHA1 eb48df8bafd07c6a862126d9b274df42b4395742 inc/Module/Install/Makefile.pm
+SHA1 95c73873c6c3cb7024614c225c53863e1e90c134 inc/Module/Install/Metadata.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 f8b2ae3386f6ba26c33408968a953d450842eade inc/Module/Install/Win32.pm
+SHA1 f302bc703d76299cff243e5b44cecd61aac27b76 inc/Module/Install/WriteAll.pm
+SHA1 d4b685de6f260385865e3df3a312bbd140f45821 t/Image-Random/00-use.t
+SHA1 24b83c04685acca6a2bd4de962e6d7bdf534d42c t/Image-Random/01-version.t
+SHA1 6df4b8fc566e0652a19876f390a5356e4475fe0a t/Image-Random/02-pod_coverage.t
+SHA1 afb22d1d89824db65dec4f19483bebd4cd5109c4 t/Image-Random/03-pod.t
+SHA1 5c04c7bb07862f629a8ca0ed13ed2fec7540a805 t/Image-Random/04-new.t
+SHA1 75d027fdee0e96c7d9f318dbe24a4b5afb673261 t/Image-Random/05-create.t
+SHA1 61d59757a6a5482c325cbe8e96fd7cd9abcbdee0 t/Image-Random/06-sizes.t
+SHA1 5f58794d50c49eb983889c2a100cb6384e6271a4 t/Image-Random/07-type.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iQEcBAEBAgAGBQJUSZb9AAoJEAwa+cf4dLBa1m8H/14NxvhHqdlBzpf+AE34D9R1
+bEwZklkU7dLAgOnjojQ3aMsJvZcmcXi7BCLXEA9ESfFXx8doEjKk9CiRIvfiXJgo
+9umuunqARXF5TWJagNrC2QR8mKaCLtaGgBzZpr1oUmfXhKGIYvm3jDL9qsxz3fja
+NjMYE7pyTHp9LLEBlPxi22Xpb8fGx6Pc9Wm/ePLfpsYigN7qmHxacqM9i8XR43Pc
+BuXDxfP00+Arf8s1G72isaEV2aaQFf/y8VwMQzJxWFbxJsnj6KQiybYy6tfLMg7U
+B8rFzPDTZpgJxAAajSbzbNJxZV9tom8TauTA5u6N8hWXS6PX2oKZ8F0VJkVygTY=
+=KXff
+-----END PGP SIGNATURE-----

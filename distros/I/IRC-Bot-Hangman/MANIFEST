@@ -1,0 +1,21 @@
+bin/hangman.pl
+Build.PL
+Changes
+lib/IRC/Bot/Hangman.pm
+lib/IRC/Bot/Hangman/Command.pm
+lib/IRC/Bot/Hangman/Command/Default.pm
+lib/IRC/Bot/Hangman/Command/Eliza.pm
+lib/IRC/Bot/Hangman/Command/Profanity.pm
+lib/IRC/Bot/Hangman/Response.pm
+lib/IRC/Bot/Hangman/Response/Default.pm
+lib/IRC/Bot/Hangman/Response/Profanity.pm
+lib/IRC/Bot/Hangman/WordList.pm
+lib/IRC/Bot/Hangman/WordList/Default.pm
+lib/IRC/Bot/Hangman/WordList/TooEasy.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00pod.t
+t/01compile.t
+t/02hangman.t

@@ -1,0 +1,113 @@
+# -*- Perl -*-
+
+use IBM::LoadLeveler;
+
+$query_mach = ll_query(MACHINES);
+$return=ll_set_request($query_mach,QUERY_ALL,undef,ALL_DATA);
+if ($return != 0 )
+{
+    print STDERR "ll_set_request failed Return = $return\n";
+}
+
+$machine=ll_get_objs($query_mach,LL_CM,NULL,$number,$err);
+print "Machine Objects = $number\n";
+
+$query_perf=ll_query(PERF);
+$rc_query_perf=ll_set_request($query_perf,QUERY_PERF,undef,ALL_DATA);
+
+while($machine) {
+
+   $mach_name=ll_get_data($machine,LL_MachineName);
+   print "-------------------- Machine $mach_name ------------------\n\n";
+
+   # 0 - schedd up, 7 - schedd drained
+   $mach_sched_state=ll_get_data($machine,LL_MachineScheddState);
+   print "Schedd State = $mach_sched_state\n";
+
+   if ($mach_sched_state == 0) {
+     $perf=ll_get_objs($query_perf,LL_SCHEDD,$mach_name,$number,$err);
+     if ($perf)
+     {
+         $perf_jpend =ll_get_data($perf,LL_ScheddPerfJobsPending);
+         $perf_jstart=ll_get_data($perf,LL_ScheddPerfJobsStarting);
+         $perf_jrunn=ll_get_data($perf,LL_ScheddPerfJobsRunning);
+         $perf_cjobs=ll_get_data($perf,LL_ScheddPerfCurrentJobs);
+         $perf_tjs=ll_get_data($perf,LL_ScheddPerfTotalJobsSubmitted);
+         $perf_tjc=ll_get_data($perf,LL_ScheddPerfTotalJobsCompleted);
+         $perf_tjrm=ll_get_data($perf,LL_ScheddPerfTotalJobsRemoved);
+         $perf_tjv=ll_get_data($perf,LL_ScheddPerfTotalJobsVacated);
+         $perf_tjrj=ll_get_data($perf,LL_ScheddPerfTotalJobsRejected);
+         $perf_tc=ll_get_data($perf,LL_ScheddPerfTotalConnections);
+         $perf_fc=ll_get_data($perf,LL_ScheddPerfFailedConnections);
+         $perf_tot=ll_get_data($perf,LL_ScheddPerfTotalOutTransactions);
+         $perf_fot=ll_get_data($perf,LL_ScheddPerfFailedOutTransactions);
+         $perf_tit=ll_get_data($perf,LL_ScheddPerfTotalInTransactions);
+         $perf_fit=ll_get_data($perf,LL_ScheddPerfFailedInTransactions);
+
+         print "Total Jobs Submitted  : $perf_tjs\n";
+         print "Total Jobs Completed  : $perf_tjc\n";
+         print "Total Jobs Removed    : $perf_tjrm\n";
+         print "Total Jobs Vacated    : $perf_tjv\n";
+         print "Total Jobs Rejected   : $perf_tjrj\n";
+         print "Total Connections     : $perf_tc\n";
+         print "Fail  Connections     : $perf_fc\n";
+         print "Total Out Connections : $perf_tot\n";
+         print "Fail  Out Connections : $perf_fot\n";
+         print "Total In  Transactions: $perf_tit\n";
+         print "Fail  In  Transactions: $perf_fit\n";
+         print "\n";
+     }
+     # Free up space allocated by perf query
+
+     $mach_startd_state=ll_get_data($machine,LL_MachineStartdState);
+     print "Startd State : $mach_startd_state\n";
+
+     $perf=ll_get_objs($query_perf,LL_STARTD,$mach_name,$number,$err);
+     if ($perf)
+     {
+         $startd_pjr=ll_get_data($perf,LL_StartdPerfJobsRunning);
+         $startd_pjp=ll_get_data($perf,LL_StartdPerfJobsPending);
+         $startd_pjs=ll_get_data($perf,LL_StartdPerfJobsSuspended);
+         $startd_pcj=ll_get_data($perf,LL_StartdPerfCurrentJobs);
+         $startd_ptjr=ll_get_data($perf,LL_StartdPerfTotalJobsReceived);
+         $startd_ptjc=ll_get_data($perf,LL_StartdPerfTotalJobsCompleted);
+         $startd_ptjrm=ll_get_data($perf,LL_StartdPerfTotalJobsRemoved);
+         $startd_ptjv=ll_get_data($perf,LL_StartdPerfTotalJobsVacated);
+         $startd_ptjrj=ll_get_data($perf,LL_StartdPerfTotalJobsRejected);
+         $startd_ptjs=ll_get_data($perf,LL_StartdPerfTotalJobsSuspended);
+         $startd_ptc=ll_get_data($perf,LL_StartdPerfTotalConnections);
+         $startd_pfc=ll_get_data($perf,LL_StartdPerfFailedConnections);
+         $startd_ptot=ll_get_data($perf,LL_StartdPerfTotalOutTransactions);
+         $startd_pfot=ll_get_data($perf,LL_StartdPerfFailedOutTransactions);
+         $startd_ptit=ll_get_data($perf,LL_StartdPerfTotalInTransactions);
+         $startd_pfit=ll_get_data($perf,LL_StartdPerfFailedInTransactions);
+
+         print "Jobs Running          : $startd_pjr\n";
+         print "Jobs Pending          : $startd_pjp\n";
+         print "Jobs Suspended        : $startd_pjs\n";
+         print "Jobs Current          : $startd_pcj\n";
+         print "Jobs Recieved         : $startd_ptjr\n";
+         print "Jobs Completed        : $startd_ptjc\n";
+         print "Jobs Removed          : $startd_ptjrm\n";
+         print "Jobs Vacated          : $startd_ptjv\n";
+         print "Jobs Rejected         : $startd_ptjrj\n";
+         print "Jobs Suspended        : $startd_ptjs\n";
+         print "Total Connections     : $startd_ptc\n";
+         print "Fail  Connections     : $startd_pfc\n";
+         print "Total Out Transactions: $startd_ptot\n";
+         print "Fail  Out Transactions: $startd_pfot\n";
+         print "Total In  Transactions: $startd_ptit\n";
+         print "Fail  In  Transactions: $startd_pfit\n";
+         print "\n";
+     }
+   }
+
+   $machine = ll_next_obj($query_mach);
+}
+
+# Free up space allocated by LoadLeveler
+ll_free_objs($query_perf);
+ll_deallocate($query_perf);
+ll_free_objs($query_mach);
+ll_deallocate($query_mach);
+

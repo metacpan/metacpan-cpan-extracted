@@ -1,0 +1,347 @@
+=head1 NAME
+
+Image::Grab - Perl extension for Grabbing images off the Internet.
+
+=head1 SYNOPSIS
+
+  # If you call grab without instantiating an Image::Grab, then you
+  # can pass grab args and it will instantiate one for you and return
+  # whatever the image is.
+  use Image::Grab qw(grab);
+  # $image should contain GIF data after this.
+  $image = grab(URL=>'http://www.example.com/test.gif');
+
+  use Image::Grab;
+  $pic = new Image::Grab;
+
+  # You can also pass new arguments:
+  use Image::Grab;
+  $pic = Image::Grab->new(SEARCH_URL=>'http://www.example.com/',
+                          REGEXP    =>'.*\.gif');
+
+  # The simplest OO case of a grab
+  use Image::Grab;
+  $pic->url('http://www.example.com/someimage.jpg')
+  $pic->grab;
+
+  # Now to save the image to disk
+  open(IMAGE, ">image.jpg") || die"image.jpg: $!";
+  binmode IMAGE;  # for MSDOS derivations.
+  print IMAGE $pic->image;
+  close IMAGE;
+
+  # A slightly more complicated case
+  use Image::Grab;
+  $pic->regexp('.*logo.*\.gif');
+  $pic->search_url('http://www.example.com');
+  $pic->grab;
+
+  # Get a weather forecast
+  use Image::Grab;
+  $pic->regexp('msy.*\.gif');
+  $pic->search_url('http://www.example.com/weather/msy/content.shtml');
+  $pic->grab;
+
+=head1 DESCRIPTION
+
+Image::Grab is a simple way to get images with URLs that are either
+not predictable or are "hidden" by some method.
+
+=head1 RATIONALE
+
+I created this module so that I would have a uniform API for grabbing
+multiple images from multiple sites that use various methods of making
+their images difficult to retrieve automatically.
+
+I've tried to put into code all the ways that website creators will
+use to try to "protect" their images.  If you know of any methods I've
+missed, please email me.
+
+This module was born from a script.  The script was born when a
+certain Comics Syndicate stopped having a static (or even predictable)
+url for their comics.  I generalized the code for a friend when he
+needed to do something similar.
+
+Hopefully, others will find this module useful as well.
+
+=head1 Retrieval Methods and Properties
+
+The following are the retrieval methods and properties available for
+any Image::Grab object.
+
+One of the following should be set to specify the image.  If either
+L<regexp> or L<index> are used to specify the image, then
+L<search_url> must be set to specify the page to be searched for the
+image.
+
+B<Image::Grab> will use the data in the following order: L<url>,
+L<regexp>, L<index>.
+
+L<refer>, L<regexp>, L<search_url> and L<url> all have POSIX time
+string expansion performed on them by the
+L<expand_url|/"expand_url_tries_"> method when L<do_posix> is set.
+Thus, if you wish to have a '%' character in your URL, you must put
+'%%'.
+
+=head2 url
+
+The fully qualified URL of the image.  This method is included simply
+for completeness and convenience.  If this is all you need, you might
+check out LWP::Simple.  (Although, the date expansion is nice...)
+
+POSIX time string expansion is performed if L<do_posix> is set.
+
+Example:
+
+  $url = $image->url("http://www.example.com/%Y/%m/%d.gif");
+
+=head2 search_url
+
+If L<regexp> and/or L<index> methods are used to specify an image then
+the url in the search_url field will be used to find the image.  For
+example, if C<regexp="mac.*\.gif"> and
+C<search_url="http://www.example.com">, then when a grab is performed,
+the page at www.example.com is searched to see if any images on the
+page match the regular expression C<"mac.*\.gif">.
+
+Also, when Image::Grab finally grabs the image, it uses the
+L<search_url> as the referer field.
+
+POSIX time string expansion is performed if L<do_posix> is set.
+
+Example:
+
+  $image->search_url("http://www.example.com/weather_maps.html");
+
+=head2 index
+
+An integer indicating the image on the page to grab.  For instance,
+'1' would find the second image on the page pointed to by
+L<search_url>.  Used in conjunction with L<regexp>, it specifies which
+image to grab that the regular expression matches.
+
+Example:
+
+  $image->search_url("http://www.example.com/index.html");
+  $image->regexp(".*\.gif");
+  $image->index(1);
+
+=head2 regexp
+
+A regular expression that will match the URL of the image.  If
+L<index> is not set, then the first image that matches will be used.
+If L<index> is set, then the I<n>th image (base 0) that matches will
+be used.
+
+Set L<search_url> to the web page that you want to search with this
+regular expression.
+
+POSIX time string expansion is performed if L<do_posix> is set.
+
+Example:
+
+  $image->search_url("http://www.example.com/index.html");
+  $image->regexp(".*\.gif");
+
+=head2 grab ([$tries])
+
+Grab the image.  Returns $image->image;
+
+If the L<url> method is not used to give an absolute
+url, then L<expand_url|/"expand_url_tries_"> is called before the image is fetched.
+
+If $tries is specified, then $tries are attempted before giving up.
+$tries defaults to 10.
+
+Returns the image grabbed.
+
+Example:
+
+  $image->url("http://www.example.com/comic_strip/%Y/%M/%d.gif");
+  $pic = $image->grab;
+
+=head2 grab_new ([$tries])
+
+If neither L<date> nor L<md5> are set, than this method acts
+identically to L<grab|/"grab_tries_">.  
+
+If L<md5> is set, then the grab is performed only if the checksum of
+the newer image is different than the current checksum.
+
+If L<date> is set than the grab is performed only if the image has
+been modified since L<date>.
+
+If both L<date> and L<md5> are set then the conditions are ANDed.
+That is, the image is returned only if it has been modified since
+L<date> and its checksum is different than L<md5>.
+
+=head1 Image Properties
+
+These are various properties of the image.  Generally, you don't want
+to set these after you've grabbed an image..
+
+=head2 image
+
+Returns the actual image.
+
+=head2 date
+
+The date that the image was last updated.  The date is represented in
+the number of seconds from epoch.
+
+If this is set when L<grab_new|/"grab_new_tries_"> is called, then an image will only be
+returned if the date of the image is newer than the date set in this
+field.  (See L<grab_new|/"grab_new_tries_"> for full details.)
+
+  $image->date(localtime(time));
+
+  # Grab the image if it changes in the past 30 seconds;
+  $pic = $image->grab_new;
+  $date = $image->date;
+
+=head2 md5
+
+The md5 sum for the image.
+
+If this is set when L<grab_new|/"grab_new_tries_"> is called, then an image will only be
+returned if the md5 checksums don't match. (See L<grab_new|/"grab_new_tries_"> for full
+details.)
+
+This will only be used if the MD5 module is available.  Otherwise,
+there will be no effect.
+
+=head2 type
+
+The Content-Type of information returned.  Usually it will be a MIME type such
+as "image/jpeg".
+
+=head1 Other Properties
+
+These are miscellaneous properties.  L<do_posix> and L<cookiefile> are
+the only ones you should need to use.
+
+=head2 do_posix
+
+Tells Image::Grab to do POSIX date substitution.  This is on by
+default in recentish perls.
+
+Perl versions 5.005 and up will have this set versions before this
+will not in order to avoid buggy behavior on long URLs.  If you have
+an earlier version of Perl and wish to use the expansion, then set
+this on:
+
+  $image->do_posix(1);
+
+=head2 cookiefile
+
+Where the cookiefile is located.  Set this to the file containing the
+cookies if you wish to use the cookie file for the image.
+
+For example, I use this to authenticate on sites that require cookie
+authentication.  To do this, first load the cookie file by visiting
+the site with Netscape and getting a cookie.  Next, set the cookie
+file like this:
+
+  $image->cookiefile($ENV{HOME} ."/.netscape/cookies")
+
+Image::Grab will automatically send the correct cookie when the remote
+server asks for it.
+
+The cookiefile is assumed to be in Netscape Navigator's format.
+
+=head2 cookiejar
+
+Usually only used internally.  Contains an HTTP::Cookies::Netscape
+blessed reference.
+
+=head2 ua
+
+This contains an Image::Grab::RequestAgent blessed reference.
+Image::Grab::RequestAgent is sub-class of LWP::UserAgent and inherits
+all its methods.
+
+=head2 refer
+
+When you do a L<grab|/"grab_tries_">, this url will be given as the referring URL.
+
+POSIX time string expansion is performed if L<do_posix> is set.
+
+=head1 Other Methods
+
+=head2 auth($user, $password)
+
+Provides a username/password pair for grabbing the image.
+
+=head2 getAllURLs ([$tries])
+
+Returns a list of URLs pointing to images from the page pointed to by
+L<search_url>.  Of course, L<search_url> must be set for this method
+to be of any use.
+
+If $tries is specified, then $tries are attempted before giving up.
+$tries defaults to 10.
+
+Returns undef if no connection is made in $tries attempts.
+
+=head2 expand_url ([$tries])
+
+=head2 getRealURL ([$tries])
+
+Returns the actual URL of the image specified.  Performs POSIX time
+string expansion (see strftime(3)) using the current time if do_posix
+is set.
+
+You can use this method to get the URL for an image if that is all you
+need.
+
+If $tries is specified, then $tries are attempted before giving up.
+$tries defaults to 10.
+
+Returns undef if no connection is made in $tries attempts, if the
+L<search_url> URL is not of type text/html, or if no image that
+matches the specs is found.
+
+If L<url> is given a full URL, then it is returned with POSIX time
+string expansion performed if L<do_posix> is set.
+
+The I<getRealURL> method is deprecated.
+
+Example:
+
+  $image->regexp('msy.*\.gif');
+  $image->search_url('http://www.example.com/weather/msy/content.shtml');
+  $url = $image->expand_url;
+
+  # Grab the image using LWP::Simple.
+  use LWP::Simple;
+  $pic = get($url);
+
+=head2 loadCookieJar
+
+Usually used only internally.  Loads up the cookiejar with cookies.
+
+=head1 BUGS
+
+getAllURLs and expand_url should really be fixed so that they go out
+to the 'net only once if they need to.
+
+POSIX date substitution screws up strings longer than 127 chars.  At
+least on Perl 5.004_04 -- Perl 5.005_03 seems to behave properly.
+
+Ummm... I am sure there are others...
+
+=head1 LICENSE
+
+Same as Perl.
+
+=head1 AUTHOR
+
+Mark A. Hershberger (mah@everybody.org), http://everybody.org/mah/
+
+=head1 SEE ALSO
+
+L<HTTP::Request>, L<HTTP::Cookies>, L<HTML::TreeBuilder>,
+L<LWP::UserAgent>, L<Digest::MD5>, L<URI::URL>, strftime(3).
+
+=cut
+

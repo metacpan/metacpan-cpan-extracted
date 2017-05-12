@@ -1,0 +1,19 @@
+
+This is IO::File::Log, a module to assist in the processing of log
+files, even as they are rotated by external processes.
+
+(c) 2002 Luis E. Munoz
+
+This code is covered by the same warranty that Perl itself.
+This code can be distributed under the same terms as Perl.
+
+To install, follow the classic incantations:
+
+$ perl Makefile.PL
+$ make
+$ make test
+$ make install
+
+Module documentation is included in POD, as customary.
+
+

@@ -1,0 +1,46 @@
+----------------------------------------------------------------------------
+"THE BEER-WARE LICENSE" (Revision 42)
+<tobez@catpipe.net> wrote this file.  As long as you retain this notice you
+can do whatever you want with this stuff. If we meet some day, and you think
+this stuff is worth it, you can buy me a beer in return.   Anton Berezin
+----------------------------------------------------------------------------
+
+NAME
+    IO::Dir::Dirfd - Perl extension to extract the file descriptor from a
+    dirhandle
+
+SYNOPSIS
+      use IO::Dir::Dirfd;
+
+      opendir D, "." or die $!;
+      my $fd = dirfd(D);
+
+      use IO::Dir::Dirfd qw(fileno);
+
+      opendir D, "." or die $!;
+      my $fd = fileno(D);
+
+DESCRIPTION
+    The IO::Dir::Dirfd module provides the possibility to extract the file
+    descriptor from a directory handle on platforms where this functionality
+    is available.
+
+    It exports a single sub, dirfd(), by default. If you specify that you
+    want to export fileno(), the core fileno() will be overrided. After this
+    you can use fileno() for both file- and dirhandles.
+
+BUGS
+    As of now, the module was only tested on FreeBSD 4.4 and FreeBSD 5.0;
+    there's no garantee it will work as advertised elsewehere (or even on
+    FreeBSD, for that matter).
+
+    It is possible that the fileno(HANDLE) form will not work under all
+    circumstances. Use fileno(*HANDLE) instead if in doubt.
+
+AUTHOR
+    Anton Berezin, tobez@catpipe.net
+
+SEE ALSO
+    dirfd(3).
+
+$Id: README,v 1.1 2001/11/21 18:16:40 tobez Exp $

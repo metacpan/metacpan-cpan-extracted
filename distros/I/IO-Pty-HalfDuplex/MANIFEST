@@ -1,0 +1,27 @@
+Changes
+doc/blog-synch-nethack.html
+doc/halfframe.png
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/IO/Pty/HalfDuplex.pm
+lib/IO/Pty/HalfDuplex/JobControl.pm
+lib/IO/Pty/HalfDuplex/PTrace.pm
+lib/IO/Pty/HalfDuplex/Ptyish.pm
+lib/IO/Pty/HalfDuplex/SysctlPoll.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+ptrace.c
+ptrace.xsf
+sysctl.c
+sysctl.xsf
+t/000-load.t
+t/001-new.t
+t/002-spawn-basic.t
+t/thdmp.c

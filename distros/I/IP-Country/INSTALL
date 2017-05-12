@@ -1,0 +1,167 @@
+#########################################
+# IP::Country Installation Instructions #
+#########################################
+
+
+1. INSTALLATION THROUGH THE CPAN SHELL
+--------------------------------------
+If you have the CPAN shell installed and working, you should be able
+to install the latest version of this distribution by the following
+commands:
+
+  $ perl -MCPAN -e shell
+
+  cpan> install IP::Country
+
+The most likely problems to occur are insufficient privileges to 
+install into the default module location (usually solved by running
+the CPAN shell as root), or a lack of some prerequisite such as GNU 
+make or an FTP command-line client.
+
+The CPAN shell can be an immensely labour-saving tool when properly 
+configured. It is worthwhile spending some time getting it right.
+
+
+2. INSTALLING FROM SOURCE CODE
+------------------------------
+The latest version of this distribution can be found using the CPAN
+search engine:
+  http://search.cpan.org/search?query=IP::Country&mode=dist
+
+Download the latest version using your web browser, and unzip the 
+distribution:
+
+  $ tar -zxvf IP-Country-2.11.tar.gz
+
+The above command works with GNU tar. Other versions of tar might not
+support the 'z' flag. In that case, refer to your operating system's
+instructions for unpacking.
+
+A directory will have been created below your current directory. From
+this new directory, make and test the modules:
+
+  $ cd IP-Country-2.11/
+  $ perl Makefile.PL
+  $ make
+  $ make test
+
+The above commands obviously rely on you having a working version of
+'make' installed on your system. Most Unix and Linux installations come
+with make pre-installed. If you do not have make, it's worthwhile 
+spending some time installing it, as most source code that you will 
+download in future will rely on make being available. However, if you
+can't or don't want to install make, you can still install this module
+(see INSTALLING WITHOUT MAKE, below).
+
+The tests might take a while on slower machines. Be patient.
+
+If all tests run without errors, you can complete the installation 
+process:
+
+  # make install
+
+This final stage might require superuser privileges.
+
+If the building and testing process throw any errors, DO NOT attempt to 
+install. The problem will probably be solved by installing some 
+pre-requisite as indicated in the errors, but it might also be an 
+indicator of some underlying problems with the code in the modules.
+
+
+3. INSTALLING WITHOUT MAKE
+--------------------------
+It is possible to install without a working version of make. From the
+unzipped distribution directory, copy the lib/IP directory into your
+Perl INCLUDE path. For example, on my PC, I can use the following
+command:
+
+  # cp -r lib/IP /usr/local/lib/perl5/site_perl/5.8.0/
+  # chmod -R uga+r /usr/local/lib/perl5/site_perl/5.8.0/IP
+
+Note how I use the 'r' flag with the copy command to recursively
+copy the distribution directories. The second command changes 
+permissions to allow any user to use the modules.
+
+I found out the location of the INCLUDE directories using 'perl -V':
+
+  $ perl -V
+  Summary of my perl5 (revision 5.0 version 8 subversion 0) config:
+    Platform:
+      osname=linux, osvers=2.4.18-14, archname=i686-linux
+
+  ... LOT OF INFORMATION HERE ...
+
+    Compiled at Oct 25 2002 14:55:23
+    @INC:
+      /usr/local/lib/perl5/5.8.0/i686-linux
+      /usr/local/lib/perl5/5.8.0
+      /usr/local/lib/perl5/site_perl/5.8.0/i686-linux
+      /usr/local/lib/perl5/site_perl/5.8.0
+      /usr/local/lib/perl5/site_perl
+      .
+  $ 
+
+Copying into your INCLUDE path will probably require superuser 
+privileges. If you don't have such privileges, it is still possible
+to use the modules within your programs. Copy the modules to some
+location where you have read/write privileges. For example:
+
+  $ copy -r lib /home/nigel/perllibs
+  $ chmod -R uga+r /home/nigel/perllibs/
+
+Now, inside your Perl programs, you can use the modules by first 
+setting the INCLUDE path.
+
+  #!/usr/local/bin/perl -w
+  use strict;
+  use lib '/home/nigel/perllibs';
+  use IP::Country::Fast;
+
+
+4. BUILDING YOUR OWN DATABASE
+-----------------------------
+WARNING: you need a lot (650MB) of free RAM to create the databases
+from raw files. These scripts use lots of physical memory to speed
+up a process that would take days to complete if I used a relational
+database.
+
+The current distribution is bundled with a recent version of the 
+country-code database. This version has been tested by the author of 
+these modules, so is likely to work. I'm sure that some people will
+be interested to know how the database has been constructed, and want
+to build their own versions of the database. This is possible using
+the two scripts provided in the dbmScripts directory (ipcc_loader.pl 
+and ipcc_maker.pl).
+
+The first script (ipcc_loader.pl) processes the files found in the 
+./rir_data directory, and produces a sorted flat file of non-overlapping
+IP ranges. The files in the ./rir_data directory are recent statistics
+from the four regional internet registries (RIRs). The RIPE and ARIN 
+statitics require unzipping before running the script.
+
+  ftp://ftp.ripe.net/ripe/dbase/split/ripe.db.inetnum.gz
+  ftp://ftp.arin.net/other/dump/aup_dump.txt.gz
+  ftp://ftp.apnic.net/public/apnic/stats/apnic/
+  ftp://ftp.lacnic.net/pub/stats/lacnic/
+
+** I also usually include the stats dumps from RIPE and ARIN - I've
+found that the arin aup_dump doesn't contain all of their ranges **
+
+The output of ipcc_loader.pl (sorted_ranges.txt) is read by the second
+script (ipcc_maker.pl) to produce two database files in the 
+lib/IP/Country/Fast directory named ip.gif and cc.gif. They have been
+given the .gif suffix to help some FTP clients properly cope with
+their binary contents. 
+
+Eventually, I will properly document the format of the database. Until
+that time, you will need to refer to ipcc_maker.pl and Fast.pm
+to understand the format.
+
+The IP::Authority database can be created using the ipauth* scripts.
+
+
+5. BUG REPORTS
+--------------
+Please send bug reports to nwetters@cpan.org or submit a bug report
+through the module's request tracker:
+  http://rt.cpan.org/NoAuth/Bugs.html?Dist=IP-Country

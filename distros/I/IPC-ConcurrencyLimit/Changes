@@ -1,0 +1,69 @@
+Revision history for Perl extension IPC::ConcurrencyLimit
+
+0.17 Wed Nov  2 17:25:40 CET 2016
+  - make _diag() less noisy by adding more guard clauses (MATTK)
+
+0.16 Thu Aug 25 16:29:09 CEST 2016
+  - default process_name_change in WithLatestStandby to off.
+  - use constant memory instead of scaling to max_procs
+    during execution in IPC::ConcurrencyLimit::Flock.
+
+0.15  Wed Aug 24 14:16 2016
+  - add new WithLatestStandby backend (YVES)
+  - bugfix related to retry count (YVES)
+
+0.14  Tue Sep 22 10:01 2015
+  - No-op release to fix META.json+META.yml+Changes
+    (https://rt.cpan.org/Public/Bug/Display.html?id=107204)
+
+0.13  Fri Sep 18 15:04 2015
+  - added warning in the POD about lock variable scope
+  - Flock:
+    - start at the *highest* id, and count *down*
+      to find the lock we want to use.
+    - add file_prefix option
+    - add file_ext option
+
+0.12  Thu Jan 29 15:20 2015
+  - Use `retries` callback earlier
+
+0.11  Tue Aug 20 21:42 2013
+  - Fix incorrect documentation for retries parameter
+
+0.10  Fri Oct 12 17:00 2012
+  - The C<heartbeat> method of IPC::ConcurrencyLimit and
+    IPC::ConcurrencyLimit::Lock object can now be used to check
+    whether a lock was lost since it was first acquired.
+
+0.09  Fri Oct  5 12:08 2012
+  - IPC::ConcurrencyLimit::WithStandby now has dynamically
+    configurable retries via a callback mechanism.
+
+0.08  Tue Oct  2 09:47 2012
+  - Fix IPC::ConcurrencyLimit::WithStandby synopsis.
+
+0.07  Wed Jun 27 07:55 2012
+  - Support modify_process_name in IPC::ConcurrencyLimit::WithStandby.
+
+0.06  Mon Jun 25 09:25 2012
+  - Add explicit loading of IO::File
+
+0.05  Mon Feb  6 07:52 2012
+  - Skip the forking tests for WithStandby on uncommon OS.
+    Specifically, CPAN testers showed failures on Solaris that I have
+    no hope of debugging. It's more likely to be a bug in the tests
+    than a bug in the module. Contributors welcome.
+    For now, disable forking tests on non-linux, non-darwin, non-win32.
+
+0.04  Fri Feb  3 19:55 2012
+  - Implement IPC::ConcurrencyLimit::WithStandby
+
+0.03  Thu May 26 13:08 2011
+  - Add missing flush to make sure PID is written to file.
+    (Should not be a critical fix)
+
+0.02  Tue Mar 19 12:10 2011
+  - Expose shared-locking mode of operation.
+
+0.01  Wed Mar 16 14:29 2011
+  - original version

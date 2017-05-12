@@ -1,0 +1,320 @@
+=for comment based on iup-3.5 - http://www.tecgraf.puc-rio.br/iup/en/dlg/iupfiledlg.html
+
+=head1 NAME
+
+IUP::FileDlg - [pre-defined dialog] selecting files or a directory
+
+=head1 DESCRIPTION
+
+Creates the File Dialog element. It is a predefined dialog for
+selecting files or a directory. The dialog can be shown with the
+L<Popup|IUP::Manual::02_Elements/"Popup()"> function only.
+
+=begin HTML
+
+<p>
+  <table border="1">
+    <tbody align="left">
+      <tr>
+        <th>GTK</th>
+        <td><img src="http://kmx.github.io/perl-iup/img-3.9/dlg/filedlg_gtk.png"></td>
+      </tr>
+      <tr>
+        <th>Motif</th>
+	<td><img src="http://kmx.github.io/perl-iup/img-3.9/dlg/filedlg_mot.png"></td>
+      </tr>
+      <tr>
+        <th>Windows</th>
+	<td><img src="http://kmx.github.io/perl-iup/img-3.9/dlg/filedlg_win.png"></td>
+      </tr>
+    </tbody>
+  </table>
+</p>
+
+=end HTML
+
+
+=head1 USAGE
+
+=head2 CREATION - new() method
+
+ $filedlg = IUP::FileDlg->new( DIALOGTYPE=>"OPEN" );
+
+B<Returns:> the identifier of the created element, or C<undef> if an error occurs.
+
+NOTE: You can pass to C<new()> other C<ATTRIBUTE=E<gt>'value'> or C<CALLBACKNAME=E<gt>\&func> pairs relevant
+to this element - see L<IUP::Manual::02_Elements|IUP::Manual::02_Elements/"new()">.
+
+=head2 ATTRIBUTES
+
+For more info about concept of attributes (setting/getting values etc.)
+see L<IUP::Manual::03_Attributes|IUP::Manual::03_Attributes>. Attributes specific to this element:
+
+=over
+
+=item B<ALLOWNEW>
+
+Indicates if non-existent file names are accepted. If
+equals "NO" and the user specifies a non-existing file, an alert dialog
+is shown. Default: if the dialog is of type "OPEN", default is "NO"; if
+the dialog is of type "SAVE", default is "YES". Not used when
+DIALOGTYPE=DIR.
+
+=item B<DIALOGTYPE>
+
+Type of dialog (Open, Save or Directory). Can have
+values "OPEN", "SAVE" or "DIR". Default: "OPEN".
+
+In Windows, when DIALOGTYPE=DIR the dialog shown is not the same dialog
+for OPEN and SAVE, this new dialog does not have the Help button
+neither filters. Also this new dialog needs CoInitializeEx with
+COINIT_APARTMENTTHREADED (done in L<IUP::Open|IUP::Open>), if the COM library was
+initialized with COINIT_MULTITHREADED prior to L<IUP::Open|IUP::Open> then the new
+dialog will have limited functionality. In Motif or GTK the dialog is
+the same, but it only allows the user to select a directory.
+
+=item B<DIRECTORY>
+
+Initial directory. When consulted after the dialog is
+closed and the user pressed the OK button, it will contain the
+directory of the selected file.
+
+In Motif or GTK, if not defined the dialog opens in the current
+directory.
+
+In Windows, if not defined and the application has used the dialog in
+the past, the path most recently used is selected as the initial
+directory. However, if an application is not run for a long time, its
+saved selected path is discarded. Also if not defined and the current
+directory contains any files of the specified filter types, the initial
+directory is the current directory. Otherwise, the initial directory is
+the "My Documents" directory of the current user. Otherwise, the
+initial directory is the Desktop folder.
+
+=item B<EXTFILTER>
+
+I<[Windows and GTK Only]> Defines several file filters. It
+has priority over FILTERINFO and FILTER. Must be a text with the format
+"FilterInfo1|Filter1|FilterInfo2|Filter2|...". The list ends with
+character '|'. Example: "Text files|*.txt;*.doc|Image
+files|*.gif;*.jpg;*.bmp|". In GTK there is no way how to overwrite the
+filters, so it is recommended to always add a less restrictive filter
+to the filter list, for example "All Files|*.*".
+
+=item B<FILE>
+
+Name of the file initially shown in the "File Name" field in
+the dialog. If contains a path, then it is used as the initial
+directory and B<DIRECTORY> is ignored.
+
+=item B<FILEEXIST>
+
+I<(read-only)> Indicates if the file defined by the FILE
+attribute exists or not. It is only valid if the user has pressed OK in
+the dialog. Not set when DIALOGTYPE=DIR or B<MULTIPLEFILES=YES>.
+
+=item B<FILTER>
+
+String containing a list of file filters separated by ';'
+without spaces. Example: "*.C;*.LED;test.*". In Motif only the first
+filter is used.
+
+=item B<FILTERINFO>
+
+I<[Windows and GTK Only]> Filter's description. If not
+defined the filter itself will be used as its description.
+
+=item B<FILTERUSED>
+
+I<[Windows and GTK Only]> the index of the filter in
+EXTFILTER to use starting at 1. It returns the selection made by the
+user. Set only if EXTFILTER is defined.
+
+=item B<MULTIPLEFILES>
+
+When "YES", this attribute allows the user to select
+multiple files when DIALOGTYPE=OPEN. The value returned by VALUE is to
+be changed the following way: the directory and the files are passed
+separately, in this order. The character used for separating the
+directory and the files is '|'. The file list ends with character '|'.
+When the user selects just one file, the directory and the file are not
+separated by '|'. For example:
+
+ "/tecgraf/iup/test|a.txt|b.txt|c.txt|"
+ or
+ "/tecgraf/iup/test/a.txt" (only one file is selected)
+
+In Windows the maximum size allowed for file name returned is 65Kb.
+
+=item B<NOCHANGEDIR>
+
+Indicates if the current working directory must be
+restored after the user navigation. Default: "YES".
+
+=item B<NOOVERWRITEPROMPT>
+
+do not prompt to overwrite an existent file when
+in "SAVE" dialog. Default is "NO", i.e. prompt before overwrite. (GTK
+2.8)
+
+=item L<PARENTDIALOG|IUP::Manual::03_Attributes/PARENTDIALOG>
+
+Makes the dialog be
+treated as a child of the specified dialog.
+
+=item B<SHOWHIDDEN>
+
+Show hidden files. Default: NO.  (GTK 2.6)
+
+=item B<SHOWPREVIEW>
+
+A preview area is shown inside the File Dialog. Can
+have values "YES" or "NO". Default: "NO". In Windows, you must link
+with the "iup.rc" resource file so the preview area can be enabled (not
+necessary if using "iup.dll"). Valid only if the FILE_CB callback is
+defined, use it to retrieve the file name and the necessary attributes
+to paint the preview area. (in Motif since iup-3.0)
+
+Read only attributes that are valid inside the FILE_CB callback when
+status="PAINT":
+
+=item B<PREVIEWDC>
+
+Returns the Device Context (HDC in Windows and GC in
+UNIX)
+
+=item B<PREVIEWWIDTH>
+
+=item B<PREVIEWHEIGHT>
+
+Returns the width and the height of the client rectangle for the preview area.
+
+Also the attributes WID, HWND, XWINDOW and XDISPLAY are valid and
+are relative to the preview area.
+
+If the attribute PREVIEWGLCANVAS is defined then it is used as the name
+of an existent IUP::GLCanvas control to be mapped internally to the
+preview canvas. Notice that this is not a fully implemented IUP::GLCanvas
+that inherits from IUP::Canvas. This does the minimum necessary so you
+can use IUP::GLCanvas auxiliary functions for the preview canvas and call
+OpenGL functions. No IUP::Canvas attributes or callbacks are available.
+
+=item B<STATUS>
+
+I<(read-only)> Indicates the status of the selection made:
+
+ "1"   New file.
+ "0"   Normal, existing file or directory.
+ "-1"  Operation cancelled.
+
+=item L<TITLE|IUP::Manual::03_Attributes/TITLE>
+
+Dialog's title.
+
+=item B<VALUE>
+
+I<(read-only)> Name of the selected file(s), or C<undef> if no file
+was selected. If FILE is not defined this is used as the initial value.
+In Windows there is a limit of 32Kb for this string.
+
+=back
+
+=head2 CALLBACKS
+
+For more info about concept of callbacks (setting callback handlers etc.)
+see L<IUP::Manual::04_Callbacks|IUP::Manual::04_Callbacks>. Callbacks specific to this element:
+
+=over
+
+=item B<FILE_CB>
+
+Action generated when a file is selected. Not called when
+DIALOGTYPE=DIR. When MULTIPLEFILES=YES it is called only for one file.
+Can be used with SHOWPREVIEW=NO also. (Windows only in 2.x)
+
+B<Callback handler prototype:>
+
+ sub file_cb_handler {
+   my ($self, $file_name, $status) = @_;
+   #...
+ }
+
+=over
+
+B<$self:> reference to the element (IUP::FileDlg) that activated the event
+
+B<$file_name:> name of the file selected.
+
+B<$status:> describes the action. Can be:
+
+=over
+
+=item * "INIT" - when the dialog has started. $file_name is C<undef>.
+
+=item * "FINISH" - when the dialog is closed. $file_name is C<undef>.
+
+=item * "SELECT" - a file has been selected.
+
+=item * "OTHER" - an invalid file or a directory is selected. $file_name
+is the one selected. (Since iup-3.0)
+
+=item * "OK" - the user pressed the OK button. If returns IUP_IGNORE
+the action is refused and the dialog is not closed.
+
+=item * "PAINT" - the preview area must be redrawn. Used only when
+SHOWPREVIEW=YES. If an invalid file or a directory is selected,
+file_name is C<undef>.
+
+=back
+
+=back
+
+=item L<HELP_CB|IUP::Manual::04_Callbacks/HELP_CB>
+
+Action generated when the Help button is pressed.
+
+=back
+
+=head1 NOTES
+
+The L<IUP::FileDlg|IUP::FileDlg> is a native pre-defined dialog that is not altered by
+L<SetLanguage|IUP/"SetLanguage()">.
+
+To show the dialog, use function L<Popup|IUP::Manual::02_Elements/"Popup()">.
+
+The dialog is mapped only inside L<Popup|IUP::Manual::02_Elements/"Popup()">, L<Map|IUP::Manual::02_Elements/"Map()"> does nothing.
+
+The L<GetFile|IUP/"GetFile()"> function simply creates and popup a L<IUP::FileDlg>.
+
+In Windows, the FILE and the DIRECTORY attributes also accept strings
+containing "/" as path separators, but the VALUE attribute will always
+return strings using the "\" character.
+
+In Windows, the dialog will be modal relative only to its parent or to
+the active dialog.
+
+=head1 EXAMPLES
+
+
+The element B<IUP::FileDlg> is used in the following sample scripts:
+
+=over
+
+=item * L<0-basic/filedlg.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/filedlg.pl> - IUP::FileDlg example
+
+=item * L<0-basic/pre-dialogs.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/pre-dialogs.pl> - IUP::Expander example
+
+=back 
+
+
+
+=head1 SEE ALSO
+
+L<Message|IUP/"Message()">, L<IUP|/"GetParam()">,
+L<ListDialog|IUP/"ListDialog()">, L<Alarm|IUP/"Alarm()">,
+L<GetFile|IUP/"GetFile()">, L<Popup|IUP::Manual::02_Elements/"Popup()">
+
+The original doc: L<iupfiledlg.html|http://www.tecgraf.puc-rio.br/iup/en/dlg/iupfiledlg.html>
+ 
+
+=cut

@@ -1,0 +1,24 @@
+MANIFEST
+LICENSE
+README
+SPECIFICATIONS.md
+Changes
+Makefile.PL
+lib/Image/Animated/JPEG.pm
+t/001_load.t
+t/002_functions.t
+t/003_functions.t
+t/data/files.nfo
+t/data/frame1.jpg
+t/data/frames_delay77.ajpeg
+t/data/frames_empty-marker.ajpeg
+t/data/test0-fuji.jpg
+bin/playajpeg
+bin/makeajpeg
+bin/gif2ajpeg
+bin/ajpeg2gif
+bin/ajpegtran
+debian/playajpeg.desktop
+debian/image-ajpeg.xml
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

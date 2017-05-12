@@ -1,0 +1,7 @@
+Revision history for IO-Async-Loop-IO-Async
+
+0.02    CHANGES:
+         * Updated for IO::Async 0.33
+
+0.01    First version, released on an unsuspecting world.
+

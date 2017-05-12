@@ -1,0 +1,26 @@
+---
+abstract: 'use C<IO::Async> with C<IO::Async>'
+author:
+  - 'Paul Evans <leonerd@leonerd.org.uk>'
+build_requires:
+  IO::Async::LoopTests: 0.24
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: IO-Async-Loop-IO-Async
+provides:
+  IO::Async::Loop::IO::Async:
+    file: lib/IO/Async/Loop/IO/Async.pm
+    version: 0.02
+requires:
+  IO::Async: 0.24
+  IO::Async::PID: 0.32
+  IO::Async::Timer::Absolute: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02

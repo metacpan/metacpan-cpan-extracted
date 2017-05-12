@@ -1,0 +1,66 @@
+#!/usr/bin/perl
+#ver 0.01
+#This is simple demo script showing some basic operations. 
+#It initializes the serial port,
+#Waits for ring on the modem, when a call comes, it records the caller message
+#and plays the same message to caller
+
+#require 5.000;
+use Ivrs;
+
+#you must specify your serial port where voice modem is connected
+$portname=$ARGV[0];
+die "\n usage: $0 ttyS0 or ttyS1\n\n" if ($portname eq "");
+
+#Set the voice file directory. The absolute path is required if you want to
+#run the IVRS from the inittab. The defaults is 'sfile' from the
+#current directory.
+#The voice files for Rockwel Chip Set modem are in 'sfiles' directory,
+#The voice files for US Robotics modem are in 'ufiles' directory,
+
+$vdir="sfiles";
+
+#initialize the serial port
+$iv = new Ivrs($portname,$vdir);
+print "Serial port and Modem initialized\n";
+
+#set the serial port parameters if you are sure.
+$iv->setport("38400","none","8","1","rts","8096")||die"Setting Failed\n";
+
+#initialize the modem and put it in voice mode.
+$iv->initmodem||die"Modem failed";
+
+#put the modem in answer mode $cid will have the caller ID
+print "Waiting for the ring.....\n";
+$cid=$iv->waitring;
+print "Call received from $cid\n";
+
+#The modem picks up the receiver' when a call comes and play a message prompt 
+#the caller for recording of message.
+$iv->playfile("recmail",0)||&closeall;
+
+#Record the caller message for 10 seconds and play the same to caller. 
+$iv->recfile("/tmp/inmsg",10)||&closeall;
+
+#end of message recording.
+$iv->playfile("beep500")||&closeall;
+
+#play the recorded message.
+$iv->playfile("/tmp/inmsg",1)||&closeall;
+
+#close the port and say thank you.
+sleep 2;
+$iv->addmsg("thank");
+$iv->playfile||&closeall;
+`bin/rmdtopvf /tmp/inmsg /tmp/inmsg.pvf`;
+`bin/pvftowav /tmp/inmsg.pvf /tmp/inmsg.wav`;
+print "--->/tmp/inmsg.wav is a wave file of recorded message\n";
+&closeall;
+exit;
+
+sub closeall
+{
+$iv->closep;
+exit 1;
+}
+

@@ -1,0 +1,31 @@
+---
+abstract: 'use SSL/TLS with L<IO::Async>'
+author:
+  - 'Paul Evans <leonerd@leonerd.org.uk>'
+build_requires:
+  IO::Async::OS: '0'
+  Test::More: '0.88'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4211, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: IO-Async-SSL
+provides:
+  IO::Async::SSL:
+    file: lib/IO/Async/SSL.pm
+    version: '0.19'
+  IO::Async::SSLStream:
+    file: lib/IO/Async/SSLStream.pm
+    version: '0.19'
+requires:
+  Future: '0.33'
+  IO::Async::Handle: '0.29'
+  IO::Async::Loop: '0.66'
+  IO::Async::Protocol::Stream: '0'
+  IO::Async::Stream: '0.59'
+  IO::Socket::SSL: '1.968'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.19'

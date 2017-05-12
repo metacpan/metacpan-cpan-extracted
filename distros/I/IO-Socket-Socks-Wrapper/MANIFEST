@@ -1,0 +1,22 @@
+Changes
+lib/IO/Socket/Socks/Wrapped.pm
+lib/IO/Socket/Socks/Wrapper.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/01_in_pkg.t
+t/02_in_pkg_no_global.t
+t/03_global.t
+t/04_sub.t
+t/05_obj.t
+t/06_builtin.t
+t/07_mix.t
+t/08_timeout.t
+t/09_timeout_global.t
+t/10_event_loop_anyevent.t
+t/10_event_loop_mojo.t
+t/11_live.t
+t/Connect.pm
+t/subs.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

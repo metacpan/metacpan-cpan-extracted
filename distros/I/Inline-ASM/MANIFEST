@@ -1,0 +1,12 @@
+ASM.pm
+ASM.pod
+MANIFEST
+Makefile.PL
+README
+examples/nasm/JAxH.pl
+examples/nasm/greet.pl
+examples/gasp/hello_world.pl
+examples/as/greet.pl
+examples/as/JAxH.pl
+examples/nasm-as.pl
+examples/5005.pl

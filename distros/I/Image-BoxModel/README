@@ -1,0 +1,33 @@
+﻿Image::BoxModel version 0.50
+=========================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  GD
+    or
+  Image::Magick
+    or
+  Imager (not implemented yet)
+    or
+  all of them if you want to be able to use them all..
+  
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 by :m)
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

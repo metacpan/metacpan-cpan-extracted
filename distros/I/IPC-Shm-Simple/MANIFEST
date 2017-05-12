@@ -1,0 +1,17 @@
+MANIFEST
+README
+README.sharelite
+Makefile.PL
+Simple.pm
+Simple.xs
+sharelite.h
+sharelite.c
+sharelite_sem.h
+sharelite_shm.h
+sharelite_shm.c
+typemap
+t/test0.t
+t/test1.t
+t/test2.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

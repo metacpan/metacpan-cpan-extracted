@@ -1,0 +1,40 @@
+--- #YAML:1.0
+name:               Image-Base-Tk
+version:            3
+abstract:           Image::Base drawing to Tk photo and canvas.
+author:
+    - Kevin Ryde <user42@zip.com.au>
+license:            gpl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Image::Base:  1.12
+    perl:         5.006
+    Tk:           0
+resources:
+    homepage:  http://user42.tuxfamily.org/image-base-tk/index.html
+    license:   http://www.gnu.org/licenses/gpl.html
+no_index:
+    directory:
+        - t
+        - inc
+        - xt
+        - devel
+generated_by:       ExtUtils::MakeMaker version 6.57_05
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4
+optional_features:
+    maximum_interoperation:
+        description:  Have maximum inter-operation with other modules (optional other stuff).
+        requires:
+            Tk::CanvasFig:  0
+            Tk::TIFF:       0
+    maximum_tests:
+        description:  Have "make test" do as much as possible.
+        requires:
+            Module::Util:   0
+            Tk::CanvasFig:  0

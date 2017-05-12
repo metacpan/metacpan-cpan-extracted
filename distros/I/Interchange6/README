@@ -1,0 +1,63 @@
+NAME
+
+    Interchange6 - Open Source Shop Machine
+
+VERSION
+
+    0.120
+
+DESCRIPTION
+
+    Interchange6, the Open Source Shop Machine, is the Modern Perl
+    ecosystem for online business. It uses the DBIx::Class database schema
+    Interchange6::Schema.
+
+    This module provides the following APIs:
+
+    Carts
+
+      Interchange6::Cart
+
+    Cart Products
+
+      Interchange6::Cart::Product
+
+    Cart Costs
+
+      Interchange6::Cart::Cost
+
+      Cart costs can be applied to both Carts and Cart Products and are
+      integrated into each via the role Interchange6::Role::Costs.
+
+    To build your own business website, please take a look at our Dancer
+    plugin: Dancer::Plugin::Interchange6.
+
+CART
+
+    Interchange6 supports multiple carts, automatic collapsing of similar
+    items and price caching.
+
+CAVEATS
+
+    Please anticipate API changes in this early state of development.
+
+ACKNOWLEDGEMENTS
+
+    Hunter McMillen, GH #31, #33, #34.
+
+AUTHORS
+
+    Stefan Hornburg (Racke), racke@linuxia.de
+
+    Peter Mottram peter@sysnix.com
+
+LICENSE AND COPYRIGHT
+
+    Copyright 2011-2016 Stefan Hornburg (Racke).
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

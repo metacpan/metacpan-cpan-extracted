@@ -1,0 +1,27 @@
+---
+abstract: 'Iterate through the files from ARGV'
+author:
+  - 'Johan Vromans <jv@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Iterator-Diamond
+provides:
+  Iterator::Diamond:
+    file: lib/Iterator/Diamond.pm
+    version: '1.01'
+  Iterator::Files:
+    file: lib/Iterator/Files.pm
+    version: '1.00'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '1.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

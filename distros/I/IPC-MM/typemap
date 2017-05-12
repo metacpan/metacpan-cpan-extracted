@@ -1,0 +1,10 @@
+TYPEMAP
+MM *	T_PTROBJ
+mm_scalar *	T_PTROBJ
+mm_btree *	T_PTROBJ
+mm_hash *	T_PTROBJ
+mm_lock_mode	T_IV
+mode_t	T_IV
+uid_t	T_IV
+gid_t	T_IV
+

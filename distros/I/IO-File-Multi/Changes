@@ -1,0 +1,8 @@
+* Aug 07, 1998 (1.02)
+  - Changed tests so that IO::File::Multi tests correctly under MacOS
+  - Fixed documentation bugs (doh!), added note about MacOS
+  - added carp() call to internal open() function.  Should have been there
+    before!
+
+* Jul 24, 1998 (1.01)
+  - Finally re-released under the now IO::File hierarchy

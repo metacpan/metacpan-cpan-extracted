@@ -1,0 +1,238 @@
+=head1 NAME
+
+IkiWiki::Plugin::syntax - Add syntax highlighting to ikiwiki
+
+=head1 SYNOPSIS
+
+In any source page include the following:
+
+    This is the example code 
+
+    [[syntax language=perl text="""
+    #!/usr/bin/perl
+    
+    print "Hello, world\n";
+    """]]
+
+    and this is my bash profile (using file type autodetection )
+
+    [[syntax file="software/examples/mybash_profile" 
+        description="My profile" ]]
+
+In order to facilitate the life to the administrator the plugin could create a
+html table with information about the engine capabilities. 
+
+Use the directive C<syntax> without any parameters as is:
+
+    This is the syntax engine chart in this site:
+
+    [[syntax ]]
+
+=head1 DESCRIPTION
+
+This plugin adds syntax highlight capabilities to Ikiwiki using third party
+modules if they are installed. 
+
+Those modules can be:
+
+=over
+
+=item * L<Syntax::Highlight::Engine::Kate>
+
+Uses the Syntax::Highlight::Engine::Kate package, a port to Perl of the
+syntax highlight engine of the Kate text editor.
+
+Copyright (c) 2006 by Hans Jeuken, all rights reserved.
+
+=item * L<Text::VimColor>
+
+This plugin uses the Text::VimColor module and the vim editor.
+
+Copyright 2002-2006, Geoff Richards.
+
+=item * L<IkiWiki::Plugin::syntax::Simple>
+
+This is the default engine. It's a passtrough engine with line numering capability.
+
+=back
+
+and they can be selected at runtime with the C<syntax_engine> parameter. In
+case of fail loading the module the plugin switch to use the simple engine.
+
+The module register a preprocessor directive named B<syntax>.
+
+=head2 Parameters
+
+The syntax directive has the following parameters:
+
+=over
+
+=item language (optional)
+
+Name of the source language for select the correct plugin. If not defined the
+module will try to determine the appropiated value.
+
+=item description (optional)
+
+Text description for the html link 
+
+=item text
+
+Source text for syntax highlighting. Mandatory if not exists the file
+parameter.
+
+=item file
+
+Ikiwiki page name as source text for syntax highlighting. The final html
+includes a link to it for direct download.
+
+=item linenumbers
+
+Enable the line numbers in the final html.
+
+=item bars
+
+Enable the bars feature. The final html text will be label with css tags on the
+odd lines.
+
+=item force_subpage
+
+Parameter for inline funcion to the source page
+
+=back
+
+=head2 CSS
+
+The package uses the following list of css tags:
+
+=over
+
+=item
+
+=back
+
+=head1 METHODS/SUBROUTINES
+
+=head2 checkconfig( )
+
+This method is called by IkiWiki main program and the plugin uses it for load
+global configuration values and initialize his internals.
+
+=head2 preprocess( )
+
+This method is called when the ikiwiki parser found a C<syntax> directive.
+Without parameters the method show information about the external syntax
+parser.
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+IkiWiki::Plugin::syntax uses the following global parameters:
+
+=over
+
+=item syntax_engine (optional)
+
+Set to a keyword for select the engine to use.
+
+=over
+
+=item Kate
+
+Uses the L<Syntax::Highlight::Engine::Kate> as backend.
+
+=item Vim
+
+Uses the L<Text::VimColor> as backend.
+
+=item Simple
+
+Uses the L<IkiWiki::Plugin::syntax::Simple> as backend.
+
+=back
+
+If this parameter is omitted or the external module fails, the plugin switch to
+use the Simple engine.
+
+=item syntax_Kate (optional)
+
+Parameters to configure the engine (not implemented yet).
+
+=item syntax_Vim (optional)
+
+Parameters to configure the engine (not implemented yet).
+
+=item syntax_Simple (optional)
+
+Parameters to configure the engine (not implemented yet).
+
+=back
+
+=head1 DEPENDENCIES
+
+The module needs the following perl packages:
+
+=over
+
+=item L<Module::Build::IkiWiki>
+
+Extension to L<Module::Build> for build and install ikiwiki plugins.
+
+=item L<Class::Accessor::Fast>
+
+=item L<Test::More>
+
+=item L<Exception::Class>
+
+=item L<HTML::Entities>
+
+=item L<HTML::Template>
+
+=item L<URI::Escape>
+
+=back
+
+And it recommends:
+
+=over
+
+=item L<Syntax::Highlight::Engine::Kate>
+
+=item L<Text::VimColor>
+
+=back
+
+=head1 BUGS AND LIMITATIONS
+
+=over 
+
+=item Break the markdown indented chain. It can't be used between paragraphs
+of one list item. Use it after the item text.
+
+=back
+
+Please report any bugs or feature requests to the author.
+
+=head1 AUTHOR
+
+"Víctor Moral"  C<< victor@taquiones.net >>
+
+=head1 LICENCE AND COPYRIGHT
+
+Copyright (c) 2008, "Víctor Moral".
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with this program; if not, write to the Free Software Foundation, Inc.,
+51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+
+

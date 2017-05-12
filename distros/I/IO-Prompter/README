@@ -1,0 +1,51 @@
+IO::Prompter version 0.004014
+
+Prompt for, read, vet, chomp, and encapsulate input.
+Like so:
+
+    use IO::Prompter;
+
+    while (prompt -num 'Enter a number') {
+        say "You entered: $_";
+    }
+
+    my $passwd
+        = prompt 'Enter your password', -echo=>'*';
+
+    my $selection
+        = prompt 'Choose wisely...', -menu => {
+                wealth => [ 'moderate', 'vast', 'incalculable' ],
+                health => [ 'hale', 'hearty', 'rude' ],
+                wisdom => [ 'cosmic', 'folk' ],
+            }, '>';
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+DEPENDENCIES
+
+Requires Contextual::Return.
+Works much better if Term::ReadKey is installed.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009, Damian Conway
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

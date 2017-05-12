@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/IO-Extended.t
+lib/IO/Extended.pm
+t/01_iohandle.t
+t/test.t
+test.pl
+META.yml                                 Module meta-data (added by MakeMaker)

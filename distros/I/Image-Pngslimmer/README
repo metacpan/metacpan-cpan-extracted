@@ -1,0 +1,83 @@
+Image::Pngslimmer version 0.30
+=============================
+
+OVERVIEW
+
+Image::Pngslimmer reduces the size of PNGs by removing non-critcal chunks and
+recompressing, filtering or palettizing images.
+
+Other tools, such as pngcrush (http://pmt.sourceforge.net/pngcrush/) 
+will deliver better results for static PNGs and Image::Pnglimmer 
+was orginally designed for dynamically created PNGs.
+
+use Image::Pngslimmer
+
+Image::Pngslimmer::ispng($blob) - returns 1 if the BLOB conforms to the
+structure for a PNG and that all CRCs are correct.
+
+Image::Pngslimmer::discard_noncritical($blob) - returns a BLOB stripped of any
+non-critcal chunks. If the passed-in BLOB does not conform to the basic
+structure of a PNG the returned BLOB is identical to the passed-in BLOB.
+The passed in BLOB is not altered by this function.
+
+Image::Pngslimmer::analyze($blob) - after calling Image::Pngslimmer::ispng($blob)
+this will iterate through the chunks in the supplied byte stream represented by 
+$blob and return an array of strings describing the chunks in the PNG. It can be
+useful for testing the "before and after" effect of discard_noncritical($blob).
+
+Image::Pngzlimmer::zlibshrink($blob) will attempt to improve compression of the
+supplied BLOB.
+
+Image::Pngslimmer::filter($blob) will attempt to apply adaptive filtering for
+better compression of the supplied BLOB - filtering normally results in better
+compression once zlibshrink() is reapplied if the original image is truecolour.
+
+Image::Pngslimmer::indexcolours($blob) will attempt to losslessly convert the
+supplied PNG to a colour indexed image - of the image contains more than 256
+colours this will not work and the original PNG is returned instead.
+
+Image::Pngslimmer::palettize($blob[, $colours[, $dither]]) will colour index
+(with a PLTE chunk) a 24 bit RGB image. If the original image has 256
+colours or less it will do this losslessly by calling indexcolours(), otherwise
+it will generate a palette by using the median cut algorithm. The size of the
+palette can be set by the optional $colours in the range 1 - 256 (the defult 0
+gives 256 colours). If the optional $dither is set to 1, then the output image
+will be dithered.
+
+Dithering is now up to 75 (!) times faster than in previous versions though
+still 3 - 5 times slower than simple quantization for most images.
+
+NB: Alpha channels in the original image will be lost with with quantization
+or indexation.
+
+
+Image::Pngslimmer::reportcolours($blob) will print details of the colour
+frequencies in the passed in PNG.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+
+POSIX
+Compress::Zlib
+Compress::Raw::Zlib
+  
+
+COPYRIGHT AND LICENCE
+
+
+Copyright (C) 2006, 2007, 2008 by Adrian McMenamin 
+<adrian AT mcmen DOT demon DOT co DOT uk>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.4 or,
+at your option, any later version of Perl 5 you may have available.

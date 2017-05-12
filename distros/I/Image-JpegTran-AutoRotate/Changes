@@ -1,0 +1,7 @@
+[Changes for 0.03 - Wed Jul 27 19:06:54 CST 2016]
+
+* Fix building on Perl 5.18+
+
+[Changes for 0.01 - Fri May 10 16:11:47 CST 2013]
+
+* Initial release to CPAN.

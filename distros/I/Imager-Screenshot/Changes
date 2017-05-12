@@ -1,0 +1,140 @@
+0.013 11 Jan 2013
+
+ - use Imager::Probe to find libraries instead of custom code
+   https://rt.cpan.org/Ticket/Display.html?id=82489
+
+ - require XSLoader without the DynaLoader fallback
+
+0.012 8 Mar 2012
+
+ - add support for screen capture on OS X Lion.
+   https://rt.cpan.org/Ticket/Display.html?id=72649
+
+ - now requires Imager 0.88 for i_psamp()
+
+0.011 23 Nov 2011
+
+- transition to git
+
+- allow builds on MSVC, there was a statement mixed in with some
+  declarations.
+  Thanks to Sri Vedurumudi for the report.
+  https://rt.cpan.org/Ticket/Display.html?id=72631
+
+- update Devel::CheckLib to avoid C< for qw(...) >
+
+- update ppport.h to avoid a redefinition warning
+
+- add some META.yml metadata
+
+- quote spaces in -I and -L options to avoid problems on Win32.
+
+0.010 18 Oct 2010
+
+- multiple monitor support for Win32
+
+0.009_001 11 Oct 2010
+
+- add Darwin (Apple Mac OS X) support
+
+- test release to see how broken it is
+
+0.009 15 Jun 2010
+
+- check for Win32 support with Devel::CheckLib if we don't find them
+  otherwise.
+  https://rt.cpan.org/Ticket/Display.html?id=56793
+
+0.008 21 Sep 2009
+
+- document that screenshot() returns nothing on failure and the cause
+  can be found with Imager->errstr
+  https://rt.cpan.org/Ticket/Display.html?id=46933
+
+- use META_MERGE instead of EXTRA_META to set configure/build_requires
+
+0.007 13 Apr 2008
+
+- wait for the widget to be displayed before doing the delay that
+  takes the screenshot.  This forces the widget to be displayed on
+  loaded machines.
+  Thanks to Slaven Rezic.
+  https://rt.cpan.org/Ticket/Display.html?id=34792
+
+- die with a message automated cpan testers treat as a non-fail when
+  we can't find the needed headers and libraries.
+  https://rt.cpan.org/Ticket/Display.html?id=34845
+
+0.006 9 Apr 2008
+
+- screenshot() on a non-toplevel Tk widget would crash when
+  calling the frame method.  Since this call appears to be
+  unnecessary I've removed it, and plan to run tests on a few
+  platforms to check I haven't broken anything.
+  RT #32843 - thanks to Slaven Rezic.
+
+- improved the error messages displayed when headers and libraries
+  can't be found
+  http://rt.cpan.org/Ticket/Display.html?id=32856
+
+- added --incpath and --libpath options to Makefile.PL and also look
+  in $ENV{IM_INCPATH} and $ENV{IM_LIBPATH} like Imager.
+
+- document the widget parameter
+  https://rt.cpan.org/Ticket/Display.html?id=32855
+
+- document that overlapping windows will show in a captured image.
+  http://rt.cpan.org/Ticket/Display.html?id=32842
+
+- add appropriate configure_requires and build_requires to META.yml
+  so that automated testers will install those pre-requisites early
+  enough.
+  http://rt.cpan.org/Ticket/Display.html?id=29560
+
+0.005 12 Mar 2007
+	- 0.005 release
+	- added a TODO section to the POD
+	- include NA in the die output from Makefile.PL if we can't
+	  find supported GUI libraries/headers (RT #24486)
+	- screenshot() no longer leaks image objects caused by the Imager
+	  typemap bug (RT #24992)
+
+0.004 23 Jan 2007
+	- 0.004 release
+	- add ppport.h for 5.005_03 support
+	- t/30tkx11.t now provides a default gemoetry to prevent
+	  a wait for window placement on window managers that do that
+	  (like TWM - RT #24445)
+	- set tags in the resulting image
+	- remove an unused variable
+	- add support for getting a subimage of the window
+	- include the interface header in the implementations so we
+	  get errors when they don't match (doh!)
+	- return something from the X11 error handler
+	- add X11/Xutil.h include for XDestroyImage()
+	- handle the default (no id or hwnd) case correctly
+
+0.003 12 Jan 2007
+	- 0.003 release
+	- ignore some VC++ generated junk in MANIFEST.SKIP
+	- avoid some Makefile.PL warnings
+	- use Imager in Makefile.PL since I'd prefer to error on that
+	  rather than Imager::ExtUtils
+	- work around Debian strangeness
+	- the x11 capture wasn't releasing the XImage or the line
+	  and color buffers.
+	- x11_open() incorrectly reset the error handler to junk
+	- Makefile.PL was checking /usr/X11R6 for headers instead of 
+	  /usr/X11R6/include
+	- add header directories as -I flags if we find a header in
+	  them
+	- avoid duplicate -L flags
+
+0.002 2 Jan 2007
+	Just packaging changes:
+	- README was missing
+	- updated my EU::MM and I now set the LICENSE key so it's set
+	  in META.yml
+
+0.001 1 Jan 2007
+	- Initial release with X11 and Win32 support

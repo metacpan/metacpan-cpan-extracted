@@ -1,0 +1,24 @@
+---
+abstract: 'Calculate digests while reading or writing'
+author:
+  - 'Chia-liang Kao <clkao@clkao.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: IO-Digest
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Digest: 0.0
+  PerlIO::via::dynamic: 0.10
+  perl: 5.008
+version: 0.11

@@ -1,0 +1,91 @@
+IPC::MMA is Copyright (C) 2008-2010, Craig MacKenna <craig@animalhead.com>
+
+DESCRIPTION
+
+  IPC::MMA allows data to be shared among related Unix/Linux processes
+  in a straightforward way.  It provides methods to create and
+  destroy shared memory segments and to create, access, and maintain
+  data structures within segments.  Perl scalars, arrays, and hashes
+  can be stored in shared memory.  There are six possible kinds of
+  arrays: general-purpose scalars, signed or unsigned integers,
+  floating-point numbers, fixed-length strings/records, and single-bit
+  booleans.
+
+LICENSE INFORMATION
+
+  This module is free software; you may redistribute it and/or modify
+  it under the same terms as Perl 5.10.1.  For more details, see the
+  full text of the licenses at
+
+  <http://www.perlfoundation.org/artistic_license_1_0> and
+  <http://www.gnu.org/licenses/gpl-2.0.html>.
+
+  This program is distributed in the hope that it will be useful, but
+  it is provided "as is" and without any express or implied warranties.
+  For details, see the full text of the licenses at the above URLs.
+
+PREREQUISITE
+
+  This module requires Ralf Engelschall's mm library.  It was developed
+  with version 1.4.2.  See http://www.ossp.org/pkg/lib/mm/ for more
+  about mm.
+
+  Experienced users may prefer to install mm from a different source:
+
+  debian/ubuntu: $ sudo apt-get install libmm-dev
+  FreeBSD ports: $ cd ports/devel/mm        # (wherever ports lives)
+                 $ sudo make
+                 $ sudo make install
+
+INSTALLATION
+
+  Your computer needs to have the mm library before you can use
+  IPC::MMA.  Many Unix/Linux systems include this library.  If you
+  need to download and install mm, see the preceding section.
+
+  The easy way to install IPC::MMA:
+
+    $ perl -MCPAN -e "install IPC::MMA"
+
+  The classic way:
+
+    Choose a directory to use for installing.
+    Move/download the distribution file IPC-MMA-n.nn.tar.gz into it
+    cd into it
+    $ tar -xf IPC-MMA-n.nn.tar.gz
+
+    This will produce a new directory IPC-MMA-n.nn.
+
+    $ cd IPC-MMA-n.nn
+    $ perl Makefile.PL
+    $ make
+    $ make test
+
+    Assuming those steps don't show any problems:
+
+    $ sudo make install  (or just make install if you're superuser)
+
+  Either of the above alternatives should install IPC::MMA into the
+  Perl library.
+
+  See the POD documentation for further details. Once the module
+  is installed, you should be able to read the documentation by
+  typing the following from the command-line:
+
+    $ perldoc IPC::MMA
+
+  Or if your man system is configured in a compatible way:
+
+    $ man IPC::MMA
+
+
+NOTES
+    This module requires perl 5.6 or later.
+
+    The initial use of the array functions of this module was to track
+    related-file accesses on our Apache web server, and thus optimize
+    use of the HTTP keep-alive feature.   Watch CPAN for this module
+    in the future (its working name is Apache2::CloseKeepAlive).
+
+    Craig MacKenna <craig@animalhead.com>
+    Jan 4 2010

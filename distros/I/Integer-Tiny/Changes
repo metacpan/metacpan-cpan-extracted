@@ -1,0 +1,19 @@
+Revision history for Perl module Integer::Tiny
+
+0.1 2009-02-12 01:28:03 CET
+
+    Initial release
+
+0.2 2009-02-12 12:23:53 CET
+
+    Fixed test suite
+
+0.3 2009-02-13 16:24:09 CET
+
+    Changed to use Math::BigInt module as suggested in
+    http://rt.cpan.org/Public/Bug/Display.html?id=43231
+    by RIBASUSHI :)
+
+    Test::Exception added to PREREQ_PM in Makefile.PL
+
+

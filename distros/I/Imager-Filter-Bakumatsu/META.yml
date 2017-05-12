@@ -1,0 +1,41 @@
+---
+abstract: 'Photo vintage filter'
+author:
+  - 'Naoki Tomita <tomita@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '6.36'
+  File::Compare: '0'
+  File::Temp: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.4, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Imager-Filter-Bakumatsu
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Imager::Filter::Bakumatsu:
+    file: lib/Imager/Filter/Bakumatsu.pm
+    version: '0.05'
+requires:
+  File::ShareDir: '1'
+  Imager: '0'
+resources:
+  bugtracker: https://github.com/tomill/Imager-Filter-Bakumatsu/issues
+  homepage: https://github.com/tomill/Imager-Filter-Bakumatsu
+  repository: git://github.com/tomill/Imager-Filter-Bakumatsu.git
+version: '0.05'
+x_contributors:
+  - 'tomi-ru <tomi-ru@d0d07461-0603-4401-acd4-de1884942a52>'

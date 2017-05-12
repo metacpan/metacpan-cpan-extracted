@@ -1,0 +1,113 @@
+0.74
+====
+   - Fix tests fails with no '.' in @INC: rt#121104
+
+
+0.73
+====
+   - Fix new_from_fd/new_from_socket which was broken since 0.69
+
+0.72
+====
+   - Fix tests: rt#118522
+
+0.71
+====
+   - Fix start_SOCKS() which may be broken in two previous releases: rt#118471
+
+0.70
+====
+   - Fix non-blocking connections when IO::Socket::INET used as base class
+
+0.69
+====
+   - Several clarifications and fixes for UDP proxying
+   - Add support for non-blocking multi-homed connect to proxy
+
+0.68
+====
+   - try to play well with multiple connections attempts which IO::Socket::IP backend may produce
+
+0.67
+====
+   - properly push $SOCKET_CLASS defined before loading to @ISA
+   - fix annoying warning about @ISA
+
+0.66
+====
+   - IPv6 support for SOCKS protocol
+   - IPv6 support for socket layer (requires IO::Socket::IP 0.36+)
+   - new $SOCKET_CLASS variable
+   - several non-critical internal fixes and doc updates
+
+0.65
+====
+   - Fix tests failures on OS X (#rt97619)
+   - Clean up documentation a little bit
+   - Do not run slow tests if environment variable SOCKS_SLOW_TESTS is not true
+
+0.64
+====
+   - start_SOCKS() method added
+
+0.63
+====
+   - Ignore SIGPIPE on write
+   - $SOCKS_ERROR is readonly now
+   - Ability to make server which understands both 4 and 5 version on the same port
+   - version() method added
+   - Prevent recreation of the passed socket by new_from_fd/new_from_socket
+
+0.62
+====
+  - Some tests didn't work without internet connection because of the resolving on client side. Fixed
+  - New socket after server accept didn't inherit SocksResolve parameter. Fixed
+  - Removed automatically resolving hostname to ip in socks4a server accept. This should be done in the program, not in this library
+  - command() on the server side now in addition returns address type as last value (ADDR_DOMAINNAME or ADDR_IPV4)
+  - Fix for $! test on Solaris and ready() time measurement on OpenBSD
+
+0.61
+====
+  - Set $! to ESOCKPROTO (new module constant) on error in the protocol
+  - Set $@ on error
+  - $SOCKS_ERROR now behaves more like $!: string or number in appropriate contexts
+  - Return socket to non-blocking state after new_from_fd if socket was non-blocking before
+
+0.60
+====
+  - Added support for non-blocking clients accept on the server side
+  - new_from_fd() is now alias to new_from_socket()
+
+0.51
+====
+  - Non-blocking connect on BSD systems could break connection with ENOTCONN error
+  - Spelling patch from the debian project was applied
+
+0.5
+===
+  - Added support for non-blocking connect/bind operations on the client side
+  - $SOCKS_DEBUG variable added, debug now to STDERR instead STDOUT
+  - Real tests added
+
+0.4
+===
+  - UDP associate support added. It closes Bug #39216
+  - method new_from_socket() added. It needed for IO::Socket::Socks::Wrapper module
+  - command() method on the client added. It allows to create socks chains and other cool things
+
+0.3
+===
+  - clarified the issue with the license (Bug #44047)
+  - socks bind support added
+  - improvements in the documentation
+
+0.2
+===
+  - fixed possible SIGPIPE (Bug #62997)
+  - blocking reading and writing replaced by non-blocking equivalents, so `Timeout' option now documented and works
+  - added support for socks v4, both server and client
+  - some bug fixes
+  
+0.1
+===
+  - Initial version.

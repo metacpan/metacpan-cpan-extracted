@@ -1,0 +1,119 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 c82d6187bf83f92dcd4a4ba9ab8341c3edcc094a .gitignore
+SHA1 04f7fd20cb175f0758e39b68b2c5dd2d5c9ae627 CHANGES
+SHA1 517bff80bcf518746150086148acaf8cfa37a17d CREDITS
+SHA1 cdfc42491a4cdaa42af14d791cb39e775f719de7 MANIFEST
+SHA1 7508fd127843a69e30ba4f58f4b4e769f20d49e2 MANIFEST.SKIP
+SHA1 dda9f065f9ecdea3906a2067a159c0b74eacaafb META.json
+SHA1 a75ffc6dd80c91f4392f61fe83339f1293a6c5c7 META.yml
+SHA1 fd14642d591e132078fc91a8e54a4a4fed927f46 Makefile.PL
+SHA1 0184503d850cb0d34d0cfe26bd5af84d4cf97dbc README
+SHA1 36ea8eabe5ac80acc416411aae77b60e1480de1b TODO
+SHA1 aa6df64a66d09be89a4faf4fb3bfe2f3f38666b4 dev/Info.pm.tmpl
+SHA1 c11e7408bd16d35b2116ee47eaac4f08266be902 dev/build.pl
+SHA1 38b386e67725abff64ea00abb8e92c46f38e2f59 exifdump
+SHA1 0e2ed058a8e6b748c639b08064f6782c4f51d643 img/bad-exif-1.jpg
+SHA1 c11f86df48ca57d0364c9afd1449683ebf1979f4 img/be.tif
+SHA1 951a303482fb78bc02c65e8310854a7be975bfca img/cynic_hang.jpg
+SHA1 49a6dcd04263d15377be6e7ced44f4e3ce01437c img/gps.jpg
+SHA1 4243d003552c27c110b75ca121294d5edddc62a8 img/graph.svg
+SHA1 07f4778b513d5c951c1878c376fba49ff0ecd644 img/interlace.png
+SHA1 979ea4a5afe76a6532fe21a2724c3dfc8405bb2a img/le.tif
+SHA1 5274644b89b81daafccd469ff024e9b22a677db1 img/no-thumbnail.jpg
+SHA1 acccfe940ec2abc5bb18787c212f1ba2340793a1 img/segfault.tif
+SHA1 2cda53a351b2c683e154e82caf843e3e630804f3 img/test-corruptchunk.jpg
+SHA1 feaec718770ec0de7fc1010827425eca5b268fb8 img/test-gimp.xbm
+SHA1 1f561889c44c24dae57de74f65401ca7bc089a87 img/test-multi0xff.jpg
+SHA1 44e527641f2af0aadfb1dcc9a7f301f258d8f77d img/test-notrailer.gif
+SHA1 75da6beb9439bc07a0cd8537ce21689d560452da img/test-unknowncode.gif
+SHA1 5d3db653df616830a6a135d862e30e355464a43a img/test.gif
+SHA1 11f4a1f61f932b1eb96d1ab45beb681488e4c13d img/test.ico
+SHA1 6299f38bf7c592409362601fe34a5b0baafdcf47 img/test.jpg
+SHA1 3ffdf0d8f92b3548aefe19e88ba7365b98315377 img/test.pbm
+SHA1 ded4506e3a536c422794966d685141cd868b4f08 img/test.pgm
+SHA1 9edfc7ab4cb4808f70d1fea5aa7cc74694c36d6e img/test.png
+SHA1 cc4e7c8487ba03b141b24983650549e3bed22abf img/test.ppm
+SHA1 1e4af5ca289c895e0499d40b04781afc3e748ca4 img/test.rle
+SHA1 b51c0ee17e88970b032f96026119d16ab667b686 img/test.svg
+SHA1 f345165b605868be0b843fe6f98e5243a449b7d4 img/test.tif
+SHA1 1cce96f5245e8ea5c13dccb34a44d73de8c4bc4a img/test.wbmp
+SHA1 8a8f9bfb0a791f01f5aeecb29d095bdb94b16d43 img/test.xbm
+SHA1 d7ead6bd7acf3aa703424697913c5a0e9c2e9244 img/test.xpm
+SHA1 2d2565cc6074fc831924dd378a4a579415505cfb img/test0-fuji.jpg
+SHA1 603d6eed47d8822cf4bae53bafa18b8044c035a6 img/test1-fuji.jpg
+SHA1 d33e338aa7a45dc6fa4cefcdd376916e2267f3f9 img/tiny.pgm
+SHA1 e403a1722e5d26002d8afbf29bd497c60f8ee05f img/upside-down.bmp
+SHA1 5023229b3010b9e9ec663ce10e29bd3cbe5486c8 img/xxe.svg
+SHA1 684ef627299906409c258ed2a66990a26dd13794 img/ztxt.png
+SHA1 376cc1bd8424b1123f0073df81ce5433be4df58e imgdump
+SHA1 9e668ca8d7f8778315883dc8f9cb751cbfcae51e lib/Bundle/Image/Info/Everything.pm
+SHA1 222dd2400f89771096842e1a5b4264534aee5935 lib/Bundle/Image/Info/PNG.pm
+SHA1 e6fe98aa5a30dbd290668cffa515aebaf14828fa lib/Bundle/Image/Info/SVG.pm
+SHA1 fa3a601365ec108901e991a8148b62c2bf3dd62b lib/Bundle/Image/Info/XBM.pm
+SHA1 7ae5950ba4474e8099068ca6122e67cadce60842 lib/Bundle/Image/Info/XPM.pm
+SHA1 9e06b296127fc0182f8202268bc2719bf2ac0417 lib/Image/Info.pm
+SHA1 6991a957bacde9d3b873184d90d910d083f5f403 lib/Image/Info/BMP.pm
+SHA1 0996bffe073126dceb72c04dc5b3002c78c24d56 lib/Image/Info/GIF.pm
+SHA1 fb628cb66c566ab66a1b7953a1bb29cfde1c79c7 lib/Image/Info/ICO.pm
+SHA1 cb662c31e3429214bdc9f1e7b65fac2c4198f689 lib/Image/Info/JPEG.pm
+SHA1 b94748d648cc5161e327b78aa5e4ac668120868b lib/Image/Info/PNG.pm
+SHA1 1b69276ab386d1795469773d6af70ff510c15feb lib/Image/Info/PPM.pm
+SHA1 badd075bff5f88975bcbff1eb2d4cdf84fe5a2ca lib/Image/Info/SVG.pm
+SHA1 c8aa83ad22ff1684a40bae3f37fccc358842b1d1 lib/Image/Info/SVG/XMLLibXMLReader.pm
+SHA1 c1fe64b6ad5faeeab7d690cd44fd0feaf56952ee lib/Image/Info/SVG/XMLSimple.pm
+SHA1 04be3e8792943ab9b61dcdc89e1f31b70dc60996 lib/Image/Info/TIFF.pm
+SHA1 ed6fde11752d6450756c815b2dca25f9ad1740d9 lib/Image/Info/WBMP.pm
+SHA1 5c896ca4cc89715527f4207bae3c1e3c7a26286a lib/Image/Info/XBM.pm
+SHA1 4a5050fdcef00704e7d1fa2ae8751aa34a866f63 lib/Image/Info/XPM.pm
+SHA1 b8da0421ddd3592facd16fdd851eaf78a6f017fe lib/Image/TIFF.pm
+SHA1 34e6def40374dc924ea7ef58c5aa04e04a783295 t/00_basics.t
+SHA1 38883a0d98f01e4e749168369848f3ab5b5c7660 t/bad_exif.t
+SHA1 aaf002b3e5103e15dad27d59bbf2ce7d84caf79e t/bmp.t
+SHA1 7cddff7d8bccd9b2e303554d31ad6f8891b7705b t/exif.t
+SHA1 86a7363e633fe7635f623f8a31cadebde585d0b3 t/fuji_s1000fd_substr_outside_of_string.t
+SHA1 919ad6c0fc44c3458cfd6cce90c665cecf83c287 t/ico.t
+SHA1 ba1cf7c01b0de6f449a90815bf7db5a3b1645e3d t/jpg_corruptchunk.t
+SHA1 3443c36fd2dbc7f58599cf175e0793c5e8601ea9 t/jpg_hang.t
+SHA1 026bdd691c1971289451e147b8ecf1c99463e74d t/jpg_ignore_thumbnail.t
+SHA1 966b714313073d7e04fdc55526ca42424117758c t/png.t
+SHA1 cc217a37ee14356bb57e4ea32c1eda94d1a2d8c9 t/pod.t
+SHA1 ddac1596c132f80e81355cc048def2733163a9aa t/pod_cov.t
+SHA1 e70d2cdc9d3e744ff309fba229a656a401bd5ec4 t/string.t
+SHA1 4d729b6d3f3d747a817657053b03f6deb0ce2de4 t/svg.t
+SHA1 1e8a42e9b7d911936853446ef907f8f74072d08f t/tiff.t
+SHA1 76e7e08522799dc0f39896c8925aff1d42b09da4 t/tiff_e.t
+SHA1 c08bf003a891603d6f5f098425a70680a699e31a t/tiff_segfault.t
+SHA1 0a5f7c518af4b72fd76fa8def1f51e8691727bdd t/tiny-pgm.t
+SHA1 7d7708b0392491f75eb9b68289469c1a488453ca t/wbmp.t
+SHA1 cea87cb4a68f31dd245d911d0c43b581939c3f34 t/xbm.t
+SHA1 982933644977d3879d1b2a269bdfb1ef45723481 t/xpm.t
+SHA1 4396e44dfbfe4c2ff26d115bc0eadbce507b7bf0 xt/kwalitee.t
+SHA1 14f51fc143d06dad6d47a810596799652928221e xt/rt118099.t
+SHA1 6ef907e37bb4840f96f8d5b16b47991806f21f31 xt/strict.t
+SHA1 776c2c96e3155a622221cb1c4989579a652452d7 xt/synopsis.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBCAAGBQJY0XlQAAoJEN1GkmBlfE8/NnQH/1lw2qbKyuC3CmKvPvQuip9Q
+I+MzOb8JLfSGSw7ZnOOa8vAK+YYdmWoRs8X+M8d8NJAJZ77swNqQvBRaC1Rks32H
+fgrZYrIWW7arIhijqevNVhqKABLbs+3nHQ2jZs0wFFHnBt0oJ6xZ3tWTwGQ5WaLe
+oYH2E3mrAjAJLQIcOf+vLu11lREp1AazSWKd6D/CMnzF6UCR7nefYrgTy/FiVtRs
+NYnnLIjU0pHnMnHCl/8noFebYqByC2FO1dqK+Au5sQGarpF1z1ymAU+nUect3Lyj
+/myNbXVQobuMbkM+kqHM8L+Jd+83KBLstoW7LkSjG4lf/qJCKb6BpC6+YFY4lMs=
+=llPA
+-----END PGP SIGNATURE-----

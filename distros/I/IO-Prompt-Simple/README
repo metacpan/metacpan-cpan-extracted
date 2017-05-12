@@ -1,0 +1,30 @@
+This is Perl module IO::Prompt::Simple.
+
+INSTALLATION
+
+IO::Prompt::Simple installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan IO::Prompt::Simple
+or
+
+    % cpanm IO::Prompt::Simple
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+DOCUMENTATION
+
+IO::Prompt::Simple documentation is available as in POD. So you can do:
+
+    % perldoc IO::Prompt::Simple
+
+to read the documentation online with your favorite pager.
+
+xaicron

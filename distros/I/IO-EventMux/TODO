@@ -1,0 +1,6 @@
+
+ * Stackable buffers
+ my $mux->add($fh, Buffered => [
+    new IO::Buffered::SSL(),  
+    new IO::Buffered::HTTP()]
+ );

@@ -1,0 +1,28 @@
+---
+abstract: 'Allows fast, simple routing of Transit messages'
+author:
+  - 'Dana M. Diederich <dana@realms.org>'
+build_requires:
+  Test::More: 0
+  lib: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: IPC-Transit-Router
+requires:
+  Exporter: 0
+  IPC::Transit: 0
+  Message::Router: 0
+  perl: 5.006
+  strict: 0
+  vars: 0
+  warnings: 0
+resources:
+  homepage: https://metacpan.org/module/IPC::Transit::Router
+  repository: http://github.com/dana/perl-IPC-Transit-Router.git
+version: 1.132260

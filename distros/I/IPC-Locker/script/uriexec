@@ -1,0 +1,162 @@
+#!/usr/bin/perl -w
+# See copyright, etc in below POD section.
+######################################################################
+
+use lib './blib/lib';        # testing
+use IO::Handle;
+use Getopt::Long;
+use Cwd qw();
+
+use strict;
+use vars qw(@CmdParts $VERSION);
+
+$VERSION = '1.496';
+
+#======================================================================
+# main
+
+my $Opt_Cd;
+my @Opt_Param;
+my $Opt_Shell = "/bin/sh -c";
+my $opt_show;
+
+autoflush STDOUT;
+autoflush STDERR;
+
+Getopt::Long::config ("no_auto_abbrev","require_order");
+if (! GetOptions (
+		  "help"	=> \&usage,
+		  "version"	=> sub { print "Version $VERSION\n"; exit(0); },
+		  "cd=s"	=> \$Opt_Cd,
+		  "shell=s"	=> \$Opt_Shell,
+		  "show!"	=> \$opt_show,
+		  )) {
+    die "%Error: Bad usage, try 'uriexec --help'\n";
+}
+my @opt_cmd = @ARGV;
+$#opt_cmd >= 0 or die "%Error: uriexec: No command specified, see 'uriexec --help'\n";
+
+push (@Opt_Param, @ARGV); # Any remaining arguments (i.e. after a -- on the command line)
+@Opt_Param or die "%Error: uriexec: No command argument was specified\n";
+
+if ($opt_show) {
+    print "cd    ",user_decode($Opt_Cd),"\n" if $Opt_Cd;
+    print "shell ",user_decode($Opt_Shell),"\n" if $Opt_Shell;
+    print "cmd   ",user_decode(join(' ',@Opt_Param)),"\n";
+    exit(0) if $opt_show;
+}
+
+if ($Opt_Cd) {
+    my $dir = uri_decode($Opt_Cd);
+    Cwd::chdir($dir)
+	or die "%Error: uriexec: Could not chdir to \"$dir\"\n";
+}
+
+# Decode all arguments and exec them.
+my $shell = uri_decode($Opt_Shell);
+my $cmd = uri_decode(join(' ', @Opt_Param));
+my @cmds = (split(' ',$shell), $cmd);
+exec(@cmds);
+die "%Error: uriexec: exec failed: '".join(' ',@cmds),"\n";
+
+#----------------------------------------------------------------------
+
+sub usage {
+    eval 'use Pod::Usage;';
+    print "Version: $VERSION\n";
+    pod2usage(-verbose=>2, -exitval=>2, -output=>\*STDOUT, -noperldoc=>1);
+    exit (1);
+}
+
+#######################################################################
+
+sub uri_decode {
+    my $str = shift;
+    $str =~ tr/+/ /; # Plus encodes a space
+    $str =~ s/%([a-fA-F0-9]{2,2})/chr(hex($1))/eg; # Decode the % encoding
+    return $str;
+}
+
+sub user_decode {
+    my $str = shift;
+    my $level = shift || 1;
+    # Recursively decode a string for user's convenience
+    $str = uri_decode($str);
+    if ($str =~ /(.*?\buriexec\s)(.*)$/) {
+	$str = $1." ".user_decode($2,$level+1);
+	return "{".$level."{ ".$str." }".$level."} ";
+    }
+    return "{".$level."{ ".$str." }".$level." ";
+}
+
+#######################################################################
+__END__
+
+=pod
+
+=head1 NAME
+
+uriexec - Decode and execute the given URI-encoded command
+
+=head1 SYNOPSIS
+
+  uriexec [--cd I<cd>] echo %24HOME
+
+=head1 DESCRIPTION
+
+Run the specified command (optionally from the specified directory).  Each
+URL-encoded character (%xx) is translated prior to executing the command
+with exec().
+
+Uriexec solves the classic problem of having to figure out how to quote
+shell metacharacters to pass commands across multiple shells and ssh
+processes.  Simply call "uriexec" on a string created with
+C<URI::Escape::uri_escape>, and it will end up executing on the final
+machine with proper quoting.
+
+=head1 ARGUMENTS
+
+=over 4
+
+=item --cd I<dir>
+
+Directory to cd to before the exec of the given command, URI-encoded.
+
+=item --shell I<shell>
+
+Name of the shell and additional parameters to prefix, URI-encoded.
+Defaults to "/bin/sh -c".
+
+=item --show
+
+Instead of executing the command, print the decoding of the command to aid
+in user debug.  This also supports decoding nested uriexec calls, however
+they are not always perfect so the output from this option is only for
+users, not scripts.
+
+=item --version
+
+Displays program version and exits.
+
+=back
+
+=head1 DISTRIBUTION
+
+Copyright 2005-2012 by Jeff Dutton <jdutton@cpan.org>.  This program is
+free software; you can redistribute it and/or modify it under the terms of
+either the GNU Lesser General Public License Version 3 or the Perl Artistic License Version 2.0.
+
+This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+more details.
+
+=head1 AUTHORS
+
+Jeff Dutton <jdutton@cpan.org>, Wilson Snyder <wsnyder@wsnyder.org>
+
+=head1 SEE ALSO
+
+L<URI::Escape>, L<IPC::Locker>
+
+=cut

@@ -1,0 +1,53 @@
+Revision history for IO-Pty-Easy
+
+0.10  2016-05-28
+    - Fix documentation of the spawn method
+
+0.09  2012-03-05
+    - Close the underlying pty before trying to kill it, to give programs that
+      clean up on EOF time to do that
+    - Other various cleanups
+
+0.08  2009-10-10
+    - Fixed some circular references, should fix global destruction issues
+      (reported by kbrint, RT#50373)
+
+0.07  2009-07-07
+    - Add a constructor option 'raw' (default true) to configure whether the
+      pty should be set to raw mode on spawn.
+    - Don't ever automatically set the master side of the pty to raw, since
+      it's controlled by the parent process (I don't think this should break
+      anything?)
+    - Build system changed to Dist::Zilla
+
+0.06  2009-07-06
+    - Localize $@ and $? in the destructor
+    - Convert the module to use the actual pty object as the class instance,
+      rather than hiding it away in the hashref - now things like fileno($pty)
+      will do what you expect. This is potentially backwards-incompatible if
+      you have been digging around in the hash prior to this.
+    - Add a few accessors for the object state
+
+0.05  2009-02-04
+    - Fix read() returning undef on timeout
+
+0.04  2009-02-03
+    - Don't mess with SIGCHLD, it breaks system() and ``
+    - Don't die if $pty->close is called multiple times (and close on DESTROY)
+    - Don't mess with SIGWINCH if we weren't the ones that set it up
+    - Sleep while waiting for a process to die, rather than spinning
+    - FreeBSD should pass all tests now (sorear)
+
+0.03  2007-08-20
+    - Make sure stdin/out are connected to a tty before trying to clone winsize
+      from them
+    - Fix the subprocess test so that it waits for the read before the
+      subprocess dies
+
+0.02  2007-08-17
+    - Made calls which could possibly terminate the subprocess blocking by
+      default
+    - A few other minor bug fixes, doc fixes, and general cleanups
+
+0.01  2007-08-17
+    - Initial release

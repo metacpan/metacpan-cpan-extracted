@@ -1,0 +1,24 @@
+---
+abstract: 'Embed JSON data structures directly into your Perl code'
+author:
+  - 'Anthony Kilna <anthony@kilna.com>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Inline-JSON
+provides:
+  Inline::JSON:
+    file: lib/Inline/JSON.pm
+    version: v1.0.4
+requires:
+  JSON: 0
+  perl: 5.01
+resources:
+  license: http://dev.perl.org/licenses/
+version: v1.0.4

@@ -1,0 +1,8 @@
+TYPEMAP
+Alpr* T_PTROBJ
+fchar* T_PV_FREE
+
+OUTPUT
+T_PV_FREE
+  sv_setpv((SV*)$arg, $var);
+  freeJsonMem($var);

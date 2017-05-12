@@ -1,0 +1,29 @@
+Revision history for Perl extension IO::FDPass
+
+1.2  Sun Sep 25 01:43:14 CEST 2016
+        - compatibility macros were still using C++ syntax, fortunately
+          only affecting the solaris platform that apparently doesn't
+          implement ipv6 (which defines those macros) (analyzed by Yary).
+
+1.1  Mon Jul  6 19:40:36 CEST 2015
+	- added stability canary support.
+	- seems to work on 5.6.2 too, so remove the use 5.008.
+        - rewrite the cmsg recv check to rely on CMSG_FIRSTHDR instead
+          of doing our own check.
+
+1.0  Sun Apr  7 00:42:13 CEST 2013
+	- this release only updates the documentation.
+	- better SYNOPSIS.
+        - discuss other file descriptor passing modules more thoroughly.
+
+0.2  Fri Apr  5 10:20:05 CEST 2013
+	- fix a problem when sending on non-blocking sockets on windows.
+        - "improve" fd passing to be less blocking on windows, at the cost
+          of leaking the handle on error.
+
+0.1  Fri Apr  5 07:04:02 CEST 2013
+	- first release.
+
+0.0  Fri Apr  5 06:09:40 CEST 2013
+	- ripped out of AnyEvent::Fork > 0.01.
+

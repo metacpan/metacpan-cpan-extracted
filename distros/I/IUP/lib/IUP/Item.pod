@@ -1,0 +1,202 @@
+=for comment based on iup-3.5 - http://www.tecgraf.puc-rio.br/iup/en/elem/iupitem.html
+
+=head1 NAME
+
+IUP::Item - [GUI element] item of the menu interface element
+
+=head1 DESCRIPTION
+
+Creates an item of the menu interface element. When selected, it
+generates an action.
+
+=head1 USAGE
+
+=head2 CREATION - new() method
+
+ $item = IUP::Item->new( TITLE=>"Item text" );
+
+B<Returns:> the identifier of the created element, or C<undef> if an error occurs.
+
+NOTE: You can pass to C<new()> other C<ATTRIBUTE=E<gt>'value'> or C<CALLBACKNAME=E<gt>\&func> pairs relevant
+to this element - see L<IUP::Manual::02_Elements|IUP::Manual::02_Elements/"new()">.
+
+=head2 ATTRIBUTES
+
+For more info about concept of attributes (setting/getting values etc.)
+see L<IUP::Manual::03_Attributes|IUP::Manual::03_Attributes>. Attributes specific to this element:
+
+=over
+
+=item B<AUTOTOGGLE>
+
+I<(non inheritable)>
+
+Enables the automatic toggle of VALUE
+state when the item is activated. Default: NO. 
+
+=item B<HIDEMARK>
+
+I<[Motif and GTK Only]>
+
+If enabled the item cannot be
+checked, since the check box will not be shown. If all items in a menu
+enable it, then no empty space will be shown in front of the items.
+Normally the unmarked check box will not be shown, but since GTK 2.14
+the unmarked check box is always shown. If your item will not be marked
+you must set HIDEMARK=YES, since this is the most common case we
+changed the default value to YES for this version of GTK, but if VALUE
+is defined the default goes back to NO. Default: NO. 
+
+=item B<IMAGE>
+
+I<[Windows and GTK Only] (non inheritable)>
+
+Image name of the
+check mark image when VALUE=OFF. In Windows, an item in a menu bar
+cannot have a check mark. Ignored if item in a menu bar. A recommended
+size would be 16x16 to fit the image in the menu item. In Windows, if
+larger than the check mark area it will be cropped.
+
+=item B<IMPRESS>
+
+I<[Windows and GTK Only] (non inheritable)>
+
+Image name of the
+check mark image when VALUE=ON.
+
+=item L<TITLE|IUP::Manual::03_Attributes/TITLE>
+
+I<(non inheritable)>
+
+Item text. The "&"
+character can be used to define a mnemonic, the next character will be
+used as key. Use "&&" to show the "&" character instead on defining a
+mnemonic. When in a menu bar an item that has a mnemonic can be
+activated from any control in the dialog using the "Alt+key"
+combination.
+
+The text also accepts the control character '\t' to force text
+alignment to the right after this character. This is used to add
+shortcut keys to the menu, aligned to the right, ex: "Save\tCtrl+S",
+but notice that the shortcut key (also known as Accelerator or Hot Key)
+still has to be implemented. To implement a shortcut use the K_*
+callbacks in the dialog.
+
+=item B<TITLEIMAGE>
+
+I<(non inheritable)>
+
+Image name of the title image. In
+Windows, it appears before of the title text and after the check mark
+area (so both title and title image can be visible). In Motif, it must
+be at least defined during map, it replaces the text, and only images
+will be possible to set (TITLE will be hidden). In GTK, it will appear
+on the check mark area. 
+
+=item B<VALUE>
+
+I<(non inheritable)>
+
+Indicates the item's state. When the value
+is ON, a mark will be displayed to the left of the item. Default: OFF.
+An item in a menu bar cannot have a check mark. When IMAGE is used, the
+checkmark is not shown. See the item AUTOTOGGLE attribute and the menu
+=item L<RADIO|iupmenu.html#RADIO> attribute.
+
+L<WID|IUP::Manual::03_Attributes/WID> (non inheritable)
+
+In Windows, returns the HMENU of the parent menu.
+
+=back
+
+The following L<common attributes|IUP::Manual::03_Attributes/Common Attributes> are also accepted:
+
+=over
+
+=item * L<ACTIVE|IUP::Manual::03_Attributes/ACTIVE>
+
+=back
+
+=head2 CALLBACKS
+
+For more info about concept of callbacks (setting callback handlers etc.)
+see L<IUP::Manual::04_Callbacks|IUP::Manual::04_Callbacks>. Callbacks specific to this element:
+
+=over
+
+=item L<ACTION|IUP::Manual::04_Callbacks/ACTION>
+
+Action generated when the item is
+selected. IUP_CLOSE will be processed. Even if inside a popup menu when
+IUP_CLOSE is returned, the current popup dialog or the main loop will
+be closed.
+
+=item L<HIGHLIGHT_CB|IUP::Manual::04_Callbacks/HIGHLIGHT_CB>
+
+Action generated when the item is highlighted.
+
+=back
+
+The following L<common callbacks|IUP::Manual::04_Callbacks/Common Callbacks> are also accepted:
+
+=over
+
+=item * L<MAP_CB|IUP::Manual::04_Callbacks/MAP_CB>,
+L<UNMAP_CB|IUP::Manual::04_Callbacks/UNMAP_CB>,
+L<HELP_CB|IUP::Manual::04_Callbacks/HELP_CB>
+
+=back
+
+=head1 NOTES
+
+Menu items are activated using the Enter key.
+
+In Motif and GTK, the text font will be affected by the dialog font
+when the menu is mapped.
+
+Since GTK 2.14 to have a menu item that can be marked you must set the
+VALUE attribute to ON or OFF, or set HIDEMARK=NO, before mapping the
+control.
+
+=head1 EXAMPLES
+
+
+The element B<IUP::Item> is used in the following sample scripts:
+
+=over
+
+=item * L<0-basic/dialog2.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/dialog2.pl> - IUP::Dialog example
+
+=item * L<0-basic/item.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/item.pl> - IUP::Item Example
+
+=item * L<0-basic/layoutdialog.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/layoutdialog.pl> - IUP::LayoutDialog example
+
+=item * L<0-basic/menu.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/menu.pl> - IUP::Menu example
+
+=item * L<0-basic/separator.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/separator.pl> - IUP::Separator example
+
+=item * L<0-basic/submenu.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/submenu.pl> - IUP::Submenu example
+
+=item * L<0-basic/tray.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/tray.pl> - IUP::Dialog + TRAY / TRAYTIP / TRAYIMAGE example
+
+=item * L<1-apps/app-mdi.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/1-apps/app-mdi.pl> - IUP app example
+
+=item * L<1-apps/app-sample1.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/1-apps/app-sample1.pl> - example used for screenshot - IUP.pod
+
+=item * L<1-apps/app-sample2.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/1-apps/app-sample2.pl> - example based on the original sample.c
+
+=item * L<1-apps/app-simple-demo.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/1-apps/app-simple-demo.pl> - example used for screenshot - IUP.pod
+
+=back 
+
+
+
+=head1 SEE ALSO
+
+L<IUP::Separator|IUP::Separator>, L<IUP::Submenu|IUP::Submenu>,
+L<IUP::Menu|IUP::Menu>.
+
+The original doc: L<iupitem.html|http://www.tecgraf.puc-rio.br/iup/en/elem/iupitem.html>
+ 
+
+=cut

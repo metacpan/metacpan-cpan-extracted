@@ -1,0 +1,52 @@
+Revision history for IO-Async-Loop-Glib
+
+0.21    CHANGES:
+         * Implement the iO::Async 0.49 Loop API - watch_time/unwatch_time
+         * Implement watch_child on specific PIDs using native GLib child
+           watches
+         * Bugfixes for pipe HUP and $context->iteration early returns
+
+0.20    CHANGES:
+         * Optionally implement watch_io on_hangup (only on Linux)
+         * Fix use of Time::HiRes::time() - Loop has a ->time method directly
+         * Added some IO::Async + Glib sharing unit tests
+
+0.19    CHANGES:
+         * Updated for IO::Async 0.33
+
+0.18    CHANGES:
+         * Use Time::HiRes for timing accuracy
+         * Added two small Gtk2-based examples
+
+        BUGFIXES:
+         * Clamp negative timer intervals to 0 - fixes RT 53281
+
+0.17    CHANGES:
+         * Updated for IO-Async 0.24
+         * Use shared acceptance testing provided by IO::Async::LoopTests
+
+        BUGFIXES:
+         * Fixed a reference leak bug in enqueue_timer
+
+0.16    CHANGES:
+         * Various small updates to keep CPANTS happy
+
+0.15    CHANGES:
+         * Added 'use warnings'
+
+        BUGFIXES:
+         * Account for timing inaccuracies and race condition in timing tests
+
+0.14    CHANGES:
+         * Updated for IO-Async 0.20
+
+0.13:   CHANGES:
+         * Implement interfaces required for IO::Async 0.17
+         * Deprecated class IO::Async::Set::GMainLoop now dies instantly
+
+        BUGFIXES:
+         * Be sure to watch for error conditions in Notifiers as well as
+           normal IO
+
+0.12    First version split out from IO-Async dist
+

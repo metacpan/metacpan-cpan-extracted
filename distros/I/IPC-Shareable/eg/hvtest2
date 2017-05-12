@@ -1,0 +1,67 @@
+#!/usr/bin/perl -w
+#
+# Test of shared hashes courtesy Robert Emmery <roberte@netscape.com>
+use IPC::Shareable;
+use Data::Dumper;
+
+use strict;
+
+  my %shareOpts = (
+                create =>       'yes',
+                exclusive =>    'no',
+                mode =>         0644,
+                destroy =>      'yes',
+                );
+
+  my %childShareOpts = (
+                create =>       'no',
+                exclusive =>    'no',
+                mode =>         0644,
+                destroy =>      'yes'
+                );
+
+$SIG{'INT'} = sub { die; };
+
+# create shared memory segment
+
+my %hashTable = ();
+
+
+print "\n\nPress any key to start.. (Press Ctrl+C to exit)\n\n";
+<STDIN>;
+
+tie(%hashTable, 'IPC::Shareable', "glue",  {%shareOpts }) || die "Failed to share hashTable"; 
+
+
+if (fork() == 0) {
+  # we're in process 1 
+  # tie to hashTable...
+  tie(%hashTable, 'IPC::Shareable', "glue",  {%childShareOpts} ) || die "Failed to tie from process 1";
+  my $count = 0;
+  while (1) {
+    (tied %hashTable)->shlock();
+      $hashTable{$count++ . " - proc 1"} = "proc 1"; 
+      print "proc 1: " . Dumper(\%hashTable); 
+    (tied %hashTable)->shunlock(); 
+    sleep(2);
+  }
+}
+if (fork() == 0) {
+  # we're in proces 2
+  # tie to hashTable...
+  tie(%hashTable, 'IPC::Shareable', "glue",  {%childShareOpts} ) || die "Failed to tie from process 2";
+  my $count = 0;
+  while (1) {
+    (tied %hashTable)->shlock();
+      $hashTable{$count++ . " - proc 2"} = "proc 2";
+      print "proc 2: " . Dumper(\%hashTable);
+    (tied %hashTable)->shunlock();
+    sleep(2);
+  }
+}
+
+
+# do not exit as shared memory will get lost
+while (1) {
+  sleep(9999);
+}

@@ -1,0 +1,29 @@
+Revision history for Image::Animated::JPEG
+
+0.01	2016-11-02
+	- left alpha stage, feature lock
+	- added missing .desktop and .xml files
+	- makeajpeg: new --split mode allows to disassemble a
+	  monolithic AJPEG to individual JPEG frame files
+	- gif2ajpeg: die on error from convert
+	- new ajpeg2gif offers the reverse operation of
+	  gif2ajpeg, via mogrify and gifsicle
+	- new ajpegtran crops a whole AJPEG animation
+	  lossless via jpegtran
+
+0.01_2	2015-11-02
+	- Specifications: proposed MIME-Type is now image/ajpeg,
+	  as previous use of a parameter to image/jpeg did not
+	  comply with RFC2048 section 2.2.3.
+	- fixed filename escaping in makeajpeg and gif2ajpeg
+	- gif2ajpeg: output filename may now be omitted
+	- gif2ajpeg: behaves like Mozilla now by limiting frame
+	  rate to 10fps when a GIF has a frame delay of 0
+	- playajpeg: display is now user zoomable with keys 1-4,
+	  shift+mousewheel or +/-
+	- playajpeg: arrow left/right is now step mode
+	- playajpeg: arrow up/down (page up/down) for file change
+	- example .desktop launcher and .xml MIME-Type files
+
+0.01_1	2015-03-04
+	- First public version, released on an unsuspecting world.

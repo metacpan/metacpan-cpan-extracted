@@ -1,0 +1,330 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     The graphic for this, hero-battle.png, was taken from RPG Maker 2003 for
+     demonstration purposes only. RPG Maker 2003 is copyright
+     (C) Enterbrain, Inc.
+-->
+<tileset>
+	<!-- Tile Definitions -->
+	<layout type="tiles" size="24x32" x="0" y="0">
+		<!-- Male Hero -->
+		<tile x="0" y="0" id="hero-m-up-1" />
+		<tile x="1" y="0" id="hero-m-up-2" />
+		<tile x="2" y="0" id="hero-m-up-3" />
+		<tile x="0" y="1" id="hero-m-right-1" />
+		<tile x="1" y="1" id="hero-m-right-2" />
+		<tile x="2" y="1" id="hero-m-right-3" />
+		<tile x="0" y="2" id="hero-m-down-1" />
+		<tile x="1" y="2" id="hero-m-down-2" />
+		<tile x="2" y="2" id="hero-m-down-3" />
+		<tile x="0" y="3" id="hero-m-left-1" />
+		<tile x="1" y="3" id="hero-m-left-2" />
+		<tile x="2" y="3" id="hero-m-left-3" />
+
+		<!-- Female Hero -->
+		<tile x="3" y="0" id="hero-f-up-1" />
+		<tile x="4" y="0" id="hero-f-up-2" />
+		<tile x="5" y="0" id="hero-f-up-3" />
+		<tile x="3" y="1" id="hero-f-right-1" />
+		<tile x="4" y="1" id="hero-f-right-2" />
+		<tile x="5" y="1" id="hero-f-right-3" />
+		<tile x="3" y="2" id="hero-f-down-1" />
+		<tile x="4" y="2" id="hero-f-down-2" />
+		<tile x="5" y="2" id="hero-f-down-3" />
+		<tile x="3" y="3" id="hero-f-left-1" />
+		<tile x="4" y="3" id="hero-f-left-2" />
+		<tile x="5" y="3" id="hero-f-left-3" />
+
+		<!-- Male Guard -->
+		<tile x="6" y="0" id="guard-m-up-1" />
+		<tile x="7" y="0" id="guard-m-up-2" />
+		<tile x="8" y="0" id="guard-m-up-3" />
+		<tile x="6" y="1" id="guard-m-right-1" />
+		<tile x="7" y="1" id="guard-m-right-2" />
+		<tile x="8" y="1" id="guard-m-right-3" />
+		<tile x="6" y="2" id="guard-m-down-1" />
+		<tile x="7" y="2" id="guard-m-down-2" />
+		<tile x="8" y="2" id="guard-m-down-3" />
+		<tile x="6" y="3" id="guard-m-left-1" />
+		<tile x="7" y="3" id="guard-m-left-2" />
+		<tile x="8" y="3" id="guard-m-left-3" />
+
+		<!-- Female Guard -->
+		<tile x="9"  y="0" id="guard-f-up-1" />
+		<tile x="10" y="0" id="guard-f-up-2" />
+		<tile x="11" y="0" id="guard-f-up-3" />
+		<tile x="9"  y="1" id="guard-f-right-1" />
+		<tile x="10" y="1" id="guard-f-right-2" />
+		<tile x="11" y="1" id="guard-f-right-3" />
+		<tile x="9"  y="2" id="guard-f-down-1" />
+		<tile x="10" y="2" id="guard-f-down-2" />
+		<tile x="11" y="2" id="guard-f-down-3" />
+		<tile x="9"  y="3" id="guard-f-left-1" />
+		<tile x="10" y="3" id="guard-f-left-2" />
+		<tile x="11" y="3" id="guard-f-left-3" />
+
+		<!-- Male Mage -->
+		<tile x="0" y="4" id="mage-m-up-1" />
+		<tile x="1" y="4" id="mage-m-up-2" />
+		<tile x="2" y="4" id="mage-m-up-3" />
+		<tile x="0" y="5" id="mage-m-right-1" />
+		<tile x="1" y="5" id="mage-m-right-2" />
+		<tile x="2" y="5" id="mage-m-right-3" />
+		<tile x="0" y="6" id="mage-m-down-1" />
+		<tile x="1" y="6" id="mage-m-down-2" />
+		<tile x="2" y="6" id="mage-m-down-3" />
+		<tile x="0" y="7" id="mage-m-left-1" />
+		<tile x="1" y="7" id="mage-m-left-2" />
+		<tile x="2" y="7" id="mage-m-left-3" />
+
+		<!-- Female Mage -->
+		<tile x="3" y="4" id="mage-f-up-1" />
+		<tile x="4" y="4" id="mage-f-up-2" />
+		<tile x="5" y="4" id="mage-f-up-3" />
+		<tile x="3" y="5" id="mage-f-right-1" />
+		<tile x="4" y="5" id="mage-f-right-2" />
+		<tile x="5" y="5" id="mage-f-right-3" />
+		<tile x="3" y="6" id="mage-f-down-1" />
+		<tile x="4" y="6" id="mage-f-down-2" />
+		<tile x="5" y="6" id="mage-f-down-3" />
+		<tile x="3" y="7" id="mage-f-left-1" />
+		<tile x="4" y="7" id="mage-f-left-2" />
+		<tile x="5" y="7" id="mage-f-left-3" />
+
+		<!-- Male Priest -->
+		<tile x="6" y="4" id="priest-m-up-1" />
+		<tile x="7" y="4" id="priest-m-up-2" />
+		<tile x="8" y="4" id="priest-m-up-3" />
+		<tile x="6" y="5" id="priest-m-right-1" />
+		<tile x="7" y="5" id="priest-m-right-2" />
+		<tile x="8" y="5" id="priest-m-right-3" />
+		<tile x="6" y="6" id="priest-m-down-1" />
+		<tile x="7" y="6" id="priest-m-down-2" />
+		<tile x="8" y="6" id="priest-m-down-3" />
+		<tile x="6" y="7" id="priest-m-left-1" />
+		<tile x="7" y="7" id="priest-m-left-2" />
+		<tile x="8" y="7" id="priest-m-left-3" />
+
+		<!-- Female Priest -->
+		<tile x="9" y="4"  id="priest-f-up-1" />
+		<tile x="10" y="4" id="priest-f-up-2" />
+		<tile x="11" y="4" id="priest-f-up-3" />
+		<tile x="9" y="5"  id="priest-f-right-1" />
+		<tile x="10" y="5" id="priest-f-right-2" />
+		<tile x="11" y="5" id="priest-f-right-3" />
+		<tile x="9" y="6"  id="priest-f-down-1" />
+		<tile x="10" y="6" id="priest-f-down-2" />
+		<tile x="11" y="6" id="priest-f-down-3" />
+		<tile x="9" y="7"  id="priest-f-left-1" />
+		<tile x="10" y="7" id="priest-f-left-2" />
+		<tile x="11" y="7" id="priest-f-left-3" />
+	</layout>
+
+	<!-- Male Hero Animations -->
+	<layout type="animation" id="hero-m-up" speed="200">
+		<tile>hero-m-up-1</tile>
+		<tile>hero-m-up-2</tile>
+		<tile>hero-m-up-3</tile>
+		<tile>hero-m-up-2</tile>
+	</layout>
+	<layout type="animation" id="hero-m-right" speed="200">
+		<tile>hero-m-right-1</tile>
+		<tile>hero-m-right-2</tile>
+		<tile>hero-m-right-3</tile>
+		<tile>hero-m-right-2</tile>
+	</layout>
+	<layout type="animation" id="hero-m-down" speed="200">
+		<tile>hero-m-down-1</tile>
+		<tile>hero-m-down-2</tile>
+		<tile>hero-m-down-3</tile>
+		<tile>hero-m-down-2</tile>
+	</layout>
+	<layout type="animation" id="hero-m-left" speed="200">
+		<tile>hero-m-left-1</tile>
+		<tile>hero-m-left-2</tile>
+		<tile>hero-m-left-3</tile>
+		<tile>hero-m-left-2</tile>
+	</layout>
+
+	<!-- Female Hero Animations -->
+	<layout type="animation" id="hero-f-up" speed="200">
+		<tile>hero-f-up-1</tile>
+		<tile>hero-f-up-2</tile>
+		<tile>hero-f-up-3</tile>
+		<tile>hero-f-up-2</tile>
+	</layout>
+	<layout type="animation" id="hero-f-right" speed="200">
+		<tile>hero-f-right-1</tile>
+		<tile>hero-f-right-2</tile>
+		<tile>hero-f-right-3</tile>
+		<tile>hero-f-right-2</tile>
+	</layout>
+	<layout type="animation" id="hero-f-down" speed="200">
+		<tile>hero-f-down-1</tile>
+		<tile>hero-f-down-2</tile>
+		<tile>hero-f-down-3</tile>
+		<tile>hero-f-down-2</tile>
+	</layout>
+	<layout type="animation" id="hero-f-left" speed="200">
+		<tile>hero-f-left-1</tile>
+		<tile>hero-f-left-2</tile>
+		<tile>hero-f-left-3</tile>
+		<tile>hero-f-left-2</tile>
+	</layout>
+
+	<!-- Male Guard Animations -->
+	<layout type="animation" id="guard-m-up" speed="200">
+		<tile>guard-m-up-1</tile>
+		<tile>guard-m-up-2</tile>
+		<tile>guard-m-up-3</tile>
+		<tile>guard-m-up-2</tile>
+	</layout>
+	<layout type="animation" id="guard-m-right" speed="200">
+		<tile>guard-m-right-1</tile>
+		<tile>guard-m-right-2</tile>
+		<tile>guard-m-right-3</tile>
+		<tile>guard-m-right-2</tile>
+	</layout>
+	<layout type="animation" id="guard-m-down" speed="200">
+		<tile>guard-m-down-1</tile>
+		<tile>guard-m-down-2</tile>
+		<tile>guard-m-down-3</tile>
+		<tile>guard-m-down-2</tile>
+	</layout>
+	<layout type="animation" id="guard-m-left" speed="200">
+		<tile>guard-m-left-1</tile>
+		<tile>guard-m-left-2</tile>
+		<tile>guard-m-left-3</tile>
+		<tile>guard-m-left-2</tile>
+	</layout>
+
+	<!-- Female Guard Animations -->
+	<layout type="animation" id="guard-f-up" speed="200">
+		<tile>guard-f-up-1</tile>
+		<tile>guard-f-up-2</tile>
+		<tile>guard-f-up-3</tile>
+		<tile>guard-f-up-2</tile>
+	</layout>
+	<layout type="animation" id="guard-f-right" speed="200">
+		<tile>guard-f-right-1</tile>
+		<tile>guard-f-right-2</tile>
+		<tile>guard-f-right-3</tile>
+		<tile>guard-f-right-2</tile>
+	</layout>
+	<layout type="animation" id="guard-f-down" speed="200">
+		<tile>guard-f-down-1</tile>
+		<tile>guard-f-down-2</tile>
+		<tile>guard-f-down-3</tile>
+		<tile>guard-f-down-2</tile>
+	</layout>
+	<layout type="animation" id="guard-f-left" speed="200">
+		<tile>guard-f-left-1</tile>
+		<tile>guard-f-left-2</tile>
+		<tile>guard-f-left-3</tile>
+		<tile>guard-f-left-2</tile>
+	</layout>
+
+	<!-- Male Mage Animations -->
+	<layout type="animation" id="mage-m-up" speed="200">
+		<tile>mage-m-up-1</tile>
+		<tile>mage-m-up-2</tile>
+		<tile>mage-m-up-3</tile>
+		<tile>mage-m-up-2</tile>
+	</layout>
+	<layout type="animation" id="mage-m-right" speed="200">
+		<tile>mage-m-right-1</tile>
+		<tile>mage-m-right-2</tile>
+		<tile>mage-m-right-3</tile>
+		<tile>mage-m-right-2</tile>
+	</layout>
+	<layout type="animation" id="mage-m-down" speed="200">
+		<tile>mage-m-down-1</tile>
+		<tile>mage-m-down-2</tile>
+		<tile>mage-m-down-3</tile>
+		<tile>mage-m-down-2</tile>
+	</layout>
+	<layout type="animation" id="mage-m-left" speed="200">
+		<tile>mage-m-left-1</tile>
+		<tile>mage-m-left-2</tile>
+		<tile>mage-m-left-3</tile>
+		<tile>mage-m-left-2</tile>
+	</layout>
+
+	<!-- Female Mage Animations -->
+	<layout type="animation" id="mage-f-up" speed="200">
+		<tile>mage-f-up-1</tile>
+		<tile>mage-f-up-2</tile>
+		<tile>mage-f-up-3</tile>
+		<tile>mage-f-up-2</tile>
+	</layout>
+	<layout type="animation" id="mage-f-right" speed="200">
+		<tile>mage-f-right-1</tile>
+		<tile>mage-f-right-2</tile>
+		<tile>mage-f-right-3</tile>
+		<tile>mage-f-right-2</tile>
+	</layout>
+	<layout type="animation" id="mage-f-down" speed="200">
+		<tile>mage-f-down-1</tile>
+		<tile>mage-f-down-2</tile>
+		<tile>mage-f-down-3</tile>
+		<tile>mage-f-down-2</tile>
+	</layout>
+	<layout type="animation" id="mage-f-left" speed="200">
+		<tile>mage-f-left-1</tile>
+		<tile>mage-f-left-2</tile>
+		<tile>mage-f-left-3</tile>
+		<tile>mage-f-left-2</tile>
+	</layout>
+
+	<!-- Male Priest Animations -->
+	<layout type="animation" id="priest-m-up" speed="200">
+		<tile>priest-m-up-1</tile>
+		<tile>priest-m-up-2</tile>
+		<tile>priest-m-up-3</tile>
+		<tile>priest-m-up-2</tile>
+	</layout>
+	<layout type="animation" id="priest-m-right" speed="200">
+		<tile>priest-m-right-1</tile>
+		<tile>priest-m-right-2</tile>
+		<tile>priest-m-right-3</tile>
+		<tile>priest-m-right-2</tile>
+	</layout>
+	<layout type="animation" id="priest-m-down" speed="200">
+		<tile>priest-m-down-1</tile>
+		<tile>priest-m-down-2</tile>
+		<tile>priest-m-down-3</tile>
+		<tile>priest-m-down-2</tile>
+	</layout>
+	<layout type="animation" id="priest-m-left" speed="200">
+		<tile>priest-m-left-1</tile>
+		<tile>priest-m-left-2</tile>
+		<tile>priest-m-left-3</tile>
+		<tile>priest-m-left-2</tile>
+	</layout>
+
+	<!-- Female Priest Animations -->
+	<layout type="animation" id="priest-f-up" speed="200">
+		<tile>priest-f-up-1</tile>
+		<tile>priest-f-up-2</tile>
+		<tile>priest-f-up-3</tile>
+		<tile>priest-f-up-2</tile>
+	</layout>
+	<layout type="animation" id="priest-f-right" speed="200">
+		<tile>priest-f-right-1</tile>
+		<tile>priest-f-right-2</tile>
+		<tile>priest-f-right-3</tile>
+		<tile>priest-f-right-2</tile>
+	</layout>
+	<layout type="animation" id="priest-f-down" speed="200">
+		<tile>priest-f-down-1</tile>
+		<tile>priest-f-down-2</tile>
+		<tile>priest-f-down-3</tile>
+		<tile>priest-f-down-2</tile>
+	</layout>
+	<layout type="animation" id="priest-f-left" speed="200">
+		<tile>priest-f-left-1</tile>
+		<tile>priest-f-left-2</tile>
+		<tile>priest-f-left-3</tile>
+		<tile>priest-f-left-2</tile>
+	</layout>
+</tileset>

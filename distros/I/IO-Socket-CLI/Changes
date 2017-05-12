@@ -1,0 +1,27 @@
+Revision history for IO-Socket-CLI
+
+0.041     2014-10-24 04:01:01+00:00 UTC
+- convert to dzil
+- version number scheme change
+- reorganize tests and skip if MSWin32
+- kwalitee
+- move POD to end and update
+
+0.04      2014-08-17 03:31:24+00:00 UTC
+- tests default to port 25 instead of 143 if no server tests, because of BSD (assuming SMTP is running).
+- add options to select test server and port.
+
+0.03      2014-08-07 07:25:59+00:00 UTC
+- lib/IO/Socket/CLI.pm:
+  - fixed bug in bye() which affected newer versions of perl.
+  - replaced Unicode – with ascii -
+- t/00_load.t:
+  - replaced global filehandles with local ones in t/00_load.t.
+  - log $errin to check for unknown content and to prevent unknown errors from messing up later tests.
+- added Gitable URL to POD.
+
+0.02      2012-07-11 04:12:32+00:00 UTC
+- added prompt for IMAP server tests.
+
+0.01      2012-05-07 20:55:16+00:00 UTC
+- original version; created by ExtUtils::ModuleMaker 0.51.

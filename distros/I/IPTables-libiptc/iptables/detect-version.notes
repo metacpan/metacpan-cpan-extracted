@@ -1,0 +1,42 @@
+
+libxtables version 1: commit dacafa5
+~~~~~~~~~~~~~~~~~~~~~
+ git describe --contains dacafa5
+ v1.4.3~46^2~9
+
+ This version is broken, but I guess it works with iptables.c v1.4.4
+
+libxtables version 2: commit c4edfa63
+~~~~~~~~~~~~~~~~~~~~
+ git describe --contains c4edfa63
+ v1.4.3.2~3^2~5
+
+ Should work with up-to: v1.4.4
+
+libxtables version 3: commit 332e4acc
+~~~~~~~~~~~~~~~~~~~~
+ git describe --contains 332e4acc
+ v1.4.5~21
+
+ Should work with up-to: v1.4.5
+
+libxtables version 4: commit bf97128
+~~~~~~~~~~~~~~~~~~~~~
+ git describe --contains  bf97128c
+ v1.4.6~8
+
+ Should work with up-to: v1.4.8
+
+libxtables version 5: commit 11c2dd54
+~~~~~~~~~~~~~~~~~~~~
+ git describe --contains 11c2dd54
+ v1.4.9~8^2
+
+ Should work with up-to: v1.4.10
+
+libxtables version 6: commit 3a32dcbb
+~~~~~~~~~~~~~~~~~~~~
+git describe --contains 3a32dcbb
+v1.4.11~19^2~8
+
+

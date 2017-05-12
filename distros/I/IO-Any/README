@@ -1,0 +1,164 @@
+NAME
+    IO::Any - open anything
+
+SYNOPSIS
+        # NOTE commented out lines doesn't work (yet)
+        use IO::Any;
+
+        $fh = IO::Any->read('filename');
+        $fh = IO::Any->read('file://var/log/syslog');
+        #$fh = IO::Any->read('http://search.cpan.org/');
+        #$fh = IO::Any->read('-');
+        $fh = IO::Any->read(['folder', 'other-folder', 'filename']);
+        $fh = IO::Any->read('folder');
+        $fh = IO::Any->read("some text\nwith more lines\n");
+        $fh = IO::Any->read(\"some text\nwith more lines\n");
+        $fh = IO::Any->read('{"123":[1,2,3]}');
+        $fh = IO::Any->read('<root><element>abc</element></root>');
+        $fh = IO::Any->read(*DATA);
+        $fh = IO::Any->read(IO::String->new("cba"));
+        #$fh = IO::Any->read($object_with_toString_method);
+
+        $fh = IO::Any->write('filename');
+        $fh = IO::Any->write('file://var/log/syslog');
+        #$fh = IO::Any->write('-');
+        $fh = IO::Any->write(['folder', 'filename']);
+        #$fh = IO::Any->write('=');
+        my $string;
+        $fh = IO::Any->write(\$string);
+
+        my $content = IO::Any->slurp(['folder', 'filename']);
+        IO::Any->spew(['folder2', 'filename'], $content);
+
+        perl -MIO::Any -le 'print IO::Any->slurp("/etc/passwd")'
+        perl -MIO::Any -le 'IO::Any->spew("/tmp/timetick", time())'
+
+DESCRIPTION
+    The aim is to provide read/write anything. The module tries to guess
+    `$what' the "anything" is based on some rules. See new method Pod for
+    examples and the new and _guess_what entries elsewhere in this document
+    code for the implementation.
+
+    There are two methods the slurp and spew entries elsewhere in this
+    document to read/write whole `$what'.
+
+MOTIVATION
+    The purpose is to be able to use IO::Any in other modules that needs to
+    read or write data. The description for an argument could be - pass
+    anything that IO::Any accepts as argument - GLOBs, IO::File,
+    Path::Class::File, IO::AtomicFile, IO::String, pointers to scalar and
+    pointer to array (array elements are passed to File::Spec as portable
+    file addressing).
+
+    First time I've used IO::Any for JSON::Util where for the functions to
+    encode and decode needs to read/write data.
+
+METHODS
+  new($what, $how, $options)
+    Open `$what' in `$how' mode.
+
+    `$what' can be:
+
+                    'filename'                => [ 'file' => 'filename' ],
+                    'folder/filename'         => [ 'file' => 'folder/filename' ],
+                    'file:///folder/filename' => [ 'file' => '/folder/filename' ],
+                    [ 'folder', 'filename' ]  => [ 'file' => File::Spec->catfile('folder', 'filename') ],
+                    'http://a/b/c'            => [ 'http' => 'http://a/b/c' ],
+                    'https://a/b/c'           => [ 'http' => 'https://a/b/c' ],
+                    '{"123":[1,2,3]}'         => [ 'string' => '{"123":[1,2,3]}' ],
+                    '[1,2,3]'                 => [ 'string' => '[1,2,3]' ],
+                    '<xml></xml>'             => [ 'string' => '<xml></xml>' ],
+                    "a\nb\nc\n"               => [ 'string' => "a\nb\nc\n" ],
+                    *DATA                     => [ 'file' => *{DATA}{IO} ],
+
+    Returns filehandle. IO::String for 'string', IO::File for 'file'. 'http'
+    not implemented yet.
+
+    Here are available `%$options' options:
+
+        atomic    true/false if the file operations should be done using L<IO::AtomicFile> or L<IO::File>
+        LOCK_SH   lock file for shared access
+        LOCK_EX   lock file for exclusive
+        LOCK_NB   lock file non blocking (will throw an excpetion if file is
+                      already locked, instead of blocking the process)
+
+  _guess_what
+    Returns ($type, $what). $type can be:
+
+        file
+        string
+        http
+        iostring
+        iofile
+
+    `$what' is normalized path that can be used for IO::*.
+
+  read($what)
+    Same as `IO::Any->new($what, '<');' or `IO::Any->new($what);'.
+
+  write($what)
+    Same as `IO::Any->new($what, '>');'
+
+  slurp($what)
+    Returns content of `$what'.
+
+    If AnyEvent is loaded then uses event loop to read the content.
+
+  spew($what, $data, $opt)
+    Writes `$data' to `$what'.
+
+    If AnyEvent is loaded then uses event loop to write the content.
+
+SEE ALSO
+    IO::All, File::Spec, Path::Class
+
+AUTHOR
+    Jozef Kutej, `<jkutej at cpan.org>'
+
+CONTRIBUTORS
+    The following people have contributed to the Sys::Path by committing
+    their code, sending patches, reporting bugs, asking questions,
+    suggesting useful advice, nitpicking, chatting on IRC or commenting on
+    my blog (in no particular order):
+
+        SREZIC [...] cpan.org
+        Alexandr Ciornii
+        Gabor Szabo
+        Przemek Wesołek
+        Slaven Rezić
+
+BUGS
+    Please report any bugs or feature requests to `bug-io-any at
+    rt.cpan.org', or through the web interface at
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=IO-Any. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc IO::Any
+
+    You can also look for information at:
+
+    * GitHub: issues
+        http://github.com/jozef/IO-Any/issues
+
+    * RT: CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=IO-Any
+
+    * AnnoCPAN: Annotated CPAN documentation
+        http://annocpan.org/dist/IO-Any
+
+    * CPAN Ratings
+        http://cpanratings.perl.org/d/IO-Any
+
+    * Search CPAN
+        http://search.cpan.org/dist/IO-Any
+
+COPYRIGHT & LICENSE
+    Copyright 2009 Jozef Kutej, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -1,0 +1,30 @@
+IP-Unique for perl
+======================
+
+IP::Unique is my first C++ perl module, and I'm quite happy with it. There are some known issues
+(see BUGS in the POD documentation), but all things considered, it has helped to solve one problem 
+I've had, and I hope it works for you as well.  Comments and patches are welcome.
+
+		--Jay Bonci
+		<jaybonci@cpan.org>
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+	This module requires only a c++ compiler (it has only been tested with g++)
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 by Jay Bonci, Open Source Development Network
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.3 or,
+at your option, any later version of Perl 5 you may have available.

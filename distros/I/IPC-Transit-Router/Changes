@@ -1,0 +1,11 @@
+1.132260  2013-08-13 21:05:09 America/Los_Angeles
+    - More automation with Dist::Zilla
+0.4 Tue Aug 13 20:27:31 PDT 2013
+    - Moving to Dist::Zilla
+0.3 Sun Apr  7 17:41:55 PDT 2013
+    - Fixed broken ABSTRACT
+0.2 Sun Mar 31 20:24:07 PDT 2013
+    - Moved to Module::Starter
+    - Cleaned up broken dependency
+0.1 Fri Mar 22 20:21:59 PDT 2013
+    - First Release

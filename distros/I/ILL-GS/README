@@ -1,0 +1,45 @@
+Biblio::ILL::GS version 0.03
+============================
+
+Biblio::ILL::GS is a little bit of glue.... 
+
+Our library web site (http://maplin.gov.mb.ca) uses Perl (of course)
+and Z39.50 to enable our libraries to search for and request items
+amongst themselves (and, for that matter, to/from the world at large).
+
+The basic procedue is: find the item, parse the resulting record,
+build a human-readable email out of it, and send it - all automagically.
+
+One of our libraries has moved to an interlibrary-loan management system,
+and would rather not have to re-key this data as it arrives.  Their
+system, however, does have the ability to process requests in the
+Interlibrary Loan Generic Script (GS) format.
+
+Biblio::ILL::GS simply lets you build a GS format message.
+
+Integrating it with your existing system is left as an excersise for
+the reader....
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  None, currently.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 David Christensen
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

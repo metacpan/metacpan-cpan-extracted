@@ -1,0 +1,23 @@
+NAME
+    "IO::Async::Loop::linux" - pick the best Loop implementation on Linux
+
+DESCRIPTION
+    If this module is installed, then the best Loop implementation will
+    automatically be picked when "IO::Async::Loop->new()" is called on a
+    Linux machine. It will attempt to use either of the following, in order,
+    if they are available
+
+    *   IO::Async::Loop::Epoll
+
+    *   IO::Async::Loop::Ppoll
+
+    The end application using IO::Async does not need to make any special
+    effort to use these; the magic constructor in IO::Async::Loop will
+    automatically find and use it if it is installed.
+
+     $ perl -MIO::Async::Loop -E 'say ref IO::Async::Loop->new'
+     IO::Async::Loop::Epoll
+
+AUTHOR
+    Paul Evans <leonerd@leonerd.org.uk>
+

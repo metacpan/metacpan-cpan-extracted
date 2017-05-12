@@ -1,0 +1,12 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+lib/Iterator/Simple/Util.pm
+lib/Iterator/Simple/Util/CSV.pm
+t/00-compile.t
+t/iterator-simple-util-csv.t
+t/iterator-simple-util.t
+t/release-no-smart-comments.t

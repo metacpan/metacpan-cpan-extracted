@@ -1,0 +1,8 @@
+Revision history for IMAP-Query
+
+0.02 - 2016-04-05 - Adam R. Schobelock <schobes@gmail.com>
+    BUGFIX: Added missing dependencies and exports.
+
+0.01 - 2015-11-01 - Adam R. Schobelock <schobes@gmail.com>
+    First version, released on an unsuspecting world.
+

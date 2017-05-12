@@ -1,0 +1,21 @@
+--- #YAML:1.0
+name:               Image-Thumbnail
+version:            0.66
+abstract:           Simple thumbnails with various Perl libraries
+author:
+    - Lee Goddard <lgoddard -at- cpan -dot- org>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Test::Harness:  0.1
+    Test::More:     0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.48
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

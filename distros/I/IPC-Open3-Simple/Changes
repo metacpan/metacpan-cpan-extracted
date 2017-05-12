@@ -1,0 +1,13 @@
+Revision history for Perl extension IPC::Open3::Simple
+
+0.01 2006-07-14
+	- first working version
+
+0.02 2006-07-18
+        - more tests, fixed pod
+
+0.03 2006-07-18 
+        - run() returns self, enabling chained calls
+
+0.04 2006-07-20
+        - added META.yml

@@ -1,0 +1,21 @@
+Revision history for Perl extension IP::Anonymous.
+
+0.04  2005-11-10
+        - initial public CPAN testing release
+        - fixed package to include version number in extracted directory
+        - minor code edits to make syntax correct throughout
+        - documentation and comments editing
+
+0.03  2005-11-09
+        - initial public testing release
+        - added 64-bit (ivsize=8) handling
+        - fixed missing initialization for $result
+        - added detailed documentation through Perl POD and README
+        - additional comments in module code
+        - packaged with standard components (e.g. tests, Makefile.PL)
+
+0.02  2005-11-08
+        - 64-bit (ivsize=8) handling attempt (unsuccessful)
+
+0.01  2005-11-07
+        - initial prototype module

@@ -1,0 +1,90 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "Diab Jerius"
+   ],
+   "dynamic_config" : "0",
+   "generated_by" : "Module::Install version 1.10, CPAN::Meta::Converter version 2.131560",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "IPC-PrettyPipe",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.36"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "ExtUtils::MakeMaker" : "6.36"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Module::Install" : "0",
+            "Module::Install::AuthorTests" : "0",
+            "Module::Install::CPANfile" : "0",
+            "Test::NoBreakpoints" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IO::ReStoreFH" : "0.04",
+            "IPC::Run" : "0",
+            "List::MoreUtils" : "0",
+            "List::Util" : "1.34",
+            "Module::Load" : "0",
+            "Module::Runtime" : "0",
+            "Moo" : "1.001000",
+            "MooX::Attributes::Shadow" : "0",
+            "Safe::Isa" : "0",
+            "String::ShellQuote" : "0",
+            "Template::Tiny" : "0",
+            "Term::ANSIColor" : "0",
+            "Try::Tiny" : "0",
+            "Type::Tiny" : "0.038",
+            "parent" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Devel::FindPerl" : "0",
+            "File::pushd" : "0",
+            "Test::Base" : "0",
+            "Test::Deep" : "0",
+            "Test::Exception" : "0",
+            "Test::File" : "0",
+            "Test::Lib" : "0",
+            "Test::More" : "0",
+            "Test::Most" : "0",
+            "Test::Trap" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=IPC-PrettyPipe"
+      },
+      "repository" : {
+         "url" : "http://bitbucket.org/djerius/ipc-prettypipe"
+      }
+   },
+   "version" : "0.03"
+}

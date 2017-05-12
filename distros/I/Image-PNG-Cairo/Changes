@@ -1,0 +1,33 @@
+0.08 2017-02-03
+
+* Correct error in documentation (data was copied).
+
+0.07 2015-04-27
+
+* Remove link to website from documentation (web app was removed).
+
+0.06 2014-02-11
+
+* Incompatible change due to change in libpng. Please upgrade! Sorry
+  about this.
+
+0.05 2014-02-04
+
+* Extended example in documentation with illustration.
+
+0.04 2014-01-24
+
+* Work around setjmp bug for old libpngs (1.2 etc.)
+
+0.03 2014-01-23
+
+* Memory handling overhaul.
+* Now requires Image::PNG::Libpng 0.28.
+
+0.02 2014-01-21
+
+* Build updates / minor fixes
+
+0.01 2014-01-21
+
+* Initial release

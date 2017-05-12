@@ -1,0 +1,48 @@
+do { my $x = {
+       'build' => {
+                    'requires' => {
+                                    'Module::Build' => '0.4202',
+                                    'version' => '0.88'
+                                  }
+                  },
+       'configure' => {
+                        'requires' => {
+                                        'Module::Build' => '0.4202',
+                                        'version' => '0.88'
+                                      }
+                      },
+       'runtime' => {
+                      'recommends' => {
+                                        'Cache::Memcached' => '1.30'
+                                      },
+                      'requires' => {
+                                      'Class::Null' => '2.110730',
+                                      'Date::Format' => '2.24',
+                                      'Exporter::Tiny' => '0.042',
+                                      'File::DataClass' => 'v0.66.0',
+                                      'IPC::ShareLite' => '0.17',
+                                      'Moo' => '2.000001',
+                                      'Time::Elapsed' => '0.31',
+                                      'Try::Tiny' => '0.22',
+                                      'Type::Tiny' => '1.000005',
+                                      'namespace::autoclean' => '0.26',
+                                      'perl' => '5.010001'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'File::DataClass' => 'v0.66.0',
+                                   'File::Spec' => '0',
+                                   'Module::Build' => '0.4202',
+                                   'Module::Metadata' => '0',
+                                   'Sys::Hostname' => '0',
+                                   'Test::Requires' => '0.06',
+                                   'version' => '0.88'
+                                 }
+                 }
+     };
+  $x;
+ }

@@ -1,0 +1,34 @@
+#!perl
+
+use strict;use warnings;
+use IPC::Transit;
+use Getopt::Std;
+use JSON;
+
+my $opts = {};
+getopt('P', $opts);
+if($opts->{P}) {
+    $IPC::Transit::config_dir = $opts->{P};
+    print "Using alternative Transit config dir: $IPC::Transit::config_dir\n";
+}
+
+my $message_text = shift or die 'json message required';
+my $qname = shift or die 'qname required';
+my $destination = shift;
+
+our $message = eval {
+    my $ret = decode_json($message_text) or die 'returned false';
+    return $ret;
+};
+die "the json message passed in first argument is invalid: $@" if $@;
+die "the json message passed in first argument is empty" unless $message;
+die "the json message passed in first argument is not a reference"
+    unless ref $message;
+die "the json message passed in first argument is not a HASH reference"
+    unless ref $message eq 'HASH';
+
+if($destination) {
+    print IPC::Transit::send(qname => $qname, message => $message, destination => $destination), "\n";
+} else {
+    print IPC::Transit::send(qname => $qname, message => $message), "\n";
+}

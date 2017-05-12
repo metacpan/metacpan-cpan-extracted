@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                Image-Imlib2-Thumbnail-S3
+version:             0.31
+abstract:            ~
+license:             perl
+author:              
+    - Leon Brocard <acme@astray.com>
+generated_by:        ExtUtils::MakeMaker version 6.38
+distribution_type:   module
+requires:     
+    File::Temp:                    0.19
+    Image::Imlib2::Thumbnail:      0.32
+    Net::Amazon::S3:               0.41
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

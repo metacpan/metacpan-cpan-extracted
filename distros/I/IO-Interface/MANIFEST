@@ -1,0 +1,12 @@
+Build.PL
+Changes
+lib/IO/Interface.pm
+lib/IO/Interface.xs
+lib/IO/Interface/Simple.pm
+LICENSE
+MANIFEST
+META.json
+META.yml			Module meta-data (added by MakeMaker)
+README.md
+t/basic.t
+t/simple.t

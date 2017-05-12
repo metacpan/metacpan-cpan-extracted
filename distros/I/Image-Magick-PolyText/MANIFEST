@@ -1,0 +1,23 @@
+Changelog.ini
+Changes
+examples/generate.xy.pl
+examples/pt.pl
+examples/pt.png
+examples/ptf.pl
+examples/ptf.png
+examples/target.jpg
+examples/test.im.pl
+examples/test.im.png
+lib/Image/Magick/PolyText.pm
+lib/Image/Magick/PolyText/FreeType.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/n019003l.pfb
+t/test.png
+t/test.t
+xt/author/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

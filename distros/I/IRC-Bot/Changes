@@ -1,0 +1,47 @@
+Revision history for Perl extension IRC::Bot.
+
+0.01  Fri May  23 13:40 2003
+	- original version;
+
+0.02  Tue June 3 14:15 2003
+        - Mild Changes;
+Made some changes to the POD to make it a bit more readable, and some 
+minor code changes, nothing that should directly impact the user.
+
+0.03 Wed June 4 17:22 2003
+        - POD Fixes Minor Enhancements;
+Fixed some jacked up POD on Bot.pm
+Cloned the ask_help() method in Auth.pm to pub_help() to make pub_help() 
+more usable.  Modified the !seen command to be more friendly.  The command 
+can now use pub_help() to display the help topic if the user doesn't use 
+the proper syntax.
+
+0.04 Thurs July 3 13:43 2003
+	- Logging improvements, Bug Fixes;
+Basically captured a few more events to log in Bot.pm. Standardized logging formats for simpler parsing. 
+Corrected a bug with .clear in the /dcc chat commands. Removed plaintext pass from bot.log(Wha!? How'd that happen!).  
+Added a handler for server notices, and mode changes.
+
+0.05 Wed January 24 15:15 2006
+	- Addition of commands..
+Added a Nickserv password to be sent on startup.  
+Added the ability to send privmsgs to users, or a channel(.msg in DCC chat).
+Added .nick command to DCC chat to be able to change the bots nick on the fly.
+
+0.06 Wed January 24 18:16 2006
+        - Addition of commands..
+Added a Nickserv password to be sent on startup.
+Added the ability to send privmsgs to users, or a channel(.msg in DCC chat).
+Added .nick command to DCC chat to be able to change the bots nick on the fly.
+Bug fixes as well :)
+
+0.07 Wed Mar 15 09:29 2006
+	- Username bug fix.
+Seemed to be defaulting to the 'foolio' username when connecting. 
+Missed typed the 'Username' field in the connection string for P::C::I.
+It is now corrected.  Thanks to windedhero@gmail.com for finding that!!
+
+0.08 Fri Jun 22 16:30 2007
+        - Password bug fix.
+I seriously think I just deleted the line when fixing the above bug.
+See http://rt.cpan.org/Ticket/Display.html?id=27116

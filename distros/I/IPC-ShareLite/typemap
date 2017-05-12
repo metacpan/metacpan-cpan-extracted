@@ -1,0 +1,10 @@
+TYPEMAP
+Share*         T_PTROBJ
+key_t		KEY
+
+INPUT
+KEY	
+		$var = (key_t) SvIV($arg);	
+
+OUTPUT
+	

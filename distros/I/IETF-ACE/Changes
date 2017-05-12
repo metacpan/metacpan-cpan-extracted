@@ -1,0 +1,14 @@
+Revision history for Perl extension IETF::ACE.
+
+0.01  Mon Nov 27 03:41:43 2000
+        - original version; created by h2xs 1.20 with options -X -n IETF::ACE
+
+0.02 Jan 3 2001
+        - minor cleanup
+
+0.03  Sat Oct 11 01:35:20 2014
+        - modernize packaging to pass CPAN Testers
+
+0.04  Sat Oct 11 09:00:00 2014
+        - update Makefile.PL and minor cleanup
+

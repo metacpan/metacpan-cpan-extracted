@@ -1,0 +1,18 @@
+<HTML>
+<HEAD>
+<TITLE><TMPL_VAR NAME=title></TITLE>
+<LINK REL=StyleSheet HREF="../extras/syntax.css" TYPPE="text/css" MEDIA="all">
+</HEAD>
+<BODY>
+    <H1><TMPL_VAR NAME=title></H1>
+
+    <P>This page contains examples of syntax highlight using the
+    IkiWiki::Plugin::syntax and several configuration and programming source
+    files. </P>
+
+    <TMPL_LOOP NAME=results>
+        <TMPL_VAR NAME=output>
+        </BR>
+    </TMPL_LOOP>
+</BODY>    
+</HTML>

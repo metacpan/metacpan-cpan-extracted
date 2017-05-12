@@ -1,0 +1,8 @@
+Changes
+=======
+
+0.00002 - Feb 25 2008
+  - Fix open mode -- watch out, don't use 0.00001
+
+0.00001 - Feb 07 2008
+  - Initial release

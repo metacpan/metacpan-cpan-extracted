@@ -1,0 +1,42 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.41.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It would check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 05047d9327dde53df559fa8263fe741c985105d2 CHANGES
+SHA1 06e9a3a51574fc361c6a23b1debb003107e4db98 MANIFEST
+SHA1 e95ebf70901a571f319332795f37932f3e706ec7 META.yml
+SHA1 ac08db3ae8a21e80ea0ef7cfa06f743158970b04 Makefile.PL
+SHA1 8668795e12776306e94d61e408b7f10e1ba795ea README
+SHA1 127fb0a41f8433b854676941c699693abc3e85d4 inc/ExtUtils/AutoInstall.pm
+SHA1 02597776ad22aacd2c8e189594fcbf701390b606 inc/Module/Install.pm
+SHA1 53422ed14b41bbc9af3ac14a26ced3ed21dee0bc inc/Module/Install/AutoInstall.pm
+SHA1 7ca8b8f54287c2b5af8062fc9f349275a07e06f3 inc/Module/Install/Base.pm
+SHA1 b6af22816210f8eaab4c2c616e05a8892b2fcfd0 inc/Module/Install/Can.pm
+SHA1 33659c004518e95afb6ffafad41e84f2a6268412 inc/Module/Install/Fetch.pm
+SHA1 b42b4d3a89848325ae29422c72638e1571e7af1b inc/Module/Install/Include.pm
+SHA1 c4ed10cd20914c04f3fff3f8aaf8943372cec114 inc/Module/Install/Makefile.pm
+SHA1 ccf9b6267b5c9e7b35ef129f7e974255955c8867 inc/Module/Install/Metadata.pm
+SHA1 1288f4c4e4ba88e19194d7952eacbd6be2a5b916 inc/Module/Install/Win32.pm
+SHA1 1022a7ab797fc0081ea947f102650362ad925d7a inc/Module/Install/WriteAll.pm
+SHA1 c097a4212bae4f472a8f3646102484b89c754459 lib/IO/Statistics.pm
+SHA1 afd99f65f33d6d7aa37e75c7320846b2e2bb97d8 t/0use.t
+SHA1 bab036e51f490cb64d8b71da4d47dfb845c7e509 t/1basic.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.4 (FreeBSD)
+
+iD8DBQFBQgDCk1XldlEkA5YRAkE7AJ4v+rqmocv5+eHQrZvh6qm9n5hsoACfZHE0
+wtr76LujDyg2EJyHpUH2L8E=
+=zBsc
+-----END PGP SIGNATURE-----

@@ -1,0 +1,223 @@
+
+
+
+=encoding UTF-8
+
+=head1 NAME
+
+Image::CairoSVG - render SVG into a Cairo surface
+
+=head1 SYNOPSIS
+
+This example converts an SVG into a PNG:
+
+    
+    use Cairo;
+    use Image::CairoSVG;
+    my $cairosvg = Image::CairoSVG->new ();
+    my $surface = $cairosvg->render ("$Bin/locust.svg");
+    $surface->write_to_png ("$Bin/locust.png");
+
+
+=begin html 
+
+<p>
+This renders the following image:
+</p>
+<img width="451.271" height="187.542" src='https://api.metacpan.org/source/BKB/Image-CairoSVG-0.07/examples/locust.png'>
+
+=end html
+
+(This example is included as L<F<synopsis.pl>|https://api.metacpan.org/source/BKB/Image-CairoSVG-0.07/examples/synopsis.pl> in the distribution. The L<input|https://api.metacpan.org/source/BKB/Image-CairoSVG-0.07/examples/locust.svg> and L<output files|https://api.metacpan.org/source/BKB/Image-CairoSVG-0.07/examples/locust.png> are also included.)
+
+=head1 VERSION
+
+This documents version 0.07 of Image::CairoSVG corresponding to git
+commit 2c5151c9cbc6492190a2c7f8722e7f04bc09ba79 released on Thu Dec 15 11:16:22 2016 +0900.
+
+=head1 DESCRIPTION
+
+This module renders some kinds of SVG ("Scalable Vector Graphics")
+instructions into a Cairo surface.
+
+=head1 METHODS
+
+=head2 new
+
+    my $cairosvg = Image::CairoSVG->new ();
+
+The user can supply a Cairo surface:
+
+    my $cairosvg = Image::CairoSVG->new (surface => $surface);
+
+For example,
+
+    my $cairosvg = Image::CairoSVG->new (
+        surface => Cairo::ImageSurface->create ('argb32', 100, 100)
+    );
+
+The user can also supply a Cairo context:
+
+    my $cairosvg = Image::CairoSVG->new (context => $cr);
+
+If a Cairo context is supplied, the value of C<surface> is ignored,
+and the image is written using the C<context> value.
+
+=head2 render
+
+    my $surface = $cairosvg->render ('some.svg');
+
+Draw an SVG file into a Cairo surface. The return value is the surface
+drawn into. If the user does not supply a context or surface in
+L</new>, a new Cairo::ImageSurface object is generated from the
+attributes of the <svg> element, either the C<width> and C<height>
+attributes, or the width and height specified in the C<viewBox>
+attribute. If the user supplied a context with L</new>, the return
+value should be ignored. If the user supplied a surface with L</new>,
+the return value is just that surface.
+
+=head1 DRAWING METHODS
+
+All of these methods take the attributes of the specific element after
+which they're named. So, for example, if you have an SVG C<line>
+element, you can parse its attributes with an XML parser, then send
+the hash of key/value pairs in the attributes to L</line>.
+
+=head2 line
+
+    $cairosvg->line (%attr);
+
+Render an SVG line onto the surface specified by C<$cairosvg>.  Given
+SVG input of the form C<< <line > >>, this renders it onto the Cairo
+surface.
+
+=head2 path
+
+    $cairosvg->path (%attr);
+
+Given an SVG path element, send its attribute key / value pairs as
+C<%attr> to render into the Cairo surface of C<$cairosvg>. This uses
+L<Image::SVG::Path> to render the "d" attibute of the path. It also
+converts quadratic bezier curves into cubic bezier curves.
+
+=head2 rect
+
+    $cairosvg->rect (%attr);
+
+=head2 ellipse
+
+    $cairosvg->ellipse (%attr);
+
+=head2 circle
+
+    $cairosvg->circle (%attr);
+
+=head2 polygon
+
+    $cairosvg->polygon (%attr);
+
+=head1 DEPENDENCIES
+
+=over
+
+=item L<Cairo>
+
+Cairo is used for rendering the image.
+
+=item L<Carp>
+
+Carp is used for reporting errors.
+
+=item L<Image::SVG::Path>
+
+Image::SVG::Path is used for parsing the "path" information of the SVG.
+
+=item L<XML::Parser>
+
+XML::Parser is used for parsing SVG files.
+
+=back
+
+=head1 SEE ALSO
+
+=over
+
+=item CairoSVG
+
+L<CairoSVG|http://cairosvg.org/> is a Python SVG renderer in
+Cairo. Parts of the code here are based on it.
+
+=back
+
+=head2 Other CPAN modules related to SVG
+
+=over
+
+=item L<Image::SVG::Path>
+
+This is for reading the "d" attribute of SVG paths.
+
+=item L<MarpaX::Languages::SVG::Parser>
+
+This extends the L<Marpa::R2> parser to parse SVG.
+
+=item L<SVG>
+
+This is for generating SVG documents.
+
+=item L<Image::LibRSVG>
+
+Perl extension for a Gnome library called librsvg which converts SVG
+to PNG or JPEG, etc. I have not tested this library.
+
+=item L<SVG::Rasterize>
+
+Rasterize SVG content to pixel graphics.
+
+=back
+
+=head2 More information
+
+=over
+
+=item Perl Maven article
+
+L<SVG - Scalable Vector Graphics with Perl|http://perlmaven.com/scalable-vector-graphics-with-perl> - article at Perl Maven
+
+=back
+
+=head1 BUGS
+
+This module is a "least effort" attempt to get the parts of SVG which
+the author needs rendered, rendered. It doesn't even pretend to be a
+full SVG renderer. So, if you find the module doesn't do some part of
+SVG which you want done, please add that to the module, and contribute
+your addition to this module via the github repository.
+
+
+=head1 AUTHOR
+
+Ben Bullock, <bkb@cpan.org>
+
+=head1 COPYRIGHT & LICENCE
+
+This package and associated files are copyright (C) 
+2014-2016
+Ben Bullock.
+
+You can use, copy, modify and redistribute this package and associated
+files under the Perl Artistic Licence or the GNU General Public
+Licence.
+
+
+
+
+=head2 cairosvg licence
+
+Some parts of the module (specifically the SVG arc drawing code) are
+translations from the above-mentioned Python program "cairosvg", which
+is under the "GNU LESSER GENERAL PUBLIC LICENSE Version 3, 29 June
+2007". I'm not really sure how or if this affects the code, but just
+in case it causes legal issues for someone downstream, I'm mentioning
+it here.
+

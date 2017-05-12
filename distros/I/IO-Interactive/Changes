@@ -1,0 +1,59 @@
+Revision history for Perl module IO::Interactive
+
+1.022 2016-09-04T05:31:39Z
+	* Stable release with some performance enhancements
+
+1.021_02 - 2016-08-30T08:09:35Z
+	* Lazy load Carp (Todd Rinaldo)
+
+1.021 = 2016-01-27T20:29:17Z
+	* Freshen the distro a bit
+	* Somehow CPAN still has 0.0.6, so no one has David Muey's enhancements
+
+1.01 - 2011-11-18
+	* Decrease memory use a bit ***:
+	1. lazy load Carp.pm only if we're about to croak()
+	2. Remove use of version.pm since a decimal will do
+		(made it 1.01 per discussion) - moots rt 50120
+	3. Remove the need for Scalar::Util
+
+	=== Baseline RSS 1204,
+		Orig RSS 2464 (+1260),
+		New RSS 2244 (+1040)
+
+	Technically -220 not a *huge* gain, but the ::Tiny version I'd
+	worked up before this patch had an RSS of 1332 (+128). I need to
+	look into that and see if anything else could be done here.
+
+0.0.6 - 2009-01-14
+
+0.0.5 - 2009-01-14
+	* Happy 2009! There aren't any code changes, but I needed to
+	make the version in the Pod match the code version.
+
+0.0.4 - 2008-08-31
+	* Fixes include:
+	* #24823: is_interactive() and command line arguments
+	* #38660: "null" filehandle is a memory leak
+	* #20689: IO::Interactive leaks temp files
+
+0.03_01 - 2008-08-24
+	* Cleaning up old tickets:
+	* #20689 Now that we don't use a scalar filehandle,
+	no extra temp files under 5.6.2
+	* #24823 Applied Schwern's patch to ignore command
+	line arguments
+	* #38660 Fix memory link (same fix for #20689), not
+	printing to a scalar
+	* Maintainer is now brian d foy <bdfoy@cpan.org>
+
+0.0.3 - 2006-02-17
+	* Fixed is_interactive to default to currently selected filehandle,
+      rather than to *STDOUT.
+
+0.0.2 - 2005-05-22
+    * added dependency on version.pm
+
+0.0.1 - 2005-03-17
+ 	* Initial release.
+

@@ -1,0 +1,49 @@
+<calibrator>	<train>
+		<preprocess>1</preprocess>
+		<fitting>linear</fitting>
+		<gamma>1e-06</gamma>
+	</train>
+	<data>
+		<value time="503">2.87248563766479</value>
+		<value time="264">2.95788145065308</value>
+		<value time="586">3.42979645729065</value>
+		<value time="306">3.50111317634583</value>
+		<value time="369">3.58752036094666</value>
+		<value time="518">3.58752036094666</value>
+		<value time="306">3.58752036094666</value>
+		<value time="481">3.70256304740906</value>
+		<value time="245">3.70256304740906</value>
+		<value time="391">3.82851719856262</value>
+		<value time="445">3.88413095474243</value>
+		<value time="447">3.88413095474243</value>
+		<value time="445">3.88413095474243</value>
+		<value time="445">3.88413095474243</value>
+		<value time="369">4.06346917152405</value>
+		<value time="479">4.07163190841675</value>
+		<value time="492">4.07163190841675</value>
+		<value time="479">4.07163190841675</value>
+		<value time="143">4.26030778884888</value>
+		<value time="441">4.26030778884888</value>
+		<value time="366">4.30992841720581</value>
+		<value time="443">5.09726619720459</value>
+		<value time="330">5.21573352813721</value>
+		<value time="434">6.63299560546875</value>
+		<value time="376">6.63299560546875</value>
+		<value time="477">6.67315673828125</value>
+		<value time="250">6.67315673828125</value>
+		<value time="523">6.69451904296875</value>
+		<value time="851">6.93783569335938</value>
+		<value time="527">6.97222900390625</value>
+		<value time="468">6.97222900390625</value>
+		<value time="531">6.97222900390625</value>
+		<value time="302">6.99423217773438</value>
+		<value time="561">8.96678066253662</value>
+		<value time="427">9.88425493240356</value>
+		<value time="341">10.095000743866</value>
+		<value time="122">11.044979095459</value>
+		<value time="508">11.044979095459</value>
+		<value time="488">11.0450325012207</value>
+		<value time="488">11.0450325012207</value>
+		<value time="873">11.0450325012207</value>
+	</data>
+</calibrator>

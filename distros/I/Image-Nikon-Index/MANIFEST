@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Image-Nikon-Index.t
+lib/Image/Nikon/Index.pm
+META.yml                                 Module meta-data (added by MakeMaker)

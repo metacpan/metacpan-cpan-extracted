@@ -1,0 +1,34 @@
+Image::Filter version 0.07
+==========================
+
+Image::Filter applies filters onto images. The included filters are still work
+in development.
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  gd2 lib - Thomas Boutell - http://www.boutell.com/gd/
+
+NOTE: You need the gd2 lib (which handles truecolor). If you can't install a 
+newer version for some reason, stick to Filter::Image 0.04.
+
+WRITING YOUR OWN FILTER
+
+This package includes a Image::Filter::Foo module, which can be used as 
+template for your own filter. Consult the gd documentation on how to use 
+specific pixel based routines. Image::Filter now does true color thanks to 
+the new gdlib. Did I mention this module is work under development?
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Hendrik Van Belleghem.
+
+Image::Filter is released under the GNU Public License. See COPYING and 
+COPYRIGHT for more information.

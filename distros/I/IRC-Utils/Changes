@@ -1,0 +1,50 @@
+Revision history for IRC-Utils
+
+0.12  Thu Oct 6 20:48:17 GMT 2011
+    - strip_formatting(): Only strip cancellation codes if there are no
+      color codes in the string
+
+0.11  Fri Jul 29 01:36:51 GMT 2011
+    - Fix typo causing numerics 333 and 338 to get mixed up
+    - Add numerics 307 and 310, used by the Rizon network (hybrid+Plexus)
+
+0.10  Sun May 22 16:12:50 GMT 2011
+    - Fix failure in parse_mask() when the mask doesn't contain '!'
+    - matches_mask(): Don't call parse_mask() on the argument first
+    - Rename parse_mask() to normalize_mask() for clarity
+
+0.09  Fri May 20 03:22:30 GMT 2011
+    - More detailed explanation of channel name encoding issues
+    - Add eq_irc() convenience function
+
+0.08  Mon May 9 17:33:04 GMT 2011
+    - Don't allow channel names to be longer than 200 bytes
+    - Don't allow colons in channel names (RFC2812 & IRCnet, though others
+      are more lax)
+
+0.07  Wed Apr 27 03:32:14 GMT 2011
+    - Add a bunch of new numerics and their names
+
+0.06  Sun Apr 3 02:51:37 GMT 2011
+    - Add support for the blink formatting code
+    - Document chanmode and statmode parameters to parse_mode_line()
+    - Don't allow a digit as the first character of a nickname
+    - Change RPL_BOUNCE (005) to RPL_ISUPPORT
+
+0.05  Sun Apr 3 00:17:00 GMT 2011
+    - Rename l_irc() and u_irc() to the more descriptive lc_irc and uc_irc()
+
+0.04  Sat Apr 2 23:57:08 GMT 2011
+    - Add numeric_to_name() and name_to_numeric() functions
+
+0.03  Sat Apr 2 22:30:42 GMT 2011
+    - Rename parse_ban_mask() to parse_mask()
+
+0.02  Sat Apr 2 21:22:02 GMT 2011
+    - matches_mask(): Return nothing if mask/match parameters have no length
+
+0.01  Sat Apr 2 20:54:37 GMT 2011
+    - Initial release. Combines most things from POE::Component::IRC::Common
+      and POE::Component::Server::IRC::Common. I gave some of the functions better
+      names and changed some of the color name constants to better match the
+      'standard' names in use.

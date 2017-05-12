@@ -1,0 +1,61 @@
+1.162230  2016-08-10 15:58:36-07:00 America/Los_Angeles
+    - Support multiple public keys for crypto.
+    - Automatic default hostname detection for key identification.
+    - Lexically sort JSON keys of rtrans output.
+
+1.161400  2016-05-19 15:44:57-07:00 America/Los_Angeles
+    - Full encryption/signing implemented.  See perldoc IPC::Transit
+
+1.161300  2016-05-09 16:18:28-07:00 America/Los_Angeles
+    - Apologies in advance for a big increase in dependencies.
+    - Changed command-line utilities rtrans and strans to print and parse
+      JSON instead of Perl, respectively.
+    - Increased the amount of information qtrans reports.
+    - Generally refactored remote transit to be far more CPU and memory
+      efficient.
+    - Added serialization type Sereal, which is the fastest available for
+      Perl at this time.
+    - (INCOMPATIBLE) Changed default serialization from JSON to Sereal.  Be
+      careful with this one if you use IPC::Transit between different
+      languages.  You probably want to specify JSON in that case.
+    - Added large message handling via local file cache.
+    - Added some simplistic DNS caching.
+    - Removed some ancient and needless tests.
+    - Ported the reference remote transit gateway program to use plack.
+
+1.133280  2013-11-24 12:45:27 America/Los_Angeles Sun Nov 24 12:44:08 PST 2013
+    - Fix one class of Test Failures by forcing prereq of
+      HTTP::Server::Simple::CGI
+    - Trivial test improvement
+1.132260  2013-08-13 21:31:52 America/Los_Angeles
+    - Move to Dist::Zilla
+0.74 Sun Jul  7 17:03:13 PDT 2013
+    - change standalone script shebang lines to #!perl, per
+      david@cantrell.org.uk
+0.73 Thu May  2 19:14:06 PDT 2013
+    - Tweaked the tests to work on boxes with smaller message queue allowances
+    - Fixed IPC::Transit::send to correctly default to non-block
+    - Added local_override flag to instruct the function to not use local queue
+0.71 Sun Apr  7 18:05:47 PDT 2013
+    - Something went wrong with the previous upload
+    - Fixed Perl version detection
+0.7 Sun Apr  7 17:26:15 PDT 2013
+    - Re-added multiple serializer support
+    - Added benchmarks for various serializers
+    - Fixed some bugs around not handling arbitrary data
+0.61 Sun Mar 31 20:40:18 PDT 2013
+    - Moved to Module::Starter
+    - Fixed broken dependencies
+0.6 Wed Mar 20 19:01:23 PDT 2013
+    - Add second argument to ftok; *BSD and others seem to require this
+    - Add various github resources
+0.5 Fri Mar 15 21:10:03 PDT 2013
+    - Complete conversion to the new, permanent wire protocol
+0.4 Sun Mar 10 13:01:01 PDT 2013
+    - Very basic remote transit: cross box messages
+0.3 Thu May 17 05:46:38 PDT 2012
+    - Fixed failure to load arbitrary serialization module on thaw
+0.01_2 Sun Apr 22 00:55:02 PDT 2012
+    - many bug fixes, along with BSD fixups
+0.01_1 Sat Mar 24 20:30:28 PDT 2012
+    - original version;

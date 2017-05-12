@@ -1,0 +1,35 @@
+# vim: ft=dosini
+
+color   = 1
+verbose = [%p] %f:%l - %m. (%e) (Severity: %s)\n
+
+[-ValuesAndExpressions::ProhibitLeadingZeros]
+[-ControlStructures::ProhibitUnlessBlocks]
+[-References::ProhibitDoubleSigils]
+[-ValuesAndExpressions::ProhibitEmptyQuotes]
+[-Variables::ProhibitPunctuationVars]
+[-Lax::ProhibitEmptyQuotes::ExceptAsFallback]
+
+# disable for the time being; I'm still getting used to this perlcritic thing
+[-CodeLayout::RequireTidyCode]
+
+[Lax::ProhibitLeadingZeros::ExceptChmod]
+[ControlStructures::ProhibitPostfixControls]
+    allow = if unless
+
+# These are disabled for the "default" profile, because
+# Dist::Zilla generates them for us
+[-Documentation::RequirePodLinksIncludeText]
+[-Documentation::RequirePodSections]
+[-Documentation::PodSpelling]
+[-Modules::RequireVersionVar]
+[-Miscellanea::ProhibitUselessNoCritic]
+
+[Bangs::ProhibitCommentedOutCode]
+[Bangs::ProhibitFlagComments]
+[Bangs::ProhibitNumberedNames]
+
+# This project favors the my $arg = shift; I can move away from this...
+[-Subroutines::RequireArgUnpacking]
+[-ErrorHandling::RequireUseOfExceptions]
+[-Modules::ProhibitMultiplePackages]

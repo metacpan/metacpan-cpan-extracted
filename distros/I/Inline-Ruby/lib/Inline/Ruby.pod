@@ -1,0 +1,815 @@
+=head1 NAME
+
+Inline::Ruby - Write Perl subroutines and classes in Ruby.
+
+=head1 SYNOPSIS
+
+   print "9 + 16 = ", add(9, 16), "\n";
+   print "9 - 16 = ", subtract(9, 16), "\n";
+
+   use Inline Ruby;
+
+   __END__
+   __Ruby__
+
+   def add(a, b)
+     a + b
+   end
+
+   def subtract(a, b)
+     a - b
+   end
+
+=head1 DESCRIPTION
+
+The C<Inline::Ruby> module allows you to put Ruby source code directly
+"inline" in a Perl script or module. It sets up an in-process Ruby
+interpreter, runs your code, and then examines Ruby's symbol table, looking
+for things to bind to Perl.
+
+The process of interrogating the Ruby interpreter only occurs the first time
+you run your Ruby code. The namespace is cached, and subsequent calls use
+the cached version. Of course, your Ruby code must still be run every time
+your run the Perl script -- but Inline::Ruby already knows the results of
+running it.
+
+=head1 Using the Inline::Ruby Module
+
+Using Inline::Ruby will seem very similar to using any other Inline language,
+thanks to Inline's consistent look and feel.
+
+This section will explain the different ways to use Inline::Ruby. For more
+details on C<Inline>, see 'perldoc Inline'.
+
+=head2 Importing Functions
+
+Using functions defined in Ruby is just like using Perl subs. You just supply
+the source code to Inline::Ruby, and then use them.
+
+   use Inline Ruby => <<'END';
+   def doit
+     ...
+   end
+   END
+
+   doit();
+
+=head2 Importing Classes
+
+If you're written a library in Ruby, it's probably object-oriented. Binding
+Ruby classes to Perl is as easy as telling Ruby to import the class library.
+
+   use Inline Ruby;
+
+   my $obj = SomeClass->new;
+
+   __END__
+   __Ruby__
+
+   # Pretend SomeClass is defined in an external library
+   require 'SomeClass'
+
+=head1 Ruby Configuration Options
+
+For information on how to specify Inline configuration options, see L<Inline>.
+This section describes each of the configuration options available for Ruby.
+
+=head2 BIND_TYPE or BIND_TYPES
+
+Normally, Inline::Ruby binds classes, modules, and functions into Perl. That
+can be really big namespace polluter, so you can tell Inline::Ruby to ignore
+functions, for example:
+
+   use Inline Ruby => DATA => BIND_TYPES => [undef, qw(classes modules)];
+
+=head2 ITER
+
+When Inline::Ruby binds a Ruby class, module, or function into a Perl package,
+it also binds a function named C<iter> to the package. C<iter> is used to set
+up an iterator block when calling Ruby methods.
+
+It's conceivable that the word C<iter> will conflict with an actual function
+in the class -- if that happens, you can override the name of the C<iter>
+function using this configuration option.
+
+   use Inline Ruby => DATA => ITER => 'my_iter';
+
+=head2 FILTERS
+
+Like several other Inline languages, Inline::Ruby allows you to preprocess
+your Inline::Ruby code with a custom filter:
+
+   use Inline Ruby => DATA => FILTER => \&my_filter;
+
+=head1 Inline::Ruby Features
+
+There are several cool topics worth mentioning specially:
+
+=over 4
+
+=item 1
+
+Perl Subs as Iterator Blocks
+
+=item 2
+
+Perl Subs as Proc Objects
+
+=item 3
+
+Exceptions
+
+=back
+
+The following few sections describe each topic and give examples.
+
+=head2 Perl Subs as Iterator Blocks
+
+Ruby has very primitive looping support -- all the libraries and builtins use
+iterators, which provide the same functionality with more power.
+
+Here's an example of iterating over the elements of an Array in Ruby:
+
+   array = [1, 2, 3]
+   array.each { |x|
+     print "array.each printing array element: #{x}\n"
+   }
+
+Here's an example writing a function which calls an iterator:
+
+   def call_iter
+     yield "hello, iterator!"
+   end
+
+Ruby's C<yield> keyword invokes the block passed the the function. There can
+only be one block passed to each function. A function can invoke the block
+several times, though. Like Perl's anonymous subroutines, Ruby's blocks are
+closures: they remember the context in which they were defined, so they have
+access to local variables defined at that point.
+
+Inline::Ruby allows you to pass a Perl subroutine reference as an iterator
+block. That means whenever C<yield> is called, the Perl subroutine will be
+called with the arguments to C<yield>.
+
+Here's an example:
+
+   use Inline Ruby;
+
+   sub block { print "Ruby says: @_\n" }
+
+   no_iter();
+   iter(\&block)->call_iter;
+
+   __END__
+   __Ruby__
+
+   def no_iter
+     print "no block\n"
+   end
+
+   def call_iter
+     yield "hello, block!"
+   end
+
+As you can see, calling a global function with an iterator is slightly more
+complicated than just calling a regular function. Why not just pass the
+subroutine in the parameter list? Because that would actually pass it as a
+Proc object, which is also supported in Ruby (see L<"Perl Subs as Proc
+Objects">).
+
+That was functions. What about methods?
+
+   use Inline Ruby;
+
+   $obj = Iterator->new(1, "2", [3, 4], {5 => 6});
+   $obj->iter(\&my_iter)->each;
+
+   sub iter {
+       use Data::Dumper;
+       print Dumper \@_;
+   }
+
+   __END__
+   __Ruby__
+
+   class Iterator
+     def initialize(*elements)
+       @elements = elements
+     end
+     def each
+       for i in @elements
+         yield i
+       end
+     end
+   end
+
+That example showed an instance method being called. Class methods are very
+similar -- you just call the method on the class, not an instance of it:
+
+   Iterator->iter(\&my_iter)->some_class_iterator(@args);
+
+There are six combinations of iterators and function types, all supported by
+Inline::Ruby:
+
+   global_function();
+   iter(\&my_iter)->global_iterator();
+   Class->class_method();
+   Class->iter(\&my_iter)->class_iterator();
+   $obj->instance_method();
+   $obj->iter(\&my_iter)->instance_iterator();
+
+Ruby also allows you to prototype a function definition to pass the block in
+as an argument:
+
+   def function(arg1, arg2, arg3, &b)
+     b.call(arg1, arg2, arg3)
+   end
+
+   function(1, 2, 3) { |x| print "hello #{x}\n" }
+
+Passing a Perl Block to such a function is just like passing a Perl Block to
+any other function:
+
+   iter(\&my_block)->function($arg1, $arg2, $arg3);
+
+Ruby also allows you to pass "real" compiled blocks around. The next section
+talks about that.
+
+=head2 Perl Subs as Proc Objects
+
+Like Perl, Ruby allows variables to contain subroutine references. They're
+called C<Proc>s in Ruby, and they're very similar to compiled blocks. You
+created them by calling C<Proc.new { }>, which returns an object with a
+C<call> method. A Proc is not allowed to call C<yield>.
+
+Perl subroutines are very similar to Ruby's Proc: they can't call C<yield>
+(Perl doesn't have it) and they are closures (which makes them suitable for
+calling from Ruby).
+
+If you pass a code ref as a parameter to a Ruby function or method, it will be
+converted to a Proc object, callable from Ruby:
+
+   use Inline Ruby;
+
+   ine(\&my_iter);
+
+   __END__
+   __Ruby__
+
+   def ine(beckand)
+     beckand.call("I'm at your")
+   end
+
+Inline::Ruby ships with this sample script:
+
+   use Inline Ruby => 'require "tk"';
+
+   # Create a button widget that prints 'hello', and pack it.
+   TkButton->new(undef,{text=>'hello',command=>sub{print"hello\n"}})->pack;
+
+   # Create a button widget that exits the process, and pack it.
+   TkButton->new(undef,{text=>'quit',command=>'exit'})->pack;
+
+   # Run Tk's mainloop
+   Tk->mainloop;
+
+This example pops up a windows with two buttons in it: "hello", and "quit".
+Clicking "hello" prints "hello\n" to your console, and "quit" does the
+expected.
+
+=head2 Exceptions
+
+Exceptions are an important part of Ruby. Any function can throw an exception
+at any time. If you don't catch an exception, Ruby will immediately exit the
+process (even if you're inside Inline::Ruby).
+
+To avoid this rather unpleasant exit, Inline::Ruby always wraps every call to
+the Ruby interpreter with a C<rescue> block (Ruby's equivalent of Perl's block
+C<eval>). When an exception occurs, Inline::Ruby creates a wrapper exception
+object and generates a Perl exception.
+
+   use Inline Ruby;
+
+   print divby0(10);
+
+   __END__
+   __Ruby__
+
+   def divby0(n)
+     n/0
+   end
+
+This throws a ZeroDivisionError in Ruby. Because it wasn't caught in Ruby, it
+gets caught by Inline::Ruby's internals, which generate a Perl exception. But
+Perl didn't trap the error either... so the process exits:
+
+   ttul:~/dev/cpan/Inline-Ruby$ perl -Mblib t.pl
+   Using /home/nwatkiss/dev/cpan/Inline-Ruby/blib
+   #<ZeroDivisionError: divided by 0>
+   ttul:~/dev/cpan/Inline-Ruby$ 
+
+The exception is actually an object, so you can call these methods on it:
+
+=over 4
+
+=item 1
+
+type
+
+What type of Exception was it? Returns the class of the Ruby exception
+("ZeroDivisionError" in this case).
+
+=item 2
+
+message
+
+Returns the error message thrown by the code ("divided by 0" in this case).
+
+=item 3
+
+inspect
+
+Returns this: sprintf("#<%s: %s>", $@->type, $@->message)
+
+=item 4
+
+backtrace
+
+Prints the backtrace as far as Ruby is concerned. This does not include any
+Perl calls that may exists between consecutive entries.
+
+=back
+
+If you "stringify" the exception ("$@"), it returns $@->inspect plus a
+newline.
+
+=head2 Perl Exceptions Inside Callbacks
+
+What happens when a callback C<die>s? This generates a Perl exception
+which is caught by Inline::Ruby. It throws a new exception to Ruby:
+PerlException. The description is whatever is contained in C<"$@">. The new
+Ruby exception might be caught inside the Ruby code, or it might percolate
+back to Inline::Ruby, where it will be wrapped back into C<$@> and thrown as a
+Perl Exception again.
+
+   use Inline Ruby;
+
+   sub callback { die "died!" }
+
+   iter(\&callback)->func;
+
+   __END__
+   __Ruby__
+
+   def func
+     yield [1, 2, 3]
+   end
+
+This example prints the following:
+
+   ttul:~/dev/cpan/Inline-Ruby$ perl -Mblib t.pl
+   Using /home/nwatkiss/dev/cpan/Inline-Ruby/blib
+   #<PerlException:        (in cleanup) died! at t.pl line 3.>
+
+So the Perl exception was wrapped in a Ruby exception (PerlException), and
+then re-wrapped into an Inline::Ruby::Exception object, which was printed out
+when Perl exited.
+
+This exception could have been caught in two places:
+
+=over 4
+
+=item 1
+
+Catching Perl Exceptions in Ruby
+
+Here's an example of catching a Perl exception from Ruby:
+
+   use Inline Ruby;
+
+   sub callback { die "died!" }
+
+   iter(\&callback)->func;
+
+   __END__
+   __Ruby__
+
+   def func
+     begin
+       yield [1, 2, 3]
+
+     rescue PerlException => e
+       print "Got an exception: " + e + "\n"
+     end
+   end
+
+Resulting in this output:
+
+   ttul:~/dev/cpan/Inline-Ruby$ perl -Mblib t.pl
+   Using /home/nwatkiss/dev/cpan/Inline-Ruby/blib
+   Got an exception:       (in cleanup) died! at t.pl line 3.
+
+=item 2
+
+Catching exceptions in Perl
+
+Here's a familiar example of catching exceptions in Perl:
+
+   use Inline Ruby;
+
+   sub callback { die "died!" }
+
+   eval {
+       iter(\&callback)->func;
+   };
+   print "Got an exception: $@" if $@;
+
+   __END__
+   __Ruby__
+
+   def func
+     yield [1, 2, 3]
+   end
+
+Which prints:
+
+   ttul:~/dev/cpan/Inline-Ruby$ perl -Mblib t.pl
+   Using /home/nwatkiss/dev/cpan/Inline-Ruby/blib
+   Got an exception: #<PerlException:      (in cleanup) died! at t.pl line 3.>
+
+=back
+
+=head1 Supported Data Types
+
+Inline::Ruby seamlessly converts between most types of Perl and Ruby data
+types.
+
+=head2 Supported Perl Data Types
+
+The following data types may be passed from Perl into Ruby. Any unrecognized
+type is replaced with C<undef> during translation.
+
+=over 4
+
+=item 1
+
+Integer
+
+Converted to Ruby "Fixnum" object.
+
+=item 2
+
+Floating Point
+
+Convert to Ruby "Float" object.
+
+=item 3
+
+String
+
+Converted to Ruby "String" object.
+
+=item 4
+
+Array Reference
+
+Converted to Ruby "Array" object (elements recursively converted).
+
+=item 5
+
+Hash Reference
+
+Converted to Ruby "Hash" object (elements recursively converted).
+
+=item 6
+
+Code Reference
+
+Converted to Ruby "Proc" object.
+
+=item 7
+
+Undef (and all others)
+
+Converted to Ruby NilClass object (known as nil).
+
+=back
+
+=head2 Supported Ruby Data Types
+
+The following Ruby types map be either returned from a Ruby method or function
+to Perl, or may be passed as arguments to a Perl callback. Unrecognized types
+are replaced with C<nil> and translated to C<undef>.
+
+=over 4
+
+=item 1
+
+Object
+
+Ruby objects are wrapped in instances of the C<Inline::Ruby::Object> class.
+This allows Perl to call methods on the object as usual.
+
+=item 2
+
+Fixnum
+
+Converted to a Perl integer scalar.
+
+=item 3
+
+Float
+
+Converted to a Perl floating point scalar.
+
+=item 4
+
+String
+
+Converted to a Perl string.
+
+=item 5
+
+Array
+
+Converted to a Perl array reference (elements recursively converted).
+
+=item 6
+
+Hash
+
+Converted to a Perl hash reference (elements recursively converted).
+
+=item 7
+
+True
+
+Converted to a scalar containing 1.
+
+=item 8
+
+False, Nil, and anything else
+
+Converted to C<undef>.
+
+=back
+
+=head1 Low-Level Inline::Ruby
+
+Unlike most other Inline languages, you can C<use Inline::Ruby> independently
+of Inline:
+
+   use Inline::Ruby qw(rb_eval);
+   rb_eval('print "hello from Ruby!\n"');
+
+By default, Inline::Ruby doesn't export anything. You can request any or all
+of the following functions:
+
+=over 4
+
+=item rb_eval()
+
+Takes one string argument, a Ruby expression, and returns the result of
+evaluating it. For example:
+
+   $sum = rb_eval("3 + 4");
+
+=item rb_call_function()
+
+Takes the following arguments:
+
+=over 4
+
+=item 1
+
+$func
+
+The name of the Ruby function to call.
+
+=item 2
+
+@_
+
+Optional arguments to the Ruby function.
+
+=back 
+
+For example:
+
+   rb_eval <<END;
+   def func(a, b, c)
+     p [a, b, c]
+   end
+   END
+   rb_call_function("func", 1, "2", [3, 4])
+
+=item rb_call_class_method()
+
+Takes the following arguments:
+
+=over 4
+
+=item 1
+
+$class
+
+The class containing the class method.
+
+=item 2
+
+$method
+
+The name of the method to call.
+
+=item 3
+
+@_
+
+Optional arguments to the class method.
+
+=back
+
+For example:
+
+   print Dumper rb_call_class_method("Class", "methods");
+
+=item rb_new_object()
+
+Takes the following arguments:
+
+=over 4
+
+=item 1
+
+$class
+
+A class into which to bless the Perl object.
+
+=item 2
+
+$ruby_class
+
+The ruby class to create an instance of.
+
+=item 3
+
+@_
+
+Optional arguments to the object's constructor.
+
+=back
+
+For example:
+
+   rb_eval <<END;
+   class Cls
+     def initialize(a, b)
+       print "Creating new Cls: #{a} #{b}\n"
+     end
+   end
+   END
+   my $o = rb_new_object("main::Cls", "Cls", 1, 2);
+
+=item rb_call_instance_method()
+
+Takes the following arguments:
+
+=over 4
+
+=item 1
+
+$instance
+
+An instance of Inline::Ruby::Object or a derived class.
+
+=item 2
+
+$method
+
+The name of the method to run on the object.
+
+=item 3
+
+@_
+
+Optional arguments to the method.
+
+=back
+
+For example:
+
+   my $o = rb_new_object("Inline::Ruby::Object", "Object")
+   my $ans = rb_call_instance_method($o, "methods");
+
+=item rb_iter()
+
+Sets up a Ruby method for calling in iterator context.
+
+Takes the following arguments:
+
+=over 4
+
+=item 1
+
+$obj
+
+An object upon which the method will be called. This object is stored inside
+the returned object, so that when you call a method on it, it is retrieved at
+that point.
+
+If you pass 'undef' as the C<$obj>, the calling methods on the returned object
+will invoke the global Ruby function of the same name with the iterator block.
+
+=item 2
+
+$iterator
+
+A reference to a Perl subroutine which will be passed as an iterator to the
+Ruby method.
+
+=back
+
+For example:
+
+   my $obj   = rb_new_obj("Something");
+   my $ready = rb_iter($obj, sub { ... });
+
+   # call Something#some_method with an iterator
+   $ready->some_method;
+
+   # call Something#some_method without an iterator
+   $obj->some_method;
+
+=item rb_bind_class()
+
+Currently undocumented.
+
+=item rb_bind_func()
+
+Currently undocumented.
+
+=back
+
+
+=head1 METHODS FOR INTERNAL USE
+
+=head2 build
+
+=head2 config_var
+
+=head2 dl_load_flags
+
+=head2 info
+
+=head2 load
+
+=head2 register
+
+=head2 validate
+
+=head1 SUPPORTED PLATFORMS
+
+Inline::Ruby has so far been tested on Linux only.
+
+Perl versions tested: 5.005_03, 5.6.0, and 5.6.1. It will probably work with
+5.7.x as well.
+
+Ruby versions tested: 1.6.[3-6].
+
+The next release will focus on increasing the number of supported platforms. I
+suspect that any platform where Perl and Ruby both compile will be easy to
+support.
+
+=head1 SEE ALSO
+
+For information about using C<Inline>, see L<Inline>.
+
+For information about other Inline languages, see L<Inline-Support>.
+
+Inline::Ruby's mailing list is inline@perl.org
+
+To subscribe, send email to inline-subscribe@perl.org
+
+=head1 BUGS AND DEFICIENCIES
+
+None so far.
+
+There are bound to be some bugs lurking about. Feel free to email bug reports
+to inline@perl.org.
+
+They're mite evan bee spelyng mystaikz.
+
+=head1 AUTHOR
+
+Maintainer: Shlomi Fish, L<http://www.shlomifish.org> .
+
+Neil Watkiss <NEILW@cpan.org>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2002, Neil Watkiss.
+
+All Rights Reserved. This module is free software. It may be used,
+redistributed and/or modified under the same terms as Perl itself.
+
+See http://www.perl.com/perl/misc/Artistic.html.

@@ -1,0 +1,50 @@
+{
+   "abstract" : "Display images in your 256 color terminal! (kinda)",
+   "author" : [
+      "Colin Kennedy <moshen@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Image-Term256Color",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "GD" : 0,
+            "Getopt::Long" : 0,
+            "Pod::Usage" : 0,
+            "Term::ExtendedColor" : 0,
+            "perl" : "5.008"
+         }
+      }
+   },
+   "provides" : {
+      "Image::Term256Color" : {
+         "file" : "lib/Image/Term256Color.pm",
+         "version" : "0.05"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.05"
+}

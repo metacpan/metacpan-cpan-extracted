@@ -1,0 +1,9 @@
+0.2       2014-12-30 16:23:19 Europe/Rome
+   - release after 82 passes in CPAN Testers
+
+0.2_01    2014-12-29 13:05:30 Europe/Rome
+   - defined-or is not available on Perl 5.8, reverting to
+     backwards-compatible syntax
+
+0.1       2014-12-29 03:59:54 Europe/Rome
+   - initial release

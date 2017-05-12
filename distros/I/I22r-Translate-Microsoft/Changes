@@ -1,0 +1,21 @@
+Revision history for I22r-Translate-Microsoft
+
+0.96	2015-11-16
+	Regex fixes for perl 5.25 compatibility
+	Make sure META.* is in distribution (RT#114254)
+
+0.95	2016-04-19
+	Factor out deprecated  ~~  constructs
+
+0.94	2013-01-15
+	Rewrite Makefile.PL to use Module::Install.
+
+0.93	2013-01-12
+	Including more dependencies in  Makefile.PL . No code changes.
+
+0.92	2012-12-02
+	Use I22r::Translate logging facility
+
+0.91    2012-11-26
+	First release of I22r::Translate::Microsoft
+

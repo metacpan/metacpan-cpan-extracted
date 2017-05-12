@@ -1,0 +1,119 @@
+
+INTRO:
+
+This is IPC::Shm::Simple, a PERL module that provides storage of simple data
+in SysV shared memory segments. Simple means string or numeric.
+
+It is a derivative of IPC::ShareLite by Maurice Aubrey.
+
+
+COPYRIGHT / LICENSE:
+
+Copyright (C) 2005,2014 Kevin Cody-Little <kcody@cpan.org>
+Copyright (C) 1998-2002 Maurice Aubrey <maurice@hevanet.com>
+
+This software may be modified and/or redistributed under the terms of
+either the Artistic License or the GNU General Public License, at the
+discretion of the modifier/redistributor. These are the same terms
+under which PERL itself is distributed.
+
+
+MAJOR CHANGES FROM ShareLite:
+
+Actual shared memory segment and semaphore operations are in separate code
+modules from the API implementation.
+
+The monolithic new() call is gone, replaced by create(),  attach(), remove().
+
+The readlock, writelock, and unlock functions mean the calling class doesn't
+have to import any constants. Of course, the old way still works.
+
+There are new shmat() and shmid() calls for effectively working with unkeyed
+shared memory segments.
+
+There is a new Descriptor structure that holds shared object data in the
+top shared memory segment, so no space is wasted in the chunk segments.
+
+The semaphore doesn't use the ipckey at all anymore.
+
+Chunk segments can now be a different size than the top segment.
+
+The PERL layer provides defeatable read-caching and write verification.
+
+The PERL layer also caches instances, to keep the kernel shm table limited
+to one connection per share object per process.
+
+
+API DOCUMENTATION:
+
+It works through an object oriented interface. See the POD's and test.pl.
+
+
+DEPENDENCIES:
+
+	Test::More
+		Test::Harness
+		Storable
+
+	Class::Attrib
+		Class::Multi
+
+
+PORTABILITY:
+
+NOTE: most of this section is old and unverified with current sources.
+
+It has compiled and tested cleanly on:
+        x86     - Linux 2.6 Gentoo 2004.0
+        x86     - Linux 2.6 Fedora FC2
+        x86     - Linux 2.4 Debian 2.2
+        AMD     - Linux 2.6 Fedora Core 3
+        PPCG4   - Mac OS X 10.3
+
+It has compiled and tested with warnings on:
+        x86     - OpenBSD 3.4 - possible Test::Harness bug
+        Alpha   - Linux 2.2 Debian 3.0 - va_list warnings
+
+It has compiled but not tested on:
+        x86     - FreeBSD 4.8 - no Test::More
+        x86     - NetBSD 1.6.1 - no Test::More
+
+It will not compile on Solaris due to the absence of LOCK_? definitions.
+
+All test servers except Gentoo and Mac were provided by SourceForge,
+and had a variety of PERL versions ranging from 5.004 to 5.8.5.
+
+Some required manual installation of:
+
+        Test::Harness
+        Test::More
+        Storable
+
+There are two dependencies whose list entries have yet to be approved:
+        Class::Multi
+        Class::Attrib
+
+
+GETTING THE SOFTWARE:
+
+They can be downloaded from my CPAN directory, or from github.com.
+
+IPC::Shm::Simple can be checked out by:
+
+git clone https://github.com/kcodyjr/ipcshm-simple
+
+Class::Multi can be checked out by:
+
+git clone https://github.com/kcodyjr/class-multi
+
+Class::Attrib can be checked out by:
+
+git clone https://github.com/kcodyjr/class-attrib
+
+
+AUTHOR CONTACT INFO:
+
+Bug reports, questions, and flames should be sent to:
+
+Kevin Cody-Little <kcody@cpan.org>
+

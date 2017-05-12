@@ -1,0 +1,38 @@
+More interfaces:
+    DJabberd
+    Twitter
+
+Make sure that we encode messages properly for all interfaces
+    Jabber and IRC are fine
+    AIM is not, does not send back あ correctly. Encode::Guess says UTF-16BE
+
+Warning and error callbacks
+    Wish we had conditions and restarts :|
+
+Best practices for using IM::Engine to *just* send a set of messages, perhaps
+staggered over time (use case: an appointment reminder bot)
+
+Don't require the runloop, especially if it's not required (such as for both
+AIM and Jabber)
+
+Middleware
+    Aliases
+    Authentication
+    Buddy list
+    User profile
+    Avatar
+    Paging or search
+    Feedback
+    Wizards (like Hiveminder task review)
+    Help
+    Invite
+    Modal commands
+    Devel mode
+    Statistics
+    Confirmation
+    Auto-registration
+    Admin interface
+    Loader (add and remove middleware)
+
+Jifty::Plugin::IM
+

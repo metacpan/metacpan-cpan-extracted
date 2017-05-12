@@ -1,0 +1,26 @@
+{   "routes": [
+        {   "match": {
+                "source": "gather.pl"
+            },
+            "forwards": [
+                {   "qname": "process.pl"
+                }
+            ],
+            "changes": [
+                {   "this": "that"
+                }
+            ]
+        },{ "match": {
+                "source": "logtail.pl"
+            },
+            "forwards": [
+                {   "qname": "process.pl"
+                }
+            ],
+            "changes": [
+                {   "x": "yy"
+                }
+            ]
+        }
+    ]
+}

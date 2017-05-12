@@ -1,0 +1,35 @@
+# Some examples of usage of computeRT and computePI
+
+# Path for InSilicoSpectro folder
+INSILICOSPECTRO=$HOME/InSilicoSpectro
+# Path for InSilico library
+INSILICO=$INSILICOSPECTRO/lib/InSilicoSpectro/InSilico
+
+# Getting some help
+$INSILICO/computeRT.pl --help
+$INSILICO/computePI.pl --help
+$INSILICO/computeRT.pl --man
+$INSILICO/computePI.pl --man
+
+# Compute retention time for peptides in file data/test1 by Hodges method
+$INSILICO/computeRT.pl --method=Hodges --current=Guo86 data/test1
+# Compute isoelectric point by iterative method
+$INSILICO/computePI.pl --method=iterative --current=Lehninger data/test1
+
+# Perform a pipeline
+$INSILICO/computeRT.pl --method=Hodges data/test1 |$INSILICO/computePI.pl --method=iterative -
+
+# Compute isoelectric point using parameters saved in data/param.xml and calibrate using data/expdata
+$INSILICO/computePI.pl --method=iterative --readparam=data/paramPI.xml --calibratefrom=data/expdata data/test1 data/test2
+
+# Learn coefficientes for Hodges method, compute retention time from stdin and save params 
+$INSILICO/computeRT.pl --method=Hodges --learnfrom=data/expdata --saveparam=data/paramRT.xml -
+# Give additional settings in data/sethod.xml
+$INSILICO/computeRT.pl --method=Hodges --learnfrom=data/expdata --settings=data/sethod.xml --saveparam=data/paramRT.xml -
+
+# Save output data in data/results
+$INSILICO/computeRT.pl --method=Petritis --learnfrom=data/expdata --out=data/results data/test2
+
+
+
+

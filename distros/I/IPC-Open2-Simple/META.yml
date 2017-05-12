@@ -1,0 +1,31 @@
+---
+abstract: 'The simplest way to read and write to a fork'
+author:
+  - 'Olivier Duclos <odc@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142060'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: IPC-Open2-Simple
+no_index:
+  directory:
+    - t
+    - inc
+    - t
+requires:
+  Carp: '0'
+  Exporter: '0'
+  IO::Handle: '0'
+  IPC::Open2: '0'
+  perl: '5.006'
+resources:
+  bugtracker: http://github.com/oliwer/IPC-Open2-Simple/issues
+  license: http://www.opensource.org/licenses/artistic-license-2.0
+  repository: http://github.com/oliwer/IPC-Open2-Simple
+version: '0.01'

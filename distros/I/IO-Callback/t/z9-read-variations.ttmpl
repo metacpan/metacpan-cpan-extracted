@@ -1,0 +1,15 @@
+use strict;
+use warnings;
+
+# Try many combinations of read operations on an IO::Callback, checking that each
+# gives exactly the same results as Perl does for a real file.
+
+# This test is split into several .t files (one for each $seglen value), since the
+# large number of tests uses too much memory if run as a single .t file. 
+
+our $seglen;
+$seglen = <<< vary!!seglen!!1,2,3,10,1_000_000 >>>;
+
+use lib 't';
+require 'read-variations.inc';
+

@@ -1,0 +1,26 @@
+1.20.99	Initial Beta release of Ipfw.pm
+
+1.22.99	Changed module name from Ipfw.pm to IPChains.pm to avoid confusion.
+
+2.1.99 	Fixed code for masq() (list masqueraded connections) function.
+
+2.14.99	Fixed broken set_policy() function.
+
+2.23.99 Added POD. Fixed SourcePort/DestPort w/o Source/Dest problem.
+	Changed numbering scheme to be more accurate of state of
+	development.
+
+4.29.99 Added user contributed patch with bug fixes and list_chains()
+	subroutine. Thanks to Sven Koch <haegar@comunit.net>.
+
+7.5.99 Added user contributed patch with bug fixes for attribute(),
+       list_chains(), and misc bugs. Thanks to Francis J. Lacoste 
+       <francis.lacoste@iNsu.COM>.
+
+4.7.02 Added support for RedirectPort (ie, -j REDIRECT). Thanks to 
+       Jonathan Schatz <bluelines@divisionbyzeor.com>
+
+3.5.16 Updated docs with more current info, added patch(es) from 3rd 
+       party "Unauthorized" 0.6 release, etc. and migrated to new home 
+       on github just for fun. CPAN modules grow old, but never die!
+

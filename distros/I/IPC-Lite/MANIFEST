@@ -1,0 +1,14 @@
+IPC/Lite.pm
+Makefile.PL
+MANIFEST
+README
+t/01-usevars.t
+t/02-path.t
+t/03-saved.t
+t/04-fleeting.t
+t/05-table.t
+t/06-array.t
+t/07-mproc.t
+Todo
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

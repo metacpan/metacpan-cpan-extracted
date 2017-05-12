@@ -1,0 +1,14 @@
+=head1 NAME
+
+IUP::DetachBox - [GUI element] detachbox
+
+=head1 DESCRIPTION
+
+XXX-TODO: missing doc
+
+=head1 SEE ALSO
+
+The original doc: L<iupdetachbox.html|http://www.tecgraf.puc-rio.br/iup/en/elem/iupdetachbox.html>
+
+
+=cut

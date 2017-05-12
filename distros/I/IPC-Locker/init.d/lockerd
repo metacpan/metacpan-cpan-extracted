@@ -1,0 +1,58 @@
+#!/bin/sh
+# DESCRIPTION: Sample file to place in /etc/init.d to start the daemon
+# Distributed with IPC::Locker
+#
+# Copyright 1999-2017 by Wilson Snyder.  This program is free software;
+# you can redistribute it and/or modify it under the terms of either the GNU
+# Lesser General Public License Version 3 or the Perl Artistic License Version 2.0.
+#
+# chkconfig: 23456 99 10
+# description: Lockerd provides cross cluster lock services for IPC::Locker
+# processname: lockerd
+#
+### BEGIN INIT INFO
+# Provides:          lockerd
+# Required-Start:    $syslog $remote_fs pidstatd
+# Should-Start:      cron
+# Required-Stop:
+# Should-Stop:
+# Default-Start:     3 5
+# Default-Stop:      0 1 2 6
+# Short-Description: lockerd
+# Description:       lockerd
+### END INIT INFO
+
+state=$1
+prog=/usr/local/bin/lockerd
+
+case $state in
+  start)
+        if [ -f $prog ]; then
+	    echo starting $prog
+	    su daemon -c $prog &
+	fi
+	exit 0
+        ;;
+  stop)
+        if test "x`pidof -o $$ -o $PPID -x lockerd`" != x; then
+                echo -n $"Stopping lockerd: "
+                kill `pidof -o $$ -o $PPID -x lockerd`
+                echo
+        fi
+	exit 0
+        ;;
+  restart|reload)
+	$0 stop
+	$0 start
+	exit 0
+	;;
+  status)
+        if test "x`pidof -o $$ -o $PPID -x lockerd`" != x; then
+	        ps f -ww `pidof -o $$ -o $PPID -x lockerd`
+        fi
+	exit 0
+	;;
+*)
+	echo $"Usage: $0 {start|stop|restart|reload|status}"
+	exit 1
+esac

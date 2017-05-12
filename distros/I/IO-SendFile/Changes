@@ -1,0 +1,6 @@
+Revision history for Perl extension IO::SendFile.
+
+0.01  Fri Dec  1 16:57:17 2000
+	- original version; created by h2xs 1.19
+	Only has sendfile() implemented for linux.
+	Only tested with linux 2.2.16

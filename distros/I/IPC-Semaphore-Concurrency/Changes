@@ -1,0 +1,19 @@
+Revision history for Perl extension IPC::Semaphore::Concurrency.
+
+0.04  Thu Jan 23 03:24:49 UTC 2014
+  - Fix failing tests on platforms with missing semaphore support
+
+0.03  Sat Jan 18 06:59:43 UTC 2014
+	- Update documentation, including important warnings on using release()
+	- Tests: better handling of file creation failure and remove created
+	  semaphores.
+
+0.02  Tue Sep  1 02:52:04 UTC 2009
+	- Fix parsing of positional arguments in acquire() that could ignore the
+	  default "undo" parameter of "1"
+
+0.01  Fri Aug 28 23:23:12 UTC 2009
+	- original version; created by h2xs 1.23 with options
+		-AX IPC::Semaphore::Concurrency
+	- Initial code
+

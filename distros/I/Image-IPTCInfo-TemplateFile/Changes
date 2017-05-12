@@ -1,0 +1,6 @@
+Revision history for Perl extension Image::IPTCInfo::TemplateFile.
+
+0.01  Tue May 13 12:40:54 2003
+	- original version; created by h2xs 1.21 with options
+		-X -n Image::IPTCInfo::TemplateFile
+

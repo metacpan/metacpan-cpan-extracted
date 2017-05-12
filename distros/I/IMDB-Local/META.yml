@@ -1,0 +1,32 @@
+---
+abstract: 'Tools to dowload and manage a local copy of the IMDB list files in a database.'
+author:
+  - 'jerryv <jerryv@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.143240'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: IMDB-Local
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Class::Accessor: '0'
+  Class::MethodMaker: '0'
+  DBD::SQLite: '0'
+  DBI: '0'
+  IO::File: '0'
+  IO::Uncompress::Gunzip: '0'
+  LWP: '0'
+  Term::ProgressBar: '2'
+  Text::Unidecode: '0'
+  Time::HiRes: '0'
+  perl: '5.006'
+version: '1.5'

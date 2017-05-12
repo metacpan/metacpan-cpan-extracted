@@ -1,0 +1,11 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/IMAP/BodyStructure.pm
+t/01-basic.t
+t/02-nonascii.t
+META.yml
+MANIFEST

@@ -1,0 +1,27 @@
+---
+abstract: 'A picture is rotated using Orientation of Exif'
+author:
+  - 'Kazuhiro Osawa <yappo <at> shibuya <döt> pl>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Imager-ExifOrientation
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Image::ExifTool: 0
+  Imager: 0.51
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/yappo/p5-Imager-ExifOrientation.git
+version: 0.07

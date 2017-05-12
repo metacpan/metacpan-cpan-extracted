@@ -1,0 +1,42 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 c2490403c54fe0c9bb7b823efe8bcfbf018d0e44 Changes
+SHA1 9a9135f858fe88ffd0d9c2227ce5ab0a25e2d488 MANIFEST
+SHA1 7f424302caef892369a2465968a3d9fdb7fc9e40 META.yml
+SHA1 6f02a5af5829b8b83d9d2eb79721b15b890bff08 Makefile.PL
+SHA1 75a96ffba1fa7d42ad6707f4d3a06b3a544ca5dd README
+SHA1 28d33487fd5b567b15f86f12428b9db848b631c1 example/identicon.cgi
+SHA1 e9bfec9d9b1b20b4971ba8d0639f35a3cbac1194 example/index.cgi
+SHA1 aebf2c08abd574edb32644971f56da6e419b86a3 example/index.tmpl.html
+SHA1 467fc9d66d116d4fda7f0383d1eba34ba6bf7803 example/patch_list.pl
+SHA1 d9eb80a34effce28f64210d2a009106904346584 example/patch_list.png
+SHA1 3aca1cdbbdc13088fd636531f0d885560b64cd61 inc/ExtUtils/MY_Metafile.pm
+SHA1 8f88d445f0349d2e665cf2d0d997128e29b237af lib/Image/Identicon.mlpod
+SHA1 47fb3ed23da858c3a06cbed0e23c37faa5d193ed lib/Image/Identicon.pm
+SHA1 38d7dfe4bbd01713088d099c893bcdf449298e69 lib/Image/Identicon_ja.pod
+SHA1 9092f6bc679eced68c11fea7d8ef58205ed6e9d0 t/00-load.t
+SHA1 a2d192aa89625493d7cb3e4638a1370b6bf8f2d5 t/01-run.t
+SHA1 19dc0a674f7699da7aaec507112ed91d23173e7a t/boilerplate.t
+SHA1 6da39b48ce64b584e4c3274bff96fc76ff484820 t/pod-coverage.t
+SHA1 0190346d7072d458c8a10a45c19f86db641dcc48 t/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.2 (GNU/Linux)
+
+iD8DBQFFw2nFewjCT38k4dkRAjUKAJ9MCuqfty7+nXkcDECQjoxtBE1mlwCfTLnU
+ccpaFtCiULnjH3m3uf0dDoo=
+=sJsR
+-----END PGP SIGNATURE-----

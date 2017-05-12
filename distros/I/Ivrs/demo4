@@ -1,0 +1,62 @@
+#!/usr/bin/perl
+#This is simple demo script showing some basic operations. 
+#It initializes the serial port,
+#And dials out a nuber and plays a message,
+#takes 4 digit dtmf code from the caller and finally says sorry and plays, 
+#the dtmf code received in numeriacal format, date, and some text.
+#It does works with some modems only.
+
+require 5.000;
+use Ivrs;
+
+#you must specify your serial port where voice modem is connected
+$portname=$ARGV[0];
+die "\n usage: $0 ttyS0 or ttyS1\n\n" if ($portname eq "");
+
+#Set the voice file directory. The absolute path is required if you want to
+#run the IVRS from the inittab or any other directory. The defaults are 
+#'sfile'  in the current directory.
+#The voice files for Rockwel Chip Set modem are in 'sfiles' directory,
+#The voice files for US Robotics modem are in 'ufiles' directory,
+
+$vdir="sfiles";
+
+#initialize the serial port
+
+$iv = new Ivrs($portname,$vdir);
+print "Serial port and Modem initialized\n";
+
+#set the serial port parameters only if you are sure.
+
+$iv->setport("38400","none","8","1","rts","8096")||die"Setting Failed\n";
+
+#initialize the modem and put it in voice mode.
+
+$iv->initmodem||die"Modem failed\n";
+
+
+print "Dialing ... the number 22\n";
+#$iv->dialout("61,9422113746");
+#dial a number and wait for 30 seconds to pick up.
+$iv->dialout("22","30")||&closeall;
+
+print "Call picked up, playing the message\n";
+
+$accno=$iv->playfile("bgreet","4")||&closeall;
+
+print "The caller has punched $accno dtmf codes \n";
+
+
+#close the port 
+$iv->addmsg("thank");
+$iv->playfile||&closeall;
+&closeall;
+exit 1;
+
+sub closeall
+{
+sleep 2;
+$iv->closep;
+exit 1;
+}
+

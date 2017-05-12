@@ -1,0 +1,19 @@
+#!/usr/bin/perl
+use IP::World;
+my $ipw = IP::World->new(0);
+
+sub showCountryCode {
+  $_ = shift;
+  if ( /((\d+)\.(\d+)\.(\d+)\.(\d+))/ ) {
+    my $cc = $ipw->getcc($1);
+    print "$1 -> $cc\n";
+  }
+}
+
+if ($#ARGV == 0) {
+  showCountryCode($ARGV[0]);
+} else {
+  while(my $ip = <>) {
+    showCountryCode($ip);
+  }
+}

@@ -1,0 +1,42 @@
+IO/File/Lockable version 0.30
+=============================
+
+IO::File::flock is extended IO::File for flock, it corresponds by many systems.
+IO::File::fcntl is extended IO::File for fcntl, it correspond to NFS.
+and IO::File::Lockable is a base class for locking a file.
+
+SYNOPSIS
+
+use IO::File::flock;
+my $fh = new IO::File::flock($finame,'>');
+my $fh = new IO::File::flock($finame,'<');
+my $fh = new IO::File::flock($finame,'>>');
+  or
+use IO::File::fcntl;
+my $fh = new IO::File::fcntl($finame,'>');
+my $fh = new IO::File::fcntl($finame,'<');
+my $fh = new IO::File::fcntl($finame,'>>');
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  IO::File
+  Fcntl
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 makoto[at]cpan.org
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

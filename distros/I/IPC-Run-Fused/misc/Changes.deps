@@ -1,0 +1,106 @@
+This file contains changes in REQUIRED dependencies for standard CPAN phases (configure/build/runtime/test)
+
+1.000001
+ [Added / configure requires]
+ - perl 5.008003
+
+ [Added / test requires]
+ - perl 5.008003
+
+ [Changed / test requires]
+ - Test::More 0.89 → 0
+
+1.000000 2014-10-03T05:04:57Z
+ [Added / configure requires]
+ - ExtUtils::MakeMaker
+
+ [Added / runtime requires]
+ - Exporter
+ - Socket
+
+ [Added / test requires]
+ - ExtUtils::MakeMaker
+ - File::Spec
+
+ [Changed / test requires]
+ - Test::More 0.98 → 0.89
+
+ [Removed / build requires]
+ - Module::Build 0.4003
+
+ [Removed / configure requires]
+ - Module::Build 0.4003
+
+ [Removed / runtime requires]
+ - Sub::Exporter 0.982
+
+ [Removed / test requires]
+ - File::Find
+ - File::Temp
+
+0.04000100 2013-02-05T07:17:18Z
+
+0.04000000 2013-02-05T05:14:00Z
+ [Added / runtime requires]
+ - Carp
+ - Module::Runtime
+
+ [Changed / runtime requires]
+ - perl 5.008000 → v5.8.3
+
+0.03000000 2013-02-03T00:47:09Z
+ [Changed / runtime requires]
+ - perl v5.8.3 → 5.008000
+
+ [Removed / runtime requires]
+ - IO::Pipe
+ - POSIX
+
+0.02000000 2013-01-26T01:07:56Z
+ [Added / runtime requires]
+ - IO::Pipe
+
+0.01028807 2013-01-26T00:26:12Z
+ [Added / runtime requires]
+ - strict
+ - warnings
+
+ [Changed / build requires]
+ - Module::Build 0.3601 → 0.4003
+
+ [Changed / configure requires]
+ - Module::Build 0.3601 → 0.4003
+
+ [Changed / runtime requires]
+ - perl 5.008000 → v5.8.3
+
+ [Changed / test requires]
+ - Test::More 0.88 → 0.98
+
+0.01028806 2010-07-30T05:52:27Z
+ [Added / build requires]
+ - Module::Build 0.3601
+
+ [Added / configure requires]
+ - Module::Build 0.3601
+
+ [Added / runtime requires]
+ - perl 5.008000
+
+ [Added / test requires]
+ - File::Find
+ - File::Temp
+ - FindBin
+ - Test::More 0.88
+
+ [Removed / runtime requires]
+ - FindBin
+ - Test::More
+
+0.01001607 2009-11-06T06:34:07Z
+
+0.01001122 2009-11-01T21:22:16Z
+
+0.01000514 2009-10-26T13:46:20Z
+ [Removed / runtime requires]
+ - Time::HiRes

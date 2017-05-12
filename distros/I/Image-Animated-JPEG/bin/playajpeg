@@ -1,0 +1,613 @@
+#!/usr/bin/perl
+
+# a Wx based GUI player for animated JPEGs
+# todo: handle one-shot animations
+
+use Wx;
+
+package MyApp;
+
+use strict;
+use vars qw(@ISA);
+
+@ISA = qw(Wx::App);
+
+sub OnInit {
+	my $self = @_;
+	my $frame = MyFrame->new("Animated JPEG player", [-1,-1], [-1,-1]);
+
+	unless($frame){ print "Unable to create wxFrame, exiting."; return undef }
+
+	1;
+}
+
+
+package MyFrame;
+
+use vars qw(@ISA);
+use strict;
+@ISA=qw(Wx::Frame);
+use Data::Dumper;
+use Data::HexDump;
+
+use Wx qw(wxWidth wxHeight wxBITMAP_TYPE_JPEG wxTIMER_ONE_SHOT wxFD_OPEN wxID_CANCEL wxBOTH);
+use Wx::Event;
+use IO::File;
+use IO::Scalar;
+use Path::Tiny;
+use lib 'lib';
+use Image::MetaData::JPEG;
+use Image::Animated::JPEG;
+use Getopt::Long;
+use Pod::Usage;
+
+
+sub new {
+	my $class = shift;
+	my $self = $class->SUPER::new( undef, -1, $_[0], $_[1], $_[2] );
+
+	Getopt::Long::Configure('no_ignore_case');
+	GetOptions(
+		'debug|d'		=> \$self->{debug},
+		'help|h'		=> \$self->{help},
+	) or pod2usage(2);
+	pod2usage(1) if $self->{help};
+
+	$self->SetIcon( Wx::Icon->newFromXPM(icon_ref()) );
+
+	# we draw on a panel to have keyboard events
+	$self->{panel} = Wx::Panel->new( $self, -1 );
+	$self->{panel}->{parent} = $self;
+	$self->{panel}->SetBackgroundColour(Wx::Colour->new(50, 50, 50));
+
+	my $default = {
+		delay	=> 100,
+	};
+
+	my $error;
+	if(@ARGV > 1){
+		print "Reading multiple files as frames\n";
+
+		# this loads all frames into memory, acceptable for short animations
+		# but multi-file playback is an experimental feature anyway
+		for(@ARGV){
+			print " loading file $_\n";
+			my $fh = IO::File->new( $_, "r" ) or return undef;
+			binmode $fh;
+
+			my $image = Wx::Image->new();
+			Wx::JPEGHandler->new()->LoadFile( $image, $fh ) or die $!;
+			my $bmp = Wx::Bitmap->new($image);
+
+			push(@{ $self->{frames} }, { bitmap => $bmp, delay => 700 });
+		}
+	}else{
+		if(!@ARGV){
+			print "No files supplied. Opening file path collection dialog...\n";
+			my $file_dialog = Wx::FileDialog->new($self, "Please select an AJPEG file", '', '', "JPEG files (*.jpg,*.jpeg,*.ajpeg,*.mjpeg)|*.jpg;*.jpeg;*.ajpeg;*.mjpeg;|All files (*.*)|*.*", wxFD_OPEN);
+
+			if($file_dialog->ShowModal == wxID_CANCEL){ exit; }
+
+			my $path = $file_dialog->GetPath;
+			$file_dialog->Destroy;
+			print " - $path \n";
+			push(@ARGV,$path);
+		}
+
+		$self->file_open($ARGV[0]) or ($error = 1);
+	}
+
+	Wx::Event::EVT_TIMER($self, -1, \&OnTimer);
+	Wx::Event::EVT_CLOSE($self, \&OnClose);
+	Wx::Event::EVT_MOUSEWHEEL($self, \&OnMousewheel);
+	Wx::Event::EVT_KEY_DOWN($self->{panel}, \&OnKey );
+	Wx::Event::EVT_LEFT_UP( $self->{panel}, sub {
+		if($_[0]->{parent}->{step_mode}){
+			$_[0]->{parent}->play();
+		}else{
+			$_[0]->{parent}->step('forward');
+		}
+	});
+
+	die "Error opening file!" if $error;
+
+	print "Entering play mode...\n";
+	Wx::InitAllImageHandlers();
+#	$self->{scale} = 1;
+#	$self->{index} = 0;
+#	$self->{parse_next} = 1;
+	$self->{'default'} = $default; # hand over
+	$self->OnTimer();
+
+		$self->Centre( wxBOTH );
+		$self->Show( 1 );
+		$self->SetFocus();
+
+	$self;
+}
+
+sub file_open {
+	my ($self, $file) = @_;
+
+	print "Opening file $file ...";
+	open(my $io_file, '<', $file) or die $!;
+	binmode($io_file);
+	print " done.\n";
+
+	print "Building file index..."; print "\n" if $self->{debug};
+	$self->{frames} = Image::Animated::JPEG::index($io_file, { debug => $self->{debug} });
+
+	print " done.\n";
+
+	$self->{scale} = 1;
+	$self->{index} = 0;
+	$self->{parse_next} = 1;
+
+	delete($self->{laid_out});
+
+	return 1;
+}
+
+sub index_next {
+	my $self = shift;
+
+	if($self->{index} >= scalar(@{ $self->{frames} }) - 1){
+		$self->{index} = 0;
+		$self->status(", index rewound to ". sprintf('%-3s',$self->{index}), 'print');
+	}else{
+		$self->{index}++;
+		$self->status(", index forward to ". sprintf('%-3s',$self->{index}), 'print');
+	}
+}
+sub index_prev {
+	my $self = shift;
+
+	if($self->{index} <= 0){
+		$self->{index} = scalar(@{ $self->{frames} }) - 1;
+		$self->status(", index rewound to ". sprintf('%-3s',$self->{index}), 'print');
+	}else{
+		$self->{index}--;
+		$self->status(", index forward to ". sprintf('%-3s',$self->{index}), 'print');
+	}
+}
+
+sub status {
+	# default is to aggregate messages; flush when $_[2] == true
+	if($_[2]){
+		$_[0]->{status} .= $_[1];
+	}else{
+		$_[0]->{status} = $_[1];
+		return;
+	}
+
+	local $| = 1 unless $_[0]->{debug}; # autoflush on for STDOUT
+
+	if($_[0]->{debug}){
+		print $_[0]->{status} ."\n";
+	}else{
+		print $_[0]->{status};
+		print "\b" x length($_[0]->{status}) if defined $_[0]->{status};
+	}
+}
+
+sub step {
+	if($_[0]->{step_mode}){
+		if($_[1] eq 'forward'){
+			$_[0]->index_next();
+		}else{
+			$_[0]->index_prev();
+		}
+		$_[0]->OnTimer();
+	}else{
+		print "\nEntering step mode... \n";
+		$_[0]->{step_mode} = 1;
+	}
+}
+
+sub play {
+	my $self = UNIVERSAL::isa($_[0], 'Wx::Panel') ? $_[0]->{parent} : $_[0]; # used via events attached to Frame and Panel
+
+	if($self->{step_mode}){
+		delete($self->{step_mode});
+
+		print "Entering play mode...\n";
+		$self->OnTimer();
+	}
+}
+
+sub scale {
+	my ($self,$scale) = @_;
+
+	if($scale == 1){
+		print " set scale 1:1 \n";
+		$self->{scale} = 1;
+	}elsif($scale =~ /^\d$/){
+		print " set scale x". $scale ." \n";
+		$self->{scale} = $scale;
+	}elsif($scale eq 'up'){
+		$self->{scale} += 0.25 if $self->{scale} < 7;
+	}elsif($scale eq 'down'){
+		$self->{scale} -= 0.25 if $self->{scale} > 0.25;
+	}
+
+	$self->{resize} = 1;
+}
+
+sub file_navigation {
+	my ($self,$which) = @_;
+
+	if(@ARGV > 1){
+		print " Changing file is only available when playajpeg is invoked with a single file!\n";
+		return;
+	}
+
+	$self->{play_dir} = path($ARGV[0])->parent->stringify() unless $self->{play_dir};
+	$self->{play_file_basename} = path($ARGV[0])->basename unless $self->{play_file_basename};
+
+	opendir(my $dh, $self->{play_dir}) or die "can't opendir play_dir: $!";
+	my @files = readdir($dh);
+	closedir($dh);
+
+	unless($self->{play_dir_files}){
+		print " file_navigation: building play_dir_files\n" if $self->{debug};
+		for(sort { lc($a) cmp lc($b) } @files){
+			next if $_ =~ /^\./;
+			next unless $_ =~ /\.ajpeg$/; # todo: actually probe files' magic and/or JPEGs for the AJEPG marker
+			push(@{ $self->{play_dir_files} }, path($self->{play_dir},$_)->stringify);
+			if($_ eq $self->{play_file_basename}){
+				$self->{play_dir_play_file_pos} = @{ $self->{play_dir_files} } - 1;
+				print " file_navigation: play_dir_play_file_pos:$self->{play_dir_play_file_pos}\n" if $self->{debug};
+			}
+		}
+	}
+
+	if($which eq 'previous'){
+		print " Play previous AJPEG-file from dir $self->{play_dir}\n";
+
+		if($self->{play_dir_play_file_pos} <= 0){
+			$self->{play_dir_play_file_pos} = @{ $self->{play_dir_files} } - 1;
+		}else{
+			$self->{play_dir_play_file_pos} = $self->{play_dir_play_file_pos} - 1;
+		}
+		my $play_file = $self->{play_dir_files}->[ $self->{play_dir_play_file_pos} ];
+		print " Play previous file: pos:$self->{play_dir_play_file_pos}, file:$play_file\n";
+
+		$self->file_open($play_file);
+	}elsif($which eq 'next'){
+		print " Play next AJPEG-file from dir $self->{play_dir}\n";
+		if($self->{play_dir_play_file_pos} >= (@{ $self->{play_dir_files} } - 1)){
+			$self->{play_dir_play_file_pos} = 0;
+		}else{
+			$self->{play_dir_play_file_pos} = $self->{play_dir_play_file_pos} + 1;
+		}
+		my $play_file = $self->{play_dir_files}->[ $self->{play_dir_play_file_pos} ];
+		print " Play next file: pos:$self->{play_dir_play_file_pos}, file:$play_file\n";
+
+		$self->file_open($play_file);
+	}
+}
+
+sub OnMousewheel {
+	if( $_[1]->GetWheelRotation() > 1){
+		if($_[1]->ShiftDown()){
+			$_[0]->scale('up');
+		}else{
+			$_[0]->step('forward');
+		}
+	}else{
+		if($_[1]->ShiftDown()){
+			$_[0]->scale('down');
+		}else{
+			$_[0]->step('backward');
+		}
+	}
+}
+
+sub OnTimer {
+	my ($self,$event) = @_;
+
+	my $buffer;
+	unless($self->{frames}->[$self->{index}]->{bitmap}){
+		$self->status(" reading frame ". ($self->{index}+1) .": offset:". $self->{frames}->[$self->{index}]->{offset} .", length:". $self->{frames}->[$self->{index}]->{length} ." ...");
+		seek($self->{frames}->[$self->{index}]->{io_file}, $self->{frames}->[$self->{index}]->{offset}, 0);
+		read($self->{frames}->[$self->{index}]->{io_file}, $buffer, $self->{frames}->[$self->{index}]->{length});
+
+		$self->status(" done. ".length($buffer)." bytes ", 1);
+		my $io_frame = IO::Scalar->new(\$buffer);
+		$self->{frames}->[$self->{index}]->{bitmap} = Wx::Bitmap->new( Wx::Image->new($io_frame, 'image/jpeg') );
+	}
+
+	if($self->{parse_next} == 1){
+		$self->status(" parsing frame ". ($self->{index}+1) );
+
+		# parse for AJPEG segment (with Image::MetaData)
+		# requires a patched Image::MetaData::JPEG
+		#	my $meta = Image::MetaData::JPEG->new(\$buffer , 'APP0', 'FASTREADONLY') or die $!; # no work, on fh...
+		#	my $per_frame;
+		#	for my $segment ($meta->get_segments('APP0')) {
+		#		next unless $segment->search_record_value('Identifier') =~ /^AJPEG/;
+		#		print " AJPEG segment $segment \n";
+		#		$per_frame = Image::Animated::JPEG::decode_ajpeg_data( $segment->data(6, $segment->size()), { debug => 1});
+		#		$self->{'default'} = {
+		#			%{ $self->{default} },
+		#			%$per_frame, # overwrite/update defaults
+		#		};
+		#	}
+
+		# parse for AJPEG segment (with Image::Animated)
+		my $ref = Image::Animated::JPEG::process(\$buffer);
+		my $per_frame;
+		if($ref && $ref->{AJPEG}){
+			$per_frame = Image::Animated::JPEG::decode_ajpeg_data( substr($buffer,$ref->{AJPEG}->{data_offset},$ref->{AJPEG}->{data_length}), { debug => 1});
+
+			$self->{'default'} = {
+				%{ $self->{default} },
+				%$per_frame, # overwrite/update defaults
+			};
+		}
+
+		warn "This file's first frame does not contain an AJPEG APP0 marker (as required by AJPEG Specs)!" if $self->{index} == 0 && !defined($per_frame->{version});
+
+		for(keys %{ $per_frame }){
+			$self->{frames}->[$self->{index}]->{$_} = $per_frame->{$_};
+		}
+
+		# unless this frame defines something different, decrement parse_next / disable subsequent parsing / skip until ..
+		if( $per_frame->{parse_next} ){
+			$self->{parse_next} = $per_frame->{parse_next};
+		}else{
+			$self->{parse_next}--;
+			print " parse_next: parse again in $self->{parse_next} \n" if $self->{parse_next} > 1;
+			print " parse_next: parse disabled \n" if $self->{parse_next} == 0;
+		}
+	}else{
+		$self->{frames}->[$self->{index}] = {
+			%{ $self->{frames}->[$self->{index}] },
+			%{ $self->{default} }, # overwrite/update defaults
+		};
+	}
+
+	unless($self->{laid_out}){
+		my $frame = ${ $self->{frames} }[ $self->{index} ]; # should be index 0 = first frame
+		my $bmp = $frame->{bitmap};
+
+		# dummy global frameset values
+		$self->{frameset} = {
+			width  => $bmp->GetWidth() < 100 ? 100 : $bmp->GetWidth(),
+			height => $bmp->GetHeight() < 50 ? 50 : $bmp->GetHeight(),
+			repeat => $frame->{repeat} || 1,
+		};
+
+		print " setting WxFrame to ". $self->{frameset}->{width} ."x". $self->{frameset}->{height} ." (WxH)\n";
+		$self->SetSize($self->{frameset}->{width}, $self->{frameset}->{height});
+		$self->Show( 1 );
+		$self->{panel}->SetFocus();
+
+		$self->{laid_out} = 1;
+	}
+
+	if($self->{resize}){
+		my $width = int($self->{frameset}->{width} * $self->{scale});
+		my $height = int($self->{frameset}->{height} * $self->{scale});
+		print " resizing WxFrame to ". $width ."x". $height ." (WxH)\n";
+		$self->SetSize($width, $height);
+		delete($self->{resize});
+	}
+
+	$self->{dc} = Wx::PaintDC->new($self->{panel}) unless $self->{dc}; # can't remember if it's ok to store a DC
+
+	$self->{dc}->SetUserScale($self->{scale},$self->{scale});
+
+	my $frame = $self->{frames}->[ $self->{index} ];
+
+	my $delay = $frame->{delay};
+	if($self->{delay_modifier}){
+		$delay = int($delay * (1+$self->{delay_modifier}));
+	}
+	$delay = 10 if $delay < 10; # hard delay (fps) floor
+
+	if( $frame->{bitmap}->Ok() ) {
+		if($self->{step_mode}){
+			$self->status(" displaying frame ". sprintf('%-3s',$self->{index}) ."in step mode");
+		}else{
+			$self->status(" displaying frame ". sprintf('%-3s',$self->{index}) ." for ". sprintf('%3s',$delay) ."ms");
+		}
+		$self->{dc}->DrawBitmap($frame->{bitmap}, 0,0, 1);
+	}else{
+		$self->status(" Frame bitmap error!");
+	}
+
+	if(@{ $self->{frames} } > 50 && $self->{frames}->[$self->{index}]->{length} > 50000){
+		$self->status(" release frame");
+		$self->{frames}->[ $self->{index} ]->{bitmap} = undef;
+	}
+
+	$self->index_next() unless $self->{step_mode};
+
+	if(@{ $self->{frames} } > 1 && $self->{index} < @{ $self->{frames} }){
+		unless($self->{step_mode}){
+			my $timer = Wx::Timer->new( $self );
+			$timer->Start( $delay, wxTIMER_ONE_SHOT );
+		}
+	}
+}
+
+sub OnKey {
+	my ($self, $event) = @_;
+
+	my $keycode = $event->GetKeyCode();
+	# print "OnKey: $keycode \n";
+
+	if($keycode == 43 ){ # +
+		$self->{parent}->scale('up');
+	}elsif($keycode == 45 ){ # -
+		$self->{parent}->scale('down');
+	}elsif($keycode == 46 ){ # . (qwerty >)
+		$self->{parent}->step('forward');
+	}elsif($keycode == 44 ){ # , (qwerty <)
+		$self->{parent}->step('backward');
+	}elsif($keycode == 49 ){ # 1
+		$self->{parent}->scale(1);
+	}elsif($keycode == 50 ){ # 2
+		$self->{parent}->scale(2);
+	}elsif($keycode == 51 ){ # 3
+		$self->{parent}->scale(3);
+	}elsif($keycode == 52 ){ # 4
+		$self->{parent}->scale(4);
+	}elsif($keycode == 78 ){ # n
+		print " slow down by 20% \n";
+		$self->{'parent'}->{delay_modifier} += 0.2;
+	}elsif($keycode == 77 ){ # m
+		print " speed up by 20% \n";
+		$self->{'parent'}->{delay_modifier} -= 0.2;
+	}elsif($keycode == 66 ){ # b
+		print " speed modifier reset \n";
+		delete($self->{'parent'}->{delay_modifier});
+	}elsif($keycode == 314 ){ # arrow left
+		$self->{parent}->step('backward');
+	}elsif($keycode == 315 || $keycode == 366){ # arrow up || page up
+		$self->{parent}->file_navigation('previous');
+	}elsif($keycode == 316 ){ # arrow right
+		$self->{parent}->step('forward');
+	}elsif($keycode == 317 || $keycode == 367){ # arrow down || page down
+		$self->{parent}->file_navigation('next');
+	}elsif($keycode == 32 ){ # space
+		if($self->{parent}->{step_mode}){
+			$self->{parent}->play();
+		}else{
+			$self->{parent}->step('forward');
+		}
+	}elsif($keycode == 81 ){ # q
+		$self->{parent}->Close();
+	}elsif($keycode == 88 ){ # x
+		$self->{parent}->Close();
+	}elsif($keycode == 27 ){ # ESC
+		$self->{parent}->Close();
+	}
+
+	$event->Skip(1);
+}
+
+sub OnClose {
+	my ($self,$event) = @_;
+
+	$event->Skip() if $event;
+}
+
+sub icon_ref {
+	return ["16 16 3 1",
+"  c #335577",
+"X c #888888",
+". c #cccccc",
+"                ",
+"                ",
+" XXXXXXXXXXX    ",
+" X.........X    ",
+" X.........X    ",
+" X.........XXX  ",
+" X.........X.X  ",
+" XXXXXXXXXXX.X  ",
+"   X.........XXX",
+"   X.........X.X",
+"   XXXXXXXXXXX.X",
+"    X..........X",
+"    X..........X",
+"    XXXXXXXXXXXX",
+"                ",
+"                "
+	];
+}
+
+package main;
+my $app = MyApp->new();
+$app->MainLoop();
+
+__END__
+
+=head1 NAME
+
+playajpeg - Play Animated JPEGs (AJPEGs)
+
+=head1 SYNOPSIS
+
+  playajpeg [options] ajpeg-file or frame-jpegs...
+
+playajpeg is a L<WxPerl|Wx> based GUI application.
+
+=head1 KEYBOARD & MOUSE
+
+During playback, playajpeg can be controled by keyboard and by mouse:
+
+=over
+
+=item B<ARROW RIGHT> or B<MOUSE WHEEL UP> or B<"." (dot)>
+
+Enter step mode, step forward.
+
+=item B<ARROW LEFT> or B<MOUSE WHEEL DOWN> or B<"," (comma)>
+
+Enter step mode, step backward.
+
+=item B<SPACE> or B<MOUSE CLICK>
+
+Toggle (start/stop) playback. Enter or exit step mode.
+
+=item B<"1"> - B<"4">
+
+Set display zoom/ scaling factor.
+
+=item B<SHIFT + MOUSE WHEEL UP / DOWN> or B<"+" / "-">
+
+Set display zoom/scaling factor, from x0.25 - x8.
+
+=item B<"M">
+
+Speed up animation by 20%.
+
+=item B<"N">
+
+Slow down animation by 20%.
+
+=item B<"B">
+
+Reset speed to normal.
+
+=item B<"X">, B<"Q"> or B<ESC>
+
+Stop animation and exit playajpeg.
+
+=item B<ARROW UP> / B<ARROW DOWN> or B<PAGE UP> / B<PAGE DOWN>
+
+Change to the next/ previous AJPEG file in current directory.
+
+=back
+
+=head1 OPTIONS
+
+=over
+
+=item B<--debug, -d>
+
+Flag. Switch debug output on.
+
+=item B<--help, -h>
+
+Flag. Print usage info.
+
+=back
+
+=head1 SEE ALSO
+
+More information about what this script does can be found in the documentation
+of the backend module L<Image::Animated::JPEG>.
+
+=head1 AUTHOR
+
+Clipland GmbH L<http://www.clipland.com/>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2012-2017 Clipland GmbH. All rights reserved.
+
+This library is free software, dual-licensed under L<GPLv3|http://www.gnu.org/licenses/gpl>/L<AL2|http://opensource.org/licenses/Artistic-2.0>.
+You can redistribute it and/or modify it under the same terms as Perl itself.

@@ -1,0 +1,90 @@
+INTRODUCTION:
+
+Inline::Java - Write Perl classes in Java.
+
+Inline::Java lets you write Perl classes in Java.
+
+Example:
+
+    use Inline Java => <<'END';
+        class JAxH {
+            public JAxH(String x){
+                System.out.println("Just Another " + x + " Hacker") ;
+            }
+        }
+    END
+    
+    new JAxH('Inline') ;
+
+When run, this complete program prints:
+
+    Just Another Inline Hacker
+
+
+-------------------------------------------------------------------------------
+JNI (JAVA NATIVE INTERFACE) EXTENSION:
+
+Inline::Java now provides a JNI extension that allows you to load the Java 
+virtual machine as shared object instead of running it as a separate process. 
+
+See README.JNI for more information on building the JNI extension.
+
+
+-------------------------------------------------------------------------------
+INSTALLATION:
+
+- This module requires Inline version 0.44 or higher to be installed.
+- It also requires a version of the Java SDK 1.2 or higher to be 
+  installed. You can get the latest Java SDK from Sun Microsystems
+  at http://java.sun.com. Follow the provided instructions in order
+  to install the Java SDK properly.
+
+To install Inline::Java do this:
+
+  % perl Makefile.PL J2SDK=/your/java/dir   (see Note 1)
+  % make                                    (see Note 2)
+  % make test                               (see Note 3, 4)
+  % make install
+
+You have to 'make install' before you can run it successfully. 
+
+Note 1: Under Win95/98/Me, you may need to do 'cd ..' to get back to the
+your original directory after the command has completed. Also, you may set
+either the JAVA_HOME or the PERL_INLINE_JAVA_J2SDK environment variable to 
+/your/java/dir instead of using the J2SDK Makefile.PL parameter.
+
+Note 2: Use nmake on Win32.
+
+Note 3: If you have built the JNI extension and want the test suite to use 
+it, you will need to set the PERL_INLINE_JAVA_JNI environment variable to 1 
+BEFORE running 'make test'.
+
+Note 4: When testing Inline::Java, it's always a good idea to run 'make test'
+twice. The first time you test the building and loading of a module, the 
+second time you test loading of an already built module.
+
+
+-------------------------------------------------------------------------------
+FEATURES FOR THIS VERSION:
+
+Inline::Java version 0.52 is a minor upgrade that includes:
+    - Fixed JNI on cygwin (many thanks to Eric Rybski for the patch)
+    - Improved installation. 'make java' is now performed automatically.
+    - Fixed problems with disappearing exceptions by localizing $@.
+    - Other minor bug fixes.
+
+See CHANGES for a full change list.
+
+-------------------------------------------------------------------------------
+INFORMATION:
+
+= For more information on Inline::Java, see 'perldoc Inline::Java'.
+= For information about Inline, see 'perldoc Inline'.
+= For information on using Java, visit http://java.sun.org.
+
+Inline::Java's mailing list is inline@perl.org. 
+To subscribe, send an email to inline-subscribe@perl.org.
+
+Please send questions and comments to Patrick LeBoutillier <patl@cpan.org>.
+
+Copyright (c) 2001-2005, Patrick LeBoutillier. All Rights Reserved.  

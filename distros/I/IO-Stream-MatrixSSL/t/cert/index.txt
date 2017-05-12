@@ -1,0 +1,2 @@
+V	260224171756Z		01	unknown	/C=UA/ST=UA/L=Kharkov/O=Test/OU=changeme/CN=testsrv/name=EasyRSA/emailAddress=powerman@powerman.name
+V	260224171807Z		02	unknown	/C=UA/ST=UA/L=Kharkov/O=Test/OU=changeme/CN=testcln/name=EasyRSA/emailAddress=powerman@powerman.name

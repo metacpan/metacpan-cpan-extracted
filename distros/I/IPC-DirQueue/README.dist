@@ -1,0 +1,45 @@
+
+RELEASE PROCEDURE
+-----------------
+
+This is the procedure used to release a new version of IPC::DirQueue,
+recorded here as an aide-memoire.
+
+
+        Run:
+
+svn up
+svn log > CHANGES
+make tardist
+
+
+        Upload the new tarball using cpan-upload.
+
+        Send this mail:
+
+================================================================================
+To: ipc-dirqueue@perl.org
+Cc: jm@jmason.org
+Subject: released version x.xx of IPC::DirQueue
+From: jm@jmason.org (Justin Mason)
+Fcc: +outbox
+
+Hi --
+
+Version x.xx of IPC::DirQueue is now released, and should be showing
+up on CPAN rsn.  Changes since x.xw:
+
+[cut and paste from CHANGES file]
+
+================================================================================
+
+        Then bump the version for the next release:
+
+vi lib/IPC/DirQueue.pm 
+/VERSION
+[bump]
+svn commit -m "RELEASED VERSION 0.08" lib/IPC/DirQueue.pm   
+
+
+        Done!
+

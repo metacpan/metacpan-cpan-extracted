@@ -1,0 +1,19 @@
+This is a naive, unidirectional sort of netcat.
+
+recv.pl sits on a well-known name, and accepts a connection from send.pl.  It
+then copies data from the socket to its stdout, until it receives a disconnect,
+at which time it goes back to waiting for new connections.
+
+send.pl copies its stdin to the socket, until it gets an eof, at which time it
+disconnects and exits.
+
+Possible uses of this would be statistics gathering (by redirecting recv.pl's
+output to a logfile), event distribution (glance at your screen to see what
+happened recently), requesting a command be run on a remote machine (piping
+recv.pl's output to /bin/sh), that sort of thing.
+
+If you run more than one recv.pl on your network, send.pl will connect to the
+nearest one.  If you run more than one send.pl at a time, recv.pl will wait for
+the first send.pl to hang up before accepting data from the second send.pl.
+
+This protocol (such as it is) connects on the name {1935081472, 0}.

@@ -1,0 +1,28 @@
+Revision history for IO-Socket-UNIX-Util
+
+0.05    2014-12-05 (PERLANCAR)
+
+	- No functional changes.
+
+	- Rename dist from SHARYANTO-IO-Socket-Utils to
+	  IO-Socket-UNIX-Util.
+
+
+0.04    2014-12-05 (PERLANCAR) (unreleased)
+
+        - Rename dist from SHARYANTO-IO-Socket-Utils to IO-Socket-UNIX-Util.
+
+
+0.03    2014-07-06 (SHARYANTO)
+
+        - Add functions: create_unix_{stream,datagram}_socket().
+
+
+0.02    2014-07-06 (SHARYANTO)
+
+        - [Bugfix] create_unix_socket(): forgot to actually create listening socket.
+
+
+0.01    2014-07-06 (SHARYANTO)
+
+        - First release.

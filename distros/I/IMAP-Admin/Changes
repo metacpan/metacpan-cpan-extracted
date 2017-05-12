@@ -1,0 +1,169 @@
+Revision history for Perl extension IMAP::Admin.
+
+0.5  Thu Dec 17 12:29:49 1998
+	- original version; created by h2xs 1.18
+
+0.7.0 Thu Mar 03 03:46:18 1999
+	- added capabilites checking and enhanced test procedure
+
+0.8.0 Fri Mar 11 whenver 1999
+	- changed get_quota and get_acl interfaces to have output
+	  that can be given as input to respective sets
+	- updated documentation
+
+0.8.1 don't remember
+	- doc and bug fixing
+
+0.8.2 Thu Mar 18 16:40:02 1999
+	- fix to list command, bug/patch submitted by Alex Perel
+	- fix in test bug/patch submitted by Alex Perel
+
+0.8.3 don't remember
+	- add quota command as per someone's suggestion and code sample
+	  I lost the original message so I apologize for not being
+	  able to give proper credit to this person
+
+0.9.0 Sat Oct 16 10:46:16 1999
+	- added optional partition argument to the create command 
+	  by request from Martti Kuparinen
+
+1.0.0 Mon Nov 22 18:15:18 1999
+	- fixed list subroutine, better support for spaces in folder names,
+	  bug/patch submitted by Paul Kranenburg
+	- fixed test.pl to hide the password, apologies to the person who sent
+	  this bug/patch 
+
+1.0.1 Don't remember
+
+1.2.0 Thu Mar 02 11:24:13 2000
+	- applied quoting fixes from mah@everybody.org this seems to have
+	  gotten rid of the lingering issues with having spaces and other such
+	  characters in folder names (thanks also for the cruft fixes :)
+	- cleaned up code and documentation
+	- added quota test
+
+1.2.1 Thu Mar 02 12:04:13 2000
+	- added none option to set_quota to set the quota to none
+
+1.2.2 Sun Mar 12 21:16:38 2000
+	- Added a license line for the debian folks, This module is distributed
+	  under the Artistic license which is now included in the module
+	  package (its the same as the perl license)
+	  If you do use this is a product just drop me a line and let me know,
+	  curiosity kills my cat.
+
+1.2.5 Thu Jun 22 08:03:04 2000
+	- bug fix for delete mailboxes with spaces from patrick@secureops.com
+	- above bug fix made me look at other mailbox issues so 
+	  getacl is also fixed with regards to mailboxes with spaces
+
+1.3.0 Tue Aug 22 20:39:34 2000
+	- typo fix (left out tilde in get_quota_root) thanks to
+	  Paul Wiechman and Alain Turbide
+	- a previous fix seems to have broken some things with cyrus users
+	  so hopefully this fixes my fix
+
+1.3.5 Thu Sep 28 17:09:02 2000
+	- added subscribe/unsubscribe at the request of the applications
+	  group of Universal Talkware (apparently makes mozilla
+          e-mail happier)
+
+1.3.7 Fri Oct 13 00:21:11 2000
+	- added rename at the request of Thomas Bolioli
+	- added h_delete (hiearchical delete) because I like just
+	  being able to specify the mailbox and have all the
+	  sub-mailboxes go away as well (be careful with this
+	  as it does do a wild card list)
+	- added new option to the new function 'Separator', set this
+	  to the hiearchical separator your server uses (defaults to period)
+	  this is needed by h_delete
+
+1.3.8 Wed Oct 25 11:50:49 2000
+	- fixed a 'bug' in list for servers that don't quote mailboxes
+	  that have spaces in folder names
+	- fixed a bug in test that I introduced in 1.3.7
+
+1.4.0 Thu Oct 26 11:59:56 2000
+	- added SSL support via IO::Socket::SSL (optional new function).
+	  imap::admin doesn't attempt to load IO::Socket::SSL until you
+	  specify that you want to use ssl (so if you don't have it
+	  installed on your box it shouldn't make a difference)
+	- rearranged code so croaks do not happen for connection issues,
+	  instead you get an error from initialize code when you try to
+	  do a command. (This is to help all of those people using this
+	  in cgi scripts)
+	- in supporting ssl I had to switch to sysreads, so now all reads
+	  are handled by _read (still doesn't select, but getting closer)
+ 	- currently it doesn't check for ssl capability (rfc2595 compliance),
+	  but maybe in the future
+
+1.4.1 Thu Oct 26 13:35:17 2000
+	- bug fix (thanks to Thomas Bolioli) for single quotes in a 
+	  mailbox name
+
+1.4.2 Thu Nov  9 22:31:08 2000
+	- rearranged new/initialize (no functionality change)
+	- added error subroutine to return error condition
+
+1.4.3 Tue Nov 28 07:50:56 2000
+	- bug report/fix (thanks to Marc Groot Koerkamp) get_acl had problems
+	  with spaces in mailbox names (my forever bug)
+	- bug report/fix (again thanks to Marc) delete was calling incorrect read
+	  function
+
+1.5.0 Thu Aug  2 12:50:21 CDT 2001
+  - re-formatted to make vi friendly (I use emacs and vi, but mostly emacs)
+    added these lines to my .emacs to keep it friendly
+    (custom-set-variables
+     '(perl-indent-level 2)
+     '(perl-continued-statement-offset 2)
+     '(perl-continued-brace-offset 0)
+     '(indent-tabs-mode nil)
+     '(tab-width 2))
+    basically sets the indent level to 2 and converts tabs to spaces
+    of course this will hose some diffs (unless you ignore whitespace diffs)
+  - bug report/fix (thanks to Lupe Christoph) some older perls don't
+    support (?{ code }), so get_acl splitting expression was re-vamped.
+  - removed use IO::Socket::INET (again some older perls)
+  - removed Text::Parsewords dependency (wasn't using it anymore anyway)
+
+1.5.1 Thu Aug  2 14:43:27 CDT 2001
+  - bug report/fix (thanks to Paul Kranenburg) in get_quotaroot, removes extraneous line
+
+1.6.0 Sun Nov  4 10:19:44 CST 2001
+  - bug report/fix (thanks to Dylan Martin and Alain Turbide) for the 
+    botch I made of the get_quotaroot fix I made in 1.5.1
+  - bug report () motd's weren't handled, I put some code in that doesn't break
+    the current, but is also untested against motd's (feedback anyone?)
+  - added CRAM-MD5 support as an authentication method, send it in the new call
+    0 off, 1 on, 2 on with LOGIN fallback, this also adds the requirement of
+    Digest::MD5, Digest::HMAC, MIME::Base64 if you use this option
+
+1.6.1 Thu Dec 27 08:40:20 CST 2001
+  - bug report/fix (thanks to Arkadi Shishlov and Oleg Gawrilof) for CRAM setting being
+    uninitialized before use for the default case.
+  - added error condition for CRAM capability, cram use wanted without
+    fallback, but cram not available
+
+1.6.2 Sun Jan 30 10:33:50 CST 2005
+  - bug report from Francesco Gennai, get_quota and get_quotaroot improperly
+    handling folders/mailboxes with spaces
+    patched both with a regex to handle the data extraction, should work now.
+
+1.6.3 Sun Jan 30 20:53:22 CST 2005
+  - arrg, I fixed get_quotaroot incorrectly and didn't test it. It should
+    have used the same regex as get_quota instead of what I did. Thanks
+    Franscesco for pointing out the error (again).
+
+1.6.4 Wed Feb 16 07:43:28 CST 2005
+  - I screwed the pooch on 1.6.3, blatant typo pointed out to me by matrix200
+    guess I forgot to run make test before releasing.
+
+1.6.5 apparently a mystery release
+
+1.6.6 Sun Sep 07 10:20:22 CST 2008
+  - Thomas Jarosch sent a patch that adds unix socket support for those
+    who have their admin restricted to unix socket instead of tcp
+
+1.6.7 Sun Aug 23 14:05:04 CST 2009
+  - David Mayo sent a patch that adds partition support for the rename function

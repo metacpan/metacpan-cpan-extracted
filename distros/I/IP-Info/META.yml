@@ -1,0 +1,51 @@
+---
+abstract: 'Interface to IP geographic and network data.'
+author:
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: IP-Info
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  IP::Info:
+    file: lib/IP/Info.pm
+    version: '0.17'
+  IP::Info::Response:
+    file: lib/IP/Info/Response.pm
+    version: '0.17'
+  IP::Info::Response::Location:
+    file: lib/IP/Info/Response/Location.pm
+    version: '0.17'
+  IP::Info::Response::Network:
+    file: lib/IP/Info/Response/Network.pm
+    version: '0.17'
+  IP::Info::UserAgent:
+    file: lib/IP/Info/UserAgent.pm
+    version: '0.17'
+  IP::Info::UserAgent::Exception:
+    file: lib/IP/Info/UserAgent/Exception.pm
+    version: '0.17'
+requires:
+  Data::Validate::IP: '0.10'
+  Digest::MD5: '2.36'
+  HTTP::Tiny: '0'
+  JSON: '0'
+  Moo: '0'
+  Throwable: '0'
+  namespace::clean: '0'
+  perl: '5.006'
+resources:
+  repository: https://github.com/manwar/IP-Info.git
+version: '0.17'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

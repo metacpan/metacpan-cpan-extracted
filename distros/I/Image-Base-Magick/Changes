@@ -1,0 +1,34 @@
+Copyright 2011, 2012 Kevin Ryde
+
+This file is part of Image-Base-Magick.
+
+Image-Base-Magick is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation; either version 3, or (at
+your option) any later version.
+
+Image-Base-Magick is distributed in the hope that it will be
+useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with Image-Base-Magick.  If not, see <http://www.gnu.org/licenses/>.
+
+
+
+
+Version 4, October 2012
+    - xy() use Draw(primitive=>'point') instead of set("pixel[]"), to
+      avoid error on negative or large X,Y
+
+Version 3, August 2011
+    - fix diamond() coordinates
+    - try strokewidth on ellipse() and diamond()
+
+Version 2, July 2011
+    - new -quality_percent option for JPEG
+    - diamond() using polygon
+
+Version 1, May 2011
+    - the first version

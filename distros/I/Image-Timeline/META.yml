@@ -1,0 +1,18 @@
+--- #YAML:1.0
+name: Image-Timeline
+version: 0.11
+author:
+  - Ken Williams, ken@mathforum.org
+abstract: Create GIF or PNG timelines
+license: perl
+requires:
+  GD: 0
+recommends:
+  Date::Format: 0
+build_requires:
+  Test: 0
+provides:
+  Image::Timeline:
+    file: Timeline.pm
+    version: 0.11
+generated_by: Module::Build version 0.23

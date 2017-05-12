@@ -1,0 +1,75 @@
+==================================================
+Changes from 1741-05-29 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.002 at 2015-03-13 02:22:30 +0000
+------------------------------------------
+
+  Change: 5cc3f39b155dfea0d0ae62558806d3c73065dfef
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2015-03-13 03:22:22 +0000
+
+    Missing requirement 
+
+------------------------------------------
+version 0.001 at 2015-03-07 15:42:57 +0000
+------------------------------------------
+
+  Change: 7792f1f9f05ec232f677c7f21a8cfe72c0dfb5db
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2015-03-07 16:42:57 +0000
+
+    Added load tests 
+
+  Change: 768e78cc3f10f61c90dfb271538b6114f2c3f0ca
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2015-03-07 16:39:13 +0000
+
+    Checking against undefined payload 
+
+  Change: bf8b829d953742278e8d684cd05bdf71617f2483
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2015-03-07 16:30:06 +0000
+
+    Bugfix 
+
+  Change: 0458338cb39a730f300d4a7a07ff6caaa6f25e9f
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2015-03-07 01:36:41 +0000
+
+    Arghl... 
+
+  Change: 1edbf99176b81eb8ae753ba0457a97b063df102b
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2015-03-07 01:36:04 +0000
+
+    Typo 
+
+  Change: b1e8496122b37884940ce5763e2cf3822d4556fc
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2015-03-07 01:33:34 +0000
+
+    Hups! Fixed tests, added simple test to avoid reverse problems 
+
+  Change: fa2ac7033483e2355905e779499d141b2b407df3
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2015-03-07 00:50:30 +0000
+
+    Classes for the packets, parse test, headers test, ready for release 
+
+  Change: 0f7cbe8731ffd978a1a9dcc6726c5a205b1b6380
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2015-03-07 00:06:13 +0000
+
+    First release, still more types required to be implemented 
+
+  Change: 913f4db08259436891f52d7ebb56b3d4fae8ad74
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2015-03-06 21:44:18 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

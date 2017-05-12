@@ -1,0 +1,44 @@
+{
+   "abstract" : "use C<IO::Async> with F<Glib> or F<GTK>",
+   "author" : [
+      "Paul Evans <leonerd@leonerd.org.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4001, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "IO-Async-Loop-Glib",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "IO::Async::LoopTests" : "0.24",
+            "Test::More" : "0.88"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Glib" : "0",
+            "IO::Async::Loop" : "0.49",
+            "Time::HiRes" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "IO::Async::Loop::Glib" : {
+         "file" : "lib/IO/Async/Loop/Glib.pm",
+         "version" : "0.21"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.21"
+}

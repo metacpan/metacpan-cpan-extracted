@@ -1,0 +1,164 @@
+# -*- Perl -*-
+
+#
+# Sample raw RSS file generator, this works quite nicely
+# with the KNewsticker in KDE (www.kde.org) - for which it 
+# generally found best to set the number of recent items 
+# to 1 for the purpose of this feed.
+#
+# This script runs on the web server and writes the file loadl.rdf
+#
+# This scripts was adapted from an early PERL script that used the
+# raw output from the command '/usr/lpp/LoadL/full/bin/llq -r %st'
+# for the job states and similarly for the machine status.
+#
+
+use LoadLeveler;
+use Sys::Hostname;
+
+@StepState=( "I", "P", "ST", "R",
+    "CP", "XP", "RP",
+    "VP", "C", "X", "RM",
+    "V", "CA", "NR", "TX",
+    "?", "SX", "H", "D",
+    "NQ", "E", "EP",
+    "MP");
+
+my $seconds = 60;
+
+# Try and work out our domain name
+
+$host=hostname();
+my($fqdn)=gethostbyname($host);
+$fqdn=~/$host\.(.*)/;
+$domain= $1;
+
+# Hotlink to a summary page of current LoadLeveler Jobs
+
+my $link = "http://$host.$domain/LoadL.html";
+
+while(TRUE) {
+
+   $jobs_idle = 0;
+   $jobs_run  = 0;
+   $jobs_held = 0;
+   $jobs_preempt = 0;
+   $jobs_not_queued = 0;
+
+   #
+   # Query Job Status information
+   #
+
+   $query = ll_query(JOBS);
+   $return=ll_set_request($query,QUERY_ALL,undef,ALL_DATA);
+
+   if ($return != 0 )
+   {
+       print STDERR "ll_set_request failed Return = $return\n";
+   }
+
+   #
+   # Query the scheduler for information
+   #
+
+   $job=ll_get_objs($query,LL_CM,NULL,$number,$err);
+   while($job)
+   {
+      #
+      # Get the status for the first step of that Job
+      #
+
+      $step=ll_get_data($job,LL_JobGetFirstStep);
+      while($step)
+      {
+         $holdtype=ll_get_data($step,LL_StepHoldType);
+         $state=ll_get_data($step,LL_StepState);
+         $st=$StepState[$state];
+         $jobs_run++     if ($st == "R");
+         $jobs_idle++    if ($st == "I");
+         $jobs_held++    if ($holdtype > 0 );
+         $jobs_preempt++ if ($st == "E");
+         $jobs_nqueued++ if ($st == "NQ");
+         $step=ll_get_data($job,LL_JobGetNextStep);
+      }
+      $job=ll_next_obj($query);
+   }
+
+   #
+   # Free up space allocated by LoadLeveler
+   #
+
+   ll_free_objs($query);
+   ll_deallocate($query);
+
+   $title_string = "Jobs: R=$jobs_run, I=$jobs_idle, H=$jobs_held, NQ=$jobs_not_queued";
+
+   $nodes_busy = 0;
+   $nodes_idle = 0;
+   $nodes_running = 0;
+   $nodes_down = 0;
+
+   #
+   # Query Job Status information
+   #
+
+   $query = ll_query(MACHINES);
+   $return=ll_set_request($query,QUERY_ALL,undef,ALL_DATA);
+
+   if ($return != 0 )
+   {
+       print STDERR "ll_set_request failed Return = $return\n";
+   }
+
+   #
+   # Query the scheduler for information
+   # $number will contain the number of objects returned
+   #
+
+   $machine=ll_get_objs($query,LL_CM,NULL,$number,$err);
+   while($machine)
+   {
+      #
+      # Get the startd status for each machine
+      #
+
+      $sts=ll_get_data($machine,LL_MachineStartdState);
+
+      $nodes_busy++    if ($sts =~ /^Busy/);
+      $nodes_idle++    if ($sts =~ /^Idle/);
+      $nodes_running++ if ($sts =~ /^Running/);
+      $nodes_down++    if ($sts =~ /^Down/);
+
+      $machine=ll_next_obj($query);
+   }
+
+   #
+   # Free up space allocated by LoadLeveler
+   #
+
+   ll_free_objs($query);
+   ll_deallocate($query);
+
+
+   $title_string .= ". Nodes: B=$nodes_busy, R=$nodes_running, I=$nodes_idle, D=$nodes_down";
+
+   open (RDF,">/web/htdocs/loadl.rdf");
+   print RDF  "<?xml version=\"1.0\"?>\n";
+   print RDF  "   <!DOCTYPE rss PUBLIC \"-//Netscape Communications//DTD RSS 0.91//EN\"\n";
+   print RDF  "             \"http://my.netscape.com/publish/formats/rss-0.91.dtd\" >\n";
+   print RDF  "   <rss version=\"0.91\">\n";
+   print RDF  "   <channel>\n";
+   print RDF  "   <title>Cluster 1A</title>\n";
+   print RDF  "   <description>Cluster 1A Web Server </description>\n\n";
+   print RDF  "   <item>\n";
+   print RDF  "   <title>$title_string</title>\n";
+   print RDF  "   <link>http://$host.$domain/status.html</link>\n";
+   print RDF  "   </item>\n";
+   print RDF  "   </channel>\n";
+   print RDF  "</rss>\n";
+   close (RDF);
+
+   # sleep for a while
+
+   sleep($seconds);
+}

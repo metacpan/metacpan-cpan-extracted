@@ -1,0 +1,224 @@
+#!/usr/bin/perl
+
+# transform an Animated JPEG in some way
+
+use strict;
+use warnings;
+
+use lib 'lib';
+use Cwd ();
+use File::Path ();
+use Getopt::Long;
+use Image::Animated::JPEG;
+use Path::Tiny;
+use File::Glob ':bsd_glob';
+use Pod::Usage;
+
+Getopt::Long::Configure('no_ignore_case');
+GetOptions(
+	'left'		=> \my $left,
+	'right'		=> \my $right,
+	'top'		=> \my $top,
+	'bottom'	=> \my $bottom,
+	'middle'	=> \my $middle,
+	'midleft'	=> \my $midleft,
+	'midright'	=> \my $midright,
+
+	'keep-mtime'		=> \my $keep_mtime,
+	'force|f'		=> \my $force,
+	'debug|d'		=> \my $debug,
+	'help|h'		=> \my $help,
+) or pod2usage(2);
+pod2usage(1) unless !$help;
+
+die "ajpegtran: nothing to do!" unless ($left || $right || $top || $bottom || $middle || $midleft || $midright);
+
+##
+my $input_file = shift;
+$input_file = path($input_file)->absolute->stringify;
+my $basename = path($input_file)->basename(qr/\.\w{2,5}$/);
+print "ajpegtran: $input_file basename:$basename\n" if $debug;
+my $output_file = path( path($input_file)->parent->stringify, $basename .'-crop.ajpeg')->absolute->stringify;
+
+die "ajpegtran: output file $output_file already exists! (Use --force to overwrite)" if -f $output_file && !$force;
+
+##
+print "ajpegtran: building file index... \n" if $debug;
+open(my $io_file, '<', $input_file) or die $!;
+binmode($io_file);
+my $index = Image::Animated::JPEG::index($io_file); # , { debug => $debug }
+# use Data::Dumper;
+# print Dumper $index;
+
+# let's assume these frames aren't too big and we can use a temp scalar
+print "ajpegtran: looking at first frame for delay (todo: do this per frame)... \n" if $debug;
+my $frame = $index->[0];
+seek($io_file, $frame->{offset},0);
+my $buffer;
+sysread($io_file,$buffer,$frame->{length});
+
+# parse for AJPEG segment (with Image::Animated)
+my $ref = Image::Animated::JPEG::process(\$buffer);
+my $per_frame;
+if($ref && $ref->{AJPEG}){
+	$per_frame = Image::Animated::JPEG::decode_ajpeg_data( substr($buffer,$ref->{AJPEG}->{data_offset},$ref->{AJPEG}->{data_length}), { debug => $debug });
+}
+
+# print Dumper $per_frame;
+my $delay = $per_frame->{delay} || 300;
+print "ajpegtran: delay is $delay ms \n" if $debug;
+
+
+##
+my $temp_dir = '/tmp/ajpegtran-' . time();
+mkdir($temp_dir) or die $!;
+my $cwd = Cwd::cwd();
+chdir($temp_dir);
+print "ajpegtran: entering temp dir $temp_dir \n" if $debug;
+
+##
+print "ajpegtran: calling makeajpeg with --split to extract frames \n" if $debug;
+my @command = ('makeajpeg', '--split', '--keep-mtime', $input_file);
+system(@command);
+
+
+if($left || $right || $top || $bottom || $middle || $midleft || $midright){
+	opendir(my $dh, $temp_dir);
+	my @dir = grep { /\.jpg$/ } readdir($dh);
+	print "ajpegtran: test file: $dir[2] \n" if $debug;
+
+	my $test = `identify $dir[0]`;
+	my ($w,$h) = $test =~ /JPEG\s(\d+)x(\d+)\s/;
+	print "ajpegtran: test result (w:$w h:$h) from $test \n" if $debug;
+
+	# -crop WxH+X+Y		=> Crop the image to a rectangular region of width W and height  H, starting  at point X,Y.
+	my ($W,$H,$X,$Y);
+	if($left){
+		($W,$H,$X,$Y) = ( ($w / 2), $h, 0, 0 );
+	}elsif($right){
+		($W,$H,$X,$Y) = ( ($w / 2), $h, ($w / 2), 0 );
+	}elsif($top){
+		($W,$H,$X,$Y) = ($w, ($h / 2), 0, 0 );
+	}elsif($bottom){
+		($W,$H,$X,$Y) = ($w, ($h / 2), 0, ($h / 2) );
+	}elsif($middle){
+		($W,$H,$X,$Y) = ( int($w / 3), $h, int($w / 3), 0 );
+	}elsif($midleft){
+		($W,$H,$X,$Y) = ( int(($w / 5)*3), $h, int($w / 5), 0 );
+	}elsif($midright){
+		($W,$H,$X,$Y) = ( int(($w / 5)*3), $h, int(($w / 5)*2), 0 );
+	}
+
+	for(@dir){
+		next if $_ =~ /^\./;
+		print "ajpegtran: call jpegtran with -crop $W,$H,$X,$Y on frame $_\n" if $debug;
+
+		@command = ('jpegtran', '-crop', $W.'x'.$H.'+'.$X.'+'.$Y, '-outfile', $_, '-copy', 'all',  $_);
+		print "ajpegtran: @command \n" if $debug;
+		system(@command);
+	}
+
+	my @sources = <$basename*>;
+	# print "@sources \n";
+
+	print "ajpegtran: re-assembling with makeajpeg, delay:$delay to $output_file\n" if $debug;
+	my @command = ('makeajpeg', '--delay', $delay, '-o', $output_file, @sources);
+	system(@command);
+}
+
+die "ajpegtran: output file $output_file not found!" unless -f $output_file;
+
+##
+print "ajpegtran: leaving temp dir $temp_dir \n" if $debug;
+chdir($cwd);
+
+##
+if($keep_mtime){
+	print "ajpegtran: Adjusting mtime of output file \n" if $debug;
+	my @stat = stat($input_file);
+	utime(0, $stat[9], $output_file );
+}
+
+##
+print "ajpegtran: removing temporary files and dir $temp_dir\n" if $debug;
+File::Path::remove_tree( $temp_dir ) or die "Error deleting temporary directory $temp_dir: $!";
+
+
+__END__
+
+=head1 NAME
+
+ajpegtran - Transform an Animated JPEG (AJPEG) in various ways
+
+=head1 SYNOPSIS
+
+  ajpegtran [options] <input-file> [output-file]
+
+=head1 DESCRIPTION
+
+This script relies on I<jpegtran>, so make sure its available and working,
+on Debian/Ubuntu that would be by having libjpeg installed.
+
+
+=head1 OPTIONS
+
+=over
+
+=item B<--left>, B<--right>, B<--top>, B<--bottom>
+
+This is the meat of this script: crop each frame in an animated JPEG and keep
+only the stated part of the frame. For example, --left will split a frame into
+two equal parts and keep the left one.
+
+Appends "-crop" to input file's basename.
+
+=item B<--middle>
+
+Splits the canvas vertically into three equal parts and keeps the middle one.
+
+Appends "-crop" to input file's basename.
+
+=item B<--midleft>, B<--midright>
+
+Keeps are more left-ish, right-ish part of the animation.
+
+Appends "-crop" to input file's basename.
+
+=item B<--keep-mtime>
+
+Flag. Tells ajpegtran to adjust the file modification timestamp (mtime) of the
+output-file to be the same as the mtime of the input-file.
+
+=item B<--force, -f>
+
+Flag. Force overwriting of an existing output file.
+
+=item B<--debug, -d>
+
+Flag. Switch debug output on.
+
+=back
+
+=head1 EXAMPLES
+
+  $ ajpegtran --keep-mtime input.ajpeg output.gif
+
+When the output file is omitted, ajpegtran will write to a file with the suffix
+.gif and the input file's basename:
+
+=head1 SEE ALSO
+
+More information about how an Animated JPEG differs from animated GIF files can be
+found in the documentation of the backend module L<Image::Animated::JPEG> and the
+official AJPEG specs bundled with this distribution.
+
+=head1 AUTHOR
+
+Clipland GmbH L<http://www.clipland.com/>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2012-2017 Clipland GmbH. All rights reserved.
+
+This library is free software, dual-licensed under L<GPLv3|http://www.gnu.org/licenses/gpl>/L<AL2|http://opensource.org/licenses/Artistic-2.0>.
+You can redistribute it and/or modify it under the same terms as Perl itself.

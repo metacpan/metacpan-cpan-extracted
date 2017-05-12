@@ -1,0 +1,79 @@
+NAME
+
+    IO::Async::Resolver::StupidCache - a trivial caching layer around an
+    IO::Async::Resolver
+
+SYNOPSIS
+
+     use IO::Async::Loop 0.62;
+     use IO::Async::Resolver::StupidCache;
+    
+     my $loop = IO::Async::Loop->new;
+    
+     # Wrap the existing resolver in a cache
+     $loop->set_resolver(
+        IO::Async::Resolver::StupidCache->new( source => $loop->resolver )
+     );
+    
+     # $loop->resolve requests will now be cached
+
+DESCRIPTION
+
+    This object class provides a wrapper around another IO::Async::Resolver
+    instance, which applies a simple caching layer to avoid making
+    identical lookups. This can be useful, for example, when performing a
+    large number of HTTP requests to the same host or a small set of hosts,
+    or other cases where it is expected that the same few resolver queries
+    will be made over and over.
+
+    This is called a "stupid" cache because it is made without awareness of
+    TTL values or other cache-relevant information that may be provided by
+    DNS or other resolve methods. As such, it should not be relied upon to
+    give always-accurate answers.
+
+PARAMETERS
+
+    The following named parameters may be passed to new or configure:
+
+    source => IO::Async::Resolver
+
+      Optional. The source of the cache data. If not supplied, a new
+      IO::Async::Resolver instance will be constructed.
+
+    ttl => INT
+
+      Optional. Time-to-live of cache entries in seconds. If not supplied a
+      default of 5 minutes will apply.
+
+    max_size => INT
+
+      Optional. Maximum number of entries to keep in the cache. Entries
+      will be evicted at random over this limit. If not supplied a default
+      of 1000 entries will apply.
+
+METHODS
+
+    The following methods documented with a trailing call to ->get return
+    Future instances.
+
+ $resolver = $cache->source
+
+    Returns the source resolver
+
+ @result = $cache->resolve( %args )->get
+
+ @addrs = $cache->getaddrinfo( %args )->get
+
+ ( $host, $service ) = $cache->getnameinfo( %args )->get
+
+    These methods perform identically to the base IO::Async::Resolver
+    class, except that the results are cached.
+
+    Returned Futures are created with the without_cancel method, so that
+    multiple concurrent waiters are shielded from cancellation by one
+    another.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

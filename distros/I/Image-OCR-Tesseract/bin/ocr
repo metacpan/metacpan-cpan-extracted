@@ -1,0 +1,123 @@
+#!/usr/bin/perl
+use strict;
+use base 'LEOCHARRE::CLI';
+use Cwd;
+our $VERSION = sprintf "%d.%02d", q$Revision: 1.7 $ =~ /(\d+)/g;
+use Image::OCR::Tesseract 'get_ocr';
+
+my $o = gopts('bl:vdh');
+
+$Image::OCR::Tesseract::DEBUG=1 if $o->{d};
+
+sub usage {q{ocr [OPTION]... FILE...
+Read an image as text and output to stdout.
+
+   -b          blowup (useful for small images)
+   -d          debug
+   -h          help
+   -l string   language
+   -v          version
+
+Try 'man ocr' for more information.
+}}
+
+my $images = argv_aspaths();
+$images and scalar @$images or die("Missing path to image files.\n");
+
+
+IMAGE: for my $abs_image (@$images){ ### Getting OCR %
+
+   if ($o->{b}){ # blowup
+      my $_abs_image = $abs_image;
+      $_abs_image=~s/(\.\w{1,5})$/_tmp$1/ or die;
+
+      require File::Which;
+      system( 
+         File::Which::which('convert'), $abs_image, 
+         #'-resize','1500x1500',
+         '-contrast', '-normalize','-colorspace','Gray',$_abs_image) == 0 or die($?);
+      $abs_image = $_abs_image;
+   }
+
+   my $ocr;
+   
+   if( $ocr = get_ocr($abs_image,undef, $o->{l}) ){
+      if ($o->{b}){ 
+         unlink $abs_image;
+      }
+
+      print $ocr;
+      next IMAGE;
+   }
+
+
+   warn("nothing inside $abs_image?\n");
+   if ($o->{b}){
+      unlink $abs_image;
+   }
+
+}
+
+exit;
+
+
+
+__END__
+
+=pod
+
+=head1 NAME
+
+ocr - perform ocr on an image and output text to stdout
+
+=head1 DESCRIPTION
+
+This is just an interface to make it quick an easy to get ocr output from an image file.
+No matter what image type you provide, imagemagick convert is called to turn it into the format
+for tesseract.
+
+=head1 USAGE
+
+ocr [OPTION]... FILE...
+
+   -b          blowup (useful for small images)
+   -d          debug
+   -h          help
+   -l string   language
+   -v          version
+
+=head2 EXAMPLE USAGE
+
+   ocr ./image.jpg > ./savetext.txt
+   ocr ./image.png
+   ocr ./image1.jpg ./image2.jpg > ./alltext.txt
+   ocr ./image*jpg
+
+=head1 SEE ALSO
+
+Image::OCR::Tesseract - parent package
+tesseract - look up google ocr project
+convert - from ImageMagick suite.
+
+=head1 COPYRIGHT
+
+Copyright (c) 2010 Leo Charre. All rights reserved.
+
+=head1 LICENSE
+
+This package is free software; you can redistribute it and/or modify it under the same terms as Perl itself, i.e., under the terms of the "Artistic License" or the "GNU General Public License".
+
+=head1 DISCLAIMER
+
+This package is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+See the "GNU General Public License" for more details.
+
+=cut
+
+
+~                                                                                                  
+~                                                                                                  
+~                                                                                                  
+~                                                                                                  
+~       

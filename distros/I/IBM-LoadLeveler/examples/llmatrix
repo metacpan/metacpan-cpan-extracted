@@ -1,0 +1,63 @@
+# -*- Perl -*-
+
+# ******************* WARNING ********************
+# This API call is only really valid for LoadL 3.1
+# Although this call still exists at LoadL 3.2.0.2,
+# the documentation does not include this information
+# and hence it may not work in the future.
+#
+
+use IBM::LoadLeveler;
+
+$query=ll_query(MATRIX);
+$return=ll_set_request($query,QUERY_ALL,undef,ALL_DATA);
+
+if ($return != 0 )
+{
+    print STDERR "ll_set_request failed Return = $return\n";
+}
+
+
+$matrix=ll_get_objs($query,LL_CM,NULL,$number,$err);
+print "Matrix Objects : $number, error - $err\n";
+print "============== GANG Matrix Information ===============\n\n";
+
+while($matrix)
+{
+
+  $matrix_time_slice=ll_get_data($matrix,LL_MatrixTimeSlice);
+  $matrix_col_count=ll_get_data($matrix,LL_MatrixColumnCount);
+  $matrix_row_count=ll_get_data($matrix,LL_MatrixRowCount);
+
+  print "Time Slice  : $matrix_time_slice\n";
+  print "Column Count: $matrix_col_count\n";
+  print "Rows Count  : $matrix_row_count\n";
+  print "\n";
+
+  $matrix_cols=ll_get_data($matrix,LL_MatrixGetFirstColumn);
+  while($matrix_cols)
+  {
+    $col_mach_name=ll_get_data($matrix_cols,LL_ColumnMachineName);
+    $col_proc_num=ll_get_data($matrix_cols,LL_ColumnProcessorNumber);
+    $col_row_count=ll_get_data($matrix_cols,LL_ColumnRowCount);
+    @col_step_names=ll_get_data($matrix_cols,LL_ColumnStepNames);
+    $col_step_names=array2string(@col_step_names);
+
+    print "$col_mach_name:$col_proc_num:$col_row_count:$col_step_names\n";
+    $matrix_cols = ll_get_data($matrix,LL_MatrixGetNextColumn);
+  }
+  $matrix = ll_next_obj($query);
+}
+
+# Free up space allocated by LoadLeveler
+ll_free_objs($query);
+ll_deallocate($query);
+
+sub array2string {
+
+  my $entry;
+  my $return_str = "";
+
+  $return_str = join(" ", @_) if @_;
+  return $return_str;
+}

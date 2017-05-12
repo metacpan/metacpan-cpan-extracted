@@ -1,0 +1,7 @@
+Revision history for Perl module Imager::Filter::RoundedCorner
+
+0.02 2006-06-15T23:31:28+09:00
+     - Added border, antialias support
+
+0.01 2006-06-15T12:16:58+09:00
+     - original version;

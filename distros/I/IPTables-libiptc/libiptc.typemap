@@ -1,0 +1,21 @@
+TYPEMAP
+IPTables::libiptc  T_PTROBJ
+ipt_chainlabel     IPT_CLABEL
+
+INPUT
+IPT_CLABEL
+    if( SvPOK($arg) ) {
+	char *temp;
+	STRLEN len;
+	temp = SvPV($arg, len);
+	if (len > IPT_FUNCTION_MAXNAMELEN) {
+	    SET_ERRSTR(\"Chainname too long ($var:%s)\", temp);
+	    XSRETURN(FALSE);
+	}
+	memset($var, 0, IPT_FUNCTION_MAXNAMELEN + 1);
+	strncpy($var, temp, len);
+    }
+    else {
+	SET_ERRSTR(\"$var must be string\");
+	XSRETURN(FALSE);
+    }

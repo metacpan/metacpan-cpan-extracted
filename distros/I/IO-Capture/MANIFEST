@@ -1,0 +1,27 @@
+README
+BUGS
+Changes
+MANIFEST
+Makefile.PL
+lib/IO/Capture.pm
+lib/IO/Capture/Stdout.pm
+lib/IO/Capture/Stderr.pm
+lib/IO/Capture/Tie_STDx.pm
+lib/IO/Capture/Overview.pod
+t/01_1_Published_Methods.t
+t/01_2_Published_Methods_Stdout.t
+t/01_3_Published_Methods_Stderr.t
+t/02_1_basic_base.t
+t/02_2_basic_Stdout.t
+t/02_3_basic_Stderr.t
+t/03_1_Errorcheck_Stdout.t
+t/03_2_Errorcheck_Stderr.t
+t/04_1_Side-effects_base.t
+t/04_2_Side-effects_Stdout.t
+t/04_3_Side-effects_Stderr.t
+t/05_2_regression.t
+t/06_2_printf_Stdout.t
+t/06_3_printf_Stderr.t
+t/06_printf_stdout.t
+t/07_3_warn_Stderr.t
+META.yml                                 Module meta-data (added by MakeMaker)

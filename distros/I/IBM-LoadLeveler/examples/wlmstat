@@ -1,0 +1,96 @@
+# -*- Perl -*-
+# Perl version of wlmstat.c from LoadL samples directory
+
+use IBM::LoadLeveler;
+
+# Initialize the query for jobs
+
+$qj=ll_query(JOBS);
+
+exit 0 if ( ! defined $qj );
+
+print "ll_query(JOBS) successful.\n";
+
+
+# I want to query all jobs 
+
+$rc = ll_set_request($qj,QUERY_ALL,undef,NULL);
+
+print "ll_set_request rc = $rc\n";
+
+# Request the objects from the Negotiator daemon
+
+$job = ll_get_objs($qj,LL_CM,NULL,$num,$err);
+
+print "ll_get_objs rc = $err\n";
+
+
+# Did we get a list of jobs ?
+if ( $job == NULL )
+{
+    print "  ll_get_objs returned a NULL job.\n";
+    print "  err = err\n";
+}
+else
+{
+    # Loop through the list and process
+    print " RESULT: number of jobs in list = $num\n";
+    while($job)
+    {
+	$step = ll_get_data($job,LL_JobGetFirstStep);
+	while ($step)
+	{
+	    $id    = ll_get_data($step,LL_StepID);
+	    $state = ll_get_data($step,LL_StepState);
+	    print " RESULT: step id: $id\n";
+	    if ($state == STATE_RUNNING)
+	    {
+		$qw = ll_query(WLMSTAT);
+		if ($qw)
+		{
+		    print "  ll_query(WLMSTAT) successful\n";
+		}
+		$rc = ll_set_request($qw,QUERY_STEPID,[$id,NULL],NULL);
+		print "  ll_set_request rc = $rc \n";
+		$machine =  ll_get_data($step,LL_StepGetFirstMachine);
+		while($machine)
+		{
+		    $name = ll_get_data($machine,LL_MachineName);
+		    # Get info from Startd on this machine
+		    $wlm = ll_get_objs($qw,LL_STARTD,$name,$num,$err);
+		    print "  ll_get_objs rc = $err \n";
+		    if ($wlm)
+		    {
+			$cpu_total = ll_get_data($wlm,LL_WlmStatCpuTotalUsage);
+			print "  RESULT: cpu_total: $cpu_total\n";
+			$cpu_snapshot = ll_get_data($wlm,LL_WlmStatCpuSnapshotUsage);
+			print "  RESULT: cpu_snapshot: $cpu_snapshot\n";
+			$memory_snapshot = ll_get_data($wlm,LL_WlmStatMemorySnapshotUsage);
+			print "  RESULT: memory_snapshot: $memory_snapshot\n";
+			$memory_highwater = ll_get_data($wlm,LL_WlmStatMemoryHighWater);
+			print "  RESULT: memory_highwater: $memory_highwater\n";
+		    }
+		    else
+		    {
+			print "  RESULT: No WLM object returned.\n";
+		    }
+		    $machine = ll_get_data($step,LL_StepGetNextMachine);
+		}
+	    }
+	    else
+	    {
+		print "  Not Running.\n";
+	    }
+	    $step=ll_get_data($job,LL_JobGetNextStep);
+
+	}
+	$job = ll_next_obj($qj);
+
+    }
+    # free jobs obtained from Negotiator
+    $rc = ll_free_objs($qj);
+
+    # free query element
+    $rc = ll_deallocate($qj);
+
+}

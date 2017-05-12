@@ -1,0 +1,11 @@
+[%
+p_start ="<p>
+<font size='-1'>"
+
+p_end = "</font>
+</p>"
+
+images = "images"
+
+%]
+

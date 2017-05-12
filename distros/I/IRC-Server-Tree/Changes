@@ -1,0 +1,47 @@
+# Changes for IRC::Server::Tree
+
+0.061001 2016-03-04
+
+  - Add optional DFS resolver
+
+  - Don't name parent startpoint
+
+  - Packaging; switch to dzil
+
+  - POD
+
+0.05 2012-09-06
+
+  - Tree; drop bless() when adding an existing IRC::Server::Tree to a node.
+
+  - Tree::Network; add split_peer_nodes() to simplify moving nodes.
+    
+0.04 2012-09-04
+
+  - Tree; fix path_by_indexes to not screw with the arrayref originally passed
+    in; this was breaking Network if memoize => 1
+
+  - Tree::Network; fix memoize/route preservation.
+
+0.03 2012-09-03
+
+  - Tree; add method path_by_indexes() for resolving names given a
+    trace_indexes hop route.
+
+  - Tree::Network;
+    Trade back some memory for some CPU time in preserving routes;
+    cache only their index-based route rather than hop names, walk 
+    the route to fetch names via Tree->path_by_indexes()
+
+  - Tree::Network; 'memoize => 0' in constructor will turn off route
+    preservation.
+
+  - Fix slightly malfunctioning constructor.
+
+0.02 2012-09-02
+
+  - Fix a syntax error in bin/irc-tree-repl
+
+0.01 2012-09-01
+
+  - Initial release

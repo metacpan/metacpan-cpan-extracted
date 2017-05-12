@@ -1,0 +1,24 @@
+Revision history for IO-HTML
+
+1.001  2014-06-28
+	- No code changes, just documentation improvements
+	- Update links to the HTML5 draft specification
+
+1.00   2013-02-23
+	- No code changes, just documentation improvements
+	- Document filehandle position set by sniff_encoding
+
+0.04   2012-02-04
+	- Require Encode 2.10 to get the utf-8-strict encoding.
+	  This is only an issue with Perl 5.8.6 and earlier.
+
+0.03   2012-01-30
+	- Fix 10-find.t to work on Perl 5.8.8
+	  (mime_name wasn't introduced until Encode 2.21; 5.8.8 has 2.12.)
+
+0.02   2012-01-29
+	- Fix 20-open.t to work on Perl < 5.14.0
+	  (Using "<:raw" on in-memory files didn't work until then.)
+
+0.01   2012-01-28
+	- Initial release

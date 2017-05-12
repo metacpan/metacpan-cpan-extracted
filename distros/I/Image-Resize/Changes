@@ -1,0 +1,24 @@
+Revision history for Perl extension Image::Resize.
+
+0.05    Friday, November 04, 2005
+    - Minor changes in test script
+
+0.04    Saturday, October 29, 2005
+    - REMOVED: type() method is obsolete
+    - FIX: scaling routine is not compatible with Image::Magick::Scale()
+    - NEW: new() can now accept GD::Image object
+
+0.03  Friday, August 19, 2005
+    - NEW: Image extension is no longer required
+    - NEW: type() method is introduced to retrieve suggested extension for image
+    - NEW: 24-bit-palette is used by default, which helps achieve photo-quality results.
+
+0.02  Thursday, June 30, 2005
+    - width() and height() methods do not rely on these method names of GD anymore,
+      instead, they use getBounds() method directly, for compatibility with older versions
+      of GD
+
+0.01  Friday June 24 16:02:13 2005
+    - original version; created by h2xs 1.22 with options
+        -A -X -n Image::Resize
+

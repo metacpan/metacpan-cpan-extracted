@@ -1,0 +1,22 @@
+Revision history for Perl module Image::Hash
+
+0.06 Sun Aug 16 16:00.00 2015
+    - Only test the Imager module if we also have JPEG support for Imager.
+
+0.04 Mon Jan 15 13:39.00 2015
+    - Support for dumping the reduced image from GD and Imager also
+    - Made the pixel_* subroutines use the reduced image
+    - Honor the geometry config
+
+0.03 Thu Des 14 15:27:19 2014
+    - Fixed some typos
+    
+0.02 Thu Des 11 14:16:50 2014
+    - Replaced some die() calls with carp/croak
+    - Replaced switch with plane old if/elsif/else to make it more compatible with older version of Perl.
+    - Some cosmetic changes in the documentation
+
+0.01 Thu Nov 13 07:27:51 2014
+    - Original version; created by ExtUtils::ModuleMaker 0.52
+
+

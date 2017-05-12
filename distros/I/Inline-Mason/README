@@ -1,0 +1,47 @@
+Inline-Mason
+============
+
+SYNOPSIS
+           package MY::Mason;
+           use Inline::Mason 'as_subs';
+           our @ISA = qw(Inline::Mason);
+
+           print Inline::Mason::generate('HELLO');
+           print Inline::Mason::HELLO();
+           print HELLO();
+           print NIFTY(lang => 'Perl');
+
+           __END__
+
+           __HELLO__
+           % my $noun = 'World';
+           Hello <% $noun %>!
+           How are ya?
+
+           __NIFTY__
+           <% $ARGS{lang} %> is nifty!
+
+DESCRIPTION
+       This module enables you to embed mason scripts in your perl code. Using it
+       is simple, much is shown in the above.
+
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 by Yung-chung Lin (a.k.a xern) <xern@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself
+
+

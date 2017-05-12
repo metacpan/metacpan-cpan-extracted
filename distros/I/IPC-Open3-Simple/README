@@ -1,0 +1,34 @@
+IPC::Open3::Simple
+==================
+
+IPC::Open3::Simple is a wrapper aroun IPC::Open3 providing
+similar functionality with a somewhat simpler interface.
+
+See perldoc for more information.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+IPC::Open3::Simple requires the following modules:
+
+  IPC::Open3
+  IO::Select
+  IO::Handle
+
+AUTHOR
+
+Erwan Lemonnier
+
+COPYRIGHT AND LICENCE
+
+See module's perldoc
+
+

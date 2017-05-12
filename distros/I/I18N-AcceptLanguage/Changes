@@ -1,0 +1,48 @@
+2005-04-11	Christian Gilmore <cag@us.ibm.com>
+
+	o Corrected secondary matching bug that errantly overwrote the
+	  first match.Added tests. Bug and fix reported by Jacques Supcik
+	  <jacques@supcik.net>.
+	o Corrected secondary list creation bug that did not put
+	  supported languages without locales into the list.
+	o Made release 1.04.
+
+2004-05-14	Christian Gilmore <cag@us.ibm.com>
+
+	o Updated documentation surrounding use of strict. Change
+	  suggested by Mark Fuller <mark.fuller@earthlink.net>.
+	o Made release 1.03.
+
+2004-02-11	Christian Gilmore <cag@us.ibm.com>
+
+	o Now return defaultLanguage from accepts method when input is
+	  insufficient. Change suggested by Morbus Iff
+	  <morbus@disobey.com>.
+	o Made release 1.02.
+
+2003-11-19	Christian Gilmore <cag@us.ibm.com>
+
+	o Corrected typo in documented. Reported by Florian
+	  Helmberger <fh@laudatio.com>.
+	o Made release 1.01.
+
+2003-01-01	Christian Gilmore <cag@us.ibm.com>
+
+	o Corrected typo in documentation. Reported by Gordon Rowell
+	  <gordon_rowell@mitel.com>.
+	o Made release 1.00.
+
+2002-10-17	Christian Gilmore <cag@us.ibm.com>
+
+	o Added strict conformance option.
+	o Made matching case-insensitive.
+	o Made release 0.03.
+
+2002-10-02	Christian Gilmore <cag@us.ibm.com>
+
+	o Reduced perl version required to 5.6.1.
+	o Made release 0.02.
+
+2002-09-26	Christian Gilmore <cag@us.ibm.com>
+
+	o Made first public release 0.01.

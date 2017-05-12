@@ -1,0 +1,39 @@
+IO::InSitu version 0.0.2
+
+This module provides a function called open_rw(), that is passed two
+filenames and returns two handles, one open for reading and the other
+for writing. It's like doing to separate open() calls, except that it
+detects cases where the input and output file are the same, and avoids
+clobbering the input file when reopening it for output.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+
+DEPENDENCIES
+
+None.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005, Damian Conway
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

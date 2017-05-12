@@ -1,0 +1,32 @@
+Changes
+lib/IMDB/Local.pm
+lib/IMDB/Local/Actor.pm
+lib/IMDB/Local/DB.pm
+lib/IMDB/Local/DB/RecordIterator.pm
+lib/IMDB/Local/Download.pm
+lib/IMDB/Local/ListFiles.pm
+lib/IMDB/Local/DB/Base.pm
+lib/IMDB/Local/DB/BaseObject.pm
+lib/IMDB/Local/DB/BaseObjectAccessor.pm
+lib/IMDB/Local/DB/SQLite.pm
+lib/IMDB/Local/Director.pm
+lib/IMDB/Local/Genre.pm
+lib/IMDB/Local/Keyword.pm
+lib/IMDB/Local/Movie.pm
+lib/IMDB/Local/Plot.pm
+lib/IMDB/Local/QualifierType.pm
+lib/IMDB/Local/Rating.pm
+lib/IMDB/Local/Title.pm
+lib/IMDB/Local/TVShow.pm
+lib/IMDB/Local/VideoGame.pm
+script/imdb-local.pl
+script/imdb-title.pl
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

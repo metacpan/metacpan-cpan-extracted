@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/IO-Socket-ByteCounter.t
+lib/IO/Socket/ByteCounter.pm
+META.yml                                 Module meta-data (added by MakeMaker)

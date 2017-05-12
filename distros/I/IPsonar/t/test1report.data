@@ -1,0 +1,2 @@
+URL: /reporting/api/service/config.reports?fmt=xml&q.page=0&q.pageSize=100
+<?xml version="1.0" ?><ConfigReportsResponse apiVersion="5.0" method="config.reports" status="SUCCESS" total="1" version="6.1.0.186978"><report><id>1</id><ipcount>1</ipcount><name>test1</name><serverTimeStr>13:40 02-02-2015</serverTimeStr><tag>chriskit/20150202-00003</tag><timestamp>1422902404295</timestamp><title>test1</title></report></ConfigReportsResponse>

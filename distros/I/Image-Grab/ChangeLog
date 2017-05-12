@@ -1,0 +1,124 @@
+2004-10-27  Mark A. Hershberger  <mah@everybody.org>
+
+	* lib/Image/Grab.pm: Conditionalize %Config lookups.
+
+2004-10-27  Mark A. Hershberger  <mah@everybody.org>
+
+	* lib/Image/Grab.pm (grab): Now works if not prefixed by
+	"Image::Grab->"...
+	
+	* t/manpage.t: Tests to verify that the manpage examples will
+	work.
+
+2002-01-20  Mark A. Hershberger  <mah@everybody.org>
+
+	* lib/Image/Grab.pm (expand_url): fixed a bug if no match to
+	regexp is found.
+	(grab): fixed bug for simple (non-OO) grab()'s.
+
+	* lib/Image/Grab.pm: use either Digest::MD5 or MD5 module.  
+
+	* t/*: Increased platform independence by using Cwd instead of
+	`pwd` in the tests.
+
+	* Makefile.PL: Added "release" target for the maintainer.
+
+2000-08-10  Mark A. Hershberger  <mah@everybody.org>
+
+	* t/*: took away necessity for network connection on most tests.
+	
+	* Makefile.PL: Query if you want to do network tests.
+
+	* lib/Image/Grab.pm (expand_url): Set refer when index or regexp
+	are used.  Removed `defined @link' so as not to trigger 5.6
+	warning.
+	(getAllURLs): Added ability to fetch background images as well.
+
+2000-04-09  Mark A. Hershberger  <mah@everybody.org>
+
+	* lib/: Moved files under this hierarchy.
+	
+	* lib/Image/Grab.pod: Seperated POD from PM.  Fleshed out the docs
+	and rearranged them according to Tom Metro's suggestions.  Filled
+	in spec on grab_new, changed realm to auth and a couple of other
+	changes to encourage me to actually do them.
+
+	* README.pod: Added the file.  Removed duplication of man
+	page.
+	
+
+1999-11-08  Mark A. Hershberger  <mah@everybody.org>
+
+	* README: noted search_url.
+
+	* Grab.pm: Clarified docs on basis of Tom Metro (tmetro@vl.com)
+	suggestions.  Added search_url and removed overloading of regex
+	method.  Added ability to grab to accept named params.
+
+	* t/direct_grab.t: added test for named param grab.
+
+1999-06-12  Mark A. Hershberger  <mah@everybody.org>
+
+	* README: Noted do_posix.
+
+	* Grab.pm: Began work on debug method.  Found bug in strftime.
+	Changed behavior of POSIX date substitution.  Added do_posix
+	method.
+	
+1999-06-09  Mark A. Hershberger  <mah@everybody.org>
+
+	* README: Added install and test instructions.
+
+	* t/comics.t: Split out cookie-dependent tests.
+
+	* t/cookies.t: Created for cookie dependent tests.
+
+1999-05-18  Mark A. Hershberger  <mah@everybody.org>
+
+	* Grab/RequestAgent.pm (new): Updated & simplified proxy code
+
+	* Grab/RequestAgent.pm (register_realm): Fixed code so it actually
+	works.
+
+	* Grab/RequestAgent.pm (get_basic_credentials): Fixed code.
+
+	* Grab/RequestAgent.pm: Removed some crufty functions.
+	
+	* Grab.pm (realm): Fixed realm problem.  Interface Change!
+
+1999-02-19  Mark A. Hershberger  <mah@everybody.org>
+
+	* t/easy.t, t/md5.t, t/type.t: Removed fork dependency and set it
+	to a "live" site.
+
+	* Grab/RequestAgent.pm (new): Added code to recognize the proxy
+	variables for firewalls.
+
+	* t/TestDaemon.pm: Removed to fix fork dependency.
+	
+	* t/comics.t: Added test to demonstrate the feature with live
+	images and to excercise new methods.
+
+	* Makefile.PL: Cosmetic changes.  Added HTTP::Cookies to required
+	packages
+
+	* Grab.pm (loadCookieJar): Added convenience method.
+
+1999-02-18  Mark A. Hershberger  <mah@everybody.org>
+
+	* Grab.pm: Broke url method up into url, refer, and index method.
+	Prettied up the man page some.  Changed all example urls to
+	reserved domain example.com.
+	(getAllURLs): Added function to get all image URLs from a page.
+	(getRealURL): Added POSIX time string expansion.
+
+1998-06-16  Mark Hershberger  <mah@eecs.tulane.edu>
+
+	* Grab.pm: Added type method to return the mime type of the object
+
+	* t/md5.t: Hardcoded md5 value instead of relying on backtic'ed
+	  md5. (Test should no longer fail for non-Unix platforms.)
+
+	* t/TestDaemon.pm: Added TestDaemon module to help with
+          simplifing tests.  Helps tests pass even if they are done behind
+	  firewalls.

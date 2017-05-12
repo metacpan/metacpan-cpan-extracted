@@ -1,0 +1,944 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: static/i18n.js:43
+msgid " ago"
+msgstr ""
+
+#: static/i18n.js:59
+msgid " days"
+msgstr ""
+
+#: static/i18n.js:41
+msgid " from now"
+msgstr ""
+
+#:
+msgid " pt"
+msgstr " 分"
+
+#:
+msgid "<< Add New Response"
+msgstr "新增回應"
+
+#:
+msgid "Access Denied."
+msgstr "存取被拒"
+
+#:
+msgid "Add"
+msgstr "新增"
+
+#:
+msgid "Add Answer"
+msgstr "新增回應"
+
+#:
+msgid "Add Topic"
+msgstr "新增題目"
+
+#:
+msgid "Address:"
+msgstr "地址:"
+
+#:
+msgid "All"
+msgstr "全部"
+
+#:
+msgid "All Chatlog"
+msgstr "顯示全部的聊天紀錄"
+
+#:
+msgid "Answers"
+msgstr "回應"
+
+#:
+msgid "Approve"
+msgstr "許可"
+
+#:
+msgid "Approve This"
+msgstr "許可"
+
+#:
+msgid "Approved"
+msgstr "已審核"
+
+#:
+msgid "Assign Channel"
+msgstr "指定頻道"
+
+#:
+msgid "Assign Group"
+msgstr "新增群組"
+
+#:
+msgid "Assign channel"
+msgstr "指定頻道"
+
+#:
+msgid "Assign group"
+msgstr "新增群組"
+
+#:
+msgid "Backlog"
+msgstr "回溯紀錄"
+
+#:
+msgid "Belongs to:"
+msgstr "屬於:"
+
+#:
+msgid "Bot"
+msgstr "機器人"
+
+#:
+msgid "Bot Ident:"
+msgstr "機器人識別名稱"
+
+#:
+msgid "Bot Name:"
+msgstr "機器人名稱"
+
+#:
+msgid "Bot Triggers"
+msgstr "機器人觸發事件"
+
+#:
+msgid "Bot:"
+msgstr "機器人"
+
+#:
+msgid "By Channel: "
+msgstr "由頻道: "
+
+#:
+msgid "Callback Name"
+msgstr "事件反應名稱"
+
+#:
+msgid "Callback:"
+msgstr "事件反應:"
+
+#:
+msgid "Callbacks"
+msgstr "事件反應:"
+
+#: static/app.js:665
+msgid "Can not connect to ZhAPI."
+msgstr "無法連線詞句剖析服務"
+
+#:
+msgid "Category"
+msgstr "類別"
+
+#:
+msgid "Channel"
+msgstr "頻道"
+
+#:
+msgid "Channel List"
+msgstr "頻道列表"
+
+#:
+msgid "Channel Name"
+msgstr "頻道名稱"
+
+#:
+msgid "Channel is not available."
+msgstr "本頻道無法使用"
+
+#:
+msgid "Channel name:"
+msgstr "頻道名稱:"
+
+#:
+msgid "ChannelFree"
+msgstr "開放頻道"
+
+#:
+msgid "Chat client scan interval"
+msgstr "Client 掃描時間間隔"
+
+#:
+msgid "Chatbot Admin Page"
+msgstr "交談機器人管理介面"
+
+#:
+msgid "Chatlog"
+msgstr "交談紀錄"
+
+#:
+msgid "Chatroom"
+msgstr "聊天室"
+
+#:
+msgid "Chatroom page for PDA."
+msgstr "PDF 聊天室"
+
+#:
+msgid "Checking ZH API connection ..."
+msgstr "檢查詞句剖析服務連線 ..."
+
+#:
+msgid "Class"
+msgstr "類別"
+
+#:
+msgid "Class Description"
+msgstr "類別敘述"
+
+#:
+msgid "Class Name"
+msgstr "類別名稱"
+
+#:
+msgid "ClientScanInt"
+msgstr ""
+
+#:
+msgid "ClientTimeout"
+msgstr "Client 超時"
+
+#:
+msgid "Close"
+msgstr "關閉"
+
+#:
+msgid "Close Time"
+msgstr "關閉時間"
+
+#:
+msgid "Close time"
+msgstr "關閉時間"
+
+#:
+msgid "Comment"
+msgstr "評論"
+
+#:
+msgid "Config"
+msgstr "設定"
+
+#:
+msgid "Contains"
+msgstr "包含"
+
+#:
+msgid "Create "
+msgstr "建立 "
+
+#:
+msgid "Create Channel"
+msgstr "建立頻道"
+
+#:
+msgid "Create Class"
+msgstr "建立類別"
+
+#:
+msgid "Create One?"
+msgstr "建立一個？"
+
+#:
+msgid "Create Sentence Class"
+msgstr "建立答覆類別"
+
+#:
+msgid "Create User"
+msgstr "建立使用者"
+
+#:
+msgid "Create bot event trigger"
+msgstr "建立機器人觸發事件"
+
+#:
+msgid "Create event callback"
+msgstr "建立觸發反應事件"
+
+#:
+msgid "Created On"
+msgstr "建立於"
+
+#:
+msgid "Created on"
+msgstr "建立:"
+
+#:
+msgid "Custom Questions"
+msgstr "自訂問題"
+
+#:
+msgid "Dashboard"
+msgstr "資訊介面"
+
+#:
+msgid "Data"
+msgstr "資料"
+
+#:
+msgid "Data:"
+msgstr "資料:"
+
+#:
+msgid "Delete"
+msgstr "刪除"
+
+#:
+msgid "Description"
+msgstr "敘述"
+
+#:
+msgid "Disabled"
+msgstr "停用"
+
+#:
+msgid "E-mail"
+msgstr "電子郵件信箱"
+
+#:
+msgid "ERROR"
+msgstr "錯誤"
+
+#:
+msgid "Edit"
+msgstr "編輯"
+
+#:
+msgid "Edit Channel"
+msgstr "編輯頻道"
+
+#:
+msgid "Edit Response"
+msgstr "編輯回應"
+
+#:
+msgid "Edit Sentence"
+msgstr "編輯問句"
+
+#:
+msgid "Email:"
+msgstr "電子郵件信箱:"
+
+#:
+msgid "Emotion"
+msgstr "情緒"
+
+#:
+msgid "Emotion Color"
+msgstr "情緒色彩"
+
+#:
+msgid "Emotion Type"
+msgstr "情緒類型"
+
+#:
+msgid "Enable Crontab events"
+msgstr "啟用定時事件"
+
+#:
+msgid "Enable Error Report"
+msgstr "器用錯誤回報"
+
+#:
+msgid "Enable ReCaptcha Authentication"
+msgstr "啟用 ReCaptcha 驗證碼"
+
+#:
+msgid "Enable ZhAPI parsing"
+msgstr "啟用詞句剖析系統"
+
+#:
+msgid "Enable bots"
+msgstr "啟用機器人"
+
+#:
+msgid "Enable channel backlog"
+msgstr "啟用頻道回溯紀錄"
+
+#:
+msgid "EnableBots"
+msgstr "啟用機器人"
+
+#:
+msgid "EnableChatlog"
+msgstr "啟用交談紀錄"
+
+#:
+msgid "EnableCron"
+msgstr ""
+
+#:
+msgid "EnableZhAPI"
+msgstr ""
+
+#:
+msgid "Error Sentence & Response"
+msgstr "謬誤答覆管理"
+
+#:
+msgid "ErrorReport"
+msgstr ""
+
+#:
+msgid "Event"
+msgstr "事件"
+
+#:
+msgid "Event data:"
+msgstr "事件資料"
+
+#:
+msgid "Event name:"
+msgstr "事件名稱"
+
+#:
+msgid "Event type:"
+msgstr "事件類型"
+
+#:
+msgid "Export CSV"
+msgstr "匯出 CSV 檔"
+
+#:
+msgid "Fallacious"
+msgstr "謬誤"
+
+#:
+msgid "File"
+msgstr "檔案"
+
+#:
+msgid "Filtering"
+msgstr "過濾"
+
+#:
+msgid "First Name:"
+msgstr "名:"
+
+#:
+msgid "First name"
+msgstr "名:"
+
+#:
+msgid "For message type callbacks, set prefix \"#channel_name:\" in data to send message to specified channel."
+msgstr "訊息類型的回應，設定前墜為 #channel:"
+
+#:
+msgid "Group"
+msgstr "群組"
+
+#:
+msgid "Group Name"
+msgstr "群組名稱"
+
+#:
+msgid "Group name:"
+msgstr "群組名稱:"
+
+#:
+msgid "Groups"
+msgstr "群組"
+
+#:
+msgid "I dont know what to say"
+msgstr "我不知道該說什麼"
+
+#:
+msgid "I dont know what to say."
+msgstr "我不知道該說些什麼。"
+
+#:
+msgid "Id"
+msgstr "識別"
+
+#:
+msgid "Ident"
+msgstr "識別名稱"
+
+#:
+msgid "K"
+msgstr "優先權"
+
+#:
+msgid "Keyword"
+msgstr "關鍵字"
+
+#:
+msgid "Keyword:"
+msgstr "關鍵字:"
+
+#:
+msgid "Last Name:"
+msgstr "姓: "
+
+#:
+msgid "Last name"
+msgstr "姓"
+
+#:
+msgid "Likert Questions"
+msgstr "李客特式題型"
+
+#:
+msgid "List Channel Log"
+msgstr "列出交談紀錄"
+
+#:
+msgid "List Topic"
+msgstr "列出題目"
+
+#:
+msgid "Log out"
+msgstr "登出"
+
+#:
+msgid "Login"
+msgstr "登入"
+
+#:
+msgid "Login failed."
+msgstr "登入失敗"
+
+#:
+msgid "Logout"
+msgstr "登出"
+
+#:
+msgid "Manage Movie"
+msgstr "管理電影"
+
+#:
+msgid "Management"
+msgstr "管理"
+
+#:
+msgid "Max Users"
+msgstr "最多使用者"
+
+#:
+msgid "Message Color:"
+msgstr "訊息色彩"
+
+#:
+msgid "Movie Uploaded"
+msgstr "影片已上傳。"
+
+#:
+msgid "Movie not found."
+msgstr "找不到影片"
+
+#:
+msgid "Name"
+msgstr "名稱"
+
+#:
+msgid "Only Self"
+msgstr "只有自己"
+
+#:
+msgid "Open Time"
+msgstr "開放時間"
+
+#:
+msgid "Open channel"
+msgstr "開放頻道"
+
+#:
+msgid "Open time"
+msgstr "開放時間"
+
+#:
+msgid "Password"
+msgstr "密碼"
+
+#:
+msgid "Password Confirm:"
+msgstr "確認密碼:"
+
+#:
+msgid "Password:"
+msgstr "密碼:"
+
+#:
+msgid "Pending"
+msgstr "待審核"
+
+#:
+msgid "Pending Sentence & Response"
+msgstr "待審核答覆管理"
+
+#:
+msgid "Please insert time or text in data field."
+msgstr "請在資料欄位內填入時間或是文字"
+
+#:
+msgid "Privacy"
+msgstr "隱私"
+
+#:
+msgid "Private"
+msgstr "私人"
+
+#:
+msgid "Public"
+msgstr "公開"
+
+#:
+msgid "Push Ping event to clients from server."
+msgstr "推送 ping 訊息至連線端"
+
+#:
+msgid "RandomAnswer"
+msgstr "隨機回應"
+
+#:
+msgid "ReCaptcha"
+msgstr "ReCaptcha 驗證碼"
+
+#:
+msgid "Relation Id"
+msgstr "關聯序號"
+
+#:
+msgid "Report for fallacious response."
+msgstr "錯誤回報"
+
+#:
+msgid "Request Text"
+msgstr "回應文字"
+
+#:
+msgid "Reset K"
+msgstr "重設優先權"
+
+#:
+msgid "Response"
+msgstr "回應"
+
+#:
+msgid "Response Contains"
+msgstr "回應包含"
+
+#:
+msgid "Response For"
+msgstr "使用者問題"
+
+#:
+msgid "Response Text"
+msgstr "系統設定回應"
+
+#:
+msgid "Response Type"
+msgstr "系統回應類型"
+
+#:
+msgid "Response detail"
+msgstr "系統回應詳細資料"
+
+#:
+msgid "Response random answer"
+msgstr "隨機回應"
+
+#:
+msgid "Role"
+msgstr "角色"
+
+#:
+msgid "Role:"
+msgstr "角色:"
+
+#:
+msgid "S Sequence"
+msgstr "詞性代號順序"
+
+#:
+msgid "Satisfacation"
+msgstr "滿意度"
+
+#:
+msgid "Satisfactory"
+msgstr "滿意度"
+
+#:
+msgid "Satisfication"
+msgstr "滿意度"
+
+#:
+msgid "Save Chat log to database."
+msgstr "儲存聊天紀錄至資料庫"
+
+#:
+msgid "Search"
+msgstr "搜尋"
+
+#:
+msgid "Search Result"
+msgstr "搜尋結果"
+
+#:
+msgid "Select Survey Topic"
+msgstr "選擇問卷題目"
+
+#:
+msgid "Send Satisfactory degree"
+msgstr "傳送滿意度"
+
+#:
+msgid "Send Text"
+msgstr "傳送文字"
+
+#:
+msgid "Sentence"
+msgstr "答覆"
+
+#:
+msgid "Sentence & Response"
+msgstr "答覆管理"
+
+#:
+msgid "Sentence Class"
+msgstr "答覆類別"
+
+#:
+msgid "Sentence Contains"
+msgstr "問句包含"
+
+#:
+msgid "Sentence class:"
+msgstr "問句類別"
+
+#:
+msgid "Sentence:"
+msgstr "系統設定問題:"
+
+#:
+msgid "ServerPushPing"
+msgstr ""
+
+#:
+msgid "Status"
+msgstr "狀態"
+
+#:
+msgid "Step 1: Create trigger"
+msgstr "第一步: 建立觸發事件"
+
+#:
+msgid "Step 2: Create callback"
+msgstr "第二步: 建立回應"
+
+#:
+msgid "Suggest"
+msgstr "建議"
+
+#:
+msgid "Suggest Response:"
+msgstr "建議回應"
+
+#:
+msgid "Survey"
+msgstr "傳送問卷"
+
+#:
+msgid "Survey Static"
+msgstr "問卷統計"
+
+#:
+msgid "Syntatic"
+msgstr "詞句剖析"
+
+#:
+msgid "Text"
+msgstr "文字"
+
+#:
+msgid "Text Contains"
+msgstr "文字包含"
+
+#:
+msgid "Text Match"
+msgstr "文字符合"
+
+#:
+msgid "Time"
+msgstr "時間"
+
+#:
+msgid "Time is not available"
+msgstr "時間未被允許"
+
+#:
+msgid "Title"
+msgstr "標題"
+
+#:
+msgid "Topic"
+msgstr "題目"
+
+#:
+msgid "Topic:"
+msgstr "題目:"
+
+#:
+msgid "Total:"
+msgstr "總共:"
+
+#:
+msgid "Triggers"
+msgstr "觸發事件"
+
+#:
+msgid "Type"
+msgstr "類型"
+
+#:
+msgid "Type and Data"
+msgstr "類型與資料"
+
+#:
+msgid "Type:"
+msgstr "類型:"
+
+#:
+msgid "Update Sentence Syntatics"
+msgstr "更新系統語意剖析"
+
+#:
+msgid "Upload Movie"
+msgstr "上傳電影"
+
+#:
+msgid "User"
+msgstr "使用者"
+
+#:
+msgid "User connection timeout"
+msgstr "使用者連線超時"
+
+#:
+msgid "Username"
+msgstr "使用者名稱"
+
+#:
+msgid "Username:"
+msgstr "使用者名稱:"
+
+#:
+msgid "View"
+msgstr "瀏覽"
+
+#:
+msgid "W Sequence"
+msgstr "字詞順序"
+
+#:
+msgid "We dont have channel now."
+msgstr "尚有頻道建立。"
+
+#:
+msgid "We dont have user now."
+msgstr "我們目前沒有此使用者。"
+
+#:
+msgid "ZHAPI_Port"
+msgstr "詞句剖析系統連接阜"
+
+#:
+msgid "ZHAPI_Server"
+msgstr "詞句剖析系統位址"
+
+#:
+msgid "Zh API"
+msgstr "詞句剖析系統"
+
+#:
+msgid "ZhAPI"
+msgstr "詞句剖析系統"
+
+#: static/app.js:662
+msgid "ZhAPI Connection OK."
+msgstr ""
+
+#:
+msgid "ZhAPI Service Host"
+msgstr "詞句剖析系統位址"
+
+#:
+msgid "ZhAPI Service Port"
+msgstr "詞句剖析系統連接阜"
+
+#:
+msgid "[Event Triggered] [Empty Message]"
+msgstr ""
+
+#: static/i18n.js:58
+msgid "about one day"
+msgstr "約一天"
+
+#: static/i18n.js:55
+msgid "about one hour"
+msgstr "約一小時"
+
+#:
+msgid "anger"
+msgstr "怒"
+
+#:
+msgid "basic"
+msgstr "基本"
+
+#:
+msgid "e.g.    #room1: Hello world"
+msgstr "例如:  #room1: 哈囉你好"
+
+#: static/i18n.js:53
+msgid "less than a minute"
+msgstr "少於一分鐘"
+
+#:
+msgid "love"
+msgstr "愛"
+
+#: static/i18n.js:57
+msgid "one day"
+msgstr "一天"
+
+#:
+msgid "peace"
+msgstr "平靜"
+
+#:
+msgid "random"
+msgstr "隨機"
+
+#:
+msgid "sadness"
+msgstr "悲"
+
+#:
+msgid "should be in hex."
+msgstr "請填入 Hex 色彩"
+
+#:
+msgid "test"
+msgstr "測試"
+
+#:
+msgid "zhi"
+msgstr "詞句剖析"

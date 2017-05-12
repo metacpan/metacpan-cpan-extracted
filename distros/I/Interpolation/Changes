@@ -1,0 +1,19 @@
+Revision history for Perl extension Interpolation.
+
+Originaly by Mark-Jason Dominus (mjd-perl-interpolation@plover.com)
+Since version 0.66 maintained by Jenda@Krynicky.cz
+
+0.68 - Fri Apr 5 2002
+
+0.69 - Fri Feb 8 2003
+	added 'name:->$' (no parameters => tied scalar)
+	you may assign to interpolators with types '$->$', '$->@' and '->$'
+
+0.70 - Thu Aug 21 2003
+	fixed the sprintfX builtin (small silly bug)
+
+0.73 - Sat Jun 13 2003
+	added support for tie()ing lexicals even with types.
+
+0.74 - Wed Sep 30 2009
+	skipping tests dependent on HTML::Entities if not available

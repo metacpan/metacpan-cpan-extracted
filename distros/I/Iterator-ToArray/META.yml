@@ -1,0 +1,43 @@
+---
+abstract: 'create array or arrayref from iterator'
+author:
+  - 'Yoshihiro Sasaki <ysasaki {at} cpan.org>'
+build_requires:
+  Module::Build: 0.38
+  Test::Exception: 0.32
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.5.3, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Iterator-ToArray
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+provides:
+  Iterator::ToArray:
+    file: lib/Iterator/ToArray.pm
+    version: 0.04
+requires:
+  Scalar::Util: 1.25
+  perl: 5.008008
+resources:
+  bugtracker: https://github.com/ysasaki/p5-iterator-toarray/issues
+  homepage: https://github.com/ysasaki/p5-iterator-toarray
+  repository: git://github.com/ysasaki/p5-iterator-toarray.git
+version: 0.04
+x_contributors:
+  - 'ysasaki <ysasaki@idac.co.jp>'
+  - 'ysasaki <aloelight@gmail.com>'

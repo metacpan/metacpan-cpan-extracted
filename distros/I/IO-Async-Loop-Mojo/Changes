@@ -1,0 +1,29 @@
+Revision history for IO-Async-Loop-Mojo
+
+0.05    2013/11/20 09:58:14
+        [BUGFIXES]
+         * Workaround for Mojo::Reactor classes that can't handle nested
+           ->start
+
+0.04    2013/11/16 02:30:44
+        [BUGFIXES]
+         * Better run implementation using ->one_tick, ->start and ->stop
+         * Obtain a reactor from Mojo::IOLoop->singleton instead of
+           constructing a new one
+         * Don't set a timeout timer if there is no timeout
+         * Avoid timing race in Mojo::Reactor::EV which causes timers to be
+           invoked twice in recursive cases
+
+0.03    CHANGES:
+         * Updated for Mojolicious 2.65:
+            + Mojo::Reactor is now an abstract base class
+            + ->drop is now called ->remove
+         * Updated for IO::Async 0.49 Loop API:
+            + ->watch_time/->unwatch_time
+
+0.02    CHANGES:
+         * Updated for Mojolicious 2.64:
+            + Mojo::IOWatcher is now called Mojo::Reactor
+
+0.01    First version, released on an unsuspecting world.
+

@@ -1,0 +1,26 @@
+[
+   {
+      filename => 'testfile.start',
+      offset   => 0,
+      length   => 36,
+      contents => 'This is the START   that is allowed!'
+   },
+   {
+      filename => 'testfile.middle',
+      offset   => 7,
+      length   => 36,
+      contents => 'This is the MIDDLE  that is allowed!'
+   },
+   {
+      filename => 'testfile.end',
+      offset   => 7,
+      length   => 36,
+      contents => "This is the END     that is allowed\n"
+   },
+   {
+      filename => 'testfile.full',
+      offset   => 0,
+      length   => 36,
+      contents => "This is the FULL    that is allowed\n"
+   },
+]

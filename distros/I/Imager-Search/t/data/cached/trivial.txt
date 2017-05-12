@@ -1,0 +1,6 @@
+class: Imager::Search::Image::Cached
+driver: Imager::Search::Driver::HTML24
+height: 4
+width: 4
+
+#000000#000000#FFFFFF#FFFFFF#000000#000000#FFFFFF#FFFFFF#FFFFFF#FFFFFF#000000#000000#FFFFFF#FFFFFF#000000#000000

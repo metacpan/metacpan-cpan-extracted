@@ -1,0 +1,16 @@
+ChangeLog
+MANIFEST
+META.yml
+Makefile.PL
+README
+SIGNATURE
+Zlib.pm
+t/basic.t
+t/external.t
+t/getc.t
+t/getline.t
+t/import.t
+t/large.t
+t/tied.t
+t/uncomp1.t
+t/uncomp2.t

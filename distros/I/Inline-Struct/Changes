@@ -1,0 +1,110 @@
+0.23 2016-05-05
+
+    - include updated Changes
+
+0.22 2016-05-05
+
+    - fix test that relied on Unix-ish shell semantics
+
+0.21 2016-05-02
+
+    - release without accidentally-included experimental code
+
+0.20 2016-05-02
+
+    - update metadata to use *_requires
+
+0.19 2016-05-02
+
+    - include Changes file
+    - All tests to force_build, clean_after_build
+    - Doc tidy-up: whitespace, sub->method
+    - no_index Inline::Struct::grammar
+
+0.18 2014-12-24
+
+    - Fixup MANIFEST
+
+0.17 2014-12-24
+
+    - no new() hashref or arrayref param, per doc
+    - Set version 0.17 plus minor tidy-ups
+    - Put modules under lib
+
+0.16 2014-11-13
+
+    - Update benchmark doc now memory leak fixed
+    - Mortalise "lookup" SV hiding in grammar.pm
+    - In settor mode, mortalise returned SV if not an SV member
+    - Ensure RT 19624 obsolete
+
+0.15 2014-11-12
+
+    - Benchmark and doc comparative memory usage
+    - Handle parse-fail of structs better
+    - Support code without terminal newline
+    - Also benchmark against perl array-ref implementation - no change
+    - Benchmark script and docs comparing time
+
+0.14 2014-11-11
+
+    - Fix problem with mortalising field-method retvals that caused RT 99555
+    - Add new tests
+
+0.13 2014-11-11
+
+    - Fix RT 100253
+    - Make README have working code, with test.
+
+0.12 2014-10-17
+
+    - ENTER/LEAVE, SAVETMPS/FREETMPS action. Fix RT 99198
+    - Doc case-insensitive config options.
+    - Add, test handling of SV* member.
+    - Switch test to non-negative main condition.
+    - Mortalise temp SV.
+    - Move some typeconvs into @{[]}.
+    - clean_after_build Ok.
+    - Allow src,targ,type as struct member names. Fix RT 99145.
+    - Minimum EUMM.
+    - Add t/refcnt.t to MANIFEST.
+    - Min perl 5.10 for // op.
+
+0.11 2014-09-24
+
+    - Mortalise SV returned by field function.
+    - Fixes https://rt.cpan.org/Ticket/Display.html?id=99091
+    - Force build on other tests too.
+    - Adjust so refcnt=2 when ref saved.
+    - Change field XS to here-doc.
+    - Lower-case keywords, force build.
+    - Test ref-count behaviour
+
+0.10 2014-08-07
+
+    - fix _HASH test
+
+0.09 2014-08-07
+
+    - _HASH test
+
+0.08 2014-08-07
+
+    - test improvements
+
+0.07 2014-08-06
+
+    - Tests into t/common.pl, floating point cmp into function.
+    - Modernise requirements.
+    - Closed TODO items not worth keeping.
+    - Update licence URL per RT 97756.
+    - Modernise distrib, include metadata
+
+0.06 2001-06-11
+
+    - dep Inline 0.42, update to that data structure
+    - doc updates
+
+0.05 2001-05-14
+
+    - first release

@@ -1,0 +1,96 @@
+{
+   "abstract" : "Keep connection to OS Inferno's registry(4) and it tasks",
+   "author" : [
+      "Alex Efros <powerman@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.043, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Inferno-RegMgr",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.15",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "EV" : "0",
+            "Export::Attrs" : "0",
+            "IO::Stream" : "0",
+            "Scalar::Util" : "0",
+            "perl" : "5.010001",
+            "version" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "Test::Perl::Critic" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Inferno::RegMgr" : {
+         "file" : "lib/Inferno/RegMgr.pm",
+         "version" : "v1.0.0"
+      },
+      "Inferno::RegMgr::Lookup" : {
+         "file" : "lib/Inferno/RegMgr/Lookup.pm",
+         "version" : "v1.0.0"
+      },
+      "Inferno::RegMgr::Monitor" : {
+         "file" : "lib/Inferno/RegMgr/Monitor.pm",
+         "version" : "v1.0.0"
+      },
+      "Inferno::RegMgr::Service" : {
+         "file" : "lib/Inferno/RegMgr/Service.pm",
+         "version" : "v1.0.0"
+      },
+      "Inferno::RegMgr::TCP" : {
+         "file" : "lib/Inferno/RegMgr/TCP.pm",
+         "version" : "v1.0.0"
+      },
+      "Inferno::RegMgr::Utils" : {
+         "file" : "lib/Inferno/RegMgr/Utils.pm",
+         "version" : "v1.0.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/powerman/perl-Inferno-RegMgr/issues"
+      },
+      "homepage" : "https://github.com/powerman/perl-Inferno-RegMgr",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/powerman/perl-Inferno-RegMgr.git",
+         "web" : "https://github.com/powerman/perl-Inferno-RegMgr"
+      }
+   },
+   "version" : "v1.0.0"
+}
+

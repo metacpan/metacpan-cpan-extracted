@@ -1,0 +1,75 @@
+{
+   "abstract" : "Draw text along a polyline",
+   "author" : [
+      "Ron Savage (ron@savage.net.au)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.22, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Image-Magick-PolyText",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Temp" : "0",
+            "Font::FreeType" : "0.07",
+            "Image::Magick" : "0",
+            "List::Maker" : "0.005",
+            "Math::Bezier" : "0.01",
+            "Math::Derivative" : "0.04",
+            "Math::Interpolate" : "1.06",
+            "Moo" : "2.003",
+            "POSIX" : "0",
+            "Readonly" : "2.05",
+            "Time::Elapsed" : "0.32",
+            "Types::Standard" : "1.000005",
+            "parent" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "1.001002",
+            "Test::Pod" : "1.51"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Image-Magick-PolyText"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ronsavage/Image-Magick-PolyText.git",
+         "web" : "https://github.com/ronsavage/Image-Magick-PolyText"
+      }
+   },
+   "version" : "2.00",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

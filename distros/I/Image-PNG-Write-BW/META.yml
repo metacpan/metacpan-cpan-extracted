@@ -1,0 +1,30 @@
+---
+abstract: 'Create minimal black-and-white PNG files.'
+author:
+  - 'Andrea Nall <anall@cpan.org>'
+build_requires:
+  Module::Build: '0.28'
+  Test::BinaryData: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150001'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Image-PNG-Write-BW
+requires:
+  Compress::Raw::Zlib: '0'
+  Digest::CRC: '0'
+  Exporter: '0'
+  base: '0'
+  perl: v5.10.0
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/anall/Image-PNG-Write-BW/issues
+  repository: git://github.com/anall/Image-PNG-Write-BW.git
+version: '0.01'
+x_serialization_backend: 'YAML::Tiny version 1.69'

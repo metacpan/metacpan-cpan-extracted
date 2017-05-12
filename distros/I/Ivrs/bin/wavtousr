@@ -1,0 +1,26 @@
+#!/usr/bin/perl -w
+#Script to convert wav files to US Robotics format rmd files.
+$filename= $ARGV[0];
+chomp $filename;
+($finfile,$fileext)=split (/\./,$filename);
+print "Converting $filename to $finfile \n";
+system "wavtopvf $filename /tmp/tmp2";
+system "pvfspeed -s 8000 /tmp/tmp2 /tmp/tmp3";
+#Change this line if you want to use other format.
+system "pvftormd US_Robotics 1 /tmp/tmp3 /tmp/tmp2";
+print "Removing Header...\n";
+open (FH1, "</tmp/tmp2");
+open (FH2, ">$finfile");
+binmode (FH1);
+binmode (FH2);
+read FH1,$tmp,32;
+while (!eof(FH1))
+{
+read FH1,$tmp,1;
+print FH2 "\020" if ($tmp=~/[\020]/); 
+print FH2 $tmp;
+
+}
+close (FH1);
+close (FH2);
+exit 1;

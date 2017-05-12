@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/1_create-object.t
+t/2_hello-world.t
+lib/Ipernity/API.pm
+lib/Ipernity/API/Request.pm

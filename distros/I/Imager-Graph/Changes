@@ -1,0 +1,209 @@
+Revision history for Perl extension Imager::Graph.
+
+Imager-Graph 0.12 - 12 May 2015
+=================
+
+ - increase tolerances on images with filled circles drawn on them to
+   account for the circle drawing change in Imager 1.002.
+   https://rt.cpan.org/Ticket/Display.html?id=103328
+
+Imager-Graph 0.11 - 30 Jun 2014
+=================
+
+ - POD fixes based on a report from Stefan Limbache, and also reported
+   by Slaven Rezić after I failed to do a release.
+   https://rt.cpan.org/Ticket/Display.html?id=95949
+
+ - skip POD tests unless AUTOMATED_TESTING or IMAGER_AUTHOR_TESTING is
+   set.
+
+Imager-Graph 0.10 - 7 May 2012
+=================
+
+ - loosen up image comparisons - the rounding change in Imager 0.90
+   made small changes to many pixels in fountain fills
+   https://rt.cpan.org/Ticket/Display.html?id=76955
+   It should fix the following too.
+   https://rt.cpan.org/Ticket/Display.html?id=68031
+
+ - negative_bg (or set via set_negative_background()) can now be a
+   fill.
+   https://rt.cpan.org/Ticket/Display.html?id=59532
+
+ - calculation of the zero position for horizontal charts was broken,
+   this resulted charts with negative data values having the
+   negative_bg color filled from the left side of the chart off the
+   right side of the image.
+
+ - Imager::Graph now requires at least perl 5.6.
+
+ - hoisted the common cmpimg() function into a separate test module
+
+ - convert shipped comparison images from ppm to png to reduce size
+
+Imager-Graph 0.09 - 05 Aug 2010
+=================
+
+Bug fixes:
+
+ - refresh the t10_lin_fount test image
+
+ - avoid use_automatic_axis() for the second area test, since systems
+   without Chart::Math::Axis will produce a different image.
+
+Imager-Graph 0.08 - 03 Aug 2010
+=================
+
+Now depends on Imager 0.75.
+
+More cool changes from Patrick Michaud:
+
+ - Area charts
+   https://rt.cpan.org/Ticket/Display.html?id=7
+
+Other changes:
+
+ - horizonal_gridlines (vertical charts) and vertical_gridlines
+   (horizontal charts) are now features and can be enabled like other
+   features (or disabled)
+
+ - hoisted the dashed-line drawing into Imager::Graph::_line() and
+   added a _get_line() method to retrieve line style information.
+
+ - features enabled earlier in the style list can now be disabled with
+   a feature "no{stylename}" when features are supplied as an arrayref
+   or scalar. eg. "nograph_outline".  If you supply features as a hashref
+   you can disable a feature with:
+     { stylename => 0 }
+
+ - for vertical and horizontal charts, allow the outline of the graph
+   area (graph_outline) to be disabled (with nograph_outline in
+   features.) or styled (graph.outline)
+
+ - for vertical and horizontal charts, allow the fill of the graph
+   area to be controlled separately from the base bg (graph.fill)
+
+ - tests
+
+Bug fixes:
+
+ - generate y-axis tic-label widths baed on the labels actually used.
+
+ - make draw() idempotent for vertical charts
+
+ - multiple calls to draw() no longer return the same image object
+
+ - labels supplied to draw() are now used for vertical and horizontal
+   charts
+
+ - Imager::Graph::Horizontal::add_column_data_series() renamed to
+   add_bar_data_series() and now adds the series as a "bar" series.
+   add_column_data_series() did nothing useful for a horizontal chart.
+
+
+Imager-Graph 0.07 - 21 May 2009
+=================
+
+Lots of cool changes from Patrick Michaud:
+
+ - added Bar, Column. StackedColumn and Line charts.
+   https://rt.cpan.org/Ticket/Display.html?id=5 [*]
+
+ - new ocean style
+
+ - new ocean_flat style
+
+ - methods to set chart style attributes, in addition to the style
+   parameters passed to draw().
+
+Bug fixes:
+
+ - missing a font parameter when we have a chart with text no longer
+   results in an exception, but in a false returned and a message in
+   error() as with other errors.
+   https://rt.cpan.org/Ticket/Display.html?id=2872
+
+ - the mono style now disables anti-aliasing by default
+
+[*] this was the oldest open bug on rt.cpan.org, now #7 is, still an
+Imager-Graph issue
+
+Imager-Graph 0.06 - 21 April 2008
+=================
+
+ - Removed ancient Imager cruft from the documentation
+
+ - round the dimensions used within the legend to integers to prevent
+   later truncation from causing uneven output.
+
+ - add horizontal legend boxes
+
+ - add a new style "primary" which is primary_red with a light grey
+   background, and made that the default, so the default graphs aren't
+   quite so ugly.
+
+ - zero-sized segments were drawn as covering the whole pie.  Skip
+   drawing zero sized segments.
+   https://rt.cpan.org/Ticket/Display.html?id=34813
+
+ - round the pie radius down to avoid running over the edge of the
+   image
+
+ - changed the pie maxsegments default to 0.01 from 0.05
+
+ - removed the obsolete pie blur style information
+
+ - documented some of the pie chart specific style settings
+
+ - changed the default drop shadow style to a translucent fill so the
+   background can show through.
+
+Imager-Graph 0.05 - 17 December 2007
+=================
+
+This release is an attempt to work around the inconsistent text output
+issues.
+
+ - created Imager::Font::Test which simply outputs boxes instead of
+   text to produce consistent graph images for comparison.
+
+
+Imager-Graph 0.04 - 11 December 2007
+=================
+
+This is a clean up release, removing code required for ancient
+releases of Imager, and otherwise modernizing the code.
+
+ - skip all tests if we can't load the font
+
+ - Save test results to ppm, so we can generate images even if we don't
+   have PNG support in Imager.
+
+ - instead of the old draw-no-aa-then-blur-the-result hack, we now use
+   arc()'s aa option
+
+ - tests now use Test::More
+
+ - remove the old circle fudge hack, since Imager fixed arc fills a
+   while ago
+
+ - strictify Makefile.PL, include the LICENSE, use the correct version
+   check for including the extra WriteMakefile keys
+
+ - various changes for Kwalitee
+
+ - remove fancy_fills check, we now depend on an Imager release that
+   supports fountain fills.
+
+Imager-Graph 0.02  Sat Oct  6 20:36:31 2001
+=================
+
+ - replace ImUgly.ttf with a new version where % renders on my older PC
+ - remove some old test code that printed the Imager version
+ - moved into local CVS to simplify cross-platform tests
+      
+Imager-Graph 0.01  Tue Sep 12 23:03:25 2001
+=================
+
+ - original version; created by h2xs 1.19
+ - can draw some nice pie graphs

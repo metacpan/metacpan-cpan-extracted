@@ -1,0 +1,30 @@
+Revision history for IO::Tokenized
+
+
+0.01  Sat 08 Nov 2003 00:55 CET (a.d. VI Id. Nov. MMDCCLVI AUC)
+
+     - original version
+
+0.02  Mon 10 Nov 2003 00:59 CET (a.d. IV Id. Nov. MMDCCLVI AUC)
+
+     - Introduced the IO::Tokenized package
+     - changed name from IO::File::Tokenized to IO::Tokenized
+
+0.03  Mon 10 Nov 2003 13:40 CET  (a.d. IV Id. Nov. MMDCCLVI AUC)
+
+     - first CPAN version
+     - new methods:
+        * skip
+        * resynch
+        * flushbuffer
+        * buffer_space
+        * token_separator
+        * initialize_parsing
+     - made methods into exportable functions
+
+0.04 Tue 11 Nov 2003 11:26:30 CET  (a.d. III Id. Nov. MMDCCLVI AUC)
+
+     - modified the way tokens are returned from array ref to array
+     - extended and corrected documentation
+     - added this Changes file
+     - changed IO::Tokenized::File::new implementation

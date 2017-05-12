@@ -1,0 +1,58 @@
+2006-09-28	Brenden Conte  <conteb@cpan.org>
+	* 0.13 - Release
+	* Fixed bug where revoke() would cause an error if the revoked permissions resulted in a null permission set.
+	* Fixed a bug where valid quota responses with empty quota attributes would cause an error
+	* Fixed bugs with most commands when mailboxes that contain spaces are used.  All mailboxes are now quoted once before being sent to the server - submitting a quoted mailbox will not result in two sets of quotes
+	* Fixed documentation error in listing of valid tagless responses for the select/examine commands
+	* Changed return values for all list/sub command to return an arrayref instead of an array for failure return value reasons.  Arrays will still be returned with a DEPRECIATED: warning sent to stdout for backward compatibility.
+
+2006-09-25	Brenden Conte  <conteb@cpan.org>
+	* 0.12 - Release
+	* Added getannotatin/getannotation support with extensive POD.
+	* Added debug bit 0x04, debugging annotations
+	* Fixed disconnection detection in _imap_command()
+	* Created Fetch Response Tutorial documentation
+	* Updated some examples for proper syntax
+	* Fixed TLS to accept SSL-specific args
+
+2006-08-31  Brenden Conte  <conteb@cpan.org>
+	* 0.11 - Release
+	* Adjusted select, examine to not add quotes around mailbox if quotes already exist
+	* Optimized parse_fetch to work almost instantly (in program run-time terms) vs old code which ran into severe performance issues with large number of responses.
+	* Fixed bug in sequence-set checking - now allows for *s (either alone - meaning just the last message - or at the end of a sequence set, like 1:* - meaning all messages)
+	* Fixed bug in parse_fetch that caused problems with parsing more than one FETCH return per request
+	* Changed debuglevels to bitmasks (no code changes, only logical).  Added bit 2 for parse_fetch debugging.
+	* Fixed bug that accidentally interpreted email headers as response codes when the header name was in valid tag syntax and the value started with NO or BAD
+	* Added (unconditional) quotes around mailbox name for select, examine
+	* Fixed typo in example code
+	* Added newline to error output if onerror mode is set to 'ABORT'
+	* Minor testfile cleanup (for development)
+	* Added extensive iplanet testing
+	* Added callback for retrieving EXISTS, RECENT values that can appear almost anywhere 
+
+2006-05-31  Brenden Conte  <conteb@cpan.org>
+	* 0.10 - Release.  Jumped to .10 to signify important multi-server changes
+	* Removed the "_active_server" functionality.  Instead, all connections will require new object, and class variables will keep track of connections
+	* Fixed bug in parse_list_lsub for some servers that did not always quote mailbox names (Dalbec)
+	* Fixed bad testing values (tests were right, values were wrong) (Hull)
+	* Fixed errors in value setting for parsing fetch (Budic)
+	* Added parsesublist test with iplanet responses
+	* Added 'usertest' program with a more limited set of commands than admintest, but using multiple connections
+	
+2006-03-17  Brenden Conte  <conteb@cpan.org>
+    * Fixed versioning issue
+    * 0.03 - Release
+	* Fixed erronious 'paste' within comments
+
+2006-03-01  Brenden Conte  <conteb@cpan.org>
+	* Fixed a quota parsing issue
+	* Fixed empty search results undef warning
+	* Fixed empty envelope information leading to odd-numbered hash warning
+	* Fixed bodysize in body hash being undef if invalid body piece selected - now set to 0
+	* Added quota parsing testing in make
+	* Added search result parsing testing in make
+	* Added example "test" clients to source under testclients directory
+	* 0.02 - Release
+	
+2005-12-13  Brenden Conte  <conteb@cpan.org>
+	* 0.01 - Initial development release.

@@ -1,0 +1,21 @@
+use strict;
+my ($bin) = @ARGV;
+
+my $code = join '', <DATA>;
+eval "print qq{$code}";
+
+__END__
+#include <unistd.h>
+#include <errno.h>
+
+extern int errno;
+
+int main(int argc, char* argv[]) {
+  execl("$bin/perl", 
+	"$bin/perl",
+	"$bin/cpr.pl",
+	argv[argc - 1],
+	NULL);
+  printf("The CPR interpreter failed to exec $bin/perl\nThe system call 'execl' failed with error code %d\n", errno);
+  return errno;
+}

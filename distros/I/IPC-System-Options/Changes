@@ -1,0 +1,205 @@
+0.31    2017-04-09 (PERLANCAR)
+
+	- No functional changes.
+
+	- [Bugfix] Add missing sprintf placeholder.
+
+
+0.30    2017-03-09 (PERLANCAR)
+
+	- Add option: capture_merged.
+
+
+0.29    2016-10-11 (PERLANCAR)
+
+	- Add option: dry_run.
+
+	- Add some more docs and example for chdir option.
+
+
+0.28    2016-10-06 (PERLANCAR)
+
+        - [Enhancement] Add option: chdir.
+
+        - Die when supplied unknown options.
+
+        - [Bugfix] Avoid the use of defined-or (//) as this requires perl v5.10.
+
+        - [test] Add test suite.
+
+
+0.27    2016-06-08 (PERLANCAR)
+
+	- Rename backtick() to readpipe() to allow overriding the
+	  backtick/qx operator (the old name has been deprecated and
+	  removed from doc but still supported for now).
+
+
+0.26    2016-06-04 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Mention quoting of multiple arguments and proper quoting on
+	  Win32.
+
+
+0.25    2016-06-04 (PERLANCAR)
+
+        - When converting multiple arguments to string, shell quote the
+          arguments (e.g. backtick('foo', 'bar baz') or system({shell=>1},
+          'foo', 'bar baz') will become "foo 'bar baz'". But single argument
+          will not be shell-quoted, e.g. backtick('foo "bar baz"') will not be
+          shell-quoted again.
+
+        - Support Win32 shell quoting using Win32::ShellQuote.
+
+
+0.24    2016-01-02 (PERLANCAR)
+
+	- No functional changes.
+
+	- Avoid using Carp for faster startup.
+
+
+0.23    2015-09-29 (PERLANCAR)
+
+	- Add run(), first written for use in Test::Perinci::CmdLine because I
+          need something like IPC::System::Options' system() (with
+          capture_stdout, capture_stderr, env, etc) but also allows passing
+          stdin (which system() does not support).
+
+
+0.22    2015-09-12 (PERLANCAR)
+
+	- Bump prereq Log::Any::IfLOG to version 0.07 (uses get_logger())
+	  [RT#107051].
+
+
+0.21    2015-08-17 (PERLANCAR)
+
+	- No functional changes.
+
+	- Switch from Log::Any to Log::Any::IfLOG.
+
+
+0.20    2015-07-27 (PERLANCAR)
+
+	- [ux] On error, show captured stdout & stderr in log/die message.
+
+
+0.19    2015-07-27 (PERLANCAR)
+
+        - No functional changes.
+
+        - Re-upload to PAUSE.
+
+
+0.18    2015-07-27 (PERLANCAR)
+
+        - [Bugfix] Allow import() to be used by other package, e.g.
+          IPC::System::Locale, by exporting the correct system() and backtick().
+
+
+0.17    2015-07-03 (PERLANCAR)
+
+	- [Incompatible change] Replace 'capture' option with separate
+	  'capture_stdout' and 'capture_stderr' options to be more flexible
+	  (e.g. only capturing stdout and letting stderr show through).
+
+
+0.16    2015-06-26 (PERLANCAR)
+
+	- No functional changes.
+
+	- Third attempt, previous release didn't remove the usage of state
+          variable.
+
+
+0.15    2015-06-26 (PERLANCAR)
+
+	- No functional changes.
+
+	- Second attempt, previous release didn't remove 'perl=5.010001'.
+
+
+0.14    2015-06-26 (PERLANCAR)
+
+	- No functional changes.
+
+	- Allow running under perl < 5.10.
+
+
+0.13    2015-06-18 (PERLANCAR)
+
+	- [Bugfix] Forgot to rename an instance of variable.
+
+
+0.12    2015-06-18 (PERLANCAR)
+
+	- [Bugfix] Defeat prototype checking (which might be active or not,
+	  depending whether Capture::Tiny has previously been loaded during
+	  compile time).
+
+
+0.11    2015-06-18 (PERLANCAR)
+
+	- Add option: capture.
+
+
+0.10    2015-05-15 (PERLANCAR)
+
+	- [ux] Accept option dies as well as die, but this is not documented.
+
+
+0.09    2015-04-21 (PERLANCAR)
+
+	- Degrade Log::Any from RuntimeRequires to RuntimeRecommends, to
+	  reduce deps.
+
+
+0.08    2015-04-15 (PERLANCAR)
+
+        - Add option: env.
+
+
+0.07    2015-04-15 (PERLANCAR)
+
+	- When shell=>1, force the use of shell by concat-ing the args.
+
+
+0.06    2015-02-07 (PERLANCAR)
+
+	- Export import() so it's easier to use by my other IPC::System::*
+	  modules.
+
+
+0.05    2015-02-07 (PERLANCAR)
+
+	- Use log level error to log failure.
+
+	- Allow specifying default options during use.
+
+
+0.04    2015-02-07 (PERLANCAR)
+
+	- [ux] Use croak instead of die (nicer in default/non-backtracing
+	  environment).
+
+
+0.03    2015-01-12 (PERLANCAR)
+
+        - Add option: die=>1.
+
+        - Add options: log=>1, max_log_output=>1. This integrates the
+          functionality of Log::Any::For::Builtins. I now deprecate that module
+          in favor of this.
+
+
+0.02    2015-01-04 (PERLANCAR)
+
+	- Add backtick().
+
+
+0.01     2015-01-04 (PERLANCAR)
+
+         - First release.

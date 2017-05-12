@@ -1,0 +1,32 @@
+---
+abstract: 'Support for Inline-based CPAN Extension Modules'
+author:
+  - 'Ingy döt Net <ingy@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.06'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Inline-Module
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+    - example
+requires:
+  ExtUtils::CppGuess: '0'
+  File::Share: '0'
+  Inline: '0'
+  Inline::C: '0'
+  perl: v5.8.1
+resources:
+  bugtracker: https://github.com/ingydotnet/inline-module-pm/issues
+  homepage: https://github.com/ingydotnet/inline-module-pm
+  repository: https://github.com/ingydotnet/inline-module-pm.git
+version: '0.34'

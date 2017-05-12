@@ -1,0 +1,28 @@
+IO::Unread version 0.03
+=======================
+
+This module provides one function, unread(), which allows you to push
+more than one character back onto a filehandle.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+PerlIO (and a perl built with perlio support), Inline::C
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Ben Morrow <ben@morrow.me.uk>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

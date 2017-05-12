@@ -1,0 +1,11 @@
+^.git
+^README\.md$
+^MANIFEST\.
+^Makefile$
+~$
+\.old(?:\..*)?$
+\.swp$
+\.orig$
+^blib
+^devel
+^tags$

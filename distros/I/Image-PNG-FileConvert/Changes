@@ -1,0 +1,26 @@
+Revision history for perl module Image::PNG::FileConvert
+
+0.09 2017-01-05
+
+* Documentation
+* Catches more errors converting back to file
+
+0.08 2014-01-23
+
+* Fixes build problem
+
+0.07 2014-01-22
+
+* Change dependence to Image::PNG::Libpng
+
+0.06 2012-04-14
+
+0.05 2012-03-26
+
+0.04 2012-03-19
+
+0.03 2012-03-18
+
+0.02 2011-04-26
+
+0.01 2011-04-21

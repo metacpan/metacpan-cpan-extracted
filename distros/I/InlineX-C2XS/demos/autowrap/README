@@ -1,0 +1,27 @@
+MyMod.pm, MyMod.xs, INLINE.h and Makefile.PL were created by cd'ing to the directory that contains
+this README file and running:
+
+perl -MInlineX::C2XS -e "InlineX::C2XS::c2xs('MyMod', 'MyMod', '.', {AUTOWRAP => 1, VERSION => 0.01, WRITE_MAKEFILE_PL => 1, WRITE_PM => 1, EXPORT_OK_ALL => 1, EXPORT_TAGS_ALL => 'all'})"
+
+Probably a good idea to verify this procedure yourself - ie remove MyMod.pm, MyMod.xs,
+INLINE.h and Makefile.PL from this directory, cd to this directory and run the same one
+liner. (You'll need to interchange the double-quotes and single-quotes if you're running
+a nix type shell.)
+
+'README' (this file) and 't/test.t' were hand written - just to make the demo complete.
+To build MyMod just run:
+
+perl Makefile.PL
+make test
+
+You could even run 'make install' if you want - but I don't know why you would actually
+want to install this module.
+
+It's probably not often (if ever) that you'll actually want to specify "AUTOWRAP => 1"
+as in the above one liner. It's more likely that the C file you've placed in the ./src
+folder will contain one or more entire functions (instead of prototype(s) that can be
+autowrapped). In those "more likely" situations, the one liner that you'll be running
+will be essentially as above, but without the "AUTOWRAP => 1".
+
+The AUTOWRAP feature used in the above example works simply because 'erf' is defined
+in your C compiler's standard math library.

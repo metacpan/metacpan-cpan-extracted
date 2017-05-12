@@ -1,0 +1,47 @@
+{
+   "abstract" : "Easily store variables in SysV shared memory.",
+   "author" : [
+      "Kevin Cody-Little <kcodyjr@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "IPC-Shm",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Class::Attrib" : "1.06",
+            "Digest::SHA1" : "0",
+            "IPC::Shm::Simple" : "1.1",
+            "Scalar::Util" : "0",
+            "Storable" : "0",
+            "UNIVERSAL" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.35"
+}

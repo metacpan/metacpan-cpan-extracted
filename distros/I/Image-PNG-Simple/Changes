@@ -1,0 +1,20 @@
+Revision history for Perl extension Image::PNG::Simple.
+0.07 (2015-08-06) (beta release)
+  - fix document
+  - rename parse_bmp_file to read_bmp_file
+0.06 (2015-08-05) (beta release)
+  - add get_bmp_data method
+  - add get_png_data method
+  - rename read_bmp_data to parse_bmp_data
+0.05 (2015-08-04) (beta release)
+  - rename read_bmp to read_bmp_file
+  - rename write_bmp to write_bmp_file
+  - rename write_png to write_png_file
+0.04 (2015-08-04) (beta release)
+  - fix bug that MinGW 32bit don't work
+0.03 (2015-08-03) (beta release)
+  - fix bug that don't work in Perl 5.8
+0.02 (2015-08-01) (beta release)
+  - fix FreeBSD and Active Perl don't work bug.
+0.01 (2015-07-23) (beta release)
+  - first release

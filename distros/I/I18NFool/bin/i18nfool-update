@@ -1,0 +1,38 @@
+#!/bin/bash 
+
+i18n_fool_sync()
+{
+   dir=$1
+   echo "* $0 working on $dir"
+
+   # create LC_MESSSAGES directory when not found
+   if test ! -d $dir/LC_MESSAGES
+   then
+      mkdir $dir/LC_MESSAGES
+   fi
+
+   # foreach pot domain file, either create or update a po file
+   for domain_file in `ls -1 *.pot`
+   do
+      domain=`echo $domain_file | sed 's/.pot$//'`
+      if test -f "$dir/LC_MESSAGES/$domain.po"
+      then
+         echo -n "  - updating domain '$domain'"
+         msgmerge -U -N --force-po $dir/LC_MESSAGES/$domain.po $domain_file
+      else
+         echo -n "  - creating domain '$domain' "
+         msginit --no-translator -l "$dir.UTF-8" -i $domain_file -o $dir/LC_MESSAGES/$domain.po
+      fi
+   done
+}
+
+
+# browse each directory or the cwd
+for dir in `ls -1`
+do
+   if test -d $dir
+   then
+      i18n_fool_sync $dir
+   fi
+done
+

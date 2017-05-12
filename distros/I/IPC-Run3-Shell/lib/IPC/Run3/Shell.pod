@@ -1,0 +1,775 @@
+
+=head1 Name
+
+IPC::Run3::Shell - Perl extension for calling system commands
+as if they were Perl functions
+
+=head1 Synopsis
+
+ #!/usr/bin/env perl
+ use warnings;
+ use strict;
+ 
+ use IPC::Run3::Shell qw(echo cat ps cp);
+ 
+ my $foo = echo("howdy", "<funny>", "world");
+ print $foo;                              # prints "howdy <funny> world\n"
+ 
+ my @passwd = cat("/etc/passwd", {chomp=>1});
+ print "$_\n" for @passwd;                # prints lines of /etc/passwd
+ 
+ print ps -ww;                            # prints output of "ps -ww"
+ 
+ cp("/etc/passwd", "/tmp/passwd.orig");
+
+=for test
+ is $foo, "howdy <funny> world\n";
+ ok -f "/tmp/passwd.orig";
+
+=for test cut
+
+The above is adapted from Larry Wall's 1994 L<email about Shell|Shell/AUTHOR>.
+
+=head1 Reference / Cheat Sheet
+
+ use strict;
+ use warnings;             # any problems with system commands are warnings
+ use IPC::Run3::Shell;                        # nothing exported by default
+ use warnings FATAL=>"IPC::Run3::Shell";      # fatal warnings (optional)
+ 
+ # ### Basic Usage (Functional Interface)
+ use IPC::Run3::Shell qw/ echo cat /;    # these functions call system cmds
+ echo "Hello, World!";                   # void context: display output
+ my $groups = cat "/etc/group";          # scalar context: get all output
+ my @passwd = cat "/etc/passwd";         # list context: get output lines
+                   # Note: option "both" changes return values, see below
+ my $foo = echo ' "" \\ ; $HOME 1>&2 ';  # shell metachars are unaffected
+ 
+ # ### OO Interface - methods become system commands
+ my $sh = IPC::Run3::Shell->new( show_cmd=>1 );    # independent options
+ $sh->cp(-v, '/etc/passwd', '/tmp/passwd.copy');   # Perl note: -v eq "-v"
+ 
+ # ### Options
+   # set default options in "use", or per command as first/last arguments
+ use IPC::Run3::Shell { chomp=>1 }, qw/ ls /;      # chomp the return value
+ my @files = ls -lA, '/etc', {chomp=>0};           # override an option
+ my $motd = cat "/etc/motd", {allow_exit=>[0,1]};  # allowed exit codes
+ my @words = echo {irs=>"-"}, -n, "A-B-C-D";       # input record separator
+ my ($out,$err,$exitcode) = echo "Foo", {both=>1}; # return both STDOUT/ERR
+ my $out_and_err = echo "FooBar", {both=>1};       # STDOUT+STDERR merged
+ echo "Foo", "Bar", {fail_on_stderr=>1};           # fail on any STDERR
+ my $bla = echo {show_cmd=>1}, "blah", "blah";     # show cmd (debugging)
+   # IPC::Run3 options binmode_* and append_* are also supported
+ 
+ # ### I/O Redirection with Options stdin, stdout, and stderr
+ use IPC::Run3::Shell qw/ :run /;        # and a demo of the run() function
+ my ($i,$o,$e) = ("Hello,");
+ run '/usr/bin/perl', '-pe', 'warn "World!\n"',    # a tricky example
+     {stdin=>\$i, stdout=>\$o, stderr=>\$e};
+   # Note use of "stdout" option means return value will be the exit code
+ print "$o $e";                                    # prints "Hello, World!"
+ # ## A *simplified* reference for stdin/stdout/stderr options:
+   # undef = inherit filehandle        # \undef = /dev/null
+   # $filename = use that filename     # \*FILEHANDLE = use that filehandle
+   # \$scalarref = use that string     # \@arrayref = lines* to/from array
+   # \&coderef = called for each line*     ( * no newlines added to stdin )
+ 
+ # ### Aliasing
+ use IPC::Run3::Shell [ psw => {chomp=>1}, '/bin/ps', -ww ];
+ my @ps = psw;        # function psw() is now an alias for "/bin/ps -ww"
+
+=for test
+ note '$groups = ', explain $groups;
+ note '@passwd = ', explain \@passwd;
+ is $foo, ' "" \\ ; $HOME 1>&2 '."\n";
+ ok -f '/tmp/passwd.copy';
+ note '@files = ', explain \@files;
+ note '$motd = ', explain $motd;
+ is_deeply \@words, [qw/A- B- C- D/];
+ is $out, "Foo\n";
+ is $err, "";
+ is $exitcode, 0;
+ is $out_and_err, "FooBar\n";
+ is $bla, "blah blah\n";
+ is $o, "Hello,"; is $e, "World!\n";
+ is "$o $e", "Hello, World!\n";
+ note '@ps = ', explain \@ps;
+
+=for test cut
+
+=head1 Description
+
+This module's goal is to provide a relatively transparent interface to system commands
+from regular-looking Perl functions.
+It is built on the module L<IPC::Run3|IPC::Run3>
+and is heavily inspired by the module L<Shell|Shell>,
+but with several important differences and added features:
+
+=over
+
+=item *
+
+functions are only exported at the request of the user
+(no L<autoloading|perlsub/Autoloading> in the user's namespace)
+
+=item *
+
+system commands and their arguments are never* sent through the shell
+(so you don't have to worry about escaping shell metacharacters)
+
+=item *
+
+failures of the system commands are (optional) warnings, which can be made fatal
+(in the spirit of L<autodie|autodie> or L<bash|bash(1)>'s C<set -e>)
+
+=item *
+
+advanced capturing of C<STDIN>, C<STDOUT> and C<STDERR>
+
+=back
+
+I<< * this should hold true for all *NIX systems, and on Windows,
+L<IPC::Run3|IPC::Run3> versions 0.047 and up use L<Win32::ShellQuote|Win32::ShellQuote>
+so that you shouldn't have to worry about shell metacharacters there either. >>
+
+B<Read on for more information and examples!>
+
+=head2 Version
+
+This document describes version 0.54 of IPC::Run3::Shell.
+
+=head1 Security
+
+Calling system commands can be dangerous.
+This module does not provide any security checks.
+All of the usual warnings apply, see L<perlsec>!
+
+=head1 General
+
+This module provides Perl functions with the following basic pattern:
+The name of the function (or method, if you're using the L<OO interface|/OO Interface>)
+becomes the name of the system command that is executed when you call the function, and
+any arguments given to the Perl function become the arguments of the system command.
+Options may be given to the Perl function as a hashref, see L</Options> for details.
+The return value of the Perl function depends on a few things,
+this is described in L</Return Values>, but normally it'll be either
+the output of the system command or its exit code.
+If something goes wrong, an optional and optionally fatal warning is raised, see L</Warnings>.
+Additional features are described in the rest of this documentation, such as
+L</Additional Functions>.
+
+The command and its argument list are stringified and should only consist of
+plain scalars or objects that stringify, as well as L<option hashrefs|/Options>.
+Other references, objects, or C<undef>s will trigger a (optional/optionally
+fatal) L<warning|/Warnings>. Objects that use overloading but don't support
+stringification will cause a fatal error as they normally would.
+(Note that before v0.53, objects that stringified also triggered a warning,
+and references were passed through unchanged to L<IPC::Run3|IPC::Run3>
+instead of being stringified.
+C<undef>s have been stringified to C<""> since v0.51.)
+
+A note on terminology: This documentation uses the term "system command"
+to refer to external executables / programs / scripts;
+you may prefer to use a different term and that's okay C<;-)>
+
+=head2 Warnings
+
+This module ties into L<Perl's warnings system|perllexwarn> and provides
+a warnings category with the same name as the module.
+Several possible error conditions generate optional warnings,
+which can also be made fatal.
+
+Any "modern" Perl script should start with the following,
+which enables all warnings:
+
+ use warnings;
+ use strict;    # or "use v5.12;" or a newer version
+
+In addition, you can turn the warnings into fatal errors like this
+(see L<perllexwarn>):
+
+ # use the module, then make the module's warnings fatal
+ use IPC::Run3::Shell;
+ use warnings FATAL=>"IPC::Run3::Shell";
+
+=for test cut
+
+Note there are a few error conditions that are currently always fatal:
+incorrect arguments to C<use>, incompatible options, a completely empty command, and
+a failure of L<IPC::Run3|IPC::Run3>.
+(In the future, some of these may be reduced into warnings, if a useful default behavior exists.)
+
+(Hint: If you want to catch fatal errors, you can look into L<Try::Tiny|Try::Tiny> or a similar module.)
+
+=head1 Functional Interface
+
+ use IPC::Run3::Shell {show_cmd=>1},  # default options for the following
+     qw/ echo cat /,       # these Perl functions will call system commands
+     [ lsl => 'ls', '-l' ];     # alias function "lsl" to command "ls -l"
+ echo "Hello,", "World!";       # similar to system() (due to void context)
+ my @passwds = cat {chomp=>1}, "/etc/passwd";  # get output lines as list
+ my $filelist = lsl;            # get the full output of the command
+
+=for test
+ note '@passwds: ', explain \@passwds;
+ note '$filelist: ', explain \$filelist;
+
+=for test cut
+
+=head2 Arguments to C<use>
+
+This section describes the arguments after the module's name and optional module
+version, i.e. the "C<LIST>" part of Perl's L<C<use>|perlfunc/use> function.
+
+The functions you name in C<use> will be made available in your script,
+these Perl functions will be translated into the system commands of the same name
+following the usual pattern described in L</General>.
+
+Default options may be specified as one or more hashrefs at the I<beginning> of the list,
+see L</Options>.
+These default options apply only to the functions you specify in C<use>,
+including L</run>, and with the exception of L</make_cmd>.
+
+=head3 Aliasing
+
+Passing an arrayref to C<use> allows you to alias functions
+to commands, with a full path name of the executable,
+any number of arguments, as well as default options
+that only affect that command.
+The first item in the array must be the function name, followed
+by any default options, then the command name and any arguments.
+
+ use IPC::Run3::Shell [ 'e', {show_cmd=>1}, 'echo', '-n' ],
+     [ d => '/bin/date' ];
+ e d '+%Z';      # calls "/bin/date +%Z" and passes its output to "echo -n"
+
+=for test cut
+
+=head1 OO Interface
+
+ use IPC::Run3::Shell;                        # nothing exported by default
+ # the following default options apply to all commands called on the object
+ my $sh = IPC::Run3::Shell->new( show_cmd => 1 );
+ $sh->echo("Hello, World!");
+ my $x = $sh->echo({show_cmd=>0}, "Test!");   # overriding a default option
+
+=for test
+ is $x, "Test!\n";
+
+=for test cut
+
+The OO interface has the advantages that no functions need to be imported to
+your namespace at all, and that each object has its own independent set of options.
+
+When you make an object with C<new>, almost all of the methods you call on
+that object are translated into system commands following the usual pattern
+described in L</General>. Default options, which apply to all commands
+called via the object, may be given to C<new> as a plain hash (not a hashref).
+
+Methods are provided via Perl's L<autoloading|perlsub/Autoloading> feature.
+So, the only methods that will I<not> be available as system commands are the
+built-ins of the L<UNIVERSAL|UNIVERSAL> class, as well as "C<AUTOLOAD>" and "C<DESTROY>".
+So if you want to run a command named, for example, "L<C<can>|UNIVERSAL>",
+you can use L</run> to do that (note that L</run> is not available via the OO interface).
+
+(Note on internals: The objects will actually not be of type C<IPC::Run3::Shell>,
+they will be of type C<IPC::Run3::Shell::Autoload>, so they have a clean namespace.)
+
+=head1 Additional Functions
+
+=head2 C<run>
+
+ use IPC::Run3::Shell qw/ :run /;               # NOTE the colon
+ my $root = run "grep", "root", "/etc/passwd";  # run system command "grep"
+ # Perl's built-in "grep" function remains unaffected
+
+=for test
+ note '$root: ', explain \$root;
+
+=for test cut
+
+C<run> mostly works like the other functions provided by this module (see L</General>),
+with the difference that the name of the system command is the first argument to the function.
+This is useful, for example, if you don't want to override Perl built-in functions,
+or if you want to call a command with the full path.
+
+It can be accessed either by specifying C<:run> (note the colon!) to C<use>
+(in this case it is affected by default options, if you specified them),
+or by calling C<IPC::Run3::Shell::run()> directly
+(in this case it is not affected by default options,
+only by those that you give to C<IPC::Run3::Shell::run()> directly).
+
+=head2 C<make_cmd>
+
+ use IPC::Run3::Shell qw/ :make_cmd /;  # NOTE the colon
+ my $pl = make_cmd 'perl', '-le';    # $pl->(ARGS) will run "perl -le ARGS"
+ $pl->('print "Hello, World!"');
+
+=for test cut
+
+C<make_cmd> is an advanced function which gives you full customizability over
+the generated Perl function and the executed system command.
+(It is actually the central function of this module.)
+
+C<make_cmd> takes optional L<options|/Options> (hashref(s)),
+a command name (optionally with full pathname),
+optional command-line arguments, and returns a code ref
+which behaves as described in L</General> and L</Return Values> and,
+when called, executes the specified system command.
+Any additional arguments to the code ref become additional command-line arguments.
+The code ref may also be given additional L<options|/Options>.
+
+It can be accessed either by specifying C<:make_cmd> (note the colon!) to C<use>
+or by calling C<IPC::Run3::Shell::make_cmd()> directly.
+Note that C<make_cmd> and the functions it generates are only affected by the options
+passed directly to them, and never by default options given elsewhere (such as to C<use>).
+
+=head2 C<import_into>
+
+Lets you export functions from this module into any package of your choosing.
+The first argument is the package name,
+the rest are the L<usual arguments to import|/Arguments to use>.
+
+ use IPC::Run3::Shell;
+ IPC::Run3::Shell->import_into('Foo::Bar', 'echo');
+ {
+     package Foo::Bar;
+     echo("Hello, World");
+ }
+
+=for test cut
+
+The C<import_into> method was added in v0.52.
+
+=head1 Options
+
+Options can be set in several different places:
+
+=over
+
+=item *
+
+In the L<functional interface|/Functional Interface>, default options can be given
+to L<C<use>|/Arguments to use>, when L<making aliases|/Aliasing>,
+or to L</make_cmd>.
+They are always specified as one or more hashrefs as the first argument(s).
+In the case of C<use>, default options apply to all functions named in
+the C<use> statement (with the exception of L</make_cmd>).
+
+=item *
+
+In the L<OO interface|/OO Interface>, the default options are passed to the constructor,
+and they then apply to all commands called on that object.
+They are not affected by C<use>.
+Each object has its own independent set of default options.
+Note that the options to C<new> are not specified as a hashref but as a plain hash.
+
+=item *
+
+In any case, options can always be specified or overridden by passing one or more hashrefs
+as the first and/or last argument(s) to any individual command.
+
+=back
+
+Whenever multiple option sets are present, they are cumulative,
+with options specified later overriding the earlier ones.
+Note that there are a few options, such as L</stdout>, that cannot be un-set.
+Specifying unknown options triggers L<warnings|/Warnings>
+and is strongly discouraged for forwards compatibility.
+
+=head2 C<allow_exit>
+
+Either a single value or an arrayref of allowed exit values.
+Defaults to only zero (0).
+May also be set to the string "C<ANY>" to mean any exit code is allowed.
+If set to C<undef>, resets the option to its default value.
+Any other non-numeric values or an empty arrayref cause a L<warning|/Warnings>.
+This option does not make much sense unless you have L<warnings|/Warnings> enabled.
+
+=head2 C<irs>
+
+Sets a C<local $/>, see Perl's L<input record separator|perlvar/"$/">.
+Note that, like L</stdout>, C<< irs => undef >> has a meaning, so the mere
+presence of this option in the options hash means the option is set.
+
+=head2 C<chomp>
+
+Setting this boolean option causes the return value(s) of the function to be
+L<chomped|perlfunc/chomp>.
+This option has no effect if you're using the option L</stdout>.
+
+=head2 C<both>
+
+Setting this boolean option has a different effect depending on whether the
+function is called in list context or in scalar context - see also L</Return Values>.
+You cannot use this option together with L</stdout>, L</stderr> or L</fail_on_stderr>.
+
+In scalar context, the function returns the entire C<STDOUT> plus C<STDERR>
+of the executed command merged as one string. Note that the order of output on these two
+streams is not always well-defined; they may be mixed together.
+This is still useful if, for example, you know the command outputs on C<STDERR> I<only>
+and you want an easier way to capture it than the L</stderr> option.
+
+In list context, the function returns three values:
+the entire C<STDOUT> as one string, the entire C<STDERR> as one string,
+and the exit code of the command. This is somewhat similar to
+L<Capture::Tiny|Capture::Tiny>'s C<capture> used together with C<system>
+(except that returns C<$?> and not the exit code).
+
+ # call an external perl process for this example
+ use IPC::Run3::Shell {both=>1}, "perl";
+ my ($stdout, $stderr, $exitcode) =  perl {allow_exit=>123}, '-e',
+   ' print "Foo\n"; warn "Bar\n"; exit 123 ';
+ # $stdout gets "Foo\n", $stderr gets "Bar\n" and $exitcode==123
+
+=for test
+ is $stdout, "Foo\n";
+ is $stderr, "Bar\n";
+ is $exitcode, 123;
+
+=for test cut
+
+The C<both> option was added in v0.52.
+
+=head2 C<stdin>
+
+=head2 C<stdout>
+
+=head2 C<stderr>
+
+ use IPC::Run3::Shell {chomp=>1}, qw/ cat find /;
+ cat { stdin=>\"Hello, World!\n" };
+ # there will probably be some "permission denied" errors in /etc,
+ # so we're allowing for an exit value of 1 and are capturing stderr
+ my $rv = find { allow_exit=>[0,1] }, '/etc', '-name', 'passwd',
+     '-print0', { stdout=>\my @files, stderr=>\my $err, irs=>"\0" };
+ print "find exited with $rv\n";
+ print "Found files: ".join(', ',@files)."\n";
+ print "## Warnings ##\n$err##\n" if $err=~/\S/;
+
+=for test cut
+
+These options give you powerful redirection of C<STDIN>, C<STDOUT> and C<STDERR>
+of the executed command.
+The possible values are the same as in L<IPC::Run3|IPC::Run3>;
+the following is a brief summary of the possible values:
+
+=over
+
+=item C<undef>
+
+inherit the filehandle from parent
+
+=item C<\undef>
+
+F<\dev\null> (or equivalent)
+
+=item scalar
+
+a filename
+
+=item filehandle
+
+use that filehandle
+
+=item scalar reference
+
+read/write from/into that scalar (string)
+
+=item array reference
+
+read/write from/into that array, splitting output (not input) "lines" on C<$/>
+
+=item code reference
+
+For C<stdin>, the sub is called repeatedly and its return values are fed to the
+process until the sub returns C<undef>.
+For C<stdout> and C<stderr>, the sub is called with each "line" of output
+(split on C<$/> as usual).
+
+=back
+
+Note that if you specify the option C<stdout>, the function will always return the exit
+code of the command, and not its output - see L</Return Values>.
+C<stdin> and C<stderr> do not have this effect.
+
+Since setting an option like C<< stdout => undef >> has a meaning,
+the I<mere presence> of any of the hash keys
+C<stdout> or C<stderr> in the options hash will be interpreted as the
+respective option being set.
+This also means that these options cannot be un-set by overriding them.
+So normally, you'll want to set these in the per-command options only,
+and not in the default options.
+
+B<Note> this module does not make any guarantees about the capabilities
+of L<IPC::Run3|IPC::Run3> to redirect streams!
+For example, at this time of writing, L<IPC::Run3|IPC::Run3> does not support
+swapping of C<STDOUT> and C<STDERR>. Also, you will get unexpected results if
+you attempt to redirect C<STDOUT> to C<STDERR> and capture C<STDERR> at the
+same time. (It is at the moment possible to redirect C<STDOUT> to C<STDERR>
+or vice versa if you don't touch the other.)
+If L<IPC::Run3|IPC::Run3>'s behavior changes in the future, that behavior will
+simply be passed through by this module.
+
+You can't use the C<stderr> option together with L</fail_on_stderr>.
+You can't use C<stdout> or C<stderr> together with L</both>.
+
+=head2 C<fail_on_stderr>
+
+If this boolean option is set,
+any output to C<STDERR> (except for a single C<$/>) is considered a fatal error.
+This option may not be specified together with L</stderr> or L</both>
+(this is currently a fatal error).
+Note that turning this option on means that C<STDERR> is always captured
+and not displayed.
+
+=head2 C<show_cmd>
+
+Setting this option to a true value causes the command which is about to be
+executed to be printed to C<STDERR>. You may also specify a filehandle /
+glob reference here to
+have the command printed there (e.g. C<< show_cmd => \*STDOUT >>).
+
+This is meant for debugging and/or user information I<only>,
+as the output may not be safely escaped, so don't try to parse this output!
+
+=head2 Options from L<IPC::Run3|IPC::Run3>
+
+The following options may be specified and they will be passed through to
+L<IPC::Run3|IPC::Run3>.
+
+=over
+
+=item *
+
+C<binmode_stdin>
+
+=item *
+
+C<binmode_stdout>
+
+=item *
+
+C<binmode_stderr>
+
+=item *
+
+C<append_stdout>
+
+=item *
+
+C<append_stderr>
+
+=item *
+
+C<return_if_system_error>
+
+(Note this module turns this option on by default.
+It's recommended not to turn it off or you may get unexpected results
+in case of errors.)
+
+=back
+
+=head1 Return Values
+
+In the following table, "C<OUT>" and "C<ERR>" refer to the C<STDOUT> and
+C<STDERR> of the executed command.
+The options L</both>, L</stdout> and L</stderr> are described in their
+respective sections.
+
+=for test ignore
+
+           |    Void Context    |   Scalar Context   |    List Context    |
+ ==========+====================+====================+====================+
+  system() |                    | return undef       | return empty list  |
+  fails    | also generates optional warning that can be made fatal[1]    |
+ ----------+--------------------+--------------------+--------------------+
+  Bad exit |                    | output as below, but may be incomplete  |
+  code[2]  | also generates optional warning that can be made fatal[1]    |
+ ==========+====================+====================+====================+
+  Default  | OUT and ERR are    | OUT is returned    | OUT is returned as |
+           | not redirected,    | as one big string  | a list of lines[4] |
+           | they are passed    |    ERR not redirected by default[3]     |
+ ==========+ thru to script's   +====================+====================+
+  Option   | STDOUT and STDERR  | return merged OUT  | return a list of   |
+  "both"   |                    | and ERR            | (OUT,ERR,exitcode) |
+ ==========+====================+====================+====================+
+  Option   | OUT is redirected as requested (ERR handled separately)      |
+  "stdout" | Function always returns the exit code                        |
+ ==========+==============================================================+
+  Option   | ERR is redirected as requested (OUT handled separately)      |
+  "stderr" |                                                              |
+ ==========+==============================================================+
+
+=for test
+
+You should always be able to inspect the exit code of the system command in
+Perl's L<C<$?>|perlvar/"$?"> variable.
+See the documentation of L<Perl's C<system()>|perlfunc/system> for an example of how to interpret C<$?>.
+
+[1] This is described in L</Warnings>.
+
+[2] If you're I<expecting> a nonzero return code from a system command,
+see the option L</allow_exit>.
+Currently, a command being terminated due to a signal will generate a
+(optional/optionally fatal) L<warning|/Warnings> and
+there is no equivalent of L</allow_exit> for signals.
+
+[3] C<STDERR> can be handled via the options L</stderr> or L</fail_on_stderr>.
+
+[4] More exactly, the command's C<STDOUT> output is split on the L<input record separator C<$E<sol>>|perlvar/"$/">.
+Since that's the line separator by default, you'll I<normally> get a list of the lines of the output,
+unless you change C<$/>, which you can also do via the option L</irs>.
+
+=head1 Portability
+
+This module strives to be as portable as L<IPC::Run3|IPC::Run3>.
+Before reporting bugs concerning portability, please first test if maybe
+it's a bug in L<IPC::Run3|IPC::Run3>.
+
+The tests for this module require that you have the C<perl> executable in your C<PATH>.
+
+If you notice any other portability issues, please let me know!
+
+Of course, scripts I<using> this module to call system commands will often
+not be portable, but that's simply the nature of scripts that call system commands.
+
+=head1 Caveats
+
+A few things to be aware of:
+
+As described in L</Return Values>,
+the functions provided by this module act differently depending on the
+context they are called in (void, scalar and list) and some of the options
+(e.g. L</stdout> and L</both>). While this is an attempt
+to provide a DWIM (Do What I Mean) interface, the difference in behavior might
+be subtle and lead to a bit of confusion.
+
+Some functions are package methods, while others are not, i.e. don't
+mix up C<::> and C<< -> >>. Examples:
+C<< IPC::Run3::Shell->new() >>, C<< IPC::Run3::Shell->import() >>,
+C<< IPC::Run3::Shell->import_into() >>,
+C<IPC::Run3::Shell::run()>, C<IPC::Run3::Shell::make_cmd()>.
+(For the latter two, it's probably easier to use C<use IPC::Run3::Shell qw/:run :make_cmd/;>.)
+
+If you plan on subclassing this module, note that the OO interface doesn't follow
+traditional Perl OO design patterns
+(e.g. C<new> isn't actually part of the package of the object).
+
+=head1 Advanced Hints
+
+=head2 Prototypes
+
+Even though they're usually discouraged and often rightly so, there are
+still a few rare cases when L<prototypes|perlsub/Prototypes> are useful.
+One way to give the Perl functions prototypes is with
+L<Scalar::Util|Scalar::Util>'s C<set_prototype>:
+
+ # a silly example for demonstration purposes only :-)
+ use IPC::Run3::Shell [ xuc => 'perl', '-e', 'print uc "@ARGV"', '--' ];
+ use Scalar::Util qw/set_prototype/;
+ BEGIN { set_prototype \&xuc, '$'; }     # make xuc() a unary operator
+ # normally xuc() would take all the arguments, now it only takes one
+ my $foo = join ",", xuc "a", "b", "c";
+ print $foo;                             # prints "A,b,c"
+
+=for test
+ is $foo, "A,b,c";
+
+=for test cut
+
+=head2 Importing at Run-Time
+
+If you know the internals of Perl's L<C<use>|perlfunc/use>,
+you know that you can import functions at run-time too, as follows.
+For a description of the arguments of C<import> please see L</Arguments to use>.
+
+ use IPC::Run3::Shell;
+ IPC::Run3::Shell->import('echo');
+ echo("foo");                       # NOTE parentheses are required here
+
+=for test cut
+
+If you like playing with globs, you could install the code refs
+created by L</make_cmd> into your namespace manually. For example:
+
+ BEGIN {              # not required, could do this at run-time
+     require IPC::Run3::Shell;
+     *foo = IPC::Run3::Shell::make_cmd('echo','foo');
+ }
+ foo "bar";           # calls "echo foo bar"
+
+=for test cut
+
+Also, note the L</import_into> function for more powerful exporting.
+
+=head2 Calling the Shell
+
+B<Warning:> Make sure you understand the safety implications of this hint before you use it!
+
+If you really want to invoke the shell and have your commands subject to its
+various interpolations and such, with all the possible safety implications
+(such as attackers injecting arbitrary commands into your shell!),
+you could do something like this:
+
+ use IPC::Run3::Shell [sh => 'sh', '-c'];
+ sh 'echo $HOME >&2';     # prints _the_shell's_ $HOME to _its_ STDERR
+
+=for test cut
+
+=head2 Autoloading
+
+B<Warning:> Make sure you understand the safety implications of this hint before you use it!
+
+If you really, really wanted to have L<Shell|Shell>'s
+L<autoloading|perlsub/Autoloading> behavior back,
+with all the possible safety implications
+(such as any typos leading to the execution of system commands!),
+you could do this:
+
+ BEGIN {
+     require IPC::Run3::Shell;
+     *AUTOLOAD = \&IPC::Run3::Shell::Autoload::AUTOLOAD;
+ }
+ echo("foo","bar");   # calls "echo foo bar" via autoloaded "echo"
+
+=for test cut
+
+=head1 See Also
+
+Larry Wall and others wrote the original L<Shell|Shell> in 1994,
+with various contributions throughout the years.
+L<Shell|Shell> is Copyright (c) 2005 by the Perl 5 Porters.
+
+L<IPC::Run3> - I chose this module from the plethora of similar modules
+for several reasons: it handles all three C<STDOUT>, C<STDERR> and C<STDIN>;
+it runs on Win32; it allows avoiding the shell;
+no non-core dependencies (except on Windows);
+and its test statistics are currently nearly perfect.
+While it doesn't support a few features that some of the more advanced modules do,
+like timeouts or interactively communicating with the subprocess,
+I hope it'll be enough for the majority of cases.
+
+L<Shell::Tools|Shell::Tools> - reduce boilerplate in Perl shell scripts,
+also includes easy access to this module!
+
+L<Capture::Tiny> - yet another capturing module.
+Its documentation includes a list of lots more such modules.
+
+L<Env|Env> - tie environment variables to Perl variables, similar in spirit
+to this module
+
+=head1 Author, Copyright, and License
+
+Copyright (c) 2014 Hauke Daempfling (haukex@zero-g.net).
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl 5 itself.
+
+For more information see the L<Perl Artistic License|perlartistic>,
+which should have been distributed with your copy of Perl.
+Try the command "C<perldoc perlartistic>" or see
+L<http://perldoc.perl.org/perlartistic.html>.
+
+=cut
+

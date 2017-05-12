@@ -1,0 +1,173 @@
+CHANGES
+-------
+
+  2.074 19 Feb 2017
+
+      * Fix bad 2.073 release
+
+  2.073 18 Feb 2017
+
+     * #120239: [PATCH] ISA fixes for c3
+
+  2.072 4 Feb 2017
+
+      * Makefile.PL
+        #120084: Need Fix for Makefile.PL depending on . in @INC
+
+  2.070 28 Dec 2016
+
+      * No Changes
+
+  2.069 26 Sep 2015
+
+      * No Changes
+
+  2.068 23 Dec 2014
+
+      * No Changes
+
+  2.067 8 Dec 2014
+
+      * No Changes
+
+  2.066 21 Sept 2014
+
+      * No Changes
+
+  2.064 1 February 2014
+
+      * No Changes
+
+  2.062 11 August 2013
+
+      * typo fixes
+        RT #86578
+
+  2.061 19 May 2013
+
+      * IO::Uncompress::UnXz v2.060 memLimit option bug
+        RT #84966
+
+  2.060 7 January 2013
+
+      * No Changes
+
+  2.059 10 December 2012
+
+      * No Changes
+
+  2.058 12 November 2012
+
+      * No Changes
+
+  2.057 10 November 2012
+
+      * General Performance improvements.
+
+  2.055 5 August 2012
+
+      * No Changes
+
+  2.052 29 April 2012
+
+      * No Changes
+
+  2.049 18 February 2012
+
+      * No Changes
+
+  2.048 29 January 2012
+
+      * No Changes
+
+  2.047 28 January 2012
+
+      * Set minimum Perl version to 5.6
+
+  2.045 3 December 2011
+
+      * Moved FAQ.pod to IO::Compress
+
+  2.044 2 December 2011
+
+      * Moved FAQ.pod under the lib directory so it can get installed
+
+  2.043 20 November 2011
+
+      * No Changes
+
+  2.042 17 November 2011
+
+      * No Changes
+
+  2.041 29 October 2011
+
+      * t/001lzma.t
+        - Remove debugging line that writes to /tmp
+          RT #72023
+
+  2.040 28 October 2011
+
+      * No Changes
+
+  2.039 28 October 2011
+
+      * IO::Unompress::UnLzma
+        - Fixed uncompression issue
+          RT #71114
+
+  2.038 23 June 2011
+
+      * Fixed missing SKIP label in t/050interop-zip-lzma.t
+
+  2.037 20 June 2011
+
+      * Handle "Cannot Allocate Memory" issue with Extreme test in 
+        t/105oneshot-zip-lzma-only.t
+
+  2.036 18 June 2011
+
+      * IO::Compress::Adapter
+        Added interface to allow creation of LZMA stream for use in a 
+        zip file
+
+      * IO::Unxompress::Adapter
+        Added interface to allow reading of LZMA stream in a 
+        zip file
+
+  2.035 6 May 2011
+
+      * RT #67931: Test failure on Windows
+
+  2.034 2 May 2011
+
+      * Updates to test harness
+
+  2.033 11 Jan 2011
+
+      * Made 001xz.t more forgiving when the tests run out of memory.
+
+  2.030 22 July 2010
+
+      * No Changes
+
+  2.027 24 April 2010
+
+      * No Changes
+
+  2.026 7 April 2010
+
+      * No Changes
+
+  2.025 27 March 2010
+
+      * No Changes
+
+  2.024 7 January 2010
+
+      * Documentation updates.
+
+  2.023 9 November 2009
+
+      * First public beta
+

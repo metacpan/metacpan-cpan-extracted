@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+
+<schema name="example" version="1.5">
+	<types>
+		<fieldType name="string" class="solr.StrField" sortMissingLast="true"/>
+        <fieldType name="boolean" class="solr.BoolField" />
+		<fieldType name="tdate" class="solr.TrieDateField" precisionStep="6" positionIncrementGap="0"/>
+		<fieldType name="int" class="solr.TrieIntField" precisionStep="0" positionIncrementGap="0"/>
+		<fieldType name="float" class="solr.TrieFloatField" precisionStep="0" positionIncrementGap="0"/>
+        <fieldType name="verbatim" class="solr.StrField" positionIncrementGap="100"/>
+		<fieldType name="text" class="solr.TextField" positionIncrementGap="100">
+			<analyzer type="index">
+				<tokenizer class="solr.StandardTokenizerFactory"/>
+				<filter class="solr.StopFilterFactory" ignoreCase="true" words="stopwords.txt" />
+				<!-- in this example, we will only use synonyms at query time
+				<filter class="solr.SynonymFilterFactory" synonyms="index_synonyms.txt" ignoreCase="true" expand="false"/>
+				-->
+				<filter class="solr.LowerCaseFilterFactory"/>
+			  </analyzer>
+			  <analyzer type="query">
+				<tokenizer class="solr.StandardTokenizerFactory"/>
+				<filter class="solr.StopFilterFactory" ignoreCase="true" words="stopwords.txt" />
+				<filter class="solr.SynonymFilterFactory" synonyms="synonyms.txt" ignoreCase="true" expand="true"/>
+				<filter class="solr.LowerCaseFilterFactory"/>
+			  </analyzer>
+		</fieldType>
+		<fieldType name="string_like" class="solr.TextField" sortMissingLast="true">
+			<analyzer type="index">
+				<tokenizer class="solr.KeywordTokenizerFactory"/>
+				<filter class="solr.LowerCaseFilterFactory" />
+				<filter class="solr.PatternReplaceFilterFactory" pattern="(\s+)" replacement="" replace="all" />
+				<filter class="solr.ReversedWildcardFilterFactory" />
+			</analyzer>
+			<analyzer type="query">
+				<tokenizer class="solr.KeywordTokenizerFactory"/>
+				<filter class="solr.LowerCaseFilterFactory" />
+				<filter class="solr.PatternReplaceFilterFactory" pattern="(\s+)" replacement="" replace="all" />
+			</analyzer>
+		</fieldType>
+		<fieldType name="date" class="solr.TrieDateField" sortMissingLast="true" omitNorms="true"/>
+		<fieldType name="long" class="solr.TrieLongField" precisionStep="0" positionIncrementGap="0"/>
+	</types>
+
+	<fields>
+		<field name="sku" type="string" indexed="true" stored="true" />
+		<field name="title" type="text" indexed="true" stored="true" />
+		<field name="category" multiValued="true" type="string" indexed="true" stored="true" />
+        <field name="manufacturer" type="verbatim" indexed="true" stored="true" />
+        <field name="suchbegriffe" type="verbatim" indexed="true" stored="true" />
+		<field name="description" type="text" indexed="true" stored="true" />
+        <field name="comment" type="text" indexed="true" stored="true" />
+        <!-- variant attributes -->
+        <field name="size"   multiValued="true" type="string" indexed="true" stored="true" />
+        <field name="color"  multiValued="true" type="string" indexed="true" stored="true" />
+        <field name="inactive" type="boolean" indexed="true" stored="true" />
+        <field name="created_date" type="date" indexed="true" stored="true" />
+        <field name="updated_date" type="date" indexed="true" stored="true" />
+		<field name="_version_" type="long" indexed="true" stored="true" /> 
+	 </fields>
+
+	<uniqueKey>sku</uniqueKey>
+
+	<defaultSearchField>title</defaultSearchField>
+</schema>

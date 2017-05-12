@@ -1,0 +1,10 @@
+IPC::Fork::Simple Functional Tests
+
+Currently IPC::Fork::Simple lacks unit tests but has a suite of functional
+tests. These functional tests spawn (multiple) processes and have the
+potential to hang (block forever on read) if there is a bug, so they are not
+suitable to be run as part of "make test".
+
+It is suggested the user run these tests by hand whenever they encounter a
+potential bug in IPC::Fork::Simple or whenever working directly on the module.
+Enhancements in the form of more functional or unit tests are always welcome.

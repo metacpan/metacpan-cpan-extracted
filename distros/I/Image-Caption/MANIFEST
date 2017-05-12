@@ -1,0 +1,14 @@
+Caption.pm
+Caption.xs
+Changes
+MANIFEST
+Makefile.PL
+test.pl
+font-bdf.c
+font-bdf.h
+ppm-lite.c
+ppm-lite.h
+config.h
+ncenB24.bdf
+image.rgb
+builtin.h

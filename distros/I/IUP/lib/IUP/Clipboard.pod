@@ -1,0 +1,118 @@
+=for comment based on iup-3.5 - http://www.tecgraf.puc-rio.br/iup/en/elem/iupclipboard.html
+
+=head1 NAME
+
+IUP::Clipboard - [special] allows access to the clipboard
+
+=head1 DESCRIPTION 
+
+Creates an element that allows access to the clipboard. Each clipboard
+should be destroyed using L<Destroy|IUP::Manual::02_Elements/"Destroy()"> method, but
+you can use only one for entire application because it does not store
+any data inside. Or you can simply create and destroy everytime you
+need to copy or paste.
+
+Example - copy to clipboard:
+
+ $text = IUP::Text->new();
+ #...
+ $clipboard = IUP::Clipboard->new();
+ $clipboard->TEXT( $text->VALUE );
+ $clipboard->Destroy();
+ ###XXX-todo-not-tested
+
+Example - paste from clipboard:
+
+ $text = IUP::Text->new();
+ #...
+ $clipboard = IUP::Clipboard->new();
+ $text->VALUE( $clipboard->TEXT );
+ $clipboard->Destroy();
+ ###XXX-todo-not-tested
+
+=head1 USAGE
+
+=head2 CREATION - new() method
+
+ $clipboard = IUP::Clipboard->new();
+
+B<Returns:> the identifier of the created element, or C<undef> if an error occurs.
+
+NOTE: You can pass to C<new()> other C<ATTRIBUTE=E<gt>'value'> or C<CALLBACKNAME=E<gt>\&func> pairs relevant
+to this element - see L<IUP::Manual::02_Elements|IUP::Manual::02_Elements/"new()">.
+
+=head2 ATTRIBUTES
+
+For more info about concept of attributes (setting/getting values etc.)
+see L<IUP::Manual::03_Attributes|IUP::Manual::03_Attributes>. Attributes specific to this element:
+
+=over
+
+=item B<EMFAVAILABLE>
+
+I<(read-only) [Windows Only]> informs if there is a
+Windows Enhanced Metafile available at the clipboard. (Since iup-3.2)
+
+=item B<IMAGE>
+
+I<(write-only)> name of an image to copy (set) or paste (get),
+to or from the clipboard. (GTK 2.6)
+
+=item B<IMAGEAVAILABLE>
+
+I<(read-only)> informs if there is an image available at the clipboard. (GTK 2.6)
+
+=item B<NATIVEIMAGE>
+
+Native handle of an image to copy or paste, to or from the clipboard.
+
+B<BEWARE:> technically it is a pointer, be carefull when using from perl.
+
+In Win32 is a B<HANDLE> of a DIB. 
+
+In GTK is a B<GdkPixbuf*>. 
+
+In Motif is a B<Pixmap>. 
+
+The returned handle in a paste must be released after used (GlobalFree(handle), g_object_unref(pixbuf)
+or XFreePixmap(display, pixmap)). After copy, do NOT release the given
+handle. See IUP-IM Functions for utility functions on image native handles. (GTK 2.6)
+
+=item B<SAVEEMF>
+
+I<(write-only) [Windows Only]> saves the EMF from the
+clipboard to the given filename. (Since iup-3.2)
+
+=item B<SAVEWMF>
+
+I<(write-only) [Windows Only]> saves the WMF from the
+clipboard to the given filename. (Since iup-3.2)
+
+=item B<TEXT>
+
+copy or paste text to or from the clipboard.
+
+=item B<TEXTAVAILABLE>
+
+I<(read-only)> informs if there is a text available at the clipboard.
+
+=item B<WMFAVAILABLE>
+
+I<(read-only) [Windows Only]> informs if there is a
+Windows Metafile available at the clipboard. (Since iup-3.2)
+
+=back
+
+=head1 EXAMPLES
+
+
+Unfortunately there are no sample scripts using this element.
+
+
+
+=head1 SEE ALSO
+
+The original doc: L<iupclipboard.html|http://www.tecgraf.puc-rio.br/iup/en/elem/iupclipboard.html>
+ 
+
+=cut

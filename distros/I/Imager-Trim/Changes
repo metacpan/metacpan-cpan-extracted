@@ -1,0 +1,22 @@
+Changelog for Imager::Trim
+
+0.007     2016-08-24 15:19:09+03:00 Europe/Helsinki
+  * Pass trim_top, trim_left, trim_right and trim_bottom as unblessed properties to outputting Imager object
+
+0.006     2016-08-18 14:42:38+03:00 Europe/Helsinki
+  * Remove duplicate AUTHOR and COPYRIGHT AND LICENSE topics
+
+0.005     2016-08-18 10:44:40+03:00 Europe/Helsinki
+  * Fix documentation
+
+0.004     2016-08-18 10:07:13+03:00 Europe/Helsinki
+  * Minor changes
+
+0.003     2016-08-19 09:59:45+03:00 Europe/Helsinki
+  * Minor changes
+
+0.002     2016-08-19 09:58:12+03:00 Europe/Helsinki
+  * Minor changes
+
+0.001     2016-08-18 15:28:31+03:00 Europe/Helsinki
+  * Initial release

@@ -1,0 +1,2396 @@
+=for comment based on iup-3.2 - http://www.tecgraf.puc-rio.br/iup/en/elem/iupcanvas.html
+
+=head1 NAME
+
+IUP::Canvas - [GUI element] 2D canvas with many drawing and text functions
+
+=head1 DESCRIPTION
+
+Creates an interface element that is a canvas - a working area for your
+application.
+
+=begin HTML
+
+<p>
+  <table border="1">
+    <col style="background-color: rgb(239, 235, 231);">
+    <col style="background-color: rgb(173, 177, 194);">
+    <tbody align="center">
+      <tr>
+        <th style="text-align: center;">GTK</th>
+        <th style="text-align: center;">Motif</th>
+      </tr>
+      <tr>
+        <td><img src="http://kmx.github.io/perl-iup/img-3.9/elem/iupcanvas_gtk.png"></td>
+        <td><img src="http://kmx.github.io/perl-iup/img-3.9/elem/iupcanvas_mot.png"></td>
+      </tr>
+    </tbody>
+  </table>
+  <table border="1">
+    <col style="background-color: rgb(212, 208, 200);">
+    <col style="background-color: rgb(236, 233, 216);">
+    <tbody align="center">
+      <tr>
+        <th style="text-align: center;">Windows Classic</th>
+        <th style="text-align: center;">Windows XP Style</th>
+      </tr>
+      <tr>
+        <td><img src="http://kmx.github.io/perl-iup/img-3.9/elem/iupcanvas_win2k.png"></td>
+        <td><img src="http://kmx.github.io/perl-iup/img-3.9/elem/iupcanvas_winxp.png"></td>
+      </tr>
+    </tbody>
+  </table>
+</p>
+
+=end HTML
+
+=head1 USAGE
+
+=head2 CREATION - new() method
+
+ my $canvas = IUP::Canvas->new( BORDER=>"YES", BGCOLOR=>"220 0 0" );
+
+B<Returns:> the identifier of the created element, or C<undef> if an error occurs.
+
+NOTE: You can pass to C<new()> other C<ATTRIBUTE=E<gt>'value'> or C<CALLBACKNAME=E<gt>\&func> pairs relevant
+to this element - see L<IUP::Manual::02_Elements|IUP::Manual::02_Elements/"new()">.
+
+=head2 ATTRIBUTES
+
+For more info about concept of attributes (setting/getting values etc.)
+see L<IUP::Manual::03_Attributes|IUP::Manual::03_Attributes>. Attributes specific to this element:
+
+=over
+
+=item B<BACKINGSTORE>
+
+I<[Motif Only]>
+
+Controls the canvas backing store flag.
+The default value is "YES".
+
+=item L<BGCOLOR|IUP::Manual::03_Attributes/BGCOLOR>
+
+Background color. The background
+is painted only if the ACTION callback is not defined. If the callback
+is defined the application must draw all the canvas contents. In GTK or
+Motif if you set the ACTION callback after map then you should also set
+BGCOLOR to any value just after setting the callback or the first
+redraw will be lost. Default: "255 255 255".
+
+=item B<BORDER>
+
+I<(creation only)>
+
+Shows a border around the canvas. Default:
+"YES".
+
+=item B<CANFOCUS>
+
+I<(creation only, non inheritable)>
+
+enables the focus
+traversal of the control. In Windows the canvas will respect CANFOCUS
+in opposite to the other controls. Default: YES. 
+
+=item B<CLIPRECT>
+
+I<[Windows and GTK Only] (only during ACTION)>
+
+Specifies a
+rectangle that has its region invalidated for painting, it could be
+used for clipping. Format: "%d %d %d %d"="x1 y1 x2 y2".
+
+=item L<CURSOR|IUP::Manual::03_Attributes/CURSOR>
+
+I<(non inheritable)>
+
+Defines a cursor
+for the canvas.
+
+=item L<EXPAND|IUP::Manual::03_Attributes/EXPAND>
+
+I<(non inheritable)>
+
+The default
+value is "YES". The natural size is the size of 1 character.
+
+=item B<DRAGDROP>
+
+I<[Windows and GTK Only] (non inheritable)>
+
+Enable or disable
+the drag&drop of files. Default: NO, but if DROPFILES_CB is defined
+when the element is mapped then it will be automatically enabled.
+
+=item B<DRAWSIZE>
+
+I<(non inheritable)>
+
+The size of the drawing area in pixels.
+This size is also used in the RESIZE_CB callback.
+
+Notice that the drawing area size is not the same as RASTERSIZE. The
+SCROLLBAR and BORDER attributes affect the size of the drawing area.
+
+=item B<HDC_WMPAINT>
+
+I<[Windows Only] (non inheritable)>
+
+Contains the HDC
+created with the BeginPaint inside the WM_PAINT message. Valid only
+during the ACTION callback.
+
+=item B<HWND>
+
+I<[Windows Only] (non inheritable, read-only)>
+
+Returns the
+Windows Window handle. Available in the Windows driver or in the GTK
+driver in Windows.
+
+=item L<SCROLLBAR|IUP::Manual::03_Attributes/SCROLLBAR>
+
+I<(creation only)>
+
+Associates a
+horizontal and/or vertical scrollbar to the canvas. Default: "NO". The
+secondary attributes are all non inheritable.
+
+=item L<DX|IUP::Manual::03_Attributes/DX>
+
+Size of the thumb in the horizontal
+scrollbar. Also the horizontal page size. Default: "0.1".
+
+=item L<DY|IUP::Manual::03_Attributes/DY>
+
+Size of the thumb in the vertical
+scrollbar. Also the vertical page size. Default: "0.1".
+
+=item L<POSX|IUP::Manual::03_Attributes/POSX>
+
+Position of the thumb in the
+horizontal scrollbar. Default: "0.0".
+
+=item L<POSY|IUP::Manual::03_Attributes/POSY>
+
+Position of the thumb in the vertical
+scrollbar. Default: "0.0".
+
+=item L<XMIN|IUP::Manual::03_Attributes/XMIN>
+
+Minimum value of the horizontal
+scrollbar. Default: "0.0".
+
+=item L<XMAX|IUP::Manual::03_Attributes/XMAX>
+
+Maximum value of the horizontal
+scrollbar. Default: "1.0".
+
+=item L<YMIN|IUP::Manual::03_Attributes/YMIN>
+
+Minimum value of the vertical
+scrollbar. Default: "0.0".
+
+=item L<YMAX|IUP::Manual::03_Attributes/YMAX>
+
+Maximum value of the vertical
+scrollbar. Default: "1.0".
+
+=item B<LINEX>
+
+The amount the thumb moves when an horizontal step is
+performed. Default: 1/10th of DX. 
+
+=item B<LINEY>
+
+The amount the thumb moves when a vertical step is performed.
+Default: 1/10th of DY. 
+
+=item X<XAUTOHIDE>B<XAUTOHIDE>
+
+When enabled, if DX E<gt>= XMAX-XMIN then the
+horizontal scrollbar is hidden. Default: "YES". 
+
+=item X<YAUTOHIDE>B<YAUTOHIDE>
+
+When enabled, if DY E<gt>= YMAX-YMIN then the
+vertical scrollbar is hidden. Default: "YES". 
+
+=item B<TOUCH>
+
+I<[Windows 7 Only]>
+
+enable the multi-touch events processing.
+(Since iup-3.3)
+
+=item B<XDISPLAY>
+
+I<[UNIX Only](non inheritable, read-only)>
+
+Returns the
+X-Windows Display. Available in the Motif driver or in the GTK driver
+in UNIX.
+
+=item B<XWINDOW>
+
+I<[UNIX Only](non inheritable, read-only)>
+
+Returns the
+X-Windows Window (Drawable). Available in the Motif driver or in the
+GTK driver in UNIX.
+
+=back
+
+The following L<common attributes|IUP::Manual::03_Attributes/Common Attributes> are also accepted:
+
+=over
+
+=item * L<ACTIVE|IUP::Manual::03_Attributes/ACTIVE>,
+L<FONT|IUP::Manual::03_Attributes/FONT>,
+L<SCREENPOSITION|IUP::Manual::03_Attributes/SCREENPOSITION>,
+L<POSITION|IUP::Manual::03_Attributes/POSITION>,
+L<MINSIZE|IUP::Manual::03_Attributes/MINSIZE>,
+L<MAXSIZE|IUP::Manual::03_Attributes/MAXSIZE>,
+L<WID|IUP::Manual::03_Attributes/WID>,
+L<TIP|IUP::Manual::03_Attributes/TIP>,
+L<SIZE|IUP::Manual::03_Attributes/SIZE>,
+L<RASTERSIZE|IUP::Manual::03_Attributes/RASTERSIZE>,
+L<ZORDER|IUP::Manual::03_Attributes/ZORDER>,
+L<VISIBLE|IUP::Manual::03_Attributes/VISIBLE>
+
+=back
+
+=head2 CALLBACKS
+
+For more info about concept of callbacks (setting callback handlers etc.)
+see L<IUP::Manual::04_Callbacks|IUP::Manual::04_Callbacks>. Callbacks specific to this element:
+
+=over
+
+=item L<ACTION|IUP::Manual::04_Callbacks/ACTION>
+
+Action generated when the canvas
+needs to be redrawn.
+
+B<Callback handler prototype:>
+
+ sub action_handler {
+   my ($self, $posx, $posy) = @_;
+   #...
+ }
+
+B<$self:> identifier of the element that activated the event.
+
+B<$posx:> thumb position in the horizontal scrollbar. The POSX attribute value.
+
+B<$posy:> thumb position in the vertical scrollbar. The POSY attribute value.
+
+=item L<BUTTON_CB|IUP::Manual::04_Callbacks/BUTTON_CB>
+
+Action generated when any mouse button is pressed or released.
+
+=item L<DROPFILES_CB|IUP::Manual::04_Callbacks/DROPFILES_CB>
+
+I<[Windows and GTK Only]>
+
+Action generated when one or more files are dropped in the element.
+
+=item B<FOCUS_CB>
+
+Called when the canvas gets or looses the focus. It is
+called after the common callbacks GETFOCUS_CB and KILL_FOCUS_CB.
+
+  sub focus_cb_handler {
+   my ($self, $focus) = @_;
+   #...
+ }
+
+B<$self:> identifier of the element that activated the event.
+
+B<$focus:> is non zero if the canvas is getting the focus, is zero if it
+is loosing the focus.
+
+=item L<MOTION_CB|IUP::Manual::04_Callbacks/MOTION_CB>
+
+Action generated when the mouse is moved.
+
+=item L<KEYPRESS_CB|IUP::Manual::04_Callbacks/KEYPRESS_CB>
+
+Action generated when a
+key is pressed or released. It is called after the common callback
+K_ANY.
+
+When the canvas has the focus, pressing the arrow keys may change the
+focus to another control in some systems. If your callback process the
+arrow keys, we recommend you to return IUP_IGNORE so it will not lose
+its focus.
+
+=item L<RESIZE_CB|IUP::Manual::04_Callbacks/RESIZE_CB>
+
+Action generated when the canvas size is changed.
+
+=item L<SCROLL_CB|IUP::Manual::04_Callbacks/SCROLL_CB>
+
+Called when the scrollbar is
+manipulated. (GTK 2.8) Also the POSX and POSY values will not be
+correctly updated for older GTK versions.
+
+=item B<TOUCH_CB>
+
+I<[Windows 7 Only]>
+
+Action generated when a touch event
+occurred. Multiple touch events will trigger several calls. Must set
+TOUCH=Yes to receive this event. (Since iup-3.3)
+
+B<Callback handler prototype:>
+
+ sub touch_cb_handler {
+   my ($self, $id, $x, $y, $state) = @_;
+   #...
+ }
+
+B<$self:> identifies the element that activated the event.
+
+B<$id:> identifies the touch point.
+
+B<$x, $y:> position in pixels, relative to the top-left corner of the canvas.
+
+B<$state:> the touch point state. Can be: DOWN, MOVE or UP. If the point
+is a "primary" point then "-PRIMARY" is appended to the string.
+
+B<Returns:> IUP_CLOSE will be processed.
+
+=item B<MULTITOUCH_CB>
+
+I<[Windows 7 Only]>
+
+Action generated when multiple touch
+events occurred. Must set TOUCH=Yes to receive this event. (Since iup-3.3)
+
+B<Callback handler prototype:>
+
+ sub multitouch_cb_handler {
+   my ($self, $count, $pid, $px, $py, $pstate) = @_;
+   #...
+ }
+ #ZZZ-test-this
+
+B<$self:> identifier of the element that activated the event.
+
+B<$count:> Number of touch points in the array (should correspond to the sizes of $pid, $px, $py, $pstate).
+
+B<$pid:> Reference to array of touch point ids.
+
+B<$px:> Reference to array of touch point x coordinates in pixels, relative to the top-left corner of the canvas.
+
+B<$py:> Reference to array of touch point y coordinates in pixels, relative to the top-left corner of the canvas.
+
+B<$pstate:> Reference to array of touch point states. Can be 'D' (DOWN), 'U' (UP) or 'M' (MOVE).
+
+B<Returns:> IUP_CLOSE will be processed.
+
+=item L<WHEEL_CB|IUP::Manual::04_Callbacks/WHEEL_CB>
+
+Action generated when the mouse wheel is rotated.
+
+=item L<WOM_CB|IUP::Manual::04_Callbacks/WOM_CB>
+
+I<[Windows Only]>
+
+Action generated when an audio device receives an event.
+
+=back
+
+The following L<common callbacks|IUP::Manual::04_Callbacks/Common Callbacks> are also accepted:
+
+=over
+
+=item * L<MAP_CB|IUP::Manual::04_Callbacks/MAP_CB>,
+L<UNMAP_CB|IUP::Manual::04_Callbacks/UNMAP_CB>,
+L<GETFOCUS_CB|IUP::Manual::04_Callbacks/GETFOCUS_CB>,
+L<KILLFOCUS_CB|IUP::Manual::04_Callbacks/KILLFOCUS_CB>,
+L<ENTERWINDOW_CB|IUP::Manual::04_Callbacks/ENTERWINDOW_CB>,
+L<LEAVEWINDOW_CB|IUP::Manual::04_Callbacks/LEAVEWINDOW_CB>,
+L<K_ANY|IUP::Manual::04_Callbacks/K_ANY>,
+L<HELP_CB|IUP::Manual::04_Callbacks/HELP_CB>
+
+=back
+
+NOTES:
+
+=over
+
+=item * Some keys might remove the focus from the canvas. To avoid
+this, return IGNORE in the L<K_ANY|IUP::Manual::04_Callbacks/K_ANY> callback.
+
+=item * The mouse cursor position can be programmatically controlled using the
+global attribute L<CURSORPOS|IUP::Manual::03_Attributes/CURSORPOS>.
+
+=back
+
+=head2 Canvas Related Constants
+
+ use IUP::Constants ':cd';
+
+See more info about import L<tag cd:|IUP::Constants/"Tag :cd"> in L<IUP::Constants>.
+
+=head2 Methods - Basic Canvas Control
+
+=head3 cdClear()
+
+ $canvas->cdClear();
+
+Cleans the active canvas using the current background color. This
+action is interpreted very differently by each driver. Many drivers
+simply draw a rectangle with the current background color. It is NOT
+necessary to call cdClear when the canvas has just been created, as at
+this moment it is already clean. Most file-based drivers do not
+implement this function.
+
+=head3 cdFlush()
+     
+ $canvas->cdFlush();
+
+Has a different meaning for each driver. It is useful to send
+information to buffered devices and to move to a new page or layer. In
+all cases, the current canvas attributes are preserved.
+
+=head3 cdSaveState()
+     
+ $state = $canvas->cdSaveState();
+ #NOTE: $state is a reference to 'internal-state' object
+
+Saves the state of attributes of the active canvas. It does not save
+cdPlay callbacks, polygon creation states (begin/vertex/vertex/...),
+the palette, complex clipping regions and driver internal attributes.
+
+=head3 cdRestoreState()
+
+ $state = $canvas1->cdSaveState();
+ #NOTE: $state param has to be a reference to 'internal-state'
+ $canvas2->cdRestoreState($state);
+ 
+Restores the attribute state of the active canvas. It can be used
+between canvases of different contexts. It can be used several times
+for the same state.
+
+=head3 cdReleaseState()
+ 
+ $state = $canvas->cdSaveState();
+ #NOTE: $state param has to be a reference to 'internal-state'
+ IUP:Canvas->cdReleaseState($state);
+
+Releases the memory allocated by the L<cdSaveState|/"cdSaveState()"> function. If this
+function is not called in Lua, the garbage collector will call it.
+
+=head3 cdSetAttribute()
+     
+ $canvas->cdSetAttribute($name, $data);
+ #or
+ $canvas->cdSetAttribute( $name1=>$data1, $name2=>$data2, $name3=>$data3 );
+
+Modifies a custom attribute directly in the driver of the active
+canvas. If the driver does not have this attribute, the call is
+ignored.
+
+=head3 cdGetAttribute()
+    
+ $data = $canvas->cdGetAttribute($name);
+ #or
+ @data = $canvas->cdGetAttribute(@names);
+
+Returns a custom attribute from the driver of the active canvas. If the
+driver does not have this attribute, it returns C<undef>.
+
+=head3 cdForeground()
+
+ $color = IUP::Canvas->cdEncodeColor($r, $g, $b);
+ 
+ $old_color = $canvas->cdForeground($color);
+ #or just
+ $canvas->cdSetForeground($color);
+
+Configures a new current foreground color and returns the previous one.
+This color is used in all primitives (lines, areas, marks and text).
+Default value: B<CD_BLACK>. Value B<CD_QUERY> simply returns the
+current value.
+
+Notice that B<CD_QUERY> conflicts with color RGBA=(255,255,255,0) (full
+transparent white). Use L<cdSetForeground|/"cdSetForeground()"> to avoid the conflict. See
+also L<Color Coding|color.html>.
+
+=head3 cdBackground()
+ 
+ $old_color = $canvas->cdBackground($color);
+ $canvas->cdSetBackground($color);
+
+Configures the new current background color and returns the previous
+one. However, it does not automatically change the background of a
+canvas. For such, it is necessary to call the L<cdClear|/"cdClear()"> function. The
+background color only makes sense for L<cdClear|/"cdClear()"> and for primitives
+affected by the background opacity attribute. Default value:
+B<CD_WHITE>. Value B<CD_QUERY> simply returns the current value.
+
+Notice that CD_QUERY conflicts with color RGBA=(255,255,255,0) (full
+transparent white). Use L<cdSetBackground|/"cdSetBackground()"> to avoid the conflict. See
+also L<Color Coding|color.html>.
+
+=head3 cdWriteMode()
+
+ $old_mode = $canvas->cdWriteMode($mode);
+
+Defines the writing type for all drawing primitives. Values:
+B<C<CD_REPLACE>>, B<C<CD_XOR>> or B<C<CD_NOT_XOR>>. Returns the
+previous value. Default value: B<C<CD_REPLACE>>. Value C<B<CD_QUERY> >
+simply returns the current value.
+
+Note: operation XOR is very useful, because, using white as the
+foreground color and drawing the same image twice, you can go back to
+the original color, before the drawing. This is commonly used for mouse
+selection feedback.
+ 
+=head2 Methods - Color Coding
+
+The library's color system is RGB. In order to simplify some functions,
+a compact representation was created for the 3 values. To make a
+conversion from this representation to the 3 separate values and
+vice-versa, use functions B<cdDecodeColor> and B<cdEncodeColor>.
+
+When the canvas used does not support more than 8 bpp of color
+resolution, you can use function B<Palette> to give the driver an idea
+of which colors to prioritize. B<Palette's> behavior is driver
+dependent.
+
+There are some predefined colors - see L<IUP::Constants>:
+
+ CD_RED          = (255,  0,  0)
+ CD_DARK_RED     = (128,  0,  0)
+ CD_GREEN        = (0  ,255,  0)
+ CD_DARK_GREEN   = (  0,128,  0)
+ CD_BLUE         = (  0,  0,255)
+ CD_DARK_BLUE    = (  0,  0,128)
+ CD_YELLOW       = (255,255,  0)
+ CD_DARK_YELLOW  = (128,128,  0)
+ CD_MAGENTA      = (255,  0,255)
+ CD_DARK_MAGENTA = (128,  0,128)
+ CD_CYAN         = (  0,255,255)
+ CD_DARK_CYAN    = (  0,128,128)
+ CD_WHITE        = (255,255,255)
+ CD_BLACK        = (  0,  0 , 0)
+ CD_DARK_GRAY    = (128,128,128)
+ CD_GRAY         = (192,192,192)
+
+=head3 cdEncodeColor()
+ 
+ $color = $canvas->cdEncodeColor($r, $g, $b);
+ #or
+ $color = IUP::Canvas->cdEncodeColor($r, $g, $b);
+
+Returns a codified triple (I<r,g,b>) in a long integer such as
+B<0x00RRGGBB>, where B<RR> are the red components, B<GG> are
+the green ones and B<BB> are the blue ones. The code is used in the
+CD library to define colors. It can be used without an active canvas.
+
+=head3 cdDecodeColor()
+
+ ($r, $g, $b) = $canvas->cdDecodeColor($color);
+ #or
+ ($r, $g, $b) = IUP::Canvas->cdDecodeColor($color);
+ 
+Returns the red, green and blue components of a color in the CD
+library. Can be used without an active canvas.
+
+=head3 cdEncodeAlpha()
+ 
+ $color = $canvas->cdEncodeAlpha($color, $alpha);
+ #or
+ $color = IUP::Canvas->cdEncodeAlpha($color, $alpha);
+
+Returns the given color coded with the alpha information. 
+
+B<ATENTION:> At the moment only the B<Cairo>, B<GDI+>, B<XRender> and L<IMAGERGB> (= L<IUP::Canvas::FileBitmap>) 
+drivers support alpha components in color
+coding. The internal representation of the component is inverted,
+because the default value must be 0 and opaque for backward
+compatibility, so you should use the L<cdDecodeAlpha|/"cdDecodeAlpha()"> function or the
+L<cdAlpha|/"cdAlpha()"> macro to retrieve the alpha component. 0 is transparent, 255 is opaque.
+
+=head3 cdDecodeAlpha()
+ 
+ $alpha = $canvas->cdDecodeAlpha($color);
+ #or
+ $alpha = IUP->Canvas->cdDecodeAlpha($color);
+
+Returns the alpha component of a color in the CD library. Can be used
+without an active canvas. 0 is transparent, 255 is opaque.
+
+=head3 cdAlpha()
+ 
+ $alpha = $canvas->cdAlpha($color);
+ #or
+ $alpha = IUP::Canvas->cdAlpha($color);
+
+Macro that returns the alpha component of a color in the CD library.
+Can be used without an active canvas.
+
+=head3 cdRed()
+ 
+ $red = $canvas->cdRed($color);
+ #or
+ $red = IUP::Canvas->cdRed($color);
+
+Macro that returns the red component of a color in the CD library. Can
+be used without an active canvas.
+
+=head3 cdGreen()
+ 
+ $green = $canvas->cdGreen($color);
+ #or
+ $green = IUP::Canvas->cdGreen($color);
+
+Macro that returns the green component of a color in the CD library.
+Can be used without an active canvas.
+
+=head3 cdBlue()
+ 
+ $blue = $canvas->cdBlue($color);
+ #or
+ $blue = IUP::Canvas->cdBlue($color);
+
+Macro that returns the blue component of a color in the CD library. Can
+be used without an active canvas.
+
+=head3 cdGetColorPlanes()
+ 
+ $bpp = $canvas->cdGetColorPlanes();
+
+Returns a given number, for instance I<p>, which defines the number of
+colors supported by the current device as I<2p>, representing the
+number of bits by pixel.
+
+=head3 cdPalette()
+ 
+ $palette = IUP::Canvas::Palette->new( [$col0, $col1, $col2, ...] );
+ $canvas->cdPalette($palette, $mode);
+
+In systems limited to 256 palette colors, this function aims at adding
+colors to the system's palette. In such systems, the colors
+demanded forward or backward which are not in the palette are
+approximated to the closest available color. The type can be
+B<CD_FORCE> or B<CD_POLITE>. B<CD_FORCE> ignores the system
+colors and interface elements, since the menus and dialogues may be in
+illegible colors, but there will be more colors available.
+C<B<CD_POLITE>> is the recommended type. It must always be used before
+drawing. It cannot be queried. See also L<IUP::Canvas::Palette>.
+
+=head3 cdCreatePalette()
+
+ $palete = $canvas=>cdCreatePalette($size);
+ #or
+ $palete = IUP::Canvas=>cdCreatePalette($size);
+
+Creates a palette. See also L<IUP::Canvas::Palette>.
+
+=head3 cdKillPalette()
+
+ $canvas->cdKillPalette($palette);
+ #or
+ IUP::Canvas->cdKillPalette($palette);
+
+Destroys the created palette and liberates allocated memory.
+
+=head3 Palette Data Access
+
+Data access in Lua is done directly using the array access operators.
+The colors can have their values checked or changed directly as if they
+were Lua tables:
+
+ $palette->[$index] = IUP::Canvas->cdEncodeColor($r, $g, $b);
+ #...
+ $color = $palette->[$index];
+ ($r, $g, $b) = IUP::Canvas->cdDecodeColor($color);
+
+Notice that the type of value returned or received by palette[index] is
+a lightuserdata, the same type used with functions L<cdEncodeColor|/"cdEncodeColor()">,
+L<cdDecodeColor|/"cdDecodeColor()">, L<cdPixel|/"cdPixel()">, L<cdForeground|/"cdForeground()"> and L<cdBackground|/"cdBackground()">.
+
+=head2 Methods - Coordinate System
+
+=head3 cdGetSize()
+ 
+ ($width, $height, $mm_width, $mm_height) = $canvas->cdGetSize();
+
+Returns the canvas size in pixels and in millimeters. You can provide
+only the desired values and C<undef> for the others.
+
+=head3 cdYAxisMode()
+ 
+ $old_invert = $canvas->cdYAxisMode($invert);
+
+Controls the orientation of the Y axis. Internally in some drivers the
+native axis orientation is top-bottom, so the CD primitives must invert
+the Y axis since the CD orientation is bottom-top. Using CD_QUERY will
+return the current Y axis mode, if needs to be invert or not. Using 1
+or 0 you can control if the Y axis should be inverted or not
+independent from the native orientation, with that you can in fact
+invert the orientation of the CD primitives.
+
+=head3 cdInvertYAxis()
+
+ $yr = $canvas->cdInvertYAxis($yc);
+
+=head3 cdUpdateYAxis()
+ 
+ $yr = $canvas->cdUpdateYAxis($yc);
+
+Converts the coordinate system of the CD library into the internal
+system of the active canvas driver, and the other way round, if they
+are invert, or else do nothing. This is just "y = height-1 - y". It
+returns the changed value. The "Invert" will always invert the given
+value, the "Update" function will invert only if the canvas has the Y
+axis inverted.
+
+=head3 cdMM2Pixel()
+ 
+ ($dx, $dy) = $canvas->cdMM2Pixel($mm_dx, $mm_dy);
+ ($dx, $dy) = $canvas->cdfMM2Pixel($mm_dx, $mm_dy);
+
+Converts sizes in millimeters into pixels (canvas coordinates). You can
+provide only the desired values and C<undef> for the others.
+
+=head3 cdPixel2MM()
+ 
+ ($mm_dx, $mm_dy) = $canvas->cdPixel2MM($dx, $dy);
+ ($mm_dx, $mm_dy) = $canvas->cdfPixel2MM($dx, $dy);
+
+Converts sizes in pixels (canvas coordinates) into millimeters. You can
+provide only the desired values and C<undef> for the others. Use this
+function to obtain the horizontal and vertical resolution of the canvas
+by passing 1 as parameter in dx and dy. The resolution value is
+obtained using the formula B<res=1.0/mm>.
+
+=head3 cdOrigin()
+ 
+ $canvas->cdOrigin($x, $y);
+ $canvas->cdfOrigin($x, $y);
+
+Allows translating the origin - for instance, to the center of the
+canvas. The function profits from the architecture of the library to
+simulate a translation of the origin, which in fact is never actually
+passed to the canvas in the respective driver. It is not related with
+WD nor Transformation Matrix. Default values: (0, 0)
+
+=head3 cdGetOrigin()
+ 
+ ($x, $y) = $canvas->cdGetOrigin();
+ ($x, $y) = $canvas->cdfGetOrigin();
+
+Returns the origin.
+
+=head3 cdTransform()
+ 
+ $canvas->cdTransform($matrix);
+
+Defines a transformation matrix with 6 elements. If the matrix is C<undef>,
+the transformation is reset to the identity. Default value: C<undef>.
+
+The matrix contains scale, rotation and translation elements as
+follows:
+
+ |x'|   |sx*cos(angle)    -sin(angle)  dx|   |x|                       | $matrix->[0]  $matrix->[2]  $matrix->[4] | 
+ |y'| = |   sin(angle)  sy*cos(angle)  dy| * |y|         with indices  | $matrix->[1]  $matrix->[3]  $matrix->[5] |
+                                             |1|
+
+But notice that the indices are different of the L<cdVectorTextTransform|/"cdVectorTextTransform">.
+
+Functions that retrieve images from the canvas are not affected by the
+transformation matrix, such as L<GetImage|/"GetImage()"> and L<ScrollArea|/"ScrollArea()">.
+
+Transformation matrix is independent of the B<World Coordinate> and
+B<Origin> functions. And those are affected if a transformation is set,
+just like other regular primitives.
+
+=head3 cdGetTransform()
+ 
+ $matrix = $canvas->cdGetTransform();
+
+Returns the transformation matrix. If the identity is set, returns C<undef>.
+
+=head3 cdTransformMultiply()
+ 
+ $canvas->cdTransformMultiply($matrix);
+
+Left multiply the current transformation by the given transformation.
+
+=head3 cdTransformTranslate()
+ 
+ $canvas->cdTransformTranslate($dx, $dy);
+
+Applies a translation to the current transformation.
+
+=head3 cdTransformScale()
+ 
+ $canvas->cdTransformScale($sx, $sy);
+
+Applies a scale to the current transformation.
+
+=head3 cdTransformRotate()
+ 
+ $canvas->cdTransformRotate($angle);
+
+Applies a rotation to the current transformation. Angle is in degrees,
+oriented counter-clockwise from the horizontal axis.
+
+=head3 cdTransformPoint()
+ 
+ ($tx, $ty) = $canvas->cdTransformPoint($x, $y);  #returns integers
+ ($tx, $ty) = $canvas->cdfTransformPoint($x, $y); #returns real numbers
+
+Applies a transformation to a given point.
+
+=head2 Methods - World Coordinates
+
+Allows the use of a World Coordinate System. In this system you can
+attribute coordinates to any unit you want. After you define a window
+(rectangular region) in your world, each given coordinate is then
+mapped to canvas coordinates to draw the primitives. You can define a
+viewport in your canvas to change the coordinate mapping from world to
+canvas. The image below shows the relation between Window and Viewport.
+
+Window x Viewport
+
+=for html <p><img src="http://kmx.github.io/perl-iup/imgcd-5.4.1/wc-dc.gif"></p>
+
+If you want to map coordinates from one system to another, use the
+B<wdWorld2Canvas> e B<wdCanvas2World> functions.
+
+The quality of the picture depends on the conversion from World to
+Canvas, so if the canvas has a small size the picture quality will be
+poor. To increase picture quality create a canvas with a larger size,
+if possible.
+
+All World Coordinate drawing in all drivers are simulated using other
+CD primitives and do NOT depend or use the L<cdTransform|/"cdTransform()">
+transformation matrix.
+
+IUP::Canvas funcrions use the following naming convention:
+
+ $canvas->cdMethodName       vs.   $canvas->wdMethodName
+ # canvas coordinates              # world coordinates
+ # params integers (pixels)        # params real numbers (milimeters)
+
+=head3 wdWindow()
+     
+ $canvas->wdWindow($xmin, $xmax, $ymin, $ymax);
+
+Configures a window in the world coordinate system to be used to
+convert world coordinates (with values in real numbers) into canvas
+coordinates (with values in integers). The default window is the size
+in millimeters of the whole canvas.
+
+=head3 wdGetWindow
+ 
+ ($xmin, $xmax, $ymin, $ymax) = $canvas->wdGetWindow();
+
+Queries the current window in the world coordinate system being used to
+convert world coordinates into canvas coordinates (and the other way
+round). It is not necessary to provide all return pointers, you can
+provide only the desired values.
+
+=head3 wdViewport
+ 
+ $canvas->wdViewport($xmin, $xmax, $ymin, $ymax);
+
+Configures a viewport in the canvas coordinate system to be used to
+convert world coordinates (with values in real numbers) into canvas
+coordinates (with values in integers). The default viewport is the
+whole canvas (0,w-1,0,h-1). If the canvas size is changed, the viewport
+will not be automatically updated.
+
+=head3 wdGetViewport()
+ 
+ ($xmin, $xmax, $ymin, $ymax) = $canvas->wdGetViewport();
+
+Queries the current viewport in the world coordinate system being used
+to convert world coordinates into canvas coordinates (and the other way
+round). It is not necessary to provide all return pointers, you can
+provide only the desired values and C<undef> for the others.
+
+=head3 wdWorld2Canvas()
+ 
+ ($xv, $yv) = $canvas->wdWorld2Canvas($xw, $yw);
+
+Converts world coordinates into canvas coordinates. It is not necessary
+to provide all return pointers, you can provide only the desired values
+and C<undef> for the others.
+
+=head3 wdCanvas2World()
+ 
+ ($xw, $yw) = $canvas->wdCanvas2World($xv, $yv);
+
+Converts canvas coordinates into world coordinates. It is not necessary
+to provide all return pointers, you can provide only the desired values
+and C<undef> for the others.
+
+=head3 wdSetTransform()
+     
+ $canvas->wdSetTransform($sx, $sy, $tx, $ty);
+
+Configures the world coordinate system transformation to be used to
+convert world coordinates (with values in real numbers) into canvas
+coordinates (with values in integers). The transformation is
+automatically set by B<wdCanvasWindow> and B<wdCanvasViewport>. This
+has NO relation with L<cdTransform|/"cdTransform()">.
+
+=head3 wdGetTransform()
+ 
+ ($sx, $sy, $tx, $ty) = $canvas->wdGetTransform();
+
+Queries the current transformation being used to convert world
+coordinates into canvas coordinates (and the other way round). It is
+not necessary to provide all return pointers, you can provide only the
+desired values.
+
+=head3 wdTranslate()
+     
+ $canvas->wdTranslate($dtx, $dty);
+
+Translates the transformation by a delta, by adding the given values to
+the current tx and ty values.
+
+=head3 wdScale()
+     
+ $canvas->wdScale($dsx, $dsy);
+
+Scales the transformation by a delta, by multiplying the given values
+by the current sx and sy values.
+
+=head3 wdCanvasHardcopy() #NOT-IMPLEMENTED
+
+ $canvas->wdCanvasHardcopy($ctx, $data, $draw_func);
+
+Creates a new canvas, prepares Window and Viewport according to the
+provided canvas, maintaining the aspect ratio and making the drawing
+occupy the largest possible area of the new canvas, calls the drawing
+function (which must use routines in WC) and, finally, removes the new
+canvas.
+
+It is usually used for "hard copies" of drawings (print equivalent
+copy). The most common used contexts are Printer, PS and PDF.
+
+=head2 Methods - Primitives / Marks
+
+A mark is a punctual representation. It can have different sizes and
+types. All types are affected only by mark attributes and by the
+foreground color.
+
+All marks in all drivers are simulated using other CD primitives,
+except L<cdPixel|/"cdPixel()">.
+
+=head3 cdPixel()
+
+ $canvas->cdPixel($x, $y, $color);
+ $canvas->wdPixel($x, $y, $color);
+
+Configures the pixel B<(x,y)> with the color defined by B<color>. It is
+the smallest element of the canvas. It depends only on global
+attributes of the canvas. It can be very slow on some drivers.
+Sometimes it is implemented as a rectangle with size 1x1.
+
+=head3 cdMark()
+
+ $canvas->cdMark($x, $y);
+ $canvas->wdMark($x, $y);
+
+Draws a mark in B<(x,y)> using the current foreground color. It is
+not possible to use this function between a call to functions
+L<cdBegin|/"cdBegin()"> and L<cdEnd|/"cdEnd()"> if the type of mark is set to
+B<CD_DIAMOND>. If the active driver does not include this primitive, it
+will be simulated using other primitives from the library, such as
+L<cdLine|/"cdLine()">.
+
+If you will call this function several times in a sequence, then it is
+recommended that the application changes the filling and line
+attributes to those used by this function:
+
+ $canvas->cdInteriorStyle(CD_SOLID);
+ $canvas->cdLineStyle(CD_CONTINUOUS);
+ $canvas->cdLineWidth(1);
+
+This will greatly increase this function's performance. Also in this
+case, if the mark is very small, we suggest using the L<cdPixel|/"cdPixel()">
+function so that the application itself draws the mark. In many cases,
+this also increases this function's performance.
+
+=head3 cdMarkType()
+
+ $canvas->cdMarkType($type);
+
+Configures the current mark type for: B<CD_PLUS>, B<CD_STAR>,
+B<CD_CIRCLE>, B<CD_X>, B<CD_BOX>, B<CD_DIAMOND>, B<CD_HOLLOW_CIRCLE>,
+B<CD_HOLLOW_BOX> or B<CD_HOLLOW_DIAMOND>. Returns the previous value.
+Default value: B<CD_STAR>. Value B<CD_QUERY>simply returns the
+current value.
+
+Mark Types:
+
+=for html <p><img src="http://kmx.github.io/perl-iup/imgcd-5.4.1/marks.gif"></p>
+ 
+=head3 cdMarkSize()
+
+ $old_size = $canvas->cdMarkSize($number);
+ $old_size = $canvas->wMarkSize($number);
+
+Configures the mark size in pixels. Returns the previous value. Default
+value: 10. Value B<CD_QUERY> simply returns the current value. Valid
+width interval: E<gt>= 1.
+
+In WC, it configures the current line width in millimeters.
+
+=head2 Methods - Primitives / Lines
+
+Line are segments that connects 2 or more points. The L<cdLine|/"cdLine()"> function
+includes the 2 given points and draws the line using the foreground
+color. Line thickness is controlled by the L<cdLineWidth|/"cdLineWidth()"> function. By
+using function L<cdLineStyle|/"cdLineStyle()"> you can draw dashed lines with some
+variations. Lines with a style other than continuous are affected by
+the back opacity attribute and by the background color.
+
+=head3 cdLine()
+
+ $canvas->cdLine($x1, $y1, $x2, $y2);
+ $canvas->cdfLine($x1, $y1, $x2, $y2);
+ $canvas->dwLine($x1, $y1, $x2, $y2);
+
+Draws a line from B<(x1,y1)> to C<B<(x2,y2)>> using the current
+foreground color and line width and style. Both points are included in
+the line.
+
+Open polygons can be created using:
+
+ $canvas->cdBegin(CD_OPEN_LINES);
+ $canvas->cdVertex($x,$y);
+ #...
+ $canvas->cdEnd();
+
+Closed polygons use the same number of vertices but the last point is
+automatically connected to the first point. Closed polygons can be
+created using:
+
+ $canvas->cdBegin(CD_CLOSED_LINES);
+ $canvas->cdVertex($x,$y);
+ #...
+ $canvas->cdEnd();
+
+Bezier lines can be created using:
+
+ $canvas->cdBegin(CD_BEZIER);
+ $canvas->cdVertex($x,$y);
+ #...
+ $canvas->cdEnd()
+
+At least 4 vertices must be defined. The two vertices of the middle are the
+control vertices. A sequence of bezier lines can be defined using more
+3 vertices, two control points and an end point, the last point of the
+previous bezier will be used as the start point.
+
+See the documentation L<polygon section|/"Methods - Primitives / Polygons">
+L<cdBegin|/"cdBegin()">
+L<cdVertex|/"cdVertex()">
+L<cdEnd|/"cdEnd()">
+
+=head3 cdRect()
+
+ $canvas->cdRect($xmin, $xmax, $ymin, $ymax);  #params are integers
+ $canvas->cdfRect($xmin, $xmax, $ymin, $ymax); #params are floating numbers
+ $canvas->wdRect($xmin, $xmax, $ymin, $ymax);  #params are floating numbers
+
+Draws a rectangle with no filling. All points in the limits of interval
+B<xmin> E<lt>= B<x> E<lt>= B<xmax>, B<y_min> E<lt>= B<y> E<lt>= B<ymax> will be painted. It
+is affected by line attributes and the foreground color. If the active
+driver does not include this primitive, it will be simulated using the
+L<cdLine|/"cdLine()"> primitive.
+
+=head3 cdArc()
+
+ $canvas->cdArc($xc, $yc, $w, $h, $angle1, $angle2);
+ $canvas->cdfArc($xc, $yc, $w, $h, $angle1, $angle2);
+ $canvas->wdArc($xc, $yc, $w, $h, $angle1, $angle2);
+
+Draws the arc of an ellipse aligned with the axis, using the current
+foreground color and line width and style.
+
+The coordinate B<(xc,yc)> defines the center of the ellipse. Dimensions
+B<w> and B<h> define the elliptic axes X and Y, respectively.
+
+Angles B<angle1> and B<angle2> are in degrees and oriented
+counter-clockwise. They define the arc start and end, but they are not
+the angle relative to the center, except when w==h and the ellipse is
+reduced to a circle. The arc starts at the point
+C<(xc+(w/2)*cos(angle1), yc+(h/2)*sin(angle1))> and ends at
+C<(xc+(w/2)*cos(angle2), yc+(h/2)*sin(angle2))>. A complete ellipse can
+be drawn using 0 and 360 as the angles. If B<angle2> is less than
+B<angle1> it will be increased by 360 until it is greater than
+B<angle1>.
+
+The angles are specified so if the size of the ellipse (w x h) is
+changed, its shape is preserved. So the angles relative to the center
+are dependent from the ellipse size. The actual angle can be obtained
+using C<rangle = atan2((h/2>B<)*sin(angle), (w/2)*cos(angle))>.
+
+To specify the angle in radians, you can use the definition
+B<CD_RAD2DEG> to multiply the value in radians before passing the angle
+to CD.
+
+Arc Parameters:
+
+=for html <p><img src="http://kmx.github.io/perl-iup/imgcd-5.4.1/arc.gif"></p>
+
+=head3 cdLineStyle()
+
+ $old_style = $canvas->cdLineStyle($style);
+
+Configures the current line style for: B<CD_CONTINUOUS>, B<CD_DASHED>,
+B<CD_DOTTED>, B<CD_DASH_DOT,> B<CD_DASH_DOT_DOT,> or C<B<CD_CUSTOM>>.
+Returns the previous value. Default value: B<CD_CONTINUOUS>. Value
+B<CD_QUERY> simply returns the current value. When B<CD_CUSTOM> is used
+the L<cdLineStyleDahes|/"cdLineStyleDahes()"> function must be called before to initialize
+the custom dashes. The spaces are drawn with the background color,
+except when back opacity is transparent then the background is left
+unchanged. See L<BackOpacity|filled.html#cdBackOpacity>.
+
+Line Styles:
+
+=for html <p><img src="http://kmx.github.io/perl-iup/imgcd-5.4.1/lines.gif"></p>
+
+=head3 cdLineStyleDashes()
+
+ $canvas->cdLineStyleDashes(\@dashes);
+
+Defines the custom line style dashes. The first value is the length of
+the first dash, the second value is the length of the first space, and
+so on. For example: C<@dashes = (10 2 5 2)> means dash size 10, space size 2, dash
+size 5, space size 2, and repeats the pattern. Sizes are in pixels.
+
+=head3 cdLineWidth()
+
+ $old_width = $canvas->cdLineWidth($width);
+ $old_width = $canvas->wdLineWidth($width_mm);
+
+Configures the width of the current line (in pixels). Returns the
+previous value. Default value: 1. Value B<CD_QUERY> simply returns
+the current value. Valid width interval: E<gt>= 1.
+
+In WC, it configures the current line width in millimeters.
+
+=head3 cdLineJoin()
+
+ $old_style = $canvas->cdLineJoin($style);
+
+Configures the current line style for: B<CD_MITER>, B<CD_BEVEL> or
+B<CD_ROUND>. Returns the previous value. Default value: B<CD_MITER>.
+Value B<CD_QUERY> simply returns the current value.
+
+Line Joins:
+
+=for html <p><img src="http://kmx.github.io/perl-iup/imgcd-5.4.1/linejoin.gif"></p>
+
+=head3 cdLineCap()
+
+ $old_style = $canvas->cdLineCap($style);
+
+Configures the current line style for: B<CD_CAPFLAT>, B<CD_CAPSQUARE>
+or B<CD_CAPROUND>. Returns the previous value. Default value:
+B<CD_CAPFLAT>. Value B<CD_QUERY> simply returns the current value.
+
+Line Caps:
+
+=for html <p><img src="http://kmx.github.io/perl-iup/imgcd-5.4.1/linecap.gif"></p>
+
+=head2 Methods - Primitives / Polygons
+
+The functions L<cdBegin|/"cdBegin()">, L<cdVertex|/"cdVertex()"> and L<cdEnd|/"cdEnd()"> are use for many
+situations. L<cdBegin|/"cdBegin()"> is called once, L<cdVertex|/"cdVertex()"> can be called many
+times, and L<cdEnd|/"cdEnd()"> is called once to actually do something. If you
+call L<cdBegin|/"cdBegin()"> again before L<cdEnd|/"cdEnd()"> the process is restarted, except
+for B<cdBegin(>B<CD_REGION>B<)> that can contains one or more polygons
+inside.
+
+=head3 cdBegin()
+
+ $canvas->cdBegin($mode);
+
+Starts defining a polygon to be drawn (or filled) according to the
+mode: B<CD_CLOSED_LINES>, B<CD_OPEN_LINES>, B<CD_FILL>B<B<,
+>>B<CD_CLIP, CD_REGION> or B<B<CD_BEZIER>>. Do not create embedded
+polygons, that is, do not call function L<cdBegin|/"cdBegin()"> twice without a call
+to L<cdEnd|/"cdEnd()"> in between.
+
+=over
+
+=item * B<CD_OPEN_LINES:> connects all the points at cdEnd. Depends
+on line width and line style attributes.
+
+=item * <CD_CLOSED_LINES:> connects all the points at cdEnd and
+connects the last point to the first. Depends on line width and line
+style attributes.
+
+=item * B<CD_FILL:> connects the last point to the first and fills the
+resulting polygon according to the current interior style. When the
+interior style B<CD_HOLLOW> is defined the it behaves as if the mode
+were B<CD_CLOSED_LINES>.
+
+=item * B<CD_CLIP: i>nstead of creating a polygon to be drawn, creates
+a polygon to define a polygonal clipping region.
+
+=item * B<B<CD_BEZIER:>> defines the points of a bezier curve. There
+must be at least 4 points: I<start>, I<control>, I< control> and
+I<end>. To specify a sequence of curves use 3 more points for each
+curve: I<control>, I<control>, I<end>, I<control>, I< control>, I<end>,
+... The end point is used as start point for the next curve.
+
+=item * B<B<CD_REGION>>: starts the creation of a complex region for
+clipping. All calls to L<cdBox|/"cdBox()">, L<cdSector|/"cdSector()">, L<cdChord|/"cdChord()">, 
+B<Filled Polygons> and L<cdText|/"cdText()"> will be composed in a region for clipping.
+See L<Regions|region.html> documentation.
+
+=item * B<CD_PATH>: creates a path composed of several primitives that
+can be line draw, filled or used as clipping. Must call 
+L<cdCanvasPathSet|/"cdCanvasPathSet()"> to configure the action between sequences of
+L<cdCanvasVertex|/"cdCanvasVertex()">.
+
+=back
+
+Open, Closed and Filled Polygons:
+
+=for html <p><img src="http://kmx.github.io/perl-iup/imgcd-5.4.1/polygon.gif"></p>
+
+Bezier Lines:
+
+=for html <p><img src="http://kmx.github.io/perl-iup/imgcd-5.4.1/bezier.gif"></p>
+
+=head3 cdVertex()
+ 
+ $canvas->cdVertex($x, $y);
+ $canvas->wdVertex($x, $y);
+
+Adds a vertex to the polygon definition.
+
+=head3 cdEnd()
+
+ $canvas->cdEnd();
+
+Ends the polygon's definition and draws it.
+
+=head3 cdPathSet()
+ 
+ $canvas->cdPathSet($action);
+
+Configures the action between sequences of L<cdCanvasVertex|/"cdCanvasVertex()">. B<action>
+can be:
+
+=over
+
+=item * B<CD_PATH_NEW> - creates a new empty path. Useful if more than
+one path is configured. L<cdCanvasBegin|/"cdCanvasBegin()">(CD_PATH) already creates a new
+path.
+
+=item * B<CD_PATH_MOVETO> - moves the current position to the given
+coordinates. Must be followed by 1 call to L<cdCanvasVertex|/"cdCanvasVertex()">, 
+B<cdfCanvasVertex>, or B<wdCanvasVertex>.
+
+=item * B<CD_PATH_LINETO> - adds a line to the path from the current
+position to the given coordinates. The current position is updated to
+the given coordinates. If there is no current position, nothing is
+connected and only the current position is updated. Must be followed by
+1 call to L<cdCanvasVertex|/"cdCanvasVertex()">, L<cdfCanvasVertex|/"cdfCanvasVertex()">, or B<wdCanvasVertex>.
+
+=item * B<CD_PATH_ARC> - adds an arc to the path. If there is a current
+position adds also a line from the current position to the start of the
+arc. The end of the arc becomes the current position. Must be followed
+by 3 calls to L<cdCanvasVertex|/"cdCanvasVertex()">, B<cdfCanvasVertex>, or
+B<wdCanvasVertex>. One for the center of the arc (xc,yc), one for the
+bounding rectangle size (w,h), and one for the start and end angles
+(angle1,angle2). Angles are in degrees and oriented counter-clockwise,
+but angle2 can be smaller than angle1 to describe a clockwise arc. When
+using integer coordinates angles must be multiplied by 1000.
+
+=item * B<CD_PATH_CURVETO> - adds a bezier curve to the path. If there
+is no current position, the first point will be used twice. The end
+point becomes the current position. Must be followed by 3 calls to
+L<cdCanvasVertex|/"cdCanvasVertex()">, B<cdfCanvasVertex>, or B<wdCanvasVertex>. Must be
+first control point (x1,y1) + second control point (x2,y2) + end point
+(x3,y3).
+
+=item * B<CD_PATH_CLOSE> - adds a line to the path that connects the
+last point with the first point of the path, closing it.
+
+=item * B<CD_PATH_FILL> - fills the path with the current fill
+attributes, then the path is discarded.
+
+=item * B<CD_PATH_STROKE> - strokes the path with the current line
+attributes, then the path is discarded.
+
+=item * B<CD_PATH_FILLSTROKE> - fills the path with the current fill
+attributes, strokes the path with the current line attributes, then the
+path is discarded.
+
+=item * B<CD_PATH_CLIP> - use the path as a clipping area to be
+intersected with the current clipping area, then the path is discarded.
+
+=back
+
+So the normal path creation to draw a line will do:
+
+ $canvas->cdBegin(CD_PATH);
+ $canvas->cdPathSet(CD_PATH_MOVETO);
+ $canvas->cdVertex($x1, $y1);
+ $canvas->cdPathSet(CD_PATH_LINETO);
+ $canvas->cdVertex($x2, $y2);
+ $canvas->cdPathSet(CD_PATH_CURVETO);
+ $canvas->cdVertex($x3, $y3);  # control point for start point
+ $canvas->cdVertex($x4, $y4);  # control point for end point
+ $canvas->cdVertex($x5, $y5);  # end point
+ $canvas->cdPathSet(CD_PATH_ARC);
+ $canvas->cdVertex($x6, $y6);  # center
+ $canvas->cdVertex($x7, $y7);  # width, height
+ $canvas->cdVertex($x8, $y8);  # start angle, end angle (degrees / 1000)
+ $canvas->cdPathSet(CD_PATH_STROKE);
+ $canvas->cdEnd();
+
+=head2 Methods - Primitives / Filled Areas
+
+It is an area filled with the foreground color, but it depends on the
+current interior style. The SOLID style depends only on the foreground
+color. The HATCH and STIPPLE style depend on the foreground color,
+background color and on the back opacity attribute. The hatch lines
+drawn with this style do not depend on the other line attributes. The
+PATTERN style depends only on global canvas attributes.
+
+The filled area includes the line at the edge of the area. So if you
+draw a filled rectangle, sector or polygon on top of a non filled one
+using the same coordinates, no style and 1 pixel width, the non filled
+primitive should be obscured by the filled primitive. But depending on
+the driver implementation some pixels at the edges may be not included.
+IMPORTANT: In the Postscript and PDF drivers the line at the edge is
+not included at all.
+
+If either the background or the foreground color are modified, the
+hatched and monochromatic fillings must be modified again in order to
+be updated.
+
+Note that when a Filling Attribute is modified, the active filling
+style is now that of the modified attribute (hatch, stipple or
+pattern). Notice that this is not true for the clipping area. When the
+clipping area is modified, the clipping is only affected if it is
+active.
+
+B<Filled polygons can be created using:>
+
+ $canvas->cdBegin(CD_FILL);
+ $canvas->cdVertex($x,$y);
+ #...
+ $canvas->cdEnd();
+
+See the documentation of
+L<cdBegin|/"cdBegin()"> L<cdVertex|/"cdVertex()">, L<cdEnd|/"cdEnd()">.
+
+=head3 cdBox()
+ 
+ $canvas->cdBox($xmin, $xmax, $ymin, $ymax);
+ $canvas->cdfBox($xmin, $xmax, $ymin, $ymax);
+ $canvas->wdBox($xmin, $xmax, $ymin, $ymax);
+
+Fills a rectangle according to the current interior style. All points
+in the interval C<< xmin <= x <= xmax >>, C<< ymin <= y <= ymax >>
+will be painted. When the interior style B<CD_HOLLOW> is defined, the
+function behaves like its equivalent L<cdRect|/"cdRect">.
+
+=head3 cdSector()
+ 
+ $canvas->cdSector($xc, $yc, $w, $h, $angle1, $angle2);
+ $canvas->cdfSector($xc, $yc, $w, $h, $angle1, $angle2);
+ $canvas->wdSector($xc, $yc, $w, $h, $angle1, $angle2);
+
+Fills the arc of an ellipse aligned with the axis, according to the
+current interior style, in the shape of a pie.
+
+The coordinate B<(xc,yc)> defines the center of the ellipse. Dimensions
+B<w> and B<h> define the elliptic axes X and Y, respectively.
+
+Angles B<angle1> and B<angle2> are in degrees and oriented
+counter-clockwise. They define the arc start and end, but they are not
+the angle relative to the center, except when w==h and the ellipse is
+reduced to a circle. The arc starts at the point
+C<(xc+(w/2)*cos(angle1), yc+(h/2)*sin(angle1))> and ends at
+C<(xc+(w/2)*cos(angle2), yc+(h/2)*sin(angle2))>. A complete ellipse can
+be drawn using 0 and 360 as the angles. If B<angle2> is less than
+B<angle1> it will be increased by 360 until it is greater than
+B<angle1>.
+
+The angles are specified so if the size of the ellipse (w x h) is
+changed, its shape is preserved. So the angles relative to the center
+are dependent from the ellipse size. The actual angle can be obtained
+using C<rangle = atan2((h/2)*sin(angle), (w/2)*cos(angle))>.
+
+To specify the angle in radians, you can use the definition
+B<CD_RAD2DEG> to multiply the value in radians before passing the angle
+to CD.
+
+When the interior style B<CD_HOLLOW> is defined, the function behaves
+like its equivalent L<cdArc|/"cdArc()">, plus two lines connecting to the
+center.
+
+Sector Parameters:
+
+=for html <p><img src="http://kmx.github.io/perl-iup/imgcd-5.4.1/sector.gif"></p>
+
+=head3 cdChord()
+ 
+ $canvas->cdChord($xc, $yc, $w, $h, $angle1, $angle2);
+ $canvas->cdfChord($xc, $yc, $w, $h, $angle1, $angle2);
+ $canvas->wdChord($xc, $yc, $w, $h, $angle1, $angle2);
+
+Fills the arc of an ellipse aligned with the axis, according to the
+current interior style, the start and end points of the arc are
+connected. The parameters are the same as the B<cdSector|/"cdSector">.
+
+When the interior style B<CD_HOLLOW> is defined, the function behaves
+like its equivalent L<cdArc|/"cdArc">, plus a line connecting the arc start and
+end points.
+
+Chord Parameters:
+
+=for html <p><img src="http://kmx.github.io/perl-iup/imgcd-5.4.1/chord.gif"></p>
+
+=head3 cdBackOpacity()
+
+ $old_opacity = $canvas->cdBackOpacity($opacity);
+
+Configures the background opacity to filling primitives based on the
+foreground and background colors. Note that only when InteriorStyle is
+B<CD_HATCH> or B<CD_STIPPLE> that backopacity is used. Values: B<CD_TRANSPARENT>
+or B<CD_OPAQUE>. If it is opaque the primitive will
+erase whatever is in the background with the background color. If it is
+transparent, only the foreground color is painted. It returns the
+previous value. Default value: B<CD_TRANSPARENT>. Value B<CD_QUERY>
+simply returns the current value. In some drivers is always opaque.
+
+Back Opacity Attribute:
+
+=for html <p><img src="http://kmx.github.io/perl-iup/imgcd-5.4.1/opacity.gif"></p>
+
+=head3 cdFillMode()
+
+ $old_mode = $canvas->cdFillMode($mode);
+
+Selects a predefined polygon fill rule (B<CD_EVENODD> or
+B<CD_WINDING>). Returns the previous value. Default value: B<CD_EVENODD>.
+Value B<CD_QUERY> simply returns the current value.
+
+Fill Modes:
+
+=for html <p><img src="http://kmx.github.io/perl-iup/imgcd-5.4.1/fillmode.gif"></p>
+
+=head3 cdInteriorStyle()
+
+ $old_style = $canvas->cdInteriorStyle($style);
+
+Configures the current style for the area filling primitives:
+B<CD_SOLID>, B<B<CD_HOLLOW>>, B<CD_HATCH>, B<CD_STIPPLE> or
+B<CD_PATTERN>. Note that only B<CD_HATCH> and B<CD_STIPPLE> are
+affected by the backopacity. It returns the previous value. Default
+value: B<CD_SOLID>. Value B<CD_QUERY> simply returns the current
+value.
+
+If I<a stipple> or I<a pattern> were not defined, when they are
+selected the state of the attribute is not changed.
+
+When the style B<CD_HOLLOW> is defined, functions L<cdBox|/"cdBox()"> and
+L<cdSector|/"cdSector"> behave as their equivalent L<cdRect|/"cdRect"> and L<cdArc+Lines|/"cdArc">,
+and the polygons with style B<CD_FILL> behave like B<CD_CLOSED_LINES>.
+
+=head3 cdHatch()
+
+ $old_style = $canvas->cdHatch($style);
+
+Selects a predefined I<hatch> style (B<CD_HORIZONTAL>, B<CD_VERTICAL>,
+B<CD_FDIAGONAL>, B<CD_BDIAGONAL>, B<CD_CROSS> or B<CD_DIAGCROSS>) and
+sets the interior style to B<CD_HATCH>. The lines are drawn with the
+foreground color, and the background is drawn with the background color
+if back opacity is opaque. Returns the previous value. Default value:
+B<CD_HORIZONTAL>. Value B<CD_QUERY> simply returns the current
+value. The foreground and background colors must be set before setting
+the style. In some drivers is always opaque.
+
+Hatch Styles
+
+=for html <p><img src="http://kmx.github.io/perl-iup/imgcd-5.4.1/hatch.gif"></p>
+
+=head3 cdStipple()
+
+ $stipple = IUP::Canvas::Stipple->new( [[1,0,1,0,1,0,1,1,0,1], 
+                                        [1,0,1,0,1,1,0,1,1,0],
+                                        [1,0,1,1,0,1,0,1,1,0],
+                                        [1,0,1,1,0,1,1,0,1,1]] );
+ $canvas->cdStipple($stipple);
+
+Defines a stipple (= matrix of zeros 0 and ones 1). The zeros are
+mapped to the background color or are transparent, according to the
+background opacity attribute. The ones are mapped to the foreground
+color. The function sets the interior style to B<CD_STIPPLE>. 
+The origin (0,0) is the left bottom corner of the
+image. It does not need to be stored by the application, as it is
+internally replicated by the library. In some drivers is always opaque.
+The foreground and background colors must be set before setting the
+style.
+
+ $canvas->wdStipple($stipple, $w_mm, $h_mm);
+
+Allows specifying the stipple in world coordinates. Another stipple
+will be created with the size in pixels corresponding to the specified
+size in millimeters. The new size in pixels will be an integer factor
+of the original size that is closets to the size in millimeters. The
+use of this function may produce very large or very small stipples.
+
+=head3 cdGetStipple()
+
+ $stipple = canvas->cdGetStipple();
+
+Returns the current I<stipple> as a reference to array of arrayrefs.
+Returns C<undef> if no I<stipple> was defined.
+
+=head3 cdPattern()
+
+ $color1 = $canvas->cdEncodeColor(0, 0, 220);
+ $color2 = $canvas->cdEncodeColor(220, 0, 220); 
+ $pattern = IUP::Canvas::Pattern->new( [[$color1, $color2, $color1], 
+                                        [$color2, $color1, $color2],
+                                        [$color1, $color2, $color1]] );
+ $canvas->cdPattern($pattern);
+
+Defines a new color matrix (C<< $pattern->[$line]->[$column] >>)
+and sets the interior style to B<CD_PATTERN>. The origin (C<< $pattern->[0]->[0] >>)
+is the left bottom corner of the image. It does not need to be stored by the
+application, as it is internally replicated by the library.
+
+ $canvas->wdPattern($pattern, $w_mm, $h_mm);
+
+Allows specifying the pattern in world coordinates. Another pattern
+will be created with the size in pixels corresponding to the specified
+size in millimeters. The new size in pixels will be an integer factor
+of the original size that is closets to the size in millimeters. The
+use of this function may produce very large or very small patterns.
+
+=head3 cdGetPattern()
+
+ $pattern = $canvas->cdGetPattern();
+
+Returns the current I<pattern> as a reference to IUP::Canvas::Pattern object.
+Returns C<undef> if no I<pattern> was defined.
+
+=head2 Methods - Primitives / Text
+
+A raster text using a font with styles. The position the text is drawn
+depends on the text alignment attribute.
+
+The library has at least 4 standard typefaces: "System" (which depends
+on the driver and platform), "Courier" (mono spaced with serif),
+"Times" (proportional with serif) and "Helvetica" (proportional without
+serif). Each typeface can have some styles: Plain, B<Bold>, I<Italic>
+and a combination of I<B<Bold and Italic>>. As an alternative to the
+standard typefaces, you can use other typefaces or native driver
+typefaces with the function L<cdNativeFont|/"cdNativeFont()">, but they may work in a
+reduced set of drivers.
+
+You may retrieve the dimensions of the selected font with function
+L<cdGetFontDim|/"cdGetFontDim()">. Also you may retrieve the bounding box of a specific
+text before drawing by using the L<cdGetTextSize|/"cdGetTextSize()"> and L<cdGetTextBox|/"cdGetTextBox()">
+functions.
+
+The text is drawn using a reference point; you can change the alignment
+relative to this point using the L<cdTextAligment|/"cdTextAligment()"> function.
+
+=head3 cdText()
+
+ $canvas->cdText($x, $y, $text);
+ $canvas->cdfText($x, $y, $text);
+ $canvas->wdText($x, $y, $text);
+
+Draws a text in the position B<C<(x,y)>> according to the current font
+and text alignment. It expects an ANSI string. Can have line breaks.
+
+=head3 cdFont()
+
+ $canvas->cdFont($typeface, $style, $size);
+ $canvas->wdFont($typeface, $style, $size);
+
+Selects a text font. The font type can be one of the standard type
+faces or other driver dependent type face. Since font face names are
+not a standard between drivers, a few names are specially handled to
+improve application portability. If you want to use names that work for
+all systems we recommend using: "B<Courier>", "B<Times>" and
+"B<Helvetica>".
+
+The style can be a combination of: B<CD_PLAIN>, B<CD_BOLD>,
+B<CD_ITALIC>, B<CD_UNDERLINE> or B<CD_STRIKEOUT>. Only the Windows and
+PDF drivers support underline and strikeout. The size is provided in
+points (1/72 inch) or in pixels (using negative values).
+
+Default values: "B<System>", B<CD_PLAIN>, 12.
+
+You can specify partial parameters using C<undef>, -1 and 0 for typeface,
+style and size. When these parameters are specified the current font
+parameter is used. For example: C<CanvasFont(undef, -1, 10)> will only
+change the font size.
+
+To convert between pixels and points use the function B<cdPixel2MM> to
+convert from pixels to millimeters and use the formula "B<(value in
+I<points>) = CD_MM2PT * (value in millimeters)>".
+
+In WC, the size is specified in millimeters, but is internally
+converted to points.
+
+Fonts can heavily benefit from the ANTIALIAS attribute where available
+in the driver.
+
+=for html <p>
+  <table border="1">
+    <tbody align="center">
+      <tr>
+        <th>Type Faces</th>
+        <th>Font Styles</th>
+      </tr>
+      <tr>
+        <td><img src="http://kmx.github.io/perl-iup/imgcd-5.4.1/fonts.gif"></td>
+        <td><img src="http://kmx.github.io/perl-iup/imgcd-5.4.1/font_style.gif"></td>
+      </tr>
+    </tbody>
+  </table>
+</p>
+
+=head3 cdGetFont()
+ 
+ ($typeface, $style, $size) = $canvas->cdGetFont();
+ ($typeface, $style, $size) = $canvas->wdGetFont();
+
+Returns the values of the current font. It is not necessary to provide
+all return pointers; you can provide only the desired values.
+
+In WC, the size is returned in millimeters.
+
+=head3 cdNativeFont()
+ 
+ $old_font = $canvas->cdNativeFont($font);
+
+Selects a font based on a string description. The description can
+depend on the driver and the platform, but a common definition is
+available for all drivers. It does not need to be stored by the
+application, as it is internally replicated by the library. The string
+is case sensitive. It returns the previous string.
+
+The string is parsed and the font typeface, style and size are set
+according to the parsed values, as if L<cdFont|/"cdFont()"> was called. The
+native font string is cleared when a font is set using L<cdFont|/"cdFont()">.
+
+The common format definition is similar to the
+L<Pango|http://www.pango.org/> library Font Description, used by GTK+2.
+It is defined as having 3 parts: E<lt>font familyE<gt>, E<lt>font
+stylesE<gt> E<lt>font sizeE<gt>. For ex: "Times, Bold 18", or
+"Arial,Helvetica, Italic Underline -24". The supported styles include:
+Bold, Italic, Underline and Strikeout. Underline, Strikeout, and
+negative pixel values are not supported by the standard Pango Font
+Description. The Pango format include many other definitions not
+supported by the CD format, they are just ignored.
+
+The IUP "FONT" attribute internal formats are also accepted in all
+drivers and platforms.
+
+Using C<undef> as a parameter, it only returns the previous string and
+does not change the font. The value returned is the last attributed
+value, which may not correspond exactly to the font selected by the
+driver.
+
+Using "CD_QUERY" (string) as a parameter, it returns the current selected
+font in the common format definition.
+
+=head3 cdTextAlignment()
+ 
+ $old_alignment = $canvas->cdTextAlignment($alignment);
+
+Defines the vertical and horizontal alignment of a text as:
+
+ CD_NORTH      CD_SOUTH      CD_EAST        CD_WEST
+ CD_NORTH_EAST CD_NORTH_WEST CD_SOUTH_EAST  CD_SOUTH_WEST
+ CD_CENTER     CD_BASE_LEFT  CD_BASE_CENTER CD_BASE_RIGHT 
+ 
+Returns the previous value. Default value: C<CD_BASE_LEFT>.
+Value C<CD_QUERY> simply returns the current value.
+
+Text Alignment:
+
+=for html <p><img src="http://kmx.github.io/perl-iup/imgcd-5.4.1/align.gif"></p>
+
+=head3 cdTextOrientation()
+
+ $old_angle = $canvas->cdTextOrientation($angle);
+
+Defines the text orientation, which is an angle provided in degrees
+relative to the horizontal line according to which the text is drawn.
+Returns the previous value. Value B<CD_QUERY> simply returns the
+current value. The default value is 0.
+
+=head3 cdGetFontDim()
+ 
+ ($max_width, $height, $ascent, $descent) = $canvas->cdGetFontDim();
+ ($max_width, $height, $ascent, $descent) = $canvas->wdGetFontDim();
+
+Returns the maximum width of a character, the line's height, the
+I<ascent> and I<descent> of the characters of the currently selected
+font. The line's height is the sum of the I< ascent> and I<descent> of
+a given additional space (if this is the case). All values are given in
+pixels and are positive. It is not necessary to provide all return
+pointers, you can provide only the desired values and C<undef> for
+the others.
+
+Font Dimension Attributes:
+
+=for html <p><img src="http://kmx.github.io/perl-iup/imgcd-5.4.1/font_dim.gif"></p>
+
+=head3 cdGetTextSize()
+ 
+ ($width, $heigth) = $canvas->cdGetTextSize($text);
+ ($width, $heigth) = $canvas->wdGetTextSize($text);
+
+Returns the text size independent from orientation. It is not necessary
+to provide all return pointers, you can provide only the desired values
+and C<undef> for the others.
+
+=head3 cdGetTextBounds()
+ 
+ 
+ ($x0,$y0,$x1,$y1,$x2,$y2,$x3,$y3) = $canvas->cdGetTextBounds($x, $y, $text);
+ ($x0,$y0,$x1,$y1,$x2,$y2,$x3,$y3) = $canvas->wdGetTextBounds($x, $y, $text);
+
+Returns the oriented bounding rectangle occupied by a text at a given
+position. The rectangle has the same dimentions returned by 
+L<cdGetTextSize|/"cdGetTextSize()">. The rectangle corners are returned in counter-clock wise
+order starting with the bottom left corner, arranged [x0,y0,x1,y1,x2,y2,x3,y3].
+
+=head3 cdGetTextBox()
+
+ ($xmin, $xmax, $ymin, $ymax) = $canvas->cdGetTextBox($x, $y, $text);
+ ($xmin, $xmax, $ymin, $ymax) = $canvas->wdGetTextBox($x, $y, $text);
+
+Returns the horizontal bounding rectangle occupied by a text at a given
+position. If orientation is not 0 then its area is always larger than
+the area of the rectangle returned by L<cdGetTextBounds|/"cdGetTextBounds()">. It is not
+necessary to provide all return pointers, you can provide only the
+desired values and C<undef> for the others.
+
+=head2 Methods - Primitives / Vector Text
+
+It is a text that uses a font created only with line segments. It is
+very useful to be scaled and very fast. You must set the text size
+before drawing any text. The default direction is horizontal from left
+to right.
+
+Vector Text Parameters:
+
+=for html <p><img src="http://kmx.github.io/perl-iup/imgcd-5.4.1/vector_text.gif"></p>
+
+All vector text drawing in all drivers are simulated with other CD
+primitives using polygons only.
+
+=head3 cdVectorText()
+    
+ $canvas->cdVectorText($x, $y, $text);
+ $canvas->wdVectorText($x, $y, $text);
+
+Draws a vector text in position C<B<(x,y)>>, respecting the alignment
+defined by L<cdTextAlignment|/"cdTextAlignment()">. It ignores the configuration
+L<cdBackOpacity|/"cdBackOpacity()">, being always transparent. It accepts strings with
+multiple lines using '\n'. It is ESSENTIAL to call L<cdVectorTextSize|/"cdVectorTextSize()">
+or L<cdVectorCharSize|/"cdVectorCharSize()"> before using this function.
+
+The B<wdCanvasVectorText> is the only function that actually depends on
+World Coordinates. The other Vector Text functions although use the
+"B<wd>" prefix they do not depend on World Coordinates. They are kept
+with these names for backward compatibility. The correct prefix would
+be "B<cdf>".
+
+=head3 cdVectorTextDirection()
+
+ $canvas->cdVectorTextDirection($x1, $y1, $x2, $y2);
+ $canvas->wdVectorTextDirection($x1, $y1, $x2, $y2);
+
+Defines the text direction by means of two points, B<C<(x1,y1)>> and B<C<(x2,y2)>>.
+The default direction is horizontal from left to right. It
+is independent from the transformation matrix.
+
+=head3 cdVectorTextTransform()
+
+ $old_matrix = $canvas->cdVectorTextTransform($matrix);
+
+Defines a transformation matrix with 6 elements. If the matrix is C<undef>,
+no transformation is set. The default is no transformation. The origin
+is the left bottom corner of matrix. It returns the previous matrix,
+and the returned vector is only valid until the following call to the
+function.
+
+The matrix contains scale, rotation and translation elements. It is
+applied after computing the position and orientation normal to the
+vector text. We can describe the elements as follows:
+
+ |x'|   | scl_x*cos(ang)       -sin(ang)  trans_x |   |x|                     | $matrix->[3]  $matrix->[4]  $matrix->[5] | 
+ |y'| = |       sin(ang)  scl_y*cos(ang)  trans_y | * |y|        with indices | $matrix->[0]  $matrix->[1]  $matrix->[2] |
+                                                      |1|
+
+It has the same effect of the L<cdTransform|/"cdTransform()">, but notice that
+the indices are different.
+
+=head3 cdVectorTextSize()
+ 
+ $canvas->cdVectorTextSize($width, $height, $text);
+ $canvas->wdVectorTextSize($width, $height, $text);
+
+Modifies the font size of the vector text so that it fits the string in
+the box defined by B<C<width>> and B<C<height>>.
+
+=head3 cdVectorCharSize()
+ 
+ $old_size = $canvas->cdVectorCharSize($size);
+ $old_size = $canvas->wdVectorCharSize($size);
+
+Modifies the font size by specifying the height of the characters.
+Returns the previous value. B<C<CD_QUERY>> returns the current value.
+
+=head3 cdVectorFontSize()
+
+ $canvas->cdVectorFontSize($size_x, $size_y);
+
+Directly modifies the font size. Set C<size_x == size_y> to maintain the
+original aspect ratio of the font.
+
+=head3 cdGetVectorFontSize()
+
+ ($size_x, $size_y) = $canvas->cdGetVectorFontSize();
+
+Returns the font size. It is not necessary to provide all return
+pointers, you can provide only the desired values and C<undef> for the
+others.
+
+=head3 cdVectorFont()
+ 
+ $fontname = $canvas->cdVectorFont($filename);
+
+Replaces the current vector font with a font stored in a file with a
+given name. Returns the name of the font loaded or C<undef>, if it fails.
+If filename is C<undef>, it activates the default font "B<Simplex II>"
+(There is no file associated to this font, it is an embedded font). The
+library will attempt to load a font from the current directory, if it
+fails then it will try the directory defined by the environment
+variable "B<C<CDDIR>>", if it fails, it will attempt to load it using
+the filename as a string containing the font as if the file was loaded
+into that string, if it fails again the font is reset to the default
+font and returns C<undef>. The file format is compatible with the GKS file
+format (text mode).
+
+=head3 cdGetVectorTextSize()
+ 
+ ($width, $height) = $canvas->cdGetVectorTextSize($text);
+ ($width, $height) = $canvas->wdGetVectorTextSize($text);
+
+Returns the text size independent from orientation. It is not necessary
+to provide all return pointers, you can provide only the desired values
+and C<undef> for the others.
+
+=head3 cdGetVectorTextBounds()
+ 
+ ($x0,$y0,$x1,$y1,$x2 $y2,$x3,$y3) = $canvas->cdGetVectorTextBounds($text, $x, $y);
+ ($x0,$y0,$x1,$y1,$x2,$y2,$x3,$y3) = $canvas->wdGetVectorTextBounds($text, $x, $y);
+
+Returns the oriented bounding rectangle occupied by a text at a given
+position. The rectangle has the same dimentions returned by 
+L<cdGetVectorTextSize|/"cdGetVectorTextSize()">. The rectangle corners are returned in counter-clock
+wise order starting with the bottom left corner, arranged (x0,y0,x1,y1,x2,y2,x3,y3).
+
+=head3 cdGetVectorTextBox()
+ 
+ ($xmin, $xmax, $ymin, $ymax) = $canvas->cdGetVectorTextBox($x, $y, $text);
+ ($xmin, $xmax, $ymin, $ymax) = $canvas->wdGetVectorTextBox($x, $y, $text);
+
+Returns the horizontal bounding rectangle occupied by a text at a given
+position. If orientation is not 0 then its area is always larger than
+the area of the rectangle returned by L<cdGetVectorTextBounds|/"cdGetVectorTextBounds()">. It is not
+necessary to provide all return pointers, you can provide only the
+desired values and C<undef> for the others.
+
+=head3 Character Codes
+
+The old GKS format contains ASCII codes so a convertion from ANSI to
+ASCII is done when possible, unmapped characters are left unchanged,
+but some rearrage was necessary to acomodate the convertion.
+
+The default vector font was changed from the original Simplex II to
+contain all ANSI accented characters. So some ASCII characters were
+replaced.
+
+Bellow is the character code table of the default font.
+
+B<Default Font>
+
+=for html <p><img src="http://kmx.github.io/perl-iup/imgcd-5.4.1/vectorfont_default.png"></p>
+
+The original Simplex II font is available in the file
+"cd/etc/vectorfont00.txt". Bellow is the character code table of the
+original font (the table displays the characters after the convertion
+from ANSI to ASCII):
+
+B<Original Simplex II>
+
+=for html <p><img src="http://kmx.github.io/perl-iup/imgcd-5.4.1/vectorfont_simplex2.png"></p>
+
+=head2 Methods - Primitives / Client Images
+
+Client Images are bitmaps (kept in memory - usually in L<IUP::Canvas::Bitmap> objects)
+that can be put (drawn) onto a canvas.
+
+Some bitmap manipulation functions (load, save, change colors/pixels) 
+are available via L<IUP::Canvas::Bitmap>.
+
+=head3 cdPutBitmap()
+
+ $bmp = IUP::Canvas::Bitmap->new('file.png');
+ $canvas->cdPutBitmap($bmp,$x,$y,$w,$h);
+ #or
+ $canvas->wdPutBitmap($bmp,$x,$y,$w,$h);
+
+Draws the image in the position (x,y), changing the scale. It
+supports B<bmp> to be of type CD_RGB, CD_RGBZ or CD_MAP.
+The region of the image drawn depends on the rectangle defined 
+by L<IUP::Canvas::Bitmap> method L<SetRect|IUP::Canvas::Bitmap/"SetRect()">.
+If no rectangle was defined, then the whole image is used.
+
+The parameters B<w> and B<h> allow scaling the image, increasing or
+decreasing its dimensions when drawn. If B<w> and/or B<h> are 0, then
+no scale change is assumed.
+
+=head3 cdGetBitmap()
+
+ $bmp = $canvas->cdGetBitmap($x,$y,$w,$h);
+ #$bmp is a reference to IUP::Canvas::Bitmap object
+
+Returns L<IUP::Canvas::Bitmap> object containing each pixel in a server 
+image given by area: [x,y,w,h].
+
+=head2 Methods - Primitives / Server Images
+
+B<Server Image> is a high performance image compatible with a specific canvas. 
+It is faster than B<Client Image> functions, but less flexible. It is commonly
+used for off-screen drawing in Window Systems.
+
+You can make gets and puts on several canvases but they must be created
+using the same driver. It is possible to specify a part of the image to
+be drawn, but it is not possible to zoom.
+
+It is called "server" images because the data is stored in a system
+private format, that the application (or the client) does not have
+access.
+
+To create a server image there must be an active canvas of a driver
+with server image support. Only the base drivers Win32, GDI+,
+X-Windows, XRender and Cairo, support server images.
+
+The server image can only be greated via L<cdGetImage|/"cdGetImage()">
+
+L<cdGetImage|/"cdGetImage()">, L<cdPutImage|/"cdPutImage()"> and
+L<wdPutImage|/"wdPutImage()"> are the only methods for manipulating Server Images.
+
+You cannot edit or even acces image content by any mean.
+
+=head3 cdGetImage()
+
+ $image = $canvas->cdGetImage($x, $y, $w, $h);
+ #NOTE: $image is a reference to 'internal-ServerImage' object
+
+Copies a rectangular region from the current rectangular context to the
+memory - 'internal-ServerImage' object (which can be later used
+via L<cdPutImage|/"cdPutImage()"> or L<wdPutImage|/"wdPutImage()">). 
+
+B<(x,y)> is the coordinate of the bottom left corner of the rectangular region. 
+The B<width> and B<length> of the rectangular region are defined in the
+image structure (when the image is created). 
+ 
+=head3 cdPutImage()
+
+ $image = $canvas->cdGetImage($x, $y, $w, $h);
+ #NOTE: $image has to be a reference to 'internal-ServerImage' object
+ $canvas->cdPutImage($image, $x, $y, $xmin, $xmax, $ymin, $ymax); 
+ #or
+ $canvas->wdPutImage($image, $x, $y, $xmin, $xmax, $ymin, $ymax);
+
+Copies an B<image> (stored via L<cdGetImage|/"cdGetImage()">)
+in a rectangular region of the canvas with the bottom
+left corner in B<(x,y)>. Allows specifying a rectangle inside the
+image to be drawn, if B<xmin, xmax, ymin> and B<ymax> are 0, then the
+whole image is assumed.
+ 
+=head3 cdCanvasScrollArea()
+
+ $canvas->cdCanvasScrollArea($xmin, $xmax, $ymin, $ymax, $dx, $dy);
+ 
+Copies the rectangle defined by the coordinates B<C<(xmin,ymin)>> and
+B<C<(xmax,ymax)>> to the rectangle defined by B<C<(xmin+dx,ymin+dy)>>
+and B<C<(xmax+dx,ymax+dy)>>. It has the same effect as B<cdGetImage>
+followed by B<cdPutImage>, but it should be faster and does not
+require the explicit creation of an image to be executed. Note that the
+region belonging to the first rectangle, but not to the second, remains
+unchanged (the function does not clean this region).
+ 
+=head2 Methods - Canvas Clipping
+
+The clipping area is an area that limits the available drawing area
+inside the canvas. Any primitive is drawn only inside the clipping
+area. It affects all primitives.
+
+You can set the clipping area by using the function L<cdClipArea|/"cdClipArea()">, and
+retrieve it using L<cdGetClipArea|/"cdGetClipArea()">. The clipping area is a rectangle by
+default, but it can has other shapes. In some drivers a polygon area
+can be defined, and in display based drivers a complex region can be
+defined. The complex region can be a combination of boxes, polygons,
+sectors, chords and texts.
+
+=head3 cdClip()
+ 
+ $old_mode = $canvas->cdClip($mode);
+
+Activates or deactivates clipping. Returns the previous status. Values:
+B<CD_CLIPAREA, CD_CLIPPOLYGON, CD_CLIPREGION> or B<CD_CLIPOFF>. The
+value B<CD_QUERY> simply returns the current status. Default value:
+B<CD_CLIPOFF>.
+
+The value B<CD_CLIPAREA> activates a rectangular area as the clipping
+region.
+
+The value B<CD_CLIPPOLYGON> activates a polygon as a clipping region,
+but works only in some drivers (please refer to the notes of each
+driver). The clipping polygon must be defined before activating the
+polygon clipping; if it is not defined, the current clipping state
+remains unchanged. See the documentation of
+L<cdBegin|/"cdBegin()">, L<cdVertex|/"cdVertex()">, L<cdEnd|/"cdEnd()"> to create a polygon.
+
+The value B<CD_CLIPREGION> activates a complex clipping region. See the
+documentation of L<Regions|region.html>.
+
+The defined clipping area, polygon and complex regions are stored
+internally, so you may define them independently and switch between
+area, polygon and complex region without having to define them again.
+Also if the active clipping region is re-defined it immediately becomes
+the current clipping region.
+
+=head3 cdClipArea()
+ 
+ $canvas->cdClipArea($xmin, $xmax, $ymin, $ymax);  #params are integers
+ $canvas->cdfClipArea($xmin, $xmax, $ymin, $ymax); #params are floating numbers
+ $canvas->wdClipArea($xmin, $xmax, $ymin, $ymax);  #params are floating numbers
+
+Defines the current rectangle for clipping. Only the points in the
+interval C<< xmin <= x <= xmax >> and C<< ymin <= y <= ymax >>
+will be printed. Default region: (0, w-1, 0, h-1).
+
+=head3 cdGetClipArea()
+ 
+ ($xmin, $xmax, $ymin, $ymax, $status) = canvas->cdGetClipArea();  #params are integers
+ ($xmin, $xmax, $ymin, $ymax, $status) = canvas->cdfGetClipArea(); #params are floating numbers
+ ($xmin, $xmax, $ymin, $ymax, $status) = canvas->wdGetClipArea();  #params are floating numbers
+
+Returns the rectangle and the clipping status. It is not necessary to
+provide all return pointers, you can provide only the desired values
+and C<undef> for the others.
+
+A polygon for clipping can be created using:
+
+ $canvas->cdBegin(CD_CLIP);
+ $canvas->cdVertex($x,$y);
+ #...
+ $canvas->cdEnd();
+
+See the documentation of L<cdBegin|/"cdBegin()">, L<cdVertex|/"cdVertex()">, L<cdEnd|/"cdEnd()">.
+
+=head2 Methods - Complex Clipping Regions
+
+A complex region can composed of boxes, sectors, chords, polygons and
+texts. It is implemented only in the Windows GDI, GDI+ and X-Windows
+base drivers.
+
+Complex clipping regions can be created using:
+
+ $canvas->cdBegin(CD_REGION);
+ # filled primtives ...
+ $canvas->cdEnd()
+
+See more info about L<cdBegin|/"cdBegin()"> and L<cdEnd|/"cdBegin()>.
+
+Between a C<< $canvas->cdBegin(CD_REGION) >> and a C<< $canvas->cdEnd() >>,
+all calls to L<cdBox|/"cdBox()">, L<cdSector|/"cdSector()">, L<cdChord|/"cdChord()">,
+L<cdBegin|/"cdBegin()">(CD_FILL) / L<cdVertex|/"cdVertex()">(x,y) / ... / L<cdEnd|/"cdEnd()">()
+and L<cdText|/"cdText()"> will be
+composed in a region for clipping. This is the only exception when you
+can call a L<cdBegin|/"cdBegin()"> after another L<cdBegin|/"cdBegin()">.
+
+When you call C<< $canvas->cdBegin(CD_REGION) >> a new empty region will be
+created. So for the first operation you should use B<C<CD_UNION>> or
+B<C<CD_NOTINTERSECT>> combine modes. When you finished to compose the
+region call L<cdEnd|/"cdEnd()">.
+
+To make the region active you must call L<cdClip|/"cdClip()">(CD_CLIPREGION). For other clipping regions see
+L<Clipping|clipping.html>.
+
+Complex clipping regions are not saved by L<cdSaveState|/"cdSaveState()">.
+
+=head3 cdRegionCombineMode()
+ 
+ $old_mode = $canvas->cdRegionCombineMode($mode);
+
+Changes the way regions are combined when created. Returns the previous
+status. Values: B<C<CD_UNION, CD_INTERSECT, CD_DIFFERENCE or
+CD_NOTINTERSECT>>. The value B<C<CD_QUERY>> simply returns the current
+status. Default value: B<C<CD_UNION>>.
+
+Combine Modes
+
+=for html <p><img src="http://kmx.github.io/perl-iup/imgcd-5.4.1/regions.gif"></p>
+
+=head3 cdIsPointInRegion()
+ 
+ $status = $canvas->cdIsPointInRegion($x, $y);
+ $status = $canvas->wdIsPointInRegion($x, $y);
+
+Returns a non zero value if the point is contained inside the current
+region.
+
+=head3 cdOffsetRegion()
+
+ $canvas->cdOffsetRegion($dx, $dy);
+ $canvas->wdOffsetRegion($dx, $dy);
+
+Moves the current region by the given offset. In X-Windows, if the
+region moves to outside the canvas border, the part moved outside will
+be lost, the region will need to be reconstructed.
+
+=head3 cdGetRegionBox()
+ 
+ ($xmin, $xmax, $ymin, $ymax, $status) = $canvas->cdGetRegionBox();
+ ($xmin, $xmax, $ymin, $ymax, $status) = $canvas->wdGetRegionBox();
+
+Returns the rectangle of the bounding box of the current region. It is
+not necessary to provide all return pointers, you can provide only the
+desired values and C<undef> for the others.
+
+=head2 Methods - Others
+
+=head3 cdVersion()
+
+ $verstring = IUP::Canvas->cdVersion();
+
+Returns the current version number of the library. The string with the
+version number has a format "major.minor.build". For instance, the
+string "2.1.3" has number 2 as the main (major) version number, 1 as
+the secondary (minor) version number, and 3 as the build number. The
+major version number represents a change in the structure or behavior
+of functions; the minor version number represents one or more new
+drivers and functions added to the library; and the build version
+number represents one or more corrected bugs.
+ 
+=head3 cdVersionDate()
+
+ $verdate = IUP::Canvas->cdVersionDate();
+
+Returns the release date of the current version of the library - e.g. "2007/04/09"
+
+=head3 cdVersionNumber()
+
+ $vernumber = IUP::Canvas->cdVersionNumber();
+
+Returns the current version number of the library - e.g. 500000 (for version 5.0)
+
+=head3 cdPlay()
+
+ $ctx = $canvas1->cdGetContext();
+ #NOTE: $ctx param has to be a reference to 'internal-context'
+ $status = $canvas2->cdPlay($ctx, $xmin, $xmax, $ymin, $ymax, $data); 
+
+Interprets the graphical contents (primitives and attributes) in a
+given driver and calls equivalent functions of the CD library using the
+given canvas. The primitives are drawn inside the region defined by the
+given limits. If limits are 0 (xmin, xmax, ymin and ymax) the
+primitives will be drawn with their coordinates having the original
+values in the file.
+
+Only some drivers L<IUP::Canvas::FileVector> formats implement this function:
+
+=over
+
+=item * format: "WMF = Windows Metafile, data is a string with filename. Works only in the MS Windows system.
+
+=item * format: "EMF" = Windows Enhanced Metafile, data is a string with filename. Works only in the MS Windows system.
+
+=item * format: "CGM" = Computer Graphics Metafile ISO, data is a string with filename.
+
+=item * format: "METAFILE" = CD Metafile, data is a string with filename.
+
+=back
+
+=head3 cdContextRegisterCallback() #NOT_IMPLEMENTED
+
+=head3 cdActivate()
+
+ $status = $canvas->cdActivate();
+
+Activates a canvas for drawing. This is used only for a few drivers.
+Native Window and IUP drivers will update the canvas size if the window
+size has changed. Double Buffer driver will recreate the image buffer
+if the window canvas size has changed. In these cases the function MUST
+be called, for other drivers is useless. Returns CD_ERROR or CD_OK.
+
+=head3 cdDeactivate()
+
+ $canvas->cdDeactivate();
+
+Called when the application has finished drawing in the canvas. It is
+optional, but if used for the Native Window driver in Windows when the
+handle can not be retained, the drawing can only be done again after a
+B< cdCanvasActivate>. On some drivers will simply call
+L<cdFlush|/cdFlush()">.
+
+=head3 cdKillCanvas()
+
+  $canvas->cdKillCanvas();
+
+Destroys a previously created canvas. There is no need to call this function
+in perl, as the garbage collector will call it automatically during DESTROY().
+
+=head3 cdUseContextPlus()
+
+ $old_use = IUP::Canvas->cdUseContextPlus();
+
+NOTE: for advanced users
+
+Activates or deactivates the use of an external context for the next
+calls of IUP::Canvas->new(...)
+
+=head3 cdInitContextPlus() #NOT_IMPLEMENTED
+
+ IUP::Canvas->cdInitContextPlus();
+
+NOTE: for advanced users
+
+Initializes the context driver to use another context replacing the
+standard drivers. This functions is only available when a library
+containing a "ContextPlus" context driver is used. See the
+B<Cairo>, B<GDI+> and B<XRender> base drivers. Those libraries does not
+support XOR write mode, but has support for anti-aliasing and alpha for
+transparency.
+
+=head3 cdGetContext()
+
+ $context = $canvas->cdGetContext();
+
+Returns the reference to 'internal-context' object of a given canvas.
+
+=head3 cdContextCaps()
+
+ $context = $canvas->cdGetContext();
+ #NOTE: $context param has to be a reference to 'internal-context'
+ $caps = IUP::Canvas->cdContextCaps($context);
+
+Returns the resources available for that context. To verify if a given
+resource is available, perform a binary AND with the following values:
+
+ CD_CAP_FLUSH
+ CD_CAP_CLEAR
+ CD_CAP_PLAY
+ CD_CAP_YAXIS - The Y axis has the same orientation as the CD axis.
+ CD_CAP_CLIPAREA
+ CD_CAP_CLIPPOLY - Usually is not implemented.
+ CD_CAP_MARK - Marks are implemented directly in the driver (they are usually simulated).
+ CD_CAP_RECT - Rectangles are implemented directly in the driver (they are usually simulated).
+ CD_CAP_VECTORTEXT - Vector text is implemented directly in the driver (it is usually simulated).
+ CD_CAP_IMAGERGB
+ CD_CAP_IMAGERGBA - If this is not implemented, but cdGetImageRGB is, then it is simulated using cdGetImageRGB and cdPutImageRGB.
+ CD_CAP_IMAGEMAP
+ CD_CAP_GETIMAGERGB
+ CD_CAP_IMAGESRV - Usually is only implemented in contexts of window graphics systems (Native Window and IUP).
+ CD_CAP_BACKGROUND
+ CD_CAP_BACKOPACITY
+ CD_CAP_WRITEMODE
+ CD_CAP_LINESTYLE
+ CD_CAP_LINEWITH
+ CD_CAP_WD - Functions of world coordinates are implemented directly in the driver (they are usually simulated).
+ CD_CAP_HATCH
+ CD_CAP_STIPPLE
+ CD_CAP_PATTERN
+ CD_CAP_FONT
+ CD_CAP_FONTDIM - If not defined, the function is implemented using an internal heuristics of the library.
+ CD_CAP_TEXTSIZE - If not defined, the function is implemented using an internal heuristics of the library.
+ CD_CAP_TEXTORIENTATION - Usually is not implemented.
+ CD_CAP_PALETTE - Usually is only implemented in contexts of window graphics systems (Native Window and IUP).
+
+=head3 cdSimulate()
+
+ $old_mode = $canvas->cdSimulate($mode);
+
+Activates the simulation of one or more primitives. It is ignored for
+the canvas in the ImageRGB context, because in this case everything is
+already simulated. It also has no effect for primitives that are
+usually simulated. It returns the previous simulation, but does not
+include primitives that are usually simulated. The simulation can be
+activated at any moment. For instance, if a line simulation is required
+only for a situation, the simulation can be activated for the line to
+be drawn, and then deactivated.
+
+=head1 EXAMPLES
+
+
+The element B<IUP::Canvas> is used in the following sample scripts:
+
+=over
+
+=item * L<0-basic/canvas1.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/canvas1.pl> - IUP::Canvas example
+
+=item * L<0-basic/canvas2.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/canvas2.pl> - IUP::Canvas example
+
+=item * L<0-basic/canvas3.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/canvas3.pl> - IUP::Canvas example
+
+=item * L<0-basic/cbox.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/cbox.pl> - IUP::Cbox example
+
+=item * L<0-basic/colorbar.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/colorbar.pl> - IUP::ColorBar example
+
+=item * L<0-basic/layoutdialog.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/layoutdialog.pl> - IUP::LayoutDialog example
+
+=item * L<0-basic/sbox2.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/sbox2.pl> - IUP::Sbox example
+
+=item * L<0-basic/scrollbar.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/scrollbar.pl> - IUP::Canvas (with scrollbar) example
+
+=item * L<1-apps/app-mdi.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/1-apps/app-mdi.pl> - IUP app example
+
+=item * L<1-apps/app-sample1.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/1-apps/app-sample1.pl> - example used for screenshot - IUP.pod
+
+=item * L<1-apps/app-sample2.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/1-apps/app-sample2.pl> - example based on the original sample.c
+
+=back 
+
+
+
+=head1 SEE ALSO
+
+L<IUP::Canvas::EMF|IUP::Canvas::EMF>,
+L<IUP::Canvas::SVG|IUP::Canvas::SVG>,
+L<IUP::CanvasGL|IUP::CanvasGL>
+
+The original doc: L<iupcanvas.html|http://www.tecgraf.puc-rio.br/iup/en/elem/iupcanvas.html>
+
+=cut

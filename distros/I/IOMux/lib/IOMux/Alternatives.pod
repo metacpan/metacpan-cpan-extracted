@@ -1,0 +1,104 @@
+=encoding utf8
+
+=head1 NAME
+
+IOMux::Alternatives - compare the IOMux implementation with other Event modules
+
+=head1 DESCRIPTION
+
+On CPAN, you can find various alternatives for this module. Probably, this
+is caused by the very low level of programming help that the basic
+C<select()> and C<poll()> operating system calls offer. Various corners
+of a program need to register event listeners and later get events back.
+This requires some administration.
+
+=head2 IO::Multiplex
+
+The L<IOMux|IOMux> module started as a major rework of IO::Multiplex. It
+follows the same concept, but with major internal and visible
+improvements. Most methods with a name like C<mux*>
+originate from C<IO::Multiplex> function C<mux_*>.
+
+The L<IOMux|IOMux> implementation is conceptually much closer to
+IO::Multiplex (I<Plex>) than you may expect. Similar enough to write
+a comparison.
+
+Main differences:
+
+=over 4
+
+=item Event managers
+
+In Plex, all is organized around a C<select> loop.  In Mux, you have
+a choice between various mechanisms of which some still need to be
+implemented.
+
+=item Callback objects
+
+In Plex, any file-handle I<may> have a callback object associated to
+it. If not, some default is used. In IOMux, the callback object has the
+focus and has a file-handle associated to it. This should simplify more
+complex implementations.
+
+IOMux does not support callbacks to name-spaces, because the object is
+used for per-handle administration. In Plex, that administration is
+located inside the multiplex main object (and therefore difficult to
+extend with higher level applications)
+
+=item Callback routines
+
+The Mux implementation defines the same C<mux_*> methods as Plex, but
+has organized them. In Plex, the connection accepting C<mux_connection>
+and the input callback C<mux_input> are always available, even though
+a callback object probably supports only one of both. In IOMux, there
+is a clear distinction between various kinds of handlers.
+
+=item Hooks
+
+In Mux, you have a few more locations where you can hook the process,
+a few more callbacks.
+
+=item Pipes and files
+
+Mux added official support for file reading and writing, pipes and more.
+Some of those do work in Plex as well, with some tricks.
+
+=back
+
+=head2 IO::Async / Net::Async
+
+Paul Evans has developed a large number of modules which is more
+feature complete than C<IOMux>. It supports far more event loops,
+is better tested, and has many higher level applications ready to
+be used.
+
+=head2 AnyEvent
+
+=head2 POE
+
+=head2 Final consideration
+
+Certain applications will benefit from L<IOMux|IOMux> (especially my
+personal development projects), because it is based on the OODoc
+module for object oriented perl module documentation, and Log::Report
+for error handling and translations.
+
+=head1 SEE ALSO
+
+This module is part of IOMux distribution version 1.00,
+built on November 11, 2015. Website: F<http://perl.overmeer.net/>
+All modules in this suite:
+L</Any::Daemon>,
+L</IOMux>, and
+L</IOMux::HTTP>.
+
+Please post questions or ideas to F<perl@overmeer.net>
+
+=head1 LICENSE
+
+Copyrights 2011-2015 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

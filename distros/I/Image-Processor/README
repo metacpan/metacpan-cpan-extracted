@@ -1,0 +1,43 @@
+Image-Processor version 0.05
+============================
+
+DESCRIPTION
+
+This module provides the ability to process a directory of
+images for multiple or single percentage based resizing.
+
+It was designed out of a need to process Kodak Picture CDs
+
+Please let me know if you find it useful or if there is
+a feature you would like to see added.  
+
+Aaron Johnson
+solution@gina.net
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Image::Magick
+  Mail::MboxParser >= .31 (if you want to extract emails)
+  XML::Simple >= 1.08
+  Text::Template
+  
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2002 Aaron Johnson
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

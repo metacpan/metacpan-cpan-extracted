@@ -1,0 +1,79 @@
+{
+   "abstract" : "Line tracer",
+   "author" : [
+      "neko <techno.cat.miau@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.1.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Imager-LineTrace",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Imager" : "0.99",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Imager::LineTrace" : {
+         "file" : "lib/Imager/LineTrace.pm",
+         "version" : "0.06"
+      },
+      "Imager::LineTrace::Algorithm" : {
+         "file" : "lib/Imager/LineTrace/Algorithm.pm"
+      },
+      "Imager::LineTrace::Figure" : {
+         "file" : "lib/Imager/LineTrace/Figure.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/techno-cat/p5-Imager-LineTrace/issues"
+      },
+      "homepage" : "https://github.com/techno-cat/p5-Imager-LineTrace",
+      "repository" : {
+         "url" : "git://github.com/techno-cat/p5-Imager-LineTrace.git",
+         "web" : "https://github.com/techno-cat/p5-Imager-LineTrace"
+      }
+   },
+   "version" : "0.06"
+}

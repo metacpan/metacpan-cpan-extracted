@@ -1,0 +1,69 @@
+README
+lib/IO/Uncompress/UnLzma.pm
+lib/IO/Uncompress/UnXz.pm
+lib/IO/Compress/Lzma.pm
+lib/IO/Compress/Xz.pm
+lib/IO/Compress/Adapter/Lzma.pm
+lib/IO/Compress/Adapter/Xz.pm
+lib/IO/Uncompress/Adapter/UnLzma.pm
+lib/IO/Uncompress/Adapter/UnXz.pm
+Makefile.PL
+t/000prereq.t
+t/001lzma.t
+t/001xz.t
+t/010examples-lzma.t
+t/010examples-xz.t
+t/050interop-lzma.t
+t/050interop-xz.t
+t/050interop-zip-lzma.t
+t/100generic-lzma.t
+t/100generic-xz.t
+t/101truncate-lzma.t
+t/101truncate-xz.t
+t/102tied-lzma.t
+t/102tied-xz.t
+t/103newtied-lzma.t
+t/103newtied-xz.t
+t/104destroy-lzma.t
+t/104destroy-xz.t
+t/105oneshot-lzma.t
+t/105oneshot-xz.t
+t/106prime-lzma.t
+t/106prime-xz.t
+t/107multi-lzma.t
+t/107multi-xz.t
+t/108anyunc-lzma.t
+t/108anyunc-xz.t
+t/110encode-lzma.t
+t/110encode-xz.t
+t/25interop-io-string.t
+t/999pod.t
+t/Test/Builder.pm
+t/Test/More.pm
+t/Test/Simple.pm
+t/compress/any.pl
+t/compress/anyunc.pl
+t/compress/destroy.pl
+t/compress/encode.pl
+t/compress/generic.pl
+t/compress/interop-io-string.pl
+t/compress/merge.pl
+t/compress/multi.pl
+t/compress/newtied.pl
+t/compress/oneshot.pl
+t/compress/prime.pl
+t/compress/tied.pl
+t/compress/truncate.pl
+t/compress/zlib-generic.pl
+t/compress/CompTestUtils.pm
+MANIFEST
+private/MakeUtil.pm
+Changes
+examples/lzcat  perl
+examples/lzgrep perl
+examples/lzstream   perl
+examples/xzcat  perl
+examples/xzgrep perl
+examples/xzstream   perl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

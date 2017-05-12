@@ -1,0 +1,142 @@
+=head1 NAME
+
+Inline::Java::PerlNatives - Map Java native methods to Perl functions.
+
+=head1 SYNOPSIS
+
+=for comment
+
+
+   use Inline Java => <<'END' ;
+      import org.perl.inline.java.* ;
+
+      class Pod_PN extends InlineJavaPerlNatives {
+         public Pod_PN() throws InlineJavaException {
+         }
+
+         native public String hello() ;
+      }
+   END
+
+   package Pod_PN ;
+   sub hello {
+      return "hi!" ;
+   }
+
+   package main ;
+   my $b = new Pod_PN() ;
+   print($b->hello() . "\n") ; # prints hi!
+
+=for comment
+
+
+=head1 DESCRIPTION
+
+WARNING: C<Inline::Java::PerlNatives> is still experimental.
+
+C<Inline::Java::PerlNatives> allows you to define your callbacks as native 
+Java methods that are automatically linked to Perl subroutines. You implement 
+the Perl subroutine directly in the package in which C<Inline::Java> binds 
+your class. You can do this by making your Java code extend the
+C<org.perl.inline.java.InlineJavaPerlNatives> class.
+
+Note: PerlNatives requires J2SDK version >= 1.4
+   Z<>
+   
+
+=head1 USING THE org.perl.inline.java.InlineJavaPerlNatives CLASS
+
+Let's revisit an example from the L<Inline::Java::Callback> documentation:
+
+=for comment
+
+   use Inline Java => <<'END' ;
+      import java.util.* ;
+      import org.perl.inline.java.* ;
+      import javax.swing.* ;
+      import java.awt.event.* ;
+
+      class Pod_Button_PN extends InlineJavaPerlNatives
+                          implements ActionListener {
+         public Pod_Button_PN() throws InlineJavaException {
+            JFrame frame = new JFrame("Pod_Button") ;
+            frame.setSize(100,100) ;
+            JButton button = new JButton("Click Me!") ;
+            frame.getContentPane().add(button) ;
+            button.addActionListener(this) ;
+            frame.show() ;
+         }
+
+         public void actionPerformed(ActionEvent e){
+            button_pressed() ;
+         }
+
+         native public void button_pressed() ;
+      }
+   END
+
+   package Pod_Button_PN ;
+   sub button_pressed {
+      print('click!' . "\n") ; # prints click!
+      $main::b->StopCallbackLoop() ;
+   }
+
+   package main ;
+   $main::b = new Pod_Button_PN() ;
+   $main::b->StartCallbackLoop() ;
+
+=for comment
+
+Extending InlineJavaPerlNatives tells C<Inline::Java> that all native methods 
+declared in that class should be linked to Perl subroutines implemented in the 
+approriate package. You can then call these methods from Java just like regular 
+methods. You can even call them from Perl if they are public. 
+   Z<>
+
+
+=head1 BUGS AND DEFICIENCIES
+
+C<Inline::Java::PerlNatives> has a few limits that one must be aware of:
+
+=over 4
+
+=item 1
+
+You cannot declare 2 native methods with the same name in a class (even if they 
+have different signatures).
+
+=item 2
+
+Native methods can have arguments of any type, but they must return either void 
+or an Object (use wrappers like Integer and Double to return primitive types).
+
+=item 3
+
+Even if you do not declare them, InlineJavaException and InlineJavaPerlException 
+exceptions (as well as others) may be thrown from within the native methods
+
+=back
+
+
+=head1 SEE ALSO
+
+L<Inline::Java>, L<Inline::Java::Callback>, L<Inline::Java::PerlInterpreter>.
+   Z<>
+
+
+=head1 AUTHOR
+
+Patrick LeBoutillier <patl@cpan.org> is the author of Inline::Java.
+   Z<>
+
+
+=head1 COPYRIGHT
+
+Copyright (c) 2001-2004, Patrick LeBoutillier.
+
+All Rights Reserved. This module is free software. It may be used,
+redistributed and/or modified under the terms of the Perl Artistic
+License. See http://www.perl.com/perl/misc/Artistic.html for more
+details.
+
+=cut

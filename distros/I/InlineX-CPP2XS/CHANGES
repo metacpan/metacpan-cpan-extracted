@@ -1,0 +1,112 @@
+- 0.25 ... Add 'T' config option.
+
+           Add metadata to InlineX::CPP2XS Makefile.PL.
+
+           Escape "{" and "}" in regex at line 165 of t/t_makefile_pl.t
+
+           Fix typo (s/C2XS/CPP2XS/) in CPP2XS.pm.
+
+- 0.24 ... In t/t_portability.t and t/t_prehead.t change all occurrences of '__INLINE_CPP'
+           to '__INLINE_CPP_' (to distinguish the pattern being sought from the defining
+           of __INLINE_CPP that was created in Inline-CPP-0.40).
+
+- 0.23 ... "eval $VERSION;" in the created PM file - as per current recommendations
+           Fix typo in Makefile.PL. (Change "Test::warn" to "Test::Warn".) Thanks Davido.
+
+- 0.22 ... Remove remove_dup function. (Simpler to override $Inline::CPP::Config::flavor_defs.)
+
+- 0.21 ... Add the capability of writing a portable Makefile.PL.
+
+           Add the capability of writing a MANIFEST file (that includes all of the
+           generated files).
+
+           Add 'DIST' config option.
+
+           Require Inline-0.50 and Inline-CPP-0.39. (Had been 0.45 and 0.25 respectively.)
+
+- 0.20 ... Fix LIBS setting. Was clobbering any value set by Inline::CPP::validate().
+
+           Add the demos/cpp2xs_utility demo.
+
+- 0.19 ... Add CCFLAGSEX, BOOT_F and PRE_HEAD options
+
+           Add cpp2xs.pl (which generates the cpp2xs script)
+
+           If EXPORT_TAGS_ALL is set, then it's now unnecessary to set
+           EXPORT_OK_ALL
+
+- 0.17 ... Add PREREQ_PM config option
+
+           Rewrite t_autowrap_cpp.t, t_code.t, t_cpp.t, t_hello.t, t_makefile_pl.t
+           and t_src_location.t to accommodate recent (and hopefully future) changes
+           to the layout of generated code.
+
+           Remove 'expected.h', 'expected_cpp.txt', 'expected_autowrap.txt',
+           'expected_autowrap_c.txt', 'expected_hello.txt' and 'expected_typemap.txt'
+           as these are no longer used.
+
+- 0.16 ... Add config option 'USE'
+
+           Substitution regex added to t_makefile_pl.t - to cater for recent ActivePerls
+
+           Cater for the possibility that we're including iostream (not iostream.h) in
+           the test scripts
+
+- 0.15 ... Add config options EXPORT_ALL, EXPORT_OK_ALL and EXPORT_TAGS_ALL
+
+           Add newline at the bottom of src/test.alt (as per requirements of a valid
+           C/CPP source file).
+
+           'USING' (which is useless with Inline::CPP and InlineX::CPP2XS anyway)
+           now takes either a string or array reference as its value (as does
+           the Inline::C equivalent).
+
+           'LIBS' and 'TYPEMAPS' can now optionally be assigned as a (space
+           delimited) string or an array reference (same as 'INC'). Previously
+           'LIBS' and 'TYPEMAPS' had to be assigned as an array reference.
+
+           'INC' (in generated Makefile.PL) no longer automatically includes the cwd.
+
+           'TYPEMAPS' (in generated Makefile.PL) no longer automatically specifies
+           the standard perl typemap. (Doing so was annoying and, afaict, unnecessary.)
+
+           Add Inline-0.45 to PREREQ_PM.
+
+- 0.13 ... Change the test for the locatability of a specified typemap from a
+           '-e' test to a '-f' test.
+
+           Add CPP2XS-Cookbook.pod.
+
+           Minor change to WRITE_PM.
+
+           The CPP source code can now be alternatively provided by either a
+           'CODE' or 'SRC_LOCATION' key.
+
+- 0.12 ... Provide access to ParseRegExp.pm. (Untested, because ParseRegExp.pm
+           is broken - see http://rt.cpan.org/Ticket/Display.html?id=6327 for
+           patches to ParseRegExp.pm)
+
+           Can now write a .pm file for you as well
+
+- 0.11 ... Can now provide the optional "4th" (config options) argument
+           without *also* having to provide a "3rd" (build directory) argument.
+           ie If the third argument is a hash reference, it's assumed to contain
+           config options - otherwise it sets the build directory.
+
+           Check that only valid config options have been passed via the "config
+           options" argument.
+
+           Catch the error (and die) if a non-existent typemap is specified
+           in the TYPEMAPS config option.
+
+           If the specified build_dir does not exist, die(). Previously, a warning was
+           issued and the files written to the current working directory.
+
+- 0.10 ... Module is now called InlineX::CPP2XS (previously Inline::CPP2XS, which is now
+           deprecated).
+           Now has the same capabilities as its C counterpart (InlineX::C2XS-0.10) -
+           ie can also (optionally) autogenerate the Makefile.PL in addition to the other
+           files it has always been capable of generating (namely the .xs file, INLINE.h
+           and CPP.map).
+
+- 0.07 ... Inline::CPP2XS born (previously part of Inline::C2XS)

@@ -1,0 +1,13 @@
+.cvsignore
+Build.PL
+Changes
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+lib/IPC/Filter.pm
+t/filter.t
+t/pod_cvg.t
+t/pod_syn.t
+SIGNATURE    Added here by Module::Build

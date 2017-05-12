@@ -1,0 +1,27 @@
+---
+abstract: 'Simple iterator with lookahead and unget'
+author:
+  - 'Paulo Custodio <pscust@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.143240'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Iterator-Simple-Lookahead
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Class::XSAccessor: '1.18'
+  Iterator::Simple: '0.06'
+  Test::More: '1.001014'
+  perl: '5.008'
+resources:
+  repository: git://github.com/pauloscustodio/Iterator-Simple-Lookahead.git
+version: '0.07'

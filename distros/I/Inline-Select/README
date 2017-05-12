@@ -1,0 +1,46 @@
+Inline::Select - Dynamic selection of ILSM for a package
+========================================================
+
+  use Inline::Select::Register (
+     PACKAGE => 'Calc',
+     Inline => [ Perl => sub {require 't/Calc.pm'} ]
+  ) ;
+  use Inline::Select::Register (
+     PACKAGE => 'Calc',
+     Inline => [ CPP => 't/Calc.cpp' ]
+  ) ;
+  use Inline::Select::Register (
+     PACKAGE => 'Calc',
+     Inline => [ Java => 't/Calc.java' ]
+  ) ;
+  use Inline::Select::Register (
+     PACKAGE => 'Calc',
+     Inline => [ Python => 't/Calc.py' ]
+  ) ;
+
+  use Inline::Select (
+     PACKAGE => 'Calc',
+     Inline => $ARGV[0] # one of 'Perl', 'CPP', 'Java', 'Python'
+  ) ;
+
+  my $c = new Calc() ;
+  ok($c->add(2, 3), 5) ;
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 Patrick LeBoutillier
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

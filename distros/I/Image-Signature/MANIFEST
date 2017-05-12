@@ -1,0 +1,11 @@
+Changes
+Image/Signature/ColorHistogram.pm
+Image/Signature/GrayMoment.pm
+Image/Signature/Grayscale.pm
+Image/Signature/Vars.pm
+INSTALL
+Makefile.PL
+MANIFEST
+META.yml
+Signature.pm
+test.pl

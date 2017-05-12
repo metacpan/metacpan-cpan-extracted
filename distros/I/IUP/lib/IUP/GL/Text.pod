@@ -1,0 +1,14 @@
+=head1 NAME
+
+IUP::GL::Text - [GUI element] GL-based text lable
+
+=head1 DESCRIPTION
+
+XXX-TODO: missing doc
+
+=head1 SEE ALSO
+
+The original doc: L<iupgltext.html|http://www.tecgraf.puc-rio.br/iup/en/gl/iupgltext.html>
+
+
+=cut

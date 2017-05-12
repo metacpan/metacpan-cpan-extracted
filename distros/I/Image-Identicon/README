@@ -1,0 +1,38 @@
+Image-Identicon
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc Image::Identicon
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/Image-Identicon
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Image-Identicon
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/Image-Identicon
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/Image-Identicon
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 YAMASHINA Hio
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

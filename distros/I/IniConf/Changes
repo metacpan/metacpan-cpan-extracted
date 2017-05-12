@@ -1,0 +1,36 @@
+This module was originally written by Scott Hutton. If you know how
+to get hold of Scott, please let me know.
+I wanted a few small additional features, but was never able
+to track down Scott to submit patches, so I'm just rereleasing this
+myself. I suppose at some point, I'll need to actually read through
+all the code and try to figure out if anything else in here needs
+updating, but at the moment, I just needed to new functionality.
+
+So, the changes:
+1) Modified ReadConfig to permit spaces in the variable names
+2) Added newval method to add new values to the ini file
+3) Added delval method to delete values from the ini file
+
+Rich Bowen
+rbowen@rcbowen.com
+January 17, 2000
+
+Previous Version History:
+#
+# Version 0.92 1997/07/11
+# BUGFIX: Perl 5.004 complained about an extraneous "my" in ReadConfig()
+# BUGFIX: value of 0 or empty string would trigger a fallthrough to the
+#         default value.  Check to see if this is defined now (in val()).
+# Version 0.91 1996/08/09
+# ADDED: support for multivalued/multiline fields.
+# ADDED: @IniConf::errors for diagnosing bad config file.
+# BUGFIX: added "require 5.002".  5.001 doesn't handle "use strict", and
+#         I live by it.
+# BUGFIX: OutputConfig.  Would complain about a bad ref when no comments
+#         are specified for a section or parameter.
+#
+# Version 0.90 1996/08/08
+# Initial revision
+#
+#
+

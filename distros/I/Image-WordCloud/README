@@ -1,0 +1,168 @@
+NAME
+    Image::WordCloud - Create word cloud images
+
+SYNOPSIS
+            use Image::WordCloud;
+            use File::Slurp;
+        
+            my $wc = Image::WordCloud->new();
+        
+            # Add the Gettysburg Address
+            my $text = read_file('script/gettysburg.txt');
+            $wc->words($text);
+        
+            # Create the word cloud as a GD image
+            my $gd = $wc->cloud();
+        
+            open(my $fh, '>', 'gettysburg.png');
+                    binmode $fh;
+                    print $fh $gd->png();
+            close($fh);
+        
+            # See examples/gettysburg.png for how the created image looks.
+            # script/gettysburg.pl will create it
+        
+            # The calls can also be chained like so:
+            my $text = read_file('script/gettysburg.txt');
+            my $gd = Image::WordCloud->new()
+                    ->words($text)
+                    ->cloud();
+
+    Create "word cloud" images from a set of specified words, similar to
+    http://wordle.net. Font size indicates the frequency with which a word
+    is used.
+
+    Colors are generated randomly using Color::Scheme. Fonts can be
+    specified or chosen randomly.
+
+FUNCTIONS
+  new( ... )
+    Accepts a number of parameters to alter the image look.
+
+    * image_size => [$x, $y]
+        Sets the size of the image in pixels, accepts an arrayref. Defaults
+        to [400, 400].
+
+        NOTE: Non-square images currently can look a little squirrely due to
+        how Math::TheodorusSpiral fills a rectangle.
+
+    * word_count => $count
+        Number of words to show on the image. Defaults to 70.
+
+    * prune_boring => <1,0>
+        Prune "boring", or "stop" words. This module currently only supports
+        English stop words (like 'the', 'a', 'and', 'but'). The full list is
+        in Image::WordCloud::StopWords::EN
+
+        Defaults to true.
+
+    * font => $name
+        Name of font to use. This is passed directly to GD::Text::Align so
+        it can either be a string like 'arial', or a full path. However in
+        order for non-path font names to work, GD needs an environment
+        variable like FONT_PATH or FONT_TT_PATH to be set, or `font_path'
+        can be used to set it manually.
+
+    * font_path => $path_to_fonts
+        Set where your font .ttf files are located. If this is not
+        specified, the path of this module's distribution directory will be
+        used via File::ShareDir. Currently this module comes bundled with
+        one set of fonts.
+
+    * background => [$r, $g, $b]
+        Takes an arrayref defining the background color to use. Defaults to
+        [40, 40, 40]
+
+    * border_padding => <$pixels | $percent>
+        Padding to leave clear around the edges of the image, either in
+        pixels or a percent with '%' sign. Defaults to '5%'
+
+                my $wc = Image::WordCloud->new(border_padding => 20);
+                my $wc = Image::WordCloud->new(border_padding => '25%');
+
+        Please note that this affects the speed with which this module can
+        fit words into the image. In my tests on the text of the Declaration
+        of Independence, bumping the percentage by 5% increments progressed
+        like so:
+
+                0%:  15.25s
+                5%:  21.50s
+                10%: 30.00s
+                15%: 63.6s avg
+
+  words(\%words_to_use | \@words | @words_to_use | $words)
+    Takes either a hashref, arrayref, array or string.
+
+    If the argument is a hashref, keys are the words, values are their
+    count. No further processing is done (we assume you've done it on your
+    own).
+
+    If the argument is an array, arrayref, or string, the words are parsed
+    to remove non-word characters and turn them lower-case.
+
+  cloud()
+    Make the word cloud. Returns a GD::Image.
+
+            my $gd = Image::WordCloud->new()->words(qw/some words etc/)->cloud();
+        
+            # Spit out the wordlcoud as a PNG
+            $gd->png;
+        
+            # ... or a jpeg
+            $gd->jpg;
+        
+            # Get the dimensions
+            $gd->width;
+            $gd->height;
+        
+            # Or anything else you can do with a GD::Image object
+
+  add_stop_words(@words)
+    Add new stop words onto the list. Automatically puts words in lowercase.
+
+  width()
+    Return wordcloud image width
+
+  height()
+    Return wordcloud image height
+
+AUTHOR
+    Brian Hann, `<bhann at cpan.org>'
+
+BUGS
+    Please report any bugs or feature requests here
+    https://github.com/c0bra/image-wordcloud-perl/issues. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Image::WordCloud
+
+    You can also look for information at:
+
+    * Github Issues Tracker (report bugs here)
+        https://github.com/c0bra/image-wordcloud-perl/issues
+
+    * AnnoCPAN: Annotated CPAN documentation
+        http://annocpan.org/dist/Image-WordCloud
+
+    * CPAN Ratings
+        http://cpanratings.perl.org/d/Image-WordCloud
+
+    * Search CPAN
+        http://search.cpan.org/dist/Image-WordCloud/
+
+    * MetaCPAN
+        https://metacpan.org/module/Image::WordCloud
+
+LICENSE AND COPYRIGHT
+    Copyright 2012 Brian Hann.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

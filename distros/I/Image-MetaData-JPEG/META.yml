@@ -1,0 +1,23 @@
+---
+abstract: 'Perl extension for showing/modifying JPEG (meta)data.'
+author:
+  - 'Stefano Bettelli <bettelli@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.143240'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Image-MetaData-JPEG
+no_index:
+  directory:
+    - t
+    - inc
+requires: {}
+resources:
+  repository: https://github.com/rjbs/Image-MetaData-JPEG.git
+version: '0.159'

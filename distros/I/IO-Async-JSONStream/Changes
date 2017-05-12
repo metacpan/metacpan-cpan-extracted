@@ -1,0 +1,9 @@
+Revision history for IO-Async-JSONStream
+
+0.02    2014/08/11 22:54:12
+        [CHANGES]
+         * Support Incremental Parsing (Frew Schmidt)
+
+0.01    2014/01/20 22:19:35
+        First version, released on an unsuspecting world.
+

@@ -1,0 +1,23 @@
+# -*- Perl -*-
+
+use IBM::LoadLeveler;
+
+$query = ll_query(MACHINES);
+print "ARGS = @ARGV\n";
+$return=ll_set_request($query,QUERY_HOST,\@ARGV,ALL_DATA);
+if ($return != 0 )
+{
+    print STDERR "ll_set_request failed Return = $return\n";
+}
+
+$machine=ll_get_objs($query,LL_CM,NULL,$number,$err);
+$tmp=ll_get_data($machine,LL_MachineName);
+print "MACHINE = $tmp\n";
+$lav=ll_get_data($machine,LL_MachineLoadAverage);
+print "LOAD AVERAGE = $lav\n";
+@msl=ll_get_data($machine,LL_MachineStepList);
+
+foreach $step ( @msl )
+{
+    print "STEPS = $step\n";
+}

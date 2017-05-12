@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<!-- Additional settings file for the retention time predictor -->
+<!DOCTYPE rtsettings SYSTEM "rtset.dtd">
+
+<rtsettings>
+  <Hodges>
+    <modif>0</modif>
+    <current>LinRegGB</current>
+    <overwrite>1</overwrite>
+    <comments>Test</comments>
+  </Hodges>
+ <Petritis>
+    <maxepoch>50</maxepoch>
+    <sqrerror>1e-3</sqrerror>
+    <mode>verbose</mode>
+    <nnet>
+      <learningrate>0.5</learningrate>
+    </nnet>
+    <layer>
+      <nodes>20</nodes>
+    </layer>
+    <layer>
+      <nodes>6</nodes>
+    </layer>
+    <layer>
+      <nodes>1</nodes>
+    </layer>
+  </Petritis>
+  <calibrator>
+     <preprocess>1</preprocess>
+     <fitting>linear</fitting>
+     <gamma>1e-6</gamma>
+  </calibrator>
+  <filtering>
+      <filter>10</filter>
+      <error>relative</error>
+  </filtering>
+</rtsettings>

@@ -1,0 +1,37 @@
+                   =====================================
+                      Package "Interal" Version 0.01
+                   =====================================
+
+    Copyright (c) 1997 by Kristian Torp. All rights reserved. This package 
+    is free software; you can redistribute it and/or modify it under the same 
+    terms as Perl itself.
+
+Abstract:
+---------
+The module is handy for for comparing temporal intevals and getting
+the overlapping interval. The module uses the Date::Manip module to
+provide the end points in the interval.
+
+The module is written entirely in Perl 5. 
+
+Legal stuff:
+------------
+This program is distributed AS IS in the hope that it will be useful,
+but WITHOUT ANY WARRANTY. See the GNU General Public License for more
+details.
+
+Prerequisites:
+--------------
+Perl version 5.000 or higher. The module Date::Manip version 5.20 or
+higher must be install on your system. You can find it at your nearst
+CPAN.
+
+Installation:
+-------------
+The usual way:
+
+perl Makefile.PL
+make
+make test
+make install
+

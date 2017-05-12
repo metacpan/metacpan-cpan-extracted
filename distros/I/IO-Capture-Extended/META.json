@@ -1,0 +1,57 @@
+{
+   "abstract" : "Extend functionality of IO::Capture",
+   "author" : [
+      "James E Keenan (jkeenan@cpan.org)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.02, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "IO-Capture-Extended",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IO::Capture" : "0.05"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Simple" : "0.44"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=IO-Capture-Extended"
+      },
+      "homepage" : "http://thenceforward.net/perl/modules/IO-Capture-Extended/",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/jkeenan/io-capture-extended.git",
+         "web" : "https://github.com/jkeenan/io-capture-extended"
+      }
+   },
+   "version" : 0.13
+}

@@ -1,0 +1,80 @@
+=pod
+
+=head1 NAME
+
+IUP::Canvas::Bitmap - [special Canvas helper] Bitmap for use with IUP::Canvas
+
+=head1 SYNOPSIS
+
+ $bmp = IUP::Canvas::Bitmap->new($filename);              #2 1x scalar value (string)
+ $bmp = IUP::Canvas::Bitmap->new($type, $width, $height); #4 3x scalar value (numbers)
+ 
+ $bmp = IUP::Canvas::Bitmap->new($type, $pixels);
+ #for $type == CD_RGB
+ $pixels = [ 
+   [ $r00,$g00,$b00, $r01,$g01,$b01, $r02,$g02,$b02, $r03,$g03,$b03, $r04,$g04,$b04 ], 
+   [ $r10,$g10,$b10, $r11,$g11,$b11, $r12,$g12,$b12, $r13,$g13,$b13, $r14,$g14,$b14 ], 
+   [ $r20,$g20,$b20, $r21,$g21,$b21, $r22,$g22,$b22, $r23,$g23,$b23, $r24,$g24,$b24 ], 
+   [ $r30,$g30,$b30, $r31,$g31,$b31, $r32,$g32,$b32, $r33,$g33,$b33, $r34,$g34,$b34 ], 
+ ];
+ #for $type == CD_RGBA
+ $pixels = [ 
+   [ $r00,$g00,$b00,$a00, $r01,$g01,$b01,$a01, $r02,$g02,$b02,$a02, $r03,$g03,$b03,$a03, $r04,$g04,$b04,$a04 ], 
+   [ $r10,$g10,$b10,$a10, $r11,$g11,$b11,$a11, $r12,$g12,$b12,$a12, $r13,$g13,$b13,$a13, $r14,$g14,$b14,$a14 ], 
+   [ $r20,$g20,$b20,$a20, $r21,$g21,$b21,$a21, $r22,$g22,$b22,$a22, $r23,$g23,$b23,$a23, $r24,$g24,$b24,$a24 ], 
+   [ $r30,$g30,$b30,$a30, $r31,$g31,$b31,$a31, $r32,$g32,$b32,$a32, $r33,$g33,$b33,$a33, $r34,$g34,$b34,$a34 ], 
+ ];
+ 
+ $bmp = IUP::Canvas::Bitmap->new($type, $pixels, $colors);
+ #only valid for $type == CD_MAP
+ $pixels = [ 
+   [ $c00, $c01, $c02, $c03, $c04 ], 
+   [ $c10, $c11, $c12, $c13, $c14 ], 
+   [ $c20, $c21, $c22, $c23, $c24 ], 
+   [ $c30, $c31, $c32, $c33, $c34 ], 
+ ];
+ $colors = [ 
+   IUP::Canvas->EncodeColor($r0,$g0,$b0), IUP::Canvas->EncodeColor($r1,$g1,$b1),
+   IUP::Canvas->EncodeColor($r2,$g2,$b2), IUP::Canvas->EncodeColor($r3,$g3,$b3), 
+   IUP::Canvas->EncodeColor($r4,$g4,$b4), IUP::Canvas->EncodeColor($r5,$g5,$b5), 
+ ];
+  
+ $bmp->Data;
+ $bmp->Palette;
+ $bmp->Width;
+ $bmp->Height;
+ $bmp->Type;
+ 
+ #XXX-TODO not implemented yet
+ $bmp->Pixel($x,$y,$r,$g,$b,$a);
+ $bmp->Pixel($x,$y,$r,$g,$b);
+ $bmp->Pixel($x,$y,$n);
+ ($r,$g,$b)    = $bmp->Pixel($x, $y);
+ ($r,$g,$b,$a) = $bmp->Pixel($x, $y);
+ $n            = $bmp->Pixel($x, $y);
+ $bmp->Color($n, $color);
+ $bmp->Color($n);
+
+ 
+ # SaveAs valid formats: TIFF JPEG PNG GIF BMP RAS ICO PNM KRN LED SGI PCX TGA
+ $err = $bmp->SaveAs("tmp.saveas.png","PNG");
+ $err = $bmp->SaveAs("tmp.saveas.jpg","JPEG");
+ # or with given DPI
+ $err = $bmp->SaveAs("tmp.saveas.png","PNG",96); 
+ 
+ $map_bmp = $bmp->RGB2Map;
+ $bmp->SetRect($xmin, $xmax, $ymin, $ymax);
+ 
+ $canvas->cdPutBitmap($bmp,$x,$y,$w,$h);
+ $canvas->wdPutBitmap($bmp,$x,$y,$w,$h);
+ $bmp = $canvas->cdGetBitmap($x,$y,$w,$h);
+
+=head1 DESCRIPTION
+
+B<IUP::Canvas::Bitmap> is a helper class used by L<IUP::Canvas> methods: L<cdPutBitmap|IUP::Canvas/"cdPutBitmap()">, L<wdPutBitmap|IUP::Canvas/"wdPutBitmap()"> and L<cdGetBitmap|IUP::Canvas/"cdGetBitmap()">
+
+=head1 SEE ALSO
+
+L<IUP::Canvas>
+
+=cut

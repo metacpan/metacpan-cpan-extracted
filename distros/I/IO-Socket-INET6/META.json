@@ -1,0 +1,70 @@
+{
+   "abstract" : "Object interface for AF_INET/AF_INET6 domain sockets",
+   "author" : [
+      "<gbarr@pobox.com> and currently maintained by the Perl Porters.",
+      "Modified by Rafael Martinez Torres <rafael.martinez@novagnet.com> and",
+      "Modified further by Shlomi Fish <shlomif@iglu.org.il>, while disclaiming"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4007, CPAN::Meta::Converter version 2.132830",
+   "keywords" : [
+      "inet6",
+      "input",
+      "internet",
+      "ipv6",
+      "network",
+      "networking",
+      "output",
+      "socket",
+      "sockets"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "IO-Socket-INET6",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.36"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Errno" : "0",
+            "Exporter" : "0",
+            "IO::Socket" : "0",
+            "Socket" : "0",
+            "Socket6" : "0.12",
+            "perl" : "5.008",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "IO::Socket::INET6" : {
+         "file" : "lib/IO/Socket/INET6.pm",
+         "version" : "2.72"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://bitbucket.org/shlomif/perl-io-socket-inet6"
+      }
+   },
+   "version" : "2.72"
+}

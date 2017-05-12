@@ -1,0 +1,25 @@
+Source: ikiwiki-plugin-syntax
+Section: web
+Priority: optional
+Build-Depends: debhelper (>= 5.0.0), ikiwiki, libmodule-build-perl, libmodule-build-ikiwiki-perl, libexception-class-perl, liburi-perl, libhtml-parser-perl, libhtml-template-perl, libclass-accessor-perl
+Build-Depends-Indep: perl (>= 5.8)
+Maintainer: Victor Moral <victor@taquiones.net>
+Standards-Version: 3.8.0
+
+Package: ikiwiki-plugin-syntax
+Architecture: all
+Depends: ${perl:Depends}, ikiwiki, libmodule-build-ikiwiki-perl, libexception-class-perl,libclass-accessor-perl
+Recommends: libsyntax-highlight-engine-kate-perl | libtext-vimcolor-perl
+Description: Add syntax highlighting to ikiwiki
+ This package is a ikiwiki plugin that adds syntax highlight capabilities to
+ the ikiwiki sites.
+ .
+ It can use third party modules if they are installed:
+ .
+ * Syntax::Highlight::Engine::Kate
+ * Text::VimColor
+ .
+ Or use a internal and simple engine for reduce the external dependencies.
+ .
+ The module register a preprocessor directive named syntax and is slow.
+ .

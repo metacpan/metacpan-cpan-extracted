@@ -1,0 +1,261 @@
+#/usr/bin/perl
+#!/usr/bin/perl -w
+
+eval 'exec /usr/bin/perl -w -S $0 ${1+"$@"}'
+    if 0; # not running under some shell
+
+#################################################################
+#								#
+# 	READ THE DOCUMENTATION IN THIS FILE BY TYPING:		#
+#								#
+#		perdoc -U ./rc.dbtarpit				#
+#								#
+#################################################################
+
+#
+# rc.dbtarpit version 0.05, 6-8-04
+#
+# Copyright 2003, 2004, Michael Robinton <michael@bizsystems.com>
+# rc.dbtarpit is free software; you can redistribute it and/or 
+# modify it under the terms of the GPL software license.
+#
+use strict;
+use IPTables::IPv4::DBTarpit::SiteConfig;
+
+my $CONFIG = new IPTables::IPv4::DBTarpit::SiteConfig;
+
+# you can override the installation configuration variables by
+# uncommenting and editing various items below:
+#
+# $CONFIG->{DBTP_DAEMON_DIR}	= '/usr/local/sbin',	# "dbtarpit daemon install directory\t:",
+# $CONFIG->{DBTP_LIBRARY_DIR}	= '/usr/local/lib',	# "shared library install directory\t:",
+# $CONFIG->{DBTP_INCLUDE_DIR}	= '/usr/local/include',	# "shared library header install directory\t:",
+# $CONFIG->{DBTP_ENVHOME_DIR}	= '/var/run/dbtarpit',	# "dbtarpit database env/home directory\t:",
+# $CONFIG->{DBTP_DB_TARPIT}	= 'tarpit',		# "dbtarpit primary database name  \t:",
+# $CONFIG->{DBTP_DB_ARCHIVE}	= 'archive',		# "dbtarpit secondary database name\t:",
+
+my $daemon	= 'dbtarpit';
+my $pid_file	= $CONFIG->{DBTP_ENVHOME_DIR} .'/'. $daemon .'.pid';
+my $daemonX	= $CONFIG->{DBTP_DAEMON_DIR} .'/'. $daemon;
+
+# Default configuration is shown below. Edit the command string below to change this
+#
+#	-b		: Log bandwidth usage to syslog
+#	-l		: Log activity to syslog
+#	-p 1000		: "Persist" state capture connect attempts
+#			   up to 1000 bytes per second
+#	-R		: Soft restart - Wait while recapturing active connects
+#	-u dbtplog	: Log to fifo
+#	-v		: Verbosely log activity to syslog
+#
+my $execmd = $daemonX .' -b -l -p 1000 -R -u dbtplog -v';
+$execmd   .= ' -r '. $CONFIG->{DBTP_ENVHOME_DIR};
+$execmd   .= ' -f '. $CONFIG->{DBTP_DB_TARPIT};
+$execmd   .= ' -s '. $CONFIG->{DBTP_DB_ARCHIVE};
+
+###########################################################################
+############## NO MORE CONFIGURABLE ITEMS BEYOND THIS POINT ###############
+###########################################################################
+
+# how long to wait for stop on restart (in seconds)
+use constant MAX_RESTART_WAIT => 10;
+
+my $DEBUG;	# set true to print command instead of executing
+		# same as 'rc.dbtarpit debug'
+
+=pod
+
+=head1 NAME
+
+rc.dbtarpit - dbtarpit controller
+
+=head1 SYNOPSIS
+
+  rc.dbtarpit start
+  rc.dbtarpit stop
+  rc.dbtarpit restart
+  rc.dbtarpit pass
+  rc.dbtarpit drop
+  rc.dbtarpit help
+  rc.dbtarpit debug
+
+=head1 DESCRIPTION
+
+This script controls the dbtarpit daemon.
+
+  rc.dbtarpit start	- start the dbtarpit daemon
+  rc.dbtarpit start -T	- print configuration and exit
+
+  rc.dbtarpit stop	- stop the dbtarpit daemon
+
+  rc.dbtarpit restart	- stop then start the daemon
+
+Note: packets to the port handled by the daemon 
+WILL BE DROPPED when the daemon is not present.
+
+  rc.dbtarpit pass	- pass all packets
+
+  rc.dbtarpit drop	- drop packets found 
+			in the tarpit database
+			do not tarpit them
+
+  rc.dbtarpit help	- print help and exit
+
+  rc.dbtarpit debug	- print command line and exit
+
+DBTarpit command line arguments can be passed directly to the daemon by
+invoking rc.dbtarpit with the options on its command line. Some options of
+interest:
+
+Pass all packets, do not tarpit, but do collect 'archive' data
+
+  rc.dbtarpit start -a
+
+Do not tarpit, just drop connections (packets) for IP's found in the
+'tarpit' database:
+
+  rc.dbtarpit start -x
+
+=head1 AUTHOR
+
+Michael Robinton <michael@bizsystems.com>
+
+=head1 COPYRIGHT
+
+Copyright 2003, Michael Robinton <michael@bizsystems.com>
+This script is free software; you can redistribute it and/or
+modify it under the terms of the GPL software license.
+
+=head1 SEE ALSO
+
+L<IPTables::IPv4::DBTarpit>
+
+=cut
+
+die <<EOF unless -e $daemonX && -x $daemonX;
+###############################################################
+
+  Can not find $daemon daemon. Please check your installation
+
+###############################################################
+EOF
+
+die <<EOF if -e $CONFIG->{DBTP_ENVHOME_DIR} .'/'. 'blockedBYwatcher';
+##############################################
+
+  startup blocked by DB watcher process
+
+##############################################
+EOF
+
+$| = 1;
+# get status
+my $running = 0;
+my $pid = 0;
+if (-e $pid_file) {
+    open(P,$pid_file);
+    $pid = <P>;
+    close P;
+    chomp $pid;
+    if ($pid and kill(0, $pid)) {
+        $running = 1;
+    }
+}
+
+my $command = shift @ARGV || '';
+
+if ($command eq 'start') {
+    do_start();
+}
+elsif ($command eq 'stop') {
+    exit do_stop();
+}
+elsif ($command eq 'restart') {
+    do_stop();
+    for my $wait (0..MAX_RESTART_WAIT()) {
+	last unless $running;
+	$running = (kill(0, $pid));
+    	print '.';
+	sleep 1;
+    }
+    exit 1 if $running;
+    do_start();
+}
+elsif ($command eq 'pass') {
+    do_start('-a');
+}
+elsif ($command eq 'drop') {
+    do_start('-x');
+}
+elsif ($command =~ 'help') {
+    usage();
+}
+elsif ($command =~ 'debug') {
+    $DEBUG = 1;
+    do_start();
+}
+
+usage("\nUNKNOWN command\n");
+
+sub do_stop {
+    unless ($running) {
+	print "$command $daemon not running\n";
+    }
+    elsif (kill 15, $pid) {
+	print "$command $daemon stopping\n";
+	return 0;
+    } else {
+	print "$command $daemon could not be stopped\n";
+    }
+    return 1;
+}
+
+sub do_start {
+    my $extra = $_[0] || '';
+    my @extra = @ARGV;
+    if ($extra) {
+	unshift @extra, @_;
+    }
+    $extra = join ' ', @extra if @extra;
+    $extra = ' '. $extra if $extra;
+    if ($running) {
+	print "$command: $daemon pid ($pid) already running\n";
+    }
+    elsif ($DEBUG) {
+        print $execmd, $extra, "\n";
+    }
+    elsif (system($execmd . $extra)) {
+	print "$command: $daemon could not be started\n";
+	exit 1;
+    }
+    exit 0;
+}
+
+sub usage {
+  my $msg = $_[0] || '';
+  print $msg, q|
+  This script controls the dbtarpit daemon.
+
+  rc.dbtarpit start     - start the dbtarpit daemon
+  rc.dbtarpit start -T  - print configuration and exit
+
+  rc.dbtarpit stop      - stop the dbtarpit daemon
+
+  rc.dbtarpit restart   - stop then start the daemon
+
+Note: packets to the port handled by the daemon
+WILL BE DROPPED when the daemon is not present.
+
+  rc.dbtarpit pass      - pass all packets
+
+  rc.dbtarpit drop      - drop packets found
+                        in the tarpit database
+                        do not tarpit them
+
+  rc.dbtarpit help      - print help and exit
+
+  rc.dbtarpit debug     - print command line and exit
+
+|;
+  exit 0;
+}

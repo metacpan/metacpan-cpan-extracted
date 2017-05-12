@@ -1,0 +1,6 @@
+************FAX MESSAGE**********************
+THIS IS FAX MESSAGE BEING SENT BY IVRS.
+YOU CAN CREATE THIS FILE ON FLY AND SEND IT TO
+CALLER OVER FAX. 
+SENT BY Ivrs.pm, A PERL MODULE FOR IVRS.
+*********************************************

@@ -1,0 +1,25 @@
+Build.PL
+Changes
+examples/.vimrc
+examples/example_1.pl
+examples/makefile
+lib/IO/Infiles.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/00_load.t
+t/01b_pod.t
+t/01c_coverage.t
+t/01s_spelling.t
+t/02_hasversion.t
+t/03_meta.t
+t/05_minimumversion.t
+t/07_strict.t
+t/09_legal.t
+t/10_basic.t
+t/13_reading.t
+t/15_reading.t
+t/distribution.t
+t/makefile

@@ -1,0 +1,31 @@
+2003-01-18 23:27  stevegt
+
+	* lib/IS/Init.pm, t/isinittab.master: add test mode
+
+2003-01-18 22:41  stevegt
+
+	* lib/IS/Init.pm, t/20wait.t, t/40respawn.t, t/50multigrp.t,
+	t/isinittab.master: add status file output
+
+2001-09-21 12:07  stevegt
+
+	* lib/IS/Init.pm: port to AIX
+
+2001-09-21 11:25  stevegt
+
+	* t/70isinit.t: fix timing problem on startup
+
+2001-09-21 11:21  stevegt
+
+	* MANIFEST, isinit, lib/IS/Init.pm, t/02_config.t, t/08daemon.t,
+	t/70isinit.t: add -k, -c, -s flags to isinit, add test cases for it
+
+2001-09-21 10:42  stevegt
+
+	* LICENSE, MANIFEST, Makefile.PL, README, gen, isinit,
+	lib/IS/Init.pm, t/01_ini.t, t/02_config.t, t/08daemon.t,
+	t/10_tell.t, t/20wait.t, t/25long.t, t/30once.t, t/40respawn.t,
+	t/45init0.t, t/47reread.t, t/48off.t, t/50multigrp.t,
+	t/60multichar.t, t/isinittab.master, t/utils.pl: first version,
+	working great, all 90 regression tests pass
+

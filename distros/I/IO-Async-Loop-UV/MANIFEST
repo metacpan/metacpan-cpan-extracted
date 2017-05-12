@@ -1,0 +1,17 @@
+Build.PL
+Changes
+lib/IO/Async/Loop/UV.pm
+MANIFEST			This list of files
+t/00use.t
+t/01loop-io.t
+t/02loop-timer.t
+t/03loop-signal.t
+t/04loop-idle.t
+t/05loop-child.t
+t/06loop-control.t
+t/99pod.t
+Makefile.PL
+README
+LICENSE
+META.yml
+META.json

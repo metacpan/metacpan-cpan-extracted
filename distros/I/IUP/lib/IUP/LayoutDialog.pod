@@ -1,0 +1,181 @@
+=for comment based on iup-3.5 - http://www.tecgraf.puc-rio.br/iup/en/dlg/iuplayoutdialog.html
+
+=head1 NAME
+
+IUP::LayoutDialog - [pre-defined-dialog] special dialog for GUI editing of other IUP dialogs
+
+=head1 DESCRIPTION
+
+Creates a Layout Dialog (since iup-3.3). It is a predefined dialog to visually edit the
+layout of another dialog in run time. It is a standard L<IUP::Dialog|IUP::Dialog>
+constructed with other IUP elements. The dialog can be shown with any
+of the show functions L<Show|IUP::Manual::02_Elements/"Show()">, L<ShowXY|IUP::Manual::02_Elements/"ShowXY()"> or L<Popup|IUP::Manual::02_Elements/"Popup()">.
+
+Any existent dialog can be selected. It does not need to be mapped on
+the native system nor visible.
+
+The layout dialog is composed by two areas: one showing the given
+dialog children hierarchy tree, and one displaying its layout.
+
+This is a dialog intended for developers, so they can see and inspect
+their dialogs in other ways.
+
+=begin HTML
+
+<p><img src="http://kmx.github.io/perl-iup/img-3.9/dlg/layoutdlg1.png"></p>
+
+=end HTML
+
+=head1 USAGE
+
+=head2 CREATION - new() method
+
+ $layoutdialog = IUP::LayoutDialog->new($dialog);
+ #or
+ $layoutdialog = IUP::LayoutDialog->new( dialog=>$dialog );
+
+B<$dialog>: reference to dialog (L<IUP::Dialog>) to display the layout. Can be C<undef>.
+
+B<Returns:> the identifier of the created element, or C<undef> if an error occurs.
+
+NOTE: You can pass to C<new()> other C<ATTRIBUTE=E<gt>'value'> or C<CALLBACKNAME=E<gt>\&func> pairs relevant
+to this element - see L<IUP::Manual::02_Elements|IUP::Manual::02_Elements/"new()">.
+
+=head2 ATTRIBUTES
+
+For more info about concept of attributes (setting/getting values etc.)
+see L<IUP::Manual::03_Attributes|IUP::Manual::03_Attributes>. Attributes specific to this element:
+
+=over
+
+=item B<DESTROYWHENCLOSED>
+
+The dialog will be automatically destroyed when
+closed. Default: Yes.
+
+=back
+
+Check the L<IUP::Dialog|IUP::Dialog/"ATTRIBUTES"> attributes.
+
+=head2 CALLBACKS
+
+For more info about concept of callbacks (setting callback handlers etc.)
+see L<IUP::Manual::04_Callbacks|IUP::Manual::04_Callbacks>. Callbacks specific to this element:
+
+Check the L<IUP::Dialog|IUP::Dialog/"CALLBACKS"> callbacks.
+
+=head1 NOTES
+
+=head2 Menu
+
+ Dialog
+         New  - creates a new empty dialog, it will be destroyed when the layout is destroyed.
+         Load - loads an existent dialog from the application.
+         Load Visible - lists only visible dialogs from the application to be loaded.
+         Reload - reloads the current dialog into the Layout Dialog.
+         Export - exports the current dialog to a text file in the specified language.
+                 C
+                 LED
+                 Lua
+         Refresh - recalculates the dialog layout of the current dialog (IUP::Refresh).
+         Redraw - send a redraw to the current dialog (IUP::Redraw).
+         Show - shows the current dialog (IUP::Show) 
+         Hide - hides the current dialog (IUP::Hide) 
+         Close - hides the Layout Dialog, optionally self destroy according to DESTROYWHENCLOSED.
+ Layout
+         Hierarchy - shows or hides the layout hierarchy tree at left.
+         Update - redraw the layout.
+         Auto Update - periodically redraw the layout.
+         Show Hidden - show hidden elements in the layout.
+         Opacity - controls the Layout Dialog opacity so you can composite it on top of the selected dialog.
+
+Use B<Reload> when the dialog has been changed and the layout was
+modified by the application. Use B<Update> when attributes of the
+dialog were changed by the application and the layout needs to be
+redrawn.
+
+The B<Export> items will export only the dialog and its children.
+Associated elements such as menus and images will not be exported. The
+selected file will be overwritten if existent.
+
+=head2 Hierarchy Tree
+
+Each element inside the dialog is mapped to a node in the tree, and
+elements that are containers are branches in the tree. The node title
+shows the element class name, its TITLE attribute when available and
+its name when available. The selected node is synced with the selected
+element in the layout display in both ways. Using the right click over
+a node shows a context menu.
+
+You can drag and drop items in the tree. But there are some
+restrictions according to each container possibilities. Some containers
+have internal children that are displayed but can not be changed.
+
+=head2 Layout Display
+
+The layout of an element is drawn with its Current size using its FONT,
+TITLE, BGCOLOR and FGCOLOR if any. But inheritance is not used
+intentionally to emphasize the element attributes. Only the first line
+(limited to 50 characters in the tree) is used from the element TITLE.
+Images are also used, but position of text and images are not the same
+as in the native control. This decoration is there simply to help
+locating the elements in the layout.
+
+Containers that are not native elements are shown with dashed lines,
+other elements are shown with solid lines. When a red line is displayed
+along with a border of an element it means that element is maximizing
+its parent size, i.e. its B<Current> size is equal to its B<Natural>
+size and both are equal to the parent B<Client> size. Usually this is
+the element determining the natural size of the container at least in
+the direction marked with red.
+
+You can NOT drag and drop elements in the layout. Using the right click
+over an element shows a context menu, the same as in a tree node. When
+an element in the layout is double clicked and the actual element is
+visible, then the actual element will blink twice.
+
+=head2 Context Menu
+
+ Properties - shows the properties dialog for the selected element.
+ Map - maps the selected element to the native system.
+ Unmap - unmaps the selected element from the native system. Its attribute are saved before unmapping.
+ Copy - copy the selected element to an internal clipboard. Its attributes are also copied.
+ Paste Child - paste the copied element as the first child of the selected container. 
+ Paste Brother - paste the copied element as brother of the selected element.
+ Add Child - adds a new element as the first child of the selected container. The new element is not mapped.
+ Add Brother - adds a new element as brother of the selected element. The new element is not mapped.
+ Remove - removes the selected element. 
+
+=head2 Properties
+
+The properties dialog allows the inspection and change of the elements
+attributes. It contains 3 Tab sections: one for the registered
+attributes of the element, one for custom attributes set at the hash
+table, and one for the callbacks. The callbacks are just for
+inspection, and custom attribute should be handled carefully because
+they may be not strings. Registered attributes values are shown in red
+when they were changed by the application. It uses the
+L<IUP::ElementPropertiesDialog|IUP::ElementPropertiesDialog>.
+
+=head1 EXAMPLES
+
+
+The element B<IUP::LayoutDialog> is used in the following sample scripts:
+
+=over
+
+=item * L<0-basic/layoutdialog.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/layoutdialog.pl> - IUP::LayoutDialog example
+
+=back 
+
+
+
+=head1 SEE ALSO
+
+L<IUP::Dialog|IUP::Dialog>, L<Show|IUP::Manual::02_Elements/"Show()">,
+L<ShowXY|IUP::Manual::02_Elements/"ShowXY()">, L<Popup|IUP::Manual::02_Elements/"Popup()">
+
+The original doc: L<iuplayoutdialog.html|http://www.tecgraf.puc-rio.br/iup/en/dlg/iuplayoutdialog.html>
+ 
+
+=cut

@@ -1,0 +1,17 @@
+Build.PL
+Changes
+examples/multicast-recieve.pl
+examples/multicast-send.pl
+examples/unicast-recieve.pl
+examples/unicast-send.pl
+lib/IO/Socket/Multicast6.pm
+MANIFEST
+META.yml
+README
+t/00use.t
+t/05interface.t
+t/10loopback.t
+t/10ttl.t
+t/20add-drop.t
+t/30send.t
+t/35mcastsend.t

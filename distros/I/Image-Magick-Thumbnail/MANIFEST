@@ -1,0 +1,14 @@
+Changes
+eg/eg.pl
+lib/Image/Magick/Thumbnail.pm
+Makefile.PL
+MANIFEST
+META.yml                                 Module meta-data (added by MakeMaker)
+README
+t/001_MANIFEST.t
+t/pod.t
+t/pod_coverage.t
+t/source.jpg
+t/source100x200.jpg
+t/test.t
+MANIFEST.skip

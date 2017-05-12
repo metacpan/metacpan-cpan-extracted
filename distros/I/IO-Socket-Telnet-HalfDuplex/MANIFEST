@@ -1,0 +1,12 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/IO/Socket/Telnet/HalfDuplex.pm
+t/000-load.t
+t/001-ping.t
+t/002-lots-of-data.t
+t/003-different-pong.t

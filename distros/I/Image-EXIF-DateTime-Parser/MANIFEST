@@ -1,0 +1,6 @@
+lib/Image/EXIF/DateTime/Parser.pm
+t/010_unit_datetime_parser.t
+README
+Makefile.PL
+MANIFEST
+META.yml                                 Module meta-data (added by MakeMaker)

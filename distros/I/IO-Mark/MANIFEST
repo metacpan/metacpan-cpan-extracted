@@ -1,0 +1,15 @@
+Changes
+lib/IO/Mark.pm
+lib/IO/Mark/Buffer.pm
+lib/IO/Mark/Cache.pm
+lib/IO/Mark/SlaveBuffer.pm
+Makefile.PL
+MANIFEST
+README
+t/00.load.t
+t/10.simple.t
+t/pod-coverage.t
+t/pod.t
+t/test-data.txt
+META.yml                                 Module meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

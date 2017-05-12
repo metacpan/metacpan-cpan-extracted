@@ -1,0 +1,39 @@
+---
+name: Iterator-BreakOn
+version: 0.4
+author:
+  - '"Víctor Moral" <victor@taquiones.net>'
+abstract: Iterator with control flow breaks
+license: lgpl
+resources:
+  license: http://opensource.org/licenses/artistic-license.php
+requires:
+  Class::Accessor: 0
+  Exception::Class: 0
+  List::MoreUtils: 0
+  Test::More: 0
+provides:
+  Iterator::BreakOn:
+    file: lib/Iterator/BreakOn.pm
+    version: 0.2
+  Iterator::BreakOn::Base:
+    file: lib/Iterator/BreakOn/Base.pm
+    version: 0.3
+  Iterator::BreakOn::Base::Event:
+    file: lib/Iterator/BreakOn/Event.pm
+    version: 0.1
+  Iterator::BreakOn::DataSource:
+    file: lib/Iterator/BreakOn/DataSource.pm
+    version: 0.1
+  Iterator::BreakOn::DataSource::GetMethod:
+    file: lib/Iterator/BreakOn/DataSource.pm
+  Iterator::BreakOn::Event:
+    file: lib/Iterator/BreakOn/Event.pm
+    version: 0.1
+  Iterator::BreakOn::X:
+    file: lib/Iterator/BreakOn/X.pm
+    version: 0.2
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

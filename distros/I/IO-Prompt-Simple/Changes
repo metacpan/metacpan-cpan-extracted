@@ -1,0 +1,22 @@
+Revision history for Perl extension IO::Prompt::Simple
+
+0.06  Mon Oct 22 01:23:33 2012
+    - repacking (suggested by miyagawa++)
+
+0.05  Sun Feb  5 19:55:09 2012
+    - lazy loading for dependent modules
+
+0.04  Sat Dec 24 02:51:19 2011
+    - added `color` and `choices` and `multi` option
+
+0.03  Wed Sep 28 23:35:46 2011
+    - remove dependence on Hash::MultiValue
+    - support REF-ARRAYREF on `anyone`
+    - refactoring
+
+0.02  Fri Sep 23 01:36:12 2011
+    - added `yn` option
+    - support Hash::MultiValue instance for anyone
+
+0.01  Wed Sep 21 01:34:54 2011
+    - original version

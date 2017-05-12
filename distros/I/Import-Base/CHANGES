@@ -1,0 +1,120 @@
+Changelog for Import-Base
+
+1.003     2017-02-16 14:09:34-06:00 America/Chicago
+
+    [Fixes]
+
+    - Update the documentation to show that the Dancer2::Plugin problem
+      was fixed months ago, and that users should upgrade to Dancer2
+      v0.200000 if they want to use Import::Base and Dancer2 plugins
+      together.
+
+1.002 2016-03-02T05:08:56
+ - clarify that exclude works on modules and symbols
+ - also check for Dancer2::Plugin::Ajax in test
+
+1.001 2016-03-01T04:06:38Z
+ - fix test that requires Dancer2
+
+1.000 2016-03-01T03:52:23Z
+ - mention known issues
+ - add use-case test for Dancer2
+ - test that moo roles can be built with bundles
+ - refer to the Importer module for renames
+ - allow exporting symbols in the base module
+
+0.014 2015-09-07T23:47:18Z
+ - neutralize the see also and add sanity.pm
+ - fix role example to remove need to preload role
+ - enable signatures before disabling warning in docs
+
+0.013 2015-09-03T03:36:35Z
+ - upgrade Import::Into to fix target
+ - add version check during import with hashref
+ - upgrade perl in travis config
+ - remove ModuleBuild to prevent toolchain confusion
+ - add link to #beam IRC channel
+
+0.012 2015-02-17T02:23:55Z
+ - add use-case test for a role with requires
+ - add import_bundle to import bundles at runtime
+
+0.011 2015-02-09T01:42:48Z
+ - run subref callbacks during the import process
+ - remove feature allowing subs to make import array
+ - add dzil plugin for prereqs and compile tests
+ - remove root dotfiles and root ini files from dist
+ - switch to dzil Git::GatherDir
+ - fix contributors dependency
+ - update copyright year
+ - add contributors dzil plugin for proper attribution
+
+0.010 2014-12-24T05:59:24Z
+ - add dzil tag annotation with name, date, and changelog
+ - fix warnings if a class doesn't have IMPORT_*
+ - remove note about custom args from dynamic api
+ - update weaver.ini from new skeleton
+
+0.009 2014-11-06T06:03:29Z
+ - release v0.009
+ - add some explanatory comments to SYNOPSIS
+ - add < and > order control prefixes
+
+0.008 2014-11-05T04:35:38Z
+ - release v0.008
+ - add example of custom arguments
+ - add package arg to subref callbacks
+ - add docs about subref arguments
+ - add subrefs for dynamic bits in the static API
+
+0.007 2014-11-03T00:24:59Z
+ - release v0.007
+ - allow cpanfile to be built as part of the release
+ - add CHANGES and cpanfile for new dist.ini
+ - update dist.ini for new best practices
+ - make sure we only check for warnings from the eval
+ - ensure there are no warnings
+ - add best practices about backward compatibility
+
+0.006 2014-10-26T23:40:36Z
+ - release v0.006
+ - add perl5 to SEE ALSO
+ - add a rationale for the dynamic API
+ - reorganize and consolidate tests
+ - add documentation boilerplate
+ - don't build 5.8
+ - add static package var api
+ - add minimum perl version
+ - add travis.yml
+
+0.005 2014-10-13T06:06:48Z
+ - release v0.005
+ - clarify docs on arguments and adding custom args
+ - add import bundles to use fewer modules
+ - SurgicalPodWeaver -> PodWeaver
+ - add Import::Into to see also
+
+0.004 2014-06-09T04:42:09Z
+ - release v0.004
+ - fix prereqs
+ - remove Test::Most since we only need Test::More
+ - use numbered level when importing. thanks haarg!
+ - add test for inheriting from a base module
+ - explain what modules() returns and remove empty []
+
+0.003 2014-06-04T22:16:00Z
+ - implement unimport "-Module"
+ - add usage examples
+ - add -exclude option when importing a base module
+
+0.002 2014-04-27T02:27:17Z
+ - update to version 0.002
+ - remove feature from the test module
+
+0.001 2014-04-26T22:39:23Z
+ - add links because it's nicer
+ - add build artifacts and base contributing file
+ - add SEE ALSO section with some similar modules
+ - use an array to order imports instead of a hash
+ - initial Import::Base implementation
+

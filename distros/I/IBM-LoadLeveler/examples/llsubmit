@@ -1,0 +1,62 @@
+# -*- Perl -*-
+
+use IBM::LoadLeveler;
+
+my ($job_name,$owner,$group,$uid,$gid,$host,$steps,$job_step)=llsubmit("/home/mike/test_job/test_job.cmd",NULL,NULL);
+
+print "Job Name   = $job_name\n";
+print "Owner      = $owner\n";
+print "Group      = $group\n";
+print "UID        = $uid\n";
+print "GID        = $gid\n";
+print "HOST       = $host\n";
+print "STEPS      = $steps\n";
+print "JOB_STEP   = $job_step\n";
+@steps=@{$job_step};
+print "JOB_STEP   = $#{$job_step}\n";
+foreach $stepref  (@steps)
+{
+	%step=%{$stepref};
+	print "STEP_NAME      = $step{'step_name'}\n";
+	print "REQUIREMENTS   = $step{'requirements'}\n";
+	print "PREFERENCES    = $step{'preferences'}\n";
+	print "PRIO           = $step{'prio'}\n";
+	print "DEPENDENCY     = $step{'dependency'}\n";
+	print "GROUP NAME     = $step{'group_name'}\n";
+	print "STEPCLASS      = $step{'stepclass'}\n";
+	print "START DATE     = $step{'start_date'}\n";
+	print "FLAGS          = $step{'flags'}\n";
+	print "MIN PROCESSORS = $step{'min_processors'}\n";
+	print "MAX PROCESSORS = $step{'max_processors'}\n";
+	print "ACCOUNT NO     = $step{'account_no'}\n";
+	print "COMMENT        = $step{'comment'}\n";
+	print "STEP ID        = @{$step{'id'}}\n";
+	print "Q_DATE         = $step{'q_date'}\n";
+	print "STATUS         = $step{'status'}\n";
+	print "NUM PROCESSORS = $step{'num_processors'}\n";
+	print "PROCESSOR LIST = @{$step{'processor_list'}}\n";
+	print "CMD            = $step{'cmd'}\n";
+	print "ARGS           = $step{'args'}\n";
+	print "ENV            = $step{'env'}\n";
+	print "IN             = $step{'in'}\n";
+	print "OUT            = $step{'out'}\n";
+	print "ERR            = $step{'err'}\n";
+	print "IWD            = $step{'iwd'}\n";
+	print "NOTIFY_USER    = $step{'notify_user'}\n";
+	print "SHELL          = $step{'shell'}\n";
+	print "TRACKER        = $step{'tracker'}\n";
+	print "TRACKER_ARGS   = $step{'tracker_arg'}\n";
+	print "NOTIFICATION   = $step{'notification'}\n";
+	print "IMAGE_SIZE     = $step{'image_size'}\n";
+	print "EXEC_SIZE      = $step{'exec_size'}\n";
+	print "LIMITS         = @{$step{'limits'}}\n";
+	print "NQS INFO       = @{$step{'nqs_info'}}\n";
+	%usage_info = %{$step{'usage_info'}};
+	print "USAGE INFO     = --------------------\n";
+	print "	STARTER_RUSAGE = $usage_info{'starter_rusage'}\n";
+	%rusage=%{$usage_info{'starter_rusage'}};
+	print "		RU_UTIME  = $rusage{'ru_utime'}\n";
+	print "		RU_MAXRSS = $rusage{'ru_maxrss'}\n";
+	print "	STEP_RUSAGE    = $usage_info{'step_rusage'}\n";
+	print "	MACH_USAGE ITEMS = $#{$usage_info{'mach_usage'}}\n";
+}

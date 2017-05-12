@@ -1,0 +1,25 @@
+---
+name: Inline-Befunge
+version: 1.1.1
+author: []
+abstract: write Perl subs in Befunge
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Inline: 0.43
+  Language::Befunge: 3.00
+build_requires:
+  Inline: 0.43
+  Language::Befunge: 3.00
+recommends:
+  Test::Pod: 0
+  Test::Pod::Coverage: 0
+provides:
+  Inline::Befunge:
+    file: lib/Inline/Befunge.pm
+    version: 1.1.1
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

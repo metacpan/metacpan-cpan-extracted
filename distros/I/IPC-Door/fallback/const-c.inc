@@ -1,0 +1,402 @@
+#define PERL_constant_NOTFOUND	1
+#define PERL_constant_NOTDEF	2
+#define PERL_constant_ISIV	3
+#define PERL_constant_ISNO	4
+#define PERL_constant_ISNV	5
+#define PERL_constant_ISPV	6
+#define PERL_constant_ISPVN	7
+#define PERL_constant_ISSV	8
+#define PERL_constant_ISUNDEF	9
+#define PERL_constant_ISUV	10
+#define PERL_constant_ISYES	11
+
+#ifndef NVTYPE
+typedef double NV; /* 5.6 and later define NVTYPE, and typedef NV to it.  */
+#endif
+#ifndef aTHX_
+#define aTHX_ /* 5.6 or later define this for threading support.  */
+#endif
+#ifndef pTHX_
+#define pTHX_ /* 5.6 or later define this for threading support.  */
+#endif
+
+static int
+constant_9 (pTHX_ const char *name, IV *iv_return) {
+  /* When generated this function returned values for the list of names given
+     here.  However, subsequent manual editing may have added or removed some.
+     DOOR_BIND DOOR_CALL DOOR_CRED DOOR_EXIT DOOR_INFO DOOR_WAIT */
+  /* Offset 7 gives the best switch position.  */
+  switch (name[7]) {
+  case 'E':
+    if (memEQ(name, "DOOR_CRED", 9)) {
+    /*                      ^       */
+#ifdef DOOR_CRED
+      *iv_return = DOOR_CRED;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 'F':
+    if (memEQ(name, "DOOR_INFO", 9)) {
+    /*                      ^       */
+#ifdef DOOR_INFO
+      *iv_return = DOOR_INFO;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 'I':
+    if (memEQ(name, "DOOR_EXIT", 9)) {
+    /*                      ^       */
+#ifdef DOOR_EXIT
+      *iv_return = DOOR_EXIT;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    if (memEQ(name, "DOOR_WAIT", 9)) {
+    /*                      ^       */
+#ifdef DOOR_WAIT
+      *iv_return = DOOR_WAIT;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 'L':
+    if (memEQ(name, "DOOR_CALL", 9)) {
+    /*                      ^       */
+#ifdef DOOR_CALL
+      *iv_return = DOOR_CALL;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 'N':
+    if (memEQ(name, "DOOR_BIND", 9)) {
+    /*                      ^       */
+#ifdef DOOR_BIND
+      *iv_return = DOOR_BIND;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  }
+  return PERL_constant_NOTFOUND;
+}
+
+static int
+constant_10 (pTHX_ const char *name, IV *iv_return) {
+  /* When generated this function returned values for the list of names given
+     here.  However, subsequent manual editing may have added or removed some.
+     DOOR_DELAY DOOR_INVAL DOOR_LOCAL DOOR_QUERY DOOR_UNREF */
+  /* Offset 5 gives the best switch position.  */
+  switch (name[5]) {
+  case 'D':
+    if (memEQ(name, "DOOR_DELAY", 10)) {
+    /*                    ^           */
+#ifdef DOOR_DELAY
+      *iv_return = DOOR_DELAY;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 'I':
+    if (memEQ(name, "DOOR_INVAL", 10)) {
+    /*                    ^           */
+#ifdef DOOR_INVAL
+      *iv_return = DOOR_INVAL;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 'L':
+    if (memEQ(name, "DOOR_LOCAL", 10)) {
+    /*                    ^           */
+#ifdef DOOR_LOCAL
+      *iv_return = DOOR_LOCAL;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 'Q':
+    if (memEQ(name, "DOOR_QUERY", 10)) {
+    /*                    ^           */
+#ifdef DOOR_QUERY
+      *iv_return = DOOR_QUERY;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 'U':
+    if (memEQ(name, "DOOR_UNREF", 10)) {
+    /*                    ^           */
+#ifdef DOOR_UNREF
+      *iv_return = DOOR_UNREF;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  }
+  return PERL_constant_NOTFOUND;
+}
+
+static int
+constant_11 (pTHX_ const char *name, IV *iv_return) {
+  /* When generated this function returned values for the list of names given
+     here.  However, subsequent manual editing may have added or removed some.
+     DOOR_CREATE DOOR_HANDLE DOOR_RETURN DOOR_REVOKE DOOR_UNBIND */
+  /* Offset 9 gives the best switch position.  */
+  switch (name[9]) {
+  case 'K':
+    if (memEQ(name, "DOOR_REVOKE", 11)) {
+    /*                        ^        */
+#ifdef DOOR_REVOKE
+      *iv_return = DOOR_REVOKE;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 'L':
+    if (memEQ(name, "DOOR_HANDLE", 11)) {
+    /*                        ^        */
+#ifdef DOOR_HANDLE
+      *iv_return = DOOR_HANDLE;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 'N':
+    if (memEQ(name, "DOOR_UNBIND", 11)) {
+    /*                        ^        */
+#ifdef DOOR_UNBIND
+      *iv_return = DOOR_UNBIND;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 'R':
+    if (memEQ(name, "DOOR_RETURN", 11)) {
+    /*                        ^        */
+#ifdef DOOR_RETURN
+      *iv_return = DOOR_RETURN;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 'T':
+    if (memEQ(name, "DOOR_CREATE", 11)) {
+    /*                        ^        */
+#ifdef DOOR_CREATE
+      *iv_return = DOOR_CREATE;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  }
+  return PERL_constant_NOTFOUND;
+}
+
+static int
+constant_12 (pTHX_ const char *name, IV *iv_return) {
+  /* When generated this function returned values for the list of names given
+     here.  However, subsequent manual editing may have added or removed some.
+     DOOR_PRIVATE DOOR_RELEASE DOOR_REVOKED */
+  /* Offset 7 gives the best switch position.  */
+  switch (name[7]) {
+  case 'I':
+    if (memEQ(name, "DOOR_PRIVATE", 12)) {
+    /*                      ^           */
+#ifdef DOOR_PRIVATE
+      *iv_return = DOOR_PRIVATE;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 'L':
+    if (memEQ(name, "DOOR_RELEASE", 12)) {
+    /*                      ^           */
+#ifdef DOOR_RELEASE
+      *iv_return = DOOR_RELEASE;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 'V':
+    if (memEQ(name, "DOOR_REVOKED", 12)) {
+    /*                      ^           */
+#ifdef DOOR_REVOKED
+      *iv_return = DOOR_REVOKED;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  }
+  return PERL_constant_NOTFOUND;
+}
+
+static int
+constant (pTHX_ const char *name, STRLEN len, IV *iv_return) {
+  /* Initially switch on the length of the name.  */
+  /* When generated this function returned values for the list of names given
+     in this section of perl code.  Rather than manually editing these functions
+     to add or remove constants, which would result in this comment and section
+     of code becoming inaccurate, we recommend that you edit this section of
+     code, and use it to regenerate a new set of constant functions which you
+     then use to replace the originals.
+
+     Regenerate these constant functions by feeding this entire source file to
+     perl -x
+
+#!perl -w
+use ExtUtils::Constant qw (constant_types C_constant XS_constant);
+
+my $types = {map {($_, 1)} qw(IV)};
+my @names = (qw(DOOR_ATTR_MASK DOOR_BIND DOOR_CALL DOOR_CREATE DOOR_CRED
+	       DOOR_DELAY DOOR_DESCRIPTOR DOOR_EXIT DOOR_HANDLE DOOR_INFO
+	       DOOR_INVAL DOOR_IS_UNREF DOOR_LOCAL DOOR_PRIVATE DOOR_QUERY
+	       DOOR_RELEASE DOOR_RETURN DOOR_REVOKE DOOR_REVOKED DOOR_UNBIND
+	       DOOR_UNREF DOOR_UNREFSYS DOOR_UNREF_ACTIVE DOOR_UNREF_MULTI
+	       DOOR_WAIT S_IFDOOR));
+
+print constant_types(); # macro defs
+foreach (C_constant ("IPC::Door", 'constant', 'IV', $types, undef, 3, @names) ) {
+    print $_, "\n"; # C constant subs
+}
+print "#### XS Section:\n";
+print XS_constant ("IPC::Door", $types);
+__END__
+   */
+
+  switch (len) {
+  case 8:
+    if (memEQ(name, "S_IFDOOR", 8)) {
+#ifdef S_IFDOOR
+      *iv_return = S_IFDOOR;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 9:
+    return constant_9 (aTHX_ name, iv_return);
+    break;
+  case 10:
+    return constant_10 (aTHX_ name, iv_return);
+    break;
+  case 11:
+    return constant_11 (aTHX_ name, iv_return);
+    break;
+  case 12:
+    return constant_12 (aTHX_ name, iv_return);
+    break;
+  case 13:
+    /* Names all of length 13.  */
+    /* DOOR_IS_UNREF DOOR_UNREFSYS */
+    /* Offset 10 gives the best switch position.  */
+    switch (name[10]) {
+    case 'R':
+      if (memEQ(name, "DOOR_IS_UNREF", 13)) {
+      /*                         ^         */
+#ifdef DOOR_IS_UNREF
+        *iv_return = DOOR_IS_UNREF;
+        return PERL_constant_ISIV;
+#else
+        return PERL_constant_NOTDEF;
+#endif
+      }
+      break;
+    case 'S':
+      if (memEQ(name, "DOOR_UNREFSYS", 13)) {
+      /*                         ^         */
+#ifdef DOOR_UNREFSYS
+        *iv_return = DOOR_UNREFSYS;
+        return PERL_constant_ISIV;
+#else
+        return PERL_constant_NOTDEF;
+#endif
+      }
+      break;
+    }
+    break;
+  case 14:
+    if (memEQ(name, "DOOR_ATTR_MASK", 14)) {
+#ifdef DOOR_ATTR_MASK
+      *iv_return = DOOR_ATTR_MASK;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 15:
+    if (memEQ(name, "DOOR_DESCRIPTOR", 15)) {
+#ifdef DOOR_DESCRIPTOR
+      *iv_return = DOOR_DESCRIPTOR;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 16:
+    if (memEQ(name, "DOOR_UNREF_MULTI", 16)) {
+#ifdef DOOR_UNREF_MULTI
+      *iv_return = DOOR_UNREF_MULTI;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 17:
+    if (memEQ(name, "DOOR_UNREF_ACTIVE", 17)) {
+#ifdef DOOR_UNREF_ACTIVE
+      *iv_return = DOOR_UNREF_ACTIVE;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  }
+  return PERL_constant_NOTFOUND;
+}
+

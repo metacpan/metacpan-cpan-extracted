@@ -1,0 +1,197 @@
+=encoding utf8
+
+=head1 NAME
+
+IOMux::Pipe::Read - read from an external command
+
+=head1 INHERITANCE
+
+ IOMux::Pipe::Read
+   is a IOMux::Handler::Read
+   is a IOMux::Handler
+
+=head1 SYNOPSIS
+
+  my $mux = IOMux::Select->new;  # or ::Poll
+
+  use IOMux::Open '-|';
+  my $pipe = $mux->open('-|', $command, @cmd_options);
+
+  use IOMux::Pipe::Read;
+  my $pipe = IOMux::Pipe::Read->new
+    ( command => [$command, @cmd_options] );
+  $mux->add($pipe);
+
+  $pipe->getline(sub {print "$_[0]\n"});
+
+=head1 DESCRIPTION
+
+In an event driven program, reading is harder to use than writing: the
+read will very probably be stalled until data has arrived, so you will
+need a callback to handle the resulting data.
+
+Extends L<"DESCRIPTION" in IOMux::Handler::Read|IOMux::Handler::Read/"DESCRIPTION">.
+ 
+=head1 METHODS
+
+Extends L<"METHODS" in IOMux::Handler::Read|IOMux::Handler::Read/"METHODS">.
+ 
+=head2 Constructors
+
+Extends L<"Constructors" in IOMux::Handler::Read|IOMux::Handler::Read/"Constructors">.
+ 
+=over 4
+
+=item IOMux::Pipe::Read-E<gt>B<bare>(%options)
+
+Creates a pipe, but does not start a process (yet). Used by
+L<IOMux::IPC|IOMux::IPC>, which needs three pipes for one process. Returned
+is not only a new pipe object, but also a write handle to be
+connected to the other side.
+
+All %options which are available to L<IOMux::Handler::Read::new()|IOMux::Handler::Read/"Constructors">
+can be used here as well.
+
+ -Option   --Default
+  read_size  4096
+
+=over 2
+
+=item read_size => INTEGER
+
+=back
+
+example: 
+
+  my ($out, $out_rh)
+      = IOMux::Pipe::Read->bare(name => 'stdout');
+
+=item IOMux::Pipe::Read-E<gt>B<new>(%options)
+
+ -Option   --Defined in          --Default
+  command                          <required>
+  fh         IOMux::Handler        <required>
+  name       IOMux::Handler        '$cmd|'
+  read_size  IOMux::Handler::Read  4096
+
+=over 2
+
+=item command => COMMAND|ARRAY
+
+The external command to be executed. Either the COMMAND needs to
+parameters, or you need to pass an ARRAY of the command name and
+all its parameters.
+
+=item fh => FILEHANDLE
+
+=item name => STRING
+
+=item read_size => INTEGER
+
+=back
+
+=item IOMux::Pipe::Read-E<gt>B<open>( $mode, <$cmd, $cmdopts>|<$cmdarray, %options> )
+
+Open the pipe to read. $mode is always C<< -| >>.  When you need to
+pass additional %options to the implied L<new()|IOMux::Pipe::Read/"Constructors">, then you must use
+an ARRAY for command name and its optional parameters.
+
+example: 
+
+  my $mux = IOMux::Poll->new;
+  $mux->open('-|', 'who', '-H');  # no opts
+  $mux->open('-|', ['who', '-H'], %opts);
+  $mux->open('-|', 'who');        # no opts
+  $mux->open('-|', ['who'], %opts);
+
+=back
+
+=head2 Accessors
+
+Extends L<"Accessors" in IOMux::Handler::Read|IOMux::Handler::Read/"Accessors">.
+ 
+=over 4
+
+=item $obj-E<gt>B<childPid>()
+
+The process id of the child on the other side of the pipe.
+
+=item $obj-E<gt>B<fh>()
+
+Inherited, see L<IOMux::Handler/"Accessors">
+
+=item $obj-E<gt>B<fileno>()
+
+Inherited, see L<IOMux::Handler/"Accessors">
+
+=item $obj-E<gt>B<mode>()
+
+The bits of the open mode.
+
+=item $obj-E<gt>B<mux>()
+
+Inherited, see L<IOMux::Handler/"Accessors">
+
+=item $obj-E<gt>B<name>()
+
+Inherited, see L<IOMux::Handler/"Accessors">
+
+=item $obj-E<gt>B<readSize>( [$integer] )
+
+Inherited, see L<IOMux::Handler::Read/"Accessors">
+
+=item $obj-E<gt>B<usesSSL>()
+
+Inherited, see L<IOMux::Handler/"Accessors">
+
+=back
+
+=head2 User interface
+
+Extends L<"User interface" in IOMux::Handler::Read|IOMux::Handler::Read/"User interface">.
+ 
+=head2 Multiplexer
+
+Extends L<"Multiplexer" in IOMux::Handler::Read|IOMux::Handler::Read/"Multiplexer">.
+ 
+=head2 Helpers
+
+Extends L<"Helpers" in IOMux::Handler::Read|IOMux::Handler::Read/"Helpers">.
+ 
+=over 4
+
+=item $obj-E<gt>B<extractSocket>(HASH)
+
+=item IOMux::Pipe::Read-E<gt>B<extractSocket>(HASH)
+
+Inherited, see L<IOMux::Handler/"Helpers">
+
+=item $obj-E<gt>B<fdset>($state, $read, $write, $error)
+
+Inherited, see L<IOMux::Handler/"Helpers">
+
+=item $obj-E<gt>B<show>()
+
+Inherited, see L<IOMux::Handler/"Helpers">
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of IOMux distribution version 1.00,
+built on November 11, 2015. Website: F<http://perl.overmeer.net/>
+All modules in this suite:
+L</Any::Daemon>,
+L</IOMux>, and
+L</IOMux::HTTP>.
+
+Please post questions or ideas to F<perl@overmeer.net>
+
+=head1 LICENSE
+
+Copyrights 2011-2015 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

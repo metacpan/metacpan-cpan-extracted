@@ -1,0 +1,166 @@
+#!/usr/bin/env perl
+
+use Modern::Perl;
+
+use Getopt::Long;
+use Image::Placeholder;
+use Pod::Usage;
+
+
+
+my %options = get_options_or_exit();
+my $size    = shift;
+my $text    = shift;
+
+$options{'size'} = $size
+    if defined $size;
+$options{'text'} = $text
+    if defined $text;
+
+my $image = Image::Placeholder->new( %options );
+print $image->generate();
+exit;
+
+
+
+
+
+sub get_options_or_exit {
+    my @options = qw(
+                  transparent|a
+            background-colour|b=s
+                         font|f=s
+                  line-colour|l=s
+                         help|h
+                output-format|o=s
+                  text-colour|t=s
+                        width|x=i
+                       height|y=i
+        );
+    my %mappings = (
+            'background-colour' => 'background_colour',
+            'line-colour'       => 'line_colour',
+            'text-colour'       => 'text_colour',
+        );
+    
+    my %getopts;
+    my %options;
+    
+    my $known = GetOptions( \%getopts, @options );
+    pod2usage() 
+        if !$known or $getopts{'help'};
+    
+    while ( my( $key, $value ) = each %getopts ) {
+        my $use_key = $mappings{ $key } // $key;
+        $options{ $use_key } = $value;
+    }
+    
+    return %options;
+}
+
+__END__
+
+=head1 NAME
+
+B<placeholder> - generate placeholder images
+
+=head1 SYNOPSIS
+
+B<placeholder> [B<-b> I<col>] [B<-l> I<col>] [B<-t> I<col>] [B<-f> I<font>]
+            [B<-x> I<pixels>] [B<-y> I<pixels>] [I<size>] [I<text>]
+
+B<placeholder> [B<--long-options> ...] [I<size>] [I<text>]
+
+=head1 DESCRIPTION
+
+B<placeholder> generates a PNG which can be used as a placeholder, most
+commonly when designing a document or website which will accept images
+with fixed dimensions, but that imagery is not yet available.
+
+=head1 OPTIONS
+
+=over
+
+=item -b I<colour>, --background_colour=I<colour>
+
+The colour that the background of the image should be painted.
+Accepts a colour value (see L<Valid colour values>). Defaults to I<ddd>.
+
+=item -f I<font>, --font I<font>
+
+The font to use for the text in the image. Requires L<fontconfig>
+support in your L<GD> library. Defaults to I<Museo Sans>, which is
+available free from
+L<http://www.josbuivenga.demon.nl/museosans.html>.
+
+=item -l I<colour>, --line_colour=I<colour>
+
+The colour that the border and cross lines should be painted in.
+Accepts either a colour value or C<none> to suppress them. Defaults
+to I<444>.
+
+=item -t I<colour>, --text_colour=I<colour>
+
+The colour that the text should be painted in. Accepts either a
+colour value or C<none> to suppress the text. Defaults to I<36f>.
+
+=item -a, --transparent
+
+Makes the background transparent.
+
+=item -x I<pixels>, --width=I<pixels>
+
+The width of the image in pixels. Defaults to I<300>.
+
+=item -y I<pixels>, --height=I<pixels>
+
+The height of the image in pixels. Defaults to the same value as the width.
+
+=item I<size>
+
+A text alternative to supplying the width and height separately;
+of the form '300x250'.
+
+=item I<text>
+
+The text to use across the image. Defaults to the size of the image,
+expressed in the form '300x250'.
+
+=back
+
+=head2 Valid colour values
+
+Colour values are specified as the red, green and blue channels in
+hexadecimal, where C<00> is the least and C<FF> is the most. So black is
+C<000000> and white is C<FFFFFF>.
+
+CSS-style 3-character shorthand is also accepted where the three
+channels are repeating characters. So black is also C<000> and white
+C<FFF>.  All three values have to be repeating, so a value such as
+C<080808> cannot be shorted.
+
+
+=head1 SEE ALSO
+
+=over
+
+=item perldoc L<Image::Placeholder>
+
+perl module that this script uses
+
+=item L<http://ima.gs/>
+
+hosted version of this code
+
+=back
+
+=head1 AUTHOR
+
+Mark Norman Francis, L<norm@cackhanded.net>.
+
+=head1 COPYRIGHT AND LICENCE
+
+Copyright 2010 Mark Norman Francis.
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

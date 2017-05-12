@@ -1,0 +1,26 @@
+Changes
+const-c.inc
+const-xs.inc
+hints/cygwin.pl
+hints/next_3.pl
+lib/IPC/Msg.pm
+lib/IPC/Semaphore.pm
+lib/IPC/SharedMem.pm
+lib/IPC/SysV.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+ppport.h
+README
+regen.pl
+SysV.xs
+t/ipcsysv.t
+t/msg.t
+t/pod.t
+t/podcov.t
+t/sem.t
+t/shm.t
+TODO
+typemap
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

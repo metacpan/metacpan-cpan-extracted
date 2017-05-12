@@ -1,0 +1,31 @@
+# Version control files and dirs.
+\bRCS\b
+\bCVS\b
+,v$
+\B\.svn\b
+^.git/\b
+^.gitignore$
+
+# Makemaker generated files and dirs.
+^MANIFEST\.
+^Makefile$
+^blib/
+^MakeMaker-\d
+
+# Temp, old and emacs backup files.
+~$
+\.old$
+^#.*#$
+^\.#
+
+# Custom skips.
+^_Inline/\b
+^_Inline/
+^pm_to_blib
+^t/_Inline/
+^t/grammar/_Inline/
+^t/namespace/_Inline/
+\.gz$
+MYMETA\b
+^Inline-CPP-\d+\.\d+/
+\.perltidyrc

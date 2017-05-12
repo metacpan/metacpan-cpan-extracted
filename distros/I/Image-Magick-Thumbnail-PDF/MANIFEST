@@ -1,0 +1,16 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Image/Magick/Thumbnail/PDF.pm
+t/0.t
+t/1all.t
+t/file1.pdf
+t/test/big.png
+t/test/bigger.png
+t/test/haha.gif
+t/test/haha.png
+t/test/linux_quickref-0.png
+t/test/linux_quickref-5.png
+t/test/linux_quickref.pdf
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,28 @@
+Revision history for Perl extension Image::Magick::PolyText.
+
+2.00  2017-01-08T08:36:00
+	- Replace /usr/bin/perl with /usr/bin/env perl.
+	- Replace common::sense with use strict and use warnings, to get uninit var warnings.
+	- Adopt new repo structure. See
+		http://savage.net.au/Ron/html/My.Workflow.for.Building.Distros.html.
+	- Adopt sane version numbering.
+	- Switch from Class::Std to Moo.
+	- The switch to Moo means params to methods are assumed to be hashes, not hashrefs any more.
+		Hence the jump in V from 1.0.3 to 2.00.
+
+v1.0.3  Thu Feb 11 17:00:00 2010
+	- Reformat VERSION lines.
+	- Add Class::Std to pre-requisites.
+
+v1.0.2  Fri Nov 13 13:20:00 2009
+	- Run dos2unix
+	- Rename Changes.txt to CHANGES
+
+v1.0.1 Tue Jul 22 10:38:00 2008
+	- Rename ChangeLog to Changes.txt so as to match all my other modules
+	- Remove pm_to_blib, Makefile, MANIFEST and META.yml, which should not have been checked in
+	- Add Changelog.ini
+
+v1.0.0 Mon Nov 26 12:00:00 2007
+	- Original version
+	- Note: The image examples/target.jpg was kindly prepared for me by Francisco Ferreiro

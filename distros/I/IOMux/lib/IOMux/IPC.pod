@@ -1,0 +1,259 @@
+=encoding utf8
+
+=head1 NAME
+
+IOMux::IPC - exchange data with external command
+
+=head1 INHERITANCE
+
+ IOMux::IPC
+   is a IOMux::Bundle
+   is a IOMux::Handler::Read
+   is a IOMux::Handler
+
+   IOMux::Bundle also extends IOMux::Handler::Write
+   is a IOMux::Handler::Write
+   is a IOMux::Handler
+
+=head1 SYNOPSIS
+
+  my $mux = IOMux::Select->new;  # or ::Poll
+
+  use IOMux::Open '|-|', '|=|';
+  my $pipe = $mux->open('|-|', $cmd, @cmdopts);
+
+  use IOMux::IPC;
+  my $ipc = IOMux::IPC->new(command => [$cmd, @cmdopts]);
+  $mux->add($ipc);
+
+  $pipe->getline(sub {print "$_[0]\n"});
+
+=head1 DESCRIPTION
+
+With this handler, you set-up a two way communication between the
+current process and some other process. This is not easy to program:
+you may need to play with timeouts every once in a while.
+
+This module is based on L<IOMux::Bundle|IOMux::Bundle>, because it will use
+two or three pipes to facilitate the communication.
+
+Extends L<"DESCRIPTION" in IOMux::Bundle|IOMux::Bundle/"DESCRIPTION">.
+ 
+=head1 METHODS
+
+Extends L<"METHODS" in IOMux::Bundle|IOMux::Bundle/"METHODS">.
+ 
+=head2 Constructors
+
+Extends L<"Constructors" in IOMux::Bundle|IOMux::Bundle/"Constructors">.
+ 
+=over 4
+
+=item IOMux::IPC-E<gt>B<new>(%options)
+
+ -Option    --Defined in           --Default
+  command                            <required>
+  errors                             <true>
+  fh          IOMux::Handler         <required>
+  mode                               |=|
+  name        IOMux::Handler         '|$cmd|'
+  read_size   IOMux::Handler::Read   32768
+  stderr      IOMux::Bundle          <undef>
+  stdin       IOMux::Bundle          <required>
+  stdout      IOMux::Bundle          <required>
+  write_size  IOMux::Handler::Write  4096
+
+=over 2
+
+=item command => COMMAND|ARRAY
+
+The external command to be executed. Either the COMMAND needs to
+parameters, or you need to pass an ARRAY of the command name and
+all its parameters.
+
+=item errors => BOOLEAN
+
+Include the stderr channel in the communication as well. These will
+be printed to STDERR by default.
+
+=item fh => FILEHANDLE
+
+=item mode => C<< |-| >> or  C<< |=| >>
+
+In the C<< |-| >> mode, only STDIN and STDOUT are processed. Specifing
+the C<< |=| >> has the same effect as setting the C<errors> option: open
+a connection for STDERR as well.
+
+=item name => STRING
+
+=item read_size => INTEGER
+
+=item stderr => L<IOMux::Handler::Read|IOMux::Handler::Read>   object
+
+=item stdin => L<IOMux::Handler::Write|IOMux::Handler::Write>  object
+
+=item stdout => L<IOMux::Handler::Read|IOMux::Handler::Read>   object
+
+=item write_size => INTEGER
+
+=back
+
+=item IOMux::IPC-E<gt>B<open>( $mode, <$cmd, $cmdopts>|<$cmdarray, %options> )
+
+Open the pipe to read. $mode is either C<< |-| >> or C<< |=| >>.  When you
+need to pass additional %options to the implied L<new()|IOMux::IPC/"Constructors">, then you must
+use an ARRAY for command name and its optional parameters.
+
+example: 
+
+  my $mux = IOMux::Poll->new;
+  $mux->open('|-|', 'sort', '-u');  # no opts
+  $mux->open('|-|', ['sort', '-u'], %opts);
+  $mux->open('|-|', 'sort');        # no opts
+  $mux->open('|-|', ['sort'], %opts);
+
+=back
+
+=head2 Accessors
+
+Extends L<"Accessors" in IOMux::Bundle|IOMux::Bundle/"Accessors">.
+ 
+=over 4
+
+=item $obj-E<gt>B<childPid>()
+
+The process id of the child on the other side of the pipe.
+
+=item $obj-E<gt>B<connections>()
+
+Inherited, see L<IOMux::Bundle/"Accessors">
+
+=item $obj-E<gt>B<fh>()
+
+Inherited, see L<IOMux::Handler/"Accessors">
+
+=item $obj-E<gt>B<fh>()
+
+Inherited, see L<IOMux::Handler/"Accessors">
+
+=item $obj-E<gt>B<fileno>()
+
+Inherited, see L<IOMux::Handler/"Accessors">
+
+=item $obj-E<gt>B<fileno>()
+
+Inherited, see L<IOMux::Handler/"Accessors">
+
+=item $obj-E<gt>B<mode>()
+
+The bits of the open mode.
+
+=item $obj-E<gt>B<mux>()
+
+Inherited, see L<IOMux::Handler/"Accessors">
+
+=item $obj-E<gt>B<mux>()
+
+Inherited, see L<IOMux::Handler/"Accessors">
+
+=item $obj-E<gt>B<name>()
+
+Inherited, see L<IOMux::Handler/"Accessors">
+
+=item $obj-E<gt>B<name>()
+
+Inherited, see L<IOMux::Handler/"Accessors">
+
+=item $obj-E<gt>B<readSize>( [$integer] )
+
+Inherited, see L<IOMux::Handler::Read/"Accessors">
+
+=item $obj-E<gt>B<stderr>()
+
+Inherited, see L<IOMux::Bundle/"Accessors">
+
+=item $obj-E<gt>B<stdin>()
+
+Inherited, see L<IOMux::Bundle/"Accessors">
+
+=item $obj-E<gt>B<stdout>()
+
+Inherited, see L<IOMux::Bundle/"Accessors">
+
+=item $obj-E<gt>B<usesSSL>()
+
+Inherited, see L<IOMux::Handler/"Accessors">
+
+=item $obj-E<gt>B<usesSSL>()
+
+Inherited, see L<IOMux::Handler/"Accessors">
+
+=item $obj-E<gt>B<writeSize>( [$integer] )
+
+Inherited, see L<IOMux::Handler::Write/"Accessors">
+
+=back
+
+=head2 User interface
+
+Extends L<"User interface" in IOMux::Bundle|IOMux::Bundle/"User interface">.
+ 
+=head2 Multiplexer
+
+Extends L<"Multiplexer" in IOMux::Bundle|IOMux::Bundle/"Multiplexer">.
+ 
+=head2 Helpers
+
+Extends L<"Helpers" in IOMux::Bundle|IOMux::Bundle/"Helpers">.
+ 
+=over 4
+
+=item $obj-E<gt>B<extractSocket>(HASH)
+
+=item IOMux::IPC-E<gt>B<extractSocket>(HASH)
+
+Inherited, see L<IOMux::Handler/"Helpers">
+
+=item $obj-E<gt>B<extractSocket>(HASH)
+
+=item IOMux::IPC-E<gt>B<extractSocket>(HASH)
+
+Inherited, see L<IOMux::Handler/"Helpers">
+
+=item $obj-E<gt>B<fdset>($state, $read, $write, $error)
+
+Inherited, see L<IOMux::Handler/"Helpers">
+
+=item $obj-E<gt>B<fdset>($state, $read, $write, $error)
+
+Inherited, see L<IOMux::Handler/"Helpers">
+
+=item $obj-E<gt>B<show>()
+
+Inherited, see L<IOMux::Handler/"Helpers">
+
+=item $obj-E<gt>B<show>()
+
+Inherited, see L<IOMux::Handler/"Helpers">
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of IOMux distribution version 1.00,
+built on November 11, 2015. Website: F<http://perl.overmeer.net/>
+All modules in this suite:
+L</Any::Daemon>,
+L</IOMux>, and
+L</IOMux::HTTP>.
+
+Please post questions or ideas to F<perl@overmeer.net>
+
+=head1 LICENSE
+
+Copyrights 2011-2015 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

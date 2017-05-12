@@ -1,0 +1,178 @@
+#!/usr/bin/perl -w
+# See copyright, etc in below POD section.
+######################################################################
+
+require 5.004;
+use lib './blib/lib';	# testing
+use Getopt::Long;
+use Pod::Usage;
+use IPC::PidStat::PidServer;
+use strict;
+
+BEGIN { $ENV{PATH} = '/usr/ucb:/bin' }	# Secure path
+
+######################################################################
+# configuration
+
+######################################################################
+# globals
+
+use vars qw($Pid);
+
+######################################################################
+# main
+
+my $Debug = 0;
+my %server_params = ();
+my $opt_fork = 1;
+
+if (!GetOptions (
+		 "help"		=> \&usage,
+		 "debug"	=> \&debug,
+		 "version"	=> \&version,
+		 "port=i"	=> sub {$server_params{port} = $_[1];},
+		 "fork!"	=> \$opt_fork,
+		 )) {
+    die "%Error: Bad usage, try 'pidstatd --help'\n";
+}
+
+# Must be after we've done --help
+$0 = 'pidstatd';   # So ps and pidof can find this daemon
+
+if (!$Debug) {
+    if ($opt_fork) {
+	# Fork once to let parent die
+	exit if fork();
+	# Disassociate from controlling terminal
+        POSIX::setsid();
+	# Prevent possibility of acquiring a controling terminal
+	exit if fork();
+	# Change working directory
+	chdir "/";
+    }
+    # Close open file descriptors
+    my $openmax = POSIX::sysconf( &POSIX::_SC_OPEN_MAX );
+    $openmax = (!defined($openmax) || $openmax < 0) ? 64 : $openmax;
+    foreach my $i (0 .. $openmax) { POSIX::close($i); }
+    # Silence please (in case user didn't pipe when starting us)
+    open(STDIN,  "+>/dev/null");
+    open(STDOUT, "+>&STDIN");
+    open(STDERR, "+>&STDIN");
+}
+
+# Loop in case something kills us
+$SIG{HUP}  = \&sig_HUP;
+$SIG{CHLD} = \&sig_HUP;
+while (1) {
+    print "Starting server\n" if $Debug;
+    unless ($Pid = fork) {
+        IPC::PidStat::PidServer->new(%server_params)->start_server ();
+	exit(0);
+    }
+    waitpid($Pid,0) if $Pid;
+    warn "%Warning: Server aborted\n" if $Debug;
+    sleep(1);
+    kill 9, $Pid if $Pid;
+    $Pid = 0;
+    sleep(1);
+}
+
+exit (0);
+
+sub sig_HUP {
+    kill 9, $Pid if $Pid;
+    $Pid = 0;
+}
+
+######################################################################
+
+sub usage {
+    print "Version: $IPC::PidStat::VERSION\n";
+    pod2usage(-verbose=>2, -exitval=>2, -output=>\*STDOUT, -noperldoc=>1);
+    exit(1);
+}
+
+sub version {
+    print "Version: $IPC::PidStat::VERSION\n";
+    exit (1);
+}
+
+sub debug {
+    $Debug = 1;
+    $IPC::PidStat::PidServer::Debug = 1;
+}
+
+######################################################################
+__END__
+
+=pod
+
+=head1 NAME
+
+pidstatd - Determine if process ID is running for Perl IPC::Locker
+
+=head1 SYNOPSIS
+
+B<pidstatd>
+[ B<--help> ]
+[ B<--port=>I<port> ]
+[ B<--version> ]
+
+=head1 DESCRIPTION
+
+Pidstatd will start a UDP daemon.  The daemon responds to requests that
+contain a PID with a packet indicating the PID and if the PID currently
+exists.
+
+The Perl IPC::Locker package optionally uses this daemon to break locks
+for PIDs that no longer exists.
+
+=head1 ARGUMENTS
+
+=over 4
+
+=item --help
+
+Displays this message and program version and exits.
+
+=item --nofork
+
+For debugging, prevents the daemon from creating additional processes and
+from going into the background.  This allows messages to appear on stdout,
+and ctrl-C to stop the daemon.
+
+=item --port
+
+Specifies the port number to be used.
+
+=item --version
+
+Displays program version and exits.
+
+=back
+
+=head1 PERFORMANCE
+
+As pidstatd is a UDP daemon, some requests may be dropped by the operating
+system, but this assists in graceful degradation under heavy loads.
+Pidstatd has been tested to perform well handling to above 13,000 requests
+per second on a 2GHz AMD Operton server.
+
+=head1 DISTRIBUTION
+
+The latest version is available from CPAN and from L<http://www.veripool.org/>.
+
+Copyright 2002-2017 by Wilson Snyder.  This package is free software; you
+can redistribute it and/or modify it under the terms of either the GNU
+Lesser General Public License Version 3 or the Perl Artistic License Version 2.0.
+
+=head1 AUTHORS
+
+Wilson Snyder <wsnyder@wsnyder.org>
+
+=head1 SEE ALSO
+
+L<IPC::Locker>, L<IPC::PidStat>, L<pidstat>, L<pidwatch>, L<uriexec>
+
+=cut
+######################################################################

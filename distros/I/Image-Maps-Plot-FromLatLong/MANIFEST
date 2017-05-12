@@ -1,0 +1,14 @@
+.earth.dat
+Changes
+FromLatLong.pm
+MANIFEST
+Makefile.PL
+README
+london_postcodes.jpg
+test.pl
+uk.jpg
+world.jpg
+world_political.jpg
+world_plain.jpg
+world_paler.jpg
+META.yml                                 Module meta-data (added by MakeMaker)

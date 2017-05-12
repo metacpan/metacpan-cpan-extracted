@@ -1,0 +1,98 @@
+README for IO::Multiplex
+
+IO::Multiplex is designed to take the effort out of managing
+multiple file handles.  It is essentially a really fancy front end to
+the C<select> system call.  In addition to maintaining the C<select>
+loop, it buffers all input and output to/from the file handles.  It
+can also accept incoming connections on one or more listen sockets.
+
+It is object oriented in design, and will notify you of significant events
+by calling methods on an object that you supply.  If you are not using
+objects, you can simply supply __PACKAGE__ instead of an object reference.
+
+You may have one callback object registered for each file handle, or
+one global one.  Possibly both -- the per-file handle callback object
+will be used instead of the global one.
+
+Each file handle may also have a timer associated with it.  A callback
+function is called when the timer expires.
+
+Here's an example which implements the beginnings of a multiuser game:
+
+    use IO::Socket;
+    use IO::Multiplex;
+    use Tie::RefHash;
+    
+    my $mux  = new IO::Multiplex;
+
+    # Create a listening socket
+    my $sock = new IO::Socket::INET(Proto     => 'tcp',
+                                    LocalPort => shift || 2300,
+                                    Listen    => 4)
+        or die "socket: $@";
+
+    # We use the listen method instead of the add method.
+    $mux->listen($sock);
+    
+    $mux->set_callback_object(__PACKAGE__);
+    $mux->loop;
+    
+    # mux_connection is called when a new connection is accepted.
+    sub mux_connection {
+        my $package = shift;
+        my $mux     = shift;
+        my $fh      = shift;
+
+        # Construct a new player object
+        Player->new($mux, $fh);
+    }
+
+    package Player;
+
+    my %players = ();
+
+    sub new {
+        my $package = shift;
+        my $self    = bless { mux  => shift,
+                              fh   => shift } => $package;
+
+        # Register the new player object as the callback specifically for
+        # this file handle.
+        $mux->set_callback_object($self, $self->{fh});
+        print $self->{fh}
+            "Greetings, Professor.  Would you like to play a game?\n";
+
+        # Register this player object in the main list of players
+        $players{$self} = $self;
+        $mux->set_timeout($self->{fh}, 1);
+    }
+
+    sub players { return values %players; }
+
+    sub mux_input {
+        my $self = shift;
+        shift; shift;         # These two args are boring
+        my $input = shift;    # Scalar reference to the input
+
+        # Process each line in the input, leaving partial lines
+        # in the input buffer
+        while ($$input =~ s/^(.*?\n)//) {
+            $self->process_command($1);
+        }
+    }
+
+    sub mux_close {
+       my $self = shift;
+
+       # Player disconnected;
+       # [Notify other players or something...]
+       delete $players{$self};
+    }
+    # This gets called every second to update player info, etc...
+    sub mux_timeout {
+        my $self = shift;
+        my $mux  = shift;
+        
+        $self->heartbeat;
+        $mux->set_timeout($self->{fh}, 1);
+    }

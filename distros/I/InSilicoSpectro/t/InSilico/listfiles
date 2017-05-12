@@ -1,0 +1,50 @@
+# List of files belonging to RT/IP project
+
+Folder ~/InSilicoSpectro/lib/InSilicoSpectro/InSilico
+
+computeRT.pl # Command-line tool for computing RT
+computeIP.pl # Command-line tool for computing IP
+
+ExpCalibrator.pm # Package for calibration of the RT/IP predictor
+
+IsoelPoint.pm # Package for IP prediction
+
+RetentionTimer.pm # Base package for RT prediction
+
+RetentionTimer/Hodges.pm # RT prediction by Hodges method
+RetentionTimer/Petritis.pm # RT prediction by Petritis method
+RetentionTimer/Krokhin.pm # Calls RT predicition by Krokhin method
+RetentionTimer/contrib/* # Krokhin's code
+
+###################################
+Folder ~/InSilicoSpectro/t/InSilico
+
+testHodges.pl # Test of Hodges RT predictor
+testPetritis.pl # Test of Petritis RT predictor
+testKrokhin.pl # Test of Krokhin RT predictor
+
+testIsoelPoint.pl # Test of IP predictor
+
+examples_rt_ip # Usage examples for computeRT.pl and computeIP.pl
+
+data/* # XML and raw data and config files for testing
+
+###################################
+Folder cgi-bin
+
+config/* # Folder with some config files: graphics, coefficients...
+data/* # Folder with data from Phenyx server
+
+rtcalc.pl # Full operative CGI front-end for RT prediction
+rtcgi.pm # Package with CGI rutines
+
+getdata.pl # Parse Phenyx server job files in folder $mydir and save retention time data in *.dat files
+
+report.pl  # Generate a report in file 'report.txt'of the *.dat files in folder $mydir (for fast popup-menu in cgi)
+
+rtHodges.pl # Old CGIs (may need some update)
+rtKrokhin.pl
+rtPetritis.pl
+
+user/* # Folders where user information is stored
+figs/*

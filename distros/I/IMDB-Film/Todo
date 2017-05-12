@@ -1,0 +1,8 @@
+TODO list for Perl module IMDB::Film
+
+- Add possibility to indicate is it TV series or not (http://www.imdb.com/title/tt0367279/).
+- Add retrieving TV series episodes (http://www.imdb.com/title/tt0367279/episodes#season-1).
+- Add functionality to get additional information such as Full Cast and Crew,
+	sound track etc.
+- Move all methods with needed additional connect to IMDB.com into separte module.
+

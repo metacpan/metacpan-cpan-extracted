@@ -1,0 +1,12 @@
+Revision history for Perl extension Image::libsiftfast
+
+0.03       2012/05/21
+        - I rewrited t/03_lena.t  for case that siftfast is not installed on the server.
+
+0.02       2012/05/20 
+        - MINOR RELEASE
+
+
+0.01_01    2012/05/182
+        - original version
+        - DEVELOPPER RELEASE

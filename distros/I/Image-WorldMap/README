@@ -1,0 +1,78 @@
+NAME
+    Image::WorldMap - Create graphical world maps of data
+
+SYNOPSIS
+      my $map = Image::WorldMap->new("earth-small.png", "maian/8");
+      $map->add(4.91, 52.35, "Amsterdam.pm");
+      $map->add(-2.355399, 51.3828, "Bath.pm");
+      $map->add(-0.093999, 51.3627, "Croydon.pm");
+      $map->draw("test.png");
+
+DESCRIPTION
+    This module helps create graphical world maps of data, such as the Perl
+    Monger World Map (http://www.astray.com/Bath.pm/). This module takes in
+    a number of label locations (longitude/latitude) and outputs an image.
+    It can attach text to the labels, and tries to make sure that labels do
+    not overlap.
+
+    It is intended to be used to create images of information such as "where
+    are all the Perl Monger groups?", "where in the world are all the CPAN
+    mirrors?" and so on.
+
+    This module comes with a low-resolution image of the world. Additional
+    larger images have not been bundled with the module due to their size,
+    but are available at: http://www.astray.com/WorldMap/
+
+METHODS
+  new
+
+    The constructor. It takes two mandatory arguments, the filename of the
+    image of the earth used for the background, and whether or not to
+    display labels.
+
+    The label option is actually a font size and name. You must have a local
+    truetype font in your directory. The font name format is
+    "font_name/size". For example. If there is a font file called cinema.ttf
+    somewhere in the font path you might use "cinema/20" to load a 20 pixel
+    sized font of cinema.
+
+      # Without labels
+      my $map = Image::WorldMap->new("earth-small.png");
+
+      # With labels
+      my $map = Image::WorldMap->new("earth-small.png", "maian/8");
+
+  add
+
+    This adds a node to the map, with an optional label. Longitude and
+    latitude are given as a decimal, with (0, 0) representing a point on the
+    Greenwich meridian and the equator and (-180, -180) top-left and (180,
+    180) bottom-right on a projection of the Earth.
+
+      $map->add(-2.355399, 51.3828, "Bath.pm");
+
+  draw
+
+    This draws the map and writes it out to a file. The file format is
+    chosen from the filename, but is typically PNG.
+
+      $map->draw("text.png");
+
+NOTES
+    This module tries hard to make sure that labels do not overlap. This is
+    an NP-hard problem. It currently uses a simulated annealing method with
+    Inline::C to speed it up. It could be faster still.
+
+    The label positioning method used is random: if you run the program
+    again, you will get a different set of label positions, which may or may
+    not be better.
+
+COPYRIGHT
+    Copyright (C) 2001, Leon Brocard
+
+    This module is free software; you can redistribute it or modify it under
+    the same terms as Perl itself.
+
+AUTHOR
+    Leon Brocard, acme@astray.com
+

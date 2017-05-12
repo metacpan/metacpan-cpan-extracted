@@ -1,0 +1,58 @@
+{
+   "abstract" : "Extract meta information from image files",
+   "author" : [
+      "Slaven Rezic <srezic@cpan.org>",
+      "Gisle Aas <gisle@ActiveState.com",
+      "Tels"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Image-Info",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "dev",
+         "img",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Bundle::Image::Info::PNG" : "0",
+            "Bundle::Image::Info::SVG" : "0",
+            "Bundle::Image::Info::XBM" : "0",
+            "Bundle::Image::Info::XPM" : "0"
+         },
+         "requires" : {
+            "IO::Scalar" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "git://github.com/eserte/image-info.git"
+      }
+   },
+   "version" : "1.40"
+}

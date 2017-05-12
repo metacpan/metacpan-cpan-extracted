@@ -1,0 +1,386 @@
+=head1 NAME
+
+Inline::SLang::Changes - Changes to previous versions of the module
+
+=head1 DESCRIPTION
+
+This document lists the changes to previous versions
+of the C<Inline::SLang> module. See the "Changes" section
+of the L<Inline::SLang> documentation for the changes in the
+latest version.
+
+=head1 CHANGES
+
+=over 2
+
+=item v0.30 Tue Jun  8 21:00:16 EDT 2004
+
+This is intended to be the last release before the release of version 1.00.
+
+I have decided to stick with the differences between the indexing of
+multi-dimensional arrays in PDL and S-Lang: a C<2x3> element
+piddle will be converted to a C<3x2> element S-Lang array.
+
+The PDL support has been upgraded to better-handle I<virtual> piddles,
+such as slices of another piddle. The current approach has the side
+effect of calling PDL's L<make_physical()|PDL::Core/PDL::make_physical>
+method on the piddle, which results in extra memory use.
+
+Minor bug fixes to Makefile.PL.
+
+Minor documentation fixes - including F<exampes/array_conversion.pl> - and
+improvements to L<Inline::SLang::Details> - including the addition of
+F<examples/order.pl>.
+
+=item v0.26 Fri Apr 16 00:07:13 EDT 2004
+
+Fixed a bug which caused t/11type_synonyms.t to fail on some machines.
+
+The S-Lang interpreter is now initialised with the min, max, sum and
+cumsum functions as part of the S-Lang run-time library (cumsum is
+only available if you have v1.4.9 of S-Lang).
+
+=item v0.25 Tue Apr 13 22:56:06 EDT 2004
+
+Another one-line fix and PDL support works on OS-X. PDL support is
+now the default option (if available) when building Inline::SLang.
+
+=item v0.24 Tue Apr 13 22:16:12 EDT 2004
+
+A one-line fix means that PDL support now works on Linux as well as
+Solaris. It works on OS-X until you try to convert a S-Lang array
+to a piddle. PDL support is now on by default for Solaris and Linux
+machines.
+
+=item v0.23 Wed Apr  7 21:32:07 EDT 2004
+
+This is a bug-fix for C<make test> in version 0.22, which failed on
+systems which did not already have C<Inline::SLang> installed.
+
+=item v0.22 Wed Apr  7 16:29:05 EDT 2004
+
+The build process has been changed to use L<Inline::C> to embed
+C code within F<Makefile.PL>, rather than having it in a separate
+file which we have to compile ourselves. This should hopefully make
+the build process a bit more portable.
+
+=item v0.21 Mon Apr  5 15:15:51 EDT 2004
+
+This release will now build on OS-X machines. The support for
+PDL has been turned off by default - even if PDL is installed on
+your system - since it does not work on Linux and OS-X machines.
+
+The main changes are behind the scenes, and involve splitting the
+code up and making a tad more modular.
+
+=item v0.20 Wed May 21 00:37:07 EDT 2003
+
+This release begins support for the
+L<Perl Data Language|PDL::Intro> in C<Inline::SLang>.
+Please note that it is a work-in-progress.
+
+=over 2
+
+=item *
+
+requires v2.4.0 of PDL which isn't actually released
+(a fairly-recent CVS build should do the trick)
+
+=item *
+
+conversion betweed 1D arrays and piddles works
+
+=item *
+
+should 0D piddles be converted to a scalar or a 1-element 1D array?
+(currently the code croaks)
+
+=item *
+
+> 1D arrays is a mess since a 2x3 array in S-Lang maps to a
+3x2 piddle.
+The first time this happens a warning is printed to
+STDERR as a precaution. Not sure what the best approach is.
+
+=item *
+
+It has not been tested on non 32-bit machines.
+
+=back
+
+=item v0.12 Sun May 11 23:33:38 EDT 2003
+
+This is a minor upgrade in functionality to version 0.11; the
+changes are made to help support the inclusion of PDL in a future
+release. The changes are:
+
+=over 2
+
+=item *
+
+Added support to the C<DataType_Type> class
+for numeric types that are - or may be -
+synonyms of the "base" types. The added types are:
+C<Int16_Type>, C<Int32_Type>, their unsigned versions,
+C<Float32_Type>, C<Float64_Type>, and - if they are not a
+"base" type - C<Short_Type> and C<Long_Type>.
+
+=item *
+
+The build process now checks that the S-Lang library was built with
+support for floating-point and complex numbers. If it was not then
+it should stop.
+
+=item *
+
+Added a brief section to this document describing
+how S-Lang errors are handled.
+
+=back
+
+=item v0.11 Wed May  7 00:39:17 EDT 2003
+
+This release makes a couple of improvements to version I<0.10> and
+includes infrastructure changes to support L<PDL|PDL::Intro>
+(although piddles are still not supported). The major
+changes are:
+
+=over 2
+
+=item *
+
+S-Lang arrays can now be converted to the Perl C<Array_Type>
+object as well as array references. The behaviour is
+controlled by the C<Inline::SLang::sl_array2perl()> function,
+described in L<Inline::SLang|Inline::SLang>.
+
+=item *
+
+It is now easier to create Perl scalars that contain a 
+C<DataType_Type> object: use the functions
+C<< Inline::SLang::<datatype name>() >> instead of
+C<< DataType_Type->new( "<datatype name>" ); >>.
+Use C<'!types'> in the C<EXPORT> configuration option to
+import all these functions.
+
+=item *
+
+C<DataType_Type> objects can now be compared for equality 
+(C<==>, C<eq>) and inequality (C<!=>, C<ne>).
+
+=back
+
+=item v0.10 Sat May  3 19:39:00 EDT 2003
+
+There have been a number of significant enhancements
+and changes in this release, which is why the release
+number has been bumped-up to the lofty heights of
+I<0.10>.
+
+The really-short summary is that all variables should now
+be supported and the support for S-Lang's associative
+arrays, normal arrays, and structures has been made much 
+-more Perl like.
+
+=over 2
+
+=item *
+
+Support for S-Lang libraries earlier than 1.4.7 has been discontinued.
+
+=item *
+
+Perl class names have been changed from C<Inline::SLang::XXX> to
+C<XXX>.
+
+=item *
+
+S-Lang structs (both C<Struct_Type> and named structs) are stored
+using a Perl object (also called C<Struct_Type>)
+which can be treated as a hash reference.
+As an example, if the S-Lang structure has a field C<x> and
+it is stored in the Perl variable C<$foo> then you can
+access the field as C<$$foo{x}>.
+
+=item *
+
+S-Lang C<Assoc_Type> arrays are now converted to the Perl
+C<Assoc_Type>
+class (and vice-versa). This object can be treated as a hash
+reference.
+When calling S-Lang functions, hash references
+are converted to S-Lang as an C<Assoc_Type [Any_Type]> array.
+
+=item *
+
+Arrays can now be converted between Perl (array
+references or Perl C<Array_Type> objects)
+and S-Lang (C<Array_Type> variables) for any
+S-Lang data type.
+Any dimension of array supported by S-Lang is now
+available (in previous only one and two dimensional
+arrays could be used).
+
+Support for piddles is I<not yet available> (planned soon).
+
+=item *
+
+Several Inline::SLang::XXX routines can now be exported to Perl's
+main package by use of the EXPORT configuration option (rather than
+the standard Perl way of using 'use foo qw( ... );'. This can be
+looked at as something of a hack.
+
+=item *
+
+Handling of S-Lang errors has been improved: they are now caught
+and then converted into Perl errors (i.e. calls to C<croak>).
+This means that calling DataType_Type->new() with an unknown type
+name no longer results in S-Lang error messages printed to STDERR
+(which it did in 0.06).
+
+=item *
+
+fixed mem leak when converting structs from Perl to S-Lang. Note that
+the code used *may* trigger a mem leak in the S-Lang library if you
+are using a version < 1.4.9.
+
+=back
+
+=item v0.06 Thu Apr  3 22:36:54 EST 2003
+
+Notable changes are:
+
+=over 2
+
+=item *
+
+Essentially all S-Lang I<scalars> can now be converted to
+Perl. Those without a direct translation to a native Perl
+type are converted to "opaque" Perl objects, with classes
+called C<Inline::SLang::XXX> where C<XXX> equals the
+name of their S-Lang data type. Essentially all you can
+do with these objects is pass them back to S-Lang
+routines. However, it does mean you can now call routines that
+return module-defined types.
+
+Currently the S-Lang file types (so C<File_Type> and
+C<FD_Type>) are converted using this scheme, which means you
+can I<not> use them with Perl I/O commands. I need to
+read up a lot more on Perl's I/O mechanism before I
+can change this (if it's possible).
+
+=item *
+
+"Named" structures - e.g. C<Foo_Type> created by
+C<< typedef struct {...} Foo_Type; >> - are now handled
+as C<Inline::SLang::XXX> objects, where C<XXX> matches the 
+structure type (so C<Foo_Type> in this example).
+These classes are sub-classes of C<Inline::SLang::Struct_Type>.
+
+=item *
+
+Fixed handling of BIND_NS =E<gt> "All".
+
+=item *
+
+Added an examples/ directory to the distribution, which
+contains simple examples (mainly from L<Inline::SLang::Types>).
+Note that these files are I<not> installed into the Perl
+tree by 'make install'.
+
+=back
+
+=item v0.05 Fri Mar 14 11:57:31 EST 2003
+
+Notable changes are:
+
+=over 2
+
+=item *
+
+Handling of 'foreign' S-Lang types - those for which we
+have introduced special classes such as C<DataType_Type>
+variables - has been changed to use a scheme in which the
+Perl class name is formed from the concatanation of
+C<Inline::SLang::> and the S-Lang type (so
+C<Inline::SLang::struct> has been renamed to
+C<Inline::SLang::Struct_Type>).
+
+The classes are also more uniform in that they have a
+number of common functions and, where possible, the
+method names are similar to S-Lang functions with the
+same functionality.
+
+=item *
+
+Ref_Type variables are now supported (scalars only)
+via the C<Inline::SLang::Ref_Type> class. Unfortunately
+this requires use of function/types that are not part
+of the public interface of the S-Lang library.
+
+=item *
+
+The BIND_NS option only works for v1.4.3 and higher of S-Lang.
+The option has been enhanced to allow namespace "renaming"
+and the use of "All" to specify all known namespaces (this
+only works for v1.4.7 and higher of S-Lang). The only valid
+string options are now "Global(=...)" and "All".
+
+=item *
+
+The BIND_SLFUNCS option has been added to allow you to use
+slected S-Lang intrinsic functions directly from Perl (i.e. without
+having to write a S-Lang wrapper function around it). To
+help avoid nameclashes you can chose your own name for
+the function in Perl.
+
+=item *
+
+Documentation on S-Lang specific configuration options
+has been moved to L<Inline::SLang::Config>.
+
+=back
+
+=item v0.04 Fri Mar  7 00:14:47 EST 2003
+
+Notable changes are:
+
+=over 2
+
+=item *
+
+License changed to GNU GPL and copyright holder to SAO.
+
+=item *
+
+Now binds all functions (other than S-Lang intrinsic
+functions) in the Global namespace. Added the C<BIND_NS> 
+configuration option to allow functions in other 
+namespaces to be bound as well. Use the Inline
+'-MInline=INFO' option to find out what functions
+have been bound.
+
+=item *
+
+S-Lang C<Struct_Type> variables are converted to 
+C<Inline::SLang::struct> objects. There are
+memory leaks!
+
+=item *
+
+Fixed memory leaks when converting C<Assoc_Type> 
+arrays to Perl.
+
+=item *
+
+S-Lang C<Struct_Type> variables are converted to 
+C<Inline::SLang::struct> objects.
+
+=back
+
+=item v0.03 Tue Jan 28 12:01:49 EST 2003
+
+Initial public release
+
+=back
+

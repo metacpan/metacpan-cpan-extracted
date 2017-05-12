@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/IO-Pipe-Producer.t
+lib/IO/Pipe/Producer.pm

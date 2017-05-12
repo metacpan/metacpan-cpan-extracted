@@ -1,0 +1,23 @@
+#!/usr/bin/perl -w
+###########################################
+# run-cached-all
+# Mike Schilli, 2007 (m@perlmeister.com)
+###########################################
+use strict;
+
+use IPC::Cmd::Cached;
+use Getopt::Std;
+use Log::Log4perl qw(:easy);
+use Pod::Usage;
+
+getopts("v", \my %opts);
+
+my $level = $INFO;
+
+if($opts{v}) {
+    $level = $DEBUG;
+}
+Log::Log4perl->easy_init($level);
+
+my $runner = IPC::Cmd::Cached->new();
+$runner->run_all();

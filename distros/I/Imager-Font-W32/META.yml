@@ -1,0 +1,30 @@
+--- #YAML:1.0
+name:               Imager-Font-W32
+version:            0.89
+abstract:           Win32 font file support for Imager
+author:
+    - Tony Cook <tonyc@cpan.org>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+    Imager:               0.95
+build_requires:
+    ExtUtils::MakeMaker:  0
+    Imager:               0.95
+    Test::More:           0.47
+requires:
+    Imager:    0.95
+    XSLoader:  0
+resources:
+    bugtracker:  http://rt.cpan.org/NoAuth/Bugs.html?Dist=Imager
+    homepage:    http://imager.perl.org/
+    repository:  git://git.imager.perl.org/imager.git
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.57_05
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

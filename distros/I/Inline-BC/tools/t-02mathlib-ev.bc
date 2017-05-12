@@ -1,0 +1,127 @@
+#!/usr/linux-glibc-2.2.5/local/bin/bc -l
+/* t-02mathlib-ev.bc: BC script file to generate the expected values for
+     the Perl test program "02mathlib.t". Each expected value is written
+     to STDOUT on a separate line in the format,
+	<test_name>exptd_value
+
+     Eg. <T1_SIN_FP12>.295520206661
+
+   Script Usage: t-02mathlib-ev.bc > 02mathlib-ev.dat
+*/
+a0[0] = 0.3	/* array of begin angles in radians */
+a0[1] = -1.7
+na0 = 2		/* no. of begin angles       */
+ni  = 20	/* no. of angle increments   */
+ai  = 0.001	/* angle increment           */
+fp[0] = 12	/* array of fractional precision values */
+fp[1] = 25
+fp[2] = 45
+nfp = 3		/* no. of frac. prec. values */
+
+/* Generate expected values for the SINE function tests */
+t = 1		/* initialise test no. */
+for (i = 0; i < na0; i++)
+{
+   for (j = 0; j < nfp; j++)
+   {  scale = fp[j]
+      a = a0[i]
+   
+      for (n = 0; n < ni; n++)
+      {  rv  = s(a)		/* calculate sine of angle */
+	 a  += ai		/* next angle */
+	 print "<T", t++, "_SIN_FP", fp[j], ">"
+	 rv
+      }
+   }
+}
+
+/* Generate expected values for the COSINE function tests */
+for (i = 0; i < na0; i++)
+{
+   for (j = 0; j < nfp; j++)
+   {  scale = fp[j]
+      a = a0[i]
+   
+      for (n = 0; n < ni; n++)
+      {  rv  = c(a)		/* calculate cosine of angle */
+	 a  += ai		/* next angle */
+	 print "<T", t++, "_COS_FP", fp[j], ">"
+	 rv
+      }
+   }
+}
+
+/* Generate expected values for the ARCTANGENT function tests */
+for (i = 0; i < na0; i++)
+{
+   for (j = 0; j < nfp; j++)
+   {  scale = fp[j]
+      a = a0[i]
+   
+      for (n = 0; n < ni; n++)
+      {  rv  = a(a)		/* calculate arctangent */
+	 a  += ai		/* next tangent value */
+	 print "<T", t++, "_ATAN_FP", fp[j], ">"
+	 rv
+      }
+   }
+}
+
+/* Generate expected values for the BESSEL function tests */
+for (i = 0; i < na0; i++)
+{
+   for (j = 0; j < nfp; j++)
+   {  scale = fp[j]
+      a = a0[i]
+   
+      for (n = 0; n < ni; n++)
+      {  rv  = j(0,a)		/* calculate Bessel function J0 at A */
+         rv2 = j(1,a)		/* calculate Bessel function J1 at A */
+	 a  += ai		/* next value of A */
+	 print "<T", t++, "_BESSEL_J0_FP", fp[j], ">"
+	 rv
+	 print "<T", t++, "_BESSEL_J1_FP", fp[j], ">"
+	 rv2
+      }
+   }
+}
+
+/* Generate expected values for the EXPONENT function tests */
+a0[1]  = -14.2
+for (i = 0; i < na0; i++)
+{
+   for (j = 0; j < nfp; j++)
+   {  scale = fp[j]
+      a = a0[i]
+   
+      for (n = 0; n < ni; n++)
+      {  rv  = e(a)		/* calculate exponent */
+	 a  += ai		/* next value */
+	 print "<T", t++, "_EXP_FP", fp[j], ">"
+	 rv
+      }
+   }
+}
+
+/* Generate expected values for the natural LOGARITHM
+   function tests.
+*/
+a0[0] = 0.0005
+a0[1] = 157.3
+
+for (i = 0; i < na0; i++)
+{
+   for (j = 0; j < nfp; j++)
+   {  scale = fp[j]
+      a = a0[i]
+   
+      for (n = 0; n < ni; n++)
+      {  rv  = l(a)		/* calculate natural logarithm */
+	 a  += ai		/* next value */
+	 print "<T", t++, "_NLOG_FP", fp[j], ">"
+	 rv
+      }
+   }
+}
+
+quit

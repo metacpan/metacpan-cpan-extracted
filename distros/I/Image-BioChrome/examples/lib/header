@@ -1,0 +1,7 @@
+<html>
+<head>
+<title>
+[% template.title %]
+</title>
+</head>
+<body bgcolor="#ffffff">

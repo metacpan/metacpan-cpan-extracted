@@ -1,0 +1,14 @@
+Revision history for Perl extension IO::Epoll.
+
+0.01  Sat Feb 28 15:32:58 2004
+	- original version; created by h2xs 1.23 with options
+		-b 5.6.0 -n IO::Epoll sys/epoll.h
+
+0.02   Sat Jan 24 14:19:22 PST 2009
+	- Applied patches from Paul LeoNerd Evans:
+		* Ensure ->poll returns correct value on error;
+		* Ensure that ->poll interprets timeout correctly
+		* Add support for epoll_pwait, and IO::Ppoll compatibility
+
+0.03   Wed Jan  4 15:34:40 EST 2012
+    - Applied patch from RT for latest bleadperl

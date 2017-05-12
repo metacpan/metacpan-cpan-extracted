@@ -1,0 +1,73 @@
+=for comment based on iup-3.5 - http://www.tecgraf.puc-rio.br/iup/en/elem/iupspin.html
+
+=head1 NAME
+
+IUP::Spin - [GUI element] vertical box containing 2 buttons for incrementing/decrementing values
+
+=head1 DESCRIPTION
+
+This functions will create a control set with a vertical box containing
+two buttons, one with an up arrow and the other with a down arrow, to
+be used to increment and decrement values.
+
+Unlike the SPIN attribute of the L<IUP::Text|IUP::Text> element, the L<IUP::Spin|IUP::Spin>
+element can NOT automatically increment the value and it is NOT
+inserted inside the L<IUP::Text|IUP::Text> area.
+
+=begin HTML
+
+<p><img src="http://kmx.github.io/perl-iup/img-3.9/elem/iupspin.png"></p>
+
+=end HTML
+
+=head1 USAGE
+
+=head2 CREATION - new() method
+
+L<IUP::Spin|IUP::Spin> is based on L<IUP::Vbox|IUP::Vbox>, and contains two L<IUP::Button|IUP::Button>.
+
+ $spin = IUP::Spin->new();
+
+B<Returns:> the identifier of the created element, or C<undef> if an error occurs.
+
+NOTE: You can pass to C<new()> other C<ATTRIBUTE=E<gt>'value'> or C<CALLBACKNAME=E<gt>\&func> pairs relevant
+to this element - see L<IUP::Manual::02_Elements|IUP::Manual::02_Elements/"new()">.
+
+=head2 CALLBACKS
+
+For more info about concept of callbacks (setting callback handlers etc.)
+see L<IUP::Manual::04_Callbacks|IUP::Manual::04_Callbacks>. Callbacks specific to this element:
+
+=over
+
+=item B<SPIN_CB>
+
+Called each time the user clicks in the buttons. It will
+increment 1 and decrement -1 by default. Holding the Shift key will set
+a factor of 2, holding Ctrl a factor of 10, and both a factor of 100.
+
+B<Callback handler prototype:>
+
+ sub spin_cb_handler {
+   my ($self, $inc) = @_;
+   #...
+ }
+
+=back
+
+=head1 EXAMPLES
+
+
+Unfortunately there are no sample scripts using this element.
+
+
+
+=head1 SEE ALSO
+
+L<IUP::Text|IUP::Text>, L<IUP::Vbox|IUP::Vbox>,
+L<IUP::Hbox|IUP::Hbox>, L<IUP::Button|IUP::Button>
+
+The original doc: L<iupspin.html|http://www.tecgraf.puc-rio.br/iup/en/elem/iupspin.html>
+ 
+
+=cut

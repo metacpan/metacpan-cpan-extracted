@@ -1,0 +1,8 @@
+# IPC::AnyEvent::Gearman
+
+IPC::AnyEvent::Gearman is IPC through gearmand.
+
+You can send data to other process anywhere, using gearmand.
+
+
+

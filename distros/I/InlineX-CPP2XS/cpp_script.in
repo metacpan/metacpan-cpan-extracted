@@ -1,0 +1,199 @@
+##########################################################################
+use warnings;
+use strict;
+use InlineX::CPP2XS 'cpp2xs';
+
+for(@ARGV) {
+   if($_ =~ /\-\-help/i) {
+      print "
+For more detailed explanation of the various options see the
+InlineX::CPP2XS documentation.
+
+Valid options are:
+--m=<value>  eg --m=My::Module (Mandatory)
+--p=<value>  eg --p=My::Module (Defaults to whatever '--m=' specified)
+--bd=<value> eg --bd=/my/build (Specified directory must already exist.
+                                Defaults to the cwd)
+--autowrap=<value>     eg --autowrap=1    (Default value is 0)
+--auto_include=<value> eg \"--auto_include=#include <header.h>\"
+--boot=<code>          eg --boot=printf(\\\"Hello\\n\\\");
+--boot_f=<value>       eg --boot_f=/home/me/boot_code.ext
+--build_noisy=<value>  eg --build_noisy=0 (Default value is 1)
+--ccflags=<value>      Will clobber \$Config{ccflags}. Use '--ccflagsex='
+                       instead.
+--ccflagsex=<value>    eg --ccflagsex=-DMY_DEFINE
+--code=<code>          eg --code=void foo(){printf(\\\"Hi\\n\\\")};
+                            (But use '-src_location=' instead)
+--dist=<value>         eg --dist=1 (Default is 0)
+--export_all=<value>   eg --export_all=1  (Default value is 0)
+--export_ok_all=<value>   eg --export_ok_all=1  (Default value is 0)
+--export_tags_all=<value> eg --export_tags_all=all
+--inc=<value>          eg --inc=-I/here -I/there
+--ld=<value>           eg --ld=g++
+--lddlflags=<value>    eg --lddlflags=-s
+--libs=<value>         eg --libs=-L/here -lib1 -L/there -llib2
+--make=<value>         eg --make=pmake     (Untested)
+--manif=<value>        eg --manif=1 (Default value is 0)
+--myextlib=<value>     eg --myextlib=/path/to/some.so
+--optimize=<value>     eg --optimize=-g -O3
+--prefix=<value>       eg --prefix=FOO_
+--pre_head=<value>     eg --pre_head=/some/file.ext
+--prereq_pm=<value>    eg --prereq_pm=X::M1 1.23 ZZ::M2 0 (Must specify
+                            name, space, version, space, name, ... etc)
+--src=<value>               An alias for '--src_location='
+--src_location=<value> eg --src_location=/home/me/source.ext
+                            (See the InlineX::CPP2XS docs.
+                            Default is './src/<mod>.cpp)
+--t=<value>            eg --t=1 (Default value is 0.)
+--typemaps=<value>     eq --typemaps=type1 type2
+--use=<value>          eg --use=ABC::M1 BCD::M2
+--using=<value>        Default is ParseRecDescent. Currently no other
+                       option for cpp2xs.
+--version=<value>      eg --version=0.42
+--write_pm=<value>     eg --write_pm=1 (Default is 0)
+--write_makefile_pl=<value> eg --write_makefile_pl=1 (Default is 0)
+                            For a portable Makefile.PL and xs file
+                            specify --write_makefile_pl=p
+";
+      exit 0;
+  }
+}
+
+my $argv = join ' ', @ARGV;
+
+die "Must begin with a '--<option>=' argument. See 'cpp2xs --help' for a list of those options\n"
+  unless $argv =~ /^\-\-.+?=/;
+
+die " A '--m=' argument (specifying the module name) must be provided on the\n", " command line.\n",
+    " See 'cpp2xs --help'\n" unless $argv =~ /\-\-m=/i;
+
+$argv =~ s/\-\-src=/\-\-src_location=/i;
+
+my @allow = @InlineX::CPP2XS::allowable_config_keys;
+
+for(@allow) {$_ = '--' . $_ .'='}
+push @allow, '--M=', '--P=', '--BD=';
+
+my @keys = $argv =~ /\-\-.+?=/g;
+my @vals = split /\-\-.+?=/, $argv;
+shift @vals;
+
+for(@keys) {
+   die "$_ is not an allowable option"
+     unless check_keys($_);
+}
+
+
+die "We have ", scalar(@keys), " keys, but ", scalar(@vals), " values ... we need the same number of both ..."
+  if @vals != @keys;
+
+for(my $i = 0; $i < @vals; $i++) {
+  remove_leading_and_trailing_whitespace($vals[$i]);
+
+  if(uc($keys[$i]) eq '--CODE=') {
+    warn "\n Providing code via $keys[$i] is not always straightforward, and is therefore not\n",
+         " recommended. A safer option is to put the code into a file, and specify that\n",
+         " file's location by using the '--source_location=' option\n";
+  }
+
+  if(uc($keys[$i]) eq '--BOOT=') {
+    warn "\n Providing code via $keys[$i] is not always straightforward, and is therefore not\n",
+         " recommended. A safer option is to put the code into a file, and specify that\n",
+         " file's location by using the '--boot_f=' option\n";
+  }
+}
+
+my %opts;
+my ($m, $p, $bd);
+
+for(my $i = 0; $i < @vals; $i++) {
+   $keys[$i] =~ s/\-\-//;
+   $keys[$i] =~ s/=//;
+   my $kname = uc($keys[$i]);
+   if($kname eq 'M') {
+     $m = $vals[$i];
+     next;
+   }
+   if($kname eq 'P') {
+     $p = $vals[$i];
+     next;
+   }
+   if($kname eq 'BD') {
+     $bd = $vals[$i];
+     next;
+   }
+   if($kname eq 'USE') {
+     $opts{$kname} = fix_USE($vals[$i]);
+   }
+   elsif($kname eq 'PREREQ_PM') {
+     $opts{$kname} = fix_PREREQ_PM($vals[$i]);
+   }
+   else {
+     $opts{$kname} = $vals[$i];
+   }
+}
+
+$p = $m unless defined $p;
+$bd = '.' unless defined $bd;
+
+print "\nThe following arguments will be passed to InlineX::CPP2XS::cpp2xs():\n";
+print "  Module Name     = *${m}*\n";
+print "  Package Name    = *${p}*\n";
+print "  Build Directory = *${bd}*\n";
+for(keys(%opts)) {
+  if($_ eq 'USE') { # $opts{USE} is an array ref.
+    print "  $_ => [qw(@{$opts{$_}})]\n";
+  }
+  elsif($_ eq 'PREREQ_PM') { # $opts{PREREQ_PM} is a hash ref.
+    my %h = %{$opts{$_}};
+    print "  $_ => {\n";
+    for my $k(keys(%h)) {
+      print "        *$k* => *$h{$k}*,\n";
+      }
+    print "        }\n";
+  }
+  else {print "  $_ => *$opts{$_}*\n";}
+}
+
+print "\n";
+
+cpp2xs($m, $p, $bd, \%opts);
+
+######################################
+######################################
+sub check_keys {
+    for(@allow) {
+       return 1 if $_ eq uc($_[0]) # it's a valid arg
+    }
+    return 0;                      # it's an invalid arg
+}
+
+######################################
+######################################
+
+sub remove_leading_and_trailing_whitespace {
+    while($_[0] =~ /\s$/) {chop $_[0]}
+    while($_[0] =~ /^\s/) {substr($_[0], 0, 1, '')}
+}
+
+######################################
+######################################
+
+sub fix_USE {
+    my @ret = split /\s+/, $_[0];
+    return \@ret;
+}
+
+######################################
+######################################
+
+sub fix_PREREQ_PM {
+    my @ret = split /\s+/, $_[0];
+    die "Uneven number of hash elements"
+      if @ret % 2;
+    my %r = @ret;
+    return \%r;
+}
+
+######################################
+######################################

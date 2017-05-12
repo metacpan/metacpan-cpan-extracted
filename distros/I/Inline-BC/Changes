@@ -1,0 +1,31 @@
+Version 0.08 - Sat Jun  6 08:02:49 GMT 2009
+* added the new config option 'MATH_LIB'.
+* added C function load_math_lib() to file mylib/myutil2.c
+* modified XS function bc_init() in file BC.xs to allow loading of BC's
+  math library.
+* modified C function my_perl_bc_init() in file mylib/myutil2.c to allow
+  loading of BC's math library.
+* in file BC.pm, added code to subroutine validate() to check and process
+  the new config option 'MATH_LIB'.
+* in file BC.pm, moved the initialisation of BC interpreter from
+  subroutine eval_support_code() to validate().
+* in file BC.pm, added the global variable $use_math_lib.
+* modified subroutine validate() in file BC.pm to allow the 'FILTERS'
+  config option to work with Inline::Filters again.
+* added a new, comprehensive section "CONFIG OPTIONS" to the POD
+  documentation of file BC.pm
+* modified Makefile.PL to include Test::More as a prerequisite module.
+* added the new test files t/02mathlib.t, tools/02mathlib-ev.dat
+
+Version 0.07 - Sat Jan 24 14:59:00 NZDT 2009
+* an old fix I think for Global symbol "$RE_balanced_brackets"
+  requires explicit package name
+
+Version 0.06 - Wed Dec  4 15:55:32 GMT 2002 -
+* Documentation erros about Inline Usage as pointed out by Abigail :-)
+
+Version 0.05 - Fri Nov 29 09:26:14 GMT 2002 -
+* Fixed up the test so that the smokehouse doesn't complain :-)
+
+Version 0.04 - Mon Nov 25 06:32:02 GMT 2002 -
+* Patch supplied by Mike Castle for the Perl grafting to bc.

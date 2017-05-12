@@ -1,0 +1,73 @@
+#!/usr/bin/perl
+#This is a simple demo script showing some basic operations. 
+#It initializes the serial port,
+#Waits for ring on the modem, when a call comes, plays the file bgreet,
+#takes the dtmf code from the caller and finally says sorry and plays , 
+#the dtmf code received in numeriacal format, date, and some text.
+
+require 5.000;
+use Ivrs;
+
+#you must specify your serial port where voice modem is connected
+$portname=$ARGV[0];
+die "\n usage: $0 ttyS0 or ttyS1\n\n" if ($portname eq "");
+
+#Set the voice file directory. The absolute path is required if you want to
+#run the IVRS from the inittab or any other directory.  
+#The voice files for Rockwel Chip Set modem are in 'sfiles' directory,
+#The voice files for US Robotics modem are in 'ufiles' directory, 
+
+$vdir="sfiles";
+
+#initialize the serial port
+$iv = new Ivrs($portname,$vdir);
+print "Serial port and Modem initialized\n";
+
+#set the serial port parameters only if you are sure.
+$iv->setport("38400","none","8","1","rts","8096")||die"Setting Failed\n";
+
+#initialize the modem and put it in voice mode.
+$iv->initmodem||die"Modem failed\n";
+
+#put the modem in answer mode, $cid will have the caller ID
+#You may test your voice files (through modem speaker, but not a very good
+#idea!!) without actually connecting from the
+#telephone. Just change $cid=$iv->waitring to $iv->atcomm("AT#VTX","CONNECT")
+#But then you will have to enter dtmf code from the telephone connected to modem.
+
+print "Waiting for the ring.....\n";
+$cid=$iv->waitring; 
+print "Call received from $cid \n";
+
+#pick up the receiver when a call come and play the greeting message.
+#and collect 4 digits of dtmf code, returned in $accno. The caller can enter
+#fewer than 4 DTMF code by terminating with * or #,
+
+$accno=$iv->playfile("bgreet","4")||&closeall;
+
+print "The caller has punched $accno dtmf codes \n";
+
+#add file sory and waccno to say "Sorry" and "Wrong account Number"
+#along with received number to a file (set in Ivrs.pm as $tmpmsg) 
+$iv->addval($accno);
+$iv->addmsg("sory");
+$iv->addmsg("waccno");
+$iv->addate("12122000");
+$iv->addtxt("ABCEFGH");
+
+#play the final file and accept one DTMF just to stop the playing of message. 
+$iv->playfile("",1)||&closeall;
+sleep 1;
+#close the port 
+$iv->addmsg("thank");
+$iv->playfile||&closeall;
+&closeall;
+exit 1;
+
+sub closeall
+{
+sleep 2;
+$iv->closep;
+exit 1;
+}
+

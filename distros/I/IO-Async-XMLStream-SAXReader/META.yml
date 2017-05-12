@@ -1,0 +1,41 @@
+---
+abstract: 'Dispatch SAX events from an XML stream.'
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Async::Loop: '0'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: IO-Async-XMLStream-SAXReader
+provides:
+  IO::Async::XMLStream::SAXReader:
+    file: lib/IO/Async/XMLStream/SAXReader.pm
+    version: '0.001002'
+  IO::Async::XMLStream::SAXReader::DuckHandler:
+    file: lib/IO/Async/XMLStream/SAXReader/DuckHandler.pm
+    version: '0.001002'
+requires:
+  Carp: '0'
+  IO::Async::Stream: '0'
+  Scalar::Util: '0'
+  XML::LibXML::SAX::ChunkParser: '0.00007'
+  parent: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/IO-Async-XMLStream-SAXReader/issues
+  homepage: https://github.com/kentnl/IO-Async-XMLStream-SAXReader
+  repository: https://github.com/kentnl/IO-Async-XMLStream-SAXReader.git
+version: '0.001002'

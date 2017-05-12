@@ -1,0 +1,35 @@
+---
+name: Interpolation
+version: 0.74
+author:
+  - 'Jan Krynicky (Jenda@Krynicky.cz), Mark-Jason Dominus (mjd@plover.com)'
+abstract: Arbitrary string interpolation semantics (using tie())
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.340201
+provides:
+  Interpolation:
+    file: lib/Interpolation.pm
+    version: 0.74
+  Interpolation::A2A:
+    file: lib/Interpolation.pm
+  Interpolation::A2S:
+    file: lib/Interpolation.pm
+  Interpolation::S2A:
+    file: lib/Interpolation.pm
+  Interpolation::Scalar:
+    file: lib/Interpolation.pm
+  Interpolation::base:
+    file: lib/Interpolation.pm
+  Interpolation::general:
+    file: lib/Interpolation.pm
+  Interpolation::internal:
+    file: lib/Interpolation.pm
+generated_by: Module::Build version 0.340201
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

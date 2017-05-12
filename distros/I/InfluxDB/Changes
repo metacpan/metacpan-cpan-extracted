@@ -1,0 +1,41 @@
+Revision history for InfluxDB
+
+1.005  2016-06-30 12:55:08 JST
+    [IMPROVEMENTS]
+        - Provide support for disabled HTTP authentication #7
+    [DOCUMENTATION]
+        - Add SSL to readme as well #2
+
+1.004  2015-11-05 20:20:26 JST
+    [DOCUMENTATION]
+        - refer to InfluxDB::LineProtocol
+
+1.003  2015-05-08 16:05:58 JST
+    [BUG FIXES]
+        - Fix cannot call constructor twice #5
+
+1.002  2015-04-17 13:35:32 JST
+    [DOCUMENTATION]
+        - Improve documents
+
+1.001  2014-12-19 14:10:32 JST
+    [NEW FEATURES]
+        - Support SSL/TLS
+
+1.000  2014-03-28 21:40:54 JST
+    [IMPROVEMENTS]
+        - Add methods for continuous query
+        - Add methods for database user and cluster admin management
+    [INCOMPATIBLE CHANGES]
+        - Requires Perl >= 5.10
+        - Remove some options from delete_points
+
+0.002  2014-02-10 14:40:32 JST
+    [NEW FEATURES]
+        - Add "errstr" method
+    [BUG FIXES]
+        - run t/author-10_basic.t test only under author test mode
+
+0.001  2014-02-07 17:02:13 JST
+    [NEW FEATURES]
+        - Initial version

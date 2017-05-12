@@ -1,0 +1,197 @@
+NAME
+    `IPC::PerlSSH::Async' - Asynchronous wrapper around IPC::PerlSSH
+
+SYNOPSIS
+    *Note:* the constructor has changed since version 0.03.
+
+     use IO::Async::Loop;
+     use IPC::PerlSSH::Async;
+
+     my $loop = IO::Async::Loop->new();
+
+     my $ips = IPC::PerlSSH::Async->new(
+        on_exception => sub { die "Failed - $_[0]\n" },
+
+        Host => "over.there",
+     );
+
+     $loop->add( $ips );
+
+     $ips->eval(
+        code => "use POSIX qw( uname ); uname()",
+        on_result => sub { print "Remote uname is ".join( ",", @_ )."\n"; },
+     );
+
+     # We can pass arguments
+     $ips->eval( 
+        code => 'open FILE, ">", shift; print FILE shift; close FILE;',
+        args => [ "foo.txt", "Hello, world!" ],
+        on_result => sub { print "Wrote foo.txt\n" },
+     );
+
+     # We can load pre-defined libraries
+     $ips->use_library(
+        library => "FS",
+        funcs   => [qw( unlink )],
+        on_loaded => sub {
+           $ips->call(
+              name => "unlink",
+              args => [ "foo.txt" ],
+              on_result => sub { print "Removed foo.txt\n" },
+           );
+        },
+     );
+
+     $loop->loop_forever;
+
+DESCRIPTION
+    This module provides an object class that implements the `IPC::PerlSSH'
+    behaviour in an asynchronous way, suitable for use in an
+    `IO::Async'-based program.
+
+    Briefly, `IPC::PerlSSH' is a module that allows execution of perl code
+    in a remote perl instance, usually accessed via ssh, with the notable
+    distinction that the module does not need to be present in the remote
+    end, nor does any special server need to be running, besides ssh itself.
+    For more detail, see the IPC::PerlSSH documentation.
+
+INITIAL PARAMETERS
+    As well as the PARAMETERS named below, the constructor will take any of
+    the constructor arguments named by IPC::PerlSSH, to set up the
+    connection.
+
+PARAMETERS
+    The following named parameters may be passed to `new' or `configure':
+
+    on_exception => CODE
+            Optional. A default callback to use if a call to `eval()',
+            `store()' or `call()' does not provide one. If it is changed
+            while a result it outstanding, the handler that was in place at
+            the time it was invoked will be used in case of errors. Changes
+            will only affect new `eval()', `store()' or `call()' calls made
+            after the change.
+
+    on_exit => CODE
+            Optional. A callback to invoke if the remote perl process exits.
+            Will be passed directly to the `IO::Async::Process' `on_finish'
+            method.
+
+METHODS
+  $ips->eval( %args )
+    This method evaluates code in the remote host, passing arguments and
+    returning the result.
+
+    The `%args' hash takes the following keys:
+
+    code => STRING
+            The perl code to execute, in a string. (i.e. NOT a CODE
+            reference).
+
+    args => ARRAY
+            Optional. An ARRAY reference containing arguments to pass to the
+            code.
+
+    on_result => CODE
+            Continuation to invoke when the code returns a result.
+
+    on_exception => CODE
+            Optional. Continuation to invoke if the code throws an
+            exception.
+
+    The code should be passed in a string, and is evaluated using a string
+    `eval' in the remote host, in list context. If this method is called in
+    scalar context, then only the first element of the returned list is
+    returned. Only string scalar values are supported in either the
+    arguments or the return values; no deeply-nested structures can be
+    passed.
+
+    To pass or return a more complex structure, consider using a module such
+    as Storable, which can serialise the structure into a plain string, to
+    be deserialised on the remote end.
+
+    If the remote code threw an exception, then this function propagates it
+    as a plain string. If the remote process exits before responding, this
+    will be propagated as an exception.
+
+  $ips->store( %args )
+    This method sends code to the remote host to store in a named procedure
+    which can be executed later.
+
+    The `%args' hash takes the following keys:
+
+    name => STRING
+            A name for the stored procedure.
+
+    code => STRING
+            The perl code to store, in a string. (i.e. NOT a CODE
+            reference).
+
+    on_stored => CODE
+            Continuation to invoke when the code is successfully stored.
+
+    on_exception => CODE
+            Optional. Continuation to invoke if compiling the code throws an
+            exception.
+
+    The code should be passed in a string, along with a name which can later
+    be called by the `call' method.
+
+    While the code is not executed, it will still be compiled into a CODE
+    reference in the remote host. Any compile errors that occur will still
+    invoke the `on_exception' continuation. If the remote process exits
+    before responding, this will be propagated as an exception.
+
+  $ips->call( %args )
+    This method invokes a stored procedure that has earlier been defined
+    using the `store' method. The arguments are passed and the result is
+    returned in the same way as with the `eval' method.
+
+    The `%params' hash takes the following keys:
+
+    name => STRING
+            The name of the stored procedure.
+
+    args => ARRAY
+            Optional. An ARRAY reference containing arguments to pass to the
+            code.
+
+    on_result => CODE
+            Continuation to invoke when the code returns a result.
+
+    on_exception => CODE
+            Optional. Continuation to invoke if the code throws an exception
+            or exits.
+
+  $ips->use_library( %args )
+    This method loads a library of code from a module, and stores them to
+    the remote perl by calling `store' on each one.
+
+    The `%params' hash takes the following keys:
+
+    library => STRING
+            Name of the library to load
+
+    funcs => ARRAY
+            Optional. Reference to an array containing names of functions to
+            load.
+
+    on_loaded => CODE
+            Continuation to invoke when all the functions are stored.
+
+    on_exception => CODE
+            Optional. Continuation to invoke if storing a function throws an
+            exception or exits.
+
+    The library name may be a full class name, or a name within the
+    `IPC::PerlSSH::Library::' space.
+
+    If the funcs list is non-empty, then only those named functions are
+    stored (analogous to the `use' perl statement). This may be useful in
+    large libraries that define many functions, only a few of which are
+    actually used.
+
+    For more information, see IPC::PerlSSH::Library.
+
+AUTHOR
+    Paul Evans <leonerd@leonerd.org.uk>
+

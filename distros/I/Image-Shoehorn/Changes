@@ -1,0 +1,70 @@
+Revision history for Perl extension Image::Shoehorn
+$Id: Changes,v 1.9 2003/05/30 22:51:06 asc Exp $
+
+1.42	Fri May 30 2003
+
+	- _ping() method taught to use File::MMagic to determine the 
+	  image's contenttype. (Image::Magick doesn't always return an 
+	  'image/foo-bar' string for an image's 'format'.)
+
+	- The 'type' attribute in hash ref returned by import() is 
+	  deprecated in favour of new 'extension' attribute.
+
+	- Added 'contenttype' attribute to hash ref returned by 
+	  import() method.
+
+	- Added requirement for Test::More in Makefile.PL
+
+	- Downgraded requirements for Image::Magick to 5.44
+
+	- Replaced test.pl with t/import.t
+
+	- Updated POD
+
+1.41	Thu Aug 01 2002
+
+	- Added test in &scaled_dimensions to catch divide by zero errors
+
+1.4	Sun Jul 21 2002
+
+	- Added "dimensions_for_scale" package method; originally part
+	  of &_scale()
+
+1.3	Mon Jul 08 2002
+
+	- Made $pkg->_dimensions a package method name
+	  scaled_dimensions in Image::Shoehorn
+
+	- Added "ScaleAllOnCleanup" config to Apache::ImageShoehorn
+
+	- Fixed a bug where Apache::ImageShoehorn handler was not
+	  returning DECLINED if no scaling was necessary. Duh.
+
+	- Updated POD
+
+1.2	Mon Jun 17 2002
+
+	- Added "SetValid" and "Convert" config options to
+	   Apache::ImageShoehorn
+
+	- Added Image::Shoehorn->converted_name package method
+
+	- Update Apache::ImageShoehorn::_valid_type to attach handler
+	  location to global TYPES hash
+
+	- Fixed a bug in Image::Shoehorn::_validate where I was returning
+	  false instead of positive. Ack!
+
+	- Updated POD
+
+1.1	Mon Jun 10 2002
+
+	- Added Apache::ImageShoehorn
+
+	- Added Image::Shoehorn->scaled_name package method
+
+	- Updated POD
+ 
+1.0	Tue Jun 06 2002
+
+	- Initial revision

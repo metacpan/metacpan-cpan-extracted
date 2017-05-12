@@ -1,0 +1,13 @@
+Revision history for IO-Pty-HalfDuplex
+
+0.02    Wed Jun 17 19:17:41 PDT 2009
+        Fixed a bug which would cause a crash on kill() calls
+        Added ptrace and sysctl backends for high performance on BSD
+        Added multi-backend support; see documentation for details
+        Wrote a blog post documenting the problem, commited to doc/
+        Removed a darcs backup file from packaging (oops)
+        Fixed Changes date for 0.01
+
+0.01    Tue Jun  9 18:36:15 PDT 2009
+        First version, released on an unsuspecting world.
+

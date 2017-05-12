@@ -1,0 +1,5 @@
+MANIFEST
+Makefile.PL
+SMITH.pm
+smith-license.txt
+t/01basic.t

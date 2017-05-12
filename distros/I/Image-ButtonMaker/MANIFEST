@@ -1,0 +1,24 @@
+Changes
+example/README.txt
+example/run.pl
+example/buttons.pl
+example/classes.pl
+example/pieces/aispec.ttf
+example/pieces/aqua-blue.png
+example/pieces/aqua-red.png
+example/pieces/aqua.gif
+example/pieces/blink.gif
+lib/Image/ButtonMaker.pm
+lib/Image/ButtonMaker/Button.pm
+lib/Image/ButtonMaker/ButtonClass.pm
+lib/Image/ButtonMaker/ColorCanvas.pm
+lib/Image/ButtonMaker/ClassContainer.pm
+lib/Image/ButtonMaker/Lexicon.pm
+lib/Image/ButtonMaker/TemplateCanvas.pm
+lib/Image/ButtonMaker/TextContainer.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
+TODO
+t/Image-ButtonMaker.t

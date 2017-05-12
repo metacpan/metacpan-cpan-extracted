@@ -1,0 +1,9 @@
+#!/usr/local/bin/perl
+
+use strict ;
+use warnings ;
+use IO::Compress::Xz qw(:all);
+
+xz '-' => '-'
+  or die "lzstream: $XzError\n" ;
+

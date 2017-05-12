@@ -1,0 +1,217 @@
+Image::Thumbnail
+================
+
+NAME
+    Image::Thumbnail - Simple thumbnails with GD/ImageMagick/Imager
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+SYNOPSIS
+            use Image::Thumbnail 0.6;
+
+            # Create a thumbnail from 'test.jpg' as 'test_t.jpg'
+            # using ImageMagick, Imager, or GD.
+            my $t = new Image::Thumbnail(
+                    size       => 55,
+                    create     => 1,
+                    input      => 'test.jpg',
+                    outputpath => 'test_t.jpg',
+            );
+
+            my $t = new Image::Thumbnail(
+                    size       => "55x75",
+                    create     => 1,
+                    module     => "Image::Magick",
+                    input      => $imageObject,
+                    outputpath => 'test_t.jpg',
+            );
+
+            # Create a thumbnail from 'test.jpg' as 'test_t.jpg'
+            # using GD.
+            my $t = new Image::Thumbnail(
+                    module     => 'GD',
+                    size       => 55,
+                    create     => 1,
+                    input      => 'test.jpg',
+                    outputpath => 'test_t.jpg',
+            );
+
+            # Create a thumbnail from 'test.jpg' as 'test_t.jpg'
+            # using Imager.
+            my $t = new Image::Thumbnail(
+                    module     => 'Imager',
+                    size       => 55,
+                    create     => 1,
+                    input      => 'test.jpg',
+                    outputpath => 'test_t.jpg',
+            );
+
+            # Create a thumbnail as 'test_t.jpg' from an ImageMagick object
+            # using ImageMagick, or GD.
+            my $t = new Image::Thumbnail(
+                    size       => "55x25",
+                    create     => 1,
+                    input      => $my_image_magick_object,
+                    outputpath => 'test_t.jpg',
+            );
+
+            # Create four more of ever-larger sizes
+            for (1..4){
+                    $t->{size} = 55+(10*$_);
+                    $t->create;
+            }
+
+            exit;
+
+DESCRIPTION
+    This module was created to answer the FAQ, 'How do I simply create a
+    thumbnail with pearl?' (*sic*). It allows you to easily make thumbnail
+    images from files, objects or 'blobs', using either the ImageMagick,
+    Imager or GD libraries.
+
+    Thumbnails created can either be saved as image files or accessed as
+    objects via the "object" field: see create.
+
+PREREQUISITES
+    One of "Image::Magick", "Imager", or "GD".
+
+CONSTRUCTOR new
+    Parameters are supplied as a hash or hash-like list of name/value pairs:
+    See the "SYNOPSIS".
+
+  REQUIRED PARAMETERS
+    size
+        The size you with the longest side of the thumbnail to be. This may
+        be provided as a single integer, or as an ImageMagick-style
+        'geometry' such as "100x120".
+
+    input
+        You must the "input" parameter as one of:
+
+        Input file path
+            A scalar that is an absolute path to an image to use as the
+            source file.
+
+        Object
+            An object-reference created by your chosen package. Naturally
+            you can't supply this field if you haven't specified a "module"
+            field (see above).
+
+        Blob
+            A reference to a scalar that is the raw binary image data,
+            perhaps drawn from a database BLOB column, perhaps from a file.
+
+        The formerly required input fields should be considered depricated,
+        and although they will be kept in the API for this release, they
+        will eventually be removed.
+
+  OPTIONAL PARAMETERS
+    module ( GD | ImageMagick | Imager )
+        If you wish to use a specific module, place its name here. You must
+        have the module you require already installed!
+
+        Supplying no name will allow ImageMagick, then Imager to be tried
+        before GD.
+
+    create
+        Put any value in this field if you wish the constructor to call the
+        "create" method automatically before returning.
+
+    inputtype, outputtype
+        If you are using "GD", you can explicitly set the input and output
+        formats for the image file, provided you use a string that can be
+        evaluated to a "GD"-supported image format (see GD).
+
+        Default behaviour is to attempt to ascertin the file type and to
+        create the thumbnail in the same format. If the type cannot be
+        defined (you are using "GD", have supplied the "object" field and
+        not the "outputtype" field) then the output file format defaults to
+        "jpeg".
+
+    depth
+        Sets colour depth in ImageMagick - GD only supports 8-bit.
+
+        The ImageMagick manpage (see
+        <http://www.imagemagick.org/www/ImageMagick.html#opti>). says:
+
+    density
+        ImageMagick only: sets the pixel density. Must be a valid
+        ImageMagick 'geometry' value (that is, two numbers giving the *x*
+        and *y* dimensions, delimited by a lower-case *x*. Default value is
+        "96x96".
+
+    quality
+        ImageMagick/Imager only: an integer from 1 to 100 to specify the
+        thumbnail quality. Defaults to 50.
+
+    attr
+        If you are using ImageMagick, this field should contain a hash of
+        ImageMagick attributes to pass to the ImageMagick "Set" command when
+        the thumbnail is created. Any errors these may generate are not yet
+        caught.
+
+    CHAT
+        Put any value in this field for real-time process info.
+
+  PARAMETERS SET
+        x,y The dimension of the thumbnail produced.
+
+  ERRORS
+        As of version 0.4, any errors are stored in the fields "error",
+        warnings in "warning".
+
+        Any errors will be printed to "STDOUT". If they completely prevent
+        processing, they will be fatal ("croak"ed). If partial processing
+        has taken place by the explicit or implicit calling of the "create"
+        method, then the field of the same name will have value.
+
+        Depending on how far processing has proceded, other fields may have
+        useful values: the "module" field will contain the name of the
+        module used; the "object" field may contain an object of the module
+        used; the "thumb" field may contain a thumbnail image.
+
+METHOD create
+        Creates a thumbnail using the supplied object. This method is called
+        automatically if you construct with the "create" field flagged.
+
+        Sets the following fields:
+
+        module
+            Will contain the name of the module used (set by this module if
+            not by the user);
+
+        object
+            Will contain an instance of the module used;
+
+        thumb
+            Will contain the thumbnail image.
+
+        Returns c<undef> on failure.
+
+EXPORT
+        None.
+
+CHANGES
+        Please see the file CHANGES in the distribution tar.
+
+SEE ALSO
+        perl, Image::Epeg, GD, Imager, Image::Magick,
+        Image::Magick::Thumbnail, Image::GD::Thumbnail.
+
+AUTHOR
+        Lee Goddard <cpan-at-leegoddard-dot-net>
+
+        Thanks to Sam Tregar, Himmy and Chris Laco.
+
+COPYRIGT
+        Copyright (C) Lee Godadrd 2001-2005. All rights reserved. Supplied
+        under the same terms as Perl itself.
+
+

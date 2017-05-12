@@ -1,0 +1,98 @@
+Revision history for IPC::Exe
+
+2.002001  2011/11/14
+          + Added syntax sugar: @REDIRECTS can be specified after LIST.
+          + Redirects may be specified with file descriptors > 2. They refer to
+            temporary filehandles that may be used for intermediate redirection.
+            Those filehandles do not necessarily have the same fd fileno.
+          - A &READER that dies will not leave STDIN in a bad state.
+          - Better localization of error variables.
+
+2.001001  2011/10/22
+          + Able to pass scalar references to \%EXE_OPTIONS for 'pid', 'stdin',
+            'stdout', and 'stderr' options. Each referenced scalar will be
+            assigned its corresponding value and will not be returned by exe().
+          + &PREEXEC can return array references to perform open().
+            If references to array refs are returned, perform sysopen() instead.
+          + Added taint checking.
+          + Raised minimum Perl version required to v5.8.8.
+            This is for better handling of filehandles and PerlIO layers.
+          + Changed release to semantic versioning.
+          - Pass along $@ upon each call to exe().
+            Do not modify $@ for bg().
+
+1.010    2010/07/25
+         - Pass along $! and $^E upon each call to exe().
+           Do not modify $?, $! and $^E for bg().
+         - Hopeful robustness improvements for non-Unix.
+
+1.009    2009/10/03
+         - Do not wait on child with returned STDOUT/STDERR filehandles.
+         - Removed dependency on POSIX module.
+         - Minor pod rearrangement.
+
+1.008    2009/05/13
+         - Added: arguments, exit_waitpid and exit_close_pipe tests.
+         - Changed: tests no longer use ualarm() because it is unavailable sometimes.
+         - Further improvement of non-Unix quoting.
+         - Cleaned up aliasing code.
+         - Tried another fix for smoke test failures duplicating STDIN.
+
+1.007    2009/05/05
+         - Changed: removed POSIX::_exit() because it got in the way of threads.
+           Unfortunately, END blocks are performed as a result of die() or exit().
+           I haven't found a reliable way to avoid END blocks inside a thread.
+           Addressed by updating CAVEAT section in pod.
+
+         - Added: $IPC::Exe::is_forked to tell if code is not in main process/thread.
+           Added is_forked test.
+
+         - Fixed: smoke test failures duplicating STDIN. We'll see if the fix works.
+         - Added: check for undef values in LIST. Added undef_cmd test.
+         - Minor pod corrections.
+
+1.006    2009/05/02
+         - RT #45413: A chain of trivial scripts is stuck under Win2k, works under Linux
+           Threaded fork-emulation has limitations.
+           Addressed by updating CAVEAT section in pod.
+           Added *_pipe tests to account for this.
+
+         - RT #45263: wrong constant intermediate exit code
+           Fixed: $? was getting clobbered by waitpid(). Added exit tests.
+
+         - &READER is now called with ($child_pid, LIST) as arguments.
+           $child_pid allows waitpid($_[0], 0); to be called in &READER to set $?
+
+         - Deprecated 'exec' option in %EXE_OPTIONS. No more use of system().
+         - Changed: improved non-Unix quoting. Added quoting test.
+         - Added: manually flush STDERR/STDOUT after &PREEXEC.
+         - Added: use POSIX::_exit() upon failed exec to avoid calling END blocks.
+         - Added: use lib "../lib"; to examples/*.pl
+         - Minor changes to "README" and "Makefile.PL".
+
+1.005    2009/04/21
+         - Fixed: unknown open() mode '>&' to be compatible with Perl 5.6+.
+         - Minor changes.
+         - Added: LICENSE to "META.yml".
+
+1.004    2009/04/20
+         - Fixed: found = in conditional, should be ==.
+           use warnings; doesn't understand what I mean.
+
+1.003    2009/04/20
+         - Changed: exec() failure code sequence.
+         - Fixed: unknown open() mode '<&' to be compatible with Perl 5.6+.
+         - Fixed: minor mistakes in pod.
+         - Added: PREREQ_PM for POSIX module.
+
+1.002    2009/04/17
+         - Fixed: barewords STDIN/STDOUT/STDERR while "strict subs".
+         - Extracted examples into new EXAMPLES section in pod.
+         - Included "META.yml" in dist.
+         - Extracted license info from "README" into its own file "LICENSE".
+         - Skip 'background' test in "02_IPC-Exe.t" if not in DEBUG mode.
+           Testing bg() requires manual inspection.
+
+1.001    2009/04/02
+         - Initial revision.
+

@@ -1,0 +1,1333 @@
+=for comment based on iup-3.5 - http://www.tecgraf.puc-rio.br/iup/en/elem/iuptree.html
+
+=head1 NAME
+
+IUP::Tree - [GUI element] tree containing nodes of branches or leaves with associated text/image
+
+=head1 DESCRIPTION 
+
+Creates a tree containing nodes of branches or leaves. Both branches
+and leaves can have an associated text and image.
+
+The branches can be expanded or collapsed. When a branch is expanded,
+its immediate children are visible, and when it is collapsed they are
+hidden.
+
+The leaves can generate an "executed" or "renamed" actions, branches
+can only generate a "renamed" action.
+
+The focus node is the node with the focus rectangle, marked nodes have
+their background inverted.
+
+=begin HTML
+
+<p>
+  <table border="1">
+    <col style="background-color: rgb(239, 235, 231);">
+    <col style="background-color: rgb(173, 177, 194);">
+    <col style="background-color: rgb(212, 208, 200);">
+    <col style="background-color: rgb(236, 233, 216);">
+    <tbody align="center">
+      <tr>
+        <th>GTK</th>
+        <th>Motif</th>
+        <th>Windows</th>
+      </tr>
+      <tr>
+        <td><img src="http://kmx.github.io/perl-iup/img-3.9/elem/iuptree_gtk.png"></td>
+        <td><img src="http://kmx.github.io/perl-iup/img-3.9/elem/iuptree_mot.png"></td>
+        <td><img src="http://kmx.github.io/perl-iup/img-3.9/elem/iuptree_win.png"></td>
+      </tr>
+    </tbody>
+  </table>
+</p>
+
+=end HTML
+
+=head1 USAGE
+
+=head2 CREATION - new() method
+
+ $tree = IUP::Tree->new( TITLE=>'Root node name' );
+
+B<Returns:> the identifier of the created element, or C<undef> if an error occurs.
+
+NOTE: You can pass to C<new()> other C<ATTRIBUTE=E<gt>'value'> or C<CALLBACKNAME=E<gt>\&func> pairs relevant
+to this element - see L<IUP::Manual::02_Elements|IUP::Manual::02_Elements/"new()">.
+
+=head2 Tree - Hierarchy
+
+Branches can contain other branches or leaves. When ADDROOT=Yes the
+tree has initially one branch, the B<root>. The first node always has
+id=0 and depth=0. The tree nodes have a sequential identification
+number (id), starting by the first, with id=0, and increases for each
+node independent from the node depth. The following picture illustrates
+the numbering of the nodes in a tree.
+
+B<Tree nodes and Ids:>
+
+=begin HTML
+
+<p><img src="http://kmx.github.io/perl-iup/spec/iuptree1.png"></p>
+
+=end HTML
+
+Since you have to add each node the creation of this tree can be done
+in several ways because the action attributes ADD* and INSERT* use an
+existent node to position the new node. The following pseudo code
+initializes the tree from top to bottom sequencially:
+
+ TITLE0 = "Figures"
+   ADDLEAF0 = "Other"    // Use the previous node as reference
+   ADDBRANCH1 = "triangle"
+     ADDLEAF2 = "equilateral"
+     ADDLEAF3 = "isoceles"
+     ADDLEAF4 = "scalenus"
+   INSERTBRANCH2 = "parallelogram"  // Use the previous node at the same depth as reference
+     ADDLEAF6 = "square"
+     ADDLEAF7 = "diamond"
+   INSERTBRANCH6 = "2D"
+   INSERTBRANCH9 = "3D"
+
+The following pseudo code initializes the tree from bottom to top
+sequentially (except for branches), and also uses the focus node:
+
+ VALUE = 0  // Set the focus node at the first (default for a new element)
+ TITLE = "Figures"
+ ADDBRANCH = "3D"
+ ADDBRANCH = "2D"
+ ADDBRANCH = "parallelogram"
+ ADDLEAF1 = "diamond"
+ ADDLEAF1 = "square"
+ ADDBRANCH = "triangle"
+ ADDLEAF1 = "scalene"
+ ADDLEAF1 = "isosceles"
+ ADDLEAF1 = "equilateral"
+ ADDLEAF = "Other"
+
+Notice that in both cases the initialization of the tree is highly
+dependent on the order of the operations. Currently we can NOT garantie
+the order before mapping to the native system, so the initialization
+must be performed after the tree is mapped.
+
+Scrollbars are automatically displayed if the tree is greater than its
+display area.
+
+Branches may be added in IUP::Lua using a Lua Table, see
+L<iup.TreeAddNodes|#TreeAddNodes>.
+
+=head2 Tree - Manipulation
+
+Node insertion or removal is done by means of attributes. It is allowed
+to remove nodes and branches inside callbacks associated to opening or
+closing branches.
+
+This means that the user may insert nodes and branches only when
+necessary when the parent branch is opened, allowing the use of a
+larger IUP::Tree without too much overhead. Then when the parent branch
+is closed the subtree can be removed. But the subtree must have at
+least 1 node so the branch can be opened and closed, empty branches can
+NOT be opened.
+
+=head2 Tree - User Data
+
+The node id does not always correspond to the same node as the tree is
+modified. For example, an id=2 will always refer to the third node in
+the tree, so if you add a node before the third node, the node with
+id=2 will now refer to the new node, and the old node will now have
+id=3. For that reason, each node can store an user data pointer
+uniquely identifying the node. To set or retrieve the user data of a
+node use the B<USERDATAid> attribute, or the B<L<Extra
+Functions|#Extra_Functions>> below to associate a user data to a node
+and to find a node given its user data.
+
+=head2 Tree - Images
+
+L<IUP::Tree> has three types of images: one associated to the leaf, one to
+the collapsed branch and the other to the expanded branch. Each image
+can be changed, both globally and individually.
+
+The predefined images used in IUP::Tree can be obtained by means of
+function IUP::GetHandle. The names of the predefined images are: IMGLEAF,
+IMGCOLLAPSED, IMGEXPANDED, IMGBLANK (blank sheet of paper) and IMGPAPER
+(written sheet of paper). By default:
+
+ "IMAGELEAF" uses "IMGLEAF"
+ "IMAGEBRANCHCOLLAPSED" uses "IMGCOLLAPSED"
+ "IMAGEBRANCHEXPANDED" uses "IMGEXPANDED"
+ "IMGBLANK" and "IMGPAPER" are designed for use as "IMAGELEAF"
+
+=head2 Tree - Simple Marking
+
+Is the IUP::Tree default operation mode (MARKMODE=SINGLE). In this mode
+only one node can be selected.
+
+=head2 Tree - Multiple Marking
+
+L<IUP::Tree> allows marking several nodes simultaneously using the Shift and
+Control keys. To use multiple marking set MARKMODE=MULTIPLE. In GTK and
+Motif multiple nodes can also be selected using a rubber band if
+SHOW_DRAGDROP=NO.
+
+When a user keeps the Control key pressed, the individual marking mode
+is used. This way, the focus node can be modified without changing the
+marked node. To reverse a node marking, the user simply has to press
+the space bar.
+
+When the user keeps the Shift key pressed, the block marking mode is
+used. This way, all nodes between the focus node and the initial node
+are marked, and all others are unmarked. The initial node is changed
+every time a node is marked without the Shift key being pressed. This
+happens when any movement is done without Shift or Control keys being
+pressed, or when the space bar is pressed together with Control.
+
+=head2 Tree - Navigation
+
+Using the keyboard:
+
+=over
+
+=item * B<Arrow Up/Down>: Moves the focus node to the neighbor node,
+according to the arrow direction.
+
+=item * B<Home/End>: Moves the focus node to the first/last node.
+
+=item * B<Page Up/Page Down>: Moves the focus node to the node one
+visible page above/below the focus node.
+
+=item * B<Enter>: If the focus node is an expanded branch, it is
+collapsed; if it is a collapsed branch, it is expanded; if it is a
+leaf, it is executed.
+
+=item * B<Ctrl+Arrow Up/Down>: Moves only the focus node.
+
+=item * B<Ctrl+Space>: Marks or unmark the node at focus.
+
+=item * B<F2>: Calls the rename callback or invoke the in place rename.
+
+=item * B<Esc>: cancels in place rename.
+
+=back
+
+In Motif when pressing Tab the focus goes to the next visible node, if
+there are no next visible node then the next control in the dialog
+receives the focus. In Windows and GTK the focus simply goes directly
+to the next control.
+
+Using the left mouse button:
+
+=over
+
+=item * B<Clicking a node>: Moves the focus node to the clicked node.
+
+=item * B<Clicking a (-/+) box>: Makes the branch to the right of the
+(-/+) box collapse/expand.
+
+=item * B<Double-clicking a node>: Moves the focus node to the clicked
+node. If the node is an expanded branch, it is collapsed; if it is a
+collapsed branch, it is expanded; if it is a leaf, it is executed.
+
+=item * B<Clicking twice a node>: Calls the rename callback or invoke
+the in place rename.
+
+=item * B<Clicking and dragging a node>: if SHOWDRAGDROP=Yes starts a
+drag. When mouse is released, the DRAGDROP_CB callback is called. If
+the callback does not exist or if it returns IUP_CONTINUE then the node
+is moved to the new position. If Ctrl is pressed then the node is
+copied instead of moved. In Motif drag is performed with the middle
+mouse button.
+
+=back
+
+=head2 Tree - Removing a Node with "Del"
+
+By default the Del key is not processed, but you can implement it using
+a simple K_ANY callback:
+
+B<Callback handler prototype:>
+
+ sub k_any_handler {
+   my ($self, $c) = @_
+   if ($c == K_DEL) {
+     $self->SetAttribute( DELNODE=>"MARKED" );
+   }
+   return IUP_CONTINUE;
+ }
+
+=head2 ATTRIBUTES
+
+For more info about concept of attributes (setting/getting values etc.)
+see L<IUP::Manual::03_Attributes|IUP::Manual::03_Attributes>. Attributes specific to this element:
+
+=head3 General
+
+=over
+
+=item B<ADDEXPANDED>
+
+I<(non inheritable)>
+
+Defines if branches will be expanded
+when created. The branch will be actually expanded when it receives the
+first child. Possible values: "YES" = The branches will be created
+expanded; "NO" = The branches will be created collapsed. Default:
+"YES".
+
+=item B<ADDROOT>
+
+I<(non inheritable)>
+
+Automatically adds an empty branch as the
+first node when the tree is mapped. Default: "YES". (Since 3.1)
+
+=item B<AUTOREDRAW>
+
+I<[Windows] (non inheritable)>
+
+Automatically redraws the
+tree when something has change. Set to NO to add many items to the tree
+without updating the display. Default: "YES". (since 3.3)
+
+=item L<BGCOLOR|IUP::Manual::03_Attributes/BGCOLOR>
+
+Background color of the tree.
+Default: the global attribute TXTBGCOLOR.
+
+=item B<CANFOCUS>
+
+I<(creation only) (non inheritable)>
+
+Enables the focus
+traversal of the control. In Windows the control will still get the
+focus when clicked. Default: YES. 
+
+=item B<COUNT>
+
+I<(read only) (non inheritable)>
+
+Returns the total number of
+nodes in the tree. 
+
+=item B<DRAGDROP>
+
+I<[Windows and GTK Only] (non inheritable)>
+
+Enable or disable
+the drag&drop of files. Default: NO, but if DROPFILES_CB is defined
+when the element is mapped then it will be automatically enabled. This
+is NOT related to the drag&drop of nodes inside the tree. 
+
+=item B<DROPEQUALDRAG>
+
+I<(non inheritable)>
+
+If enabled will allow a drop node
+to be equal to the drag node. Used only if SHOWDRAGDROP =Yes. In the
+case the nodes are equal the callback return value is ignored and
+nothing is done after. (since 3.3)
+
+=item L<EXPAND|IUP::Manual::03_Attributes/EXPAND>
+
+I<(non inheritable)>
+
+The default value is "YES".
+
+=item B<FGCOLOR>
+
+Default text foreground color. Once each node is created it
+will not change its color when FGCOLOR is changed. Default: the global
+attribute TXTFGCOLOR. 
+
+=item B<HIDEBUTTONS>
+
+I<(creation only)>
+
+Hide the expand and collapse buttons.
+In GTK, branches will be only expanded programmatically. In Motif it
+did not work and crash the test.  (GTK 2.12)
+
+=item B<HIDELINES>
+
+I<(creation only)>
+
+Hide the lines that connect the nodes in
+the hierarchy.  (GTK 2.10)
+
+=item B<INDENTATION>
+
+Sets the indentation level in pixels. The visual effect
+of changing the indentation is highly system dependent. In GTK it acts
+as an additional indent value, and the lines do not follow the extra
+indent. In Windows is limited to a minimum of 5 pixels. 
+(GTK 2.12)
+
+=item L<RASTERSIZE|IUP::Manual::03_Attributes/RASTERSIZE>
+
+I<(non inheritable)>
+
+The initial size is "400x200". Set to C<undef> to allow the automatic layout
+use smaller values.
+
+=item B<SHOWDRAGDROP>
+
+I<(creation only, non inheritable)>
+
+Enables the drag and
+drop of nodes, and enables the B<DRAGDROP_CB> callback. Default: "NO".
+Works only if MARKMODE=SINGLE.
+
+=item B<SPACING>
+
+Vertical internal padding for each node. Notice that the
+distance between each node will be actually 2x the spacing. 
+
+=item B<TOPITEM>
+
+I<(write-only)>
+
+Position the given node identifier at the top
+of the tree or near to make it visible. If any parent node is collapsed
+then they are automatically expanded. 
+
+=back
+
+The following L<common attributes|IUP::Manual::03_Attributes/Common Attributes> are also accepted:
+
+=over
+
+=item * L<ACTIVE|IUP::Manual::03_Attributes/ACTIVE>,
+L<EXPAND|IUP::Manual::03_Attributes/EXPAND>, L<FONT|IUP::Manual::03_Attributes/FONT>,
+L<SCREENPOSITION|IUP::Manual::03_Attributes/SCREENPOSITION>,
+L<POSITION|IUP::Manual::03_Attributes/POSITION>,
+L<MINSIZE|IUP::Manual::03_Attributes/MINSIZE>,
+L<MAXSIZE|IUP::Manual::03_Attributes/MAXSIZE>, L<WID|IUP::Manual::03_Attributes/WID>,
+L<TIP|IUP::Manual::03_Attributes/TIP>, L<SIZE|IUP::Manual::03_Attributes/SIZE>,
+L<RASTERSIZE|IUP::Manual::03_Attributes/RASTERSIZE>,
+L<ZORDER|IUP::Manual::03_Attributes/ZORDER>,
+L<VISIBLE|IUP::Manual::03_Attributes/VISIBLE>
+
+The NAME common attribute is still not supported because of a backward
+compatibility code. Old applications must change the use of the old
+NAME attribute to TITLE, so the new NAME common attribute can be
+enabled in future versions.
+
+=back
+
+=head3 Nodes (non inheritable)
+
+For these attributes "id" is the specified branch identifier. If id is
+empty, then the focus node is used as the specified node.
+
+=over
+
+=item B<CHILDCOUNT(id)>
+
+I<(read only)> Returns the immediate children count of
+the specified branch. It does not count children of child that are
+branches. 
+
+=item B<COLOR(id)>
+
+Text foreground color of the specified node. The value
+should be a string in the format "R G B" where R, G, B are numbers from
+0 to 255.
+
+=item B<DEPTH(id)>
+
+I<(read only)> Returns the depth of the specified node. The
+first node has depth=0, its immediate children has depth=1, their
+children has depth=2 and so on.
+
+=item B<KIND(id)>
+
+I<(read only)> Returns the kind of the specified node. Possible values:
+
+=over
+
+=item * "LEAF": The node is a leaf
+
+=item * "BRANCH": The node is a branch
+
+=back
+
+=item B<PARENT(id)>
+
+I<(read only)> Returns the identifier of the specified node.
+
+=item B<STATE(id)>
+
+The state of the specified branch. Returns C<undef> for a LEAF.
+In Windows, it will be effective only if the branch has children. In
+GTK, it will be effective only if the parent is expanded. Possible
+values:
+
+=over
+
+=item * "EXPANDED": Expanded branch state (shows its children)
+
+=item * "COLLAPSED": Collapsed branch state (hides its children)
+
+=back
+
+=item B<TITLE(id)>
+
+The text label of the specified node.
+
+=item B<TITLEFONT(id)>
+
+The text font of the specified node. The format is the
+same as the L<FONT|IUP::Manual::03_Attributes/FONT> attribute. 
+
+=item B<TOTALCHILDCOUNT(id)>
+
+I<(read only)> Returns the total children count of
+the specified branch. It counts all grandchildren. 
+
+=item B<USERDATA(id)>
+
+The user data associated with the specified node. (since iup-3.0)
+
+=back
+
+=head3 Images (non inheritable)
+
+=over
+
+=item B<IMAGE(id)>
+
+Image name or reference to L<IUP::Image> to be used in the specified node, where id is
+the specified node identifier. If id is empty, then the focus node is
+used as the specified node. 
+
+See - L<Using Images in Other Elements (via IMAGE Attribute)|IUP::Image/"Using Images in Other Elements (via IMAGE Attribute)">
+
+In Windows and Motif set the BGCOLOR attribute before setting the image.
+If node is a branch it is used when collapsed.
+
+=item B<IMAGEEXPANDED(id)>
+
+Same as the IMAGE attribute but used for expanded branches.
+
+=item B<IMAGELEAF>
+
+The image name that will be shown for all leaves.
+Default: "IMGLEAF". Internal values "IMGBLANK" and "IMGPAPER" are also
+available. If BGCOLOR is set the image is automatically updated.
+
+=item B<IMAGEBRANCHCOLLAPSED>
+
+The image name that will be shown for all
+collapsed branches. Default: "IMGCOLLAPSED". If BGCOLOR is set the
+image is automatically updated.
+
+=item B<IMAGEBRANCHEXPANDED>
+
+The image name that will be shown for all
+expanded branches. Default: "IMGEXPANDED". If BGCOLOR is set the image
+is automatically updated.
+
+=back
+
+=head3 Focus Node
+
+=over
+
+=item B<VALUE>
+
+I<(non inheritable)> The focus node identifier. When retrieved
+but there isn't a node with focus it returns 0 if there are any nodes,
+and returns -1 if there are no nodes. When changed and MARKMODE=SINGLE
+the node is also selected. The tree is always scrolled so the node
+becomes visible. In Motif the tree will also receive the focus.
+Additionally accepts the values:
+
+=over
+
+=item * "ROOT" or "FIRST": the first node
+
+=item * "LAST": the last visible node
+
+=item * "NEXT": the next visible node, one node after the focus node. If at the
+last does nothing
+
+=item * "PREVIOUS": the previous visible node, one node before the focus node.
+If at the first does nothing
+
+=item * "PGDN": the next visible node, ten nodes node after the focus node. If
+at the last does nothing
+
+=item * "PGUP": the previous visible node, ten nodes before the focus node. If
+at the first does nothing
+
+=back
+
+=back
+
+=head3 Marks
+
+=over
+
+=item B<MARK>
+
+I<(write only, non inheritable)> Selects a range of nodes in the
+format "start-end" (%d-%d). Allowed only when MARKMODE=MULTIPLE. Also
+accepts the values:
+
+=over
+
+=item * "INVERT(id)": Inverts the specified node mark state, where id is the
+specified node identifier. If id is empty, then the focus node is used
+as reference node.
+
+=item * "BLOCK": Marks all nodes between the focus node and the initial
+block-marking node defined by MARKSTART
+
+=item * "CLEARALL": Unmark all nodes
+
+=item * "MARKALL": Marks all nodes
+
+=item * "INVERTALL": Inverts the marking of all nodes
+
+=back
+
+=item B<MARKED(id)>
+
+I<(non inheritable)> The selection state of the specified
+node, where id is the specified node identifier. If id is empty, then
+the focus node is used as reference node. Can be: YES or NO. Default: NO
+
+=item B<MARKEDNODES>
+
+I<(non inheritable)> The selection state of all nodes when
+MARKMODE=MULTIPLE. It is/accepts a sequence of '+' and '-' symbols
+indicating the state of each item ('+'=selected, '-'=unselected. When
+setting this value, if the number of specified symbols is smaller than
+the total count then the remaining nodes will not be changed. (since iup-3.1)
+
+=item B<MARKMODE>
+
+Defines how the nodes can be selected. Can be: SINGLE or MULTIPLE. Default: SINGLE.
+
+=item B<MARKSTART>
+
+I<(non inheritable)> Defines the initial node for the block
+marking, used when MARK=BLOCK. The value must be the node identifier.
+Default: 0 (first node).
+
+=back
+
+=head3 Hierarchy (non inheritable)
+
+=over
+
+=item B<ADDLEAF(id)>
+
+I<(write only)> Adds a new leaf after the reference
+node, where id is the reference node identifier. If id is empty, then
+the focus node is used as reference node. Use id=-1 to add the first
+node in an empty tree. The value is used as the text label of the new
+node. The id of the new node will be the id of the reference node + 1.
+The attribute B<LASTADDNODE> is set to the new id. The reference node
+is marked and all others unmarked. The reference node position remains
+the same. If the reference node does not exist, nothing happens. If the
+reference node is a branch then the depth of the new node is one depth
+increment from the depth of the reference node, if the reference node
+is a leaf then the new node has the same depth. If you need to add a
+node after a specified node but at a different depth use B<
+INSERTLEAF>. Ignored if set before map.
+
+=item B<ADDBRANCH(id)>
+
+I<(write only)> Same as B<ADDLEAF> for branches. Branches can be created expanded or
+collapsed depending on B<ADDEXPANDED>. Ignored if set before map.
+
+=begin HTML
+
+<p>
+  <table border="1">
+    <tbody align="center">
+      <tr>
+        <th>Initial layout</th>
+        <th>After calling: <pre>$tree->SetAttribute(ADDBRANCH9, "new branch");</pre></th>
+      </tr>
+      <tr>
+        <td><img src="http://kmx.github.io/perl-iup/spec/iuptree1.png"></td>
+        <td><img src="http://kmx.github.io/perl-iup/spec/iuptree2_addbranch9.png"></td>
+      </tr>
+    </tbody>
+  </table>
+</p>
+
+=end HTML
+
+=item B<COPYNODE(id)>
+
+I<(write only)> Copies a node and its children, where id is
+the specified node identifier. If id is empty, then the focus node is
+used as the specified node. The value is the destination node
+identifier. If the destination node is a branch and it is expanded,
+then the specified node is inserted as the first child of the
+destination node. If the branch is not expanded or the destination node
+is a leaf, then it is inserted as the next brother of the leaf. The
+specified node is not changed. All node attributes are copied, except
+user data. Ignored if set before map. 
+
+=item B<DELNODE(id)>
+
+I<(write only)> Removes a node and/or its children, where id
+is the specified node identifier. If id is empty, then the focus node
+is used as the specified node. Ignored if set before map. Possible
+values:
+
+=over
+
+=item * "ALL": deletes all nodes, id is ignored (Since 3.1)
+
+=item * "SELECTED": deletes the specified node and its children
+
+=item * "CHILDREN": deletes only the children of the specified node
+
+=item * "MARKED": deletes all the selected nodes (and all their children), id is ignored
+
+=back
+
+=item B<EXPANDALL>
+
+I<(write only)> Expand or contracts all nodes. Can be YES (expand all), or NO (contract all). 
+
+=item B<INSERTLEAF(id)>, B<INSERTBRANCH(id)>
+
+I<(write only)> Same as B<ADDLEAF> and B<ADDBRANCH> but the depth of the new node is always the same of
+the reference node. If the reference node is a leaf, then the id of the
+new node will be the id of the reference node + 1. If the reference
+node is a branch the id of the new node will be the id of the reference
+node + 1 + the total number of child nodes of the reference node.
+
+=begin HTML
+
+<p>
+  <table border="1">
+    <tbody align="center">
+      <tr>
+        <th>Initial layout</th>
+        <th>After calling: <pre>$tree->SetAttribute(INSERTBRANCH9, "new branch");</pre></th>
+      </tr>
+      <tr>
+        <td><img src="http://kmx.github.io/perl-iup/spec/iuptree1.png"></td>
+        <td><img src="http://kmx.github.io/perl-iup/spec/iuptree3_insertbranch9.png"></td>
+      </tr>
+    </tbody>
+  </table>
+</p>
+
+=end HTML
+
+=item B<MOVENODE(id)>
+
+I<(write only)> Moves a node and its children, where id is
+the specified node identifier. If id is empty, then the focus node is
+used as the specified node. The value is the destination node
+identifier. If the destination node is a branch and it is expanded,
+then the specified node is inserted as the first child of the
+destination node. If the branch is not expanded or the destination node
+is a leaf, then it is inserted as the next brother of the leaf. The
+specified node is removed. User data and all node attributes are
+preserved. Ignored if set before map. 
+
+=back
+
+=head3 Editing
+
+=over
+
+=item B<RENAME>
+
+I<(write only)> Forces a rename action to take place. Valid only when SHOWRENAME=YES.
+
+=item B<RENAMECARET>
+
+I<(write only)> The caret's position of the text
+box when in-place renaming. Same as the CARET attribute for
+L<IUP::Text|IUP::Text>, but here is used only once after
+SHOWRENAME_CB is called and before the text box is shown.
+
+=item B<RENAMESELECTION>
+
+I<(write only)> The selection interval of the text box
+when in-place renaming. Same as the SELECTION attribute for
+L<IUP::Text|IUP::Text>, but here is used only once after
+SHOWRENAME_CB is called and before the text box is shown.
+
+=item B<SHOWRENAME>
+
+I<(creation in Windows, non inheritable)> Allows the
+in place rename of a node. Default: "NO". Since iup-3.0, F2 and clicking
+twice only starts to rename a node if SHOWRENAME=Yes. In Windows must
+be set to YES before map, but can be changed later (since iup-3.3).
+
+=back
+
+=head2 CALLBACKS
+
+For more info about concept of callbacks (setting callback handlers etc.)
+see L<IUP::Manual::04_Callbacks|IUP::Manual::04_Callbacks>. Callbacks specific to this element:
+
+=over
+
+=item B<SELECTION_CB>
+
+Action generated when a node is selected or
+deselected. This action occurs when the user clicks with the mouse or
+uses the keyboard with the appropriate combination of keys.
+
+B<Callback handler prototype:>
+
+ sub selection_cb_handler {
+   my ($self, $id, $status) = @_;
+   #...
+ }
+
+=over
+
+B<$self:> identifier of the element that activated the event.
+
+B<$id:> Node identifier.
+
+B<$status:> 1=node selected, 0=node unselected.
+
+=back
+
+=item B<MULTISELECTION_CB>
+
+Action generated after a continuous range of
+nodes is selected in one single operation. If not defined the
+SELECTION_CB with status=1 will be called for all nodes in the range.
+The range is always completely included, independent if some nodes were
+already marked. That single operation also guaranties that all other
+nodes outside the range are already not selected. Called only if
+MARKMODE=MULTIPLE.
+
+B<Callback handler prototype:>
+
+ sub multiselection_cb_handler {
+   my ($self, $ids, $n) = @_;
+   #...
+ }
+ 
+
+=over
+
+B<$self:> identifier of the element that activated the event.
+
+B<$ids:> Reference to array of node identifiers. This array is kept for backward
+compatibility, the range is simply defined by C<$ids->[0]> to C<$ids->[$n-1]>, where
+C<$ids->[$i+1]=$ids->[$i]+1>.
+
+B<$n:> Number of nodes in the array.
+
+=back
+
+=item B<MULTIUNSELECTION_CB>
+
+Action generated before multiple nodes are
+unselected in one single operation. If not defined the SELECTION_CB
+with status=0 will be called for all nodes in the range. The range is
+not necessarily continuous. Called only if MARKMODE=MULTIPLE. (Since
+3.1)
+
+B<Callback handler prototype:>
+
+ sub multiunselection_cb_handler {
+   my ($self, $ids, $n) = @_;
+   #...
+ }
+
+=over
+
+B<$self:> identifier of the element that activated the event.
+
+B<$ids:> Reference to array of node identifiers.
+
+B<$n:> Number of nodes in the array (should correspond to the size of $ids).
+
+=back
+
+=item B<BRANCHOPEN_CB>
+
+Action generated when a branch is expanded. This
+action occurs when the user clicks the "+" sign on the left of the
+branch, or when double clicks the branch, or hits Enter on a collapsed
+branch.
+
+B<Callback handler prototype:>
+
+ sub branchopen_cb_handler {
+   my ($self, $id) = @_;
+   #...
+ }
+
+=over
+
+B<$self:> identifier of the element that activated the event.
+
+B<$id:> node identifier.
+
+B<Returns:> IUP_IGNORE for the branch not to be opened, or IUP_DEFAULT for
+the branch to be opened.
+
+=back
+
+=item B<BRANCHCLOSE_CB>
+
+Action generated when a branch is collapsed. This
+action occurs when the user clicks the "-" sign on the left of the
+branch, or when double clicks the branch, or hits Enter on an expanded
+branch.
+
+B<Callback handler prototype:>
+
+ sub branchclose_cb_handler {
+   my ($self, $id) = @_;
+   #...
+ }
+
+=over
+
+B<$self:> identifier of the element that activated the event.
+
+B<$id:> node identifier.
+
+B<Returns:> IUP_IGNORE for the branch not to be closed, or IUP_DEFAULT for
+the branch to be closed.
+
+=back
+
+=item B<EXECUTELEAF_CB>
+
+Action generated when a leaf is to be executed. This
+action occurs when the user double clicks a leaf, or hits Enter on a
+leaf.
+
+B<Callback handler prototype:>
+
+ sub executeleaf_cb_handler {
+   my ($self, $id) = @_;
+   #...
+ }
+
+=over
+
+B<$self:> identifier of the element that activated the event.
+
+B<$id:> node identifier.
+
+=back
+
+=item B<SHOWRENAME_CB>
+
+Action generated when a node is about to be renamed.
+It occurs when the user clicks twice the node or press B<F2>. Called
+only if SHOWRENAME=YES.
+
+B<Callback handler prototype:>
+
+ sub showrename_cb_handler {
+   my ($self, $id) = @_;
+   #...
+ }
+
+=over
+
+B<$self:> identifier of the element that activated the event.
+
+B<$id:> node identifier.
+
+B<Returns:> if IUP_IGNORE is returned, the rename is canceled (in GTK the
+rename continuous but the edit box is read-only).
+
+=back
+
+=item B<RENAME_CB>
+
+Action generated after a node was renamed in place. It
+occurs when the user press B<Enter> after editing the name, or when the
+text box looses it focus. Called only if SHOWRENAME=YES.
+
+B<Callback handler prototype:>
+
+ sub rename_cb_handler {
+   my ($self, $id, $title) = @_;
+   #...
+ }
+
+=over
+
+B<$self:> identifier of the element that activated the event.
+
+B<$id:> node identifier.
+
+B<$title:> new node title.
+
+B<Returns:> The new title is accepted only if the callback returns
+IUP_DEFAULT. If the callback does not exists the new title is always
+accepted. If the user pressed B<Enter> and the callback returns
+IUP_IGNORE the editing continues. If the text box looses its focus the
+editing stops always.
+
+=back
+
+=item B<DRAGDROP_CB>
+
+Action generated when a drag & drop is executed. Only
+active if B<SHOWDRAGDROP=YES.>
+
+B<Callback handler prototype:>
+
+ sub dragdrop_cb_handler {
+   my ($self, $drag_id, $drop_id, $isshift, $iscontrol) = @_;
+   #...
+ }
+
+=over
+
+B<$self:> identifier of the element that activated the event.
+
+B<$drag_id:> Identifier of the clicked node where the drag start.
+
+B<$drop_id:> Identifier of the clicked node where the drop were executed.
+
+B<$isshift:> Boolean flag indicating the shift key state.
+
+B<$iscontrol:> Boolean flag indicating the control key state.
+
+B<Returns:> if returns IUP_CONTINUE, or if the callback is not defined and
+B<SHOWDRAGDROP=YES>, then the node is moved to the new position. If
+Ctrl is pressed then the node is copied instead of moved. If the drop
+node is a branch and it is expanded, then the drag node is inserted as
+the first child of the node. If the branch is not expanded or the node
+is a leaf, then the drag node is inserted as the next brother of the
+drop node.
+
+=back
+
+=item B<NODEREMOVED_CB>
+
+Action generated when a node is going to be removed.
+It is only a notification, the action can not be aborted. No node
+dependent attribute can be consulted during the callback. Not called
+when the tree is unmapped. 
+
+B<Callback handler prototype:>
+
+ sub noderemoved_cb_handler {
+   my ($self, $userdata_ref) = @_;
+   #...
+ }
+
+=over
+
+B<$self:> identifier of the element that activated the event.
+
+B<$userdata_ref:> perl reference associated via L<TreeSetUserId|/"TreeSetUserId()"> with a node being removed
+
+=back
+
+=item B<RIGHTCLICK_CB>
+
+Action generated when the right mouse button is pressed over a node.
+
+B<Callback handler prototype:>
+
+ sub rightclick_cb_handler {
+   my ($self, $id) = @_;
+   #...
+ }
+
+=over
+
+B<$self:> identifier of the element that activated the event.
+
+B<$id:> node identifier.
+
+=back
+
+=item L<BUTTON_CB|IUP::Manual::04_Callbacks/BUTTON_CB>
+
+Action generated when any
+mouse button is pressed or released inside the element. Use
+L<ConvertXYToPos|IUP::Manual::02_Elements/"ConvertXYToPos()"> to convert (x,y)
+coordinates in the node identifier. 
+
+=item L<MOTION_CB|IUP::Manual::04_Callbacks/MOTION_CB>
+
+Action generated when the
+mouse is moved over the element. Use
+L<ConvertXYToPos|IUP::Manual::02_Elements/"ConvertXYToPos()"> to convert (x,y)
+coordinates in item the node identifier. 
+
+=item L<DROPFILES_CB|IUP::Manual::04_Callbacks/DROPFILES_CB>
+
+I<[Windows and GTK Only]>
+
+Action generated when one or more files are dropped in the element.
+
+=back
+
+The following L<common callbacks|IUP::Manual::04_Callbacks/Common Callbacks> are also accepted:
+
+=over
+
+=item * L<MAP_CB|IUP::Manual::04_Callbacks/MAP_CB>,
+L<UNMAP_CB|IUP::Manual::04_Callbacks/UNMAP_CB>,
+L<GETFOCUS_CB|IUP::Manual::04_Callbacks/GETFOCUS_CB>,
+L<KILLFOCUS_CB|IUP::Manual::04_Callbacks/KILLFOCUS_CB>,
+L<ENTERWINDOW_CB|IUP::Manual::04_Callbacks/ENTERWINDOW_CB>,
+L<LEAVEWINDOW_CB|IUP::Manual::04_Callbacks/LEAVEWINDOW_CB>,
+L<K_ANY|IUP::Manual::04_Callbacks/K_ANY>,
+L<HELP_CB|IUP::Manual::04_Callbacks/HELP_CB>
+
+In Motif the tree always resets the focus to the first node when
+receive the focus. The KILLFOCUS_CB callback is called only when the
+focus is at the first node. Also in Motif some LEAVEWINDOW_CB events
+are delayed to when the user enter again, firing a leave and enter
+events at enter time.
+
+=back
+
+=head1 NOTES
+
+=head2 Extra Functions
+
+L<IUP::Tree> has functions that allow associating a perl reference to a node.
+In order to do that, you provide the id of the node and the reference to userdata; even
+if the node's id changes later on, the reference to userdata will still be associated with the given node.
+These functions use the B<USERDATA(id)> attribute.
+
+B<IMPORTANT:> Do not manipulate B<USERDATA(id)> attribute directly, always
+use L<TreeSetUserId/"TreeSetUserId()"> and L<TreeGetUserId|/"TreeGetUserId()">.
+
+=head3 TreeSetUserId()
+
+ $userdata_ref = { item1=>1, item2=>2 };
+ $tree->TreeSetUserId($id, $userdata_ref);
+
+B<$id:> Node identifier.
+
+B<$userdata_ref:> reference (to scalar, array, hash ... whatever) to be associated with the node.
+Use C<undef> to remove the association.
+
+B<Returns:> a non zero value if the node was found.
+
+Associates an userdata_ref with a given id. If the id of the node is changed,
+the userdata_ref remains the same.
+
+=head3 TreeGetUserId()
+
+ $userdata_ref = $tree->TreeGetUserId($id);
+
+B<$id:> Node identifier.
+
+Returns the reference to data associated to the node or C<undef> if none
+was associated. L<SetUserId|/"SetUserId()"> must have been called for the node with
+the given id.
+
+=head3 TreeGetId()
+
+ $id = $tree->TreeGetId($userdata_ref);
+
+B<$userdata_ref:> Reference to data associated to the node.
+
+Returns the id of the node that has the userdata_ref on success or C<undef>
+if not found. L<SetUserId|/"SetUserId()"> must have been called with the same userdata_ref.
+
+B<BEWARE:> If you wanna use this function keep in mind that you probably want to assure
+that the same reference will not be associated with more that 1 node.
+
+=head3 TreeAddNodes()
+
+ $tree->TreeAddNodes($tree2add, $id);
+ #or
+ $tree->TreeAddNodes($tree2add);
+
+B<$tree2add:> table of nodes (required structure see below)
+
+B<$id:> optional existing node. The default is the first (0).
+
+Initializes the tree using the hash or hash reference as values for the tree
+nodes using ADDBRANCH and ADDLEAF. For example:
+
+ $t_singleroot = {
+   TITLE=>"Animals", child=>[
+     "0.Extra",
+     { TITLE=>"1.Mammals",     child=>["Horse",  "Whale"] },
+     "2.Extra",
+     { TITLE=>"3.Crustaceans", child=>["Shrimp", "Lobster"] },
+     "4.Extra",
+   ],
+ };
+
+ $t_rootless = [
+   "0.Extra",
+   { TITLE=>"1.Mammals",     child=>["Horse",  "Whale"] },
+   { TITLE=>"2.Crustaceans", child=>["Shrimp", "Lobster"] },
+   "3.Extra",
+   "4.Extra",
+   { TITLE=>"5.Extra", child=>["Dog", "Cat"] },
+ ];
+ 
+ $dlg->Map();
+ $tree1->TreeAddNodes($t_rootless,-1);   #has to go after dialog->Map()
+ $tree2->TreeAddNodes($t_singleroot,-1); #has to go after dialog->Map()
+ $dlg->Show();
+
+XXX-FIXME-not-true-for-perl
+Inside a table B<BRANCHNAME> defines a branch and its title,
+B<LEAFNAME> defines a leaf and its title. When a node inside a branch
+is not a table then it is a leaf and only defines the leaf title. When
+B<LEAFNAME> or B<BRANCHNAME> are used you can also define other node
+attributes: B<COLOR>, B<STATE>, B<TITLEFONT>, B<MARKED>, B<IMAGE> and
+B<IMAGEEXPANDED>; without specifying the node id. You can also use
+B<USERID> to associate an userdata or table just like in B<TREESETUSERID>. 
+
+Example:
+
+=begin HTML
+
+<p>
+  <table border="1">
+    <tbody align="center">
+      <tr>
+        <th>Initial layout</th>
+        <th>After calling: <pre>$tree->TreeAddNodes( {TITLE=>"subtree", child=>["item1","item2"]}, 9);</pre></th>
+      </tr>
+      <tr>
+        <td><img src="http://kmx.github.io/perl-iup/spec/iuptree1.png"></td>
+        <td><img src="http://kmx.github.io/perl-iup/spec/iuptree4_TreeAddNodes9.png"></td>
+      </tr>
+    </tbody>
+  </table>
+</p>
+
+=end HTML
+
+=head3 TreeInsertNodes()
+
+ $tree->TreeInsertNodes($tree2add, $id);
+ #or
+ $tree->TreeInsertNodes($tree2add);
+
+Same as L<TreeAddNodes|/"TreeAddNodes()"> but the depth of the new node is always the same of
+the reference node. If the reference node is a leaf, then the id of the
+new node will be the id of the reference node + 1. If the reference
+node is a branch the id of the new node will be the id of the reference
+node + 1 + the total number of child nodes of the reference node.
+
+=begin HTML
+
+<p>
+  <table border="1">
+    <tbody align="center">
+      <tr>
+        <th>Initial layout</th>
+        <th>After calling: <pre>$tree->TreeInsertNodes( {TITLE=>"subtree", child=>["item1","item2"]}, 9);</pre></th>
+      </tr>
+      <tr>
+        <td><img src="http://kmx.github.io/perl-iup/spec/iuptree1.png"></td>
+        <td><img src="http://kmx.github.io/perl-iup/spec/iuptree5_TreeInsertNodes9.png"></td>
+      </tr>
+    </tbody>
+  </table>
+</p>
+
+=end HTML
+
+=head3 TreeSetNodeAttributes()
+
+ $tree->TreeSetNodeAttributes($id, $attrs);
+
+B<$id:> existing node.
+
+B<$attrs:> table of attributes.
+
+Sets a group of attributes stored in a table in the form:
+
+ $attrs = {
+   TITLE => "Text",
+   COLOR => "0 0 220",
+   IMAGE => $img,   
+ }
+ $tree->TreeSetNodeAttributes($id, $attrs); 
+ #which sets:
+ # $tree->SetAttribute( "TITLE$id" => "Text" );
+ # $tree->SetAttribute( "COLOR$id" => "0 0 220" );
+ # $tree->SetAttribute( "IMAGE$id" => $img );
+
+=head3 TreeSetAncestorsAttributes()
+
+ $tree->TreeSetAncestorsAttributes($id, $attrs);
+
+B<$id:> existing node
+
+B<$attrs:> table of attributes
+
+Calls L<TreeSetNodeAttributes|/"TreeSetNodeAttributes()"> for all ancestors of the given node
+(not including the node).
+
+=head3 TreeSetDescentsAttributes()
+
+ $tree->TreeSetDescentsAttributes($id, $attrs);
+
+B<$id:> existing node
+
+B<$tree:> table of attributes
+
+Calls L<TreeSetNodeAttributes|/"TreeSetNodeAttributes()"> for all descendents of the given
+node (not including the node).
+
+=head2 Utility Functions
+
+These functions can be used to set and get attributes from the element:
+
+ $elem->SetAttributeId($name, $id, $value);
+ $elem->GetAttributeId($name, $id);
+
+They work just like the respective traditional set and get functions.
+But the attribute string is complemented with the id value. For ex:
+
+ $elem->SetAttributeId("KIND", 30, $value) ~~ $elem->SetAttribute("KIND30", $value);
+ 
+ $elem->SetAttributeId("ADDLEAF", 10, $value) ~~ $elem->SetAttribute("ADDLEAF10", $value);
+
+But these functions are faster than the traditional functions because
+they do not need to parse the attribute name string and the application
+does not need to concatenate the attribute name with the id.
+
+=head1 EXAMPLES
+
+
+The element B<IUP::Tree> is used in the following sample scripts:
+
+=over
+
+=item * L<0-basic/cbox.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/cbox.pl> - IUP::Cbox example
+
+=item * L<0-basic/sbox2.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/sbox2.pl> - IUP::Sbox example
+
+=item * L<0-basic/tree1.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/tree1.pl> - IUP::Tree example (animals) - using helper methods e.g. TreeAddNodes()
+
+=item * L<0-basic/tree2.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/tree2.pl> - IUP::Tree example (figures) - using attribute only interface
+
+=item * L<0-basic/tree3.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/tree3.pl> - IUP::Tree example (figures) - using attribute only interface
+
+=item * L<0-basic/tree_set_attrs.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/tree_set_attrs.pl> - IUP::Tree example (attributes)
+
+=back 
+
+
+
+=head1 SEE ALSO
+
+The original doc: L<iuptree.html|http://www.tecgraf.puc-rio.br/iup/en/elem/iuptree.html>
+ 
+
+=cut

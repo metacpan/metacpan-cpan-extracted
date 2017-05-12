@@ -1,0 +1,45 @@
+IO-File-Cycle
+
+Easily split output file while writing
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc IO::File::Cycle
+
+You can also look for information at:
+
+    GitHub issue tracker
+        https://github.com/nicwolff/IO-File-Cycle/issues
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/IO-File-Cycle
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/IO-File-Cycle
+
+    Search CPAN
+        http://search.cpan.org/dist/IO-File-Cycle/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2012 Nic Wolff
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

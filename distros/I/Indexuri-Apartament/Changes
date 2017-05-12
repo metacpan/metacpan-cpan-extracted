@@ -1,0 +1,10 @@
+Revision history for Indexuri-Apartament
+
+0.02    2015-11-06
+        Pod revision.
+        Added methods _init() and _run().
+        Added use of feature qw/say/.
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

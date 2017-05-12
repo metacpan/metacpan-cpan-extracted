@@ -1,0 +1,17 @@
+2012-06-14  0.04
+
+  Adapted to the new Image::PBMlib 2.00 interface.
+
+2004-05-09  0.03
+
+  Added documentation.
+
+2004-04-01  0.02
+
+  Localized the change of properties in save().
+
+  Added tests.
+
+2004-03-29  0.01
+
+  First public release on CPAN.

@@ -1,0 +1,39 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 6c67d3ac9cfeda7daf66b48f1781a51c5a6c5053 Changes
+SHA1 1e23e4b7999b637f5b6f2cd3c37fdbd2d322349d MANIFEST
+SHA1 456adf723e4cd3b84ad657cf9d64cc7c042b977d META.yml
+SHA1 8e8a7dd37aece0dd916a78c1c7a7dfd55d4e1ec5 Makefile.PL
+SHA1 82c7acfb70f7c2bc7b00d628afc2e24d5ac89326 README
+SHA1 1327e7cf2deda846b3f20a8fcf583715c82788ed ShareLite.xs
+SHA1 be67fd6b5fe57d9f5c0707595be8e5f65f090763 inc/Devel/CheckLib.pm
+SHA1 223b535f54603412215d820f8d03709b99ef2ba9 inc/IO/CaptureOutput.pm
+SHA1 18ae9fc202a3cb6725428d830b3adfc9ba94523e lib/IPC/ShareLite.pm
+SHA1 5fe4ba63c8d84a0ffdd834a49c21fc8c22ecee11 sharestuff.c
+SHA1 f0dc48bc23afed673887fdb3c69c5cc9dcf41fd3 sharestuff.h
+SHA1 294b9854766274e2d8b0d7bbc738c7564b3a6d5a t/00-load.t
+SHA1 0190346d7072d458c8a10a45c19f86db641dcc48 t/pod.t
+SHA1 c20fff25b5d842c1961015e99b20ddf366cfa0ed t/sharelite.t
+SHA1 3afef6542d6b02d998082ae3828ee43bb6cd7cc7 t/unicode-key.t
+SHA1 cae7af10ad41654f2e353566d1659f7bb0301879 typemap
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (Darwin)
+
+iEYEARECAAYFAkm3B7EACgkQwoknRJZQnCHo9QCgpRRRIw+4F0Mvu0DS1+mr4I7C
+c2wAmwedVfSkTxgR4CVqfj/QnzBQBaJf
+=22Op
+-----END PGP SIGNATURE-----

@@ -1,0 +1,173 @@
+NAME
+     Indent::Form - A perl module for form indenting.
+
+SYNOPSIS
+     use Indent::Form;
+     my $indent = Indent::Form->new(%parametes);
+     $indent->indent($data_ar, $actual_indent, $non_indent_flag);
+
+METHODS
+    "new(%params)"
+             Constructor.
+
+            *       "ansi"
+
+                     Use with ANSI sequences.
+                     Default value is 0.
+
+            *       "align"
+
+                     Align of left side of form.
+                     Default value is 'right'.
+
+            *       "fill_character"
+
+                     Fill character for left side of form.
+                     Default value is ' '.
+
+            *       "form_separator"
+
+                     Form separator.
+                     Default value of 'form_separator' is ': '.
+
+            *       "line_size"
+
+                     Line size.
+                     Default value of 'line_size' is 79 chars.
+
+            *       "next_indent"
+
+                     Next indent.
+                     Default value of 'next_indent' isn't define.
+
+            *       "output_separator"
+
+                     Output separator.
+                     Default value of 'output_separator' is new line (\n).
+
+    "indent($data_ar[, $actual_indent, $non_indent_flag])"
+             Indent data. Returns string.
+
+             Arguments:
+             $data_ar - Reference to data array ([['key' => 'value'], [..]]);
+             $actual_indent - String to actual indent.
+             $non_indent_flag - Flag, than says no-indent.
+
+ERRORS
+     new():
+             'align' parameter must be a 'left' or 'right' string.
+             'line_size' parameter must be a number.
+             Cannot load 'Text::ANSI::Util' module.
+             From Class::Utils:
+                     Unknown parameter '%s'.
+
+EXAMPLE1
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Indent::Form;
+
+     # Indent object.
+     my $indent = Indent::Form->new;
+
+     # Input data.
+     my $input_ar = [
+             ['Filename', 'foo.bar'],
+             ['Size', '1456kB'],
+             ['Description', 'File'],
+             ['Author', 'skim.cz'],
+     ];
+
+     # Indent.
+     print $indent->indent($input_ar)."\n";
+
+     # Output:
+     #    Filename: foo.bar
+     #        Size: 1456kB
+     # Description: File
+     #      Author: skim.cz
+
+EXAMPLE2
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Indent::Form;
+
+     # Indent object.
+     my $indent = Indent::Form->new(
+             'align' => 'left',
+     );
+
+     # Input data.
+     my $input_ar = [
+             ['Filename', 'foo.bar'],
+             ['Size', '1456kB'],
+             ['Description', 'File'],
+             ['Author', 'skim.cz'],
+     ];
+
+     # Indent.
+     print $indent->indent($input_ar)."\n";
+
+     # Output:
+     # Filename   : foo.bar
+     # Size       : 1456kB
+     # Description: File
+     # Author     : skim.cz
+
+EXAMPLE3
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Indent::Form;
+
+     # Indent object.
+     my $indent = Indent::Form->new(
+             'align' => 'left',
+             'fill_character' => '.',
+     );
+
+     # Input data.
+     my $input_ar = [
+             ['Filename', 'foo.bar'],
+             ['Size', '1456kB'],
+             ['Description', 'File'],
+             ['Author', 'skim.cz'],
+     ];
+
+     # Indent.
+     print $indent->indent($input_ar)."\n";
+
+     # Output:
+     # Filename...: foo.bar
+     # Size.......: 1456kB
+     # Description: File
+     # Author.....: skim.cz
+
+DEPENDENCIES
+    Class::Utils, English, Error::Pure, Indent::Word, List::MoreUtils,
+    Readonly.
+
+    Text::ANSI::Util for situation with 'ansi' => 1.
+
+SEE ALSO
+    Indent, Indent::Block, Indent::Data, Indent::String, Indent::Utils,
+    Indent::Word.
+
+AUTHOR
+    Michal Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    BSD license.
+
+VERSION
+    0.01
+

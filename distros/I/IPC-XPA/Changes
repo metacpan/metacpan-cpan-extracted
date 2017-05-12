@@ -1,0 +1,67 @@
+Revision history for Perl extension IPC::XPA.
+
+0.10    Tue Mar 29 09:58:17 EDT 2011
+
+	- Fix inappropriate freeing of memory if no servers responded
+	  to XPANSLookup
+
+0.09    Tue Nov 10 13:13:47 EST 2009
+	- fix licensing; was a mix of GPL2 & Perl, now is pure GPL3
+
+0.08_01 Fri Jan 18 14:57:47 EST 2008
+	- remove nuisance GNUMakefile
+	- add primitive support for pkg-config for xpa
+
+0.08  Mon Sep 23 11:01:31 EDT 2002
+        - the buf argument to Set may be a scalar ref
+	  as well as a scalar
+
+0.07  Fri Apr 12 16:54:22 EDT 2002
+        - code + doc cleanups.
+
+0.06  Fri Jan 25 19:13:59 EST 2002
+        - upgraded to XPA 2.1.0b8.
+	- NSLookup and Access had API changes.
+	- Handle Access error message against old servers
+
+0.05  Fri Sep  8 20:54:43 EDT 2000
+        - missing typemap cast caused warnings from gcc  
+
+	- removed AUTOLOAD stuff; not needed
+
+0.04  Wed Aug  2 12:08:26 EDT 2000
+        - revamped returns from _Set() and _Get(); these now return
+	  a hash keyed off of the server name (as returned by XPA),
+	  with values being hashes with the returned results.
+	  previously it returned an array of the hashes with returned
+	  results.  THIS IS A MAJOR API CHANGE and WILL BREAK CODE.
+
+	- the XPA handle had been blessed into IPC::XPA, but the
+  	  IPC::XPA::DESTROY routine was set up to handle what
+	  IPC::XPA::new created, namely a hash, not a scalar.  Thus,
+	  when Perl cleanup was going on, it called DESTROY on the
+	  scalar, causing it to burp.  To solve this, the XPA handle is
+	  now in it's own class, IPC::XPA::RAW.
+
+
+      Thu Jul  6 09:30:49 EDT 2000
+        - test script set max_servers to -1 when no servers were
+          there, causing _Get to try to allocate that many things.
+
+	- added check for version of ds9; older versions apparantly
+	  don't do array correctly.  really shouldn't be using ds9 for
+	  testing!
+
+0.03  Thu May 11 13:51:01 EDT 2000
+	- nullXPA() was was returning something which caused
+	  the XS routines to complain about undef'd values.  it was
+	  moved into XS land, and a more sophisticated (kludgy?)
+	  thing was done to check for undef and mapping it correctly
+	  to NULL.
+
+0.02  Tue May  9 16:58:56 EDT 2000
+	- fixed test script to work if more than one server is running
+
+0.01  Wed Apr 19 13:40:48 2000
+	- original version; created by h2xs 1.18
+

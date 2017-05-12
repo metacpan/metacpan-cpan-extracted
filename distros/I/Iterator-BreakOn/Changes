@@ -1,0 +1,27 @@
+This file documents the revision history for Perl module Iterator::BreakOn
+
+0.4 Tue, 16 Oct 2007 11:26:06 +0200
+
+    [FIXES]
+    - t/iterator-breakon.t:
+        + Fixed the number of tests.
+    - t/pod-coverage.t:
+        + Remove the "no_plan" parameter in the call to Test::More.
+        
+    - Closes [rt.cpan.org 29743]
+
+0.3 Wed, 25 Apr 2007 10:47:32 +0200
+
+    - New module for event objects management.
+    - Minor bugfixes in documentation and code.
+    - New dependency on Class::Accessor
+
+0.2 Tue, 24 Apr 2007 09:26:06 +0200
+
+    - First functional version
+    - Add debian package infrastructure.
+
+0.1 Mon, 23 Apr 2007 12:15:21 +0200
+
+    - Initial Release.
+

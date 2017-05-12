@@ -1,0 +1,12 @@
+MANIFEST
+Changes
+Bugs
+Makefile.PL
+Tcl.pm
+Tcl.pod
+Tcl.xs
+README
+t/00init.t
+t/01aaa.t
+t/02bbb.t
+t/a1.pl

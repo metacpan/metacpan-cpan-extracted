@@ -1,0 +1,24 @@
+---
+abstract: 'Validator for polish PESEL number.'
+author:
+  - 'Andrzej Cholewiusz <cholewiusz@gmail.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Identifier-PL-PESEL
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Test::Exception: '0'
+  Test::More: '0'
+  perl: '5.006'
+version: '0.2'

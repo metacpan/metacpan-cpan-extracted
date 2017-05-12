@@ -1,0 +1,6 @@
+Revision history for Perl extension Image::WMF.
+
+0.01  Mon Dec 16 20:52:40 2002
+	- original version; created by h2xs 1.21 with options
+		-X -n Image::WMF
+

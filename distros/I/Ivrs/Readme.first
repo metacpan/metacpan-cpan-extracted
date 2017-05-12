@@ -1,0 +1,142 @@
+                 INTERACIVE VOICE RESPONSE SYSTEM
+
+INTRODUCTION- IVRS (Interactive Voice Response System) is relatively new 
+technology aimed to integrate computer and telephony. We find number of 
+IVRS applications in daily walk of life giving information to caller 
+through Tele banking, Product Information, Fax Servers, Call Centers, Voice 
+Mail Systems, and many more. All these can be implemented using this module 
+under linux. Vgetty, which is a voice version of getty, is around for many years, but I found 
+Vgetty not suitable for IVRS due to it's slow responses, and lack of proper 
+documentation. This modules is written in perl, uses voice modem and does 
+not require any other special cards, not even the sound card. I have tested 
+it on Red Hat 6.2 and debian 2.1, but I see no reason why, it should not 
+work on other Linux distribution. As regard capability of this module, it 
+can play message (sampling rate 11025 bytes/sec), get Caller ID, send /receive 
+fax, Record message, dial out side number, generate fast response (no need 
+to wait for message to complete), interface with data base, and in short 
+almost every thing that a commercial IVRS can do. The only limitation number 
+of telephone line that can be supported on one machine.  I have tested this 
+IVRS on two modems and it rocks, which hopefully should hold good for 4 
+modems (with extra serial port card) as well. 
+
+MODEM - The use of standard voice modem (33.6kbps and above) obviates the 
+need for additional hardware for IVRS. The modem has a micro controller and 
+a data pump (analog to digital to analog converter). These two makes a 
+beautiful voice /fax/ data interface to telephone line which can play voice 
+files up to a sampling rate of 11025 bytes/sec (most commercial card allow 
+up to 8000 bytes/sec only). Beside this you can divert voice signal to/from 
+internal speaker and microphone, and add external speaker and microphone. 
+The PC communicates with Modem via serial port and AT commands. The complete 
+AT command set contains more than 100 commands and it is freely available 
+on net. This module mostly uses the AT# commands. The new voice modem has 
+ability to read the CallerID information, receive/send fax, dial another 
+number, line quality diagnosis etc.  Due to use of modem, this IVRS is 
+limited to two channel (or Telephone lines), because PC has only two serial 
+ports. Multi port serial card can be installed but I have not tested it.
+I have tested Dlink, GVC, LanBit, US Robotics modems with this 
+module. The modem speed does not matter because voice modem with 33.6 KBPS 
+and above will work fine.
+
+VOICE FILES - You will find lot of reading material for sound format on the 
+net. I will restrict this discussion to IVRS only. The modem understands only 
+rmd (raw modem data) format. The pvftools (Portable Voice Format Tools) which 
+is included with Vgetty has excellent utilities to convert sound files from 
+one format to another format. From version 0.06, I have used raw modem data 
+type (or rmd ) format files only. The files in sfiles/ directory are in rmd 
+format  and converted from wav format using pvftools. The headers of these 
+files are removed so that these can be cut and pasted. In IVRS number of 
+messages are generated on the fly, depending on user input. The rmd files 
+in sfiles/ directory can be cut or joined to create a new message. For 
+example to announce a number 123 to caller, files (from sfiles/ ) "1", 
+"hundred", "20", "3" will be added and then played to caller. 
+The voice files in this distribution are customized for Rockwell chip set
+modem and US Robotics modem, which is most popular. The pvftools supports other modem type also 
+and files for the other modem can be created using pvftools.
+
+
+SUPPORTED MODEMS - The following modem uses Rockwell Chip set and may work 
+with this module. Please note that this list is neither complete nor can be 
+relied upon. I have collected this information from the net. 
+
+Accord Model H33RFSP-H0 
+Wisecom WS-3314JS3 
+Harmony HM18010-3
+Wisecom Accelerator
+Pro WS-5614JS3 
+Harmony HM18020-4,
+Wisecom WS-5614ES2A
+Mitac MDM-56KVR-2
+Digicom/Creative DE5620-3
+SupraSonic 336V+
+SupraExpress Model 2420, 56e 
+SupraExpress Model 2730 56e V.90
+Sysgration SYS-MI56002 
+Shark Multimedia 56K Leopard XT 
+Kye/Genius GM56flex-V
+Model FM-3251-412/612, 
+Model FM-3711
+Pro-Nets Technology VD56SPV
+PnP modem, Model RFM336INC
+Philips EasyCONNECT 56K 
+Aeton Webcruiser FB R56I 
+Web Excel ME201[A..J]
+Modemsurfr 56K, Model 3456 INT
+ACCURA 336 Model 5636US,
+GVC, Rockwell RCV336DPF/SP chipset
+GVC/OEM Model (S)F-1156V/R21,  
+Tidalwave 56K internal, Model M(D)56IV
+Compaq "Netelligent" 56k internal ISA
+AOpen FM56-EX(/2)
+Atrie 56K Explore,
+Taicom MR56SVS
+AOpen FM56-RS, 
+AOpen FM56-ITU/2
+AOpen FM56-ITU
+SmartLink 5634BRS
+SmartLink 5634RS
+ViVa CommCenter, 
+Quantex MDM-DFVS336-1/C
+E56KRVP (*), Rockwell RP56D/SP chipset
+FM-VSP336i, Rockwell RCV336ACF
+FMVSP56e, Rockwell ACF chipset
+DSI/Creative Modem Blaster 33.6
+Harmony HM18010-4, Rockwell 
+ZyXEL Comet 3356
+Dynalink VoiceDesk56 Pro
+OEM (Mx-)E110, 
+Harmony USA Model 18008-4
+Harmony USA Model 18020A
+Twister SFM336E
+US Robotics
+
+ADAPTABILITY - This distribution is complete with all the voice files and 
+to make a full functional IVRS you need a few line of perl scripts and 
+additional message files. You may  need to record messages, if you want 
+additional messages or if you do not like the tone of these files. You can 
+record all the messages in one file in wav format and cut them in to separate 
+files. Then using wavtorock (script included) convert them to rmd files. You 
+also need to write small scripts to fetch the numerical data, from data base 
+files, which is played to caller. The demo scripts included in this 
+distribution gives fair knowledge of module. 
+
+REPORTS - Please send the bug report / suggestions to me, so that those can 
+be incorporated in next version. I also would like to know type and make of 
+Modem on which it is tested so that I can include list of tested Modems in
+future release. I am planning to port this module to NT also provided I get 
+sufficient feed back to do so. 
+
+Copyright (C) 2001, Mukund Deshmukh. All rights reserved. This program is free
+software, you can redistribute it and/or modify it under the same terms as 
+Perl itself.
+
+Author: 
+Mukund Deshmukh 
+M/s.Beta Computronics Pvt. Ltd. 
+10/1, IT Park, Parsodi, 
+Nagpur - 440022, India. 
+Tel  91-712-2227125, 2240122 
+email betacomp_ngp@sancharnet.in 
+web site www.betacomp.com 
+ 
+ 
+

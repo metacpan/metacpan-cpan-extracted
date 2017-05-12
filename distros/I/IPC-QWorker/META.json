@@ -1,0 +1,55 @@
+{
+   "abstract" : "processing a queue in parallel",
+   "author" : [
+      "Markus Benning <me@w3r3wolf.de>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300020, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "IPC-QWorker",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Data::Dumper" : "0",
+            "IO::Select" : "0",
+            "IO::Socket" : "0",
+            "Storable" : "0",
+            "perl" : "5.000",
+            "strict" : "0",
+            "utf8" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-IPC-QWorker@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=IPC-QWorker"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/benningm/IPC-QWorker",
+         "web" : "https://github.com/benningm/IPC-QWorker.git"
+      }
+   },
+   "version" : "0.07"
+}
+

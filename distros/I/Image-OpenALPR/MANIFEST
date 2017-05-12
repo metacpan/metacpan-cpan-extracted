@@ -1,0 +1,15 @@
+Changes
+COPYING
+lib/Image/OpenALPR.pm
+lib/Image/OpenALPR/PlateResult.pm
+Makefile.PL
+MANIFEST
+OpenALPR.xs
+ppport.h
+README
+t/ex.jpg
+t/Image-OpenALPR.t
+typemap
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

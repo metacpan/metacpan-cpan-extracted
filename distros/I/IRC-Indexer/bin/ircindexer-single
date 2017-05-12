@@ -1,0 +1,152 @@
+#!perl
+
+## Example single-server trawler using postback.
+
+use 5.10.1;
+use strict;
+use warnings;
+
+use POE;
+use IRC::Indexer::Trawl::Bot;
+
+use IRC::Indexer::Output::JSON;
+use IRC::Indexer::Output::YAML;
+use IRC::Indexer::Output::Dumper;
+
+my($server, $port, $verbose, $outpath, $timeout, $interval);
+my $fmt = 'STDOUT';
+
+use Getopt::Long;
+GetOptions(
+  'help' => sub {
+    print(
+      "ircindexer-single help\n\n",
+      
+      "  -s, --server=SERVER\n",
+      "      Destination server.\n\n",
+      
+      "  -p, --port=PORT\n",
+      "      Destination port [6667]\n\n",
+      
+      "  -f, --format=FORMAT\n",
+      "      One of: JSON, YAML, Dumper\n\n",
+      
+      "  -t, --timeout=SECS\n",
+      "      IRC session timeout in seconds.\n\n",
+      
+      "  -i, --interval=SECS\n",
+      "      Interval between IRC requests in seconds.\n\n",
+      
+      "  -o, --output=PATH\n",
+      "      File to write output to (rather than STDOUT)\n",
+    );
+    
+    exit 0
+  },
+  
+  'verbose:0'  => \$verbose,
+
+  'server=s' => \$server,
+  'port:6667' => \$port,
+  
+  'timeout:90'  => \$timeout,
+  'interval:15' => \$interval,
+  
+  'format|export=s' => \$fmt,
+  
+  'output=s'   => \$outpath,
+);
+
+die "Missing --server\n" unless $server;
+
+warn "Connecting to: $server\n";
+
+POE::Session->create(
+  inline_states => {
+    '_start' => sub {
+      IRC::Indexer::Trawl::Bot->spawn(
+        postback => $_[SESSION]->postback('trawler_done'),
+        server => $server,
+        port   => $port,
+        verbose  => $verbose,
+        timeout  => $timeout,
+        interval => $interval,
+      );
+    },
+    
+    trawler_done => sub {
+      ## Should have gotten the trawler obj.
+      ## ARG1 will be an arrayref.
+      my $trawl = $_[ARG1]->[0];
+      if ($trawl->failed) {
+        die "Trawler failed: ".$trawl->failed
+      }
+    
+      my $info = $trawl->info;
+      $info->channels; ## builds sorted chan list
+      my $ref = $trawl->dump;
+      undef $trawl;
+      warn "Done\n";
+
+      my $output;
+      given ($fmt) {
+        when ("JSON") {
+          $output = IRC::Indexer::Output::JSON->new(
+            Input => $ref,
+          );
+        }
+        
+        when ("YAML") {
+          $output = IRC::Indexer::Output::YAML->new(
+            Input => $ref,
+          );
+        }
+        
+        default {
+          $output = IRC::Indexer::Output::Dumper->new(
+            Input => $ref,
+          );
+        }
+      }
+      
+      if ($outpath) {
+        warn "Writing: $outpath\n";
+        $output->write($outpath);
+      } else {
+        print $output->dump;
+      }
+
+    },
+    
+  }, ## inline_states
+);
+
+POE::Kernel->run;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+ircindexer-single - Trawl a single server for network information
+
+=head1 SYNOPSIS
+
+  ## Get complete usage details:
+  $ ircindexer-single --help
+  
+  ## Simple usage:
+  $ ircindexer-single -f JSON -s irc.cobaltirc.org -o cobaltirc.out
+  
+=head1 DESCRIPTION
+
+Trawl a single server for network statistics.
+
+By default, outputs human-readable Perl data structures.
+
+=head1 AUTHOR
+
+Jon Portnoy <avenj@cobaltirc.org>
+
+=cut

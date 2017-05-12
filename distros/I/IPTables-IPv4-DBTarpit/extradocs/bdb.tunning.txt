@@ -1,0 +1,167 @@
+UPDATE #2: Thanks to a tip from fellow subway rider Aaron Ross, I
+adjusted the Cachesize setting for BerkeleyDB and now it beats the 
+file system by a significant margin. Below is the final code 
+(including other suggestions):
+
+  #!/usr/bin/perl -w
+
+  use strict;
+  use Benchmark qw(:all);
+  use BerkeleyDB;
+
+  my $file_dir = '/home/perrin/filetest';
+  my $db_dir   = '/home/perrin/dbdir';
+  my $db_file  = '/home/perrin/dbtest';
+
+  my %db;
+  my $env = new BerkeleyDB::Env(
+                    -Home  => $db_dir,
+                    -Flags => DB_INIT_CDB | DB_CREATE | DB_INIT_MPOOL,
+                    -Cachesize => 23152000,
+  )
+    or die "can't create BerkelyDB::Env: $!";
+  my $db_obj = tie %db, 'BerkeleyDB::Btree',
+    -Filename => $db_file,
+    -Flags    => DB_CREATE,
+    -Mode     => 0666,
+    -Env      => $env
+    or die $!;
+
+  sub read_file {
+    my $key = shift;
+    my $file = "$file_dir/$key";
+    my $value;
+    open(FH, '<', $file) or die $!;
+    read FH, $value, (stat FH)[7];
+    close FH;
+    return $value;
+  }
+
+  sub slurp_file {
+    my $key = shift;
+    my $file = "$file_dir/$key";
+    local $/;
+    open(FH, '<', $file) or die $!;
+    my $value = <FH>;
+    close FH;
+    return $value;
+  }
+
+  sub sysread_file {
+    my $key = shift;
+    my $file = "$file_dir/$key";
+    my $value;
+    open(FH, '<', $file) or die $!;
+    sysread FH, $value, (stat FH)[7];
+    close FH;
+    return $value;
+  }
+
+  sub print_file {
+    my ($key, $value) = @_;
+    my $file = "$file_dir/$key";
+    open(FH, '>', $file) or die $!;
+    print FH $value;
+    close FH;
+  }
+
+  sub write_file {
+    my ($key, $value) = @_;
+    my $file = "$file_dir/$key";
+    open(FH, '>', $file) or die $!;
+    print FH $value;
+    close FH;
+  }
+
+  sub syswrite_file {
+    my ($key, $value) = @_;
+    my $file = "$file_dir/$key";
+    open(FH, '>', $file) or die $!;
+    print FH $value;
+    close FH;
+  }
+
+  cmpthese(50, {
+      'file write' => sub {
+        for (0..1000) {
+      write_file($_, $_ x 8000);
+        }
+      },
+
+      'berkeley write' => sub {
+        for (0..1000) {
+      $db_obj->db_put($_, $_ x 8000);
+        }
+      },
+       'file print' => sub {
+         for (0..1000) {
+          print_file($_, $_ x 8000);
+         }
+       },
+       'file syswrite' => sub {
+         for (0..1000) {
+          syswrite_file($_, $_ x 8000);
+         }
+       },
+
+          });
+
+  cmpthese(100, {
+      'file read' => sub {
+        for (0..1000) {
+      read_file($_);
+        }
+      },
+       'file slurp' => sub {
+         my $test;
+         for (0..1000) {
+          $test = slurp_file($_);
+         }
+       },
+       'file sysread' => sub {
+         my $test;
+         for (0..1000) {
+          $test = sysread_file($_);
+          }
+        },
+
+      'berkeley read' => sub {
+        my $v;
+        for (0..1000) {
+      $db_obj->db_get($_, $v);
+        }
+      },
+           });
+
+  This gives the following results:
+
+  Benchmark: timing 50 iterations of berkeley write, file print, file sy
+
+  +swrite, file write...
+  berkeley write:  5 wallclock secs ( 5.17 usr +  0.02 sys =  5.19 CPU)  +@  9.63/s (n=50)
+  file print:	  10 wallclock secs ( 4.38 usr +  4.00 sys =  8.38 CPU) @  5.97/s (n=50)
+  file syswrite: 11 wallclock secs ( 4.35 usr +  4.08 sys =  8.43 CPU) @  5.93/s (n=50)
+  file write: 10 wallclock secs ( 4.37 usr +  4.26 sys =  8.63 CPU) @  5.79/s (n=50)
+
+                   Rate     file write file syswrite     file print berkeley write
+  file write     5.79/s             --           -2%            -3%      -40%
+  file syswrite  5.93/s             2%            --            -1%      -38%
+  file print     5.97/s             3%            1%             --      -38%
+  berkeley write 9.63/s            66%           62%            61%        --
+
+  Benchmark: timing 100 iterations of berkeley read, file read, file slurp, file sysread...
+
+  berkeley read:  4 wallclock secs ( 3.72 usr +  0.03 sys =  3.75 CPU) @ 26.67/s (n=100)
+   file read:  	5 wallclock secs ( 2.71 usr +  2.01 sys =  4.72 CPU) @ 21.19/s (n=100)
+  file slurp:  	6 wallclock secs ( 3.88 usr +  2.03 sys =  5.91 CPU) @ 16.92/s (n=100)
+  file sysread: 4 wallclock secs ( 2.49 usr +  1.91 sys =  4.40 CPU) @ 22.73/s (n=100)
+
+                  Rate    file slurp     file read  file sysread berkeley read
+
+  file slurp    16.9/s            --          -20%          -26%  -37%
+  file read     21.2/s           25%            --           -7%  -21%
+  file sysread  22.7/s           34%            7%            --  -15%
+  berkeley read 26.7/s           58%           26%           17%    --
+
+  If you are using BerkeleyDB, make sure you tune that cache size! 
+  Use the db_stat utility and this document.

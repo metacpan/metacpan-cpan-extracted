@@ -1,0 +1,14 @@
+Revision history for Perl extension IO::Dir::Recursive.
+
+0.03  Sat Oct 22 22:26:22 2005
+	- Fixed test suite.
+	- Removed perl 5.8.7 dependency.
+
+0.02  Sun Oct  2 11:58:46 2005
+	- Updated PREREQ_PM in Makefile.PL.
+	- Fixed some documentation.
+
+0.01  Fri Sep 16 19:35:23 2005
+	- original version; created by h2xs 1.23 with options
+		-AXce -n IO::Dir::Recursive
+

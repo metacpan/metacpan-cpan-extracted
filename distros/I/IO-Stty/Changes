@@ -1,0 +1,8 @@
+Revision history for Perl extension IO::Stty
+
+0.02_01 Tue Mar 23 2010
+  - Re-vamp module to Module::Build
+  - stty.txt merged into POD so it shows up on CPAN
+  - add Changes log
+  - basic tests
+  - die if no parameters passed to stty

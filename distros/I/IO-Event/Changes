@@ -1,0 +1,161 @@
+Revision history for Perl module IO::Event
+
+0.813 2013/09/17
+
+ - Spelling corrections contributed by x.guimard@free.fr
+ - Replace CHANGELOG with Changes
+
+0.812 2013/04/09
+
+ - Missing peerpath on FreeBSD 9 will die().  Work around.
+ - Added missing depenency on List::MoreUtils
+
+0.809 2013/04/04
+
+ - Remove rinetd.pl -- becoming its own module
+
+0.808 2013/03/20
+
+ - No longer required to start with IO::Event->new()
+ - fixed forked3.t, getline3.t, and multifork3.t tests
+ - Added timer tests.
+ - Now specifies "hard" on Event.pm timers
+ - Added ->ie_desc()
+
+0.807 2013/03/14
+
+ - Bugfix: IO::Event constructor calls that did not include an
+ - explicit handler were not getting the correct handler.
+
+0.806 2012/02/28
+
+ - Add 'diagnostics' to build requirements.
+ - Documentation updates.
+
+0.805 2011/06/17
+
+ - Docfix.  It's IO::Event->timer() not IO::Event::timer.
+
+0.804 2011/02/28
+
+ - Adjust tests to use 127.0.0.1 instead of Sys::Hostname::hostname 
+
+0.803 2011/02/27
+
+ - Adjust prerequisites and tests.  Require Event & AnyEvent, run tests w/o them anyway.
+
+0.802 2011/02/26
+
+ - Add missing files to the MANIFEST
+ - Forgot to update README
+
+0.801 2011/02/25
+
+ - Add framework to support multiple backend event loops.
+ - Add AnyEvent as a new supported event loop.
+
+0.704 2009/07/23
+
+ - Added new API: IO::Event::Callback that provides a 
+ - closure/callback interface instead of the subclass
+ - interface of IO::Event.  It's a layer.
+
+0.703 2009/04/29
+
+ - OOps.  Changes for 0.702 didn't actually make it in.
+
+0.702 2009/04/28
+
+ - Added shutdown()
+ - Bugfix: writes when the OS buffer was completely full are now handled properly
+
+0.701 2009/02/17
+
+ - Made the use of Event.pm optional
+
+0.603 2009/01/30
+
+ - Write buffering debugged.
+ - Failure to close() on eof() now auto-closes.
+ - Rewrote rinetd.pl to use Daemon::Generic
+
+0.602 2006/10/05
+
+ - Minor bugfix to rinetd.pl
+
+0.601 2005/11/04
+
+ - Added example program: rinetd.pl
+ - API CHANGE: 
+   Replaced ie_connect_timeout() with ie_connect_failed().  
+   Previously ie_eof() would be called for non-timeout connection
+   failures.  Now ie_connect_failed() handles all connection failues.
+ - Documentation fixes.
+
+0.508 2005/08/29
+
+ - Bugfix: don't try to read recently-closed filehandles.
+
+0.507 2005/08/29
+
+ - Add support for read-only and write-only descriptors.
+
+0.506 2005/01/27
+
+ - Drop Event objects to prevent memory leaks.
+
+0.505 2005/01/21
+
+ - Removed some race-condition warnings if descriptors are
+ - close()ed before EOF.
+
+0.504 2004/05/05
+
+ - Dropped all calls to eof().  Switched from read() to
+   sysread().  Fixed bugs in ie_invoke.  Made forked.t
+   portable to DragonflyBSD which probably also made it
+   work on a bunch of other systems too.
+
+0.503 2004/04/20
+
+ - Bugfix: eof was falsing positive
+ - Bugfix: partial lines were being returned for <$ieo>
+
+0.502 2004/02/24
+
+ - Added can_read()
+ - Bugfix: spurrious warning in unget()
+ - Added ungets() to support FileHandle::Unget semantics
+
+0.501 2003/11/29
+
+ - Changed version numbering 'cause we don't want to get to 1.0 quite yet.
+ - Add reentrantcy controls 
+ - Add readevents()
+ - Add output buffer size related code.
+ - Bugfix: remove input watermark code
+ - Bugfix: retry read() until EAGAIN prevents lost events
+ - Bugfix: don't suppress ie_eof after reopen or connect.
+
+0.5 2003/11/26
+
+ - Lots more bugs fixed.  Documentation added.  Test case added.
+
+0.4 2003/11/26
+
+ - Lots of bad bugs fixed.  Some speedups.
+
+0.3 2003/11/26
+
+ - Fixed the semantics of read() and sysread() to match perl's 
+   documentation.  Oops.
+ - Added 'use diagnostics' and fixed the things it complained about.
+ - Added descriptions to the test suite.
+
+0.2 2003/04/14
+
+ - Added sysread()
+
+0.1 2002/12/20
+
+ - Initial revision

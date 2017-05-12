@@ -1,0 +1,13 @@
+TODO:
+
+1. Add a "transact" function which allows for multiple IPC::Lite edits atomically.
+1 a. Check to see if AutoCommit is *already off* when entering a function like PUSH, and, if so, don't begin_work
+1 b. Store the transact "expected state" in the db handle itself, so inconsistencies can be checked and warn'ed/croak'ed
+
+2. Change timeouts to work on a per-value level, not per-variable.  The whole extra table thing is completely silly.  Just add the "exp" to hashes and arrays.   Add an "expiry" attribute to tied variables which can be read or set.
+
+3. Create more forking tests that run in tight loops and try to break things.
+
+4. Autodetect whether DBI's CLONE thing works on fork, and, if so, reuse database handles?? (this might be a bad idea, needs benchmarking and lots of testing, my guess is... not much improvement and lots of room for failure)
+
+

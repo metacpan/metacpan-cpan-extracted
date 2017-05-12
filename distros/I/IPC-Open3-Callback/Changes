@@ -1,0 +1,99 @@
+Revision history for Perl module IPC::Open3::Callback
+
+1.19 2016-02-06
+    - Cleaned up prereqs
+
+1.18 2016-01-28
+    - fixed bug when buffer_out => 1 and a out_callback where pid was not 
+      passed to callback
+
+1.17 2015-01-09
+    - Fixed issue 12: Adding escaping of pathnames with white-space
+      and single/double quotes...: 
+      https://github.com/lucastheisen/ipc-open3-callback/pull/12
+
+1.16 2015-01-09
+    - Fixed bug in CommmandFailedException and CommandRunner that was
+      causing the to_string to print err message with out header when
+      only capturing err.
+
+1.15 2014-11-13
+    - Fixed bug in cp_command when using zip where sudo needs
+      to be on the bash -c and not on the cd and zip.
+
+1.14 2014-08-08
+    - added status option to cp_command
+
+1.13 2014-08-04
+    - created new module to contain failed command information
+    - added safety check in get_xxx_buffer to verify arrayref before join
+    - added convenience return out_buffer on run_or_die
+
+1.12 2014-06-04
+    - fixed bug in checking out_fh or err_fh even if they were undef
+    - updated pod for Command.pm, Logger
+
+1.11 2014-06-03
+    - fixed bug in wrap when using sudo...  cant assume bash -c for everything 
+      because sudo is limited to command
+    - added the ability to supply IO::Handles was well as callbacks
+    - split NullLogger into its own file, cleaned up Callback, and added new 
+      get_last_exit_code method
+    - added initialization for Log::Log4perl to unit tests
+    - added leftovers to weaver.ini to pass through =for Pod::Coverage to 
+      ignore unwanted methods
+
+1.10 2014-06-03
+    - fixed bug in wrap when using sudo...  cant assume bash -c for everything 
+      because sudo is limited to command
+    - added the ability to supply IO::Handles was well as callbacks
+
+1.09 2014-05-18
+    - removed localhost detection, it doesnt fit in this module
+    - added cp_command
+    - fixed pod doc for command_options
+
+1.08 2014-05-08
+    - fixed dist.ini to exclude @Basic readme
+    - renamed destination_options to command_options, added sudo_username 
+      option, and removed command_prefix option
+    - added ability to avoid ssh when local
+    - fixed bug in log debug message
+    - Fixed bug in wrap which removed ; from end of find commands, added more 
+      unit tests
+    - Added line_separator option to write_command
+    - added options to write_command
+    - fixed bug in sed_command, added write_command, and made 
+      destination_options a class
+    - Added information about git
+
+1.07 2013-11-24
+    - Added README.mkdn and CONTRIBUTING.mkdn.
+
+1.06 2013-11-11
+    - Added unit tests for accessors and updated pod for 
+      completeness.
+
+1.05 2013-11-10
+    - Added Class::Accessor to Callback.pm and added various
+      accessors.
+
+1.04 2013-11-04
+    - Reformatted Changes file to conform to CPAN::Changes::Spec
+
+1.03 2013-11-04
+    - Updated code to follow more "perl best practices"
+
+1.02  2013-10-30
+    - Modified Callback.pm to use hashref instead of hash
+      for arguments.
+    - Added lock_keys to Callback.pm and CommandRunner.pm
+    - Updated dist.ini to add perltidy
+    - Included .perltidyrc in project to support multiple
+      developers.
+
+1.01 2013-09-03
+    - First non-developer release to CPAN
+    - original version created by h2xs 1.23
+      with options -X -n IPC::Open3::Callback
+

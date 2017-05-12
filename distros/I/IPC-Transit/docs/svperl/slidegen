@@ -1,0 +1,86 @@
+#!perl
+
+use common::sense;
+use Moose::Autobox;
+
+my $slide_header = q
+<html><head><title>Message Based Programming</title>
+ 
+<script type="text/javascript" src="jquery.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+    $(document).keypress(function(event){
+        var keycode = (event.keyCode ? event.keyCode : event.which);
+        if(keycode == '13'){
+            window.location.href = "FORWARD_SLIDE";
+        }
+        if(keycode == '8'){
+            window.location.href = "BACKWARD_SLIDE";
+        }
+    });
+});
+</script>
+ 
+</head>
+<body>
+;
+
+system 'rm -f sl_*';
+my $get_slide_filename = sub {
+    my $n = shift;
+    my $filename = sprintf('sl_%05d.html', $n);
+    return $filename;
+};
+my $write_slide;
+{   my $slide_ct = 0;
+    $write_slide = sub {
+        my $slide = shift;
+        $slide_ct++;
+        my $filename = $get_slide_filename->($slide_ct);
+        open my $fh, '>', $filename;
+        my $s = $slide_header;
+        my $forward_slide = $get_slide_filename->($slide_ct + 1);
+        my $backward_slide = $get_slide_filename->($slide_ct - 1);
+        $s =~ s/FORWARD_SLIDE/$forward_slide/m;
+        $s =~ s/BACKWARD_SLIDE/$backward_slide/m;
+        say $fh $s;
+        say $fh $slide;
+        say $fh '</body></html>';
+        close $fh;
+    };
+}
+my $slide = '';
+my $code_slide = 0;
+my $fh = open my $fh, '<', 'slides.txt';
+while(my $line = <$fh>) {
+    chomp $line;
+    if($line =~ /^#/) {
+        $code_slide = 1;
+        $line =~ s/^#//;
+    }
+    if($line =~ /^$/) {
+        if($code_slide) {
+            $write_slide->("<pre>$slide</pre>");
+        } else {
+            $write_slide->("<h3>$slide</h3>");
+        }
+        $slide = '';
+        $code_slide = 0;
+    }
+    $slide .= "$line\n";
+}
+
+
+__END__
+
+my @a = [];
+
+my $ct = 0;
+while(1) {
+    push @a, 'xyzzy' x 1024;
+    $ct++;
+    for($ct) {
+        my $thing = $a[$ct];
+    }
+}
+

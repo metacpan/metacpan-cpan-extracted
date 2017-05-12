@@ -1,0 +1,555 @@
+<!-- In this file the layout of the xml file containing the information used by InSilicoSpectro::Spectra::Filter::MSFilter is described-->
+<!-- the elements are: 
+
+<ExpMsMsSpectrumFilter>
+
+You can have several 'oneExpMsMsSpectrumFilter' in 'ExpMsMsSpectrumFilter' each of the filters will be processed consecutively. If you want to do so, you have to use MSFilterCollection.pm instead of MSFilter.pm. 
+
+You can choose between 'spectrumType' "msms" and "ms". Furthermore you can set a name for the SpectrumFilter.                      
+
+<oneExpMsMsSpectrumFilter spectrumType="msms" name="dummy">
+
+The level on which the filter will be applied can be either 'msmsCompounds' or 'peaks'. Most filters can only be applied on one of the two levels. 
+  
+     <level>peaks</level>         
+
+     <action type="removeOther">
+
+The action-type can be "label", "removeOther", "remove", "algorithm" and "none". Using "label" you can set a label for the selected msmsCompounds (you cannot label peaks):
+
+     <action type="label">
+              <labelValue>%.3f</labelValue>   
+	      <labelName>some name</labelName>
+  
+The 'labelValue' is the resulting value of the filter for each compound. The result can be formated using the printf-perl-syntax.
+Use "removeOther" - to keep just the selected peaks or msmsCompounds - and "remove" to remove the selected ones. "algorithm" leaves it up to the algorithm to take off or change the peaks/peak-intensities. "algorithm" can only be set for the filters "banishNeighbors" and "smartPeaks". 
+
+
+You can choose which part of the msmsCompounds or peaks should be selected to apply the 'action' on. 'relativeTo' can have the values 'nFix', 'absValue', 'relMax' and 'quantile'. The 'comparator' can be 'ge' , 'gt', 'le' and 'lt'. Using the three parameters 'relativeTo', 'thresholdValue' and 'comparator' you can choose a certain part of msmsCompounds/peaks to select. See the examples at the end of this file..
+
+
+               <threshold type="sort">	
+			   <relativeTo>nFix</relativeTo> 
+                           <thresholdValue>100</thresholdValue>
+			   <comparator>ge</comparator>
+               </threshold>
+
+
+The type of the filters can be either "directValue" for directly accessible information of the spectra and 'algorithm' for the more complex algorithms. 
+
+
+     </action>
+      <filterValue type="directValue">
+
+                <name>fragment.intensity</name>
+
+you can choose which type of spectra-values can be used. You can choose either the 'intensity' or 'moz' of the 'fragments' (only on level 'peaks') or the 'precursor' (only on level 'msmsCompounds'). 'size' gives back the number of peaks in a compound and can only be applied on the level 'msmsCompounds'. 'sum' summs up the fragment values of choice.  
+
+The filterValue type 'algorithm' uses more complex filter algorithms
+
+For 'balance' the moz-range (between minMoz and maxMoz) of the spectra is divided into the number of 'bands'. For each band the total raw intensity is calculated ant the standard deviation between the bands is the resulting value. 
+      
+      <filterValue type="algorithm"> 
+                <name>balance</name>
+                <param name="bands">10</param>    
+                <param name="minMoz">300</param>    this parameter isn't mandatory   
+                <param name="maxMoz">900</param>    this parameter isn't mandatory   
+      </filterValue>                   
+
+
+The algorithm 'smartPeaks' change the probability for peaks of regions of low intensities and/or only a few peaks to be selected. If you use the action type="algorithm" the intensities of the fragments in the spectra are changed. 
+
+            <name>smartPeaks</name>
+            <param name="winSize">100</param>
+            <param name="stepSize">20</param>
+            <param name="weightIntensity">0.8</param>
+            <param name="weightDensity">1</param>
+
+
+The sum of all normalized peaks which have the distance of one of the 20 amino-acids. You can set a tolerance and which type of mass ('mono' or 'average') to use. 
+
+            <name>goodDiff.normRank</name>
+            <param name="tolerance">0.37</param>
+            <param name="toleranceUnit">Da</param>
+            <param name="mass">mono</param>
+                        
+
+You can directly choose a maximal number of peaks to consider:
+
+            <param name="filter">intensity</param>
+            <param name="peakNr">50</param>
+
+
+Or you use 'smartPeaks' to increase the probability to choose peaks in regions of low intensities. 
+
+
+            <param name="filter">smartPeaks</param>
+            <param name="peakNr">50</param>
+            <param name="winSize">100</param>
+            <param name="stepSize">20</param>
+            <param name="weightIntensity">0.8</param>
+            <param name="weightDensity">1</param>
+
+
+'waterLosses' sums up the peaks having the distance of water (18 Da). 'Complements' sums up the peaks which sums up to the moz-value of the precursor-ion considering the possible charge states. The syntax is the same as for 'goodDiff'.
+
+
+'banishNeighbors' can be used to take off small peaks near strong peaks. 'selectStrongest' indicates the percentage of the peaks to be considered as strong ones. The peaks in the 'banishRange' of a strong peak not bigger than 'banishLimit' of the highest peak in this range are prepared to be taken off. Either you can use action type="removeOther" and level="peaks" to take of the amount of peaks you want. If you use the action type="algorithm" all the peaks which fulfill the condition are taken off and spectra with less than "skipSpectraBelow" peaks are skipped.  
+
+            <name>banishNeighbors</name>
+            <param name="selectStrongest">0.8</param>
+            <param name="banishRange">0.5</param>
+            <param name="banishLimit">0.9</param>
+            <param name="rangeUnit">Da</param>
+            <param name="skipSpectraBelow">100</param>
+
+
+	</oneExpMsMsSpectrumFilter>
+</ExpMsMsSpectrumFilter>
+
+
+-->
+
+
+
+<!-- to make it more clear there are some examples of usage: -->
+
+<!-- the first examples show how to use the type "directValue" and the different action types -->
+
+
+<!-- an example to keep the 10 strongest peaks: -->
+
+<ExpMsMsSpectrumFilter>
+<oneExpMsMsSpectrumFilter spectrumType="msms" name="dummy">
+	        <level>peaks</level>	
+		<action type="removeOther">		
+		       <threshold type="sort">	
+			   <relativeTo>nFix</relativeTo>							
+			   <thresholdValue>10</thresholdValue>
+			   <comparator>ge</comparator>						
+		       </threshold>
+                </action>
+		<filterValue type="directValue">							
+			<name>fragment.intensity</name>						
+		</filterValue>
+	</oneExpMsMsSpectrumFilter>
+</ExpMsMsSpectrumFilter>
+
+
+
+
+<!--keep the peaks above a absolute intesity value of 40-->
+
+<ExpMsMsSpectrumFilter>
+<oneExpMsMsSpectrumFilter spectrumType="msms" name="dummy">
+	        <level>peaks</level>	
+		<action type="removeOther">		
+		       <threshold type="sort">	
+			   <relativeTo>absValue</relativeTo>							
+			   <thresholdValue>40</thresholdValue>
+			   <comparator>gt</comparator>						
+		       </threshold>
+                </action>
+		<filterValue type="directValue">							
+			<name>fragment.intensity</name>						
+		</filterValue>
+	</oneExpMsMsSpectrumFilter>
+</ExpMsMsSpectrumFilter>
+
+
+
+
+<!--keep the peaks bigger or equal 20% of the highest peak-->
+
+<ExpMsMsSpectrumFilter>
+<oneExpMsMsSpectrumFilter spectrumType="msms" name="dummy">
+	        <level>peaks</level>	
+		<action type="removeOther">		
+		       <threshold type="sort">	
+			   <relativeTo>relMax</relativeTo>							
+			   <thresholdValue>0.2</thresholdValue>
+			   <comparator>ge</comparator>						
+		       </threshold>
+                </action>
+		<filterValue type="directValue">							
+			<name>fragment.intensity</name>						
+		</filterValue>
+	</oneExpMsMsSpectrumFilter>
+</ExpMsMsSpectrumFilter>
+
+
+
+
+<!--only leave the peaks with a higher or equal intensity as the quantil of 90%-->
+
+<ExpMsMsSpectrumFilter>
+<oneExpMsMsSpectrumFilter spectrumType="msms" name="dummy">
+	        <level>peaks</level>	
+		<action type="removeOther">		
+		       <threshold type="sort">	
+			   <relativeTo>quantile</relativeTo>							
+			   <thresholdValue>0.9</thresholdValue>
+			   <comparator>ge</comparator>						
+		       </threshold>
+                </action>
+		<filterValue type="directValue">							
+			<name>fragment.intensity</name>						
+		</filterValue>
+	</oneExpMsMsSpectrumFilter>
+</ExpMsMsSpectrumFilter>
+
+
+
+<!--keep the 5 MSMS-Compounds with the largest parent-ion-intensity-->
+
+<ExpMsMsSpectrumFilter>
+<oneExpMsMsSpectrumFilter spectrumType="msms" name="dummy">
+	        <level>msmsCompounds</level>	
+		<action type="removeOther">		
+		       <threshold type="sort">	
+			   <relativeTo>nFix</relativeTo>							
+			   <thresholdValue>5</thresholdValue>
+			   <comparator>ge</comparator>						
+		       </threshold>
+                </action>
+		<filterValue type="directValue">							
+			<name>precursor.intensity</name>						
+		</filterValue>
+	</oneExpMsMsSpectrumFilter>
+</ExpMsMsSpectrumFilter>
+
+
+
+<!--keep the MSMS-Compounds above a absolute intesity value of 20'000-->
+
+<ExpMsMsSpectrumFilter>
+<oneExpMsMsSpectrumFilter spectrumType="msms" name="dummy">
+	        <level>msmsCompounds</level>	
+		<action type="removeOther">		
+		       <threshold type="sort">	
+			   <relativeTo>absValue</relativeTo>							
+			   <thresholdValue>20000</thresholdValue>
+			   <comparator>gt</comparator>						
+		       </threshold>
+                </action>
+		<filterValue type="directValue">							
+			<name>precursor.intensity</name>						
+		</filterValue>
+	</oneExpMsMsSpectrumFilter>
+</ExpMsMsSpectrumFilter>
+
+
+
+<!--keep the MSMS-Compounds with a parent-intensity bigger or equal 10% of the highest parent-intensity-->
+
+<ExpMsMsSpectrumFilter>
+<oneExpMsMsSpectrumFilter spectrumType="msms" name="dummy">
+	        <level>msmsCompounds</level>	
+		<action type="removeOther">		
+		       <threshold type="sort">	
+			   <relativeTo>relMax</relativeTo>							
+			   <thresholdValue>0.1</thresholdValue>
+			   <comparator>ge</comparator>						
+		       </threshold>
+                </action>
+		<filterValue type="directValue">							
+			<name>precursor.intensity</name>						
+		</filterValue>
+	</oneExpMsMsSpectrumFilter>
+</ExpMsMsSpectrumFilter>
+
+
+
+<!--only leave the msmsCompounds with a higher or equal intensity  as the quantil of 90%-->
+
+<ExpMsMsSpectrumFilter>
+<oneExpMsMsSpectrumFilter spectrumType="msms" name="dummy">
+	        <level>msmsCompounds</level>	
+		<action type="removeOther">		
+		       <threshold type="sort">	
+			   <relativeTo>quantile</relativeTo>							
+			   <thresholdValue>0.9</thresholdValue>
+			   <comparator>ge</comparator>						
+		       </threshold>
+                </action>
+		<filterValue type="directValue">							
+			<name>precursor.intensity</name>						
+		</filterValue>
+	</oneExpMsMsSpectrumFilter>
+</ExpMsMsSpectrumFilter>
+
+
+
+
+<!--only leave the msmsCompounds with a number of fragments higher or equal 6 -->
+
+<ExpMsMsSpectrumFilter>
+<oneExpMsMsSpectrumFilter spectrumType="msms" name="dummy">
+	        <level>msmsCompounds</level>	
+		<action type="removeOther">		
+		       <threshold type="sort">	
+			   <relativeTo>nFix</relativeTo>							
+			   <thresholdValue>6</thresholdValue>
+			   <comparator>ge</comparator>						
+		       </threshold>
+                </action>
+		<filterValue type="directValue">							
+			<name>size</name>						
+		</filterValue>
+	</oneExpMsMsSpectrumFilter>
+</ExpMsMsSpectrumFilter>
+
+
+
+<!-- take off the fragments with moz values lower or equal 200 -->
+
+<ExpMsMsSpectrumFilter>
+<oneExpMsMsSpectrumFilter spectrumType="msms" name="dummy">
+	        <level>peaks</level>	
+		<action type="remove">		
+		       <threshold type="sort">	
+			   <relativeTo>absValue</relativeTo>							
+			   <thresholdValue>200</thresholdValue>
+			   <comparator>le</comparator>						
+		       </threshold>
+                </action>
+		<filterValue type="directValue">							
+			<name>moz</name>						
+		</filterValue>
+	</oneExpMsMsSpectrumFilter>
+</ExpMsMsSpectrumFilter>
+
+
+
+<!-- keep the compounds which have a sum of the raw intensities higher than 20000-->
+
+<ExpMsMsSpectrumFilter>
+<oneExpMsMsSpectrumFilter spectrumType="msms" name="dummy">
+	        <level>msmsCompounds</level>	
+		<action type="removeOther">		
+		       <threshold type="sort">	
+			   <relativeTo>absValue</relativeTo>							
+			   <thresholdValue>20000</thresholdValue>
+			   <comparator>gt</comparator>						
+		       </threshold>
+                </action>
+		<filterValue type="directValue">							
+			<name>sum.fragment.intensity</name>						
+		</filterValue>
+	</oneExpMsMsSpectrumFilter>
+</ExpMsMsSpectrumFilter>
+
+
+
+<!-- the following examples demonstrate the usage of the type "algorithm" -->
+
+
+<!-- leaves half of the spectra which led to the best result using the algoritm "balance" -->
+
+<ExpMsMsSpectrumFilter>
+<oneExpMsMsSpectrumFilter spectrumType="msms" name="dummy">
+	        <level>msmsCompounds</level>	
+		<action type="removeOther">		
+		       <threshold type="sort">	
+			   <relativeTo>quantile</relativeTo>							
+			   <thresholdValue>0.5</thresholdValue>
+			   <comparator>ge</comparator>						
+		       </threshold>
+                </action>
+		<filterValue type="algorithm">	
+	                <name>balance</name>
+                        <param name="bands">10</param>
+                        <param name="minMoz">300</param>
+                        <param name="maxMoz">900</param>
+                </filterValue>
+	</oneExpMsMsSpectrumFilter>
+</ExpMsMsSpectrumFilter>
+
+
+
+<!-- labels half of the spectra which led to the best result using the algoritm "goodDiff" (the 50 peaks selected by 'smartPeaks' are considered)-->
+<!-- the label is the name "goodDiff ok" and the result from the algorithm expressed to two decimal places -->
+
+<ExpMsMsSpectrumFilter>
+<oneExpMsMsSpectrumFilter spectrumType="msms" name="dummy">
+	        <level>msmsCompounds</level>	
+		<action type="label">
+                     <labelValue>%.2f</labelValue>
+	             <labelName>goodDiff ok</labelName>	
+		       <threshold type="sort">	
+			   <relativeTo>quantile</relativeTo>							
+			   <thresholdValue>0.5</thresholdValue>
+			   <comparator>ge</comparator>						
+		       </threshold>
+                </action>
+		<filterValue type="algorithm">	
+	                <name>goodDiff.normRank</name>
+                        <param name="tolerance">0.37</param>
+                        <param name="toleranceUnit">Da</param>
+                        <param name="mass">mono</param>  
+                        <param name="filter">smartPeaks</param>
+                          <param name="peakNr">50</param>
+                          <param name="winSize">100</param>
+                          <param name="stepSize">20</param>
+                          <param name="weightIntensity">1</param>
+                          <param name="weightDensity">2</param>                                 
+		</filterValue>
+	</oneExpMsMsSpectrumFilter>
+</ExpMsMsSpectrumFilter>
+
+
+
+<!-- leaves half of the spectra which led to the best result using the algoritm "waterLosses" (the 100 strongest peaks are considered)-->
+
+
+<ExpMsMsSpectrumFilter>
+<oneExpMsMsSpectrumFilter spectrumType="msms" name="dummy">
+	        <level>msmsCompounds</level>	
+		<action type="removeOther">		
+		       <threshold type="sort">	
+			   <relativeTo>quantile</relativeTo>							
+			   <thresholdValue>0.5</thresholdValue>
+			   <comparator>ge</comparator>						
+		       </threshold>
+                </action>
+		<filterValue type="algorithm">	
+	                <name>waterLosses.normRank</name>
+                        <param name="tolerance">0.37</param>
+                        <param name="toleranceUnit">Da</param>
+                        <param name="mass">average</param>  
+                        <param name="filter">intensity</param>
+                        <param name="peakNr">100</param>
+		</filterValue>
+	</oneExpMsMsSpectrumFilter>
+</ExpMsMsSpectrumFilter>
+
+
+
+<!-- leaves half of the spectra which led to the best result using the algoritm "complements" (all peaks are considered)-->
+
+
+<ExpMsMsSpectrumFilter>
+<oneExpMsMsSpectrumFilter spectrumType="msms" name="dummy">
+	        <level>msmsCompounds</level>	
+		<action type="removeOther">		
+		       <threshold type="sort">	
+			   <relativeTo>quantile</relativeTo>							
+			   <thresholdValue>0.5</thresholdValue>
+			   <comparator>ge</comparator>						
+		       </threshold>
+                </action>
+		<filterValue type="algorithm">	
+	                <name>complements.normRank</name>
+                        <param name="tolerance">1</param>
+                        <param name="toleranceUnit">Da</param>
+                        <param name="mass">average</param>  
+ 		</filterValue>
+	</oneExpMsMsSpectrumFilter>
+</ExpMsMsSpectrumFilter>
+
+
+
+
+<!-- The fragments in regions of low intensities or only a few peaks are intensified -->
+
+
+<ExpMsMsSpectrumFilter>
+<oneExpMsMsSpectrumFilter spectrumType="msms" name="dummy">
+	        <level>peaks</level>	
+		<action type="algorithm">
+                </action>
+		<filterValue type="algorithm">	
+	                <name>smartPeaks</name>
+                        <param name="winSize">10</param>
+                        <param name="stepSize">2</param>
+                        <param name="weightIntensity">0.8</param>
+                        <param name="weightDensity">1</param>                       
+		</filterValue>
+	</oneExpMsMsSpectrumFilter>
+</ExpMsMsSpectrumFilter>
+
+
+
+
+<!-- The fragments around the strongest peaks are deleted, unless the spectra contains less than 100 fragments. In this case you have to use MSFilterCollection.pm instead of MSFilter.pm-->
+
+
+<ExpMsMsSpectrumFilter>
+<oneExpMsMsSpectrumFilter spectrumType="msms" name="dummy">
+	        <level>peaks</level>	
+		<action type="algorithm">
+                </action>
+		<filterValue type="algorithm">	
+                        <name>banishNeighbors</name>
+                        <param name="selectStrongest">0.8</param>
+                        <param name="banishRange">0.5</param>
+                        <param name="banishLimit">0.9</param>
+                        <param name="rangeUnit">Da</param>
+                        <param name="skipSpectraBelow">100</param>
+	       </filterValue>
+	</oneExpMsMsSpectrumFilter>
+</ExpMsMsSpectrumFilter>
+
+
+
+<!-- You can process a spectrum successively by several filters -->
+<!-- banishNeighbors is applied
+     only the 100 strongest peaks of each compound are kept
+     the 10% percent of all compounds with the lowest complements-score are deleted -->
+
+<ExpMsMsSpectrumFilter>
+        <oneExpMsMsSpectrumFilter spectrumType="msms" name="dummy">
+	        <level>peaks</level>	
+		<action type="algorithm">
+                </action>
+		<filterValue type="algorithm">	
+                        <name>banishNeighbors</name>
+                        <param name="selectStrongest">0.8</param>
+                        <param name="banishRange">0.5</param>
+                        <param name="banishLimit">0.9</param>
+                        <param name="rangeUnit">Da</param>
+                        <param name="skipSpectraBelow">100</param>
+	       </filterValue>
+	</oneExpMsMsSpectrumFilter>
+
+
+        <oneExpMsMsSpectrumFilter spectrumType="msms" name="dummy">
+	        <level>peaks</level>	
+		<action type="removeOther">		
+		       <threshold type="sort">	
+			   <relativeTo>nFix</relativeTo>							
+			   <thresholdValue>100</thresholdValue>
+			   <comparator>ge</comparator>						
+		       </threshold>
+                </action>
+		<filterValue type="directValue">							
+			<name>fragment.intensity</name>						
+		</filterValue>
+	</oneExpMsMsSpectrumFilter>
+
+
+        <oneExpMsMsSpectrumFilter spectrumType="msms" name="dummy">
+	        <level>msmsCompounds</level>	
+		<action type="removeOther">		
+		       <threshold type="sort">	
+			   <relativeTo>quantile</relativeTo>							
+			   <thresholdValue>0.1</thresholdValue>
+			   <comparator>ge</comparator>						
+		       </threshold>
+                </action>
+		<filterValue type="algorithm">	
+	                <name>complements.normRank</name>
+                        <param name="tolerance">0.4</param>
+                        <param name="toleranceUnit">Da</param>
+                        <param name="mass">average</param>  
+ 		</filterValue>
+	</oneExpMsMsSpectrumFilter>
+
+
+</ExpMsMsSpectrumFilter>
+
+
+
+
+<!-- see also the xml files in InSilicoSpectro/t/Spectra/Filter/testData for more (but esssentially the same) examples.. -->
+            

@@ -1,0 +1,82 @@
+Integrator-Module-Build
+
+This module is used to design test harnesses compatible with Integrator
+from Cydone Solutions. There is a comprehensive help document on how to
+use this module that is embeded in ./lib/Integrator/Module/Build.pm. You
+can also go to http://www.cydone.com and click on the demo icon to
+register to a free demo.
+
+After installation 'man Integrator::Module::Build' should get you started.
+
+INSTALLATION
+
+To install this module, run the following commands (as root):
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+Note: Integrator::Module::Build needs access to xml and ssl tools.  We have
+found that the installation process can be streamlined a lot if specific
+software packages are already installed before attempting to start the
+Integrator::Module::Build installation itself.
+
+You will find three scripts to help you install these software
+packages before attempting to install the perl modules required by
+Integrator::Module::Build in the following sections.
+
+UBUNTU and DEBIAN MACHINE DEPENDANCIES
+
+The 'pre_config_ubuntu' and 'pre_config_debian' scripts should be all that
+is necessary to pre configure the installation by installing software
+packages. Simply run one of the selected script before installing the
+module. Any of these scripts will typically install software packages
+with a one-liner:
+
+> apt-get install gcc build-essential libxml-perl libexpat1-dev libssl-dev
+
+(see the script for the exact list)
+
+FEDORA MACHINE DEPENDANCIES
+
+The 'pre_config_fedora' script should be all that is necessary to pre
+configure the installation by installing required software packages. Run
+this script before installing the module. It typically installs packages
+with a one-liner:
+
+> yum -y install gcc perl-libxml-perl expat-devel openssl openssl-devel
+
+(see the script for the exact list)
+
+WINDOWS MACHINE DEPENDANCIES
+
+(coming soon...)
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc Integrator::Module::Build
+    perldoc Integrator::Test::ConfigData
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/Integrator-Module-Build
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Integrator-Module-Build
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/Integrator-Module-Build
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/Integrator-Module-Build
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 Cydone Solutions Inc
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

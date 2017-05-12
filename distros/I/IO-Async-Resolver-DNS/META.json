@@ -1,0 +1,62 @@
+{
+   "abstract" : "resolve DNS queries using C<IO::Async>",
+   "author" : [
+      "Paul Evans <leonerd@leonerd.org.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4211",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "IO-Async-Resolver-DNS",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4004"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Future" : "0",
+            "IO::Async::Loop" : "0.47",
+            "IO::Async::Resolver" : "0.52",
+            "List::UtilsBy" : "0.07",
+            "Net::DNS" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "provides" : {
+      "IO::Async::Resolver::DNS" : {
+         "file" : "lib/IO/Async/Resolver/DNS.pm",
+         "version" : "0.06"
+      },
+      "IO::Async::Resolver::DNS::Constants" : {
+         "file" : "lib/IO/Async/Resolver/DNS/Constants.pm",
+         "version" : "0.06"
+      },
+      "IO::Async::Resolver::DNS::LibResolvImpl" : {
+         "file" : "lib/IO/Async/Resolver/DNS/LibResolvImpl.pm",
+         "version" : "0.06"
+      },
+      "IO::Async::Resolver::DNS::NetDNSImpl" : {
+         "file" : "lib/IO/Async/Resolver/DNS/NetDNSImpl.pm",
+         "version" : "0.06"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.06"
+}

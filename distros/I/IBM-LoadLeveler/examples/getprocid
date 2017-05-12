@@ -1,0 +1,83 @@
+# -*- Perl -*-
+
+use IBM::LoadLeveler;
+use Sys::Hostname;
+
+@StepState=( "I", "P", "ST", "R",
+    "CP", "XP", "RP",
+    "VP", "C", "X", "RM",
+    "V", "CA", "NR", "TX",
+    "?", "SX", "H", "D",
+    "NQ", "E", "EP",
+    "MP");
+
+# Format for llq style output
+format STDOUT_TOP =
+Id                       Owner      Submitted   ST PRI Class        Running On
+------------------------ ---------- ----------- -- --- ------------ -----------
+.
+
+format STDOUT =
+@<<<<<<<<<<<<<<<<<<<<<<< @<<<<<<<<< @<<<<<<<<<< @< @<< @<<<<<<<<<<< @<<<<<<<<<<
+$id,$owner,$submit,$st,$pri,$class,$run
+.
+
+$proc = @ARGV[0];
+@procid = ($proc, NULL);
+$host = @ARGV[1];
+
+$query = ll_query(JOBS);
+$return=ll_set_request($query,QUERY_PROCID,\@procid,ALL_DATA);
+
+if ($return != 0 )
+{
+    print STDERR "ll_set_request failed Return = $return\n";
+}
+
+$job=ll_get_objs($query,LL_STARTD,$host,$number,$err);
+
+# Try and work out our domain name
+
+while ($job)
+{
+    $SubmitTime=ll_get_data($job,LL_JobSubmitTime);
+    my @time=localtime($SubmitTime);
+    $submit=$time[4]+1 . "/$time[3] $time[2]:$time[1]";
+
+    $cred=ll_get_data($job,LL_JobCredential);
+    $owner=ll_get_data($cred,LL_CredentialUserName);
+
+    $step=ll_get_data($job,LL_JobGetFirstStep);
+    while ($step)
+    {
+	$state=ll_get_data($step,LL_StepState);
+	$st=$StepState[$state];
+
+	$id=ll_get_data($step,LL_StepID);
+
+	# strip domain name from step name for ease of reading
+
+	$tmp=$id;
+	$id=$1 . $2 if $tmp=~/(.*).$domain(.*)/;
+
+	$pri=ll_get_data($step,LL_StepPriority);
+	$class=ll_get_data($step,LL_StepJobClass);
+
+	if ($state == STATE_RUNNING)
+	{
+	    # If it is running get the unquallified machine name
+	    $machine=ll_get_data($step,LL_StepGetFirstMachine);
+	    $tmp=ll_get_data($machine,LL_MachineName);
+	    $run=$1 if $tmp=~/([^\.]*)/;
+	}
+
+	write;
+
+	$step=ll_get_data($job,LL_JobGetNextStep);
+    }
+    $job=ll_next_obj($query);
+}
+# Free up space allocated by LoadLeveler
+ll_free_objs($query);
+ll_deallocate($query);
+

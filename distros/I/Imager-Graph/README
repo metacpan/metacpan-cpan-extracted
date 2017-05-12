@@ -1,0 +1,128 @@
+Copyright 2000-2002,2007 Anthony Cook.  All rights reserved.
+This program is free software, you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+
+What is it?
+===========
+
+Imager::Graph is intended to produce good looking graphs with a
+minimum effort on the part of the user.  Hopefully I've managed that.
+
+Currently only the pie graph class, Imager::Graph::Pie, is provided.
+
+
+Fonts
+=====
+
+For best results you will need one or more attractive fonts, and one
+of the outline font libraries that Imager supports.  The ImUgly font
+is supplied with Imager::Graph, but it is fairly ugly, so probably
+isn't useful if you want nice output.
+
+
+Installation
+============
+
+Imager::Graph follows the normal perl module installation process:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Please Note: don't be too suprised if you get test failures,
+unfortunately minor changes in the image can result in large changes
+in the measure I use to check the results.  If you get test failures
+please check the results in testout/
+
+The tests require PNG file format and TrueType font format support.
+
+Creating Graphs
+===============
+
+The aim is to make things as simple as possible, if you have some data
+you can create a pie chart with:
+
+  use Imager::Graph::Pie;
+
+  my $font = Imager::Font->new(file=>$fontfile)
+    or die "Cannot create font: ",Imager->errstr;
+  my $pie_graph = Imager::Graph::Pie->new();
+  my $img = $pie_graph->draw(data=>\@data);
+
+If you want to add a legend, you need to provide some descriptive text
+as well:
+
+  my $img = $pie_graph->draw(data=>\@data, labels=>\@labels, font=>$font,
+                             features=>'legend');
+
+You might want to add a title instead:
+
+  my $img = $pie_graph->draw(data=>\@data, font=>$font, title=>'MyGraph');
+
+or instead of a legend, use callouts to annotate each segment:
+
+  my $img = $pie_graph->draw(data=>\@data, labels=>\@labels,
+	                     features=>'allcallouts', font=>$font);
+
+(The following graphs use features introduce after Imager 0.38.)
+
+If you want draw a monochrome pie graph, using hatched fills, specify
+the 'mono' style:
+
+  my $img = $pie_graph->draw(data=>\@data, style=>'mono');
+
+The 'mono' style produces a 1 channel image by default, so if you want
+to add some color you need to reset the number of channels, for
+example, you could change the drawing color to red:
+
+  my $img = $pie_graph->draw(data=>\@data, style=>'mono', 
+                             fg=>'FF0000', channels=>3);
+
+
+If you're feeling particularly adventurous, you could create a graph
+with a transparent background, suitable for compositing onto another
+image:
+
+  my $img = $pie_graph->draw(data=>\@data, style=>'mono', 
+                             bg=>'00000000', channels=>4);
+
+If you only want the background of the graph to be transparent, while leaving other parts of the chart opaque, use the back option:
+
+  my $img = $pie_graph->draw(data=>\@data, style=>'mono', 
+                             back=>'00000000', channels=>4);
+
+or you could make the background an image based fill:
+
+  my $img = $pie_graph->draw(data=>\@data, style=>'mono', channels=>4,
+                             back=>{ image=>$otherimage } );
+
+If you want a "prettier" image, you could use one of the fountain fill
+based styles:
+
+  my $img = $pie_graph->draw(data=>\@data, style=>'fount_lin');
+
+The image you receive from Imager::Graph is a normal Imager image,
+typically an 8-bit/sample direct color image, though options to extend
+that may be introduced in the future.
+
+
+Portability
+===========
+
+Imager::Graph should work on any system that Imager works on.
+
+
+More Information
+================
+
+If you have queries about Imager::Graph, please email me at
+tony@develop-help.com.
+
+A PPM compatible version of this module should be available from
+http://ppd.develop-help.com/.
+
+Thanks go to Addi for Imager.
+
+

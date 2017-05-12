@@ -1,0 +1,21 @@
+---
+abstract: 'Locking via Redis'
+author:
+  - 'Steffen Mueller <smueller@cpan.org>'
+build_requires: {}
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.023, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: IPC-ConcurrencyLimit-Lock-Redis
+requires:
+  Carp: '0'
+  Class::XSAccessor: '1.12'
+  Data::UUID::MT: '0'
+  IPC::ConcurrencyLimit: '0.10'
+  IPC::ConcurrencyLimit::Lock: '0'
+  Redis: '1.955'
+  Redis::ScriptCache: '0.03'
+version: '0.03'

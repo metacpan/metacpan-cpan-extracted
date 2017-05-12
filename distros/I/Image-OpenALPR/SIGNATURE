@@ -1,0 +1,47 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 78e50e186b04c8fe1defaa098f1c192181b3d837 COPYING
+SHA1 fa60187f363309d7ce7cddc29dc4f9f291614219 Changes
+SHA1 39942ef24bf5ef1216c7d6e287f1c88622382aa7 MANIFEST
+SHA1 b573c65814f806d524a863f48a4618a691f7ac4e META.json
+SHA1 059cc00579a1d81c25fbf9dc746eddebda91f8e4 META.yml
+SHA1 8c557a271b8371fa5b7628769cd2594edb96a350 Makefile.PL
+SHA1 10af7ea2a1c63836e3ded998f0d1730951ff9f73 OpenALPR.xs
+SHA1 1fcc01cd28aea900bbc4dd3192df09bf453d8392 README
+SHA1 ddc1eb875a0a9e86903d015f3766be327db04e08 lib/Image/OpenALPR.pm
+SHA1 8dc2590c8c5b855aa5d647d15db805573ac88fcb lib/Image/OpenALPR/PlateResult.pm
+SHA1 6844e39f940a78a20ee15b642086923190be4f4e ppport.h
+SHA1 1a25973de1a7874c7e3182c8415ea30154cc3cb9 t/Image-OpenALPR.t
+SHA1 86f1c669a8043b016a210eec2c124cc78f9fb31b t/ex.jpg
+SHA1 1ac6b522dca4d6665ffd6e0df736c274539a74c9 typemap
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBCgAGBQJXEom4AAoJEMoENb5ewbNiMxwP/2FRTRTvli5hCKHPkfp/yBSM
+czH8p1aeyxxrbj130Pf2+I8G40zRpSYGNoax/fp4oju8Y1wITBSY3Np2pLt7XOan
+Z+6rXhOahC+f6NOG7L3hsu/obm8Iztf8Sunsq5fUJqfviqsivBWD9KzfBCbRvhVW
+VGlwL2B1rmHrh/2C7VWHpmtspwWDpuzLZ4PH9hqnrimOYYTt+wDB2rOsuSSgGK9X
+AckZytAnwVRlP0CcoZi18qZqk5SVUbw9VvwbSU1jKBpPGsdC0MPUKK7Oi25+s7bh
+6odO4YbParteeMork2KZWI4JlFKN8ONKc8NxCw1WrgtSFTdqS3ypjTF2eHoJTnxB
+j1ONQYMTSAynAfQNNNbheZe0N2kTDXnFNfgVc/UbaF4px834uTVga59EwLXFOCoC
+QipEjedOqt9qjWIYLJHgEy4o448soZgeVZRx+zMB4zq5ShpFSJ7Vx+Wg2JCrfHtu
+cG8Skx05Wx1qzTK2Jrq9ViOLCGypYof2X4SOfGDtM4ZR8OQBxo2l3PbKpZFmWdng
+0m9+vJqI4qL2UI+TkI/72nAEXvUPw/Y+5OsZf7m9AnAV6Hwe1l/aOCEdeEMgpCNa
+TvO2sHwTsEENqFwcd9Ti1TgoLWQUol/b+hQSQPtyP2dxMXS6QejuRv/iGP45IDmb
+WfzNPtpL3HhZBVvsgw8A
+=g3Xk
+-----END PGP SIGNATURE-----

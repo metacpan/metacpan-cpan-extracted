@@ -1,0 +1,14 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Iterator/GroupedRange.pm
+minil.toml
+t/array.t
+t/code.t
+t/compile.t
+t/empty_array_is_not_terminate_condition.t
+META.yml
+MANIFEST

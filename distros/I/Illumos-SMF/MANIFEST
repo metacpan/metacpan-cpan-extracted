@@ -1,0 +1,11 @@
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README.md
+lib/Illumos/SMF.pm
+t/smf.t
+t/manifest.t
+t/pod.t
+.travis.yml
+META.yml                                 Module meta-data (added by MakeMaker)

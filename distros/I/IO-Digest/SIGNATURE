@@ -1,0 +1,42 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.41.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It would check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 299be842ca6269b3987f57f9a19cbf34aa156a3a CHANGES
+SHA1 eff5768541f715616b4d455e12c41c63546d4d4f MANIFEST
+SHA1 69d1c6948846f09c516e41a7b862b67339e7ea72 META.yml
+SHA1 259f06f70c1f0774a8354f8ebe55f60e9220c423 Makefile.PL
+SHA1 83db5470dc3d684d285ffc728f270e5d5ee40d9c README
+SHA1 127fb0a41f8433b854676941c699693abc3e85d4 inc/ExtUtils/AutoInstall.pm
+SHA1 02597776ad22aacd2c8e189594fcbf701390b606 inc/Module/Install.pm
+SHA1 53422ed14b41bbc9af3ac14a26ced3ed21dee0bc inc/Module/Install/AutoInstall.pm
+SHA1 7ca8b8f54287c2b5af8062fc9f349275a07e06f3 inc/Module/Install/Base.pm
+SHA1 b6af22816210f8eaab4c2c616e05a8892b2fcfd0 inc/Module/Install/Can.pm
+SHA1 33659c004518e95afb6ffafad41e84f2a6268412 inc/Module/Install/Fetch.pm
+SHA1 b42b4d3a89848325ae29422c72638e1571e7af1b inc/Module/Install/Include.pm
+SHA1 c4ed10cd20914c04f3fff3f8aaf8943372cec114 inc/Module/Install/Makefile.pm
+SHA1 ccf9b6267b5c9e7b35ef129f7e974255955c8867 inc/Module/Install/Metadata.pm
+SHA1 1288f4c4e4ba88e19194d7952eacbd6be2a5b916 inc/Module/Install/Win32.pm
+SHA1 1022a7ab797fc0081ea947f102650362ad925d7a inc/Module/Install/WriteAll.pm
+SHA1 716b67b14f1b46403297fbc41c7c7a77bc5086de lib/IO/Digest.pm
+SHA1 dbf02d6ee146df5da346214fcde7e4a7a380f1ff t/0use.t
+SHA1 d2643f6aee444fe9338cf431f7f3bc5ce1ffbdb5 t/1basic.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.4 (FreeBSD)
+
+iD8DBQFBQzalk1XldlEkA5YRAsFLAJ9FDucsyK6qdxQqhnj9y/ALJ1H9PQCfRFnm
+0suO/1ZIhdDTC3PImaYCb6o=
+=HVgD
+-----END PGP SIGNATURE-----

@@ -1,0 +1,47 @@
+This is a  perl module for implementation of IVRS under Linux.
+
+You require perl 5.001 or later to use this module.
+
+Simply extract the files to a directory of your choice and run
+./demo1 ttyS1 
+
+Where ttyS1 is serial/modem port.
+
+Or else,
+
+You can install the module by running these commands:
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+There are some demo scripts included.
+
+Many people have reported that they get "disabling ioctl methods - constant
+not found". This is due to missing perl header files. Copy these files from
+perlheader/asm to /usr/lib/perl/<perl version>/asm/. Your destination
+may change but, this directory is top level directory of perl distribution.
+
+If your modem fails to respond to AT# commands, then replace AT# with AT+ at
+all places in Ivrs.pm.
+
+For fax install efax or copy efix and efax from bin/ to your /usr/bin.
+
+For converting your recorded wav files, install mgetty-voice for pvftools
+support.
+
+US Robotics support is added.
+
+Please report any bugs/suggestions to Mukund Deshmukh
+<betacomp_ngp@sancharnet.in>
+
+All files contained in this distribution are Copyright (c) 2000-2005
+Mukund Deshmukh unless otherwise specified. All rights reserved.
+
+This Module is free software; you can redistribute it and/or modify it under 
+the same terms as Perl itself.
+
+
+
+

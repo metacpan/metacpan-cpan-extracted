@@ -1,0 +1,109 @@
+NAME
+    Image::Timeline - Create GIF or PNG timelines
+
+SYNOPSIS
+      use Image::Timeline;
+      my $t = new Image::Timeline(width => 400);
+      $t->add('J.S. Bach', 1685, 1750);
+      $t->add('Beethoven', 1770, 1827);
+      $t->add('Brahms',    1833, 1897);
+      $t->add('Ravel',     1875, 1937);
+      ...
+       # For older versions of GD:
+      $t->write_gif('composers.gif');
+       # For newer versions of GD:
+      $t->write_png('composers.png');
+  
+      # Get the GD object
+      my $img = $t->draw;
+
+DESCRIPTION
+    This module creates bar-format timelines using the GD.pm module.
+    Depending on the version of GD you have, you can produce either GIF or
+    PNG files.
+
+    See the file `t/truth.gif' for example output.
+
+METHODS
+  new()
+
+    Creates a new timeline object. Accepts several named parameters that
+    affect how the timeline is created:
+
+    * width
+        How many pixels wide the image should be. Default is 900 pixels, for
+        no good reason.
+
+    * font
+        Which GD font should be used to label each entry in the timeline.
+        Default is `gdTinyFont'.
+
+    * bar_stepsize
+        The "tick interval" on the timeline's legend at the top. Default is
+        50 (i.e. 50 years).
+
+    * vspacing
+        How many pixels of vertical space should be left between entries.
+        Default is 2.
+
+    * hmargin
+        How many pixels should be left at the far right and far left of the
+        image. Default is 3.
+
+    * bg_color
+    * bar_color
+    * endcap_color
+    * legend_color
+    * text_color
+        These parameters affect the colors of the image. Each associated
+        value should be a 3-element array reference, specifying RGB values
+        from 0 to 255. For instance, the default value of `bar_color' is
+        pure red, specified as `[255,0,0]'. The defaults are reasonable, but
+        not necessarily attractive.
+
+  add(label, start, end)
+
+    Adds a new entry to the timeline. Supply a label that you want to
+    include in the image, the starting date, and the ending date.
+
+  draw()
+
+    Creates the `GD' object and returns it. This method is where all the
+    real work is done - the code must figure out things like how to squeeze
+    the entries most compactly but avoid collisions between bars, when to
+    draw labels above their bars and when below (again, to avoid collisions
+    between labels), the image's height (a function of how many concurrent
+    entries it contains), and so on.
+
+  write_png(filename)
+
+  write_gif(filename)
+
+    A convenience method which writes the timeline to a file. Because of
+    some Unisys/Compuserve/GD patent issues that I don't want to get
+    involved in, writing PNG output requires a version of GD newer than
+    1.19, while writing GIF output requires GD version 1.19 or older.
+
+LIMITATIONS
+    Currently all dates/times are specified as integers, which are meant to
+    represent years. Finer granularity (time of day) isn't supported yet,
+    but it probably could be if it's desired (or someone gives me a patch).
+
+    Doesn't yet fully test the PNG capabilities during 'make test'. This is
+    just because I haven't yet found time to build all the necessary PNG
+    libraries on my system, so I haven't gotten the benchmark image built.
+    Please let me know whether this works correctly, and maybe even send me
+    the 't/testdata.png' file created so I can include it here.
+
+AUTHOR
+    Ken Williams, ken@forum.swarthmore.edu
+
+COPYRIGHT
+    Copyright 2001 Ken Williams. All rights reserved.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    perl(1), GD(3)
+

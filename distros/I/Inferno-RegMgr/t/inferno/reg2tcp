@@ -1,0 +1,19 @@
+#!/dis/sh
+# (for perl) plain tcp interface to /mnt/registry/{new,find,event}
+listen -A tcp!127.0.0.172!6701 { {
+    cat >/mnt/registry/new
+    } & }
+listen -A tcp!127.0.0.172!6702 { {
+    read >[1=3]; read -o 0 0 <[0=3]; cat >[1=0] <[0=3]
+    } <>[3]/mnt/registry/find & }
+# 'echo READY' needed to workaround race: between connecting to tcp port
+# and opening event file may happens some events which will be lost in
+# case client expect to get ALL events after establishing connection
+listen -A tcp!127.0.0.172!6703 { {
+    echo READY
+    cat &                      pid1 := $apid
+    cat <[0=1] >/dev/null &    pid2 := $apid
+    { read < /prog/$pid2/wait; kill $pid1 >[2]/dev/null } &
+    read < /prog/$pid1/wait; kill $pid2 >[2]/dev/null
+    } </mnt/registry/event & }
+

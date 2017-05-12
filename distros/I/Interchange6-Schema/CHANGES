@@ -1,0 +1,1019 @@
+Revision history for Interchange6::Schema
+
+0.133 Sun Oct 30 11:59:33 2016 CET
+
+   [ENHANCEMENTS]
+
+   * Add real email address for company user in fixtures (Stefan Hornburg/Racke).
+
+   [TESTS]
+
+   * Switch to new Test::Postgresql58 for PostgreSQL tests (Peter Mottram).
+
+0.132 Sat Oct  1 09:59:22 2016 CEST
+
+   [ENHANCEMENTS]
+
+   * Add company user role (Pattawan Kaewduangdee, GH #204, #205).
+
+0.131 Mon Aug 22 12:34:52 2016 CEST
+
+   [BUG FIXES]
+
+   * Fix number of countries in tests (Peter Mottram, GH #201).
+   * Fix MANIFEST.SKIP so sql only matches directory (Peter Mottram, GH #200).
+
+   [TESTS]
+
+   * Manual config for travis so it doesn't run build-dist (Peter Mottram).
+
+0.130 Mon Aug  1 10:57:09 2016 CEST
+
+   [ENHANCEMENTS]
+
+   * Add MediaMessage result class (Stefan Hornburg/Racke).
+
+   [BUG FIXES]
+
+   * Fix problems reported by new DBIx::Class SanityChecker (Peter Mottram).
+   * Simplify DBIC/SQLT dependency config to fix travis 5.24 dep problems
+     (Peter Mottram).
+   * Disregard password for reset token checksum in case it isn't yet
+     defined (Peter Mottram).
+   * Add YAML to build dependencies for the sake of Schema::Config
+     (Peter Mottram).
+
+   [TESTS]
+
+   * Add coverage testing to Travis configuration file (Stefan Hornburg/Racke).
+
+0.120 Mon Jun 27 16:16:36 2016 CEST
+
+   [ENHANCEMENTS]
+
+   * Remove pg_enable_utf8 parameter which isn't necessary any
+     more with DBD::Pg version 3.0.0 and higher (see
+     https://metacpan.org/pod/DBD::Pg#pg_enable_utf8-integer).
+     Peter Mottram
+   * Remove build dependency on Class::Load (Peter Mottram).
+   * Add useful Message resultset methods: approved, public,
+     with_author, with_children (Peter Mottram).
+   * Add NavigationMessage result class (Peter Mottram).
+
+   [TESTING]
+
+   * Add Perl version 5.24 to Travis configuration (Stefan Hornburg/Racke).
+
+0.111 Wed Jun  1 13:27:25 2016 CEST
+
+   [ENHANCEMENTS]
+
+   * Add clone method to Cart result class
+     (Marco Pessotto, Peter Mottram, GH #197).
+
+0.110 Wed May 25 12:16:11 2016 CEST
+
+   [ENHANCEMENTS]
+
+   * Add combine and extra column to CartProduct result class (Peter
+     Mottram).
+   * Add combine column ot Product result class (Peter Mottram).
+   * Remove prerequisite on Crypt::Eksblowfish::Bcrypt (Peter Mottram).
+
+0.102 Thu Mar  3 18:35:23 2016 CET
+
+   [ENHANCEMENTS]
+
+   * Pass arrayref to set_roles method as single hashref will be
+     deprecated in DBIx::Class (Peter Mottram)
+   * Zone result tweaks (Peter Mottram)
+     - in _get_state_obj combine 2 queries using a subquery
+     - use resultset 'single' method instead of search->single in add_states
+     - this also removes potential for leaked cursor
+   * Add column accessor image to Product result class (Peter Mottram).
+   * Use 'inherited' instead of 'simple' for schema attributes so they
+     are available in subclassed schemas (Peter Mottram).
+
+   [DOCUMENTATION]
+
+   * Add notes about using Schema::Config in inherited classes
+     (Peter Mottram).
+
+0.101 Mon Feb 29 12:28:49 2016 CET
+
+   [BUG FIXES]
+
+   * Use cmp_deeply with num to prevent SQLite test failure fixes
+     (Peter Mottram, Slaven Rezić, Stefan Hornburg/Racke, GH #195, #196).
+
+0.100 Sat Feb 27 17:35:12 2016 CET
+
+   [BUG FIXES]
+
+   * Fix bug causing exception in find_variant method from the
+     Product class (Peter Mottram).
+   * Correct CASCADE behaviour in Cart class (Peter Mottram).
+
+   [ENHANCEMENTS]
+
+   * Add user_locale attribute to Schema (Peter Mottram, GH #127).
+   * Improve usage of Me helper
+     (Peter Mottram, Stefan Hornburg/Racke, GH #194).
+   * Add support for partial shipments (Peter Mottram, GH #192).
+   * Change file column in Media to be nullable (Peter Mottram).
+   * Remove 'is_foreign_key => 1' from result class definitions
+     (Peter Mottram).
+   * Add priority column to Media class (Peter Mottram).
+   * Add Navigation resultset class (Peter Mottram).
+   * Add MediaNavigation link table (Peter Mottram).
+   * Remove unused variable in with_highest_price method
+     (Stefan Hornburg/Racke).
+   * Add with_media method to Product ResultSet class (Peter Mottram).
+   * Add current_user attribute to Schema (Peter Mottram).
+   * Replace ProductReview result class with ProductMessage (Peter Mottram).
+   * Resize numeric columns holding prices (Peter Mottram).
+   * Support old Perls (Peter Mottram).
+
+   [TESTS]
+
+   * Full code coverage of tests (Peter Mottram).
+
+0.092 Mon Jan 18 16:28:41 2016 CET
+
+   [BUG FIXES]
+
+   * Use crypt encoding for password column in User result class
+     (Peter Mottram, GH #188)
+
+0.091 Mon Nov 23 09:23:44 2015 CET
+
+   [BUG FIXES]
+
+   * Use DBIx::Class::Schema::Config as base instead of as component
+     (Peter Mottram, Stefan Hornburg/Racke).
+
+0.090 Wed Nov 18 12:20:44 2015 CET
+
+   [ENHANCEMENTS]
+
+   * Switch to Authen::Passphrase for User password column
+     (Peter Mottram).
+   * Use Helper::Row::ProxyResultSetMethod for Product->average_rating
+     and Product->variant_count (Peter Mottram).
+   * Remove stale prerequisites on MooX:: modules (Peter Mottram).
+   * Add Devel::Cover uncoverable comments to Schema (Peter Mottram).
+
+   [DOCUMENTATION]
+
+   * Update database connect options to current best practice
+     (Peter Mottram).
+   * POD fix in UriRedirect resultset class (Peter Mottram).
+   * Document minimum Perl version (Stefan Hornburg/Racke).
+
+   [TESTS]
+
+   * Remove unnecessary diag call from UriRedirect test
+     (Peter Mottram).
+   * Switch MySQL test role to using set_strict_mode
+     (Peter Mottram).
+
+0.089 Tue Aug 11 11:19:30 2015 CEST
+
+   [ENHANCEMENTS]
+
+   * Add atomic increment and decrement methods to Inventory class
+     (Peter Mottram).
+
+   [DOCUMENTATION]
+
+   * Fix typo in inventory_exempt description (Stefan Hornburg).
+
+0.088 Tue Jul 28 19:06:40 2015 EEST
+
+   [API CHANGES]
+
+   * Add summary column to Message class (Peter Mottram, GH #184).
+
+   [BUG FIXES]
+
+   * Force lowercase on username (Peter Mottram, GH #183).
+   * Return undef instead of throwing exception for circular redirect
+     (Peter Mottram).
+
+   [DOCUMENTATION]
+
+   * Fix links to order status class in POD for order class
+     (Stefan Hornburg).
+
+0.087 Fri Jul  3 18:19:28 2015 CEST
+
+   [API CHANGES]
+
+   * Add manufacturer_sku to Product class (Peter Mottram, GH #181).
+   * Add UriRedirect result and result set class (Sam Batschelet,
+     Peter Mottram, GH #179, GH #180).
+
+0.086 Tue Jun 30 16:46:29 2015 CEST
+
+   [API CHANGES]
+
+   * Move generate_uri method for Navigation result class from insert to new.
+     This skips automatic uri generation in case uri is passed as undef
+     (Peter Mottram, GH #178).
+
+   [BUG FIXES]
+
+   * Fix assumption in 'around check_password' that fail_count is defined
+     (Peter Mottram).
+
+   [TESTS]
+
+   * Add tests to ensure empty password cannot be used for login
+     (Peter Mottram).
+
+0.085 Thu Jun 18 14:01:29 2015 CEST
+
+   [ENHANCEMENTS]
+
+   * Let reset_token_checksum in User result class work without password
+     (Peter Mottram).
+   * Automatically create uri value in Navigation result class if value
+     is not defined instead of if false (Peter Mottram).
+   * Update last_login and fail_count in User result class on check_password
+     call (Peter Mottram).
+   * Add priority to Address result class (Peter Mottram, GH #175).
+
+   [DOCUMENTATION]
+
+   * Add YAML config Dancer::Plugin::DBIC to database support manual
+     (Peter Mottram).
+   * Fix database support manual text regarding set_strict_mode in MySQL
+     (Peter Mottram).
+   * Add cookbook to list of manuals (Stefan Hornburg).
+
+   [TESTS]
+
+   * Fix datetime comparison check in user tests (Peter Mottram).
+
+0.084 Tue Mar 31 16:39:23 2015 CEST
+
+   [API CHANGES]
+
+   * Change product weight to NOT NULL with default value of 0 (Peter Mottram).
+
+   [ENHANCEMENTS]
+
+   * Create order status on order create (Peter Mottram, GH #173).
+
+   [TESTS]
+
+   * Remove Pod::POM module check from sanity test (Peter Mottram).
+
+0.083 Sun Mar 22 06:38:42 2015 CET
+
+   [BUG FIXES]
+
+   * Fix prerequisite on DBIx::Class::Schema::Config which causes build
+     problems on NetBSD when using non-Gnu make (Peter Mottram, GH #169).
+
+0.082 Thu Mar 19 16:28:23 2015 CET
+
+   [ENHANCEMENTS]
+
+   * Add unique constraint on uri column in Message class (Marco Pessotto, GH #168).
+
+   [BUG FIXES]
+
+   * Add extra comma to SET SQL_MODE CONCAT (Peter Mottram, GH #149),
+
+   [TESTS]
+
+   * Reduce noise in tests (Peter Mottram).
+
+0.081 Wed Mar 18 11:23:10 2015 CET
+
+   [DOCUMENTATION]
+
+   * Add Manual::Cookbook with information on modifying the schema (Peter Mottram).
+
+   [TESTS]
+
+   * Stop using File::Slurp in tests (Peter Mottram, GH #171).
+   * Remove extra debug code that was added to test_mysql.t.
+     It hasn't helped significantly and caused test failures on some linux smoker
+     (Peter Mottram).
+
+0.080 Sun Mar 15 08:00:40 2015 CET
+
+   [FEATURES]
+
+   * Add support for password reset (Peter Mottram):
+     - Add columns reset_token and reset_expires to users table.
+     - Add User resultset class with find_user_with_reset_token method.
+     - Add methods to User class (reset_token_generate, reset_token_verify,
+       reset_token_checksum).
+   * Add DBIx::Class::Schema::Config component (GH#162, Peter Mottram).
+
+   [ENHANCEMENTS]
+
+   * Product resultset listing method split into multiple chainable
+     methods each using correlated subqueries instead of joins (Peter Mottram).
+   * Add new Product result set methods (Peter Mottram):
+     - with_average_rating
+     - with_lowest_selling_price
+     - with_highest_price
+     - with_quantity_in_stock
+     - with_variant_count
+   * Update/add Product class methods to use cached column data from new
+     result set methods when available (Peter Mottram):
+     - average_rating
+     - selling_price
+     - highest_price
+     - quantity_in_stock
+     - variant_count
+   * Add OrderStatus class (GH #154, #167, Peter Mottram).
+   * Add attributes many-to-many relationship to Navigation class
+     (GH #95, Peter Mottram).
+   * Add random helper (Peter Mottram).
+   * Add canonical_only method to Product resultset (Peter Mottram).
+   * Add navigations many-to-many relationship to Product class
+     (GH #164, #165, Sam Batschelet).
+   * Add explicit attribute definition in add_variants method of Product class
+     (GH #118, Peter Mottram).
+   * Add active_children relationship to Navigation class (Peter Mottram).
+   * Add unique constraint merchandising_products_sku_sku_related_type to
+     MerchandisingProduct class (Peter Mottram).
+   * Allow parameters to be passed to Product resultset listing method
+     (Peter Mottram).
+   * Add format and parent_id to Message class (GH #156, Peter Mottram).
+   * Use "Me helper" in ResultSet::Product for safety reasons (Peter Mottram).
+   * Use join_type left for the following relationships (Peter Mottram):
+     - canonical in Product class
+     - user and session in Cart class
+     - author in Media class
+     - order and user in PaymentOrder class
+   * Add discount_percent method to Product (Peter Mottram).
+   * Add valid_from and valid_to columns to ShipmentRate class (Peter Mottram).
+   * Add unique constraint on navigation_id and attributes_id in
+     NavigationAttribute class (Peter Mottram).
+   * Add unique constraint on sku and attributes_id in ProductAttribute
+     class (Peter Mottram).
+   * Add unique constraint on users_id and attributes_id in UserAttribute
+     class (Peter Mottram).
+   * Add is_anonymous column to User class. If a user is created with
+     username undef and is_anonymous true then a random username starting
+     with 'anonymous-' is created and active is set to false.
+     (GH#92, Peter Mottram).
+   * Add discount column to PriceModifier class to allow modified prices
+     to be calculated based on a percentage discount (GH#126, Peter Mottram).
+   * ShipmentRate class min/max_weight columns renamed to min/max_value and
+     value_type and value_unit columns added (GH#71, Peter Mottram).
+   * Remove status and approved columns from Cart (GH#135, Peter Mottram).
+
+   [BUG FIXES]
+
+   * Increase version number of DBIx::Class::Helpers prerequisite in order
+     to fix Dancer::Plugin::Interchange GH issue #48 (Peter Mottram).
+   * Add has_variants method to Product for backwards-compatibility
+     (Peter Mottram).
+
+   [DOCUMENTATION]
+
+   * Remove boilerplate from POD for Media, MediaDisplay, MediaProduct,
+     MediaType, MerchandisingAttribute, MerchandisingProduct, Navigation,
+     NavigationAttributeValue, Orderline, PaymentOrder, Permission,
+     PriceModifier, ProductAttribute, ProductAttributeValue, Role, Session,
+     Setting, Shipment, ShipmentCarrier, ShipmentDestination, ShipmentMethod,
+     State, Tax, User, UserAttribute, UserAttributeValue, UserRole, Zone, 
+     ZoneCountry and ZoneState classes (GH #134, Peter Mottram).
+   * Add ResultSet::Product to Manual::Classes (Peter Mottram).
+   * Improve pod for quantity_in_stock method in Product class (Peter Mottram).
+   * Improve pod for Populate::Role (Peter Mottram).
+
+   [TESTS]
+
+   * Add test for left join with nullable FK closes (GH #146, Peter Mottram).
+   * Adjust tests now that selling_price is always defined (Peter Mottram).
+
+0.070 Wed Dec 31 11:39:33 2014 CET
+
+   [ENHANCEMENTS]
+
+   * Set default value of title in Attribute and Attribute value class
+     from name and value column respectively (Peter Mottram).
+   * Add "SetOperations" DBIx::Class::Helper (Peter Mottram).
+
+0.060_93 Fri Dec 26 10:41:23 2014 CET
+
+   [ENHANCEMENTS]
+
+   * Add "me" DBIx::Class::Helper (Peter Mottram).
+   * Add SQL literal AS to selling_price query within listing method from
+     Product class (Peter Mottram).
+
+   [TESTS]
+
+   * Stop using t/var as temporary directory in tests and set TMPDIR => 1 instead.
+     Prevents exhausting of socket file path max length (108 on Linux systems).
+     (Sam Batschelet, Stefan Hornburg, Peter Mottram).
+   * Recheck DBIx::Class deployment dependencies before running tests
+     (Peter Mottram).
+   * Retrieve and display mysqld version info in top-level test script to help debug
+     GH #149 (Peter Mottram).
+   * Fix BaseAttribute test array order bug (Peter Mottram).
+
+0.060_92 Mon Dec 22 13:44:34 2014 CET
+
+   [ENHANCEMENTS]
+
+   * Ensure that selling_price method in Product class always return defined price
+     (Peter Mottram).
+
+   [BUG FIXES]
+
+   * Use DBIx::Class::Optional::Dependencies to ensure correct deployment
+     prerequsites for DBIx::Class (Peter Mottram).
+   * Add version to prerequisite on DBIx::Class::Helpers to ensure that
+     DBIx::Class::Helpers::DateTime is available (Peter Mottram).
+   * Fix test problems with PriceModifier and SQLite floats
+     (Peter Mottram, GH #148).
+
+0.060_91 Sat Dec 20 14:56:52 2014 CET
+
+   [ENHANCEMENTS]
+
+   * Add base ResultSet class which loads shortcut and correlate relationship
+     helper class (Peter Mottram).
+   * Replace count method with has_rows in Message class (Peter Mottram).
+   * Add ResultSet class for products including listing method (Peter Mottram).
+   * Add priority column to NavigationProduct (Peter Mottram).
+   * Add role 'user' to user on insert (Peter Mottram).
+   * Remove anonymous and authenticated roles and adjust selling_price and
+     tier_pricing (Peter Mottram).
+   * Add DateTime and QuoteNames helpers to schema (Peter Mottram).
+
+   [BUG FIXES]
+
+   * Fix cascade relationships between User and UserRole classes (Peter Mottram).
+   * Use left join for state relationship of Address class
+     (Jeff Boes, Peter Mottram).
+   * Fix problems with path method in Product class
+     (Peter Mottram, GH #133, #145).
+   * Overload delete in Address and OrderlinesShipping classes (Peter Mottram).
+
+   [DOCUMENTATION]
+
+   * Add note about MySQL strict mode settings and on_connect_do parameters
+     to DatabaseSupport manual (Peter Mottram).
+   * Fix link to PriceModifier class in Manual::Classes (Stefan Hornburg).
+   * Fix start_date and end_date links in POD for PriceModifier class
+     (Stefan Hornburg).
+   * Fix create database statement for MySQL (Marco Pessotto, GH #147).
+   * Fix wrong method name for has_descendant in POD for Navigation class
+     (Sam Batschelet).
+   * Clear out boilerplate from modules (Stefan Hornburg, Sam Batschelet,
+     Peter Mottram, GH #134, #137)
+   * Add description section to POD for Address class (Peter Mottram).
+
+   [TESTS]
+
+   * Update PriceModifier tests (Peter Mottram).
+   * Replace on_connect_call with on_connect_to in MySQL test role
+     (Peter Mottram).
+   * Add test for attribute_iterator method from Product class
+     with hashref argument (Peter Mottram).
+   * Clean up relationship tests (Peter Mottram).
+   * Allow fixtures to avoid some foreign key constraints on clear_orders
+     (Peter Mottram).
+   * Add tests for Address delete cascades (Peter Mottram).
+   * Add fixtures for ShipmentCarrier and ShipmentRate classes (Peter Mottram).
+   * Remove pod tests from schema_sanity.t (Peter Mottram).
+
+0.060 Thu Nov 27 16:30:51 2014 CET
+
+   [BUG FIXES]
+
+   * Fix many-to-many zones relationship in State class
+     (GH #132, Grega Pompe, Peter Mottram).
+
+0.060_03 Thu Nov 27 11:43:22 2014 CET
+
+   [ENHANCEMENTS]
+
+   * Add name method to User class (Peter Mottram).
+   * Add quantity_in_stock to Product class (Peter Mottram).
+
+   [BUG FIXES]
+
+   * Fix columns and relations with same name in the Message class (Peter Mottram).
+
+   [TESTS]
+
+   * Add first_name and last_name data to user fixtures (Peter Mottram).
+   * Use hashrefs in fixtures for add_attributes calls prevent warnings (Peter Mottram).
+   * Add more variants and also simple product attributes to fixtures (Peter Mottram).
+   * Change Test::Role::Fixtures to use Moo::Role (Peter Mottram).
+   * Add navigation fixture tests (Peter Mottram).
+
+0.060_02 Thu Nov  6 16:13:18 2014 CET
+
+   [ENHANCEMENTS]
+
+   * Allow optional argument for precision in average_rating method
+     of the Product class (Peter Mottram).
+
+   [TESTS]
+
+   * Add load_all_fixtures method to test fixtures (Peter Mottram).
+   * Add fixtures to Test::Fixtures that were previously missed (Peter Mottram).
+   * Test fixtures can now be used by consuming modules (Peter Mottram).
+   * Merge all fixtures from the populate_ic5 script in the demo shop (Peter Mottram).
+
+0.060_01 Tue Nov  4 21:05:45 2014 CET
+
+   [API CHANGES]
+
+   * Switch to DBIx::Class::Candy (Peter Mottram).
+
+   * Pricing changes (Peter Mottram, Sam Batschelet, GH #117, #122):
+     - GroupPricing class renamed to PriceModifier
+     - start_date and end_date columns added
+
+   * Fix primary key columns with multiple plurals (Jure Kodzoman, Peter Mottram):
+     - navigation_attributes_values_id to navigation_attribute_values_id
+     - product_attributes_values_id to product_attribute_values_id
+     - user_attributes_values_id to user_attribute_values_id
+
+   * Review related changes (Peter Mottram, Sam Batschelet):
+     - add top_reviews and average_rating to Product class
+     - reviews method now accepts search args
+
+   * Add description to Role class (Peter Mottram).
+
+   [ENHANCEMENTS]
+
+   * Add many_to_many relationship from Navigation to Product class (Peter Mottram).
+   * Add siblings_with_self method to Navigation class (Peter Mottram).
+   * Add tier_pricing and selling_price methods to Product class (Peter Mottram).
+   * New helper interchange6-create-schema-png (Peter Mottram).
+   * Add search_attribute_values (Sam Batschelet, GH #101).
+
+   [BUG FIXES]
+
+   * Fix order_by in attribute_iterator method of the Product class (Peter Mottram).
+   * Make name column of Role class unique (Peter Mottram).
+
+   [DOCUMENTATION]
+
+   * Add instructions on creating databases (Peter Mottram, GH #103).
+
+   [TESTS]
+
+   * Add quote_names to db engine connect_info (Peter Mottram).
+   * Replace Mock::DateTime with MockTime (Peter Mottram).
+   * Add role and pricing fixtures (Peter Mottram, Sam Batschelet).
+
+0.053 Thu Oct  9 14:39:59 2014 EDT
+
+   [BUG FIXES]
+
+   * Remove _map_namespaces method from Interchange6::Schema (Peter Mottram).
+
+   [TESTS]
+
+   * Adjust shipment test to deal with SQLite's notion of numeric columns (Peter Mottram).
+   * Skip MySQL tests if the constructor dies (Peter Mottram).
+   * Force standard locale for PostgreSQL tests (Peter Mottram).
+
+0.052 Sun Oct  5 08:24:24 2014 EDT
+
+   [BUG FIXES]
+
+   * Fix relationship between Session and PaymentOrder result classes (Peter Mottram).
+
+0.051 Fri Aug 15 11:06:33 2014 CEST
+
+   [BUG FIXES]
+
+   * Fix odd error with populating zones (Peter Mottram, Stefan Hornburg,
+     Sam Batschelet, GH #102).
+   * Turn session relationship in PaymentOrder result class into might_have
+     (Stefan Hornburg).
+
+   [DOCUMENTATION]
+
+   * Add explanation of payment_sessions_id and sessions_id fields to the
+     documentation of the PaymentOrder result class (Stefan Hornburg).
+
+   [TESTS]
+
+   * Add checks on payment_orders to expire test (Marco Pessotto, GH #107).
+   * Add test to check if the payment is still there after session removal
+     (Marco Pessotto, GH #106).
+   * Fix flat rate shipping price test (Peter Mottram, GH #105).
+   * Switch from die to plan skip_all if Test::PostgreSQL->new fails
+     (Peter Mottram, GH #104).
+
+0.050 Wed Aug 13 10:37:54 2014 CEST
+
+   [API CHANGES]
+
+   * Add Message, ProductReview and OrderComment result class (Peter Mottram).
+   * Remove filter_column from username in User result class and replace it
+     with overloaded new and update methods (Peter Mottram, see RT #95054).
+
+   [ENHANCEMENTS]
+
+   * Stop using literal defaults for booleans (Peter Mottram).
+   * Add primary key to Permission result class (Peter Mottram, GH #97).
+   * Improve methods of Zone result class to support ISO codes as input
+     (Peter Mottram).
+   * Add unique constraint to State result class (Peter Mottram).
+
+   [BUG FIXES]
+
+   * Remove superfluous many_to_many relationship from ProductAttribute
+     result class (Grega Pompe, GH #94)
+   * Round price in shipment price to avoid SQLite problems.
+
+   [DOCUMENTATION]
+
+   * Add Tree::AdjacencyList accessors to Navigation result class 
+     (Peter Mottram, GH #98).
+   * Improve documentation on attribute_iterator method from Product result
+     class (Peter Mottram).
+
+   [TESTS]
+
+   * Extend variant tests (Peter Mottram).
+   * Switch to role based testing with Test::Roo (Peter Mottram).
+   * Remove Test::Most from schema sanity test (Peter Mottram, GH #84).
+   * Update available Perl versions for Travis (Peter Mottram).
+
+0.040 Wed Jul  2 11:13:09 2014 CEST
+
+   [API CHANGES]
+
+   * Update result class relationships and methods with new naming standards
+     outlined in issue (Sam Batschelet, Peter Mottram, GH #76, GH #81).
+   * Nickname is no longer lower-cased in User class (Peter Mottram).
+   * Change precision to decimal_places in Tax class (Peter Mottram).
+   * Remove postal ranges from Zone class (Peter Mottram).
+
+   [ENHANCEMENTS]
+
+   * Change password encryption to bcrypt (Peter Mottram, GH #24).
+   * Add has_many relationship from Country to State (Peter Mottram).
+   * Add zone_states and states relationships to State class
+     (Sam Batschelet, GH #66).
+   * Add shipment_rates has_many relationship to ShipmentMethod class
+     (Sam Batschelet).
+   * Add min_weight, max_weight and shipment_method belongs_to relationship
+     to ShipmentRate class (Sam Batschelet).
+
+   [BUG FIXES]
+
+   * Remove media_displays relationship from Product (Peter Mottram).
+   * Fix cart and cart resultset setup (Peter Mottram, GH #79).
+   * Fix role->users many-to-many relationship (Stefan Hornburg (Racke)).
+
+   [TESTS]
+
+   * Get rid of TEST_DBIC environment variable (Stefan Hornburg (Racke)).
+   * Add travis support (Peter Mottram, GH #69).
+   * Add support for code coverage tests (Peter Mottram).
+   * Add flat rate shipping test (Sam Batschelet).
+
+   [DOCUMENTATION]
+
+   * Add shipment result classes to main POD (Stefan Hornburg (Racke)).
+   * Fix typo in POD of Zone class (Stefan Hornburg (Racke)).
+
+0.032 Mon Apr  7 19:59:30 2014 CEST
+
+   [BUG FIXES]
+
+   * Add missing relationships to country and shipments (Marco Pessotto, GH #65).
+   * Fix Result::Tax and Component::Validation classes due to update bug
+     (Peter Mottram).
+
+   [TESTS]
+
+   * Add tests for specific databases with Test::DBIx::Class (Peter Mottram).
+   * Code coverage tests for zones (Peter Mottram).
+
+0.031 Sat Apr  5 18:08:27 2014 CEST
+
+   [BUG FIXES]
+
+   * Use Test::DBIx::Class safely for RELEASE_TESTING only
+     (Peter Mottram, GH #63).
+
+   [TESTS]
+
+   * Silence media test (Stefan Hornburg (Racke)).
+
+0.030 Fri Apr  4 18:48:47 2014 CEST
+
+   [ENHANCEMENTS]
+
+   * Extend path method from Product result class to use "type" parameter as
+     search option (Stefan Hornburg (Racke)).
+
+   * Overhaul media result classes (Marco Pessotto, GH #54, #59, #61).
+
+   * Add shipment result classes (Sam Batschelet, GH #57).
+
+   * Add basic schema sanity testing and fix result classes based on the
+     result (Peter Mottram, GH #56, #60).
+
+   * Added column payment_fee to PaymentOrder result class
+     (Marco Pessotto, GH #53).
+
+   [BUG FIXES]
+
+   * Fix missing size of foreign keys for country_iso_code.
+     Caused problems which PostgreSQL where columns ended up with size 1
+     (Stefan Hornburg (Racke)).
+
+   * Add unique constraint on zone in Result::Zone (Peter Mottram, GH #55).
+
+   * Bump up Perl requirement to 5.14 (Peter Mottram, GH #51).
+
+0.020 Mon Mar 31 17:12:33 2014 CEST
+
+   [API CHANGES]
+
+   * Switch to using single primary key for CartProduct result class
+     (Stefan Hornburg (Racke)).
+
+   [ENHANCEMENTS]
+
+   * Add NavigationAttribute and NavigationAttributeValue result classes
+     (Sam Batschelet, GH #36).
+   * Add Zone, ZoneCountry and ZoneState result classes (Peter Mottram, GH #33).
+   * Add Role::Errors class (Peter Mottram, GH #33).
+   * Add Tax result and resultset class (Peter Mottram, GH #38).
+   * Add Component::Validation class (Peter Mottram, GH #48).
+
+   [BUG FIXES]
+
+   * Fix definition of numeric fields (Peter Mottram, GH #49).
+
+   [DOCUMENTATION]
+
+   * Reorganize classes in main POD.
+
+0.019 Fri Mar 21 09:11:06 2014 CET
+
+   [ENHANCEMENTS]
+
+   * Inflate data from datetime columns into DateTime objects, alongside
+     with tests for classes missing the inflation component (Peter Mottram).
+
+   [API CHANGES]
+
+   * Change states_iso_code column to states_id foreign_key in Address
+     result class (Sam Batschelet).
+   * Make country_iso_code a foreign key in State result class 
+     (Sam Batschelet).
+   * Add State and Country relationships to Address result class 
+     (Sam Batschelet).
+   * Change name of primary_key for State result class to states_id
+     (Sam Batschelet).
+
+   [BUG FIXES]
+
+   * Prevent warning originating from find_variant method caused by missing
+     values in input (Stefan Hornburg (Racke)).
+
+   [TESTS]
+
+   * Avoid DBIC::Storage::DBI::SQLite RT79576 by adding a prerequisite on
+     DBD::SQLite 1.38_01 (Peter Mottram).
+
+0.018 Tue Mar 11 17:11:35 2014 CET
+
+   [API CHANGES]
+
+   * Replace order_number with orders_id as foreign key for PaymentOrder and
+     Orderline resultsets.
+
+   * Remove shipping_method and tracking_number from Orderline resultset.
+
+   * Fix many_to_many relationships.
+
+0.017 Mon Mar 10 01:00:54 2014 CET
+
+   [API CHANGES]
+
+   * Increase size of sku column from 32 to 64 (GH #19, Šimun Kodžoman).
+
+0.016 Sat Mar  8 18:32:53 2014 CET
+
+   [API CHANGES]
+
+   * Remove tracking_number field from Order schema.
+
+   [ENHANCEMENTS]
+
+   * Add methods find_attribute_value, update_attribute_value and
+     find_or_create_attribute to User result class.
+
+   [DOCUMENTATION]
+
+   * Move column descriptions for the Product resultset to the individual
+     columns.
+
+0.015 Sun Feb 23 10:41:44 2014 CET
+
+   [API CHANGES]
+
+   * Add users_id column to PaymentOrder result class.
+   * Add shipping_addresses_id column to Order result class.
+
+   [BUG FIXES]
+
+   * Fix User to Role many_to_many relationship (GH #15).
+
+0.014 Sat Feb 15 15:52:37 2014 CET
+
+   [API CHANGES]
+
+   * Add nickname column to User result class.
+   * Add created and last_modified columns to Product result class.
+
+0.013 Mon Jan 27 14:25:43 2014 CET
+
+   [API CHANGES]
+
+   * Change author column to author_users_id in Media result class and link it to User result class.
+   * Add canonical and Variant accessors to Product result class.
+     This implies is_nullable for canonical_sku column.
+   * Add UserAttributeValue result class.
+   * Add type, priority and dynamic column to Attribute result class.
+   * Add recommend, proper sku relationship and drop name from Review result class.
+
+   [ENHANCEMENTS]
+
+   * Add has_many ProductAttribute relationship to Attribute result class.
+   * Add methods for adding, updating and deleting attributes to User result class.
+   * Add add_variants and find_variant method to Product result class.
+   * Let attributes_iterator method of Product result class return hash reference on request.
+   * Add selected column to output of attribute_iterator method.
+   * Return all attributes of children resp. sibling products from attribute_iterator method.
+
+   [TESTS]
+
+   * Add attribute_iterator tests.
+
+0.012 Tue Jan  7 16:07:29 2014 CET
+
+   [API CHANGES]
+
+   * Rename when_added column of CartProduct result class to created.
+   * Add last_modified column to CartProduct result class.
+
+   [ENHANCEMENTS]
+
+   * Add attribute_iterator method to Product result class.
+   * Add custom Session resultset with expire method.
+
+0.011 Thu Jan  2 14:14:18 2014 CET
+
+   [API CHANGES]
+
+   * Add Attribute, AttributeValue and ProductAttributeValue result classes.
+   * Change ProductValue result class.
+   * Remove ProductAttributes result class.
+
+0.010 Fri Dec 27 13:24:45 2013 CET
+
+   [API CHANGES]
+
+   * Use created and last_modified columns for Navigation result set
+     instead of entered.
+   * Rename zip column in Address result set to postal_code.
+   * Make order_number in PaymentOrder result class nullable.
+
+   [BUG FIXES]
+
+   * Add unique constraint on username.
+
+   [TESTS]
+
+   * Add tests for Navigation result class and path method from Product
+     result class.
+   * Test password encryption.
+   * Add POD tests.
+
+   [DOCUMENTATION]
+
+   * Add documentation for records method in Populate classes.
+   * Fix is_nullable value in documentation of Cart result class.
+
+0.009 Sat Dec 21 01:23:04 2013 CET
+
+   [API CHANGES]
+
+   * Use datetime type for all created and last modified columns.
+   * Use set_on_update for all last_modified columns.
+   * Change uri and gtin in Product result class to allow NULL and require unique.
+   * Change weight to include two digits.
+   * Change column types for primary keys of Country and State result class.
+
+   [TESTS]
+
+   * Add simple test for Address and Session result class.
+
+0.008 Mon Dec 16 21:20:27 2013 EST
+
+   [API CHANGES]
+
+    * Remove primary key country_iso_code from State resultset.
+
+    [ENHANCEMENTS]
+
+    * Added command line parameters to interchange6-create-database. -Kaare Rasmussen
+    * Added StateLocale and CountryLocale populate classes.
+
+    [TESTS]
+
+    * Add a few additional tests with State and Country resultset.
+
+0.007 Thu Dec 12 09:30:25 2013 CET
+
+    [API CHANGES]
+
+    * Remove ProductClass from Schema.
+
+    [TESTS]
+
+    * Add a few more tests with Product and Country resultset.
+
+    [DOCUMENTATION]
+
+    * Add a list of resultsets to main POD.
+    * Add description to main POD.
+
+0.006 Mon Dec  9 16:19:42 2013 CET
+
+    [API CHANGES]
+
+    * Change primary key for Country resultset to country_iso_code.
+    * Change default value of show_states in Country resultset to false.
+
+    [ENHANCEMENTS]
+
+    * Add State resultset.
+
+    [BUG FIXES]
+
+    * Make parent_id in Navigation resultset nullable.
+      Otherwise we can't add toplevel records because of the constraint
+      imposed by DBIx::Tree.
+
+    [DOCUMENTATION]
+
+    * Fix mismatch of POD for when_added column in CartProduct resultset (GH #4).
+
+0.005 Sat Dec  7 20:59:04 2013 CET
+
+    [API CHANGES]
+
+    * Change column parent in Navigation resultset to parent_id.
+
+    [ENHANCEMENTS]
+
+    * Use Tree::AdjacencyList with Navigation resultset.
+    * Add Country and Review resultset.
+    * Add path method to Product resultset.
+
+0.004 Sat Nov 30 14:47:13 2013 CET
+
+    [BUG FIXES]
+
+    * Allow NULL values for foreign keys users_id and sessions_id.
+    * Add missing primary key directive to CartProduct resultset.
+    * Use datetime type in CartProduct resultset.
+
+0.003 Tue Nov 19 20:58:07 2013 CET
+
+    [BUG FIXES]
+
+    * Pass mysql_version to producer to avoid broken booleans (GH #1).
+    * Remove default value from sessions' last_modified column.
+    * Use datetime types in user resultset.
+
+    [ENHANCEMENTS]
+
+    * Add simple schema test with DBICx::TestDatabase.
+    * Added EncodedColumn for password field.
+
+0.002 Fri Nov 15 12:24:47 2013 CET
+
+    * Mark interchange6-create-database for install.
+
+0.001 Fri Nov 15 10:31:02 2013 CET
+
+    * Initial release.

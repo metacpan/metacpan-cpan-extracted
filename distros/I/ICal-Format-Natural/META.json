@@ -1,0 +1,56 @@
+{
+   "abstract" : "Create an Data::ICal object with natural parsing logic.",
+   "author" : [
+      "Andrew Jones <andrew@arjones.co.uk>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300006, CPAN::Meta::Converter version 2.113640",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "ICal-Format-Natural",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::ICal" : 0,
+            "Data::ICal::Entry::Event" : 0,
+            "DateTime::Format::ICal" : 0,
+            "DateTime::Format::Natural" : 0,
+            "Exporter" : 0,
+            "strict" : 0,
+            "warnings" : 0
+         }
+      },
+      "test" : {
+         "requires" : {
+            "English" : 0,
+            "File::Find" : 0,
+            "File::Temp" : 0,
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/andrewrjones/perl5-ICal-Format-Natural/issues"
+      },
+      "homepage" : "https://github.com/andrewrjones/perl5-ICal-Format-Natural",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/andrewrjones/perl5-ICal-Format-Natural.git",
+         "web" : "https://github.com/andrewrjones/perl5-ICal-Format-Natural"
+      }
+   },
+   "version" : "1.121310"
+}
+

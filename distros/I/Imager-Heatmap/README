@@ -1,0 +1,52 @@
+Imager-Heatmap version 0.03
+===========================
+
+Imager::Heatmap - Perl extension for drawing Heatmap using Imager
+
+SYNOPSIS
+
+    use Imager::Heatmap;
+    my $hmap = Imager::Heatmap->new(
+        xsize  => 640,        # Image width
+        ysize  => 480,        # Image height
+        xsigma => 10,         # Sigma value of X-direction.
+        ysigma => 10,         # Sigma value of Y-direction.
+    );
+
+    # Add point datas to construct density matrix
+    $hmap->insert_datas(@piont_datas); # @point_datas should be: ( [ x1, y1, weight1 ], [ x2, y2, weight2 ] ... )
+
+    $hmap->insert_datas(...); # You can call multiple times to add large data that cannot process at a time.
+
+    # After adding datas, you could get heatmap as Imager instance.
+    my $img = $hmap->draw;
+
+DESCRIPTION
+
+    Imager::Heatmap is a module to draw heatmap using Imager.
+
+    This module calculates probability density matrix from input data and
+    map a color for each pixels to represent density of input data.
+
+INSTALLATION
+
+    To install this module type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+AUTHOR
+    Yuto KAWAMURA(kawamuray) <kawamuray.dadada@gmail.com>
+
+SEE ALSO
+    Imager(3), Imager::Transformations(3)
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2012 by Yuto KAWAMURA(kawamuray)
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.12.3 or,
+at your option, any later version of Perl 5 you may have available.

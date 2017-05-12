@@ -1,0 +1,30 @@
+=pod
+
+=head1 NAME
+
+IUP::Canvas::Pattern - [special Canvas helper] Fill pattern for use with IUP::Canvas
+
+=head1 SYNOPSIS
+
+ $pat = IUP::Canvas::Pattern->new( [ [...], [...] ] );   #1 param
+ $pat = IUP::Canvas::Pattern->new( $w, $h );             #2 params
+ 
+ $value = $pat->Pixel($x, $y);
+ $pat->Pixel($x, $y, $value);
+ $pat->Width();
+ $pat->Height();
+ $pat->Data();
+ 
+ $canvas->cdPattern($pat);
+ $canvas->wdPattern($pat, $w_mm, $h_mm);
+ $curpat = $canvas->cdGetPattern();
+
+=head1 DESCRIPTION
+
+B<IUP::Canvas::Bitmap> is a helper class used by L<IUP::Canvas> methods: L<cdPattern|IUP::Canvas/"cdPattern()">, L<wdPattern|IUP::Canvas/"wdPattern()"> and L<cdGetPattern|IUP::Canvas/"cdGetPattern()">
+
+=head1 SEE ALSO
+
+L<IUP::Canvas>
+
+=cut

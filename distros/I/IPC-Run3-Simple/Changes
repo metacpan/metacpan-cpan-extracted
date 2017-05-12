@@ -1,0 +1,33 @@
+Revision history for IPC-Run3-Simple
+
+0.011     2012-04-23 12:28:24 America/Boise
+  - added undocumented debugging setup
+
+0.010     2012-03-02 12:21:25 America/Boise
+  - fix croak when croak_on_err is true
+
+0.009     2012-03-01 17:30:24 America/Boise
+  - changed handling of default stdin and stdout to match more closely what
+    I wanted
+
+0.008     2012-03-01 13:08:38 America/Boise
+  - fixed doc error for croak_on_err function
+  - changed function to return dereferenced scalar instead of scalar reference
+  - fixed tests to match change in how scalars are returned
+
+0.007     2012-02-29 12:12:34 America/Boise
+  - fixed test for sleep and Time::HiRes not installed
+
+0.006     2012-02-20 22:43:31 America/Boise
+  - fixed up some documentation
+  - added timing on system call
+  - added option to tee output
+  - added option functions to export_ok
+
+0.005     2012-02-15 12:09:47 America/Boise
+  - Forgot to include the version number
+
+0.004     2012-02-15 11:22:16 America/Boise
+  - Started using new Changes file format
+  - Updated dzil and weaver files
+  - Changed defaults to match my own preferences

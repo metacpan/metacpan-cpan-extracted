@@ -1,0 +1,17 @@
+<!--keep the peaks above a absolute intesity value of 40-->
+
+<ExpMsMsSpectrumFilter>
+<oneExpMsMsSpectrumFilter spectrumType="msms" name="dummy">
+	        <level>peaks</level>	
+		<action type="removeOther">		
+		       <threshold type="sort">	
+			   <relativeTo>absValue</relativeTo>							
+			   <thresholdValue>40</thresholdValue>
+			   <comparator>gt</comparator>						
+		       </threshold>
+                </action>
+		<filterValue type="directValue">							
+			<name>fragment.intensity</name>						
+		</filterValue>
+	</oneExpMsMsSpectrumFilter>
+</ExpMsMsSpectrumFilter>

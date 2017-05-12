@@ -1,0 +1,177 @@
+JNI (JAVA NATIVE INTERFACE) EXTENSION
+-------------------------------------
+Inline::Java now provides a JNI extension that allows you to load the Java 
+virtual machine as shared object instead of running it as a separate process. 
+
+
+PLATFORM AVAILABILITY
+---------------------
+The JNI extension is available on all supported platforms.
+
+The extension builds properly on all platform, but problems can occur when
+running it or tweaking maybe necessary on certain platforms. All help
+is welcome if anyone out there is a JNI expert.
+
+The reason why JNI is a bit complex under Linux/Solaris is because of 
+threads. The Java Virtual Machine (libjvm.so) shared object uses native 
+threads when embedded inside another program and that host program (in
+this case Perl) must link with the same threads library for everything 
+to work properly. Starting with Perl 5.8, this works fine. With previous
+versions, you may get around rebuilding Perl by setting LD_PRELOAD. 
+The only problems encountered where that when setting LD_PRELOAD before 
+running the test suite, the LD_PRELOAD affects make as well and on Solaris 
+some crashes were seen. Read more on this in the Solaris section below.
+
+Note: Make sure the directories listed at the end of the installation
+procedure are included in your LD_LIBRARY_PATH (PATH on Win32) environment
+variable. This JNI extension will not load properly the the Java shared 
+objects cannot be located at runtime.
+
+
+OVERVIEW
+--------
+              +----------+------------+------------+
+              | JDK1.3.1 | J2SDK1.4.2 | J2SDK1.5.0 |
++-------------+----------+------------+------------+
+| Win32       |    ok    |     ok     |     ok     |
++-------------+----------+------------+------------+
+| cygwin      |    ok*   |     ok*    |     ok*    |
++-------------+----------+------------+------------+
+| Linux RH7.3 |    ok*   |     ok*    |     ?      |
++-------------+----------+------------+------------+
+| Linux RH9.0 |    ok*   |     ok*    |     ok     |
++-------------+----------+------------+------------+
+| Soloris 2.8 |    ok*   |      ?     |     ?      |
++-------------+----------+------------+------------+
+*   : Read below
+
+
+WIN32
+-----
+Java 2 SDK 1.3.1:
+	The JNI extension runs without problems.
+
+Java 2 SDK 1.4.2:
+	The JNI extension runs without problems.
+
+
+LINUX
+-----
+Java 2 SDK 1.3.1:
+    The JNI extension runs without problems with this Java 2 SDK, provided
+that you use Perl >= 5.8.0 or do one of the following:
+
+1- Rebuild perl and add the libpthread library in front of all other 
+   libraries (see the 'BUILDING PERL' section below). You should also 
+   use your system's malloc (not perl's).
+   This is the recommended solution.
+
+2- Add the proper version of libpthread.so to your LD_PRELOAD environment 
+   variable. On my test system this was /lib/i686/libpthread.so.0.
+   This solution seems viable but thread related crashes/hang-ups have
+   been reported on some systems. If make crashes while running the test 
+   suite, try running it like this:
+     % for i in `ls t/*.t` ; do perl -Mblib $i; done
+
+Also, make sure you use do not use 'classic' VM. This one should only
+be used with 'green threads', which don't seem to work with JNI. Use either 
+the 'client' or the 'server' VMs.
+
+Java 2 SDK 1.4.2:
+    The same as Java 2 SDK 1.3.1 applies.
+
+	
+SOLARIS
+-------
+Java 2 SDK 1.3.1:
+    The JNI extension runs without problems with this Java 2 SDK, provided
+that you use Perl >= 5.8.0 or do one of the following:
+
+1- Rebuild perl and add the libthread library in front of all other 
+   libraries (see the 'BUILDING PERL' section below). You should also 
+   use gcc and your system's malloc (not perl's).
+   This is the recommended solution.
+
+2- Add the proper version of libthread.so to your LD_PRELOAD environment 
+   variable. On my test system this was /lib/libthread.so.
+   This solution seems viable but thread related crashes/hang-ups have
+   been reported on some systems. If make crashes while running the test 
+   suite, try running it like this:
+     % for i in `ls t/*.t` ; do perl -Mblib $i; done
+
+
+CYGWIN
+------
+Java 2 SDK 1.3.1:
+   The JNI extension runs without problems.
+
+    PerlInterpreter:
+        Compiles but stand-alone (non-JNI initiated) Java interpreter locks
+        up when attempting to load the DLL.  This is a known issue with
+        initialization of the cygwin1.dll from a non-cygwin DLL or EXE, which
+        has been "broken" since at least Cygwin 1.5.13.
+        A possible work around might be to build the PerlInterpreter against
+        a native Win32 Perl distribution with '-mno-cygwin' GCC compile flag,
+        although this means you would be using native Perl instead of Cygwin
+        Perl when using PerlInterpreter.
+
+Java 2 SDK 1.4.2:
+   The JNI extension runs without problems.
+
+   PerlInterpreter:
+       The same as Java 2 SDK 1.3.1 applies.
+
+   PerlNatives:
+       Compiles and runs fine in a JNI-initiated interpreter, but stand-alone
+       (non-JNI initiated) Java interpreter locks up when attempting to load
+       the DLL.  This is a known issue with initialization of the
+       cygwin1.dll from a non-cygwin DLL or EXE, which has been "broken"
+       since at least Cygwin 1.5.13.
+
+Java 2 SDK 1.5.0:
+   The same as Java 2 SDK 1.4.2 applies.
+
+
+BUILDING PERL
+-------------
+Here's how to rebuild Perl (version < 5.8.0) to get the JNI extension to 
+work properly:
+
+- Use all the defaults or whatever makes sense, but no threaded Perl 
+  and no interpreter threads, i.e.:
+
+  Build a threading Perl? [n] n 
+  Build Perl for multiplicity? [n] n 
+
+- When asked what libraries to use, type -lthread (Solaris) or -lpthread 
+  (Linux) and tack on whatever the default is at the end, i.e.:
+
+  What libraries to use? -> [-lnsl -lndbm -lgdbm -ldb -ldl -lm -lc -lcrypt 
+  -lutil] -lpthread -lnsl -lndbm -lgdbm -ldb -ldl -lm -lc -lcrypt -lutil 
+  (under Linux it's -lpthread, but for Solaris it's -lthread) 
+
+- Make sure that you do not use perl's own malloc, i.e.: 
+
+  Do you wish to attempt to use the malloc that comes with perl5? -> [n] n 
+
+
+RUNNING Inline::Java WITH THE JNI EXTENSION
+-------------------------------------------
+To run Inline::Java with the JNI extension, do one of the following:
+
+   - set the JNI configuration option to 1
+   - set the PERL_INLINE_JAVA_JNI environment variable to 1
+
+To run the test suite (make test) with the JNI extension you must use the 
+PERL_INLINE_JAVA_JNI environment variable
+
+
+USING THE 'SHARED_JVM' MODE
+---------------------------
+Inline::Java 0.30 introduced a 'SHARED_JVM' mode that allows many clients 
+to connect to the same Inline::Java Java server. The 'SHARED_JVM' mode is 
+meant to be used with forking processes such as Apache with mod_perl. The 
+'SHARED_JVM' mode does NOT work along with the JNI mode. In fact the author 
+was not able to successfully fork the Java Virtual Machine under any 
+circumstances.
+

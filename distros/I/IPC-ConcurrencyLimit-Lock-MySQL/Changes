@@ -1,0 +1,11 @@
+Revision history for Perl extension IPC::ConcurrencyLimit::Lock::MySQL
+
+0.03  Tue Oct 01 23:45 2013
+  - Distribution fixes.
+
+0.02  Mon Sep 12 14:30 2011
+  - Robustify when not running DB tests.
+
+0.01  Fri Sep  2 20:00 2011
+  - original version
+

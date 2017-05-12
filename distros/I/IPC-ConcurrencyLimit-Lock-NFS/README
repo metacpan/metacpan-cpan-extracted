@@ -1,0 +1,53 @@
+NAME
+    IPC::ConcurrencyLimit::Lock::NFS - Locking via NFS
+
+SYNOPSIS
+      use IPC::ConcurrencyLimit;
+
+DESCRIPTION
+    This locking strategy uses File::SharedNFSLock to implement locking on
+    NFS shares across multiple hosts. The locking technique employed by
+    "File::SharedNFSLock" should work on other, local file systems as well.
+    If in doubt, do your own testing.
+
+    Beware: If processes are killed harshly without being able to clean up,
+    stale lock files may remain that are not recoverable. In principle,
+    "File::SharedNFSLock" can reclaim them after a timeout, but that feature
+    does not seem to make a lot of sense in this context. All
+    "File::SharedNFSLock" gotchas apply.
+
+METHODS
+  new
+    Given a hash ref with options, attempts to obtain a lock in the pool. On
+    success, returns the lock object, otherwise undef.
+
+    Required options:
+
+    "path"
+      The directory that will hold the lock files. Created if it does not
+      exist. It is suggested not to use a directory that may hold other
+      data.
+
+    "max_procs"
+      The maximum no. of locks (and thus usually processes) to allow at one
+      time.
+
+  lock_file
+    Returns the full path and name of the lock file.
+
+  path
+    Returns the directory in which the lock files resides.
+
+AUTHOR
+    Steffen Mueller, "smueller@cpan.org"
+
+COPYRIGHT AND LICENSE
+     (C) 2011 Steffen Mueller. All rights reserved.
+ 
+     This code is available under the same license as Perl version
+     5.8.1 or higher.
+ 
+     This program is distributed in the hope that it will be useful,
+     but WITHOUT ANY WARRANTY; without even the implied warranty of
+     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+

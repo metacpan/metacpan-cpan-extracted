@@ -1,0 +1,27 @@
+CHANGES
+INSTALL
+MANIFEST
+Makefile.PL
+README
+bin/ip2cc.PL
+dbmScripts/whois_filenames
+dbmScripts/ipauth_loader.pl
+dbmScripts/ipauth_maker.pl
+dbmScripts/ipcc_loader.pl
+dbmScripts/ipcc_maker.pl
+lib/IP/Authority/auth.gif
+lib/IP/Authority/ipauth.gif
+lib/IP/Authority.pm
+lib/IP/Country/Fast/cc.gif
+lib/IP/Country/Fast/ip.gif
+lib/IP/Country/Fast.pm
+lib/IP/Country/MaxMind.pm
+lib/IP/Country/Medium.pm
+lib/IP/Country/Slow.pm
+lib/IP/Country.pm
+t/01object_creation.t
+t/02fast_lookup.t
+t/03medium_lookup.t
+t/04auth_lookup.t
+t/05fast_bench.t
+META.yml                                 Module meta-data (added by MakeMaker)

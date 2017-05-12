@@ -1,0 +1,82 @@
+SYNOPSIS
+
+     use IO::Prompt::I18N qw(prompt confirm);
+     use Text::LocaleDomain 'My-App';
+    
+     my $file = prompt(__"Enter filename");
+    
+     if (confirm(__"Really delete filename", {lang=>"id", default=>0})) {
+         unlink $file;
+     }
+
+DESCRIPTION
+
+    This module provides the prompt function to ask for a value from STDIN.
+    It features prompt text, default value, validation (using regex),
+    optional/required. It also provides confirm wrapper to ask yes/no, with
+    localizable text.
+
+FUNCTIONS
+
+ prompt([ $text[, \%opts] ]) => val
+
+    Display $text and ask value from STDIN. Will re-ask if value is not
+    valid. Return the chomp-ed value.
+
+    Options:
+
+      * var => \$var
+
+      * required => bool
+
+      If set to true then will require that value is not empty
+      (zero-length).
+
+      * default => VALUE
+
+      Set default value.
+
+      * show_default => bool (default: 1)
+
+      Whether to show default value if defined.
+
+      * regex => REGEX
+
+      Validate using regex.
+
+ confirm([ $text, [\%opts] ]) => bool
+
+    Display $text (defaults to Confirm in English) and ask for yes or no.
+    Will return bool. Basically a convenient wrapper around prompt.
+
+    Options:
+
+      * lang => str
+
+      Support several languages (id, en, fr). Default to using
+      LANG/LANGUAGE or English. Will preset yes_words and no_words and adds
+      the choice of words to $text. Will die if language is not supported.
+      Here are the supported languages:
+
+        lang  yes_words     no_regex   default text
+        ----  ---------     --------   ------------
+        en    y, yes        n, no      Confirm
+        fr    o, oui        n, non     Confirmer
+        id    y, ya         t, tidak   Konfirmasi
+
+      * yes_words => array
+
+      Overrides preset from lang.
+
+      * no_words => array
+
+      Overrides preset from lang.
+
+      * default => bool
+
+      Set default value.
+
+SEE ALSO
+
+    IO::Prompt, IO::Prompt::Tiny, Term::Prompt, Prompt::Timeout
+

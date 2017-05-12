@@ -1,0 +1,123 @@
+=for comment based on iup-3.5 - http://www.tecgraf.puc-rio.br/iup/en/elem/iupfill.html
+
+=head1 NAME
+
+IUP::Fill - [GUI element] dynamically occupies empty spaces always trying to expand itself
+
+=head1 DESCRIPTION
+
+Creates a Fill composition element, which dynamically occupies empty
+spaces always trying to expand itself. Its parent B<must> be an
+L<IUP::Hbox|IUP::Hbox> or an L<IUP::Vbox|IUP::Vbox>. If an EXPAND is set on at least one of the
+other children of the box, then the Fill is ignored.
+
+It does not have a native representation.
+
+=head1 USAGE
+
+=head2 CREATION - new() method
+
+ $fill = IUP::Fill->new( SIZE=>30 );
+ 
+B<Returns:> the identifier of the created element, or C<undef> if an error occurs.
+
+NOTE: You can pass to C<new()> other C<ATTRIBUTE=E<gt>'value'> or C<CALLBACKNAME=E<gt>\&func> pairs relevant
+to this element - see L<IUP::Manual::02_Elements|IUP::Manual::02_Elements/"new()">.
+
+=head2 ATTRIBUTES
+
+For more info about concept of attributes (setting/getting values etc.)
+see L<IUP::Manual::03_Attributes|IUP::Manual::03_Attributes>. Attributes specific to this element:
+
+=over
+
+=item L<EXPAND|IUP::Manual::03_Attributes/EXPAND>
+
+I<(non inheritable)>
+
+Ignored. If B<User> size is not defined, then when inside a L<IUP::Hbox|IUP::Hbox> EXPAND is
+HORIZONTAL, when inside a L<IUP::Vbox> EXPAND is VERTICAL. If B<User> size
+is defined then EXPAND is NO.
+
+=item  L<SIZE|IUP::Manual::03_Attributes/SIZE> / L<RASTERSIZE|IUP::Manual::03_Attributes/RASTERSIZE> (non inheritable)
+
+Defines the width, if inside a L<IUP::Hbox|IUP::Hbox>, or the height, if it is inside a
+L<IUP::Vbox|IUP::Vbox>. When consulted behaves as the standard SIZE/RASTERSIZE
+attributes. The standard format "wxh" can also be used, but width will
+be ignored if inside a L<IUP::Vbox|IUP::Vbox> and height will be ignored if inside
+a L<IUP::Hbox|IUP::Hbox> (since iup-3.3).
+
+=item B<WID>
+
+I<(read-only)>
+
+Returns -1 if mapped.
+
+=back
+
+The following L<common attributes|IUP::Manual::03_Attributes/Common Attributes> are also accepted:
+
+=over
+
+=item * L<FONT|IUP::Manual::03_Attributes/FONT>,
+L<POSITION|IUP::Manual::03_Attributes/POSITION>,
+L<MINSIZE|IUP::Manual::03_Attributes/MINSIZE>,
+L<MAXSIZE|IUP::Manual::03_Attributes/MAXSIZE>
+
+=back
+
+=head1 EXAMPLES
+
+
+The element B<IUP::Fill> is used in the following sample scripts:
+
+=over
+
+=item * L<0-basic/button.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/button.pl> - IUP::Button example
+
+=item * L<0-basic/canvas2.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/canvas2.pl> - IUP::Canvas example
+
+=item * L<0-basic/colorbrowser.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/colorbrowser.pl> - IUP::ColorBrowser example
+
+=item * L<0-basic/fill.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/fill.pl> - IUP::Fill Example
+
+=item * L<0-basic/frame1.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/frame1.pl> - IUP::Frame Example
+
+=item * L<0-basic/gauge.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/gauge.pl> - IUP::Gauge example
+
+=item * L<0-basic/hbox.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/hbox.pl> - IUP::Hbox example
+
+=item * L<0-basic/image.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/image.pl> - IUP::Image example
+
+=item * L<0-basic/plot_advanced.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/plot_advanced.pl> - Plot controls
+
+=item * L<0-basic/pre-dialogs.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/pre-dialogs.pl> - IUP::Expander example
+
+=item * L<0-basic/progressbar2.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/progressbar2.pl> - IUP::ProgressBar example
+
+=item * L<0-basic/progressbar3.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/progressbar3.pl> - IUP::ProgressBar example
+
+=item * L<0-basic/radio.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/radio.pl> - IUP::Radio example
+
+=item * L<0-basic/tabs3.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/tabs3.pl> - IUP::Tabs example 
+
+=item * L<0-basic/tree_set_attrs.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/tree_set_attrs.pl> - IUP::Tree example (attributes)
+
+=item * L<0-basic/vbox.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/vbox.pl> - IUP::Vbox example
+
+=item * L<0-basic/zbox.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/zbox.pl> - IUP::Zbox example
+
+=item * L<1-apps/app-plot-demo.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/1-apps/app-plot-demo.pl> - dials for zooming
+
+=back 
+
+
+
+=head1 SEE ALSO
+
+L<IUP::Hbox|IUP::Hbox>, L<IUP::Vbox|IUP::Vbox>
+
+The original doc: L<iupfill.html|http://www.tecgraf.puc-rio.br/iup/en/elem/iupfill.html>
+ 
+
+=cut

@@ -1,0 +1,61 @@
+# INSTALL.tesseract
+# =================
+# 
+# Installing tesseract can be tricky.
+# 
+# 
+# 1) Some dependencies..
+# 
+# 
+# 
+# You're may need gcc-c++, automake (gnu automake), and svn (subversion).
+# You can check if you have these using the 'which' command..
+#    which svn
+#    which automake
+# 
+# If the command is not present, nothing happens.
+# 
+# If you have 'yum' (fedora/rehat) or 'apt-get' (debian/ubuntu), you may want
+# to simply try:
+# 
+#    apt-get install automake
+#    apt-get install subversion
+# 
+#    yum -y install subversion
+#    yum -y install automake
+# 
+# If this does not work, you need to download the source packages and manually
+# install them.
+# 
+# You can get gnu autake from:
+#    http://www.gnu.org/software/automake/
+# 
+# And subversion from:
+#    http://subversion.apache.org/
+# 
+# As for gcc-c++ installed on your system- This is likely already present.
+# If you're missing gcc-c++, try using yum or apt-get. 
+# Here is where to read more about gcc
+#    http://gcc.gnu.org/
+# 
+# 2) Get the source for tesseract..
+# 
+# You may be able to simply install the SVN version of Tesseract by 
+# using these commands..
+
+svn checkout http://tesseract-ocr.googlecode.com/svn/trunk/ tesseract-ocr 
+cd tesseract-ocr
+./runautoconf
+mkdir build-directory
+cd build-directory
+../configure
+make
+make install
+
+# 
+# for more info, see google project on ocr, they use tesseract
+# 
+# you can also try to run these commands as a script ( lines starting
+# with a pount sign are comments and ignored bash/sh
+# 
+# sh ./INSTALL.tesseract

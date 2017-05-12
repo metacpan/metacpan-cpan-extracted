@@ -1,0 +1,35 @@
+Revision history for IMDB-Local
+
+1.0_1    Date/time
+         Initial sharable version
+
+1.0_2    Mon Mar 29 21:14:58 MDT 2015
+	 Improved db schema and list file import
+
+1.0_3    Mon Mar 30 21:14:00 MDT 2015
+	 adjusted package dependencies
+
+1.0_4    Mon Mar 30 21:24:00 MDT 2015
+	 attempt to get version information consistent
+
+1.0_5    Tue Mar 31 21:41:42 MDT 2015
+	 fix bin/imdblocal.pl filename
+
+1.1      Sun Apr 12 20:33:06 MDT 2015
+	 Lots of improvements, works well with prototype tv_imdb update
+	 Ready for other to try out.
+
+1.2      Sun Apr 12 21:00:00 MDT 2015
+	 fixed minor error in bin/imdb-local.pl
+
+1.3      Sun Apr 13 12:00:00 MDT 2015
+	 added in missing dependency (Class::Accessor)
+	 fixed db->optimize code
+
+1.4      Thu Apr 16 20:44:44 MDT 2015
+	 added 'AirDate' to Titles table for tv series episodes where we're given a date and series/episode info
+         ex) "EastEnders" (1985) {(1991-10-15)}
+
+1.5      For tv epsiodes, set SearchTitle to encoded episode title
+         Using constants for QualifierTypeIDs
+         imdb-title.pl - now searches tv-series and movie titles separately

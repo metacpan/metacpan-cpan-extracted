@@ -1,0 +1,24 @@
+---
+abstract: 'A lightweight wrapper to GD for mass image resizing'
+author:
+  - 'Logan Bell <logan@orchardtech.com>'
+build_requires:
+  Cwd: 0
+  Data::Dumper: 0
+  Test::MockObject: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200015, CPAN::Meta::Converter version 2.110440'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Email-POP3-Markdown
+requires:
+  Carp: 0
+  Class::Accessor: 0
+  GD: 0
+  GD::Image: 0
+version: 0.01

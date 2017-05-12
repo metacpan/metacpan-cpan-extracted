@@ -1,0 +1,53 @@
+InfoSys/FreeDB $Revision: 0.92 $
+===============================
+
+SHORT DESCRIPTION
+
+The modules in InfoSys::FreeDB form an API to query FreeDB and CDDB
+databases.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Error
+  File::Compare
+  File::Copy
+  File::Spec
+  IO::File
+  IO::Socket::INET
+  LWP::UserAgent
+  Sys::Hostname
+  Test::More
+
+AUTHOR
+       Vincenzo Zocca
+
+COPYRIGHT
+       Copyright 2003 by Vincenzo Zocca
+
+LICENSE
+
+The InfoSys::FreeDB module hierarchy is free software; you can
+redistribute it and/or modify it under the terms of the GNU General
+Public License as published by the Free Software Foundation; either
+version 2 of the License, or (at your option) any later version.
+
+The InfoSys::FreeDB module hierarchy is distributed in the hope
+that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with the InfoSys::FreeDB module hierarchy; if not, write to
+the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
+Boston, MA 02111-1307 USA

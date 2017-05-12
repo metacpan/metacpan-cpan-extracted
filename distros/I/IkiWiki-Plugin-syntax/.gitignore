@@ -1,0 +1,9 @@
+blib/
+Build
+_build/
+examples/example.html
+*.gz
+ikiwiki-plugin-syntax*
+IkiWiki-Plugin-syntax-*
+*.bak
+*.orig

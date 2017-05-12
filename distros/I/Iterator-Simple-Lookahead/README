@@ -1,0 +1,28 @@
+You can install this using in the usual Perl fashion
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+        
+The documentation is in the module file.  Once you install
+the file, you can read it with perldoc.
+
+	perldoc Iterator::Simple::Lookahead
+
+If you want to read it before you install it, you can use
+perldoc directly on the module file.
+
+	perldoc lib/Iterator/Simple/Lookahead.pm
+        
+This module repository is kept in Github, please feel free to submit issues, 
+fork and send pull requests.
+
+	https://github.com/pauloscustodio/Iterator-Simple-Lookahead
+
+
+Copyright (C) 2013-2015 by Paulo Custodio <pscust@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.16.1 or,
+at your option, any later version of Perl 5 you may have available.

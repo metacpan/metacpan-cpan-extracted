@@ -1,0 +1,31 @@
+Revision history for Perl extension Inline::Mason.
+
+0.01  Tue Feb 24 23:14:09 2004
+	- original version; created by h2xs 1.23 with options
+		-n Inline::Mason -O -XA -c --skip-ppport --skip-warnings
+
+0.02  Wed, 25 Feb 2004 15:47:38 +0800
+	- added external mason capability
+
+0.03  Thu, 26 Feb 2004 03:15:06 +0800
+	- migrated $as_sub to be global
+	- added %tatoo_word
+	- added Inline::Mason::load_mason()
+
+0.04
+	- s/tatoo/taboo/;
+	- added per-package-inline-mason
+	- added load_file
+	- modified duplication resolution policy
+
+0.05  Sat, 28 Feb 2004 10:19:07 +0800
+	- added Inline/Mason/Base.pm
+	- added Inline/Mason/OO.pm
+	- extended to OO style
+	- document tweaked
+
+0.06  Sat, 28 Feb 2004 12:21:23 +0800
+	- added no_autoload() and to_load_files() in Inline/Mason/OO.pm
+
+0.07  Tue, 13 Apr 2004 08:30:57 +0800
+	- access to Text::MicroMason methods

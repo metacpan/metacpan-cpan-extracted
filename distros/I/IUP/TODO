@@ -1,0 +1,205 @@
+################ the last time working on ################ 
+
+* kill IUP::PPlot
+* improve doc for IUP::Plot
+
+######################### POSTPONED
+##IUP::MultiLine          https://webserver2.tecgraf.puc-rio.br/iup/en/elem/iupmultiline.html
+##IUP::Config             https://webserver2.tecgraf.puc-rio.br/iup/en/func/iupconfig.html
+##IUP::OLE                https://webserver2.tecgraf.puc-rio.br/iup/en/ctrl/iupole.html
+##IUP::WebBrowser         https://webserver2.tecgraf.puc-rio.br/iup/en/ctrl/iupweb.html
+##IUP::Tuio               https://webserver2.tecgraf.puc-rio.br/iup/en/ctrl/iuptuio.html
+
+######################### https://webserver2.tecgraf.puc-rio.br/iup/en/dlg/iupgetparam.html
+##Iup::Param??            https://webserver2.tecgraf.puc-rio.br/iup/en/elem/iupparam.html
+##Iup::ParamBox??         https://webserver2.tecgraf.puc-rio.br/iup/en/elem/iupparambox.html
+
+AnimatedLabel:
+- The IupImageLib contains a simple animation to show an indefinite progress called "IUP_CircleProgressAnimation".
+- The IUP-IM functions has two functions that can create an animation from image files called IupLoadAnimation and IupLoadAnimationFrames.
+
+Bug:
+- BROKEN (not always!?) $canvas->cdDumpBitmap("tmp-testoutput.png", "PNG");  - tmp-testoutput.png / examples/2-canvas/simpledraw.pl
+- UTF8 issue with GetParam (examples: getparam1.pl getparam2.pl)
+
+IupMatrixEx - add new element - http://www.tecgraf.puc-rio.br/iup/en/ctrl/iupmatrixex.html
+- IUP::MatrixEx? or maybe extend existing IUP::Matrix?
+- callbacks
+- IupMatrixExOpen()                                               void IupMatrixExOpen(void);
+- calling IupMatrixExInit for an existing IupMatrix control.      void IupMatrixExInit(Ihandle* ih);
+
+fix:
+- cb_table->{_dragdrop} what about CanvasGL, PPlot, MglPlot ?
+- cb_table->{_canvas}   what about PPlot, MglPlot ?
+- global callbacks
+
+##########################################################
+
+constants via ExtUtils::Constant
+- e.g. https://metacpan.org/source/PEVANS/Socket-2.016/Makefile.PL#L163
+
+######## later
+- Canvas: void functions should return $self
+- implement: MglPlotSetData(Ihandle *ih, int ds_index, float* data, int count_x, int count_y, int count_z);
+- POD: IUP::Canvas::FileBitmap: Supported constructors: XXX-TODO add some description
+- POD: IUP::Canvas::FileVector: Supported formats: XXX-TODO more description
+- POD: overall "doc polish" needed - search for 'XXX'
+- POD: html tables - metacpan.org breaks header line (probably broken <th>)
+
+######## CODE/IMPORTANT: correct element destruction still needs some work
+- Internal/Element.pm (look for XXX-FIXME + XXX-CHECKLATER)
+
+######## TESTS/IMPORTANT: add more tests
+- split tests: t\*.t + all GUI-related >>> t\gui\*.t
+- maybe close after timeout (IUP::Timer -> return IUP_CLOSE)
+- how to skip - example:
+  plan skip_all => "\$ENV{RELEASE_TESTING} required fot testing", unless $ENV{RELEASE_TESTING};
+  eval "use Win32::Job ()";
+  plan skip_all => "Can't interrupt hung processes without Win32::Job" if $@;  
+
+######## POD/COSMETICS: mention in POD/DOC
+- mention IUP::Manual::10_FAQ::PARPacking recommendation in DOC
+- beware: (IUP_DEFAULT related) sub returns value even without explicit return
+- pplot: note in doc that DS_ has to be set after ->PPlotEnd()
+- tree: note in doc that tree->SetAttribute has to go after dialog->Show
+
+######## MAYBE: access child=>[...] items like this
+ $mybox = IUP::Hbox->new( child=>[ $bt1, $bt2, $bt3] );
+ $mybox->[0]->FGCOLOR("255 0 0");   # changes bt1 foreground color
+ $mybox->[1]->FGCOLOR("255 0 255"); # changes bt2 foreground color
+- beware: somehow handle AddChild & co.
+- from perl doc:
+  $a = $array[5]; 	$obj->FETCH(5);
+  $array[5] = "aa" 	$obj->STORE(5, "aa");
+- see implementation of SDLx::Surface + SDLx::Surface::TiedMatrix
+  http://cpansearch.perl.org/src/KTHAKORE/SDL-2.533/lib/SDLx/Surface.pm
+  http://cpansearch.perl.org/src/KTHAKORE/SDL-2.533/lib/SDLx/Surface/TiedMatrix.pm
+
+### COSMETICS ################################################################################################
+
+(cosmetics)######## NICE-TO-HAVE: cdKillCanvas
+- see examples/2-canvas/simpledraw.pl
+- why we need 'undef $canvas' and '$canvas->cdKillCanvas()' is not enough?
+
+(cosmetics)######## NICE-TO-HAVE: more Canvas examples
+- port more lua examples into perl
+
+(cosmetics)######## IDEA: 
+use IUP qw/:basic iup_NO_INIT/; #generally iup_ANY_OTHER_FLAG
+
+(cosmetics)######## IUP::Canvas missing functions (not crutial for now)
+- void wdCanvasHardcopy(cdCanvas* canvas, cdContext* ctx, void *data, void(*draw_func)(cdCanvas *canvas_copy));
+- int cdContextRegisterCallback(cdContext *context, int cb, cdCallback func);
+- void cdInitContextPlus(void); /* needs: GDI+, Cairo, XRender */
+
+(cosmetics)######## GTK too noisy when no DISPLAY: asck scuri
+- GTK + no DISPLAY set - error during gtk_init_check (= during 'use IUP'):
+  (<unknown>:7541): GLib-GObject-CRITICAL **: g_object_unref: assertion `G_IS_OBJECT (object)' failed
+  IUP->Open == -1
+  [http://developer.gnome.org/doc/API/2.2/gtk/gtk-General.html]
+  
+bool XDisplayExists() {
+  return (gdk_display_get_default() != NULL);
+}
+  
+++        if (!gdk_display_get_default ()) {
+++                if (!gtk_init_check (NULL, NULL)) {
+++                        /* Oh well, no X for you! */
+++                        g_printerr (_("Unable to connect to the X server"));
+++                        g_printerr ("%s", message);
+++                        exit (1);
+++                }
+++        }
+++ 
+  
+- GTK/NOT-WORKING-DISPLAY 
+  The application '<unknown>' lost its connection to the display localhost:10.0;
+  most likely the X server was shut down or you killed/destroyed
+  the application.
+
+(cosmetics)######## global
+- icon - see y:\IUP3.3\fltk\FLTK-0.532007\inc\MBX\FLTK.pm  (ACTION_code)
+
+(cosmetics)######## Check this:
+- consider return; vs. return undef;
+  return IUP::Internal::LibraryIup::_voidfunc; == return;
+  return IUP::Internal::LibraryIup::_nonvoidfunc; == return undef;
+  SUGGESTION: always call: return IUP::Internal::LibraryIup::_func; (even for void functions)
+- http://stackoverflow.com/questions/3435122/whats-the-difference-between-return-and-return-undef-in-perl
+- "Perl Best Practices" (and Perl::Critic) suggest not using return undef
+
+(cosmetics)######## IUP (main module)
+- ??? better detection of initialized gui than (IUP->Open == IUP_OPENED)?
+- ??? detection of codepage used in GUI
+
+(cosmetics)######## IUP::Submenu
+- consider using $firstonly param of new()
+
+(cosmetics)######## IUP::ProgressBar
+- FGCOLOR seems to be ignored
+
+(cosmetics)######## IUP::Split
+- maybe support also new($child1, $child2) instead of new(child1=>$child1, child2=>$child2)
+
+(cosmetics)######## IUP::Internal::Element
+- change: _create_element should set $self->ihandle value
+
+### NOT NOW, MAYBE LATER ################################################################################################
+
+(not now, maybe later)!!Big Task!! ######## IUP::OLE (extra module)
+- $o->IUNKNOWN ... pointer created by CoCreateInstance Function http://msdn.microsoft.com/en-us/library/ms686615%28v=vs.85%29.aspx
+- perahps integrate with Win32::OLE like $o->ole->methodname(...)
+- Win32::OLE needs something like new_from_iunknown
+  IUnknown *punk = ... value from $olecontrol->IUNKNOWN;
+  HRESULT hr;
+  IDispatch *pDispatch = NULL;
+  hr = punk->QueryInterface(IID_IDispatch, (void**)&pDispatch);
+  punk->Release();
+  ST(0) = CreatePerlObject(aTHX_ stash, pDispatch, destroy);
+- see Wx+OLE/ActiveX integration http://search.cpan.org/~mdootson/Wx-ActiveX-0.15/lib/Wx/ActiveX.pm
+- missing example: notepad.wlua? olecontrol_browser.wlua?
+- missing -> add
+- conditionally only on Win32
+- we probably need IUP::ConfigData for listing available features (iupole, iupgl ...)
+
+(not now, maybe later)######## implement threads demo
+- threads+Wx - http://use.perl.org/~Alias/journal/40377
+
+(not now, maybe later)######## memory issues
+- moustly should be handled, some corner cases may occur
+- see http://stackoverflow.com/questions/2223721/common-perl-memory-reference-leak-patterns
+- somehow check memory leaks - http://use.perl.org/~jozef/journal/40411
+- somehow check memory consumption - Devel::Size, Devel::Peak, PerlBench 
+  - http://stackoverflow.com/questions/1359771/perl-memory-usage-profiling-and-leak-detection
+  - http://www252.pair.com/comdog/mastering_perl/Chapters/06.benchmarking.html
+- check memleaks by storing SetAttribute("ATTR", $ref)
+
+(not now, maybe later)######## unicode in filenames (cpodepage magic)
+http://www.i-programmer.info/programming/other-languages/1973-unicode-issues-in-perl.html
+
+(not now, maybe later)######## missing examples
+- no example for: Clipboard.pm ?
+- no example for: User.pm ?
+- no example for: ColorDlg.pm ?
+- no example for: FontDlg.pm ?
+
+(not now, maybe later)######## Linux - platform specific issues
+- GTK: 'Quit' in main menu requires double click
+
+### REJECTED FOR NOW ################################################################################################
+
+(rejected)#######IUP
+- consider adding iupKeyCodeToName
+- consider adding iupKeyNameToCode
+- Idle? #xxxsomething causes progressbar3.pl to hangup/crash (after pressing accel/decel) - cannot reproduce
+- is GetIhClassName() func name OK - yes for now
+- IUP->GetIdle? or IUP->CheckIdle? #xxx how to check existing idle handler? - not for now
+
+(rejected)#######IUP::Internal::Element
+ - passing undef to child=> ... - maybe later
+  Can't call method "ihandle" on an undefined value at
+  Y:\@repos\perl-iup\blib\lib/IUP/Internal/Element.pm line 574. (better error message)
+- consider checking arg count SetAttributeId($$$) SetAttributeId2($$$$) - not now
+
+(rejected)#######IUP::List
+- IUP::List->new() items 0-based or 1-based index? (item[0] >> attribute 1)

@@ -1,0 +1,29 @@
+Build.PL
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/IO/Prompt.pm
+t/00.load.t
+t/pod-coverage.t
+t/pod.t
+examples/clear.pl
+examples/cmdline.pl
+examples/data.pl
+examples/default.pl
+examples/hand.pl
+examples/interactive.pl
+examples/lingua.pl
+examples/menu.pl
+examples/nonl.pl
+examples/num.pl
+examples/passwd.pl
+examples/record.pl
+examples/require.pl
+examples/to.pl
+examples/tty.pl
+examples/underscore.pl
+examples/while_until.pl
+examples/yesno.pl
+META.json                                Module JSON meta-data (added by MakeMaker)

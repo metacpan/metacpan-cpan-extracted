@@ -1,0 +1,674 @@
+=for comment based on iup-3.5 - http://www.tecgraf.puc-rio.br/iup/en/elem/iuplist.html
+
+=head1 NAME
+
+IUP::List - [GUI element] displays a list of items (listbox, combobox, dropdown)
+
+=head1 DESCRIPTION
+
+Creates an interface element that displays a list of items. The list
+can be visible or can be dropped down. It also can have an edit box for
+text input. So it is a 4 in 1 element. In native systems the dropped
+down case is called Combo Box.
+
+=begin HTML
+
+<p>
+  <table border="1">
+    <tbody align="center">
+      <col style="background-color: rgb(239, 235, 231);" width="530">
+      <col style="background-color: rgb(173, 177, 194);" width="530">
+      <tr>
+        <th>GTK</th>
+        <th>Motif</th>
+      </tr>
+      <tr>
+        <td><img src="http://kmx.github.io/perl-iup/img-3.9/elem/iuplist_gtk.png"></td>
+        <td><img src="http://kmx.github.io/perl-iup/img-3.9/elem/iuplist_mot.png"></td>
+      </tr>
+    </tbody>
+  </table>
+  <br>
+  <table border="1">
+    <tbody align="center">
+      <col style="background-color: rgb(212, 208, 200);" width="530">
+      <col style="background-color: rgb(236, 233, 216);" width="530">
+      <tr>
+        <th>Windows Classic</th>
+        <th>Windows XP Style</th>
+      </tr>
+      <tr>
+        <td><img src="http://kmx.github.io/perl-iup/img-3.9/elem/iuplist_win2k.png"></td>
+        <td><img src="http://kmx.github.io/perl-iup/img-3.9/elem/iuplist_winxp.png"></td>
+      </tr>
+    </tbody>
+  </table>
+</p>
+
+=end HTML
+
+=head1 USAGE
+
+=head2 CREATION - new() method
+
+ $list = IUP::List->new( 1=>"Firts item", 2=>"Second item" );
+
+B<Returns:> the identifier of the created element, or C<undef> if an error occurs.
+
+NOTE: You can pass to C<new()> other C<ATTRIBUTE=E<gt>'value'> or C<CALLBACKNAME=E<gt>\&func> pairs relevant
+to this element - see L<IUP::Manual::02_Elements|IUP::Manual::02_Elements/"new()">.
+
+=head2 ATTRIBUTES
+
+For more info about concept of attributes (setting/getting values etc.)
+see L<IUP::Manual::03_Attributes|IUP::Manual::03_Attributes>. Attributes specific to this element:
+
+=over
+
+=item B<"1">
+
+First item in the list.
+
+=item B<"2">
+
+Second item in the list.
+
+=item B<"3">
+
+Third item in the list.
+
+=item B<< "<n>" >>
+
+n-th item in the list.
+
+The values can be any text. Items before "1" are
+ignored. Before map the first item with a C<undef> is considered the end of
+the list and items can be set in any order. After map, there are a few
+rules:
+
+=over
+
+=item if "1" is set to C<undef>, all items are removed.
+
+=item if "n" is set to C<undef>, all items after n are removed.
+
+=item if "n" is between the first and the last item, the current nth
+item is replaced. The effect is the same as removing the old item and
+inserting a new one at the old position.
+
+=item if "n+1" is set then it is appended after the last item.
+
+=item Items after "n+1" are ignored. 
+
+=back
+
+=item B<APPENDITEM>
+
+I<(write-only)>
+
+Inserts an item after the last item.
+Ignored if set before map. 
+
+=item B<AUTOHIDE>
+
+Scrollbars are shown only if they are necessary. Default: "YES".
+
+=item B<AUTOREDRAW>
+
+I<[Windows] (non inheritable)>
+
+Automatically redraws the
+list when something has change. Set to NO to add many items to the list
+without updating the display. Default: "YES". (since iup-3.3)
+
+=item L<BGCOLOR|IUP::Manual::03_Attributes/BGCOLOR>
+
+Background color of the text.
+
+Default: the global attribute TXTBGCOLOR. In GTK does nothing when DROPDOWN=Yes.
+
+=item B<CANFOCUS>
+
+I<(creation only) (non inheritable)>
+
+Enables the focus
+traversal of the control. In Windows the control will still get the
+focus when clicked. Default: YES. 
+
+=item B<COUNT>
+
+I<(read-only) (non inheritable)>
+
+Returns the number of items.
+Before mapping it counts the number of non C<undef> items before the first
+C<undef> item. 
+
+=item B<DRAGDROP>
+
+I<[Windows and GTK Only] (non inheritable)>
+
+Enable or disable
+the drag&drop of files. Default: NO, but if DROPFILES_CB is defined
+when the element is mapped then it will be automatically enabled.
+
+=item B<DROPDOWN>
+
+I<(creation only)>
+
+Changes the appearance of the list for the
+user: only the selected item is shown beside a button with the image of
+an arrow pointing down. To select another option, the user must press
+this button, which displays all items in the list. Can be "YES" or
+"NO". Default "NO".
+
+=item B<DROPEXPAND>
+
+I<[Windows Only]>
+
+When DROPDOWN=Yes the size of the dropped
+list will expand to include the largest text. Can be "YES" or "NO".
+Default: "YES".
+
+=item B<EDITBOX>
+
+I<(creation only)>
+
+Adds an edit box to the list. Can be "YES"
+or "NO". Default "NO".
+
+=item L<FGCOLOR|IUP::Manual::03_Attributes/FGCOLOR>
+
+Text color. Default: the global
+attribute TXTFGCOLOR.
+
+=item B<INSERTITEMn>
+
+I<(write-only)>
+
+Inserts an item before the given n
+position. n starts at 1. If n=COUNT+1 then it will append after the
+last item. Ignored if out of bounds. Ignored if set before map. (since
+3.0)
+
+=item B<MULTIPLE>
+
+I<(creation only)>
+
+Allows selecting several items
+simultaneously (multiple list). Default: "NO". Only valid when
+EDITBOX=NO and DROPDOWN=NO.
+
+=item B<REMOVEITEM>
+
+I<(write-only)>
+
+Removes the given value. value starts at 1.
+If value is C<undef> removes all the items. Ignored if set before map.
+
+=item B<SCROLLBAR>
+
+I<(creation only)>
+
+Associates automatic scrollbars to the
+list when DROPDOWN=NO. Can be: "YES" or "NO" (none). Default: "YES".
+For all systems, when SCROLLBAR=YES the natural size will always
+include its size even if the native system hides the scrollbars. If
+B<AUTOHIDE>=YES scrollbars are shown only if they are necessary, by
+default AUTOHIDE=YES. In Motif, SCROLLBAR=NO is not supported and if
+EDITBOX=YES the horizontal scrollbar is never shown.
+
+When DROPDOWN=YES the scrollbars are system dependent, and do NOT
+depend on the SCROLLBAR or AUTOHIDE attributes. Usually the scrollbars
+are shown if necessary. In GTK, scrollbars are never shown and all
+items are always visible. In Motif, the horizontal scrollbar is never
+shown. In Windows, if DROPEXPAND=YES then the horizontal scrollbar is
+never shown.
+
+=item B<SHOWDROPDOWN>
+
+I<(write-only)>
+
+Opens or closes the dropdown list. Can be
+"YES" or "NO". Valid only when DROPDOWN=YES. Ignored if set before map.
+
+=item L<SIZE|IUP::Manual::03_Attributes/SIZE>
+
+Size of the list. The B<Natural>
+=item B<Size> is defined by the number of elements in the list and the with
+of the largest item, the default has room for 5 characters in 1 item.
+In IUP 3, the B<Natural> B<Size> ignores the list contents if
+VISIBLECOLUMNS or VISIBLELINES attributes are defined. The text in the
+edit box is ignored when considering the list contents.
+
+=item B<SORT>
+
+I<(creation only)>
+
+Force the list to be alphabetically sorted.
+When using INSERTITEMn or APPENDITEM the position will be ignored.
+
+=item B<TOPITEM>
+
+I<(write-only)>
+
+Position the given item at the top of the list
+or near to make it visible. Valid only when DROPDOWN=NO. 
+
+=item B<SPACING>
+
+Internal padding for each item. Notice that vertically the
+distance between each item will be actually 2x the spacing. It also
+affects the horizontal margin of the item. In Windows, the text is
+aligned at the top left of the item always. Valid only when
+DROPDOWN=NO. 
+
+=item B<VALUE>
+
+I<(non inheritable)>
+
+Depends on the DROPDOWN+EDITBOX combination:
+
+=over
+
+=item EDITBOX=YES: Text entered by the user.
+
+=item DROPDOWN=YES or MULTIPLE=NO: Integer number representing the
+selected item in the list (begins at 1). It can be zero if there is no
+selected item. The value can be C<undef> for no item selected 
+(In Motif when DROPDOWN=YES there is always an item selected, except
+only when the list is empty).
+
+=item MULTIPLE=YES: Sequence of '+' and '-' symbols indicating the
+state of each item. When setting this value, the user must provide the
+same amount of '+' and '-' symbols as the amount of items in the list,
+otherwise the specified items will be deselected.
+
+=back
+
+=item B<VISIBLE_ITEMS>
+
+I<[Windows and Motif Only]>
+
+Number of items that are
+visible when DROPDOWN=YES is used for the dropdown list. Default: 5.
+
+=item B<VISIBLECOLUMNS>
+
+Defines the number of visible columns for the
+=item B<Natural> B<Size>, this means that will act also as minimum number of
+visible columns. It uses a wider character size then the one used for
+the SIZE attribute so strings will fit better without the need of extra
+columns. 
+
+B<VISIBLELINES>
+
+When DROPDOWN=NO defines the number of visible lines
+for the B<Natural> B<Size>, this means that will act also as minimum
+number of visible lines. 
+
+=back
+
+The following L<IUP::Text|IUP::Text> attributes, but are also valid for L<IUP::List>
+but  only when EDITBOX=YES and effective only for the edit box inside the list.
+
+=over
+
+=item L<APPEND|IUP::Text/APPEND>,
+L<CARET|IUP::Text/CARET>,
+L<CARETPOS|IUP::Text/CARETPOS>,
+L<CLIPBOARD|IUP::Text/CLIPBOARD>,
+L<CUEBANNER|IUP::Text/CUEBANNER>,
+L<FILTER|IUP::Text/FILTER>,
+L<INSERT|IUP::Text/INSERT>,
+L<PADDING|IUP::Text/PADDING>,
+L<MASK|IUP::Text/MASK>,
+L<NC|IUP::Text/NC>,
+L<READONLY|IUP::Text/READONLY>,
+L<SELECTEDTEXT|IUP::Text/SELECTEDTEXT>,
+L<SELECTION|IUP::Text/SELECTION>,
+L<SELECTIONPOS|IUP::Text/SELECTIONPOS>,
+L<SCROLLTO|IUP::Text/SCROLLTO>,
+L<SCROLLTOPOS|IUP::Text/SCROLLTOPOS>
+
+=back
+
+The following L<common attributes|IUP::Manual::03_Attributes/Common Attributes> are also accepted:
+
+=over
+
+=item * L<ACTIVE|IUP::Manual::03_Attributes/ACTIVE>, L<FONT|IUP::Manual::03_Attributes/FONT>,
+L<EXPAND|IUP::Manual::03_Attributes/EXPAND>,
+L<SCREENPOSITION|IUP::Manual::03_Attributes/SCREENPOSITION>,
+L<POSITION|IUP::Manual::03_Attributes/POSITION>,
+L<MINSIZE|IUP::Manual::03_Attributes/MINSIZE>,
+L<MAXSIZE|IUP::Manual::03_Attributes/MAXSIZE>, L<WID|IUP::Manual::03_Attributes/WID>,
+L<TIP|IUP::Manual::03_Attributes/TIP>,
+L<RASTERSIZE|IUP::Manual::03_Attributes/RASTERSIZE>,
+L<ZORDER|IUP::Manual::03_Attributes/ZORDER>,
+L<VISIBLE|IUP::Manual::03_Attributes/VISIBLE>
+
+=back
+
+=head2 CALLBACKS
+
+For more info about concept of callbacks (setting callback handlers etc.)
+see L<IUP::Manual::04_Callbacks|IUP::Manual::04_Callbacks>. Callbacks specific to this element:
+
+=over
+
+=item L<ACTION|IUP::Manual::04_Callbacks/ACTION>
+
+Action generated when the state of
+an item in the list is changed. Also provides information on the
+changed item:
+
+B<Callback handler prototype:>
+
+ sub action_handler {
+   my ($self, $text, $item, $state) = @_;
+   #...
+ }
+
+=over
+
+B<$self:> reference to the element (IUP::List) that activated the event
+
+B<$text:> Text of the changed item.
+
+B<$item:> Number of the changed item starting at 1.
+
+B<$state:> Equal to 1 if the option was selected or to 0 if the option
+was deselected.
+
+The state=0 is simulated internally by IUP in all systems. If you add
+or remove items to/from the list and you count on the state=0 value,
+then after adding/removing items set the VALUE attribute to ensure
+proper state=0 value.
+
+=back
+
+=item L<BUTTON_CB|IUP::Manual::04_Callbacks/BUTTON_CB>
+
+Action generated when any
+mouse button is pressed or released inside the list. Called only when
+DROPDOWN=NO. If the list has an editbox the message is called when
+cursor is at the listbox only (ignored at the editbox). 
+Use L<ConvertXYToPos|IUP::Manual::02_Elements/"ConvertXYToPos()"> to convert (x,y)
+coordinates in item position. 
+
+=item B<CARET_CB>
+
+Action generated when the caret/cursor position is
+changed. Valid only when EDITBOX=YES.
+
+B<Callback handler prototype:>
+
+ sub caret_cb_handler {
+   my ($self, $lin, $col, $pos) = @_;
+   #...
+ }
+
+=over
+
+B<$self:> reference to the element (IUP::List) that activated the event
+
+B<$lin, $col:> line and column number (start at 1).
+
+B<$pos:> 0 based character position.
+
+For lists B<lin> is always 1, and B<pos> is always "B<col-1>".
+
+This is the same CARET_CB callback definition as for the L<IUP::Text|IUP::Text>.
+
+=back
+
+=item B<DBLCLICK_CB>
+
+Action generated when the user double click an item.
+Called only when DROPDOWN=NO. 
+
+B<Callback handler prototype:>
+
+ sub dblclick_cb_handler {
+   my ($self, $item, $text) = @_;
+   #...
+ }
+
+=over
+
+B<$self:> reference to the element (IUP::List) that activated the event
+
+B<$item:> Number of the selected item starting at 1.
+
+B<$text:> Text of the selected item.
+
+=back
+
+=item B<DROPDOWN_CB>
+
+Action generated when the list of a dropdown is shown
+or hidden. Called only when DROPDOWN=YES. 
+
+B<Callback handler prototype:>
+
+ sub dropdown_cb_handler {
+   my ($self, $state) = @_;
+   #...
+ }
+
+=over
+
+B<$self:> reference to the element (IUP::List) that activated the event
+
+B<$state:> state of the list 1=shown, 0=hidden.
+
+=back
+
+=item L<DROPFILES_CB|IUP::Manual::04_Callbacks/DROPFILES_CB>
+
+I<[Windows and GTK Only]>
+
+Action generated when one or more files are dropped in the element.
+
+=item B<EDIT_CB>
+
+Action generated when the text in the text box is manually
+changed by the user, but before its value is actually updated. Valid
+only when EDITBOX=YES.
+
+B<Callback handler prototype:>
+
+ sub edit_cb_handler {
+   my ($self, $c, $new_value) = @_;
+   #...
+ }
+
+=over
+
+B<$self:> reference to the element (IUP::List) that activated the event
+
+B<$c:> valid alpha numeric character or 0.
+
+B<$new_value:> Represents the new text value.
+
+B<Returns:> IUP_CLOSE will be processed, but the change will be ignored.
+If IUP_IGNORE, the system will ignore the new value. If B<c> is valid
+and returns a valid alpha numeric character, this new character will be
+used instead. The VALUE attribute can be changed only if IUP_IGNORE is
+returned.
+
+This is the same ACTION callback definition as for the L<IUP::Text|IUP::Text>.
+
+=back
+
+=item L<MOTION_CB|IUP::Manual::04_Callbacks/MOTION_CB>
+
+Action generated when the
+mouse is moved over the list. Called only when DROPDOWN=NO. If the list
+has an editbox the message is called when cursor is at the listbox only
+(ignored at the editbox). Use L<ConvertXYToPos|IUP::Manual::02_Elements/"ConvertXYToPos()"> to convert (x,y)
+coordinates in item position. 
+
+=item B<MULTISELECT_CB>
+
+Action generated when the state of an item in the
+multiple selection list is changed. But it is called only when the
+interaction is over.
+
+B<Callback handler prototype:>
+
+ sub multiselect_cb_handler {
+   my ($self, $value) = @_;
+   #...
+ }
+
+=over
+
+B<$self:> reference to the element (IUP::List) that activated the event
+
+B<$value:> Similar to the VALUE attribute for a multiple selection list.
+Items selected are marked with '+', items deselected are marked with
+'-', and non changed items are marked with an 'x'.
+
+This callback is called only when MULTIPLE=YES. If this callback is
+defined the B<ACTION> callback will not be called.
+
+The non changed items marked with 'x' are simulated internally by IUP
+in all systems. If you add or remove items to/from the list and you
+count on the 'x' values, then after adding/removing items set the VALUE
+attribute to ensure proper 'x' values.
+
+=back
+
+=item B<VALUECHANGED_CB>
+
+Called after the value was interactively changed by
+the user. Called when the selection is changed or when the text is
+edited. 
+
+B<Callback handler prototype:>
+
+ sub valuechanged_cb_handler {
+   my ($self) = @_;
+   #...
+ }
+
+=over
+
+B<$self:> reference to the element (IUP::List) that activated the event
+
+=back
+
+=back
+
+The following L<common callbacks|IUP::Manual::04_Callbacks/Common Callbacks> are also accepted:
+
+=over
+
+=item * L<MAP_CB|IUP::Manual::04_Callbacks/MAP_CB>,
+L<UNMAP_CB|IUP::Manual::04_Callbacks/UNMAP_CB>,
+L<GETFOCUS_CB|IUP::Manual::04_Callbacks/GETFOCUS_CB>,
+L<KILLFOCUS_CB|IUP::Manual::04_Callbacks/KILLFOCUS_CB>,
+L<ENTERWINDOW_CB|IUP::Manual::04_Callbacks/ENTERWINDOW_CB>,
+L<LEAVEWINDOW_CB|IUP::Manual::04_Callbacks/LEAVEWINDOW_CB>,
+L<K_ANY|IUP::Manual::04_Callbacks/K_ANY>, L<HELP_CB|IUP::Manual::04_Callbacks/HELP_CB>
+
+=back
+
+=head1 NOTES
+
+Text is always left aligned.
+
+The L<GETFOCUS_CB|IUP::Manual::04_Callbacks/GETFOCUS_CB> and
+L<KILLFOCUS_CB|IUP::Manual::04_Callbacks/KILLFOCUS_CB> callbacks behave
+differently depending on the list configuration and on the native
+system:
+
+=over
+
+=item * If DROPDOWN=NO and EDITBOX=YES, then the list never gets the
+focus, the callbacks are called only when the edit box is clicked.
+
+=item * In Motif if DROPDOWN=YES then when the dropdown button is
+clicked the list looses its focus and when the dropped list is closed
+the list regain the focus, also when that happen if the list looses its
+focus to another control the kill focus callback is not called.
+
+=item * In GTK, if DROPDOWN=YES and EDITBOX=NO, both callbacks are
+called only when navigating with the keyboard (tip: if you need those
+callbacks with mouse navigation set EDITBOX=YES and READONLY=YES). Also
+in GTK, if DROPDOWN=YES and EDITBOX=YES then when the dropdown button
+is clicked the list looses its focus and it gets it back only if the
+edit box is clicked.
+
+=back
+
+In Windows, if EDITBOX=YES then the tooltips are shown only when the
+cursor is near the control border or at the dropdown arrow. Also the
+selection and caret attributes are not preserved if the list loses its
+focus, or in other words these attributes are only useful in Windows if
+the list has the focus.
+
+B<IMPORTANT:> In Windows when DROPDOWN=Yes the vertical size is
+controlled by the system, and has the height just right to include the
+borders and the text. So the B<User> height from RASTERSIZE or SIZE
+will be always ignored.
+
+In GTK older than 2.12, the editbox of a dropdown will not follow the
+list attributes: FONT, BGCOLOR, FGCOLOR and SPACING.
+
+=head2 Utility Functions
+
+These functions can be used to set and get attributes from the element:
+
+ $elem->SetAttributeId($name, $id, $value);
+ $elem->GetAttributeId($name, $id);
+
+They work just like the respective traditional set and get functions.
+But the attribute string is complemented with the id value. For ex:
+
+ $elem->SetAttributeId("", 3, $value) ~~ $elem->SetAttribute("3", $value)
+ 
+ $elem->SetAttributeId("INSERTITEM", 8, $value) ~~ $elem->SetAttribute("INSERTITEM8", $value)
+
+But these functions are faster than the traditional functions because
+they do not need to parse the attribute name string and the application
+does not need to concatenate the attribute name with the id.
+
+=head1 EXAMPLES
+
+
+The element B<IUP::List> is used in the following sample scripts:
+
+=over
+
+=item * L<0-basic/cbox.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/cbox.pl> - IUP::Cbox example
+
+=item * L<0-basic/layoutdialog.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/layoutdialog.pl> - IUP::LayoutDialog example
+
+=item * L<0-basic/list1.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/list1.pl> - IUP::List example
+
+=item * L<0-basic/list2.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/list2.pl> - IUP::List example
+
+=item * L<0-basic/text_font.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/text_font.pl> - IUP::Text (font) example
+
+=item * L<0-basic/zbox.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/zbox.pl> - IUP::Zbox example
+
+=item * L<1-apps/app-mdi.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/1-apps/app-mdi.pl> - IUP app example
+
+=item * L<1-apps/app-sample1.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/1-apps/app-sample1.pl> - example used for screenshot - IUP.pod
+
+=item * L<1-apps/app-sample2.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/1-apps/app-sample2.pl> - example based on the original sample.c
+
+=back 
+
+
+
+=head1 SEE ALSO
+
+L<ListDialog|IUP/"ListDialog>()">, L<IUP::Text>
+
+The original doc: L<iuplist.html|http://www.tecgraf.puc-rio.br/iup/en/elem/iuplist.html>
+ 
+
+=cut

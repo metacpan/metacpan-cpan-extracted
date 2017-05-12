@@ -1,0 +1,58 @@
+<?xml version="1.0" standalone="yes"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+
+<svg width="209" height="51" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<!-- Generated at Sun Jul 16 13:33:40 2006 by:
+  Graph::Easy v0.44
+  Graph::Easy::As_svg v0.18
+-->
+
+<title>Untitled graph</title>
+<defs>
+ <!-- open arrow head -->
+ <g id="ah" stroke-linecap="round" stroke-width="1">
+  <line x1="-8" y1="-4" x2="1" y2="0" />
+  <line x1="1" y1="0" x2="-8" y2="4" />
+ </g>
+
+ <!-- class definitions -->
+ <style type="text/css"><![CDATA[
+ .edge {
+  fill: inherit;
+  font-family: monospaced, courier-new, courier, sans-serif;
+  stroke: black;
+ }
+ .node {
+  text-anchor: middle;
+  fill: white;
+ }
+ .edge {
+  text-anchor: middle;
+  font-size: 13px;
+ }
+ ]]></style>
+</defs>
+
+<!-- graph background with border (mainly for printing) -->
+<rect x="0" y="0" width="217" height="59" fill="white" stroke="none" />
+
+<g class="edge">
+ <!-- from Image::Info to Info -->
+ <!-- horizontal -->
+ <line x1="123.2" y1="26" x2="147.8" y2="26" stroke="black" stroke-width="1" />
+ <use stroke="black" xlink:href="#ah" x="148.8" y="26"/>
+</g>
+
+<g class="node">
+ <!-- Image::Info, rect -->
+ <rect fill="white" height="35" stroke="black" width="111" x="8.5" y="8.5" />
+ <text x="64" y="32" fill="black">Image::Info</text>
+</g>
+
+<g class="node">
+ <!-- Info, rect -->
+ <rect fill="white" height="35" stroke="black" width="49" x="152.5" y="8.5" />
+ <text x="177" y="32" fill="black">Info</text>
+</g>
+
+</svg>

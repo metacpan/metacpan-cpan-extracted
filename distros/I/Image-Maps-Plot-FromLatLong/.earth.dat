@@ -1,0 +1,262 @@
+$VAR1 = {
+          'Dave Hodgkinson' => {
+                                 'LAT' => 11111111,
+                                 'PLACE' => 'Bath  (Unknown Postcode)',
+                                 'LON' => 11111111
+                               },
+          'Merijn Broeren' => {
+                                'LAT' => '51.467409',
+                                'PLACE' => 'Mayday Gardens, London, SE3 8NL, United Kingdom',
+                                'LON' => '0.046744'
+                              },
+          'Barbie' => {
+                        'LAT' => '52.392545',
+                        'PLACE' => 'Graham Crescent, Rubery, Rednal, Birmingham, West Midlands B45 9DD, United Kingdom',
+                        'LON' => '-2.016021'
+                      },
+          'Chris Devers at work' => {
+                                      'LAT' => '42.4985',
+                                      'PLACE' => 'Burlington, MA  01803-3408, USA',
+                                      'LON' => '-71.2183'
+                                    },
+          'Matthew Byng-Maddick' => {
+                                      'LAT' => '51.529469',
+                                      'PLACE' => 'London E2, United Kingdom',
+                                      'LON' => '-0.063249'
+                                    },
+          'Marcel' => {
+                        'LAT' => 11111111,
+                        'PLACE' => 'Vienna, Austria  (Unknown Postcode)',
+                        'LON' => 11111111
+                      },
+          'Andrew Wilson' => {
+                               'LAT' => '54.689705',
+                               'PLACE' => 'Ballyvesey Park, Newtownabbey, County Antrim BT36 5XG, United Kingdom',
+                               'LON' => '-5.964012'
+                             },
+          'Aaron Trevena' => {
+                               'LAT' => 11111111,
+                               'PLACE' => 'Bristol  (Unknown Postcode)',
+                               'LON' => 11111111
+                             },
+          'Peter Berlin' => {
+                              'LAT' => 11111111,
+                              'PLACE' => 'Reading  (Unknown Postcode)',
+                              'LON' => 11111111
+                            },
+          'Tony Bowden' => {
+                             'LAT' => '54.608125',
+                             'PLACE' => 'Belmont Road, Belfast, County Antrim BT4 2NG, United Kingdom',
+                             'LON' => '-5.846687'
+                           },
+          'Natalie Ford' => {
+                              'LAT' => '51.016751',
+                              'PLACE' => 'Station Road, Billingshurst, West Sussex RH14 9RU, United Kingdom',
+                              'LON' => '-0.45076'
+                            },
+          'Andy Williams' => {
+                               'LAT' => '52.431363',
+                               'PLACE' => 'St. Judiths Lane, Sawtry, Huntingdon, Cambridgeshire PE28 5XE, United Kingdom',
+                               'LON' => '-0.279474'
+                             },
+          'Paul Johnson' => {
+                              'LAT' => '47.535',
+                              'PLACE' => 'Altlassing 8903, Austria',
+                              'LON' => '14.2663'
+                            },
+          'Lucy McWilliam' => {
+                                'LAT' => '52.218666',
+                                'PLACE' => 'Atherton Close, Cambridge, Cambridgeshire CB4 2BE, United Kingdom',
+                                'LON' => '0.128879'
+                              },
+          'David Cantrell' => {
+                                'LAT' => '51.288591',
+                                'PLACE' => 'British Broadcasting Corporation, Kingswood Warren, Woodland Way, Kingswood, Tadworth, Surrey KT20 6NP, United Kingdom',
+                                'LON' => '-0.213703'
+                              },
+          'Ian Brayshaw' => {
+                              'LAT' => '51.463501',
+                              'PLACE' => 'Kings Farm Avenue, Richmond, Surrey TW10 5AB, United Kingdom',
+                              'LON' => '-0.286695'
+                            },
+          'Alex David Shadrach Hooper' => {
+                                            'LAT' => '51.576107',
+                                            'PLACE' => 'Crouch Hill, London, N8 9QN, United Kingdom',
+                                            'LON' => '-0.122789'
+                                          },
+          'Roger Burton West' => {
+                                   'LAT' => '51.53217',
+                                   'PLACE' => 'Western Road, London, E13 9JE, United Kingdom',
+                                   'LON' => '0.032043'
+                                 },
+          'Simon Wistow' => {
+                              'LAT' => '51.491512',
+                              'PLACE' => 'Mossington Gardens, London, SE16 2DZ, United Kingdom',
+                              'LON' => '-0.055925'
+                            },
+          'Greg McCarroll' => {
+                                'LAT' => '51.425378',
+                                'PLACE' => 'Kent House Road, London, SE26 5LN, United Kingdom',
+                                'LON' => '-0.043471'
+                              },
+          'Rob Price at Work' => {
+                                   'LAT' => '51.523139',
+                                   'PLACE' => 'Farringdon Lane, London, EC1R 3AW, United Kingdom',
+                                   'LON' => '-0.10702'
+                                 },
+          'Chris Devers at home' => {
+                                      'LAT' => '42.3847',
+                                      'PLACE' => 'Somerville, MA  02145-3262, USA',
+                                      'LON' => '-71.0853'
+                                    },
+          'Lathos according to Matthew Byng-Maddick' => {
+                                                          'LAT' => 11111111,
+                                                          'PLACE' => 'Oxford  (Unknown Postcode)',
+                                                          'LON' => 11111111
+                                                        },
+          'Brian Raven at home' => {
+                                     'LAT' => '51.771943',
+                                     'PLACE' => 'Homestead Road, Hatfield, Hertfordshire AL10 0QW, United Kingdom',
+                                     'LON' => '-0.224584'
+                                   },
+          'Steve' => {
+                       'LAT' => '54.58437',
+                       'PLACE' => 'Ashley Avenue, Belfast, County Antrim BT9 7BT, United Kingdom',
+                       'LON' => '-5.947024'
+                     },
+          'Robin Szemeti' => {
+                               'LAT' => '52.38861',
+                               'PLACE' => 'Trimpley Lane, Bewdley, Worcestershire DY12 1RB, United Kingdom',
+                               'LON' => '-2.304559'
+                             },
+          'Richard Proctor' => {
+                                 'LAT' => '50.77409',
+                                 'PLACE' => 'Diprose Road, Corfe Mullen, Wimborne, Dorset BH21 3QY, United Kingdom',
+                                 'LON' => '-2.014224'
+                               },
+          'Jonathan Stone' => {
+                                'LAT' => '50.856705',
+                                'PLACE' => 'Tackleway, Hastings, East Sussex TN34 3DE, United Kingdom',
+                                'LON' => '0.594025'
+                              },
+          'Brian Raven visiting his principle client' => {
+                                                           'LAT' => '51.510974',
+                                                           'PLACE' => 'London International Financial Futures E, Cannon Bridge House, 1 Cousin Lane, London, EC4R 3XX, United Kingdom',
+                                                           'LON' => '-0.09049'
+                                                         },
+          '"Stray Toaster"' => {
+                                 'LAT' => '54.594571',
+                                 'PLACE' => 'Alfred Street, Belfast, County Antrim BT2 8ED, United Kingdom',
+                                 'LON' => '-5.928268'
+                               },
+          'David H Alder' => {
+                               'LAT' => 11111111,
+                               'PLACE' => 'New York NY, USA  (Unknown Postcode)',
+                               'LON' => 11111111
+                             },
+          'Robert Shiels' => {
+                               'LAT' => '51.483779',
+                               'PLACE' => 'Lawn Close, Datchet, Slough, Berkshire SL3 9LA, United Kingdom',
+                               'LON' => '-0.571361'
+                             },
+          'One of Simon Wistow\'s homes (his parents\' on a swap under a runway)' => {
+                                                                                       'LAT' => '51.19825',
+                                                                                       'PLACE' => 'Niederkrüchten 41372, Germany',
+                                                                                       'LON' => '6.22248'
+                                                                                     },
+          'Simon Wilcox' => {
+                              'LAT' => '51.40414',
+                              'PLACE' => 'Portland Road, Kingston upon Thames, Surrey KT1 2SG, United Kingdom',
+                              'LON' => '-0.299611'
+                            },
+          'Mark Blackman' => {
+                               'LAT' => '51.457334',
+                               'PLACE' => 'Stanley Street, Reading, Berkshire RG1 7NY, United Kingdom',
+                               'LON' => '-0.984877'
+                             },
+          'Robert Thompson' => {
+                                 'LAT' => '50.780887',
+                                 'PLACE' => 'Stocker Road, Bognor Regis, West Sussex PO21 2QF, United Kingdom',
+                                 'LON' => '-0.686847'
+                               },
+          'Richard Clyne' => {
+                               'LAT' => '51.549942',
+                               'PLACE' => 'Anadarko Algeria Corporation, PO Box 576, Uxbridge, Middlesex UB8 1YH, United Kingdom',
+                               'LON' => '-0.476823'
+                             },
+          'Rob Price at Home' => {
+                                   'LAT' => '50.803966',
+                                   'PLACE' => 'Wilton Avenue, Eastbourne, East Sussex BN22 9HY, United Kingdom',
+                                   'LON' => '0.280046'
+                                 },
+          'Marty Pauly' => {
+                             'LAT' => '54.754858',
+                             'PLACE' => 'Edward Road, Whitehead, Carrickfergus, County Antrim BT38 9RU, United Kingdom',
+                             'LON' => '-5.713384'
+                           },
+          'Paul Makepeace' => {
+                                'LAT' => '36.5895',
+                                'PLACE' => 'Monterey, CA  93940-4408, USA',
+                                'LON' => '-121.902'
+                              },
+          'Niklas Nordebo in Sweden' => {
+                                          'LAT' => '59.31353',
+                                          'PLACE' => 'Stockholm 118 64, Sweden',
+                                          'LON' => '18.06026'
+                                        },
+          'Philip Newton' => {
+                               'LAT' => '53.42808',
+                               'PLACE' => 'Hamburg 21077, Germany',
+                               'LON' => '9.93637'
+                             },
+          'Alex' => {
+                      'LAT' => 11111111,
+                      'PLACE' => 'Oxford  (Unknown Postcode)',
+                      'LON' => 11111111
+                    },
+          'J Duncan' => {
+                          'LAT' => '51.514629',
+                          'PLACE' => 'Commercial Road, London, E1 1NZ, United Kingdom',
+                          'LON' => '-0.066053'
+                        },
+          'David Irvine at home' => {
+                                      'LAT' => '55.836502',
+                                      'PLACE' => 'Garturk Street, Glasgow, Lanarkshire G42 8JH, United Kingdom',
+                                      'LON' => '-4.25913'
+                                    },
+          'Niklas Nordebo in the UK' => {
+                                          'LAT' => '51.541296',
+                                          'PLACE' => 'Camden Road, London, NW1 9EA, United Kingdom',
+                                          'LON' => '-0.138571'
+                                        },
+          'Leon Brocard' => {
+                              'LAT' => '51.512818',
+                              'PLACE' => 'Chepstow Crescent, London, W11 3EA, United Kingdom',
+                              'LON' => '-0.198561'
+                            },
+          'Tony Kennick' => {
+                              'LAT' => '53.380624',
+                              'PLACE' => 'University of Sheffield - Union of Studen, Western Bank, Sheffield, South Yorkshire S10 2TG, United Kingdom',
+                              'LON' => '-1.487651'
+                            },
+          'Lee' => {
+                     'LAT' => '51.592423',
+                     'PLACE' => 'Leslie Road, London, N2 8BH, United Kingdom',
+                     'LON' => '-0.171996'
+                   },
+          'Leo Lapworth' => {
+                              'LAT' => '51.535702',
+                              'PLACE' => 'Laburnum Street, London, E2 8BD, United Kingdom',
+                              'LON' => '-0.070639'
+                            },
+          'Chris Benson' => {
+                              'LAT' => '54.990169',
+                              'PLACE' => 'Queens Road, Jesmond, Newcastle upon Tyne, Tyne and Wear NE2 2PQ, United Kingdom',
+                              'LON' => '-1.601319'
+                            },
+          'Cal' => {
+                     'LAT' => 11111111,
+                     'PLACE' => 'Bedford  (Unknown Postcode)',
+                     'LON' => 11111111
+                   }
+        };

@@ -1,0 +1,28 @@
+---
+name: IO-Socket-Multicast6
+version: 0.03
+author:
+  - 'Based on L<IO::Socket::Multicast> by Lincoln Stein, lstein@cshl.org.'
+  - 'IO::Socket::Multicast6 by Nicholas J Humfrey, E<lt>njh@cpan.orgE<gt>.'
+abstract: Send and receive IPv4 and IPv6 multicast messages
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  IO::Interface: 1.01
+  IO::Socket::INET6: 2.51
+  Socket: 0
+  Socket6: 0.19
+  Socket::Multicast6: 0.01
+  Test::More: 0
+  perl: 5.6.1
+build_requires:
+  Module::Build: 0.20
+provides:
+  IO::Socket::Multicast6:
+    file: lib/IO/Socket/Multicast6.pm
+    version: 0.03
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

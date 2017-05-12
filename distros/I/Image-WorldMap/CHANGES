@@ -1,0 +1,29 @@
+Revision history for Perl extension Image::WorldMap.
+
+0.15 Fri Dec 12 21:49:47 GMT 2008
+    - rename Changes to CHANGES
+    - add machine- and human-readable license
+    - perltidy
+    - use warnings
+    - mark private subroutines with an underscore
+    - add pod test
+
+0.14 Sat Jan 18 20:51:28 GMT 2003
+	- complete label layout rewrite, no longer uses Inline
+
+0.13 Mon Dec 16 09:02:16 GMT 2002
+	- arrrgh, fixed Inline bug
+
+0.12 Sat Dec 14 11:50:18 GMT 2002
+	- make dots a little clearer (no longer use imlib's buggy
+          fill_ellipse)
+
+0.11 Sat Sep  7 12:26:08 BST 2002
+	- better synopsis and coloured dots thanks to Nathan.Bailey
+	- lines, labels slightly more defined
+	- new earth-small.png world map thanks to NASA
+	  http://earthobservatory.nasa.gov/Newsroom/BlueMarble/
+
+0.10 Thu Jul 12 17:41:43 BST 2001
+	- first release to CPAN
+

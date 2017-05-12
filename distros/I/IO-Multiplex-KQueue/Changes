@@ -1,0 +1,9 @@
+Revision history for Perl extension IO::Multiplex::KQueue.
+
+0.02  Fri Dec 30 2005
+	- remove debug message.
+	- fix name conflict with IO::Multiplex::Handle.
+
+0.01  Sun Dec 25 2005
+        - first release. small modification to IO::Multiplex 1.08.
+

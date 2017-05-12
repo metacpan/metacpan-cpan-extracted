@@ -1,0 +1,580 @@
+# -*- Perl -*-
+=pod
+
+=head1 NAME
+
+IBM::LoadLeveler - Perl Access to IBM LoadLeveler API
+
+=head1 SYNOPSIS
+
+  use IBM::LoadLeveler;
+
+  $version = ll_version();
+
+  # Workload Management API
+
+  $rc=ll_control($control_op,\@host_list,\@user_list,\@job_list,\@class_list,$priority);
+
+  $rc=llctl(LL_CONTROL_START|LL_CONTROL_STOP|LL_CONTROL_RECYCLE|\
+		LL_CONTROL_RECONFIG|LL_CONTROL_DRAIN|LL_CONTROL_DRAIN_SCHEDD|\
+		LL_CONTROL_DRAIN_STARTD|LL_CONTROL_FLUSH|LL_CONTROL_PURGE_SCHEDD|\
+		LL_CONTROL_SUSPEND|LL_CONTROL_RESUME|LL_CONTROL_RESUME_STARTD|\
+		LL_CONTROL_RESUME_SCHEDD,\@host_list,\@class_list);
+
+  $rc=llfavorjob(LL_CONTROL_FAVOR_JOB|LL_CONTROL_UNFAVOR_JOB,\@job_list);
+
+  $rc=llfavoruser(LL_CONTROL_FAVOR_USER|LL_CONTROL_UNFAVOR_USER,\@user_list);
+
+  $rc=llhold(LL_CONTROL_HOLD_USER|LL_CONTROL_HOLD_SYSTEM|LL_CONTROL_HOLD_RELEASE,\@host_list,\@user_list,\@job_list);
+
+  $rc=llprio(LL_CONTROL_PRIO_ABS|LL_CONTROL_PRIO_ADJ,\@job_list,$priority);
+
+  $rc=ll_start_job($cluster,$proc,$from_host,\@node_list);
+  $rc=ll_terminate_job($cluster,$proc,$from_host,$msg);
+  $rc=ll_preempt($job_step_id, PREEMPT_STEP|RESUME_STEP);
+  $rc=ll_preempt_jobs(\@param);
+
+  $rc=ll_modify(EXECUTION_FACTOR|CONSUMABLE_CPUS|CONSUMABLE_MEMORY|WCLIMIT_ADD_MIN|JOB_CLASS|ACCOUNT_NO,\$value,$job_step);
+
+  $rc=ll_run_scheduler($obj);
+
+  $rc=ll_start_job_ext(\%Info);
+
+  $rc=ll_cluster(CLUSTER_SET|CLUSTER_UNSET,\@cluster_list);
+
+  $rc=ll_cluster_auth();
+
+  # Error API
+
+  ll_error($errObj,1 | 2 );
+
+  or
+
+  ll_error(1 | 2 );
+
+  # Submit API function
+
+  ($job_name,$owner,$groupname,$uid,$gid,$submit_host,$numsteps,$ref)=llsubmit($job_cmd_file,$monitor_program,$monitor_args);
+
+  # Data Access API functions
+
+  $query = ll_query( JOBS|MACHINES|CLUSTER|WLMSTAT|MATRIX|RESERVATIONS|MCLUSTERS|BLUE_GENE|FAIRSHARE );
+
+  $return = ll_set_request( $query,QUERY_ALL|QUERY_JOBID|QUERY_STEPID|\
+		QUERY_GROUP|QUERY_CLASS|QUERY_HOST|QUERY_STARTDATE|\
+		QUERY_ENDDATE|QUERY_PROCID|QUERY_RESERVATION_ID|
+                QUERY_BG_JOB|QUERY_BG_PARTITION|QUERY_BG_BASE_PARTITION,\
+		QUERY_TOP_DOG, \@filter,ALL_DATA|Q_LINE|STATUS_LINE );
+
+  $object = ll_get_objs( $query, LL_STARTD|LL_SCHEDD|LL_CM|LL_MASTER|\
+		LL_STARTER|LL_HISTORY_FILE, $hostname, $number_of_objs, $error_code);
+
+  $return = ll_reset_request( $object );
+
+  $next_object = ll_next_obj ( $object );
+
+  $return = ll_free_objs ( $object );
+
+  $return = ll_deallocate ( $object );
+
+  $result = ll_get_data( $object, $LLAPI_Specification );
+
+  # Reservation API
+
+  $resid = ll_make_reservation($start_time,$duration,RESERVATION_BY_NODE|RESERVATION_BY_HOSTLIST|RESERVATION_BY_JOBSTEP|RESERVATION_BY_JCF,$data,$options,\@users,\@groups,$group);
+
+  $result = ll_change_reservation($ID,%param);
+
+  $result = ll_bind(\@jobsteplist,$ID,$unbind)
+
+  $result = ll_remove_reservation(\@IDs,\@user_list,\@host_list,\@group_list)
+
+  # Query API functions ( deprecated )
+
+  my ($version_num,$numnodes,$noderef)=ll_get_nodes();
+
+  my ($version_num,$numjobs,$ref)=ll_get_jobs();
+
+  # Fair Share Scheduling API
+
+  $rc=ll_fair_share(FAIR_SHARE_RESET|FAIR_SHARE_SAVE,savedir,savefile);
+
+  # Configuration API
+
+  $rc=ll_config_changed();
+
+  $rc=ll_read_config();
+
+=head1 DESCRIPTION
+
+This module provides access to the APIs of the Tivoli Workload Scheduler LoadLeveler from IBM.  The APIs currently implemented are:
+
+=over 4
+
+=item * L<Data Access|DataAccess>
+
+=item * L<Query|Query>
+
+=item * L<Submit|Submit>
+
+=item * L<Reservation|Reservation>
+
+=item * L<Workload Management|Workload>
+
+=item * L<Fair Share Scheduling|FairShare>
+
+=item * L<Error Handling|Error>
+
+=item * L<Configuration|Configuration>
+
+=back
+
+This module is not for the faint hearted.  The LoadLeveler API returns a huge amount of information, the ll_get_data call has over 300 different specifications that can be supplied.  To use this module you really need a copy of the the IBM documentation on using LoadLeveler and maybe a copy of the llapi.h header file.
+
+=head2 LoadLeveler Versions
+
+This version has been "tested" with under quite a few versions of LoadLeveler from 3.1.0.16 to 3.5.1.2 under AIX,
+Linux and pLinux also thanks to SDSC L<http://www.sdsc.edu/> it has been tested on Blue Gene.  
+The coverage of the test suite however is not very good.
+
+Since LoadLeveler 3.2 does not change the version number in the llapi.h file a crude hack is used to work out what version is installed and only include the appropriate functions and enum values.  If your compile starts spitting out errors like:
+
+ "LoadLeveler.xs", line 3459.22: 1506-045 (S) Undeclared identifier WCLIMIT_ADD_MIN.
+ "LoadLeveler.xs", line 3459.22: 1506-051 (S) Case expression must be a valid integral constant.
+
+Then the hack has probably not worked and you will either need to either fix the Makefile.PL file or hardcode a value for the LLVER variable:
+
+ 3.1 : 3010000
+ 3.2 : 3020000
+
+There is a fairly strong probability that since I tested using 3.1.0.16 and later there might be failures with previous versions.
+If there is I would be grateful if you could send me, the outputs from the make command and:
+
+ lslpp -lc | grep LoadL
+
+These are the changes I know of for arguments to ll_get_data:
+
+=over 4
+
+=item * 3.1.0.4
+
+ LL_StepWallClockUsed
+
+=item * 3.1.0.5
+
+ LL_StepLargePage
+ LL_MachineLargePageSize64
+ LL_MachineLargePageCount64
+ LL_MachineLargePageFree64
+
+=item * 3.1.0.26
+
+ LL_StepStartTime
+
+=item * 3.1.0.31
+
+  LL_StepDependency
+  LL_MachineConfigTimeStamp
+
+=item * 3.2.0.0
+
+ LL_StepMaxProtocolInstances
+ LL_TaskInstanceMachineAddress
+ LL_AdapterUsageCommunicationInterface
+ LL_AdapterUsageDevice
+ LL_AdapterUsageInstanceNumber
+ LL_AdapterWindowList
+ LL_AdapterUsageWindowMemory64
+ LL_AdapterMinWindowSize64
+ LL_AdapterMaxWindowSize64
+ LL_AdapterMemory64
+ LL_ClassName
+ LL_ClassPriority
+ LL_ClassExcludeUsers
+ LL_ClassIncludeUsers
+ LL_ClassExcludeGroups
+ LL_ClassIncludeGroups
+ LL_ClassAdmin
+ LL_ClassNqsClass
+ LL_ClassNqsSubmit
+ LL_ClassNqsQuery
+ LL_ClassMaxProcessors
+ LL_ClassMaxJobs
+ LL_ClassGetFirstResourceRequirement
+ LL_ClassGetNextResourceRequirement
+ LL_ClassComment
+ LL_ClassCkptDir
+ LL_ClassCkptTimeHardLimit
+ LL_ClassCkptTimeSoftLimit
+ LL_ClassWallClockLimitHard
+ LL_ClassWallClockLimitSoft
+ LL_ClassCpuStepLimitHard
+ LL_ClassCpuStepLimitSoft
+ LL_ClassCpuLimitHard
+ LL_ClassCpuLimitSoft
+ LL_ClassDataLimitHard
+ LL_ClassDataLimitSoft
+ LL_ClassCoreLimitHard
+ LL_ClassCoreLimitSoft
+ LL_ClassFileLimitHard
+ LL_ClassFileLimitSoft
+ LL_ClassStackLimitHard
+ LL_ClassStackLimitSoft
+ LL_ClassRssLimitHard
+ LL_ClassRssLimitSoft
+ LL_ClassNice
+ LL_ClassFreeSlots
+ LL_ClassMaximumSlots
+ LL_ClassConstraints
+ LL_ClassExecutionFactor
+ LL_ClassMaxTotalTasks
+ LL_ClassPreemptClass
+ LL_ClassStartClass
+ LL_ClassMaxProtocolInstances
+
+=item * 3.2.0.5
+
+ LL_AdapterUsageNetworkId
+
+=item * 3.2.0.6
+
+ LL_StepBulkXfer
+ LL_StepTotalRcxtBlocks
+ LL_AdapterUsageTag
+
+=item * 3.2.0.9
+
+ LL_StepUserRcxtBlocks
+
+=item * 3.2.0.17
+
+ LL_AdapterReqInstances
+ LL_AdapterReqProtocol
+ LL_AdapterReqMode
+ LL_AdapterReqTypeName
+
+=item * 3.3.0.0
+
+ LL_JobSchedd
+ LL_JobJobQueueKey
+ LL_JobIsRemote
+ LL_JobSchedulingCluster
+ LL_JobSubmittingCluster
+ LL_JobSubmittingUser
+ LL_JobSendingCluster
+ LL_JobRequestedCluster
+ LL_JobLocalOutboundSchedds
+ LL_JobScheddHistory
+ LL_JobGetFirstClusterInputFile
+ LL_JobGetNextClusterInputFile
+ LL_JobGetFirstClusterOutputFile
+ LL_JobGetNextClusterOutputFile
+ LL_StepRequestedReservationID
+ LL_StepReservationID
+ LL_StepPreemptable
+ LL_StepPreemptWaitList
+ LL_StepRsetName
+ LL_StepCkptExecuteDirectory
+ LL_StepAcctKey
+ LL_MachineReservationPermitted
+ LL_MachineReservationList
+ LL_MachinePrestartedStarters
+ LL_MachineCPUList
+ LL_MachineGetFirstMCM
+ LL_MachineGetNextMCM
+ LL_MachineCpuList
+ LL_TaskInstanceMachine
+ LL_TaskInstanceCpuList
+ LL_AdapterMCMId
+ LL_ClusterPreemptionEnabled
+ LL_ClusterSysPrioThreshold
+ LL_ClusterMusterEnvironment
+ LL_ClusterClusterMetric
+ LL_ClusterClusterUserMapper
+ LL_ClusterClusterRemoteJobFilter
+ LL_ReservationID
+ LL_ReservationStartTime
+ LL_ReservationDuration
+ LL_ReservationMachines
+ LL_ReservationJobs
+ LL_ReservationModeShared
+ LL_ReservationModeRemoveOnIdle
+ LL_ReservationStatus
+ LL_ReservationOwner
+ LL_ReservationGroup
+ LL_ReservationCreateTime
+ LL_ReservationModifiedBy
+ LL_ReservationModifyTime
+ LL_ReservationUsers
+ LL_ReservationGroups
+ LL_MClusterName
+ LL_MClusterInboundScheddPort
+ LL_MClusterLocal
+ LL_MClusterInboundHosts
+ LL_MClusterOutboundHosts
+ LL_MClusterIncludeUsers
+ LL_MClusterExcludeUsers
+ LL_MClusterIncludeGroups
+ LL_MClusterExcludeGroups
+ LL_MClusterIncludeClasses
+ LL_MClusterExcludeClasses
+ LL_MClusterSecureScheddPort
+ LL_MClusterMulticlusterSecurity
+ LL_MClusterSslCipherList
+ LL_ClusterFileLocalPath
+ LL_ClusterFileRemotePath
+ LL_MCMID
+ LL_MCMCPUList
+
+=item * 3.3.0.1
+
+ LL_ClusterEnforceMemory
+
+=item * 3.3.1.0
+
+ LL_JobUsersJCF
+ LL_StepFavoredJob
+ LL_StepBgJobId
+ LL_StepBgState
+ LL_StepBgSizeRequested
+ LL_StepBgSizeAllocated
+ LL_StepBgShapeRequested
+ LL_StepBgShapeAllocated
+ LL_StepBgConnectionRequested
+ LL_StepBgConnectionAllocated
+ LL_StepBgPartitionRequested
+ LL_StepBgPartitionAllocated
+ LL_StepBgPartitionState
+ LL_StepBgErrorText
+ LL_MachineUsedCPUs
+ LL_MachineUsedCPUList
+ LL_AdapterUsageRcxtBlocks
+ LL_AdapterRcxtBlocks
+ LL_AdapterReqRcxtBlks
+ LL_MCMCPUs
+ LL_BgMachineBPSize
+ LL_BgMachineSize
+ LL_BgMachineSwitchCount
+ LL_BgMachineWireCount
+ LL_BgMachinePartitionCount
+ LL_BgMachineGetFirstBP
+ LL_BgMachineGetNextBP
+ LL_BgMachineGetFirstSwitch
+ LL_BgMachineGetNextSwitch
+ LL_BgMachineGetFirstWire
+ LL_BgMachineGetNextWire
+ LL_BgMachineGetFirstPartition
+ LL_BgMachineGetNextPartition
+ LL_BgBPId
+ LL_BgBPState
+ LL_BgBPLocation
+ LL_BgBPSubDividedBusy
+ LL_BgBPCurrentPartition
+ LL_BgBPCurrentPartitionState
+ LL_BgBPNodeCardCount
+ LL_BgBPGetFirstNodeCard
+ LL_BgBPGetNextNodeCard
+ LL_BgSwitchId
+ LL_BgSwitchBasePartitionId
+ LL_BgSwitchState
+ LL_BgSwitchDimension
+ LL_BgSwitchConnCount
+ LL_BgSwitchGetFirstConn
+ LL_BgSwitchGetNextConn
+ LL_BgPortConnToSwitchPort
+ LL_BgPortConnFromSwitchPort
+ LL_BgPortConnCurrentPartition
+ LL_BgPortConnCurrentPartitionState
+ LL_BgWireId
+ LL_BgWireState
+ LL_BgWireFromPortCompId
+ LL_BgWireFromPortId
+ LL_BgWireToPortCompId
+ LL_BgWireToPortId
+ LL_BgWireCurrentPartition
+ LL_BgWireCurrentPartitionState
+ LL_BgPartitionId
+ LL_BgPartitionState
+ LL_BgPartitionBPCount
+ LL_BgPartitionSwitchCount
+ LL_BgPartitionBPList
+ LL_BgPartitionGetFirstSwitch
+ LL_BgPartitionGetNextSwitch
+ LL_BgPartitionNodeCardList
+ LL_BgPartitionConnection
+ LL_BgPartitionOwner
+ LL_BgPartitionMode
+ LL_BgPartitionSmall
+ LL_BgPartitionMLoaderImage
+ LL_BgPartitionBLRTSImage
+ LL_BgPartitionLinuxImage
+ LL_BgPartitionRamDiskImage
+ LL_BgPartitionDescription
+ LL_BgNodeCardId
+ LL_BgNodeCardState
+ LL_BgNodeCardQuarter
+ LL_BgNodeCardCurrentPartition
+ LL_BgNodeCardCurrentPartitionState
+
+=item * 3.3.1.1
+
+ LL_StepBgJobState
+ LL_StepMcmAffinityOptions
+ LL_AdapterUsageExclusive
+
+=item * 3.4.2.1
+
+ LL_StepTaskAffinity
+ LL_StepCpusPerCore
+ LL_StepIsTopDog
+ LL_StepConsideredAt
+ LL_StepEstimatedStartTime
+ LL_StepUserHoldTime
+ LL_StepQueueId
+ LL_StepQueueIndex
+ LL_ClassExcludeBg
+ LL_ClassIncludeBg
+ LL_BgBPIONodeCount
+ LL_BgPartitionUserList
+ LL_BgPartitionIONodeCount
+ LL_BgPartitionCnLoadImage
+ LL_BgPartitionIoLoadImage
+ LL_BgPartitionIONodeList
+ LL_BgNodeCardSubDividedBusy
+ LL_BgNodeCardIONodeCount
+ LL_BgNodeCardGetFirstIONode
+ LL_BgNodeCardGetNextIONode
+ LL_BgIONodeId
+ LL_BgIONodeIPAddr
+ LL_BgIONodeCurrentPartition
+ LL_BgIONodeCurrentPartitionState
+ LL_BgPartitionBLRTSImage
+ 
+=item * 3.5.0.0
+ LL_StepClusterOption
+ LL_StepScaleAcrossClusterCount
+ LL_StepGetFirstScaleAcrossCluster
+ LL_StepGetNextScaleAcrossCluster
+ LL_StepBgPartitionType
+ LL_MachineRSetSupport
+ LL_MachineSMTState
+ LL_ClusterScaleAcrossEnv
+ LL_WlmStatVMemoryHighWater
+ LL_WlmStatVMemorySnapshotUsage
+ LL_WlmStatLargePageMemorySnapshotUsage
+ LL_ClassAllowScaleAcrossJobs
+ LL_ClassGetFirstMaxResourceRequirement
+ LL_ClassGetNextMaxResourceRequirement
+ LL_ClassGetFirstMaxNodeResourceRequirement
+ LL_ClassGetNextMaxNodeResourceRequirement
+ L_ClassStripingWithMinimumNetworks
+ LL_ClassMaxNode
+ LL_ReservationExpiration
+ LL_ReservationCanceledOccurrences
+ LL_ReservationCanceledOccurrencesCount
+ LL_ReservationRecurringString
+ LL_ReservationRecurrenceStructure
+ LL_ReservationBindingMethod
+ LL_ReservationGetNextOccurrence
+ LL_ReservationOccurrenceID
+ LL_StepReservationBindingMethod
+ LL_StepReservationFirstOidStepBoundTo
+ LL_MClusterAllowScaleAcrossJobs
+ LL_MClusterMainScaleAcrossCluster
+ LL_BgPartitionType
+
+=item * 3.5.1.2
+ 
+ LL_ReservationRecurrenceString
+ LL_ReservationJobOids
+
+=back
+
+=head2 64 bit types and 32 bit perl
+
+B<ll_get_data> has a whole set of 64 bit return types
+
+=head2 Build/Installation
+
+The module currently relies on the llapi.h file supplied with LoadLeveler for definitions of constants.  The make file automatically processes the llapi.h file into a llapi.ph file and installs it as part of the build process.
+
+You will probably need to edit Makefile.PL to change the value of $LoadL to point to where LoadLeveler is installed
+
+Standard build/installation supported by ExtUtils::MakeMaker(3)...
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+To convert the pod documentation (what there is of it) to html:
+
+	make html
+
+=head2 Building for Linux on PowerPC & Blue Gene
+
+The libllapi distributed for Linux on PowerPC architectures is 64 bit, typically the perl distributed is 32 bits. 
+This isn't good, to use this module you will need to build a 64 bit version of perl. This has worked for me:
+
+ sh Configure -Accflags='-q64' -Dcc='xlc' \ 
+        -Aldflags='-q64' -Alddlflags='-G -q64' \
+        -Adefine:libs='-lnsl -lgdbm -ldl -lm -lcrypt -lutil -lc' \
+        -Doptimize='-O2' -des
+ make
+ make install PERLNAME=perl64
+
+The libs definition was simply to remove the 32 bit -ldb that was discovered but couldn't be used. 
+Several of the other libraries are not essential, if you don't have them don't include them, Perl just 
+won't build modules that need them.
+
+If you want or need to build it somewhere other than the default then add B<-Dprefix=/path> to the Configure line.
+
+=head1 Examples
+
+Example uses of the module can be found in the examples directory.  Some of the examples are Perl versions of the C examples
+provided by LoadLeveler but most have provided by Mark Roberts who also wrote and maintains a Python interface.
+
+=head1 Known Problems
+
+=head2 QUERY_PROCID
+
+See APAR IY48329
+
+This does not return some values, eg LL_StepState always returns 0.  If your scheduler type is GANG then you don't get any results at all.
+
+=head2 Large History files
+
+This module has been observed to crash when given a history file of >92MB and <132MB ( the killer value is probably 128MB ).
+
+B<Workaround>
+
+The solution is to increase the bmaxdata value of the Perl executable. If you are using the installp version of perl it is recommended to copy the executable to another directory, and modify using ldedit to increase the number of data segments.
+
+        cp /usr/opt/perl/bin/perl /global/bin/llperl
+        /usr/bin/ldedit -o bmaxdata:0x20000000 /global/bin/llperl
+
+Then modify any scripts that have exhibited this behaviour to use the new
+executable. If this fails then increase the bmaxdata value until successful.
+
+=head1 CREDITS
+
+I would like to thank Mark "Red Dwarf" Roberts for his extensive assistance in making this module and for the large number of 
+example programs he has provided.
+
+LoadLeveler is a product of IBM and trademarked and copyrighted
+
+=head1 AUTHOR
+
+Mike Hawkins
+
+=head1 SEE ALSO
+
+L<perl>.
+
+IBM LoadLeveler for AIX 5L: Using and Administering
+
+Home Page:  L<http://www.pink-pit.com/LoadLeveler/>
+
+Python Interface PyLoadL: L<http://www.gingergeeks.co.uk>
+
+=cut

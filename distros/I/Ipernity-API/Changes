@@ -1,0 +1,27 @@
+Revision history for Perl extension Ipernity::API.
+
+0.01  Sun Oct 12 16:04:22 2008
+	- original version; created by h2xs 1.23 with options
+		-cfOn Ipernity::API
+
+0.02  Mon Dec 29 20:46:09 2008 
+	- Removed 'args' part of the new() construct. It is important
+	  that you change your code to reflect this.
+	- Code cleanup
+	- Renamed execute_xml() to execute_hash()
+	- Cleaned up CheckResponse()
+
+0.07  Tue Sep 28 11:16:15 2010 
+	- Forced array output for execute_hash()
+
+0.09  Wed Jan  5 14:33:59 2011
+	- Complete code cleanup
+	- Optimization of some functions
+	- new() now takes single arguments instead of a hashref
+	- Better test suite
+	- Documentation cleanup
+	- Better- more useful Makefile.PL
+
+0.10  Thu Jan 13 13:26:10 2011
+	- Fixed major bug in authtoken() function which caused
+	  this function to break

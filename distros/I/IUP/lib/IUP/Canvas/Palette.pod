@@ -1,0 +1,27 @@
+=pod
+
+=head1 NAME
+
+IUP::Canvas::Palette - [special Canvas helper] Color palette for use with IUP::Canvas
+
+=head1 SYNOPSIS
+
+ $pal = IUP::Canvas::Palette->new( [$col0, $col1, $col2, ...] );
+ $pal = IUP::Canvas::Palette->new($n);
+ 
+ $value = $pal->Color($n);
+ $pal->Color($n, $color);
+ $pal->Size;
+ $pal->Data;
+ 
+ $canvas->cdPalette($pal, $mode);
+
+=head1 DESCRIPTION
+
+B<IUP::Canvas::Bitmap> is a helper class used by L<IUP::Canvas> methods: L<cdPalette|IUP::Canvas/"cdPalette()">
+
+=head1 SEE ALSO
+
+L<IUP::Canvas>
+
+=cut

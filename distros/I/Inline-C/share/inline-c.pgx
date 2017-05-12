@@ -1,0 +1,66 @@
+# This is the Pegex grammar for Inline::C
+
+# Note:
+#
+# Use the following environment variables for dev:
+#
+#   export PERL_PEGEX_DEBUG=1
+#   export PERL_PEGEX_AUTO_COMPILE=1
+#
+# To recompile the grammar without AUTO COMPILE, just run:
+#
+#   perl -Ilib -MInline::C::ParsePegex::Grammar=compile
+#
+# And that will put changes to this file into Inline::C::ParsePegex::Grammar.
+
+%grammar inline-c
+%version 0.0.1
+
+# C code is 1 or more 'parts'
+code: part+
+
+# The only parts we care about are function definitions and declarations, but
+# not those inside a comment.
+part: =ALL (
+  | comment
+  | function_definition
+  | function_declaration
+  | anything_else
+)
+
+comment:
+  /- SLASH SLASH [^ BREAK ]* BREAK / |
+  /- SLASH STAR (: [^ STAR ]+ | STAR (! SLASH))* STAR SLASH ([ TAB ]*)? /
+
+# int foo_ () { return -1; }\n
+function_definition:
+  rtype /( identifier )/ -
+  LPAREN arg* % COMMA /- RPAREN - LCURLY -/
+
+function_declaration:
+  rtype /( identifier )/ -
+  LPAREN arg_decl* % COMMA /- RPAREN - SEMI -/
+
+rtype: /- (: rtype1 | rtype2 ) -/
+
+rtype1: / modifier*( type_identifier ) - ( STAR*) /
+
+rtype2: / modifier+ STAR*/
+
+arg: /(: type - ( identifier)|( DOT DOT DOT ))/
+
+arg_decl: /( type WS* identifier*| DOT DOT DOT )/
+
+type: / WS*(: type1 | type2 ) WS* /
+
+type1: / modifier*( type_identifier ) WS*( STAR* )/
+
+type2: / modifier* STAR* /
+
+modifier: /(: (:unsigned|long|extern|const)\b WS* )/
+
+identifier: /(: WORD+ )/
+
+type_identifier: /(: WORD+ )/
+
+anything_else: / ANY* (: EOL | EOS ) /

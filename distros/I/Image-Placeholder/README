@@ -1,0 +1,21 @@
+Image::Placeholder 1.0
+======================
+Image::Placeholder is a module and command-line script for generating PNG
+images which can be used as placeholders, most commonly when designing a
+document or website which will accept images with fixed dimensions, but that
+imagery is not yet available.
+
+
+Dependencies
+------------
+- Perl v5.10 or better
+- Modern::Perl
+- Moose, MooseX::FollowPBP, MooseX::Method::Signatures
+- GD
+
+Copyright and licence
+---------------------
+Copyright (c) 2010 Mark Norman Francis <norm@cackhanded.net>.
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

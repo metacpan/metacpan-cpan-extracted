@@ -1,0 +1,8 @@
+version 0.0102 - December 1, 2014
+ * Added missing dependency for Test::Deep. Thanks to andk.
+
+version 0.0101 - November 20, 2014
+ * Fixed broken links in documentation. Thanks to Matthew Musgrove.
+
+version 0.0100 - November 15, 2014
+ * Initial public release.

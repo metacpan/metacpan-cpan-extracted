@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE Registry [ 
+    <!ENTITY included_service SYSTEM "t/conf/063b_IOC_Config_XML_include_test.xml"> 
+]>
+<Registry>
+    <Container name="test">
+        &included_service;
+    </Container>
+</Registry>

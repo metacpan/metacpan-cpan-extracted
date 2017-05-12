@@ -1,0 +1,150 @@
+NAME
+    `IO::Ppoll' - Object interface to Linux's `ppoll()' call
+
+SYNOPSIS
+     use IO::Ppoll qw( POLLIN POLLOUT );
+     use POSIX qw( sigprocmask SIG_BLOCK SIGHUP );
+
+     my $ppoll = IO::Ppoll->new();
+     $ppoll->mask( $input_handle => POLLIN );
+     $ppoll->mask( $output_handle => POLLOUT );
+
+     $SIG{HUP} = sub { print "SIGHUP happened\n"; };
+     sigprocmask( SIG_BLOCK, POSIX::SigSet->new( SIGHUP ), undef );
+
+     # If a SIGHUP happens, it can only happen during this poll
+     $ppoll->poll( $timeout );
+
+     $input_ev = $poll->events( $input_handle );
+
+DESCRIPTION
+    `IO::Ppoll' is a simple interface to Linux's `ppoll()' system call. It
+    provides an interface that is drop-in compatible with IO::Poll. The
+    object stores a signal mask that will be in effect during the actual
+    `ppoll()' system call and has additional methods for manipulating the
+    signal mask.
+
+    The `ppoll()' system call atomically switches the process's signal mask
+    to that provided by the call, waits identically to `poll()', then
+    switches it back again. This allows a program to safely wait on either
+    file handle IO or signals, without needing such tricks as a
+    self-connected pipe or socket.
+
+    The usual way in which this is used is to block the signals the
+    application is interested in during the normal running of code. Whenever
+    the `ppoll()' wait is entered the process signal mask will be switched
+    to that stored in the object. If there are any pending signals, the
+    Linux kernel will then deliver them and make `ppoll()' return -1 with
+    `errno' set to `EINTR'. If no signals are pending, it will wait as a
+    normal `poll()' would. This guarantees the signals will only be
+    delivered during the `ppoll()' wait, when it would be safe to do so.
+
+CONSTRUCTOR
+  new
+       $ppoll = IO::Ppoll->new()
+
+    Returns a new instance of an `IO::Ppoll' object. It will contain no file
+    handles and its signal mask will be empty.
+
+METHODS
+  mask
+       $mask = $ppoll->mask( $handle )
+
+    Returns the current mask bits for the given IO handle
+
+       $ppoll->mask( $handle, $newmask )
+
+    Sets the mask bits for the given IO handle. If `$newmask' is 0, the
+    handle will be removed.
+
+  mask_add
+  mask_del
+       $ppoll->mask_add( $handle, $addmask )
+
+       $ppoll->mask_del( $handle, $delmask )
+
+    *Since version 0.12.*
+
+    Convenient shortcuts to setting or clearing one or more bits in the mask
+    of a handle. Equivalent, respectively, to the following lines
+
+     $ppoll->mask( $handle, $ppoll->mask( $handle ) | $addmask )
+
+     $ppoll->mask( $handle, $ppoll->mask( $handle ) & ~$delmask )
+
+    Specifically note that `$maskbits' contains bits to remove from the
+    mask.
+
+  poll
+       $ret = $ppoll->poll( $timeout )
+
+    Call the `ppoll()' system call. If `$timeout' is not supplied then no
+    timeout value will be passed to the system call. Returns the result of
+    the system call, which is the number of filehandles that have non-zero
+    events, 0 on timeout, or -1 if an error occurred (including being
+    interrupted by a signal). If -1 is returned, `$!' will contain the
+    error.
+
+  events
+       $bits = $ppoll->events( $handle )
+
+    Returns the event mask which represents the events that happened on the
+    filehandle during the last call to `poll()'.
+
+  remove
+       $ppoll->remove( $handle )
+
+    Removes the handle from the list of file descriptors for the next poll.
+
+  handles
+       @handles = $ppoll->handles( $bits )
+
+    Returns a list of handles. If `$bits' is not given then all of the
+    handles will be returned. If `$bits' is given then the list will only
+    contain handles which reported at least one of the bits specified during
+    the last `poll()' call.
+
+  sigmask
+       $sigset = $ppoll->sigmask
+
+    Returns the `POSIX::SigSet' object in which the signal mask is stored.
+    Since this is a reference to the object the `IO::Ppoll' object uses, any
+    modifications made to it will be reflected in the signal mask given to
+    the `ppoll()' system call.
+
+       $ppoll->sigmask( $newsigset )
+
+    Sets the `POSIX::SigSet' object in which the signal mask is stored.
+    Usually this is not required, as a new `IO::Ppoll' is initialised with
+    an empty set, and the `sigmask_add()' and `sigmask_del()' methods can be
+    used to modify it.
+
+  sigmask_add
+       $ppoll->sigmask_add( @signals )
+
+    Adds the given signals to the signal mask. These signals will be blocked
+    during the `poll()' call.
+
+  sigmask_del
+       $ppoll->sigmask_del( @signals )
+
+    Removes the given signals from the signal mask. These signals will not
+    be blocked during the `poll()' call, and may be delivered while `poll()'
+    is waiting.
+
+  sigmask_ismember
+       $present = $ppoll->sigmask_ismember( $signal )
+
+    Tests if the given signal is present in the signal mask.
+
+SEE ALSO
+    *   IO::Poll - Object interface to system poll call
+
+    *   `ppoll(2)' - wait for some event on a file descriptor (Linux
+        manpages)
+
+    *   IO::Async::Loop::IO_Ppoll - a Loop using an IO::Ppoll object
+
+AUTHOR
+    Paul Evans <leonerd@leonerd.org.uk>
+

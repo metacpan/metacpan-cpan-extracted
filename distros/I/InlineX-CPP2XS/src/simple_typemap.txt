@@ -1,0 +1,16 @@
+simple_double T_S_DOUBLE
+extra_simple_double T_XS_DOUBLE
+
+INPUT
+T_S_DOUBLE
+          $var = (simple_double)SvNV($arg)
+
+T_XS_DOUBLE
+          $var = (simple_double)SvNV($arg)
+
+OUTPUT
+T_S_DOUBLE
+          sv_setnv($arg, (simple_double)$var);
+
+T_XS_DOUBLE
+          sv_setnv($arg, (simple_double)$var);

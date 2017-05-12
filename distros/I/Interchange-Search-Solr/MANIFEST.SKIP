@@ -1,0 +1,24 @@
+# Avoid version control files
+^\.git\/
+^.gitignore$
+
+# Skip distribution files
+^.*\.tar.gz$
+
+# Skip automatically generated files
+MYMETA.*
+^.*blib
+^Makefile$
+
+# Avoid temp and backup files.
+~$
+\.tmp$
+\.old$
+\.bak$
+\..*?\.sw[po]$
+\#$
+\b\.#
+
+# Avoid patch remnants
+\.orig$
+\.rej$

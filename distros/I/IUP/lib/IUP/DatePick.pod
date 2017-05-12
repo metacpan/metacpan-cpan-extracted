@@ -1,0 +1,14 @@
+=head1 NAME
+
+IUP::DatePick - [GUI element] date picker
+
+=head1 DESCRIPTION
+
+XXX-TODO: missing doc
+
+=head1 SEE ALSO
+
+The original doc: L<iupdatepick.html|http://www.tecgraf.puc-rio.br/iup/en/elem/iupdatepick.html>
+
+
+=cut

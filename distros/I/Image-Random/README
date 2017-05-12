@@ -1,0 +1,108 @@
+NAME
+    Image::Random - Perl class for creating random image.
+
+SYNOPSIS
+     use Image::Random;
+     my $obj = Image::Random->new(%parameters);
+     my $type = $obj->create($output_path);
+     my ($width, $height) = $obj->sizes($new_width, $new_height);
+     my $type = $obj->type($new_type);
+
+METHODS
+    new(%parameters)
+             Constructor.
+
+            *       "color"
+
+                     Color of image.
+                     Default value is undef.
+                     Undefined value means random color.
+
+            *       "height"
+
+                     Height of image.
+                     Default value is 1920.
+
+            *       "type"
+
+                     Image type.
+                     List of supported types: bmp, gif, jpeg, png, pnm, raw, sgi, tga, tiff
+                     Default value is 'bmp'.
+
+            *       "width"
+
+                     Width of image.
+                     Default value is 1080.
+
+    "create($path)"
+             Create image.
+             Returns scalar value of supported file type.
+
+    "sizes([$width, $height])"
+             Set/Get image sizes.
+             Returns actual width and height.
+
+    "type([$type])"
+             Set/Get image type.
+             Returns actual type of image.
+
+ERRORS
+     new():
+             Bad background color definition. Use Imager::Color object.
+             Image type '%s' doesn't supported.
+             From Class::Utils:
+                     Unknown parameter '%s'.
+
+     create():
+             Cannot write file to '$path'.
+                     Error, %s
+             Image type '%s' doesn't supported.
+
+EXAMPLE
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use File::Temp qw(tempfile);
+     use Image::Random;
+
+     # Temporary file.
+     my (undef, $temp) = tempfile();
+
+     # Object.
+     my $obj = Image::Random->new;
+
+     # Create image.
+     my $type = $obj->create($temp);
+
+     # Print out type.
+     print $type."\n";
+
+     # Unlink file.
+     unlink $temp;
+
+     # Output:
+     # bmp
+
+DEPENDENCIES
+    Class::Utils, Error::Pure, File::Basename, Imager, Imager::Color,
+    List::MoreUtils.
+
+SEE ALSO
+    Data::Random, Image::Select.
+
+REPOSITORY
+    <https://github.com/tupinek/Image-Random>.
+
+AUTHOR
+    Michal Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    BSD license.
+
+VERSION
+    0.06
+

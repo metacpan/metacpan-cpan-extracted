@@ -1,0 +1,61 @@
+Revision History for IPC-AnyEvent-Gearman
+=========================================
+
+v0.8 2012-06-04
+---------------
+
+2012-06-04 21:44:11 +0900  be sure DEMOLISHing
+
+v0.7 2012-06-01
+---------------
+
+2012-06-01 18:10:15 +0900  v0.7 remove prefix,pid and add channel
+2012-06-01 10:51:38 +0900  ver up to 0.7 fix wrong codes in SYNOPSIS
+
+v0.6 2012-06-01
+---------------
+
+2012-06-01 10:09:45 +0900  v0.6 rename callbacks to on_recv,on_fail rename servers attr to job_servers send() changed. It accepts 'target_pid' as first arg.
+
+v0.5 2012-05-30
+---------------
+
+2012-05-30 21:41:26 +0900  v0.5 - change retry_count to retrying - update some codes,tests
+2012-05-30 16:49:19 +0900  add leak test sample
+2012-05-30 16:27:05 +0900  add moose tip
+2012-05-30 16:18:05 +0900  set log level tp ERROR
+
+v0.4 2012-05-30
+---------------
+
+2012-05-30 16:14:57 +0900  add Re-registering functions
+2012-05-30 15:08:40 +0900  Patch Any::Gearman::Worker for connection persistence
+2012-05-30 12:39:36 +0900  -_-
+2012-05-30 01:10:19 +0900  restore to 0.2 code
+2012-05-30 00:38:25 +0900  add use AnyEvent
+
+v0.3 2012-05-30
+---------------
+
+2012-05-30 00:27:34 +0900  Change worker to Gearman::Worker update to v0.3
+
+v0.2 2012-05-29
+---------------
+
+2012-05-29 21:15:35 +0900  version up and fix demolish
+2012-05-25 16:04:40 +0900  fix attr
+
+v0.1 2012-05-25
+---------------
+
+2012-05-25 16:01:45 +0900  version up
+2012-05-25 15:57:59 +0900  update POD for PodWeaber
+
+v0.002 2012-05-25
+-----------------
+
+2012-05-25 15:48:05 +0900  v0.002 fix pods
+
+===================================
+End of changes in the last 365 days
+===================================

@@ -1,0 +1,349 @@
+=for comment based on iup-3.5 - http://www.tecgraf.puc-rio.br/iup/en/elem/iuptoggle.html
+
+=head1 NAME
+
+IUP::Toggle - [GUI element] two-state (on/off) button with a text and/or an image
+
+=head1 DESCRIPTION
+
+Creates the toggle interface element. It is a two-state (on/off) button
+that, when selected, generates an action that activates a function in
+the associated application. Its visual representation can contain a
+text or an image.
+
+=begin HTML
+
+<p>
+  <table border="1">
+    <col style="background-color: rgb(239, 235, 231);">
+    <col style="background-color: rgb(173, 177, 194);">
+    <col style="background-color: rgb(212, 208, 200);">
+    <col style="background-color: rgb(236, 233, 216);">
+    <tbody align="center">
+      <tr>
+        <th>GTK</th>
+        <th>Motif</th>
+        <th>Windows<br>Classic</th>
+        <th>Windows<br>XP Style</th>
+      </tr>
+      <tr>
+        <td><img src="http://kmx.github.io/perl-iup/img-3.9/elem/iuptoggle_gtk_3state.png"></td>
+        <td><img src="http://kmx.github.io/perl-iup/img-3.9/elem/iuptoggle_mot_3state.png"></td>
+        <td><img src="http://kmx.github.io/perl-iup/img-3.9/elem/iuptoggle_win2k_3state.png"></td>
+        <td><img src="http://kmx.github.io/perl-iup/img-3.9/elem/iuptoggle_winxp_3state.png"></td>
+      </tr>
+      <tr>
+        <td><img src="http://kmx.github.io/perl-iup/img-3.9/elem/iuptoggle_gtk_image.png"></td>
+        <td><img src="http://kmx.github.io/perl-iup/img-3.9/elem/iuptoggle_mot_image.png"></td>
+        <td><img src="http://kmx.github.io/perl-iup/img-3.9/elem/iuptoggle_win2k_image.png"></td>
+        <td><img src="http://kmx.github.io/perl-iup/img-3.9/elem/iuptoggle_winxp_image.png"></td>
+      </tr>
+      <tr>
+        <td><img src="http://kmx.github.io/perl-iup/img-3.9/elem/iuptoggle_gtk_radio.png"></td>
+        <td><img src="http://kmx.github.io/perl-iup/img-3.9/elem/iuptoggle_mot_radio.png"></td>
+        <td><img src="http://kmx.github.io/perl-iup/img-3.9/elem/iuptoggle_win2k_radio.png"></td>
+        <td><img src="http://kmx.github.io/perl-iup/img-3.9/elem/iuptoggle_winxp_radio.png"></td>
+      </tr>
+      <tr>
+        <td><img src="http://kmx.github.io/perl-iup/img-3.9/elem/iuptoggle_gtk_text.png"></td>
+        <td><img src="http://kmx.github.io/perl-iup/img-3.9/elem/iuptoggle_mot_text.png"></td>
+        <td><img src="http://kmx.github.io/perl-iup/img-3.9/elem/iuptoggle_win2k_text.png"></td>
+        <td><img src="http://kmx.github.io/perl-iup/img-3.9/elem/iuptoggle_winxp_text.png"></td>
+      </tr>
+    </tbody>
+  </table>
+</p>
+
+=end HTML
+
+=head1 USAGE
+
+=head2 CREATION - new() method
+
+ $toggle = IUP::Toggle->new( VALUE=>"ON" );
+
+B<Returns:> the identifier of the created element, or C<undef> if an error occurs.
+
+NOTE: You can pass to C<new()> other C<ATTRIBUTE=E<gt>'value'> or C<CALLBACKNAME=E<gt>\&func> pairs relevant
+to this element - see L<IUP::Manual::02_Elements|IUP::Manual::02_Elements/"new()">.
+
+=head2 ATTRIBUTES
+
+For more info about concept of attributes (setting/getting values etc.)
+see L<IUP::Manual::03_Attributes|IUP::Manual::03_Attributes>. Attributes specific to this element:
+
+=over
+
+=item B<ALIGNMENT>
+
+I<(non inheritable)>
+
+horizontal and vertical alignment when
+IMAGE is defined. Possible values: "ALEFT", "ACENTER" and "ARIGHT",
+combined to "ATOP", "ACENTER" and "ABOTTOM". Default:
+"ACENTER:ACENTER". Partial values are also accepted, like "ARIGHT" or
+":ATOP", the other value will be used from the current alignment. In
+Motif, vertical alignment is restricted to "ACENTER". In Windows works
+only when Visual Styles is active. Text is always left aligned. (since
+3.0)
+
+=item L<BGCOLOR|IUP::Manual::03_Attributes/BGCOLOR>
+
+Background color of toggle mark
+when displaying a text. The text background is transparent, it will use
+the background color of the native parent. When displaying an image in
+Windows the background is ignored and the system color is used.
+Default: the global attribute DLGBGCOLOR.
+
+=item B<CANFOCUS>
+
+I<(creation only) (non inheritable)>
+
+enables the focus
+traversal of the control. In Windows the control will still get the
+focus when clicked. Default: YES. 
+
+=item L<FGCOLOR|IUP::Manual::03_Attributes/FGCOLOR>
+
+Color of the text shown on the
+toggle. In Windows, when using Visual Styles FGCOLOR is ignored.
+Default: the global attribute DLGFGCOLOR.
+
+=item B<FLAT>
+
+I<(creation only)>
+
+Hides the toggle borders until the mouse enter
+the toggle area when the toggle is not checked. If the toggle is
+checked, then the borders will be shown even if flat is enabled. Used
+only when IMAGE is defined. Can be YES or NO. Default: NO. (since iup-3.3)
+
+=item B<IMAGE>
+
+I<(non inheritable) [GTK 2.6]>
+
+Image name or L<IUP::Image> reference. When the IMAGE attribute is
+defined, the TITLE is not shown. This makes the toggle looks just like
+a button with an image, but its behavior remains the same. 
+
+See - L<Using Images in Other Elements (via IMAGE Attribute)|IUP::Image/"Using Images in Other Elements (via IMAGE Attribute)">
+
+=item B<IMPRESS>
+
+I<(non inheritable) [GTK 2.6]>
+
+Image name of the pressed toggle. Unlike
+buttons, toggles always display the button border when IMAGE and
+IMPRESS are both defined.
+
+=item B<IMINACTIVE>
+
+I<(non inheritable)>
+
+Image name of the inactive toggle. If
+it is not defined but IMAGE is defined then for inactive toggles the
+colors will be replaced by a modified version of the background color
+creating the disabled effect. (GTK 2.6)
+
+=item B<MARKUP>
+
+I<[GTK only]>
+
+Allows the title string to contains pango markup
+commands. Works only if a mnemonic is NOT defined in the title. Can be
+"YES" or "NO". Default: "NO".
+
+=item B<PADDING>
+
+Internal margin when IMAGE is defined. Works just like the
+MARGIN attribute of the L<IUP::Hbox|IUP::Hbox> and L<IUP::Vbox|IUP::Vbox> containers, but uses
+a different name to avoid inheritance problems. Default value: "0x0".
+
+=item B<RADIO>
+
+I<(read-only)>
+
+Returns if the toggle is inside a radio. Can be
+"YES" or "NO". Valid only after the element is mapped, before returns C<undef>. 
+
+=item B<RIGHTBUTTON>
+
+I<(Windows Only) (creation only)>
+
+Place the check button
+at the right of the text. Can be "YES" or "NO". Default: "NO".
+
+=item B<VALUE>
+
+I<(non inheritable)>
+
+Toggle's state. Values can be "ON" or
+"OFF". If 3STATE=YES then can also be "NOTDEF". Default: "OFF". In GTK
+if you change the state of a radio, the unchecked toggle will receive
+an ACTION callback notification.
+
+=item L<TITLE|IUP::Manual::03_Attributes/TITLE>
+
+I<(non inheritable)>
+
+Toggle's text. If
+IMAGE is not defined before map, then the default behavior is to
+contain a text. The button behavior can not be changed after map. The
+natural size will be larger enough to include all the text in the
+selected font, even using multiple lines, plus the button borders or
+check box if any. The '\n' character is accepted for line change. The
+"&" character can be used to define a mnemonic, the next character will
+be used as key. Use "&&" to show the "&" character instead on defining
+a mnemonic. The toggle can be activated from any control in the dialog
+using the "Alt+key" combination. (mnemonic support since iup-3.0)
+
+=item B<3STATE> (creation only)
+
+Enable a three state toggle. Valid for
+toggles with text only and that do not belong to a radio. Can be "YES"
+or NO". Default: "NO".
+
+=back
+
+The following L<common attributes|IUP::Manual::03_Attributes/Common Attributes> are also accepted:
+
+=over
+
+=item * L<ACTIVE|IUP::Manual::03_Attributes/ACTIVE>, L<FONT|IUP::Manual::03_Attributes/FONT>,
+L<EXPAND|IUP::Manual::03_Attributes/EXPAND>,
+L<SCREENPOSITION|IUP::Manual::03_Attributes/SCREENPOSITION>,
+L<POSITION|IUP::Manual::03_Attributes/POSITION>,
+L<MINSIZE|IUP::Manual::03_Attributes/MINSIZE>,
+L<MAXSIZE|IUP::Manual::03_Attributes/MAXSIZE>, L<WID|IUP::Manual::03_Attributes/WID>,
+L<TIP|IUP::Manual::03_Attributes/TIP>, L<SIZE|IUP::Manual::03_Attributes/SIZE>,
+L<RASTERSIZE|IUP::Manual::03_Attributes/RASTERSIZE>,
+L<ZORDER|IUP::Manual::03_Attributes/ZORDER>,
+L<VISIBLE|IUP::Manual::03_Attributes/VISIBLE>
+
+also accepted.
+
+=back
+
+=head2 CALLBACKS
+
+For more info about concept of callbacks (setting callback handlers etc.)
+see L<IUP::Manual::04_Callbacks|IUP::Manual::04_Callbacks>. Callbacks specific to this element:
+
+=over
+
+=item L<ACTION|IUP::Manual::04_Callbacks/ACTION>
+
+Action generated when the toggle's
+state (on/off) was changed. The callback also receives the toggle's
+state.
+
+B<Callback handler prototype:>
+
+ sub action_handler {
+   my ($self, $state) = @_;
+   #...
+ }
+
+=over
+
+B<$self:> reference to the element (IUP::Toggle) that activated the event
+
+B<$state:> 1 if the toggle's state was shifted to on; 0 if it was
+shifted to off.
+
+B<Returns:> IUP_CLOSE will be processed.
+
+=back
+
+=item B<VALUECHANGED_CB>
+
+Called after the value was interactively changed by
+the user. Called after the ACTION callback, but under the same context.
+
+B<Callback handler prototype:>
+
+ sub valuechanged_cb_handler {
+   my ($self) = @_;
+   #...
+ }
+
+=over
+
+B<$self:> reference to the element (IUP::Toggle) that activated the event
+
+=back
+
+=back
+
+The following L<common callbacks|IUP::Manual::04_Callbacks/Common Callbacks> are also accepted:
+
+=over
+
+=item * L<MAP_CB|IUP::Manual::04_Callbacks/MAP_CB>,
+L<UNMAP_CB|IUP::Manual::04_Callbacks/UNMAP_CB>,
+L<GETFOCUS_CB|IUP::Manual::04_Callbacks/GETFOCUS_CB>,
+L<KILLFOCUS_CB|IUP::Manual::04_Callbacks/KILLFOCUS_CB>,
+L<ENTERWINDOW_CB|IUP::Manual::04_Callbacks/ENTERWINDOW_CB>,
+L<LEAVEWINDOW_CB|IUP::Manual::04_Callbacks/LEAVEWINDOW_CB>,
+L<K_ANY|IUP::Manual::04_Callbacks/K_ANY>, L<HELP_CB|IUP::Manual::04_Callbacks/HELP_CB>
+
+=back
+
+=head1 NOTES
+
+Toggle with image or text can not change its behavior after mapped.
+This is a creation attribute. But after creation the image can be
+changed for another image, and the text for another text.
+
+Toggles are activated using the Space key.
+
+To build a set of mutual exclusive toggles, insert them in a
+L<IUP::Radio|IUP::Radio> container. They must be inserted before creation, and their
+behavior can not be changed. If you need to dynamically remove toggles
+that belongs to a radio in Windows, then put the radio inside a
+L<IUP::Frame|IUP::Frame> that has a title.
+
+=head1 EXAMPLES
+
+
+The element B<IUP::Toggle> is used in the following sample scripts:
+
+=over
+
+=item * L<0-basic/cbox.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/cbox.pl> - IUP::Cbox example
+
+=item * L<0-basic/image.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/image.pl> - IUP::Image example
+
+=item * L<0-basic/layoutdialog.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/layoutdialog.pl> - IUP::LayoutDialog example
+
+=item * L<0-basic/plot_advanced.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/plot_advanced.pl> - Plot controls
+
+=item * L<0-basic/radio.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/radio.pl> - IUP::Radio example
+
+=item * L<0-basic/text_format.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/text_format.pl> - IUP::Text (formating) example
+
+=item * L<0-basic/toggle.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/toggle.pl> - IUP::Toggle example
+
+=item * L<1-apps/app-mdi.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/1-apps/app-mdi.pl> - IUP app example
+
+=item * L<1-apps/app-plot-demo.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/1-apps/app-plot-demo.pl> - dials for zooming
+
+=item * L<1-apps/app-sample1.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/1-apps/app-sample1.pl> - example used for screenshot - IUP.pod
+
+=item * L<1-apps/app-sample2.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/1-apps/app-sample2.pl> - example based on the original sample.c
+
+=item * L<1-apps/app-simple-demo.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/1-apps/app-simple-demo.pl> - example used for screenshot - IUP.pod
+
+=back 
+
+
+
+=head1 SEE ALSO
+
+L<IUP::Image|IUP::Image>, L<IUP::Button|IUP::Button>,
+L<IUP::Label|IUP::Label>, L<IUP::Radio|IUP::Radio>.
+
+The original doc: L<iuptoggle.html|http://www.tecgraf.puc-rio.br/iup/en/elem/iuptoggle.html>
+ 
+
+=cut

@@ -1,0 +1,23 @@
+---
+abstract: 'IPv4 and IPv6 to country translation using DB_File'
+author:
+  - 'Nick Wellnhofer <wellnhofer@aevum.de>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: IP-Country-DB_File
+requires:
+  DB_File: '0'
+  Math::Int64: '0'
+  Net::FTP: '0'
+  Socket: '1.94'
+  perl: '5.008'
+resources:
+  repository: http://github.com/nwellnhof/IP-Country-DB_File
+version: '3.03'

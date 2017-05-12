@@ -1,0 +1,28 @@
+---
+abstract: 'Easily store variables in SysV shared memory.'
+author:
+  - 'Kevin Cody-Little <kcodyjr@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: IPC-Shm
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: 0
+  Class::Attrib: 1.06
+  Digest::SHA1: 0
+  IPC::Shm::Simple: 1.1
+  Scalar::Util: 0
+  Storable: 0
+  UNIVERSAL: 0
+version: 0.35

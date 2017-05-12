@@ -1,0 +1,24 @@
+IBM::LoadLeveler version 1.05
+=============================
+
+This module makes the IBM LoadLeveler Data Access, Query, Submit & Workload management APIs available to Perl.
+
+LoadLeveler is a product of IBM.  For more information, please refer to http://www.ibm.com/
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+   make html
+
+DEPENDENCIES
+
+This module requires IBM LoadLeveler
+
+  Copying
+
+    Copyright (c) 2002 Mike Hawkins. All rights reserved. This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself. 

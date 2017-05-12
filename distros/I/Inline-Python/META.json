@@ -1,0 +1,59 @@
+{
+   "abstract" : "Write Perl subs and classes in Python.",
+   "author" : [
+      "Neil Watkiss <NEILW@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Inline-Python",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "Digest::MD5" : "2.5",
+            "Inline" : "0.46"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Proc::ProcessTable" : "0.53",
+            "Test" : "0",
+            "Test::Deep" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "http://github.com/niner/inline-python-pm.git",
+         "web" : "http://github.com/niner/inline-python-pm"
+      }
+   },
+   "version" : "0.52",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

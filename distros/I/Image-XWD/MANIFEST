@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Image-XWD.t
+lib/Image/XWD.pm

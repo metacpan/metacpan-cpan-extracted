@@ -1,0 +1,61 @@
+Revision history for Image-Compare
+
+{{$NEXT}}
+
+1.03 2016-02-10
+
+    - Warning "Constants from lexical variables potentially modified elsewhere are deprecated" fixed
+
+1.02 2016-01-31
+
+    - Add section LICENSE to the pod as suggested by CPANTS
+      (thanks to Mohammad S Anwar)
+
+1.01 2016-01-31
+
+    - Assembly system is replaced with EUMM
+    - The module is posted on Github
+    - Some tests are corrected
+
+1.0 2014-12-16
+
+    - Adding some clarity to the documentation around the IMAGE output method.
+      Thanks to Daniel Gempesaw for the patch!
+
+0.9 2010-09-23
+
+    - I really hope this is the last time I have to fix this test.
+
+0.8 2010-05-29
+
+    - Yet ANOTHER fix for the world's worst test
+
+0.7 2010-05-18
+
+    - Making the dumb network test marginally less moronic
+
+0.6 2010-05-01
+
+    - Fixing some Pod::Coverage problems
+
+0.5 2008-04-06
+
+    - Major refactoring
+    - Made some requirements into recommendations
+    - Added new THRESHOLD_COUNT comparator
+    - Added support for user-provided color gradients
+    - Added match mask support
+    - I'm not sure where 0.4 went.
+
+0.3 2006-09-15
+
+    - Adding accessors for image1, image2 and method
+    - Fixing up makefile to make it friendlier
+
+0.2 2006-07-23
+
+    - Adding a few tests
+
+0.1 2006-04-11
+
+    - No changes -- initial release

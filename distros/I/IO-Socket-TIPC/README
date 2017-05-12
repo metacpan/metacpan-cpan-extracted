@@ -1,0 +1,64 @@
+IO::Socket::TIPC
+=====================================
+
+This is a TIPC (Transparent Inter-Process Communication) module for perl.  See
+http://tipc.sf.net/ if you don't know what this is.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+* An operating system supported by TIPC, which also has Perl.  (So far, that
+means Linux and Solaris.)  See the "OPERATING SYSTEM SUPPORT" section, below,
+for more details.
+
+* At build-time, it must be able to find the header file "tipc.h".  It will try
+several well-known locations for Linux and Solaris, before giving up.  The vast
+majority of the time, this works just fine.
+
+* At runtime, it expects your kernel to have TIPC enabled.  (On Linux you'll
+see a line in your /proc/net/protocols that starts with "TIPC"; on Solaris
+you'll see the "tipc" module loaded in modinfo.)  Without this, many of the
+most important tests will be skipped, and none of the examples will work, nor
+will any real applications.  If you've built TIPC as a module, be sure you've
+inserted that module into your kernel.
+
+* The Scalar::Util perl module is required.
+
+* In addition to the above, the test suite uses Test::Exception, Test::Pod and
+Devel::Leak.  Without each of these, it will skip a portion of the tests.
+Note: the Devel::Leak tests result in a lot of ugly hexspam, so it probably
+isn't worth the trouble.  The other two modules are very helpful, though.
+
+
+OPERATING SYSTEM SUPPORT
+
+Linux has TIPC support built-in, as of kernel 2.6.16.  I believe there are
+(older, possibly buggy) packages to support earlier versions of Linux, at
+http://tipc.sf.net/ .
+
+Solaris users get TIPC support through the use of a separate add-on package,
+available at http://opensolaris.org/os/project/tipc/ .
+
+I'm looking forward to supporting other operating systems, as soon as TIPC
+itself does.  Patches are always welcome.
+
+
+AUTHOR
+
+Mark Glines <mark-tipc@glines.org>
+
+COPYRIGHT AND LICENSE
+
+This module is licensed under a dual BSD/GPL license, the same terms as TIPC
+itself.

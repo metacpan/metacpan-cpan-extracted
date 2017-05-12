@@ -1,0 +1,6 @@
+Revision history for Perl extension IP::Location.
+
+0.01  Sun Jan  9 16:41:15 2011
+	- original version; created by h2xs 1.23 with options
+		-XAn IP::Location -b 5.6.0
+

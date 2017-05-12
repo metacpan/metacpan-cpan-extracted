@@ -1,0 +1,14 @@
+Revision history for Perl extension IPTables.
+
+	0.01:	Reading chains and tables are semi stable
+
+	0.02:	Tidied up code, added bit of documentation for 
+			upload to CPAN
+
+	0.03:	Added add_entry, delete_entry, set_policy, list_matches, reset_counter.
+			Some are a bit of a hack for now, will improve soon.  promise :)
+
+	0.04:	Fixed a few small problems with compiling with iptables-1.2.6
+
+	0.05:	Changed Makefile.PL to use /usr/lib/libiptc.a - if it's not in there, 
+			edit the makefile for now. Sorry to be such a pain ;)

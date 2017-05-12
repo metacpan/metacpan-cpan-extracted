@@ -1,0 +1,7 @@
+o  Support alternative formats of IP addresses, such as a 32-bit
+   integer, that get passed and returned with anonymize().
+
+o  Support alternative formats of the key, such as a hex character
+   string, passed to new().
+
+o  Support IPv6 addresses or other arbitrary length addresses.

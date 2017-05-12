@@ -1,0 +1,23 @@
+# http://module-build.sourceforge.net/META-spec.html
+name:         IO-Tail
+version:      0.01
+version_from: lib/IO/Tail.pm
+installdirs:  site
+author:       YAMASHINA Hio <hio@cpan.org>
+abstract: follow the tail of files/stream
+license: unknown
+requires:
+  File::Temp:  0
+  Test::More:  0
+  Time::HiRes: 0
+#build_requires:
+no_index:
+  directory:
+    - inc
+    - t
+
+distribution_type: module
+generated_by: ExtUtils::MY_Metafile version 0.07, EUMM-6.17.
+meta-spec:
+  version: 1.2
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html

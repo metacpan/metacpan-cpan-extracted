@@ -1,0 +1,42 @@
+MODULE
+	IO::Extended - more print functions
+
+DESCRIPTION
+
+	IO::Extended contains a collection of print-like functions, which automatically add
+	newlines to the output. It also has functionality for text indentation/formatting.
+
+PREREQUISITES
+
+	Exporter (5.562)
+
+BUILD/INSTALL
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+WIN32 BUILD/INSTALL (when Microsoft Developer Studio installed)
+
+	perl Makefile.PL
+	nmake
+	nmake test
+	nmake install
+
+HISTORY
+
+	See the Changes file in this distribution.
+
+AUTHOR
+
+	Murat Uenalan (muenalan@cpan.org)
+
+COPYRIGHT NOTICE
+
+	Copyright (c) 1997 Murat Uenalan. All rights reserved.
+
+	This program is free software; you can redistribute it and/or modify it
+
+	under the same terms as Perl itself.
+	                                 

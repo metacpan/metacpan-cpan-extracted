@@ -1,0 +1,21 @@
+Revision history for IO::File::AtomicChange
+
+0.05  2013-10-21
+    [INSTALLATION]
+        - Change phase of Module::Install in cpanfile. (thanks: shoichikaji)
+
+0.04  Wed Jul 24 10:39:00 UTC 2013
+        * No feature change just refine documents.
+
+0.03  Thu Feb  3 10:30:00 UTC 2011
+        * check if defined backdup_dir before check existence of target_file.
+          (thanks: Ryo Okamoto san)
+        * fixed glitch of file order: t/20_backup.t
+
+0.02  Wed Sep  9 09:23:30 UTC 2009
+        * do fsync(2) before close and rename. (thanks: kosaki san)
+        * include microsecond in backup filename.
+
+0.01  Fri Sep  4 07:52:53 UTC 2009
+        * Initial release
+

@@ -1,0 +1,33 @@
+# Copyright 2010, 2011, 2012, 2013, 2014 Kevin Ryde
+#
+# This file is part of Image-Base-Prima.
+#
+# Image-Base-Prima is free software; you can redistribute it
+# and/or modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 3, or
+# (at your option) any later version.
+#
+# Image-Base-Prima is distributed in the hope that it will be
+# useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+# of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with Image-Base-Prima.  If not, see <http://www.gnu.org/licenses/>.
+
+Source: libimage-base-prima-perl
+Section: perl
+Priority: optional
+Build-Depends: cdbs, debhelper (>= 5)
+Maintainer: Kevin Ryde <user42_kevin@yahoo.com.au>
+Standards-Version: 3.9.6
+Homepage: http://user42.tuxfamily.org/image-base-prima/index.html
+Bugs: mailto:user42_kevin@yahoo.com.au
+
+Package: libimage-base-prima-perl
+Architecture: all
+Depends: perl (>= 5.005), libimage-base-perl | libimage-base-bundle-perl, libprima-perl, ${perl:Depends}, ${misc:Depends}
+Recommends: libprima-perl (>= 1.29)
+Description: Draw into Prima windows or images
+ This extends Image::Base extension to draw into Prima drawables,
+ including file loading and saving of Prima::Image.

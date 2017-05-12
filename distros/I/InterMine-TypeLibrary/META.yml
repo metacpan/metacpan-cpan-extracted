@@ -1,0 +1,25 @@
+---
+abstract: 'A library of MooseX types used by InterMine'
+author:
+  - 'InterMine <dev@intermine.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3624'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: InterMine-TypeLibrary
+provides:
+  InterMine::TypeLibrary:
+    file: lib/InterMine/TypeLibrary.pm
+    version: 0.9701
+requires:
+  Math::BigInt: 0
+  MooseX::Types: 0
+  Scalar::Util: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.9701

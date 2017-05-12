@@ -1,0 +1,21 @@
+Revision history for IO-All-Rule
+
+0.003     2013-01-24 07:28:39 America/New_York
+
+    [DOCUMENTED]
+
+    - Added PERFORMANCE section with caveats
+
+0.002     2013-01-23 14:47:44 America/New_York
+
+    [CHANGES]
+
+    - Fixed internals for Path::Iterator::Rule 0.002 changes
+
+    - Updated abstract
+
+
+0.001     2013-01-22 06:28:57 America/New_York
+
+    - First release
+

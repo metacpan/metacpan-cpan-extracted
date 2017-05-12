@@ -1,0 +1,34 @@
+Changes
+lib/Image/EXIF.pm
+Image-EXIF.xs
+Makefile.PL
+MANIFEST
+README
+test.pl
+typemap
+asahi.c
+canon.c
+casio.c
+exif.c
+exif.h
+exifgps.c
+exifint.h
+exifutil.c
+fuji.c
+jpeg.c
+jpeg.h
+leica.c
+makers.c
+makers.h
+minolta.c
+nikon.c
+olympus.c
+panasonic.c
+sanyo.c
+sigma.c
+tagdefs.c
+examples/create_web_gallery.pl
+examples/rename.pl
+examples/t.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

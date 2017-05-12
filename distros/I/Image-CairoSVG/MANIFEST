@@ -1,0 +1,20 @@
+Changes
+examples/locust.png
+examples/locust.svg
+examples/synopsis.pl
+lib/Image/CairoSVG.pm
+lib/Image/CairoSVG.pod
+make-pod.pl
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+script/svg2png
+t/Church.png
+t/Church.svg
+t/image-cairosvg.t
+t/image-similar.t
+t/Technical_college.png
+t/Technical_college.svg
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

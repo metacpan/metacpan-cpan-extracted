@@ -1,0 +1,3 @@
+LL_element *	T_PTR
+int	*	T_PTR
+void		T_IV

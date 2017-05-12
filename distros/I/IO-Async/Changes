@@ -1,0 +1,892 @@
+Revision history for IO-Async
+
+0.71    2016/12/22 15:05:50
+        [CHANGES]
+         * Added 'prefork' option to IO::Async::Channel (RT115920) - thanks
+           GMARLER
+         * Prefer Sereal Channel encoding if that module is available
+         * Ensure that IaFunction still prints debug information on futures
+         * Miscellaneous spelling fixes in docs - thanks genio
+
+        [BUGFIXES]
+         * 'use lib ".";' for perl 5.24
+         * Make t/50resolver.t less sensitive to EAI_NONAME vs EAI_NODATA
+           because some resolvers lie (RT113429)
+         * Fix error message linefeed tests in t/50resolver.t (RT119369)
+         * Ensure that SIGPIPE is ignored if it's still at its default value
+
+0.70    2015/12/15 18:17:43
+        [CHANGES]
+         * Support perl 5.8.x (tested on 5.8.9, presumed working as far as
+           5.8.4)
+
+0.69    2015/11/09 19:56:58
+        [CHANGES]
+         * Use Future->catch instead of poorly-implemented string-eq test
+         * Use L<...> instead of C<...> in docs where appropriate (RT107417)
+           (thanks Arthur Axel 'fREW' Schmidt)
+
+        [BUGFIXES]
+         * Don't silently swallow Listener acceptor failures (RT107806)
+         * Don't silently swallow other ->connect errors
+         * Remember to ->unwatch_io before setting IaHandle's handle to undef
+
+0.68    2015/07/31 20:07:48
+        [CHANGES]
+         * Allow IO::Async::Function body to 'die' with an ARRAYref to set
+           more details on failed Future
+         * Have IO::Async::Resolver calls indicate the failed resolver name
+         * Have IO::Async::Resolver's getaddrinfo and getnameinfo resolvers
+           give error numbers in failure result
+         * Added 'init_code' parameter to IO::Async::Function (RT104127)
+         * Added IO::Async::Channel->encode, ->send_encoded; deprecate the old
+           ->send_frozen method
+         * Added IO::Async::Test::wait_for_future
+        
+        [BUGFIXES]
+         * Clean up after 'on_hangup' loop tests (RT106061)
+         * Make ->stop + ->start on IO::Async::Timer::Periodic not forget the
+           first_interval (RT100927)
+
+0.67    2015/06/01 15:06:13
+        [CHANGES]
+         * Add a ->post_fork method to IO::Async::Loop in case subclasses
+           should take specific action (RT104130)
+         * Remove IO::Async::MergePoint entirely
+         * Add debug_printf() calls to IO::Async::Process
+         * Various documentation additions
+
+        [BUGFIXES]
+         * Remember to actually delete unused filehandles from the pollmask
+           (RT103922)
+
+0.66    2015/04/17 20:36:39
+        [CHANGES]
+         * Created IO::Async::Debug
+         * Ignore SIGPIPE by default (RT92024)
+         * IaSocket->bind now returns a Future
+         * Added IaSocket->bind resolver support and neatened up UDP examples
+           in synopsis/documentation
+
+        [BUGFIXES]
+         * Correct call to unpack() in IaStream example (RT103143)
+         * Don't silently eat accept() failures in IaListener (RT102677)
+         * Remember to add the new resolver instance to $loop in
+           ->set_resolver (RT103446)
+         * Correct implementation of ->unwatch_io on IaLoop::Poll to prevent
+           100% CPU spin (RT103445)
+         * Ensure that an exception thrown by Timer::Periodic's on_tick
+           doesn't prevent rescheduling
+
+0.65    2015/02/15 14:28:02
+        [CHANGES]
+         * Optionally allow IO::Async::Channel to use 'Sereal' serialisation
+         * Added documentation about the 'env' Child Manager key and copying
+           %ENV
+         * Take OS "preferred loop subclass" hints from IO::Async::OS directly
+
+        [BUGFIXES]
+         * Nested $stream->read_* inside read_* cause double-completion of
+           Future (RT101774)
+         * Implement IO::Async::Loop::Poll directly on _poll() syscall
+           wrapper, thus avoiding many bugs in IO::Poll (RT93141)
+         * Ensure that IO::Async::Loop::Select can cope with callbacks that
+           remove other IO handle watches (RT101919)
+         * Silently upgrade watched IO handles to O_NONBLOCK (RT102044)
+         * Complain about unrecognised keys to ->extract_addrinfo (RT101453)
+
+0.64    2014/10/17 17:51:07
+        [CHANGES]
+         * Make specific mention of 'TCP' and 'UDP' around socket examples
+           where appropriate
+         * Allow construction of an IO::Async::Handle using fileno integers
+           directly
+         * Provide a better search for 'all open filehandles' via IO::Async::OS
+           on Linux (RT97942)
+         * Allow IO::Async::Listener to have handle_constructor or handle_class
+           as a subclass method (RT97208)
+         * Clarify documentation on how to use IO::Async::Process's
+           on_exception event (RT98929)
+
+        [BUGFIXES]
+         * Ensure that Stream's write Futures are also informed of write errors
+           (RT97433)
+         * Remember to ->remove_child the individual workers of an
+           IO::Async::Function (RT99552)
+         * Fix IO::Async::Function synopsis example (RT97713)
+
+0.63    2014/07/11 15:09:08
+        [CHANGES]
+         * Allow Notifier subclasses to last-ditch handle unrecognised
+           ->configure() params
+         * Added $notifier->adopt_future
+         * Added $notifier->invoke_error and 'on_error' event
+         * Ensure that TimeQueue inserts in FIFO order for equal timestamps
+         * Kill remaining docs to long-dead IO::Async::Sequencer
+
+        [BUGFIXES]
+         * Cygwin needs the SELECT_CONNECT_EVEC OS hint as well
+         * Probe for a broken port to perform listen() tests on by using
+           ReuseAddr => 1 so it matches what IO::Async will do (RT84051)
+
+0.62    2014/03/27 23:15:25
+        [CHANGES]
+         * Added IO::Async::Future->{done,fail}_later
+         * Allow overriding of debug log file or file descriptor
+         * Avoid Future's and_then/or_else methods
+         * Allow Channel->recv in async mode to return a Future (RT91180)
+         * Ensure that Function ->call Futures cancel correctly
+         * Added $routine->kill
+         * Kill the 'getaddrinfo' => 'getaddrinfo_array' legacy redirection
+         * Allow Loop's resolver to be changed to a different object
+
+        [BUGFIXES]
+         * Avoid relying on strong forward references in Future, by creating
+           intentional cycles on pending Futures. Workaround for bugfix in
+           upcoming Future release.
+
+0.61    2013/10/15 01:10:51
+        [CHANGES]
+         * Some OSes lack signals; forbid the ->*_signal methods, and use
+           waitpid() polling for child processes if so
+         * Rearrangement of $loop->listen and IO::Async::Listener logic to
+           allow Listener subclasses to use listen extensions (e.g. SSL)
+         * Allow ->listen to construct new Stream or Socket handles
+         * Updated documentation and tests to emphasise futures with resolver
+           and ->listen
+         * Support spawning threads and watching for exit
+         * Support IO::Async::Routine based on threads
+         * Various MSWin32 improvements and fixes - it now passes tests \o/
+         * Declare that MSWin32 does not support POSIX-like fork(); skip all
+           unit tests and functionallity based on it if so
+
+         Note: These changes break IO::Async::SSL versions 0.12 or older.
+
+        [BUGFIXES]
+         * Ensure that $stream->write( CODE, on_write/write_len ) works
+           correctly
+
+        With many thanks to Mithaldu for the use of his Windows smoker for
+        development and testing of the MSWin32 fixes
+
+0.60    2013/09/19 14:26:22
+        [CHANGES]
+         * Updated for Future 0.16 - no longer needs 'return' argument for
+           Future::Utils functions
+         * $stream->connect() ought to default socktype => "stream"
+
+        [BUGFIXES]
+         * Fix unit tests to better handle INADDR_LOOPBACK not being 127.0.0.1
+         * Skip-guard ->socket("inet6") unit tests on machines unable to
+           socket(AF_INET6)
+         * Remmeber to ->accept connections to testing socket in
+           t/63handle-connect.t
+
+0.59    CHANGES:
+         * Allow IO::Async::Stream to define custom reader/writer methods
+         * Support writeready-for-read and readready-for-write in Stream
+         * Allow Stream->write() on_write and write_len args
+         * Neatened and documented Future ->fail arguments and conventions
+         * Added Stream on_writeable_{start,stop} events
+         * Added Handle->socket, ->bind and ->connect methods
+         * Revamp of Loop->connect logic; allow passing through an
+           IO::Async::Handle instance
+
+        BUGFIXES:
+         * Ensure that stream read EOF state is visible during queued on_read
+           events that caused it
+         * Fix 'return ... or die' precendence bug in Resolver (RT87051)
+         * Need to poll() for POLLPRI on MSWin32 and Cygwin
+
+0.58    CHANGES:
+         * Added Stream read watermarks
+
+        BUGFIXES:
+         * Fix weakself event handlers' use of "shift or return"
+
+0.57    CHANGES:
+         * Allow Stream->write from a Future, CODE that returns Future, Future
+           that returns CODE, etc...
+         * Added Future-returning Stream->read_* methods and ->push_on_read
+         * Return a flush-complete notification Future from Stream->write
+         * Allow Timer::Periodic to stop itself from its own on_tick event
+         * Wrap transport on_{read,write}_eof from Protocol::Stream
+
+0.56    CHANGES:
+         * Added $loop->delay_future and $loop->timeout_future
+         * Added $future->loop accessor
+         * Use a faster splice()-based mechanism for the ARRAY-based TimeQueue
+         * Updated for Future::Utils 0.12 'repeat' function
+
+        BUGFIXES:
+         * Ensure that Process from => "" works
+         * If select() returns -1 ignore the bit vectors
+         * pipe() on Windows doesn't play with select(); emulate ->pipepair
+           using ->socketpair
+         * Correct use of S_ISREG and stat()
+
+0.55    CHANGES:
+         * Try to ensure IO::Async::OS->socket returns an IO::Socket::IP
+           instance for PF_INET or PF_INET6 if it is available
+         * Don't bother testing subsecond loop_once behaviour because most
+           loops can't actually do it
+         * Use Future::Utils instead of CPS, removing a dependency
+         * Removed IO::Async::Sequencer
+         * Print a deprecation warning on old loop classes with old timer
+           support
+
+0.54    CHANGES:
+         * Use Future instead of CPS::Future
+         * Created IO::Async::Future subclass
+         * Initial support for Futures on Loops
+         * Rewrite lots of internals to use Futures instead of MergePoints or
+           other logic
+         * Renamed all "task" to "future" in APIs
+         * Allow packing of inet/inet6 address structures to omit the IP or
+           port and presume passive or port 0
+         * Removed $notifier->get_loop synonym
+         * Make IO::Async::MergePoint throw a deprecation warning
+
+0.53    CHANGES:
+         * Added IO_ASYNC_WATCHDOG debugging support
+
+        BUGFIXES:
+         * Remember to return a task from Function->call even if it's queued
+           (RT79248)
+
+0.52    CHANGES:
+         * Initial attempt at Tasks using CPS::Future
+         * Minor fixes to timer LoopTests to prevent spurious failures of
+           sub-second timing
+         * Declare dependence on perl 5.10 now we're using 5.10 features
+         * Removed long-since deprecated IO::Async::DetachedCode
+
+0.51    CHANGES:
+         * Split much code out to new IO::Async::OS heirarchy
+         * Drop dead dependency on Test::Warn
+         * Smaller simpler signal handling, avoid POSIX::SigSet
+         * Expose getfamilybyname and getsocktypebyname as OS methods
+
+        BUGFIXES:
+         * Many small MSWin32 fixes that might help pass some tests. Likely
+           still incomplete though
+
+0.50    CHANGES:
+         * Added IO::Async::File
+         * Added filename mode of IO::Async::FileStream
+         * Make Heap dependency optional by reimplementing a tiny but less
+           efficient version of TimeQueue using a plain array
+         * No longer need MB-only Build.PL
+
+        BUGFIXES:
+         * Round up select() and poll() timeouts to nearest milisecond, might
+           help correct wait-time vs. gettimeofday() mismatches
+         * Fake read- and write-readiness of S_ISREG filehandles in select()
+           on MSWin32
+         * select() for exceptional status on MSWin32 to check for connect()
+           failures
+         * Don't unit-test that getsockname() works on socketpair()ed sockets
+
+0.49    CHANGES:
+         * Fix watch_time => enqueue_timer conversions; fix unit tests and
+           Timer implementations
+
+0.48    CHANGES:
+         * Support Channel long-running on_recv handler
+         * Support Channel directly between two Routines, in sync. mode at
+           both ends
+         * Added Loop->{watch,unwatch}_time API
+         * Added Function->restart and max_worker_calls parameter
+         * Support other reschedule policies for Timer::Periodic to allow
+           tick skipping, or drift
+
+        BUGFIXES:
+         * Fix example in Routine SYNOPSIS (thanks apeiron)
+         * Connector should check definedness of local_{host,port} rather than
+           existence
+
+0.47    CHANGES:
+         * Support $listener->listen( v6only => ... )
+         * Added new data-passing $loop->run and $loop->stop methods
+
+        BUGFIXES:
+         * Emulate ->socketpair on MSWin32 by connecting to a temporary socket
+         * Account for EWOULDBLOCK on MSWin32
+         * Don't try reading STDIN to block awaiting a signal in unit-tests
+         * Allow zero-delay Countdown timers (RT75954)
+         * Handle dup2() collisions in ChildManager filehandle setups
+           (RT75573)
+         * Fix race condition in t/33process.t (RT75573)
+         * Ensure Timer->stop doesn't fail if the timer isn't running
+           (RT75571)
+         * Possibly-fix some cygwin test failures (RT71706)
+         * Ensure that 'passive' getaddrinfo hint is handled in both
+           synchronous and numeric cases
+
+0.46    ADDITIONS:
+         * IO::Async::Routine + IO::Async::Channel
+         * IO::Async::Process->kill method
+
+        CHANGES:
+         * Use Socket 1.93 rather than dual-dependency logic on
+           Socket::GetAddrInfo
+         * Rewrote ::Function based on ::Routine and ::Channel
+         * Cleaner refcount behaviour in ::Process
+         * ::Process no longer waits for EOF condition on write-only pipes
+         * Don't unit-test the reading end of a pipe for HUP condition
+         * Documentation updates
+         * Removed documentation for long-since deprecated $loop->detach_child
+           and ->detach_code methods
+
+0.45    CHANGES:
+         * Added Timer->is_expired predicate, remove_on_expire parameter
+           (RT71767)
+
+        BUGFIXES:
+         * Use fd3/4 in ::Function rather than STDIN/STDOUT, to avoid
+           corrupting the return channel if the body function prints (RT72448)
+         * Better error detection around setuid/setgid/setgroups (RT72407)
+         * IO::Handle->binmode is not available as a method before perl 5.12;
+           use CORE::binmode() instead
+         * Don't attempt to invoke a missing on_notifier callback in
+           Loop->listen (RT71768)
+
+0.44    CHANGES:
+         * Allow Process to have sockets as handles; including datagram
+           sockets
+
+        BUGFIXES:
+         * Extract TimeQueue entiries before firing them, in case they do
+           something weird like cancelling themselves (RT70231)
+         * Test dollarbang for EWOULDBLOCK which might help MSWin32
+         * Cope correctly with Function handles in the presence of -CS or
+           PERL_UNICODE=S
+
+0.43    CHANGES:
+         * Allow IO::Async::Notifier to be used as a non-principle mixin class
+         * Provide Notifier->loop accessor
+         * Added (still-experimental) Notifier debug features
+         * Deleted various deprecated features:
+            + Notifier to Handle upgrade
+            + Loop->enable_childmanager, Loop->disable_childmanager
+         * Print deprecation warnings on Loop->detach_code, Loop->detach_child
+         * Minor improvements to LoopTests
+
+0.42    BUGFIXES:
+         * Test Stream encoding errors on a sequence which still returns
+           U+FFFD immediately on 5.14.0 (RT69020)
+
+0.41    CHANGES:
+         * Support 'encoding' parameter in IO::Async::Stream
+         * Allow IO::Async::Stream->write with an empty string, for the
+           side-effect of setting an on_flush handler
+         * Support 'first_interval' parameter to IO::Async::Timer::Periodic
+         * Expanded documentation of timers
+        
+        BUGFIXES:
+         * Explicitly 'use IO::Handle;'
+
+0.40    ADDITIONS:
+         * Added IO::Async::FileStream - RT66520
+         * Added IO::Async::Stream 'close_on_read_eof' parameter
+         * Added IO::Async::Listener 'on_accept_failure' event
+
+        CHANGES:
+         * Allow Loop->listen to be extended via extensions, similar to
+           ->connect
+         * Autoflush streams used in Function::Worker objects by default
+         * Default Resolver to idle_timeout=30, min_workers=0
+
+        BUGFIXES:
+         * Don't convert method names to CODErefs during _capture_weakself as
+           it breaks dynamic dispatch and code reload - RT65785
+         * Only calculate Timer::Periodic's next tick time if it actually has
+           a Loop
+         * Put primary GID first in a 'setgroups' list, otherwise some BSDs
+           get upset - RT65127
+         * Load getaddrinfo() from Socket or Socket::GetAddrInfo in
+           t/50resolver.t
+         * Remove the anonymous Listener from the Loop if Loop->listen fails
+           - RT66168
+         * Supply LocalPort => 0 to IO::Socket::INET constructor explicitly
+           during testing
+
+0.39    CHANGES:
+         * Added IO::Async::Notifier 'notifier_name' parameter, which may be
+           used in debugging code in a later version
+         * Added IO::Async::Stream on_write_eof event
+         * Complain about unrecognised keys in IO::Async::Loop->watch_io and
+           IO::Async::Stream->write
+
+        BUGFIXES:
+         * Don't claim on_hangup supported except on those places we know it
+           will be (Linux, FreeBSD >= 8.0)
+         * Fixed race condition in t/41detached-code.t
+         * Fixed race condition in IO::Async::Function
+
+0.38    ADDITIONS:
+         * IO::Async::Function
+         * IO::Async::Loop->notifiers accessor
+
+        CHANGES:
+         * Symbolic flags in IO::Async::Resolver as convenience for commonly
+           used flag constants
+         * Distribution now uses Test::Fatal rather than Test::Exception
+         * Resolver is now a subclass of Function, not DetachedCode
+
+        BUGFIXES:
+         * More robust detection of Socket vs Socket::GetAddrInfo
+         * Portability fix for ChildManager's FD_CLOEXEC flag
+
+0.37    ADDITIONS:
+         * Handle->close_read, ->close_write
+         * Stream on_read_eof event
+         * extract_addrinfo conveniences for 'inet', 'inet6' and 'unix'
+
+        CHANGES:
+         * Allow Process filehandles to set up plain pipes without read/write
+           behaviour on the associated Stream
+         * Renamed Loop->unpack_addrinfo to ->extract_addrinfo
+         * Prepare for Socket::getaddrinfo() in core; prefer it to
+           Socket::GetAddrInfo::getaddrinfo()
+
+0.36    ADDITIONS:
+         * IO::Async::Process
+
+        CHANGES:
+         * Allow prequeuing of ->write data in Stream
+         * Check that signal handling remains properly deferred in LoopTests
+         * Miscellaneous documentation and examples updates
+
+        BUGFIXES:
+         * RT 64558 - getaddrinfo() returns duplicate addresses for localhost
+         * Don't rely on having NI_NUMERICSERV
+
+0.35    ADDITIONS:
+         * Loop->unpack_addrinfo
+
+        CHANGES:
+         * Recognise 'inet' and 'unix' as socket families
+         * Recognise 'stream', 'dgram' and 'raw' as socket types
+         * Recognise nicer HASH-based addrinfo layout in ->connect and
+           ->listen
+         * Listener now has on_stream / on_socket as full events, not just
+           CODEref parameters
+         * Make Resolver->getaddrinfo try synchronously if given numeric names
+         * Make Resolver->getnameinfo run synchronously if given
+           NI_NUMERICHOST|NI_NUMERICSERV flags
+         * Try to combine small data buffers from Stream->write calls if
+           possible
+
+        BUGFIXES:
+         * Linefeed in die case of getaddrinfo_hash to preserve exeception
+           string
+         * Deconfigure Protocol->transport after it is closed
+
+0.34    ADDITIONS:
+         * New Notifier methods ->_replace_weakself, ->maybe_invoke_event,
+           ->maybe_make_event_cb
+         * New Protocol method ->connect
+         * New subclass Protocol::LineStream
+         * Direct Resolver->getaddrinfo and ->getnameinfo methods
+
+        CHANGES:
+         * New Protocol::Stream->new( handle => $io ) parameters, which
+           creates an IO::Async::Stream to use as a transport
+         * Renamed Loop->detach_child to Loop->fork
+         * Pass errno values into ->connect on_connect_error and
+           ->listen on_listen_error
+         * Support timeouts on Resolver operations
+         * Allow direct access to Resolver via Loop->resolver
+
+        BUGFIXES:
+         * Make sure Protocol::Stream handles writersub and on_flush callback
+
+0.33    ADDITIONS:
+         * Allow watching child PID 0, to capture every child process exit
+         * $loop->time accessor
+         * Stream->write( sub { ... } ) dynamic stream generation
+         * Stream->write( $data, on_flush => sub { ... } ) callback
+
+        CHANGES:
+         * IO::Async::Loop->new magic constructor now caches the loop; useful
+           for wrapping modules, other event system integration, etc..
+
+0.32    ADDITIONS:
+         * IO::Async::Timer::Absolute
+         * Listener accessors for ->sockname, ->family, ->socktype
+
+        CHANGES:
+         * Implement and document Handle's want_{read,write}ready parameters
+         * Rearranged documentation for Notifier subclasses; new EVENTS
+           sections
+         * Correct location for #io-async channel on irc.perl.org
+
+0.31    ADDITIONS:
+         * Delegate Protocol->close method and on_closed continuation to its
+           transport object
+         * Stream->new_for_stdin, ->new_for_stdout, ->new_for_stdio
+         * Support Listener->new( handle => $fh )
+         * IO::Async::PID notifier subclass
+
+        CHANGES:
+         * Better documentation of Listener and Connector addr and addrs
+           arguments
+
+        BUGFIXES:
+         * INADDR_ANY/INADDR_LOOPBACK fixes inside BSD jails with restricted
+           networking
+
+0.30    ADDITIONS:
+         * Added IO::Async::Socket
+         * Added IO::Async::Protocol and ::Protocol::Stream
+         * Added on_stream and on_socket continuations for $loop->connect and
+           Listener
+
+        CHANGES:
+         * Emulate socketpair(AF_INET,...)
+         * Allow IO::Async::Stream 's read_len and write_len to be configured
+           per-instance
+         * Allow a Stream object without an on_read handler
+
+        BUGFIXES:
+         * Cope with exceptional-state sockets in Loop::Poll
+
+0.29    CHANGES:
+         * Don't require 'CODE' refs for callbacks/continations; this allows
+           the use of CODEref objects, &{} operator overloads, or other things
+           that are callable
+         * Implement 'read_all' and 'write_all' options on IO::Async::Stream
+         * Allow IO::Async::Stream subclasses to override on_closed
+
+        BUGFIXES:
+         * Work around some OSes not implementing SO_ACCEPTCONN
+         * Ensure Handle's on_read_ready/on_write_ready callbacks also take a
+           $self reference
+
+0.28    BUGFIXES:
+         * Ensure that Timer->start returns $self even when not in a Loop
+         * Accept bare GLOB refs as IO::Async::Listener handles; upgrade them
+           to IO::Socket refs if required
+         * Applied documentation patch from RT 55375 - thanks to
+           Chris Williams
+
+0.27    CHANGES:
+         * Implement 'autoflush' option on IO::Async::Stream
+
+        BUGFIXES:
+         * Avoid $_ breaking stored signal handler references when invoking
+           them
+         * Ignore EINTR from sysread/syswrite
+         * More reliable socket address tests - don't rely on uninitialised
+           padding bytes between struct members
+
+0.26    BUGFIXES:
+         * Connect to INADDR_LOOPBACK rather than INADDR_ANY during
+           t/24listener.t; hopefully fixes FAILs on OpenBSD
+         * Fix IO::Async::Stream during combined read/write-ready of a closed
+           stream
+
+0.25    CHANGES:
+         * Accept 'stream'/'dgram'/'raw' as symbolic shortcuts for socket
+           types in connect/listen operations - avoids 'use Socket'
+         * Accept IO::Handle-derived objects in ChildManager setup keys as
+           well as raw GLOB refs
+
+        BUGFIXES:
+         * Various changes to test scripts to hopefully improve portability or
+           reliability during smoke tests
+
+0.24    ADDITIONS:
+         * Timer subclasses - Countdown and Periodic
+         * Idleness event watching via low-level 'watch_io/unwatch_io' methods
+           and higher-level 'later' method
+         * Added the missing 'unwatch_child' method
+         * Shareable acceptance testing suite for IO::Async::Loop subclasses
+           for better testing in subclass implementations
+
+        CHANGES:
+         * More future-proof API version checking for subclasses - requires
+           subclasses to declare their version. 
+           ### pre-0.24 Loop subclasses are no longer compatible. ###
+         * Entirely remove the need to $loop->enable_childmanager by calling
+           waitpid() in 'watch_child'.
+
+0.23    CHANGES:
+         * Rearranged IO::Async::Listener to be a constructable Notifier
+           suclass
+         * Allow Signal, Timer and Listener to act as base classes as well as
+           standalone with callbacks
+         * Renamed IO::Async::Loop::IO_Poll to ::Poll; created transparent
+           backward-compatibility wrapper
+
+0.22    CHANGES:
+         * Added tcp-proxy.pl example
+         * More documentation on IO::Async::Notifier subclass-override methods
+         * Documented that IO::Async::MergePoint is just an Async::MergePoint
+         * Various small updates to keep CPANTS happy
+
+        BUGFIXES:
+         * Don't test Async::MergePoint locally as it's now a separate dist,
+           and the tests here were reporting false negatives.
+
+0.21    CHANGES:
+         * Added "use warnings" to all modules
+         * Created Notifier->configure method to allow changing properties of
+           a Notifier or subclass after construction
+         * New 'examples' dir with some small example scripts
+
+        BUGFIXES:
+         * More robust timing tests to avoid some spurious test failures due
+           to busy testing servers or other non-issues
+
+0.20    CHANGES:
+         * Major reworking of underlying Loop implementation:
+            + Unified low-level IO, timer and signal watches as callbacks
+            + Split IO handle parts of Notifier into new IO::Async::Handle
+              class
+            + Created Timer and Signal subclasses of Notifier
+
+           These changes will require a compatible upgrade to the underlying
+           Loop implementation.
+
+         * Hide SignalProxy and TimeQueue from CPAN's indexer, as they are
+           internal-only details that don't need exposing there.
+         * Loop magic constructor now warns if a specifically-requested class
+           is not available
+         * Allow multiple attachment of signals via Loop->attach_signal or new
+           Signal objects
+
+0.19    CHANGES:
+         * Allow control of Sequencer's pipelining
+         * Documentation fixes
+         * Allow Loop->run_child to take a 'setup' array
+         * Added 'setuid', 'setgid' and 'setgroups' child setup operations
+         * Support 'on_notifier' in Loop->listen
+
+        BUGFIXES:
+         * carp before return in Stream->write so it actually prints
+         * Ensure Streams still work after being closed and reopened by
+           ->set_handle
+         * If IO::Socket->new() fails, try again with generic ->socket
+           (makes IPv6 work on platforms without IO::Socket::INET6)
+
+0.18    CHANGES:
+         * Allow Sequencer to be a base class as well as using constructor
+           callbacks
+         * Use signal names from Config.pm rather than relying on POSIX.pm.
+           Covers more signals that way
+
+        BUGFIXES:
+         * Gracefully handle accept() returning EAGAIN
+         * Fixed handling of IO::Socket->getsockopt( SOL_SOCKET, SO_ERROR )
+
+0.17    CHANGES:
+         * Added Stream->close_when_empty and ->close_now. Added docs
+         * Added OS abstractions of socketpair() and pipe()
+         * Many documentation changes and updates
+
+        BUGFIXES:
+         * Properly handle stream read/write errors; close immediately rather
+           than deferring until empty.
+         * Various CPAN testers somketest bug fixes
+         * Fixed http://rt.cpan.org/Ticket/Display.html?id=38476
+
+0.16    ADDITIONS:
+         * Loop->requeue_timer()
+         * Magic constructor in IO::Async::Loop which tries to find the best
+           subclass
+         * 'chdir' and 'nice' ChildManager operations
+
+        CHANGES:
+         * Make sure that top-level objects are refcount-clean by using
+           Test::Refcount, and Scalar::Util::weaken()
+
+        BUGFIXES:
+         * Keep perl 5.6.1 happy by not passing LocalPort => 0 when
+           constructing IO::Socket::INETs
+         * Pass the Type option to IO::Socket::INET constructor in test
+           scripts
+
+0.15    REMOVALS:
+         * IO::Async::Set subclasses and IO::Async::Buffer have now been
+           entirely removed.
+
+        CHANGES:
+         * Support handle-less IO::Async::Sequencer, like ::Notifier
+         * Set SO_REUSEADDR on listening sockets by default
+         * Allow Loop->listen() on a plain filehandle containing a socket
+         * No longer any need to explcitly call Loop->enable_childmanager
+
+        BUGFIXES:
+         * IO::Async::Loop->_adjust_timeout actually works properly
+         * Notifier->close() only runs on_closed callback if it actually 
+           closed - allows for neater cross-connected Notifiers
+         * Made Notifier->want_{read,write}ready more efficient
+         * Notifier->close() on a child notifier works
+         * Loop->listen() should take the first successful address, rather
+           than trying them all
+
+0.14    REMOVALS:
+         * IO::Async::Set subclasses and IO::Async::Buffer are now completely
+           deprecated. Any attempt to use them will fail immediately.
+
+        ADDITIONS:
+         * 'keep' ChildManager operation
+         * IO::Async::Test::wait_for_stream()
+         * Loop->listen()
+         * IO::Async::Sequencer class
+
+        CHANGES:
+         * Support dynamic swapping of temporary 'on_read' handlers in Stream
+         * Now requires Socket::GetAddrInfo >= 0.08
+         * Further shortcuts in ChildManager setup keys - IO references and
+           simple string operation names
+         * Support handle-less IO::Async::Notifiers that have IO handles added
+           to them later
+         * Allow 'setup' key to Loop->detach_code()
+         * Various documentation updates
+
+        BUGFIXES:
+         * Allow the same filehandle to be 'dup'ed more than once in
+           ChildManager
+
+0.13    CHANGES:
+         * Flush all awaiting data from Stream when it becomes writeready
+         * Supply a real IO::Async::Test module to allow testing in 3rd party
+           distros
+         * Various documentation fixes
+
+        BUGFIXES:
+         * Don't rely on STDOUT being writable during test scripts
+
+0.12    CHANGES:
+         * Allow Notifiers that are write-only.
+         * Added ChildManager->open and ->run; with ->open_child and 
+           ->run_child on the containing Loop.
+         * Moved IO::Async::Loop::Glib out to its own CPAN dist, to
+           simplify Build.PL and testing scripts
+
+        BUGFIXES:
+         * Make sure to "use IO::Socket" in IO::Async::Connector
+         * Pass 'socktype' argument to ->connect during testing
+
+0.11    INCOMPATIBLE CHANGES:
+         * Renamed IO::Async::Set::* to IO::Async::Loop::* - provided
+           backward-compatibility wrappers around old names. 
+           IO::Async::Set::GMainLoop has become IO::Async::Lib::Glib
+         * Renamed IO::Async::Buffer to IO::Async::Stream - provided backward-
+           compatibility wrapper around old name.
+         * Loop->get_childmanager() and ->get_sigproxy() no longer allowed
+
+        CHANGES:
+         * Extended ->loop_once() and ->loop() feature out to all
+           IO::Async::Loop classes
+         * Added IO::Async::Resolver and IO::Async::Connector, plus Loop
+           integration
+         * Allow write-only IO::Async::Notifiers that have no read handle or
+           readiness callback.
+
+0.10    INCOMPATIBLE CHANGES:
+         * Renamed events and methods in IO::Async::Notifier to better fit the
+           naming scheme of normal Perl handles. Backward-compatibility hooks
+           are currently provided, but will be removed in a later release. Any
+           code using the old names should be updated
+
+        CHANGES:
+         * Allow DetachedCode to have multiple back-end worker processes.
+         * Control if a back-end worker exits when the code "die"s
+         * Added 'close()' method on Notifiers/Buffers. Sensible behaviour on
+           buffers with queued data to send
+         * Reset %SIG hash in ChildManager->detach_child()
+
+        BUGFIXES:
+         * Clean up temporary directory during testing
+         * Shut down DetachedCode workers properly on object deref
+         * Better handling of borderline timing failures in t/11set-*.t
+         * Close old handles before dup2()ing new ones when detaching code
+         * Various other minor test script improvements
+
+0.09    CHANGES:
+         * Added TimeQueue object and integration with IO::Async::Set and
+           subclasses.
+         * Added MergePoint object
+         * Added 'on_closed' callback support to IO::Async::Notifier
+
+        BUGFIXES:
+         * Don't depend on system locale when checking string value of $!
+         * Fixed test scripts to more closely approximate real code behaviour
+           in the presence of poll() vs. deferred signal delivery
+
+0.08    CHANGES:
+         * Added ChildManager->detach_child() method
+         * Added DetachedCode object
+
+        BUGFIXES:
+         * Better tests for presence of Glib to improve test false failures
+         * More lenient times in test script 11set-IO-Poll-timing to allow for
+           variances at test time
+         * Avoid bugs in post_select()/post_poll() caused by some notifier
+           callbacks removing other notifiers from the set
+
+0.07    BUGFIXES:
+         * Avoid race condition in t/30childmanager.t - wait for child process
+           to actually exit
+         * Avoid race condition in IO::Async::ChildManager->spawn() by waiting
+           for SIGCHLD+pipe close, rather than SIGCHLD+pipe data
+
+0.06    CHANGES:
+         * Allow 'env' setup key to ChildManager->spawn() to change the
+           child's %ENV
+         * Updated the way some of the ->spawn() tests are conducted. There
+           seems to be massive failures reported on cpantesters against 0.05.
+           These changes won't fix the bugs, but should assist in reporting
+           and tracking them down.
+
+        BUGFIXES:
+         * Don't rely on existence of /bin/true - test for /usr/bin/true as
+           well, fall back on "$^X -e 1"
+         * Avoid kernel race condition in t/32childmanager-spawn-setup.t by
+           proper use of select() when testing.
+
+0.05    CHANGES:
+         * Added ChildManager object
+         * Added singleton storage in IO::Async::Set to store a SignalProxy or
+           ChildManager conveniently
+
+        BUGFIXES:
+         * Workaround for a bug in IO::Poll version 0.05
+
+0.04    CHANGES:
+         * Added dynamic signal attach / detach methods to SignalProxy
+         * Buffer now has on_read_error / on_write_error callbacks for
+           handling IO errors on underlying sysread()/syswrite() calls
+
+0.03    CHANGES:
+         * No longer build_requires 'Glib' - print a warning if it's not
+           installed but carry on anyway.
+         * IO_Poll->loop_once() now returns the result from the poll() call
+         * Added concept of nested child notifiers within Notifier object
+
+        BUGFIXES:
+         * Fix to test scripts that call IO_Poll's loop_once() with a timeout
+           of zero. This can cause a kernel race condition, so supply some
+           small non-zero value instead.
+
+0.02    INCOMPATIBLE CHANGES:
+         * Event methods/callback functions now called "on_*" to distinguish
+           them
+         * Callback functions now pass $self as first argument to simplify
+           called code
+
+        CHANGES:
+         * Improved POD in Notifier.pm and Buffer.pm
+
+        BUGFIXES:
+         * GMainLoop.pm - return 1 from callbacks so that glib doesn't remove
+           our IO sources
+         * GMainLoop.pm - make sure re-asserting want_writeready actually adds
+           the IO source again
+
+0.01    First version, released on an unsuspecting world.
+

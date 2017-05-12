@@ -1,0 +1,5 @@
+SSHWND	T_HWND
+
+INPUT
+T_HWND
+	$var = hwnd_from_sv(aTHX_ $arg);

@@ -1,0 +1,122 @@
+#!/home/ben/software/install/bin/perl
+
+=pod
+
+=head1 NAME
+
+pnginspect - print contents of PNG files
+
+=head1 SYNOPSIS
+
+    pnginspect a.png b.png c.png
+
+=head1 DESCRIPTION
+
+This is a primitive "dumper" for PNG image data.
+
+=head1 SEE ALSO
+
+=over
+
+=item L<Image::PNG::Libpng>
+
+=back
+
+=head1 AUTHOR
+
+Ben Bullock <bkb@cpan.org>
+
+=cut
+
+use warnings;
+use strict;
+use Image::PNG::Libpng ':all';
+use Data::Dumper;
+my $webok;
+
+eval {
+    require Data::Validate::URI;
+    Data::Validate::URI->import (qw/is_web_uri/);
+    require LWP::Simple;
+    LWP::Simple->import ();
+    $webok = 1;
+};
+
+if ($@) {
+    $webok = 0;
+}
+
+binmode STDOUT, ":utf8";
+
+for my $file (@ARGV) {
+    my $png;
+    if (-f $file) {
+	$png = read_png_file ($file);
+    }
+    else {
+	if ($webok && is_web_uri ($file)) {
+	    print "Getting '$file' from web.\n";
+	    my $png_data = get ($file);
+	    if ($png_data) {
+		$png = read_from_scalar ($png_data);
+	    }
+	    else {
+		warn "Could not download '$file', skipping.\n";
+	    }
+	}
+	else {
+	    warn "Cannot find a file called '$file', skipping.\n";
+	    next;
+	}
+    }
+
+    my $ihdr = $png->get_IHDR ();
+    for my $k (sort keys %$ihdr) {
+	if ($k eq 'color_type') {
+	    print "$k: ", color_type_name ($ihdr->{$k}), "\n";
+	}
+	else {
+	    print "$k: $ihdr->{$k}\n";
+	}
+    }
+    my $valid = $png->get_valid ();
+    for my $key (sort keys %$valid) {
+	if ($valid->{$key}) {
+	    print "Valid $key chunk.\n";
+	    if ($key ne 'IDAT' && $key ne 'tIME') {
+		my $value = $png->get_chunk ($key);
+		print Dumper ($value);
+	    }
+	}
+    }
+    my $text = $png->get_text ();
+    if ($text) {
+	my $i = 0;
+        for my $t (@$text) {
+	    $i++;
+            print "Text chunk $i:\n";
+            for my $k (sort keys %$t) {
+                my $v = $t->{$k};
+                if (! defined $v) {
+                    $v = 'undefined';
+                }
+		if ($k eq 'compression') {
+		    $v = text_compression_name ($v);
+		}
+                print "$k: $v\n";
+            }
+            print "\n";
+        }
+    }
+    my $time = $png->get_tIME ();
+    if ($time) {
+	print "Modification time:\n";
+	for my $k (qw/year month day hour minute second/) {
+	    print "$k: $time->{$k}\n";
+	}
+    }
+}
+
+# Local variables:
+# mode: perl
+# End:

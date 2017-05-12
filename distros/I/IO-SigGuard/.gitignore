@@ -1,0 +1,4 @@
+*.sw*
+MYMETA.*
+Makefile
+IO-SigGuard-*

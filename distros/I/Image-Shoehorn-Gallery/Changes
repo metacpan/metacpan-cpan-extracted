@@ -1,0 +1,53 @@
+Revision history for Perl extension Image::Shoehorn::Gallery
+
+0.22	Mon Sep 02 2002
+
+	- Added support for 'floating thumbnails' on index pages.
+
+	- Fixed a syntax error when testing [@class = 'file' or @class = 'directory']
+
+	- Added package LocalSAX_FloatingThumbs
+
+	- Renamed all the MySAX_* packages as LocalSAX_*
+
+0.21	Fri Aug 02 2002
+	
+	- Now adds a breadcrumbs style menu at the top of each page. Woot!
+
+	- Added package MySAX::Breadcrumbs
+
+	- Added package Breadcrumbs
+
+	- Made sure to explicitly call 'close' on IO::File handles to prevent 'too many open files' errors
+
+	- Added check to account for possible 'default'-ness when comparing source file with scaled file
+
+	- Upped requirement in Makefile for Image::Shoehorn to 1.41
+
+	- Updated the default CSS
+
+	- Updated POD
+
+0.2	Wed Jul 31 2002
+
+	- Absolutely nothing in the TO DO list from 0.1
+
+	- Added hooks to specify separate source and destination directories
+
+	- Added hooks for 'default' image size
+
+	- Added hooks for 'scaleif'
+
+	- Added hooks to set lang attribute in <html> element
+
+	- Added <link rel = (start|contents|prev|next) ...> elements
+
+	- Added &source_to_dest
+	
+	- Added &do_scale
+
+	- Updated POD
+
+0.1	Wed Jul 24 2002
+
+	- Initial revision

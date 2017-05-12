@@ -1,0 +1,30 @@
+Revision history for Ingres-Utility-IINamu
+
+0.07	Wed Oct 25 2006
+	add() and del() methods with defaults for missing parameters (blank)
+	t/perlcritic.t test included in distro
+
+0.06	Mon Oct 23 2006
+	add() and del() methods implemented
+	Methods received prototypes
+	t/boilplate.t test removed from distro
+
+0.05	Wed Oct 18
+        show(...) returned last command when iinamu returned empty
+	getSever() omitted last server info
+	Carp::carp "..." instead of die "..."0.01    Thu Sep 14 2006
+
+0.04    Sat Oct 14 2006
+        Syntax corretction
+	First complete install through CPAN
+
+0.03    Thu Oct 05 2006
+        Syntax corretction
+        META.yml added to distribuition
+
+0.02    Thu Sep 15 2006
+        Syntax correction
+
+0.01    Thu Sep 14 2006
+        First version, to be used as-is, please report bugs!
+

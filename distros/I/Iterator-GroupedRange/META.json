@@ -1,0 +1,73 @@
+{
+   "abstract" : "Iterates retrieving a set of specified number rows",
+   "author" : [
+      "Toru Yamaguchi <zigorou@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.12.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Iterator-GroupedRange",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Iterator::GroupedRange" : {
+         "file" : "lib/Iterator/GroupedRange.pm",
+         "version" : "0.08"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/zigorou/p5-iterator-groupedrange/issues"
+      },
+      "homepage" : "https://github.com/zigorou/p5-iterator-groupedrange",
+      "repository" : {
+         "url" : "git://github.com/zigorou/p5-iterator-groupedrange.git",
+         "web" : "https://github.com/zigorou/p5-iterator-groupedrange"
+      }
+   },
+   "version" : "0.08",
+   "x_contributors" : [
+      "Toru Yamaguchi <yamaguchi.toru@51547-mac.dena.local>",
+      "Syohei YOSHIDA <syohex@gmail.com>",
+      "Yuji Shimada <xaicron@gmail.com>"
+   ]
+}

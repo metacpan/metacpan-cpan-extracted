@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+META.yml
+t/POE-Component-IRC-Plugin-IRCDHelp.t
+lib/POE/Component/IRC/Plugin/IRCDHelp.pm

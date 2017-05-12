@@ -1,0 +1,29 @@
+Image-PNGwriter version 0.01
+============================
+
+Image::PNGwriter - Use pngwriter from Perl.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires:
+
+- pngwriter 0.5.3 or higher.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 by Andres Kievsky - ank@cpan.org
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.5 or,
+at your option, any later version of Perl 5 you may have available.
+
+

@@ -1,0 +1,27 @@
+NAME
+    Image::DecodeQR - decode QRCode (using libdecodeqr)
+
+SYNOPSIS
+      use Image::DecodeQR;
+
+      my $string = Image::DecodeQR::decode($filename);
+
+DESCRIPTION
+    Image::DecodeQR is a simple module to decode QRCode from image file
+    using libdecodeqr.
+
+    It is available at: http://trac.koka-in.org/libdecodeqr
+
+METHODS
+    decode($filename)
+        Decodes QRCode.
+
+AUTHOR
+    Jiro Nishiguchi <jiro@cpan.org>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    <http://trac.koka-in.org/libdecodeqr/>
+

@@ -1,0 +1,15 @@
+0.06 2014-10-24T02:02:01+02:00
+ - Add tests.
+ - Fix 'color' parameter default value in doc.
+ - Fix 'type' parameter default value in doc.
+ - Remove trailing whitespace from code.
+ - Rewrite word "Suffix" to "Image type" in error message.
+ - Simplify code (remove 'color_random' parameter).
+
+0.05 2014-10-24T01:12:29+02:00
+ - Add Image::Select to SEE ALSO section in doc.
+ - Fix ERRORS section in doc.
+ - Rewrite B<> to C<> in doc.
+
+0.01 2014-10-23T18:22:08+02:00
+ - First version.

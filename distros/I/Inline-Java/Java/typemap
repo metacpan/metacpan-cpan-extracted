@@ -1,0 +1,23 @@
+TYPEMAP
+InlineJavaJNIVM * 	T_PTROBJ_IJVM
+
+
+OUTPUT
+
+T_PTROBJ_IJVM
+	sv_setref_pv($arg, \"Inline::Java::JNI\", (void *)$var) ;
+
+
+INPUT
+
+T_PTROBJ_IJVM
+	if (sv_derived_from($arg, \"Inline::Java::JNI\")) {
+	    $var = ($type)SvIV((SV*)SvRV($arg)) ;
+	}
+	else{
+		if (SvOK($arg)){
+		    croak(\"$var is not of type Inline::Java::JNI\") ;
+		}
+	}
+
+

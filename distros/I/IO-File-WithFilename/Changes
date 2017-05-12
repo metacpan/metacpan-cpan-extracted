@@ -1,0 +1,6 @@
+Revision history for Perl extension IO::File::WithFilename.
+
+0.01  Wed Oct 20 21:29:37 2010
+	- original version; created by h2xs 1.23 with options
+		-Xn IO::File::WithFilename
+

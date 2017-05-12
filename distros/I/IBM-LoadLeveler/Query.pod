@@ -1,0 +1,253 @@
+# -*- Perl -*-
+=pod
+
+=head1 Query API
+
+IBM::LoadLeveler - Query API
+
+=head1 SYNOPSIS
+
+  # Query API functions
+
+  my ($version_num,$numnodes,$noderef)=ll_get_nodes();
+
+  my ($version_num,$numjobs,$ref)=ll_get_jobs();
+
+=head1 DESCRIPTION
+
+B<The Query API has been deprecated by IBM.>
+
+The Query API has the following functions:
+
+=over 4
+
+=item ll_get_jobs
+
+=item ll_get_nodes
+
+=back
+
+The functions B<ll_free_jobs> and B<ll_free_nodes> are not provided to Perl, they are called inside the ll_get_jobs/ll_get_nodes code after the data has been converted to perl functions.
+
+=over 4
+
+=item ll_get_jobs
+
+The return from ll_get_jobs is a perlized version of the LL_job structure.  In perl terms it is a horror, this is how to decode the information for one step.
+
+	#!/usr/bin/perl -*- Perl -*-
+
+	# Use ll_get_jobs to print out information about one job
+
+	use IBM::LoadLeveler;
+
+	my ($version_num,$numjobs,$ref)=ll_get_jobs();
+
+	print "Version           : $version_num\n";
+	print "Number of Jobs    : $numjobs\n";
+	print "----------------------------------------\n";
+
+	@jobs=@{$ref};
+
+	# Get The reference to the first Job
+
+	$job=pop @jobs;
+
+	# Get The Job information
+	my($job_name,$owner,$groupname,$uid,$gid,$submit_host,$job_steps,$job_step)=@{$job};
+
+	print "Job Name          : $job_name\n";
+	print "Owner             : $owner\n";
+	print "Group Name        : $groupname\n";
+	print "UID               : $uid\n";
+	print "GID               : $gid\n";
+	print "Submit Host       : $submit_host\n";
+	print "Number of Steps   : $job_steps\n";
+	print "----------------------------------------\n";
+
+	# Print Information about first Job Step
+
+	$ref = pop @{$job_step};
+	%step= %{$ref};
+
+	print "Step Name         : $step{'step_name'}\n";
+	print "Requirements      : $step{'requirements'}\n";
+	print "Preferences       : $step{'preferences'}\n";
+	print "User Step Pri     : $step{'prio'}\n";
+	print "Step Dependency   : $step{'dependency'}\n";
+	print "Group Name        : $step{'group_name'}\n";
+	print "Step Class        : $step{'stepclass'}\n";
+	print "Start Date        : ", scalar localtime($step{'start_date'}),"\n";
+	print "Step Flags        : $step{'flags'}\n";
+	print "Minimum # Procs   : $step{'min_processors'}\n";
+	print "Maximum # Procs   : $step{'max_processors'}\n";
+	print "Account Number    : $step{'account_no'}\n";
+	print "User Comment      : $step{'comment'}\n";
+	print "Step ID           : @{$step{'id'}}\n";
+	print "Submit Date       : ", scalar localtime($step{'q_date'}),"\n";
+	print "Status            : $step{'status'}\n";
+	print "Actual # Procs    : $step{'num_processors'}\n";
+	print "Assigned Procs    : @{$step{'processor_list'}}\n";
+	print "Command           : $step{'cmd'}\n";
+	print "Arguments         : $step{'args'}\n";
+	print "Environment       : $step{'env'}\n";
+	print "stdin             : $step{'in'}\n";
+	print "stdout            : $step{'out'}\n";
+	print "stderr            : $step{'err'}\n";
+	print "Initial Dir       : $step{'iwd'}\n";
+	print "Notify User       : $step{'notify_user'}\n";
+	print "Shell             : $step{'shell'}\n";
+	print "Command           : $step{'cmd'}\n";
+	print "User Tracker Exit : $step{'tracker'}\n";
+	print "Tracker Args      : $step{'tracker_arg'}\n";
+	print "Notification      : $step{'notification'}\n";
+	print "Image Size        : $step{'image_size'}\n";
+	print "Executable Size   : $step{'exec_size'}\n";
+	print "Step Res Limits   : @{$step{'limits'}}\n";
+	print "NQS Info          : @{$step{'nqs_info'}}\n";
+	print "Dispatch Date     : ", scalar localtime($step{'dispatch_time'}),"\n";
+	print "Start Time        : $step{'start_time'}\n";
+	print "Completion Code   : $step{'completion_code'}\n";
+	print "Completion Date   : ", scalar localtime($step{'completion_date'}),"\n";
+	print "Start Count       : $step{'start_count'}\n";
+	%usage_info = %{$step{'usage_info'}};
+	print "Starter rusage  ru_utime    : @{$usage_info{'starter_rusage'}{'ru_utime'}}\n";
+	print "Starter rusage  ru_stime    : @{$usage_info{'starter_rusage'}{'ru_stime'}}\n";
+	print "Starter rusage  ru_maxrss   : $usage_info{'starter_rusage'}{'ru_maxrss'}\n";
+	print "Starter rusage  ru_ixrss    : $usage_info{'starter_rusage'}{'ru_ixrss'}\n";
+	print "Starter rusage  ru_majflt   : $usage_info{'starter_rusage'}{'ru_majflt'}\n";
+	print "Starter rusage  ru_nswap    : $usage_info{'starter_rusage'}{'ru_nswap'}\n";
+	print "Starter rusage  ru_maxrss   : $usage_info{'starter_rusage'}{'ru_maxrss'}\n";
+	print "Starter rusage  ru_inblock  : $usage_info{'starter_rusage'}{'ru_inblock'}\n";
+	print "Starter rusage  ru_oublock  : $usage_info{'starter_rusage'}{'ru_oublock'}\n";
+	print "Starter rusage  ru_msgsnd   : $usage_info{'starter_rusage'}{'ru_msgsnd'}\n";
+	print "Starter rusage  ru_msgrcv   : $usage_info{'starter_rusage'}{'ru_msgrcv'}\n";
+	print "Starter rusage  ru_nsignals : $usage_info{'starter_rusage'}{'ru_nsignals'}\n";
+	print "Starter rusage  ru_nvcsw    : $usage_info{'starter_rusage'}{'ru_nvcsw'}\n";
+	print "Starter rusage  ru_nivcsw   : $usage_info{'starter_rusage'}{'ru_nivcsw'}\n";
+	print "Step rusage  ru_utime       : @{$usage_info{'step_rusage'}{'ru_utime'}}\n";
+	print "Step rusage  ru_stime       : @{$usage_info{'step_rusage'}{'ru_stime'}}\n";
+	print "Step rusage  ru_maxrss      : $usage_info{'step_rusage'}{'ru_maxrss'}\n";
+	print "Step rusage  ru_ixrss       : $usage_info{'step_rusage'}{'ru_ixrss'}\n";
+	print "Step rusage  ru_majflt      : $usage_info{'step_rusage'}{'ru_majflt'}\n";
+	print "Step rusage  ru_nswap       : $usage_info{'step_rusage'}{'ru_nswap'}\n";
+	print "Step rusage  ru_maxrss      : $usage_info{'step_rusage'}{'ru_maxrss'}\n";
+	print "Step rusage  ru_inblock     : $usage_info{'step_rusage'}{'ru_inblock'}\n";
+	print "Step rusage  ru_oublock     : $usage_info{'step_rusage'}{'ru_oublock'}\n";
+	print "Step rusage  ru_msgsnd      : $usage_info{'step_rusage'}{'ru_msgsnd'}\n";
+	print "Step rusage  ru_msgrcv      : $usage_info{'step_rusage'}{'ru_msgrcv'}\n";
+	print "Step rusage  ru_nsignals    : $usage_info{'step_rusage'}{'ru_nsignals'}\n";
+	print "Step rusage  ru_nvcsw       : $usage_info{'step_rusage'}{'ru_nvcsw'}\n";
+	print "Step rusage  ru_nivcsw      : $usage_info{'step_rusage'}{'ru_nivcsw'}\n";
+	$first_mach_usage_info = $#{$usage_info{'mach_usage'}};
+	print "Step machine Usage          : $first_mach_usage_info\n";
+
+	print "User System Prio  : $step{'user_sysprio'}\n";
+	print "Group System Prio : $step{'group_sysprio'}\n";
+	print "Class System Prio : $step{'class_sysprio'}\n";
+	print "User Number       : $step{'number'}\n";
+	print "CPUS requested    : $step{'cpus_requested'}\n";
+	print "Virutal Mem Req   : $step{'virtual_memory_requested'}\n";
+	print "Memory Requested  : $step{'memory_requested'}\n";
+	print "Adapter Used mem  : $step{'adapter_used_memory'}\n";
+	print "Adapter Reg count : $step{'adapter_req_count'}\n";
+
+	print "Image Size        : $step{'image_size64'}\n";
+	print "Executable Size   : $step{'exec_size64'}\n";
+	print "Step Res Limits   : @{$step{'limits64'}}\n";
+	print "Virutal Mem Req   : $step{'virtual_memory_requested64'}\n";
+	print "Memory Requested  : $step{'memory_requested64'}\n";
+
+	print "Last Checkpoint   : $step{'good_ckpt_start_time'}\n";
+	print "Time Spent ckpting: $step{'accum_ckpt_time'}\n";
+	print "Checkpoint Dir    : $step{'ckpt_dir'}\n";
+	print "Checkpoint File   : $step{'ckpt_file'}\n";
+	print "Large Page Req    : $step{'large_page'}\n";
+
+=item ll_get_nodes
+
+ll_get_nodes is almost as bad as ll_get_jobs.  The following is an example of decoding the data returned:
+
+	# -*- Perl -*-
+
+	use IBM::LoadLeveler;
+
+	# Use the deprecated ll_get_nodes call to find information on all nodes in the system
+	# similar to llstatus -l
+
+	my ($version_num,$numnodes,$ref)=ll_get_nodes();
+
+	print "LoadLeveler Version  : $version_num\n";
+	print "Number of Nodes      : $numnodes\n";
+
+	@nodes=@{$ref};
+
+	foreach $node (@nodes)
+	{
+	    my($node_name,$version,$configtimestamp,$timestamp,$vmem,$memory,$disk,$loadavg,$speed,$max_starters,$pool,$cpus,$state,$keywordidle,$totaljobs,$arch,$opsys,$adapters,$feature,$job_class,$initiators,$steplist,$vmem64,$memory64,$disk64)=@{$node};
+	    print "----------------------------------------\n";
+	    print "Node Name            : $node_name\n";
+	    print "Proc Version         : $version\n";
+	    print "Date of reconfig     : ",scalar localtime $configtimestamp,"\n";
+	    print "Data timestamp       : ",scalar localtime $timestamp,"\n";
+	    print "Virtual Memory (KB)  : $vmem\n";
+	    print "Physical Memory (KB) : $memory\n";
+	    print "Avail Disk Space (KB): $disk\n";
+	    print "Load Avgerage        : $loadavg\n";
+	    print "Node Speed           : $speed\n";
+	    print "Max Jobs allowed     : $max_starters\n";
+	    print "Pool Number          : $pool\n";
+	    print "Number of CPUs       : $cpus\n";
+	    print "Startd state         : $state\n";
+	    print "Since keyboard active: $keywordidle\n";
+	    print "Total jobs           : $totaljobs\n";
+	    print "Hardware Architecture: $arch\n";
+	    print "Operating System     : $opsys\n";
+	    print "Available Adapters   : @{$adapters}\n";
+	    print "Available Features   : @{$feature}\n";
+
+	    %classes=();
+	    foreach $class (  @{$job_class} )
+	    {
+	        $classes{$class}++;
+	    }
+	    print "Job Classes Allowed  : ";
+	    foreach $class ( keys %classes )
+	    {
+	        print "$class\($classes{$class}\) ";
+	    }
+	    print "\n";
+
+	    %classes=();
+	    foreach $class (  @{$initiators} )
+	    {
+	        $classes{$class}++;
+	    }
+	    print "Initiators Available : ";
+	    foreach $class ( keys %classes )
+	    {
+	        print "$class\($classes{$class}\) ";
+	    }
+	    print "\n";
+	
+	    @steps=@{$steplist};
+	    print "Steps Allocated      : ";
+	    if ( $#steps < 0 )
+	    {
+	        print "None.";
+	    }
+	    else
+	    {
+	        foreach $step ( @steps )
+	        {
+	            @id=@{$step};
+	            print "$id[2].$id[0].$id[1] ";
+	        }
+	    }
+	    print "\n";
+	    print "Virtual Memory (KB)  : $vmem64\n";
+	    print "Physical Memory (KB) : $memory64\n";
+	    print "Avail Disk Space (KB): $disk64\n";
+	}
+
+=back

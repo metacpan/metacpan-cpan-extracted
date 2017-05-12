@@ -1,0 +1,7 @@
+MANIFEST
+Makefile.PL
+lib/IDCHECKIO/Client.pm
+lib/IDCHECKIO/ResponseIDCIO.pm
+README
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

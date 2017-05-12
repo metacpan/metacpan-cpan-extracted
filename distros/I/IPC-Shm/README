@@ -1,0 +1,12 @@
+
+IPC::Shm implements shared memory Perl variables as follows:
+
+use IPC::Shm;
+our %variable1 : shm;
+
+The variable by that name in that package will always have the same
+contents in any process, and will persist beyond the processes'
+lifetimes.
+
+See https://metacpan.org/release/IPC-Shm
+

@@ -1,0 +1,322 @@
+0.96 Thu Jul 28 11:17:12 BST 2016
+
+  Bug fixes:
+  * Require Module::Load::Conditional 0.66 to resolve
+    CVE-2016-1238: avoid loading optional modules from default .
+
+0.94 Fri Feb 12 18:55:05 GMT 2016
+
+  Bug fixes:
+  * move __END__ above POD in documentation (plicease)
+  * Don't clobber $SIG{__DIE__} and $SIG{__WARN__} in open3_run() (avar)
+  * Fix 'terminate_on_signal' segfaulting (Petya Kohts)
+  * Fix usage of fcntl(..., F_GETFL, ...) (tonyc)
+
+0.92 Wed Jan 22 19:57:27 GMT 2014
+
+  Test fixes:
+  * Use File::Temp in run_forked tests (hugmeir)
+
+0.90 Mon Nov 18 15:08:15 GMT 2013
+
+  Misc:
+  * skip some problematic tests when PERL_CORE
+
+0.88 Fri Nov 15 14:44:03 GMT 2013
+
+  Misc:
+  * skip some problematic tests on Cygwin
+
+0.86 Mon Nov  4 14:09:42 GMT 2013
+
+  Bug fixes:
+  * run_forked: workaround absent CLOCK_MONOTONIC on OSX (Petya Kohts)
+  * RT#89770 Patch to fix error reporting if command killed by signal
+    (Ed Avis)
+  * Make the false test more forgiving, for Solaris and other SVR*
+    (bingos)
+
+0.85_02 Thu Oct 10 13:59:34 BST 2013
+
+  Bug Fixes:
+  * run_forked: incomplete output more than buffer size
+
+0.85_01 Thu Sep  5 20:30:51 BST 2013
+
+  Enhancements:
+  * run_forked() now uses Time::HiRes and Carp
+
+0.84    Tue Aug  6 10:03:03 BST 2013
+
+  Enhancements:
+  * Lowered CPU usage for run_forked() (Petya Kohts)
+
+  Bug Fixes:
+  * RT#85912 Handle STDOUT/STDERR for run_forked()
+    and coderefs (Petya Kohts)
+  * RT#76901 fixed regression introduced in 0.78
+    (Petya Kohts)
+  * RT#70530 run_forked() now has a consistent
+    API with run() (Petya Kohts)
+  * Socket only used where needed (bingos)
+
+  Misc:
+  * Install into sitelib if >= v5.12.0
+
+0.82    Sat Jun 29 22:11:22 BST 2013
+
+* Typo fixes (David Steinbrunner)
+
+0.80    Sat Mar  2 22:03:49 GMT 2013
+
+* Use File::Spec->path instead of relying on
+  Config (William Orr)
+
+0.78    Mon Apr 30 19:45:00 BST 2012
+
+* Use POSIX::_exit() instead of exit() in
+  run_forked(). Reported by Mithun Ayachit
+  [RT 76901]
+
+0.76    Mon Jan 30 11:30:53 GMT 2012
+
+* Make the empty arg stripping the default again,
+  with option to override this behaviour.
+
+0.74    Mon Jan 30 10:24:30 GMT 2012
+
+* Applied patch from WATANABE Hiroaki [RT #74470]
+  "Empty string cannot be passed to command"
+* Resolved [RT #74373] reported by Randy Stauner
+  "Compilation error when POSIX.pm fails to load"
+
+0.72    Wed Jun 22 12:29:59 BST 2011
+
+* Added IPC::Open3 support for capturing STDOUT/STDERR
+  on MSWin32, prefer this over IPC::Run
+
+0.70    Mon Jan 31 20:34:09 GMT 2011
+
+* Apply a patch from Petya Kohts, RT #65276, with
+  run_forked:
+
+  1) fix for the typo in the name of the signal
+  2) changed default for clean_up_children (which
+     seems to be the behavior expected by the majority of the users)
+  3) added detection (and forwarding to the caller) of the case
+     when run program is killed by signal
+  4) kill_gently is now used in cases when parent died
+     and when the executed program times out
+  5) added options which allow to execute some user code
+     in the beginning and at the end of the child
+
+0.68    Fri Jan  7 21:08:58 GMT 2011
+
+* Apply blead patch from Peter Acklam
+
+0.66    Tue Nov 23 12:10:24 GMT 2010
+
+* Apply documentation patch from Dan Dascalescu [RT # 63250]
+* Apply another documentation patch from Dan Dascalescu [RT #63251]
+* Fix an issue with _split_like_shell_win32() raised by tunakermit [RT #62961]
+
+0.64    Tue Oct 19 19:01:05 BST 2010
+
+* Only enable the can_run instances behaviour when 
+  global variable $INSTANCES is set
+
+0.62    Tue Oct 19 15:51:30 BST 2010
+
+* Amended can_run behaviour to run all found instances
+  of the given binary in a list context
+
+0.60    Mon Jul  5 09:04:54 BST 2010
+
+* Corrected spelling mistakes in POD, spotted by H.Merijn Brand
+* Apply a patch from Burak Gursoy RT #58886, which fixes paths 
+  on MSWin32
+* Apply patch from Petya Kohts, RT #50398, which allows more
+  flexible configuration of run_forked and its children
+
+0.58    Thu Apr 29 20:49:07 BST 2010
+
+* Applied patch from Petya Kohts, RT #50398, which
+  adds 'terminate_on_parent_sudden_death' option to
+  run_forked().
+* Applied patches from David Morel RT #56973, which
+  add 'discard_output' option to run_forked().
+* Added documentation as suggested by Rafaël Garcia-Suarez
+  in RT #56973
+
+0.56    Wed Feb  3 14:17:00 GMT 2010
+
+* Applied patch from Petya Kohts, RT #50398, which 
+  updates run_forked() to allow coderefs
+
+0.54    Sun Nov 15 21:43:51 GMT 2009
+
+* Fixed issues on older perls requiring Time::HiRes
+
+0.52    Fri Nov 13 16:15:11 GMT 2009
+
+* Added documentation for run_forked()
+
+0.51_01 Sun Nov  8 22:36:33 GMT 2009
+
+* Apply patch from Petya Kohts, RT #50398, which adds
+  run_forked()
+
+0.50    Mon Sep  7 16:17:32 BST 2009
+
+* Apply patch from Steve Hay that fixes a test failure in
+  core since the move from lib/ to ext/ [RT #49490]
+
+0.48    Mon Sep  7 15:12:43 BST 2009
+
+* Apply a patch from Vincent Pit to fix warnings when undefined 
+  values are provided in the command list [RT #48868]
+
+0.46    Fri Jun 12 13:40:09 UTC 2009
+
+* Apply patch from Craig Berry to quote arguments correctly
+  on VMS. See RT #46288 for details.
+  Non-VMS users need not upgrade
+
+0.44    Mon May  4 10:13:19 CEST 2009
+
+* Apply core patch to silence diagnostics during perl 
+  core tests. Users of 0.42 need not upgrade.
+
+0.42    Fri Oct 10 11:42:28 CEST 2008
+
+* Promote 0.41_07 to stable as it passes tests on all
+  CPAN Testers platforms now. 
+
+0.41_07 Sun Oct  5 18:18:15 CEST 2008
+
+* This release addresses issues for Win32 commands using quoted
+  strings containing whitespace. Non Win32 users need not upgrade.
+* Copy in Module::Build::Platform::Windows->split_like_shell, as 
+  Text::ParseWords::shelwords() uses UNIX semantics, which breaks on
+  Win32. Now IPC:Cmd uses ->split_like_shell on Win32, and shellwords()
+  on a UNIX like platform.
+* Export QUOTE and add docs for it to allow users to pick a platform
+  agnostic quote character.
+* Utility functions to check for ipc::run and ipc::open3 presence
+  now return their respective version
+* Use '"' (double quote) as quote character in all the whitespace tests 
+  -- they only contain constants
+* Improved diagnostics in test suite, so it's easier to see what
+  configuration failed from a single line of test output
+* Disable gzip test in production releases
+
+0.41_06 Wed Sep 24 17:03:14 CEST 2008
+
+* Add missing source file for tests. Users of 0.41_05
+  need not upgrade.
+
+0.41_05 Mon Sep 22 14:22:45 CEST 2008
+
+* Address whitespace issues in commands: if the full command 
+  contains special chars (ie, <,>,|,&) it needs to be stringified 
+  for system() and ipc::open3 or the special chars are escaped
+  as arguments to the command. So, if you pass an arrayref as
+  command, we'll stringify it.
+  Of course that conflicts with arguments containing whitespace, 
+  so if we need to stringify we'll also attempt to fixup any 
+  arguments that have whitespace with the OS specific quote.
+* Added tests for pipes, whitespace and pipes + whitespace to make
+  sure our fix works
+* Documentation on whitespace updated accordingly.
+
+0.41_04 Mon Jul 14 15:54:57 CEST 2008
+
+* Forgot to add new test file. Users of 0.41_03 
+  need not to upgrade.
+
+0.41_03 Sun Jul 13 14:59:44 CEST 2008
+
+* Address #36365: IPC::Cmd error reporting by adding extra
+  diagnostics on failure and pretty printing of errors
+* Fix the issue that caused many testers failures:
+  When _ipc_open3_run is interrupted by an alarm, the FDs were
+  not being restored, causing subsequent processes to not have
+  access to STDIN.
+* Add more diagnostics to 01.t
+* Add tests for interleaving stdout/stderr, which are now TODO
+  Record this as #37532: Unable to interleave STDOUT and STDERR
+  Mention this in the Caveats sections of the docs
+
+0.41_02 Sun Jun 29 17:38:47 CEST 2008
+
+* Implement timeouts for commands (#36437)
+
+0.41_01 Sun Apr  6 14:10:17 CEST 2008
+
+* Strip empty whitespace from array ref commands -- some 
+  commands can't deal with an empty argument after (like 
+  make) and will exit with an error because of it
+* Address 29532, 29723 and 32187 which all have issues 
+  with using arguments containing whitespace. IPC::Cmd 
+  can now deal with arguments with whitespace properly
+  using IPC::Run, Open3 and system.
+  Tests are added for this.
+* Apply patch from John M. ipc::open3 does not work on 
+  OpenVMS because it claims that it needs fork().
+* Merge the 2 test routines for stdout/stderr tests by 
+  making the buffer to inspect a variable
+  
+0.40    Wed Oct 17 10:57:11 CEST 2007
+
+* Promote 0.39_01 to stable. Users who already have
+  0.38 installed do not need to upgrade. This is merely
+  a test suit portability fix for perl 5.005
+
+0.39_01 Tue Oct 16 10:59:35 CEST 2007
+
+* Address test failure on 5.00505 by using 2-arg
+  version of open, instead of 3-arg version.
+
+0.38    Thu Oct 11 17:04:28 CEST 2007
+
+* Address perlbug [perl #46293] IPC::Cmd can lose stderr 
+* Apply [perl #46111] [PATCH] Add tests for stderr-only 
+  in IPC::Cmd to test for that bug
+  
+0.36    Fri Nov 24 14:55:56 CET 2006
+
+* 3-arg open doesn't work on 5.6.2 properly, so we changed
+  to the 2-arg form of open. This to avoid errors as seen
+  in this report:
+  http://www.nntp.perl.org/group/perl.cpan.testers/363646
+
+0.34    Fri Oct 20 15:13:23 CEST 2006
+
+* use Carp::carp explicitly
+
+0.32    Fri Oct 13 13:08:23 CEST 2006
+
+* Fix logic to detect IPC::Open3 usability on various platforms
+* Propogate the programs exit code properly when using IPC::Open3
+* Make IPC::Run a dependency on request
+
+0.30    Wed Oct 11 13:00:40 CEST 2006
+
+* 0.29_01 upgraded to stable.
+
+0.29_01 Thu Oct  5 16:34:44 CEST 2006
+
+* Rework IPC::Cmd heavily to work better on win32
+* Add $WARN as global variable
+* Pass parents STDOUT/STDERR to IPC::Open3 to attach STDOUT/STDERR to
+  the current tty. This doesn't support capturing buffers, but there
+  seems no way to do this, without using Win32::* modules.
+	 
+0.25    Wed Sep  6 17:32:18 CEST 2006
+
+* Add proper interactive support for IPC::Open3
+  Thanks to James Mastros and Martijn van de
+  Streek
+* Add an interactive test file for this support
+  (skipped under Test::Harness)
+    

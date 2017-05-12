@@ -1,0 +1,45 @@
+IO::Prompt version 0.997004
+
+By default, this module exports a single function: prompt().  It prompts the
+user to enter some input, and returns an object that represents the user input.
+
+You may specify various flags to the function to affect its behaviour; most
+notably, it defaults to automatically chomp the input, unless the -line
+flag is specified.
+
+Note that this is an interim re-release. A full release with better
+documentation will follow in the near future. Meanwhile, please consult
+the 'examples/' directory from this module's CPAN distribution to better
+understand how to make use of this module.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+
+DEPENDENCIES
+
+None.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005, Damian Conway
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

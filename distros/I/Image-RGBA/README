@@ -1,0 +1,80 @@
+Image::RGBA Version 0.04
+========================
+
+Hides all the ugly stuff involved when sampling individual pixel values
+from images.  A good range of quality levels are provided, currently;
+simple, linear and spline16.
+
+For an explanation of what is going on, see:
+
+    http://www.fh-furtwangen.de/~dersch/interpolator/interpolator.html
+
+For usage, read the pod documentation, eg:
+
+    perldoc Image::RGBA
+
+Also provided is optional radial luminance correction - Suitable for
+sampling photographs where there is a known light falloff from the
+centre of the image to the edges.
+
+Radial lens distortion can be corrected at the same time using a, b & c
+parameters, see:
+
+    http://www.fh-furtwangen.de/~dersch/barrel/barrel.html
+
+For usage, read the pod documentation, eg:
+
+    perldoc Image::Photo
+
+For typical applications, see the 'examples' folder.
+
+ADVANTAGES
+
+ - Inputs any file format supported by ImageMagick (png, jpg, tiff, pdf,
+   bmp, mng, mpg, whatever).
+
+ - Alpha channel information is sampled in the same way as Red, Green &
+   Blue information.
+
+ - Uses spline16 pixel interpolated sampling for high quality results.
+
+ - Radial brightness and barrel distortion correction.  Independent of
+   image orientation and brightness, so each camera should have one set
+   of values that work in all situations.  
+
+DISADVANTAGES
+
+ - Since it works at a lower level than the Image::Magick Get() method,
+   it's not quite as flexible.
+
+BUGS
+
+ - Probably.
+
+TODO
+
+ - Make faster (rewrite in C, contributions welcome).
+
+ - Support 16 bit per pixel images.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This package depends on perl and the Image::Magick perl module.
+
+These are available from CPAN, ActiveState, etc..
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002 Bruno Postle <bruno@postle.net> All Rights Reserved.
+This module is Free Software. It may be used, redistributed and/or
+modified under the same terms as Perl itself.
+

@@ -1,0 +1,17 @@
+<!--keep the MSMS-Compounds with a parent-intensity bigger or equal 10% of the highest parent-intensity-->
+
+<ExpMsMsSpectrumFilter>
+<oneExpMsMsSpectrumFilter spectrumType="msms" name="dummy">
+	        <level>msmsCompounds</level>	
+		<action type="removeOther">		
+		       <threshold type="sort">	
+			   <relativeTo>relMax</relativeTo>							
+			   <thresholdValue>0.1</thresholdValue>
+			   <comparator>ge</comparator>						
+		       </threshold>
+                </action>
+		<filterValue type="directValue">							
+			<name>precursor.intensity</name>						
+		</filterValue>
+	</oneExpMsMsSpectrumFilter>
+</ExpMsMsSpectrumFilter>

@@ -1,0 +1,1830 @@
+NAME
+    IO::AIO - Asynchronous Input/Output
+
+SYNOPSIS
+     use IO::AIO;
+
+     aio_open "/etc/passwd", IO::AIO::O_RDONLY, 0, sub {
+        my $fh = shift
+           or die "/etc/passwd: $!";
+        ...
+     };
+
+     aio_unlink "/tmp/file", sub { };
+
+     aio_read $fh, 30000, 1024, $buffer, 0, sub {
+        $_[0] > 0 or die "read error: $!";
+     };
+
+     # version 2+ has request and group objects
+     use IO::AIO 2;
+
+     aioreq_pri 4; # give next request a very high priority
+     my $req = aio_unlink "/tmp/file", sub { };
+     $req->cancel; # cancel request if still in queue
+
+     my $grp = aio_group sub { print "all stats done\n" };
+     add $grp aio_stat "..." for ...;
+
+DESCRIPTION
+    This module implements asynchronous I/O using whatever means your
+    operating system supports. It is implemented as an interface to "libeio"
+    (<http://software.schmorp.de/pkg/libeio.html>).
+
+    Asynchronous means that operations that can normally block your program
+    (e.g. reading from disk) will be done asynchronously: the operation will
+    still block, but you can do something else in the meantime. This is
+    extremely useful for programs that need to stay interactive even when
+    doing heavy I/O (GUI programs, high performance network servers etc.),
+    but can also be used to easily do operations in parallel that are
+    normally done sequentially, e.g. stat'ing many files, which is much
+    faster on a RAID volume or over NFS when you do a number of stat
+    operations concurrently.
+
+    While most of this works on all types of file descriptors (for example
+    sockets), using these functions on file descriptors that support
+    nonblocking operation (again, sockets, pipes etc.) is very inefficient.
+    Use an event loop for that (such as the EV module): IO::AIO will
+    naturally fit into such an event loop itself.
+
+    In this version, a number of threads are started that execute your
+    requests and signal their completion. You don't need thread support in
+    perl, and the threads created by this module will not be visible to
+    perl. In the future, this module might make use of the native aio
+    functions available on many operating systems. However, they are often
+    not well-supported or restricted (GNU/Linux doesn't allow them on normal
+    files currently, for example), and they would only support aio_read and
+    aio_write, so the remaining functionality would have to be implemented
+    using threads anyway.
+
+    Although the module will work in the presence of other (Perl-) threads,
+    it is currently not reentrant in any way, so use appropriate locking
+    yourself, always call "poll_cb" from within the same thread, or never
+    call "poll_cb" (or other "aio_" functions) recursively.
+
+  EXAMPLE
+    This is a simple example that uses the EV module and loads /etc/passwd
+    asynchronously:
+
+       use EV;
+       use IO::AIO;
+
+       # register the IO::AIO callback with EV
+       my $aio_w = EV::io IO::AIO::poll_fileno, EV::READ, \&IO::AIO::poll_cb;
+
+       # queue the request to open /etc/passwd
+       aio_open "/etc/passwd", IO::AIO::O_RDONLY, 0, sub {
+          my $fh = shift
+             or die "error while opening: $!";
+
+          # stat'ing filehandles is generally non-blocking
+          my $size = -s $fh;
+
+          # queue a request to read the file
+          my $contents;
+          aio_read $fh, 0, $size, $contents, 0, sub {
+             $_[0] == $size
+                or die "short read: $!";
+
+             close $fh;
+
+             # file contents now in $contents
+             print $contents;
+
+             # exit event loop and program
+             EV::break;
+          };
+       };
+
+       # possibly queue up other requests, or open GUI windows,
+       # check for sockets etc. etc.
+
+       # process events as long as there are some:
+       EV::run;
+
+REQUEST ANATOMY AND LIFETIME
+    Every "aio_*" function creates a request. which is a C data structure
+    not directly visible to Perl.
+
+    If called in non-void context, every request function returns a Perl
+    object representing the request. In void context, nothing is returned,
+    which saves a bit of memory.
+
+    The perl object is a fairly standard ref-to-hash object. The hash
+    contents are not used by IO::AIO so you are free to store anything you
+    like in it.
+
+    During their existance, aio requests travel through the following
+    states, in order:
+
+    ready
+        Immediately after a request is created it is put into the ready
+        state, waiting for a thread to execute it.
+
+    execute
+        A thread has accepted the request for processing and is currently
+        executing it (e.g. blocking in read).
+
+    pending
+        The request has been executed and is waiting for result processing.
+
+        While request submission and execution is fully asynchronous, result
+        processing is not and relies on the perl interpreter calling
+        "poll_cb" (or another function with the same effect).
+
+    result
+        The request results are processed synchronously by "poll_cb".
+
+        The "poll_cb" function will process all outstanding aio requests by
+        calling their callbacks, freeing memory associated with them and
+        managing any groups they are contained in.
+
+    done
+        Request has reached the end of its lifetime and holds no resources
+        anymore (except possibly for the Perl object, but its connection to
+        the actual aio request is severed and calling its methods will
+        either do nothing or result in a runtime error).
+
+FUNCTIONS
+  QUICK OVERVIEW
+    This section simply lists the prototypes most of the functions for quick
+    reference. See the following sections for function-by-function
+    documentation.
+
+       aio_wd $pathname, $callback->($wd)
+       aio_open $pathname, $flags, $mode, $callback->($fh)
+       aio_close $fh, $callback->($status)
+       aio_seek  $fh,$offset,$whence, $callback->($offs)
+       aio_read  $fh,$offset,$length, $data,$dataoffset, $callback->($retval)
+       aio_write $fh,$offset,$length, $data,$dataoffset, $callback->($retval)
+       aio_sendfile $out_fh, $in_fh, $in_offset, $length, $callback->($retval)
+       aio_readahead $fh,$offset,$length, $callback->($retval)
+       aio_stat  $fh_or_path, $callback->($status)
+       aio_lstat $fh, $callback->($status)
+       aio_statvfs $fh_or_path, $callback->($statvfs)
+       aio_utime $fh_or_path, $atime, $mtime, $callback->($status)
+       aio_chown $fh_or_path, $uid, $gid, $callback->($status)
+       aio_chmod $fh_or_path, $mode, $callback->($status)
+       aio_truncate $fh_or_path, $offset, $callback->($status)
+       aio_allocate $fh, $mode, $offset, $len, $callback->($status)
+       aio_fiemap $fh, $start, $length, $flags, $count, $cb->(\@extents)
+       aio_unlink $pathname, $callback->($status)
+       aio_mknod $pathname, $mode, $dev, $callback->($status)
+       aio_link $srcpath, $dstpath, $callback->($status)
+       aio_symlink $srcpath, $dstpath, $callback->($status)
+       aio_readlink $pathname, $callback->($link)
+       aio_realpath $pathname, $callback->($path)
+       aio_rename $srcpath, $dstpath, $callback->($status)
+       aio_mkdir $pathname, $mode, $callback->($status)
+       aio_rmdir $pathname, $callback->($status)
+       aio_readdir $pathname, $callback->($entries)
+       aio_readdirx $pathname, $flags, $callback->($entries, $flags)
+          IO::AIO::READDIR_DENTS IO::AIO::READDIR_DIRS_FIRST
+          IO::AIO::READDIR_STAT_ORDER IO::AIO::READDIR_FOUND_UNKNOWN
+       aio_scandir $pathname, $maxreq, $callback->($dirs, $nondirs)
+       aio_load $pathname, $data, $callback->($status)
+       aio_copy $srcpath, $dstpath, $callback->($status)
+       aio_move $srcpath, $dstpath, $callback->($status)
+       aio_rmtree $pathname, $callback->($status)
+       aio_fcntl $fh, $cmd, $arg, $callback->($status)
+       aio_ioctl $fh, $request, $buf, $callback->($status)
+       aio_sync $callback->($status)
+       aio_syncfs $fh, $callback->($status)
+       aio_fsync $fh, $callback->($status)
+       aio_fdatasync $fh, $callback->($status)
+       aio_sync_file_range $fh, $offset, $nbytes, $flags, $callback->($status)
+       aio_pathsync $pathname, $callback->($status)
+       aio_msync $scalar, $offset = 0, $length = undef, flags = 0, $callback->($status)
+       aio_mtouch $scalar, $offset = 0, $length = undef, flags = 0, $callback->($status)
+       aio_mlock $scalar, $offset = 0, $length = undef, $callback->($status)
+       aio_mlockall $flags, $callback->($status)
+       aio_group $callback->(...)
+       aio_nop $callback->()
+
+       $prev_pri = aioreq_pri [$pri]
+       aioreq_nice $pri_adjust
+
+       IO::AIO::poll_wait
+       IO::AIO::poll_cb
+       IO::AIO::poll
+       IO::AIO::flush
+       IO::AIO::max_poll_reqs $nreqs
+       IO::AIO::max_poll_time $seconds
+       IO::AIO::min_parallel $nthreads
+       IO::AIO::max_parallel $nthreads
+       IO::AIO::max_idle $nthreads
+       IO::AIO::idle_timeout $seconds
+       IO::AIO::max_outstanding $maxreqs
+       IO::AIO::nreqs
+       IO::AIO::nready
+       IO::AIO::npending
+
+       IO::AIO::sendfile $ofh, $ifh, $offset, $count
+       IO::AIO::fadvise $fh, $offset, $len, $advice
+       IO::AIO::mmap $scalar, $length, $prot, $flags[, $fh[, $offset]]
+       IO::AIO::munmap $scalar
+       IO::AIO::madvise $scalar, $offset, $length, $advice
+       IO::AIO::mprotect $scalar, $offset, $length, $protect
+       IO::AIO::munlock $scalar, $offset = 0, $length = undef
+       IO::AIO::munlockall
+
+  API NOTES
+    All the "aio_*" calls are more or less thin wrappers around the syscall
+    with the same name (sans "aio_"). The arguments are similar or
+    identical, and they all accept an additional (and optional) $callback
+    argument which must be a code reference. This code reference will be
+    called after the syscall has been executed in an asynchronous fashion.
+    The results of the request will be passed as arguments to the callback
+    (and, if an error occured, in $!) - for most requests the syscall return
+    code (e.g. most syscalls return -1 on error, unlike perl, which usually
+    delivers "false").
+
+    Some requests (such as "aio_readdir") pass the actual results and
+    communicate failures by passing "undef".
+
+    All functions expecting a filehandle keep a copy of the filehandle
+    internally until the request has finished.
+
+    All functions return request objects of type IO::AIO::REQ that allow
+    further manipulation of those requests while they are in-flight.
+
+    The pathnames you pass to these routines *should* be absolute. The
+    reason for this is that at the time the request is being executed, the
+    current working directory could have changed. Alternatively, you can
+    make sure that you never change the current working directory anywhere
+    in the program and then use relative paths. You can also take advantage
+    of IO::AIOs working directory abstraction, that lets you specify paths
+    relative to some previously-opened "working directory object" - see the
+    description of the "IO::AIO::WD" class later in this document.
+
+    To encode pathnames as octets, either make sure you either: a) always
+    pass in filenames you got from outside (command line, readdir etc.)
+    without tinkering, b) are in your native filesystem encoding, c) use the
+    Encode module and encode your pathnames to the locale (or other)
+    encoding in effect in the user environment, d) use
+    Glib::filename_from_unicode on unicode filenames or e) use something
+    else to ensure your scalar has the correct contents.
+
+    This works, btw. independent of the internal UTF-8 bit, which IO::AIO
+    handles correctly whether it is set or not.
+
+  AIO REQUEST FUNCTIONS
+    $prev_pri = aioreq_pri [$pri]
+        Returns the priority value that would be used for the next request
+        and, if $pri is given, sets the priority for the next aio request.
+
+        The default priority is 0, the minimum and maximum priorities are -4
+        and 4, respectively. Requests with higher priority will be serviced
+        first.
+
+        The priority will be reset to 0 after each call to one of the
+        "aio_*" functions.
+
+        Example: open a file with low priority, then read something from it
+        with higher priority so the read request is serviced before other
+        low priority open requests (potentially spamming the cache):
+
+           aioreq_pri -3;
+           aio_open ..., sub {
+              return unless $_[0];
+
+              aioreq_pri -2;
+              aio_read $_[0], ..., sub {
+                 ...
+              };
+           };
+
+    aioreq_nice $pri_adjust
+        Similar to "aioreq_pri", but subtracts the given value from the
+        current priority, so the effect is cumulative.
+
+    aio_open $pathname, $flags, $mode, $callback->($fh)
+        Asynchronously open or create a file and call the callback with a
+        newly created filehandle for the file (or "undef" in case of an
+        error).
+
+        The pathname passed to "aio_open" must be absolute. See API NOTES,
+        above, for an explanation.
+
+        The $flags argument is a bitmask. See the "Fcntl" module for a list.
+        They are the same as used by "sysopen".
+
+        Likewise, $mode specifies the mode of the newly created file, if it
+        didn't exist and "O_CREAT" has been given, just like perl's
+        "sysopen", except that it is mandatory (i.e. use 0 if you don't
+        create new files, and 0666 or 0777 if you do). Note that the $mode
+        will be modified by the umask in effect then the request is being
+        executed, so better never change the umask.
+
+        Example:
+
+           aio_open "/etc/passwd", IO::AIO::O_RDONLY, 0, sub {
+              if ($_[0]) {
+                 print "open successful, fh is $_[0]\n";
+                 ...
+              } else {
+                 die "open failed: $!\n";
+              }
+           };
+
+        In addition to all the common open modes/flags ("O_RDONLY",
+        "O_WRONLY", "O_RDWR", "O_CREAT", "O_TRUNC", "O_EXCL" and
+        "O_APPEND"), the following POSIX and non-POSIX constants are
+        available (missing ones on your system are, as usual, 0):
+
+        "O_ASYNC", "O_DIRECT", "O_NOATIME", "O_CLOEXEC", "O_NOCTTY",
+        "O_NOFOLLOW", "O_NONBLOCK", "O_EXEC", "O_SEARCH", "O_DIRECTORY",
+        "O_DSYNC", "O_RSYNC", "O_SYNC", "O_PATH", "O_TMPFILE", and
+        "O_TTY_INIT".
+
+    aio_close $fh, $callback->($status)
+        Asynchronously close a file and call the callback with the result
+        code.
+
+        Unfortunately, you can't do this to perl. Perl *insists* very
+        strongly on closing the file descriptor associated with the
+        filehandle itself.
+
+        Therefore, "aio_close" will not close the filehandle - instead it
+        will use dup2 to overwrite the file descriptor with the write-end of
+        a pipe (the pipe fd will be created on demand and will be cached).
+
+        Or in other words: the file descriptor will be closed, but it will
+        not be free for reuse until the perl filehandle is closed.
+
+    aio_seek $fh, $offset, $whence, $callback->($offs)
+        Seeks the filehandle to the new $offset, similarly to perl's
+        "sysseek". The $whence can use the traditional values (0 for
+        "IO::AIO::SEEK_SET", 1 for "IO::AIO::SEEK_CUR" or 2 for
+        "IO::AIO::SEEK_END").
+
+        The resulting absolute offset will be passed to the callback, or -1
+        in case of an error.
+
+        In theory, the $whence constants could be different than the
+        corresponding values from Fcntl, but perl guarantees they are the
+        same, so don't panic.
+
+        As a GNU/Linux (and maybe Solaris) extension, also the constants
+        "IO::AIO::SEEK_DATA" and "IO::AIO::SEEK_HOLE" are available, if they
+        could be found. No guarantees about suitability for use in
+        "aio_seek" or Perl's "sysseek" can be made though, although I would
+        naively assume they "just work".
+
+    aio_read $fh,$offset,$length, $data,$dataoffset, $callback->($retval)
+    aio_write $fh,$offset,$length, $data,$dataoffset, $callback->($retval)
+        Reads or writes $length bytes from or to the specified $fh and
+        $offset into the scalar given by $data and offset $dataoffset and
+        calls the callback without the actual number of bytes read (or -1 on
+        error, just like the syscall).
+
+        "aio_read" will, like "sysread", shrink or grow the $data scalar to
+        offset plus the actual number of bytes read.
+
+        If $offset is undefined, then the current file descriptor offset
+        will be used (and updated), otherwise the file descriptor offset
+        will not be changed by these calls.
+
+        If $length is undefined in "aio_write", use the remaining length of
+        $data.
+
+        If $dataoffset is less than zero, it will be counted from the end of
+        $data.
+
+        The $data scalar *MUST NOT* be modified in any way while the request
+        is outstanding. Modifying it can result in segfaults or World War
+        III (if the necessary/optional hardware is installed).
+
+        Example: Read 15 bytes at offset 7 into scalar $buffer, starting at
+        offset 0 within the scalar:
+
+           aio_read $fh, 7, 15, $buffer, 0, sub {
+              $_[0] > 0 or die "read error: $!";
+              print "read $_[0] bytes: <$buffer>\n";
+           };
+
+    aio_sendfile $out_fh, $in_fh, $in_offset, $length, $callback->($retval)
+        Tries to copy $length bytes from $in_fh to $out_fh. It starts
+        reading at byte offset $in_offset, and starts writing at the current
+        file offset of $out_fh. Because of that, it is not safe to issue
+        more than one "aio_sendfile" per $out_fh, as they will interfere
+        with each other. The same $in_fh works fine though, as this function
+        does not move or use the file offset of $in_fh.
+
+        Please note that "aio_sendfile" can read more bytes from $in_fh than
+        are written, and there is no way to find out how many more bytes
+        have been read from "aio_sendfile" alone, as "aio_sendfile" only
+        provides the number of bytes written to $out_fh. Only if the result
+        value equals $length one can assume that $length bytes have been
+        read.
+
+        Unlike with other "aio_" functions, it makes a lot of sense to use
+        "aio_sendfile" on non-blocking sockets, as long as one end
+        (typically the $in_fh) is a file - the file I/O will then be
+        asynchronous, while the socket I/O will be non-blocking. Note,
+        however, that you can run into a trap where "aio_sendfile" reads
+        some data with readahead, then fails to write all data, and when the
+        socket is ready the next time, the data in the cache is already
+        lost, forcing "aio_sendfile" to again hit the disk. Explicit
+        "aio_read" + "aio_write" let's you better control resource usage.
+
+        This call tries to make use of a native "sendfile"-like syscall to
+        provide zero-copy operation. For this to work, $out_fh should refer
+        to a socket, and $in_fh should refer to an mmap'able file.
+
+        If a native sendfile cannot be found or it fails with "ENOSYS",
+        "EINVAL", "ENOTSUP", "EOPNOTSUPP", "EAFNOSUPPORT", "EPROTOTYPE" or
+        "ENOTSOCK", it will be emulated, so you can call "aio_sendfile" on
+        any type of filehandle regardless of the limitations of the
+        operating system.
+
+        As native sendfile syscalls (as practically any non-POSIX interface
+        hacked together in a hurry to improve benchmark numbers) tend to be
+        rather buggy on many systems, this implementation tries to work
+        around some known bugs in Linux and FreeBSD kernels (probably
+        others, too), but that might fail, so you really really should check
+        the return value of "aio_sendfile" - fewre bytes than expected might
+        have been transferred.
+
+    aio_readahead $fh,$offset,$length, $callback->($retval)
+        "aio_readahead" populates the page cache with data from a file so
+        that subsequent reads from that file will not block on disk I/O. The
+        $offset argument specifies the starting point from which data is to
+        be read and $length specifies the number of bytes to be read. I/O is
+        performed in whole pages, so that offset is effectively rounded down
+        to a page boundary and bytes are read up to the next page boundary
+        greater than or equal to (off-set+length). "aio_readahead" does not
+        read beyond the end of the file. The current file offset of the file
+        is left unchanged.
+
+        If that syscall doesn't exist (likely if your OS isn't Linux) it
+        will be emulated by simply reading the data, which would have a
+        similar effect.
+
+    aio_stat $fh_or_path, $callback->($status)
+    aio_lstat $fh, $callback->($status)
+        Works like perl's "stat" or "lstat" in void context. The callback
+        will be called after the stat and the results will be available
+        using "stat _" or "-s _" etc...
+
+        The pathname passed to "aio_stat" must be absolute. See API NOTES,
+        above, for an explanation.
+
+        Currently, the stats are always 64-bit-stats, i.e. instead of
+        returning an error when stat'ing a large file, the results will be
+        silently truncated unless perl itself is compiled with large file
+        support.
+
+        To help interpret the mode and dev/rdev stat values, IO::AIO offers
+        the following constants and functions (if not implemented, the
+        constants will be 0 and the functions will either "croak" or fall
+        back on traditional behaviour).
+
+        "S_IFMT", "S_IFIFO", "S_IFCHR", "S_IFBLK", "S_IFLNK", "S_IFREG",
+        "S_IFDIR", "S_IFWHT", "S_IFSOCK", "IO::AIO::major $dev_t",
+        "IO::AIO::minor $dev_t", "IO::AIO::makedev $major, $minor".
+
+        Example: Print the length of /etc/passwd:
+
+           aio_stat "/etc/passwd", sub {
+              $_[0] and die "stat failed: $!";
+              print "size is ", -s _, "\n";
+           };
+
+    aio_statvfs $fh_or_path, $callback->($statvfs)
+        Works like the POSIX "statvfs" or "fstatvfs" syscalls, depending on
+        whether a file handle or path was passed.
+
+        On success, the callback is passed a hash reference with the
+        following members: "bsize", "frsize", "blocks", "bfree", "bavail",
+        "files", "ffree", "favail", "fsid", "flag" and "namemax". On
+        failure, "undef" is passed.
+
+        The following POSIX IO::AIO::ST_* constants are defined: "ST_RDONLY"
+        and "ST_NOSUID".
+
+        The following non-POSIX IO::AIO::ST_* flag masks are defined to
+        their correct value when available, or to 0 on systems that do not
+        support them: "ST_NODEV", "ST_NOEXEC", "ST_SYNCHRONOUS",
+        "ST_MANDLOCK", "ST_WRITE", "ST_APPEND", "ST_IMMUTABLE",
+        "ST_NOATIME", "ST_NODIRATIME" and "ST_RELATIME".
+
+        Example: stat "/wd" and dump out the data if successful.
+
+           aio_statvfs "/wd", sub {
+              my $f = $_[0]
+                 or die "statvfs: $!";
+
+              use Data::Dumper;
+              say Dumper $f;
+           };
+
+           # result:
+           {
+              bsize   => 1024,
+              bfree   => 4333064312,
+              blocks  => 10253828096,
+              files   => 2050765568,
+              flag    => 4096,
+              favail  => 2042092649,
+              bavail  => 4333064312,
+              ffree   => 2042092649,
+              namemax => 255,
+              frsize  => 1024,
+              fsid    => 1810
+           }
+
+        Here is a (likely partial - send me updates!) list of fsid values
+        used by Linux - it is safe to hardcode these when $^O is "linux":
+
+           0x0000adf5 adfs
+           0x0000adff affs
+           0x5346414f afs
+           0x09041934 anon-inode filesystem
+           0x00000187 autofs
+           0x42465331 befs
+           0x1badface bfs
+           0x42494e4d binfmt_misc
+           0x9123683e btrfs
+           0x0027e0eb cgroupfs
+           0xff534d42 cifs
+           0x73757245 coda
+           0x012ff7b7 coh
+           0x28cd3d45 cramfs
+           0x453dcd28 cramfs-wend (wrong endianness)
+           0x64626720 debugfs
+           0x00001373 devfs
+           0x00001cd1 devpts
+           0x0000f15f ecryptfs
+           0x00414a53 efs
+           0x0000137d ext
+           0x0000ef53 ext2/ext3/ext4
+           0x0000ef51 ext2
+           0xf2f52010 f2fs
+           0x00004006 fat
+           0x65735546 fuseblk
+           0x65735543 fusectl
+           0x0bad1dea futexfs
+           0x01161970 gfs2
+           0x47504653 gpfs
+           0x00004244 hfs
+           0xf995e849 hpfs
+           0x00c0ffee hostfs
+           0x958458f6 hugetlbfs
+           0x2bad1dea inotifyfs
+           0x00009660 isofs
+           0x000072b6 jffs2
+           0x3153464a jfs
+           0x6b414653 k-afs
+           0x0bd00bd0 lustre
+           0x0000137f minix
+           0x0000138f minix 30 char names
+           0x00002468 minix v2
+           0x00002478 minix v2 30 char names
+           0x00004d5a minix v3
+           0x19800202 mqueue
+           0x00004d44 msdos
+           0x0000564c novell
+           0x00006969 nfs
+           0x6e667364 nfsd
+           0x00003434 nilfs
+           0x5346544e ntfs
+           0x00009fa1 openprom
+           0x7461636F ocfs2
+           0x00009fa0 proc
+           0x6165676c pstorefs
+           0x0000002f qnx4
+           0x68191122 qnx6
+           0x858458f6 ramfs
+           0x52654973 reiserfs
+           0x00007275 romfs
+           0x67596969 rpc_pipefs
+           0x73636673 securityfs
+           0xf97cff8c selinux
+           0x0000517b smb
+           0x534f434b sockfs
+           0x73717368 squashfs
+           0x62656572 sysfs
+           0x012ff7b6 sysv2
+           0x012ff7b5 sysv4
+           0x01021994 tmpfs
+           0x15013346 udf
+           0x00011954 ufs
+           0x54190100 ufs byteswapped
+           0x00009fa2 usbdevfs
+           0x01021997 v9fs
+           0xa501fcf5 vxfs
+           0xabba1974 xenfs
+           0x012ff7b4 xenix
+           0x58465342 xfs
+           0x012fd16d xia
+
+    aio_utime $fh_or_path, $atime, $mtime, $callback->($status)
+        Works like perl's "utime" function (including the special case of
+        $atime and $mtime being undef). Fractional times are supported if
+        the underlying syscalls support them.
+
+        When called with a pathname, uses utimes(2) if available, otherwise
+        utime(2). If called on a file descriptor, uses futimes(2) if
+        available, otherwise returns ENOSYS, so this is not portable.
+
+        Examples:
+
+           # set atime and mtime to current time (basically touch(1)):
+           aio_utime "path", undef, undef;
+           # set atime to current time and mtime to beginning of the epoch:
+           aio_utime "path", time, undef; # undef==0
+
+    aio_chown $fh_or_path, $uid, $gid, $callback->($status)
+        Works like perl's "chown" function, except that "undef" for either
+        $uid or $gid is being interpreted as "do not change" (but -1 can
+        also be used).
+
+        Examples:
+
+           # same as "chown root path" in the shell:
+           aio_chown "path", 0, -1;
+           # same as above:
+           aio_chown "path", 0, undef;
+
+    aio_truncate $fh_or_path, $offset, $callback->($status)
+        Works like truncate(2) or ftruncate(2).
+
+    aio_allocate $fh, $mode, $offset, $len, $callback->($status)
+        Allocates or frees disk space according to the $mode argument. See
+        the linux "fallocate" documentation for details.
+
+        $mode is usually 0 or "IO::AIO::FALLOC_FL_KEEP_SIZE" to allocate
+        space, or "IO::AIO::FALLOC_FL_PUNCH_HOLE |
+        IO::AIO::FALLOC_FL_KEEP_SIZE", to deallocate a file range.
+
+        IO::AIO also supports "FALLOC_FL_COLLAPSE_RANGE", to remove a range
+        (without leaving a hole) and "FALLOC_FL_ZERO_RANGE", to zero a range
+        (see your fallocate(2) manpage).
+
+        The file system block size used by "fallocate" is presumably the
+        "f_bsize" returned by "statvfs".
+
+        If "fallocate" isn't available or cannot be emulated (currently no
+        emulation will be attempted), passes -1 and sets $! to "ENOSYS".
+
+    aio_chmod $fh_or_path, $mode, $callback->($status)
+        Works like perl's "chmod" function.
+
+    aio_unlink $pathname, $callback->($status)
+        Asynchronously unlink (delete) a file and call the callback with the
+        result code.
+
+    aio_mknod $pathname, $mode, $dev, $callback->($status)
+        [EXPERIMENTAL]
+
+        Asynchronously create a device node (or fifo). See mknod(2).
+
+        The only (POSIX-) portable way of calling this function is:
+
+           aio_mknod $pathname, IO::AIO::S_IFIFO | $mode, 0, sub { ...
+
+        See "aio_stat" for info about some potentially helpful extra
+        constants and functions.
+
+    aio_link $srcpath, $dstpath, $callback->($status)
+        Asynchronously create a new link to the existing object at $srcpath
+        at the path $dstpath and call the callback with the result code.
+
+    aio_symlink $srcpath, $dstpath, $callback->($status)
+        Asynchronously create a new symbolic link to the existing object at
+        $srcpath at the path $dstpath and call the callback with the result
+        code.
+
+    aio_readlink $pathname, $callback->($link)
+        Asynchronously read the symlink specified by $path and pass it to
+        the callback. If an error occurs, nothing or undef gets passed to
+        the callback.
+
+    aio_realpath $pathname, $callback->($path)
+        Asynchronously make the path absolute and resolve any symlinks in
+        $path. The resulting path only consists of directories (same as
+        Cwd::realpath).
+
+        This request can be used to get the absolute path of the current
+        working directory by passing it a path of . (a single dot).
+
+    aio_rename $srcpath, $dstpath, $callback->($status)
+        Asynchronously rename the object at $srcpath to $dstpath, just as
+        rename(2) and call the callback with the result code.
+
+        On systems that support the AIO::WD working directory abstraction
+        natively, the case "[$wd, "."]" as $srcpath is specialcased -
+        instead of failing, "rename" is called on the absolute path of $wd.
+
+    aio_mkdir $pathname, $mode, $callback->($status)
+        Asynchronously mkdir (create) a directory and call the callback with
+        the result code. $mode will be modified by the umask at the time the
+        request is executed, so do not change your umask.
+
+    aio_rmdir $pathname, $callback->($status)
+        Asynchronously rmdir (delete) a directory and call the callback with
+        the result code.
+
+        On systems that support the AIO::WD working directory abstraction
+        natively, the case "[$wd, "."]" is specialcased - instead of
+        failing, "rmdir" is called on the absolute path of $wd.
+
+    aio_readdir $pathname, $callback->($entries)
+        Unlike the POSIX call of the same name, "aio_readdir" reads an
+        entire directory (i.e. opendir + readdir + closedir). The entries
+        will not be sorted, and will NOT include the "." and ".." entries.
+
+        The callback is passed a single argument which is either "undef" or
+        an array-ref with the filenames.
+
+    aio_readdirx $pathname, $flags, $callback->($entries, $flags)
+        Quite similar to "aio_readdir", but the $flags argument allows one
+        to tune behaviour and output format. In case of an error, $entries
+        will be "undef".
+
+        The flags are a combination of the following constants, ORed
+        together (the flags will also be passed to the callback, possibly
+        modified):
+
+        IO::AIO::READDIR_DENTS
+            When this flag is off, then the callback gets an arrayref
+            consisting of names only (as with "aio_readdir"), otherwise it
+            gets an arrayref with "[$name, $type, $inode]" arrayrefs, each
+            describing a single directory entry in more detail.
+
+            $name is the name of the entry.
+
+            $type is one of the "IO::AIO::DT_xxx" constants:
+
+            "IO::AIO::DT_UNKNOWN", "IO::AIO::DT_FIFO", "IO::AIO::DT_CHR",
+            "IO::AIO::DT_DIR", "IO::AIO::DT_BLK", "IO::AIO::DT_REG",
+            "IO::AIO::DT_LNK", "IO::AIO::DT_SOCK", "IO::AIO::DT_WHT".
+
+            "IO::AIO::DT_UNKNOWN" means just that: readdir does not know. If
+            you need to know, you have to run stat yourself. Also, for speed
+            reasons, the $type scalars are read-only: you can not modify
+            them.
+
+            $inode is the inode number (which might not be exact on systems
+            with 64 bit inode numbers and 32 bit perls). This field has
+            unspecified content on systems that do not deliver the inode
+            information.
+
+        IO::AIO::READDIR_DIRS_FIRST
+            When this flag is set, then the names will be returned in an
+            order where likely directories come first, in optimal stat
+            order. This is useful when you need to quickly find directories,
+            or you want to find all directories while avoiding to stat()
+            each entry.
+
+            If the system returns type information in readdir, then this is
+            used to find directories directly. Otherwise, likely directories
+            are names beginning with ".", or otherwise names with no dots,
+            of which names with short names are tried first.
+
+        IO::AIO::READDIR_STAT_ORDER
+            When this flag is set, then the names will be returned in an
+            order suitable for stat()'ing each one. That is, when you plan
+            to stat() all files in the given directory, then the returned
+            order will likely be fastest.
+
+            If both this flag and "IO::AIO::READDIR_DIRS_FIRST" are
+            specified, then the likely dirs come first, resulting in a less
+            optimal stat order.
+
+        IO::AIO::READDIR_FOUND_UNKNOWN
+            This flag should not be set when calling "aio_readdirx".
+            Instead, it is being set by "aio_readdirx", when any of the
+            $type's found were "IO::AIO::DT_UNKNOWN". The absence of this
+            flag therefore indicates that all $type's are known, which can
+            be used to speed up some algorithms.
+
+    aio_load $pathname, $data, $callback->($status)
+        This is a composite request that tries to fully load the given file
+        into memory. Status is the same as with aio_read.
+
+    aio_copy $srcpath, $dstpath, $callback->($status)
+        Try to copy the *file* (directories not supported as either source
+        or destination) from $srcpath to $dstpath and call the callback with
+        a status of 0 (ok) or -1 (error, see $!).
+
+        This is a composite request that creates the destination file with
+        mode 0200 and copies the contents of the source file into it using
+        "aio_sendfile", followed by restoring atime, mtime, access mode and
+        uid/gid, in that order.
+
+        If an error occurs, the partial destination file will be unlinked,
+        if possible, except when setting atime, mtime, access mode and
+        uid/gid, where errors are being ignored.
+
+    aio_move $srcpath, $dstpath, $callback->($status)
+        Try to move the *file* (directories not supported as either source
+        or destination) from $srcpath to $dstpath and call the callback with
+        a status of 0 (ok) or -1 (error, see $!).
+
+        This is a composite request that tries to rename(2) the file first;
+        if rename fails with "EXDEV", it copies the file with "aio_copy"
+        and, if that is successful, unlinks the $srcpath.
+
+    aio_scandir $pathname, $maxreq, $callback->($dirs, $nondirs)
+        Scans a directory (similar to "aio_readdir") but additionally tries
+        to efficiently separate the entries of directory $path into two sets
+        of names, directories you can recurse into (directories), and ones
+        you cannot recurse into (everything else, including symlinks to
+        directories).
+
+        "aio_scandir" is a composite request that creates of many sub
+        requests_ $maxreq specifies the maximum number of outstanding aio
+        requests that this function generates. If it is "<= 0", then a
+        suitable default will be chosen (currently 4).
+
+        On error, the callback is called without arguments, otherwise it
+        receives two array-refs with path-relative entry names.
+
+        Example:
+
+           aio_scandir $dir, 0, sub {
+              my ($dirs, $nondirs) = @_;
+              print "real directories: @$dirs\n";
+              print "everything else: @$nondirs\n";
+           };
+
+        Implementation notes.
+
+        The "aio_readdir" cannot be avoided, but "stat()"'ing every entry
+        can.
+
+        If readdir returns file type information, then this is used directly
+        to find directories.
+
+        Otherwise, after reading the directory, the modification time, size
+        etc. of the directory before and after the readdir is checked, and
+        if they match (and isn't the current time), the link count will be
+        used to decide how many entries are directories (if >= 2).
+        Otherwise, no knowledge of the number of subdirectories will be
+        assumed.
+
+        Then entries will be sorted into likely directories a non-initial
+        dot currently) and likely non-directories (see "aio_readdirx"). Then
+        every entry plus an appended "/." will be "stat"'ed, likely
+        directories first, in order of their inode numbers. If that
+        succeeds, it assumes that the entry is a directory or a symlink to
+        directory (which will be checked separately). This is often faster
+        than stat'ing the entry itself because filesystems might detect the
+        type of the entry without reading the inode data (e.g. ext2fs
+        filetype feature), even on systems that cannot return the filetype
+        information on readdir.
+
+        If the known number of directories (link count - 2) has been
+        reached, the rest of the entries is assumed to be non-directories.
+
+        This only works with certainty on POSIX (= UNIX) filesystems, which
+        fortunately are the vast majority of filesystems around.
+
+        It will also likely work on non-POSIX filesystems with reduced
+        efficiency as those tend to return 0 or 1 as link counts, which
+        disables the directory counting heuristic.
+
+    aio_rmtree $pathname, $callback->($status)
+        Delete a directory tree starting (and including) $path, return the
+        status of the final "rmdir" only. This is a composite request that
+        uses "aio_scandir" to recurse into and rmdir directories, and unlink
+        everything else.
+
+    aio_fcntl $fh, $cmd, $arg, $callback->($status)
+    aio_ioctl $fh, $request, $buf, $callback->($status)
+        These work just like the "fcntl" and "ioctl" built-in functions,
+        except they execute asynchronously and pass the return value to the
+        callback.
+
+        Both calls can be used for a lot of things, some of which make more
+        sense to run asynchronously in their own thread, while some others
+        make less sense. For example, calls that block waiting for external
+        events, such as locking, will also lock down an I/O thread while it
+        is waiting, which can deadlock the whole I/O system. At the same
+        time, there might be no alternative to using a thread to wait.
+
+        So in general, you should only use these calls for things that do
+        (filesystem) I/O, not for things that wait for other events
+        (network, other processes), although if you are careful and know
+        what you are doing, you still can.
+
+    aio_sync $callback->($status)
+        Asynchronously call sync and call the callback when finished.
+
+    aio_fsync $fh, $callback->($status)
+        Asynchronously call fsync on the given filehandle and call the
+        callback with the fsync result code.
+
+    aio_fdatasync $fh, $callback->($status)
+        Asynchronously call fdatasync on the given filehandle and call the
+        callback with the fdatasync result code.
+
+        If this call isn't available because your OS lacks it or it couldn't
+        be detected, it will be emulated by calling "fsync" instead.
+
+    aio_syncfs $fh, $callback->($status)
+        Asynchronously call the syncfs syscall to sync the filesystem
+        associated to the given filehandle and call the callback with the
+        syncfs result code. If syncfs is not available, calls sync(), but
+        returns -1 and sets errno to "ENOSYS" nevertheless.
+
+    aio_sync_file_range $fh, $offset, $nbytes, $flags, $callback->($status)
+        Sync the data portion of the file specified by $offset and $length
+        to disk (but NOT the metadata), by calling the Linux-specific
+        sync_file_range call. If sync_file_range is not available or it
+        returns ENOSYS, then fdatasync or fsync is being substituted.
+
+        $flags can be a combination of
+        "IO::AIO::SYNC_FILE_RANGE_WAIT_BEFORE",
+        "IO::AIO::SYNC_FILE_RANGE_WRITE" and
+        "IO::AIO::SYNC_FILE_RANGE_WAIT_AFTER": refer to the sync_file_range
+        manpage for details.
+
+    aio_pathsync $pathname, $callback->($status)
+        This request tries to open, fsync and close the given path. This is
+        a composite request intended to sync directories after directory
+        operations (E.g. rename). This might not work on all operating
+        systems or have any specific effect, but usually it makes sure that
+        directory changes get written to disc. It works for anything that
+        can be opened for read-only, not just directories.
+
+        Future versions of this function might fall back to other methods
+        when "fsync" on the directory fails (such as calling "sync").
+
+        Passes 0 when everything went ok, and -1 on error.
+
+    aio_msync $scalar, $offset = 0, $length = undef, flags = 0,
+    $callback->($status)
+        This is a rather advanced IO::AIO call, which only works on
+        mmap(2)ed scalars (see the "IO::AIO::mmap" function, although it
+        also works on data scalars managed by the Sys::Mmap or Mmap modules,
+        note that the scalar must only be modified in-place while an aio
+        operation is pending on it).
+
+        It calls the "msync" function of your OS, if available, with the
+        memory area starting at $offset in the string and ending $length
+        bytes later. If $length is negative, counts from the end, and if
+        $length is "undef", then it goes till the end of the string. The
+        flags can be a combination of "IO::AIO::MS_ASYNC",
+        "IO::AIO::MS_INVALIDATE" and "IO::AIO::MS_SYNC".
+
+    aio_mtouch $scalar, $offset = 0, $length = undef, flags = 0,
+    $callback->($status)
+        This is a rather advanced IO::AIO call, which works best on
+        mmap(2)ed scalars.
+
+        It touches (reads or writes) all memory pages in the specified range
+        inside the scalar. All caveats and parameters are the same as for
+        "aio_msync", above, except for flags, which must be either 0 (which
+        reads all pages and ensures they are instantiated) or
+        "IO::AIO::MT_MODIFY", which modifies the memory pages (by reading
+        and writing an octet from it, which dirties the page).
+
+    aio_mlock $scalar, $offset = 0, $length = undef, $callback->($status)
+        This is a rather advanced IO::AIO call, which works best on
+        mmap(2)ed scalars.
+
+        It reads in all the pages of the underlying storage into memory (if
+        any) and locks them, so they are not getting swapped/paged out or
+        removed.
+
+        If $length is undefined, then the scalar will be locked till the
+        end.
+
+        On systems that do not implement "mlock", this function returns -1
+        and sets errno to "ENOSYS".
+
+        Note that the corresponding "munlock" is synchronous and is
+        documented under "MISCELLANEOUS FUNCTIONS".
+
+        Example: open a file, mmap and mlock it - both will be undone when
+        $data gets destroyed.
+
+           open my $fh, "<", $path or die "$path: $!";
+           my $data;
+           IO::AIO::mmap $data, -s $fh, IO::AIO::PROT_READ, IO::AIO::MAP_SHARED, $fh;
+           aio_mlock $data; # mlock in background
+
+    aio_mlockall $flags, $callback->($status)
+        Calls the "mlockall" function with the given $flags (a combination
+        of "IO::AIO::MCL_CURRENT" and "IO::AIO::MCL_FUTURE").
+
+        On systems that do not implement "mlockall", this function returns
+        -1 and sets errno to "ENOSYS".
+
+        Note that the corresponding "munlockall" is synchronous and is
+        documented under "MISCELLANEOUS FUNCTIONS".
+
+        Example: asynchronously lock all current and future pages into
+        memory.
+
+           aio_mlockall IO::AIO::MCL_FUTURE;
+
+    aio_fiemap $fh, $start, $length, $flags, $count, $cb->(\@extents)
+        Queries the extents of the given file (by calling the Linux "FIEMAP"
+        ioctl, see <http://cvs.schmorp.de/IO-AIO/doc/fiemap.txt> for
+        details). If the ioctl is not available on your OS, then this
+        request will fail with "ENOSYS".
+
+        $start is the starting offset to query extents for, $length is the
+        size of the range to query - if it is "undef", then the whole file
+        will be queried.
+
+        $flags is a combination of flags ("IO::AIO::FIEMAP_FLAG_SYNC" or
+        "IO::AIO::FIEMAP_FLAG_XATTR" - "IO::AIO::FIEMAP_FLAGS_COMPAT" is
+        also exported), and is normally 0 or "IO::AIO::FIEMAP_FLAG_SYNC" to
+        query the data portion.
+
+        $count is the maximum number of extent records to return. If it is
+        "undef", then IO::AIO queries all extents of the range. As a very
+        special case, if it is 0, then the callback receives the number of
+        extents instead of the extents themselves (which is unreliable, see
+        below).
+
+        If an error occurs, the callback receives no arguments. The special
+        "errno" value "IO::AIO::EBADR" is available to test for flag errors.
+
+        Otherwise, the callback receives an array reference with extent
+        structures. Each extent structure is an array reference itself, with
+        the following members:
+
+           [$logical, $physical, $length, $flags]
+
+        Flags is any combination of the following flag values (typically
+        either 0 or "IO::AIO::FIEMAP_EXTENT_LAST" (1)):
+
+        "IO::AIO::FIEMAP_EXTENT_LAST", "IO::AIO::FIEMAP_EXTENT_UNKNOWN",
+        "IO::AIO::FIEMAP_EXTENT_DELALLOC", "IO::AIO::FIEMAP_EXTENT_ENCODED",
+        "IO::AIO::FIEMAP_EXTENT_DATA_ENCRYPTED",
+        "IO::AIO::FIEMAP_EXTENT_NOT_ALIGNED",
+        "IO::AIO::FIEMAP_EXTENT_DATA_INLINE",
+        "IO::AIO::FIEMAP_EXTENT_DATA_TAIL",
+        "IO::AIO::FIEMAP_EXTENT_UNWRITTEN", "IO::AIO::FIEMAP_EXTENT_MERGED"
+        or "IO::AIO::FIEMAP_EXTENT_SHARED".
+
+        At the time of this writing (Linux 3.2), this requets is unreliable
+        unless $count is "undef", as the kernel has all sorts of bugs
+        preventing it to return all extents of a range for files with large
+        number of extents. The code works around all these issues if $count
+        is undef.
+
+    aio_group $callback->(...)
+        This is a very special aio request: Instead of doing something, it
+        is a container for other aio requests, which is useful if you want
+        to bundle many requests into a single, composite, request with a
+        definite callback and the ability to cancel the whole request with
+        its subrequests.
+
+        Returns an object of class IO::AIO::GRP. See its documentation below
+        for more info.
+
+        Example:
+
+           my $grp = aio_group sub {
+              print "all stats done\n";
+           };
+
+           add $grp
+              (aio_stat ...),
+              (aio_stat ...),
+              ...;
+
+    aio_nop $callback->()
+        This is a special request - it does nothing in itself and is only
+        used for side effects, such as when you want to add a dummy request
+        to a group so that finishing the requests in the group depends on
+        executing the given code.
+
+        While this request does nothing, it still goes through the execution
+        phase and still requires a worker thread. Thus, the callback will
+        not be executed immediately but only after other requests in the
+        queue have entered their execution phase. This can be used to
+        measure request latency.
+
+    IO::AIO::aio_busy $fractional_seconds, $callback->() *NOT EXPORTED*
+        Mainly used for debugging and benchmarking, this aio request puts
+        one of the request workers to sleep for the given time.
+
+        While it is theoretically handy to have simple I/O scheduling
+        requests like sleep and file handle readable/writable, the overhead
+        this creates is immense (it blocks a thread for a long time) so do
+        not use this function except to put your application under
+        artificial I/O pressure.
+
+  IO::AIO::WD - multiple working directories
+    Your process only has one current working directory, which is used by
+    all threads. This makes it hard to use relative paths (some other
+    component could call "chdir" at any time, and it is hard to control when
+    the path will be used by IO::AIO).
+
+    One solution for this is to always use absolute paths. This usually
+    works, but can be quite slow (the kernel has to walk the whole path on
+    every access), and can also be a hassle to implement.
+
+    Newer POSIX systems have a number of functions (openat, fdopendir,
+    futimensat and so on) that make it possible to specify working
+    directories per operation.
+
+    For portability, and because the clowns who "designed", or shall I
+    write, perpetrated this new interface were obviously half-drunk, this
+    abstraction cannot be perfect, though.
+
+    IO::AIO allows you to convert directory paths into a so-called
+    IO::AIO::WD object. This object stores the canonicalised, absolute
+    version of the path, and on systems that allow it, also a directory file
+    descriptor.
+
+    Everywhere where a pathname is accepted by IO::AIO (e.g. in "aio_stat"
+    or "aio_unlink"), one can specify an array reference with an IO::AIO::WD
+    object and a pathname instead (or the IO::AIO::WD object alone, which
+    gets interpreted as "[$wd, "."]"). If the pathname is absolute, the
+    IO::AIO::WD object is ignored, otherwise the pathname is resolved
+    relative to that IO::AIO::WD object.
+
+    For example, to get a wd object for /etc and then stat passwd inside,
+    you would write:
+
+       aio_wd "/etc", sub {
+          my $etcdir = shift;
+
+          # although $etcdir can be undef on error, there is generally no reason
+          # to check for errors here, as aio_stat will fail with ENOENT
+          # when $etcdir is undef.
+
+          aio_stat [$etcdir, "passwd"], sub {
+             # yay
+          };
+       };
+
+    The fact that "aio_wd" is a request and not a normal function shows that
+    creating an IO::AIO::WD object is itself a potentially blocking
+    operation, which is why it is done asynchronously.
+
+    To stat the directory obtained with "aio_wd" above, one could write
+    either of the following three request calls:
+
+       aio_lstat "/etc"    , sub { ...  # pathname as normal string
+       aio_lstat [$wd, "."], sub { ...  # "." relative to $wd (i.e. $wd itself)
+       aio_lstat $wd       , sub { ...  # shorthand for the previous
+
+    As with normal pathnames, IO::AIO keeps a copy of the working directory
+    object and the pathname string, so you could write the following without
+    causing any issues due to $path getting reused:
+
+       my $path = [$wd, undef];
+
+       for my $name (qw(abc def ghi)) {
+          $path->[1] = $name;
+          aio_stat $path, sub {
+             # ...
+          };
+       }
+
+    There are some caveats: when directories get renamed (or deleted), the
+    pathname string doesn't change, so will point to the new directory (or
+    nowhere at all), while the directory fd, if available on the system,
+    will still point to the original directory. Most functions accepting a
+    pathname will use the directory fd on newer systems, and the string on
+    older systems. Some functions (such as realpath) will always rely on the
+    string form of the pathname.
+
+    So this functionality is mainly useful to get some protection against
+    "chdir", to easily get an absolute path out of a relative path for
+    future reference, and to speed up doing many operations in the same
+    directory (e.g. when stat'ing all files in a directory).
+
+    The following functions implement this working directory abstraction:
+
+    aio_wd $pathname, $callback->($wd)
+        Asynchonously canonicalise the given pathname and convert it to an
+        IO::AIO::WD object representing it. If possible and supported on the
+        system, also open a directory fd to speed up pathname resolution
+        relative to this working directory.
+
+        If something goes wrong, then "undef" is passwd to the callback
+        instead of a working directory object and $! is set appropriately.
+        Since passing "undef" as working directory component of a pathname
+        fails the request with "ENOENT", there is often no need for error
+        checking in the "aio_wd" callback, as future requests using the
+        value will fail in the expected way.
+
+    IO::AIO::CWD
+        This is a compiletime constant (object) that represents the process
+        current working directory.
+
+        Specifying this object as working directory object for a pathname is
+        as if the pathname would be specified directly, without a directory
+        object. For example, these calls are functionally identical:
+
+           aio_stat "somefile", sub { ... };
+           aio_stat [IO::AIO::CWD, "somefile"], sub { ... };
+
+    To recover the path associated with an IO::AIO::WD object, you can use
+    "aio_realpath":
+
+       aio_realpath $wd, sub {
+          warn "path is $_[0]\n";
+       };
+
+    Currently, "aio_statvfs" always, and "aio_rename" and "aio_rmdir"
+    sometimes, fall back to using an absolue path.
+
+  IO::AIO::REQ CLASS
+    All non-aggregate "aio_*" functions return an object of this class when
+    called in non-void context.
+
+    cancel $req
+        Cancels the request, if possible. Has the effect of skipping
+        execution when entering the execute state and skipping calling the
+        callback when entering the the result state, but will leave the
+        request otherwise untouched (with the exception of readdir). That
+        means that requests that currently execute will not be stopped and
+        resources held by the request will not be freed prematurely.
+
+    cb $req $callback->(...)
+        Replace (or simply set) the callback registered to the request.
+
+  IO::AIO::GRP CLASS
+    This class is a subclass of IO::AIO::REQ, so all its methods apply to
+    objects of this class, too.
+
+    A IO::AIO::GRP object is a special request that can contain multiple
+    other aio requests.
+
+    You create one by calling the "aio_group" constructing function with a
+    callback that will be called when all contained requests have entered
+    the "done" state:
+
+       my $grp = aio_group sub {
+          print "all requests are done\n";
+       };
+
+    You add requests by calling the "add" method with one or more
+    "IO::AIO::REQ" objects:
+
+       $grp->add (aio_unlink "...");
+
+       add $grp aio_stat "...", sub {
+          $_[0] or return $grp->result ("error");
+
+          # add another request dynamically, if first succeeded
+          add $grp aio_open "...", sub {
+             $grp->result ("ok");
+          };
+       };
+
+    This makes it very easy to create composite requests (see the source of
+    "aio_move" for an application) that work and feel like simple requests.
+
+    *   The IO::AIO::GRP objects will be cleaned up during calls to
+        "IO::AIO::poll_cb", just like any other request.
+
+    *   They can be canceled like any other request. Canceling will cancel
+        not only the request itself, but also all requests it contains.
+
+    *   They can also can also be added to other IO::AIO::GRP objects.
+
+    *   You must not add requests to a group from within the group callback
+        (or any later time).
+
+    Their lifetime, simplified, looks like this: when they are empty, they
+    will finish very quickly. If they contain only requests that are in the
+    "done" state, they will also finish. Otherwise they will continue to
+    exist.
+
+    That means after creating a group you have some time to add requests
+    (precisely before the callback has been invoked, which is only done
+    within the "poll_cb"). And in the callbacks of those requests, you can
+    add further requests to the group. And only when all those requests have
+    finished will the the group itself finish.
+
+    add $grp ...
+    $grp->add (...)
+        Add one or more requests to the group. Any type of IO::AIO::REQ can
+        be added, including other groups, as long as you do not create
+        circular dependencies.
+
+        Returns all its arguments.
+
+    $grp->cancel_subs
+        Cancel all subrequests and clears any feeder, but not the group
+        request itself. Useful when you queued a lot of events but got a
+        result early.
+
+        The group request will finish normally (you cannot add requests to
+        the group).
+
+    $grp->result (...)
+        Set the result value(s) that will be passed to the group callback
+        when all subrequests have finished and set the groups errno to the
+        current value of errno (just like calling "errno" without an error
+        number). By default, no argument will be passed and errno is zero.
+
+    $grp->errno ([$errno])
+        Sets the group errno value to $errno, or the current value of errno
+        when the argument is missing.
+
+        Every aio request has an associated errno value that is restored
+        when the callback is invoked. This method lets you change this value
+        from its default (0).
+
+        Calling "result" will also set errno, so make sure you either set $!
+        before the call to "result", or call c<errno> after it.
+
+    feed $grp $callback->($grp)
+        Sets a feeder/generator on this group: every group can have an
+        attached generator that generates requests if idle. The idea behind
+        this is that, although you could just queue as many requests as you
+        want in a group, this might starve other requests for a potentially
+        long time. For example, "aio_scandir" might generate hundreds of
+        thousands of "aio_stat" requests, delaying any later requests for a
+        long time.
+
+        To avoid this, and allow incremental generation of requests, you can
+        instead a group and set a feeder on it that generates those
+        requests. The feed callback will be called whenever there are few
+        enough (see "limit", below) requests active in the group itself and
+        is expected to queue more requests.
+
+        The feed callback can queue as many requests as it likes (i.e. "add"
+        does not impose any limits).
+
+        If the feed does not queue more requests when called, it will be
+        automatically removed from the group.
+
+        If the feed limit is 0 when this method is called, it will be set to
+        2 automatically.
+
+        Example:
+
+           # stat all files in @files, but only ever use four aio requests concurrently:
+
+           my $grp = aio_group sub { print "finished\n" };
+           limit $grp 4;
+           feed $grp sub {
+              my $file = pop @files
+                 or return;
+
+              add $grp aio_stat $file, sub { ... };
+           };
+
+    limit $grp $num
+        Sets the feeder limit for the group: The feeder will be called
+        whenever the group contains less than this many requests.
+
+        Setting the limit to 0 will pause the feeding process.
+
+        The default value for the limit is 0, but note that setting a feeder
+        automatically bumps it up to 2.
+
+  SUPPORT FUNCTIONS
+   EVENT PROCESSING AND EVENT LOOP INTEGRATION
+    $fileno = IO::AIO::poll_fileno
+        Return the *request result pipe file descriptor*. This filehandle
+        must be polled for reading by some mechanism outside this module
+        (e.g. EV, Glib, select and so on, see below or the SYNOPSIS). If the
+        pipe becomes readable you have to call "poll_cb" to check the
+        results.
+
+        See "poll_cb" for an example.
+
+    IO::AIO::poll_cb
+        Process some requests that have reached the result phase (i.e. they
+        have been executed but the results are not yet reported). You have
+        to call this "regularly" to finish outstanding requests.
+
+        Returns 0 if all events could be processed (or there were no events
+        to process), or -1 if it returned earlier for whatever reason.
+        Returns immediately when no events are outstanding. The amount of
+        events processed depends on the settings of "IO::AIO::max_poll_req",
+        "IO::AIO::max_poll_time" and "IO::AIO::max_outstanding".
+
+        If not all requests were processed for whatever reason, the poll
+        file descriptor will still be ready when "poll_cb" returns, so
+        normally you don't have to do anything special to have it called
+        later.
+
+        Apart from calling "IO::AIO::poll_cb" when the event filehandle
+        becomes ready, it can be beneficial to call this function from loops
+        which submit a lot of requests, to make sure the results get
+        processed when they become available and not just when the loop is
+        finished and the event loop takes over again. This function returns
+        very fast when there are no outstanding requests.
+
+        Example: Install an Event watcher that automatically calls
+        IO::AIO::poll_cb with high priority (more examples can be found in
+        the SYNOPSIS section, at the top of this document):
+
+           Event->io (fd => IO::AIO::poll_fileno,
+                      poll => 'r', async => 1,
+                      cb => \&IO::AIO::poll_cb);
+
+    IO::AIO::poll_wait
+        Wait until either at least one request is in the result phase or no
+        requests are outstanding anymore.
+
+        This is useful if you want to synchronously wait for some requests
+        to become ready, without actually handling them.
+
+        See "nreqs" for an example.
+
+    IO::AIO::poll
+        Waits until some requests have been handled.
+
+        Returns the number of requests processed, but is otherwise strictly
+        equivalent to:
+
+           IO::AIO::poll_wait, IO::AIO::poll_cb
+
+    IO::AIO::flush
+        Wait till all outstanding AIO requests have been handled.
+
+        Strictly equivalent to:
+
+           IO::AIO::poll_wait, IO::AIO::poll_cb
+              while IO::AIO::nreqs;
+
+    IO::AIO::max_poll_reqs $nreqs
+    IO::AIO::max_poll_time $seconds
+        These set the maximum number of requests (default 0, meaning
+        infinity) that are being processed by "IO::AIO::poll_cb" in one
+        call, respectively the maximum amount of time (default 0, meaning
+        infinity) spent in "IO::AIO::poll_cb" to process requests (more
+        correctly the mininum amount of time "poll_cb" is allowed to use).
+
+        Setting "max_poll_time" to a non-zero value creates an overhead of
+        one syscall per request processed, which is not normally a problem
+        unless your callbacks are really really fast or your OS is really
+        really slow (I am not mentioning Solaris here). Using
+        "max_poll_reqs" incurs no overhead.
+
+        Setting these is useful if you want to ensure some level of
+        interactiveness when perl is not fast enough to process all requests
+        in time.
+
+        For interactive programs, values such as 0.01 to 0.1 should be fine.
+
+        Example: Install an Event watcher that automatically calls
+        IO::AIO::poll_cb with low priority, to ensure that other parts of
+        the program get the CPU sometimes even under high AIO load.
+
+           # try not to spend much more than 0.1s in poll_cb
+           IO::AIO::max_poll_time 0.1;
+
+           # use a low priority so other tasks have priority
+           Event->io (fd => IO::AIO::poll_fileno,
+                      poll => 'r', nice => 1,
+                      cb => &IO::AIO::poll_cb);
+
+   CONTROLLING THE NUMBER OF THREADS
+    IO::AIO::min_parallel $nthreads
+        Set the minimum number of AIO threads to $nthreads. The current
+        default is 8, which means eight asynchronous operations can execute
+        concurrently at any one time (the number of outstanding requests,
+        however, is unlimited).
+
+        IO::AIO starts threads only on demand, when an AIO request is queued
+        and no free thread exists. Please note that queueing up a hundred
+        requests can create demand for a hundred threads, even if it turns
+        out that everything is in the cache and could have been processed
+        faster by a single thread.
+
+        It is recommended to keep the number of threads relatively low, as
+        some Linux kernel versions will scale negatively with the number of
+        threads (higher parallelity => MUCH higher latency). With current
+        Linux 2.6 versions, 4-32 threads should be fine.
+
+        Under most circumstances you don't need to call this function, as
+        the module selects a default that is suitable for low to moderate
+        load.
+
+    IO::AIO::max_parallel $nthreads
+        Sets the maximum number of AIO threads to $nthreads. If more than
+        the specified number of threads are currently running, this function
+        kills them. This function blocks until the limit is reached.
+
+        While $nthreads are zero, aio requests get queued but not executed
+        until the number of threads has been increased again.
+
+        This module automatically runs "max_parallel 0" at program end, to
+        ensure that all threads are killed and that there are no outstanding
+        requests.
+
+        Under normal circumstances you don't need to call this function.
+
+    IO::AIO::max_idle $nthreads
+        Limit the number of threads (default: 4) that are allowed to idle
+        (i.e., threads that did not get a request to process within the idle
+        timeout (default: 10 seconds). That means if a thread becomes idle
+        while $nthreads other threads are also idle, it will free its
+        resources and exit.
+
+        This is useful when you allow a large number of threads (e.g. 100 or
+        1000) to allow for extremely high load situations, but want to free
+        resources under normal circumstances (1000 threads can easily
+        consume 30MB of RAM).
+
+        The default is probably ok in most situations, especially if thread
+        creation is fast. If thread creation is very slow on your system you
+        might want to use larger values.
+
+    IO::AIO::idle_timeout $seconds
+        Sets the minimum idle timeout (default 10) after which worker
+        threads are allowed to exit. SEe "IO::AIO::max_idle".
+
+    IO::AIO::max_outstanding $maxreqs
+        Sets the maximum number of outstanding requests to $nreqs. If you do
+        queue up more than this number of requests, the next call to
+        "IO::AIO::poll_cb" (and other functions calling "poll_cb", such as
+        "IO::AIO::flush" or "IO::AIO::poll") will block until the limit is
+        no longer exceeded.
+
+        In other words, this setting does not enforce a queue limit, but can
+        be used to make poll functions block if the limit is exceeded.
+
+        This is a very bad function to use in interactive programs because
+        it blocks, and a bad way to reduce concurrency because it is
+        inexact: Better use an "aio_group" together with a feed callback.
+
+        Its main use is in scripts without an event loop - when you want to
+        stat a lot of files, you can write somehting like this:
+
+           IO::AIO::max_outstanding 32;
+
+           for my $path (...) {
+              aio_stat $path , ...;
+              IO::AIO::poll_cb;
+           }
+
+           IO::AIO::flush;
+
+        The call to "poll_cb" inside the loop will normally return
+        instantly, but as soon as more thna 32 reqeusts are in-flight, it
+        will block until some requests have been handled. This keeps the
+        loop from pushing a large number of "aio_stat" requests onto the
+        queue.
+
+        The default value for "max_outstanding" is very large, so there is
+        no practical limit on the number of outstanding requests.
+
+   STATISTICAL INFORMATION
+    IO::AIO::nreqs
+        Returns the number of requests currently in the ready, execute or
+        pending states (i.e. for which their callback has not been invoked
+        yet).
+
+        Example: wait till there are no outstanding requests anymore:
+
+           IO::AIO::poll_wait, IO::AIO::poll_cb
+              while IO::AIO::nreqs;
+
+    IO::AIO::nready
+        Returns the number of requests currently in the ready state (not yet
+        executed).
+
+    IO::AIO::npending
+        Returns the number of requests currently in the pending state
+        (executed, but not yet processed by poll_cb).
+
+   MISCELLANEOUS FUNCTIONS
+    IO::AIO implements some functions that are useful when you want to use
+    some "Advanced I/O" function not available to in Perl, without going the
+    "Asynchronous I/O" route. Many of these have an asynchronous "aio_*"
+    counterpart.
+
+    IO::AIO::sendfile $ofh, $ifh, $offset, $count
+        Calls the "eio_sendfile_sync" function, which is like
+        "aio_sendfile", but is blocking (this makes most sense if you know
+        the input data is likely cached already and the output filehandle is
+        set to non-blocking operations).
+
+        Returns the number of bytes copied, or -1 on error.
+
+    IO::AIO::fadvise $fh, $offset, $len, $advice
+        Simply calls the "posix_fadvise" function (see its manpage for
+        details). The following advice constants are available:
+        "IO::AIO::FADV_NORMAL", "IO::AIO::FADV_SEQUENTIAL",
+        "IO::AIO::FADV_RANDOM", "IO::AIO::FADV_NOREUSE",
+        "IO::AIO::FADV_WILLNEED", "IO::AIO::FADV_DONTNEED".
+
+        On systems that do not implement "posix_fadvise", this function
+        returns ENOSYS, otherwise the return value of "posix_fadvise".
+
+    IO::AIO::madvise $scalar, $offset, $len, $advice
+        Simply calls the "posix_madvise" function (see its manpage for
+        details). The following advice constants are available:
+        "IO::AIO::MADV_NORMAL", "IO::AIO::MADV_SEQUENTIAL",
+        "IO::AIO::MADV_RANDOM", "IO::AIO::MADV_WILLNEED",
+        "IO::AIO::MADV_DONTNEED".
+
+        On systems that do not implement "posix_madvise", this function
+        returns ENOSYS, otherwise the return value of "posix_madvise".
+
+    IO::AIO::mprotect $scalar, $offset, $len, $protect
+        Simply calls the "mprotect" function on the preferably AIO::mmap'ed
+        $scalar (see its manpage for details). The following protect
+        constants are available: "IO::AIO::PROT_NONE", "IO::AIO::PROT_READ",
+        "IO::AIO::PROT_WRITE", "IO::AIO::PROT_EXEC".
+
+        On systems that do not implement "mprotect", this function returns
+        ENOSYS, otherwise the return value of "mprotect".
+
+    IO::AIO::mmap $scalar, $length, $prot, $flags, $fh[, $offset]
+        Memory-maps a file (or anonymous memory range) and attaches it to
+        the given $scalar, which will act like a string scalar. Returns true
+        on success, and false otherwise.
+
+        The only operations allowed on the scalar are "substr"/"vec" that
+        don't change the string length, and most read-only operations such
+        as copying it or searching it with regexes and so on.
+
+        Anything else is unsafe and will, at best, result in memory leaks.
+
+        The memory map associated with the $scalar is automatically removed
+        when the $scalar is destroyed, or when the "IO::AIO::mmap" or
+        "IO::AIO::munmap" functions are called.
+
+        This calls the "mmap"(2) function internally. See your system's
+        manual page for details on the $length, $prot and $flags parameters.
+
+        The $length must be larger than zero and smaller than the actual
+        filesize.
+
+        $prot is a combination of "IO::AIO::PROT_NONE",
+        "IO::AIO::PROT_EXEC", "IO::AIO::PROT_READ" and/or
+        "IO::AIO::PROT_WRITE",
+
+        $flags can be a combination of "IO::AIO::MAP_SHARED" or
+        "IO::AIO::MAP_PRIVATE", or a number of system-specific flags (when
+        not available, the are 0): "IO::AIO::MAP_ANONYMOUS" (which is set to
+        "MAP_ANON" if your system only provides this constant),
+        "IO::AIO::MAP_LOCKED", "IO::AIO::MAP_NORESERVE",
+        "IO::AIO::MAP_POPULATE", "IO::AIO::MAP_NONBLOCK",
+        "IO::AIO::MAP_FIXED", "IO::AIO::MAP_GROWSDOWN",
+        "IO::AIO::MAP_32BIT", "IO::AIO::MAP_HUGETLB" or
+        "IO::AIO::MAP_STACK".
+
+        If $fh is "undef", then a file descriptor of -1 is passed.
+
+        $offset is the offset from the start of the file - it generally must
+        be a multiple of "IO::AIO::PAGESIZE" and defaults to 0.
+
+        Example:
+
+           use Digest::MD5;
+           use IO::AIO;
+
+           open my $fh, "<verybigfile"
+              or die "$!";
+
+           IO::AIO::mmap my $data, -s $fh, IO::AIO::PROT_READ, IO::AIO::MAP_SHARED, $fh
+              or die "verybigfile: $!";
+
+           my $fast_md5 = md5 $data;
+
+    IO::AIO::munmap $scalar
+        Removes a previous mmap and undefines the $scalar.
+
+    IO::AIO::munlock $scalar, $offset = 0, $length = undef
+        Calls the "munlock" function, undoing the effects of a previous
+        "aio_mlock" call (see its description for details).
+
+    IO::AIO::munlockall
+        Calls the "munlockall" function.
+
+        On systems that do not implement "munlockall", this function returns
+        ENOSYS, otherwise the return value of "munlockall".
+
+    IO::AIO::splice $r_fh, $r_off, $w_fh, $w_off, $length, $flags
+        Calls the GNU/Linux splice(2) syscall, if available. If $r_off or
+        $w_off are "undef", then "NULL" is passed for these, otherwise they
+        should be the file offset.
+
+        $r_fh and $w_fh should not refer to the same file, as splice might
+        silently corrupt the data in this case.
+
+        The following symbol flag values are available:
+        "IO::AIO::SPLICE_F_MOVE", "IO::AIO::SPLICE_F_NONBLOCK",
+        "IO::AIO::SPLICE_F_MORE" and "IO::AIO::SPLICE_F_GIFT".
+
+        See the splice(2) manpage for details.
+
+    IO::AIO::tee $r_fh, $w_fh, $length, $flags
+        Calls the GNU/Linux tee(2) syscall, see its manpage and the
+        description for "IO::AIO::splice" above for details.
+
+    $actual_size = IO::AIO::pipesize $r_fh[, $new_size]
+        Attempts to query or change the pipe buffer size. Obviously works
+        only on pipes, and currently works only on GNU/Linux systems, and
+        fails with -1/"ENOSYS" everywhere else. If anybody knows how to
+        influence pipe buffer size on other systems, drop me a note.
+
+    ($rfh, $wfh) = IO::AIO::pipe2 [$flags]
+        This is a direct interface to the Linux pipe2(2) system call. If
+        $flags is missing or 0, then this should be the same as a call to
+        perl's built-in "pipe" function and create a new pipe, and works on
+        systems that lack the pipe2 syscall. On win32, this case invokes
+        "_pipe (..., 4096, O_BINARY)".
+
+        If $flags is non-zero, it tries to invoke the pipe2 system call with
+        the given flags (Linux 2.6.27, glibc 2.9).
+
+        On success, the read and write file handles are returned.
+
+        On error, nothing will be returned. If the pipe2 syscall is missing
+        and $flags is non-zero, fails with "ENOSYS".
+
+        Please refer to pipe2(2) for more info on the $flags, but at the
+        time of this writing, "IO::AIO::O_CLOEXEC", "IO::AIO::O_NONBLOCK"
+        and "IO::AIO::O_DIRECT" (Linux 3.4, for packet-based pipes) were
+        supported.
+
+EVENT LOOP INTEGRATION
+    It is recommended to use AnyEvent::AIO to integrate IO::AIO
+    automatically into many event loops:
+
+     # AnyEvent integration (EV, Event, Glib, Tk, POE, urxvt, pureperl...)
+     use AnyEvent::AIO;
+
+    You can also integrate IO::AIO manually into many event loops, here are
+    some examples of how to do this:
+
+     # EV integration
+     my $aio_w = EV::io IO::AIO::poll_fileno, EV::READ, \&IO::AIO::poll_cb;
+
+     # Event integration
+     Event->io (fd => IO::AIO::poll_fileno,
+                poll => 'r',
+                cb => \&IO::AIO::poll_cb);
+
+     # Glib/Gtk2 integration
+     add_watch Glib::IO IO::AIO::poll_fileno,
+               in => sub { IO::AIO::poll_cb; 1 };
+
+     # Tk integration
+     Tk::Event::IO->fileevent (IO::AIO::poll_fileno, "",
+                               readable => \&IO::AIO::poll_cb);
+
+     # Danga::Socket integration
+     Danga::Socket->AddOtherFds (IO::AIO::poll_fileno =>
+                                 \&IO::AIO::poll_cb);
+
+  FORK BEHAVIOUR
+    Usage of pthreads in a program changes the semantics of fork
+    considerably. Specifically, only async-safe functions can be called
+    after fork. Perl doesn't know about this, so in general, you cannot call
+    fork with defined behaviour in perl if pthreads are involved. IO::AIO
+    uses pthreads, so this applies, but many other extensions and (for
+    inexplicable reasons) perl itself often is linked against pthreads, so
+    this limitation applies to quite a lot of perls.
+
+    This module no longer tries to fight your OS, or POSIX. That means
+    IO::AIO only works in the process that loaded it. Forking is fully
+    supported, but using IO::AIO in the child is not.
+
+    You might get around by not *using* IO::AIO before (or after) forking.
+    You could also try to call the IO::AIO::reinit function in the child:
+
+    IO::AIO::reinit
+        Abandons all current requests and I/O threads and simply
+        reinitialises all data structures. This is not an operation
+        supported by any standards, but happens to work on GNU/Linux and
+        some newer BSD systems.
+
+        The only reasonable use for this function is to call it after
+        forking, if "IO::AIO" was used in the parent. Calling it while
+        IO::AIO is active in the process will result in undefined behaviour.
+        Calling it at any time will also result in any undefined (by POSIX)
+        behaviour.
+
+  MEMORY USAGE
+    Per-request usage:
+
+    Each aio request uses - depending on your architecture - around 100-200
+    bytes of memory. In addition, stat requests need a stat buffer (possibly
+    a few hundred bytes), readdir requires a result buffer and so on. Perl
+    scalars and other data passed into aio requests will also be locked and
+    will consume memory till the request has entered the done state.
+
+    This is not awfully much, so queuing lots of requests is not usually a
+    problem.
+
+    Per-thread usage:
+
+    In the execution phase, some aio requests require more memory for
+    temporary buffers, and each thread requires a stack and other data
+    structures (usually around 16k-128k, depending on the OS).
+
+KNOWN BUGS
+    Known bugs will be fixed in the next release.
+
+SEE ALSO
+    AnyEvent::AIO for easy integration into event loops, Coro::AIO for a
+    more natural syntax.
+
+AUTHOR
+     Marc Lehmann <schmorp@schmorp.de>
+     http://home.schmorp.de/
+

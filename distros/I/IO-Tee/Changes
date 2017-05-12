@@ -1,0 +1,33 @@
+Revision history for Perl module IO::Tee.
+
+0.01  1997-07-24
+        - Original version; created by h2xs 1.18.
+
+0.50  1997-07-24
+        - First release.
+
+0.60  1998-03-04
+        - Added a bunch of proxy methods; the object returned by new()
+          is a glob ref to a tied handle whose associated object is an
+          array ref which is the same array ref as is obtained by
+          casting the glob ref to an array ref.
+
+0.61  1998-04-11
+        - Added handling of input handles. (Thanks to Jochen Wiedmann)
+
+0.62  1998-04-20
+        - Fixed the "untie attempted" warning when destroying IO::Tee
+          objects with warnings on. (Thanks to Jochen Wiedmann)  Also
+          fixed the "use of uninitialized value" warning when calling
+          IO::Tee::sysread with the offset argument omitted.
+
+0.63  1998-11-06
+        - Fixed test.pl problem on Win32 -- files need to be closed
+          before being unlinked. (Thanks to Mike Blazer)
+
+0.64  2001-03-10
+        - Fixed: output_field_separator, output_record_separator,
+          input_record_separator, format_line_break_characters, and
+          format_formfeed are not supported on a per-handle basis
+        - Applied long overdue patch to make IO::Tee work with Perl 5.6.
+          (Thanks to Tim Jenness)

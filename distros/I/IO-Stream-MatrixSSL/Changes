@@ -1,0 +1,24 @@
+Revision history for IO-Stream-MatrixSSL
+
+v2.0.1  2016-03-05 02:17:24 EET
+	- Fix tests portability.
+
+v2.0.0  2016-03-01 12:46:25 EET
+	- Switch to Dist::Milla.
+	- Update for Crypt::MatrixSSL3-v3.7.4.
+
+	[INCOMPATIBLE API CHANGE]
+	- Validation callback params was changed,
+	  see MIGRATION section in doc for details.
+
+1.1.2   2013-10-03 16:52:03 EEST
+	- Remove MYMETA.*
+
+1.1.1	2012-05-13 06:01:33 EEST
+	- Fix requirements and tests.
+
+1.1.0	2009-04-04 19:11:42 EEST
+	- Added support for client certificates.
+
+1.0.0	2008-11-16 19:37:10 EET
+	- Initial release.

@@ -1,0 +1,20 @@
+Revision history for ICS-Simple
+
+0.06    Fri Mar  2 00:38:58 UTC 2007
+          Modified filtering code to prevent credit card information from appearing in failure alert emails.
+
+0.04    Fri Sep 29 22:40:05 UTC 2006
+          Modified error messages to be more informative or otherwise helpful.
+          Added vitalErrorMap for auth_auth_response code which is reported as auth_auth_error (raw).
+
+0.03    Thu Sep 21 21:22:08 UTC 2006
+          Fixed a bug with the "test"/"prod" flag.
+          Modified error messages to be more informative.
+
+0.02    Mon Aug 21 02:08:49 UTC 2006
+          Added taxed item support.
+          Fixed Vital rejection codes to 'decline' for codes 01, 02, 04,
+            07, 41, 43, 57, 58.
+
+0.01    Sun Aug 20 17:29:27 UTC 2006
+          First version, released on an unsuspecting world.

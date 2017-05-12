@@ -1,0 +1,8 @@
+MANIFEST
+README
+Inherit.pm
+Inherit.xs
+CPP.map
+Makefile.PL
+test.pl
+INLINE.h

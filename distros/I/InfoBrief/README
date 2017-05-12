@@ -1,0 +1,61 @@
+NAME
+     InfoBrief - Perl extension for printing envelopes for
+     Infobrief mailings according to the standards of the
+     Deutsche Bundespost
+
+SYNOPSIS
+       use InfoBrief;
+       $x = new InfoBrief %OPTIONS;
+       print $x->preamble;
+       print $x->page(@address);
+       print $x->trailer;
+
+
+DESCRIPTION
+     This modules is probably not very useful outside of Germany.
+     It is a tool dedicated for printing envelopes for Infobrief
+     mailings according to the standards of the Deutsche
+     Bundespost. You may customize it for other standards though.
+
+     The output generated is Postscript level 2 and conforms to
+     EPSF 1.2.  Since copypage ist used, the single pages contain
+     only the new address and running number and the size of the
+     postscript file is modest.
+
+OPTIONS
+     The Constructor new take a few options to customize the
+     output:
+
+     a4
+     a5   Generate A4 rsp. A5 output. Default is C5.
+
+     width number
+     height number
+          Custom output size. Units are Postscript dots (72 dpi).
+
+     border number
+          Set custom border size. Default is 20.
+
+     amt string
+          Set the Postamt for the "Entgelt bezahlt" stamp.
+          Default is '44227 Dortmund 54'.
+
+     stempel
+          Add/Omit the "Entgelt bezahlt" stamp. Default is true.
+
+     infobrief
+          Add/Omit the "Infobrief" banner. Default is false since
+          the banner is not required.
+
+     numbering
+          Add/Omit a running number on each envelope. Default is
+          true.
+
+AUTHOR
+     Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+
+SEE ALSO
+     perl(1).
+
+
+

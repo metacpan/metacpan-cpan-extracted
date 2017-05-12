@@ -1,0 +1,33 @@
+Revision history for CPAN module Image::PNG::QRCode
+
+0.07 2017-02-06
+
+* Crash if output is discarded is now fixed
+* New example and better documentation
+* Warnings if return value is discarded or used twice
+
+0.06 2017-02-04
+
+* Return size of image to user with size option
+* Improve documentation (diagnostics, examples, etc.)
+
+0.05 2015-09-05
+
+* Better comments and attribution in source files and documentation
+
+0.04 2015-09-05
+
+* Remove link to defunct URL from documentation
+
+0.03 2014-05-27
+
+* Fixes bug when using return values
+* Documentation improved.
+
+0.02 2014-04-23
+
+* Fixes memory/file write bugs on Microsoft Windows
+
+0.01 2014-04-17
+
+* Initial release

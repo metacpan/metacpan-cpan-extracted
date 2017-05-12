@@ -1,0 +1,10 @@
+NAME
+    IniConf - A Module for reading .ini-style configuration files
+
+	IniConf.pm has been replaced by Config::IniFiles. Please move
+	to that as soon as convenient. It should only mean replacing
+		use IniConf;
+	with
+		use Config::IniFiles;
+	if you choose not to use any of the cool new features.
+

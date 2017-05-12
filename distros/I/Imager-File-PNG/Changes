@@ -1,0 +1,147 @@
+Imager-File-PNG 0.91
+====================
+
+ - update the bundled/modified Devel::CheckLib to handle the gcc-4
+   symlink on Cygwin
+
+Imager-File-PNG 0.91
+====================
+
+ - skip the benign tests before libpng 1.6.0 since older versions do
+   not treat an extranrous palette as any sort of error.
+
+Imager-File-PNG 0.90
+====================
+
+ - support libpng 1.6.10.
+   1.6.10 changed CRC errors from benign errors to normal errors,
+   which broke the test which used CRC errors to check for benign
+   error support.  Switched to using a 1-bit grey-scale image with a
+   palette to test for benign errors.
+   https://rt.cpan.org/Ticket/Display.html?id=94717
+
+Imager-File-PNG 0.89
+====================
+
+ - treat a version mismatch between library and headers as a probe
+   failure.
+   https://rt.cpan.org/Ticket/Display.html?id=86659
+
+ - the check for benign error support is more complex than a simple
+   library version check, check for the appropriate macro.
+   Thanks for Slaven Rezic for following up on my CPAN Testers result
+   queries.
+   https://rt.cpan.org/Ticket/Display.html?id=86659
+
+Imager-File-PNG 0.88
+====================
+
+Distributed with Imager 0.96_01.
+
+ - support libpng 1.6
+   https://rt.cpan.org/Ticket/Display.html?id=85746
+
+Imager-File-PNG 0.87
+====================
+
+ - update README
+
+Imager-File-PNG 0.86
+====================
+
+ - clean up .dSYM directories generated performing probes on OS X
+   Mountain Lion.
+
+ - pass the --verbose command-line option through to Imager::Probe in
+   Makefile.PL
+   https://rt.cpan.org/Ticket/Display.html?id=75878
+
+Imager-File-PNG 0.85
+====================
+
+ - fix some compiler warnings, no functional changes
+
+Imager-File-PNG 0.84
+====================
+
+ - libpng 1.5 specific probes were looking for libpng 1.4 filenames.
+
+ - added alternative probe configurations that try to link libz, to
+   handle a statically linked libpng.
+   https://rt.cpan.org/Ticket/Display.html?id=74043
+
+ - PNG rework
+   - improve error reporting
+   - add png_interlace, png_bits tags
+   - read paletted images as paletted images, including transparency
+   - read 1 bit greyscale images as a type suitable for other file
+     handlers to write as bilevel
+   - read 16 bit/sample PNG as 16-bit/sample Imager images
+   - write "bilevel" paletted images as 1 bit grayscale images
+   - write paletted images as paletted images
+   - write 16-bit (or higher)/sample images as 16-bit/sample PNG
+     images
+   - improved metadata support
+   https://rt.cpan.org/Ticket/Display.html?id=29268
+
+Imager-File-PNG 0.83
+====================
+
+ - no longer fallback to using DynaLoader to load the XS code
+   https://rt.cpan.org/Ticket/Display.html?id=75560
+
+Imager-File-PNG 0.82
+====================
+
+ - modify to use the new buffered I/O functions instead of calling
+   I/O layer callbacks directly.
+
+ - handle I/O close errors properly
+
+Imager-File.PNG 0.81
+====================
+
+ - update the bundled (and still modified) Devel::CheckLib
+   https://rt.cpan.org/Ticket/Display.html?id=69170
+
+Imager-File.PNG 0.80
+====================
+
+ - the big types cleanup
+
+Imager-File-PNG 0.79
+====================
+
+ - replace (imager|tony)@imager.perl.org in the doc, since I don't
+   plan to continue receiving mail at that address.
+   https://rt.cpan.org/Ticket/Display.html?id=68591
+
+ - Makefile.PL updates to report library detection info back to the
+   main Imager Makefile.PL.
+   https://rt.cpan.org/Ticket/Display.html?id=9675
+
+Imager-File-PNG 0.78
+====================
+
+Bug fixes:
+
+ - don't access deprecated members of the png_structp.
+   https://rt.cpan.org/Ticket/Display.html?id=60242
+
+ - cleanup testout on make clean
+
+Imager-File-PNG 0.77
+====================
+
+Bug fixes:
+
+ - add inc at the front of @INC so we don't pick up old installed 
+   Devel::CheckLib
+
+Imager-File-PNG 0.76
+====================
+
+Initial release based on Imager 0.77
+
+The idea here is that you can depend on Imager::File::PNG and be sure
+of PNG support.

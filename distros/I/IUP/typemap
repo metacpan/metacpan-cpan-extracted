@@ -1,0 +1,40 @@
+###########################
+TYPEMAP
+
+#string (char*) with automatic NULL<->undef conversion on input/output
+char *                  T_STR_OR_NULL
+const char *            T_STR_OR_NULL
+
+#pointer with automatic NULL<->undef conversion on input/output
+unsigned char *         T_PTR_OR_NULL
+Ihandle *               T_PTR_OR_NULL
+cdCanvas *              T_PTR_OR_NULL
+
+#structs with automatic conversion to perl classes
+IUP::Canvas::Bitmap     T_PTROBJ
+IUP::Canvas::Palette    T_PTROBJ
+IUP::Canvas::Pattern    T_PTROBJ
+IUP::Canvas::Stipple    T_PTROBJ
+IUP::Canvas::InternalServerImage  T_PTROBJ
+IUP::Canvas::InternalState        T_PTROBJ
+IUP::Canvas::InternalContext      T_PTROBJ
+
+###########################
+INPUT
+
+T_PTR_OR_NULL
+        $var = (SvIOK($arg)) ? INT2PTR($type,SvIVX($arg)) : NULL;
+
+T_STR_OR_NULL
+        $var = (SvOK($arg)) ? SvPV_nolen($arg) : NULL;
+
+###########################
+OUTPUT
+
+T_PTR_OR_NULL
+        if ($var==NULL) XSRETURN_UNDEF;
+        else sv_setiv($arg, PTR2IV($var));
+
+T_STR_OR_NULL
+        if ($var==NULL) XSRETURN_UNDEF;
+        else sv_setpv($arg, $var);

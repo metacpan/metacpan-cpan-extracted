@@ -1,0 +1,49 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 f578ba3a6fbc6ecc29cbe66bac7de7ee4ea773fe Changes
+SHA1 dfa635f28fdaeffd0653b7db7f0f3683a5b93e03 INSTALL
+SHA1 1d431d36f36b6e6d6caf68e84e78806a6c83e85f LICENSE
+SHA1 0844ab804c83e758f82bb9bdb2f73427de2799bd MANIFEST
+SHA1 ce2089f2341df2c7e73e3f4cda57eb00915ea884 META.json
+SHA1 cd16901d221d55924d1539a9ad0a3d63fbd7f1c2 META.yml
+SHA1 6100fcd54e5bb1de9e7640c9b4f5753c0047c91a Makefile.PL
+SHA1 a8f0915ffb19ae2294446191645952730a478fcb README
+SHA1 968016a901b7973313f7c558ed22dd547b54522a cpanfile
+SHA1 fdc4a7a098dee72ffd775f3f3806354aee947ed2 dist.ini
+SHA1 834f1086bc640d6e63cae621cf81570b8aa39c2b inc/Devel/AssertOS.pm
+SHA1 7e51a16a32d50e21e4603ce1865ad28676c88515 inc/Devel/AssertOS/MSWin32.pm
+SHA1 66351fdd4353b5147e2d42f4500414a489a14d93 inc/Devel/CheckOS.pm
+SHA1 bce0857fa3932702c97b6d173a663b94887b5ebf lib/IO/AsyncX/Sendfile.pm
+SHA1 985d9ded8d8ed7e344a09e52b1402e878e91da28 t/00-check-deps.t
+SHA1 2673368263223e3692429dc58a0b32378fb69d6e t/00-compile.t
+SHA1 ded79bcc798d1278863ba07efb21733047677f2b t/000-report-versions-tiny.t
+SHA1 380220577ebcb7448a89f639e1f4481a0a1fbf91 t/parallel.t
+SHA1 198d1665317c3d91e3bb81f0a3b8dad8d4d66f20 xt/release/common_spelling.t
+SHA1 c6c3c9f7fe12058b4771449dff874b1c450c982c xt/release/mojibake.t
+SHA1 296928dbbcaffd1514ccc9b77a1e6e03cfe9b068 xt/release/pod-syntax.t
+SHA1 1294a6710ea8e2626e43722e50111bf872668316 xt/release/test-version.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJU4sWwAAoJEFKElMNpjtyDQqoH/1Tfg5fzP76k57jpki8JR/tS
+2SWJ4JA1o7K9FnbXSFGZtlu8NeN2fwRgiQb9t4UMX+U1mpRzHaBbtEX3IK/EiM4R
+V930MAMQiiIahZBtfSiXdix3T/tpeBPYRwr1f+cx7xs0lkz/eTpRo+t8flusny8w
+T7IZYxj7d99zrqF74Fh3Lv6YySJ/ReeGGpvvVLCAaYjGowJ8Bf5LAnxv96pU2iXh
+TkgXIL2MJXrSMOLwLQpsEda4+dcmO0V99Tyqa0CepZe4Y4GGuJ6m6/YCJuM27re4
+yFVWPRQB3J9BzNq5hcoWdJWTaH8L0Gq3u2HsIWH5DSKwNt8ejN62gbVxvMUaTbA=
+=sA/R
+-----END PGP SIGNATURE-----

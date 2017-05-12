@@ -1,0 +1,92 @@
+=for comment based on iup-3.9 - http://www.tecgraf.puc-rio.br/iup/en/elem/iupscrollbox.html
+
+=head1 NAME
+
+IUP::ScrollBox - [GUI element] container that allows its child to be scrolled
+
+=head1 DESCRIPTION
+
+Creates a native container that allows its child to be scrolled. It
+inherits from L<IUP::Canvas|IUP::Canvas>.
+
+=begin HTML
+
+<p>
+<img src="http://kmx.github.io/perl-iup/img-3.9/elem/iupscrollbox.png ">
+</p>
+
+=end HTML
+
+=head1 USAGE
+
+=head2 CREATION - new() method
+
+ #standard way
+ $mlist = IUP::ScrollBox->new( child=>$child, ANYATTRIBUTE=>'any value' );
+ #or with just 1 parameter
+ $mlist = IUP::ScrollBox->new($child);
+ 
+B<child:> (named parameter) reference to an interface element.
+
+B<Returns:> the identifier of the created element, or C<undef> if an error occurs.
+
+NOTE: You can pass to C<new()> other C<ATTRIBUTE=E<gt>'value'> or C<CALLBACKNAME=E<gt>\&func> pairs relevant
+to this element - see L<IUP::Manual::02_Elements|IUP::Manual::02_Elements/"new()">.
+
+=head2 ATTRIBUTES
+
+For more info about concept of attributes (setting/getting values etc.)
+see L<IUP::Manual::03_Attributes|IUP::Manual::03_Attributes>. Attributes specific to this element:
+
+Inherits all attributes and callbacks of the L<IUP::Canvas|IUP::Canvas>, but redefines a few attributes.
+
+=over
+
+=item L<BGCOLOR|IUP::Manual::03_Attributes/BGCOLOR>
+
+will use the background color of the native parent by default.
+
+=item B<BORDER>
+
+I<(creation only)> the default value is "NO".
+
+=item L<EXPAND|IUP::Manual::03_Attributes/EXPAND>
+
+I<(non inheritable)> the default value is "YES".
+
+=item L<SCROLLBAR|IUP::Manual::03_Attributes/SCROLLBAR>
+
+I<(creation only)> the default value is "YES".
+
+=item L<CLIENTSIZE|IUP::Manual::03_Attributes/CLIENTSIZE>, L<CLIENTOFFSET|IUP::Manual::03_Attributes/CLIENTOFFSET> also accepted.
+
+=back
+
+=head1 NOTES
+
+The box allows the application to create a virtual space for the dialog
+that is actually larger than the visible area. The current size of the
+box defines the visible area. The natural size of the child (and its
+children) defines the virtual space size. So the L<IUP::ScrollBox|IUP::ScrollBox> does
+not depend on its child size or expansion, and its natural size is
+always "0x0".
+
+The user can move the box contents by dragging the background. Also the
+mouse wheel scrolls the contents vertically.
+
+The box can be created with no elements and be dynamic filled 
+using L<Append|IUP::Manual::02_Elements/"Append()"> or L<Insert|IUP::Manual::02_Elements/"Insert()">.
+
+=head1 EXAMPLES
+
+
+Unfortunately there are no sample scripts using this element.
+
+
+
+=head1 SEE ALSO
+
+The original doc: L<iupscrollbox.html|http://www.tecgraf.puc-rio.br/iup/en/elem/iupscrollbox.html>
+ 
+
+=cut

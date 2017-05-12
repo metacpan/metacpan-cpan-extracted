@@ -1,0 +1,17 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+TODO
+t/01_packet.t
+t/02_buffer.t
+t/03_handle.t
+t/04_multi.t
+t/05_select.t
+t/pod.t
+lib/IO/Mux.pm
+lib/IO/Mux/Buffer.pm
+lib/IO/Mux/Handle.pm
+lib/IO/Mux/Packet.pm
+lib/IO/Mux/Select.pm
+META.yml                                 Module meta-data (added by MakeMaker)

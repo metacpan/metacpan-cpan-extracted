@@ -1,0 +1,572 @@
+=pod
+
+=head1 NAME
+
+IUP::Manual::01_Introduction - Basic introduction to IUP concept
+
+=head1 IUP MANUAL
+
+=over
+
+=item * IUP::Manual::01_Introduction E<nbsp>E<nbsp>E<nbsp>E<nbsp>E<nbsp> B<E<lt>E<lt>E<lt> this document>
+
+=item * L<IUP::Manual::02_Elements|IUP::Manual::02_Elements>
+
+=item * L<IUP::Manual::03_Attributes|IUP::Manual::03_Attributes>
+
+=item * L<IUP::Manual::04_Callbacks|IUP::Manual::04_Callbacks>
+
+=item * L<IUP::Manual::06_HandlingKeyboard|IUP::Manual::06_HandlingKeyboard>
+
+=item * L<IUP::Manual::05_DialogLayout|IUP::Manual::05_DialogLayout>
+
+=item * L<IUP::Manual::07_UsingImageLibrary|IUP::Manual::07_UsingImageLibrary>
+
+=item * L<IUP::Manual::08_DragAndDrop|IUP::Manual::08_DragAndDrop>
+
+=back
+
+=head1 INTRODUCTION
+
+IUP uses an abstract layout model based on the boxes-and-glue paradigm
+from the TeX typesetting system. This model makes the dialog creation
+task more flexible and independent from the graphics system's
+resolution.
+
+IUP has four important concepts that are implemented in a very
+different way from other toolkits.
+
+=over
+
+=item * B<First is the control creation timeline.> When a control is created it is not immediately mapped to the native
+system. So some attributes will not work until the control is mapped. The mapping is done when the dialog is shown or
+manually calling IupMap for the dialog. You can not map a control without inserting it into a dialog.
+
+=item * B<Second is the attribute system.> IUP has only a few functions because it uses string attributes to access the
+properties of each control. So get used to IupSetAttribute and IupGetAttribute, because you are going to use them a lot.
+
+=item * B<Third is the abstract layout positioning.> IUP controls are never positioned in a specific (x,y) coordinate
+inside the dialog. The positioning is always calculated dynamically from the abstract layout hierarchy. So get used to
+the IupFill, IupHbox and IupVbox controls that allows you to position the controls in the dialog.
+
+=item * B<Fourth is the callback system.>
+
+=back
+
+=head1 IUP ELEMENTS
+
+IUP contains several user interface controls. The IUP's main
+characteristic is the use of native elements. This means that the
+drawing and management of a button or text box is done by the native
+interface system, not by IUP. This makes the application's
+appearance more similar to other applications in that system. On the
+other hand, the application's appearance can vary from one
+system to another.
+
+But this is valid only for the standard controls, many additional
+controls are drawn by IUP. Composition controls are not visible, so
+they are independent from the native system.
+
+Each control has an unique creation function, and all of its management
+is done by means of L<attributes|IUP::Manual::03_Attributes> and L<callbacks|IUP::Manual::04_Callbacks>, using functions
+common to all the controls. This simple but powerful approach is one of
+the advantages of using IUP.
+
+Controls are automatically destroyed when the dialog is destroyed. 
+
+B<Currently available IUP elements:>
+
+=over
+
+=item * The most important GUI element used for the main applications window:
+
+L<IUP::Dialog>
+
+=item * GUI elements:
+
+L<IUP::AnimatedLabel|IUP::AnimatedLabel>,
+L<IUP::BackgroundBox|IUP::BackgroundBox>,
+L<IUP::Button|IUP::Button>,
+L<IUP::Calendar|IUP::Calendar>,
+L<IUP::CanvasGL|IUP::CanvasGL>,
+L<IUP::Canvas|IUP::Canvas>,
+L<IUP::Cbox|IUP::Cbox>,
+L<IUP::Cells|IUP::Cells>,
+L<IUP::ColorBar|IUP::ColorBar>,
+L<IUP::ColorBrowser|IUP::ColorBrowser>,
+L<IUP::DatePick|IUP::DatePick>,
+L<IUP::DetachBox|IUP::DetachBox>,
+L<IUP::Dialog|IUP::Dialog>,
+L<IUP::Dial|IUP::Dial>,
+L<IUP::Expander|IUP::Expander>,
+L<IUP::Fill|IUP::Fill>,
+L<IUP::FlatButton|IUP::FlatButton>
+L<IUP::Frame|IUP::Frame>,
+L<IUP::Gauge|IUP::Gauge>,
+L<IUP::GridBox|IUP::GridBox>,
+L<IUP::Hbox|IUP::Hbox>,
+L<IUP::Image|IUP::Image>,
+L<IUP::Item|IUP::Item>,
+L<IUP::Label|IUP::Label>,
+L<IUP::Link|IUP::Link>,
+L<IUP::List|IUP::List>,
+L<IUP::MatrixList|IUP::MatrixList>,
+L<IUP::Matrix|IUP::Matrix>,
+L<IUP::Menu|IUP::Menu>,
+L<IUP::MglPlot|IUP::MglPlot>,
+L<IUP::Normalizer|IUP::Normalizer>,
+L<IUP::OLE|IUP::OLE>,
+L<IUP::Plot|IUP::Plot>,
+L<IUP::ProgressBar|IUP::ProgressBar>,
+L<IUP::Radio|IUP::Radio>,
+L<IUP::Sbox|IUP::Sbox>,
+L<IUP::Scintilla|IUP::Scintilla>,
+L<IUP::ScrollBox|IUP::ScrollBox>,
+L<IUP::Separator|IUP::Separator>,
+L<IUP::SpinBox|IUP::SpinBox>,
+L<IUP::Spin|IUP::Spin>,
+L<IUP::Split|IUP::Split>,
+L<IUP::Submenu|IUP::Submenu>,
+L<IUP::Tabs|IUP::Tabs>,
+L<IUP::Text|IUP::Text>,
+L<IUP::Toggle|IUP::Toggle>,
+L<IUP::Tree|IUP::Tree>,
+L<IUP::Val|IUP::Val>,
+L<IUP::Vbox|IUP::Vbox>,
+L<IUP::Zbox|IUP::Zbox>
+
+=for comment generated list - predefined dialogs
+
+=item * GL-based GUI elements:
+
+L<IUP::GL::BackgroundBox>,
+L<IUP::GL::Button>,
+L<IUP::GL::CanvasBox>,
+L<IUP::GL::Expander>,
+L<IUP::GL::Frame>,
+L<IUP::GL::Label>,
+L<IUP::GL::Link>,
+L<IUP::GL::ProgressBar>,
+L<IUP::GL::ScrollBox>,
+L<IUP::GL::Separator>,
+L<IUP::GL::SizeBox>,
+L<IUP::GL::SubCanvas>,
+L<IUP::GL::Text>,
+L<IUP::GL::Toggle>,
+L<IUP::GL::Val>
+
+=for comment generated list - predefined dialogs
+
+=item * Pre-defined dialogs:
+
+L<IUP::ColorDlg|IUP::ColorDlg>,
+L<IUP::FileDlg|IUP::FileDlg>,
+L<IUP::FontDlg|IUP::FontDlg>,
+L<IUP::MessageDlg|IUP::MessageDlg>,
+L<IUP::ProgressDlg|IUP::ProgressDlg>
+
+=item * Special non-GUI elements:
+
+L<IUP::Clipboard|IUP::Clipboard>,
+L<IUP::Timer|IUP::Timer>,
+L<IUP::User|IUP::User>
+
+=back
+
+
+B<Every IUP based application has the main IUP::Dialog object> and a set
+of other child GUI objects. Example:
+
+ use IUP ':all';
+ my $dlg = IUP::Dialog->new( TITLE=>"Test Dialog", MARGIN=>"10x10", child=>
+             IUP::Vbox->new([
+               IUP::Button->new( TITLE=>"This is testing demo Button1"),
+               IUP::Button->new( TITLE=>"This is testing demo Button2"),
+             ])
+           );
+ $dlg->Show;
+ IUP->MainLoop;
+
+For more info see separate documents:
+
+=over
+
+=item * L<IUP::Manual::05_DialogLayout> - composing more complex application layout
+
+=item * L<IUP::Manual::02_Elements> - common IUP element methods
+
+=item * L<IUP::Manual::03_Attributes> - common IUP element attributes
+
+=item * L<IUP::Manual::04_Callbacks> - common IUP element callbacks
+
+=back
+ 
+=head1 ATTRIBUTES CONCEPT
+
+Attributes are used to change or consult properties of elements. Each
+element has a set of attributes that affect it, and each attribute can
+work differently for each element. Depending on the element, its value
+can be computed or simply verified. Also it can be internally stored or
+not.
+
+Attribute names are always upper case, lower case names will not work.
+But attribute values like "YES", "NO", "TOP", are case insensitive, so
+"Yes", "no", "top", and other variations will work.
+
+If not defined their value can be inherited from the parent container.
+
+=head2 Using Attributes
+
+Attributes are a way to send and obtain information to and from
+elements. They are used by the application to communicate with the user
+interface system, on the other hand callbacks are used by the
+application to receive notifications from the system that the user or
+the system itself has interacted with the user interface of the
+application.
+
+B<The ways of setting an attribute value:>
+
+ #via standard SetAttribute() call
+ $element->SetAttribute("ATTRNAME", "VALUE");
+ 
+ #via standard SetAttribute() call + using fat-comma
+ $element->SetAttribute( ATTRNAME=>"VALUE" );
+ 
+ #setting more attributes at once - via standard SetAttribute()
+ $element->SetAttribute( ATTRNAME1=>"VALUE1", ATTRNAME2=>"VALUE2" );
+ 
+ #via accessor
+ $element->TITLE("Text");
+ 
+ #setting attributes during element creation
+ $element = IUP::Label->new( TITLE=>"Text", ATTRNAME1=>"VALUE1", ATTRNAME2=>"VALUE2" );
+ 
+ #which is equivalent to
+ $element = IUP::Label->new();
+ $element->SetAttribute("TITLE", "Text");
+ $element->SetAttribute("ATTRNAME1", "VALUE1");
+ $element->SetAttribute("ATTRNAME2", "VALUE2");
+
+B<When an attribute is updated (Set)> it is stored internally at the
+hash table of the control only if the control class allows it. If the
+value is C<undef>, the attribute will also be removed from the hash table
+and the default value will be used if there is one defined. Finally the
+attribute is updated for the children of the control if they do not
+have the attribute defined in their own hash table.
+
+B<The ways of getting an attribute value:>
+
+ #via GetAttribute() call
+ $value = $element->GetAttribute("ATTRNAME");
+  
+ #getting more attributes at once - via GetAttribute()
+ ($val1, $val2, $val3) = $element->GetAttribute( "ATTRNAME1", "ATTRNAME2", "ATTRNAME3" );
+ 
+ #via accessor
+ $value = $element->TITLE;
+ 
+B<When an attribute is retrieved (Get)> it will first be checked at the
+control class. If not defined then it checks in the hash table. If not
+defined it checks its parent hash table and so forth, until it reaches
+the dialog. And finally if still not defined then a default value is
+returned (the default value can also be C<undef>).
+
+Notice that the parent recursion is done only at the parent hash table,
+the parent control class is not consulted.
+
+The control class can update or retrieve a value even if the control is
+not mapped. When the control is not mapped and its implementation can
+not process the attribute, then the attribute is simply stored in the
+hash table. After the element is mapped its attributes are re-processed
+to be updated in the native system and they can be removed from the
+hash table at that time.
+
+All this flexibility turns the attribute system very complex with
+several nuances. If the attribute is checked before the control is
+mapped and just after, its value can be completely different. Depending
+on how the attribute is stored its inheritance can be completely
+ignored.
+
+B<Attribute names> are always upper case, lower case names will not work.
+But attribute values like "YES", "NO", "TOP", are case insensitive, so
+"Yes", "no", "top", and other variations will work.
+
+B<Boolean attributes> accept the values:
+
+=over
+
+=item * 1, "YES", "ON" or "TRUE" for B<true>
+
+=item * 0, "NO", "OFF", C<undef> or "FALSE" for B<false>
+
+=back
+
+Even if in the documentation is only one of these combinations.
+
+There are attributes common to all the elements. In some cases, common
+attributes behave differently in different elements, but in such cases,
+there are comments in the documentation of the element explaining the
+different behavior.
+
+=head2 Attribute accessors
+
+Attribute accessors are build at run-time via perl's AUTOLOAD feature.
+
+It means that:
+
+ $val = $element->ANY_UPPERCASE_ATTR_NAME;
+ $element->ANY_OTHER_UPPERCASE_ATTR_NAME(123);
+
+is automatically turned into:
+
+ $val = $element->GetAttribute('ANY_UPPERCASE_ATTR_NAME');
+ $element->SetAttribute('ANY_OTHER_UPPERCASE_ATTR_NAME', 123);
+
+=head2 Inheritance
+
+Elements included in other elements can inherit their attributes. There
+is an B<inheritance> mechanism inside a given child tree.
+
+This means, for example, that if you set the "MARGIN" attribute of a
+Vbox containing several other elements, including other Vboxes, all the
+elements depending on the attribute "MARGIN" will be affected, except
+for those who the "MARGIN" attribute is already defined.
+
+Please note that not all attributes are inherited. As general rules the
+following attributes are B<NON> inheritable always:
+
+=over
+
+=item * Essential attributes like VALUE, TITLE, SIZE, RASTERSIZE, X and Y
+
+=item * Id numbered attributes (like "1" or "MARK1:1")
+
+=item * Handle names (like "CURSOR", "IMAGE" and "MENU")
+
+=item * Pointers that are not strings (like WID)
+
+=item * Read-only or write-only attributes
+
+=item * Internal attributes that starts with "_IUP"
+
+=back
+
+Inheritable attributes are stored in the hash table so the
+L<SetAttribute|IUP::Manual::02_Elements/"SetAttribute()> / L<GetAttribute|IUP::Manual::02_Elements/"GetAttribute()> logic can work, even if the control class store it
+internally. But when you change an attribute to C<undef>, then its value is
+removed from the hash table and the default value if any is passed to
+the native system.
+
+When consulted the attribute is first checked at the control class. If
+not defined then it checks in the hash table. If not defined in its
+hash table, the attribute will be inherited from its parent's hash
+table and so forth, until it reaches the root child (usually the
+dialog). But if still then the attribute is not defined a default value
+for the element is returned (the default value can also be C<undef>).
+
+When changed the attribute change is propagated to all children except
+for those who the attribute is already defined in the hash table.
+
+But some attributes can be marked as B<non inheritable> at the control
+class.
+
+B<Non inheritable> attributes at the element are not propagated to its
+children. If an attribute is not marked as B<non inheritable> at the
+element it is propagated as expected, but if marked as B<non
+inheritable> at a child, that child will ignore the propagated value.
+
+Since Vbox, Hbox, and other containers have only a few registered
+attributes, by default an unknown attribute is treated as inheritable,
+that's why it will be automatically propagated.
+
+An example: the IMAGE attribute of a Label is B<non inheritable>, so
+when checked at the Label it will return C<undef> if not defined, and the
+Label parent tree will not be consulted. If you change the IMAGE
+attribute at a Vbox that contains several Labels, the child Labels will
+not be affected.
+
+=head2 Availability
+
+Although attributes can be changed and retrieved at any time there are
+exceptions and some rules that must be followed according to the
+documentation of the attribute:
+
+=over
+
+=item * B<read only>: the attribute can not be changed. Ignored when set.
+
+=item * B<write only>: the attribute can not be retrieved. Normally
+used for action attributes. Returns C<undef>, or eventually some value set
+before the element was mapped.
+
+=item * B<creation only>: it will be used only when the element is
+mapped on the native system. So set it before the element is mapped.
+Ignored when set after the element is mapped.
+
+=back
+
+B<Creating an IUP element> - for example button with text label "Hello":
+
+  my $demo_button = IUP::Button->new( TITLE=>"Ok" );
+
+If you want the same button with changed background color, you can:
+
+=over
+
+=item * specify BGCOLOR attribute value when creating the element:
+
+ my $demo_button = IUP::Button->new( TITLE=>"Hello", BGCOLOR=>"0 255 0" );
+ 
+=item * or using BGCOLOR accessor:
+
+ my $demo_button = IUP::Button->new( TITLE=>"Hello" );
+ $demo_button->BGCOLOR("0 255 0");
+
+=item * or via SetAttribute method:
+ 
+ my $demo_button = IUP::Button->new( TITLE=>"Hello" );
+ $demo_button->SetAttribute("BGCOLOR", "0 255 0");
+
+=back
+
+Some interface elements can contain one or more elements, as is the
+case of dialogs, lists and boxes. In such cases, the object's
+element list items can be accessed by indexing the object containing
+them, as can be seen in this example:
+
+ $mybox = IUP::Hbox->new( child=>[ $bt1, $bt2, $bt3] );
+ #XXX-FIXME THIS DOES NOT WORK IN PERL
+ $mybox->[0]->FGCOLOR("255 0 0");   # changes bt1 foreground color
+ $mybox->[1]->FGCOLOR("255 0 255"); # changes bt2 foreground color
+
+=head1 CALLBACKS CONCEPT
+
+IUP is a graphics interface library, so most of the time it waits for
+an event to occur, such as a button click or a mouse leaving a window.
+The application can inform IUP which callback to be called, informing
+that an event has taken place. Hence events are handled through
+callbacks, which are just functions that the application register in
+IUP.
+
+The events are processed only when IUP has the control of the
+application. After the application creates and shows a dialog it must
+return the control to IUP so it can process incoming events. This is
+done in the IUP main event loop. And it is usually done once per 
+application. One exception is the display of modal
+dialogs. These dialogs will have their own event loop and the previous
+shown dialogs will stop receiving events until the modal dialog
+returns. 
+
+=head2 Using Callbacks
+
+Callbacks are used by the application to receive notifications from the
+system that the user or the system itself has interacted with the user
+interface of the application. On the other hand attributes are used by
+the application to communicate with the user interface system.
+
+Even though callbacks have different purposes from attributes, they are
+also associated to an element by means of an name.
+
+B<The ways of setting callback:>
+
+ sub cb_handler1 {
+   #...
+ }
+ 
+ sub cb_handler2 {
+   #...
+ }
+
+ #via standard SetCallback() call
+ $element->SetCallback("ACTION", \&cb_handler1);
+ 
+ #via standard SetCallback() call + using fat-comma
+ $element->SetAttribute( ACTION=>\&cb_handler1 );
+ 
+ #using anonymous function
+ $element->SetCallback( ACTION=>sub { IUP->Message('Hi!') } );
+ 
+ #setting more callbacks at once
+ $element->SetAttribute( ACTION=>\&cb_handler1, K_ANY=>\&cb_handler2 );
+ 
+ #via accessor
+ $element->ACTION(\&cb_handler2);
+
+ #setting attributes during element creation
+ $element = IUP::Button->new( TITLE=>"Text", ACTION=>\&cb_handler1, K_ANY=>\&cb_handler2 );
+ 
+ #which is equivalent to
+ $element = IUP::Button->new();
+ $element->SetAttribute( TITLE=>"Text" );
+ $element->SetCallback( ACTION=>\&cb_handler1 );
+ $element->SetCallback( K_ANY=>\&cb_handler2 );
+
+Callbacks do NOT have B<inheritance> like attributes.
+
+All callbacks receive at least the reference to the element which activated 
+the action as a parameter C<$self>. Each callback handler has given set of parameters
+e.g. BUTTON_CB callback expects handler function like:
+
+ sub button_cb_handler {
+   my ($self, $button, $pressed, $x, $y, $status) = @_;
+   #...
+ }
+
+Always check documentation for specific callback to get the information about expected hanler function.
+
+The callbacks should return one of the following values:
+
+=over
+
+=item * IUP_DEFAULT: Proceeds normally with user interaction. In case
+other return values do not apply, the callback should return this
+value.
+
+=item * IUP_CLOSE: Call L<ExitLoop|IUP/"ExitLoop()"> after return. Depending on the
+state of the application it will close all windows and exit the
+application. Applies only to some actions.
+
+=item * IUP_IGNORE: Makes the native system ignore that callback
+action. Applies only to some actions.
+
+=item * IUP_CONTINUE: Makes the element to ignore the callback and pass
+the treatment of the execution to the parent element. Applies only to
+some actions.
+
+=back
+
+IUP_DEFAULT will automatically be returned if no value is returned from callback handler.
+
+Only some callbacks support the last 3 return values. Check each
+callback documentation. When nothing is documented then only
+IUP_DEFAULT is supported.
+
+An important detail when using callbacks is that they are only called
+when the user actually executes an action over an element. A callback
+is not called when the programmer sets a value via L<SetAttribute|IUP::Manual::02_Elements/"SetAttribute()">.
+For instance: when the programmer changes a selected item on a list, no
+callback is called.
+
+The order of callback calling is system dependent. For instance, the
+RESIZE_CB and the SHOW_CB are called in different order in Win32 and in
+X-Windows when the dialog is shown for the first time.
+
+=head2 Callback accessors
+
+XXX-FIXME-ADD ACCESSOR TABLE
+
+=head2 MainLoop
+
+IUP is an event-oriented interface system, so it will keep a loop
+E<ldquo>waitingE<rdquo> for the user to interact with the application.
+For this loop to occur, the application must call the L<MainLoop|IUP/"MainLoop()">
+function, which is generally used right before L<Close|IUP/"Close()">.
+
+When the application is closed by returning IUP_CLOSE in a callback,
+calling L<ExitLoop|IUP/"ExitLoop()"> or by hiding the last visible dialog, the
+function L<MainLoop|IUP/"MainLoop()"> will return.
+
+The L<LoopStep|IUP/"LoopStep()"> and the L<Flush|IUP::Manual::02_Elements/"Flush()"> functions force the processing
+of incoming events while inside an application callback.
+
+=cut

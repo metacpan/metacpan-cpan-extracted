@@ -1,0 +1,22 @@
+0.04 2015-11-19T11:59:09+01:00
+ - Add Image::Select::Array module.
+ - Fix and improve ABSTRACT.
+
+0.03 2015-09-30T16:28:48+02:00
+ - Add REPOSITORY section to doc.
+ - Fix test requires.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Improve SEE ALSO section in doc.
+ - Move author tests to xt/ directory.
+ - Update Module::Install to 1.16 version.
+ - Update copyright years.
+
+0.02 2014-10-25T09:20:52+02:00
+ - Add error check for 'path_to_images' parameter.
+ - Add tests.
+ - Fix dependencies.
+ - Rewrite word "Suffix" to "Image type" in error message.
+ - Sort modules in EXAMPLE sections in doc.
+
+0.01 2014-10-24T20:24:38+02:00
+ - First version.

@@ -1,0 +1,31 @@
+Revision history for IPC-PerlSSH-Async
+
+0.07    CHANGES:
+         * Use new ->build_command_from ability of IPC::PerlSSH::Base 0.16;
+           allows recognition of all current options, and more future-proof
+           when more are added later.
+         * Implement as an IO::Async::Notifier with a contained ::Process
+           object rather than using $loop->spawn_child()
+
+0.06    CHANGES:
+         * More graceful handling of remote perl exit()
+         * Added Test::Pod testing
+
+0.05    CHANGES:
+         * Updated for IPC::PerlSSH 0.11 - STOREPKG, stored procedure tracking
+         * Fix POD errors
+
+0.04    CHANGES:
+         * 'use warnings'
+         * Added an example - collect the current time across multiple hosts
+         * Adjusted for IO::Async version 0.21 - implement as a real 
+           IO::Async::Stream, complete with ->configure method.
+
+0.03    BUGFIXES:
+         * Ensure that large calls/returns (over 8192 bytes) work correctly
+
+0.02    CHANGES:
+         * Wrote POD documentation
+
+0.01    First version, released on an unsuspecting world.
+

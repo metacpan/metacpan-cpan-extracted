@@ -1,0 +1,106 @@
+Imager::Font::T1 1.024
+======================
+
+ - update the bundled/modified Devel::CheckLib to handle the gcc-4
+   symlink on Cygwin
+
+Imager::Font::T1 1.023
+======================
+
+ - if the first text drawn with Imager::Font::T1 is not anti-aliased,
+   text drawn would be nonsense.  This would also read beyond the end
+   of a malloced buffer.
+
+Imager::Font::T1 1.022
+======================
+
+ - depend on Imager 0.95.
+
+Imager::Font::T1 1.021
+======================
+
+Released as part of Imager 0.94_02.
+
+ - enable the debug log for t/t90std.t
+
+ - add typemap to the manifest, this caused build failures in 1.020.
+
+Imager::Font::T1 1.020
+======================
+
+ - add the 1.019 changes list
+
+ - update README
+
+Imager::Font::T1 1.019
+======================
+
+ - slightly improve control over anti-aliasing, this is now recorded
+   per thread
+
+ - use a mutex to avoid re-entering t1lib, which isn't thread safe.
+
+ - avoid a paralled testing race condition.
+
+Imager::Font::T1 1.018
+======================
+
+ - match Imager::Font;:T1's error message translations to those from
+   later versions of T1Lib.
+
+ - clean up .dSYM directories generated performing probes on OS X
+   Mountain Lion.
+
+ - pass the --verbose command-line option through to Imager::Probe in
+   Makefile.PL
+   https://rt.cpan.org/Ticket/Display.html?id=75878
+
+Imager::Font::T1 1.017
+======================
+
+ - no longer fallback to using DynaLoader to load the XS code
+   https://rt.cpan.org/Ticket/Display.html?id=75560
+
+Imager::Font::T1 1.016
+======================
+
+ - update dependency to Imager 0.86
+   https://rt.cpan.org/Ticket/Display.html?id=72643
+
+Imager::Font::T1 1.015
+======================
+
+ - use T1_StrError() for error messages on modern libt1
+   https://rt.cpan.org/Ticket/Display.html?id=69879
+
+ - actually load the font rather than just adding it to the catalog on
+   creation.
+
+ - Imager::Font->new now produces better error messages for the T1
+   engine.
+
+ - has_chars() now returns perl's true and false values in list
+   context rather than integers, which should be more efficient.
+   https://rt.cpan.org/Ticket/Display.html?id=69158
+
+ - the default text color is no longer transparent.
+   https://rt.cpan.org/Ticket/Display.html?id=71469
+
+Imager::Font::T1 1.014
+======================
+
+ - if reinitialization failed, the t1_initialized flag was left set.
+   https://rt.cpan.org/Ticket/Display.html?id=69877
+
+ - update the bundled (and still modified) Devel::CheckLib
+   https://rt.cpan.org/Ticket/Display.html?id=69170
+
+Imager::Font::T1 1.013
+======================
+
+ - the big types cleanup, should be no change in behaviour
+
+Imager::Font::T1 1.012
+======================
+
+Initial release.

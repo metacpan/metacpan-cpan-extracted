@@ -1,0 +1,105 @@
+Revision history for Perl extension Iodef::Pb::Simple.
+
+0.21    2013-11-19
+    - fixes:
+        - [klehigh]     fixed bro output
+                        https://github.com/csirtgadgets/iodef-pb-simple-perl/issues/6
+   
+    - features:
+        - [mjbroekman]  added csv output flag for duplicate supression
+                        https://github.com/csirtgadgets/iodef-pb-simple-perl/pull/8
+                        added ipset output support
+                        https://github.com/csirtgadgets/iodef-pb-simple-perl/pull/9
+
+0.20    2013-08-29
+    - added ability to map 'additional_data1,additional_data1_meaning,additional_data2,addititonal_data2_meaning'
+    - fixed #40 (iptables output)
+    - fixed https://github.com/collectiveintel/cif-v1/issues/45 (iptables output)
+    - fixed https://github.com/collectiveintel/cif-v1/issues/46 (snort output)
+
+0.19    2013-07-09
+    - added "address_mask" as a keyword, the ipv4 plugin handles
+
+0.18     2013-05-02
+    - added exclude_assessment option
+    - [jeff] spelling error in contacts mod
+    - bugfix to pcapfilter output
+    - added iptables output
+    - bugfix to Ipv4 plugin
+    - added carbon copy support
+
+0.17    2013-01-14
+    - misc
+
+0.16    2013-01-14
+    - bugfix to table.pm limit display
+
+0.16    2013-01-11
+    - added OSSP::uuid as a dep, added uuid_ns, uuid_random and is_uuid functions
+    - added limit output to table.pm
+
+0.15    2013-01-05
+    - fixed severity bug in Plugin/Assessment.pm
+
+0.14    2012-12-27
+    - Makefile.PL fix, added Text::Table
+
+0.13    2012-12-26
+    - another digest::sha1 fix
+
+0.12    2012-12-20
+    - switched to digest::sha interface (instead of digest::sha1)
+
+0.11    2012-12-19
+    - added raw (array keypair return) support
+    - added 'limit' option
+    - bugfix to snort plugin
+    - ported bro plugin
+    - bugfix to domain plugin (adding rdata_type keyword)
+    - added service type to domain and ipv4 plugins
+    - bugfix to portlist for ipv4 and domain
+    - added better bgp support
+    - backported 'advanced config' support from cif-client v0
+    - added html output
+    - fix to restriction functions
+    - added option allowing the rounding of floating point confidence numbers
+
+0.10    2012-10-01
+    - stoooopid bugfix
+
+0.09    2012-10-01
+    - added json output plugin (requires json::xs)
+    - bugfix to snort output
+    - added basic malware binary support
+    - misc bugfixes
+
+0.08    2012-09-01
+    - bugfixes to to_keypair function
+    - added bindzone plugin
+
+0.07    2012-08-30
+    - bugfix
+
+0.06    2012-08-15
+    - consolidated Iodef::Pb to this module
+    - consolidated Iodef::Pb::Format to this module
+    - bugfix to Ipv4 module (protocol fix)
+
+0.05    2012-08-10
+    - added CarbonCopy plugin
+    - enabled a legacy 'impact' keyword to be used as assessment
+
+0.04    2012-08-01
+    - added method plugin
+
+0.03    2012-07-30
+    - bugfixes
+    - added malware module
+
+0.02    2012-06-27
+    - bugfixes
+
+0.00_01  Wed Apr 11 10:37:13 2012
+	- original version; created by h2xs 1.23 with options
+		-ABXb 5.8.8 Iodef::Pb::Simple
+

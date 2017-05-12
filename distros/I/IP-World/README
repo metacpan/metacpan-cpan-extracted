@@ -1,0 +1,85 @@
+IP::World is Copyright (C) 2010, Craig MacKenna <craig@animalhead.com>
+
+DESCRIPTION
+
+  IP::World returns the ISO-3166 country code associated with an IP4 
+  address.  It uses two free databases from WIPmania.com and MaxMind.com.  
+  
+  The included application 'maint_ip_world_db' checks whether the 
+  included IP::World database needs updating during installation, and 
+  can be run or scheduled to keep it current.  WIPmania.com and 
+  MaxMind.com release new source data bimonthly and monthly, 
+  respectively.  On a server, 'maint_ip_world_db' can be scheduled 
+  (cron'ed on Unix/Linux) to run at an unbusy time.
+  
+LICENSE INFORMATION
+
+  This module is free software; you may redistribute it and/or modify
+  it under the same terms as Perl 5.10.1.  For more details, see the
+  full text of the licenses at
+
+  <http://www.perlfoundation.org/artistic_license_1_0> and
+  <http://www.gnu.org/licenses/gpl-2.0.html>.
+
+  This program is distributed in the hope that it will be useful, but
+  it is provided "as is" and without any express or implied warranties.
+  For details, see the full text of the licenses at the above URLs.
+
+INSTALLATION
+
+  During the installation you will be asked if you want to enter a 
+  command for 'maint_ip_world_db' to run when the database is updated.  
+  (The author enters a command to restart his Apache server at this point.)  
+  If you don't want to use this feature, just hit Return.
+
+  Easy ways to install IP::World:
+
+    $ perl -MCPAN -e "install IP::World"
+    
+    OR
+    
+    $ perl -MCPANPLUS -e 'fetch IP::World'
+
+  The classic way:
+
+    Choose a directory to use for installing.
+    Move/download the distribution file IP-World-n.nn.tar.gz into that directory
+    cd into the directory
+    $ tar -xf IP-World-n.nn.tar.gz
+
+    This will produce a new directory IP-World-n.n.
+
+    $ cd IP-World-n.n
+    $ perl Build.PL
+    $ ./Build
+    $ ./Build test
+
+    Assuming those steps don't show any problems:
+
+    $ sudo ./Build install  (or just ./Build install if you're superuser)
+    
+  Windows users can omit the './' and just type Build.
+
+  Either of the above alternatives should install IP::World into the
+  Perl library.
+  
+  See the POD documentation for further details. Once the module
+  is installed, you should be able to read the documentation by
+  typing the following from the command-line:
+
+    $ perldoc IP::World
+
+  Or if your man system is configured in a compatible way:
+
+    $ man IP::World
+
+NOTES
+    
+    This module requires perl 5.7.3 or later.
+
+    The author uses it for customizing web pages on his server to the 
+    location of the visitor, particularly to quote prices of items 
+    for sale in the visitor's currency.  Also for server log analysis.
+
+    Craig MacKenna <craig@animalhead.com>
+    Apr 7 2010

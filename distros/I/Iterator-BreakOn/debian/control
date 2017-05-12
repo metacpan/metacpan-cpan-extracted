@@ -1,0 +1,17 @@
+Source: libiterator-breakon-perl
+Section: perl
+Priority: optional
+Build-Depends: debhelper (>= 5.0.0), libmodule-build-perl
+Build-Depends-Indep: perl (>= 5.8.8-7), libexception-class-perl, liblist-moreutils-perl, libclass-accessor-perl
+Maintainer: Victor Moral <victor@taquiones.net>
+Standards-Version: 3.7.2
+
+Package: libiterator-breakon-perl
+Architecture: all
+Depends: ${perl:Depends}, libexception-class-perl, liblist-moreutils-perl, libclass-accessor-perl
+Description: Data iterator with control flow breaks
+ This module implements break events on a iterator based on the value of the
+ fields of each item.
+ . 
+ The data source can be a DBI resultset, and the returned rows are assumed  to
+ be sorted.

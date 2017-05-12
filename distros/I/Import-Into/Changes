@@ -1,0 +1,41 @@
+Revision history for Import-Into
+
+1.002005 - 2015-08-28
+  - fix level as a hashref parameter
+
+1.002004 - 2014-07-09
+  - fix prerequisite declarations for older toolchain
+
+1.002003 - 2014-07-09
+  - module loading is now done while importing, making it unnecessary to load
+    them beforehand (RT#96995, Christian Walde)
+
+1.002002 - 2014-05-06
+  - minor metadata updates
+
+1.002001 - 2014-03-04
+  - fix tests and Makefile.PL to support perl 5.6
+
+1.002000 - 2013-12-10
+  - allow specifying by caller level, as well as specifying file, line,
+    and version
+
+1.001001 - 2013-03-25
+  - fix NAME in Makefile.PL (RT#84207)
+
+1.001000 - 2012-05-12
+  - add unimport::out_of
+
+1.000003 - 2012-05-06
+  - clarify how the method name trick works since apparently now people
+    understand the eval/import trick they've noticed that that isn't the
+    only bit of crazy
+
+1.000002 - 2012-05-05
+  - improve explanation and add more examples to the SYNOPSIS
+
+1.000001 - 2012-05-03
+  - correct NAME in Makefile.PL
+
+1.000000 - 2012-05-03
+  - initial release

@@ -1,0 +1,192 @@
+=for comment based on iup-3.5 - http://www.tecgraf.puc-rio.br/iup/en/dlg/iupcolordlg.html
+
+=head1 NAME
+
+IUP::ColorDlg - [pre-defined dialog] selecting color
+
+=head1 DESCRIPTION 
+
+Creates the Color Dialog element. It is a predefined dialog for
+selecting a color.
+
+=begin HTML
+
+<p>
+  <table border="1">
+    <tbody align="center">
+      <col style="text-align: center;">
+      <col style="text-align: left;">
+      <tr>
+        <th>GTK</th>
+        <td><img src="http://kmx.github.io/perl-iup/img-3.9/dlg/colordlg_gtk.png"></td>
+      </tr>
+      <tr>
+        <th>Windows</th>
+	<td><img src="http://kmx.github.io/perl-iup/img-3.9/dlg/colordlg_win.png"></td>
+      </tr>
+      <tr>
+        <th>ColorBrowser<br>based</th>
+	<td><img src="http://kmx.github.io/perl-iup/img-3.9/dlg/colordlg_cb.png"></td>
+      </tr>
+    </tbody>
+  </table>
+</p>
+
+=end HTML
+
+There are 3 versions of the dialog. One for Windows only, one for GTK
+only and one for all systems, but it is based on the L<IUP::ColorBrowser|IUP::ColorBrowser>.
+
+The Windows and GTK dialogs can be shown only with the L<Popup|IUP::Manual::02_Elements/"Popup()">
+function. The L<IUP::ColorBrowser|IUP::ColorBrowser> based dialog is a L<IUP::Dialog> that
+can be shown as any regular L<IUP::Dialog>.
+
+B<IMPORTANT:> In perl IUP bindings only B<IUP::ColorBrowser> based dialog is available
+(because perl bindings automatically initializes the Controls Library after that
+the Windows and GTK dialogs are not available anymore).
+
+=head1 USAGE
+
+=head2 CREATION - new() method
+
+ $colordlg = IUP::ColorDlg->new( VALUE=>"100 100 0" );
+
+B<Returns:> the identifier of the created element, or C<undef> if an error occurs.
+
+NOTE: You can pass to C<new()> other C<ATTRIBUTE=E<gt>'value'> or C<CALLBACKNAME=E<gt>\&func> pairs relevant
+to this element - see L<IUP::Manual::02_Elements|IUP::Manual::02_Elements/"new()">.
+
+=head2 ATTRIBUTES
+
+For more info about concept of attributes (setting/getting values etc.)
+see L<IUP::Manual::03_Attributes|IUP::Manual::03_Attributes>. Attributes specific to this element:
+
+=over
+
+=item B<ALPHA>
+
+I<[ColorBrowser and GTK only]> if defined it will enable an
+alpha selection additional controls with its initial value. If the user
+pressed the Ok button contains the returned value. Default: no defined,
+or 255 if SHOWALPHA=YES.
+
+=item B<COLORTABLE>
+
+list of colors separated by ";". In GTK and in the
+ColorBrowser based accepts 20 values and if not present the palette
+will not be visible. In Windows accepts 16 values and will be always
+visible, even if the colors are not defined (in this case are
+initialized with black). If a color is not specified then the default
+color is used. You can skip colors using ";;".
+
+=item L<PARENTDIALOG|IUP::Manual::03_Attributes/PARENTDIALOG>
+
+I<(creation only)> Name of a dialog to be used as parent. This dialog will be always in front of the parent dialog.
+
+=item B<SHOWALPHA>
+
+I<[ColorBrowser and GTK only]>
+
+if enabled will display the
+alpha selection controls, regardless if ALPHA is defined for the
+initial value or not.
+
+=item B<SHOWCOLORTABLE>
+
+if enabled will display the color table,
+regardless if B<COLORTABLE> is defined or not. The default colors in
+the color table are different in GTK and in the ColorBrowser based
+dialog. In Windows the default colors are all black.
+
+=item B<SHOWHEX>
+
+I<[ColorBrowser only]> if enabled will display the Hexadecimal
+notation of the color.
+
+=item B<SHOWHELP>
+
+I<[ColorBrowser only]> if enabled will display the Help
+button. In GTK and Windows, the Help button is shown only if the
+HELP_CB callback is defined.
+
+=item B<STATUS>
+
+I<(read-only)> defined to "1" if the user pressed the Ok
+button, C<undef> if pressed the Cancel button.
+
+=item L<TITLE|IUP::Manual::03_Attributes/TITLE>
+
+Dialog title.
+
+=item B<VALUE>
+
+The color value in RGB coordinates and optionally alpha. It
+is used as the initial value and contains the selected value if the
+user pressed the Ok button. Format: "R G B" or "R G B A". Each
+component range from 0 to 255.
+
+=item B<VALUEHSI>
+
+I<[ColorBrowser only]>
+
+The color value in HSI coordinates. It
+is used as the initial value and contains the selected value if the
+user pressed the Ok button. Format: "H S I". Each component range from
+0-359, 0-100 and 0-100 respectively.
+
+=item B<VALUEHEX>
+
+I<[ColorBrowser only]>
+
+The color value in RGB Hexadecimal
+notation. It is used as the initial value and contains the selected
+value if the user pressed the Ok button. Format: "#RRGGBB". Each
+component range from 0-255, but in hexadecimal notation.
+
+=back
+
+=head2 CALLBACKS
+
+For more info about concept of callbacks (setting callback handlers etc.)
+see L<IUP::Manual::04_Callbacks|IUP::Manual::04_Callbacks>. Callbacks specific to this element:
+
+=over
+
+=item L<HELP_CB|IUP::Manual::04_Callbacks/HELP_CB>
+
+Action generated when the Help
+button is pressed.
+
+=back
+
+=head1 NOTES
+
+The GTK and Windows dialogs are native pre-defined dialogs that are not
+altered by L<SetLanguage|IUP/"SetLanguage()">. To show the dialog, use function
+L<Popup|IUP::Manual::02_Elements/"Popup()">. The dialog is mapped only inside L<Popup|IUP::Manual::02_Elements/"Popup()">,
+L<Map|IUP::Manual::02_Elements/"Map()"> does nothing.
+
+=head1 EXAMPLES
+
+
+The element B<IUP::ColorDlg> is used in the following sample scripts:
+
+=over
+
+=item * L<0-basic/colordlg.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/colordlg.pl> - IUP::ColorDlg example (used for screenshot - IUP.pod)
+
+=item * L<0-basic/pre-dialogs.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/pre-dialogs.pl> - IUP::Expander example
+
+=back 
+
+
+
+=head1 SEE ALSO
+
+L<IUP::MessageDlg|IUP::MessageDlg>, L<IUP::FileDlg|IUP::FileDlg>,
+L<Popup|IUP::Manual::02_Elements/"Popup()">
+
+The original doc: L<iupcolordlg.html|http://www.tecgraf.puc-rio.br/iup/en/dlg/iupcolordlg.html>
+ 
+
+=cut

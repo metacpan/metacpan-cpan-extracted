@@ -1,0 +1,15 @@
+use warnings;
+use strict;
+use utf8;
+use FindBin '$Bin';
+use Test::More;
+my $builder = Test::More->builder;
+binmode $builder->output,         ":utf8";
+binmode $builder->failure_output, ":utf8";
+binmode $builder->todo_output,    ":utf8";
+binmode STDOUT, ":encoding(utf8)";
+binmode STDERR, ":encoding(utf8)";
+use Test::Perl::Critic;
+use Test::More tests => 1;
+critic_ok ("$Bin/../lib/IP/China.pm");
+done_testing ();

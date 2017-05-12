@@ -1,0 +1,9 @@
+Changes
+lib/Image/Heatmap/bolilla.png
+lib/Image/Heatmap/colors.png
+lib/Image/Heatmap.pm
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/001-image_heatmap.t

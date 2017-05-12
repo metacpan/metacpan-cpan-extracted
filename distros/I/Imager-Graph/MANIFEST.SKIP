@@ -1,0 +1,20 @@
+^testout/
+~$
+^blib/
+^Makefile$
+^Makefile\.old$
+^pm_to_blib$
+\.diff$
+\.rej$
+\.bak$
+^Imager-Graph
+^\.git/
+^\.gitignore$
+
+# t/x tests aren't distributed
+^t/x
+^xtestimg/
+
+^cover_db/
+^nytprof/
+^nytprof\.out$

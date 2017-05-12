@@ -1,0 +1,12 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+eg/facedetect.pl
+lib/Image/ObjectDetect.pm
+lib/Image/ObjectDetect.xs
+src/ppport.h
+t/00_compile.t
+t/01_detect.t
+t/test.jpg

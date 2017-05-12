@@ -1,0 +1,220 @@
+=head1 NAME
+
+Inline::Struct -- Manipulate C structures directly from Perl.
+
+=head1 SYNOPSIS
+
+  use Inline C => 'DATA', structs => ['Foo'];
+
+  my $obj = Inline::Struct::Foo->new;
+  $obj->num(10);
+  $obj->str("Hello");
+
+  print myfunc($obj), "\n";
+
+  __END__
+  __C__
+  struct Foo {
+    int num;
+    char *str;
+  };
+  typedef struct Foo Foo;
+
+  SV *myfunc(Foo *f) {
+    return newSVpvf("myfunc: num=%i, str='%s'", f->num, f->str);
+  }
+
+This complete program prints:
+
+  myfunc: num=10, str='Hello'
+
+=head1 DESCRIPTION
+
+Inline::Struct is not a new language. It's a language extension designed to
+be used by Inline::C. It parses struct definitions and creates
+typemaps and XS code which bind each struct into a Perl class. This code is
+passed to Inline::C, which compiles it in the normal way.
+
+NOTE: Inline::Struct parses only C-style structs. It doesn't know about any
+C++ extensions to structs like scopes, constructors or methods. If you want
+such functionality you should use Inline::CPP to parse your structs.
+
+=head1 Using Inline::Struct
+
+Inline::Struct has a Parse::RecDescent grammar to parse C structs. If a struct
+is recognized, it can be bound to Perl. If the struct's definition is not
+recognized (usually because it has a member with no typemap), it will not be
+bound to Perl, but will be available from other functions in C or C++.
+
+The following example shows how a simple struct might look to a Perl
+programmer.
+
+Example 1:
+
+  use Inline C => <<'END', enable => 'structs';
+  struct Fraction {
+    long numer;
+    long denom;
+  };
+  END
+
+  my $o = Inline::Struct::Fraction->new(4, 3);
+  print $o->numer, $o->denom, "\n";
+  $o->numer(4)->denom(7);
+
+After the code above has been compiled, Perl's namespace looks a lot like
+the following:
+
+  package Inline::Struct::Fraction;
+  sub new { }
+  sub DESTROY { }
+  sub _KEYS { }
+  sub _VALUES { }
+  sub _HASH { }
+  sub numer { }
+  sub denom { }
+
+Note that these are actually XS subs written in C, not Perl subs. But that's
+what it looks like.
+
+=head1 The Struct Interface
+
+The following sections define the interface of each subroutine. B<Note: this
+interface is likely to change in future versions of Inline::Struct>. Please
+don't rely on Inline::Struct in production code quite yet.
+
+When a struct is bound by Inline::Struct, a new namespace is created underneath
+Inline::Struct. So if you have a struct named 'Foo', the package of the Perl
+class will be 'Inline::Struct::Foo'.
+
+=head2 new
+
+If no arguments are provided, all fields are zeroed out. If you provide values,
+they should be appropriate for the field type, and in the same order as they
+are defined in the struct.
+
+=head2 DESTROY
+
+The destructor. Should never be called by the programmer -- this is called
+automatically when the Perl variable holding the struct is destroyed. Frees
+the memory associated with the struct. If the struct holds pointers to malloc'd
+memory, they will not be freed. If you run into such a situation, consider
+using C++ and Inline::CPP instead.
+
+=head2 _KEYS
+
+A read-only method, this returns a reference to an array containing the names
+of the fields in the struct. The fields are in the order they appear in the
+C source code.
+
+=head2 _VALUES
+
+A read-only method, this returns a reference to an array containing the values
+of the fields in the struct. The values are returned in the same order as the
+fields.
+
+=head2 _HASH
+
+A read-only method, this returns a reference to a hash, mapping field names
+to field values.
+
+=head2 Accessors
+
+For each field in the struct, an accessor method will be created which
+lets you get or set the value in the struct. If no arguments are provided,
+the method returns the value of that field. If any arguments are provided,
+the field is set to the first argument, and the modified structure is
+returned. This makes setting multiple fields easy:
+
+   $o->field1(something)->field2(somethingelse);
+
+=head1 C and C++ Configuration Options
+
+Inline::Struct has no configuration options of its own, but it does provide
+a new configuration option for C or C++.
+
+=head2 structs
+
+Specifies that structs are to be bound to Perl. There are several meanings to
+this option, so I'll explain with an example:
+
+   use Inline C => config => structs => 'Foo';
+
+Adds 'Foo' to the list of structs to bind to Perl.
+
+   use Inline C => config => structs => ['Foo', 'Bar'];
+
+Adds 'Foo' and 'Bar' to the list of structs to bind to Perl.
+
+   use Inline C => config => structs => undef;
+
+Clears the list of structs to bind to Perl.
+
+   use Inline C => config => enable => 'structs';
+or
+   use Inline C => config => structs => 1;
+
+Enable binding structs to Perl, without specifying any structs to search for.
+As shown, this would bind all structs to Perl.
+
+   use Inline C => config => disable => 'structs';
+
+or
+
+   use Inline C => config => structs => 0;
+
+Disable binding structs to Perl.
+
+=head1 PERFORMANCE OF STRUCTS AGAINST PERL DATA STRUCTURES
+
+=head2 Time
+
+A script, F<benchmark>, that benchmarks a simple C C<struct> against
+a pure-Perl data structure, is supplied. It should be run a couple of
+times to get everything cached. A typical results run is as follows:
+
+  Faster type          % faster
+  ISF dnum read        24%
+  PP dnum write        247%
+  ISF inum read        39%
+  PP inum write        231%
+  ISF str read         18%
+  PP str write         264%
+
+This shows that reading the struct is faster than a simple object
+implemented as a hash-ref, while writing to a struct in the current
+implementation is several times slower. If the Perl object is instead
+implemented as an array-ref, in the class C<PP::Foo::Array>, the numbers
+do not change significantly.
+
+=head2 Memory
+
+The same script also compares memory usage. A typical results run:
+
+  Memory usage
+  10000 x bless [ 7, "string" ], "main": 34592
+  10000 x Inline::Struct::Foo->new: 45648
+  100000 x bless [ 7, "string" ], "main": 139344
+  100000 x Inline::Struct::Foo->new: 248080
+  1000000 x bless [ 7, "string" ], "main": 1187024
+  1000000 x Inline::Struct::Foo->new: 2257968
+
+The memory usage of the struct is around twice as large.
+
+=head1 SEE ALSO
+
+For more information about using C from Perl, see L<Inline::C>. For more
+information about using C++ from Perl, see L<Inline::CPP>.
+
+=head1 AUTHOR
+
+Neil Watkiss (NEILW@cpan.org)
+
+=head1 COPYRIGHT
+
+Copyright (C) 2001, Neil Watkiss.
+
+This module is free software. It may be used, redistributed and/or modified
+under the same terms as Perl itself.
+
+See L<http://dev.perl.org/licenses/>

@@ -1,0 +1,23 @@
+#!/home/ben/software/install/bin/perl
+use warnings;
+use strict;
+use Image::CairoSVG;
+for my $file (@ARGV) {
+    my $cairosvg = Image::CairoSVG->new ();
+    my $outfile = $file;
+    $outfile =~ s/\.svg$/\.png/i;
+    if ($outfile eq $file) {
+	$outfile = "$file.png";
+    }
+    eval {
+	my $surface = $cairosvg->render ($file);
+	$surface->write_to_png ($outfile);
+    };
+    if ($@) {
+	warn "$0 failed for $file: $@\n";
+    }
+}
+
+# Local variables:
+# mode: perl
+# End:

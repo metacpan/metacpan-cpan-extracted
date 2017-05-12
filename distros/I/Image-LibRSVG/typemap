@@ -1,0 +1,16 @@
+TYPEMAP
+SVGLibRSVG *  T_OBJECT
+
+OUTPUT
+T_OBJECT
+        sv_setref_pv($arg, CLASS, (void*)$var);
+
+INPUT
+T_OBJECT
+        if (sv_isobject($arg) && SvTYPE(SvRV($arg)) == SVt_PVMG)
+        {
+          IV tmp = SvIV((SV*)SvRV($arg));
+          $var = INT2PTR($type, tmp);
+        }
+        else
+          Perl_croak(aTHX_ \"${Package}::$func_name(): $var is not a blessed SV reference\");

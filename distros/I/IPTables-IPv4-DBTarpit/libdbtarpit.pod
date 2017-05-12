@@ -1,0 +1,445 @@
+=head1 NAME
+
+bdbtarpit - api
+
+Shared library for DBTarpit Berkeley DB access
+distributed with perl module IPTables::IPv4::DBTarpit
+
+libdbtarpit.so.0.0.0
+
+=head1 SYNOPSIS
+
+Include the following statements in foo.xs and Makefile.PL
+
+  /*	foo.xs	*/
+  ...
+
+  #include <bdbtarpit.h>
+  ...
+
+  /* end foo.xs	*/
+
+  ----------------------
+
+  # Makefile.PL
+  
+  WriteMakefile(
+	...
+	
+	'LIBS'	=> ['-ldb -ldbtarpit'],
+	
+	...
+  }
+
+=head1 DESCRIPTION
+
+This file contains the documentation of the bdbtarpit public API,
+specifically a listing of functions, macros, flags, and variables that may be used by extension
+writers.  The interfaces of any functions that are not listed here are subject to change without notice.  For
+this reason, blindly using functions listed is to be avoided when writing extensions.
+
+=over 2
+
+item * DBTPD
+The structure that holds the instance of data passed to and from the shared
+library by your extension. One of these should be declared within your
+extension.
+
+  #define DBTP_MAXdbf 10  /* maximum number of open databases */
+
+  typedef struct {
+    int     dberr;		/* BDB status returned */
+    DB_ENV  * dbenv; 		/* BDB environment descriptor */
+    DBT     mgdbt;		/* BDB data descriptor */
+    DBT     keydbt;		/* BDB key descriptor  */
+    DB      * dbaddr[DBTP_MAXdbf]; /* BDB database descriptor */
+    char    * dbfile[DBTP_MAXdbf]; /* BDB database name
+  } DBTPD;
+
+Declare a structure of this type in your extension
+
+  DBTPD dptp;
+
+For detailed explanation of DB_ENV, DBT, and DB; see the documentation for
+Berkeley DB at http://www.sleepycat.com
+
+
+=item * int dbtp_init(DBTPD * dbtp, unsigned char * home, int index);
+
+Initialize database(s).
+
+  status = dbtp_init(&dbtp, home, index);
+
+  DBTPD * dbtp
+	Contains the array of database file name
+	pointers char * dbfile
+
+  char * home
+	Pointer to the text of the absolute path
+	to the Berkeley DB environment directory
+
+  int index
+	Normally -1, however if you wish to 
+	initialize a SINGLE specific database
+	which has a 'dbfile' array entry, this
+	is the index to that specific file name
+
+	If 'index' is specified with the value
+	DB_RUNRECOVERY, then the old Berkeley DB
+	environment will be destroyed and a new
+	one created when the database(s) are opened.
+	This requires a single controling thread.
+	Since this is not a tranactional DB, there
+	is no point in trying to use the DB_RECOVER
+	flag. DBENV->remove is used instead.
+
+The array 'dbfile' should contain pointers to the character strings
+representing the name of each database that should be opened. Pointers
+should be set in ascending order with unused pointers set to zero (NULL).
+
+  i.e. 
+	dbfile[0] -> first dbfile name
+	dbfile[1] -> second dbfile name
+	... and so on...
+
+The function returns zero (0) on success or the Berkeley DB error code on
+failure.
+
+  dbtp->dberr is set to zero or the error code.
+
+  dbtp->dbenv is set as the BDB environment pointer
+
+  dbtp->dbaddr[n] is set as the database pointer
+		  for each open database
+
+
+=item * void dbtp_env_close(DBTPD * dbtp);
+
+Close the environment opened by dbtp_init. Normally only used from within
+the shared library since it is done as part of dbtp_close.
+
+  DBTPD * dbtp  pointer to private data structure
+
+  dbtp->dbenv is set to NULL
+
+
+=item * void dbtp_close(DBTPD * dbtp);
+
+Close the environment and each open database found in dbtp->dbaddr
+
+  DBTPD * dbtp  pointer to private data structure
+
+  dbtp->dbaddr[n] is set to NULL
+
+
+=item * int dbtp_index(DBTPD * dbtp, char * name);
+
+Find and return the B<a>ddress B<i>ndex of 'name' in dbtp->dbaddr[n]
+
+  DBTPD * dbtp  pointer to private data structure
+
+  char * name	pointer to the name string of database
+
+If the index is not found, the function returns -1
+
+  dbtp->dberr is set to zero or the error code.
+
+
+=item * int dbtp_get(DBTPD * dbtp, int ai, void * addr, size_t size);
+
+Get a record by key from the database.
+
+  DBTPD * dbtp	pointer to private data structure
+
+  int ai	index to the database of interest
+
+  void * addr	pointer to database key
+		This is normally network address
+		of the form returned by inet_aton
+	i.e. 	&in_addr.s_addr
+
+  size_t size	sizeof(in_addr.saddr)
+
+The function returns zero (0) on success or the Berkeley DB error code
+
+  dbtp->dberr is set to zero or the error code.
+
+  dbtp->keydbt contains the key information
+
+  dbtp->mgdbt contains the data information
+
+See the Berkeley DB documentation for DBT
+
+
+=item * int dbtp_getrecno(DBTPD * dbtp, int ai, u_int32_t cursor);
+
+Get a record by record number from the database.
+
+  DBTPD * dbtp  pointer to private data structure
+
+  int ai        index to the database of interest
+
+  u_int32_t cursor	the record number
+
+	NOTE: record numbers in the Berkeley DB
+	database start with record number ONE (1)
+	Trying to access record ZERO will return
+	an error.
+
+The function returns zero (0) on success or the Berkeley DB error code
+
+  dbtp->dberr is set to zero or the error code.
+
+  dbtp->keydbt contains the key information
+
+  dbtp->mgdbt contains the data information
+
+See the Berkeley DB documentation for DBT
+
+
+=item * u_int32_t dbtp_stati(DBTPD * dbtp, int ai);
+
+Returns the number of unique keys or records in a database.
+
+If an error is encountered, the function will return zero (0). If you expect
+zero (0) keys in a database, check the error status code for success or
+failure.
+
+  DBTPD * dbtp  pointer to private data structure
+
+  int ai        index to the database of interest
+
+
+=item * u_int32_t dbtp_statn(DBTPD * dbtp, char * name);
+
+Get status by name instead of index.
+
+Exactly the same as calling:
+
+  u_int32_t number_of_keys;
+  int ai = dbtp_index(&dbtp, name)
+  number_of_keys = dbtp_stati(&dbtp, ai);
+
+
+=item * int dbtp_readOne(DBTPD * dbtp, u_char how, int ai, void * ptr, int is_network);
+
+This function provides a single access point to retrieve data and is
+implemented with calls to B<get> and B<getrecno>, described above.
+
+  DBTPD * dbtp  pointer to private data structure
+
+  u_char how	access method
+	0  access by key
+	1  access by record number
+
+  int ai        index to the database of interest
+
+  void * pointer
+	a pointer to either the key or record
+	record number depending on 'how'
+
+  int is_network
+	if true, the function will convert the 
+	key and data records to and from
+	host to network order as appropriate
+
+If the function is called for access by record number with a record number
+of zero (0), the number of records and the version number of the host
+Berkeley DB database is returned as follows:
+
+  The key will contain the version number as
+  a packed network address which will expand
+  to a string representing the version number 
+  when fed to inet_ntoa
+
+	i.e.	0.3.1.17
+
+    dbtp->keydbt.data->[0] = 0;
+    dbtp->keydbt.data->[1] = 3;
+    dbtp->keydbt.data->[2] = 1;
+    dbtp->keydbt.data->[3] = 17;
+
+  data will contain the number of keys
+
+    *(dbtp->mgdbt.data) = nkeys;
+
+For standard access, the data is returned as for get and getrecno.
+
+The function returns zero (0) on success or the Berkeley DB error code
+
+  dbtp->dberr is set to zero or the error code.
+
+  dbtp->keydbt contains the key information
+
+  dbtp->mgdbt contains the data information
+
+See the Berkeley DB documentation for DBT
+
+
+=item * int dbtp_readDB(DBTPD * dbtp, u_char how, char * name, void * ptr, int is_network);
+
+Read one record by name instead of index.
+
+Exactly the same as calling:
+  
+  int status;
+  int ai = dbtp_index(&dbtp, name)              
+  status = dbtp_readDB(&dbtp,how,name,ptr,is_network)
+
+
+=item * int dbtp_put(DBTPD * dbtp, int ai, void * addr, size_t asize, void * data, size_t dsize);
+
+Put a record into a database.
+
+  DBTPD * dbtp  pointer to private data structure
+
+  int ai        index to the database of interest
+
+  void * addr	pointer to database key
+		This is normally network address
+		of the form returned by inet_aton
+        i.e.	&in_addr.s_addr
+
+  size_t asize	sizeof(in_addr.saddr)
+
+  void * data	pointer to data
+
+  size_t dsize	sizeof(the data)
+
+Returns zero (0) on success else the Berkeley DB error code.
+
+  dbtp->dberr is set to zero or the error code.
+
+
+=item * int dbtp_sync(DBTPD * dbtp, int ai);
+
+Flush any cached information to disk.
+
+In order for other threads to see information added to a database, it is 
+necessary to flush it from the current session's cache to disk. This is 
+normally done after each write or delete operation if these operations are 
+asynchronisly. For multiple record or cursor operations, do a sync after 
+completion to update the disk.
+
+  DBTPD * dbtp  pointer to private data structure
+
+  int ai        index to the database of interest
+
+Returns zero (0) on success else the Berkeley DB error code.
+
+  dbtp->dberr is set to zero or the error code.
+
+
+=item * int dbtp_find_addr(DBTPD * dbtp, int ai, void * addr, u_int32_t timestamp);
+
+Find a record by key from the B<dbtarpit> database and return the data which will
+in the form of a 32 bit timestamp number as returned from:
+
+	date +%s
+
+  DBTPD * dbtp  pointer to private data structure
+
+  int ai        index to the database of interest
+
+  void * addr   pointer to database key
+                This is normally network address
+                of the form returned by inet_aton
+        i.e.    &in_addr.s_addr
+
+  Returns zero (0) if the record is found.
+  Returns one (1) if the record is NOT found.
+
+If the record IS found, then the timestamp is updated to the current time.
+
+  dbtp->dberr is set to zero or the BDB error code.
+
+  dbtp->keydbt contains the key information
+
+  dbtp->mgdbt contains the 32 bit timestamp
+
+
+=item * int dbtp_del(DBTPD * dbtp, int ai, void * addr, size_t size);
+
+Delete a record from a database.
+
+  DBTPD * dbtp  pointer to private data structure
+
+  int ai        index to the database of interest
+
+  void * addr   pointer to database key
+                This is normally network address
+                of the form returned by inet_aton
+        i.e.    &in_addr.s_addr
+
+  size_t asize  sizeof(in_addr.saddr)
+
+Returns zero (0) on success else the Berkeley DB error code.
+
+  dbtp->dberr is set to zero or the error code.
+
+
+=item * int dbtp_notfound();
+
+Returns the numeric code for DB_NOTFOUND
+
+
+=item * char * dbtp_libversion(int * major, int * minor, int * patch);
+
+The dbtp_version method returns a pointer to a string containing
+bdbtarpit version information. If major is non-NULL, the
+major version of the bdbtarpit release is stored in the memory to
+which it refers. If minor is non-NULL, the minor
+version of the bdbtarpit release is stored in the memory to which it
+refers. If patch is non-NULL, the patch version of
+the bdbtarpit release is stored in the memory to which it refers.
+
+=item * char * dbtp_bdbversion(int * major, int * minor, int * patch);
+
+The dbtp_version method returns a pointer to a string containing Berkeley
+DB version information. If major is non-NULL, the
+major version of the Berkeley DB release is stored in the memory to
+which it refers. If minor is non-NULL, the minor
+version of the Berkeley DB release is stored in the memory to which it
+refers. If patch is non-NULL, the patch version of
+the Berkeley DB release is stored in the memory to which it refers.
+
+
+char * dbtp_strerror(int err);
+
+The dbtp_strerror method returns an error message string corresponding to
+the error number. The interface is a superset of the 
+ANSI C X3.159-1989 (ANSI C) strerror(3) interface. If
+the error number error is greater than or equal to 0,
+then the string returned by the system interface strerror(3) is
+returned. If the error number is less than 0, an error
+string appropriate to the corresponding Berkeley DB library error is
+returned. For more information, see Error returns to applications.
+
+
+=back
+
+=head1 AUTHOR
+
+Michael Robinton <michael@bizsystems.com>
+
+=head1 COPYRIGHT AND LICENCE
+
+  Copyright 2003, Michael Robinton <michael@bizsystems.com>
+ 
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 2 of the License, or
+  (at your option) any later version.
+ 
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+ 
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+=head1 SEE ALSO
+
+L<BerkeleyDB>, L<IPTables::IPv4::DBTarpit>

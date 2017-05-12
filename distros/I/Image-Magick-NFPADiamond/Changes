@@ -1,0 +1,7 @@
+Revision history for Perl extension Image::Magick::NFPADiamond.
+
+0.01  Fri Mar 28 09:14:31 2008
+	- original version; created by h2xs 1.23 with options
+		-AX --skip-exporter --use-new-tests -n Image::Magick::NFPADiamond
+1.00  Mon Mar 31 09:18:00 2008
+        - Going public

@@ -1,0 +1,5 @@
+DIR*	T_DIR
+
+INPUT
+T_DIR
+	$var = IoDIRP(sv_2io($arg))

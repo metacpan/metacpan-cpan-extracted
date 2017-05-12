@@ -1,0 +1,111 @@
+Revision history for Imager-Bing-MapLayer
+
+v0.1.9  2014-09-14
+  [Bug Fixes]
+  - Fixed bug in tile cleanup code that led to tiles not being saved.
+
+v0.1.8  2014-09-11 19:20 BST
+  [Incompatabilities]
+  - Renamed "last_cleanup_time" to "_last_cleanup_time", since this
+    attribute is intended for internal use. (This probably won't
+    affect anyone.)
+
+  [Documentation]
+  - Fixed POD markup for README generation.
+
+  [Tests]
+  - Skip malloc.t test unless running author tests, since it uses too
+    much memory for some cpantesters.
+
+  [Other Changes]
+  - Clean up tiles from memory before drawing new tiles.
+
+  - Tiles cleaned up in expiration order.
+
+v0.1.7  2014-09-09 19:28 BST
+
+  [Incompatabilities]
+  - The Tile class now has a build_filename method that can be
+    overriden when changing the filename.
+
+  [Documentation]
+  - Added more documentation.
+
+  - Minor POD tweaks.
+
+  - Added sections to Changes.
+
+  [Enhancements]
+  - Added errstr method to Imager class.
+
+  - _max_buffer_breadth can be configured globally in the MapLayer
+    class.
+
+  [Bug Fixes]
+  - Ignore 0-byte tile files when overwrite is false.
+
+  - Fixed bug with workaround for malloc limitations.
+
+  [Other Changes]
+  - Reduced size of _max_buffer_breadth to 4096 bytes.
+
+  - Miscellaneous cleanup of internals.
+
+v0.1.6  2014-09-08 19:06 BST
+
+  [Documentation]
+  - Minor POD tweaks/typo fixes.
+
+  - Removed POD from internal modules.
+
+  [Enhancements]
+  - Added a workaround for malloc limitations when drawing images that
+    are too large.
+
+  - Added Cambridge (aka "US") spelling for method names.
+
+  [Bug Fixes]
+  - Fixed method name typo.
+
+v0.1.5  2014-07-21
+
+  - Added test for tile subclassing.
+
+  - Added example of subclassing to the POD.
+
+  - Internal code refactoring and code tweaks.
+
+  - Minor POD tweaks/typo fixes.
+
+v0.1.4  2014-07-18
+
+  - Added missing prereq for tests.
+
+  - Tweaked MANIFEST rules.
+
+  - The tile_class_type() utility function has been renamed, since it
+    is meant for internal usage.
+
+v0.1.3  2014-07-17
+
+  - Added tile_class attribute.
+
+  - Minor POD tweaks.
+
+  - Removed QA tests from distribution (they are still in the repo).
+
+v0.1.2  2014-03-11
+
+  - Removed unnecessary dependency on Module::Install (GitHub #3)
+
+  - Fixed inconsistent/missing versions between modules.
+
+v0.1.1  2014-03-10
+
+  - README now excludes unnecessary details.
+
+  - Corrected typos in text.
+
+v0.1.0  2014-03-05
+
+  - First publicly-released version.

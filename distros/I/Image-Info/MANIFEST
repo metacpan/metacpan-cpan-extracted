@@ -1,0 +1,93 @@
+.gitignore
+CHANGES
+CREDITS
+dev/build.pl
+dev/Info.pm.tmpl		Will become lib/Image/Info.pm
+exifdump			Test driver script
+img/bad-exif-1.jpg
+img/be.tif
+img/cynic_hang.jpg		cycle in IFD's causing hangs in older than v1.25
+img/gps.jpg
+img/graph.svg
+img/interlace.png		Interlaced PNG example
+img/le.tif
+img/no-thumbnail.jpg
+img/segfault.tif
+img/test-corruptchunk.jpg
+img/test-gimp.xbm
+img/test-multi0xff.jpg
+img/test-notrailer.gif
+img/test-unknowncode.gif
+img/test.gif			An GIF example
+img/test.ico
+img/test.jpg			An Exif example from my Digicam
+img/test.pbm
+img/test.pgm
+img/test.png			An PNG example
+img/test.ppm
+img/test.rle
+img/test.svg
+img/test.tif
+img/test.wbmp
+img/test.xbm
+img/test.xpm
+img/test0-fuji.jpg		Testcase for RT #49546
+img/test1-fuji.jpg		Testcase for RT #49546
+img/tiny.pgm
+img/upside-down.bmp
+img/xxe.svg			Testcase for RT #118099
+img/ztxt.png			PNG example with ztxt chunk
+imgdump				Test driver script
+lib/Bundle/Image/Info/Everything.pm
+lib/Bundle/Image/Info/PNG.pm
+lib/Bundle/Image/Info/SVG.pm
+lib/Bundle/Image/Info/XBM.pm
+lib/Bundle/Image/Info/XPM.pm
+lib/Image/Info.pm
+lib/Image/Info/BMP.pm
+lib/Image/Info/GIF.pm
+lib/Image/Info/ICO.pm
+lib/Image/Info/JPEG.pm
+lib/Image/Info/PNG.pm
+lib/Image/Info/PPM.pm
+lib/Image/Info/SVG.pm
+lib/Image/Info/SVG/XMLLibXMLReader.pm
+lib/Image/Info/SVG/XMLSimple.pm
+lib/Image/Info/TIFF.pm
+lib/Image/Info/WBMP.pm
+lib/Image/Info/XBM.pm
+lib/Image/Info/XPM.pm
+lib/Image/TIFF.pm		Parse TIFF tags
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/00_basics.t
+t/bad_exif.t
+t/bmp.t
+t/exif.t
+t/fuji_s1000fd_substr_outside_of_string.t	Testcase for RT #49546
+t/ico.t
+t/jpg_corruptchunk.t
+t/jpg_hang.t
+t/jpg_ignore_thumbnail.t
+t/png.t
+t/pod.t
+t/pod_cov.t
+t/string.t
+t/svg.t
+t/tiff.t
+t/tiff_e.t
+t/tiff_segfault.t
+t/tiny-pgm.t
+t/wbmp.t
+t/xbm.t
+t/xpm.t
+TODO
+xt/kwalitee.t
+xt/rt118099.t
+xt/strict.t
+xt/synopsis.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

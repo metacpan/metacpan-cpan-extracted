@@ -1,0 +1,21 @@
+<!--keep the 5 MSMS-Compounds with the largest parent-ion-intensity-->
+
+<ExpMsMsSpectrumFilter>
+<oneExpMsMsSpectrumFilter spectrumType="msms" name="dummy">
+	        <level>peaks</level>	
+		<action type="removeOther">		
+		       <threshold type="sort">	
+			   <relativeTo>quantile</relativeTo>							
+			   <thresholdValue>0.5</thresholdValue>
+			   <comparator>ge</comparator>						
+		       </threshold>
+                </action>
+		<filterValue type="algorithm">							
+			<name>normIntDalton</name>
+                        <param name="winSize">100</param>
+                        <param name="stepSize">1</param>
+			<param name="p1">2</param>
+                       
+		</filterValue>
+	</oneExpMsMsSpectrumFilter>
+</ExpMsMsSpectrumFilter>

@@ -1,0 +1,29 @@
+Revision history for Perl extension Iterator::GroupedRange
+
+0.08 2014-03-18T15:45:49Z
+    - Fixed packaging (#2)
+
+0.07 2014-03-18T06:26:12Z
+    - Fixed when constract in empty array (#1)
+    - minil migrate
+
+0.06    Tue Sep 27 17:14:32 2011
+        - Fixed broken tar ball. (OSX 10.6's tar command is based BSD. 
+          So 0.04 and 0.05's tar ball is broken to the system used gnu tar like a Linux)
+
+0.05    Tue Sep 27 16:54:14 2011
+        - This version includes an important changes. It is empty array is not terminate condition.
+
+0.04    Wed Sep 14 15:20:41 2011
+        - Add rows() accessor
+        - Add append() method
+        - Increase pod document
+
+0.03    Tue Apr  5 02:02:15 2011
+        - Add methods description
+
+0.02    Mon Apr  4 23:40:13 2011
+        - Fixed wrong synopsis
+
+0.01    Mon Apr  4 13:53:32 2011
+        - original version

@@ -1,0 +1,52 @@
+#!/usr/local/bin/perl
+
+# test memory leakage of IPC::MMA
+
+use strict;
+use warnings;
+use IPC::MMA qw(:basic :hash);
+
+sub randStr {
+    my $len = int(rand shift())+1;
+    my $ret = '';
+    if ($len) {sysread (RAND, $ret, $len)}
+    return $ret;
+}
+
+open (RAND, "</dev/random") or die "Can't open /dev/random for read: $!\n";
+
+my $mm = mm_create (0, '/tmp/test_lockfile') or die "Can't create mm";
+my $memsize = mm_available ($mm);
+
+my $hash = mm_make_hash ($mm) or die "can't make hash";
+
+my $nStores = 0;
+my %keys = ();
+my ($key, $value, $mmav);
+
+print "please wait while half of the max shared memory is populated\n";
+
+do {
+    $key = randStr(16);
+    $value = randStr(256);
+
+    mm_hash_store ($hash, $key, $value) or die "can't store record";
+    $nStores++;
+    $keys{$key}=1;
+} until (($mmav = mm_available($mm)) < $memsize>>1);
+
+print "$nStores initial hash stores left $mmav bytes left\n";
+
+my @keys = keys (%keys);
+my $nKeys = scalar @keys;
+undef %keys;
+$nStores = 0;
+
+while (1) {
+    while (++$nStores % 100000) {
+        $value = randStr(256);
+        $key = $keys[int(rand $nKeys)];
+        mm_hash_store ($hash, $key, $value) or die "can't modify existing hash entry";
+    }
+    print "after $nStores updates, " . mm_available($mm) . " bytes are left\n";
+}

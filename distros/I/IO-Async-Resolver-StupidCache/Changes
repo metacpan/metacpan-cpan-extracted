@@ -1,0 +1,19 @@
+Revision history for IO-Async-Resolver-StupidCache
+
+0.04    2016/07/26 16:40:57
+        [BUGFIXES]
+         * Since IO::Async 0.62, the 'getaddrinfo_hash' named resolver is now
+           called 'getaddrinfo'
+
+0.03    2015/05/06 15:07:37
+        [BUGFIXES]
+         * Declare dependency on Future 0.30 for ->without_cancel
+
+0.02    2015/04/10 20:23:14
+        [BUGFIXES]
+         * Shield multiple concurrent callers from each other's cancellation
+
+0.01    2014/03/28 11:12:13
+         * First version, released on an unsuspecting world.
+
+        Sponsored by NET-A-PORTER (http://www.net-a-porter.com/)

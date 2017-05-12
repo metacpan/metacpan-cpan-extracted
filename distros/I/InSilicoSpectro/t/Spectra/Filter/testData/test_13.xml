@@ -1,0 +1,18 @@
+<!-- take off the fragments with moz values lower or equal 200 -->
+
+
+<ExpMsMsSpectrumFilter>
+<oneExpMsMsSpectrumFilter spectrumType="msms" name="dummy">
+	        <level>peaks</level>	
+		<action type="remove">		
+		       <threshold type="sort">	
+			   <relativeTo>absValue</relativeTo>							
+			   <thresholdValue>200</thresholdValue>
+			   <comparator>le</comparator>						
+		       </threshold>
+                </action>
+		<filterValue type="directValue">							
+			<name>moz</name>						
+		</filterValue>
+	</oneExpMsMsSpectrumFilter>
+</ExpMsMsSpectrumFilter>

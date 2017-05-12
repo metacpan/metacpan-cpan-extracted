@@ -1,0 +1,297 @@
+#!/usr/bin/perl -w
+# See copyright, etc in below POD section.
+######################################################################
+
+require 5.006_001;
+use lib './blib/lib';        # testing
+use Getopt::Long;
+use IO::File;
+use Pod::Usage;
+use Cwd qw (getcwd chdir);
+use strict;
+use vars qw ($Debug);
+use IPC::PidStat;
+use IPC::Locker;
+
+#======================================================================
+
+our @Orig_Argv = @ARGV;
+our @Opt_FgArgv;
+our $Opt_Host = IPC::Locker::hostfqdn();
+our $Opt_Pid;
+our $Opt_Signal = 'HUP';
+our $Opt_Killer;
+our $Opt_Foreground;
+
+#======================================================================
+# main
+
+# Beware, POSIX execve() et al. have an unspecified effect on the action
+# for SIGCHLD (alone).  So this won't work.
+## $SIG{CHLD} = 'IGNORE';
+
+my $opt_cd;
+my %server_params = ();
+
+$Debug = 0;
+Getopt::Long::config ("require_order");
+if (! GetOptions (
+		  "help"	=> \&usage,
+		  "debug"	=> \&debug,
+		  "version"	=> \&version,
+		  "port=i"	=> sub {shift; $server_params{port} = shift;},
+		  #
+		  "host=s"	=> \$Opt_Host,
+		  "pid=i"	=> \$Opt_Pid,
+		  "cd=s"	=> \$opt_cd,
+		  "foreground=i"=> \$Opt_Foreground,
+		  "signal=s"	=> \$Opt_Signal,
+		  "killer=s"	=> \$Opt_Killer,
+		  "<>"		=> \&parameter,
+		  )) {
+    die "%Error: Bad usage, try 'pidwatch --help'\n";
+}
+push @Opt_FgArgv, @ARGV;
+
+$Opt_Host or die "%Error: --host not specified\n";
+$Opt_Pid or die "%Error: --pid not specified\n";
+if ($Opt_Foreground) {
+    !$Opt_FgArgv[0] or die "%Error: --foreground option does not take additional command arguments\n";
+} else {
+    $Opt_FgArgv[0] or die "%Error: No command specified\n";
+}
+
+if ($opt_cd && -d $opt_cd) {
+    $ENV{PWD} = $opt_cd;
+    chdir ($opt_cd);
+}
+
+# Debugging
+my $dbgfh = \*STDERR;
+#$dbgfh = IO::File->new("$ENV{HOME}/pidwatch_$$","w") if $Debug;
+print $dbgfh "\tArgs: @Orig_Argv\n" if $Debug;
+
+# Fork once to start parent process
+my $foreground_pid = $Opt_Foreground || $$;  # Unlike most forks, the job goes in the parent
+
+if (my $pid = fork()) {  # Parent process, foreground job
+    print $dbgfh "\tForeground: @Opt_FgArgv\n" if $Debug;
+    # The child forks again quickly.  Sometimes, SIG_CHLD leaks to us and
+    # wrecks the exec'd command, so wait for it now.
+    my $rv = waitpid($pid, 0);
+    if ($rv != $pid) {
+	die "%Error: waitpid() returned $rv: $!";
+    } elsif ($?) {
+	die "%Error: Child process died with status $?,";
+    }
+
+    if ($Opt_Foreground) {
+	exit(0);  # Not relevant
+    } else {
+	my $shArg = join(' ', map{"$_"} @Opt_FgArgv);
+	print $dbgfh "\t/bin/sh -c $shArg\n" if $Debug;
+	exec ("/bin/sh", "-c", $shArg);
+	die "%Error: Exec failed: @Opt_FgArgv,";
+    }
+}
+#else, rest is for child process.
+
+# Do this while we still have STDERR.
+my $exister = new IPC::PidStat (%server_params)
+    or die "%Error: Did not connect to pidstatd,";
+
+# Disassociate from controlling terminal
+POSIX::setsid()	or die "%Error: Can't start a new session: $!";
+
+# Change working directory
+chdir "/";
+open(STDIN,  "+>/dev/null") or die "%Error: Can't re-open STDIN: $!";
+if (!$Debug) {
+    open(STDOUT, "+>&STDIN");
+    open(STDERR, "+>&STDIN");
+}
+# Prevent possibility of acquiring a controling terminal
+exit(0) if fork();
+
+while (1) {
+    if (IPC::PidStat::local_pid_doesnt_exist($foreground_pid)) {
+	print $dbgfh "  Local pid $foreground_pid died\n" if $Debug;
+	exit(0);
+    }
+    $exister->pid_request(host=>$Opt_Host, pid=>$Opt_Pid,
+			  return_exist=>0,
+			  return_doesnt=>1,
+			  return_unknown=>0,);
+    my @recved;
+    eval {
+	local $SIG{ALRM} = sub { die "Timeout\n"; };
+	alarm(1);
+	@recved = $exister->recv_stat();
+	alarm(0);
+    };
+    if ($@) {
+	alarm(0);
+	# Recovery of PidStat protocol must be handled in that class.
+    }
+    if ($recved[0]
+	&& $recved[0]==$Opt_Pid
+	&& $recved[1]==0) {   # It doesn't exist.  Oh my.
+	print $dbgfh "  Remote pid $Opt_Pid died\n" if $Debug;
+	$Opt_Signal =~ s/^-?(SIG)?//;
+	if ($Opt_Killer) {
+	    exec ($Opt_Killer, "-".$Opt_Signal, $foreground_pid);
+	    exit(0);  # If exec fails...
+	} else {
+	    kill $Opt_Signal, $foreground_pid;
+	}
+	exit(0);
+    }
+    sleep 1;
+}
+
+#----------------------------------------------------------------------
+
+sub usage {
+    print "Version: $IPC::PidStat::VERSION\n";
+    pod2usage(-verbose=>2, -exitval=>2, -output=>\*STDOUT, -noperldoc=>1);
+    exit (1);
+}
+
+sub version {
+    print "Version: $IPC::Locker::VERSION\n";
+    exit (1);
+}
+
+sub debug {
+    $Debug = 1;
+    $IPC::PidStat::Debug = 1;
+}
+
+sub parameter {
+    my $param = shift;
+    if ($Opt_FgArgv[0] || $param !~ /^-/) {
+	push @Opt_FgArgv, $param;
+    } else {
+	die "%Error: Unknown option: $param\n";
+    }
+}
+
+#######################################################################
+__END__
+
+=pod
+
+=head1 NAME
+
+pidwatch - Run a command and if another PID exits, kill the command
+
+=head1 SYNOPSIS
+
+  pidwatch [--cd I<cd>] --host <host> --pid <pid>  args[....]
+  pidwatch [--cd I<cd>] --host <host> --pid <pid> --foreground <pid>
+
+=head1 DESCRIPTION
+
+Chdir to the specified directory, if specified and possible, then run the
+arguments as a command in the foreground.  When the foreground process
+exits, return its exit status.  This is basically the same as running the
+command directly.
+
+In the background, watch the specified pid on the specified host.  If
+L<pidstatd> is running on the specified host, and the specified pid goes
+away, kill the foreground command.
+
+Alternatively pass the PID of any process with --foreground.  When the
+foreground process exits, the background job exits; if the specified
+watched PID exits, the foreground pid is killed.
+
+Common usage is to kill remote rsh children when a parent is kill -9ed.
+An example Perl application would invoke:
+
+    system("rsh \$remote_host pidwatch"
+           ." --cd \$ENV{PWD} --host \$ENV{HOST} --pid \$\$"
+           ."\$remote_command...");
+
+Another usage is as a "barrier" to start the new step in a script when
+another process completes.  Just use a sleep with a appropriate timeout
+value:
+
+    pidwatch --host HOST --pid PID sleep 9999999
+    echo PID has completed, do whatever is next
+
+=head1 ARGUMENTS
+
+=over 4
+
+=item <parameters>
+
+All non switch arguments after the switches are passed to /bin/sh as a -c
+argument.  Thus passing "a && b" to pidwatch will result in pidwatch
+executing "/bin/sh -c 'a && b'".
+
+=item --cd I<dir>
+
+Directory to chdir to.
+
+=item --help
+
+Displays this message and program version and exits.
+
+=item --host I<host>
+
+Hostname to check for specified pid on.  L<pidstatd> must be running
+on that host to have this program be useful.
+
+=item --killer I<program>
+
+Program to use instead of kill when it's time to terminate the pid.  Will
+be passed arguments as if it was /bin/kill (I<program> I<signame> I<pid>).
+
+=item --foreground I<pid>
+
+Process ID to be killed when watched process exits.  Used to watch a
+preexisting PID, instead of launching commands under a shell.
+
+=item --pid I<pid>
+
+Process ID to watch.  When this pid exits, the program will kill the
+foreground process.
+
+=item --port I<port>
+
+Port of L<pidstatd> server on remote host.
+
+=item --signal I<signame>
+
+Signal number/name to send to process on remote PIDs death.  Defaults to
+-HUP.
+
+=item --version
+
+Displays program version and exits.
+
+=back
+
+=head1 DISTRIBUTION
+
+The latest version is available from CPAN and from L<http://www.veripool.org/>.
+
+Copyright 2002-2017 by Wilson Snyder.  This package is free software; you
+can redistribute it and/or modify it under the terms of either the GNU
+Lesser General Public License Version 3 or the Perl Artistic License Version 2.0.
+
+=head1 AUTHORS
+
+Wilson Snyder <wsnyder@wsnyder.org>
+
+=head1 SEE ALSO
+
+L<IPC::Locker>, L<IPC::PidStat>, L<pidstat>, L<pidstatd>, L<pidwatch>, L<uriexec>
+
+=cut
+
+######################################################################
+### perl -e 'print "$$\n"; while(1) { sleep(1); }'
+### Local Variables:
+### compile-command: "./pidwatch "
+### End:

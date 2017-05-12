@@ -1,0 +1,63 @@
+---
+name: IkiWiki-Plugin-syntax
+version: 0.25
+author:
+  - '"Victor Moral" <victor@taquiones.net>'
+abstract: Add syntax highlighting to ikiwiki
+license: gpl
+resources:
+  homepage: http://taquiones.net/software/factory/syntax.html
+  license: http://opensource.org/licenses/gpl-license.php
+requires:
+  Class::Accessor::Fast: 0
+  Exception::Class: 0
+  File::Basename: 0
+  File::Spec: 0
+  HTML::Entities: 0
+  HTML::Template: 0
+  IO::Dir: 0
+  IO::File: 0
+  Module::Build::IkiWiki: 0
+  Test::More: 0
+  URI::Escape: 0
+recommends:
+  Syntax::Highlight::Engine::Kate: 0
+  Test::Distribution: 0
+  Test::Exception: 0
+  Test::Pod: 1.14
+  Text::VimColor: 0
+provides:
+  IkiWiki::Plugin::syntax:
+    file: lib/IkiWiki/Plugin/syntax.pm
+    version: 0.25
+  IkiWiki::Plugin::syntax::CSS:
+    file: lib/IkiWiki/Plugin/syntax/CSS.pm
+    version: 0.1
+  IkiWiki::Plugin::syntax::Kate:
+    file: lib/IkiWiki/Plugin/syntax/Kate.pm
+    version: 0.1
+  IkiWiki::Plugin::syntax::Simple:
+    file: lib/IkiWiki/Plugin/syntax/Simple.pm
+    version: 0.1
+  IkiWiki::Plugin::syntax::Vim:
+    file: lib/IkiWiki/Plugin/syntax/Vim.pm
+    version: 0.2
+  IkiWiki::Plugin::syntax::X:
+    file: lib/IkiWiki/Plugin/syntax/X.pm
+    version: 0.1
+  IkiWiki::Plugin::syntax::base:
+    file: lib/IkiWiki/Plugin/syntax/base.pm
+    version: 0.2
+  IkiWiki::Plugin::syntax::gettext:
+    file: lib/IkiWiki/Plugin/syntax/gettext.pm
+    version: 0.1
+  Syntax::X:
+    file: lib/IkiWiki/Plugin/syntax/X.pm
+generated_by: Module::Build version 0.3
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2
+no_index:
+  directory:
+    - t/lib
+    - examples

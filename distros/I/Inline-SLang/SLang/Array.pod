@@ -1,0 +1,453 @@
+=head1 NAME
+
+Inline::SLang::Array - Support for arrays
+
+=head1 SYNOPSIS
+
+  use Inline 'SLang';
+
+  # you can send arrays to S-Lang
+  print_in_slang( [ 1, 2, 4 ] );
+
+  # and get them back from S-Lang
+  $aref = get_from_slang();
+  print "The array contains: " . join(',', @$aref) . "\n";
+
+  __END__
+  __SLang__
+
+  define print_in_slang (arr) {
+    variable adims, ndim, atype;
+    ( adims, ndim, atype ) = array_info(arr);
+    vmessage( "Array has type=%S with %d dims", atype, ndim );
+    foreach ( arr ) {
+      variable val = ();
+      vmessage( "  Value = %s", string(val) );
+    }
+  }
+  define get_from_slang() { return ["a string","another one","3"]; }
+
+The output of this code - which can be found in the source-code
+distribution as F<examples/arrays.pl> - is:
+
+  Array has type=Integer_Type with 1 dims
+    Value = 1
+    Value = 2
+    Value = 4
+  The array contains: a string,another one,3
+
+=head1 DESCRIPTION
+
+The philosophy behind arrays in Perl and S-Lang is somewhat
+different, which makes converting arrays between the two
+languages a bit more awkward than with many of the
+other data types.
+
+We admit three different array representations in Perl:
+Perl's array references; as an C<Array_Type> object
+(this class is a part of the C<Inline::SLang> package);
+and as a piddle - the fundamental object of
+the L<Perl Data Language|PDL::Intro> - which is the 
+suggested method to analyze large numeric arrays in Perl.
+Before discussing this I want to talk about
+going the "other way".
+
+=head2 Things to remember when converting arrays to S-Lang
+
+Consider the following Perl array reference:
+
+  [ [ 2, 1 ], [ 4, 5 ], [ 8, 9 ] ]
+
+This could be represented in S-Lang as one of the
+following arrays:
+
+  Integer_Type [3,2]
+  Double_Type  [3,2]
+  String_Type  [3,2]
+  Array_Type   [3]
+  Any_Type     [3]
+
+Note that this does B<not> match the way that
+PDL represents array (which considers this
+to be a C<2x3> array).
+Please see the L<"Issues with the PDL support">
+section below.
+
+Admittedly most of these are unlikely, but the point is
+that they are all I<valid> representations, which makes
+automatically converting such an item to S-Lang awkward.
+
+As discussed below it is possible to provide extra 
+information (the type and/or dimensionality of the array) to help
+the conversion - using an C<Array_Type> object or the
+C<Inline::SLang::SL_array()> function - but hopefully the
+guesses the code makes will be sufficient.
+
+=head3 How do we guess the array?
+
+If the array is stored as a I<piddle> or an C<Array_Type>
+object then the computer can find out the information
+without guessing, so the following is only relevant
+when an I<array reference> is used.
+
+When given an array reference, the code looks at the
+first element to decide what type of array it is: if
+it is an array reference then we have a multi-dimensional
+array and the process is repeated until we reach a
+value. So, in the example above the "2" would be used
+to determine the type of the array - so it should come out
+as C<Integer_Type> - and the array dimensions are taken to
+be C<[3,2]>.
+
+=head4 How to confuse the array conversion (by data type)
+
+Since the code only looks at the first element in the
+array to guess the type it is not too hard to come across
+arrays that will cause the code to croak with some bizarre
+message from S-Lang.
+For instance:
+
+  [ 1, 2, "a string" ]
+
+will cause a problem since it is assumed to be an
+C<Integer_Type [3]> array, which is fine for the first two
+elements but not for the last one.
+
+The code could be updated so that it checks all elements
+in the array and finds the most suitable type and
+dimensionality; however,
+this could be a large performance hit for large
+arrays and the current advice is to use one of the 
+techniques we describe below.
+
+=head4 How to confuse the array conversion (by array size)
+
+The code assumes that the array dimensions it calculates
+hold for all elements. If they don't then you will see 
+error messages (quite possibly strange ones at that).
+As an example,
+
+  [ [ 2, 1 ], [1] ]
+
+is guaranteed not to be liked by the code; on my machine
+it dislikes it so much that it causes a B<segmentation fault>.
+Even if we were to loop through every element, checking
+the dimensionality of the array, it is not clear how this
+array should be represented in S-Lang.
+
+=head3 How can I help?
+
+If you know the array size and/or type then you can use
+the C<Inline::SLang::sl_array()> function to help the
+code out. As an example (see also F<examples/array_help.pl>):
+
+  use Inline 'SLang' => Config => EXPORT =>
+       [ 'sl_array', 'Integer_Type' ];
+  use Inline 'SLang';
+
+  my $aref = [ 1, 3, 2 ];
+  foo( $aref );
+  foo( sl_array( $aref, "Int_Type" ) );
+  foo( sl_array( $aref, [3] ) );
+  foo( sl_array( $aref, [3], Integer_Type() ) );
+
+  __END__
+  __SLang__
+
+  define foo(x) { vmessage("Array has type: %S", _typeof(x) ); }
+
+which produces four lines saying
+
+  Array has type: Integer_Type
+
+Note that I snuck in an example of using an
+automatically-generated wrapper around the C<DataType_Type>
+constructor - the C<Integer_Type()> function in the last call
+to C<foo()>.
+
+Unfortunately you can I<not> use C<sl_array()> to
+typecast the array: at least not at the moment.
+If you replace C<Int_Type> with C<String_Type> 
+in the above then you will come across the following error
+message
+
+  S-Lang Error: Type Mismatch: Unable to typecast Integer_Type to String_Type
+
+even though Perl can happily treat 1 as an integer or
+a string. Suggestions on how to handle this case are welcome.
+
+The C<sl_array()> function is actually a wrapper around the
+constructor call for the C<Array_Type> class which tries to guess
+the array type and size if they have not been supplied.
+
+=head2 Things to remember when converting arrays to Perl
+
+There are three different ways that a S-Lang array
+can be represented in Perl:
+
+=over 4
+
+=item 1
+
+As a reference to a Perl array.
+
+=item 2
+
+As a piddle (see the L<Perl Data Language|PDL::Intro>
+documentation) for numeric types. 
+
+Please see the L<"Issues with the PDL support">
+section below.
+
+=item 3
+
+As an C<Array_Type> object.
+
+=back
+
+In most cases the first two representations are likely
+to be the ones you use; the use of an C<Array_Type>
+object is only needed when it is I<hard> for the code to
+guess the type/dimensionality of an array.
+
+The C<Inline::SLang::sl_array2perl()> function
+is used to define how S-Lang arrays are converted to
+Perl, and to find out what the current conversion
+system is. This function is described in
+L<Inline::SLang>.
+
+=head3 Example
+
+  use Inline 'SLang' => Config => EXPORT => [ 'sl_array2perl' ];
+  use Inline 'SLang';
+
+  # use array references for all S-Lang arrays
+  sl_array2perl(0);
+  my $a0 = get_array();
+  print "Array returned as an " . ref($a0) . "\n";
+  print "  dim size = " . (1+$#$a0) . "\n";
+
+  # use Array_Type for all S-Lang arrays
+  sl_array2perl(1);
+  my $a1 = get_array();
+  print "Array returned as an " . ref($a1) . "\n";
+  my ( $dims, $ndim, $atype ) = $a1->array_info();
+  print "  dim size = $$dims[0]\n";
+  print "  type     = $atype\n";
+
+  # use a piddle (assumes Inline::SLang::sl_have_pdl() == 1)
+  sl_array2perl(2);
+  my $a2 = get_array();
+  print "Array returned as an " . ref($a2) . "\n";
+  print "  dim size = " . $a2->dims(0) . "\n";
+  print "  type     = " . $a2->type . "\n";
+
+  __END__
+  __SLang__
+
+  define get_array() { return [ 14.0, 3 ]; }
+
+This example is available as F<examples/array_conversion.pl>
+in the source distribution.
+When run this outputs:
+
+  Array returned as an ARRAY
+    dim size = 2
+  Array returned as an Array_Type
+    dim size = 2
+    type     = Double_Type
+  Array returned as an PDL
+    dim size = 2
+    type     = double
+
+=head1 Issues with the PDL support
+
+=head2 How to access array elements
+
+Although both languages
+deal with n-dimensional arrays, they use different
+indexing schemes: PDL uses the FORTRAN-like method
+where the first index loops fastest, whilst S-Lang
+uses the C indexing scheme, where the last index
+loops fastest. This means that a 2 by 3 array in
+PDL is represented as a 3 by 2 array in S-Lang.
+
+=head2 Handling "virtual" piddles
+
+Currently, any "virtual" piddle sent to a S-Lang function
+will be "made physical". This ensures that the S-Lang
+function is sent the correct data but will lead to
+increased memory use. As an example, if C<foo()> is
+a S-Lang function then
+
+  $a = sequence(10);
+  $b = $a(2:5);
+  print $b->info( "Type: %T Dim: %-15D State: %S" );
+  foo( $b );
+  print $b->info( "Type: %T Dim: %-15D State: %S" );
+
+will change C<$b> just as if
+L<make_physical()|PDL::Core/PDL::make_physical> had been called
+on it. The output of the two print lines would be:
+
+  Type: Double Dim: D [4]           State: -C
+  Type: Double Dim: D [4]           State: P
+
+=head2 Dealing with piddles with zero dimensionality
+
+In PDL you can have piddles with zero dimensionality.
+I have not yet decided whether these should be converted to
+S-Lang as a scalar or a single-element array. Either
+choice would result in loss of information if the variable
+were returned to Perl.
+
+It should be possible to change the way the data from the
+piddle is accessed to avoid this.
+
+=head2 Support for 64-bit machines
+
+The PDL support has only been tested on 32-bit machines, so
+it is possible that things may not work well on 64-bit machines.
+
+=head1 THE ARRAY_TYPE CLASS
+
+The Perl C<Array_Type> class stores the datatype and
+dimensionality of an array along with the data.
+In most cases this information is not needed
+so you should stick with using array references (or
+I<piddles>) since it's much easier, but there are times when it can
+come in handy.
+
+The C<Array_Type> class inherit the default methods
+of all the Inline::SLang objects, namely:
+
+=over 2
+
+=item *
+
+C<typeof()>
+
+This returns C<Array_Type> as a C<DataType_Type>
+object. See the C<_typeof()> method below to
+find the datatype used to store the data. 
+
+=item *
+
+C<stringify()>
+
+This returns the string "Array_Type".
+
+=item *
+
+C<is_struct_type()>
+
+This returns 0.
+
+=back
+
+As with the other object classes these methods can
+only be called using the C<< $object->method( args ) >>
+syntax.
+There are also a number of additional methods
+for this class:
+
+=over 2
+
+=item * C<new( datatype, dims [, data ] )>
+
+The constructor takes the datatype of the array -
+as either a string or a C<DataType_Type> object - and
+an array reference containing the size of the array and
+returns an C<Array_Type> object. If a third argument
+is supplied then it is taken to be an array reference
+containing the data to be stored in the array.
+Note that in this case we just copy the array reference
+and B<not> the actual data stored in this array. This
+means that you can change the data stored in the
+object: useful, but can cause bizarre behaviour for the
+unwary.
+
+  my $arr1 = Array_Type->new( "Int_Type", [3,2] );
+  my $arr2 = Array_Type->new(
+               "String_Type", [3],
+               [ "a string", "another string", "boo" ]
+             );
+
+There is B<no> sanity checking of the input values;
+if they do not agree then something strange will happen at
+some point during the execution of the progam.
+
+An alternative way to create an C<Array_Type> object
+is to use the C<Inline::SLang::sl_array()> function,
+which is described in the L<Inline::SLang|Inline::SLang>
+document. This has the advantage that it will try and
+guess the type and/or dimensionality of the array
+if you do not specify it.
+
+=item * C<_typeof()>
+
+Returns - as a C<DataType_Type> object - the class
+of the data stored in the array.
+
+  my $arr1 = Array_Type->new( "Int_Type", [3,2] );
+  my $type = $arr1->_typeof();
+
+=item * C<array_info()>
+
+Mimics the S-Lang C<array_info()> function (slightly
+more efficient than using the S-Lang version). The
+array dimensions are returned as a Perl array reference
+and the datatype as a C<DataType_Type> object.
+
+  my $arr1 = Array_Type->new( "Int_Type", [3,2] );
+  my ( $dims, $ndims, $type ) = $arr1->array_info();
+  print "Num of dims = $ndims and type = $type\n";
+  print "Dims = [ " . join( ", ", @$dims ) . " ]\n";
+
+=item * C<get( coord1, ..., coordN )>
+
+Returns the data value stored at the given location.
+
+  my $arr1 = Array_Type->new( "Int_Type", [3,2] );
+  my $val  = $arr1->get(1,0);
+
+=item * C<set( coord1, ..., coordN, newval )>
+
+Sets the data value stored at the given location
+to the specified value. It returns this value.
+
+  my $arr1 = Array_Type->new( "Int_Type", [3,2] );
+  $arr1->set(1,0,-43);
+
+Note that there is no check made that the datatype
+of the new value matches that of the array. You
+will find out about this when you try to convert the
+array to S-Lang, probably with a rather unfriendly
+message.
+
+=item * C<toPerl()>
+
+Since the accessor functions described above
+are very limited, the C<toPerl()> can be used
+to get an array reference to the actual data. This
+can then be used as you would any other Perl array
+reference. If you change the array size then
+you are going to make the object unhappy, so take care.
+
+  my $arr1 = Array_Type->new( "Int_Type", [3,2] );
+  my $dref = $arr1->toPerl();
+  $$dref[1][0] = -4;
+
+=back
+
+Further methods could be added to improve the array access -
+such as the C<resize> S-Lang function and means of accessing array
+slices - but this is unlikely to happen since PDL has a
+I<much> richer set of operations (although they only work for
+numeric types), or you can do the array processing in S-Lang.
+
+=head1 SEE ALSO
+
+L<Inline::SLang::Assoc>, L<Inline::SLang::Types>, L<Inline::SLang>, L<PDL>
+
+

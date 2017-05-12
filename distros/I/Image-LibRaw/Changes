@@ -1,0 +1,14 @@
+Revision history for Perl extension Image::LibRaw
+
+0.03
+
+    - modernize package
+
+0.02
+ 
+    NO FEATURE CHANGES.
+    - updated ppport.h, bindpp.h
+    - use M::I::* stuff.
+
+0.01    Thu Mar 26 18:07:50 2009
+        - original version

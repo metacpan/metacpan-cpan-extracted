@@ -1,0 +1,17 @@
+Revision history for IPC-Concurrency
+
+0.5     2008-03-28 17:00:00 CET
+        Added Test::Exception to Makefile.PL
+
+0.4     2008-03-18 18:00:00 CET
+        Fixed version inconsistency - 0.3 for file vs 0.03 declared in module
+
+0.03    2008-03-17 14:00:00 CET
+        Removed Build.PL as pointed in http://rt.cpan.org/Ticket/Display.html?id=34071
+
+0.02    2008-03-13 16:00:00 CET
+        Fixed "Use of uninitialized value in subroutine entry at (...) /IPC/ShareLite.pm line 352."
+
+0.01    2008-03-13 13:00:00 CET
+        First version, released on an unsuspecting world.
+

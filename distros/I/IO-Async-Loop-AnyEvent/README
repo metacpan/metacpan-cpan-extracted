@@ -1,0 +1,51 @@
+NAME
+    "IO::Async::Loop::AnyEvent" - use "IO::Async" with "AnyEvent"
+
+SYNOPSIS
+     use IO::Async::Loop::AnyEvent;
+
+     my $loop = IO::Async::Loop::AnyEvent->new();
+
+     $loop->add( ... );
+
+     $loop->add( IO::Async::Signal->new(
+           name => 'HUP',
+           on_receipt => sub { ... },
+     ) );
+
+     $loop->loop_forever();
+
+DESCRIPTION
+    This subclass of IO::Async::Loop uses AnyEvent to perform its work.
+
+CONSTRUCTOR
+  $loop = IO::Async::Loop::AnyEvent->new
+    This function returns a new instance of a "IO::Async::Loop::AnyEvent"
+    object.
+
+BUGS
+    *   "watch_idle" and "unwatch_idle" don't work properly against
+        "AnyEvent::Impl::IOAsync". At least, the unit tests fail, and some
+        scheduled CODErefs never get executed, and sit in the internal queue
+        of the inner-nested "IO::Async::Loop" that "AnyEvent::Impl::IOAsync"
+        itself constructed. An easy workaround here is simply to pick
+        another AnyEvent model, by using the "PERL_ANYEVENT_MODEL"
+        environment variable.
+
+        That all said, I am honestly surprised this is the only thing that
+        breaks, when "IO::Async" is nested upon "AnyEvent" itself running
+        atop another "IO::Async".
+
+    *   The implementation of the "loop_once" method requires the use of an
+        undocumented "AnyEvent" method ("one_event" before version 6,
+        "_poll" thereafter). This happens to work at the time of writing,
+        but as it is undocumented it may be subject to change.
+
+        The "loop_forever" method does not rely on this undocumented method,
+        so should be safe from upstream changes. Furthremore, if "AnyEvent"
+        rather than "IO::Async" remains ultimately in control of the
+        runtime, by waiting on condvars, this should not be problematic.
+
+AUTHOR
+    Paul Evans <leonerd@leonerd.org.uk>
+

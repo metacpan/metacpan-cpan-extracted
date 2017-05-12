@@ -1,0 +1,231 @@
+#!/usr/bin/perl
+use strict;
+use YAML;
+use IPC::Open3;
+
+use IPTables::Mangle;
+
+=head1 NAME
+
+ipmangle - Manage iptables rules with YAML files
+
+=head1 SYNOPSIS
+
+   usage: ipmangle --config=[file] [ test | commit | dump | out=[file] ]
+
+   --config   | takes a YAML file
+   --dump     | prints processed iptable rules to stdout
+   --commit   | commits rules
+   --test     | tests rules
+   out=[file] | dumps iptables rules to file
+
+=head1 CONFIGURATION FILE
+
+The configuration file is a YAML data-structure interpreted by the L<IPTables::Mangle> module.
+
+=head1 EXAMPLE FILE
+
+   filter:
+       forward: { default: drop }
+       foo:
+           rules:
+              - src: 9.9.9.9
+              - src: 10.10.10.10
+                action: drop
+       input:
+           # by default, do not allow any connections unless authorized
+           # in the rules below
+           default: drop
+
+           # by default, if no "action" is given to a rule below, accept it
+           default_rule_action: accept 
+
+           rules:
+               # Accept all traffic on loopback interface
+               - in-interface: lo
+
+               # Don't disconnect existing connections during a rule change.
+               - { match: state, state: 'ESTABLISHED,RELATED' }
+
+               # Allow for pings (no more than 10 a second)
+               - { protocol: icmp, icmp-type: 8, match: limit, limit: 10/sec }
+
+               # Allow these IPs, no matter what
+               - src: 123.123.123.123
+
+               # example of blocking an IP 
+               - { action: drop, src: 8.8.8.8 }
+
+               # example of allowing ip to connect to port 25 (smtp) (one-line)
+               - { protocol: tcp, dport: 25, src: 4.2.2.2 }
+
+               # jump to rules defined in "foo" above
+               - action: foo
+
+               # if there are no more rules, reject the connection with icmp, don't just let it hang
+               - action: reject
+                 action_options:
+                     reject-with: icmp-admin-prohibited
+
+=cut
+
+my $iptables_restore = '/sbin/iptables-restore';
+
+sub main
+{
+    # grab options
+    my $options = _parse_options();
+
+    my $file = $options->{config};
+    return &usage() unless $file;
+
+    die "$0: $file does not exist\n" unless -e $file;
+
+    my $config = Load(_get_file_contents($file));
+    my $iptables_rules = IPTables::Mangle::process_config($config);
+
+    if ($options->{test})
+    {
+        my($wtr, $rdr, $err);
+        my $pid = open3($wtr, $rdr, $err, $iptables_restore, '--test');
+        print $wtr $iptables_rules;
+        close($wtr);
+        waitpid( $pid, 0 );
+
+        my $error = '';
+        $error .= $_ while (<$rdr>);
+
+        my $child_exit_status = $? >> 8;
+
+        if ($child_exit_status)
+        {
+            warn "$0: iptables file failed\n======\n$error\n";
+            exit(1);
+        }
+        else
+        {
+            warn "$0: File parsed successfully\n";
+            exit(0);
+        }
+    }
+    elsif ($options->{commit})
+    {
+        my($wtr, $rdr, $err);
+        my $pid = open3($wtr, $rdr, $err, $iptables_restore, '--verbose');
+        print $wtr $iptables_rules;
+        close($wtr);
+        waitpid( $pid, 0 );
+
+        my $child_exit_status = $? >> 8;
+
+        my $error = '';
+        $error .= $_ while (<$rdr>);
+
+        my $host = &_local_host();
+
+        if ($child_exit_status)
+        {
+            warn "[$host $0]: iptables file failed\n======\n$error\n";
+            exit(1);
+        }
+        else
+        {
+            warn "[$host $0]: Successfully committed rules\n";
+            exit(0);
+        }
+    }
+    elsif ($options->{dump})
+    {
+        print $iptables_rules;
+    }
+    elsif ($options->{out})
+    {
+        open(my $tmp_f, "> $options->{out}");
+        print $tmp_f $iptables_rules;
+        close($tmp_f);
+    }
+    else
+    {
+        usage();
+    }
+}
+
+sub _local_host
+{
+    open(my $fh, "/etc/hostname");
+    my $hostname = <$fh>;
+    close($fh);
+
+    $hostname =~ s/\..*$//g;
+    $hostname =~ s/[\n\r]//g;
+
+    return $hostname;
+}
+
+sub _get_file_contents
+{
+    my $file = shift;
+
+    open(my $fh, $file);
+    my @content = <$fh>;
+    close($fh);
+
+    return join('', @content);
+}
+
+# quick and dirty
+sub _parse_options
+{
+    my %options;
+
+    my @acceptable_options = qw(
+        config commit test dump out
+    );
+
+    for my $arg (@ARGV)
+    {
+        # cleanse all parameters of all unrighteousness
+        #   `--` & `-` any parameter shall be removed
+        $arg =~ s/^--//;
+        $arg =~ s/^-//;
+
+        # does this carry an assignment?
+        if ($arg =~ /=/)
+        {
+            my ($key, $value) = split('=', $arg);
+
+            $options{$key} = $value;
+        }
+        else
+        {
+            $options{$arg} = 1;
+        }
+    }
+
+    for my $option (keys %options)
+    {
+        die("[$0] `$option` is an invalid option")
+            unless (grep { $_ eq $option } @acceptable_options)
+    }
+
+    return \%options;
+}
+
+sub usage
+{
+    warn "usage: $0 --config=[file] [ test | commit | dump | out=[file] ]\n";
+}
+
+exit __PACKAGE__->main;
+
+=head1 AUTHORS
+
+Bizowie <http://bizowie.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2013 Bizowie
+
+This library is free software. You can redistribute it and/or modify it under the same terms as Perl itself.
+
+=cut

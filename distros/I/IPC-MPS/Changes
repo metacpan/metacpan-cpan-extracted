@@ -1,0 +1,66 @@
+Revision history for Perl extension IPC::MPS.
+
+0.19  1016-08-08
+	- vpid2pid
+
+0.18  2016-04-07
+	- fix error: do not sending messages when the target was eliminated
+
+0.17  2016-04-01
+	- fix error: do not sending messages when the target was eliminated
+
+0.16  2015-04-01
+	- "close" and "exit" messages are special
+
+0.15  2015-02-18
+	- fix ipc_loop flag
+
+0.14  2014-02-04
+	- SPAWN_CLOSED
+
+0.13  2012-09-24
+	- quit for receive
+
+0.12  2012-04-14
+	- connected flag in NODE_CLOSED
+	- your own pack and unpack functions, instead of Storable
+
+0.11  2011-03-12
+	- Fix Makefile.PL
+
+0.10  2011-03-02
+	- Fix Makefile.PL
+
+0.09  2010-10-19
+	- Laziness in message processing supported
+	- IPC::MPS::EV: using EV "default event loop"
+	- Event and EV based side modules support (directly or thru AnyEvent)
+
+0.08  2010-07-21
+	- Distributed Programming
+
+0.07  2010-02-01
+	- Fix two errors bonded with "wt" sub
+
+0.06  2010-01-29
+	- Small cleaning code
+
+0.05  2010-01-24
+	- IPC::MPS::Event
+	- IPC::MPS::EV
+
+0.04  2010-01-22
+	- Fix logic error bonded with "wt" sub into IPC::MPS
+
+0.03  2010-01-14
+	- waiting for a response to a specific message
+	- doc
+	- test
+
+0.02  2010-01-03
+	- exit on parent exit
+	- demo
+	- doc
+
+0.01  2009-12-12
+	- original version

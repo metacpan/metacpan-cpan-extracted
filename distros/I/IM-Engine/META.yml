@@ -1,0 +1,39 @@
+---
+abstract: 'The HTTP::Engine of instant messaging'
+author:
+  - 'Shawn M Moore, C<sartak@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: IM-Engine
+no_index:
+  directory:
+    - examples
+    - inc
+    - t
+recommends:
+  AnyEvent::IRC: 0
+  AnyEvent::XMPP: 0
+  HTML::TreeBuilder: 0
+  Net::OSCAR: 0
+requires:
+  Data::OptList: 0
+  Moose: 0
+  MooseX::AttributeHelpers: 0
+  MooseX::Role::Parameterized: 0
+  MooseX::StrictConstructor: 0
+  MooseX::Traits: 0
+  Scalar::Util: 0
+  perl: 5.8.1
+resources:
+  homepage: http://github.com/sartak/IM-Engine/tree
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/sartak/IM-Engine.git
+version: 0.06

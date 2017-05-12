@@ -1,0 +1,25 @@
+#!/usr/bin/perl
+use strict; use warnings;
+
+use Inline TT2 => 'DATA';
+
+print hello( { name => 'Rob' } ), "\n";
+# prints '<H1> Hello Rob, how are you? </H1>'
+
+print goodbye( { name => 'Mr. Mitchell' } ), "\n";
+# print '<H1> Goodbye Mr. Mitchell, have a nice day. </H1>'
+
+# Note that in all cases, there is a lot of trimming.  This includes:
+#	Removing any text left over when template directives are removed by tt2
+#   Stripping all leading and trailing spaces.
+# At present these are not configurable.
+
+__DATA__
+__TT2__
+[% BLOCK hello %]
+    <H1> Hello [% name %], how are you? </H1>
+[% END %]
+[% BLOCK goodbye %]
+	<H1> Goodbye [% name %], have a nice day. </H1>
+[% END %]
+

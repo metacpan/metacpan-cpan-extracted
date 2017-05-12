@@ -1,0 +1,24 @@
+CHANGES
+lib/Interchange6.pm
+lib/Interchange6/Cart.pm
+lib/Interchange6/Cart/Cost.pm
+lib/Interchange6/Cart/Product.pm
+lib/Interchange6/Role/Costs.pm
+lib/Interchange6/Types.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/README
+t/00-base.t
+t/01-combine-by-sku.t
+t/author/manifest.t
+t/author/pod-coverage.t
+t/author/pod.t
+t/costs.t
+t/unit/cart.t
+t/unit/cart_product.t
+t/unit/cost.t
+t/unit/costs_role.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

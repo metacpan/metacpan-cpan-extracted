@@ -1,0 +1,54 @@
+Copyright 2011, 2012 Kevin Ryde
+
+This file is part of Image-Base-Imager.
+
+Image-Base-Imager is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation; either version 3, or (at
+your option) any later version.
+
+Image-Base-Imager is distributed in the hope that it will be
+useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with Image-Base-Imager.  If not, see <http://www.gnu.org/licenses/>.
+
+
+
+
+Version 11, November 2012
+    - xy() allow for x,y outside image size
+    - tests don't use "raw" as test file type
+
+Version 10, August 2011
+    - fix xy() pixel query green/blue return
+
+Version 9, August 2011
+    - fix diamond() coordinates
+
+Version 8, August 2011
+    - tests fix test count
+
+Version 7, July 2011
+    - new -quality_percent option for JPEG
+    - diamond() use polyline
+
+Version 6, April 2011
+    - debian/control fix Depends libimager-perl
+
+Version 5, February 2011
+    - Makefile.PL ask for a tolerably new Imager for the oop interface
+
+Version 4, February 2011
+    - tests use plain Test.pm instead
+
+Version 3, February 2011
+    - fix Makefile.PL for perl 5.6 and earlier
+
+Version 2, January 2011
+    - tests allow for no png support
+
+Version 1, January 2011
+    - the first version

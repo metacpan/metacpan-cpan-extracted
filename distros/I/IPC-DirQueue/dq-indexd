@@ -1,0 +1,61 @@
+#!/usr/bin/perl
+=head1 NAME
+
+dq-indexd - index server for IPC::DirQueue tasks
+
+=head1 SYNOPSIS
+
+B<dq-indexd> --port I<port>
+
+=head1 DESCRIPTION
+
+B<dq-indexd> is a single-process event-driven daemon, used by C<IPC::DirQueue>
+to track queue activity at a centralised point.
+
+C<IPC::DirQueue> uses a filesystem directory to hold its queue files, and
+normally uses the normal UNIX filesystem C<readdir> APIs to list the queue.
+
+However, in certain situations when NFS is in use, these APIs may scale poorly,
+and a TCP/IP-based central server may be more appropriate (although adding a
+new single point of failure).  C<dq-indexd> makes this possible.
+
+=head1 REQUIRED MODULES
+
+POE
+
+=head1 SEE ALSO
+
+IPC::DirQueue(3)
+dq-deque(1)
+dq-list(1)
+dq-server(1)
+dq-submit(1)
+
+=cut
+
+use lib 'lib';
+use lib '../lib';
+
+use strict;
+use warnings;
+use Getopt::Long;
+
+use IPC::DirQueue::IndexServer;
+
+sub usage {
+  die "usage: dq-indexd --port port\n";
+}
+
+our $opt_port = 0;
+
+GetOptions(
+  'port=s' => \$opt_port,
+) or usage();
+$opt_port or usage();
+
+my $idx = IPC::DirQueue::IndexServer->new({
+        port => $opt_port,
+      });
+
+$idx->run();
+

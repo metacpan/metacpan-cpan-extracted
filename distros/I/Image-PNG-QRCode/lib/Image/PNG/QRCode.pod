@@ -1,0 +1,412 @@
+
+=encoding UTF-8
+
+=head1 NAME
+
+Image::PNG::QRCode - make a PNG image containing a QR code from text
+
+=head1 SYNOPSIS
+
+    
+    use Image::PNG::QRCode 'qrpng';
+    qrpng (text => 'boom shake shake shake the room', out => 'shake.png');
+    
+
+
+(This example is included as L<F<synopsis.pl>|https://api.metacpan.org/source/BKB/Image-PNG-QRCode-0.07/examples/synopsis.pl> in the distribution.)
+
+
+=head1 VERSION
+
+This documents Image::PNG::QRCode version 0.07
+corresponding to git commit L<3044488671774bd11adaeda5554671364cd3b0e2|https://github.com/benkasminbullock/image-png-qrcode/commit/3044488671774bd11adaeda5554671364cd3b0e2> released on Mon Feb 6 10:14:48 2017 +0900.
+
+=head1 DESCRIPTION
+
+This module converts input text to a PNG image of a QR code containing
+the text. The PNG image can either be stored to a file or it can be a
+scalar.
+
+Image::PNG::Libpng requires "libpng" to be installed. "libpng" should
+already be installed on most Linux and Windows systems.
+
+=head1 FUNCTIONS
+
+=head2 qrpng
+
+    my $png = qrpng (text => 'this is my text');
+
+This makes a scalar PNG data in C<$png> containing the QR code PNG.    
+    
+    qrpng (in => 'file.txt', out => 'file.png');
+
+This makes a PNG file F<file.png> from the contents of F<file.txt>.
+
+=head3 qrpng options
+
+The function takes the following options.
+
+=over
+
+=item text
+
+    qrpng (text => 'this is my text');
+
+Text to convert to a QR code.
+
+=item in
+
+    qrpng (in => 'file.txt');
+
+C<in> specifies an input file of text to convert to a QR code. If you
+specify both C<text> and C<in>, the module prints a warning message
+and uses the contents of C<in>, overwriting the value of C<text>.
+
+=item out
+
+C<out> specifies an output file or a scalar to put the PNG data into.
+
+     qrpng (out => 'file.png');
+
+writes to F<file.png>, but
+
+     qrpng (out => \$s);
+
+writes the PNG data into a scalar C<$s>.
+
+=item version
+
+    qrpng (in => 'in.txt', out => 'out.png', version => 40);
+
+C<version> specifies the "version" of the QR code. The "version" is
+the "size" of the barcode, which controls the amount of information it
+can contain. The maximum value of "version" is 40. If no version is
+specified, the program chooses one using the length of the text. If
+you choose a version which is too small for the input data, a fatal
+error occurs. Usually it isn't necessary to set this parameter.
+
+=item level
+
+    qrpng (in => 'in.txt', out => 'out.png', level => 4);
+
+Specify the amount of error checking code (ECC) to use. The default is
+level one, which corresponds to 7% error tolerance. The level can go
+up to 4, which corresponds to 30% error tolerance. Values less than
+one or greater than four cause a fatal error.
+
+=item quiet
+
+    qrpng (in => 'in.txt', out => 'out.png', quiet => 9);
+
+C<quiet> is a non-negative integer which specifies the size of the
+"quiet zone", the white area around the QR code, in units of
+"modules", the size of one black square of the QR code. The default is
+4 modules. The QR specification requires a minimum of a four-module
+quiet zone, but you could set this to zero if, for example, you are
+going to embed the image in a white background, so it's not an error
+to set this lower. There is an arbitrary upper limit of 100
+imposed. Note that changing this size makes little difference to the
+output PNG's size because it's just a white area which is compressed
+to take little room.
+
+=item scale
+
+    qrpng (in => 'in.txt', out => 'out.png', scale => 9);
+
+C<scale> is a positive integer which specifies how many pixels one
+"module" (one block of the QR code) occupies. The default is 3. You
+can't use fractional values. An arbitrary upper limit of 100 is
+imposed.
+
+=item size
+
+    qrpng (text => 'lime green', size => \$size);
+
+Get the size (height and width in pixels) of the output PNG. This
+requires a scalar reference.
+
+=back
+
+=head1 DIAGNOSTICS
+
+=over
+
+=item Overwriting input text '$options{text}' with contents of file $options{in}
+
+(Warning) User requested conflicting options.
+
+=item No input
+
+(Fatal) No file or text input was supplied to L</qrpng>
+
+=item quiet zone cannot be negative
+
+(Fatal) User value for L</quiet> was negative
+
+=item requested quiet zone, $options{quiet}, exceeds arbitrary maximum of 100
+
+(Fatal) User requested very large quiet zone
+
+=item negative or zero scale $options{scale}
+
+(Fatal) L</scale> was negative or zero
+
+=item scale option needs to be an integer
+
+(Fatal)
+
+=item requested scale, $options{scale}, exceeds arbitrary maximum of 100
+
+(Fatal) See L</scale>.
+
+=item Bad version number $options{version}: use integer between one and forty
+
+(Fatal) See L</level>.
+
+=item Bad level number $options{level}: use integer between one and four
+
+(Fatal) See L</level>.
+
+=item size option requires a scalar reference
+
+(Warning) See L</size>. In this case, the supplied value is deleted
+from the inputs.
+
+=item Return value used twice
+
+(Warning) The user used both the return value of qrpng and specified
+the L</out> option.
+
+=item Output discarded: use return value or specify 'out => \$value'
+
+(Warning) The user called qrpng in void context and with the L</out>
+option unspecified.
+
+=back
+
+=head1 SCRIPT
+
+There is a script "qrpng" installed with the module:
+
+    qrpng "earphone pad" 
+
+makes F<qrcode.png>. Try
+
+    qrpng --help
+
+for more options.
+
+=head1 EXAMPLES
+
+=head2 qrpng-data.pl
+
+This example makes a data URL QR code:
+
+    
+    use Image::PNG::QRCode 'qrpng';
+    use URI;
+    my $data = 'abcdefghijklmnopqrstuvwxyz';
+    my $u = URI->new ('data:');
+    $u->media_type ('image/png');
+    $u->data (qrpng (text => $data));
+    print "<img src='$u'>\n";
+
+
+(This example is included as L<F<qrpng-data.pl>|https://api.metacpan.org/source/BKB/Image-PNG-QRCode-0.07/examples/qrpng-data.pl> in the distribution.)
+
+
+=head2 qrpng CGI script
+
+This example CGI (common gateway interface) script makes a PNG from a
+user's input.
+
+    
+    use Image::PNG::QRCode 'qrpng';
+    use URI::Escape;
+    
+    my $request = $ENV{QUERY_STRING};
+    if ($request) {
+        my %params;
+        my @params = split /\&/, $request;
+        for my $param (@params) {
+            my ($k, $v) = split /=/, $param;
+            if ($k && $v) {
+                $v =~ s/\+/ /g;
+                $params{$k} = uri_unescape ($v);
+            }
+        }
+        if ($params{w}) {
+            send_qr_code (%params);
+        }
+    }
+    print <<EOF;
+    Content-Type: text/plain
+    Status: 400
+    
+    You didn't send anything, use me like this: qrpng.cgi?w=message-to-encode
+    EOF
+    exit;
+    
+    sub send_qr_code
+    {
+        my (%params) = @_;
+        my $w = $params{w};
+        my $s;
+        eval {
+            qrpng (text => $w, out => \$s);
+        };
+        if ($@) {
+            print <<EOF;
+    Content-Type: text/plain
+    Status: 500
+    
+    qrpng failed like this: $@
+    EOF
+            exit;
+        }
+        binmode STDOUT, ":raw";
+        my $l = length $s;
+        print <<EOF;
+    Content-Type: image/png
+    Content-Length: $l
+    
+    $s
+    EOF
+        exit;
+    }
+
+
+(This example is included as L<F<qrpng.pl>|https://api.metacpan.org/source/BKB/Image-PNG-QRCode-0.07/examples/qrpng.pl> in the distribution.)
+
+
+=head1 SEE ALSO
+
+=head2 About QR codes
+
+L<QRCode.com from Denso Wave|http://www.qrcode.com/en/index.html>, the
+inventors of the QR code, contains much information.
+
+=head2 Other QR code generators
+
+=head3 On CPAN
+
+=over
+
+=item Imager::QRCode
+
+L<Imager::QRCode> is based on the L<Imager> module and libqrencode.
+
+=item Text::QRCode
+
+L<Text::QRCode> makes a text QR code. It's based on libqrencode.
+
+=item HTML::QRCode
+
+L<HTML::QRCode> is an HTML QR code system based on L<Text::QRCode>.
+
+=item Term::QRCode
+
+L<Term::QRCode> makes QR codes on terminal windows. It's based on
+L<Text::QRCode>.
+
+=item  PostScript::Barcode::qrcode
+
+This is part of L<PostScript::Barcode>. It's actually PostScript
+rather than Perl.
+
+=item Image::QRCode::Effects
+
+L<Image::QRCode::Effects> is based on L<Imager::QRCode> and adds
+"effects commonly used on QRCodes to make them look interesting".
+
+=item GD::Barcode::QRcode
+
+Pure-Perl implementation of QR codes using the GD library for the
+graphical part. At the time of writing, the last update was in 2004.
+
+=back
+
+=head3 Non-CPAN
+
+=over
+
+=item qrduino
+
+L<qrduino|https://github.com/tz1/qrduino> is a QR code generator
+developed by Tom Zerucha for a microcomputer platform called the
+Arduino. Image::PNG::QRCode is a fork of this project.
+
+=item libqrencode
+
+L<libqrencode|http://fukuchi.org/works/qrencode/index.html.en> is the
+library underlying L<Text::QRCode> and its dependents.
+
+=item Google Charts QR code generator
+
+L<Google Charts offers a QR code
+generator|https://developers.google.com/chart/infographics/docs/qr_codes>.
+The QR codes generated by Image::PNG::QRCode are about 1/3 the size of
+the default Google charts ones, for example the "Hello world" example
+in the above documentation is 728 bytes, but Image::PNG::QRCode makes
+an equivalent QR code using only 243 bytes. The reason for the reduced
+size is that Google Charts uses RGB colour space, whereas
+Image::PNG::QRCode uses one-bit monochrome colour space.
+
+=item ZXing
+
+L<ZXing|https://github.com/zxing/zxing/> is a Java project which can
+generate QR codes. These are one-bit monochrome ones.
+
+=item QrCode.net
+
+L<QrCode.net|http://qrcodenet.codeplex.com/> is a .Net version.
+
+=item JavaScript qrcode generators
+
+These might be a useful alternative to using a server-side solution:
+
+L<http://d-project.googlecode.com/svn/trunk/misc/qrcode/js/>
+
+L<http://code.google.com/p/jsqrencode/downloads/list>
+
+However, sending these large JavaScript files over the internet will
+use much more bandwidth than sending the QR codes themselves, for most
+usage cases.
+
+=back
+
+=head1 BUGS
+
+The QR code PNG files are very small and various tricks are used to
+make the memory use and the PNG file very small. Although the original
+plan was to interoperate with L<Image::PNG::Libpng>, this ended up
+looking like a big burden to get only a small return, so this module
+actually just copies the parts of the code of
+L<Image::PNG::Libpng>. If you want to manipulate the output PNG file
+you'll need to read it in again and operate on it.
+
+The module isn't optimized for repeated uses, it builds up and tears
+down everything for each image.
+
+The QR encoding is not checked for correctness. The QR code library
+comes from the "qrduino" project, but the contents have been worked on
+so it's not clear whether it's still correct. Also there was a bug in
+the original thing leading to reading uninitialized memory.
+
+This encoder doesn't support the "shift-JIS" format. UTF-8 seems to
+pass through it OK. It doesn't use a BOM for the UTF-8.
+
+The QR codes have only been checked by using two Android smartphones.
+
+=head1 COPYRIGHT AND LICENCE
+
+The QR code creation part (the contents of F<qrencode.c> in the
+distribution) is copyright 2010, Tom Zerucha,
+L<https://github.com/tz1>. The rest of the module is copyright by Ben
+Bullock 2015-2017.
+
+This Perl module is licensed under the Gnu General Public Licence
+version 3.
+
+=cut
+

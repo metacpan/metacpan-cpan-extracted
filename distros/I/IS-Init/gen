@@ -1,0 +1,16 @@
+#!/usr/bin/perl -w
+use strict;
+use ExtUtils::ModuleMaker;
+
+Generate_Module_Files (
+    NAME     => 'IS::Init',
+    ABSTRACT => 'Clusterwide "init", spawn cluster applications',
+    AUTHOR => {
+      NAME => 'Steve Traugott', EMAIL => 'stevegt@TerraLuna.Org',
+      CPANID => 'STEVEGT', 
+      WEBSITE => 'http://www.stevegt.com',
+    },
+    VERSION  => 0.01,
+    LICENSE => 'perl'
+		      );
+

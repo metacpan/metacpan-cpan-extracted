@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# find po files 
+pofiles=`find -name "*.po"`
+for po in $pofiles
+do
+    mo=`echo $po | sed 's/.po/.mo/'`
+    echo "* building $mo"
+    msgfmt $po -o $mo
+done
+

@@ -1,0 +1,169 @@
+Revision history for IPC-Run-Fused
+
+1.000001 2017-03-08T14:46:47Z 9a6d4ee
+ - Bugfix: Avoid test failures with -Ddefault_inc_excludes_dot
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.000000, see misc/*.deps* for details
+ - configure: +1 (recommends: ↑1)
+ - develop: +14 ↑4 -3 (recommends: +1, suggests: ↑2)
+ - test: +1 ↓1 (recommends: ↑1 ↓1)
+
+1.000000 2014-10-03T05:04:57Z
+ [00 - Important - Version Scheme Change]
+ - Using 1.xxxyyy ( mantissa=6 ) instead of 0.xxxyyyzz
+ - This may affect hand-operated downstreams
+ - This is the primary reason for the 1.x on the box.
+
+ [01 - Important - Toolkit Switch]
+ - Tooling now uses ExtUtils::MakeMaker
+ - This may affect hand-operated downstreams
+ - "Latest" Testing dependencies now merely recommendations.
+ - https://questhub.io/realm/perl/quest/5388cc12bbd0be5b2500011f
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.04000100, see misc/*.deps* for details
+ - build: -1
+ - configure: +1 -1 (recommends: +1)
+ - develop: +46 -2 (recommends: -1, suggests: +1 ↑1)
+ - runtime: +2 -1 (suggests: -2)
+ - test: +2 ↓1 -2 (recommends: +3)
+
+ [Internals]
+ - use lower level Exporter code instead of Sub::Exporter
+ - Avoid need for builder method and bake implementation at USE
+ - Newer technique for passing vivifable references around internally employed to make parameter passing more apparent.
+
+ [Metadata]
+ - Specify email address in copyright data
+ - Migrate repo to kentnl org.
+
+ [Packaging]
+ - Smarter Handling of Win32 Prereqs
+
+0.04000100 2013-02-05T07:17:18Z
+ [BugFix]
+ - load IO::Handle in the test script.
+
+0.04000000 2013-02-05T05:14:00Z
+ [!Features]
+ - Should now actually work on Win32 due to the discovery of Win32::Job
+ - Fail behaviour should be more concise with additional context.
+
+ [BugFix]
+ - previous release accidentally dropped _fail method.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.03000000, see misc/*.deps* for details
+ - runtime: +2 ↑1 (suggests: +2)
+
+ [Internals]
+ - _fail method now unified via goto \&IPC::Run::Fused::_fail
+ - new ::Win32 namespace to implement Win32 Features
+
+ [Tests]
+ - reworked to not be order dependent, only flush-atomic.
+ - previously disabled tests re-enabled on Win32
+
+0.03000000 2013-02-03T00:47:09Z
+ [!Features]
+ - Most the code for Unix-like environments moved to ::POSIX with a proxy method in the main namespace that will defer
+   to the right backend depending on the value of $^O.
+ - This serves as a stepping stone to working Win32 Support.
+ - Win32 Currently causes a die() because its broken anyway atm.
+ - Added support for passing a coderef to run.
+ - IO::Pipe code dropped and just uses a plain `pipe` which is less magical.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.02000000, see misc/*.deps* for details
+ - runtime: ↓1 -2
+
+ [Modules::New]
+ - IPC::Run::Fused::POSIX
+
+ [Tests::New]
+ - t/03-captures-nodelay-fork.t
+
+0.02000000 2013-01-26T01:07:56Z
+ - Guts removed mostly and replaced with IO::Pipe, because the existing code was broken and not very portable.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.01028807, see misc/*.deps* for details
+ - runtime: +1
+
+0.01028807 2013-01-26T00:26:12Z
+ - Maint release.
+
+ [BugFixes]
+ - disabled tests on Win32. We have had it work on win32, but the tests are broken on win32, and we're not quite sure
+   why yet. Code is planned to have a total overhaul at some point.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.01028806, see misc/*.deps* for details
+ - build: ↑1
+ - configure: ↑1
+ - develop: +6 (recommends: +1, suggests: +1)
+ - runtime: +2 ↑1
+ - test: ↑1
+
+ [Documentation]
+ - add README.mkdn to dist
+ - normalise Changes to CPAN::Changes form
+ - update copyright license year
+ - reindent LICENSE file
+ - update fsf address
+
+ [Internals]
+ - declare $AUTHORITY
+ - change $VERSION declaration form
+
+ [Meta]
+ - set bug tracker to github issues
+ - use https:// for all git uris.
+ - add x_authority
+
+ [Packaging]
+ - move to @Author::KENTNL
+ - move author/release tests to xt/ and stay there
+
+ [Tests]
+ - regenerate 00-compile.t
+ - regenerate 000-report-versions-tiny.t
+
+0.01028806 2010-07-30T05:52:27Z
+ - Migrate code to [@KENTNL]
+ - Fix non-portable vstring in use $version;
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.01001607, see misc/*.deps* for details
+ - build: +1
+ - configure: +1
+ - runtime: +1 -2
+ - test: +4
+
+0.01001607 2009-11-06T06:34:07Z
+ - Native pipes by default.
+ - Removed needless POSIX::dup();
+ - Loads more error handling to try work out whats going wrong in tests.
+ - Reorgansied fork() code into a handy subroutine.
+ - Reduced Test-grinding from 400 to 100, as 100 seems enough to make problems turn up if there are any
+
+0.01001122 2009-11-01T21:22:16Z
+ - Fall back to native pipes if POSIX pipes fail. Experimental, so will carp.
+
+0.01000514 2009-10-26T13:46:20Z
+ - Hard depends on perl 5.8.0 or greater due to >>&= File Open
+ - Fixed up the absense of parentheses in synopsis and tests.
+ - Tidied Synopsis Code.
+ - run_fused( $fh, 'Command String | bar' ) will now be interpreted as
+ - if to look for a literal program sharing that literal name. To get the prior behaviour,
+ - pass a scalar ref instead, ie: run_fused( $fh, \'Command String' ).
+ - run_fused( $fh, @list ) now properly calls exec with exec { $program } @args
+ - dropped Time::HiRes and now use a stupid arthimetic loop to delay things.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.01000001, see misc/*.deps* for details
+ - runtime: -1
+
+0.01000001 2009-10-21T00:36:09Z
+ - First version.

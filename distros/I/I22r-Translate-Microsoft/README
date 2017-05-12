@@ -1,0 +1,139 @@
+I22r-Translate-Microsoft
+
+Microsoft backend for the Internationalizationizer translation
+framework.
+
+Translates content from one supported language to another, using
+the Microsoft Translator webservice with the  I22r::Translate
+framework. See the  I22r::Translate  for more information.
+
+To use the Microsoft Translator API, you must set up an account
+at the "Windows Azure Marketplace", choose a translator API
+data plan, and "register an application" to get a "client ID"
+and a "client secret" that you must provide to this module.
+See the instructions below or the  I22r::Translate::Microsoft
+documentation on how to get these credentials.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+TESTING WITH MICROSOFT DATA SERVICES CREDENTIALS
+
+If you have registered for data services from Microsoft
+and want to use your credentials with the unit tests in
+this distribution, edit the bottom of the file
+t/Constants.pm  before you run "make test". See the
+documentation for the  I22r::Translate::Microsoft
+package for some (possibly outdated) information about
+how to obtain those credentials.
+
+If you do not specify your credentials (a "client id"
+and a "secret"), then the unit tests that interact with
+Microsoft's data services will be skipped.
+
+CONFIGURATION
+
+This Microsoft backend is used in conjunction with the
+I22r::Translate  framework. You configure the framework
+with a call to  I22r::Translate->config  , passing a 
+key-value pair with the key "I22r::Translate::Microsoft".
+A minimal configuration would look like:
+
+    I22r::Translate->config(
+        'I22r::Translate::Microsoft' => {
+            ENABLED => 1,
+            CLIENT_ID => '... see below ...',
+	    SECRET => '... see below ...'
+        } );
+
+The  CLIENT_ID  and  SECRET  parameters are required. See
+the  I22r::Translate::Microsoft  and  I22r::Translate
+documentation about other possible parameters.
+
+GETTING CREDENTIALS FOR MICROSOFT TRANSLATOR API
+
+You will need to obtain and provide a "client id" and
+"client secret" to the  I22r::Translate  framework to
+use the Microsoft backend. As of October 2012, here are
+the instructions for getting these credentials:
+
+1. If you don't have a  Windows Live ID , sign up
+   for one at L<https://signup.live.com/signup.aspx?lic=1>    
+
+2. Visit  https://datamarket.azure.com/dataset/bing/microsofttranslator .
+   Register for a "Windows Azure Marketplace" account.
+
+3. Choose a Microsoft Translator data plan. One of the
+   available plans is a free option for 2,000,000 characters/month.
+
+4. Now you have to "register an application". Visit
+   https://datamarket.azure.com/developer/applications  and hit the
+   big green  REGISTER  button.
+ 
+5. Choose any "Client ID" and "Name" for your application. The "URI"
+   is also a required field, but the translator API doesn't use it, so 
+   you can put whatever you like in that field, too.
+
+   Make a note of the "Client ID"  value that you entered and the
+   "Client secret" value that Microsoft provided. You will have to provide
+   these values to the  I22r::Translate::Microsoft  backend configuration
+   with the "CLIENT_ID" and "SECRET" keys.
+
+Example: If your application registration screen (at
+https::/datamarket.azure.com/developer/applications) looks like:
+
+    * Client ID         angus
+    * Name              The Beefinator
+    * Client secret     ykiDjfQ9lztW/oFUC4t2ciPWH2nJS88FqXcQbs/Z9Y=7
+    * Redirect URI      https://ilikebeef.com/
+      Description       The multilingual Beefinator site
+
+Then you would configure the Microsoft backend with
+
+    I22r::Translate->config(
+        'I22r::Translate::Microsoft' => {
+            ENABLED => 1,
+            CLIENT_ID => "angus",
+            SECRET => "ykiDjfQ9lztW/oFUC4t2ciPWH2nJS88FqXcQbs/Z9Y=7"
+        } );
+
+(these are not real credentials).
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc I22r::Translate::Microsoft
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=I22r-Translate-Microsoft
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/I22r-Translate-Microsoft
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/I22r-Translate-Microsoft
+
+    Search CPAN
+        http://search.cpan.org/dist/I22r-Translate-Microsoft/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2012 Marty O'Brien
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.

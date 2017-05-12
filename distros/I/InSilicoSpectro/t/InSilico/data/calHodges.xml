@@ -1,0 +1,8 @@
+<calibrator>	<train>
+		<preprocess>1</preprocess>
+		<fitting>bypass</fitting>
+		<gamma>1e-06</gamma>
+	</train>
+	<data>
+	</data>
+</calibrator>

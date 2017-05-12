@@ -1,0 +1,4 @@
+This is definitely out of date; IPC::Transit used to
+ship with a sub-module, IPC::Transit::Router, but that's a separate
+distribution now.
+

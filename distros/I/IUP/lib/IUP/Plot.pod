@@ -1,0 +1,14 @@
+=head1 NAME
+
+IUP::Plot - [GUI element] canvas-like element for creating 2D plots
+
+=head1 DESCRIPTION
+
+XXX-TODO: missing doc
+
+=head1 SEE ALSO
+
+The original doc: L<iup_plot.html|http://www.tecgraf.puc-rio.br/iup/en/ctrl/iup_plot.html>
+
+
+=cut

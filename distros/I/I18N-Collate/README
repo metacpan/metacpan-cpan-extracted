@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution I18N-Collate,
+version 1.02:
+
+  compare 8-bit scalar data according to the current locale
+
+This software is copyright (c) 2011 by Jarkko Hietaniemi.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

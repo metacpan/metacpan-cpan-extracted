@@ -1,0 +1,31 @@
+CHANGES
+Makefile.PL
+MANIFEST
+lib/IO/Pager.pm
+lib/IO/Pager/Buffered.pm
+lib/IO/Pager/Page.pm
+lib/IO/Pager/Unbuffered.pm
+README
+TODO
+.proverc
+.travis.yml
+t.pl
+t/01-load.t
+t/02-which.t
+t/02-which_interactive.t
+t/03-bald_interactive.t
+t/04-buffered_interactive.t
+t/05-binmode_interactive.t
+t/06-scalar_interactive.t
+t/07-oo_interactive.t
+t/08-redirect.pl
+t/08-redirect.t
+t/09-open.t
+t/10-close_interactive.t
+t/11-redirect-oo.pl
+t/11-redirect-oo.t
+t/12-preservelayers_interactive.t
+t/13-eof_interactive.t
+t/TestUtils.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

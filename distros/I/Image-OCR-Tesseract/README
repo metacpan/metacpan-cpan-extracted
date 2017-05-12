@@ -1,0 +1,23 @@
+Image::OCR::Tesseract - read an image with tesseract and get output
+===================================================================
+
+Provides a perl interface to tesseract.
+Also accepts any image input- takes care of converting your imput image to a
+tiff to the required specs, without changing the original.
+
+You will need tesseract and ImageMagick installed on your system.
+
+This package runs on posix. This package is not win compatible. No effort will
+be made to provide win portability. This package will not work on windows.
+
+The Makefile.PL will check that you have tesseract and convert (imagemagick) 
+installed.
+
+SEE ALSO
+
+INSTALL.tesseract
+INSTALL.imagemagick
+INSTALL
+
+
+

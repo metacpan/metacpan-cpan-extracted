@@ -1,0 +1,11 @@
+%
+% $Id: slsh.rc,v 1.1 2005/01/03 16:59:50 dburke Exp $
+%
+% Used by 00init.t when the 'setup as slsh' option was enabled
+% at compile time.
+%
+% We just define a variable so that 00init.t can check for it.
+%
+
+public variable system_rc_called = 1;
+

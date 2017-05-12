@@ -1,0 +1,49 @@
+IOC-Slinky-Container
+
+This module aims to be a (1) transparent and (2) simple 
+dependency-injection (DI) container; and usually preconfigured from a 
+configuration file.
+
+A DI-container is a special object used to load and configure other 
+components/objects. Each object can then be globally resolved using a 
+unique lookup id.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc IOC::Slinky::Container
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=IOC-Slinky-Container
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/IOC-Slinky-Container
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/IOC-Slinky-Container
+
+    Search CPAN
+        http://search.cpan.org/dist/IOC-Slinky-Container/
+
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2011 Dexter Tad-y
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

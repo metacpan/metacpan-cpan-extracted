@@ -1,0 +1,54 @@
+NAME
+    IO::Socket::UNIX::Util - Unix domain socket utilities
+
+VERSION
+    This document describes version 0.05 of IO::Socket::UNIX::Util (from
+    Perl distribution IO-Socket-UNIX-Util), released on 2014-12-05.
+
+FUNCTIONS
+  create_unix_socket($path[, $mode, \%opts]) => SOCKET
+    Create a listening Unix socket (by default with Type SOCK_STREAM) using
+    IO::SOcket::UNIX. %opts will be passed to IO::Socket::UNIX.
+
+    Die on failure.
+
+    This function creates Unix domain socket with the usual way of using
+    IO::Socket::UNIX with some extra stuffs: remove stale socket first, show
+    more detailed/precise error message, chmod with $mode.
+
+  create_unix_stream_socket($path[, $mode, \%opts]) => SOCKET
+    Shortcut for:
+
+     create_unix_socket($path, $mode, {Type=>SOCK_STREAM, %opts});
+
+    which is the default anyway.
+
+  create_unix_datagram_socket($path[, $mode, \%opts]) => SOCKET
+    Shortcut for:
+
+     create_unix_socket($path, $mode, {Type=>SOCK_DGRAM, %opts});
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/IO-Socket-UNIX-Util>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-SHARYANTO-IO-Socket-Utils>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=IO-Socket-UNIX-Util>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

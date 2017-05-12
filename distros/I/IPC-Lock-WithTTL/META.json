@@ -1,0 +1,76 @@
+{
+   "abstract" : "run only one process up to given timeout",
+   "author" : [
+      "HIROSE Masaaki <hirose31 _at_ gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.035, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "IPC-Lock-WithTTL",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.039"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "App::scan_prereqs_cpanfile" : "0.09",
+            "Dist::Milla" : "v1.0.15",
+            "Pod::Wordlist" : "0",
+            "Test::Fixme" : "0",
+            "Test::Kwalitee" : "1.21",
+            "Test::More" : "0.96",
+            "Test::Pod" : "1.41",
+            "Test::Spelling" : "0.12",
+            "Test::Vars" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Accessor::Lite" : "0",
+            "Smart::Args" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Temp" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/hirose31/IPC-Lock-WithTTL/issues"
+      },
+      "homepage" : "https://github.com/hirose31/IPC-Lock-WithTTL",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/hirose31/IPC-Lock-WithTTL.git",
+         "web" : "https://github.com/hirose31/IPC-Lock-WithTTL"
+      }
+   },
+   "version" : "0.02",
+   "x_contributors" : [
+      "HIROSE Masaaki <hirose31@gmail.com>"
+   ]
+}
+

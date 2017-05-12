@@ -1,0 +1,12 @@
+Admin.pm
+Changes
+MANIFEST
+Makefile.PL
+test.pl
+examples/create.pl
+examples/delete.pl
+certs/ca-cert.pem
+certs/client-cert.pem
+certs/client-key.pem
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

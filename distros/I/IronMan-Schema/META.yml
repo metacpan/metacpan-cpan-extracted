@@ -1,0 +1,27 @@
+---
+abstract: 'Schema for the Enlightened Perl Organisations IronMan project'
+author:
+  - 'Jess Robinson (castaway) <castaway@desert-island.me.uk>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: IronMan::Schema
+name: IronMan-Schema
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  DBIx::Class::Schema: 0
+  perl: 5.8.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.03

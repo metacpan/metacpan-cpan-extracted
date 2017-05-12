@@ -1,0 +1,15 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Imager/SkinDetector.pm
+examples/contains_nudity.pl
+examples/hue_frequencies.pl
+examples/is_skinny.pl
+examples/fractal.gif
+examples/ferrari.bmp
+examples/woman.bmp
+examples/sand.jpg
+examples/model.bmp
+t/00-load.t
+META.yml                                 Module meta-data (added by MakeMaker)

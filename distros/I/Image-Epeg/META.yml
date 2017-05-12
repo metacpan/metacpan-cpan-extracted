@@ -1,0 +1,33 @@
+---
+abstract: 'Thumbnail jpegs at lightning speed'
+author:
+  - 'Michael Curtis <mike@beatbot.com>'
+  - 'Michael Curtis (mcurtis@yahoo-inc.com)'
+build_requires:
+  Devel::PPPort: 3.19
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0.98
+configure_requires:
+  Devel::PPPort: 3.19
+  ExtUtils::MakeMaker: 6.59
+  ExtUtils::ParseXS: 2.21
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Image-Epeg
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  XSLoader: 0.02
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/tokuhirom/image-epeg.git
+version: 0.13

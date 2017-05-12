@@ -1,0 +1,54 @@
+#!perl
+
+use 5.10.1;
+use strict;
+use warnings;
+
+use IRC::Indexer::Conf;
+
+my($cftype, $outpath, $show);
+use Getopt::Long;
+GetOptions(
+  help => sub {
+    print(
+      "ircindexer-examplecf\n",
+      " Write example configuration files.\n\n",
+      
+      " -s, --show\n",
+      "       Display, rather than write, the example config.\n\n",
+      
+      " -o, --output=PATH\n",
+      "       Path to the destination to write.\n\n",
+      
+      " -t, --type=TYPE\n",
+      "       Type of config to output.\n",
+      "       One of: httpd, spec\n\n",
+    
+    );
+    exit 0
+  },
+
+  'type|config=s' => \$cftype,
+  
+  'output|file=s' => \$outpath,
+  
+  'show!' => \$show,
+);
+
+$cftype = lc($cftype||'');
+
+die "Invalid --type\nShould be one of: httpd, spec\n"
+  unless $cftype and $cftype ~~ [qw/httpd spec/];
+
+if ($show) {
+  print IRC::Indexer::Conf->get_example_cf($cftype);
+  exit 0
+}
+
+die "No --output file specified\n"
+  unless $outpath;
+
+
+print "Writing: $outpath\n";
+IRC::Indexer::Conf->write_example_cf($cftype, $outpath);
+exit 0

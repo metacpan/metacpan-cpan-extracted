@@ -1,0 +1,81 @@
+NAME
+    Interchange6::Currency - Currency objects for Interchange 6
+
+DESCRIPTION
+    Extends CLDR::Number::Format::Currency with accurate calculation
+    functions using Math::BigFloat.
+
+    Many useful standard operators are overloaded and return currency
+    objects if appropriate.
+
+ATTRIBUTES
+  value
+    Value as simple decimal, e.g.: 3.45
+
+    All values are coerced into Math::BigFloat.
+
+  converter_class
+    Defaults to Finance::Currency::Convert::WebserviceX.
+
+    The class name which handles conversion to a new "currency_code".
+
+    The converter class can be any class that supports the following method
+    signature:
+
+      sub convert {
+          my ($self, $price, $from, $to) = @_;
+ 
+          return $converted_price;
+      };
+
+  converter
+    Vivified "converter_class".
+
+METHODS
+  BUILD
+    Sets precision for automatic rounding of "value" to
+    "maximum_fraction_digits" in CLDR::Number::Format::Currency.
+
+  clone %new_attrs?
+    Returns clone of the currency object possibly with new attribute values
+    (if any are supplied).
+
+  convert $new_corrency_code
+    Convert to new currency using "converter".
+
+    NOTE: If "/convert" is called in void context then the currency object
+    is mutated in place. If called in list or scalar context then the
+    original object is not modified and a new Interchange6::Currency object
+    is returned instead.
+
+  as_string
+    Stringified formatted currency, e.g.: $3.45
+
+  stringify
+    Alias for "as_string".
+
+  add $arg
+    Add $arg to "value" in place.
+
+  subtract $arg
+    Subtract $arg from "value" in place.
+
+  multiply $arg
+    Multiply "value" by $arg in place.
+
+  divide $arg
+    Divide "value" by $arg in place.
+
+  modulo $arg
+    Return "value" "%" $arg as currency object.
+
+  cmp_value $arg
+    Equivalent to "value" "<=>" $arg.
+
+  cmp $arg
+    String comparison.
+
+    Not always useful in itself since string comparison of stringified
+    currency objects might not produce what you expect depending on locale
+    and currency code.
+

@@ -1,0 +1,50 @@
+2001-04-12 14:11  stevegt
+
+	* Session.pm: significant rewrite to fix csh bug, provide real
+	detection of remote shell type, flush stderr and stdout before
+	every send
+
+2001-02-27 12:25  stevegt
+
+	* MANIFEST, Session.pm, test.pl, test1, t/sh.t, t/timeout.t,
+	t/csh.t, MANIFEST, Changes: fix errno not getting returned in
+	scalar context, fix csh incompatibility
+
+2000-03-02 02:10  stevegt
+
+	* MANIFEST, Session.pm, test3, lib/IPC/Session.pm: releasing to
+	CPAN
+
+1998-10-12 22:42  stevegt
+
+	* lib/IPC/Session.pm: checkpoint before working at home mping works
+	working on how to bypass dead interfaces
+
+1998-08-13 20:47  stevegt
+
+	* test2: test version of SYNOPSIS
+
+1998-08-13 20:46  stevegt
+
+	* lib/IPC/Session.pm: clean up CHANGES section
+
+1998-08-06 17:24  stevegt
+
+	* lib/IPC/Session.pm: Session.pm package v0.02 switch to unbuffered
+	non-blocking I/O add timeout() remove need for FileHandle.pm add
+	cloning
+
+1998-08-05 11:35  stevegt
+
+	* lib/IPC/Session.pm: released package v0.01
+
+1998-08-04 15:14  stevegt
+
+	* Changes, MANIFEST, Makefile.PL, test.pl, lib/IPC/Session.pm:
+	Initial revision
+
+1998-08-04 15:14  stevegt
+
+	* Changes, MANIFEST, Makefile.PL, test.pl, lib/IPC/Session.pm:
+	created
+

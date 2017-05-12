@@ -1,0 +1,9 @@
+MANIFEST
+README
+LICENSE
+Todo
+Changes
+Makefile.PL
+lib/IO/Socket/RedisPubSub.pm
+t/001_load.t
+META.yml                                 Module meta-data (added by MakeMaker)

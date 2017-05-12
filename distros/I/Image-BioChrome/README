@@ -1,0 +1,102 @@
+NAME
+    Image::BioChrome - Colorise gif files by rewriting the color table
+
+    This module is still considered ALPHA code, the module and interfaces
+    are still subject to change.
+
+SYNOPSIS
+            my $bio = new Image::BioChrome $file;
+
+            $bio->colors(.....);
+
+            or 
+
+            $bio->alphas(.....);
+
+            or
+
+            $bio->percents(100, 100, 50)
+
+            $bio->write_file($file);
+
+            # cause the file to be re-read from the source
+            $bio->read_file();
+
+DESCRIPTION
+    This module is designed to recolor images files. I built it because I am
+    regularly producing web sites with many common interface graphics where
+    we just need to change the colors. The name BioChrome comes from the
+    name of the special color changing cells that give a Chameleon its color
+    changing ability.
+
+    Also included in the distribution are modules that allow Apache (with
+    mod_perl) to build images on the fly and a Template::Toolkit plugin to
+    allow the creation of images from within a Template.
+
+    An instance of a Image::BioChrome should be created for each image file
+    that you want to work on.
+
+    my $b = new Image::BioChrome 'test.gif';
+
+    In order to then change the colors you need to call one of the color
+    change methods detailed below. There the method requires a color string
+    it will accept the input as either a string of color values or as an
+    array ref to a set of colors.
+
+    A color string is simply a series of hexadecimal rgb triples separated
+    by character other than 0-9, a-f or #. For example ff0000_00ff00_0000ff
+    is red followed by green followed by blue.
+
+    $b->colors('ff0000_00ff00_0000ff')
+
+    or
+
+    $b->colors(['ff0000','00ff00','0000ff']);
+
+    or
+
+    $b->colors('ff0000','00ff00','0000ff');
+
+    Now you may be asking yourself what the module does with the color
+    information. The best answer is to look at the documentation in the
+    examples directory. Explaining how colors are processed in ascii art is
+    really difficult.
+
+    Once you have passed the relevant color information the file can be
+    written to disk by calling the write file method.
+
+    $b->write_file('output.gif');
+
+    Currently BioChrome will only recolor GIF files. Any file which it is
+    not capable of being recolored will simply be copied when write_file is
+    called.
+
+Color Change Methods
+  alphas
+    Expects a color string with upto four colors. Every color in the color
+    palette will be changed. The four colors are blended according to the
+    amount of red, green and blue in the image.
+
+  colors
+    Expects a set of colors upto the number of colors in the color palette.
+    The colors will be replaced with the colors given.
+
+  percents ( red_percent, green_percent, blue_percent )
+    Changes every color in the palette by adjusting the amount each part of
+    the color by the percentages given.
+
+SEE ALSO
+    Apache::BioChrome, Template::Plugin::BioChrome
+
+AUTHOR
+    Simon Matthews <sam@tt2.com>
+
+REVISION
+    $Revision: 1.16 $
+
+COPYRIGHT
+    Copyright (C) 2003 Simon Matthews. All Rights Reserved.
+
+    This module is free software; you can distribute it and/or modify it
+    under the same terms as Perl itself.
+

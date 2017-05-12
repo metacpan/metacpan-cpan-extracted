@@ -1,0 +1,12 @@
+^\.git\/
+^.*\.tar.gz$
+^.*.bak
+^.*.old
+^.*.swp
+.gitignore
+.travis.yml
+lib/Interchange6/Schema/Result/t
+^sql\/
+t/README
+schema.png
+t/var/ic6s_test_.*

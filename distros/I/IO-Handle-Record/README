@@ -1,0 +1,230 @@
+NAME
+    IO::Handle::Record - IO::Handle extension to pass perl data structures
+
+SYNOPSIS
+     use IO::Socket::UNIX;
+     use IO::Handle::Record;
+
+     ($p, $c)=IO::Socket::UNIX->socketpair( AF_UNIX,
+                                            SOCK_STREAM,
+                                            PF_UNSPEC );
+     while( !defined( $pid=fork ) ) {sleep 1}
+
+     if( $pid ) {
+       close $c; undef $c;
+
+       $p->fds_to_send=[\*STDIN, \*STDOUT];
+       $p->record_opts={send_CODE=>1};
+       $p->write_record( {a=>'b', c=>'d'},
+                         sub { $_[0]+$_[1] },
+                         [qw/this is a test/] );
+     } else {
+       close $p; undef $p;
+
+       $c->record_opts={receive_CODE=>sub {eval $_[0]}};
+       ($hashref, $coderef, $arrayref)=$c->read_record;
+       readline $c->received_fds->[0];       # reads from the parent's STDIN
+     }
+
+INSTALLATION
+     perl Makefile.PL
+     make
+     make test
+     make install
+
+DEPENDENCIES
+    * perl 5.8.0
+    * Storable 2.05
+    * Class::Member 1.3
+
+DESCRIPTION
+    "IO::Handle::Record" extends the "IO::Handle" class. Since many classes
+    derive from "IO::Handle" these extensions can be used with "IO::File",
+    "IO::Socket", "IO::Pipe", etc.
+
+    The methods provided read and write lists of perl data structures. They
+    can pass anything that can be serialized with "Storable" even
+    subroutines between processes.
+
+    The following methods are added:
+
+    $handle->record_opts
+        This lvalue method expects a hash reference with options as
+        parameter. The "send_CODE" and "receive_CODE" options correspond to
+        localized versions of $Storable::Deparse and $Storable::Eval
+        respectively. Using them Perl code can be passed over a connection.
+        See the Storable manpage for further information.
+
+        Further, setting "forgive_me" sets $Storable::forgive_me before
+        "freeze()"ing anything. That way GLOB values are stored as strings.
+
+        In a few cases IO::Handle::Record passes binary data over the
+        connection. Normally network byte order is used there. You can save
+        a few CPU cycles if you set the "local_encoding" option to true. In
+        this case the byte order of the local machine is used.
+
+        Example:
+
+         $handle->record_opts={send_CODE=>1, receive_CODE=>1, local_encoding=>1};
+
+    $handle->fds_to_send=\@fds
+        Called before "write_record" sets a list of file handles that are
+        passed to the other end of a UNIX domain stream socket. The next
+        "write_record" transfers them as open files. So the other process
+        can read or write to them.
+
+    @fds=@{$handle->received_fds}
+        This is the counterpart to "fds_to_send". After a successful
+        "read_record" the receiving process can fetch the transferred
+        handles from this list. The handles are GLOBs blessed to one of:
+
+        * IO::File
+        * IO::Dir
+        * IO::Pipe
+        * IO::Socket::UNIX
+        * IO::Socket::INET
+        * IO::Socket::INET6
+        * IO::Handle
+
+        according to their type. "IO::Handle" is used as kind of catchall
+        type. Open devices are received as such. "IO::Handle::Record" does
+        not load all of these modules. That's up to you.
+
+    $handle->write_record(@data)
+        writes a list of perl data structures.
+
+        "write_record" returns 1 if the record has been transmitted. "undef"
+        is returned if $handle is non blocking and a EAGAIN condition is
+        met. In this case reinvoke the operation without parameters (just
+        "$handle->write_record") when the handle becomes ready. Otherwise it
+        throws an exception "IO::Handle::Record: syswrite error". Check $!
+        in this case.
+
+        EINTR is handled internally.
+
+        Example:
+
+         $handle->write_record( [1,2],
+                                sub {$_[0]+$_[1]},
+                                { list=>[1,2,3],
+                                  hash=>{a=>'b'},
+                                  code=>sub {print "test\n";} } );
+
+    @data=$handle->read_record
+        reads one record of perl data structures.
+
+        On success it returns the record as list. An empty list is returned
+        if $handle is in non blocking mode and not enough data has been
+        read. Check $!==EAGAIN to catch this condition. When the handle
+        becomes ready just repeat the operation to read the next data chunk.
+        If a complete record has arrived it is returned.
+
+        On EOF an empty list is returned. To distinguish this from the non
+        blocking empty list return check "$handle->end_of_input".
+
+        EINTR is handled internally.
+
+        Example:
+
+         ($array, $sub, $hash)=$handle->read_record;
+
+    $handle->end_of_input
+        When an end of file condition is read this is set to true.
+
+    ($pid, $uid, $gid)=$handle->peercred
+        ONLY FOR UNIX DOMAIN SOCKETS ON LINUX
+
+        Return the PID, eUID and eGID of the peer at the time of the
+        connect.
+
+    $handle->read_buffer
+    $handle->expected
+    $handle->expect_fds
+    $handle->_received_fds
+    $handle->write_buffer
+    $handle->written
+        these methods are used internally to provide a read and write buffer
+        for non blocking operations.
+
+  Exceptions
+    *   "IO::Handle::Record: sysread"
+
+        thrown in "read_record". Check $! for more information.
+
+    *   "IO::Handle::Record: premature end of file"
+
+        thrown in "read_record" on end of file if according to the internal
+        protocol more input is expected.
+
+    *   "IO::Handle::Record: busy"
+
+        thrown in "write_record" if a non-blocking write is not yet
+        finished. There may be only one write operation at a time. If that
+        hits you organise a queue.
+
+    *   "IO::Handle::Record: syswrite"
+
+        thrown in "write_record" on an error of the underlying transport
+        method. Check $! for more information.
+
+    *   Other exceptions
+
+        thrown in "read_record" and "write_record" if something cannot be
+        encoded or decoded by the "Storable" module. If that hits you the
+        "Storable" module at one side is probably too old.
+
+  EXPORT
+    None.
+
+Data Transfer Format
+    The Perl data is serialized using Storable::freeze or Storable::nfreeze.
+    Storable::freeze is used if the "local_encoding" option is set,
+    Storable::nfreeze otherwise.
+
+    The length in bytes of this data chunk and the number of file handles
+    that are passed along with the data are then each "pack()"ed as a 4 byte
+    binary value using the "L" or "N" template. "L" is used of
+    "local_encoding" is in effect.
+
+    If there are file descriptors to be passed they are sent by a separate
+    sendmsg call along with 2 length fields only.
+
+    Both fields is the prepended to the data chunk:
+
+     +-----------------+------------------------+
+     | data length (N) | number of file handles |
+     | 4 bytes         | 4 bytes                |
+     +-----------------+------------------------+
+     |                                          |
+     |                                          |
+     |                                          |
+     |                                          |
+     |                   data                   |
+     |                                          |
+     |                 N bytes                  |
+     |                                          |
+     |                                          |
+     |                                          |
+     |                                          |
+     |                                          |
+     +------------------------------------------+
+
+    WARNING: The transfer format has changed in version 0.07 (never made it
+    to CPAN) and again in version 0.08.
+
+TODO
+    * compression
+    * credential passing over UNIX domain sockets
+
+SEE ALSO
+    "IO::Handle"
+
+AUTHOR
+    Torsten Foertsch, <torsten.foertsch@gmx.net<gt>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2005-2009 by Torsten Foertsch
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

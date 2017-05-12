@@ -1,0 +1,15 @@
+0.06 2016-08-05 17:00 CEST
+    - Update for compatibility with current MoarVM
+0.05 2016-03-07 11:30 CET
+    - Update for compatibility with Perl 6.c and current MoarVM
+    - Documentation updates
+0.04 2015-03-23 21:15 CET
+    - Lower perl requirement to 5.18
+    - Support perl without multiplicity
+    - Be compatible with and require rakudo 2015.03
+0.03 2015-02-12 21:20 CET
+    - New OO API
+    - use() method for loading Perl6 modules
+    - invoke() method for invoking Perl6 class methods (like constructors)
+0.02 2015-02-09 19:00 CET
+    - First working version that allowed executing Perl 6 code from Perl 5.

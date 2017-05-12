@@ -1,0 +1,8 @@
+0.101   2014-12-30
+  * Change ragel function to filters to support new
+    Inline::Filters::* plug-ins. Keep ragel function
+    and export around for now for back-compat
+  * Docs
+
+0.100   2014-12-28
+  * Initial CPAN release

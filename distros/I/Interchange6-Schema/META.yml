@@ -1,0 +1,56 @@
+---
+abstract: 'Database Schema for Interchange 6'
+author:
+  - 'Stefan Hornburg (Racke) <racke@linuxia.de>'
+build_requires:
+  DBD::SQLite: '1.3801'
+  Data::Dumper::Concise: '0'
+  File::Temp: '0'
+  Test::MockTime: '0'
+  Test::More: '0'
+  Test::Most: '0.33'
+  Test::Warnings: '0'
+  YAML: '0'
+configure_requires:
+  DBIx::Class: '0'
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Interchange6-Schema
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Class::Method::Modifiers: '0'
+  DBIx::Class: '0'
+  DBIx::Class::Candy: '0.002104'
+  DBIx::Class::Helpers: '2.024001'
+  DBIx::Class::InflateColumn::DateTime: '0'
+  DBIx::Class::InflateColumn::DateTime::Duration: '0'
+  DBIx::Class::PassphraseColumn: '0.02'
+  DBIx::Class::Schema::Config: '0.001011'
+  DBIx::Class::TimeStamp: '0'
+  DBIx::Class::Tree: '0'
+  Data::UUID: '0'
+  DateTime: '0'
+  Digest::MD5: '0'
+  Encode: '0'
+  Locale::SubCountry: '1.64'
+  SQL::Translator: '0.11018'
+  Session::Token: '1.008'
+  Sub::Quote: '1.004006'
+  Test::Roo: '1.003'
+  Time::Duration::Parse: '0'
+  Try::Tiny: '0'
+  namespace::clean: '0'
+resources:
+  IRC: irc://irc.freenode.net/#interchange
+  bugtracker: https://github.com/interchange/interchange6-schema/issues
+  repository: https://github.com/interchange/interchange6-schema.git
+version: '0.133'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

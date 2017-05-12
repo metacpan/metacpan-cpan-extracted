@@ -1,0 +1,22 @@
+---
+abstract: 'Alternative but compatible interface to modules that export symbols.'
+author:
+  - 'Chad Granum <exodist@cpan.org>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Importer
+requires:
+  perl: '5.008001'
+resources:
+  bugtracker: http://github.com/exodist/Importer/issues
+  repository: http://github.com/exodist/Importer/
+version: '0.024'
+x_serialization_backend: 'YAML::Tiny version 1.69'

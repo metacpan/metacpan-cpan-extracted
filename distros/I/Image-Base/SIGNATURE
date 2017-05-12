@@ -1,0 +1,39 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 ab6e4d6719831bb818a13239ebde50aefc81b49f Changes
+SHA1 8624bcdae55baeef00cd11d5dfcfa60f68710a02 GPL-3
+SHA1 f45ee1c765646813b442ca58de72e20a64a7ddba LGPL-3
+SHA1 288915df64dc5767d6bd7ae8d8c2df1c826247e6 MANIFEST
+SHA1 b758f740af57256154bbf4e1f8a760a1b9f9dfe1 MANIFEST.SKIP
+SHA1 2052b29df1cfd30cdbbe567d5b8b9d6e92420b8e META.yml
+SHA1 69066afd64835f1183674535e3e3707bc875ae4f Makefile.PL
+SHA1 a07d01541a0dfa66c6fc71eacd5fd7e772700542 README
+SHA1 7a9126ab21861578e2df22d301007f9380e4405c devel/ellipse.pl
+SHA1 52f808c108014b75b5036d24e9102d61154e3811 devel/misc.pl
+SHA1 e7f0c1958a4f5c609a08eb83229b4d50743d57d1 devel/overflow.pl
+SHA1 b42c606d6f690c04ff766d0742292cf90a2a21ea devel/symmetry.pl
+SHA1 8c25e0b2dd759276d0f38b6444fae08269bd769d lib/Image/Base.pm
+SHA1 2efe7bbb8a8636612732b839a22e01a5aaf66771 t/base.t
+SHA1 48e2391567418fd5e10aed6dcac3df63ce622b26 t/misc.t
+SHA1 5674be1b5f8a92bf904d09d0e24b6c283f880c61 t/samples.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iD8DBQFQGISLLFMCIV9q3ToRAh41AJ9c3WiN4vHxTqk57ul1X1TH3DTMbACcD908
+aRfkaaUebbKmZnOLXPHJR48=
+=P5hI
+-----END PGP SIGNATURE-----

@@ -1,0 +1,92 @@
+IO-Util Latest Versions Changes
+
+Version 1.5
+- Added Time::HiRes and Sys::Hostname as prerequisites
+- Changed tests '04_uniqid.t' '04_uniqid_no_import.t'
+
+Version 1.49
+- Added the 'SPLIT_LINES' mml handler and tests 
+
+Version 1.48
+- Fixed incompatibility with perl version < 5.8x of the capture function;
+  the fix excludes the usage of other tied class :-(
+
+Version 1.47
+- Maintainance release. A few minor changes
+
+Version 1.46
+- Fixed bug in nested capture, introduced with v1.45
+- Simplified the capture implementation
+- Added a few tests
+
+Version 1.45
+- Full reimplemention of the capture() function, greatly improved
+- Removed the Tie::Handle dependency
+- Improvement of the slurp() function
+- Added the 'markers' option in the load_mml function and tests.
+
+Version 1.44
+- Fixed missing quotes in the slurp and _path_mtime function
+- Added the 'optional' option in the load_mml function
+
+Version 1.43
+- Added HASH reference check of parsed MML.
+- load_mml options are now passable as plain name=>value pairs
+- A few test and POD changes
+
+Version 1.42
+- Little improvement of the capture function (syswrite support)
+
+Version 1.41
+- Fixed capture bug related to unimplemented tied methods
+- Created the internal IO::Util::Handle class based on Tie::StdHandle
+
+Version 1.4
+- Added perl 5.6.1 version check in Makefile.PL
+- Added SKIP block in unique id tests if Time::HiRes is not installed
+- Added load_mml() function (loads MML data into perl structures)
+- POD restyling and fixing
+
+Version 1.3
+- Added Tid(), Lid() and Uid() functions and tests
+
+Version 1.26
+- Fixed bug in the capture function when run with -T
+
+Version 1.25
+- Fixed bug in the slurp function when run with -T
+
+Version 1.24
+- Eliminated version check and installation feedback system
+  ("phone home" opt-out) from Makefile.PL to make Randal L Schwartz happy :-)
+  and sad the author :-(
+
+Version 1.23
+- Minor POD changes
+
+Version 1.22
+- Changed Makefile.PL version check
+
+Version 1.21
+- Fixed nested capture problem (now the nested capture does not
+  capture multiple time the same output)
+
+Version 1.2
+- Extended compatibility with perl 5.6.1 (it didn't work on some build)
+- Added the slurp function
+- Some POD fixing
+
+Version 1.11
+- Fixed $IO::Util::VERSION required by CGI::Builder and Template::Magic
+
+Version 1.1
+- Fixed catching for already tied filehandlers
+- Fixed appending of output record separator
+- Added 'prinf' catching
+- POD fixes
+
+Version 1.01
+- More strict coding, trying to avoid test failure on MSWin32-x86-multi-thread
+
+Version 1.0
+- first public release

@@ -1,0 +1,54 @@
+{
+   "abstract" : "Select a pager and pipe text to it if destination is a TTY",
+   "author" : [
+      "Jerrad Pierce <jpierce@cpan.org>, Florent Angly <florent.angly@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "IO-Pager",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Config" : "0",
+            "Env" : "0",
+            "Exporter" : "0",
+            "File::Temp" : "0",
+            "Test::More" : "0.88"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Env" : "0",
+            "File::Spec" : "0",
+            "File::Which" : "0",
+            "IO::Handle" : "0",
+            "PerlIO" : "0",
+            "SelectSaver" : "0",
+            "Symbol" : "0",
+            "Tie::Handle" : "0",
+            "base" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.37",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

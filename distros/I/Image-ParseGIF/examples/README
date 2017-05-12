@@ -1,0 +1,25 @@
+
+
+Progress Bar Example
+--------------------
+
+Install main.cgi, status.cgi and the progressbar.gif into an appropriate 
+web server CGI-bin directory.
+
+Calling main.cgi should result in a 'progress' page, and the thence 
+(after a refresh or click) the 'results' page.
+
+The progress page should have the animated progress bar update according 
+to the random delays in main.cgi as it does it's "work".
+
+These scripts were tested under Apache 1.3.3, you may need to adjust the 
+script URLs to work with your server.
+
+Incidentally, the progressbar.gif is under the same license as the 
+Image-ParseGIF module.
+
+Deanimation Example
+--------------------
+
+Run deanim.pl across any animated gif/s to extract a random frame of each.
+

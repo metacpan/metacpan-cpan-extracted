@@ -1,0 +1,29 @@
+#!perl
+use warnings;
+use strict;
+use Image::PNG::FileConvert 'file2png';
+use Getopt::Long;
+my $name;
+my $result = GetOptions ("name=s" => \$name);
+my $infile = $ARGV[0];
+my $outfile = $ARGV[1];
+if (! $infile || ! $outfile) {
+    usage ();
+}
+my %options;
+if ($name) {
+   $options{name} = $name;
+}
+file2png ($infile, $outfile, \%options);
+exit;
+
+sub usage
+{
+    print "Usage:\n";
+    print "$0 <infile> <outfile>\n";
+    print "$0 --name <name> <infile> <outfile>\n";
+}
+
+# Local Variables:
+# mode: perl
+# End:

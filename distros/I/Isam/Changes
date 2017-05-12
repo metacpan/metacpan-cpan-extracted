@@ -1,0 +1,11 @@
+Revision history for Perl extension Isam.
+
+0.2   May
+	- IsamData.pm improved : more types and better performances
+	- isread now set data to undef if failed
+
+0.1   Mon May 08 
+	- Annoucement
+0.01  Sat Apr 22 08:55:59 2000
+	- original version; created by h2xs 1.19
+

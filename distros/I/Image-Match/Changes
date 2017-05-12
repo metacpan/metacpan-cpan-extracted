@@ -1,0 +1,5 @@
+01 Sep 2008
+	1.00 initial
+
+02 Sep 2008
+	1.02 expanded match() functionality, add 'overlap' and 'mode' options

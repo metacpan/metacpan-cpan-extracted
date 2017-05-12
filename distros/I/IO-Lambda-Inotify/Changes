@@ -1,0 +1,5 @@
+1.00 - May 03 2012
+	first version
+
+1.00 - May 07 2012
+	add inotify()

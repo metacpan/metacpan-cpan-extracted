@@ -1,0 +1,63 @@
+Revision history for Perl extension IO::Pipe::Producer.
+
+1.0  2003/03/07 by robleach
+
+    Initial version.
+
+1.1  2005/04/11 by robleach
+
+    I added the ability to return handles on both standard output and standard
+    error (when called in array context).  I also added a subroutine to do the
+    same thing with a system call (as opposed to a subroutine call).
+
+1.2  2005/04/11 by robleach
+
+    I added the ability to return handles on both standard output and standard
+    error (when called in array context).  I also added a subroutine to do the
+    same thing with a system call (as opposed to a subroutine call).
+
+1.3  2005/04/11 by robleach
+
+    This is a modular version of producer_fork.pl.  I changed the method names,
+    made a constructor, and changed the documentation.  It now ISA IO::Pipe and
+    all the file handles returned are IO::Pipe::Producer instances.
+
+1.4  2005/05/04 by robleach
+
+    I incorporated Carp.pm, pod documentation, created $Producer::VERSION and
+    $Producer::errstr variables, and edited/updated some comments.
+
+1.5  2010/09/01 by robleach
+
+    Updated LANL license info.
+
+1.6  Fri Nov 16 10:51:29 2012 by robleach
+
+    Standardized with Makemaker and updated perldoc documentation.
+    Created by h2xs 1.23 with options
+        -AX --skip-exporter --use-new-tests -n IO::Pipe::Producer
+
+1.7  2014/07/11 by robleach
+
+    Changed documentation to inform user that they must close the returned file
+    handles and added a check for finished unclosed file handles.  Closes them
+    if there are over 200.
+
+1.8  2014/07/15 by robleach
+
+    Based on test results, I reduced the maximum number of allowed unclosed
+    file handles to 100, as it seemed the most any system tested could handle
+    was 110.
+
+1.9  2014/07/18 by robleach
+
+    Added a call to tell before calling eof when checking for expired file
+    handles so as to avoid blocking IO situations.
+
+2.0  2014/07/22 by robleach
+
+    Based on CPAN tester test results, removed file handle tracking.
+
+2.01  2015/02/26 by robleach
+
+    Reduced perl version requirement to 5.10.0 since testing passes.

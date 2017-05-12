@@ -1,0 +1,6 @@
+Revision history for Perl extension Image::Magick::Iterator.
+
+0.01  Sun May  2 20:16:17 2004
+	- original version; created by h2xs 1.23 with options
+		-AXn Image::Magick::Iterator
+

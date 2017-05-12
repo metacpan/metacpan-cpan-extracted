@@ -1,0 +1,28 @@
+Revision history for Perl extension I18N::Handle
+
+0.051   Sun 26 Dec 2010 05:11:14 PM CST
+        - Fix no-install test
+        - Fix document (jp => ja)
+
+0.05    Sun 26 Dec 2010 04:44:51 PM CST
+        - add no_global_loc option
+        - add get_current_handle, get_loc_method method to Locale class.
+        - provide abstract class for backend(s).
+
+0.043   Thu 23 Dec 2010 04:39:47 AM CST
+
+0.042   Wed 22 Dec 2010 01:15:33 PM CST
+        - speaking method
+
+0.04
+        - loc_func option.
+
+0.03
+        - More pods
+
+0.02    
+        - Added singleton method.
+        - More documents
+
+0.01    Sun Dec 19 01:03:06 2010
+        - original version

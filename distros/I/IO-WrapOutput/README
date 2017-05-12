@@ -1,0 +1,111 @@
+NAME
+    IO::WrapOutput - Wrap your output filehandles with minimal fuss
+
+SYNOPSIS
+     use IO::WrapOutput;
+     use Module::Which::Hogs::STDOUT::And::STDERR;
+
+     my $foo = Module::Which::Hogs::STDOUT::And::STDERR->new();
+     my ($stdout, $stderr) = wrap_output();
+
+     # read from $stdout and $stderr
+
+     # then, later, restore the original handles
+     $foo->shutdown;
+     unwrap_output();
+
+
+     # example using POE::Wheel::ReadLine
+     use strict;
+     use warnings;
+     use IO::WrapOutput;
+     use POE;
+     use POE::Wheel::ReadLine;
+     use POE::Wheel::ReadWrite;
+
+     POE::Session->create(
+         package_states => [main => [qw(_start got_output got_input)]],
+     );
+
+     $poe_kernel->run();
+
+     sub _start {
+         my ($heap) = $_[HEAP];
+
+         $heap->{console} = POE::Wheel::ReadLine->new(
+             InputEvent => 'got_input',
+         );
+
+         my ($stdout, $stderr) = wrap_output();
+         $heap->{stdout_reader} = POE::Wheel::ReadWrite->new(
+             Handle     => $stdout,
+             InputEvent => 'got_output',
+         );
+         $heap->{stderr_reader} = POE::Wheel::ReadWrite->new(
+             Handle     => $stderr,
+             InputEvent => 'got_output',
+         );
+
+         # request the first line
+         $heap->{console}->get('>');
+     }
+
+     sub got_output {
+         my ($heap, $line) = @_[HEAP, ARG0];
+         $heap->{console}->put($line);
+     }
+
+     sub got_input {
+         my ($heap, $line, $exception) = @_[HEAP, ARG0, ARG1];
+
+         if (defined $exception && $exception eq 'interrupt') {
+             # terminate the console
+             unwrap_output();
+             delete $heap->{console};
+             delete $heap->{stdout_reader};
+             delete $heap->{stderr_reader};
+             print "Terminated\n";
+             return;
+         }
+
+         # do something with $line ...
+
+         # request the next line
+         $heap->{console}->get();
+     }
+
+DESCRIPTION
+    When you have a module (e.g. POE::Wheel::ReadLine) which needs all
+    output to go through a method that it provides, it can be cumbersome (or
+    even impossible) to change all the code in an asynchronous/event-driven
+    program to do that instead of printing directly to STDOUT/STDERR. That's
+    where "IO::WrapOutput" comes in.
+
+    You just do the setup work for the output-hogging module in question,
+    then call "wrap_output" which will return filehandles that you can read
+    from. Then you take what you get from those filehandles and feed it into
+    your output-hogging module's output method. After you stop using the
+    output-hogging module, you can restore your original STDOUT/STDERR
+    handles with "unwrap_output".
+
+FUNCTIONS
+  "wrap_output"
+    Takes no arguments. Replaces the current STDOUT and STDERR handles with
+    pipes, and returns the read ends of those pipes back to you. Any copies
+    made of the STDOUT/STDERR handles before calling this function will
+    still be attached to the process' terminal.
+
+     my ($stdout, $stderr) = wrap_output();
+
+  "unwrap_output"
+    Takes no arguments. Restores the original STDOUT and STDERR handles.
+
+AUTHOR
+    Hinrik Örn Sigurðsson, hinrik.sig@gmail.com
+
+LICENSE AND COPYRIGHT
+    Copyright 2011 Hinrik Örn Sigurðsson
+
+    This program is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -1,0 +1,19 @@
+--- 
+abstract: Use HTTP and FTP URLs with IO::All
+author: Ivan Tubert-Brohman <itub@cpan.org>
+distribution_type: module
+generated_by: Module::Install version 0.65
+license: perl
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: IO-All-LWP
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  IO::All: 0.30
+  LWP: 0
+  perl: 5.8.0
+version: 0.14

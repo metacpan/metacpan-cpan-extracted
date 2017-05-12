@@ -1,0 +1,93 @@
+0.34 Tue Feb 17 07:17:10 PST 2015
+ - Fix DEBUG with PR/30. mohawk++
+
+0.33 Wed Dec 31 22:33:01 PST 2014
+ - Update doc to use new Swim plugins
+
+0.32 Tue Dec 30 16:38:48 EST 2014
+ - Add a (bundle => 0) option
+
+0.31 Fri Dec 26 19:02:07 PST 2014
+ - Remove/deprecate sutostubbing
+
+0.30 Thu Dec 25 00:18:18 PST 2014
+ - Normalize $program
+ - Add `makestub` meta keyword
+ - Change Inline directory to .inline from blib/Inline
+ - Add .inline to 'clean' Makefile target
+
+0.29 Tue Dec 23 11:20:23 PST 2014
+ - Fix bug in some smokers. BinGOs++
+
+0.28 Mon Dec 22 15:22:46 PST 2014
+ - Finish the documentation.
+
+0.27 Sun Dec 21 00:28:22 EST 2014
+ - Add CppGuess support.
+ - Probably a temporary solution.
+
+0.26 Thu Dec 18 18:04:08 PST 2014
+ - Patch to make Inline Modules build ok on MSWin32
+
+0.25 Thu Dec 18 11:13:47 PST 2014
+ - Refactor internals to be consistent across plugins
+
+0.24 Wed Dec 17 17:52:05 PST 2014
+ - Change to API version v2
+
+0.23 Tue Dec 16 23:58:49 EST 2014
+ - Add Inline::C and Inline::CPP::Config for Inline::CPP-based modules
+
+0.22 Tue Dec 16 23:32:17 EST 2014
+ - Use RegExp (not RecDescent) for Inline::C
+
+0.21 Sat Dec 13 11:29:29 EST 2014
+ - Make handle_distdir return manifest added files
+
+0.20 Fri Dec 12 19:17:54 EST 2014
+ - Refactor handle_distdir to support dzil plugin and other external calls
+
+0.19 Thu Dec 11 18:47:18 PST 2014
+ - Update MANIFEST
+ - Support CPP correctly
+
+0.18 Sun Dec  7 00:23:01 PST 2014
+ - Auto-Stubbing
+
+0.17 Mon Nov 24 10:27:25 PST 2014
+ - Change Contributing to About
+
+0.16 Sat Nov 22 07:29:34 UTC 2014
+ - Update tutorial for postamble
+
+0.15 Sat Nov 22 05:02:50 UTC 2014
+ - Merge in leont++ postamble patches
+
+0.14 Wed Nov 19 06:29:48 UTC 2014
+ - Merge Inline::Module::MakeMaker in Inline::Module
+ - Make all code be OO
+
+0.13 Sun Nov 16 14:36:34 PST 2014
+ - Fixed issue
+
+0.12 Sat Nov 15 23:09:59 PST 2014
+ - Small changes to tutorial
+
+0.11 Sun Nov  9 17:15:57 EST 2014
+ - Added Inline::Module::Tutorial
+ - Bump version past the old Inline::Module from 2006
+ - Make a note in the doc about that
+
+0.04 Thu Nov  6 17:26:03 PST 2014
+ - Fixed a doc glitch.
+
+0.03 Thu Nov  6 07:11:05 UTC 2014
+ - First fully working version
+ - Supports Acme::Math::XS
+
+0.02 Fri Oct 24 05:04:02 UTC 2014
+ - Implement perl-inline-module command
+
+0.01 Fri Oct 24 01:48:54 UTC 2014
+ - Initial release
+

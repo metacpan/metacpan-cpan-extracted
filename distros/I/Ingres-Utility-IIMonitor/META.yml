@@ -1,0 +1,13 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Ingres-Utility-IIMonitor
+version:      0.13
+version_from: lib/Ingres/Utility/IIMonitor.pm
+installdirs:  site
+requires:
+    Expect::Simple:                0
+    Test::More:                    0
+
+distribution_type: module
+license:      perl
+generated_by: ExtUtils::MakeMaker version 6.17

@@ -1,0 +1,6 @@
+README
+MANIFEST
+Makefile.PL
+getCite.pl
+lib/INSPEC/Retriever.pm
+lib/INSPEC/BibTeX.pm

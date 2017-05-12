@@ -1,0 +1,39 @@
+aio_req		T_AIO
+aio_req_ornot	T_AIO_ORNOT
+SV8 *		T_SV8
+
+size_t          T_VAL64
+ssize_t         T_VAL64
+off_t           T_VAL64
+
+aio_rfd		T_AIO_RFD
+aio_wfd		T_AIO_WFD
+
+INPUT
+
+T_AIO
+	if (!($var = SvAIO_REQ ($arg)))
+          croak (\"busy IO::AIO::REQ object expected\")
+
+T_AIO_ORNOT
+	if (!($var = SvAIO_REQ ($arg)))
+	  XSRETURN_EMPTY
+
+T_SV8
+	($var) = $arg;
+        if (SvPOKp ($var) && !sv_utf8_downgrade ($var, 1))
+          croak (\"\\\"%s\\\" argument must be byte/octet-encoded\", \"$var\")
+
+T_VAL64
+	$var = ($type)SvVAL64 ($arg);
+
+T_AIO_RFD
+	$var = s_fileno_croak ($arg, 0);
+
+T_AIO_WFD
+	$var = s_fileno_croak ($arg, 1);
+
+OUTPUT
+
+T_VAL64
+	$arg = newSVval64 ($var);

@@ -1,0 +1,194 @@
+#!/usr/bin/perl
+
+# convert an Animated JPEG to an animated GIF
+
+use strict;
+use warnings;
+
+use lib 'lib';
+use Cwd ();
+use File::Path ();
+use Getopt::Long;
+use Image::Animated::JPEG;
+use Path::Tiny;
+
+Getopt::Long::Configure('no_ignore_case');
+GetOptions(
+	'keep-mtime'		=> \my $keep_mtime,
+	'force|f'		=> \my $force,
+	'debug|d'		=> \my $debug,
+	'help|h'		=> \my $help,
+) or pod2usage(2);
+pod2usage(1) unless !$help;
+
+##
+my $input_file = shift;
+$input_file = path($input_file)->absolute->stringify;
+my $basename = path($input_file)->basename(qr/\.\w{2,5}$/);
+print "ajpeg2gif: $input_file basename:$basename\n" if $debug;
+
+die "ajpeg2gif: output file $basename" . '.gif' . " already exists! (Use --force to overwrite)" if -f $basename.'.gif' && !$force;
+
+##
+print "ajpeg2gif: building file index... \n" if $debug;
+open(my $io_file, '<', $input_file) or die $!;
+binmode($io_file);
+my $index = Image::Animated::JPEG::index($io_file); # , { debug => $debug }
+# use Data::Dumper;
+# print Dumper $index;
+
+# let's assume these frames aren't too big and we can use a temp scalar
+print "ajpeg2gif: looking at first frame for delay (todo: do this per frame)... \n" if $debug;
+my $frame = $index->[0];
+seek($io_file, $frame->{offset},0);
+my $buffer;
+sysread($io_file,$buffer,$frame->{length});
+
+# parse for AJPEG segment (with Image::Animated)
+my $ref = Image::Animated::JPEG::process(\$buffer);
+my $per_frame;
+if($ref && $ref->{AJPEG}){
+	$per_frame = Image::Animated::JPEG::decode_ajpeg_data( substr($buffer,$ref->{AJPEG}->{data_offset},$ref->{AJPEG}->{data_length}), { debug => $debug });
+}
+
+# print Dumper $per_frame;
+my $delay = $per_frame->{delay} || 300;
+print "ajpeg2gif: delay is $delay ms \n" if $debug;
+
+
+##
+my $temp_dir = '/tmp/ajpeg2gif-' . time();
+mkdir($temp_dir) or die $!;
+my $cwd = Cwd::cwd();
+chdir($temp_dir);
+print "ajpeg2gif: entering temp dir $temp_dir \n" if $debug;
+
+##
+print "ajpeg2gif: calling makeajpeg with --split to extract frames \n" if $debug;
+my @command = ('makeajpeg', '--split', '--keep-mtime', $input_file);
+system(@command);
+
+##
+print "ajpeg2gif: calling mogrify to convert frames to gif \n" if $debug;
+@command = ('mogrify', '-format', 'gif', '-dither', 'FloydSteinberg', $basename ."_frame*");
+print "ajpeg2gif: @command \n" if $debug;
+system(@command);
+
+##
+print "ajpeg2gif: removing jpegs \n" if $debug;
+system('rm ./*.jpg');
+
+##
+print "ajpeg2gif: calling gifsicle to assemble animated gif file \n" if $debug;
+$delay = int($delay / 10); # gifsicle expects delay in hundredths of a second (GIF delays are in fractions of 1/100sec (8 => 80ms))
+@command = ('gifsicle', '--optimize=02', '--delay='. $delay, '--loopcount=0', '--colors=256', $basename .'_frame*', '>', $basename .'.gif');
+print "ajpeg2gif: @command \n" if $debug;
+system("@command");
+
+die "ajpeg2gif: output file $basename". '.gif'. " not found!" unless -f $basename .'.gif';
+
+##
+print "ajpeg2gif: leaving temp dir $temp_dir \n" if $debug;
+chdir($cwd);
+
+##
+print "ajpeg2gif: moving output file \n" if $debug;
+system('mv '. $temp_dir . "/". $basename .'.gif '. $cwd);
+
+##
+if($keep_mtime){
+	print "ajpeg2gif: Adjusting mtime of output gif file \n" if $debug;
+	my @stat = stat($input_file);
+	utime(0, $stat[9], path($cwd, $basename .'.gif')->stringify );
+}
+
+##
+print "ajpeg2gif: removing temporary files and dir $temp_dir\n" if $debug;
+File::Path::remove_tree( $temp_dir ) or die "Error deleting temporary directory $temp_dir: $!";
+
+# dead end notes
+#
+# convert -delay <delay> -layers Optimize <file_glob_frame00*> <output>.gif
+#
+# with fuzz
+# convert -fuzz 1% -delay 1x8 `seq -f %03g.png 10 3 72` \
+#          -coalesce -layers OptimizeTransparency animation.gif
+#
+# with dither
+# convert +dither -delay 1x8 `seq -f %03g.png 10 3 72` \
+#         -coalesce -layers OptimizeTransparency animation.gif
+#
+# convert -delay 1x8 `seq -f %03g.png 10 3 72` \
+#         -ordered-dither o8x8,8 \
+#         -coalesce -layers OptimizeTransparency \
+#         -append -format %k info:
+
+# convert -delay 1x8 `seq -f %03g.png 10 3 72` \
+#         -ordered-dither o8x8,8 \
+#         -coalesce -layers OptimizeTransparency \
+#         +map animation.gif
+
+__END__
+
+=head1 NAME
+
+gif2ajpeg - Convert an Animated JPEG (AJPEG) to an animated GIF on command-line
+
+=head1 SYNOPSIS
+
+  ajpeg2gif [options] <input-file> [output-file]
+
+=head1 DESCRIPTION
+
+This script relies on I<mogrify> and I<gifsicle>, so make sure both tools are available,
+on Debian/Ubuntu that would be by executing I<apt-get install imagemagick gifsicle>.
+
+
+=head1 OPTIONS
+
+=over
+
+=item not implemented: B<--quality, -q>
+
+Animated GIFs require a lot of tweaking to bring file-size down to a reasonable
+size. ajpeg2gif can't achieve this automatically and thus currently uses hardcoded
+FloydSteinberg dithering via mogrify, and optimizations done in gifsicle.
+
+=item B<--keep-mtime>
+
+Flag. Tells ajpeg2gif to adjust the file modification timestamp (mtime) of the
+output-file to be the same as the mtime of the input-file.
+
+=item B<--force, -f>
+
+Flag. Force overwriting of an existing output file.
+
+=item B<--debug, -d>
+
+Flag. Switch debug output on.
+
+=back
+
+=head1 EXAMPLES
+
+  $ ajpeg2gif --keep-mtime input.ajpeg output.gif
+
+When the output file is omitted, ajpeg2gif will write to a file with the suffix
+.gif and the input file's basename:
+
+=head1 SEE ALSO
+
+More information about how an Animated JPEG differs from animated GIF files can be
+found in the documentation of the backend module L<Image::Animated::JPEG> and the
+official AJPEG specs bundled with this distribution.
+
+=head1 AUTHOR
+
+Clipland GmbH L<http://www.clipland.com/>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2012-2017 Clipland GmbH. All rights reserved.
+
+This library is free software, dual-licensed under L<GPLv3|http://www.gnu.org/licenses/gpl>/L<AL2|http://opensource.org/licenses/Artistic-2.0>.
+You can redistribute it and/or modify it under the same terms as Perl itself.

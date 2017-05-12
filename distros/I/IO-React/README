@@ -1,0 +1,24 @@
+IO::React provides an interface for interacting with whatever may be
+connected to an IO::Handle.  Typical usage of this module would
+include automated interaction with telnet.  This is similar to
+'expect'.
+
+This module has not been tested on versions of Perl prior to 5.6.0.
+It may not function correctly.  If you plan to use it with an older
+version you will need to edit out the 'require 5.6.0' statement.
+
+After unpacking the distribution, to install this module run:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Documentation is embedded in the module.
+
+Please report any bugs/suggestions to John Redford <John.Redford@fmr.com>.
+
+Copyright 2001 John Redford <John.Redford@fmr.com>.
+
+This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.

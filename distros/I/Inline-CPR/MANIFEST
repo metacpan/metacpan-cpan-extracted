@@ -1,0 +1,12 @@
+CPR.pm
+CPR.pod
+Changes
+MANIFEST
+Makefile.PL
+README
+bin/synopsis.PL
+c/Makefile.PL
+c/cpr.plc
+c/test.pl
+script/cpr.pl
+test.pl

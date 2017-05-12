@@ -1,0 +1,57 @@
+=pod
+
+=head1 NAME
+
+IRC::Indexer::POD::NetworkSpec - Export format for a network
+
+=head1 DESCRIPTION
+
+This document describes the format of IRC::Indexer exports from a 
+collection of trawlers composing an IRC network.
+
+This is the data returned by L<IRC::Indexer::Report::Network> after it has 
+been fed at least one L<IRC::Indexer::Report::Server>.
+
+You'll probably want to read L<IRC::Indexer::POD::ServerSpec> -- the 
+same conventions apply.
+
+=head1 HASH KEYS
+
+  ConnectedAt => TIME
+  FinishedAt  => TIME
+  
+  GlobalUsers => INT
+  OperCount   => INT
+
+  Servers     => HASH   (see below)
+  LastServer  => STRING (last server trawled for this network)
+
+  ChanCount   => INT  (public channels only)  
+  HashChans   => HASH
+  ListChans   => ARRAY
+
+These are documented further in L<IRC::Indexer::POD::ServerSpec>.
+
+=head2 Servers hash
+
+  Servers => {
+    SERVER-NAME => {
+      TrawledAt => TIME
+      IRCD => STRING (server version)
+      MOTD => [ ARRAY of MOTD lines ]  ## OPTIONAL
+    }
+  }
+
+The B<Servers> hash contains information pertaining to specific servers 
+belonging to this network that have been trawled.
+
+It is keyed on actual reported server name (the ServerName field of a 
+Server export); each server is a nested hash.
+
+=head1 AUTHOR
+
+Jon Portnoy <avenj@cobaltirc.org>
+
+L<http://www.cobaltirc.org>
+
+=cut

@@ -1,0 +1,984 @@
+=pod
+
+=head1 NAME
+
+Image::DS9 - interface to the DS9 image display and analysis program
+
+=head1 SYNOPSIS
+
+  use Image::DS9;
+
+  $dsp = new Image::DS9;
+  $dsp = new Image::DS9( \%attrs );
+
+=head1 DESCRIPTION
+
+This class provides access to the B<DS9> image display and analysis
+program through its B<XPA> access points.
+
+B<DS9> is a rather flexible and feature-rich image display program.
+Rather than extol its virtues, please consult the website in
+L</REQUIREMENTS>.
+
+While one could communicate with B<DS9> solely via the B<IPC::XPA>
+class, this class provides a cleaner, less error prone interface,
+as it checks the passed commands and arguments for syntax and data
+type.  It also cleans up returned data from B<DS9>.
+
+To use this class, first construct a B<Image::DS9> object, and
+then apply its methods.  It is possible to both address more
+than one B<DS9> with a single object, as well as having
+multiple B<Image::DS9> objects communicate with their own
+B<DS9> invocations.  Eventually there will be documentation
+spelling out how to do this.
+
+
+=head1 METHODS
+
+The methods in this class closely follow the XPA access points.  The
+documentation here tries to cover the mechanics of calling the
+methods. For more information on what the methods do, or how the
+arguments affect things, please consult the B<DS9> documentation.
+
+=head2 Arguments
+
+Commands sent to DS9 are sent as strings.  Many of the option strings
+are available as Perl constants.  See L</Constants> for more details.
+
+=head2 Boolean values
+
+Some methods take boolean values; these may be the strings C<on>, C<off>,
+C<yes>, C<no>, or the integers C<1> or C<0>.
+
+=head2 Return Values
+
+Because a single B<Image::DS9> object may communicate with multiple
+instances of B<DS9>, queries may return more than one value.
+Because one usually communicates with a single B<DS9> instance,
+if a query is made in scalar mode, the result is returned as a scalar,
+i.e.:
+
+	$cmap = $dsp->cmap();
+
+In this mode, if more than one server responds, you'll get the
+results for a randomly chosen server.  Some commands, in particular
+some of the options to the C<fits>, will return a scalar reference
+in called in scalar mode, as the returned data may be large, and it
+makes no sense to have multiple copies of the data floating about.
+These commands are documented below.
+
+If a return value is multi-valued, a query in scalar context yields a
+reference to an array, not a scalar.  For instance:
+
+	$res = $dsp->bin( 'about' );
+	($x, $y ) = @$res;
+
+returns a reference to an array, while
+
+	$res = $dsp->bin( 'buffersize' );
+
+returns a scalar.  Don't attempt to do
+
+	($x, $y ) = $dsp->bin( 'about' ); # ERROR DON"T DO THIS
+
+as it will return a full blown hash as documented next.
+
+When queries are made in list mode, the return values are hashes,
+rather than scalars.  The hash has as keys the names of the servers,
+with the values being references to hashes with the keys C<name>,
+C<buf> and C<message>.  The C<message> element is present if there was
+an error. The C<buf> element contains the results of a query.
+
+For example,
+
+	use Data::Dumper;
+	%cmaps = $dsp->cmap;
+	print Dumper \%cmaps;
+
+yields
+
+	$VAR1 = {
+	         'DS9:ds9 838e2ab4:32832' =>
+	          {
+	            'name' => 'DS9:ds9 838e2ab4:32832',
+	            'buf' => 'Grey'
+	          }
+	        };
+
+Ordinarily, the C<buf> element will be unaltered (except for the
+removal of trailing newlines) from what B<DS9> outputs.  For
+multi-valued return results, C<buf> is set to an array containing
+the values:
+
+	use Data::Dumper;
+	%res = $dsp->bin( 'about' );
+	print Dumper \%res;
+
+	$VAR1 = {
+	         'DS9:ds9 838e2ab4:32832' =>
+	          {
+	            'name' => 'DS9:ds9 838e2ab4:32832',
+	            'buf' => [ 20, 30 ],
+	          }
+	        };
+
+Sending data doesn't result in a return value.
+
+
+=head2 Error Returns
+
+In case of error, an exception is thrown via B<croak()>.  The B<res()>
+method will return a hash, keyed off of the servers' names.  For each
+server which had an error, the hash value will be a reference to a
+hash containing the keys C<name> and C<message>; the latter will
+contain error information.  For those commands which return data, and
+for those servers which did not have an error, the C<buf> key will be
+available.
+
+=head2 Administrative Methods
+
+=over 8
+
+=item new
+
+  $dsp = new Image::DS9;
+  $dsp = new Image::DS9( \%attrs );
+
+Construct a new object.  It returns a handle to the object.  It throws
+an exception (catch via B<eval>) upon error.
+
+The optional hash B<attrs> may contain one of the following keys:
+
+=over 8
+
+=item Server
+
+An alternate server to which to communicate.  It defaults to C<ds9>.
+
+=item WaitTimeOut
+
+The default number of seconds that the B<wait()> method should
+try to contact B<DS9> servers.
+
+=item max_servers
+
+The maximum number of servers to which to communicate.  It defaults to
+the number of C<DS9> servers running at the time the constructor is
+called.
+
+=item min_servers
+
+The minimum number of servers which should respond to commands.  If
+a response is not received from at least this many servers, an exception
+will be thrown.  It defaults to C<1>.
+
+=item ResErrCroak
+
+If true, queries sent to B<ds9> which returns fewer values than
+expected will result in B<croak()>s.  This may be a problem if B<ds9>
+is queried for inappropriate information. For example, it will return
+an empty result if a image (i.e. not a binned event list) is displayed
+in the current frame and the names of the binned columns are queried
+(which of course makes no sense).  See the C<ResErrWarn> and
+C<ResErrIgnore> attributes for ways of handling this.
+
+If too I<many> results are returned, this module will always croak.
+B<ResErrCroak> is the default mode.
+
+=item ResErrWarn
+
+If true, queries sent to B<ds9> which returns fewer values than
+expected will result in B<carp()>s and will be compensated for by
+filling in the missing values with empty strings.
+
+=item ResErrIgnore
+
+Queries sent to B<ds9> which returns fewer values than expected are
+silently compensated for by filling in the missing values with
+empty strings.
+
+=back
+
+For example,
+
+	$dsp = new Image::DS9( { max_servers => 3 } );
+
+
+=item nservers
+
+  $nservers = $dsp->nservers;
+
+This returns the number of servers which the object is communicating
+with.
+
+=item res
+
+  %res = $dsp->res;
+
+In case of error, the returned results from the failing B<XPA> call
+are available via this method.  It returns a hash, keyed off of the
+server signature(s). See the B<IPC::XPA> documentation for more
+information on what the hashes contain.
+
+=item wait
+
+  $dsp->wait();
+  $dsp->wait($timeout);
+
+Try to contact the B<DS9> servers, and wait until at least
+B<min_servers> have replied.  It will attempt this for
+B<WaitTimeOut> seconds if no timeout is supplied, else
+the given time.  It returns true upon success.  This routine
+is useful for doing things like:
+
+  $dsp = new Image::DS9;
+  unless ( $dsp->nservers )
+  {
+    system("ds9 &" );
+    $dsp->wait() or die( "unable to connect to DS9\n" );
+  }
+
+=back
+
+
+=head2 Control Methods
+
+Most methods exactly parallel the B<DS9> B<XPA> commands.  In general
+each element in a command is passed as a separate argument to the
+method.  For example, to change the binning factor:
+
+	 $dsp->bin( factor => 0.2 );
+
+Some commands have more arguments:
+
+	$dsp->bin( smooth => function => 'boxcar' );
+	$dsp->bin( smooth => radius => 33 );
+	$dsp->bin( about => ( 3, 3 ) );
+	$dsp->bin( cols => ( 'rt_x', 'rt_y' ) );
+
+Note the use of the C<=E<gt>> operator to force preceding barewords to be
+treated as strings, and the frivolous use of extra parenthesis for
+aesthetics.  Some arguments are concatenated to avoid confusion; see
+the documentation for the individual methods.
+
+Some commands can query B<DS9> for state information as well as set it.
+For example,
+
+        $function = $dsp->bin( smooth => function );
+
+B<Image::DS9> differentiates between the setting and requesting of
+values by the presence or absence of the argument containing the information.
+
+Some commands take a hash as their last argument, which contains
+attributes which are passed on to B<DS9>.
+
+True Boolean values may be one of the following:  C<1>, C<yes>, C<true>.
+False Boolean values may be one of the following:  C<0>, C<no>,
+C<false>.  Boolean values returned by a command are always translated
+into either C<0> or C<1>.
+
+The documentation for the commands lists the options supported and
+any deviations from the general approach described above.  Refer
+to the B<DS9> B<XPA> documentation to determine which commands permit
+queries and the allowed data types for the arguments.  B<Image::DS9>
+checks that all data passed to B<DS9> is of the appropriate type.
+
+
+The documentation which follows uses doubled square brackets to
+indicate an optional argument.
+
+=over 8
+
+=item array
+
+  $dsp->array( $image, [[ \%attrs ]]);
+
+This is a interface to the B<array> access point, which displays
+images.  C<$image> may be a PDL object, a scalar, or a scalar
+reference.  If it is a PDL object, all required information is
+extracted from it, and it is passed to B<DS9>.  Otherwise, it should
+be binary data suitable for B<DS9>, and the B<attrs> hash should be
+used to pass dimensional and size data to B<DS9>.  B<attrs> may
+contain the following elements:
+
+=over 8
+
+=item xdim
+
+The X coordinate array extent.
+
+=item ydim
+
+The Y coordinate array extent.
+
+=item bitpix
+
+The number of bits per pixel.  Negative values indicate a floating point
+number (similar to the B<FITS> standard).
+
+=back
+
+=item bin
+
+The following options are supported:
+
+C<about>,
+C<buffersize>,
+C<cols>,
+C<factor>,
+C<filter>,
+C<function>,
+C<average>,
+C<sum>,
+C<to fit> or C<tofit>
+
+=item blink
+
+To query the whether blink is on:
+
+   $is_blink_on = $dsp->blink( 'state' );
+
+To turn blink on:
+
+   $dsp->blink;
+
+=item cd
+
+  $dsp->cd( $dir );
+  $dir = $dsp->cd;
+
+=item cmap
+
+The following options are supported:
+
+C<file>,
+C<invert>,
+C<value>.
+
+To query the current colormap,
+
+   $cmap = $dsp->cmap;
+
+=item contour
+
+The following options are supported:
+
+C<copy>,
+C<paste>,
+C<save>.
+
+To turn contouring on or off:
+
+   $dsp->contour( $boolean_value );
+
+To query the state of contouring:
+
+   $is_contour_on = $dsp->contour;
+
+=item crosshair
+
+  $dsp->crosshair( [[x, y, <coordinate system>, [[<sky frame>]],
+                                               [[<sky format>]] ]] );
+  $coords = $dsp->crosshair( [[<coordinate system>,
+                        [[<sky frame>]], [[<sky format>]] ]] );
+  ($x, $y ) = @$coords
+
+To query the position, pass no coordinates to the method.  The
+return value is multi-valued.
+
+=item cursor
+
+  $dsp->cursor( $x, $y );
+
+Set the cursor position to the given position.
+
+=item dss
+
+The following options are supported:
+
+C<name>
+C<coord>
+C<server>
+C<survey>
+C<size>
+
+When queried, some of the options may return more than one value.  In
+those cases, a query yields a reference to an array, not a scalar.
+For instance:
+
+	$res = $dsp->dss( 'coord' );
+	($x, $y ) = @$res;
+
+returns a reference to an array, while
+
+	$res = $dsp->dss( 'server' );
+
+returns a scalar.  Don't attempt to do
+
+	($x, $y ) = $dsp->dss( 'coord' ); # ERROR DON"T DO THIS
+
+As it will return a full blown hash as documented in L</Return Values>.
+
+=item exit
+
+No options, just the grand finale.
+
+
+=item file
+
+return the current file name loaded for the current frame:
+
+  $dsp->file( $file );
+
+Save the frame as a file:
+
+  $dsp->file( 'save', [[<save options>>,]] $file );
+
+Display the specified C<$file>.
+
+  $dsp->file( [[<type>]], $file, [[\%attrs]] );
+
+The attributes are the possible options for the B<array> type (see
+the B<DS9> docs), as well as the following options:
+
+=over 8
+
+=item C<new> I<boolean>
+
+create a new frame.
+
+=item C<bin> I<columns>.
+
+I<columns> should be an array ref containing the names of the columns
+upon which to bin the data
+
+=item C<extname> I<string>
+
+The name of the FITS extension HDU to display.
+
+=item C<filter> I<string>
+
+A B<DS9> filter specification
+
+=back
+
+
+=item fits
+
+Return the current frame (as a fits file) as a I<scalar ref>
+
+  $scalar_ref = $dsp->fits( [[<type>]], [[<type options>]], [[\%attr]] );
+
+Load an image from a scalar:
+
+  $dsp->fits( [[<type>]], [[%attrs]] );
+
+The available attributes are
+
+=over 8
+
+=item C<new> I<boolean>
+
+create a new frame.
+
+=item C<bin> I<columns>.
+
+I<columns> should be an array ref containing the names of the columns
+upon which to bin the data
+
+=item C<extname> I<string>
+
+The name of the FITS extension HDU to display.
+
+=item C<filter> I<string>
+
+A B<DS9> filter specification
+
+=back
+
+
+=item frame
+
+The following options are supported:
+
+C<center>,
+C<clear>,
+C<new>,
+C<delete>,
+C<reset>,
+C<refresh>,
+C<hide>,
+C<show>,
+C<move>,
+C<first>,
+C<next>,
+C<prev>,
+C<last>,
+C<frameno>,
+C<all>,
+C<center>,
+
+To load a particular frame, specify the frame number as the argument:
+
+   $dsp->frame(3).
+
+The C<all> option returns an array of the frames:
+
+   $array_ref = $dsp->frame( 'all' );
+
+=item grid
+
+The C<load> and C<save> options are supported.
+
+With a boolean argument, specify the state of the coordinate grid, else
+return it.
+
+=item height
+
+  $dsp->height( $height );
+  $height = $dsp->height;
+
+=item iconify
+
+  $dsp->iconify($bool);
+  $iconify_state = $dsp->iconify;
+
+With a boolean argument, specify the iconification state, else
+return it.
+
+=item lower
+
+  $dsp->lower();
+
+Lowers the B<DS9> window in the stacking order
+
+=item minmax
+
+Supports the options
+
+C<mode>,
+C<interval>.
+
+Their values may be queried by passing no arguments.
+
+
+=item mode
+
+  $mode = $dsp->mode;
+  $dsp->mode( $state );
+
+Set (or query) the first mouse button mode state.
+
+=item nameserver
+
+The following options are supported: 
+
+C<name>,
+C<server>,
+C<skyformat>.
+
+They may be queried by specifying no argument.
+
+=item orient
+
+  $state = $dsp->orient;
+  $dsp->orient( $state );
+
+Set (or query) the orientation of the current frame.
+
+=item page
+
+To reflect the B<XPA> command sequence, the first argument must
+always be C<setup>, e.g.
+
+  $dsp->page( setup => orientation => 'portrait' );
+
+The supported options are:
+
+C<orientation>,
+C<pagescale>,
+C<pagesize>.
+
+They may be queried by specifying no argument.
+
+=item pan
+
+To set the pan position:
+
+  $dsp->pan( [[<type>,]] $x, $y,
+        [[ <coordinate system> [[,<sky frame>]] [[,<sky format>]] ]] );
+
+where C<type> is one of C<abs> or C<to> to specify an absolute position,
+or C<rel> or unspecified for a relative pan.
+
+To get the pan position:
+
+  $pan = $dsp->pan(
+          [[ <coordinate system> [[,<sky frame>]] [[,<sky format>]] ]] );
+
+=item pixeltable
+
+  $dsp->pixeltable($bool);
+  $state = $dsp->pixeltable;
+
+With a boolean argument, specify the pixeltable state, else
+return it.
+
+=item print
+
+I<print only works if >B<ds9>I< uses the >C<local>I< XPA transfer protocol>.
+Set the B<XPA_METHOD> environment variable to C<local> prior to
+starting up B<ds9> and using this module.
+
+The supported options are:
+
+C<destination>,
+C<command>,
+C<filename>,
+C<palette>,
+C<level>,
+C<interpolate>,
+C<resolution>,
+
+To print, specify no options.  To query an option, don't specify
+a value for it.
+
+=item quit
+
+Just do it.
+
+=item raise
+
+  $dsp->raise()
+
+Raise the B<DS9> window in the windkow stacking order.
+
+=item regions
+
+The supported options are:
+
+C<movefront>,
+C<moveback>,
+C<selectall>,
+C<selectnone>,
+C<deleteall>,
+C<load>,
+C<save>,
+C<format>,
+C<system>,
+C<sky>,
+C<skyformat>,
+C<strip>,
+C<shape>,
+C<color>,
+C<width>,
+C<source>,
+C<background>,
+C<include>,
+C<exclude>,
+C<selected>.
+
+To query the state of options which are subject to query, don't
+pass a value for the option (just the option name).
+
+To send B<DS9> a region, pass B<regions> a scalar or scalar ref:
+
+  $dsp->regions( $region );
+
+To query the current list of regions and receive the results using
+the current attribute formats,
+
+  $regions = $dsp->regions();
+
+
+Alternatively, one can request a different attribute format directly
+in the query by passing a hash reference with the following available
+keys: C<-format>, C<-system>, C<-sky>, C<-skyformat>, C<-strip>.
+
+  $regions = $dsp->regions( \%attr );
+
+=item rotate
+
+  $rotate = $dsp->rotate;	  # query current angle
+  $dsp->rotate( abs => $angle );  # absolute
+  $dsp->rotate( to => $angle );   # absolute
+  $dsp->rotate( rel => $angle );  # relative
+  $dsp->rotate( $angle );         # relative
+
+
+=item saveas
+
+The following options are supported:
+
+C<jpeg>,
+C<tiff>,
+C<png>,
+C<ppm>.
+
+=item scale
+
+The following options are supported:
+
+C<datasec>,
+C<limits>,
+C<mode>,
+C<scope>.
+
+To query the state of the options, don't pass a value for the option.
+A query of C<limits> returns an array ref, as it is multi-valued.
+
+
+=item single
+
+To query the whether single mode is set:
+
+   $is_single_on = $dsp->single( 'state' );
+
+To turn single mode on:
+
+   $dsp->single;
+
+
+=item source
+
+Just use the source, Luke.
+
+=item tcl
+
+Nothing special here, move along.
+
+=item tile
+
+The following options are supported:
+
+C<mode>,
+C<grid>,
+C<grid> C<mode>,
+C<grid> C<layout>,
+C<grid> C<gap>,
+C<row>,
+C<column>.
+
+To specify grid modes, layout and gap, do this:
+
+  $dsp->tile( grid => mode => 'automatic' );
+
+To turn tiling on or off,
+
+  $dsp->tile( $boolean ).
+
+To query tiling state, either
+
+  $state = $dsp->tile;
+  $state = $dsp->tile( 'state' ); # same as blink and single
+
+To query those options that support query, don't pass a value for the option.
+Note that a query of the grid layout will return an arrayref.
+
+
+=item update
+
+The now option is passed via a hash:
+
+  $dsp->update( { now => 1 } );
+
+=item version
+
+Queries and returns B<DS9>'s version.
+
+=item view
+
+Supported options are:
+
+C<layout>,
+C<info>,
+C<panner>,
+C<magnifier>,
+C<buttons>,
+C<colorbar>,
+C<graph>,
+C<filename>,
+C<object>,
+C<minmax>,
+C<lowhigh>,
+C<frame>,
+C<image>,
+C<physical>,
+C<wcs>,
+C<wcsa>..C<wcsz>.
+C<red>,
+C<green>,
+C<blue>
+
+=item vo
+
+All aboard!
+
+=item wcs
+
+The options supported are:
+
+C<wcs>, C<wcsa>..C<wcsz>,
+C<system>,
+C<sky>,
+C<skyformat>,
+C<align>,
+C<reset>
+C<replace>,
+C<append>,
+C<replace>,
+C<append>.
+
+The C<replace> and C<append> options may take either the C<file>
+option (followed by a filename)
+
+  $dsp->wcs( replace => file => $filename );
+
+or a scalar, scalar ref, hash ref, or array ref containing a WCS specification:
+
+  $dsp->wcs( replace => \%wcs ).
+  $dsp->wcs( replace => \@wcs ).
+  $dsp->wcs( replace => $wcs ).
+  $dsp->wcs( replace => \$wcs ).
+
+If it is scalar, the scalar should hold the WCS record.  If it is a hash
+reference, a WCS record is constructed from the keys and values.  If
+it is an array reference, the record is constructed by appending a
+newline to each array value and concatenating the resultant strings.
+
+Query the appropriate options by not passing a value for the option.
+
+=item web
+
+Set (or query) the web address in B<DS9>'s built in browser.
+
+=item width
+
+  $dsp->width( $width );
+  $width = $dsp->width;
+
+=item zoom
+
+  $zoom = $dsp->zoom;          # query
+  $dsp->zoom( to => $zoom );   # absolute
+  $dsp->zoom( abs => $zoom );  # absolute
+  $dsp->zoom( rel => $zoom );  # relative
+  $dsp->zoom( $zoom );         # relative
+  $dsp->zoom(0);               # zoom to fit
+  $dsp->zoom('tofit');         # zoom to fit
+  $dsp->zoom('to', 'fit');     # zoom to fit
+
+=item Set
+
+  $dsp->Set( $cmd, $buf )
+
+Send an arbitrary XPA Set command to the DS9 server.  If there was an
+error sending the command to the server, or fewer than expected
+servers responded, it'll B<croak()>.  Messages from the server will be
+made available via the B<res()> method.  See IPC::XPA for more
+information on the format of those messages.
+
+=item Get
+
+  %results = $dsp->Get( $cmd )
+
+Send an arbitrary XPA Get command to the DS9 Server.   If there was an
+error sending the command to the server, or fewer than expected
+servers responded, it'll B<croak()>.  Messages from the server will be
+made available via the B<res()> method.
+
+Upon success, it'll return the results of the command.  If called in
+scalar mode, it'll return just one result (if there is more than one
+server, it returns results from an arbitrary server). In array mode,
+It'll return a hash, with the hash keys being the names of the server.
+The hash values are themselves references to hashes containing
+the results, with a key of C<buf>.
+
+=back
+
+=head2 Constants
+
+Many of the options which must be passed as strings to the command
+methods are available as Perl constants.  This provides a way for Perl
+to verify the strings at compile time, rather than run time.  For
+example,
+
+  $ds9->regions( 'resett' );
+
+will be caught at run time, while
+
+  $ds9->regions( _resett );
+
+will be caught at compile time.  There are some places where Perl
+will get confused as to whether you are using a constant or a string.
+For example, assume there's a constant named C<_mode>:
+
+  $ds9->tile( _mode => 'grid' );
+
+Because of the C<=E<gt>> operator, C<_mode> will be turned into the
+string C<_mode>, rather than being identified as the constant B<_mode>,
+which presumably will resolve into the string C<mode>.  To avoid this,
+use the C<,> operator:
+
+  $ds9->tile( _mode, 'grid' );
+
+There are two ways to get to the constants:
+B<Image::DS9::OldConstants> and B<Image::DS9::Constants>.  The former
+is the older deprecated way, which groups the constants by command and
+uses a group specific prefix to make the constants unique.  This is
+confusing, as one has to remember all of the prefixes.
+
+The new arrangement uses a single prefix for all constants.  The
+prefix defaults to C<_>, but may be specified by the user.  See
+B<Image::DS9::Constants> for more info.
+
+=head1 Obsolete Methods, Changed Interfaces
+
+
+These methods were available in previous versions of B<DS9>, but
+are no longer supported.
+
+=over
+
+=item display
+
+This hid C<tile yes|no>, C<blink>, and C<single>.  Call them
+directly.
+
+=item tile_mode
+
+This was really C<tile>, but without the C<tile yes|no> option.
+Call C<tile> instead.
+
+=back
+
+The constants previous available from B<Image::DS9> are now available
+via B<Image::DS9::OldConstants>.
+
+=head1 REQUIREMENTS
+
+B<Image::DS9> requires B<IPC::XPA> to be installed.  At present, both
+B<DS9> and B<xpans> (part of the B<XPA> distribution) must be running
+prior to any attempts to access B<DS9>.  B<DS9> will automatically
+start B<xpans> if it is in the user's path.
+
+B<DS9> is available at C<http://hea-www.harvard.edu/RD/ds9/>.
+
+B<XPA> is available at C<http://hea-www.harvard.edu/RD/xpa/>.
+
+=head1 LICENSE
+
+This software is released under the GNU General Public License.  You
+may find a copy at
+
+   http://www.fsf.org/copyleft/gpl.html
+
+=head1 AUTHOR
+
+Diab Jerius ( djerius@cfa.harvard.edu )
+
+=head1 SEE ALSO
+
+perl(1), IPC::XPA.
+
+=cut

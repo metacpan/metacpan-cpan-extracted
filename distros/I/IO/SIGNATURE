@@ -1,0 +1,60 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 56fc4a6898ff79b079270c786c4171577eba66fe ChangeLog
+SHA1 b41e60d1f0074df55cab2eb6917b1d02e152d7fb IO.pm
+SHA1 dfaa60111f7f4b4802462c16a808afdbf4ee776b IO.xs
+SHA1 68740fe4a2ceb1d615fe72602c7343ccdfed11ff MANIFEST
+SHA1 f486bb9de8eaf932f6e71cddb14bcbf998c5e936 META.yml
+SHA1 5b300042817f21160bd7757b46907cc39de8ed95 Makefile.PL
+SHA1 95dd3cdd177410b7e05e8be47257de3fd0e5a2de README
+SHA1 cbebed0054993f8554975e8423ad87810c4703e3 lib/IO/Dir.pm
+SHA1 5cd96bae6ea66c6697becd5de9deb33833165646 lib/IO/File.pm
+SHA1 f4998c4be5d802dd2c0e212af6e31673fcc0874b lib/IO/Handle.pm
+SHA1 8e27e33e1c1412fc5e8fc69a94426e2a94d47d79 lib/IO/Pipe.pm
+SHA1 641773c8d7232af97945b5a0fad5524c43198c6f lib/IO/Poll.pm
+SHA1 fb2c1270260aae4a464c47a7592aa471c9105dfa lib/IO/Seekable.pm
+SHA1 378fe48b732975a6955c55bbe62680c2b59824c3 lib/IO/Select.pm
+SHA1 2636d31ddc4e9f0186359de2050a6c280615b8ed lib/IO/Socket.pm
+SHA1 8075ebe07903acf2f8fb96df319ce1602f9b4a72 lib/IO/Socket/INET.pm
+SHA1 62ac6d72686dd4deb56baa1606af9e94082ee15f lib/IO/Socket/UNIX.pm
+SHA1 5f8c30523272b59c8952b2c63579f78de5e5f239 poll.c
+SHA1 20378e1968187ad569e3d69bb5077badb8c83fd1 poll.h
+SHA1 0b7ca8e23654a2d02ef533b0037ceec9fb0ada47 t/IO.t
+SHA1 8637fc119bff67af0d76e3ca2ff3bbd93d03c5df t/io_const.t
+SHA1 93299b25099d76015507f478f7c0ea627a4455e0 t/io_dir.t
+SHA1 09674bf9199ae652efad49eb9d1d1f428357f824 t/io_dup.t
+SHA1 7a245c6f1ea59b7e7f5d20d95a532f18434274d1 t/io_file.t
+SHA1 4e9c13f5b4573814318d4fe7068de542a3404341 t/io_linenum.t
+SHA1 3c1b6e51ab7c21887c4519824abbda4c4911ebe3 t/io_multihomed.t
+SHA1 f8d3184feb386124230d07d0919f4d172322e023 t/io_pipe.t
+SHA1 d0565aff22dd3eb8bea90952ba57244278c00a30 t/io_poll.t
+SHA1 997bf026a7ce78ebc8c9dc70d8969e05273d1eb3 t/io_sel.t
+SHA1 03339c7176c1920f416f74c1a27d7fa29a0c7628 t/io_sock.t
+SHA1 c858bc6901927912902ccaa6fee103f513671290 t/io_taint.t
+SHA1 dfd2dc1376acd3cc61185ce43112bf2124750c2a t/io_tell.t
+SHA1 03780c5fb6553a80f2ce896e008ce8cdefc55e46 t/io_udp.t
+SHA1 6221ba862c949dca9e0febd8855ad02c6d3caa2c t/io_unix.t
+SHA1 9fa2fc325b11d87c3097cca61e3af3a016709219 t/io_utf8.t
+SHA1 3b445ba14e47c16f0a72a99cdce8e4021e6b526a t/io_xs.t
+SHA1 2393b3e585978305e31ad3d898649f058f451ee9 t/test.pl
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (Darwin)
+
+iEYEARECAAYFAkoLXDMACgkQR0BL4gbYw3QzgACffPbJi9/fepQYL+PFY8KdgrPA
+VxkAoI38XKkjL6rNzdyxO1dZLOi7XsMh
+=LbxT
+-----END PGP SIGNATURE-----

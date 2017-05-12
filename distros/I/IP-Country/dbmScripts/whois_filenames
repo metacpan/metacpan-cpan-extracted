@@ -1,0 +1,6 @@
+#!/bin/bash
+ftp ftp://ftp.ripe.net/ripe/dbase/split/ripe.db.inetnum.gz && gunzip ripe.db.inetnum.gz
+ftp ftp://ftp.ripe.net/pub/stats/afrinic/delegated-afrinic-latest
+ftp ftp://ftp.ripe.net/pub/stats/apnic/delegated-apnic-latest
+ftp ftp://ftp.ripe.net/pub/stats/arin/delegated-arin-latest
+ftp ftp://ftp.ripe.net/pub/stats/lacnic/delegated-lacnic-latest

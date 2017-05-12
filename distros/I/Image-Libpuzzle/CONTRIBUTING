@@ -1,0 +1,22 @@
+Features for this module are motivated by my needs and needs of others who
+let me know. I appreciate patches and Issue reports.
+
+
+To report a bug, pleae create a new Issue if a current doesn't cover it.
+
+To request support for something, please create a new Issue if a current issue doesn't cover it.
+
+To send something upstream:
+
+a. create an Issue *here*
+b. fork this repo from master
+c. on your local clone, create a branch using a descriptive name, preferably of the form "Issue-x-some-terse-description"
+d. check your work - please use perltidy
+e. check your wokr - recommended you also use perlcritic
+f. check your work - do not break existing unit tests, if you do necessarily please fix the broken tests
+g. add a regression test or feature test in ./t, name it using the convention see in ./t (<num>-thing.t)
+h. issue pull request
+
+Thank you!
+Brett
+

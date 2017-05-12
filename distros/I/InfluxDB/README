@@ -1,0 +1,355 @@
+NAME
+
+    InfluxDB - Client library for InfluxDB
+
+INSTALLATION
+
+    To install this module, run the following commands:
+
+        perl Build.PL
+        ./Build
+        ./Build test
+        ./Build install
+
+CAUTION
+
+        The JSON write protocol is deprecated as of InfluxDB 0.9.1. It is
+        still present but it will be removed when InfluxDB 1.0 is
+        released. The line protocol is the primary write protocol for
+        InfluxDB 0.9.1+.
+
+    This InfluxDB module can handle only JSON protocol.
+
+    If you want to use line protocol, please use InfluxDB::LineProtocol
+    module.
+
+SYNOPSIS
+
+        use InfluxDB;
+        
+        my $ix = InfluxDB->new(
+            host     => '127.0.0.1',
+            port     => 8086,
+            username => 'scott',
+            password => 'tiger',
+            database => 'test',
+            # ssl => 1, # enable SSL/TLS access
+            # timeout => 5, # set timeout to 5 seconds
+        );
+        
+        $ix->write_points(
+            data => {
+                name    => "cpu",
+                columns => [qw(sys user idle)],
+                points  => [
+                    [20, 50, 30],
+                    [30, 60, 10],
+                ],
+            },
+        ) or die "write_points: " . $ix->errstr;
+        
+        my $rs = $ix->query(
+            q => 'select * from cpu',
+            time_precision => 's',
+        ) or die "query: " . $ix->errstr;
+        
+        # $rs is ArrayRef[HashRef]:
+        # [
+        #   {
+        #     columns => ["time","sequence_number","idle","sys","user"],
+        #     name => "cpu",
+        #     points => [
+        #       ["1391743908",6500001,10,30,60],
+        #       ["1391743908",6490001,30,20,50],
+        #     ],
+        #   },
+        # ]
+        
+        my $hrs = $ix->as_hash($rs); # or InfluxDB->as_hash($rs);
+        # convert into HashRef for convenience
+        # {
+        #   cpu => [
+        #     {
+        #       idle   => 10,
+        #       seqnum => 6500001,
+        #       sys    => 30,
+        #       time   => "1391743908",
+        #       user   => 60
+        #     },
+        #     {
+        #       idle   => 30,
+        #       seqnum => 6490001,
+        #       sys    => 20,
+        #       time   => "1391743908",
+        #       user   => 50
+        #     }
+        #   ]
+        # }
+
+DESCRIPTION
+
+    This module `InfluxDB` is a client library for InfluxDB
+    <http://influxdb.org>.
+
+METHODS
+
+ Class Methods
+
+  new(%args:Hash) :InfluxDB
+
+    Creates and returns a new InfluxDB client instance. Dies on errors.
+
+    %args is following:
+
+    host => Str
+
+    port => Int (default: 8086)
+
+    username => Str
+
+    password => Str
+
+    database => Str
+
+    ssl => Bool (optional)
+
+    timeout => Int (default: 120)
+
+    debug => Bool (optional)
+
+ Instance Methods
+
+  write_points(%args:Hash) :Bool
+
+    Write to multiple time series names.
+
+    data => ArrayRef[HashRef] | HashRef
+
+      HashRef like following:
+
+          {
+              name    => "name_of_series",
+              columns => ["col1", "col2", ...],
+              points  => [
+                  [10.0, 20.0, ...],
+                  [10.9, 21.3, ...],
+                  ...
+              ],
+          }
+
+      The time and any other data fields which should be graphable must be
+      numbers, not text. See "simple scalars" in JSON.
+
+    time_precision => "s" | "m" | "u" (optional)
+
+      The precision timestamps should come back in. Valid options are s for
+      seconds, m for milliseconds, and u for microseconds.
+
+  delete_points(name => Str) :Bool
+
+    Delete ALL DATA from series specified by name
+
+  query(%args:Hash) :ArrayRef
+
+    q => Str
+
+      The InfluxDB query language, see:
+      http://influxdb.org/docs/query_language/
+
+    time_precision => "s" | "m" | "u" (optional)
+
+      The precision timestamps should come back in. Valid options are s for
+      seconds, m for milliseconds, and u for microseconds.
+
+    chunked => Bool (default: 0)
+
+      Chunked response.
+
+  as_hash($result:ArrayRef[HashRef]) :HashRef
+
+    Utility instance/class method for handling result of query.
+
+    Takes result of query()(ArrayRef) and convert into following HashRef.
+
+        {
+          cpu => [
+            {
+              idle => 10,
+              seqnum => 6500001,
+              sys => 30,
+              time => "1391743908",
+              user => 60
+            },
+            {
+              idle => 30,
+              seqnum => 6490001,
+              sys => 20,
+              time => "1391743908",
+              user => 50
+            }
+          ]
+        }
+
+  create_continuous_query(q => Str, name => Str) :ArrayRef
+
+    Create continuous query.
+
+        $ix->create_continuous_query(
+            q    => "select mean(sys) as sys, mean(usr) as usr from cpu group by time(15m)",
+            name => "cpu.15m",
+        );
+
+  list_continuous_queries() :ArrayRef
+
+    List continuous queries.
+
+  drop_continuous_query(id => Str) :ArrayRef
+
+    Delete continuous query that has specified id.
+
+    You can get id of continuous query by list_continuous_queries().
+
+  switch_database(database => Str) :Bool
+
+    Switch to another database.
+
+  switch_user(username => Str, password => Str) :Bool
+
+    Change your user-context.
+
+  create_database(database => Str) :Bool
+
+    Create database. Requires cluster-admin privileges.
+
+  list_database() :ArrayRef[HashRef]
+
+    List database. Requires cluster-admin privileges.
+
+        [
+          {
+            name => "databasename",
+            replicationFactor => 1
+          },
+          ...
+        ]
+
+  delete_database(database => Str) :Bool
+
+    Delete database. Requires cluster-admin privileges.
+
+  list_series() :ArrayRef[HashRef]
+
+    List series in current database
+
+  create_database_user(name => Str, password => Str) :Bool
+
+    Create a database user on current database.
+
+  delete_database_user(name => Str) :Bool
+
+    Delete a database user on current database.
+
+  update_database_user(name => Str [,password => Str] [,admin => Bool])
+  :Bool
+
+    Update a database user on current database.
+
+  list_database_users() :ArrayRef
+
+    List all database users on current database.
+
+  show_database_user(name => Str) :HashRef
+
+    Show a database user on current database.
+
+  create_cluster_admin(name => Str, password => Str) :Bool
+
+    Create a database user on current database.
+
+  delete_cluster_admin(name => Str) :Bool
+
+    Delete a database user on current database.
+
+  update_cluster_admin(name => Str, password => Str) :Bool
+
+    Update a database user on current database.
+
+  list_cluster_admins() :ArrayRef
+
+    List all database users on current database.
+
+  show_cluster_admin(name => Str) :HashRef
+
+    Show a database user on current database.
+
+  status() :HashRef
+
+    Returns status of previous request, as following hash:
+
+    code => Int
+
+      HTTP status code.
+
+    message => Str
+
+      HTTP status message.
+
+    status_line => Str
+
+      HTTP status line (code . " " . message).
+
+    content => Str
+
+      Response body.
+
+  errstr() :Str
+
+    Returns error message if previous query was failed.
+
+  host() :Str
+
+    Returns hostname of InfluxDB server.
+
+  port() :Str
+
+    Returns port number of InfluxDB server.
+
+  username() :Str
+
+    Returns current user name.
+
+  database() :Str
+
+    Returns current database name.
+
+ENVIRONMENT VARIABLES
+
+    IX_DEBUG
+
+      Print debug messages to STDERR.
+
+AUTHOR
+
+    HIROSE Masaaki <hirose31@gmail.com>
+
+REPOSITORY
+
+    https://github.com/hirose31/p5-InfluxDB
+
+        git clone https://github.com/hirose31/p5-InfluxDB.git
+
+    patches and collaborators are welcome.
+
+SEE ALSO
+
+    http://influxdb.org
+
+COPYRIGHT
+
+    Copyright HIROSE Masaaki
+
+LICENSE
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

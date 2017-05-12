@@ -1,0 +1,104 @@
+Revision history for Perl extension IO::Socket::TIPC.
+
+1.08 Wed Mar 26 05:09:33 PDT 2008
+	- fix testsuite's Test::Exception detection (again)
+
+1.07 Tue Mar 25 06:39:12 PDT 2008
+	- support the Solaris TIPC stack, thanks to Renaud Metrich
+	- update documentation accordingly
+	- add a ->detect() method with some OS-specific runtime checks
+	- resolve some weird test failures regarding "use_ok" in Test::Simple 0.78
+
+1.06 Mon Jul 17 11:15:35 PDT 2006
+	- 03_socket.t skips if kernel doesn't support TIPC.  (The other tests
+	  already checked this.)
+
+1.05 Tue Jun 27 08:42:00 PDT 2006
+	- add missing (but documented) waitfor.pl example script
+
+1.04 Tue May 16 14:27:00 PDT 2006
+	- Document the fact that ->recvfrom() only requires one argument.
+	- Document the fact that ->getsockopt() and ->setsockopt() are really
+	  just the perl builtins, and point to perlfunc.
+	- Minor POD highlighting changes.
+
+1.03 Tue May 10 13:56:00 PDT 2006
+	- Now that Programmers_Guide.txt is on the TIPC website, remove the local
+	  copy, link to the official one.
+
+1.02 Tue May  9 10:35:10 PDT 2006
+	- Changes file should be in reverse order, newest first.
+	- Oops, the SYNOPSIS was wrong in the manpage.  Fix it.
+
+1.01 Tue Apr 25 18:04:40 PDT 2006
+	- Complete examples/multicast_msg, add a waitfor.pl.
+	- ->recvfrom()'s length argument now defaults to TIPC_MAX_USER_MSG_SIZE.
+
+1.00 Sun Apr 23 20:15:20 PDT 2006
+	- add documentation for getsockopt/setsockopt, and the TIPC specific flags.
+	- add ->new() fields to set TIPC_IMPORTANCE and TIPC_CONN_TIMEOUT before
+	  bind/connect.
+	- remove dependency on Switch.pm.  That seems to have sped things up 300%.
+	- add a multicast example.  Organize examples/.  Document them properly.
+	- tempt fate, release 1.0 - I'm out of features to add, time to fix bugs.
+
+0.11 Sun Apr 23 10:00:35 PDT 2006
+	- change my XS POD into #-style comments... I don't really want my ugly
+	  internals listed as "Documentation" on cpan.org.
+	- Sockaddr.pm: fix the ->set_* functions.  
+	- implement ->getpeername() and ->getsockname().
+	- export tipc_addr, tipc_zone, tipc_cluster, tipc_node functions.
+	- the documentation should now be complete.
+
+0.10  Sat Apr 22 12:37:25 PDT 2006
+	- Add accessor methods for all of the individual Sockaddr fields.
+	- Sockaddr.pm class instances don't really need to be huge hash references,
+	  just a reference to the raw sockaddr_tipc data is fine.  This simplifies
+	  things quite a bit, and speeds it up a little too.
+	- Add an ugly, spammy, memory-leak test for the XS stuff.  It passes.
+	- Run tests in a non-random order.
+
+0.04  Fri Apr 21 09:10:00 PDT 2006
+	- Allan Stephens reported a couple of missing constants.  I went and
+	  grabbed a copy of tipc-1.5.10, its TIPC is missing PF_TIPC, TIPC_CFG_SRV,
+	  TIPC_TOP_SRV and TIPC_RESERVED_NODES.
+	  In the interests of maximum portability, I'm making missing constants a
+	  nonfatal error; the constant just returns 'undef' if it wasn't defined in
+	  tipc.h.  Also, PF_TIPC is rather important, so I've conditionally defined
+	  it to AF_TIPC in TIPC.xs when found to be undefined.  (linux-2.6.16's
+	  tipc.h defines it the same way.)
+	- Added an extra set of tests, to ensure useful return values from those
+	  constants the TIPC module uses internally.  (Currently, a very small
+	  subset of the full list.)
+	- The socket(2) manpage indicates its first field should be a PF_* value,
+	  not AF_*.  Switch TIPC.pm to use PF_TIPC.
+	- Fix Sockaddr's _stringify() XS method, to print everything as unsigned
+	  integers.  This is rather important; portid references are 32-bit and
+	  they seem to be randomly generated, so the high bit is set half of the
+	  time.
+
+0.03  Fri Apr 21 06:17:00 PDT 2006
+	- Tested the module with 5.6.2 successfully.  Lower required version in
+	  Makefile.PL, accordingly.  perl-5.6.0 failed to build (some Makefile
+	  problem), so I was unable to test TIPC against that version.
+	- Rework the Makefile.PL stuff that attempts to find tipc.h.  Work with a
+	  tipc.h file from either linux kernel sources, or from the tipc addon
+	  sources.
+	- As a useful side effect of the above, tell CPANPLUS not to report build
+	  failures if the prerequisites aren't met (OS = Linux, can find tipc.h).
+	- Implement sendto() and recvfrom().  These are still a bit hackish at the
+	  moment, but I can fix that without changing the API.
+	- Write tests for SOCK_RDM and SOCK_DGRAM.  Update the testsuite to always
+	  call things in the right order, rather than relying on sleep(1) to avoid
+	  race conditions.  This speeds "make test" up by 5 seconds or more.
+	- Adjust t/sockaddr.t to skip the throws_ok() tests, when the user doesn't
+	  have Test::Exception installed.  Since we run without it, remove it from
+	  the list of dependencies.
+	- Release 0.03.
+
+0.02  Thu Apr 20 13:15:23 PDT 2006
+	- minor POD fix.
+	- tell CPANPLUS (and everyone else) that we only support Linux (for now).
+
+0.01  Thu Apr 20 09:34:45 PDT 2006
+	- First release.  Supports SOCK_STREAM and SOCK_DGRAM.

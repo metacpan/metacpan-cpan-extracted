@@ -1,0 +1,79 @@
+==============================================================================
+                   Release of version 0.62 of Inline::Files
+==============================================================================
+
+
+NAME
+    Inline::File - Multiple virtual files at the end of your code
+
+SYNOPSIS
+
+    use Inline::Files;
+
+    my Code $here;
+
+    while (<FOO>) { print }
+
+    # etc.
+
+    __FOO__
+    This is a virtual file at the end
+    of the data
+        
+    __BAR__
+    This is another
+    virtual
+
+    file
+    __FOO__
+    This is yet another 
+    such file
+
+DESCRIPTION
+    Inline::Files generalizes the notion of the `__DATA__' marker and the
+    associated `<DATA>' filehandle, to an arbitrary number of markers and
+    associated filehandles.
+
+    When you add the line:
+
+            use Inline::Files;
+
+    to a source file you can then specify an arbitrary number of
+    distinct virtual files at the end of the code.
+
+AUTHOR
+    Damian Conway (damian@conway.org)
+
+
+==============================================================================
+
+CHANGES IN VERSION 0.52
+
+(No changes have been documented for this version)
+
+==============================================================================
+
+AVAILABILITY
+
+Inline::Files has been uploaded to the CPAN
+and is also available from:
+
+	http://www.csse.monash.edu.au/~damian/CPAN/Inline-Files.tar.gz
+
+==============================================================================
+
+
+==============================================================================
+
+CHANGES IN VERSION 0.62
+
+
+
+
+==============================================================================
+
+AVAILABILITY
+
+Inline::Files has been uploaded to the CPAN
+
+==============================================================================

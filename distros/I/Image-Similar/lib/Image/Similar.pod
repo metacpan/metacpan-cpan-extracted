@@ -1,0 +1,335 @@
+
+=encoding UTF-8
+
+=head1 NAME
+
+Image::Similar - find out how similar two images are
+
+=head1 SYNOPSIS
+
+    
+    use Image::Similar 'load_image';
+    use Imager;
+    my $x = Imager->new ();
+    # Get image data from file
+    $x->read (file => 'x.png');
+    # Load image into Image::Similar
+    my $xi = load_image ($x);
+    my $y = Imager->new ();
+    # Get image data from file
+    $y->read (file => 'y.jpg');
+    # Load image into Image::Similar
+    my $yi = load_image ($y);
+    print "The difference is ", $xi->diff ($yi), ".\n";
+    
+
+
+=head1 VERSION
+
+This documents version 0.05 of Image::Similar corresponding to git
+commit 337e72f29409dc8ae2fbed3b64c8ee008b0b3203 released on Tue Aug 23 09:56:53 2016 +0900.
+
+=head1 DESCRIPTION
+
+This is an experimental module for comparing images. It uses a
+simplified form of the algorithm described in L</An image signature
+for any kind of image> to calculate image signatures and distances
+between images.
+
+The module does not contain its own image-reading facility, so images
+must be loaded to the module via one of the following supported Perl
+modules:
+
+=over
+
+=item L<GD>
+
+All image types are supported. RGB images are combined to greyscale
+using constants taken from the source code of L<Imager>.
+
+=item L<Imager>
+
+All image types are supported. Unless you only need to compare PNG
+images, and if you have no prior preference, we suggest using Imager
+since it is a very well-behaved module. The conversion to greyscale is
+done using Imager's own routines.
+
+=item L<Image::PNG::Libpng>
+
+This is used for some internals of Image::Similar related to testing
+thus it was installed when you installed Image::Similar. However,
+Image::PNG::Libpng is only for PNG images.
+
+Image::Similar supports all PNG image types. It currently only
+supports bit depths of eight.
+
+RGB images are combined to greyscale using constants taken from the
+source code of L<Imager>. As of this version, there is no handling of
+the alpha channel (transparent pixels) and the background value is
+ignored.
+
+=back
+
+Use L</load_image> to load the image.
+
+=head1 FUNCTIONS
+
+=head2 load_image
+
+Using L<Imager>:
+
+    
+    use Imager;
+    my $img = Imager->new ();
+    $img->read (file => 'my.jpg');
+    my $is = load_image ($img);
+    
+
+
+Using L<Image::PNG::Libpng>:
+
+    
+    use Image::PNG::Libpng ':all';
+    my $img = read_png_file ('my.png');
+    my $is = load_image ($img);
+    
+
+
+The return value is an Image::Similar object.
+
+=head1 METHODS
+
+=head2 new
+
+    my $is = Image::Similar->new (height => 10, width => 10);
+
+Unless you want to change internals, use L</load_image> instead of
+this.
+
+The returned image currently contains a field C<< $is->{image} >>
+which you need to use the L</set_pixel> method on to set the pixels.
+
+=head2 diff
+
+    my $diff = $is1->diff ($is2);
+
+This returns a floating-point number which is the difference between
+images C<$is1> and C<$is2>. This is meant to be approximately the same
+value as given by L<Image::Libpuzzle/vector_euclidean_length()>, but
+no validation has been carried out yet.
+
+=head2 signature
+
+    my $sig = $is->signature ();
+
+Get the signature of the image. This is currently a text string
+consisting of digits 0-4 which identifies the image. This is liable to
+change with future versions of the module.
+
+=head2 sig_diff
+
+    my $diff = $is->sig_diff ($sig);
+
+Get the difference between C<$sig> and the image represented by
+C<$is>.
+
+=head2 load_signature
+
+    my $is = load_signature ($sig);
+
+Load C<$is>, an Image::Similar object, from C<$sig>.
+
+=head1 TESTING AND INTERNAL METHODS
+
+This section lists the testing and internal methods of the module, for
+people interested in extending or otherwise improving it. Since these
+are internal private methods, these are subject to change without
+notice.
+
+=head2 write_png
+
+    $is->write_png ('test.png');
+
+This is used in conjunction with L<Image::PNG::Libpng/png_compare>
+(version 0.42 or later) to check that Image::Similar has correctly
+read in the image, by writing out Image::Similar's internal data as a
+PNG file.
+
+=head2 load_image_gd
+
+    
+    use Image::Similar;
+    use GD;
+    my $gd = GD::Image->newFromPng ("t/images/chess/chess-100.png");
+    my $is = Image::Similar::load_image_gd ($gd);
+
+
+This is the internal routine used by L</load_image> to load L<GD>
+images.
+
+=head2 load_image_imager
+
+    my $is = load_image_imager ($imager, %options);
+
+This is the internal routine used by L</load_image> to load L<Imager>
+images.  It is not exported. The options are
+
+=over
+
+=item make_grey_png
+
+    my $is = load_image_imager ($imager, make_grey_png => 'imager.png');
+
+Make the greyscale PNG for comparing to Image::Similar's internal
+version. See L</write_png> for how to extract Image::Similar's
+internal version.
+
+=back
+
+=head2 load_image_libpng
+
+    my $is = load_image_libpng ($libpng);
+
+This loads an image from the return value of
+L<Image::PNG::Libpng/read_png_file>.
+
+=head2 INTERNAL Image::Similar::Image METHODS
+
+These methods work on the XS object within an Image::Similar, which is
+called Image::Similar::Image.
+
+=head3 fill_grid
+
+    fill_grid ($img);
+
+Calculate the image's signature and store it within C<$img>. This
+method is called automatically by L</load_image>, and it does not need
+to be called by L</load_signature>, which overrides it with values
+from the signature, so it should only be used when calling L</new>,
+filling the pixels by the user, and then making the signature "by
+hand" rather than via L</load_image>.
+
+=head3 image_diff
+
+    my $diff = image_diff ($img1, $img2);
+
+Compute the value for L</diff>.
+
+=head3 set_pixel
+
+    $img->set_pixel ($x, $y, $grey);
+
+C<$x> and C<$y> need to be integers, and C<$grey> needs to be an
+integer within 0-255.
+
+=head3 get_rows
+
+    my $rows = $img->get_rows ();
+
+Get the greyscale pixels from C<$img> as an array reference C<$rows>
+containing strings of bytes, one byte per pixel.
+
+=head3 signature
+
+    my $sig = $image->signature ();
+
+=head3 valid_image
+
+    if ($image->valid_image ()) {
+	# do something with image data
+    }
+
+This returns a true value only if C<$image> contains valid image
+data. This is to distinguish between an image which is loaded from a
+stored signature using L</fill_from_sig> and one which is loaded from
+an actual image.
+
+=head3 fill_from_sig
+
+    my $image = Image::Similar::Image::fill_from_sig ($sig);
+
+Fill C<$image> using signature data.
+
+=head1 KNOWN PROBLEMS
+
+=head2 Unimplemented parts of the original algorithm
+
+The following parts of the original algorithm are unimplemented as of
+this version:
+
+=over
+
+=item Cropping
+
+The 5% and 95% image cropping methods described in the paper are not
+used.
+
+=item Soft pixels
+
+The soft pixel method is not used.
+
+=item Histogram of image
+
+There is no balancing of the greyscale of the image using a histogram,
+it only uses the raw pixel values.
+
+=back
+
+=head1 SEE ALSO
+
+=head2 Other CPAN modules
+
+=over
+
+=item L<Image::Libpuzzle>
+
+This uses a similar algorithm to Image::Similar, but it requires
+installing a third-party library called libpuzzle, as well as the gd
+library. 
+
+=item L<Image::Seek>
+
+This uses L<ImgSeek|http://www.imgseek.net/> to find similar pictures
+in a library. It can load images via L<Imager>, L<Image::Imlib2>, or
+L<GD>.
+
+=back
+
+=head2 References
+
+=over
+
+=item An image signature for any kind of image
+
+I<An image signature for any kind of image> by H. Chi Wong, Marshall
+Bern, and David Goldberg, published in I<Proceedings: 2002
+International Conference on Image Processing>, Volume 1, date 22-25
+September 2002.
+
+=back
+
+
+=head1 AUTHOR
+
+Ben Bullock, <bkb@cpan.org>
+
+=head2 Request
+
+If you'd like to see this module continued, let me know that you're
+using it. For example, send an email, write a bug report, star the
+project's github repository, add a patch, add a C<++> on Metacpan.org,
+or write a rating at CPAN ratings. It really does make a
+difference. Thanks.
+
+=head1 COPYRIGHT & LICENCE
+
+This package and associated files are copyright (C) 
+2016
+Ben Bullock.
+
+You can use, copy, modify and redistribute this package and associated
+files under the Perl Artistic Licence or the GNU General Public
+Licence.
+
+
+

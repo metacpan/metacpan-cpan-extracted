@@ -1,0 +1,14 @@
+Changes
+examples/simple
+lib/Inline/TT.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/01_load.t
+t/02_simple.t
+t/03_include.t
+t/05_array.t
+t/06_options.t
+t/datarec.tt
+t/header.tt

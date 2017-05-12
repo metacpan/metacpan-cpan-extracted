@@ -1,0 +1,35 @@
+---
+abstract: 'Port of List::Util and List::MoreUtils to Iterator::Simple'
+author:
+  - 'Ray Miller <raym@cpan.org>'
+build_requires:
+  File::Find: 0
+  File::Temp: 0
+  List::MoreUtils: 0
+  Test::More: 0
+  Test::Most: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300017, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Iterator-Simple-Util
+requires:
+  B: 0
+  Carp: 0
+  Const::Fast: 0
+  IO::File: 0
+  IO::Handle: 0
+  Iterator::Simple: 0
+  Sub::Exporter: 0
+  Text::CSV_XS: 0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Iterator-Simple-Util
+  homepage: https://github.com/ray1729/Iterator-Simple-Util/wiki
+  repository: git://github.com/ray1729/Iterator-Simple-Util.git
+version: 0.002

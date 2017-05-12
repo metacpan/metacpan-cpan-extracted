@@ -1,0 +1,6 @@
+Revision history for Perl extension IPDevice2::ALLNET::ALL4000.
+
+0.01  Wed Jan 28 11:48:16 2009
+	- original version; created by h2xs 1.23 with options
+		-AX IPDevice2::ALLNET::ALL4000
+

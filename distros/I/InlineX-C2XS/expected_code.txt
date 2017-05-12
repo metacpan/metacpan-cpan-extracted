@@ -1,0 +1,21 @@
+#include "EXTERN.h"
+#include "perl.h"
+#include "XSUB.h"
+#include "INLINE.h"
+#include <simple.h>
+#include "src/extra_simple.h"
+simple_double  simple(simple_double);
+extra_simple_double x_simple(extra_simple_double);
+MODULE = testc	PACKAGE = testc
+
+PROTOTYPES: DISABLE
+
+
+simple_double
+simple (arg1)
+	simple_double	arg1
+
+extra_simple_double
+x_simple (arg1)
+	extra_simple_double	arg1
+

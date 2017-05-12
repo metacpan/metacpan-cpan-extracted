@@ -1,0 +1,33 @@
+Image::Xpm
+==========
+
+Image::Xpm is a Perl module for loading, creating, manipulating and
+saving xpm image files.
+
+INSTALLATION
+------------
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Or with modern CPAN.pm ($CPAN::VERSION >= 1.88_55) just:
+
+   cpan .
+
+AUTHOR
+------
+
+Mark Summerfield <summer@perlpress.com>
+
+Current maintainer is Slaven Rezic <srezic@cpan.org>
+
+COPYRIGHT
+---------
+
+Copyright (c) Mark Summerfield 2000. All Rights Reserved.
+
+This module may be used/distributed/modified under the GPL. 

@@ -1,0 +1,5 @@
+- Split writes into small (1K, 4K, ?) chunks in order to make IO::Mux::Select
+  more performant. However this will make error reporting for the write function
+  more complex. Maybe using syswrite would be better there. Trap difference between
+  PRINT and WRITE in order to support syswrite. PRINT should do WRITE until everything
+  is written.

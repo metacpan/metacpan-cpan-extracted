@@ -1,0 +1,125 @@
+Revision history for perl module Image::SVG::Path
+
+0.30 2016-12-15
+
+* Bug in parsing sequence of numbers like 2.4.1.2 fixed.
+
+0.29 2016-10-15
+
+* Exports $smooth_curveto regex
+* Bug fix for $smooth_curveto regex
+* Inputs are no longer checked against $svg_path
+
+0.28 2016-10-13
+
+* Use the SVG standard regexes to check all inputs.
+* Elliptical arcs no longer accept arbitrary flag values (bug fixed).
+* Document the regular expression exports.
+
+0.27 2016-10-12
+
+* Use number and whitespace regexes from the official SVG grammar
+
+0.26 2016-10-11
+
+* Fix broken README
+
+0.25 2016-10-11
+
+* Handle + signs in exponentials, and as a number separator
+
+0.24 2016-09-12
+
+* Handle multiple closepath (z) commands in sequence
+* Document the "type" field of the return values.
+
+0.23 2016-08-10
+
+* Handle implicit arc commands
+
+0.22 2016-07-26
+
+* Handle implicit line-to's in extended move-to syntax
+
+0.21 2016-06-10
+
+* Better splitting of numbers
+
+0.20 2016-06-08
+
+* Error messages improved
+
+0.19 2014-05-21
+
+* Documentation cleanup
+
+0.18 2014-05-19
+
+* Bug fixes for relative to absolute path option
+* Support for V, H, L, and A elements in "create_path_string"
+
+0.17 2014-05-19
+
+* Allow multiple "moveto" elements in a path.
+* Stricter regular expression (use "\G" to catch unparsed elements).
+
+0.16 2014-05-19
+
+* Document output format
+* Change partial use of "end" to "point" in the line output type
+
+0.15 2014-02-05
+
+* Add MIN_PERL_VERSION in "Makefile.PL".
+
+0.14 2013-12-24
+
+* CPANTS fixes
+
+0.13 2013-12-07
+
+* Add support for q, t, a, h and v controls.
+
+0.12 2013-12-06
+
+* Minor fixes
+
+0.11 2013-12-06
+
+* Add parsing of exponential format
+* Add M followed by implicit linetos
+
+0.10 2013-12-05
+
+* Fix bug with "l" format.
+
+0.09 2013-11-27
+
+* Added "See also" section on Marpa-based module.
+* Fix "Changes" to conform to CPAN::Changes::Spec.
+
+0.08 2013-06-04
+
+* Adds the "z" element.
+
+0.07 2012-04-22
+
+0.06 2011-07-22
+
+* "reverse" is now "reverse_path".
+* Exports "create_path_string".
+
+0.05 2011-07-14
+
+* Change for old versions of Perl (not "use parent Exporter").
+
+0.04 2011-07-12
+
+0.03 2011-06-05
+
+* Added all the different commands to the regex.
+
+0.02 2011-04-02
+
+0.01 2011-04-01
+

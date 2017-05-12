@@ -1,0 +1,37 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 aaaa10558a4bf9245afffe7252a7bd2df17ee351 MANIFEST
+SHA1 606bd6424682249397d63caf905f651178a4d6cc MANIFEST.SKIP
+SHA1 4b868be205250455bb80599d1cf2659705132198 META.yml
+SHA1 89ef726b73f8dadfe4d973bdca91d337c53eae3a Makefile.PL
+SHA1 4caf59bf245bea3934caa009358802ad62d3afe6 lib/IO/Handle/Iterator.pm
+SHA1 18e6eff724ca079cc6d760c76a6210f91984bd4a lib/IO/Handle/Prototype.pm
+SHA1 a5622946e85d76a1b61a26fc23196a52e278453b lib/IO/Handle/Prototype/Fallback.pm
+SHA1 3a52c91b6022a6650969e265b917a7aad7a30d32 lib/IO/Handle/Util.pm
+SHA1 2e938cbfcd28e32639e912e268f0f204999d73aa lib/IO/Handle/Util/Overloading.pm
+SHA1 d3237362fdaecbaa1e645195a0e6e9d989a08454 lib/IO/Handle/Util/Tie.pm
+SHA1 8bf8a1774221ce60241b1d93aca0caa0a7313668 t/basic.t
+SHA1 e35f6553fdfc12bdf3453d6670f2a08382e97aab t/iterator.t
+SHA1 fa9d2e98d8b6d92f1370b71aadd2c5f7fb127acd t/prototype.t
+SHA1 8c27be9cd04be85d1be0fcbe7b23cda0e0701ae6 t/prototype_fallback.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG/MacGPG2 v2.0.12 (Darwin)
+
+iEYEARECAAYFAkrEiwgACgkQVCwRwOvSdBgkuwCfdZ1Cacgla+DssffTrIOGz0NS
+wM8Anibcz5Kn0RisD2Gee0DFTw/HmqB9
+=RbEQ
+-----END PGP SIGNATURE-----

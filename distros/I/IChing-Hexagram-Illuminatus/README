@@ -1,0 +1,28 @@
+IChing/Hexagram/Illuminatus version 0.01
+========================================
+
+DESCRIPTION
+
+There is full POD in Illiminatus.pm. So go read that!
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+so it does.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002, mwk
+
+This module is free software; you can redistribute it or
+modify it under the same terms as Perl itself.

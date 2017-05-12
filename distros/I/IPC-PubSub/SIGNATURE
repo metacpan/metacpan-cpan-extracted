@@ -1,0 +1,50 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 95bccc98dbd22f908804955ed1b93d1fd1307126 Changes
+SHA1 10db9ec4115d344c939604adb5622910dfa3103d MANIFEST
+SHA1 4bf7d07ec4a6c394c23e7d8bc33f266c5b2b0ba3 META.yml
+SHA1 1efb0dda270171a9accec4db6643c6d9b81d6e78 Makefile.PL
+SHA1 7edc5bba981fd5d734a9a095b3bddfed8d1acda0 README
+SHA1 8b836389e4bc170eb8d19b7296b2f4978ac36136 inc/Module/Install.pm
+SHA1 85b32a1d5f215d99f411c3dd6113b537fcd5c57d inc/Module/Install/Base.pm
+SHA1 fde745e180861c7c0ba3ee5a767cafdbdb1d3ebd inc/Module/Install/Can.pm
+SHA1 e259400ceb54c34def9c994f52d7091108ce7ffc inc/Module/Install/Fetch.pm
+SHA1 da42b522e5a7ffbae0ceec900f3635ad9990c565 inc/Module/Install/Makefile.pm
+SHA1 ba005818ee9f97146bfa4e14e53c684e9e446902 inc/Module/Install/Metadata.pm
+SHA1 85e6b1cf5b7ca81bfb469a99389fa947d4b8a08e inc/Module/Install/Win32.pm
+SHA1 d32dff9f0d2f02023ca6d79a48d62fd855916351 inc/Module/Install/WriteAll.pm
+SHA1 51ee056caa49c8e736d5190566ccc00b6cb58fd0 lib/IPC/PubSub.pm
+SHA1 0ed23d984f0dc09d76ed50c16a2b0aeaa71c8648 lib/IPC/PubSub/Cache.pm
+SHA1 80b988a5d95ecb1689d58052cb139cf54ff482a4 lib/IPC/PubSub/Cache/DBM_Deep.pm
+SHA1 4a865e5f6443b2fc2cd44e4b1e9aa9aba110b9c0 lib/IPC/PubSub/Cache/JiftyDBI.pm
+SHA1 a6f3aee0362d3e8e9f7d063f5e40bbd8c6f0815e lib/IPC/PubSub/Cache/JiftyDBI/Stash.pm
+SHA1 3b270ac2da87b439cde2a2755d1bea3b2a578a05 lib/IPC/PubSub/Cache/JiftyDBI/Stash/Item.pm
+SHA1 84dd4abad24f85cc5a879dd2888134cc87351c7d lib/IPC/PubSub/Cache/JiftyDBI/Stash/Publisher.pm
+SHA1 78f87c95d2c66ffd9ed283cf84fff08298d3e6de lib/IPC/PubSub/Cache/Memcached.pm
+SHA1 adaaa2bba258b95536c24d38ba3adc6ec5d8c9e4 lib/IPC/PubSub/Cache/PlainHash.pm
+SHA1 5f34b5791db8193cc06fc25df2bfe33aa6cc0951 lib/IPC/PubSub/Cacheable.pm
+SHA1 10cda8411ba967f8230c38056e6ccd984f06bc06 lib/IPC/PubSub/Publisher.pm
+SHA1 33e500a83f8a7be3f1d5c9486a80a41566deac3b lib/IPC/PubSub/Subscriber.pm
+SHA1 afc073bdc3a645a7a01646c0a08f575cc365f644 t/basic.t
+SHA1 140f4206abc483d51a64316123a73f0ccadb7e1b t/publisher.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.9 (GNU/Linux)
+
+iEYEARECAAYFAklDVNIACgkQMflWJZZAbqAp+ACfS126BFH5oQX+brur3ylTs0Ei
+2C0AoLJX4i7F9IDUWSjn3zpXyxbiy154
+=m/eG
+-----END PGP SIGNATURE-----

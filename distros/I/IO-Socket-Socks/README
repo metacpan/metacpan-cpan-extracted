@@ -1,0 +1,15 @@
+This module seeks to provide a full implementation of the SOCKS protocol
+while behaving like a regular socket as much as possible.
+
+Ryan Eatmon
+reatmon@mail.com
+
+Oleg G
+oleg@cpan.org
+
+
+INSTALLATION
+
+  perl Makefile.PL
+  make
+  make install

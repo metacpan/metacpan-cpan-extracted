@@ -1,0 +1,84 @@
+{
+   "abstract" : "IkuSan is IRC reaction bot framework.",
+   "author" : [
+      "mix3 <himachocost333@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.11.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "IkuSan",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent::ForkManager" : "0",
+            "AnySan" : "0",
+            "Encode" : "0",
+            "Furl" : "0",
+            "Getopt::Long" : "0",
+            "Plack::Request" : "0",
+            "Try::Tiny" : "0",
+            "Twiggy::Server" : "0",
+            "perl" : "v5.10.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "IkuSan" : {
+         "file" : "lib/IkuSan.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mix3/p5-IkuSan/issues"
+      },
+      "homepage" : "https://github.com/mix3/p5-IkuSan",
+      "repository" : {
+         "url" : "https://github.com/mix3/p5-IkuSan.git",
+         "web" : "https://github.com/mix3/p5-IkuSan"
+      }
+   },
+   "version" : "0.01",
+   "x_contributors" : [
+      "mix3 <himachocost333@hotmail.co.jp>"
+   ]
+}

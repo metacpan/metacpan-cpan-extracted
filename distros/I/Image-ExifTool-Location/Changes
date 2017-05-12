@@ -1,0 +1,15 @@
+Revision history for Image-ExifTool-Location
+
+0.0.1   Fri Dec 29 21:21:31 2006
+        Initial release.
+
+0.0.2   2007-02-23
+        Added machine readable version.
+
+0.0.3   2007-02-23
+        Fixed scary regression to pre-released version. Sorry folks.
+        Implemented Phil's suggestion to use ValueConv values and remove
+        dependency on Geo::Coordinates::DecimalDegrees.
+
+0.0.4   2007-02-23
+        Made Image::ExifTool dependency explicit.

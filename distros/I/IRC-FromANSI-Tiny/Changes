@@ -1,0 +1,8 @@
+Revision history for IRC-FromANSI-Tiny
+
+Version 0.02: 2015-02-18
+  * Fix for color codes before digits.
+
+Version 0.01: 2015-02-18
+  * First alpha release
+

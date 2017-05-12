@@ -1,0 +1,44 @@
+Revision history for Image::MetaData::GQview
+
+1.8 Klaus Ethgen <Klaus@Ethgen.de>
+
+	* Hmpf, making the comment silent again
+
+1.8 Klaus Ethgen <Klaus@Ethgen.de>
+
+	* Making comment section more robust (Escape '[')
+	* Add a comment char for the start comment
+
+1.7 Klaus Ethgen <Klaus@Ethgen.de>
+
+	* Make it a bit more fault tolerant (Hmpf, this seems to be not
+	  possible to test)
+
+1.6 Klaus Ethgen <Klaus@Ethgen.de>
+
+	* I should test also the read of the data
+
+1.5 Klaus Ethgen <Klaus@Ethgen.de>
+
+	* Add the possibility to add new fields in future
+
+1.4 Klaus Ethgen <Klaus@Ethgen.de>
+
+	* Making more robust by throwing exceptions
+	* Reworking the documentation
+	* Build new tests
+
+1.3 Tue Aug 9 Klaus Ethgen <Klaus@Ethgen.de>
+
+	* Unify the changelog
+	* Update the version in all parts
+
+1.2 Tue Aug 9 Klaus Ethgen <Klaus@Ethgen.de>
+
+	* Correct the license
+
+1.1 Tue Aug 8 Klaus Ethgen <Klaus@Ethgen.de>
+
+	* First version, released on an unsuspecting world
+
+vim: ft=changelog

@@ -1,0 +1,10 @@
+Revision history for Perl extension Image::OpenALPR.
+
+0.001001 2016-04-16T21:51+03:00
+ - Use Devel::CheckLib to abort Makefile generation if library is not found
+ - Overload stringify operator in Image::OpenALPR::PlateResult
+ - Improve POD
+ - Expand testsuite
+
+0.001 2016-04-10T01:42+03:00
+ - Initial release

@@ -1,0 +1,10 @@
+MANIFEST
+README
+Makefile.PL
+ParseGIF.pm
+examples/README
+examples/main.cgi
+examples/status.cgi
+examples/progressbar.gif
+examples/deanim.pl
+examples/printer-friendly.pl

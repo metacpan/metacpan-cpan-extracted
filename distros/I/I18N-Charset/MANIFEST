@@ -1,0 +1,27 @@
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/I18N/Charset.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+README.md
+t/bug1.t
+t/enco.t
+t/iana.t
+t/libi.t
+t/map8.t
+t/mib.t
+t/mime.t
+t/pod-coverage.t
+t/pod.t
+t/rt33087.t
+t/umap.t
+t/utf8.t

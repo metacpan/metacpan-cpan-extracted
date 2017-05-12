@@ -1,0 +1,49 @@
+{
+   "abstract" : "Load, create, manipulate and save xpm image files.",
+   "author" : [
+      "Mark Summerfield <summer@perlpress.com>",
+      "Slaven Rezic <srezic@cpan.org"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "gpl_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Image-Xpm",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Image::Base" : "1.06",
+            "perl" : "5.005000"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "git://github.com/eserte/image-xpm.git"
+      }
+   },
+   "version" : "1.13",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

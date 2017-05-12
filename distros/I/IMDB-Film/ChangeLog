@@ -1,0 +1,303 @@
+Revision history for Perl module IMDB::Film
+
+0.53 Jan 04 2013
+	- fixed search functionality;
+	- fixed parsing of movie data.
+
+0.52 Apr 30 2012
+	- fixed retrieving episodes of TV series following IMDB change (ticket #74679) [ARJONES];
+	- fixed issue with movie connection parsing.
+
+0.51 Sep 28 2011
+	- fixed retrieving of moive rating (ticket #71117);
+	- fixed official movie sites test.
+
+0.50 Aug 09 2011
+	- fixed retrieving of movie rating (ticket #69049);
+	- fixed returning of MPAA rating;
+	- fixed parsing of movie title;
+	- fixed parsing of person name;
+	- fixed variuos tests.
+
+0.49 Nov 25 2010
+	- fixed issue with returning the episodes of TV series;
+	- made movie kind low case to have back compatibility;
+	- fixed retrieving year of movie;
+	- fixed retrieving bio of the movie person;
+	- fixed tests;
+
+0.48 Oct 19 2010
+	- fixed bug with retrieving of movie cover if the title contains special HTML symbols, ticket #62254;
+	- added returning of default IMDB image in case if movie doesn't have a cover;
+	- fixed issue with retrieving of movie's plot;
+	- added a new method - storyline;
+	- fixed bug with return of movie's kind;
+	- fixed issue with not completed year period, i.e 2004-, ticket #62174;
+		- added a few new tests.
+
+0.47 Oct 12 2010
+	- fixed module functionality according to new IMDB design.
+
+0.46 Sep 10 2010
+	- added possibility to get big size covers;
+	- fixed retrieving of cover for non-English movies;
+	- fixed bug with parsing of the movie title on the search page, ticket #55739;
+	- fixed plot parsing.
+
+0.45 Mar 19 2010
+	- fixed parsing of movie top info (thanks to Stefan Göbel for the patch);
+	- added new test for top movie info;
+	- fixed a few tests.
+
+0.44 Mar 17 2010
+	- fixed issue with retrieving movie by its title (thanks to Peter Valdemar
+	Mørch for patch);
+	- fixed issue with parsing person birthday and birthplace;
+	- fixed tests.
+
+0.43 Nov 12 2009
+	- fixed issue with retrieving plot keywords instead of plot (thanks to Justin 
+	Fletcher for the bugreport and patch, for ticket #51240);
+	- fixe issue with parsing Top 250 or Bottom 100 movie property (thans for
+	Byju for bugreport);
+	- fixed parsing AKA movie info (thanks to Milos Vavrek for bugreport,
+	ticket #52729);
+
+0.42 Oct 8 2009
+	- added keywords for the film;
+	- fixed issue with retrieving of plot contained a link (thanks to Byju for
+	the bug-report);
+	- fixed issue with displaying special HTML symbols (ticket #49060);
+	- fixed POD documentation.
+
+0.41 Jul 30 2009
+	- added retrieving of recommendation movies;
+	- fixed issue with using of uninitialized value in pattern match (thanks
+	to Byju);
+	- fixed issue with wrong item in the list of movie directors. 
+
+0.40 Jul 11 2009
+	- added top info into rating array (requested by Geoffrey Hoffman);
+	- fixed pod errors (thanks to Bas Zoetekouw, ticket #47433).
+
+0.39 Jul 03 2009
+	- added additional attributes such "re-release", "DVD premiere" etc from
+	the release date page (requested by Vincent Lefevre, ticket #47457);
+	- added support for companies and movie connections (thanks to Justin for
+	the patch, ticket #42756);
+	- fixed retrieving release date information (reported by Vincent Lefevre,
+	ticket #47457);
+	- reorganize tests.
+
+0.38 Jun 30 2009
+	- fixed issue with empty cast list (thanks to Andréas Bratell);
+	- fixed issue with retrieving metadata for movies with code less then 7
+	digits (thanks to Simon), ticket #47422;
+	- fixed POD documentation (thanks to Bas Zoetekouw), ticket #47433).
+
+0.37 May 25 2009
+	- added MPAA info for the specified movie;
+	- fixed issue with retrieving of filmography for the specified actor or
+	actresse (thanks to Cento for the bugreport);
+	- fixed issue with retrieving metadata for movies with title contained
+	only digits, i.e. 300 (thanks to Eric Johnson for bugreport); 
+
+0.36 Jan 30 2009
+	- fixed issue with parsing TV Shows information (thanks to Tom);
+	- fixed issue with retrieving movie person name;
+	- fixed a few test;
+
+0.35 29 Sep 2008
+	- fixed a few bugs.
+
+0.34 Jun 12 2008
+	- fixed issue with parsing user rating (thanks to Faidon Liambotis for his
+	patch);
+	- fixed module documentation.
+
+0.33 Jun 09 2008
+	- fixed a bug with parsing a list of countries;
+	- fixed a bug with parsing a list of language;
+	- fixed a bug with parsing a list of certificates;
+	- fixed a bug with list of matches (thanks to Dan Faerch for bug-report and
+	patch);
+	- fixed a bug with searching by movie title in case if it a number (thanks
+	to Brian Wilson for bug-report and suggestion).
+
+0.32 Dec 28 2007
+	- fixed a bug with retrieving movie cast (thanks to David Sullivan for his
+	patch);
+	- added tests for the TV series;
+	- fixed a bug with parsing a person filmography.
+
+0.31 Nov 16 2007
+	- added functionality to retrieve data of TV series: indicate is it TV
+	series of not and getting a list of episodes (thanks to Branislav Gerzo
+		for the patch);
+	- added new tests to check TV series functionlity;	
+	- modified a procedure of getting trivia text;
+	- fixed a bug with retrieving cast details (thanks to Matthias Hopf for
+		patch).
+
+0.30 Sep 13 2007
+	- modified a functionlity to retrieve cast;
+	- fixed a bug with return a goofs (thanks to John Norton for bug-report);
+	- added localization of variable $/ (thanks to John Norton for bug-report);
+	- fixed a few bugs in the tests.
+
+0.29 Jul 18 2007
+	- added possibility to get movie by its title and year (good idea given by Ohad Ben-Cohen);
+	- modified a search procedure to fit a new IMDB layout (thanks to Danial
+	Pearce, Peter Valdemar Mørch for bug-reports and patches);
+	- modified retrieving a list of official sites and released dates;
+	- fixed a bug with parsing writers movie info in case if there is only one
+	person (thanks to Szel Miklos for bug-report).
+
+0.28 May 07 2007
+	- added a new method  - aspect_ratio, to get movie aspect ratio;
+	- fixed a bug with retrieving movie runtime (thanks to Steve Meier for bugreport).
+
+0.27 Apr 16 2007
+	- fixed a bug with parsing of list of movie directors and writers (thanks to Nick Johnston for
+		his patch and Benjamin Juang and Bas for bugreports).
+
+0.26 Apr 02 2007
+	- fixed a bug with parsing directors and writers (thanks to Andy Dales for the bugreport);
+	- added a few new tests;
+	- updated a module documentation.
+
+0.25 Mar 02 2007
+	- fixed a bug with retrieving of movie rating (thanks to Arne Brutschy, Ulrich Tueshaus and 
+		Nick Johnston for bug reports and patches);
+	- fixed a retrieving of movie certifications (thanks to Nick Johnston);
+	- added new tests for rating and certifications.
+
+0.24 Feb 20 2007
+	- modified a logic of IMDB::Film and IMDB::Person according to the new
+		layout of IMDB site.
+
+0.23 Dec 19 2006
+	- added a new method to retrieve a release dates (thanks to Danial Pearce);
+	- added a new method to retrieve a list of quotes (thanks to buu);
+	- fixed a bug with retrieving movie cover in case when its title contains
+		some special symbils (thanks to Thomas Hoff);
+	- added tests for new functionality.	
+
+0.22 Aug 1 2006
+	- modified a procedure of parsing cast (thanks to drmarker for contibution);
+	- removed a request for retrieving of movie official sites from the base initialization
+		procedure (thanks to Danial Pearce);
+	- fixed a bug with parsing movie title if the title contains some special symbols such '*' 
+		(thanks to Matthew Bone for bugreport);
+	- fixed a bug with retrieving a cover if it isn't uploaded (Brano Gerzo).	
+
+0.21 May 17 2006
+	- added retrieving official site urls for specified movie;
+	- added possibility to clean cached data;
+	- added new test for official sites;
+	- fixed a bug with retrieving a filmography of specified movie person (thanks
+		to Przemek Klys);
+	- fixed a bug with test of full plot of movie;
+	- fixed a bug with test of movie trivia.
+
+0.20 Mar 10 2006
+	- added possibility to specify a path for cached data (thanks to Brano Gerzo);
+	- added new statuses to separate objects retrieved from internet, cache or file;
+	- added test to check cache functionality.
+
+0.19 Jan 16 2006
+	- fixed a bug related with search by movie title contained some special symbols such "&" 
+		(thanks to Peter Backman);
+	- fixed a bug with retrieving a movie cover (thanks to Len Kranendonk);
+	- fixed a bug with retrieving a list of cast of TV series (thanks to Bas);
+	- added prerequest module Digest::SHA1 (thanks to CPAN testers).
+
+0.18 Dec 30 2005
+	- fixed a bug with retrieving ID of writers (thanks to Brano Gerzo for bugreport);
+	- fixed a bug with retrieving a list of writers if there is a link 'more';
+	- fixed a documentation of method 'awards'.
+
+0.17 Dec 15 2005
+	- moved functionality to get a page via HTTP to the separate method
+		to it for getting of movie full plot;
+	- fixed a bug with retrieving full plot (thanks to halcyon);
+	- fixed a bug related with matched results if there is an only one;
+	- fixed module documentation;
+	- added new tests to cover bugs described above.
+
+0.16 Dec 14 2005
+	- added retrieving of AKA info (requested by Brano Gerzo);
+	- added retriving of movie trivia;
+	- added retriving of movie goofs;
+	- added retrieving of movie avards;
+	- fixed a bug with adding full plot into cache.
+
+0.15 Nov 18 2005
+	- added possibility to pass HTML page from IMDB instead of connection
+		and getting page online (thanks to Brano Gerzo for idea);
+	- switched to LWP::Simple from LWP::UserAgent;
+	- added possibility to specify timeout and user agent for HTTP request;
+	- removed a retrieving of a full plot from initialization stage;
+	- improved test suite.	
+
+0.14 Aug 22 2005
+	- fixed a bug with search film by title (reported by Scott D'Aquila 
+		and Kwesi Leggett);
+	- fixed a bug with search person by name;
+	- fixed a bug with define proxy address (reported by Bas Zoetekouw);
+	- fixed bugs with movies and persons data in the test script.
+
+0.13 Jun 03 2005
+	- fixed a bug with craching of search when no any matches were 
+		found (reported by Peter Bäckman);
+	- added a new property - status which indicates is successful or
+		not information was retrieved from IMDB;
+	- added a new property - id which is the same as code because
+		it's not clear that IMDB code is like id.
+
+0.12 Mar 07 2005
+	- fixed a bug with retrieving information about movie
+		persons in case no proxy server;
+	- added an suppression of pseudo-hash warnings.	
+
+0.11 Mar 04 2005 
+	- fixed a bug with retrieving a list of casts
+		in case if there are only credited casts (thanks to 
+		Steve Rushe);
+	- fixed a bug with define a proxy in the class IMDB::Persons.	
+	- fixed a bug with retrieve a list of casts if there are 
+		only complete credited cast;
+	- fixed a bug with assing a person IMDB code in case when we 
+		make a search by its name;
+	- fixed a bug with assing a movie IMDB code when movie detailed
+		page doesn't contain rating;
+
+0.10 Jan 07 2005
+	- moved all common functionality into base class;
+	- added a new class to retrieve an information about IMDB persons;
+	- modified a test;
+	- fixed a bug with undefined value in the method 'rating'.
+	- fixed a bug with using fields.
+
+0.05 Dec 28 2004
+	- added a new method - full_plot to retrieve a full novie plot;
+	- fixed a bug with retrieve a title and production year of movie in case of search by 
+		movie title;
+	- fixed bugs with test.	
+
+0.04 Sep 09 2004
+	- added roles to the retrieving data about cast;
+	- added possibility to retrieve number of votes;
+	- fixed a bug with retrieving directors for movie which doesn't contains writers info.
+
+0.03 Jul 31 2004
+	- fixed bug with retrieving film information by its title;
+	- corrected class documentation;
+
+0.02 Jul 28 2004
+	- fixed class documentation;	
+
+0.01 Jul 27 2004
+	- original version; created by ExtUtils::ModuleMaker 0.32
+
+

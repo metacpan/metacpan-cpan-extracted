@@ -1,0 +1,11 @@
+Revision history for Perl extension IPC::Lock.
+
+0.20  Fri Mar  5 00:08:00 2010
+       - making unatomic take an argument properly.  Thanks to Alexander Lourier 
+0.12  Fri Oct 21 14:30:00 2005
+       - changing the docs to including memcached warnings and to encourage calling unlock explicitly,
+           as per Perrin Harkin's suggestion.
+
+0.10  Thu Oct 20 23:48:27 2005
+	- original version; created by h2xs 1.23 with options
+		-X -n IPC::Lock

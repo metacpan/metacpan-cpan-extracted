@@ -1,0 +1,22 @@
+Revision history for Perl extension Image::Math::Constrain
+
+1.02 Thu 10 Jul 2008
+	- No functional changes
+	- Upgrading to Module::Install 0.76
+
+1.01 Sun Feb  5 2006
+	- Upgrading installer to Module::Install 0.55
+	- No other module changes
+
+1.00 Mon Jul 25 2005
+	- CPAN #13553 Applied doc fixes from qef at ungwe dot org
+	- Incrementing to stable version number
+
+0.03 Tue Feb 15 2005
+	- Removing braindead Build.PL
+
+0.02 Tue Nov  2 2004
+	- Added as_string and support for 'constrain(800x600)'
+
+0.01 Tue Nov  2 2004
+	- Created the initial version of the file

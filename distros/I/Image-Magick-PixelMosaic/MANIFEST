@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/Image/Magick/PixelMosaic.pm
+t/00_prereqs.t
+t/01_property.t
+t/02_pixelize.t
+t/03_pod.t
+t/04_pod_coverage.t
+META.yml                                 Module meta-data (added by MakeMaker)

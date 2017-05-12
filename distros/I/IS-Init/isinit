@@ -1,0 +1,53 @@
+#!/usr/bin/perl -w
+use strict;
+use lib 'IS/Init/lib';
+use IS::Init;
+use Getopt::Std;
+
+my %opt;
+getopts("hkc:s:", \%opt) || usage();
+
+usage() if $opt{h};
+
+my %parms = (
+    'config' => $opt{c} || '/etc/isinittab',
+    'socket' => $opt{s} || '/var/run/is/init.s'
+	    );
+
+my $init = new IS::Init (%parms);
+
+if ($opt{k})
+{
+  $init->stopall(); 
+  exit;
+}
+
+unless ($#ARGV >= 0)
+{
+  $init->tell(0,0);
+  exit;
+}
+
+# spawn all apps for requested resource group and runlevel 
+my $runlevel=pop;
+my $resource_group=pop || `hostname`;
+chomp($resource_group);
+$init->tell($resource_group,$runlevel);
+
+sub usage
+{
+  die "
+  usage: $0 [-h] [[resource_group] runlevel]
+
+    -h	help
+    -k	kill daemon
+    -c  config file (default /etc/isinittab)
+    -s  socket path (default /var/run/is/init.s)
+
+  If resource_group is not given, it defaults to hostname.
+
+  If neither resource_group nor runlevel are given, reread /etc/isinittab.
+  
+  \n";
+}
+

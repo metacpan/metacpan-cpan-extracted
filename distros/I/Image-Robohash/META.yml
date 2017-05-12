@@ -1,0 +1,24 @@
+---
+abstract: 'Headless library to generate Robohash images'
+author:
+  - 'John Wang <johncwang@gmail.com>'
+build_requires:
+  Test::More: 0
+  strict: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300008, CPAN::Meta::Converter version 2.120351'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Image-Robohash
+requires:
+  Digest::SHA: 0
+  Graphics::Magick: 0
+  Moose: 0
+  MooseX::StrictConstructor: 0
+  namespace::autoclean: 0
+  warnings: 0
+version: 0.02

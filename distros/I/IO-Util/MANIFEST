@@ -1,0 +1,17 @@
+Changes
+lib/IO/Util.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/0
+t/01_capture.t
+t/02_capture_memory_leaking.t
+t/03_slurp.t
+t/04_uniqid.t
+t/05_uniqid_no_import.t
+t/06_load_mml.t
+t/07_load_mml.t
+t/test.txt
+t/test_pod.t
+t/test_pod_coverage.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,11 @@
+Revision history for Perl extension Image::Maps::Plot::FromPostcode.
+
+0.25  Clean IMG path and double-header bugs
+
+0.22  Added thumbnail images to index page
+
+0.02  Fri Jun 29 10:39:12 2001
+	- created by h2xs 1.21 with options
+		-Xcfn Image::Maps::Plot::FromPostcode
+
+0.01  was ACME::PM::LONDON::MAPS::EARTH

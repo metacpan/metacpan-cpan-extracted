@@ -1,0 +1,21 @@
+use warnings;
+use strict;
+use utf8;
+use FindBin '$Bin';
+use Test::More;
+my $builder = Test::More->builder;
+binmode $builder->output,         ":utf8";
+binmode $builder->failure_output, ":utf8";
+binmode $builder->todo_output,    ":utf8";
+binmode STDOUT, ":encoding(utf8)";
+binmode STDERR, ":encoding(utf8)";
+use Image::Similar qw/load_image load_signature/;
+use Image::PNG::Libpng ':all';
+my $file = read_png_file ("$Bin/images/chess/chess-100.png");
+my $is = load_image ($file);
+my $sig = $is->signature ();
+my $boo = load_signature ($sig);
+my $diff = $is->diff ($boo);
+cmp_ok ($diff, "<", 0.001, "same sig, same image");
+
+done_testing ();

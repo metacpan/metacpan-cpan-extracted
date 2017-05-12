@@ -1,0 +1,291 @@
+# NAME
+
+I18N::Handle - A common i18n handler for web frameworks and applications.
+
+# DESCRIPTION
+
+__***THIS MODULE IS STILL IN DEVELOPMENT***__
+
+[I18N::Handle](http://search.cpan.org/perldoc?I18N::Handle) is a common handler for web frameworks and applications.
+
+I18N::Handle also provides exporting a global loc function to make localization, 
+the default loc function name is `"_"`. To change the exporting loc function name
+, please use `loc` option.
+
+The difference between I18N::Handle and [Locale::Maketext](http://search.cpan.org/perldoc?Locale::Maketext) is that
+I18N::Handle automatically does most things for you, and it provides simple API
+like `speak`, `can_speak` instead of `get_handle`, `languages`.
+
+To generate po/mo files, [App::I18N](http://search.cpan.org/perldoc?App::I18N) is an utility for this, App::I18N is a
+command-line tool for parsing, exporting, managing, editing, translating i18n
+messages. See also [App::I18N](http://search.cpan.org/perldoc?App::I18N).
+
+# SYNOPSIS
+
+Ideas are welcome. just drop me a line.
+
+option `import` takes the same arguments as [Locale::Maketext::Lexicon](http://search.cpan.org/perldoc?Locale::Maketext::Lexicon) takes.
+it's _language_ => [ _format_ => _source_ ].
+    
+
+    use I18N::Handle;
+    my $hl = I18N::Handle->new( 
+                import => {
+                        en => [ Gettext => 'po/en.po' ],
+                        fr => [ Gettext => 'po/fr.po' ],
+                        ja => [ Gettext => 'po/ja.po' ],
+                })->accept( qw(en fr) )->speak( 'en' );
+
+Or a simple way to import gettext po files:
+This will transform the args to the args that `import` option takes:
+
+    use I18N::Handle;
+    my $hl = I18N::Handle->new( 
+                Gettext => {
+                        en => 'po/en.po',
+                        fr => 'po/fr.po',
+                        ja => [ 'po/ja.po' , 'po2/ja.po' ],
+                })->accept( qw(en fr) )->speak( 'en' );
+
+
+
+    print _('Hello world');
+
+    $hl->speak( 'fr' );
+    $hl->speak( 'ja' );
+    $hl->speaking;  # return 'ja'
+
+    my @langs = $hl->can_speak();  # return 'en', 'fr', 'ja'
+
+# OPTIONS
+
+- _format_ => { _language_ => _source_ , ... }
+
+Format could be _Gettext | Msgcat | Slurp | Tie_.
+
+    use I18N::Handle;
+    my $hl = I18N::Handle->new( 
+                Gettext => {
+                        en => 'po/en.po',
+                        fr => 'po/fr.po',
+                        ja => [ 'po/ja.po' , 'po2/ja.po' ],
+                });
+    $hl->speak( 'en' );
+
+- `po` => '_path_' | [ _path1_ , _path2_ ]
+
+Suppose you have these files:
+
+    po/en.po
+    po/zh_TW.po
+
+When using:
+
+    I18N::Handle->new( po => 'po' );
+
+will be found. can you can get these langauges:
+
+    [ en , zh-tw ]
+
+- `locale` => 'path' | [ path1 , path2 ]
+
+
+
+- `import` => Arguments to [Locale::Maketext::Lexicon](http://search.cpan.org/perldoc?Locale::Maketext::Lexicon)
+
+# OPTIONAL OPTIONS
+
+- no_global_loc => bool
+
+Do not install global locale method `"_"`. 
+
+- style => style  ... (Optional)
+
+The style could be `gettext`.
+
+- loc => global loc function name (Optional)
+
+The default global loc function name is `_`. 
+
+    loc => 'loc'
+
+- `loc_func` => _CodeRef_  (Optional)
+
+Use a custom global localization function instead of default localization
+function.
+
+    loc_func => sub {
+            my ($self,$lang_handle) = @_;
+
+            ...
+
+            return $text;
+    }
+
+# USE CASES
+
+## Handling po files
+
+    $hl = I18N::Handle->new( 
+            po => 'path/to/po',
+            style => 'gettext'          # use gettext style format (default)
+                )->speak( 'en' );
+
+    print _('Hello world');
+
+
+
+## Handling locale
+
+If you need to bind the locale directory structure like this:
+
+    path/to/locale/en/LC_MESSAGES/app.po
+    path/to/locale/en/LC_MESSAGES/app.mo
+    path/to/locale/zh_tw/LC_MESSAGES/app.po
+    path/to/locale/zh_tw/LC_MESSAGES/app.mo
+
+You can just pass the `locale` option:
+
+    $hl = I18N::Handle->new(
+            locale => 'path/to/locale'
+            )->speak( 'en_US' );
+
+or just use `import`:
+
+    $hl = I18N::Handle->new( 
+            import => { '*' => 'locale/*/LC_MESSAGES/hello.mo'  } );
+
+## Handling json files
+
+__not implemented yet__
+
+Ensure you have json files:
+
+    json/en.json
+    json/fr.json
+    json/ja.json
+
+Then specify the `json` option:
+
+    $hl = I18N::Handle->new( json => 'json' );
+
+## Singleton
+
+If you need a singleton [I18N::Handle](http://search.cpan.org/perldoc?I18N::Handle), this is a helper function to return
+the singleton object:
+
+    $hl = I18N::Handle->singleton( locale => 'path/to/locale' );
+
+In your applications, might be like this:
+
+    sub get_i18n {
+        my $class = shift;
+        return I18N::Handle->singleton( ... options ... )
+    }
+
+
+
+## Connect to a remote i18n server
+
+__not implemented yet__
+
+Connect to a translation server:
+
+    $handle = I18N::Handle->new( 
+            server => 'translate.me' )->speak( 'en_US' );
+
+
+
+## Binding with database
+
+__not implemented yet__
+
+Connect to a database:
+
+    $handle = I18N::Handle->new(
+            dsn => 'DBI:mysql:database=$database;host=$hostname;port=$port;'
+            );
+
+## Binding with Google translation service
+
+__not implemented yet__
+
+Connect to google translation:
+
+    $handle = I18N::Handle->new( google => "" );
+
+## Exporting loc function to Text::Xslate
+
+    my $tx = Text::Xslate->new( 
+        path => ['templates'], 
+        cache_dir => ".xslate_cache", 
+        cache => 1,
+        function => { "_" => \&_ } );
+
+Then you can use `_` function inside your [Text::Xslate](http://search.cpan.org/perldoc?Text::Xslate) templates:
+
+    <: _('Hello') :>
+
+# PUBLIC METHODS 
+
+## new
+
+## singleton( I<options> )
+
+If you need a singleton [I18N::Handle](http://search.cpan.org/perldoc?I18N::Handle), this is a helper function to return
+the singleton object.
+
+## speak( I<language> )
+
+setup current language. _language_, can be `en`, `fr` and so on..
+
+## speaking()
+
+get current speaking language name.
+
+## can_speak()
+
+return a list that currently supported.
+
+## accept( I<language name list> )
+
+setup accept languages.
+
+    $hl->accpet( qw(en fr) );
+
+## fallback( I<language> )
+
+setup fallback language. when speak() fails , fallback to this language.
+
+    $hl->fallback( 'en' );
+
+# PRIVATE METHODS
+
+## _unify_langtag
+
+## _scan_po_files
+
+## _scan_locale_files
+
+
+
+
+
+
+
+
+
+
+
+# AUTHOR
+
+Yoan Lin <cornelius.howl {at} gmail.com>
+
+# SEE ALSO
+
+[App::I18N](http://search.cpan.org/perldoc?App::I18N)
+
+# LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

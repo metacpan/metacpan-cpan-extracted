@@ -1,0 +1,55 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 842745cb706f8f2126506f544492f7a80dbe29b3 COPYING
+SHA1 d001690eacf7017ee7260fde5586586ca7b793f7 Changes
+SHA1 705395b94d8955f6131e00946092e8cdeb549679 MANIFEST
+SHA1 1d745ef4cc154d3b13bfee6d1048ac4135fc1aa7 MANIFEST.SKIP
+SHA1 e70145d7d703677f4e3b24e308454bc53aa3f91f META.yml
+SHA1 98eb6b3b7914dfa5328b62035f87ca97fcfce873 Makefile.PL
+SHA1 094be0520b04c2301af1f9389f540ec8839f424d debian/changelog
+SHA1 ac3478d69a3c81fa62e60f5c3696165a4e5e6ac4 debian/compat
+SHA1 cef70a286449050ac2c2a2699c0696598d86babb debian/control
+SHA1 41e0f6105b2838d25c442007f559776c5ddf814f debian/copyright
+SHA1 22cf012990e97a23b83fa05b7ff25e5e54e7ec6a debian/rules
+SHA1 61652cd1568dcf2614df833eba241755eee34e89 debian/source/format
+SHA1 d8132ee05d74ccf350551091b53afdfc5377f7fd debian/watch
+SHA1 018a58b031eb29060aafaf5af0b3fcf2daa11886 devel/imlib.pl
+SHA1 e49e071a43390ddb233272dbf39fbaf2947b1cd6 inc/MyMakeMakerExtras.pm
+SHA1 7a988b2aa7ed09f1cb9029a1ef3f0e2139dca0cf inc/my_pod2html
+SHA1 1bed2963ad675ad763387bb07a35e03da5404bc4 lib/Image/Base/Imlib2.pm
+SHA1 c4d73182ac8cb327ad5d0b8064ba0c646262a5eb t/Imlib2-use.t
+SHA1 f5a903bf60d20e46bfb8600c5b63ba50b0e3bae6 t/Imlib2-weaken.t
+SHA1 226bc18bd5bf4a1000c604062d582d7f5f751e47 t/Imlib2.t
+SHA1 7cbfd9bf15948b19f71c0f54f11b607c052d8385 t/MyTestHelpers.pm
+SHA1 e84a5d834b4a994a2319822be210fc2eef7286e2 t/MyTestImageBase.pm
+SHA1 0279c9310ec528d10a2a14e602bf98f1c776cce1 xt/0-META-read.t
+SHA1 219395eb91b03829e6f14db4ebd57d88ea972e61 xt/0-Test-ConsistentVersion.t
+SHA1 8a5e0f34131de34e584fbb1939c191a152566155 xt/0-Test-DistManifest.t
+SHA1 cc04a5fe5d8b8b38bfd56453d5d2686c8ea58783 xt/0-Test-Pod.t
+SHA1 8cc52e23427a82cfef5802bf512b13c65de2687a xt/0-Test-Synopsis.t
+SHA1 194f76a77d4b022a8b707932d3a45be310400360 xt/0-Test-YAML-Meta.t
+SHA1 d1d6dc2ff925e7ba5c014ce1361e6d097d061f2a xt/0-file-is-part-of.t
+SHA1 daba2840c7f128371d42516619a0e04fee2f5ff4 xt/0-no-debug-left-on.t
+SHA1 845275dd7c2844e25efebde2504ac2b922f4e274 xt/dummy/Image/Base.pm
+SHA1 8405a49bde02c916c9c465d0205a7e6e421002a1 xt/dummy/Image/Imlib2.pm
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iD8DBQFOc9KDLFMCIV9q3ToRAuQ7AKCEmntIXuIsVP7GiAyZvXnYMmy5TACcCCTk
+RJ9iDAR1aBZIAYwn4nMgA44=
+=AH86
+-----END PGP SIGNATURE-----

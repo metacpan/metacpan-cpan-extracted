@@ -1,0 +1,408 @@
+#!/usr/bin/perl -w
+# Copyright 2005 Jean-Michel Fayard jmfayard_at_gmail.com
+#
+#   This program is free software; you can redistribute it and/or
+#   modify it under the terms of the GNU General Public
+#   License as published by the Free Software Foundation; either
+#   version 2 of the License, or (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#   General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License
+#   along with this program; see the file COPYING.  If not, write to
+#   the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+#   Boston, MA 02111-1307, USA.
+
+# Changelog:
+#	17/01/2005  Initial version
+
+use strict;
+use Image::Kimdaba;
+
+my $folder=getRootFolder();
+parseDB( "$folder" );
+    # parse the xml file and create two hashes:
+    # %imageattributes	: HASH OF (url of the picture, REF. HASH OF (attribute, value) )
+    # %imageoptions	: HASH of (url, REF. HASH OF (optoin, REF. LIST OF value) )
+my $nb1= scalar keys %imageattributes;
+my $nb2= scalar keys %imageoptions;
+print "I've found $nb1 pictures with attributes, and $nb2 with options\n";
+
+my %newimageoptions;	# Hash similar to %imageoptions containing options
+			# Found in Digikam DB but not in the Image::Kimdaba one
+my %dirs;	# "'/USA/Yocemite'" => 42 (dirid)
+my %categories; # "Keywords"	    =>  [ 1, 0, "Keywords",  "'tag-events'" ],
+my @categories;	# $categories[1]=Keywords;    
+my %tags;	# "Keyword-Holiday" =>	21 (tagid)
+my $id_album=5;
+my $id_tags=10;
+my %images;
+my @imagesindigikam;
+open(SQL, ">$folder/kimdaba2digikam.sql") || die "Cannot write SQL file";
+if (-r "$folder/digikam.db" )
+{
+    &sql_albums;
+    &sql_categories;
+    &sql_tags;
+    @imagesindigikam = sql_images();
+} else {
+    &create_table;
+    @imagesindigikam =  ();
+}
+&kimdaba_albums;
+&kimdaba_tags;
+&kimdaba_images( @imagesindigikam );
+&export_new_options_found_in_digikam_db
+    unless ( scalar keys %newimageoptions == 0 );
+
+#my $nb=0;
+#$nb++ while (-e "$folder/digikam.db.$nb" );
+#if (-e "$folder/digikam.db" ) {
+#    print "Old digikam database saved to \'$folder/digikam.db.$nb\'\n";
+#    rename "$folder/digikam.db","$folder/digikam.db.$nb";
+#}
+
+print "Updating $folder/digikam.db\n";
+open( SQLITE, "| sqlite $folder/digikam.db")
+|| die "You need the program sqlite to create a digikam database";
+print SQLITE ".read $folder/kimdaba2digikam.sql\n" ;
+print SQLITE ".quit\n";
+close( SQLITE );
+print "That's it, you can start digiKam\n";
+
+
+sub export_new_options_found_in_digikam_db
+{
+my $destdir="/tmp";
+open( EXPORT, "> ${destdir}/index.xml");
+print EXPORT <<END
+<?xml version="1.0" encoding="utf-8"?>
+<kimdaba-EXPORT location="external" >
+END
+;
+
+    while( my ($url,$r_hash) = each( %newimageoptions )  )
+    {
+	next unless( -e "${folder}/${url}" );
+	my %a = %$r_hash;
+	print EXPORT <<END
+ <image file="$url" >
+  <options>
+END
+;
+	while( my ($option, $r_values) = each %a )
+	{
+	    print EXPORT <<END
+   <option name="$option" >
+END
+;
+	    foreach my $value (@$r_values) {
+		print EXPORT <<END
+    <value value="$value" />
+END
+	    }
+
+	    print EXPORT <<END
+   </option>
+END
+;
+	}
+	print EXPORT <<END
+  </options>
+ </image>
+END
+;
+    }
+
+    print EXPORT <<END
+</kimdaba-EXPORT>
+END
+;
+    close( EXPORT );
+    makeKimFile( $destdir, "digikam_export.kim", keys %newimageoptions);
+}
+
+sub kimdaba_tags 
+{
+    my $image=0;
+
+    for my $url (keys %imageoptions) 
+    {
+	my $dir= base($url);
+	next if ($dir eq "'/'") ;
+	next unless (-e "${folder}/${url}" ) ;
+	$dir	    = $dirs{ base($url) };
+	( my $filename =  $url  ) =~ s#^.*/## ;
+
+	my %options = %{ $imageoptions{$url} };
+	for my $option ( sort keys %options ) 
+	{
+	    unless (exists $categories{$option})
+	    {
+		$categories{$option} = [ $id_tags, 0, $option, "''" ];
+print SQL "insert into tags values ( $id_tags,  0, '$option',  '' ); \n";
+		$id_tags++;
+	    }
+	    my $pid = $categories{$option}[0];
+		
+	    for my $tag (@{ $options{$option} } )
+	    {
+		my $tagid;
+		unless (exists $tags{"$option-$tag"})
+		{
+		    my $icon = $categories{$option}[3] ;
+		    $tags{"$option-$tag"} = $id_tags;
+print SQL "insert into tags values ($id_tags, $pid, ", esc($tag), ", $icon ) ;\n";
+		    $id_tags++;
+		}
+		$tagid = $tags{"$option-$tag"};
+print SQL "insert  into imagetags values (",esc($filename),", $dir, $tagid);\n";		
+	    }	
+	}
+    }
+}
+sub sql_images
+{
+    my @res=();
+    open( SQLITE, "sqlite $folder/digikam.db "
+		.' "select name, url, dirid '
+		.'  from albums,images '
+		.'  where albums.id = images.dirid '
+		.'  order by name ;" '
+		.' | ' # read from pipe
+	)
+	or die "you need the program sqlite to create a digikam database";
+    while( my $line=<SQLITE> )
+    {
+	chomp( $line );
+	my ($name, $url,$dirid) = split( /\|/, $line); 
+	$url =~ s#^/##;
+	if (! -e "${folder}/${url}/${name}" ) {
+#debug print stderr "delete from images where name=\"$name\" and dirid=$dirid;\n" ;
+	    next;
+	}
+	push @res, "$url/$name";
+    }
+    close( SQLITE );
+    return @res;
+}
+sub kimdaba_images
+{
+    my @except=@_;
+    my $image=0;
+    for my $url (@except)
+    {
+	if (exists $imageoptions{$url} ) {
+	    delete $imageoptions{$url};
+	}
+    }
+    for my $url (keys %imageoptions) 
+    {
+	my $dir= base($url);
+	next if ($dir eq "'/'") ;
+	next unless (-e "$folder/$url");
+	$dir	    = $dirs{ base($url) };
+	my $caption = $imageattributes{$url}{"label"} ;
+	my $date    = date( $url ) ;
+	( my $filename =  $url  ) =~ s#^.*/## ;
+#debug print stderr "##insertimqges: filename=$filename dirid=$dir url=$url\n";
+print SQL "insert into images values ( ",esc($filename), ", $dir, ",esc($caption)," ,$date );\n" ;
+    }
+}
+
+
+sub kimdaba_imagetags
+{
+
+}
+sub sql_albums
+{
+    open( SQLITE, "sqlite $folder/digikam.db "
+		.' "select id, url '
+		.'  from albums ;" '
+		.' | ' # read from pipe
+	)
+	or die "you need the program sqlite to create a digikam database";
+    while( my $line=<SQLITE> )
+    {
+	chomp( $line );
+	my ($dirid, $url) = split( /\|/, $line); 
+	$id_album=$dirid if ($dirid >= $id_album);
+	if (! -d "${folder}${url}" )
+	{
+	    print SQL "delete * from images where id=$dirid";
+	    next;
+	}
+	$dirs{"'$url'"} = $dirid;
+    }
+    close( SQLITE );
+    $id_album++;
+}
+sub urlhasoption
+{
+    my ($url,$option,$value) = @_;
+    unless( exists $imageoptions{$url} ) {
+	return 0;
+    }
+    my %hash=%{ $imageoptions{$url} };
+    unless( exists $hash{$option}) {
+	return 0;
+    }
+    my @search=grep { $_ eq $value } @{ $hash{$option} };
+    return ( scalar @search != 0 );
+}
+sub urldeleteoption
+{
+    my ($url,$option,$value) = @_;
+    my %hash=%{ $imageoptions{$url} };
+    my @others=();
+    for my $other (@{ $hash{$option} }) {
+	unless( $other eq $value) {
+	    push @others, $other;
+	}
+    }
+    $imageoptions{$url}{$option} = [ @others ];
+}
+sub urladdnewoption
+{
+    my ($url,$option,$value) = @_;
+    if ( !exists $newimageoptions{$url} ) {
+	$newimageoptions{$url} = {};
+    }
+    my %hash=%{ $newimageoptions{$url} };
+    if( exists $hash{$option}) {
+	my @values = @{ $hash{$option} };
+	push @values, $value;
+	$newimageoptions{$url} = { $option => [ @values ] };
+    } else {
+	$newimageoptions{$url} = { $option => [ $value  ] };
+    }
+}
+sub sql_categories
+{
+    open( SQLITE, "sqlite $folder/digikam.db "
+		.' "select id, pid, name, icon '
+		.'  from tags '
+		.'  where pid = 0 "; '
+		.' | ' # read from pipe
+	) or die "you need the program sqlite to create a digikam database";
+    while( my $line=<SQLITE> )
+    {
+	chomp( $line );
+	my ($tagid,$tagpid,$tagname,$icon) = split( /\|/, $line); 
+
+	$categories{$tagname} = [ $tagid, 0, $tagname, "'$icon'" ] ;
+	$categories[$tagid]=$tagname;
+
+    }
+    close( SQLITE );
+}
+
+sub sql_tags
+{
+    $id_tags=10;
+    open( SQLITE, "sqlite $folder/digikam.db "
+		.' "select albums.url, albums.id, imagetags.name, tags.id, tags.pid, tags.name '
+		.'  from imagetags, tags, albums '
+		.'  where imagetags.tagid = tags.id and imagetags.dirid = albums.id '
+		. ' order by tags.id ;" '
+		.' | ' # read from pipe
+	) or die "you need the program sqlite to create a digikam database";
+    while( my $line=<SQLITE> )
+    {
+	chomp( $line );
+	my ($albumurl,$dirid,$imagename,$tagid,$tagpid,$tagname) = split( /\|/, $line); 
+	$id_tags=$tagid if ($tagid>=$id_tags);
+
+	$tags{$categories[$tagpid]."-".$tagname} = $tagid;
+	    
+	$albumurl =~ s#^/##;
+	my $url = "$albumurl/$imagename";
+
+	if (urlhasoption( $url, $categories[$tagpid], $tagname )) {
+	    urldeleteoption( $url, $categories[$tagpid], $tagname );
+	} else {
+	    urladdnewoption( $url, $categories[$tagpid], $tagname );
+	}
+    }
+    $id_tags++;  # warranty : we can create tags with an id more or equal than this one.
+    close( SQLITE );
+}
+
+sub kimdaba_albums
+{
+    for my $url (keys %imageoptions) 
+    {
+	my $dir= base($url);
+	next if ($dir eq "'/'");	
+	unless (exists $dirs{$dir})
+	{
+	    my $date=date( $url );
+	    $dirs{$dir} = $id_album;
+print SQL "insert into albums values ( $id_album, $dir, $date, \"\", \"\", 0, \"\" );\n" ;
+	    $id_album++;
+	}
+    }
+}
+sub date()
+{
+    my ($url)=@_;
+    return "\'1970-01-01\'" unless (exists $imageattributes{$url} );
+    my $year=	$imageattributes{$url}{"yearFrom"};
+    my $month=	$imageattributes{$url}{"monthFrom"};
+    my $day=	$imageattributes{$url}{"dayFrom"};
+    return "\'$year-$month-$day\'";
+}
+sub base()
+{
+    my ($file)=@_;
+    my $res="'/'";
+    if ($file =~ m#(^.*)/#) {
+	$res=esc("/$1") ;
+    }
+    return $res
+}
+sub create_table
+{
+    print SQL  <<fin    
+create table albums (id integer primary key,  url text not null unique,  date date not null,  caption text,  collection text,  ignoreprops boolean,  icon text);
+create table imagetags (name text not null,  dirid integer not null,  tagid integer not null,  unique (name, dirid,tagid));
+create table images (name text not null,  dirid integer not null,  caption text,  datetime datetime,  unique (name,dirid));
+create table tags (id integer primary key,  pid integer,  name text not null,  icon text,  unique (name, pid));
+
+create index dir_index on images    (dirid);
+create index tag_index on imagetags (tagid);
+create trigger delete_album delete on albums
+begin
+ delete from images     where dirid = old.id;
+ delete from imagetags  where dirid = old.id;
+end;
+create trigger delete_tag delete on tags
+begin
+ delete from imagetags where tagid = old.id;
+ delete from tags       where pid   = old.id;
+end;
+
+insert into tags values ( 1,  0, "Keywords",  'tag-events' );
+insert into tags values ( 2,  0, "Persons",  'tag-people' );
+insert into tags values ( 3,  0, "Locations",  'tag-places' );
+fin
+    ;
+    %categories=(
+	    "Keywords"	=>  [ 1, 0, "Keywords",  "'tag-events'" ],
+	    "Persons"	=>  [ 2, 0, "Persons",   "'tag-people'" ],
+	    "Locations"	=>  [ 3, 0, "Locations", "'tag-places'" ]
+	    ); 
+    %tags=();
+    $id_tags=10;
+}
+
+sub esc
+{
+    my ($s) = @_;
+    $s =~ s/'/''/g;
+    return "'$s'";
+}

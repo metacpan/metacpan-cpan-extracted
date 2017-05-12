@@ -1,0 +1,13 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         IPC-Open3-Simple
+version:      0.03
+version_from: lib/IPC/Open3/Simple.pm
+installdirs:  site
+requires:
+    IPC::Open3:                    0
+    IO::Select:                    0
+    IO::Handle:                    0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

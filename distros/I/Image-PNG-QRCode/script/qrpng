@@ -1,0 +1,71 @@
+#!/home/ben/software/install/bin/perl
+use warnings;
+use strict;
+use Image::PNG::QRCode 'qrpng';
+use Getopt::Long;
+
+# File to output to if the user forgets to specify an output.
+
+my $default_file = 'qrcode.png';
+
+my %options;
+
+GetOptions (
+    "input=s" => \my $in,
+    "quiet=i" => \my $quiet,
+    "scale=i" => \my $scale,
+    "output=s" => \$options{out},
+    "force" => \my $force,
+    "help" => \my $help,
+);
+
+if ($in) {
+    $options{in} = $in;
+}
+
+if ($scale) {
+    $options{scale} = $scale;
+}
+
+if ($quiet) {
+    $options{quiet} = $quiet;
+}
+
+if (! $options{in}) {
+    $options{text} = "@ARGV";
+}
+
+if (! $options{out}) {
+    $options{out} = $default_file;
+}
+
+if (! $force && -f $options{out}) {
+    die "File $options{out} exists; use 'qrpng --force' to overwrite.\n";
+}
+#use Data::Dumper;
+#print Dumper (\%options);
+qrpng (%options);
+
+sub usage
+{
+    print <<EOF;
+qrpng "message to encode"
+
+Options are:
+--input <file>   A file of text to encode
+--output <file>  The file to write to
+--force          Overwrite an existing file with the same name
+--quiet <number> The size of the quiet zone (white border around image)
+--scale <number> Number of pixels to use for each "module" (unit square)
+--help           Get this message
+
+If you do not specify an output file, it is written to '$default_file'.
+EOF
+    exit;
+}
+
+
+
+# Local variables:
+# mode: perl
+# End:

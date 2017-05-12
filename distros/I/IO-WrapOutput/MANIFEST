@@ -1,0 +1,12 @@
+Changes
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/IO/WrapOutput.pm
+t/01_basic.t
+t/02_poe.t

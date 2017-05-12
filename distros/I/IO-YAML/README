@@ -1,0 +1,334 @@
+NAME
+    IO::YAML - read and write YAML streams incrementally
+
+SYNOPSIS
+        use IO::YAML;
+    
+        $io = IO::YAML->new($path_or_filehandle);
+        $io = IO::YAML->new(
+            'path'      => '/path/to/a/file',
+            'auto_load' => $bool,
+        );
+        $io = IO::YAML->new(
+            'handle' => $fh,
+            'mode'   => '>',  # or 'w'; '<' or 'r'; '>>' or 'a'
+        );
+    
+        $io = IO::YAML->new;
+        $io->open($path, '>')  or die $!;  # Open a stream for writing
+        $io->open($path, '>>') or die $!;  # Open a stream for appending
+    
+        # Automatically add "...\n" at end of each document written
+        $io->auto_terminate(1);
+    
+        print $io $mystring;
+        print $io @myvalues;
+        print $io \@myarray;
+        print $io \%myhash;
+        print $io $myobj;
+    
+        $io = IO::YAML->new;
+        $io->open($path, '<')  or die $!;  # Open a stream for reading
+        while (<$io>) {
+            $data = YAML::Load($_);
+        }
+    
+        $io = IO::YAML->new;
+        $io->open($path) or die $!;  # Default mode is reading
+        $io->auto_load(1);
+        while (not $io->eof) {
+            $data = <$io>;
+        }
+    
+        $io = IO::YAML->new($path_or_handle);
+        $io->auto_load(1);
+        my @values = <$io>;  # Roughly equivalent to YAML::LoadFile(...)
+
+DESCRIPTION
+    IO::YAML may be used to read and write YAML streams one "document"
+    (i.e., one value) at a time.
+
+    A YAML stream is a file consisting of a sequence of YAML documents, each
+    of which may (optionally) be terminated by a line consisting solely of
+    three periods ("...").
+
+    The first line of each document must begin with the three-byte sequence
+    "---".
+
+    Here's a simple YAML file consisting of three documents; their values
+    are the string 'foo', an empty array, and a hash with three elements:
+
+        --- #YAML:1.0 foo
+        --- #YAML:1.0 []
+        --- #YAML:1.0
+        title: Testing 1, 2, 3
+        author: nkuitse
+        date: 2004-03-05
+        ^D
+
+    (Here, "^D" indicates the end of the file.)
+
+    In this next example, the stream consists of a single YAML document
+    whose value is "undef":
+
+        --- ~
+        ^D
+
+    As this example shows, the first line in each document need not contain
+    the full YAML 1.0 header.
+
+  Reading from a YAML stream
+    To read from a YAML stream, you may use the angle-brackets operator
+    (e.g., <$fh>) or the equivalent methods "getline" or "read". Rather than
+    reading a single line, this will read an entire YAML document.
+
+        while(defined(my $yaml = <$io>)) {
+            my $value = YAML::Load($yaml);
+            ...
+        }
+
+    The "YAML::Load" step may be omitted by setting the IO::YAML object's
+    "auto_load" property to a true value:
+
+        $io->auto_load(1);
+        while(defined(my $value = <$io>)) {
+            ...
+        }
+
+    However, this example is complicated by the fact that the value of a
+    YAML document may be undef; the loop as written will terminate when the
+    end of the stream is reached *or* when an undef value is read.
+
+    To avoid this problem while still taking advantage of the "auto_load"
+    property, use "$io->eof" to test for the end of the stream:
+
+        $io->auto_load(1);
+        while(not $io->eof) {
+            my $value = <$io>;
+            ...
+        }
+
+    IO::YAML properly recognizes the document terminator ("..."). Some
+    versions of YAML do not recognize it, however; in order to prevent
+    problems when reading YAML streams with auto-loading off, IO::YAML
+    strips the document terminator line if it is present.
+
+  Writing to a YAML stream
+    To print to a YAML stream, call "print" just as you would with a regular
+    file handle; the value(s) you're printing will be converted to YAML
+    format before being written:
+
+        $io = IO::YAML->new;
+        $io->open('>file') or die "Couldn't open 'file'";
+        print $io $anything;
+
+    You can `print' anything that YAML is capable of serializing; an
+    exception will be raised if you attempt to print something that can't be
+    serialized (e.g., a reference to a subroutine).
+
+    The complication with undef values that affects the reading of a YAML
+    stream is not an issue when writing to a YAML stream.
+
+  Terminating YAML documents
+    Documents in a YAML stream may be terminated by a line consisting solely
+    of the string "...". You can use the "terminate" method to add an
+    explicit document terminator to a YAML stream that you have open for
+    writing (or appending):
+
+        $io = IO::YAML->new($file_or_handle, '>');
+    
+        foreach my $value (@data_values) {
+            print $io $value;
+            $io->terminate;
+        }
+
+    It's generally safer to have YAML documents terminated automatically:
+
+        # 1. Set auto_terminate to a true value
+        #    a) When creating the object
+        $io = IO::YAML->new(
+            'handle' => $fh,
+            'mode' => '>>',
+            'auto_terminate' => 1,
+        );
+        # or b) At any point thereafter
+        $io = IO::YAML->new(...);
+        $io->auto_terminate(1);
+    
+        # 2. Documents are now auto-terminated
+        foreach my $value (@data_values) {
+            print $io $value;
+            # $io->terminate called implicitly
+        }
+
+    Note that it's not the YAML *stream* that's terminated; it's the YAML
+    document that was previously written.
+
+  Low-level access
+    Sometimes it is helpful to be able to access a YAML stream at a lower
+    level. For example, you may wish to read and write a file consisting of
+    a YAML document (here, serving as a header of sorts) followed by
+    arbitrary text. The "handle" method may be used to obtain the underlying
+    file handle so that it can be used for this low-level access:
+
+        # Read header + body
+        $io->auto_load(1);
+        $header = <$io>;
+        $fh = $io->handle;
+        while (<$fh>) {
+            # Process each line after the YAML document
+        }
+    
+        # Write header + body
+        $io->auto_terminate(1);
+        print $io $header;
+        $fh = $io->handle;
+        for (@other_stuff_to_write) {
+            print $fh $_;
+        }
+
+METHODS
+    new
+            $io = IO::YAML->new;
+    
+            # Concise forms
+            $io = IO::YAML->new("$file");     # Default is read-only
+            $io = IO::YAML->new("<$file");    # Read-only made explicit
+            $io = IO::YAML->new(">$file");    # Read-write (empty header & body)
+            $io = IO::YAML->new($file, '<');  # Or '>', '+<', 'r', etc.
+            $io = IO::YAML->new(\*STDIN);
+            $io = IO::YAML->new(\*STDOUT, '>');
+            $io = IO::YAML->new($anything_that_isa_GLOB);
+    
+            # Full-fledged forms
+            $io = IO::YAML->new(
+                'path' => $file,        # File will be opened read-only
+                'auto_load' => 1,       # Default is 0
+            );
+            $io = IO::YAML->new(
+                'path' => $file,        # File will be opened or created
+                'mode' => '>',          # Default is '<'; '>>' is also allowed
+            );
+
+        Instantiate an IO::YAML object. An exception is thrown if anything
+        goes wrong.
+
+        If a path is specified, the file at that path will be opened.
+        Otherwise, you'll have to open it yourself using the "open()"
+        method.
+
+        If a path has been specified and the file doesn't already exist, it
+        will be created -- but only if you've specified a mode that permits
+        writing; if you haven't, an exception will be thrown.
+
+        The following arguments may be specified in the constructor:
+
+        *path*
+            Path to a file to create (if it doesn't already exist) and open.
+
+        *mode*
+            Read/write/append mode for the new file. This must be specified
+            in one of the following forms:
+
+            <
+            >
+            >>
+            r
+            w
+            a   Modes that allow for both reading and writing are not
+                allowed, since YAML documents are variable in size.
+
+            NOTE: Numeric modes are not yet implemented.
+
+        *auto_load*
+            Indicates whether YAML document values should be auto-loaded
+            after being read (see above). The default is not to auto-load
+            values.
+
+        *auto_terminate*
+            Indicates whether YAML documents should be auto-terminated when
+            they are written (see above). The default is not to
+            auto-terminate documents.
+
+    open
+            $io = IO::YAML->new;
+            $io->open("<$file") or die $!;
+            $io->open($file, $mode) or die $!;
+
+        Open a file with the specified name and mode. You must use this
+        method if the instance was created without a "path" element (and one
+        has not been assigned using the "path()" method).
+
+        Upon failure, sets $! to a meaningful message and returns a false
+        value.
+
+        The possible modes are as described for new.
+
+        The "open()" method may be called repeatedly on the same instance,
+        without having to close it.
+
+    close
+            $io->close or die $!;
+
+        Close the filehandle.
+
+    print
+            $io->print($data) or die $!;
+
+    getline
+    getlines
+    seek
+            $io->seek($pos, $whence);
+
+        Set the IO::YAML file handle's position *in bytes* within the YAML
+        stream. This will fail unless it moves the position to the beginning
+        of a YAML document or the end of the whole file handle.
+
+    tell
+            $pos = $io->tell;
+
+        Return the the IO::YAML file handle's position *in bytes*.
+
+    truncate
+            $io->truncate(0);
+            $io->truncate($io->tell);
+
+        Truncates the IO::YAML file to the specified length. As illustrated
+        here, this must be either 0 or equal to the filehandle's current
+        position.
+
+    eof
+            if ($io->eof) { ... }
+
+        Return 1 if the IO::YAML filehandle is at the end of the YAML
+        stream.
+
+BUGS
+    Autoflush might not be working.
+
+    Seeking to the first position beyond the end of the YAML stream should
+    be possible but doesn't currently work.
+
+TO DO
+    Normalize modes passed in the constructor.
+
+    Implement numeric modes.
+
+    Add tests for seek and tell methods.
+
+    Enable seeking to the first byte beyond the end of the YAML stream.
+
+    Figure out how to allow read-write access and truncate().
+
+SEE ALSO
+    YAML
+
+AUTHOR
+    Paul Hoffman (nkuitse AT cpan DOT org)
+
+COPYRIGHT
+    Copyright 2004-2007, 2009 Paul M. Hoffman.
+
+    This is free software, and is made available under the same terms as
+    Perl itself.
+

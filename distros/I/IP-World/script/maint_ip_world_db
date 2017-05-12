@@ -1,0 +1,352 @@
+#!/usr/local/bin/perl
+
+# program to get the WorldIP and GeoIP databases 
+#  and build a composite file for IP::World
+
+use strict;
+use warnings;
+use LWP::UserAgent;
+use HTTP::Status qw(:constants :is status_message);
+use URI;
+use File::ShareDir qw(module_dir);
+use constant FN => 'ipworld';
+
+# online archives
+my @URLS = ("http://static.wipmania.com/static/worldip.en.text.zip",
+            "http://geolite.maxmind.com/download/geoip/database/GeoIPCountryCSV.zip");
+# file names within the archives
+my @FNS = ("worldip.en.txt",
+           "GeoIPCountryWhois.csv");
+
+my @moname = ('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+              'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec');
+my $mainpack = 'L';
+my ($testing, $dual_out, $resp, $dd);
+
+# look for options (-testing, -dual_out, -user "user", -p "password")
+my $i=0;
+
+for (@ARGV) {
+  if      (/^--?t/) {
+    $testing = 1;
+    $dd = 'blib/lib/auto/IP/World/';
+  } elsif (/^--?d/) {
+    $dual_out = 1;
+    $dd = 'lib/auto/IP/World/';
+    if (!-d $dd) {$dd = ''}
+    $mainpack = 'V';
+  }
+  $i++;
+}
+# get the destination directory, make path to our output file
+if (!$testing && !$dual_out) {
+  # a production check-for-update run!
+  eval "require IP::World";
+  if ($@) {die "Can't load IP::World -- $@"}
+  $dd = module_dir('IP::World') or die "Can't get the destination directory";
+  $dd .= '/';
+}
+my $replfn = $dd.FN.($dual_out ? ".le" : ".dat");
+my $replfn_exists = -e $replfn;
+my $replMod = $replfn_exists ? (CORE::stat $replfn)[9] : 0;
+
+# blow up in bad calling situations
+if ($testing && $dual_out
+ || $testing && !$replfn_exists) {
+  die "bad call: -[-]t... and -[-]d, or -[-]t... and no included database";
+}
+my $outfn = $dd.FN.".".($replfn_exists ? 'tmp'
+                                       : $dual_out ? 'le' : 'dat');
+my $outfn2;
+if ($dual_out) {
+  $outfn2 = $dd.FN.".".($replfn_exists ? 'tbe' : 'be');
+}
+
+# create the user-agent object via the package at the start of this file
+my $ua = LWP::UserAgent->new (timeout => 30);
+# MaxMind occasionally block LWP::UserAgent's default User-Agent header,
+# but I've been told that they don't mind if we lie. This one taken from
+# a real browser during one of those outages worked OK
+#    -- DCANTRELL
+$ua->agent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36');
+
+# only proxy handling is via environment variables
+if ($ENV{http_proxy} || $ENV{HTTP_PROXY}) {$ua->env_proxy}
+
+# if we have a file already, get mod times of the data sources
+my $latestMod = 0;
+if ($replfn_exists) {
+  for my $url (@URLS) {
+    $resp = $ua->head($url);
+    if (!$resp->is_success) {
+      die "Source file $url could not be found: ".status_message($resp->code);
+    }
+    $_ = $resp->last_modified;
+    if ($_ > $latestMod) {$latestMod = $_}
+} }
+# we will build a new database if we're testing,
+#   or either of the two sources is newer than our current DB
+my @lines = (0) x @URLS;
+my $running = 1;
+my $ents = '';
+my @ccs = ();
+my @prevLast = (-1) x @URLS;
+my $lastOut = -1;
+my $unknowns = 0;
+my $lastcc = '';
+
+# all of these will be the same size as @URLS
+my (@in, @start, @last, @cc, @fns);
+
+if (!$replfn_exists
+ || $latestMod > $replMod) {
+
+  # we are going to build a new database or two
+  # GET the file from each source into the dest dir, open them for reading
+  for ($i=0; $i < @URLS; $i++) {
+
+    if ($URLS[$i] !~ m'([^/]+)$') {die "Can't find base file name in $URLS[$i]"}
+    my $fn = $dd.$1;
+
+    # read the source archives from the internet
+    $resp = $ua->get($URLS[$i], ':content_file' => $fn);
+    if (!$resp->is_success) {
+      die "Source file $URLS[$i] could not be fetched: "
+          . status_message($resp->code);
+    }
+    # maintain the latest mod time among the sources
+    $_ = $resp->last_modified;
+    if ($_ > $latestMod) {$latestMod = $_}
+
+    # save the file name
+    push @fns, $fn;
+
+    # open the subfile of the .zip archive that we want, through a pipe
+    # if '.gz' files need to be added to the source lists,
+    #  this will get more complicated
+    open ($in[$i], "-|", "unzip", '-cq', $fn, $FNS[$i])
+      or die "Can't open $fn for read: $!";
+  }
+
+  # start by reading the first record of each file
+  for ($i=0; $i < @URLS; $i++) {getLine($i)}
+
+  my ($minI, $lastCurr);
+
+  # open the output file(s)
+    open DAT,   ">$outfn"  or die "Can't open $outfn for write: $!";
+  if ($dual_out) {
+    open DATBE, ">$outfn2" or die "Can't open $outfn2 for write: $!";
+  }
+
+  # loop thru the source files
+  while ($running) {
+
+    # find the lowest start IP between/among the source fles
+    # if there are more than one file with that start, take the one with the lowest $last
+    # if there's more than one of those, take the one with the lowest index (WorldIP is 0)
+    $minI = -1;
+    $lastCurr = 0xFFFFFFFF;
+
+    for ($i=0; $i < @URLS; $i++) {
+      if (defined $in[$i]) {
+        if ($minI < 0
+         || $start[$i] < $start[$minI]) {
+          $minI = $i;
+        } elsif ($start[$i] == $start[$minI]) {
+          if ($cc[$i] eq $cc[$minI]) {
+            if  ($last [$i] >  $last [$minI]) {
+              getLine($minI);
+              if ($last[$minI] < $lastCurr) {$lastCurr = $last[$minI]}
+              $minI = $i;
+            }
+            elsif ($last[$i] < $last[$minI]) {getLine($i); redo}
+          } elsif ($last[$i] < $last[$minI]) {$minI = $i}
+        } else {
+          # start of this source is greater than start of min source,
+          #  but its start can limit the size of the current entry
+          if ($start[$i] <= $lastCurr) {$lastCurr = $start[$i] - 1}
+        }
+        if ($last[$i] < $lastCurr) {$lastCurr = $last[$i]}
+    } }
+
+    # if there's a hole, put its starting address in the SA table
+    #   and the encoded value for 'unknown' in the saved table
+    if ($start[$minI] > $lastOut + 1) {
+      out($lastOut + 1);
+      push @ccs, 26*26;
+      $unknowns++;
+      $lastcc = '??';
+    }
+    if ($cc[$minI] ne $lastcc) {
+
+      # put the starting address in the starting address table
+      # and the encoded country code in the saved table
+      out($start[$minI]);
+      push @ccs, (ord(substr($cc[$minI], 0, 1)) - ord('A')) * 26
+                + ord(substr($cc[$minI], 1))    - ord('A');
+      $lastcc = $cc[$minI];
+    }
+    $lastOut = $lastCurr;
+
+    # modify $start, $last of sources per this output
+    for ($i=0; $i < @URLS; $i++) {
+      if (defined $in[$i]
+       &&   $start[$i] <= $lastOut) {
+        if ($last [$i] <= $lastOut) {getLine($i)}
+        else {$start[$i] = $lastOut+1}
+    } }
+    # for breaking
+    # my $zzz=0;
+  }
+  # make a last "hole" entry if it's needed for the binary search
+  if ($lastOut < 0xFFFFFFFF) {
+    out($lastOut + 1);
+    push @ccs, 26*26;
+    $unknowns++;
+  }
+  # output the country code table
+  my $word;
+  for ($i=0; $i < @ccs; $i++) {
+    my $j = $i%3;
+    if (!$j)      {$word  = $ccs[$i] << 20}
+    elsif ($j==1) {$word |= $ccs[$i] << 10}
+    else      {out($word |  $ccs[$i])}
+  }
+  # print a last incomplete word
+  if (@ccs%3) {out($word)}
+  # output file complete
+  close   DAT   or die "Can't close output file $outfn: $!";
+  if ($dual_out) {
+    close DATBE or die "Can't close output file $outfn2: $!"}
+
+  # set the mod time of the result file to that of the source file
+  utime($latestMod, $latestMod, $outfn)==1
+    or die "Can't make modification time of $outfn match that of source file: $1";
+  if ($dual_out) {
+    utime($latestMod, $latestMod, $outfn2)==1
+      or die "Can't make modification time of $outfn2 match that of source file: $1";
+
+    # since we can't trust a mod time to make it through dist-making and unpacking,
+    #  put the mod time for these files into an accompanying file.
+    my $mtfn = $dd.'modtime.dat';
+    open DAT, ">$mtfn" or die "Can't open for $mtfn write: $!";
+    print DAT pack 'N', $latestMod;
+    close DAT or die "Can't close $mtfn: $!";
+  }
+  # delete the source files
+  unlink(@fns) == @fns or die "Can't delete the source files";
+
+  # if we just made a .tmp file, cycle it (them) to become the target file
+  if ($outfn =~ /tmp$/) {
+    if ($testing) {
+      eval "require Module::Build;";
+      if ($@) {die "Can't load Module::Build: $@"}
+      my $build = Module::Build->current();
+
+      if ($build->is_unixish()) {
+        # prevent making a root-owned file in blib
+        my ($old_uid, $old_gid) = (CORE::stat $replfn)[4..5];
+        my ($new_uid, $new_gid) = (CORE::stat $outfn )[4..5];
+        if ($new_uid != $old_uid
+         || $new_gid != $old_gid) {
+          chown ($old_uid, $old_gid, $outfn)==1
+            or die "Can't transfer owner:group from old $replfn to new: $!";
+    } } }
+    # old file(s) -> .bak[xx] then new file(s) -> .dat or .le or .be
+    my @renamers = $dual_out ? (\$outfn, 'le',  'bakle', \$outfn2, 'be', 'bakbe')
+                             : (\$outfn, 'dat', 'bak');
+    while (@renamers) {
+      my ($targfn, $bakfn);
+      ($targfn = ${$renamers[0]}) =~ s/[^.]+$/$renamers[1]/e;
+      ($bakfn  = ${$renamers[0]}) =~ s/[^.]+$/$renamers[2]/e;
+      rename ($targfn, $bakfn)==1
+        or die "Can't rename $targfn to $bakfn: $!";
+      rename (${$renamers[0]}, $targfn)==1
+        or die "Can't rename ${$renamers[0]} to $targfn: $!";;
+      ${$renamers[0]} = $targfn;
+      splice (@renamers, 0, 3);
+  } }
+  # make the new output file(s) read-only
+  chmod(0444, $outfn) == 1
+    or die "Can't set permissions of $outfn to read-only: $!";
+  if ($dual_out) {
+    chmod(0444, $outfn2) == 1
+      or die "Can't set permissions of $outfn2 to read-only: $!";
+  }
+  # if the user entered a command to run at this time, do so
+  #   but not if we're just testing
+  if (!$testing) {
+    eval 'require IP::World::ConfigData';
+    if (!$@
+     && ($_ = IP::World::ConfigData->config('cmd'))) {system $_}
+  }  
+  # show that we updated the DB (no one may be watching...)
+  my ($mday, $mon, $year) = (localtime($latestMod))[3..5];
+  my $mod_date = $moname[$mon].sprintf("-%d-", $mday).($year+1900);
+  print "Wrote IP::World database".($dual_out && $dd ? " to $dd" : '')
+        .", including ".(scalar(@ccs)-$unknowns)
+        ." country blocks and $unknowns unknown blocks\n";
+  # my $zzz = 0
+} else {
+  print "IP::World database is up-to-date\n";
+}
+#### end of main, start of subs ####
+
+# make a 32-bit packed value
+sub pack32 {
+  my $s = pack($_[0], $_[1]);
+  if (length($s) <= 4) {return $s}
+  if (unpack('N', $s) == $_[1]) {return substr($s, -4)}
+  return substr($s, 0, 4);
+}
+# output a word to the output file(s)
+sub out {
+    print DAT   pack32($mainpack, $_[0]);
+  if ($dual_out) {
+    print DATBE pack32('N',       $_[0]);
+} }
+# read a line from a source file
+sub getLine {
+  my ($i) = @_;
+  my (@f, @l, $j, $cc);
+  my $fh = $in[$i];
+
+  LINE: while (<$fh>) {
+    $lines[$i]++;
+
+    # check the overall format of the line
+    if ((@f[0..3], @l[0..3], $start[$i], $last[$i], $cc[$i]) =
+      /^"(\d+)\.(\d+)\.(\d+)\.(\d+)","(\d+)\.(\d+)\.(\d+)\.(\d+)","(\d+)","(\d+)","(..)",/
+      ) {
+
+      # ok: check the range of the IP address subfields
+      for ($j = 0; $j < 4; $j++) {
+        if ($f[$j] > 255
+         || $l[$j] > 255) {
+          warn "text IP address error at line $lines[$i] of $FNS[$i]";
+          next LINE;
+      } }
+      if ($start[$i] != ($f[0]<<24 | $f[1]<<16 | $f[2]<<8 | $f[3])
+       || $last[$i]  != ($l[0]<<24 | $l[1]<<16 | $l[2]<<8 | $l[3])) {
+        warn "text and numeric IP don't match at line $lines[$i] of $FNS[$i]";
+      } elsif ($start[$i] > $last[$i]) {
+        warn "starting IP > ending IPmatch at line $lines[$i] of $FNS[$i]";
+      } elsif ($start[$i] <= $prevLast[$i]) {
+        warn "IP addresses out of order at line $lines[$i] of $FNS[$i]";
+        # lines with non-UC-alpha codes are quietly ignored
+      } elsif ($cc[$i] =~ /[A-Z][A-Z]/) {
+        # it's a good record!
+        $prevLast[$i] = $last[$i];
+        return;
+      }
+    } else {warn "format error in line $lines[$i] of $FNS[$i]"}
+  }
+  if (!defined $_) {
+    close $in[$i];
+    undef $in[$i];
+    for ($i=0; $i < @FNS; $i++) {
+      if (defined $in[$i]) {return}
+    }
+    $running = 0;
+} }

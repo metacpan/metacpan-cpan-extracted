@@ -1,0 +1,36 @@
+IPC-Exe
+
+IPC::Exe provides a secure and highly flexible way to execute external
+programs or Perl subroutines, and string them via IPC with an
+intuitive syntax.
+
+For more info, run the following command after installation:
+
+    perldoc IPC::Exe
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+DEPENDENCIES
+
+See "Makefile.PL" under PREREQ_PM key.
+
+
+CREDITS
+
+Sergei Steshenko - for immediately pointing out flaws in the module,
+                   especially when running under Win32 environment.
+
+
+AUTHOR
+
+Gerald Lai
+

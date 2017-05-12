@@ -1,0 +1,24 @@
+0.007
+  - Fix timeout callback being called in global destruction
+    not working as expected.
+
+0.006
+  - Fix bug when trying to unlock and encountering a timeout.
+
+0.005
+  - Fix dependencies and put onto CPAN.
+
+0.004
+  - Fix timeout code to not die.
+
+0.003
+  - Ensure that timer is set using accurate time (by calling ->now_update)
+    so that timer runs for the full interval, even if the event loop hasn't
+    run for a long time.
+
+0.002
+  - Allow locks to time out.
+
+0.001
+  - Initial version
+

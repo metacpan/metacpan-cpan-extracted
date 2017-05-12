@@ -1,0 +1,41 @@
+# Exclude the author-only build script
+build\.pl
+# Exclude the built module
+blib/.*
+# Exclude all git files
+\b\.gitignore$
+\.git/.*
+# Don't include the Makefile made from Makefile.PL in the distribution.
+Makefile$
+# Exclude the stamp file
+pm_to_blib
+# Exclude the META files made by ExtUtils::MakeMaker
+MYMETA..*
+# Exclude backup files made by ExtUtils::MakeMaker
+.*\.bak
+# Exclude untarred distribution files
+^Image-Similar-[0-9\.]+/$
+# Exclude tarred distribution files
+^Image-Similar-[0-9\.]+\.tar\.gz$
+^timesheet.txt$
+# Template for building pod file.
+^lib/Image/Similar.pod.tmpl$
+# Don't include the script which makes the POD
+^make-pod.pl$
+# Don't include the outputs from running the examples
+^examples/*-out.txt$
+^Similar.(?:c|o|bs)$
+# Personal makefile
+^mymakefile$
+^xt/.*$
+# Object files
+\.o$
+# .gitignore
+\.gitignore$
+# File for testing C file from C
+^similar-image-test\.c$
+# File for making images
+t/images/chess/make-chessboards\.pl$
+t/images/lenagercke/.*
+^examples/.*-out\.txt$
+^\.perlcriticrc$

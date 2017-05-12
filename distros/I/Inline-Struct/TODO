@@ -1,0 +1,8 @@
+ o fix new() bug pointed out by "Paul" at inline@perl.org
+ o allow assignment to _HASH & _ARRAY (but not _KEYS)
+ o change names of _HASH, _ARRAY, and _KEYS (to what?)
+ o add a _TIEHASH accessor?
+ o allow nesting of structures which aren't _pointers_
+ o enum support?
+ o #define support?
+ o type checking in accessors

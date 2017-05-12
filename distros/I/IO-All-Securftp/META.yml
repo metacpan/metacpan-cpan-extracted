@@ -1,0 +1,31 @@
+---
+abstract: 'Securftp handler for IO::All'
+author:
+  - 'Jens Rehsack <rehsack@cpan.org>'
+build_requires:
+  Test::More: '0.9'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: IO-All-Securftp
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  IO::All: '0.30'
+  Net::SFTP::Foreign: '1.77'
+  Scalar::Util: '0'
+  URI: '0'
+  namespace::clean: '0'
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=IO-All-Securftp
+  homepage: https://metacpan.org/release/IO-All-Securftp
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com:rehsack/IO-All-Securftp.git
+version: '0.001'

@@ -1,0 +1,14 @@
+Changes
+lib/Inline/Mason.pm
+lib/Inline/Mason/Base.pm
+lib/Inline/Mason/OO.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/external_mason
+t/Inline-Mason.func.t
+t/Inline-Mason.OO.t
+t/Inline-Mason.passive.t
+t/Inline-Mason.t
+t/test.pm

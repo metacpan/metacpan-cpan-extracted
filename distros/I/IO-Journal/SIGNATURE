@@ -1,0 +1,47 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 31a553b9be6c00ab6ee57c867bec3aa8cf2221db Build.PL
+SHA1 651b4511fc465cad00ca8acb7a37b8bc527c3e5e Changes
+SHA1 b679b3727cbb6993299b97df1250a62d577afc8a LICENSE
+SHA1 09223abc3ba089520f6fc0f24097dfc4e8c6f7a3 MANIFEST
+SHA1 ae99475c60a7f5f9cf89e10e858d107337a299f8 MANIFEST.SKIP
+SHA1 9d69ff63948b3632711ae0c0f4935bb37d31bb01 META.yml
+SHA1 7cfa2f7bdb9c7494ceb0f3260077453c41deb412 Makefile.PL
+SHA1 5cdab56dc5899c87c392eceaf7bc20754da0e08d README
+SHA1 e48596e76e562cf8859fa56e173225cabf5307de lib/IO/Journal.pm
+SHA1 a725dcafdbfaaf07d069e52fb27d45749e9fdbf6 lib/IO/Journal/Transaction.pm
+SHA1 e3574d791705fb7c4244c0d0cce795ce740aafad src/Journal.xs
+SHA1 06df0c00ff5adc2f25528b28a979f61decf821b9 src/Transaction.xs
+SHA1 3dcf3a9a7409661a6fb62c6eee0c6498f6ef2cb4 src/model.h
+SHA1 913b2193c4a587b462a394aa7cc0e554bcc29a33 src/ppport.h
+SHA1 a174141d0f31906b04dfa7c2238f0dc2d142fbed t/00signature.t
+SHA1 9846b4714be4fd2dc2d025892aefe84555c45b9f t/01compile.t
+SHA1 296ba506e96ded7db49129cb0588f3f3db0c753c t/01kwalitee.t
+SHA1 2577c5294d47fe7e41dfb2ecb25f14ac0e8a709e t/01manifest.t
+SHA1 c9aeb25d2e8bef8b1f707b98b47ef1be71cfe465 t/01meta.t
+SHA1 c8e15b2e5766a2676122685c9b2696c98684a462 t/01min-perl.t
+SHA1 9cf3bd83ef64efa74d87234b6abb1fffd532eac2 t/01pod-coverage.t
+SHA1 f8b08b99a487f88f0be18d66724917625fdc67aa t/01pod.t
+SHA1 728b4d8213806203c6202efeb943f4a7b7eae1c4 t/01portability.t
+SHA1 b76888d234c17a6167c633665486684211a57950 typemap
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
+
+iEYEARECAAYFAkprlYoACgkQYYN9T93mai83JwCfX6LxgdDL1vzdCLnKXwlPDNJu
+xnkAn1dnJbSVgiq1mYIlMvGffGC+WZE1
+=8ZWq
+-----END PGP SIGNATURE-----

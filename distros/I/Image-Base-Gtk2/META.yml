@@ -1,0 +1,34 @@
+--- #YAML:1.0
+name:               Image-Base-Gtk2
+version:            11
+abstract:           Image::Base drawing to Gtk2 things.
+author:
+    - Kevin Ryde <user42@zip.com.au>
+license:            gpl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Gtk2:         0
+    Image::Base:  1.12
+    perl:         5.008
+resources:
+    homepage:  http://user42.tuxfamily.org/image-base-gtk2/index.html
+    license:   http://www.gnu.org/licenses/gpl.html
+no_index:
+    directory:
+        - t
+        - inc
+        - xt
+        - devel
+generated_by:       ExtUtils::MakeMaker version 6.57_05
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4
+optional_features:
+    maximum_tests:
+        description:  Have "make test" do as much as possible.
+        requires:
+            Test::Weaken:  2.000

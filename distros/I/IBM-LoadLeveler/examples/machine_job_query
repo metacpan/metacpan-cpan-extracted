@@ -1,0 +1,259 @@
+# -*- Perl -*-
+#
+# This is a Perl version of the example that comes with LoadLeveler in
+# LoadL/full/samples/lldata_access/machine_job_query.c
+#
+# ---------------------------------------------------------------------------------
+# This sample program shows how LoadLeveler's Data Access API can be used
+# to obtain machine, job, and cluster information. The program consists of
+# three steps:
+#   1. Get information of selected machines in the LoadLeveler cluster.
+#   2. Get information of jobs of selected classes.
+#   3. Get floating consumable resource information of the LoadLeveler cluster.
+#
+# Notes:
+#   1. The host_list of machine names must be modified to match your configuration.
+#   2. The class_list of class names must be modified to match your configuration.
+# ---------------------------------------------------------------------------------
+#
+
+use IBM::LoadLeveler;
+
+# Step 1: Display information of selected machines in the LL cluster
+
+#Initialize the query: Machine query
+
+$queryObject = ll_query(MACHINES);
+
+if (!queryObject)
+{
+    print "Query MACHINES: ll_query() returns NULL.\n"; 
+    exit(1);
+}
+
+# Set query parameters: query specific machines by name
+
+$rc = ll_set_request($queryObject, QUERY_HOST,  ["f03n03c","f13n03c"], ALL_DATA);
+if ($rc) 
+{
+    print "Query MACHINES: ll_set_request() return code is non-zero.\n";
+    exit(1);
+}
+
+# Get the machine objects from the LoadL_negotiator (central manager) daemon
+
+$machine = ll_get_objs($queryObject, LL_CM, NULL, $obj_count, $err_code);
+if ($machine == NULL) 
+{
+    print "Query MACHINES: ll_get_objs() returns NULL. Error code =  $err_code\n";
+}
+print "Number of machines objects returned = $obj_count\n";
+
+# Process the machine objects
+while($machine)
+{
+    $name = ll_get_data($machine, LL_MachineName);
+    if ($name)
+    {
+	print "Machine name: $name ------------------\n";
+    }
+    $startd_state = ll_get_data($machine, LL_MachineStartdState);
+    print "STARTD_STATE = $startd_state\n";
+    if (! defined $startd_state)
+    {
+	print "Query MACHINES: ll_get_data() return code is non-zero.\n";
+	exit(1);
+    }
+    print "Startd State: $startd_state\n";
+    if ($startd_state ne "Down")
+    {
+         $value64 = ll_get_data($machine, LL_MachineRealMemory64);
+         print "Total Real Memory: $value64 MB\n";
+         $value64 = ll_get_data($machine, LL_MachineVirtualMemory64);
+         print "Free Swap Space: $value64 KB\n";
+         $load_avg = ll_get_data($machine, LL_MachineLoadAverage);
+         print "Load Average: $load_avg\n";
+     }
+
+    # Consumable Resources associated with this machine
+    $resource = ll_get_data($machine, LL_MachineGetFirstResource);
+    while( $resource) 
+    {
+	$res_name = ll_get_data($resource, LL_ResourceName);
+	print "Resource Name = $res_name\n";
+	$value64 =  ll_get_data($resource, LL_ResourceInitialValue64);
+	print "   Total: $value64\n";
+	$value64 = ll_get_data($resource, LL_ResourceAvailableValue64);
+	print "   Available: $value64\n";
+	$resource = ll_get_data($machine, LL_MachineGetNextResource);
+     }
+    $machine = ll_next_obj($queryObject);
+}
+
+# Free objects obtained from Negotiator
+ll_free_objs($queryObject);
+# Free query element
+ll_deallocate($queryObject);
+
+#Step 2: Display information of selected jobs
+
+#Initialize the query: Job query
+
+print "==================================================================\n";
+
+$queryObject = ll_query(JOBS);
+if (!$queryObject)
+{
+    print "Query JOBS: ll_query() returns NULL.\n";
+    exit(1);
+}
+
+# Query all jobs of class "Parallel", "small", and "No_Class" submitted to c209f1n01, c209f1n05
+#   class_list = (char **)malloc(4*sizeof(char *));
+#   class_list[0] = "Parallel";
+#   class_list[1] = "No_Class";
+#   class_list[2] = "small";
+#   class_list[3] = NULL;
+
+$rc = ll_set_request($queryObject, QUERY_HOST,  ["f03n03c","f13n03c"], ALL_DATA);
+if ($rc) 
+{
+    printf("Query JOBS: ll_set_request() return code is non-zero.\n"); 
+    exit(1);
+}
+$rc = ll_set_request($queryObject, QUERY_CLASS, [ "poe", "B_p", "S_s" ], ALL_DATA);
+if ($rc) 
+{
+    printf("Query JOBS: ll_set_request() return code is non-zero.\n"); 
+    exit(1);
+}
+
+# Get the requested job objects from the Central Manager
+$job = ll_get_objs($queryObject, LL_CM, NULL, $obj_count, $err_code);
+if ($job == NULL) 
+{
+    printf("Query JOBS: ll_get_objs() returns NULL. Error code = %d\n", err_code);
+}
+printf("Number of job objects returned = %d\n", obj_count);
+
+#
+# Process the job objects and display selected information of each job step.
+#
+#  Notes:
+#    1. Since LL_element is defined as "void" in llapi.h, when using
+#       ll_get_data it is important that a valid "specification" parameter
+#       be used for a given "element" argument.
+#    2. Checking of return code is not always made in the following loop to
+#       minimize the length of the listing.
+#
+
+while($job) {
+      printf("------------------------------------------------------------------\n");
+      $ name= ll_get_data($job, LL_JobName);
+      print "Job name: $name\n";
+
+      $credential = ll_get_data($job, LL_JobCredential);
+      $name = ll_get_data($credential, LL_CredentialUserName);
+      printf("Job owner: %s\n", $name);
+      $name = ll_get_data($credential, LL_CredentialGroupName);
+      printf("Unix Group: %s\n", $name);
+      $step = ll_get_data($job, LL_JobGetFirstStep);
+
+      while($step) {
+         printf("  ----------------------------------------------------------------\n");
+         $step_id = ll_get_data($step, LL_StepID);
+         printf("  Step ID: %s\n", $step_id);
+         $job_class = ll_get_data(step, LL_StepJobClass);
+         printf("  Step Job Class: %s\n", $job_class);
+         $value64 = ll_get_data($step, LL_StepCpuStepLimitHard64);
+	 print "  Job Step CPU Hard Limit: $value64\n";
+	 $value64 = ll_get_data($step, LL_StepCpuLimitHard64);
+	 print "  Step CPU Hard Limit: $value64\n";
+         $value64 = ll_get_data($step, LL_StepFileLimitHard64);
+	 print "  Step File Hard Limit: $value64\n";
+	 $step_state = ll_get_data($step, LL_StepState);
+	 if ($step_state == STATE_RUNNING) 
+	 {
+               printf("  Step Status: Running\n");
+               printf("  Allocated Hosts:\n");
+               $machine = ll_get_data($step, LL_StepGetFirstMachine);
+               while($machine) 
+	       {
+                  $name = ll_get_data($machine, LL_MachineName);
+		  printf("    %s\n", $name);
+                  $machine = ll_get_data($step, LL_StepGetNextMachine);
+               }
+            }
+            else {
+               printf("  Step Status: Not Running\n");
+            }
+         $node = ll_get_data($step, LL_StepGetFirstNode);
+         while($node) 
+	 {
+	     $node_req = ll_get_data($node, LL_NodeRequirements);
+	     printf("    Node Requirements: %s\n", $node_req);
+	     $task = ll_get_data($node, LL_NodeGetFirstTask);
+	     while($task) 
+	     {
+		 $task_exec = ll_get_data($task, LL_TaskExecutable);
+		 printf("      Task Executable: %s\n", $task_exec);
+		 $ex_args = ll_get_data($task, LL_TaskExecutableArguments);
+		 printf("      Task Executable Arguments: %s\n",$ex_args);
+		 $resource_req = ll_get_data($task, LL_TaskGetFirstResourceRequirement);
+		 while($resource_req) 
+		 {
+		     $name = ll_get_data($resource_req, LL_ResourceRequirementName);
+		     printf("        Resource Req Name: %s\n", $name);
+		     $value64 =  ll_get_data($resource_req, LL_ResourceRequirementValue64);
+		     print "        Resource Req Value: $value64\n";
+		     $resource_req = ll_get_data($task, LL_TaskGetNextResourceRequirement);
+		 }
+		 $task = ll_get_data($node, LL_NodeGetNextTask);
+	     }
+	     $node = ll_get_data($step, LL_StepGetNextNode);
+	 }
+         $step = ll_get_data($job, LL_JobGetNextStep);
+      }
+      $job = ll_next_obj($queryObject);
+   }
+ll_free_objs($queryObject);
+ll_deallocate($queryObject);
+
+# Step 3: Display Floating Consumable Resources information of LL cluster.
+
+# Initialize the query: Cluster query
+
+printf "==================================================================\n";
+$queryObject = ll_query(CLUSTERS);
+
+if (!$queryObject) {
+     printf("Query CLUSTERS: ll_query() returns NULL.\n");
+     exit(1);
+  }
+
+ll_set_request($queryObject, QUERY_ALL, undef, ALL_DATA);
+$cluster = ll_get_objs($queryObject, LL_CM, NULL, $obj_count, $err_code);
+
+if (!$cluster) {
+    printf("Query CLUSTERS: ll_get_objs() returns NULL. Error code = %d\n", $err_code);
+}
+print "Number of Cluster objects = $obj_count\n";
+while($cluster)
+{
+    $resource = ll_get_data($cluster, LL_ClusterGetFirstResource);
+    while($resource)
+    {
+	$res_name  = ll_get_data($resource, LL_ResourceName);
+	print "Resource Name = $res_name\n";
+	$value64= ll_get_data(resource, LL_ResourceInitialValue64);
+	print "Resource Initial Value = $value64\n";
+	$value64 = ll_get_data(resource, LL_ResourceAvailableValue64);
+	print "Resource Available Value = $value64\n";
+	$resource = ll_get_data($cluster, LL_ClusterGetNextResource);
+    }
+    $cluster = ll_next_obj($queryObject);
+}
+ll_free_objs($queryObject);
+ll_deallocate($queryObject);
+
+

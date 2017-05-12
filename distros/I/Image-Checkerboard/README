@@ -1,0 +1,125 @@
+NAME
+    Image::Checkerboard - Image generator for checkboards.
+
+SYNOPSIS
+     use Image::Checkerboard;
+     my $image = Image::Checkerboard->new(%parameters);
+     my $suffix = $image->create($path);
+     my $type = $image->type($type);
+
+METHODS
+    "new(%parameters)"
+             Constructor
+
+            *       "bg"
+
+                     Background color.
+                     Default value is 'black'.
+
+            *       "flip"
+
+                     Flip flag. Means that each next video has reversed foreground and background.
+                     Default value is 1.
+
+            *       "fg"
+
+                     Foreground color.
+                     Default value is 'white'.
+
+            *       "height"
+
+                     Image height.
+                     Default value is 1080.
+
+            *       "type"
+
+                     Image type.
+                     Possible types are:
+                     - bmp
+                     - gif
+                     - jpeg
+                     - png
+                     - pnm
+                     - raw
+                     - sgi
+                     - tga
+                     - tiff
+                     Default value is 'bmp'.
+
+            *       "width"
+
+                     Image width.
+                     Default value is 1920.
+
+    "create($path)"
+             Create image.
+             Returns scalar value of supported file type.
+
+    "type([$type])"
+             Set/Get image type.
+             Returns actual type of image.
+
+ERRORS
+     new():
+             From Class::Utils::set_params():
+                     Unknown parameter '%s'.
+     create():
+             Cannot write file to '$path'.",
+                     Error, %s
+             Image type '%s' doesn't supported.
+
+     type():
+             Image type '%s' doesn't supported.
+
+EXAMPLE
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use File::Temp qw(tempfile);
+     use Image::Checkerboard;
+
+     # Temporary file.
+     my (undef, $temp) = tempfile();
+
+     # Object.
+     my $obj = Image::Checkerboard->new;
+
+     # Create image.
+     my $type = $obj->create($temp);
+
+     # Print out type.
+     print $type."\n";
+
+     # Unlink file.
+     unlink $temp;
+
+     # Output:
+     # bmp
+
+DEPENDENCIES
+    Class::Utils, Error::Pure, Imager, Imager::Fill.
+
+SEE ALSO
+    Image::Random
+        Perl class for creating random image.
+
+    Image::Select
+        Perl class for creating random image.
+
+REPOSITORY
+    <https://github.com/tupinek/Image-Checkerboard>.
+
+AUTHOR
+    Michal Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+     © 2012-2015 Michal Špaček
+     BSD 2-Clause License
+
+VERSION
+    0.03
+

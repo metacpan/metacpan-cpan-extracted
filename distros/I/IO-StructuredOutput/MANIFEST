@@ -1,0 +1,10 @@
+ChangeLog
+Makefile.PL
+MANIFEST
+README
+StructuredOutput.pm
+StructuredOutput/Sheets.pm
+StructuredOutput/Styles.pm
+examples/test.pl
+t/1.t
+META.yml                                 Module meta-data (added by MakeMaker)

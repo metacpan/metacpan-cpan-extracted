@@ -1,0 +1,454 @@
+=for comment based on iup-3.2 - http://www.tecgraf.puc-rio.br/iup/en/ctrl/iupcells.html
+
+=head1 NAME
+
+IUP::Cells - [GUI element] grid widget (set of cells) that enables chess-table-like drawings
+
+=head1 DESCRIPTION
+
+Creates a grid widget (set of cells) that enables several
+application-specific drawing, such as: chess tables, tiles editors,
+degrade scales, drawable spreadsheets and so forth.
+
+This element is mostly based on application callbacks functions that
+determine the number of cells (rows and coluns), their appearence and
+interation. This mechanism offers full flexibility to applications, but
+requires programmers attention to avoid infinite loops inside this
+functions. Using callbacks, cells can be also grouped to form major or
+hierarchical elements, such as headers, footers etc. This callback
+approach was intentionally chosen to allow all cells to be dinamically
+and directly changed based on application's data structures. Since the
+size of each cell is given by the application the size of the control
+also must be given using SIZE or RASTERSIZE attributes.
+
+=begin HTML
+
+<p>
+  <table border="1">
+    <tbody align="center">
+      <tr>
+        <th>Checkerboard Pattern</th>
+        <th>Numbering Cells</th>
+      </tr>
+      <tr>
+        <td><img src="http://kmx.github.io/perl-iup/img-3.9/ctrl/iupcells_chess.jpg"></td>
+        <td><img src="http://kmx.github.io/perl-iup/img-3.9/ctrl/iupcells_num.jpg"></td>
+      </tr>
+    </tbody>
+  </table>
+</p>
+
+=end HTML
+
+=head1 USAGE
+
+=head2 CREATION - new() method
+
+ my $cells = IUP::Cells->new( BOXED=>'NO', RASTERSIZE=>'400x300' );
+
+=over
+
+B<Returns:> the identifier of the created element, or C<undef> if an error occurs.
+
+NOTE: You can pass to C<new()> other C<ATTRIBUTE=E<gt>'value'> or C<CALLBACKNAME=E<gt>\&func> pairs relevant
+to this element - see L<IUP::Manual::02_Elements|IUP::Manual::02_Elements/"new()">.
+
+=back
+
+=head2 ATTRIBUTES
+
+For more info about concept of attributes (setting/getting values etc.)
+see L<IUP::Manual::03_Attributes|IUP::Manual::03_Attributes>. Attributes specific to this element:
+
+=over
+
+=item B<BOXED>
+
+Determines if the bounding cells' regions should be drawn
+with black lines. It can be "YES" or "NO". Default: "YES". If the span
+atributtes are used, set this attribute to "NO" to avoid grid drawing
+over spanned cells.
+
+=item B<BUFFERIZE>
+
+Disables the automatic redrawing of the control, so many
+attributes can be changed without many redraws. When set to "NO" the
+control is redrawn. When REPAINT attribute is set, BUFFERIZE is
+automatically set to "NO". Default: "NO".
+
+=item B<CANVAS>
+
+I<(read-only, non inheritable)>
+
+Returns the internal CD canvas (reference to L<IUP::Canvas>). ZZZ-test-this
+This attribute should be used only in specific cases and by experienced programmers.
+
+=item B<CLIPPED>
+
+Determines if, before cells drawing, each bounding region
+should be clipped. This attribute should the changed in few specific
+cases. It can be "YES" or "NO". Default: "YES".
+
+=item B<FIRST_COL>
+
+I<(read-only, non inheritable)>
+
+Returns the number of the first visible column.
+
+=item B<FIRST_LINE>
+
+I<(read-only, non inheritable)>
+
+Returns the number of the first visible line.
+
+=item B<FULL_VISIBLE>
+
+I<(write-only, non inheritable)>
+
+Tries to show
+completely a specific cell (considering any vertical or horizontal
+header or scrollbar position). This attribute is set by a formatted
+string "%d:%d" (C syntax), where each "%d" represent the line and
+column integer indexes respectively.
+
+=item B<IMAGE_CANVAS>
+
+I<(read-only, non inheritable)>
+
+Returns the internal image CD canvas (reference to L<IUP::Canvas>) ZZZ-test-this
+This attribute should be used only in specific cases and by experienced programmers.
+
+=item B<LIMITS(L):(C)>
+
+I<(read-only, non inheritable)>
+
+Where (L) is the line number and (C) the column number - e.g. "LIMITS11:25". 
+Returns the limits of a given cell. Output format is a string "xmin:xmax:ymin:ymax".
+
+=item B<NON_SCROLLABLE_LINES>
+
+Determines the number of non-scrollable lines
+(vertical headers) that should always be visible despite the vertical
+scrollbar position. It can be any non-negative integer value. Default: "0"
+
+=item B<NON_SCROLLABLE_COLS>
+
+Determines the number of non-scrollable columns
+(horizontal headers) that should always be visible despite the
+horizontal scrollbar position. It can be any non-negative integer
+value. Default: "0"
+
+=item B<ORIGIN>
+
+Sets the first visible line and column positions. This
+attribute is set by a formatted string "%d:%d" (C syntax), where each
+"%d" represent the line and column integer indexes respectively.
+
+=item B<REPAINT>
+
+I<(write-only, non inheritable)>
+
+When set with any value, provokes the control to be redrawn.
+
+=item L<SIZE|IUP::Manual::03_Attributes/SIZE>
+
+I<(non inheritable)>
+
+There is no initial size. You must define SIZE or RASTERSIZE.
+
+=item L<SCROLLBAR|IUP::Manual::03_Attributes/SCROLLBAR>
+
+I<(creation only)>
+
+Default: "YES".
+
+=back
+
+The following L<common attributes|IUP::Manual::03_Attributes/Common Attributes> are also accepted:
+
+=over
+
+=item * L<ACTIVE|IUP::Manual::03_Attributes/ACTIVE>,
+L<BGCOLOR|IUP::Manual::03_Attributes/BGCOLOR>, L<FONT|IUP::Manual::03_Attributes/FONT>,
+L<X|IUP::Manual::03_Attributes/X>, L<Y|IUP::Manual::03_Attributes/Y>,
+L<POSITION|IUP::Manual::03_Attributes/POSITION>,
+L<MINSIZE|IUP::Manual::03_Attributes/MINSIZE>,
+L<MAXSIZE|IUP::Manual::03_Attributes/MAXSIZE>, L<WID|IUP::Manual::03_Attributes/WID>,
+L<TIP|IUP::Manual::03_Attributes/TIP>, L<SIZE|IUP::Manual::03_Attributes/SIZE>,
+L<RASTERSIZE|IUP::Manual::03_Attributes/RASTERSIZE>,
+L<ZORDER|IUP::Manual::03_Attributes/ZORDER>,
+L<VISIBLE|IUP::Manual::03_Attributes/VISIBLE>
+
+=back
+
+=head2 CALLBACKS
+
+For more info about concept of callbacks (setting callback handlers etc.)
+see L<IUP::Manual::04_Callbacks|IUP::Manual::04_Callbacks>. Callbacks specific to this element:
+
+=over
+
+=item B<DRAW_CB>
+
+Called when a specific cell needs to be redrawn.
+
+B<Callback handler prototype:>
+
+ sub draw_cb_handler {
+   my ($self, $line, $column, $xmin, $xmax, $ymin, $ymax, $canvas) = @_;
+   #...
+ }
+
+=over
+
+B<$self> - reference to the element (IUP::Cells) that activated the event
+
+B<$line>, B<$column> - the grid position inside the control that is being
+redrawn, in grid coordinates.
+
+B<$xmin, $xmax, $ymin, $ymax> - the raster bounding box of the redrawn
+cells, where the application can use CD functions to draw anything. If
+the attribute IUP_CLIPPED is set (the default), all CD graphical
+primitives is clipped to the bounding region.
+
+B<$canvas> - internal canvas CD used to draw the cells.
+
+=back
+
+=item B<HEIGHT_CB>
+
+Called when the controls needs to know a (eventually new) line height.
+
+B<Callback handler prototype:>
+
+ sub height_cb_handler {
+   my ($self, $line) = @_;
+   #...
+ }
+
+=over
+
+B<$self> - reference to the element (IUP::Cells) that activated the event
+
+B<$line> - the line index
+
+B<Returns> - an integer that specifies the desired height (in pixels).
+Default is 30 pixels.
+
+=back
+
+=item B<HSPAN_CB>
+
+Called when the control needs to know if a cell should be horizontally spanned.
+
+B<Callback handler prototype:>
+
+ sub hspan_cb_handler {
+   my ($self, $line, $column) = @_;
+   #...
+ }
+
+=over
+
+B<$self> - reference to the element (IUP::Cells) that activated the event
+
+B<$line, $column> - the line and column indexes (in grid coordinates)
+
+B<Returns> - an integer that specifies the desired span.
+Default is 1 (no span).
+
+=back
+
+=item B<MOUSECLICK_CB>
+
+Called when a color is selected. The primary color is selected with
+the left mouse button, and if existent the secondary is selected with
+the right mouse button.
+
+B<Callback handler prototype:>
+
+ sub mouseclick_cb_handler {
+   my ($self, $button, $pressed, $line, $column, $x, $y, $status) = @_;
+   #...
+ }
+
+=over
+
+B<$self> - reference to the element (IUP::Cells) that activated the event
+
+B<$button, $pressed, $x, $y, $status> - same as the L<BUTTON_CB|IUP::Manual::04_Callbacks/BUTTON_CB> by L<IUP::Canvas>.
+
+B<$line, $column> - the grid position in the control where the event
+has occurred, in grid coordinates.
+
+=back
+
+=item B<MOUSEMOTION_CB>
+
+Called when the mouse moves over the control.
+
+B<Callback handler prototype:>
+
+ sub mousemotion_cb_handler {
+   my ($self, $line, $column, $x, $y, $status) = @_;
+   #...
+ }
+
+=over
+
+B<$self> - reference to the element (IUP::Cells) that activated the event
+
+B<$x, $y, $status> - same as the L<MOTION_CB|IUP::Manual::04_Callbacks/MOTION_CB> by L<IUP::Canvas>.
+
+B<$line, $column> - the grid position in the control where the event
+has occurred, in grid coordinates.
+
+=back
+
+=item B<NCOLS_CB>
+
+Called when then controls needs to know its number of
+columns.
+
+B<Callback handler prototype:>
+
+ sub ncols_cb_handler {
+   my $self = shift;
+   #...
+ }
+
+=over
+
+B<$self> - reference to the element (IUP::Cells) that activated the event.
+
+B<Returns> - an integer that specifies the number of columns.
+Default is 10 columns.
+
+=back
+
+=item B<NLINES_CB>
+
+Called when then controls needs to know its number of lines.
+
+B<Callback handler prototype:>
+
+ sub nlines_cb_handler {
+   my $self = shift;
+   #...
+ }
+
+=over
+
+B<$self> - reference to the element (IUP::Cells) that activated the event.
+
+B<Returns> - an integer that specifies the number of lines.
+Default is 10 lines.
+
+=back
+
+=item B<SCROLLING_CB>
+
+Called when the scrollbars are activated.
+
+B<Callback handler prototype:>
+
+ sub scrolling_cb_handler {
+   my ($self, $line, $column) = @_
+   #...
+ }
+
+=over
+
+B<$self> - reference to the element (IUP::Cells) that activated the event.
+
+B<$line, $column> - the first visible line and column indexes
+(in grid coordinates).
+
+B<Returns> - if IUP_IGNORE the cell is not redrawn. By default the cell is
+always redrawn.
+
+=back
+
+=item B<VSPAN_CB>
+
+Called when the control needs to know if a cell should
+be vertically spanned.
+
+B<Callback handler prototype:>
+
+ sub vspan_cb_handler {
+   my ($self, $line, $column) = @_
+   #...
+ }
+
+=over
+
+B<$self> - reference to the element (IUP::Cells) that activated the event.
+
+B<$line, $column> - the line and column indexes (in grid coordinates).
+
+B<Returns> - an integer that specifies the desired span.
+Default is 1 (no span).
+
+=back
+
+=item B<WIDTH_CB>
+
+Called when the controls needs to know the column width.
+
+B<Callback handler prototype:>
+
+ sub width_cb_handler {
+   my ($self, $column) = @_
+   #...
+ }
+
+=over
+
+B<$self> - reference to the element (IUP::Cells) that activated the event.
+
+B<$column> - the column index.
+
+B<Returns> - an integer that specifies the desired width (in pixels).
+Default is 60 pixels.
+
+=back
+
+=back
+
+The following L<common callbacks|IUP::Manual::04_Callbacks/Common Callbacks> are also accepted:
+
+=over
+
+=item * L<MAP_CB|IUP::Manual::04_Callbacks/MAP_CB>, L<UNMAP_CB|IUP::Manual::04_Callbacks/UNMAP_CB>,
+L<GETFOCUS_CB|IUP::Manual::04_Callbacks/GETFOCUS_CB>, L<KILLFOCUS_CB|IUP::Manual::04_Callbacks/KILLFOCUS_CB>,
+L<ENTERWINDOW_CB|IUP::Manual::04_Callbacks/ENTERWINDOW_CB>, L<LEAVEWINDOW_CB|IUP::Manual::04_Callbacks/LEAVEWINDOW_CB>,
+L<K_ANY|IUP::Manual::04_Callbacks/K_ANY>, L<HELP_CB|IUP::Manual::04_Callbacks/HELP_CB>
+
+=back
+
+=head1 EXAMPLES
+
+
+The element B<IUP::Cells> is used in the following sample scripts:
+
+=over
+
+=item * L<0-basic/cells_checkboard.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/cells_checkboard.pl> - IUP::Cells example
+
+=item * L<0-basic/cells_degrade.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/cells_degrade.pl> - IUP::Cells example
+
+=item * L<0-basic/cells_numbering.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/cells_numbering.pl> - IUP::Cells example
+
+=back 
+
+
+
+=head1 SEE ALSO
+
+L<IUP::Canvas|IUP::Canvas>
+
+The original doc: L<iupcells.html|http://www.tecgraf.puc-rio.br/iup/en/ctrl/iupcells.html>
+ 
+
+=cut

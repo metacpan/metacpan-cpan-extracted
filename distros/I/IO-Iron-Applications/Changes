@@ -1,0 +1,11 @@
+Revision history for IO-Iron-Applications
+
+0.12      2014-08-31 18:51:18+03:00 Europe/Helsinki
+	Corrected documentation.
+
+0.11      2014-08-28 00:02:03+03:00 Europe/Helsinki
+        Added tests.
+
+0.10      2014-08-26 03:01:30+03:00 Europe/Helsinki
+        Initial release.
+        Released together with package IO-Iron.

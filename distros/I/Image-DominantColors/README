@@ -1,0 +1,83 @@
+Image-DominantColors
+
+This module does just one simple thing. It scans an image and clusters colors with the L<k-means clustering|http://en.wikipedia.org/wiki/K-means_clustering> 
+algorithm to give you the most dominant colors in that image.
+
+This is how it works, I would advise leaving the clusters to a default 3 which works best with images.:
+
+    use Image::DominantColors;
+    use Data::Dumper;
+    
+    
+    my $dmt = Image::DominantColors->new({file => 'some_path/img.jpg', clusters => 4});
+    #OR three clusters is default
+    my $dmt = Image::DominantColors->new({file => 'some_path/img.jpg'});
+    my $r = $dmt->getDominantColors();
+    
+    print "Returned:";
+    print Dumper($r);
+    # [
+    #           {
+    #             'r' => 31,
+    #             'b' => 23,
+    #             'g' => 15
+    #           },
+    #           {
+    #             'r' => 193,
+    #             'b' => 41,
+    #             'g' => 84
+    #           },
+    #           {
+    #             'r' => 114,
+    #             'b' => 136,
+    #             'g' => 128
+    #           },
+    #           {
+    #             'r' => 61,
+    #             'b' => 82,
+    #             'g' => 66
+    #           }
+    # ];
+    ...
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Image::DominantColors
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Image-DominantColors
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Image-DominantColors
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Image-DominantColors
+
+    Search CPAN
+        http://search.cpan.org/dist/Image-DominantColors/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright 2013 Gideon Israel Dsouza.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the the Artistic License (2.0). You may obtain a
+copy of the full license at:
+
+L<http://www.perlfoundation.org/artistic_license_2_0>
+

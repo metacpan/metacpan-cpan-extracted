@@ -1,0 +1,18 @@
+<!-- 1. in first case we want to keep the 10 strongest peaks: -->
+
+
+<ExpMsMsSpectrumFilter>
+<oneExpMsMsSpectrumFilter spectrumType="msms" name="dummy">
+	        <level>peaks</level>	
+		<action type="removeOther">		
+		       <threshold type="sort">	
+			   <relativeTo>nFix</relativeTo>							
+			   <thresholdValue>10</thresholdValue>
+			   <comparator>ge</comparator>						
+		       </threshold>
+                </action>
+		<filterValue type="directValue">							
+			<name>fragment.intensity</name>						
+		</filterValue>
+	</oneExpMsMsSpectrumFilter>
+</ExpMsMsSpectrumFilter>

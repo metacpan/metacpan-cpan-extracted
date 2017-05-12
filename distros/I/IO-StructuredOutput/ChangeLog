@@ -1,0 +1,105 @@
+2003-08-22 10:48  jmiller
+
+	* StructuredOutput/Sheets.pm, examples/test.pl: changed Sheets.pm
+	  so that an undef for style uses the default style. Added docs to
+	  test.pl
+
+2003-08-21 22:16  jmiller
+
+	* t/1.t: fixed tests
+
+2003-08-21 22:15  jmiller
+
+	* t/1.t: fixed test.
+
+2003-08-21 22:14  jmiller
+
+	* StructuredOutput/Styles.pm: added newline to html row output
+
+2003-08-21 22:12  jmiller
+
+	* StructuredOutput/Styles.pm: er... missed another ~=
+
+2003-08-21 22:12  jmiller
+
+	* StructuredOutput/Styles.pm: fixed typo in regex (~= not the same
+	  as =~)
+
+2003-08-21 22:09  jmiller
+
+	* MANIFEST: had to change Changes to ChangeLog in MANIFEST
+
+2003-08-21 22:08  jmiller
+
+	* TODO: added TODO (cause I have some outstanding bugs)
+
+2003-08-21 22:07  jmiller
+
+	* ChangeLog, Changes, StructuredOutput/Styles.pm: removed "Changes"
+	  file, replaced with ChangeLog (created by cvs2cl.pl)
+
+2003-08-21 21:18  jmiller
+
+	* examples/test.pl: added test.pl that output's some example files
+
+2003-08-21 21:13  jmiller
+
+	* t/1.t: modified tests
+
+2003-08-21 21:11  jmiller
+
+	* README: added USAGE info
+
+2003-08-21 21:11  jmiller
+
+	* StructuredOutput.pm: added Styles support
+
+2003-08-21 21:10  jmiller
+
+	* StructuredOutput/: Sheets.pm, Styles.pm: added Styles module,
+	  updated Sheets to support it
+
+2003-08-18 19:48  jmiller
+
+	* README: added readme data
+
+2003-08-18 19:46  jmiller
+
+	* StructuredOutput.pm: added documentation
+
+2003-08-18 19:00  jmiller
+
+	* StructuredOutput/Sheets.pm: added sheet() method, and fixed
+	  adding of html table rows
+
+2003-08-18 18:59  jmiller
+
+	* StructuredOutput.pm: fixed zip archiving of csv files, added
+	  output functionality
+
+2003-08-18 18:56  jmiller
+
+	* t/1.t: fixed tests
+
+2003-08-11 11:08  jmiller
+
+	* StructuredOutput.pm: re-arranged function order to be a bit more
+	  logical
+
+2003-08-11 11:03  jmiller
+
+	* StructuredOutput.pm: just added a line so I could get a decent
+	  Revision
+
+2003-08-11 11:00  jmiller
+
+	* Changes, MANIFEST, Makefile.PL, README, StructuredOutput.pm,
+	  StructuredOutput/Sheets.pm, t/1.t: Initial import of
+	  IO-StructuredOutput perl module - a module to transparently and
+	  easily handle output to excel, csv, or html tables
+
+2003-08-11 11:00  jmiller
+
+	* Changes, MANIFEST, Makefile.PL, README, StructuredOutput.pm,
+	  StructuredOutput/Sheets.pm, t/1.t: Initial revision
+

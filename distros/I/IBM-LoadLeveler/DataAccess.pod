@@ -1,0 +1,426 @@
+# -*- Perl -*-
+=pod
+
+=head1 Data Access API
+
+IBM::LoadLeveler - Data Access API
+
+=head1 SYNOPSIS
+
+  use IBM::LoadLeveler;
+
+  $version = ll_version();
+
+  # Data Access API functions
+
+  $query = ll_query( JOBS|MACHINES|CLUSTER|WLMSTAT|MATRIX|CLASSES|RESERVATIONS|MCLUSTERS|BLUE_GENE|FAIRSHARE );
+
+  $return = ll_set_request( $query,QUERY_ALL|QUERY_JOBID|QUERY_STEPID|\
+	QUERY_GROUP|QUERY_CLASS|QUERY_HOST|QUERY_STARTDATE|QUERY_ENDDATE|\
+	QUERY_PROCID|QUERY_RESERVATION_ID|QUERY_BG_JOB|QUERY_BG_PARTITION|\
+        QUERY_BG_BASE_PARTITION|QUERY_TOP_DOG, \@filter,ALL_DATA|Q_LINE|STATUS_LINE );
+
+  $object = ll_get_objs( $query, LL_STARTD|LL_SCHEDD|LL_CM|LL_MASTER|\
+	LL_STARTER|LL_HISTORY_FILE, $hostname, $number_of_objs, $error_code);
+
+  $return = ll_reset_request( $object );
+
+  $next_object = ll_next_obj ( $object );
+
+  $return = ll_free_objs ( $object );
+
+  $return = ll_deallocate ( $object );
+
+  $result = ll_get_data( $object, $LLAPI_Specification );
+
+
+=head1 DESCRIPTION
+
+
+A minimal example of using the Data Access API is:
+
+	use IBM::LoadLeveler;
+
+	# Query Job information
+	$query = ll_query(JOBS);
+
+	# Ask for all data on all jobs
+	$return=ll_set_request($query,QUERY_ALL,undef,ALL_DATA);
+	if ($return != 0 )
+	{
+	    print STDERR "ll_set_request failed Return = $return\n";
+	}
+
+	# Query the scheduler for information
+	# $number will contain the number of objects returned
+
+	$job=ll_get_objs($query,LL_CM,NULL,$number,$err);
+
+	while ( $job)
+	{
+		# Get the Job submit time
+		$SubmitTime=ll_get_data($job,LL_JobSubmitTime);
+		$job=ll_next_obj($query);
+	}
+	# Free up space allocated by LoadLeveler to hold the job object
+	ll_free_objs($job);
+
+	# Free up space used by the Query Object
+	ll_deallocate($query);
+
+The Data Access API has the following functions:
+
+=over 4
+
+=item * ll_query
+
+=item * ll_set_request
+
+=item * ll_reset_request
+
+=item * ll_get_objs
+
+=item * ll_get_data
+
+=item * ll_next_obj
+
+=item * ll_free_objs
+
+=item * ll_deallocate
+
+=back
+
+=head2 ll_query
+
+	$query = ll_query( JOBS | MACHINES | CLUSTER | WLMSTAT | MATRIX | CLASSES | RESERVATIONS | MCLUSTERS | BLUE_GENE | FAIRSHARE);
+
+ll_query is the first call you make to access the API it establishes the type of information you receive.
+
+Note: 
+
+=over 4
+
+=item *	CLASSES query is only available in version LoadLeveler 3.2 and above.
+
+=item * RESERVATIONS requires LoadLeveler 3.3+
+
+=item * MCLUSTERS & BLUE_GENE require LoadLeveler 3.3.1+
+
+=item * FAIRSHARE requires LoadLeveler 3.3.2+
+
+=back
+
+=head2 ll_set_request
+
+	$return=ll_set_request($query,$QueryFlags,$ObjectFilter, $DataFilter);
+
+ll_set_request is used to determine the range of data returned by ll_get_objs.
+
+
+=head3 Parameters
+
+=over 4
+
+=item 1 $query
+
+The return from L<ll_query>
+
+=item 2 $QueryFlags
+
+The permissable Query Flags depends on the type of query being made.  The flags are:
+
+=over 4
+
+=item * QUERY_ALL
+: Query all jobs.
+
+=item * QUERY_JOBID
+: Query by job ID.
+
+=item * QUERY_STEPID
+: Query by step ID.
+
+=item * QUERY_USER
+: Query by user ID.
+
+=item * QUERY_GROUP
+: Query by LoadLeveler group.
+
+=item * QUERY_CLASS
+: Query by LoadLeveler class.
+
+=item * QUERY_HOST
+: Query by machine name.
+
+=item * QUERY_STARTDATE
+: Query by job start dates
+
+=item * QUERY_ENDDATE
+: Query by job end dates.
+
+=item * QUERY_PROCID
+: Query by process id.
+
+=item * QUERY_RESERVATION_ID
+: Query by reservation id.
+
+=item * QUERY_BG_JOB
+: Query by bluegene type jobs only
+
+=item * QUERY_BG_PARTITION
+: Query defined Blue Gene partitions
+
+=item * QUERY_BG_BASE_PARTITIONS
+: Query Blue Gene base partitions
+
+=item * QUERY_TOP_DOG
+: Query by Job steps that are top dogs
+
+=back
+
+They can be used with the following query types:
+
+	Query Type	Permitted Flags
+	-------------------------------
+        BLUE_GENE       QUERY_ALL QUERY_BG_BASE_PARTITION QUERY_BG_PARTITION
+        CLASSES         QUERY_ALL QUERY_CLASS
+        CLUSTER         QUERY_ALL
+        FAIRSHARE       QUERY_ALL QUERY_USER QUERY_GROUP
+        JOBS            QUERY_ALL QUERY_BG_JOB QUERY_CLASS QUERY_ENDDATE QUERY_GROUP QUERY_HOST QUERY_JOBID QUERY_RESERVATION_ID QUERY_STARTDATE QUERY_STEPID QUERY_USER QUERY_TOP_DOG
+        MACHINES        QUERY_ALL QUERY_HOST
+        MATRIX          QUERY_ALL QUERY_HOST
+        MCLUSTERS       QUERY_ALL
+        RESERVATIONS    QUERY_ALL QUERY_BG_BASE_PARTITION QUERY_GROUP QUERY_HOST QUERY_RESERVATION_ID QUERY_USER
+        WLMSTAT         QUERY_STEPID
+
+=item 3 $ObjectFilter
+
+
+Specifies the search criteria:
+
+	Query Flag	Filter Description
+	---------------------------------------
+	QUERY_ALL		undef
+	QUERY_JOBID		Array reference of job IDs eg ["host.jobid1", "host.jobid2"]
+	QUERY_STEPID		Array reference of step IDs eg ["host.jobid.stepid"]
+	QUERY_USER		Array reference of user IDs eg ["mike", "mark", "mary"]
+	QUERY_CLASS		Array reference of LoadLeveler class names.
+	QUERY_GROUP		Array reference of LoadLeveler group names.
+	QUERY_HOST		Array reference of LoadLeveler host names.
+	QUERY_STARTDATE or QUERY_ENDDATE	two start dates or two end dates having the format MM/DD/YYYY eg ["01/14/2003", "02/23/2003"].
+	QUERY_PROCID		Array reference containing a single process id terminated by a NULL string eg ["procid",NULL].
+	QUERY_RESERVATION_ID	Array reference containing a list of reervation IDs.
+	QUERY_BG_BASE_PARTITION	Array reference of base partition IDs. For all base partitions, the first entry in the list must contain the string "all"
+	QUERY_BG_PARTITION	Array reference of partition IDs. For all base partitions, the first entry in the list must contain the string "all"
+	QUERY_TOP_DOG		Array reference of job step
+
+=over 4
+
+=item NOTE:
+
+QUERY_PROCID is currently broken, some of the return fields don't return a value and it does not work at all with GANG scheduling.  APAR is IY48329
+
+=back
+
+=item 4 $DataFilter
+
+Filters the amount of data you get back from the query. Permitted values are:
+
+=over  4
+
+=item * ALL_DATA
+
+=item * Q_LINE
+
+Valid only for a JOBS query, not using the history file, returns the same data as B<llq -f>
+
+=item * STATUS_LINE
+
+Valid only for a MACHINES query, returns the same data as B<llstatus -f>
+
+=back
+
+=back
+
+=head2 ll_reset_request
+
+
+	$return=ll_reset_request($query);
+
+This is used to reset the request (surprise!) associated with a query object, you use it if you want to do another L<ll_set_request> using different parameters.
+
+=head2 ll_get_objs
+
+	$data=ll_get_objs($query,$query_daemon,$host,$number,$err);
+
+Sends a query request to LoadLeveler
+
+=head3 Parameters
+
+=over 4
+
+=item 1 $query
+
+Data from ll_query
+
+=item 2 $query_daemon
+
+The LoadLeveler Daemon you want to query, permitted values are:
+
+=over 4
+
+=item * LL_STARTD
+
+=item * LL_SCHEDD
+
+=item * LL_CM (negotiator)
+
+=item * LL_MASTER
+
+=item * LL_STARTER
+
+=item * LL_HISTORY_FILE
+
+=back
+
+=item 3 $host
+
+Should be NULL unless you are querying LL_STARTD or LL_SCHEDD and want to query a machine other than the localhost. If you are querying LL_HISTORY_FILE then this should be the name of the history file.
+
+=item 4 $number
+
+The number of query objects returned.
+
+=item 5 $error
+
+If there is an error this is it. Possible values are:
+
+
+=over 4
+
+=item -1 query_element not valid
+
+=item -2 query_daemon not valid
+
+=item -3 Cannot resolve hostname
+
+=item -4 Request type for specified daemon not valid
+
+=item -5 System error
+
+=item -6 No valid objects meet the request
+
+=item -7 Configuration error
+
+=item -9 Connection to daemon failed
+
+=item -10 Error processing history file (LL_HISTORY_FILE query only)
+
+=item -11 History file must be specified in the hostname argument (LL_HISTORY_FILE query only)
+
+=item -12 Unable to access the history file (LL_HISTORY_FILE query only)
+
+=item -13 DCE identity of calling program can not be established
+
+=item -14 No DCE credentials
+
+=item -15 DCE credentials within 300 secs of expiration
+
+=item -16 64-bit API is not supported when DCE is enabled
+
+=back
+
+=back
+
+=head2 ll_get_data
+
+	$data=ll_get_data($element,$specification);
+
+This call differs from the IBM documentation, the data you request is returned as the return value and not as a third parameter eg
+
+	$lav=ll_get_data($machine,LL_MachineLoadAverage);	# Returns a double
+
+	@msl=ll_get_data($machine,LL_MachineStepList);		# Returns an array of strings.
+
+To know what you are getting you really need to know about the LoadLeveler Job Object Model.  All of this is in the I<IBM LoadLeveler for AIX 5L: Using and Administering> book and html. Sorry for not including it here, but there is an awful lot of it.
+
+
+-head3 enum types
+
+Returns from some query types may be, in C terms, enumerated types.  In perl these all return as SCALAR Integers.  Return values are shown below:
+
+=over 4
+
+=item LL_AdapterReqUsage
+
+    SHARED, NOT_SHARED, SLICE_NOT_SHARED
+
+=item LL_StepHoldType
+
+    NO_HOLD, HOLDTYPE_USER, HOLDTYPE_SYSTEM, HOLDTYPE_USERSYS
+
+=item LL_StepNodeUsage
+
+    SHARED, NOT_SHARED, SLICE_NOT_SHARED
+
+=item LL_StepState
+
+    STATE_IDLE, STATE_PENDING, STATE_STARTING, STATE_RUNNING,
+    STATE_COMPLETE_PENDING, STATE_REJECT_PENDING, STATE_REMOVE_PENDING,
+    STATE_VACATE_PENDING, STATE_COMPLETED, STATE_REJECTED, STATE_REMOVED,
+    STATE_VACATED, STATE_CANCELED, STATE_NOTRUN, STATE_TERMINATED,
+    STATE_UNEXPANDED, STATE_SUBMISSION_ERR, STATE_HOLD, STATE_DEFERRED,
+    STATE_NOTQUEUED, STATE_PREEMPTED, STATE_PREEMPT_PENDING, 
+    STATE_RESUME_PENDING
+
+=back
+
+=head2 ll_next_obj
+
+	$job=ll_next_obj($query);
+
+This returns the next object from the query object.
+
+=head2 ll_free_objs
+
+	$return=ll_free_objs($query);
+
+This frees up the the space taken by the ll_get_objs routine for the LoadLeveler Data.  Since there is probably an awful lot of this this is a very important call.
+
+=head2 ll_deallocate
+
+	$return=ll_deallocate($query);
+
+Frees the query object itself, this is the last LoadLeveler action.
+
+=head2 LL_MachinePoolList & LL_AdapterWindowList
+
+These two requests are supposed to return integer arrays.  In this module they will return lists.
+
+=over 4
+
+=item * LL_MachinePoolList
+
+This will return a list with LL_MachinePoolListSize elements in it.
+
+=item * LL_AdapterWindowList
+
+This will return a list with LL_AdapterTotalWindowCount elements in it.
+
+=item * Blue Gene
+
+The Blue Gene arrays are all 3 elements in size.
+
+=back
+
+
+=head1 AUTHOR
+
+Mike Hawkins <mike@pink-pit.com>
+
+=head1 SEE ALSO
+
+L<LoadLeveler> L<perl>.
+IBM LoadLeveler for AIX 5L: Using and Administering
+
+=cut

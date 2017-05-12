@@ -1,0 +1,369 @@
+<coefficients>
+	<values author="Guo86">
+		<Rc data="A">2.000e+00</Rc>
+		<Rc data="C">2.600e+00</Rc>
+		<Rc data="D">2.000e-01</Rc>
+		<Rc data="E">1.100e+00</Rc>
+		<Rc data="F">8.100e+00</Rc>
+		<Rc data="G">-2.000e-01</Rc>
+		<Rc data="H">-2.100e+00</Rc>
+		<Rc data="I">7.400e+00</Rc>
+		<Rc data="K">-2.100e+00</Rc>
+		<Rc data="L">8.100e+00</Rc>
+		<Rc data="M">5.500e+00</Rc>
+		<Rc data="N">-6.000e-01</Rc>
+		<Rc data="P">2.000e+00</Rc>
+		<Rc data="Q">0.000e+00</Rc>
+		<Rc data="R">-6.000e-01</Rc>
+		<Rc data="S">-2.000e-01</Rc>
+		<Rc data="T">6.000e-01</Rc>
+		<Rc data="V">5.000e+00</Rc>
+		<Rc data="W">8.800e+00</Rc>
+		<Rc data="Y">4.500e+00</Rc>
+		<Rc data="~Amino">-6.900e+00</Rc>
+		<Rc data="~Carboxyl">-8.000e-01</Rc>
+		<comments>pH 2.0</comments>
+		<lc data="intercept">0.000e+00</lc>
+		<lc data="slope">0.000e+00</lc>
+		<t0>0.000e+00</t0>
+	</values>
+	<values author="Krokhin04">
+		<Rc data="A">8.000e-01</Rc>
+		<Rc data="C">-8.000e-01</Rc>
+		<Rc data="D">-5.000e-01</Rc>
+		<Rc data="E">0.000e+00</Rc>
+		<Rc data="F">1.050e+01</Rc>
+		<Rc data="G">-9.000e-01</Rc>
+		<Rc data="H">-1.300e+00</Rc>
+		<Rc data="I">8.400e+00</Rc>
+		<Rc data="K">-1.900e+00</Rc>
+		<Rc data="L">9.600e+00</Rc>
+		<Rc data="M">5.800e+00</Rc>
+		<Rc data="N">-1.200e+00</Rc>
+		<Rc data="P">2.000e-01</Rc>
+		<Rc data="Q">-9.000e-01</Rc>
+		<Rc data="R">-1.300e+00</Rc>
+		<Rc data="S">-8.000e-01</Rc>
+		<Rc data="T">4.000e-01</Rc>
+		<Rc data="V">5.000e+00</Rc>
+		<Rc data="W">1.100e+01</Rc>
+		<Rc data="Y">4.000e+00</Rc>
+		<comments></comments>
+		<lc data="intercept">0.000e+00</lc>
+		<lc data="slope">0.000e+00</lc>
+		<t0>0.000e+00</t0>
+	</values>
+	<values author="Sagasawa82">
+		<Rc data="A">9.000e+00</Rc>
+		<Rc data="C">0.000e+00</Rc>
+		<Rc data="D">0.000e+00</Rc>
+		<Rc data="E">1.000e+01</Rc>
+		<Rc data="F">1.190e+02</Rc>
+		<Rc data="G">1.500e+00</Rc>
+		<Rc data="H">3.300e+01</Rc>
+		<Rc data="I">1.040e+02</Rc>
+		<Rc data="K">-1.200e+01</Rc>
+		<Rc data="L">1.000e+02</Rc>
+		<Rc data="M">5.500e+01</Rc>
+		<Rc data="N">-4.300e+01</Rc>
+		<Rc data="P">3.000e+01</Rc>
+		<Rc data="Q">1.200e+01</Rc>
+		<Rc data="R">0.000e+00</Rc>
+		<Rc data="S">4.000e+00</Rc>
+		<Rc data="T">2.800e+01</Rc>
+		<Rc data="V">2.800e+01</Rc>
+		<Rc data="W">1.260e+02</Rc>
+		<Rc data="Y">8.000e+01</Rc>
+		<comments>Relative to Leu</comments>
+		<lc data="intercept">0.000e+00</lc>
+		<lc data="slope">0.000e+00</lc>
+		<t0>0.000e+00</t0>
+	</values>
+	<values author="LinRegGB">
+		<Rc data="A">3.806e+01</Rc>
+		<Rc data="C">0.000e+00</Rc>
+		<Rc data="D">2.395e+01</Rc>
+		<Rc data="E">1.728e+01</Rc>
+		<Rc data="F">4.730e+01</Rc>
+		<Rc data="G">2.113e+00</Rc>
+		<Rc data="H">-2.128e+01</Rc>
+		<Rc data="I">1.134e+02</Rc>
+		<Rc data="K">1.258e+02</Rc>
+		<Rc data="L">4.951e+00</Rc>
+		<Rc data="M">1.252e+02</Rc>
+		<Rc data="N">-8.972e+01</Rc>
+		<Rc data="P">-1.789e+01</Rc>
+		<Rc data="Q">-5.010e+00</Rc>
+		<Rc data="R">3.273e+02</Rc>
+		<Rc data="S">-5.791e+01</Rc>
+		<Rc data="T">-3.897e+01</Rc>
+		<Rc data="V">2.257e+01</Rc>
+		<Rc data="W">1.114e+02</Rc>
+		<Rc data="Y">-4.830e+01</Rc>
+		<Rc data="~Oxidation_M">-1.109e+02</Rc>
+		<comments>Test Hodges</comments>
+		<t0>1.608e+02</t0>
+	</values>
+	<values author="Casal96">
+		<Rc data="A">-6.700e-01</Rc>
+		<Rc data="C">0.000e+00</Rc>
+		<Rc data="D">7.700e-01</Rc>
+		<Rc data="E">8.000e-02</Rc>
+		<Rc data="F">1.630e+01</Rc>
+		<Rc data="G">-2.500e-01</Rc>
+		<Rc data="H">-2.990e+00</Rc>
+		<Rc data="I">7.760e+00</Rc>
+		<Rc data="K">-3.200e+00</Rc>
+		<Rc data="L">1.050e+01</Rc>
+		<Rc data="M">8.310e+00</Rc>
+		<Rc data="N">0.000e+00</Rc>
+		<Rc data="P">2.190e+00</Rc>
+		<Rc data="Q">0.000e+00</Rc>
+		<Rc data="R">-1.000e-02</Rc>
+		<Rc data="S">-2.180e+00</Rc>
+		<Rc data="T">4.210e+00</Rc>
+		<Rc data="V">6.420e+00</Rc>
+		<Rc data="W">1.860e+01</Rc>
+		<Rc data="Y">7.370e+00</Rc>
+		<comments></comments>
+		<lc data="intercept">0.000e+00</lc>
+		<lc data="slope">0.000e+00</lc>
+		<t0>0.000e+00</t0>
+	</values>
+	<values author="Petritis03">
+		<Rc data="A">7.100e-01</Rc>
+		<Rc data="C">3.200e-01</Rc>
+		<Rc data="D">1.800e-01</Rc>
+		<Rc data="E">5.600e-01</Rc>
+		<Rc data="F">3.370e+00</Rc>
+		<Rc data="G">-2.100e-01</Rc>
+		<Rc data="H">-5.900e-01</Rc>
+		<Rc data="I">2.370e+00</Rc>
+		<Rc data="K">-5.500e-01</Rc>
+		<Rc data="L">6.120e+00</Rc>
+		<Rc data="M">1.630e+00</Rc>
+		<Rc data="N">-2.900e-01</Rc>
+		<Rc data="P">4.800e-01</Rc>
+		<Rc data="Q">-3.000e-01</Rc>
+		<Rc data="R">-2.400e-01</Rc>
+		<Rc data="S">-3.500e-01</Rc>
+		<Rc data="T">1.800e-01</Rc>
+		<Rc data="V">1.630e+00</Rc>
+		<Rc data="W">2.270e+00</Rc>
+		<Rc data="Y">7.200e-01</Rc>
+		<comments></comments>
+		<lc data="intercept">0.000e+00</lc>
+		<lc data="slope">0.000e+00</lc>
+		<t0>0.000e+00</t0>
+	</values>
+	<values author="Meek81">
+		<Rc data="A">1.100e+00</Rc>
+		<Rc data="C">7.100e+00</Rc>
+		<Rc data="D">-1.600e+00</Rc>
+		<Rc data="E">7.000e-01</Rc>
+		<Rc data="F">1.340e+01</Rc>
+		<Rc data="G">-2.000e-01</Rc>
+		<Rc data="H">-7.000e-01</Rc>
+		<Rc data="I">8.500e+00</Rc>
+		<Rc data="K">-1.900e+00</Rc>
+		<Rc data="L">1.100e+01</Rc>
+		<Rc data="M">5.400e+00</Rc>
+		<Rc data="N">-4.200e+00</Rc>
+		<Rc data="P">4.400e+00</Rc>
+		<Rc data="Q">-2.900e+00</Rc>
+		<Rc data="R">-4.000e-01</Rc>
+		<Rc data="S">-3.200e+00</Rc>
+		<Rc data="T">-1.700e+00</Rc>
+		<Rc data="V">5.900e+00</Rc>
+		<Rc data="W">1.710e+01</Rc>
+		<Rc data="Y">7.400e+00</Rc>
+		<comments>Taken from Petritis03</comments>
+		<lc data="intercept">0.000e+00</lc>
+		<lc data="slope">0.000e+00</lc>
+		<t0>0.000e+00</t0>
+	</values>
+	<values author="Browne82_2">
+		<Rc data="A">3.900e+00</Rc>
+		<Rc data="C">-1.430e+01</Rc>
+		<Rc data="D">-2.800e+00</Rc>
+		<Rc data="E">-7.500e+00</Rc>
+		<Rc data="F">1.470e+01</Rc>
+		<Rc data="G">-2.300e+00</Rc>
+		<Rc data="H">-2.000e+00</Rc>
+		<Rc data="I">1.100e+01</Rc>
+		<Rc data="K">-2.500e+00</Rc>
+		<Rc data="L">1.500e+01</Rc>
+		<Rc data="M">4.100e+00</Rc>
+		<Rc data="N">-2.800e+00</Rc>
+		<Rc data="P">5.600e+00</Rc>
+		<Rc data="Q">1.800e+00</Rc>
+		<Rc data="R">3.200e+00</Rc>
+		<Rc data="S">-3.500e+00</Rc>
+		<Rc data="T">1.100e+00</Rc>
+		<Rc data="V">2.100e+00</Rc>
+		<Rc data="W">1.780e+01</Rc>
+		<Rc data="Y">3.800e+00</Rc>
+		<Rc data="~Amide">7.000e+00</Rc>
+		<Rc data="~Amino">4.200e+00</Rc>
+		<Rc data="~Carboxyl">2.400e+00</Rc>
+		<Rc data="~N-Acetyl">1.020e+01</Rc>
+		<Rc data="~N-Glyco">-6.500e+00</Rc>
+		<Rc data="~O-Phospho">-4.100e+00</Rc>
+		<comments>0.13% HFBA</comments>
+		<lc data="intercept">0.000e+00</lc>
+		<lc data="slope">0.000e+00</lc>
+		<t0>0.000e+00</t0>
+	</values>
+	<values author="Guo86_2">
+		<Rc data="A">2.200e+00</Rc>
+		<Rc data="C">2.600e+00</Rc>
+		<Rc data="D">-2.600e+00</Rc>
+		<Rc data="E">-1.300e+00</Rc>
+		<Rc data="F">9.000e+00</Rc>
+		<Rc data="G">0.000e+00</Rc>
+		<Rc data="H">2.200e+00</Rc>
+		<Rc data="I">8.300e+00</Rc>
+		<Rc data="K">0.000e+00</Rc>
+		<Rc data="L">9.000e+00</Rc>
+		<Rc data="M">6.000e+00</Rc>
+		<Rc data="N">-8.000e-01</Rc>
+		<Rc data="P">2.200e+00</Rc>
+		<Rc data="Q">-2.000e-01</Rc>
+		<Rc data="R">9.000e-01</Rc>
+		<Rc data="S">-5.000e-01</Rc>
+		<Rc data="T">3.000e-01</Rc>
+		<Rc data="V">5.700e+00</Rc>
+		<Rc data="W">9.500e+00</Rc>
+		<Rc data="Y">4.600e+00</Rc>
+		<Rc data="~Amino">-2.400e+00</Rc>
+		<Rc data="~Carboxyl">-5.200e+00</Rc>
+		<comments>pH 7.0</comments>
+		<lc data="intercept">0.000e+00</lc>
+		<lc data="slope">0.000e+00</lc>
+		<t0>0.000e+00</t0>
+	</values>
+	<values author="Su81">
+		<Rc data="A">-4.000e+00</Rc>
+		<Rc data="C">-4.000e+01</Rc>
+		<Rc data="D">6.100e+01</Rc>
+		<Rc data="E">-2.400e+01</Rc>
+		<Rc data="F">8.000e+01</Rc>
+		<Rc data="G">-2.600e+01</Rc>
+		<Rc data="H">-8.500e+01</Rc>
+		<Rc data="I">1.840e+02</Rc>
+		<Rc data="K">-1.700e+01</Rc>
+		<Rc data="L">1.000e+02</Rc>
+		<Rc data="M">1.130e+02</Rc>
+		<Rc data="N">-5.600e+01</Rc>
+		<Rc data="P">1.300e+01</Rc>
+		<Rc data="Q">1.400e+01</Rc>
+		<Rc data="R">-4.300e+01</Rc>
+		<Rc data="S">2.100e+01</Rc>
+		<Rc data="T">-2.500e+01</Rc>
+		<Rc data="V">3.400e+01</Rc>
+		<Rc data="W">-9.000e+00</Rc>
+		<Rc data="Y">2.800e+01</Rc>
+		<Rc data="~Amino">-2.400e+00</Rc>
+		<Rc data="~Carboxyl">-5.200e+00</Rc>
+		<comments>Relative to Leu</comments>
+		<lc data="intercept">0.000e+00</lc>
+		<lc data="slope">0.000e+00</lc>
+		<t0>0.000e+00</t0>
+	</values>
+	<values author="Browne82">
+		<Rc data="A">7.300e+00</Rc>
+		<Rc data="C">-9.200e+00</Rc>
+		<Rc data="D">-2.900e+00</Rc>
+		<Rc data="E">-7.100e+00</Rc>
+		<Rc data="F">1.920e+01</Rc>
+		<Rc data="G">-1.200e+00</Rc>
+		<Rc data="H">-2.100e+00</Rc>
+		<Rc data="I">6.600e+00</Rc>
+		<Rc data="K">-3.700e+00</Rc>
+		<Rc data="L">2.000e+01</Rc>
+		<Rc data="M">5.600e+00</Rc>
+		<Rc data="N">-5.700e+00</Rc>
+		<Rc data="P">5.100e+00</Rc>
+		<Rc data="Q">-3.000e-01</Rc>
+		<Rc data="R">-3.600e+00</Rc>
+		<Rc data="S">-4.100e+00</Rc>
+		<Rc data="T">8.000e-01</Rc>
+		<Rc data="V">3.500e+00</Rc>
+		<Rc data="W">1.630e+01</Rc>
+		<Rc data="Y">5.900e+00</Rc>
+		<Rc data="~Amide">1.030e+01</Rc>
+		<Rc data="~Amino">4.200e+00</Rc>
+		<Rc data="~Carboxyl">2.400e+00</Rc>
+		<Rc data="~N-Acetyl">1.020e+01</Rc>
+		<Rc data="~N-Glyco">-8.000e+00</Rc>
+		<Rc data="~O-Phospho">-2.400e+00</Rc>
+		<comments>0.1% TFA</comments>
+		<lc data="intercept">0.000e+00</lc>
+		<lc data="slope">0.000e+00</lc>
+		<t0>0.000e+00</t0>
+	</values>
+	<values author="Meek80_2">
+		<Rc data="A">-1.000e-01</Rc>
+		<Rc data="C">-2.200e+00</Rc>
+		<Rc data="D">-2.800e+00</Rc>
+		<Rc data="E">-7.500e+00</Rc>
+		<Rc data="F">1.390e+01</Rc>
+		<Rc data="G">-5.000e-01</Rc>
+		<Rc data="H">8.000e-01</Rc>
+		<Rc data="I">1.180e+01</Rc>
+		<Rc data="K">-3.200e+00</Rc>
+		<Rc data="L">1.000e+01</Rc>
+		<Rc data="M">7.100e+00</Rc>
+		<Rc data="N">-1.600e+00</Rc>
+		<Rc data="P">8.900e+00</Rc>
+		<Rc data="Q">-2.500e+00</Rc>
+		<Rc data="R">-4.500e+00</Rc>
+		<Rc data="S">-3.700e+00</Rc>
+		<Rc data="T">1.500e+00</Rc>
+		<Rc data="V">3.300e+00</Rc>
+		<Rc data="W">1.810e+01</Rc>
+		<Rc data="Y">8.200e+00</Rc>
+		<Rc data="~Acetyl">3.900e+00</Rc>
+		<Rc data="~Amide">5.000e+00</Rc>
+		<Rc data="~Amino">-4.000e-01</Rc>
+		<Rc data="~COOH">6.900e+00</Rc>
+		<Rc data="~Pyroglutamyl">-2.800e+00</Rc>
+		<Rc data="~Tyrosine sulfate">6.500e+00</Rc>
+		<comments>pH 2.1</comments>
+		<lc data="intercept">0.000e+00</lc>
+		<lc data="slope">0.000e+00</lc>
+		<t0>0.000e+00</t0>
+	</values>
+	<values author="Meek80">
+		<Rc data="A">5.000e-01</Rc>
+		<Rc data="C">-6.800e+00</Rc>
+		<Rc data="D">-8.200e+00</Rc>
+		<Rc data="E">-1.690e+01</Rc>
+		<Rc data="F">1.320e+01</Rc>
+		<Rc data="G">0.000e+00</Rc>
+		<Rc data="H">-3.500e+00</Rc>
+		<Rc data="I">1.390e+01</Rc>
+		<Rc data="K">1.000e-01</Rc>
+		<Rc data="L">8.800e+00</Rc>
+		<Rc data="M">4.800e+00</Rc>
+		<Rc data="N">8.000e-01</Rc>
+		<Rc data="P">6.100e+00</Rc>
+		<Rc data="Q">-4.800e+00</Rc>
+		<Rc data="R">8.000e-01</Rc>
+		<Rc data="S">1.200e+00</Rc>
+		<Rc data="T">2.700e+00</Rc>
+		<Rc data="V">2.700e+00</Rc>
+		<Rc data="W">1.490e+01</Rc>
+		<Rc data="Y">6.100e+00</Rc>
+		<Rc data="~Acetyl">5.600e+00</Rc>
+		<Rc data="~Amide">7.800e+00</Rc>
+		<Rc data="~Amino">2.400e+00</Rc>
+		<Rc data="~COOH">-3.000e+00</Rc>
+		<Rc data="~Pyroglutamyl">-1.100e+00</Rc>
+		<Rc data="~Tyrosine sulfate">1.090e+01</Rc>
+		<comments>pH 7.4</comments>
+		<lc data="intercept">0.000e+00</lc>
+		<lc data="slope">0.000e+00</lc>
+		<t0>0.000e+00</t0>
+	</values>
+</coefficients>

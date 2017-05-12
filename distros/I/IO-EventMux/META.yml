@@ -1,0 +1,33 @@
+---
+name: IO-EventMux
+version: 2.02
+author:
+  - 'Jonas Jensen <jonas@infopro.dk>,Troels Liebe Bentsen <troels@infopro.dk>'
+abstract: |-
+  Multiplexer for sockets, pipes and any other types of
+  filehandles that you can set O_NONBLOCK on and does buffering for the user.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Carp: 0
+  Errno: 0
+  Fcntl: 0
+  IO::EventMux::Socket::MsgHdr: 0
+  IO::Select: 0
+  IO::Socket: 0
+  Scalar::Util: 0
+  Socket: 0
+  perl: '>= 5.8.0'
+build_requires:
+  Test::More: 0
+provides:
+  IO::EventMux:
+    file: lib/IO/EventMux.pm
+    version: 2.02
+  IO::EventMux::Dump:
+    file: lib/IO/EventMux/Dump.pm
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

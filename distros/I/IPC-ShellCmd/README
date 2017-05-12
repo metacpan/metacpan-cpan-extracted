@@ -1,0 +1,177 @@
+NAME
+    IPC::ShellCmd - Run a command with a given environment and capture
+    output
+
+SYNOPSIS
+        my $isc = IPC::ShellCmd->new(["perl", "Makefile.PL"])
+                ->working_directory("/path/to/IPC_ShellCmd-0.01")
+                ->stdin(-filename => "/dev/null")
+                ->add_envs(PERL5LIB => "/home/mbm/cpanlib/lib/perl5")
+                ->chain_prog(
+                    IPC::ShellCmd::Sudo->new(
+                            User => 'cpanbuild',
+                            SetHome => 1,
+                        )
+                )->run();
+
+        my $stdout = $isc->stdout();
+        my $status = $isc->status();
+
+DESCRIPTION
+    This module comes from the nth time I've had to implement a select loop
+    and wanted appropriate sudo/su privilege magic, environment variables
+    that are set in the child, working directories set etc.
+
+    It aims to provide a reasonable interface for setting up command
+    execution environment (working directory, environment variables, stdin,
+    stdout and stderr redirection if necessary), but allowing for ssh and
+    sudo and magicing in the appropriate shell quoting.
+
+    It tries to be flexible about how you might want to capture output, exit
+    status and other such, but in such a way as it's hopefully easy to
+    understand and make it work.
+
+    Setup method calls are chainable in a File::Find::Rule kind of a way.
+
+  my *$isc* = IPC::ShellCmd->new(\*@cmd*, *%opts*)
+    Creates a new IPC::ShellCmd object linking to the command and arguments.
+    Possible options:
+
+    -nowarn
+        Don't throw warnings for overwriting values that have already been
+        set
+
+    -debug
+        Set the debug level
+
+  *$isc*->set_umask(*$mask*)
+    Sets the umask that this command is going to have, and returns ** so
+    that it can be chained.
+
+  *$isc*->working_dir([*$path*])
+    Sets the working directory that this command is going to run under, and
+    returns ** so that it can be chained, or returns the current setting
+    with no arguments.
+
+  *$isc*->add_envs(*$env1* => *$val1* [, *$env2* => *$val2*, ...])
+    Adds environment variables to be setup when the command is run. Returns
+    ** so that it can be chained.
+
+  *$isc*->chain_prog(*$chain_obj*, [*$opt* => *$val*, ...])
+    Adds a chain object, for example IPC::ShellCmd::Sudo->new(User =>
+    'root') into the chain. Returns ** so that it can be chained.
+
+    Valid options are:
+
+    -include-stdin
+        If set, and stdin is a filename (rather than a pipe, open
+        filehandle, or other type of descriptor) then the file will be
+        included in the chain.
+
+    -include-stdout
+        As above but with stdout.
+
+    -include-stderr
+        As above but with stderr.
+
+  *$isc*->stdin($stdin)
+  *$isc*->stdin($type, $stdin)
+    The 1 argument form takes either
+
+    A scalar
+        This is the input to the command in full.
+
+    A scalar ref
+        This is a reference to the input that will be passed.
+
+    A code ref
+        This is expected to generate the text to send to stdin. It is called
+        with an argument of the number of bytes that the caller wants to
+        read. If it generates more, some may be lost - you have been warned.
+
+    The 2 argument form takes a type and then a ref, handle or other. Valid
+    types:
+
+    -inherit
+        The argument to this is ignored. If specified this takes stdin from
+        whatever the caller is reading from.
+
+    -file
+        The argument to this is a perl filehandle.
+
+    -fd The argument to this is a system file descriptor.
+
+    -filename
+        The argument to this is a filename which is opened.
+
+    Both of these return ** for chaining. The default is an empty scalar.
+
+  *$isc*->stdout()
+  *$isc*->stderr()
+    These 0-argument forms return the captured stdout/stderr if the default
+    stdout/stderr handler is set and run() has been called. If either has
+    been setup elsewhere, then these will croak() an error.
+
+  *$isc*->stdout(*$value*)
+  *$isc*->stderr(*$value*)
+  *$isc*->stdout(*$type*, *$value*)
+  *$isc*->stderr(*$type*, *$value*)
+    These setup stdout/stderr as appropriate. The forms are similar to the
+    stdin method above.
+
+    The 1 argument form takes either
+
+    A scalar ref
+        This is a reference to a scalar that will have the output appended
+        to it.
+
+    A code ref
+        This code will be called (probably more than once) with a scalar of
+        text to be appended which has been read from stdout/stderr.
+
+    The 2 argument form takes a type and then a ref, handle or other. Valid
+    types:
+
+    -inherit
+        The argument to this is ignored. If specified this takes
+        stdout/stderr from whatever the caller is set to.
+
+    -file
+        The argument to this is a perl filehandle.
+
+    -fd The argument to this is a system file descriptor.
+
+    -filename
+        The argument to this is a filename which is opened.
+
+    All of these forms return ** for chaining. The default is that it will
+    populate an internal variable to be used by the corresponding 0-argument
+    form.
+
+  *$isc*->status()
+    Returns the exit status of the command if it got run.
+
+  *$isc*->run()
+    Runs the command with all the setup that has been done.
+
+BUGS
+    Apart from the ones that are probably in there and that I don't know
+    about, this is a very UNIX-centric view of the world, it really should
+    cope with Win32 concepts etc.
+
+SEE ALSO
+    IPC::ShellCmd::Generic, IPC::ShellCmd::Sudo, IPC::ShellCmd::SSH,
+    IO::Select, IPC::Open3
+
+AUTHORS
+        Matthew Byng-Maddick <matthew.byng-maddick@bbc.co.uk> <mbm@colondot.net>
+
+        Tomas Doran (t0m) <bobtfish@bobtfish.net>
+
+COPYRIGHT
+    Copyright (c) 2009 the British Broadcasting Corperation.
+
+LICENSE
+    This library is free software and may be distributed under the same
+    terms as perl itself.
+

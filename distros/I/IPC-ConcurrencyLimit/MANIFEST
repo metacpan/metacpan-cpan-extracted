@@ -1,0 +1,16 @@
+Changes
+lib/IPC/ConcurrencyLimit.pm
+lib/IPC/ConcurrencyLimit/Lock.pm
+lib/IPC/ConcurrencyLimit/Lock/Flock.pm
+lib/IPC/ConcurrencyLimit/WithLatestStandby.pm
+lib/IPC/ConcurrencyLimit/WithStandby.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/01load.t
+t/02basic.t
+t/03shared.t
+t/04standby.t
+t/05lateststandby.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

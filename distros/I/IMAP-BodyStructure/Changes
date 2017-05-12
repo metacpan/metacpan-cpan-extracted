@@ -1,0 +1,66 @@
+Revision history for Perl extension IMAP::BodyStructure.
+
+1.03 2015-10-06T20:32:25Z
+	- Add support for lists in "lang".
+	  RFC3501 supports that, I just never saw non-NIL in "lang".
+	  Submitted by: jonas@cpan.org
+
+1.02 2015-10-06T19:29:45Z
+	- Convert to Minilla, no functional change
+
+1.01
+	- INCOMPATIBLE CHANGE:
+		->part_at() with wrong part path now returns undef
+		instead of automatically climbing up the tree.
+
+	- be more smart (follow RFC) when filling {*_full} members
+		of envelope addresses
+	- defined but empty (or 0) disposition should mean `inline'
+	- speed up several busy regexen by a factor of 2-5.
+	- ->charset will never return mysterious '' or '0' instead
+	  of `undef'.
+
+0.96  2005/11/16
+	- ->{parts} for singlepart messages is now a '[]'.
+
+0.95  2005/08/01
+	- use fields;
+
+	- English fixes in doc;
+
+	- Create subs by assigning anonsubs to globs rather than
+	  evaling.
+
+	- "reply-to" in envelopes is now "reply_to",
+	  "in-reply-to" is "in_reply_to".
+
+	- Fix "part_id" for singlepart messages (it is '1', surprise).
+
+0.91  Mon, 6 September 2004 18:15 (MSD)
+	- use Test::NoWarnings in test.pl.
+	
+	- Do not choke on literal of more than 32766 chars (/.{}/ limit).
+
+	- Do not default disposition to anything. Sometimes this leads
+	to information loss. Clarify docs on the issue.
+
+0.9  Mon, 19 July 2004 18:05 (MSD)
+	- Propagate class from constructor into nested parts
+	both for structures and envelopes.
+
+	- Changed the way nested message/rfc822 affect hierarchy.
+	We are now compatible with IMAP FETCH BODY[...] command.
+
+	- Wrote a README.
+
+0.81 Tue,  7 July 2004 15:40 (MSD)
+	- Clarify message/rfc822 and hierarchy issue.
+
+0.8  Tue,  6 July 2004 18:52:55 (MSD)
+	- Getting ready to release to public.
+	High version means it's almose feature-complete.
+
+0.5  Tue Jun  8 13:49:39 2004
+	- original version; created by h2xs 1.21 with options
+		-XA -n IMAP::BodyStructure -b 5.5.0
+

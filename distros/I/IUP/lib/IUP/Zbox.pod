@@ -1,0 +1,157 @@
+=for comment based on iup-3.5 - http://www.tecgraf.puc-rio.br/iup/en/elem/iupzbox.html
+
+=head1 NAME
+
+IUP::Zbox - [GUI element] container for composing elements in hidden layers with only one layer visible
+
+=head1 DESCRIPTION
+
+Creates a void container for composing elements in hidden layers with
+only one layer visible. It is a box that piles up the children it
+contains, only the one child is visible.
+
+It does not have a native representation.
+
+Zbox works by changing the VISIBLE attribute of its children, so if any
+of the grand children has its VISIBLE attribute directly defined then
+Zbox will NOT change its state.
+
+=head1 USAGE
+
+=head2 CREATION - new() method
+
+ #standard way
+ my $zbox = IUP::Zbox->new( child=>[$elem1, $elem2], ANYATTRIBUTE=>'any value' );
+ 
+ #or with just a single child
+ my $zbox = IUP::Zbox->new( child=>$elem, ANYATTRIBUTE=>'any value' );
+ 
+ #or with just 1 parameter (arrayref)
+ my $zbox = IUP::Zbox->new( [$elem1, $elem2] );
+ 
+ #or with just 1 parameter (reference to child elements)
+ my $zbox = IUP::Zbox->new( $elem );
+
+B<child:> (named parameter) List of the references to elements (or just a single element) that
+will be placed in the box. Can be C<undef>.
+
+B<Returns:> the identifier of the created element, or C<undef> if an error occurs.
+
+NOTE: You can pass to C<new()> other C<ATTRIBUTE=E<gt>'value'> or C<CALLBACKNAME=E<gt>\&func> pairs relevant
+to this element - see L<IUP::Manual::02_Elements|IUP::Manual::02_Elements/"new()">.
+
+=head2 ATTRIBUTES
+
+For more info about concept of attributes (setting/getting values etc.)
+see L<IUP::Manual::03_Attributes|IUP::Manual::03_Attributes>. Attributes specific to this element:
+
+=over
+
+=item B<ALIGNMENT>
+
+I<(non inheritable)>
+
+Defines the alignment of the visible
+child. Possible values:
+
+ "NORTH", "SOUTH", "WEST", "EAST",
+ "NE", "SE", "NW", "SW",
+ "ACENTER".
+
+Default: "NW".
+
+=item L<EXPAND|IUP::Manual::03_Attributes/EXPAND>
+
+I<(non inheritable)>
+
+The default value is "YES".
+
+=item L<FLOATING|IUP::Manual::03_Attributes/FLOATING>
+
+I<(non inheritable, at children only)>
+
+If a child has FLOATING=YES then its size and position
+will be ignored by the layout processing. Default: "NO". 
+
+=item B<VALUE>
+
+I<(non inheritable)>
+
+The visible child. The value passed must be the perl reference or name of one of the children contained in the zbox.
+
+To associate a name to element use L<SetName|/"SetName()"> or C<< name=>'ElemName' >> named parameter of L<new()|/"new()"> constructor.
+
+When the value is changed the selected child is made visible and all
+other children are made invisible, regardless their previous visible state.
+
+=item B<VALUE_HANDLE>
+
+I<(non inheritable)>
+
+The visible child accessed by its
+handle. The value passed must be the handle of a child contained in the
+zbox. When the zbox is created, the first element inserted is set as
+the visible child. 
+
+=item B<VALUEPOS>
+
+I<(non inheritable)>
+
+The visible child accessed by its
+position. The value passed must be the index of a child contained in
+the zbox, starting at 0. When the zbox is created, the first element
+inserted is set as the visible child. 
+
+=item L<SIZE|IUP::Manual::03_Attributes/SIZE> / L<RASTERSIZE|IUP::Manual::03_Attributes/RASTERSIZE> (non inheritable)
+
+The default size is the smallest size that fits its largest child. All
+child elements are considered even invisible ones, except when
+FLOATING=YES in a child.
+
+=item B<WID>
+
+I<(read-only)>
+
+Returns -1 if mapped.
+
+=back
+
+The following L<common attributes|IUP::Manual::03_Attributes/Common Attributes> are also accepted:
+
+=over
+
+=item * L<FONT|IUP::Manual::03_Attributes/FONT>,
+L<CLIENTSIZE|IUP::Manual::03_Attributes/CLIENTSIZE>,
+L<CLIENTOFFSET|IUP::Manual::03_Attributes/CLIENTOFFSET>,
+L<POSITION|IUP::Manual::03_Attributes/POSITION>,
+L<MINSIZE|IUP::Manual::03_Attributes/MINSIZE>,
+L<MAXSIZE|IUP::Manual::03_Attributes/MAXSIZE>
+
+=back
+
+=head1 NOTES
+
+The box can be created with no elements and be dynamic filled using
+L<Append|IUP::Manual::02_Elements/"Append()"> or L<Insert|IUP::Manual::02_Elements/"Insert()">.
+
+=head1 EXAMPLES
+
+
+The element B<IUP::Zbox> is used in the following sample scripts:
+
+=over
+
+=item * L<0-basic/zbox.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/zbox.pl> - IUP::Zbox example
+
+=back 
+
+
+
+=head1 SEE ALSO
+
+L<IUP::Hbox|IUP::Hbox>, L<IUP::Vbox|IUP::Vbox>
+
+The original doc: L<iupzbox.html|http://www.tecgraf.puc-rio.br/iup/en/elem/iupzbox.html>
+ 
+
+=cut

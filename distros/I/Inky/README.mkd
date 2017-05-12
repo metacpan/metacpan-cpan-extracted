@@ -1,0 +1,141 @@
+p5-Inky
+=======
+
+[![Build Status](https://api.travis-ci.org/theregister/p5-Inky.svg)](https://travis-ci.org/theregister/p5-Inky/)
+
+This module allows you to use the Inky template language in Perl, and follows
+the same structure and tests as the original Inky NPM module:
+https://github.com/zurb/inky
+
+See http://foundation.zurb.com/emails/email-templates.html for more information.
+
+How to use Inky and create a fantastic HTML emaiL with it
+---------------------------------------------------------
+
+See https://github.com/zurb/inky for an overview of the tags that Inky
+introduces.
+
+You'll likely want to use the CSS from
+https://github.com/zurb/foundation-emails in order to style your HTML e-mails
+"properly" for use with Inky.
+
+You'll want to use the HTML "wrapper template" from
+https://github.com/zurb/foundation-emails-template/blob/master/src/layouts/default.html
+
+You might want to convert that HTML into the templating system you are going to
+be using, such as Template or Text::Xslate.
+
+For example, in Template you'll want to create a `wrapper.tt`
+containing the above file's contents, and ensuring you have:
+
+    ...
+    <center>
+    [% content %]
+    </center>
+    ...
+
+You'll then be able to use the never-changing wrapper template to create
+beautiful HTML emails, creating a `your_mailing_list.tt` which contains
+something like:
+
+    [%-
+    SET override_css = '
+        // any override to be placed _after_ the Foundation for Emails CSS
+    ';
+    WRAPPER "path/to/wrapper.tt"
+    -%]
+    Your email contents go here
+    [% END %]
+
+To style them "properly", you'll want to clone the repository at:
+https://github.com/zurb/foundation-emails
+and make changes to the various source `scss` files to fit your "brand",
+assuming the defaults aren't to your liking.
+
+Once done, you'll have to generate the CSS, using something like:
+
+    sass -t compact --sourcemap=none --no-cache foundation.scss > foundation.css
+
+If you want to include the foundation CSS and a newsletter-specific overriding
+CSS, you will want to modify the `wrapper.tt` to contain, near the `body` tag:
+
+    <body>
+      [%~# CSS::Inliner REQUIRES type = "text/css" ~%]
+      <style type="text/css">
+      [% foundation_css %]
+      [% override_css   %]
+      </style>
+      ....
+
+The `style` _must_ go in the `body` as otherwise some mailers will wail to
+"use" it.
+
+If you need to support Gmail and other mail readers which do _not_ allow
+inline styles, you'll likely have no option but to use
+CSS::Inliner, which - with the above `style` addition to the
+`wrapper.tt` template, will allow you to seamlessly inline your styles in the
+HTML email.
+
+It's entirely up to you to also use HTML::Packer to ensure any useless
+whitespace and comments are trimmed from the resulting email.
+
+To sum up, and assuming you'll be using Template, HTML::Packer and
+CSS::Inliner, here's a rough program to send a beautiful HTML email with Inky
+and Foundation for Emails:
+
+    use 5.010_001;
+    use strict;
+    use warnings;
+    use Inky;
+    use Template;
+    use HTML::Packer;
+    use CSS::Packer;
+    use CSS::Inliner;
+    use Path::Tiny;
+    use Carp qw<croak>;
+    # Create TT object, ensure the foundation for emails CSS is in the stash
+    my $TT = Template->new(
+        # any TT options go here
+    );
+    my $stash = {
+        foundation_css => path('./foundation.css')->slurp_utf8,
+        # your other data goes here
+    };
+    my $html = '';
+    $TT->process('your_mailing_list.tt', $stash, \$html)
+        or croak $TT->error;
+    # At this point $html contains the full "inky" templated email.
+    my $INKY    = Inky->new;
+    my $PACKER  = HTML::Packer->init;
+    my $parsed  = $INKY->release_the_kraken($html);
+    my $inliner = CSS::Inliner->new({ leave_style => 1, relaxed => 1 });
+    $inliner->read({ html => $parsed });
+    my $inlined  = $inliner->inlinify;
+    my $minified = $PACKER->minify( \$inlined, {
+        remove_comments => 1,
+        remove_newlines => 1,
+        do_stylesheet   => 'minify', # needs CSS::Packer
+    });
+    say $minified;
+    # $minified is your beautiful HTML email, with styles inlined,
+    # and ready to be sent to an unsuspecting user!
+
+That's all, folks!
+
+Changes from the NPM version
+----------------------------
+
+The current version of this module is up-to-date with
+https://github.com/zurb/inky branch `master` as of 2016-06-23.
+
+Additional component tags aren't supported.
+
+Differing amounts of columns are untested.
+
+Copyright
+---------
+
+This software is copyright (c) 2016 by Situation Publishing.
+
+This is free software; you can redistribute it and/or modify it under
+the terms of the attached LICENSE file (the MIT license).

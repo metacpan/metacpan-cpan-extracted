@@ -1,0 +1,18 @@
+IO::NestedCapture 1.03 (2005-12-13 20:24):
+
+    * Added Makefile.PL support.
+
+IO::NestedCapture 1.02 (2005-9-4 21:23):
+
+	* Added the capture_in, capture_out, capture_err, capture_in_out,
+	  capture_in_err, capture_out_err, and capture_all methods.
+	* Fixed some problems with the SYNOPSIS and some other places.
+	* Updated the documentation to reflect the new subroutine interface.
+	* Added an EXPORTS section to the documentation.
+
+IO::NestedCapture 1.01 (2005-9-3 11:45):
+
+	* Initial commit of IO::NestedCapture.
+	* This version is capable of capturing output to STDOUT and STDERR and
+	* "capturing" input sent to STDIN using the start() and stop() methods.
+	* I have 100% test coverage as determined by Devel::Cover.

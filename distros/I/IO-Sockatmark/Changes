@@ -1,0 +1,6 @@
+Revision history for Perl extension IO::Sockatmark.
+
+1.00  Sat Jan  6 22:48:02 2001
+	- original version; created by h2xs 1.20 with options
+		-f -A -n IO::Sockatmark
+

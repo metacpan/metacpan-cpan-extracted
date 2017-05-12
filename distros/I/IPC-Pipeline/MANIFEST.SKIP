@@ -1,0 +1,13 @@
+.hgignore
+^\.hg
+.gitignore
+^\.git
+^.*\.swp$
+^blib
+^Makefile$
+^Build$
+.*\.bak$
+.*\.old$
+pm_to_blib
+cover_db
+^_build

@@ -1,0 +1,38 @@
+#!/usr/bin/perl -w
+
+use lib 'lib';
+use strict;
+use Image::Info qw(image_info);
+
+my $i=image_info($ARGV[0]);
+
+foreach (sort keys %$i) {
+    if ($i->{$_} =~ /[\001-\037\177-\377]/ && !/error/) {
+        printf "%s ->\n" ,$_;
+        hex_print($i->{$_});
+	next;
+    }
+    $i->{$_} =~ s/\000//g;
+    printf "%s -> %s\n" ,$_, ref($i->{$_}) ? deref(@{$i->{$_}}) : $i->{$_}
+};
+
+sub deref {
+   my @args;
+   if (ref($_[0]) eq 'ARRAY') {
+     foreach my $ref (@_) {  
+       push(@args, deref(@{$ref}))
+     } 
+   } else {
+     @args = @_;
+   }
+   '[' . join(',',@args) . ']';
+}
+
+sub hex_print {
+    for (my $i=0; $i<length $_[0];$i+=16) {
+       my $ss = substr($_[0],$i,16);
+       printf "  %04x: %s ", $i, join(' ',grep !/^$/,split(/(..)/,unpack("H*",$ss)));
+       $ss =~ tr /\000-\037\177-\377/./;
+       print $ss,"\n";
+    }
+}

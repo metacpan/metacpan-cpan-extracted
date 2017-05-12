@@ -1,0 +1,9 @@
+Brand.pm
+Changes
+Makefile.PL
+MANIFEST
+README
+t/1.t
+test/test.pl
+test/photo.jpg
+test/logo.png

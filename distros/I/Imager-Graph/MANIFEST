@@ -1,0 +1,54 @@
+Changes				A list of changes :)
+Graph.pm
+ImUgly.ttf			A moderately ugly font
+lib/Imager/Graph/Area.pm
+lib/Imager/Graph/Bar.pm
+lib/Imager/Graph/Column.pm
+lib/Imager/Graph/Horizontal.pm
+lib/Imager/Graph/Line.pm
+lib/Imager/Graph/Pie.pm
+lib/Imager/Graph/StackedColumn.pm
+lib/Imager/Graph/Util.pm
+lib/Imager/Graph/Vertical.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/lib/Imager/Font/Test.pm
+t/lib/Imager/Graph/Test.pm
+t/t00load.t
+t/t10pie.t
+t/t11line.t
+t/t12column.t
+t/t13stacked_col.t
+t/t14bar.t
+t/t15line_horizontal.t
+t/t20api.t
+t/t21style_api.t
+t/t30many_points.t
+t/t31tic_color.t
+t/t32series_labels.t
+t/t33_long_labels.t
+t/t34horizontal_many_points.t
+t/t40area.t
+t/t91pod.t
+t/t93podcover.t
+testimg/t10_hlegend.png
+testimg/t10_lin_fount.png	Test output comparison images
+testimg/t10_mono.png
+testimg/t10_noother.png
+testimg/t10_pie1.png
+testimg/t10_pie2.png
+testimg/t10_rad_fount.png
+testimg/t14_bar.png
+testimg/t30_points.png
+testimg/t31tic_color.png
+testimg/t31tic_color_CMA.png
+testimg/t32_series.png
+testimg/t33_long_labels.png
+testimg/t34_points.png
+testimg/t40area1.png
+testimg/t40area2.png
+TODO
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

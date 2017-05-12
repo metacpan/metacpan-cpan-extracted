@@ -1,0 +1,24 @@
+Revision history for Inline::Tcl
+
+0.09:  Initial release compatible with Inline-0.40
+       Removed debugging files mydebug.h and test.sh
+
+0.08:  Resubitted changes make in 0.07.  Functionally equivilent to 0.05.
+
+0.07:  Backed out of changes make in 0.06
+
+0.06:  Made changes to use new Inline API
+
+0.05:  Removed all dependency on variable parameter function macros from gcc
+       Added "Changes" file
+       Removed gcc style comments
+       Searches for FreeBSD paths for libraries
+       Added library compile options for sun-solaris cc compiler (-R...)
+       Checks in include paths for valid tcl headers
+       Tested on FreeBSD and Linux
+       
+0.04:  Fixed dependency on gcc, but still doesn't compile on some systems
+       Fixed dependency on tcl distribution, now uses top level API
+       Tested on Linux
+
+0.03:  First public release

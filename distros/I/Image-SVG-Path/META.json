@@ -1,0 +1,54 @@
+{
+   "abstract" : "read the \"d\" attribute of an SVG path",
+   "author" : [
+      "Ben Bullock <bkb@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Image-SVG-Path",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.006001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/benkasminbullock/Image-SVG-Path/issues"
+      },
+      "repository" : {
+         "url" : "https://github.com/benkasminbullock/Image-SVG-Path"
+      }
+   },
+   "version" : "0.30",
+   "x_contributors" : [
+      "Alessandro Ranellucci <aar@cpan.org>",
+      "Colin Kuskie <colink@cpan.org>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

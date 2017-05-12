@@ -1,0 +1,38 @@
+IBM-ThinkPad-ACPI-Extras version 0.01
+=====================================
+
+The IBM::ThinkPad::ACPI::Extras module was designed to interact
+with the ACPI capabilities of IBM ThinkPad laptops.
+
+This perl module requires the IBM ThinkPad ACPI Extras Driver
+Module (ibm_acpi/thinkpad_acpi) which was coded by Borislav
+Deianov and Henrique de Moraes Holschuh.
+It support various features of these laptops which are accessible
+through the ACPI framework.
+
+For further information take a look at http://ibm-acpi.sourceforge.net
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  none
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 by Manuel Gebele
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

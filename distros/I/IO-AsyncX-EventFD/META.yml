@@ -1,0 +1,35 @@
+---
+abstract: 'Linux eventfd support for IO::Async'
+author:
+  - 'Tom Molesworth <TEAM@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::CheckDeps: '0.010'
+  Test::Fatal: '0'
+  Test::More: '0.98'
+  perl: '5.012000'
+configure_requires:
+  ExtUtils::MakeMaker: '6.48'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: IO-AsyncX-EventFD
+no_index:
+  directory:
+    - inc
+requires:
+  IO::Async: '0.70'
+  Linux::FD: '0.011'
+  curry: '1.000'
+  mro: '1.00'
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=IO-AsyncX-EventFD
+  homepage: http://search.cpan.org/dist/IO-AsyncX-EventFD/
+version: '0.001'
+x_serialization_backend: 'YAML::Tiny version 1.69'

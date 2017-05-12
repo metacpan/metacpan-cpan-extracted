@@ -1,0 +1,162 @@
+=head1 NAME
+
+Image::Hash - Perceptual image hashing [aHash, dHash, pHash].
+
+=head1 SYNOPSIS
+
+  use Image::Hash;
+  use File::Slurp;
+  
+  # Read a image from the command line
+  my $image = read_file( shift @ARGV, binmode => ':raw' ) ;
+
+  my $ihash = Image::Hash->new($image);
+
+  # Calculate the average hash
+  my $a = $ihash->ahash();
+
+  # Calculate the difference hash
+  my $b = $ihash->dhash();
+
+  # Calculate the perception hash
+  my $p = $ihash->phash();
+
+  print "$a\n$b\n$p\n";
+
+
+
+=head1 DESCRIPTION
+
+Image::Hash allows you to calculate the average hash, difference hash and perception hash an image.
+
+Depending on what is available on your system Image::Hash will use GD, Image::Magick or Imager to interact with your image.
+
+
+
+=head1 CONSTRUCTOR METHODS
+
+  my $ihash = Image::Hash->new($image [, $module ]);
+  
+The first argument is a scalar with a binary representation of an image.
+
+You may also optionally specify a second argument of "GD", "ImageMagick" or "Imager" to force Image::Hash to use the specific image module when it interacts with the image.
+The different image modules may give direct hashes for the same image. Using GD normally hives the best results, and are is highly recommended.
+
+
+=head1 HASHES
+
+=head2 ahash
+
+  $ihash->ahash();
+  $ihash->ahash('geometry' => '8x8');
+
+Calculate the Average Hash
+	
+Return an array of binary values in array context and a hex representative in scalar context.
+
+=head2 dhash
+
+  $ihash->dhash();
+  $ihash->dhash('geometry' => '8x8');
+
+Calculate the Dynamic Hash
+	
+Return an array of binary values in array context and a hex representative in scalar context.
+	
+=head2 phash
+
+  $ihash->phash();
+  $ihash->phash('geometry' => '8x8');
+
+Calculate the Perceptual Hash
+	
+Return an array of binary values in array context and a hex representative in scalar context.
+
+=head1 HELPER
+
+=head2 greytones
+
+  $ihash->greytones();
+  $ihash->greytones('geometry' => '8x8');
+
+Return the number of different shades of grey after the image are converted to grey tones. The number of shades can be used to indicate the complexity of an image, and exclude images that has a very low complexity.
+
+For example, all images with only a single color will be reduced to an image with a single grey color and thus give the same hash.
+
+=head1 DEBUGGING
+
+Functions useful for debug purposes. 
+
+=head2 dump
+
+
+
+  my $ihash = Image::Hash->new($image, $module);
+
+  my @hash = $ihash->ahash();
+  $ihash->dump('hash' => \@hash );
+
+  
+  array(  [ 183 (1), 189 (1), 117 (0),  80 (0), 183 (1), 189 (1), 189 (1), 189 (1) ],
+          [ 183 (1), 158 (0),  89 (0), 211 (1),  89 (0), 189 (1), 168 (1), 162 (1) ],
+          [ 176 (1), 151 (0),  93 (0), 160 (1), 160 (1), 191 (1), 154 (0), 154 (0) ],
+          [ 195 (1), 139 (0),  53 (0), 168 (1),  83 (0), 205 (1), 146 (0), 146 (0) ],
+          [ 195 (1), 195 (1), 183 (1), 160 (1), 160 (1), 199 (1), 124 (0), 129 (0) ],
+          [ 187 (1), 183 (1), 183 (1), 195 (1), 180 (1), 193 (1), 129 (0), 135 (0) ],
+          [ 176 (1), 180 (1), 174 (1), 183 (1), 176 (1), 176 (1), 135 (0), 146 (0) ],
+          [ 162 (1), 171 (1),  99 (0), 149 (0), 129 (0), 162 (1), 140 (0), 146 (0) ])
+
+Dump the array used when generating hashes. Option 'hash' may be specified to show with pixel has witch value in the hash.
+
+=head2 reducedimage
+
+  use Image::Hash;
+  use File::Slurp;
+
+  my $file = shift @ARGV or die("Pleas spesyfi a file to read!");
+
+  my $image = read_file( $file, binmode => ':raw' ) ;
+
+  my $ihash = Image::Hash->new($image);
+
+  binmode STDOUT;
+  print STDOUT $ihash->reducedimage();
+ 
+ Returns the reduced image that will be used by the hash functions.
+ 
+=head1 EXAMPLES
+
+Please see the C<eg/> directory for further examples.
+
+=head1 BUGS
+
+Image::Hash support different back ends (GD, Image::Magick or Imager), but because the different back ends work slightly different they will not produce the same hash for the same image. More info is available at https://github.com/runarbu/PerlImageHash/blob/master/Hash_differences.md .
+
+=head1 AUTHOR
+
+    Runar Buvik
+    CPAN ID: RUNARB
+    runarb@gmail.com
+    http://www.runarb.com
+
+=head1 Git
+
+https://github.com/runarbu/PerlImageHash
+
+=head1 COPYRIGHT
+
+This program is free software; you can redistribute
+it and/or modify it under the same terms as Perl itself.
+
+The full text of the license can be found in the
+LICENSE file included with this module.
+
+
+=head1 SEE ALSO
+
+Articles L<Looks like it|http://www.hackerfactor.com/blog/index.php?/archives/432-Looks-Like-It.html> and L<Kind of like that|http://www.hackerfactor.com/blog/?/archives/529-Kind-of-Like-That.html> by Neal Krawetz that describes the theory behind aHash, dHash, pHash.
+
+L<ImageHash|https://github.com/JohannesBuchner/imagehash> image hashing library written in Python that dos the same thing.
+
+L<Class ImageHash|http://jax-work-archive.blogspot.no/2013/05/php-ahash-phash-dhash.html> a PHP class that do the same thing.
+

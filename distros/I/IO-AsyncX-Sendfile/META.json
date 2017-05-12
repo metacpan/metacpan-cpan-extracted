@@ -1,0 +1,71 @@
+{
+   "abstract" : "sendfile support for IO::Async",
+   "author" : [
+      "Tom Molesworth <cpan@perlsite.co.uk>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "IO-AsyncX-Sendfile",
+   "no_index" : {
+      "directory" : [
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "perl" : "5.010001"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.48"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Version" : "1",
+            "version" : "0.9901"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Future" : "0.30",
+            "IO::Async" : "0.64",
+            "Sys::Sendfile" : "0.14",
+            "parent" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Digest::SHA" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::CheckDeps" : "0.010",
+            "Test::Fatal" : "0.010",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-io-asyncx-sendfile at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=IO-AsyncX-Sendfile"
+      },
+      "homepage" : "http://search.cpan.org/dist/IO-AsyncX-Sendfile/"
+   },
+   "version" : "0.002"
+}
+

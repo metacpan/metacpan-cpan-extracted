@@ -1,0 +1,596 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>IO::Moose::Handle - Reimplementation of IO::Handle with improvements</title>
+<link rel="stylesheet" href="../../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:support@ActiveState.com" />
+</head>
+
+<body>
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="block" valign="middle">
+<big><strong><span class="block">&nbsp;IO::Moose::Handle - Reimplementation of IO::Handle with improvements</span></strong></big>
+</td></tr>
+</table>
+
+
+<!-- INDEX BEGIN -->
+<div name="index">
+<p><a name="__index__"></a></p>
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#inheritance">INHERITANCE</a></li>
+	<li><a href="#exceptions">EXCEPTIONS</a></li>
+	<li><a href="#attributes">ATTRIBUTES</a></li>
+	<li><a href="#imports">IMPORTS</a></li>
+	<li><a href="#constructors">CONSTRUCTORS</a></li>
+	<li><a href="#methods">METHODS</a></li>
+	<li><a href="#debugging">DEBUGGING</a></li>
+	<li><a href="#internals">INTERNALS</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+	<li><a href="#bugs">BUGS</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#license">LICENSE</a></li>
+</ul>
+
+<hr name="index" />
+</div>
+<!-- INDEX END -->
+
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>IO::Moose::Handle - Reimplementation of IO::Handle with improvements</p>
+<p>
+<a href="#__index__"><small>Back to Top</small></a>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+  <span class="keyword">use</span> <span class="variable">IO::Moose::Handle</span><span class="operator">;</span>
+</pre>
+<pre>
+  <span class="keyword">my</span> <span class="variable">$fh</span> <span class="operator">=</span> <span class="variable">IO::Moose::Handle</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">;</span>
+  <span class="variable">$fh</span><span class="operator">-&gt;</span><span class="variable">fdopen</span><span class="operator">(</span> <span class="keyword">fileno</span><span class="operator">(</span><span class="variable">STDIN</span><span class="operator">)</span> <span class="operator">);</span>
+  <span class="keyword">print</span> <span class="variable">$fh</span><span class="operator">-&gt;</span><span class="variable">getline</span><span class="operator">;</span>
+  <span class="keyword">my</span> <span class="variable">$content</span> <span class="operator">=</span> <span class="variable">$fh</span><span class="operator">-&gt;</span><span class="variable">slurp</span><span class="operator">;</span>
+  <span class="variable">$fh</span><span class="operator">-&gt;</span><span class="variable">close</span><span class="operator">;</span>
+</pre>
+<pre>
+  <span class="keyword">my</span> <span class="variable">$fh</span> <span class="operator">=</span> <span class="variable">IO::Moose::Handle</span><span class="operator">-&gt;</span><span class="variable">fdopen</span><span class="operator">(</span> <span class="operator">\</span><span class="variable">*STDERR</span><span class="operator">,</span> <span class="string">'&gt;'</span> <span class="operator">);</span>
+  <span class="variable">$fh</span><span class="operator">-&gt;</span><span class="variable">autoflush</span><span class="operator">(</span><span class="number">1</span><span class="operator">);</span>
+  <span class="variable">$fh</span><span class="operator">-&gt;</span><span class="variable">say</span><span class="operator">(</span><span class="string">'Some text'</span><span class="operator">);</span>
+  <span class="keyword">undef</span> <span class="variable">$fh</span><span class="operator">;</span>  <span class="comment"># calls close at DESTROY</span>
+</pre>
+<p>
+<a href="#__index__"><small>Back to Top</small></a>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>This class extends <a href="../../../../site/IO/Handle.html">the IO::Handle manpage</a> with following differences:</p>
+<ul>
+<li>
+<p>It is based on <a href="../../../../site/lib/IO/Moose.html">the Moose manpage</a> object framework.</p>
+</li>
+<li>
+<p>The <a href="#stat"><code>stat</code></a> method returns <a href="../../../../site/File/Stat/Moose.html">the File::Stat::Moose manpage</a> object.</p>
+</li>
+<li>
+<p>It uses <a href="../../../../site/Exception/Base.html">the Exception::Base manpage</a> for signaling errors. Most of methods are throwing
+exception on failure.</p>
+</li>
+<li>
+<p>The modifiers like <code>input_record_separator</code> are supported on per file handle
+basis.</p>
+</li>
+<li>
+<p>It also implements additional methods like <a href="#say"><code>say</code></a>, <a href="#slurp"><code>slurp</code></a>.</p>
+</li>
+</ul>
+<p>
+<a href="#__index__"><small>Back to Top</small></a>
+</p>
+<hr />
+<h1><a name="inheritance">INHERITANCE</a></h1>
+<ul>
+<li>
+<p>extends <a href="../../../../site/MooseX/GlobRef/Object.html">the MooseX::GlobRef::Object manpage</a></p>
+<ul>
+<li>
+<p>extends <a href="../../../../site/Moose/Object.html">the Moose::Object manpage</a></p>
+</li>
+</ul>
+</li>
+<li>
+<p>extends <a href="../../../../site/IO/Handle.html">the IO::Handle manpage</a></p>
+</li>
+</ul>
+<p>
+<a href="#__index__"><small>Back to Top</small></a>
+</p>
+<hr />
+<h1><a name="exceptions">EXCEPTIONS</a></h1>
+<dl>
+<dt><strong><a name="exception_argument" class="item"><a href="../../../../site/Exception/Argument.html">the Exception::Argument manpage</a></a></strong></dt>
+
+<dd>
+<p>Thrown whether method is called with wrong argument.</p>
+</dd>
+<dt><strong><a name="exception_fatal" class="item"><a href="../../../../site/Exception/Fatal.html">the Exception::Fatal manpage</a></a></strong></dt>
+
+<dd>
+<p>Thrown whether fatal error is occurred by core function.</p>
+</dd>
+</dl>
+<p>
+<a href="#__index__"><small>Back to Top</small></a>
+</p>
+<hr />
+<h1><a name="attributes">ATTRIBUTES</a></h1>
+<dl>
+<dt><strong><a name="file_num_filehandle_openhandle_ro" class="item">file : Num|FileHandle|OpenHandle {ro}</a></strong></dt>
+
+<dd>
+<p>File (file descriptor number, file handle or IO object) as a parameter for new
+object or argument for <a href="#fdopen"><code>fdopen</code></a> method.</p>
+</dd>
+<dt><strong><a name="mode_canonopenmodestr_ro" class="item">mode : CanonOpenModeStr {ro} = &quot;&lt;&quot;</a></strong></dt>
+
+<dd>
+<p>File mode as a parameter for new object or argument for <a href="#fdopen"><code>fdopen</code></a> method.  Can
+be Perl-style (<code>&lt;</code>, <code>&gt;</code>, <code>&gt;&gt;</code>, etc.) or C-style (<code>r</code>,
+<code>w</code>, <code>a</code>, etc.)</p>
+</dd>
+<dt><strong><a name="fh_globref_ro" class="item">fh : GlobRef {ro}</a></strong></dt>
+
+<dd>
+<p>File handle used for internal IO operations.</p>
+</dd>
+<dt><strong><a name="autochomp_bool_false_rw" class="item">autochomp : Bool = false {rw}</a></strong></dt>
+
+<dd>
+<p>If is true value the input will be auto chomped.</p>
+</dd>
+<dt><strong><a name="tainted_bool_taint_rw" class="item">tainted : Bool = ${^TAINT} {rw}</a></strong></dt>
+
+<dd>
+<p>If is false value and tainted mode is enabled the <a href="#untaint"><code>untaint</code></a> method will be
+called after <a href="#fdopen"><code>fdopen</code></a>.</p>
+</dd>
+<dt><strong><a name="blocking_bool_true_rw" class="item">blocking : Bool = true {rw}</a></strong></dt>
+
+<dd>
+<p>If is false value the non-blocking IO will be turned on.</p>
+</dd>
+<dt><strong><a name="copyfh_bool_false_ro" class="item">copyfh : Bool = false {ro}</a></strong></dt>
+
+<dd>
+<p>If is true value the file handle will be copy of <em>file</em> argument.  If
+<em>file</em> argument is not a file handle, the <a href="../../../../site/Exception/Argument.html">the Exception::Argument manpage</a> is
+thrown.</p>
+</dd>
+<dt><strong><a name="tied_bool_true_ro" class="item">tied : Bool = true {ro}</a></strong></dt>
+
+<dd>
+<p>By default the object's file handle is tied variable, so it can be used with
+standard, non-OO interface (<code>open</code>, <a href="#print"><code>print</code></a>, <a href="#getc"><code>getc</code></a> functions and
+<code>&lt;&gt;</code> operator).  This interface is slow and can be disabled if the OO
+interface only is used.</p>
+</dd>
+<dt><strong><a name="strict_accessors_bool_false_rw" class="item">strict_accessors : Bool = false {rw}</a></strong></dt>
+
+<dd>
+<p>By default the accessors might be avoided for performance reason.  This
+optimization can be disabled if the attribute is set to true value.</p>
+</dd>
+<dt><strong><a name="format_formfeed_str_rw_var_l" class="item">format_formfeed : Str {rw, var=&quot;$^L&quot;}</a></strong></dt>
+
+<dt><strong><a name="format_line_break_characters_str_rw_var" class="item">format_line_break_characters : Str {rw, var=&quot;$:&quot;}</a></strong></dt>
+
+<dt><strong><a name="input_record_separator_str_rw_var" class="item">input_record_separator : Str {rw, var=&quot;$/&quot;}</a></strong></dt>
+
+<dt><strong><a name="output_field_separator_str_rw_var" class="item">output_field_separator : Str {rw, var=&quot;$,&quot;}</a></strong></dt>
+
+<dt><strong><a name="output_record_separator_str_rw_var" class="item">output_record_separator : Str {rw, var=&quot;$\&quot;}</a></strong></dt>
+
+<dd>
+<p>These are attributes assigned with Perl's built-in variables. See <em>perlvar</em>
+for complete descriptions.  The fields have accessors available as per file
+handle basis if called as <code>$io-&gt;accessor</code> or as global setting if called
+as <code>IO::Moose::Handle-&gt;accessor</code>.</p>
+</dd>
+</dl>
+<p>
+<a href="#__index__"><small>Back to Top</small></a>
+</p>
+<hr />
+<h1><a name="imports">IMPORTS</a></h1>
+<dl>
+<dt><strong><a name="use_io_moose_handle_stdin_stdout_stderr" class="item">use IO::Moose::Handle '$STDIN', '$STDOUT', '$STDERR';</a></strong></dt>
+
+<dt><strong><a name="use_io_moose_handle_std" class="item">use IO::Moose::Handle ':std';</a></strong></dt>
+
+<dt><strong><a name="use_io_moose_handle_all" class="item">use IO::Moose::Handle ':all';</a></strong></dt>
+
+<dd>
+<p>Creates handle as a copy of standard handle and imports it into caller's
+namespace.  This handles won't be created until explicit import.</p>
+<pre>
+  <span class="keyword">use</span> <span class="variable">IO::Moose::Handle</span> <span class="string">':std'</span><span class="operator">;</span>
+  <span class="keyword">print</span> <span class="variable">$STDOUT</span><span class="operator">-&gt;</span><span class="variable">autoflush</span><span class="operator">(</span><span class="number">1</span><span class="operator">);</span>
+  <span class="keyword">print</span> <span class="variable">$STDIN</span><span class="operator">-&gt;</span><span class="variable">slurp</span><span class="operator">;</span>
+</pre>
+</dd>
+</dl>
+<p>
+<a href="#__index__"><small>Back to Top</small></a>
+</p>
+<hr />
+<h1><a name="constructors">CONSTRUCTORS</a></h1>
+<dl>
+<dt><strong><a name="new" class="item">new( <em>args</em> : Hash ) : Self</a></strong></dt>
+
+<dd>
+<p>Creates the <code>IO::Moose::Handle</code> object and calls <a href="#fdopen"><code>fdopen</code></a> method if the
+<em>mode</em> parameter is defined.</p>
+<pre>
+  <span class="variable">$io</span> <span class="operator">=</span> <span class="variable">IO::Moose::Handle</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span> <span class="string">file</span> <span class="operator">=&gt;</span> <span class="operator">\</span><span class="variable">*STDIN</span><span class="operator">,</span> <span class="string">mode</span> <span class="operator">=&gt;</span> <span class="string">"r"</span> <span class="operator">);</span>
+</pre>
+<p>The object can be created with unopened file handle which can be opened later.</p>
+<pre>
+  <span class="variable">$in</span> <span class="operator">=</span> <span class="variable">IO::Moose::Handle</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span> <span class="string">file</span> <span class="operator">=&gt;</span> <span class="operator">\</span><span class="variable">*STDIN</span> <span class="operator">);</span>
+  <span class="variable">$in</span><span class="operator">-&gt;</span><span class="variable">fdopen</span><span class="operator">(</span><span class="string">"r"</span><span class="operator">);</span>
+</pre>
+<p>If <em>copyfh</em> is true value and <em>file</em> contains a file handle, this file
+handle is copied rather than new file handle created.</p>
+<pre>
+  <span class="variable">$tmp</span> <span class="operator">=</span> <span class="variable">File::Temp</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">;</span>
+  <span class="variable">$io</span> <span class="operator">=</span> <span class="variable">IO::Moose::Handle</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span> <span class="string">file</span> <span class="operator">=&gt;</span> <span class="variable">$tmp</span><span class="operator">,</span> <span class="string">copyfh</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">,</span> <span class="string">mode</span> <span class="operator">=&gt;</span> <span class="string">"w"</span> <span class="operator">);</span>
+</pre>
+</dd>
+<dt><strong><a name="new_from_fd" class="item">new_from_fd( <em>fd</em> : Num|FileHandle|OpenHandle, <em>mode</em> : CanonOpenModeStr = &quot;&lt;&quot;) : Self</a></strong></dt>
+
+<dd>
+<p>Creates the <code>IO::Moose::Handle</code> object and immediately opens the file handle
+based on arguments.</p>
+<pre>
+  <span class="variable">$out</span> <span class="operator">=</span> <span class="variable">IO::Moose::Handle</span><span class="operator">-&gt;</span><span class="variable">new_from_fd</span><span class="operator">(</span> <span class="operator">\</span><span class="variable">*STDOUT</span><span class="operator">,</span> <span class="string">"w"</span> <span class="operator">);</span>
+</pre>
+</dd>
+</dl>
+<p>
+<a href="#__index__"><small>Back to Top</small></a>
+</p>
+<hr />
+<h1><a name="methods">METHODS</a></h1>
+<dl>
+<dt><strong><a name="fdopen" class="item">fdopen( <em>fd</em> : Num|FileHandle|OpenHandle, <em>mode</em> : CanonOpenModeStr = &quot;&lt;&quot; ) : Self</a></strong></dt>
+
+<dd>
+<p>Opens the previously created file handle.  If the file was already opened, it
+is closed automatically and reopened without resetting its line counter.  The
+method also sets the <code>file</code> and <code>mode</code> attributes.</p>
+<pre>
+  <span class="variable">$out</span> <span class="operator">=</span> <span class="variable">IO::Moose::Handle</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">;</span>
+  <span class="variable">$out</span><span class="operator">-&gt;</span><span class="variable">fdopen</span><span class="operator">(</span> <span class="operator">\</span><span class="variable">*STDOUT</span><span class="operator">,</span> <span class="string">"w"</span> <span class="operator">);</span>
+</pre>
+<pre>
+  <span class="variable">$dup</span> <span class="operator">=</span> <span class="variable">IO::Moose::Handle</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">;</span>
+  <span class="variable">$dup</span><span class="operator">-&gt;</span><span class="variable">fdopen</span><span class="operator">(</span> <span class="variable">$dup</span><span class="operator">,</span> <span class="string">"a"</span> <span class="operator">);</span>
+</pre>
+<pre>
+  <span class="variable">$stdin</span> <span class="operator">=</span> <span class="variable">IO::Moose::Handle</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">;</span>
+  <span class="variable">$stdin</span><span class="operator">-&gt;</span><span class="variable">fdopen</span><span class="operator">(</span> <span class="number">0</span><span class="operator">,</span> <span class="string">"r"</span><span class="operator">);</span>
+</pre>
+</dd>
+<dt><strong><a name="close" class="item">close(<em></em>) : Self</a></strong></dt>
+
+<dd>
+<p>Closes the opened file handle.  The <code>file</code> and <code>mode</code> attributes are cleared
+after closing.</p>
+</dd>
+<dt><strong><a name="eof" class="item">eof(<em></em>) : Bool</a></strong></dt>
+
+<dt><strong><a name="fileno" class="item">fileno(<em></em>) : Int</a></strong></dt>
+
+<dt><strong><a name="opened" class="item">opened(<em></em>) : Bool</a></strong></dt>
+
+<dt><strong><a name="print" class="item">print( <em>args</em> : Array ) : Self</a></strong></dt>
+
+<dt><strong><a name="printf" class="item">printf( <em>fmt</em> : Str = &quot;&quot;, <em>args</em> : Array = (<em></em>) ) : Self</a></strong></dt>
+
+<dt><strong><a name="sysread" class="item">sysread( out <em>buf</em>, <em>len</em> : Int, <em>offset</em> : Int = 0 ) : Int</a></strong></dt>
+
+<dt><strong><a name="syswrite" class="item">syswrite( <em>buf</em> : Str, <em>len</em> : Int, <em>offset</em> : Int = 0 ) : Int</a></strong></dt>
+
+<dt><strong><a name="getc" class="item">getc(<em></em>) : Char</a></strong></dt>
+
+<dt><strong><a name="read" class="item">read( out <em>buf</em>, <em>len</em> : Int, <em>offset</em> : Int = 0 ) : Int</a></strong></dt>
+
+<dt><strong><a name="truncate" class="item">truncate( <em>len</em> : Int ) : Self</a></strong></dt>
+
+<dd>
+<p>These are front ends for corresponding built-in functions.  Most of them
+throws exception on failure which can be caught with try/catch:</p>
+<pre>
+  <span class="keyword">use</span> <span class="variable">Exception::Base</span><span class="operator">;</span>
+  <span class="keyword">eval</span> <span class="operator">{</span>
+    <span class="keyword">open</span> <span class="variable">$f</span><span class="operator">,</span> <span class="string">"/etc/hostname"</span><span class="operator">;</span>
+    <span class="variable">$io</span> <span class="operator">=</span> <span class="variable">IO::Moose::Handle</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span> <span class="string">file</span> <span class="operator">=&gt;</span> <span class="variable">$f</span><span class="operator">,</span> <span class="string">mode</span> <span class="operator">=&gt;</span> <span class="string">"r"</span> <span class="operator">);</span>
+    <span class="variable">$c</span> <span class="operator">=</span> <span class="variable">$io</span><span class="operator">-&gt;</span><span class="variable">getc</span><span class="operator">;</span>
+  <span class="operator">};</span>
+  <span class="keyword">if</span> <span class="operator">(</span><span class="variable">$@</span><span class="operator">)</span> <span class="operator">{</span>
+    <span class="keyword">my</span> <span class="variable">$e</span> <span class="operator">=</span> <span class="variable">Exception::Base</span><span class="operator">-&gt;</span><span class="variable">catch</span><span class="operator">)</span> <span class="operator">{</span>
+    <span class="keyword">warn</span> <span class="string">"problem with /etc/hostname file: </span><span class="variable">$e</span><span class="string">"</span><span class="operator">;</span>
+  <span class="operator">};</span>
+</pre>
+<p>The <a href="#fdopen"><code>fdopen</code></a>, <a href="#close"><code>close</code></a>, <a href="#print"><code>print</code></a>, <a href="#printf"><code>printf</code></a> and <a href="#truncate"><code>truncate</code></a> methods returns
+this object.</p>
+</dd>
+<dt><strong><a name="write" class="item">write( <em>buf</em> : Str, <em>len</em> : Int, <em>offset</em> : Int = 0 ) : Int</a></strong></dt>
+
+<dd>
+<p>The opposite of <strong>read</strong>. The wrapper for the perl <em>perlfunc/write</em> function is called
+<a href="#format_write"><code>format_write</code></a>.</p>
+</dd>
+<dt><strong><a name="format_write" class="item">format_write( <em>format_name</em> : Str ) : Self</a></strong></dt>
+
+<dd>
+<p>The wrapper for perl <em>perlfunc/format</em> function.</p>
+</dd>
+<dt><strong><a name="readline" class="item">readline(<em></em>) : Maybe[Str|Array]</a></strong></dt>
+
+<dt><strong><a name="getline" class="item">getline(<em></em>) : Str</a></strong></dt>
+
+<dd>
+<p>The <a href="#readline"><code>readline</code></a> method which is called always in scalar context.</p>
+<pre>
+  <span class="variable">$io</span> <span class="operator">=</span> <span class="variable">IO::Moose::Handle</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span> <span class="string">file</span><span class="operator">=&gt;\</span><span class="variable">*STDIN</span><span class="operator">,</span> <span class="string">mode</span><span class="operator">=&gt;</span><span class="string">"r"</span> <span class="operator">);</span>
+  <span class="keyword">push</span> <span class="variable">@a</span><span class="operator">,</span> <span class="variable">$io</span><span class="operator">-&gt;</span><span class="variable">getline</span><span class="operator">;</span>  <span class="comment"># reads only one line</span>
+</pre>
+</dd>
+<dt><strong><a name="getlines" class="item">getlines(<em></em>) : Array</a></strong></dt>
+
+<dd>
+<p>The <a href="#readline"><code>readline</code></a> method which is called always in array context.</p>
+<pre>
+  <span class="variable">$io</span> <span class="operator">=</span> <span class="variable">IO::Moose::Handle</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span> <span class="string">file</span> <span class="operator">=&gt;</span> <span class="operator">\</span><span class="variable">*STDIN</span><span class="operator">,</span> <span class="string">mode</span> <span class="operator">=&gt;</span> <span class="string">"r"</span> <span class="operator">);</span>
+  <span class="keyword">print</span> <span class="keyword">scalar</span> <span class="variable">$io</span><span class="operator">-&gt;</span><span class="variable">getlines</span><span class="operator">;</span>  <span class="comment"># error: can't call in scalar context.</span>
+</pre>
+</dd>
+<dt><strong><a name="ungetc" class="item">ungetc( <em>ord</em> : Int ) : Self</a></strong></dt>
+
+<dd>
+<p>Pushes a character with the given ordinal value back onto the given handle's
+input stream.</p>
+<pre>
+  <span class="variable">$io</span> <span class="operator">=</span> <span class="variable">IO::Moose::Handle</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span> <span class="string">file</span> <span class="operator">=&gt;</span> <span class="operator">\</span><span class="variable">*STDIN</span><span class="operator">,</span> <span class="string">mode</span> <span class="operator">=&gt;</span> <span class="string">"r"</span> <span class="operator">);</span>
+  <span class="variable">$io</span><span class="operator">-&gt;</span><span class="variable">ungetc</span><span class="operator">(</span><span class="keyword">ord</span><span class="operator">(</span><span class="string">'A'</span><span class="operator">));</span>
+  <span class="keyword">print</span> <span class="variable">$io</span><span class="operator">-&gt;</span><span class="variable">getc</span><span class="operator">;</span>  <span class="comment"># prints A</span>
+</pre>
+</dd>
+<dt><strong><a name="say" class="item">say( <em>args</em> : Array ) : Self</a></strong></dt>
+
+<dd>
+<p>The <a href="#print"><code>print</code></a> method with EOL character at the end.</p>
+<pre>
+  <span class="variable">$io</span> <span class="operator">=</span> <span class="variable">IO::Moose::Handle</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span> <span class="string">file</span> <span class="operator">=&gt;</span> <span class="operator">\</span><span class="variable">*STDOUT</span><span class="operator">,</span> <span class="string">mode</span> <span class="operator">=&gt;</span> <span class="string">"w"</span> <span class="operator">);</span>
+  <span class="variable">$io</span><span class="operator">-&gt;</span><span class="variable">say</span><span class="operator">(</span><span class="string">"Hello!"</span><span class="operator">);</span>
+</pre>
+</dd>
+<dt><strong><a name="slurp" class="item">IO::Moose::Handle-&gt;slurp( <em>file</em> : Num|FileHandle|OpenHandle, <em>args</em> : Hash ) : Str|Array</a></strong></dt>
+
+<dd>
+<p>Creates the <code>IO::Moose::Handle</code> object and returns its content as a scalar in
+scalar context or as an array in array context.</p>
+<pre>
+  <span class="keyword">open</span> <span class="variable">$f</span><span class="operator">,</span> <span class="string">"/etc/passwd"</span><span class="operator">;</span>
+  <span class="variable">$passwd_file</span> <span class="operator">=</span> <span class="variable">IO::Moose::Handle</span><span class="operator">-&gt;</span><span class="variable">slurp</span><span class="operator">(</span><span class="variable">$f</span><span class="operator">);</span>
+</pre>
+<p>Additional <em>args</em> are passed to <code>IO::Moose::Handle</code> constructor.</p>
+</dd>
+<dt><strong>slurp(<em></em>) : Str|Array</strong></dt>
+
+<dd>
+<p>Reads whole file and returns its content as a scalar in scalar context or as
+an array in array context (like <a href="#getlines"><code>getlines</code></a> method).</p>
+<pre>
+  <span class="keyword">open</span> <span class="variable">$f</span><span class="operator">,</span> <span class="string">"/etc/passwd"</span><span class="operator">;</span>
+</pre>
+<pre>
+  <span class="variable">$io1</span> <span class="operator">=</span> <span class="variable">IO::Moose::Handle</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span> <span class="string">file</span> <span class="operator">=&gt;</span> <span class="variable">$f</span><span class="operator">,</span> <span class="string">mode</span> <span class="operator">=&gt;</span> <span class="string">"r"</span> <span class="operator">);</span>
+  <span class="variable">$passwd_file</span> <span class="operator">=</span> <span class="variable">$io1</span><span class="operator">-&gt;</span><span class="variable">slurp</span><span class="operator">;</span>
+</pre>
+<pre>
+  <span class="variable">$io2</span> <span class="operator">=</span> <span class="variable">IO::Moose::Handle</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span> <span class="string">file</span> <span class="operator">=&gt;</span> <span class="variable">$f</span><span class="operator">,</span> <span class="string">mode</span> <span class="operator">=&gt;</span> <span class="string">"r"</span> <span class="operator">);</span>
+  <span class="variable">$io2</span><span class="operator">-&gt;</span><span class="variable">autochomp</span><span class="operator">(</span><span class="number">1</span><span class="operator">);</span>
+  <span class="variable">@passwd_lines</span> <span class="operator">=</span> <span class="variable">$io2</span><span class="operator">-&gt;</span><span class="variable">slurp</span><span class="operator">;</span>
+</pre>
+</dd>
+<dt><strong><a name="stat" class="item">stat(<em></em>) : File::Stat::Moose</a></strong></dt>
+
+<dd>
+<p>Returns <code>File::Stat::Moose</code> object which represents status of file pointed by
+current file handle.</p>
+<pre>
+  <span class="keyword">open</span> <span class="variable">$f</span><span class="operator">,</span> <span class="string">"/etc/passwd"</span><span class="operator">;</span>
+  <span class="variable">$io</span> <span class="operator">=</span> <span class="variable">IO::Moose::Handle</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span> <span class="string">file</span> <span class="operator">=&gt;</span> <span class="variable">$f</span><span class="operator">,</span> <span class="string">mode</span> <span class="operator">=&gt;</span> <span class="string">"r"</span> <span class="operator">);</span>
+  <span class="variable">$st</span> <span class="operator">=</span> <span class="variable">$io</span><span class="operator">-&gt;</span><span class="variable">stat</span><span class="operator">;</span>
+  <span class="keyword">print</span> <span class="variable">$st</span><span class="operator">-&gt;</span><span class="variable">size</span><span class="operator">;</span>  <span class="comment"># size of /etc/passwd file</span>
+</pre>
+</dd>
+<dt><strong><a name="error" class="item">error(<em></em>) : Bool</a></strong></dt>
+
+<dd>
+<p>Returns true value if the file handle has experienced any errors since it was
+opened or since the last call to <a href="#clearerr"><code>clearerr</code></a>, or if the handle is invalid.</p>
+<p>It is recommended to use exceptions mechanism to handle errors.</p>
+</dd>
+<dt><strong><a name="clearerr" class="item">clearerr(<em></em>) : Bool</a></strong></dt>
+
+<dd>
+<p>Clear the given handle's error indicator.  Returns true value if the file
+handle is valid or false value otherwise.</p>
+</dd>
+<dt><strong><a name="sync" class="item">sync(<em></em>) : Self</a></strong></dt>
+
+<dd>
+<p>Synchronizes a file's in-memory state with that on the physical medium.  It
+operates on file descriptor and it is low-level operation.  Returns this
+object on success or throws an exception.</p>
+</dd>
+<dt><strong><a name="flush" class="item">flush(<em></em>) : Self</a></strong></dt>
+
+<dd>
+<p>Flushes any buffered data at the perlio API level.  Returns self object on
+success or throws an exception.</p>
+</dd>
+<dt><strong><a name="printflush" class="item">printflush( <em>args</em> : Array ) : Self</a></strong></dt>
+
+<dd>
+<p>Turns on autoflush, print <em>args</em> and then restores the autoflush status.
+Returns self object on success or throws an exception.</p>
+</dd>
+<dt><strong><a name="blocking" class="item">blocking(<em></em>) : Bool</a></strong></dt>
+
+<dt><strong>blocking( <em>bool</em> : Bool ) : Bool</strong></dt>
+
+<dd>
+<p>If called with an argument blocking will turn on non-blocking IO if <em>bool</em> is
+false, and turn it off if <em>bool</em> is true.  <a href="#blocking"><code>blocking</code></a> will return the value
+of the previous setting, or the current setting if <em>bool</em> is not given.</p>
+</dd>
+<dt><strong><a name="untaint" class="item">untaint(<em></em>) : Self {rw}</a></strong></dt>
+
+<dd>
+<p>Marks the object as taint-clean, and as such data read from it will also be
+considered taint-clean.  It has meaning only if Perl is running in tainted
+mode (<code>-T</code>).</p>
+</dd>
+<dt><strong><a name="format_lines_left" class="item">format_lines_left(<em></em>) : Str {var=&quot;$-&quot;}</a></strong></dt>
+
+<dt><strong>format_lines_left( <em>value</em> : Str ) : Str {var=&quot;$-&quot;}</strong></dt>
+
+<dt><strong><a name="format_lines_per_page" class="item">format_lines_per_page(<em></em>) : Str {var=&quot;$=&quot;}</a></strong></dt>
+
+<dt><strong>format_lines_per_page( <em>value</em> : Str ) : Str {var=&quot;$=&quot;}</strong></dt>
+
+<dt><strong><a name="format_page_number" class="item">format_page_number(<em></em>) : Str {var=&quot;$%&quot;}</a></strong></dt>
+
+<dt><strong>format_page_number( <em>value</em> : Str ) : Str {var=&quot;$%&quot;}</strong></dt>
+
+<dt><strong><a name="input_line_number" class="item">input_line_number(<em></em>) : Str {var=&quot;$.&quot;}</a></strong></dt>
+
+<dt><strong>input_line_number( <em>value</em> : Str ) : Str {var=&quot;$.&quot;}</strong></dt>
+
+<dt><strong><a name="output_autoflush" class="item">output_autoflush(<em></em>) : Str {var=&quot;$|&quot;}</a></strong></dt>
+
+<dt><strong>output_autoflush( <em>value</em> : Str ) : Str {var=&quot;$|&quot;}</strong></dt>
+
+<dt><strong><a name="autoflush" class="item">autoflush(<em></em>) : Str {var=&quot;$|&quot;}</a></strong></dt>
+
+<dt><strong>autoflush( <em>value</em> : Str ) : Str {var=&quot;$|&quot;}</strong></dt>
+
+<dt><strong><a name="format_name" class="item">format_name(<em></em>) : Str {var=&quot;$~&quot;}</a></strong></dt>
+
+<dt><strong>format_name( <em>value</em> : Str ) : Str {var=&quot;$~&quot;}</strong></dt>
+
+<dt><strong><a name="format_top_name" class="item">format_top_name(<em></em>) : Str {var=&quot;$^&quot;}</a></strong></dt>
+
+<dt><strong>format_top_name( <em>value</em> : Str ) : Str {var=&quot;$^&quot;}</strong></dt>
+
+<dd>
+<p>These are accessors assigned with Perl's built-in variables. See <em>perlvar</em>
+for complete descriptions.</p>
+</dd>
+</dl>
+<p>
+<a href="#__index__"><small>Back to Top</small></a>
+</p>
+<hr />
+<h1><a name="debugging">DEBUGGING</a></h1>
+<p>The debugging mode can be enabled if <code>PERL_DEBUG_IO_MOOSE_HANDLE</code> environment
+variable is set to true value.  The debugging mode requires <a href="../../../../site/Smart/Comments.html">the Smart::Comments manpage</a>
+module.</p>
+<p>The run-time assertions can be enabled with <a href="../../../../site/Test/Assert.html">the Test::Assert manpage</a> module.</p>
+<p>
+<a href="#__index__"><small>Back to Top</small></a>
+</p>
+<hr />
+<h1><a name="internals">INTERNALS</a></h1>
+<p>This module uses <a href="../../../../site/MooseX/GlobRef/Object.html">the MooseX::GlobRef::Object manpage</a> and stores the object's attributes
+in glob reference.  They can be accessed with <code>*$self-&gt;{attr}</code>
+expression or with standard accessors <code>$self-&gt;attr</code>.</p>
+<p>There are two handles used for IO operations: the original handle used for
+real IO operations and tied handle which hooks IO functions interface.</p>
+<p>The OO-style uses original handle stored in <em>fh</em> field.</p>
+<pre>
+  <span class="comment"># Usage:</span>
+  <span class="variable">$io</span><span class="operator">-&gt;</span><span class="variable">print</span><span class="operator">(</span><span class="string">"OO style"</span><span class="operator">);</span>
+</pre>
+<pre>
+  <span class="comment"># Implementation:</span>
+  <span class="keyword">package</span> <span class="variable">IO::Moose::Handle</span><span class="operator">;</span>
+  <span class="keyword">sub</span><span class="variable"> print </span><span class="operator">{</span>
+      <span class="keyword">my</span> <span class="variable">$self</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+      <span class="variable">CORE::print</span> <span class="operator">{</span> <span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">fh</span> <span class="operator">}</span> <span class="variable">@_</span>
+  <span class="operator">}</span>
+</pre>
+<p>The IO functions-style uses object reference which is dereferenced as a
+handle tied to proxy object which operates on original handle.</p>
+<pre>
+  <span class="comment"># Usage:</span>
+  <span class="keyword">print</span> <span class="variable">$io</span> <span class="string">"IO functions style"</span><span class="operator">;</span>
+</pre>
+<pre>
+  <span class="comment"># Implementation:</span>
+  <span class="keyword">package</span> <span class="variable">IO::Moose::Handle</span><span class="operator">;</span>
+  <span class="keyword">sub</span><span class="variable"> PRINT </span><span class="operator">{</span> <span class="keyword">shift</span><span class="operator">()-&gt;</span><span class="variable">print</span><span class="operator">(</span><span class="variable">@_</span><span class="operator">)</span> <span class="operator">};</span>
+  <span class="keyword">sub</span><span class="variable"> print </span><span class="operator">{</span>
+      <span class="keyword">my</span> <span class="variable">$self</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+      <span class="variable">CORE::print</span> <span class="operator">{</span> <span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">fh</span> <span class="operator">}</span> <span class="variable">@_</span>
+  <span class="operator">}</span>
+</pre>
+<p>
+<a href="#__index__"><small>Back to Top</small></a>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p><a href="../../../../site/IO/Handle.html">the IO::Handle manpage</a>, <a href="../../../../site/MooseX/GlobRef/Object.html">the MooseX::GlobRef::Object manpage</a>, <a href="../../../../site/lib/IO/Moose.html">the Moose manpage</a>.</p>
+<p>
+<a href="#__index__"><small>Back to Top</small></a>
+</p>
+<hr />
+<h1><a name="bugs">BUGS</a></h1>
+<p>The API is not stable yet and can be changed in future.</p>
+<p>
+<a href="#__index__"><small>Back to Top</small></a>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Piotr Roszatycki &lt;<a href="mailto:dexter@cpan.org">dexter@cpan.org</a>&gt;</p>
+<p>
+<a href="#__index__"><small>Back to Top</small></a>
+</p>
+<hr />
+<h1><a name="license">LICENSE</a></h1>
+<p>Copyright 2007, 2008, 2009 by Piotr Roszatycki &lt;<a href="mailto:dexter@cpan.org">dexter@cpan.org</a>&gt;.</p>
+<p>This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.</p>
+<p>See <a href="http://www.perl.com/perl/misc/Artistic.html">http://www.perl.com/perl/misc/Artistic.html</a></p>
+<p><a href="#__index__"><small>Back to Top</small></a></p>
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="block" valign="middle">
+<big><strong><span class="block">&nbsp;IO::Moose::Handle - Reimplementation of IO::Handle with improvements</span></strong></big>
+</td></tr>
+</table>
+
+</body>
+
+</html>

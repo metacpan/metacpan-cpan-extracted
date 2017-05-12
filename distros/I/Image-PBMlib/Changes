@@ -1,0 +1,11 @@
+
+March 2012
+2.0 is a nearly complete rewrite fixing the bugs that arose from
+not taking the max value into account. Only the code to read an
+image header is taken from 1.x. None of the function names are the
+same and most of the interface has changed.
+
+Feb 2003
+1.05 fixes two comment related bugs (thanks Ladislav Sladecek!) and
+some error reporting bugs with bad filehandles.
+

@@ -1,0 +1,14 @@
+Changes
+Makefile.PL
+MANIFEST
+RasterCaption.pm
+README
+t/caption.jpg
+t/has_caption.jpg
+t/new_caption.jpg
+t/sample.jpg
+t/view_caption.jpg
+t/add.t
+t/view.t
+t/load.t
+t/text.t

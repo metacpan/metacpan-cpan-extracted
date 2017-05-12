@@ -1,0 +1,25 @@
+---
+abstract: 'Convert ANSI color codes to IRC'
+author:
+  - 'Andrew Rodland <arodland@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: IRC-FromANSI-Tiny
+requires:
+  Parse::ANSIColor::Tiny: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=IRC-FromANSI-Tiny
+  homepage: http://metacpan.org/release/IRC-FromANSI-Tiny
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/arodland/IRC-FromANSI-Tiny.git
+version: '0.02'
+x_authority: cpan:ARODLAND

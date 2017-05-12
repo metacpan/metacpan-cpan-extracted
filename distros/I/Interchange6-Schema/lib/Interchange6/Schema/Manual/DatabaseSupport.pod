@@ -1,0 +1,70 @@
+=head1 NAME
+
+Interchange6::Schema::Manual::DatabaseSupport - Details of database engine support for Interchange6
+
+=head1 MySQL
+
+MySQL databases should be created with UTF8 encoding and appropriate collation for your local, for example:
+
+    CREATE DATABASE my_shop_db
+        DEFAULT CHARACTER SET utf8
+        DEFAULT COLLATE utf8_general_ci;
+
+The following L<Connection attributes|DBIx::Class::Storage::DBI/DBIx::Class specific connection attributes> are recommended as a minimum for MySQL:
+
+    mysql_enable_utf8 => 1,
+    on_connect_call   => 'set_strict_mode',
+    quote_names       => 1,
+
+YAML-formatted configuration example for L<Dancer::Plugin::DBIC>:
+
+  DBIC:
+    default:
+      dsn: "dbi:mysql:database=mydb;mysql_socket=/tmp/mysql.sock"
+      user: myuser
+      password: mypassword
+      schema_class: Interchange6::Schema
+      options:
+        mysql_enable_utf8: 1
+        on_connect_call: set_strict_mode
+        quote_names: 1
+
+=head1 PostgreSQL
+
+PostgreSQL databases should be created with UT8 encoding, for example:
+
+    createdb -E UTF8 my_shop_db
+
+The following L<Connection attributes|DBIx::Class::Storage::DBI/DBIx::Class specific connection attributes> are recommended as a minimum for PostgreSQL:
+
+    on_connect_do  => 'SET client_min_messages=WARNING;',
+    quote_names    => 1,
+
+YAML-formatted configuration example for L<Dancer::Plugin::DBIC>:
+
+  DBIC:
+    default:
+      dsn: dbi:Pg:dbname=mydb
+      user: myuser
+      password: mypassword
+      schema_class: Interchange6::Schema
+      options:
+        on_connect_do: 'SET client_min_messages=WARNING;'
+        pg_enable_utf8: 1
+        quote_names: 1
+
+=head1 SQLite
+
+Although we support SQLite in as much that all tests are run against it we do not recommend its use in a production environment.
+
+The following L<Connection attributes|DBIx::Class::Storage::DBI/DBIx::Class specific connection attributes> are recommended as a minimum for SQLite:
+
+    on_connect_call => 'use_foreign_keys',
+    sqlite_unicode  => 1,
+    quote_names     => 1,
+
+In addition the following attribute can be useful for test use only for greatly improved performance:
+
+    on_connect_do   => 'PRAGMA synchronous = OFF',
+
+=cut

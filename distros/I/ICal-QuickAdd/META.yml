@@ -1,0 +1,26 @@
+---
+abstract: 'Quickly Add Events to ICal with natural language'
+author:
+  - 'Mark Stosberg <mark@summersault.com>'
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3601'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: ICal-QuickAdd
+provides:
+  ICal::QuickAdd:
+    file: lib/ICal/QuickAdd.pm
+    version: 1.00
+requires:
+  Data::ICal: 0
+  DateTime::Format::ICal: 0
+  DateTime::Format::Natural: 0
+  Email::Date: 0
+  Mail::Audit: 0
+  Test::More: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.00

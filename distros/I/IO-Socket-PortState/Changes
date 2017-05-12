@@ -1,0 +1,11 @@
+Revision history for Perl extension IO::Socket::PortState.
+
+0.03  Fri Aug 26 18:35:00 2005    
+        - fixed issue with VERSION() that conflicted with UNIVERSAL's VERSION functionality
+
+0.02  Fri Jul  8 10:43:03 2005
+        - added documentation for expanding the module
+
+0.01  Fri Jul  1 19:47:20 2005
+	- original version; created by h2xs 1.22 with options
+		-AXc -n IO::Socket::PortState

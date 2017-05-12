@@ -1,0 +1,35 @@
+---
+abstract: 'Emulate file interface for a code reference'
+author:
+  - 'Dave Taylor <dave.taylor.cpan@gmail.com>'
+build_requires:
+  Fatal: 0
+  Fcntl: 0
+  File::Slurp: 0
+  File::Temp: 0
+  IO::Handle: 0
+  Module::Build: 0
+  Test::Exception: 0
+  Test::More: 0
+  Test::NoWarnings: 0
+configure_requires:
+  Module::Build: 0.40
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4008, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: IO-Callback
+provides:
+  IO::Callback:
+    file: lib/IO/Callback.pm
+    version: 1.12
+requires:
+  Carp: 0
+  Errno: 0
+  IO::String: 0
+  perl: 5.006
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.12

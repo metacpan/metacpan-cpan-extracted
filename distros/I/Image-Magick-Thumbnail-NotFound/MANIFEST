@@ -1,0 +1,7 @@
+Makefile.PL                              See README
+MANIFEST											  This file
+README							
+lib/Image/Magick/Thumbnail/NotFound.pm   Module
+META.yml                                 Module meta-data (added by MakeMaker)
+cgi-bin/error.cgi								  Example error.cgi script
+public_html/.thumbnails/.htaccess	     Sample .htaccess code that calls error.cgi on 404 error

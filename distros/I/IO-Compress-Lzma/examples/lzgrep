@@ -1,0 +1,25 @@
+#!/usr/bin/perl
+
+use strict ;
+use warnings ;
+use IO::Uncompress::UnLzma qw($UnLzmaError);
+
+die "Usage: gzgrep pattern [file...]\n"
+    unless @ARGV >= 1;
+
+my $pattern = shift ;
+my $file ;
+
+@ARGV = '-' unless @ARGV ;
+
+foreach $file (@ARGV) {
+    my $gz = new IO::Uncompress::UnLzma $file 
+         or die "Cannot uncompress $file: $UnLzmaError\n" ;
+
+     while (<$gz>) {
+        print if /$pattern/ ;
+     }
+
+     die "Error reading from $file: $UnLzmaError\n" 
+        if $UnLzmaError ;
+}

@@ -1,0 +1,32 @@
+Image/WMF version 1.01
+======================
+
+The IMAGE::WMF module provides a means of generating Windows
+metafile images on non-windows platforms.
+
+It emulates the binary data structures produced by the Windows
+GDI API and packs them into a binary image file.
+
+As far as possible the GD-style API is re-created and code used to
+generate png images using the GD module should run with very little
+change to produce WMFs.
+
+Note that WMF if a vector image, not a bitmap, so image scaling
+is possible in rendering applications.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+ none
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2012 A.V.Cox <avc@sanger.ac.uk>

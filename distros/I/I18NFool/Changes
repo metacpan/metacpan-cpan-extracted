@@ -1,0 +1,22 @@
+Revision history for I18NFool.
+
+0.31 Thu Oct 07 11:24:00 2004
+    - Added warnings when keys with non-identical attributes are clobbered
+
+0.3 Wed Oct 06 12:58:00 2004
+    - Fixed documentation s/i18n-update/i18nfool-update/
+                          s/i18n-build/i18nfool-build/
+    - Removed Jean-Michel's email address since it no longer 
+      exists
+    - msgmerge doesn't use fuzzy matching
+    - msginit sets locale to UTF-8
+    - string canonicalization now strips new-lines
+
+0.2 Wed Jul 28 11:10:20 2004
+    - Fixed i18nfool-extract attributes parsing
+    - Fixed i18nfool-extract producing corrupted po files
+    - Fixed i18nfool-extract dying on non-well formed XML
+    - Fixed i18nfool-extract ignoring first file to extract
+
+0.1
+    - Initial release 

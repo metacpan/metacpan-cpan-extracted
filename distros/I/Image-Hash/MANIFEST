@@ -1,0 +1,14 @@
+MANIFEST
+README
+LICENSE
+Todo
+Changes
+Makefile.PL
+lib/Image/Hash.pm
+t/001_load.t
+t/002_lengths.t
+eg/print-hashes-for-files.pl
+eg/print-reduced-image.pl
+eg/synopsis.pl
+eg/images/FishEyeViewofAtlantis.jpg
+META.yml                                 Module meta-data (added by MakeMaker)

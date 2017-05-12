@@ -1,0 +1,69 @@
+Revision history for IO-Iron
+
+0.12      2017-03-28 16:37:22+02:00 Europe/Stockholm
+   Conversion to IronMQ v3 done.
+
+0.12_02
+   Add method for API function /stacks in IronWorker.
+   Start conversion to IronMQ v3.
+
+0.11_01   2016-01-18 11:17:02+01:00 Europe/Stockholm (TRIAL RELEASE)
+   Remove the config item Host Path Prefix, use instead API Version.
+   Set Defaults to all clients: DEFAULT_API_VERSION, DEFAULT_HOST.
+
+0.11      2014-09-22 03:28:07+03:00 Europe/Helsinki
+   Removed release tests from t/.
+
+0.10      2014-08-26 03:04:14+03:00 Europe/Helsinki
+   Added a new feature: Policies.
+   Released together with package IO-Iron-Application.
+
+0.09      2014-04-19 09:52:47+03:00 Europe/Helsinki
+	Renamed integ_t/common.pm to avoid naming conflict.
+
+0.08      2014-04-19 08:26:10+03:00 Europe/Helsinki
+	Added support methods for alerts.
+	Added support methods for push queues.
+	Adopted Params::Validate to IronMQ libraries.
+
+0.07_03   2014-03-20 20:28:22+02:00 Europe/Helsinki
+	Changed dependency from Perl 5.8.0 to Perl 5.10.0 because Hash::Util v0.06 comes with Perl 5.8.9. We need Hash::Util v0.06 for features 'lock_keys_plus' and 'legal_keys'.
+
+0.07_01   2014-03-19 11:52:29+02:00 Europe/Helsinki
+	Interim developer version. Distro converted to Dist::Zilla.
+
+0.07    2014-Mar-05
+        Fixed an autodefer bug.
+
+0.06    2014-Feb-23
+        IronCache API changed to use named parameters.
+
+0.05    2013-Dec-04
+        IronWorker API changed to use named parameters.
+
+0.04    2013-Dec-04
+        Complete IronWorker
+
+0.03    2013-Dec-04
+        Fixed some parts of documentation.
+
+0.02    2013-Dec-01
+        First public release.
+        IronWorker code package handling added. Other IronWorker stuff still missing.
+
+0.01_04 2013-Oct-20
+        Developer release. Working IronMQ Client.
+        Logging rethought.
+                Api classes have logging format.
+                All activities using IO::Iron::Connection (actually making a REST operation to Iron services) will be logged.
+                Removed logging from Client classes.
+
+0.01_03 2013-Aug-16
+        Developer release. Working IronMQ Client.
+
+0.01_02 2013-Aug-16
+        Developer release. Working IronMQ Client.
+
+0.01_01 2013-Aug-16
+        Developer release. Working IronMQ Client.
+

@@ -1,0 +1,44 @@
+INSTALL
+
+# the usual
+% perl Makefile.PL
+% make
+% make test
+% make install
+
+
+DESCRIPTION
+
+C<Inline::WebChat> is a module for letting you embed WebChat scripts in your Perl scripts.
+
+Why would you wnat to do this? Well, Gisle Aas' WebChat is an Expect type langauage that
+fetches and manipulates web pages and their forms. For example you can do stuff like
+
+        GET http://www.perl.com
+           EXPECT OK && /perl/ 
+           GET not_there.html  
+              EXPECT ERROR    
+           BACK
+        BACK   
+        
+... and ...
+
+        GET http://www.altavista.com
+                EXPECT OK
+                F q=Gisle
+                CLICK
+                EXPECT OK && /Gisle Aas/
+                
+Which is obviously a lot easier than hand rolling your own code with C<LWP> and C<HTML::Forms> ...
+... which is exactly what webchat does - take your WebChat script and convert it to pure Perl. Wh$why you can mix and match Perl and WebChat. Handy huh?
+
+
+
+
+COPYRIGHT
+
+Copyright (c) 2001. Simon Wistow <simon@thegestalt.org>. All rights reserved.
+
+This program is free software; you can redistribute it and/or modify it under the same terms as P$           
+See http://www.perl.com/perl/misc/Artistic.html
+

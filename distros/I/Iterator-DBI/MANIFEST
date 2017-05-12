@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+DBI.pm
+Iterator-DBI.ppd
+Iterator-DBI-ppm.tar.gz
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,164 @@
+#!/usr/bin/perl -w
+# See copyright, etc in below POD section.
+######################################################################
+
+require 5.004;
+use lib './blib/lib';	# testing
+use Getopt::Long;
+use Pod::Usage;
+use IPC::Locker::Server;
+use strict;
+
+BEGIN { $ENV{PATH} = '/usr/ucb:/bin' }	# Secure path
+
+######################################################################
+# configuration
+
+######################################################################
+# globals
+
+use vars qw($Pid);
+
+######################################################################
+# main
+
+my $Debug = 0;
+my %server_params = ();
+my $opt_fork = 1;
+
+if (!GetOptions (
+		 "help"		=> \&usage,
+		 "debug"	=> \&debug,
+		 "version"	=> \&version,
+		 "host=s"	=> sub {$server_params{host} = $_[1];},
+		 "port=i"	=> sub {$server_params{port} = $_[1];},
+		 "path=s"	=> sub {$server_params{port} = $_[1];
+					$server_params{family}='UNIX';},
+		 "fork!"	=> \$opt_fork,
+		 )) {
+    die "%Error: Bad usage, try 'lockerd --help'\n";
+}
+
+# Must be after we've done --help
+$0 = 'lockerd';   # So ps and pidof can find this daemon
+
+# Loop in case something kills us
+$SIG{HUP}  = \&sig_HUP;
+$SIG{CHLD} = \&sig_HUP;
+while (1) {
+    print "Starting server\n" if $Debug;
+    $Pid = fork if $opt_fork;
+    unless ($Pid) {
+        IPC::Locker::Server->new(%server_params)->start_server ();
+	exit(0);
+    }
+    waitpid($Pid,0) if $Pid;
+    warn "%Warning: Server aborted, status=$?\n" if $Debug;
+    sleep(1);
+    kill 9, $Pid if $Pid;
+    $Pid = 0;
+    sleep(1);
+}
+
+exit (0);
+
+sub sig_HUP {
+    kill 9, $Pid if $Pid;
+    $Pid = 0;
+}
+
+######################################################################
+
+sub usage {
+    pod2usage(-verbose=>2, -exitval=>2, -output=>\*STDOUT, -noperldoc=>1);
+    exit(1);
+}
+
+sub version {
+    print "Version: $IPC::Locker::VERSION\n";
+    exit (1);
+}
+
+sub debug {
+    $Debug = 1;
+    $IPC::Locker::Server::Debug = 1;
+    $IPC::PidStat::Debug = 1;
+}
+
+######################################################################
+__END__
+
+=pod
+
+=head1 NAME
+
+lockerd - Distributed lock handler for Perl IPC::Locker
+
+=head1 SYNOPSIS
+
+B<lockerd>
+[ B<--help> ]
+[ B<--port=>I<port> ]
+[ B<--host=>I<host> ]
+[ B<--path=>I<fifo_path> ]
+[ B<--version> ]
+
+=head1 DESCRIPTION
+
+Lockerd will start a daemon to watch for and service connects by the Perl
+IPC::Locker package.
+
+=head1 ARGUMENTS
+
+=over 4
+
+=item --help
+
+Displays this message and program version and exits.
+
+=item --nofork
+
+Keep the daemon in the foreground for debugging.
+
+=item --host
+
+Specifies the IP address to be used for the daemon. Defaults to localhost.
+
+=item --port
+
+Specifies the port number to be used for the daemon.
+
+=item --path
+
+Specifies that UNIX FIFO will be used for communications with clients and
+the path to the FIFO.
+
+=item --version
+
+Displays program version and exits.
+
+=back
+
+=head1 PERFORMANCE
+
+Lockerd has tested to perform well handling above 3,000 lock or unlock
+requests per second on a 2GHz AMD Operton server.
+
+=head1 DISTRIBUTION
+
+The latest version is available from CPAN and from L<http://www.veripool.org/>.
+
+Copyright 1999-2017 by Wilson Snyder.  This package is free software; you
+can redistribute it and/or modify it under the terms of either the GNU
+Lesser General Public License Version 3 or the Perl Artistic License Version 2.0.
+
+=head1 AUTHORS
+
+Wilson Snyder <wsnyder@wsnyder.org>
+
+=head1 SEE ALSO
+
+L<IPC::Locker>, L<lockersh>
+
+=cut
+######################################################################

@@ -1,0 +1,97 @@
+
+                               Interpolation.pm
+
+(Current version 0.73; last updated 13 June 2009)
+
+   Suppose your program needs to print out a lot of dollar amounts, and
+   you'd like to print each one out with a leading dollar sign, commas
+   every three places, and always two places for cents after a decimal
+   point, so that the number 1234.5 should be formatted as $1,234.50. One
+   way to do it is to define a commify routine to insert the punctuation
+   (which you can crib from the FAQ) and do something like this:
+
+    $com_SALARY = commify($SALARY);
+    print "Last year I made $com_SALARY.\n";
+
+   That can get old pretty quick---you end up with a lot of useless
+   variables like $com_SALARY cluttering up your program. Or you could
+   use printf:
+
+    printf "Last year I made %s.\n", commify($SALARY);
+
+   This is all right, but a little hard to read, because you have to
+   match up the formatting codes in the first argmuent with the values in
+   the rest of the arguments.
+
+   The bottom line here is that `commify' is just cosmetic, for output
+   formatting, not really an interesting or important part of the
+   program, and you'd really like to sweep it under the rug and make it
+   take up as little space as possible.
+
+   You can do that with Interpolation. Here's what that example looks
+   like if you use Interpolation:
+
+    print "Last year I made $money{$SALARY}.\n";
+
+   One line, no extra variables, and no sign of the formatting except the
+   descriptive word money there to say what the format is. If you're
+   going to be doing a lot of money, and the word money is too long, you
+   can use M instead:
+
+    print "Last year I made $M{$SALARY}.\n";
+
+   Or you can use whatever name you prefer, even _. If you're going to be
+   printing out a lot of percentages to two decimal places, you might
+   name the interpolator %, so that you could write this:
+
+    print "Sales have increased by $%{$increase}.\n";
+
+   And, since $% is an abbreviation for `format in a way appropriate for
+   percentages', what it would print would look like:
+
+    print "Sales have increased by 3.12%.\n";
+
+   You can have as many different formats as you want, and you can give
+   them whatever names you want. You can install a formatter in one part
+   of your program, and uninstall it again when you're done with it.
+
+   Here's another example: You do a database call and get back the name
+   of a U.S. state of Canadian province. The database doesn't capitalize
+   these consistently; sometimes they're correct, sometimes all
+   uppercase, sometimes all lowercase. You need to capitalize correctly
+   when you rpint out the results.
+
+   Rather than explicitly calling a capitalization function each and
+   every time you get data from the database, you can use an
+   interpolator, like this:
+
+    print "Database returned: $Cap{$RESULT}.\n";
+
+   $C is an interpolator that fixes the capitalization of anything it
+   gets, in this case the contents of $RESULT.
+
+   The argument to an interpolator can be any Perl expression. In the
+   context of the money example, that means you can do something like
+   this:
+
+    print "If I get a 6% raise, I'll be making $money{$SALARY * 1.06}.\n";
+
+   And again you save on space and on useless temporary variables. It
+   seems like this is prone to abuse, but in many cases, like this one,
+   it does seem to make the code clearer, putting emphasis on the
+   important parts and preventing a lot of excess verbiage that would
+   obscure what was really going on.
+
+   As a special case, you can evaluate arbitrary expressions into
+   strings, like this: "1 + 2 = $eval{1 + 2}", which turns into _1 + 2 =
+   3_.
+
+See also:
+
+   Interpolation.pm page:
+	http://www.plover.com/~mjd/perl/Interpolation/
+   M-J. Dominus Perl Paraphernalia:
+	http://www.plover.com/~mjd/perl/
+   Jenda's page
+	http://Jenda.Krynicky.cz
+

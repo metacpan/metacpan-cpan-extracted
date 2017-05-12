@@ -1,0 +1,122 @@
+=for comment based on iup-3.2 - http://www.tecgraf.puc-rio.br/iup/en/elem/iupcbox.html
+
+=head1 NAME
+
+IUP::Cbox - [GUI element] container for position elements in absolute coordinates
+
+=head1 DESCRIPTION
+
+Creates a void container for position elements in absolute coordinates.
+It is a B<concrete> layout container.
+
+It does not have a native representation.
+
+The L<IUP::Cbox|IUP::Cbox> is equivalent of a L<IUP::Vbox|IUP::Vbox> or L<IUP::Hbox|IUP::Hbox> where all
+the children have the L<FLOATING|IUP::Manual::03_Attributes/FLOATING> attribute
+set to YES, but children must use CX and CY attributes instead of the
+POSITION attribute.
+
+=head1 USAGE
+
+=head2 CREATION - new() method
+
+ #standard way
+ my $cbox = IUP::Cbox->new( child=>[$elem1, $elem2], ANYATTRIBUTE=>'any value' );
+ 
+ #or with just a single child
+ my $cbox = IUP::Cbox->new( child=>$elem, ANYATTRIBUTE=>'any value' );
+ 
+ #or with just 1 parameter (arrayref)
+ my $cbox = IUP::Cbox->new( [$elem1, $elem2] );
+ 
+ #or with just 1 parameter (reference to child elements)
+ my $cbox = IUP::Cbox->new( $elem );
+
+=over 
+
+B<child:> (named parameter) List of the references to elements (or just a single element) that 
+will be placed in the box. It can be ommited (see note below).
+
+B<Returns:> The reference to the created element, or C<udnef> if an error
+occurs.
+
+NOTE: You can pass to C<new()> other C<ATTRIBUTE=E<gt>'value'> or C<CALLBACKNAME=E<gt>\&func> pairs relevant
+to this element - see L<IUP::Manual::02_Elements|IUP::Manual::02_Elements/"new()">.
+
+NOTE: IUP::Cbox can be created with no elements (no child params passed to C<new()> constructor)
+and be dynamic filled later using
+L<C<< $element->Append() >>|IUP::Manual::02_Elements/"Append()"> and/or
+L<C<< $element->Insert() >>|IUP::Manual::02_Elements/"Insert()"> methods.
+
+=back
+
+=head2 ATTRIBUTES
+
+For more info about concept of attributes (setting/getting values etc.)
+see L<IUP::Manual::03_Attributes|IUP::Manual::03_Attributes>. Attributes specific to this element:
+
+=over
+
+=item B<CX, CY>
+
+I<(non inheritable) B<(at children only)>>
+
+Position in pixels
+of the child relative to the top-left corner of the box. Must be set
+for each child inside the box.
+
+=item L<EXPAND|IUP::Manual::03_Attributes/EXPAND>
+
+I<(non inheritable)>
+
+The default value is "YES".
+
+=item L<SIZE|IUP::Manual::03_Attributes/SIZE> /
+L<RASTERSIZE|IUP::Manual::03_Attributes/RASTERSIZE> (non inheritable)
+
+Must be
+defined for each child. If not defined for the box, then it will be the
+bounding box that includes all children in their position.
+
+=item B<WID>
+
+I<(read-only)>
+
+returns -1 if mapped.
+
+=back
+
+The following L<common attributes|IUP::Manual::03_Attributes/Common Attributes> are also accepted:
+
+=over
+
+=item * L<FONT|IUP::Manual::03_Attributes/FONT>,
+L<CLIENTSIZE|IUP::Manual::03_Attributes/CLIENTSIZE>,
+L<CLIENTOFFSET|IUP::Manual::03_Attributes/CLIENTOFFSET>,
+L<POSITION|IUP::Manual::03_Attributes/POSITION>,
+L<MINSIZE|IUP::Manual::03_Attributes/MINSIZE>,
+L<MAXSIZE|IUP::Manual::03_Attributes/MAXSIZE>
+
+=back
+
+=head1 EXAMPLES
+
+
+The element B<IUP::Cbox> is used in the following sample scripts:
+
+=over
+
+=item * L<0-basic/cbox.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/cbox.pl> - IUP::Cbox example
+
+=back 
+
+
+
+=head1 SEE ALSO
+
+L<IUP::Vbox|IUP::Vbox>, L<IUP::Hbox|IUP::Hbox>
+
+The original doc: L<iupcbox.html|http://www.tecgraf.puc-rio.br/iup/en/elem/iupcbox.html>
+ 
+
+=cut

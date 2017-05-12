@@ -1,0 +1,81 @@
+# -*- Perl -*-
+
+use IBM::LoadLeveler;
+
+# Use the deprecated ll_get_nodes call to find information on all nodes in the system
+# similar to llstatus -l
+
+my ($version_num,$numnodes,$ref)=ll_get_nodes();
+
+print "LoadLeveler Version  : $version_num\n";
+print "Number of Nodes      : $numnodes\n";
+
+@nodes=@{$ref};
+
+foreach $node (@nodes)
+{
+    my($node_name,$version,$configtimestamp,$timestamp,$vmem,$memory,$disk,$loadavg,$speed,$max_starters,$pool,$cpus,$state,$keywordidle,$totaljobs,$arch,$opsys,$adapters,$feature,$job_class,$initiators,$steplist,$vmem64,$memory64,$disk64)=@{$node};
+    print "----------------------------------------\n";
+    print "Node Name            : $node_name\n";
+    print "Proc Version         : $version\n";
+    print "Date of reconfig     : ",scalar localtime $configtimestamp,"\n";
+    print "Data timestamp       : ",scalar localtime $timestamp,"\n";
+    print "Virtual Memory (KB)  : $vmem\n";
+    print "Physical Memory (KB) : $memory\n";
+    print "Avail Disk Space (KB): $disk\n";
+    print "Load Avgerage        : $loadavg\n";
+    print "Node Speed           : $speed\n";
+    print "Max Jobs allowed     : $max_starters\n";
+    print "Pool Number          : $pool\n";
+    print "Number of CPUs       : $cpus\n";
+    print "Startd state         : $state\n";
+    print "Since keyboard active: $keywordidle\n";
+    print "Total jobs           : $totaljobs\n";
+    print "Hardware Architecture: $arch\n";
+    print "Operating System     : $opsys\n";
+    print "Available Adapters   : @{$adapters}\n";
+    print "Available Features   : @{$feature}\n";
+
+    %classes=();
+    foreach $class (  @{$job_class} )
+    {
+	$classes{$class}++;
+    }
+    print "Job Classes Allowed  : ";
+    foreach $class ( keys %classes )
+    {
+	print "$class\($classes{$class}\) ";
+    }
+    print "\n";
+
+    %classes=();
+    foreach $class (  @{$initiators} )
+    {
+	$classes{$class}++;
+    }
+    print "Initiators Available : ";
+    foreach $class ( keys %classes )
+    {
+	print "$class\($classes{$class}\) ";
+    }
+    print "\n";
+
+    @steps=@{$steplist};
+    print "Steps Allocated      : ";
+    if ( $#steps < 0 )
+    {
+	print "None.";
+    }
+    else
+    {
+	foreach $step ( @steps )
+	{
+	    @id=@{$step};
+	    print "$id[2].$id[0].$id[1] ";
+	}
+    }
+    print "\n";
+    print "Virtual Memory (KB)  : $vmem64\n";
+    print "Physical Memory (KB) : $memory64\n";
+    print "Avail Disk Space (KB): $disk64\n";
+}

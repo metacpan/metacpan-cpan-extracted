@@ -1,0 +1,15 @@
+Awk.pm
+Changes
+MANIFEST
+Makefile.PL
+README
+test.pl
+examples/a2a.pl
+examples/addcomma.pl
+examples/greet01.pl
+examples/greet02.pl
+examples/greet03.pl
+examples/primes.pl
+examples/wc.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

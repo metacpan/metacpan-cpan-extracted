@@ -1,0 +1,10 @@
+Xbm.pm
+t/xbm.t
+t/xbm-badfile.t
+Changes
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

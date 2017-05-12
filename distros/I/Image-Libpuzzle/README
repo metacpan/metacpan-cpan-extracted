@@ -1,0 +1,29 @@
+Puzzle version 0.05
+===================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+The module also lives on CPAN, http://search.cpan.org/~estrabd/Image-Libpuzzle/
+
+DEPENDENCIES
+
+This module requires Libpuzzle - L<http://www.pureftpd.org/project/libpuzzle>
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2015 by B. Estrade <estrabd@gmail.com>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.4 or,
+at your option, any later version of Perl 5 you may have available.
+
+

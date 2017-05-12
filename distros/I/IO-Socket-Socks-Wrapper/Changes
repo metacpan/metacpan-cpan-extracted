@@ -1,0 +1,75 @@
+Revision history for Perl extension IO::Socket::Socks::Wrapper.
+
+0.17  Thu Feb 16 23:01:15 KRAT 2017
+      - Play well with connections interrupted by system signals (like SIGALRM): gh#4
+
+0.16  Sun Nov 20 13:55:55 KRAT 2016
+      - Call CORE::connect on already connected sockets, which
+        fixes non-blocking usage of IO::Socket::IP
+      - Fix some tests
+
+0.15  Wed Oct 19 12:54:20 NOVT 2016
+      - Fix checking of value returned by IO::Socket::Socks: rt#118430
+
+0.14  Sat Jan 17 12:48:29 NOVT 2015
+      - Skip some tests if IO::Socket::IP with CORE::connect detected
+      - Add note about old IO::Socket::IP and global wrapping
+
+0.13  Fri Jan 16 19:42:53 NOVT 2015
+      - IO::Socket::IP support added
+      - IPv6 support added
+      - Fix memory leak and incompatibility with epoll() for event loop integration
+      - Fix compatibility with non-blocking sockets
+
+0.12  Sun Dec 28 21:39:39 NOVT 2014
+      - Remove Mojo::IOLoop tests and examples because Mojo doesn't support
+        IO::Socket::INET since v5.59: rt#101166
+
+0.11  Mon Sep  8 00:28:39 NOVT 2014
+      - Ability to integrate into event loop
+      - Try to avoid using of IO::Socket::IP and HTTP proxy in the tests
+      - Bump I::S::S dep to 0.63, earlier version had bug inside new_from_socket()
+
+0.10  Wed Dec 18 23:40:35 NOVT 2013
+      - Tests fixed
+
+0.09  Thu Dec 12 16:17:59 NOVT 2013
+      - Ability to wrap packages that uses built-in connect() internally
+      - Fix for Timeout option (it worked only for global wrapping)
+
+0.08  Sat Apr  6 17:30:56 2013
+      - Ability to wrap separate objects
+
+0.07  Tue Oct 30 19:14:01 2012
+      - Fix for barewords syntax: connect(SOCK, $addr)
+      - Rebless socket to GLOB after IO::Socket::Socks->new_from_socket
+        if it was GLOB before, this may works for packages which checks
+        that ref($socket) eq 'GLOB'
+
+0.06  Sat Jan 21 23:15:37 2012
+      - Set default connect timeout to 180 sec
+      - Bump I::S::S dep to 0.61 for more correct errors handling
+
+0.05  Tue Jun  7 17:49:20 2011
+      - tests fixes: OpenBSD doesn't know how to connect to 0.0.0.0
+      - new syntax to override IO::Socket::connect in the specified
+        package subroutine added
+      - tests for new syntax added
+      - documentation improvements
+
+0.04  Fri Jun  3 00:38:32 2011
+      - alot of tests added
+      - suppress warnings about prototype mismatch
+      - override IO::Socket::connect instead of IO::Socket::INET::connect if package inherits from IO::Socket,
+        makes available to wrap IO::Socket::INET package
+      - call package version of the connect if it has own, makes available to wrap packages like
+        IO::Socket::SSL
+
+0.03  Mon Apr 18 23:32:42 2011
+      - added support for packages (even if package name != module name)
+
+0.02  Mon Feb 15 18:22:17 2011
+      - added support for modules with own connect function, different from IO::Socket::INET::connect;
+
+0.01  Thu Feb 3 11:23:28 2011
+      - original version;

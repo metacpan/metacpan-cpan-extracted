@@ -1,0 +1,40 @@
+{
+   "abstract" : "Interface to the DCMTK Dicom Toolkit",
+   "author" : [
+      "q{Robert Haxton <robert.haxton@gmail.com>}"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Image-DCMTK",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::PrintUtils" : "0",
+            "Getopt::CommandLineExports" : "0",
+            "IO::All" : "0",
+            "Test::More" : "0",
+            "XML::Simple" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Image::DCMTK" : {
+         "file" : "lib/Image/DCMTK.pm",
+         "version" : "0.05"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.05"
+}

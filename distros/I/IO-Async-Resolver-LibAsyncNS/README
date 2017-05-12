@@ -1,0 +1,37 @@
+NAME
+    `IO::Async::Resolver::LibAsyncNS' - use libasyncns for `IO::Async'
+    resolver queries
+
+SYNOPSIS
+     use IO::Async::Loop;
+     use IO::Async::Resolver::LibAsyncNS;
+
+     my $loop = IO::Async::Loop->new;
+
+     my $resolver = IO::Async::Resolver::LibAsyncNS->new;
+     $loop->add( $resolver );
+
+     $resolver->getaddrinfo(
+        host => "metacpan.org",
+        service => "http",
+        socktype => "stream",
+     )->on_done( sub {
+        my @res = @_;
+        print "metacpan.org available at\n";
+        printf "  family=%d addr=%v02x\n", $_->{family}, $_->{addr} for @res;
+     })->get;
+
+DESCRIPTION
+    This subclass of IO::Async::Resolver applies special handling to the
+    `getaddrinfo_hash' and `getnameinfo' resolvers to use a Net::LibAsyncNS
+    instance, rather than using the usual IO::Async::Function wrapper around
+    the system resolver functions. This may lead to higher performance in
+    some applications.
+
+    It provides no additional methods, configuration options or events
+    besides those supported by `IO::Async::Resolver' itself. It exists
+    purely to implement the same behaviours in a more efficient manner.
+
+AUTHOR
+    Paul Evans <leonerd@leonerd.org.uk>
+

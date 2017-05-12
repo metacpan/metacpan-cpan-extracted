@@ -1,0 +1,14 @@
+=head1 NAME
+
+IUP::GL::BackgroundBox - [GUI element] GL-based background box
+
+=head1 DESCRIPTION
+
+XXX-TODO: missing doc
+
+=head1 SEE ALSO
+
+The original doc: L<iupglbackgroundbox.html|http://www.tecgraf.puc-rio.br/iup/en/ctrl/iupglbackgroundbox.html>
+
+
+=cut

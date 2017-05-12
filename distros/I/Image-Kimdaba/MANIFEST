@@ -1,0 +1,16 @@
+ChangeLog
+MANIFEST			This list of files
+META.yml
+Makefile.PL
+README
+bin/kim_2_digikam
+bin/kim_2_digikam_old
+bin/kim_2_filesystem
+bin/kim_bestof
+bin/kim_categories_image.pl
+bin/kim_category_images
+bin/kim_example.pl
+bin/kim_example_modifydb.pl
+bin/kim_jalbum.pl
+bin/kim_rotate.pl
+lib/Image/Kimdaba.pm

@@ -1,0 +1,17 @@
+<!--keep the peaks bigger or equal 20% of the highest peak-->
+
+<ExpMsMsSpectrumFilter>
+<oneExpMsMsSpectrumFilter spectrumType="msms" name="dummy">
+	        <level>peaks</level>	
+		<action type="removeOther">		
+		       <threshold type="sort">	
+			   <relativeTo>relMax</relativeTo>							
+			   <thresholdValue>0.2</thresholdValue>
+			   <comparator>ge</comparator>						
+		       </threshold>
+                </action>
+		<filterValue type="directValue">							
+			<name>fragment.intensity</name>						
+		</filterValue>
+	</oneExpMsMsSpectrumFilter>
+</ExpMsMsSpectrumFilter>

@@ -1,0 +1,17 @@
+CHANGES
+Makefile.PL
+MANIFEST
+typemap
+ppport.h
+README
+Unique.xs
+ipuniq.cpp
+ipuniq.h
+t/00new.t
+t/10add_bad_ips.t
+t/11add_good_ips.t
+t/12count.t
+t/20pod.t
+t/21podcoverage.t
+lib/IP/Unique.pm
+META.yml                                 Module meta-data (added by MakeMaker)

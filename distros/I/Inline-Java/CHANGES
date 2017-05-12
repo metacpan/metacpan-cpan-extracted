@@ -1,0 +1,176 @@
+Revision history for Perl extension Inline::Java
+------------------------------------------------
+0.53  Sun Jan  9 08:15:06 EST 2011
+    - Removed PerlNatives extension from the build because it is unmaintained and broken.
+      It can still be enabled manually using the BUILD_PERL_NATIVES build configuration 
+      option.
+    - Improved automatic casting.
+    - Fix with get_source_dir() using the DEBUGGER option. Thanks to Paul Frantz for the fix.
+    - Other minor bug and doc fixes.
+
+0.52  Sun Dec 17 20:46:51 EST 2006
+    - Fixed JNI on cygwin (many thanks to Eric Rybski for the patch)
+    - Improved installation. 'make java' is now performed automatically.
+    - Fixed problems with disappearing exceptions by localizing $@.
+    - Other minor bug fixes
+
+0.51  Tue May 23 20:40:07 EDT 2006
+    - Several major speed optimizations.
+    - Introduction of support for I/O mapping between Perl and Java (Inline::Java::Handle)
+    - Applied patches by Andrew Bruno and Tim Bunce for MAC OSX
+    - JNI fix for system property passing
+        (thanks to Brian Gugliemetti and Jason Stelzer)
+    - Added NATIVE_DOUBLES configuration option to avoid loss of precision
+      when passing double values between Perl and Java
+    - New interface for processing callbacks from java to perl.
+    - Added support for java.lang.CharSequence as a primitive type. Any
+      Perl scalar passed as a java.lang.CharSequence will instantiate
+      a java.lang.String on the Java side
+    - Added BUILD_JNI, BUILD_PERL_NATIVES, BUILD_PERL_INTERPRETER and JVM_LIB_TYPE build 
+      configuration options to help with automated builds
+    - Added BIND configuration option. See docs for details. 
+      Note: The Java JVM server noe listens on localhost by default (instead of 0.0.0.0).
+    - Other minor bug fixes
+
+0.50  Mon Jan 31 20:14:43 EST 2005
+    - Added HOST configuration option to access JVM server remotely
+    - Fixed bug with paths in Cygwin
+    - Fixed bug with regexp that was badly interpreted under the debugger
+    - Extended InlineJavaClassLoader from current thread ClassLoader to enable it to work
+      properly under Tomcat
+    - Include patch by Ihab Awad that allows running the JVM server inside Tomcat
+    - Fixed bug with longs over 32 bits in length and loosened boundary checking in numeric values
+      since it was not portable
+    - Fixed bug (found by Dean Thayer) with socket not closed properly in Java
+    - Other minor bug fixes
+
+0.49  
+    - Added PerlInterpreter: require/eval Perl code directly from Java
+    - Reworked type casting: changes are NOT backwards compatible :(
+    - Callbacks can now be called in list context using "@function_name"
+    - Renamed PerlNatives stuff
+    - Added external command line tool to start/stop a SHARED_JVM server
+    - Applied JNI memory leak patch by Jeff Janes
+    - Removed exports from Inline::Java::Portable
+    - Split and updated documentation
+
+0.47  Sat Feb 14 10:00:00 EST 2004
+    - Fixed bugs in portability code and added HPUX, AIX and Solaris specifics
+    - Tweaked CLASSPATH directory order
+	- Changed port numbers for SHARED_JVM tests in order to avoid clashes
+      with running installations
+    - Made PerlNatives optional
+    
+0.46  Web Feb 04 20:00:00 EST 2004
+    - Fixed Natives.xs to work with ExtUtils::ParseXS
+
+0.45  Fri Jan 30 20:00:00 EST 2004
+    - Fixed Makefile.PL arguments that were getting lost
+    - Fixed deprecated require call
+    - Fixed support for symbolic links in J2SDK directory
+    - Basic support for J2SDK 1.5
+    - Added new experimental feature: PerlNatives
+
+0.44  Sun Nov 23 15:47:06 EST 2003
+    - Callbacks from multiple threads are now supported
+    - Refactored (again...) studying/.jdat/cache stuff
+    - Added PRIVATE mode for use with SHARED_JVM
+    - Added DEBUGGER mode that launches jdb
+    - Fixed memory leak in JNI code (patch submitted by Dave Blob)
+
+0.43  Tue Oct 14 13:18:25 EDT 2003
+    - Restored $VERSION in each .pm file
+    - Inline::Java now formerly requires Perl 5.6
+
+0.42  Fri Sep  5 13:18:25 EDT 2003
+    - Fixed more CLASSPATH issues. CLASSPATH now works like this:
+      * CLASSPATH environment variable is global
+      * CLASSPATH configuration option is local to the user class loader
+    - Added method cache to increase performance and decrease reflection 
+      API calls
+    - Altered and documented the study_classes() function
+    - Added EXTRA_JAVA_ARGS and EXTRA_JAVAC_ARGS config options
+
+0.41  Mon Jul 14 13:18:25 EDT 2003
+    - Fixed CLASSPATH bug
+    - Possibly (!) fixed test suite problems under heavy load
+
+0.40  Fri Apr 11 11:00:00 EST 2003
+    - Patch by Doug MacEachern to allow running under servlet engines.
+    - Patch by John Kinsley for handling empty arrays.
+    - Custom ClassLoader allows for better isolation of user code and
+      dynamic 'CLASSPATH' (multiple sections/clients are now totally
+      independant).
+    - Core Java code is now compiled separately (at install time) instead
+      of with the user code (for each script). This dramatically improves
+      build time.
+    - Default port number changed to 0 (next available port number). 
+      This allows many multiple users to run concurrently without 
+      clashes.
+      Note: The default port on systems where this feature is not 
+            available has remained 7890.
+      Note: The default port for SHARED_JVM mode is now 7891.
+    - SHARED_JVM mode now calls release_JVM() automatically.
+    - UTF8 support
+    - User code can now be a public class and (optionally) inside a package.
+    - Callback classes have changed.
+      Note: These classes are now in the org.perl.inline.java package.
+      Note: PerlException has been renamed InlineJavaPerlException.
+      Note: If you presently use callbacks, your code may now no longer compile.
+            You will need to apply the changes listed above to fix it.
+    - study_classes now returns the package in which the studied classes
+	  have been put.
+    - Many bug fixes and documentation corrections.
+
+0.33  Mon Jun 17 13:50:14 EDT 2002
+    - Improved and more flexible debug output
+    - Auto loading of thread libraries under Solaris
+	- Basic support for J2SDK 1.4
+    - Other minor bug fixes
+
+0.32  Sat Apr  6 11:45:06 EST 2002
+    - Restored compatibility with perl 5.005_03
+    - Other minor bug fixes
+
+0.31  Mon Feb  4 15:45:06 EDT 2002
+    - Exception handling (Perl can 'catch' Java exceptions)
+    - Callbacks to Perl from Java
+    - More complete test suite
+    - Improved documentation and related examples
+    - Improved installation script and directions
+    - Other minor bug fixes
+
+0.30  Mon Sep 17 15:45:06 EDT 2001
+    - JVM server is now multi-threaded
+    - Added 'SHARED_JVM' option for mod_perl support
+    - Beefed up test suite
+
+0.23  Thu Aug 30 08:41:11 EDT 2001
+    - Added support for multiple Inline sections using a special notation
+      in the CLASSPATH.
+    - Added the 'fix' Makefile.PL option au automatically fix the Makefile
+      for Win95/98/Me.
+
+0.22  Fri Jun  1 13:31:35 EDT 2001
+    - Fixed up Inline::Java to work with Inline 0.41
+    - Added support for java.lang.Number as a primitive numeric type. Any
+      Perl scalar passed as a java.lang.Number will instantiate
+      a java.lang.Double on the Java side.
+
+0.21  Tue May  8 11:32:28 EDT 2001
+    - Added 'studying' of external Java classes
+    - Added support for default no-arg constructors for public classes
+    - Caching for class information
+    - Added error message stating that Inline::Java doesn't currently 
+      support multiple sections
+
+0.20  Sat Apr 14 23:00:00 EDT 2001
+    - Added optional JNI extension.
+    - Added support for arrays.
+    - Added support for public member variables.
+    - Added support for public static member variables.
+    - Added type casting.
+
+0.01  Thu Feb 15 14:01:25 EST 2001  
+    - Created Inline::Java.
+

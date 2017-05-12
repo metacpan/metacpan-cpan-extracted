@@ -1,0 +1,12 @@
+<?xml version="1.0" standalone="yes"?>
+<svg width="4in" height="3in" 
+ xmlns="http://www.w3.org/2000/svg">
+   <desc xmlns:mydoc="http://example.org/mydoc">
+      <mydoc:title>This is an example SVG file</mydoc:title>
+      <mydoc:para>The global description uses markup from the 
+        <mydoc:emph>mydoc</mydoc:emph> namespace.</mydoc:para>
+   </desc>
+   <g>
+   <!-- the picture goes here -->
+   </g>
+</svg>

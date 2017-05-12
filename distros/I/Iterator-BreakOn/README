@@ -1,0 +1,66 @@
+Iterator-BreakOn 
+
+This module implements break events on an data iterator
+
+It has the following premises:
+
+- It works with objects streams. 
+- The source is a reference to an object with a next() method.
+- This method returns in every call a reference to the next object in the
+  data stream. 
+
+It is designed mainly for work with DBIx::Class::ResulSet and similars.
+
+This is a simple usage example:
+
+    use Iterator::BreakOn;
+
+    my $iter = Iterator::BreakOn->new( 
+                    datasource => $my_resultset,
+                    break_after => [
+                        'zipcode' => \&my_dispatch_function
+                        ],
+                    on_first => \&dispatch_before_first_item,
+                    on_last  => \&dispatch_after_last_item,
+                    on_every => sub {
+                                    ## do something with every item
+                                    }
+               );
+
+    $iter->run();               
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+DEPENDENCIES
+
+Requires the following modules from the CPAN:
+
+- Test::More
+- List::MoreUtils
+- Exception::Class
+- Text::CSV
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007, "Víctor Moral" <victor@taquiones.net>
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or any later version.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  US

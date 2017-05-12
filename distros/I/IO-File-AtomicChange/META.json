@@ -1,0 +1,77 @@
+{
+   "abstract" : "change content of a file atomically",
+   "author" : [
+      "HIROSE Masaaki <hirose31 _at_ gmail.com>"
+   ],
+   "dynamic_config" : "0",
+   "generated_by" : "Module::Install version 1.06, CPAN::Meta::Converter version 2.130880",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "IO-File-AtomicChange",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.36"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "ExtUtils::MakeMaker" : "6.36"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Module::Install" : "0",
+            "Module::Install::CPANfile" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Copy" : "0",
+            "File::Sync" : "0",
+            "File::Temp" : "0",
+            "IO::File" : "0",
+            "POSIX" : "0",
+            "Path::Class" : "0",
+            "Time::HiRes" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Devel::Cover" : "0",
+            "FindBin" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "IO::File::AtomicChange" : {
+         "file" : "lib/IO/File/AtomicChange.pm",
+         "version" : "0.05"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/hirose31/IO-File-AtomicChange.git"
+      }
+   },
+   "version" : "0.05"
+}

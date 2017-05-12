@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Insolation.t
+lib/Insolation.pm
+eg/insolation.pl
+eg/srlocat.for
+eg/srlocat.sh

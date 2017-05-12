@@ -1,0 +1,47 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.66.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 d397cdb7b08c7efc51a30867514226b16e8ba1bd Changes
+SHA1 2c0f9c1cacb3b1def8b2d17c52d0e9d4a6ca06de MANIFEST
+SHA1 5d05310acfccf7afd5d224e020888c47553cb1cc META.yml
+SHA1 7a08e036b55c06e3f517e6ae2f11186d62902b3a Makefile.PL
+SHA1 88b0979c5792dc454e70d9ddbfe988efd879d2ae README
+SHA1 ad5b7b4cd4e2171318ea3d1002f3a565a69b3d4b lib/Image/Thumbnail.pm
+SHA1 affcc32cbe487f871ae0f614919a57c92c3c64a8 t/gdblob.t
+SHA1 54dd8448e00d6e6b8c9e156327f250d681e77364 t/gdf.t
+SHA1 c1fc5fb861435c5b4857b1f041a960f840572648 t/gdo.t
+SHA1 cf43d74f4c3df71372af9f346fa802af55b25d9d t/imagerf.t
+SHA1 726a7d752be57c0b6fb5572bdc70178507ec6313 t/imagerfbmp.t
+SHA1 849ba3af769ed84dbcefc8b7fe9cb079d5086cb2 t/imagero.t
+SHA1 db1e471801232ee54c4c07324116eea13a4421f7 t/imagerobmp.t
+SHA1 4e94b5e563a7348699a9086e043455c434fa38b5 t/imblob.t
+SHA1 7cbaa706aab53494cce4454f7bc1444886655612 t/imf.t
+SHA1 d3ff17640ea794746b2344e403002011a296bf15 t/imfa.t
+SHA1 1d038c19fb93e01b87abd71eba2ce5cd6ee3eee9 t/imo.t
+SHA1 8b67c21d3038710af8bf1fb5bd533a9168ee7b2a t/test.bmp
+SHA1 c2e329e292e3e4ea76132276fbcf383c1d352526 t/test.gif
+SHA1 043c0e9736a9e980a7ef337113b73c886541f4f1 t/test.jpg
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG/MacGPG2 v2.0.14 (Darwin)
+
+iQEcBAEBAgAGBQJNZ4mvAAoJEFbbDNKvu26Xz7MH/3+ZNxORKLf4RETDZLHsVdBp
+WgfXajanik8hnF0S61pgQSkCHzwkfpREDenyvDBwdglaD0D94v9dcz2x/kBi4j1S
+objZUOK8oNfNN3uraFZyoKvyHWmUmMCjEQV9FUP1OXxXwU1ufk3WhzeoBLzbkZN2
+RyF411mkJyrPW6T4vWS4HYZxBdMyxfLcV4sEZkJW8oiwbVGalG0z45blazKHr0R+
+EgvN0iaVVHLBfyNKvqfPya5XiMyyxMsEUaLTaRSTCWJjF89Xg397h6FvufgTYe4M
+T8UorQ9qSpckv+9ITKB59tWR4XTRNwEWLnsju9YTujivQt8M+81Cn51c0AqiLnY=
+=8gUZ
+-----END PGP SIGNATURE-----

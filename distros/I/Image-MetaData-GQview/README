@@ -1,0 +1,91 @@
+Image::MetaData::GQview
+=======================
+
+SYNOPSIS
+
+         use Image::MetaData::GQview;
+         my $md = Image::MetaData::GQview->new("test.jpg");
+         $md->load("test.jpg");
+         my $comment = $md->comment;
+         my @keywords = $md->keywords;
+         my $raw = $md->raw;
+         $md->comment("This is a comment");
+         $md->keywords(@keywords);
+         $md->save("test.jpg");
+
+DESCRIPTION
+
+This module is a abstraction to the image meta data of GQview.
+
+METHODS
+
+   new
+      This is a class method and the only one. It is used to get a object
+      of Image::MetaData::GQview. It can be called without parameter or
+      with the image as only option in witch case it try to load the meta
+      data.
+
+   load
+      If you didn't load the data with new you can do that with this
+      method. If the parameter is left out the one setted before is used.
+
+   comment
+      Get or set the comment.
+
+   keywords
+      Get or set the keywords.
+
+   raw
+      Get the raw data
+
+   save
+      Save the data to disk. This will read the location from the gqview
+      configuration. If there is none, the info will be saved in local
+      directory.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc Image::MetaData::GQview
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/Image-MetaData-GQview
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Image-MetaData-GQview
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/Image-MetaData-GQview
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/Image-MetaData-GQview
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2006 by Klaus Ethgen. All rights reserved.
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation; either version 2 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with
+this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+Ave, Cambridge, MA 02139, USA.

@@ -1,0 +1,144 @@
+=pod
+
+=head1 NAME
+
+IRC::Indexer::POD::ServerSpec - Export format for a single server
+
+=head1 DESCRIPTION
+
+This document describes the format of IRC::Indexer exports from a single 
+trawler; this is the hash returned by L<IRC::Indexer::Report::Server>
+after a trawler run has completed.
+
+See L<IRC::Indexer::POD::NetworkSpec> for details on the format of 
+network-wide information exports as provided by 
+L<IRC::Indexer::Report::Network>.
+
+Current as of IRC::Indexer 0.01
+
+=head1 FORMAT
+
+B<JSON> is the preferred format for network transmission; it is light 
+and support is fairly universal.
+
+L<IRC::Indexer> also provides support for B<YAML> and pure-perl 
+serialization formats. This layout definition applies to any 
+L<IRC::Indexer::Output> format.
+
+The export is a hash. This is called "associative array" in some 
+languages; this document will use the term "ARRAY" to refer to a list 
+and "HASH" to refer to an associative key=>value mapping. In Perl these 
+data structures deserialize to an array reference and a hash reference 
+respectively.
+
+The term I<undef> will be used to refer to what some languages call 
+I<null>.
+
+=head1 HASH KEYS
+
+  Status
+  Failure
+  StartedAt
+  ConnectedAt
+  FinishedAt
+  ConnectedTo
+  ServerName
+  NetName
+  IRCD
+  MOTD
+  GlobalUsers
+  OperCount
+  ChanCount
+  HashChans
+  ListChans
+  ListLinks
+
+=head2 Internals
+
+  Status  => STRING describing status  (or undef)
+  Failure => STRING describing failure (or undef)
+
+=head2 Time-related
+
+All times are in epoch seconds.
+
+  StartedAt   => TIME of object construction
+  ConnectedAt => TIME of socket creation (or undef)
+  FinishedAt  => TIME the trawl run completed (or undef)
+
+In Perl, you can use these to create a DateTime object, for example:
+
+  my $dt = DateTime->new(from_epoch => $secs);
+  print $dt->mdy;
+
+=head2 Informational
+
+  ConnectedTo => STRING server address we connected to
+  ServerName  => STRING server name announced by the server
+  NetName     => STRING network name announced by the server
+                 (or undef if no NETWORK= specified by server)
+  GlobalUsers => INT total number of global users
+  OperCount   => INT total number of global operators
+                 (optional, undef if not announced in LUSERS)
+  IRCD        => STRING IRCD version if available
+
+=head2 MOTD
+
+  MOTD => [ ARRAY of MOTD lines ]
+
+MOTD is saved as an array of lines as they are received, without 
+newlines.
+
+=head2 Channels
+
+  ChanCount => INT (public channels only)
+  ListChans => ARRAY (of arrays)
+  HashChans => HASH
+
+=head3 HashChans
+
+  HashChans->{$channel} = {
+    Users => INT
+    Topic => STRING
+  }
+
+HashChans is a hash, keyed on channel name, containing the number of 
+users and the topic under the keys B<Users> and B<Topic> respectively.
+
+If no topic is set, B<Topic> should be the empty string, B<NOT> undef.
+
+=head3 ListChans
+
+  ListChans = [
+    [ CHANNEL, USERS, TOPIC ],
+    [ CHANNEL, USERS, TOPIC ],
+  ],
+
+ListChans is an array whose members are arrays containing three 
+elements: channel name, channel users, channel topic.
+
+L<IRC::Indexer> generates ListChans if $trawler->info->channels() is 
+called; it is not guaranteed to be available.
+
+ListChans is provided as a convenience to frontends, so they do not 
+need to execute possibly expensive sort routines themselves.
+If provided in exported output, B<ListChans must be sorted by 
+user count, highest first>.
+
+The channel data should otherwise match HashChans.
+
+=head2 Links
+
+=head3 ListLinks
+
+  ListLinks => ARRAY
+
+Array containing the raw data from B<LINKS>, if available.
+
+=head1 AUTHOR
+
+Jon Portnoy <avenj@cobaltirc.org>
+
+L<http://www.cobaltirc.org>
+
+=cut

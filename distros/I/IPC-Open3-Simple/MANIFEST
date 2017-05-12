@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+META.yml
+lib/IPC/Open3/Simple.pm
+t/test-all.t
+t/pod.t
+t/pod-coverage.t

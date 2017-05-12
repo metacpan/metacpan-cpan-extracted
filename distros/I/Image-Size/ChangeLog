@@ -1,0 +1,628 @@
+                     Perl Module Image::Size Change History                 
+
+		Image::Size is a simple library that allows the 
+		fetching of image size information from files   
+		in a wide variety of common (and not-so-common) 
+		formats.                                        
+
+3.300	Saturday February 28, 2015, 08:44:22 AM -0800
+
+	* lib/Image/Size.pm
+	* t/all.t
+	* t/old-os2.bmp (added)
+	Add support for old OS/2 version of BMP header (Geoff Richards).
+
+	* lib/Image/Size.pm
+	Typo fixes (David Steinbrunner).                                
+
+	* lib/Image/Size.pm
+	Avoid a sprintf() warning in Perl 5.21. Perl 5.21 introduces a  
+	warning for redundant arguments to s?printf(), so sprintf("%d", 
+	1, 2) would warn. This commit silences that warning by passing  
+	sprintf the exact number of arguments that it expects (Brian    
+	Fraser).                                                        
+
+	* lib/Image/Size.pm
+	Added =encoding utf8 to pod - the accented character was        
+	causing a pod error (Neil Bowers).                              
+
+	* lib/Image/Size.pm
+	Added Z<> to the =item [012] to resolve pod warning. You can't  
+	have =item 0, so the way round this seems to be to add a Z<>    
+	(zero width space) before each digit (Neil Bowers).             
+
+	* lib/Image/Size.pm
+	Added link to github repo to doc (Neil Bowers).                 
+
+	* lib/Image/Size.pm
+	RT #41238: Applied modified version of patch from user to fix a 
+	die problem with unpack on truncated files.                     
+
+	* lib/Image/Size.pm
+	* t/1.sm.webp (added)
+	* t/all.t
+	* t/move.cur (added)
+	* t/tux.ico (added)
+	Add support for WEBP, ICO and CUR file types (Baldur            
+	Kristinsson).                                                   
+
+	* lib/Image/Size.pm
+	Fix some perlcritic issues.                                     
+
+3.232	Monday May 28, 2012, 05:20:00 PM -0700
+
+	* lib/Image/Size.pm
+	Removed the "!" flag in pack template for EMF. It was not       
+	needed and it broke on earlier Perls.                           
+
+3.231	Wednesday May 23, 2012, 11:30:00 PM -0700
+
+	* lib/Image/Size.pm
+	Small change to swfmxsize for short-buffer issues.              
+
+	* lib/Image/Size.pm
+	Multiple changes in this commit: Abandoned AutoLoader; moved    
+	POD to the end of the file now that all the per-format          
+	subroutines are part of the file-proper; fixed cases where lack 
+	of ImageMagick would cause the error message to be overwritten. 
+
+	* t/all.t
+	* t/kazeburo-bar.jpg (added)
+	New test (and image) for JPG tag-offset issue.                  
+
+	* lib/Image/Size.pm
+	Applied patch from github user kazeburo: bug fix for some jpeg  
+	files                                                           
+
+	* imgsize
+	Fixed so that default output now catches errors. Previously,    
+	you would get an "undefined" warning if there was an error in   
+	parsing/sizing the input file.                                  
+
+	* lib/Image/Size.pm
+	Turns out the 4 bounding-box ints for EMF are signed.           
+
+3.230	Sunday August 29, 2010, 04:00:00 PM -0700
+
+	* imgsize
+	* lib/Image/Size.pm
+	perlcritic clean-ups from new rules.                            
+
+	* lib/Image/Size.pm
+	* t/Test_emf_small.emf (added)
+	* t/all.t
+	RT #59995: Added support for Windows Enhanced Metafile Format   
+	(EMF).                                                          
+
+	* t/00_load.t (deleted)
+	* t/01_pod.t (deleted)
+	* t/02_pod_coverage.t (deleted)
+	* t/03_meta.t (deleted)
+	* t/04_minimumversion.t (deleted)
+	* t/05_critic.t (deleted)
+	* xt/00_load.t (added)
+	* xt/01_pod.t (added)
+	* xt/02_pod_coverage.t (added)
+	* xt/03_meta.t (added)
+	* xt/04_minimumversion.t (added)
+	* xt/05_critic.t (added)
+	Move the author/distro-sanity tests to an "xt" directory.       
+
+3.221	Sunday April 25, 2010, 02:10:00 PM -0700
+
+	* imgsize
+	* lib/Image/Size.pm
+	Large-scale code and documentation clean-up based on perlcritic 
+	and visual review.                                              
+
+3.220	Sunday November  8, 2009, 05:45:00 PM -0800
+
+	* lib/Image/Size.pm
+	Small fix to the regex for detecting GIFs, per Slaven Rezic.    
+
+3.210	Wednesday October 21, 2009, 06:50:00 PM -0700
+
+	* t/magick.t
+	Removed a stray colon causing errors with some Perl versions.   
+
+	* t/00_load.t (added)
+	* t/00_signature.t (deleted)
+	* t/01_pod.t (added)
+	* t/02_pod_coverage.t (added)
+	* t/03_meta.t (added)
+	* t/04_minimumversion.t (added)
+	* t/05_critic.t (added)
+	* t/magick.t
+	* t/pod.t (deleted)
+	* t/pod_coverage.t (deleted)
+	Removed useless signature test, added QA tests, removed a       
+	duplicate test.                                                 
+
+	* lib/Image/Size.pm
+	Moved around some conditionally-needed libs to delay loading    
+	until/unless needed. Also made a small fix per Perl::Critic.    
+
+3.2	Monday February 23, 2009, 05:00:00 AM -0800
+
+	* lib/Image/Size.pm
+	* t/all.t
+	Make the package buildable in a pure-Perl software stack. Per   
+	RT ticket #42930, make Compress::Zlib optional, so that those   
+	who do not need it are not required to install it. Updated the  
+	test around the compressed-SWF file to skip if Compress::Zlib   
+	is absent.                                                      
+
+	* Build.PL (restored)
+	* ChangeLog (deleted)
+	* ChangeLog.xml (added)
+	* MANIFEST (deleted)
+	* Makefile.PL (deleted)
+	* README.Win32 (deleted)
+	* etc/ChangeLogML.xsd (added)
+	Making large-scale house-keeping changes to the build/dist      
+	process. Replace ChangeLog (plain-text) with a ChangeLogML file 
+	created from the CVS/SVN history and hand-adjusted; add the XSD 
+	for ChangeLogML; restore Build.PL and heavily enhance; and      
+	remove README.Win32, Makefile.PL and MANIFEST.                  
+
+	* lib/Image/Size.pm
+	Per RT ticket #43452, make the cache visible outside the        
+	lexical scope of the module This allows the hash to be used     
+	with packages like IPC::Shareable or IPC::MM to enable sharing  
+	the cache between processes. Added extra documentation of this, 
+	and a new section describing approaches to cache-sharing.       
+
+	Transaction revision: 136
+	* imgsize
+	* lib/Image/Size.pm
+	Fix URL/specification of the license info for LGPL.             
+
+3.1.1	Monday February 18, 2008, 06:37:36 AM UTC
+
+	* Build.PL, revision 134
+	Misspelled a prereq name.                                       
+
+3.1	Friday October  5, 2007, 10:19:33 AM UTC
+
+	* Makefile.PL, revision 130
+	Restored for users who don't have Module::Build installed.      
+
+	* lib/Image/Size.pm, revision 129
+	Small patch from n@shaplov.ru to fix CWS-related error.         
+
+	* lib/Image/Size.pm, revision 128
+	Changed the copyright info and the licensing. Added COPYRIGHT   
+	and LICENSE blocks to the pod.                                  
+
+	Transaction revision: 127
+	* MANIFEST
+	* META.yml (deleted)
+	Removing META.yml and SIGNATURE from permanent place in         
+	MANIFEST. Removing META.yml from repo.                          
+
+3.01	Wednesday October  3, 2007, 10:08:20 AM UTC
+
+	* t/pass-1_s.png, revision 121
+	Trying to fix MIME                                              
+
+	Transaction revision: 120
+	* t/8.swf
+	* t/bexjdic.tif
+	* t/letter_T.jpg
+	* t/lexjdic.tif
+	* t/pak38.jpg
+	* t/pass-1_s.png
+	* t/test.gif
+	* t/xterm.bmp
+	* t/yasp.swf
+	MIME types                                                      
+
+3.0	Thursday September 14, 2006, 03:10:50 AM UTC
+
+	* t/pod.t
+	* t/pod_coverage.t
+	Added test suites for POD correctness and POD coverage.         
+
+	* Size.pm
+	Implemented and documented a flag called                        
+	$Image::Size::GIF_BEHAVIOR that controls whether the GIF code   
+	returns the screensize, the first sub-image or the largest of   
+	the sub-images.                                                 
+
+	* MANIFEST
+	* Size.pm
+	* t/8.swf (added)
+	* t/all.t
+	Applied a patch from mrj@mrj.spb.ru to fix usage of the         
+	Compress::Zlib module in the handling of compressed flash       
+	files. Added a new SWF file to test this, and added reference   
+	to the file in MANIFEST and t/all.t.                            
+
+	* MANIFEST
+	* Makefile.PL
+	* Size.pm
+	* t/magick.t (added)
+	Delay Image::Magick loading until it is needed. (Mark           
+	Stosberg). Add support for Graphics::Magick as an alternative   
+	to Image::Magick. If either Graphics::Magick or Image::Magick   
+	is loaded into memory that module will be used. Otherwise, they 
+	are both tried to be loaded, with Graphics::Magick being tried  
+	first. (Mark Stosberg). This patch also adds a new test suite,  
+	t/magick.t, to the distribution and modifies both MANIFEST and  
+	Makefile.PL (to add a build-dependancy on Test::More).          
+
+	* t/all.t
+	With Test::More now required for building, converted t/all.t to 
+	use it.                                                         
+
+2.992	Tuesday July 22, 2003, 12:00:00 AM UTC
+
+	* Size.pm, revision 116
+	Added support for Flash 6/FlashMX.                              
+
+2.991	Friday January  3, 2003, 09:09:39 AM UTC
+
+	* Size.pm, revision 111
+	Bumped version number and moved the trailing "1;" for           
+	safety-sake.                                                    
+
+	* imgsize, revision 110
+	Way-long-overdue code cleanup.                                  
+
+	* Size.pm, revision 109
+	Small change in the block that sets up read from a scalar ref,  
+	to avoid warnings about undef values (in case $stream is a      
+	reference to an undef value).                                   
+
+2.99	Saturday May  4, 2002, 08:23:42 AM UTC
+
+	* Size.pm, revision 106
+	Applied two patches from Ville Skyttä <ville.skytta@iki.fi>,    
+	providing MNG and Image::Magick support.                        
+
+2.98	Saturday March  2, 2002, 08:36:07 PM UTC
+
+	* Size.pm, revision 104
+	Bumped the version number. Wouldn't have to keep remembering    
+	this if I'd move it to the Makefile.PL.                         
+
+	* Size.pm, revision 103
+	Fixed some documentation issues and a small buglet in an error  
+	message.                                                        
+
+	* README.Win32, revision 102
+	Small change to step #2                                         
+
+2.97	Thursday February 28, 2002, 07:58:43 AM UTC
+
+	* Size.pm, revision 99
+	Fixed some lingering tsoft.com e-mail addresses, cleared up the 
+	docs per Jeff Friedl's suggestion, moved the call to            
+	File::Spec->catpath() so that it only gets called when cacheing 
+	is still on.                                                    
+
+2.96	Tuesday November 20, 2001, 11:39:43 PM UTC
+
+	* Size.pm, revision 96
+	Silly typo in PCD code                                          
+
+2.95	Sunday November 11, 2001, 11:42:48 AM UTC
+
+	* Size.pm, revision 94
+	Added manual disabling of the cache, and added support for PCD  
+	images.                                                         
+
+2.94	Wednesday September 19, 2001, 03:27:20 AM UTC
+
+	* Size.pm, revision 91
+	Corrected a bug in psdsize(), credited source of the PSD test   
+	image, and bumped the version number.                           
+
+	* t/all.t, revision 90
+	Added test for PSD code, using recently-supplied image          
+
+	* MANIFEST, revision 89
+	Added entry for the PSD test file                               
+
+	* t/468x60.psd, revision 87 (added)
+	Test file for PSD (PhotoShop) support                           
+
+	* Makefile.PL, revision 86
+	Changes to the name of the template spec file and the generated 
+	spec file                                                       
+
+	Transaction revision: 85
+	* Image-Size.spec.in (deleted)
+	* spec.in (added)
+	Renamed this file                                               
+
+	* Makefile.PL, revision 84
+	Adapted parts of the Perl-RPM Makefile.PL to enable building of 
+	RPM and SRPM files. This version uses an external template      
+	rather than embedding it under the __DATA__ token.              
+
+	* Image-Size.spec.in, revision 83 (added)
+	Basic RPM specfile template to allow for building a noarch RPM  
+	and SRPM for this package.                                      
+
+2.93	Friday April 13, 2001, 08:55:11 AM UTC
+
+	* t/all.t, revision 80
+	Added test for Flash support                                    
+
+	* MANIFEST, revision 79
+	Added test file for Flash support                               
+
+	* Size.pm, revision 78
+	Forgot to credit Dmitry in the docs.                            
+
+	* Size.pm, revision 77
+	Added code from Dmitry Dorofeev <dima@yasp.com> to handle       
+	ShockWave/Flash files.                                          
+
+	* t/yasp.swf, revision 76 (added)
+	Sample Flash file from Dmitry Dorofeev <dima@yasp.com>          
+
+2.92	Sunday March 11, 2001, 10:56:01 PM UTC
+
+	* Size.pm, revision 72
+	Manually added a patch from Dan Klein to close files that       
+	imgsize opens.                                                  
+
+2.91	Friday December  8, 2000, 08:20:34 AM UTC
+
+	Transaction revision: 69
+	* Size.pm
+	* imgsize
+	Added copyright notice so that Debian could use the module      
+
+	Transaction revision: 68
+	* MANIFEST
+	* Makefile.PL
+	Reflect change to imgsize script                                
+
+	Transaction revision: 67
+	* imgsize (added)
+	* imgsize.PL (deleted)
+	Changed from imgsize.PL to plain imgsize, thanks to MakeMaker   
+	features                                                        
+
+2.904	Tuesday November 28, 2000, 08:10:05 AM UTC
+
+	* Makefile.PL, revision 65
+	Added PREREQ_PM clause for detecting File::Spec                 
+
+	* Size.pm, revision 64
+	Bumped version number for CPAN                                  
+
+	* ANNOUNCE, revision 62 (deleted)
+	Removed from the distribution                                   
+
+2.903	Friday April 28, 2000, 02:56:13 AM UTC
+
+	Transaction revision: 60
+	* Size.pm
+	Minor fix from CPAN Testers Group for workability on Macs       
+
+2.902	Wednesday April 26, 2000, 07:21:04 AM UTC
+
+	* Size.pm, revision 57
+	Worked on the regular expressions that are used on the          
+	text-based formats, in hopes of further smoothing out the rift  
+	between UNIX and non-UNIX systems. Added use of Cwd. Filenames  
+	passed in are prepended with the current dir if they aren't     
+	already absolute pathnames. This was to fix a subtle problem    
+	where different files with the same relative names (referenced  
+	from different directories) would confuse the cache. Added the  
+	image type to the cached data. Previously, only dimensions were 
+	cached. Now, a cache-hit returns the same triple returned       
+	originally. Also added the file's modification-time to the      
+	cache, as the (growing!) use of Image::Size in Apache mod_perl  
+	environments found that if an image is changed, the cache won't 
+	notice. Now it does. Added recognition of thumbnail-format pics 
+	from the popular viewer XV. The value of image type for these   
+	is the string "XV". Integrated a patch that makes html_imgsize  
+	generate tags that are XHTML- compliant. Same patch also caught 
+	a few doc bugs that I'd missed.                                 
+
+	* MANIFEST, revision 55
+	Added ChangeLog                                                 
+
+	* ChangeLog, revision 54 (added)
+	Change history moved here from README                           
+
+	* MANIFEST, revision 53
+	Changed dave.jpg to pak38.jpg                                   
+
+	* t/all.t, revision 52
+	Updated html_imgsize test and replaced image for test 6         
+
+	* t/pak38.jpg, revision 51 (added)
+	GIF-named-JPG to replace dave.jpg                               
+
+	* t/dave.jpg, revision 50 (deleted)
+	corrupted file                                                  
+
+	* README.Win32, revision 47 (added)
+	A basic step-by-step for those whose Perl lacks MakeMaker       
+	support (generally Win-based systems).                          
+
+	Transaction revision: 46
+	* t/bexjdic.tif (added)
+	* t/dave.jpg (added)
+	* t/letter_N.ppm (added)
+	* t/letter_T.jpg (added)
+	* t/lexjdic.tif (added)
+	* t/pass-1_s.png (added)
+	* t/spacer50.xbm (added)
+	* t/test.gif (added)
+	* t/xterm.bmp (added)
+	* t/xterm.xpm (added)
+	Initial check-in, files had been released in previous versions  
+	but were not being tracked.                                     
+
+	* imgsize.PL, revision 45
+	Changed a lingering uswest.com address to the current.          
+
+2.901	Wednesday March 10, 1999, 12:28:00 PM UTC
+
+	Transaction revision: 44
+	* ANNOUNCE
+	* README
+	* Size.pm
+	Change the version number for this release due to CPAN treating 
+	2.10 as less than 2.9.                                          
+
+2.10	Wednesday March 10, 1999, 08:37:00 AM UTC
+
+	* Size.pm, revision 42
+	Moved some things around, and added two significant changes: no 
+	longer uses IO::File internally (and is also more lax on        
+	whether a passed-in FH is specifically from that class) and is  
+	now fully strict-clean (no longer strict-refs dirty).           
+
+2.9	Wednesday December  9, 1998, 09:10:11 AM UTC
+
+	* Size.pm, revision 40
+	Four changes: fix to GIFs that are GIF87 but have GIF98a-style  
+	indicators; fix byte-ordering problem in bmpsize(); fix         
+	eol-condition in the PPM pattern for earlier Win32 builds; and  
+	(hopefully) addressed MacOS in that last adjustment, as well.   
+
+	* Makefile.PL, revision 39
+	Added attributes to the WriteMakefile call for ActiveState PPM  
+	(only done for Perl 5.005 and later).                           
+
+	* imgsize.PL, revision 38
+	Added some docs and better error-handling.                      
+
+2.8	Monday December  7, 1998, 10:18:44 AM UTC
+
+	* t/all.t, revision 37
+	Added a test for the new BMP support.                           
+
+	* Size.pm, revision 36
+	Added support for BMP files, changed VERSION to 2.8.            
+
+2.7	Friday August  7, 1998, 08:35:47 AM UTC
+
+	* Size.pm, revision 33
+	Corrected numerous documentation errors and make the base       
+	imgsize routine return a void context if called in a void       
+	context.                                                        
+
+	Sunday January 25, 1998, 09:29:14 AM UTC
+
+	* t/all.t, revision 31
+	Incorporate changes from Cloyce Spradling that were             
+	accidentally left out of 2.5.                                   
+
+	* Size.pm, revision 30
+	Fixed some problems with reading of XPM and XBM headers. In the 
+	case of XPM, it was a matter of the key line having a third     
+	pair of numbers. In the case of XBM, comments at the head of an 
+	XBM file could keep the read-in buffer from extracting enough   
+	data (fixed by upping the read size from 160 to 1024).          
+
+2.5	Wednesday December 24, 1997, 05:19:00 PM UTC
+
+	Transaction revision: 28
+	* ANNOUNCE
+	* MANIFEST
+	* README
+	* Size.pm
+	Added support for TIFF images and two test cases. Many thanks   
+	to Cloyce Spradling <cloyce@headgear.org> for both the code     
+	patches and the test images.                                    
+
+2.4	Tuesday September  2, 1997, 07:36:54 PM UTC
+
+	* Size.pm, revision 26
+	Fixed tiny bug in jpeg code that failed to return "JPG" as the  
+	3rd element. Figures someone would actually use that feature... 
+
+2.3	Monday April 21, 1997, 06:34:53 PM UTC
+
+	* Size.pm, revision 24
+	Fixed usage of AutoLoader to 5.004 standards and fixed glitch   
+	in XPM regex.                                                   
+
+2.2	Thursday January 16, 1997, 10:25:10 PM UTC
+
+	* Makefile.PL, revision 23
+	Fixed it so that the imgsize script gets removed for make clean 
+	or make realclean.                                              
+
+	* Size.pm, revision 22
+	Small patch to set binmode for OS/2, etc. that need it. Also    
+	change to gifsize to clean up -w noise from new lexical-related 
+	warnings (in this case, a reference to $stream might not have   
+	been properly shared).                                          
+
+2.1	Friday November 29, 1996, 05:25:00 PM UTC
+
+	* Size.pm
+	Added in changes to the error handling that were meant for 2.0. 
+	Fixed a bug in attr_imgsize caused by the new return format.    
+
+2.0	Monday November 25, 1996, 01:33:00 PM UTC
+
+	* README, revision 19
+	Notation of the changed error syntax.                           
+
+	* Size.pm, revision 18
+	Image::Size 2.0 package: better GIF, JPG and PNG handling.      
+	Added PPM handling. No longer uses filenames to type the data.  
+	Operates on memory and file- handles as well as filenames.      
+
+	* t/all.t, revision 16
+	New tests for new formats, new error reporting.                 
+
+	* Makefile.PL, revision 15
+	Specified GNU zip as compressor.                                
+
+1.2	Friday September  6, 1996, 03:31:57 PM UTC
+
+	* MANIFEST, revision 11
+	Changed imgsize to imgsize.PL (from patch by Bernd Leibing      
+	<bernd.leibing@rz.uni-ulm.de>)                                  
+
+	* imgsize.PL, revision 10
+	Revised by Bernd Leibing <bernd.leibing@rz.uni-ulm.de> to use   
+	var substitution for things like the start-up line.             
+
+	* Size.pm, revision 9
+	Assignment of $Image::Size::revision caused an error due to q//.
+
+1.1	Wednesday September  4, 1996, 09:26:25 PM UTC
+
+	Transaction revision: 7
+	* ANNOUNCE (added)
+	* imgsize.PL (added)
+	Initial revision                                                
+
+	* Makefile.PL, revision 5
+	Added imgsize, a simple script that sizes images from the       
+	command-line.                                                   
+
+	* Size.pm, revision 4
+	Fixed a bug in jpegsize and added some clarity to docs and      
+	comments.                                                       
+
+1.0	Tuesday August  6, 1996, 10:24:38 PM UTC
+
+	Transaction revision: 3
+	* MANIFEST (added)
+	* Makefile.PL (added)
+	* README (added)
+	* Size.pm (added)
+	* t/all.t (added)
+	Initial commit of the core project files.                       
+
+# Generated on Saturday February 28, 2015, 09:00:55 AM -0800
+# Using changelog2x/0.11, App::Changelog2x/0.11, XML::LibXML/2.0117,           
+# XML::LibXSLT/1.92, libxml/2.9.0, libxslt/1.1.28 (with exslt)                 
+# XSLT sources:
+#     $Id: changelog2text.xslt 8 2009-01-19 06:46:50Z rjray $
+#     $Id: common-text.xslt 8 2009-01-19 06:46:50Z rjray $
+#     $Id: common.xslt 4 2009-01-07 13:02:06Z rjray $

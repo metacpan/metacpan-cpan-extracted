@@ -1,0 +1,61 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.80.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 06c895db4c083da1f6e7c9585abb00e2629fee6d Changes
+SHA1 1dafcbcb7b25dfbf360c799cc6713033b4a81c2d Image-JpegTran/Changes
+SHA1 71db464289235e9c688252b609de757912d30b45 Image-JpegTran/JpegTran.xs
+SHA1 fceccec7f917fa6079af951473c27ace4a0fb409 Image-JpegTran/MANIFEST
+SHA1 3e637cb720d4a0d0a0e25931bebdbc3e7ed8b629 Image-JpegTran/MANIFEST.SKIP
+SHA1 d3fc5b1210f8294f5012502b82e96711ce186619 Image-JpegTran/META.yml
+SHA1 8a13deda6f75e61d8c98818c96ea4ff56e99fae1 Image-JpegTran/Makefile.PL
+SHA1 cba20ecf107fa420db5bd38f96f99ecfabdded56 Image-JpegTran/README
+SHA1 de128f54a73fad86f5aa51c0356c51ddbed12297 Image-JpegTran/README.IJG
+SHA1 3fa8e76e8526804181706992b337e57501e3d683 Image-JpegTran/inc/Devel/CheckLib.pm
+SHA1 c2fd823f1b40207df3753982e1bd6995f875ef6e Image-JpegTran/jinclude.h
+SHA1 1a833c8697f4d2877086de2c1c5de58ae87084b7 Image-JpegTran/jpegint.h
+SHA1 ade2a08fe29823712964d6d3bd54c19651f3bd5b Image-JpegTran/lib/Image/JpegTran.pm
+SHA1 71e1d6bf7bb0b323e6ee1c71560020db1f29e9bf Image-JpegTran/ppport.h
+SHA1 dbe18533640d7c481a71757da86a0fae101eb6fe Image-JpegTran/t/00-load.t
+SHA1 249f78ba2a2431714d5ecb8786291a17199b4f93 Image-JpegTran/t/01-conversions.t
+SHA1 7a432cc71b6822683d30da9f103a6f0be61391bb Image-JpegTran/t/data/testimg.jpg
+SHA1 877de1bd0d368aa39469728aab37cab64b251b38 Image-JpegTran/transupp.c
+SHA1 a970b9ce5aa67a1605fa37b3dc0151b26c9e90d0 Image-JpegTran/transupp.h
+SHA1 003a7da492598d6575afdfe1e5828bfbf2a85d02 MANIFEST
+SHA1 f8eddd327bb9d9a35ac1e87cb12e961bd5b9cc85 META.yml
+SHA1 b79aea62e4d8e2099fb9383352dc5764c11c7293 Makefile.PL
+SHA1 10a86c6c41d21c7c6f329d6ba6b001b52f887aef README
+SHA1 c9779f3b4535047a8d65110ac455d5df3d75961f README.mkdn
+SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
+SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
+SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
+SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
+SHA1 5fd0e992f3615576d9428dc2ca4a2198b22b2957 inc/Module/Install/GithubMeta.pm
+SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
+SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
+SHA1 3b9281ddf7dd6d6f5de0a9642c69333023193c80 inc/Module/Install/Package.pm
+SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
+SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
+SHA1 26d58a041cd6b3d21db98b32e8fd1841aae21204 inc/Module/Package.pm
+SHA1 f8e4173d8a810cd1379574a457956275d7507046 inc/Pod/Markdown.pm
+SHA1 fd3392de1c9df5f92c16769b8bf39159e8478b60 lib/Image/JpegTran/AutoRotate.pm
+SHA1 41afe2c04bb573b40e283e2b210ed70a47a3f8ba t/0-signature.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAleYluQACgkQtLPdNzw1AaDHZgCgh3SbRc9o1jb1ttmRmAPtJh5e
+tfEAnj12JdVVnPHWWRuyFLVYAsALLVp8
+=TNPP
+-----END PGP SIGNATURE-----

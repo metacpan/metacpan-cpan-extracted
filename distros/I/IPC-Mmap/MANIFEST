@@ -1,0 +1,12 @@
+Changes.txt
+MANIFEST
+Makefile.PL
+lib/IPC/Mmap.pm
+lib/IPC/Mmap/POSIX.pm
+lib/IPC/Mmap/Win32.pm
+Mmap.xs
+typemap
+t/01mmap.t
+t/02multithread.t
+t/03multiproc.t
+META.yml                                Module meta-data (added by MakeMaker)

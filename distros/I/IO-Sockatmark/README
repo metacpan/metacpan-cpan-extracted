@@ -1,0 +1,38 @@
+NAME
+    IO::Sockatmark - Perl extension for TCP urgent data
+
+SYNOPSIS
+      use IO::Sockatmark;
+      use IO::Socket;
+
+      my $sock = IO::Socket::INET->new('some_server');
+      $sock->read(1024,$data) until $sock->atmark;
+
+DESCRIPTION
+    This module adds the atmark() method to the standard IO::Socket class.
+    This can be used to detect the "mark" created by the receipt of TCP
+    urgent data.
+
+  Methods
+
+    $flag = $socket->atmark()
+        The atmark() method true if the socket is currently positioned at
+        the urgent data mark, false otherwise.
+
+  Exported functions
+
+    $flag = atmark($socket)
+        The atmark() function returns true if the socket is currently
+        positioned at the urgent data mark, false otherwise. This will work
+        with an IO::Socket object, as well as with a conventional filehandle
+        socket.
+
+AUTHOR
+    Copyright 2001, Lincoln Stein <lstein@cshl.org>.
+
+    This module is distributed under the same terms as Perl itself. Feel
+    free to use, modify and redistribute it as long as you retain the
+    correct attribution.
+
+SEE ALSO
+    perl(1), IO::Socket(3)

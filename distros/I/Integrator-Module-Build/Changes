@@ -1,0 +1,17 @@
+Revision history for Integrator-Module-Build
+
+August 2nd 2007 - rev 1.057
+
+	- Requires perl >= 5.8.8
+
+July 30th 2007 - rev 1.056
+
+	- Added dev switch in tests
+	- Documentation touch-ups
+
+July 30th 2007 - First release to CPAN - rev 1.055
+
+
+Revision 1.1  2006/02/13 17:32:40
+created Integrator-Module-Build
+

@@ -1,0 +1,12 @@
+MANIFEST
+Makefile.PL
+Changes
+lib/Image/Match.pm
+eg/test.pl
+t/01_load.t
+t/02.png
+t/02_match.t
+t/03_multiple.t
+t/98_pod.t
+t/99_pod_coverage.t
+META.yml                                 Module meta-data (added by MakeMaker)

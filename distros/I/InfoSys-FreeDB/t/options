@@ -1,0 +1,64 @@
+# Set this to 1 to test CDDBP connections
+test_cddbp: 0
+
+# Set this to 1 to test CDDBP over HTTP connections
+test_http: 0
+
+# Set this to 1 to test the CDDBP synopsis. Put a CD that is known in
+# FreeDB in cdparanoia's default device.
+test_cddbp_syn: 0
+
+# Set this to 1 to test the CDDBP over HTTP synopsis. Put a CD that is known in
+# FreeDB in cdparanoia's default device.
+test_http_syn: 0
+
+# Set this to 1 to test the CDDBP over HTTP track synopsis. Put a CD that is
+# known in FreeDB in cdparanoia's default device.
+test_http_track_syn: 0
+
+# Set this to 1 to test the CDDBP over HTTP discid synopsis. Put a CD that is
+# known in FreeDB in cdparanoia's default device.
+test_http_discid_syn: 0
+
+# Set this to 1 to test the CDDBP over HTTP lscat synopsis.
+test_http_lscat_syn: 0
+
+# Set this to 1 to test the CDDBP over HTTP motd synopsis.
+test_http_motd_syn: 0
+
+# Set this to 1 to test the CDDBP proto synopsis.
+test_cddbp_proto_syn: 0
+
+# Set this to 1 to test the CDDBP over HTTP sites synopsis.
+test_http_sites_syn: 0
+
+# Set this to 1 to test the CDDBP over HTTP stat synopsis.
+test_http_stat_syn: 0
+
+# Set this to 1 to test the CDDBP over HTTP ver synopsis.
+test_http_ver_syn: 0
+
+# Set this to 1 to test the CDDBP over HTTP whom synopsis.
+test_http_whom_syn: 0
+
+# Here you can overrule the default HTTP cgi. Leave empty otherwise.
+freedb_cgi:
+
+# Here you can overrule the default freedb host. Leave empty otherwise.
+freedb_host:
+
+# Here you can overrule the default freedb port. Leave empty otherwise.
+freedb_port:
+
+# Here you can set the freedb proxy host for CDDBP over HTTP through proxy.
+proxy_host:
+
+# Here you can set the freedb proxy password for CDDBP over HTTP through proxy.
+proxy_passwd:
+
+# Here you can set the freedb proxy port for CDDBP over HTTP through proxy.
+proxy_port:
+
+# Here you can set the freedb proxy user for CDDBP over HTTP through proxy.
+proxy_user:
+

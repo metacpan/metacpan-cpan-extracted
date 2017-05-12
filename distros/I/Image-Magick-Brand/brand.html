@@ -1,0 +1,190 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Image::Magick::Brand - Perl extension for creating branded images with ImageMagick.</title>
+<link rev="made" href="mailto:root@hampsten.nonet" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#prerequisites">PREREQUISITES</a></li>
+	<li><a href="#parameters">PARAMETERS</a></li>
+	<ul>
+
+		<li><a href="#required_parameters">REQUIRED PARAMETERS</a></li>
+		<li><a href="#optional_parameters">OPTIONAL PARAMETERS</a></li>
+	</ul>
+
+	<li><a href="#export">EXPORT</a></li>
+	<li><a href="#version_history">VERSION HISTORY</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#copyright_and_license">COPYRIGHT AND LICENSE</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>Image::Magick::Brand - Perl extension for creating branded images with ImageMagick.</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+  use Image::Magick::Brand;
+  my $b = new Image::Magick::Brand;
+  
+  $b-&gt;debug(1); # debugging statements on
+  
+  # Required parameters
+  $b-&gt;brand( source =&gt; 'brand.png',
+             target =&gt; 'photo.jpg',
+             output =&gt; 'branded.jpg' );
+   
+  # Required and optional parameters
+  $b-&gt;brand( source    =&gt; 'brand.png',
+             target    =&gt; 'photo.jpg',
+             output    =&gt; 'branded.jpg',
+             gravity   =&gt; 'SouthWest',
+             format    =&gt; 'jpg',
+             composite =&gt; 'over',
+             quality   =&gt; 75 );</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>Create branded images by composing one image on top of another. For optimal results, use a transparent png (or gif...if you must)
+as the source image. Note: You must have the appropriate system libraries installed to use certain image formats (ie: lipjpeg, libpng).
+ImageMagick will complain if you don't.</p>
+<p>Source + Target = Branded Image</p>
+<pre>
+       +---------+   +---------+
+       |         |   |         |
+       |         |   |         |
+       |         |   | +--+    |
++--+   |         |   | |  |    |
+|  | + |         | = | +--+    |
++--+   +---------+   +---------+</pre>
+<p>
+</p>
+<hr />
+<h1><a name="prerequisites">PREREQUISITES</a></h1>
+<p><code>Image::Magick</code></p>
+<p>
+</p>
+<hr />
+<h1><a name="parameters">PARAMETERS</a></h1>
+<p>
+</p>
+<h2><a name="required_parameters">REQUIRED PARAMETERS</a></h2>
+<dl>
+<dt><strong><a name="item_source">source</a></strong><br />
+</dt>
+<dd>
+The input path of the source image ('brand image').
+</dd>
+<dl>
+<dt><strong><a name="item_target">target</a></strong><br />
+</dt>
+<dd>
+The input path of the target image.
+</dd>
+<dl>
+<dt><strong><a name="item_output">output</a></strong><br />
+</dt>
+<dd>
+The output path of the branded image.
+</dd>
+<p></p></dl>
+</dl>
+</dl>
+<p>
+</p>
+<h2><a name="optional_parameters">OPTIONAL PARAMETERS</a></h2>
+<dl>
+<dt><strong><a name="item_gravity">gravity</a></strong><br />
+</dt>
+<dd>
+The gravity (location) of the source image on top of the target image.
+</dd>
+<dd>
+<pre>
+ +---------+
+ | 1  2  3 |
+ |    4    |
+ | 5  6  7 |
+ +----------
+ 
+ 1 = NorthWest
+ 2 = North
+ 3 = NorthEast
+ 4 = Center
+ 5 = SouthWest (default)
+ 6 = South
+ 7 = SouthEast</pre>
+</dd>
+<p></p>
+<dt><strong><a name="item_quality">quality</a></strong><br />
+</dt>
+<dd>
+Quality for JPG/MIFF/PNG output (0-100). Default = 100.
+</dd>
+<p></p>
+<dt><strong><a name="item_composite">composite</a></strong><br />
+</dt>
+<dd>
+The 'composite' value as passed to ImageMagick's composite function. Default = 'over'. Read the docs for the other possible values.
+</dd>
+<p></p>
+<dt><strong><a name="item_format">format</a></strong><br />
+</dt>
+<dd>
+The output format. Default = jpg.
+</dd>
+<p></p></dl>
+<p>
+</p>
+<hr />
+<h1><a name="export">EXPORT</a></h1>
+<p>None by default.</p>
+<p>
+</p>
+<hr />
+<h1><a name="version_history">VERSION HISTORY</a></h1>
+<p>Version 0.01 (03 May 2005): Initial Revision</p>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p><a href="/Image/Magick.html">the Image::Magick manpage</a></p>
+<p><a href="/Image/Magick/Thumbnail/Fixed.html">the Image::Magick::Thumbnail::Fixed manpage</a></p>
+<p><a href="http://imagemagick.org/script/perl-magick.php">http://imagemagick.org/script/perl-magick.php</a></p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Adam Roth, &lt;<a href="mailto:aroth@cpan.org">aroth@cpan.org</a>&gt;</p>
+<p>Originally developed for <a href="http://www.fetishcyclesfanclub.com.">http://www.fetishcyclesfanclub.com.</a> Let me know if you find this module useful.</p>
+<p>
+</p>
+<hr />
+<h1><a name="copyright_and_license">COPYRIGHT AND LICENSE</a></h1>
+<p>Copyright 2005 by Adam Roth</p>
+<p>This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+</p>
+
+</body>
+
+</html>

@@ -1,0 +1,15 @@
+Changes
+COPYRIGHT
+lib/IPC/Pipeline.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+t/code.t
+t/handletypes.t
+t/invalid.t
+t/pipeline.t
+t/stderr.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

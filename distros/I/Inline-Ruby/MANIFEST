@@ -1,0 +1,29 @@
+Changes
+Changes.old-changes
+LICENSE
+MANIFEST
+Makefile.PL
+README
+Ruby.pm
+Ruby.xs
+examples/inline-ruby-test.pl
+lib/Inline/Ruby.pod
+rb2pl.c
+rb2pl.h
+samples/tk/tkhello.pl
+t/01basic.t
+t/02iter.t
+t/03bindfunc.t
+t/04iterator.t
+t/05rb_exc.t
+t/06pl_exc.t
+t/07proc.t
+t/08bind1.t
+t/08bind2.t
+t/09regex.t
+t/cpan-changes.t
+t/pod-coverage.t
+t/pod.t
+t/style-trailing-space.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

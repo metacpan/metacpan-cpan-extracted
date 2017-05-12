@@ -1,0 +1,69 @@
+Changes for IRC::Indexer
+
+
+0.06 2012-04-17
+
+ Fix glaringly obvious test failure.
+ Didn't come up here since Multi.pm was still present.
+ Yes, I'm an idiot.
+
+ 
+0.05 2012-04-17
+
+ ircindexer-server-json:
+   - TrawlInterval configurable, override via --interval
+   - PidFile configurable, override via --pidfile
+ 
+ IRC::Indexer::Conf:
+   - Support writing to open FH in write_example_cf()
+
+ IRC::Indexer::Trawl::Multi:
+   - Removed.
+     Never very well-tested, throws inconsistent test failures on *BSD, 
+     very braindead.
+
+
+0.04 2012-04-16
+
+ - Allow parsing confs from previously-opened file handles.
+
+ - Fix POE::Component::IRC shutdown timeout.
+ 
+ - t/01_load/ :
+   01_loadable,t; Deprecated, deleted
+   04_helpers.t; Test IRC::Indexer::Conf & ::Logger properly
+
+
+0.03 2012-04-15
+
+ - Report::Server->status(); report empty string, not undef
+   Makes it easier to test status strings.
+   
+ - Tweak examples/chart_users_cron.pl
+
+ - Trawl::Multi:
+    Properly cleanup when finished
+    Shorter initial check alarm
+    (Trawl::Multi still sucks; use Trawl::Bot.)
+
+ - t/ expanded; Add Test::Cmd tests, improve others.
+   Add Trawl::Multi test.
+
+
+0.02 2012-04-15
+
+ - Add missing test t/03_runnable.t
+
+ - Clean up examples/chart_users_cron.pl a bit
+  (It's still pretty terrible. You're welcome.)
+
+ - server-json; log message typo
+
+ - Significant POD updates/cleanups
+
+
+0.01 2012-04-14
+
+  Initial IRC::Indexer release.
+  Prior history lives in git: 
+   git://eris.cobaltirc.org/irc-indexer.git

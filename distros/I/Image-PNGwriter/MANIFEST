@@ -1,0 +1,13 @@
+Changes
+Makefile.PL
+MANIFEST
+PNGwriter.xs
+ppport.h
+README
+t/Image-PNGwriter.t
+fallback/const-c.inc
+fallback/const-xs.inc
+lib/Image/PNGwriter.pm
+perlobject.map
+typemap
+META.yml                                 Module meta-data (added by MakeMaker)

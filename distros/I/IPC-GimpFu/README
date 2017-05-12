@@ -1,0 +1,66 @@
+IPC-GimpFu
+
+This module makes it possible to communicate with Gimp's script-fu
+server, and also to start/stop it on the local machine.
+
+From the synopsis, two tiny examples:
+
+    use IPC::GimpFu;
+
+    # Start locally if needed, keep running once we're done:
+    my $gimp = IPC::GimpFu->new({ autostart => 1 });
+    $gimp->run({ file => "gimp-source.scm" });
+    $gimp->run("some command");
+
+    # Use a remote server:
+    my $remote_gimp = IPC::GimpFu->new({ server => "other-server", port => "other-port" });
+    $remote_gimp->run("something else");
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+If the gimp binary isn't available, the first command can be changed
+into:
+
+	BYPASS_MISSING_GIMP=1 perl Makefile.P
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc IPC::GimpFu
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=IPC-GimpFu
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/IPC-GimpFu
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/IPC-GimpFu
+
+    Search CPAN
+        http://search.cpan.org/dist/IPC-GimpFu/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2012-2013 Cyril Brulebois
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

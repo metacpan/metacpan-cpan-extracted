@@ -1,0 +1,7 @@
+Revision history for IOC-Slinky-Container
+
+0.1001  Thu Nov 24 22:28:50 PHT 2011
+        - added support for _constructor_passthru
+0.1000  Mon May 16 16:50:51 PHT 2011
+        - initial version
+

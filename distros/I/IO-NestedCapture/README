@@ -1,0 +1,55 @@
+IO::NestedCapture
+=================
+
+IO::NestedCapture allows for some nice and simple STDIN, STDOUT, STDERR
+capturing that can be nested. If you just need to capture output without the
+nesting, you might want to see IO::Capture.
+
+What do I mean by nested capture? Here's an example:
+
+  use IO::NestedCapture ':subroutines';
+  my $io = IO::String->new;
+
+  IO::NestedCapture->set_next_out($io);
+
+  capture_out \&foo;
+
+  while (<$io>) { print ucfirst($_) }
+
+  sub foo {
+    capture_out \&bar;
+
+    my $out = IO::NestedCapture->get_last_out;
+    while (<$out>) { print lc($_) }
+  }
+
+  sub bar {
+    print "HELLO WORLD!\n";
+  }
+
+  # output is:
+  # Hello world!
+
+Basically, the output of the first method is captured and converted to lowercase
+and then the other capture captures it and converts the first character to
+uppercase.
+
+Installation
+------------
+
+Typical Module::Build install:
+
+  perl Build.PL
+  ./Build
+  ./Build test
+  ./Build install
+
+Bugs and Such
+-------------
+
+Feature requests and bugs can be submitted to CPAN RT:
+
+  http://rt.cpan.org/
+
+Cheers,
+Sterling

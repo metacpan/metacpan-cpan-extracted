@@ -1,0 +1,26 @@
+<-------------- THE SEVENTY-TWO CHARACTER COLUMN-OMETER --------------->
+<--------1---------2---------3---------4---------5---------6---------7->
+
+
+IP-Country-DNSBL-1.02, 2006.12.19
+---------------------------------
+Now queries any DNSBL server (thx, Jeff Garzik).
+
+
+IP-Country-DNSBL-1.01, 2006.12.18
+---------------------------------
+Name change, suggested by Jeff Garzik.
+
+
+IP-Country-NetOp-1.01, 2006.12.18
+---------------------------------
+Fix for my naive use of Net::DNS modules (thx Jeff Garzik).
+
+
+IP-Country-NetOp-1.00, 2006.12.18
+---------------------------------
+First attempt at producing a module for netop.org. Works for me ;)
+
+
+<--------1---------2---------3---------4---------5---------6---------7->
+<-------------- THE SEVENTY-TWO CHARACTER COLUMN-OMETER --------------->

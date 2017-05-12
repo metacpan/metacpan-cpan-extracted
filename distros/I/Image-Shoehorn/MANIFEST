@@ -1,0 +1,7 @@
+Changes
+examples/20020313-scary-easter-monsters.jpg
+lib/Apache/ImageShoehorn.pm
+lib/Image/Shoehorn.pm
+Makefile.PL
+MANIFEST
+t/import.t

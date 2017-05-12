@@ -1,0 +1,76 @@
+{
+   "abstract" : "IMAP4-compatible BODYSTRUCTURE and ENVELOPE parser",
+   "author" : [
+      "Alex Kapranoff <alex@kapranoff.ru>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.5.0",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "IMAP-BodyStructure",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008_001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::NoWarnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "IMAP::BodyStructure" : {
+         "file" : "lib/IMAP/BodyStructure.pm",
+         "version" : "1.03"
+      },
+      "IMAP::BodyStructure::Envelope" : {
+         "file" : "lib/IMAP/BodyStructure.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kappa/IMAP-BodyStructure/issues"
+      },
+      "homepage" : "https://github.com/kappa/IMAP-BodyStructure",
+      "repository" : {
+         "url" : "git://github.com/kappa/IMAP-BodyStructure.git",
+         "web" : "https://github.com/kappa/IMAP-BodyStructure"
+      }
+   },
+   "version" : "1.03",
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

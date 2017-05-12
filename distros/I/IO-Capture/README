@@ -1,0 +1,34 @@
+		IO::Capture
+
+  The IO::Capture Module defines an abstract base class that can be
+used to create any number of useful sub-classes that capture output 
+being sent on a filehandle such as STDOUT or STDERR.
+  Several modules come with the distribution that define sub-
+classes of IO::Capture to do just that. (I.e., capture STDOUT and STDERR)  
+See the man page IO::Capture::Overview for a discussion of these 
+modules and how to build a module to sub-class the B<IO::Capture> 
+class yourself. 
+  To build and install this module, follow the standard procedures:
+
+    $ perl Makefile.PL
+    $ make
+    $ make test
+    $ su
+    # make install
+
+ 
+Report any problems via http://rt.cpan.org/.
+
+CHANGES:
+        I found a couple of problems that made me re-think the module
+        IO::Capture::ErrorMessages.  As a result, I am  removing this
+        module from the distribution.  It is  now depreciated and will
+        be remove in the next release.   IO::Capture::Stderr now has
+        has the same functionality that IO::Capture::Stderr did previously,
+        and can be used instead.
+
+	I have added a new parameter to IO::Capture::Stderr, "FORCE_CAPTURE_WARN".
+	It controls capturing text sent via warn(), if $SIG{__WARN__} has been 
+	changed.  The default is to let the text go to the handler set in 
+	$SIG{__WARN__}.  If you want to override this, set FORCE_CAPTURE_WARN
+        to a 1.  

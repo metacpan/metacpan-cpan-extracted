@@ -1,0 +1,11 @@
+This module provides an IRC guess word game
+
+Here are the basic install instructions.
+
+perl Build.PL
+./Build
+./Build test
+./Build install
+
+
+If you are on a windows box you should use 'nmake' rather than 'make'.

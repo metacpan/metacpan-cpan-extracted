@@ -1,0 +1,22 @@
+---
+name: Image-Imlib2
+version: 2.03
+author:
+  - 'Leon Brocard, acme@astray.com'
+abstract: Interface to the Imlib2 image library
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Module::Build: 0.20
+  Test::More: 0.01
+configure_requires:
+  Module::Build: 0.35
+provides:
+  Image::Imlib2:
+    file: lib/Image/Imlib2.pm
+    version: 2.03
+generated_by: Module::Build version 0.35
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

@@ -1,0 +1,17 @@
+Changes
+inc/Devel/CheckLib.pm
+inc/IO/CaptureOutput.pm
+lib/IPC/ShareLite.pm
+Makefile.PL
+MANIFEST
+README
+ShareLite.xs
+sharestuff.c
+sharestuff.h
+t/00-load.t
+t/pod.t
+t/sharelite.t
+t/unicode-key.t
+typemap
+META.yml                                 Module meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

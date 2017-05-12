@@ -1,0 +1,20 @@
+bin/ipcwipe.sh
+bin/perlshm-cleanup
+IPC/Shm.pm
+IPC/Shm/Make.pm
+IPC/Shm/Segment.pm
+IPC/Shm/Tied.pm
+IPC/Shm/Tied/ARRAY.pm
+IPC/Shm/Tied/HASH.pm
+IPC/Shm/Tied/SCALAR.pm
+t/00_preinit.t
+t/10_scalar.t
+t/11_scalar.t
+t/95_cleanup.t
+t/96_cleanup.t
+t/99_cleanup.t
+Makefile.PL
+MANIFEST
+README
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,45 @@
+Revision history for Perl extension Image::JpegCheck
+
+0.10
+
+    - detect GLOB or not by Scalar::Util::openhandle
+
+0.09
+
+        - 0.08's change is not compat for Ricoh GRX.
+          Ricoh GRX inject some random bytes in stuffing byte.
+
+0.08
+
+        - support stuffing byte
+          (yappo++)
+
+0.07
+
+        - I failed cpan upload.re-release.
+
+0.06
+
+        - validate EOI for truncated jpeg file(hirose31++)
+
+0.05
+
+        - added scalarref support
+        - added Path::Class::File support
+        - added validation code(yappo++)
+
+0.04
+
+        - remove xs(pp is fast enough)
+        - fixed bug for some jpeg file(patch by kazeburo++)
+
+0.03
+
+        - brush up xs code
+
+0.02
+
+        - added xs version. xs version is 150% faster.
+
+0.01    Thu Apr 23 17:00:44 2009
+        - original version

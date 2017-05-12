@@ -1,0 +1,33 @@
+---
+abstract: 'Useful IRC objects and utilities'
+author:
+  - 'Jon Portnoy <avenj@cobaltirc.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: IRC-Toolkit
+requires:
+  Exporter::Tiny: '0'
+  List::Objects::Types: '1'
+  List::Objects::WithUtils: '2'
+  Moo: '2'
+  MooX::TypeTiny: '0'
+  POE::Filter::IRCv3: '0.045'
+  Role::Tiny: '0'
+  Storable: '0'
+  Sub::Infix: '0'
+  Types::Standard: '0'
+  strictures: '2'
+resources:
+  repository: git://github.com/avenj/irc-toolkit.git
+version: '0.092002'
+x_serialization_backend: 'YAML::Tiny version 1.69'

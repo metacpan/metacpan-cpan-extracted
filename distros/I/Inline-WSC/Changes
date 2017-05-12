@@ -1,0 +1,10 @@
+Revision history for Perl extension Inline::WSC.
+
+0.02  Tue Aug 1 21:13:14 2006
+	- Inline::WSC now looks at both $ENV{TMP} and $ENV{TEMP} before 
+	defaulting to "C:\Windows\Temp" as its SWC temporary directory.
+
+0.01  Tue Apr 25 09:17:12 2006
+	- original version; created by h2xs 1.23 with options
+		-AXf --name=Inline::WSC
+

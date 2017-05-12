@@ -1,0 +1,26 @@
+Revision history for Image-Magick-Safer
+
+0.07     2016-08-04
+        - [Fix] test failures on BSD systems by skipping them, document
+          this problem (GH #2)
+
+0.06     2016-07-22
+        - [Add] add explicit check for leading pipes and file not found
+          as bad filenames check added in v0.04 doesn't always catch
+          these (GH #1)
+
+0.05     2016-07-22
+        - [Add] add explicit check for leading pipes and file not found
+          as bad filenames check added in v0.04 doesn't always catch
+          these (GH #1)
+
+0.04     2016-05-31
+        - [Add] return error on bad filenames, which also catches
+          use of pipe as leading char to defend against popen()
+          shell vulnerability
+
+0.02     2016-05-20
+        - [Fix] add Read aliases: ReadImage, read, readimage
+
+0.01     2016-05-20
+        - First release

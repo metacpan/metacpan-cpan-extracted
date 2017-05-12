@@ -1,0 +1,35 @@
+---
+abstract: 'run only one process up to given timeout'
+author:
+  - 'HIROSE Masaaki <hirose31 _at_ gmail.com>'
+build_requires:
+  File::Temp: 0
+  Test::More: 0
+configure_requires:
+  Module::Build::Tiny: 0.039
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.035, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: IPC-Lock-WithTTL
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  Class::Accessor::Lite: 0
+  Smart::Args: 0
+  perl: 5.008005
+resources:
+  bugtracker: https://github.com/hirose31/IPC-Lock-WithTTL/issues
+  homepage: https://github.com/hirose31/IPC-Lock-WithTTL
+  repository: https://github.com/hirose31/IPC-Lock-WithTTL.git
+version: 0.02
+x_contributors:
+  - 'HIROSE Masaaki <hirose31@gmail.com>'

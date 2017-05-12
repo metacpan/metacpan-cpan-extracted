@@ -1,0 +1,93 @@
+Revision history for Perl extension Inline::Files.
+
+0.69  Sun May 24 11:39:27 WEST 2015 (AMBS)
+    - Skip superuser test in Cygwin.
+
+0.68  Sat Jul 23 19:45:01 WEST 2011 (AMBS)
+    - Use 'VERSION_FROM' and 'ABSTRACT_FROM' on Makefile.PL
+
+0.67  Fri Jul 8  12:33:03 WEST 2011 (AMBS)
+    - Getting rid of 'diagnostics' (really!)
+
+0.66  Thu Jul 7  12:33:03 WEST 2011 (AMBS)
+    - Getting rid of 'diagnostics'
+      (thanks to Sawyer X for the help)
+
+0.65  Sat Jun 18 11:44:02 WEST 2011 (AMBS)
+    - Require 'Test' for better debugging.
+
+0.64  Mon Jan 31 10:53:23 WET 2011 (AMBS)
+    - Support open with pipes (not for virtual files).
+      Fixes #44692.
+
+0.63  Sun May 10 17:02:02 WEST 2009 (AMBS)
+	- Fixed test 03nowrite.t to success if run by root.
+        - Corrected module name in the documentation
+
+0.62  Tue May 27 23:35:53 GMT 2003 (DCONWAY)
+	- Fixed signature of vf_truncate
+
+0.61  Sun Jun 17 05:48:49 EST 2001 (DCONWAY)
+	- Reinstated Ingy's workaround for desymbolization of globs
+	  under threaded perls
+
+0.53  Thu May 24 23:51:57 PDT 2001 (INGY)
+	- Removed doc references to diagnostics that were removed in 0.51.
+
+0.52  Fri May 25 15:31:02 EST 2001 (DCONWAY)
+	- Added %WHATEVER mechanism hash to access inline data
+	  about __WHATEVER__
+
+0.52  Fri May 25 13:50:35 EST 2001 (DCONWAY)
+	- Silenced complaint when vf_close used on normal filehandle names
+
+0.52  Fri May 25 13:00:53 EST 2001 (DCONWAY)
+        - Added -backup option to import list
+
+0.51  Mon May 21 13:40:09 PDT 2001 (INGY)
+	- Changed seek() to work more like a real seek in regards to
+	  edge cases. (Actually set to emulate my Linux seek)
+
+0.51  Mon May 21 13:13:39 PDT 2001 (INGY)
+	- Warn instead of croak for user errors. More like real functions.
+
+0.51  Mon May 21 02:08:44 PDT 2001 (INGY)
+	- Create a new Inline File with 'open FILE ">";'
+
+0.51  Mon May 21 02:08:44 PDT 2001 (INGY)
+	- Make file name absolute so chdir() will not cause problems
+
+0.51  Sun May 20 23:38:56 PDT 2001 (INGY)
+	- Added a multi-file test harness that supports writing to files.
+
+0.51  Sun May 20 21:51:49 PDT 2001 (INGY)
+	- Don't croak on save() failure. Just warn if appropriate and return 0.
+	- close() returns value of save().
+
+0.51  Sun May 20 21:37:07 PDT 2001 (INGY)
+	- Set changed flag in the appropriate place
+	- Mode got confused in some contexts
+
+0.51  Thu Mar 22 11:29:06 PST 2001 (INGY)
+	- Save was adding an extra newline to each written file.
+	- NOTE: Inline::Files must always end with a newline
+
+0.51  Thu Mar 22 11:14:11 PST 2001 (INGY)
+	- Fixed list behaviour for PRINT
+
+0.51  Thu Mar 22 11:04:23 PST 2001 (INGY)
+	- Added list context for READLINE
+
+0.51  Wed Mar 21 23:12:54 PST 2001 (INGY)
+	- Fixed weird glob reference bug for threaded perls.
+
+0.50  Thu Mar 15 12:00:50 2001 (DCONWAY)
+	- First draft. Inline::Files and Inline::Files::Virtual are functional.
+
+0.01  Fri Mar  2 06:05:33 2001
+	- original version; created by h2xs 1.18
+
+
+
+0.62	Tue May 27 23:36:55 2003
+

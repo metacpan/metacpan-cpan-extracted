@@ -1,0 +1,117 @@
+NAME
+    IO::Callback::HTTP - read/write from HTTP URIs as if they were filehandles
+
+SYNOPSIS
+     use IO::Callback::HTTP;
+ 
+     my $fh = IO::Callback::HTTP->new("<", "http://www.example.com/");
+ 
+     while (my $line = <$fh>)
+     {
+        print $line;
+     }
+
+DESCRIPTION
+    This module allows you to read from and write to HTTP resources as if they
+    were normal file handles (in fact, any non-HTTP resources supported by
+    LWP::UserAgent ought to be OK too, including FTP, Gopher, etc).
+
+    Why would you do this? Not for efficiency reasons, that's for sure.
+    However, certain APIs expect to be passed filehandles; this module gives
+    you those filehandles.
+
+    Files can be opened in either read mode, using:
+
+     my $fh = IO::Callback::HTTP->new('<', $request, %options);
+
+    or write mode:
+
+     my $fh = IO::Callback::HTTP->new('>', $request, %options);
+
+    The $fh variable will then act like a normal Perl filehandle, but instead
+    of interacting with a local file on disk, you'll be interacting with an
+    HTTP resource on a remote server.
+
+    $request can be a URI (either a string, or a blessed URI object), or it
+    can be an HTTP::Request object. A URI is obviously simpler, but using an
+    HTTP::Request object offers you more flexibility, such as the ability to
+    change the HTTP method (defaults to GET for filehandles opened in read
+    mode, and PUT for filehandles opened in write mode) or include particular
+    HTTP headers (some of which are very useful: Accept, Content-Type,
+    User-Agent, etc).
+
+    Note that for a single filehandle, only one HTTP request is actually made.
+    In the case of read mode, this happens on the first read. If no characters
+    are read from the handle, then no request is made. In the case of write
+    mode, the request happens once the file is closed.
+
+    There are also a few options which can be passed to the constructor:
+
+    `agent`
+        An LWP::UserAgent object (or a subclass, such as WWW::Mechanize or
+        LWPx::ParanoidAgent) that will actually make the request.
+
+        This is optional; IO::Callback::HTTP does have its own pet UA that it
+        can use if you don't provide one.
+
+    `bytes`
+        In read mode, if true, will make sure the data read from the handle is
+        returned encoded as a UTF-8 byte string. If false, then the data read
+        will be returned as a utf8 character string.
+
+        In write mode, if true, will assume that you're writing bytes to the
+        filehandle. If false, will assume that you're writing utf8 character
+        strings to the filehandle, so will deal with encoding them to UTF-8
+        octets.
+
+        Defaults to true.
+
+    `failure`
+        Set this to a coderef to trigger when the HTTP request fails (i.e.
+        times out or non-2XX HTTP response code). It is passed a single
+        parameter, which is the HTTP::Response object.
+
+        As a shortcut, the strings 'croak', 'confess', 'carp' and 'cluck' are
+        also accepted, with the same meanings as defined in Carp.
+
+        Either way, IO::Callback::HTTP should do the correct thing, setting $!
+        and so on.
+
+    `success`
+        Set this to a coderef to trigger when the HTTP request succeeds (i.e.
+        2XX HTTP response code). It is passed a single parameter, which is the
+        HTTP::Response object.
+
+        For filehandles in read mode, this is probably not especially useful,
+        the fact that you can read from the file handle at all indicates that
+        the request was successful. In write mode, it's more interesting as
+        you may be interested in the result of a POST or PUT request.
+
+CAVEATS
+    Most of the test suite is skipped on MSWin32 because Test::HTTP::Server
+    does not currently support that platform. IO::Callback::HTTP is *believed*
+    to function correctly on Windows, but it's had no meaningful testing.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=IO-Callback-HTTP>.
+
+SEE ALSO
+    IO::Callback, LWP::UserAgent.
+
+    IO::All::LWP does something similar, though it's less flexible.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2012 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

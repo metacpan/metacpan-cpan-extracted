@@ -1,0 +1,21 @@
+This is a simple toolkit to send simple (one-line text) messages to any
+interested parties on the network.
+
+notify.pl sends a message to all receivers on the network, which you pass in
+quotes as a command line argument.
+
+monitor.pl prints all the messages it receives, and never exits.
+
+waitfor.pl waits for a specific message, prints it and exits.  You specify the
+message on its command line; it will match any message which starts with the
+specified string.
+
+The obvious use for this is event notification.  For instance, one host has
+finished creating a file of some sort, (media, software binary release), and
+tells the web server to copy the file out of a tmp-directory into a web server
+directory, over nfs.
+
+This is also a useful base model to extend for various purposes, such as
+gaming and text messaging.
+
+This protocol runs connectionless, using the name {1935081472, 1}.

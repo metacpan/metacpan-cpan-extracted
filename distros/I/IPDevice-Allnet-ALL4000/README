@@ -1,0 +1,34 @@
+IPDevice2-Allnet-ALL4000 version 0.11
+=====================================
+
+Provides an interface to ALL4000 ethernet sensormeter
+At present it is only possible to get the data with this module.
+
+ALL4000 specifications:
+http://www.allnet-usa.com/selfupload/ALL4000%20english.pdf
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+LWP::UserAgent;
+XML::Parser;
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 by Robin Clarke
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+

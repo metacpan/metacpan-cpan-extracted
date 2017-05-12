@@ -1,0 +1,23 @@
+Image/GD/Thumbnail version 0.04
+===============================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  GD
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+

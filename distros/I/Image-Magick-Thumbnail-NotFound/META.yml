@@ -1,0 +1,13 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Image-Magick-Thumbnail-NotFound
+version:      1.008
+version_from: lib/Image/Magick/Thumbnail/NotFound.pm
+installdirs:  site
+requires:
+    Image::Magick:                 0
+    Image::Magick::Square:         0
+    Image::Magick::Thumbnail:      0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

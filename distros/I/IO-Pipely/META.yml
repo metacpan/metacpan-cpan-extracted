@@ -1,0 +1,32 @@
+---
+abstract: 'Portably create pipe() or pipe-like handles, one way or another.'
+author:
+  - 'Rocco Caputo <rcaputo@cpan.org>'
+build_requires:
+  Carp: 1.26
+  Scalar::Util: 1.29
+  Test::More: 0.98
+  perl: 5.004
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.132140'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: IO-Pipely
+requires:
+  Exporter: 5.68
+  Fcntl: 1.06
+  IO::Socket: 1.31
+  Symbol: 1.06
+  base: 2.18
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=IO-Pipely
+  homepage: http://search.cpan.org/dist/IO-Pipely/
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/rcaputo/io-pipely.git
+version: 0.005

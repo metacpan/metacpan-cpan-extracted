@@ -1,0 +1,24 @@
+#!/usr/bin/perl -w
+use strict;
+use warnings;
+
+use Image::Fixup;
+
+my $usage = "image_info image1.jpg\n";
+die $usage unless @ARGV > 0;
+
+for my $file (@ARGV) {
+	print "Reading image...\n";
+	my $image = Image::Fixup->new($file);
+	$image->printImageInfo;
+	print "Changing image orientation...\n";
+	$image->autoOrient;
+	print "Resizing image...\n";
+	$image->autoResize;
+	print "Writing image to disk...\n";
+	$image->writeImage;
+	$image->printImageInfo;
+	print "\n";
+}
+
+exit 0;

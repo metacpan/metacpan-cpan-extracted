@@ -1,0 +1,14 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=playajpeg
+Comment=Play AJPEG animated JPEG files
+Exec=/usr/local/bin/playajpeg %u
+Terminal=false
+Type=Application
+Icon=
+Categories=Video;Graphics;Audio;AudioVideo;
+StartupNotify=true
+MimeType=image/ajpeg
+NoDisplay=true
+Comment[de]=Animierte 'Animated JPEG' Dateien abspielen
+#MimeType=image/jpeg;

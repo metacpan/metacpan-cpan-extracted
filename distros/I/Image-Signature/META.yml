@@ -1,0 +1,12 @@
+name: Image-Signature
+module_name: Image::Signature
+version: 0.01
+author: xern <xern@cpan.org>
+distribution_type: module
+requires:
+  List::Util: 0
+  Image::Magick: 5.5.7
+private:
+  directory:
+    - inc
+generated_by: Module::Install version 0.22

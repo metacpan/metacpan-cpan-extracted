@@ -1,0 +1,41 @@
+Image-SubImageFind version 0.03
+===============================
+
+A module for locating a sub-image file within a larger image file.
+
+Leveraging Dr. Werner Van Belle's work from the following paper:
+   An Adaptive Filter for the Correct Localization of Subimages: FFT
+   based Subimage Localization Requires Image Normalization to work 
+   properly (http://werner.yellowcouch.org/Papers/subimg/index.html)
+
+In addition, there are additional comparison mechanisms available.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  ImageMagick (MagickCore, Magick++)
+  ImageMagick-devel
+  ImageMagick-c++-devel
+  fftw3
+  fftw3-devel 
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010-2011 by Dennis K. Paulsen
+
+Other portions are copyright their respective owners.
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; version 2 of the License.
+

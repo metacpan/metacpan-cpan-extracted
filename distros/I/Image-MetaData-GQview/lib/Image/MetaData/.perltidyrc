@@ -1,0 +1,33 @@
+# Configfile für perltidy
+# -gnu ist -lp -bl -noll -pt=2 -bt=2 -sbt=2 -icp
+#          ^^^ ^^^ ~~~~~ ^^^^^ ^^^^^ ^^^^^^ ~~~~
+-l=0	# Zeilenlänge von 80 ist nicht mehr wirklich zeitgemäß
+-i=3	# Indent 3
+-pt=2	# Klammerhandling
+-sbt=2	# Klammerhandling
+-bt=2	# Klammerhandling
+-bbt=1	# Klammerhandling
+-ci=3	# Indent bei mehrzeiligen Zeilen
+-isbc	# Indent nur schon eingerückte Kommentare
+#-noll	# Ersetzt durch (n)olc und (n)olq
+-nolc	# Kein Indent bei langen Blockkommentare entfernen
+-nolq	# Kein Indent bei langen Quotes entfernen
+-nbbb	# Keine Leerzeilen vor Blöcken
+#-icp	# Ersetzt durch cti=2
+-cti=1	# Schliesende Klammer in Höhe der öffnenden
+-bl	# Öffnende Klammern in neuer Zeile
+-et=8	# Komprimiere 8 Space zu einem Tab
+-se	# Fehler auf STDERR
+-w	# Warnings als Error
+-syn	# Check Syntax
+-msc=3	# Kommentarabstand
+-nsfs	# Kein Space vor Semikolon (plenken ausschalten)
+-csc	# Kommentar auf schliesenden Klammern
+-csce=1	# + else
+-cscw	# Warne bei Ersetzung
+-ssc	# Static side comment
+-otr	# Öffnente Klammer nach Komma in selber Zeile
+#-lp	# Nicht lesbar; Indented Listen mehr als nötig
+-sot	# Öffnente Klammern zusammenfassen
+-sct	# Schliesende Klammern zusammenfassen
+-wbb="% + - * / x < > | & F p m"

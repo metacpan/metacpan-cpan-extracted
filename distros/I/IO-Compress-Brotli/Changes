@@ -1,0 +1,21 @@
+Revision history for Perl extension IO::Compress::Brotli.
+
+0.002001 2016-09-08T23:09+01:00
+ - Use gmake (if available) to compile the brotli library
+
+0.002 2016-08-28T00:33+01:00
+ - Thanks to Quim Rovira, Ævar Arnfjörð Bjarmason, Marcell Szathmári
+   and Mattia Barbon for all changes in this version
+ - Use a git submodule to embed the brotli repo
+ - Modernise calls to deprecated brotli decoder APIs
+ - Add brotli encoder bindings
+ - Add more tests
+ - Add a command line tool (bro-perl) that imitates the official bro
+   tool
+ - Make XS code look nicer
+
+0.001001 2016-01-01T11:32+02:00
+ - Add BUILD_REQUIRES
+
+0.001 2015-12-31T21:02+02:00
+ - Initial release

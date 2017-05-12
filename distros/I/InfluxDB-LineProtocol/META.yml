@@ -1,0 +1,30 @@
+---
+abstract: 'Write and read InfluxDB LineProtocol'
+author:
+  - 'Thomas Klausner <domm@cpan.org>'
+build_requires:
+  Module::Build: '0.28'
+  Test::More: '0'
+  Test::Most: '0'
+  lib: '0'
+  perl: '5.012'
+configure_requires:
+  Module::Build: '0.28'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: InfluxDB-LineProtocol
+requires:
+  Carp: '0'
+  Time::HiRes: '0'
+  perl: '5.012'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: git://github.com/domm/InfluxDB-LineProtocol.git
+version: '1.009'
+x_serialization_backend: 'YAML::Tiny version 1.69'

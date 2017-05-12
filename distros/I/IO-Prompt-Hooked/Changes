@@ -1,0 +1,62 @@
+Revision history for Perl module IO::Prompt::Hooked
+
+0.10 2013-03-26
+  - Fixed another POD example.  No other changes.
+
+0.09 2013-03-07
+  - Fixed an example in the POD's SYNOPSIS.
+
+0.08 2012-11-08
+  - Fix distribution metadata to specify proper module version.
+  - Fixed t/09-changes.t for Perl::Critic compliance.
+  - Removed 'Carp' dependency; no exceptions thrown explicitly by
+    IO::Prompt::Hooked. (IO::Prompt::Tiny could still throw).
+  - Minor POD revisions.
+
+0.07 2012-11-08
+  - If 'message' parameter is unspecified or set to undef, use an empty
+    string instead so that we don't cause IO::Prompt::Tiny::prompt to
+    die.
+  - Added tests to verify graceful handling of no message.
+
+0.06 2012-11-02
+  - "Changes" is now W3CDTF and CPAN::Changes::Spec compliant.
+  - Added author only RELEASE_TESTING test: t/09-changes.t to verify 
+    compliance.
+
+0.05 2012-10-22
+  - Set default number of tries if tries isn't already set to a positive
+    number in non-interactive mode.  This fixes the endless loop 
+    condition that could occur if default fails to validate in 
+    non-interactive mode.
+  - Tests now manage interactive mode detection more directly.
+  - POD now explains new "tries" bevavior in non-interactive mode.
+  - Param validation simplified.
+  - Devel::Cover now reports 100% coverage.
+  - Set minimum Perl version to 5.6.0.
+
+0.04 2012-10-19
+  - Changed how _is_interactive() is imported into module (tracking
+    down an elusive *BSD test suite FAIL).
+  - Added several tests to t/20-logic.t to try to track down the bug.
+  - Tests added to bring coverage to 96.9%.
+
+0.03 2012-10-11
+  - Fixed a test in 20-logic.t that was generating warnings under 
+    Perl 5.8.x.
+  - Took a closer look at Perl::Critic advice (made a couple of 
+    minor changes).
+  - Removed Capture::Tiny dependency from t/20-logic.t (it wasn't
+    being used there anyway).
+  - Added Capture::Tiny dependency to BUILD_REQUIRES in Makefile.PL
+    for 30-io_prompt_tiny.t.
+
+0.02 2012-10-11
+  - Localized and unset the PERL_MM_USE_DEFAULT in two tests where
+    smoke testers might have been running with it set, thus breaking
+    the tests.
+
+0.01 2012-10-09
+  - Initial release.
+  - Based on IO::Prompt::Tiny
+

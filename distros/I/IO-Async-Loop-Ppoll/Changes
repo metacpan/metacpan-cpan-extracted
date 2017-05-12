@@ -1,0 +1,36 @@
+Revision history for IO-Async-Loop-Ppoll
+
+0.09    CHANGES:
+         * Implement IO_ASYNC_WATCHDOG
+
+0.08    BUGFIXES:
+         * Try to workaround perl block/unblock signals bug by using an unsafe
+           POSIX::SigAction handler
+
+0.07    CHANGES:
+         * Updated for IO::Async 0.33
+
+0.06    CHANGES:
+         * Updated for IO-Async 0.24
+         * Use shared acceptance testing provided by IO::Async::LoopTests
+
+0.05    CHANGES:
+         * Various small changes to keep CPANTS happy
+         * Renamed to remove 'IO_' prefix for consistency with other Loop
+           modules
+
+0.04    CHANGES:
+         * Added 'use warnings'
+
+        BUGFIXES:
+         * Don't rely on writability of STDOUT during test scripts
+
+0.03    CHANGES:
+         * Updated for IO-Async 0.20
+
+0.02    CHANGES:
+         * Use IO::Async::SignalProxy::signame2num() to convert signal numbers
+           since it may know more than POSIX does
+
+0.01    First version, released on an unsuspecting world.
+

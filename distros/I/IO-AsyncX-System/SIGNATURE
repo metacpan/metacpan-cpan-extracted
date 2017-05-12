@@ -1,0 +1,52 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.78.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 66ef65a27ad618612a4c539b2e53180968f900f0 Changes
+SHA1 022cd34341a78ae77bb13c9c15c4d2ecb00034f5 INSTALL
+SHA1 1d431d36f36b6e6d6caf68e84e78806a6c83e85f LICENSE
+SHA1 52ac51130881217f62533dfe8ab1b43180b0dfcf MANIFEST
+SHA1 be74395807bc86a27f6d2b19ad6fcc06177318e6 META.json
+SHA1 b77e1356c2ea9091cac59271eb035d0c0d18954d META.yml
+SHA1 0ec65d52446b57791051a582565c3f021572f3bb Makefile.PL
+SHA1 4f90ec74c690d42f0c9c35144ac4f5aaa57ebbae README
+SHA1 7b57fd56b6711a38a4132fd58daf9f8ed8edd4b9 cpanfile
+SHA1 eb01b891d19d4ad3b05f35a420e78bd94ab84906 dist.ini
+SHA1 adc83b19e793491b1c6ea0fd8b46cd9f32e592fc empty.txt
+SHA1 1b7d4632976d250956d49d509b30bdd2ac5f48e5 inc/Devel/AssertOS.pm
+SHA1 2050c7f1cff1c952edc8d8461520c55df17591d3 inc/Devel/AssertOS/MSWin32.pm
+SHA1 52dcb8b2b98363d1e1fdebd5e193bc12c57c220a inc/Devel/CheckOS.pm
+SHA1 bf9f86b3196957b76817a55195a53a4a7e575097 lib/IO/AsyncX/System.pm
+SHA1 de3606508a78bc6b37eb7be48cb2c2c654d600fc lib/IO/AsyncX/System.pod
+SHA1 985d9ded8d8ed7e344a09e52b1402e878e91da28 t/00-check-deps.t
+SHA1 507b02f90881cf403c82ed41ebc1f3aad2033d47 t/00-compile.t
+SHA1 d4d254240163e37b97868d8f83144bf6a22fe09c t/000-report-versions-tiny.t
+SHA1 8bbc439afc76028fc3be849d157d833c3f22f551 t/system.t
+SHA1 198d1665317c3d91e3bb81f0a3b8dad8d4d66f20 xt/release/common_spelling.t
+SHA1 c6c3c9f7fe12058b4771449dff874b1c450c982c xt/release/mojibake.t
+SHA1 296928dbbcaffd1514ccc9b77a1e6e03cfe9b068 xt/release/pod-syntax.t
+SHA1 34513f89a70b96f6412fe2ef0ad4d475e8cac66c xt/release/synopsis.t
+SHA1 e1c7ebf87fe628a6b1cd24977c2636915a1ba7aa xt/release/test-version.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJVUVvQAAoJEFKElMNpjtyDhk8H/ih4XJlQFa4pQ6GtCZYS8Q7T
+l3dP7fyPg3mdxjZUip1H2jil90xVq3naXMIB7BlXtpU6Q5qNS6fx2JCT8XRX2pLe
+f8XvRCw3Jf31J6LMZ4tUw7FdcH6i7w4aQij8Phefkf+c0tMpsIVnoi4y7XGL5swZ
+amyRnno/O5yUxxBj9e84Imhh7zJ+TienBZxGroW9ETncyRl8Awhbbt7tSmIuSdk5
+T8oZgFw+fbsydXxgItCCMFInC0cXDtsBClJEsiU0lwNvpdTZPYpB8uKuxhmtC6+e
+b+D9Q5oesnXDXbJmmYn/ikr+C2MKiSiGrp2IUKTR1p4hqPCVSonR0GWHsx8Hdy4=
+=cjtK
+-----END PGP SIGNATURE-----

@@ -1,0 +1,132 @@
+releases by David Cantrell:
+
+0.39  2016-11-15  test jiggery-pokery to make sure stuff works once
+                    . is removed from default @INC (see
+                    http://www.nntp.perl.org/group/perl.cpan.workers/2016/11/msg1513.html)
+
+0.38  2016-10-27  set User-Agent in maint_ip_world_db to cope with
+                    Maxmind occasionally blocking LWP::UserAgent's
+                    default UA. Maxmind are fine with this;
+                  provide constants to use to set mode instead of
+                    numbers (see https://rt.cpan.org/Public/Bug/Display.html?id=70687)
+
+releases by Craig MacKenna:
+
+0.37  Jul 3 2010
+      * Corrected "number of tests to skip" in t/2mmap.t for systems 
+        that don't have/implement mmap.
+
+0.36  Jul 2 2010
+      * i.r.t. RT bug #59056, modified maint_ip_world_db to check for 
+        existence of IP::World::ConfigData before checking for a 
+        datum inside it.
+      * i.r.t. FAIL 07342895 on a test system with non-standard 
+        versions of LWP::UserAgent and HTTP::Status, required at 
+        least version 5.817 (Oct 2008) of both in Build.PL.
+      * updated DB and revised tests per changes in IP space
+
+0.35  Apr 26 2010
+      * Included new ck_ip4 in World.xs, successor to inet_pton which 
+        was mostly for Windows, in which Microsoft Visual Studio
+        found C errors and warnings.
+      * Changed mode in World.xs data file opening from "r" to "rb", 
+        so that Windows will read the file in binary mode.  Maybe 
+        someday this module will pass on Windows.
+
+0.34  Apr 23 2010
+      * Revised IP::World::Builder further to make databases writable 
+        before changing their mod dates, on Windows.  Maybe someday 
+        this module will pass on Windows.
+
+0.33  Apr 12 2010
+      * Removed all proxy handling except LWP::UserAgent env_proxy
+        from maint_ip_world_db.  It was too ugly to fix.  A new module 
+        will handle proxies in a future version.
+      * Reconciled New vs. Newx call for perls < 5.8.8.
+      * Added an implementation of inet_pton for Windows systems that
+        don't include it.  It's only included/used on such systems.
+      * Revised IP::World::Builder to make databases writable before
+        changing their mod dates, on Windows.
+      * Revised tests 4-8 in each test file to use quoted numeric
+        constants.  This accomodates a weird cygwin test box that
+        seemed to compile unquoted numeric constants as packed 32-bit 
+        values(?).
+      * Fixed a little problem in the ip2country script which was 
+        contributed by a guy at WorldIP.
+
+0.32  Apr 7 2010
+      * Added some proxy handling to maint_ip_world_db.  Future
+        versions will use a separate module for proxy handling.
+      * Moved most of sub process_dat_files out of Build.PL, into
+        IP/World/Builder.pm (known in perl as IP:World::Builder).
+      * Moved 'use Probe::Perl' from test 0 to Build.PL.  Ensures
+        that the automatic execution of maint_ip_world_db during the
+        install phase happens under the perl used for the build.
+      * Changed name of PERLIO pointer from IN.  IN had a conflict
+        with something predefined on testers' Win32 systems.
+      * Split former DASD mode 2 into mode 2 using C library I/O
+        and mode 3 using Perl I/O.  Perl 5.10.1 seems to have slow
+        Perl I/O.
+
+0.2   Feb 22 2010
+      * Fixed further problem in which the DESTROY function after
+        new(1) on systems without the Mmap feature would do the wrong
+        thing, resulting in segment-faults.
+
+0.18  Feb 21 2010
+      * Fixed problem in which new(1) on systems without Mmap feature
+        wouldn't allocate memory, resulting in segment-faults on a
+        subsequent getcc or DESTROY operation.
+      * Fixed problem wherein C compiler name was compound.  Thanks
+        to Stefan Rezic.
+      * New included database, reflecting Feb update by WIPmania.
+      * Minuscule improvement in maint_ip_world_db, in avoiding
+        creation of a root-owned file in blib.
+
+0.17  Feb 19 2010
+      * Provided empty string as the 2nd (default) operand to the
+        prompt() call in Build.PL, so that smoke-testers won't die
+        with an UNKNOWN result.
+      * Moved the execution of maint_ip_world_db from the build (code)
+        phase to the install phase.  Main advantage is that tests
+        will use an included database and so will not be subject to
+        errors due to updating of the database by maint_ip_world_db.
+      * Improved maint_ip_world_db to use a '.tmp' file for its output,
+        then rename .dat->.bak, then .tmp->.dat.  This prevents
+        destruction of the database by a run that encounters an error.
+      * Added Probe::Perl to get the path to the current perl in
+        t/0check_scripts.t
+      * Changed t/0check_scripts.t to do a perl check of
+        script/maint_ip_world_db, rather than a results check.
+      * Added a way to preserve the mod time of the included databases
+        through archiving and unpacking.
+
+0.15  Feb 17 2010
+      * Improved Build.PL to play better with Module::Build
+      * Pre-built databases (big- and little-endian) are now included
+        in the distribution, to allow installation without internet
+        access, as well as speed up the installation as long as the
+        included databases are recent enough not to need updating.
+      * Added a -d or --dual switch to script/maint_ip_world_db, to
+        produce both big- and little-endian databases in one run.
+        (Mostly for the author in building new distributions.)
+
+0.14  Feb 17 2010
+      * Included ppport.h to maximize compatibility with older perls
+      * Changed requires to perl 5.7.3
+      * Small optimization to internal search loop in lib/IP/World.xs
+
+0.13  Feb 16 2010
+      * Updated Build.PL to make command line more compatible with
+        non-Unix/Linux systems.
+      * Updated script/maint_ip_world_db to improve the initial
+        decision-making as to whether to build a database.
+      * Updated t/0check_scripts.t to run perl syntax checks on
+        script/ip_world_dump and script/ip_cc_benchmark.
+      * Updated documentation in lib/IP/World.pod.
+
+0.12  Feb 15 2010
+      * Initial version: combines data from WorldIP and GeoIP
+      * 3 modes: 0: fast, keeps data in memory
+                 1: Mmap, fast, may save memory for forked children
+                 2: tiny, slow but minimum memory, searches on disk

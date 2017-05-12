@@ -1,0 +1,9 @@
+Revision history for Icon-Theme-Index-Parse
+
+0.0.1	2010-07-02/11:50
+		-Fix it's handling of themes that don't inherit from any
+			others, such as hicolor.
+		-Make sure "Config::IniHash" is a requirement in "Makefile.PL".
+
+0.0.0	2009-12-25/23:30
+		-Initial release.

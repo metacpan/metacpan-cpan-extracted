@@ -1,0 +1,10 @@
+Revision history for Perl extension Inline::CPR.
+
+0.11  Sat Jan 13 13:13:37 PST 2001
+	- Corrected 2nd arg of execl
+
+0.11  Sat Jan 13 13:05:59 PST 2001
+	- Changed to work with Inline v0.31
+
+0.10  Sun Dec 10 10:39:38 PST 2000
+	- Original release for CPAN

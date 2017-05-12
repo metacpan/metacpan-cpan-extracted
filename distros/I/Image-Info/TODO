@@ -1,0 +1,12 @@
+
+* Image::TIFF should not need to slurp
+* convert the EXIF parsing code to just use something like
+  Image::Exiftool - our code is way to complicated, outdated,
+  and it's double work to maintain it
+* Get rid of XML::Simple dependency in Image::Info::SVG::XMLLibXMLReader
+* determining XBM files fail if a long comment precedes the "pseudo magic"
+  Seen with /usr/local/include/X11/bitmaps/mouse.xbm. Possible solutions:
+  * read more than 64 bytes for magic checks
+  * make the file detection mechanism two-step: first step with a small
+    buffer for file formats which have a real magic at beginning of the
+    file, and if this fails following a second step for stuff like xbm

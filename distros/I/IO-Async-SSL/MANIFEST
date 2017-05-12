@@ -1,0 +1,26 @@
+Build.PL
+Changes
+examples/delayed_sclient.pl
+examples/sclient.pl
+lib/IO/Async/SSL.pm
+lib/IO/Async/SSLStream.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00use.t
+t/01upgrade.t
+t/02protocol-upgrade.t
+t/03cross.t
+t/04readwrite.t
+t/05utf8.t
+t/10connect-openssl.t
+t/10connect-socat.t
+t/11listen-openssl.t
+t/11listen-socat.t
+t/20stream.t
+t/99pod.t
+t/privkey.pem
+t/server.pem

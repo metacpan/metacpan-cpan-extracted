@@ -1,0 +1,19 @@
+[% USE bc = BioChrome("$image_src/button.gif");
+   colors = ['00' '33' '66' '99' 'CC' 'FF']
+%]
+
+<table border="0">
+[% FOREACH row IN colors %]
+<tr>
+	[%- FOREACH col IN colors;
+		hexcol = "${row}00${col}";
+		bc.alphas("ffffff_${hexcol}_ffffff_000000");
+		bc.write_file("$image_dest/button${hexcol}.gif")
+	-%]
+	<td>
+		<img src="[% images %]/button${hexcol}.gif" />
+	</td>
+	[% END %]
+</tr>
+[% END %]
+</table>

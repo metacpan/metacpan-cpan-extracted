@@ -1,0 +1,24 @@
+Revision history for Perl extension IO::Infiles.
+
+0.06  Mon Oct 16 08:21:33 2011
+	   - added more tests
+       - created examples/
+
+0.05  Sat Aug 28 08:15:21 2011
+       - Regular upkeep: changed installer, changed and added tests
+
+0.04  Wed Jul 23 21:48:23 2008
+        - Fixed license entry (to perl)
+
+0.03  Thu Sep 29 00:55:35 2005
+        - Disabled the t/distribution.t test 
+
+0.02  Fri Sep 23 09:58:10 2005
+        - Packaging changes to keep CPANTS happy.
+        - Also builds with Module::Build.
+        - Changed META.yaml, and added packaging and pod tests
+
+0.01  Mon Sep 19 14:27:06 2005
+	- original version; created by h2xs 1.23 with options
+		-A -X -n IO::Infiles
+

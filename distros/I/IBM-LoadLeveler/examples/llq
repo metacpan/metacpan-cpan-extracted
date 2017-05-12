@@ -1,0 +1,100 @@
+# -*- Perl -*-
+
+use IBM::LoadLeveler;
+use Sys::Hostname;
+
+@StepState=( "I", "P", "ST", "R",
+    "CP", "XP", "RP",
+    "VP", "C", "X", "RM",
+    "V", "CA", "NR", "TX",
+    "?", "SX", "H", "D",
+    "NQ", "E", "EP",
+    "MP");
+
+@HoldType=("","H","S","HS");
+
+# Format for llq style output
+format STDOUT_TOP =
+Id                       Owner      Submitted   ST PRI Class        Running On
+------------------------ ---------- ----------- -- --- ------------ -----------
+.
+
+format STDOUT =
+@<<<<<<<<<<<<<<<<<<<<<<< @<<<<<<<<< @<<<<<<<<<< @< @<< @<<<<<<<<<<< @<<<<<<<<<<
+$id,$owner,$submit,$st,$pri,$class,$run
+.
+
+# Query Job information
+$query = ll_query(JOBS);
+
+# Ask for all data on all jobs
+$return=ll_set_request($query,QUERY_ALL,undef,ALL_DATA);
+if ($return != 0 )
+{
+    print STDERR "ll_set_request failed Return = $return\n";
+}
+
+# Query the scheduler for information
+# $number will contain the number of objects returned
+
+$job=ll_get_objs($query,LL_CM,NULL,$number,$err);
+
+# Try and work out our domain name
+
+$host=hostname();
+my($fqdn)=gethostbyname($host);
+$fqdn=~/$host\.(.*)/;
+$domain= $1;
+
+while ( $job)
+{
+    # Get the Job submit time and reformat it into something small ala llq
+    $SubmitTime=ll_get_data($job,LL_JobSubmitTime);
+    my @time=localtime($SubmitTime);
+    $submit=$time[4]+1 . "/$time[3] $time[2]:$time[1]";
+
+    # Get User Information
+
+    $cred=ll_get_data($job,LL_JobCredential);
+    $owner=ll_get_data($cred,LL_CredentialUserName);
+
+    # Loop through all steps for this job
+    $step=ll_get_data($job,LL_JobGetFirstStep);
+    while ($step)
+    {
+	$state=ll_get_data($step,LL_StepState);
+	$st=$StepState[$state];
+
+	$id=ll_get_data($step,LL_StepID);
+	#
+	# strip domain name from step name for ease of reading
+	#
+	$tmp=$id;
+	$id=$1 . $2 if $tmp=~/(.*).$domain(.*)/;
+
+	$pri=ll_get_data($step,LL_StepPriority);
+	$class=ll_get_data($step,LL_StepJobClass);
+
+	if ($state == STATE_RUNNING)
+	{
+	    # If it is running get the unquallified machine name
+	    $machine=ll_get_data($step,LL_StepGetFirstMachine);
+	    $tmp=ll_get_data($machine,LL_MachineName);
+	    $run=$1 if $tmp=~/([^\.]*)/;
+	} else {
+            $holdtype=ll_get_data($step,LL_StepHoldType);
+            if ($holdtype > 0 ){
+              $st=$HoldType[$holdtype];
+            }
+        }
+
+	write;
+
+	$step=ll_get_data($job,LL_JobGetNextStep);
+    }
+    $job=ll_next_obj($query);
+}
+# Free up space allocated by LoadLeveler
+ll_free_objs($query);
+ll_deallocate($query);
+

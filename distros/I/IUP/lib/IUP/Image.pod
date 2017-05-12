@@ -1,0 +1,329 @@
+=for comment based on iup-3.5 - http://www.tecgraf.puc-rio.br/iup/en/elem/iupimage.html
+
+=head1 NAME
+
+IUP::Image - [GUI element] image to be shown on a label, button, toggle, or as a cursor
+
+=head1 DESCRIPTION
+
+Creates an image to be shown on a label, button, toggle, or as a cursor.
+
+=head1 USAGE
+
+=head2 CREATION - new() method
+           
+ #8bit/256colors image + color palette definition + 2-dimensional pixels array
+ my $img = IUP::Image->new( 
+             BPP=>8, colors=>[ "0 0 0", "255 0 0", "128 0 0" ],
+             pixels=>[[ 0,0,0,0,0,0,0,0,0,0,0,0 ],
+                      [ 0,0,0,0,2,2,2,2,2,2,2,0 ],
+                      [ 0,0,0,0,0,2,1,1,1,1,2,0 ],
+                      [ 0,0,0,0,0,2,1,1,1,1,2,0 ],
+                      [ 0,0,0,0,2,1,1,1,1,1,2,0 ],
+                      [ 0,0,0,2,1,1,1,1,1,1,2,0 ],
+                      [ 0,0,2,1,1,1,1,1,2,2,2,0 ],
+                      [ 0,2,1,1,1,1,1,2,0,0,2,0 ],
+                      [ 0,0,2,1,1,1,2,0,0,0,0,0 ],
+                      [ 0,0,0,2,2,2,0,0,0,0,0,0 ],
+                      [ 0,0,0,0,2,0,0,0,0,0,0,0 ],
+                      [ 0,0,0,0,0,0,0,0,0,0,0,0 ]], 
+ );
+ 
+ #the same 8bit/256colors image - defined by 1-dimensional pixels array
+ my $img = IUP::Image->new(
+             HEIGHT=>12, WIDTH=>12, BPP=>8, # HEIGHT*WIDTH*BPP/8 should match the size of pixels
+             colors=>[ "0 0 0", "255 0 0", "128 0 0" ],
+             pixels=>[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2,2,0,
+                      0,0,0,0,0,2,1,1,1,1,2,0,0,0,0,0,0,2,1,1,1,1,2,0,
+                      0,0,0,0,2,1,1,1,1,1,2,0,0,0,0,2,1,1,1,1,1,1,2,0,
+                      0,0,2,1,1,1,1,1,2,2,2,0,0,2,1,1,1,1,1,2,0,0,2,0,
+                      0,0,2,1,1,1,2,0,0,0,0,0,0,0,0,2,2,2,0,0,0,0,0,0,
+                      0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+ );
+ 
+ #24bit image - defined by 1-dimensional pixels array
+ my $img = IUP::Image->new(
+      HEIGHT=>11, WIDTH=>11, BPP=>24, # HEIGHT*WIDTH*BPP/8 should match the size of pixels
+      pixels = [
+         0,255,0,  255,  0,0,  255,255,0,  255,255,0,  255,255,0,  255,255,0,  255,255,0,  255,255,0,  255,255,0,  255,  0,0,    0,255,0,
+       255,  0,0,    0,255,0,  255,  0,0,  255,255,0,  255,255,0,  255,255,0,  255,255,0,  255,255,0,  255,  0,0,    0,255,0,  255,  0,0,
+       255,255,0,  255,  0,0,    0,255,0,  255,  0,0,  255,255,0,  255,255,0,  255,255,0,  255,  0,0,    0,255,0,  255,  0,0,  255,255,0,
+       255,255,0,  255,255,0,  255,  0,0,    0,255,0,  255,  0,0,  255,255,0,  255,  0,0,    0,255,0,  255,  0,0,  255,255,0,  255,255,0,
+       255,255,0,  255,255,0,  255,255,0,  255,  0,0,    0,255,0,  255,  0,0,    0,255,0,  255,  0,0,  255,255,0,  255,255,0,  255,255,0,
+       255,255,0,  255,255,0,  255,255,0,  255,255,0,  255,  0,0,    0,255,0,  255,  0,0,  255,255,0,  255,255,0,  255,255,0,  255,255,0,
+       255,255,0,  255,255,0,  255,255,0,  255,  0,0,    0,255,0,  255,  0,0,    0,255,0,  255,  0,0,  255,255,0,  255,255,0,  255,255,0,
+       255,255,0,  255,255,0,  255,  0,0,    0,255,0,  255,  0,0,  255,255,0,  255,  0,0,    0,255,0,  255,  0,0,  255,255,0,  255,255,0,
+       255,255,0,  255,  0,0,    0,255,0,  255,  0,0,  255,255,0,  255,255,0,  255,255,0,  255,  0,0,    0,255,0,  255,  0,0,  255,255,0,
+       255,  0,0,    0,255,0,  255,  0,0,  255,255,0,  255,255,0,  255,255,0,  255,255,0,  255,255,0,  255,  0,0,    0,255,0,  255,  0,0,
+         0,255,0,  255,  0,0,  255,255,0,  255,255,0,  255,255,0,  255,255,0,  255,255,0,  255,255,0,  255,255,0,  255,  0,0,    0,255,0, ]
+ );
+
+ #the same 24bit image - defined by 2-dimensional pixels array (no need to declare WIDTH+HEIGHT)
+ my $img = IUP::Image->new(
+      BPP=>24,
+      pixels = [
+       [  0,255,0,  255,  0,0,  255,255,0,  255,255,0,  255,255,0,  255,255,0,  255,255,0,  255,255,0,  255,255,0,  255,  0,0,    0,255,0],
+       [255,  0,0,    0,255,0,  255,  0,0,  255,255,0,  255,255,0,  255,255,0,  255,255,0,  255,255,0,  255,  0,0,    0,255,0,  255,  0,0],
+       [255,255,0,  255,  0,0,    0,255,0,  255,  0,0,  255,255,0,  255,255,0,  255,255,0,  255,  0,0,    0,255,0,  255,  0,0,  255,255,0],
+       [255,255,0,  255,255,0,  255,  0,0,    0,255,0,  255,  0,0,  255,255,0,  255,  0,0,    0,255,0,  255,  0,0,  255,255,0,  255,255,0],
+       [255,255,0,  255,255,0,  255,255,0,  255,  0,0,    0,255,0,  255,  0,0,    0,255,0,  255,  0,0,  255,255,0,  255,255,0,  255,255,0],
+       [255,255,0,  255,255,0,  255,255,0,  255,255,0,  255,  0,0,    0,255,0,  255,  0,0,  255,255,0,  255,255,0,  255,255,0,  255,255,0],
+       [255,255,0,  255,255,0,  255,255,0,  255,  0,0,    0,255,0,  255,  0,0,    0,255,0,  255,  0,0,  255,255,0,  255,255,0,  255,255,0],
+       [255,255,0,  255,255,0,  255,  0,0,    0,255,0,  255,  0,0,  255,255,0,  255,  0,0,    0,255,0,  255,  0,0,  255,255,0,  255,255,0],
+       [255,255,0,  255,  0,0,    0,255,0,  255,  0,0,  255,255,0,  255,255,0,  255,255,0,  255,  0,0,    0,255,0,  255,  0,0,  255,255,0],
+       [255,  0,0,    0,255,0,  255,  0,0,  255,255,0,  255,255,0,  255,255,0,  255,255,0,  255,255,0,  255,  0,0,    0,255,0,  255,  0,0],
+       [  0,255,0,  255,  0,0,  255,255,0,  255,255,0,  255,255,0,  255,255,0,  255,255,0,  255,255,0,  255,255,0,  255,  0,0,    0,255,0] ]
+ );
+
+ #8bit/256colors image + color palette definition + pixels in a rawbuffer
+ my $img = IUP::Image->new(
+             HEIGHT=>12, WIDTH=>12, BPP=>8, # HEIGHT*WIDTH*BPP/8 should match the size of pixels
+             colors=>[ "0 0 0", "255 0 0", "128 0 0" ],
+             pixels=>$rawdata, # e.g. $rawdata buffer got via sysread()
+ );
+
+ #8bit/256colors image + pixels in a rawbuffer + setting color palette via attributes "0", "1", "2" ...
+ my $img = IUP::Image->new(
+             HEIGHT=>12, WIDTH=>12, BPP=>8, # HEIGHT*WIDTH*BPP/8 should match the size of pixels
+             0=>"0 0 0", 1=>"255 0 0", 2=>"128 0 0", #alternative color palete definition
+             pixels=>$rawdata, # e.g. $rawdata buffer got via sysread()
+ );
+
+ #creating image object from file
+ my $img = IUP::Image->new( file=>'test.png' );
+
+B<pixels:> (named parameter) Reference to array containing the value of each pixel. When BPP=>8 it uses
+1 value per pixel, when BPP=>24 it uses 3 values and when BPP=>4 it
+uses 4 values per pixel. Each value is always 8 bit (0-255). Origin is at the
+top-left corner and data is oriented top to bottom, and left to right.
+The pixels array is duplicated internally so you can discard it after
+the call.
+
+Pixes should be defined as 2-dimensional array (in this case the array sizes define WIDTH + HEIGHT)
+or as 1-dimensional arrat (you have to set WIDTH + HEIGHT explicitely) - see examples above.
+
+B<colors:> (named parameter) Reference to array containing the colors indices.
+
+B<file:> (named parameter) Filename to load image from - is mutually exclusive with pixels parameter.
+Supported image formats (BMP PCX GIF TIFF SGI JPEG TGA ICO PNG PPM PBM PNM PGM LED).
+
+B<WIDTH, HEIGHT, BPP:> Image width, height and color depth in bits-per-pixel - not relevant when using C<< file=>"..." >>
+
+B<Returns:> the identifier of the created element, or C<undef> if an error occurs.
+
+NOTE: You can pass to C<new()> other C<ATTRIBUTE=E<gt>'value'> or C<CALLBACKNAME=E<gt>\&func> pairs relevant
+to this element - see L<IUP::Manual::02_Elements|IUP::Manual::02_Elements/"new()">.
+
+=head2 General Usage Notes
+
+Application icons are usually 32x32. Toolbar bitmaps are 24x24 or
+smaller. Menu bitmaps and small icons are 16x16 or smaller.
+
+Images created with the L<IUP::Image|IUP::Image> constructors can be reused in
+different elements.
+
+The images should be destroyed when they are no longer necessary, by
+means of the L<Destroy|IUP::Manual::02_Elements/"Destroy()"> function. To destroy an image, it cannot be
+in use, i.e the controls where it is used should be destroyed first.
+
+Please observe the rules for creating cursor images: L<CURSOR|IUP::Manual::03_Attributes/CURSOR>.
+
+=head2 Using Images in Other Elements (via IMAGE Attribute)
+
+Images are used in elements such as buttons and labels by attributes
+that points to a image. For example:
+
+ $label->IUP::Label->new();
+ $image = IUP::Image->new( WIDTH=>$width, HEIGHT=>$height, pixels=>$pixels );  
+ $label->SetAttribute( IMAGE=>$image );
+ 
+ #or
+ 
+ $label->IUP::Label->new();
+ $image = IUP::Image->new( WIDTH=>$width, HEIGHT=>$height, pixels=>$pixels, name=>"IMG_NICKNAME" );  
+ $label->SetAttribute( IMAGE=>"IMG_NICKNAME" );
+ 
+You can use images/icons from the B<IupImageLib>, a library of pre-defined images - see L<IUP::Manual::07_UsingImageLibrary>:
+
+ $label->IUP::Label->new();
+ $label->SetAttribute( IMAGE=>"IUP_MessageError" ); #buil-in image name from IupImageLib
+ 
+In all drivers, a path to a file name can also be used as the attribute
+value. But the B<available file formats supported are system
+dependent>. The Windows driver supports BMP, ICO and CUR. The GTK driver
+supports the formats supported by the GDK-PixBuf library, such as BMP,
+GIF, JPEG, PCX, PNG, TIFF and many others. The Motif driver supports
+the X-Windows bitmap. For example:
+
+ $label->IUP::Label->new();
+ $label->SetAttribute( IMAGE=>"/path/to/tecgraf.bmp" ); #BEWARE: do not use non ascii chars in filename
+ 
+The alternative approach to load an image from file is:
+
+ $label->IUP::Label->new();
+ $label->SetAttribute( IMAGE=>IUP::Image->new( file=>"/path/to/tecgraf.bmp" ) );
+
+Which internally uses L<im library|http://www.tecgraf.puc-rio.br/im/> to load the image
+and supports the given set of image formats (BMP PCX GIF TIFF SGI JPEG TGA ICO PNG PPM PBM PNM PGM LED) B<on all drivers>.
+
+In Windows, names of resources in RC files linked with the application
+are also accepted (not true for perl IUP bindings). In GTK, names of GTK Stock Items are also accepted.
+In Motif, names of bitmaps installed on the system are also accepted.
+For example:
+
+ $label->IUP::Label->new();
+ $label->SetAttribute( IMAGE=>"gtk-open");  # available in the GTK Stock Items
+
+=head2 Using Colors
+
+In Motif, the alpha channel 32bit images is composed with the control
+BGCOLOR by IUP prior to setting the image at the control. In Windows
+and in GTK, the alpha channel is composed internally by the system. But
+in Windows for some controls the alpha must be composed prior also, it
+includes: L<IUP::Item> and L<IUP::Submenu> always; and L<IUP::Toggle> when
+NOT using Visual Styles. This implies that if the control background is
+not uniform then probably there will be a visible difference where it
+should be transparent.
+
+For L<IUP::Image|IUP::Image>, if a color is not set, then it is used a default color
+for the 16 first colors. The default color table is the same for Windows, GTK and Motif:
+
+  0 =   0,  0,  0 (black)
+  1 = 128,  0,  0 (dark red)
+  2 =   0,128,  0 (dark green) 
+  3 = 128,128,  0 (dark yellow)
+  4 =   0,  0,128 (dark blue)
+  5 = 128,  0,128 (dark magenta) 
+  6 =   0,128,128 (dark cian) 
+  7 = 192,192,192 (gray)
+  8 = 128,128,128 (dark gray)
+  9 = 255,  0,  0 (red)     
+ 10 =   0,255,  0 (green)
+ 11 = 255,255,  0 (yellow)
+ 12 =   0,  0,255 (blue)
+ 13 = 255,  0,255 (magenta)
+ 14 =   0,255,255 (cian)  
+ 15 = 255,255,255 (white)
+
+For images with more than 16 colors, and up to 256 colors, all the
+color indices must be defined up to the maximum number of colors. For
+example, if the biggest image index is 100, then all the colors from
+i=16 up to i=100 must be defined even if some indices are not used.
+
+=head2 ATTRIBUTES
+
+For more info about concept of attributes (setting/getting values etc.)
+see L<IUP::Manual::03_Attributes|IUP::Manual::03_Attributes>. Attributes specific to this element:
+
+=over
+
+=item B<0> Color in index 0.
+
+=item B<1> Color in index 1.
+
+=item B<2> Color in index 2.
+
+=item B<(n)> Color in index n.
+
+Example C<< $image->SetAttribute( 0=>"0 0 220", 1=>"0 220 0" ) >>
+
+The indices can range from 0 to 255. The total number of colors is
+limited to 256 colors. Be careful when setting colors, since they are
+attributes they follow the same storage rules for standard attributes.
+
+The values are integer numbers from 0 to 255, one for each color in the
+RGB triple (For ex "64 190 255"). If the value of a given index is
+"BGCOLOR", the color used will be the background color of the element
+on which the image will be inserted. The "BGCOLOR" value must be
+defined within an index less than 16.
+
+Used only for images created via C<< IUP::Image->new( pixels=>...) >> not C<< IUP::Image->new( file=>... ) >>.
+
+=item B<BGCOLOR>
+
+The color used for transparency. If not defined uses the
+BGCOLOR of the control that contains the image.
+
+=item B<BPP>
+
+I<(read-only)> Returns the number of bits per pixel in the image (8 or 24 or 32). 
+
+=item B<CHANNELS>
+
+I<(read-only)> Returns the number of channels in the image.
+Images created with BPP=>8 returns 1, with BPP=>24 returns
+3 and with BPP=>32 returns 4. 
+
+=item B<HEIGHT>
+
+I<(read-only)> Image height in pixels.
+
+=item B<HOTSPOT>
+
+Hotspot is the position inside a cursor image indicating
+the mouse-click spot. Its value is given by the x and y coordinates
+inside a cursor image. Its value has the format "x:y", where x and y
+are integers defining the coordinates in pixels. Default: "0:0".
+
+=item B<RASTERSIZE>
+
+I<(read-only)> Returns the image size in pixels. (since iup-3.0)
+
+=item B<WID>
+
+I<(read-only)> Returns the internal pixels data pointer. (since iup-3.0)
+
+=item B<WIDTH>
+
+I<(read-only)> Image width in pixels.
+
+=back
+
+=head1 EXAMPLES
+
+
+The element B<IUP::Image> is used in the following sample scripts:
+
+=over
+
+=item * L<0-basic/button.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/button.pl> - IUP::Button example
+
+=item * L<0-basic/cbox.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/cbox.pl> - IUP::Cbox example
+
+=item * L<0-basic/dialog2.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/dialog2.pl> - IUP::Dialog example
+
+=item * L<0-basic/gauge.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/gauge.pl> - IUP::Gauge example
+
+=item * L<0-basic/glcanvasbox.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/glcanvasbox.pl> - warn "ACTION: x=$x y=$y\n";
+
+=item * L<0-basic/glcontrols.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/glcontrols.pl> - original: http://webserver2.tecgraf.puc-rio.br/iup/examples/C/glcontrols.c
+
+=item * L<0-basic/image.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/image.pl> - IUP::Image example
+
+=item * L<0-basic/label.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/label.pl> - IUP::Label and IUP::Link example
+
+=item * L<0-basic/progressbar2.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/progressbar2.pl> - IUP::ProgressBar example
+
+=item * L<0-basic/progressbar3.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/progressbar3.pl> - IUP::ProgressBar example
+
+=item * L<0-basic/toggle.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/toggle.pl> - IUP::Toggle example
+
+=item * L<0-basic/tray.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/tray.pl> - IUP::Dialog + TRAY / TRAYTIP / TRAYIMAGE example
+
+=item * L<1-apps/app-mdi.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/1-apps/app-mdi.pl> - IUP app example
+
+=item * L<1-apps/app-sample2.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/1-apps/app-sample2.pl> - example based on the original sample.c
+
+=back 
+
+
+
+=head1 SEE ALSO
+
+L<IUP::Label|IUP::Label>, L<IUP::Button|IUP::Button>,
+L<IUP::Toggle|IUP::Toggle>, L<Destroy|IUP::Manual::02_Elements/"Destroy()">
+
+The original doc: L<iupimage.html|http://www.tecgraf.puc-rio.br/iup/en/elem/iupimage.html>, L<iupimglib.html|http://www.tecgraf.puc-rio.br/iup/en/iupimglib.html>
+ 
+
+=cut

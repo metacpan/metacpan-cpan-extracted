@@ -1,0 +1,30 @@
+NAME
+    Image::JpegTran::AutoRotate - Losslessly fix JPEG orientation
+
+SYNOPSIS
+        use Image::JpegTran::AutoRotate; # auto-exports auto_rotate
+
+        auto_rotate('file.jpg'); # rotates in-place (via a temporary file)
+        auto_rotate('from.jpg' => 'to.jpg'); # writes to another file
+
+DESCRIPTION
+    Transforms JPEG files so that orientation becomes 1.
+
+    This is the same operation as "exifautotran", but with no dependencies
+    on command-line programs; instead, we use the excellent Image::JpegTran
+    and Image::ExifTool CPAN modules.
+
+SEE ALSO
+    <http://sylvana.net/jpegcrop/exif_orientation.html>
+
+AUTHORS
+    Audrey Tang <cpan@audreyt.org>
+
+CC0 1.0 Universal
+    To the extent possible under law, 唐鳳 has waived all copyright and
+    related or neighboring rights to Image::JpegTran::AutoRotate.
+
+    This work is published from Taiwan.
+
+    <http://creativecommons.org/publicdomain/zero/1.0>
+

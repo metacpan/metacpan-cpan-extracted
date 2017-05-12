@@ -1,0 +1,242 @@
+=for comment based on iup-3.5 - http://www.tecgraf.puc-rio.br/iup/en/ctrl/iupdial.html
+
+=head1 NAME
+
+IUP::Dial - [GUI element] dial for regulating a given angular variable
+
+=head1 DESCRIPTION
+
+Creates a dial for regulating a given angular variable.
+
+=begin HTML
+
+<p><img src="http://kmx.github.io/perl-iup/img-3.9/ctrl/iupdial.gif"></p>
+
+=end HTML
+
+=head1 USAGE
+
+=head2 CREATION - new() method
+
+ $dial = IUP::Dial->new( ORIENTATION=>"VERTICAL" );
+
+B<Returns:> the identifier of the created element, or C<undef> if an error occurs.
+
+NOTE: You can pass to C<new()> other C<ATTRIBUTE=E<gt>'value'> or C<CALLBACKNAME=E<gt>\&func> pairs relevant
+to this element - see L<IUP::Manual::02_Elements|IUP::Manual::02_Elements/"new()">.
+
+=head2 ATTRIBUTES
+
+For more info about concept of attributes (setting/getting values etc.)
+see L<IUP::Manual::03_Attributes|IUP::Manual::03_Attributes>. Attributes specific to this element:
+
+=over
+
+=item B<DENSITY>
+
+Number of lines per pixel in the handle of the dial.
+Default is "0.2".
+
+=item L<EXPAND|IUP::Manual::03_Attributes/EXPAND>
+
+The default is "NO".
+
+=item L<FGCOLOR|IUP::Manual::03_Attributes/FGCOLOR>
+
+Foreground color. The default
+value is "64 64 64". Not used for the circular dial.
+
+=item L<SIZE|IUP::Manual::03_Attributes/SIZE>
+
+I<(non inheritable)>
+
+The initial size is "16x80", "80x16" or "40x35" according to the dial orientation. Set to
+C<undef> to allow the automatic layout use smaller values.
+
+=item B<ORIENTATION>
+
+I<(creation only) (non inheritable)>
+
+Dial layout configuration "VERTICAL", "HORIZONTAL" or "CIRCULAR". Default:
+"HORIZONTAL".
+
+=item B<UNIT>
+
+Unit of the angle. Can be "DEGREES" or "RADIANS". Default is
+"RADIANS". Used only in the callbacks.
+
+=item B<VALUE>
+
+I<(non inheritable)>
+
+The dial angular value in radians. The
+value is reset to zero when the interaction is started, except for
+C<ORIENTATION="CIRCULAR">. When orientation is vertical or horizontal, the
+dial measures relative angles. When orientation is circular the dial
+measure absolute angles, where the origin is at 3 o'clock.
+
+=back
+
+The following L<common attributes|IUP::Manual::03_Attributes/Common Attributes> are also accepted:
+
+=over
+
+=item * L<ACTIVE|IUP::Manual::03_Attributes/ACTIVE>,
+L<BGCOLOR|IUP::Manual::03_Attributes/BGCOLOR>, L<FONT|IUP::Manual::03_Attributes/FONT>,
+L<SCREENPOSITION|IUP::Manual::03_Attributes/SCREENPOSITION>,
+L<POSITION|IUP::Manual::03_Attributes/POSITION>,
+L<MINSIZE|IUP::Manual::03_Attributes/MINSIZE>,
+L<MAXSIZE|IUP::Manual::03_Attributes/MAXSIZE>, L<WID|IUP::Manual::03_Attributes/WID>,
+L<TIP|IUP::Manual::03_Attributes/TIP>,
+L<RASTERSIZE|IUP::Manual::03_Attributes/RASTERSIZE>,
+L<ZORDER|IUP::Manual::03_Attributes/ZORDER>,
+L<VISIBLE|IUP::Manual::03_Attributes/VISIBLE>
+
+=back
+
+=head2 CALLBACKS
+
+For more info about concept of callbacks (setting callback handlers etc.)
+see L<IUP::Manual::04_Callbacks|IUP::Manual::04_Callbacks>. Callbacks specific to this element:
+
+=over
+
+=item B<BUTTON_PRESS_CB>
+
+Called when the user presses the left mouse button
+over the dial. The angle here is always zero, except for the circular
+dial.
+
+B<Callback handler prototype:>
+
+ sub button_press_cb_handler {
+   my ($self, $angle) = @_;
+   #...
+ }
+
+=over
+
+B<$self:> reference to the element (IUP::Dial) that activated the event
+
+B<$angle:> the dial value converted according to UNIT.
+
+=back
+
+=item B<BUTTON_RELEASE_CB>
+
+Called when the user releases the left mouse
+button after pressing it over the dial.
+
+B<Callback handler prototype:>
+
+ sub button_release_cb_handler {
+   my ($self, $angle) = @_;
+   #...
+ }
+
+=over
+
+B<$self:> reference to the element (IUP::Dial) that activated the event
+
+B<$angle:> the dial value converted according to UNIT.
+
+=back
+
+=item B<MOUSEMOVE_CB>
+
+Called each time the user moves the dial with the
+mouse button pressed. The angle the dial rotated since it was
+initialized is passed as a parameter.
+
+B<Callback handler prototype:>
+
+ sub mousemove_cb_handler {
+   my ($self, $angle) = @_;
+   #...
+ }
+
+=over
+
+B<$self:> reference to the element (IUP::Dial) that activated the event
+
+B<$angle:> the dial value converted according to UNIT.
+
+=back
+
+=item B<VALUECHANGED_CB>
+
+Called after the value was interactively changed by
+the user. It is called whenever a B<BUTTON_PRESS_CB>, a
+B<BUTTON_RELEASE_CB> or a B<MOUSEMOVE_CB> would also be called, but if
+defined those callbacks will not be called. 
+
+B<Callback handler prototype:>
+
+ sub valuechanged_cb_handler {
+   my ($self) = @_;
+   #...
+ }
+
+=over
+
+B<$self:> reference to the element (IUP::Dial) that activated the event
+
+=back
+
+=back
+
+The following L<common callbacks|IUP::Manual::04_Callbacks/Common Callbacks> are also accepted:
+
+=over
+
+=item * L<MAP_CB|IUP::Manual::04_Callbacks/MAP_CB>,
+L<UNMAP_CB|IUP::Manual::04_Callbacks/UNMAP_CB>,
+L<GETFOCUS_CB|IUP::Manual::04_Callbacks/GETFOCUS_CB>,
+L<KILLFOCUS_CB|IUP::Manual::04_Callbacks/KILLFOCUS_CB>,
+L<ENTERWINDOW_CB|IUP::Manual::04_Callbacks/ENTERWINDOW_CB>,
+L<LEAVEWINDOW_CB|IUP::Manual::04_Callbacks/LEAVEWINDOW_CB>,
+L<K_ANY|IUP::Manual::04_Callbacks/K_ANY>, L<HELP_CB|IUP::Manual::04_Callbacks/HELP_CB>
+
+=back
+
+=head1 NOTES
+
+When the keyboard arrows are pressed and released the mouse press and
+the mouse release callbacks are called in this order. If you hold the
+key down the mouse move callback is also called for every repetition.
+
+When the wheel is rotated only the mouse move callback is called, and
+it increments the last angle the dial was rotated.
+
+In all cases the value is incremented or decremented by PI/10 (18
+degrees).
+
+If you press Shift while using the arrow keys the increment is reduced
+to PI/100 (1.8 degrees). Press the Home key in the circular dial to
+reset to 0. 
+
+=head1 EXAMPLES
+
+
+The element B<IUP::Dial> is used in the following sample scripts:
+
+=over
+
+=item * L<0-basic/dial.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/dial.pl> - IUP::Dial example
+
+=item * L<0-basic/plot_advanced.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/plot_advanced.pl> - Plot controls
+
+=item * L<1-apps/app-plot-demo.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/1-apps/app-plot-demo.pl> - dials for zooming
+
+=back 
+
+
+
+=head1 SEE ALSO
+
+L<IUP::Canvas|IUP::Canvas>
+
+The original doc: L<iupdial.html|http://www.tecgraf.puc-rio.br/iup/en/ctrl/iupdial.html>
+ 
+
+=cut

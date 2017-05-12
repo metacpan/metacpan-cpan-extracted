@@ -1,0 +1,13 @@
+IM::Engine::Plugin::Dispatcher changes
+
+0.02  2009-08-09
+    Parameterize the 404 message
+
+    Use post_initialization instead of waiting for an incoming message to
+        augment the dispatcher
+
+    Get rid of RequiresDispatcherPlugin in favor of the new RequiresPlugins
+
+0.01  2009-08-08
+    First version
+

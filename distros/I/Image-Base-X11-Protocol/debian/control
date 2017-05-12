@@ -1,0 +1,32 @@
+# Copyright 2010, 2011, 2012, 2013 Kevin Ryde
+#
+# This file is part of Image-Base-X11-Protocol.
+#
+# Image-Base-X11-Protocol is free software; you can redistribute it
+# and/or modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 3, or
+# (at your option) any later version.
+#
+# Image-Base-X11-Protocol is distributed in the hope that it will be
+# useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+# of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with Image-Base-X11-Protocol.  If not, see <http://www.gnu.org/licenses/>.
+
+Source: libimage-base-x11-protocol-perl
+Section: perl
+Priority: optional
+Build-Depends: libtest-perl | perl (>= 5.004.05), cdbs, debhelper (>= 5)
+Maintainer: Kevin Ryde <user42@zip.com.au>
+Standards-Version: 3.9.4
+Homepage: http://user42.tuxfamily.org/image-base-x11-protocol/index.html
+Bugs: mailto:user42@zip.com.au
+
+Package: libimage-base-x11-protocol-perl
+Architecture: all
+Depends: perl (>= 5.004), libimage-base-perl | libimage-base-bundle-perl, libx11-protocol-perl (>= 0.56), libx11-protocol-other-perl (>= 3), ${perl:Depends}, ${misc:Depends}
+Description: Draw into X windows or pixmaps in Image::Base style
+ This extends Image::Base to draw into X server windows or pixmaps
+ using X11::Protocol.

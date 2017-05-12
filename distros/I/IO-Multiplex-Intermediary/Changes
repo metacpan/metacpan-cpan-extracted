@@ -1,0 +1,21 @@
+0.06
+    - inc/* is included in MANIFEST
+
+0.05
+    - MANIFEST.SKIP is fixed so Makefile.PL gets shipped
+
+0.04 [NOT INSTALLABLE VIA CPAN]
+    - Give client a method 'multisend' allowing to efficiently emit
+      data to multiple IDs at one time
+
+0.03
+    - Remove a warning from when client isn't connected
+    - Go back to using POE for the guts (fixes many gotchas for now)
+
+0.02
+    - Fix a bunch of typos and do more explaining in the doc
+    - Update TODO
+    - Add this Changes file :)
+
+0.01
+    - Initial release

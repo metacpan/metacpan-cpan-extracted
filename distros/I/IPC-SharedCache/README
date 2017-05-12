@@ -1,0 +1,100 @@
+IPC::SharedCache - a Perl module to manage a cache in SysV IPC shared
+memory.
+
+DESCRIPTION
+
+This module provides a shared memory cache accessed as a tied hash.
+
+Shared memory is an area of memory that is available to all processes.
+It is accessed by choosing a key, the ipc_key arguement to tie.  Every
+process that accesses shared memory with the same key gets access to
+the same region of memory.  In some ways it resembles a file system,
+but it is not hierarchical and it is resident in memory.  This makes
+it harder to use than a filesystem but much faster.  The data in
+shared memory persists until the machine is rebooted or it is
+explicitely deleted.
+
+This module attempts to make shared memory easy to use for one
+specific application - a shared memory cache.  For other uses of
+shared memory see the documentation to the excelent module I use,
+IPC::ShareLite (L<IPC::ShareLite>).
+
+A cache is a place where processes can store the results of their
+computations for use at a later time, possibly by other instances of
+the application.  A good example of the use of a cache is a web
+server.  When a web server receieves a request for an html page it
+goes to the file system to read it.  This is pretty slow, so the web
+server will probably save the file in memory and use the in memory
+copy the next time a request for that file comes in, as long as the
+file hasn't changed on disk.  This certainly speeds things up but web
+servers have to serve multiple clients at once, and that means
+multiple copies of the in-memory data.  If the web server uses a
+shared memory cache, like the one this module provides, then all the
+servers can use the same cache and much less memory is consumed.
+
+This module handles all shared memory interaction using the
+IPC::ShareLite module (version 0.06 and higher) and all data
+serialization using Storable.  See L<IPC::ShareLite> and L<Storable>
+for details.
+
+MOTIVATION
+
+This module began its life as an internal piece of HTML::Template (see
+L<HTML::Template>).  HTML::Template has the ability to maintain a
+cache of parsed template structures when running in a persistent
+environment like Apache/mod_perl.  Since parsing a template from disk
+takes a fair ammount of time this can provide a big performance gain.
+Unfortunately it can also consume large ammounts of memory since each
+web server maintains its own cache in its own memory space.
+
+By using IPC::ShareLite and Storable (L<IPC::ShareLite> and
+L<Storable>), HTML::Template was able to maintain a single shared
+cache of templates.  The downside was that HTML::Template's cache
+routines became complicated by a lot of IPC code.  My solution is to
+break out the IPC cache mechanisms into their own module,
+IPC::SharedCache.  Hopefully over time it can become general enough to
+be usable by more than just HTML::Template.
+
+INSTALLATION
+
+In case this is your first module, the usual methods are:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+You will need to have IPC::ShareLite (at least version 0.06) and
+Storable installed to use this module.  If you want to use the 'walk'
+function, you'll need Data::Dumper.  All these are available on CPAN
+(www.cpan.org).
+
+DOCUMENTATION
+
+The documentation is in SharedCache.pm in the form of POD format
+perldocs.  Even the above text might be out of date, so be sure to
+check the perldocs for the straight truth!
+
+CONTACT INFO
+
+This module was written by Sam Tregar (sam@tregar.com).  
+
+LICENSE
+
+IPC::SharedCache - a Perl module to manage a SysV IPC shared cache.
+Copyright (C) 2000 Sam Tregar (sam@tregar.com)
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or (at
+your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
+USA

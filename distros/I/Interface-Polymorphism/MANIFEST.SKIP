@@ -1,0 +1,6 @@
+~$
+\.(bak|tar|gz)$
+CVS/
+Makefile$
+blib/
+pm_to_blib$

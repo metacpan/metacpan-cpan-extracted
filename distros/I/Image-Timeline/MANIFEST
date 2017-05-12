@@ -1,0 +1,18 @@
+Build.PL
+Changes
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/common.pl
+t/date_format.t
+t/gif.t
+t/png.t
+t/testdata.txt
+t/truth.gif
+t/truth.png
+t/truth_format.gif
+t/truth_format.png
+Timeline.pm
+
+SIGNATURE    Added here by Module::Build

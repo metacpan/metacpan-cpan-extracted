@@ -1,0 +1,22 @@
+Revision history for Perl extension Image::Embroidery.
+
+Version 1.2 (2007/11/03)
+	- Support for Melco EXP format. You can now convert between
+	  EXP and DST formats
+	- Minor changes to work around applications that put bogus
+	  header data in Tajima DST files
+	- Added ignore_header_coordinates option to work around
+	  files with broken Tajima start coordinates
+
+Version 1.1 (2007/03/28)
+	- No changes, I'm an idiot and erased version 1.0 from CPAN
+
+Version 1.0 (2005/11/02)
+	- Added pod tests and cleaned up distribution
+
+Version 0.2 (2005/06/10)
+	- Made the module more forgiving when dealing
+	  with files that have errors
+
+Version 0.1 (2003/09/28)
+	- original version

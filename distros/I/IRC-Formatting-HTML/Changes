@@ -1,0 +1,99 @@
+Revision history for IRC-Formatting-HTML
+
+0.29    01/13/2011
+        Fixed an issue parsing color codes on some
+        unicode strings
+
+0.28    09/21/2010
+        Added an option to use CSS classes instead
+        of inline CSS styles
+
+0.27    07/28/2010
+        Added an option to treat inverted irc text as
+        italic
+
+0.26    07/15/2010
+        Handle color HTML attribute
+
+0.25    07/15/2010
+        Handle block elements better
+
+0.24    07/15/2010
+        Handle colors from HTML input
+        More accurate html to irc conversion
+
+0.23    06/26/2010
+        Fixed an issue with tokens that evaluate to false
+        (e.g. "0")
+
+0.22    06/19/2010
+        Handle &nbsp;
+
+0.21    06/17/2010
+        Fixed consecutive formattings in irc_to_html
+
+0.20    06/17/2010
+        Fixed docs
+        Detect more bold and italic tags
+
+0.19    06/16/2010
+        Removed "formatted_string_to_html", use irc_to_html instead
+        Added html_to_irc export
+
+0.18    04/19/2010
+        Add irc_to_html export
+        Minor speedups
+
+0.17    04/19/2010
+        Fix MANIFEST
+
+0.16    04/19/2010
+        Drop Any::Moose dependency
+        Use file scope for accumulated state
+
+0.15    04/15/2010
+        Small fix to avoid warning
+
+0.14    03/24/2010
+        Handle "0" and "" properly
+
+0.13    02/24/2010
+        Remove HTML::Entities dependency
+
+0.12    02/21/2010
+        Remove leftover IO::String use statement
+
+0.11    02/21/2010
+        Verify that the color codes exist
+        Stop using natatime to avoid growing memory
+
+0.10    12/22/2009
+        Remove POD tests
+
+0.09    12/06/2009
+        Use Any::Moose
+
+0.08    10/09/2009
+        Properly apply the last patch
+
+0.07    10/08/2009
+        Put the &#160; entity after a space, so links don't
+        get broken when followed by a double space
+
+0.06    09/24/2009
+        Only replace regular spaces with HTML entities
+
+0.05    08/21/2009
+        More POD cleanup
+
+0.04    08/21/2009
+        Properly apply previous patch
+
+0.03    08/16/2009
+        Fixed rendering bug for inverted text (thanks nop)
+
+0.02    08/02/2009
+        Cleaned up POD
+
+0.01    07/23/2009
+        First version

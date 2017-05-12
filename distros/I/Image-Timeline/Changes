@@ -1,0 +1,58 @@
+Revision history for Perl extension Image::Timeline.
+
+0.11  Wed Feb 25 22:28:12 CST 2004
+
+ - Images are now written uwing binmode() on the output filehandle,
+   which makes a difference on platforms like Win32. [Pa'll I'so'lfur
+   O'lason]
+
+0.09  Sun Feb 22 20:15:42 CST 2004
+
+ - Added 'right_margin' parameter, which allows the user to define
+   some extra space in the right of the picture so that the last
+   legend isn't cut in the final image. [Paulo Jorge Jesus Silva]
+
+ - Added 'to_string' parameter, which allows the user to define the
+   function used to convert the numerical value of a date into a
+   string. [Paulo Jorge Jesus Silva]
+
+0.08  Wed Jul  9 12:11:47 CDT 2003
+
+ - Apparently the "better way" from release 0.07 didn't work for
+   everybody, so there's yet *another* change in the testing for
+   it.
+
+0.07  Tue Jul  8 17:56:19 CDT 2003
+
+ - Found a better way to test whether GD was compiled with support for
+   GIFs.  Now we don't fail a couple tests (we skip them) when GIFs
+   aren't supported. [Reported by Gene Boggs]
+
+0.06  Tue Jul  8 17:10:11 CDT 2003
+
+ - Skip the 'date_format.t' test if Date::Format isn't installed.
+
+ - Document the interface to write(), which allows rendering in any
+   format supported by GD.
+
+0.05  Fri Aug 24 11:15:00 BST 2001
+  - MZSANFORD@cpan.org helped add simple date support via the 'date_format' parameter.
+  
+  - 'bar_stepsize' can now be specified as a percentage of total data width
+
+0.04  Mon Jun 18 01:56:24 CDT 2001
+  - Forgot to include a file necessary for the 'make test' installation step.
+    Added to MANIFEST.
+
+0.03  Mon Jun 11 10:59:16 CDT 2001
+  - Fixed a stray backslash in a string constant, which caused an 
+    incompatibility with perl 5.7.1.
+
+0.02  Jun  5 17:10 2001
+  - Added a real test for PNG output, comparing generated data to 
+    a sample output file.
+
+0.01  Thu May 31 22:40:04 2001
+  - original version; created by h2xs 1.1.1.4 with options
+	-XA -n Image::Timeline
+

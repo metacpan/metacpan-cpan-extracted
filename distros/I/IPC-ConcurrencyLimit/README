@@ -1,0 +1,128 @@
+NAME
+    IPC::ConcurrencyLimit - Lock-based limits on cooperative
+    multi-processing
+
+SYNOPSIS
+      use IPC::ConcurrencyLimit;
+  
+      sub run {
+        my $limit = IPC::ConcurrencyLimit->new(
+          type      => 'Flock', # that's also the default
+          max_procs => 10,
+          path      => '/var/run/myapp', # an option to the locking strategy
+        );
+    
+        my $id = $limit->get_lock;
+        if (not $id) {
+          warn "Got none of the worker locks. Exiting.";
+          exit(0);
+        }
+        else {
+          # Got one of the worker locks (ie. number $id)
+          do_work();
+        }
+    
+        # lock released with $limit going out of scope here
+      }
+  
+      run();
+      exit();
+
+DESCRIPTION
+    This module implements a mechanism to limit the number of concurrent
+    processes in a cooperative multiprocessing environment. This is an
+    alternative to, for example, running several daemons.
+
+    Roughly speaking, a typical setup would be the following:
+
+    * Cron starts a new process every minute.
+
+    * The process attempts to get a lock as shown in synopsis.
+
+    * If it obtains a lock, it starts working and exits when the work is
+      done.
+
+    * If not, "max_procs" processes are already working, so it exits.
+
+    This has several distinct advantages over daemons.
+
+    * Processes do not run as long. Small memory leaks are less likely to
+      become a problem.
+
+    * Rolling out new code is trivial. No need to do any daemon restarting
+      and worrying about interrupting a unit of work.
+
+    * No complicated master/slave setups and process/thread pooling.
+
+    The implementation uses some form of locking to limit concurrency:
+    There's simply a limited number of locks to go around. The detailed
+    locking implementation is chosen using the "type" parameter to the
+    constructor. The base distributions ships with one locking strategy
+    only: IPC::ConcurrencyLimit::Lock::Flock for a file-locking based
+    concurrency limit.
+
+    Among the other potential strategies that are not part of this
+    distribution are NFS-based locking using File::SharedNFSLock or using
+    MySQL's "GET_LOCK". Both of these schemes would allow limiting
+    concurrency across multiple hosts without a special-purpose daemon.
+
+METHODS
+  new
+    Creates a new concurrency limit. Creating the object does not lock
+    anything. This requires a followup call to the "get_lock()" method!
+
+    After calling "get_lock()", the lock will be held by the
+    "IPC::ConcurrencyLimit" object and released when either "release_lock()"
+    is called or the "IPC::ConcurrencyLimit" object is freed.
+
+    Takes named parameters, one of which is the "type" parameter, which
+    specifies the type of lock to use and defaults to "Flock".
+
+    The "max_procs" option indicates the maximum number of locks that can be
+    held at the same time and thus usually the maximum no. of running
+    processes. It defaults to 1.
+
+    All concurrency limits that refer to the same resource/limit must use
+    the same setting for "max_procs". If not, the behaviour is undefined.
+
+    All other named parameters will be passed as options to the lock
+    implementation. See IPC::ConcurrencyLimit::Lock::Flock or other
+    implementations.
+
+  get_lock
+    Creates the actual lock and if successful, returns its id (starting from
+    1, not 0).
+
+    Returns undef if locking was unsuccessful. Multiple calls do not stack.
+    They will simply return the same lock id as long as a lock is held.
+
+  release_lock
+    Releases the lock. Returns 1 if a lock has been released or undef if
+    there had been no lock to be released.
+
+  is_locked
+    Returns whether we have a lock.
+
+  lock_id
+    Returns the id of the lock or undef if there is none.
+
+AUTHOR
+    Steffen Mueller, "smueller@cpan.org"
+
+    Yves Orton
+
+ACKNOWLEDGMENT
+    This module was originally developed for booking.com. With approval from
+    booking.com, this module was generalized and put on CPAN, for which the
+    authors would like to express their gratitude.
+
+COPYRIGHT AND LICENSE
+     (C) 2011, 2012 Steffen Mueller. All rights reserved.
+ 
+     This code is available under the same license as Perl version
+     5.8.1 or higher.
+ 
+     This program is distributed in the hope that it will be useful,
+     but WITHOUT ANY WARRANTY; without even the implied warranty of
+     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+

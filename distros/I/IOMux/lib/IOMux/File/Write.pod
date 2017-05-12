@@ -1,0 +1,180 @@
+=encoding utf8
+
+=head1 NAME
+
+IOMux::File::Write - write to file
+
+=head1 INHERITANCE
+
+ IOMux::File::Write
+   is a IOMux::Handler::Write
+   is a IOMux::Handler
+
+=head1 SYNOPSIS
+
+  my $mux = IOMux::Select->new;  # or ::Poll
+
+  use IOMux::Open '>';
+  my $file = $mux->open('>', $filename);
+
+  use IOMux::File::Write;
+  my $file = IOMux::File::Write->new
+    (file => $filename, mode => '>>');
+  $mux->add($file);
+
+  $file->write($text);
+  $file->print($text);
+
+  write $file $text;
+  print $file $text;
+
+=head1 DESCRIPTION
+
+Open a file to be written.
+
+Extends L<"DESCRIPTION" in IOMux::Handler::Write|IOMux::Handler::Write/"DESCRIPTION">.
+ 
+=head1 METHODS
+
+Extends L<"METHODS" in IOMux::Handler::Write|IOMux::Handler::Write/"METHODS">.
+ 
+=head2 Constructors
+
+Extends L<"Constructors" in IOMux::Handler::Write|IOMux::Handler::Write/"Constructors">.
+ 
+=over 4
+
+=item IOMux::File::Write-E<gt>B<new>(%options)
+
+ -Option    --Defined in           --Default
+  append                             <false>
+  create                             <true>
+  exclusive                          <false>
+  fh          IOMux::Handler         <required>
+  file                               <required>
+  mode                               '>'
+  modeflags                          <undef>
+  name        IOMux::Handler         '$mode$file'
+  write_size  IOMux::Handler::Write  4096
+
+=over 2
+
+=item append => BOOLEAN
+
+=item create => BOOLEAN
+
+=item exclusive => BOOLEAN
+
+=item fh => FILEHANDLE
+
+=item file => FILENAME|HANDLE
+
+The file to be managed, either provided as FILENAME or as HANDLE. When
+a HANDLE is passed, most other options will be ignored. The HANDLE must
+be in non-blocking mode already and opened for writing (only).
+
+=item mode => '>'|'>>'
+
+The C<&gt;&gt;> is short for normal open plus the append option set.
+
+=item modeflags => INTEGER
+
+When defined, the C<mode>, C<exclusive>, C<create> and C<append> options
+are not used, but your value is taken. Use constants defined by Fcntl.
+Do not forget to include C<O_NONBLOCK>.
+
+=item name => STRING
+
+=item write_size => INTEGER
+
+=back
+
+=item IOMux::File::Write-E<gt>B<open>($mode, $file, %options)
+
+=back
+
+=head2 Accessors
+
+Extends L<"Accessors" in IOMux::Handler::Write|IOMux::Handler::Write/"Accessors">.
+ 
+=over 4
+
+=item $obj-E<gt>B<fh>()
+
+Inherited, see L<IOMux::Handler/"Accessors">
+
+=item $obj-E<gt>B<fileno>()
+
+Inherited, see L<IOMux::Handler/"Accessors">
+
+=item $obj-E<gt>B<mode>()
+
+The bits of the open mode.
+
+=item $obj-E<gt>B<mux>()
+
+Inherited, see L<IOMux::Handler/"Accessors">
+
+=item $obj-E<gt>B<name>()
+
+Inherited, see L<IOMux::Handler/"Accessors">
+
+=item $obj-E<gt>B<usesSSL>()
+
+Inherited, see L<IOMux::Handler/"Accessors">
+
+=item $obj-E<gt>B<writeSize>( [$integer] )
+
+Inherited, see L<IOMux::Handler::Write/"Accessors">
+
+=back
+
+=head2 User interface
+
+Extends L<"User interface" in IOMux::Handler::Write|IOMux::Handler::Write/"User interface">.
+ 
+=head2 Multiplexer
+
+Extends L<"Multiplexer" in IOMux::Handler::Write|IOMux::Handler::Write/"Multiplexer">.
+ 
+=head2 Helpers
+
+Extends L<"Helpers" in IOMux::Handler::Write|IOMux::Handler::Write/"Helpers">.
+ 
+=over 4
+
+=item $obj-E<gt>B<extractSocket>(HASH)
+
+=item IOMux::File::Write-E<gt>B<extractSocket>(HASH)
+
+Inherited, see L<IOMux::Handler/"Helpers">
+
+=item $obj-E<gt>B<fdset>($state, $read, $write, $error)
+
+Inherited, see L<IOMux::Handler/"Helpers">
+
+=item $obj-E<gt>B<show>()
+
+Inherited, see L<IOMux::Handler/"Helpers">
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of IOMux distribution version 1.00,
+built on November 11, 2015. Website: F<http://perl.overmeer.net/>
+All modules in this suite:
+L</Any::Daemon>,
+L</IOMux>, and
+L</IOMux::HTTP>.
+
+Please post questions or ideas to F<perl@overmeer.net>
+
+=head1 LICENSE
+
+Copyrights 2011-2015 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

@@ -1,0 +1,19 @@
+Changes
+lib/Inline/Perl6.pm
+lib/Inline/Perl6/Helper.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+Perl6.xs
+ppport.h
+t/01load.t
+t/02eval.t
+t/03eval_return.t
+t/04call_function.t
+t/05p6_to_p5.t
+t/06p5_to_p6.t
+t/07call_method.t
+t/lib/Perl6Test.pm
+t/use.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,44 @@
+---
+abstract: 'Capture Stdout/Stderr simultaneously as if it were one stream, painlessly.'
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  FindBin: '0'
+  Test::More: '0'
+  perl: '5.008003'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.008003'
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: IPC-Run-Fused
+provides:
+  IPC::Run::Fused:
+    file: lib/IPC/Run/Fused.pm
+    version: '1.000001'
+  IPC::Run::Fused::POSIX:
+    file: lib/IPC/Run/Fused/POSIX.pm
+    version: '1.000001'
+  IPC::Run::Fused::Win32:
+    file: lib/IPC/Run/Fused/Win32.pm
+    version: '1.000001'
+requires:
+  Carp: '0'
+  Exporter: '0'
+  IO::Handle: '0'
+  Module::Runtime: '0'
+  Socket: '0'
+  perl: '5.008003'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/IPC-Run-Fused/issues
+  homepage: https://github.com/kentnl/IPC-Run-Fused
+  repository: https://github.com/kentnl/IPC-Run-Fused.git
+version: '1.000001'

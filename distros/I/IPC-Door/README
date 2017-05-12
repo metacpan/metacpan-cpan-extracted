@@ -1,0 +1,86 @@
+IPC::Door version 0.11
+=============================
+
+NOTICE
+
+This software is of ALPHA quality.  API is in flux and may be changed
+without notice.  Deploy in production environment at your own risk.
+
+Comments are welcome.  Please contact the author if you have any.
+
+For more information, consult the POD documentation in the module files.
+
+INTRODUCTION
+
+IPC::Door is a Perl extension that interfaces with the door
+library, found in Solaris 2.6 and later.
+
+WHAT IS A DOOR?
+
+The doors are a fast IPC mechanism on a local machine.
+
+	"A new, fast, lightweight mechanism for calling procedures between
+	processes is available in Solaris: doors.  Doors are a low-latency
+	method of invoking a procedure in local processes.  A door server
+	contains a thread that sleeps, waiting for an invocation from the
+	door client.  A client makes a call to the server through the door,
+	along with a small (16 Kbyte) payload.  When the call is made from
+	a door client to a door server, scheduling control is passed
+	directly to the thread in the door server.  Once a door server
+	finished handling the request, it passes control and response back
+	to the calling thread.  The scheduling control allows ultra-low-
+	latency turnaround because the client does not need to wait for the
+	server thread to be scheduled to complete the request."
+			--Jim Mauro and Richard McDougal, "Solaris Internals," 2001
+
+See, for example,
+<http://docs.sun.com/db/doc/817-0697/6mgfsdh2p?q=door&a=expand#D>
+
+A simple-minded benchmarking script is enclosed in "benchmark"
+subdirectory.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires the door library.  This version assumes the API
+found in Solaris 2.6 and later.
+
+There is a project that attempts to implement the API in Linux.  See
+<http://ldoor.sourceforge.net> for more information.
+
+TO DO
+
+Some tests will fail with threaded perl.  As a consequence,
+Makefile.PL will die if your perl binary supports threads.  I understand
+that the binary package from blastwave.org is indeed thread-capable, so
+I know this is a rather important issue.  I welcome your input if you
+can help me troubleshoot this.
+
+In addition, some test results seem to depend on timing.  This could be
+due to my less than robust test scripts.
+
+The scalability leaves something to be desired.  The bundled benchmark
+scripts perform a simple-minded comparison with pipes, but the test
+itself becomes unreliable if you test too much.
+
+And much, much more.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003-2005 ASARI Hirotsugu
+
+asarih at cpan dot org
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+-- 
+$Id: README 37 2005-06-07 05:50:05Z asari $

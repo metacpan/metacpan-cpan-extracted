@@ -1,0 +1,31 @@
+bin/solr_update
+Changes
+examples/data.yaml
+examples/schema.xml
+lib/Interchange/Search/Solr.pm
+lib/Interchange/Search/Solr/Builder.pm
+lib/Interchange/Search/Solr/Response.pm
+lib/Interchange/Search/Solr/UpdateIndex.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/00-load.t
+t/00-populate.t
+t/basic.t
+t/breadcrumbs.t
+t/builder.t
+t/complex-query.t
+t/empty-search.t
+t/encoding.t
+t/facet-as-word-bug.t
+t/filters.t
+t/manifest.t
+t/mouse.t
+t/pod-coverage.t
+t/pod.t
+t/query.t
+t/serialize-data.t
+t/sorting.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

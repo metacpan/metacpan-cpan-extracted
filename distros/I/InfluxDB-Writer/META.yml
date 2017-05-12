@@ -1,0 +1,40 @@
+---
+abstract: 'Various tools to send lines to InfluxDB'
+author:
+  - 'Thomas Klausner <domm@cpan.org>'
+build_requires:
+  Module::Build: '0.28'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: InfluxDB-Writer
+requires:
+  Carp: '0'
+  Cwd: '0'
+  File::Spec: '0'
+  File::Spec::Functions: '0'
+  Hijk: '0'
+  IO::Async::File: '0'
+  IO::Async::FileStream: '0'
+  IO::Async::Loop: '0'
+  InfluxDB::LineProtocol: '0'
+  Log::Any: '0'
+  Log::Any::Adapter: '0'
+  MIME::Base64: '0'
+  Moose: '0'
+  Moose::Role: '0'
+  MooseX::Getopt: '0'
+  Sys::Hostname: '0'
+  Time::Moment: '0'
+  feature: '0'
+  lib::projectroot: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: git://code.validad.net/validad/influxdb-writer
+version: '1.002'

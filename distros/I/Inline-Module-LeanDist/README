@@ -1,0 +1,134 @@
+NAME
+    Inline::Module::LeanDist - Develop your module with Inline but
+    distribute lean XS
+
+SYNOPSIS
+    In your module (say "Acme::Math::XS::LeanDist"):
+
+        use Inline::Module::LeanDist C => 'DATA';
+
+    This module forwards all its parameters to Inline.
+
+    NOTE: Currently the entire use statement must be on one line! The DATA
+    section is generally the best place to put your code (heredocs won't
+    work).
+
+    In "Makefile.PL":
+
+        use ExtUtils::MakeMaker;
+
+        use Inline::Module::LeanDist::MakefilePL;
+
+        WriteMakefile(
+            NAME => 'Acme::Math::XS::LeanDist',
+            OBJECT => '',
+            postamble => {
+              inline => {
+                file => 'lib/Acme/Math/XS/LeanDist.pm',
+              },
+            },
+        );
+
+    NOTE: The "postamble.inline.file" parameter should be the filename of
+    your module that is using Inline, and you must have an "OBJECT"
+    parameter in the "WriteMakefile" arguments.
+
+DESCRIPTION
+    This module is heavily inspired by Inline::Module. I wrote it because I
+    wanted to be able to use Inline during development, but ship
+    distributions that have no dependencies on it or any other module (for
+    example Inline::Filters and its plugins). I wanted to ship distributions
+    that were (from the user's perspective) identical to the XS dists I
+    would have created by hand (without Inline).
+
+    Essentially, Inline compiles your code as lazily as possible which means
+    all compilation dependencies are required at run-time. Inline::Module
+    pushes the compilation dependencies back to build time. However,
+    Inline::Module::LeanDist goes yet one step futher and pushes back the
+    compilation dependencies to distribution creation time (of course the
+    normal XS tool-chain dependency is still required).
+
+    The advantage of the Inline::Module approach over Inline is that
+    start-up time is faster for your modules since the fairly heavy-weight
+    Inline system isn't loaded, and a compiled version of your module is
+    always available no matter the state of the current ".inline" directory
+    (or which user is running the program, file-system permissions, etc).
+
+    Inline::Module::LeanDist has all of these advantages as well as some
+    additional ones: Downloading and installing Inline is not necessary to
+    build the distribution. This also goes for any other dependencies (such
+    as the "ragel" binary required by Inline::Filters::Ragel).
+
+    With Inline::Module::LeanDist you don't need to worry about updates to
+    Inline/Inline::Module/etc breaking your distribution, not that there is
+    any more reason to expect "Inline::*" to break than say "MakeMaker" or
+    "Test::*". Inline::Module recommends avoiding back-compat problems by
+    bundling hundreds of KB of Inline and its dependencies along with every
+    distribution. I recommend against that. Fortunately there is a C"bundle
+    => 0" option in Inline::Module to stop the bundling. Just add the
+    required modules to your distribution's build-time pre-requisites.
+
+    Finally, with Inline::Module::LeanDist you don't need to mess around
+    with Inline::Module's awkward "stub" packages.
+
+    On the other hand, Inline::Module will likely work for more ILSMs: this
+    module module has only been tested with Inline::C so far. Also, although
+    it's a bit subjective, in my opinion Inline::Module is nicer to develop
+    with over Inline since it always puts the ".so" files into "blib/" which
+    is more "normal" than the ".inline" directory (and of course it's nice
+    that running "make" actually, you know, compiles your code).
+
+HOW DOES IT WORK?
+    Basically it's all a huge hack. :)
+
+    During development time, the Inline::Module::LeanDist forwards all its
+    parameters to Inline so you develop with normal Inline practices.
+
+    However, Inline::Module::LeanDist::MakefilePL modifies "Makefile.PL" so
+    that at "make dist" time, it will comment out the "use
+    Inline::Module::LeanDist::MakefilePL;" line in "Makefile.PL". It will
+    also comment out the "use Inline::Module::LeanDist" line in your module
+    and replace it with an XSLoader invocation. Finally, it copies the
+    generated ".xs" file from the ".inline" directory into the distribution
+    and adds this to the "OBJECT" parameter in "Makefile.PL" (as well as the
+    dist's "MANIFEST").
+
+    The consequence of all this hacking is that the created distributions
+    are lean, XS-only distributions.
+
+EXAMLES
+    Acme::Math::XS::LeanDist - This is a very simple example in the style of
+    Acme::Math::XS and co.
+
+    Unicode::Truncate - This is an actually somewhat useful module that
+    doubles as a proof of concept for Inline::Module::LeanDist and
+    Inline::Filters::Ragel.
+
+BUGS
+    It really ought to be possible to have multiple separate files in a
+    single dist that use Inline, but this is not yet supported.
+
+    It should support "Build.PL" in addition to "Makefile.PL".
+
+    It should support other ILSMs (C++ at least).
+
+    "make" prints some annoying warning, need to figure out how to insert
+    dist actions with MakeMaker:
+
+        Makefile:884: warning: overriding commands for target `distdir'
+        Makefile:632: warning: ignoring old commands for target `distdir'
+
+SEE ALSO
+    Inline-Module-LeanDist github repo
+    <https://github.com/hoytech/Inline-Module-LeanDist>
+
+    Inline::Module
+
+AUTHOR
+    Doug Hoyte, "<doug@hcsw.org>"
+
+COPYRIGHT & LICENSE
+    Copyright 2015 Doug Hoyte.
+
+    This module is licensed under the same terms as perl itself.
+

@@ -1,0 +1,165 @@
+Revision history for IO::CaptureOutput
+
+1.1104    2015-01-23 22:03:57-05:00 America/New_York
+
+    [PREREQS]
+
+    - Drop File::Spec 3.27 prereq except on MSWin32
+
+1.1103    2014-02-27 19:54:14-05:00 America/New_York
+
+    [FIXED]
+
+    - Fixed rt.cpan.org #71775: test failure on non-threaded Win32 perls
+
+    [CHANGED]
+
+    - Updated metadata, repo and bugtracker
+
+    - Switched distribution management to Dist::Zilla
+
+1.1102 Mon Feb 15 07:36:53 EST 2010
+
+    - Fixed: RT#45160 test that confused archname and osname
+      (reported by Dolmen and Tux)
+
+1.1101 Tue Mar  3 23:30:45 EST 2009
+
+    - Fixed Makefile.PL; no functional changes
+
+1.11 Mon Feb  9 21:47:37 EST 2009
+
+    - Fixed: bug in creation of STDERR capture proxy object
+
+1.1001 Tue Jan 20 18:32:27 EST 2009
+
+    - Test fix: marked some wperl.exe tests as TODO on Windows Vista/Win7
+
+1.10 Sun Sep 21 09:34:31 EDT 2008
+
+    - Added: functions to capture output from external command now also
+      return a success flag and the exit code
+
+    - Documented: shorter, punchier synopsis
+
+1.09 Thu Jul  3 09:17:35 EDT 2008
+
+    - Added: parameter validation and error messages
+
+    - Documented: examples of capturing only to a file and parameter errors
+
+1.08_50 Mon May 19 23:19:01 EDT 2008
+
+    - Changed: doesn't bother to read captured output back from file if no
+      scalar reference is provided to receive it
+
+    - Fixed: 'capture { .. } undef, undef, $capture_file' now correctly
+      merges STDOUT and STDERR
+
+1.0801 Sat Feb  9 09:41:11 EST 2008
+
+    - testfix: skip some error handling tests if temp files can't be made
+      read-only (e.g. running test as root)
+
+    - added some prerequisites and meta information to Build.PL
+
+    - added an 'examples' directory
+
+1.08 Wed Feb  6 22:43:37 EST 2008
+
+    - added additional tests and revised documentation
+
+1.07_01 Wed Jan 30 20:57:15 EST 2008
+
+    - added support for capturing to named files instead of anonymous
+      temporary ones (adapted from patch from Anton Berezin)
+
+    - added support to pass through STDOUT or STDERR without capture while
+      capturing the other one (adapted from patch from Anton Berezin)
+
+1.0601 Sun Dec 30 17:31:31 EST 2007
+
+    - relaxed capture_exec.t to avoid failing under noisy perl configurations
+
+1.06 Mon, 26 Nov 2007 16:40:40 EST
+
+    - no changes from 1.05_53
+
+1.05_53 Sat Nov 17 18:45:08 EST 2007
+
+    - MSVC++ fixes for Inline::C testing breaks on other compilers; this
+      version uses separate C routines for MSVC++ and other compilers
+
+1.05_52 Sat Nov 17 14:47:52 EST 2007
+
+    - changed Inline::C code for printing to stdout to match that for stderr;
+      works around a bug if the intalled MSVC++ version doesn't match the
+      version used to build ActiveState Perl on MSWin32.
+
+1.05_51 Sat Nov 17 13:36:39 EST 2007
+
+    - changed Inline::C code for printing to stderr to attempt to work around
+      a segfault bug on some MSWin32 systems (Alternative described by
+      BrowserUK at http://www.perlmonks.org/?node_id=649021 )
+
+    - minor Perl::Critic cleanup to pass xt tests
+
+1.05 Fri Nov 16 08:44:06 EST 2007
+
+    *** No changes since 1.04_03; key changes since 1.03 follows ***
+
+    - added support for capture() merging STDERR and STDOUT to the same
+      scalar, i.e. "capture( \&foo, \$out, \$out )" (RT#24695)
+
+    - added capture_exec_combined() and alias qxy() to merge STDERR and STDOUT
+      for subprocess execution (RT#29289)
+
+    - bugfix: stop crashing if output filehandles are previously closed or
+      if running without a console on MSWin32 (i.e. wperl.exe) (RT#23676)
+
+    - bugfix: capture.t would fail on Win32 if Inline::C was installed;
+      fixed the sample C code used in testing to flush stderr (RT#21712)
+
+    - bugfix: was failing on perl 5.8.0 due to extraneous space in call
+      to open(); removing the space fixed the bug (RT#22044)
+
+1.04_03 Sun Nov  4 11:35:57 EST 2007
+
+    - suppress warnings included in captured output when console output
+      handles were previously closed; only affects some versions/builds of
+      perl on some platforms (found by Slaven Rezic 5.6.2 on FreeBSD 6.2)
+
+1.04_02 Wed Oct 31 00:52:49 EDT 2007
+
+    - added support for capture() merging STDERR and STDOUT to the same
+      scalar, i.e. "capture( \&foo, \$out, \$out )" (RT#24695)
+
+    - added capture_exec_combined() and alias qxy() to merge STDERR and STDOUT
+      for subprocess execution (RT#29289)
+
+    - bugfix: stop crashing if output filehandles are previously closed or
+      if running without a console on MSWin32 (i.e. wperl.exe) (RT#23676)
+
+    - cleaned up documentation for consistency
+
+1.04_01 Mon Oct 29 22:56:45 EDT 2007
+
+    - DAGOLDEN added as maintainer; updated build system and packaging for
+      ongoing maintenance
+
+    - bugfix: capture.t would fail on Win32 if Inline::C was installed;
+      fixed the sample C code used in testing to flush stderr (RT#21712)
+
+    - bugfix: was failing on perl 5.8.0 due to extraneous space in call
+      to open(); removing the space fixed the bug (RT#22044)
+
+1.03  2005-03-25
+    - Add t/pod_coverage.t
+
+1.02  2004-11-22
+    - add extra quoting on Win32 platform
+    - Win32 won't unlink a file that is open in write mode, so close it first
+    - minor POD tweaks
+
+1.0  2004-11-21
+    - Initial revision

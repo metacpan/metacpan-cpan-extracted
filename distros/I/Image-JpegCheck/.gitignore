@@ -1,0 +1,8 @@
+JpegCheck.c
+MANIFEST
+Makefile
+*.old
+inc/
+*.swp
+*.swo
+*.bak

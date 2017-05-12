@@ -1,0 +1,27 @@
+Revision history for Imager-SkinDetector
+
+0.05    2008-10-18 23:00 CEST
+
+        Added is_fuzzy() method.
+        Added other images as examples.
+        Now class constructor accepts a "url" parameter, to
+           check URLs instead of local files.
+
+0.04    2008-10-16 22:15 CEST
+
+        Added contains_nudity() method and example
+
+0.03    2008-10-11 14:13 CEST
+
+        Added color frequencies method, docs and an example
+
+0.02    2008-09-28 09:00 CEST
+
+        Try to fix the world-writable files thing.
+
+0.01    2008-09-26 23:30 CEST
+
+        First version, released on an unsuspecting world.
+        The algorithm is as stupid as you can get.
+
+

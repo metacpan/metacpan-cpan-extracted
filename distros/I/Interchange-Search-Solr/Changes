@@ -1,0 +1,66 @@
+Revision history for Interchange-Search-Solr
+
+0.13 Tue Aug 16 08:44:24 2016 CEST
+
+     [ENHANCEMENTS]
+
+     * Implement multiple sorting directives based on SQL::Abstract syntax
+       (Marco Pessotto).
+     * Die when status is not OK and return corresponding message
+       (Pattawan Kaewduangdee, GH #8).
+     * Add builder class for uri's (Pattawan Kaewduangdee, GH #6).
+
+0.12 Sat Jan  9 08:45:59 2016 CET
+
+     [BUG FIXES]
+
+     * Add build prerequisite on YAML (Stefan Hornburg / Racke)
+     * Fix typo in the LICENSE name in Makefile.PL script
+       (Mohammad S Anwar, GH#4).
+
+0.11 Fri Jan  8 09:02:04 2016 CET
+
+     [BUG FIXES]
+
+     * Fix broken MANIFEST.SKIP (Stefan Hornburg/Racke).
+
+0.10 Thu Jan  7 10:11:14 2016 CET
+
+     All changes done by Marco Pessotto.
+
+     [ENHANCEMENTS]
+
+     * Added first/next/previous/last page numbers to the paginator.
+     * Add total_pages values to the paginator.
+     * Prevent empty search unless explicitly permitted.
+     * Filter out very short terms.
+     * Filter out stopwords from search terms.
+     * Add subclass of WebService::Solr::Response for error handling.
+
+     [TESTS]
+
+     * Add test file for weird error (probably due to Mouse).
+     * Do not use SOLR_URL for testing as it may point to production
+       Solr instance.
+     * Adjust query test to our data.
+     * Fix encoding test.
+     * Add instructions and populate script for test instance.
+
+0.09 Fri Jun 19 10:24:29 2015 CEST
+
+	 [BUG FIXES]
+
+	 * Add solr_update script to MANIFEST (Stefan Hornburg).
+
+	 [ENHANCEMENTS]
+
+	 * Add meta resources to Makefile.PL (Stefan Hornburg).
+
+	 [DOCUMENTATION]
+
+	 * Add short description to main POD (Stefan Hornburg).
+     * Update Github and CPAN links in main POD (Stefan Hornburg).
+
+0.08 Wed Jun 17 15:18:08 2015 CEST
+
+	* Initial release.

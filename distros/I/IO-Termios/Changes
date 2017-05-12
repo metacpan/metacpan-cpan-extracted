@@ -1,0 +1,28 @@
+Revision history for IO-Termios
+
+0.05    2016/06/06 01:37:24
+        [CHANGES]
+         * Opportunistically use Linux::Termios2 if available for arbitrary
+           baudrate support
+         * Name tiocmbic / tiocmbis correctly
+
+        [BUGFIXES]
+         * Fix the sense of the ICANON mode documentation
+         * select() for readability of O_NONBLOCK handles before sysread
+           during unit tests
+
+0.04    2013/12/23 10:58:30
+        [CHANGES]
+         * Added wrapper methods for modem line control bits
+         * Added more documentation to mention "serial ports"
+
+0.03    2013/12/20 21:10:33
+        [CHANGES]
+         * Added ->set_mode and ->get_mode convenience methods
+         * Added $modestr parameter to IO::Termios->open() constructor
+
+0.02    CHANGES:
+         * Added accessors for CREAD, CLOCAL and HUPCL c_cflags flags.
+
+0.01    First version, released on an unsuspecting world.
+

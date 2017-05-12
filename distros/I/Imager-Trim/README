@@ -1,0 +1,74 @@
+NAME
+
+    Imager::Trim - automatic cropping for images using Imager.
+
+VERSION
+
+    version 0.007
+
+SYNOPSIS
+
+        use Imager::Trim;
+    
+        my $imager = Imager::Trim->new( file => 'image.jpg' )
+            or die "Cannot open file: ", Imager::Trim->errstr();
+    
+        my $cropped_image = $imager->trim( fuzz => 50 );
+    
+        $cropped_image->write( file => 'cropped_image.jpg' );
+
+    By default the first pixel from top left is used for automatic
+    cropping, however you can provide yourself an Imager::Color for custom
+    action:
+
+        use Imager::Trim;
+        use Imager::Color;
+    
+        my $white_color = Imager::Color->new("#FFFFFF");
+        my $imager = Imager::Trim->new( file => 'image_with_white_background.jpg' );
+        my $color_cropped_image = $imager->trim( color => $white_color );
+
+    You can even do the cropping manually using Imager (on this example,
+    we're leaving 10px extra space around the automatically cropped image,
+    if possible:
+
+        use Imager::Trim;
+    
+        my $imager = Imager::Trim->new( file => 'image.jpg' );
+        my $cropped_image = $imager->trim();
+    
+        my $border = 10;
+        my $top = $cropped_image->{trim_top} - $border;
+        my $left = $cropped_image->{trim_left} - $border;
+        my $right = $cropped_image->{trim_right} + $border;
+        my $bottom = $cropped_image->{trim_bottom} + $border;
+    
+        my $manually_cropped_image = $imager->crop(
+            top => ($top > 0) ? $top : 0,
+            left => ($left > 0) ? $left : 0,
+            right => ($right > 0) ? $right : 0,
+            bottom => ($bottom > 0) ? $bottom : 0
+        );
+
+DESCRIPTION
+
+    This module extends Imager to allow automatic cropping of images. The
+    method is similar as used in image editors (e.g. "magic wand") or with
+    ImageMagick's "trim" (e.g. 'convert image.jpg -fuzz 50 -background
+    white -trim cropped_image.jpg').
+
+SEE ALSO
+
+    http://imager.perl.org/
+
+AUTHOR
+
+    Jussi Kinnula <spot@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2016 by Jussi Kinnula.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

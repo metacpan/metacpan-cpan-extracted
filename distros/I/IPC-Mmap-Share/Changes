@@ -1,0 +1,14 @@
+Revision history for Perl module IPC::Mmap::Share
+
+0.03 Thu Jul 13
+	- Added lock and unlock
+	- DESTROY method
+	- minor corrections
+
+0.02 Sun Jul 9
+	- Minor changes
+
+0.01 Fri Jul  7 00:35:21 2006
+    - original version; created by ExtUtils::ModuleMaker 0.47
+
+

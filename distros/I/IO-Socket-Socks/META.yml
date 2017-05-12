@@ -1,0 +1,26 @@
+---
+abstract: 'Provides a way to create socks client or server both 4 and 5 version.'
+author:
+  - 'Oleg G <oleg@cpan.org>'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '6.52'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.143240'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: IO-Socket-Socks
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  IO::Select: '0'
+  Socket: '1.94'
+  constant: '1.03'
+resources:
+  repository: https://github.com/olegwtf/p5-IO-Socket-Socks
+version: '0.74'

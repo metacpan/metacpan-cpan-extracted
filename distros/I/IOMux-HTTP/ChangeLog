@@ -1,0 +1,9 @@
+
+==== version history for IOMux::HTTP
+
+version 0.11:
+	- CPAN namespace problem with IO::Mux, renamed into IOMux
+
+version 0.10: Wed Jan 26 16:34:55 CET 2011
+	- initial implementation, derived from HTTP::Deamon::Multiplex
+	  and some LWP code fragments.

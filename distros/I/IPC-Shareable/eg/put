@@ -1,0 +1,28 @@
+#!/usr/bin/perl -w
+#
+# Test of shared arrays courtesy Terry Ewing <terry@intevo.com>
+# See also eg/get
+
+use lib ".";
+
+
+use IPC::Shareable;
+use strict;
+
+
+my @shared;
+                   
+my $ipch = tie @shared,   'IPC::Shareable',
+                           "foco",
+                           {  create    => 1,
+                              exclusive => 'no',
+                              mode      => 0666,
+                              size      => 1024*512
+                           };
+                  
+for (my $i = 1;; $i++) {
+   $ipch->shlock;
+   push(@shared, $i."-----".$i);
+   $ipch->shunlock;
+   sleep(2);
+}                  

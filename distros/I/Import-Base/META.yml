@@ -1,0 +1,50 @@
+---
+abstract: 'Import a set of modules into the calling module'
+author:
+  - 'Doug Bell <preaction@cpan.org>'
+build_requires:
+  Carp: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Import-Base
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  Import::Base:
+    file: lib/Import/Base.pm
+    version: '1.003'
+requires:
+  Import::Into: '1.002005'
+  Module::Runtime: '0'
+  mro: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+resources:
+  IRC: irc://irc.perl.org/#beam
+  bugtracker: https://github.com/preaction/Import-Base/issues
+  homepage: https://github.com/preaction/Import-Base
+  repository: https://github.com/preaction/Import-Base.git
+version: '1.003'
+x_authority: cpan:PREACTION
+x_contributors:
+  - 'Brian Medley <pub-github@bmedley.org>'
+  - 'Doug Bell <doug@preaction.me>'
+x_serialization_backend: 'YAML::Tiny version 1.64'

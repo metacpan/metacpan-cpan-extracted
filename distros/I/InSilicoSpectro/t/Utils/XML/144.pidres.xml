@@ -1,0 +1,1102 @@
+<idr:IdentificationResult xmlns:idr="http://www.phenyx-ms.com/namespace/IdentificationResult.html" version="2">
+  <idl:IdentificationList xmlns:idl="http://www.phenyx-ms.com/namespace/IdentificationList.html">
+    <idl:header>
+      <idl:jobId>144</idl:jobId>
+      <idl:title></idl:title>
+      <idl:date>2005-06-08</idl:date>
+      <idl:time>19:45:34</idl:time>
+    </idl:header>
+    <idl:SubmissionParam>
+      <olavJobSubmission>
+        <dbSearchSubmitScriptParameters>
+        <jobTitle></jobTitle>
+      
+      
+        <userDef>
+          <name>joe</name>
+        </userDef>
+      
+        <searchEnv>
+          <olavHome>USERDEFAULT</olavHome>
+          <nbProcs>9999</nbProcs>
+        </searchEnv>
+      
+        <searchSpace>
+          <databases>
+            <database db="uniprot_sprot"/>
+          </databases>
+          <taxoCriterion>40674</taxoCriterion>   <!-- optional  taxonomy criterion example "9606:-63221" for homo sapiens, but not naenderthalis -->
+          <acList></acList>
+        </searchSpace>
+      
+        <userCustomDefinitions>
+        </userCustomDefinitions>
+      
+        <identificationAlgos>
+          <oneIdentificationAlgo type="msms">
+              <sampleFilters>
+                <oneSampleFilter name="spectrumType" value="msms"/>
+                <!-- example if you want to select only ESI produced samples <oneSampleFilter name="instrument" value="ESI"/> -->
+                </sampleFilters>
+                <identificationAlgoParameters>
+                  <!-- the following part is related to the identification algorithm -->
+                  <DbSearchParameters>
+                    <olavHome>__DEFAULT__</olavHome>
+                    <dbPath>__DEFAULT__</dbPath>
+                    <scoring type="wb" instrument="ESI - ion trap" spectrumType="msms" name="esquire 3000+" file="esquire3000+-gbaa-is-hmm.scoring.xml"/>
+                   <defaultParentCharge>12</defaultParentCharge>
+                    <peptMassBounds min="500" max="3500"/>
+                    <trustParentMass>yes</trustParentMass>
+                    <rndDbMMLinksFile name="config/gpsprot-peptides-3.mm_links_binary" type="bin" dico="config/gpsprot-peptides.dico"/>
+                    <taxonomyChildListFile name="taxdump/taxdump.childlst.txt"/>
+                    <nbScoreSamples>500</nbScoreSamples>
+                    <randomSeed>yes</randomSeed>
+      
+                    <OneSearchRound>
+                      <peptTolerance unit="Da" value="2.0"/>
+                    <cleavageEnzyme name="Trypsin" missedCleavage="1" cleavMode="normal"/>
+                    <Modifications>
+                      <OneModif mode="fixed" name="Cys_CAM" tol="0"/>
+                    </Modifications>
+                    <conflictResolutionStgy>yes</conflictResolutionStgy>
+                    <acScoreThres>5.0</acScoreThres>
+                    <peptZScoreThres>5.0</peptZScoreThres>
+                    <peptPValueThres>1.0E-4</peptPValueThres>
+                    <peptMinCountingSize>6</peptMinCountingSize>
+                    <speedoScoring>
+                      <speedoScoringTol unit="Da" value="0.8"/>
+                      <speedoScoringThres>0.2</speedoScoringThres>
+                      <speedoScoringOneSeries>b</speedoScoringOneSeries>
+                      <speedoScoringOneSeries>b++</speedoScoringOneSeries>
+                      <speedoScoringOneSeries>y</speedoScoringOneSeries>
+                      <speedoScoringOneSeries>y++</speedoScoringOneSeries>
+                    </speedoScoring>
+                    </OneSearchRound>
+      
+                    <OneSearchRound>
+                      <peptTolerance unit="Da" value="2.0"/>
+                    <cleavageEnzyme name="Trypsin" missedCleavage="1" cleavMode="half cleaved"/>
+                    <Modifications>
+                      <OneModif mode="fixed" name="Cys_CAM" tol="0"/>
+                    </Modifications>
+                    <conflictResolutionStgy>yes</conflictResolutionStgy>
+                    <acScoreThres>5.0</acScoreThres>
+                    <peptZScoreThres>5.0</peptZScoreThres>
+                    <peptPValueThres>1.0E-4</peptPValueThres>
+                    <peptMinCountingSize>6</peptMinCountingSize>
+                    <speedoScoring>
+                      <speedoScoringTol unit="Da" value="0.8"/>
+                      <speedoScoringThres>0.2</speedoScoringThres>
+                      <speedoScoringOneSeries>b</speedoScoringOneSeries>
+                      <speedoScoringOneSeries>b++</speedoScoringOneSeries>
+                      <speedoScoringOneSeries>y</speedoScoringOneSeries>
+                      <speedoScoringOneSeries>y++</speedoScoringOneSeries>
+                    </speedoScoring>
+                    </OneSearchRound>
+                  </DbSearchParameters>
+                </identificationAlgoParameters>
+            </oneIdentificationAlgo>
+        </identificationAlgos>
+      </dbSearchSubmitScriptParameters>
+      </olavJobSubmission>
+      
+
+    </idl:SubmissionParam>
+    <idl:PeptideMatchesDefDictionary>
+      <idl:PeptideMatchDef matchType="msms" key="GDLSGHGQEVLIR%::::::::::::::%0%86">
+        <idl:sequence>GDLSGHGQEVLIR</idl:sequence>
+        <idl:modifAt>::::::::::::::</idl:modifAt>
+        <idl:peptZScore>6.04</idl:peptZScore>
+        <idl:peptScore>15.5</idl:peptScore>
+        <idl:peptZvalue>7.88e-10</idl:peptZvalue>
+        <idl:spectrumRef>sample_0%cmpd_86</idl:spectrumRef>
+        <idl:charge>2</idl:charge>
+        <idl:validity confidence="1">dbConflictRejected</idl:validity>
+        <idl:deltaMass>0.856</idl:deltaMass>
+        <idl:DBMatchesRefList>
+          <idl:oneDBMatchesRef>uniprot_sprot%P04249</idl:oneDBMatchesRef>
+        </idl:DBMatchesRefList>
+        <ionicSeries>
+          <oneIonicSeries fragType='a'>
+            <expTheoSpectraMatch len='13'>
+             <expMoz>-1:-1:258.031:-1:-1:-1:596.186:-1:-1:-1:-1:-1:-1</expMoz>
+             <expIntensity>-1:-1:541.000:-1:-1:-1:761.000:-1:-1:-1:-1:-1:-1</expIntensity>
+             <expIntensitySlice>-1:-1:0:-1:-1:-1:2:-1:-1:-1:-1:-1:-1</expIntensitySlice>
+             <theoMass>30.034:145.061:258.145:345.177:402.198:539.257:596.279:724.337:853.380:952.448:1065.532:1178.616:1334.717</theoMass>
+             <deltaMass>-9999:-9999:0.114:-9999:-9999:-9999:0.093:-9999:-9999:-9999:-9999:-9999:-9999</deltaMass>
+            </expTheoSpectraMatch>
+          </oneIonicSeries>
+          <oneIonicSeries fragType='a-NH3'>
+            <expTheoSpectraMatch len='13'>
+             <expMoz>-1:-1:-1:-1:-1:-1:-1:-1:836.579:-1:-1:-1:-1</expMoz>
+             <expIntensity>-1:-1:-1:-1:-1:-1:-1:-1:633.000:-1:-1:-1:-1</expIntensity>
+             <expIntensitySlice>-1:-1:-1:-1:-1:-1:-1:-1:1:-1:-1:-1:-1</expIntensitySlice>
+             <theoMass>-1:-1:-1:-1:-1:-1:-1:707.300:836.343:935.411:1048.495:1161.579:1317.680</theoMass>
+             <deltaMass>-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-0.236:-9999:-9999:-9999:-9999</deltaMass>
+            </expTheoSpectraMatch>
+          </oneIonicSeries>
+          <oneIonicSeries fragType='b'>
+            <expTheoSpectraMatch len='13'>
+             <expMoz>-1:-1:-1:-1:-1:-1:-1:752.146:-1:-1:-1:-1:-1</expMoz>
+             <expIntensity>-1:-1:-1:-1:-1:-1:-1:658.000:-1:-1:-1:-1:-1</expIntensity>
+             <expIntensitySlice>-1:-1:-1:-1:-1:-1:-1:1:-1:-1:-1:-1:-1</expIntensitySlice>
+             <theoMass>58.029:173.056:286.140:373.172:430.193:567.252:624.274:752.332:881.375:980.443:1093.527:1206.611:1362.712</theoMass>
+             <deltaMass>-9999:-9999:-9999:-9999:-9999:-9999:-9999:0.186:-9999:-9999:-9999:-9999:-9999</deltaMass>
+            </expTheoSpectraMatch>
+          </oneIonicSeries>
+          <oneIonicSeries fragType='b-H2O'>
+            <expTheoSpectraMatch len='13'>
+             <expMoz>-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1</expMoz>
+             <expIntensity>-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1</expIntensity>
+             <expIntensitySlice>-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1</expIntensitySlice>
+             <theoMass>-1:-1:-1:355.161:412.183:549.242:606.263:734.322:863.364:962.433:1075.517:1188.601:1344.702</theoMass>
+             <deltaMass>-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999</deltaMass>
+            </expTheoSpectraMatch>
+          </oneIonicSeries>
+          <oneIonicSeries fragType='b-NH3'>
+            <expTheoSpectraMatch len='13'>
+             <expMoz>-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1</expMoz>
+             <expIntensity>-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1</expIntensity>
+             <expIntensitySlice>-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1</expIntensitySlice>
+             <theoMass>-1:-1:-1:-1:-1:-1:-1:735.295:864.338:963.406:1076.490:1189.574:1345.675</theoMass>
+             <deltaMass>-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999</deltaMass>
+            </expTheoSpectraMatch>
+          </oneIonicSeries>
+          <oneIonicSeries fragType='y'>
+            <expTheoSpectraMatch len='13'>
+             <expMoz>-1:-1:-1:-1:1008.726:951.690:814.581:757.659:629.455:500.469:401.137:288.127:-1</expMoz>
+             <expIntensity>-1:-1:-1:-1:7195.000:5451.000:22800.000:3404.000:1803.000:7925.000:2442.000:1577.000:-1</expIntensity>
+             <expIntensitySlice>-1:-1:-1:-1:4:4:4:4:4:4:4:4:-1</expIntensitySlice>
+             <theoMass>1380.723:1323.702:1208.675:1095.591:1008.558:951.537:814.478:757.457:629.398:500.355:401.287:288.203:175.119</theoMass>
+             <deltaMass>-9999:-9999:-9999:-9999:-0.168:-0.153:-0.103:-0.202:-0.057:-0.114:0.150:0.076:-9999</deltaMass>
+            </expTheoSpectraMatch>
+          </oneIonicSeries>
+          <oneIonicSeries fragType='y++'>
+            <expTheoSpectraMatch len='13'>
+             <expMoz>-1:662.333:604.924:-1:504.712:476.190:-1:-1:-1:-1:-1:-1:-1</expMoz>
+             <expIntensity>-1:676.000:579.000:-1:1541.000:7943.000:-1:-1:-1:-1:-1:-1:-1</expIntensity>
+             <expIntensitySlice>-1:1:0:-1:4:4:-1:-1:-1:-1:-1:-1:-1</expIntensitySlice>
+             <theoMass>690.865:662.354:604.841:548.299:504.783:476.272:407.743:379.232:315.203:250.681:201.147:144.605:88.063</theoMass>
+             <deltaMass>-9999:0.021:-0.083:-9999:0.071:0.082:-9999:-9999:-9999:-9999:-9999:-9999:-9999</deltaMass>
+            </expTheoSpectraMatch>
+          </oneIonicSeries>
+          <oneIonicSeries fragType='y++-H2O'>
+            <expTheoSpectraMatch len='13'>
+             <expMoz>-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1</expMoz>
+             <expIntensity>-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1</expIntensity>
+             <expIntensitySlice>-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1</expIntensitySlice>
+             <theoMass>681.860:653.349:595.836:539.294:-1:-1:-1:-1:-1:-1:-1:-1:-1</theoMass>
+             <deltaMass>-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999</deltaMass>
+            </expTheoSpectraMatch>
+          </oneIonicSeries>
+          <oneIonicSeries fragType='y++-NH3'>
+            <expTheoSpectraMatch len='13'>
+             <expMoz>-1:-1:596.186:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1</expMoz>
+             <expIntensity>-1:-1:761.000:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1</expIntensity>
+             <expIntensitySlice>-1:-1:2:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1</expIntensitySlice>
+             <theoMass>682.347:653.836:596.322:539.780:496.264:467.754:399.224:370.713:306.684:242.163:192.629:136.087:79.545</theoMass>
+             <deltaMass>-9999:-9999:0.136:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999</deltaMass>
+            </expTheoSpectraMatch>
+          </oneIonicSeries>
+          <oneIonicSeries fragType='y-H2O'>
+            <expTheoSpectraMatch len='13'>
+             <expMoz>-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1</expMoz>
+             <expIntensity>-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1</expIntensity>
+             <expIntensitySlice>-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1</expIntensitySlice>
+             <theoMass>1362.712:1305.691:1190.664:1077.580:-1:-1:-1:-1:-1:-1:-1:-1:-1</theoMass>
+             <deltaMass>-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999</deltaMass>
+            </expTheoSpectraMatch>
+          </oneIonicSeries>
+          <oneIonicSeries fragType='y-NH3'>
+            <expTheoSpectraMatch len='13'>
+             <expMoz>-1:-1:-1:1078.487:991.592:-1:-1:-1:-1:-1:-1:-1:-1</expMoz>
+             <expIntensity>-1:-1:-1:644.000:1334.000:-1:-1:-1:-1:-1:-1:-1:-1</expIntensity>
+             <expIntensitySlice>-1:-1:-1:1:3:-1:-1:-1:-1:-1:-1:-1:-1</expIntensitySlice>
+             <theoMass>1363.686:1306.664:1191.637:1078.553:991.521:934.500:797.441:740.420:612.361:483.318:384.250:271.166:158.082</theoMass>
+             <deltaMass>-9999:-9999:-9999:0.066:-0.071:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999</deltaMass>
+            </expTheoSpectraMatch>
+          </oneIonicSeries>
+          <oneIonicSeries fragType='b++'>
+            <expTheoSpectraMatch len='13'>
+             <expMoz>-1:-1:-1:-1:-1:-1:-1:-1:-1:490.815:547.208:-1:-1</expMoz>
+             <expIntensity>-1:-1:-1:-1:-1:-1:-1:-1:-1:685.000:919.000:-1:-1</expIntensity>
+             <expIntensitySlice>-1:-1:-1:-1:-1:-1:-1:-1:-1:1:2:-1:-1</expIntensitySlice>
+             <theoMass>29.518:87.031:143.574:187.090:215.600:284.130:312.640:376.670:441.191:490.725:547.267:603.809:681.860</theoMass>
+             <deltaMass>-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-0.090:0.059:-9999:-9999</deltaMass>
+            </expTheoSpectraMatch>
+          </oneIonicSeries>
+        </ionicSeries>
+      </idl:PeptideMatchDef>
+      <idl:PeptideMatchDef matchType="msms" key="EGDLSGHGQEVLIR%:::::::::::::::%0%88">
+        <idl:sequence>EGDLSGHGQEVLIR</idl:sequence>
+        <idl:modifAt>:::::::::::::::</idl:modifAt>
+        <idl:peptZScore>6.99</idl:peptZScore>
+        <idl:peptScore>13.1</idl:peptScore>
+        <idl:peptZvalue>1.37e-12</idl:peptZvalue>
+        <idl:spectrumRef>sample_0%cmpd_88</idl:spectrumRef>
+        <idl:charge>2</idl:charge>
+        <idl:validity confidence="1">dbConflictRejected</idl:validity>
+        <idl:deltaMass>0.3325</idl:deltaMass>
+        <idl:DBMatchesRefList>
+          <idl:oneDBMatchesRef>uniprot_sprot%P04249</idl:oneDBMatchesRef>
+        </idl:DBMatchesRefList>
+        <ionicSeries>
+          <oneIonicSeries fragType='a'>
+            <expTheoSpectraMatch len='14'>
+             <expMoz>-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1</expMoz>
+             <expIntensity>-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1</expIntensity>
+             <expIntensitySlice>-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1</expIntensitySlice>
+             <theoMass>102.055:159.076:274.103:387.187:474.219:531.241:668.300:725.321:853.380:982.422:1081.491:1194.575:1307.659:1463.760</theoMass>
+             <deltaMass>-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999</deltaMass>
+            </expTheoSpectraMatch>
+          </oneIonicSeries>
+          <oneIonicSeries fragType='a-NH3'>
+            <expTheoSpectraMatch len='14'>
+             <expMoz>-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1</expMoz>
+             <expIntensity>-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1</expIntensity>
+             <expIntensitySlice>-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1</expIntensitySlice>
+             <theoMass>-1:-1:-1:-1:-1:-1:-1:-1:836.343:965.385:1064.454:1177.538:1290.622:1446.723</theoMass>
+             <deltaMass>-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999</deltaMass>
+            </expTheoSpectraMatch>
+          </oneIonicSeries>
+          <oneIonicSeries fragType='b'>
+            <expTheoSpectraMatch len='14'>
+             <expMoz>-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1</expMoz>
+             <expIntensity>-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1</expIntensity>
+             <expIntensitySlice>-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1</expIntensitySlice>
+             <theoMass>130.050:187.071:302.098:415.182:502.214:559.236:696.295:753.316:881.375:1010.417:1109.486:1222.570:1335.654:1491.755</theoMass>
+             <deltaMass>-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999</deltaMass>
+            </expTheoSpectraMatch>
+          </oneIonicSeries>
+          <oneIonicSeries fragType='b-H2O'>
+            <expTheoSpectraMatch len='14'>
+             <expMoz>-1:-1:-1:-1:-1:541.014:678.384:-1:-1:-1:1091.369:-1:-1:-1</expMoz>
+             <expIntensity>-1:-1:-1:-1:-1:494.000:587.000:-1:-1:-1:138.000:-1:-1:-1</expIntensity>
+             <expIntensitySlice>-1:-1:-1:-1:-1:4:4:-1:-1:-1:0:-1:-1:-1</expIntensitySlice>
+             <theoMass>-1:-1:-1:-1:484.204:541.225:678.284:735.306:863.364:992.407:1091.475:1204.559:1317.643:1473.744</theoMass>
+             <deltaMass>-9999:-9999:-9999:-9999:-9999:0.211:-0.100:-9999:-9999:-9999:0.106:-9999:-9999:-9999</deltaMass>
+            </expTheoSpectraMatch>
+          </oneIonicSeries>
+          <oneIonicSeries fragType='b-NH3'>
+            <expTheoSpectraMatch len='14'>
+             <expMoz>-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1</expMoz>
+             <expIntensity>-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1</expIntensity>
+             <expIntensitySlice>-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1</expIntensitySlice>
+             <theoMass>-1:-1:-1:-1:-1:-1:-1:-1:864.338:993.380:1092.449:1205.533:1318.617:1474.718</theoMass>
+             <deltaMass>-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999</deltaMass>
+            </expTheoSpectraMatch>
+          </oneIonicSeries>
+          <oneIonicSeries fragType='y'>
+            <expTheoSpectraMatch len='14'>
+             <expMoz>-1:-1:-1:-1:-1:1008.728:951.690:814.596:-1:629.416:500.288:401.350:288.042:-1</expMoz>
+             <expIntensity>-1:-1:-1:-1:-1:3227.000:1383.000:3905.000:-1:368.000:2881.000:884.000:278.000:-1</expIntensity>
+             <expIntensitySlice>-1:-1:-1:-1:-1:4:4:4:-1:3:4:4:2:-1</expIntensitySlice>
+             <theoMass>1509.766:1380.723:1323.702:1208.675:1095.591:1008.558:951.537:814.478:757.457:629.398:500.355:401.287:288.203:175.119</theoMass>
+             <deltaMass>-9999:-9999:-9999:-9999:-9999:-0.170:-0.153:-0.118:-9999:-0.018:0.067:-0.063:0.161:-9999</deltaMass>
+            </expTheoSpectraMatch>
+          </oneIonicSeries>
+          <oneIonicSeries fragType='y++'>
+            <expTheoSpectraMatch len='14'>
+             <expMoz>-1:690.867:-1:-1:-1:504.898:476.329:-1:-1:-1:-1:-1:-1:-1</expMoz>
+             <expIntensity>-1:435.000:-1:-1:-1:371.000:1705.000:-1:-1:-1:-1:-1:-1:-1</expIntensity>
+             <expIntensitySlice>-1:3:-1:-1:-1:3:4:-1:-1:-1:-1:-1:-1:-1</expIntensitySlice>
+             <theoMass>755.386:690.865:662.354:604.841:548.299:504.783:476.272:407.743:379.232:315.203:250.681:201.147:144.605:88.063</theoMass>
+             <deltaMass>-9999:-0.002:-9999:-9999:-9999:-0.115:-0.057:-9999:-9999:-9999:-9999:-9999:-9999:-9999</deltaMass>
+            </expTheoSpectraMatch>
+          </oneIonicSeries>
+          <oneIonicSeries fragType='y++-H2O'>
+            <expTheoSpectraMatch len='14'>
+             <expMoz>-1:-1:653.419:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1</expMoz>
+             <expIntensity>-1:-1:389.000:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1</expIntensity>
+             <expIntensitySlice>-1:-1:3:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1</expIntensitySlice>
+             <theoMass>746.381:681.860:653.349:595.836:539.294:-1:-1:-1:-1:-1:-1:-1:-1:-1</theoMass>
+             <deltaMass>-9999:-9999:-0.070:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999</deltaMass>
+            </expTheoSpectraMatch>
+          </oneIonicSeries>
+          <oneIonicSeries fragType='y++-NH3'>
+            <expTheoSpectraMatch len='14'>
+             <expMoz>-1:-1:-1:-1:-1:-1:467.552:-1:-1:-1:-1:-1:-1:-1</expMoz>
+             <expIntensity>-1:-1:-1:-1:-1:-1:159.000:-1:-1:-1:-1:-1:-1:-1</expIntensity>
+             <expIntensitySlice>-1:-1:-1:-1:-1:-1:1:-1:-1:-1:-1:-1:-1:-1</expIntensitySlice>
+             <theoMass>746.868:682.347:653.836:596.322:539.780:496.264:467.754:399.224:370.713:306.684:242.163:192.629:136.087:79.545</theoMass>
+             <deltaMass>-9999:-9999:-9999:-9999:-9999:-9999:0.202:-9999:-9999:-9999:-9999:-9999:-9999:-9999</deltaMass>
+            </expTheoSpectraMatch>
+          </oneIonicSeries>
+          <oneIonicSeries fragType='y-H2O'>
+            <expTheoSpectraMatch len='14'>
+             <expMoz>-1:-1:1305.945:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1</expMoz>
+             <expIntensity>-1:-1:156.000:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1</expIntensity>
+             <expIntensitySlice>-1:-1:0:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1</expIntensitySlice>
+             <theoMass>1491.755:1362.712:1305.691:1190.664:1077.580:-1:-1:-1:-1:-1:-1:-1:-1:-1</theoMass>
+             <deltaMass>-9999:-9999:-0.254:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999</deltaMass>
+            </expTheoSpectraMatch>
+          </oneIonicSeries>
+          <oneIonicSeries fragType='y-NH3'>
+            <expTheoSpectraMatch len='14'>
+             <expMoz>-1:-1:-1:-1:-1:991.554:-1:797.438:740.383:-1:483.270:-1:-1:-1</expMoz>
+             <expIntensity>-1:-1:-1:-1:-1:256.000:-1:237.000:193.000:-1:242.000:-1:-1:-1</expIntensity>
+             <expIntensitySlice>-1:-1:-1:-1:-1:2:-1:2:1:-1:2:-1:-1:-1</expIntensitySlice>
+             <theoMass>1492.728:1363.686:1306.664:1191.637:1078.553:991.521:934.500:797.441:740.420:612.361:483.318:384.250:271.166:158.082</theoMass>
+             <deltaMass>-9999:-9999:-9999:-9999:-9999:-0.033:-9999:0.003:0.037:-9999:0.048:-9999:-9999:-9999</deltaMass>
+            </expTheoSpectraMatch>
+          </oneIonicSeries>
+          <oneIonicSeries fragType='b++'>
+            <expTheoSpectraMatch len='14'>
+             <expMoz>-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:611.924:-1:-1</expMoz>
+             <expIntensity>-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:136.000:-1:-1</expIntensity>
+             <expIntensitySlice>-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:0:-1:-1</expIntensitySlice>
+             <theoMass>65.529:94.039:151.553:208.095:251.611:280.122:348.651:377.162:441.191:505.712:555.247:611.789:668.331:746.381</theoMass>
+             <deltaMass>-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-0.135:-9999:-9999</deltaMass>
+            </expTheoSpectraMatch>
+          </oneIonicSeries>
+        </ionicSeries>
+      </idl:PeptideMatchDef>
+      <idl:PeptideMatchDef matchType="msms" key="EADLAGHGQEVLIR%:::::::::::::::%0%88">
+        <idl:sequence>EADLAGHGQEVLIR</idl:sequence>
+        <idl:modifAt>:::::::::::::::</idl:modifAt>
+        <idl:peptZScore>12.6</idl:peptZScore>
+        <idl:peptScore>45.9</idl:peptScore>
+        <idl:peptZvalue>1.48e-36</idl:peptZvalue>
+        <idl:spectrumRef>sample_0%cmpd_88</idl:spectrumRef>
+        <idl:charge>2</idl:charge>
+        <idl:validity confidence="1">dbConflictWinner</idl:validity>
+        <idl:deltaMass>-0.657</idl:deltaMass>
+        <idl:DBMatchesRefList>
+          <idl:oneDBMatchesRef>uniprot_sprot%P02157</idl:oneDBMatchesRef>
+          <idl:oneDBMatchesRef>uniprot_sprot%P02171</idl:oneDBMatchesRef>
+          <idl:oneDBMatchesRef>uniprot_sprot%P14396</idl:oneDBMatchesRef>
+          <idl:oneDBMatchesRef>uniprot_sprot%P11343</idl:oneDBMatchesRef>
+          <idl:oneDBMatchesRef>uniprot_sprot%P02170</idl:oneDBMatchesRef>
+          <idl:oneDBMatchesRef>uniprot_sprot%Q7M3C1</idl:oneDBMatchesRef>
+          <idl:oneDBMatchesRef>uniprot_sprot%Q6PL31</idl:oneDBMatchesRef>
+        </idl:DBMatchesRefList>
+        <ionicSeries>
+          <oneIonicSeries fragType='a'>
+            <expTheoSpectraMatch len='14'>
+             <expMoz>-1:-1:288.042:401.350:472.266:-1:-1:-1:-1:-1:1079.755:1192.934:1305.945:-1</expMoz>
+             <expIntensity>-1:-1:278.000:884.000:123.000:-1:-1:-1:-1:-1:1556.000:119.000:156.000:-1</expIntensity>
+             <expIntensitySlice>-1:-1:2:4:0:-1:-1:-1:-1:-1:4:0:0:-1</expIntensitySlice>
+             <theoMass>102.055:173.092:288.119:401.203:472.240:529.262:666.321:723.342:851.401:980.443:1079.512:1192.596:1305.680:1461.781</theoMass>
+             <deltaMass>-9999:-9999:0.077:-0.147:-0.026:-9999:-9999:-9999:-9999:-9999:-0.243:-0.338:-0.265:-9999</deltaMass>
+            </expTheoSpectraMatch>
+          </oneIonicSeries>
+          <oneIonicSeries fragType='a-NH3'>
+            <expTheoSpectraMatch len='14'>
+             <expMoz>-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:1062.726:-1:-1:-1</expMoz>
+             <expIntensity>-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:172.000:-1:-1:-1</expIntensity>
+             <expIntensitySlice>-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:1:-1:-1:-1</expIntensitySlice>
+             <theoMass>-1:-1:-1:-1:-1:-1:-1:-1:834.363:963.406:1062.474:1175.559:1288.643:1444.744</theoMass>
+             <deltaMass>-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-0.252:-9999:-9999:-9999</deltaMass>
+            </expTheoSpectraMatch>
+          </oneIonicSeries>
+          <oneIonicSeries fragType='b'>
+            <expTheoSpectraMatch len='14'>
+             <expMoz>-1:-1:316.218:-1:500.288:-1:694.444:-1:-1:1008.728:-1:1220.979:1333.841:-1</expMoz>
+             <expIntensity>-1:-1:532.000:-1:2881.000:-1:994.000:-1:-1:3227.000:-1:156.000:321.000:-1</expIntensity>
+             <expIntensitySlice>-1:-1:4:-1:4:-1:4:-1:-1:4:-1:0:3:-1</expIntensitySlice>
+             <theoMass>130.050:201.087:316.114:429.198:500.235:557.257:694.315:751.337:879.396:1008.438:1107.507:1220.591:1333.675:1489.776</theoMass>
+             <deltaMass>-9999:-9999:-0.104:-9999:-0.053:-9999:-0.129:-9999:-9999:-0.290:-9999:-0.388:-0.166:-9999</deltaMass>
+            </expTheoSpectraMatch>
+          </oneIonicSeries>
+          <oneIonicSeries fragType='b-H2O'>
+            <expTheoSpectraMatch len='14'>
+             <expMoz>-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1</expMoz>
+             <expIntensity>-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1</expIntensity>
+             <expIntensitySlice>-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1</expIntensitySlice>
+             <theoMass>-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1</theoMass>
+             <deltaMass>-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999</deltaMass>
+            </expTheoSpectraMatch>
+          </oneIonicSeries>
+          <oneIonicSeries fragType='b-NH3'>
+            <expTheoSpectraMatch len='14'>
+             <expMoz>-1:-1:-1:-1:-1:-1:-1:-1:-1:991.554:-1:1203.946:1316.357:-1</expMoz>
+             <expIntensity>-1:-1:-1:-1:-1:-1:-1:-1:-1:256.000:-1:152.000:245.000:-1</expIntensity>
+             <expIntensitySlice>-1:-1:-1:-1:-1:-1:-1:-1:-1:2:-1:0:2:-1</expIntensitySlice>
+             <theoMass>-1:-1:-1:-1:-1:-1:-1:-1:862.358:991.401:1090.469:1203.553:1316.638:1472.739</theoMass>
+             <deltaMass>-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-0.153:-9999:-0.393:0.281:-9999</deltaMass>
+            </expTheoSpectraMatch>
+          </oneIonicSeries>
+          <oneIonicSeries fragType='y'>
+            <expTheoSpectraMatch len='14'>
+             <expMoz>-1:-1:-1:1192.934:1079.755:1008.728:951.690:814.596:-1:629.416:500.288:401.350:-1:-1</expMoz>
+             <expIntensity>-1:-1:-1:119.000:1556.000:3227.000:1383.000:3905.000:-1:368.000:2881.000:884.000:-1:-1</expIntensity>
+             <expIntensitySlice>-1:-1:-1:0:4:4:4:4:-1:3:4:4:-1:-1</expIntensitySlice>
+             <theoMass>1507.786:1378.744:1307.707:1192.680:1079.596:1008.558:951.537:814.478:757.457:629.398:500.355:401.287:288.203:175.119</theoMass>
+             <deltaMass>-9999:-9999:-9999:-0.254:-0.159:-0.170:-0.153:-0.118:-9999:-0.018:0.067:-0.063:-9999:-9999</deltaMass>
+            </expTheoSpectraMatch>
+          </oneIonicSeries>
+          <oneIonicSeries fragType='y++'>
+            <expTheoSpectraMatch len='14'>
+             <expMoz>-1:689.909:654.489:597.068:540.369:504.898:476.329:-1:-1:-1:-1:-1:-1:-1</expMoz>
+             <expIntensity>-1:145.000:953.000:1272.000:554.000:371.000:1705.000:-1:-1:-1:-1:-1:-1:-1</expIntensity>
+             <expIntensitySlice>-1:0:4:4:4:3:4:-1:-1:-1:-1:-1:-1:-1</expIntensitySlice>
+             <theoMass>754.397:689.875:654.357:596.843:540.301:504.783:476.272:407.743:379.232:315.203:250.681:201.147:144.605:88.063</theoMass>
+             <deltaMass>-9999:-0.034:-0.132:-0.225:-0.068:-0.115:-0.057:-9999:-9999:-9999:-9999:-9999:-9999:-9999</deltaMass>
+            </expTheoSpectraMatch>
+          </oneIonicSeries>
+          <oneIonicSeries fragType='y++-H2O'>
+            <expTheoSpectraMatch len='14'>
+             <expMoz>-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1</expMoz>
+             <expIntensity>-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1</expIntensity>
+             <expIntensitySlice>-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1</expIntensitySlice>
+             <theoMass>-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1</theoMass>
+             <deltaMass>-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999</deltaMass>
+            </expTheoSpectraMatch>
+          </oneIonicSeries>
+          <oneIonicSeries fragType='y++-NH3'>
+            <expTheoSpectraMatch len='14'>
+             <expMoz>-1:-1:-1:-1:531.895:-1:-1:-1:-1:-1:-1:-1:-1:-1</expMoz>
+             <expIntensity>-1:-1:-1:-1:466.000:-1:-1:-1:-1:-1:-1:-1:-1:-1</expIntensity>
+             <expIntensitySlice>-1:-1:-1:-1:3:-1:-1:-1:-1:-1:-1:-1:-1:-1</expIntensitySlice>
+             <theoMass>745.878:681.357:645.838:588.325:531.783:496.264:467.754:399.224:370.713:306.684:242.163:192.629:136.087:79.545</theoMass>
+             <deltaMass>-9999:-9999:-9999:-9999:-0.112:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999</deltaMass>
+            </expTheoSpectraMatch>
+          </oneIonicSeries>
+          <oneIonicSeries fragType='y-H2O'>
+            <expTheoSpectraMatch len='14'>
+             <expMoz>-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1</expMoz>
+             <expIntensity>-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1</expIntensity>
+             <expIntensitySlice>-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1</expIntensitySlice>
+             <theoMass>-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1</theoMass>
+             <deltaMass>-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999</deltaMass>
+            </expTheoSpectraMatch>
+          </oneIonicSeries>
+          <oneIonicSeries fragType='y-NH3'>
+            <expTheoSpectraMatch len='14'>
+             <expMoz>-1:-1:-1:-1:1062.726:991.554:-1:797.438:740.383:-1:483.270:-1:-1:-1</expMoz>
+             <expIntensity>-1:-1:-1:-1:172.000:256.000:-1:237.000:193.000:-1:242.000:-1:-1:-1</expIntensity>
+             <expIntensitySlice>-1:-1:-1:-1:1:2:-1:2:1:-1:2:-1:-1:-1</expIntensitySlice>
+             <theoMass>1490.749:1361.707:1290.669:1175.643:1062.558:991.521:934.500:797.441:740.420:612.361:483.318:384.250:271.166:158.082</theoMass>
+             <deltaMass>-9999:-9999:-9999:-9999:-0.168:-0.033:-9999:0.003:0.037:-9999:0.048:-9999:-9999:-9999</deltaMass>
+            </expTheoSpectraMatch>
+          </oneIonicSeries>
+          <oneIonicSeries fragType='b++'>
+            <expTheoSpectraMatch len='14'>
+             <expMoz>-1:-1:-1:-1:-1:-1:-1:-1:-1:504.898:-1:-1:667.349:745.520</expMoz>
+             <expIntensity>-1:-1:-1:-1:-1:-1:-1:-1:-1:371.000:-1:-1:140.000:672.000</expIntensity>
+             <expIntensitySlice>-1:-1:-1:-1:-1:-1:-1:-1:-1:3:-1:-1:0:4</expIntensitySlice>
+             <theoMass>65.529:101.047:158.561:215.103:250.621:279.132:347.661:376.172:440.201:504.723:554.257:610.799:667.341:745.392</theoMass>
+             <deltaMass>-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-0.175:-9999:-9999:-0.008:-0.128</deltaMass>
+            </expTheoSpectraMatch>
+          </oneIonicSeries>
+        </ionicSeries>
+      </idl:PeptideMatchDef>
+      <idl:PeptideMatchDef matchType="msms" key="EADLAGHGQEVLIR%:::::::::::::::%0%90">
+        <idl:sequence>EADLAGHGQEVLIR</idl:sequence>
+        <idl:modifAt>:::::::::::::::</idl:modifAt>
+        <idl:peptZScore>11.1</idl:peptZScore>
+        <idl:peptScore>32.7</idl:peptScore>
+        <idl:peptZvalue>5.93e-29</idl:peptZvalue>
+        <idl:spectrumRef>sample_0%cmpd_90</idl:spectrumRef>
+        <idl:charge>2</idl:charge>
+        <idl:validity confidence="1">dbConflictWinner</idl:validity>
+        <idl:deltaMass>-0.137</idl:deltaMass>
+        <idl:DBMatchesRefList>
+          <idl:oneDBMatchesRef>uniprot_sprot%P02157</idl:oneDBMatchesRef>
+          <idl:oneDBMatchesRef>uniprot_sprot%P02171</idl:oneDBMatchesRef>
+          <idl:oneDBMatchesRef>uniprot_sprot%P14396</idl:oneDBMatchesRef>
+          <idl:oneDBMatchesRef>uniprot_sprot%P11343</idl:oneDBMatchesRef>
+          <idl:oneDBMatchesRef>uniprot_sprot%P02170</idl:oneDBMatchesRef>
+          <idl:oneDBMatchesRef>uniprot_sprot%Q7M3C1</idl:oneDBMatchesRef>
+          <idl:oneDBMatchesRef>uniprot_sprot%Q6PL31</idl:oneDBMatchesRef>
+        </idl:DBMatchesRefList>
+        <ionicSeries>
+          <oneIonicSeries fragType='a'>
+            <expTheoSpectraMatch len='14'>
+             <expMoz>-1:-1:-1:401.160:-1:-1:-1:-1:-1:-1:1079.773:-1:1306.016:-1</expMoz>
+             <expIntensity>-1:-1:-1:199.000:-1:-1:-1:-1:-1:-1:453.000:-1:41.000:-1</expIntensity>
+             <expIntensitySlice>-1:-1:-1:4:-1:-1:-1:-1:-1:-1:4:-1:0:-1</expIntensitySlice>
+             <theoMass>102.055:173.092:288.119:401.203:472.240:529.262:666.321:723.342:851.401:980.443:1079.512:1192.596:1305.680:1461.781</theoMass>
+             <deltaMass>-9999:-9999:-9999:0.043:-9999:-9999:-9999:-9999:-9999:-9999:-0.261:-9999:-0.336:-9999</deltaMass>
+            </expTheoSpectraMatch>
+          </oneIonicSeries>
+          <oneIonicSeries fragType='a-NH3'>
+            <expTheoSpectraMatch len='14'>
+             <expMoz>-1:-1:-1:-1:-1:-1:-1:-1:834.253:-1:-1:-1:-1:-1</expMoz>
+             <expIntensity>-1:-1:-1:-1:-1:-1:-1:-1:74.000:-1:-1:-1:-1:-1</expIntensity>
+             <expIntensitySlice>-1:-1:-1:-1:-1:-1:-1:-1:2:-1:-1:-1:-1:-1</expIntensitySlice>
+             <theoMass>-1:-1:-1:-1:-1:-1:-1:-1:834.363:963.406:1062.474:1175.559:1288.643:1444.744</theoMass>
+             <deltaMass>-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:0.110:-9999:-9999:-9999:-9999:-9999</deltaMass>
+            </expTheoSpectraMatch>
+          </oneIonicSeries>
+          <oneIonicSeries fragType='b'>
+            <expTheoSpectraMatch len='14'>
+             <expMoz>-1:-1:-1:-1:500.416:557.328:694.444:-1:879.630:1008.342:1107.815:1220.662:1333.712:-1</expMoz>
+             <expIntensity>-1:-1:-1:-1:487.000:41.000:70.000:-1:54.000:271.000:91.000:50.000:43.000:-1</expIntensity>
+             <expIntensitySlice>-1:-1:-1:-1:4:0:2:-1:2:4:3:1:1:-1</expIntensitySlice>
+             <theoMass>130.050:201.087:316.114:429.198:500.235:557.257:694.315:751.337:879.396:1008.438:1107.507:1220.591:1333.675:1489.776</theoMass>
+             <deltaMass>-9999:-9999:-9999:-9999:-0.181:-0.071:-0.129:-9999:-0.234:0.096:-0.308:-0.071:-0.037:-9999</deltaMass>
+            </expTheoSpectraMatch>
+          </oneIonicSeries>
+          <oneIonicSeries fragType='b-H2O'>
+            <expTheoSpectraMatch len='14'>
+             <expMoz>-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1</expMoz>
+             <expIntensity>-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1</expIntensity>
+             <expIntensitySlice>-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1</expIntensitySlice>
+             <theoMass>-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1</theoMass>
+             <deltaMass>-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999</deltaMass>
+            </expTheoSpectraMatch>
+          </oneIonicSeries>
+          <oneIonicSeries fragType='b-NH3'>
+            <expTheoSpectraMatch len='14'>
+             <expMoz>-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:1090.848:1203.420:-1:-1</expMoz>
+             <expIntensity>-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:42.000:37.000:-1:-1</expIntensity>
+             <expIntensitySlice>-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:0:0:-1:-1</expIntensitySlice>
+             <theoMass>-1:-1:-1:-1:-1:-1:-1:-1:862.358:991.401:1090.469:1203.553:1316.638:1472.739</theoMass>
+             <deltaMass>-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-0.379:0.133:-9999:-9999</deltaMass>
+            </expTheoSpectraMatch>
+          </oneIonicSeries>
+          <oneIonicSeries fragType='y'>
+            <expTheoSpectraMatch len='14'>
+             <expMoz>-1:-1:-1:-1:1079.773:1008.738:951.654:814.612:-1:629.598:500.416:-1:-1:-1</expMoz>
+             <expIntensity>-1:-1:-1:-1:453.000:855.000:278.000:1038.000:-1:182.000:487.000:-1:-1:-1</expIntensity>
+             <expIntensitySlice>-1:-1:-1:-1:4:4:4:4:-1:4:4:-1:-1:-1</expIntensitySlice>
+             <theoMass>1507.786:1378.744:1307.707:1192.680:1079.596:1008.558:951.537:814.478:757.457:629.398:500.355:401.287:288.203:175.119</theoMass>
+             <deltaMass>-9999:-9999:-9999:-9999:-0.177:-0.180:-0.117:-0.134:-9999:-0.200:-0.061:-9999:-9999:-9999</deltaMass>
+            </expTheoSpectraMatch>
+          </oneIonicSeries>
+          <oneIonicSeries fragType='y++'>
+            <expTheoSpectraMatch len='14'>
+             <expMoz>-1:690.114:654.273:597.062:540.229:-1:476.254:-1:-1:315.174:-1:-1:-1:-1</expMoz>
+             <expIntensity>-1:39.000:126.000:279.000:132.000:-1:74.000:-1:-1:74.000:-1:-1:-1:-1</expIntensity>
+             <expIntensitySlice>-1:0:3:4:3:-1:2:-1:-1:2:-1:-1:-1:-1</expIntensitySlice>
+             <theoMass>754.397:689.875:654.357:596.843:540.301:504.783:476.272:407.743:379.232:315.203:250.681:201.147:144.605:88.063</theoMass>
+             <deltaMass>-9999:-0.239:0.084:-0.219:0.072:-9999:0.018:-9999:-9999:0.029:-9999:-9999:-9999:-9999</deltaMass>
+            </expTheoSpectraMatch>
+          </oneIonicSeries>
+          <oneIonicSeries fragType='y++-H2O'>
+            <expTheoSpectraMatch len='14'>
+             <expMoz>-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1</expMoz>
+             <expIntensity>-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1</expIntensity>
+             <expIntensitySlice>-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1</expIntensitySlice>
+             <theoMass>-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1</theoMass>
+             <deltaMass>-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999</deltaMass>
+            </expTheoSpectraMatch>
+          </oneIonicSeries>
+          <oneIonicSeries fragType='y++-NH3'>
+            <expTheoSpectraMatch len='14'>
+             <expMoz>-1:-1:645.818:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1</expMoz>
+             <expIntensity>-1:-1:34.000:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1</expIntensity>
+             <expIntensitySlice>-1:-1:0:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1</expIntensitySlice>
+             <theoMass>745.878:681.357:645.838:588.325:531.783:496.264:467.754:399.224:370.713:306.684:242.163:192.629:136.087:79.545</theoMass>
+             <deltaMass>-9999:-9999:0.020:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999</deltaMass>
+            </expTheoSpectraMatch>
+          </oneIonicSeries>
+          <oneIonicSeries fragType='y-H2O'>
+            <expTheoSpectraMatch len='14'>
+             <expMoz>-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1</expMoz>
+             <expIntensity>-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1</expIntensity>
+             <expIntensitySlice>-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1</expIntensitySlice>
+             <theoMass>-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1</theoMass>
+             <deltaMass>-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999</deltaMass>
+            </expTheoSpectraMatch>
+          </oneIonicSeries>
+          <oneIonicSeries fragType='y-NH3'>
+            <expTheoSpectraMatch len='14'>
+             <expMoz>-1:-1:-1:-1:1062.940:-1:-1:797.602:-1:612.440:-1:-1:-1:-1</expMoz>
+             <expIntensity>-1:-1:-1:-1:36.000:-1:-1:192.000:-1:44.000:-1:-1:-1:-1</expIntensity>
+             <expIntensitySlice>-1:-1:-1:-1:0:-1:-1:4:-1:1:-1:-1:-1:-1</expIntensitySlice>
+             <theoMass>1490.749:1361.707:1290.669:1175.643:1062.558:991.521:934.500:797.441:740.420:612.361:483.318:384.250:271.166:158.082</theoMass>
+             <deltaMass>-9999:-9999:-9999:-9999:-0.382:-9999:-9999:-0.161:-9999:-0.079:-9999:-9999:-9999:-9999</deltaMass>
+            </expTheoSpectraMatch>
+          </oneIonicSeries>
+          <oneIonicSeries fragType='b++'>
+            <expTheoSpectraMatch len='14'>
+             <expMoz>-1:-1:-1:-1:-1:-1:-1:-1:-1:504.662:-1:-1:-1:-1</expMoz>
+             <expIntensity>-1:-1:-1:-1:-1:-1:-1:-1:-1:126.000:-1:-1:-1:-1</expIntensity>
+             <expIntensitySlice>-1:-1:-1:-1:-1:-1:-1:-1:-1:3:-1:-1:-1:-1</expIntensitySlice>
+             <theoMass>65.529:101.047:158.561:215.103:250.621:279.132:347.661:376.172:440.201:504.723:554.257:610.799:667.341:745.392</theoMass>
+             <deltaMass>-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:0.061:-9999:-9999:-9999:-9999</deltaMass>
+            </expTheoSpectraMatch>
+          </oneIonicSeries>
+        </ionicSeries>
+      </idl:PeptideMatchDef>
+      <idl:PeptideMatchDef matchType="msms" key="SKHPSDFGADAQGAMTK%::::::::::::::::::%0%56">
+        <idl:sequence>SKHPSDFGADAQGAMTK</idl:sequence>
+        <idl:modifAt>::::::::::::::::::</idl:modifAt>
+        <idl:peptZScore>6.4</idl:peptZScore>
+        <idl:peptScore>35.8</idl:peptScore>
+        <idl:peptZvalue>7.66e-11</idl:peptZvalue>
+        <idl:spectrumRef>sample_0%cmpd_56</idl:spectrumRef>
+        <idl:charge>3</idl:charge>
+        <idl:validity confidence="1">dbValid</idl:validity>
+        <idl:deltaMass>0.151666666666667</idl:deltaMass>
+        <idl:DBMatchesRefList>
+          <idl:oneDBMatchesRef>uniprot_sprot%P02183</idl:oneDBMatchesRef>
+        </idl:DBMatchesRefList>
+        <ionicSeries>
+          <oneIonicSeries fragType='b'>
+            <expTheoSpectraMatch len='17'>
+             <expMoz>-1:-1:-1:450.277:-1:652.372:-1:-1:-1:1042.301:-1:-1:-1:-1:-1:-1:-1</expMoz>
+             <expIntensity>-1:-1:-1:1166.000:-1:1168.000:-1:-1:-1:758.000:-1:-1:-1:-1:-1:-1:-1</expIntensity>
+             <expIntensitySlice>-1:-1:-1:3:-1:3:-1:-1:-1:2:-1:-1:-1:-1:-1:-1:-1</expIntensitySlice>
+             <theoMass>88.039:216.134:353.193:450.246:537.278:652.305:799.373:856.395:927.432:1042.459:1113.496:1241.555:1298.576:1369.613:1500.654:1601.701:1729.796</theoMass>
+             <deltaMass>-9999:-9999:-9999:-0.031:-9999:-0.067:-9999:-9999:-9999:0.158:-9999:-9999:-9999:-9999:-9999:-9999:-9999</deltaMass>
+            </expTheoSpectraMatch>
+          </oneIonicSeries>
+          <oneIonicSeries fragType='b++'>
+            <expTheoSpectraMatch len='17'>
+             <expMoz>-1:-1:-1:-1:-1:-1:-1:-1:464.260:521.770:557.303:-1:-1:-1:-1:801.369:-1</expMoz>
+             <expIntensity>-1:-1:-1:-1:-1:-1:-1:-1:1396.000:2231.000:1344.000:-1:-1:-1:-1:605.000:-1</expIntensity>
+             <expIntensitySlice>-1:-1:-1:-1:-1:-1:-1:-1:3:4:3:-1:-1:-1:-1:1:-1</expIntensitySlice>
+             <theoMass>44.523:108.571:177.100:225.627:269.143:326.656:400.190:428.701:464.220:521.733:557.252:621.281:649.792:685.310:750.830:801.354:865.402</theoMass>
+             <deltaMass>-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-0.040:-0.037:-0.051:-9999:-9999:-9999:-9999:-0.015:-9999</deltaMass>
+            </expTheoSpectraMatch>
+          </oneIonicSeries>
+          <oneIonicSeries fragType='b++-H2O'>
+            <expTheoSpectraMatch len='17'>
+             <expMoz>-1:-1:-1:-1:-1:-1:391.213:-1:455.164:-1:-1:-1:640.731:676.449:-1:792.482:-1</expMoz>
+             <expIntensity>-1:-1:-1:-1:-1:-1:935.000:-1:1191.000:-1:-1:-1:631.000:2004.000:-1:2006.000:-1</expIntensity>
+             <expIntensitySlice>-1:-1:-1:-1:-1:-1:3:-1:3:-1:-1:-1:2:4:-1:4:-1</expIntensitySlice>
+             <theoMass>35.518:99.565:168.095:216.621:260.137:317.651:391.185:419.696:455.214:512.728:548.246:612.276:640.786:676.305:741.825:792.349:856.396</theoMass>
+             <deltaMass>-9999:-9999:-9999:-9999:-9999:-9999:-0.028:-9999:0.050:-9999:-9999:-9999:0.055:-0.144:-9999:-0.133:-9999</deltaMass>
+            </expTheoSpectraMatch>
+          </oneIonicSeries>
+          <oneIonicSeries fragType='b++-NH3'>
+            <expTheoSpectraMatch len='17'>
+             <expMoz>-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:792.857:-1</expMoz>
+             <expIntensity>-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:875.000:-1</expIntensity>
+             <expIntensitySlice>-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:3:-1</expIntensitySlice>
+             <theoMass>-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:612.762:641.273:676.792:742.312:792.836:856.883</theoMass>
+             <deltaMass>-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-0.021:-9999</deltaMass>
+            </expTheoSpectraMatch>
+          </oneIonicSeries>
+          <oneIonicSeries fragType='b-H2O'>
+            <expTheoSpectraMatch len='17'>
+             <expMoz>-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:1351.747:-1:-1:-1</expMoz>
+             <expIntensity>-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:437.000:-1:-1:-1</expIntensity>
+             <expIntensitySlice>-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:0:-1:-1:-1</expIntensitySlice>
+             <theoMass>70.029:198.124:335.183:432.235:519.267:634.294:781.363:838.384:909.421:1024.448:1095.485:1223.544:1280.565:1351.603:1482.643:1583.691:1711.786</theoMass>
+             <deltaMass>-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-0.144:-9999:-9999:-9999</deltaMass>
+            </expTheoSpectraMatch>
+          </oneIonicSeries>
+          <oneIonicSeries fragType='b-NH3'>
+            <expTheoSpectraMatch len='17'>
+             <expMoz>-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1</expMoz>
+             <expIntensity>-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1</expIntensity>
+             <expIntensitySlice>-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1</expIntensitySlice>
+             <theoMass>-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:1224.517:1281.539:1352.576:1483.616:1584.664:1712.759</theoMass>
+             <deltaMass>-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999</deltaMass>
+            </expTheoSpectraMatch>
+          </oneIonicSeries>
+          <oneIonicSeries fragType='y'>
+            <expTheoSpectraMatch len='17'>
+             <expMoz>-1:-1:-1:-1:-1:-1:-1:949.572:892.605:821.512:-1:635.432:507.260:450.277:379.178:-1:-1</expMoz>
+             <expIntensity>-1:-1:-1:-1:-1:-1:-1:2167.000:1329.000:7809.000:-1:9261.000:14549.000:1166.000:2315.000:-1:-1</expIntensity>
+             <expIntensitySlice>-1:-1:-1:-1:-1:-1:-1:4:3:4:-1:4:4:3:4:-1:-1</expIntensitySlice>
+             <theoMass>1747.807:1660.775:1532.680:1395.621:1298.568:1211.536:1096.509:949.441:892.419:821.382:706.355:635.318:507.260:450.238:379.201:248.160:147.113</theoMass>
+             <deltaMass>-9999:-9999:-9999:-9999:-9999:-9999:-9999:-0.131:-0.186:-0.130:-9999:-0.114:-0.000:-0.039:0.023:-9999:-9999</deltaMass>
+            </expTheoSpectraMatch>
+          </oneIonicSeries>
+          <oneIonicSeries fragType='y++'>
+            <expTheoSpectraMatch len='17'>
+             <expMoz>874.207:-1:-1:-1:-1:-1:548.772:475.151:-1:411.270:-1:-1:-1:-1:-1:-1:-1</expMoz>
+             <expIntensity>429.000:-1:-1:-1:-1:-1:510.000:566.000:-1:735.000:-1:-1:-1:-1:-1:-1:-1</expIntensity>
+             <expIntensitySlice>0:-1:-1:-1:-1:-1:1:1:-1:2:-1:-1:-1:-1:-1:-1:-1</expIntensitySlice>
+             <theoMass>874.407:830.891:766.844:698.314:649.788:606.272:548.758:475.224:446.713:411.195:353.681:318.163:254.133:225.623:190.104:124.584:74.060</theoMass>
+             <deltaMass>0.200:-9999:-9999:-9999:-9999:-9999:-0.014:0.073:-9999:-0.075:-9999:-9999:-9999:-9999:-9999:-9999:-9999</deltaMass>
+            </expTheoSpectraMatch>
+          </oneIonicSeries>
+          <oneIonicSeries fragType='y++-H2O'>
+            <expTheoSpectraMatch len='17'>
+             <expMoz>-1:822.087:-1:-1:640.731:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1</expMoz>
+             <expIntensity>-1:1232.000:-1:-1:631.000:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1</expIntensity>
+             <expIntensitySlice>-1:3:-1:-1:2:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1:-1</expIntensitySlice>
+             <theoMass>865.402:821.886:757.838:689.309:640.782:597.266:539.753:466.219:437.708:402.189:344.676:309.157:245.128:216.617:181.099:115.579:-1</theoMass>
+             <deltaMass>-9999:-0.201:-9999:-9999:0.051:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999</deltaMass>
+            </expTheoSpectraMatch>
+          </oneIonicSeries>
+          <oneIonicSeries fragType='y++-NH3'>
+            <expTheoSpectraMatch len='17'>
+             <expMoz>-1:822.574:-1:-1:-1:597.806:-1:-1:-1:402.520:345.135:-1:-1:-1:-1:-1:-1</expMoz>
+             <expIntensity>-1:2134.000:-1:-1:-1:447.000:-1:-1:-1:597.000:811.000:-1:-1:-1:-1:-1:-1</expIntensity>
+             <expIntensitySlice>-1:4:-1:-1:-1:0:-1:-1:-1:1:2:-1:-1:-1:-1:-1:-1</expIntensitySlice>
+             <theoMass>865.888:822.372:758.325:689.796:641.269:597.753:540.240:466.705:438.195:402.676:345.163:309.644:-1:-1:-1:-1:-1</theoMass>
+             <deltaMass>-9999:-0.202:-9999:-9999:-9999:-0.053:-9999:-9999:-9999:0.156:0.028:-9999:-9999:-9999:-9999:-9999:-9999</deltaMass>
+            </expTheoSpectraMatch>
+          </oneIonicSeries>
+          <oneIonicSeries fragType='y-H2O'>
+            <expTheoSpectraMatch len='17'>
+             <expMoz>-1:-1:-1:-1:-1:-1:-1:931.533:874.207:803.498:-1:617.456:489.193:-1:361.193:-1:-1</expMoz>
+             <expIntensity>-1:-1:-1:-1:-1:-1:-1:402.000:429.000:1143.000:-1:3520.000:1269.000:-1:1226.000:-1:-1</expIntensity>
+             <expIntensitySlice>-1:-1:-1:-1:-1:-1:-1:0:0:3:-1:4:3:-1:3:-1:-1</expIntensitySlice>
+             <theoMass>1729.796:1642.764:1514.669:1377.610:1280.558:1193.526:1078.499:931.430:874.409:803.372:688.345:617.308:489.249:432.228:361.190:230.150:-1</theoMass>
+             <deltaMass>-9999:-9999:-9999:-9999:-9999:-9999:-9999:-0.103:0.202:-0.126:-9999:-0.148:0.056:-9999:-0.003:-9999:-9999</deltaMass>
+            </expTheoSpectraMatch>
+          </oneIonicSeries>
+          <oneIonicSeries fragType='y-NH3'>
+            <expTheoSpectraMatch len='17'>
+             <expMoz>-1:-1:-1:-1:-1:-1:-1:-1:-1:804.412:-1:618.461:-1:-1:-1:-1:-1</expMoz>
+             <expIntensity>-1:-1:-1:-1:-1:-1:-1:-1:-1:556.000:-1:7526.000:-1:-1:-1:-1:-1</expIntensity>
+             <expIntensitySlice>-1:-1:-1:-1:-1:-1:-1:-1:-1:1:-1:4:-1:-1:-1:-1:-1</expIntensitySlice>
+             <theoMass>1730.770:1643.738:1515.643:1378.584:1281.531:1194.499:1079.472:932.404:875.382:804.345:689.318:618.281:-1:-1:-1:-1:-1</theoMass>
+             <deltaMass>-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-9999:-0.067:-9999:-0.180:-9999:-9999:-9999:-9999:-9999</deltaMass>
+            </expTheoSpectraMatch>
+          </oneIonicSeries>
+        </ionicSeries>
+      </idl:PeptideMatchDef>
+    </idl:PeptideMatchesDefDictionary>
+    <idl:DatabaseResults>
+      <idl:OneDatabaseResult name="uniprot_sprot" release="46.0" taxoCriterion="40674">
+        <idl:IdentificationAlg name="WideBafScoring" version="WB_default" final_yn="">
+          <idl:parameters>
+            <idl:OneParam name="fragTol" value="+600ppm; max(300ppm, 0.2Da)"/>
+            <idl:OneParam name="parentMaxCharge" value="4"/>
+            <idl:OneParam name="fragmentationSeries" value="a:a-H2O:a-NH3:b:b-H2O:b-NH3:y:y-H2O:y-NH3:b++:y++,a:a-NH3:b:b-H2O:b-NH3:y:y++:y++-H2O:y++-NH3:y-H2O:y-NH3:b++,b:b++:b++-H2O:b++-NH3:b-H2O:b-NH3:y:y++:y++-H2O:y++-NH3:y-H2O:y-NH3,b:b++:b+++:y:y++:y+++:b-NH3:b-H2O:y-NH3:y-H2O"/>
+          </idl:parameters>
+          <idl:DBMatches>
+            <idl:DBMatch key="uniprot_sprot%P68082">
+              <idl:AC>P68082</idl:AC>
+              <idl:origAC>P68082</idl:origAC>
+              <idl:ID>MYG_HORSE</idl:ID>
+              <idl:dbName>uniprot_sprot</idl:dbName>
+              <idl:description><![CDATA[Myoglobin]]></idl:description>
+              <idl:seqVersion></idl:seqVersion>
+              <idl:seqString start="0" length="153">GLSDGEWQQVLNVWGKVEADIAGHGQEVLIRLFTGHPETLEKFDKFKHLKTEAEMKASEDLKKHGTVVLTALGGILKKKGHHEAELKPLAQSHATKHKIPIKYLEFISDAIIHVLHSKHPGDFGADAQGAMTKALELFRNDIAAKYKELGFQG</idl:seqString>
+              <idl:seqPI>8.122</idl:seqPI>
+              <idl:seqMass>16940.965</idl:seqMass>
+              <idl:score>107.542</idl:score>
+              <idl:coverage>0.464</idl:coverage>
+              <idl:oversetOf>
+                <idl:contains>uniprot_sprot%P68083</idl:contains>
+                <idl:contains>uniprot_sprot%P02187</idl:contains>
+                <idl:contains>uniprot_sprot%P02186</idl:contains>
+                <idl:contains>uniprot_sprot%P02169</idl:contains>
+                <idl:contains>uniprot_sprot%P02178</idl:contains>
+                <idl:contains>uniprot_sprot%P02180</idl:contains>
+                <idl:contains>uniprot_sprot%P02177</idl:contains>
+                <idl:contains>uniprot_sprot%P02179</idl:contains>
+              </idl:oversetOf>
+              <idl:PeptideMatches>
+              <idl:PeptideMatch matchType="msms" ref="ADIAGHGQEVLIR%::::::::::::::%0%86">
+                <idl:pos>
+                  <idl:start>18</idl:start>
+                  <idl:end>30</idl:end>
+                  <idl:frame>-1</idl:frame>
+                  <idl:missCleav>-2</idl:missCleav>
+                  <idl:aaBefore>E</idl:aaBefore>
+                  <idl:aaAfter>L</idl:aaAfter>
+                </idl:pos>
+                <idl:pValue>6.86e-29</idl:pValue>
+                <idl:scorePercent>0.111</idl:scorePercent>
+              </idl:PeptideMatch>
+              <idl:PeptideMatch matchType="msms" ref="EADIAGHGQEVLIR%:::::::::::::::%0%90">
+                <idl:pos>
+                  <idl:start>17</idl:start>
+                  <idl:end>30</idl:end>
+                  <idl:frame>-1</idl:frame>
+                  <idl:missCleav>-2</idl:missCleav>
+                  <idl:aaBefore>V</idl:aaBefore>
+                  <idl:aaAfter>L</idl:aaAfter>
+                </idl:pos>
+                <idl:pValue>1.23e-24</idl:pValue>
+                <idl:scorePercent>0.000996</idl:scorePercent>
+              </idl:PeptideMatch>
+              <idl:PeptideMatch matchType="msms" ref="EADIAGHGQEVLIR%:::::::::::::::%0%88">
+                <idl:pos>
+                  <idl:start>17</idl:start>
+                  <idl:end>30</idl:end>
+                  <idl:frame>-1</idl:frame>
+                  <idl:missCleav>-2</idl:missCleav>
+                  <idl:aaBefore>V</idl:aaBefore>
+                  <idl:aaAfter>L</idl:aaAfter>
+                </idl:pos>
+                <idl:pValue>3.08e-32</idl:pValue>
+                <idl:scorePercent>0.117</idl:scorePercent>
+              </idl:PeptideMatch>
+              <idl:PeptideMatch matchType="msms" ref="VEADIAGHGQEVLIR%::::::::::::::::%0%84">
+                <idl:pos>
+                  <idl:start>16</idl:start>
+                  <idl:end>30</idl:end>
+                  <idl:frame>-1</idl:frame>
+                  <idl:missCleav>0</idl:missCleav>
+                  <idl:aaBefore>K</idl:aaBefore>
+                  <idl:aaAfter>L</idl:aaAfter>
+                </idl:pos>
+                <idl:pValue>3.32e-08</idl:pValue>
+                <idl:scorePercent>0</idl:scorePercent>
+              </idl:PeptideMatch>
+              <idl:PeptideMatch matchType="msms" ref="VEADIAGHGQEVLIR%::::::::::::::::%0%85">
+                <idl:pos>
+                  <idl:start>16</idl:start>
+                  <idl:end>30</idl:end>
+                  <idl:frame>-1</idl:frame>
+                  <idl:missCleav>0</idl:missCleav>
+                  <idl:aaBefore>K</idl:aaBefore>
+                  <idl:aaAfter>L</idl:aaAfter>
+                </idl:pos>
+                <idl:pValue>3.01e-22</idl:pValue>
+                <idl:scorePercent>0.0985</idl:scorePercent>
+              </idl:PeptideMatch>
+              </idl:PeptideMatches>
+            </idl:DBMatch>
+            <idl:DBMatch key="uniprot_sprot%P68083">
+              <idl:AC>P68083</idl:AC>
+              <idl:origAC>P68083</idl:origAC>
+              <idl:ID>MYG_EQUBU</idl:ID>
+              <idl:dbName>uniprot_sprot</idl:dbName>
+              <idl:description><![CDATA[Myoglobin]]></idl:description>
+              <idl:seqVersion></idl:seqVersion>
+              <idl:seqString start="0" length="153">GLSDGEWQQVLNVWGKVEADIAGHGQEVLIRLFTGHPETLEKFDKFKHLKTEAEMKASEDLKKHGTVVLTALGGILKKKGHHEAELKPLAQSHATKHKIPIKYLEFISDAIIHVLHSKHPGDFGADAQGAMTKALELFRNDIAAKYKELGFQG</idl:seqString>
+              <idl:seqPI>8.122</idl:seqPI>
+              <idl:seqMass>16940.965</idl:seqMass>
+              <idl:score>107.542</idl:score>
+              <idl:coverage>0.464</idl:coverage>
+              <idl:subsetOf>uniprot_sprot%P68082</idl:subsetOf>
+              <idl:oversetOf>
+                <idl:contains>uniprot_sprot%P02187</idl:contains>
+                <idl:contains>uniprot_sprot%P02186</idl:contains>
+                <idl:contains>uniprot_sprot%P02169</idl:contains>
+                <idl:contains>uniprot_sprot%P02178</idl:contains>
+                <idl:contains>uniprot_sprot%P02180</idl:contains>
+                <idl:contains>uniprot_sprot%P02177</idl:contains>
+                <idl:contains>uniprot_sprot%P02179</idl:contains>
+              </idl:oversetOf>
+              <idl:PeptideMatches>
+              <idl:PeptideMatch matchType="msms" ref="ADIAGHGQEVLIR%::::::::::::::%0%86">
+                <idl:pos>
+                  <idl:start>18</idl:start>
+                  <idl:end>30</idl:end>
+                  <idl:frame>-1</idl:frame>
+                  <idl:missCleav>-2</idl:missCleav>
+                  <idl:aaBefore>E</idl:aaBefore>
+                  <idl:aaAfter>L</idl:aaAfter>
+                </idl:pos>
+                <idl:pValue>6.86e-29</idl:pValue>
+                <idl:scorePercent>0.111</idl:scorePercent>
+              </idl:PeptideMatch>
+              <idl:PeptideMatch matchType="msms" ref="EADIAGHGQEVLIR%:::::::::::::::%0%90">
+                <idl:pos>
+                  <idl:start>17</idl:start>
+                  <idl:end>30</idl:end>
+                  <idl:frame>-1</idl:frame>
+                  <idl:missCleav>-2</idl:missCleav>
+                  <idl:aaBefore>V</idl:aaBefore>
+                  <idl:aaAfter>L</idl:aaAfter>
+                </idl:pos>
+                <idl:pValue>1.23e-24</idl:pValue>
+                <idl:scorePercent>0.000996</idl:scorePercent>
+              </idl:PeptideMatch>
+              <idl:PeptideMatch matchType="msms" ref="EADIAGHGQEVLIR%:::::::::::::::%0%88">
+                <idl:pos>
+                  <idl:start>17</idl:start>
+                  <idl:end>30</idl:end>
+                  <idl:frame>-1</idl:frame>
+                  <idl:missCleav>-2</idl:missCleav>
+                  <idl:aaBefore>V</idl:aaBefore>
+                  <idl:aaAfter>L</idl:aaAfter>
+                </idl:pos>
+                <idl:pValue>3.08e-32</idl:pValue>
+                <idl:scorePercent>0.117</idl:scorePercent>
+              </idl:PeptideMatch>
+              <idl:PeptideMatch matchType="msms" ref="VEADIAGHGQEVLIR%::::::::::::::::%0%84">
+                <idl:pos>
+                  <idl:start>16</idl:start>
+                  <idl:end>30</idl:end>
+                  <idl:frame>-1</idl:frame>
+                  <idl:missCleav>0</idl:missCleav>
+                  <idl:aaBefore>K</idl:aaBefore>
+                  <idl:aaAfter>L</idl:aaAfter>
+                </idl:pos>
+                <idl:pValue>3.32e-08</idl:pValue>
+                <idl:scorePercent>0</idl:scorePercent>
+              </idl:PeptideMatch>
+              </idl:PeptideMatches>
+            </idl:DBMatch>
+          </idl:DBMatches>
+        </idl:IdentificationAlg>
+      </idl:OneDatabaseResult>
+    </idl:DatabaseResults>
+    <idl:SampleInfos>
+      <idl:oneSampleInfo spectrumType="msms">
+        <idl:compoundInfo key="sample_0%cmpd_0" sampleNumber="0" compoundNumber="0">
+          <idl:description><![CDATA[Cmpd 11, +MSn(786.25) 16.0 min]]></idl:description>
+          <idl:precursor>
+            <idl:acquTime></idl:acquTime>
+            <idl:moz>786.240</idl:moz>
+            <idl:intensity>6955</idl:intensity>
+            <idl:charges>1</idl:charges>
+          </idl:precursor>
+          <idl:size>13</idl:size>
+        </idl:compoundInfo>
+        <idl:compoundInfo key="sample_0%cmpd_1" sampleNumber="0" compoundNumber="1">
+          <idl:description><![CDATA[Cmpd 12, +MSn(565.83) 16.2 min]]></idl:description>
+          <idl:precursor>
+            <idl:acquTime></idl:acquTime>
+            <idl:moz>565.828</idl:moz>
+            <idl:intensity>14150</idl:intensity>
+            <idl:charges>2,3</idl:charges>
+          </idl:precursor>
+          <idl:size>88</idl:size>
+        </idl:compoundInfo>
+        <idl:compoundInfo key="sample_0%cmpd_2" sampleNumber="0" compoundNumber="2">
+          <idl:description><![CDATA[Cmpd 13, +MSn(660.46) 16.3 min]]></idl:description>
+          <idl:precursor>
+            <idl:acquTime></idl:acquTime>
+            <idl:moz>659.886</idl:moz>
+            <idl:intensity>2080</idl:intensity>
+            <idl:charges>2,3</idl:charges>
+          </idl:precursor>
+          <idl:size>35</idl:size>
+        </idl:compoundInfo>
+        <idl:compoundInfo key="sample_0%cmpd_3" sampleNumber="0" compoundNumber="3">
+          <idl:description><![CDATA[Cmpd 14, +MSn(868.27) 16.5 min]]></idl:description>
+          <idl:precursor>
+            <idl:acquTime></idl:acquTime>
+            <idl:moz>867.468</idl:moz>
+            <idl:intensity>736</idl:intensity>
+            <idl:charges>2,3</idl:charges>
+          </idl:precursor>
+          <idl:size>14</idl:size>
+        </idl:compoundInfo>
+        <idl:compoundInfo key="sample_0%cmpd_4" sampleNumber="0" compoundNumber="4">
+          <idl:description><![CDATA[Cmpd 15, +MSn(497.07) 16.7 min]]></idl:description>
+          <idl:precursor>
+            <idl:acquTime></idl:acquTime>
+            <idl:moz>496.234</idl:moz>
+            <idl:intensity>1050</idl:intensity>
+            <idl:charges>2,3</idl:charges>
+          </idl:precursor>
+          <idl:size>120</idl:size>
+        </idl:compoundInfo>
+      </idl:oneSampleInfo>
+    </idl:SampleInfos>
+  </idl:IdentificationList>
+  <anl:AnalysisList xmlns:anl="/AnalysisList.html">
+    <ple:PeakListExport key="sample_0" spectrumType="msms" xmlns:ple="/PeakListExport.html">
+      <ple:date>2005-06-08</ple:date>
+      <ple:time>19:45:31</ple:time>
+      <ple:PeakDetectionAlg>
+        <ple:ProgramName>InSilicoSpectro::Spectra::MSMSSpectra</ple:ProgramName>
+        <ple:ProgramVersion>0.9</ple:ProgramVersion>
+        <ple:ProgramParameters>
+          <ple:PParam name="source" value="/home/vital-it/phenyx/tmp/jobs/JobSubmission-akCVi8/1717.mgf"/>
+        </ple:ProgramParameters>
+      </ple:PeakDetectionAlg>
+      <ple:PeakLists>
+      <ple:ItemOrder xmlns:ple="namespace/PeakListExport.html">
+        <ple:item type="moz"/>
+        <ple:item type="intensity"/>
+        <ple:item type="charge"/>
+      </ple:ItemOrder>
+        <ple:MSMSRun>
+          <ple:sample instrumentId="n/a" origFile="1717.mgf" spectrumType="msms" sampleNumber='0' instrument="n/a"/>
+          <ple:peptide key="sample_0%cmpd_0" xmlns:ple="namespace/PeakListExport.html">
+            <ple:PeptideDescr>Cmpd 11, +MSn(786.25) 16.0 min</ple:PeptideDescr>
+            <ple:ParentMass><![CDATA[786.240 6955 1]]></ple:ParentMass>
+            <ple:peaks><![CDATA[
+197.725 96 0
+198.053 38 0
+199.141 34 0
+711.524 29 0
+715.513 48 0
+738.915 186 0
+739.374 81 1
+743.954 37 0
+744.386 88 0
+751.116 90 0
+768.535 462 0
+771.675 169 1
+772.725 70 0
+]]></ple:peaks>
+          </ple:peptide>
+          <ple:peptide key="sample_0%cmpd_1" xmlns:ple="namespace/PeakListExport.html">
+            <ple:PeptideDescr>Cmpd 12, +MSn(565.83) 16.2 min</ple:PeptideDescr>
+            <ple:ParentMass><![CDATA[565.828 14150 2,3]]></ple:ParentMass>
+            <ple:peaks><![CDATA[
+178.055 51 0
+206.228 37 0
+222.051 82 0
+229.220 72 0
+251.058 188 0
+294.000 72 0
+302.050 39 0
+323.518 94 0
+340.966 84 0
+343.123 125 0
+352.067 36 0
+367.758 68 0
+388.443 81 0
+389.160 195 1
+411.168 34 0
+411.451 53 0
+413.731 65 0
+423.223 37 0
+430.093 129 0
+436.147 74 0
+439.265 69 0
+444.125 57 0
+458.392 29 0
+468.119 32 0
+490.620 54 0
+491.982 62 0
+493.021 104 0
+494.289 192 0
+494.819 42 0
+495.231 36 0
+496.803 120 0
+497.303 30 0
+515.555 159 0
+518.469 40 0
+524.487 140 0
+524.808 71 0
+525.265 159 0
+533.766 1165 0
+534.241 1031 0
+535.525 65 0
+536.805 38 0
+538.415 37 0
+541.856 70 0
+548.052 33 0
+556.373 43 0
+556.822 52 0
+584.832 203 0
+587.387 29 0
+592.121 30 0
+609.241 32 0
+619.212 158 0
+623.290 54 0
+637.368 90 0
+638.264 68 0
+655.824 40 0
+660.223 46 0
+661.366 71 0
+664.206 55 0
+668.525 31 0
+706.990 121 0
+707.764 78 0
+708.436 98 0
+724.435 187 1
+799.401 74 0
+809.198 63 1
+814.968 42 0
+816.082 109 0
+816.417 101 1
+818.759 84 0
+819.006 48 0
+819.739 58 0
+835.828 64 0
+836.319 103 0
+836.885 74 0
+837.508 357 1
+853.651 36 0
+878.205 82 1
+880.469 189 1
+886.386 68 0
+902.541 81 0
+920.540 58 0
+920.956 54 0
+921.407 44 0
+928.515 98 1
+929.696 53 1
+938.842 37 0
+939.531 64 0
+993.631 75 0
+]]></ple:peaks>
+          </ple:peptide>
+        </ple:MSMSRun>
+      </ple:PeakLists>
+    </ple:PeakListExport>
+  </anl:AnalysisList>
+
+</idr:IdentificationResult>

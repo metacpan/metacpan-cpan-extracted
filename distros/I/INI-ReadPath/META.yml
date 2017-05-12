@@ -1,0 +1,21 @@
+---
+abstract: 'Read INI config file with path and output string'
+author:
+  - 'Michael Vu <email@michael.vu>'
+build_requires:
+  Try::Tiny: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.140640'
+license: restrictive
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: INI-ReadPath
+requires:
+  Config::INI: '0'
+  Getopt::Long: '0'
+  Mouse: '0'
+  Template: '0'
+version: '1'

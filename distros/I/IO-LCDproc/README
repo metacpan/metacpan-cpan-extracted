@@ -1,0 +1,24 @@
+IO/LCDproc
+==========
+
+IO::LCDproc provides access to a LCDproc enabled screen. http://lcdproc.org
+for more info.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 Juan C. Muller
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+This project's repository is available at http://github.com/jcmuller/IO-LCDproc
+

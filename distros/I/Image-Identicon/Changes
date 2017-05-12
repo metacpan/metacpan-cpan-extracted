@@ -1,0 +1,13 @@
+Revision history for Image-Identicon
+
+0.03    Sat Feb  3 01:40:28 JST 2007
+        fix, Japanese pod was shown on CPAN.
+
+0.02    Fri Feb  2 21:35:44 JST 2007
+        generate image more smoothly.
+				image #15 changed.
+				added, patches list generator (example/patch_list.pl)
+
+0.01    Thu Feb  1 16:17:29 JST 2007
+        First version.
+

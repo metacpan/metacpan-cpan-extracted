@@ -1,0 +1,7 @@
+Revision history for Perl extension Inline::Select.
+
+0.01  Sun Jan 23 17:35:27 EST 2005
+	- original version; created by h2xs 1.22 with options
+		-AX Inline::Select
+
+

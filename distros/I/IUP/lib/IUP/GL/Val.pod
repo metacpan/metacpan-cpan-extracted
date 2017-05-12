@@ -1,0 +1,14 @@
+=head1 NAME
+
+IUP::GL::Val - [GUI element] GL-based value selector
+
+=head1 DESCRIPTION
+
+XXX-TODO: missing doc
+
+=head1 SEE ALSO
+
+The original doc: L<iupglval.html|http://www.tecgraf.puc-rio.br/iup/en/gl/iupglval.html>
+
+
+=cut

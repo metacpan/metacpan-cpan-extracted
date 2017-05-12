@@ -1,0 +1,24 @@
+Revision history for Perl extension Image::LibRSVG.
+
+0.07   - cpan release of 0.06 holds wrong version
+
+0.06   - fixed loading of gz files with new version (RT 18146)
+       - removed DEFINE from Makefile-call (old librvg installations can use 0.05)
+
+0.05   - enabled new function "getBitmap" which returns the bitmap into a scalar
+       - added new function "isGzCompressionSupported" to check if gzipped files can be passed
+       - added some new tests
+
+0.04   
+       - fixed typo in POD (cpan-bug-id 6187)
+       - fixed problems with detecting zlib support 
+         (now default is on and can be turned off by perl Makefile.PL-Param 
+         as shown in read me)
+0.03
+       - added loading from string
+
+0.02 
+       - corrected wrong Modulenames in examples in POD
+       - corrected typo in loadImage dimesion => dimension
+0.01  
+       - added support 4 librsvg 2

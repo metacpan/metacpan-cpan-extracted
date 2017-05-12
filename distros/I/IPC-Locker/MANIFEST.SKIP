@@ -1,0 +1,14 @@
+^CVS/
+/CVS/
+^.git/
+pm_to_blib$
+,v$
+\.(bak|new|old)$
+\bMakefile$
+\.wpsin$
+\.tar\.
+\bblib\b
+\.svn/
+nodist/
+test_dir
+^(.*/)?MYMETA\..*$

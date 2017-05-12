@@ -1,0 +1,13 @@
+#!/usr/bin/perl -w
+
+use lib "./lib";
+
+use strict;
+use Image::Info qw(image_info);
+use Data::Dumper;
+
+while (@ARGV) {
+    print Data::Dumper::Dumper(image_info(shift)), "\n";
+}
+
+

@@ -1,0 +1,82 @@
+# -*- Perl -*-
+
+# Perl version of llq -w
+
+use IBM::LoadLeveler;
+
+$found = 0;
+
+# Initialize the query for jobs
+
+$qj=ll_query(JOBS);
+
+exit 0 if ( ! defined $qj );
+
+$rc = ll_set_request($qj,QUERY_ALL,undef,NULL);
+$job = ll_get_objs($qj,LL_CM,NULL,$num,$err);
+
+if ( $job == NULL )
+{
+    print "  ll_get_objs returned a NULL job object.\n";
+    print "  err = err\n";
+} else {
+    while($job)
+    {
+	$step = ll_get_data($job,LL_JobGetFirstStep);
+	while ($step)
+	{
+	    $id    = ll_get_data($step,LL_StepID);
+	    $state = ll_get_data($step,LL_StepState);
+
+	    if ($state == STATE_RUNNING)
+	    {
+                $found = $found + 1;
+	        print "=============== Job Step $id ===============\n";
+		$qw = ll_query(WLMSTAT);
+		if ($qw)
+		{
+	      	  $rc = ll_set_request($qw,QUERY_STEPID,[$id,NULL],NULL);
+	  	  $machine =  ll_get_data($step,LL_StepGetFirstMachine);
+		  while($machine)
+		  {
+		      $name = ll_get_data($machine,LL_MachineName);
+	              print "$name:\n";
+		      # Get info from Startd on this machine
+		      $wlm = ll_get_objs($qw,LL_STARTD,$name,$num,$err);
+		      if ($wlm)
+		      {
+                          print "\tResource: CPU\n";
+			  $cpu_snapshot = ll_get_data($wlm,LL_WlmStatCpuSnapshotUsage);
+			  print "\t\tsnapshot: $cpu_snapshot\n";
+			  $cpu_total = ll_get_data($wlm,LL_WlmStatCpuTotalUsage);
+			  print "\t\ttotal: $cpu_total\n";
+                          print "\tResource: Real Memory\n";
+		  	  $memory_snapshot = ll_get_data($wlm,LL_WlmStatMemorySnapshotUsage);
+			  print "\t\tsnapshot: $memory_snapshot\n";
+			  $memory_highwater = ll_get_data($wlm,LL_WlmStatMemoryHighWater);
+			  print "\t\thigh water: $memory_highwater\n";
+		      } else {
+			print "  RESULT: No WLM object returned.\n";
+		      }
+		      $machine = ll_get_data($step,LL_StepGetNextMachine);
+                   }
+		}
+	    }
+	    $step=ll_get_data($job,LL_JobGetNextStep);
+
+	}
+	$job = ll_next_obj($qj);
+
+    }
+
+    if ($found == 0) {
+       print "There is currently no job status to report.\n";
+    }
+
+    # free jobs obtained from Negotiator
+    $rc = ll_free_objs($qj);
+
+    # free query element
+    $rc = ll_deallocate($qj);
+
+}

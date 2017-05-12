@@ -1,0 +1,230 @@
+Revision history for Perl extension IPTables::IPv4::DBTarpit.
+
+0.44  Mon Jan 27 11:59:58 PST 2014
+        modify Makefile.PL to bypass missing 'pod2text'
+
+0.43  Mon Apr 19 16:05:27 PDT 2010
+	Update Makefile.PL to work around \s+ bug in perl distributed with
+	some redHat versions.
+
+0.42  Wed May 13 10:12:45 PDT 2009
+	in bdbtarpit.c, clean up casting differences char/u_char and
+	add paren's for some IF statements to surpress warnings
+
+	clean up casting and unused variables throughout
+
+	removed debug line accidentally left in Tools.pm
+
+	updated local_config to find libipq.h in /usr/local/include
+
+	enforce LANG = en_US in Makefile
+
+	corrected error in t/util_pid.t that caused a false positive failure
+
+	edit godaemon.c, misc.c, main.c, tarpit.c, util_pid.c, CTest.xs
+	to eliminate warnings from newer versions of gcc
+
+
+	in Tools 1.13	------------------------------
+	enforce LANG = en_US in Makefile.PL
+
+	edit Tools.xs to quiet compiler warnings for
+	recent versions of gcc
+
+0.41  Wed Dec 10 10:06:00 PST 2008
+      In Tools v 1.12
+	DBTPD structure for each instance is now stored in perl
+	a perl lexical with a pointer on the stack to make the
+	Tools portion of the library fully re-entrant except for
+	error code handling ... similar to unix error handling.
+	
+0.40  Thu Oct  2 12:30:42 PDT 2008
+	Add CPAN tester cutouts for bad OS's and missing libs
+
+0.39  Tue Sep 30 16:38:36 PDT 2008
+	Makefile.PL change to facilitate testing
+
+0.38  Wed Dec 12 12:26:31 PST 2007
+	replace $VERSION with $modVERSION in CTest.pm
+
+0.37  Fri Mar  12 13:27:36 PST 2007
+	add updates for compatibility up to BDB 4.5
+
+	update config.sub, config.guess
+
+0.36  Mon Sep 11 16:55:20 PDT 2006
+	'mkdir' compatability updates for perl 5.0503
+
+0.35  not released
+	clean up some typo's in IPTables::IPv4::DBTarpit::Inst
+	no code changes
+
+0.34  Sat Nov 13 15:55:29 PST 2004
+	fix typo in docs
+	IPTables::IPv4::DBTarpit::Config
+      should be:
+	IPTables::IPv4::DBTarpit::SiteConfig
+	This messed up SpamCannibal on-line documentation
+
+0.33  Wed Jun 30 17:11:41 PDT 2004
+	Tune docs on DNAT
+	Tune QUEUE documentation
+
+	Seperate the libipq functions in tarpit.c into libipq_wrapper.c 
+	to work around a conflict between net/if.c and linux/if.c included
+	in libnet.h and libipq.h
+
+0.32  Sun Jun 27 14:01:44 PDT 2004
+	updated the documentation to include bastion host DNAT
+	instructions for setting up a tarpit connection where 
+	the server is behind the bastion host
+
+0.31  Wed Jun 23 16:37:13 PDT 2004
+	updated rc.dbtarpit v0.05 to fix bug for perl v5.8.3 where unshift 
+	does not work properly for default @_
+
+	add workaround to MAKE process to find misplaced libipq.h in debian
+	distribution
+
+0.30  released only for testing -- changes included above
+
+0.29  Fri May 28 17:26:33 PDT 2004
+	Update source for tarpit.c to reflect the API change between   
+	libnet-1.0.x and libnet-1.1.x. Add code to test in make and 
+	detect which version of libnet is present; create a header 
+	file that passes necessary info to the compiler + ifdef
+	tarpit.c to use the correct API
+
+	consolidate the library test code for linbet-1.1.x and
+	iptables-1.28? into 'local_config'
+
+0.28  Mon May 24 14:12:39 PDT 2004
+	As of rev 1.28? of iptables, the call to ipq_create_handle
+	has gained an arg for support of IPv6 (not supported here).
+	Add code  to test in the make sequence and detect the newer 
+	library version; create a header file that passes necessary 
+	info to the compiler + ifdef main.c to call ipq_create_handle 
+	with one or two arguments as appropriate.
+
+0.27  Sat May 22 10:24:53 PDT 2004
+	removed compiler dependent bug when extracting version number
+	from DBTarpit.pm for C sources.
+
+0.26	not released
+	altered the comments at the beginning of DBTarpit.pm
+
+0.25  Tue Apr  6 22:08:13 PDT 2004
+	remove 'sync' from bdbtarpit.c "dbtp_find_addr",
+	put a call to "dbtp_sync" in check.c, conditional on
+	the time of last sync being over 15 minutes old. This 
+	will reduce DB write operations to the disk under heavy load.
+
+0.24  Mon Feb  9 15:56:51 PST 2004
+	rewrite 'restart' logic in rc.dbtarpit v0.4
+
+0.23  Sat Dec  6 17:36:49 PST 2003
+	plugged a leak in libnet-1.02a
+	virtual memory use goes up after a call to 
+	  ptr = libnet_open_link_interface
+	and does not go back down when calling
+	  libnet_close_link_interface(ptr)
+
+	adding a call to free(ptr) in tarpit.c, seems to do the trick
+
+0.22  Sat Oct  4 17:27:29 PDT 2003
+	put a check in libdbtarpit to prevent keys that are not netaddrs
+	from being entered into the databases.
+
+	update the test suites to accomodate above
+
+	incorporate auto-delete of records that are not IPv4 address size
+	into 'getrecno' to prevent inadvertent database corruption
+
+0.21  Fri Oct  3 16:23:17 PDT 2003
+	clean up db recovery interface in bdbtarpit.c so it works
+
+	Unlink pid file on exit in main.c This lets the database 
+	watcher know that the task has exited cleanly.
+
+FIRST BETA RELEASE
+0.20  Mon Sep 22 18:09:36 PDT 2003
+	add OS independent ifdef's
+
+0.19  Sat Sep 13 21:16:37 PDT 2003
+	add set_recovery function to Tools package
+	add DB_RECOVER attribute to dbtp_init
+
+0.18  Wed Sep 10 09:35:10 PDT 2003
+	add -X option to drop non-TCP/IP connections addresses
+	found in tarpit db -- DoS defense mode
+
+0.17  Thu Sep  4 18:18:00 PDT 2003
+	Add code to insert outgoing MAC address into ETH-net header
+	and to correctly calculate headersize
+	Add code to log bandwidth to pipe -- forgot about that.
+	Redo the bandwidth calculations
+
+0.16  Sat Aug 30 19:25:13 PDT 2003
+	add -L switch to enable tarpiting of 127.x.x.x hosts
+	changes to main.c, data.c, check.c and test suite
+
+	Add code to insert outgoing MAC address into ETHnet header
+
+0.15  Thu Aug 28 14:04:09 PDT 2003
+	updated to IPTables::IPv4::DBTarpit::Inst version 0.05
+	corrected dialog for SpamCannibal
+
+0.14  Sun Aug  3 21:33:12 PDT 2003
+	update Makefile.PL to build libdbtarpit
+	but not dbtarpit when not on a Linux os
+
+0.13  Sat Aug  2 10:27:23 PDT 2003
+	remove bzero of DBTPD from dbtp_close, it was
+	overkill and zapped the file names for axfr in dnsbls
+
+	Update Tools to 1.04 -- include clear database function
+
+0.12  Wed Jul 30 09:44:47 PDT 2003
+	change conflicting name 'Config' to 'SiteConfig'
+
+0.11  Sat Jul 26 09:03:58 PDT 2003
+	increased size of short buffer for packets
+	to IP_MAXPACKET + sizeof(ipq_packet_msg_t)
+
+0.10  Sat Jul 19 10:28:39 PDT 2003
+	add fifo logging
+
+	add -a flag to allow the tarpit to run
+	without affecting packet flow
+
+0.09  Tue Jul 18 21:28:06 PDT 2003
+	update to use shared libdbtarpit
+
+	Released shared library 0.0.0
+
+0.08  Sat Jul 12 13:34:30 PDT 2003
+	update to use common bdbtarpit.c library
+
+0.07  Fri Jul  4 14:14:58 PDT 2003
+	modified godameon.c to do double fork
+	modified sig handler to ignore SIGHUP
+
+0.06  Mon Jun 30 13:41:06 PDT 2003
+	convert underlying db to Btree
+	with RECNO access
+
+0.05  Sun Jun 29 16:07:38 PDT 2003
+	add missing spam.lib to MANIFEST
+
+0.04  Tue Jun 17 16:53:13 PDT 2003
+	remove redundant inet_aton, inet_ntoa
+
+0.03  Thu May 29 09:14:49 PDT 2003
+	Correct man page installation directory
+
+0.02  Tue May 27 15:30:35 PDT 2003
+	released IPTables::IPv4::DBTarpit::Tools
+	version 0.07 as part of this package.
+
+0.01  Fri Apr 11 13:16:27 2003
+	initial release

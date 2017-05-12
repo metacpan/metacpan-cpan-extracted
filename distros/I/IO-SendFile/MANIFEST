@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+SendFile.pm
+SendFile.xs
+test.pl
+typemap
+README

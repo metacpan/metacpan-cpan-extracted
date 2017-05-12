@@ -1,0 +1,54 @@
+- Implement the following matches:
+	+ condition (v4/v6)
+	- connbytes (v4)
+	+ connlimit (v4)
+	+ connmark (v4)
+	+ conntrack (v4)
+	+ dst (v6)
+	+ frag (v6)
+	+ fuzzy (v4/v6)
+	+ hbh (v6)
+	+ helper (v4)
+	+ iprange (v4)
+	+ ipv6header (v6)
+	+ nth (v4/v6)
+	- physdev (v4)
+	+ pool (v4)
+	+ quota (v4)
+	+ random (v4/v6)
+	- realm (v4)
+	+ recent (v4)
+	- record_rpc (v4)
+	+ rpc (v4)
+	+ rt (v6)
+	- sctp (v4)
+	+ string (v4)
+	- u32 (v4)
+
+- Implement the following targets:
+	- BALANCE (v4)
+	+ CLASSIFY (v4)
+	+ CONNMARK (v4)
+	+ IPMARK (v4)
+	+ NETLINK (v4)
+	+ NETMAP (v4)
+	+ POOL (v4)
+	+ ROUTE (v4)
+	+ SAME (v4)
+	+ XOR (v4)
+
+- Port more of the netfilter testsuite test cases to IPTables::IPv4. The
+  following should be ported ASAP, as they don't require any special stuff:
+
+	21loop.sh
+	56speed.sh
+	57badtargmatch.sh
+	58ipchainscrash.sh
+	59numberproto.sh
+	60bignum.sh
+
+  Others can be ported later, once I figure out how to reproduce some of the
+  other stuff, like the stuff for using /dev/tap* for simulating real network
+  activity for rule testing.
+
+- Include some testing of IPTables::IPv6, now that it's there.

@@ -1,0 +1,32 @@
+Inline::Nouse
+=============
+
+An Inline implementation of the Nouse language.
+( see http://code.iamcal.com/docs/nouse.html )
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Inline
+  Inline::Interp
+  Language::Nouse
+  Test::More
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003-2012 Cal Henderson, <cal@iamcal.com>
+License: Perl Artistic License 2.0
+

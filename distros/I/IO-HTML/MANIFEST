@@ -1,0 +1,15 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+lib/IO/HTML.pm
+t/00-all_prereqs.t
+t/00-load.t
+t/10-find.t
+t/20-open.t
+t/30-outfile.t
+xt/release/pod-coverage.t
+xt/release/pod-syntax.t

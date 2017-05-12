@@ -1,0 +1,172 @@
+NAME
+    `IO::Async::Resolver::DNS' - resolve DNS queries using `IO::Async'
+
+SYNOPSIS
+     use IO::Async::Loop;
+     use IO::Async::Resolver::DNS;
+
+     my $loop = IO::Async::Loop->new;
+     my $resolver = $loop->resolver;
+
+     $resolver->res_query(
+        dname => "cpan.org",
+        type  => "MX",
+     )->then( sub {
+        my ( $pkt ) = @_;
+
+        foreach my $mx ( $pkt->answer ) {
+           next unless $mx->type eq "MX";
+
+           printf "preference=%d exchange=%s\n",
+              $mx->preference, $mx->exchange;
+        }
+     })->get;
+
+DESCRIPTION
+    This module extends the IO::Async::Resolver class with extra methods and
+    resolver functions to perform DNS-specific resolver lookups. It does not
+    directly provide any methods or functions of its own.
+
+    These functions are provided for performing DNS-specific lookups, to
+    obtain `MX' or `SRV' records, for example. For regular name resolution,
+    the usual `getaddrinfo' and `getnameinfo' methods on the standard
+    `IO::Async::Resolver' should be used.
+
+    If Net::LibResolv is installed then it will be used for actually sending
+    and receiving DNS packets, in preference to a internally-constructed
+    Net::DNS::Resolver object. `Net::LibResolv' will be more efficient and
+    shares its implementation with the standard resolver used by the rest of
+    the system. `Net::DNS::Resolver' reimplements the logic itself, so it
+    may have differences in behaviour from that provided by libresolv. The
+    ability to use the latter is provided to allow for an XS-free dependency
+    chain, or for other situations where `Net::LibResolv' is not available.
+
+  Record Extraction
+    If certain record type queries are made, extra information is returned
+    to the `on_resolved' continuation, containing the results from the DNS
+    packet in a more useful form. This information will be in a list of
+    extra values following the packet value.
+
+     my ( $pkt, @data ) = $f->get;
+
+     $on_resolved->( $pkt, @data )
+
+    The type of the elements in `@data' will depend on the DNS record query
+    type:
+
+    * A and AAAA
+        The `A' or `AAAA' records will be unpacked and returned in a list of
+        strings.
+
+         @data = ( "10.0.0.1",
+                   "10.0.0.2" );
+
+         @data = ( "fd00:0:0:0:0:0:0:1" );
+
+    * PTR
+        The `PTR' records will be unpacked and returned in a list of domain
+        names.
+
+         @data = ( "foo.example.com" );
+
+    * MX
+        The `MX' records will be unpacked, in order of `preference', and
+        returned in a list of HASH references. Each HASH reference will
+        contain keys called `exchange' and `preference'. If the exchange
+        domain name is included in the DNS `additional' data, then the HASH
+        reference will also include a key called `address', its value
+        containing a list of `A' and `AAAA' record `address' fields.
+
+         @data = ( { exchange   => "mail.example.com",
+                     preference => 10,
+                     address    => [ "10.0.0.1", "fd00:0:0:0:0:0:0:1" ] } );
+
+    * SRV
+        The `SRV' records will be unpacked and sorted first by order of
+        priority, then by a weighted shuffle by weight, and returned in a
+        list of HASH references. Each HASH reference will contain keys
+        called `priority', `weight', `target' and `port'. If the target
+        domain name is included in the DNS `additional' data, then the HASH
+        reference will also contain a key called `address', its value
+        containing a list of `A' and `AAAA' record `address' fields.
+
+         @data = ( { priority => 10,
+                     weight   => 10,
+                     target   => "server1.service.example.com",
+                     port     => 1234,
+                     address  => [ "10.0.1.1" ] } );
+
+Error Reporting
+    The two possible back-end modules that implement the resolver query
+    functions provided here differ in their semantics for error reporting.
+    To account for this difference and to lead to more portable user code,
+    errors reported by the back-end modules are translated to one of the
+    following (exported) constants.
+
+     ERR_NO_HOST        # The specified host name does not exist
+     ERR_NO_ADDRESS     # The specified host name does not provide answers for the
+                          given query type
+     ERR_TEMPORARY      # A temporary failure that may disappear on retry
+     ERR_UNRECOVERABLE  # Any other error
+
+RESOLVER METHODS
+    The following methods documented with a trailing call to `->get' return
+    Future instances.
+
+  res_query
+       ( $pkt, @data ) = $resolver->res_query( %params )->get
+
+    Performs a resolver query on the name, class and type, and invokes a
+    continuation when a result is obtained.
+
+    Takes the following named parameters:
+
+    dname => STRING
+            Domain name to look up
+
+    type => STRING
+            Name of the record type to look up (e.g. `MX')
+
+    class => STRING
+            Name of the record class to look up. Defaults to `IN' so
+            normally this argument is not required.
+
+    On failure on `IO::Async' versions that support extended failure results
+    (0.68 and later), the extra detail will be an error value matching one
+    of the `ERR_*' constants listed above.
+
+     ->fail( $message, resolve => res_query => $errnum )
+
+    Note that due to the two possible back-end implementations it is not
+    guaranteed that messages have any particular format; they are intended
+    for human consumption only, and the `$errnum' value should be used for
+    making decisions in other code.
+
+    When not returning a `Future', the following extra arguments are used as
+    callbacks instead:
+
+    on_resolved => CODE
+            Continuation which is invoked after a successful lookup. Will be
+            passed a Net::DNS::Packet object containing the result.
+
+             $on_resolved->( $pkt )
+
+            For certain query types, this continuation may also be passed
+            extra data in a list after the `$pkt'
+
+             $on_resolved->( $pkt, @data )
+
+            See the Record Extraction section above for more detail.
+
+    on_error => CODE
+            Continuation which is invoked after a failed lookup.
+
+  res_search
+    Performs a resolver query on the name, class and type, and invokes a
+    continuation when a result is obtained. Identical to `res_query' except
+    that it additionally implements the default domain name search
+    behaviour.
+
+AUTHOR
+    Paul Evans <leonerd@leonerd.org.uk>
+

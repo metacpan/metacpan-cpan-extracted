@@ -1,0 +1,112 @@
+h1. Image::Size - Determine the size of images in several common formats
+
+Version: 3.300 (See CHANGES below)
+
+h2. WHAT IS IT
+
+Image::Size is a library based on the image-sizing code in the wwwimagesize script, a tool that analyzes HTML files and adds HEIGHT and WIDTH tags to IMG directives. Image::Size has generalized that code to return a raw (X, Y) pair, and included wrappers to pre-format that output into either HTML or a set of attribute pairs suitable for the CGI.pm library by Lincoln Stein.  Currently, Image::Size can size images in XPM, XBM, GIF, JPEG, PNG, MNG, TIFF, the PPM family of formats (PPM/PGM/PBM) and if Image::Magick is installed, the formats supported by it.
+
+I did this because my old WWW server generated a lot of documents on demand rather than keeping them in static files. These documents not only used directional icons and buttons, but other graphics to annotate and highlight sections of the text. Without size attributes, browsers cannot render the text of a page until the image data is loaded and the size known for layout.  This library enables scripts to size their images at run-time and include that as part of the generated HTML. Or for any other utility that uses and manipulates graphics. The idea of the basic interface + wrappers is to not limit the programmer to a certain data format.
+
+
+h2. USING Image::Size IN YOUR SCRIPTS
+
+Image::Size has pod documentation that gives a more complete overview, but in a nutshell:
+
+<pre>
+<code>
+        use Image::Size;
+
+        ($x, $y) = imgsize("something.gif");
+</code>
+</pre>
+
+And <code>($x, $y)</code> is now the width and height of something.gif. 95% of my usage of this library is in conjunction with Lincoln Stein's CGI.pm:
+
+<pre>
+<code>
+        use CGI ':all';
+        use Image::Size 'attr_imgsize';
+
+        #
+        # Emit an IMG tag with size attributes:
+        #
+        print img({-SRC => '/server/images/arrow.gif',
+                   attr_imgsize('/server_root/server/images/arrow.gif')});
+</code>
+</pre>
+
+Alternately, if you are running under Apache and mod_perl:
+
+<pre>
+<code>
+        # Assume $Q is an object of class CGI, $r is an Apache request object
+        $r->print($Q->img({ -src => $imgpath,
+                            attr_imgsize($r->lookup_uri($imgpath)->
+                                         filename) }));
+</code>
+</pre>
+
+h2. BUILDING/INSTALLING
+
+This package uses Makefile.PL:
+
+<pre>
+<code>
+        perl Makefile.PL
+        make && make test
+        make install
+</code>
+</pre>
+
+You may need super-user access to install.
+
+
+h2. PROBLEMS/BUG REPORTS
+
+Please send any reports of problems or bugs to rjray@blackperl.com.
+
+
+h2. CHANGES
+
+* lib/Image/Size.pm
+* t/all.t
+* t/old-os2.bmp (added)
+
+p{margin-bottom:2em}. Add support for old OS/2 version of BMP header (Geoff Richards).
+
+* lib/Image/Size.pm
+
+p{margin-bottom:2em}. Typo fixes (David Steinbrunner).
+
+* lib/Image/Size.pm
+
+p{margin-bottom:2em}. Avoid a sprintf() warning in Perl 5.21. Perl 5.21 introduces a warning for redundant arguments to s?printf(), so sprintf("%d", 1, 2) would warn. This commit silences that warning by passing sprintf the exact number of arguments that it expects (Brian Fraser).
+
+* lib/Image/Size.pm
+
+p{margin-bottom:2em}. Added =encoding utf8 to pod - the accented character was causing a pod error (Neil Bowers).
+
+* lib/Image/Size.pm
+
+p{margin-bottom:2em}. Added Z<> to the =item [012] to resolve pod warning. You can't have =item 0, so the way round this seems to be to add a Z<> (zero width space) before each digit (Neil Bowers).
+
+* lib/Image/Size.pm
+
+p{margin-bottom:2em}. Added link to github repo to doc (Neil Bowers).
+
+* lib/Image/Size.pm
+
+p{margin-bottom:2em}. RT #41238: Applied modified version of patch from user to fix a die problem with unpack on truncated files.
+
+* lib/Image/Size.pm
+* t/1.sm.webp (added)
+* t/all.t
+* t/move.cur (added)
+* t/tux.ico (added)
+
+p{margin-bottom:2em}. Add support for WEBP, ICO and CUR file types (Baldur Kristinsson).
+
+* lib/Image/Size.pm
+
+p{margin-bottom:2em}. Fix some perlcritic issues.

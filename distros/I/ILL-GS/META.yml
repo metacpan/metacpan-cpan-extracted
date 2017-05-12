@@ -1,0 +1,10 @@
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         ILL-GS
+version:      0.05
+version_from: lib/Biblio/ILL/GS.pm
+installdirs:  site
+requires:
+    Test::More:                    0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.13

@@ -1,0 +1,13 @@
+<SOFTPKG NAME="Iterator-DBI" VERSION="0,01,0,0">
+    <TITLE>Iterator-DBI</TITLE>
+    <ABSTRACT>An iterator for returning DBI query results.</ABSTRACT>
+    <AUTHOR>Eric Roode &lt;roode@cpan.org&gt;</AUTHOR>
+    <IMPLEMENTATION>
+        <DEPENDENCY NAME="Exception-Class" VERSION="1,21,0,0" />
+        <DEPENDENCY NAME="Iterator" VERSION="0,01,0,0" />
+        <DEPENDENCY NAME="Test-Simple" VERSION="0,40,0,0" />
+        
+        
+        <CODEBASE HREF="" />
+    </IMPLEMENTATION>
+</SOFTPKG>

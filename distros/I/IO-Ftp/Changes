@@ -1,0 +1,27 @@
+Revision history for Perl extension IO::Ftp.
+
+0.01  Mon Aug 11 14:19:12 2003
+	- original version
+
+0.02  Thu Aug 14 2003
+	- added README
+	- removed redundant 'our' statement  (thanks Ben!)
+	- added more POD
+
+0.03  Wed Aug 27 2003
+	- Handle leading // for absolute path
+	- let URI handle port default
+
+0.04  Thur Aug 28 2003
+	- allow passing a URI object in place of the URI string
+	- added uri() method to retrieve the URI object associated with the IO::Ftp object
+	- added path() method to retrieve path portion of filename when '<<' open mode is used
+	- fixed handling of embeded null directory names in path spec
+	
+0.05	Mon Sep 15 2003
+	- force transfer type to uppercase for compatibility with Net::FTP.
+
+0.06    Thu May 07 2015
+        - Deprecated.  Use IO::All::Ftp or similar.
+
+	

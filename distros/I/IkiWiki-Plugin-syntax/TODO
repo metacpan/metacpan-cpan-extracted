@@ -1,0 +1,24 @@
+IkiWiki::Plugin::syntax TODO
+============================
+
+- Documentation:
+    * Clean the documentation.
+    * Add documentation about subclassing.
+
+- Tests:
+
+- Plugin base:
+    * Use the IkiWiki private pages feature for better performance.
+    * Add fine parameters for the engines. 
+
+- Vim's interface:
+    * Build a mechanism for determine the source language using the filename
+      extension.
+    * Cache the proposed language.
+
+- Kate's interface:
+    * Clean the initialization phase.
+    * Shorten the supported languages
+
+- Package:
+    

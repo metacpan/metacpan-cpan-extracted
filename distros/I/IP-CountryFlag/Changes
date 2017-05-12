@@ -1,0 +1,37 @@
+Revision history for IP::CountryFlag
+
+0.08    Mon Sep 05 09:55:00 2016
+        - Updated copyright year information.
+        - Tidied up unit test script t/00-load.t.
+
+0.07    Thu Feb 05 11:35:00 2015
+        - Updated MANIFEST.SKIP file to ignore folder '_eumm'.
+        - Added LICENSE file.
+        - Defined $AUTHORITY in all the packages of the distribution.
+        - Updated Copyright year information.
+
+0.06    Tue Dec 16 10:53:00 2014
+        - Added missing dependency 'HTTP::Tiny' to Mafefile.PL file.
+
+0.05    Mon Dec 15 11:05:00 2014
+        - Added missing dependency 'autodie' to Mafefile.PL file.
+        - Minor changes to the method _save() to remove warning.
+
+0.04    Sun Dec 14 03:00:00 2014
+        - Added missing dependency 'Throwable' to Makefile.PL file.
+
+0.03    Sat Dec 13 09:30:11 2014
+        - Re-structured the code using 'Moo' i.e. downgraded from 'Mouse'.
+        - Added package IP::CountryFlag::Params to support common data types.
+        - Added package IP::CountryFlag::UserAgent to process api request.
+        - Added package IP::CountryFlag::UserAgent::Exception to process exception.
+        - Deleted Build.PL file.
+        - Deleted SIGNATURE file.
+        - Updated unit test with respect to the above changes.
+
+0.02    Tue Aug 09 15:40:11 2011
+        - Made Readonly v1.03 as minimum requirement.
+        - Prepared the distribution using the Module::Signature v0.68.
+
+0.01    Thu Aug 04 12:00:01 2011
+        - First version, released.

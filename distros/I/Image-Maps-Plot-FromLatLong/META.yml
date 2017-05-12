@@ -1,0 +1,13 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Image-Maps-Plot-FromLatLong
+version:      0.12
+version_from: FromLatLong.pm
+installdirs:  site
+requires:
+    Data::Dumper:                  0.01
+    File::Basename:                0.01
+    Image::Magick:                 0.01
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.21

@@ -1,0 +1,19 @@
+			ILL REQUEST/DEMANDE DE PEB
+
+LSB:	MWPL
+LSP:	BVAS
+P/U:	Christensen, David
+ADR:	Public Library Services
+	Interlibrary Loan Department
+	1525 First Street South
+	Brandon, MB  R7A 7A1
+SER:	LOAN
+AUT:	Wall, Larry
+TIT:	Programming Perl
+P/L:	Cambridge, Mass.
+P/M:	O'Reilly
+DAT:	2000
+SBN:	0596000278
+SRC:	TEST SCRIPT
+REM:	This is a comment.
+	And another comment.

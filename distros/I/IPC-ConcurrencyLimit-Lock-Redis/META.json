@@ -1,0 +1,32 @@
+{
+   "abstract" : "Locking via Redis",
+   "author" : [
+      "Steffen Mueller <smueller@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.023, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "IPC-ConcurrencyLimit-Lock-Redis",
+   "prereqs" : {
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Class::XSAccessor" : "1.12",
+            "Data::UUID::MT" : "0",
+            "IPC::ConcurrencyLimit" : "0.10",
+            "IPC::ConcurrencyLimit::Lock" : "0",
+            "Redis" : "1.955",
+            "Redis::ScriptCache" : "0.03"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.03"
+}
+

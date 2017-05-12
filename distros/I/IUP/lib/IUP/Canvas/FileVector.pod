@@ -1,0 +1,116 @@
+=pod
+
+=head1 NAME
+
+IUP::Canvas::FileVector - [special] 2D drawing canvas storing the result into vector image file (SVG, EMF, ...)
+
+=head1 SYNOPSIS
+
+ use IUP::Constants ':cd';
+ use IUP::Canvas::FileVector;
+
+ my $cnv = IUP::Canvas::FileVector->new(format=>"SVG", filename=>"tmp_test.svg", width=>400, height=>400);
+
+ $cnv->cdForeground(CD_RED);
+ $cnv->cdBox(0, 200, 0, 400);
+
+ $cnv->cdForeground(CD_BLACK);
+ $cnv->cdLineStyle(CD_DOTTED);
+ $cnv->cdArc(200,200,180,380,0,360);
+
+ $cnv->cdKillCanvas; # this saves the file to disk
+
+=head1 DESCRIPTION
+
+L<IUP::Canvas::FileVector> is derived from L<IUP::Canvas> and offers all 2D drawing related methods:
+
+=over
+
+=item * L<Canvas Related Constants|IUP::Canvas/"Canvas Related Constants">
+
+=item * L<Methods - Basic Canvas Control|IUP::Canvas/"Methods - Basic Canvas Control">
+
+=item * L<Methods - Color Coding|IUP::Canvas/"Methods - Color Coding">
+
+=item * L<Methods - Coordinate System|IUP::Canvas/"Methods - Coordinate System">
+
+=item * L<Methods - World Coordinates|IUP::Canvas/"Methods - World Coordinates">
+
+=item * L<Methods - Primitives E<sol> Marks|IUP::Canvas/"Methods - Primitives E<sol> Marks">
+
+=item * L<Methods - Primitives E<sol> Lines|IUP::Canvas/"Methods - Primitives E<sol> Lines">
+
+=item * L<Methods - Primitives E<sol> Polygons|IUP::Canvas/"Methods - Primitives E<sol> Polygons">
+
+=item * L<Methods - Primitives E<sol> Filled Areas|IUP::Canvas/"Methods - Primitives E<sol> Filled Areas">
+
+=item * L<Methods - Primitives E<sol> Text|IUP::Canvas/"Methods - Primitives E<sol> Text">
+
+=item * L<Methods - Primitives E<sol> Vector Text|IUP::Canvas/"Methods - Primitives E<sol> Vector Text">
+
+=item * L<Methods - Primitives E<sol> Client Images|IUP::Canvas/"Methods - Primitives E<sol> Client Images">
+
+=item * L<Methods - Primitives E<sol> Server Images|IUP::Canvas/"Methods - Primitives E<sol> Server Images">
+
+=item * L<Methods - Canvas Clipping|IUP::Canvas/"Methods - Canvas Clipping|IUP::Canvas">
+
+=item * L<Methods - Complex Clipping Regions|IUP::Canvas/"Methods - Complex Clipping Regions">
+
+=item * L<Methods - Others|IUP::Canvas/"Methods - Others">
+
+=back
+
+=head1 SUPPORTED FORMATS
+
+XXX-TODO more description
+
+ format 'PS'
+     # http://www.tecgraf.puc-rio.br/cd/en/drv/ps.html
+     # "filename -p[paper] -w[width] -h[height] -l[left] -r[right] -b[bottom] -t[top] -s[resolution] [-e] [-g] [-o] [-1] -d[margin]"
+     # "%s -p%d -w%g -h%g -l%g -r%g -b%g -t%g -s%d -e -o -1 -g -d%g"
+     
+ format 'SVG'
+     # http://www.tecgraf.puc-rio.br/cd/en/drv/svg.html
+     # "filename [widthxheight] [resolution]"
+     # "%s %gx%g %g"
+     
+ format 'CGM'
+     # http://www.tecgraf.puc-rio.br/cd/en/drv/cgm.html
+     # "filename [widthxheight] [resolution] [-t] -p[precision]"
+     # "%s %gx%g %g %s"
+     
+ format 'DEBUG'
+     # http://www.tecgraf.puc-rio.br/cd/en/drv/debug.html
+     # "filename [widthxheight] [resolution]"
+     # "%s %gx%g %g"
+     
+ format 'DGN'
+     # http://www.tecgraf.puc-rio.br/cd/en/drv/dgn.html
+     # "filename [widthxheight] [resolution] [-f] [-sseedfile]"
+     # "%s %gx%g %g %s"
+     
+ format 'DXF'
+     # http://www.tecgraf.puc-rio.br/cd/en/drv/dxf.html
+     # "filename [widthxheight] [resolution]"
+     # "%s %gx%g %g"
+     
+ format 'EMF'
+     # http://www.tecgraf.puc-rio.br/cd/en/drv/emf.html
+     # "filename widthxheight"
+     # "%s %dx%d"
+     
+ format 'METAFILE'
+     # http://www.tecgraf.puc-rio.br/cd/en/drv/mf.html
+     # "filename [widthxheight] [resolution]"
+     # "%s %gx%g %g"
+     
+ format 'WMF'
+     # http://www.tecgraf.puc-rio.br/cd/en/drv/wmf.html
+     # "filename widthxheight [resolution]"
+     # "%s %dx%d %g"
+
+=head1 SEE ALSO
+
+L<IUP::Canvas>, L<IUP::Canvas::FileBitmap>
+
+=cut

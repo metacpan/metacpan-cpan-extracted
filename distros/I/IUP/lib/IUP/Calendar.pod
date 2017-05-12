@@ -1,0 +1,14 @@
+=head1 NAME
+
+IUP::Calendar - [GUI element] calendar
+
+=head1 DESCRIPTION
+
+XXX-TODO: missing doc
+
+=head1 SEE ALSO
+
+The original doc: L<iupcalendar.html|http://www.tecgraf.puc-rio.br/iup/en/elem/iupcalendar.html>
+
+
+=cut

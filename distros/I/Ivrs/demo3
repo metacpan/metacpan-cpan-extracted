@@ -1,0 +1,68 @@
+#!/usr/bin/perl
+#This is a simple demo script showing some basic operations. 
+#It initializes the serial port,
+#Waits for ring on the modem, when a call comes, sends a text file
+#faxmsg.txt over fax,
+
+require 5.000;
+use Ivrs;
+
+#you must specify your serial port where voice modem is connected
+$portname=$ARGV[0];
+die "\n usage: $0 ttyS0 or ttyS1\n\n" if ($portname eq "");
+
+#Set the voice file directory. The absolute path is required if you want to
+#run the IVRS from the inittab. The defaults are 'sfile' and 'bin' from the
+#current directory.
+#The voice files for Rockwel Chip Set modem are in 'sfiles' directory,
+#The voice files for US Robotics modem are in 'ufiles' directory,
+
+$vdir="sfiles";
+
+#initialize the serial port
+$iv = new Ivrs($portname,$vdir,$bindir);
+print "Serial port and Modem initialized\n";
+
+#set the serial port parameters if you are sure.
+$iv->setport("38400","none","8","1","rts","8096")||die"Setting Failed\n";
+
+#initialize the modem and put it in voice mode.
+$iv->initmodem||die"Modem failed\n";
+
+#put the modem in answer mode $cid will have the caller ID
+print "Waiting for the ring.....\n";
+$cid=$iv->waitring;
+print "Call received from $cid \n";
+
+#The modem will 'pick up the receiver' when a call comes and plays the instruction to start 
+#fax machine.
+$iv->playfile("faxst")||&closeall;
+
+#Put the modem in fax mode
+$iv->faxmode;
+sleep 1;
+
+#send fax using efix and efax. The modem and IVRS (at present) can not
+#recover from fax mode, so this must be last message and close down is 
+#required. Ensure that efax and efix are in your path.
+#Uncomment  following line if you do want messages from efax and efix.
+#open (STDOUT,">>/dev/null");
+#open (STDERR,">>/dev/null");
+
+system "bin/efix -p8x3 -n /tmp/faxmsg faxmsg.txt";
+system "bin/efax -d /dev/$portname -o1 -jX3 -tT /tmp/faxmsg";
+unlink ("/tmp/faxmsg");
+
+
+#close every thing
+&closeall;
+exit 1;
+
+sub closeall
+{
+$iv->closep;
+close (STDOUT);
+close (STDERR);
+exit 1;
+}
+

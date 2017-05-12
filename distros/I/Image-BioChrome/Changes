@@ -1,0 +1,81 @@
+Revision history for Perl extension Image::BioChrome
+
+1.16
+
+* Changed the internal structure to allow easier implementation of color 
+  calculations that affect every color in the palette
+
+* Added a percent method which allows percentage adjustment of every color in
+  the color palette
+
+
+1.15
+
+* Updated the examples and files in the documentation directory
+
+* Removed requirement for File::MMagic as this is seriously broken with versions
+  prior to 1.71 and although I have submitted a patch at the moment I don't
+  really need to use it to check that the file is a gif file.
+
+1.14
+
+* Documentation updates
+
+* Patch from Andy Wardley applied to add documentation for the Template Plugin.
+
+1.13
+
+* Fixed an issue with temporary files getting left behind when we fail to write 
+  the file for any reason
+
+1.12
+
+* Added additional validation on color information passed to BioChrome.pm
+  Invalid colors are now ignored by BioChrome, I thought long and hard about 
+  how to handle these but decided in the end it was easier to ignore them as 
+  this would make the code in Apache::BioChrome simpler
+
+* Added additional tests to check the color validation added above
+
+1.11
+
+* Changed the default behaviour so that files get automatically reset after 
+  writing.  This used to be the case that calling write_file twice would color
+  the image twice.  This caused strange and non-valuable behaviour on alpha
+  colors and so has been changed.  This also means that the reset_file method
+  can now go.
+* Beefed up the 01biochrome tests to ensure that the files produced are the 
+  correct colors
+* Added the internal _safedump method for use when testing
+
+1.10
+* Added biochrome_path to Apache::BioChrome to allow for layering of images
+* Fixed BioChrome to set the same owner and permissions as the source file on
+  any file which it creates by default
+* Split the DummyRequest module out of 03apache.t so that it can be reused in 
+  more than one test
+* Fixed a bug in Apache::BioChrome when the url has no colors in it.  It will
+  now correctly copy the file
+
+1.09
+Released to a small sample of users to check that the interfaces work
+
+1.08
+Made die the default when failing to make it easier to return errors to 
+the Template::Toolkit
+
+1.06
+
+Modification of the colors and alphas handling to allow color strings in more
+flexible ways.  Tidied up some of the tests for the base module.
+
+1.03
+
+Changed the default behavior for unknown file types.  We now treat unknown
+files as a copy operation rather than failing to create the object.  This 
+simplifies the handling of errors in calling code.
+
+1.02
+
+The first real release of the module
+

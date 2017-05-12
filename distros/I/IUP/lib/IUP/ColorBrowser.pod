@@ -1,0 +1,216 @@
+=for comment based on iup-3.5 - http://www.tecgraf.puc-rio.br/iup/en/ctrl/iupcolorbrowser.html
+
+=head1 NAME
+
+IUP::ColorBrowser - [GUI element] color selector via cylindrical projection of the RGB cube
+
+=head1 DESCRIPTION
+
+Creates an element for selecting a color. The selection is done using a
+cylindrical projection of the RGB cube. The transformation defines a
+coordinate color system called HSI, that is still the RGB color space
+but using cylindrical coordinates.
+
+B<H> is for Hue, and it is the angle around the RGB cube diagonal
+starting at red (RGB=255 0 0).
+
+B<S> is for Saturation, and it is the normal distance from the color to
+the diagonal, normalized by its maximum value at the specified Hue.
+This also defines a point at the diagonal used to define B<I>.
+
+B<I> is for Intensity, and it is the distance from the point defined at
+the diagonal to black (RGB=0 0 0). B<I> can also be seen as the
+projection of the color vector onto the diagonal. But B<I> is not
+linear, see L<Notes|#Notes> below.
+
+=begin HTML
+
+<p><img src="http://kmx.github.io/perl-iup/img-3.9/ctrl/iupcolorbrowser.png"></p>
+
+=end HTML
+
+NOTE: For a dialog that simply returns the selected color, you can use
+function L<GetColor|IUP/"GetColor()"> or L<IUP::ColorDlg|IUP::ColorDlg>.
+
+=head1 USAGE
+
+=head2 CREATION - new() method
+
+ $colorbrowser = IUP::ColorBrowser->new( RGB=>"100 100 0" );
+
+B<Returns:> the identifier of the created element, or C<undef> if an error occurs.
+
+NOTE: You can pass to C<new()> other C<ATTRIBUTE=E<gt>'value'> or C<CALLBACKNAME=E<gt>\&func> pairs relevant
+to this element - see L<IUP::Manual::02_Elements|IUP::Manual::02_Elements/"new()">.
+
+=head2 ATTRIBUTES
+
+For more info about concept of attributes (setting/getting values etc.)
+see L<IUP::Manual::03_Attributes|IUP::Manual::03_Attributes>. Attributes specific to this element:
+
+=over
+
+=item L<EXPAND|IUP::Manual::03_Attributes/EXPAND>
+
+The default is "NO".
+
+=item L<RASTERSIZE|IUP::Manual::03_Attributes/RASTERSIZE>
+
+I<(non inheritable)>
+
+The initial size is "181x181". Set to C<undef> to allow the automatic layout
+use smaller values.
+
+=item B<RGB>
+
+I<(non inheritable)>
+
+The color selected in the control, in the "r g b" format; r, g and b are integers ranging from 0 to 255.
+Default: "255 0 0".
+
+=item B<HSI>
+
+I<(non inheritable)>
+
+The color selected in the control, in the "h s i" format; h, s and i are floating point numbers ranging from
+0-360, 0-1 and 0-1 respectively.
+
+=back
+
+The following L<common attributes|IUP::Manual::03_Attributes/Common Attributes> are also accepted:
+
+=over
+
+=item * L<ACTIVE|IUP::Manual::03_Attributes/ACTIVE>,
+L<BGCOLOR|IUP::Manual::03_Attributes/BGCOLOR>, L<FONT|IUP::Manual::03_Attributes/FONT>,
+L<X|IUP::Manual::03_Attributes/X>, L<Y|IUP::Manual::03_Attributes/Y>,
+L<POSITION|IUP::Manual::03_Attributes/POSITION>,
+L<MINSIZE|IUP::Manual::03_Attributes/MINSIZE>,
+L<MAXSIZE|IUP::Manual::03_Attributes/MAXSIZE>, L<WID|IUP::Manual::03_Attributes/WID>,
+L<TIP|IUP::Manual::03_Attributes/TIP>, L<SIZE|IUP::Manual::03_Attributes/SIZE>,
+L<ZORDER|IUP::Manual::03_Attributes/ZORDER>,
+L<VISIBLE|IUP::Manual::03_Attributes/VISIBLE>
+
+=back
+
+=head2 CALLBACKS
+
+For more info about concept of callbacks (setting callback handlers etc.)
+see L<IUP::Manual::04_Callbacks|IUP::Manual::04_Callbacks>. Callbacks specific to this element:
+
+=over
+
+=item B<CHANGE_CB>
+
+Called when the user releases the left mouse button over
+the control, defining the selected color.
+
+B<Callback handler prototype:>
+
+ sub change_cb_handler {
+   my ($self, $r, $g, $b) = @_;
+   #...
+ }
+
+=over
+
+B<$self:> reference to the element (IUP::ColorBrowser) that activated the event
+
+B<$r, $g, $b:> color value.
+
+=back
+
+=item B<DRAG_CB>
+
+Called several times while the color is being changed by
+dragging the mouse over the control.
+
+B<Callback handler prototype:>
+
+ sub drag_cb_handler {
+   my ($self, $r, $g, $b) = @_;
+   #...
+ }
+
+=over
+
+B<$self:> reference to the element (IUP::ColorBrowser) that activated the event
+
+B<$r, $g, $b:> color value.
+
+=back
+
+=item B<VALUECHANGED_CB>
+
+Called after the value was interactively changed by
+the user. It is called whenever a B<CHANGE_CB> or a B<DRAG_CB> would
+also be called, it is just called after them. 
+
+B<Callback handler prototype:>
+
+ sub drag_cb_handler {
+   my ($self) = @_;
+   #...
+ }
+
+=over
+
+B<$self:> reference to the element (IUP::ColorBrowser) that activated the event
+
+=back
+
+=back
+
+The following L<common callbacks|IUP::Manual::04_Callbacks/Common Callbacks> are also accepted:
+
+=over
+
+=item * L<MAP_CB|IUP::Manual::04_Callbacks/MAP_CB>,
+L<UNMAP_CB|IUP::Manual::04_Callbacks/UNMAP_CB>,
+L<GETFOCUS_CB|IUP::Manual::04_Callbacks/GETFOCUS_CB>,
+L<KILLFOCUS_CB|IUP::Manual::04_Callbacks/KILLFOCUS_CB>,
+L<ENTERWINDOW_CB|IUP::Manual::04_Callbacks/ENTERWINDOW_CB>,
+L<LEAVEWINDOW_CB|IUP::Manual::04_Callbacks/LEAVEWINDOW_CB>,
+L<K_ANY|IUP::Manual::04_Callbacks/K_ANY>, L<HELP_CB|IUP::Manual::04_Callbacks/HELP_CB>
+
+=back
+
+=head1 NOTES
+
+When the control has the focus the keyboard can be used to change the
+color value. Use the arrow keys to move the cursor inside the SI
+triangle, and use Home(0), PageUp, PageDn and End(180) keys to move the
+cursor inside the Hue circle.
+
+The Hue in the HSI coordinate system defines a plane that it is a
+triangle in the RGB cube. But the maximum saturation in this triangle
+is different for each Hue because of the geometry of the cube. In
+ColorBrowser this point is fixed at the center of the B<I> axis. So the
+B<I> axis is not completely linear, it is linear in two parts, one from
+0 to 0.5, and another from 0.5 to 1.0. Although the selected values are
+linear specified you can notice that when Hue is changed the gray scale
+also changes, visually compacting values above or below the B<I>=0.5 line
+according to the selected Hue.
+
+=head1 EXAMPLES
+
+
+The element B<IUP::ColorBrowser> is used in the following sample scripts:
+
+=over
+
+=item * L<0-basic/colorbrowser.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/colorbrowser.pl> - IUP::ColorBrowser example
+
+=back 
+
+
+
+=head1 SEE ALSO
+
+L<GetColor|IUP/"GetColor()">,
+L<IUP::ColorDlg|IUP::ColorDlg>
+
+The original doc: L<iupcolorbrowser.html|http://www.tecgraf.puc-rio.br/iup/en/ctrl/iupcolorbrowser.html>
+ 
+
+=cut

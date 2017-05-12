@@ -1,0 +1,32 @@
+This is the README file for IO::File::Multi (v 1.02), a simple module to
+handle printing to multiple (output) filehandles, with single print() or
+printf() calls.
+
+Requires: IO::File (and it's requirements)
+
+Installation:  You should know the routine by now...
+	perl Makefile.PL
+	make test
+	make install
+
+If for some reason MakeMaker is broken or you have a personal problem with
+the make command (seek help), you can just copy Multi.pm into your perl
+site directory and everything should be okay.
+
+Author: Nem W Schlecht (nem@plains.nodak.edu)
+
+Multi.pm - Copyright (c) 1996 by Nem W Schlecht.  All rights reserved.
+This is free software; you can distribute it and/or modify it under the
+same terms as Perl itself.
+
+Simple example:
+
+#!/local/bin/perl
+use IO::File::Multi;
+$mh1 = new IO::File::Multi;
+$mh1->open(">-");	# print to stdout
+$mh1->open("| lpr");	# print to hard-copy printer
+$mh1->open(">>log");	# append to log file
+$mh1->print("This line goes to multiple places!\n");
+$mh1->printf("This is just a number: %2.2f\n", 12.535632);
+$mh1->close();		# close all filehandles

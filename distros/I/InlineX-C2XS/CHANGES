@@ -1,0 +1,113 @@
+- 0.25 ... Escape braces {} in t/t_makefile_pl.t and t/t_makefile_pl_pre.t
+
+- 0.23 ... Add 'T' config option.
+           Add metadata to InlineX::C2XS Makefile.PL.
+           Add Context.pm and demos/context.
+           Add PROTOTYPES and PROTOTYPE config options
+           Remove t/t_using.t (broken by Inline-C-0.62)
+
+- 0.22 ... Add DIST and MANIF config options.
+
+- 0.19 ... If EXPORT_TAGS_ALL is set, then it's now unnecessary
+           to set EXPORT_OK_ALL
+
+- 0.18 ... Add CPPFLAGSEX, BOOT_F and PRE_HEAD config options.
+
+           Add script.in (which generates the c2xs script)
+
+- 0.17 ... Add PREREQ_PM config option
+
+- 0.16 ... Add config option '_TESTING' (and tests)
+
+           Inline pre-requisite version now 0.46_01
+
+           Add config option 'USE'
+
+           Substitution regex added to t_makefile_pl_pre.t and
+            t_makefile_pl.t - to cater for recent ActivePerls
+
+- 0.15 ... Add config options EXPORT_ALL, EXPORT_OK_ALL and EXPORT_TAGS_ALL
+
+- 0.14 ... Requires Inline-0.45 or later.
+
+           Add tests for the use of ParseRegExp.pm.
+
+           'USING' now takes either a string or array reference as its value (as
+           does the Inline::C equivalent).
+
+           'LIBS' and 'TYPEMAPS' can now optionally be assigned as a (space
+           delimited) string or an array reference (same as 'INC'). Previously
+           'LIBS' and 'TYPEMAPS' had to be assigned as an array reference.
+
+           'INC' (in the generated Makefile.PL) no longer automatically includes the cwd.
+
+           'TYPEMAPS' (in the generated Makefile.PL) no longer automatically specifies
+           the standard perl typemap. (Doing so was annoying and, afaict, unnecessary.)
+
+- 0.13 ... Change the test for the locatability of a specified typemap from a
+           '-e' test to a '-f' test.
+
+           Add C2XS-Cookbook.pod
+
+           Minor correction to WRITE_PM
+
+           The C source code can now be alternatively provided by either a
+           'CODE' or 'SRC_LOCATION' key.
+
+- 0.12 ... Provide access to ParseRegExp.pm. (Untested, because ParseRegExp.pm
+           is broken - see http://rt.cpan.org/Ticket/Display.html?id=6327 for
+           patches to ParseRegExp.pm)
+
+           Can now write a .pm file for you as well
+
+- 0.11 ... Can now provide the optional "4th" (config options) argument
+           without *also* having to provide a "3rd" (build directory) argument.
+           ie If the third argument is a hash reference, it's assumed to contain
+           config options - otherwise it sets the build directory.
+
+           Check that only valid config options have been passed via the "config
+           options" argument.
+
+           Catch the error (and die) if a non-existent typemap is specified
+           in the TYPEMAPS config option.
+
+           If the specified build_dir does not exist, die(). Previously, a warning
+           was issued and the files written to the current working directory.
+
+- 0.10 ... Add coverage for the PREFIX and BOOT options.
+           Add coverage for CCFLAGS, LDDLFLAGS, MYEXTLIB and OPTIMIZE (and
+           test that they get passed to the generated Makefile.PL) Also check
+           that the CC, LD and MAKE parameters are passed on to the
+           generated Makefile.PL. Not sure how to utilise FILTERS.
+           (I won't do anything with it unless requested.)
+
+- 0.09 ... Rewrite the t_makefile_pl test script. (It's now not a very
+           conclusive test ... still needs further work ... though I think
+           the WRITE_MAKEFILE_PL functionality is operating correctly.)
+           Add coverage (currently untested) for the CC, LD, and MAKE options.
+           TODO: Add coverage for BOOT, CCFLAGS, FILTERS, LDDLFLAGS,
+           MYEXTLIB, OPTIMIZE and PREFIX options.
+
+- 0.08 ... Rename the module into the InlineX namespace (previously named
+           Inline::C2XS)
+           Add coverage for VERSION, LIBS, BUILD_NOISY and
+           WRITE_MAKEFILE_PL options.
+
+- 0.07 ... Add coverage for AUTOWRAP, TYPEMAPS, INC and AUTO_INCLUDE.
+           The cpp2xs() function is no longer supported by this module.
+           Use Inline::CPP2XS instead.
+
+- 0.06 ... Add a demos/cpp folder with a CPP demo.
+
+- 0.05 ... Add Inline::CPP to XS support with the cpp2xs() function.
+
+- 0.04 ... Now hooks into the Inline::C routines that parse the code and write
+           the XS file.
+           The c2xs() sub now takes an optional 3rd argument (the directory
+           into which the XS file gets written).
+
+- 0.03 ... more bugfixes
+
+- 0.02 ... bugfixes
+
+- 0.01 ... born

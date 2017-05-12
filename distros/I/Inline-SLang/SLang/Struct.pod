@@ -1,0 +1,301 @@
+=head1 NAME
+
+Inline::SLang::Struct - Support for structures
+
+=head1 SYNOPSIS
+
+  use Inline 'SLang';
+
+  # you can send arrays to S-Lang
+  # - note we use them like a hash reference
+  my $s1 = Struct_Type->new( ["xx","aa","one"] );
+  $$s1{xx} = 14; $$s1{aa} = "foo"; $$s1{one} = [1,2];
+  print_in_slang( $s1 );
+
+  # and get them back from S-Lang
+  my $s2 = get_from_slang();
+  print "The struct has a type of $s2\n";
+  while ( my ( $k, $v ) = each %$s2 ) {
+    print "  field $k has type ",
+      (ref($v) ? ref($v) : "perl scalar"),
+      " and value $v\n";
+  }
+
+  __END__
+  __SLang__
+
+  define print_in_slang (st) {
+    vmessage( "S-Lang has been sent a %S structure", typeof(st) );
+    foreach ( get_struct_field_names(st) ) {
+      variable f = ();
+      vmessage( " and field %s = %S", f, get_struct_field(st,f) );
+    }
+  }
+  typedef struct { key1, wowza } FooStruct;
+  define get_from_slang() {
+    variable x = @FooStruct;
+    x.key1 = "this is key 1";
+    x.wowza = 4+3i;
+    return x;
+  }
+
+The output of this code - which can be found in the source-code
+distribution as F<examples/structs.pl> - is:
+
+  S-Lang has been sent a Struct_Type structure
+   and field xx = 14
+   and field aa = foo
+   and field one = Integer_Type[2]
+  The struct has a type of FooStruct
+    field key1 has type perl scalar and value this is key 1
+    field wowza has type Math::Complex and value 4+3i
+
+=head1 DESCRIPTION
+
+S-Lang's structures can be thought of as "restricted"
+associative arrays, in that the keys are fixed (so no adding or
+deleting) and when you loop through them the order is
+set by the order they are given in the structure.
+So, we convert S-Lang structures into
+Perl C<Struct_Type> objects which behave like hash references
+(with some additional methods).
+
+To support "named" structures - i.e. those created using
+S-Lang's C<typedef struct { ... } SomeName;> syntax,
+we create sub-classes of the C<Struct_Type> class with
+names that match that of the structure. In this
+particular case that would be C<SomeName>.
+B<Note> that this only works for those typedef statements
+executed when the code is loaded; if you call S-Lang's
+C<eval()> function with a C<typedef> statement then 
+that structure name will I<not> be available as a Perl class.
+
+Note that a bare hash reference is B<not> converted
+into a S-Lang structure since this is used to represent
+an associative array (see L<Inline::SLang::Assoc|Inline::SLang::Assoc>).
+
+=head1 THE STRUCT_TYPE CLASS
+
+Once created, the Perl C<Struct_Type> class behaves 
+like a hash reference I<except> for the following:
+
+=over 2
+
+=item *
+
+Keys can not be created once the object has been created.
+
+=item *
+
+Keys can not be destroyed (although their contents can be set
+to undef).
+
+=item *
+
+When iterating through the keys or values, the order is fixed
+to match that of the field names in the structure.
+
+=back
+
+The C<Struct_Type> class inherit the default methods
+of all the Inline::SLang classes, namely:
+
+=over 2
+
+=item *
+
+C<typeof()>
+
+This returns C<Struct_Type> as a C<DataType_Type>
+object. For "named" structures it returns the
+data type of the structure.
+
+=item *
+
+C<stringify()>
+
+This returns the string "Struct_Type".
+For "named" structures it returns the
+name of the structure.
+
+=item *
+
+C<is_struct_type()>
+
+This returns 1.
+
+=back
+
+As with the other object classes these methods can
+only be called using the C<< $object->method( args ) >>
+syntax.
+There are also a number of additional methods
+for this class:
+
+=over 2
+
+=item * C<new( field-names )>
+
+The constructor takes an array reference which contains
+the field names and returns an object in which the
+values of these fields are set to C<undef>.
+For "named" structs the field names array is not supported
+since the fields are fixed for these structures.
+
+The return value can be treated as a hash reference,
+or you can use some of the other methods described
+below to manipulate the contents of the array.
+
+  my $struct = Struct_Type->new( ["x","a","one"] );
+  $$struct{one} = 2;
+  $$struct{x} = "hello";
+  $$struct{a} = "hi there";
+  while ( my ($k,$v) = each %$struct ) {
+    print "  key $k has a value of $v\n";
+  }
+
+The order of keys returned by the Perl hash iterators - such
+as C<each>, C<keys>, and C<values> - is set to the order
+of the fields in the structure. For this example
+it would be C<x>, C<a>, and then C<one>.
+
+=item * C<get_field_names()>
+
+Returns, as an array reference, a list of the fields
+of the structure, in the order they have in the structure.
+It is essentially S-Lang's
+C<struct_get_field_names()> routine although it is implemented
+using Perl's C<keys> routine.
+
+  my $struct = Struct_Type->new( ["x","a","one"] );
+  foreach my $f ( $struct->get_field_names ) {
+    print "  field = $f\n";
+  }
+
+There is no advantage to using this method
+over Perl's C<keys %$struct>.
+
+=item * C<get_field( $field )>
+
+Returns the value of the given field in the structure.
+It is essentially S-Lang's
+C<struct_get_field()> routine.
+
+  my $struct = Struct_Type->new( ["x","a","one"] );
+  $$struct{one} = 2;
+  $$struct{x} = "hello";
+  $$struct{a} = "hi there";
+  print "Field x has a value of ", $struct->get_field("x"), "\n";
+
+There is no advantage to using this method
+over Perl's C<$$struct{$key}>.
+
+=item * C<set_field( $field, $value )>
+
+Sets the value of the given field in the structure.
+It is essentially S-Lang's
+C<struct_set_field()> routine.
+
+  my $struct = Struct_Type->new( ["x","a","one"] );
+  $struct->set_field( "one", 2 );
+  $struct->set_field( "x", "hello" );
+  $struct->set_field( a => "hi there" );
+
+There is no advantage to using this method
+over Perl's C<$$struct{$key}>.
+
+=back
+
+S-Lang's C<stuct_set_fields()> routine is currently
+not provided by the class but it's not hard to add (or to
+emulate).
+
+=head2 Examples
+
+=head3 Using a named structure created in S-Lang
+
+Another simple example of using structures in Perl (this
+can be found in F<examples/types_struct.pl>) is shown below:
+
+  use Inline 'SLang' => <<'EOS';
+  variable runtime = time();
+  typedef struct { x, time } xTime_Struct;
+  define ret1(x) {
+    variable y = struct { x, time };
+    y.x    = x;
+    y.time = runtime;
+    return y;
+  }
+  define ret2(x) {
+    variable y = @xTime_Struct;
+    y.x    = x;
+    y.time = runtime;
+    return y;
+  }
+  EOS
+
+  # first with a normal structure
+  my $s1 = ret1( "struct example" );
+  print  "ret1() returned a $s1\n";
+  printf "Is it a structure? [%d]\n", $s1->is_struct_type;
+  printf "With keys/fields [ %s ]\n",
+    join( ", ", keys(%$s1) );
+  print  " s.x    = $$s1{x}\n";
+  print  " s.time = $$s1{time}\n";
+
+  # and then with a "named" structure
+  my $s2 = ret2( "named struct example" );
+  print  "ret2() returned a $s2\n";
+  printf "Is it a structure? [%d]\n", $s2->is_struct_type;
+  printf "With keys/fields [ %s ]\n",
+    join( ", ", keys(%$s2) );
+  print  " s.x    = $$s2{x}\n";
+  print  " s.time = $$s2{time}\n";
+
+The output of the code is going to look
+something like (depending on whether you keep
+sociable hours or not):
+
+  ret1() returned a Struct_Type
+  Is it a structure? [1]
+  With keys/fields [ x, time ]
+   s.x    = struct example
+   s.time = Sat May  3 03:46:01 2003
+  ret2() returned a xTime_Struct
+  Is it a structure? [1]
+  With keys/fields [ x, time ]
+   s.x    = named struct example
+   s.time = Sat May  3 03:46:01 2003
+
+=head3 Using a named structure created in Perl
+
+An example of creating a "named" structure from Perl
+(available as F<examples/named_struct.pl> in the
+source distribution) is:
+
+  use Inline 'SLang' => <<'EOS';
+  typedef struct { x, foo } My_Struct;
+  define is_okay(x) {
+    if ( typeof(x) != My_Struct ) {
+      vmessage("You sent me a %S", typeof(x));
+      return;
+    }
+    vmessage( "My_Struct field x   = %S", x.x );
+    vmessage( "My_Struct field foo = %S", x.foo );
+  }
+  EOS
+
+  my $s = My_Struct->new();
+  $$s{x}   = 1;
+  $$s{foo} = "foo foo";
+  is_okay( $s );
+
+which produces:
+
+  My_Struct field x   = 1
+  My_Struct field foo = foo foo
+
+=head1 SEE ALSO
+
+L<Inline::SLang::Assoc>, L<Inline::SLang>
+

@@ -1,0 +1,51 @@
+Revision history for Perl extension Image::Xpm.
+
+1.13 2016-12-17
+	- bugfix: del_colour now correctly deletes entries from -cindex
+	  (GH #2 and #3; reported and fixed by openstrike)
+
+1.12
+	- no code changes, just fixed tests on systems without /tmp
+	  (i.e. Windows)
+
+1.11
+	- should work again with perl 5.8.0, by not using "scalar open"
+	  (problem reported by g.grigelionis)
+
+1.10
+	- no changes, just a non-developer release
+
+1.09_50
+	- fix for RT bugs 51053 and 51212: allow other formats of
+	  C array declaration
+	- fix for RT bug 51211: handle non-standard end of file
+	- fix for RT bug 7438: new(-file => $ref) was broken
+	- more tests
+	- new maintainer
+
+2000/11/09
+
+Added Jerrad Pierce's patch to allow load() to accept filehandles or strings;
+will document in next release.
+
+
+2000/10/19
+
+Fixed bugs in xy() and vec() reported by Pat Gunn.
+
+
+2000/05/25
+
+Fixed a bug in the test file; fixed a bug in save() which affected xpm
+extensions.
+
+
+2000/05/04
+
+Fixed bugs in xy(), vec(), save() and load(). 
+Improved the test program.
+
+
+2000/05/03 
+
+Created. 

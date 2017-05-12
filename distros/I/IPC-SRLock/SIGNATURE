@@ -1,0 +1,51 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 15aa6e10277e6704c9bbbecdec18776af6063c15 Build.PL
+SHA1 590b292f30ce3bf7f0e5dd1633085fa3191faac0 Changes
+SHA1 c9287a0cfea1301a8e275e14df35a74d0b85e71c LICENSE
+SHA1 c80ad349a4417ead4fd58a0c9b9df1cf2fee97ec MANIFEST
+SHA1 f01636822326b3820a8e9d9ff1c43e1810d9868f META.json
+SHA1 a48f22bc88508cb7e87ff7f71b7d9c0f1090667b META.yml
+SHA1 691d419e9abe40479871afa36ae46b199616451f README
+SHA1 cfa4d3cd7b750723c697908a6c40642f2bf7786c lib/IPC/SRLock.pm
+SHA1 b7d23176de2bd6d7a5147e7c9b7c3a23eaa5adfc lib/IPC/SRLock/Base.pm
+SHA1 f0d6f30028d1d1f03aacfd113d3c16f329fd2a14 lib/IPC/SRLock/Constants.pm
+SHA1 78da361e972b5bf4ad74bb57c39fe633ca775f1f lib/IPC/SRLock/Fake.pm
+SHA1 24413343bd43e50e27867903cf46e3df438858c0 lib/IPC/SRLock/Fcntl.pm
+SHA1 ae3238c0cae98f3188dfdb1e9da1f644cc566696 lib/IPC/SRLock/Memcached.pm
+SHA1 0d546a97f6cf47047fc4ecfe8887c86d627aa593 lib/IPC/SRLock/Sysv.pm
+SHA1 0c952da7e2662b0cd600c36927a321573004b349 lib/IPC/SRLock/Utils.pm
+SHA1 946503604c573fdb927fc50235721dd6daaf1ada t/00report-metadata.dd
+SHA1 c7d9429f60087220bf7b11ad1f97c7af9a647fa7 t/00report-metadata.t
+SHA1 427b1a5820b3d6bc52044b99c999e458eba7d6dc t/02pod.t
+SHA1 905a84ed4a01bba172b682620964560f04ff93d2 t/03podcoverage.t
+SHA1 c1c29d14c961c30f0ea1ff84dd3b6acb7f4d3e81 t/05kwalitee.t
+SHA1 e924b46272cd857d1bb46d4defaf68e5345210dc t/07podspelling.t
+SHA1 745f84ef9f1b1f6326597217b35d3352ceef65a4 t/10test_script.t
+SHA1 5ca3d33e602461489c4795ecea1c3adc200530c3 t/boilerplate.pm
+SHA1 9d74561bcee4913daeb46248537ef90582eb0ee1 t/exceptions.dd
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iQEcBAEBAgAGBQJYlQ2FAAoJEK492j4Im1BpC9MIAJVsJrmIqC5Ql7qFtJRsya4l
+xGIG47wjwcp10Q1FBiFaL2mp5mIcl/BRnQ9XP+O5NcU9gl95EsVGjcwX9EG0FbKL
+Kv9fVAOq3v+AyB/RHc6jDyyt1CbiV7r+f5mDG1Oc0T9TiU0pZi7UxoPnOXR5rpda
+/Jcm3Q9SIv/hbgaZlwFXw5kDp7BEyL60y3hyc9EqFYSVW2PDqqtXEkYOK14IUqK5
+AXIeJLdOFv3d6uQ2VPEOwAHk3BzolDqHmvbRvjj6kB1JXYWmcB3RvnCb3Abr91wg
+pz+no4VLN+Y9aL4W+nodB0ZouL0rgQawyUWwReNK2k7ycI8xIaVD/tI3YnDUyHQ=
+=ffUY
+-----END PGP SIGNATURE-----

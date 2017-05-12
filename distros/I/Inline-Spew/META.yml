@@ -1,0 +1,13 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Inline-Spew
+version:      0.02
+version_from: lib/Inline/Spew.pm
+installdirs:  site
+requires:
+    Inline:                        0
+    Parse::RecDescent:             0
+    YAML:                          0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.26

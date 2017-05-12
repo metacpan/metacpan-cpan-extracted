@@ -1,0 +1,91 @@
+Revision history for IO-ReStoreFH
+
+0.05	2014-02-14T15:58:07-0500
+
+    * fix bad META.yml in CPAN distribution
+
+0.04	2014-02-09T07:08:02-0500
+
+    * CPAN testers seem happy; promote to stable
+
+0.03_03 2014-02-07T12:09:58-0500
+
+  [TEST FIX FIX]
+    * test for breakage under 5.10.x missed 5.10.0
+
+0.03_02	2014-02-07T09:21:05-0500
+
+  [TEST FIX]
+
+    * add test to ensure no breakage under 5.10.x
+
+0.03_01	2014-02-06T17:39:23-0500
+
+  [BUG FIX]
+
+    * properly(?) secure against Perl 5.10.1's handling of FileHandle
+
+  [MISC]
+
+    * require newer version of FileHandle::Fmode and remove workaround
+      for bad behavior
+
+v0.03 Thu Oct  4 14:42:26 EDT 2012
+
+    * Bump revision for official release
+
+v0.02_06 Wed Oct  3 12:19:58 EDT 2012
+
+    * Code & doc cleanup before CPAN testing for official release
+
+  [API CHANGE]
+
+    * filehandle access mode should now be completely determined
+      internally; if not, it's not something the user can help with.
+
+
+v0.02_05 Tue Oct  2 15:33:43 EDT 2012
+
+  [BUG FIX]
+
+    * fix on Perl 5.10.x, hopefully; see ChangeLog for details
+
+v0.02_04 Mon Oct  1 20:24:26 EDT 2012
+
+  [BUG FIX]
+
+    * restore accidently deleted code loading IO::Handle; hopefully
+      fixes CPAN Testers failures on some early 5.10.x builds
+
+v0.02_03 Mon Oct  1 11:38:27 EDT 2012
+
+  [BUG FIX]
+
+    * use FileHandle::Fmode to determine access mode for filehandles
+      instead of fcntl (and thus hopefully work on Windows)
+
+v0.02_02 Thu Sep 27 17:35:02 EDT 2012
+
+
+  [BUILD]
+
+    * add Test::Exception test requirement
+
+
+v0.02_01 Thu Sep 27 13:30:01 EDT 2012
+
+  [BUILD]
+
+    * add Try::Tiny requirement
+
+v0.02  Thu Sep 27 09:49:33 EDT 2012
+
+  [MISC]
+
+    * old name for the module was still in a couple of files
+
+
+v0.01
+
+    * Initial release.
+

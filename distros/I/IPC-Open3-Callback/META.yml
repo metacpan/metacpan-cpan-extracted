@@ -1,0 +1,39 @@
+---
+abstract: 'An extension to IPC::Open3 that will feed out and err to callbacks instead of requiring the caller to handle them.'
+author:
+  - 'Lucas Theisen <lucastheisen@pastdev.com>'
+  - 'Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>'
+build_requires:
+  File::Basename: '0'
+  File::Temp: '0'
+  Test::More: '0'
+  Test::Most: '0.34'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: IPC-Open3-Callback
+requires:
+  Carp: '0'
+  Class::Accessor: '0.34'
+  Data::Dumper: '0'
+  Exporter: '0'
+  File::Spec: '0'
+  Hash::Util: '0'
+  IO::Select: '0'
+  IO::Socket: '0'
+  IPC::Open3: '0'
+  Log::Log4perl: '0'
+  Symbol: '0'
+  overload: '0'
+  parent: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/lucastheisen/ipc-open3-callback
+  repository: https://github.com/lucastheisen/ipc-open3-callback.git
+version: '1.19'

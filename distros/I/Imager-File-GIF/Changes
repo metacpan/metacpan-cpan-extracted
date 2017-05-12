@@ -1,0 +1,119 @@
+Imager-File-GIF 0.91
+====================
+
+ - a write failure when writing to a GIF file could leak memory.
+
+Imager-File-GIF 0.90
+====================
+
+ - don't leave a test file behind when probing for the 4.2.0 file
+   version bug fails.
+
+ - update the bundled/modified Devel::CheckLib to handle the gcc-4
+   symlink on Cygwin
+
+Imager-File-GIF 0.89
+====================
+
+ - add support for giflib 5.1.0, which added error code pointer
+   parameters to EGifCloseFile() and DGifCloseFile().
+   https://rt.cpan.org/Ticket/Display.html?id=96756
+
+ - avoid a double-free when do_write() fails.
+
+Imager-File-GIF 0.88
+====================
+
+ - eliminate various set but otherwise unused variables caught by GCC.
+
+Imager-File-GIF 0.87
+====================
+
+ - add the missing 0.86 changes list
+
+ - update README
+
+Imager-File-GIF 0.86
+====================
+
+ - avoid re-entrancy to giflib using the mutex API
+
+Imager-File-GIF 0.85
+====================
+
+ - add giflib 5.0 support.
+   https://rt.cpan.org/Ticket/Display.html?id=79029
+   The giflib API Imager uses doesn't have a mechanism to set the
+   header version in 5.0.0.
+
+ - previously a transparency enabled write (the default) would always
+   use a GIF89a header even if none of the images were transparent.
+
+ - update the GIF library probe code to check for the new giflib 5.0.1
+   EGifSetGifVersion() function, and to check for the giflib 4.2.0
+   uninitialized gif89 bug.
+   https://rt.cpan.org/Ticket/Display.html?id=79679
+   http://sourceforge.net/tracker/?func=detail&aid=3574283&group_id=102202&atid=631304
+
+ - clean up .dSYM directories generated performing probes on OS X
+   Mountain Lion.
+
+ - pass the --verbose command-line option through to Imager::Probe in
+   Makefile.PL
+   https://rt.cpan.org/Ticket/Display.html?id=75878
+
+Imager-File-GIF 0.84 - released with Imager 0.92_01
+====================
+
+ - giflib 4.2 eliminates the GIF_LIB_VERSION macro, handle that
+   correctly for both probing and runtime.
+   https://rt.cpan.org/Ticket/Display.html?id=77672
+
+ - allow building with C89 compilers
+
+Imager-File-GIF 0.83
+====================
+
+ - no longer fallback to using DynaLoader to load the XS code
+   https://rt.cpan.org/Ticket/Display.html?id=75560
+
+Imager-File-GIF 0.82
+====================
+
+ - modify to use the new buffered I/O functions instead of calling
+   I/O layer callbacks directly.
+
+ - handle I/O close errors properly
+
+Imager-File-GIF 0.81
+====================
+
+ - update the bundled (and still modified) Devel::CheckLib
+   https://rt.cpan.org/Ticket/Display.html?id=69170
+
+ - use snprintf() when imconfig.h indicates it's available
+   https://rt.cpan.org/Ticket/Display.html?id=69147
+
+Imager-File-GIF 0.80
+====================
+
+ - the big types cleanup
+
+ - refuse to write images (or screens) that are too large to represent.
+
+Imager-File-GIF 0.79
+====================
+
+ - writing a paletted image to GIF wouldn't always use the colors
+   supplied (or generated, eg. via make_colors => "mono"), which was
+   confusing at best.  Requires changes from Imager 0.84.
+   https://rt.cpan.org/Ticket/Display.html?id=67912
+
+ - replace (imager|tony)@imager.perl.org in the doc, since I don't
+   plan to continue receiving mail at that address.
+   https://rt.cpan.org/Ticket/Display.html?id=68591
+
+Imager-File-GIF 0.78
+====================
+
+Split out from Imager.

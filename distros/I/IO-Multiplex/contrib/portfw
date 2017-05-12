@@ -1,0 +1,193 @@
+#!/usr/bin/perl -w
+
+=pod
+
+=head1 NAME
+
+portfw - Port forwarder
+
+=head1 SYNOPSYS
+
+portfw [-p pidfile] [local_ip:]local_port[/proto] remote_ip[:remote_port]
+
+=head1 DESCRIPTION
+
+Forwards all incoming request from local_port to remote_port.  If
+local_ip is not specified, all addresses on all interfaces are used.
+If no remote_port is specified, then the same local_port is assumed
+as the default.  If no /proto is specified, tcp is assumed.
+
+=head1 AUTHOR
+
+Rob Brown - bbb@cpan.org
+
+$Id: portfw,v 1.7 2003/07/30 06:50:26 rob Exp $
+
+=cut
+
+use strict;
+use Getopt::Long;
+use IO::Multiplex;
+use IO::Socket;
+
+my $pidfile;
+GetOptions
+  "pidfile=s" => \$pidfile,
+  ;
+
+my ($local_addr,$remote_addr)=@ARGV;
+die "Missing local port\n" if !$local_addr;
+die "Missing remote ip\n" if !$remote_addr;
+
+my ($local_ip, $local_port, $proto,
+    $remote_ip,$remote_port);
+if ($local_addr =~ s%/(\w+)$%%) {
+  $proto = $1;
+} else {
+  $proto = "tcp";
+}
+if ($local_addr =~ s%^([\d\.]+):%%) {
+  $local_ip = $1;
+} else {
+  $local_ip = "0.0.0.0";
+}
+if ($local_addr =~ m%^(\d+)$%) {
+  $local_port = $1;
+} else {
+  die "Invalid local port [$local_addr]\n";
+}
+if ($remote_addr =~ s%:(\d+)$%%) {
+  $remote_port = $1;
+} else {
+  $remote_port = $local_port;
+}
+if ($remote_addr =~ m%^([\d\.]+)$%) {
+  $remote_ip = $1;
+} else {
+  die "Invalid remote ip [$remote_addr]\n";
+}
+
+print STDERR "Forwarding $proto packets from $local_ip:$local_port to $remote_ip:$remote_port\n";
+
+# Get ready to receive an incoming connection
+my $listen = new IO::Socket::INET
+  LocalAddr => $local_ip,
+  LocalPort => $local_port,
+  Proto     => $proto,
+  ReuseAddr => 1,
+  $proto eq "tcp"?(Listen => 10):(),
+  or die "Could not bind local port $local_port/$proto: $!";
+
+# Just test the remote connection once.
+my $remote_connect = new IO::Socket::INET
+  PeerAddr => $remote_ip,
+  PeerPort => $remote_port,
+  Proto    => $proto,
+  or die "Could not connect to remote $remote_ip:$remote_port/$proto: $!";
+
+if ($proto eq "tcp") {
+  # Close the test tcp socket
+  $remote_connect->close;
+} elsif ($proto eq "udp") {
+  # Keep this around for udp replies
+} else {
+  die "Unimplemented protocol $proto\n";
+}
+
+if ($pidfile) {
+  if (my $pid = fork) {
+    open (PID, ">$pidfile") or die "WARNING: Cannot create $pidfile: $!\n";
+    print PID "$pid\n";
+    close PID;
+    exit;
+  } elsif (!defined $pid) {
+    die "fork: $!\n";
+  }
+  $SIG{TERM} = sub {
+    unlink $pidfile;
+    exit;
+  };
+} else {
+  exit if fork;
+}
+open STDIN,  "</dev/null";
+open STDOUT, ">/dev/null";
+open STDERR, ">/dev/null";
+
+my $mux = new IO::Multiplex;
+$mux->set_callback_object("My::Portfw");
+if ($proto eq "tcp") {
+  $mux->listen($listen);
+} elsif ($proto eq "udp") {
+  $My::Portfw::complement{"$listen"} = $remote_connect;
+  $My::Portfw::complement{"$remote_connect"} = $listen;
+  $mux->add($listen);
+  $mux->add($remote_connect);
+} else {
+  die "Unimplemented proto [$proto]";
+}
+$mux->loop;
+# Never reaches here
+exit 1;
+
+package My::Portfw;
+use vars qw(%complement);
+
+sub mux_connection {
+  my $self = shift;
+  my $mux = shift;
+  my $fh = shift;
+  my $remote_client = new IO::Socket::INET
+    PeerAddr => $remote_ip,
+    PeerPort => $remote_port,
+    Proto    => $proto;
+  if (!$remote_client) {
+    warn "FAILED!\n";
+    # Remote connection failed
+    $fh->write("Server Down! $!\n");
+    $fh->close;
+    return;
+  }
+  $mux->add($remote_client);
+  $complement{"$fh"} = $remote_client;
+  $complement{"$remote_client"} = $fh;
+  return 1;
+}
+
+sub mux_input {
+  my $self = shift;
+  my $mux  = shift;
+  my $fh   = shift;
+  my $data = shift;
+  if (my $proxy = $complement{"$fh"}) {
+    # Consume the packet by sending to its complement socket.
+    $proxy->write($$data);
+    $$data = "";
+  } else {
+    # Not sure what to do, close it.
+    $$data = "";
+    $fh->close;
+  }
+}
+
+sub mux_eof {
+  my $self = shift;
+  my $mux  = shift;
+  my $fh   = shift;
+  my $data = shift;
+  if (my $proxy = $complement{"$fh"}) {
+    # Consume the packet by sending to its complement socket.
+    $proxy->write($$data);
+    $$data = "";
+    # If this has been closed for writing,
+    # then close the complement for writing too.
+    $mux->shutdown($proxy, 1);
+  }
+}
+
+sub mux_close {
+  my $self = shift;
+  my $mux  = shift;
+  my $fh   = shift;
+  delete $complement{"$fh"} if exists $complement{"$fh"};
+}

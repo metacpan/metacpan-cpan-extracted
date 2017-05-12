@@ -1,0 +1,53 @@
+
+     Per RFC 793
+      0                   1                   2                   3   
+      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 
+     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+     |          Source Port          |       Destination Port        |
+     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   4 |                        Sequence Number                        |
+     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   8 |                    Acknowledgment Number                      |
+     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+     |  Data |           |U|A|P|R|S|F|                               |
+  12 | Offset| Reserved  |R|C|S|S|Y|I|            Window             |
+     |       |           |G|K|H|T|N|N|                               |
+     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+  16 |           Checksum            |         Urgent Pointer        |
+     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+     |                    Options                    |    Padding    |
+     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+     |                             data                              |
+     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+  Data Offset:  4 bits
+
+    The number of 32 bit words in the TCP Header.  This indicates where
+    the data begins.  The TCP header (even one including options) is an
+    integral number of 32 bits long.
+
+     struct libnet_tcp_hdr
+     {
+         u_short th_sport;       /* source port */
+         u_short th_dport;       /* destination port */
+         u_long th_seq;          /* sequence number */
+         u_long th_ack;          /* acknowledgement number */
+     #if (LIBNET_LIL_ENDIAN)
+         u_char th_x2:4,         /* (unused) */
+                th_off:4;        /* data offset */
+     #endif
+     #if (LIBNET_BIG_ENDIAN)
+         u_char th_off:4,        /* data offset */
+                th_x2:4;         /* (unused) */
+     #endif
+         u_char  th_flags;       /* control flags */
+     #define TH_FIN    0x01
+     #define TH_SYN    0x02
+     #define TH_RST    0x04
+     #define TH_PUSH   0x08
+     #define TH_ACK    0x10
+     #define TH_URG    0x20
+         u_short th_win;         /* window */
+         u_short th_sum;         /* checksum */
+         u_short th_urp;         /* urgent pointer */
+     };

@@ -1,0 +1,98 @@
+#!/usr/bin/perl
+# Test configuration: IP, 1/10/100 simultaneous connections
+#   WHAT                            THREADS     SPEED       CPU:
+# IO::Stream                        1          100.2 MB/sec 100%
+# IO::Stream                        10         101.1 MB/sec
+# IO::Stream                        100         79.3 MB/sec
+# POWER::Event::IO                  1           33.8 MB/sec
+# POWER::Event::IO                  10          42.7 MB/sec
+# POWER::Event::IO                  100         38.6 MB/sec
+use warnings;
+use strict;
+use Carp;
+
+use Socket;
+use Fcntl;
+use Errno qw( EAGAIN );
+
+use blib;
+use EV;
+use IO::Stream;
+
+use Carp::Heavy;
+$SIG{PIPE}  = 'IGNORE';
+$EV::DIED   = sub { warn $@; exit 255 };
+
+warn "Testing IO::Stream-$IO::Stream::VERSION\n";
+
+sub tcp_server {
+    my ($host, $port) = @_;
+    socket my $sock, AF_INET, SOCK_STREAM, 0        or croak qq{socket: $!};
+    setsockopt $sock, SOL_SOCKET, SO_REUSEADDR, 1   or croak qq{setsockopt: $!};
+    bind $sock, sockaddr_in($port, inet_aton($host))or croak qq{bind: $!};
+    listen $sock, SOMAXCONN                         or croak qq{listen: $!};
+    fcntl $sock, F_SETFL, O_NONBLOCK                or croak qq{fcntl: $!};
+    return $sock;
+}
+
+my $srv_sock = tcp_server('127.0.0.1', 1234);
+my $srv_w = EV::io($srv_sock, EV::READ, sub {
+    if (accept my $sock, $srv_sock) {
+        IO::Stream->new({
+            fh          => $sock,
+            cb          => \&server,
+            wait_for    => IN,
+        });
+    }
+    elsif ($! != EAGAIN) {
+        die "accept: $!\n";
+    }
+});
+
+sub new_client {
+    IO::Stream->new({
+        host        => '127.0.0.1',
+        port        => 1234,
+        cb          => \&client,
+        wait_for    => IN,
+        out_buf     => 'Hello, World!' x 10240,
+    })
+};
+
+new_client() for 1 .. 1;
+
+my $BYTES = 0;
+my $alarm = 15;
+my $t = EV::timer $alarm, 0, sub {
+    warn sprintf "BYTES=%d (%.1f MB/sec)\n", $BYTES, $BYTES/1024/1024/$alarm;
+    EV::unloop;
+};
+EV::loop;
+
+
+sub server {
+    my ($io, $e, $err) = @_;
+    if ($err) {
+        $io->close();
+        die "server: $err\n";
+    }
+    if ($e == IN) {
+        $io->write($io->{in_buf});
+        $io->{in_buf} = q{};
+    }
+}
+
+sub client {
+    my ($io, $e, $err) = @_;
+    if ($err) {
+        $io->close();
+        die "server: $err\n";
+    }
+    if ($e == IN) {
+        $BYTES += $io->{in_bytes};
+        $io->write($io->{in_buf});
+        $io->{in_buf}   = q{};
+        $io->{in_bytes} = 0;
+    }
+}
+

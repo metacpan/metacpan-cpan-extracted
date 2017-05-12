@@ -1,0 +1,25 @@
+Changes
+INSTALL
+INSTALL.imagemagick
+INSTALL.tesseract
+MANIFEST
+Makefile.PL
+README
+bin/ocr
+inc/Devel/AssertEXE.pm
+inc/Devel/AssertOS.pm
+inc/Devel/AssertOS/Linux.pm
+inc/Devel/AssertOS/Unix.pm
+inc/Devel/CheckOS.pm
+lib/Image/OCR/Tesseract.pm
+lib/Image/OCR/Tesseract.pod
+t/00_dep.t
+t/02_Image_OCR_Tesseract.t
+t/99_cleanup.t
+t/img_big.jpg
+t/img_med.jpg
+t/img_small.jpg
+t/paragraph.jpg
+t/tesseract_install_helper.pl
+t/test.sh
+META.yml                                 Module meta-data (added by MakeMaker)

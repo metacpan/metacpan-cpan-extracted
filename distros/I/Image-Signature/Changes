@@ -1,0 +1,6 @@
+Revision history for Perl extension Image::Signature.
+
+0.01  Sun Aug 24 11:56:15 2003
+	- original version; created by h2xs 1.21 with options
+		-XA Image::Signature
+

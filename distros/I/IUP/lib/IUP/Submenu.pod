@@ -1,0 +1,136 @@
+=for comment based on iup-3.5 - http://www.tecgraf.puc-rio.br/iup/en/elem/iupsubmenu.html
+
+=head1 NAME
+
+IUP::Submenu - [GUI element] menu item that, when selected, opens another menu
+
+=head1 DESCRIPTION
+
+Creates a menu item that, when selected, opens another menu.
+
+=begin HTML
+
+<p><img src="http://kmx.github.io/perl-iup/img-3.9/elem/iupsubmenu.png"></p>
+
+=end HTML
+
+=head1 USAGE
+
+=head2 CREATION - new() method
+
+ $submenu = IUP::Submenu->new( TITLE=>"Name", child=>$menu_element );
+
+B<child:> (named parameter) optional child menu reference. Can be C<undef> or ommited.
+
+B<Returns:> the identifier of the created element, or C<undef> if an error occurs.
+
+NOTE: You can pass to C<new()> other C<ATTRIBUTE=E<gt>'value'> or C<CALLBACKNAME=E<gt>\&func> pairs relevant
+to this element - see L<IUP::Manual::02_Elements|IUP::Manual::02_Elements/"new()">.
+
+=head2 ATTRIBUTES
+
+For more info about concept of attributes (setting/getting values etc.)
+see L<IUP::Manual::03_Attributes|IUP::Manual::03_Attributes>. Attributes specific to this element:
+
+=over
+
+=item B<IMAGE>
+
+I<[Windows and GTK Only] (non inheritable)>
+
+Image name of the
+submenu image. In Windows, an item in a menu bar cannot have a check
+mark. Ignored if submenu in a menu bar. A recommended size would be
+16x16 to fit the image in the menu item. In Windows, if larger than the
+check mark area it will be cropped. 
+
+=item L<TITLE|IUP::Manual::03_Attributes/TITLE>
+
+I<(non inheritable)>
+
+Submenu Text. The
+"&" character can be used to define a mnemonic, the next character will
+be used as key. Use "&&" to show the "&" character instead on defining
+a mnemonic.
+
+=item L<WID|IUP::Manual::03_Attributes/WID>
+
+I<(non inheritable)>
+
+In Windows, returns
+the HMENU of the parent menu and it is actually created only when its
+child menu is mapped.
+
+=back
+
+The following L<common attributes|IUP::Manual::03_Attributes/Common Attributes> are also accepted:
+
+=over
+
+=item * L<ACTIVE|IUP::Manual::03_Attributes/ACTIVE>
+
+=back
+
+=head2 CALLBACKS
+
+For more info about concept of callbacks (setting callback handlers etc.)
+see L<IUP::Manual::04_Callbacks|IUP::Manual::04_Callbacks>. Callbacks specific to this element:
+
+=over
+
+=item L<HIGHLIGHT_CB|IUP::Manual::04_Callbacks/HIGHLIGHT_CB>
+
+Action generated when the submenu is highlighted.
+
+=back
+
+The following L<common callbacks|IUP::Manual::04_Callbacks/Common Callbacks> are also accepted:
+
+=over
+
+=item * L<MAP_CB|IUP::Manual::04_Callbacks/MAP_CB>, L<UNMAP_CB|IUP::Manual::04_Callbacks/UNMAP_CB>
+
+=back
+
+=head1 NOTES
+
+In Motif and GTK, the text font will be affected by the dialog font
+when the menu is mapped.
+
+=head1 EXAMPLES
+
+
+The element B<IUP::Submenu> is used in the following sample scripts:
+
+=over
+
+=item * L<0-basic/dialog2.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/dialog2.pl> - IUP::Dialog example
+
+=item * L<0-basic/item.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/item.pl> - IUP::Item Example
+
+=item * L<0-basic/layoutdialog.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/layoutdialog.pl> - IUP::LayoutDialog example
+
+=item * L<0-basic/menu.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/menu.pl> - IUP::Menu example
+
+=item * L<0-basic/separator.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/separator.pl> - IUP::Separator example
+
+=item * L<0-basic/submenu.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/submenu.pl> - IUP::Submenu example
+
+=item * L<1-apps/app-mdi.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/1-apps/app-mdi.pl> - IUP app example
+
+=item * L<1-apps/app-sample1.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/1-apps/app-sample1.pl> - example used for screenshot - IUP.pod
+
+=item * L<1-apps/app-sample2.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/1-apps/app-sample2.pl> - example based on the original sample.c
+
+=back 
+
+
+
+=head1 SEE ALSO
+
+L<IUP::Item|IUP::Item>, L<IUP::Separator|IUP::Separator>, L<IUP::Menu|IUP::Menu>
+
+The original doc: L<iupsubmenu.html|http://www.tecgraf.puc-rio.br/iup/en/elem/iupsubmenu.html>
+ 
+
+=cut

@@ -1,0 +1,33 @@
+---
+abstract: 'Solr query encapsulation'
+author:
+  - 'Marco Pessotto <melmothx@gmail.com>'
+build_requires:
+  DateTime: '0'
+  Test::More: '0'
+  YAML: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.143240'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Interchange-Search-Solr
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Lingua::StopWords: '0.09'
+  Moo: '0'
+  Type::Tiny: '1'
+  WebService::Solr: '0'
+  XML::LibXML: '0'
+  namespace::clean: '0'
+resources:
+  IRC: irc://irc.freenode.net/#interchange
+  bugtracker: https://github.com/interchange/Interchange-Search-Solr/issues
+  repository: https://github.com/interchange/Interchange-Search-Solr.git
+version: '0.13'

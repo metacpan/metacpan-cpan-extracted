@@ -1,0 +1,32 @@
+Revision history for Perl extension Image::Delivery
+
+0.14 Wed 12 Dec 2007
+	- Adding missing dependency
+
+0.13 Fri Jan  5 2007
+	- Moving from Phase N to CPAN repository
+
+0.12 Fri Nov 18 2005
+	- Updating to more modern dependencies
+
+0.10 Fri Nov 19 2004
+	- Avoid a HTML::Location clone/catfile in the ->_exists method
+
+0.09 Mon Nov  1 2004
+	- Inlined the image type detection, removing File::Type dependency
+
+0.08 Thu Oct 13 2004
+	- Updating HTML::Location dependency
+
+0.07 Wed Oct 13 2004
+	- More changes to be more flexible in sub-classes
+
+0.06 Wed Oct 13 2004
+	- Doing coercion via GLOB aliasing doesn't support subclassing.
+	  Doing it via sub instead.
+
+0.05 Wed Oct 13 2004
+	- Minor change to ->filename to be a little more flexible in subclasses
+
+0.01 Wed Sep  1 2004
+	- original version

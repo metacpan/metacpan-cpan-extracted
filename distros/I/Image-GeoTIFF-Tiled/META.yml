@@ -1,0 +1,24 @@
+--- #YAML:1.0
+name:               Image-GeoTIFF-Tiled
+version:            0.08
+abstract:           Read data and extract shapes from tiled GeoTIFF rasters
+author:
+    - Blake Willmarth <bwillmarth@gmail.com>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Inline:           0.46
+    List::MoreUtils:  0.22
+    Module::Load:     0.18
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

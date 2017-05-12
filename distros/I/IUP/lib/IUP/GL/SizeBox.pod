@@ -1,0 +1,14 @@
+=head1 NAME
+
+IUP::GL::SizeBox - [GUI element] GL-based sizebox
+
+=head1 DESCRIPTION
+
+XXX-TODO: missing doc
+
+=head1 SEE ALSO
+
+The original doc: L<iupglsizebox.html|http://www.tecgraf.puc-rio.br/iup/en/gl/iupglsizebox.html>
+
+
+=cut

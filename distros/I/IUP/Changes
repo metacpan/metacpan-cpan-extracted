@@ -1,0 +1,80 @@
+Revision history for perl module IUP
+
+0.305 2016-09-07
+    - NEW: IUP::Plot               https://webserver2.tecgraf.puc-rio.br/iup/en/ctrl/iup_plot.html
+    - NEW: IUP::AnimatedLabel      https://webserver2.tecgraf.puc-rio.br/iup/en/elem/iupanimatedlabel.html
+    - NEW: IUP::BackgroundBox      https://webserver2.tecgraf.puc-rio.br/iup/en/elem/iupbackgroundbox.html
+    - NEW: IUP::Calendar           https://webserver2.tecgraf.puc-rio.br/iup/en/elem/iupcalendar.html
+    - NEW: IUP::DatePick           https://webserver2.tecgraf.puc-rio.br/iup/en/elem/iupdatepick.html
+    - NEW: IUP::DetachBox          https://webserver2.tecgraf.puc-rio.br/iup/en/elem/iupdetachbox.html
+    - NEW: IUP::FlatButton         https://webserver2.tecgraf.puc-rio.br/iup/en/elem/iupflatbutton.html
+    - NEW: IUP::GL::BackgroundBox  https://webserver2.tecgraf.puc-rio.br/iup/en/ctrl/iupglbackgroundbox.html
+    - NEW: IUP::GL::Text           https://webserver2.tecgraf.puc-rio.br/iup/en/gl/iupgltext.html
+    - REMOVED: IUP::PPlot (use IUP::Plot instead)
+
+0.304 2016-07-10
+    - require Alien::IUP-0.705 (big upgrade to iup-3.19.1 & co.)
+
+0.303 2015-02-08
+    - require Alien::IUP-0.703 (better OpenGL handling on UNIX platforms)
+
+0.302 2015-02-07
+    - require Alien::IUP-0.702
+
+0.301 2015-02-06
+    - new: IUP::Scintilla
+    - new: IUP::GL::*
+
+0.202 2014-04-08
+    - fixing bug in loading IUP::Internal::Canvas
+
+0.201 2013-12-10
+    - UTF-8 support (requires iup-3.9)
+    - INCOMPATIBLE CHANGE: IUP::PPlot has completely new interface (like MglPlot)
+    - NEW: IUP::MglPlot, IUP::MatrixList, IUP::Expander, IUP::Link, 
+           IUP::GridBox, IUP::Gauge, IUP::ProgressDlg, IUP::ScrollBox
+    - Fixed Append()/Insert() bug
+    - Fixed Drag & Drop support
+
+0.101 2013-07-31
+    - fixing broken links to examples
+
+0.100 2013-02-06
+    - updating callbacks newly added in iup 3.6/3.7
+    - starting new version line
+
+0.006 2012-08-12
+    - attribute accesors now handled via AUTOLOAD
+    - Callback.xs+Canvas.xs incorporated into IupLibrary.xs
+    - improved thread awareness of Idle callback
+    - preparing for iup-3.6
+
+0.004 2011-08-19
+    - forcing newer Alien::IUP (to make IUP install smoothly on cygwin)
+    - fixing cygwin build failures
+
+0.003 2011-08-18
+    - much better documentation
+    - many fixes for IUP::Canvas methods
+    - added: IUP::Canvas::(Palette|Pattern|Stipple|Bitmap) -
+      canvas helper modules
+    - added: IUP::Canvas::(InternalState|InternalServerImage|InternalContext)
+      canvas helper modules (hidden)
+    - added: IUP::Canvas::FileBitmap
+    - added: IUP::Canvas::FileVector - replacement for IUP::Canvas::(SVG|EMF)
+    - added: IUP::ConfigData
+    - fix for callbacks: better handling of callbacks with no return value
+      (fallback to IUP_DEFAULT)
+    - fix for callbacks: MULTITOUCH_CB, MULTISELECTION_CB,
+      MULTIUNSELECTION_CB, NODEREMOVED_CB
+    - removing debug stuff 'use Data::Dump(er)'
+
+0.002 2011-07-29
+    - removing invalid accessors "0" and "1"
+    - fix for "Can't locate IUP/OleControl.pm"
+    - fixing documentation
+
+0.001_01 2011-07-19
+    - the first CPAN release
+    - initial proof-of-concept (0.000) version uploaded to github 2010-09-15
+      https://github.com/kmx/perl-iup/commit/e8cb0bb10e4ce6e7a342f65a6b933bbd90c1fb6d

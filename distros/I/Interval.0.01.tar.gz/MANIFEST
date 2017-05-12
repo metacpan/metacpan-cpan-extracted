@@ -1,0 +1,11 @@
+MANIFEST
+Makefile.PL
+Interval.pm
+README
+t/00_version.t
+t/01_overlap.t
+t/02_get_overlap.t
+t/03_overload.t
+t/04_allen.t
+t/05_class_met.t
+t/06_int_types.t

@@ -1,0 +1,57 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use IM::Engine;
+
+# This is a rock-paper-scissors bot that uses IM::Engine::Plugin::Dispatcher
+
+do {
+    package Rock::Paper::Scissors;
+    use Path::Dispatcher::Declarative -base;
+
+    my %beats = (
+        rock     => 'scissors',
+        paper    => 'rock',
+        scissors => 'paper',
+    );
+
+    on [ ['rock', 'paper', 'scissors'] ] => sub {
+        my $human    = $1;
+        my $computer = (qw/rock paper scissors/)[rand 3];
+
+        my $result = "$human vs $computer: ";
+
+        $result .= "It's a draw!" if $human    eq $computer;
+        $result .= "You win!"     if $computer eq $beats{$human};
+        $result .= "I win!"       if $human    eq $beats{$computer};
+
+        # Just return a string and the plugin will know what to do
+        return $result;
+    };
+};
+
+IM::Engine->new(
+    interface => {
+        # Select any protocol you like. I enjoy CLI and REPL. :)
+        protocol    => 'IRC',
+        credentials => {
+            server   => 'irc.perl.org',
+            channels => ['#im-engine'],
+            nick     => 'IM_Engine',
+        },
+    },
+    plugins => [
+        # Hook into Path::Dispatcher instead of defining an incoming_callback
+        Dispatcher => {
+            dispatcher => 'Rock::Paper::Scissors',
+        },
+
+        # "Hi", "bye", and "thanks" type commands
+        'Dispatcher::Flavor',
+
+        # If you're running a non-IRC bot, you probably want to tell the user
+        # about invalid commands with:
+        # 'Dispatcher::404',
+    ],
+)->run;
+

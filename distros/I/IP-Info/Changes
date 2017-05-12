@@ -1,0 +1,67 @@
+Revision history for IP::Info
+
+0.17  2017-04-30T04:45:00+01:00
+      - Addressed issue RT #121444 with regard to broken link.
+      - Updated base url as service provider has changed.
+
+0.16  2016-12-03T05:30:00+01:00
+      - Added test scripts (t/meta-json.t and t/meta-yml.t).
+
+0.15  2016-11-24T12:20:00+01:00
+      - Added key 'provides' to the Makefile.PL script.
+
+0.14  2016-11-21T12:20:00+01:00
+      - Updated Copyright year information.
+
+0.13  2015-05-05T11:15:00+01:00
+      - Added LICENSE file.
+
+0.12  2015-01-17T01:15:10+01:00
+      - Removed SIGNATURE file.
+      - Updated MANIFEST.SKIP file to ignore folder 'eumm/'.
+      - Updated Copyright year information.
+
+0.11  2014-11-06T23:15:20+01:00
+      - Corrected the syntax of pod document of package IP::Info.
+      - Added method parameter to the pod document.
+
+0.10  2014-11-05T19:17:10+01:00
+      - Some more tidied up the pod document.
+
+0.09  2014-11-04T21:24:11+01:00
+      - Tidied up the pod document.
+
+0.08  2014-10-31T22:35:00+01:00
+      - Updated Changes file according to CPAN::Changes::Spec package.
+      - Added unit test changes.t file.
+
+0.07  2014-09-28T00:48:35+01:00
+      - Re-structured the code using 'Moo'.
+      - Added two placeholder for result i.e. IP::Info::Response::Network and IP::Info::Response::Location.
+      - Removed the dependency on Readonly and XML::Simple. It now uses JSON.
+      - Added key "META_MERGE" key on condition (ExUtils::MakeMake->VERSION(6.46).
+      - Added section "REPOSITORY" to the pod document.
+      - Added key "META_MERGE" to Makefile.PL
+
+0.06  2013-01-05T01:02:03+01:00
+      - Patch for RT# 82365 requested by Andrei.
+      - Added unit test for exception handler.
+
+0.05  2011-09-05T10:11:12+01:00
+      - Removed the format attribute as its no longer relevant.
+      - Updated the signature of method schema() and logic as it nows saves the file as well.
+      - Updated unit test for the constructor 01-new.t.
+      - Added new unit for the method schema().
+
+0.04  2011-09-02T11:12:13+01:00
+      - Added response handler as suggested by Neil Bowers.
+
+0.03  2011-08-09T15:34:11+01:00
+      - Made Readonly v1.03 as minimum requirement.
+      - Prepared the distribution using the Module::Signature v0.68.
+
+0.02  2011-08-05T10:15:16+01:00
+      - Renamed global var $VER to $API_VER.
+
+0.01  2011-08-01T10:00:00+01:00
+      - First version, released.

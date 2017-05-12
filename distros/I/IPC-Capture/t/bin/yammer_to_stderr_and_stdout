@@ -1,0 +1,73 @@
+#!/usr/bin/perl
+## #!/usr/local/perl_5.9.5/bin/perl5.9.5
+# yammer_to_stderr_and_stdout                    doom@kzsu.stanford.edu
+#                                                    06 Apr 2008
+
+use warnings;
+use strict;
+$|=1;
+use Data::Dumper;
+
+use File::Basename qw( basename );
+use Env qw(HOME);
+
+our $VERSION = 0.01;
+my $prog     = basename($0);
+
+my $DEBUG = 1;
+
+for my $i (1..6) {
+  print "$i: (O): hello out there\n";
+  print STDERR "$i: <e>: hello err there\n";
+}
+
+
+__END__
+
+=head1 NAME
+
+yammer_to_stderr_and_stdout - yammers to stderr and stdout
+
+
+=head1 DESCRIPTION
+
+B<yammer_to_stderr_and_stdout> is a script which sends a known
+quantity of output to stdout and stderr, so that a test
+script can run it and check it's ability to capture either
+of them.
+
+Specifically, it outputs the following dozen lines,
+the lines marked (O) go to STDOUT, the lines marekd <e>
+go to STDERR:
+
+1: (O): hello out there
+1: <e>: hello err there
+2: (O): hello out there
+2: <e>: hello err there
+3: (O): hello out there
+3: <e>: hello err there
+4: (O): hello out there
+4: <e>: hello err there
+5: (O): hello out there
+5: <e>: hello err there
+6: (O): hello out there
+6: <e>: hello err there
+
+
+=head1 AUTHOR
+
+Joseph Brenner, E<lt>doom@kzsu.stanford.eduE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2008 by Joseph Brenner
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+=head1 BUGS
+
+None reported... yet.
+
+=cut

@@ -1,0 +1,23 @@
+--- #YAML:1.0
+name:               Ima::DBI::Contextual
+version:            1.006
+abstract:           Liteweight dbi handle cache and utility methods.
+author:
+    - John Drago <jdrago_999@yahoo.com>
+license:            perl
+distribution_type:  module
+test_requires:
+    Test::More:       0
+    DBD::SQLite:      0
+requires:
+    Carp:             0
+    DBI:              1.614
+    Digest::MD5:      0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       Hand
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

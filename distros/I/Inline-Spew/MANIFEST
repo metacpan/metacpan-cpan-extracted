@@ -1,0 +1,10 @@
+Changes
+lib/Inline/Spew.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/01-basic.t
+t/02-mission.t
+t/99-test-pod-coverage.t
+t/99-test-pod.t

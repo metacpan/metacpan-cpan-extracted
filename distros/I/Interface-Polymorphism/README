@@ -1,0 +1,26 @@
+          Interface Polymorphism Version 1.00 Beta Release 1
+
+                              2000/10/06
+
+This is the first (rough) release of a pair of pragmata to do Perl6
+RFC265 style interface polymorphism in Perl 5. The Changes file
+details any changes made since the pre beta code. This is reasonably
+fully featured code and should be reliable and not overly painful to
+use since it does most of its magic at compile time and cleans up
+after itself. Which is nice.
+
+Installation is the usual dance of:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+Documentation is *very* rough, but will get better, I promise.
+Eventually.
+
+Any errors, inaccuracies or omissions are bugs and should be reported
+to the author, who only wrote this thing for a laugh really.
+
+Enjoy this, I hope it's useful; it got written to scratch an itch.
+PDC

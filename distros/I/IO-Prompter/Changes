@@ -1,0 +1,182 @@
+Revision history for IO-Prompter
+
+0.0.1  Fri May  1 17:34:17 2009
+       Initial release.
+
+
+0.001001  Tue Jun 22 05:39:09 2010
+
+    * More documentation
+
+    * Fixed README
+
+    * Tweaked Makefile.PL and Build.PL
+
+    * Fixed history completion (removed prefix)
+
+    * Added 'dirnames' as a completion option
+
+    * Allowed use of -number or -integer to specify numerically indexed -menu
+
+    * Made $SIG{INT} handling transparent
+
+    * Made constraints apply to -default value
+      (and issue a warning if they aren't satisfied)
+
+    * Added -DEFAULT option to override constraint checking
+
+    * Added -keyletters option to extract guarantees and defaults
+      from the prompt
+
+
+0.002000  Tue Apr 10 17:25:54 2012
+
+    * Fixed selection of menu items specified by non-single character
+      (Thanks Chris!)
+
+    * Tweaked varname in docs (thanks Salvatore)
+
+    * Other doc fixes
+
+    * Made default values echo when selected
+
+    * Fixed -default value handling on -menu prompts
+      (disabled constraint-checking on that case)
+
+    * Fixed -keyletters example (-guarantee regex was wrong)
+
+    * Allowed -key and -keys as abbreviations for -keyletters
+
+    * Added -style and -echostyle features
+
+    * Added: use IO::Prompter -argv
+
+    * Improved -argv prompting
+
+0.003000  Thu Jun 14 21:34:33 EST 2012
+
+    * Added lexically scoped automatic options
+      (e.g. use IO::Prompter [-yesno, -single])
+
+    * Fixes for -argv mode (especially filename completion)
+
+    * Added -yesno => $count option
+
+    * BACKWARDS INCOMPATIBLE CHANGE: Changed behaviour of prompt() in
+      list contexts: now returns empty list on failure.
+      Use C<scalar prompt @args> to get old behaviour.
+
+
+0.003001  Tue Jul  3 17:54:40 2012
+
+    * Documented -echo=>'yea/nay' special case
+
+    * Fixed erroneous error message when completing with 'dirnames'
+      (thanks Matthias!)
+
+
+0.004000  Sat Sep 22 14:30:13 2012
+
+    * Added ^A, ^B, ^E, ^F for in-line editing
+
+
+0.004001  Sun Sep 23 21:18:33 2012
+
+    * Fixed nasty bug that prevented echoing most upper-case input
+
+
+0.004002  Mon Sep 24 11:39:24 2012
+
+    * Fixed induced error in input faking
+
+
+
+0.004003  Wed Jan 16 16:24:09 2013
+
+    * Patched history mechanism to allow non-recording of input history
+      (thanks Brian!)
+
+
+0.004004  Sun Jan 27 09:05:25 2013
+
+    * Patched missing validity check for non-ReadKey input under -menu
+      (thanks Kalyan Raj!)
+
+
+0.004005  Wed Mar  6 09:19:56 2013
+
+    * Disabled interactive testing on Windows platforms
+      (thanks Brian and Lady Aleena)
+
+
+0.004006  Thu Aug 29 10:28:48 2013
+
+    * Better handling of input EOL under Windows (thanks Bas)
+
+    * Workaround for Term::ReadKey bug under Windows (thanks Bas)
+
+
+0.004007  Fri Aug 30 07:25:33 2013
+
+    * Reworked workaround for Term::ReadKey timeout bug under Windows
+      (thanks again, Bas)
+
+
+0.004008  Mon Sep 30 14:36:57 2013
+
+    * Further improvements under 5.18, especially for Windows
+      (thanks, Bas)
+
+    * Attempted to mollify cpanm by moving $VERSION declaration
+
+
+0.004009  Wed Oct  2 21:55:06 2013
+
+    * Further improvements under 5.18
+      (thanks, Gareth)
+
+
+
+0.004010  Thu Oct  3 18:17:48 2013
+
+    * Still further improvements under Windows
+      (thanks, Gareth)
+
+    * Fixed spurious ERASEs when deleting "past" start of input
+      (thanks, Gareth)
+
+
+0.004011  Fri Jul 25 17:03:42 2014
+
+    * Added 'normal', 'default', 'standard', etc. to colour translation
+
+    * Added <ESC><ESC> at start of faked input to defer next fake and insert real input
+      (i.e. like <ESC>, but doesn't throw away the line that was scheduled next)
+
+
+0.004012  Wed Feb  4 09:46:17 2015
+
+    * Added -void option to silence void warnings
+
+    * Added ability to declare lexically scoped wrapper subs
+      (thanks Schwern!)
+
+    * Documented incompatibility with Moose
+      (thanks Torbjørn!)
+
+    * Handle terminal escape sequences (e.g. arrow keys) more gracefully
+      (Thanks, Lukasz!)
+
+
+0.004013  Thu Jul 23 07:15:57 2015
+
+    * Added better default ERASE character for MSWin32 (thanks Dan!)
+
+    * Silenced warnings within test for valid input
+      (Thanks Joel!)
+
+
+0.004014  Tue Nov 24 08:50:00 2015
+
+    * Numerous improvements to completion behaviour
+      (Many thanks, Victor, and apologies for the long delay!)

@@ -1,0 +1,73 @@
+Copyright 2010, 2011, 2012 Kevin Ryde
+
+This file is part of Image-Base-GD.
+
+Image-Base-GD is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3, or (at your option)
+any later version.
+
+Image-Base-GD is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You can get a copy of the GNU General Public License online at
+<http://www.gnu.org/licenses/>.
+
+
+
+Version 15, February 2012
+    - more rectangle() clip workaround
+
+Version 14, February 2012
+    - clip to 0,0,width,height (rectangle() workaround for libgd2.0.36
+      which is supposed to do this itself but doesn't)
+
+Version 13, August 2011
+    - fix diamond() coordinates
+
+Version 12, July 2011
+    - new -quality_percent option for JPEG
+    - diamond() using polygon
+
+Version 11, June 2011
+    - new -file_format
+    - load() croak on bad file contents
+    - fix load()/new() trouble with filenames like GIF8.png
+
+Version 10, February 2011
+    - fix Makefile.PL for perl 5.6
+
+Version 9, November 2010
+    - help 1x1 filled ellipse on past libgd
+
+Version 8, November 2010
+    - ellipse() $fill parameter
+
+Version 7, October 2010
+    - use Image:Base 1.09 for ellipse() fixes to chain up to
+    - ask for GD 2.45 for GD::Simple / GD::Group fix
+
+Version 6, September 2010
+    - test manifest only as an author test
+
+Version 5, July 2010
+    - lower a couple of stray "use 5.010"s
+
+Version 4, July 2010
+    - workaround for apparent GD bug where an unfilled y1==y2
+      rectangle gets sides y-1 to y+1, outside the x1,y1 x2,y2 area
+
+Version 3, July 2010
+    - fix ellipse() positioning
+    - add 4-digit hex colours too
+    - add $image->new() to copy
+
+Version 2, June 2010
+    - fix badly botched xy() set pixel
+    - better colour None handling
+    - new add_colours()
+
+Version 1, June 2010
+    - the first version

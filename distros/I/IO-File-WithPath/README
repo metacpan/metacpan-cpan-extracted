@@ -1,0 +1,27 @@
+This is Perl module IO::File::WithPath.
+
+INSTALLATION
+
+IO::File::WithPath installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan IO::File::WithPath
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+DOCUMENTATION
+
+IO::File::WithPath documentation is available as in POD. So you can do:
+
+    % perldoc IO::File::WithPath
+
+to read the documentation online with your favorite pager.
+
+Masahiro Chiba

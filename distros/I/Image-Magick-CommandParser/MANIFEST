@@ -1,0 +1,38 @@
+Changelog.ini
+Changes
+colors/aqua.png
+colors/black.png
+colors/blue.png
+colors/fuchsia.png
+colors/gray.png
+colors/green.png
+colors/lime.png
+colors/maroon.png
+colors/navy.png
+colors/olive.png
+colors/purple.png
+colors/red.png
+colors/silver.png
+colors/teal.png
+colors/white.png
+colors/yellow.png
+data/convert.list.txt
+data/todo.txt
+lib/Image/Magick/CommandParser.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+scripts/convert.list.pl
+scripts/pod2html.sh
+scripts/process.pl
+scripts/process.sh
+scripts/synopsis.pl
+scripts/synopsis.sh
+scripts/test.sh
+t/label.1.txt
+t/test.t
+xt/author/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

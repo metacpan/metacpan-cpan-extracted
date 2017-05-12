@@ -1,0 +1,244 @@
+NAME
+
+    IPv6::Address - IPv6 Address Manipulation Library
+
+VERSION
+
+    version 0.207
+
+SYNOPSIS
+
+     use IPv6::Address;
+    
+     my $ipv6 = IPv6::Address->new('2001:648:2000::/48');
+    
+     $ipv6->contains('2001:648:2000::/64'); #true
+    
+     say $ipv6->to_string;
+     say $ipv6->string; # Same as previous
+     say $ipv6; # Same as previous
+    
+     say $ipv6->string(nocompress=>1); # do not compress using the :: notation
+     say $ipv6->string(ipv4=>1); #print the last 32 bits as an IPv4 address
+     
+     $ipv6->addr_string; # Returns '2001:648:2000::'
+     
+     $ipv6->split(4); # Split the prefix into 2^4 smaller prefixes. Returns a list.  
+    
+     $ipv6->apply_mask; # Apply the mask to the address. All bits beyond the mask length become 0.
+    
+     $ipv6->first_address;
+    
+     $ipv6->last_address;
+    
+     $a->enumerate_with_offset( 5 , 64 ); #returns 2001:648:2000:4::/64 
+
+DESCRIPTION
+
+    A pure Perl IPv6 address manipulation library. Emphasis on manipulation
+    of prefixes and addresses. Very easy to understand and modify. The
+    internal representation of an IPv6::Address is a blessed hash with two
+    keys, a prefix length (0-128 obviously) and a 128-bit string. A
+    multitude of methods to do various tasks is provided.
+
+ Methods
+
+    new( ipv6_string )
+
+      Takes a string representation of an IPv6 address and creates a
+      corresponding IPv6::Address object.
+
+    raw_new( bitstr, length )
+
+      Creates a new IPv6::Address out of a bitstring and a prefix length.
+      The bitstring must be binary, please do not use a '0' or '1'
+      character string.
+
+    get_bitstr
+
+      Returns the bitstr of the object.
+
+    get_prefixlen
+
+      Returns the prefix length of the address.
+
+    get_mask_bitstr(length)
+
+      Returns a 128-bit string with the first prefix-length bits equal to
+      1, rest equal to 0. Essentially takes the prefix length of the object
+      and returns a corresponding bit mask.
+
+    get_masked_address_bitstr
+
+      Returns the bitstring, after zeroing out all the bits after the
+      prefix length. Essentially applies the prefix mask to the address.
+
+    generate_bitstr( number )
+
+      Not a method, returns 128-bit string, first n-items are 1, rest is 0.
+
+    bitstr_and( bitstr1 , bitstr2 )
+
+      Not a method, AND's two bitstrings, returns result.
+
+    bitstr_or( bitstr1 , bitstr2)
+
+      Not a method, OR's two bitstrings, returns result.
+
+    bitstr_not( bitstr )
+
+      Not a method, inverts a bitstring.
+
+    from_str( string_bitstring )
+
+      Not a method, takes a string of characters 0 or 1, returns
+      corresponding binary bitstring. Please do not use more than 128
+      characters, rest will be ignored.
+
+    to_str( bitstring )
+
+      Not a method, takes a binary bitstring, returns a string composed of
+      0's and 1's. Please supply bitstrings of max. 128 bits, rest of the
+      bits will be ignored.
+
+    contains( other_address )
+
+      This method takes an argument which is either an IPv6::Address or a
+      plain string that can be promoted to a valid IPv6::Address, and tests
+      whether the object contains it. Obviously returns true or false.
+
+    addr_string
+
+      Returns the address part of the IPv6::Address. Using the option
+      ipv4=>1 like
+
+       $a->addr_string(ipv4=>1) 
+
+      will make the last 32-bits appear as an IPv4 address. Also, using
+      nocompress=>1 like
+
+       $a->addr_string( nocompress => 1 ) 
+
+      will prevent the string from containing a '::' part. So it will be 8
+      parts separated by ':' colons.
+
+    string
+
+      Returns the full IPv6 address, with the prefix in its end.
+
+    to_string
+
+      Used internally by the overload module.
+
+    split( exponent , target_length )
+
+      Splits the address to the order of two of the number given as first
+      argument. Example: if argument is 3, 2^3=8, address is split into 8
+      parts. The final parts have prefix length equal to the target_length
+      specified in the second argument.
+
+    apply_mask
+
+      Applies the prefix length mask to the address. Does not return
+      anything. Works on $self. WARNING:This will alter the object.
+
+    first_address
+
+      Returns the first address of the prefix that is represented by the
+      object. E.g. consider 2001:648:2000::1234/64. First address will be
+      2001:648:2000::/64.
+
+    last_address
+
+      Returns the last address of the prefix that is represented by the
+      object. E.g. consider 2001:648:2000::1234/64. Last address will be
+      2001:648:2000::ffff:ffff:ffff:ffff/64.
+
+    is_unspecified , is_loopback , is_multicast
+
+      Returns true or false depending on whether the address falls into the
+      corresponding category stated by the method name. E.g.
+
+       IPv6::Address->new('::1')->is_loopback # returns true
+
+    ipv4_to_binarray
+
+      Not a method, takes an IPv4 address, returns a character string
+      consisting of 32 characters that are 0 or 1. Used internally, not too
+      useful for the end user.
+
+    enumerate_with_IPv4( ipv4, mask )
+
+      Takes an IPv4 address and uses a part of it to enumerate inside the
+      Ipv6 prefix of the object. E.g.
+
+       IPv6::Address->new('2001:648:2001::/48')->enumerate_with_IPv4('0.0.0.1',0x0000ffff) #will yield 2001:648::2001:0001::/64
+
+      The return value will be a new IPv6::Address object, so the original
+      object remains intact. The part that will be used as an offset is
+      extracted from the ipv4 by using the mask.
+
+    enumerate_with_offset( offset, desired_length )
+
+      Takes a non-negative integer offset and returns a prefix whose
+      relative position inside the object is defined by the offset. The
+      prefix length of the result is defined by the second argument. E.g.
+
+       IPv6::Address->new('2001:648:2000::/48')->enumerate_with_offset( 5 , 64 ) #2001:648:2000:4::/64
+
+    increment( offset )
+
+      Increments the IPv6::Address object by offset. Offsets larger than
+      2^32-1 are not acceptable. This method is probably not too useful,
+      but is provided for completeness.
+
+    nxx_parts(unpack_format)
+
+      Takes the bitstring of the address and unpacks it using the first
+      argument. Internal use mostly.
+
+    n16_parts
+
+      Splits the address into an 8-item array of unsigned short integers.
+      Network byte order is implied, a short integer is 16-bits long.
+
+    n16_parts
+
+      Splits the address into an 4-item array of unsigned long integers.
+      Network byte order is implied, a long integer is 32-bits long.
+
+    n_cmp( a , b )
+
+      Takes two 128-bit bitstr arguments, compares them and returns the
+      result as -1, 0 or 1. The semantics are the same as that of the
+      spaceship operator <=>.
+
+      This method will overload the <=> operator for IPv6::Address objects,
+      so comparing IPv6::Address objects like they were integers produces
+      the correct results.
+
+    n_sort( array )
+
+      Sorts an array of bitstrs using the n_cmp function.
+
+    radius_string
+
+      Returns a string suitable to be returned as an IPv6 Radius AV-pair.
+      See RFC 3162 for an explanation of the format.
+
+AUTHOR
+
+    Athanasios Douitsis <aduitsis@cpan.org>
+
+SUPPORT
+
+    Please open a ticket at https://github.com/aduitsis/IPv6-Address.
+
+COPYRIGHT & LICENSE
+
+    Copyright 2008-2015 Athanasios Douitsis, all rights reserved.
+
+    This program is free software; you can use it under the terms of
+    Artistic License 2.0 which can be found at
+    http://www.perlfoundation.org/artistic_license_2_0
+

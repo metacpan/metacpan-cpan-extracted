@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+mydatasrc/jinclude.h
+mydatasrc/Makefile.PL
+mydatasrc/mydatasrc.c
+test.pl
+TestJPG.pm
+TestJPG.xs

@@ -1,0 +1,66 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 842745cb706f8f2126506f544492f7a80dbe29b3 COPYING
+SHA1 be3dd67dbe87a1be5f71a94bf374e8310c18ea60 Changes
+SHA1 ae3e35d5ba32fa11b947b1fd8e5f6e7bc43567ea MANIFEST
+SHA1 d73f6910c2283dca6aa23a5d820950745dcb76f6 MANIFEST.SKIP
+SHA1 a25c7c79c95b841c0e30ad49412777058af894f9 META.json
+SHA1 18870a39b164530f9212a8afb198879b0673e63d META.yml
+SHA1 c1e341f9f009f0f4c7aebf2c3c8bcf099c25ff53 Makefile.PL
+SHA1 471b71a011ad8ace64e70bb79d177afc65777b0a debian/changelog
+SHA1 ac3478d69a3c81fa62e60f5c3696165a4e5e6ac4 debian/compat
+SHA1 30276df67716212a5ef6b6b56fd5d0fb121681ca debian/control
+SHA1 2294f39e0f849c31141edda40f5aff536fe45d42 debian/copyright
+SHA1 46eb1bf49f779183eb55bf845267b89d5bf6966b debian/rules
+SHA1 61652cd1568dcf2614df833eba241755eee34e89 debian/source/format
+SHA1 617cd930c6b3a5f87e68d647659e659919c9ba27 debian/watch
+SHA1 fe45b60f6fa9dad27e4e39b5b33bf8b2d4a9ab61 devel/codecs.pl
+SHA1 4920698cda0df218321d9e553927c81d2ec97c38 devel/hotspot.pl
+SHA1 27bb5c2574bd0fb7c457942411eb771d22dc1de7 devel/image-nox11-pixel.pl
+SHA1 4f045d7384c37834e20db6bdbccd2f86a06c6781 devel/image-nox11.pl
+SHA1 5ed3c320b78b0527b5807255744e078c0ca268e2 devel/prima.pl
+SHA1 2c31f38013695c85f0a75eb2c783989978aa298b inc/my_pod2html
+SHA1 363aeaf881bcce2399a5d91eeab96b0b796dce35 lib/Image/Base/Prima/Drawable.pm
+SHA1 663c56ccdea32348e5a8c0fdd9885e9c0bce80f9 lib/Image/Base/Prima/Image.pm
+SHA1 a8a0c610003938ffbd461cfc952d36e7b8f90b1d t/Drawable-load.t
+SHA1 86965dfdf94ee0283a5c2b95feb999fd89be98bb t/Drawable.t
+SHA1 41af7341aee16893910a8187e17ba59b0dc6fa34 t/Image-load.t
+SHA1 c9144be94121864a24f6c00cc40a6d6950da1e19 t/Image-path-class.t
+SHA1 c049dd18d7abf47d072f17b3290e3b858403d2c8 t/Image-png.t
+SHA1 8d91b03ec5b0a399b667b71c4e782ecb84d49733 t/Image-weaken.t
+SHA1 95945d6f84da5d2fad500456697fa01a06327f7a t/Image-xpm.t
+SHA1 8f152218067df4c043ef5e90197e1456d115a1ed t/Image.t
+SHA1 3855de075da37f5bc4e6a5534b2f00cc14872a98 t/MyTestHelpers.pm
+SHA1 a242f0517e122205e08d3b3e18bddf4c2854f7cc t/MyTestImageBase.pm
+SHA1 f2ceb7bb4bf68bd24728b90918e63d251fd06183 xt/0-META-read.t
+SHA1 c9e7a47e1f397eb5f46d7e4ef21754d9df76e36e xt/0-Test-ConsistentVersion.t
+SHA1 d9e7f38a8dcfdb76c56951e4214be8eeda2e2289 xt/0-Test-DistManifest.t
+SHA1 9496e4a2a2734c7093ab6961900dd7a55800976e xt/0-Test-Pod.t
+SHA1 63abbc3297914cd38081e95588fd794f9d1f0306 xt/0-Test-YAML-Meta.t
+SHA1 4a897c9b09f37290f507d151e84b6a3c8defd496 xt/0-file-is-part-of.t
+SHA1 aeb6f41dfae96d04459448f6c3e3dee44691e722 xt/0-no-debug-left-on.t
+SHA1 230df3a34109353a91d90d51372ce8d96ac974e7 xt/1-Test-Synopsis.t
+SHA1 cd18ddee73ad0007ba667f0e472ea9d73d0dfa89 xtools/my-check-copyright-years.sh
+SHA1 b12199bcc70c569ff43f8d8e2ea1c896f587c62f xtools/my-check-spelling.sh
+SHA1 475e8eb08eac6eecec94a0f9e9928af7d467d2d0 xtools/my-deb.sh
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iD8DBQFVh8vqLFMCIV9q3ToRAjx7AJ4mLRk/eQkghJYe/aDLRocnYJq3qQCgn2HP
+8AX41uHQ00exdoMaF7dvuTs=
+=bjmF
+-----END PGP SIGNATURE-----

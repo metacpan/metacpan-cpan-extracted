@@ -1,0 +1,23 @@
+
+frame1.jpeg
+
+	A very simple JPEG file.
+
+
+frames_delay77.ajpeg
+
+	A simple 3-frame animation / AJPEG file.
+	Carries the APP0 AJPEG marker and a value 0f 77ms for delay.
+
+
+frames_delay77.ajpeg
+
+	A simple 3-frame animation / AJPEG file.
+	Carries the APP0 AJPEG marker but defines no metadata properties.
+
+
+test0-fuji.jpg
+
+	From Image::Info 1.37, GPL 1
+	JPEG/JFIF with embedded JPEG thumbnail
+

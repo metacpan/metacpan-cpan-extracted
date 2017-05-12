@@ -1,0 +1,19 @@
+* Documentation!
+* Possibly make a filter to allow for some different syntactical magic, say:
+    
+    interface Foo;
+    sub method1;
+    sub method2;
+    sub method3;
+
+  which would map to
+   
+    package Foo;
+    use interface qw/method1 method2 method3/;
+
+  And then do:
+
+    package Bar implements qw/Foo/;
+
+
+

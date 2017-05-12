@@ -1,0 +1,10 @@
+README
+Changes
+Isam.pm
+IsamData.pm
+eg/Person.pm
+eg/Salaire.pm
+Isam.xs
+Makefile.PL
+MANIFEST
+test.pl

@@ -1,0 +1,47 @@
+Revision history for Perl extension Image::TextMode::Reader::ANSI::XS.
+
+0.12 2015-02-05
+ - Force bitwise-and 1 when doing XOR 1
+
+0.11 2013-12-01
+ - Pull blink mode setting from SAUCE if available
+
+0.10 2013-09-09
+ - Use unsigned char to make sure 0xff chars are readable
+
+0.09 2013-06-19
+ - Handle blink mode feature enable/disable codes
+ - Handle attribute codes 2/22/25/7/27
+ - Use filesize option from newer Image::TextMode to avoid reading into SAUCE
+   records
+ - Support RGB ANSI codes
+ - Update prereqs to require a newer version of Image:TextMode
+
+0.08 2011-06-28
+ - Fix issues with the argument stack with respect to call_method()
+
+0.07 2011-05-02
+ - Fix some parsing to more closely match perl code
+ - Implement the 0 and 1 options of the "clear screen" command
+ - Implement the 0 and 1 options of the "clear line" command
+
+0.06 2011-04-27
+ - Reset cursor to (0,0) after a clear screen
+ - Implement ANSI parsing for codes E, F and G
+
+0.05 2011-03-28
+ - Use XSLoader instead of DynaLoader
+ - Use standard width for SAUCE data that reports 0 for the width
+
+0.04 2010-03-19
+ - Fix adding new rows to places other than the very end
+
+0.03 2010-02-23
+ - Fix "set position" command when less than 2 args are used
+
+0.02 2009-10-29
+ - fix width option handling
+
+0.01 2009-02-13
+ - original version
+

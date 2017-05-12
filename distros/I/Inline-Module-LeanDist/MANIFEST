@@ -1,0 +1,9 @@
+Changes
+lib/Inline/Module/LeanDist.pm
+lib/Inline/Module/LeanDist/DistDir.pm
+lib/Inline/Module/LeanDist/MakefilePL.pm
+Makefile.PL
+MANIFEST
+t/loads.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

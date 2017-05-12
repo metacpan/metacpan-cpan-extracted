@@ -1,0 +1,28 @@
+Revision history for Perl extension IPC::Run3::Shell.
+
+0.54	Sat, May 23 2015
+	- Objects that stringify no longer warn when used as arguments.
+	- Using "undef" in the argument list now causes an "uninitialized"
+	  warning instead of the custom warnings category.
+	- Non-numeric values in "allow_exit" now warn in "numeric" category
+	  instead of the custom warnings category.
+	- Various documentation and test updates.
+
+0.52	Thu, Jan  1 2015	commit 7e1ab1fe4fe6fb57c6580682ea54231ad90433ca
+	- added "both" option
+	- added ->import_into("package", ...)
+	- various documentation updates
+	- fixed a few tests in Perl v5.6 and (hopefully) on Windows
+	- note that as of this release, odd numbered versions will be
+	  development versions (normally not released)
+
+0.51	Sun, Aug 24 2014	commit e1eae144ce2a3b0493f9f5b4706861b2afdc68e4
+	- fix a test failure on Darwin
+	- undefs in the argument list are now changed to empty strings
+	  (was causing trouble on Windows with Win32::ShellQuote)
+	- added support for Perls < v5.10
+	- updated documentation, mainly Synopsis
+
+0.50	Sun, Aug 17 2014	commit c3b776d8707b61b1d6095fe05952d9031eb6ae55
+	- first public release
+

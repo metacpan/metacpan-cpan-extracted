@@ -1,0 +1,367 @@
+==================================================
+Changes from 2014-03-05 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 0.17 at 2015-03-05 19:58:47 +0000
+-----------------------------------------
+
+  Change: 6a5295ed155de23baf6d4d7ec06310870a3d6482
+  Author: Daniel Blanchard <dblanchard@ets.org>
+  Date : 2015-03-05 14:58:43 +0000
+
+    Update version to 0.17 
+
+  Change: 85a2fd274cda58c8d45a7e2c1424d0e22d1d8a75
+  Author: Daniel Blanchard <dblanchard@ets.org>
+  Date : 2015-03-05 14:58:14 +0000
+
+    Fix == instead of eq in Bolt.pm 
+
+-----------------------------------------
+version 0.16 at 2015-03-03 19:39:01 +0000
+-----------------------------------------
+
+  Change: 53f1fe26a481b76c363d254dad60facfc5398aa6
+  Author: Daniel Blanchard <dblanchard@ets.org>
+  Date : 2015-03-03 14:39:01 +0000
+
+    Update version in README 
+
+  Change: d1bac6bcac9fa2f8c6eee5ce3eae7f98eb45930e
+  Author: Daniel Blanchard <dblanchard@ets.org>
+  Date : 2015-03-03 14:34:54 +0000
+
+    Fix #1 and add support for multilang heartbeats 
+
+-----------------------------------------
+version 0.15 at 2014-12-15 19:50:03 +0000
+-----------------------------------------
+
+  Change: 6c58d4674f7a92e472a0b1a61f5615ebd06c5dd9
+  Author: Daniel Blanchard <dblanchard@ets.org>
+  Date : 2014-12-15 14:50:03 +0000
+
+    Bump version to 0.15 
+
+  Change: 8fd8fd0e6e28d587ac679f48d52a4e1604065978
+  Author: Daniel Blanchard <dblanchard@ets.org>
+  Date : 2014-12-15 14:49:55 +0000
+
+    Switch to binmode from open pragma. Should fix UTF-8 issues. 
+
+-----------------------------------------
+version 0.14 at 2014-12-12 15:46:56 +0000
+-----------------------------------------
+
+  Change: e53022157e7fc92b2f38e12d3328d8afd804110c
+  Author: Daniel Blanchard <dblanchard@ets.org>
+  Date : 2014-12-12 10:46:56 +0000
+
+    Bump version to 0.14 
+
+  Change: ea61f60ca73b58fa5a2661089c6099993e23241e
+  Author: Daniel Blanchard <dblanchard@ets.org>
+  Date : 2014-12-12 10:45:24 +0000
+
+    IO::Storm now uses UTF-8 encoding for all communication with Storm.
+
+    It should have been this way all along. 
+
+  Change: 2cd2934bd56842635308d57fcbe78a4c46505f55
+  Author: Dan Blanchard <dan.blanchard@gmail.com>
+  Date : 2014-12-04 11:55:53 +0000
+
+    Merge pull request #2 from dapuck/master
+
+    Auto anchor inserts entire tuples instead of just the ids 
+
+  Change: 7d49adace5788faea700f3de6d444b28b16b509d
+  Author: Ian McCall <imccall@where2getit.com>
+  Date : 2014-12-04 09:58:55 +0000
+
+    Merge remote-tracking branch 'upstream/master'
+
+    Merging in travis file from parent repo. 
+
+  Change: e6eff8ee9f73d4e43e2f7b0fdf5fb5c814cbee3d
+  Author: Daniel Blanchard <dblanchard@ets.org>
+  Date : 2014-12-04 10:35:39 +0000
+
+    Add .travis.yml for automated CI 
+
+  Change: 0c994e40bdb28eb528742799339b19589ab03519
+  Author: Ian McCall <imccall@where2getit.com>
+  Date : 2014-12-03 16:02:51 +0000
+
+    Fixed use of tab instead of spaces. 
+
+  Change: 1cda57e8ae4472e7318cbd1b8a794dac57d78d3f
+  Author: Ian McCall <imccall@where2getit.com>
+  Date : 2014-12-03 15:49:22 +0000
+
+    Fixes auto anchoring. Refactor emit.
+
+    When using auto_anchor the entire tuple gets added to the anchor
+    array instead of just the id. This change fixes that, and makes it so
+    that the anchors arg will override auto_anchor. Also refactored the
+    code to reflect that args will be defined, even if the user doesn't
+    supply it. 
+
+  Change: 2d5fe541d99d98e87d2b8e2f8442ba5d416bfa06
+  Author: Daniel Blanchard <dblanchard@ets.org>
+  Date : 2014-08-12 22:27:27 +0000
+
+    Merge branch 'master' of github.com:dan-blanchard/io-storm 
+
+  Change: c06fb9790ff218bc950122719c710ea49df653a7
+  Author: Dan Blanchard <dan.blanchard@gmail.com>
+  Date : 2014-08-12 13:51:08 +0000
+
+    Fix typo in README from running markdown2pod 
+
+-----------------------------------------
+version 0.13 at 2014-08-13 02:23:24 +0000
+-----------------------------------------
+
+  Change: c5964b0ba703ed5c0a6f1e9909b2ade2b03884d3
+  Author: Daniel Blanchard <dblanchard@ets.org>
+  Date : 2014-08-12 22:23:24 +0000
+
+    Update README 
+
+  Change: ad60c74e7237c36dddd2b43c1d37c03a399d449a
+  Author: Daniel Blanchard <dblanchard@ets.org>
+  Date : 2014-08-12 22:22:47 +0000
+
+    Fix yet another issue caused by operations on array refs being marked
+    experimental in 5.20 
+
+  Change: 823147757180927f18f607ce463cc6210d4788e8
+  Author: Daniel Blanchard <dblanchard@ets.org>
+  Date : 2014-08-12 10:46:53 +0000
+
+    Fix a typo in POD for Storm.pm. 
+
+-----------------------------------------
+version 0.12 at 2014-08-12 14:41:38 +0000
+-----------------------------------------
+
+  Change: 1c5150f46c5abd0a4f0325165d3d611c6f3b2484
+  Author: Daniel Blanchard <dblanchard@ets.org>
+  Date : 2014-08-12 10:41:38 +0000
+
+    Add .build to .gitignore 
+
+  Change: 6babb9d271a32309271d82908320dd7fae9f1155
+  Author: Daniel Blanchard <dblanchard@ets.org>
+  Date : 2014-08-12 10:40:52 +0000
+
+    Change minimum Perl version back to 5.10 and fix compatibility. 
+
+-----------------------------------------
+version 0.11 at 2014-08-11 15:49:50 +0000
+-----------------------------------------
+
+  Change: 47bcb5993015c74e316cb045c55380f5770611f0
+  Author: Daniel Blanchard <dblanchard@ets.org>
+  Date : 2014-08-11 11:49:50 +0000
+
+    Bump required Perl version up to 5.14 
+
+-----------------------------------------
+version 0.10 at 2014-08-11 14:34:10 +0000
+-----------------------------------------
+
+  Change: 1432cd7bae328b9c6bbc5096ee505969e05643b7
+  Author: Daniel Blanchard <dblanchard@ets.org>
+  Date : 2014-08-11 10:34:10 +0000
+
+    Make explicit Component package and add POD documentation to Storm.pm 
+
+  Change: 2d24e984ee857024a3de616923fddba13fc4e563
+  Author: Dan Blanchard <dan.blanchard@gmail.com>
+  Date : 2014-08-09 07:56:53 +0000
+
+    Update dist.ini
+
+    Added autoprereqs and GitHub-specific plugins for managing README and
+    issues. 
+
+-----------------------------------------
+version 0.09 at 2014-08-09 03:19:54 +0000
+-----------------------------------------
+
+  Change: 4b21e54221621d66b83531d187c1960042fed227
+  Author: Daniel Blanchard <dblanchard@ets.org>
+  Date : 2014-08-08 23:19:54 +0000
+
+    v0.09 
+
+-----------------------------------------
+version 0.08 at 2014-08-09 03:15:33 +0000
+-----------------------------------------
+
+  Change: 9cfc8530f3864455a9e66e155d46da69b15988a6
+  Author: Daniel Blanchard <dblanchard@ets.org>
+  Date : 2014-08-08 23:15:33 +0000
+
+    Remove version numbers from Bolt.pm, Spout.pm, and Tuple.pm 
+
+-----------------------------------------
+version 0.07 at 2014-08-09 03:09:45 +0000
+-----------------------------------------
+
+  Change: 5d83b0fb597139e4768efbc6d12e766bd932948a
+  Author: Daniel Blanchard <dblanchard@ets.org>
+  Date : 2014-08-08 23:09:45 +0000
+
+    Tweak a bunch of Dist::Zilla settings. 
+
+  Change: ebc79f18c1ec263b59b2d3910fbedbd23d884c6e
+  Author: Daniel Blanchard <dblanchard@ets.org>
+  Date : 2014-08-08 09:16:51 +0000
+
+    Update version in README.md 
+
+  Change: d77282551aa69aed834baa9fee78ed59776d90f4
+  Author: Daniel Blanchard <dblanchard@ets.org>
+  Date : 2014-08-08 09:14:53 +0000
+
+    Remove Git::Check from dist.ini, because it confused dzil release 
+
+  Change: 6391c1a8fec7be5cc5101df4e65cb2d6b6e23f2f
+  Author: Daniel Blanchard <dblanchard@ets.org>
+  Date : 2014-07-30 09:05:46 +0000
+
+    Bump version to 0.06 
+
+-----------------------------------------
+version 0.06 at 2014-07-30 13:02:12 +0000
+-----------------------------------------
+
+  Change: 18463c3d7c5c47e12731c7948b71acecf5cd539d
+  Author: Daniel Blanchard <dblanchard@ets.org>
+  Date : 2014-07-30 09:02:12 +0000
+
+    Fix bolt emit anchoring, and add corresponding test. 
+
+-----------------------------------------
+version 0.05 at 2014-07-29 03:50:42 +0000
+-----------------------------------------
+
+  Change: b7f16c35a0ef8f352f3cd197f4f458f081854cb7
+  Author: Daniel Blanchard <dblanchard@ets.org>
+  Date : 2014-07-28 23:50:42 +0000
+
+    Bump version in dist.ini 
+
+  Change: 65ec6fdb64f5f42afe0b1901e7f2111bb02a185f
+  Author: Daniel Blanchard <dblanchard@ets.org>
+  Date : 2014-07-28 23:48:31 +0000
+
+    Fix a couple crashes in Bolt.pm related to 'ro' instead of 'rw'.
+
+    Also made _setup_component more resilient to weird values for
+    $storm_conf. 
+
+  Change: 7194a7359dc6d82992353cc2b420a34a7b6c3920
+  Author: Daniel Blanchard <dblanchard@ets.org>
+  Date : 2014-07-28 22:33:49 +0000
+
+    Add a lot of little fixes from Streamparse fix/major branch. 
+
+-----------------------------------------
+version 0.04 at 2014-07-25 19:35:10 +0000
+-----------------------------------------
+
+  Change: 3fb68f1b2cbfe2d4f75afa0e776f5d813636aec9
+  Author: Daniel Blanchard <dblanchard@ets.org>
+  Date : 2014-07-25 15:35:10 +0000
+
+    Fix test for PID sending and remove int() conversion for tuple IDs. 
+
+  Change: de6861081539e231902a50845fa4e32645914e57
+  Author: Daniel Blanchard <dblanchard@ets.org>
+  Date : 2014-07-25 15:26:03 +0000
+
+    Ensure PID and tuple ID are sent as ints 
+
+-----------------------------------------
+version 0.03 at 2014-07-25 18:32:15 +0000
+-----------------------------------------
+
+  Change: ecb03456b2eea09a79d4cfeddfbde493c5dc6e34
+  Author: Daniel Blanchard <dblanchard@ets.org>
+  Date : 2014-07-25 14:32:15 +0000
+
+    More tweaks to dist.ini 
+
+  Change: e82802e0de707a1432eea16713d5ba302ab043c8
+  Author: Daniel Blanchard <dblanchard@ets.org>
+  Date : 2014-07-25 14:15:32 +0000
+
+    Make dist.ini more standard 
+
+  Change: b173c37b763c6d8599345b37186edef55fe3642d
+  Author: Daniel Blanchard <dblanchard@ets.org>
+  Date : 2014-07-25 11:03:11 +0000
+
+    Can now modify JSON parser used by Storm.pm. Unit tests now pass. 
+
+  Change: e03c7cc928b85abe3271cb86cb08d48c6c62c0cd
+  Author: Daniel Blanchard <dblanchard@ets.org>
+  Date : 2014-07-25 10:50:11 +0000
+
+    Update changelog 
+
+  Change: f72007d732ad19e8673b61d845e0ca4a82ec7c7e
+  Author: Daniel Blanchard <dblanchard@ets.org>
+  Date : 2014-07-25 10:48:24 +0000
+
+    README fixes 
+
+  Change: ec9f7885ba309a1701fd4f8295f059f4f801d144
+  Author: Daniel Blanchard <dblanchard@ets.org>
+  Date : 2014-07-25 10:44:24 +0000
+
+    More README tweaks 
+
+  Change: 8a86c590951125f06bf0d23b3744e67a66eeaca1
+  Author: Daniel Blanchard <dblanchard@ets.org>
+  Date : 2014-07-25 10:42:40 +0000
+
+    Update README and dist.ini 
+
+  Change: 2ee099c27a2465896ea3de40c69ef2bd8e364d19
+  Author: Daniel Blanchard <dblanchard@ets.org>
+  Date : 2014-07-25 10:04:07 +0000
+
+    Fix handling of optional hashref args to emit methods.
+
+    Also fixed issue where Tuple class did not have TO_JSON method.
+
+    Unit tests just need to be tweaked so that JSON is sorted by key,
+    because currently tests will randomly fail due to ordering issues. 
+
+  Change: 128eaffe0e543e2ecc14148a7602804a6b47063b
+  Author: Daniel Blanchard <dblanchard@ets.org>
+  Date : 2014-07-24 23:04:57 +0000
+
+    Documentation clean up and the start of fixing the unit tests. 
+
+  Change: 7f6967ae3dd7ff33138c6a22b11c07ecf77fbbb9
+  Author: Daniel Blanchard <dblanchard@ets.org>
+  Date : 2014-07-24 23:00:29 +0000
+
+    Remove methods that are no longer necessary from Storm.pm 
+
+  Change: 7f26797a3598ca2460f0091c8e8b85345a851d58
+  Author: Daniel Blanchard <dblanchard@ets.org>
+  Date : 2014-07-24 22:58:12 +0000
+
+    Ported Bolt/BasicBolt and Spout over from Python Streamparse. 
+
+===============================================
+Plus 1 release after 2014-03-05 00:00:00 +0000.
+===============================================

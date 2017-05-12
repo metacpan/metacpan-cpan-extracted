@@ -1,0 +1,28 @@
+---
+abstract: 'Manipulate an IRC "spanning tree"'
+author:
+  - 'Jon Portnoy <avenj@cobaltirc.org>'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: IRC-Server-Tree
+recommends:
+  Eval::WithLexicals: '0'
+  Term::Readline: '0'
+requires:
+  Carp: '0'
+  Data::Dumper: '0'
+  Scalar::Util: '0'
+  Storable: '0'
+  perl: v5.10.1
+  strictures: '1'
+resources:
+  repository: git://github.com/avenj/irc-server-tree.git
+version: '0.061001'

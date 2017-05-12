@@ -1,0 +1,9 @@
+Revision history for Imager-Filter-Sepia
+
+0.0.2  Mon Nov  6 17:03:01 2006
+       - Removed few tests
+       - No required version.pm
+
+0.0.1  Thu Nov  2 02:03:01 2006
+       Initial release.
+

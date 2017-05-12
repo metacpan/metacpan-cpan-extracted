@@ -1,0 +1,30 @@
+IO-Tty-Util version 0.01
+=========================
+
+IO-Tty-Util provides basic Perl bindings to the openpty and login_tty functions
+found in libutil.so and provides a Perl implementation of the forkpty function.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+ - libutil.so
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006-2007 by Patrick LeBoutillier
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.5 or,
+at your option, any later version of Perl 5 you may have available.
+
+

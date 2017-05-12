@@ -1,0 +1,26 @@
+ChangeLog
+lib/IMDB/BaseClass.pm
+lib/IMDB/Film.pm
+lib/IMDB/Persons.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+README
+t/01_base.t
+t/m1_get_movie_by_code.t
+t/m2_get_movie_by_title.t
+t/m3_get_movie_by_wrong_title.t
+t/m4_get_movie_by_title_single_match.t
+t/m5_get_movie_by_title_without_rate.t
+t/m6_get_movie_by_title_with_cr_casts.t
+t/m7_get_movie_by_info_offline.t
+t/p1_get_person_by_name.t
+t/p2_get_person_by_code.t
+t/p3_get_person_by_wrong_name.t
+t/p4_get_person_info_offline.t
+t/test.html
+t/test_p.html
+Todo
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,26 @@
+---
+abstract: lib/IO/Stty.pm
+author:
+  - 'Austin Schutz <auschutz@cpan.org> (Initial version and maintenance)'
+  - 'Todd Rinaldo <toddr@cpan.org> (Maintenance)'
+build_requires:
+  Module::Build: 0.35
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: IO-Stty
+provides:
+  IO::Stty:
+    file: lib/IO/Stty.pm
+    version: 0.03
+resources:
+  MailingList: mailto:toddr@cpan.org
+  homepage: http://github.com/toddr/IO-Stty
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/toddr/IO-Stty.git
+version: 0.03

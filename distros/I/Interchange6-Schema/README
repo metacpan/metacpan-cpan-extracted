@@ -1,0 +1,102 @@
+NAME
+
+    Interchange6::Schema - Database Schema for Interchange 6
+
+VERSION
+
+    0.133
+
+MANUAL
+
+    Please see the Interchange6 Schema Manual for an overview of available
+    documentation.
+
+DESCRIPTION
+
+    Database schema classes for Interchange6 Open Source eCommerce
+    software.
+
+    The minimum Perl version for Interchange6::Schema is 5.8.
+
+BASE CLASS
+
+    DBIx::Class::Schema::Config
+
+    If you inherit from Interchange6::Schema then in order to make use of
+    DBIx::Class::Schema::Config in your own schema you must load it as a
+    component.
+
+COMPONENTS
+
+    Components used:
+
+      * DBIx::Class::Helper::Schema::DateTime
+
+      * DBIx::Class::Helper::Schema::QuoteNames
+
+ATTRIBUTES
+
+ current_user
+
+    This attribute can be used to stash the
+    Interchange6::Schema::Result::User object of the currently logged in
+    user. If set then any result class and resultset methods which take
+    users_id as an argument will make use of the value of this attribute to
+    set users_id.
+
+    writer: set_current_user
+
+ user_locale
+
+    This attribute can be used to store the locale of the current user.
+
+    writer: set_user_locale
+
+METHODS
+
+ deploy
+
+    Overload "deploy" in DBIx::Class::Schema in order to add some core
+    fixtures via Interchange6::Schema::Populate.
+
+CREATE SQL FILES FOR DATABASE SCHEMA
+
+    This command creates SQL files for our database schema in the sql/
+    directory:
+
+       interchange6-create-database
+
+POLICY FOR RELATIONSHIP ACCESSORS
+
+    All lower case
+
+    Singular names for belongs_to and has_one relationships
+
+    Pluralised names for many_to_many and has_many relationships
+
+    Use underscores for things like shipment_destinations.
+
+AUTHORS
+
+    Stefan Hornburg (Racke), racke@linuxia.de
+
+    Peter Mottram, peter@sysnix.com
+
+    Jeff Boes, jeff@endpoint.com
+
+    Sam Batschelet sbatschelet@mac.com
+
+CONTRIBUTORS
+
+    Kaare Rasmussen Šimun Kodžoman Grega Pompe
+
+LICENSE AND COPYRIGHT
+
+    Copyright 2013-2014 Stefan Hornburg (Racke), Jeff Boes.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

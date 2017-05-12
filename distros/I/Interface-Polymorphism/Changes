@@ -1,0 +1,10 @@
+2000-10-06  Piers Cawley  <pdcawley@bofh.org.uk>
+
+	* lib/ex/interface.pm: Changed interface and implements to
+	ex::interface and ex::implements to denote their EXperimental
+	nature. 
+	
+	* test.pl: Actually added some testing code. Currently *very*
+	simpleminded but it's better than nothing.
+	
+

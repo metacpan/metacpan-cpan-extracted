@@ -1,0 +1,77 @@
+{
+   "abstract" : "Write Perl subroutines and classes in C++.",
+   "author" : [
+      "David Oswald <davido@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Inline-CPP",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Config" : "0",
+            "English" : "0",
+            "File::Temp" : "0",
+            "Test::More" : "1.001009"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Config" : "0",
+            "ExtUtils::CppGuess" : "0.11",
+            "ExtUtils::MakeMaker" : "7.04",
+            "FindBin" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Inline" : "0.78",
+            "Inline::C" : "0.67",
+            "Parse::RecDescent" : "0",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "provides" : {
+      "Inline::CPP" : {
+         "file" : "lib/Inline/CPP.pm",
+         "version" : "0.74"
+      },
+      "Inline::CPP::Config" : {
+         "file" : "lib/Inline/CPP/Config.pm",
+         "version" : "0.74"
+      },
+      "Inline::CPP::Parser::RecDescent" : {
+         "file" : "lib/Inline/CPP/Parser/RecDescent.pm",
+         "version" : "0.74"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://github.com/daoswald/Inline-CPP",
+      "license" : [
+         "http://dev.perl.org/licenses/artistic.html"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "http://github.com/daoswald/Inline-CPP.git",
+         "web" : "http://github.com/daoswald/Inline-CPP"
+      }
+   },
+   "version" : "0.74"
+}

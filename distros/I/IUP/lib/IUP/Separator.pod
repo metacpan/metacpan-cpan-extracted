@@ -1,0 +1,57 @@
+=for comment based on iup-3.5 - http://www.tecgraf.puc-rio.br/iup/en/elem/iupseparator.html
+
+=head1 NAME
+
+IUP::Separator - [GUI element] shows a line between two menu items
+
+=head1 DESCRIPTION
+
+Creates the separator interface element. It shows a line between two
+menu items.
+
+=head1 USAGE
+
+=head2 CREATION - new() method
+
+ $separator = IUP::Separator->new();
+
+B<Returns:> the identifier of the created element, or C<undef> if an error occurs.
+
+NOTE: You can pass to C<new()> other C<ATTRIBUTE=E<gt>'value'> or C<CALLBACKNAME=E<gt>\&func> pairs relevant
+to this element - see L<IUP::Manual::02_Elements|IUP::Manual::02_Elements/"new()">.
+
+=head1 NOTES
+
+The separator is ignored when it is part of the definition of the items in a bar menu.
+
+=head1 EXAMPLES
+
+
+The element B<IUP::Separator> is used in the following sample scripts:
+
+=over
+
+=item * L<0-basic/layoutdialog.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/layoutdialog.pl> - IUP::LayoutDialog example
+
+=item * L<0-basic/separator.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/separator.pl> - IUP::Separator example
+
+=item * L<0-basic/submenu.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/submenu.pl> - IUP::Submenu example
+
+=item * L<1-apps/app-mdi.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/1-apps/app-mdi.pl> - IUP app example
+
+=item * L<1-apps/app-sample1.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/1-apps/app-sample1.pl> - example used for screenshot - IUP.pod
+
+=item * L<1-apps/app-sample2.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/1-apps/app-sample2.pl> - example based on the original sample.c
+
+=back 
+
+
+
+=head1 SEE ALSO
+
+L<IUP::Item|IUP::Item>, L<IUP::Submenu|IUP::Submenu>, L<IUP::Menu|IUP::Menu>
+
+The original doc: L<iupseparator.html|http://www.tecgraf.puc-rio.br/iup/en/elem/iupseparator.html>
+ 
+
+=cut

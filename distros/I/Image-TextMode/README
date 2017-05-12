@@ -1,0 +1,53 @@
+NAME
+    Image::TextMode - Create, manipulate and save text mode images
+
+SYNOPSIS
+        # load and rasterize an ANSI
+        use Image::TextMode::Format::ANSI;
+        use Image::TextMode::Renderer::GD;
+    
+        my $ansi = Image::TextMode::Format::ANSI->new;
+        $ansi->read( $file );
+    
+        my $renderer = Image::TextMode::Renderer::GD->new;
+        print $renderer->fullscale( $ansi );
+
+DESCRIPTION
+    This set of modules provides the basic structure to represent a text
+    mode image such as an ANSI file.
+
+TODO
+    *   better documentation
+
+    *   flesh out and optimize write() methods
+
+    *   better guessing techniques in the loader
+
+SEE ALSO
+    *   Image::TextMode::Format::ADF
+
+    *   Image::TextMode::Format::ANSI
+
+    *   Image::TextMode::Format::ANSIMation
+
+    *   Image::TextMode::Format::AVATAR
+
+    *   Image::TextMode::Format::Bin
+
+    *   Image::TextMode::Format::IDF
+
+    *   Image::TextMode::Format::PCBoard
+
+    *   Image::TextMode::Format::Tundra
+
+    *   Image::TextMode::Format::XBin
+
+AUTHOR
+    Brian Cassidy <bricas@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright 2008-2015 by Brian Cassidy
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

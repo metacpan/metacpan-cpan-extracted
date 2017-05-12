@@ -1,0 +1,9 @@
+Revision history for IO-Async-Loop-EV
+
+0.02    CHANGES:
+         * Implement IO::Async 0.49 Loop API:
+           + ->watch_time / ->unwatch_time
+         * Declare that subsecond timing won't work for unit-test purposes
+
+0.01    First version, released on an unsuspecting world.
+

@@ -1,0 +1,608 @@
+=head1 NAME
+
+Inline::SLang::Types - Support for S-Lang types in Perl
+
+=head1 SYNOPSIS
+
+  use Inline SLang => Config => BIND_SLFUNCS => [ "vmessage" ];
+  use Inline SLang;
+  use Math::Complex;
+
+  # the S-Lang Complex_Type variable is automatically converted
+  # to a Math::Complex object in Perl.
+  #
+  my $val = makecplx();
+  print "Perl has been sent $val\n";
+
+  # the multiplication is done using Math::Complex objects and
+  # the result then converted to a S-Lang Complex_Type variable,
+  # since vmessage is a S-Lang function [the %S means convert
+  # the variable to its string representation].
+  #
+  vmessage( "S-Lang has been sent %S", $val * cplx(0,1) );
+
+  my $type = typecplx($val);
+  print "And the S-Lang datatype is $type\n";
+  print "        Perl object        " .  $type->typeof . "\n";
+
+  __END__
+  __SLang__
+
+  define makecplx() { return 3 + 4i; }
+  define typecplx(cval) { return typeof(cval); }
+
+The output of this code - which can be found in the source-code
+distribution as F<examples/types.pl> - is:
+
+  Perl has been sent 3+4i
+  S-Lang has been sent (-4 + 3i)
+  And the S-Lang datatype is Complex_Type
+          Perl object        DataType_Type
+
+=head1 DESCRIPTION
+
+The aim of the type-handling in C<Inline::SLang>
+is to allow a user to program "naturally" in Perl
+and S-Lang - i.e. to take advantage of the strengths
+of each language - 
+and so native data types are used wherever
+possible.
+However, Perl objects (classes defined in this
+module) are used when necessary
+- for some I<poorly defined> definition of necessary - to preserve type
+information.
+
+As an example, consider swapping a complex
+number between S-Lang and Perl. In S-Lang it would be represented
+as a C<Complex_Type> and in Perl we choose to use a
+C<Math::Complex> object. Something simple - such as
+an array reference containing two elements - could have
+been used, but then we would not be able to convert it
+back into a C<Complex_Type> variable in S-Lang (well, not
+without telling the computer this is what we wanted).
+
+Version 0.20 of the module added support for the
+L<the Perl Data Language (ie PDL)|PDL::Intro>.
+
+=head2 Supported S-Lang Data Types
+
+The following S-Lang types may be returned from a S-Lang function to
+Perl. Note that the list does I<not> include all 
+synonyms for a type, although they are recognised; 
+for instance the C<Int_Type> is accepted but converted to
+C<Integer_Type>.
+
+See L<the "DATATYPE CLASSES" section below|/"DATATYPE CLASSES">
+for further details.
+
+=over 4
+
+=item *
+
+NULL
+
+Converted to a Perl undef.
+
+=item *
+
+[Char|UChar|Short|UShort|Integer|UInteger|Long|ULong]_Type
+
+Converted to a Perl integer. The unsigned types are
+converted as unsigned values, whatever difference that
+may make.
+
+=item *
+
+[Float|Double]_Type
+
+Converted to a Perl floating-point number.
+
+=item *
+
+Complex_Type
+
+Converted to a Perl C<Math::Complex> object.
+
+=item *
+
+String_Type
+
+Converted to a perl string.
+
+=item *
+
+Array_Type
+
+Converted to one of: a Perl array reference,
+a Perl C<Array_Type> object, or a I<piddle>.
+
+=item *
+
+Assoc_Type
+
+Converted to a Perl C<Assoc_Type> object.
+
+=item *
+
+Struct_Type and "named" structures
+
+Struct_Type variables are converted to a
+Perl C<Struct_Type> object, whilst "named" structures
+are converted to objects with the same name
+as the S-Lang struct name.
+
+=item *
+
+DataType_Type
+
+Converted to a Perl C<DataType_Type> object.
+
+=item *
+
+Other S-Lang types are converted to a Perl class
+that matches the name of the S-Lang datatype. They are then
+treated in Perl as I<opaque> objects, in that
+you can pass them back to S-Lang and let it
+access their contents but you can not do anything
+else with them in Perl.
+
+=back
+
+=head2 Supported Perl Data Types
+
+The following data types may be passed from Perl into S-Lang. Any
+other type results in the Perl interpreter issuing a C<croak>;
+we could create an I<opaque> datatype to store such values
+- much as we do when we come across a S-Lang datatype that we
+don't recognise - but this would only be useful if we also
+allow Perl to be embedded into S-Lang.
+
+See L<the "DATATYPE CLASSES" section below|/"DATATYPE CLASSES">
+for further details.
+
+=over 4
+
+=item *
+
+undef
+
+Converted to C<NULL> (i.e. S-Lang's C<Null_Type> datatype).
+
+=item *
+
+Integer
+
+Converted to S-Lang's C<Integer_Type>.
+
+=item *
+
+Floating Point
+
+Converted to S-Lang's C<Double_Type>.
+
+=item *
+
+C<Math::Complex>
+
+Converted to S-Lang's C<Complex_Type>.
+
+=item *
+
+String
+
+Converted to S-Lang's C<String_Type>.
+
+=item *
+
+Array reference
+
+Converted to a S-Lang array with (hopefully)
+the correct datatype and dimensionality.
+
+=item *
+
+Perl C<Array_Type> object
+
+Converted to a S-Lang array with datatype
+and dimensionality matching that of the Perl
+object.
+
+=item *
+
+Piddles
+
+Will be be converted to a S-Lang array with datatype
+and dimensionality matching that of the Perl
+object.
+
+=item *
+
+Hash reference
+
+Converted to S-Lang's C<Assoc_Type [Any_Type]>.
+
+=item *
+
+Perl C<Assoc_Type> object.
+
+Converted to S-Lang's C<Assoc_Type> with
+the datatype of the array being determined by the
+contents of the object.
+
+=item *
+
+Perl C<Struct_Type> and derived objects.
+
+Converted to the matching S-Lang type
+(C<Struct_Type> or the "named" struct).
+
+=item *
+
+Perl C<DataType_Type> object.
+
+Converted to S-Lang's C<DataType_Type>.
+
+=item *
+
+"Opaque" objects
+
+S-Lang data types that are handled as so-called "opaque"
+variables are converted back into the correct S-Lang
+variable type.
+
+=back
+
+=head1 DATATYPE CLASSES
+
+Objects are used to represent those S-Lang data types for 
+which there is no corresponding Perl data type:
+for complex numbers we use the L<Math::Complex|Math::Complex> 
+module which is distributed with Perl;
+arrays can be handled in a variety of ways - as a perl array
+reference, an C<Array_Type> object, or a piddle
+(see the documentation for the L<Perl Data Language|PDL::Intro>);
+and for other types we use a class specific to
+C<Inline::SLang>.
+
+=over 2
+
+=item * 
+
+Complex numbers
+
+Complex numbers are represented as C<Complex_Type> in 
+S-Lang and as a
+L<Math::Complex|Math::Complex> object in Perl. See the
+L<Math::Complex|Math::Complex> documentation for
+information on how to use this class.
+
+=item *
+
+Struct_Type and "named" structs
+
+S-Lang structures - variables with a type of C<Struct_Type> -
+are represented using
+C<Struct_Type> objects in Perl.
+Named structs - ie those created via a C<typedef struct {} XXX> call -
+are represented using 
+C<XXX> objects in Perl; these objects are
+sub-classes of the C<Struct_Type> class.
+The objects behave similarly to a hash reference, except that
+you can not add or delete keys, the order of
+the keys is fixed to match that of the structure,
+and there are a number
+of method calls that match the S-Lang language.
+
+See L<Inline::SLang::Struct> for
+more information.
+
+=item *
+
+Associative arrays
+
+S-Lang associative arrays (C<Assoc_Type>) are represented
+in Perl as C<Assoc_Type> objects. These objects behave just
+as hash references do but have additional methods to
+match the S-Lang language.
+
+See L<Inline::SLang::Assoc> for
+more information.
+
+=item *
+
+Arrays
+
+Support for S-Lang arrays (C<Array_Type>) comes in three "flavours":
+
+=over 2
+
+=item 1
+
+As a Perl array reference.
+
+=item 2
+
+As a piddle (if you are using the L<Perl Data Language|PDL::Intro>).
+
+=item 3
+
+As a Perl C<Array_Type> object.
+
+It is expected that this object will I<rarely> be used,
+at least directly.
+
+=back
+
+See L<Inline::SLang::Array> for
+more information.
+
+=item *
+
+S-Lang data type.
+
+S-Lang C<Datatype_Type> values are represented using
+Perl C<DataType_Type> objects, which are described
+below.
+
+=item *
+
+Other types.
+
+A number of S-Lang types do not map to an obvious Perl
+type. For these types, Inline::SLang creates
+an object of class C<< <type> >>,
+where C<< <type> >> is the name of the S-lang datatype
+(i.e. the output of S-Lang's C<typeof> function).
+Examples are the C<Ref_Type> and C<Any_Type> S-Lang variable types.
+
+The objects are treated as "opaque" containers; you can store
+them and send them back to S-Lang but there's essentially
+nothing else you can do with them directly in Perl.
+
+This currently I<includes> the
+filehandle types C<File_Ptr_Type> and
+C<File_FD_Type> since it looks like the Perl I/O
+system is quite scary "under the hood" in v 5.8.0!
+
+=back
+
+=head1 PERL OBJECTS
+
+Each class provides a number of methods.
+These methods are not exported into the calling packages
+namespace, so they can I<only> be accessed using the
+"object-oriented" form, i.e.
+
+  $obj->foo()
+
+Note that the C<new()> method is not defined for
+some classes, which means you can only create them
+by calling a S-Lang function.
+
+=head2 Common methods
+
+All classes provide the following methods:
+
+=over 2
+
+=item *
+
+typeof()
+
+Returns a C<DataType_Type> object which contains the
+the S-Lang datatype of the object. This object will
+return the name of the datatype when converted to a string.
+
+=item *
+
+stringify()
+
+The "print" method for the objects has been 
+over-loaded to use the C<stringify()> method:
+for most - probably all - types it will return the
+datatype name.
+
+=item *
+
+is_struct_type()
+
+Returns a 1 if the object represents a S-Lang structure
+- including "named" structures created via a C<typedef> - and
+0 otherwise.
+
+=back
+
+=head2 Array_Type Objects
+
+See L<Inline::SLang::Array|Inline::SLang::Array>.
+
+=head2 Assoc_Type Objects
+
+See L<Inline::SLang::Assoc|Inline::SLang::Assoc>.
+
+=head2 Struct_Type Objects
+
+See L<Inline::SLang::Struct|Inline::SLang::Struct>.
+
+=head2 DataType_Type Objects
+
+Although you can use the C<new()> constructor described
+below to create a C<DataType_Type> variable, it is
+easier just to call the given type as a function.
+If you have specified C<!types> as a value in
+the C<EXPORT> configuration option (see
+L<Inline::SLang::Config> for more details) then
+you can just say:
+
+  my $var = Integer_Type();
+
+otherwise you have to include the package name, as in
+the following
+
+  my $var = Inline::SLang::Integer_Type();
+
+Note that even though the functions take no arguments
+you have to supply the C<()> in order for Perl to
+recognise it as a function.
+The return value (C<$var> here) can be used just
+as the output of C<< DataType_Type->new() >> can.
+
+It is possible to use the names of type "synonyms" - such
+as C<Int_Type()> and C<Float32_Type()> - although the
+value they return is of the I<base> type and not the
+synonym.
+
+The class-specific methods are:
+
+=over 2
+
+=item new()
+
+  $dtype = DataType_Type->new([$type]);
+
+The C<new()> method accepts a string (C<$type>) 
+containing the name of the S-Lang datatype (e.g.
+"UChar_Type"). If no variable is supplied then
+"DataType_Type" is assumed.
+Synonyms of types (eg 'Int_Type' and 'Float32_Type')
+are accepted but automatically converted to
+the I<base> type name.
+If you supply a name that does I<not>
+map to a S-Lang datatype then the return value is
+C<undef>.
+
+In general you should probably be using the functional
+form described abode - i.e. use C<Integer_Type()> - but
+this constructor can be useful when the data type is
+not known ahead of time.
+
+=item stringify()
+
+The name of the datatype represented by the
+object is returned.
+
+For instance
+
+  $type = DataType_Type->new("Any_Type");
+  print("And the type is '$type'\n");
+
+outputs
+
+  And the type is 'Any_Type'.
+
+=back
+
+The equality and inequality operators - namely
+C<==>, C<eq>, C<ne>, and C<!=> - have been over-ridden to
+work for variables containing C<DataType_Type> objects.
+So you can say:
+
+  my $val = some_function_call();
+  print "Got a S-Lang array\n" if
+    $val->typeof == Array_Type(); 
+
+To see a list of all the possible datatypes
+recognised by a particular program use the
+C<INFO> option provided by L<the Inline module|Inline>,
+as described in the
+L<"What functions and namespaces have been bound to Perl?"|Inline::SLang::Config/"What functions and namespaces have been bound to Perl?">
+section of Inline::SLang::Config.
+
+=head2 Other objects - aka "opaque" variables
+
+These objects are used to store S-Lang data types
+for which there is no obvious - or perhaps easy - 
+way to represent in Perl. Examples are the
+C<Ref_Type> and C<Any_Type> S-Lang variable types.
+
+The Perl objects can I<only> be created from S-Lang
+(i.e. there are no C<new()> methods).
+In fact, there is little that you can do with these
+objects in Perl; if you want to access/change the
+value referred to then you need to pass the object
+back to S-Lang.
+
+There are I<no> class-specific methods. This means that
+there is no way of creating one of these objects
+except from S-Lang (i.e. there is no object
+constructor in Perl).
+
+An example using S-Lang references - available
+as F<examples/use_refs.pl> in the source code - is:
+
+  use Inline 'SLang';
+
+  my $ref = getfoo();
+  print "\$ref is a " . ref($ref) . " object\n";
+  print "And when printed as a string = $ref\n";
+  printfoo($ref);
+  changefoo($ref,"no it isn't");
+  printfoo($ref);
+
+  __END__
+  __SLang__
+
+  variable foo = "this is a string";
+  define getfoo() { return &foo; }
+  define printfoo(x) { () = printf("foo = [%s]\n", @x ); }
+  define changefoo(x,y) { @x = y; }
+
+The output of this script is:
+
+  $ref is a Ref_Type object
+  And when printed as a string = Ref_Type
+  foo = [this is a string]
+  foo = [no it isn't]
+
+Note that to change the value pointed to by the reference
+we had to send the variable back to S-Lang and do the
+processing there.
+
+For C<Any_Type> variables (this is also available
+as F<examples/use_anytype.pl>):
+
+  use Inline 'SLang';
+
+  my $a0 = getfoo(0);
+  my $a1 = getfoo(1);
+  my $a2 = getfoo(2);
+  print "\nIn Perl:\n";
+  printf "typeof(foo[0]) = %s\n", $a0->typeof;
+  printf "typeof(foo[1]) = %s\n", $a1->typeof;
+  printf "typeof(foo[2]) = %s\n",
+    defined($a2) ? $a2->typeof : "undef";
+
+  __END__
+  __SLang__
+
+  variable foo = Any_Type [3];
+  foo[0] = "a string";
+  foo[1] = 23;
+
+  define getfoo(x) { return foo[x]; }
+  message( "In S-Lang:" );
+  vmessage( "typeof(foo[0]) = %s", string(typeof(foo[0])) );
+  vmessage( "typeof(foo[1]) = %s", string(typeof(foo[1])) );
+  vmessage( "typeof(foo[2]) = %s", string(typeof(foo[2])) );
+
+The output of this script is:
+
+  In S-Lang:
+  typeof(foo[0]) = Any_Type
+  typeof(foo[1]) = Any_Type
+  typeof(foo[2]) = Null_Type
+
+  In Perl:
+  typeof(foo[0]) = Any_Type
+  typeof(foo[1]) = Any_Type
+  typeof(foo[2]) = undef
+
+Note that the C<Null_Type> value (in S-Lang) has been converted
+into a Perl C<undef> value.
+
+=head1 SEE ALSO
+
+L<Inline::SLang::Array>, L<Inline::SLang::Assoc>, L<Inline::SLang::Struct>,
+L<Inline::SLang>, L<Math::Complex>, L<PDL>, L<PDL::Intro>
+
+

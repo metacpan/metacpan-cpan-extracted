@@ -1,0 +1,31 @@
+<calibrator>	<train>
+		<preprocess>1</preprocess>
+		<fitting>spline</fitting>
+		<gamma>1e-06</gamma>
+	</train>
+	<data>
+		<value time="1038">1105.86735231338</value>
+		<value time="1170">1152.38094080396</value>
+		<value time="1194">1163.73042617042</value>
+		<value time="1182">1163.73042617042</value>
+		<value time="1194">1173.29428484388</value>
+		<value time="1182">1173.29428484388</value>
+		<value time="1152">1190.15697078392</value>
+		<value time="1224">1250.7227098464</value>
+		<value time="1230">1250.7227098464</value>
+		<value time="1284">1263.28722541078</value>
+		<value time="1314">1297.77733477913</value>
+		<value time="1368">1378.54007328612</value>
+		<value time="1374">1378.54007328612</value>
+		<value time="1380">1378.54007328612</value>
+		<value time="1374">1418.94316058337</value>
+		<value time="1380">1418.94316058337</value>
+		<value time="1368">1418.94316058337</value>
+		<value time="1500">1536.22907390596</value>
+		<value time="1620">1582.03620124966</value>
+		<value time="1740">1700.67517308734</value>
+		<value time="1674">1707.87290352012</value>
+		<value time="1914">1854.26128968146</value>
+		<value time="2094">1892.41401814701</value>
+	</data>
+</calibrator>

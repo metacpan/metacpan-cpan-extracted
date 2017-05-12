@@ -1,0 +1,53 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.44.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 7852d28c0d59823679b4047d61d6885afbe89b88 Changes
+SHA1 fe4c085e6bc71b95a19170a0aed5d84606880e3f Door.pm
+SHA1 74a463fe5dabb105ca73d493a946c2bb82a5390b Door.xs
+SHA1 12ce1d412c21017205bb9dd289348048b4225a9f Door/Client.pm
+SHA1 0058868dc3871047ab38e8d44d9518c15df8967d Door/Server.pm
+SHA1 158ea52ab7aa1a861a8b0d6f7e345b17da05022f MANIFEST
+SHA1 eb2a541e530b5fcd52ebdd6f8da95f89ecc38114 META.yml
+SHA1 b8bdd26378811d0a9ea2f32c28036d6c77bd1d02 Makefile.PL
+SHA1 fd8cd3f720ffa2049dd51ee141e67f23666481d2 README
+SHA1 e01b1643718d2e512862931d9a0e9c120e7cf1b5 benchmark/bench-door-server.pl
+SHA1 6a37c8b1fb5920c7433e860bb4ba3fe53c29cc98 benchmark/bench-pipe-server.pl
+SHA1 eb085bcba5321ef2bb0a58307c3ff6a492047c87 benchmark/benchmark.pl
+SHA1 86eeecd13b2a84b265ab741251ba7d4dcad51b2d fallback/const-c.inc
+SHA1 040e6da58931556b68870289eee834dc96f44eb0 fallback/const-c.inc_10
+SHA1 dffa9821b49d21ec4d07e9314de27092bb810fb4 fallback/const-xs.inc
+SHA1 dffa9821b49d21ec4d07e9314de27092bb810fb4 fallback/const-xs.inc_10
+SHA1 115da7144f264305baa5ac074fc5b8cd64aa734b ppport.h
+SHA1 d1c00a446d6ef9549da98f4f6d46e675ac60bfe6 t/01-tags-attr.t
+SHA1 3074cb926cce47343edf491c662cef98d2898c35 t/02-tags-attr_desc.t
+SHA1 bad12be2f647897df23ff22987a967039eed6592 t/03-tags-desc.t
+SHA1 9ce478acb3f4bb1b6eb5f89baf2be25e4120f491 t/04-tags-errors.t
+SHA1 6c6c73204bb87467580ea9df0ae09ce1ae3b4928 t/05-tags-subcodes.t
+SHA1 291aaad2e0b23e3c747a9d79c40d312ce6836d51 t/06-tags-all.t
+SHA1 5ee876e6e6f1d98558e7a0d80c9eef72b6272826 t/07-main.t
+SHA1 a3ee1870ddff17281b618b133ea0700c5012851a t/08-client.t
+SHA1 269b949e959e0e72f0527befa33ae5d8bb9930f3 t/09-server.t
+SHA1 f68ff9fe379ff78a62361cd50d12b55a57fbc9a0 t/door-client.pl
+SHA1 812b4b38b0273b2229730793b4cfc7d574405c9d t/door-server0.pl
+SHA1 59c1193ee691ad1f26128ed218201739f6e15be2 t/door-server1.pl
+SHA1 fa90b210a872d76d40ebc65ace2686d9e07cbd65 t/door-server2.pl
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.4 (SunOS)
+
+iD8DBQFCpZJRoXhPvmJPsrERAt4cAKDkCO3Nhr2saiGKlEptWsQ9khbxTQCg42hO
+9tqsd/+80GZPZ/eZV1vSJJ8=
+=KPGx
+-----END PGP SIGNATURE-----

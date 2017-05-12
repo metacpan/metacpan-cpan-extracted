@@ -1,0 +1,23 @@
+Changes
+inc/Module/AutoInstall.pm
+inc/Module/Install.pm
+inc/Module/Install/AutoInstall.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/GithubMeta.pm
+inc/Module/Install/Include.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/IM/Engine/Plugin/Dispatcher.pm
+lib/IM/Engine/Plugin/Dispatcher/404.pm
+lib/IM/Engine/Plugin/Dispatcher/AugmentsDispatcher.pm
+lib/IM/Engine/Plugin/Dispatcher/Flavor.pm
+lib/IM/Engine/Plugin/Dispatcher/RequiresDispatcherPlugin.pm
+lib/IM/Engine/Plugin/Dispatcher/ShortcutsDispatch.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+t/001-basic.t

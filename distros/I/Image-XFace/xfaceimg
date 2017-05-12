@@ -1,0 +1,53 @@
+#!/usr/bin/perl -w
+#
+# xfaceimg:
+# Produce an X-Face image as a PNG file as a CGI script. Call as
+#   .../xfaceimg?xface=...
+#
+# Copyright (c) 2002 Chris Lightfoot. All rights reserved.
+# Email: chris@ex-parrot.com; WWW: http://www.ex-parrot.com/~chris/
+#
+
+my $rcsid = '$Id: xfaceimg,v 1.1 2002/02/17 23:20:42 chris Exp $';
+
+use CGI;
+use GD;
+use Image::XFace;
+
+$q = new CGI;
+
+sub err ($) {
+    print <<EOF;
+Status: 400 Bad Request
+Content-type: text/plain
+
+Bad request: $_[0]
+
+EOF
+
+    exit(1);
+}
+
+$xf = $q->param('xface');
+error("no image data") if (!$xf);
+
+$img = Image::XData::uncompface_gd($xf);
+error("bad image data") if (!$img);
+
+$png = $img->png;
+$len = length($png);
+
+# We want these things to be cacheable, since the image we get from a given
+# X-Face string is invariant. RFC2068 suggests an expiry date of one year in
+# the future for this.
+$when = gmtime(time() + (365 * 24 * 3600));
+
+print <<EOF;
+Content-Type: image/png
+Content-Length: $len
+Expires: $when
+
+$png
+EOF
+
+exit(0);

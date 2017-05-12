@@ -1,0 +1,29 @@
+Image/Embroidery version 1.2
+=============================
+
+This module can be used to read, write and (with GD)
+display embroidery data files. It currently supports
+Tajima DST and Melco EXP files.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Bit::Vector
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Kirk Baucom <kbaucom@schizoid.com>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

@@ -1,0 +1,988 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- :tabSize=2:indentSize=2:wrap=hard: -->
+<changelog xmlns="http://www.blackperl.com/2009/01/ChangeLogML"
+  xmlns:sc="http://www.blackperl.com/2009/01/ChangeLogML/source-control"
+  xmlns:git="http://www.blackperl.com/2009/01/ChangeLogML/source-control/git"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml"
+  xsi:schemaLocation="http://www.blackperl.com/XML/ChangeLog etc/ChangeLogML.xsd">
+  <project>Image::Size</project>
+  <title>Perl Module Image::Size Change History</title>
+  <description>
+    Image::Size is a simple library that allows the fetching of image size
+    information from files in a wide variety of common (and not-so-common)
+    formats.
+  </description>
+  <release version="3.300" sc:tag="3.300" date="2015-02-28T08:44:22-08:00">
+    <change git:commit="f538442f7b6a0547142337be988c96b8d37648c0">
+      <fileset>
+        <file path="lib/Image/Size.pm" />
+        <file path="t/all.t" />
+        <file path="t/old-os2.bmp" action="ADD" />
+      </fileset>
+      <description>
+        Add support for old OS/2 version of BMP header (Geoff Richards).
+      </description>
+    </change>
+    <change git:commit="d5a47fa98f5008a419de60a826883cdfa1bad4f8">
+      <file path="lib/Image/Size.pm" />
+      <description>
+        Typo fixes (David Steinbrunner).
+      </description>
+    </change>
+    <change git:commit="28fb705be3730342cb65fe5e1fde252fa4424ca6">
+      <file path="lib/Image/Size.pm" />
+      <description>
+        Avoid a sprintf() warning in Perl 5.21. Perl 5.21 introduces a warning
+        for redundant arguments to s?printf(), so sprintf("%d", 1, 2) would
+        warn. This commit silences that warning by passing sprintf the
+        exact number of arguments that it expects (Brian Fraser).
+      </description>
+    </change>
+    <change git:commit="64e39193169d32f4a2d366f11d1eb97a9695fc9d">
+      <file path="lib/Image/Size.pm" />
+      <description>
+        Added =encoding utf8 to pod - the accented character was causing a pod
+        error (Neil Bowers).
+      </description>
+    </change>
+    <change git:commit="d8e79be2f5a5844c63829ff4598047e71eb40cf5">
+      <file path="lib/Image/Size.pm" />
+      <description>
+        Added Z&lt;&gt; to the =item [012] to resolve pod warning.
+        You can't have =item 0, so the way round this seems to be to add a
+        Z&lt;&gt; (zero width space) before each digit (Neil Bowers).
+      </description>
+    </change>
+    <change git:commit="5f7f014873171be7c0bb3f942d25587c2e312a47">
+      <file path="lib/Image/Size.pm" />
+      <description>
+        Added link to github repo to doc (Neil Bowers).
+      </description>
+    </change>
+    <change git:commit="ecf88247cbb9122e1cd290e559031dc911bad09f">
+      <file path="lib/Image/Size.pm" />
+      <description>
+        <xhtml:a href="http://rt.cpan.org/Ticket/Display.html?id=41238">RT #41238</xhtml:a>:
+        Applied modified version of patch from user to fix a die problem with
+        unpack on truncated files.
+      </description>
+    </change>
+    <change git:commit="7f3de1e5f29d84d45a8ad98a76b7cbbe9112667c">
+      <fileset>
+        <file path="lib/Image/Size.pm" />
+        <file path="t/1.sm.webp" action="ADD" />
+        <file path="t/all.t" />
+        <file path="t/move.cur" action="ADD" />
+        <file path="t/tux.ico" action="ADD" />
+      </fileset>
+      <description>
+        Add support for WEBP, ICO and CUR file types (Baldur Kristinsson).
+      </description>
+    </change>
+    <change git:commit="cd5a4a70d4a8ca500bf31fd7aa6ae504eba70891">
+      <file path="lib/Image/Size.pm" />
+      <description>
+        Fix some perlcritic issues.
+      </description>
+    </change>
+  </release>
+  <release version="3.232" sc:tag="3.232" date="2012-05-28T17:20:00-07:00">
+    <change git:commit="330406f70b677b6ed71309d49c381b61738328b0">
+      <file path="lib/Image/Size.pm" />
+      <description>
+        Removed the "!" flag in pack template for EMF. It was not needed and it
+        broke on earlier Perls.
+      </description>
+    </change>
+  </release>
+  <release version="3.231" sc:tag="3.231" date="2012-05-23T23:30:00-07:00">
+    <change git:commit="aadafa29c310a2a467ba5b5a3bb7bbdfd7da2fe1">
+      <file path="lib/Image/Size.pm" />
+      <description>
+        Small change to swfmxsize for short-buffer issues.
+      </description>
+    </change>
+    <change git:commit="73916c143c53b5d1eedcce77ed1a2d541b49bbeb">
+      <file path="lib/Image/Size.pm" />
+      <description>
+        Multiple changes in this commit:
+        Abandoned AutoLoader; moved POD to the end of the file now that all the
+        per-format subroutines are part of the file-proper; fixed cases where
+        lack of ImageMagick would cause the error message to be overwritten.
+      </description>
+    </change>
+    <change git:commit="37c54cd271fa9faf1981cb9601b9e1e72ce76f28">
+      <fileset>
+        <file path="t/all.t" />
+        <file path="t/kazeburo-bar.jpg" action="ADD" />
+      </fileset>
+      <description>
+        New test (and image) for JPG tag-offset issue.
+      </description>
+    </change>
+    <change git:commit="1bf120eb3463d11b67a6254a7ebdccfcc8562ac1">
+      <file path="lib/Image/Size.pm" />
+      <description>
+        Applied patch from github user kazeburo:
+        bug fix for some jpeg files
+      </description>
+    </change>
+    <change git:commit="282245f85ca4d644b650e8328c1c2e81d3cb13f0">
+      <file path="imgsize" />
+      <description>
+        Fixed so that default output now catches errors.
+        Previously, you would get an "undefined" warning if there was an error
+        in parsing/sizing the input file.
+      </description>
+    </change>
+    <change git:commit="68b393c33ac248bc6f8230fa69cafddceb805f4f">
+      <file path="lib/Image/Size.pm" />
+      <description>
+        Turns out the 4 bounding-box ints for EMF are signed.
+      </description>
+    </change>
+  </release>
+  <release version="3.230" sc:tag="3.230" date="2010-08-29T16:00:00-07:00">
+    <change git:commit="269c8932ccabf981d7723ee86c5e1ac49f361ece">
+      <fileset>
+        <file path="imgsize" />
+        <file path="lib/Image/Size.pm" />
+      </fileset>
+      <description>
+        perlcritic clean-ups from new rules.
+      </description>
+    </change>
+    <change git:commit="f2ec9f0313a692b5f87b778e38b3bd9641beb922">
+      <fileset>
+        <file path="lib/Image/Size.pm" />
+        <file path="t/Test_emf_small.emf" action="ADD" />
+        <file path="t/all.t" />
+      </fileset>
+      <description>
+        <xhtml:a href="http://rt.cpan.org/Ticket/Display.html?id=59995">RT #59995</xhtml:a>:
+        Added support for Windows Enhanced Metafile Format (EMF).
+      </description>
+    </change>
+    <change git:commit="3ed01fd7bff2cd551f399d9a37d1f96c5330be1f">
+      <fileset>
+        <file path="t/00_load.t" action="DELETE" />
+        <file path="t/01_pod.t" action="DELETE" />
+        <file path="t/02_pod_coverage.t" action="DELETE" />
+        <file path="t/03_meta.t" action="DELETE" />
+        <file path="t/04_minimumversion.t" action="DELETE" />
+        <file path="t/05_critic.t" action="DELETE" />
+        <file path="xt/00_load.t" action="ADD" />
+        <file path="xt/01_pod.t" action="ADD" />
+        <file path="xt/02_pod_coverage.t" action="ADD" />
+        <file path="xt/03_meta.t" action="ADD" />
+        <file path="xt/04_minimumversion.t" action="ADD" />
+        <file path="xt/05_critic.t" action="ADD" />
+      </fileset>
+      <description>
+        Move the author/distro-sanity tests to an "xt" directory.
+      </description>
+    </change>
+  </release>
+  <release version="3.221" sc:tag="3.221" date="2010-04-25T14:10:00-07:00">
+    <change git:commit="45914d2c9da36b21d4262627231d41f0203a81cc">
+      <fileset>
+        <file path="imgsize" />
+        <file path="lib/Image/Size.pm" />
+      </fileset>
+      <description>
+        Large-scale code and documentation clean-up based on perlcritic
+        and visual review.
+      </description>
+    </change>
+  </release>
+  <release version="3.220" sc:tag="3.220" date="2009-11-08T17:45:00-08:00">
+    <change git:commit="85c84e5cdf9fdfd9cf878847a95d696f795e0fd7">
+      <file path="lib/Image/Size.pm" />
+      <description>
+        Small fix to the regex for detecting GIFs, per Slaven Rezic.
+      </description>
+    </change>
+  </release>
+  <release version="3.210" sc:tag="3.210" date="2009-10-21T18:50:00-07:00">
+    <change git:commit="4f12b06dd27f1f7b720acaea7a369c653e659206">
+      <file path="t/magick.t" />
+      <description>
+        Removed a stray colon causing errors with some Perl versions.
+      </description>
+    </change>
+    <change git:commit="175a683f3d568c418a94218702997da20d237fdd">
+      <fileset>
+        <file path="t/00_load.t" action="ADD" />
+        <file path="t/00_signature.t" action="DELETE" />
+        <file path="t/01_pod.t" action="ADD" />
+        <file path="t/02_pod_coverage.t" action="ADD" />
+        <file path="t/03_meta.t" action="ADD" />
+        <file path="t/04_minimumversion.t" action="ADD" />
+        <file path="t/05_critic.t" action="ADD" />
+        <file path="t/magick.t" />
+        <file path="t/pod.t" action="DELETE" />
+        <file path="t/pod_coverage.t" action="DELETE" />
+      </fileset>
+      <description>
+        Removed useless signature test, added QA tests, removed a duplicate
+        test.
+      </description>
+    </change>
+    <change git:commit="2c11bfe0c4df6b6201bce8c44b5763151dacf42c">
+      <file path="lib/Image/Size.pm" />
+      <description>
+        Moved around some conditionally-needed libs to delay loading
+        until/unless needed. Also made a small fix per Perl::Critic.
+      </description>
+    </change>
+  </release>
+  <release version="3.2" date="2009-02-23T05:00:00-08:00" sc:tag="v3.2">
+    <change git:commit="16dfa93026200cf00840f5ec721ac765644f72a7">
+      <fileset>
+        <file path="lib/Image/Size.pm" />
+        <file path="t/all.t" />
+      </fileset>
+      <description>
+        Make the package buildable in a pure-Perl software stack. Per
+        <xhtml:a href="http://rt.cpan.org/Ticket/Display.html?id=42930">RT ticket #42930</xhtml:a>,
+        make Compress::Zlib optional, so that those who do not need
+        it are not required to install it. Updated the test around the
+        compressed-SWF file to skip if Compress::Zlib is absent.
+      </description>
+    </change>
+    <change git:commit="b59616cef04cfe6aac47b6c332c405633946b10d">
+      <fileset>
+        <file path="Build.PL" action="RESTORE" />
+        <file path="ChangeLog" action="DELETE" />
+        <file path="ChangeLog.xml" action="ADD" />
+        <file path="MANIFEST" action="DELETE" />
+        <file path="Makefile.PL" action="DELETE" />
+        <file path="README.Win32" action="DELETE" />
+        <file path="etc/ChangeLogML.xsd" action="ADD" />
+      </fileset>
+      <description>
+        Making large-scale house-keeping changes to the build/dist
+        process. Replace ChangeLog (plain-text) with a ChangeLogML file created
+        from the CVS/SVN history and hand-adjusted; add the XSD for
+        ChangeLogML; restore Build.PL and heavily enhance; and remove
+        README.Win32, Makefile.PL and MANIFEST.
+      </description>
+    </change>
+    <change git:commit="36875a8b9f6c4407b38e62e70483ea154cd836f5">
+      <file path="lib/Image/Size.pm" />
+      <description>
+        Per
+        <xhtml:a href="http://rt.cpan.org/Ticket/Display.html?id=43452">RT ticket #43452</xhtml:a>,
+        make the cache visible outside the lexical scope of the
+        module This allows the hash to be used with packages like
+        IPC::Shareable or IPC::MM to enable sharing the cache between
+        processes. Added extra documentation of this, and a new section
+        describing approaches to cache-sharing.
+      </description>
+    </change>
+    <change date="2009-01-29T01:35:27.047379Z" author="rjray">
+      <fileset revision="136">
+        <file path="imgsize"/>
+        <file path="lib/Image/Size.pm"/>
+      </fileset>
+      <description>
+        Fix URL/specification of the license info for LGPL.
+      </description>
+    </change>
+  </release>
+  <release version="3.1.1" sc:tag="v3_1_1" date="2008-02-18T06:37:36.755344Z">
+    <change date="2008-02-18T06:36:02.029666Z" author="rjray">
+      <file path="Build.PL" revision="134"/>
+      <description>
+        Misspelled a prereq name.
+      </description>
+    </change>
+  </release>
+  <release version="3.1" sc:tag="v3_1" date="2007-10-05T10:19:33.589800Z">
+    <change date="2007-10-04T10:49:12.904758Z" author="rjray">
+      <file path="Makefile.PL" revision="130"/>
+      <description>
+        Restored for users who don't have Module::Build installed.
+      </description>
+    </change>
+    <change date="2007-10-04T10:37:59.308026Z" author="rjray">
+      <file path="lib/Image/Size.pm" revision="129"/>
+      <description>
+        Small patch from n@shaplov.ru to fix CWS-related error.
+      </description>
+    </change>
+    <change date="2007-10-04T10:09:52.651335Z" author="rjray">
+      <file path="lib/Image/Size.pm" revision="128"/>
+      <description>
+        Changed the copyright info and the licensing. Added COPYRIGHT and
+        LICENSE blocks to the pod.
+      </description>
+    </change>
+    <change date="2007-10-04T10:08:50.535846Z" author="rjray">
+      <fileset revision="127">
+        <file path="MANIFEST"/>
+        <file path="META.yml" action="DELETE"/>
+      </fileset>
+      <description>
+        Removing META.yml and SIGNATURE from permanent place in MANIFEST.
+        Removing META.yml from repo.
+      </description>
+    </change>
+  </release>
+  <release version="3.01" sc:tag="v3_01" date="2007-10-03T10:08:20.439641Z">
+    <change date="2007-10-03T09:29:37.005204Z" author="rjray">
+      <file path="t/pass-1_s.png" revision="121"/>
+      <description>
+        Trying to fix MIME
+      </description>
+    </change>
+    <change date="2007-10-03T09:27:21.609099Z" author="rjray">
+      <fileset revision="120">
+        <file path="t/8.swf"/>
+        <file path="t/bexjdic.tif"/>
+        <file path="t/letter_T.jpg"/>
+        <file path="t/lexjdic.tif"/>
+        <file path="t/pak38.jpg"/>
+        <file path="t/pass-1_s.png"/>
+        <file path="t/test.gif"/>
+        <file path="t/xterm.bmp"/>
+        <file path="t/yasp.swf"/>
+      </fileset>
+      <description>
+        MIME types
+      </description>
+    </change>
+  </release>
+  <release version="3.0" sc:tag="v3_0" date="2006-09-14T03:10:50.631653Z">
+    <change>
+      <fileset>
+        <file path="t/pod_coverage.t" />
+        <file path="t/pod.t" />
+      </fileset>
+      <description>
+        Added test suites for POD correctness and POD coverage.
+      </description>
+    </change>
+    <change>
+      <file path="Size.pm" />
+      <description>
+        Implemented and documented a flag called $Image::Size::GIF_BEHAVIOR
+        that controls whether the GIF code returns the screensize, the first
+        sub-image or the largest of the sub-images.
+      </description>
+    </change>
+    <change>
+      <fileset>
+        <file path="Size.pm" />
+        <file path="t/all.t" />
+        <file path="MANIFEST" />
+        <file action="ADD" path="t/8.swf" />
+      </fileset>
+      <description>
+        Applied a patch from mrj@mrj.spb.ru to fix usage of the Compress::Zlib
+        module in the handling of compressed flash files. Added a new SWF file
+        to test this, and added reference to the file in MANIFEST and t/all.t.
+      </description>
+    </change>
+    <change>
+      <fileset>
+        <file path="Size.pm" />
+        <file path="MANIFEST" />
+        <file path="Makefile.PL" />
+        <file action="ADD" path="t/magick.t" />
+      </fileset>
+      <description>
+        Delay Image::Magick loading until it is needed. (Mark Stosberg).  Add
+        support for Graphics::Magick as an alternative to Image::Magick.  If
+        either Graphics::Magick or Image::Magick is loaded into memory that
+        module will be used. Otherwise, they are both tried to be loaded, with
+        Graphics::Magick being tried first. (Mark Stosberg). This patch also
+        adds a new test suite, t/magick.t, to the distribution and modifies
+        both MANIFEST and Makefile.PL (to add a build-dependancy on
+        Test::More).
+      </description>
+    </change>
+    <change>
+      <file path="t/all.t" />
+      <description>
+        With Test::More now required for building, converted t/all.t to use it.
+      </description>
+    </change>
+  </release>
+  <release version="2.992" date="2003-07-22T00:00:00Z">
+    <change date="2003-07-21T06:48:47.000000Z" author="rjray">
+      <file path="Size.pm" revision="116"/>
+      <description>
+        Added support for Flash 6/FlashMX.
+      </description>
+    </change>
+  </release>
+  <release version="2.991" date="2003-01-03T09:09:39.000000Z" sc:tag="v2_991">
+    <change date="2003-01-03T09:09:13.000000Z" author="rjray">
+      <file path="Size.pm" revision="111"/>
+      <description>
+        Bumped version number and moved the trailing "1;" for safety-sake.
+      </description>
+    </change>
+    <change date="2003-01-03T09:06:02.000000Z" author="rjray">
+      <file path="imgsize" revision="110"/>
+      <description>
+        Way-long-overdue code cleanup.
+      </description>
+    </change>
+    <change date="2003-01-03T08:56:24.000000Z" author="rjray">
+      <file path="Size.pm" revision="109"/>
+      <description>
+        Small change in the block that sets up read from a scalar ref, to
+        avoid warnings about undef values (in case $stream is a reference to
+        an undef value).
+      </description>
+    </change>
+  </release>
+  <release version="2.99" sc:tag="v2_99" date="2002-05-04T08:23:42.000000Z">
+    <change date="2002-05-04T08:23:29.000000Z" author="rjray">
+      <file path="Size.pm" revision="106"/>
+      <description>
+        Applied two patches from Ville Skyttä &lt;ville.skytta@iki.fi&gt;,
+        providing MNG and Image::Magick support.
+      </description>
+    </change>
+  </release>
+  <release version="2.98" sc:tag="v2_98" date="2002-03-02T20:36:07.000000Z">
+    <change date="2002-03-02T07:47:11.000000Z" author="rjray">
+      <file path="Size.pm" revision="104"/>
+      <description>
+        Bumped the version number. Wouldn't have to keep remembering this if
+        I'd move it to the Makefile.PL.
+      </description>
+    </change>
+    <change date="2002-03-02T07:44:20.000000Z" author="rjray">
+      <file path="Size.pm" revision="103"/>
+      <description>
+        Fixed some documentation issues and a small buglet in an error
+        message.
+      </description>
+    </change>
+    <change date="2002-03-02T07:38:58.000000Z" author="rjray">
+      <file path="README.Win32" revision="102"/>
+      <description>
+        Small change to step #2
+      </description>
+    </change>
+  </release>
+  <release version="2.97" sc:tag="r2_97" date="2002-02-28T07:58:43.000000Z">
+    <change date="2002-02-28T07:55:54.000000Z" author="rjray">
+      <file path="Size.pm" revision="99"/>
+      <description>
+        Fixed some lingering tsoft.com e-mail addresses, cleared up the docs
+        per Jeff Friedl's suggestion, moved the call to
+        File::Spec-&gt;catpath() so that it only gets called when cacheing is
+        still on.
+      </description>
+    </change>
+  </release>
+  <release version="2.96" sc:tag="r2_96" date="2001-11-20T23:39:43.000000Z">
+    <change date="2001-11-20T23:38:01.000000Z" author="rjray">
+      <file path="Size.pm" revision="96"/>
+      <description>
+        Silly typo in PCD code
+      </description>
+    </change>
+  </release>
+  <release version="2.95" date="2001-11-11T11:42:48.000000Z">
+    <change date="2001-11-11T11:41:02.000000Z" author="rjray">
+      <file path="Size.pm" revision="94"/>
+      <description>
+        Added manual disabling of the cache, and added support for PCD images.
+      </description>
+    </change>
+  </release>
+  <release version="2.94" sc:tag="v2_94" date="2001-09-19T03:27:20.000000Z">
+    <change date="2001-09-19T03:23:32.000000Z" author="rjray">
+      <file path="Size.pm" revision="91"/>
+      <description>
+        Corrected a bug in psdsize(), credited source of the PSD test image,
+        and bumped the version number.
+      </description>
+    </change>
+    <change date="2001-09-19T03:23:00.000000Z" author="rjray">
+      <file path="t/all.t" revision="90"/>
+      <description>
+        Added test for PSD code, using recently-supplied image
+      </description>
+    </change>
+    <change date="2001-09-19T03:22:37.000000Z" author="rjray">
+      <file path="MANIFEST" revision="89"/>
+      <description>
+        Added entry for the PSD test file
+      </description>
+    </change>
+    <change date="2001-09-19T03:12:18.000000Z" author="rjray">
+      <file path="t/468x60.psd" action="ADD" revision="87"/>
+      <description>
+        Test file for PSD (PhotoShop) support
+      </description>
+    </change>
+    <change date="2001-08-11T08:49:14.000000Z" author="rjray">
+      <file path="Makefile.PL" revision="86"/>
+      <description>
+        Changes to the name of the template spec file and the generated spec
+        file
+      </description>
+    </change>
+    <change date="2001-08-11T08:47:35.000000Z" author="rjray">
+      <fileset revision="85">
+        <file path="Image-Size.spec.in" action="DELETE"/>
+        <file path="spec.in" action="ADD"/>
+      </fileset>
+      <description>
+        Renamed this file
+      </description>
+    </change>
+    <change date="2001-08-10T08:17:48.000000Z" author="rjray">
+      <file path="Makefile.PL" revision="84"/>
+      <description>
+        Adapted parts of the Perl-RPM Makefile.PL to enable building of RPM
+        and SRPM files. This version uses an external template rather than
+        embedding it under the __DATA__ token.
+      </description>
+    </change>
+    <change date="2001-08-10T08:13:03.000000Z" author="rjray">
+      <file path="Image-Size.spec.in" action="ADD" revision="83"/>
+      <description>
+        Basic RPM specfile template to allow for building a noarch RPM and
+        SRPM for this package.
+      </description>
+    </change>
+  </release>
+  <release version="2.93" sc:tag="v2_93" date="2001-04-13T08:55:11.000000Z">
+    <change date="2001-04-13T08:53:16.000000Z" author="rjray">
+      <file path="t/all.t" revision="80"/>
+      <description>
+        Added test for Flash support
+      </description>
+    </change>
+    <change date="2001-04-13T08:53:07.000000Z" author="rjray">
+      <file path="MANIFEST" revision="79"/>
+      <description>
+        Added test file for Flash support
+      </description>
+    </change>
+    <change date="2001-04-13T08:52:41.000000Z" author="rjray">
+      <file path="Size.pm" revision="78"/>
+      <description>
+        Forgot to credit Dmitry in the docs.
+      </description>
+    </change>
+    <change date="2001-04-13T08:51:40.000000Z" author="rjray">
+      <file path="Size.pm" revision="77"/>
+      <description>
+        Added code from Dmitry Dorofeev &lt;dima@yasp.com&gt; to handle
+        ShockWave/Flash files.
+      </description>
+    </change>
+    <change date="2001-04-13T08:36:54.000000Z" author="rjray">
+      <file path="t/yasp.swf" action="ADD" revision="76"/>
+      <description>
+        Sample Flash file from Dmitry Dorofeev &lt;dima@yasp.com&gt;
+      </description>
+    </change>
+  </release>
+  <release version="2.92" sc:tag="v2_92" date="2001-03-11T22:56:01.000000Z">
+    <change date="2001-03-11T22:49:41.000000Z" author="rjray">
+      <file path="Size.pm" revision="72"/>
+      <description>
+        Manually added a patch from Dan Klein to close files that imgsize
+        opens.
+      </description>
+    </change>
+  </release>
+  <release version="2.91" date="2000-12-08T08:20:34Z">
+    <change date="2000-12-08T08:20:34.000000Z" author="rjray">
+      <fileset revision="69">
+        <file path="Size.pm"/>
+        <file path="imgsize"/>
+      </fileset>
+      <description>
+        Added copyright notice so that Debian could use the module
+      </description>
+    </change>
+    <change date="2000-12-08T08:19:50.000000Z" author="rjray">
+      <fileset revision="68">
+        <file path="MANIFEST"/>
+        <file path="Makefile.PL"/>
+      </fileset>
+      <description>
+        Reflect change to imgsize script
+      </description>
+    </change>
+    <change date="2000-12-08T08:16:01.000000Z" author="rjray">
+      <fileset revision="67">
+        <file path="imgsize" action="ADD"/>
+        <file path="imgsize.PL" action="DELETE"/>
+      </fileset>
+      <description>
+        Changed from imgsize.PL to plain imgsize, thanks to MakeMaker features
+      </description>
+    </change>
+  </release>
+  <release version="2.904" sc:tag="r02_09_04" date="2000-11-28T08:10:05Z">
+    <change date="2000-11-28T08:10:05.000000Z" author="rjray">
+      <file path="Makefile.PL" revision="65"/>
+      <description>
+        Added PREREQ_PM clause for detecting File::Spec
+      </description>
+    </change>
+    <change date="2000-11-28T08:09:47.000000Z" author="rjray">
+      <file path="Size.pm" revision="64"/>
+      <description>
+        Bumped version number for CPAN
+      </description>
+    </change>
+    <change date="2000-05-04T04:08:02.000000Z" author="rjray">
+      <file path="ANNOUNCE" action="DELETE" revision="62"/>
+      <description>
+        Removed from the distribution
+      </description>
+    </change>
+  </release>
+  <release version="2.903" sc:tag="r02_09_03" date="2000-04-28T02:56:13Z">
+    <change date="2000-04-28T02:56:13.000000Z" author="rjray">
+      <fileset revision="60">
+        <file path="Size.pm"/>
+      </fileset>
+      <description>
+        Minor fix from CPAN Testers Group for workability on Macs
+      </description>
+    </change>
+  </release>
+  <release version="2.902" sc:tag="r02_09_02" date="2000-04-26T07:21:04Z">
+    <change date="2000-04-26T07:21:04.000000Z" author="rjray">
+      <file path="Size.pm" revision="57"/>
+      <description>
+        Worked on the regular expressions that are used on the text-based
+        formats, in hopes of further smoothing out the rift between UNIX and
+        non-UNIX systems.  Added use of Cwd. Filenames passed in are prepended
+        with the current dir if they aren't already absolute pathnames. This
+        was to fix a subtle problem where different files with the same
+        relative names (referenced from different directories) would confuse
+        the cache.  Added the image type to the cached data. Previously, only
+        dimensions were cached. Now, a cache-hit returns the same triple
+        returned originally.  Also added the file's modification-time to the
+        cache, as the (growing!) use of Image::Size in Apache mod_perl
+        environments found that if an image is changed, the cache won't
+        notice. Now it does.  Added recognition of thumbnail-format pics from
+        the popular viewer XV. The value of image type for these is the string
+        "XV".  Integrated a patch that makes html_imgsize generate tags that
+        are XHTML- compliant. Same patch also caught a few doc bugs that I'd
+        missed.
+      </description>
+    </change>
+    <change date="2000-04-26T07:16:49.000000Z" author="rjray">
+      <file path="MANIFEST" revision="55"/>
+      <description>
+        Added ChangeLog
+      </description>
+    </change>
+    <change date="2000-04-26T07:16:10.000000Z" author="rjray">
+      <file path="ChangeLog" action="ADD" revision="54"/>
+      <description>
+        Change history moved here from README
+      </description>
+    </change>
+    <change date="2000-04-25T09:07:47.000000Z" author="rjray">
+      <file path="MANIFEST" revision="53"/>
+      <description>
+        Changed dave.jpg to pak38.jpg
+      </description>
+    </change>
+    <change date="2000-04-25T09:05:29.000000Z" author="rjray">
+      <file path="t/all.t" revision="52"/>
+      <description>
+        Updated html_imgsize test and replaced image for test 6
+      </description>
+    </change>
+    <change date="2000-04-25T09:03:59.000000Z" author="rjray">
+      <file path="t/pak38.jpg" action="ADD" revision="51"/>
+      <description>
+        GIF-named-JPG to replace dave.jpg
+      </description>
+    </change>
+    <change date="2000-04-25T09:03:37.000000Z" author="rjray">
+      <file path="t/dave.jpg" action="DELETE" revision="50"/>
+      <description>
+        corrupted file
+      </description>
+    </change>
+    <change date="1999-08-18T08:35:23.000000Z" author="rjray">
+      <file path="README.Win32" action="ADD" revision="47"/>
+      <description>
+        A basic step-by-step for those whose Perl lacks MakeMaker support
+        (generally Win-based systems).
+      </description>
+    </change>
+    <change date="1999-08-12T07:21:47.000000Z" author="rjray">
+      <fileset revision="46">
+        <file path="t/bexjdic.tif" action="ADD"/>
+        <file path="t/dave.jpg" action="ADD"/>
+        <file path="t/letter_N.ppm" action="ADD"/>
+        <file path="t/letter_T.jpg" action="ADD"/>
+        <file path="t/lexjdic.tif" action="ADD"/>
+        <file path="t/pass-1_s.png" action="ADD"/>
+        <file path="t/spacer50.xbm" action="ADD"/>
+        <file path="t/test.gif" action="ADD"/>
+        <file path="t/xterm.bmp" action="ADD"/>
+        <file path="t/xterm.xpm" action="ADD"/>
+      </fileset>
+      <description>
+        Initial check-in, files had been released in previous versions but
+        were not being tracked.
+      </description>
+    </change>
+    <change date="1999-04-07T08:56:25.000000Z" author="rjray">
+      <file path="imgsize.PL" revision="45"/>
+      <description>
+        Changed a lingering uswest.com address to the current.
+      </description>
+    </change>
+  </release>
+  <release version="2.901" date="1999-03-10T12:28:00Z">
+    <change date="1999-03-11T08:47:24.000000Z" author="rjray">
+      <fileset revision="44">
+        <file path="ANNOUNCE"/>
+        <file path="README"/>
+        <file path="Size.pm"/>
+      </fileset>
+      <description>
+        Change the version number for this release due to CPAN treating 2.10
+        as less than 2.9.
+      </description>
+    </change>
+  </release>
+  <release version="2.10" date="1999-03-10T08:37:00Z">
+    <change date="1999-03-10T08:02:47.000000Z" author="rjray">
+      <file path="Size.pm" revision="42"/>
+      <description>
+        Moved some things around, and added two significant changes: no
+        longer uses IO::File internally (and is also more lax on whether a
+        passed-in FH is specifically from that class) and is now fully
+        strict-clean (no longer strict-refs dirty).
+      </description>
+    </change>
+  </release>
+  <release version="2.9" date="1998-12-09T09:10:11.000000Z">
+    <change date="1998-12-09T08:58:03.000000Z" author="rjray">
+      <file path="Size.pm" revision="40"/>
+      <description>
+        Four changes: fix to GIFs that are GIF87 but have GIF98a-style
+        indicators; fix byte-ordering problem in bmpsize(); fix eol-condition
+        in the PPM pattern for earlier Win32 builds; and (hopefully)
+        addressed MacOS in that last adjustment, as well.
+      </description>
+    </change>
+    <change date="1998-12-09T08:29:05.000000Z" author="rjray">
+      <file path="Makefile.PL" revision="39"/>
+      <description>
+        Added attributes to the WriteMakefile call for ActiveState PPM (only
+        done for Perl 5.005 and later).
+      </description>
+    </change>
+    <change date="1998-12-09T08:15:15.000000Z" author="rjray">
+      <file path="imgsize.PL" revision="38"/>
+      <description>
+        Added some docs and better error-handling.
+      </description>
+    </change>
+  </release>
+  <release version="2.8" date="1998-12-07T10:18:44.000000Z">
+    <change date="1998-12-07T10:18:44.000000Z" author="rjray">
+      <file path="t/all.t" revision="37"/>
+      <description>
+        Added a test for the new BMP support.
+      </description>
+    </change>
+    <change date="1998-12-07T10:18:08.000000Z" author="rjray">
+      <file path="Size.pm" revision="36"/>
+      <description>
+        Added support for BMP files, changed VERSION to 2.8.
+      </description>
+    </change>
+  </release>
+  <release version="2.7" date="1998-08-07T08:35:47.000000Z">
+    <change date="1998-08-07T08:27:47.000000Z" author="rjray">
+      <file path="Size.pm" revision="33"/>
+      <description>
+        Corrected numerous documentation errors and make the base imgsize
+        routine return a void context if called in a void context.
+      </description>
+    </change>
+  </release>
+  <release varsion="2.6" date="1998-01-25T09:29:14.000000Z">
+    <change date="1998-01-25T09:21:30.000000Z" author="rjray">
+      <file path="t/all.t" revision="31"/>
+      <description>
+        Incorporate changes from Cloyce Spradling that were accidentally left
+        out of 2.5.
+      </description>
+    </change>
+    <change date="1998-01-25T06:35:03.000000Z" author="rjray">
+      <file path="Size.pm" revision="30"/>
+      <description>
+        Fixed some problems with reading of XPM and XBM headers. In the case
+        of XPM, it was a matter of the key line having a third pair of
+        numbers. In the case of XBM, comments at the head of an XBM file
+        could keep the read-in buffer from extracting enough data (fixed by
+        upping the read size from 160 to 1024).
+      </description>
+    </change>
+  </release>
+  <release version="2.5" date="1997-12-24T17:19:00Z">
+    <change date="1997-12-25T01:11:48.000000Z" author="rjray">
+      <fileset revision="28">
+        <file path="ANNOUNCE"/>
+        <file path="MANIFEST"/>
+        <file path="README"/>
+        <file path="Size.pm"/>
+      </fileset>
+      <description>
+        Added support for TIFF images and two test cases. Many thanks to Cloyce
+        Spradling &lt;cloyce@headgear.org&gt; for both the code patches and the
+        test images.
+      </description>
+    </change>
+  </release>
+  <release version="2.4" date="1997-09-02T19:36:54.000000Z">
+    <change date="1997-09-02T19:32:02.000000Z" author="rjray">
+      <file path="Size.pm" revision="26"/>
+      <description>
+        Fixed tiny bug in jpeg code that failed to return "JPG" as the 3rd
+        element. Figures someone would actually use that feature...
+      </description>
+    </change>
+  </release>
+  <release version="2.3" date="1997-04-21T18:34:53.000000Z">
+    <change date="1997-04-21T18:30:30.000000Z" author="rjray">
+      <file path="Size.pm" revision="24"/>
+      <description>
+        Fixed usage of AutoLoader to 5.004 standards and fixed glitch in XPM
+        regex.
+      </description>
+    </change>
+  </release>
+  <release version="2.2" date="1997-01-16T22:25:10.000000Z">
+    <change date="1997-01-16T22:25:10.000000Z" author="rjray">
+      <file path="Makefile.PL" revision="23"/>
+      <description>
+        Fixed it so that the imgsize script gets removed for make clean or
+        make realclean.
+      </description>
+    </change>
+    <change date="1997-01-16T22:23:39.000000Z" author="rjray">
+      <file path="Size.pm" revision="22"/>
+      <description>
+        Small patch to set binmode for OS/2, etc. that need it. Also change
+        to gifsize to clean up -w noise from new lexical-related warnings (in
+        this case, a reference to $stream might not have been properly
+        shared).
+      </description>
+    </change>
+  </release>
+  <release version="2.1" date="1996-11-29T17:25:00Z">
+    <change>
+      <file path="Size.pm" />
+      <description>
+        Added in changes to the error handling that were meant for 2.0. Fixed
+        a bug in attr_imgsize caused by the new return format.
+      </description>
+    </change>
+  </release>
+  <release version="2.0" date="1996-11-25T13:33:00Z">
+    <change author="rjray">
+      <file path="README" revision="19"/>
+      <description>
+        Notation of the changed error syntax.
+      </description>
+    </change>
+    <change author="rjray">
+      <file path="Size.pm" revision="18"/>
+      <description>
+        Image::Size 2.0 package: better GIF, JPG and PNG handling. Added PPM
+        handling. No longer uses filenames to type the data. Operates on
+        memory and file- handles as well as filenames.
+      </description>
+    </change>
+    <change author="rjray">
+      <file path="t/all.t" revision="16"/>
+      <description>
+        New tests for new formats, new error reporting.
+      </description>
+    </change>
+    <change author="rjray">
+      <file path="Makefile.PL" revision="15"/>
+      <description>
+        Specified GNU zip as compressor.
+      </description>
+    </change>
+  </release>
+  <release version="1.2" date="1996-09-06T15:31:57.000000Z">
+    <change date="1996-09-06T15:15:50.000000Z" author="rjray">
+      <file path="MANIFEST" revision="11"/>
+      <description>
+        Changed imgsize to imgsize.PL (from patch by Bernd Leibing
+        &lt;bernd.leibing@rz.uni-ulm.de&gt;)
+      </description>
+    </change>
+    <change date="1996-09-06T15:14:14.000000Z" author="rjray">
+      <file path="imgsize.PL" revision="10"/>
+      <description>
+        Revised by Bernd Leibing &lt;bernd.leibing@rz.uni-ulm.de&gt; to use var
+        substitution for things like the start-up line.
+      </description>
+    </change>
+    <change date="1996-09-06T14:47:23.000000Z" author="rjray">
+      <file path="Size.pm" revision="9"/>
+      <description>
+        Assignment of $Image::Size::revision caused an error due to q//.
+      </description>
+    </change>
+  </release>
+  <release version="1.1" date="1996-09-04T21:26:25.000000Z">
+    <change date="1996-09-04T21:25:46.000000Z" author="rjray">
+      <fileset revision="7">
+        <file path="ANNOUNCE" action="ADD"/>
+        <file path="imgsize.PL" action="ADD"/>
+      </fileset>
+      <description>
+        Initial revision
+      </description>
+    </change>
+    <change date="1996-09-04T21:20:35.000000Z" author="rjray">
+      <file path="Makefile.PL" revision="5"/>
+      <description>
+        Added imgsize, a simple script that sizes images from the
+        command-line.
+      </description>
+    </change>
+    <change date="1996-09-04T21:18:52.000000Z" author="rjray">
+      <file path="Size.pm" revision="4"/>
+      <description>
+        Fixed a bug in jpegsize and added some clarity to docs and comments.
+      </description>
+    </change>
+  </release>
+  <release version="1.0" date="1996-08-06T22:24:38.000000Z">
+    <change date="1996-08-06T22:24:38.000000Z" author="rjray">
+      <fileset revision="3">
+        <file path="MANIFEST" action="ADD"/>
+        <file path="README" action="ADD"/>
+        <file path="Size.pm" action="ADD"/>
+        <file path="Makefile.PL" action="ADD"/>
+        <file path="t/all.t" action="ADD"/>
+      </fileset>
+      <description>
+        Initial commit of the core project files.
+      </description>
+    </change>
+  </release>
+</changelog>

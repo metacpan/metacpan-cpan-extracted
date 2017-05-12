@@ -1,0 +1,13 @@
+         Installation instructions for Image::BMP
+
+To install this module, just do:
+
+  perl Makefile.PL
+  make
+  make install     (this step may need to be done as the superuser)
+
+Substitute "nmake" or "gmake" for "make" if you prefer using some
+other make-alike on your platform.
+
+David Madison
+http://MarginalHacks.com/

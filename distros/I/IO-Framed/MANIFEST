@@ -1,0 +1,23 @@
+.gitignore
+Changes
+LICENSE
+MANIFEST
+Makefile.PL
+lib/IO/Framed.pm
+lib/IO/Framed/Read.pm
+lib/IO/Framed/ReadWrite.pm
+lib/IO/Framed/ReadWrite/Blocking.pm
+lib/IO/Framed/ReadWrite/NonBlocking.pm
+lib/IO/Framed/Write.pm
+lib/IO/Framed/Write/Blocking.pm
+lib/IO/Framed/Write/NonBlocking.pm
+lib/IO/Framed/X.pm
+lib/IO/Framed/X/Base.pm
+lib/IO/Framed/X/EmptyRead.pm
+lib/IO/Framed/X/ErrnoBase.pm
+lib/IO/Framed/X/ReadError.pm
+lib/IO/Framed/X/WriteError.pm
+t/read.t
+t/write.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,98 @@
+=pod
+
+=head1 NAME
+
+IRC::Indexer::POD::ClientExamples - Example indexer frontends
+
+=head1 DESCRIPTION
+
+This document offers some possible methods of putting IRC::Indexer 
+trawler output to use.
+
+Be sure to also see the B<examples/> directory in the distribution.
+
+=head1 JSON SERVER
+
+L<ircindexer-server-json> can be used to manage a set of trawlers, 
+exporting JSON over HTTP for use by frontends.
+
+Note that server-json only reports networks & servers that have been 
+trawled in the current instance. It is up to frontends to handle 
+persistency and storage.
+
+Assuming your ircindexer-server-json is running on port 8700 on 
+localhost:
+
+=head2 Retrieve available networks
+
+  use LWP::UserAgent;
+  use JSON::XS;
+  
+  my $response = LWP::UserAgent->new()->get(
+    'http://localhost:8700/network'
+  );
+  
+  my $networks;
+  if ($response->success) {
+    my $json = $response->content;
+    
+    $networks = decode_json($json);
+  } else {
+    ## Retrieving JSON failed ...
+    ## You can check for $response->code == 404
+    ## If the content() of the 404 starts with "PENDING" the trawl 
+    ## run is waiting for a successful completion; otherwise it is 
+    ## not an available network.
+    ## ... or just die()   :-)
+  }
+  
+Now $networks contains an array reference listing available network 
+names. We can use that to retrieve a specific network's information:
+  
+  for my $netname (@$networks) {
+    my $response = LWP::UserAgent->new()->get(
+      "http://localhost:8700/network/$netname"
+    );
+      
+    my $netinfo;
+    if ($response->success) {
+      my $json = $response->content;
+      $netinfo = decode_json($json);
+    }
+  }
+
+The 'netinfo' hash adheres to the format specified by 
+L<IRC::Indexer::POD::NetworkSpec>.
+
+=head2 Retrieve available servers
+
+A similar technique can be used to get the currently available trawled 
+servers, given a valid $netname:
+
+  my $response = LWP::UserAgent->new()->get(
+    "http://localhost:8700/network/${netname}/server"
+  );
+  
+  my $servlist;
+  if ($response->success) {
+    my $json = $response->content;
+    $servlist = decode_json($json);
+  }
+
+The servlist allows you to retrieve specific server hashes, as detailed 
+in L<IRC::Indexer::POD::ServerSpec>:
+
+  for my $server (@$servlist) {
+    my $response = LWP::UserAgent->new()->get(
+      "http://localhost:8700/network/${netname}/server/${server}"
+    );
+    
+    my $servinfo;
+    ## decode, same as above
+  }
+
+=head1 AUTHOR
+
+Jon Portnoy <avenj@cobaltirc.org>
+
+=cut

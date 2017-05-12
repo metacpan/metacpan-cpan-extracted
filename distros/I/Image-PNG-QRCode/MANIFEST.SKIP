@@ -1,0 +1,15 @@
+^(build|make-pod)\.pl$
+blib/.*
+.gitignore
+.git/.*
+Makefile$
+pm_to_blib
+MYMETA..*
+.*\.bak
+^Image-PNG-QRCode-[0-9\.]+/$
+^Image-PNG-QRCode-[0-9\.]+\.tar\.gz$
+^QRCode.(?:c|o|bs)$
+^(qrpng|qrencode)\.o$
+.*\.png$
+^makeitfile$
+^examples/.*-out\.txt$

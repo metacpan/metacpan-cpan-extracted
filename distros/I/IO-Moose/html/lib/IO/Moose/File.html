@@ -1,0 +1,312 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>IO::Moose::File - Reimplementation of IO::File with improvements</title>
+<link rel="stylesheet" href="../../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:support@ActiveState.com" />
+</head>
+
+<body>
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="block" valign="middle">
+<big><strong><span class="block">&nbsp;IO::Moose::File - Reimplementation of IO::File with improvements</span></strong></big>
+</td></tr>
+</table>
+
+
+<!-- INDEX BEGIN -->
+<div name="index">
+<p><a name="__index__"></a></p>
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#inheritance">INHERITANCE</a></li>
+	<li><a href="#exceptions">EXCEPTIONS</a></li>
+	<li><a href="#attributes">ATTRIBUTES</a></li>
+	<li><a href="#constructors">CONSTRUCTORS</a></li>
+	<li><a href="#methods">METHODS</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+	<li><a href="#bugs">BUGS</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#license">LICENSE</a></li>
+</ul>
+
+<hr name="index" />
+</div>
+<!-- INDEX END -->
+
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>IO::Moose::File - Reimplementation of IO::File with improvements</p>
+<p>
+<a href="#__index__"><small>Back to Top</small></a>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+  <span class="keyword">use</span> <span class="variable">IO::Moose::File</span><span class="operator">;</span>
+  <span class="keyword">my</span> <span class="variable">$file</span> <span class="operator">=</span> <span class="variable">IO::Moose::File</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span> <span class="string">file</span> <span class="operator">=&gt;</span> <span class="string">"/etc/passwd"</span> <span class="operator">);</span>
+  <span class="keyword">my</span> <span class="variable">@passwd</span> <span class="operator">=</span> <span class="variable">$file</span><span class="operator">-&gt;</span><span class="variable">getlines</span><span class="operator">;</span>
+</pre>
+<p>
+<a href="#__index__"><small>Back to Top</small></a>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>This class provides an interface mostly compatible with <a href="../../../../site/IO/File.html">the IO::File manpage</a>.  The
+differences:</p>
+<ul>
+<li>
+<p>It is based on <a href="../../../../site/lib/IO/Moose.html">the Moose manpage</a> object framework.</p>
+</li>
+<li>
+<p>It uses <a href="../../../../site/Exception/Base.html">the Exception::Base manpage</a> for signaling errors. Most of methods are throwing
+exception on failure.</p>
+</li>
+<li>
+<p>It doesn't export any constants.  Use <em>Fcntl</em> instead.</p>
+</li>
+</ul>
+<p>
+<a href="#__index__"><small>Back to Top</small></a>
+</p>
+<hr />
+<h1><a name="inheritance">INHERITANCE</a></h1>
+<ul>
+<li>
+<p>extends <a href="../../../../site/lib/IO/Moose/Seekable.html">the IO::Moose::Seekable manpage</a></p>
+<ul>
+<li>
+<p>extends <a href="../../../../site/lib/IO/Moose/Handle.html">the IO::Moose::Handle manpage</a></p>
+<ul>
+<li>
+<p>extends <a href="../../../../site/MooseX/GlobRef/Object.html">the MooseX::GlobRef::Object manpage</a></p>
+<ul>
+<li>
+<p>extends <a href="../../../../site/Moose/Object.html">the Moose::Object manpage</a></p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>extends <a href="../../../../site/IO/File.html">the IO::File manpage</a></p>
+<ul>
+<li>
+<p>extends <a href="../../../../site/IO/Seekable.html">the IO::Seekable manpage</a></p>
+<ul>
+<li>
+<p>extends <a href="../../../../site/IO/Handle.html">the IO::Handle manpage</a></p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>
+<a href="#__index__"><small>Back to Top</small></a>
+</p>
+<hr />
+<h1><a name="exceptions">EXCEPTIONS</a></h1>
+<dl>
+<dt><strong><a name="exception_argument3" class="item"><a href="../../../../site/Exception/Argument.html">the Exception::Argument manpage</a></a></strong></dt>
+
+<dd>
+<p>Thrown whether method is called with wrong argument.</p>
+</dd>
+<dt><strong><a name="exception_fatal3" class="item"><a href="../../../../site/Exception/Fatal.html">the Exception::Fatal manpage</a></a></strong></dt>
+
+<dd>
+<p>Thrown whether fatal error is occurred by core function.</p>
+</dd>
+</dl>
+<p>
+<a href="#__index__"><small>Back to Top</small></a>
+</p>
+<hr />
+<h1><a name="attributes">ATTRIBUTES</a></h1>
+<dl>
+<dt><strong><a name="file_str_filehandle_openhandle_ro" class="item">file : Str|FileHandle|OpenHandle {ro}</a></strong></dt>
+
+<dd>
+<p>File (file name, file handle or IO object) as a parameter for new object or
+<a href="#open"><code>open</code></a> method.</p>
+</dd>
+<dt><strong><a name="mode_openmodewithlayerstr_canonopenmodestr_ro" class="item">mode : OpenModeWithLayerStr|CanonOpenModeStr = &quot;&lt;&quot; {ro}</a></strong></dt>
+
+<dd>
+<p>File mode as a parameter for new object or <a href="#open"><code>open</code></a> method.  Can be Perl-style
+string (&lt;, &gt;, &gt;&gt;, etc.) with optional PerlIO layer after colon
+(i.e. <code>&lt;:encoding(UTF-8)</code>) or C-style string (<code>r</code>, <code>w</code>, <code>a</code>, etc.)</p>
+</dd>
+<dt><strong><a name="sysmode_num_ro" class="item">sysmode : Num {ro}</a></strong></dt>
+
+<dd>
+<p>File mode as a parameter for new object or <a href="#sysopen"><code>sysopen</code></a> method.  Can be decimal
+number (<code>O_RDONLY</code>, <code>O_RDWR</code>, <code>O_CREAT</code>, other constants from standard
+module <em>Fcntl</em>).</p>
+</dd>
+<dt><strong><a name="perms_num_0666_ro" class="item">perms : Num = 0666 {ro}</a></strong></dt>
+
+<dd>
+<p>Permissions to use in case a new file is created and mode was decimal number.
+The permissions are always modified by umask.</p>
+</dd>
+<dt><strong><a name="layer_perliolayerstr_ro" class="item">layer : PerlIOLayerStr = &quot;&quot; {ro}</a></strong></dt>
+
+<dd>
+<p>PerlIO layer string.</p>
+</dd>
+</dl>
+<p>
+<a href="#__index__"><small>Back to Top</small></a>
+</p>
+<hr />
+<h1><a name="constructors">CONSTRUCTORS</a></h1>
+<dl>
+<dt><strong><a name="new" class="item">new( <em>args</em> : Hash ) : Self</a></strong></dt>
+
+<dd>
+<p>Creates an object.  If <em>file</em> is defined and is a string or array
+reference, the <a href="#open"><code>open</code></a> method is called; if the open fails, the object
+is destroyed.  Otherwise, it is returned to the caller.</p>
+<pre>
+  <span class="variable">$io</span> <span class="operator">=</span> <span class="variable">IO::Moose::File</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">;</span>
+  <span class="variable">$io</span><span class="operator">-&gt;</span><span class="variable">open</span><span class="operator">(</span><span class="string">"/etc/passwd"</span><span class="operator">);</span>
+</pre>
+<pre>
+  <span class="variable">$io</span> <span class="operator">=</span> <span class="variable">IO::Moose::File</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span> <span class="string">file</span> <span class="operator">=&gt;</span> <span class="string">"/var/log/perl.log"</span><span class="operator">,</span> <span class="string">mode</span> <span class="operator">=&gt;</span> <span class="string">"a"</span> <span class="operator">);</span>
+</pre>
+<p>If <em>file</em> is a file handler, the <code>fdopen</code> method is called.</p>
+<pre>
+  <span class="variable">$tmp</span> <span class="operator">=</span> <span class="variable">IO::Moose::File</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span> <span class="string">file</span> <span class="operator">=&gt;</span> <span class="operator">\</span><span class="variable">*STDERR</span><span class="operator">,</span> <span class="string">mode</span> <span class="operator">=&gt;</span> <span class="string">'w'</span> <span class="operator">);</span>
+  <span class="variable">$tmp</span><span class="operator">-&gt;</span><span class="variable">say</span><span class="operator">(</span><span class="string">"Some important message"</span><span class="operator">);</span>
+</pre>
+<p>If <em>layer</em> is defined, the <a href="#binmode"><code>binmode</code></a> method is called.</p>
+<pre>
+  <span class="variable">$io</span> <span class="operator">=</span> <span class="variable">IO::Moose::File</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span> <span class="string">file</span> <span class="operator">=&gt;</span> <span class="string">"test.txt"</span><span class="operator">,</span> <span class="string">layer</span> <span class="operator">=&gt;</span> <span class="string">":utf8"</span> <span class="operator">);</span>
+</pre>
+</dd>
+<dt><strong><a name="new_tmpfile" class="item">new_tmpfile( <em>args</em> : Hash ) : Self</a></strong></dt>
+
+<dd>
+<p>Creates the object with opened temporary and anonymous file for read/write.
+If the temporary file cannot be created or opened, the object is destroyed.
+Otherwise, it is returned to the caller.</p>
+<p>All <em>args</em> will be passed to the <a href="../../../../site/File/Temp.html">the File::Temp manpage</a> and <a href="../../../../site/lib/IO/Moose/Handle.html">the IO::Moose::Handle manpage</a>
+constructors.</p>
+<pre>
+  <span class="variable">$io</span> <span class="operator">=</span> <span class="variable">IO::Moose::File</span><span class="operator">-&gt;</span><span class="variable">new_tmpfile</span><span class="operator">(</span> <span class="string">UNLINK</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">,</span> <span class="string">SUFFIX</span> <span class="operator">=&gt;</span> <span class="string">'.jpg'</span> <span class="operator">);</span>
+  <span class="variable">$pos</span> <span class="operator">=</span> <span class="variable">$io</span><span class="operator">-&gt;</span><span class="variable">getpos</span><span class="operator">;</span>  <span class="comment"># save position</span>
+  <span class="variable">$io</span><span class="operator">-&gt;</span><span class="variable">say</span><span class="operator">(</span><span class="string">"foo"</span><span class="operator">);</span>
+  <span class="variable">$io</span><span class="operator">-&gt;</span><span class="variable">setpos</span><span class="operator">(</span><span class="variable">$pos</span><span class="operator">);</span>   <span class="comment"># rewind</span>
+  <span class="variable">$io</span><span class="operator">-&gt;</span><span class="variable">slurp</span><span class="operator">;</span>          <span class="comment"># prints "foo"</span>
+</pre>
+<pre>
+  <span class="variable">$tmp</span> <span class="operator">=</span> <span class="variable">IO::Moose::File</span><span class="operator">-&gt;</span><span class="variable">new_tmpfile</span><span class="operator">(</span> <span class="string">output_record_separator</span> <span class="operator">=&gt;</span> <span class="string">"\n"</span> <span class="operator">);</span>
+  <span class="variable">$tmp</span><span class="operator">-&gt;</span><span class="variable">print</span><span class="operator">(</span><span class="string">"say"</span><span class="operator">);</span>  <span class="comment"># with eol</span>
+</pre>
+</dd>
+</dl>
+<p>
+<a href="#__index__"><small>Back to Top</small></a>
+</p>
+<hr />
+<h1><a name="methods">METHODS</a></h1>
+<dl>
+<dt><strong><a name="open" class="item">open( <em>file</em> : Str, <em>mode</em> : OpenModeWithLayerStr|CanonOpenModeStr = &quot;&lt;&quot; ) : Self</a></strong></dt>
+
+<dd>
+<p>Opens the <em>file</em> with <em>perlfunc/open</em> function and returns self object.</p>
+<pre>
+  <span class="variable">$io</span> <span class="operator">=</span> <span class="variable">IO::Moose::File</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">;</span>
+  <span class="variable">$io</span><span class="operator">-&gt;</span><span class="variable">open</span><span class="operator">(</span><span class="string">"/etc/passwd"</span><span class="operator">);</span>
+</pre>
+<pre>
+  <span class="variable">$io</span> <span class="operator">=</span> <span class="variable">IO::Moose::File</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">;</span>
+  <span class="variable">$io</span><span class="operator">-&gt;</span><span class="variable">open</span><span class="operator">(</span><span class="string">"/var/tmp/output"</span><span class="operator">,</span> <span class="string">"w"</span><span class="operator">);</span>
+</pre>
+</dd>
+<dt><strong><a name="sysopen" class="item">sysopen( <em>file</em> : Str, <em>sysmode</em> : Num, <em>perms</em> : Num = 0600 ) : Self</a></strong></dt>
+
+<dd>
+<p>Opens the <em>file</em> with <em>perlfunc/sysopen</em> function and returns self object.
+The <em>sysmode</em> is decimal value (it can be <code>O_XXX</code> constant from standard
+module <em>Fcntl</em>).  The default <em>perms</em> are set to <code>0666</code>.  The <code>mode</code>
+attribute is set based on <em>sysmode</em> value.</p>
+<pre>
+  <span class="keyword">use</span> <span class="variable">Fcntl</span><span class="operator">;</span>
+  <span class="variable">$io</span> <span class="operator">=</span> <span class="variable">IO::Moose::File</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">;</span>
+  <span class="variable">$io</span><span class="operator">-&gt;</span><span class="variable">open</span><span class="operator">(</span><span class="string">"/etc/hosts"</span><span class="operator">,</span> <span class="variable">O_RDONLY</span><span class="operator">);</span>
+  <span class="keyword">print</span> <span class="variable">$io</span><span class="operator">-&gt;</span><span class="variable">mode</span><span class="operator">;</span>   <span class="comment"># prints "&lt;"</span>
+</pre>
+</dd>
+<dt><strong><a name="binmode" class="item">binmode(<em></em>) : Self</a></strong></dt>
+
+<dt><strong>binmode( <em>layer</em> : PerlIOLayerStr ) : Self</strong></dt>
+
+<dd>
+<p>Sets binmode on the underlying IO object.  On some systems (in general, DOS
+and Windows-based systems) binmode is necessary when you're not working with
+a text file.</p>
+<p>It can also sets PerlIO layer (<code>:bytes</code>, <code>:crlf</code>, <code>:utf8</code>,
+<code>:encoding(XXX)</code>, etc.). More details can be found in <a href="../../../../site/PerlIO/encoding.html">the PerlIO::encoding manpage</a>.</p>
+<p>In general, <a href="#binmode"><code>binmode</code></a> should be called after <a href="#open"><code>open</code></a> but before any I/O is
+done on the file handler.</p>
+<p>Returns self object.</p>
+<pre>
+  <span class="variable">$io</span> <span class="operator">=</span> <span class="variable">IO::Moose::File</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span> <span class="string">file</span> <span class="operator">=&gt;</span> <span class="string">"/tmp/picture.png"</span><span class="operator">,</span> <span class="string">mode</span> <span class="operator">=&gt;</span> <span class="string">"w"</span> <span class="operator">);</span>
+  <span class="variable">$io</span><span class="operator">-&gt;</span><span class="variable">binmode</span><span class="operator">;</span>
+</pre>
+<pre>
+  <span class="variable">$io</span> <span class="operator">=</span> <span class="variable">IO::Moose::File</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span> <span class="string">file</span> <span class="operator">=&gt;</span> <span class="string">"/var/tmp/fromdos.txt"</span> <span class="operator">);</span>
+  <span class="variable">$io</span><span class="operator">-&gt;</span><span class="variable">binmode</span><span class="operator">(</span><span class="string">":crlf"</span><span class="operator">);</span>
+</pre>
+</dd>
+</dl>
+<p>
+<a href="#__index__"><small>Back to Top</small></a>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p><a href="../../../../site/IO/File.html">the IO::File manpage</a>, <a href="../../../../site/lib/IO/Moose.html">the IO::Moose manpage</a>, <a href="../../../../site/lib/IO/Moose/Handle.html">the IO::Moose::Handle manpage</a>, <a href="../../../../site/lib/IO/Moose/Seekable.html">the IO::Moose::Seekable manpage</a>,
+<a href="../../../../site/File/Temp.html">the File::Temp manpage</a>.</p>
+<p>
+<a href="#__index__"><small>Back to Top</small></a>
+</p>
+<hr />
+<h1><a name="bugs">BUGS</a></h1>
+<p>The API is not stable yet and can be changed in future.</p>
+<p>
+<a href="#__index__"><small>Back to Top</small></a>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Piotr Roszatycki &lt;<a href="mailto:dexter@cpan.org">dexter@cpan.org</a>&gt;</p>
+<p>
+<a href="#__index__"><small>Back to Top</small></a>
+</p>
+<hr />
+<h1><a name="license">LICENSE</a></h1>
+<p>Copyright 2008, 2009 by Piotr Roszatycki &lt;<a href="mailto:dexter@cpan.org">dexter@cpan.org</a>&gt;.</p>
+<p>This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.</p>
+<p>See <a href="http://www.perl.com/perl/misc/Artistic.html">http://www.perl.com/perl/misc/Artistic.html</a></p>
+<p><a href="#__index__"><small>Back to Top</small></a></p>
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="block" valign="middle">
+<big><strong><span class="block">&nbsp;IO::Moose::File - Reimplementation of IO::File with improvements</span></strong></big>
+</td></tr>
+</table>
+
+</body>
+
+</html>

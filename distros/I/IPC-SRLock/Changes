@@ -1,0 +1,93 @@
+Revision history for IPC::SRLock
+
+0.31.1    2017-02-03 23:08:51
+          - Toolchain update
+          - Toolchain update
+
+0.30.1    2016-08-23 18:00:43
+          - Fixes missing lockfile attribute
+
+0.29.1    2016-02-13 17:46:53
+          - Added broken smoker to exception list
+
+0.28.1    2016-02-03 02:42:14
+          - Constructor accepts builder config lock_attributes
+          - Full coverage achieved
+          - Reset throws if pids do not match
+            Adjusted Async::IPC::Semaphore to pass pid to child
+          - Enhanced constructor to accept builder argument
+          - Improved program flow
+
+0.27.1    2016-01-03 00:09:50
+          - More idiomatic name for function package
+          - Improved test coverage
+          - Added coverage badge
+          - Refactored smoker exceptions to dump file
+          - Updated Travis configuration and toolchain
+          - Updated prereqs
+          - Toolchain updates
+
+0.26.1    2015-05-28 19:07:29
+          - Dropped exception_class attribute
+          - Added Constants Expception_Class
+
+0.25.1    2015-05-18 14:47:51
+          - Don't try to untaint undef on BUILDARGS
+          - Added MANIFEST to repository to keep Travis happy
+          - Added public repository and badges
+          - Added Fake lock type
+          - Untaint type arg and add qualifying
+          - Now using exception classes
+          - Switched to private lexical subs
+
+0.24.1    2014-11-10 16:38:26
+          - Dropped atomic shm file writes from ::Fcntl. Unecessary
+          - Added async option. Blocks for memcached implementation
+          - Optimized and retested memcache backend
+
+0.23.1    2014-09-15 15:51:17
+          - Replaced namespace::sweep with namespace::autoclean
+          - Updated prereqs
+
+0.22.1    2014-05-06 12:22:47
+          - Removed Ident and VERSION lines
+          - Remove prereqs below min perl ver
+          - Stopped using _normalize_prereqs in Build.PL. My bad
+          - Use DZ::P::AbstractFromPOD and LicenseFromModule
+
+0.21.1    2013-11-27 15:25:41
+          - Module::Build backwardly incompatible change around 0.4200
+            The dynamic config was stuffed by a change in the data
+            structure used by _normalize_prereqs. It is now keyed by
+            phase, relation and module. Thanks
+
+0.20.1    2013-11-26 22:46:46
+          - 8aae5113-6bf7-1014-9ee2-ba2209253afe wtf?
+
+0.19.1    2013-09-13 13:29:41
+          - Create shared memory segment on construction
+
+0.18.1    2013-09-11 23:21:44
+          - Readded dynamic config
+
+0.17.1    2013-09-11 21:35:12
+          - Removed dependency on Unexpected
+          - Removed IPC::SRLock::Exception
+
+0.16.2    2013-09-03 15:58:15
+          - Improved test coverage
+
+0.15.1    2013-09-02 16:04:33
+          - Bumped version for Unexpected
+
+0.14.3    2013-08-17 00:17:32
+          - Exception no longer overrides 'class' attribute
+          - Updated toolchain
+          - Switched to Dist::Zilla
+
+0.13.3    2013-08-07 14:30:09
+          - Reset min perl testing to original behaviour
+          - Raised minimum Perl version to v5.10.1
+          - POD updates
+
+

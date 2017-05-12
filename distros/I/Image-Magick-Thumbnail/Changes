@@ -1,0 +1,18 @@
+Revision history for Perl extension Image::Magick::Thumbnail.
+
+0.05  08 February 2008
+	  Allow forcing which side to which scale, for Arthur.
+
+0.05  Wed Dec 19 11:56:00 2007
+
+0.03  Sun Apr 17 12:13:14 2005
+	  Catches a weird floating point situation, spotted by 
+	  André Warrier.
+
+0.02  Date?
+	  Caught some operator errors and supported gemortry
+
+0.01  Thu Jun  6 17:17:42 2002
+	- original version; created by h2xs 1.21 with options
+		-X -n Image::Magick::Thumbnail
+

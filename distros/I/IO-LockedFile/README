@@ -1,0 +1,56 @@
+                            IO::LockedFile
+
+  Copyright (c) 2001-2002 Ockham Technology N.V. & Rani Pinchuk.  
+  All rights reserved.  
+  This package is free software; you can redistribute it and/or 
+  modify it under the same terms as Perl itself.
+
+DESCRIPTION
+  
+  In its simplistic use, the IO::LockedFile class gives us the same 
+  interface of the IO::File class to files with the unique difference
+  that those files are locked using the flock mechanism. Yet, the
+  class provides us with the ability to use other schemes then flock.
+  
+  Example for the use of the class:
+
+     use IO::LockedFile;
+
+     # create new locked file object. $file will hold a file handle.
+     # if the file is already locked, the method will not return until the
+     # file is unlocked
+     my $file = new IO::LockedFile(">locked1.txt");
+
+     # when we close the file - it become unlocked.
+     $file->close();
+
+PREREQUISITES
+
+  IO::File 
+  Fcntl
+
+INSTALLATION
+
+  Follow the standard installation procedure for Perl modules, which is to
+  type the following commands:
+
+          perl Makefile.PL
+          make
+          make test
+          make install
+
+  You'll probably need to do the last as root.  
+
+AUTHOR NOTES
+
+  After I wrote the first version of this module that was extremely simple, 
+  I found out that actually my knowledge in locking files was quite poor. 
+  Yet, with the help of some great people, the module became (hopefully) 
+  better. 
+
+  This is why I would like to ask you for help when you see bugs, mistakes 
+  or just if you have any suggestions or comments - please email me.
+
+Rani Pinchuk
+rani@cpan.org
+

@@ -1,0 +1,58 @@
+2010-02-04 21:36  cvs
+
+	* Makefile.PL, README, t/02_Image_OCR_Tesseract.t: tests are better
+	  at detecting missing deps cleaned up testing output- not as
+	  annoying to install- less to look through in case of any errors
+
+2010-02-04 19:31  cvs
+
+	* INSTALL.tesseract: Updated install help for tesseract dependency.
+
+2009-07-18 22:21  cvs
+
+	* INSTALL, t/00_dep.t, t/02_Image_OCR_Tesseract.t: Updated tests so
+	  if command deps are missing, tests skip out- warnings are made of
+	  the missing deps, which would be imagemagick convert and or
+	  tesseract
+
+2009-06-26 10:10  cvs
+
+	* lib/Image/OCR/: Tesseract.pm, Tesseract.pod: updated docs
+
+2009-04-12 21:14  cvs
+
+	* Makefile.PL, bin/ocr, lib/Image/OCR/Tesseract.pm: cleaned up
+	  documentation, moved module doc to own .pod, implemented ability
+	  to tell tesseract what language to use
+
+2008-11-21 12:04  cvs
+
+	* bin/ocr: fixed up bug in bin/ocr
+
+2008-09-18 17:24  cvs
+
+	* lib/Image/OCR/Tesseract.pm: changed the way trash is cleaned up
+	  with a global @TRASH is debug is on, files are not deleted on END
+	  and the list is output to stdout
+
+2008-09-18 16:59  cvs
+
+	* INSTALL.imagemagick, INSTALL.tesseract, README: Added INSTALL.*
+	  files to help with deps
+
+2008-01-01 04:23  cvs
+
+	* MANIFEST, Makefile.PL, README, t/02_Image_OCR_Tesseract.t,
+	  t/99_cleanup.t, t/tesseract_install_helper.pl, t/img_big.jpg,
+	  t/img_med.jpg, t/00_dependencies_check.t, t/img_small.jpg,
+	  t/test.sh, bin/ocr, lib/Image/OCR/Tesseract.pm, t/paragraph.jpg:
+	  Initial revision
+
+2008-01-01 04:23  cvs
+
+	* MANIFEST, Makefile.PL, README, t/02_Image_OCR_Tesseract.t,
+	  t/99_cleanup.t, t/tesseract_install_helper.pl, t/img_big.jpg,
+	  t/img_med.jpg, t/00_dependencies_check.t, t/img_small.jpg,
+	  t/test.sh, bin/ocr, lib/Image/OCR/Tesseract.pm, t/paragraph.jpg:
+	  init import
+

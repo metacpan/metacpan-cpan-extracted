@@ -1,0 +1,106 @@
+=for comment based on iup-3.5 - http://www.tecgraf.puc-rio.br/iup/en/elem/iupnormalizer.html
+
+=head1 NAME
+
+IUP::Normalizer - [special] normalizes all controls from a list to be the biggest natural size
+
+=head1 DESCRIPTION 
+
+Normalizes all controls from a list so their natural size to be the
+biggest natural size among them. All natural width will be set to the
+biggest width, and all natural height will be set to the biggest height
+according to is value.
+
+ my $normalizer = IUP::Normalizer->new( child=>[$elem1, $elem2, $elem3], NORMALIZE=>"HORIZONTAL" );
+ #at his point $elem1 ... $elem3 are normalized, IUP::Normalizer instance can be destroyed
+ undef $normalizer;
+
+=head1 USAGE
+
+=head2 CREATION - new() method
+
+ #standard way
+ $normalizer = IUP::Normalizer->new( child=>[$elem1, $elem2], NORMALIZE=>"HORIZONTAL" );
+ 
+ #or with just a single child
+ $normalizer = IUP::Normalizer->new( child=>$elem1, NORMALIZE=>"HORIZONTAL" );
+ 
+ #or with just 1 parameter (arrayref)
+ $normalizer = IUP::Normalizer->new( [$elem1, $elem2] );
+ 
+ #or with just 1 parameter (reference to child elements)
+ $normalizer = IUP::Normalizer->new( $elem1 );
+
+B<child:> (named parameter) List of the references to elements (or just a single element) that
+will be normalized.
+
+B<Returns:> the identifier of the created element, or C<undef> if an error occurs.
+
+NOTE: You can pass to C<new()> other C<ATTRIBUTE=E<gt>'value'> or C<CALLBACKNAME=E<gt>\&func> pairs relevant
+to this element - see L<IUP::Manual::02_Elements|IUP::Manual::02_Elements/"new()">.
+
+=head2 ATTRIBUTES
+
+For more info about concept of attributes (setting/getting values etc.)
+see L<IUP::Manual::03_Attributes|IUP::Manual::03_Attributes>. Attributes specific to this element:
+
+=over
+
+=item B<NORMALIZE>
+
+I<(non inheritable)> Normalization direction. Can be
+HORIZONTAL, VERTICAL or BOTH. These are the same values of the
+NORMALIZESIZE attribute. Default: HORIZONTAL.
+
+=item B<NORMALIZERGROUP>
+
+I<(non inheritable, for contained controls use)> Name of a normalizer to automatically add the control. If a normalizer
+with that name does not exists then one is created.
+
+=item B<ADDCONTROL>
+
+I<(non inheritable)> Adds a control to the normalizer. The value passed must be the perl reference or name of the element.
+
+To associate a name to element use L<SetName|/"SetName()"> or C<< name=>'ElemName' >> named parameter of L<new()|/"new()"> constructor.
+
+=item B<ADDCONTROL_HANDLE>
+
+I<(non inheritable)> Adds a control to the normalizer. The value passed must be a handle of an element.
+
+=back
+
+=head1 NOTES
+
+It is NOT necessary to add the normalizer to a dialog hierarchy. Every
+time the NORMALIZE attribute is set a normalization occurs. If the
+normalizer is added to a dialog hierarchy, then whenever the B<Natural>
+size is calculated a normalization occurs, so add it to the hierarchy
+before the elements you want to normalize or its normalization will be
+not used.
+
+The elements do NOT need to be children of the same parent, do NOT need
+to be mapped, and do NOT need to be in a complete hierarchy of a
+dialog.
+
+The elements are NOT children of the normalizer. To remove or add other
+elements, the normalizer must be destroyed and created a new one.
+
+Has the same effect of the NORMALIZESIZE attribute of the L<IUP::Vbox|IUP::Vbox>
+and L<IUP::Hbox|IUP::Hbox> controls, but it can be used for elements with different
+parents, it changes the B<User> size of the elements.
+
+=head1 EXAMPLES
+
+
+Unfortunately there are no sample scripts using this element.
+
+
+
+=head1 SEE ALSO
+
+L<IUP::Hbox|IUP::Hbox>, L<IUP::Vbox|IUP::Vbox>
+
+The original doc: L<iupnormalizer.html|http://www.tecgraf.puc-rio.br/iup/en/elem/iupnormalizer.html>
+ 
+
+=cut

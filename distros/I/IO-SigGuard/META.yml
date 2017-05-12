@@ -1,0 +1,28 @@
+---
+abstract: 'Signal protection for sysread/syswrite'
+author:
+  - 'Felipe Gasper'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Slurp: '0'
+  File::Temp: '0'
+  Test::More: '0'
+  Test::Simple: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: IO-SigGuard
+no_index:
+  directory:
+    - t
+    - inc
+requires: {}
+resources:
+  repository: git://github.com/FGasper/p5-IO-SigGuard.git
+version: '0.013'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

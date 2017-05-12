@@ -1,0 +1,5 @@
+TYPEMAP
+Image::Imlib2	T_PTROBJ
+Image::Imlib2::Polygon  T_PTROBJ
+Image::Imlib2::ColorRange  T_PTROBJ
+DATA32 *  T_OPAQUEPTR

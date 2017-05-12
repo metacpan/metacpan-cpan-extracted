@@ -1,0 +1,57 @@
+Changelog for Inky
+
+0.161810 2016-06-29T18:33:40Z
+ [Marco Fontani]
+ - Update changes
+ - [Inky pod] fix missing text for link "Inky"
+ - [Readme] convert pod to markdown
+ - [Readme] add nicer/longer description based on the POD
+ - [Inky pod] add missing assumptions
+ - [Inky pod] add a long, but thorough example
+ - [Inky pod] add HTML for build status at bottom of POD
+ - [dist.ini] only support 5.14+
+ - [travis] only test 5.14+
+ - [travis] also test on 5.24
+ - [travis] always install Dist::Zilla
+
+0.161800 2016-06-28T08:46:21Z
+ [Marco Fontani]
+ - fix substitution regex for older perls
+
+0.161790 2016-06-27T16:07:00Z
+ [Marco Fontani]
+ - shut up perlcritic
+ - Update changes before release
+ - [inky] spacers can get size-sm/size-lg
+ - [inky] add support for raw tags
+ - [inky] add align=center to container
+ - [inky] fix menu item not being passed html target attribute
+ - [inky] pass attributes down
+ - [inky] add support for columns with no-expander attribute
+ - [inky] add optional target= for button
+ - [inky v1.2.2] callouts are tds, not ths
+ - [tests] add test for "does not choke on inline elements"
+
+0.161260 2016-05-05T17:01:03Z
+ [Marco Fontani]
+ - up prereq to Mojolicious 6.0
+ - update Changelog
+
+0.161251 2016-05-04T16:09:40Z
+ [Marco Fontani]
+ - make metacpan link to the right repo
+ - update changelog
+
+0.161250 2016-05-04T13:46:51Z
+ [Marco Fontani]
+ - update Changelog before release
+ - rename pod section "METHODS"
+ - install more test modules for travis author tests
+ - fix: spacer does not incorporate any element
+ - do not auto-create license
+ - add readme
+ - make LICENSE explicit for the repo
+ - copyright holder change
+ - add travis yml
+ - use "nbsp" element for spacer
+ - initial

@@ -1,0 +1,49 @@
+Image-Magick-NFPADiamond version 0.01
+=====================================
+
+Image::Magick::NFPADiamond 
+
+This module renders a NFPA diamond using ImageMagick
+
+Sample:
+
+   use Image::Magick::NFPADiamond;
+
+   my $diamond=Image::Magick::NFPADiamond->new(red=>3, blue=>0, yellow=>1);
+   $diamond->save('warning.jpg');
+
+CGI Sample based on this URL: diamond.cgi?red=3&yellow=2
+
+   use Image::Magick::NFPADiamond;
+   use CGI;
+
+   my $request=new CGI;
+   my $diamond=Image::Magick::NFPADiamond->new($request->Vars);
+   $diamond->response();
+
+March 2008
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Image::Magick
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 by Erich Strelow
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

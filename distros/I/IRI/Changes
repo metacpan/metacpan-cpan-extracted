@@ -1,0 +1,43 @@
+IRI
+===
+
+Created:      2014-07-23
+Home page:    <http://search.cpan.org/dist/IRI/>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=IRI>
+Maintainer:   Gregory Todd Williams <mailto:gwilliams@cpan.org>
+
+0.006  2016-07-19
+
+ - (Update) Fix regular expression use of quantifiers (#8 from Karl
+   Williamson).
+
+0.005  2016-04-04
+
+ - (Addition) Add ability to lazily parse IRI components.
+ - (Addition) Add cpanfile, with Module::Install deps (#5 from Alberto
+   Simões).
+ - (Addition) Added Try::Tiny to list of build requirements (github issue
+   #3).
+ - (Update) Improve performance of IRI component parsing.
+ - (Update) Update POD coverage test to ignore private attributes (#6 from
+   Alberto Simões).
+ - (Update) Updated required version of Type::Tiny to 0.008 to support use
+   of InstanceOf (#7 from Alexandr Ciornii).
+
+0.004  2014-09-25
+
+ - (Update) Changed IRI to use old-style VERSION declaration.
+ - (Update) Moved modules from Moose to Moo.
+
+0.003  2014-08-11
+
+ - (Addition) Added coercion from Str to IRI.
+
+0.002  2014-08-09
+
+ - (Addition) Added as_string method.
+
+0.001  2014-08-02
+
+ - (Addition) First release.
+

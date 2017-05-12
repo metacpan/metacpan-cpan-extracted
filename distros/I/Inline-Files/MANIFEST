@@ -1,0 +1,34 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+demo/XML.xml
+demo/demo_XML
+demo/demo_multiple.pl
+demo/demo_persistence.pl
+demo/demo_persistence_simple.pl
+demo/demo_simple.pl
+demo/demo_singles.pl
+demo/demo_virtual.pl
+demo/demo_nowrite.pl
+demo/demo_write.pl
+lib/Inline/Files.pm
+lib/Inline/Files/Virtual.pm
+t/00init.t
+t/01basics.t
+t/02write.t
+t/03nowrite.t
+t/04create.t
+t/05seek.t
+t/06backup.t
+t/07hash.t
+tests/01basics.t
+tests/02write.t
+tests/03nowrite.t
+tests/04create.t
+tests/05seek.t
+tests/06backup.t
+tests/07hash.t
+t/08coreopen.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

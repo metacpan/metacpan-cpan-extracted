@@ -1,0 +1,6 @@
+Revision history for Perl extension IsUTF8.
+
+0.01  Tue Jun 20 16:39:48 2006
+	- original version; created by h2xs 1.23 with options
+		-AX --skip-exporter --use-new-tests -n IsUTF8
+

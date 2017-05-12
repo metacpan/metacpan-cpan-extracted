@@ -1,0 +1,49 @@
+<calibrator>	<train>
+		<preprocess>1</preprocess>
+		<fitting>linear</fitting>
+		<gamma>1e-06</gamma>
+	</train>
+	<data>
+		<value time="851">82</value>
+		<value time="264">111</value>
+		<value time="143">127</value>
+		<value time="122">208</value>
+		<value time="302">210</value>
+		<value time="873">211</value>
+		<value time="341">218</value>
+		<value time="441">255</value>
+		<value time="250">288</value>
+		<value time="477">294</value>
+		<value time="245">304</value>
+		<value time="376">324</value>
+		<value time="306">336</value>
+		<value time="468">337</value>
+		<value time="427">362</value>
+		<value time="434">375</value>
+		<value time="488">397</value>
+		<value time="306">443</value>
+		<value time="445">459</value>
+		<value time="508">467</value>
+		<value time="369">470</value>
+		<value time="527">471</value>
+		<value time="488">481</value>
+		<value time="391">482</value>
+		<value time="330">499</value>
+		<value time="369">501</value>
+		<value time="481">522</value>
+		<value time="447">523</value>
+		<value time="479">528</value>
+		<value time="492">534</value>
+		<value time="445">543</value>
+		<value time="445">595</value>
+		<value time="479">612</value>
+		<value time="518">680</value>
+		<value time="523">684</value>
+		<value time="531">736</value>
+		<value time="366">741</value>
+		<value time="503">768</value>
+		<value time="443">922</value>
+		<value time="586">947</value>
+		<value time="561">1295</value>
+	</data>
+</calibrator>

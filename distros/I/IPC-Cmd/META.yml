@@ -1,0 +1,31 @@
+---
+abstract: 'A cross platform way of running (interactive) commandline programs.'
+author:
+  - 'Jos Boumans <kane[at]cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: IPC-Cmd
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  Locale::Maketext::Simple: '0'
+  Module::Load::Conditional: '0.66'
+  Params::Check: '0.20'
+  Test::More: '0'
+resources:
+  repository: https://github.com/jib/ipc-cmd
+version: '0.96'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

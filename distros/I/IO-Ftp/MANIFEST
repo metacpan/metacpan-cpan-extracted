@@ -1,0 +1,8 @@
+Changes
+Ftp.pm
+Makefile.PL
+MANIFEST
+test.pl
+README
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

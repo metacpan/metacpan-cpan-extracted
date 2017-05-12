@@ -1,0 +1,6 @@
+Revision history for Perl extension Image::Resize::OpenCV.
+
+0.01  Wed Jul 13 11:31:18 2011
+	- original version; created by h2xs 1.23 with options
+		-c Image::Resize::OpenCV
+

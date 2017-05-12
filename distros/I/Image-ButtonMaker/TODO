@@ -1,0 +1,6 @@
+TO DO:
+
+- add tests
+- fix transparent background problems in png files
+- Gtk/Qt GUI?
+- better border support and rounded corners in ColorCanvas.pm

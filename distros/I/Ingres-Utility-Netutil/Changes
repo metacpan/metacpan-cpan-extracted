@@ -1,0 +1,14 @@
+Revision history for Ingres-Utility-IINetutil
+
+0.04    Wed Nov 15 2006
+	Command's echo removed from return output of NETUTIL utility 
+	Remove "userId" from argument list for destroyLogin()
+	carp ... substitutes die ...
+        Methods got prototyped
+
+0.02    Thu Oct 05 2006
+        Syntax corrections, and prependind underscores to "private" methods
+
+0.01    Wed Sep 27 21:50 2006
+        Initial release.
+

@@ -1,0 +1,533 @@
+=head1 NAME
+
+Inline::SLang - Write Perl subroutines in S-Lang.
+
+=head1 SYNOPSIS
+
+  use Inline SLang;
+
+  print "9 + 16 = ", add(9,16), "\n";
+  print "9 - 16 = ", subtract(9,16), "\n";
+  print JAxH('Inline'), "\n";
+
+  __END__
+  __SLang__
+
+  define add      (a,b) { return a + b; }
+  define subtract (a,b) { return a - b; }
+  define JAxH () {
+    variable type = ();
+    return sprintf( "Just Another %S Hacker!", type );
+  }
+
+=head1 DESCRIPTION
+
+The C<Inline::SLang> module lets you write Perl subroutines in S-Lang.
+It dynamically translates the parameters and return values into 
+native data types for both languages (or into Perl classes that are 
+used to represent
+S-Lang types with no direct translation to Perl).
+This allows you to write a Perl script and take advantage of S-Lang
+whenever you wish: perhaps there is a S-Lang I<module> that you
+wish to use, or you want to take advantage of a S-Lang function
+that you have written.
+
+The module sets up an in-process
+S-Lang interpreter, runs your code, and then examines the
+interpreter's symbol table, looking for things to bind to Perl.
+The process of interrogating the S-Lang interpreter only occurs the
+first time you run your S-Lang code. The namespaces are cached, and
+subsequent calls use the cached version (which is hidden in the
+F<_Inline> directory; see the L<Inline documentation|Inline> for details of
+how the code is cached). Of course, your S-Lang code
+must still be run every time your run the Perl script -- but
+Inline::S-Lang already knows the results of running it.
+
+=head1 What is S-Lang?
+
+From the S-Lang library home page at L<http://www.s-lang.org/>
+
+S-Lang is a multi-platform programmer's library designed to allow a
+developer to create robust multi-platform software. It provides
+facilities required by interactive applications such as display/screen
+management, keyboard input, keymaps, and so on. The most exciting
+feature of the library is the slang interpreter that may be easily
+embedded into a program to make it extensible. 
+
+For our purposes it is the S-Lang interpreter that we are interested
+in. See the L<Term::Slang|Term::Slang> module (on CPAN) if you
+want an interface to the terminal library provided by S-Lang.
+
+=head1 Using the Inline::SLang Module
+
+Using Inline::SLang will seem very similar to using any other Inline
+language, thanks to Inline's consistent look and feel.
+
+This section will explain the different ways to use Inline::SLang.
+Further details on configuring the behaviour of C<Inline::SLang>
+can be found in L<Inline::SLang::Config>.
+For more details on C<Inline>, see L<Inline> or
+C<perldoc Inline>.
+
+=head2 S-Lang Functions
+
+Using functions defined in S-Lang is just like using Perl subroutines.
+You just supply the source code to Inline::SLang - see the
+L<Inline manual|Inline> for the various ways of doing this -
+and then use them in your Perl code. For example:
+
+   # set up a S-Lang function
+   use Inline SLang => <<'END';
+   define doit() { vmessage("Printing from S-Lang"); }
+   END
+
+   # now call the S-Lang function from Perl
+   doit;
+
+By default all S-Lang functions - other than S-Lang intrinsic
+functions (the functions defined by the S-Lang interpreter,
+such as C<array_map()> and C<assoc_get_keys()>) - in the 
+default namespace ("Global") are bound to Perl. The
+Perl functions are available in the C<main> package.
+
+The C<BIND_NS> configuration option can be used to
+change the list of S-Lang namespaces bound to Perl.
+If you have need of an intrinsic S-Lang function then
+you can either write a wrapper routine or use the
+C<BIND_SLFUNCS> option.
+See L<Inline::SLang::Config> for more details.
+
+Note that there are no checks that a S-Lang symbol,
+when mapped to Perl, does not clobber an existing value
+(or is a Perl built-in function so can not be over-ridden).
+So I<beware> when you define a S-Lang function called 
+C<open()>!
+
+=head3 But all I want to do is use a S-Lang module?
+
+If you have a S-Lang module that you want to use directly
+from Perl, it's as easy as the following (assuming the
+module is importable and called C<funkymodule>):
+
+  use Inline 'SLang' => 'import("funkymodule");';
+
+and then you can start using the functions defined
+by the module. You use a similar technique if you have
+a file containing S-Lang code that can be loaded using
+C<require> or C<evalfile>: e.g.
+
+  use Inline 'SLang' => 'require("funkypackage");';
+
+The use of the C<require()> function is only possible if
+your S-Lang installation includes the C<slsh> interpreter
+and ancillary files (which is true if you use
+C<CIAO 3.2>).
+
+=head2 S-Lang Variables
+
+We do not bind any S-Lang variables to Perl.
+To access variables you have to write S-Lang routines
+that read/write the variable, as shown by the
+C<get_foobar()> and C<set_foobar()> routines below:
+
+  variable foobar = "a string";
+  define get_foobar()  { return foobar; }
+  define set_foobar(x) { foobar = x; }
+
+=head2 Supported Data Types
+
+Inline::S-Lang attempts to seamlessly convert between 
+Perl and S-Lang data types. 
+For "simple" types - for example strings -
+where there is a direct match between S-Lang and Perl, the
+conversion is not noticeable. For more complicated
+types - such as complex numbers - S-Lang variables are
+converted to Perl objects.
+Where possible a I<perl-like> interface is retained.
+See L<Inline::SLang::Types>
+for more information on how the various data types are
+supported.
+
+The module currently B<requires> that yor S-Lang library has been compiled
+with support for both floating-point and complex numbers.
+
+=head2 Perl routines
+
+The module provides several utility functions which are 
+discussed below. By default they are only available
+using fully-qualified names - e.g. C<Inline::SLang::sl_eval()> -
+although the C<EXPORT> 
+L<configuration option|Inline::SLang::Config/EXPORT>
+can be used to change this.
+
+=head3 Inline::SLang::sl_array
+
+=head4 Usage:
+
+  $sl = Inline::SLang::sl_array( $aref );
+  $sl = Inline::SLang::sl_array( $aref, $adims );
+  $sl = Inline::SLang::sl_array( $aref, $atype );
+  $sl = Inline::SLang::sl_array( $aref, $adims, $atype );
+
+This is a wrapper around the C<Array_Type> constructor
+and is intended to make it easy to ensure that a Perl array
+reference is converted into a S-Lang array of the correct
+type, dimensionality, and size.
+
+The data is stored in C<$aref>, a Perl array reference. If
+no other parameters are supplied then the array dimensions,
+size, and type are I<guessed> from C<$aref>. Since Perl has such a 
+flexible type system the routine can sometimes make a surprising
+choice for the data type of the array, so it may well be worth
+supplying the array type as C<$atype> - which can be either
+a string containing the name of the S-Lang datatype, such as
+C<"Int_Type">, or a C<DataType_Type> object.
+
+If you know the array dimensions then it's probably faster
+to supply them as the C<$adims> argument, which should
+be an array reference.
+
+Note that there is limited error checking in this routine:
+if C<$aref> is a 2x3 array but you send in C<$adims> as
+C<[3,2]> - or C<[24]> say - then expect
+I<weird behaviour> (at the very least). 
+
+=head4 Example:
+
+  use Inline 'SLang' => Config => EXPORT => [ "sl_array" ];
+  use Inline 'SLang';
+  ...
+  some_slang_func( sl_array([[1.0,0.0],[0.0,1.0]],"Double_Type") );
+
+For numeric types I expect most people to use piddles.
+This routine is more useful for arrays of
+non-numeric data types.
+
+=head3 Inline::SLang::sl_array2perl
+
+=head4 Usage:
+
+  $val = Inline::SLang::sl_array2perl();
+  $val = Inline::SLang::sl_array2perl( $newval );
+
+Sets/Gets the current status of the "how do we convert
+a S-Lang array into Perl" flag. Returns the status.
+
+We list the possible values of the flag below.
+For further details on array support in C<Inline::SLang>
+see L<Inline::SLang::Array>.
+
+=head4 With no PDL support
+
+If PDL support was not compiled in to the module then
+the flag can either be 0 or 1, where
+
+=over 3
+
+=item Value = B<0>
+
+All arrays are converted to a Perl array reference.
+
+=item Value = B<1>
+
+All arrays are converted to a Perl C<Array_Type> object
+
+=back
+
+=head4 With PDL support
+
+If PDL support is available
+then there are four options:
+
+=over 3
+
+=item Value = B<0>
+
+All arrays are converted to a Perl array reference.
+
+=item Value = B<1>
+
+All arrays are converted to a Perl C<Array_Type> object
+
+=item Value = B<2>
+
+Numeric arrays are converted to piddles and
+non-numeric arrays are converted to a Perl array reference.
+
+=item Value = B<3>
+
+Numeric arrays are converted to piddles and
+non-numeric arrays are converted to a Perl C<Array_Type> object.
+
+=back
+
+=head3 Inline::SLang::sl_eval
+
+=head4 Usage
+
+  [ retval(s) = ] Inline::SLang::sl_eval( $str );
+
+This function evaluates the supplied S-Lang code (in C<$str>)
+and converts any return values to Perl.
+In general this will not be needed,
+since you can always call S-Lang's C<eval()> function
+via a wrapper function (or by binding it to a different
+function name in Perl). One approach is shown in the last
+example below. 
+
+One time it can come in useful is to access a S-Lang variable
+(either to set its value or store its value in a Perl variable).
+
+If C<$str> does not end with a ";" then one will be added before the
+code is evaluated by S-Lang.
+
+=head4 Examples:
+
+  # get the version of the S-Lang library
+  my $sl_ver = Inline::SLang::sl_eval( "_slang_version" );
+
+  # set a variable in S-Lang scope (assuming this_var exists in
+  # S-Lang scope)
+  Inline::SLang::sl_eval( "this_var = 23.5" );
+
+  # evaluate arbitrary S-Lang code
+  my $foo = Inline::SLang::sl_eval("23+4");
+  print "S-Lang thinks 23+4 is $foo\n";
+
+A more flexible solution is to write a S-lang wrapper around
+the S-Lang C<eval()> function (perhaps this functionality should be moved
+into C<sl_eval>?):
+
+  % Call as myeval( "slang code" [, var1, var2, ... ] );
+  % where varX are variables that placed onto the S-Lang
+  % stack before calling the S-Lang code
+  define myeval() {
+    % pop off the slang code from the stack, leave the rest there
+    variable slcode;
+    if ( _NARGS > 1 ) {
+      _stk_reverse(_NARGS);
+      slcode = ();
+      _stk_reverse(_NARGS-1);
+    }
+    else
+      slcode = ();
+    eval( slcode );
+  }
+
+=head3 Inline::SLang::sl_have_pdl
+
+=head4 Usage:
+
+  $flag = Inline::SLang::sl_have_pdl();
+
+Returns C<1> if the module was compiled with support
+for L<PDL|PDL::Intro>, and C<0> otherwise.
+
+=head3 Inline::SLang::sl_setup_as_slsh()
+
+=head4 Usage:
+
+  Inline::SLang::sl_setup_as_slsh();
+
+This routine sets up the S-Lang interpreter to use the
+same paths as the C<slsh> interpreter from the S-Lang
+distribution. It is called by the module when the 
+C<SETUP> configuration option is set to C<slsh>,
+which is the default value. It is very unlikely that a user
+will have a need to call this routine directly.
+
+=head3 Inline::SLang::sl_setup_called()
+
+=head4 Usage:
+
+  $counter = Inline::SLang::sl_setup_called();
+
+Returns the number of times the C<sl_setup_slsh()>
+function has been called. In most cases this will 
+return 1 if the C<SETUP> configuration option was
+set to C<slsh> - the default value - and 0 otherwise.
+
+=head3 Inline::SLang::sl_typeof
+
+=head4 Usage:
+
+  $type = Inline::SLang::sl_typeof( $var );
+
+Returns the S-Lang type of the data stored in the Perl
+variable C<$var>. This should be more efficient than
+using S-Lang's C<typeof()> command since it does not
+require the conversion of the whole variable to S-Lang
+(normally not a big issue but it can be if C<$var> contains
+a large array or a complicated structure).
+
+The return value is an object of the C<DataType_Type>
+class; see L<PDL::Types|PDL::Types> for more information
+on how S-Lang variables are represented in Perl.
+
+=head4 Example:
+
+  my $foo = some_slang_function();
+  my $type = Inline::SLang::sl_typeof($foo);
+  print "The function returned a $type variable\n";
+
+Note that all objects used to represent S-Lang data types
+- other than C<Math::Complex> objects - have a C<typeof()>
+method which can be used to find the type of the object.
+
+=head3 Inline::SLang::sl_version
+
+=head4 Usage:
+
+  $ver = Inline::SLang::sl_version();
+
+Returns, as a string, the version of S-Lang
+against which the module was compiled, with a format
+of "a.b.c". You can use C<sl_eval("_slang_version_string")>
+to find out what version of the library
+you are using.
+
+=head2 What happens when there is a S-Lang error?
+
+The module will refuse to build if there is an error in the S-Lang
+code compiled when your program is first run. If an error occurs
+in the S-Lang interpreter - such as calling a function that expects
+an argument with none - then the S-Lang error is transformed into
+a Perl error (as a call to C<croak>) and the S-Lang interpreter
+is restarted.
+This means that these
+errors can be handled by using Perl's C<eval> statement.
+For example, the code
+
+  use strict;
+  use Inline 'SLang';
+
+  # Call the S-Lang function
+  #
+  my $ans;
+  eval { $ans = mydiv (0.0); };
+  print "The S-Lang error was:\n$@\n";
+
+  # Evaluate S-Lang code directly
+  #
+  eval { Inline::SLang::sl_eval( "10.0/0.0;" ); };
+  print "The S-Lang error was:\n$@\n";
+
+  __END__
+  __SLang__
+
+  define mydiv(y) { return 10.0 / y; }
+
+(which can be found in the distribution as F<examples/trap_errors.pl>)
+produces the following output:
+
+  The S-Lang error was:
+  S-Lang Error: Divide by zero: Error while executing mydiv
+
+  The S-Lang error was:
+  S-Lang Error: Divide by zero: called from line 1, file: ***string***
+
+=head1 CHANGES
+
+=head2 v1.00 Tue Jan  4 12:02:37 EST 2005
+
+The S-Lang interpreter can now be initialised in a similar manner to
+that used in the C<slsh> interpreter from the S-Lang distribution.
+This was primarily added to support the changes made to the S-Lang
+support in C<CIAO 3.2> - e.g. the use of C<require()> to load modules - but
+may be useful elsewhere. This does I<not> add the functions and
+variables added by slsh, e.g.: C<__argc>, C<__argv>, C<exit()>,
+C<atexit()>, and C<stat_mode_to_string()>.
+
+This support is on by default but can be turned off by adding
+
+  use Inline SLang => CONFIG => 'none';
+
+to your script.
+
+General documentation clean up (mainly minor changes). Added
+F<examples/trap_errors.pl> to the distribution.
+
+The list of changes to previous versions has been moved
+to L<Inline::SLang::Changes>.
+
+=head1 SUPPORTED PLATFORMS
+
+=over 2
+
+=item *
+
+S-Lang library >= 1.4.7. The code has B<NOT> been tested against
+version 2 of the S-Lang library and is currently
+unlikely to work with it.
+
+=item *
+
+The S-Lang library must have been compiled with support for
+floating-point and complex numbers. The module could be
+made to work without these numbers/types but I do not have the
+time to do this.
+
+=item *
+
+The only tested operating systems are Solaris, Linux, and
+OS-X (10.3). It should compile on UNIX-like systems (no promises
+though), and I will be surprised if it works without tweaking
+on other operating systems.
+
+=item *
+
+Perl >= 5.6.0 (only really tested on version 5.8).
+
+=back
+
+=head1 BUGS AND DEFICIENCIES
+
+Please use the CPAN Resource Tracker at
+http://rt.cpan.org/NoAuth/Bugs.html?Dist=Inline-SLang
+to check for bugs, report new ones, and request new features.
+
+=head1 SEE ALSO
+
+L<Inline::SLang::Config>, L<Inline::SLang::Changes>, L<Inline::SLang::Types>,
+L<Inline::SLang::Array>, L<Inline::SLang::Assoc>, L<Inline::SLang::Struct>,
+L<Inline::SLang::Details>, 
+L<Term::Slang>
+
+For information about using C<Inline>, see L<Inline>.
+
+For information about other Inline languages, see L<Inline-Support>.
+
+For information about S-Lang see L<http://www.s-lang.org/>.
+
+=head1 ACKNOWLEDGEMENTS
+
+John Davis (for S-Lang), Brian Ingerson (for the Inline framework),
+and Neil Watkiss since I based much of this module on
+his L<Inline::Python> and L<Inline::Ruby> modules.
+
+However, please do not assume that any errors in this module are in
+any way related to the above people.
+
+=head1 AUTHOR
+
+Doug Burke <djburke@cpan.org>
+
+=head1 COPYRIGHT
+
+This software is Copyright (C) 2003, 2004, 2005
+Smithsonian Astrophysical Observatory.
+All rights are reserved. 
+
+It is released under the GNU General Public License.
+You may find a copy of this licence in the file 
+LICENSE within the source distribution or at 
+L<http://www.fsf.org/copyleft/gpl.html>
+
+Prior to version 0.04 the module was distributed
+under the same terms as Perl.
+
+=head1 WARRANTY
+
+There is no warranty. Please see the GNU General Public
+License for more details.
+

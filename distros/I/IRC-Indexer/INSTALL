@@ -1,0 +1,10 @@
+Install via cpan:
+
+  $ tar xvzf IRC-Indexer-VERSION.tar.gz
+  $ cd IRC-Indexer-VERSION
+  $ cpan .
+
+
+You will need DB_File; on some distributions this requires installing 
+development headers. On Debian-based systems this appears to be the 
+package "libdb-dev"

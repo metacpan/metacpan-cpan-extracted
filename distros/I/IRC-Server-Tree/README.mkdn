@@ -1,0 +1,262 @@
+# NAME
+
+IRC::Server::Tree - Manipulate an IRC "spanning tree"
+
+# SYNOPSIS
+
+    ## Basic path-tracing usage:
+    my $tree = IRC::Server::Tree->new;
+
+    $tree->add_node_to_top($_) for qw/ peerA peerB /;
+
+    $tree->add_node_to_name('peerA', 'leafA');
+    $tree->add_node_to_name('peerA', 'leafB');
+
+    $tree->add_node_to_name('peerB', 'hubA');
+    $tree->add_node_to_name('hubA', 'peerB');
+
+    ## ARRAY of hop names between root and peerB:
+    my $hop_names = $tree->trace( 'peerB' );
+
+See [IRC::Server::Tree::Network](https://metacpan.org/pod/IRC::Server::Tree::Network) for a simpler and more specialized 
+interface to the tree.
+
+See the DESCRIPTION for a complete method list.
+
+# DESCRIPTION
+
+An IRC network is defined as a 'spanning tree' per RFC1459; this module 
+is an array-type object representing such a tree, with convenient path 
+resolution methods for determining route "hops" and extending or shrinking 
+the tree.
+
+See [IRC::Server::Tree::Network](https://metacpan.org/pod/IRC::Server::Tree::Network) for higher-level 
+(and simpler) methods pertaining to manipulation of an IRC network 
+specifically; a Network instance also provides an optional 
+memory-for-speed tradeoff via memoization of traced paths.
+
+An IRC network tree is essentially unordered; any node can have any 
+number of child nodes, with the only rules being that:
+
+- The tree remains a tree (it is acyclic; there is only one route between 
+any two nodes, and no node has more than one parent)
+- No two nodes can share the same name.
+
+Currently, this module doesn't enforce the listed rules for performance 
+reasons, but things will break if you add non-uniquely-named nodes. Be 
+warned. In fact, this module doesn't sanity 
+check very much of anything; an [IRC::Server::Tree::Network](https://metacpan.org/pod/IRC::Server::Tree::Network) does much 
+more to validate the tree and passed arguments.
+
+A new Tree can be created from an existing Tree:
+
+    my $new_tree = IRC::Server::Tree->new( $old_tree );
+
+In principle, the general structure of the tree is your average deep 
+array-of-arrays:
+
+    $self => [
+      hubA => [
+        leafA => [],
+        leafB => [],
+      ],
+
+      hubB => [
+        leafC => [],
+        leafD => [],
+      ],
+    ],
+
+The methods provided below can be used to manipulate the tree and 
+determine hops in a path to an arbitrary node using either breadth-first 
+or depth-first search.
+
+Currently routes are not memoized; that's left to a higher layer or 
+subclass.
+
+## new
+
+Create a new network tree:
+
+    my $tree = IRC::Server::Tree->new;
+
+Create a new network tree from an old one or part of one (see 
+["child\_node\_for"](#child_node_for) and ["del\_node\_by\_name"](#del_node_by_name)):
+
+    my $tree = IRC::Server::Tree->new( $old_tree );
+
+(Note that this will clone the old Tree object.)
+
+Optionally create a tree from an ARRAY, if you really know what 
+you're doing:
+
+    my $tree = IRC::Server::Tree->new(
+      [
+        hubA => [
+          hubB => [
+            hubBleaf1 => [],
+          ],
+          leaf1 => [],
+          leaf2 => [],
+        ],
+      ],
+    );
+
+## add\_node\_to\_parent\_ref
+
+    ## Add empty node to parent ref:
+    $tree->add_node_to_parent_ref( $parent_ref, $new_name );
+    ## Add existing node to parent ref:
+    $tree->add_node_to_parent_ref( $parent_ref, $new_name, $new_ref );
+
+Adds an empty or preexisting node to a specified parent reference.
+
+Also see ["add\_node\_to\_top"](#add_node_to_top), ["add\_node\_to\_name"](#add_node_to_name)
+
+## add\_node\_to\_top
+
+    $tree->add_node_to_top( $new_name );
+    $tree->add_node_to_top( $new_name, $new_ref );
+
+Also see ["add\_node\_to\_parent\_ref"](#add_node_to_parent_ref), ["add\_node\_to\_name"](#add_node_to_name)
+
+## add\_node\_to\_name
+
+    $tree->add_node_to_name( $parent_name, $name );
+    $tree->add_node_to_name( $parent_name, $name, $new_ref );
+
+Adds an empty or specified node to the specified parent name.
+
+For example:
+
+    $tree->add_node_to_top( 'MyHub1' );
+    $tree->add_node_to_name( 'MyHub1', 'MyLeafA' );
+
+    ## Existing nodes under our new node
+    my $new_node = [ 'MyLeafB' => [] ];
+    $tree->add_node_to_name( 'MyHub1', 'MyHub2', $new_node );
+
+## as\_hash
+
+    my $hash_ref = $tree->as_hash;
+    my $hash_ref = $tree->as_hash( $parent_ref );
+
+Get a (possibly deep) HASH describing the state of the tree underneath 
+the specified parent reference, or the entire tree if none is specified.
+
+For example:
+
+    my $hash_ref = $tree->as_hash( $self->child_node_for('MyHub1') );
+
+Also see ["child\_node\_for"](#child_node_for)
+
+## as\_list
+
+    my @tree = $tree->as_list;
+    my @tree = $tree->as_list( $parent_ref );
+
+Returns the tree in list format.
+
+(["as\_hash"](#as_hash) is likely to be more useful.)
+
+## child\_node\_for
+
+    my $child_node = $tree->child_node_for( $parent_name );
+    my $child_node = $tree->child_node_for( $parent_name, $start_ref );
+
+Finds and returns the named child node from the tree.
+
+Starts at the root of the tree or the specified parent reference.
+
+## del\_node\_by\_name
+
+    $tree->del_node_by_name( $parent_name );
+    $tree->del_node_by_name( $parent_name, $start_ref );
+
+Finds and deletes the named child from the tree.
+
+Returns the deleted node.
+
+## names\_beneath
+
+    my $names = $tree->names_beneath( $parent_name );
+    my $names = $tree->names_beneath( $parent_ref );
+
+Return an ARRAY of all names in the tree beneath the specified parent 
+node.
+
+Takes either the name of a node in the tree or a reference to a node.
+
+## path\_by\_indexes
+
+    my $names = $tree->path_by_indexes( $index_route );
+    my $names = $tree->path_by_indexes( $index_route, $parent_ref );
+
+Given an array of index hops as retrieved by ["trace\_indexes"](#trace_indexes), retrieve 
+the name for each hop.
+
+This is mostly used internally by ["trace"](#trace).
+
+## print\_map
+
+    $tree->print_map;
+    $tree->print_map( $start_ref );
+
+Prints a visualization of the network map to STDOUT.
+
+## trace
+
+    my $names = $tree->trace( $parent_name );
+    my $names = $tree->trace( $parent_name, $start_ref );
+    my $names = $tree->trace( $parent_name, $start_ref, 'dfs' );
+
+Returns an ARRAY of the names of every hop in the path to the 
+specified parent name.
+
+Starts tracing from the root of the tree unless a parent node reference 
+is also specified.
+
+The last hop returned is the target's name.
+
+Specifying a true value as a third argument is the same as calling 
+["trace\_dfs"](#trace_dfs). Defaults to breadth-first as described in 
+["trace\_indexes"](#trace_indexes).
+
+## trace\_dfs
+
+A convenience method for using depth-first tracing. This is likely to be less
+efficient than the default breadth-first approach for most network layouts.
+
+This is the same as specifying a true third argument to ["trace"](#trace).
+
+## trace\_indexes
+
+Primarily intended for internal use. This is the BFS/DFS search 
+that other methods use to find a node. There is nothing very 
+useful you can do with this externally except count hops; it is documented 
+here to show how path resolution works.
+
+Returns an ARRAY consisting of the index of every hop taken to get to 
+the node reference belonging to the specified node name starting from 
+the root of the tree or the specified parent node reference.
+
+Given a network:
+
+    hubA
+      leafA
+      leafB
+      hubB
+        leafC
+        leafD
+
+`trace_indexes(**'leafD'**)` would return:
+
+    [ 1, 5, 1 ]
+
+These are the indexes into the node references (arrays) owned by each 
+hop, including the last hop. Retrieving their names requires 
+subtracting one from each index; ["trace"](#trace) handles this.
+
+# AUTHOR
+
+Jon Portnoy &lt;avenj@cobaltirc.org>

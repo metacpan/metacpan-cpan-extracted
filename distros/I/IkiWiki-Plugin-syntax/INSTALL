@@ -1,0 +1,37 @@
+IkiWiki-Plugin-syntax
+=====================
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+DEPENDENCIES
+
+It requires the following modules:
+
+- HTML::Parser
+- HTML::Template
+- Locale::gettext
+- URI::Escape
+- HTML::Entities
+- RPC::XML
+- IkiWiki
+- XML::Parser
+- version
+
+and recommends:
+
+- Syntax::Highlight::Engine::Kate
+- Text::VimColor (and the Vim editor)
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008, "Víctor Moral"
+
+See the copyright file attach to this package.
+

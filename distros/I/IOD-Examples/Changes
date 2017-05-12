@@ -1,0 +1,112 @@
+0.19    2017-01-13 (PERLANCAR)
+
+	- Add example for !none (IOD 0.9.11).
+
+        - Add a couple of other examples.
+
+
+0.18    2016-02-24 (PERLANCAR)
+
+	- Add example for !path and !paths (IOD 0.9.10).
+
+
+0.17    2015-09-06 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.16    2015-08-18 (PERLANCAR)
+
+	- Add test ';name=val' which should be processed as comment not key
+	  line (Config::IOD 0.18 fails at this).
+
+
+0.15    2015-03-27 (PERLANCAR)
+
+	- [dzil] Switch to ShareDir::Tarball again after corruption issue got
+          solved.
+
+
+0.14    2015-03-26 (PERLANCAR)
+
+	- [dzil] Revert to ShareDir for now due to corrupted
+	  shared-files.tar.gz.
+
+
+0.13    2015-03-26 (PERLANCAR)
+
+	- [dzil] Replace ShareDir with ShareDir::Tarball to avoid issues of
+	  renamed/deleted shared files.
+
+
+0.12    2015-03-20 (PERLANCAR)
+
+	- Add sample/test for section name (& comment) containing equal
+	  sign + generate json.
+
+
+0.11    2015-03-19 (PERLANCAR)
+
+	- Replace File::Slurp::Tiny (which produces 'wide character in
+	  print' warning) with File::Slurper.
+
+	- Add example: invalid-directive-unknown.iod.
+
+
+0.10    2015-03-12 (PERLANCAR)
+
+        - Add examples: extra-bench-basic-compat.
+
+
+0.09    2015-03-12 (PERLANCAR)
+
+        - Add examples: empty-section, extra-bench-basic, extra-bench-typical1.
+
+
+0.08    2014-09-12 (PERLANCAR)
+
+	- Test comment character inside string/array/object.
+
+
+0.07     2014-09-01 (PERLANCAR)
+
+         - Move expr examples to subdir so they are not tested by default by
+           Config-IOD-Reader [CT].
+
+
+0.06     2014-08-30 (PERLANCAR)
+
+         - Add example: encoding-expr.iod.
+
+
+0.05     2014-08-28 (PERLANCAR)
+
+         - Add examples for implicit JSON array & object (IOD 0.9.6).
+
+
+0.04     2014-08-17 (SHARYANTO)
+
+         - No example changes.
+
+         - Add devscripts/gen-json.
+
+
+0.03     2014-08-17 (SHARYANTO)
+
+         - Add example: include to subdir (and include from included).
+
+         - Fix JSON for merge examples.
+
+
+0.02     2014-08-17 (SHARYANTO)
+
+         - Add more examples, produce .json files.
+
+
+0.01     2014-08-17 (SHARYANTO)
+
+         - First release.

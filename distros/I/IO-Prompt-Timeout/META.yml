@@ -1,0 +1,36 @@
+---
+abstract: 'Simple prompt interface with timeout.'
+author:
+  - 'YASUTAKE Kiyoshi <yasutake.kiyoshi@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.3.0, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: IO-Prompt-Timeout
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  IO::Prompt::Timeout:
+    file: lib/IO/Prompt/Timeout.pm
+    version: '0.04'
+requires:
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/key-amb/perl5-IO-Prompt-Timeout/issues
+  homepage: https://github.com/key-amb/perl5-IO-Prompt-Timeout
+  repository: git://github.com/key-amb/perl5-IO-Prompt-Timeout.git
+version: '0.04'

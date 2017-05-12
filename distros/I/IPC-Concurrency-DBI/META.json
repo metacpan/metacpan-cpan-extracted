@@ -1,0 +1,73 @@
+{
+   "abstract" : "Control how many instances of an application run in parallel, using DBI as the IPC method.",
+   "author" : [
+      "Guillaume Aubert <aubertg@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4205",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "IPC-Concurrency-DBI",
+   "no_index" : {
+      "file" : [
+         "t/LocalTest.pm"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "DBD::SQLite" : "0",
+            "DBI" : "0",
+            "Test::Exception" : "0",
+            "Test::FailWarnings" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Data::Dumper" : "0",
+            "Data::Validate::Type" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "IPC::Concurrency::DBI" : {
+         "file" : "lib/IPC/Concurrency/DBI.pm",
+         "version" : "v1.2.0"
+      },
+      "IPC::Concurrency::DBI::Application" : {
+         "file" : "lib/IPC/Concurrency/DBI/Application.pm",
+         "version" : "v1.2.0"
+      },
+      "IPC::Concurrency::DBI::Application::Instance" : {
+         "file" : "lib/IPC/Concurrency/DBI/Application/Instance.pm",
+         "version" : "v1.2.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/guillaumeaubert/IPC-Concurrency-DBI/issues"
+      },
+      "homepage" : "https://metacpan.org/release/IPC-Concurrency-DBI",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/guillaumeaubert/IPC-Concurrency-DBI"
+      }
+   },
+   "version" : "v1.2.0"
+}

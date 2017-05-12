@@ -1,0 +1,6 @@
+Revision history for Perl extension IPC::ForkPipe.
+
+0.01  Mon Jul  8 15:51:53 2013
+	- original version; created by h2xs 1.23 with options
+		-AX IPC::ForkPipe
+

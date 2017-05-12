@@ -1,0 +1,47 @@
+---
+abstract: 'CLI for IO::Socket::INET6 and IO::Socket::SSL'
+author:
+  - 'Ashley Willis <ashley+perl@gitable.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: IO-Socket-CLI
+provides:
+  IO::Socket::CLI:
+    file: lib/IO/Socket/CLI.pm
+    version: 0.041
+  IO::Socket::CLI::IMAP:
+    file: lib/IO/Socket/CLI/IMAP.pm
+    version: 0.041
+  IO::Socket::CLI::IMAPS:
+    file: lib/IO/Socket/CLI/IMAPS.pm
+    version: 0.041
+  IO::Socket::CLI::POP3:
+    file: lib/IO/Socket/CLI/POP3.pm
+    version: 0.041
+  IO::Socket::CLI::POP3S:
+    file: lib/IO/Socket/CLI/POP3S.pm
+    version: 0.041
+  IO::Socket::CLI::SMTP:
+    file: lib/IO/Socket/CLI/SMTP.pm
+    version: 0.041
+  IO::Socket::CLI::SMTPS:
+    file: lib/IO/Socket/CLI/SMTPS.pm
+    version: 0.041
+requires:
+  Carp: 0
+  IO::Socket::INET6: 0
+  IO::Socket::SSL: 0
+  perl: 5.006
+  strict: 0
+  warnings: 0
+resources:
+  repository: https://gitable.org/ashley/IO-Socket-CLI.git
+version: 0.041

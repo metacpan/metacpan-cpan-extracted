@@ -1,0 +1,14 @@
+Revision history for Perl extension Image::TestJPG.
+
+1.0	Tue Feb 27 17:14:29 CST 2007
+  - updated documentation
+	- modified to work with newer gcc
+	- hacked into submission
+
+0.9		Sat Aug 16 17:11:24 CDT 2003
+	-	inital release version
+
+0.01  Sun Jul 20 23:30:02 2003
+	- original version; created by h2xs 1.21 with options
+		-A -n Image::TestJPG
+

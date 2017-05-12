@@ -1,0 +1,126 @@
+Revision history for Perl extension IO::Multiplex.
+
+1.16 Thu Apr  9 17:00:00 CET 2015
+	- Fix descriptor memory leak:
+	  Make $mux->close actually untie *$fh
+
+1.15 Tue Mar 11 14:00:00 CET 2015
+	- Move untie patch to the right place.
+
+1.14 Mon Mar 30 11:00:00 CET 2015
+	- Fix 110_ntest to avoid reading from muxed handle.
+	- Apply patch to prevent untie warnings. 
+	  rt.cpan.org#67846 [dmcbridepath@cpan.org Darin McBride]
+
+1.13 Fri Apr 15 08:42:43 CEST 2011
+	- fix handling of outbuf which contains '0'.
+	  rt.cpan.org#67458 [Gordon Russell]
+
+1.12 Wed Feb 23 22:35:27 CET 2011
+	- fix MSWin32 complaints
+	  rt.cpan.org#66096 [Mark Dootson]
+
+1.11 Wed Feb  2 17:05:08 CET 2011
+        - Avoid warning while adding pipe
+          rt.cpan.org#60068 [Khedin] and #16259
+	- Add EWOULDBLOCK and non-blocking mode for windows,
+	  rt.cpan.org#23982 [junk@penilecolada.com]
+	- Typo "closeing", rt.cpan.org#21085 [D Steinbrunner]
+	- avoid shutdown after close,
+	  rt.cpan.org#5715 [Lars Jensen] and #5885
+	- use length of outbuf, not exists to see if it is
+	  empty. [Ersun Warncke]
+	- turn "use warnings" on
+
+1.10  Mon Sep 15 2008
+	- Update Copyright and License.
+	- Buttwag around minor Windows deficiencies.
+
+1.09  Sat Mar 03 2007
+	- Detect readability for special IO::Socket::SSL
+	  handles more accurately.
+	- Avoid "freed value in iteration" crashing.
+
+1.08  Fri Nov 11 2003
+	- Solaris/FreeBSD compatibility fixes.
+	- Add mux_epipe EPIPE hook, patch by
+	  leo@strike.wu-wien.ac.at (Alexander Bergolth)
+
+1.07  Wed Jul 30 01:00:00 MDT 2003
+	- Handle certain eof conditions better.
+	  Spot by win@edx.de (Winfried Koenig)
+	- Fixed contrib/portfw to handle partly
+	  shutdown sockets more accurately.
+	- Add udp support to contrib/portfw.
+
+1.06  Mon Jul 28 14:45:00 MDT 2003
+	- Added contrib/portfw demo script.
+
+1.05  Web Apr 23 01:30:00 MST 2003
+	- Handle rare ECONNRESET condition that can occur
+	  when reading from the client on a socket that
+	  has already been torn down.
+	- Added support for UDP (experimental).
+	  Thanks klimkin@mcst.ru (Alexey Klimkin)
+	- Add writeable detection hook for sockets
+	  even when the outbuffer is empty.
+	  Patch by klimkin@mcst.ru (Alexey Klimkin)
+
+1.04  Sat Nov 23 12:00:00 MST 2002
+	- Compatibility generalizations
+	  perl 5.004 / 5.005 / 5.6.0 / 5.6.1 / 5.8.0
+	  Thanks muir@idiom.com (David Muir Sharnoff)
+	  for bug reports and testing help.
+	- Rid old MVModule::MVmux::Handle package name.
+	- New Timeout Structure
+	  Thanks dwebb@ovid.com (Douglas Webb)
+	- Use POSIX::read/write instead to avoid TIEHANDLE.
+
+1.03  Mon Jun 03 15:00:00 MDT 2002
+	- Fix NAME for ABSTRACT_FROM setting.
+	- Added spec file for RPM
+	- Added TODO doc
+	- Avoid using Tie::RefHash to improve performance.
+	  by dwebb@ovid.com (Douglas Webb)
+
+1.02  Tue Feb 05 13:05:00 MDT 2002
+	- Allow the rest of input buffer to be consumed
+	  when doing shutdown.
+	- Fix {_fhs} keys dereference race condition.
+
+1.01  Wed Oct 17 13:00:00 MDT 2001
+	- The following by Rob Brown <bbb@cpan.org>
+	- Ported to work with Perl 5.6.0
+	- Added optional code ref for loop
+	- Added tie FILENO method
+	- Fixed tie CLOSE and shutdown to flush both
+          input {inbuffer} and output {outbuffer} correctly
+
+1.00  Wed Feb 23 12:07:07 PST 2000
+	- Stable enough now.  Call it a release.
+
+0.08  Thu Oct 28 16:06:33 MDT 1999
+        - More autovivification ailments
+
+0.07  Mon Oct 25 15:01:46 PDT 1999
+	- Fix documentation
+
+0.06  Sun Oct 10 13:25:03 MDT 1999
+	- Fix autovivification evils
+
+0.05  Fri Oct  8 17:23:08 MDT 1999
+        - Yet more EOF/close fixes
+
+0.04  Wed Sep 29 12:50:44 MDT 1999
+	- Fix yesterday's fix
+
+0.03  Tue Sep 28 12:04:53 MDT 1999
+	- Remove some debugging stuff
+	- Deal properly with the situation where a fd is shutdown in
+	  response to EOF
+
+0.02  Wed Sep 22 15:44:28 PDT 1999
+	- Check for errors on accept
+
+0.01  Fri Jul  2 10:39:23 1999
+	- original version; created by h2xs 1.19

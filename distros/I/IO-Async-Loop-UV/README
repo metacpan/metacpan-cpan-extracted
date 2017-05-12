@@ -1,0 +1,42 @@
+NAME
+    `IO::Async::Loop::UV' - use `IO::Async' with `UV'
+
+SYNOPSIS
+     use IO::Async::Loop::UV;
+
+     my $loop = IO::Async::Loop::UV->new();
+
+     $loop->add( ... );
+
+     $loop->add( IO::Async::Signal->new(
+           name => 'HUP',
+           on_receipt => sub { ... },
+     ) );
+
+     $loop->loop_forever();
+
+DESCRIPTION
+    This subclass of IO::Async::Loop uses UV to perform its work.
+
+    As both `UV' and the underlying libuv are quite new, this module
+    currently has a few shortcomings and limitations. See the BUGS section.
+
+BUGS
+    * libuv does not provide a way to inspect the `POLLUP' status bit, so
+      some types of file descriptor cannot provide EOF condition. This
+      causes a unit-test failure.
+
+    * libuv attempts to invoke a close callback when closing watch handles,
+      even if one is not defined. This causes the next `UV::run_once()' call
+      after a handle has been closed to always return immediately. This
+      should not cause a problem in practice, but does cause a unit-test
+      failure.
+
+    * UV does not wrap signal or child-process watch abilities of libuv, so
+      these are currently emulated by the Loop's built-in signal-pipe
+      mechanism. Because of this, signal or child-process watching cannot be
+      shared by both `IO::Async' and `UV'-using code at the same time.
+
+AUTHOR
+    Paul Evans <leonerd@leonerd.org.uk>
+

@@ -1,0 +1,11 @@
+Makefile.PL
+MANIFEST
+README
+Changes
+lib/IO/Tokenized.pm
+lib/IO/Tokenized/File.pm
+t/1.t
+t/2.t
+t/3.t
+t/t2.txt
+

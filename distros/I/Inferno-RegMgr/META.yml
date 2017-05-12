@@ -1,0 +1,56 @@
+---
+abstract: "Keep connection to OS Inferno's registry(4) and it tasks"
+author:
+  - 'Alex Efros <powerman@cpan.org>'
+build_requires:
+  Test::Exception: '0'
+  Test::More: '0'
+  Test::Perl::Critic: '0'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Inferno-RegMgr
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  Inferno::RegMgr:
+    file: lib/Inferno/RegMgr.pm
+    version: v1.0.0
+  Inferno::RegMgr::Lookup:
+    file: lib/Inferno/RegMgr/Lookup.pm
+    version: v1.0.0
+  Inferno::RegMgr::Monitor:
+    file: lib/Inferno/RegMgr/Monitor.pm
+    version: v1.0.0
+  Inferno::RegMgr::Service:
+    file: lib/Inferno/RegMgr/Service.pm
+    version: v1.0.0
+  Inferno::RegMgr::TCP:
+    file: lib/Inferno/RegMgr/TCP.pm
+    version: v1.0.0
+  Inferno::RegMgr::Utils:
+    file: lib/Inferno/RegMgr/Utils.pm
+    version: v1.0.0
+requires:
+  EV: '0'
+  Export::Attrs: '0'
+  IO::Stream: '0'
+  Scalar::Util: '0'
+  perl: '5.010001'
+  version: '0'
+resources:
+  bugtracker: https://github.com/powerman/perl-Inferno-RegMgr/issues
+  homepage: https://github.com/powerman/perl-Inferno-RegMgr
+  repository: https://github.com/powerman/perl-Inferno-RegMgr.git
+version: v1.0.0

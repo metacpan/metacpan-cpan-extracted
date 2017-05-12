@@ -1,0 +1,46 @@
+DESCRIPTION :
+-------------
+
+This module is used to create OrgCharts using the GD graphic library. Currently, all image sizes are done dynamically.
+
+PREREQUSITE :
+--------------
+
+GD
+
+USAGE       :
+--------------
+
+  use Image::OrgChart;
+  use strict;
+    
+  my $org_chart = Image::OrgChart->new();
+  $org_chart->add('/manager/middle-manager/employee1');
+  $org_chart->add('/manager/middle-manager/employee2');
+  $org_chart->add('/manager/middle-manager/employee3');
+  $org_chart->add('/manager/middle-manager/employee4');
+  
+  my $imagedata = $org_chart->as_image();
+  if ($org_chart->data_type() eq 'gif') {
+      ## write gif file using $imagedata
+  } elsif ($org_chart->data_type() eq 'png') {
+      ## write png file using $imagedata
+  }
+  
+  ## or
+  my $GDObj = $org_chart->gd();
+  my $imagedata = $GDObj->png();
+
+
+THANKS TO    :
+---------------
+
+CPAN Testers (for alerting me to broken tests)
+Image::Timeline (for giving me the idea)
+PerlMonks.org (for help and inspiration)
+Ruth Sanford (for patience)
+
+SEE ALSO     :
+---------------
+
+The example scripts, and thier output, can be found somewhere on http://mzsanford.perlmonk.org

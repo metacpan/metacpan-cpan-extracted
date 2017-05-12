@@ -1,0 +1,58 @@
+
+2012-05-07    v1.006
+  - DEPRECATED.
+
+2012-03-04    v1.005
+  - Increased DBI required version to 1.614 for AutoInactiveDestroy attribute.
+
+2012-03-04    v1.004
+  - A problem with forked children was discovered, which prompted further investigation.
+    After many solid hours of furious hacking, I wonder how this ever worked.
+    (Don't we all have moments like that?)
+  - Performance with threads.pm, forks.pm, and regular perl fork()s *should*
+    now be quite solid.
+  - Recommended upgrade includes Class::DBI::Lite as a partially-related issue
+    was discovered and fixed there as part of this coding session.
+  - If this release does turn out to be stable, the amount of work that went into
+    this release will warrant a full version bump.
+
+2012-03-03    v1.003
+  - Of course 5 minutes later, I think I see the bug.
+  - *This* one surely will do the trick.
+
+2012-03-02    v1.002
+  - After extensive use in forked/threaded environments, some problems began to appear.
+  - This release addresses these problems:
+    "DBD driver has not implemented the AutoCommit attribute"
+    "DBD::mysql::db do failed: MySQL server has gone away"
+  - Major shout-out to Perrin for solving most of this several years ago.
+    Perrin++
+
+2011-06-05    v1.001
+  - Deprecated commit and rollback methods.
+
+2011-06-01    v1.000
+  - After a year of solid performance, I'm giving Ima::DBI::Contextual a 1.0 version number.
+  - Removed warnings that look like this:
+    "Issuing rollback() due to DESTROY without explicit disconnect()..."
+  - The warnings were caused when the db connection has gone away and we reconnect.
+  - No other changes.
+
+2010-05-21    v0.006
+  - db_Main was failing because $dbh->ping alone couldn't detect a dead handle.
+
+2010-05-20    v0.005
+  - Fixed synopsis in POD.
+
+2010-05-20    v0.004
+  - Just a couple tweaks here and there.
+
+2010-05-19    v0.003
+  - Fixed a failing test that still referred to Ima::DBI::Lite.
+
+2010-05-19    v0.002
+  - Initial release as "Ima::DBI::Contextual"
+
+2010-05-18    v0.001
+  - Initial release as "Ima::DBI::Lite"
+

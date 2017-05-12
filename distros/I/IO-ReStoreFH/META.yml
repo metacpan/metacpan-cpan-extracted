@@ -1,0 +1,33 @@
+---
+abstract: 'store/restore file handles'
+author:
+  - 'Diab Jerius'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::Exception: 0
+  Test::File::Contents: 0.2
+  Test::More: 0.96
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: gpl3
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: IO-ReStoreFH
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  FileHandle::Fmode: 0.12
+  Try::Tiny: 0
+  perl: 5.10.0
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=IO-ReStoreFH
+  license: http://opensource.org/licenses/gpl-3.0.html
+  repository: http://bitbucket.org/djerius/io-restorefh
+version: 0.05

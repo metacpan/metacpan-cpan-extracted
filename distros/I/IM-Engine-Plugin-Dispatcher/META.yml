@@ -1,0 +1,29 @@
+---
+abstract: 'Path::Dispatcher ♥  IM::Engine'
+author:
+  - 'Shawn M Moore, C<sartak@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: IM-Engine-Plugin-Dispatcher
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  IM::Engine: 0.03
+  Moose: 0
+  Path::Dispatcher: 0.13
+  perl: 5.8.1
+resources:
+  homepage: http://github.com/sartak/IM-Engine-Plugin-Dispatcher/tree
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/sartak/IM-Engine-Plugin-Dispatcher.git
+version: 0.02

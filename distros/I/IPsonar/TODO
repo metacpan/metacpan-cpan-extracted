@@ -1,0 +1,5 @@
+Look into changing from XML to JSON to see if it cuts down
+on the number of dependencies we have.
+
+Work up a meta.yaml file to make things easier for CPAN (and everybody else).
+n -e '$url=/URL:\s+(.*)$/; print "URL: $1\n"; print `curl -k -q -u admin:admin "$1"`,"\n"'  scratch 2>/dev/null | tee scratch2

@@ -1,0 +1,24 @@
+COPYING
+MANIFEST
+Makefile.PL
+README
+contrib/Clever.pm
+examples/IO_Scalar_synopsis
+lib/IO/AtomicFile.pm
+lib/IO/InnerFile.pm
+lib/IO/Lines.pm
+lib/IO/Scalar.pm
+lib/IO/ScalarArray.pm
+lib/IO/Stringy.pm
+lib/IO/Wrap.pm
+lib/IO/WrapTie.pm
+t/Common.pm
+t/ExtUtils/TBone.pm
+t/IO_InnerFile.t
+t/IO_Lines.t
+t/IO_Scalar.t
+t/IO_ScalarArray.t
+t/IO_WrapTie.t
+t/simple.t
+t/two.t
+META.yml                                 Module meta-data (added by MakeMaker)

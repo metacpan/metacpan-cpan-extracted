@@ -1,0 +1,9 @@
+Revision history for Interchange6-Currency
+
+0.100 Thu 21 Jan 13:45:01 CET 2016
+
+    * Initial release
+
+0.101 Thu 21 Jan 17:26:11 CET 2016
+
+    * add support for Finance::Currency::Convert::XE

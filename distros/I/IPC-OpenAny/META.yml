@@ -1,0 +1,33 @@
+---
+abstract: 'Run a process with control over any FDs it may use.'
+author:
+  - 'Stephen R. Scaffidi <sscaffidi@cpan.org>'
+build_requires:
+  Capture::Tiny: 0
+  File::Find: 0
+  File::Slurp: 0
+  File::Temp: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300016, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: IPC-OpenAny
+requires:
+  Carp: 0
+  Data::Dumper: 0
+  English: 0
+  Exporter: 0
+  Params::Util: 0
+  autodie: 0
+  parent: 0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/Hercynium/IPC-OpenAny/issues
+  repository: git://github.com/Hercynium/IPC-OpenAny.git
+version: 0.005

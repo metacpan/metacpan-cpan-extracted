@@ -1,0 +1,59 @@
+Revision history for Perl extension IPC::PrettyPipe
+
+0.03	2014-07-18T16:42:33-0400
+
+
+  [BUG FIX]
+
+    - renderers/executors provided as class names were not properly
+      handled
+
+    - adding a stream to a pipe object was broken
+
+    - the Template::Tiny renderer didn't properly quote arguments for
+      the shell
+
+  [ENHANCEMENT]
+
+    - commands, attribute names, and attribute values now have a
+      "quoted_" accessor which returns strings properly escaped for
+      use by a shell.
+
+  [BUILD FIX]
+
+    - add missing runtime dependency on List::MoreUtils
+
+
+0.02	2014-02-14T15:49:54-0500
+
+    - promote to stable, CPAN Testers is all green!
+
+0.01_03	2014-02-09T07:53:24-0500
+
+  [BUILD FIX]
+    - require IO::ReStoreFH >= 0.04 to handle Perl 5.10.x/FileHandle problems
+    - require Win32::Console::ANSI on Win32 boxes
+
+0.01_02	 2014-02-07T06:15:35-0500
+
+  [TEST FIX]
+    - IPC::Run can't redirect fd's > 2 on Win32; skip tests which do
+      that
+
+0.01_01	2014-02-05T18:59:08-0500
+
+  [BUG FIX]
+    - remove errant 'use DDP' statement
+
+  [OTHER]
+    - switch from Probe::Perl to Devel::FindPerl
+
+
+0.01  	2014-02-04T17:54:09-0500
+
+    - first public release
+
+
+0.00	Mon Sep 10 11:36:14 EDT 2012
+
+    - forked from private IPC::PipeC module

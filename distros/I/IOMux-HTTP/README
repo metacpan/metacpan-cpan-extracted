@@ -1,0 +1,25 @@
+=== README for IOMux-HTTP version 0.11
+=   Generated on Thu Jan 27 12:32:39 2011 by OODoc 1.07
+
+There are various ways to install this module:
+
+ (1) if you have a command-line, you can do:
+       perl -MCPAN -e 'install <any package from this distribution>'
+
+ (2) if you use Windows, have a look at http://ppm.activestate.com/
+
+ (3) if you have downloaded this module manually (as root/administrator)
+       gzip -d IOMux-HTTP-0.11.tar.gz
+       tar -xf IOMux-HTTP-0.11.tar
+       cd IOMux-HTTP-0.11
+       perl Makefile.PL
+       make          # optional
+       make test     # optional
+       make install
+
+For usage, see the included manual-pages or
+    http://search.cpan.org/dist/IOMux-HTTP-0.11/
+
+Please report problems to
+    http://rt.cpan.org/Dist/Display.html?Queue=IOMux-HTTP
+

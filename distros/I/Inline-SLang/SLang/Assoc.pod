@@ -1,0 +1,264 @@
+=head1 NAME
+
+Inline::SLang::Assoc - Support for associative arrays
+
+=head1 SYNOPSIS
+
+  use Inline 'SLang';
+
+  # you can send hash references to S-Lang
+  print_in_slang( { a => 23, "b b" => "foo" } );
+
+  # and get them back from S-Lang
+  $href = get_from_slang();
+  print "The assoc array contains:\n" .
+    join( "", map { "\t$_ => $$href{$_}\n"; } keys %$href );
+
+  __END__
+  __SLang__
+
+  define print_in_slang (assoc) {
+    message( "SLang thinks you sent it an assoc. array with:" );
+    foreach ( assoc ) using ( "keys", "values" ) {
+      variable k, v;
+      ( k, v ) = ();
+      vmessage( " key %s = %S", k, v );
+    }
+  }
+  define get_from_slang() {
+    variable x = Assoc_Type [String_Type];
+    x["a key"] = "a value";
+    x["another key"] = "another value";
+    return x;
+  }
+
+The output of this code - which can be found in the source-code
+distribution as F<examples/assoc.pl> - is:
+
+  SLang thinks you sent it an assoc. array with:
+   key a = 23
+   key b b = foo
+  The assoc array contains:
+          another key => another value
+          a key => a value
+
+=head1 DESCRIPTION
+
+Since S-Lang's associative arrays are similar to Perl's 
+associative (aka "hash") arrays then the conversion
+is fairly easy. It is not completely trivial since
+S-Lang's assoc. arrays know about the datatype of the 
+variables they contain.
+
+When a S-Lang associative array is sent to Perl, it
+is converted into a C<Assoc_Type> Perl object.
+As discussed below, this behaves just like a hash
+reference with a few additional method calls.
+
+When sending an associative array to a S-Lang function
+from Perl, two different (but not very different)
+techniques can be used:
+
+=over 2
+
+=item *
+
+As a hash reference.
+
+When converted to S-Lang, it will
+appear as a C<Assoc_Type [Any_Type]> array
+since the code does not try to guess the type
+based on the stored values. This could be a
+future enhancement if the current approach
+turns out to be unsatisfactory (C<Any_Type>
+variables can be a bit of a pain to work with
+in S-Lang).
+
+Or we could assume a default type of C<Int_Type>,
+which would match S-Lang's approach.
+
+=item *
+
+As a Perl C<Assoc_Type> object.
+
+Whilst it involves more typing to set up, you
+are guaranteed that the datatype is correct.
+
+=back
+
+=head1 THE ASSOC_TYPE CLASS
+
+The Perl C<Assoc_Type> class stores the datatype
+of the array along with the data. Once you have created
+the object you can use it as a hash reference to get and set
+fields in the array. As described below the object also
+has a number of methods based on the S-Lang language which
+provides similar functionality.
+
+The C<Assoc_Type> class inherit the default methods
+of all the Inline::SLang objects, namely:
+
+=over 2
+
+=item *
+
+C<typeof()>
+
+This returns C<Assoc_Type> as a C<DataType_Type>
+object. See the C<_typeof()> method below to
+find the datatype used to store the data. 
+
+=item *
+
+C<stringify()>
+
+This returns the string "Assoc_Type".
+
+=item *
+
+C<is_struct_type()>
+
+This returns 0.
+
+=back
+
+As with the other object classes these methods can
+only be called using the C<< $object->method( args ) >>
+syntax.
+There are also a number of additional methods
+for this class:
+
+=over 2
+
+=item * C<new( datatype )>
+
+The constructor takes the datatype of the asociative array -
+as either a string or a C<DataType_Type> object - and
+returns an C<Assoc_Type> object.
+
+The return value can be treated as a hash reference,
+or you can use some of the other methods described
+below to manipulate the contents of the array.
+
+  my $assoc = Assoc_Type->new( "String_Type" );
+  $$assoc{foo} = "hello";
+  $$assoc{baz} = "hi there";
+  while ( my ($k,$v) = each %$assoc ) {
+    print "  key $k has a value of $v\n";
+  }
+
+The order of keys returned by the Perl hash iterators - such
+as C<each>, C<keys>, and C<values> - is B<not> guaranteed
+to match that of S-Lang's iterators such as
+C<assoc_get_keys>.
+
+=item * C<_typeof()>
+
+Returns - as a C<DataType_Type> object - the class
+of the data stored in the array. This is unlike
+the S-Lang C<_typeof> command which just
+returns C<Assoc_Type>.
+
+  my $assoc = Assoc_Type->new( "Complex_Type" );
+  my $type  = $assoc->_typeof();
+
+=item * C<length()>
+
+Returns the number of keys in the associative array.
+
+  my $assoc = Assoc_Type->new( "Double_Type" );
+  $$assoc{"foo"} = 1.0; $$assoc{"bar"} = 3.0e6;
+  print "Number of keys = ", $assoc->length, "\n";
+
+=item * C<get_keys()>
+
+Returns, as an array reference, a list of the keys
+of the asociative array. It is essentially S-Lang's
+C<assoc_get_keys()> routine although it is implemented
+using Perl's C<keys> routine. This means that the
+order of the returned keys is B<not> guaranteed
+to match that of S-Lang's C<assoc_get_keys()>.
+
+  my $assoc = Assoc_Type->new( "Double_Type" );
+  $$assoc{"foo"} = 1.0; $$assoc{"bar"} = 3.0e6;
+  foreach my $k ( $assoc->get_keys ) {
+    print "  key $k has value $$assoc{$k}\n";
+  }
+
+There is no advantage to using this method
+over Perl's C<keys %$assoc>.
+
+=item * C<get_values()>
+
+Returns, as an array reference, a list of the values
+of the asociative array. It is essentially S-Lang's
+C<assoc_get_values()> routine although it is implemented
+using Perl's C<values> routine. This means that the
+order of the returned keys is B<not> guaranteed
+to match that of S-Lang's C<assoc_get_values()>.
+
+  my $assoc = Assoc_Type->new( "Double_Type" );
+  $$assoc{"foo"} = 1.0; $$assoc{"bar"} = 3.0e6;
+  foreach my $v ( $assoc->get_values ) {
+    print "  array contains $v\n";
+  }
+
+There is no advantage to using this method
+over Perl's C<values %$assoc>.
+
+=item * C<key_exists( $key )>
+
+Returns 1 if the key exists in the associative array
+and 0 otherwise.
+It is essentially S-Lang's
+C<assoc_key_exists()> routine.
+
+  my $assoc = Assoc_Type->new( "Double_Type" );
+  $$assoc{"foo"} = 1.0; $$assoc{"bar"} = 3.0e6;
+  print "foo exists\n" if $assoc->key_exists("foo");
+
+There is no advantage to using this method
+over Perl's C<exists $$assoc{$key}>.
+
+=item * C<delete_key( $key )>
+
+Removes the key from the associative array. 
+It is essentially S-Lang's
+C<delete_key()> routine.
+
+  my $assoc = Assoc_Type->new( "Double_Type" );
+  $$assoc{"foo"} = 1.0; $$assoc{"bar"} = 3.0e6;
+  print "foo exists\n" if $assoc->key_exists("foo");
+
+There is no advantage to using this method
+over Perl's C<delete $$assoc{$key}>.
+
+=item * C<get_value( $key )>
+
+Returns the value for the given key.
+
+  my $assoc = Assoc_Type->new( "Double_Type" );
+  $$assoc{"foo"} = 1.0; $$assoc{"bar"} = 3.0e6;
+  my $val = $assoc->get_value( "foo" );
+
+There is no advantage to using this method
+rather than Perl's C<$$assoc{$key}>.
+
+=item * C<set_value( $key, $val )>
+
+Sets the given key to the supplied value.
+
+  my $assoc = Assoc_Type->new( "Double_Type" );
+  $$assoc{"foo"} = 1.0; $$assoc{"bar"} = 3.0e6;
+  $assoc->set_value( "foo", 44.1 );
+
+There is no advantage to using this method
+over Perl's C<$$assoc{$key}>.
+
+=back
+
+=head1 SEE ALSO
+
+L<Inline::SLang::Array>, L<Inline::SLang>, L<Math::Complex>, L<PDL>
+
+

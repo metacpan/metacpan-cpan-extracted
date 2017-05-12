@@ -1,0 +1,13 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+Rewriter.xs
+lib/Image/PNG/Rewriter.pm
+t/00basic.t
+t/01simple.t
+t/02gd.t
+t/98podsyn.t
+t/99podcov.t
+eg/recompress.pl
+META.yml                                 Module meta-data (added by MakeMaker)

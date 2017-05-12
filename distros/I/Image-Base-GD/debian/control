@@ -1,0 +1,33 @@
+# Copyright 2010, 2011, 2012 Kevin Ryde
+#
+# This file is part of Image-Base-GD.
+#
+# Image-Base-GD is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation; either version 3, or (at your option) any later
+# version.
+#
+# Image-Base-GD is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+# more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with Image-Base-GD.  If not, see <http://www.gnu.org/licenses/>.
+
+Source: libimage-base-gd-perl
+Section: perl
+Priority: optional
+Build-Depends: libtest-more-perl | perl (>= 5.6.2), libscalar-list-utils-perl | perl-modules (>= 5.8), cdbs, debhelper (>= 5)
+Maintainer: Kevin Ryde <user42@zip.com.au>
+Standards-Version: 3.9.2
+Homepage: http://user42.tuxfamily.org/image-base-gd/index.html
+Bugs: mailto:user42@zip.com.au
+
+Package: libimage-base-gd-perl
+Architecture: all
+Depends: perl (>= 5.004), libimage-base-perl (>= 1.12), libgd-gd2-perl (>= 1:2.45) | libgd-gd2-noxpm-perl (>= 1:2.45) | libgd-perl, ${perl:Depends}, ${misc:Depends}
+Suggests: libgd-svg-perl, libgd-window-perl, libimage-wmf-perl
+Description: Create or update image files using GD
+ An Image::Base extension to operate on PNG, JPEG and other format
+ files using GD.

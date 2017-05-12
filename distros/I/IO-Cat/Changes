@@ -1,0 +1,7 @@
+Revision history for Perl extension File::Cat.
+
+1.0  Tue Sep 14 17:33:29 EDT 1998
+	- original version; created by h2xs 1.18
+
+1.1  Tue Sep 15 21:59:15 EDT 1998
+	- added cattail() function

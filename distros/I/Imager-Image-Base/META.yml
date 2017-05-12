@@ -1,0 +1,26 @@
+---
+abstract: unknown
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Imager-Image-Base
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Image::Xbm: '0'
+  Image::Xpm: '0'
+  Imager: '0'
+resources:
+  repository: git://github.com/eserte/imager-image-base.git
+version: '0.02'

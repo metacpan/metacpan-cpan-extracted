@@ -1,0 +1,25 @@
+---
+name: IO-EventMux-Socket-MsgHdr
+version: 0.02
+author:
+  - 'Michael J. Pomraning <mjp@pilcrow.madison.wi.us>Troels Liebe Bentsen <troels@infopro.dk>'
+abstract: 'sendmsg, recvmsg and ancillary data operations'
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Exporter: 0
+  XSLoader: 0
+  perl: '>= 5.8.0'
+build_requires:
+  ExtUtils::CBuilder: 0
+  Socket: 0
+  Test::More: 0
+provides:
+  IO::EventMux::Socket::MsgHdr:
+    file: lib/IO/EventMux/Socket/MsgHdr.pm
+    version: 0.02
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

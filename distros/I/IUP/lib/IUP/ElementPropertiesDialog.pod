@@ -1,0 +1,78 @@
+=for comment based on iup-3.5 - http://www.tecgraf.puc-rio.br/iup/en/dlg/iupelementpropdialog.html
+
+=head1 NAME
+
+IUP::ElementPropertiesDialog - [pre-defined dialog] special dialog for GUI editing of IUP elements
+
+=head1 DESCRIPTION
+
+Creates an Element Properties Dialog. It is a predefined dialog to edit
+the properties of an element in run time. It is a standard L<IUP::Dialog|IUP::Dialog>
+constructed with other IUP elements. The dialog can be shown with any
+of the show functions L<Show|IUP::Manual::02_Elements/"Show()">, L<ShowXY|IUP::Manual::02_Elements/"ShowXY()"> or L<Popup|IUP::Manual::02_Elements/"Popup()">.
+
+=begin HTML
+
+<p><img src="http://kmx.github.io/perl-iup/img-3.9/dlg/layoutdlg2.png"></p>
+
+=end HTML
+
+Any existent element can be edited. It does not need to be mapped on
+the native system nor visible.
+
+This is a dialog intended for developers, so they can see and inspect
+their elements in other ways.
+
+It contains 3 Tab sections: one for the registered attributes of the
+element, one for custom attributes set at the hash table, and one for
+the callbacks. The callbacks are just for inspection, and custom
+attribute should be handled carefully because they may be not strings.
+Registered attributes values are shown in red when they were changed by
+the application.
+
+=head1 USAGE
+
+=head2 CREATION - new() method
+
+ $propdialog = IUP::ElementPropertiesDialog( $element );
+ #or
+ $propdialog = IUP::ElementPropertiesDialog( element=>$element );
+
+B<$element>: identifier of the element to display the properties. Not optional.
+
+B<Returns:> the identifier of the created element, or C<undef> if an error occurs.
+
+NOTE: You can pass to C<new()> other C<ATTRIBUTE=E<gt>'value'> or C<CALLBACKNAME=E<gt>\&func> pairs relevant
+to this element - see L<IUP::Manual::02_Elements|IUP::Manual::02_Elements/"new()">.
+
+=head2 ATTRIBUTES
+
+For more info about concept of attributes (setting/getting values etc.)
+see L<IUP::Manual::03_Attributes|IUP::Manual::03_Attributes>. Attributes specific to this element:
+
+Check the L<IUP::Dialog|IUP::Dialog/"ATTRIBUTES"> attributes.
+
+=head2 CALLBACKS
+
+For more info about concept of callbacks (setting callback handlers etc.)
+see L<IUP::Manual::04_Callbacks|IUP::Manual::04_Callbacks>. Callbacks specific to this element:
+
+Check the L<IUP::Dialog|IUP::Dialog/"CALLBACKS"> callbacks.
+
+=head1 EXAMPLES
+
+
+Unfortunately there are no sample scripts using this element.
+
+
+
+=head1 SEE ALSO
+
+L<IUP::Dialog|IUP::Dialog>, L<Show|IUP::Manual::02_Elements/"Show()">,
+L<ShowXY|IUP::Manual::02_Elements/"ShowXY()">, L<Popup|IUP::Manual::02_Elements/"Popup()">,
+L<IUP::LayoutDialog|IUP::LayoutDialog>
+
+The original doc: L<iupelementpropdialog.html|http://www.tecgraf.puc-rio.br/iup/en/dlg/iupelementpropdialog.html>
+ 
+
+=cut

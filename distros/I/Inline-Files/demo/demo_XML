@@ -1,0 +1,12 @@
+use Inline::Files::Virtual;
+
+my @files = vf_load("XML.xml", "(?=<FILE>)");
+
+foreach $file (@files) {
+	local *FILE;
+	print "<<$file>>\n";
+	vf_open FILE, $file or die "huh?";
+	while (<FILE>) {
+		print "> $_";
+	}
+}

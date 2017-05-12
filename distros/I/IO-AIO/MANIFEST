@@ -1,0 +1,36 @@
+README
+MANIFEST
+COPYING
+Changes
+Makefile.PL
+schmorp.h
+AIO.pm
+AIO.xs
+gendef0
+def0.h
+bin/treescan
+t/00_load.t
+t/01_stat.t
+t/02_read.t
+t/03_errors.t
+t/04_fork.t
+t/05_readdir.t
+t/06_group.t
+t/07_feeder.t
+t/aio_test_common.pm
+
+libeio/xthread.h
+libeio/ecb.h
+libeio/eio.h
+libeio/eio.c
+libeio/etp.c
+libeio/libeio.m4
+libeio/config.h.in
+
+configure.ac
+configure
+autogen.sh
+
+typemap
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

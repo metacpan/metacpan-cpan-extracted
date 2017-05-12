@@ -1,0 +1,166 @@
+0.43 2016-02-27
+
+- Documents png_compare function
+- Documents pnginspect script
+
+0.42 2016-02-18
+
+- Adds "png_compare", a function to compare image data in two PNGs
+- Removes reference to mailing list from metadata
+- Fixes documentation internal links
+
+0.41 2015-09-26
+
+* Remove broken image, download, and mailing list links from documentation.
+* Simplify documentation (excessive headings).
+
+0.40 2015-09-26
+
+* Fixes bug related to use of memory after freeing.
+
+0.39 2014-10-17
+
+* Fixes bugs related to 64 bit systems (ARC)
+
+0.38 2014-08-17
+
+* Compilation guards for various kinds of libpng.
+* More tests for libpng support in libpng_supports.
+
+0.37 2014-04-27
+
+* Fixup for too-modern test (used s///r flag)
+* "get_IHDR" no longer returns "compression_method" and
+  "filter_method" (always 0)
+* Some documentation cleanup.
+
+0.36 2014-04-26
+
+* Implements get_sBIT, set_sBIT (previously incorrectly implemented)
+* Implements get_tRNS, set_tRNS (previously unimplemented)
+* Distribution now includes testing over all valid members of "PngSuite"
+  for copy-correctness of "copy_png".
+
+0.35 2014-04-26
+
+* Fix bug caused by premature freeing of memory due to changes in
+  version 0.34. "copy_png" should be OK again.
+
+0.34 2014-04-11
+
+* Plug memory leak
+
+0.33 2014-02-21
+
+* New functions "set_row_pointers" and "set_image_data" for access to
+  low-level PNG structures.
+
+0.32 2014-02-14
+
+* Changes to a C file to compile successfully on SunOS/Solaris
+* Remove DESTROY accidentally included in EXPORTS_OK (causes serious problems)
+
+0.31 2014-02-11
+
+* Changes to XS access routines "get_internals", "copy_row_pointers".
+* This supports "Image::PNG::Cairo" version 0.06 but not earlier versions.
+
+0.30 2014-02-11
+
+* Support sCAL chunk.
+* use warnings, use strict in main module.
+* "libpng_supports" added pCAL and sCAL to testable options.
+* "set_text" now has a default compression of
+  PNG_TEXT_COMPRESSION_NONE, so the field "compression" doesn't have
+  to be specified for every text chunk.
+* New function "copy_png" for copying chunks from a read PNG to a write PNG.
+* Support sPLT chunk (experimental).
+* Fix bug where some PNG constants (PNG_FILLER_AFTER etc.) were lost.
+
+0.29 2014-02-11
+
+* As 0.30 except bug fixes were not fully applied.
+
+0.28 2014-01-23
+
+* Memory handling changed for the benefit of Image::PNG::Cairo.
+
+0.27 2014-01-21
+
+* Change "supports" to "libpng_supports" and add "tEXt", "zTXt"
+  options.
+* Try to detect broken libpngs and skip text tests for them.
+
+0.26 2014-01-21
+
+* Skip text tests for people without libpng text support.
+
+0.25 2014-01-21
+
+* Use the "official libpng" test PNG files for testing (previous files
+  had bugs in them, leading to obscure test failures.)
+
+0.24 2014-01-21
+
+* Fix errors in gAMA.t causing test failures
+* Open internals for the sake of Image::PNG::Cairo.
+
+0.23 2014-01-20
+
+* "read_from_scalar" now has a return value & doesn't require
+  create_read_struct to be called.
+* Documentation clarified.
+
+0.22 2014-01-19
+
+* Change Image::PNG::Libpng::Const back to Image::PNG::Const.
+* Minor fixes in documentation, etc.
+
+0.21 2014-01-18
+
+* Split from Image::PNG
+
+0.20 2013-03-12
+
+* Use Devel::CheckLib to check for png library.
+* Fix up for bug on Windows multithreaded.
+
+0.19 2013-02-16
+
+0.18 2013-02-15
+
+0.17 2013-02-14
+
+0.16 2012-04-18
+
+0.15 2012-04-14
+
+0.14 2012-04-14
+
+0.13 2012-04-14
+
+0.12 2012-04-14
+
+0.11 2012-03-28
+
+0.10 2012-03-26
+
+0.09 2012-03-18
+
+0.08 2011-06-02
+
+0.07 2011-05-31
+
+0.06 2011-05-24
+
+0.05 2011-05-23
+
+0.04 2011-05-23
+
+0.03 2011-04-26
+
+0.02 2011-04-21
+
+0.01 2011-04-21
+
+

@@ -1,0 +1,29 @@
+Note that src/FastSieve.cpp is basically a copy of the code included in FastSieve.pm in David Oswald's
+Math-Prime-FastSieve-0.13 source distro.
+The only change is that the "Sieve" class has been renamed to "_Sieve" to accommodate the
+--export_ok_all option (which places all functions that don't begin with a single underscore into @EXPORT_OK).
+
+Similarly - the 't' folder is basically a copy of the 't' folder from the same distro.
+Both t/01can_subs.t and t/03sieve_object.t have been altered to accommodate the renaming of the class
+from "Sieve" to "_Sieve". (No other changes were made.)
+
+Having installed InlineX::CPP2XS (version 0.20 or later), if you 'cd' to the folder that contains this file and:
+
+1) run cpp2xs --m=Math::Prime::FastSieve --write_makefile_pl=1 --write_pm=1 --manif=1 --version=0.13 --export_ok_all=1
+2) Run 'perl Makefile.PL' and 'make test'
+
+then you will have built Math-Prime-FastSieve-0.13 such that it has no dependency on Inline::CPP.
+(Nothing more ... nothing less :-)
+
+Also, to extend the demo:
+
+1) run cpp2xs --m=Math::Prime::FastSieve --dist=1 --version=0.13 --export_ok_all=1 --bd=./mybuild
+2) 'cd' to the './mybuild' folder
+3) Run 'perl Makefile.PL' and 'make test'
+
+Again, you will have built Math-Prime-FastSieve-0.13 such that it has no dependency on Inline::CPP.
+But this time you'll have created a *portable* Makefile.PL that should work across different OS/Compiler
+combos. (The Makefile.PL that was written in the first example will likely not work for different OS/Compiler
+combos.)
+
+

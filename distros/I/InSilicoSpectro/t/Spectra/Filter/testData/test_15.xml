@@ -1,0 +1,17 @@
+<!-- keep the compounds which have a sum of the raw intensities higher than 20000-->
+
+<ExpMsMsSpectrumFilter>
+<oneExpMsMsSpectrumFilter spectrumType="msms" name="dummy">
+	        <level>msmsCompounds</level>	
+		<action type="removeOther">		
+		       <threshold type="sort">	
+			   <relativeTo>absValue</relativeTo>							
+			   <thresholdValue>20000</thresholdValue>
+			   <comparator>gt</comparator>						
+		       </threshold>
+                </action>
+		<filterValue type="directValue">							
+			<name>sum.fragment.intensity</name>						
+		</filterValue>
+	</oneExpMsMsSpectrumFilter>
+</ExpMsMsSpectrumFilter>

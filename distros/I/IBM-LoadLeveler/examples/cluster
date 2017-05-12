@@ -1,0 +1,67 @@
+# -*- Perl -*-
+
+use IBM::LoadLeveler;
+
+$query=ll_query(CLUSTERS);
+$return=ll_set_request($query,QUERY_ALL,undef,ALL_DATA);
+
+if ($return != 0 )
+{
+    print STDERR "ll_set_request failed Return = $return\n";
+}
+
+
+$cluster=ll_get_objs($query,LL_CM,NULL,$number,$err);
+print "Cluster Objects : $number, error - $err\n\n";
+
+while($cluster)
+{
+    $schedtype=ll_get_data($cluster,LL_ClusterSchedulerType);
+    print "Scheduler Type : $schedtype\n";
+    print "\n";
+
+    $enfsub=ll_get_data($cluster,LL_ClusterEnforceSubmission);
+    print "Enforced Submission : ", $enfsub ? "Yes\n":"No\n";
+    print "\n";
+
+    $enfrescnt=ll_get_data($cluster,LL_ClusterEnforcedResourceCount);
+    print "Enforced Resource Count : $enfrescnt\n";
+    @enfres=ll_get_data($cluster,LL_ClusterEnforcedResources);
+    print array2string(@enfres);
+    print "\n\n";
+
+    $defrescnt=ll_get_data($cluster,LL_ClusterDefinedResourceCount);
+    print "Defined Resource Count  : $defrescnt\n";
+    @defres=ll_get_data($cluster,LL_ClusterDefinedResources);
+    print array2string(@defres);
+    print "\n\n";
+
+    $schedrescnt=ll_get_data($cluster,LL_ClusterSchedulingResourceCount);
+    print "Scheduling Resource Count: $schedrescnt\n";
+    @schedres=ll_get_data($cluster,LL_ClusterSchedulingResources);
+    print array2string(@schedres);
+    print "\n\n";
+
+    $resource=ll_get_data($cluster,LL_ClusterGetFirstResource);
+    print "Resource Info :\n";
+    while($resource)
+    {
+         $name=ll_get_data($resource, LL_ResourceName);
+         $init_val=ll_get_data($resource, LL_ResourceInitialValue);
+         $avail_val=ll_get_data($resource, LL_ResourceAvailableValue);
+         print "\t$name, Inital : $init_val, Available : $avail_val\n";
+         $resource=ll_get_data($cluster, LL_ClusterGetNextResource);
+    }
+    $cluster=ll_next_obj($query);
+}
+
+# Free up space allocated by LoadLeveler
+ll_free_objs($query);
+ll_deallocate($query);
+
+sub array2string {
+  my $entry;
+  my $return_str = "";
+  $return_str = join(" ", @_) if @_;
+  return $return_str;
+}

@@ -1,0 +1,33 @@
+Imager/Chart/Radial version 0.01
+================================
+
+This module uses Imager to plot and output Radial or Radar charts.
+
+I originally wrote a radial chart creator based on GD, but the GD library did not provide anti-aliasing and
+sufficient colours for a clean looking image until relatively recently. I wrote this version because I wanted
+to learn Imager and also provide some charting modules for Imager to make life easier when the GD library is
+not available.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Imager
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003, Aaron J Trevena <aaron@droogs.org>
+
+This module is free software; you can redistribute it or modify it
+under the same terms as Perl itself.
+

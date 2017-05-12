@@ -1,0 +1,11 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/Image/DecodeQR.pm
+lib/Image/DecodeQR.xs
+src/ppport.h
+t/00_compile.t
+t/01_decode.t
+t/test.png

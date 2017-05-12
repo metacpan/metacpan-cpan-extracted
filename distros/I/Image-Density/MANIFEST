@@ -1,0 +1,12 @@
+Build.PL
+Changes
+lib/Image/Density/TIFF.pm
+Makefile.PL
+MANIFEST
+META.yml # Will be created by "make dist"
+README.md
+t/diffuse.tif
+t/examples.t
+t/multi.tif
+t/noisy.tif
+t/original.tif

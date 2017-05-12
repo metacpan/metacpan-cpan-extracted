@@ -1,0 +1,52 @@
+{
+   "abstract" : "Simple prompting with validation hooks.",
+   "author" : [
+      "David Oswald <davido [@at] cpan [d.o.t] org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "IO-Prompt-Hooked",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "English" : "0",
+            "Test::More" : "0.98"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.62"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IO::Prompt::Tiny" : "0.001",
+            "Params::Smart" : "0.08",
+            "parent" : "0.225",
+            "perl" : "5.006000"
+         }
+      }
+   },
+   "provides" : {
+      "IO::Prompt::Hooked" : {
+         "file" : "lib/IO/Prompt/Hooked.pm",
+         "version" : "0.10"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.10"
+}

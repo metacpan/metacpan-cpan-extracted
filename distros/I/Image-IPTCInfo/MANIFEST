@@ -1,0 +1,10 @@
+Changes
+demo.pl
+demo_images/burger_van.jpg
+demo_images/dog.jpg
+IPTCInfo.pm
+Makefile.PL
+MANIFEST
+README
+test.pl
+META.yml                                Module meta-data (added by MakeMaker)

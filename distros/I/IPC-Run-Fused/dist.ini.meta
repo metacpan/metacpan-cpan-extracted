@@ -1,0 +1,29 @@
+; vim: syntax=dosini
+name    = IPC-Run-Fused
+author  = Kent Fredric <kentnl@cpan.org>
+license = Perl_5
+copyright_holder = Kent Fredric <kentfredric@gmail.com>
+
+[@Author::KENTNL]
+twitter_extra_hash_tags = #ipc
+normal_form = numify
+mantissa = 6
+toolkit = eumm
+toolkit_hardness = soft
+bumpversions = 1
+copyfiles = LICENSE
+srcreadme = mkdn
+
+;version_major  = 0
+;version_minor  = 1
+;version_rel_year = 2009
+;version_rel_month = 10
+;version_rel_day = 21
+;version_rel_hour = 12
+;version_rel_time_zone = Pacific/Auckland
+
+[Prereqs]
+
+[OSPrereqs / MSWin32]
+Win32::Job = 0
+File::Which = 0

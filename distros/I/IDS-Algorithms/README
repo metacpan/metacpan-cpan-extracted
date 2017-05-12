@@ -1,0 +1,46 @@
+IDS Algorithm and Data Source modules for testing IDS algorithms.
+
+Copyright 2005-2007 Kenneth Ingham.  All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+No special prerequisites *UNLESS* you are going to be debugging DFAs.
+Then you need PerlTk.  If you are a tester or good perl coder, I would
+love to get suggestions about how to make this independent of the DFA
+code, since it has to dig deeply into the DFA code to allow the
+debugging.
+
+This software was research software that I used as a part of my PhD
+research.  You can get my dissertation at 
+http://www.i-pi.com/~ingham/dissertation-twoside.pdf
+
+Parts of this software were described in the following journal
+articles/conference presentations:
+
+@article{ingham2007jocn,
+    author = "Kenneth L. Ingham and Anil Somayaji and John Burge and
+              Stephanie Forrest",
+    title = "Learning {DFA} Representations of {HTTP} for Protecting Web
+             Applications",
+    month = "11 April",
+    year = 2007,
+    journal = "Computer Networks",
+    volume = 51,
+    number = 5,
+    pages = "1239--1255 ",
+    doi = "http://dx.doi.org/10.1016/j.comnet.2006.09.016",
+}
+
+
+Expected changes/enhancements:
+
+I do not intend on enhancing this software further, but it all depends
+on how post-PhD research goes.  I solicit bug reports and enhancements.
+This note will change (and the version number of the package will also
+change) if this state of affairs changes.
+
+Revision history:
+
+Version 1.0: First public release.
+

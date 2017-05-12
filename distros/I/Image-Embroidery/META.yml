@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name:                Image-Embroidery
+version:             1.2
+abstract:            Parse and display embroidery data files
+license:             perl
+generated_by:        ExtUtils::MakeMaker version 6.36
+distribution_type:   module
+requires:     
+    Bit::Vector:                   6.3
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3
+author:
+    - Kirk Baucom <kbaucom@schizoid.com>

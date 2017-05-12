@@ -1,0 +1,4 @@
+Revision history for IBM-SONAS
+
+0.20	Fri 27 Nov 2015 <ltp@cpan.org>
+	- Release 0.20.  New cluster throughput statistical methods.

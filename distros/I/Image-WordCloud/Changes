@@ -1,0 +1,47 @@
+Revision history for Image-WordCloud
+
+0.02_05			2012.03.23
+  [BUG FIXES]
+  * Fixed strings with unicode (accented) characters being split improperly
+    (reported by sukria) [issue #1]
+	
+	* Releasing all the other queued up changes in master branch. There will
+	  still probably be problems with words not displaying properly or being
+	  outside of the playing field. This will (hopefully) be fixed in the
+	  0.04 release.
+
+0.02_02
+
+	[BUG FIXES]
+	* _max_font_size() was returning sizes that were too small. It now returns
+	  a size that will scale properly in cloud()
+    * 'font_path' option is now set for GD::Text objects at startup, this means
+      that methods using fonts outside of cloud() should work properly. They
+      WERE defaulting to the core libgd (awful) fonts.
+	
+	[FEATURES]
+	* Added a 'border_padding' option to new() that takes either a number in
+	  pixels or a percentage.
+	* Fonts now scale properly according to the aspect ratio we have to fill,
+      but because of how we're placing words some still get left outside the
+      image bounds. This should be less noticeable when using the
+      'border_padding' option.
+    * Images are now TrueColor, and not palette-based.
+
+0.02_01			2012.02.02
+
+	[BUG FIXES]
+	* Long words were overrunning the image bounds. Added _max_font_size() which
+	  tries the longest word in each font, scaling the font size down until it
+	  will fit width the image's width. (Eventually this will need to be changed
+	  to handle vertical words)
+	* Long FIRST words were overrunning the image bounds too. The first (largest)
+	  word was not being checked to make sure its placement fit within the image.
+	  
+	[TESTS]
+	* Added tests so every method is covered. Added more tests for coverage.
+
+0.01_01			2012.01.27
+
+	First version, released on an unsuspecting world.
+

@@ -1,0 +1,121 @@
+NAME
+    IPC::RunSession::Simple - Run a simple IPC session in the same vein as
+    IPC::Run & Expect
+
+VERSION
+    Version 0.002
+
+SYNOPSIS
+        use IPC::RunSession::Simple
+
+        $session = IPC::RunSession::Simple->open( "fcsh" )
+
+        # Read until the prompt (which doesn't end in a newline)
+        # Timeout after 5 seconds
+        $result = $session->read_until( qr/\(fcsh\) /, 5 )
+
+        if ( $result->closed ) {
+             # We encountered an (abnormal) EOF... 
+        }
+        elsif ( $result->expired ) {
+            # The timeout got triggered...
+        }
+        else {
+            print $result->content
+        }
+
+        # Tell 'fcsh' we want to quit
+        $session->write( "quit\n" )
+
+DESCRIPTION
+    A simple IPC session with read/write capability using IPC::Open3 and
+    IO::Select
+
+USAGE
+  $session = IPC::RunSession::Simple->open( $cmd )
+    Create a new session by calling "open3" on $cmd
+
+  $result = $session->read( [ $timeout ] )
+    Read (blocking) until some output is gotten
+
+    If $timeout is given, then wait until output is gotten OR the timeout
+    expires (setting $result->expired appropiately)
+
+  $result = $session->read_until( $marker, [ $timeout ] )
+    Read (blocking) until some output matching $marker is gotten
+
+    $marker can either be a regular expression or a code block. If a code
+    block is given, the content accumulated will be available as the first
+    argument and as $_
+
+    If $timeout is given, then wait until output is gotten OR the timeout
+    expires (setting $result->expired appropiately). Any content collected
+    up to the timeout will be included in $result->content
+
+  $session->write( $content )
+    Write $content to the input of the opened process
+
+  $reader = $session->reader
+    Return the reader filehandle (the STDOUT/STDERR of the process)
+
+  $writer = $session->writer
+    Return the writer filehandle (the STDIN of the process)
+
+  $result->content
+    The content read via "read" or "read_until"
+
+  $result->expired
+    True if a read returned as a result of taking longer than the specified
+    timeout value
+
+  $result->closed
+    True if the process closed during the read
+
+SEE ALSO
+    IPC::Run
+
+    Expect
+
+AUTHOR
+    Robert Krimen, "<rkrimen at cpan.org>"
+
+BUGS
+    Please report any bugs or feature requests to "bug-ipc-runsession-simple
+    at rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=IPC-RunSession-Simple>.
+    I will be notified, and then you'll automatically be notified of
+    progress on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc IPC::RunSession::Simple
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=IPC-RunSession-Simple>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/IPC-RunSession-Simple>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/IPC-RunSession-Simple>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/IPC-RunSession-Simple/>
+
+ACKNOWLEDGEMENTS
+COPYRIGHT & LICENSE
+    Copyright 2009 Robert Krimen.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

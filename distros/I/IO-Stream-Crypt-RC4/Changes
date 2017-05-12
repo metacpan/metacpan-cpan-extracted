@@ -1,0 +1,16 @@
+Revision history for IO-Stream-Crypt-RC4
+
+v2.0.0  2016-02-20 13:52:32 EET
+	- Switch to Dist::Milla.
+
+1.0.3   2013-10-03 16:49:21 EEST
+	- Remove MYMETA.*
+
+1.0.2	2012-05-13 06:01:33 EEST
+	- Fix requirements and tests.
+
+1.0.1	2008-11-19 05:09:12 EET
+	- Added compatibility with Win32.
+
+1.0.0	2008-11-16 02:36:32 EET
+	- Initial release.

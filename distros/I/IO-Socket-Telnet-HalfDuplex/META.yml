@@ -1,0 +1,13 @@
+---
+abstract: 'more reliable telnet communication'
+author:
+  - 'Jesse Luehrs <doy at tozt dot net>'
+generated_by: 'Dist::Zilla::Plugin::MetaYAML version 1.091440'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: IO-Socket-Telnet-HalfDuplex
+requires:
+  IO::Socket::Telnet: 0
+version: 0.02

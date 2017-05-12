@@ -1,0 +1,18 @@
+Revision history for Imager-Filter-Autocrop
+
+1.22/1.23    08 Oct. 2016
+             - Minor changes (speed improvements, early detection of no-crop and image-wide outlines).
+
+1.20/1.21    07 Oct. 2016
+              - Significant performance boost.
+              - Fix for scan boundaries.
+              - JPEG output quality can now be specified for autocrop.pl script.
+
+1.10         06 Oct. 2016
+             - It is now possible to override the name under which the filter is registered.
+             - Utility script autocrop.pl has been added.
+             - Markdown version of README has been added.
+
+1.00         05 Oct. 2016
+             - Initial version.
+

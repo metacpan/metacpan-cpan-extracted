@@ -1,0 +1,41 @@
+---
+abstract: 'Perl extension for calling system commands as if they were Perl functions'
+author:
+  - 'Hauke D <haukex@zero-g.net>'
+build_requires:
+  Capture::Tiny: '0'
+  Config: '0'
+  Exporter: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec::Functions: '0'
+  File::Temp: '0'
+  FindBin: '0'
+  Test::Fatal: '0'
+  Test::More: '0'
+  base: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: IPC-Run3-Shell
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Data::Dumper: '0'
+  IPC::Run3: '0'
+  Scalar::Util: '0'
+  overload: '0'
+  perl: '5.006000'
+  warnings::register: '0'
+resources:
+  bugtracker: https://github.com/haukex/IPC-Run3-Shell/issues
+  homepage: https://github.com/haukex/IPC-Run3-Shell
+  repository: https://github.com/haukex/IPC-Run3-Shell.git
+version: '0.54'

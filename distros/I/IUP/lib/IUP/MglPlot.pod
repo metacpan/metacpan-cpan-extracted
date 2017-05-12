@@ -1,0 +1,1723 @@
+=for comment based on iup-3.9 - http://www.tecgraf.puc-rio.br/iup/en/ctrl/iup_mglplot.html
+
+=head1 NAME
+
+IUP::MglPlot - [GUI element] canvas-like element for creating 2D plots (based on MathGL library)
+
+=head1 DESCRIPTION
+
+Creates a L<MathGL|http://mathgl.sourceforge.net/> based element for creating 2D and 3D plots with interface similar to L<IUP::PPlot>.
+
+=begin HTML
+
+<p>
+  <table border="1">
+    <tbody>
+    <tr>
+      <td><img src="http://kmx.github.io/perl-iup/img-3.9/ctrl/iup_mglplot0.png" border="0"></td>
+      <td><img src="http://kmx.github.io/perl-iup/img-3.9/ctrl/iup_mglplot1.png" border="0"></td>
+    </tr>
+    <tr>
+      <td><img src="http://kmx.github.io/perl-iup/img-3.9/ctrl/iup_mglplot2.png" border="0"></td>
+      <td><img src="http://kmx.github.io/perl-iup/img-3.9/ctrl/iup_mglplot3.png" border="0"></td>
+    </tr>
+  </table>
+</p>
+
+=end HTML
+
+=head1 USAGE
+
+=head2 CREATION - new() method
+
+ $plot = IUP::MglPlot->new( TITLE=>"Simple Data", GRID=>"YES" );
+
+B<Returns:> the identifier of the created element, or C<undef> if an error occurs.
+
+NOTE: You can pass to C<new()> other C<ATTRIBUTE=E<gt>'value'> or C<CALLBACKNAME=E<gt>\&func> pairs relevant
+to this element - see L<IUP::Manual::02_Elements|IUP::Manual::02_Elements/"new()">.
+
+=head2 Guide
+
+Each plot can contain 2 or 3 B<axes> (X and Y and/or Z), a B<title>, a
+B< legend> B<box>, a B<colorbar>, a B<grid>, a B<dataset> B<area> and
+as many B<datasets> you want.
+
+Each dataset is added using the L<PlotAdd1D|/PlotAdd1D>, L<PlotAdd2D|/PlotAdd2D>, L<PlotAdd3D|/PlotAdd3D>, 
+L<PlotInsert1D|/PlotInsert1D>, L<PlotInsert2D|/PlotInsert2D>, L<PlotInsert3D|/PlotInsert3D>
+L<PlotSet1D|/PlotSet1D>, L<PlotSet2D|/PlotSet2D> and L<PlotSet3D|/PlotSet3D> functions. All other plot
+parameters are configured by attributes.
+
+If no attribute is set, the default values were selected to best
+display the plot.
+
+B<IMPORTANT>: When setting attributes the plot is NOT redrawn until the
+REDRAW attribute is set or a redraw event occurs.
+
+The B<dataset area> is delimited by the min/max axis attributes. Data
+is only plotted inside the dataset area. This area defines the 2D or 3D
+plot coordinate space. The screen area is a 2D pixels coordinate space.
+And finally the dataset also defines a normalized space, that means
+min/max is converted to 0-1.
+
+The B<legend box> is a list of the dataset names, each one drawn with
+the same color of the correspondent dataset. The box is located in one
+of the four corners of the dataset area.
+
+The B<colorbar> is an additional axis showing the the colors used to
+pseudo color the data for some plot modes.
+
+The B<grid> is automatically spaced accordingly the current axis
+displayed values.
+
+The B<title> is always centered in the top of the plot.
+
+The B<axes> are positioned at the origin (0,0,0), but can be
+automatically positioned at the left-bottom. If values are only
+positive then the origin will be placed in left bottom position. If
+values are negative and positive then origin will be placed inside the
+plot. The ticks in the axis are also automatically distributed.
+
+=head2 Data
+
+MathGL supports several kinds of data. IUP::MglPlot restricts this to a
+few combinations. First there are 3 major classes:
+
+=over
+
+=item * B<Linear> sequential data are simply a sequence of points whether in
+1D, 2D or 3D coordinates.
+
+=item * B<Planar> data is a bi-dimensional array of values, just like a digital
+image. Each value is C<f(x,y)>, where C<x> belongs to C<[-1, 1]> and C<y> to C<[-1, 1]>.
+
+=item * B<Volumetric> data is a tri-dimensional array of values, that
+represents a 3D volume. Each value is C<f(x,y,z)>, where C<x> belongs
+to C<[-1, 1]>, C<y> to C<[-1, 1]> and C<z> to C<[-1, 1]>.
+
+=back
+
+Planar and volumetric data can be very memory consuming, so be careful
+when using them. Linear data is the same representation accepted by
+L<IUP::PPlot>, with the exception that L<IUP::MglPlot> has support for 3D
+coordinates. Also planar and volumetric data in L<IUP::MglPlot> have x, y
+and z coordinates equidistantly distributed from 0 to count-1.
+
+Planar and volumetric data are stored in a 1D dataset created by
+L<PlotNewDataSet|/"PlotNewDataSet()">, and filled with L<PlotSetData|/"PlotSetData()">,
+L<PlotLoadData|/"PlotLoadData()"> or L<SetFromFormula|/"SetFromFormula()"> functions only.
+
+=head2 Interaction - Zoom and Pan
+
+Zoom and Pan operations can be done using keyboard or mouse actions in
+2D and 3D plots.
+
+Zoom can be done using the mouse wheel (Zoom in: scroll up; Zoom out:
+scroll down), the Ctrl+Left mouse button pressed and vertical mouse
+movements (Zoom in: bottom-up; Zoom out: top-down) or the plus '+'
+(Zoom in) and minus 'E<minus>' (Zoom out) keys.
+
+Pan is done using horizontal and vertical mouse movements with the left
+mouse button pressed. By keyboard, the Ctrl+arrow keys combinations can
+be used to shift the window. Arrow keys can also be used without using
+the Ctrl key to slower movements.
+
+=head2 Interaction - Rotation
+
+Rotation operations can also be done using keyboard or mouse actions,
+but only for 3D plots.
+
+=over
+
+=item * Rotation in X axis: right mouse button pressed and vertical mouse movements, or 'w' and 's' keys.
+
+=item * Rotation in Y axis: right mouse button pressed and horizontal mouse movements, or 'a' and 'd' keys.
+
+=item * Rotation in Z axis: Ctrl+right mouse button pressed and vertical mouse movements, or 'e' and 'q' keys.
+
+=back
+
+=head2 Interaction - Reseting
+
+The interaction can be reset with a mouse double-click inside the plot
+area or by pressing the HOME key. This action restores the plot to the
+default view (no zoom, no pan and no rotation).
+
+=head2 Text and Fonts
+
+MathGL provides support for parsing LaTeX-like syntax. So all labels
+and title can contain formatting commands and equation symbols. For
+example: \b (bold), \i (italic), \u (underline), \big (bigger size),
+@ (smaller size), ^ (upper), _ (lower), etc. The full list contain
+approximately 2000 commands. Multiline text is accepted.
+
+For example:
+
+ "It can be \\wire{wire}, \\big{big} or #r{colored}" 
+ "One can change style in string: " "\\b{bold}, \\i{italic, \\b{both}}"
+ "Easy to \\a{overline} or \\u{underline}" 
+ "Easy to change indexes ^{up} _{down} @{center}"
+ "It parse TeX: \\int \\alpha \\cdot \\sqrt3{sin(\\pi x)^2 + \\gamma_{i_k}} dx"
+ "\\sqrt{\\frac{\\alpha^{\\gamma^2}+" "\\overset 1{\\big\\infty}}{\\sqrt3{2+b}}}"
+
+=head2 Auxiliary Functions
+
+=head3 PlotBegin()
+
+ $plot->PlotBegin($dim);
+ # $dim = 1 (for 1D) or 2 (for 2D) or 3 (for 3D)
+
+Prepares a dataset to receive samples. The dimension of the data can be 1, 2 or 3. I<Linear data only.>
+
+=head3 PlotEnd()
+
+ $index = $plot->PlotEnd();
+
+Adds the dataset to the plot and returns the dataset B<index>. The
+dataset can be empty. Redraw is NOT done until the REDRAW attribute is
+set. Also it will change the current dataset index (CURRENT) to the
+return value. You can only set attributes of a dataset AFTER you added
+the dataset. Can only be called if L<PlotBegin|/"PlotBegin()"> was called.
+Whenever you create a dataset all its "DS_*" attributes will be set to
+the default values. Notice that DS_MODE must be set before other "DS_*"
+attributes. I<Linear data only.>
+
+=head3 PlotNewDataSet()
+
+  $plot->PlotNewDataSet($dim);
+  # $dim = 1 (for 1D) or 2 (for 2D) or 3 (for 3D)
+  
+Creates an empty dataset to receive samples. The dimension of the data
+can be 1, 2 or 3. Linear data can have 1, 2 or 3 dimensions. Planar
+data has 2 dimensions, but use dim=1. Volumetric data has 3 dimensions,
+but use dim=1.
+
+Planar and volumetric data distribute their data in 2D and 3D
+continuous arrays, so the number of dimensions is given only when the
+array is set in L<PlotSetData|/"PlotSetData()">, L<PlotLoadData|/"PlotLoadData()"> or
+L<PlotSetFromFormula|/"PlotSetFromFormula()">. You can convert planar data into linear
+data using the DS_REARRANGE and DS_SPLIT attributes.
+
+=head3 PlotAdd1D()
+
+ $plot->PlotAdd1D($name, $y);
+ #or
+ $plot->PlotAdd1D(\@name, \@y);
+ #or
+ $plot->PlotAdd1D($y);
+ #or
+ $plot->PlotAdd1D(\@y);
+
+Adds a sample to the dataset. Can only be called if L<PlotBegin|/"PlotBegin()">
+was called with dim=1. B<name> is an optional string used for tick
+labels in the X axis, and it can be C<undef>. Names are
+allowed only for the first dataset and when set ticks configuration for
+the X axis is ignored, all the names are shown. The X axis data is
+automatically generated (0,1,2,3,...). I<Linear data only.>
+
+=head3 PlotAdd2D()
+
+ $plot->PlotAdd2D($x, $y);
+ #or
+ $plot->PlotAdd2D(\@x, \@y);
+
+=head3 PlotAdd3D()
+
+ $plot->PlotAdd3D($x, $y, $z);
+ #or
+ $plot->PlotAdd3D(\@x, \@y, \@z);
+
+Adds a sample to the dataset. Can only be called if L<PlotBegin|/PlotBegin>
+was called with dim=3. I<Linear data only.>
+
+=head3 PlotInsert1D()
+
+ $plot->PlotInsert1D($ds_index, $sample_index, \@name, \@y);
+ #or
+ $plot->PlotInsert1D($ds_index, $sample_index, \@y);
+
+See L<PlotInsert2D|/"PlotInsert2D()">.
+
+=head3 PlotInsert2D()
+
+ $plot->PlotInsert2D($ds_index, $sample_index, \@x, \@y);
+
+Inserts an array of samples in the dataset B<ds_index> at the given
+B<sample_index>. Can be used only after the dataset is added to the
+plot. B<sample_index> can be after the last sample so data is appended
+to the array. Current data is shifted if necessary. For 1D version B<names> are
+optional strings used for tick labels in the X axis, and it can be C<undef>.
+Names are allowed only for the first dataset and when set
+ticks configuration for the X axis is ignored, all the names are shown.
+Also for the 1D version, the X axis data is automatically generated
+(0,1,2,3,...). I<Linear data only.>
+
+=head3 PlotInsert3D()
+
+ $plot->PlotInsert3D($index, $sample_index, \@x, \@y, \@z);
+
+See L<PlotInsert2D|/"PlotInsert2D()">.
+
+=head3 PlotSet1D()
+
+ $plot->PlotSet1D($index, \@name, \@y);
+
+See L<PlotSet2D|/"PlotSet2D()">.
+
+=head3 PlotSet2D()
+
+ $plot->PlotSet2D($index, \@x, \@y);
+
+Sets an array of samples in the dataset B<ds_index>. Existing data is
+removed. Can be used only after the dataset is added to the plot.
+For 1D version B<name> is an optional array of strings used for tick labels in the X
+axis, and it can be C<undef>. Names are allowed only for the
+first dataset and when set ticks configuration for the X axis is
+ignored, all the names are shown. Also for the 1D version, the X axis
+data is automatically generated (0,1,2,3,...). I<Linear data only.>
+
+=head3 PlotSet3D()
+
+ $plot->PlotSet3D($index, \@x, \@y, \@z);
+
+See L<PlotSet2D|/"PlotSet2D()">.
+
+=head3 PlotTransform()
+
+ ($ix, $iy) = $plot->PlotTransform($x, $y, $z);
+ 
+Converts coordinates from plot coordinates to pixels. It can be used
+only inside PREDRAW_CB and POSTDRAW_CB callbacks. Output variables can
+be C<undef> if not used.
+
+=head3 PlotTransformTo()
+
+ ($x, $y, $z) = $plot->PlotTransformTo($ix, $iy);
+
+Converts coordinates from pixels to plot coordinates. It can be used
+only inside PREDRAW_CB and POSTDRAW_CB callbacks. Output variables can
+be C<undef> if not used.
+
+=head3 PlotPaintTo()
+
+ $plot->PlotPaintTo($filename);
+ #or
+ $plot->PlotPaintTo($filename, $width, $height, $dpi);
+
+Plots to a vector imagefile instead of the display canvas. Note: only *.SVG and *.EPS formats are supported.
+
+B<$width> and B<$height> is the size in pixels, and B<$dpi> is the resolution in dots or pixels per inch.
+If B<width>, B<$height> or B<$dpi> are 0 the screen equivalent is used.
+ 
+=head3 PlotSetFormula()
+
+ $plot->PlotSetFormula($ds_index, $count, $formulaX);                           # 1D
+ #or
+ $plot->PlotSetFormula($ds_index, $count, $formulaX, $formulaY);                # 2D
+ #or
+ $plot->PlotSetFormula($ds_index, $count, $formulaX, $formulaY, $formulaZ);     # 3D
+
+Same as PlotSet1D/2D/3D but data is generated from a formula. If
+B<$count> is 0 the current size is used. If 2D data then B<$formulaY>
+must be non C<undef>. If 3D data then B<$formulaZ> must be non C<undef>. The
+variables of the formulas must be x, y and/or z. Coordinates are
+evaluated in the [0,1] interval. There is no difference between lower
+or upper case in formulas. I<Linear data only.>
+
+The operators and functions can be:
+
+ + - * / ^      (^=integer power)
+ < > = & |      (logical operators, &=true if a and b both nonzero, |=true if x or y nonzero)
+ sqrt(a)  pow(a,b)  log(a,b)  ln(a)     lg(a)              (ln(a)=log(e,a)  lg(a)=log(10,a)
+ abs(a)   sign(a)   mod(a,b)  step(a)   int(a)    rnd       pi
+ abs(a)   sign(a)   mod(a,b)  step(a)   int(a)    rnd       pi
+ sin(a)   cos(a)    tan(a)    asin(a)   acos(a)   atan(a)
+ sinh(a)  cosh(a)   tanh(a)   asinh(a)  acosh(a)  atanh(a)
+
+=head3 PlotSetFromFormula()
+
+ $plot->PlotSetFromFormula($ds_index, $formula);
+ #or
+ $plot->PlotSetFromFormula($ds_index, $formula, $count_x);
+ #or
+ $plot->PlotSetFromFormula($ds_index, $formula, $count_x, $count_y);
+ #or
+ $plot->PlotSetFromFormula($ds_index, $formula, $count_x, $count_y, $count_z);
+
+Same as L<PlotSetData|/"PlotSetData()"> but data is generated from a formula. If
+all B<$count_*> are 0 (or undef) the current size remains, and the existing data is
+preserved but overwritten if the formula results that. If any
+B<$count_*> is NOT zero then the existing data size is removed. The
+variables of the formulas must be x, y and/or z. Coordinates are
+evaluated in the [0,1] interval. There is no difference between lower
+or upper case in formulas. The operators and functions can be:
+
+ + - * / ^      (^=integer power)
+ < > = & |      (logical operators, &=true if a and b both nonzero, |=true if x or y nonzero)
+ sqrt(a)  pow(a,b)  log(a,b)  ln(a)    lg(a)            (ln(a)=log(e,a)  lg(a)=log(10,a)
+ abs(a)   sign(a)   mod(a,b)  step(a)  int(a)   rnd      pi
+ sin(a)   cos(a)    tan(a)    asin(a)  acos(a)  atan(a)
+ sinh(a)   cosh(a)  tanh(a)   asinh(a) acosh(a) atanh(a)
+
+DS_COUNT is set to count_x*count_x*count_y.
+
+I<Can be used for linear, planar or volumetric data, but linear data is
+limited to 1D coordinates. You can convert planar data into linear data
+using the DS_REARRANGE and DS_SPLIT attributes.>
+
+=head3 PlotSetData()
+
+ $plot->PlotSetData($ds_index, $data);
+
+Sets an array of samples in the dataset B<$ds_index>. All previous values are removed. 
+
+XXX-FIXME-NOT-IMPLEMENTED
+
+=head3 PlotLoadData()
+
+ $plot->PlotLoadData($ds_index, $filename);
+ #or
+ $plot->PlotLoadData($ds_index, $filename, $count_x);
+ #or
+ $plot->PlotLoadData($ds_index, $filename, $count_x, $count_y);
+ #or
+ $plot->PlotLoadData($ds_index, $filename, $count_x, $count_y, $count_z);
+
+Same as L<PlotSetData|/"PlotSetData()"> but loads the data from a file. The file
+must contains space (' ') separated numeric data in text format. The
+text can contains line comments starting with '#'.
+
+DS_COUNT is set to C<$count_x*$count_x*$count_y>. Existing data is removed.
+Linear data is limited to 1D coordinates.
+
+If any B<$count_*> is 0 (or undef) all their values are automatically calculated.
+The number of elements in the first line defines B<$count_x>, the number
+of lines before an empty line or before a form feed ('\f') defines
+B<$count_y>, and the number of empty lines or the number of form feeds
+('\f') defines B<$count_z>.
+
+I<Can be used for linear, planar or volumetric data, but linear data is
+limited to 1D coordinates.> I<You can convert planar data into linear
+data using the DS_REARRANGE and DS_SPLIT attributes.>
+
+=head3 PlotDrawMark()
+
+  $plot->PlotDrawMark($x, $y, $z);
+
+Draws a mark at given position in plot coordinates. It can be used only
+inside PREDRAW_CB and POSTDRAW_CB callbacks. The attributes DRAWCOLOR,
+DRAWMARKSTYLE and DRAWMARKSIZE can be used to control mark appearance.
+
+=head3 PlotDrawLine()
+
+ $plot->PlotDrawLine($x1, $y1, $z1, $x2, $y2, $z2);
+
+Draws a line from position 1 to position 2 in plot coordinates. It can
+be used only inside PREDRAW_CB and POSTDRAW_CB callbacks. The
+attributes DRAWCOLOR, DRAWLINESTYLE and DRAWLINEWIDTH can be used to
+control line appearance.
+
+=head3 PlotDrawText()
+
+ $plot->PlotDrawText($text, $x, $y, $z);
+
+Draws a text at given position in plot coordinates. It can be used only
+inside PREDRAW_CB and POSTDRAW_CB callbacks. The attributes DRAWCOLOR,
+DRAWTEXTALIGN, DRAWFONTSTYLE and DRAWFONTSIZE can be used to control
+text appearance. DRAWTEXTALIGN can be LEFT, CENTER or RIGHT.
+
+=head2 ATTRIBUTES
+
+=over
+
+=item B<ALPHA>
+
+I<(non inheritable)> Alpha value for overall transparency. Used
+only when TRANSPARENT=Yes. Default: 0.5
+
+=item B<ANTIALIAS>
+
+I<(non inheritable)> Enable or disable the anti-aliasing
+support. For screen display only, ignored when OPENGL=NO. Default: Yes.
+When enabled text has a much better rendering, but 3D graphs will not
+process depth properly.
+
+=item L<BGCOLOR|IUP::Manual::03_Attributes/BGCOLOR>
+
+the background color. Default: "255 255 255".
+
+=item B<ERRORMESSAGE>
+
+I<(read-only)(non inheritable)> If not C<undef> returns the last error message reported by MathGL.
+
+=item L<FONT|IUP::Manual::03_Attributes/FONT>
+
+the default font used in all text
+elements of the plot: title, legend and labels. Font support is done
+using the libraries Freetype and FTGL, so TrueType (*.ttf) and OpenType
+(*.otf) font files can be loaded. If the font is not located in the
+system, then it will try to find the font file in the current
+directory, or in the path from the "IUP_MGLFONTS" environment variable,
+or in the path from the "MGLFONTS" global attribute, or in a system
+folder. The font name will be combined with the path to compose a file
+name. A full path can also be used. If the font load fail, an internal
+MathGL font is used.
+
+=item L<FGCOLOR|IUP::Manual::03_Attributes/FGCOLOR>
+
+the default color used in all
+text elements of the plot: title, legend and labels. Default: "0 0 0".
+
+=item B<OPENGL>
+
+L<(non inheritable)> Enable or disable the rendering in OpenGL.
+Default: No. When NO the rendering is slower, but when Yes some
+features does not behave as expected. See L<Known Issues|/"Known Issues">.
+
+=item B<REDRAW>
+
+I<(write-only)(non inheritable)> redraw the plot and update the
+display. Value is ignored. All other attributes will B<NOT> update the
+display, so you can set many attributes without visual output. If the
+element is redraw by the system because of a redraw event or by a call
+to IUP::Update, it will have the same effect as if REDRAW was set.
+
+=item B<RESET>
+
+I<(write-only) (non inheritable)> restores all attributes to
+their default values. Value is ignored.
+
+=item B<TRANSPARENT>
+
+I<(non inheritable)> Enable or disable the transparency support. Default: No.
+
+=back
+
+=head3 Interaction (non inheritable)
+
+=over
+
+=item B<ROTATE>
+
+I<(non inheritable)> define the angles of the axis rotation in
+degrees for 3D plots. The format is "angleX:angleY:angleZ". As example,
+the "0.0:90:0.0" rotates the Y-axis plot in 90 degrees. Partial values
+are also accepted, like "60::E<minus>45" or "::30" or "120". Default:
+0:0:0.
+
+=item B<ZOOM>
+
+I<(non inheritable)> define the zoom to 2D and 3D plots. The
+format is "x1:y1:x2:y2" in normalized coordinates, limited to the
+interval [0-1]. As example, the "0:0:1:1" set a plot to default view
+(centered in the drawing area). Partial values are also accepted, like
+"0.2:0.2" or ":0.3::1.3" or "E<minus>0.4". If values are set only to x1
+and/or x2 coordinates, the zoom is restricted to the X axis. On the
+other hand, if values are set only to y1 and/or y2 coordinates, the
+zoom is restricted to the Y axis. Default: 0:0:1:1
+
+=back
+
+=head3 Title Configuration (non inheritable)
+
+=over
+
+=item B<TITLE>
+
+I<(non inheritable)> the title. Located always at the top center area.
+
+=item B<TITLECOLOR>
+
+title color. Default: FGCOLOR.
+
+=item B<TITLEFONTSIZE>
+
+title font size factor. It is a multiple of the FONT
+size. Default: 1.6
+
+=item B<TITLEFONTSTYLE>
+
+title font style. If not defined the FONT attribute
+will be used instead. Set to C<undef>, to use the FONT attribute values.
+Style can be "PLAIN", "BOLD", "ITALIC" or "BOLDITALIC".
+
+=back
+
+=head3 Legend Configuration (non inheritable)
+
+=over
+
+=item B<LEGEND>
+
+shows or hides the legend box. Can be YES or NO. Default: NO. LEGENDSHOW is also accepted.
+
+=item B<LEGENDBOX>
+
+draws a box around the legend area. Default: YES.
+
+=item B<LEGENDCOLOR>
+
+title color. Default: FGCOLOR.
+
+=item B<LEGENDFONTSIZE>
+
+legend font size factor. It is a multiple of the
+FONT size. Default: 0.8
+
+=item B<LEGENDFONTSTYLE>
+
+legend font style. If not defined the FONT
+attribute will be used instead. Set to C<undef>, to use the FONT attribute
+values. Style can be "PLAIN", "BOLD", "ITALIC" or "BOLDITALIC".
+
+=item B<LEGENDPOS>
+
+legend box position. Can be: "TOPLEFT", "TOPRIGHT",
+"BOTTOMLEFT", or "BOTTOMRIGHT. Default: "TOPRIGHT".
+
+=back
+
+=head3 Colorbar Configuration (non inheritable)
+
+=over
+
+=item B<COLORBAR>
+
+shows or hides the colorbar. Can be YES or NO. Default:
+NO.
+
+=item B<COLORBAR(pos)>
+
+colorbar position. Can be: "LEFT, "TOP", "RIGHT",
+"BOTTOM". Default: "RIGHT".
+
+=item B<COLORBARRANGE>
+
+interval of data values used for pseudo coloring in some plot modes. Must be "min:max" ("%g:%g in C). Default from AXS_?MIN to AXS_?MAX according to COLORBARAXISTICKS.
+
+=item B<COLORBARAXISTICKS>
+
+axis used as reference for colorbar ticks.
+Default: Z
+
+=back
+
+=head3 Grid Configuration (non inheritable)
+
+=over
+
+=item B<GRID>
+
+shows or hides the grid in both or a specific axis. Can be:
+XYZ (YES), X, Y, Z, XY, XZ, YZ or NO. Default: NO. The values
+HORIZONTAL (Y) and X (VERTICAL) are accepted for IUP::PPlot
+compatibility.
+
+=item B<GRIDCOLOR>
+
+grid color. Default: "200 200 200".
+
+=item B<GRIDLINESTYLE>
+
+line style of the grid. Can be: "CONTINUOUS",
+"DASHED", "DOTTED", "DASH_DOT", "DASH_DOT_DOT". Default is
+"CONTINUOUS".
+
+=back
+
+=head3 Box Configuration (non inheritable)
+
+=over
+
+=item B<BOX>
+
+draws a bounding box around the dataset area. Default: NO.
+
+=item B<BOXTICKS>
+
+if BOX=Yes then major ticks are also drawn along the box.
+Default: YES.
+
+=item B<BOXCOLOR>
+
+box color. Default: FGCOLOR.
+
+=back
+
+=head3 Dataset List Management (non inheritable)
+
+=over
+
+=item B<CLEAR>
+
+I<(write-only)> removes all datasets. Value is ignored.
+
+=item B<COUNT>
+
+I<(read-only)> total number of datasets.
+
+=item B<CURRENT>
+
+current dataset index. Default is -1. When a dataset is
+added it becomes the current dataset. The index starts at 0. All "DS_*"
+attributes are dependent on this value.
+
+=item B<REMOVE>
+
+I<(write-only)> removes a dataset given its index.
+
+=back
+
+=head3 Dataset Configuration (non inheritable)
+
+=over
+
+=item B<DS_COLOR>
+
+color of the current dataset and it legend text. Default
+is dynamically generated for the 6 first datasets, others are default
+to black "0 0 0". The first 6 are: 0="255 0 0", 1="0 0 255", 2="0 255
+0", 3="0 255 255", 4="255 0 255", 5="255 255 0".
+
+=item B<DS_COUNT>
+
+I<(read-only)> returns the number of samples of the current
+dataset. For planar or volumetric datasets returns count_x * count_y * count_z.
+
+=item B<DS_DIMENSION>
+
+I<(read-only)> returns the number of dimensions of the
+data: 1, 2 or 3. For planar and volumetric datasets returns the actual
+size of each dimension C<count_x x count_y x count_z>, for example
+"600x400x1" (planar) or "512x512x512" (volumetric).
+
+=item B<DS_LEGEND>
+
+legend text of the current dataset. Default is
+dynamically generated: "plot 0", "plot 1", "plot 2", ...
+
+=item B<DS_LINESTYLE>
+
+line style of the current dataset. Can be:
+"CONTINUOUS", "LONGDASHED", "DASHED", "SMALLDASHED", "DOTTED",
+"DASH_DOT", "SMALLDASH_DOT". Default is "CONTINUOUS".
+
+=item B<DS_LINEWIDTH>
+
+line width of the current dataset. Default: 1.0.
+
+=item B<DS_MARKSTYLE>
+
+mark style of the current dataset. Can be: "PLUS",
+"STAR", "CIRCLE", "X", "BOX", "DIAMOND", "HOLLOW_CIRCLE", "HOLLOW_BOX",
+"HOLLOW_DIAMOND". Default is "X".
+
+=item B<DS_MARKSIZE>
+
+mark size of the current dataset in normalized
+coordinates. Default: 0.02.
+
+=item B<DS_MODE>
+
+drawing mode of the current dataset. Default: "LINE".
+
+=over
+
+Can be: LINE, BAR, MARK, MARKLINE, RADAR, AREA, BARHORIZONTAL, CHART,
+STEP or STEM for linear datasets.
+
+Can be: PLANAR_MESH, PLANAR_FALL, PLANAR_BELT, PLANAR_SURFACE,
+PLANAR_BOXES, PLANAR_TILE, PLANAR_DENSITY, PLANAR_CONTOUR,
+PLANAR_AXIALCONTOUR or PLANAR_GRADIENTLINES for planar datasets.
+
+Can be: VOLUME_ISOSURFACE, VOLUME_DENSITY, VOLUME_CONTOUR or
+VOLUME_CLOUD for volumetric datasets.
+
+Each of these modes can have secondary attributes, that can be
+configured only for the plot, and not for a specific dataset. See more
+at L<DS_MODE Options|/"DS_MODE Options">.
+
+=back
+
+=item B<DS_REARRANGE>
+
+I<(write-only)> rearrange planar data into linear data.
+Value is ignored. It can rearrange planar data with count_y=2 or
+count_y=3, into 2D or 3D linear data accordingly. It can also rearrange
+planar data with count_y!=1 and count_x=2 or count_x=3 into 2D or 3D
+linear data accordingly.
+
+=item B<DS_SPLIT>
+
+I<(write-only)> rearrange planar data into linear data, but
+spliting into different datasets. It can rearrange planar data with
+count_y=2 or count_y=3, into 2 or 3 datasets of 1D linear data
+accordingly. The current dataset is modified and 1 or 2 new datasets
+are created accordingly.
+
+=item B<DS_SHOWVALUES>
+
+enable or disable the display of the values near each
+sample. Can be YES or NO. Default: NO. Values are drawn with
+LEGENDFONTSIZE and LEGENDFONTSTYLE.
+
+=item B<DS_REMOVE>
+
+I<(write-only)> removes a sample from the current dataset
+given its index. It can specify a range of samples using "index:count"
+(%d:%d). Ignored for planar and volumetric datasets.
+
+=back
+
+=head3 Axis Configuration (non inheritable) (for X, Y and Z)
+
+Note: attributes C<AXS_?SOMENAME> means 3 possible variants C<AXS_XSOMENAME>, C<AXS_YSOMENAME> and C<AXS_ZSOMENAME>
+
+=over
+
+=item B<AXS_?>
+
+enable or disable the axis display. Can be YES or NO.
+Default: YES.
+
+=item B<AXS_?AUTOMIN> B<AXS_?AUTOMAX>
+
+configures the automatic scaling of the
+minimum and maximum display values. Can be YES or NO. Default: YES.
+
+=item B<AXS_?ARROW>
+
+enable or disable the axis arrow display. Can be YES or
+NO. Default: YES.
+
+=item B<AXS_?COLOR>
+
+ticks values and label color. Default: "0 0 0".
+
+=item B<AXS_?CROSSORIGIN>
+
+same as setting AXS_?ORIGIN to 0 or C<undef>. Can be
+YES or NO. Default: NO. Returns YES if AXS_?ORIGIN is 0 and returns NO
+if AXS_?ORIGIN in C<undef>. Available for compatibility with IUP::PPlot, but
+the default is different.
+
+=item B<AXS_?FONTSIZE>
+
+axis label font size factor. It is a multiple of the
+FONT size. Default: 1.0
+
+=item B<AXS_?FONTSTYLE>
+
+axis label font style. If not defined the FONT
+attribute will be used instead. Set to C<undef>, to use the FONT attribute
+values. Can be "PLAIN", "BOLD", "ITALIC" or "BOLDITALIC".
+
+=item B<AXS_?LABEL>
+
+text label of the respective axis.
+
+=item B<AXS_?LABELCENTERED>
+
+text label position at center (YES) or at
+top/right (NO). Default: YES. Will set/get AXS_?LABELPOSITION to CENTER
+or MAX. Available for compatibility with IUP::PPlot.
+
+=item B<AXS_?LABELPOSITION>
+
+text label position. Can be CENTER, MAX or MIN.
+Default: CENTER.
+
+=item B<AXS_?LABELROTATION>
+
+enable or disable the text label rotation along
+the 3D axis. Can be YES or NO. Default: Yes. This means that text will
+be aligned with the axis even when rotating the graph. When NO text
+will be horizontal, always facing the camera, independently from graph
+rotation. For 2D graphs is useful to the Y axis only.
+
+=item B<AXS_?MAX>, B<AXS_?MIN>
+
+minimum and maximum displayed values of the
+respective axis in plot coordinates. Automatically calculated values
+when AUTOMIN or AUTOMAX are enabled. Default: 1.0 and 0.0.
+
+=item B<AXS_?ORIGIN>
+
+position the origin of the axis in plot coordinates
+(%g). But if set to C<undef> will automatically position the origin at the
+bottom left corner of the dataset area. Default: not defined.
+
+=item B<AXS_?REVERSE>
+
+reverse the axis direction. Can be YES or NO. Default:
+NO. Default is Y oriented bottom to top, and X oriented from left to
+right.
+
+=item B<AXS_?SCALE>
+
+configures the scale of the respective axis. Can be: LIN
+(linear) or LOG10 (decimal logarithm base 10). Default: LIN.
+
+=back
+
+=head3 Axis Ticks Configuration (non inheritable) (for X, Y and Z)
+
+=over
+
+=item B<AXS_?TICK>
+
+enable or disable the axis tick display. Can be YES or
+NO. Default: YES.
+
+=item B<AXS_?TICKAUTO>
+
+configures the automatic tick spacing. Can be YES or NO. Default
+
+YES. AXS_?AUTOTICK is also accepted.
+
+=item B<AXS_?TICKAUTOSIZE>
+
+configures the automatic tick size. Can be YES or
+NO. Default: YES. AXS_?AUTOTICKSIZE is also accepted.
+
+=item B<AXS_?TICKFONTSIZE>
+
+axis tick number font size factor. It is a
+multiple of the FONT size. Default: 0.8
+
+=item B<AXS_?TICKFONTSTYLE>
+
+axis tick number font style. If not defined the
+FONT attribute will be used instead. Set to C<undef>, to use the FONT
+attribute values. Can be "PLAIN", "BOLD", "ITALIC" or "BOLDITALIC".
+
+=item B<AXS_?TICKFORMAT>
+
+axis tick number C format string. Default: is
+internally computed according to the Min-Max range.
+
+=item B<AXS_?TICKMAJORSIZE>
+
+axis major ticks size in normalized coordinates.
+Default is 0.1. Used only when TICKAUTOSIZE is disabled.
+
+=item B<AXS_?TICKMAJORSPAN>
+
+spacing between major ticks in plot coordinates
+if positive, or number of major ticks along the axis range if negative.
+Default is -5 when TICKAUTO is disabled.
+
+=item B<AXS_?TICKMINORDIVISION>
+
+number of minor ticks intervals between each
+major tick. Default is 5 when TICKAUTO is disabled. AXS_?TICKDIVISION
+is also accepted.
+
+=item B<AXS_?TICKMINORSIZE>
+
+axis minor ticks size factor. It is a multiple
+of the AXS_?TICKMAJORSIZE. Default is 0.6. Used only when AUTOTICKSIZE
+is disabled. AXS_?TICKSIZE is also accepted.
+
+=item B<AXS_?TICKVALUES>
+
+enable or disable the axis tick values display. Can
+be YES or NO. Default: YES.
+
+=item B<AXS_?TICKVALUESROTATION>
+
+enable or disable the axis tick values
+rotation along the 3D axis. Can be YES or NO. Default: YES. This means
+that text will be aligned with the axis even when rotating the graph.
+When NO text will be horizontal, always facing the camera,
+independently from graph rotation. For 2D graphs is useful to the Y
+axis only.
+
+=back
+
+The following L<common attributes|IUP::Manual::03_Attributes/Common Attributes> are also accepted:
+
+=over
+
+=item * L<ACTIVE|IUP::Manual::03_Attributes/ACTIVE>,
+L<SCREENPOSITION|IUP::Manual::03_Attributes/SCREENPOSITION>,
+L<POSITION|IUP::Manual::03_Attributes/POSITION>,
+L<MINSIZE|IUP::Manual::03_Attributes/MINSIZE>,
+L<MAXSIZE|IUP::Manual::03_Attributes/MAXSIZE>,
+L<WID|IUP::Manual::03_Attributes/WID>,
+L<TIP|IUP::Manual::03_Attributes/TIP>,
+L<SIZE|IUP::Manual::03_Attributes/SIZE>,
+L<RASTERSIZE|IUP::Manual::03_Attributes/RASTERSIZE>,
+L<ZORDER|IUP::Manual::03_Attributes/ZORDER>,
+L<VISIBLE|IUP::Manual::03_Attributes/VISIBLE>
+
+=back
+
+=head2 CALLBACKS
+
+For more info about concept of callbacks (setting callback handlers etc.)
+see L<IUP::Manual::04_Callbacks|IUP::Manual::04_Callbacks>. Callbacks specific to this element:
+
+=over
+
+=item B<PREDRAW_CB>, B<POSTDRAW_CB>
+
+Actions generated before and after the
+redraw operation. They can be used to draw additional information in
+the plot. Use only the C<PlotDraw*> functions. For display output
+OpenGL primitives can also be used.
+
+B<Callback handler prototype:>
+
+ sub PREDRAW_CB_handler {
+   my ($self) = @_;
+   #...
+ }
+ 
+ sub POSTDRAW_CB_handler {
+   my ($self) = @_;
+   #...
+ }
+
+B<$self:> reference to the element (IUP::MglPlot) that activated the event
+
+=item B<DELETE_CB>
+
+Action generated when the Del key is pressed to removed a
+sample from a dataset. If multiple points are selected it is called
+once for each selected point. Called only when DS_EDIT=Yes.
+
+B<Callback handler prototype:>
+
+ sub DELETE_CB_handler {
+   my ($self, $index, $sample_index, $x, $y) = @_;
+   #...
+ }
+
+B<$self:> reference to the element (IUP::MglPlot) that activated the event
+
+B<$index:> index of the dataset
+
+B<$sample_index:> index of the sample in the dataset
+
+B<$x:> X coordinate value of the sample
+
+B<$y:> Y coordinate value of the sample
+
+B<Returns:> If IUP_IGNORE then the sample is not deleted.
+
+=item B<DELETEBEGIN_CB>, B<DELETEEND_CB>
+
+Actions generated when a delete
+operation will begin or end. But they are called only if DELETE_CB is
+also defined. Called only when DS_EDIT=Yes.
+
+B<Callback handler prototype:>
+
+ sub DELETEBEGIN_CB_handler {
+   my ($self) = @_;
+   #...
+ }
+
+ sub DELETEEND_CB_handler {
+   my ($self) = @_;
+   #...
+ }
+
+B<$self:> reference to the element (IUP::MglPlot) that activated the event
+
+B<Returns:> If DELETEBEGIN_CB returns IUP_IGNORE the delete operation for all the selected samples are aborted.
+
+=item B<SELECT_CB>
+
+Action generated when a sample is selected. If multiple
+points are selected it is called once for each new selected point. It
+is called only if the selection state of the sample is about to be
+changed. Called only when DS_EDIT=Yes.
+
+B<Callback handler prototype:>
+
+ sub SELECT_CB_handler {
+   my ($self, $index, $sample_index, $x, $y, $select) = @_;
+   #...
+ }
+
+B<$self:> reference to the element (IUP::MglPlot) that activated the event
+
+B<$index:> index of the dataset
+
+B<$sample_index:> index of the sample in the dataset
+
+B<$x:> X coordinate value of the sample
+
+B<$y:> Y coordinate value of the sample
+
+B<$select:> boolean value that a non zero value indicates if the point is to be selected.
+
+B<Returns:> If IUP_IGNORE then the sample is not selected.
+
+=item B<SELECTBEGIN_CB> B<SELECTEND_CB>
+
+Actions generated when a selection
+operation will begin or end. But they are called only if SELECT_CB is
+also defined. Called only when DS_EDIT=Yes.
+
+B<Callback handler prototype:>
+
+ sub SELECTBEGIN_CB_handler {
+   my ($self) = @_;
+   #...
+ }
+
+ sub SELECTEND_CB_handler {
+   my ($self) = @_;
+   #...
+ }
+
+B<$self:> reference to the element (IUP::MglPlot) that activated the event
+
+B<Returns:> If SELECTBEGIN_CB returns IUP_IGNORE the selection operation is aborted.
+
+=item B<EDIT_CB>
+
+Action generated when a sample is selected. If multiple
+points are selected it is called once for each new selected point. It
+is called only if the selection state of the sample is about to be
+changed. Called only when DS_EDIT=Yes.
+
+B<Callback handler prototype:>
+
+ sub EDIT_CB_handler {
+   my ($self, $index, $sample_index, $x, $y, $new_x, $new_y) = @_;
+   #...
+ }
+
+B<$self:> reference to the element (IUP::MglPlot) that activated the event
+
+B<$index:> index of the dataset
+
+B<$sample_index:> index of the sample in the dataset
+
+B<$x:> X coordinate value of the sample
+
+B<$y:> Y coordinate value of the sample
+
+B<$new_x:> the new X coordinate value of the sample
+
+B<$new_y:> the new Y coordinate value of the sample
+
+B<Returns:> If IUP_IGNORE then the sample is not edited. The application can changed the new value before it is edited.
+
+=item B<EDITBEGIN_CB>, B<EDITEND_CB>
+
+Actions generated when an editing
+operation will begin or end. But they are called only if EDIT_CB is
+also defined. Called only when DS_EDIT=Yes.
+
+B<Callback handler prototype:>
+
+ sub EDITBEGIN_CB_handler {
+   my ($self) = @_;
+   #...
+ }
+
+ sub EDITEND_CB_handler {
+   my ($self) = @_;
+   #...
+ }
+
+B<$self:> reference to the element (IUP::MglPlot) that activated the event
+
+B<Returns:> If EDITBEGIN_CB returns IUP_IGNORE the editing operation is aborted.
+
+=back
+
+The following L<common callbacks|IUP::Manual::04_Callbacks/Common Callbacks> are also accepted:
+
+=over
+
+=item * L<MAP_CB|IUP::Manual::04_Callbacks/MAP_CB>,
+L<UNMAP_CB|IUP::Manual::04_Callbacks/UNMAP_CB>,
+L<GETFOCUS_CB|IUP::Manual::04_Callbacks/GETFOCUS_CB>,
+L<KILLFOCUS_CB|IUP::Manual::04_Callbacks/KILLFOCUS_CB>,
+L<ENTERWINDOW_CB|IUP::Manual::04_Callbacks/ENTERWINDOW_CB>,
+L<LEAVEWINDOW_CB|IUP::Manual::04_Callbacks/LEAVEWINDOW_CB>,
+L<K_ANY|IUP::Manual::04_Callbacks/K_ANY>,
+L<HELP_CB|IUP::Manual::04_Callbacks/HELP_CB>
+
+=back
+
+=head2 DS_MODE Options
+
+See original documentatiom L<iup_mglplot_modes.htm|http://www.tecgraf.puc-rio.br/iup/en/ctrl/iup_mglplot_modes.html>
+
+=head3 For Linear Datasets
+
+=head4 LINE
+
+Draws lines between points. DS_COLOR, DS_LINESTYLE and DS_LINEWIDTH are
+used to configure the lines.
+
+=begin HTML
+
+<table style="border-collapse: collapse" border="0" bordercolor="#111111" cellpadding="0" cellspacing="0">
+    <tbody><tr>
+        <td><img src="http://kmx.github.io/perl-iup/img-3.9/ctrl/iupmglplot_line.png" height="248" width="348"></td>
+        <td valign="top">(3 plots)<br>BOX=Yes</td>
+        <td><img src="http://kmx.github.io/perl-iup/img-3.9/ctrl/iupmglplot_line3d.png" height="248" width="348"></td>
+        <td valign="top">ROTATE=40:0:60<br>BOX=Yes<br>
+        </td>
+    </tr>
+</tbody></table>
+
+=end HTML
+
+=head4 MARK
+
+Draws a mark in each point. DS_COLOR, DS_MARKSTYLE and DS_MARKSIZE are
+used to configure the marks.
+
+=head4 MARKLINE
+
+Draws lines between points and draws a mark in each point. Same as if
+LINE and MARK where set together.
+
+=head4 RADAR
+
+Draws a radar chart. Like a LINE plot in polar coordinates. RADARSHIFT
+configures an additional radial shift of the data [If rsE<lt>0 then
+rs=max(0, -min(a))], default=-1. If DATAGRID=Yes then a grid of radial
+lines and a circle for rs are drawn. DS_COLOR, DS_LINESTYLE and
+DS_LINEWIDTH are used to configure the lines. DS_COLOR, DS_MARKSTYLE
+and DS_MARKSIZE are used to configure the marks.
+
+=begin HTML
+
+<table style="border-collapse: collapse" border="0" bordercolor="#111111" cellpadding="0" cellspacing="0">
+    <tbody><tr>
+        <td><img src="http://kmx.github.io/perl-iup/img-3.9/ctrl/iupmglplot_radar.png" height="248" width="348"></td>
+        <td valign="top">(3 plots)<br>RADARSHIFT=0.4<br>DATAGRID=Yes<br>BOX=Yes</td>
+    </tr>
+</tbody></table>
+
+=end HTML
+
+=head4 AREA
+
+Draws lines between points and fills it to axis plane. DS_COLOR is used
+to configure fill color. The order of the datasets will define which
+one will be drawn first.
+
+=begin HTML
+
+<table style="border-collapse: collapse" border="0" bordercolor="#111111" cellpadding="0" cellspacing="0">
+    <tbody><tr>
+        <td><img src="http://kmx.github.io/perl-iup/img-3.9/ctrl/iupmglplot_area.png" height="248" width="348"></td>
+        <td valign="top">(3 plots)<br>AXS_XORIGIN=0<br>AXS_YORIGIN=0<br>BOX=Yes</td>
+    </tr>
+</tbody></table>
+
+=end HTML
+
+=head4 BAR
+
+Draws vertical bars from points to axis plane. If DATAGRID=Yes then
+grid lines are drawn, default=No. BARWIDTH sets relative width of
+rectangles, default=0.7.
+
+=begin HTML
+
+<table style="border-collapse: collapse" border="0" bordercolor="#111111" cellpadding="0" cellspacing="0">
+    <tbody><tr>
+        <td><img src="http://kmx.github.io/perl-iup/img-3.9/ctrl/iupmglplot_bar.png" height="248" width="348"></td>
+        <td valign="top">AXS_XORIGIN=0<br>AXS_YORIGIN=0<br>BOX=Yes</td>
+        <td><img src="http://kmx.github.io/perl-iup/img-3.9/ctrl/iupmglplot_bar3d.png" height="248" width="348"></td>
+        <td valign="top">ROTATE=40:0:60<br>BOX=Yes<br>
+        </td>
+    </tr>
+</tbody></table>
+
+=end HTML
+
+=head4 BARHORIZONTAL
+
+Draws horizontal bars from points to axis plane. If DATAGRID=Yes then
+grid lines are drawn, default=No. BARWIDTH sets relative width of
+rectangles, default=0.7.
+
+=begin HTML
+
+<table style="border-collapse: collapse" border="0" bordercolor="#111111" cellpadding="0" cellspacing="0">
+    <tbody><tr>
+        <td><img src="http://kmx.github.io/perl-iup/img-3.9/ctrl/iupmglplot_barhorizontal.png" height="248" width="348"></td>
+        <td valign="top">AXS_XORIGIN=0<br>AXS_YORIGIN=0<br>BOX=Yes</td>
+    </tr>
+</tbody></table>
+
+=end HTML
+
+=head4 CHART
+
+Draws colored stripes (boxes). If DATAGRID=Yes then black border lines
+are drawn, default=No. If PIECHART=Yes cylindrical coordinates are
+used, default=No.
+
+=begin HTML
+
+<table style="border-collapse: collapse" border="0" bordercolor="#111111" cellpadding="0" cellspacing="0">
+    <tbody><tr>
+        <td><img src="http://kmx.github.io/perl-iup/img-3.9/ctrl/iupmglplot_chart.png" height="248" width="348"></td>
+        <td valign="top">DATAGRID=Yes<br>BOX=Yes</td>
+        <td><img src="http://kmx.github.io/perl-iup/img-3.9/ctrl/iupmglplot_chartpie.png" height="248" width="348"></td>
+        <td valign="top">DATAGRID=Yes<br>BOX=Yes<br>PIECHART=Yes<br>COLORSCHEME=bgr cmy</td>
+    </tr>
+</tbody></table>
+
+=end HTML
+
+=head4 STEP
+
+Draws continuous stairs for points to axis plane. DS_COLOR,
+DS_LINESTYLE and DS_LINEWIDTH are used to configure the lines.
+DS_COLOR, DS_MARKSTYLE and DS_MARKSIZE are used to configure the marks.
+
+=begin HTML
+
+<table style="border-collapse: collapse" border="0" bordercolor="#111111" cellpadding="0" cellspacing="0">
+    <tbody><tr>
+        <td><img src="http://kmx.github.io/perl-iup/img-3.9/ctrl/iupmglplot_step.png" height="248" width="348"></td>
+        <td valign="top">(3 plots)<br>BOX=Yes</td>
+    </tr>
+</tbody></table>
+
+=end HTML
+
+=head4 STEM
+
+Draws vertical lines from points to axis plane. DS_COLOR, DS_LINESTYLE
+and DS_LINEWIDTH are used to configure the lines. DS_COLOR,
+DS_MARKSTYLE and DS_MARKSIZE are used to configure the marks.
+
+=begin HTML
+
+<table style="border-collapse: collapse" border="0" bordercolor="#111111" cellpadding="0" cellspacing="0">
+    <tbody><tr>
+        <td><img src="http://kmx.github.io/perl-iup/img-3.9/ctrl/iupmglplot_stem.png" height="248" width="348"></td>
+        <td valign="top">(3 plots)<br>DS_MARKSTYLE=HOLLOW_CIRCLE<br>DS_SHOWMARKS=Yes<br>AXS_XORIGIN=0<br>AXS_YORIGIN=0<br>BOX=Yes</td>
+    </tr>
+</tbody></table>
+
+=end HTML
+
+=head4 DOTS
+
+Draws arbitrary placed points. Colors will be used from the previous
+color scheme or from COLORSCHEME if defined.
+
+=begin HTML
+
+<table style="border-collapse: collapse" border="0" bordercolor="#111111" cellpadding="0" cellspacing="0">
+    <tbody><tr>
+        <td><img src="http://kmx.github.io/perl-iup/img-3.9/ctrl/iupmglplot_dots.png" height="248" width="348"></td>
+        <td valign="top">ROTATE=40:0:60<br>BOX=Yes<br>TRANSPARENT=No<br>LIGHT=Yes</td>
+    </tr>
+</tbody></table>
+
+=end HTML
+
+=head4 CRUST
+
+This will reconstruct and draw the surface for arbitrary placed points.
+Parameter CRUSTRADIUS set relative radius (increase it for removing
+holes), default=0. If DATAGRID=Yes then wire plot is produced,
+default=No. Colors will be used from the previous color scheme or from
+COLORSCHEME if defined.
+
+=begin HTML
+
+<table style="border-collapse: collapse" border="0" bordercolor="#111111" cellpadding="0" cellspacing="0">
+    <tbody><tr>
+        <td><img src="http://kmx.github.io/perl-iup/img-3.9/ctrl/iupmglplot_crust.png" height="248" width="348"></td>
+        <td valign="top">ROTATE=40:0:60<br>BOX=Yes<br>TRANSPARENT=No<br>LIGHT=Yes</td>
+    </tr>
+</tbody></table>
+
+=end HTML
+
+=head3 For Planar Datasets
+
+For all planar modes colors will be used from the previous color scheme
+or from COLORSCHEME if defined. COLORSCHEME is a string that can
+specify a group of colors to be used by the plot.
+
+Colors in a color scheme are specified by the codes
+"wkrgbcymhRGBCYMHWlenupqLENUPQ" only. A brightness weight from 1 to 9
+can also be used to change the default value from 5 normal, to 1 very
+dark, and to 9 very bright.
+
+Also the symbol d denotes the interpolation by 3D position instead of
+the coloring by amplitude. Symbol | disables color interpolation in
+color scheme, which can be useful, for example, for sharp colors during
+matrix plotting.
+
+For coloring by amplitude (most common) the final color is a linear
+interpolation of color array. The color array is constructed from the
+string ids. The argument is the amplitude normalized based on
+COLORBARRANGE. When coloring by coordinate, the final color is
+determined by the position of the point in 3D space and is calculated
+from combining the first three elements of color array with the x, y
+and z normalizes values. This type of coloring is useful for isosurface
+plot where color may show the exact position of a piece of surface.
+
+Here are some examples or color codes and color schemes:
+
+=begin HTML
+
+<p>
+<img src="http://kmx.github.io/perl-iup/img-3.9/ctrl/iupmglplot_colorschemes.png">
+<img src="http://kmx.github.io/perl-iup/img-3.9/ctrl/iupmglplot_colorcodes.png">
+</p>
+
+=end HTML
+
+=head4 PLANAR_MESH
+
+Draws mesh lines for the surface. Mesh lines are plotted for each z
+slice of the data. DS_LINESTYLE and DS_LINEWIDTH are used to configure
+the lines.
+
+=begin HTML
+
+<table style="border-collapse: collapse" border="0" bordercolor="#111111" cellpadding="0" cellspacing="0">
+    <tbody><tr>
+        <td><img src="http://kmx.github.io/perl-iup/img-3.9/ctrl/iupmglplot_planar_mesh.png" height="248" width="348"></td>
+        <td valign="top">ROTATE=40:0:60<br>BOX=Yes<br>TRANSPARENT=No<br>LIGHT=Yes</td>
+    </tr>
+</tbody></table>
+
+=end HTML
+
+=head4 PLANAR_FALL
+
+Draws fall lines for the surface. DS_LINESTYLE and DS_LINEWIDTH are
+used to configure the lines. If DIR=X, then lines are drawn along
+x-direction else lines are drawn along y-direction, default=Y.
+
+=begin HTML
+
+<table style="border-collapse: collapse" border="0" bordercolor="#111111" cellpadding="0" cellspacing="0">
+    <tbody><tr>
+        <td><img src="http://kmx.github.io/perl-iup/img-3.9/ctrl/iupmglplot_planar_fall.png" height="248" width="348"></td>
+        <td valign="top">ROTATE=40:0:60<br>BOX=Yes<br>TRANSPARENT=No<br>LIGHT=Yes</td>
+    </tr>
+</tbody></table>
+
+=end HTML
+
+=head4 PLANAR_BELT
+
+Draws belts for the surface. If DIR=X, then lines are drawn along
+x-direction else lines are drawn along y-direction, default=Y.
+
+=begin HTML
+
+<table style="border-collapse: collapse" border="0" bordercolor="#111111" cellpadding="0" cellspacing="0">
+    <tbody><tr>
+        <td><img src="http://kmx.github.io/perl-iup/img-3.9/ctrl/iupmglplot_planar_belt.png" height="248" width="348"></td>
+        <td valign="top">ROTATE=40:0:60<br>BOX=Yes<br>TRANSPARENT=No<br>LIGHT=Yes</td>
+    </tr>
+</tbody></table>
+
+=end HTML
+
+=head4 PLANAR_SURFACE
+
+Draws the surface. If DATAGRID=Yes then grid lines are drawn,
+default=No.
+
+=begin HTML
+
+<table style="border-collapse: collapse" border="0" bordercolor="#111111" cellpadding="0" cellspacing="0">
+    <tbody><tr>
+        <td><img src="http://kmx.github.io/perl-iup/img-3.9/ctrl/iupmglplot_planar_surface.png" height="248" width="348"></td>
+        <td valign="top">ROTATE=40:0:60<br>BOX=Yes<br>TRANSPARENT=No<br>LIGHT=Yes</td>
+        <td><img src="http://kmx.github.io/perl-iup/img-3.9/ctrl/iupmglplot_planar_surface_colors.png" height="248" width="348"></td>
+        <td valign="top">ROTATE=40:0:60<br>BOX=Yes<br>TRANSPARENT=No<br>LIGHT=Yes<br>COLORSCHEME=BbcyrR|</td>
+    </tr>
+</tbody></table>
+
+=end HTML
+
+=head4 PLANAR_BOXES
+
+Draws vertical boxes for the surface. If DATAGRID=Yes then box lines
+are drawn, default=No.
+
+=begin HTML
+
+<table style="border-collapse: collapse" border="0" bordercolor="#111111" cellpadding="0" cellspacing="0">
+    <tbody><tr>
+        <td><img src="http://kmx.github.io/perl-iup/img-3.9/ctrl/iupmglplot_planar_boxes.png" height="248" width="348"></td>
+        <td valign="top">ROTATE=40:0:60<br>BOX=Yes<br>TRANSPARENT=No<br>LIGHT=Yes<br>AXS_XORIGIN=0<br>AXS_YORIGIN=0<br>AXS_ZORIGIN=0</td>
+    </tr>
+</tbody></table>
+
+=end HTML
+
+=head4 PLANAR_TILE
+
+Draws horizontal tiles for the surface, it can be seen as 3D
+generalization of STEP.
+
+=begin HTML
+
+<table style="border-collapse: collapse" border="0" bordercolor="#111111" cellpadding="0" cellspacing="0">
+    <tbody><tr>
+        <td><img src="http://kmx.github.io/perl-iup/img-3.9/ctrl/iupmglplot_planar_tile.png" height="248" width="348"></td>
+        <td valign="top">ROTATE=40:0:60<br>BOX=Yes<br>TRANSPARENT=No<br>LIGHT=Yes</td>
+    </tr>
+</tbody></table>
+
+=end HTML
+
+=head4 PLANAR_DENSITY
+
+Draws density plot for the surface at a specified z coordinate.
+PLANARVALUE specifies the z coordinate, if not defined AXS_ZMIN is
+used.
+
+=begin HTML
+
+<table style="border-collapse: collapse" border="0" bordercolor="#111111" cellpadding="0" cellspacing="0">
+    <tbody><tr>
+        <td><img src="http://kmx.github.io/perl-iup/img-3.9/ctrl/iupmglplot_planar_density.png" height="248" width="348"></td>
+        <td valign="top">BOX=Yes<br>TRANSPARENT=No<br>COLORBAR=Yes</td>
+    </tr>
+</tbody></table>
+
+=end HTML
+
+=head4 PLANAR_CONTOUR
+
+Draws contour lines for the surface at a z coordinate. CONTOURCOUNT
+defines the number of contour lines, default=7. PLANARVALUE specifies a
+z coordinate, if not defined contours are distributed in the
+COLORBARRANGE interval. If CONTOURFILLED=Yes draws solid (or filled)
+contour lines for the surface, default=No. If CONTOURLABELS is defined
+then contour labels will be drawn BELLOW or ABOVE the contours.
+
+=begin HTML
+
+<table style="border-collapse: collapse" border="0" bordercolor="#111111" cellpadding="0" cellspacing="0">
+    <tbody><tr>
+        <td><img src="http://kmx.github.io/perl-iup/img-3.9/ctrl/iupmglplot_planar_contour.png" height="248" width="348"></td>
+        <td valign="top">ROTATE=40:0:60<br>BOX=Yes<br>TRANSPARENT=No<br>LIGHT=Yes<br>CONTOURLABELS=BELLOW</td>
+        <td><img src="http://kmx.github.io/perl-iup/img-3.9/ctrl/iupmglplot_planar_contour_filled.png" height="248" width="348"></td>
+        <td valign="top">ROTATE=40:0:60<br>BOX=Yes<br>TRANSPARENT=No<br>LIGHT=Yes<br>CONTOURFILLED=Yes</td>
+    </tr>
+    <tr>
+        <td><img src="http://kmx.github.io/perl-iup/img-3.9/ctrl/iupmglplot_planar_surface_contour.png" height="248" width="348"></td>
+        <td valign="top">ROTATE=40:0:60<br>BOX=Yes<br>TRANSPARENT=No<br>LIGHT=Yes<br><br>(dual plot)<br>DS_MODE=PLANAR_SURFACE<br>DS_MODE=PLANAR_CONTOUR</td>
+        <td>&nbsp;</td>
+        <td valign="top">&nbsp;</td>
+    </tr>
+</tbody></table>
+
+=end HTML
+
+=head4 PLANAR_AXIALCONTOUR
+
+Draws a surface which is result of the contour plot rotation for the
+surface. AXIALCOUNT defines the number of elements distributed in the
+COLORBARRANGE interval, default=3.
+
+=begin HTML
+
+<table style="border-collapse: collapse" border="0" bordercolor="#111111" cellpadding="0" cellspacing="0">
+    <tbody><tr>
+        <td><img src="http://kmx.github.io/perl-iup/img-3.9/ctrl/iupmglplot_planar_axialcontour.png" height="248" width="348"></td>
+        <td valign="top">ROTATE=40:0:60<br>BOX=Yes<br>TRANSPARENT=Yes<br>LIGHT=Yes</td>
+    </tr>
+</tbody></table>
+
+=end HTML
+
+=head4 PLANAR_GRADIENTLINES
+
+Draws gradient lines for scalar field defined by the surface at a
+specified z coordinate. PLANARVALUE specifies the z coordinate, if not
+defined AXS_ZMIN is used. Number of lines is proportional to
+GRADLINESCOUNT, default=5 . If GRADLINESCOUNTE<lt>0 then lines start
+from borders only. Lines are plotted for each z slice of the data.
+
+=begin HTML
+
+<table style="border-collapse: collapse" border="0" bordercolor="#111111" cellpadding="0" cellspacing="0">
+    <tbody><tr>
+        <td><img src="http://kmx.github.io/perl-iup/img-3.9/ctrl/iupmglplot_planar_gradientlines.png" height="248" width="348"></td>
+        <td valign="top">BOX=Yes<br>TRANSPARENT=Yes<br>LIGHT=Yes</td>
+        <td><img src="http://kmx.github.io/perl-iup/img-3.9/ctrl/iupmglplot_planar_density_gradientlines.png" height="248" width="348"></td>
+        <td valign="top">BOX=Yes<br>TRANSPARENT=Yes<br>LIGHT=Yes<br><br>(dual plot)<br>DS_MODE=PLANAR_GRADIENTLINES <br>DS_MODE=PLANAR_DENSITY </td>
+    </tr>
+</tbody></table>
+
+=end HTML
+
+=head3 For Volumetric Datasets
+
+For all volumetric modes colors will be used from the previous color
+scheme or from COLORSCHEME if defined.
+
+=head4 VOLUME_ISOSURFACE
+
+Draws isosurface plot for the volume. If DATAGRID=Yes then wire plot is
+produced, default=No. if ISOVALUE is defined only 1 isosurface is plot,
+else ISOCOUNT (default=3) surfaces are plot distributed in the
+COLORBARRANGE interval.
+
+Note, that there is possibility of incorrect plotting due to
+uncertainty of cross-section defining if there are two or more
+isosurface intersections inside one cell.
+
+=begin HTML
+
+<table style="border-collapse: collapse" border="0" bordercolor="#111111" cellpadding="0" cellspacing="0">
+    <tbody><tr>
+        <td><img src="http://kmx.github.io/perl-iup/img-3.9/ctrl/iupmglplot_volume_isosurface.png" height="248" width="348"></td>
+        <td valign="top">ROTATE=40:0:60<br>BOX=Yes<br>TRANSPARENT=Yes<br>LIGHT=Yes</td>
+    </tr>
+</tbody></table>
+
+=end HTML
+
+=head4 VOLUME_DENSITY
+
+Draws density plot for the volume. If DATAGRID=Yes then grid lines are
+drawn, default=No. If PROJECT=Yes draws density plot in x, y, or z
+plain, default=No. When PROJECT=Yes, PROJECTVALUEX, PROJECTVALUEY and
+PROJECTVALUEZ, are used to select data at the given coordinate, if they
+are not defined AXS_?ORIGIN is used accordingly. When PROJECT=No,
+SLICEX, SLICEY and SLICEZ, are used to define the slice where the plot
+is done, default is -1 (central). SLICEDIR defines which directions are
+used, default "XYZ".
+
+=begin HTML
+
+<table style="border-collapse: collapse" border="0" bordercolor="#111111" cellpadding="0" cellspacing="0">
+    <tbody><tr>
+        <td><img src="http://kmx.github.io/perl-iup/img-3.9/ctrl/iupmglplot_volume_density.png" height="248" width="348"></td>
+        <td valign="top">ROTATE=40:0:60<br>BOX=Yes<br>TRANSPARENT=Yes<br>LIGHT=No<br>AXS_XORIGIN=0<br>AXS_YORIGIN=0<br>AXS_ZORIGIN=0<br>AXS_X=Yes<br>AXS_Y=Yes<br>AXS_Z=Yes</td>
+        <td><img src="http://kmx.github.io/perl-iup/img-3.9/ctrl/iupmglplot_volume_densityproject.png" height="248" width="348"></td>
+        <td valign="top">ROTATE=40:0:60<br>BOX=Yes<br>TRANSPARENT=No<br>LIGHT=No<br>PROJECT=Yes<br>PROJECTVALUEX=-1<br>PROJECTVALUEY=1<br>PROJECTVALUEZ=-1</td>
+    </tr>
+</tbody></table>
+
+=end HTML
+
+=head4 VOLUME_CONTOUR
+
+Draws contour plot for the volume. If DATAGRID=Yes then grid lines are
+drawn, default=No. If PROJECT=Yes draws contour plot in x, y, or z
+plain, default=No. When PROJECT=Yes, PROJECTVALUEX, PROJECTVALUEY and
+PROJECTVALUEZ, are used to select data at the given coordinate, if they
+are not defined AXS_?ORIGIN is used accordingly. When PROJECT=No,
+SLICEX, SLICEY and SLICEZ, are used to define the slice where the plot
+is done, default is -1 (central). SLICEDIR defines which directions are
+used, default "XYZ". If CONTOURFILLED=Yes draws solid (or filled)
+contour lines for the surface, default=No. CONTOURCOUNT defines the
+number of contour lines, default=7. Where lines are used, DS_LINESTYLE
+and DS_LINEWIDTH are used to configure the lines.
+
+=begin HTML
+
+<table style="border-collapse: collapse" border="0" bordercolor="#111111" cellpadding="0" cellspacing="0">
+    <tbody><tr>
+        <td><img src="http://kmx.github.io/perl-iup/img-3.9/ctrl/iupmglplot_volume_contour.png" height="248" width="348"></td>
+        <td valign="top">ROTATE=40:0:60<br>BOX=Yes<br>TRANSPARENT=No<br>LIGHT=Yes</td>
+        <td><img src="http://kmx.github.io/perl-iup/img-3.9/ctrl/iupmglplot_volume_contourproject.png" height="248" width="348"></td>
+        <td valign="top">ROTATE=40:0:60<br>BOX=Yes<br>TRANSPARENT=No<br>LIGHT=Yes<br>PROJECT=Yes<br>PROJECTVALUEX=-1<br>PROJECTVALUEY=1<br>PROJECTVALUEZ=-1</td>
+    </tr>
+    <tr>
+        <td><img src="http://kmx.github.io/perl-iup/img-3.9/ctrl/iupmglplot_volume_contourfilled.png" height="248" width="348"></td>
+        <td valign="top">ROTATE=40:0:60<br>BOX=Yes<br>TRANSPARENT=No<br>LIGHT=Yes</td>
+        <td><img src="http://kmx.github.io/perl-iup/img-3.9/ctrl/iupmglplot_volume_contourfilledproject.png" height="268" width="348"></td>
+        <td valign="top">ROTATE=40:0:60<br>BOX=Yes<br>TRANSPARENT=No<br>LIGHT=Yes<br>PROJECT=Yes<br>PROJECTVALUEX=-1<br>PROJECTVALUEY=1<br>PROJECTVALUEZ=-1<br>CONTOURFILLED=Yes</td>
+    </tr>
+</tbody></table>
+
+=end HTML
+
+=head4 VOLUME_CLOUD
+
+Draws cloud plot for the volume. This plot is a set of cubes with color
+and transparency proportional to value of ALPHA. The resulting plot is
+like cloud low value is transparent but higher ones are not. If
+CLOUDCUBES=No the semi-transparent points are used instead of cubes,
+default=Yes.
+
+=begin HTML
+
+<table style="border-collapse: collapse" border="0" bordercolor="#111111" cellpadding="0" cellspacing="0">
+    <tbody><tr>
+        <td><img src="http://kmx.github.io/perl-iup/img-3.9/ctrl/iupmglplot_volume_cloud.png" height="248" width="348"></td>
+        <td valign="top">ROTATE=40:0:60<br>BOX=Yes<br>TRANSPARENT=Yes<br>LIGHT=No<br>COLORSCHEME=wyrRk<br>CLOUDCUBES=No</td>
+        <td><img src="http://kmx.github.io/perl-iup/img-3.9/ctrl/iupmglplot_volume_cloudcubes.png" height="248" width="348"></td>
+        <td valign="top">ROTATE=40:0:60<br>BOX=Yes<br>TRANSPARENT=Yes<br>LIGHT=No<br>COLORSCHEME=wyrRk</td>
+    </tr>
+</tbody></table>
+
+=end HTML
+
+=head2 Known Issues
+
+=over
+
+=item * Selection and editing of a dataset using the DS_EDIT attribute are not implemented.
+
+=item * Automatic ticks computation needs to be improved.
+
+=item * BOLD and ITALIC styles are not working inside TeX formatting.
+
+=item * There is still lots of MathGL features not available in IUP::MglPlot.
+
+=item * When OPENGL=Yes and ANTIALIAS=Yes, 3D graphs will not process depth properly. (OpenGL configuration?)
+
+=item * When OPENGL=Yes, Graph is disappearing during zoom in, after a zoom factor. Maybe a depth clipping problem. (OpenGL configuration?)
+
+=item * When OPENGL=Yes, Legend box is not being displayed. (MathGL)
+
+=item * When OPENGL=Yes aspect ratio of text and marks are not respected.(MathGL)
+
+=item * The control of ticks being oriented inside or outside the graph is not working. (MathGL)
+
+=item * Bar graph is clipped at 0 and at n-1. (MathGL)
+
+=item * When tick labels are specified all ticks are displayed regardless of tick spacing configuration. (MathGL)
+
+=item * Axis color is always drawn in black. (MathGL)
+
+=back
+
+=head1 EXAMPLES
+
+
+The element B<IUP::MglPlot> is used in the following sample scripts:
+
+=over
+
+=item * L<0-basic/mglplot1.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/mglplot1.pl> - IUP::MglPlot example
+
+=item * L<1-apps/app-plot-demo.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/1-apps/app-plot-demo.pl> - dials for zooming
+
+=back 
+
+
+
+=head1 SEE ALSO
+
+L<IUP::PPlot|IUP::PPlot>
+
+The original doc: L<iup_mglplot.html|http://www.tecgraf.puc-rio.br/iup/en/ctrl/iup_mglplot.html>, <iup_mglplot_modes.htm|http://www.tecgraf.puc-rio.br/iup/en/ctrl/iup_mglplot_modes.html>
+
+
+=cut

@@ -1,0 +1,57 @@
+Revision history for Perl extension IO::Handle::Record.
+
+0.15 Fri Mar 22 11:42:31 CET 2013
+     - fix a test problem caused by the new hash randomization in Perl
+       5.17.x
+
+0.13 Wed Jan  7 12:32:24 CET 2009
+	- work around a kernel bug in openSUSE 11.1. If there are file
+	  descriptors to pass they are sent by a short separate message
+	  of 8 bytes (number of file descriptors + number of bytes in the
+	  record). This prevents the file descriptors to be read by the
+	  receiver multiple times if the passed data block is too large.
+	  (t/005.t)
+
+0.12 Sun Oct 12 20:36:37 CEST 2008
+	- forgive_me record option
+
+0.11 Thu Sep 25 18:55:15 CEST 2008
+	- peercred() on Linux
+	- Build.PL
+
+0.10 Wed Sep 17 12:38:50 CEST 2008
+	- yet another bug: when passing file descriptors along with a large
+	  perl data structure over a non-blocking socket the file descriptors
+	  may get transferred multiple times
+	- portability issues
+
+0.09 Sun Sep 14 17:20:34 CEST 2008
+	- small typo
+	- XS rewrite
+
+0.08 Thu Sep 11 14:28:42 CEST 2008
+	- file descriptor passing
+
+0.07 Mon Sep  8 12:38:03 CEST 2008
+	- local_encoding redord_opt
+
+0.06 Sun May 27 13:30:29 CEST 2007
+	- support for non blocking operations
+
+0.05 Thu Jan  4 21:01:47 CET 2007
+	- bugfix: read_record: sysread must check for 0 instead of undef
+
+0.03 Tue Jan 18 10:59:08 CET 2005
+	- no longer pushing to @IO::Handle::ISA because then the order in
+	  IO::Handle and IO::Handle::Record are use()d in matters.
+
+0.02 Tue Jan 18 09:36:00 CET 2005
+	- changed "package IO::Handle" to "package IO::Handle::Record"
+	  to get the module indexed by the CPAN indexer.
+	- pushed 'IO::Handle::Record' to @IO::Handle::ISA to make IO::Handle
+	  inherit from IO::Handle::Record
+	- this seems to be functionally equivalent to the previous version
+
+0.01  Mon Jan 17 13:54:03 2005
+	- original version; created by h2xs 1.23 with options
+		-n IO::Handle::Record -A -X -b 5.8.0

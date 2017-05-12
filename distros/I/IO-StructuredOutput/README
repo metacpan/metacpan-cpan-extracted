@@ -1,0 +1,39 @@
+IO/StructuredOutput version 0.01
+================================
+
+IO::StructuredOutput provides a high level abstraction from creating output that is formatted in a structured way (like in tables). Currently, excel, csv, and html table output are supported.
+
+  csv data is returned in a zip archive
+  xls data is returned as an excel spreadsheet
+  html data is returned as plain text w/ html formatting
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Text::CSV_XS
+  IO::Scalar
+  Archive::Zip
+  Spreadsheet::WriteExcel
+
+USAGE
+
+Please see the pod documentation in StructuredOutput.pm. Once installed, it is available through:
+perldoc IO::StructuredOutput
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Josh Miller
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

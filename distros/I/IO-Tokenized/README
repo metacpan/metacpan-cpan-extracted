@@ -1,0 +1,70 @@
+IO/Tokenized version 0.04
+================================
+
+RATIONALE
+
+Lexical analysis, which is a fundamental step in all parsing, mainly consists in 
+decomposing an input stream into smal chunks called tokens. The tokens are in
+turn defined by regular expressions.
+
+As Perl is good at handling regular expressions, one should expects that writing
+lexical analyser in Perl should be easy. In truth it is not, and tools like lex or
+flex are even been ported to Perl. There are also a whole lot of ad-hoc lexers for
+different parsing modules/programmes. 
+
+Now, approaches to lexical analysis like those underlying Parse::Lex and Parse::Flex
+are general but fairly complexes to use, while ad-hoc solutions are obviously, 
+well... ad-hoc.
+
+What I'd always sought was a way to tell to a file handle: "well, that is how
+the chunks I'm interested are. Please, found them in your input stream".  It 
+seems a simple thingh enough, but I could not found a module doing it.
+
+Obviously, impatience pushed me to implement such a module, but until little
+time ago I had no real need for it, so lazines spoke against it. Recently I 
+started to write a compiler for a scripting language and I started using the
+Parse::RecDescent module. There in the documentation Damian Conway says
+
+     There's no support for parsing directly from an input stream.  If
+     and when the Perl Gods give us regular expressions on streams, this
+     should be trivial (ahem!) to implement.
+
+Why, regular expression on streams was exactly what I had in mind, so hubris 
+kicked in and I wrote this couple of modules.
+
+MODULES
+
+The distribution includes two modules: IO::Tokenized and IO::Tokenized::File. 
+
+IO::Tokenized is used for hadding token parsing methods to existing filehandles
+as well as a base class for classes in the IO::Tokenized::* hiearchy.
+
+IO::Tokenized::File is an example of how to use the methods in IO::tokenized to
+add tokenized input to classes in the C<IO::*> hierarcy.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  * Carp
+  * Test::More (for testing)
+  * IO::File
+
+COPYRIGHT AND LICENCE
+
+
+Copyright (C) 2003 Leo "TheHobbit" Cacciari
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

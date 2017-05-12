@@ -1,0 +1,15 @@
+2002-08-11  Mark A. Hershberger  <mah@everybody.org>
+
+	* lib/IO/BLOB/Pg.pm:
+	  new(): Fixed to return undef on failure of new();
+	  pad(): Implemented
+	  truncate(): extends the size of the blob, but doesn't truncate it.
+	  seek():act like builtin seek (returns 1 on success)
+	  
+	* t/*: ported over other tests from IO::String to verify
+	functionality -- found a few bugs (seek) in the meantime.
+
+2000-05-27  Mark A. Hershberger  <mah@everybody.org>
+
+	* Initial release.
+

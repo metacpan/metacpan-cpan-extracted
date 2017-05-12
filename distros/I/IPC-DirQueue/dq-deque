@@ -1,0 +1,57 @@
+#!/usr/bin/perl -w
+=head1 NAME
+
+dq-deque - run a command on one task from an IPC::DirQueue queue
+
+=head1 SYNOPSIS
+
+B<dq-deque> --dir I<qdirectory> I<command arg arg ...>
+
+=head1 DESCRIPTION
+
+B<dq-deque> will remove one task from an C<IPC::DirQueue> directory,
+run the named command, and then exit.
+
+The command is run as:
+
+    command arg arg ... nameofdatafile
+
+=head1 SEE ALSO
+
+IPC::DirQueue(3)
+dq-deque(1)
+dq-list(1)
+dq-server(1)
+dq-submit(1)
+
+=cut
+
+use strict;
+use lib 'lib';
+use IPC::DirQueue;
+use Getopt::Long;
+
+sub usage {
+  die "usage: dq-deque --dir qdirectory command arg arg...\n";
+}
+
+our $dir;
+
+GetOptions(
+  'dir=s'   => \$dir
+) or usage();
+$dir or usage();
+
+my $dq = IPC::DirQueue->new({ dir => $dir });
+
+my $job = $dq->pickup_queued_job();
+if (!$job) {
+  print "no jobs left\n";
+  exit;
+}
+
+system (@ARGV, $job->get_data_path());
+
+$job->finish();
+print "finished\n";
+

@@ -1,0 +1,20 @@
+Changes
+Makefile.PL
+MANIFEST
+ppport.h
+README
+LICENSE
+ValidJpeg.xs
+t/proto.t
+t/Image-ValidJpeg.t
+t/memory.t
+t/data/small.jpg
+t/data/short.jpg
+t/data/double.jpg
+t/data/extra.jpg
+t/data/empty.jpg
+lib/Image/ValidJpeg.pm
+valid_jpeg.c
+valid_jpeg.h
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,24 @@
+0.07 - October 14, 2016
+ * Use new SVG parsing code from Image::SVG::Path
+
+0.06 - October 11, 2016
+ * Fix failing tests
+
+0.05 - October 10, 2016
+ * Handle plus signs in and between numbers
+
+0.04 - September 2, 2016
+ * Remove duplicate code for handling scale twice
+
+0.0102 - June 12, 2016
+ * Document that Clone is a requirement (for testing)
+ * Add predicates and clearer for transforms
+ * Change from croak to ouch (Add Ouch as a dependency)
+ * Add the "untransform" method, to go from viewport to userspace points
+
+0.0101 - June 11, 2016 (later in the day)
+ * Handle X&Y translates
+
+0.0100 - June 11, 2016
+ * Initial public release.
+

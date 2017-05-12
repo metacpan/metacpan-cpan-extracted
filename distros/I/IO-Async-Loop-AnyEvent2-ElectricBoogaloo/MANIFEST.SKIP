@@ -1,0 +1,15 @@
+\.tar\.gz$
+^Build$
+^IO-Async-Loop-AnyEvent2-ElectricBoogaloo-
+^MANIFEST\.(?!SKIP$)
+^MYMETA\.
+^Makefile$
+^Makefile\.old$
+^\.
+^_build
+^blib
+^cover_db$
+^pm_to_blib
+^remote$
+^untracked
+^maint/

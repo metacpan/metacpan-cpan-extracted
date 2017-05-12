@@ -1,0 +1,315 @@
+=head1 NAME
+
+Inline::SLang::Details - How Inline::SLang works
+
+=head1 DESCRIPTION
+
+This document is intended to provide details of how
+L<Inline::SLang|Inline::SLang> weaves its magic. 
+It's probably going to be most use in cases when you 
+find apparently bizarre behaviour and wonder if it is
+a bug or a feature.
+
+The implementation for Inline::SLang was initally
+based on the code found in Neil Watkiss'
+L<Inline::Python> and L<Inline::Ruby> modules.
+However, all bugs are my own creation.
+
+=head2 What happens when Perl starts?
+
+The S-Lang interpreter is initialized using the
+C<SLang_init_all()>, C<SLang_init_array_extra()>, and
+C<SLang_init_import()> routines. These are used to ensure
+that all the functions in the
+S-Lang Run-Time Library
+(L<http://www.s-lang.org/doc/html/slangfun.html>)
+are available.
+An error handler is set up (using the C<SLang_Error_Hook>
+variable in the C library) which restarts the S-Lang library,
+clears the S-Lang error variable, and then calls Perl's
+C<croak()> routine with the S-Lang error message. This
+allows users to trap S-Lang errors from Perl code using
+C<eval()>; for instance
+
+  # Evaluate a S-Lang statement which contains an error
+  #
+  eval { Inline::SLang::sl_eval( "variable = ;" ); };
+  print "The S-Lang error was:\n$@\n";
+
+will result in the following message printed to the screen:
+
+  The S-Lang error was:
+  S-Lang Error: Syntax Error: Expecting a variable name: found '=', line 1, file: ***string***
+
+The initialization of the S-Lang interpreter is
+done in the C<BOOT> section of F<Slang.xs>.
+
+Additional initializtion is performed if the C<SETUP> configuration
+option is set to C<slsh>, which is its default value. This
+step is performed by Perl just prior to loading the user-supplied
+S-Lang code (see the functions C<build()> and C<load()> in
+F<Slang.pm>).
+If the option is set, additional changes are made 
+so that the environment of the
+S-Lang interpreter matches that used by the C<slsh> interpreter from
+the S-Lang distribution.
+These changes are listed below and are currently "UNIX centric",
+although they should be made to work on all systems in the long run.
+Note that the S-Lang functions and variables created by C<slsh> -
+e.g. C<atexit()>, C<exit()>, and C<__argv> - are I<not> created
+by this code.
+
+=over 2
+
+=item 1
+
+The load path for the S-Lang library is set to the contents of
+the C<SLSH_PATH> environment variable. The path can be queried
+and changed using the C<get_slang_load_path()> and
+C<set_slang_load_path()> functions from the S-Lang Run-Time
+Library.
+
+=item 2
+
+The system configuration file (F<slsh.rc>) is evaluated. The 
+file is searched from the colon-separated directly list stored in
+(only the first value that is defined is used in the search):
+
+=over 2
+
+=item *
+
+The environment variable C<SLSH_CONF_DIR>.
+
+=item *
+
+The environment variable C<SLSH_LIB_DIR>.
+
+=item *
+
+The set of directories: C</usr/local/etc:/usr/local/slsh:/etc:/etc/slsh>.
+
+=back
+
+=item 3
+
+The user configuration file (F<.slshrc>) is evaluated if one exists
+in the directory given by the environment variable C<HOME>.
+
+=back
+
+If the Perl code has not been evaluated before - or if
+it has been changed since the previous run - the 
+L<Inline> code kicks in to evaluate the S-Lang code.
+This involves:
+
+=over 2
+
+=item 1
+
+The S-Lang interpreter is queried to find
+out all functions that are defined in the namespaces
+listed in the C<BIND_NS> configuration option. 
+The user-supplied
+S-Lang code is then evaluated and the same set of
+namespaces are again queried for the names of defined functions.
+We also pick up any new namespaces that may have been 
+defined if the C<BIND_NS> option is set to C<All>.
+
+The names of the new functions - i.e. those functions added by the
+user-supplied S-Lang code which the S-Lang
+function C<_apropos()> lists when the flag value is set to 3 - are
+stored for later use.
+
+Complications:
+
+=over 2
+
+=item *
+
+The C<_inline> namespace is ignored since this is used by the
+module and should be considered off-limits.
+
+=item *
+
+The list of functions in C<bind_slfuncs> is added to the list
+of functions to bind. This list can include functions defined as
+part of the S-Lang Run-Time Library.
+
+=item *
+
+The fact that the module allows users to change the name
+that namespaces and (some) functions have when mapped to Perl.
+
+=back
+
+=item 2
+
+The list of defined S-Lang data types is found. This
+includes user-defined types added by any imported modules
+and "named" structures created via a S-Lang C<typedef>
+statement.
+
+Utility functions are created in Perl in the 
+C<Inline::SLang> package which are
+wrappers around calls to the C<DataType_Type> constructor.
+This allows users to say C<Inline::SLang::UShort_Type()>
+rather than C<< DataType_Type->new("UShort_Type") >>.
+
+For those types we do not recognise - essentially all
+user-defined types - we create objects with names
+equal to the S-Lang variable name. The objects have very
+few methods, and are just a way of carrying around a
+reference to the S-Lang variable within Perl. The
+S-Lang variable is saved in an associative array within
+the C<_inline> namespace, to ensure that it is not
+destroyed, and this is used when the Perl variable is
+sent to a S-Lang function.
+The "native" S-Lang types included in this list are:
+C<Any_Type>, C<Ref_Type>, C<BString_Type>, C<File_Type>,
+and C<FD_Type>. It would be useful if we could handle
+these directly, but it is not easy (for instance I believe
+it would be hard to use the file handles with 
+C<PerlIO> code since C<PerlIO> makes assumptions
+about who has opened the file).
+
+The conversion between S-Lang and PDL types - e.g.
+what type of piddle should an C<Int_Type> array be
+converted to - has only been tested on 32-bit machines.
+It may well fail on 64 bit machines.
+
+=item 3
+
+The information - including the S-Lang source code - is
+written to a configuration file by L<Inline>. The default location
+for the file is within the F<_Inline/> directory, but this can
+be changed, as discussed in the L<Inline documentation|Inline>.
+
+=back
+
+If the code has previously been run then this information can just
+be read from the configuration file. The information - whether read
+from file or calculated directly - is used to:
+
+=over 2
+
+=item *
+
+Set up the bindings between Perl and S-Lang functions.
+
+=item *
+
+Set up the Perl classes to handle the various datatypes that
+can not be processed natively within Perl.
+
+=item *
+
+Set up the functions and variables in the C<_inline> namespace
+(these should B<never> be accessed by user code).
+
+=back
+
+Once the S-Lang code has been processed the Perl code is
+run.
+
+=head1 CALLING A S-LANG FUNCTION
+
+For each S-Lang function we want to bind to Perl, a small
+Perl subroutine is created which pushes the S-Lang function
+name (including any necessary namespace) onto the start of the
+stack and then calls the C<Inline::SLang::sl_call_function()>
+subroutine (which is defined in F<Slang.xs> and should B<never> be
+called directly).
+By including the S-Lang function name on the stack we allow the
+Perl and S-Lang names to be different, as required by the 
+C<BIND_SLFUNCS> and C<BIND_NS> 
+L<configuration options|Inline::SLang::Config>.
+
+The C<sl_call_function()> routine performs 4 operations:
+
+=over 2
+
+=item 1
+
+The S-Lang interpreter is checked to see if the routine
+is defined (this step could be removed).
+
+=item 2
+
+The remaining items on the Perl stack (the arguments to the
+function) are converted to S-Lang variables and pushed onto
+the S-Lang stack. The conversion from Perl to S-Lang
+types is done by the C<pl2sl()> routine which is
+defined in F<pl2sl.c>.
+
+=item 3
+
+The S-Lang function is called. The S-Lang error hook is used to
+catch any errors that the S-Lang interpreter may throw; these
+are converted to Perl errors by calling the C<croak()>
+function so that they can be trapped by Perl's C<eval()>
+routine.
+
+=item 4
+
+The S-Lang stack is examined and any variables returned by
+the function are popped off, converted to Perl variables, and
+pushed onto the Perl stack. The order of the S-Lang stack is
+reversed when creating the Perl stack so that the S-Lang
+statement
+
+  ( x, y ) = some_func();
+
+can be converted to
+
+  ( my $x, my $y ) = some_func();
+
+The conversion from S-Lang to Perl
+types is done by the C<sl2pl()> routine which is
+defined in F<sl2pl.c>.
+
+=back
+
+The major part of the whole module is the conversion between Perl and S-Lang
+variables, namely the C<pl2sl()> and C<sl2pl()> routines. The routines
+are not pretty - they could be re-written to allow additional convertors
+to be "plugged in" - but they seem to work.
+
+=head1 NOTES
+
+=head2 How to find out what S-Lang functions and datatypes are recognised
+
+The C<info> option of L<Inline> can be used to find out what
+functions and data types are bound to Perl. If the code is stored
+in the file F<script.pl>, use
+
+  perl -MInline=info script.pl
+
+L<Further details|Inline::SLang::Config/"What functions and namespaces have been bound to Perl?">
+are available in the L<Inline::SLang::Config documentation|Inline::SLang::Config>.
+
+=head2 Execution of S-Lang code
+
+The S-Lang code is executed I<before> any Perl code. This can be
+seen in the following example (available as
+F<examples/order.pl> in the source distribution):
+
+ use Inline 'SLang' => 'message("This is S-Lang");';
+ print "This is Perl\n";
+
+When run, the script displays:
+
+ This is S-Lang
+ This is Perl
+
+=head2 Exporting symbols
+
+The system used to bind functions to Perl
+- in particular to make the symbols available to Perl - is
+a "simplified" version of the Exporter Perl module (since I
+have been unable to successfully use Exporter directly).
+
+=head1 SEE ALSO
+
+L<Inline::SLang>, L<Inline>
+

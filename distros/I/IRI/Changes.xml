@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dbug="http://ontologi.es/doap-bugs#" xmlns:dc="http://purl.org/dc/terms/" xmlns:dcs="http://ontologi.es/doap-changeset#" xmlns:doap="http://usefulinc.com/ns/doap#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
+<rdf:Description rdf:nodeID="r1468938689r0">
+	<doap:created>2016-07-19</doap:created>
+	<doap:revision>0.006</doap:revision>
+</rdf:Description>
+<rdf:Description xmlns:ns1="http://aaronland.info/ns/changefile/" rdf:nodeID="r1468938689r1">
+	<ns1:update>Fix regular expression use of quantifiers (#8 from Karl Williamson).</ns1:update>
+</rdf:Description>
+<rdf:Description rdf:nodeID="r1468938689r10">
+	<doap:created>2014-08-02</doap:created>
+	<doap:revision>0.001</doap:revision>
+</rdf:Description>
+<rdf:Description xmlns:ns1="http://aaronland.info/ns/changefile/" rdf:nodeID="r1468938689r11">
+	<ns1:addition>First release.</ns1:addition>
+</rdf:Description>
+<rdf:Description rdf:nodeID="r1468938689r2">
+	<doap:created>2016-04-04</doap:created>
+	<doap:revision>0.005</doap:revision>
+</rdf:Description>
+<rdf:Description xmlns:ns1="http://aaronland.info/ns/changefile/" rdf:nodeID="r1468938689r3">
+	<ns1:addition>Add ability to lazily parse IRI components.</ns1:addition>
+	<ns1:addition>Add cpanfile, with Module::Install deps (#5 from Alberto Simões).</ns1:addition>
+	<ns1:addition>Added Try::Tiny to list of build requirements (github issue #3).</ns1:addition>
+	<ns1:update>Improve performance of IRI component parsing.</ns1:update>
+	<ns1:update>Update POD coverage test to ignore private attributes (#6 from Alberto Simões).</ns1:update>
+	<ns1:update>Updated required version of Type::Tiny to 0.008 to support use of InstanceOf (#7 from Alexandr Ciornii).</ns1:update>
+</rdf:Description>
+<rdf:Description rdf:nodeID="r1468938689r4">
+	<doap:created>2014-09-25</doap:created>
+	<doap:revision>0.004</doap:revision>
+</rdf:Description>
+<rdf:Description xmlns:ns1="http://aaronland.info/ns/changefile/" rdf:nodeID="r1468938689r5">
+	<ns1:update>Changed IRI to use old-style VERSION declaration.</ns1:update>
+	<ns1:update>Moved modules from Moose to Moo.</ns1:update>
+</rdf:Description>
+<rdf:Description rdf:nodeID="r1468938689r6">
+	<doap:created>2014-08-11</doap:created>
+	<doap:revision>0.003</doap:revision>
+</rdf:Description>
+<rdf:Description xmlns:ns1="http://aaronland.info/ns/changefile/" rdf:nodeID="r1468938689r7">
+	<ns1:addition>Added coercion from Str to IRI.</ns1:addition>
+</rdf:Description>
+<rdf:Description rdf:nodeID="r1468938689r8">
+	<doap:created>2014-08-09</doap:created>
+	<doap:revision>0.002</doap:revision>
+</rdf:Description>
+<rdf:Description xmlns:ns1="http://aaronland.info/ns/changefile/" rdf:nodeID="r1468938689r9">
+	<ns1:addition>Added as_string method.</ns1:addition>
+</rdf:Description>
+<rdf:Description xmlns:ns1="http://purl.org/dc/elements/1.1/" rdf:about="file:///Users/greg/data/prog/git/perl-iri/Changes.ttl">
+	<ns1:description>Changes for IRI</ns1:description>
+	<ns1:subject rdf:resource="http://purl.org/NET/cpan-uri/dist/IRI/project"/>
+	<ns1:title>Changes</ns1:title>
+</rdf:Description>
+<rdf:Description xmlns:ns1="http://www.w3.org/2002/07/owl#" rdf:about="http://kasei.us/about/foaf.xrdf#greg">
+	<rdf:type rdf:resource="http://xmlns.com/foaf/0.1/Person"/>
+	<ns1:sameAs rdf:resource="http://purl.org/NET/cpan-uri/person/gwilliams"/>
+	<foaf:homepage rdf:resource="http://kasei.us/"/>
+	<foaf:mbox rdf:resource="mailto:gwilliams@cpan.org"/>
+	<foaf:name>Gregory Todd Williams</foaf:name>
+	<foaf:page rdf:resource="http://search.cpan.org/~gwilliams/"/>
+</rdf:Description>
+<rdf:Description xmlns:ns1="http://aaronland.info/ns/changefile/" rdf:about="http://kasei.us/code/files/IRI-0.001.tar.gz">
+	<ns1:changes rdf:nodeID="r1468938689r11"/>
+	<dc:isVersionOf rdf:resource="http://purl.org/NET/cpan-uri/dist/IRI/project"/>
+	<doap:Version rdf:nodeID="r1468938689r10"/>
+</rdf:Description>
+<rdf:Description xmlns:ns1="http://aaronland.info/ns/changefile/" rdf:about="http://kasei.us/code/files/IRI-0.002.tar.gz">
+	<ns1:changes rdf:nodeID="r1468938689r9"/>
+	<dc:isVersionOf rdf:resource="http://purl.org/NET/cpan-uri/dist/IRI/project"/>
+	<dc:replaces rdf:resource="http://kasei.us/code/files/IRI-0.001.tar.gz"/>
+	<doap:Version rdf:nodeID="r1468938689r8"/>
+</rdf:Description>
+<rdf:Description xmlns:ns1="http://aaronland.info/ns/changefile/" rdf:about="http://kasei.us/code/files/IRI-0.003.tar.gz">
+	<ns1:changes rdf:nodeID="r1468938689r7"/>
+	<dc:isVersionOf rdf:resource="http://purl.org/NET/cpan-uri/dist/IRI/project"/>
+	<dc:replaces rdf:resource="http://kasei.us/code/files/IRI-0.002.tar.gz"/>
+	<doap:Version rdf:nodeID="r1468938689r6"/>
+</rdf:Description>
+<rdf:Description xmlns:ns1="http://aaronland.info/ns/changefile/" rdf:about="http://kasei.us/code/files/IRI-0.004.tar.gz">
+	<ns1:changes rdf:nodeID="r1468938689r5"/>
+	<dc:isVersionOf rdf:resource="http://purl.org/NET/cpan-uri/dist/IRI/project"/>
+	<dc:replaces rdf:resource="http://kasei.us/code/files/IRI-0.003.tar.gz"/>
+	<doap:Version rdf:nodeID="r1468938689r4"/>
+</rdf:Description>
+<rdf:Description xmlns:ns1="http://aaronland.info/ns/changefile/" rdf:about="http://kasei.us/code/files/IRI-0.005.tar.gz">
+	<ns1:changes rdf:nodeID="r1468938689r3"/>
+	<dc:isVersionOf rdf:resource="http://purl.org/NET/cpan-uri/dist/IRI/project"/>
+	<dc:replaces rdf:resource="http://kasei.us/code/files/IRI-0.004.tar.gz"/>
+	<doap:Version rdf:nodeID="r1468938689r2"/>
+</rdf:Description>
+<rdf:Description xmlns:ns1="http://aaronland.info/ns/changefile/" rdf:about="http://kasei.us/code/files/IRI-0.006.tar.gz">
+	<ns1:changes rdf:nodeID="r1468938689r1"/>
+	<dc:isVersionOf rdf:resource="http://purl.org/NET/cpan-uri/dist/IRI/project"/>
+	<dc:replaces rdf:resource="http://kasei.us/code/files/IRI-0.005.tar.gz"/>
+	<doap:Version rdf:nodeID="r1468938689r0"/>
+</rdf:Description>
+<rdf:Description rdf:about="http://purl.org/NET/cpan-uri/dist/IRI/project">
+	<doap:bug-database rdf:resource="http://rt.cpan.org/Dist/Display.html?Queue=IRI"/>
+	<doap:created rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2014-07-23</doap:created>
+	<doap:developer rdf:resource="http://kasei.us/about/foaf.xrdf#greg"/>
+	<doap:documenter rdf:resource="http://kasei.us/about/foaf.xrdf#greg"/>
+	<doap:download-page rdf:resource="http://search.cpan.org/dist/IRI/"/>
+	<doap:homepage rdf:resource="http://search.cpan.org/dist/IRI/"/>
+	<doap:license rdf:resource="http://dev.perl.org/licenses/"/>
+	<doap:maintainer rdf:resource="http://kasei.us/about/foaf.xrdf#greg"/>
+	<doap:name>IRI</doap:name>
+	<doap:programming-language>Perl</doap:programming-language>
+	<doap:shortdesc xml:lang="en">A Perl implementation of Internationalized Resource Identifiers (IRIs)</doap:shortdesc>
+	<doap:tester rdf:resource="http://kasei.us/about/foaf.xrdf#greg"/>
+	<rdf:type rdf:resource="http://usefulinc.com/ns/doap#Project"/>
+</rdf:Description>
+</rdf:RDF>

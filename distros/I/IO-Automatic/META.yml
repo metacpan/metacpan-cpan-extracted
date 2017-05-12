@@ -1,0 +1,18 @@
+--- #YAML:1.0
+name: IO-Automatic
+version: 0.03
+author:
+  - Richard Clamp <richardc@unixbeard.net>
+abstract: automatically choose a suitable IO::* module
+license: perl
+requires:
+  IO::File: 0
+  IO::Scalar: 0
+  IO::Zlib: 0
+  Module::Build: 0
+  Test::More: 0
+provides:
+  IO::Automatic:
+    file: lib/IO/Automatic.pm
+    version: 0.03
+generated_by: Module::Build version 0.2607

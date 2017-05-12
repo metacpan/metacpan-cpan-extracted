@@ -1,0 +1,229 @@
+Revision history for Perl extension Iptables.
+
+0.01  Fri Oct 13 16:50:13 2000
+	- original version; created by h2xs 1.19
+
+0.02  Sun Oct 15 16:56:28 2000
+	- Wrote wrappers for all functions, except those whose functionality
+	has been encased in a different way (iptc_(first|next)_(rule|chain),
+	and iptc_strerror()).
+	- Began helper function to explode struct ipt_entry into a Perl hash.
+	This will make it easier to manipulate rules. I considered encasing
+	the struct ipt_entry * in an object, and using methods to access the
+	rule values, but decided that won't do.
+
+0.03  Tue Oct 17 08:04:54 2000
+	- Succeeded in writing the basic explode/pack routines to handle
+	struct ipt_entry data. Still need to handle target and match modules.
+	Currently I'm just forcing the standard (null) target, which is, of
+	course, completely and utterly wrong, but it lets me test things.
+	- Discovered that with a reference variable, you must ALWAYS push
+	the new value back up the call stack. That was causing a segfault if
+	I tried to commit() or do ANYTHING else after create_chain(), because
+	create_chain() reallocates the handle struct.
+	- Still wrestling with a segfault - if a chain is created with
+	create_chain(), and then either of the entry-adding calls
+	(insert_entry or append_entry) is made, this causes a segfault.
+	It dies on a free() in the insert_rules() routine. Still trying
+	to determine the cause.
+
+0.04a  Sat Nov 11 11:00:46 2000
+	- Took care of some endianness issues in width-value mask handling.
+	This is now endianness-independent. (using ntohl()/htonl() calls for
+	reordering)
+	- Removed the check_packet() method, as it presently does nothing.
+	- Sent a message to netfilter-devel to ask about the 'matchmask'
+	parameter to iptc_delete_entry(). I haven't been able to determine
+	its purpose, and calling it with nothing or a garbage string seems
+	to have no adverse effect on its behavior.
+	- Determined the cause of the earlier segfault. A bug in the libiptc
+	code was causing the problem, and Harald Welte has since remedied
+	it in the netfilter CVS tree.
+	- Basic rule and chain handling is pretty much complete, I am (for
+	now) satisfied with the interface I'm exporting. I now need to
+	determine how to handle all the match and target modules. (Other than
+	the check_packet call, and the delete_entry call, as noted
+	previously - I'm still waiting for feedback on these.)
+
+0.05
+	- Added infrastructure for match and target modules. All hooks should
+	now be in place. I've got the standard target module and the UDP
+	protocol match module done, and I'm working on the TCP protocol match
+	module.
+
+0.05a
+	- TCP protocol module should be working fully, but presently only
+	supports one input format for each field.
+	- ICMP protocol module should be working now also. Need to get some
+	extra handling in for the numeric identifiers. Had to modify the
+	protocol match module handling for a Netfilter weirdness related to
+	the ICMP protocol (if there is a match entry in the ipt_entry data
+	structure, it is not possible to just match any ICMP packet). This
+	takes a bit more black magic to make work right, but I think I have
+	it.
+
+0.05b
+	- Took care of a bug that made any attempt to construct a chain-to-
+	chain jump in a rule cause a segfault. The STANDARD target module
+	(ipt_ip_standard.so) has to be loaded in the case of no target or
+	a chain-to-chain jump. (However, I beefed up my pointer checking
+	a bit, just in case.)
+	- Fixed the call to iptc_set_policy. Apparently between the 1.1.2 and
+	1.2 releases of iptables, an extra parameter was added. I'm still not
+	sure what it does. I'll have to do some more investigating. However,
+	for now, it appears that it's safe to just make it a NULL. So that's
+	what I'm going to do for now.
+
+0.05c
+	- Hopefully I've now squashed the chain-to-chain jump bug. Had to
+	change the other find_module() calls that loaded target modules to
+	match the one I'd changed previously.
+
+0.05d
+	- Found a boundary condition in find_module() where if the string
+	containing the path to the shared object to load (via dlopen()) had
+	a length that was a multiple of 4, apparently one byte of the return
+	address would get overwritten, causing a segfault. This only occurred
+	with the multiport match module, just because the path string was the
+	right length.
+	- Added code to, if a target module couldn't be found (and data is
+	present for it), add a key containing the raw data for it 
+	(<target>-target-raw). Still need to integrate the module build
+	process with the rest of the build.
+	- Modified the packer to accept numeric protocols. Discovered I need
+	to generate a 'matches' list as part of the exploder. Also should add
+	code to accept the raw data for match modules, though we, of course,
+	don't want to have to use that much.
+	- Modified the packer to just ignore the 'bcnt' and 'pcnt' fields of
+	a rule hash.
+	- Removed sv_2mortal()s in the exploder - it was causing values to
+	disappear and get overwritten with junk. I'm confused.
+	- Started adding code to accept raw target data in the packer routine.
+	Forgot that if the module isn't available, then no data zone will be
+	allocated at all - one must be added. More work will be involved to get
+	the same for match modules, but with what I'm learning here, it
+	shouldn't be too difficult to make work.
+	- Got acceptance of raw target data working. Forgot I had to update
+	the entry and target size values as well. Oops. Works now, anyway.
+	- Rolled raw target data code into the main target setup code in the
+	packer. This simplifies the code somewhat.
+	- Implemented generation of the 'matches' list in the exploder, and
+	use of raw match data in the packer. The raw target and match data
+	handlers are only intended as a fallthrough condition, not for regular
+	use. However, skillful use of pack() and unpack() could be brought to
+	bear to manipulate the raw data. I still don't recommend this, it's
+	better to write a proper module for handling this.
+	- Added code to the set_policy method to allow setting packet and byte
+	counters on a (built-in) chain.
+
+0.06	Thu Apr 26 22:52:11 MDT 2001
+	- With all the new changes and fixes, decided to roll the version
+	number.
+	- Modified the exploder to not include the protocol name in the list
+	of matches.
+	- Got raw match data retrieval working for the protocol as well.
+	- Had the packer use the "official" protocol name returned by
+	getprotobyname(), instead of the passed string, since the "official"
+	protocol name will always be lowercase, and therefore will match up
+	with the match module name.
+	- Setup an actual Makefile in the modules/ subdir. Maybe a slight
+	rearrangement of the source, and including a copy of the libiptc
+	source tree (to remove the dependency on having iptables) should be
+	undertaken?
+	- Modified the 'delete_entry' method, adding a function to helper.c
+	to generate the matchmask based on the (struct ipt_entry), and no
+	longer expect the user to input it. Now that I (sort of) understand
+	what the matchmask is for and how it's constructed, I think I have
+	the right way to build it (and it seems to be working).
+	- Extended the module interface with a final_check() call (to be
+	used as part of the packing routine), and added an extra parameter
+	to the parse_field and get_fields calls to pass a pointer to the
+	(struct ipt_entry), for checking things like the protocol in use
+	(necessary for the multiport match module, among others).
+	- Added a match module for multiport.
+	- Added a match module for state.
+	- Added a match module for owner.
+	- Added documentation for the multiport, state and owner match modules
+	to IPv4.pm. (A man page is automatically generated as part of the
+	'make' procedure, and the embedded documentation can be read using
+	'perldoc'.)
+	- Added a target module for LOG, and documentation for the module.
+	- Added a target module for REJECT, and documentation for the module.
+	- Added a bit of code in the REJECT target module's parse_field()
+	routine to, if tcp-reset rejection is requested, make sure TCP
+	protocol is being used.
+	- Modified code throughout, including in match and target modules, so
+	that modules can set $! to indicate why a failure has occurred when
+	packing a hash into a (struct ipt_entry).
+	- Modified TCP and UDP protocol match modules to provide and accept
+	port names when available. Also now am using asprintf in all the
+	match modules whenever possible, as it makes string generation far
+	simpler, since it takes care of string allocation.
+
+0.10	Mon Apr 30 10:41:23 MDT 2001
+	- Rolled the version number over, due to the number of changes made.
+	- Improved documentation formatting and grammar, alphabetized method
+	descriptions, and did a general cleanup. Regenerated PDF file.
+	- Modified the memset() call in parse_iface() to write 0xFF values
+	instead of 1 in the mask string, to match the behavior of the iptables
+	command-line tool.
+	- Further cleanups in helper code and modules. Eliminated several
+	uses of realloc() in the exploder routine (using asprintf() instead),
+	changed packer routines to eliminate multiple call points per key for
+	hv_store(), and did the same in modules. Changed some code in modules
+	to pass back integer values when possible. In TCP and UDP protocol
+	matches, snipped out the code to build the SV containing the port
+	(or port range) into a separate function (one in each module), to
+	minimize previous errors (in the TCP module, I was mixing up src and
+	dst references - that could get very ugly later).
+	- Rewrote chunks of ipt_entry generator code, to follow the style of
+	the iptables codebase. It turns out this is more or less necessary to
+	handle the way certain match modules can extend their data area. (Of
+	course, it COULD be done the way I was doing it - it would be very
+	ugly, though.) Also cleaned up some uses of sprintf() and snprintf(),
+	replacing them with asprintf() (and free()s in the appropriate places).
+	- Changed the module interface (again) to pass a pointer to a pointer
+	for the match and target data blocks, so that the match and target
+	modules can reallocate their data blocks for those that wish to enlarge
+	their data areas (like SNAT and DNAT). Also changed plugins themselves
+	to match.
+	- Added SNAT target support. Should support mapping both based on
+	ports and IP addresses. Will add DNAT target support soon - it should
+	only involve minor changes to the SNAT target.
+	- Added DNAT target support. Also fixed minor bug in SNAT target
+	module.
+	- Added MASQUERADE target support, based on SNAT target code.
+	- Minor fix to setup() routine in MASQUERADE target.
+	- Added REDIRECT target support, based on MASQUERADE target code.
+	- Added documentation for SNAT and DNAT targets to IPv4.pm.
+	- Added mac match module.
+	- Fixed a bug in the unpacking code when handling rules with more
+	than one match module associated with them.
+	- Oops - remove debugging printf()s from helper.c! :p
+	- Added code to mac match module's final_check() routine to help
+	ensure that the MAC address gets set.
+	- Added unclean match module.
+	- Added MARK target module.
+	- Cleaned up some error case code (the code to set the Perl $! variable
+	in error cases in the modules).
+	- Added code to the MASQUERADE and REDIRECT targets to handle integer
+	values in their to-ports argument handlers.
+	- Changed the Makefile, removing .o files from the .PRECIOUS:
+	specifier line.
+	- Added MIRROR target module.
+	- Added mark match module.
+	- Added tos match module.
+	- Added TOS target module.
+	- Added documentation for MASQUERADE, REDIRECT, MARK and MIRROR
+	targets, and mac and unclean matches.
+	- Added documentation for the mark and tos matches.
+	- Added limit match module.
+
+0.90	Thu Oct  4 20:47:21 MDT 2001
+	- Rolled over the internal version number.
+	- Added documentation for the limit match.
+	- Added libiptc source and headers from netfilter CVS (tagged version
+	1.2.3) for libip4tc.
+	- Added material to Makefile.PL and modules/Makefile to unify the
+	build process. libiptc and all modules will be built automatically,
+	and 'make install' will install modules to their appropriate location.

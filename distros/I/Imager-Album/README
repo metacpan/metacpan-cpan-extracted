@@ -1,0 +1,26 @@
+This is a little Beta version of something I use for
+making albums.  It's intended to be run just directly
+on a bunch of file names like: album.pl new_stuff/*.jpg
+
+Installation: 
+make test
+make install
+
+copy the album.pl to somewhere in your path.
+
+notes:
+
+It does create a directory containing thumbnails
+in $HOME.  When you press the store button it gives
+the path it's using.
+
+To re-edit a gallery you can start album with 
+album.pl -D path_to_dir
+
+You can actually move that directory, but you cannot
+move the images you gave it in the begining if you want to
+re-edit the data.
+
+
+
+

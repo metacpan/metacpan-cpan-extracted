@@ -1,0 +1,18 @@
+Build.PL
+Changes
+examples/date.pl
+lib/IPC/PerlSSH/Async.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00use.t
+t/01perltest.t
+t/02bigeval.t
+t/03legacy-loop.t
+t/04exit.t
+t/10library-load.t
+t/99pod.t
+t/Math.pm
+META.json

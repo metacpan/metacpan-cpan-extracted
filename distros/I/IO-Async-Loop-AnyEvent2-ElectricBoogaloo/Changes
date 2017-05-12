@@ -1,0 +1,6 @@
+Revision history for IO-Async-Loop-AnyEvent2-ElectricBoogaloo
+
+0.003  2016-09-04
+       - update build system
+       - make package declaration easier for tools to parse
+       - update for AnyEvent 7 compatibility

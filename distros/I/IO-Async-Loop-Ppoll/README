@@ -1,0 +1,57 @@
+NAME
+    `IO::Async::Loop::Ppoll' - use `IO::Async' with `ppoll(2)'
+
+SYNOPSIS
+     use IO::Async::Loop::Ppoll;
+
+     my $loop = IO::Async::Loop::Ppoll->new();
+
+     $loop->add( ... );
+
+     $loop->add( IO::Async::Signal->new(
+           name =< 'HUP',
+           on_receipt => sub { ... },
+     ) );
+
+     $loop->loop_forever();
+
+DESCRIPTION
+    This subclass of `IO::Async::Loop::Poll' uses an `IO::Ppoll' object
+    instead of a `IO::Poll' to perform read-ready and write-ready tests so
+    that they can be mixed with signal handling.
+
+    The `ppoll()' system call atomically switches the process's signal mask,
+    performs a wait exactly as `poll()' would, then switches it back. This
+    allows a process to block the signals it cares about, but switch in an
+    empty signal mask during the poll, allowing it to handle file IO and
+    signals concurrently.
+
+CONSTRUCTOR
+  $loop = IO::Async::Loop::Ppoll->new( %args )
+    This function returns a new instance of a `IO::Async::Loop::Ppoll'
+    object. It takes the following named arguments:
+
+    `poll'  The `IO::Ppoll' object to use for notification. Optional; if a
+            value is not given, a new `IO::Ppoll' object will be
+            constructed.
+
+METHODS
+    As this is a subclass of IO::Async::Loop::Poll, all of its methods are
+    inherited. Expect where noted below, all of the class's methods behave
+    identically to `IO::Async::Loop::Poll'.
+
+  $count = $loop->loop_once( $timeout )
+    This method calls the `poll()' method on the stored `IO::Ppoll' object,
+    passing in the value of `$timeout', and processes the results of that
+    call. It returns the total number of `IO::Async::Notifier' callbacks
+    invoked, or `undef' if the underlying `poll()' method returned an error.
+    If the `poll()' was interrupted by a signal, then 0 is returned instead.
+
+SEE ALSO
+    *   IO::Ppoll - Object interface to Linux's `ppoll()' call
+
+    *   IO::Async::Loop::Poll - a set using an `IO::Poll' object
+
+AUTHOR
+    Paul Evans <leonerd@leonerd.org.uk>
+

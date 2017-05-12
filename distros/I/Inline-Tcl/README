@@ -1,0 +1,75 @@
+INTRODUCTION:
+
+Inline::Tcl -- Write Perl subroutines in Tcl.
+
+Inline::Tcl lets you add Tcl procedures to perl code without using XS.
+
+Example:
+
+   use Inline Tcl => <<END;
+   set asdf 2
+   proc dummy { val } {
+      puts "Dummy says \$::asdf + \$val = [expr \$::asdf + \$val]"
+      incr val
+      return [expr \$::asdf + \$val]
+   }
+   END
+
+   $result = dummy(1);
+   print "But returned $result\n";
+
+When run, this complete program prints:
+
+   Dummy says 2 + 1 = 3
+   But returned 4
+
+-------------------------------------------------------------------------------
+INSTALLATION:
+
+This module requires Inline.pm version 0.30 or higher to be installed.
+
+To install Inline::Tcl do this:
+
+perl Makefile.PL
+make
+make test
+make install
+
+(On ActivePerl for MSWin32, use nmake instead of make.  This has not been
+tested at all.)
+
+You have to 'make install' before you can run it successfully.
+
+-------------------------------------------------------------------------------
+TROUBLESHOOTING:
+
+This is alpha code.  I have no idea if it will work on any system but mine.
+If it does work on your system, I would be interested in hearing from you.
+
+It works on my system in any case:  suse7.0, kernel 2.2.17, tcl8.3.2.  
+Makefile.PL will let you choose where to look for your installed version 
+of Tcl: usually /usr/include or /usr/local/include.  In addition, you will 
+be prompted for the location of the distribution.  It automatically searches 
+in your home directory and lets you choose from any possibilities.  This 
+requirement will be removed in future versions.
+
+Currently Inline::Tcl only makes procedures available to perl.  Global
+variables can only be referenced from within the Tcl procedure.
+
+-------------------------------------------------------------------------------
+INFORMATION:
+
+For information about Inline.pm, see 'perldoc Inline'.  For more 
+information on Inline::Tcl see 'perldoc Inline::Tcl'.
+
+Other modules that might be of interest are 'Tcl' at:
+	 http://search.cpan.org/search?module=Tcl
+This module is not related to the Inline::Tcl module, but it might be 
+valuable to have some compatibility between the two.
+
+The Inline::Tcl mailing list is currently inline@perl.org. Send mail to
+inline-subscribe@perl.org to subscribe.
+
+Please send questions and comments to "Ryan Sadler" <RRS@cpan.org>
+
+Copyright (c) 2001, Ryan Sadler. All Rights Reserved.  

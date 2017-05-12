@@ -1,0 +1,119 @@
+<!-- test 1: balance -->
+
+<ExpMsMsSpectrumFilter>
+<oneExpMsMsSpectrumFilter spectrumType="msms" name="dummy">
+	        <level>msmsCompounds</level>	
+		<action type="removeOther">		
+		       <threshold type="sort">	
+			   <relativeTo>quantile</relativeTo>							
+			   <thresholdValue>0.5</thresholdValue>
+			   <comparator>ge</comparator>						
+		       </threshold>
+                </action>
+		<filterValue type="algorithm">	
+	                <name>balance</name>
+                        <param name="bands">10</param>
+                        <param name="minMoz">300</param>
+                        <param name="maxMoz">900</param>
+                </filterValue>
+	</oneExpMsMsSpectrumFilter>
+
+
+<!-- test 2: goodDiff -->
+
+<oneExpMsMsSpectrumFilter spectrumType="msms" name="dummy">
+	        <level>msmsCompounds</level>	
+		<action type="removeOther">		
+		       <threshold type="sort">	
+			   <relativeTo>quantile</relativeTo>							
+			   <thresholdValue>0.5</thresholdValue>
+			   <comparator>ge</comparator>						
+		       </threshold>
+                </action>
+		<filterValue type="algorithm">	
+	                <name>goodDiff.normRank</name>
+                        <param name="tolerance">0.37</param>
+                        <param name="toleranceUnit">Da</param>
+                        <param name="mass">mono</param>  
+                        <param name="filter">smartPeaks</param>
+                        <param name="peakNr">50</param>
+                        <param name="winSize">100</param>
+                        <param name="stepSize">20</param>
+                        <param name="weightIntensity">1</param>
+                        <param name="weightDensity">2</param>
+                                 
+		</filterValue>
+	</oneExpMsMsSpectrumFilter>
+
+
+<!-- test 3: waterLoss -->
+
+<oneExpMsMsSpectrumFilter spectrumType="msms" name="dummy">
+	        <level>msmsCompounds</level>	
+		<action type="removeOther">		
+		       <threshold type="sort">	
+			   <relativeTo>quantile</relativeTo>							
+			   <thresholdValue>0.5</thresholdValue>
+			   <comparator>ge</comparator>						
+		       </threshold>
+                </action>
+		<filterValue type="algorithm">	
+	                <name>waterLosses.normRank</name>
+                        <param name="tolerance">0.37</param>
+                        <param name="toleranceUnit">Da</param>
+                        <param name="mass">average</param>  
+                        <param name="filter">smartPeaks</param>
+                        <param name="peakNr">50</param>
+                        <param name="winSize">100</param>
+                        <param name="stepSize">20</param>
+                        <param name="weightIntensity">1</param>
+                        <param name="weightDensity">2</param>         
+		</filterValue>
+	</oneExpMsMsSpectrumFilter>
+
+
+
+
+<!-- test 3: complements -->
+
+<oneExpMsMsSpectrumFilter spectrumType="msms" name="dummy">
+	        <level>msmsCompounds</level>	
+		<action type="removeOther">		
+		       <threshold type="sort">	
+			   <relativeTo>quantile</relativeTo>							
+			   <thresholdValue>0.5</thresholdValue>
+			   <comparator>ge</comparator>						
+		       </threshold>
+                </action>
+		<filterValue type="algorithm">	
+	                <name>complements.normRank</name>
+                        <param name="tolerance">2</param>
+                        <param name="toleranceUnit">Da</param>
+                        <param name="mass">average</param>  
+                        <param name="filter">smartPeaks</param>
+                        <param name="peakNr">200</param>
+                        <param name="winSize">100</param>
+                        <param name="stepSize">20</param>
+                        <param name="weightIntensity">1</param>
+                        <param name="weightDensity">1</param>        
+		</filterValue>
+	</oneExpMsMsSpectrumFilter>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</ExpMsMsSpectrumFilter>
+
+
+
+

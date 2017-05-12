@@ -1,0 +1,18 @@
+Changes
+inc/Devel/CheckLib.pm
+jinclude.h
+jpegint.h
+JpegTran.xs
+lib/Image/JpegTran.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+ppport.h
+README
+README.IJG
+t/00-load.t
+t/01-conversions.t
+t/data/testimg.jpg
+transupp.c
+transupp.h
+META.yml                                 Module meta-data (added by MakeMaker)

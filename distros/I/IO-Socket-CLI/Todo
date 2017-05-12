@@ -1,0 +1,6 @@
+TODO list for Perl module IO::Socket::CLI
+
+* tests should allow selecting a different protocol than IMAP
+* tests should be more robust (comments in file)
+* use IO::Socket::IP?
+* get rid of globals ($SSL, $PORT, $BYE)

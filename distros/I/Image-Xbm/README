@@ -1,0 +1,337 @@
+=head1 NAME
+
+Image::Xbm - Load, create, manipulate and save xbm image files.
+
+=head1 SYNOPSIS
+
+    use Image::Xbm ;
+
+    my $j = Image::Xbm->new( -file, 'balArrow.xbm' ) ;
+
+    my $i = Image::Xbm->new( -width => 10, -height => 16 ) ;
+
+    my $h = $i->new ; # Copy of $i
+
+    my $p = Image::Xbm->new_from_string( "###\n#-#\n###" ) ;
+
+    my $q = $p->new_from_string( "H##", "#-#", "###" ) ;
+
+    my $s = $q->serialse ; # Compresses a little too.
+    my $t = Image::Xbm->new_from_serialsed( $s ) ;
+
+    $i->xybit( 5, 8, 1 ) ;           # Set a bit
+    print '1' if $i->xybit( 9, 3 ) ; # Get a bit
+    print $i->xy( 4, 5 ) ;           # Will print black or white
+
+    $i->vec( 24, 0 ) ;            # Set a bit using a vector offset
+    print '1' if $i->vec( 24 ) ;  # Get a bit using a vector offset
+
+    print $i->get( -width ) ;     # Get and set object and class attributes
+    $i->set( -height, 15 ) ;
+
+    $i->load( 'test.xbm' ) ;
+    $i->save ;
+
+    print "equal\n" if $i->is_equal( $j ) ; 
+
+    print $j->as_string ;
+
+    #####-
+    ###---
+    ###---
+    #--#--
+    #---#-
+    -----#
+
+    print $j->as_binstring ;
+
+    1111101110001110001001001000100000010000
+
+View an xbm file from the command line:
+
+    % perl -MImage::Xbm -e'print Image::Xbm->new(-file,shift)->as_string' file
+
+Create an xbm file from the command line:
+
+    % perl -MImage::Xbm -e'Image::Xbm->new_from_string("###\n#-#\n-#-")->save("test.xbm")'
+
+=head1 DESCRIPTION
+
+This class module provides basic load, manipulate and save functionality for
+the xbm file format. It inherits from C<Image::Base> which provides additional
+manipulation functionality, e.g. C<new_from_image()>. See the C<Image::Base>
+pod for information on adding your own functionality to all the C<Image::Base>
+derived classes.
+
+=head2 new()
+
+    my $i = Image::Xbm->new( -file => 'test.xbm' ) ;
+    my $j = Image::Xbm->new( -width => 12, -height => 18 ) ;
+    my $k = $i->new ;
+
+We can create a new xbm image by reading in a file, or by creating an image
+from scratch (all the bits are unset by default), or by copying an image
+object that we created earlier.
+
+If we set C<-file> then all the other arguments are ignored (since they're
+taken from the file). If we don't specify a file, C<-width> and C<-height> are
+mandatory.
+
+=over
+
+=item C<-file>
+
+The name of the file to read when creating the image. May contain a full path.
+This is also the default name used for C<load>ing and C<save>ing, though it
+can be overridden when you load or save.
+
+=item C<-width>
+
+The width of the image; taken from the file or set when the object is created;
+read-only.
+
+=item C<-height>
+
+The height of the image; taken from the file or set when the object is created;
+read-only.
+
+=item C<-hotx>
+
+The x-coord of the image's hotspot; taken from the file or set when the object
+is created. Set to -1 if there is no hotspot.
+
+=item C<-hoty>
+
+The y-coord of the image's hotspot; taken from the file or set when the object
+is created. Set to -1 if there is no hotspot.
+
+=item C<-bits>
+
+The bit vector that stores the image; read-only.
+
+=back
+
+=head2 new_from_string()
+
+    my $p = Image::Xbm->new_from_string( "###\n#-#\n###" ) ;
+    my $q = $p->new_from_string( "H##", "#-#", "###" ) ;
+    my $r = $p->new_from_string( $p->as_string ) ;
+
+Create a new bitmap from a string or from an array or list of strings. If you
+want to use different characters you can:
+
+    Image::Xbm->set( -setch => 'X', -unsetch => ' ' ) ;
+    my $s = $p->new_from_string( "XXX", "X X", "XhX" ) ;
+
+You can also specify a hotspot by making one of the characters a 'H' (set bit
+hotspot) or 'h' (unset bit hotspot) -- you can use different characters by
+setting C<-sethotch> and C<-unsethotch> respectively.
+
+=head2 new_from_serialised()
+
+    my $i = Image::Xbm->new_from_serialised( $s ) ;
+
+Creates an image from a string created with the C<serialse()> method. Since
+such strings are a little more compressed than xbm files or Image::Xbm objects
+they might be useful if storing a lot of bitmaps, or for transferring bitmaps
+over comms links.
+
+=head2 serialise()
+
+    my $s = $i->serialise ;
+
+Creates a string version of the image which can be completed recreated using
+the C<new_from_serialised> method.
+
+=head2 get()
+    
+    my $width = $i->get( -width ) ;
+    my( $hotx, $hoty ) = $i->get( -hotx, -hoty ) ;
+
+Get any of the object's attributes. Multiple attributes may be requested in a
+single call.
+
+See C<xy> and C<vec> to get/set bits of the image itself.
+
+=head2 set()
+
+    $i->set( -hotx => 120, -hoty => 32 ) ;
+
+Set any of the object's attributes. Multiple attributes may be set in a single
+call. Except for C<-setch> and C<-unsetch> all attributes are object
+attributes; some attributes are read-only.
+
+See C<xy> and C<vec> to get/set bits of the image itself.
+
+=head2 class attributes
+
+    Image::Xbm->set( -setch => 'X' ) ;
+    $i->set( -setch => '@', -unsetch => '*' ) ;
+
+=over
+
+=item C<-setch>
+
+The character to print set bits as when using C<as_string>, default is '#'.
+This is a class attribute accessible from the class or an object via C<get>
+and C<set>.
+
+=item C<-unsetch>
+
+The character to print set bits as when using C<as_string>, default is '-'.
+This is a class attribute accessible from the class or an object via C<get>
+and C<set>.
+
+=item C<-sethotch>
+
+The character to print set bits as when using C<as_string>, default is 'H'.
+This is a class attribute accessible from the class or an object via C<get>
+and C<set>.
+
+=item C<-unsethotch>
+
+The character to print set bits as when using C<as_string>, default is 'h'.
+This is a class attribute accessible from the class or an object via C<get>
+and C<set>.
+
+=back
+
+=head2 xybit()
+
+    $i->xy( 4, 11, 1 ) ;      # Set the bit at point 4,11
+    my $v = $i->xy( 9, 17 ) ; # Get the bit at point 9,17
+
+Get/set bits using x, y coordinates; coordinates start at 0.
+
+=head2 xy()
+
+    $i->xy( 4, 11, 'black' ) ;  # Set the bit from a colour at point 4,11
+    my $v = $i->xy( 9, 17 ) ;   # Get the bit as a colour at point 9,17
+
+Get/set bits using colours using x, y coordinates; coordinates start at 0.
+
+If set with a colour of 'black' or a numeric value > 0 or a string not
+matching /^#0+$/ then the bit will be set, otherwise it will be cleared.
+
+If you get a colour you will always get 'black' or 'white'.
+
+=head2 vec()
+
+    $i->vec( 43, 0 ) ;      # Unset the bit at offset 43
+    my $v = $i->vec( 87 ) ; # Get the bit at offset 87
+
+Get/set bits using vector offsets; offsets start at 0.
+
+=head2 load()
+
+    $i->load ;
+    $i->load( 'test.xbm' ) ;
+
+Load the image whose name is given, or if none is given load the image whose
+name is in the C<-file> attribute.
+
+=head2 save()
+
+    $i->save ;
+    $i->save( 'test.xbm' ) ;
+
+Save the image using the name given, or if none is given save the image using
+the name in the C<-file> attribute. The image is saved in xbm format, e.g.
+
+    #define test_width 6
+    #define test_height 6
+    static unsigned char test_bits[] = {
+     0x1f, 0x07, 0x07, 0x09, 0x11, 0x20 } ;
+
+=head2 is_equal()
+
+    print "equal\n" if $i->is_equal( $j ) ;
+
+Returns true (1) if the images are equal, false (0) otherwise. Note that
+hotspots and filenames are ignored, so we compare width, height and the actual
+bits only.
+
+=head2 as_string()
+
+    print $i->as_string ;
+
+Returns the image as a string, e.g.
+
+    #####-
+    ###---
+    ###---
+    #--#--
+    #---#-
+    -----#
+
+The characters used may be changed by C<set>ting the C<-setch> and C<-unsetch>
+characters. If you give C<as_string> a parameter it will print out the hotspot
+if present using C<-sethotch> or C<-unsethotch> as appropriate, e.g.
+
+    print $n->as_string( 1 ) ;
+
+    H##
+    #-#
+    ###
+
+=head2 as_binstring()
+
+    print $i->as_binstring ;
+
+Returns the image as a string of 0's and 1's, e.g.
+
+    1111101110001110001001001000100000010000
+
+=head1 CHANGES
+
+2016/02/23 (Slaven Rezic)
+
+Make sure macro/variable names are always sane.
+
+More strict parsing of bits.
+
+
+2000/11/09
+
+Added Jerrad Pierce's patch to allow load() to accept filehandles or strings;
+will document in next release.
+
+
+2000/05/05
+
+Added new_from_serialised() and serialise() methods.
+
+
+2000/05/04
+
+Made xy() compatible with Image::Base, use xybit() for the earlier
+functionality.
+
+
+2000/05/01
+
+Improved speed of vec(), xy() and as_string().
+
+Tried use integer to improve speed but according to Benchmark it made the code
+slower so I dropped it; interestingly perl 5.6.0 was around 25% slower than
+perl 5.004 with and without use integer.
+
+
+2000/04/30 
+
+Created. 
+
+
+=head1 AUTHOR
+
+Mark Summerfield. I can be contacted as <summer@perlpress.com> -
+please include the word 'xbm' in the subject line.
+
+=head1 COPYRIGHT
+
+Copyright (c) Mark Summerfield 2000. All Rights Reserved.
+
+This module may be used/distributed/modified under the LGPL. 
+
+=cut
+

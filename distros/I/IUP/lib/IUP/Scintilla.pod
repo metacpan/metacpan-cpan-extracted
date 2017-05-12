@@ -1,0 +1,1332 @@
+=for comment based on iup-3.11 - http://www.tecgraf.puc-rio.br/iup/en/ctrl/iup_scintilla.html
+
+=head1 NAME
+
+IUP::Scintilla - [GUI element] multiline source code text editor (based on Scintilla library)
+
+=head1 DESCRIPTION
+
+Creates a multiline source code text editor that uses the Scintilla
+library.
+
+Scintilla is a free library that provides text-editing functions, with
+an emphasis on advanced features for source code editing. It is available
+on L<http://www.scintilla.org|http://www.scintilla.org>.
+
+L<IUP::Scintilla> includes the Scintilla 3.4.4 source code, so no
+external references are needed.
+
+Supported in Windows and in the systems the GTK driver is supported.
+
+=head1 USAGE
+
+=head2 CREATION - new() method
+
+ $fill = IUP::Scintilla->new( EXPAND=>'YES' );
+ 
+B<Returns:> the identifier of the created element, or C<undef> if an error occurs.
+
+NOTE: You can pass to C<new()> other C<ATTRIBUTE=E<gt>'value'> or C<CALLBACKNAME=E<gt>\&func> pairs relevant
+to this element - see L<IUP::Manual::02_Elements|IUP::Manual::02_Elements/"new()">.
+
+=head2 ATTRIBUTES
+
+For more info about concept of attributes (setting/getting values etc.)
+see L<IUP::Manual::03_Attributes|IUP::Manual::03_Attributes>. Attributes specific to this element:
+
+=head3 General
+
+=over
+
+=item * B<BORDER> (creation only)
+
+Shows a border around the text. Default: "YES".
+
+=item * B<CANFOCUS> (creation only) (non inheritable)
+
+enables the focus traversal of the control. In Windows the control will still get the
+focus when clicked. Default: YES.
+
+=item * B<CLIPBOARD> (non inheritable)
+
+clear, cut, copy or paste the selection
+to or from the clipboard. Values: "CLEAR", "CUT", "COPY", "PASTE".
+Returns Yes or No, if data can be pasted from the clipboard.
+
+=item * B<CURSOR> (non inheritable)
+
+defines the cursor type. Can be: "NORMAL"
+or "WAIT" (displays a wait cursor when the mouse is over or owned by the control).
+
+=item * B<DROPFILESTARGET> [Windows and GTK Only] (non inheritable)
+
+Enable or disable the drop of files. Default: NO, but if DROPFILES_CB is defined
+when the element is mapped then it will be automatically enabled.
+
+=item * B<KEYSUNICODE> [Windows Only] (non inheritable)
+
+allow processing of Unicode typed characters. Default: NO. (since 3.9)
+
+=item * B<OVERWRITE> (non inheritable)
+
+turns the overwrite mode ON or OFF.
+When enabled, each typed character replaces the character to the right
+of the text caret. When disabled, characters are inserted at the caret.
+
+=item * B<READONLY> (non inheritable)
+
+Allows the user only to read the
+contents, without changing it. Restricts the insertion using keyboard
+input and attributes. Navigation keys are still available. 
+Possible values: "YES" and "NO". Default: NO.
+
+=item * B<SAVEDSTATE> (non inheritable)
+
+sets the current state of
+the document to saved (given value is ignored), returns Yes or No if
+the document has been modified. After setting the SAVEDSTATE, when
+editing is done the L<SAVEPOINT_CB> callback is called
+with status=0. When undo is performed back to the point were the saved
+state was set the callback is called again with status=1.
+
+=item * L<SIZE|IUP::Manual::03_Attributes/SIZE> (non inheritable)
+
+Since the contents
+can be changed by the user, the B<Natural> B<Size> is not affected by
+the text contents. In IUP 2.x the B<Natural> B<Size> was defined by the
+number of lines in the text and the with of the largest line. For IUP
+3, use VISIBLECOLUMNS and VISIBLELINES to control the B<Natural Size>.
+
+=item * B<USEPOPUP> (non inheritable)
+
+allows to disable the default editing
+menu shown when the user clicks with the right button. Default: Yes.
+
+=item * B<VISIBLECOLUMNS>
+
+Defines the number of visible columns for the
+B<Natural Size>, this means that will act also as minimum number of
+visible columns. It uses a wider character size then the one used for
+the SIZE attribute so strings will fit better without the need of extra
+columns. As for SIZE you can set to NULL after map to use it as an
+initial value. 
+
+Default: 50.
+
+=item * B<VISIBLELINES>
+
+Defines the number of visible lines for the B<Natural Size>, this means that will act also as minimum number of visible
+lines. As for SIZE you can set to NULL after map to use it as an initial value. 
+
+Default: 10.
+
+=item * B<VISIBLELINESCOUNT> (non inheritable, read-only)
+
+returns the number of actual visible lines.
+
+=item * B<WORDWRAP> (non inheritable)
+
+If enabled will force a word wrap of
+lines that are greater than the with of the control, and the horizontal
+scrollbar will be removed. Default: NO.
+
+=item * B<WORDWRAPVISUALFLAGS> (non inheritable)
+
+enable the drawing of visual
+flags to indicate a line is wrapped. Can be: MARGIN (at the line number
+margin), START (start of wrapped line), END (end of wrapped line) or
+NONE. Default: NONE.
+
+=back
+
+=head3 Text Retrieval and Modification
+
+=over
+
+=item * B<APPEND> (non inheritable, write-only)
+
+Inserts a text at the B<end>
+of the current text. If APPENDNEWLINE=YES, a "\n" character will be
+automatically inserted before the appended text if the current text is
+not empty (APPENDNEWLINE default is YES).
+
+=item * B<CHAR(id)> (non inheritable, read-only)
+
+returns the character at a
+given position, considering the "id" as the position.
+
+=item * B<CLEARALL> (non inheritable, write-only)
+
+deletes all the text (unless
+the document is read-only).
+
+=item * B<COUNT> (non inheritable, read-only)
+
+returns the number of characters
+in the text.
+
+=item * B<DELETERANGE> (non inheritable, write-only)
+
+Deletes a range of text
+in the document. It uses a string format "B<pos,len>" in order to
+indicate the start position and text length to delete.
+
+=item * B<INSERT(id)> (non inheritable, write-only)
+
+Inserts a text string at
+position "id" or at the current position if pos is -1 or omitted. If
+the current position is after the insertion point then it is moved
+along with its surrounding text but no scrolling is performed.
+
+=item * B<LINE(id)> (non inheritable, read-only)
+
+returns the text of the
+line, considering the "id" as the line number. It does not include the
+"\n" character. Number lines starts at 0.
+
+=item * B<LINECOUNT> (non inheritable, read-only)
+
+returns the number of lines
+in the text.
+
+=item * B<LINEVALUE> (non inheritable, read-only)
+
+returns the text of the line
+where the caret is. It does not include the "\n" character.
+
+=item * B<PREPEND> (non inheritable, write-only)
+
+Inserts a text at the
+=item * B<begin> of the current text. If APPENDNEWLINE=YES, a "\n" character
+will be automatically inserted after the prepended text if the current
+text is not empty (APPENDNEWLINE default is YES).
+
+=item * B<VALUE> (non inheritable)
+
+Text entered by the user. The "\n"
+character indicates a new line. After the element is mapped and if
+there is no text will return the empty string "". This replaces all the
+text in the document with the zero terminated text string you pass in.
+
+=back
+
+=head3 Annotation
+
+=over
+
+=item * B<ANNOTATIONTEXT(id)> (non inheritable)
+
+defines and returns an
+annotation displayed underneath a specific line, considering the "id"
+as the line number. An annotation may consist of multiple lines
+separated by '\n'.
+
+=item * B<ANNOTATIONSTYLE(id)> (non inheritable)
+
+sets and gets a
+particular style to the annotation, considering the "id" as the line
+number.
+
+=item * B<ANNOTATIONSTYLEOFFSET> (non inheritable)
+
+sets and gets a style
+offset, in order to separate standard text styles from annotation
+styles.
+
+=item * B<ANNOTATIONVISIBLE> (non inheritable)
+
+enable or disable annotations.
+Can be "HIDDEN" (not displayed), "STANDARD" (displayed) or "BOXED"
+(displayed and surrounded by a box). Default HIDDEN.
+
+=item * B<ANNOTATIONCLEARALL> (non inheritable, write-only)
+
+deletes all
+annotations.
+
+=back
+
+=head3 Auto-Completion (since 3.10)
+
+=over
+
+=item * B<AUTOCSHOW(id)> (non inheritable, write only)
+
+causes a list of
+words to be displayed. The words are separated by a space. "id" defines
+the number of characters of the word already entered by user.
+
+=item * B<AUTOCCANCEL> (non inheritable, write only)
+
+cancels any displayed
+auto-completion list. When in auto-completion mode, the list should
+disappear when the user types a character that can not be part of the
+auto-completion.
+
+=item * B<AUTOCACTIVE> (non inheritable, read only)
+
+returns YES if there is an
+active auto-completion list and NO if there is not.
+
+=item * B<AUTOCPOSSTART> (non inheritable, read only)
+
+returns the current
+position when the list of words started to be shown.
+
+=item * B<AUTOCCOMPLETE> (non inheritable, write only)
+
+triggers
+auto-completion. This has the same effect as the tab key.
+
+=item * B<AUTOCSELECT> (non inheritable, write only)
+
+selects an item in the
+auto-completion list. It searches in the list of words for the first
+that matches of value (comparisons are case sensitive). If the item is
+not found, no item is selected.
+
+=item * B<AUTOCSELECTEDINDEX> (non inheritable, read only)
+
+retrieves the
+current selection index, set by AUTOCSELECT attribute.
+
+=item * B<AUTOCDROPRESTOFWORD> (non inheritable)
+
+when an item is selected, any
+word characters following the caret are first erased if this attribute
+is set YES. The default is NO.
+
+=item * B<AUTOCMAXHEIGHT> (non inheritable)
+
+sets and gets the maximum number
+of rows that will be visible in an auto-completion list. If there are
+more rows in the list, then a vertical scrollbar is shown. The default
+is 5.
+
+=item * B<AUTOCMAXWIDTH> (non inheritable)
+
+the maximum width of an
+auto-completion list expressed as the number of characters in the
+longest item that will be totally visible. The default is 0 (in this
+case, the list width is calculated to fit the item with the most
+characters).
+
+=back
+
+=head3 Brace Highlighting
+
+=over
+
+=item * B<BRACEHIGHLIGHT> (non inheritable, write only)
+
+highlights the brace,
+defined by its initial and final positions (format: "B<pos1>:B<pos2>").
+Up to two characters can be highlighted in a 'brace highlighting
+style', which is defined as style number (See L<Style
+Definition|#StyleDefinition>, id = 34).
+
+=item * B<BRACEBADLIGHT> (non inheritable, write only)
+
+highlights the non
+matching brace, based on a position. If there is no matching brace then
+the brace badlighting style (See L<Style Definition|#StyleDefinition>,
+id = 35) can be used to show the brace that is unmatched. Set -1 as
+position removes the highlight.
+
+=item * B<BRACEMATCH(id)> (non inheritable, read only)
+
+finds a corresponding
+matching brace given id, the position of one brace. The brace
+characters handled are '(', ')', '[', ']', '{', '}', 'E<lt>', and
+'E<gt>'. If the character at position is not a brace character, or a
+matching brace cannot be found, the return value is -1.
+
+=back
+
+=head3 Caret and Selection
+
+=over
+
+=item * B<CARET> (non inheritable)
+
+Position of the insertion point.
+The first position, B<lin> or B<col>, is "0". It uses a string format
+"B<lin>,B<col>" in order to indicate the caret position, where B<lin>
+and B<col> must be integer numbers.
+
+When B<lin> is greater than the number of lines, the caret is placed at
+the last line. When B<col> is greater than the number of characters in
+the given line, the caret is placed after the last character of the
+line.
+
+If the caret is not visible the text is scrolled to make it visible.
+
+=item * B<CARETPOS> (non inheritable)
+
+Position of the insertion
+point using a zero based character unique index "pos". Useful for
+indexing the VALUE string. This removes any selection, sets the caret
+at pos and scrolls the view to make the caret visible, if necessary.
+
+=item * B<CARETTOVIEW> (non inheritable, write only)
+
+Moves the caret to the
+nearest visible line. Any selection is lost.
+
+=item * B<SELECTEDTEXT> (non inheritable)
+
+Selection text. Returns NULL if
+there is no selection. When changed replaces the current selection.
+Similar to INSERT, but does nothing if there is no selection.
+
+=item * B<SELECTION> (non inheritable)
+
+Selection interval. Returns NULL if
+there is no selection. The first position, B<lin> or B<col>, is "0".
+The accepted format is represented by the string
+"B<lin1>,B<col1>:B<lin2>,B<col2>", where B<lin1>, B<col1>, B<lin2> and
+=item * B<col2> are integer numbers corresponding to the selection's interval.
+B<col2> correspond to the character after the last selected character.
+The values ALL and NONE are also accepted.
+
+B<SELECTIONPOS> (non inheritable)
+
+Same as SELECTION but using a zero
+based character index "B<pos1>:B<pos2>". Useful for indexing the VALUE
+string. The values ALL and NONE are also accepted.
+
+=back
+
+=head3 Folding
+
+=over
+
+=item * B<FOLDFLAGS> (non inheritable, write-only)
+
+determines how folding
+lines are drawn. Can be: "LEVELNUMBERS", "LINEBEFORE_EXPANDED",
+"LINEBEFORE_CONTRACTED", "LINEAFTER_EXPANDED" or "LINEAFTER_CONTRACTED
+" (default).
+
+=item * B<FOLDLEVEL(id)> (non inheritable)
+
+sets and gets the fold level of a
+"id" line. Can be: "WHITEFLAG", "HEADERFLAG", "NUMBERMASK" or "BASE"
+(default). If you use a Lexer, it is not recommend to set the fold
+level (this is far better handled by the Lexer). By contrast, get fold
+level is useful to decide how to handle user folding requests.
+
+=item * B<FOLDTOGGLE> (non inheritable, write-only)
+
+Determines if the fold
+point (line number) may be either expanded, displaying all its child
+lines, or contracted, hiding all the child lines.
+
+=back
+
+=head3 Lexer
+
+=over
+
+=item * B<KEYWORD(id)> (non inheritable, write-only)
+
+keyword list used by the
+current Lexer. Until 9 lists of keywords can set up using id from 0 to
+8. The value is a list of keywords separated by spaces, tabs, "\n" or
+"\r" or any combination of these.
+
+=item * B<KEYWORDSETS> (non inheritable, read only)
+
+returns a description of
+all of the keyword sets separated by "\n".
+
+=item * B<LEXERLANGUAGE> (non inheritable)
+
+associate the Lexer language name.
+It is case sensitive. Default: not defined. Set to NULL to clear the
+association. Can be: any name supported by Scintilla. For instance:
+asm, bash, freebasic, cmake, COBOL, cpp (C++), css, d, diff, eiffel,
+fortran, hypertext (HTML), xml, lisp, lua (Lua), makefile, matlab,
+mysql, nsis, pascal, perl, python, ruby, smalltalk, sql, tcl, tex, vb
+(Visual Basic), and many others.
+
+=item * B<LOADLEXERLIBRARY> (non inheritable, write-only)
+
+Load a Lexer
+implemented in a dynamic library given the library file name. This is a
+.so file on GTK+/Linux or a .DLL file on Windows. (since 3.11)
+
+=item * B<PROPERTY> (non inheritable)
+
+sets and gets Lexer properties using
+"name=value" string pairs, where name is case sensitive and value is
+the associated string. There is no limit to the number of keyword pairs
+you can set, other than available memory. To retrieve a property first
+set the PROPERTYNAME attribute, the PROPERTY attribute will return its
+value.
+
+=item * B<PROPERTYNAMES> (non inheritable, read only)
+
+returns a list of
+property names separated by "\n". If the Lexer does not support this
+information then an empty string is returned.
+
+=back
+
+=head3 Margins
+
+=over
+
+=item * B<MARGINMASKFOLDERS(id)> (non inheritable)
+
+defines if a margin is
+folding or non-folding. Can be: Yes or No.
+
+=item * B<MARGINSENSITIVE(id)> (non inheritable)
+
+determines if a margin is
+sensitive or not. Margins that are not sensitive act as selection
+margins which make it easy to select ranges of lines. By default, all
+margins are insensitive. Can be: YES or NO.
+
+=item * B<MARGINTYPE(id)> (non inheritable)
+
+set and get the type of a margin.
+The margin argument should be 0, 1, 2, 3 or 4. Each margin can be set
+to display only symbols, line numbers, or text. You can use the
+predefined values "SYMBOL", "NUMBER", "TEXT", "RTEXT" (right justify
+text), "BACKGROUND" or "FOREGROUND" (the latter two used for symbol
+margins that set their background or foreground using the style default
+colors).
+
+=item * B<MARGINWIDTH(id)> (non inheritable)
+
+width of a margin in pixels
+(Default value: 0). A margin with width=0 is invisible. The margins are
+numbered 0 to 4. By default, Scintilla margin 0 is set to display line
+numbers, margin 1 is set to display non-folding symbols, and margin 2
+is set to display folding symbols. Margins 3 and 4 are free for user
+default. However, you can set the margins to be whatever you wish using
+MARGINTYPEid.
+
+=item * B<MARGINLEFT> (non inheritable)
+
+size of the blank margin on the left
+side. Default: 1.
+
+=item * B<MARGINRIGHT> (non inheritable)
+
+size of the blank margin on the right
+side. Default: 1.
+
+=item * B<MARGINTEXT(id)> (non inheritable)
+
+controls the text of each line of
+a text margin. id is the line number.
+
+=item * B<MARGINTEXTSTYLE(id)> (non inheritable)
+
+controls the style of the
+text of each line of a text margin. id is the line number.
+
+=item * B<MARGINTEXTCLEARALL> (non inheritable, write-only)
+
+clear all text and
+styles of a text margin.
+
+=item * B<MARGINCURSOR(id)> (non inheritable)
+
+set and get the arrow cursor
+normally shown over margins. Can be: "REVERSEARROW" (default) or
+"ARROW".
+
+=back
+
+=head3 Markers
+
+=over
+
+=item * B<MARKERDEFINE> (non inheritable, write-only)
+
+Defines a marker using
+its number and its symbol. Format: "number=symbol".
+
+=item * B<Marker numbers>
+
+can be a number in the range 0 to 31, or the
+pre-defined names: "FOLDEREND", "FOLDEROPENMID", "FOLDERMIDTAIL",
+"FOLDERSUB", "FOLDER" and "FOLDEROPEN".
+
+=item * B<Marker symbols:> (see MARKERSYMBOL).
+
+=item * B<MARKERSYMBOL(id)> (non inheritable)
+
+Defines a marker symbol given
+its number. id can be from 0 to 31.
+
+=item * B<Marker symbols:> "CIRCLE", "ROUNDRECT", "ARROW", "SMALLRECT",
+"SHORTARROW", "EMPTY", "ARROWDOWN", "MINUS", "PLUS", "VLINE",
+"LCORNER", "TCORNER", "BOXPLUS", "BOXPLUSCONNECTED", "BOXMINUS",
+"BOXMINUSCONNECTED", "LCORNERCURVE", "TCORNERCURVE", "CIRCLEPLUS",
+"CIRCLEPLUSCONNECTED", "CIRCLEMINUS", "CIRCLEMINUSCONNECTED",
+"BACKGROUND" (line background color), "DOTDOTDOT", "ARROWS", "FULLRECT"
+(margin background color), "LEFTRECT", "UNDERLINE" (underline across
+the line), "RGBAIMAGE" and "CHARACTER+c" (where c is an ASCii character
+code).
+
+=item * B<MARKERFGCOLOR(id)> (non inheritable, write only)
+
+defines the
+foreground color of a marker number (id). Values in RGB format ("r g
+b").
+
+=item * B<MARKERBGCOLOR(id)> (non inheritable, write only)
+
+defines the
+background color of a marker number (id). Values in RGB format ("r g
+b").
+
+=item * B<MARKERBGCOLORSEL(id)> (non inheritable, write only)
+
+defines the
+highlight background colour of a marker number (id) when its folding
+block is selected. Values in RGB format ("r g b").
+
+=item * B<MARKERALPHA(id)> (non inheritable, write only)
+
+defines the alpha
+value of a marker number (id). Markers may be drawn translucently when
+there are no margins.
+
+=item * B<MARKERRGBAIMAGE(id)> (non inheritable, write only)
+
+defines the
+image name to be used on a marker number. Use
+=item * L<IUP::SetHandle|IUP::SetHandle> or
+L<IUP::SetAttributeHandle|IUP::SetAttributeHandle> to
+associate an image to a name. See also
+L<IUP::Image|IUP::Image>. It must be an image created with the
+L<IUP::ImageRGBA|IUP::ImageRGBA> constructor, it can not be a image loaded from stock or
+resources.
+
+B<MARKERRGBAIMAGESCALE >(non inheritable, write only)
+
+defines the
+image scale factor, in percent (1-100).
+
+=item * B<MARKERHIGHLIGHT> (non inheritable)
+
+enable or disable the the
+highlight folding block when it is selected. (i.e. block that contains
+the caret). Can be Yes or No. Default: No.
+
+=item * B<MARKERADD(id)> (non inheritable, write-only)
+
+adds marker number to
+a line (id). Internally, sets the marker handle number
+(LASTMARKERADDHANDLE attribute) that identifies the added marker (or -1
+for invalid line and out of memory), which may be useful to find where
+a marker is after moving or combining lines removes markers of the
+given number from all lines. If marker number is -1, it deletes all
+markers from all lines.
+
+=item * B<MARKERDELETE(id)> (non inheritable, write-only)
+
+deletes marker
+number given a line number (id). If marker number is -1, all markers
+are deleted from the line.
+
+=item * B<MARKERDELETEALL> (non inheritable, write-only)
+
+removes markers of
+the given number from all lines. If marker number is -1, it deletes all
+markers from all lines.
+
+=item * B<MARKERGET(id)> (non inheritable, read-only)
+
+returns a 32-bit
+integer that indicates which markers were present on the line (id). Bit
+0 is set if marker 0 is present, bit 1 for marker 1 and so on.
+
+=item * B<MARKERNEXT(id)> (non inheritable, write-only)
+
+searches a given
+marker number, starting at line number (id) and continuing forwards to
+the end of the file. Internally, sets the the line number of the first
+line that contains the marker (LASTMARKERFOUND attribute) or -1, if no
+marker is found.
+
+=item * B<MARKERPREVIOUS(id)> (non inheritable, write-only)
+
+searches a given
+marker number, starting at line number (id) and continuing backwards to
+the start of the file. Internally, sets the the line number of the
+first line that contains the marker (LASTMARKERFOUND attribute) or -1,
+if no marker is found.
+
+=item * B<MARKERLINEFROMHANDLE(id)> (non inheritable, read-only)
+
+searches the
+document for the marker given its handle returned in MARKERADDid (use
+the LASTMARKERADDHANDLE as attribute value) and returns the line number
+of the first line that contains the marker or -1, if no marker is
+found.
+
+=item * B<MARKERDELETEHANDLE> (non inheritable, write-only)
+
+searches the
+document for the marker with this handle (use the LASTMARKERADDHANDLE
+as attribute value) and deletes the marker if it is found.
+
+=item * B<LASTMARKERADDHANDLE> (non inheritable, read-only)
+
+returns the last
+marker handle set by the MARKERADDid attribute.
+
+=item * B<LASTMARKERFOUND> (non inheritable, read-only)
+
+returns the last line
+number that contains a marker found by the MARKERNEXTid,
+MARKERPREVIOUSid or MARKERLINEFROMHANDLE attributes.
+
+=back
+
+=head3 Scrolling
+
+=over
+
+=item * B<SCROLLBAR> (creation only)
+
+Associates an automatic horizontal and/or
+vertical scrollbar. Can be: "VERTICAL", "HORIZONTAL", "YES" (both) or
+"NO" (none). Default: "YES". For all systems, when SCROLLBAR is NO, the
+natural size will always include its size even if the native system
+hides the scrollbar.
+
+=item * B<SCROLLTO> (non inheritable, write only)
+
+Scroll the text to make the
+given position visible. It uses the same format and reference of the
+=item * L<CARET|#CARET> attribute ("lin,col" or "col" starting at 0).
+
+B<SCROLLTOCARET> (non inheritable, write only)
+
+Scroll the text to make
+the caret position visible.
+
+=item * B<SCROLLTOPOS> (non inheritable, write only)
+
+Scroll the text to make
+the given position visible. It uses the same format and reference of
+the L<CARETPOS|#CARETPOS> attribute ("pos" starting at 0).
+
+=item * B<SCROLLWIDTH> (non inheritable)
+
+controls the document width in
+pixels. Default: 2000.
+
+=back
+
+=head3 Search and Replace (since 3.10)
+
+=over
+
+=item * B<SEARCHINTARGET> (non inheritable, write only)
+
+This searches for the
+first occurrence of a text string in the target defined by TARGETSTART
+and TARGETEND. If the search succeeds, the target is set to the found
+text.
+
+=item * B<SEARCHFLAGS> (non inheritable)
+
+sets and gets the search flags used
+in SEARCHINTARGET attribute. Possible values: MATCHCASE, WHOLEWORD,
+WORDSTART, REGEXP and POSIX. The flag options are combined using "|" as
+separators. Use NULL to reset all flags.
+
+=item * B<TARGETSTART> (non inheritable)
+
+sets and gets the start of target.
+When searching in non-regular expression mode, you can set TARGETSTART
+greater than TARGETEND to find the last matching text in the target
+rather than the first matching text. If set 0, target start will be 1
+(first position of text).
+
+=item * B<TARGETEND> (non inheritable)
+
+sets and gets the end of target. If set
+0, target end will be the last position of text.
+
+=item * B<TARGETFROMSELECTION> (non inheritable, write only)
+
+set the target
+start and end from current position of the selection.
+
+=item * B<REPLACETARGET> (non inheritable, write only)
+
+replaces the target
+text. After replacement, the target range refers to the replacement
+text.
+
+=back
+
+=head3 Style Definition (See L<Style Definition|#StyleDefinition>)
+
+=over
+
+=item * L<BGCOLOR|IUP::Manual::03_Attributes/BGCOLOR>
+
+Background color of the text.
+Default: the global attribute TXTBGCOLOR. If changed it will affect the
+default style.
+
+=item * L<FGCOLOR|IUP::Manual::03_Attributes/FGCOLOR>
+
+Text color. Default: the global
+attribute TXTFGCOLOR. If changed it will affect the default style.
+
+=item * L<FONT|IUP::Manual::03_Attributes/FONT>
+
+the text font. Default: the global
+attribute DEFAULTFONT. If changed it will affect the default style.
+
+=item * B<STYLEBGCOLOR(id)> (non inheritable)
+
+background color for a style
+(See L<Style Definition|#StyleDefinition>). Values in RGB format ("r g
+b").
+
+=item * B<STYLEBOLD(id)> (non inheritable)
+
+the boldness of a font (See Style Definition).
+
+=item * B<STYLECASE(id)> (non inheritable)
+
+determines how text is displayed
+(See L<Style Definition|#StyleDefinition>). Values: LOWERCASE,
+UPPERCASE or MIXED (default).
+
+=item * B<STYLECHARSET(id)> (non inheritable)
+
+sets and gets a style to use a
+different character set than the default (See L<Style
+Definition|#StyleDefinition>). Can be ANSI (default), EASTEUROPE,
+RUSSIAN, GB2312, HANGUL or SHIFTJIS.
+
+=item * B<STYLECLEARALL(id)> (non inheritable)
+
+sets all styles to have the
+same attributes as default global style (id = 32) (See L<Style
+Definition|#StyleDefinition>).
+
+=item * B<STYLEEOLFILLED(id)> (non inheritable)
+
+If the last character in the
+line has a style with this attribute set, the remainder of the line up
+to the right edge of the window is filled with the background color set
+for the last character (See L<Style Definition|#StyleDefinition>). Can
+be YES (italic) or NO.
+
+=item * B<STYLEFGCOLOR(id)> (non inheritable)
+
+foreground color for a style
+(See L<Style Definition|#StyleDefinition>). Values in RGB format ("r g
+b").
+
+=item * B<STYLEFONT(id)> (non inheritable)
+
+sets and gets the font name (See
+=item * L<Style Definition|#StyleDefinition>). Scintilla caches fonts by their
+names, but the cache is case sensitive.
+
+=item * B<STYLEFONTSIZE(id)> (non inheritable)
+
+sets and gets the font size
+(See L<Style Definition|#StyleDefinition>), using a integer number of
+points.
+
+=item * B<STYLEFONTSIZEFRAC(id)> (non inheritable)
+
+sets and gets the font
+size (See L<Style Definition|#StyleDefinition>), using a fractional
+point size in hundredths of a point. For example, a text size of 9.4
+points is set with value = 940.
+
+=item * B<STYLEHOTSPOT(id)> (non inheritable)
+
+used to mark ranges of text
+that can detect mouse clicks (See L<Style
+Definition|#StyleDefinition>). The cursor changes to a hand over
+hotspots, and the foreground, and background colors may change and an
+underline appear to indicate that these areas are sensitive to
+clicking. This may be used to allow hyperlinks to other documents.
+
+=item * B<STYLEITALIC(id)> (non inheritable)
+
+the italic style of a font (See
+=item * L<Style Definition|#StyleDefinition>). Can be YES (italic) or NO.
+
+=item * B<STYLERESET(id)> (non inheritable, write-only)
+
+Resets to the initial
+Scintilla style default (See L<Style Definition|#StyleDefinition>).
+
+=item * B<STYLEUNDERLINE(id)> (non inheritable)
+
+determines if the underline
+is drawn, using a foreground color (See L<Style
+Definition|#StyleDefinition>). Can be YES (underline) or NO.
+
+=item * B<STYLEVISIBLE(id)> (non inheritable)
+
+determines if the text is
+visible (YES) or hidden (NO) (See L<Style
+Definition|#StyleDefinition>).
+
+=item * B<STYLEWEIGHT(id)> (non inheritable)
+
+the weight of a font (See
+=item * L<Style Definition|#StyleDefinition>). Predefined values
+
+NORMAL,
+SEMIBOLD and BOLD. The weight can also be a number between 1 and 999
+with 1 being very light and 999 very heavy.
+
+=back
+
+=head3 Styling
+
+=over
+
+=item * B<CLEARDOCUMENTSTYLE> (non inheritable, write-only)
+
+clear all styling
+information and reset the folding state.
+
+=item * B<STARTSTYLING> (non inheritable, write only)
+
+prepares for styling by
+setting the styling position.
+
+=item * B<STYLING(id)> (non inheritable, write only)
+
+sets the style of given
+length characters starting at the styling position and then increases
+the styling position by length. id is the style.
+
+=back
+
+=head3 Tabs and Indentation Guides
+
+=over
+
+=item * B<TABSIZE> (non inheritable)
+
+Controls the number of characters for a
+tab stop. Default: 8.
+
+=item * B<INDENTATIONGUIDES> (non inheritable)
+
+dotted vertical lines that
+appear within indentation white space every indent size columns. Can
+be: NONE, REAL, LOOKFORWARD, LOOKBOTH. Default: NONE.
+
+=item * B<HIGHLIGHTGUIDE> (non inheritable)
+
+Highlights the indentation guide
+of a given column. When brace highlighting occurs, the indentation
+guide corresponding to the braces may be highlighted with the brace
+highlighting style (See L<Style Definition|#StyleDefinition>, id = 34).
+Set column to 0 to cancel this highlight.
+
+=item * B<USETABS> (non inheritable)
+
+Use tabs also for indentation or only
+spaces. Can be Yes or No. Default: Yes.
+
+=back
+
+=head3 Undo and Redo
+
+=over
+
+=item * B<REDO> (non inheritable)
+
+redo the last operation if set to Yes,
+clears the undo information otherwise. Returns Yes or No if redo can be
+performed.
+
+=item * B<UNDO> (non inheritable)
+
+undo the last operation if set to Yes,
+clears the undo information otherwise. Returns Yes or No if undo can be
+performed.
+
+=item * B<UNDOCOLLECT> (non inheritable)
+
+enable or disable the undo collect of
+information. Can be Yes or No. Default: Yes.
+
+=back
+
+=head3 White Space
+
+=over
+
+=item * B<EXTRAASCENT> (non inheritable)
+
+sets and gets the space to be added
+to the maximum ascent, in order to allow for more space between lines.
+Default: 0.
+
+=item * B<EXTRADESCENT> (non inheritable)
+
+sets and gets the space to be added
+to the maximum descent, in order to allow for more space between lines.
+Default: 0.
+
+=item * B<WHITESPACEVIEW> (non inheritable)
+
+sets and gets the white space
+display mode. The white spaces can be: "INVISIBLE" (shown as an empty
+background color), "VISIBLEALWAYS" (drawn as dots and arrows) or
+"VISIBLEAFTERINDENT" (white space used for indentation is displayed
+normally but after the first visible character, it is shown as dots and
+arrows). Default: INVISIBLE.
+
+=item * B<WHITESPACESIZE> (non inheritable)
+
+sets and gets the size of the dots
+used for mark space characters. Default: 1.
+
+=item * B<WHITESPACEFGCOLOR> (non inheritable, write only)
+
+defines the
+foreground color of visible white space. Values in RGB format ("r g
+b"). By default the color will be defined by the Lexer, but defining
+this attribute will overriding the Lexer definition. Set to NULL to
+reset the definition and use the Lexer again.
+
+=item * B<WHITESPACEBGCOLOR> (non inheritable, write only)
+
+defines the
+background color of visible white space. Values in RGB format ("r g
+b"). By default the color will be defined by the Lexer, but defining
+this attribute will overriding the Lexer definition. Set to NULL to
+reset the definition and use the Lexer again.
+
+=back
+
+=head3 Zooming
+
+=over
+
+=item * B<ZOOMIN> (non inheritable, write only)
+
+increases the zoom factor by
+one point if the current zoom factor is less than 20 points.
+
+=item * B<ZOOMOUT> (non inheritable, write only)
+
+decreases the zoom factor by
+one point if the current zoom factor is greater than -10 points.
+
+=item * B<ZOOM> (non inheritable)
+
+sets and gets the zoom factor directly.
+Limits: -10 points to zoom out and 20 points to zoom in.
+
+=back
+
+The following L<common attributes|IUP::Manual::03_Attributes/Common Attributes> are also accepted:
+
+=over
+
+=item * L<ACTIVE|IUP::Manual::03_Attributes/ACTIVE>,
+L<EXPAND|IUP::Manual::03_Attributes/EXPAND>,
+L<SCREENPOSITION|IUP::Manual::03_Attributes/SCREENPOSITION>,
+L<POSITION|IUP::Manual::03_Attributes/POSITION>,
+L<MINSIZE|IUP::Manual::03_Attributes/MINSIZE>,
+L<MAXSIZE|IUP::Manual::03_Attributes/MAXSIZE>, L<WID|IUP::Manual::03_Attributes/WID>,
+L<TIP|IUP::Manual::03_Attributes/TIP>,
+L<RASTERSIZE|IUP::Manual::03_Attributes/RASTERSIZE>,
+L<ZORDER|IUP::Manual::03_Attributes/ZORDER>,
+L<VISIBLE|IUP::Manual::03_Attributes/VISIBLE>
+
+=item * Drag E<amp> Drop attributes are supported.
+
+=back
+
+=head2 CALLBACKS
+
+For more info about concept of callbacks (setting callback handlers etc.)
+see L<IUP::Manual::04_Callbacks|IUP::Manual::04_Callbacks>. Callbacks specific to this element:
+
+=over
+
+=item * L<ACTION|IUP::Manual::04_Callbacks/ACTION>
+
+Action generated when the text is
+edited, but before its value is actually changed. Can be generated when
+using the keyboard, undo/redo system or from the clipboard.
+
+ XXXXXX-TODO: int function(Ihandle *ih, int insert, int pos, int length, char* text ); [in C]elem:action(insert: boolean, pos, length: number, text: string) -> (ret: number) [in Lua]
+
+B<$ih> - identifier of the element that activated the event.
+
+B<$insert> - =1 when text is inserted, =0 when text is deleted.
+
+B<$pos> - 0 based character position when change started.
+
+B<$length> - size of the change.
+
+B<$text> - the inserted text value. It is NULL when insert=0.
+
+=item * B<AUTOCSELECTION_CB>
+
+Action generated when the user has selected an
+item in an auto-completion list. It is sent before the selection is
+inserted. Automatic insertion can be cancelled by setting the B<
+AUTOCCANCEL> attribute before returning from the callback. (since
+3.10.1)
+
+ XXX-TODO: int function(Ihandle *ih, int pos, char* text ); [in C]elem:autocselection_cb(pos: number, text: string) -> (ret: number) [in Lua]
+
+B<$ih> - identifier of the element that activated the event.
+
+B<$pos> - 0 based character start position of the word being completed.
+
+B<$text> - the text of the selection.
+
+=item * B<AUTOCCANCELLED_CB>
+
+Called after the user has cancelled an
+auto-completion list. (since 3.10.1)
+
+ XXX-TODO: int function(Ihandle *ih); [in C]elem:autoccancelled_cb() -> (ret: number) [in Lua]
+
+B<$ih> - identifier of the element that activated the event.
+
+=item * B<AUTOCCHARDELETED_CB>
+
+Called after the user deleted a character while
+auto-completion list was active. (since 3.10.1)
+
+ XXX-TODO: int function(Ihandle *ih); [in C]elem:autocchardeleted_cb() -> (ret: number) [in Lua]
+
+B<$ih> - identifier of the element that activated the event.
+
+=item * L<BUTTON_CB|../call/iup_button_cb.html>
+
+Action generated when any
+mouse button is pressed or released. Use
+=back
+
+=item * L<IUP::ConvertXYToPos|IUP::ConvertXYToPos> to convert (x,y)
+coordinates in character positioning.
+
+=item * B<CARET_CB>
+
+Action generated when the caret/cursor position is
+changed.
+
+ XXX-TODO: int function(Ihandle *ih, int lin, int col, int pos); [in C]elem - caret_cb(lin, col, pos: number) -> (ret: number) [in Lua]
+
+B<$ih> - identifier of the element that activated the event.
+
+B<$lin, col> - line and column number (start at 0).
+
+B<$pos> - 0 based character position.
+
+=item * L<DROPFILES_CB|../call/iup_dropfiles_cb.html>
+
+Action generated when
+one or more files are dropped in the element.
+
+=item * B<HOTSPOTCLICK_CB>
+
+Action generated when the user clicks or double
+clicks on text that is in a style with the hotspot attribute set.
+
+ XXX-TODO: int function(Ihandle *ih, int pos, int lin, int col, char* status); [in C]elem:hotspotclick_cb(pos, lin, col: number, status: string) -> (ret: number) [in Lua]
+
+B<$ih> - identifier of the element that activated the event.
+
+B<$pos> - the character position in the document that corresponds to the
+hotspot click.
+
+B<$lin> - line in the document that corresponds to the hotspot click.
+
+B<$col> - column in the document that corresponds to the hotspot click.
+
+B<$status> - status of mouse buttons and certain keyboard keys at the
+moment the event was generated. The same macros used for
+
+=item * L<BUTTON_CB|../call/iup_button_cb.html> can be used for this status.
+
+=item * B<MARGINCLICK_CB>
+
+Action generated when the mouse button is clicked
+inside a margin that is marked as sensitive.
+
+ XXX-TODO: int function(Ihandle *ih, int margin, int lin, char* status); [in C]elem - marginclick_cb(margin, lin: number, status: string) -> (ret: number) [in Lua]
+
+B<$ih> - identifier of the element that activated the event.
+
+B<$margin> - the margin number that was clicked.
+
+B<$lin> - line in the document that corresponds to the margin click.
+
+B<$status> - status of mouse buttons and certain keyboard keys at the
+moment the event was generated. The same macros used for
+
+=item * L<BUTTON_CB>
+
+=item * L<MOTION_CB>
+
+Action generated when the
+mouse is moved. Use L<ConvertXYToPos|ConvertXYToPos>
+to convert (x,y) coordinates in character positioning.
+
+=item * B<SAVEPOINT_CB>
+
+Notifies the application that a save
+point was reached (1) or left (0). Can be used to controls whether to
+display a saved or modified document. To set the save point use the
+L<SAVEDSTATE> attribute.
+
+ XXX-TODO: int function(Ihandle *ih, int status); [in C]elem savepoint_cb(status - number) -> (ret: number) [in Lua]
+
+B<$ih> - identifier of the element that activated the event.ih> - identifier of the element that activated the event.
+
+B<$status> - can be 1 (reached) or 0 (left).
+
+=item * B<VALUECHANGED_CB>
+
+Called after the value was interactively changed by
+the user.
+
+ XXX-TODO: int function(Ihandle *ih); [in C]elem:valuechanged_cb() -> (ret: number) [in Lua]
+
+B<$ih> - identifier of the element that activated the event.
+
+=item * B<ZOOM_CB>
+
+Notifies the application when the user zooms the display
+using the keyboard or the ZOOM attribute. Can be used to recalculate
+positions, such as the width of the line number margin to maintain
+sizes in terms of characters rather than pixels.
+
+ XXX-TODO: int function(Ihandle *ih, int zoomInPoints); [in C]elem:zoom_cb(zoomInPoints: number) -> (ret: number) [in Lua]
+
+B<$ih> - identifier of the element that activated the event.ih> - identifier of the element that activated the event.
+
+B<$ih> - identifier of the element that activated the event.zoomInPoints> - the current zoom factor.
+
+=item * L<MAP_CB>, L<UNMAP_CB>, L<GETFOCUS_CB>, L<KILLFOCUS_CB>, L<ENTERWINDOW_CB>, L<LEAVEWINDOW_CB>, L<K_ANY>, L<HELP_CB>
+
+=item * L<Drag E<amp> Drop> callbacks are supported. See Notes bellow.
+
+=back
+
+=head3 Auxiliary Functions
+
+L<IUP::Text|IUP::Text> auxiliary functions C<TextConvertLinColToPos> and C<TextConvertPosToLinCol> can be used.
+
+=head3 Style Definition
+
+Scintilla can automatically format the text using the Lexer or the
+application can manually format the text. In both cases only 256
+different styles are available. Styles are numbered from 0 to 255,
+invalid IDs are simply ignored. When the id is not specified for an
+attributes the style 0 is assumed.
+
+Each Lexer will use the available styles with its own rules, but
+several Lexers share many ids. Notice that language keywords and styles
+definitions are not pre-defined internally, the application must define
+them.
+
+ ID      Global styles
+ ======  ==================================================================
+ 32      This style defines the attributes that all styles receive
+         when the STYLECLEARALL attribute is used.
+ 33      This style sets the attributes of the text used to display
+         line numbers in a line number margin.
+ 34      This style sets the attributes used when highlighting braces
+         with the BRACEHIGHLIGHT and HIGHLIGHTGUIDE attributes.
+ 35      This style sets the attributes used when marking an unmatched
+         brace with the BRACEBADLIGHT attribute.
+ 36      This style sets the font used when drawing control characters.
+ 37      This style sets the foreground and background colors used when
+         drawing the indentation guides. Used when INDENTATIONGUIDES!=NONE.
+
+Here are some known styles for C++ and Lua:
+
+ ID  C++ styles                                  Lua styles
+ ==  ==========================================  ==============================================
+ 0   Default style                               Default style
+ 1   C comment                                   Lua comment
+ 2   C++ comment line                            Lua comment line
+ 3   JavaDoc/ Doxygen style C comment            JavaDoc/ Doxygen style Lua comment
+ 4   Number                                      Number
+ 5   Keyword                                     Keyword
+ 6   String                                      String
+ 7   Character                                   Character
+ 8   IDL UUID                                    Literal string
+ 9   Preprocessor block                          Preprocessor block
+ 10  Operator                                    Operator
+ 11  Identifier                                  Identifier
+ 12  End of a line where a string is not closed  End of a line where a string is not closed
+ 13  C# verbatim string                          Keyword set number 2
+ 14  Regular expression                          Keyword set number 3
+ 15  JavaDoc/Doxygen style C++ comment line      Keyword set number 4
+ 16  Keyword set number 2                        Keyword set number 5
+ 17  JavaDoc/Doxygen keyword                     Keyword set number 6
+ 18  JavaDoc/Doxygen keyword error               Keyword set number 7
+ 19  Global class or typedef defined in keyword  Keyword set number 8
+ 20  C++ raw string                              Label
+ 21  F# triple-quoted verbatim strings           -
+ 22  Hash-quoted strings                         -
+ 23  Preprocessor block comment                  -
+
+=head2 Navigation, Selection and Clipboard Keys
+
+Here is a list of the common keys for all drivers. Other keys are
+available depending on the driver.
+
+ Keys                    Action
+ ======================  ======================
+ Arrows                  move by individual characters/lines
+ Ctrl+Arrows             move by words/paragraphs
+ Home/End                move to begin/end line
+ Ctrl+Home/End           move to begin/end text
+ PgUp/PgDn               move vertically by pages
+ Ctrl+PgUp/PgDn          move horizontally by pages
+ Shift+Arrows            select characters
+ Ctrl+A                  select all
+ Del                     delete the character at right
+ Backspace               delete the character at left
+ Ctrl+C                  copy
+ Ctrl+X                  cut
+ Ctrl+V                  paste
+
+=head1 EXAMPLES
+
+
+The element B<IUP::Scintilla> is used in the following sample scripts:
+
+=over
+
+=item * L<0-basic/scintilla.pl|https://metacpan.org/source/KMX/IUP-0.305/examples/0-basic/scintilla.pl> - IUP::Scintilla example
+
+=back 
+
+
+
+=head1 SEE ALSO
+
+The original doc: L<iup_scintilla.html|http://www.tecgraf.puc-rio.br/iup/en/elem/iup_scintilla>
+ 
+
+=cut

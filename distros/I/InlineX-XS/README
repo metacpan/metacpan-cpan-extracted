@@ -1,0 +1,190 @@
+NAME
+    InlineX::XS - Auto-convert Inline::C based modules to XS
+
+SYNOPSIS
+      package Your::Module;
+
+      # Make sure your $VERSION is accessible at compile time for XSLoader:
+      # (yes, this is strict-safe)
+      our $VERSION = '0.01';
+      BEGIN {$VERSION = '0.01'}
+
+      # Replace the use of Inline::C:
+      # use Inline C => <<'CODE';
+      # becomes:
+
+      use InlineX::XS <<'CODE';
+         ... C code ...
+      CODE
+
+      # Perl code, more C, more Perl...
+  
+      # Replace the final '1;' of your module with:
+      use InlineX::XS 'END';
+
+DESCRIPTION
+    Make sure to read the CAVEATS section below before using this. This is
+    experimental software.
+
+  Introduction
+    Extending Perl with C was made much easier by the introduction of Ingy's
+    Inline or rather Inline::C module. It is possible to create CPAN
+    distributions which use "Inline::C", but traditionally, writing XS, the
+    C-to-Perl glue language, by hand has been considered superior in that
+    regard because "Inline::C" writes its compiled shared libraries to cache
+    areas whereas the libraries compiled from XS are properly installed. (I
+    know, technically, "Inline::C" *generates XS on the fly*.)
+
+    This module is intended to enable developers to use "Inline::C" and have
+    the C code converted to (static) XS code before they make a release.
+
+  How it works
+    Mostly, you replace any invocation of "Inline::C" with "InlineX::XS" as
+    follows:
+
+      use Inline C => <<'CODE';
+         ... C code ...
+      CODE
+
+    becomes
+
+      use InlineX::XS <<'CODE';
+         ... C code ...
+      CODE
+
+    Note that most advanced usage of "Inline::C" is currently ignored by
+    "InlineX::XS" during packaging. Also, "InlineX::XS" cannot read from the
+    "__DATA__" section of your module.
+
+    There are some other changes you need to make to your code, but the
+    above is the main difference. The other changes are shown in the
+    SYNOPSIS above.
+
+    "InlineX::XS" will take the plain C code and first look for a loadable
+    shared object file which was compiled from XS and if that wasn't found,
+    fall back to passing the code to "Inline::C".
+
+  Packaging
+    By forcing "InlineX::XS" into the packaging mode and compiling your
+    ".pm" file with "perl -c", you can make it extract the C code from your
+    .pm file into the src/ subdirectory. From there, "InlineX::C2XS" will be
+    used to generate a .xs file in the current directory.
+
+    You may do so explicitly from the main distribution directory with the
+    following command:
+
+      perl -c -MInlineX::XS=PACKAGE lib/Your/Module.pm
+
+    You should now have a shiny new XS file Module.XS. Add it to the
+    distributions MANIFEST file and you are good to go. But read on:
+
+  Easier packaging
+    More conveniently, you can just slightly modify your Makefile.PL if you
+    are using ExtUtils::MakeMaker and not the newer Module::Build or
+    Module::Install. It should be straightforward to do with those as well,
+    but I haven't explored that.
+
+    In the Makefile.PL, there is a call to "WriteMakefile". Add a key/value
+    pair to the argument list of this call:
+
+      dist => {
+        PREOP => 'perl -MInlineX::XS::MM=$(DISTNAME)-$(VERSION) -c lib/Your/Module.pm'
+      }
+
+    Of course, you need to add a dependency on "InlineX::XS". You do not
+    need a dependency on "Inline::C". On the user's machine, the generated
+    XS code will be compiled and installed. "Inline::C" will not be used
+    unless the user removes the XS code before compilation.
+
+    Given this modified Makefile.PL, you can issue the following usual
+    commands to create a release-ready package of your module:
+
+      perl Makefile.PL
+      make dist
+
+    "InlineX::XS::MM" will take care of generating the XS and modifying your
+    MANIFEST. Expect similar utility modules for "Module::Build" and
+    "Module::Install" in the future. (Help welcome, though.)
+
+    An example distribution "Foo::Bar" can be found in the examples/
+    subdirectory.
+
+CAVEATS
+    "InlineX::XS" isn't a drop-in replacement for "Inline::C" in some cases.
+    For example, it doesn't support reading from arbitrary files or getting
+    the code from code references.
+
+    When passing the arguments through to "Inline::C" because no loadable
+    object was found, some of the various advanced Inline::C features work
+    alright. Once extracted as XS and compiled, those won't be available any
+    more.
+
+    The configuration options are only partially supported. Additionally,
+    there is one major discrepancy in behaviour: Any configuration settings
+    (i.e. "use Inline C =" 'Config'...> or "use Inline C =" '...code...',
+    cfg1=>'value1'...>) are applied to all Inlined code in the package! In
+    ordinary "Inline::C" code, these are built up as the various inlined
+    code sections are parsed and compiled.
+
+    Multiple modules which use "InlineX::XS" in the same distribution are
+    problematic. This isn't really an "InlineX::XS" problem but rather a
+    general issue with distributions that contain XS. It's possible, but I
+    haven't explored it fully.
+
+    Naturally, if you use the "bind" function from "Inline" to load C
+    routines at run-time, "InlineX::XS" can't interfere.
+
+    Do not think you can use "InlineX::XS" like a random Inline language
+    module because it isn't one of those.
+
+      # Cannot work and should not work:
+      use Inline XS => 'code';
+
+    We can't declare our prerequisites in the "Makefile.PL" because they're
+    not needed by users who use modules which have been compiled to XS.
+
+PREREQUISITES
+    Depending on the mode of operation, this module may required various
+    other modules. For end-users who use modules which make use of
+    "InlineX::XS", there are currently no prerequisites at all.
+
+    Developers who use "InlineX::XS" in conjunction with "Inline::C" need to
+    install "Inline::C".
+
+    Those who generate distributions with XS code from the "Inline::C" (or
+    rather "InlineX::XS") code need an installed "InlineX::C2XS" and thus an
+    installed "Inline::C". In particular, version 0.08 or higher of
+    "InlineX::C2XS" is required for packaging (only).
+
+CLASS METHODS
+  debug
+    Get or set the debugging flag. Defaults to false.
+
+  import
+    Automatically called via "use InlineX::XS".
+
+SEE ALSO
+    The obvious place to learn how to use "Inline::C" (and thus InlineX::XS)
+    is Inline::C.
+
+    This class implements the ExtUtils::MakeMaker packager: InlineX::XS::MM,
+    see also: ExtUtils::MakeMaker,
+
+    The XS is generated from the C code using InlineX::C2XS.
+
+    The shared objects that are compiled from the generated XS code are
+    loaded using XSLoader.
+
+    The concept was originally proposed here:
+    <http://perlmonks.org/index.pl?node_id=584125>
+
+AUTHOR
+    Steffen Mueller, <smueller@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2006 by Steffen Mueller
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.6 or, at your
+    option, any later version of Perl 5 you may have available.
+

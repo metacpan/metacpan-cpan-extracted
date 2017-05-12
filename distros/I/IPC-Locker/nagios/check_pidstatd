@@ -1,0 +1,146 @@
+#!/usr/bin/perl -w
+# See copyright, etc in below POD section.
+######################################################################
+
+require 5.006_001;
+use lib '../blib/lib';        # testing
+use Getopt::Long;
+use Pod::Usage;
+use strict;
+use vars qw ($Debug $VERSION);
+
+use lib "/usr/lib/nagios/plugins" ;
+use utils qw(%ERRORS &print_revision &support &usage);
+use IPC::PidStat;
+
+$VERSION = '1.496';
+
+#======================================================================
+# main
+
+our $PROGNAME = "check_pidstatd";
+my %opt_req_params = (
+    host => "localhost",
+);
+
+autoflush STDOUT 1;
+autoflush STDERR 1;
+
+Getopt::Long::Configure('bundling');
+if (! GetOptions (
+		  "h|help"	=> \&print_usage,
+		  "v|debug"	=> \&debug,
+		  "V|version"	=> \&version,
+		  "H|host|hostname=s"	=> sub {$opt_req_params{host}   = $_[1];},
+		  "pid=i"	=> sub {$opt_req_params{pid}   = $_[1];},
+		  "p|port=i"	=> sub {$opt_req_params{port}   = $_[1];},
+		  )) {
+    usage("Bad options passed, use --help for more information.\n");
+}
+
+check_pidstatd(%opt_req_params);
+
+#----------------------------------------------------------------------
+
+sub print_usage {
+    print_revision($PROGNAME, $VERSION);
+    pod2usage(-verbose=>2, -exitval=>2, -output=>\*STDOUT, -noperldoc=>1);
+    support();
+    exit $ERRORS{'OK'};
+}
+
+sub version {
+    print_revision($PROGNAME, $VERSION);
+    exit $ERRORS{'OK'};
+}
+
+sub debug {
+    $Debug = 1;
+    $IPC::PidStat::Debug = 1;
+}
+
+#######################################################################
+
+sub check_pidstatd {
+    my %params = (tries=>5,	# One second timeout
+		  pid => 1,	# Init process should always exist
+		  @_);
+
+    # Config requestor
+    my $exister = new IPC::PidStat (%params);
+
+    # Send a request to the server, get reply & trap errors
+    my $res = $exister->ping_status(%params);
+    if ($res && $res->{ok}) {
+	print "PIDSTATD OK - $res->{status}\n";
+	exit $ERRORS{OK};
+    } else {
+	print "PIDSTATD CRITICAL - $res->{status}\n";
+	exit $ERRORS{CRITICAL};
+    }
+}
+
+#######################################################################
+__END__
+
+=pod
+
+=head1 NAME
+
+check_pidstatd - Under Nagios, check the pidstat daemon on the specified host.
+
+=head1 SYNOPSIS
+
+  check_pidstatd --host hostname -p port
+
+=head1 DESCRIPTION
+
+Check_pidstatd is a nagios plugin for the IPC::Locker daemon.
+
+Add to Nagios's checkcommands.cfg:
+
+    define command{
+	command_name	check_pidstatd
+	command_line	$USER1$/check_pidstatd -H $HOSTADDRESS$
+	}
+
+=head1 ARGUMENTS
+
+=over 4
+
+=item --help
+
+Displays this message and program version and exits.
+
+=item --host
+
+Specifies host name to check for a process.
+
+=item --port
+
+Specifies the port number to contact the "pidstatd" on.  (default 1752)
+
+=back
+
+=head1 DISTRIBUTION
+
+The latest version is available from CPAN and from L<http://www.veripool.org/>.
+
+Copyright 2006-2017 by Wilson Snyder.  This package is free software; you
+can redistribute it and/or modify it under the terms of either the GNU
+Lesser General Public License Version 3 or the Perl Artistic License Version 2.0.
+
+=head1 AUTHORS
+
+Wilson Snyder <wsnyder@wsnyder.org>
+
+=head1 SEE ALSO
+
+L<IPC::Locker>, L<IPC::PidStat>, L<pidstatd>, L<nagios>
+
+=cut
+
+######################################################################
+### Local Variables:
+### compile-command: "./check_pidstatd "
+### End:

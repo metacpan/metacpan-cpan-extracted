@@ -1,0 +1,8 @@
+MODULE = IO::Pty::HalfDuplex  PACKAGE = IO::Pty::HalfDuplex::PTrace  PREFIX = iphd_ptrace
+
+int
+iphd_ptrace_continue_to_next_read(pid)
+    int pid
+
+int
+iphd_ptrace_fork_traced()

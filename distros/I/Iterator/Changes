@@ -1,0 +1,11 @@
+Revision history for Perl extension Iterator.
+
+0.01  2005 August 18
+    - First version
+
+0.02  2005 August 23
+    - Fixed several documentation typos.
+
+0.03  2005 October 10
+    - Minor change to suppress a warning with newer versions of
+      Exception::Class.

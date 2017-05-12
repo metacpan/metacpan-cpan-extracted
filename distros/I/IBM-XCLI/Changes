@@ -1,0 +1,21 @@
+Revision history for IBM-XCLI
+
+0.051	Thu Apr 11 2013
+	Three arg open, explicit close on filehandle, use carp rather than warn.
+
+0.05	Wed Aug 22 2012
+	Major rewrite;
+		- Methods fc_login_status and connected_hosts have been removed.
+		- The following new methods have been added - pool_list, cluster_list, target_list, dest_list, snap_group_list, ipinterface_list,
+		  target_port_list, reservation_key_list, fc_port_list, host_connectivity_list, ups_list, psu_list, ats_list, cf_list, dimm_list,
+		  fan_list, mm_list, switch_list, service_list, component_list, ethernet_cable_list, fs_list, cg_list, rule_list,
+		  metadata_list, reservation_list, event_threshold_list, snapshot_list, host_list_raw, pool_list_raw, mirror_list_raw,
+		  vol_list_raw, cluster_list_raw, target_list_raw, dest_list_raw, snap_group_list_raw, ipinterface_list_raw, target_port_list_raw,
+		  reservation_key_list_raw, fc_port_list_raw, fc_connectivity_list_raw, host_connectivity_list_raw, ups_list_raw, psu_list_raw,
+		  ats_list_raw, cf_list_raw, dimm_list_raw, fan_list_raw, mm_list_raw, switch_list_raw, service_list_raw, component_list_raw,
+		  ethernet_cable_list_raw, fs_list_raw, cg_list_raw, rule_list_raw, metadata_list_raw, reservation_list_raw, event_threshold_list_raw
+		  snapshot_list_raw, mapping_list_raw
+
+0.02    Fri Jan 6 2012
+        First release to CPAN.
+

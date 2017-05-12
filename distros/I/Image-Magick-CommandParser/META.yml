@@ -1,0 +1,42 @@
+---
+abstract: 'Parse any command line acceptable to convert or mogrify'
+author:
+  - 'Ron Savage (ron@savage.net.au)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  Test::Pod: '1.51'
+  Test::Simple: '1.302052'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.22, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Image-Magick-CommandParser
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Data::Section::Simple: '0.07'
+  File::Glob: '0'
+  File::Slurper: '0.008'
+  Getopt::Long: '0'
+  Log::Handler: '0.88'
+  Moo: '2.002004'
+  Pod::Usage: '1.67'
+  Set::Array: '0.3'
+  Set::FA::Element: '2'
+  Types::Standard: '1.00005'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Image-Magick-CommandParser
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/ronsavage/Image-Magick-CommandParser.git
+version: '1.04'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

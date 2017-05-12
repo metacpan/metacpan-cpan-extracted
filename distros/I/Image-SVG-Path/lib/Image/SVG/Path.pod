@@ -1,0 +1,790 @@
+
+
+=encoding UTF-8
+
+=head1 NAME
+
+Image::SVG::Path - read the "d" attribute of an SVG path
+
+=head1 SYNOPSIS
+
+    
+    use Image::SVG::Path 'extract_path_info';
+    my $path_d_attribute = "M9.6,20.25c0.61,0.37,3.91,0.45,4.52,0.34c2.86-0.5,14.5-2.09,21.37-2.64c0.94-0.07,2.67-0.26,3.45,0.04";
+    my @path_info = extract_path_info ($path_d_attribute);
+
+
+
+(This example is included as L<F<synopsis.pl>|https://api.metacpan.org/source/BKB/Image-SVG-Path-0.30/examples/synopsis.pl> in the distribution.)
+
+=head1 VERSION
+
+This documents version 0.30 of Image::SVG::Path corresponding to git
+commit 480776a934b033453feec526ab7d0a5931bb44af released on Thu Dec 15 11:32:48 2016 +0900.
+
+=head1 DESCRIPTION
+
+This module extracts information contained in the "d" attribute of an
+SVG <path> element and turns it into a simpler series of steps. 
+
+For example, an SVG <path> element might take the form
+
+    <path d="M9.6,20.25c0.61,0.37,3.91,0.45,4.52,0.34c2.86-0.5,14.5-2.09,21.37-2.64c0.94-0.07,2.67-0.26,3.45,0.04"/>
+
+Using an XML parser, such as L<XML::Parser>,
+
+    
+    use FindBin '$Bin';
+    use XML::Parser;
+    use Image::SVG::Path 'extract_path_info';
+    my $file = "$Bin/Home_for_the_aged.svg";
+    my $p = XML::Parser->new (Handlers => {Start => \& start});
+    $p->parsefile ($file) or die "Error $file: ";
+    
+    sub start
+    {
+        my ($expat, $element, %attr) = @_;
+    
+        if ($element eq 'path') {
+            my $d = $attr{d};
+            my @r = extract_path_info ($d);
+            for (@r) {
+                if ($_->{svg_key} =~ /^[mM]$/i) {
+                    print "MOVE TO @{$_->{point}}.\n";
+                }
+            }
+        }
+    }
+
+
+produces output
+
+    MOVE TO 15 119.
+    MOVE TO 52 88.
+    MOVE TO 198 88.
+    MOVE TO 20 214.
+    MOVE TO 148 214.
+
+
+(This example is included as L<F<xml-parser.pl>|https://api.metacpan.org/source/BKB/Image-SVG-Path-0.30/examples/xml-parser.pl> in the distribution.)
+
+
+SVG means "scalable vector graphics" and it is a standard of the W3
+consortium. See L</SVG standards> for details.  Although SVG is a type
+of XML, the text in the C<d> attribute of SVG paths is not XML but a
+condensed form using single letters and numbers. This module is a
+parser for that condensed format.
+
+=head1 FUNCTIONS
+
+=head2 extract_path_info
+
+    my @path_info = extract_path_info ($path_d_attribute);
+
+Turn the SVG path string into a series of simpler things.
+
+For example,
+
+    
+    use Image::SVG::Path 'extract_path_info';
+    my @path_info = extract_path_info ('M6.93,103.36c3.61-2.46,6.65-6.21,6.65-13.29c0-1.68-1.36-3.03-3.03-3.03s-3.03,1.36-3.03,3.03s1.36,3.03,3.03,3.03C15.17,93.1,10.4,100.18,6.93,103.36z');
+    
+    my $count = 0;
+    for my $element (@path_info) {                
+        $count++;                                 
+        print "Element $count:\n";                
+        for my $k (sort keys %$element) {              
+            my $val = $element->{$k};             
+            if (ref $val eq 'ARRAY') {            
+                $val = "[$val->[0], $val->[1]]";  
+            }                                     
+            print "   $k -> $val\n";              
+        }                                         
+    }
+
+
+produces output
+
+    Element 1:
+       name -> moveto
+       point -> [6.93, 103.36]
+       position -> absolute
+       svg_key -> M
+       type -> moveto
+    Element 2:
+       control1 -> [3.61, -2.46]
+       control2 -> [6.65, -6.21]
+       end -> [6.65, -13.29]
+       name -> curveto
+       position -> relative
+       svg_key -> c
+       type -> cubic-bezier
+    Element 3:
+       control1 -> [0, -1.68]
+       control2 -> [-1.36, -3.03]
+       end -> [-3.03, -3.03]
+       name -> curveto
+       position -> relative
+       svg_key -> c
+       type -> cubic-bezier
+    Element 4:
+       control2 -> [-3.03, 1.36]
+       end -> [-3.03, 3.03]
+       name -> shorthand/smooth curveto
+       position -> relative
+       svg_key -> s
+       type -> shortcut-cubic-bezier
+    Element 5:
+       control2 -> [1.36, 3.03]
+       end -> [3.03, 3.03]
+       name -> shorthand/smooth curveto
+       position -> relative
+       svg_key -> s
+       type -> shortcut-cubic-bezier
+    Element 6:
+       control1 -> [15.17, 93.1]
+       control2 -> [10.4, 100.18]
+       end -> [6.93, 103.36]
+       name -> curveto
+       position -> absolute
+       svg_key -> C
+       type -> cubic-bezier
+    Element 7:
+       name -> closepath
+       position -> relative
+       svg_key -> z
+       type -> closepath
+
+
+(This example is included as L<F<extract-path-info.pl>|https://api.metacpan.org/source/BKB/Image-SVG-Path-0.30/examples/extract-path-info.pl> in the distribution.)
+
+
+The return value is a list of hash references. Each hash reference has
+at least four keys, C<type>, C<position>, C<name>, and C<svg_key>. The
+C<svg_key> field is the original key from the path. The C<type> and
+C<name> fields say what the element is, for example a cubic bezier
+curve or a line. The C<position> value is either "relative" or
+"absolute" depending on whether the coordinates of this step of the
+path are relative to the current point (relative) or to the drawing's
+origin (absolute). C<position> is relative if C<svg_key> is lower case
+and absolute if it is upper case, unless the user chooses the
+L</absolute> option.
+
+C<extract_path_info> replaces all implicit commands with the explicit
+version. For example, an input moveto followed by an implicit lineto
+of the form C<M 1 2 3 4> is converted into a moveto C<M 1 2> followed
+by an explicit lineto C<L 3 4>. An input sequence of elliptic arcs,
+one explicit and one implicit, is turned into two elliptic arcs in the
+output. This means that "round trips" are not possible; it is not
+possible to use the output of this function to reconstruct the input
+path string exactly, although the actual path itself can be reproduced
+exactly.
+
+A second argument to C<extract_path_info> contains options for the
+extraction in the form of a hash reference. For example,
+
+    my @path_info = extract_path_info ($path, {absolute => 1});
+
+The following options exist:
+
+=over
+
+=item absolute
+
+If the hash element C<absolute> is set to a true value, relative
+positions are changed to absolute. For example a "c" curve is changed
+to the equivalent "C" curve. In this case, the C<position> value of
+each element's hash is C<absolute>, and C<svg_key> is converted to
+upper case.
+
+=item no_shortcuts
+
+If the hash element C<no_shortcuts> is set to a true value then smooth
+cubic bezier curves, "S" curves, are changed into the equivalent "C"
+curves. This only works in combination with the "absolute" option,
+otherwise it does nothing. It does not work with smooth quadratic
+bezier curves. See L</no_shortcuts does not work with quadratic bezier
+curves>.
+
+=item verbose
+
+If this is set to a true value, C<extract_path_info> prints out
+informative messages about what it is doing as it parses the path.
+
+=back
+
+=head2 reverse_path
+
+    my $reverse_path = reverse_path ($path);
+
+Make an SVG path which is the exact reverse of the input.
+
+This only works for cubic bezier curves with absolute position and no
+shortcuts (C elements only). It doesn't fill in all the information
+correctly.
+
+    
+    use Image::SVG::Path 'reverse_path';
+    my $path = "M26.75,73c-2.61,6.25-5.49,12.25-8.36,17.15c-0.74,1.26-1.99,1.54-3.23,1.03";
+    my $reverse = reverse_path ($path);
+    print "$reverse\n";
+    
+
+
+produces output
+
+    M15.160000,91.180000 C16.400000,91.690000 17.650000,91.410000 18.390000,90.150000 C21.260000,85.250000 24.140000,79.250000 26.750000,73.000000 
+
+
+(This example is included as L<F<test-reverse.pl>|https://api.metacpan.org/source/BKB/Image-SVG-Path-0.30/examples/test-reverse.pl> in the distribution.)
+
+
+=head2 create_path_string
+
+    my $path = create_path_string (\@info);
+
+Given a set of information as created by L</extract_path_info>, turn
+them into an SVG string representing a path.
+
+This only works for elements with C<absolute> position with no
+shortcuts. It does not handle quadratic bezier curves.
+
+=head1 SVG path elements
+
+This section documents the output elements. If the path is extracted
+using
+
+    my @path = extract_path_info ($d);
+
+then the elements of C<@path> are each hash references which contain
+one of the following kinds of elements, depending on what is next on
+the path. 
+
+=head2 Move to elements, M
+
+If C<type> is C<moveto>, the hash reference contains one more field,
+C<point>, which is the point to move to. This is an array reference
+containing the I<x> and I<y> coordinates as elements indexed 0 and 1
+respectively.
+
+=over
+
+=item type
+
+This is C<moveto>.
+
+=item svg_key
+
+This is M or m.
+
+=item point
+
+This is the point to move to.
+
+=back
+
+=head2 Line elements, L
+
+If C<type> is C<lineto>, the hash reference contains one more field,
+C<point>, which is the point to move to. This is an array reference
+containing the I<x> and I<y> coordinates as elements indexed 0 and 1
+respectively.
+
+=over
+
+=item type
+
+This is C<lineto>.
+
+=item svg_key
+
+This is L or l.
+
+=item point
+
+This is the end point of the line.
+
+=item end
+
+This field occurs in some lines for backwards compatibility with
+pre-0.16 versions of the module.
+
+=back
+
+=head2 Cubic bezier curve elements, C
+
+If the type is C<cubic-bezier>, the hash reference contains three more
+fields, C<control1>, C<control2> and C<end>. The value of each is an
+array reference containing the I<x> and I<y> coordinates of the first
+and second control points and the end point of the Bezier curve
+respectively. (The start point of the curve is the end point of the
+previous part of the path.)
+
+=over
+
+=item type
+
+This is C<cubic-bezier>.
+
+=item svg_key
+
+This is C or c.
+
+=item control1
+
+Control point 1 of the curve.
+
+=item control2
+
+Control point 2 of the curve.
+
+=item end
+
+The end point of the curve.
+
+=back
+
+=head2 Shortcut cubic bezier curve elements, S
+
+If the type is C<shortcut-cubic-bezier>, the hash contains two more
+fields, C<control2> and C<end>. C<control2> is the second control
+point, and C<end> is the end point. The first control point is got by
+reflecting the second control point of the previous curve around the
+end point of the previous curve (the start point of the current
+curve). 
+
+Use the L</no_shortcuts> option to automatically convert these into
+cubic bezier curve elements.
+
+=over
+
+=item type
+
+This is C<shortcut-cubic-bezier>.
+
+=item svg_key
+
+This is S or s.
+
+=item control2
+
+This is the second control point of the curve (the first one is implicit).
+
+=item end
+
+This is the end point of the curve.
+
+=back
+
+=head2 Quadratic bezier curve elements, Q
+
+If the type is C<quadratic-bezier>, the hash contains two more fields,
+C<control> and C<end>. C<control> is the control point, and
+C<end> is the end point.
+
+=over
+
+=item type
+
+This is C<quadratic-bezier>.
+
+=item svg_key
+
+This is Q or q.
+
+=item control
+
+This is the control point.
+
+=item end
+
+This is the end point.
+
+=back
+
+=head2 Shortcut quadratic Bezier curves, T
+
+See L<the SVG documentation|/SVG specification> (section 8.3.7) for
+how to calculate the control point.
+
+=over
+
+=item type
+
+This is C<shortcut-quadratic-bezier>.
+
+=item svg_key
+
+This is T or t.
+
+=item end
+
+This is the end point.
+
+=back
+
+=head2 Arc elements, A
+
+=over
+
+=item type
+
+This is C<arc>.
+
+=item svg_key
+
+This is C<A> or C<a>.
+
+=item rx, ry
+
+X and Y radiuses
+
+=item x_axis_rotation
+
+See L<the SVG documentation|/SVG specification> (section 8.3.8) for details.
+
+=item large_arc_flag
+
+See L<the SVG documentation|/SVG specification> (section 8.3.8) for details.
+
+=item sweep_flag
+
+See L<the SVG documentation|/SVG specification> (section 8.3.8) for details.
+
+=item x, y
+
+These are the end points of the arc.
+
+=back
+
+Arcs are omitted from L</SVG Tiny>.
+
+=head2 Horizontal line elements, H
+
+Horizontal line elements contain one additional key, C<x>, the
+x-coordinate of the end of the line. The y-coordinate is the same as
+the y-coordinate of the end point of the previous element.
+
+=over
+
+=item type
+
+This is C<horizontal-line-to>.
+
+=item svg_key
+
+This is H or h.
+
+=item x
+
+This is the x coordinate of the end point. The y coordinate is implicit.
+
+=back
+
+=head2 Vertical line elements, V
+
+Vertical line elements contain one additional key, C<y>, the
+y-coordinate of the end of the line. The x-coordinate is the same as
+the x-coordinate of the end point of the previous element.
+
+=over
+
+=item type
+
+This is C<vertical-line-to>.
+
+=item svg_key
+
+This is V or v.
+
+=item y
+
+This is the y coordinate of the end point. The x coordinate is implicit.
+
+=back
+
+=head2 Closepath elements, Z
+
+=over
+
+=item type
+
+This is C<closepath>.
+
+=item svg_key
+
+This is Z or z.
+
+=back
+
+Each hash reference also contains the field C<position>, which has
+either the value C<absolute> or C<relative> depending on whether
+C<svg_key> is upper case or lower case, respectively. A field C<name>
+also exists.
+
+=head1 BUGS
+
+
+
+=over
+
+=item B<shortcut> should be B<smooth>
+
+This document and the module both make the error of calling "smooth"
+"shortcut".
+
+
+This is L<bug 20|https://github.com/benkasminbullock/Image-SVG-Path/issues/20> on the issue tracker.
+
+
+=item no_shortcuts does not work with quadratic bezier curves
+
+The L</no_shortcuts> option to L</extract_path_info> does not work
+with quadratic bezier curves. See also L</HISTORY>.
+
+
+This is L<bug 19|https://github.com/benkasminbullock/Image-SVG-Path/issues/19> on the issue tracker.
+
+
+=item Some inputs cause blowups
+
+Some relatively simple inputs blow up the L</$svg_path> regex, causing
+errors of the form I<Complex regular subexpression recursion limit
+(32766) exceeded>. See the file F<t/export-regex.t> for an example
+(commented out).
+
+Because of this, as of version 0.29, C<$svg_path> is no longer used to
+check the path inputs of L</extract_path_info>.
+
+I am not sure whether this issue is inherent in the SVG grammar or
+whether it is caused by some kind of regex error. I (Ben Bullock)
+believe that the regular expression L</$svg_path> exactly follows the
+SVG grammar, does not contain any duplicates, and that the problems
+arise because the grammar itself is inherently difficult to parse.
+This is because of the many ambiguous ways that numbers can be put
+into a list. For example 123-456,1e-78+9 has to be parsed into four
+numbers. The SVG standard insists on this for the sake of saving a few
+bytes of whitespace or commas, which, considering that these condensed
+paths are embedded within the excruciatingly verbose XML format, seems
+a false economy.
+
+But I might be wrong about that, so if you can find an error in my
+regular expression, let me know.
+
+
+This is L<bug 21|https://github.com/benkasminbullock/Image-SVG-Path/issues/21> on the issue tracker.
+
+
+=item reverse_path only works for cubic bezier curves
+
+See L</reverse_path>.
+
+
+This is L<bug 23|https://github.com/benkasminbullock/Image-SVG-Path/issues/23> on the issue tracker.
+
+
+=item create_path_string does not work for quadratic bezier curves
+
+See L</create_path_string>.
+
+
+This is L<bug 22|https://github.com/benkasminbullock/Image-SVG-Path/issues/22> on the issue tracker.
+
+
+=back
+
+=head1 EXPORTS
+
+None of the functions is exported by default.
+
+     use Image::SVG::Path ':all';
+
+exports all of the module's functions, L</extract_path_info>,
+L</reverse_path> and L</create_path_string>. For backward
+compatibility, this does not export the regular expressions.
+
+=head2 Regular expressions
+
+The following SVG-parsing regular expressions which (are supposed to) exactly
+correspond to the SVG standard can also be exported.
+
+=over
+
+=item $svg_path
+
+Match a complete path consisting of multiple move-to and drawing
+commands. See also L</Some inputs cause blowups>.
+
+=item $drawto_command
+
+Match one drawing command. Note this does not match a move-to
+command. The command is captured as $1.
+
+=item $drawto_commands
+
+Match a sequence of one or more drawing commands.
+
+=item $moveto
+
+Match a move-to command, including any subsequent implicit
+line-tos. See L</Move to elements, M>.
+
+=item $closepath
+
+=item $curveto
+
+=item $elliptical_arc
+
+=item $horizontal_lineto
+
+=item $lineto
+
+=item $quadratic_bezier_curveto
+
+=item $smooth_curveto
+
+=item $smooth_quadratic_bezier_curveto
+
+=item $vertical_lineto
+
+=back
+
+Of necessity, underscores (C<_>) have been substituted for the hyphens
+(C<->) in the SVG standard, but otherwise these names correspond
+exactly to the names in the standard. In each of the drawing commands,
+the command itself is captured as $1 and the arguments are captured as
+$2.
+
+To export all of these, use
+
+    use Image::SVG::Path ':regex';
+
+The subexpressions used in the definitions of the above in the SVG
+standard (things like C<vertical-lineto-argument-sequence>) are not
+exported, and some of the more ridiculous ones (long-winded duplicates
+of other expressions) are not even implemented in this module's source
+code.
+
+=head1 SEE ALSO
+
+=head2 Other CPAN modules
+
+=over
+
+=item L<SVG::Rasterize>
+
+This contains a complete parser for SVG paths in
+C<SVG::Rasterize::Engine::PangoCairo>. It is embedded into the module
+and is used to draw with L<Cairo>.
+
+=item L<MarpaX::Languages::SVG::Parser>
+
+This is a parser for SVG by Ron Savage which uses Jeffrey Kegler's
+L<Marpa::R2> system, hence the name "MarpaX" (Marpa extension).
+
+=item L<SVG::Estimate>
+
+This is an application of Image::SVG::Path which uses it to estimate
+the lengths of the paths of SVG images.
+
+=item L<Image::CairoSVG>
+
+This is a least-effort module by the same author as Image::SVG::Path
+which renders some kinds of SVGs using L<Cairo>.
+
+=item L<Image::LibRSVG>
+
+Render SVG via a Gnome library.
+
+=item L<Image::SVG::Transform>
+
+This module reads the "transform" attribute of an SVG element.
+
+=item L<Image::Info::SVG>
+
+Part of L<Image::Info>, you can get dimensions and other information
+about SVG images without the bother of parsing the file.
+
+=back
+
+=head2 SVG standards
+
+=over
+
+=item SVG specification
+
+L<The full specification|https://www.w3.org/TR/SVG/> contains all the
+details. The L<SVG path
+specification|https://www.w3.org/TR/SVG/paths.html> contains the
+specifications for paths. The grammar of paths is described in L<The
+grammar for path
+data|https://www.w3.org/TR/SVG/paths.html#PathDataBNF> within that
+section of the document.
+
+=item SVG Tiny
+
+L<SVG Tiny|http://www.w3.org/TR/SVGTiny12/index.html> is a subset of
+SVG. It claims to have a L<Perl Language
+Binding|http://www.w3.org/TR/SVGTiny12/perl-binding.html>, but I
+cannot locate the source code.
+
+=item SVG basic
+
+There is also another standard, SVG basic, I'm not too sure whether
+either this or SVG Tiny are in use.
+
+=back
+
+=head2 Other things
+
+=over
+
+=item CairoSVG
+
+L<CairoSVG|http://cairosvg.org/> is a Python SVG renderer using Cairo.
+
+=back
+
+=head1 HISTORY
+
+This module was originally begun as a way to hack the data out of the
+SVG-like data of a project called L<KanjiVG (kanji vector
+graphics)|http://kanjivg.tagaini.net/> for the benefit of L<this kanji
+recognition system|http://kanji.sljfaq.org> which relies on the
+KanjiVG data. At the time I (Ben Bullock) created this, I only had a
+vague idea of what SVG was. The KanjiVG data consists only of a subset
+of SVG, namely the initial move-tos and cubic bezier curves, which is
+why some parts of this module only deal with that kind of SVG path. At
+the time I started using it, the KanjiVG data actually contained a
+number of kanji strokes going in the wrong direction, and
+L</reverse_path> was devised as a way to fix these.
+
+=head1 ACKNOWLEDGEMENTS
+
+Alessandro Ranellucci (L<http://makerblog.it/>) pointed out that
+implicit commands and floating point numbers were not handled
+correctly.
+
+Colin Kuskie (L<http://www.thegamecrafter.com/>) fixed error messages
+for version 0.20, number paths for version 0.21, implicit line-tos for
+version 0.22, implicit arc commands for version 0.23, multiple
+closepaths for version 0.24, and handling plus signs in numbers in
+0.25.
+
+
+=head1 AUTHOR
+
+Ben Bullock, <bkb@cpan.org>
+
+=head1 COPYRIGHT & LICENCE
+
+This package and associated files are copyright (C) 
+2011-2016
+Ben Bullock.
+
+You can use, copy, modify and redistribute this package and associated
+files under the Perl Artistic Licence or the GNU General Public
+Licence.
+
+
+

@@ -1,0 +1,56 @@
+Revision history for Perl extension IPC::Door.
+
+0.11  Tue Jun  7 07:25:33 CDT 2005
+    - Tested with the shipping version of Solaris 10.
+    - Combined client-server test scripts into one.
+    - Other miscellaneous changes in test scripts.
+    - Refuse to compile for threaded perl until it is fixed.
+    - Reorganized benchmark scripts in a separate directory.
+    - Client credentials are properly fetched, and stored in special
+      variables.
+
+0.10  Sat May 22 23:30:24 CDT 2004
+    - Updated for Solaris 10 (some changes in API).
+
+0.09  Thu May  6 00:52:29 CDT 2004
+    - Reverted to non-XS memory management in __call(), due to some
+      problems in certain configurations.
+
+0.08  Wed May  5 21:39:58 CDT 2004
+    - More complex data structures can be passed between the server and
+      the client with the help of the Storable module (if available).
+    - Fixed the error in SIGNATURE.
+    - Memory management the XS way (sometimes).
+
+0.07  Sun May  2 03:44:40 CDT 2004
+    - Removed C99-style comments for compatibility with older compilers.
+
+0.06  Sat May  1 11:07:15 CDT 2004
+    - Now the only data that you can send through the door are strings.
+
+0.05
+    - No public release.
+
+0.04  Mon Apr  5 00:16:20 CDT 2004
+    - No public release.
+    - servproc() now takes one scalar and returns one scalar.
+      It probably should be more intelligent to deal with other
+      kinds of input/output.
+    - SIGNATURE file is added.  You can verify the integrity of each file
+      with Module::Signature.
+
+0.03  Wed Sep  3 22:41:22 CDT 2003
+    - Implemented door_cred(), door_info() (with some limitations)
+    - Split Door.pm into three files: Door.pm, Door/Client.pm,
+      Door/Server.pm
+    - Added AutoLoader support (basically redid h2xs without '-A')
+    - More robust test scripts
+    - No longer tied to &main::serv.
+
+0.02  Thu Aug 28 23:07:59 CDT 2003
+    - First public release
+
+0.01  Mon Aug 18 21:10:23 2003
+    - original version; created by h2xs 1.22 with options
+        -A -n IPC::Door
+

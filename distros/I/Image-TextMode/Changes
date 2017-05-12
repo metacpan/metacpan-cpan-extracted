@@ -1,0 +1,121 @@
+Revision history for Perl extension Image::TextMode.
+
+0.25 2015-02-05
+ - Force bitwise-and 1 when doing XOR 1
+
+0.24 2015-09-30
+ - Switched from Moose to Moo and Type::Tiny
+ - When reading SAUCE records, check for "SAUCE00" for header instead of 
+   just "SAUCE" as we only support version "00"
+ - Set proper default filler
+ - Add alias tinfos() for filler() to match the 00.5 spec
+ - add parse_ansiflags() convenience method and fix tinfo/flags meta-info
+
+0.23 2013-11-28
+ - Basic ATASCII support
+ - Use Module::Runtime for loading modules (RT #90928)
+
+0.22 2013-06-19
+ - Handle blink mode feature enable/disable codes
+ - Handle attribute codes 2/22/25/7/27
+ - Support RGB ANSI codes
+ - Specify filesize option for readers to avoid reading into SAUCE records
+
+0.21 2013-03-13
+ - repackaged
+
+0.20 2013-03-12
+ - update to proper 8x16 amiga font
+
+0.19 2013-01-03
+ - fix off-by-one error in background rendering
+
+0.18 2012-03-30
+ - do not special case chr(26) in XBin reading, as it likely does not mean EOF
+
+0.17 2012-02-27
+ - fix IDF reading when a SAUCE record is found
+ - fix XBin reading to stop when the height indicated in the header is reached
+
+0.16 2012-02-15
+ - dos_aspect, a DOS aspect ratio emulation mode option, has been added to 
+   the GD renderer
+
+0.15 2011-05-02
+ - make sure line is defined before we try to clear it
+
+0.14 2011-05-02
+ - add delete_line() to canvas, which removes the line entirely instead of 
+   just clearing its contents
+ - implement the 0 and 1 options of the "clear screen" command
+ - fix clear_line canvas method where range option included "-1"
+
+0.13 2011-04-27
+ - implement ANSI parsing for codes E, F and G
+ - reset cursor to (0,0) after a clear screen
+
+0.12 2011-01-06
+ - use proper color intensity in palettes
+ - use proper bitshifting when parsing XBin/IDF/ADF palettes
+ - updated 8x16 font to match original MSDOS font
+ - do not combine current attr with new bg/fg values in PCBoard reader
+
+0.11 2010-12-11
+ - allow simple font and palette overrides in GD renderer; fix textmode2png
+   script to match
+
+0.10 2010-12-01
+ - save cpu cycles by shipping pre-built GD fonts
+ - add PCBoard format support
+ - add AVATAR format support
+
+0.09 2010-03-19
+ - clean whitespace from argument buffer in ANSI reader
+ - add as_ascii() method to animations
+ - attempt to handle undef datatypes and filetypes in general
+ - handle invalid datatypes in Loader to match invalid filetypes
+
+0.08 2010-02-23
+ - documentation cleanup for Renderer/GD.pm and textmode2png script
+ - convert read/render options specified as "true" and "false" strings to
+   boolean values
+ - avoid undef warnings in Loader when working with files with SAUCE
+   metadata, but no filetype
+ - avoid autovivification in as_ascii method
+ - add IMAGE_TEXTMODE_NOXS ENV variable to ignore XS extensions
+
+0.07 2010-01-01
+ - fix readopt option in textmode2png script
+ - Add basic nearest neighbor textmode scaling 
+ - fix pod typo in SAUCE.pm and Renderer/GD.pm
+ - reduce code complexity in as_ascii method
+
+0.06 2009-10-29
+ - conform to Perl::Critic policies
+ - add binmode for output from textmode2png script
+ - fix undef warning when no output format is specified for thumbnail()
+ - fix docs for truecolor rendering option
+
+0.05 2009-02-13
+ - tidy up ANSI and ANSIMation write() to only write the columns needed
+ - add basic RLE encoding to ANSI and ANSIMation write()
+ - fix up sauce read on files less than 128 bytes
+ - reset the state of the ANSI parser for each read()
+
+0.04 2009-02-09
+ - fix XBin write()
+ - convert "use constant" to "my $var"
+
+0.03 2009-02-05
+ - implement write() for IDF format
+ - implement write() for Tundra format
+ - implement write() for XBin format
+ - implement write() for ANSI format
+ - implement write() for ANSIMation format
+
+0.02 2009-01-14
+ - pod fixes
+
+0.01 2008-10-03
+ - original version
+

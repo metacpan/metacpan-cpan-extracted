@@ -1,0 +1,6 @@
+Build.PL
+COPYING
+lib/IkiWiki/Plugin/disqus.pm
+MANIFEST			This list of files
+META.yml
+META.json

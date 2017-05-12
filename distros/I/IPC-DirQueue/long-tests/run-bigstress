@@ -1,0 +1,13 @@
+#!/bin/sh
+
+runtest() {
+  ./90bigstress.t $1 > log.$1
+}
+
+> progress
+for n in 10 100 500 1000 2000 5000 10000 20000 
+do
+  echo $n ; date
+  time runtest $n
+  time runtest $n
+done

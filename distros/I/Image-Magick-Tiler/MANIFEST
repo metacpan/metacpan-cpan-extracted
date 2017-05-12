@@ -1,0 +1,15 @@
+Changelog.ini
+Changes
+lib/Image/Magick/Tiler.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+scripts/synopsis.pl
+scripts/tile.pl
+t/sample.png
+t/test.t
+xt/author/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

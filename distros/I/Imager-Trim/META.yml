@@ -1,0 +1,33 @@
+---
+abstract: 'automatic cropping for images using Imager.'
+author:
+  - 'Jussi Kinnula <spot@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  blib: '1.01'
+  perl: '5.006'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Imager-Trim
+requires:
+  Imager: '0'
+  Imager::Color: '0'
+  parent: '0'
+  perl: '5.006'
+  strict: '0'
+resources:
+  repository: git://github.com/jussikinnula/imager-trim.git
+version: '0.007'
+x_authority: cpan:SPOT
+x_serialization_backend: 'YAML::Tiny version 1.69'

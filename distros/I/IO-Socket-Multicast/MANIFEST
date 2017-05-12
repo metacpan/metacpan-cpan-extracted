@@ -1,0 +1,12 @@
+Changes
+examples/client.pl
+examples/server.pl
+lib/IO/Socket/Multicast.pm
+Makefile.PL
+MANIFEST			This list of files
+Multicast.xs
+README
+t/01_use.t
+t/03_multicast.t
+t/04_send.t
+META.yml                                 Module meta-data (added by MakeMaker)

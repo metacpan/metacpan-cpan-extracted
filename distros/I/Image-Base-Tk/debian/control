@@ -1,0 +1,38 @@
+# Copyright 2011 Kevin Ryde
+#
+# This file is part of Image-Base-Tk.
+#
+# Image-Base-Tk is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation; either version 3, or (at your option) any later
+# version.
+#
+# Image-Base-Tk is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+# more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with Image-Base-Tk.  If not, see <http://www.gnu.org/licenses/>.
+
+Source: libimage-base-tk-perl
+Section: perl
+Priority: optional
+Build-Depends: cdbs, debhelper (>= 5)
+Maintainer: Kevin Ryde <user42@zip.com.au>
+Standards-Version: 3.9.2
+Homepage: http://user42.tuxfamily.org/image-base-tk/index.html
+Bugs: mailto:user42@zip.com.au
+
+Package: libimage-base-tk-perl
+Architecture: all
+Depends: libimage-base-perl (>= 1.12), perl-tk, ${perl:Depends}, ${misc:Depends}
+Suggests: libtk-tiff-perl, libtk-canvasfig-perl
+Description: Draw into Tk photo or canvas
+ An Image::Base extension to operate on Tk::Photo images and
+ Tk::Canvas widgets.
+ .
+ Tk::Photo can read and write various file formats, including PNG,
+ JPEG, XPM, XBM, GIF, BMP, PPM/PGM, and TIFF with Tk::TIFF from
+ libtk-tiff-perl.  Tk::Canvas can write (but not read) postscript EPS,
+ and with Tk::CanvasFig (libtk-canvasfig-perl) xfig format too.

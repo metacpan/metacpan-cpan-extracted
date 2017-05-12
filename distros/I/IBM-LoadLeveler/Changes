@@ -1,0 +1,136 @@
+Revision history for Perl extension IBM::LoadLeveler.
+
+1.09  Tue Nov 17 22:20 2009
+        - Minor documentation tweeks
+
+---   Mon Nov 02 22:45 2009
+        - Updated for 3.5.1.2
+	- Added new code to find LoadLeveler version
+	- removed some unused variables and properly discarded hv_store returns
+
+---   Sun Jan 19 18:12 2009
+	- Update for 3.5 support:
+	- ll_bind -- binding_method
+	- ll_modify
+	- ll_make_reservation -- expiration & recurrence
+	- Fixed problem building defs.h caused by Unused entries
+	
+---   Tue Oct 28 22:05 2008
+	- Added extra parameters for ll_modify
+
+1.08  Sun Sep 21 08:53 2008
+        - Added C tests to use for comparison with Perl
+        - Re-wrote int array code to fix various problems
+        - Modified Makefile.PL OS detection and C compiler choices
+
+---   Sat Apr 19 13:05 2008
+        - Fixed a problem with LL_ClassPreemptClass call trying to free a NULL pointer 
+
+---   Mon Nov 19 21:55 2007
+        - Modified Makefile.PL to be more CPAN testers friendly
+        - Added query.t test file
+
+1.07  Fri Sep 21 13:30 2007
+        - Added support for version 3.4.1.0 & 3.4.2.1
+	- Added Configuration API
+	- Added Workload API function ll_move_job & ll_move_spool
+	- Removed status value return from ll_make_reservation
+
+1.06  Tue Sep 18 17:05 2007
+	- Added a few more llapi.h files so some definitions are now correctly
+	  in older versions.
+	- Initialised some variables to stop warnings on plinux.
+	- Simple testing done on plinux
+	- Added code for ll_start_job_ext
+	- Added code for ll_preempt_jobs
+	- Added support for version 3.3.1.0+
+	- Major rewrite to alleviate some problems with version support, 
+          defs.h.in now included 
+        - Added ll_cluster, ll_cluster_auth
+	- Added ll_fair_share
+        - Added $IBM::LoadLeveler::errObj and stopped returning errObj
+        - Modified ll_error
+
+1.05  Fri Aug 26 12:54:00 2005
+	- Added Linux Support
+	- Added support for LoadLeveler 3.3.0.0+
+	- Added llqres and reservation examples
+	- Changed how the export list is built from enums
+	- commented out a chunk of code that was created in the initial build
+          since I don't know what it's for. I'll remove it in a later version
+	  if nobody complains.
+
+1.04  Tue Apr  5 13:00:00 2005
+	- Fixed LL_AdapterWindowList & LL_MachinePoolList.
+
+1.03  Web Oct 20 10:20:00 2004
+	- Fixed problem with ll_control wrappers
+	- Checked to see if any updates needed for version 3.2.0.11
+	- Removed NULL string warning in XS_unpack_charPtrPtr
+
+1.02  Mon Sep 20 12:31:00 2004
+	- Analyzed Versions 3.1.0.24 & 3.2.0.0 - 3.2.0.9 for changes
+	  updated LoadLeveler.pod and pm/xs files accordingly
+	- exported symbols for ll_modify
+
+1.01  Mon Aug 23 13:30:00 2004  
+        - ll_reset_request not exported
+        - bugfix from Bernd Kallies (kallies-AT-zib.de)
+	- Stripped leading 0 from LLVER variable in Makefile
+	  stops it looking like octal, which is bad for version 3.2.0.8
+	- Fixed a few typos
+	- Updated examples xmlrss-llq and rss-llq
+
+1.00  Tue Jan 06 10:13:00 2004
+	- Added support for LoadLeveler 3.2
+		- LL_CLASS_* in Data Access API
+		- Extra arguments to ll_modify
+	- using lslpp in Makefile to work out a version number
+	- More examples from Mark Roberts (mark.roberts-AT-awe.co.uk)
+
+1.00  Fri Aug 29 15:34:00 2003
+	- Added QUERY_PROCID parameter from APAR IY35212
+		(Currently broken see APAR IY48329)
+	- Added SYSTEM_PREEMPT_STEP from APAR IY37022
+	- Fixed some problems with 64 bit compile
+
+0.08  Mon Jun 09 16:18:00 2003
+	- Split documentation into sections for easier maintenance
+	- Removed some of the more innovative spellings
+	- Added example of monitor program in Submit.pod
+
+0.07  Tue Mar 18 09:44:00 2003
+	- Changed module name from LoadLeveler to IBM::LoadLeveler for CPAN
+
+0.06  Thu Mar 06 16:16:00 2003
+	- Added Notes on Core dumps with large history files and solution 
+	  contributed by Dr Peter Mayes (peter_mayes-AT-uk.ibm.com) 
+	  and Mark Roberts (mark.roberts-AT-awe.co.uk)
+	- Modified documentation
+
+0.05  Tue Jan 28 16:15:00 2003
+	- Added Workload Management API
+	- Added Data Access API test
+	- More Documentation
+
+0.04  Tue Jan 21 15:20:00 2003
+	- 64 bit data types are now truncated if they overflow the Perl type
+	- Added Generation and installation of llapi.ph to Makefile.PL
+	- Added html target to convert pod to html
+
+0.03  Thu Jan 16 09:26:32 2003
+	- Added submit API
+	- Added ll_control function from Workload Management API
+	- Added ll_error
+
+0.02  Tue Jan 07 16:12:05 2003
+	- Fixed int64_t ll_get_data return types
+	- added STATE_ constants to export list
+	- added machine_job_query & wlmstat examples
+	- Changed package name to LoadLeveler
+	- Improved 64 bit types
+
+0.01  Thu Dec 12 11:49:27 2002
+	- original version; created by h2xs 1.21 with options
+		-x -n LoadLeveler llapi.h
+

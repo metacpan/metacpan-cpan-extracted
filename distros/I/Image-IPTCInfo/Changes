@@ -1,0 +1,82 @@
+Revision history for Image::IPTCInfo.
+
+1.1  May 23, 2001 by Josh Carter
+     - Properly packaged the module with makefile and such.
+     - Fixed stupid byte-ordering bug on Intel architectures.
+
+1.5  May 28, 2001 by Josh Carter
+     - Major update with "real" JFIF parsing and can also
+       create/modify/save IPTC info in JFIF files.
+     - Lots of other features I didn't document at the time and can't
+       remember now.
+
+1.6  Mar 10, 2002 by Josh Carter
+     - Now handles all flavors of JPEG for saving, not just JFIF.
+       (Most nobably it now supports EXIF.)
+     - Fix in CollectAdobeParts() that was corrupting files during
+       SaveAs() if they had an Adobe Resource Block. Sorry!
+     - Some proggies would save files starting the IIM section with
+       0x1c0219 instead of the usual 0x1c0200, so I allow that now.
+     - Fixed a couple stupid bugs in ExportXML.
+     - Now works fine with warnings turned on.
+     - Fixed up HexDump a little and added other debugging tools.
+
+1.7  Oct 03, 2003 by Josh Carter
+     - Fix for odd-length Adobe part at end of Adobe block (thanks to
+       Ed Rossi for sending me files with this problem).
+     - Added option to SaveAs() which lets you discard the other stuff
+       in the Adobe block, which is useful if you have an image with a
+       corrupted block (e.g. from IPTCInfo version 1.5).
+     - Fixed stupid bug in Log().
+
+1.8
+     - Fix to conditional that was using bitwise & instead of boolean
+       &&. They evalutated to the same thing in this case, but it was
+       still a bug. (Thanks Brian.)
+     - Reduced strictness of looking for tag/record/dataset at start
+       of IPTC info. The spec says the version dataset is supposed to
+       be first, but not all apps obey this. IrfanView in particular
+       doesn't.
+     - Couple options on saving for trashing the Abode block and
+       another for trashing *all* application data blocks. You can
+       ditch about 10-15k worth of EXIF, FlashPix, etc. stuff without
+       touching image data. (Feature requested by Scott at USA Today.)
+
+1.9
+     - Contacts is now a repeatable field, like keywords and
+       supplemental categories. (Thanks Edward and Dirk.)
+     - Scanning of App data #13 (Photoshop block) is now limited to
+       the block length, which should keep us both from scanning
+       outside the block, and also not stopping short of scanning the
+       full block. (Thanks Edward and Dirk.)
+     - Trashing application data blocks now preserves APP0 if it's
+       there, since that includes the image resolution, and you need
+       an APP0 block anyway.
+
+1.91
+     - Added 'local caption' field, 121. (Thanks, Joe.)
+
+1.93
+     - Blindscan max can now be configured for large non-JPEG files
+       with code like:
+
+         use Image::IPTCInfo;
+         $Image::IPTCInfo::MAX_FILE_OFFSET = 8192 * 5;
+         my $info = Image::IPTCInfo->new("largefile.tif");
+         
+       (Thanks to Brian Carp.)
+     - Fix to CollectAdobeParts if the size of the data block is smaller
+       than what's expected for the block. (Thanks to Brian Carp.)
+
+1.94
+     - Added support for passing in IO::File file handles in addition to 
+       file names. (Thanks to Marc Liyanage.)
+     - Changed all file accesses from the regular Perl open/read/seek/close
+       calls operating on the FILE handle to OO-style IO::File method calls
+       (Thanks to Marc Liyanage.)
+     - debugMode was accidentally left on in 1.93, turning off.
+       (Thanks to Dr. Michael Langner.)
+
+1.95
+     - Fixing distribution file, 1.94 contained some bogus Mac resource
+       fork files.

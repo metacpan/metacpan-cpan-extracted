@@ -1,0 +1,255 @@
+#!/usr/bin/perl -w
+# See copyright, etc in below POD section.
+######################################################################
+
+require 5.006_001;
+use lib './blib/lib';        # testing
+use Getopt::Long;
+use IO::File;
+use Pod::Usage;
+use Cwd qw (getcwd chdir);
+use strict;
+use vars qw ($Debug);
+use IPC::Locker;
+use IPC::PidStat;
+
+#======================================================================
+
+our @Opt_FgArgv;
+our $Opt_Locklist;
+
+#======================================================================
+# main
+
+# Beware, POSIX execve() et al. have an unspecified effect on the action
+# for SIGCHLD (alone).  So this won't work.
+## $SIG{CHLD} = 'IGNORE';
+
+my %server_params = (lock=>[]);
+
+$Debug = 0;
+Getopt::Long::config ("require_order");
+if (! GetOptions (
+		  "help"	=> \&usage,
+		  "debug"	=> \&debug,
+		  "version"	=> \&version,
+		  "dhost=s"	=> sub {shift; $server_params{host} = shift;},
+		  "lock=s"	=> sub {shift; push @{$server_params{lock}}, split(':',shift);},
+		  "port=i"	=> sub {shift; $server_params{port} = shift;},
+		  "timeout=i"	=> sub {shift; $server_params{timeout} = shift;},
+		  "verbose!"	=> sub {shift; $server_params{verbose} = shift;},
+		  "locklist!"	=> \$Opt_Locklist,
+		  #
+		  "<>"		=> \&parameter,
+		  )) {
+    die "%Error: Bad usage, see lockersh --help\n";
+}
+push @Opt_FgArgv, @ARGV;
+
+if ($Opt_Locklist) {
+    my $lock  = new IPC::Locker (verbose=>0,
+				 timeout=>0,
+				 autounlock=>1,
+				 destroy_unlock=>0,
+				 %server_params,
+				 );
+    locklist($lock);
+    exit(0);
+}
+
+$#{$server_params{lock}}>=0 or die "%Error: --lock not specified; see --help\n";
+$Opt_FgArgv[0] or die "%Error: No command specified\n";
+
+# Fork once to start parent process
+my $foreground_pid = $$;  # Unlike most forks, the job goes in the parent
+
+# Do this while we still have STDERR.
+my $lock  = new IPC::Locker (verbose=>0,
+			     timeout=>0,
+			     autounlock=>1,
+			     destroy_unlock=>0,
+			     %server_params,
+			     );
+$lock or die "%Error: Did not connect to lockerd,";
+$lock->lock;
+
+if (my $pid = fork()) {  # Parent process, foreground job
+    print "\tForeground: @Opt_FgArgv\n" if $Debug;
+    # The child forks again quickly.  Sometimes, SIG_CHLD leaks to us and
+    # wrecks the exec'd command, so wait for it now.
+    my $rv = waitpid($pid, 0);
+    if ($rv != $pid) {
+	die "%Error: waitpid() returned $rv: $!";
+    } elsif ($?) {
+	die "%Error: Child process died with status $?,";
+    }
+
+    print "Exec in $$\n" if $Debug;
+    exec ("/bin/sh", "-c", join(' ',@Opt_FgArgv));
+    die "%Error: Exec failed: @Opt_FgArgv,";
+}
+#else, rest is for child process.
+
+# Disassociate from controlling terminal
+POSIX::setsid()	or die "%Error: Can't start a new session: $!";
+
+# Change working directory
+chdir "/";
+open(STDIN,  "+>/dev/null") or die "%Error: Can't re-open STDIN: $!";
+if (!$Debug) {
+    open(STDOUT, "+>&STDIN");
+    open(STDERR, "+>&STDIN");
+}
+# Prevent possibility of acquiring a controlling terminal
+exit(0) if fork();
+
+# Wait for child to complete.  We can't waitpid, as we're not the parent
+while (IPC::PidStat::local_pid_exists($foreground_pid)) { sleep 1; }
+print "Parent $foreground_pid completed\n" if $Debug;
+
+# Unlock
+$lock->unlock; $lock=undef;
+print "Child exiting\n" if $Debug;
+
+#----------------------------------------------------------------------
+
+sub usage {
+    print "Version: $IPC::Locker::VERSION\n";
+    pod2usage(-verbose=>2, -exitval=>2, -output=>\*STDOUT, -noperldoc=>1);
+    exit (1);
+}
+
+sub version {
+    print "Version: $IPC::Locker::VERSION\n";
+    exit (1);
+}
+
+sub debug {
+    $Debug = 1;
+    $IPC::Locker::Debug = 1;
+}
+
+sub parameter {
+    my $param = shift;
+    if ($Opt_FgArgv[0] || $param !~ /^-/) {
+	push @Opt_FgArgv, $param;
+    } else {
+	die "%Error: Unknown option: $param\n";
+    }
+}
+
+#######################################################################
+
+sub locklist {
+    my $lock = shift;
+    my %list = ($lock->lock_list);
+    foreach my $lockname (sort keys %list) {
+	printf ("%-20s %s\n",$lockname, $list{$lockname});
+    }
+}
+
+#######################################################################
+__END__
+
+=pod
+
+=head1 NAME
+
+lockersh - Run a command under a global lock
+
+=head1 SYNOPSIS
+
+  lockersh [--dhost <host> --port <port>] --lock <name> [args....]
+
+=head1 DESCRIPTION
+
+Obtain a global IPC::Locker lock with the passed name.
+
+When the lock is granted, run the arguments as a command in the foreground.
+When the foreground process exits, release the lock, and return the executed
+command's exit status.
+
+This makes it very easy to insure only one copy of a program executes across
+a clump:
+
+   lockersh --lock one_sleep_runs sleep 10
+
+=head1 ARGUMENTS
+
+=over 4
+
+=item --dhost I<host>
+
+Hostname of L<lockerd> server.  Defaults to IPCLOCKER_HOST environment
+variable.
+
+=item --help
+
+Displays this message and program version and exits.
+
+=item --lock I<lockname>
+
+Name for the lock.  This argument may be passed multiple times or with a
+colon separator to allow one of multiple possible locks to be selected.
+
+=item --locklist
+
+Suppress normal operation, and instead print a list of all outstanding
+locks and their owners.
+
+=item --port I<port>
+
+Port of L<pidstatd> server on remote host.  Defaults IPCLOCKER_PORT environment variable.
+
+=item --timeout
+
+Set number of seconds before wait for license will timeout.   Defaults
+to wait forever.
+
+=item --verbose
+
+Print 'waiting for lock' and similar messages.
+
+=item --version
+
+Displays program version and exits.
+
+=back
+
+=head1 ENVIRONMENT
+
+=over 4
+
+=item IPCLOCKER_HOST
+
+Hostname of L<lockerd> server, or colon separated list including backup
+servers.  Defaults to localhost.
+
+=item IPCLOCKER_PORT
+
+Port number of L<lockerd> server.  Defaults to 1751.
+
+=back
+
+=head1 DISTRIBUTION
+
+The latest version is available from CPAN and from L<http://www.veripool.org/>.
+
+Copyright 2006-2017 by Wilson Snyder.  This package is free software; you
+can redistribute it and/or modify it under the terms of either the GNU
+Lesser General Public License Version 3 or the Perl Artistic License Version 2.0.
+
+=head1 AUTHORS
+
+Wilson Snyder <wsnyder@wsnyder.org>
+
+=head1 SEE ALSO
+
+L<IPC::Locker>, L<lockerd>
+
+=cut
+
+######################################################################
+### Local Variables:
+### compile-command: "./lockersh --lock lockersh_test sleep 10"
+### End:

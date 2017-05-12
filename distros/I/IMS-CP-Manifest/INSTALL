@@ -1,0 +1,44 @@
+
+This is the Perl distribution IMS-CP-Manifest.
+
+Installing IMS-CP-Manifest is straightforward.
+
+## Installation with cpanm
+
+If you have cpanm, you only need one line:
+
+    % cpanm IMS::CP::Manifest
+
+If you are installing into a system-wide directory, you may need to pass the
+"-S" flag to cpanm, which uses sudo to install the module:
+
+    % cpanm -S IMS::CP::Manifest
+
+## Installing with the CPAN shell
+
+Alternatively, if your CPAN shell is set up, you should just be able to do:
+
+    % cpan IMS::CP::Manifest
+
+## Manual installation
+
+As a last resort, you can manually install it. Download the tarball, untar it,
+then build it:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+If you are installing into a system-wide directory, you may need to run:
+
+    % sudo make install
+
+## Documentation
+
+IMS-CP-Manifest documentation is available as POD.
+You can run perldoc from a shell to read the documentation:
+
+    % perldoc IMS::CP::Manifest

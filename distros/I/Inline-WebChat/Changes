@@ -1,0 +1,20 @@
+Revision history for Perl extension Inline::WebChat.
+
+0.62  Tues Dec 11 17:52:14 2001
+	- apparently I didn't release 0.61 - bad me
+
+	- fixes conflicts with Test::More
+
+	- added documentation patche which fixes some speeeling mistooks 
+	  and also shows how to work around a inherent flaw in the whole caboodle.
+	
+0.6   later
+	- up the version number to sort out some problems
+ 
+0.5   Sat Aug 11 20:43:27 2001
+	- actually written now, tests done, docs written
+
+0.01  Fri Aug 10 20:22:13 2001
+	- original version; created by h2xs 1.20 with options
+		-X Inline::WebChat
+

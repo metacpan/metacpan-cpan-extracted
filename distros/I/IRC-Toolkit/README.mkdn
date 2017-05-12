@@ -1,0 +1,71 @@
+# NAME
+
+IRC::Toolkit - Useful IRC objects and utilities
+
+# SYNOPSIS
+
+    ## Import the most commonly used Tookit:: modules
+    ##  (Case, Colors, CTCP, ISupport, Masks, Modes, Parser)
+    use IRC::Toolkit;
+
+    ## Import a list of modules:
+    use IRC::Toolkit qw/
+      CTCP
+      Masks
+      Modes
+      Numerics
+    /;
+
+    ## ... or individually:
+    use IRC::Toolkit::Numerics;
+
+# DESCRIPTION
+
+A collection of useful IRC-related utilities. See their respective
+documentation, below.
+
+Modules that export functions use [Exporter::Tiny](https://metacpan.org/pod/Exporter::Tiny), which is quite flexible;
+see the [Exporter::Tiny](https://metacpan.org/pod/Exporter::Tiny) docs for details.
+
+[IRC::Message::Object](https://metacpan.org/pod/IRC::Message::Object); Objects representing incoming or outgoing IRC events
+
+[IRC::Mode::Single](https://metacpan.org/pod/IRC::Mode::Single); Objects representing a single mode change
+
+[IRC::Mode::Set](https://metacpan.org/pod/IRC::Mode::Set); Objects representing a set of mode changes
+
+[IRC::Toolkit::Case](https://metacpan.org/pod/IRC::Toolkit::Case); RFC-compliant case folding tools
+
+[IRC::Toolkit::Colors](https://metacpan.org/pod/IRC::Toolkit::Colors); Color/format code interpolation & removal
+
+[IRC::Toolkit::CTCP](https://metacpan.org/pod/IRC::Toolkit::CTCP); CTCP quoting and extraction tools
+
+[IRC::Toolkit::ISupport](https://metacpan.org/pod/IRC::Toolkit::ISupport); ISUPPORT (numeric 005) parser
+
+[IRC::Toolkit::Masks](https://metacpan.org/pod/IRC::Toolkit::Masks); Hostmask parsing and matching tools
+
+[IRC::Toolkit::Modes](https://metacpan.org/pod/IRC::Toolkit::Modes); Mode-line parsing tools
+
+[IRC::Toolkit::Numerics](https://metacpan.org/pod/IRC::Toolkit::Numerics); IRC numerics translation to/from RPL or ERR names
+
+[IRC::Toolkit::Parser](https://metacpan.org/pod/IRC::Toolkit::Parser); Functional interface to [POE::Filter::IRCv3](https://metacpan.org/pod/POE::Filter::IRCv3)
+
+[IRC::Toolkit::TS6](https://metacpan.org/pod/IRC::Toolkit::TS6); Produce sequential TS6 IDs
+
+[IRC::Toolkit::Role::CaseMap](https://metacpan.org/pod/IRC::Toolkit::Role::CaseMap); A Role for classes that track IRC casemapping
+settings
+
+# SEE ALSO
+
+[IRC::Utils](https://metacpan.org/pod/IRC::Utils)
+
+[Parse::IRC](https://metacpan.org/pod/Parse::IRC)
+
+# AUTHOR
+
+Jon Portnoy <avenj@cobaltirc.org>
+
+Portions of code are derived from [IRC::Utils](https://metacpan.org/pod/IRC::Utils), [Net::IRC](https://metacpan.org/pod/Net::IRC), and
+[POE::Filter::IRC::Compat](https://metacpan.org/pod/POE::Filter::IRC::Compat), which are copyright their respective authors;
+these items are documented where they are found.
+
+Licensed under the same terms as Perl.

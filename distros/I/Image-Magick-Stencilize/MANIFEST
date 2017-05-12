@@ -1,0 +1,14 @@
+t/99_cleanup.t
+t/rihannawma52.jpg
+t/soldier.jpg
+t/BuffaloSoldierBugler.jpg
+t/MLK.jpg
+t/rihanna.jpg
+t/01_Image_Magick_Stencilize.t
+t/lou_reed.jpg
+t/rhianna.jpg
+Makefile.PL
+lib/Image/Magick/Stencilize.pm
+MANIFEST
+
+META.yml                                 Module meta-data (added by MakeMaker)

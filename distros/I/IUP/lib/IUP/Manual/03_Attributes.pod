@@ -1,0 +1,1822 @@
+=pod
+
+=head1 NAME
+
+IUP::Manual::03_Attributes - Attributes concept, using attributes, common + global attributes
+
+=head1 IUP MANUAL
+
+=over
+
+=item * L<IUP::Manual::01_Introduction|IUP::Manual::01_Introduction>
+
+=item * L<IUP::Manual::02_Elements|IUP::Manual::02_Elements>
+
+=item * IUP::Manual::03_Attributes E<nbsp>E<nbsp>E<nbsp>E<nbsp>E<nbsp> B<E<lt>E<lt>E<lt> this document>
+
+=item * L<IUP::Manual::04_Callbacks|IUP::Manual::04_Callbacks>
+
+=item * L<IUP::Manual::06_HandlingKeyboard|IUP::Manual::06_HandlingKeyboard>
+
+=item * L<IUP::Manual::05_DialogLayout|IUP::Manual::05_DialogLayout>
+
+=item * L<IUP::Manual::07_UsingImageLibrary|IUP::Manual::07_UsingImageLibrary>
+
+=item * L<IUP::Manual::08_DragAndDrop|IUP::Manual::08_DragAndDrop>
+
+=back
+
+=head1 INTRODUCTION
+
+This document is intended as a reference list for common attributes used by several
+(or all) GUI elements and global attributes which are not associated with any element.
+
+For more information about using attributes see L<Attributes Concept|IUP::Manual::01_Introduction/"Attributes Concept">
+in L<IUP::Manual::01_Introduction|IUP::Manual::01_Introduction>.
+
+=head2 Common and/or frequently used attributes
+
+You can manipulate these attributes via Get/SetAttributes methods of particualr emlement:
+
+ my $value = $element->GetAttribute('TITLE');  #get value
+ $element->SetAttribute('TITLE', $value);      #set value
+
+or via accessors:
+
+ my $value = $element->TITLE;  #get value
+ $element->TITLE($value);      #set value
+
+=for comment c_at_marker
+
+=over
+
+=item * B<L<Common Attributes|/"Common Attributes">>
+
+L<ACTIVE|/"ACTIVE">, L<BGCOLOR|/"BGCOLOR">, L<CHARSIZE|/"CHARSIZE">, L<CLIENTOFFSET|/"CLIENTOFFSET">, L<CLIENTSIZE|/"CLIENTSIZE">, L<EXPAND|/"EXPAND">,
+L<FGCOLOR|/"FGCOLOR">, L<FLOATING|/"FLOATING">, L<FONT|/"FONT">, L<FONTFACE|/"FONTFACE">, L<FONTSIZE|/"FONTSIZE">, L<FONTSTYLE|/"FONTSTYLE">,
+L<FOUNDRY|/"FOUNDRY">, L<MAXSIZE|/"MAXSIZE">, L<MINSIZE|/"MINSIZE">, L<NAME|/"NAME">, L<POSITION|/"POSITION">, L<RASTERSIZE|/"RASTERSIZE">,
+L<SIZE|/"SIZE">, L<TIP|/"TIP">, L<TIPBALLON|/"TIPBALLON">, L<TIPBALLONTITLE|/"TIPBALLONTITLE">, L<TIPBALLONTITLEICON|/"TIPBALLONTITLEICON">,
+L<TIPBGCOLOR|/"TIPBGCOLOR">, L<TIPDELAY|/"TIPDELAY">, L<TIPFGCOLOR|/"TIPFGCOLOR">, L<TIPFONT|/"TIPFONT">, L<TIPICON|/"TIPICON">,
+L<TIPMARKUP|/"TIPMARKUP">, L<TIPRECT|/"TIPRECT">, L<TIPVISIBLE|/"TIPVISIBLE">, L<TITLE|/"TITLE">, L<VALUE|/"VALUE">, L<VISIBLE|/"VISIBLE">,
+L<WID|/"WID">, L<X|/"X">, L<Y|/"Y">, L<ZORDER|/"ZORDER">
+
+=item * B<L<Frequently used Attributes|/"Frequently used Attributes">>
+
+L<CONTROL|/"CONTROL">, L<CURSOR|/"CURSOR">, L<DX|/"DX">, L<DY|/"DY">, L<ICON|/"ICON">, L<MASK|/"MASK">, L<MASKCASEI|/"MASKCASEI">,
+L<MASKFLOAT|/"MASKFLOAT">, L<MASKINT|/"MASKINT">, L<PARENTDIALOG|/"PARENTDIALOG">, L<POSX|/"POSX">, L<POSY|/"POSY">, L<SCROLLBAR|/"SCROLLBAR">,
+L<SHRINK|/"SHRINK">, L<XMAX|/"XMAX">, L<XMIN|/"XMIN">, L<YMAX|/"YMAX">, L<YMIN|/"YMIN">
+
+=back
+
+=head2 Global Attributes
+
+You can manipulate these attributes like this:
+
+ my $value = IUP->GetAttribute('TITLE');  #get value
+ IUP->SetAttribute('TITLE', $value);      #set value
+
+=for comment g_at_marker
+
+=over
+
+=item * B<L<Global Attributes - General|/"Global Attributes - General">>
+
+L<COPYRIGHT|/"COPYRIGHT">, L<DRIVER|/"DRIVER">, L<LANGUAGE|/"LANGUAGE">, L<VERSION|/"VERSION">
+
+=item * B<L<Global Attributes - System Control|/"Global Attributes - System Control">>
+
+L<AUTOREPEAT|/"AUTOREPEAT">, L<CONTROLKEY|/"CONTROLKEY">, L<CURSORPOS|/"CURSORPOS">, L<KEY|/"KEY">, L<KEYPRESS|/"KEYPRESS">, L<KEYRELEASE|/"KEYRELEASE">,
+L<LOCKLOOP|/"LOCKLOOP">, L<MODKEYSTATE|/"MODKEYSTATE">, L<MOUSEBUTTON|/"MOUSEBUTTON">, L<SHIFTKEY|/"SHIFTKEY">, L<SINGLEINSTANCE|/"SINGLEINSTANCE">,
+L<UTF8AUTOCONVERT|/"UTF8AUTOCONVERT">
+
+=item * B<L<Global Attributes - System Information|/"Global Attributes - System Information">>
+
+L<COMPUTERNAME|/"COMPUTERNAME">, L<GTKDEVVERSION|/"GTKDEVVERSION">, L<GTKVERSION|/"GTKVERSION">, L<MOTIFNUMBER|/"MOTIFNUMBER">,
+L<MOTIFVERSION|/"MOTIFVERSION">, L<SYSTEM|/"SYSTEM">, L<SYSTEMLANGUAGE|/"SYSTEMLANGUAGE">, L<SYSTEMVERSION|/"SYSTEMVERSION">,
+L<USERNAME|/"USERNAME">, L<XSERVERVENDOR|/"XSERVERVENDOR">, L<XVENDORRELEASE|/"XVENDORRELEASE">
+
+=item * B<L<Global Attributes - Screen Information|/"Global Attributes - Screen Information">>
+
+L<FULLSIZE|/"FULLSIZE">, L<MONITORSINFO|/"MONITORSINFO">, L<SCREENDEPTH|/"SCREENDEPTH">, L<SCREENSIZE|/"SCREENSIZE">,
+L<TRUECOLORCANVAS|/"TRUECOLORCANVAS">, L<VIRTUALSCREEN|/"VIRTUALSCREEN">
+
+=item * B<L<Global Attributes - System Data|/"Global Attributes - System Data">>
+
+L<APPSHELL|/"APPSHELL">, L<DLL_HINSTANCE|/"DLL_HINSTANCE">, L<HINSTANCE|/"HINSTANCE">, L<XDISPLAY|/"XDISPLAY">, L<XSCREEN|/"XSCREEN">
+
+=item * B<L<Global Attributes - Default Attributes|/"Global Attributes - Default Attributes">>
+
+L<DEFAULTFONT|/"DEFAULTFONT">, L<DEFAULTFONTSIZE|/"DEFAULTFONTSIZE">, L<DLGBGCOLOR|/"DLGBGCOLOR">, L<DLGFGCOLOR|/"DLGFGCOLOR">,
+L<MENUBGCOLOR|/"MENUBGCOLOR">, L<MENUFGCOLOR|/"MENUFGCOLOR">, L<TXTBGCOLOR|/"TXTBGCOLOR">, L<TXTFGCOLOR|/"TXTFGCOLOR">
+
+=back
+
+=for comment at_details
+
+=head1 COMMON ATTRIBUTES
+
+=head2 Common Attributes
+
+=over
+
+=item B<ACTIVE>
+
+Activates or inhibits user interaction.
+
+B<Value:> "YES" (active), "NO" (inactive).
+
+B<Default:> "YES"
+
+B<Notes:>
+
+An interface element is only active if its native parent is also
+active.
+
+ACTIVE can also be set for controls that do not have user interaction
+because they may have a visual feedback to indicate the inactive state.
+
+In GTK and Motif the inactive dialogs will still be able to move,
+resize and change their Z-order. Although their contents will be
+inactive, keyboard will be disabled, and they can not be closed from
+the close box.
+
+B<Affects:> All controls that have visual representation.
+
+=item B<BGCOLOR>
+
+Element's background color.
+
+B<Value:> The RGB components.
+
+Values should be between 0 and 255, separated by a blank space. For
+example "255 0 128", red=255 blue=0 green=128.
+
+B<Default:> It is the value of the DLGBGCOLOR global attribute. On some
+controls if not defined will inherit the background of the native
+parent.
+
+B<Affects:> All, but with restrictions. Several controls have transparent parts
+that are not affected by the BGCOLOR.
+
+See also the screenshots of the L<sample.c|../../examples/C/sample.c>
+results with L<normal background|../sample_results.html>, changing the
+dialog L<BACKGROUND|../sample_results_background.html>, the dialog
+L</../sample_results_bgcolor.html> and the L<children
+BGCOLOR|../sample_results_bgcolor_indiv.html>.
+
+B<See Also:> L</IUP::Manual::03_Attributes/FGCOLOR>, L</iup_globals.html#DLGBGCOLOR>
+
+=item B<CHARSIZE>
+
+I<(read-only, non inheritable)>
+
+Returns the average character size of the current FONT attribute. This
+is the factor used by the SIZE attribute to convert its units to
+pixels.
+
+=item B<CLIENTOFFSET>
+
+I<(read-only, non inheritable)>
+
+Returns the container offset to the B<Client> area, see the L<IUP::Manual::05_DialogLayout|IUP::Manual::05_DialogLayout>.
+Useful for L<IUP::Frame|IUP::Frame>, L<IUP::Tabs|IUP::Tabs> and
+L<IUP::Dialog|IUP::Dialog> that have decorations. Can also be consulted in other
+containers, it will return "0x0". For controls that have a native
+representation is only available when the control is mapped.
+
+In GTK and Motif, for the L<IUP::Dialog|IUP::Dialog>, the dy value is negative when
+there is a menu. This occours because in those systems the menu is
+placed inside the Client Area and all children must be placed bellow
+the menu.
+
+In Windows, for the L<IUP::Frame|IUP::Frame>, the value is always "0x0" because it
+actually does not have a B<Client> area, so the child is manually
+positioned in the expected B<Client> area.
+
+This attribute can be used in conjunction with the POSITION attribute
+of a child so the coordinates of a child relative to the native parent
+top-left corner can be obtained.
+
+B<Value:> C<< "<dx>x<dy>" >>, where C<< <dx> >> and C<< <dy> >> are integer
+values corresponding to the horizontal and vertical offsets, respectively, in pixels.
+
+B<Affects:> All elements that are containers, except menus.
+
+B<See Also:> L<SIZE|/SIZE>, L<RASTERSIZE|/RASTERSIZE>,
+L<CLIENTSIZE|/CLIENTSIZE>, L<POSITION|iup_position.html>
+
+=item B<CLIENTSIZE>
+
+I<(read-only**, non inheritable)>
+
+Returns the container B<Current> size, in pixels, excluding the
+decorations, i.e. the size of the B<Client> area, see the L<IUP::Manual::05_DialogLayout|IUP::Manual::05_DialogLayout>.
+Useful for L<IUP::Frame|IUP::Frame>, L<IUP::Tabs|IUP::Tabs> and
+L<IUP::Dialog|IUP::Dialog> that have decorations. Can also be consulted in other
+containers, it will return the B<Current> size. For controls that have
+a native representation is only available when the control is mapped.
+
+B<Value:> C<< "<width>x<height>" >>, where C<< <width> >> and C<< <height> >> are integer
+values corresponding to the horizontal and vertical size, respectively, in
+pixels.
+
+B<Affects:> All elements that are containers, except menus.
+
+B<Notes:>
+
+**) For L<IUP::Dialog|IUP::Dialog> CLIENTSIZE is NOT read-only, and it will define
+RASTERSIZE by adding the decorations to the Client size. (Since iup-3.3)
+
+B<See Also:> L<SIZE|/SIZE>, L<RASTERSIZE|/RASTERSIZE>,
+L<CLIENTOFFSET|/CLIENTOFFSET>
+
+=item B<EXPAND>
+
+I<(non inheritable)>
+
+Allows the element to expand, fulfilling empty spaces inside its
+container.
+
+It is a non inheritable attribute, but a container can inherits its
+parents EXPAND attribute. So although EXPAND is non inheritable, it is
+inheritable for containers. So if you set it at a container it will not
+affect its children, but a child that is a container will get the same
+value if not defined at the child itself.
+
+The expansion is done equally for all expandable elements in the same
+container.
+
+See the L<IUP::Manual::05_DialogLayout|IUP::Manual::05_DialogLayout> for more details on sizes.
+
+B<Value:> "YES" (both directions), "HORIZONTAL", "VERTICAL" or "NO".
+
+B<Default:> "NO". For containers the default is "YES"
+
+B<Affects:> All elements, except menus.
+
+=item B<FGCOLOR>
+
+Element's foreground color. Usually it is the color of the
+associated text.
+
+B<Value:> The RGB components. Values should be between 0 and 255, separated by a
+blank space.
+
+B<Default:> "0 0 0"
+
+B<Affects:> All.
+
+B<See Also:> L</IUP::Manual::03_Attributes/BGCOLOR>
+
+=item B<FLOATING>
+
+I<(non inheritable)>
+
+If an element has FLOATING=YES then its size and position will be
+ignored by the layout processing in L<IUP::Vbox|IUP::Vbox>, L<IUP::Hbox|IUP::Hbox> and
+L<IUP::Zbox|IUP::Zbox>. But the element size and position will still be updated in
+the native system allowing the usage of B<SIZE>/B<RASTERSIZE> and
+B<POSITION> to manually position and size the element.
+
+This is useful when you do not want that an invisible element to be
+computed in the box size.
+
+If the value IGNORE is used then it will behave as YES, but also it
+will not update the the size and position in the native system. (since
+3.3)
+
+B<Value:> "YES", "IGNORE" (since iup-3.3) or "NO".
+
+B<Default:> "NO"
+
+B<Affects:> All elements, except menus.
+
+B<See Also:> L<IUP::Zbox|IUP::Zbox>, L<IUP::Vbox|IUP::Vbox>, L<IUP::Hbox|IUP::Hbox>
+
+=item B<FONT>
+
+Character font of the text shown in the element. Although it is an
+inheritable attribute, it is defined only on elements that have a
+native representation.
+
+B<Value:>
+
+Font description containing typeface, style and size.
+
+B<Default:> the global attribute DEFAULTFONT.
+
+The common format definition is similar to the the L<Pango|http://www.pango.org/> library Font Description, used by GTK+2.
+It is defined as having 3 parts: "E<lt>font familyE<gt>, E<lt>font
+stylesE<gt> E<lt>font sizeE<gt>".
+
+Font family can be a list of fonts face names, but this is only
+accepted in GTK. So the font family can be reduced to font face.
+
+The supported font style is a combination of: B<Bold>, B<Italic>,
+B<Underline> and B<Strikeout>. The Pango format include many other
+definitions not supported by the common format, they are supported only
+by the GTK driver. Unsupported values are simply ignored.
+
+Font size is in points (1/72 inch) or in pixels (using negative
+values).
+
+The old L<Font Names|iup_font.html#Font_Names> are still supported. The
+old Windows L<FONT|/FONT> format is still supported in the
+Windows driver.
+
+Returned values will be the same value when changing the attribute,
+except for the old font names that will be converted to the new common
+format definition.
+
+B<Windows Related Notes:>
+
+The DEFAULTFONT is retrieved from the System Settings (see bellow), if
+this failed then "Tahoma, 10" is assumed.
+
+The native handle can be obtained using the "B<HFONT>" attribute.
+
+In "Control Panel", open the "Display Properties" then click on
+"Advanced" and select "Message Box" and change its Font to affect the
+default font for applications. In Vista go to "Window Color and
+Appearance", then "Open Classic Appearance", then Advanced.
+
+B<Motif Related Notes:>
+
+The DEFAULTFONT is retrieved from the user resource file (see bellow),
+if failed then "Fixed, 11" is assumed.
+
+The X-Windows Logical Font Description format (XLFD) is also supported.
+
+The native handle can be obtained using the "B<XMFONTLIST>" and
+"B<XFONTSTRUCT>" attributes. The selected X Logical Font Description
+string can be obtained from the attribute "B<XLFD>".
+
+You can use the B<xfontsel> program to obtain a string in the X-Windows
+Logical Font Description format (XLFD). Noticed that the first size
+entry of the X-Windows font string format (B<pxlsz>) is in pixels and
+the next one (B<ptSz>) is in deci-points (multiply the value in points
+by 10).
+
+Be aware that the resource files ".Xdefaults" and "Iup" in the user
+home folder can affect the default font and many others visual
+appearance features in Motif.
+
+B<GTK2+ Related Notes:>
+
+The DEFAULTFONT is retrieved from the style defined by GNOME (see
+bellow), if failed "Sans, 10" is assumed.
+
+The X-Windows Logical Font Description format (XLFD) is also supported.
+
+The native handle can be obtained using the "B<PANGOFONTDESC>"
+attribute.
+
+Style can also be a combination of: Small-Caps,
+[Ultra-Light|Light|Medium|Semi-Bold|Bold|Ultra-Bold|Heavy],
+[Ultra-Condensed|Extra-Condensed|Condensed|Semi-Condensed|Semi-Expanded|Expanded|Extra-Expanded|Ultra-Expanded].
+Those values can be used only when the string is a full Pango compliant
+font, i.e. no underline, no strikeout and sizeE<gt>0.
+
+In GNOME, go to the "Appearance Preferences" tool, then in the Fonts
+tab change the Applications Font to affect the default font.
+
+B<Examples:>:
+
+ "Times, Bold 18"
+ "Arial,Helvetica, 24" (list of fonts for GTK)
+ "Courier New, Italic Underline -30" (size in pixels)
+
+B<Affects:> All elements, since the SIZE attribute depends on the FONT attribute,
+except for menus.
+
+B<Notes:>
+
+When FONT is changed and L<SIZE|/SIZE> is set, then L<RASTERSIZE|/RASTERSIZE> is also updated.
+
+Since font face names are not a standard between Windows, Motif and
+GTK, a few names are specially handled to improve application
+portability. If you want to use names that work for all systems we
+recommend using: Courier, Times and Helvetica (same as Motif). Those
+names always have a native system name equivalent. If you use those
+names IUP will automatically map to the native system equivalent. See
+the table bellow:
+
+ Motif            Windows           GTK               Description
+ ---------------- ----------------- ----------------- -------------------------------
+ Helvetica        Arial             Sans              without serif, variable spacing 
+ Courier          Courier New       Monospace         with serif, fixed spacing 
+ Times            Times New Roman   Serif             with serif, variable spacing 
+
+B<Notes: Font - Auxiliary Attributes>
+
+See FONTFACE, FONTSIZE, FONTSTYLE, FOUNDRY - they will change the FONT
+attribute, and depends on it. They are used only to set partial FONT
+parameters of style and size. To do that the FONT attribute is
+parsed, changed and updated to the new value in the common
+format definition. This means that if the attribute was set in
+X-Windows format or in the old Windows and IUP formats, the previous
+value will be replaced by a new value in the common format definition.
+Pango additional styles will also be removed.
+
+=item B<FONTFACE>
+
+I<(read-only, non inheritable)> Returns the face name of the current FONT attribute.
+
+=item B<FONTSIZE>
+
+I<(non inheritable)> Replaces or returns the size of the current FONT attribute.
+
+=item B<FONTSTYLE>
+
+I<(non inheritable)> Replaces or returns the style of the current FONT attribute.
+
+=item B<FOUNDRY>
+
+I<(non inheritable) [Motif Only]> Allows to select a foundry for the FONT being selected. Must be set
+before setting the FONT attribute.
+
+=item B<MAXSIZE>
+
+I<(non inheritable)> Specifies the element maximum size in pixels during the layout process.
+
+See the L<IUP::Manual::05_DialogLayout|IUP::Manual::05_DialogLayout> for more details on sizes.
+
+B<Value:> C<< "<width>x<height>" >>, where C<< <width> >> and C<< <height> >> are integer
+values corresponding to the horizontal and vertical size, respectively, in
+pixels.
+
+You can also set only one of the parameters by removing the other one
+and maintaining the separator C<"x">, but this is equivalent of setting
+the other value to 0. For example: C<"x40"> (height only = C<"0x40">) or
+C<"40x"> (width only = C<"40x0">).
+
+B<Affects:> All, except menus and the dialog.
+
+The L<IUP::Dialog|IUP::Dialog> has the same attribute but within a different behavior
+although with a very similar objective.
+
+B<Notes:>
+
+The limits are applied during the layout computation. It will limit the
+Natural size and the Current size.
+
+If the element can be expanded, then its empty space will NOT be
+occupied by other controls although its size will be limited.
+
+See the L<IUP::Manual::05_DialogLayout|IUP::Manual::05_DialogLayout> for mode details on sizes.
+
+B<See Also:> L<RASTERSIZE|/RASTERSIZE>, L<MINSIZE|iup_minsize.html>
+
+=item B<MINSIZE>
+
+I<(non inheritable)> Specifies the element minimum size in pixels during the layout process.
+
+See the L<IUP::Manual::05_DialogLayout|IUP::Manual::05_DialogLayout> for more details on sizes.
+
+B<Value:> C<< "<width>x<height>" >>, where C<< <width> >> and C<< <height> >> are integer
+values corresponding to the horizontal and vertical size, respectively, in
+pixels.
+
+You can also set only one of the parameters by removing the other one
+and maintaining the separator C<"x">, but this is equivalent of setting
+the other value to 0. For example: C<"x40"> (height only = C<"0x40">) or
+C<"40x"> (width only = C<"40x0">).
+
+B<Affects:> All, except menus and the dialog.
+
+The L<IUP::Dialog|IUP::Dialog> has the same attribute but within a different behavior
+although with a very similar objective.
+
+B<Notes:>
+
+The limits are applied during the layout computation. It will limit the
+Natural size and the Current size.
+
+If the element can be expanded, then its empty space will NOT be
+occupied by other controls although its size will be limited.
+
+See the L<IUP::Manual::05_DialogLayout|IUP::Manual::05_DialogLayout> for mode details on sizes.
+
+B<See Also:> L<RASTERSIZE|/RASTERSIZE>, L<MAXSIZE|iup_maxsize.html>
+
+=item B<NAME>
+
+I<(non inheritable)> Name of the control inside the dialog. Not releated to L<SetName|IUP::Manual::02_Elements/"SetName()">.
+
+B<Value:> Text.
+
+B<Notes:>
+
+The NAME value will be used by L<GetDialogChild|IUP::Manual::02_Elements/"GetDialogChild()"> to find a child inside a dialog.
+
+B<Affects:> All controls.
+
+B<See Also:> L<GetDialogChild|IUP::Manual::02_Elements/"GetDialogChild()">
+
+=item B<POSITION>
+
+I<(read-only, non inheritable)> The position of the element
+relative to the origin of the B<Client>
+area of the native parent. If you add the CLIENTOFFSET attribute of the
+native parent, you can obtain the coordinates relative to the B<Window>
+area of the native parent. See the L<IUP::Manual::05_DialogLayout|IUP::Manual::05_DialogLayout>.
+
+It is normally read-only, but if FLOATING=YES then it can be set.
+
+B<Value:> C<< "<x>,<y>" >>, where C<< <x> >> and C<< <y> >> are integer
+values corresponding to the horizontal and vertical position,
+respectively, in pixels.
+
+B<Affects:> All, except menus.
+
+B<See Also:> L<SIZE|/SIZE>, L<RASTERSIZE|/RASTERSIZE>,
+L<FLOATING|/FLOATING>, L<CLIENTOFFSET|/CLIENTOFFSET>
+
+=item B<RASTERSIZE>
+
+I<(non inheritable)> Specifies the element B<User> size, and returns the B<Current> size, in pixels.
+
+See the L<IUP::Manual::05_DialogLayout|IUP::Manual::05_DialogLayout> for more details on sizes.
+
+B<Value:> C<< "<width>x<height>" >>, where C<< <width> >> and C<< <height> >> are integer
+values corresponding to the horizontal and vertical size, respectively, in
+pixels.
+
+You can also set only one of the parameters by removing the other one
+and maintaining the separator C<"x">, but this is equivalent of setting
+the other value to 0. For example: C<"x40"> (height only = C<"0x40">) or
+C<"40x"> (width only = C<"40x0">).
+
+When this attribute is consulted the B<Current> size of the control is
+returned.
+
+B<Affects:> All, except menus.
+
+B<Notes:>
+
+When this attribute is set, it resets the L<SIZE|/SIZE>
+attribute. So changes to the L<FONT|/FONT> attribute will not
+affect the B<User> size of the element.
+
+A B<User> size of "0x0" can be set, it can also be set using C<undef>.
+
+If you wish to use the B<User> size only as an initial size, change
+this attribute to C<undef> after the control is mapped, the returned size
+in L<GetAttribute|IUP::Manual::02_Elements/"GetAttribute()"> will still be the B<Current> size.
+
+The element is NOT immediately repositioned. Call L<Refresh|IUP::Manual::02_Elements/"Refresh()"> to
+update the dialog layout.
+
+L<Map|IUP::Manual::02_Elements/"Map()"> also updates the dialog layout even if it is already mapped,
+so calling it or calling L<Show|IUP::Manual::02_Elements/"Show()">, L<ShowXY|IUP::Manual::02_Elements/"ShowXY()"> or L<Popup|IUP::Manual::02_Elements/"Popup()">
+(they all call L<Map|IUP::Manual::02_Elements/"Map()">) will also update the dialog layout.
+
+See the L<IUP::Manual::05_DialogLayout|IUP::Manual::05_DialogLayout> for mode details on sizes.
+
+B<See Also:> L<SIZE|/SIZE>, L<FONT|/FONT>
+
+=item B<SIZE>
+
+I<(non inheritable)>
+
+Specifies the element B<User> size, and returns the B<Current> size, in
+units proportional to the size of a character.
+
+See the L<IUP::Manual::05_DialogLayout|IUP::Manual::05_DialogLayout> for more details on sizes.
+
+B<Value:> C<< "<width>x<height>" >>, where C<< <width> >> and C<< <height> >> are integer
+values corresponding to the horizontal and vertical size, respectively, in
+characters fraction unit (see Notes bellow).
+
+You can also set only one of the parameters by removing the other one
+and maintaining the separator C<"x">, but this is equivalent of setting
+the other value to 0. For example: C<"x40"> (height only = C<"0x40">) or
+C<"40x"> (width only = C<"40x0">).
+
+When this attribute is consulted the B<Current> size of the control is
+returned.
+
+B<Notes:>
+
+The size units observes the following heuristics:
+
+=over
+
+=item * Width in 1/4's of the average width of a character for the
+current B<FONT> of each control.
+
+=item * Height in 1/8's of the average height of a character for the
+current B<FONT> of each control.
+
+=back
+
+So, a SIZE="4x8" means 1 character width and 1 character height.
+
+Notice that this is the average character size, the space occupied by a
+specific string is always different than its number of character times
+its average character size, except when using a monospaced font like
+Courier. Usually for common strings this size is smaller than the
+actual size, so it is a good practice to leave more room than expected
+if you use the SIZE attribute. For smaller font sizes this difference
+is more noticeable than for larger font sizes.
+
+When this attribute is changed, the L<RASTERSIZE|/RASTERSIZE>
+attribute is automatically updated.
+
+SIZE depends on L<FONT|/FONT>, so when L<FONT|/FONT> is changed and
+L<SIZE|/SIZE> is set, then L<RASTERSIZE|/RASTERSIZE> is also updated.
+
+The average character size of the current B<FONT> can be obtained from
+the L<CHARSIZE|/CHARSIZE> attribute.
+
+A B<User> size of "0x0" can be set, it can also be set using C<undef>.
+
+If you wish to use the B<User> size only as an initial size, change
+this attribute to C<undef> after the control is mapped, the returned size
+in L<GetAttribute|IUP::Manual::02_Elements/"GetAttribute()"> will still be the B<Current> size.
+
+The element is NOT immediately repositioned. Call L<Refresh|IUP::Manual::02_Elements/"Refresh()"> to
+update the dialog layout.
+
+L<Map|IUP::Manual::02_Elements/"Map()"> also updates the dialog layout even if it is already mapped,
+so calling it or calling L<Show|IUP::Manual::02_Elements/"Show()">, L<ShowXY|IUP::Manual::02_Elements/"ShowXY()"> or L<Popup|IUP::Manual::02_Elements/"Popup()">
+(they all call L<Map|IUP::Manual::02_Elements/"Map()">) will also update the dialog layout.
+
+See the L<IUP::Manual::05_DialogLayout|IUP::Manual::05_DialogLayout> for mode details on sizes.
+
+B<Affects:> All, except menus.
+
+B<See Also:> L<FONT|/FONT>, L<RASTERSIZE|/RASTERSIZE>,
+L<Refresh|IUP::Manual::02_Elements/"Refresh()">
+
+=item B<TIP>
+
+I<(non inheritable)>
+
+Text to be shown when the mouse lies over the element.
+
+B<Value:> Text.
+
+B<Notes:> Check also additional TIP* attributes (Windows / Motif / GTK specific). These attributes affect the TIP display.
+
+=item B<TIPBALLON>
+
+I<[Windows Only]>
+
+The tip window will have the appearance of
+a cartoon "balloon" with rounded corners and a stem pointing to the
+item.
+
+B<Default:> "NO"
+
+=item B<TIPBALLONTITLE>
+
+I<[Windows Only]>
+
+When using the ballon format, the tip
+can also has a title in a separate area.
+
+=item B<TIPBALLONTITLEICON>
+
+I<[Windows Only]>
+
+When using the ballon format, the
+tip can also has a pre-defined icon in the title area. Values can be:
+
+ "0" - No icon
+ "1" - Info icon
+ "2" - Warning icon
+ "3" - Error Icon
+
+=item B<TIPBGCOLOR>
+
+I<[Windows and Motif Only]>
+
+The tip background color.
+
+B<Default:> "255 255 225" (Light Yellow)
+
+=item B<TIPDELAY>
+
+I<[Windows and Motif Only]>
+
+Time the tip will remain visible.
+
+B<Default:> "5000"
+
+=item B<TIPFGCOLOR>
+
+I<[Windows and Motif Only]>
+
+The tip text color.
+
+B<Default:> "0 0 0" (Black)
+
+=item B<TIPFONT>
+
+I<[Windows and Motif Only]>
+
+The font for the tip text. If not
+defined the font used for the text is the same as the FONT attribute
+for the element. If the value is SYSTEM then, no font is selected and
+the default system font for the tip will be used.
+
+=item B<TIPICON>
+
+I<[GTK only]>
+
+Name of an image to be displayed in the TIP. See L<IUP::Image|IUP::Image>. (GTK 2.12)
+
+=item B<TIPMARKUP>
+
+I<[GTK only]>
+
+Allows the tip string to contains pango markupcommands. Can be "YES" or "NO".
+
+B<Default:> "NO"
+
+Must be set before setting the TIP attribute. (GTK 2.12)
+
+=item B<TIPRECT>
+
+I<(non inheritable)>
+
+Specifies a rectangle inside the element where the tip will be activated.
+
+Format: "%d %d %d %d"="x1 y1 x2 y2".
+
+B<Default:> all the element area (GTK 2.12)
+
+=item B<TIPVISIBLE>
+
+Action attribute used to show or hide the tip under the
+mouse cursor. Use values "YES" or "NO". This will work in GTK but it
+will trigger the tip state, the given value will be ignored. (GTK 2.12)
+
+B<Affects:> All except label, menu item and submenu item.
+
+=item B<TITLE>
+
+I<(non inheritable)>
+
+Element's title. It is often used to modify some static text of
+the element (which cannot be changed by the user).
+
+B<Value:> Text.
+
+B<Default:> ""
+
+B<Notes:>
+
+The '\n' character usually is accepted for line change (except for
+menus).
+
+The "&" character can be used to define a MNEMONIC, use "&&" to show
+the "&" character instead on defining a mnemonic.
+
+If a mnemonic is defined then the character relative to it is
+underlined and a key is associated so that when pressed together with
+the Alt key activates the control.
+
+In GTk, if you define a mnemonic using "&" and the string has an
+underscore, then make sure that the mnemonic comes before the
+underscore.
+
+In GTK, if the MARKUP attribute is defined then the title string can
+contains pango markup commands. Works only if a mnemonic is NOT defined
+in the title. Not valid for menus.
+
+B<Affects:> All elements with an associated text.
+
+B<See Also:> L<FONT|/FONT>
+
+=item B<VALUE>
+
+I<(non inheritable)>
+
+Affects several elements differently - that is, its behavior is element
+dependent. It is often used to change the control's main value, such as
+the text of a L<IUP::Text|IUP::Text>.
+
+For the L<IUP::Radio|IUP::Radio> and
+L<IUP::Zbox|IUP::Zbox>, elements, which are categorized as
+composition elements, this attribute represents the element "selected"
+among the others in the designed composition. To change this attribute
+in such cases, different mechanisms are necessary according to the
+programming environment used. When the elements taking part in a
+composition were created in C, this attribute's contents is a name that
+must be defined by the L<SetName|IUP::Manual::02_Elements/"SetName()">
+function. When the elements were created in Lua, this attribute's
+contents is the name of a variable - more precisely, the one receiving
+the return from the function that created the element you wish to
+select. In LED it is not possible to dynamically change the value of
+any attribute, so the elements created in this environment must be
+identified and manipulated in C by means of their identifying name.
+
+=item B<VISIBLE>
+
+Shows or hides the element.
+
+B<Value:>
+
+"YES" (visible), "NO" (hidden).
+
+B<Default:> "YES"
+
+B<Notes:>
+
+An interface element is only visible if its native parent is also
+visible.
+
+B<Affects:>
+
+All controls that have visual representation.
+
+=item B<WID>
+
+I<(read-only) (non inheritable)>
+
+Element identifier in the native interface system.
+
+B<Value:>
+
+In Motif, returns the B<Widget> handle.
+
+In Windows, returns the B<HWND> handle.
+
+In GTK, return the B<GtkWidget*> handle.
+
+B<Notes:>
+
+Verification-only attribute, available after the control is mapped.
+
+For elements that do not have a native representation, C<undef> is
+returned.
+
+B<Affects:> All.
+
+=item B<X> (read-only, non inheritable)
+
+Returns the absolute horizontal position in pixels relative to the
+upper left corner of the screen.
+
+B<Value:> Integer number.
+
+B<Affects:> All controls that have visual representation.
+
+=item B<Y> (read-only, non inheritable)
+
+Returns the absolute vertical position in pixels relative to the upper
+left corner of the screen.
+
+B<Value:> Integer number.
+
+B<Affects:> All controls that have visual representation.
+
+=item B<ZORDER>
+
+I<(write-only, non inheritable)>
+
+Change the ZORDER of a dialog or control. It is commonly used for
+dialogs, but it can be used to control the z-order of controls in a
+L<IUP::Cbox>.
+
+B<Value:> Can be "TOP" or "BOTTOM".
+
+B<Affects:> All controls that have visual representation.
+
+=back
+
+=head2 Frequently used Attributes
+
+=over
+
+=item B<CONTROL>
+
+B<Windows only.> Whether the dialog is embedded inside the parent
+window or has a window of its own.
+
+B<Value:> YES or NO. If the value is YES, the dialog will appear embedded inside
+its parent window (you must set a parent, either with PARENTDIALOG or
+NATIVEPARENT, or this setting will be ignored). If the value is NO, the
+dialog will have its own window.
+
+B<Notes:>
+
+This is useful for implementing ActiveX controls, with the help of the
+L<LuaCOM|http://www.tecgraf.puc-rio.br/~rcerq/luacom/> library. ActiveX
+controls run embedded inside another window. LuaCOM will send a window
+creation event the the control, passing a handle to the parent window
+and the size of the control. You can use this to set the dialog's
+NATIVEPARENT and RASTERSIZE attributes. See the
+L<LuaCOM|http://www.tecgraf.puc-rio.br/~rcerq/luacom/> documentation
+for more information.
+
+B<Affects:> IUP::Dialog
+
+B<See Also:> L<NATIVEPARENT|/NATIVEPARENT>, L<PARENTDIALOG|/PARENTDIALOG>, L<RASTERSIZE|/RASTERSIZE>
+
+=item B<CURSOR>
+
+I<(non inheritable)>
+
+Defines the element's cursor.
+
+B<Value:> Name of a cursor.
+
+It will check first for the following predefined names:
+
+XXX-FIXME-missing-image
+
+B<Default:> "ARROW"
+
+(*) To use these cursors on Windows, the B<iup.rc> file, provided with
+IUP, must be linked with the application (except when using the IUP
+DLL).
+
+The GTK cursors have the same appearance of the X-Windows cursors.
+Althought GTK cursors can have more than 2 colors depending on the
+X-Server.
+
+If it is not a pre-defined name, then will check for other system
+cursors. In Windows the value will be used to load a cursor form the
+application resources. In Motif the value will be used as a X-Windows
+cursor number, see definitions in the X11 header "cursorfont.h". In GTK
+the value will be used as a cursor name, see the GDK documentation on
+Cursors.
+
+If no system cursors were found then the value will be used to try to
+find an IUP image with the same name. Use L<SetName|IUP::Manual::02_Elements/"SetName()"> to define a
+name for an L<IUP::Image|IUP::Image>. But the image will need an extra attribute and
+some specific characteristics, see notes bellow.
+
+B<Notes:>
+
+For an image to represent a cursor, it should has the attribute
+"B<HOTSPOT"> to define the cursor hotspot (place where the mouse click
+is actually effective). The default value is "0:0".
+
+Usually only color indices 0, 1 and 2 can be used in a cursor, where 0
+will be transparent (must be "BGCOLOR"). The RGB colors corresponding
+to indices 1 and 2 are defined just as in regular images. In Windows
+and GTK the cursor can have more than 2 colors. Cursor sizes are
+usually less than or equal to 32x32.
+
+The cursor will only change when the interface system regains control
+or when IUP::Flush is called.
+
+The Windows SDK recommends that cursors and icons should be implemented
+as resources rather than created at run time.
+
+When the cursor image is no longer necessary, it must be destroyed
+through function L<Destroy|IUP::Manual::02_Elements/"Destroy()">. Attention: the
+cursor cannot be in use when it is destroyed.
+
+B<Affects:> L<IUP::Dialog|IUP::Dialog>, L<IUP::Canvas|IUP::Canvas>
+
+B<See Also:> L<IUP::Image|IUP::Image>
+
+=item B<DX>
+
+Size of the horizontal scrollbar's thumbnail in any unit.
+
+B<Value:> Any floating-point value greater than zero and smaller than the
+difference between L<XMAX|/XMAX> and L<XMIN|/XMIN>.
+
+B<Default:>: "0.1"
+
+B<Notes:>
+
+LINEX, XMAX and XMIN are only updated in the scrollbar when DX is
+updated.
+
+When the canvas is visible, a change in DX can generate a redraw in the
+horizontal scrollbar on the screen.
+
+A change in these values can affect the attribute
+L<POSX|/POSX>.
+
+B<Affects:> L<IUP::Canvas|IUP::Canvas>
+
+B<See Also:> L<SCROLLBAR|/SCROLLBAR>
+
+=item B<DY>
+
+Size of the vertical scrollbar's thumbnail in any unit.
+
+B<Value:> Any floating-point value greater than zero and smaller than the
+difference between L<YMAX|/YMAX> and L<YMIN|/YMIN>.
+
+B<Default:>: "0.1"
+
+B<Notes:>
+
+LINEY, YMAX and YMIN are only updated in the scrollbar when DY is
+updated.
+
+When the canvas is visible, a change in DY can generate a redraw in the
+horizontal scrollbar on the screen.
+
+A change in these values can affect the attribute
+L<POSY|/POSY>.
+
+B<Affects:> L<IUP::Canvas|IUP::Canvas>
+
+B<See Also:> L<SCROLLBAR|/SCROLLBAR>
+
+=item B<ICON>
+
+Dialog's icon. This icon will be used when the dialog is minimized.
+
+B<Value:>
+
+Name of a IUP image.
+
+B<Default:> undef
+
+B<Notes:>
+
+Icon sizes are usually less than or equal to 32x32.
+
+The Windows SDK recomends that cursors and icons should be implemented
+as resources rather than created at run time.
+
+On Motif, it only works with some window managers, like I<mwm> and
+I<gnome>. Icon colors can have the BGCOLOR values, but it works better
+if it is at index 0.
+
+To associate a name to element use L<SetName|/"SetName()"> or C<< name=>'ElemName' >> named parameter of L<new()|/"new()"> constructor.
+
+B<Affects:> L<IUP::Dialog|IUP::Dialog>
+
+B<See Also:> L<IUP::Image|IUP::Image>
+
+=item B<MASK>
+
+I<(non inheritable)>
+
+Defines a mask that will filter interactive text input. See also related attributes MASKCASEI, MASKINT, MASKFLOAT.
+
+B<Value:> string
+
+Set to C<undef> to remove the mask.
+
+B<Notes:>
+
+Since the validation process is performed key by key when the user is
+typing, an intermediate value cannot be typed if it does not follow the
+mask rules.
+
+B<Pre-Defined Masks:>
+
+ DEFINITION       VALUE                                       DESCRIPTION
+ IUP_MASK_INT     "[+/-]?/d+"                                 integer number
+ IUP_MASK_UINT    "/d+"                                       unsigned integer number
+ IUP_MASK_FLOAT   "[+/-]?(/d+/.?/d*|/./d+)"                   floating point number
+ IUP_MASK_UFLOAT  "(/d+/.?/d*|/./d+)"                         unsigned floating point number
+ IUP_MASK_EFLOAT  "[+/-]?(/d+/.?/d*|/./d+)([eE][+/-]?/d+)?"   floating point number with exponential notation
+
+B<Pattern Specification:>
+
+The pattern to be searched in the text can be defined by the rules given below.
+
+=over
+
+=item * "Function" codes (such as /l, /D, /w) cannot be used inside a
+class ([...]).
+
+=item * If the character following a / does not mean a special case
+(such as /w or /n), it is matched with no / - that means that /x will
+match only x, and not /x. If you want to match /x, use //x.
+
+=item * The caret (^) character has different meanings when used inside
+or outside a class - inside a class it means negative, and outside a
+class it is an anchor to the beginning of a line.
+
+=item * The boundary function (/b) anchors the pattern to a word
+boundary - it does not match anything. A word boundary is a point
+between a /w and a /W character.
+
+=item * Capture operators (f and g) group patterns and are also used to
+keep matched sections of texts.
+
+=item * A word on precedence: concatenation has precedence over the
+alternation (j) operator - that is, faj fej fi will match fa OR fe OR
+fi.
+
+=item * The @ character is used to determine that, instead of searching
+the text until the first match is made, the function should try to
+match the pattern only with the first character. If present, it must be
+the first character of the pattern.
+
+=item * The % character is used to determine that the text should be
+searched to its end, independently of the number of matches found. If
+present, it must be the first character of the pattern. This is only
+useful when combined with the capture feature.
+
+=back
+
+B<Allowed pattern characters:>
+
+ c         Matches a "c" (non-special) character
+ .         Matches any single character
+ [abc]     Matches an "a", "b" or "c" characters
+ [a-d]     Matches any character between "a" and "d", including them (just like[abcd])
+ [^a-dg]   Matches any character which is neither between "a" and "d" nor "a" "g"
+ /d        Matches any digit (just like [0-9])
+ /D        Matches any non-digit (just like [^0-9])
+ /l        Matches any letter (just like [a-zA-Z])
+ /L        Matches any non-letter (just like [^a-zA-Z])
+ /w        Matches any alphanumeric character (just like [0-9a-zA-Z ])
+ /W        Matches any non-alphanumeric character (just like [^0-9a-zA-Z ])
+ /s        Matches any "blank" character (TAB, SPACE, CR)
+ /S        Matches any non-blank character
+ /n        Matches a newline character
+ /t        Matches a tabulation character
+ /nnn      Matches an ASCII character with a nnn value (decimal)
+ /xnn      Matches an ASCII character with a nn value (hexadecimal)
+ /special  Matches the special character literally (/[, //, /.)
+ abc       Matches a sequence of a, b and c patterns in order
+ aj bj c   Matches a pattern a, b or c
+ a*        Matches 0 or more characters a
+ a+        Matches 1 or more characters a
+ a?        Matches 1 or no characters a
+ (pattern) Considers pattern as one character for the above
+ fpatterng Captures pattern for later reference
+ /b        Anchors to a word boundary
+ /B        Anchors to a non-boundary
+ ^pattern  Anchors pattern to the beginning of a line
+ pattern$  Anchors pattern to the end of a line
+ @pattern  Returns the match found only in the beginning of the text
+ %pattern  Returns the firstmatch found, but searches all the text
+
+B<Examples:>
+
+ (my|his)            Matches both my pattern and his pattern.
+ /d/d:/d/d(:/d/d)?   Matches time with seconds (01:25:32) or without seconds (02:30).
+ [A-D]/l+            Matches names such as Australia, Bolivia, Canada or Denmark, but not England, Spain or single letters such as A.
+ /l/w*               my variable = 23 * width;
+ ^Subject:[^/n]*/n   Subject: How to match a subject line.1
+ /b[ABab]/w*         Matches any word that begins with A or B
+ from:/s*/w+         Captures "sender" in a message from sender
+
+B<Affects:> L<IUP::Text|IUP::Text>,L<IUP::Multiline|IUP::Multiline>,
+L<IUP::List|IUP::List> and L<IUP::Matrix|IUP::Matrix>
+
+=item B<MASKCASEI>
+
+I<(non inheritable)>
+
+If YES, will turn the filter case insensitive.
+
+B<Default:> "NO"
+
+Must be set before MASK.
+
+B<Affects:> L<IUP::Text|IUP::Text>,L<IUP::Multiline|IUP::Multiline>,
+L<IUP::List|IUP::List> and L<IUP::Matrix|IUP::Matrix>
+
+=item B<MASKFLOAT>
+
+I<(non inheritable, write only)>
+
+Defines a floating point mask with limits. Format: "%f:%f" ("min:max").
+It will replace MASK.
+
+B<Affects:> L<IUP::Text|IUP::Text>,L<IUP::Multiline|IUP::Multiline>,
+L<IUP::List|IUP::List> and L<IUP::Matrix|IUP::Matrix>
+
+=item B<MASKINT>
+
+I<(non inheritable, write only)>
+
+Defines an integer mask with limits. Format: "%d:%d" ("min:max"). It
+will replace MASK.
+
+B<Affects:> L<IUP::Text|IUP::Text>,L<IUP::Multiline|IUP::Multiline>,
+L<IUP::List|IUP::List> and L<IUP::Matrix|IUP::Matrix>
+
+=item B<PARENTDIALOG>
+
+The parent dialog of a dialog.
+
+B<Value:> Name of a dialog to be used as parent.
+
+B<Default:> undef
+
+B<Notes:>
+
+This dialog will be always in front of the parent dialog. If the parent
+is minimized, this dialog is automatically minimized. The parent dialog
+must be mapped before mapping the child dialog. If PARENTDIALOG is not
+defined then the NATIVEPARENT attribute is consulted. This one must be
+a native handle of an existing dialog.
+
+To associate a name to element use L<SetName|/"SetName()"> or C<< name=>'ElemName' >> named parameter of L<new()|/"new()"> constructor. 
+
+B<IMPORTANT>: When the parent is destroyed the child dialog is also
+destroyed, then the CLOSE_CB callback of the child dialog is NOT
+called. The application must take care of destroying the children
+dialogs before destroying the parent. This is usually done when
+CLOSE_CB of the parent dialog is called.
+
+B<Affects:> L<IUP::Dialog|IUP::Dialog>
+
+=item B<POSX>
+
+Thumbnail position in the horizontal scrollbar in any unit.
+
+B<Value:> Any floating-point value. Must be a value between XMIN and XMAX-DX.
+
+B<Default:> "0.0"
+
+B<Notes:>
+
+When the canvas is visible, a change in POSX can generate a redraw in
+the horizontal scrollbar on the screen.
+
+This attribute does not generate a redraw of the canvas. If you need a
+redraw call L<Update|IUP::Manual::02_Elements/"Update()"> in L<SCROLL_CB|IUP::Manual::04_CallbacksSCROLL_CB>.
+
+B<Affects:> L<IUP::Canvas|IUP::Canvas>
+
+B<See Also:> L<SCROLLBAR|/SCROLLBAR>
+
+=item B<POSY>
+
+Thumbnail position in the vertical scrollbar in any unit.
+
+B<Value:> Any floating-point value. Must be a value between YMIN and YMAX-DY.
+
+B<Default:> "0.0"
+
+B<Notes:>
+
+When the canvas is visible, a change in POSY can generate a redraw in
+the vertical scrollbar on the screen.
+
+This attribute does not generate a redraw of the canvas. If you need a
+redraw call L<Update|IUP::Manual::02_Elements/"Update()"> in L<SCROLL_CB|IUP::Manual::04_CallbacksSCROLL_CB>.
+
+B<Affects:> L<IUP::Canvas|IUP::Canvas>
+
+B<See Also:> L<SCROLLBAR|/SCROLLBAR>
+
+=item B<SCROLLBAR>
+
+I<(creation only)>
+
+Associates a horizontal and/or vertical scrollbar to the element.
+
+B<Value:> "VERTICAL", "HORIZONTAL", "YES" (both) or "NO" (none).
+
+B<Default:> "NO"
+
+B<Notes:>
+
+The scrollbar allows you to create a virtual space associated to the
+element. In the image below, such space is marked in B<red>, as well as
+the attributes that affect the composition of this space. In B<green>
+you can see how these attributes are reflected on the scrollbar.
+
+images/scrollbar.gif (2113 bytes)
+
+Hence you can clearly deduce that POSX is limited to XMIN and XMAX-DX,
+or B<XMINE<lt>=POSXE<lt>=XMAX-DX>. When the virtual space has the same
+size as the canvas, DX equals XMAX-XMIN, the scrollbar can be
+automatically hidden. See the attribute XAUTOHIDE.
+
+The same is valid for YMIN, YMAX, DY and POSY. But remember that the Y
+axis is oriented from top to bottom in IUP. So if you want to consider
+YMIN and YMAX as bottom-up oriented, then the actual YPOS must be
+obtained using B<YMAX-DY-POSY>.
+
+Important: the LINE*, *MAX and *MIN are only updated in the scrollbar
+when the respective D* is updated.
+
+If you have to change the properties of the scrollbar (XMIN, XMAX and
+DX) but you want to keep the thumb still (if possible) in the same
+relative position, then you have to also recalculate its position
+(POSX) using the old position as reference to the new one. For example,
+you can convert it to a 0-1 interval and then scale to the new limits:
+
+ old_posx_relative = (old_posx - old_xmin)/(old_xmax - old_xmin)
+ posx = (xmax - xmin)*old_posx_relative + xmin
+
+L<IUP::List|IUP::List> and L<IUP::Multiline|IUP::Multiline> scrollbars are automatically managed and
+do NOT have the POS, MIN, MAX and D attributes.
+
+B<Affects:> L<IUP::List|IUP::List>,
+L<IUP::Multiline|IUP::Multiline>,
+L<IUP::Canvas|IUP::Canvas>, L<POSX|/POSX>,
+L<XMIN|/XMIN>, L<XMAX|/XMAX>, L<DX|/DX>,
+L<XAUTOHIDE|IUP::Canvas/XAUTOHIDE>, L<POSY|/POSY>,
+L<YMIN|/YMIN>, L<YMAX|/YMAX>, L<DY|/DY>,
+L<YAUTOHIDE|IUP::Canvas/YAUTOHIDE>.
+
+=item B<SHRINK>
+
+If this attribute is defined, the elements inside the dialog will try
+to adjust their sizes even when the dialog's size is smaller than its
+natural size.
+
+See the L<IUP::Manual::05_DialogLayout|IUP::Manual::05_DialogLayout> for more details on sizes.
+
+B<Value:> "YES" or "NO".
+
+B<Default:> "NO"
+
+B<Notes:>
+
+When the user changes the size of the dialog, the elements are
+automatically re-distributed inside the dialog. Some elements even have
+their size changed if the EXPAND attribute is active. When this size is
+smaller than a minimum limit in which all elements still fit the
+dialog, the elements' distribution is no longer modified. Actually, the
+virtual size of the dialog remains larger than its actual size on the
+screen, and some elements to the right and bottom are hidden by the
+borders of the dialog.
+
+The SHRINK attribute offers an alternative to this behavior. It makes
+the elements continue to rearrange, even if they must overlap.
+
+The results of this new rearrangement may vary according to the
+elements' distribution on the dialog.
+
+See the L<IUP::Manual::05_DialogLayout|IUP::Manual::05_DialogLayout> for more details on sizes.
+
+B<Affects:> L<IUP::Dialog|IUP::Dialog>
+
+=item B<XMAX>
+
+Maximum value of the horizontal scrollbar, in any unit.
+
+B<Value:> Any floating-point value.
+
+B<Default:> "1.0"
+
+B<Notes:>
+
+A change in this value will only be effective after the attribute
+L<DX|/DX> is changed.
+
+B<Affects:> L<IUP::Canvas|IUP::Canvas>
+
+B<See Also:> L<SCROLLBAR|/SCROLLBAR>
+
+=item B<XMIN>
+
+Minimum value of the horizontal scrollbar, in any unit.
+
+B<Value:> Any floating-point value.
+
+B<Default:> "0.0"
+
+B<Notes:>
+
+A change in this value will only be effective after the attribute
+L<DX|/DX> is changed.
+
+B<Affects:> L<IUP::Canvas|IUP::Canvas>
+
+B<See Also:> L<SCROLLBAR|/SCROLLBAR>
+
+=item B<YMAX>
+
+Maximum value of the vertical scrollbar, in any unit.
+
+B<Value:> Any floating-point value.
+
+B<Default:> "1.0"
+
+B<Notes:>
+
+A change in this value will only be effective after the attribute
+L<DY|/DY> is changed.
+
+B<Affects:> L<IUP::Canvas|IUP::Canvas>
+
+B<See Also:> L<SCROLLBAR|/SCROLLBAR>
+
+=item B<YMIN>
+
+Minimum value of the vertical scrollbar, in any unit.
+
+B<Value:> Any floating-point value.
+
+B<Default:> "0.0"
+
+B<Notes:>
+
+A change in this value will only be effective after the attribute
+L<DY|/DY> is changed.
+
+B<Affects:> L<IUP::Canvas|IUP::Canvas>
+
+B<See Also:> L<SCROLLBAR|/SCROLLBAR>
+
+=back
+
+=head1 GLOBAL ATTRIBUTES
+
+=head2 Global Attributes - General
+
+=over
+
+=item B<COPYRIGHT>
+
+I<(read-only)>
+
+Returns the IUP's copyright.
+
+Ex: "Copyright (C) 1994-2004 Tecgraf/PUC-Rio and PETROBRAS S/A".
+
+=item B<DRIVER>
+
+I<(read-only)>
+
+Informs the current driver being used.
+
+Two drivers are available now, one for each platform: "GTK", "Motif"
+and "Win32".
+
+=item B<LANGUAGE>
+
+The language used by some pre-defined dialogs.
+
+Can have the values "ENGLISH" and "PORTUGUESE".
+
+B<Default:> "ENGLISH"
+
+Can also be set by L<SetLanguage|IUP/"SetLanguage()">.
+
+=item B<VERSION>
+
+I<(read-only)>
+
+Returns the name of IUP's version.
+
+The value follows the "major.minor.micro" format, major referring to
+broader changes, minor referring to smaller changes, and micro
+referring to corrections only. Ex.: "1.7.2".
+
+=back
+
+=head2 Global Attributes - System Control
+
+=over
+
+=item B<AUTOREPEAT>
+
+I<[Motif Only]>
+
+Turns on/off ("YES" or "NO") the autorepeat of keyboard keys in the
+whole system - may be used as an optimization in high performance
+applications.
+
+=item B<CONTROLKEY>
+
+I<(read-only)>
+
+Returns the state of the Control keys (left and right). Possible
+values: "ON" or "OFF".
+
+=item B<CURSORPOS>
+
+The cursor position in absolute coordinates relative to the upper left
+corner of the screen. Accept values in the format "XB<x>Y" (in C
+"%dx%d), example "200x200". (since GTK 2.8)
+
+=item B<KEY>
+
+I<(write-only)>
+
+Sends a key press and a key release messages to the element with the
+focus. The value is a key code. See the L<Keyboard Codes|key.html>
+table for a list of the possible values.
+
+=item B<KEYPRESS>
+
+I<(write-only)>
+
+Sends a key press message to the element with the focus. The value is a
+key code. See the L<Keyboard Codes|key.html> table for a list of the
+possible values.
+
+=item B<KEYRELEASE>
+
+I<(write-only)>
+
+Sends a key release message to the element with the focus. The value is
+a key code. See the L<Keyboard Codes|key.html> table for a list of the
+possible values.
+
+=item B<LOCKLOOP>
+
+When the last visible dialog is closed the L<ExitLoop|IUP/"ExitLoop()"> function is
+called. To avoid that set LOCKLOOP=YES before hiding the last dialog.
+
+Possible values: "YES" or "NO".
+
+B<Default:> "NO"
+
+=item B<MODKEYSTATE>
+
+I<(read-only)>
+
+Returns the state of the keyboard modifier keys: Shift, Ctrl, Alt and
+sYs(Win/Apple). In the format of 4 characters: "SCAY". When not pressed
+the respective letter is replaced by a space " ".
+
+=item B<MOUSEBUTTON>X<MOUSEBUTTON> (write-only)
+
+Simulates a mouse button press or release at the given coordinates. The
+position is in absolute coordinates relative to the upper left corner
+of the screen. Accept values in the format "XB<x>Y button state" (in C
+"%dx%d %c %d"), example "200x200 1 1". B<button> can be one of the
+IUP_BUTTON1,... definitions. B<state> can be 1=pressed, or 0=released.
+The cursor position is always updated. (since GTK 2.8)
+
+=item B<SHIFTKEY>
+
+I<(read-only)>
+
+Returns the state of the Shit keys (left and right). Possible values:
+"ON" or "OFF".
+
+=item B<SINGLEINSTANCE>
+
+I<[Windows Only]>
+
+Restricts the number of instances of the application by using a name to
+identify it. The value must also be a partial match to the title of a
+dialog that will receive the COPYDATA_CB callback with the command line
+of the second instance. When consulted return C<undef> if inside the second
+instance. So usually in the application initialization after
+L<IUP->Open|IUP/"Open">, set SINGLEINSTANCE and then consult its value, if C<undef>
+abort the second instance by calling L<IUP->Close|IUP/"Close"> and returning from
+I<main>.
+
+=item B<UTF8AUTOCONVERT>
+
+I<[GTK Only]>
+
+GTK uses UTF-8 as its charset for all displayed text, so IUP will
+automatically convert all strings to (SetAttribute) and from
+(GetAttribute) UTF-8.
+
+B<Default:> "YES"
+
+If the default locale is already
+UTF-8, but the given string is not UTF-8 then it will be assumed that
+the string uses the ISO8859-1 charset.
+
+=back
+
+=head2 Global Attributes - System Information
+
+=over
+
+=item B<COMPUTERNAME>
+
+I<(read-only)>
+
+Returns the hostname.
+
+=item B<GTKDEVVERSION>
+
+I<(read-only) [GTK Only]>
+
+Returns the development version of the GTK toolkit. This is the version
+at the time the IUP library was compiled.
+
+=item B<GTKVERSION>
+
+I<(read-only) [GTK Only]>
+
+Returns the run time version of the GTK toolkit. This is the version
+being used at the time of the IUP::Open function was called by the
+application.
+
+=item B<MOTIFNUMBER>
+
+I<(read-only) [Motif Only]>
+
+Returns the number of the Motif Version if full form, e.x: 2.2.3 = "2203".
+
+=item B<MOTIFVERSION>
+
+I<(read-only) [Motif Only]>
+
+Returns the version of the run time Motif.
+
+=item B<SYSTEM>
+
+I<(read-only)>
+
+Informs the current operating system. On UNIX, it is equivalent to the
+command "uname -s" (sysname). On Windows, it identifies if you are on
+Windows 2000, Windows XP or Windows Vista. Some known names:
+
+=over
+
+=item * C<"MacOS">
+
+=item * C<"FreeBSD">
+
+=item * C<"Linux">
+
+=item * C<"SunOS">
+
+=item * C<"Solaris">
+
+=item * C<"IRIX">
+
+=item * C<"AIX">
+
+=item * C<"HP-UX">
+
+=item * C<"Win2K">
+
+=item * C<"WinXP">
+
+=item * C<"Vista">
+
+=item * C<"Win7">
+
+=back
+
+=item B<SYSTEMLANGUAGE>
+
+I<(read-only)>
+
+Return respectively a text with a description of the system language.
+
+=item B<SYSTEMVERSION>
+
+I<(read-only)>
+
+Informs the current operating system version number.
+
+On UNIX, it is equivalent to the command "uname -r" (release). On
+Windows, it identifies the system version number and service pack
+version. On MacOSX is system version.
+
+=item B<USERNAME>
+
+I<(read-only)>
+
+Returns the user logged in.
+
+=item B<XSERVERVENDOR>
+
+I<(read-only) [GTK and Motif Only]>
+
+X-Windows Server Vendor string.
+
+=item B<XVENDORRELEASE>
+
+I<(read-only) [GTK and Motif Only]>
+
+X-Windows Server Vendor release number.
+
+=back
+
+=head2 Global Attributes - Screen Information
+
+=over
+
+=item B<FULLSIZE>
+
+I<(read-only)>
+
+Returns the full screen size in pixels.
+
+String in the C<< "<width>x<height>" >> format (e.g. C<"800x600">).
+
+=item B<MONITORSINFO>
+
+I<(read-only) [Win32 and GTK Only]>
+
+Returns the position and size in pixels of all monitors. Each monitor
+information is terminated by a C<"\n"> character.
+
+String in the C<< "<x> <y> <width> <height>\n<x> <y> <width> <height>\n..." >> format.
+
+=item B<SCREENDEPTH>
+
+I<(read-only)>
+
+Returns the screen depth in bits per pixel.
+
+=item B<SCREENSIZE>
+
+I<(read-only)>
+
+Returns the screen size in pixels available for dialogs, i.e. not
+including menu bars, task bars, etc. In Motif has the same value as the
+FULLSIZE attribute. The main screen size does not include additional
+monitors.
+
+String in the C<< "<width>x<height>" >> format (e.g. C<"300x400">).
+
+=item B<TRUECOLORCANVAS>
+
+I<(read-only)>
+
+Indicates if the display allows creating TrueColor (E<gt> 8bpp)
+L<IUP::Canvas|IUP::Canvas> controls, even if PseudoColor is the default, i.e. even if
+SCREENDEPTHE<lt>=8 . Returns "YES" or "NO". Usefull in Motif.
+
+=item B<VIRTUALSCREEN>
+
+I<(read-only)  [Win32 and GTK Only]>
+
+Returns the virtual screen position and size in pixels. It is the
+virtual space defined by all monitors in the system.
+
+String in the C<< "<x> <y> <width> <height>" >> format (e.g. C<"100 50 800 600">).
+
+=back
+
+=head2 Global Attributes - System Data
+
+=over
+
+=item B<APPSHELL>
+
+I<(read-only) [Motif Only]>
+
+Returns the shell Widget created by XtOpenApplication.
+
+=item B<DLL_HINSTANCE>
+
+I<[Win32 Only]>
+
+Changes and returns a handle (HINSTANCE) that identifies the DLL where
+resources are stored.
+
+=item B<HINSTANCE>
+
+I<(read-only) [Win32 Only]>
+
+Returns a handle (HINSTANCE) that identifies the application in the
+native system.
+
+=item B<XDISPLAY>
+
+I<(read-only) [GTK and Motif Only]>
+
+Returns the X-Windows Display.
+
+=item B<XSCREEN>
+
+I<(read-only) [GTK and Motif Only]>
+
+Returns the X-Windows Screen.
+
+=back
+
+=head2 Global Attributes - Default Attributes
+
+=over
+
+=item B<DEFAULTFONT>
+
+The default font used by all elements, except for menus.
+
+=item B<DEFAULTFONTSIZE>
+
+Auxiliar attribute to retrieve and set the default font size used by
+all elements. It retrieves the size from DEFAULTFONT. When changed will
+actually change the DEFAULTFONT.
+
+=item B<DLGBGCOLOR>
+
+The default background color for all elements that have the background
+similar of the dialog.
+
+=item B<DLGFGCOLOR>
+
+The default foreground color for all elements that have text over the
+background of the dialog or similar. Usually is C<"0 0 0">.
+
+=item B<MENUBGCOLOR>
+
+The default menu background color. Usually is C<"255 255 255">.
+
+=item B<MENUFGCOLOR>
+
+The default menu foreground color. Usually is C<"0 0 0">.
+
+=item B<TXTBGCOLOR>
+
+The default background color for editable text, also used by lists and
+tree. Usually is C<"255 255 255">.
+
+=item B<TXTFGCOLOR>
+
+The default foreground color for editable text, also used by lists and
+tree. Usually is C<"0 0 0">.
+
+=back

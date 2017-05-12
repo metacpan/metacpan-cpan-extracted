@@ -1,0 +1,11 @@
+Log.pm
+README
+MANIFEST
+Makefile.PL
+t/basic.t
+t/wipe.t
+t/grow.t
+t/sgrow.t
+t/trunc.t
+t/rotate.t
+t/srotate.t

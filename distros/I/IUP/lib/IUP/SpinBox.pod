@@ -1,0 +1,58 @@
+=for comment based on iup-3.5 - http://www.tecgraf.puc-rio.br/iup/en/elem/iupspin.html
+
+=head1 NAME
+
+IUP::SpinBox - [GUI element] horizontal container that already contains a IUP::Spin
+
+=head1 DESCRIPTION
+
+L<IUP::SpinBox|IUP::SpinBox> is an horizontal container that already contains a L<IUP::Spin|IUP::Spin>.
+
+=head1 USAGE
+
+=head2 CREATION - new() method
+
+ $spinbox = IUP::SpinBox->new( child=>$element );
+
+B<child:> Identifier of an interface element which will receive the spinbox around.
+
+B<Returns:> the identifier of the created element, or C<undef> if an error occurs.
+occurs.
+
+NOTE: You can pass to C<new()> other C<ATTRIBUTE=E<gt>'value'> or C<CALLBACKNAME=E<gt>\&func> pairs relevant
+to this element - see L<IUP::Manual::02_Elements|IUP::Manual::02_Elements/"new()">.
+
+=head2 CALLBACKS
+
+For more info about concept of callbacks (setting callback handlers etc.)
+see L<IUP::Manual::04_Callbacks|IUP::Manual::04_Callbacks>. Callbacks specific to this element:
+
+=over
+
+=item * L<SPIN_CB|IUP::Spin/SPIN_CB>
+
+See L<IUP::Spin|IUP::Spin/SPIN_CB>.
+
+=back
+
+=head1 NOTES
+
+The L<IUP::SpinBox> can be created with no elements and be dynamic filled using
+L<Append|IUP::Manual::02_Elements/"Append()"> or L<Insert|IUP::Manual::02_Elements/"Insert()">.
+
+=head1 EXAMPLES
+
+
+Unfortunately there are no sample scripts using this element.
+
+
+
+=head1 SEE ALSO
+
+L<IUP::Text|IUP::Text>, L<IUP::Vbox|IUP::Vbox>,
+L<IUP::Hbox|IUP::Hbox>, L<IUP::Button|IUP::Button>
+
+The original doc: L<iupspin.html|http://www.tecgraf.puc-rio.br/iup/en/elem/iupspin.html>
+ 
+
+=cut

@@ -1,0 +1,42 @@
+---
+abstract: 'execute remote perl code over an SSH link'
+author:
+  - 'Paul Evans <leonerd@leonerd.org.uk>'
+build_requires:
+  File::Temp: '0'
+  IO::Handle: '0'
+  Test::Fatal: '0'
+  Test::More: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4218, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: IPC-PerlSSH
+provides:
+  IPC::PerlSSH:
+    file: lib/IPC/PerlSSH.pm
+    version: '0.17'
+  IPC::PerlSSH::Base:
+    file: lib/IPC/PerlSSH/Base.pm
+    version: '0.17'
+  IPC::PerlSSH::Library:
+    file: lib/IPC/PerlSSH/Library.pm
+    version: '0.17'
+  IPC::PerlSSH::Library::FS:
+    file: lib/IPC/PerlSSH/Library/FS.pm
+    version: '0.17'
+  IPC::PerlSSH::Library::IO:
+    file: lib/IPC/PerlSSH/Library/IO.pm
+    version: '0.17'
+  IPC::PerlSSH::Library::Run:
+    file: lib/IPC/PerlSSH/Library/Run.pm
+    version: '0.17'
+requires:
+  Exporter: '5.57'
+  IPC::Open2: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.17'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

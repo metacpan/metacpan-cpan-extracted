@@ -1,0 +1,87 @@
+#!/bin/sh
+#
+# local_config version 1.04 4-28-09, michael@bizsystems.com
+#
+# script to test which versions of libipq and libnet are present
+#
+# call from makefile with
+#
+# local_config ${CC}
+#
+
+CC=$1
+if [ "$CC" == "" ]; then
+  echo "compiler not defined, call as 'local_config gcc'"
+  exit -1
+fi
+
+######################## section for libipq
+TEST_FILE="local_conf_test"
+ARGS_FILE="libipq.h"
+
+LIBIPQ_ERR=0
+ARGNO=0
+for libipq_path in /usr/include/libipq.h /usr/include/libipq/libipq.h /usr/local/include/libipq.h /usr/local/include/libipq/libipq.h
+do
+  argno=1
+  for ich in "ipq_create_handle(0)" "ipq_create_handle(0,PF_INET)"
+  do
+    echo "#include \"$libipq_path\"" > ${TEST_FILE}.c
+    echo "int main() { struct ipq_handle *h;h = $ich;return 0;}" >> ${TEST_FILE}.c
+    eval "$CC -c ${TEST_FILE}.c 1>/dev/null 2>&1"
+    status=$?
+    if [ $status -eq 0 ]; then
+      ARGNO=$argno
+      LIBIPQ_PATH=$libipq_path
+    fi
+    argno=$((argno +1))
+  done
+done
+
+echo "/* do not edit the file," > $ARGS_FILE
+echo " * created automatically by Makefile" >> $ARGS_FILE
+echo " */" >> $ARGS_FILE
+
+if [ $ARGNO -eq 0 ]; then
+  echo "#error Could not fine libipq.h" >> $ARGS_FILE
+  echo "ERROR: could not find libipq.h, check your installation"
+  exit -1
+else
+  echo "#include \"$LIBIPQ_PATH\"" >> $ARGS_FILE
+  echo "#define DBTARPIT_IPQ_CREATE_ARGS $ARGNO" >> $ARGS_FILE
+fi
+
+######################## section for libnet
+
+HEAD_FILE="libnet_version.h"
+
+echo "#include \"endian.h\""	>	${TEST_FILE}.c
+echo "#include <libnet.h>"	>>	${TEST_FILE}.c
+echo "int main(){printf(LIBNET_VERSION);printf(\"\\n\");return 0;}" >>	${TEST_FILE}.c
+
+$CC -o ${TEST_FILE}.x ${TEST_FILE}.c 1>/dev/null 2>&1
+
+LNVERSION=`./${TEST_FILE}.x`
+
+LNV1=`echo $LNVERSION | cut -d. -f1`
+LNV2=`echo $LNVERSION | cut -d. -f2`
+
+rm -f ${TEST_FILE}*
+
+echo "/* do not edit the file,"	>	$HEAD_FILE
+echo " * created automatically by Makefile" >>	$HEAD_FILE
+echo " */"	>>	$HEAD_FILE
+
+echo "#define DBTARPIT_LNV_HIGH $LNV1" >> $HEAD_FILE
+echo "#define DBTARPIT_LNV_MID $LNV2" >> $HEAD_FILE
+
+if [ $LNV1 -gt 0 ]; then
+  LNV3=`echo $LNVERSION | cut -d. -f3`
+else
+  LNV3=0
+  echo "#error YOUR MUST INSTALL libnet VERSION 1.0.0 or greater" >> $HEAD_FILE
+  exit -1
+fi
+
+echo "#define DBTARPIT_LNV_LOW $LNV3" >> $HEAD_FILE
+exit 0

@@ -1,0 +1,32 @@
+Revision history for Perl extension IPC::Capture.
+
+0.01  Wed Apr  9 15:30:31 2008
+	- original version; created by h2xs 1.23 with options
+		-AX -nIPC::Capture -b5.8.0
+
+0.02  Thursday April 17, 2008   2:15 PM
+        - fixed a possible bug in tests: now explicitly uses the
+          running perl ($^X) to run a sub-script, rather than
+          relying on the hashbang line.
+
+0.03  Sunday April 20, 2008  10:43 PM
+        - fixed test bug: ignore nonexistant directories in PATH
+        - added more verbose output on some test failures for
+          future debugging efforts.
+        - modified run_qx_all_separated method to deal with an
+          MSwin32 issue.
+        - changed name of object attribute 'output_director' to 'filter'
+          Note: this is a change in the UI.
+
+0.04  Tuesday April 22, 2008  01:15 AM
+        - now deals with chatty "which" commands on some systems (e.g. Sun)
+
+0.05 Saturday April 26, 2008   2:22 AM
+        - dropped mention of unimplemented feature "success" from SYNOPSIS
+
+0.06 Sunday March 15, 2009  10:07 PM
+        - Added a (theoretically) redundant dependency on Text::Diff
+          to try to cover an odd smoke test failure.
+        - Fixed bugs in the internally used can_run_qx_which
+          routine (was failing if system did not have a "which" command).
+        - Removed inherently non-portable tests from the MANIFEST: t/02-can_run_method.t

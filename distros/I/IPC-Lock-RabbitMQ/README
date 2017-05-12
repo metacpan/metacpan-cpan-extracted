@@ -1,0 +1,52 @@
+NAME
+    IPC::Lock::RabbitMQ - Simple and reliable scoped locking for coarse
+    grained locks.
+
+SYNOPSIS
+        my $locker1 = IPC::Lock::RabbitMQ->new( mq => $rabbitfoot );
+        my $locker2 = IPC::Lock::RabbitMQ->new( mq => $rabbitfoot );
+
+        {
+            my $lock  = $locker1->lock("foo");
+            my $false = $locker2->lock("foo");
+        }
+        # $lock out of scope here, i.e.
+        # $lock = undef;
+
+        my $new_lock = $locker2->lock("foo");
+        $new_lock->unlock;
+
+DESCRIPTION
+    This module uses RabbitMQ to provide locking for coarse grained locks.
+    The idea being that you want to take a lock to stop duplicate jobs doing
+    the same work you are doing.
+
+    The lock taken whilst your job is running can last quite a while, and
+    you don't want your lock to be broken by another process if you're still
+    working. Equally well, if you crash, you want the lock to be freed so
+    that another process can retry the job.
+
+METHODS
+  new
+    Constructs a lock manager object. Supply it with the "mq" parameter
+    which contains either an instance of AnyEvent::RabbitMQ or
+    Net::RabbitFoot
+
+  lock ($key)
+    Take a lock named with a specified key. Returns false if the lock is
+    already held, returns a IPC::Lock::RabbitMQ::Lock object if the lock was
+    successful.
+
+    The lock is unlocked either by latting the IPC::Lock::RabbitMQ::Lock
+    object go out of scope, or by explicitly calling the unlock method on
+    it.
+
+AUTHOR
+    Tomas Doran (t0m) "<bobtfish@bobtfish.net>".
+
+COPYRIGHT & LICENSE
+    Copyright 2011 the above author(s).
+
+    This sofware is free software, and is licensed under the same terms as
+    perl itself.
+

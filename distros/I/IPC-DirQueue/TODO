@@ -1,0 +1,4 @@
+
+- possibly add an "flock" serialization mode, if that turns out
+  to be more efficient than link/unlink
+

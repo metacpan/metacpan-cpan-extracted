@@ -1,0 +1,246 @@
+CHANGES
+-------
+
+  2.074 19 Feb 2017
+
+      * Fix bad 2.073 release
+
+  2.073 18 Feb 2017
+
+      * #120239: [PATCH] ISA fixes for c3
+
+  2.072 4 Feb 2017
+
+      * Makefile.PL
+        #120084: Need Fix for Makefile.PL depending on . in @INC
+
+  2.070 28 Dec 2016
+
+      * No Changes
+
+  2.069 26 Sep 2015
+
+      * No Changes
+
+  2.068 23 Dec 2014
+
+      * No Changes
+
+  2.067 8 Dec 2014
+
+      * No Changes
+
+  2.066 21 Sept 2014
+
+      * No Changes
+
+  2.064 1 February 2014
+
+      * No Changes
+
+  2.062 11 August 2013
+
+      * No Changes
+
+  2.061 19 May 2013
+
+      * No Changes
+
+  2.060 7 January 2013
+
+      * No Changes
+
+  2.059 10 December 2012
+
+      * No Changes
+
+  2.058 12 November 2012
+
+      * No Changes
+
+  2.057 10 November 2012
+
+      * General Performance improvements.
+
+  2.055 5 August 2012
+
+      * No Changes
+
+  2.052 29 April 2012
+
+      * No Changes
+
+  2.049 18 February 2012
+
+      * No Changes
+
+  2.048 29 January 2012
+
+      * No Changes
+
+  2.047 28 January 2012
+
+      * Set minimum Perl version to 5.6
+
+  2.045 3 December 2011
+
+      * Moved FAQ.pod to IO::Compress
+
+  2.044 2 December 2011
+
+      * Moved FAQ.pod under the lib directory so it can get installed
+
+  2.043 20 November 2011
+
+      * No Changes
+
+  2.042 17 November 2011
+
+      * No Changes
+
+  2.040 28 October 2011
+
+      * No Changes
+
+  2.039 28 October 2011
+
+      * No Changes
+
+  2.037 22 June 2011
+
+      * No Changes
+
+  2.036 18 June 2011
+
+      * No Changes
+
+  2.035 6 May 2011
+
+      * RT #67931: Test failure on Windows
+
+  2.034 2 May 2011
+
+      * Updates to test harness
+
+  2.033 11 Jan 2011
+
+      * No Changes
+
+  2.032 4 Jan 2011
+
+      * No Changes
+
+  2.030 22 July 2010
+
+      * No Changes
+
+  2.027 24 April 2010
+
+      * No Changes
+
+  2.026 7 April 2010
+
+      * No Changes
+
+  2.025 27 March 2010
+
+      * No Changes
+
+  2.023 9 November 2009
+
+      * No Changes
+
+  2.021 30 August 2009
+
+      * Changed test harness so that it can cope with PERL5OPT=-MCarp=verbose
+        [RT# 47225]
+
+  2.020 3 June 2009
+
+      * Added 'ConsumesInput' attribute to Adapter
+
+  2.019 3 May 2009
+
+      * No Changes
+
+  2.018 3 May 2009
+
+      * No Changes
+
+  2.017 28 March 2009
+
+      * No Changes
+
+  2.015 3 September 2008
+
+      * Makefile.PL
+        Backout changes made in 2.014
+
+  2.014 2 September 2008
+
+      * Makefile.PL
+        Updated to check for indirect dependencies.
+
+  2.012 15 July 2008
+
+      * No Changes
+
+  2.011 17 May 2008
+
+      * No Changes
+
+  2.010 5 May 2008
+
+      * No Changes
+
+  2.009 20 April 2008
+
+      * No Changes
+
+  2.008 2 November 2007
+
+      * Minor documentation changes in README
+
+  2.006 1 September 2007
+
+      * No Changes
+
+  2.005 18 June 2007
+
+      * No Changes
+
+  2.004 3 March 2007
+
+      * No Change
+
+  2.003 2 January 2007
+
+      * Added explicit version checking
+
+  2.002 29 December 2006
+
+      * Documentation updates.
+
+  2.001 1 November 2006
+
+      * Remove beta status.
+
+  2.000_11 22 March 2006
+
+      * Beefed up 050interop-lzop.t to check that the external lzop command
+        works as expected before starting the tests. This means that
+        this test harness will just be skipped on problematic systems.
+
+  2.000_10 13 March 2006
+
+      * Documentation updates.
+
+  2.000_09 3 March 2006
+
+      * Released to CPAN.
+
+  2.000_08 2 March 2006
+
+      * Split IO::Compress::Lzop into its own distribution.
+
+

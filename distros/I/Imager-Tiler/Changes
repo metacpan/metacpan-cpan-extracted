@@ -1,0 +1,13 @@
+Revision history for Perl extension Imager-Tiler
+
+1.010002  2015-04-23
+    [Changes by ZOFFIX]
+    - Specified prereq versions explicitly, to avoid test failures
+
+1.010001  2015-04-22
+    [Changes by ZOFFIX]
+    - Converted to Dist::Zilla packaging
+    - Fixed fatal error due to changed Imager interface
+
+1.01  2007-12-25
+    - ported from GD::Tiler 0.11

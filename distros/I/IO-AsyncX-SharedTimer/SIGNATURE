@@ -1,0 +1,50 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 5e804937033428efb982b47f33ec50bd7ded91b6 Changes
+SHA1 cbf8309d4c3f1cfa76ac92ccaf9aed037b4fa5be INSTALL
+SHA1 1d431d36f36b6e6d6caf68e84e78806a6c83e85f LICENSE
+SHA1 729b06dbf08f3d8c422c7ad0572025ca2c0f2bba MANIFEST
+SHA1 0829a46bde8e45ebe3c54bc2c6afe91d38a6e627 META.json
+SHA1 5ab9a60d361b909230e2c06ccafe55b278f816fb META.yml
+SHA1 d76cac1664585e83a937b0fdde46b8dc0e9c4bd1 Makefile.PL
+SHA1 23c132a591b50a06d7c6b6b4ea61de7df052a46a README
+SHA1 11ceee8cda82ce83370a6f33eee4746b55c11ef3 cpanfile
+SHA1 3e3061ef49109a99de2b62c971fd06f06724ff08 dist.ini
+SHA1 430a5ae55842e093c9a82a97aad1432cf4a2438c examples/benchmark-now.pl
+SHA1 11937cbb342b937246b3724146e6274b597d98af examples/benchmark.pl
+SHA1 8affad7523b88e0efd1805af3f4cb33c6f45fae7 lib/IO/AsyncX/SharedTimer.pm
+SHA1 66e8cc9feb966d2919584ea38c5f27ceff28728f lib/IO/AsyncX/SharedTimer.pod
+SHA1 985d9ded8d8ed7e344a09e52b1402e878e91da28 t/00-check-deps.t
+SHA1 89354a80f121d2d23b5a7702e8f3d3dc5a7f021a t/00-compile.t
+SHA1 e85d233d3070111968384de101710e46b52625a7 t/000-report-versions-tiny.t
+SHA1 7d6f004402e96253700fe762939fa15f9c5d575b t/current-time.t
+SHA1 d4cd5a41c56c27b22668b025d110f5c612193fbe t/futures.t
+SHA1 198d1665317c3d91e3bb81f0a3b8dad8d4d66f20 xt/release/common_spelling.t
+SHA1 c6c3c9f7fe12058b4771449dff874b1c450c982c xt/release/mojibake.t
+SHA1 296928dbbcaffd1514ccc9b77a1e6e03cfe9b068 xt/release/pod-syntax.t
+SHA1 1294a6710ea8e2626e43722e50111bf872668316 xt/release/test-version.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJUzgasAAoJEFKElMNpjtyDxe0IAJtqnxwOwAWHuZaKiMYhHvjP
+iqkXWvFBKFHkHto97pFGceMP+ZVfktchqspAAeTRB2ScgAIj+ZS1J9f9DRq4QLyz
+gdwRRoBB8cVj8dCff3jx0krpuv349rjiQv/9k7lGWMJEyPZHQxbrVdGpiJZx63Dg
+ja7qRsIBzervr3TjhDQc/vgxX/G8HZoqa/z84GwqeSdfZjRYvtOsupzHVxgWhTwF
+UNvr19QSQQ3DSWk52lgJDEyIEcLu8YLD9SRiWvrm2ykT3HDHG02rxoKPjtnEtVUW
+2BAqf5s+6aIKFNDu5CZjp7BQhEiqkS/JDsqBUfx6w29kXDzWtcrBbTZqCKrwl8o=
+=VyUj
+-----END PGP SIGNATURE-----

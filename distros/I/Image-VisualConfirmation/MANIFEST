@@ -1,0 +1,12 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+README.txt
+dist.ini
+examples/basic_example.pl
+lib/Image/VisualConfirmation.pm
+lib/Image/VisualConfirmation/Vera.ttf
+t/Image-VisualConfirmation.t

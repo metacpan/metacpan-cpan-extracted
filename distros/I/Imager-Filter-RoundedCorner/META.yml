@@ -1,0 +1,19 @@
+---
+name: Imager-Filter-RoundedCorner
+version: 0.02
+author:
+  - 'Daisuke Murase <typester@cpan.org>'
+abstract: Make nifty images with Imager
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Imager: 0.50
+provides:
+  Imager::Filter::RoundedCorner:
+    file: lib/Imager/Filter/RoundedCorner.pm
+    version: 0.02
+generated_by: Module::Build version 0.2801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

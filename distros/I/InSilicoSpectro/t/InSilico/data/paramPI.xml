@@ -1,0 +1,51 @@
+<computeIP>
+	<calibrator>	<train>
+			<preprocess>1</preprocess>
+			<fitting>linear</fitting>
+			<gamma>1e-06</gamma>
+		</train>
+		<data>
+			<value time="264">3.36328125</value>
+			<value time="503">3.47265625</value>
+			<value time="531">3.5</value>
+			<value time="434">3.5</value>
+			<value time="527">3.5</value>
+			<value time="523">3.5</value>
+			<value time="468">3.5</value>
+			<value time="477">3.5</value>
+			<value time="851">3.5</value>
+			<value time="302">3.5</value>
+			<value time="376">3.5</value>
+			<value time="250">3.5</value>
+			<value time="586">3.869140625</value>
+			<value time="518">3.978515625</value>
+			<value time="369">3.978515625</value>
+			<value time="306">3.978515625</value>
+			<value time="306">3.978515625</value>
+			<value time="391">4.12890625</value>
+			<value time="245">4.12890625</value>
+			<value time="481">4.12890625</value>
+			<value time="369">4.416015625</value>
+			<value time="445">4.45703125</value>
+			<value time="492">4.45703125</value>
+			<value time="445">4.45703125</value>
+			<value time="143">4.45703125</value>
+			<value time="479">4.45703125</value>
+			<value time="447">4.45703125</value>
+			<value time="441">4.45703125</value>
+			<value time="445">4.45703125</value>
+			<value time="479">4.45703125</value>
+			<value time="366">4.73046875</value>
+			<value time="330">5.6328125</value>
+			<value time="443">5.6328125</value>
+			<value time="427">8.8046875</value>
+			<value time="341">9.078125</value>
+			<value time="561">9.078125</value>
+			<value time="873">9.84375</value>
+			<value time="488">9.84375</value>
+			<value time="122">9.84375</value>
+			<value time="488">9.84375</value>
+			<value time="508">9.84375</value>
+		</data>
+	</calibrator>
+</computeIP>

@@ -1,0 +1,5 @@
+version 0.0101 - March 21, 2015
+ * Fixed the height parameter. It would change the height of the bar code but not the default image that is created if no image is passed in.
+
+version 0.0100 - March 6, 2015
+ * Initial public release.

@@ -1,0 +1,61 @@
+{
+   "abstract" : "IO::All to Larry Wall!",
+   "author" : [
+      "Ingy döt Net <ingy@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "IO-All",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t",
+         "xt",
+         "example"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "File::MimeInfo" : "0",
+            "File::ReadBackwards" : "0"
+         },
+         "requires" : {
+            "Cwd" : "0",
+            "Scalar::Util" : "0",
+            "perl" : "v5.8.1"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ingydotnet/io-all-pm/issues"
+      },
+      "homepage" : "https://github.com/ingydotnet/io-all-pm",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ingydotnet/io-all-pm.git",
+         "web" : "https://github.com/ingydotnet/io-all-pm"
+      }
+   },
+   "version" : "0.86"
+}
+

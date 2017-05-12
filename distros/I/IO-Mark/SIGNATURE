@@ -1,0 +1,37 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 4d74c0b79a6e71d07bdd8f3cf2b42ab6d34d5919 Changes
+SHA1 de773f6fedb2989bf9e7798a2fc6a62a260e1f6f MANIFEST
+SHA1 73ebd6b6c620afd00bd81d7065163c3d4c966041 META.yml
+SHA1 2c4a1fbe335cca24b311142309961b1f03532682 Makefile.PL
+SHA1 7d1d82f5f316bd36af410ca100d5915291154777 README
+SHA1 8a06899808368cc6e62745d5b0199389ac17d4d9 lib/IO/Mark.pm
+SHA1 bdb0150436ea4ece54927269c1d39e35ff3f3208 lib/IO/Mark/Buffer.pm
+SHA1 fc1ebc37b3c85b75ca8050d952313c9bcaa6adb4 lib/IO/Mark/Cache.pm
+SHA1 eeb157a5888043d95fc176d5277f766b1eff2c14 lib/IO/Mark/SlaveBuffer.pm
+SHA1 db77fd44f8743792fc3f673244fcda9450b21b67 t/00.load.t
+SHA1 e86387764c78b42bbead86c6b26fa6006018d02a t/10.simple.t
+SHA1 4ac4934d8079a700adec70250ee556833233f85e t/pod-coverage.t
+SHA1 0190346d7072d458c8a10a45c19f86db641dcc48 t/pod.t
+SHA1 8084f0f10255c5e26605a1cb1f51c5e53f92df40 t/test-data.txt
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.6 (Darwin)
+
+iD8DBQFF5NfGwoknRJZQnCERAsW+AKCGt02kSSqQUt6LCVIB7AHF/mLKxgCfaAyM
+n1NCyxizB9To/8M/xv8Net8=
+=K42+
+-----END PGP SIGNATURE-----

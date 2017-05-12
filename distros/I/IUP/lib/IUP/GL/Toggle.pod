@@ -1,0 +1,14 @@
+=head1 NAME
+
+IUP::GL::Toggle - [GUI element] GL-based two-state (on/off) button
+
+=head1 DESCRIPTION
+
+XXX-TODO: missing doc
+
+=head1 SEE ALSO
+
+The original doc: L<iupgltoggle.html|http://www.tecgraf.puc-rio.br/iup/en/gl/iupgltoggle.html>
+
+
+=cut

@@ -1,0 +1,218 @@
+###########################################################
+# A Perl package for showing/modifying JPEG (meta)data.   #
+# Copyright (C) 2004,2005,2006 Stefano Bettelli           #
+# See the COPYING and LICENSE files for license terms.    #
+###########################################################
+
+###########################################################
+# This file contains only the package man-page in perldoc #
+# format. In order to visualise it, it is sufficient to   #
+# type "perldoc <name_of_this_file>".                     #
+###########################################################
+
+=head1 NAME
+
+Image::MetaData::JPEG::MakerNotes - random information and details on MakerNotes
+
+=head1 OVERVIEW
+
+This document contains random information and details on MakerNotes; it is an
+appendix to the main manual page of the L<Image::MetaData::JPEG> module, which
+the reader should refer to for further details and the general scope. The note
+on L<MakerNote parsing|Image::MetaData::JPEG/On the problem of MakerNote
+corruption and ways to overcome it> in the main manual page is of particular
+interest.
+
+=head1 Pieces of information available after parsing the MakerNote
+
+The result of the process of parsing the maker note is stored in a
+directory in the internal data structure for the APP1 Segment, whose path
+is "IFD@SubIFD@MakerNoteData_$format", where $format is the specific note
+format; the 'MakerNote' entry in IFD0@SubIFD is then removed. This
+translation happens always, because there is a catch-all 'unknown' rule for
+a binary makernote with very broad acceptance rules. The maker note
+directory contains, in addition, a special subdir with some fields
+reporting about the parsing process.
+
+    key         content
+    --------    -------
+    ORIGINAL    the raw content of the maker note (unparsed)
+    SIGNATURE   the first few bytes which allowed the format to be chosen
+    ENDIANNESS  the byte order chosen during parsing
+    FORMAT      the maker note format chosen during parsing
+    ERROR       [optional] error details, in case of failure while parsing
+
+=head1 Supported MakerNote formats
+
+Maker note formats are specified in a special internal hash, with a key for
+each format (including the 'unknown' format). Each format entry corresponds
+to an anonymous hash containing information for parsing the MakerNote; the
+"normal" format is considered to be an IFD-like MakerNote with a next_link
+pointer, offsets counted from the global TIFF header and no MakerNote
+internal TIFF header.
+
+        key         meaning or effect
+        ---------   -----------------
+        signature   the MakerNote signature (a regular expression)
+        maker       the Maker signature (i.e., its name, no regex)
+        tags        a reference to a hash for tag translations
+    (A) mkntstart   if set, offsets are counted from the maker note start
+    (B) mkntTIFF    if set, offsets are counted from the internal TIFF header
+    (C) ignore      if set, the format is to be ignored
+    (D) nonext      if set, the maker note IFD does not have a next_link
+    (E) endianness  if set, the byte order is fixed to this value
+    (F) nonIFD      if set, the maker note is not IFD-like
+
+Currently, "supported" formats are described in the following table;
+authoritative data is indeed kept in Tables_makernotes.pl, to which the
+reader should refer for tag definitions and translations. Remember that
+both the 'signature' and the 'maker' fields are regular expressions
+matching at the beginning (the real signature corresponds to $1).
+
+                A B C D E F Maker     Signature
+		----------- --------- -----------------
+    Agfa                    AGFA      (AGFA \000\001)
+    Canon                   Canon     ()
+    Casio_1                 CASIO     ()[^Q]
+    Casio_2                 CASIO     (QVC\000{3})
+    Epson                   EPSON     (EPSON\000\001\000)
+    Foveon                  FOVEON    (FOVEON\000{2}\001\000)
+    Fujifilm    x           FUJIFILM  (FUJIFILM\014\000{3})
+    HPackard        x       Hewlett-Packard    (HP)
+    Kyocera     x     x     KYOCERA   (KYOCERA {12}\000{3})
+    Kodak               B x KODAK     (KDK INFO[a-zA-Z0-9]*  )
+    Minolta_1               MINOLTA   ().{10}MLT0 
+    Minolta_2               Minolta   ().{10}MLT0
+    Konica          x       Minolta|KONICA ((MLY|KC|(\+M){4})|\001\000{5}\004)
+    Nikon_1                 NIKON     (Nikon\000\001\000)
+    Nikon_2                 NIKON     ()[^N] 
+    Nikon_3       x         NIKON     (Nikon\000\002[\020\000]\000{2})
+    Olympus                 OLYMPUS   (OLYMP\000[\001\002]\000) 
+    Panasonic_1       x     Panasonic (Panasonic\000{3})
+    Panasonic_2     x x     Panasonic (MKED)
+    Pentax_1    x           Asahi     ()[^A]
+    Pentax_2    x     x     Asahi     (AOC\000..)
+    Ricoh_1         x       RICOH     (Rv|Rev)
+    Ricoh_2         x       RICOH     (\000)
+    Ricoh_3                 RICOH     ((Ricoh|RICOH)\000{3})
+    Sanyo                   SANYO     (SANYO\000\001\000)
+    Sigma                   SIGMA     (SIGMA\000{3}\001\000)
+    Sony              x     SONY      (SONY (CAM|DSC) \000{3})
+    Toshiba         x       TOSHIBA   ()
+    unknown             x   .         ()
+
+=head1 References
+
+MakerNote format details are not usually released by vendors (well, this is
+an euphemism: no vendor ever, to my knowledge, released any detail on its
+format, exception made for Sigma/Foveon). All information used for this
+package was collected on the Internet (and its reliability is therefore
+limited) or through personal tests. Some interesting sites are (not an
+exhaustive list at all):
+
+  General:   home.arcor.de/ahuggel/exiv2/makernote.html
+    .....:   www.ozhiker.com/electronics/pjmt/jpeg_info/makernotes.html
+
+  Agfa:      www.ozhiker.com/electronics/pjmt/jpeg_info/agfa_mn.html
+  Canon:     www.burren.cx/david/canon.html
+  Casio:     park2.wakwak.com/~tsuruzoh/Computer/Digicams/exif-e.html
+    ...:     www.dicasoft.de/casiomn.htm
+  Epson:     www.ozhiker.com/electronics/pjmt/jpeg_info/epson_mn.html
+  Foveon:    Foveon is the same as Sigma, see Sigma
+  Fujifilm:  park2.wakwak.com/~tsuruzoh/Computer/Digicams/exif-e.html
+    ......:  www.ozhiker.com/electronics/pjmt/jpeg_info/fujifilm_mn.html
+  Kyocera:   www.ozhiker.com/electronics/pjmt/jpeg_info/kyocera_mn.html
+  Kodak:     my personal tests with my Kodak DX3900 (not IFD-like)
+  Minolta:   www.dalibor.cz/minolta/makernote.htm
+    .....:   www.ozhiker.com/electronics/pjmt/jpeg_info/minolta_mn.html
+  Nikon:     park2.wakwak.com/~tsuruzoh/Computer/Digicams/exif-e.html
+    ...:     www.tawbaware.com/990exif.htm
+    ...:     www.ozhiker.com/electronics/pjmt/jpeg_info/nikon_mn.html
+  Olympus:   park2.wakwak.com/~tsuruzoh/Computer/Digicams/exif-e.html
+    .....:   www.ozhiker.com/electronics/pjmt/jpeg_info/olympus_mn.html
+  Panasonic: www.compton.nu/panasonic.html
+  Pentax:    www.ozhiker.com/electronics/pjmt/jpeg_info/pentax_mn.html
+  Ricoh:     www.ozhiker.com/electronics/pjmt/jpeg_info/ricoh_mn.html
+  Sanyo:     www.exif.org/makernotes/SanyoMakerNote.html
+  Sigma:     www.x3f.info/technotes/FileDocs/MakerNoteDoc.html
+  Sony:      www.ozhiker.com/electronics/pjmt/jpeg_info/sony_mn.html
+
+=head1 DX3900 MakerNote format
+
+Kodak MakerNotes are written in a proprietary binary format, which is not
+IFD-like. So, there is no way to detect the beginning, end and type of a
+field; everything here was inferred through a careful comparison of the
+content of a set of Kodak JPEG files and their shot parameters. Fields
+seems to be aligned on four bytes boundaries. For the DX3900 model the
+endianness is always fixed to big endian. The signature regular expression
+is "^(KDK INFO[a-zA-Z0-9]* )", the maker is 'KODAK'. The meaning of the
+tags is as follows:
+
+  BYTE   ???                firmware version? This is always 3
+  BYTE   Compression        1 = normal, 2 = 2160x1440 high compression
+  BYTE   BurstMode          0 = off,    1 = on
+  BYTE   MacroMode          0 = normal, 1 = close-up
+  SHORT  PixelXDimension    \ allowed     2160x1440, 1800x1200, 
+  SHORT  PixelYDimension    /     values: 1536x1024, 1080x720
+  SHORT  Year               the year value, with four digits
+  BYTE   Month              the month value  (in [1,12])
+  BYTE   Day                the day value    (in [1,31])
+  BYTE   Hour               the hour value   (in [0,23])
+  BYTE   Minute             the minute value (in [0,59])
+  BYTE   Second             the second value (in [0,59])
+  BYTE   SubSecond          (in 130th of seconds?)
+  SHORT  ???                ???
+  BYTE   ???                ???
+  BYTE   ShutterMode        0 = auto, 32 = manual
+  BYTE   MeteringMode       0 = multi-pattern, 1=centre weight., 2=centre spot
+  BYTE   BurstSequenceIndex index in [1,8], 0 if burst mode off
+  SHORT  FNumber            100 times the Exif F-number
+  LONG   ExposureTime       in 10^-5 seconds
+  SSHORT ExposureBiasValue  1000 times the exposure bias in [-2,+2 step .5]
+  SHORT  ???                ???
+  LONG   ???                \
+  LONG   ???                 \ is this an estimate of the subject
+  LONG   ???                 / distance? If so, it is very rough.
+  LONG   ???                /
+  BYTE   FocusMode          0 = auto, 2 = close, 3 = infinity
+  BYTE   ???                always 2
+  SHORT  ???                ???
+  SSHORT PanoramaMode       0 = normal, -1 = focus at infinity
+  SHORT  SubjectDistance    (x-28)*2.54+7 looks like the distance in cm
+  BYTE   WhiteBalance       0 = normal, 1 = fluor., 2 = tungsten, 3 = daylight
+  (27 bytes with unknown meaning here)
+  BYTE   FlashMode          0 = auto, 1 = on, 2 = off, 3 = red-eyes
+  BYTE   FlashFired         0 = yes,  1 = no
+  SHORT  ISOSpeedMode       the requested speed in {100,200,400} or zero
+  SHORT  ???                ???
+  SHORT  TotalZoomFactor    100 times the zoom factor in [+1,+6 step 0.1]
+  SHORT  DateTimeStampMode  0 = none, [1,6] = the six modes
+  SHORT  ColourMode         1 = black & white, 2 = sepia, 32 = colour
+  SHORT  DigitalZoomFactor  100 times the zoom factor in [+1,+3 step 0.1]
+  BYTE   ???                always zero
+  SBYTE  Sharpness          0 = standard, 1 = sharp, -1 = soft
+  (808 bytes with unknown meaning here, maybe a thumbnail?)
+
+=head1 AUTHOR
+
+Stefano Bettelli, B<bettelli@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2004,2005,2006 by Stefano Bettelli
+
+This library is free software; you can redistribute it and/or modify it
+under the terms of the GNU L<General Public License|perlgpl>. See the
+COPYING and LICENSE file for the license terms.
+
+=head1 SEE ALSO
+
+The main documentation page for the L<Image::MetaData::JPEG> module.
+
+=cut
+
+### Local Variables: ***
+### mode:perl ***
+### fill-column:75 ***
+### ispell-dictionary: "british" ***
+### End: ***
