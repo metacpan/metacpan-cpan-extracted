@@ -1,0 +1,40 @@
+[%# -*- mode: web; coding: utf-8 -*-
+  ######################################################################
+    General page layout
+    Parameters set by actual pages using this layout:
+       title - page title
+       content - page content
+    Parameters set by OAuthomatic:
+       app_name - application name
+       site_name - symbolic name of the site we authorize
+       site_client_creation_page - URL where application tokens can be received (optional)
+       site_client_creation_desc - elaborate text how to reach that
+  ###################################################################### -%]
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <title>[% title %] ([% app_name %] - accessing [% site_name %])</title>
+
+    [%# We sometimes close embedded web just after returning reply,
+      # therefore we insert style and js to avoid races. 
+      # <link rel="stylesheet" href="/static/style.css" />
+	  # <script src="/static/jquery-1.11.2.min.js"></script>  %]
+    <style type="text/css">[% INSERT "style.css" %]</style>
+    <script>[% INSERT "jquery-1.11.2.min.js" %]</script>
+</head>
+<body>
+
+<div class="title">
+    <h1>[% title %]</h1>
+</div>
+
+<div class="content">
+[% content %]
+</div>
+
+<div class="footer">
+    Generated using <a href="https://metacpan.org/pod/distribution/OAuthomatic/lib/OAuthomatic.pm">OAuthomatic</a>.
+</div>
+
+</body>
+</html>

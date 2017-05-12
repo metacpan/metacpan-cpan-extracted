@@ -1,0 +1,30 @@
+---
+abstract: "simple interface to OCS's SOAP API"
+author:
+  - 'Gustavo L. de M. Chaves <gnustavo@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: OCS-Client
+requires:
+  Carp: '0'
+  SOAP::Lite: '0'
+  URI: '0'
+  XML::Entities: '0'
+  XML::Simple: '0'
+  constant: '0'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/gnustavo/OCS-Client/issues
+  homepage: http://search.cpan.org/dist/OCS-Client/
+  repository: git://github.com/gnustavo/OCS-Client.git
+version: '0.013'

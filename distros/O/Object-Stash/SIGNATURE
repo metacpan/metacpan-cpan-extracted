@@ -1,0 +1,44 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 33317486c4fa2cf7fec85bf92ed38ac0f64233a0 CONTRIBUTING
+SHA1 ddfdc29741fb37c678e441606bdaca3b00f3a0fc COPYRIGHT
+SHA1 540e627824058dc4b3f75009923f7af8f8e388c8 CREDITS
+SHA1 5df9f233a794f526ec4d902eaa8b8ca1e4dec84c Changes
+SHA1 6d93e0ad7d9d6f6db70620cc64c47115abaaaf66 INSTALL
+SHA1 34f5e12514b91055de4b164a1f2327ef5c30ba53 LICENSE
+SHA1 daaa6dd287d6fb10f843609964f6c86c10f13d24 MANIFEST
+SHA1 d5b7c0392fb43be586879215f1e2c4b196da67a4 META.json
+SHA1 598f3ae0ba93a9b0711bc9afa961ca409087c203 META.yml
+SHA1 bdb50df6d8b756785057b4d59dea49982b202d57 Makefile.PL
+SHA1 108adcfe05ad491825a56a808579004f1083f5ad README
+SHA1 4314efeae88127c5aa36ccb433bcda3fe4813f40 dist.ini
+SHA1 e0e1c426ca0d9a94b1c73d049b19375ece1216fd doap.ttl
+SHA1 8250c4a0e9a2358c78d044f86114e0d554307ed2 lib/Object/Stash.pm
+SHA1 08ce566bec2b875ca99267ea7f4aa9229050d819 lib/Object/Stash/Util.pm
+SHA1 97cb9f150d6b7c3566c08715e0b1291620c6b2ea t/01basic.t
+SHA1 1c829356e0cb534aa97eba1bd98e5154cd9d7520 t/02stashes.t
+SHA1 07023807a58779e5f186b0c9bf0c01fac496994c t/03destruction.t
+SHA1 b685cb3904ab297bffc3e11a56adc41fca38959c t/04stashobject.t
+SHA1 8a21c1826acf2824cc3fc47de15ead4d01e8a9b9 t/05multiretrieval.t
+SHA1 b40a1eba48dfa3e5f5b9f94557601ea1ff8d12cc t/06util.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlQQz5sACgkQzr+BKGoqfTl9ZACfalF6sU3gI+XdkVozTxs0XFUS
+Hq4AoLYpTHP4waMSkTyA2cy2KzK0CwFk
+=tPNf
+-----END PGP SIGNATURE-----

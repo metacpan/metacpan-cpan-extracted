@@ -1,0 +1,157 @@
+NAME
+    Object::Sub - Create objects without those pesky classes
+
+SYNOPSIS
+        use Object::Sub;
+
+        my $obj = Object::Sub->new(sub {
+                      my ($self, $method, @args) = @_;
+
+                      print "self: $self, method name: $method, first arg: $args[0]\n";
+                  });
+
+        $obj->whatever(123);
+        ## self: Object::Sub=HASH(0xc78eb0), method name: whatever, first arg: 123
+
+        $obj->(123);
+        ## self: Object::Sub=HASH(0xc78eb0), method name: , first arg: 123
+        ##   ($method is undef)
+
+    Alternatively, you can use a hash of subs:
+
+        my $obj = Object::Sub->new({
+            add => sub {
+                my ($self, $num1, $num2) = @_;
+                return $num1 + $num2;
+            },
+            mul => sub {
+                my ($self, $num1, $num2) = @_;
+                return $num1 * $num2;
+            },
+        });
+
+        $obj->add(2, 3);
+        ## => 5
+
+DESCRIPTION
+    Sometimes you want something that acts like an object but you don't want
+    to go to all the trouble of creating a new package, with constructor and
+    methods and so on. This module is a trivial wrapper around perl's
+    AUTOLOAD functionality which intercepts method calls and lets you handle
+    them in a single "sub". It also uses overload so that you can
+    additionally treat the object as a "sub" if you desire.
+
+USE-CASES
+  AUTOLOAD SYNTACTIC SUGAR
+    AUTOLOAD allows you to dispatch on method names at run-time which can
+    sometimes be useful, for example in RPC protocols where you transmit
+    method call messages to another process for them to be executed
+    remotely. Unfortunately, using AUTOLOAD is a bit annoying since the
+    interface is somewhat arcane. Object::Sub is a nicer interface to the
+    most commonly used AUTOLOAD functionality:
+
+        my $obj = Object::Sub->new(sub {
+                    my ($self, $method, @args) = @_;
+
+                    my $rpc_input = encode_json({ method => $method, args => [ @args ] });
+
+                    my $rpc_output = do_rpc_call($rpc_input);
+
+                    return decode_json($rpc_output);
+                  });
+
+    Because "Object::Sub" objects can also be treated as subs, your RPC
+    interface can support sub-routine calls on the objects as well as method
+    calls, even on the same object.
+
+  PLACE-HOLDER OBJECTS
+    Some APIs require you to pass in or provide an object but then don't
+    actually end up using it. Instead of passing in undef and getting a
+    weird "Can't call method "XYZ" on an undefined value" error, you can
+    pass in an Object::Sub which will throw a "helpful" exception instead:
+
+        my $obj = Some::API->new(
+                    logger => Object::Sub->new(sub { die "FIXME: add logger" }),
+                  );
+
+    Alternatively, you may choose to minimally implement the API "inline" in
+    your program:
+
+        my $obj = Some::API->new(
+                    logger => Object::Sub->new(sub {
+                                my ($self, $method, @args) = @_;
+
+                                return if $method eq 'debug';
+
+                                say STDERR "Some::API $method: " . join(' ', @args);
+                              })
+                  );
+
+  LAZY OBJECT CREATION
+    Again, some APIs may never end up using an object so you may wish to
+    "lazily" defer the creation of that object until a method is actually
+    called on it. This module can help you make the cases where it doesn't
+    use it more efficient.
+
+    For example, suppose you have a large CGI script which always opens a
+    DBI connection but only actually accesses this connection for a small
+    portion of runs. You can prevent the script from accessing the database
+    on the majority of runs with Object::Sub:
+
+        my $dbh = Object::Sub->new(sub {
+                    require DBI;
+                    $_[0] = DBI->connect($dsn, $user, $pass, { RaiseError => 1 })
+                        || die "Unable to connect to database: $DBI::errstr";
+
+                    my ($self, $method, @args) = @_;
+                    return $self->$method(@args);
+                  });
+
+    Note how we don't even load or compile the module until the first method
+    is called. After you call a method on $dbh it changes from a
+    "Object::Sub" object into a "DBI" object (assuming the "DBI->connect"
+    constructor succeeds). This works because the $_[0] argument is actually
+    an alias to $dbh and can be modified.
+
+    To demonstrate this, here is an example with Session::Token:
+
+        my $o = Object::Sub->new(sub {
+                  require Session::Token;
+                  $_[0] = Session::Token->new;
+
+                  my ($self, $method, @args) = @_;
+                  return $self->$method(@args);
+                });
+
+        say ref $o;
+        ## Object::Sub
+
+        say $o->get;
+        ## mhDPtfLlFMGl5kyNcJgFt7
+
+        say ref $o;
+        ## Session::Token
+
+        say $o->get;
+        ## 4JYkGgwWbYWGleU7Qk912P
+
+    With Object::Sub you can lazily "create" and pass around objects before
+    their constructor code has even been loaded.
+
+BUGS
+    Although not really a bug in this module, common perl code tends to copy
+    references of objects. Any code that overwrites the caller object (for
+    example in the "LAZY OBJECT CREATION" section) will only update one of
+    the copies.
+
+SEE ALSO
+    Object-Sub github repo <https://github.com/hoytech/Object-Sub>
+
+AUTHOR
+    Doug Hoyte, "<doug@hcsw.org>"
+
+COPYRIGHT & LICENSE
+    Copyright 2015-2016 Doug Hoyte.
+
+    This module is licensed under the same terms as perl itself.
+

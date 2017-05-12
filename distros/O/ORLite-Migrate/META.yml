@@ -1,0 +1,40 @@
+---
+abstract: 'Extremely light weight SQLite-specific schema migration'
+author:
+  - 'Adam Kennedy <adamk@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.62
+  Test::More: 0.47
+configure_requires:
+  ExtUtils::MakeMaker: 6.62
+distribution_type: module
+dynamic_config: 0
+generated_by: 'Module::Install version 1.04'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: ORLite::Migrate
+name: ORLite-Migrate
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  DBD::SQLite: 1.21
+  DBI: 1.58
+  File::Path: 2.04
+  File::Spec: 3.2701
+  File::Which: 1.07
+  File::pushd: 1.00
+  IPC::Run3: 0.042
+  ORLite: 1.28
+  Params::Util: 0.37
+  Probe::Perl: 0.01
+  perl: 5.6.0
+resources:
+  ChangeLog: http://fisheye2.atlassian.com/changelog/cpan/trunk/ORLite-Migrate
+  license: http://dev.perl.org/licenses/
+  repository: http://svn.ali.as/cpan/trunk/ORLite-Migrate
+version: 1.10

@@ -1,0 +1,20 @@
+Build.PL
+CHANGES
+MANIFEST			This list of files
+META.yml
+Makefile.PL
+NINJA
+README
+apache.pl
+apache/conf/httpd.conf.default
+apache/conf/mime.types
+apache/logs/README
+lib/OpenFrame/Example/ApacheSimple.pm
+lib/OpenFrame/Example/Redirector.pm
+lib/OpenFrame/Segment/Apache.pm
+lib/OpenFrame/Segment/Apache/NoImages.pm
+lib/OpenFrame/Segment/Apache/Request.pm
+lib/OpenFrame/Segment/Apache/Response.pm
+t/apache.t
+webpages/index.html
+webpages/leon.jpg

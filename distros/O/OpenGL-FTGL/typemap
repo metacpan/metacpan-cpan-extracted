@@ -1,0 +1,8 @@
+FTGLfont* T_PTROBJ
+FTGLlayout* T_PTROBJ
+const unsigned char * T_PTR
+FTGLfontPtr  T_PTROBJ
+FT_Encoding T_INT
+FT_Error T_INT
+const int T_INT
+const float T_FLOAT

@@ -1,0 +1,32 @@
+[% IF criteria %]
+  [% page_title = "Map of $criteria_title - $site_name" %]
+[% ELSE %]
+  [% page_title = "Map of all nodes - $site_name" %]
+[% END %]
+[% INCLUDE header.tt %]
+[% INCLUDE banner.tt %]
+
+[%# NOTE: the "content" div is closed off in footer.tt %]
+<div id="content">
+
+  <div id="maincontent_no_navbar">
+
+    <h2 class="map_index_header">Map of
+      [% IF criteria %]
+        [% links = [] %]
+        [% FOREACH criterion = criteria %]
+          [% links.push( '<a href="' _ cgi_url _ '?' _ criterion.param _ '">' _ criterion.name _ '</a>' ) %]
+        [% END %]
+        [% links.join( ' and ' ) %]
+      [% ELSE %]
+        all nodes
+      [% END %]
+      (<a href="[% feed_base %]">view as a list</a>)
+    </h2>
+
+    [% INCLUDE index_form.tt %]
+    [% INCLUDE search_results_leaflet.tt %]
+
+  </div>
+
+[% INCLUDE footer.tt %]

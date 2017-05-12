@@ -1,0 +1,12 @@
+Object::Releaser
+    Version 0.10 February 17, 2013
+
+      Initial release
+
+    Version 0.11 February 21, 2013
+
+      Fixed bug: incorrect number of test in test plan.
+
+    Version 0.12 April 25, 2014
+
+      Fixed error in META.yml.

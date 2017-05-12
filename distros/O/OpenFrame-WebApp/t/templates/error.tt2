@@ -1,0 +1,4 @@
+Template::Toolkit error test
+
+[% IF error %]
+  TT2 Error: hanging if statement...

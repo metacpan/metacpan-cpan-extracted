@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<SITE ID="Yes">
+
+<NAME Lang="en-us">YES Search</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+®®¤ó·j´M(¥xÆW)
+]]></NAME>
+<INFO Lang="en-us">general information web search in Taiwan</INFO>
+<INFO Lang="zh-tw">general information web search in Taiwan</INFO>
+
+<URL Type="More"><![CDATA[
+http://yes.net.tw_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+post://yes.net.tw/index.htm?keyword=_QUERY_
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_NEXT_"><![CDATA[
+<a href="_NEXT_"><img src=http://yes.net.tw/icon/button_next.gif
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<a id=link href="_URL_">_TITLE_</a>___<font id=small>_PREVIEW_</font>___HTTP All in One
+]]></TEMPLATE>
+</SITE>

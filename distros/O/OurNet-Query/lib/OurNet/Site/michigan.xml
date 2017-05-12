@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<SITE ID="Michigan">
+
+<NAME Lang="en-us">Michigan Electronic Library</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+密西根電子圖書館
+]]></NAME>
+<INFO Lang="en-us">Michigan online library</INFO>
+<INFO Lang="zh-tw">Michigan online library</INFO>
+
+<URL Type="Start"><![CDATA[
+http://mel.lib.mi.us/cgi-bin/AT-MELsearch.cgi?search=_QUERY_
+]]></URL>
+
+<EXPRESSION>Boolean</EXPRESSION>
+
+
+<TEMPLATE><![CDATA[
+x.gif"></A>_SCORE_%___<A architext=result HREF="_URL_">_TITLE_</A>_PREVIEW_</ul>
+]]></TEMPLATE>
+</SITE>

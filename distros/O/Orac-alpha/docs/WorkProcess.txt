@@ -1,0 +1,32 @@
+WorkProcess
+
+For the moment, this file is meaningless to us, as we don't have revision
+control in place (except for locally on my machine, which is accessable
+only to me).  However, we are working on making that happen.  At that time,
+I will fill in the details, and make sure it all works and makes sense.
+OTOH, I don't want to lose this info. :-)
+
+Kevin
+
+************************************************************************
+
+1. check out from the "development" branch
+2. do our work
+3. update our local area
+4. test the heck out of it (fixing where necessary)
+5. commit back to the dev branch, taking care of merge conflicts should
+they arise (which should require another update/test/commit cycle if so)
+5. notify the other developers and the "in charge person" (Andy?  the
+"pumpkin patch" holder, as in the Perl dev world)
+
+Then at the appropriate time, a final test, then merging the dev branch
+back to the mainline (but not ending that branch), and tagging it (the
+new mainline version) with the appropriate version label.  Then tar'ing
+up a copy of that for release to CPAN.  (or something along those lines :-)
+
+The mainline is the stable released versions (even minor versions),
+branches are for development (odd minor versions: 1.3.x, 1.5.x, ...),
+which are merged back as we need to release (1.4.0, then 1.4.1, then 1.6.0,
+...).  A very simple and basic plan, but then, that's all we really need.
+
+=========================================================================

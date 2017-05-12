@@ -1,0 +1,260 @@
+THINGS I DONT LIKE
+------------------
+The segment stored procedures are awful.  If segments overlap on
+devices, I have not figured out a good way  to decode the free space 
+available on that segment.  You thus can run out of space and I dont know
+of a good way of detecting it in advance.  I may try to code up some 
+procedures that work ASSUMING you have one segment per device or some other 
+such limitations.  
+
+Three of the stored procedures use syscomments.  To make output reasonable,
+I only use row 1.  In a wierd cases (ie. in sp__helpview) where the select
+statement of a view (the part before the where) is over 255 characters, this
+procedure will produce incorrect output.  Concievable but extremely rare.
+
+OUTSTANDING BUGS
+----------------
+i think the reverse engineering might not do segments
+i think several system 10 datatypes are not supported
+
+FIXES IN VERSION 1.01
+---------------------
+sp__help seems to hang on line 80
+sp__quickstats output format changed 4/22/95
+
+FIXES IN VERSION 1.10
+---------------------
+rows and key are reserved words
+sp__dbspace had Used MB and Percent twice in select list
+Some procs needed to change context
+sp__helpmirror uses keyword mirror
+
+FIXES IN VERSION 1.20
+---------------------
+if running sa can see password in sp__helplogin
+added suid field to sp__helplogin
+changed header in sp__quickstats for clarity
+
+FIXES IN V2.0 (POST REAL RELEASE)
+----------------------
+ALL PROCS NOW LOAD ONTO SYSTEM 10
+quick stats has mirror key word
+noindex has rows key word
+sp__block, sp__lock - user and type key word
+sp__helpdevice added dbo to master table names
+sp__revdb fully qualified master tables
+sp__auditsecurity checks if model, or tempdb are default db
+sp__auditdb checks for object/comment mismatch
+sp__auditsecurity now looks for %name% and stupid passwords
+sp__helptrigger did not work - have fixed
+
+sp__revindex would put N.A. instead of create for nc indexes
+sp__helplogin changed due to system 10 password field
+sp__revlogin goes bad in system 10 due to password field
+do not desplay password in configure utility
+several minor doc changes
+sp__revgroup would print create statement for public
+sp__revuser would print create statement for sa
+sp__helplogin can be passed parameter to not show password
+
+V2.0 CHANGES
+------------
+sp__auditsecurity: changed password like %name% to %+name+%
+
+V2.1 CHANGES
+added sp__revsegment: segement creation 
+sp__helpuser now lists users with no logins as NULL
+sp__helpgroup now lists groups with no logins
+added sp__depends 
+sp__quickstats changed @mirror to @mirror_name
+sp__lock added auto check of dbid in sp__lock
+sp__help now also calls sp__trigger
+sp__auditsecurity would crash in system 10 due to varbinary password field
+document sp__revlogin not giving password for system  10
+sp__dbspace showed user space as log = fixed this
+added sp__revtable 
+fixed sp__helpindex not showing indexes of 2+ columns in system 10
+sp__helpview would blow with no where clause
+added sp__checkkey (undocumented)
+modified configure to ask for database
+sp_help 'proc' and sp__help 'proc' not compatible
+modified reverse engineering so no prints
+rewrote sp__dbspace to handle large table overflow better
+rewrote sp__helptable  to handle large table overflow better
+
+Version 2.8
+------------
+added sp__iostat (must doc)
+added sp__ls (must doc)
+sp__lock did not show object name in sys10
+modified sp__helpsegment per paul castelano
+added sp__flowchart.sql 
+
+Version 3.0
+-----------
+added sp__grep and sp__helptext  (need to doc)
+added sp__diskdevice 
+added sp__read_write
+rewrote configure for system 10
+modified sp__auditdb to look for trojan horses in master
+modified sp__auditsecurity for simplicity
+broke some procs into 10 and 49 versions.  
+modified sp__auditdb for performance (boy was it slow on large databases)
+sp__helplogin added role lookup
+sp__whoactive,sp__isactive added (doc)
+sp__whodo
+
+Version 3.01
+------------
+sp__heltable - system tables
+sp__helptable- fixed divide by 0 error
+sp__flowchart- rewrote the whole damn thing - it was way slow
+sp__indexspace - make only on dbo objects
+sp__helptable - make only on dbo objects
+sp__helpindex - if pass a procedure then find indexes dependant on it
+sp__helplogin - paramater of login now works
+sp__ls		- can pass in search string
+
+sp__helpcolumn - add identity, numeric, decimal correcness (new column)
+sp__revtable   - ditto
+added sp__syntax
+
+VERSION 3.02
+------------
+sp__helpcolumn - fixed length bug.  Made to fit on 80 columns
+sp__whodo      - removed look at self
+sp__whodo      - if pass in dbname then it works ok
+sp__who        = ditto
+sp__block      - for system 10 now cleaner
+sp__lock       - does not abort if you cant use database.
+sp__helpdb     - add abort tran on log full
+sp__lock       - locks
+sp__lockt      - locks
+
+VERSION 3.03
+-------------
+sp__indexspace - rowpage not found in system 11
+sp__helpuser   - changed space allocation to 17 char fields
+sp__syntax     - allow null parameter
+
+VERSION 3.04
+------------
+sp__helplogin converts id to char(4) not 3 if suid>1000
+
+VERSION 3.1
+-----------
+Had lots of bugs added due to 4.9 not being tested (fixed)
+made 4.9 version look like 10 versions
+added sp__helprotects...
+
+VERSION 3.2
+------------
+made sp__syntax do sybsystemprocs procedures too
+
+VERSION 3.3
+------------
+fixed system 11 bugs
+made system tables show in helptable and helpcolumn only on demand
+
+VERSION 3.4
+-----------
+added menu.sh program
+added dbid/spid to sp__lock 
+made helptable only do one row per table
+rewrote badindex 
+modified dbspace workaround for sybase bug on some systems
+broke up collist into colconflict and colnull and collist
+fixed helptable dup segment bug
+
+VERSION 3.5
+-----------
+changed helptable to fix rounding of rows/per field
+changed helptable integer to int for 4.92 compatibility
+
+VERSION 3.6
+----------
+changed audit and other procs to ignore new system 10 groups
+removed db not tran dumped message from audit stuff when db can
+	 not be tran dumped
+removed probe with master as default error in audits
+change message in audit security
+added stat.sql and id.sql
+added stats table in sybsystemprocs with sp__add_record,
+	and sp__show_record
+
+VERSION 3.7
+-----------
+column order of sp__helpcolumn is colid if just a table passed
+column order of sp__collist.10 is colid if just a table passed
+changed date formats to 04Jan96 from 01/04/96 for internationalization
+modified configure order of install to stop having error
+modified cleanup.SQL to include new stuff
+helptable on a system table give results now (bug fix)
+changed quickstats so system processes are not counted
+changed badindex.sql to account for overflow of large tables
+added html documentation
+modified sp__revdb
+added precision to sp__dbspace
+added 'K' to sp__helptable
+modified indexspace so -1 rows if you are going to overflow
+
+VERSION 3.8
+-----------
+some fixes to 4.9 version
+modified dbspace so it does not overflow on 1+GB databases
+
+VERSION 3.9
+-----------
+Sun Jun  1 16:13:17 EDT 1997
+modified sp__whodo for overflow of io/cpu/mem
+modified sp__indexspace & helptable for overflow too
+sp_depends now needs no parameters
+
+Cleaned Up sp__revindex
+changed GO to go
+added @colname parm to sp__helpcolumn
+added sp__size
+added sp__password
+
+sp_depends - no need for not null check - blows up on 4.9.2
+
+fixed bug in revindex
+
+4.0
+----
+modified sp_whodo for rtrim and io fields
+made sp__who have one host field
+modified helptable and segment for overflow
+documented stuff
+modified sp__date for system 11
+
+
+4.1
+----
+modified copyright code in menu.sh
+modified GO statement in revtable to go
+added segment to revindex
+helptable changed K to M for huge tables
+sp__ls can search on type now
+sp__revtable
+
+4.2
+---
+diskused is 0 if no disk used in helpdevice
+
+4.3
+---
+fix to helptext for lines in syscomments with no new lines
+revtable fix for null constraints
+sp__helplogin better if one login passed
+upgraded audit procs
+
+4.4
+sp__helpgroup removed roles
+TO DO
+---------
+i dont think i handle constraints well
+badindex does not add null length to length of index
+sp__auditoption doesnt really do anything
+
+shoudl add sp__revsegment

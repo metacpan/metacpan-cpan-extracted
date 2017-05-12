@@ -1,0 +1,23 @@
+language: perl
+perl:
+   - "5.16"
+   - "5.14"
+   - "5.12"
+
+before_install:
+   # also initialize submodules recursive
+   - git submodule update --init --recursive
+   - cpanm -n Devel::Cover::Report::Coveralls
+install:
+   # Deal with all of the dependencies, quickly and quietly
+   - cpanm --quiet --notest --skip-satisfied File::Slurp
+before_script:
+   # also initialize submodules recursive
+   # - git submodule update --init --recursive
+script:
+   - perl Build.PL
+   - ./Build verbose=1
+   - ./Build test verbose=1
+   - ./Build install verbose=1
+after_success:
+   - cover -test -report coveralls

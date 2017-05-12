@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<SITE ID="Gais.FTP">
+
+<NAME Lang="en-us">GAIS FTP Search</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+GAIS FTP站台檔案搜尋-台灣
+]]></NAME>
+<INFO Lang="en-us">ftp servers and files search in Taiwan</INFO>
+<INFO Lang="zh-tw">ftp servers and files search in Taiwan</INFO>
+
+<URL Type="Start"><![CDATA[
+http://gais4.cs.ccu.edu.tw:7777/cgi-bin/gaisftp?maxmatch=_HITS_&selectsite=all+of+the+sites&query=_QUERY_
+]]></URL>
+
+<EXPRESSION>Plain</EXPRESSION>
+<CATEGORY>FTP,Regional</CATEGORY>
+
+
+<TEMPLATE><![CDATA[
+file:</B> <A HREF = "_URL_">_TITLE_</A>_SIZEK_/_DATE_<
+]]></TEMPLATE>
+</SITE>

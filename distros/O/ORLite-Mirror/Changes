@@ -1,0 +1,92 @@
+Changes for Perl extension ORLite-Mirror
+
+1.24 Tue 30 Oct 2012
+	- Upgrading to Module::Install::DSL 1.06
+	- Move decompression modules to require to save 2-3 meg of memory
+
+1.23 Fri 3 Feb 2012
+	- Updating Module::Install::DSL to 1.04
+	- Added documentation for the constructor options.
+
+1.22 Wed 2 Aug 2011
+	- Added env_proxy => 1 to enable LWP proxy support
+
+1.21 Tue 31 May 2011
+	- Updating Module::Install::DSL to 1.01
+	- Updating copyright year
+	- Fixes a warning when the calling package $VERSION is null
+
+1.20 Thu 28 Jan 2010
+	- Switching to use array => 1 by default for all ORLite::Mirror
+	  classes (most notably the ORDB:: family will get faster)
+
+1.19 Thu 28 Jan 2010
+	- Upgrading ORLite dependency to 1.37 to get array support.
+	- Changed the "no transactions" test from begin to commit
+
+1.18 Sat  2 Jan 2010
+	- Upgrading ORLite dependency to 1.30 to get improved startup
+	  error handling, and new DBD::SQLite 1.27
+	- Added user_version consistency checking on ->refresh
+	- Completing the first basic implementation of stub support
+
+1.17 Fri 25 Sep 2009
+	- Updating ORLite dep to 1.28 to get prune support
+	- Integrated support for prune to ORLite::Mirror
+	- Switch all tests to use prune
+
+1.16 Tue  7 Jul 2009
+	- Bug fix to the show_progress param
+
+1.15 Mon  1 Jun 2009
+	- Add support for using file:// URLs while offline
+
+1.14 Mon  1 Jun 2009
+	- Upgrading to Module::Install::DSL 0.91
+	- Adding support for show_progress pass-through to LWP
+	- Add support for generating additional indexes
+	- Fixing the warning when we don't have an existing file
+
+1.13 skipped
+
+1.12 Sat 21 Feb 2009
+	- Adding offline support to the mirror logic
+	- Slightly better test file cleanup
+
+1.11 Wed  4 Feb 2009
+	- Minor fixes
+
+1.10 Tue  3 Feb 2009
+	- Adding support for a custom maxage
+
+0.09 Fri 16 Jan 2009
+	- Critical bug fix
+
+0.08 Thu 15 Jan 2009
+	- Skip the mirroring process if the archive is newer than a certain
+	  age. Initially we hardcode in a 24 hours default.
+
+0.07 Mon 15 Sep 2008
+	- Fixing ORLite::Mirror against newer versions of ORLite
+	- Support and pass-through the -DEBUG flag.
+	- Support and pass-through the tables param.
+
+0.06 Sat 31 May 2008
+	- Adding missing File::Remove dependency
+
+0.05 Thu 29 May 2008
+	- Adding support for Bzip2 so that we can load CPAN Testers data.
+
+0.04 Thu 29 May 2008
+	- If a compressed database gets 304 Not Modified, don't decompress
+	  the old version (if the uncompressed one exists at all).
+
+0.03 Thu 29 May 2008
+	- Apparently LWP doesn't consider a HTTP 304 Not Modified response
+	  to be "a successful response".
+
+0.02 Thu 29 May 2008
+	- Support for loading compressed remote databases.
+
+0.01 Wed 28 May 2008
+	- Created initial package.

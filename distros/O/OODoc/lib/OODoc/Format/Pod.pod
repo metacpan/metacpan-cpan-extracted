@@ -1,0 +1,407 @@
+=encoding utf8
+
+=head1 NAME
+
+OODoc::Format::Pod - Produce POD pages from the doc tree
+
+=head1 INHERITANCE
+
+ OODoc::Format::Pod
+   is a OODoc::Format
+   is a OODoc::Object
+
+ OODoc::Format::Pod is extended by
+   OODoc::Format::Pod2
+   OODoc::Format::Pod3
+
+=head1 SYNOPSIS
+
+ my $doc = OODoc->new(...);
+ $doc->create
+   ( 'pod'
+   , format_options => [show_examples => 'NO']
+   , append         => "extra text\n"
+   );
+
+=head1 DESCRIPTION
+
+Create manual pages in the POD syntax.  POD is the standard document
+description syntax for Perl.  POD can be translated to many different
+operating system specific manual systems, like the Unix C<man> system.
+
+Extends L<"DESCRIPTION" in OODoc::Format|OODoc::Format/"DESCRIPTION">.
+ 
+=head1 OVERLOADED
+
+Extends L<"OVERLOADED" in OODoc::Format|OODoc::Format/"OVERLOADED">.
+ 
+=head1 METHODS
+
+Extends L<"METHODS" in OODoc::Format|OODoc::Format/"METHODS">.
+ 
+=head2 Constructors
+
+Extends L<"Constructors" in OODoc::Format|OODoc::Format/"Constructors">.
+ 
+=over 4
+
+=item OODoc::Format::Pod-E<gt>B<new>(%options)
+
+Inherited, see L<OODoc::Format/"METHODS">
+
+=back
+
+=head2 Inheritance knowledge
+
+Extends L<"Inheritance knowledge" in OODoc::Format|OODoc::Format/"Inheritance knowledge">.
+ 
+=over 4
+
+=item $obj-E<gt>B<extends>( [$object] )
+
+Inherited, see L<OODoc::Object/"Inheritance knowledge">
+
+=back
+
+=head2 Attributes
+
+Extends L<"Attributes" in OODoc::Format|OODoc::Format/"Attributes">.
+ 
+=over 4
+
+=item $obj-E<gt>B<manifest>()
+
+Inherited, see L<OODoc::Format/"Attributes">
+
+=item $obj-E<gt>B<project>()
+
+Inherited, see L<OODoc::Format/"Attributes">
+
+=item $obj-E<gt>B<version>()
+
+Inherited, see L<OODoc::Format/"Attributes">
+
+=item $obj-E<gt>B<workdir>()
+
+Inherited, see L<OODoc::Format/"Attributes">
+
+=back
+
+=head2 Page generation
+
+Extends L<"Page generation" in OODoc::Format|OODoc::Format/"Page generation">.
+ 
+=over 4
+
+=item $obj-E<gt>B<cleanup>($manual, STRING)
+
+Inherited, see L<OODoc::Format/"Page generation">
+
+=item $obj-E<gt>B<cleanupPOD>($in, $out)
+
+The POD is produced in the specified $in filename, but may contain some
+garbage, especially a lot of superfluous blanks lines.  Because it is
+quite complex to track double blank lines in the production process,
+we make an extra pass over the POD to remove it afterwards.  Other
+clean-up activities may be implemented later.
+
+=item $obj-E<gt>B<createManual>(%options)
+
+ -Option        --Defined in     --Default
+  append                           ''
+  format_options  OODoc::Format    []
+  manual          OODoc::Format    <required>
+  project         OODoc::Format    <required>
+  template        OODoc::Format    undef
+
+=over 2
+
+=item append => STRING|CODE
+
+Text to be added at the end of each manual page.
+See L<formatManual(append)|OODoc::Format::Pod/"Page generation"> for an explanation.
+
+=item format_options => ARRAY
+
+=item manual => MANUAL
+
+=item project => STRING
+
+=item template => LOCATION
+
+=back
+
+=item $obj-E<gt>B<createOtherPages>(%options)
+
+Inherited, see L<OODoc::Format/"Page generation">
+
+=item $obj-E<gt>B<formatManual>(%options)
+
+The %options are a collection of all options available to show* methods.
+They are completed with the defaults set by L<createManual(format_options)|OODoc::Format/"Page generation">.
+
+ -Option--Default
+  append  ''
+  manual  <required>
+  output  <required>
+
+=over 2
+
+=item append => STRING|CODE
+
+Used after each manual page has been formatting according to the
+standard rules.  When a STRING is specified, it will be appended to
+the manual page.  When a CODE reference is given, that function is
+called with all the options that L<showChapter()|OODoc::Format/"Page generation"> usually gets.
+
+Using C<append> is one of the alternatives to create the correct
+Reference, Copyrights, etc chapters at the end of each manual
+page.  See L</Configuring>.
+
+=item manual => MANUAL
+
+=item output => FILE
+
+=back
+
+=item $obj-E<gt>B<link>( $manual, $object, [$text] )
+
+Create the text for a link which refers to the $object.  The link will be
+shown somewhere in the $manual.  The $text will be displayed is stead
+of the link path, when specified.
+
+=item $obj-E<gt>B<removeMarkup>(STRING)
+
+There is (AFAIK) no way to get the standard podlators code to remove
+all markup from a string: to simplify a string.  On the other hand,
+you are not allowed to put markup in a verbatim block, but we do have
+that.  So: we have to clean the strings ourselves.
+
+=item $obj-E<gt>B<showChapter>(%options)
+
+Inherited, see L<OODoc::Format/"Page generation">
+
+=item $obj-E<gt>B<showChapterIndex>($file, $chapter, $indent)
+
+=item $obj-E<gt>B<showExamples>(%options)
+
+Inherited, see L<OODoc::Format/"Page generation">
+
+=item $obj-E<gt>B<showOptionExpand>(%options)
+
+Inherited, see L<OODoc::Format/"Page generation">
+
+=item $obj-E<gt>B<showOptionTable>(%options)
+
+Inherited, see L<OODoc::Format/"Page generation">
+
+=item $obj-E<gt>B<showOptionUse>(%options)
+
+Inherited, see L<OODoc::Format/"Page generation">
+
+=item $obj-E<gt>B<showOptionalChapter>($name, %options)
+
+Inherited, see L<OODoc::Format/"Page generation">
+
+=item $obj-E<gt>B<showOptions>(%options)
+
+Inherited, see L<OODoc::Format/"Page generation">
+
+=item $obj-E<gt>B<showRequiredChapter>($name, %options)
+
+Inherited, see L<OODoc::Format/"Page generation">
+
+=item $obj-E<gt>B<showStructureExpanded>(%options)
+
+Inherited, see L<OODoc::Format/"Page generation">
+
+=item $obj-E<gt>B<showStructureRefer>(%options)
+
+Inherited, see L<OODoc::Format/"Page generation">
+
+=item $obj-E<gt>B<showSubroutine>( <@> )
+
+Inherited, see L<OODoc::Format/"Page generation">
+
+=item $obj-E<gt>B<showSubroutineDescription>(%options)
+
+Inherited, see L<OODoc::Format/"Page generation">
+
+=item $obj-E<gt>B<showSubroutineName>(%options)
+
+Inherited, see L<OODoc::Format/"Page generation">
+
+=item $obj-E<gt>B<showSubroutineUse>(%options)
+
+Inherited, see L<OODoc::Format/"Page generation">
+
+=item $obj-E<gt>B<showSubroutines>(%options)
+
+Inherited, see L<OODoc::Format/"Page generation">
+
+=item $obj-E<gt>B<writeTable>()
+
+ -Option--Default
+  ARRAY   <required>
+  header  <required>
+  output  <required>
+  widths  undef
+
+=over 2
+
+=item ARRAY => -OF-ARRAYS
+
+An array of arrays, each describing a row for the output.  The first row
+is the header.
+
+=item header => ARRAY
+
+=item output => FILE
+
+=item widths => ARRAY
+
+=back
+
+=back
+
+=head2 Commonly used functions
+
+Extends L<"Commonly used functions" in OODoc::Format|OODoc::Format/"Commonly used functions">.
+ 
+=over 4
+
+=item $obj-E<gt>B<filenameToPackage>($filename)
+
+=item OODoc::Format::Pod-E<gt>B<filenameToPackage>($filename)
+
+Inherited, see L<OODoc::Object/"Commonly used functions">
+
+=item $obj-E<gt>B<mkdirhier>($directory)
+
+=item OODoc::Format::Pod-E<gt>B<mkdirhier>($directory)
+
+Inherited, see L<OODoc::Object/"Commonly used functions">
+
+=back
+
+=head2 Manual Repository
+
+Extends L<"Manual Repository" in OODoc::Format|OODoc::Format/"Manual Repository">.
+ 
+=over 4
+
+=item $obj-E<gt>B<addManual>($manual)
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<mainManual>($name)
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<manual>($name)
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<manuals>()
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<manualsForPackage>($name)
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<packageNames>()
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=back
+
+=head1 DETAILS
+
+=head2 Configuring
+
+Probably, the output which is produced by the POD formatter is only a
+bit in the direction of your own ideas, but not quite what you like.
+Therefore, there are a few ways to adapt the output.
+
+=head3 Configuring with format options
+
+L<createManual(format_options)|OODoc::Format/"Page generation"> or L<OODoc::create(format_options)|OODoc/"Formatter">
+can be used with a list of formatting options which are passed to
+L<showChapter()|OODoc::Format/"Page generation">.  This will help you to produce pages which have
+pre-planned changes in layout.
+
+=head3 Configuring by appending
+
+By default, the last chapters are not filled in: the C<REFERENCES> and
+C<COPYRIGHTS> chapters are very personal.  You can fill these in by
+extending the POD generator, as described in the next section, or take
+a very simple approach simply using L<createManual(append)|OODoc::Format::Pod/"Page generation">.
+
+=head3 Configuring via extension
+
+OODoc is an object oriented module, which means that you can extend the
+functionality of a class by creating a new class.  This provides an
+easy way to add, change or remove chapters from the produced manual
+pages.
+
+=head3 Configuring with OODoc::Template
+
+When using 'pod2' in stead of 'pod' when L<OODoc::create()|OODoc/"Formatter"> is called,
+the L<OODoc::Format::Pod2|OODoc::Format::Pod2> will be used.   It's nearly a drop-in
+replacement by its default behavior.  When you specify
+your own template file, every thing can be made.
+
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item Error: cannot read prelimary pod from $infn: $!
+
+=item Error: cannot write final pod to $outfn: $!
+
+=item Error: cannot write pod manual at $manfile: $!
+
+=item Error: formatter does not know the version.
+
+=item Error: formatter has no project name.
+
+A formatter was created without a name specified for the project at
+hand.  This should be passed with L<new(project)|OODoc::Format/"METHODS">.
+
+=item Error: manual definition requires manual object
+
+A call to L<addManual()|OODoc::Object/"Manual Repository"> expects a new manual object (a L<OODoc::Manual|OODoc::Manual>),
+however an incompatible thing was passed.  Usually, intended was a call
+to L<manualsForPackage()|OODoc::Object/"Manual Repository"> or L<mainManual()|OODoc::Object/"Manual Repository">.
+
+=item Warning: missing required chapter $name in $manual
+
+=item Error: no directory to put pod manual for $name in
+
+=item Error: no package name for pod production
+
+=item Error: no package name for pod production
+
+=item Error: no working directory specified.
+
+The formatter has to know where the output can be written.  This
+directory must be provided via L<new(workdir)|OODoc::Format/"METHODS">, but was not specified.
+
+=item Warning: unknown subroutine type $type for $name in $manual
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of OODoc distribution version 2.01,
+built on November 11, 2015. Website: F<http://perl.overmeer.net/oodoc/>
+
+=head1 LICENSE
+
+Copyrights 2003-2015 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

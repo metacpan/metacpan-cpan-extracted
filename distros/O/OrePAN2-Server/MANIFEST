@@ -1,0 +1,16 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/OrePAN2/Server.pm
+lib/OrePAN2/Server/CLI.pm
+minil.toml
+script/orepan2-server.pl
+t/00_compile.t
+t/01_cpan-uploader-interface.t
+t/02_git_interface.t
+t/MockModule-0.01.tar.gz
+META.yml
+MANIFEST

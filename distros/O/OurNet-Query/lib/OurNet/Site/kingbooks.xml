@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<SITE ID="Kingbooks">
+
+<NAME Lang="en-us">Kingbooks Search</NAME>
+<INFO Lang="en-us">searching information and estimating of a book</INFO>
+
+<URL Type="Start"><![CDATA[
+http://www.kingbooks.com/scripts/search3.exe?by=keywords&keywords=_QUERY_
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+
+<TEMPLATE><![CDATA[
+<table___href="_URL_">_TITLE_</a>___colspan="5">_PREVIEW_</table>
+]]></TEMPLATE>
+</SITE>

@@ -1,0 +1,10 @@
+Revision history for Perl extension OpenSocialX-Shindig-Crypter
+
+0.03    2009.09.21
+        fix php lib 'GeneralSecurityException'
+
+0.02    2009.09.17
+        add sample
+
+0.01    2009.09.16
+        a start

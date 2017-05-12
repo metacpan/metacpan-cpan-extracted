@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution OX-RouteBuilder-REST,
+version 0.003:
+
+  OX::RouteBuilder which routes to an action method in a controller class based on HTTP verbs
+
+This software is copyright (c) 2014 by Thomas Klausner.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

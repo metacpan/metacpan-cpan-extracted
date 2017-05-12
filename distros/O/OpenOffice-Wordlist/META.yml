@@ -1,0 +1,20 @@
+---
+name: OpenOffice-Wordlist
+version: 0.04
+author:
+  - 'Johan Vromans <jv@cpan.org>'
+abstract: Read/write OpenOffice.org wordlists
+license: perl
+resources:
+  license: ~
+build_requires:
+  File::Compare: 0
+  Test::More: 0
+provides:
+  OpenOffice::Wordlist:
+    file: lib/OpenOffice/Wordlist.pm
+    version: 0.04
+generated_by: Module::Build version 0.32
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

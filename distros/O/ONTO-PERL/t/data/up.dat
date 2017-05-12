@@ -1,0 +1,156 @@
+ID   EF2_SCHPO               Reviewed;         842 AA.
+AC   O14460; Q9USG7; Q9USZ9; Q9UT64;
+DT   15-JUL-1998, integrated into UniProtKB/Swiss-Prot.
+DT   11-JAN-2001, sequence version 2.
+DT   10-AUG-2010, entry version 84.
+DE   RecName: Full=Elongation factor 2;
+DE            Short=EF-2;
+GN   Name=eft1; ORFNames=SPCP31B10.07;
+GN   and
+GN   Name=eft2; ORFNames=SPAC513.01c, SPAPYUK71.04c;
+OS   Schizosaccharomyces pombe (Fission yeast).
+OC   Eukaryota; Fungi; Dikarya; Ascomycota; Taphrinomycotina;
+OC   Schizosaccharomycetes; Schizosaccharomycetales;
+OC   Schizosaccharomycetaceae; Schizosaccharomyces.
+OX   NCBI_TaxID=4896;
+RN   [1]
+RP   NUCLEOTIDE SEQUENCE [GENOMIC DNA].
+RC   STRAIN=JY333;
+RX   MEDLINE=97254480; PubMed=9099890; DOI=10.1016/S0378-1119(96)00764-0;
+RA   Mita K., Morimyo M., Ito K., Sugaya K., Ebihara K., Hongo E.,
+RA   Higashi T., Hirayama Y., Nakamura Y.;
+RT   "Comprehensive cloning of Schizosaccharomyces pombe genes encoding
+RT   translation elongation factors.";
+RL   Gene 187:259-266(1997).
+RN   [2]
+RP   NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA] (EFT1 AND EFT2).
+RC   STRAIN=ATCC 38366 / 972;
+RX   MEDLINE=21848401; PubMed=11859360; DOI=10.1038/nature724;
+RA   Wood V., Gwilliam R., Rajandream M.A., Lyne M.H., Lyne R., Stewart A.,
+RA   Sgouros J.G., Peat N., Hayles J., Baker S.G., Basham D., Bowman S.,
+RA   Brooks K., Brown D., Brown S., Chillingworth T., Churcher C.M.,
+RA   Collins M., Connor R., Cronin A., Davis P., Feltwell T., Fraser A.,
+RA   Gentles S., Goble A., Hamlin N., Harris D.E., Hidalgo J., Hodgson G.,
+RA   Holroyd S., Hornsby T., Howarth S., Huckle E.J., Hunt S., Jagels K.,
+RA   James K.D., Jones L., Jones M., Leather S., McDonald S., McLean J.,
+RA   Mooney P., Moule S., Mungall K.L., Murphy L.D., Niblett D., Odell C.,
+RA   Oliver K., O'Neil S., Pearson D., Quail M.A., Rabbinowitsch E.,
+RA   Rutherford K.M., Rutter S., Saunders D., Seeger K., Sharp S.,
+RA   Skelton J., Simmonds M.N., Squares R., Squares S., Stevens K.,
+RA   Taylor K., Taylor R.G., Tivey A., Walsh S.V., Warren T., Whitehead S.,
+RA   Woodward J.R., Volckaert G., Aert R., Robben J., Grymonprez B.,
+RA   Weltjens I., Vanstreels E., Rieger M., Schaefer M., Mueller-Auer S.,
+RA   Gabel C., Fuchs M., Duesterhoeft A., Fritzc C., Holzer E., Moestl D.,
+RA   Hilbert H., Borzym K., Langer I., Beck A., Lehrach H., Reinhardt R.,
+RA   Pohl T.M., Eger P., Zimmermann W., Wedler H., Wambutt R., Purnelle B.,
+RA   Goffeau A., Cadieu E., Dreano S., Gloux S., Lelaure V., Mottier S.,
+RA   Galibert F., Aves S.J., Xiang Z., Hunt C., Moore K., Hurst S.M.,
+RA   Lucas M., Rochet M., Gaillardin C., Tallada V.A., Garzon A., Thode G.,
+RA   Daga R.R., Cruzado L., Jimenez J., Sanchez M., del Rey F., Benito J.,
+RA   Dominguez A., Revuelta J.L., Moreno S., Armstrong J., Forsburg S.L.,
+RA   Cerutti L., Lowe T., McCombie W.R., Paulsen I., Potashkin J.,
+RA   Shpakovski G.V., Ussery D., Barrell B.G., Nurse P.;
+RT   "The genome sequence of Schizosaccharomyces pombe.";
+RL   Nature 415:871-880(2002).
+RN   [3]
+RP   PHOSPHORYLATION [LARGE SCALE ANALYSIS] AT SER-568 AND THR-574, AND
+RP   MASS SPECTROMETRY.
+RX   PubMed=18257517; DOI=10.1021/pr7006335;
+RA   Wilson-Grady J.T., Villen J., Gygi S.P.;
+RT   "Phosphoproteome analysis of fission yeast.";
+RL   J. Proteome Res. 7:1088-1097(2008).
+CC   -!- FUNCTION: This protein promotes the GTP-dependent translocation of
+CC       the nascent protein chain from the A-site to the P-site of the
+CC       ribosome (By similarity).
+CC   -!- SUBCELLULAR LOCATION: Cytoplasm (By similarity).
+CC   -!- SIMILARITY: Belongs to the GTP-binding elongation factor family.
+CC       EF-G/EF-2 subfamily.
+CC   -----------------------------------------------------------------------
+CC   Copyrighted by the UniProt Consortium, see http://www.uniprot.org/terms
+CC   Distributed under the Creative Commons Attribution-NoDerivs License
+CC   -----------------------------------------------------------------------
+DR   EMBL; D83976; BAA23591.1; -; Genomic_DNA.
+DR   EMBL; D83975; BAA23590.1; -; Genomic_DNA.
+DR   EMBL; CU329672; CAB58373.1; -; Genomic_DNA.
+DR   EMBL; CU329670; CAB52147.1; -; Genomic_DNA.
+DR   PIR; T41697; T41697.
+DR   RefSeq; NP_587863.1; -.
+DR   RefSeq; XP_001713073.1; -.
+DR   ProteinModelPortal; O14460; -.
+DR   SMR; O14460; 1-842.
+DR   MINT; MINT-4672831; -.
+DR   STRING; O14460; -.
+DR   EnsemblFungi; SPAC513.01c-1; SPAC513.01c-1; SPAC513.01c.
+DR   EnsemblFungi; SPCP31B10.07-1; SPCP31B10.07-1; SPCP31B10.07.
+DR   GeneID; 2539544; -.
+DR   GeneID; 3361483; -.
+DR   GenomeReviews; CU329670_GR; eft2.
+DR   GenomeReviews; CU329672_GR; eft2.
+DR   KEGG; spo:SPAC513.01c; -.
+DR   KEGG; spo:SPCP31B10.07; -.
+DR   GeneDB_Spombe; SPAC513.01c; -.
+DR   GeneDB_Spombe; SPCP31B10.07; -.
+DR   eggNOG; fuNOG07681; -.
+DR   HOGENOM; HBG737692; -.
+DR   OMA; GIQYLNE; -.
+DR   OrthoDB; EOG9C898X; -.
+DR   PhylomeDB; O14460; -.
+DR   BioCyc; SPOM-XXX-01:SPOM-XXX-01-001929-MONOMER; -.
+DR   BioCyc; SPOM-XXX-01:SPOM-XXX-01-002211-MONOMER; -.
+DR   ArrayExpress; O14460; -.
+DR   GO; GO:0005829; C:cytosol; IDA:GeneDB_Spombe.
+DR   GO; GO:0005525; F:GTP binding; IEA:UniProtKB-KW.
+DR   GO; GO:0003924; F:GTPase activity; IEA:InterPro.
+DR   GO; GO:0003746; F:translation elongation factor activity; TAS:GeneDB_Spombe.
+DR   InterPro; IPR009022; Elongation_fac_G/III/V.
+DR   InterPro; IPR000795; ProtSyn_GTP-bd.
+DR   InterPro; IPR020568; Ribosomal_S5_D2-typ_fold.
+DR   InterPro; IPR014721; Ribosomal_S5_D2-typ_fold_subgr.
+DR   InterPro; IPR005225; Small_GTP-bd.
+DR   InterPro; IPR000640; Transl_elong_EFG/EF2_C.
+DR   InterPro; IPR005517; Transl_elong_EFG/EF2_IV.
+DR   InterPro; IPR004161; Transl_elong_EFTu/EF1A_2.
+DR   InterPro; IPR009000; Transl_elong_init/rib_B-barrel.
+DR   Gene3D; G3DSA:3.30.230.10; Ribosomal_S5_D2-type_fold; 2.
+DR   Pfam; PF00679; EFG_C; 1.
+DR   Pfam; PF03764; EFG_IV; 1.
+DR   Pfam; PF00009; GTP_EFTU; 1.
+DR   Pfam; PF03144; GTP_EFTU_D2; 1.
+DR   PRINTS; PR00315; ELONGATNFCT.
+DR   SMART; SM00838; EFG_C; 1.
+DR   SMART; SM00889; EFG_IV; 1.
+DR   SUPFAM; SSF54980; EFG_III_V; 2.
+DR   SUPFAM; SSF54211; Ribosomal_S5_D2-typ_fold; 1.
+DR   SUPFAM; SSF50447; Translat_factor; 1.
+DR   TIGRFAMs; TIGR00231; small_GTP; 1.
+DR   PROSITE; PS00301; EFACTOR_GTP; 1.
+PE   1: Evidence at protein level;
+KW   Complete proteome; Cytoplasm; Elongation factor; GTP-binding;
+KW   Nucleotide-binding; Phosphoprotein; Protein biosynthesis.
+FT   CHAIN         1    842       Elongation factor 2.
+FT                                /FTId=PRO_0000091023.
+FT   NP_BIND      26     33       GTP (By similarity).
+FT   NP_BIND     104    108       GTP (By similarity).
+FT   NP_BIND     158    161       GTP (By similarity).
+FT   MOD_RES     568    568       Phosphoserine; by MAPK sty1.
+FT   MOD_RES     574    574       Phosphothreonine.
+FT   MOD_RES     699    699       Diphthamide (By similarity).
+FT   CONFLICT    821    823       EAR -> DVG (in Ref. 1; BAA23591/
+FT                                BAA23590).
+SQ   SEQUENCE   842 AA;  93231 MW;  A544C5C454BC55C7 CRC64;
+     MVAFTPEEVR NLMGKPSNVR NMSVIAHVDH GKSTLTDSLV QKAGIISAAK AGDARFMDTR
+     ADEQERGVTI KSTAISLFAE MTDDDMKDMK EPADGTDFLV NLIDSPGHVD FSSEVTAALR
+     VTDGALVVVD TIEGVCVQTE TVLRQALGER IRPVVVVNKV DRALLELQIS QEELYQNFAR
+     VVESVNVVIS TYYDKVLGDC QVFPDKGTVA FASGLHGWAF TVRQFANRYA KKFGIDRNKM
+     MQRLWGENYF NPKTKKWSKS ATDANGNSNQ RAFNMFILDP IYRIFDAVMN SRKDEVFTLL
+     SKLEVTIKPD EKELEGKALL KVVMRKFLPA ADALMEMIVL HLPSPKTAQQ YRAETLYEGP
+     MDDECAVGIR NCDANAPLMI YVSKMVPTSD RGRFYAFGRV FSGTVRSGLK VRIQGPNYVP
+     GKKDDLFIKA IQRTVLMMGS RIEPIEDCPA GNIIGLVGVD QFLVKSGTLT TSEVAHNMKV
+     MKFSVSPVVQ VAVEVKNGND LPKLVEGLKR LSKSDPCVLC TTSESGEHIV AGAGELHLEI
+     CLKDLQEDHA GIPLKISPPV VSYRESVSEP SSMTALSKSP NKHNRIFMTA EPMSEELSVA
+     IETGHVNPRD DFKVRARIMA DEFGWDVTDA RKIWCFGPDT TGANVVVDQT KAVAYLNEIK
+     DSVVAAFAWA SKEGPMFEEN LRSCRFNILD VVLHADAIHR GGGQIIPTAR RVVYASTLLA
+     SPIIQEPVFL VEIQVSENAM GGIYSVLNKK RGHVFSEEQR VGTPLYNIKA YLPVNESFGF
+     TGELRQATAG QAFPQLVFDH WSPMSGDPLD PTSKPGQIVC EARKRKGLKE NVPDYTEYYD
+     RL
+//

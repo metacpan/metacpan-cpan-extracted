@@ -1,0 +1,81 @@
+{
+   "abstract" : "bulk insert for Otogiri",
+   "author" : [
+      "ytnobody <ytnobody@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.5.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Otogiri-Plugin-BulkInsert",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::PostgreSQL" : "0",
+            "Test::Spellunker" : "v0.2.7",
+            "Test::mysqld" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Otogiri" : "0.09",
+            "Otogiri::Plugin" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98",
+            "Test::Requires" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Otogiri::Plugin::BulkInsert" : {
+         "file" : "lib/Otogiri/Plugin/BulkInsert.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ytnobody/Otogiri-Plugin-BulkInsert/issues"
+      },
+      "homepage" : "https://github.com/ytnobody/Otogiri-Plugin-BulkInsert",
+      "repository" : {
+         "url" : "git://github.com/ytnobody/Otogiri-Plugin-BulkInsert.git",
+         "web" : "https://github.com/ytnobody/Otogiri-Plugin-BulkInsert"
+      }
+   },
+   "version" : "0.02",
+   "x_authority" : "cpan:YTURTLE",
+   "x_contributors" : [
+      "Takuya Tsuchida <tsucchi@cpan.org>"
+   ]
+}

@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<SITE ID="Download">
+
+<NAME Lang="en-us">Download.com</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+Download 軟體資訊查詢
+]]></NAME>
+<INFO Lang="en-us">software and files search, download support</INFO>
+<INFO Lang="zh-tw">software and files search, download support</INFO>
+
+<URL Type="More"><![CDATA[
+http://www.download.com_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://www.download.com/pc/list/1,339,0-a-0-0-e-1,00.html?tag=st.dl.fd.srch.list&search=_QUERY_&queryType=quicksearch
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+<EXPRESSION>Boolean</EXPRESSION>
+
+<VAR Name="_NEXT_"><![CDATA[
+<a href="_NEXT_"><b>Next
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<td align=left>___<b><a href="_URL_">_TITLE_</a>___<br>_PREVIEW_<br>___ms sans serif,geneva" size=-2>_DATE_</font></td>___ms sans serif,geneva" size=-2>___ms sans serif,geneva" size=-2>_SIZEK_K</font></td>
+]]></TEMPLATE>
+</SITE>

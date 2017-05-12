@@ -1,0 +1,280 @@
+=encoding utf8
+
+=head1 NAME
+
+OODoc::Text - text component as found in a manual
+
+=head1 INHERITANCE
+
+ OODoc::Text
+   is a OODoc::Object
+
+ OODoc::Text is extended by
+   OODoc::Text::Default
+   OODoc::Text::Diagnostic
+   OODoc::Text::Example
+   OODoc::Text::Option
+   OODoc::Text::Structure
+   OODoc::Text::Subroutine
+
+=head1 SYNOPSIS
+
+ # Cannot be instantiated itself
+
+=head1 DESCRIPTION
+
+The parsers (implemented in the L<OODoc::Parser|OODoc::Parser> classes) scan
+the documentation as written down by the author of the module, and
+build a tree of these OODoc::Text objects from it. Then, any formatter
+(implemented by the L<OODoc::Format|OODoc::Format> classes) can take this tree of text
+objects and convert it into manual pages.
+
+Extends L<"DESCRIPTION" in OODoc::Object|OODoc::Object/"DESCRIPTION">.
+ 
+=head1 OVERLOADED
+
+Extends L<"OVERLOADED" in OODoc::Object|OODoc::Object/"OVERLOADED">.
+ 
+=over 4
+
+=item overload: B<'""' <$stringification>>
+
+Returned is the name of the text object.
+
+=item overload: B<'==' $and '!='>
+
+Numeric comparison is used to compare to objects whether they are
+identical.  String comparison is overloaded to compare the names
+of the objects.
+
+=item overload: B<'cmp' <$string $comparison>>
+
+Names are compared.
+
+=back
+
+=head1 METHODS
+
+Extends L<"METHODS" in OODoc::Object|OODoc::Object/"METHODS">.
+ 
+=head2 Constructors
+
+Extends L<"Constructors" in OODoc::Object|OODoc::Object/"Constructors">.
+ 
+=over 4
+
+=item OODoc::Text-E<gt>B<new>(%options)
+
+ -Option     --Default
+  container    <required>
+  description  ''
+  linenr       <required>
+  name         undef
+  type         <required>
+
+=over 2
+
+=item container => OBJECT
+
+All text objects except chapters are contained in some other object.
+
+=item description => STRING
+
+The text which is contained in the body of this text item.  Often, this
+is filled in later by L<openDescription()|OODoc::Text/"Collected">.
+
+=item linenr => INTEGER
+
+=item name => STRING
+
+The name contains the main data about the text piece.
+
+=item type => STRING
+
+The type of this text element.  This is used for debugging only.
+
+=back
+
+=back
+
+=head2 Inheritance knowledge
+
+Extends L<"Inheritance knowledge" in OODoc::Object|OODoc::Object/"Inheritance knowledge">.
+ 
+=over 4
+
+=item $obj-E<gt>B<extends>( [$object] )
+
+Inherited, see L<OODoc::Object/"Inheritance knowledge">
+
+=back
+
+=head2 Attributes
+
+=over 4
+
+=item $obj-E<gt>B<container>( [$object] )
+
+The text element which encapsulates the text element at hand.  This
+defines the structure of the documentation.
+Only for chapters, this value will be undefined.
+
+=item $obj-E<gt>B<description>()
+
+Returns the description text for this object.  Nearly all objects
+contains some kind of introductory description.
+
+=item $obj-E<gt>B<name>()
+
+The name of this text element.  Stringification is overloaded to call
+this name method.
+
+example: 
+
+ print $text->name;
+ print $text;   # via overload
+
+=item $obj-E<gt>B<type>()
+
+Returns the type name of this data object.
+
+=back
+
+=head2 Location
+
+=over 4
+
+=item $obj-E<gt>B<manual>( [$name] )
+
+Without a $name, the manual of the text object is returned. With a $name,
+the manual with that name is returned, even when that does not have a
+relation to the object: it calls L<OODoc::Object::manual()|OODoc::Object/"Manual Repository">.
+
+=item $obj-E<gt>B<unique>()
+
+Returns a unique id for this text item.  This is the easiest way to
+see whether two references to the same (overloaded) objects point to
+the same thing. The ids are numeric.
+
+example: 
+
+ if($obj1->unique == $obj2->unique) {...}
+ if($obj1 == $obj2) {...}   # same via overload
+
+=item $obj-E<gt>B<where>()
+
+Returns the source of the text item: the filename name and the line
+number of the start of it.
+
+=back
+
+=head2 Collected
+
+=over 4
+
+=item $obj-E<gt>B<example>($object)
+
+Add a new example (a OODoc::Text::Example object) to the list already in
+this object.  You can not look for a specific because they have no real
+name (only a sequence number).
+
+=item $obj-E<gt>B<examples>()
+
+Returns a list of all examples contained in this text element.
+
+=item $obj-E<gt>B<findDescriptionObject>()
+
+From the current object, search in the extends until an object is found
+which has a content for the description field.
+
+=item $obj-E<gt>B<openDescription>()
+
+Returns a reference to the scalar which will contain the description for
+this object.
+
+example: 
+
+ my $descr = $text->openDescription;
+ $$descr  .= "add a line\n";
+
+=back
+
+=head2 Commonly used functions
+
+Extends L<"Commonly used functions" in OODoc::Object|OODoc::Object/"Commonly used functions">.
+ 
+=over 4
+
+=item $obj-E<gt>B<filenameToPackage>($filename)
+
+=item OODoc::Text-E<gt>B<filenameToPackage>($filename)
+
+Inherited, see L<OODoc::Object/"Commonly used functions">
+
+=item $obj-E<gt>B<mkdirhier>($directory)
+
+=item OODoc::Text-E<gt>B<mkdirhier>($directory)
+
+Inherited, see L<OODoc::Object/"Commonly used functions">
+
+=back
+
+=head2 Manual Repository
+
+Extends L<"Manual Repository" in OODoc::Object|OODoc::Object/"Manual Repository">.
+ 
+=over 4
+
+=item $obj-E<gt>B<addManual>($manual)
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<mainManual>($name)
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<manuals>()
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<manualsForPackage>($name)
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<packageNames>()
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=back
+
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item Error: manual definition requires manual object
+
+A call to L<addManual()|OODoc::Object/"Manual Repository"> expects a new manual object (a L<OODoc::Manual|OODoc::Manual>),
+however an incompatible thing was passed.  Usually, intended was a call
+to L<manualsForPackage()|OODoc::Object/"Manual Repository"> or L<mainManual()|OODoc::Object/"Manual Repository">.
+
+=item Error: no text container specified for the $type object
+
+Each text element is encapsulated by an other text element, except
+chapters.  A value must be known for this C<container> option to
+define the elements relative location.
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of OODoc distribution version 2.01,
+built on November 11, 2015. Website: F<http://perl.overmeer.net/oodoc/>
+
+=head1 LICENSE
+
+Copyrights 2003-2015 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

@@ -1,0 +1,12 @@
+HashRecord.pm
+ChangeLog
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+NOTES
+README
+TODO
+pl/gen_hashrecord.pl
+gen_lib.PL
+hints/dec_osf.pl
+hints/solaris_2.pl

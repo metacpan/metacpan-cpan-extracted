@@ -1,0 +1,157 @@
+package Kernel::Modules::AgentTicketSearch;
+
+use strict;
+use warnings;
+
+use OTRS::SphinxSearch;
+
+.... other uses block
+
+sub new {
+    my ( $Type, %Param ) = @_;
+
+    # allocate new hash for object
+    my $Self = {%Param};
+    bless( $Self, $Type );
+
+    .... some stuff checks
+
+    $Self->{Config} = $Self->{ConfigObject}->Get("OTRS::SphinxSearch::Config");
+
+    $Self->{SphinxSearchObject}  = OTRS::SphinxSearch->new(
+        config => $Self->{Config},
+    );
+
+    unless ( $Self->{SphinxSearchObject} ) {
+        $Self->{LayoutObject}->FatalError( Message => "Can not init OTRS::SphinxSearch" );
+        return;
+    }
+
+    .... other preparations
+
+    # Default to search not archived tickets only
+    $Self->{SearchInArchive} = 'NotArchivedTickets';
+
+    ....
+
+    return $Self;
+}
+
+sub Run {
+    my ( $Self, %Param ) = @_;
+
+    if (.....) {
+        some code
+    }
+    else {
+        .....
+        ....
+        for (
+            qw(TicketNumber Title From To ToFrom Cc Subject Body CustomerID StateType
+            .....
+            <other fields>
+            .....
+            )
+        ) {
+            # get search string params (get submitted params)
+            $GetParam{$_} = $Self->{ParamObject}->GetParam( Param => $_ );
+
+            # remove bad chars, white space on the start and the end
+            if ( $GetParam{$_} ) {
+                 $GetParam{$_} =~ s/\s+$//g; 
+                 $GetParam{$_} =~ s/^\s+//g;
+                 $GetParam{$_} =~ s/[\x22\x25\x27\x2F\x5C\x2A\x3C\x3E]//g;
+                 $GetParam{$_} =~ s/[Ss][Ee][Nn][Tt][Ee][Nn][Cc][Ee]//g;
+                 $GetParam{$_} =~ s/^\x40$//;
+            }
+        }
+
+        # Convert of field params name to their ids
+        my %MultiValueFields = (
+            States              => 'StateIDs',
+            Queues              => 'QueueIDs',
+            .....
+            .....
+        );
+        while ( my ($TextLabel, $IDLabel) = each %MultiValueFields ) {
+            my @IDLabelValues   = $Self->{ParamObject}->GetArray( Param => $IDLabel );
+            my @TextLabelValues = $Self->{ParamObject}->GetArray( Param => $TextLabel );
+
+            if ( scalar @IDLabelValues > 0 ) {
+                push @{ $GetParam{$IDLabel} }, @IDLabelValues;
+            }
+
+            if ( scalar @TextLabelValues > 0 ) {
+                foreach my $Value (@TextLabelValues) {
+                    my $ValueID = $Self->_GetFieldIDByName(
+                        Name    => $TextLabel,
+                        Value   => $Value,
+                    );
+
+                    push @{ $GetParam{$IDLabel} }, $ValueID if defined $ValueID;
+                }
+            }
+        }
+
+        .... some code for get other datas
+    }
+
+    # show result site
+    if ( $Self->{Subaction} eq 'Search' && !$Self->{EraseTemplate} ) {
+
+        .... some code
+
+        # perform ticket search
+        my $SearchResults = $Self->{SphinxSearchObject}->search(
+            SortBy  => $Self->{SortBy},
+            OrderBy => $Self->{OrderBy},
+            Result  => 'ARRAY',
+            %GetParam,
+        );
+
+        my @ViewableTicketIDs = @{ $SearchResults->{viewable_ticket_ids} };
+        my $ATSSError         = $SearchResults->{error};
+ 
+        .... some code
+
+        If $ATSSError is true i something doing.
+        So, I notify about error connection to the Sphinx
+
+        .... some code
+    }
+    elsif ( $Self->{Subaction} eq 'AJAXProfileDelete' ) {
+        .... some code
+    }
+
+    .... some code
+    return $Output;
+}
+
+sub _GetFieldIDByName {
+    my ( $Self, %Param ) = @_;
+
+    return unless defined $Param{Name};
+    return unless defined $Param{Value};
+
+    # current ticket state lookup
+    if ( $Param{Name} eq 'States') {
+        my %State =  $Self->{StateObject}->StateGet(
+            Name => $Param{Value},
+        );
+
+        return unless defined $State{ID};
+        return $State{ID};
+    }
+
+    # current queue lookup
+    elsif ( $Param{Name} eq 'Queues') {
+        .....
+    }
+    
+    .... other elsifs
+
+
+    return;
+}
+
+1;

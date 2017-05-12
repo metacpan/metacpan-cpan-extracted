@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<otrs_config version="1.0" init="Application">
+    <CVS>$Id: Escalation.xml,v 1.0 2013/02/04 14:38:57 enhi Exp $</CVS>
+    <ConfigItem Name="Frontend::Module###AdminESCL" Required="0" Valid="1">
+        <Description Translatable="1">Frontend module registration for the agent interface.</Description>
+        <Group>Ticket</Group>
+        <SubGroup>Frontend::Admin::ModuleRegistration</SubGroup>
+        <Setting>
+            <FrontendModuleReg>
+                <Group>admin</Group>
+                <Description>Admin</Description>
+                <Title>Escalation Matrix</Title>
+                <NavBarName>Admin</NavBarName>
+                <NavBarModule>
+                    <Module>Kernel::Output::HTML::NavBarModuleAdmin</Module>
+                    <Name Translatable="1">Escalation Matrix</Name>
+                    <Description Translatable="1">Create and manage Escalation Matrix.</Description>
+                    <Block>Ticket</Block>
+                    <Prio>1100</Prio>
+                </NavBarModule>
+            </FrontendModuleReg>
+        </Setting>
+    </ConfigItem>
+</otrs_config>

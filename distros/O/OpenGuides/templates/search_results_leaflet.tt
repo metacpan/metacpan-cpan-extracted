@@ -1,0 +1,70 @@
+[% USE JSON.Escape %]
+
+<div id="map_index_node_list">
+  <ul>
+    [% IF no_nodes_on_map %]
+      [% FOREACH node = nodes %]
+        <li><a href="?[% node.param %]">[% node.name %]</a></li>
+      [% END %]
+    [% ELSE %]
+      [% i = 0 %]
+      [% FOREACH node = nodes %]
+        [% i = i + 1 %]
+        <li>
+          [% IF node.has_geodata %]
+            <a href="#" onclick="return show_marker( [% i %] )">[% node.name | html %]</a>
+          [% ELSE %]
+            [% node.name | html %] (not on map &#8212;
+              <a href="?[% node.param %]">view info</a>)
+          [% END %]
+        </li>
+      [% END %]
+    [% END %]
+  </ul>
+</div>
+
+<div id="map_index_canvas">
+  [% IF no_nodes_on_map %]
+    <p class="no_nodes_on_map">No pages with geodata - nothing to display
+    on map!</p>
+  [% ELSE %]
+    <span id="map_index_no_js">
+      <p>Sorry! JavaScript is required to view the map - you may prefer to
+      <a href="[% feed_base %]">view the results as a list</a> instead.</p>
+    </span>
+
+    <script type="text/javascript">
+
+      $('#map_index_no_js').hide();
+
+      map_div_id = 'map_index_canvas';
+      centre_lat = [% centre_lat %];
+      centre_long = [% centre_long %];
+      min_lat = [% min_lat %];
+      max_lat = [% max_lat %];
+      min_long = [% min_long %];
+      max_long = [% max_long %];
+
+      function add_markers() {
+        var node;
+        [% i = 0 %]
+        [% FOREACH node = nodes %]
+          [% i = i + 1 %]
+          [% IF node.has_geodata %]
+            node = {
+              name: [% node.name.json %],
+              param: [% node.param.json %],
+              [% address = node.node_data.metadata.address.list.first %]
+              [% IF address %]
+                address: [% address.json %],
+              [% END %]
+              lat: [% node.wgs84_lat.json %],
+              long: [% node.wgs84_long.json %],
+            };
+            add_marker( [% i %], node );
+          [% END %]
+        [% END %]
+      }
+    </script>
+  [% END %]
+</div>

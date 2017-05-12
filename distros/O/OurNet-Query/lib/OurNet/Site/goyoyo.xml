@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<SITE ID="Goyoyo">
+
+<NAME Lang="zh-cn"><![CDATA[
+悠游中文搜索
+]]></NAME>
+<NAME Lang="en-us">Goyoyo Search</NAME>
+<NAME Lang="zh-tw">眣村いゅ穓(虏砰)</NAME>
+<INFO Lang="zh-cn">general information web search in Mainland China</INFO>
+<INFO Lang="en-us">general information web search in Mainland China</INFO>
+<INFO Lang="zh-tw">general information web search in Mainland China</INFO>
+
+<URL Type="More"><![CDATA[
+post://www.goyoyo.com.hk_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+post://www.goyoyo.com.hk/gyy/guide/gquery%20GB%20trans%20All%20%22_QUERY_%22?query=_QUERY_&way1=site
+]]></URL>
+
+<SCORE>_SCORE_/10</SCORE>
+
+<VAR Name="_NEXT_"><![CDATA[
+<A HREF="_NEXT_"> 接下一页
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<DT>___. <A HREF="_URL_">_TITLE_</A>___相关程度_SCORE_<A HREF="___<DD>_PREVIEW_<I>___---_DATE_GMT___</DL>
+]]></TEMPLATE>
+</SITE>

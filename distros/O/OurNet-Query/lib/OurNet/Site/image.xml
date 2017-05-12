@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<SITE ID="Image">
+
+<NAME Lang="en-us">Image Surfer Picture Search</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+WWW圖片搜尋(中英文)
+]]></NAME>
+<INFO Lang="en-us">arts relevant information search</INFO>
+<INFO Lang="zh-tw">arts relevant information search</INFO>
+
+<URL Type="More"><![CDATA[
+_MORE_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://isurf.yahoo.com/cgi-bin/y/keyword_search.cgi?db=%2Fdata%2Fglobal_keyword&_I_query=-2-1maxis-0&_I_fromWhere=-2-1.3-0&q=_QUERY_
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_MORE_"><![CDATA[
+    <a href="_MORE_">     <img src="/icons/right-h.gif"
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+width=235><a href="_URL_">___Page Title:</FONT><BR>___<i>_TITLE_</i>
+]]></TEMPLATE>
+</SITE>

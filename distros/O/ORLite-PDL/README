@@ -1,0 +1,66 @@
+NAME
+    ORLite::PDL - PDL integration for ORLite
+
+SYNOPSIS
+      package Foo;
+      
+  # Load database and add statistics package
+      use ORLite 'statistics.db';
+      use ORLite::PDL;
+      
+  my $pdl = Foo->selectcol_pdl('select column from table');
+
+DESCRIPTION
+    Note: This is a very simple initial implementation, more functionality
+    to come in the future.
+
+    Compressed SQLite database files are a handy format for the distribution
+    of bulk data, including statistical data.
+
+    The ORLite Object-Relational Model provides a convenient way to create
+    client APIs on top of these databases. However, its numberical analysis
+    ability is limited to that provided by native SQLite.
+
+    The Perl Database Language (PDL) is a high-performance library for
+    numerical analysis in Perl.
+
+    ORLite::PDL provides convenient integration between ORLite and PDL.
+
+METHODS
+  selectcol_pdl
+      my $pdl = Foo->selectcol_pdl(
+          'select col from table where country = ?', {},
+          'Australia',
+      );
+
+    The "selectcol_pdl" method is added to the root namespace of your ORLite
+    module tree.
+
+    It takes the same parameters and returns the same results as
+    "selectcol_arrayref", but automatically converts the result to a PDL
+    "piddle" object.
+
+    Returns a PDL object, or throws an exception on error.
+
+SUPPORT
+    Bugs should be reported via the CPAN bug tracker at
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=ORLite-PDL>
+
+    For other issues, contact the author.
+
+AUTHOR
+    Adam Kennedy <adamk@cpan.org>
+
+SEE ALSO
+    ORLite, ORLite::Mirror
+
+COPYRIGHT
+    Copyright 2010 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

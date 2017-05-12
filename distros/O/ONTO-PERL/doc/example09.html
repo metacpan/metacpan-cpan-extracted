@@ -1,0 +1,43 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"/>
+<title>Building an ontology from an existing sub-ontology</title>
+</head>
+<body>
+	
+<h2>Working with sub-ontologies</h2>
+	
+<ol>
+	<li><a href="#1">Building an ontology from an existing sub-ontology.</a></li>
+
+</ol>
+	
+	<ol>
+	<li> <b><a href="#1">Building an ontology from an existing sub-ontology:</a></b>
+		<pre>
+		
+			use OBO::Parser::OBOParser;
+			
+			my $my_parser = OBO::Parser::OBOParser->new();
+			my $onto = $my_parser->work("gene_ontology.obo");        # load: gene_ontology.obo
+			
+			my $sub_ontology_root_id = "GO:0007126";                 # term: meiosis
+			my $term = $onto->get_term_by_id($sub_ontology_root_id); # get the term 'meiosis'
+			my @descendents = @{$onto->get_descendent_terms($term)}; # get its descendants
+			unshift @descendents, $term;
+			
+			my $term_set = OBO::Util::TermSet->new();
+			$term_set->add_all(@descendents);                        # collect the descendants
+			my $so = $onto->subontology_by_terms($term_set);         # get the sub-ontology
+			$so->default_namespace("meiosis_ontology");
+			$so->subsets($onto->subsets()->get_set());
+			$so->remarks("A Meiosis Sub-Ontology");
+
+		</pre>
+	</li>
+	</ol>
+
+Copyright (c) 2006-2015 by Erick Antezana. All rights reserved.
+
+</body>
+</html>

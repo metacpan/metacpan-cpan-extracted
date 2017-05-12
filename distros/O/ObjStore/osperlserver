@@ -1,0 +1,291 @@
+#!/applications/3trade/p17/bin/perl -w
+
+use strict;
+package osperlserver;
+use ObjStore::NoInit ':ADV';
+use vars qw($VERSION @DB $DAEMON $Loop $LoopMeth %Debug
+	    $Top $Subscribe $Shutdown $AutoReloader $ClientName $TimeWarp);
+$VERSION = '1.06';
+$DAEMON = 1;
+$LoopMeth = 'defaultLoop';
+my $default_server = 'ObjStore::ServerDB';
+
+# checkpoint interval should be a command line option? XXX
+# avoid the need for Date::Manip XXX
+
+for (my $arg=0; $arg < @ARGV; $arg++) {
+    my $o = $ARGV[$arg];
+    if ($o =~ m/^ -d(ebug)? $/x) {
+	warn "-debug with no flags is deprecated\n";
+	&usage;
+    } elsif ($o =~ m/^ -F (ore(ground)?)? $/x) {
+	$DAEMON = 0;
+	warn "please use '-dF' instead\n";
+    } elsif ($o =~ m/^-C(\w+)$/) {
+	my $c = $1;
+	if ($c eq 'schema') {
+	    require ObjStore::REP;
+	    ObjStore::REP::be_compatible();
+	} else {
+	    warn "unrecognized compatibility option '$c' (ignored)\n";
+	}
+    } elsif ($o =~ m/^-d(\w+)$/) {
+	for my $d (split / */, $1) {
+	    if ($d eq 'F') {
+		$DAEMON = 0;
+	    } elsif ($d eq 'n') {
+		#ok
+	    } elsif ($d eq 'b') {
+		#ok
+	    } else {
+		warn "unrecognized debug option '$d' (ignored)\n";
+	    }
+	    ++$Debug{$d};
+	}
+    } elsif ($o =~ m/^ \- (M|m) ([\w:]+) (\=\w+)? $/x ) {
+	my ($way,$m,@im) = ($1,$2,$3?substr($3,1):());
+        eval "require $m";
+	warn, next if $@;
+	if ($way eq 'M') {
+	    $m->import(@im);
+	} else {
+	    $m->unimport(@im);
+	}
+    } elsif ($o eq '-n') {
+	$ClientName = $ARGV[++$arg];
+	
+    } elsif ($o eq '-loop') {
+	$LoopMeth = $ARGV[++$arg];
+
+    } elsif ($o =~ m/^-I (\S*) $/x) {
+	my $dir = $1;
+	$dir = $ARGV[++$arg]
+	    if !$dir;
+	if ($dir =~ m{^ \/ }x) {
+	    unshift @INC, $dir;
+	} else {
+	    require FindBin;
+	    die "osperlserver: can't find myself" if !$FindBin::Bin;
+	    unshift(@INC, "$FindBin::Bin/$dir");
+	}
+    } elsif ($o =~ m/^-top$/) {
+	$Top=1;
+    } elsif ($o =~ m/^-subscribe_all$/) {
+	$Subscribe=1;
+    } elsif ($o eq '-time') {
+	$TimeWarp = $ARGV[++$arg];
+    } elsif ($o eq '-shutdown') {
+	$Shutdown = $ARGV[++$arg];
+    } elsif ($o =~ m/^-((no)?)reload/) {
+	$AutoReloader = $1 eq 'no'? 0 : 1;
+	warn "[Module::Reload is experimental]\n" if $AutoReloader;
+    } elsif ($o !~ m/^-/) {
+#	warn "osperlserver: database.db is boring" if $o =~ m/\.db$/;
+	push @DB, $o;
+    } elsif ($o =~ m/^-v$/) {
+	require ObjStore;
+	print "osperlserver $VERSION ($ObjStore::VERSION)\n";
+	exit;
+    } elsif ($o =~ m/^-h(elp)?$/) {
+	&usage;
+    } else {
+	warn "Unknown option '$o' (-h for usage).\n";
+    }
+}
+&usage if @DB==0;
+
+open(STDOUT, ">&STDERR") or die "can't redirect STDOUT: $!";
+if ($DAEMON) {
+    # all forking must happen before ObjStore::initialize!
+    require POSIX;
+    chdir '/'               or die "Can't chdir to /: $!";
+    defined(my $pid = fork) or die "Can't fork: $!";
+    exit if $pid;
+    &POSIX::setsid()        or die "Can't start a new session: $!";
+    $SIG{HUP} = 'IGNORE';
+}
+
+for (@DB) {
+    # Not foolproof... Hm.
+    if (m/^(.*) \= (.*) \+ (.*)$/x) {
+	# deprecated?
+	$_ = [$1,$2,$3];
+
+    } elsif (m/^(.*) \+\= (.*)$/x) {
+	$_ = [$1,$default_server,$2];
+
+    } elsif (m/^(.*) \= (.*)$/x) {
+	# deprecated?
+	$_ = [$1,$2,''];
+
+    } else {
+	$_ = [$_,$default_server,''];
+    }
+}
+
+$ClientName ||= "osperl[".join(',',map {
+    $_->[0] =~ m,/([^/]+)$, ? $1:$_->[0]
+} @DB)."]";
+
+$ObjStore::CLIENT_NAME = $ClientName;
+
+sub do_load_module {
+    no strict 'refs';
+    my $class = shift;
+    unless (defined %{"$class\::"}) {
+	my $file = $class;
+	$file =~ s,::,/,g;
+	require "$file.pm";
+    }
+}
+
+ObjStore::initialize();
+require ObjStore::ServerInfo;
+for (@DB) {
+    no strict 'refs';
+    my $class = $_->[1];
+    do_load_module($class);
+
+    my @boot = split /,/, $_->[2];
+    for my $m (@boot) {
+	do_load_module($m);
+    }
+
+    my $DB = $class->new($_->[0], 'update');
+    $DB->subscribe()
+	if $Subscribe;
+    bless $DB, $class if
+	$class ne $default_server || blessed $DB eq 'ObjStore::Database';
+
+    begin 'update', sub {
+	# hostile takeover
+	$DB->hash->{'ObjStore::ServerInfo'} = ObjStore::ServerInfo->new($DB);
+    };
+    die if $@;
+
+    begin 'update', sub {
+	my $top = $DB->hash;
+	bless $top, $class.'::Top' if
+	    $class ne $default_server || blessed $top eq 'ObjStore::HV';
+	$top->boot(@boot);
+	$top->restart() if $top->can('restart'); #dubious
+	
+	# Restart top level objects until no more are created.
+	# Is order important?
+	my %objs;
+	while (1) {
+	    my $more = 0;
+	    for my $z (values %$top) {
+		next if !blessed $z || exists $objs{ $z };
+		++$more;
+		$objs{$z} = $z;
+	    }
+	    last if !$more;
+	    for my $k (keys %objs) {
+		my $o = $objs{$k};
+		next if !ref $o;
+		$o->restart() if $o->can('restart');
+		$objs{$k} = undef;
+
+		# allow override of default event loop stuff
+		$Loop = ref $o if !$Loop && $o->isa('osperlserver'); #?
+	    }
+	}
+
+	# default to our built-in event dispatch service
+	if (!$Loop) {
+	    $Loop = 'ObjStore::Serve';
+	    $top->do_boot_class($Loop)->restart;
+	}
+    };
+    die if $@;
+}
+
+if ($Top) {
+    eval { require NetServer::Portal };
+    if ($@) { die "osperlserver -top failed: $@" }
+    else {
+	NetServer::Portal->set_storefile("/var/tmp/".$ClientName.".npc");
+	$Top = NetServer::Portal->default_start();
+    }
+}
+if ($TimeWarp) {
+    require Date::Manip;
+    Date::Manip->import();
+    require Time::Warp;
+    my $now = ParseDate($TimeWarp);
+    if (!$now) {
+	warn "osperlserver: do not understand -time '$TimeWarp' (ignored)\n";
+    } else {
+	Time::Warp::to(UnixDate($now, '%s'));
+	Event::cache_time_api();
+    }
+}
+if ($AutoReloader) {
+    require Module::Reload;
+    $Module::Reload::Debug = $Module::Reload::Debug = 1;
+    Event->timer(desc => 'osperlserver reload',
+		 interval => 1, cb => sub { Module::Reload->check });
+}
+if ($Shutdown) {
+    require Date::Manip;
+    Date::Manip->import();
+    my $at = ParseDate($Shutdown);
+    if (!$at) {
+	warn "osperlserver: do not understand -shutdown '$Shutdown' (ignored)\n"
+    } else {
+	die "osperlserver: -shutdown $at is in the past [DIED]\n"
+	    if UnixDate($at, '%s') < Event::time();
+	Event->timer(desc => "osperlserver shutdown",
+		     at => UnixDate($at,'%s'), cb => sub {
+			 warn "Shutdown at ".UnixDate($at,"%u")."\n";
+			 kill 'TERM', $$
+		     });
+    }
+}
+
+my $why;
+
+eval q[ END{ warn $why || 'exiting...'; } ];
+warn '@ARGV = '.join(' ',@ARGV)."\n";
+warn "Started!!\n";
+
+eval {
+    if ($Loop->can('Loop')) {
+	$why = $Loop->Loop();
+    } elsif ($Loop->can($LoopMeth)) {
+	$why = $Loop->$LoopMeth()
+    } else {
+	die "fatal: $Loop can't Loop or '$LoopMeth'";
+    }
+};
+$why = $@ if $@; # see END{} above
+
+sub usage {
+    print "
+Usage: osperlserver [switches] database[=Class[+Class[,Class,..]]] [databases..]
+  -C\\w+            compatibility options
+    schema          preload DLL schemas (now optional)
+  -d\\w+            debugging options
+     b              enable boot diagnostics
+     n              print notifications to STDERR
+     F              do not fork
+  -Idirectory       specify \@INC directory (may be used more than once)
+  -loop <method>    use a different event loop method             [defaultLoop]
+  -[mM]module..     executes `use/no module...' (just like perl)
+  -n <client_name>  the client name given to osserver
+  -shutdown <when>  exit at <when> (requires Date::Manip)
+  -subscribe_all    subscribe to notifications for all databases
+  -time <when>      set the time using Time::Warp
+  -top              activate NetServer::ProcessTop
+  -v                print version number (and exit)
+
+    server:/full/path/to/database
+       $default_server->new(...); boot();
+
+    server:/full/path/to/database+=My::Class1,My::Class2
+       $default_server->new(...); boot('My::Class1','My::Class2')
+
+";
+    exit;
+}

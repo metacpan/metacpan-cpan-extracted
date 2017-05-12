@@ -1,0 +1,100 @@
+Object::Pluggable
+=========================
+
+1.29  Sat Oct 9 02:52:22 GMT 2010
+    - I didn't actually set the version (1.36) for Pod::Parser. Fixed.
+
+1.28  Sat Oct 2 12:06:47 GMT 2010
+    - Require Pod::Parser 1.36 to avoid test failures due to =encoding utf8
+
+1.27  Tue Sep 28 19:31:45 2010 +0000
+    - Allow arguments to be passed to plugins' register/unregister methods
+    - Localize $@ before we eval
+    - Let subclasses and plugins add new event arguments in their handlers
+    - Remove the POE dependency
+    - Fixed a warning when a subclass plugin method returns undef
+    - Change the name from POE::Component::Pluggable to Object::Pluggable
+    - Migrate distribution to Dist::Zilla
+
+1.26  Fri Jun 25 18:35:15 BST 2010
+    - Document the 'debug' parameter
+    - Croak if the user does not supply the 'types' parameter
+    - Fix problems with SYNOPSIS and show example plugin usage
+    - Don't warn inside plugin_del
+    - Don't complain about invalid eat constants when debug mode is off
+    - Add irc_plugin_error event
+
+    ( All the above by Hinrik ).
+
+1.24  Tue Aug 18 09:17:59 BST 2009
+    - Applied patch from Jonathan Steinert to fix RT #48788
+
+1.22  Thu Jul 23 14:12:05 BST 2009
+    - Added constant 1.17 as a prereq. Versions prior to 1.03
+      did not support the use constant { }; construct.
+
+1.20  Wed Apr 29 09:27:08 BST 2009
+    - Removed the crufty checks in Makefile.PL for 'weaken' support and
+      required Task::Weaken instead.
+    - Fixed some warnings when plugin return undef.
+
+1.18  Sat Apr 11 10:05:02 BST 2009
+    - Tidied up all the code. Removed hard tabs and made code more readable
+      some places. (Hinrik)
+    - Complain when plugin register/unregister subroutines don't return a
+      true value (Hinrik)
+
+1.16  Wed Mar  4 23:07:47 GMT 2009
+    - Remove extraneous newline from some debug messages (Hinrik)
+    - Give a helpful warning when a plugin handler does not return
+      a valid EAT constant (Hinrik)
+
+1.14  Mon Jan 26 12:25:26 GMT 2009
+    - We were not processing '_default' in $self. Fixed.
+
+1.12  Thu Jan 22 10:29:10 GMT 2009
+    - Fixed circular reference problem with ::Pipeline
+      reported with hints on how to fix by Jonathan Steinert
+    - Some Makefile.PL magic to make sure that we have 
+      Scalar::Util::weaken
+
+1.10  Thu Jun 26 19:19:37 BST 2008
+    - Report errors if register/unregister calls fail (Hinrik)
+
+1.08  Sat Jun 14 08:41:53 BST 2008
+    - Lower-case the event name before processing it (Hinrik)
+
+1.06  Tue May 27 19:32:46 BST 2008
+    - Allow changing the _register()/_unregister() prefix (Hinrik)
+    - Allow abbreviating event prefixes in method names (Hinrik)
+    - Improved error handling somewhat (Hinrik) 
+    - Some improvements in documentation (Hinrik)
+
+1.04  Tue May  6 11:55:54 BST 2008
+    - Removed kwalitee test and added license information
+
+1.02  Tue Feb 26 13:12:36 GMT 2008
+    - Some Kwalitee fixes and doc tweaks.
+
+1.00  Thu Nov  1 07:12:04 GMT 2007
+    - Updated Module::Install to 0.68
+
+0.06  Wed Jul 25 12:19:27 BST 2007
+    - Fixed abstract_from and build_requires in Makefile.PL
+
+0.05  Fri Feb 16 16:27:56 GMT 2007
+    - Added kwalitee test
+
+0.04  Wed Dec 06 07:37:37 GMT 2006
+    - strict was missing from pluggable. Doh. Kwalitee failure.
+
+0.03  Mon Dec 04 19:01:34 GMT 2006
+    - Classic school-boy error. Poco event handlers were clobbering all 
+      events.
+
+0.02  Mon Dec 04 18:27:05 GMT 2006
+    - The return value of component plugin event handlers now affect
+      subsequent processing of events.
+
+0.01  Wed Nov 29 12:01:34 GMT 2006
+    - Initial CPAN release.

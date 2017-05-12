@@ -1,0 +1,55 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+oai-listsets - list sets in an OAI-PMH archive
+
+=head1 SYNOPSIS
+
+    oai-listsets --baseURL=http://preprint.chemweb.com/CPS/OAI
+
+=head1 DESCRIPTION
+
+A command line utility to listing the sets that belong to an OAI-PMH 
+archive.
+
+=head1 AUTHORS
+
+=over 4 
+
+=item * Ed Summers <ehs@pobox.com>
+
+=back
+
+=cut
+
+use strict;
+use Getopt::Long;
+use Net::OAI::Harvester;
+use Pod::Usage;
+
+my ( $url, $debug ); 
+
+GetOptions(
+    'baseURL:s'	=> \$url,
+    'debug!'	=> \$debug,
+);
+
+if ( !$url ) { 
+    pod2usage( { -verbose => 0 } );
+}
+
+my $harvester = Net::OAI::Harvester->new( baseURL => $url );
+$Net::OAI::Harvester::DEBUG = 1 if $debug;
+
+my $list = $harvester->listSets();
+
+if ( $list->errorCode() ) { 
+    print STDERR $list->errorString(); 
+    exit(1);
+}
+
+foreach my $spec ( $list->setSpecs() ) { 
+    my $name = $list->setName( $spec );
+    print "$spec ==> $name\n";
+}

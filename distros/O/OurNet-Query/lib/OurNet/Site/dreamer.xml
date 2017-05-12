@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<SITE ID="Dreamer">
+
+<NAME Lang="en-us">Dreamer Search</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+夢想家搜尋引擎
+]]></NAME>
+<INFO Lang="en-us">general information web search in Taiwan</INFO>
+<INFO Lang="zh-tw">general information web search in Taiwan</INFO>
+
+<URL Type="More"><![CDATA[
+http://engine.dreamer.com.tw:9090_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://engine.dreamer.com.tw:9090/?Target=SW&SWord=_QUERY_&Type=N
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_NEXT_"><![CDATA[
+<a href=_NEXT_>下頁
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<DT><font color=cc0000>_URL_">_TITLE_</a>___<DD>_PREVIEW_&#160;___Date:_DATE_Size:_SIZE_bytes
+]]></TEMPLATE>
+</SITE>

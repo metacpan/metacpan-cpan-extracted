@@ -1,0 +1,32 @@
+Object-I18n version 0.02
+========================
+
+This is an alpha release, meaning the API is subject to change.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+To run the Class::DBI tests, fill in the values in t/lib/dbi_connect.pl
+with something that can be used for testing.
+
+DEPENDENCIES
+
+None, but it was primarily written for use with Class::DBI.
+It is more generic, though, so please use it with your other objects
+and contribute an Object::I18n::Storage class if you have one.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 by Rick Delaney
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.3 or,
+at your option, any later version of Perl 5 you may have available.
+
+

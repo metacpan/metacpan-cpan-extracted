@@ -1,0 +1,87 @@
+SUBJECT:        os_reference_protected 
+
+PLATFORM:       All
+
+PRODUCT:        ObjectStore
+
+VERSION:        4.x/5.0
+
+AUTHOR:         Kirk Stepanian
+
+DATE:           6/16/96
+
+EXPIRES:        6/16/97
+
+KEYWORDS: os_reference_protected, hash table, concurrency, performance
+
+QUESTION:
+How do protected references work and what, if any, are the drawbacks of using 
+them?
+	
+
+ANSWER:
+Protected references can be used as substitutes for cross database and 
+cross-transaction pinters and they are valid under a wider array of 
+circumstances than are pointers to persistent data. They also are safer than 
+standard references. This extra protection, such as allowing you to check if 
+an object has been deleted before attempting to resolve a reference, is 
+achieved by adding an extra level of indirection via a hash table which 
+contains unique tags for objects stored as protected references. It is the 
+presence and use of the hash table that allows the benefits, as well as causes 
+the drawbacks associated with the use of protected references.
+
+There are a couple of major problems with protected references regarding 
+concurrency. The first is that protected references are implemented by using a 
+hash table which stores a unique id for each object. In order to access an 
+object you first need to access the id in this hash table. The hash table has 
+single concurrency access so if you are resolving a reference then what you 
+effectively do shut out access to any other protected reference objects in the 
+database, In the case where every object would be a protected reference you 
+would in effect be allowing only 1 user to access an object at a time. The 
+hash table for a protected reference is allocated on a per-segment basis in the
+segment of allocation of the object to which the protected reference refers.
+Looking up a protected reference imposes a read-lock on the protected reference
+table, which means that you cannot create a new one in that segment. Creating
+a new protected reference locks out all other creators of protected references
+in the segment until the txn commits. 
+
+There is also a performance hit associated with creating additional
+protected references to an object. Creating additional protected
+references requires a linear search through the protected references
+table to search for a potentially existing object ID.  As a result, the
+cost of creating the second and following protected reference to a given
+object is proportional to the number of addresses in the segment that
+are targets of protected references.
+
+The following methods of the os_reference_protected class access the hash table
+
+deleted()
+forget()
+operator void*()
+operator==(const void*)
+os_reference_protected(const void*)
+resolve()
+
+The forget method will free up the memory allocated for the object in the hash
+table.
+One additional note on the use of the forget() method. In the following code 
+snippet the output is "DELETED" :
+
+DM_Patient* p; 
+os_Reference_protected<DM_Patient> ref1, ref2;
+
+	ref1 = p;
+	ref2 = p;
+	ref1.forget();
+	if (ref2.deleted())
+           cout << "DELETED!!!!" << endl;
+        else
+           cout << "OH, I was WRONG" << endl;
+
+This is because once the call is made to forget the memory is released and at 
+that point ALL references which were looking at that memory/object are now 
+looking at nothing.
+
+In short, protected references should be used sparingly only when it is
+determined that the benefits will outweigh the rather heavy costs
+associated with them.

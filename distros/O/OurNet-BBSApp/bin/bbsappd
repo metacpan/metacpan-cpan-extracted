@@ -1,0 +1,42 @@
+#!/usr/bin/perl -w
+
+$VERSION = '1.52';
+
+=head1 NAME
+
+bbscomd - Launch BBSCOM applications
+
+=head1 SYNOPSIS
+
+    % bbsappd <bbsapp1> [bbsapp2...]
+
+=head1 DESCRIPTION
+
+L<OurNet::BBSApp> provides a XML-based, unified access interface to
+applications operating on L<OurNet::BBS>. The factory class for
+these services are usually L<OurNet::BBSApp::Board>, which supports
+various tweakings on ArticleGroup classes.
+
+This script runs a well-formed service file specified as the first 
+argument.
+
+=cut
+
+use strict;
+use OurNet::BBSApp;
+
+die "Usage: $0 <bbsapp1> [bbsapp2...]\n" 
+    unless @ARGV;
+
+foreach my $arg (@ARGV) {
+    unless (-e $arg) {
+        $arg .= ".xml";
+
+        die "Cannot find BBSApp: $arg\n" unless -e $arg;
+    }
+
+    OurNet::BBSApp->new($arg)->load();
+}
+
+OurNet::BBSApp::run();
+

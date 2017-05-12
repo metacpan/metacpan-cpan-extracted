@@ -1,0 +1,71 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
+  <head>
+    <title>Sample action.perl Configuration</title>
+  </head>
+
+  <body>
+    <h1>Sample action.perl Configuration</h1>
+
+<pre><font size="-1">
+# This is a sample action.perl file. Its purpose is to define the
+# actions that OpenInteract can take based on the URL requested or
+# other means. The keys are commented below.
+
+
+$action = {
+
+# 'action-key' - This is the published tag for this particular action
+# -- the tag specifies how the various pieces of OpenInteract will be
+# able to execute the action. See OpenInteract documentation under
+# 'Action Table'. Note that whatever your key is, it should *ALWAYS*
+# be lower-cased.
+
+#   'action-key' => {
+
+# class - The class that will execute the action. Can be blank if it's
+# a template-only action.
+
+#     class   => '',
+
+# method - The method in 'class' (above) that will execute the
+# action. If not specified we use the method defined in your
+# application's 'server.perl' file (normally 'handler').
+
+#     method  => '',
+
+# redir - Instead of specifying information for a particular action,
+# you can tell OI to lookup the information from another action. For
+# instance, if you wanted both the '/Person/' and '/People/' URLs to
+# run the same action, you could define the information in 'person'
+# and then put for '/People/' something like:
+#
+#   'people' => { redir => 'person' },
+
+#     redir   => '',
+
+# template - You can also specify just a template for an action. This,
+# along with the template package (in 'package'), is how template-only 
+# components are specified. (See the OI Component Guide for more info.)
+
+#     template => '',
+#     package  => '',
+
+# security - Check security for this action or not (normally used only
+# with components). Default is 'yes', so if you do not security 
+# specify 'no'
+
+#     security      => '',
+
+# Box parameters: if you are specifying a box with this action, you 
+# can also list the following, which should be intuitive:
+
+#     weight => 5,
+#     title  => '',
+
+#   },
+};
+</font></pre>
+
+  </body>
+</html>

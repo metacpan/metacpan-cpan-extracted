@@ -1,0 +1,42 @@
+Revision history for Object-Array
+
+0.060   Mon Aug 28 17:30:38 EDT 2006
+
+        Extend 'contains' to catch some corner cases.
+        Release to freshen Module::Install.
+
+0.05_01 Mon Apr 24 12:59:32 EDT 2006
+
+        Add 'contains'.  Add isa for "ARRAY".
+
+0.05    Thu Mar 23 10:22:39 EST 2006
+
+        Remove extra tied array -- anyone who wants special
+        semantics can pass in a reference to a tied array.
+        Overloading is easier and makes some things work
+        that didn't before (from List::MoreUtils).
+
+0.04_02 Wed Mar 22 15:55:33 EST 2006
+
+        Use Module::Pluggable instead of ::Fast
+
+0.04_01 Wed Mar 22 15:40:48 EST 2006
+
+        Add 'ref' as alias for '_real' (should be public)
+
+0.04    Sat Mar 18 09:24:37 EST 2006
+
+        Add 'join' method to Builtins
+
+0.03    Fri Mar 17 13:33:44 EST 2006
+
+        Plugins, include List::MoreUtils
+
+0.02    Fri Mar 17 10:51:52 EST 2006
+
+        Make slices work.
+
+0.01    Thu Mar 16 23:54:28 EST 2006
+
+        First version, released on an unsuspecting world.
+

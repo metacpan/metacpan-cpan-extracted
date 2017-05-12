@@ -1,0 +1,43 @@
+Changes for Perl extension ORDB-CPANMeta-Generator
+
+0.12 Sun 9 Sep 2012
+	- Updating CPAN::Mini::Visit dependency to rid us of warnings
+	- Updating to use CPAN::Meta
+
+0.11 Tue 29 Mar 2011
+	- Read from either META.json or META.yaml
+	- Updating various dependencies
+
+0.10 Mon 20 Jul 2009
+	- If the dependency is in the core, store the version of the core
+	  that can satisfy the dependency without installing the tarball.
+	- Adding the meta column to distinguish distributions
+	  which have no META.yml at all from those that do.
+
+0.09 skipped
+
+0.08 Wed  8 Jul 2009
+	- Pass a warnings param to CPAN::Mini::Visit
+
+0.07 Mon  6 Jul 2009
+	- Support explicit publish => undef
+
+0.06 Tue 30 Jun 2009
+	- Adding index generation
+	- Don't destroy the database when installing a new release
+
+0.05 Sat 27 Jun 2009
+	- Adding a separate 'publish' path param
+
+0.04 Fri 26 Jun 2009
+	- Added prefer_bin pass-through to CPAN::Mini::Visit
+
+0.03 Thu 25 Jun 2009
+	- Implementing delta processing of new distributions
+	- Updated dependencies so we now support all the minicpan
+
+0.02 Tue  2 Jun 2009
+	- Adding tgz files and Acme:: namespace to the scan
+
+0.01 Wed 27 May 2009
+	- Creating the initial implementation

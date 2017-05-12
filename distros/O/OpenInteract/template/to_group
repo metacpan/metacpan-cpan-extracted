@@ -1,0 +1,277 @@
+[%########################################
+  to_group()
+      Display a from and to SELECT box (SIZEd) for moving items from
+      one group to another, plus the Javascript necessary to make it
+      happen.
+
+      This is not a complete form, just a self-contained table you can
+      place anywhere you wish.
+
+      To make this work, you must have an onSubmit handler for your
+      form; just add this to the form tag:
+
+               onsubmit="return tally_added_items()"
+
+      In your application, all the 'id' values will be
+      semicolon-separated in a form field named whatever the
+      'mem_list_hold' variable was set to.
+
+  Parameters:
+      form_name     - name of form where these items reside
+      from_element  - name of the SELECT control that has the population of records
+      to_element    - name of the SELECT control that has the member records
+      pop_list      - list of population record hashrefs: id = x, name = y
+      mem_list      - list of member record hashrefs: id = x, name = y
+      mem_list_hold - name of hidden variable that will hold the ID numbers
+      label_from    - label to place over SELECT control with population
+      label_to      - label to place over SELECT control with members
+      id_field      - hash key under which the ID (or 'OPTION' value) is stored
+      name_field    - hash key under which the value is stored
+      list_size     - size of SELECT lists (DEFAULT: 6)
+
+   Defaults:
+      id_field   = 'id'
+      name_field = 'name'
+      list_size  = 6
+  ########################################%]
+
+[%- DEFAULT id_field   = 'id';
+    DEFAULT name_field = 'name';
+    DEFAULT list_size  = 6; -%]
+
+<!-- Begin table with to_group tool -->
+
+<table border="0" cellspacing="0" cellpadding="5">
+  <tr>
+    <td align="center">
+        <b>[% label_from %]</b>
+    </td>
+    <td align="center">&nbsp;</td>
+    <td align="center" colspan="2">
+       <b>[% label_to %] </b>
+    </td>
+  </tr>
+  <tr>
+    <td align="right" valign="bottom">
+      <select name="[% from_element %]" size="[% list_size %]">
+[% FOREACH pop_item = pop_list %]
+       <option value="[% pop_item.$id_field %]">[% pop_item.$name_field %] </option>
+[% END %]
+      </select>
+    </td>
+    <td align="center" valign="middle">
+      <input type="button" name="add" value="&gt;&gt;" onclick="add_item()"><br>
+      <input type="button" name="remove" value="&lt;&lt;" onclick="remove_item()"><br>
+    </td>
+    <td align="left" valign="bottom">
+       <select name="[% to_element %]" size="6">
+[% FOREACH mem_item = mem_list %]
+         <option value="[% mem_item.$id_field %]">[% mem_item.$name_field %] </option>
+[% END %]
+       </select>
+    </td>
+    <td align="left" valign="middle">
+      <input type="button" value="Up"   onclick="raise_item()"><br>
+      <input type="button" value="Down" onclick="lower_item()"><br>
+    </td>                     
+  </tr>
+</table>
+<input type="hidden" name="[% mem_list_hold %]">
+<!-- End table with to_group tool -->
+
+
+<script language="javascript">
+
+// NAME of the form we're editing
+
+var edit_form_name = '[% form_name %]';
+
+// NAME of the element that has the list of ALL items
+
+var from_element   = '[% from_element %]';
+
+// NAME of the element that has the member list
+
+var to_element     = '[% to_element %]';
+
+// NAME of the hidden variable that will hold the 
+// packed value of all the member items.
+
+var mem_list_hold  = '[% mem_list_hold %]';
+
+[%####################
+  NOTE: There are no other TT-modified variables below this point;
+  just Javascript.
+  ####################-%]
+
+// Raise an item in the listings. Remove the option
+// above the one selected.
+
+function raise_item() {
+ var form  = self.document[ edit_form_name ];
+ var members = form[ to_element ];
+ var idx = members.selectedIndex;
+
+// alert( 'Selected index: ' + idx );
+
+ if ( idx == 0 ) {
+   alert( 'Cannot raise an item already at the top!' );
+   return false;
+ }
+
+ var new_opts = new Array();
+ 
+ // Remove the option above the one selected
+ // and save it.
+
+ var save_idx = idx - 1;
+ new_opts[0] = new Option( members.options[ save_idx ].text, members.options[ save_idx ].value ); 
+ members.options[ save_idx ] = null;
+
+// confirm( 'Value of first option: ' + new_opts[0].value + ' -- ' + new_opts[0].text );
+
+ var end_list = members.options.length - 1;
+ var this_opt;
+ for ( i = end_list; i >= idx; i-- ) {
+//    alert( 'Trying option: ' + i );
+    this_opt = new Option(  members.options[ i ].text, members.options[ i ].value );
+    new_opts.push( this_opt );
+    members.options[ i ] = null;
+//    confirm( 'Value of option just added for space ' + i + ': ' + this_opt.value + ' -- ' + this_opt.text );
+ }
+
+ for ( j = 0; j < new_opts.length; j++ ) {
+   this_opt = new_opts[ j ];
+//   confirm( 'Going to add: ' + this_opt.value + ' -- ' + this_opt.text ); 
+   members.options[ members.options.length ] = new Option( this_opt.text, this_opt.value );
+ }
+ return true;
+}
+
+// Lower an item in the listings -- first remove
+// it OI.from its place as well as all items below, 
+// then reinsert the items at the end.
+
+function lower_item() {
+ var form = self.document[ edit_form_name ];
+ var members = form[ to_element ];
+ var idx = members.selectedIndex;
+ if ( idx == members.options.length - 1 ) {
+   alert( 'Cannot lower an item already at the bottom!' );
+   return false;
+ }
+
+ var new_opts = new Array();
+
+ // Put the option selected at the head of the options
+ // to be inserted.
+
+ new_opts[0] = new Option( members.options[ idx ].text, members.options[ idx ].value );
+
+ // Remove the option selected. members.options[ idx ] 
+ // will be the option that 'moves up'.
+
+ members.options[ idx ] = null
+
+// alert( 'Value of first option: ' + new_opts[0].value );
+
+ // Cycle down OI.from the end of the list and eliminate
+ // options, saving them in the new_opts list.
+
+ var end_list = members.options.length - 1;
+ var this_opt;
+ for ( i = end_list; i > idx; i-- ) {
+    this_opt = new Option( members.options[ i ].text, members.options[ i ].value );
+    new_opts.push( this_opt );
+    members.options[ i ] = null;
+//    alert( 'Value of option just added: ' + new_opts[ new_opts.length - 1 ].value );
+ }
+
+ // Now, cycle through the saved options and add each in
+ // turn to the end of the displayed options.
+
+ for ( j = 0; j < new_opts.length; j++ ) {
+   this_opt = new Option( new_opts[ j ].text, new_opts[ j ].value );
+   members.options[ members.options.length ] = this_opt;
+ }
+ return true;
+}
+
+
+function add_option ( Element, Text, Value ) {
+ var form = self.document[edit_form_name];
+ var members = form[ Element ];
+ var newopt = new Option( Text , Value );
+ for ( opt = 0; opt < members.options.length; opt++ ) {
+      if ( members.options[opt].value == Value )
+          return false;
+ }
+ members.options[ members.options.length ] = newopt;
+ return true;
+}
+
+function remove_option ( Element, Value ) {
+ var form = self.document[edit_form_name];
+ var members = form[Element];
+ for ( opt = 0; opt < members.options.length; opt++ ) {
+      if ( members.options[opt].value == Value ) {
+          members.options[opt] = null;
+          return true;
+      }
+ }
+ return false;
+}
+
+
+function add_item ( ) {
+ var form = self.document[edit_form_name];
+ var listing = form[from_element];
+ var idx = listing.selectedIndex;
+ if ( idx == -1 ) {
+      alert('Please pick an item to add!');
+      return false;
+ }
+ if ( listing.options[idx].value == '' ) {
+      return false;
+ }
+ var id    = listing.options[idx].value;
+ var value = listing.options[idx].text;
+ add_option( to_element, value, id );
+ remove_option( from_element, id );
+ return true;
+}
+
+
+function remove_item ( ) {
+ var form = self.document[edit_form_name];
+ var listing = form[to_element];
+ var idx = listing.selectedIndex;
+ if ( idx == -1 ) {
+      alert('Please pick an item to remove OI.from the member list!');
+      return false;
+ }
+ if ( listing.options[idx].value == '' ) {
+      return false;
+ }
+ var id    = listing.options[idx].value;
+ var value = listing.options[idx].text;
+ remove_option( to_element, id );
+ add_option( from_element, value, id );
+ return true;
+}
+
+
+function tally_added_items ( ) {
+ var form = self.document[edit_form_name];
+ var listing = form[to_element];
+ var return_string = '';
+ for ( opt = 0; opt < listing.options.length; opt++ ) {
+      if ( listing.options[opt].value != '' )
+          return_string += listing.options[opt].value + ';';
+ }
+ return_string = return_string.substring( 0, return_string.length - 1 );
+ form[ mem_list_hold ].value = return_string;
+// return confirm( 'Value of itemlist: ['+form[mem_list_hold].value+']. Continue?');
+ return true;
+}
+</script>

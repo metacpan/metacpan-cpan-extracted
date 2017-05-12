@@ -1,0 +1,19 @@
+This is the README file for OurNet::BBSApp, a set of BBS
+applets built on top of OurNet::BBS, by Elixir Group
+and OurInternet, Inc.
+
+* Installation
+
+libOurNet uses the standard perl module install process:
+
+perl Makefile.PL
+make
+make install
+
+* Copyright
+
+Copyright 2001 by Autrijus Tang <autrijus@autrijus.org>.
+
+All rights reserved.  You can redistribute and/or modify
+this bundle under the same terms as Perl itself.
+

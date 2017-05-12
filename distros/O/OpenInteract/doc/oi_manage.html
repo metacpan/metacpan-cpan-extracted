@@ -1,0 +1,1124 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
+  <head>
+    <title>Documentation for oi_manage</title>
+  </head>
+
+  <body>
+    <h1>Documentation for oi_manage</h1>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#common commands">COMMON COMMANDS</A></LI>
+	<LI><A HREF="#common options">COMMON OPTIONS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#shortcuts">SHORTCUTS</A></LI>
+	<LI><A HREF="#commands">COMMANDS</A></LI>
+	<UL>
+
+		<LI><A HREF="#install">INSTALL</A></LI>
+		<LI><A HREF="#upgrade">UPGRADE</A></LI>
+		<LI><A HREF="#initial packages">INITIAL PACKAGES</A></LI>
+		<LI><A HREF="#list packages">LIST PACKAGES</A></LI>
+		<LI><A HREF="#list actions">LIST ACTIONS</A></LI>
+		<LI><A HREF="#list objects">LIST OBJECTS</A></LI>
+		<LI><A HREF="#create skeleton">CREATE SKELETON</A></LI>
+		<LI><A HREF="#export package">EXPORT PACKAGE</A></LI>
+		<LI><A HREF="#check package">CHECK PACKAGE</A></LI>
+		<LI><A HREF="#install package">INSTALL PACKAGE</A></LI>
+		<LI><A HREF="#create website">CREATE WEBSITE</A></LI>
+		<LI><A HREF="#test db">TEST DB</A></LI>
+		<LI><A HREF="#test ldap">TEST LDAP</A></LI>
+		<LI><A HREF="#refresh doc">REFRESH DOC</A></LI>
+		<LI><A HREF="#refresh widget">REFRESH WIDGET</A></LI>
+		<LI><A HREF="#apply package">APPLY PACKAGE</A></LI>
+		<LI><A HREF="#remove package">REMOVE PACKAGE</A></LI>
+		<LI><A HREF="#upgrade package">UPGRADE PACKAGE</A></LI>
+		<LI><A HREF="#change spops driver">CHANGE SPOPS DRIVER</A></LI>
+		<LI><A HREF="#update objects">UPDATE OBJECTS</A></LI>
+	</UL>
+
+	<LI><A HREF="#sql commands">SQL COMMANDS</A></LI>
+	<UL>
+
+		<LI><A HREF="#install sql">INSTALL SQL</A></LI>
+		<LI><A HREF="#dump sql">DUMP SQL</A></LI>
+	</UL>
+
+	<LI><A HREF="#template commands">TEMPLATE COMMANDS</A></LI>
+	<UL>
+
+		<LI><A HREF="#install template">INSTALL TEMPLATE</A></LI>
+		<LI><A HREF="#dump template">DUMP TEMPLATE</A></LI>
+		<LI><A HREF="#remove template">REMOVE TEMPLATE</A></LI>
+		<LI><A HREF="#other methods">OTHER METHODS</A></LI>
+	</UL>
+
+	<LI><A HREF="#examples">EXAMPLES</A></LI>
+	<LI><A HREF="#to do">TO DO</A></LI>
+	<LI><A HREF="#bugs">BUGS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#copyright">COPYRIGHT</A></LI>
+	<LI><A HREF="#authors">AUTHORS</A></LI>
+	<LI><A HREF="#revision">REVISION</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<HR>
+<H1><A NAME="name">NAME</A></H1>
+<P>oi_manage - Manage OpenInteract websites and packages</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<P>oi_manage [options] [command]</P>
+<P>Administration commands:</P>
+<PRE>
+   install, upgrade, install_package</PRE>
+<P>Package development commands:</P>
+<PRE>
+   create_skeleton, export_package, check_package</PRE>
+<P>Website creator commands:</P>
+<PRE>
+   create_website, apply_package, upgrade_package,
+   remove_package, install_sql, install_template,
+   dump_template, remove_template, refresh_doc,
+   test_db, test_ldap, change_spops_driver</PRE>
+<P>Other commands:</P>
+<PRE>
+   initial_packages, list_packages, list_actions, list_objects</PRE>
+<P>For more information, run 'oi_manage --man'</P>
+<P>
+<HR>
+<H1><A NAME="common commands">COMMON COMMANDS</A></H1>
+<P>Commands by the Administrator:</P>
+<PRE>
+ install             - Install OpenInteract to base directory
+ upgrade             - Upgrade core OpenInteract packages
+ install_package     - Install package to the base</PRE>
+<P>Commands by the Package Developer:</P>
+<PRE>
+ create_skeleton     - Create a skeleton package for development
+ export_package      - Export package(s) to distribution file(s)
+ check_package       - Ensure that package passes initial inspection</PRE>
+<P>Commands by the Website Creator:</P>
+<PRE>
+ create_website      - Create a new website
+ apply_package       - Install a package from base to website
+ upgrade_package     - Upgrade a website package
+ remove_package      - Remove a package from a website
+ install_sql         - Install the SQL for packages
+ install_template    - Install package templates to the database
+ dump_template       - Dump package templates to the filesystem
+ remove_template     - Remove package templates from the database
+ refresh_doc         - Sync website docs to base installation docs
+ update_object       - Re-save all objects in a given class
+ test_db             - Test database settings in 'server.perl'
+ test_ldap           - Test LDAP settings in 'server.perl'
+ change_spops_driver - Change the SPOPS driver for your objects</PRE>
+<P>Other commands:</P>
+<PRE>
+ initial_packages    - List packages marked as 'initial'
+ list_packages       - List packages installed to app or base
+ list_actions        - List actions currently implemented in website
+ list_objects        - List object classes currently implemented in website</PRE>
+<P>
+<HR>
+<H1><A NAME="common options">COMMON OPTIONS</A></H1>
+<P>Summary of common options:</P>
+<PRE>
+ --base_dir           OpenInteract install directory
+ --website_dir        Website install directory
+ --website_name       Website name
+ --package_dir        Directory with package subdirectories (usually devel)
+ --package_file       Distribution file containing an OpenInteract package
+ --package            List packages to operate on
+ --package_list_file  File specifying packages to operate on
+ --dump_dir           Directory to dump stuff into
+ --driver             A generic driver (DBI, SPOPS, etc.)
+ --object             An SPOPS object tag
+ --help               Display brief help
+ --man                Display full help</PRE>
+<P>Details:</P>
+<PRE>
+ --base_dir=/path/to/OpenInteract</PRE>
+<PRE>
+    Name the directory where OpenInteract is installed. You can set
+    the environment variable 'OPENINTERACT' instead of passing the
+    value on the command-line, We recommend you set this environment
+    variable for all OpenInteract users and developers.</PRE>
+<PRE>
+ --website_dir=/path/to/OpenInteract/website</PRE>
+<PRE>
+    Name the directory where an OpenInteract website is
+    installed. This directory will have the website package database
+    in the 'conf/' directory. You can set the environment variable
+    'OIWEBSITE' instead of passing the value on the command
+    line. However, setting this permanently will cause you problems,
+    so it is best to set on a temporary basis.</PRE>
+<PRE>
+ --website_name=MyAppName</PRE>
+<PRE>
+    Name of your website. Must be all one word (no underscores or
+    anything), and StudlyCaps are A-OK (in fact, recommended). Note
+    that this name becomes your perl namespace, so all your packages
+    become 'MyAppName::News' and 'MyAppName::WebLink::Handler', etc.</PRE>
+<PRE>
+ --package_dir=/path/to/my/devel/packages</PRE>
+<PRE>
+    Name the directory where you do your OpenInteract
+    development. This is used by the 'export_package' and the
+    'check_package' commands. This directory can also be where a
+    single package is -- we also look at the 'package' parameter to
+    discern which way to use 'package_dir'.</PRE>
+<PRE>
+ --package_file=an-oi-package-x.xx.tar.gz</PRE>
+<PRE>
+    OpenInteract packages are distributed in common tarballs, which
+    can be created by the 'export_package' command and installed by
+    the 'install_package' command.</PRE>
+<PRE>
+ --package=a,b,c,d  OR --package=a --package=b --package=d</PRE>
+<PRE>
+ --package_list_file=/path/to/package_list</PRE>
+<PRE>
+    File containing package names, one per line, without version
+    numbers or anything else. Blank lines and lines beginning with a
+    '#' are skipped. You can substitute this wherever you see
+    '--package' specified as a parameter in the discussions below.</PRE>
+<PRE>
+ --dump_dir=/path/to/dump/stuff</PRE>
+<PRE>
+    Specify a directory where you would like to dump something -- such
+    as the SQL for a package or the templates belonging to a
+    package. Dumping routines typically have a designated place for
+    this (usually the 'dump/' directory in the area pertaining to what
+    is being dumped), but sometimes you might want to put the data
+    elsewhere.</PRE>
+<PRE>
+ --driver=SPOPS::DBI::Pg</PRE>
+<PRE>
+    Specify some sort of driver -- this can be used to name an SPOPS
+    driver (such as 'SPOPS::DBI::Pg') or a DBD driver ('DBD::mysql')
+    when necessary.</PRE>
+<PRE>
+ --object=SPOPS-object-tag</PRE>
+<PRE>
+    Specify the name of an SPOPS object tag. This is not an object
+    class but rather the 'alias' by which OpenInteract can refer to an
+    object. For instance, the alias for the template objects is
+    'site_template' and the alias for the page objects stored in the
+    database is 'basic_page'.</PRE>
+<PRE>
+ --sql_action=(all|structure|data|security|all_data)</PRE>
+<PRE>
+    Specify an action to take with the 'install_sql' command. The
+    action 'all' is the default if not specified. You should not need
+    this often, if at all.</PRE>
+<P>Other options depend on the <EM>command</EM> you choose and are listed under
+that command below.</P>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P><STRONG>oi_manage</STRONG> is the command-line interface for managing packages
+within OpenInteract and installing new OpenInteract websites. It is
+also useful for developers so they can export their work into a
+<EM>tar.gz</EM> file for distribution, or install it into the OpenInteract
+package database.</P>
+<P>
+<HR>
+<H1><A NAME="shortcuts">SHORTCUTS</A></H1>
+<P>A few shortcuts that can make your life much simpler.</P>
+<P><STRONG>Environment Variables</STRONG></P>
+<OL>
+<LI>
+Set the 'OPENINTERACT' environment variable and never type
+'--base_dir=/blah' again.
+<P></P>
+<LI>
+Set the 'OIWEBSITE' environment variable and never type
+'--website_dir=/blah' again.
+<P></P></OL>
+<P>How to do this? If you are on a Linux machine using the <EM>bash</EM> shell,
+just do:</P>
+<PRE>
+ export OPENINTERACT=/path/to/base/installation</PRE>
+<P>and</P>
+<PRE>
+ export OIWEBSITE=/path/to/my/website</PRE>
+<P>If you do not wish to type these in everytime you login, just put them
+in your '.bashrc' or equivalent. (If you do not know what '.bashrc'
+is, ask your friendly sysadmin.)</P>
+<P><STRONG>Package Names: INITIAL</STRONG></P>
+<P>If you are working with the core set of packages necessary to make
+OpenInteract function, you should know about the 'INITIAL' keyword.</P>
+<P>The 'INITIAL' keyword can be used in place of a package name when you
+use the '--package' parameter specification. For instance, running:</P>
+<PRE>
+ oi_manage export_package --package_dir=/my/devel/oi/pkg --package=INITIAL</PRE>
+<P>First replaces 'INITIAL' with the list of initial packages, then runs
+the operation.</P>
+<P>You can see the list of initial packages by running:</P>
+<PRE>
+ $ oi_manage initial_packages</PRE>
+<P><STRONG>Package Names: External File</STRONG></P>
+<P>If you commonly perform an operation on a number of different packages
+at once, you can store the package names in an external file and refer
+to it when you run 'oi_manage'.</P>
+<P>The file format is simple: one package name per line, blank lines and
+lines beginning with a comment ('#') are skipped. The following would
+be a valid file:</P>
+<PRE>
+ BEGIN---------------
+ # Packages I contribute to
+ news</PRE>
+<PRE>
+ # Packages I own and work on
+ photo_album
+ recipe_box
+ bicycle_trip
+ ---------------END</PRE>
+<P>Specify the file to 'oi_manage' using the '--package_list_file'
+parameter specification.</P>
+<P>
+<HR>
+<H1><A NAME="commands">COMMANDS</A></H1>
+<P>The following tools and actions are available from <STRONG>oi_manage</STRONG>:</P>
+<P>
+<H2><A NAME="install">INSTALL</A></H2>
+<P>Command: install</P>
+<P>Required options:</P>
+<PRE>
+ --base_dir=/path/to/OpenInteract</PRE>
+<P>Install OpenInteract. Note that you must be in the OpenInteract source
+directory to run this command. For instance, a typical installation
+might look like the following sequence:</P>
+<PRE>
+ &gt;&gt; tar -zxvf OpenInteract-1.01.tar.gz
+ &gt;&gt; cd OpenInteract-1.01
+ &gt;&gt; perl Makefile.PL
+ &gt;&gt; make
+ &gt;&gt; make test
+ &gt;&gt; make install
+ (file 'oi_manage' is now in /usr/local/bin)
+ &gt;&gt; /usr/local/bin/oi_manage --base_dir=/opt/OpenInteract install</PRE>
+<P>You should only ever need to do this once. But just in case, it might
+be a good idea to keep the initial source directory around.</P>
+<P>
+<H2><A NAME="upgrade">UPGRADE</A></H2>
+<P>Command: upgrade</P>
+<PRE>
+ --base_dir=/path/to/OpenInteract</PRE>
+<P>Upgrade OpenInteract packages. Note that you must be in the
+OpenInteract source directory to run this command. For instance, a
+typical upgrademight look like the following sequence:</P>
+<PRE>
+ &gt;&gt; tar -zxvf OpenInteract-1.52.tar.gz
+ &gt;&gt; cd OpenInteract-1.52
+ &gt;&gt; perl Makefile.PL
+ &gt;&gt; make
+ &gt;&gt; make test
+ &gt;&gt; make install
+ (file 'oi_manage' is now in /usr/bin)
+ &gt;&gt; /usr/local/bin/oi_manage --base_dir=/opt/OpenInteract upgrade</PRE>
+<P>While you run the 'install' command only once, you can run the
+'upgrade' command for every new release of OpenInteract that comes
+out. All old documentation files and configuration samples are saved
+with an <CODE>.old</CODE> suffix, but they will be overwritten (with the new old
+file) if you run the 'upgrade' command again.</P>
+<P>
+<H2><A NAME="initial packages">INITIAL PACKAGES</A></H2>
+<P>Command: initial_packages</P>
+<P>Just lists the initial package <STRONG>oi_manage</STRONG> is currently configured to
+install when given a 'create_website' command.</P>
+<P>
+<H2><A NAME="list packages">LIST PACKAGES</A></H2>
+<P>Command: list_packages</P>
+<P>Required options -- one of the following:</P>
+<PRE>
+ --base_dir=/path/to/OpenInteract
+ --website_dir=/path/to/my_website</PRE>
+<P>List the packages currently installed in a website or in the base
+OI installation.</P>
+<P>
+<H2><A NAME="list actions">LIST ACTIONS</A></H2>
+<P>Command: list_actions</P>
+<P>Required options:</P>
+<PRE>
+ --website_dir=/path/to/my_website</PRE>
+<P>Bootstrap an OpenInteract environment from the command line and
+inspect it to see what actions are created in the action table.</P>
+<P>Output includes the action name, the package the action is found in,
+and either the class and method used to call it or the template which
+implements it.</P>
+<P>This can be extremely useful if you are unsure what actions your
+website currently implements, and for ensuring that you do not chose
+an action for your new package that is already in use elsewhere.</P>
+<P>
+<H2><A NAME="list objects">LIST OBJECTS</A></H2>
+<P>Command: list_objects</P>
+<P>Required options:</P>
+<PRE>
+ --website_dir=/path/to/my_website</PRE>
+<P>Bootstrap an OpenInteract environment from the command line and
+inspect it to see what SPOPS objects can be created in the
+environment.</P>
+<P>Output is simply the aliases by which the object class are known
+(frequently just one) and the class implementing the object.</P>
+<P>
+<H2><A NAME="create skeleton">CREATE SKELETON</A></H2>
+<P>Command: create_skeleton</P>
+<P>Required options:</P>
+<PRE>
+ --package=mypackagename
+ --base_dir=/path/to/OpenInteract</PRE>
+<P>Creates skeleton <CODE>package(s)</CODE> in your current directory for
+development.</P>
+<P>This includes:</P>
+<UL>
+<LI>
+The necessary directories
+<P></P>
+<LI>
+An initial <CODE>package.conf</CODE> file
+<P></P>
+<LI>
+A documentation template and index
+<P></P>
+<LI>
+Commented sample <CODE>conf/spops.perl</CODE> and <CODE>conf/action.perl</CODE>,
+configuration files
+<P></P>
+<LI>
+Commented sample <CODE>OpenInteract/SQLInstall</CODE> file
+<P></P>
+<LI>
+Commented sample template files in <CODE>template/dummy.meta</CODE>, and
+<CODE>template/dummy.tmpl</CODE>
+<P></P>
+<LI>
+A starter changelog (Changes) and
+<P></P>
+<LI>
+A working MANIFEST file along with MANIFEST.SKIP with common patterns
+for files not to include in the MANIFEST.
+<P></P></UL>
+<P>If you specify multiple packages, multiple directories will be created
+in your current directory.</P>
+<P>
+<H2><A NAME="export package">EXPORT PACKAGE</A></H2>
+<P>Command: export_package</P>
+<P>You can run this one of two ways:</P>
+<OL>
+<LI>
+Export a single package by changing to its directory and running this
+command without any parameters.
+<P></P>
+<LI>
+Specify the following parameters for multiple packages:
+<PRE>
+ --package_dir=/path/to/my/packages
+ --package=x (at least one)</PRE>
+<P>All packages you specify that the command can find in the
+'package_dir' directory will get distributions created.</P>
+<P></P></OL>
+<P>This is a utility for people developing new packages for
+OpenInteract. Some might consider it a Bad Idea to develop packages
+under the base OpenInteract/pkg directory -- for new uninstalled packages
+it is not a problem, but once you start doing that you start working
+on packages in-place, and before you know it everything it out of
+whack. Best not go there.</P>
+<P>So what this utility does is peek into a directory for a
+'package.conf' file. This is a simple file with information about your
+package in a simple format. Here is an example:</P>
+<PRE>
+ name           MyKillerApp
+ version        1.14
+ dependency     YourKillerApp 1.20
+ dependency     TheirLameApp  0.89
+ author         Zippy Doodad (zippy@doodad.com)
+ author         Bolt (bolt@uno.com)
+ url            <A HREF="http://mykillerapp.com/">http://mykillerapp.com/</A>
+ sql_installer  OpenInteract::SQLInstall::MyKillerApp
+ description
+ This package implements what everybody -- especially the town of
+ Ottumwa, Iowa -- thinks is a KillerApp. You will too.</PRE>
+<P>So we read in configuration and ensure you have the required
+fields. (Currently, the fields 'name', 'version' and 'author' are
+required, although no validation is performed on them.)</P>
+<P>If the configuration file passes muster, we then check out the
+MANIFEST that accompanies your package. MANIFEST lists the files that
+should be distributed with your package.</P>
+<P>If 'export_package' finds any files in MANIFEST not in the directory
+or if it finds files in the directory <STRONG>not</STRONG> specified in MANIFEST, it
+will give you a warning but still create the distribution. You then
+have the option of distributing your package as-is (probably a bad
+idea, but you might have your reasons) or fixing the problem and
+re-creating the distribution. You can go through this process as many
+times as necessary since the 'export_package' command does not change
+any information in your package.</P>
+<P>You may also specify a MANIFEST.SKIP file that determines which files
+should not be compared to the MANIFEST to ensure that you do not have
+any extra files floating around. Each line in the MANIFEST.SKIP file
+is a regular expression matching files that should <STRONG>not</STRONG> be included
+in MANIFEST. For example, if you specify in MANIFEST.SKIP:</P>
+<PRE>
+ \bCVS\b</PRE>
+<P>Then when this command finds files matching this pattern (all your CVS
+directories) in your package directory, it will not complain and tell
+you there are extra files in the directory.</P>
+<P>(Since we use <A HREF="/ExtUtils/Manifest.html">ExtUtils::Manifest</A> to manipulate
+the MANIFEST file, including the MANIFEST.SKIP file, you might find it
+helpful to read more about it.)</P>
+<P>The command 'create_skeleton' creates a default MANIFEST and
+MANIFEST.SKIP for you, although it is your responsibility to add your
+files to MANIFEST and your exclusion patterns to MANIFEST.SKIP after
+that.</P>
+<P>Once we get this file and directory listing, we use them to create a
+<STRONG>distribution file</STRONG> -- just a '.tar.gz' file conforming to certain
+standards -- suitable for installation in another OpenInteract
+installation with the 'install_package' command.</P>
+<P>
+<H2><A NAME="check package">CHECK PACKAGE</A></H2>
+<P>Command: check_package</P>
+<P>Required options:</P>
+<P>One of the following:</P>
+<OL>
+<LI>
+None (check the package in the current directory)
+<P></P>
+<LI>
+Check the package in a particular directory:
+<PRE>
+ --package_dir=/path/to/my/devel/package</PRE>
+<P></P>
+<LI>
+Check one or more packages in a particular website:
+<PRE>
+ --website_dir=/path/to/my_website
+ --package=x (at least one)</PRE>
+<P></P>
+<LI>
+Check one or more packages in the installation directory.
+<PRE>
+ --base_dir=/path/to/OpenInteract
+ --package=x (at least one)</PRE>
+<P></P></OL>
+<P>This command checks that a package has the bare necessities and that
+the files at least pass some basic sanity checks.</P>
+<P>Files we check:</P>
+<PRE>
+ Changes
+ package.conf
+ conf/*.perl
+ *.pm
+ &lt;website-name&gt;/*.pm (if this is a website)</PRE>
+<P>We also ensure that the files found in MANIFEST are all there give you
+a warning if there are extra files in the directory not found in
+MANIFEST.</P>
+<P>It is probably a good idea to always run this before you send a
+package to someone else. (Commands like this usually spring from the
+embarrassment of someone else, so learn the lesson :)</P>
+<P>This leads to the common idiom of:</P>
+<PRE>
+ &gt; ... work on package ...</PRE>
+<PRE>
+ &gt; cd /my/package/devel/dir</PRE>
+<PRE>
+ &gt; oi_manage check_package
+ (all is ok)</PRE>
+<PRE>
+ &gt; oi_manage export_package</PRE>
+<PRE>
+ &gt; scp mypkg-1.21.tar.gz me@mywebste:/home/httpd/pkg</PRE>
+<PRE>
+ &gt; ...</PRE>
+<P>
+<H2><A NAME="install package">INSTALL PACKAGE</A></H2>
+<P>Command: install_package</P>
+<P>Required options:</P>
+<PRE>
+ --base_dir=/path/to/OpenInteract
+ --package_file=/path/to/package-x.xx.tar.gz</PRE>
+<P>Installs a package from a <STRONG>distribution file</STRONG>, which are just tar.gz
+files with the package information in them. The steps to install the
+package include:</P>
+<UL>
+<LI>
+Unpack the distribution and determine the package name and version
+<P></P>
+<LI>
+See if that package and version are already installed
+<P></P>
+<LI>
+Copy the files to the base OpenInteract directory
+<P></P>
+<LI>
+Install the package information to the OpenInteract package database
+<P></P></UL>
+<P>
+<H2><A NAME="create website">CREATE WEBSITE</A></H2>
+<P>Command: create_website</P>
+<P>Required options:</P>
+<PRE>
+ --website_name=MyAppName
+ --website_dir=/path/to/my_website
+ --base_dir=/path/to/OpenInteract</PRE>
+<P>Creates a new directory for your website and all the necessary
+subdirectories, so ensure that 'website_dir' does not exist
+yet.</P>
+<P>This command also copies over configuration files and replaces various
+keys with ones specific to your website. The program creates a
+simple stash class for you as well as installs the base packages
+necessary for OpenInteract to function.</P>
+<P>After running this command, you typically have to only edit some
+configuration files and your website can be up and running! See
+the file <CODE>INSTALL.website</CODE> distributed with 0penInteract for
+more information.</P>
+<P>
+<H2><A NAME="test db">TEST DB</A></H2>
+<P>Command: test_db</P>
+<P>Required options:</P>
+<PRE>
+ --website_dir=/path/to/my_website</PRE>
+<P>Tests whether you can establish a connection to all the databases for
+which you have specified parameters in the <CODE>conf/server.perl</CODE>
+configuration file. Also test whether the user specified in each
+configuration can create a table. This is generally a good indicator
+of whether the user will have sufficient permissions to run
+OpenInteract, since a user who can create tables typically has full
+read/write privileges to the tables created by the account.</P>
+<P>***NOTE***</P>
+<P>Just because your database connection works from the command line does
+<STRONG>NOT</STRONG> mean that it will automatically work from your web
+server. Hopefully (for security purposes), your web server runs under
+a user with minimal permissions. This can affect shared library and
+other types of access. In addition, your command-line environment
+might be set up properly to connect to your database while the web
+server environment is not. More is in the entry: <EM>When I run a perl
+script from the command line, it works, but, when I run it under the
+httpd, it fails!  Why?</EM> in <A HREF="/DBI/FAQ.html">DBI::FAQ</A>.</P>
+<P>
+<H2><A NAME="test ldap">TEST LDAP</A></H2>
+<P>Command: test_ldap</P>
+<P>Required options:</P>
+<PRE>
+ --website_dir=/path/to/my_website</PRE>
+<P>Test whether you can establish a connection and bind to all the LDAP
+directories for which you have specified parameters in the
+<CODE>conf/server.perl</CODE> configuration file.</P>
+<P>
+<H2><A NAME="refresh doc">REFRESH DOC</A></H2>
+<P>Command: refresh_doc</P>
+<P>Required options:</P>
+<PRE>
+ --website_dir=/path/to/my_website</PRE>
+<P>Refreshes documentation to match that in the base installation
+directory. Run this if your sysadmin has installed a new OpenInteract
+version or has downloaded updated documentation for you to use.</P>
+<P>The newly refreshed documentation should be immediately available on
+your website at the URL:</P>
+<PRE>
+ <A HREF="http://mysite.com/oi_docs/">http://mysite.com/oi_docs/</A></PRE>
+<P>You can also get to it through the 'System Documentation' link found
+in the 'Admin Tools' box.</P>
+<P>
+<H2><A NAME="refresh widget">REFRESH WIDGET</A></H2>
+<P>Command: refresh_widget</P>
+<P>Required options:</P>
+<PRE>
+ --website_dir=/path/to/my_website</PRE>
+<P>Refreshes the template widgets in your website to match the ones in
+the base installation. Note that your old widgets will be renamed to
+'$NAME.old'.</P>
+<P>Run this if your sysadmin has installed a new OpenInteract version or
+has downloaded updated widgets for you to use.</P>
+<P>The newly refreshed widgets will be available to you immediately on
+the next mod_perl restart, or if the server is not restarted then
+whenever the template cache expires.</P>
+<P>You will probably not need this as often as 'refresh_doc' since
+widgets tend to get customized quite heavily.</P>
+<P>
+<H2><A NAME="apply package">APPLY PACKAGE</A></H2>
+<P>Command: apply_package</P>
+<P>Required options:</P>
+<PRE>
+ --website_dir=/path/to/my_website
+ --package=x (at least one)</PRE>
+<P>Applies a package from the installed base of packages in OpenInteract
+to your website. (The package must have first been installed with
+'install_package', although future versions of OpenInteract may allow
+you to install a package to a website only.) This includes
+localizing all the files (changing the namespace from 'OpenInteract::'
+to 'MyApp::') and copying all the templates, SQL structures and
+default data/security to your website directory.</P>
+<P>APPLYING THE PACKAGE DOES **NOT** INSTALL THE SQL FOR YOU. SEE
+<A HREF="#install sql">INSTALL SQL</A>.</P>
+<P>This option will by default apply the latest version of the available
+package for you. Applying earlier versions is not yet supported.</P>
+<P>
+<H2><A NAME="remove package">REMOVE PACKAGE</A></H2>
+<P>Command: remove_package</P>
+<P>Required options:</P>
+<PRE>
+ --website_dir=/path/to/my_website
+ --package=x (at least one)</PRE>
+<P>Removes the package from the website. Note that we do <STRONG>not</STRONG>
+currently support removing the files associated with the package, or
+the templates in the database that belong to the package. If you want
+to truly eradicate your package, you should do the following:</P>
+<PRE>
+ &gt;&gt; oi_manage --pacakage=mypackage \
+              --website_dir=/path/to/my_website \
+              remove_template
+ &gt;&gt; oi_manage --pacakage=mypackage \
+              --website_dir=/path/to/my_website \
+              remove_package
+ &gt;&gt; cd /path/to/my_website/pkg
+ &gt;&gt; rm -rf mypackage-x.xx</PRE>
+<P>
+<H2><A NAME="upgrade package">UPGRADE PACKAGE</A></H2>
+<P>Command: upgrade_package</P>
+<P>Required options:</P>
+<PRE>
+ --website_dir=/path/to/my_website
+ --package=x (at least one)</PRE>
+<P>Upgrades a package from the base installation to a website. For
+instance, if your website has the package 'classified-1.04' and
+the base installation has the package 'classified-1.11', then you can
+simply do:</P>
+<PRE>
+ &gt;&gt; oi_manage --website_dir=/path/to/my_website --package=classified \
+              upgrade_package</PRE>
+<P>Note that the files from the older version of your package are kept
+intact, but they are no longer used. This program does not currently
+support the more complicated task of trying to find the differences
+between your files and the new files -- you are left to your own
+devices.</P>
+<P>NOTE: As of OpenInteract 1.41, you can place your templates in a
+subdirectory of the site-wide template directory and maintain them
+throughout package upgrades. For instance, if you are editing
+templates in the package 'recipe_box', you can place your templates
+in:</P>
+<PRE>
+ $WEBSITE_DIR/template/recipe_box/recipe_listing.tmpl
+ $WEBSITE_DIR/template/recipe_box/recipe_detail.tmpl
+ $WEBSITE_DIR/template/recipe_box/recipe_form.tmpl
+ ...</PRE>
+<P>And when you run an 'upgrade_package' these templates will not be
+overwritten and will continue to be used by the new package.</P>
+<P>
+<H2><A NAME="change spops driver">CHANGE SPOPS DRIVER</A></H2>
+<P>Command: change_spops_driver</P>
+<P>Required options:</P>
+<PRE>
+ --website_dir=/path/to/my_website
+ --driver=SPOPS::Driver::To::Use</PRE>
+<P>Modifies the SPOPS driver used for all the objects in your
+website. OpenInteract ships with all objects configured for the MySQL
+database. You can see this in the 'isa' configuration for the object,
+like this configuration from the User object class:</P>
+<PRE>
+    ...,
+    'object_name' =&gt; 'User',
+    'isa' =&gt; [
+      'OpenInteract::SPOPS',
+      'SPOPS::Utility',
+      'SPOPS::Secure',
+      'SPOPS::DBI::MySQL',
+      'SPOPS::DBI'
+    ],
+    ...,</PRE>
+<P>For this, we would replace <A HREF="/SPOPS/DBI/MySQL.html">SPOPS::DBI::MySQL</A> with
+the appropriate SPOPS driver. This will normally take the form
+<CODE>SPOPS::DBI::xxxx</CODE>. For example:
+<A HREF="/SPOPS/DBI/Sybase.html">SPOPS::DBI::Sybase</A> or
+<A HREF="/SPOPS/DBI/Pg.html">SPOPS::DBI::Pg</A>.</P>
+<P>NOTE: You can accomplish this same task in a more permanent way by
+editing the global override options file for SPOPS. See
+<A HREF="/OpenInteract/Config/GlobalOverride.html">OpenInteract::Config::GlobalOverride</A>
+for details.</P>
+<P>
+<H2><A NAME="update objects">UPDATE OBJECTS</A></H2>
+<P>Command: update_object</P>
+<P>Required options:</P>
+<PRE>
+ --website_dir=/path/to/my_website
+ --object=SPOPS-object-tag</PRE>
+<P>This action fetches all instances of a particular object class and
+saves them. This is useful if you have implemented a schema change
+that needs a <CODE>save()</CODE> to activate a trigger which fills data.</P>
+<P>For instance, a 'last_update' field gets triggered by a save -- by
+running this action you automatically set all objects to a known
+value. Another example would be if your objects use the indexing
+feature of the full_text package -- just run this action and the index
+will be automatically updated.</P>
+<P>Output is the number of objects touched, saved successfully and any
+errors encountered.</P>
+<P>
+<HR>
+<H1><A NAME="sql commands">SQL COMMANDS</A></H1>
+<P>One of the difficulties in any website framework is getting data
+into the framework from somewhere else and getting data out of the
+framework to somewhere else.</P>
+<P>OpenInteract provides a flexible framework for the first and the
+seedlings of something for the second. Exporting data into the format
+used by OpenInteract is on the list of things to do and has a
+relatively high priority, although your help could push it over the
+top!</P>
+<P>
+<H2><A NAME="install sql">INSTALL SQL</A></H2>
+<P>Command: install_sql</P>
+<P>Required options:</P>
+<PRE>
+ --package=x (at least one)
+ --website_dir=/path/to/my_website</PRE>
+<P>Other options:</P>
+<PRE>
+ --sql_action=(all|structure|data|security|all_data)</PRE>
+<P>This command goes through a list of packages and installs the initial
+tables and data for each one. It is also empowered to run perl scripts
+that set initial security or do other tasks.</P>
+<P>Generally, this works by each package creating an <EM>Installer Class</EM>
+that is used by
+<A HREF="/OpenInteract/SQLInstall.html">OpenInteract::SQLInstall</A>. The dispatching
+class provides a number of tools for the implementing class so that
+each package does not need to do terribly much. However, if the
+package <STRONG>needs</STRONG> to do quite a bit of customization, it can.</P>
+<P>Please see the <A HREF="/OpenInteract/SQLInstall.html">OpenInteract::SQLInstall</A>
+module for more information on how this whole process works.</P>
+<P>Also, note that experts -- people who know what they are doing -- can
+specify only parts of the process to run. Again, you should do this
+only if you have a good reason. As an example, you can only run the
+security installation for a particular package like this:</P>
+<PRE>
+ $ oi_manage install_sql --package=mypkg --sql_action=security</PRE>
+<P>The options for the <CODE>--sql_action</CODE> parameter are:</P>
+<UL>
+<LI>
+<STRONG>all</STRONG>: Run all three steps. This is the default, and most people will
+never need to specify an action.
+<P></P>
+<LI>
+<STRONG>structure</STRONG>: Only install the tables, no data or security.
+<P></P>
+<LI>
+<STRONG>data</STRONG>: Only install the data, no tables or security. Note that this
+may leave your setup in an inconsistent state, since you may have data
+not accessible due to lack of security settings.
+<P></P>
+<LI>
+<STRONG>security</STRONG>: Only install the security for the data.
+<P></P>
+<LI>
+<STRONG>all_data</STRONG>: Run both the 'data' and 'security' steps, but do not
+install the tables.
+<P></P></UL>
+<P>
+<H2><A NAME="dump sql">DUMP SQL</A></H2>
+<P>Command: dump_sql</P>
+<P>Required options:</P>
+<PRE>
+ --package=x (at least one)
+ --website_dir=/path/to/my_website</PRE>
+<P>Useful option:</P>
+<PRE>
+ --dump_dir=/path/to/dump/sql</PRE>
+<P>Dumps data from the tables and security used by the website into a
+number of files. If 'dump_dir' is specified the files will go there;
+if not, they will go into the 'data/dump/' directory under the
+package specified in the 'website_dir'.</P>
+<P>This is still under development. How this will work:</P>
+<UL>
+<LI>
+You define parameters in the SQLInstall class for your package that
+determines how you want to dump certain data.
+<P></P>
+<LI>
+After running the command in this script, you will have a set of files
+in the <CODE>dump/</CODE> subdirectory of one or both of the <CODE>data/</CODE> and
+<CODE>struct/</CODE> package subdirectories. (Or in the 'dump_dir' that you
+choose) These files can be distributed with the package and used to
+install data on other OpenInteract installations.
+<P></P></UL>
+<P>
+<HR>
+<H1><A NAME="template commands">TEMPLATE COMMANDS</A></H1>
+<P>This script should help with the whole template editing
+process. Editing templates via the browser interface can be
+tedious. HTML interfaces are, shall we say, not very robust for
+dealing with most data. (Now, if we can only get XEmacs embedded as a
+Mozilla widget for the TEXTAREA item...)</P>
+<P>Anyway, most people will naturally prefer editing templates in their
+favorite editor -- say, XEmacs -- and we would like to encourage such
+productive behavior. We support this in two ways:</P>
+<P><STRONG>Calling Templates</STRONG></P>
+<P>This is covered elsewhere, but worth mentioning here. When you call a
+template with a last parameter like the following:</P>
+<PRE>
+ { db =&gt; 'my_template_name', package =&gt; 'my_pkg' }</PRE>
+<P>The system first looks in the database for a template with the given
+name. If it is not found, it then looks to the filesystem in the
+specified package. If it is not found there, the system raises an
+error which is displayed onscreen.</P>
+<P>What this means is that you can start creating your templates using
+files -- test them, go through umpteen iterations of input-view-debug
+until everything is stable, then add the template to the database for
+performance reasons. You can still update the template from there, but
+the editing cycle once the template is in the database is stretched
+out. (At least for now it is.)</P>
+<P>There are two commands to let you transfer templates between the
+filesystem and the database, and one to remove them from the database
+altogether.</P>
+<P>
+<H2><A NAME="install template">INSTALL TEMPLATE</A></H2>
+<P>Command: install_template</P>
+<P>Required options:</P>
+<PRE>
+ --package=x (at least one)
+ --website_dir=/path/to/my_website</PRE>
+<P>Each package has its own directory for templates, and you can choose
+to transfer these files into the database at any time. You can even do
+so once the templates are already in the database -- the system will
+first check to see if a template exists and update its information
+before creating an entirely new one.</P>
+<P>Note that all templates require a 'tmpl' file and a 'meta' file. A
+typical 'tmpl' file might be:</P>
+<PRE>
+ Typical Template File
+ ==============================
+ [% IF user %]</PRE>
+<PRE>
+ [%- label = 'User Info'  IF not label -%]</PRE>
+<PRE>
+ &lt;table border=&quot;0&quot; cellpadding=&quot;1&quot; bgcolor=&quot;[% th.box_border_color %]&quot;
+        cellspacing=&quot;0&quot; width=&quot;[% th.box_width %]&quot;&gt;
+ &lt;tr&gt;&lt;td&gt;&lt;font size=&quot;+1&quot; color=&quot;[% th.box_label_font_color %]&quot;&gt;
+     &lt;b&gt;[% label %]&lt;/b&gt;
+ &lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;
+ &lt;tr&gt;&lt;td&gt;</PRE>
+<PRE>
+   &lt;table border=&quot;0&quot; width=&quot;100%&quot; cellpadding=&quot;4&quot;
+          bgcolor=&quot;[% th.box_bgcolor %]&quot; cellspacing=&quot;0&quot;&gt;
+   &lt;tr&gt;&lt;td align=&quot;left&quot;&gt;
+     &lt;font size=&quot;-1&quot; color=&quot;[% tg.box_font_color %]&quot;&gt;
+      &lt;b&gt;[% user.first_name %] [% user.last_name %]&lt;/b&gt; ([% user.login_name %])&lt;br&gt;
+     &lt;/font&gt;
+   &lt;/td&gt;&lt;/tr&gt;
+   &lt;tr&gt;&lt;td align=&quot;right&quot;&gt;&lt;font size=&quot;-1&quot;&gt;
+     &lt;a href=&quot;/User/show/?user_id=[% user.user_id %]&quot;&gt;Edit my info&lt;/a&gt; |
+     &lt;a href=&quot;/NoTmpl/Logout/?return=[% return_url %]&quot;&gt;Logout&lt;/a&gt;
+   &lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;
+   &lt;/table&gt;</PRE>
+<PRE>
+ &lt;/td&gt;&lt;/tr&gt;
+ &lt;/table&gt;</PRE>
+<PRE>
+ [% END %]
+ ==============================</PRE>
+<P>And its accompanying 'meta' file might be:</P>
+<PRE>
+ Typical Meta File
+ ==============================
+ name: user_info_box
+ title: Box that shows login user information
+ package: base_component
+ Parameters for this component:
+ --user: the user object (returns nothing if it does not exist)
+ --return_url: URL of the current page, which we will come back to if
+ the user logs out
+ --label: What is the label for the box? (default: 'User Info')
+ ==============================</PRE>
+<P>We use the information in the 'meta' file to name or location template
+object when we install the templates.</P>
+<P>
+<H2><A NAME="dump template">DUMP TEMPLATE</A></H2>
+<P>Command: dump_template</P>
+<P>Required options:</P>
+<PRE>
+ --package=x (at least one)
+ --website_dir=/path/to/my_website</PRE>
+<P>Useful option:</P>
+<PRE>
+ --dump_dir=/path/to/dump/stuff</PRE>
+<P>Dumps the templates for a package from the database to the
+filesystem. If you do not specify a 'dump_dir', all dumped templates
+are stored in the directory within a package 'template/dump/' rather
+than just 'template/'. (What you do with the templates after that is
+your business.)</P>
+<P>
+<H2><A NAME="remove template">REMOVE TEMPLATE</A></H2>
+<P>Command: remove_template</P>
+<P>Required options:</P>
+<PRE>
+ --package=x (at least one)
+ --website_dir=/path/to/my_website</PRE>
+<P>Removes all templates in the specified <CODE>package(s)</CODE> from the database
+used by 'website_dir'.</P>
+<P>
+<H2><A NAME="other methods">OTHER METHODS</A></H2>
+<P>If you are adding functionality to this script, these methods can be
+useful.</P>
+<P><STRONG>initialize_db_actions( $website_dir, $action )</STRONG></P>
+<P>This method initializes OpenInteract without mod_perl, reading in the
+configuration, creating an
+<A HREF="/OpenInteract/Request.html">OpenInteract::Request</A> object and connecting
+the database specified in the configuration.</P>
+<P>Note that this creates the <STRONG>whole</STRONG> environment -- SPOPS classes are
+created and everything.</P>
+<P>Return value is an <A HREF="/OpenInteract/Request.html">OpenInteract::Request</A>
+object ($R).</P>
+<P><STRONG>print_status_line</STRONG></P>
+<P>Display information from a 'status' record. Each status record is a
+hashref which can have the following keys:</P>
+<PRE>
+ ok
+   True if status is ok, undef/0 otherwise</PRE>
+<PRE>
+ name
+   Name of the package</PRE>
+<PRE>
+ version
+   Version of the package</PRE>
+<PRE>
+ msg
+   Message to accompany status (gets displayed whether status is 'ok'
+   or not)</PRE>
+<P>
+<HR>
+<H1><A NAME="examples">EXAMPLES</A></H1>
+<P>Some quick examples:</P>
+<P>Installing OpenInteract for the first time, to the directory
+'/opt/OpenInteract':</P>
+<PRE>
+ &gt;&gt; tar -zxvf OpenInteract-1.01.tar.gz
+ &gt;&gt; cd OpenInteract-1.01
+ &gt;&gt; perl Makefile.PL
+ &gt;&gt; make
+ &gt;&gt; make test
+ &gt;&gt; make install
+ &gt;&gt; /usr/local/bin/oi_manage --base_dir=/opt/OpenInteract install</PRE>
+<P>Create a new website:</P>
+<PRE>
+ &gt;&gt; /usr/local/bin/oi_manage --website_dir=~/OIApp \
+       --website_name=MyOIApp \
+       --base_dir=/opt/OpenInteract create_website</PRE>
+<P>Install a package to the OpenInteract installation directory with a
+file you have downloaded:</P>
+<PRE>
+ &gt;&gt; /usr/local/bin/oi_manage --base_dir=/opt_OpenInteract \
+       --package_file=/tmp/downloadedpackage-1.41.tar.gz \
+       install_package</PRE>
+<P>Then apply the new package to your website:</P>
+<PRE>
+ &gt;&gt; /usr/local/bin/oi_manage --website_dir=~/OIApp \
+       --package=downloadedpackage apply_package</PRE>
+<P>Create a new skeleton directory for a package you will develop:</P>
+<PRE>
+ &gt;&gt; cd ~/OpenInteract
+ &gt;&gt; /usr/local/bin/oi_manage --package=mydevelpackage \
+       create_skeleton</PRE>
+<P>After you have worked on your new package, you want to create a
+distribution file. First, run a check on the package:</P>
+<PRE>
+ &gt;&gt; /usr/local/bin/oi_manage \
+       --package_dir=~/OpenInteract/mydevelpackage \
+       check_package</PRE>
+<P>If everything looks ok, then export it to a .tar.gz</P>
+<PRE>
+ &gt;&gt; cd ~/OpenInteract/mydevelpackage
+ &gt;&gt; /usr/local/bin/oi_manage export_package</PRE>
+<P>Install it to the main OpenInteract installation:</P>
+<PRE>
+ &gt;&gt; /usr/local/bin/oi_manage --base_dir=/opt_OpenInteract \
+       --package_file=~/OpenInteract/mydevelpackage/mydevelpackage-0.01.tar.gz \
+       install_package</PRE>
+<P>And then apply it to your website:</P>
+<PRE>
+ &gt;&gt; /usr/local/bin/oi_manage --website_dir=~/OIApp \
+       --package=mydevelpackage apply_package</PRE>
+<P>List the website packages to make sure it is there:</P>
+<PRE>
+ &gt;&gt; /usr/local/bin/oi_manage --website_dir=~/OIApp list_packages</PRE>
+<P>You might want to bring its templates into the website database:</P>
+<PRE>
+ &gt;&gt; /usr/local/bin/oi_manage --website_dir=~/OIApp \
+       --package=mydevelpackage install_template</PRE>
+<P>And then create the SQL structures:</P>
+<PRE>
+ &gt;&gt; /usr/local/bin/oi_manage --website_dir=~/OIApp \
+       --package=mydevelpackage install_sql</PRE>
+<P>Moving to a new database -- change the SPOPS classes:</P>
+<PRE>
+ &gt;&gt; /usr/local/bin/oi_manage --website_dir=~/OIApp \
+       --driver=SPOPS::DBI::Pg change_spops_driver</PRE>
+<P>
+<HR>
+<H1><A NAME="to do">TO DO</A></H1>
+<P><STRONG>Put this into a module</STRONG></P>
+<P>The functionality in <STRONG>oi_manage</STRONG> needs to be put into a module
+(likely 'OpenInteract::Manage') and oi_manage modified to simply call
+the methods of that module. This would make it fairly simple to create
+a web front-end to the functions as well. This would make Nate happy
+and would save people from reading this huge (but relatively
+well-organized) script.</P>
+<P><STRONG>Progress Indicator</STRONG></P>
+<P>When you are doing actions on multiple packages -- installing
+OpenInteract, creating a website, etc. -- you do not get feedback as
+the action is happening but rather everything at the end. (See
+Term::ProgressBar for a possible implementation...)</P>
+<P><STRONG>Friendly Dependency Finder</STRONG></P>
+<P>At install_package time, inspect the modules used by the package --
+list_module.dat, ISA, etc. If we find one that is not installed, ask
+the user if he/she would like to install it and use CPAN to do so.</P>
+<P><STRONG>File Verification</STRONG></P>
+<P>Integrate MD5 checksum verification into the system for each file as
+well as for the package distribution on the whole.</P>
+<P><STRONG>SQL: Create an Equivalent Dumper</STRONG></P>
+<P>It would be nice to have a database-independent data dumping program
+that put the data into the format used by
+<CODE>OpenInteract::SQLInstall</CODE>. This actually should not be too hard,
+since the format is pretty simple. We might need to add information to
+the object (in <CODE>spops.perl</CODE>) so that it can tell which fields are
+'class' fields or other fields that need to be transformed.</P>
+<P>
+<HR>
+<H1><A NAME="bugs">BUGS</A></H1>
+<P>None known.</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="/OpenInteract/PackageRepository.html">OpenInteract::PackageRepository</A></P>
+<P><A HREF="/OpenInteract/Package.html">OpenInteract::Package</A></P>
+<P><A HREF="/OpenInteract/SQLInstall.html">OpenInteract::SQLInstall</A></P>
+<P><A HREF="/OpenInteract/Startup.html">OpenInteract::Startup</A></P>
+<P>
+<HR>
+<H1><A NAME="copyright">COPYRIGHT</A></H1>
+<P>Copyright (c) 2001 intes.net, inc.. All rights reserved.</P>
+<P>This script is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.</P>
+<P>
+<HR>
+<H1><A NAME="authors">AUTHORS</A></H1>
+<P>Chris Winters &lt;<A HREF="mailto:chris@cwinters.com">chris@cwinters.com</A>&gt;</P>
+<P>Christian Lemburg &lt;<A HREF="mailto:lemburg@aixonix.de">lemburg@aixonix.de</A>&gt; suffered through early
+versions of this installer and package management system and offered
+insightful feedback.</P>
+<P>Nate Haas &lt;<A HREF="mailto:nateh@intes.net">nateh@intes.net</A>&gt; and Marcus Baker &lt;<A HREF="mailto:mbaker@intes.net">mbaker@intes.net</A>&gt; also
+worked with early versions of this installer and provided many helpful
+usability, documentation and functionality comments.</P>
+<P>
+<HR>
+<H1><A NAME="revision">REVISION</A></H1>
+<P>Revision: $Revision: 1.3 $</P>
+
+</body>
+</html>
+

@@ -1,0 +1,8 @@
+Revision history for Perl extension OS2::Proc.
+
+0.01  Sat Nov  2 23:30:34 1996
+	- original version; created by h2xs 1.16
+
+0.02  Documentation added.
+      Safeguard for a non-existing process bug added
+      New entries static_handles/names for a process entry hash.

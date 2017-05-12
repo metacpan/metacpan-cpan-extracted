@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<SITE ID="OpenFind_TW.BBS">
+
+<NAME Lang="en-us">Openfind newsthreads search</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+Openfind台灣BBS文章查詢
+]]></NAME>
+<INFO Lang="en-us">newsgroup discussion search</INFO>
+<INFO Lang="zh-tw">newsgroup discussion search</INFO>
+
+<URL Type="More"><![CDATA[
+http://bbs.openfind.com.tw_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://bbs.openfind.com.tw/cgi-bin/n_search.cgi?QUERY=_QUERY_&FUZZY=0&TYPE=ALL&LINE=_HITS_&SORT=THREAD&LIST=TOP&BOARD=ALL
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_NEXT_"><![CDATA[
+<A HREF="_NEXT_"><img src="/images/pd.gif" alt="下一頁"
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<font color=#800000>___<a href="_URL_">_TITLE_</a></td>
+]]></TEMPLATE>
+</SITE>

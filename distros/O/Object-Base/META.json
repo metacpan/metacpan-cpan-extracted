@@ -1,0 +1,61 @@
+{
+   "abstract" : "Multi-threaded base class and exception class",
+   "author" : [
+      "Orkun Karaduman <orkunkaraduman@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.16, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Object-Base",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "SUPER" : "1.16",
+            "forks" : "0.29",
+            "perl" : "5.008008",
+            "threads" : "1.72",
+            "threads::shared" : "1.28"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Object-Base@rt.cpan.org",
+         "web" : "https://github.com/orkunkaraduman/p5-Object-Base/issues"
+      },
+      "homepage" : "https://metacpan.org/release/Object-Base",
+      "license" : [
+         "https://www.gnu.org/licenses/gpl-3.0.html"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://git@github.com:orkunkaraduman/p5-Object-Base.git",
+         "web" : "https://github.com/orkunkaraduman/p5-Object-Base"
+      }
+   },
+   "version" : "1.15",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

@@ -1,0 +1,18 @@
+[% SET actions = c.controller.intranet_action_list(c) %]
+[% IF actions.defined && actions.size > 0 %]
+<div id="application_nav">
+    <ul>
+        [% FOREACH nav IN actions %]
+            [% IF nav.hide_as %]
+                [% stash_item = nav.hide_with | trim | html %]
+                [% UNLESS ! c.stash.$stash_item %]
+                    <li><a [% IF nav.title %] title="[% nav.title %]" [% END %] href="[% c.uri_for(nav.controller.action_for(nav.actionname)) %]"[% IF (section == nav.value) %] class="active"[% END %]>[% nav.value %]</a>
+                [% END %]
+            [% ELSE %]
+            <li><a [% IF nav.title %] title="[% nav.title %]" [% END %] href="[% c.uri_for(nav.controller.action_for(nav.actionname)) %]"[% IF (section == nav.value) %] class="active"[% END %]>[% nav.value %]</a>
+            [% END %]
+        [% END %]
+    </ul>
+</div>
+[% END %]
+

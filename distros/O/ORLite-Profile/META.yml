@@ -1,0 +1,30 @@
+---
+abstract: 'Experimental Aspect-Oriented Profiler for ORLite'
+author:
+  - 'Adam Kennedy <adamk@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.85'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: ORLite::Profile
+name: ORLite-Profile
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Aspect: 0.14
+  ORLite: 1.20
+  perl: 5.8.0
+resources:
+  ChangeLog: http://fisheye2.atlassian.com/changelog/cpan/trunk/ORLite-Profile
+  license: http://dev.perl.org/licenses/
+  repository: http://svn.ali.as/cpan/trunk/ORLite-Profile
+version: 0.01

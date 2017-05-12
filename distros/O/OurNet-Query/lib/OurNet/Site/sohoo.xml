@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<SITE ID="Sohoo">
+
+<NAME Lang="zh-cn"><![CDATA[
+搜狐：中国人自己的网路神探
+]]></NAME>
+<NAME Lang="en-us">Sohoo WWW Search</NAME>
+<INFO Lang="zh-cn">general information web search in Mainland China</INFO>
+<INFO Lang="en-us">general information web search in Mainland China</INFO>
+
+<URL Type="Start"><![CDATA[
+http://search.sohoo.com.cn/cgi-bin/sohoosearch.exe?recnum=0&anadir=edir&curdir=&dirflag=1&siteflag=0&y=site&search_key=_QUERY_&search=%B2%E9%D1%AF
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+
+<TEMPLATE><![CDATA[
+<li><a href=_URL_>_TITLE_</a>___---_PREVIEW_<br>
+]]></TEMPLATE>
+</SITE>

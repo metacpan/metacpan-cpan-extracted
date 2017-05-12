@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<SITE ID="Mw">
+
+<NAME Lang="en-us">Medical World Search</NAME>
+<INFO Lang="en-us">medical and health information search</INFO>
+
+<URL Type="More"><![CDATA[
+_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://www.mwsearch.com/cgi-bin/new_search.pl?search_target=Major+Sites&start_docid=1&which_form=initial_search&initial_query=_QUERY_
+]]></URL>
+
+<SCORE>_RANK_/5</SCORE>
+<EXPRESSION>boolean</EXPRESSION>
+<CATEGORY>WWW, health</CATEGORY>
+
+<VAR Name="_NEXT_"><![CDATA[
+<A Href="_NEXT_"> Next 10 documents </A>
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<Dt><Strong> <A Href="_URL_">_TITLE_</A></Strong>___<BR>_PREVIEW_<Dd><A Href="
+]]></TEMPLATE>
+</SITE>

@@ -1,0 +1,33 @@
+Oracle::Trace version 0.01
+=========================
+
+Interface to parsing Oracle Trace files.
+
+Note this is a bit rudimentary at the moment...
+
+See 'perldoc Oracle::Trace' for more detailed description.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+	FileHandle
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 by Richard Foley
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+

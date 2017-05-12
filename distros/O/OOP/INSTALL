@@ -1,0 +1,16 @@
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+An attempt was made to keep dependencies to a minimum. The following
+dependencies are made, requiring you to have the following modules
+installed on your system:
+
+  CGI

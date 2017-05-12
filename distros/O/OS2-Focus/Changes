@@ -1,0 +1,6 @@
+Revision history for Perl extension OS2::Focus.
+
+0.01  Wed Jan 19 03:28:29 2000
+	- original version; created by h2xs 1.20 with options
+		-O -d -o LHANDLE -p Win -fn OS2::Focus -M '^(Win.*Focus.*|HWND_DESKTOP)' -F '-I. -DINCL_BASE -DINCL_PM' -x os2emx.h
+	Minimal edit to create new export tags.  Macros for simplified interface.

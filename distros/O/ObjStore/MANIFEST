@@ -1,0 +1,130 @@
+.psrc
+API/Core.xs
+API/Makefile.PL
+API/XSthr.h
+API/core.h
+API/osp-preamble.h
+API/osperl-15.sch
+API/osperl.c
+API/osperl.h
+API/txn.c
+API/typemap
+CHANGES
+INSTALL
+MANIFEST
+MANIFEST.SKIP
+Main/Makefile.PL
+Main/ObjStore.xs
+Main/typemap
+Makefile.PL
+QtPosh
+README
+README.haloween
+REP/Makefile.PL
+REP/ODI/Makefile.PL
+REP/ODI/ODI.h
+REP/ODI/ODI.pm
+REP/ODI/ODI.xs
+REP/ODI/REP-ODI-01.sch
+REP/ODI/osp_hkey.c
+REP/ODI/osp_hkey.h
+REP/Splash/Makefile.PL
+REP/Splash/REP-Splash-02.sch
+REP/Splash/Splash.h
+REP/Splash/Splash.pm
+REP/Splash/Splash.xs
+REP/Splash/splash.h
+REP/Splash/typemap
+TODO
+UPGRADE
+demo/ospeek
+demo/osp_copy
+gif/PoweredByOS.gif
+gif/PoweredByOS2.gif
+hints/dec_osf.pl		wont work till OS 6.0
+hints/solaris_2.pl
+junk/2misc.t
+junk/4tindex.t
+junk/osp_hack
+lib/ObjStore.pm			main library
+lib/ObjStore.pod		introductory
+lib/ObjStore/AV/QSet.pm
+lib/ObjStore/AV/Set.pm
+lib/ObjStore/AVHV.pm		array based hashes
+lib/ObjStore/AppInstance.pm
+lib/ObjStore/CSV.pm		deprecated
+lib/ObjStore/Config.pm
+lib/ObjStore/HV/Database.pm
+lib/ObjStore/Internals.pod	implementation details
+lib/ObjStore/Job.pm
+lib/ObjStore/Job/Table.pm	server utility
+lib/ObjStore/MakeMaker.pm
+lib/ObjStore/Mortician.pm	delay object destruction
+lib/ObjStore/NoInit.pm		help for forkers
+lib/ObjStore/Path/Cursor.pm
+lib/ObjStore/Path/Ref.pm
+lib/ObjStore/PathExam/Path.pm
+lib/ObjStore/Peeker.pm		prints data structures
+lib/ObjStore/Posh/Cursor.pm
+lib/ObjStore/Posh/Remote.pm	qtposh backend
+lib/ObjStore/Reference.pod	listing of APIs
+lib/ObjStore/REP.pm
+lib/ObjStore/Serve.pm		server utilities
+lib/ObjStore/Serve/Notify.pm	dispatch notifications
+lib/ObjStore/ServerDB.pm	base class for server databases
+lib/ObjStore/ServerDB/Top.pm
+lib/ObjStore/ServerInfo.pm
+lib/ObjStore/Set.pm		deprecated
+lib/ObjStore/SetEmulation.pm	deprecated
+lib/ObjStore/Table.pm		deprecated
+lib/ObjStore/Table2.pm		deprecated
+lib/ObjStore/Table3.pm
+lib/ObjStore/Table3/Database.pm	deprecated
+lib/ObjStore/Test.pm		help for writing test scripts
+lib/ObjStore/notify.pm
+notes/10_threads_questions
+notes/calls_to_cleanup_after
+notes/database_overhead_per_object
+notes/deadlock_debugging
+notes/deadlock_explanation
+notes/hints_on_allocating_large_objects
+notes/mmap
+notes/protected_references_info
+notes/static_linking_and_vector_delete
+osperlserver
+patches/MM
+posh
+qtposh
+t/.psrc
+t/0illuminate.t
+t/1av.t
+t/1data.t
+t/1hv.t
+t/1hvbugs.t
+t/1leak.t
+t/1objav.t
+t/1overload.t
+t/1pathexam.t
+t/1segment.t
+t/1stargate.t
+t/1typemap.t
+t/2bless.t
+t/2heap.t
+t/2ref.t
+t/2root.t
+t/2transact.t
+t/3avhv.t
+t/3avset.t
+t/3notify.t
+t/4csv.t
+t/4noinit.t
+t/4stash.t
+t/9set.t
+t/9table.t
+t/PTest.pm
+t/Row.pm
+t/TestDB.pm
+t/deadlock.pl
+t/peek.good
+t/test.pm
+t/zpeek.t

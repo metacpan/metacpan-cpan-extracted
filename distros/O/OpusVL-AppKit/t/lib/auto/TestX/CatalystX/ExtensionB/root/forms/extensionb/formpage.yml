@@ -1,0 +1,19 @@
+
+auto_fieldset: 1
+elements:
+  - type: Text
+    name: foo
+    label: Foo
+
+  - type: Select
+    name: author
+    empty_first: 1
+    empty_first_label: "-- Testing FormFu/DBIx --"
+    model_config:
+      model: BookDB
+      resultset: Author
+      id_column: id
+      label_column: full_name
+
+  - type: Submit
+    name: submitbutton

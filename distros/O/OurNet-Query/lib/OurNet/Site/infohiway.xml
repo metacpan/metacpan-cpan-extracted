@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<SITE ID="Infohiway">
+
+<NAME Lang="en-us">Infohiway Search Engine</NAME>
+<INFO Lang="en-us">general information web search</INFO>
+
+<URL Type="More"><![CDATA[
+http://www.infohiway.com_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+post://www.infohiway.com/cgi-bin/srch.cgi?d=f&s=_QUERY_&a=1&t=3
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_NEXT_"><![CDATA[
+HREF="_NEXT_"><B>Next
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<B><A HREF="_URL_"___">_TITLE_</A>___<TD COLSPAN=2>_PREVIEW_</TD></TR>
+]]></TEMPLATE>
+</SITE>

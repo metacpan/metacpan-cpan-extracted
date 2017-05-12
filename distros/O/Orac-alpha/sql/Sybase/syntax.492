@@ -1,0 +1,97 @@
+/* Procedure copyright(c) 1996 by Edward M Barlow */
+
+/******************************************************************************
+**
+** Name        : sp__syntax
+**
+******************************************************************************/
+:r database
+go
+:r dumpdb
+go
+
+IF EXISTS (SELECT * FROM sysobjects
+           WHERE  name = "sp__syntax"
+           AND    type = "P")
+   DROP PROC sp__syntax
+go
+
+CREATE PROC sp__syntax( @objname varchar(30)=NULL, @dont_format char(1) = NULL )
+AS 
+BEGIN
+
+set nocount on
+
+declare @objid int
+select  @objid = object_id(@objname)
+
+select
+	Proc_name = o.name,
+	Parameter_name = c.name,
+	Type = t.name,
+	Length = c.length,
+	Prec = 0,
+	Scale = 0,
+	Param_order=c.colid,
+	utype = t.usertype
+into #collist
+from syscolumns c, systypes t, sysobjects o
+where c.usertype *= t.usertype
+and	o.id = isnull(@objid,o.id)
+and 	o.id = c.id
+and 	o.type = 'P'
+order by o.name
+
+if @objid is null and @objname is not null	/* check in sybsystemprocs */
+begin
+		print "Error: Object Does Not Exist"
+		return
+end
+
+update #collist
+set Type=Type+'('+rtrim(convert(char(3),Length))+')'
+where Type='varchar'
+or    Type='char'
+
+update #collist
+set Type=Type+'('+rtrim(convert(char(3),Prec))+')'
+where Type='decimal'
+
+update #collist
+set Type=Type+'('+rtrim(convert(char(3),Prec))+')'
+where Type='numeric'
+and   Scale=0
+
+update #collist
+set Type=Type
+	+'('
+	+rtrim(convert(char(3),Prec))
+	+','
+	+rtrim(convert(char(3),Scale))
+	+')'
+where Type='numeric'
+and   Scale>0
+
+if @dont_format is null
+	select 
+		Proc_name,
+		"Order" = Param_order,
+		Parameter = substring(Parameter_name + " " + Type,1,30)
+	from #collist
+	order by Proc_name,Param_order
+else
+	select 
+		Proc_name,
+		"Order" = Param_order,
+		Parameter = Parameter_name + " " + Type
+	from #collist
+	order by Proc_name,Param_order
+
+return(0)
+
+END
+
+go
+GRANT EXECUTE ON sp__syntax  TO public
+go
+

@@ -1,0 +1,35 @@
+#!/usr/local/bin/perl -w
+###########################################
+# smartthings-webapi
+# Mike Schilli, 2016 (m@perlmeister.com)
+###########################################
+use strict;
+use OAuth::Cmdline::Smartthings;
+use Sysadm::Install qw(:all);
+use JSON qw( from_json );
+use Log::Log4perl qw(:easy);
+
+Log::Log4perl->easy_init( $DEBUG );
+
+  # This is location-specific:
+  #   https://graph-na02-useast1.api.smartthings.com (US)
+  #   https://graph-eu01-euwest1.api.smartthings.com (UK)
+my $base_url = "https://graph-na02-useast1.api.smartthings.com";
+
+my $oauth = OAuth::Cmdline::Smartthings->new(
+  base_url => $base_url,
+  scope     => "app",
+);
+
+$oauth->client_init_conf_check( $base_url );
+
+my $json = $oauth->http_get( "$base_url/api/smartapps/endpoints" );
+
+if( !defined $json ) {
+    die "Can't get endpoints";
+}
+
+my $uri = from_json( $json )->[ 0 ]->{ uri } . "/switches";
+
+my $data = $oauth->http_get( $uri );
+print "$data\n";

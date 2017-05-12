@@ -1,0 +1,303 @@
+NAME
+    Oracle::DML - Perl class for Oracle batch DML
+
+SYNOPSIS
+      use Oracle::DML;
+
+      my %cfg = ('conn_string'=>'usr/pwd@db', 'table_name'=>'my_ora_tab');
+      my $ot = Oracle::DML->new;
+      # or combine the two together
+      my $ot = Oracle::DML->new(%cfg);
+      my $sql= $ot->prepare(%cfg); 
+      $ot->execute();    # actually create the audit table and trigger
+
+DESCRIPTION
+    This class contains methods to create audit tables and triggers for
+    Oracle tables.
+
+  Object Constructor
+   new (%arg)
+    Input variables:
+
+      $cs  - Oracle connection string in usr/pwd@db
+      $tn  - Oracle table name without schema
+
+    Variables used or routines called:
+
+      None
+
+    How to use:
+
+       my $obj = new Oracle::DML;      # or
+       my $obj = Oracle::DML->new;     # or
+       my $cs  = 'usr/pwd@db';
+       my $tn  = 'my_table'; 
+       my $obj = Oracle::DML->new(cs=>$cs,tn=>$tn); # or
+       my $obj = Oracle::DML->new('cs',$cs, 'tn',$tn); 
+
+    Return: new empty or initialized Oracle::DML object.
+
+METHODS
+    The following are the common methods, routines, and functions defined in
+    this class.
+
+  Exported Tag: All
+    The *:all* tag includes all the methods or sub-rountines defined in this
+    class.
+
+      use Oracle::DML qw(:all);
+
+   insert_into ($dbh,$tab,$crf,$pr)
+    Input variables:
+
+      $dbh - database handler 
+      $tab - table name
+      $crf - table definition array: $crf->[$i]{$itm} 
+          $i - column number
+          $k - items: col, typ, req, wid, dft, etc.
+               PK, CK, MP_TABLE, MP are in the last element of the array
+      $pr  - additional parameters
+
+    Variables used or routines called:
+
+      None
+
+    How to use:
+
+       my $obj = new Oracle::DML;      # or
+       my $obj = Oracle::DML->new;     # or
+       my $cs  = 'usr/pwd@db';
+       my $tn  = 'my_table'; 
+       my $def = 'tables.def';
+       my $crf = $self->read_tab_def($def); 
+       my $sql = $obj->insert_into($dbh,$tn,$def->{$tn});  
+
+    Return: SQL statement
+
+   select_records($dbh,$tn,$cns,$whr,$rtp)
+    Input variables:
+
+      $dbh - a database handler.
+      $tn  - table name.
+      $cns - column names separated by comma.
+      $whr - conditions used in WHERE clause
+      $rtp - returned array type:
+             ARRAY     - default, array does not contain column names.
+             SFR_ARRAY - first row contains column names, i.e.,
+                         skip first row when processing data
+             HASH      - hashed array
+             lc_hash   - column name in lower case
+      $dtp - database type: Oracle|CSV|ODBC
+
+    Variables used or routines called:
+
+      echoMSG - display messages
+
+    How to use:
+
+      my $arf = $self->select_records($dbh,'emp',
+            'firstname,lastname', 'sal > 10000','lc_hash');
+
+    Return: an array reference contain the records in sequence while columns
+    can be in sequence or in hash.
+
+    The returned array can be accessed through ${$arf}[$i][$j] or
+    ${$arf}[$i]{$col}. When it is ${$arf}[$i][$j], no column name is
+    returned from it. When $atp = 'SFR_ARRAY', then the first row contains
+    column names.
+
+   delete_records($dbh,$tab,$col,$op,$val,$dft)
+    Input variables:
+
+      $dbh - database handler
+      $tab - table name
+      $col - column name
+      $op  - operator such as '=','<','in','like','btw', etc.
+      $val - value or values separated by space
+      $dft - date format, default to 'YYYYMMDD.HH24MISS'
+
+    Variables used or routines called:
+
+      echoMSG    - echo message
+
+    How to use:
+
+      my $cs  = "usr/pwd@db";
+      my $dbh = $self->getDBHandler($cs, 'Oracle');
+      $self->insert($dbh, 'myTab', 'ID', 'in', 'A B C');
+
+    Return: None.
+
+    If operator is 'like', then you can use wildcard such as '%' or '?' in
+    the $val. You can only use one string, and the others after the first
+    blank space will be ignored.
+
+   insert_records($dbh,$tab,$drf,$pk,$dft)
+    Input variables:
+
+      $dbh - database handler
+      $tab - target table name
+      $drf - data array reference: ${$arf}[$i]{$col} or 
+             a source table.
+      $pk  - primary key. 
+      $dft - date format. Defaults to 'YYYYMMDD.HH24MISS'
+
+    Variables used or routines called:
+
+      echoMSG      - echo message
+      check_input_drf - check input array ref
+      is_object_exist   - check object existence
+      get_table_definition  - get table definitions
+      select_records - get table data 
+
+    How to use:
+
+      my $cs  = 'usr/pwd@db';
+      my $dbh = $self->getDBHandler($cs, "Oracle");
+      my $drf = $self->select_records($dbh,$srctab,'*','','hash');
+      my $tab = "test_table";
+      $self->insert_records($dbh,$tab,$drf); 
+
+    Return: None.
+
+    This method inserts records in a data array ($drf) into a table. If the
+    primary key is specified, it checks to see if the primary key does not
+    exist in the table. If the primary key exists, it will skip inserting
+    the record. Here are the steps involved in this method: 1) Checks
+    whether the table exists; 2) Gets the table definition; 3) Compares the
+    column names with the column names in the array; 4) Gets a list of
+    primary keys in the table; 5) Loops through each records in the array;
+    6) Inserts records only if the primary key does not exist in the table.
+
+   check_records($dbh,$tab,$drf,$ckc,$dft)
+    Input variables:
+
+      $dbh - database handler
+      $tab - target table name
+      $drf - data array reference: ${$arf}[$i]{$col} or 
+             a source table.
+      $chc - a list of column names separated by comma and 
+             to be checked against the column definition.
+      $dft - date format. Defaults to 'YYYYMMDD.HH24MISS'
+      $pk  - primary key. Defaults to the first column
+
+    Variables used or routines called:
+
+      echoMSG      - echo message
+      check_input_drf - check input array ref
+      is_object_exist   - check object existence
+      get_table_definition  - get table definitions
+      select_records - get table data 
+
+    How to use:
+
+      my $cs  = 'usr/pwd@db';
+      my $dbh = $self->getDBHandler($cs, "Oracle");
+      my $drf = $self->select_records($dbh,$srctab,'*','','hash');
+      my $tab = "test_table";
+      my $rrf = $self->check_records($dbh,$tab,$drf); 
+
+    Return: $rrf - report hash array reference. The $rrf contains
+    ${$rrf}{$cat}{$itm}{...}, where
+
+      cn - column name
+        {cn}{no_missing_in_array} - number of colunm name missing
+              in the array comparing to the column names in the
+              table.
+        {cn}{nm_missing_in_array} - a list of column names separated
+              by comma, which are missing in the array comparing to
+              the column names in the table.
+      rec - record related statistics
+        {rec}{total} - total number of records in the array
+      col - column statistics
+        {col}{$cn}{wid} - statistics related to width and range
+            {ok_cnt} - number of records within max and min width and
+                       not null requirement if there is any
+            {ok_pct} - percentage of the ok records
+            {emp_rec} - number of empty records, which is excluded 
+                       from ok_cnt if it is 'not null' column. 
+            {bad_typ} - number of bad datatype records.
+            {out_rng} - number of record which is out of range.
+                       The range is determined by max and min width
+                       for char columns and max and dec width for 
+                       number fields.
+            {rownum} - a list of row numbers for the records that
+                       exceed the max width for char columns or
+                       is out of range for numeric fields. 
+
+    This method checks data fields against column definition and report any
+    records that do not confirm with the column definition. Here are the
+    steps involved in this method:
+
+      1) Checks inputs and data array;
+      2) Gets the table definition; 
+      3) Compares the column names with the column names in the array;
+      4) Check data fields 
+      5) Report results 
+
+   update_records($dbh,$tab,$drf,$pk,$dft,$skn)
+    Input variables:
+
+      $dbh - database handler
+      $tab - target table name
+      $drf - data array reference: ${$arf}[$i]{$col} or
+             a source table.
+      $pk  - primary key. Defaults to the first column or specified as
+             my_id
+             my_id:upper
+             my_id=u_id
+             my_id:lpad('0',?)=u_id:lpad('0',?)
+      $dft - date format. Defaults to 'YYYYMMDD.HH24MISS'
+      $skn - skip null: 1|0.
+             1 - default to skip updating the column if the new value
+                 is null but the target column is not null.
+             0 - update the column any way.
+
+    Variables used or routines called:
+
+      echoMSG      - echo message
+      is_object_exist  - check object existence
+      get_table_definition  - get table definitions
+      select_records - get table data 
+
+    How to use:
+
+      my $cs  = 'usr/pwd@db';
+      my $dbh = $self->getDBHandler($cs, "Oracle");
+      my $drf = $self->select_records($dbh,$srctab,'*','','hash');
+      my $tab = "test_table";
+      $self->update_records($dbh,$tab,$drf); 
+
+    Return: None.
+
+    This method updates records in a data array ($drf) into a table if the
+    primary key does not exist in the table. Here are the steps involved in
+    this method: 1) Checks whether the table exists; 2) Gets the table
+    definition; 3) Get common column names in table and in the array; 4)
+    Gets a list of primary keys in the table; 5) Loops through each records
+    in the array; 6) Updates records only if the primary key does exist in
+    the table.
+
+  Exported Tag: Misc
+    The *:misc* tag includes all the miscellaneous methods or sub-rountines
+    defined in this class.
+
+      use Oracle::DML qw(:misc);
+
+HISTORY
+    * Version 0.10
+        This version is to test the concept.
+
+    * Version 0.2
+SEE ALSO (some of docs that I check often)
+        Data::Describe, Oracle::Loader, Oracle::Trigger, CGI::Getopt,
+        File::Xcopy, Oracle::DDL, Oracle::DML, etc
+
+AUTHOR
+        Copyright (c) 2005 Hanming Tu. All rights reserved.
+
+        This package is free software and is provided "as is" without
+        express or implied warranty. It may be used, redistributed and/or
+        modified under the terms of the Perl Artistic License (see
+        http://www.perl.com/perl/misc/Artistic.html)
+

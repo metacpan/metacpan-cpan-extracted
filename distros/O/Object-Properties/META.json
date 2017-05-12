@@ -1,0 +1,55 @@
+{
+   "abstract" : "minimal-ceremony class builder",
+   "author" : [
+      "Aristotle Pagaltzis <pagaltzis@gmx.de>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.034, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Object-Properties",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "NEXT" : "0",
+            "Sentinel" : "0",
+            "perl" : "5.008008",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Carp" : "0",
+            "Test::Fatal" : "0",
+            "Test::Lives" : "0",
+            "Test::More" : "0.88",
+            "lib" : "0",
+            "parent" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/ap/Object-Properties/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/ap/Object-Properties",
+         "web" : "http://github.com/ap/Object-Properties"
+      }
+   },
+   "version" : "1.002"
+}
+

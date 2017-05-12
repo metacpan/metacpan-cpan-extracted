@@ -1,0 +1,93 @@
+WebPlugIn
+
+OracWeb
+=======
+It is now possible (albeit a bit tricky) to run Orac over the web.
+You will require the use of Frank Holtry's Perl/Tk Plug-In, pplug,
+which you can find here:
+
+=> http://home.rmi.net/~fholtry/
+
+Setting Up the Perl/Tk Plug-In
+==============================
+Setting this up is currently a non-automatic process.  Please 
+follow the set-up of the Plug-In, with Frank's instructions,
+as closely as you can.  It can become involved, and may not work
+under all OSes, but is worth the experimentation :-)
+
+Hopefully, once you've got it all working, you can now move onto
+our instructions.  We've tried this using Linux/Apache/Netscape
+and Solaris/Apache/Netscape combinations for Oracle.  You may
+like to experiment with your own OS/Webserver/Database
+combinations.
+
+You may like to follow Frank's pages and email listings for 
+further information on this (b)leading edge technology.  
+
+It's a lot of fun :-)
+
+Oracle Set-up: OracWeb for the Pplug NetScape Plug-In
+=====================================================
+
+*. This section assumes you fully understand the set-up of
+   Frank's plug-in, and have completed the installation. It also
+   assumes your Webserver is Apache, for ease of description,
+   and that you're familiar with configuring Apache.
+*. First, unpack your Orac distribution file under your
+   Apache cgi-bin directory.
+*. Rename Orac-x.y.z/orac_dba.pl to Orac-x.y.z/orac_dba.ppl
+*. Go to Orac-x.y.z/pplug directory
+*. Edit the orac.html file by renaming the Orac-x.y.z string
+   to the appropriate directory under cgi-bin.
+*. Move orac.html to your Apache /htdocs directory.
+*. Edit the perlplus-secure.cgi file.  Edit the URL_ROOT string
+   to your appropriate host, the one you compile the Frank 
+   Holtry Plug-in with, using the Makefile SECURE_CGI
+   directive.
+*. Move perlplus-secure.cgi directly into the Apache cgi-bin.
+*. Now copy Orac-x.y.z/img/splash.gif to your Apache /icons
+   directory.  It will be accessed here by orac.html later.
+*. Under your Apache configuration file, httpd.conf, and 
+   add the following section (adapt where appropriate):
+
+   # OracWeb General Environment Variables
+   SetEnv ORACWEB_SWITCH 1
+   
+   SetEnv ORACWEB_DB_TYPE Oracle
+   
+   SetEnv ORACWEB_DBA_USER SYSTEM
+   SetEnv ORACWEB_BACKGROUND_COL steelblue2
+   SetEnv ORACWEB_STANDARD_DB pppep
+   SetEnv ORACWEB_FOREGROUND_COL black
+   SetEnv ORACWEB_ENTRY_COL white
+   
+   SetEnv ORACWEB_FONT_FAMILY courier
+   SetEnv ORACWEB_FONT_SIZE 10
+   SetEnv ORACWEB_FONT_WEIGHT normal
+   SetEnv ORACWEB_FONT_SLANT roman
+   
+   # OracWeb Specific Oracle Required Variable
+   SetEnv ORACLE_HOME /u00/app/oracle/8.0.4
+
+*. Shutdown your Apache httpd program, and restart with new
+   configurations.
+
+Unfortunately, your OracWeb program will probably *NOT* 
+come up as if by magic, over your netscape connection, 
+(though it might).
+
+It'll probably take a lot more work to get the whole thing
+going, but once you've done it, it'll probably be worth it.
+Also, if you would like to become the OracWeb Plug-In Guru,
+the vacancy is there.  The salary's not up to much, but
+the hours are great.
+
+Good luck! :-)
+
+Rgds,
+AndyD
+andy_j_duncan@yahoo.com
+
+21th Dec 1999
+
+EOF

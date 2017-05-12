@@ -1,0 +1,111 @@
+: # use perl
+    eval 'exec ./perl -Iblib/arch -Iblib/lib -w -S $0 ${1+"$@"}'
+	if 0;
+
+# smf_test - a test of the OS390::Stdio::smf_record() function.
+# Note that above we expect ./perl.  In other words it is assumed that
+# you named your new statically linked perl binary with the OS390::Stdio
+# module linked in `perl' an that it is in the cwd.  If you called you 
+# perl something_else then invoke this script as:
+#     ./something_else -Iblib/arch -Iblib/lib smf_test
+# or simply edit the eval exec line above and s/perl/something_else/.
+
+my $DEBUG = 1;
+
+use strict;
+
+use OS390::Stdio ();
+
+my $smf_type_def = shift;
+if (defined($smf_type_def)) {
+    if ($smf_type_def + 0 != $smf_type_def) { $smf_type_def = undef; }
+}
+my $smf_subtype_def = shift;
+if (defined($smf_subtype_def)) {
+    if ($smf_subtype_def + 0 != $smf_subtype_def) { $smf_subtype_def = undef; }
+}
+my $smf_record_def = shift;
+
+print <<EOPDS;
+
+In order to test the OS390::Stdio::smf_record() routine
+you will need to ensure that SMF is running and that the
+BPX.SMF RACF facility (if any) does not preclude your writing 
+of SMF records.
+
+If that is all set up then you'll need to provide me with 
+a test SMF record type, subtype, and a record.
+
+EOPDS
+
+print "Do you wish to continue with this test? [y] "; 
+my $junk = <STDIN>;
+chomp($junk);
+if ($junk =~ /^n/i) {
+    exit;
+}
+
+Input_type:
+
+print "\nWhat is the type of your test SMF record? ", 
+      $smf_type_def ? "[$smf_type_def] " : '';
+
+my $smf_type = <STDIN>;
+print "\n";
+chomp($smf_type);            # rid of linefeed
+if ($smf_type_def) { $smf_type = ($smf_type_def) ? $smf_type_def : $smf_type; }
+if ($smf_type + 0 != $smf_type) 
+{
+    warn "Oops that SMF record type $smf_type was not numeric.  Let's start over.\n";
+    goto Input_type;
+}
+
+Input_subtype:
+
+print "What is the sub-type of your test SMF record? ", 
+      $smf_subtype_def ? "[$smf_subtype_def] " : '';
+
+my $smf_subtype = <STDIN>;
+print "\n";
+chomp($smf_subtype);            # rid of linefeed
+if ($smf_subtype_def) { $smf_subtype = ($smf_subtype_def) ? $smf_subtype_def : $smf_subtype; }
+if ($smf_subtype + 0 != $smf_subtype) 
+{
+    warn "Oops that SMF record sub-type $smf_subtype was not numeric.  Let's try again.\n";
+    goto Input_subtype;
+}
+
+Input_record:
+
+print "What is your test SMF record? ", 
+      $smf_record_def ? "[$smf_record_def] " : '';
+
+my $smf_record = <STDIN>;
+print "\n";
+chomp($smf_record);            # rid of linefeed
+if ($smf_record_def) { $smf_record = ($smf_record_def) ? $smf_record_def : $smf_record; }
+
+print <<EOBEGIN;
+\$smf_type = $smf_type
+\$smf_subtype = $smf_subtype
+\$smf_record = $smf_record
+
+EOBEGIN
+
+my $rc = OS390::Stdio::smf_record($smf_type,$smf_subtype,$smf_record);
+
+if (defined($rc)) {
+print << "EOREPORT";
+
+The return code from calling smf_record indicated success and was: $rc.
+
+EOREPORT
+}
+else {
+print << "EOREPORT";
+
+The return code from calling smf_record was undefined.
+
+EOREPORT
+}
+

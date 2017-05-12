@@ -1,0 +1,30 @@
+ReportedBugs
+
+This file contains reported bugs, to be fixed when someone has time.  Anyone
+who wants may chase any of these and submit patches to the orac-dev list; they
+will be greatly appreciated.
+
+* This is probably a minor thing, but I've noticed that if you don't quit
+  nicely, the config/what_db.txt doesn't get updated correctly.  That is,
+  it's not getting written as soon as a valid connection is made.  I've
+  found that I can correctly connect, then ^C in my xterm, and the file
+  will have the original (& wrong) value. [Reported by KevinB, do we need
+  a SIG handler?]
+* Autoclear does not seem to work on callbacks like:
+  sub onstat_chunks
+  {
+     my $self = shift;
+     $self->f_clr();
+     $self->show_sql("Chunks", "1");
+  }
+  [Reported by KevinB, may affect only him?]
+* The main window is fine, but the dialog box for errors, the show_sql
+  dialog box, and the GUI shell window all have scrolled text frames
+  that will expand horizontally, but if I resize them vertically, the
+  scrolled text frames do not increase in size, but the area of the
+  window at the bottom (below the OK button in the dialog boxes) grows.
+  [Reported by BruceA]
+* However, I noticed today that the 
+  Oracle show SQL pool/Explain Plain window doesn't grow when resized.
+
+=========================================================================

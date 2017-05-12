@@ -1,0 +1,55 @@
+---
+abstract: 'Component Object Model for BBS systems'
+author:
+  - 'Chia-Liang Kao <clkao@clkao.org>,'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.31
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: OurNet-BBS
+no_index:
+  directory:
+    - inc
+    - t
+recommends:
+  Class::MethodMaker: 1.00
+  Crypt::Rijndael: 0.03
+  GnuPG::Interface: 0.31
+  IO::Scalar: 1.0
+  MIME::Tools: 5.0
+  Mail::Box: 1.0
+  Mail::Internet: 1.0
+  Net::Daemon: 0.13
+  Net::NNTP: 2.19
+  Net::Telnet: 3.02
+  OurNet::BBSAgent: 1.55
+  RPC::PlClient: 0.2013
+  RPC::PlServer: 0.2013
+  Storable: 1.011
+  Term::ReadKey: 2.13
+requires:
+  Date::Format: 0.01
+  Date::Parse: 2.20
+  Digest::MD5: 2.10
+  File::Spec: 0.6
+  File::Temp: 0.12
+  Hook::LexWrap: 0.01
+  Mail::Address: 1.17
+  Mail::Internet: 1.0
+  Net::NNTP: 2.19
+  Storable: 1.011
+  Term::ReadKey: 2.13
+  Test::Harness: 1.23
+  enum: 1.016
+  if: 0.04
+  perl: 5.6.1
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.67

@@ -1,0 +1,51 @@
+[%########################################
+  date_select( year_list, year_value, month_value, day_value,
+               blank, year_field, month_field, day_field, field_prefix )
+     Display three dropdown boxes for inputting dates.
+
+  Parameters:
+
+     year_list    = list of years
+     object       = Class::Date object from which we can get the year,
+                    month and day; if this is given we ignore the
+                    year/month/day_value fields
+     year_value   = chosen year
+     month_value  = chosen month (number)
+     day_value    = chosen day (number)
+     is_blank     = if true, start each SELECT with a blank option
+     year_field   = name for year SELECT
+     month_field  = name for month SELECT
+     day_field    = name for day SELECT
+     field_prefix = use instead of specifying year/month/day_field;
+                    prefix to put in front of '_year', '_month' and
+                    '_day' (e.g, if field_prefix = 'birthdate', the
+                    fields would be 'birthdate_year',
+                    'birthdate_month', and 'birthdate_day')
+     comment      = if true includes an HTML comment with values (debugging)
+
+  Defaults:
+     year_list = 2000 .. 2010
+  ########################################-%]
+
+[%- SET month_names   = [ 'Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec' ];
+    DEFAULT year_list = [ 2000..2010 ]; -%]
+
+[%- IF field_prefix -%]
+  [%- month_field   = "${field_prefix}_month";
+      day_field     = "${field_prefix}_day";
+      year_field    = "${field_prefix}_year"; -%]
+[% END -%]
+[%- IF object -%]
+  [%- year_value  = object.year;
+      month_value = object.month;
+      day_value   = object.day; -%]
+[%- END -%]
+    
+[% INCLUDE form_select( name = month_field, plain = 1, first_blank = is_blank,
+                        value_list = [ 1..12 ], label_list = month_names,
+                        picked = month_value ) -%]
+[% INCLUDE form_select( name = day_field, plain = 1, first_blank = is_blank,
+                        value_list = [ 1..31 ], picked = day_value ) -%]
+[% INCLUDE form_select( name = year_field, plain = 1, first_blank = is_blank,
+                        value_list = year_list, picked = year_value ) -%]
+[% IF comment %]<!-- Date: [% year_value %] (y) [% month_value %] (m) [% day_value %] (d) -->[% END -%]

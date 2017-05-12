@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<SITE ID="Infonavihayate">
+
+<NAME Lang="en-us">InfoNavigator Hayate</NAME>
+<INFO Lang="en-us">general information web search in Japan</INFO>
+
+<URL Type="More"><![CDATA[
+http://para.cab.infoweb.ne.jp/cgi-bin/para?db=DB&max=_MAX_&OPE=OR&page=page_index#&SearchType=again&sort=_SORT_&template=_TEMP_&SessionID=_SID_&SearchNo=_SNO_&Sortflg=_SFL_&DisplayMin=_DMIN_&PageChange=次ページ
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://para.cab.infoweb.ne.jp/cgi-bin/para?Page=page_index&DB=DB&template=%2Fresults_rbt.html&OPE=AND&Max=10&Querystring=_QUERY_&OPE=OR&Max=_HITS_&QueryRule=%24QueryString+URL%3D%24URL1&URL1=&x=15&y=17
+]]></URL>
+
+<CHARSET>ja-jp.euc</CHARSET>
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_SFL_"><![CDATA[
+hidden" name="Sortflg" value="_SFL_">
+]]></VAR>
+<VAR Name="_TEMP_"><![CDATA[
+hidden" name="template"   value="_TEMP_">
+]]></VAR>
+<VAR Name="_MAX_"><![CDATA[
+hidden" name="max"        value="_MAX_">
+]]></VAR>
+<VAR Name="_DMIN_"><![CDATA[
+hidden" name="DisplayMin" value="_DMIN_">
+]]></VAR>
+<VAR Name="_SORT_"><![CDATA[
+hidden" name="sort"       value="_SORT_">
+]]></VAR>
+<VAR Name="_SNO_"><![CDATA[
+hidden" name="SearchNo" value="_SNO_">
+]]></VAR>
+<VAR Name="_SID_"><![CDATA[
+hidden" name="SessionID" value="_SID_">
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<DL>___<A HREF="_URL_">_TITLE_</A>___<DD>_PREVIEW_</DL>
+]]></TEMPLATE>
+</SITE>

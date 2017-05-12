@@ -1,0 +1,11 @@
+[%- IF update_list.size == 0 -%]
+brand new!
+[%- ELSE -%]
+<table border="0" cellpadding="3" cellspacing="0">
+  [% FOREACH item = update_list -%]
+  <tr><td><font size="-1">[% item.login_name %]</font></td>
+      <td><font size="-1">[% item.date %]</font></td>
+      <td><font size="-1">[% item.notes %]</font></td></tr>
+  [%- END %]
+</table>
+[%- END -%]

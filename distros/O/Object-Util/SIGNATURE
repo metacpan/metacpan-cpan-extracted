@@ -1,0 +1,59 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 33317486c4fa2cf7fec85bf92ed38ac0f64233a0 CONTRIBUTING
+SHA1 db2ff90d29432b71fec63eaecc9ee431f8734498 COPYRIGHT
+SHA1 6bd7b17d81be63d08d4efa6cb80106e72887842c CREDITS
+SHA1 bde4bee51919100f08a4c5bcca8ac75d7e907eec Changes
+SHA1 530ca7a7a6de6ab6089bb7cc466ec560495502eb INSTALL
+SHA1 34f5e12514b91055de4b164a1f2327ef5c30ba53 LICENSE
+SHA1 e16fe463671015a6da5781556acffbc1c5109615 MANIFEST
+SHA1 f85c51fb121cd2d815bca25a49eb37ae3aed4e35 META.json
+SHA1 d2365444ec22b81c6128e87475cbf06d4154e44b META.yml
+SHA1 0a3e5dd382aff1e8f0318156746d77309d4beefa Makefile.PL
+SHA1 a22027bd20ea2c1473e1f760c103e9ab653668c0 README
+SHA1 97db9055399ffa9b1a712a842261cf790cc2c79f dist.ini
+SHA1 da7877e96a2a8e67f23810fcd9c20246b8bb5914 doap.ttl
+SHA1 d91b55152df25ea8e75a58d5072ab3b59b2de491 lib/Object/Util.pm
+SHA1 b898269a7927d0071d815a5877de662d07ca8ff7 t/01basic.t
+SHA1 3be835e87a57587e26f5b5d4747dba25f18041df t/02noparser.t
+SHA1 c52f06975259947bede42672f29d75992cff3123 t/UNIVERSAL_DOES.t
+SHA1 1a39669c31f85ad0f533d526411c1ed048ce4f4b t/call_if_object.t
+SHA1 4bdb8c234a6d613dd9ae45c00a54e6d1b27ab3ff t/can.t
+SHA1 579cedf8ac4974e7764d5f5c3d17871dddab080b t/clone-moose.t
+SHA1 dec83ac7dcdca933ed4ac8cbb3e14fc41abebebe t/clone-mouse.t
+SHA1 542b71895dead28a8607ae94e45569407f85e532 t/clone.t
+SHA1 1482342af69ea15ddd0bb6aff27dfae9dd18a07e t/does.t
+SHA1 ee3e02e80021bfe754788de658dcd3c69790ebde t/dump.t
+SHA1 768375d5a599048d7c5754e2fa2d582339d57f42 t/extend-moo.t
+SHA1 682ca4bac0e301f5c87dfd7f74e094ee1f5009e9 t/extend-moose.t
+SHA1 33ec071fc2343c8f1f82da41a3ce790919105a8f t/extend-mouse.t
+SHA1 025cca35aa0123b744aa0ad1eb04e22dfd9999a2 t/extend.t
+SHA1 9320f517568bd4ccd96dcdbb9106b03bc176b6e4 t/isa.t
+SHA1 1c9b0cd5f792d86e4fea72353b6313c156104895 t/new.t
+SHA1 263b119320b168ac01dc54f8d577122458fed372 t/tap.t
+SHA1 3203a5d9c175e2d20f44c0e81e7ed8014ef9cdc8 t/try.t
+SHA1 2e79f2ea6c09735f699fc443980fbb6e9262a291 t/with_traits-moose.t
+SHA1 a01044a558a039e132cefb1fef0c4ff0adcdb717 t/with_traits-mouse.t
+SHA1 989694204f7e625561ea30b7506c1c71249f640b t/with_traits.t
+SHA1 af53c4aadc8b9269d95263c81f68f13ff821f6df t/zz_combined_traits_new.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlQYMHEACgkQzr+BKGoqfTnFtACeIhkFab8MVZLwJ5yypH0wpbvH
+6XcAnjev3A4lTD7PD3KuWJWPAYcGMyiI
+=8Bp5
+-----END PGP SIGNATURE-----

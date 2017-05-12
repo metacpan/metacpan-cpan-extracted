@@ -1,0 +1,13 @@
+Operator::Util Installation
+
+# install via cpanminus
+cpanm Operator::Util
+
+# install via CPAN shell
+cpan Operator::Util
+
+# install manually
+perl Build.PL
+./Build
+./Build test
+./Build install

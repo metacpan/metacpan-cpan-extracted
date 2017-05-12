@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<SITE ID="Ufo">
+
+<NAME Lang="en-us">UFO WWW Search</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+UFO ·j´M¤ÞÀº
+]]></NAME>
+<INFO Lang="en-us">lifestyle information search in Taiwan</INFO>
+<INFO Lang="zh-tw">lifestyle information search in Taiwan</INFO>
+
+<URL Type="More"><![CDATA[
+http://www.ufo.com.tw_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://www.ufo.com.tw/cgi/search/listkn.cfm?row=1&keyword=_QUERY_&Ttrade=0
+]]></URL>
+
+
+<VAR Name="_NEXT_"><![CDATA[
+<a href="_NEXT_"><img src="http://www.ufo.com.tw/search/pic/nextpage.gif"
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+.</b></font><br>___<a href="_URL_">_TITLE_</a>_PREVIEW_<br><br>
+]]></TEMPLATE>
+</SITE>

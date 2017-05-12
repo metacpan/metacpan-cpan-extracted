@@ -1,0 +1,53 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'File::Spec' => '0',
+                                      'IO::Handle' => '0',
+                                      'IPC::Open3' => '0',
+                                      'Test::More' => '0',
+                                      'Test::PAUSE::Permissions' => '0',
+                                      'Test::Pod' => '1.41'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'DBIx::Class::Core' => '0',
+                                      'DBIx::Class::ResultSet' => '0',
+                                      'DBIx::Class::Schema' => '0',
+                                      'Moose' => '0',
+                                      'Moose::Role' => '0',
+                                      'MooseX::NonMoose' => '0',
+                                      'OpusVL::SimpleCrypto' => '0',
+                                      'OpusVL::Text::Util' => '0',
+                                      'namespace::autoclean' => '0',
+                                      'perl' => '5.010',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'FindBin' => '0',
+                                   'IO::Handle' => '0',
+                                   'IPC::Open3' => '0',
+                                   'Test::DBIx::Class' => '0.49',
+                                   'Test::More' => '0.96',
+                                   'Test::Most' => '0',
+                                   'Test::Postgresql58' => '0',
+                                   'blib' => '1.01',
+                                   'lib' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

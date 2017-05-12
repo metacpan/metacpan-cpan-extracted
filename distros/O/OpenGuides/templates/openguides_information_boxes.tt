@@ -1,0 +1,38 @@
+<fieldset id="openguides_information">
+  <legend>About your edit</legend>
+
+  <div class="edit_form_group" id="username_group">
+    <label for="username">
+      Your username (<a href="preferences.cgi">set it</a>):
+    </label>
+    <div class="edit_box">
+      <input type="text" size="30" name="username" id="username"
+       value="[% username %]" />
+    </div>
+  </div>
+
+  <div class="edit_form_group" id="comment_group">
+    <label for="comment">
+      Comment about your changes:
+    </label>
+    <div class="edit_box">
+      <input type="text" size="30" name="comment" id="comment"
+       value="[% comment %]" />
+    </div>
+  </div>
+
+  <div class="edit_form_group" id="edit_type_group">
+    <label for="edit_type">
+      Type of edit:
+    </label>
+    <div class="edit_box">
+      <select name="edit_type" id="edit_type">
+        <option [% IF edit_type == "Normal edit" %] selected="selected" [% END %] value="Normal edit">Normal edit</option>
+        <option [% IF edit_type == "Minor tidying" %] selected="selected" [% END %] value="Minor tidying">Minor tidying</option>
+      </select>
+    </div>
+  </div>
+
+</fieldset>
+
+

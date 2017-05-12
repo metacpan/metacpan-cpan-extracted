@@ -1,0 +1,36 @@
+Revision history for Perl extension OIDC::Lite
+
+0.10 2015-06-05T07:02:53Z
+    - update JSON::WebToken version to 0.10
+    - rename token.psgi to oidc_token.psgi
+
+0.09 2014-12-23T07:27:56Z
+    - update JSON::WebToken version to 0.09
+
+0.08 2014-08-08T06:23:19Z
+    - redirect_uri is set optional for WebServer Client for Google specific case
+    - update OAuth::Lite2 version to 0.10
+
+0.07 2014-07-22T08:02:31Z
+    - catch up OAuth::Lite2-0.09
+
+0.06 2013-11-08T17:10:29Z
+    - replace JSON to JSON::XS
+
+0.05 2013-10-17T17:34:06Z
+    - add support for "server_state" grant type
+
+0.04 2013-09-10T16:50:01Z
+    - fixed bug for Authorization Handler
+
+0.03 2013-08-17T14:19:14Z
+    - updated the dependence 
+    - removed Dynamic Client Registration support
+    - migrated to Minilla
+
+0.02  Thu Mar 7 00:00:00 2013
+    - added test_require modules
+    - removed Session related modules
+
+0.01  Sun Mar 3 00:00:00 2013
+    - initial version

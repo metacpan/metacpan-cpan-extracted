@@ -1,0 +1,11 @@
+[%########################################
+  form_login()
+      Display a dropdown box with a list of users. Note that we rely
+      on the 'get_users()' method from the OI plugin to grab the
+      users -- we might modify this to accept filter parameters.
+  ########################################-%]
+
+[% INCLUDE form_select( iterator    = OI.get_users(),
+                        first_label = 'User List...',
+                        value_field = 'id',
+                        label_field = 'login_name' ) -%]

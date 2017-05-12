@@ -1,0 +1,24 @@
+---
+elements:
+
+  - type: Checkbox
+    name: can_change_any_role
+    label: Can change any role
+
+  - type: Checkboxgroup
+    name: roles_allowed_roles
+    label: Roles allowed to modify/apply
+
+  - type: Submit
+    name: confirm
+    value: Save
+    attributes:
+      class: "submit submit_ok"
+      
+  - type: Submit
+    name: cancel
+    value: Cancel
+    attributes:
+      class: "submit submit_cancel"
+
+

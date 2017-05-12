@@ -1,0 +1,14 @@
+Revision history for Perl extension OS2::WinObject.
+
+0.01  Mon Sep 27 02:52:13 1999
+	- original version; created by h2xs 1.20 with options
+		-O -d -o LHANDLE -p Win -fn OS2::WinObject -M '^(OPEN_(SETTINGS|TREE|DEFAULT|CONTENTS|DETAILS|HELP|RUNNING|PROMPTDLG|PALETTE|USER|AUTO|STATUS|BATTERY)|CO_|SWP_)|(PMERR_(WPDSERVER|INV_HDC|INVALID_(HWND|FLAG|HPTR)))|^Win.*(Object|SOMDD|WPDS|FileIcon|WindowPos|Desktop|ShutdownSys)' -F '-I. -DINCL_BASE -DINCL_PM' -x os2emx.h open_settings.h
+
+	Minimal manual edits, mostly to make error codes into $! and $^E.
+
+0.02  Mininal documentation added.
+      %h = ObjectClasses(); $path = ActiveDesktopPathname;
+      $path = ObjectPath($hobject); $obj = _hwnd($int);
+      ($x,$y,$w,$h,$flags,$hwndBehindOf,$hwndMy,$r1,$r2) = WindowPos($hwnd);
+      implemented.
+      Prototypes enabled.

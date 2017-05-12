@@ -1,0 +1,33 @@
+#insure++.report_file insure.out
+
+gus_reload_dynamics_on_failure unsafe
+demangle_method filter c++filt
+interface_defaults none
+signal_ignore SEGV
+#symbol_banner on
+
+#ignore_wild on
+
+#suppress USER_ERROR { * __0FR_ODI_gettimeofdayP6Kos_timevalPv * }
+
+#suppress READ_OVERFLOW { __0fL_Class_typeMis_anonymousvK * }
+#suppress READ_OVERFLOW { * __0FL_ODI_str* * }
+#suppress READ_WILD { __0fL_Class_typeMis_anonymousvK * }
+#suppress READ_WILD { * __0FL_ODI_str* * }
+#suppress READ_WILD { * __0FM_ODI_str* * }
+#suppress READ_WILD { * __0fP_Basic* * }
+#suppress READ_WILD { * __0FZis_type* * }
+
+#suppress READ_WILD { * __0fL_Class_type* * }
+#suppress READ_OVERFLOW { * __0fL_Class_type* * }
+
+#suppress READ_WILD { * __0FNdeclared* * }
+#suppress READ_OVERFLOW { * __0FNdeclared* * }
+
+#suppress READ_OVERFLOW { * __0fV_pset_with_key_lookup* * }
+#suppress READ_WILD { * __0fV_pset_with_key_lookup* * }
+
+#suppress READ_OVERFLOW { * __0fK_OST_utils* * }
+#suppress READ_WILD { * __0fK_OST_utils* * }
+
+#suppress READ_BAD_INDEX { __0fEhkeyEhashPCvT * }

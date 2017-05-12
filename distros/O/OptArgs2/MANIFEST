@@ -1,0 +1,15 @@
+Build.PL
+Changes
+cpanfile
+error
+example/demo
+example/simple
+lib/OptArgs2.pm
+MANIFEST			This list of files
+t/OptArgs2.t
+TODO
+Makefile.PL
+README
+LICENSE
+META.yml
+META.json

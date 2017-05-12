@@ -1,0 +1,47 @@
+<div id="appList" class="tlMenu">
+    <div class="tlMenu_top">
+        <div class="tlMenu_tl"></div>
+        <div class="tlMenu_tr"></div>
+    </div>
+    <div class="tlMenu_mid">
+        <div class="tlMenu_ml">
+            <p>Applications</p>
+            <ul class="appList_l1">
+                    [% USE Math %]
+                    [% SET apps = c.apps_allowed %]
+                    [% SET application_count = apps.size %]
+                    [% x = application_count ? Math.sqrt(application_count) : 0 %]
+                    [% appList_cols = ((x - Math.int(x)) > 0) ? (Math.int(x)) + 1 : x %]
+                    [% FOREACH appList_col IN [1 .. appList_cols] %]
+                        <li>
+                            <ul class="appList_l2" id="appList_col[% appList_col %]">
+                            </ul>
+                        </li>
+                    [% END %]
+                <script language="JavaScript">
+                    $(function() {
+                        var col_id = 1;
+                        [% FOR myc IN apps  %]
+                
+                            $('#appList_col' + col_id).append('<li id="app_[% myc.appkit_name | lower | html %]" style="background: url([% myc.appkit_icon %]) no-repeat 6px 6px;"><a href="[% c.uri_for( myc.action_for( myc.home_action.actionname ) ) %]">[% myc.appkit_name %]</a>');
+            
+                            col_id++;
+            
+                            if (col_id > [% appList_cols %] ) 
+                            {
+                                col_id = 1;
+                            }
+                
+                        [% END %]
+                    });
+                </script>
+            </ul>
+        </div>
+        <div class="tlMenu_mr"></div>
+    </div>
+    <div class="tlMenu_bot">
+        <div class="tlMenu_bl"></div>
+        <div class="tlMenu_br"></div>
+    </div>
+</div>
+

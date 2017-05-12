@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<SITE ID="Ondeir">
+
+<NAME Lang="en-us">Onde ir Search</NAME>
+<INFO Lang="en-us">general information web search in Brazil</INFO>
+
+<URL Type="More"><![CDATA[
+http://www.ondeir.com.br/cgi-shl/ondeir/_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+post://www.ondeir.com.br/cgi-shl/ondeir/pesquisa.pl?Argumento=_QUERY_
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_NEXT_"><![CDATA[
+<A HREF=_NEXT_>Proximas
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<A HREF=_URL_><B>_TITLE_</B></A>___<br>_PREVIEW_<br><A HREF
+]]></TEMPLATE>
+</SITE>

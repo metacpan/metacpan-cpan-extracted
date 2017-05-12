@@ -1,0 +1,109 @@
+# extended LDIF
+#
+# LDAPv3
+# base <dc=auth,dc=example,dc=net> with scope subtree
+# filter: (objectclass=*)
+# requesting: ALL
+#
+
+# auth.example.net
+dn: dc=auth,dc=example,dc=net
+objectClass: top
+objectClass: organization
+objectClass: dcObject
+o: Auth Group
+dc: auth
+
+# people, auth.example.net
+dn: ou=people,dc=auth,dc=example,dc=net
+ou: people
+objectClass: top
+objectClass: organizationalUnit
+
+# unixgroups, auth.example.net
+dn: ou=unixgroups,dc=auth,dc=example,dc=net
+objectClass: organizationalUnit
+ou: unixgroups
+
+# writeaccess, auth.example.net
+dn: ou=writeaccess,dc=auth,dc=example,dc=net
+objectClass: organizationalUnit
+ou: writeaccess
+
+# bindclients, auth.example.net
+dn: ou=bindclients,dc=auth,dc=example,dc=net
+objectClass: organizationalUnit
+ou: bindclients
+
+# netgroups, auth.example.net
+dn: ou=netgroups,dc=auth,dc=example,dc=net
+objectClass: organizationalUnit
+ou: netgroups
+
+# state, auth.example.net
+dn: ou=state,dc=auth,dc=example,dc=net
+objectClass: organizationalUnit
+ou: state
+
+# users, unixgroups, auth.example.net
+dn: cn=users,ou=unixgroups,dc=auth,dc=example,dc=net
+objectClass: posixGroup
+objectClass: top
+cn: users
+
+gidNumber: 100
+
+# binduser, bindclients, auth.example.net
+dn: uid=binduser,ou=bindclients,dc=auth,dc=example,dc=net
+objectClass: top
+objectClass: person
+objectClass: posixAccount
+objectClass: shadowAccount
+uid: binduser
+cn: binduser
+sn: binduser
+uidNumber: 10000
+gidNumber: 100
+homeDirectory: /home
+loginShell: /sbin/nologin
+
+description: Read-only, bind user for bind clients
+
+# webportal, writeaccess, auth.example.net
+dn: uid=webportal,ou=writeaccess,dc=auth,dc=example,dc=net
+objectClass: top
+objectClass: person
+objectClass: posixAccount
+objectClass: shadowAccount
+uid: webportal
+cn: webportal
+sn: webportal
+uidNumber: 9999
+gidNumber: 100
+homeDirectory: /home
+loginShell: /sbin/nologin
+description: Write access account
+
+
+# maxUid, auth.example.net
+dn: uid=maxUid,dc=auth,dc=example,dc=net
+objectClass: top
+objectClass: person
+objectClass: posixAccount
+cn: maxUid
+sn: Uid
+uid: maxUid
+gidNumber: 999999
+homeDirectory: /dev/null
+description: Current Maxuid
+uidNumber: 10059
+
+
+# wheel, unixgroups, auth.example.net
+dn: cn=wheel,ou=unixgroups,dc=auth,dc=example,dc=net
+objectClass: posixGroup
+objectClass: top
+cn: wheel
+gidNumber: 10
+memberUid: root
+

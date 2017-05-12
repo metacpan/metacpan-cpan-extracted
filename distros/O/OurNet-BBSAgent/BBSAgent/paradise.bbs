@@ -1,0 +1,14 @@
+# $File: //depot/OurNet-BBSAgent/BBSAgent/paradise.bbs $ $Author: autrijus $
+# $Revision: #2 $ $Change: 2862 $ $DateTime: 2002/01/13 01:58:49 $
+# Contributed by Jedi <Jedi@ms11.url.com.tw>
+# zh_TW.Big5: 北護天使樂園
+
+Taipei Nurse College
+paradise.twbbs.org
+
+load maple3.board
+
+=main
+send qqqqqqee
+wait 主功能表
+till 呼叫/訊息

@@ -1,0 +1,42 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use FindBin qw($Bin);
+use lib "$Bin/../lib";
+use Data::Dumper;
+use OptArgs;
+
+$OptArgs::COLOUR = 1;
+
+opt help => (
+    isa     => 'Bool',
+    alias   => 'h',
+    ishelp  => 1,
+    comment => 'print this help message and exit',
+);
+
+opt dry_run => (
+    isa     => 'Bool',
+    comment => 'do nothing',
+    alias   => 'n',
+);
+
+arg arg1 => (
+    isa      => 'Str',
+    comment  => 'a mandatory argument',
+    required => 1,
+);
+
+arg arg2 => (
+    isa     => 'Num',
+    comment => 'an argument whose value defaults to "optional"',
+    default => 'optional',
+    greedy  => 1,
+);
+
+#die usage();
+
+my $opts = optargs;
+
+print Dumper($opts);
+

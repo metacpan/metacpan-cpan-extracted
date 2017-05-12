@@ -1,0 +1,34 @@
+---
+abstract: 'An OpenDocument management interface'
+author:
+  - 'Jean-Marie Gouarne <jean-marie.gouarne@online.fr>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: ODF-lpOD
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Archive::Zip: 1.30
+  File::Basename: 2.76
+  File::Find: 1.01
+  File::Slurp: 0
+  File::Temp: 0.12
+  File::Type: 0
+  IO::File: 1.14
+  Image::Size: 0
+  LWP::Simple: 0
+  Time::Local: 1.07
+  XML::Twig: 3.34
+  experimental: 0
+  perl: 5.010001
+version: 1.126

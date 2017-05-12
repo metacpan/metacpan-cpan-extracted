@@ -1,0 +1,40 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 594fcebb48efbaacb54b4144ded41c9143933e74 .travis.yml
+SHA1 a52c5bcc79135e0a978d664d1683d45ae63389e8 Changes
+SHA1 cf78eb481ed8b04f9e9a01ae9cb4014ad30c79f4 LICENSE
+SHA1 04359e915379cd0dfa3684dbaecd9c7636ca96aa MANIFEST
+SHA1 b47f9e6b3f48c276beaa7e5cb490139db2376769 META.json
+SHA1 854bc1bde4d1a2c8f6a44130ab8eee0663642fa6 META.yml
+SHA1 a910bb9b0a9b8dd18cdec287f97f739eef01e4a6 Makefile.PL
+SHA1 ed2c94877d483e7c37303aadd3f62e7d0bb39bf5 Opcodes.xs
+SHA1 b48c95e56e8d011b28d60df671907a60293a7778 README.md
+SHA1 69d63197211650682c97c193b91090819ac5151e lib/Opcodes.pm
+SHA1 51702fb498aaa4b9f82c5bcb7dfe6c4836c4db59 ppport.h
+SHA1 8e836ca278cb3578914e07e2d4c03356407e382e t/Opcodes.t
+SHA1 e7dd7ac83f7cb16b50ca8439c406e0b28324a84b t/z_kwalitee.t
+SHA1 6b2bcbcb327191beeb7aea3a82ddee7ce1aed25e t/z_meta.t
+SHA1 f4934d6029737d0fd1046bde57fb7a9657e19225 t/z_perl_minimum_version.t
+SHA1 08efe8b3beb32f27b3ee73f982b62761d5e48309 t/z_pod-coverage.t
+SHA1 8e6c77dd1d7e2bb99d62e199e1b19b6090e405f5 t/z_pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlPGvZsACgkQmm2SYo/9yUJTBACePMRsW9gyUzj1RarLHbI972X9
+f3QAn3+IOkz8gbrWs2GGgwq3R8vBlrG9
+=8fem
+-----END PGP SIGNATURE-----

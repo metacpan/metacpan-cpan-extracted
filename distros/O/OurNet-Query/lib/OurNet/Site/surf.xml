@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<SITE ID="Surf">
+
+<NAME Lang="en-us">Surf Search</NAME>
+<INFO Lang="en-us">general information web search in Brazil</INFO>
+
+<URL Type="More"><![CDATA[
+http://www.surf.com.br/x/busca.cgi?keys=_QSTR_&operador=&NOT=&quant_por_vez=_QUA_&ini=_INI_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://www.surf.com.br/x/busca.cgi?keys=_QUERY_
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_QUA_"><![CDATA[
+NAME="quant_por_vez" VALUE="_QUA_">
+]]></VAR>
+<VAR Name="_QSTR_"><![CDATA[
+hidden" NAME="keys" VALUE="_QSTR_">
+]]></VAR>
+<VAR Name="_INI_"><![CDATA[
+hidden" NAME="ini" VALUE="_INI_">
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<DT>___<A HREF="_URL_">_TITLE_</A>___<DD>_PREVIEW_<BR>___<P>
+]]></TEMPLATE>
+</SITE>

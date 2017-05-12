@@ -1,0 +1,16 @@
+th_info *		T_PTR
+th_huff_code *		T_PTR
+th_img_plane *		T_PTR
+th_quant_info *		T_PTR
+th_quant_ranges *	T_PTR
+th_stripe_callback *	T_PTR
+th_ycbcr_buffer *  	T_PTR
+th_comment *		T_PTR
+th_setup_info *		T_PTR
+th_dec_ctx *  		T_PTR
+th_enc_ctx *  		T_PTR
+
+ogg_packet *		T_PTR
+ogg_uint32_t		T_IV
+ogg_int64_t		T_NV
+

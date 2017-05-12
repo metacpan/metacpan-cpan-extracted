@@ -1,0 +1,28 @@
+[% UNLESS not_editable %]
+  <div id="navbar_this_page">
+    <div class="navbar_group_title">
+      This page:
+    </div>
+    <ul>
+[% UNLESS read_only %]
+      <li><a class="edit_page_link" href="[% source_site or full_cgi_url %]?id=[% node_param %];action=edit">Edit this page</a></li>
+[% END %]
+      <li><a href="[% full_cgi_url %]?action=show_backlinks;id=[% node_param %]">Show pages linking here</a></li>
+      [% IF version AND version > 1 %]
+        <li><a href="[% full_cgi_url %]?action=list_all_versions;id=[% node_param %]">List all versions</a></li>
+        <li><a href="[% cgi_url %]?id=[% node_param %];version=[% version - 1 %];diffversion=[% version %]">Show diff from previous version</a></li>
+      [% END %]
+      <li><a href="[% full_cgi_url %]?id=[% node_param %];format=json">View as JSON</a></li>
+      <li><a href="[% full_cgi_url %]?id=[% node_param %];format=rdf">View as RDF/XML</a></li>
+    [% IF rss_locale_url %]
+      <li><a href="[% rss_locale_url %]">RSS feed for this locale</a></li>
+    [% END %]
+    [% IF rss_category_url %]
+      <li><a href="[% rss_category_url %]">RSS feed for this category</a></li>
+    [% END %]
+      [% IF enable_page_deletion and is_admin %]
+        <li><a href="[% full_cgi_url %]?id=[% node_param %];action=delete">Delete (admin only)</a></li>
+      [% END %]
+    </ul>
+  </div>
+[% END %]

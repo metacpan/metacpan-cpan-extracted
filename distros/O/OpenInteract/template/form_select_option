@@ -1,0 +1,11 @@
+[%########################################
+  form_select_option( item, label_field, value_field, picked )
+     Display a single OPTION item for use in a <SELECT> dropdown.
+  ########################################-%]
+[%- UNLESS plain -%]
+  [%- SET use_label_field = label_field || value_field;
+      SET value           = item.$value_field;
+      SET label           = item.$use_label_field; -%]
+[%- END -%]
+[%- SET is_picked = ( value == picked || picked_multiple.$value ) ? ' SELECTED' : '' -%] 
+<option value="[% value %]"[% is_picked %]>[% label %]</option>

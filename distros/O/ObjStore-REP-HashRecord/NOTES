@@ -1,0 +1,111 @@
+
+
+I didn't have time to write proper documentation but here are some
+notes.  This may seem like a complicated, detailed mess, but the
+performance is outstanding!  8-)
+
+
+1. Your structures must inherit from OSPV_HashRecord.  Be aware that
+you may no longer be able to store 'undef' in some field types.
+
+
+2. You probably want a super-class to identify a family of implementations.
+
+   Zot_Impl1 --+- Zot_Record ---- OSPV_HashRecord
+   Zot_Impl2   |
+   Zot_Impl3   |
+   Zot_Impl4 -/
+
+Virtual methods are great because they are class specific, yet the
+database don't care about them.  Never underestimate the usefulness of
+being able to change virtual methods.  You should arrange your
+inheritance tree to maximize the opportunity for virtual methods.
+
+
+3. Your Makefile.PL should include at least:
+
+use ExtUtils::MakeMaker;
+use ObjStore::MakeMaker qw(add_os_args os_schema_rule);
+use ObjStore::REP::HashRecord qw(hrec_args);
+
+my $v = '01';
+my %arg = (NAME => "Data::Zot",
+	   VERSION_FROM => './Zot.pm',
+	   OBJECT => "Zot.o Lib-Zot-$v.o",
+	   clean => { FILES => 'zot.c zot.h' },
+	  );
+
+WriteMakefile(add_os_args(hrec_args(%arg)));
+
+sub MY::postamble {
+    'Zot.xs zot.c zot.h :: zot.rec
+	gen_hashrecord.pl zot.rec
+
+'.os_schema_rule("Lib-Zot-$v.sch")
+}
+
+
+4. A XS file needs to implement the default 'new' method.  It should
+look something like below.  You might name it 'allocate' instead.
+
+void
+new(CSV, seg)
+	SV *CSV;
+	SV *seg;
+	PPCODE:
+	os_segment *area = osp_thr::sv_2segment(seg);
+	PUTBACK;
+	OSSVPV *pv;
+	NEW_OS_OBJECT(pv, area, Zot_Impl1::get_os_typespec(), Zot_Impl1);
+	pv->bless(CSV);
+	return;
+
+
+5. You need a schema file:
+
+#include <ostore/manschem.hh>
+
+OS_REPORT_DLL_LOAD_AND_UNLOAD(0)
+OS_SCHEMA_DLL_ID("perl:MyZotApp::Zot")
+OS_SCHEMA_INFO_NAME(ObjStore_Lib_Zot_dll_schema_info)
+
+OS_MARK_SCHEMA_TYPE(Zot_Impl1)
+OS_MARK_SCHEMA_TYPE(Zot_Impl2)
+OS_MARK_SCHEMA_TYPE(Zot_Impl3)
+OS_MARK_SCHEMA_TYPE(Zot_Impl4)
+
+
+6. You need to bootstrap the shared library and load the schema:
+
+XS BOOT:
+  extern _Application_schema_info ObjStore_Lib_Zot_dll_schema_info;
+  osp_thr::register_schema("MyZotApp::Zot",
+	&ObjStore_Lib_Zot_dll_schema_info);
+
+Zot.pm:
+__PACKAGE__->bootstrap($VERSION);
+$ObjStore::SCHEMA{'MyZotApp::Zot'}->
+    load($ObjStore::Config::SCHEMA_DBDIR."/Lib-Zot-01.adb");
+
+
+7. Make sure the perl side knows the inheritance tree:
+
+package MyZotApp::Zot;
+use base 'ObjStore::HV';
+
+
+8. Test!!
+
+
+9. Undocumented features:
+
+- Keys beginning with '_' are not accessable from perl.
+
+- OSPVptr FALLBACK is searched in the case that a key is not found.
+This allows fast, compact storage of commonly used fields with the
+flexibility of a generic schema.
+
+- // rename: new_field_name
+
+- alias: foo bar
+

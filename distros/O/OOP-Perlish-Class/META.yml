@@ -1,0 +1,18 @@
+--- #YAML:1.0
+name:                OOP-Perlish-Class
+version:             0.45.0
+abstract:            A Base class implementation providing the fundimental infrastructure for perl OOP
+license:             perl
+author:              
+    - Jamie Beverly <jbeverly@cpan.org>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Data::Dumper:                  1
+    Scalar::Util:                  1.2
+    Test::Class:                   0.3
+    Test::More:                    0
+    Tie::IxHash:                   1
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

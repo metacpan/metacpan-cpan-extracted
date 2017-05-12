@@ -1,0 +1,25 @@
+Router ID: 172.16.0.48
+Uptime: 21w6d11h
+RFC1583 compatibility flag is disabled
+SPF delay is 1 sec(s), hold time between two SPFs is 5 sec(s)
+Number of external LSA(s) 68
+Number of areas attached to this router: 3
+
+Area ID: 23.0.0.0
+  Number of interfaces in this area: 1
+  Number of fully adjacent neighbors in this area: 1
+  SPF algorithm executed 2103 time(s)
+  Number LSA(s) 60
+
+Area ID: 0.0.0.0
+  Number of interfaces in this area: 1
+  Number of fully adjacent neighbors in this area: 0
+  SPF algorithm executed 2138 time(s)
+  Number LSA(s) 31
+
+Area ID: 51.0.0.0
+  Number of interfaces in this area: 5
+  Number of fully adjacent neighbors in this area: 2
+  SPF algorithm executed 3085 time(s)
+  Number LSA(s) 33
+

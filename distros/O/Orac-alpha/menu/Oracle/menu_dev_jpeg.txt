@@ -1,0 +1,13 @@
+Menubutton^devel^
+command^0^1^oi_tables^$main::current_db->dev_tables^'TABLE'^
+command^0^1^indexs^$main::current_db->dev_tables^'INDEX'^
+command^0^1^oi_synonyms^$main::current_db->dev_tables^'SYNONYM'^
+command^0^1^hits^$main::current_db->dev_jpeg_tunen^'SYNONYM'^
+Menubutton^chart^
+cascade^data_obj^
+casc_command^0^1^objcnt^$main::current_db->dev_jpeg^'OBJCNT'^
+casc_command^0^1^invobjcnt^$main::current_db->dev_jpeg^'INVOBJCNT'^
+casc_command^0^1^allobjcnt^$main::current_db->dev_jpeg^'ALLOBJCNT'^
+casc_command^0^1^invallobjcnt^$main::current_db->dev_jpeg^'INVALLOBJCNT'^
+separator^
+command^0^1^tabspace^$main::current_db->dev_jpeg^'TABSPACE'^

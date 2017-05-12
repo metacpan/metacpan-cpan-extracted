@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<SITE ID="Education_world">
+
+<NAME Lang="en-us">Education World</NAME>
+<INFO Lang="en-us">educational relevant information web search</INFO>
+
+<URL Type="More"><![CDATA[
+_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+post://db.education-world.com/search97cgi/s97r_cgi?queryText=_QUERY_&ResultTemplate=hits.hts&Collection=Education+World&Action=FilterSearch&Filter=search_filter.hts&QueryMode=Freetext&url=index.shtml
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_NEXT_"><![CDATA[
+<A HREF="_NEXT_">[Next
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+-->  <A HREF="_URL_">_TITLE_</A> -_PREVIEW_<br><br>
+]]></TEMPLATE>
+</SITE>

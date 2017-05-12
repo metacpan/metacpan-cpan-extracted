@@ -1,0 +1,25 @@
+---
+name: Object-Boolean
+version: 0.02
+author:
+  - 'Brian Duggan <bduggan@matatu.org>'
+abstract: Represent boolean values as objects
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Class::Data::Inheritable: 0
+  Sub::Exporter: 0
+build_requires:
+  Test::More: 0
+provides:
+  Object::Boolean:
+    file: lib/Object/Boolean.pm
+    version: 0.02
+  Object::Boolean::YesNo:
+    file: lib/Object/Boolean/YesNo.pm
+    version: 0.02
+generated_by: Module::Build version 0.2805
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

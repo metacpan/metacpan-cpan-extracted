@@ -1,0 +1,11 @@
+---
+name: Osgood::Server
+Model::OsgoodDB:
+    schema_class: Osgood::Server::Schema
+    connect_info:
+        - DBI:mysql:database=osgood;host=localhost
+        - root
+        -
+        -
+            quote_char: '`'
+            name_sep: .

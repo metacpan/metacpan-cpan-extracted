@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<SITE ID="Galaxy">
+
+<NAME Lang="en-us">Galaxy Search</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+Galaxy ¥þ²yWWW·j´M
+]]></NAME>
+<INFO Lang="en-us">general information web search</INFO>
+<INFO Lang="zh-tw">general information web search</INFO>
+
+<URL Type="More"><![CDATA[
+post://galaxy.einet.net/cgi-bin/wais-text-multi?nextpageresult=_NEXTPAGERESULT_&nextwebtitleresult=_NEXTWEBTITLE_&nextwebtextresult=_NEXTWEBTEXTRESULT_&nextweblinkresult=_NEXTWEBLINK_&nexttelnetresult=_NEXTELN_&nextgopherresult=_NEXTGOPHER_&next=Get%20more%20search%20results...&bool=anyterms&websearch=checked&area=webtext&pagesearch=&keywords=_QUERYSTR_
+]]></URL>
+<URL Type="Start"><![CDATA[
+post://galaxy.einet.net/cgi-bin/wais-text-multi?bool=anyterms&websearch=checked&area=webtext&pagesearch=&keywords=_QUERY_
+]]></URL>
+
+<SCORE>_SCORE_/10</SCORE>
+<EXPRESSION>Boolean</EXPRESSION>
+<CATEGORY>WWW,General</CATEGORY>
+
+<VAR Name="_NEXTGOPHER_"><![CDATA[
+NAME="nextgopherresult" VALUE="_NEXTGOPHER_">
+]]></VAR>
+<VAR Name="_NEXTWEBLINK_"><![CDATA[
+NAME="nextweblinkresult" VALUE="_NEXTWEBLINK_">
+]]></VAR>
+<VAR Name="_NEXTPAGERESULT_"><![CDATA[
+<INPUT TYPE="hidden" NAME="nextpageresult" VALUE="_NEXTPAGERESULT_">
+]]></VAR>
+<VAR Name="_NEXTELN_"><![CDATA[
+NAME="nexttelnetresult" VALUE="_NEXTELN_">
+]]></VAR>
+<VAR Name="_QUERYSTR_"><![CDATA[
+<INPUT NAME="keywords" SIZE=25 VALUE="_QUERYSTR_">
+]]></VAR>
+<VAR Name="_NEXTWEBTITLE_"><![CDATA[
+NAME="nextwebtitleresult" VALUE="_NEXTWEBTITLE_">
+]]></VAR>
+<VAR Name="_NEXTWEBTEXTRESULT_"><![CDATA[
+<INPUT TYPE="hidden" NAME="nextwebtextresult" VALUE="_NEXTWEBTEXTRESULT_">
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+. <A HREF="_URL_"><B>_TITLE_</B></A><I>-___Score:_SCORE_-_SIZE_</I>___<BR><P><B>Excerpt:_PREVIEW_...<P>___Entered:</B>_DATE_<B>
+]]></TEMPLATE>
+</SITE>

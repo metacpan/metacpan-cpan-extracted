@@ -1,0 +1,42 @@
+OpenGL-Array version 0.71
+============================
+
+This is a stand-alone distribution of OpenGL::Array
+(which includes OpenGL::Matrix).  All of these were
+implicitly loaded whenever the Perl OpenGL module was use-d.
+
+This module should be compatible with OpenGL::Array
+and OpenGL::Matrix from Perl OpenGL version 0.70 and can
+be used as a replacement for that functionality.
+
+The separate release is to enable backwards and forwards
+compatibility between the legacy OpenGL module functionality
+and the coming OpenGL::Modern module under development.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Devel::CheckOS      => 0
+  ExtUtils::MakeMaker => 6.52
+  Test::More          =>  0
+
+COPYRIGHT AND LICENCE
+
+  Copyright (c) 1998,1999 Kenneth Albanowski. All rights reserved.
+  Copyright (c) 2007 Bob Free. All rights reserved.
+  Copyright (c) 2009-2013 Chris Marshall. All rights reserved.
+  Copyright (C) 2017 Chris Marshall.  <chm@cpan.org>
+
+  This program is free software; you can redistribute it and/or
+  modify it under the same terms as Perl itself.

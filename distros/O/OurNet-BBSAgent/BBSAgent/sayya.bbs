@@ -1,0 +1,18 @@
+# $File: //depot/libOurNet/BBSAgent/BBSAgent/sayya.bbs $ $Author: autrijus $
+# $Revision: #1 $ $Change: 3672 $ $DateTime: 2003/01/20 01:50:52 $
+# Contributed by Smartboy <kcwu@ck.tp.edu.tw>
+# zh_TW.Big5: SayYA Linux 資訊站
+
+SayYA Linux BBS
+bbs.sayya.org
+
+load maple3.board
+setv separator \x0d(?:\e\[36m(?:─)+)|(?:\e\[47;34m\x20路徑.+)\x20+\e\[m\e\[\d+;1H
+
+=article_post_raw
+call board $[board]
+send \x10\n$[title]\n0\n$[body] # 在 $[title] 前加上 \n
+# clean header
+send \x13\x19\x19\x19\x19
+send \x18s\n\x20
+exit

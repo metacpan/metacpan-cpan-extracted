@@ -1,0 +1,15 @@
+Revision history for Perl extension Ogg::Theora::LibTheora.
+
+0.04  thu sep 06 00:50:40 2011
+        - issues#1 (get_th_ycbcr_buffer_info)
+
+0.03  thu apr 07 14:59:40 2011
+        - cleaned up pod
+
+0.02  Wed Apr 06 18:51:55 2011
+        - removed =head1 NAME from .xs file 
+
+0.01  Tue Mar 15 16:51:28 2011
+	- original version; created by h2xs 1.23 with options
+		-A -n Ogg::Theora::LibTheora -b 5.8.0
+

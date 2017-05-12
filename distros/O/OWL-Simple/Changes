@@ -1,0 +1,66 @@
+Version 0.51 1/12/2011
+Added optional definition_tag
+
+Version 0.50 1/06/2011
+OBOWriter now outputs Term stanzas before Typedefs and 
+discards owl#Thing parent
+
+Version 0.49 1/06/2011
+Inadvertently released OWL::Simple::Parser as 0.10 instead of 1.00.
+Corrected in this release. 
+
+Version 0.48 30/05/2011
+Fixes to the Makefile.PL
+
+Version 0.47 30/05/2011
+Making OWL::Simple::Parser namespace agnostic and fixes
+in the documentation
+
+Version 0.46 22/02/2011
+Changes to parse and convert owl:versionInfo
+
+Version 0.45 22/02/2011
+Fixes to the OWL parser breaking up on &gt; signs
+
+Version 0.44 21/02/2011
+Fixed incorrect date output
+Log and skip empty labels
+OBO::Writer 0.04 - replaces underscores with colons in ids and xrefs
+Fixes to similarity_match.pl script (single column flat files)
+Changed the distance function from Levenshtein to n-grams
+
+Version 0.43 29/11/2010
+Alignment of the OBO writer to the output accepted by OLS
+A better method to normalise string values in similarity_match.pl
+Preserving of the columns in flat file format
+
+Version 0.42 20/10/2010
+Some fixes for the Protege 4.1 OWL format
+
+Version 0.41 3/8/2010
+Parser returns a hashref collection for easier lookup by id
+Added a simple converter to OBO format
+Fixed tests and improved docs
+
+Version 0.40 1/8/2010
+First public release
+
+COPYRIGHT & LICENSE
+===================
+
+Copyright (c) 2010 - 2011 European Molecular Biology Laboratory
+
+Contact: tomasz@cpan.org
+ 
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU Lesser General Public License as published by the Free
+Software Foundation; either version 3 of the License, or (at your option) any
+later version.
+ 
+This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+details.
+
+You should have received a copy of the GNU Lesser General Public License along
+with this program. If not, see <http://www.gnu.org/licenses/>.

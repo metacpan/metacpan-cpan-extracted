@@ -1,0 +1,24 @@
+Change List for 1.01 - Bob "grafman" Free <bfree@graphcomp.com>
+____________________________________________________________
+
+Updated Changes
+
+Updated MANIFEST
+
+Updated README
+
+Updated Shader.pm
+
+Updated Shader/Common.pm
+
+Updated Shader/Objects.pm
+
+Updated Shader/ARB.pm
+
+Updated Shader/CG.pm
+
+Updated Shader/GLSL.pm
+
+Updated t/OpenGL-Shader.t
+
+Added shader-test.pl

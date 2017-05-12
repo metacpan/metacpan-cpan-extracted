@@ -1,0 +1,22 @@
+=============================
+ OpenFrame-WebApp Change Log
+=============================
+
+v0.04
+    +	bugfixes
+
+v0.03
+    +	wrote User::Session & User::SessionLoader
+    +	factories now try to load classes before trying to create new objects
+    +	hard-coded classes for templates, sessions, and users to take advantage
+	of the above
+    +	created t/lib
+    +	Fixed pod bug for Template::*
+    +	static content decliner
+
+v0.02
+    +	created this file
+    +	now using Pipeline-3.04
+
++--
+ Steve Purkis <spurkis@epn.nu>

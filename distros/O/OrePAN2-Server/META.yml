@@ -1,0 +1,48 @@
+---
+abstract: 'DarkPAN Server'
+author:
+  - 'Hiroyuki Akabane <hirobanex@gmail.com>'
+build_requires:
+  File::Which: 0
+  File::pushd: 0
+  HTTP::Request::Common: 0
+  Test::More: 0.98
+  Test::Output: 1.02
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.8.1, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: OrePAN2-Server
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  OrePAN2::Server:
+    file: lib/OrePAN2/Server.pm
+    version: 0.04
+  OrePAN2::Server::CLI:
+    file: lib/OrePAN2/Server/CLI.pm
+requires:
+  OrePAN2: 0.16
+  Plack: 0
+  perl: 5.008001
+resources:
+  bugtracker: https://github.com/hirobanex/p5-OrePAN2-Server/issues
+  homepage: https://github.com/hirobanex/p5-OrePAN2-Server
+  repository: git://github.com/hirobanex/p5-OrePAN2-Server.git
+version: 0.04
+x_contributors:
+  - 'Songmu <y.songmu@gmail.com>'

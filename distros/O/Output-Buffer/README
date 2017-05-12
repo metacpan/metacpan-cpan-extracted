@@ -1,0 +1,29 @@
+Output/Buffer version 0.01
+==========================
+
+This module assists in the capture and buffer of data outputted from a program.
+For more information please see http://www.theperlreview.com Volume 0 Issue 5
+"Filehandle Ties".
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Tie::FileHandle::Buffer (version 0.1 or greater)
+
+COPYRIGHT AND LICENCE
+
+Written by Robby Walker ( robwalker@cpan.org ) for Point Writer ( http://www.pointwriter.com/ ).
+
+You may redistribute/modify/etc. this module under the same terms as Perl itself.
+
+

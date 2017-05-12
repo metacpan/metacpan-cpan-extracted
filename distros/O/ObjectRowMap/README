@@ -1,0 +1,37 @@
+ObjectRowMap version 0.01
+=========================
+
+DESCRIPTION
+
+ObjectRowMap - Simple perl object to DBI persistence engine
+
+ObjectRowMap is a Perl module which works with the DBI module to provide
+a simple means to store a customized style of perl objects to anything with
+a DBI module and generally SQL 92 (or later) syntax
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test #optional, there are preparation requirements
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  DBI
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+
+Copyright (C) 2002 Craig Welch
+
+You may distribute under the terms of either the GNU General Public
+License or the Artistic License, as specified in the Perl README file.
+
+

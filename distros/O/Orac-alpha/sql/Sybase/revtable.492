@@ -1,0 +1,120 @@
+/* Procedure copyright(c) 1995 by Edward M Barlow */
+
+/******************************************************************************
+**
+** Name        : sp__revtable
+**
+** Created By  : Ed Barlow
+**
+******************************************************************************/
+
+:r database
+go
+:r dumpdb
+go
+
+IF EXISTS (SELECT * FROM sysobjects
+           WHERE  name = "sp__revtable"
+           AND    type = "P")
+   DROP PROC sp__revtable
+go
+
+create proc sp__revtable(@objname char(30)=NULL)
+as 
+begin
+
+declare @objid int
+declare @cnt int, @status tinyint, @type tinyint, @buffer varchar(70)
+declare @fldname char(30),@maxcnt int,@prec int, @scale int, @maxnamelen int
+
+set nocount on
+
+if @objname is null
+begin
+	select convert(varchar(70), "Usage: sp__revtable @objname")
+	return -1
+end
+
+select  @objid=object_id(@objname)
+if @objid is null
+begin
+	select convert(varchar(70), "Object "+@objname+" Not Found")
+	return -1
+end
+
+create table #tmp ( row_id int, tbl_txt varchar(70) )
+insert #tmp values (-1,"CREATE TABLE "+@objname)
+insert #tmp values ( 0,"(")
+select @cnt=1
+select @maxcnt=count(*) from syscolumns c where c.id = @objid
+
+select @maxnamelen = max(char_length(name))+2
+from   syscolumns
+where  id = @objid
+
+while 1=1
+begin 
+
+	/* We are trying to allign the fields */
+	select 
+		/* output is c.name for n characters */
+		@buffer=' ' + substring(c.name+space(30),1,@maxnamelen) 
+				+ t.name +
+	 		   + substring('(' + convert(varchar(3),c.length) + ')',
+			1, 6 * (charindex(t.name, 'varchar/varbinary'))),
+	   @scale  = 0,
+		@prec	  = 0,
+		@fldname= t.name,
+		@status = c.status,
+		@type = c.type 
+	from syscolumns c, systypes t 
+		where c.id = @objid
+		and c.usertype *= t.usertype
+		and colid=@cnt
+
+	if @@rowcount = 0 break
+
+	if @fldname = "numeric"
+	begin
+		select @buffer=rtrim(@buffer) + '(' + convert(varchar(3),@prec) 
+		if @scale > 0
+			select @buffer=rtrim(@buffer) +',' + convert(varchar(3),@scale) 
+		select @buffer=rtrim(@buffer) + ')'
+	end
+
+	if @fldname = "decimal"
+	begin
+		select @buffer=rtrim(@buffer) + '(' + convert(varchar(3),@prec) + ')'
+	end
+
+	if (@fldname != "bit" and @status & 0x80 != 0)
+		select @buffer = rtrim(@buffer) + '  identity' 
+
+	if (@fldname != "bit" and @status & 8 != 0)
+		select @buffer = substring(@buffer+space(24),1,@maxnamelen+24) + 'NULL' 
+	else 
+		select @buffer = substring(@buffer+space(24),1,@maxnamelen+24) + 'NOT NULL' 
+
+	if @cnt < @maxcnt 
+		select @buffer = rtrim(@buffer) + ',' 
+
+	insert #tmp values (@cnt,@buffer)
+
+	select @cnt=@cnt+1
+end
+
+insert #tmp values (@cnt,')')
+
+select rtrim(tbl_txt) from #tmp order by row_id
+
+drop table #tmp
+
+
+return(0)
+
+end
+
+go
+
+grant execute on sp__revtable to public
+go

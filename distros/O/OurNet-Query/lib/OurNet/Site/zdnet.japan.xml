@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<SITE ID="ZDNet.Japan">
+
+<NAME Lang="en-us">ZDNet News Search</NAME>
+<INFO Lang="en-us">daily news search in Japan</INFO>
+
+<URL Type="More"><![CDATA[
+_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://search.zdnet.co.jp/search97cgi/s97_cgi?QueryText=_QUERY_&collection=all&SortSpec=Date+desc&ResultTemplate=zdnormal.hts
+]]></URL>
+
+<CHARSET>ja-jp.jis</CHARSET>
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_NEXT_"><![CDATA[
+<A HREF="_NEXT_">&nbsp;&nbsp;[ŽŸ‚Ìƒy[ƒW]
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<B><A HREF="_URL_">_TITLE_</A>___DATE_)</FONT>__<FONT SIZE="2">_PREVIEW_</FONT>_
+]]></TEMPLATE>
+</SITE>

@@ -1,0 +1,103 @@
+---
+abstract: 'Parse General Transit Feeds (GTFS)'
+author:
+  - 'Erik Carlsson <info@code301.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0.96'
+  Test::RequiresInternet: '0.02'
+  Try::Tiny: '0.24'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, Dist::Iller version 0.1408, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Opendata-GTFS-Feed
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  Opendata::GTFS::Feed:
+    file: lib/Opendata/GTFS/Feed.pm
+    version: '0.0202'
+  Opendata::GTFS::Feed::Elk:
+    file: lib/Opendata/GTFS/Feed/Elk.pm
+    version: '0.0202'
+  Opendata::GTFS::Type::Agency:
+    file: lib/Opendata/GTFS/Type/Agency.pm
+    version: '0.0202'
+  Opendata::GTFS::Type::Calendar:
+    file: lib/Opendata/GTFS/Type/Calendar.pm
+    version: '0.0202'
+  Opendata::GTFS::Type::CalendarDate:
+    file: lib/Opendata/GTFS/Type/CalendarDate.pm
+    version: '0.0202'
+  Opendata::GTFS::Type::FareAttribute:
+    file: lib/Opendata/GTFS/Type/FareAttribute.pm
+    version: '0.0202'
+  Opendata::GTFS::Type::FareRule:
+    file: lib/Opendata/GTFS/Type/FareRule.pm
+    version: '0.0202'
+  Opendata::GTFS::Type::Frequency:
+    file: lib/Opendata/GTFS/Type/Frequency.pm
+    version: '0.0202'
+  Opendata::GTFS::Type::Route:
+    file: lib/Opendata/GTFS/Type/Route.pm
+    version: '0.0202'
+  Opendata::GTFS::Type::Shape:
+    file: lib/Opendata/GTFS/Type/Shape.pm
+    version: '0.0202'
+  Opendata::GTFS::Type::Stop:
+    file: lib/Opendata/GTFS/Type/Stop.pm
+    version: '0.0202'
+  Opendata::GTFS::Type::StopTime:
+    file: lib/Opendata/GTFS/Type/StopTime.pm
+    version: '0.0202'
+  Opendata::GTFS::Type::Transfer:
+    file: lib/Opendata/GTFS/Type/Transfer.pm
+    version: '0.0202'
+  Opendata::GTFS::Type::Trip:
+    file: lib/Opendata/GTFS/Type/Trip.pm
+    version: '0.0202'
+  Types::Opendata::GTFS:
+    file: lib/Types/Opendata/GTFS.pm
+    version: '0.0202'
+recommends:
+  Text::CSV_XS: '0'
+requires:
+  Archive::Extract: '0'
+  Archive::Zip: '0'
+  File::BOM: '0'
+  File::Temp: '0'
+  Lingua::EN::Inflect: '0'
+  List::Util: '1.42'
+  List::UtilsBy: '0.04'
+  Moose: '2.1405'
+  Moose::Role: '0'
+  MooseX::AttributeDocumented: '0.1003'
+  MooseX::AttributeShortcuts: '0.028'
+  Path::Tiny: '0.072'
+  Text::CSV: '0'
+  Type::Tiny: '1.000005'
+  Types::Path::Tiny: '0.005'
+  Types::Standard: '1.000005'
+  Types::URI: '0'
+  namespace::autoclean: '0.22'
+  perl: '5.010000'
+resources:
+  bugtracker: https://github.com/Csson/p5-Opendata-GTFS-Feed/issues
+  homepage: https://metacpan.org/release/Opendata-GTFS-Feed
+  repository: https://github.com/Csson/p5-Opendata-GTFS-Feed.git
+version: '0.0202'
+x_authority: cpan:CSSON

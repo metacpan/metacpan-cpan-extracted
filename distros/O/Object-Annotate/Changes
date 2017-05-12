@@ -1,0 +1,22 @@
+Changelog for Object-Annotate
+
+0.025     2015-12-03 21:51:00-05:00 America/New_York
+          mark deprecated in the deprecated
+
+0.024     2013-07-24 10:36:49 America/Los_Angeles
+          add missing prereq on Class::DBI
+
+0.023     2013-07-14 21:31:57 America/New_York
+          require DBD::SQLite for testing
+
+0.022     2013-07-07 08:33:48 America/New_York
+          repackage, mark dead
+
+0.021     2010-09-19
+          fix missing test prereq
+
+          you should use Mixin::Historian instead.  when it's released.
+
+0.020     2006-05-18
+          restructure parameter-passing
+          still not a stable interface!

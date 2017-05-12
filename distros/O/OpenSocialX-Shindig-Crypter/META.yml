@@ -1,0 +1,19 @@
+---
+abstract: 'OpenSocial Shindig Crypter'
+author:
+  - 'Fayland Lam <fayland@gmail.com>'
+generated_by: 'Dist::Zilla::Plugin::MetaYAML version 1.092450'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: OpenSocialX-Shindig-Crypter
+requires:
+  Crypt::CBC: 2.30
+  Crypt::Rijndael: 1.07
+  Digest::SHA: 5.47
+  MIME::Base64: 0
+  URI::Escape: 0
+resources:
+  repository: http://github.com/fayland/opensocialx-shindig-crypter/tree
+version: 0.03

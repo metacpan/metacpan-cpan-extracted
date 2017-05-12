@@ -1,0 +1,34 @@
+OpenGL::Simple::Viewer version 0.01
+====================================
+
+This module uses OpenGL::Simple and OpenGL::Simple::GLUT to provide a
+quick and simple geometry viewer. If you just want to view a single
+biomolecule, or throw some polygons at the screen and make sure they
+come out looking OK, then this module might be for you. If you want to
+write a first-person-shooter or comprehensive visualization toolkit,
+this module is probably not for you.
+
+You should not have to worry about quaternion algebra or any of the
+subtleties of how to represent 3D rotations unless you really want to;
+the module attempts to take care of all of this for you.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+OpenGL::Simple, OpenGL::Simple::GLUT, Math::Quaternion.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 Jonathan Chin
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

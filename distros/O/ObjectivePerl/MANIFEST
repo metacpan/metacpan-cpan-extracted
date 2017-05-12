@@ -1,0 +1,13 @@
+Changes
+Makefile.PL
+MANIFEST
+DISCLAIMER
+CHANGELOG
+ObjectivePerl.pm
+ObjectivePerl/InstanceVariable.pm
+ObjectivePerl/Object.pm
+ObjectivePerl/Parser.pm
+ObjectivePerl/Runtime.pm
+README
+t/1.t
+META.yml                                Module meta-data (added by MakeMaker)

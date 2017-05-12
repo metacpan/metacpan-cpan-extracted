@@ -1,0 +1,105 @@
+
+=head1 Developing OAuthomatic
+
+=head2 Grabbing the source
+
+This code is maintained in Mercurial repository at 
+L<bitbucket.org/Mekk/perl-oauthomatic|https://bitbucket.org/Mekk/perl-oauthomatic>:
+
+    hg clone https://bitbucket.org/Mekk/perl-oauthomatic
+
+or
+
+    hg clone ssh://hg@bitbucket.org/Mekk/perl-oauthomatic
+
+If you can't speak Mercurial,
+L<Download repository|https://bitbucket.org/Mekk/perl-oauthomatic/downloads>.
+
+Released versions can be downloaded from CPAN:
+
+    cpanm --look OAuthomatic
+
+but note, that they are mashed-up by L<Pod::Weaver>, so it is not recommended 
+to edit those versions and patches made against them are not very welcome.
+
+=head2 Building and testing
+
+This module uses L<Dist::Zilla> for build and release. 
+
+Install dependencies:
+
+   dzil listdeps --all --missing   |  cpanm --sudo
+
+Build distro:
+
+    dzil build
+
+(or C<dzil build --verbose> to get better info what is built).
+
+Review documentation shape:
+
+    firefox README.html
+    firefox OAuthomatic-X.Y/docs/
+
+Test:
+
+    prove -l           # without build
+    dzil test          # with build
+    dzil test --all    # with build, also release and author tests
+
+Separate perl::critic:
+
+    perlcritic --profile perlcritic.rc lib
+    # Elaborate
+    perlcritic --profile perlcritic.rc --verbose 10 lib
+
+=head2 Local install
+
+To install locally:
+
+    dzil install
+
+=head2 Contributing
+
+Preferable form: BitBucket pull requst (fork repository on BitBucket,
+implement changes, issue pull request). 
+
+I will also accept patches - Mercurial bundle, git-diff or plain diff
+(in this order of preference). In case of diffs, please specify the
+version diff is made against. Patches may be attached to either
+BitBucket (preferably), or CPAN issue tracker.
+
+For bigger changes, please open issue and describe your idea before
+working on the code.
+
+=head2 Making CPAN release (author only)
+
+=over 4
+
+=item * 
+
+edit version number in C<dist.ini> (tag will be placed automatically)
+
+=item *
+
+edit C<Changes> file
+
+=item *
+
+C<dzil build> and C<hg commit> to commit edits above and regenerated
+C<README.mkdn> and C<README-development.txt>.
+
+=item *
+
+build, test, and publish to CPAN:
+
+    dzil release
+
+=item *
+
+push source changes:
+
+    hg push bitbucket
+
+=back 
+

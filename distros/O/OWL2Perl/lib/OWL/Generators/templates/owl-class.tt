@@ -1,0 +1,355 @@
+[%# A template for an owl class property.
+    ===========================
+    Expected/recognized parameters:
+    obj ... a OWL::Data::Def::OWLClass object
+      
+-%]
+#-----------------------------------------------------------------
+# [% obj.module_name %]
+# Generated: [% USE Date (format = '%d-%b-%Y %H:%M:%S %Z') %][% Date.format %]
+# Contact: Edward Kawas <edward.kawas+owl2perl@gmail.com>
+#-----------------------------------------------------------------
+package [% obj.module_name %];
+
+[% FOREACH child IN obj.module_parent -%]
+use [% child %];
+[% END %]
+
+no strict;
+use vars qw( @ISA );
+@ISA = qw(
+ [% obj.module_parent.join("\n ") %] 
+);
+use strict;
+
+# imports 
+use OWL::Data::String;
+use OWL::Data::Integer;
+use OWL::Data::Float;
+use OWL::Data::Boolean;
+use OWL::Data::DateTime;
+
+use OWL::RDF::Predicates::DC_PROTEGE;
+use OWL::RDF::Predicates::OMG_LSID;
+use OWL::RDF::Predicates::OWL;
+use OWL::RDF::Predicates::RDF;
+use OWL::RDF::Predicates::RDFS;
+
+[% FOREACH child IN obj.object_properties %]
+use [% child.module_name %];[% END %]
+[% FOREACH child IN obj.datatype_properties %]
+use [% child.module_name %];[% END %]
+[% FOREACH child IN obj.has_value_property %]
+use [% child.module %];[% END %]
+
+{
+    my %_allowed = (
+[% FOREACH child IN obj.object_properties %]
+        [% child.name %] => {
+        	type => 'OWL::Data::OWL::Class',
+        	# range checking of classes added 
+        	post => sub {
+        		my ($self) = shift;
+        		return unless $self->strict;
+[%- IF obj.cardinality_constraints and obj.cardinality_constraints.item(child.name) and obj.cardinality_constraints.item(child.name).max %]
+                # check cardinality constraints
+                my $size = scalar(@{$self->[% child.name %]});
+                if ($size > [%- obj.cardinality_constraints.item(child.name).max %] ) {
+                	# correct the size of the array (remove from the end) and throw an error
+                	splice(@{$self->[% child.name %]}, [%- obj.cardinality_constraints.item(child.name).max %] );
+                    $self->throw($self->_bad_cardinality_msg([%- obj.cardinality_constraints.item(child.name).max %], '[%- child.name -%]'));
+                }
+[%- END %]
+                my $type = @{$self->[% child.name %]}[-1] if defined $self->[% child.name %];
+                return unless defined $type and $type->type;
+                my $range = new [% child.module_name %]->range();
+                return unless $range;
+                $range = $self->uri2package($range);
+                eval {
+                	$range = $range->new();
+                };
+                return if $@;
+        		$self->throw("\n" . $type->type() . "\nis not related to\n" . $range->type()) unless $type->isa(ref($range));
+        	},
+        	is_array => 1, },
+[% END %]
+[% FOREACH child IN obj.datatype_properties %]
+        [% child.name %] => {
+            type => '[% child.module_name %]',
+[%- IF obj.cardinality_constraints and obj.cardinality_constraints.item(child.name) and obj.cardinality_constraints.item(child.name).max %]
+            post => sub {
+                my ($self) = shift;
+                return unless $self->strict;
+                # check cardinality constraints
+                my $size = scalar(@{$self->[% child.name %]});
+                if ($size > [%- obj.cardinality_constraints.item(child.name).max %] ) {
+                	# correct the size of the array (remove from the end) and throw an error
+                    splice(@{$self->[% child.name %]}, [%- obj.cardinality_constraints.item(child.name).max %] );
+                    $self->throw($self->_bad_cardinality_msg([%- obj.cardinality_constraints.item(child.name).max %], '[%- child.name -%]'));
+                }
+            },
+[%- END %]
+            is_array => 1, },
+[% END %]
+    );
+
+    sub _accessible {
+        my ( $self, $attr ) = @_;
+        exists $_allowed{$attr} 
+[% FOREACH child IN obj.module_parent -%]
+          or $self->[%- child -%]::_accessible($attr)
+[% END -%]
+    }
+
+    sub _attr_prop {
+        my ( $self, $attr_name, $prop_name ) = @_;
+        my $attr = $_allowed{$attr_name};
+        return ref($attr) ? $attr->{$prop_name} : $attr if $attr;
+[% FOREACH child IN obj.module_parent -%]
+        return $self->[%- child -%]::_attr_prop( $attr_name, $prop_name ) 
+            if $self->[%- child -%]::_accessible($attr_name);
+[% END %]
+    }
+}
+
+#-----------------------------------------------------------------
+# init
+#-----------------------------------------------------------------
+sub init {
+    my ($self) = shift;
+[% FOREACH child IN obj.module_parent -%]
+    $self->[%- child -%]::init();
+[% END -%]
+    $self->type('[% obj.type %]');
+[% FOREACH child IN obj.has_value_property -%]
+    $self->add_[%- child.name -%]([%- child.module -%]->new('[%- child.object -%]'));
+[% END -%]
+
+}
+
+sub __properties {
+	my $self = shift;
+	my %props_hash;
+[%- IF obj.datatype_properties -%]
+    my @dps; 
+  # add datatype properties 
+[%- FOREACH child IN obj.datatype_properties %]
+  push @dps, '[% child.name %]';
+[%- END %]
+    $props_hash{datatypes} = \@dps;
+[%- END -%]
+[% IF obj.object_properties -%]
+  # add object properties 
+  my @ops; #array of hash names, modules
+[%- FOREACH child IN obj.object_properties %]
+[%- SET childname = child.name %]
+[%- IF obj.values_from_property.$childname %]
+[%- FOREACH key IN obj.values_from_property.$childname.sort %]
+  push @ops, {
+        prop => '[% child.name %]',
+        mod => '[% key %]',
+  };
+[%- END %]
+[%- ELSE %]
+  # OWL::Data::OWL::Class used as an example
+  push @ops, {
+        prop => '[% child.name %]',
+        mod => 'OWL::Data::OWL::Class',
+  };
+[% END %]
+[%- END %]
+    $props_hash{objects} = \@ops;
+[%- END %]
+	return \%props_hash;
+}
+
+# returns an RDF::Core::Enumerator object or undef;
+sub _get_statements {
+	# use_type is undef initially and 1 for super() calls
+	my ($self) = @_;
+
+    # create a named resource or bnode for this object ....
+    my $subject = new RDF::Core::Resource( $self->value ) if defined $self->value and $self->value ne '';
+    $subject = 
+        new RDF::Core::Resource( "_:a" . sprintf( "%08x%04x", time(), int(rand(0xFFFF))) )
+      unless defined $self->value and $self->value ne '';
+    # set the subject so that this sub graph can be linked to other graphs
+    $self->subject($subject);
+    
+    my $add_type_statement = defined $self->value and $self->value ne '' ? 1 : undef;
+
+    # in case we have a bnode
+    $self->value($subject->getURI) unless defined $self->value and $self->value ne '';
+
+    # add parent statements too
+[% FOREACH child IN obj.module_parent -%]
+    eval {
+    	# add parent statements
+        $self->[%- child -%]::_get_statements();
+    };
+[% END -%]
+
+[% FOREACH child IN obj.object_properties -%]
+    # for each attribute, if is array do:
+    if (defined $self->[%- child.name -%]){
+	    foreach (@{$self->[%- child.name -%]}) {
+	        # add all statements from $_
+	        my $enumerator = $_->_get_statements if defined $_->_get_statements;
+	        next unless defined $enumerator;
+            my $statement = $enumerator->getFirst;
+            while (defined $statement) {
+              $self->model->addStmt($statement);
+              $statement = $enumerator->getNext
+            }
+            $enumerator->close;
+	        # add a statement linking the graphs
+	        $self->model->addStmt(
+	          new RDF::Core::Statement(
+	              $subject,
+	              $subject->new('[%- child.uri -%]'), 
+	              (defined $_->subject ? $_->subject : RDF::Core::Resource->new($_->value))
+	          )
+	        );
+	        $add_type_statement = 1;
+	    }
+    }
+[% END -%]
+[% FOREACH child IN obj.datatype_properties -%]
+    if (defined $self->[%- child.name -%]){
+	    foreach (@{$self->[%- child.name -%]}) {
+	        $self->model->addStmt(
+	          new RDF::Core::Statement(
+	              $subject,
+	              $subject->new('[%- child.uri -%]'), 
+	              new RDF::Core::Literal( 
+	                $_->value, undef, (defined $_->range ? $_->range : undef) 
+	              ),
+	          )
+	        );
+	        $add_type_statement = 1;
+	    }
+    }
+[% END -%]
+
+    # add a label if one is specified
+    if (defined $self->label()) {
+        $self->model->addStmt(
+           new RDF::Core::Statement(
+            $subject,
+            $subject->new( OWL::RDF::Predicates::RDFS->label ),
+            new RDF::Core::Literal( $self->label )
+           )
+        );
+    }
+    
+    # add the type
+    $self->model->addStmt(
+        new RDF::Core::Statement(
+            $subject,
+            $subject->new( OWL::RDF::Predicates::RDF->type ),
+            new RDF::Core::Resource( $self->type )
+        )
+    ) if $add_type_statement;
+    return $self->model()->getStmts();
+}
+
+1;
+
+__END__
+
+=head1 NAME
+
+[% obj.module_name %] - an automatically generated owl class!
+
+=cut
+
+=head1 SYNOPSIS
+
+  use [% obj.module_name %];
+  my $class = [% obj.module_name %]->new();
+
+  # get the uri for this class
+  my $uri = $class->uri;
+
+[%- IF obj.datatype_properties -%]
+  # add datatype properties 
+[%- FOREACH child IN obj.datatype_properties %]
+  use [% child.module_name %];
+  my $[% child.name %] = new [% child.module_name %]('some value');
+  $class->add_[% child.name %]($[% child.name %]);
+  # get the [% child.name %] datatype properties
+  my $[% child.name %]_property = $class->[% child.name %];
+[%- END -%][%- END -%]
+[% IF obj.object_properties -%]
+  # add object properties 
+[%- FOREACH child IN obj.object_properties %]
+[%- SET childname = child.name %]
+[%- IF obj.values_from_property.$childname %]
+[%- FOREACH key IN obj.values_from_property.$childname.sort %]
+  use [% key %];
+  # add a [% child.name %] property ([% key %])
+  $class->add_[% child.name %](new [% key %]());
+[%- END %]
+[%- ELSE %]
+  # Make sure to use the appropriate OWL class! 
+  # OWL::Data::OWL::Class used as an example
+  $class->add_[% child.name %](new OWL::Data::OWL::Class('#someURI'));
+[% END %]
+  # get the [% child.name %] object properties
+  my $[% child.name %]_objects = $class->[% child.name %];
+[%- END -%][%- END -%]
+
+
+=cut
+
+=head1 DESCRIPTION
+
+I<Inherits from>:
+[% FOREACH child IN obj.module_parent -%]
+L<[% child %]>
+[% END %]
+
+[%- IF obj.cardinality_constraints and obj.cardinality_constraints.keys.size > 0 -%]
+=head2 Cardinality constraints:
+
+[%- FOREACH key IN obj.cardinality_constraints.keys.sort -%]
+
+=head3 [% obj.cardinality_constraints.$key.name %]
+
+=over
+
+[%- IF obj.cardinality_constraints.$key.min.defined %]
+=item * Minimum = [%- obj.cardinality_constraints.$key.min -%]
+[%- END -%]
+
+[% IF obj.cardinality_constraints.$key.max.defined %]
+=item * Maximum = [%- obj.cardinality_constraints.$key.max -%]
+[%- END -%]
+
+
+=back
+
+=cut
+[% END %]
+=cut
+[%- END -%]
+
+
+[%- IF obj.has_value_property and obj.has_value_property.size > 0 %]
+=head2 Constraints on hasValue 
+
+This class has the following values
+
+=over
+[% FOREACH child IN obj.has_value_property %]
+=item '[%- child.name -%]' has value '[%- child.object -%]', for example, ([%- child.module -%]->new('[%- child.object -%]'));
+
+[%- END %]
+
+=back
+
+=cut
+[% END %]
+
+=cut
+

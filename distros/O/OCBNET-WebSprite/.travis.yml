@@ -1,0 +1,41 @@
+language: perl
+perl:
+   - "5.12"
+
+before_install:
+   # also initialize submodules recursive
+   - git clone --depth=50 --branch=master https://github.com/mgreter/OCBNET-CSS3.git mgreter/OCBNET-CSS3
+   - cd mgreter/OCBNET-CSS3
+   # git checkout -qf c6f403a62610a09c832d24b39b93868776d5ae1f
+   - perl Build.PL
+   - ./Build
+   - sudo ./Build install
+   - cd ../..
+   - git submodule update --init --recursive
+   - cpanm -n Devel::Cover::Report::Coveralls
+   - wget http://sourceforge.net/projects/graphicsmagick/files/graphicsmagick/1.3.19/GraphicsMagick-1.3.19.tar.xz/download --output-document GraphicsMagick-1.3.19.tar.xz
+   - tar xvf GraphicsMagick-1.3.19.tar.xz
+   - cd GraphicsMagick-1.3.19
+   - ./configure --with-perl --prefix=/usr --with-modules --disable-static --enable-shared --with-quantum-depth=16
+   - make
+   - sudo make install
+   - cd PerlMagick
+   - perl Makefile.PL
+   - make
+   - sudo make install
+   - cd ..
+   - cd ..
+
+install:
+   # Deal with all of the dependencies, quickly and quietly
+   - cpanm --quiet --notest --skip-satisfied File::Slurp
+before_script:
+   # also initialize submodules recursive
+   # - git submodule update --init --recursive
+script:
+   - perl Build.PL
+   - ./Build verbose=1
+   - ./Build test verbose=1
+   - sudo ./Build install verbose=1
+after_success:
+   - cover -test -report coveralls

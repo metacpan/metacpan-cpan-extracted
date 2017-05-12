@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<SITE ID="Awesome">
+
+<NAME Lang="en-us">The Awesome Library</NAME>
+<INFO Lang="en-us">online library</INFO>
+
+<URL Type="Start"><![CDATA[
+post://www.awesomelibrary.org/cgi-bin/search-aw1.cgi?terms=_QUERY_
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+
+<TEMPLATE><![CDATA[
+<li> <a href="_URL_">_TITLE_</a>___<UL>_PREVIEW_</UL>
+]]></TEMPLATE>
+</SITE>

@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<SITE ID="Disney">
+
+<NAME Lang="en-us">Disney</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+狄斯奈相關資訊搜尋(英文)
+]]></NAME>
+<INFO Lang="en-us">Disney relevant products information search</INFO>
+<INFO Lang="zh-tw">Disney relevant products information search</INFO>
+
+<URL Type="More"><![CDATA[
+http://home.disney.com_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://home.disney.com/WebObjects/Search?kc=All&p=_QUERY_&n=_HITS_
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_NEXT_"><![CDATA[
+ [<A href="_NEXT_">
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<dt>___<A href="_URL_">_TITLE_</A>___<dd>_PREVIEW_<i> (_SIZE_bytes)</i>___</dd>
+]]></TEMPLATE>
+</SITE>

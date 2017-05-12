@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<SITE ID="Medhunt">
+
+<NAME Lang="en-us">Health On the Net</NAME>
+<INFO Lang="en-us">health relevant web search</INFO>
+
+<URL Type="Start"><![CDATA[
+post://www.hon.ch/cgi-bin/find?1+search?preferences=1&SEARCH=_QUERY_&Word=Free&AFF=20&country=Geographic/Domain:+All
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+
+<TEMPLATE><![CDATA[
+<TABLE BORDER=0___<A HREF="_URL_">_TITLE_</A>___<FONT COLOR="#FF0000">_PREVIEW_</FONT></TD>___:_DATE_</I></font>
+]]></TEMPLATE>
+</SITE>

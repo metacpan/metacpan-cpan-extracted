@@ -1,0 +1,27 @@
+SYNOPSIS
+
+     use Org::To::HTML::WordPress qw(org_to_html_wordpress);
+    
+     # use like you would use Org::To::HTML's org_to_html()
+
+DESCRIPTION
+
+    This is a subclass of Org::To::HTML that produces WordPress-variant of
+    HTML. Currently the differences are:
+
+      * SRC Block
+
+      Instead of:
+
+       <PRE CLASS="block block_src"> ... </PRE>
+
+      will instead use:
+
+       [sourcecode language="..."]
+       ...
+       [/sourcecode]
+
+SEE ALSO
+
+    Org::To::HTML
+

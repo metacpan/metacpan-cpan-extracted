@@ -1,0 +1,347 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <title>Caching in OpenInteract</title>
+  </head>
+
+  <body>
+<!-- <template_status>no_parse</template_status> -->
+    <h1>Caching in OpenInteract</h1>
+
+    <p>As of version <b>1.51</b>, caching of generated content is
+    supported in OpenInteract. This can provide a dramatic speedup to
+    content that has a lot of template processing. Caching of SPOPS
+    objects is not officially supported yet.</p>
+
+    There are two different levels of caching for content in
+    OpenInteract:
+
+    <ul>
+      <li>Templates: Once a template has been parsed we don't want to
+      repeat the actions again</li>
+
+      <li>Content: Once a component has been generated with a
+      particular set of parameters, we don't want to regenerate it
+      again.</li>
+
+    </ul>
+
+    <p>Fortunately, the first one is done in the Template Toolkit and
+    in the OpenInteract implementation for the provider. How to
+    control this from OpenInteract is discussed briefly below. The
+    authoritative voice on Template Toolkit caching is in the
+    excellent TT documentation.</p>
+
+    <h1>Content Caching</h1>
+
+    <p>Content caching is still fairly young in OpenInteract, and it's
+    not appropriate (or useful) for all purposes. It's best when used
+    on pages that contain a lot of data or require a good deal of
+    processing.</p>
+
+    <h2>Global Configuration</h2>
+
+    <p>The following keys in your server configuration are used in
+    caching:</p>
+
+    <ul>
+
+      <li><tt>dir.cache_content</tt>: The directory where we put the
+      cached content. This is normally
+      <tt>$WEBSITE_DIR/cache/content</tt>.</li>
+
+      <li><tt>cache_info.data.cleanup</tt>: If true we delete and
+      recreate the cache directory every time the server starts
+      up. This is recommended.</li>
+
+      <li><tt>cache_info.data.use</tt>: If set to true, content
+      caching is enabled; if set to false, it is disabled.</li>
+
+      <li><tt>cache_info.data.default_expire</tt>: number of seconds
+      used for the cached content expiration. You can override this on
+      a case-by-case basis.</li>
+
+      <li><tt>cache_info.data.class</tt>: Cache implementation to
+      use. Currently only <tt>OpenInteract::Cache::File</tt> is
+      supported.</tt>
+
+      <li><tt>cache_info.data.max_size</tt>: Max size the cache should
+      be allowed to grow, in bytes.</tt>
+
+      <li><tt>cache_info.data.directory_depth</tt>: If you find that
+      retrieving cached content is slow because of the number of items
+      in a particular directory, increase this number.</li>
+
+    </ul>
+
+    <h2>Identifying Cached Data</h2>
+
+    <p>Each piece of cached data needs to be uniquely identified. We
+    use two pieces of information for this: a basic key and a set of
+    parameters and values. For instance, you can cache a listing of
+    news entries but there can be multiple types of listings depending
+    on the news section the user filters by. So your information would
+    be:</p>
+
+    <ul>
+      <li><b>basic key</b>: 'news_listing'</li>
+      <li><b>parameters</b>: value of section used as filter</li>
+    </ul>
+
+    <p>We describe below how to set this up.</p>
+
+    <h1>How to Setup</h1>
+
+    <p>Here are the four requirements for caching content:</p>
+
+    <p><b>First</b>: your handler needs to subclass either
+    <tt>OpenInteract::Handler::GenericDispatcher</tt> or
+    <tt>OpenInteract::CommonHandler</tt>. (Most handlers already do
+    this so it's not much of a burden.)</p>
+
+    <p><b>Second</b>: caching must be configured in your action using
+    the parameter <tt>cache_key</tt> and, optionally,
+    <tt>cache_expire</tt>.</p>
+
+    <p><b>Third</b>: you must explicitly check in your handler to see
+    if there is cached content.</p>
+
+    <p><b>Fourth</b>: you must call a new method to generate the
+    content.</p>
+
+    <h2>Handler Parents</h2>
+
+    <p>Just do one of the following, assuming your handler is named
+    <tt>MySite::Handler::MyHandler</tt>:</p>
+
+    <p><tt>use base qw( OpenInteract::Handler::GenericDispatcher );</tt></p>
+    <p><tt>use base qw( OpenInteract::CommonHandler );</tt></p>
+    <p><tt>@MySite::Handler::MyHandler::ISA = qw( OpenInteract::Handler::GenericDispatcher );</tt></p>
+    <p><tt>@MySite::Handler::MyHandler::ISA = qw( OpenInteract::CommonHandler );</tt></p>
+
+    <h2>Action Configuration</h2>
+
+    <p>Each method has its own basic key. This key is used along with
+    parameters to uniquely identify the cached content so it can be
+    retrieved properly. In your action configuration you set the basic
+    key for each method that is going to produce cached content. For
+    instance, here we set the key for the method 'listing':</p>
+
+    <pre>
+     mypkg/conf/action.perl
+     ----------------------------------------
+     $action = {
+        myaction => {
+           class    => 'OpenInteract::Handler::MyHandler',
+           security => 'no',
+           cache_key => {
+               listing => 'myaction::listing',
+           },
+        },
+     };
+     </pre>
+
+    <p>You can also set expiration times here. These will override the
+    setting in the server configuration under
+    <tt>cache_info.data.default_expire</tt>:
+
+    <pre>
+     mypkg/conf/action.perl
+     ----------------------------------------
+     $action = {
+        myaction => {
+           class    => 'OpenInteract::Handler::MyHandler',
+           security => 'no',
+           cache_key => {
+               listing => 'myaction::listing',
+           },
+           cache_expire => {
+               listing => 1800,
+           },
+        },
+     };
+     </pre>
+
+    <h2>Checking for Cached Content</h2>
+
+    <p>Every handler deriving from
+    <tt>OpenInteract::Handler::GenericDispatcher</tt> gains the method
+    <tt>check_cache()</tt>. Here is a typical call:</p>
+
+    <pre>
+    sub listing {
+        my ( $class, $p ) = @_;
+        my $R = OpenInteract::Request->instance;
+        my $num_items = $R->apache->param( 'num_items' )
+                        || DEFAULT_NUM_ITEMS;
+        my %cache_params = ( num_items => $num_items );
+        my $cached = $class->check_cache( $p, \%cache_params );
+        return $cached if ( $cached );
+    }
+    </pre>
+
+    <p>Here we are saying that the cached content depends on the
+    number of items requested. Once we have that information we can
+    check to see if there is anything in the cache matching it.</p>
+
+    <p>It's necessary to pass <tt>$p</tt> to the caching methods since
+    our handlers are class methods rather than objects. If they were
+    objects we could save the action state in them. As it is, we need
+    to work around it. The next version of OpenInteract makes these
+    full-fledged objects.</p>
+
+    <h2>Generating Content for the Cache</h2>
+
+    <p>Every handler deriving from
+    <tt>OpenInteract::Handler::GenericDispatcher</tt> also gains the
+    method <tt>generate content()</tt>. Here is a typical call (the
+    first part is copied from above):</p>
+
+    <pre>
+    sub listing {
+        my ( $class, $p ) = @_;
+        my $R = OpenInteract::Request->instance;
+        my $num_items = $R->apache->param( 'num_items' )
+                        || DEFAULT_NUM_ITEMS;
+        my %cache_params = ( num_items => $num_items );
+        my $cached = $class->check_cache( $p, \%cache_params );
+        return $cached if ( $cached );
+        my $item_list = $R->item->fetch_group({ limit => $num_items,
+                                                order => 'created_on DESC' });
+        my %vars = ( item_list => $item_list );
+        return $class->generate_content( $p, \%cache_params, \%vars,
+                                         { name => 'mypkg::mytmpl' } );
+    }
+    </pre>
+
+    <p>Previously we might have called for the return statement:</p>
+
+    <pre>
+        return $R->template->handler( {}, \%vars,
+                                      { name => 'mypkg::mytmpl' } );
+    </pre>
+
+    <p>There are three differences -- besides the name! -- between
+    these two statements:</p>
+
+    <ul>
+
+      <li>We have jettisoned the first argument to
+      <tt>$R-&gt;template-&gt;handler()</tt>, since it was rarely used.</li>
+
+      <li>We have passed the hashref <tt>$p</tt> as the first
+      argument.</li>
+
+      <li>We have passed a hashref of parameters (<tt>\%vars</tt>) OI
+      will use to cache the content. Note that these are the same
+      parameters we used in the <tt>check_cache()</tt> call
+      above.</li>
+
+    </ul>
+
+    <h2>Clearing the Cache</h2>
+
+    <p>You have the option of clearing the cache whenever you
+    manipulate data. For instance, if you edit the title of a news
+    story you do not want the old title to appear in the story
+    listing. And if you delete a story and mark it as inactive because
+    it's inappropriate, you do not want it in your headline listing.</p>
+
+    <p>So whenever you modify data, it's normally best to call
+    <tt>clear_cache()</tt>. This method is inherited from
+    <tt>OpenInteract::Handler::GenericDispatcher</tt> like the
+    others. Here's an example:</p>
+
+    <pre>
+    sub edit {
+        my ( $class, $p ) = @_;
+        my $R = OpenInteract::Request->instance;
+        my $thingy_id = $R->apache->param( 'thingy_id' );
+        my $thingy = $R->thingy->fetch( $thingy_id );
+        $thingy->{foo} = $R->apache->param( 'foo' );
+        eval { $thingy->save };
+        if ( $@ ) {
+            return $class->listing({ error_msg => "Blarg: $@" });
+        }
+        else {
+            $class->clear_cache();
+            return $class->listing({ status_msg => 'Cool' });
+        }
+    }
+    </pre>
+
+    <p>So when the 'listing' method is called after a successful
+    <tt>save()</tt> on the object, the previously cached content will
+    have been deleted and the content will be regenerated anew.</p>
+
+    <h2>When Not to Cache</h2>
+
+    <p>If you're an admin user you frequently see functionality that
+    normal users do not see: <b>Edit</b> or <b>Remove</b> links next
+    to an object, etc. You do not want to cache this content, since
+    users shouldn't see this information. (Normal users modifying the
+    object shouldn't be an issue, since security should take care of
+    it.)</p>
+
+    <p>As a result, any user defined as an administrator will not view
+    or save cached content. "Defined as an administrator" means that a
+    call to the following will return true:</p>
+
+    <pre>
+    my $is_admin = $R->{auth}{is_admin};
+    </pre>
+
+    <h2>Example: news</h2>
+
+    <p>The 'news' package shipped with OpenInteract has an
+    implementation of caching that you can experiment with.</p>
+
+    <h1>Template Caching</h1>
+
+    <p>Instead of parsing a template every time you request it, the
+    Template Toolkit (TT) will translate the template to Perl code
+    and, if allowed, cache it in memory. Keeping templates in memory
+    will make your website much faster.</p>
+
+    <p>TT will also save your compiled template to the
+    filesystem. This is useful for successive starts of your website
+    -- if the template if found in the compile directory TT doesn't
+    need to parse it again, even though you've stopped and restarted
+    your server since it was first read.</p>
+
+    <h2>Configuration</h2>
+
+    <p>The following keys from your server configuration control
+    caching and compiling:</p>
+
+    <ul>
+
+      seconds) for how long the templates remain cached in memory
+      before they're reparsed.</li>
+
+      <li><tt>template_info.cache_size</tt>: This is the main
+      parameter, describing how many cached templates TT will hold in
+      memory. The only restriction on a high value is your memory, so
+      experiment with as high a number as possible.
+
+      <p>If you set this to 0 then caching will be disabled. This is
+      useful when you're doing debugging on your site, but it will
+      make things noticably slower.</p></li>
+
+      <li><tt>dir.cache_tt</tt>: The directory where we store the
+      compiled templates in the filesystem. This is normally
+      <tt>$WEBSITE_DIR/cache/tt</tt></li>
+
+      <li><tt>cache_info.template.expire</tt>: Sets the expiration (in
+      <li><tt>template_info.compile_cleanup</tt>: If set to a true
+      value, we clean out the template compile directory when the
+      Apache server starts up.</li>
+
+      <li><tt>template_info.compile_ext</tt>: Extension of the file
+      created when the template is compiled to the filesystem.</li>
+      
+    </ul>
+
+
+  </body>
+</html>

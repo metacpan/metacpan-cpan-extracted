@@ -1,0 +1,95 @@
+<?xml version="1.0"?>
+<rdf:RDF
+ xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+ xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+ xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+ xmlns:owl="http://www.w3.org/2002/07/owl#"
+ xml:base="http://sadiframework.org/examples/example.owl#">
+    <owl:Ontology rdf:about=""/>
+    <!-- NOTE: Some or all of the following properties or classes may not exist and are defined here for testing purposes -->
+    <!-- in lieu of importing the whole ontology... -->
+    <owl:DatatypeProperty rdf:about="http://ontology.dumontierlab.com/hasSymbol"/>
+    <owl:DatatypeProperty rdf:about="http://sadiframework.org/ontologies/predicates.owl#hasDescription"/>
+    <owl:DatatypeProperty rdf:about="http://sadiframework.org/ontologies/predicates.owl#hasProteinName"/>
+    <owl:DatatypeProperty rdf:about="http://sadiframework.org/ontologies/predicates.owl#hasName"/>
+	<owl:DatatypeProperty rdf:about="http://sadiframework.org/ontologies/predicates.owl#hasName2"/>
+    
+    <!-- in lieu of importing the whole ontology... -->
+    <owl:ObjectProperty rdf:about="http://sadiframework.org/ontologies/predicates.owl#hasResource"/>
+    <owl:ObjectProperty rdf:about="http://sadiframework.org/ontologies/predicates.owl#hasResource2"/>
+    
+    <!-- in lieu of importing the whole ontology -->
+    <owl:Class rdf:about="http://purl.oclc.org/SADI/LSRN/GeneID_Record"/>
+    <owl:Class rdf:about="http://purl.oclc.org/SADI/LSRN/KEGG_ec_Record"/>
+    <owl:Class rdf:about="http://purl.oclc.org/SADI/LSRN/KEGG_Record"/>
+    <owl:Class rdf:about="http://purl.oclc.org/SADI/LSRN/taxon_Record"/>
+    
+    <owl:Class rdf:ID="AnnotatedGeneID_Record">
+        <rdfs:subClassOf rdf:resource="http://purl.oclc.org/SADI/LSRN/GeneID_Record"/>
+        <rdfs:subClassOf>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://ontology.dumontierlab.com/hasSymbol"/>
+						<!-- purposely added new lines to the following cardinality constraint -->
+                        <owl:minCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int">
+                        	0
+					    </owl:minCardinality>
+                    </owl:Restriction>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://sadiframework.org/ontologies/predicates.owl#hasDescription"/>
+                        <owl:minCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int">0</owl:minCardinality>
+                    </owl:Restriction>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://sadiframework.org/ontologies/predicates.owl#hasProteinName"/>
+                        <owl:minCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int">0</owl:minCardinality>
+                    </owl:Restriction>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://sadiframework.org/ontologies/predicates.owl#hasName"/>
+                        <owl:minCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int">0</owl:minCardinality>
+                    </owl:Restriction>
+                </owl:intersectionOf>
+            </owl:Class>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+    <owl:Class rdf:ID="getEcGeneComponentPartsHuman_Output">
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://purl.oclc.org/SADI/LSRN/KEGG_ec_Record"/>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://sadiframework.org/ontologies/predicates.owl#hasName"/>
+                        <owl:hasValue>
+                        	some resource name
+					    </owl:hasValue>
+                    </owl:Restriction>
+					<owl:Restriction>
+                        <owl:onProperty rdf:resource="http://sadiframework.org/ontologies/predicates.owl#hasName2"/>
+                        <owl:hasValue>
+                            some resource name
+							with newlines
+							embedded within
+							it.
+                        </owl:hasValue>
+                    </owl:Restriction>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://sadiframework.org/ontologies/predicates.owl#hasResource"/>
+                        <owl:hasValue rdf:resource="http://lsrn.org/taxon:9606"/>
+                    </owl:Restriction>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://sadiframework.org/ontologies/predicates.owl#hasResource2"/>
+                        <owl:hasValue rdf:resource="http://lsrn.org/taxon:90100"/>
+                    </owl:Restriction>
+                </owl:intersectionOf>
+            </owl:Class>
+        </owl:equivalentClass>
+    </owl:Class>
+    
+    <!-- http://lsrn.org/taxon:9606 -->
+    <rdf:Description rdf:about="http://lsrn.org/taxon:9606">
+        <rdf:type rdf:resource="http://purl.oclc.org/SADI/LSRN/taxon_Record"/>
+        <rdfs:label>Human</rdfs:label>
+    </rdf:Description>
+    
+</rdf:RDF>

@@ -1,0 +1,869 @@
+Apache::OpenIndex - Perl Open Index manager for a Apache Web server
+
+SYNOPSIS
+
+  PerlModule Apache::Icon
+  PerlModule Apache::OpenIndex
+  (PerlModule Apache::Language) optional
+  (PerlModule Image::Magick)    optional
+
+DESCRIPTION
+
+OpenIndex provides a file manager for a web sites through a web
+browser. It is a extensive rewrite of the Apache::AutoIndex.pm
+module which in turn was a remake of the autoindex Apache
+module. OpenIndex can provide the same functionality as
+AutoIndex.pm and can be used to both navigate and manage the web
+site.
+
+OpenIndex has dropped the mod_dir support provided by AutoIndex.
+
+In order to activate the file manager functionality, two things
+have to happen. First, the proper http.conf directives need to
+be placed into a <Location area> section. Second, there has to
+be a directory stub (.XOI) created off of the directory where
+the file manager is to be provided.
+
+Within the ROOT directory stub (.XOI), a MARK sub-directory
+(.XOI/.MARK) can also be provided to present a MARK directory
+tree by the file manager. The MARK (.XOI/.MARK) directory
+provides a physical directory where files can be managed,
+unzipped, moved, copied, deleted, and renamed. New directories
+can be created with the mkdir command. The MARK directory can
+be mapped to any path location on the Apache server or to any
+site path location.  To activate the MARK directory access  
+the "mark" directive needs to be set to '1'.  The ROOT (.XOI) 
+directory is actually a fake path of the site's root directory. 
+For example to access "http://www.site.com/bob/" the following 
+URL would be required:
+
+	"http://www.site.com/bob/.XOI/"
+
+This would in turn would display the file manager for bob. To
+Bob, the ROOT directory appears to be his actual web root
+directory.
+
+If the above description does not make sense, just follow the
+examples provided, and perhaps it will become clearer once you
+see some results.
+
+Since a URL fake path (.XOI) is provided, authentication and
+authorization can be used to only allow authorized users to
+have access to the OpenIndex module.
+
+In short, you will no longer need to use ftp to upload and
+manage the web site files. Since OpenIndex is web based, you can
+use all of your other Apache functionality, such as SSL,
+proxies, and etc.
+  
+The best procedure to get OpenIndex loaded and working is to first
+have the Apache mod_perl and autoindex modules loaded and
+working properly. Then remove the httpd.conf 
+"AddModule autoindex" 
+directive and add the Apache::Icon and Apache::OpenIndex module 
+directives.
+  
+DIRECTIVES
+
+Loading the Modules
+
+The following describes what httpd.conf directives you need in
+your httpd.conf file to load OpenIndex and it's companion modules.
+
+First or all you must have mod_perl loaded, with the following:
+
+AddModule mod_perl.c
+
+You will also need to load the following mod_perl modules, with:
+
+  PerlModule Apache::Icon
+  PerlModule Apache::OpenIndex
+
+in your httpd.conf file or with:
+
+   use Apache::Icon();
+   use Apache::OpenIndex();
+ 
+in your startup.pl file.
+
+Configuration Guidelines
+
+It is best to put the OpenIndex directives is in a <Location area>
+section of your httpd.conf file, because it is the highest
+priority Apache httpd.conf section. This way, other directives
+will not get in the way of (ahead of) OpenIndex during the Apache
+request processing. Apache 1.3.x the directive section priorities
+are (in increasing order):
+
+    <Directory>
+    <Files>
+    <Location>
+
+Here is an example of a <Location area> directive:
+
+    <LocationMatch /.*/\.XOI>
+	SetHandler perl-script
+	PerlHandler Apache::OpenIndex
+    </LocationMatch> 
+
+Notice that a regular expression Location form was used. This
+will provide a file manager for each 1-level deep
+sub-directory of the site's document root which have a
+.XOI stub directory in them.  For example:
+    
+http:://www.site.com/friends/bob/
+
+If a browser in turn accesses:
+
+    http:://www.site.com/friends/bob/.XOI/
+
+The OpenIndex file manager would be activated for "/friends/bob".
+
+Even though the .XOI directory is a fake reference for the real
+directory tree, it must exist in order to activate the file
+manager. If a ".XOI/.MARK" directory is also present, and the
+"mark" directive is set to '1', access to any location on the
+Apache server can be managed.
+
+You will probably want to provide authentication and
+authorization for the .XOI fake location. For example, I have
+used Apache::AuthenDBI and Apache::AuthzDBI with the following
+additions to the same <Location> as above:
+
+ PerlAuthenHandler Apache::AuthenDBI
+ PerlAuthzHandler  Apache::AuthzDBI
+ AuthName DBI
+ AuthType Basic
+ PerlSetVar Auth_DBI_data_source  dbi:Pg:dbname=webdb
+ PerlSetVar Auth_DBI_username     webuser
+ PerlSetVar Auth_DBI_password     webpass
+ PerlSetVar Auth_DBI_pwd_table    users
+ PerlSetVar Auth_DBI_uid_field    username
+ PerlSetVar Auth_DBI_grp_field    GID
+ PerlSetVar Auth_DBI_pwd_field    password
+ PerlSetVar Auth_DBI_encrypted    on
+ require group webgroup friends propellers
+
+If you only want to provide the AutoIndex functionality, just place the
+following into either a <Directory area>, or <Location area>
+directive and don't bother to create the .XOI directory.
+
+ SetHandler perl-script
+ PerlHandler Apache::OpenIndex
+
+Mod_perl does not provide configuration merging for Apache
+virtual hosts. Therefore, you have to maintain a complete set of
+OpenIndex directives for each virtual host, if any of the virtual
+host configurations are different.
+ 
+File Permissions
+
+When using OpenIndex as a file manager, understanding and
+implementing the file permissions is the hardest concept. First,
+you need to have a good understanding of your operating system's
+(OS) file permissions.
+
+OpenIndex can allow groups of users to share the same web server
+file space (tree), such that individuals can be prevented from
+changing each others files and directories. An "admin" group can
+also be specified, which allows certain users to be able to
+modify all the files and directories within the tree, as well
+as, assign GID access to the files and directories.
+ 
+File permissions are controlled by a group ID (GID) provided by
+an authorization module for the user. It is assigned to the
+files and directories that that user creates. 
+
+An Apache environment variable must be set prior to each OpenIndex
+request. This environment variable would normally be set by an
+authorization module.
+
+For example, the Apache::AuthzDBI module (presented above) can
+provide an environment variable "REMOTE_GROUP" which contains
+the group ID of the authorized user. The following OpenIndex
+directive tells it which environment variable contains the
+user's GID for the request:
+
+    OpenIndexOptions GIDEnv=REMOTE_GROUP
+
+For example, if the authorization module sets the environment
+variable:
+
+	REMOTE_GROUP=1000
+
+OpenIndex would set the GID for that user to 1000. If the GID is
+valid (for Apache and it's OS), all files and directories created by
+that user will have their GID set to 1000.
+
+HINT:  If you set the "OpenIndexOptions Debug 1" directive, the
+environment variables will be listed along with other debugging
+information.  You can then spot your GID environment variable
+set by your authorization module in order to verify it's
+existence and OpenIndex operation. 
+
+An admin directive can also be specified which enables a user
+with the specified admin GID to access and control all files and
+directories within the current file manager directory (.XOI)
+tree.
+
+In summary, if the following directives are provided:
+
+  OpenIndexOptions GIDEnv=REMOTE_GROUP
+  OpenIndexOptions Admin=1000
+ 
+The GIDEnv directive tells OpenIndex which environment variable
+contains the GID (REMOTE_GROUP in this example). [This variable
+would have been set by an authorization module.] If the GID for
+the user happens to be 1000, then that user will have "admin"
+privileges and it's commands (SetGID).
+
+The operating system (OS) rules still apply to all of the GID
+operations. For example (OS=UNIX), if Apache's program ID (PID)
+is 100 and a file is owned by user 200, Apache can not change
+the GID of file unless the Apache process is also a member of
+the GID 200 group.
+
+If a "group name" (instead of a number) is provided, the GID
+name is looked-up in the /etc/group file in order to obtain the
+numeric GID. This is very UNIX like and my not work for other
+operating systems.
+
+HINT: Any environment variable can be used to contain the
+GID. Therefore, you can trick the authorization module into
+coughing up a GID by using the REMOTE_USER (user) environment
+variable and then simply create a group with the same name. 
+Don't forget to make the Apache's process user ID (PUID) a
+member of the group (in /etc/group). 
+
+AutoIndex Functionality
+
+When a .XOI directory is not present in the URL, OpenIndex will
+function like AutoIndex. Note that the .XOI directory name can
+be changed with a directive. This is explain later on in the
+text.
+
+DIRECTIVES
+
+The display options (directives) are a composite of autoindex,
+AutoIndex, and OpenIndex's own module directives.
+
+The original module directives are maintained by OpenIndex, so
+that any existing directives that you may have, can be used to
+maintain the status quo.
+
+autoindex DIRECTIVES
+
+Apache normally comes with mod_autoindex C module. A number of
+it's httpd.conf directives are provided when Apache is
+installed.
+
+Documentation for autoindex can be found at:
+
+    http://www.apache.org/docs/mod/mod_autoindex.html
+
+An incomplete (no Alt directives) and a very brief description
+of the autoindex (used by Apache::Icon) directives is
+provided below.
+
+These directives are processed by Apache::Icon.pm which
+provides icons to Apache::AutoIndex and Apache::OpenIndex.
+
+* FancyIndexing boolean
+
+    The FancyIndexing directive tells OpenIndex to present a
+    robust display which can include permissions, an icon, name,
+    date, size, and description for each file and directory. All
+    of the following autoindex and AutoIndex directives require
+    FancyIndexing.
+    
+* HeaderName file file ...
+
+    Inserts a list of files displayed at the top of the document
+    After Apache 1.3.5 the filename can be a relative URI.  If 
+    the file name extention is '.html' it will be sent as is.
+
+* IndexIgnore file file
+
+    A list of files not to be displayed. The files can specify
+    extensions, partial names, wild card expressions, or full
+    filenames.  Multiple IndexIgnore directives add to the list.
+
+* IndexOptions [+|-]option [+|-]option ... 
+    
+    There are several options. Please refer to the above URL:
+	http://www.apache.org/docs/mod/mod_autoindex.html 
+    for the complete list.
+
+* IndexOrderDefault Ascending|Descending|Extension Name|Date|Size|Description
+
+    IndexOrderDefault takes two arguments. The first must be
+    either Ascending, Descending, or Extension indicating the
+    direction of the sort. Only Name can have the Extension
+    specified, which will sort on the file extension.  The 
+    second argument must be one of the keywords: Name, Date,
+    Size, or Description. It identifies the primary sort key.
+
+* ReadmeName file file ...
+
+    A list of text files that will be displayed to the end of the
+    document.  If the file mime type is text/html it will be sent
+    as is.
+    
+* AddDescription "string" file file...
+
+    The file description displayed for the given file (file name
+    wild cards).
+
+* AddIconByEncoding (alttext, url) MIME-encoding MIME-encoding ...
+    
+    The file icon (alttext, url) to be displayed according to
+    the MIME-encoding (mime-encoding).
+    
+* AddIconByType (alttext, url) MIME-type MIME-type ...
+
+    The file icon (alttext, url) to be displayed according to
+    the MIME-type (mime-type).
+
+* AddIcon (alttext, url) name name ...
+
+    The file icon (alttext, url) to be displayed according to
+    file name extension.
+
+* DefaultIcon icon
+
+    The file icon to be displayed if no other icon can be found.
+    (default icon)
+
+
+AutoIndex DIRECTIVES
+
+* IndexOptions Thumbnails
+
+    The listing will include thumbnails for pictures. Defaults to
+    false.
+
+* IndexOptions ShowPermissions
+    
+    Print file permissions. Defaults to false.
+
+* IndexOptions SuppressHtmlPreamble
+
+    When a header or footer file is included with the 
+       HeaderName file file ...
+       ReadmeName file file ...
+    directives, the <HTML> <HEAD> and <BODY> tags are striped.
+    
+* IndexOptions FoldersFirst
+
+    The folders will be presented first in the index listings.
+    
+* IndexOptions HideExt
+
+    The HideExt directive tells OpenIndex to not display the
+    file extention within the index display.
+    
+* IndexHtmlTag tag attributes
+
+    This directive specifies the tag's attributes that will be
+    inserted into the tag.  For example: <TAG attributes>
+
+    If the first character of attributes is a '+', it will 
+    append the following attributes to the current tag's
+    attributes.  If the first character of attributes is a '-'
+    or not a '+', the current tag's attributes will be set to
+    the following attributes string.  Note that an initial '+'
+    or '-' character is always striped.
+
+    HINT: If you need to have the first line start with a '+' or a
+    '-' character, use "-+ . . ." or "-- . . .".
+
+* IndexHtmlText tag [+|-]text
+
+    This directive specifies the tag text that will be inserted 
+    within the tag.  For example: <TAG> text </TAG>
+
+    If the first character of text is a '+', it will append 
+    the following text to the current tag's text.  If the first
+    character of text is a '-' or not a '+', the current tag's
+    text will be set to the following text.  Note that an initial
+    '+' or '-' character is always striped.
+
+    HINT: If you need to have the first line start with a '+' or a
+    '-' character, use "-+ . . ." or "-- . . .".
+
+    The frameset tag is special in that you will need to place
+    <mainframe> in the position where the index (main) frame is to
+    be placed  In this way any arbitrary frameset can be supported.
+
+    HTML text can also be inserted just before each of the form text
+    and submit buttons by appending 'insert' before it's name.  For
+    example to insert "Hello World" just before 'Browse' text field
+    specify:
+
+        IndexHtmlText InsertBrowse Hello World
+
+    HINT: If the language option is enabled, the text will be looked
+    up in order to support multiple languages.
+
+* IndexURIHead value
+
+    Value should be the uri (absolute or relative) of a resource
+    that would be inserted right after the <BODY> tag and just
+    before anything else.
+
+* IndexHtmlFoot value
+
+    Value should be the uri (absolute or relative) of a resource
+    that would be inserted right before the ending </BODY> tag
+    and after everything else.
+
+* IndexFrameTail value
+
+    Value is a string that will be inserted after the main frame.
+    The Frame option has to activated in order for this to work.
+    The main frame contains the index table and is always inserted 
+    into the frameset.  A NOFRAME tag is also always included.
+
+* IndexHtmlStyle value
+
+    Value is a string that will be inserted inside the <Style>
+    tag.
+    
+    
+OpenIndex DIRECTIVES
+
+* OpenIndexOptions Admin n
+
+    Sets the admin GID to n. If the user's GID equals the admin
+    GID, the "SetGID" command will be provided and file access
+    control will be provided for all files and directories in
+    both the MARK and ROOT directory trees.
+    
+* OpenIndexOptions Debug [0|1]
+
+    If set to 1, the listing displayed will print debugging
+    information if the user is set to Admin. The default is 0.
+
+* OpenIndexOptions Frames [0|1]
+
+    If set to 1, the output will use HTLM horizontal frames.
+    The default is 0.
+
+* OpenIndexOptions Menu command1 command2 . . .
+
+    Allows you to add and remove commands from the menu.
+    The default menu is: "Browse", "Upload", "Unzip", "Delete",
+    "MkDir", "MkFile","Copy", "Move","Edit","Rename","Help". 
+    If the first command is preceded by '+' the following 
+    commands will be added to the existing list of the menu.
+    If it is preceded by '-' they well be removed from the list. 
+    The  sign can only be used as the first argument, while the 
+    remaining arguments are a list of the items to either add 
+    or remove.   If no sign is provided the menu list is replaced 
+    by the list provided.
+
+* OpenIndexOptions AdmnMenu command1 command2 . . .
+
+    AdmnMenu allows you to modify the admin command menu. When
+    a user is an admin, as defined by the:
+    "OpenIndexOptions Admin" directive, the AdmnMenu is provided.
+    The default menu is: "SetGID", "Revoke", and "Debug".  Note 
+    that the "Debug" command only is displayed if the: 
+    "OpenIndexOptions Debug 1" directive is also provided.
+    If the first command is preceded by '+' the following 
+    commands will be added to the existing list of the menu.
+    If it is preceded by '-' they well be removed from the list. 
+    The  sign can only be used as the first argument, while the 
+    remaining arguments are a list of the items to either add 
+    or remove.   If no sign is provided the menu list is replaced 
+    by the list provided.
+
+* OpenIndexOptions Root Directory
+    
+    When operating in the AutoIndex mode, this option allows 
+    you to specify the root directory where OpenIndex will not
+    display the "Parent directory" item (the root).  The 
+    string is compared with Perl regular expressions.
+
+* OpenIndexOptions FakeDir Directory
+    
+    Sets the FakeDir directory stub name from which the files
+    can be managed. The default is ".XOI". You should probably
+    consider changing this value to something else if you do not
+    want people probing your web site. You may want to prefix
+    the name with a '.' in order to hide it from view.
+    
+* OpenIndexOptions MarkDir SubDirectory
+    
+    Set the mark subdirectory stub name of the where OpenIndex
+    stores the Mark directory files. The default is ".MARK".
+    Note that this is the fake name used to reference the MARK
+    directory.  The MARK directory can be designated to be 
+    anywhere on the web server.
+    
+* OpenIndexOptions MarkRoot syspath
+    
+    Set the rooted MARK path location to "syspath".  The path is
+    from the Apache server's root path, that is it must contain
+    the initial '/'.  It can allow the client to get to any file
+    on the web server.  The browser client will not be able to 
+    go below this directory.
+    
+* OpenIndexOptions UserDir pattern
+
+    If you use the userdir_module and you want OpenIndex to
+    manage the files accessed there, then you will need to
+    duplicate it's UserDir translation directive using this 
+    directive.  For example:
+
+    OpenIndexOptions UserDir /home/*/htdocs
+
+    will translate /~bob to /home/bob/htdocs
+
+* OpenIndexOptions UserSite rootpath
+
+    This directive restricts a user to a particular site
+    path.  This is useful because it allow one group id
+    to be used for a group of users by restricting which
+    path particular each use can access.  For example, if
+    you have two user sites which use the following URLs:
+
+        http://www.thesite.com/friends/ed
+        http://www.thesite.com/friends/steve
+
+    You could create a group, named 'friends' for both
+    users and restrict each user to their own site, by 
+    specifying:
+
+        OpenIndexOptions UserSite /friends
+
+    Then when 'ed' tries to access any URL outside
+    of '/friends/ed', OpenIndex will deny the request.
+
+* OpenIndexOptions TextLen n
+    
+    Sets the text entry field of the command form to length n.
+    The default value is 49.  The "SetGID" text length is
+    almost one-half this value (default 25).
+     
+* OpenIndexOptions EditMax n
+    
+    Sets the maximum edit file byte size to n.  This is the
+    maximum file size that can be edited.  The default value
+    is 131072 bytes.
+    
+* OpenIndexOptions PostMax n
+    
+    Sets the http maximum post byte size to n.  This is also
+    the maximum file size that can be uploaded.  The default
+    value is 4,194,304 bytes.
+    
+* OpenIndexOptions umask n
+    
+    Allows you to set the umask for the files and directories
+    created.  Generally n is an octal number starting with a '0'.
+
+* OpenIndexOptions Help URL
+    
+    Sets the URL of the user help command.  The default URL is:
+    http://www.xorgate.com/help/OpenIndex
+    
+* OpenIndexOptions language [0|no|off]
+    
+    Tells OpenIndex not to use the Apache::Language module to
+    translate messages. ('0', 'no', or 'off')  Defaults 'off'.
+    When enabled the Apache::Language module must be loaded.
+    Make sure if you set language on that you load the 
+    negotiation module and either use the Multiviews option
+    or the *.var method. 
+    
+* OpenIndexOptions GIDEnv name    
+        
+    If an authorization module provides an environment variable
+    (name) with the user's GID, the GIDEnv directive tells
+    OpenIndex which variable contains the GID for the current
+    request. The GID is then retrieved from the environment
+    variable and is applied to the user's commands. For each
+    command the source GID is checked to make sure that the GID
+    matches each file and directory created. If a name (not a
+    number) is provided, it is looked up in the /etc/group file
+    to obtain the GID number.
+    
+* OpenIndexOptions UserEnv name    
+        
+    An environment variable can be specified which holds the
+    user name of the request.  If 'Basic' authorization is being
+    used, the user name will be recovered from Apache, regardless
+    of what ever is specified for 'UserEnv name'.
+
+* OpenIndexOptions Revoke [1|0]
+    
+    A boolean value which tells OpenIndex to check the file
+    "revoked" in the root fake directory (FakeDir) for users and
+    groups that will not be allowed to execute commands. This
+    file is maintained by OpenIndex for the admin user through
+    "Enable" and "Disable" commands provide in the Revoke form.
+    Note that Apache will need to have read and write access in
+    this file ("revoked") and root fake directory (.XOI).
+
+* OpenIndexOptions Mark [1|0]
+    
+    A boolean value which tells OpenIndex to use and process the
+    MARK (mark) directory (tree), if it exists. ('1', 'yes', or
+    'on') Default 0. If the MARK directory does not exist, it
+    will not use it :-).
+
+* OpenIndexOptions NoTitle [1|0]
+
+    If set to 1, the header title will not be displayed.
+    The default is 0.
+
+* OpenIndexOptions NoCache [1|0]
+    
+    A boolean value which tells OpenIndex to have the expire time
+    of the http header to zero so that browsers will not cache 
+    OpenIndex's output. Default 0.
+
+* OpenIndexOptions Import package subroutine limit_arguments
+
+    "This is are real cool directive!"  It allows you to add
+    new commands and routines to OpenIndex.   Look in the 
+    OpenIndex/OpenIndex directory and you will find an external
+    command "MD5.pm".  This command calculates and displays
+    the MD5 hash of the files selected, stores them in the
+    file entered into the "Destination" form text field, and
+    displays the results.  This directive can provide the
+    full subroutine name including the '::'s.  For example,
+    for the MD5 command the following directive is used:
+      OpenIndexOptions \
+	import MD5 MD5 before=>MD5before after=>MD5after \
+        back=>MD5back min=>1 max=>0
+
+    NOTE: that the escape character '\' is used to indicate
+    that the the line continues.  Do not use the '/' character
+    in your conf file.
+ 
+    The interesting arguments are as follows:
+    The first argument is the package name that contains the
+    subroutines.  If it is not fully specified with '::' it
+    is preappended with "Apache::OpenIndex::".
+
+    The second argument is the menu command name of the 
+    routine.  The command is added to the menu  by using 
+    either the 'Menu' or the 'AdmnMenu' directive.
+
+    before=>subroutine
+        Is the name of the subroutine to run just before the
+        menu command subroutine (Apache::OpenIndex::MD5before in 
+        the example).  This command allows any initialization
+        work to be done before the main command.  The main
+        command (Apache::OpenIndex::MD5 in the example) is called
+        once for each file/directory item selected from the
+        directory index listing within the browser window.
+    after=>subroutine
+        This is the subroutine executed just after the last
+        item is processed.  This routine will normally do
+        cleanup of anything required from the before routine.
+    back=>subroutine
+        This subroutine is executed after a SUBMIT from the
+        menu command.  It is a call back routine that depends
+        on the 'proc' HIDDEN field from your HTML form.  The
+        'proc' should contain the cmd name.
+    min=>number
+        Is the minimum number of items that must be selected 
+        by the OpenIndex user.
+    max=>number
+        Is the maximum number of items that must be selected 
+        by the OpenIndex user.  A value of 0, means there is no
+        maximum number.
+    src=>arg
+        This tells OpenIndex which argument contains the source 
+        string for the command.  Normally this is the list of
+        items from the directory index listing.  However, you
+        can use any input you like by perhaps setting an @args
+        string in the before=>routine.
+    dst=>arg
+        This tells OpenIndex which argument contains the destination
+        string for the command.  Normally this is the text in
+        "Destination" text form field.  However, you can use 
+        any input you like by perhaps setting an @args string 
+        in the before=>routine.
+    req=>arg
+        This tells OpenIndex to check and make sure that a value
+        is contained in the argument.  The default is to have
+        an item selected from the directory index listing.
+    admin=>1
+        Requires that user is the admin user in order to execute
+        the commands submitted. 
+
+* OpenIndexOptions Always package subroutine arguments
+
+    "This is another real cool directive!"  It allows you to 
+    specify an external command to run before each OpenIndex
+    managed page is processed.  This is where you would hook
+    in a quota check routine and so forth.  The arguments
+    are only for use by the command specified.
+
+THUMBNAILS
+
+Generation of thumbnails is possible. This means that listing a
+directory that contains images can be listed with little reduced
+thumbnails beside each image name instead of the standard
+'image' icon.
+
+To enable this you simply need to preload Image::Macick in
+Apache. The IndexOption option Thumbnails controls thumbnails
+generation for specific directories like any other IndexOption
+directive.
+
+USAGE
+
+The way thumbnails are generated/produced can be configured in
+many ways.  A general overview of the procedure follows.
+
+For each directory containing pictures, there will be a
+.thumbnails directory created in it that will hold the thumbnails.
+Each time the directory is accessed, and if thumbnail generation
+is active, small thumbnails will be produced, shown beside each
+image name, instead of the normal , generic, image icon.
+
+That can be done in 2 ways. In the case the image is pretty
+small, no actual thumbnail will be created. Instead the image
+will resize the HEIGHT and WIDTH attributes of the IMG tag.
+
+If the image is big enough, Image::Magick will resize it and
+save (cache) it in the .thumbnails directory for the next
+requests.
+
+Changing configuration options will correctly refresh the cached
+thumbnails. Also, if the original image is modified, the
+thumbnail will be updated accordingly. Still, the browser might
+screw things up if it preserves the cached images.  
+
+Thumbnail DIRECTIVES
+
+* IndexCacheDir dir
+
+This is the name of the directory where the generated thumbnails
+will be created.  Make sure the user under which the web server
+runs has read and write permissions. Defaults to .thumbnails
+
+* IndexCreateDir 0|1
+
+Specifies that when a cache directory isn't found, should an
+attempt to be made to create it. Defaults to 1(true), meaning if
+possible, a missing cache directories will be created. 
+
+* ThumbMaxFilesize bytes
+
+This value fixes the maximum size of an image at which thumbnail
+processing isn't even attempted.  Trying to process a few
+very big images could bring a server down to it's knees.
+Defaults to 500,000
+
+* ThumbMinFilesize bytes
+
+This value fixes the minimum size of an image at which thumbnail
+processing isn't actually done. Since trying to process already
+very small images could be an overkill, the image is simply
+resized with the size attributes of the IMG tag. Defaults to
+5,000.
+
+* ThumbMaxWidth pixels
+
+This value fixes the maximum x-size of an image at which
+thumbnail processing isn't actually done. Since trying to
+process already very small images would be an overkill, the
+image is simply resized with the size attributes of the IMG tag.
+Defaults to 4 times the default icon width.
+
+* ThumbMaxHeight pixels
+
+This value fixes the maximum y-size of an image at which
+thumbnail processing isn't actually done. Since trying to
+process already very small images would be an overkill, the
+image is simply resized with the size attributes of the IMG tag.
+Defaults to 4 times the default icon height
+
+* ThumbScaleWidth scaling-factor
+
+Preserved only if there is no scaling factor for the other axis
+of the image. 
+
+* ThumbScaleHeight scaling-factor
+
+This value fixes an y-scaling factor between 0 and 1 to resize
+the images. The image ratio will be preserved only if there is
+no scaling factor for the other axis of the image. 
+
+* ThumbWidth pixels
+
+This value fixes a fixed x-dimension to resize the image. The
+image ratio will be preserved only if there is no fixed scaling
+factor for the other axis of the image. This has no effect if a
+scaling factor is defined.
+
+* ThumbHeight pixels
+
+This value fixes a fixed x-dimension to resize the image. The
+image ratio will be preserved only if there is no fixed scaling
+factor for the other axis of the image. This has no effect if a
+scaling factor is defined.
+
+TODO
+
+The thumbnail support needs to be tested. It was provide with
+Apache:: AutoIndex, but I have not tested it yet.
+    
+Some minor changes to the thumbnails options will still have the
+thumbnails regenerated. This should be avoided by checking the
+attributes of the already existing thumbnail.
+
+Some form of garbage collection should be performed on thumbnail
+cache or the directories will fill up.
+
+SEE ALSO
+
+perl(1), L<Apache>(3), L<Apache::Icon>(3), L<Image::Magick>(3) .
+L<Apache::AutoIndex>(3)
+    
+SUPPORT
+
+Please send any questions or comments to the Apache modperl 
+mailing list <modperl@apache.org> or to me at <perler@xorgate.com>
+
+NOTES
+
+This code was made possible by :
+
+Philippe M. Chiasson
+
+<gozer@ectoplasm.dyndns.com> Creator of Apache::AutoIndex.
+
+Doug MacEachern 
+
+<dougm@pobox.com>  Creator of Apache::Icon, and of course, mod_perl.
+
+Rob McCool
+
+Who produced the final mod_autoindex.c I copied, hrm.., well,
+translated to perl.
+
+The mod_perl mailing-list 
+
+at <modperl@apache.org> for all your mod_perl related problems.
+
+AUTHOR
+
+George Sanderson <george@xorgate.com>
+
+COPYRIGHT
+
+Copyright (c) 2000-2001 George Sanderson All rights reserved.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. 
+
+Copyright (c) 1999 Philippe M. Chiasson. All rights reserved.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. 
+

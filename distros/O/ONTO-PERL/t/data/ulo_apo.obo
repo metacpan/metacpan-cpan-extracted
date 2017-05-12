@@ -1,0 +1,96 @@
+format-version: 1.0
+date: 28:06:2006 13:57
+saved-by: easr
+auto-generated-by: easr
+default-namespace: apo
+remark: <p>This file holds the Upper Level Ontology in APO.</p>
+
+[Term]
+id: APO:U0000000
+name: cell-cycle entity
+def: "A process or continuant." [APO:ea]
+synonym: "cell cycle entity" EXACT [APO:ea]
+
+[Term]
+id: APO:U0000001
+name: continuant
+def: "Entities which endure, or continue to exist, through time while undergoing different sort of changes, including changes of place." [PMID:15892874]
+synonym: "endurant" EXACT [PMID:15892874]
+synonym: "thing" BROAD [PMID:15892874]
+disjoint_from: APO:U0000002 ! process
+is_a: APO:U0000000 ! cell-cycle entity
+
+[Term]
+id: APO:U0000002
+name: process
+def: "Entities that unfold themselves in successive temporal phases." [PMID:15892874]
+synonym: "perdurant" EXACT [PMID:15892874]
+synonym: "ocurrent" BROAD [PMID:15892874]
+disjoint_from: APO:U0000001 ! continuant
+is_a: APO:U0000000 ! cell-cycle entity
+
+[Term]
+id: APO:U0000003
+name: biopolymer
+def: "A polymer, such as a protein, nucleic acid, or transcript, ocurring in, or formed by, living systems." [APO:ea]
+synonym: "bio-polymer" EXACT [APO:ea]
+is_a: APO:U0000001 ! continuant
+
+[Term]
+id: APO:U0000004
+name: gene
+def: "A locatable region of genomic sequence, corresponding to a unit of inheritance, which is associated with regulatory regions, transcribed regions and/or other functional sequence regions." [SO:0000704]
+xref: SO:0000704
+disjoint_from: APO:U0000005 ! protein
+is_a: APO:U0000003 ! biopolymer
+
+[Term]
+id: APO:U0000005
+name: protein
+def: "One or more polypeptides which may, or may not, be covalently bonded, and which assume a native secondary and tertiary structure." [SO:0000358]
+xref: SO:0000358
+disjoint_from: APO:U0000004 ! gene
+is_a: APO:U0000003 ! biopolymer
+
+[Term]
+id: APO:U0000006
+name: transcript
+def: "An RNA synthesized on a DNA or RNA template by an RNA polymerase." [SO:0000673]
+xref: SO:0000673
+is_a: APO:U0000003 ! biopolymer
+
+[Term]
+id: APO:U0000007
+name: interaction
+def: "Any reciprocal or mutual action or effect between two continuants." [APO:ea]
+is_a: APO:U0000002 ! process
+
+[Term]
+id: APO:U0000008
+name: pathway
+def: "A chain of interactions undergone by a given biopolymer or molecular entity in a particular organism." [APO:ea]
+is_a: APO:U0000002 ! process
+
+[Term]
+id: APO:U0000009
+name: small molecule
+def: "A small structural unit of matter consisting of one or more atoms." [APO:ea]
+is_a: APO:U0000001 ! continuant
+
+[Term]
+id: APO:U0000010
+name: complex
+def: "Any distinct chemical species in which two or more identical or nonidentical chemical species are associated." [APO:ea]
+is_a: APO:U0000001 ! continuant
+
+[Typedef]
+id: is_a
+name: is_a
+builtin: true
+def: "For continuants: C is_a C' if and only if: given any c that instantiates C at a time t, c instantiates C' at t. For processes: P is_a P' if and only if: that given any p that instantiates P, then p instantiates P'." [PMID:15892874]
+comment: The is_a relationship is considered axiomatic by the obo file format specification, and by OWL
+exact_synonym: "is_subtype_of" []
+xref_analog: owl:subClassOf
+is_reflexive: true
+is_anti_symmetric: true
+is_transitive: true

@@ -1,0 +1,10 @@
+eg/openhmd-backend-inline.pl
+lib/OpenHMD.pm
+lib/OpenHMD.pod
+lib/OpenHMD/Backend/Inline.pm
+lib/OpenHMD/Backend/Inline.pod
+Makefile.PL
+MANIFEST
+t/openhmd-backend-inline.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

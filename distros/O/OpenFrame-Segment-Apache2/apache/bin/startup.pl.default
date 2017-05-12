@@ -1,0 +1,13 @@
+use strict;
+use lib '[% cwd %]/lib';
+use Apache2;
+use Apache::RequestRec;
+use Apache::RequestUtil;
+use Apache::RequestIO;
+use APR::Table;
+
+use Apache::Const -compile => qw(OK DECLINED);
+
+# put more things here ;-)
+
+1;

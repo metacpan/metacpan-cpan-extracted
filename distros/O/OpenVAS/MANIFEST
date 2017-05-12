@@ -1,0 +1,6 @@
+README.md
+Changes
+Makefile.PL
+MANIFEST
+lib/OpenVAS/OMP.pm
+t/1_create-object.t

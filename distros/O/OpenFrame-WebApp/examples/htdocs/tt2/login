@@ -1,0 +1,18 @@
+<html>
+  <head>
+    <title>OpenFrame-WebApp TT2 Example - Login</title>
+  </head>
+  <body>
+    <h1>Login</h1>
+
+    Please log in to the world's most insecure website.
+
+    <form method="get" action="/welcome.template">
+      Enter your user id: <input type="text" name="user_id"/><br/>
+      <input type="submit" name="login" value="login"/>
+    </form>
+
+    [% INCLUDE 'htdocs/tt2/footer' %]
+
+  </body>
+</html>

@@ -1,0 +1,15 @@
+
+                Net Link States (Area 10.188.0.0)
+
+LS age: 831
+LS Type: Network
+Link State ID: 0.0.0.1 (Interface ID of Designated Router)
+Advertising Router: 10.188.50.50
+LS Seq Number: 0x80000009
+Checksum: 0x7582
+Length: 32
+Options: *|*|-|R|-|*|E|V6
+Number of Routers: 2
+    Attached Router: 10.188.1.10
+    Attached Router: 10.188.50.50
+

@@ -1,0 +1,41 @@
+---
+abstract: 'make Otogiri to pluggable'
+author:
+  - 'Takuya Tsuchida <tsucchi@cpan.org>'
+build_requires:
+  DBD::SQLite: '0'
+  Test::More: '0.98'
+configure_requires:
+  CPAN::Meta: '0'
+  CPAN::Meta::Prereqs: '0'
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v1.0.0, CPAN::Meta::Converter version 2.141170'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Otogiri-Plugin
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Otogiri::Plugin:
+    file: lib/Otogiri/Plugin.pm
+    version: '0.03'
+requires:
+  Module::Load: '0'
+  Otogiri: '0.12'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/tsucchi/p5-Otogiri-Plugin/issues
+  homepage: https://github.com/tsucchi/p5-Otogiri-Plugin
+  repository: git://github.com/tsucchi/p5-Otogiri-Plugin.git
+version: '0.03'

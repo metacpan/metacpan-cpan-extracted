@@ -1,0 +1,10 @@
+\bCVS\b
+\bdist\b
+~$
+\.old$
+\.bak$
+\.backup$
+\.err$
+^tmp
+^notes
+^_

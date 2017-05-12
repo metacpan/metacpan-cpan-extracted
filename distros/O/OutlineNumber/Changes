@@ -1,0 +1,9 @@
+Revision history for Perl extension Number::Outline.
+
+1.00  Thu Jan 17 22:03:20 2002
+	- version created earlier today pulled into this format
+
+0.01  Thu Jan 17 22:02:24 2002
+	- original version; created by h2xs 1.21 with options
+		-AX -n Number::Outline
+

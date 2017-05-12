@@ -1,0 +1,9 @@
+
+# $Id: Changes,v 1.2 2003/05/09 18:55:30 oradb Exp $
+
+Revision history for Perl extension Oracle::DEBUG.
+
+0.01  Fri Apr  4 14:52:25 2003
+	- original version; created by h2xs 1.22 with options
+		-X -n Oracle::DEBUG
+

@@ -1,0 +1,98 @@
+=head1 NAME
+
+B<ciscoospf2yaml> - convert Cisco OSPF LSDB to YAML file
+
+=head1 SYNOPSIS
+
+B<ciscoospf2yaml>
+[B<-B> F<boundary>]
+[B<-E> F<external>]
+[B<-h>]
+[B<-H> I<user@host>]
+[B<-I> F<selfid>]
+[B<-N> F<network>]
+[B<-R> F<router>]
+[B<-S> F<summary>]
+[F<ospf.yaml>]
+
+=head1 DESCRIPTION
+
+B<ciscoospf2yaml> takes the OSPF link state database of a Cisco IOS
+router and converts it into a YAML file.
+
+The several input files containing the LSDB can be passed via command
+line.
+If a file is not given, B<ssh> to the router is invoked gather the
+information dynamically.
+For that the user C<ospf> must be allowed to log into the Cisco
+router.
+
+Optionally one output file can be given on command line, otherwise
+stdout is used.
+
+The options are as follows:
+
+=over 4
+
+=item B<-B> F<boundary>
+
+File describing the AS boundary routers summary-LSAs.
+It can be obtained with B<show ip ospf database asbr-summary>.
+
+=item B<-E> F<external>
+
+File describing the AS-external-LSAs.
+It can be obtained with B<show ip ospf database external>.
+
+=item B<-h>
+
+Show help message and exit.
+
+=item B<-H> I<user@host>
+
+The specified user and host are used for ssh login otherwise C<cisco>
+is used as host name.
+
+=item B<-I> F<selfid>
+
+File describing the router from witch the LSDB has been taken.
+It can be obtained with B<show ip ospf>.
+
+=item B<-N> F<network>
+
+File describing the network-LSAs.
+It can be obtained with B<show ip ospf database network>.
+
+=item B<-R> F<router>
+
+File describing the router-LSAs.
+It can be obtained with B<show ip ospf database router>.
+
+=item B<-S> F<summary>
+
+File describing the network summary-LSAs.
+It can be obtained with B<show ip ospf database summary>.
+
+=back
+
+=head1 EXAMPLES
+
+ ciscoospf2yaml | ospf2dot | dot
+
+=head1 DIAGNOSTICS
+
+The program dies if an error occurs.
+Typical errors are B<ssh> failure or parsing errors of the LSDB
+files.
+
+=head1 SEE ALSO
+
+L<OSPF::LSDB::Cisco>,
+L<OSPF::LSDB::YAML>,
+L<OSPF::LSDB>
+
+L<ospf2dot>
+
+=head1 AUTHOR
+
+Alexander Bluhm

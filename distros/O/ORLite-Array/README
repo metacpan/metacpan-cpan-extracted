@@ -1,0 +1,73 @@
+NAME
+    ORLite::Array - Array based objects for ORLite
+
+SYNOPSIS
+      # Used like the regular ORLite:
+      package Foo;
+
+      use ORLite::Array 'data/sqlite.db';
+
+      my @awesome = Foo::Person->select(
+         'where first_name = ?',
+         'Adam',
+      );
+
+      # Or used with extensions:
+      package Foo;
+
+      use ORLite::Array ();
+      use ORLite::Mirror 'http://myserver/path/mydb.sqlite';
+
+DESCRIPTION
+    ORLite is a light weight ORM specifically designed for used with SQLite
+    databases. By changing ORLite's hash based objects to using array based
+    objects we can cut away some time spend in DBI slicing the objects.
+
+    For some sample examples this has show the average time spend in the
+    select() method going from 350 µs/call to 160 µs/call.
+
+ACCESSORS
+    THIS FEATURE IS EXPERIMENTAL AND SUBJECT TO CHANGE WITHOUT NOTICE
+
+    Encapsulation isn't a goal. With ORLite you were able to access the
+    individual keys of the hash. This isn't an usable posibility with array
+    based objects. As an alternative ORLite::Array marks accessors for non
+    foreign key fields as lvalue methods. This makes it possible to update
+    attributes this way:
+
+      my $person = Foo::Person->select(
+          'where id = ?', 42
+      );
+      $person->age++;
+      $person->weigth += 10;
+
+    THIS FEATURE IS EXPERIMENTAL AND SUBJECT TO CHANGE WITHOUT NOTICE
+
+TODO
+    - Support for updating foreign key fields
+
+COMPATIBILITY
+    This code is compatible with ORLite version 1.25
+
+SUPPORT
+    Bugs should be reported via the CPAN bug tracker at
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=ORLite-Array>
+
+    For other issues, contact the author.
+
+AUTHOR
+    Peter Makholm <peter@makholm.net>
+
+SEE ALSO
+    ORLite
+
+COPYRIGHT
+    Copyright 2008 - 2009 Adam Kennedy. 2009 Peter Makholm
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

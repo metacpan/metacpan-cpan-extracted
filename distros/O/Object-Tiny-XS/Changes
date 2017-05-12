@@ -1,0 +1,9 @@
+Revision history for Perl extension Object-Tiny-XS
+
+1.01 Sun 30 Nov 2008
+	- Switch to Module::Install to fix indexing issues
+          as Module::Install automatically detects no_index
+          directories.
+
+1.00 Sat 29 Nov 2008
+	- Initial release

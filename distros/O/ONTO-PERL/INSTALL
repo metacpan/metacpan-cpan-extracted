@@ -1,0 +1,111 @@
+INSTALL
+=======
+
+There are two typical ways:
+
+(1) Using CPAN  
+==============
+
+You'll want to use CPAN to install the modules by performing the 
+following steps:
+
+From the root prompt on your server, invoke the CPAN shell:
+
+# perl -MCPAN -e shell
+
+Once the PERL interpreter has loaded (and been configured), you can 
+install modules by issuing the command install MODULENAME.
+
+The first thing you should do is upgrade your CPAN:
+
+cpan> install Bundle::CPAN
+
+Once it's done, type:
+
+cpan> reload cpan
+
+Now, enter the following command to retrieve all of the required modules:
+
+cpan> install OBO::Core::Ontology
+
+(2) Manually
+============
+
+By typing the following mantra:
+
+	perl Makefile.PL
+	make
+	make test
+	sudo make install
+
+Other useful commands:
+
+	make clean	
+	make distcheck
+	
+Documentation
+=============
+
+For more information about these modules, check:
+
+ - http://search.cpan.org/~easr/ONTO-PERL/
+ - http://www.cellcycleontology.org
+ - http://www.semantic-systems-biology.org
+ 
+See also:
+ 
+  1. ONTO-PERL: An API supporting the development and analysis of bio-ontologies
+     Antezana E, Egana M, De Baets B, Kuiper M, Mironov V.
+     Bioinformatics (2008) 24 (6): 885-887; doi: 10.1093/bioinformatics/btn042
+
+  2. ONTO-Toolkit: A set of Galaxy tools to deal with OBO-formatted ontologies,
+     Antezana E, Venkatesan A, Mungall C, Mironov V, Kuiper M.
+     BMC Bioinformatics 2010, 11(Suppl 12):S8 doi:10.1186/1471-2105-11-S12-S8
+     
+Citing ONTO-PERL
+================
+
+If you use ONTO-PERL in your work, you are kindly requested to cite:
+
+    ONTO-PERL: An API supporting the development and analysis of bio-ontologies
+    Antezana E, Egana M, De Baets B, Kuiper M, Mironov V.
+    Bioinformatics (2008) 24 (6): 885-887; doi: 10.1093/bioinformatics/btn042
+
+Third part modules
+==================
+
+Required module:
+
+1. Date::Manip (> v6.24) is used by the OBOParser (to check dates):
+
+   http://search.cpan.org/~sbeck/Date-Manip/
+
+Optional modules:
+
+1. XML::Parser (> v2.41) is used in format conversions (obo2owl and owl2obo):
+
+   http://search.cpan.org/~msergeant/XML-Parser/
+
+2. XML::XPath (> v1.13) is used by the IntAct related modules:
+
+   http://search.cpan.org/~msergeant/XML-XPath/
+
+3. SWISS Knife (> v1.67) is used by the 'UniProtParser':
+
+   ftp://ftp.ebi.ac.uk/pub/software/swissprot/Swissknife/
+
+4. Text::CSV (> v1.32) is used by 'bioportal_csv2obo.pl':
+
+   http://search.cpan.org/~makamaka/Text-CSV/
+
+Bugs/comments/questions/etc
+===========================
+
+We are regularly improving this API, please report any bugs 
+or send your comments to erick.antezana -@- gmail.com
+
+Contributions
+=============
+
+If you have any module or piece of code you believe it should 
+be part of ONTO-perl, contact erick.antezana -@- gmail.com

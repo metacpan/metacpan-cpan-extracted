@@ -1,0 +1,32 @@
+---
+abstract: 'Implementation of the OTRS search engine by Sphinx search'
+author:
+  - 'Iurii Shikin <shikin@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+  File::Spec: 0
+  Test::MockTime: 0
+  Test::More: 0
+  Test::Spec: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: OTRS-SphinxSearch
+requires:
+  Readonly: 0
+  Sphinx::Search: 0.28
+  Time::Piece: 0
+  perl: 5.006001
+  strict: 0
+  vars: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/regru/ORTS-SphinxSearch/issues
+  homepage: https://metacpan.org/release/ORTS-SphinxSearch
+  repository: https://github.com/regru/ORTS-SphinxSearch.git
+version: 0.011

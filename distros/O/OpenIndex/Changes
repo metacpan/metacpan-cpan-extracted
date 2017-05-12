@@ -1,0 +1,56 @@
+Revision history for Perl extension Apache::FileMan.
+
+0.01  Sat Sep 02 16:19:00 2000
+	- it's alive!
+0.06a Sun Feb 18 20:16:55 2001
+    - Fixed Apache::Language.
+0.07a
+    - Added frame support.
+0.07c
+    - Reorganized HOLD directory to be located anywhere on the server.
+    - Added the import directive for adding arbitrary commands.
+    - Supplied MD5 as an example of an import commond.
+0.07d
+    - Added "SelectAll" internal command.
+0.07g Mon Sep  3 17:55:45 CDT 2001 
+    - Added Total size.
+    - Fixed IndexOrderDefault for Name file extension sort.
+0.99 Thu Sep  6 16:58:20 CDT 2001
+    - Changed the name of the package to Apache::OpenIndex
+    - Added always directive and routine hook.
+1.00 Fri Sep 14 16:00 CDT 2001
+    - Uploaded the source to CPAN
+1.01 Fri Sep 28 18:27:00 CDT 2001
+    - Added Tatsuhiko Miyagawa patch to allow it to compile
+      on Perl 5.005_03
+    - Removed adding the import command to the Menu, because
+      it might turn out that it should be added to the admnmenu.
+    - Added admin check for admin commands to prevent spoofs.
+1.02 Tue Oct 09 15:18:00 CDT 2001
+    - Filtered user required text to not include hidden files.
+    - Fix a problem with the menu configuration merge affecting
+      all Apache directory and location blocks.
+    - Override the glob function in File::NCopy in order to 
+      support file names with spaces in them.
+1.03  Tue Oct 17 18:19:00 CDT 2001
+    - Fixed a problem where by, if a directory was being viewed
+      in both the index and file manager mode by two different 
+      browsers, the hidden files could appear in the index mode.
+    - Added IndexHtmlTag and IndexHtmlText directives to support
+      adding attributes and text for most HTML tags.  This
+      includes <STYLE> support for casscading style sheets.
+1.04  Fri Oct 26 07:08:00 CDT 2001
+    - Enhanced the IndexHtmlTag and IndexHtmlText directives
+      to append multi-lines (directives)i by using an initial
+      '+' character.
+    - Modified (empty) tags to comform to XHTML requirements.
+      For example: <p /> 
+1.05  Mon Sep 02 11:04:00 CST 2002
+    - Added three checks for $cfg-{ignore} existance.
+    - Added OpenIndexOptions UserDir directive and fixed ~user
+      processing for userdir_module.
+    - Added OpenIndexOptions UserSite directive.  This option
+      allows a group of users to use the same GID which in
+      turn prevents each user from accessing other user sites.
+    - Added more IndexHtmlText directives to insert HTML text
+      just before each of the form text and submit objects.

@@ -1,0 +1,146 @@
+Object-InsideOut version 4.04
+=============================
+
+This module provides comprehensive support for implementing classes using the
+inside-out object model.
+
+This module implements inside-out objects as anonymous scalar references that
+are blessed into a class with the scalar containing the ID for the object
+(usually a sequence number).  Object data (i.e., fields) are stored within the
+class's package in either arrays indexed by the object's ID, or hashes keyed
+to the object's ID.
+
+The virtues of the inside-out object model over the 'blessed hash' object
+model have been extolled in detail elsewhere.  Briefly, inside-out objects
+offer the following advantages over 'blessed hash' objects:
+
+* Encapsulation
+
+Object data is enclosed within the class's code and is accessible only through
+the class-defined interface.
+
+* Field Name Collision Avoidance
+
+Inheritance using 'blessed hash' classes can lead to conflicts if any classes
+use the same name for a field (i.e., hash key).  Inside-out objects are immune
+to this problem because object data is stored inside each class's package, and
+not in the object itself.
+
+* Compile-time Name Checking
+
+A common error with 'blessed hash' classes is the misspelling of field names:
+
+    $obj->{'coment'} = 'No comment';   # Should be 'comment' not 'coment'
+
+As there is no compile-time checking on hash keys, such errors do not usually
+manifest themselves until runtime.
+
+With inside-out objects, data is accessed using methods, the names of which
+are checked by the Perl compiler such that any typos are easily caught using
+"perl -c".
+
+
+This module offers all the capabilities of other inside-out object modules
+with the following additional key advantages:
+
+* Speed
+
+When using arrays for storing object data, Object::InsideOut objects are as
+much as 40% faster than 'blessed hash' objects for fetching and setting data,
+and even with hashes they are still several percent faster than 'blessed hash'
+objects.
+
+* Threads
+
+Object::InsideOut is thread safe, and thoroughly supports sharing objects
+between threads using threads::shared.
+
+* Flexibility
+
+Allows control over object ID specification, accessor naming, parameter name
+matching, and more.
+
+* 'Runtime' Support
+
+Supports classes that may be loaded at runtime (i.e., using "eval { require
+...; };").  This makes it usable from within mod_perl, as well.  Also supports
+additions to class hierarchies, and dynamic creation of object fields during
+runtime.
+
+* Perl 5.6
+
+Tested on Perl v5.6.0 through v5.6.2, v5.8.0 through v5.8.8, and v5.9.3.
+
+* Exception Objects
+
+As recommended in "Perl Best Practices", Object::InsideOut uses
+Exception::Class for handling errors in an OO-compatible manner.
+
+* Object Serialization
+
+Object::InsideOut has built-in support for object dumping and reloading that
+can be accomplished in either an automated fashion or through the use of
+class-supplied subroutines.  Serialization using 'Storable' is also supported.
+
+* Foreign Class Inheritance
+
+Object::InsideOut allows classes to inherit from foreign (i.e.,
+non-Object::InsideOut) classes, thus allowing you to sub-class other Perl
+class, and access their methods from your own objects.
+
+* Introspection
+
+Obtain constructor parameters and method metadata for Object::InsideOut
+classes.
+
+INSTALLATION
+
+To install this module type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+or if you have Module::Build installed:
+
+    perl Build.PL
+    perl Build
+    perl Build test
+    perl Build install
+
+DEPENDENCIES
+
+Requires Perl 5.6.0 or later.
+
+This module uses the following 'standard' modules:
+
+  ExtUtils::MakeMaker          - For installation
+  Test::More (0.50 or later)   - For installation
+  Scalar::Util (1.10 or later) - Standard in 5.8 or obtain from CPAN
+  Data::Dumper
+  attributes
+  overload
+  B
+
+This module requires the following module available from CPAN:
+
+  Exception::Class (1.22 or later)
+
+Using the :lvalue accessor feature of this module requires the following
+module from CPAN:
+
+  Want (0.12 or later)
+
+For :SECURE mode, this module requires the following module from CPAN:
+
+  Math::Random::MT::Auto (5.04 or later)
+
+COPYRIGHT AND LICENCE
+
+Copyright 2005 - 2012 Jerry D. Hedden <jdhedden AT cpan DOT org>
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+# EOF

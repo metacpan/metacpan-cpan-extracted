@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<SITE ID="Whoizzy">
+
+<NAME Lang="en-us">WHOIZZY.COM Search Engine</NAME>
+<INFO Lang="en-us">general information web search</INFO>
+
+<URL Type="Start"><![CDATA[
+post://www.whoizzy.com/websearch.cgi?action=search&Keywords=_QUERY_
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/5</SCORE>
+
+
+<TEMPLATE><![CDATA[
+<td><a href="_URL_">_TITLE_</a></td><td>_PREVIEW_</td></tr>
+]]></TEMPLATE>
+</SITE>

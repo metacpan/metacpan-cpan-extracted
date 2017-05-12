@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<SITE ID="Eldl">
+
+<NAME Lang="en-us">Edward Lowe Digital Library</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+Edward Lowe電子圖書館
+]]></NAME>
+<INFO Lang="en-us">online library</INFO>
+<INFO Lang="zh-tw">online library</INFO>
+
+<URL Type="Start"><![CDATA[
+post://search.lowe.org:8118/cgi-bin/query?queryels=_QUERY_
+]]></URL>
+
+
+
+<TEMPLATE><![CDATA[
+</strong><a href="_URL_">_TITLE_</a>
+]]></TEMPLATE>
+</SITE>

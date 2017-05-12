@@ -1,0 +1,20 @@
+Changes
+lib/Object/Result.pm
+Makefile.PL
+MANIFEST
+README
+t/00.load.t
+t/alternative_coercions.t
+t/coercions.t
+t/default_coercions.t
+t/empty_result.t
+t/exceptions.t
+t/fail.t
+t/fail_dollar_at.t
+t/fail_msg.t
+t/fail_msg_dollar_bang.t
+t/named_methods.t
+t/no_default_coercions.t
+t/true_false.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

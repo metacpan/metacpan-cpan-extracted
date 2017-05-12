@@ -1,0 +1,85 @@
+-*- change-log -*-
+Based on CORE Opcode-1.16
+
+0.14	2014-07-16 rurban
+        * added .travis.yml and .gitignore
+        * replaced README with README.md
+        * added test_cover and test_coverall targets (37.9%)
+
+0.13	2013-12-30 rurban
+        * added LICENSE head1 to pod, fixes t/z_kwalitee.t
+
+0.12	2013-04-05 rurban
+	* remove outdated SIGNATURE and META files from repo.
+        * fix t/kwalitee.t to use generated MYMETA.yml
+        * Update SIGNATURE with new gpg key
+
+0.11	2011-12-06 rurban
+	* remove Opcode, Carp and AutoLoader, too heavy and not needed.
+	  Loads 4 files and 1162 lines less.
+
+0.10	2010-11-27 rurban
+	* maybranch fixes (for Jit): internal LOGOPs,
+	  added dump, entergiven, range
+	  removed padhv.
+
+0.09	2010-09-12 rurban
+	* removed enter, leave from no_stack. Fixed by Heinz Knutzen in B::CC
+
+0.08	2010-08-31 rurban
+	* now that OA_RETINTEGER is in danger move all flags to constants
+	  (See commit 95ddc6755 and my i_opt branch on github). Add ours also.
+
+0.07	2010-08-30 rurban
+	* added OA_ constants. 5.13.5 903fd87c2 introduced a OASHIFT change,
+	  so get it from op.h instead of hardcoded
+
+0.06	2010-08-20 rurban
+	* added README (now really)
+	* added t/z_kwalitee.t, t/z_meta.t, t/z_perl_minimum_version.t
+
+0.05	2010-08-20 rurban
+	* added to github: http://github.com/rurban/Opcodes
+
+0.04	2010-08-11 rurban
+	* added maybranch for Jit: subst substcont defined formline grepstart grepwhile
+	  mapwhile and or dor cond_expr andassign orassign dorassign dbstate return
+	  last next redo dump goto enterwhen require entereval entertry once
+
+0.03	2010-04-04 rurban
+	* removed realclean => Makefile.PL left-over from Opcode in CORE.
+	Thanks to Sisyphus <sisyphus1@optusnet.com.au>.
+
+0.02	2010-01-24 rurban
+	* better test and pod
+
+0.01	2010-01-23 rurban
+	First release as Opcodes-0.01
+	rgs didn't want to add this to core Opcode.
+	removed duplicate code from Opcode and modernized tests.
+
+2010-01-08 rurban
+	(Opcode 2.01)
+	* Added opflags n 512 no stack
+
+2010-01-07 rurban
+	(Opcode 2.00)
+	* cpanified, added quality tests. Backported to 5.6.
+	Dig around the history for Changes and LICENSE.
+	* added opname2code
+
+2010-01-07 rurban
+	(Opcode 1.17)
+	* in blead post-5.11.3: added opcodes() and properties
+
+Earlier see L<perldelta.pod>
+
+Split from Safe with 2ded1cc127f8ba301 "New Opcode extension subsumes Safe"
+	1996-06-18 02:18:18
+	and 6badd1a5d1be4008f79fa "Add Opcode extension"
+	1996-06-18 02:12:05
+	by Tim Bunce
+
+Added to Perl with cb1a09d0194fed9b9 "patch.2b1g to perl5.002beta1"
+	1995-12-21 00:01:16
+	by Malcom Beattie

@@ -1,0 +1,9 @@
+[%########################################
+  form_select_options_iterator( iterator, label_field, value_field, picked )
+     Cycle through all objects in an iterator and display an <OPTION>
+     for each
+  ########################################-%]
+
+[%- WHILE ( item = iterator.get_next ) -%]
+   [%- INCLUDE form_select_option -%]
+[%- END -%]

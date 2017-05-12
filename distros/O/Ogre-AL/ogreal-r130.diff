@@ -1,0 +1,168 @@
+Index: Demos/Directional_Demo/Listener.cpp
+===================================================================
+--- Demos/Directional_Demo/Listener.cpp	(revision 130)
++++ Demos/Directional_Demo/Listener.cpp	(working copy)
+@@ -35,12 +35,12 @@
+ 
+ 	mInputManager = OIS::InputManager::createInputSystem(params);
+ 
+-	if(mInputManager->numMice() > 0)
++	if(mInputManager->getNumberOfDevices(OIS::OISMouse) > 0)
+ 	{
+ 		mMouse = static_cast<OIS::Mouse*>(mInputManager->createInputObject(OIS::OISMouse, true));
+ 		mMouse->setEventCallback(this);
+ 	}
+-	if(mInputManager->numKeyboards() > 0)
++	if(mInputManager->getNumberOfDevices(OIS::OISKeyboard) > 0)
+ 	{
+ 		mKeyboard = static_cast<OIS::Keyboard*>(mInputManager->createInputObject(OIS::OISKeyboard, true));
+ 		mKeyboard->setEventCallback(this);
+@@ -98,7 +98,7 @@
+ 		mHornNode->yaw(Degree(115*evt.timeSinceLastFrame), Node::TS_WORLD);
+ 
+     // Move the camera
+-	mCamNode->translate(mPitchNode->getWorldOrientation() * mDirection * evt.timeSinceLastFrame);
++	mCamNode->translate(mPitchNode->_getDerivedOrientation() * mDirection * evt.timeSinceLastFrame);
+ 
+ 	const RenderWindow::FrameStats& stats = mWindow->getStatistics();
+ 	OverlayManager::getSingleton().getOverlayElement("TextAreaName")->setCaption(
+Index: Demos/Basic_Demo/Listener.cpp
+===================================================================
+--- Demos/Basic_Demo/Listener.cpp	(revision 130)
++++ Demos/Basic_Demo/Listener.cpp	(working copy)
+@@ -35,12 +35,12 @@
+ 
+ 	mInputManager = OIS::InputManager::createInputSystem(params);
+ 
+-	if(mInputManager->numMice() > 0)
++	if(mInputManager->getNumberOfDevices(OIS::OISMouse) > 0)
+ 	{
+ 		mMouse = static_cast<OIS::Mouse*>(mInputManager->createInputObject(OIS::OISMouse, true));
+ 		mMouse->setEventCallback(this);
+ 	}
+-	if(mInputManager->numKeyboards() > 0)
++	if(mInputManager->getNumberOfDevices(OIS::OISKeyboard) > 0)
+ 	{
+ 		mKeyboard = static_cast<OIS::Keyboard*>(mInputManager->createInputObject(OIS::OISKeyboard, true));
+ 		mKeyboard->setEventCallback(this);
+@@ -95,7 +95,7 @@
+     yaw = pitch = 0;
+ 
+     // Move the camera
+-	mCamNode->translate(mPitchNode->getWorldOrientation() * mDirection * evt.timeSinceLastFrame);
++	mCamNode->translate(mPitchNode->_getDerivedOrientation() * mDirection * evt.timeSinceLastFrame);
+ 
+ 	const RenderWindow::FrameStats& stats = mWindow->getStatistics();
+ 	OverlayManager::getSingleton().getOverlayElement("TextAreaName")->setCaption(
+Index: Demos/MultiChannel_Demo/Listener.cpp
+===================================================================
+--- Demos/MultiChannel_Demo/Listener.cpp	(revision 130)
++++ Demos/MultiChannel_Demo/Listener.cpp	(working copy)
+@@ -33,12 +33,12 @@
+ 
+ 	mInputManager = OIS::InputManager::createInputSystem(params);
+ 
+-	if(mInputManager->numMice() > 0)
++	if(mInputManager->getNumberOfDevices(OIS::OISMouse) > 0)
+ 	{
+ 		mMouse = static_cast<OIS::Mouse*>(mInputManager->createInputObject(OIS::OISMouse, true));
+ 		mMouse->setEventCallback(this);
+ 	}
+-	if(mInputManager->numKeyboards() > 0)
++	if(mInputManager->getNumberOfDevices(OIS::OISKeyboard) > 0)
+ 	{
+ 		mKeyboard = static_cast<OIS::Keyboard*>(mInputManager->createInputObject(OIS::OISKeyboard, true));
+ 		mKeyboard->setEventCallback(this);
+@@ -93,7 +93,7 @@
+     yaw = pitch = 0;
+ 
+     // Move the camera
+-	mCamNode->translate(mPitchNode->getWorldOrientation() * mDirection * evt.timeSinceLastFrame);
++	mCamNode->translate(mPitchNode->_getDerivedOrientation() * mDirection * evt.timeSinceLastFrame);
+ 
+ 	const RenderWindow::FrameStats& stats = mWindow->getStatistics();
+ 	OverlayManager::getSingleton().getOverlayElement("TextAreaName")->setCaption(
+Index: Demos/PlayPen/Listener.cpp
+===================================================================
+--- Demos/PlayPen/Listener.cpp	(revision 130)
++++ Demos/PlayPen/Listener.cpp	(working copy)
+@@ -33,12 +33,12 @@
+ 
+ 	mInputManager = OIS::InputManager::createInputSystem(params);
+ 
+-	if(mInputManager->numMice() > 0)
++	if(mInputManager->getNumberOfDevices(OIS::OISMouse) > 0)
+ 	{
+ 		mMouse = static_cast<OIS::Mouse*>(mInputManager->createInputObject(OIS::OISMouse, true));
+ 		mMouse->setEventCallback(this);
+ 	}
+-	if(mInputManager->numKeyboards() > 0)
++	if(mInputManager->getNumberOfDevices(OIS::OISKeyboard) > 0)
+ 	{
+ 		mKeyboard = static_cast<OIS::Keyboard*>(mInputManager->createInputObject(OIS::OISKeyboard, true));
+ 		mKeyboard->setEventCallback(this);
+@@ -93,7 +93,7 @@
+     yaw = pitch = 0;
+ 
+     // Move the camera
+-	mCamNode->translate(mPitchNode->getWorldOrientation() * mDirection * evt.timeSinceLastFrame);
++	mCamNode->translate(mPitchNode->_getDerivedOrientation() * mDirection * evt.timeSinceLastFrame);
+ 
+ 	const RenderWindow::FrameStats& stats = mWindow->getStatistics();
+ 	OverlayManager::getSingleton().getOverlayElement("TextAreaName")->setCaption("");
+Index: Demos/Doppler_Demo/Listener.cpp
+===================================================================
+--- Demos/Doppler_Demo/Listener.cpp	(revision 130)
++++ Demos/Doppler_Demo/Listener.cpp	(working copy)
+@@ -120,12 +120,12 @@
+ 
+ 	mInputManager = OIS::InputManager::createInputSystem(params);
+ 
+-	if(mInputManager->numMice() > 0)
++	if(mInputManager->getNumberOfDevices(OIS::OISMouse) > 0)
+ 	{
+ 		mMouse = static_cast<OIS::Mouse*>(mInputManager->createInputObject(OIS::OISMouse, true));
+ 		mMouse->setEventCallback(this);
+ 	}
+-	if(mInputManager->numKeyboards() > 0)
++	if(mInputManager->getNumberOfDevices(OIS::OISKeyboard) > 0)
+ 	{
+ 		mKeyboard = static_cast<OIS::Keyboard*>(mInputManager->createInputObject(OIS::OISKeyboard, true));
+ 		mKeyboard->setEventCallback(this);
+@@ -204,7 +204,7 @@
+     yaw = pitch = 0;
+ 
+     // Move the camera
+-	mCamNode->translate(mPitchNode->getWorldOrientation() * mDirection * evt.timeSinceLastFrame);
++	mCamNode->translate(mPitchNode->_getDerivedOrientation() * mDirection * evt.timeSinceLastFrame);
+ 
+ 	carNode->yaw(Degree(-100 * evt.timeSinceLastFrame));
+ 	soundManager->getSound("BusSound")->setVelocity(carNode->getOrientation().zAxis() * 100);
+Index: Demos/ManySources_Demo/Listener.cpp
+===================================================================
+--- Demos/ManySources_Demo/Listener.cpp	(revision 130)
++++ Demos/ManySources_Demo/Listener.cpp	(working copy)
+@@ -33,12 +33,12 @@
+ 
+ 	mInputManager = OIS::InputManager::createInputSystem(params);
+ 
+-	if(mInputManager->numMice() > 0)
++	if(mInputManager->getNumberOfDevices(OIS::OISMouse) > 0)
+ 	{
+ 		mMouse = static_cast<OIS::Mouse*>(mInputManager->createInputObject(OIS::OISMouse, true));
+ 		mMouse->setEventCallback(this);
+ 	}
+-	if(mInputManager->numKeyboards() > 0)
++	if(mInputManager->getNumberOfDevices(OIS::OISKeyboard) > 0)
+ 	{
+ 		mKeyboard = static_cast<OIS::Keyboard*>(mInputManager->createInputObject(OIS::OISKeyboard, true));
+ 		mKeyboard->setEventCallback(this);
+@@ -93,7 +93,7 @@
+     yaw = pitch = 0;
+ 
+     // Move the camera
+-	mCamNode->translate(mPitchNode->getWorldOrientation() * mDirection * evt.timeSinceLastFrame);
++	mCamNode->translate(mPitchNode->_getDerivedOrientation() * mDirection * evt.timeSinceLastFrame);
+ 
+ 	const RenderWindow::FrameStats& stats = mWindow->getStatistics();
+ 	OverlayManager::getSingleton().getOverlayElement("TextAreaName")->setCaption(

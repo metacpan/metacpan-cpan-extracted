@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<SITE ID="PC_World">
+
+<NAME Lang="en-us">PC World Online</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+PC World¥þ²yWWW·j´M
+]]></NAME>
+<INFO Lang="en-us">computer relevant web Search</INFO>
+<INFO Lang="zh-tw">computer relevant web Search</INFO>
+
+<URL Type="More"><![CDATA[
+http://search.pcworld.com:8080/_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://search.pcworld.com:8080/cgi-bin/query?mss=simple&pg=q&what=web&fmt=.&q=_QUERY_
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_NEXT_"><![CDATA[
+<a href="_NEXT_">[Next
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<dt><FONT___<a href="_URL_">_TITLE_</a>___<dd>_PREVIEW_<br>___<p>
+]]></TEMPLATE>
+</SITE>

@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<SITE ID="Francite">
+
+<NAME Lang="en-us">Francite Search</NAME>
+<INFO Lang="en-us">general information web search in France</INFO>
+
+<URL Type="More"><![CDATA[
+http://francite.infinit.net_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://francite.infinit.net/i3dpro/francite.exe/q?name=_QUERY_&quelbd=robot&bd=franrob1&quelrech=ou&ortho=exact
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_NEXT_"><![CDATA[
+<a href="_NEXT_">Les
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+.<A HREF="___TARGET="_top">_TITLE_</A>___SIZE=-1 FACE=ARIAL>_PREVIEW_<br>___image(s),_SIZEK_kb,___TARGET="_top">_URL_</a>___<TD></TD>
+]]></TEMPLATE>
+</SITE>

@@ -1,0 +1,52 @@
+NAME
+    OWL::DirectSemantics - representation of the direct semantics of OWL2
+
+SYNOPSIS
+      use RDF::Trine;
+      my $model = RDF::Trine::Model->temporary_model;
+      RDF::Trine::Mode->parse_url_into_model($url, $model);
+  
+      use OWL::DirectSemantics;
+      my $translator = OWL::DirectSemantics::Translator->new;
+      my $ontology   = $translator->translate($model);
+  
+      foreach my $ax ($ontology->axioms)
+      {
+        if ($ax->element_name eq 'ClassAssertion')
+        {
+          printf("%s is of type %s.\n", $ax->node, $ax->class);
+        }
+      }
+  
+      print "The following data couldn't be translated to OWL:\n";
+      print RDF::Trine::Serializer
+        ->new('ntriples')
+        ->serialize_model_to_string($model);
+
+DESCRIPTION
+    This distribution provides a basic framework for representing the OWL 2
+    direct semantics model, and a translator to build that model from an
+    RDF-based model.
+
+SEE ALSO
+    OWL::DirectSemantics::Translator, OWL::DirectSemantics::Element,
+    RDF::Trine::Serializer::OwlFn.
+
+    RDF::Closure, RDF::Trine::Parser::OwlFn.
+
+    RDF::Trine, RDF::Query, <http://www.perlrdf.org/>.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT
+    Copyright 2011-2012 Toby Inkster
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

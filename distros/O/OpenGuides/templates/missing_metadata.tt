@@ -1,0 +1,89 @@
+[% INCLUDE header.tt page_title = "Missing Metadata - $site_name" %]
+[% INCLUDE banner.tt %]
+<div id="content">
+
+[% IF no_nodes_on_map OR !show_map %]
+  [% INCLUDE navbar.tt %]
+  <div id="maincontent">
+[% ELSE %]
+  <div id="maincontent_no_navbar">
+[% END %]
+
+<h2>Pages Missing Metadata</h2>
+
+[% options = [ "category", "locale", "address", "postcode", "phone", "fax",
+               "website", "hours", "summary", "latitude", "longitude",
+               "os_x", "os_y", "map_link", "node_image" ] %]
+
+[% labels = { phone => "Telephone Number", hours => "Opening Hours",
+              os_x => "OS X", os_y => "OS Y", map_link => "Map Link",
+              node_image => "Image" } %]
+
+<form method="get" action="[% script_name %]">
+  <input type="hidden" name="action" value="show_missing_metadata" />
+  <div>
+    <label for="metadata_type">Metadata Type:</label>
+    <select name="metadata_type" id="metadata_type">
+      [% FOREACH option = options %]
+        <option value="[% option %]"[% IF option == metadata_type %] selected="1"[% END %]>
+          [%- IF labels.$option -%]
+            [%- labels.$option -%]
+          [%- ELSE -%]
+            [%- option.ucfirst -%]
+          [%- END -%]
+        </option>
+      [% END %]
+    </select>
+  </div>
+  <div>
+    <label for="metadata_value">Metadata Value:</label>
+    <input name="metadata_value" id="metadata_value" value="[% metadata_value %]" />
+    &nbsp; &nbsp; &nbsp;
+    <i>Optional, eg 'pub' when metadata value is Category</i>
+  </div>
+  <div>
+    <label for="exclude_locales">Exclude Locales:</label>
+    <input type="checkbox" name="exclude_locales" id="exclude_locales" [% IF exclude_locales %]checked="true"[% END %] />
+  </div>
+  <div>
+    <label for="exclude_categories">Exclude Categories:</label>
+    <input type="checkbox" name="exclude_categories" id="exclude_categories" [% IF exclude_categories %]checked="true"[% END %] />
+  </div>
+  [% IF config.use_leaflet %]
+    <div>
+      <label for="show_map">Show results on a map:</label>
+      <input type="checkbox" name="format" value="map" id="show_map"[% IF show_map %] checked="true"[% END %] />
+    </div>
+  [% END %]
+  <div>
+    <input type="submit" value="Find Nodes" />
+  </div>
+</form>
+
+[% IF done_search %]
+  <h3>Pages</h3>
+  [% IF show_map %]
+    [% IF config.use_leaflet %]
+      [% INCLUDE search_results_leaflet.tt %]
+    [% ELSE %]
+      <span class="map_results_no_leaflet">Sorry!  Map output is only available
+      for sites using the Leaflet mapping library.</span>
+    [% END %]
+  [% ELSE %]
+    <a name="nodes"></a>
+    <table id="nodes">
+    <tr><th>Node name</th><th>View</th><th>Edit</th></tr>
+      [% FOREACH node = nodes %]
+        <tr>
+         <td><a href="[% node.view_url %]">[% node.name %]</a></td>
+         <td><a href="[% node.view_url %]">view</a></td>
+         <td><a href="[% node.edit_url %]">edit</a></td>
+        </tr>
+      [% END %]
+    </table>
+  [% END %]
+[% END %]
+
+</div>
+
+[% INCLUDE footer.tt %]

@@ -1,0 +1,10 @@
+begin:
+text has 'id'
+text has 'title'
+text has 'body'
+text has 'userId'
+text match /id/
+text match /title/
+text match /body/
+text match /userId/
+end:

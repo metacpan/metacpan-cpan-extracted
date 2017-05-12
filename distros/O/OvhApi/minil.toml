@@ -1,0 +1,4 @@
+name = "OvhApi"
+# badges = ["travis"]
+module_maker="ModuleBuildTiny"
+license="bsd"

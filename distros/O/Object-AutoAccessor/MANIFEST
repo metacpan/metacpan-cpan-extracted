@@ -1,0 +1,12 @@
+Changes
+lib/Object/AutoAccessor.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/00_compile.t
+t/01_base.t
+t/02_inherit.t
+t/03_html_template.t
+t/04_build.t
+t/lib/Foo.pm

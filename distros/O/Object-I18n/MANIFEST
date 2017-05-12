@@ -1,0 +1,18 @@
+Changes
+lib/Object/I18n.pm
+lib/Object/I18n/Storage.pm
+lib/Object/I18n/Storage/CDBI.pm
+lib/Object/I18n/Storage/MemHash.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+README
+t/cdbi.t
+t/language.t
+t/lib/dbi_connect.pl
+t/lib/OI18nTest/CDBI.pm
+t/lib/OI18nTest/Greeting.pm
+t/lib/OI18nTest/Greeting/CDBI.pm
+t/lib/OI18nTest/Storage/Greeting.pm
+t/Object-I18n.t

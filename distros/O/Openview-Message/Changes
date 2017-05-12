@@ -1,0 +1,27 @@
+Revision history for Perl extension Openview::Message.
+
+0.03  Sat Jan  17 02:45:00 EST 2004
+   - No functional changes
+	- More Documentation cleanup
+   - Reorg files to more standard module locations
+
+   L Baxter
+
+0.02  Fri Feb  7 13:21:33 EST 2003
+	- Documentation cleanup
+   - Look at the OV/lib dir to determine the available libraries 
+     with which to link
+   - Provide CLI wrapper implementation for those cases where we cannot link
+     with the library, but CLI is available.
+     This can also be used with the CLI_OPENVIEW_SENDER
+     evironment VAR to force the use of the CLI in forking servers
+     which would be trashed by the fact that the OV libraries
+     "are not fork safe".
+
+   L Baxter
+
+0.01  Sat Apr 20 23:42:03 EDT 2002
+	- original version
+
+   L Baxter
+

@@ -1,0 +1,239 @@
+format-version: 1.0
+date: 11:05:2007 12:52
+saved-by: easr
+synonymtypedef: FORMULA "FORMULA" RELATED
+synonymtypedef: IUPAC_NAME "IUPAC NAME"
+idspace: CCO http://www.cellcycleontology.org/ontology/CCO "cell cycle ontology terms"
+idspace: GO urn:lsid:bioontology.org:GO: "gene ontology terms"
+default-namespace: test_namespace
+
+[Term]
+id: MYO:0000000
+name: A
+!TODO This is a TODO
+
+[Term]
+id: MYO:0000001
+name: B
+is_a: MYO:0000000 ! A
+
+[Term]
+id: MYO:0000002
+name: C
+is_a: MYO:0000000 ! A
+
+[Term]
+id: MYO:0000003
+name: D
+is_a: MYO:0000001 ! B
+
+[Term]
+id: MYO:0000004
+name: E
+is_a: MYO:0000001 ! B
+
+[Term]
+id: MYO:0000005
+name: F
+is_a: MYO:0000001 ! B
+
+[Term]
+id: MYO:0000006
+name: G
+is_a: MYO:0000002 ! C
+
+[Term]
+id: MYO:0000007
+name: H
+is_a: MYO:0000002 ! C
+
+[Term]
+id: MYO:0000008
+name: I
+is_a: MYO:0000002 ! C
+
+[Term]
+id: MYO:0000009
+name: J
+is_a: MYO:0000002 ! C
+
+[Term]
+id: MYO:0000010
+name: K
+is_a: MYO:0000005 ! F
+
+[Term]
+id: MYO:0000011
+name: L
+is_a: MYO:0000005 ! F
+
+[Term]
+id: MYO:0000013
+name: M
+is_a: MYO:0000005 ! F
+relationship: part_of MYO:0000014 ! N
+relationship: part_of MYO:0000015 ! O
+relationship: part_of MYO:0000016 ! P
+
+[Term]
+id: MYO:0000014
+name: N
+is_a: MYO:0000009 ! J
+relationship: part_of MYO:0000001 ! B
+
+[Term]
+id: MYO:0000015
+name: O
+is_a: MYO:0000009 ! J
+
+[Term]
+id: MYO:0000016
+name: P
+def: "This is a definition having a partial dbxref." [EASR:]
+is_a: MYO:0000009 ! J
+relationship: part_of MYO:0000003 ! D
+relationship: part_of MYO:0000004 ! E
+relationship: part_of MYO:0000005 ! F
+
+[Term]
+id: MYO:0000557
+name: granulocyte monocyte progenitor cell
+def: "A progenitor cell committed to the granulocyte and monocyte lineages." [http://www.copewithcytokines.de, ISBN:0721601464, PMID:15684376, PMID:15867096]
+broad_synonym: "CFU-C , Colony forming unit in culture" [http://www.copewithcytokines.de]
+exact_synonym: "CFU-GM" [PMID:15867096, ISBN:0721601464, PMID:15684376]
+exact_synonym: "colony forming unit granulocyte macrophage" [PMID:15867096, ISBN:0721601464, PMID:15684376]
+exact_synonym: "GMP" [PMID:15867096, ISBN:0721601464, PMID:15684376]
+exact_synonym: "granulocyte-macrophage progenitor" [PMID:15867096, ISBN:0721601464, PMID:15684376]
+
+[Term]
+id: MYO:0000050
+name: msa_name
+def: "The name given to the multiple sequence alignment." [RO:jt]
+synonym: "aln_name" []
+synonym: "aln_name2" [TEST:]
+xref_unknown: RO:jt
+
+[Term]
+id: MYO:0000330
+name: conserved_region
+def: "Region of sequence similarity by descent from a common ancestor." [MYO:ke]
+synonym: "conserved region" EXACT []
+xref: http://en.wikipedia.org/wiki/Conserved_region "wiki"
+
+[Term]
+id: MYO:1990265
+name: platelet-derived growth factor complex
+namespace: cellular_component
+def: "A protein complex consisting of two chains of platelet-derived growth factor (PDGF) subunits. PDGF dimers bind to PDGF receptors in the plasma membrane and induce receptor dimerisation and activation. PDGFs are involved in a wide variety of signalling processes. PDGFs are found in all vertebrates where at least 2 different chains (A and B) exist. In human (and other mammals), four types of PDGF chains (A, B, C, and D) are known which form five different dimers (AA, AB, BB, CC and DD)." [GOC:bhm, IntAct:EBI-2881436, IntAct:EBI-2881443, IntAct:EBI-2881451, PMID:11331882]
+comment: An example of this is PDGFA in human (P04085) in PMID:20534510 (inferred from direct assay).
+synonym: "PDGF complex" RELATED []
+synonym: "PDGF-AA dimer" NARROW []
+synonym: "PDGF-AB dimer" NARROW []
+synonym: "PDGF-BB dimer" NARROW []
+synonym: "PDGF-CC dimer" NARROW []
+synonym: "PDGF-DD dimer" NARROW []
+xref: IntAct:EBI-2881436
+xref: IntAct:EBI-2881443
+xref: IntAct:EBI-2881451
+created_by: bhm
+creation_date: 2014-01-09T16:09:11Z
+
+[Term]
+id: MYO:0000853
+name: homologous_region
+def: "A region that is homologous to another region." [MYO:ke]
+synonym: "homolog" EXACT []
+synonym: "homologous region" EXACT []
+synonym: "homologue" EXACT []
+xref: http://en.wikipedia.org/wiki/Homology_(biology) "wiki"
+intersection_of: MYO:0000330 ! conserved_region
+intersection_of: has_quality MYO:0000857 ! homologous
+
+[Term]
+id: MYO:0000857
+name: homologous
+def: "Similarity due to common ancestry." [MYO:ke]
+
+[Term]
+id: MYO:33820
+name: iduronate
+synonym: "C6H9O7" RELATED FORMULA [ChEBI:]
+synonym: "C6H9O7" RELATED IUPAC_NAME [ChEBI:]
+created_by: erick_antezana
+creation_date: 2010-04-13T01:32:36Z
+
+[Term]
+id: MYO:1000006
+name: country
+namespace: geographical_location
+xref: http://es.wikipedia.org/wiki/Pais\,_Bolivia
+xref: http://en.wikipedia.org/wiki/Country
+
+[Term]
+id: MYO:1000007
+name: ghost town
+property_value: lastest_modification_by "erick" xsd:string
+property_value: number_of_permanent_residents "0" xsd:positiveInteger
+created_by: erick_antezana
+creation_date: 2012-11-08T08:55:12Z
+
+[Term]
+id: MYO:1000008
+name: term without a definition
+def: "" [src_code:NR]
+is_obsolete: true
+
+[Instance]
+id: MYO:1000008
+name: Belgium
+namespace: geographical_location
+synonym: "BE" EXACT [MYO:erick]
+xref: http://en.wikipedia.org/wiki/Belgium
+instance_of: MYO:1000006 ! country
+
+[Instance]
+id: MYO:fred
+name: fred flintstone
+instance_of: MYO:caveman
+property_value: married_to MYO:wilma
+property_value: shoe_size "12" xsd:positiveInteger
+
+[Instance]
+id: MYO:wilma
+name: wilma flintstone
+instance_of: MYO:caveman
+property_value: shoe_size "10" xsd:positiveInteger
+
+[Typedef]
+id: has_quality
+name: has_quality
+comment: The relationship between a feature and an attribute.
+disjoint_from: does_not_have_quality
+
+[Typedef]
+id: is_a
+name: is_a
+
+[Typedef]
+id: located_in
+name: is located in
+def: "C located_in C' if and only if: given any c that instantiates C at a time t, there is some c' such that: c' instantiates C' at time t and c *located_in* c'. (Here *located_in* is the instance-level location relation.)" [PMID:15892874]
+comment: Location as a relation between instances: The primitive instance-level relation c located_in r at t reflects the fact that each continuant is at any given time associated with exactly one spatial region, namely its exact location. Following we can use this relation to define a further instance-level location relation - not between a continuant and the region which it exactly occupies, but rather between one continuant and another. c is located in c1, in this sense, whenever the spatial region occupied by c is part_of the spatial region occupied by c1.    Note that this relation comprehends both the relation of exact location between one continuant and another which obtains when r and r1 are identical (for example, when a portion of fluid exactly fills a cavity), as well as those sorts of inexact location relations which obtain, for example, between brain and head or between ovum and uterus
+is_reflexive: true
+is_transitive: true
+is_a: overlapped_by ! is overlapped by
+inverse_of: location_of ! is location of
+holds_over_chain: located_in part_of
+holds_over_chain: part_of located_in
+holds_over_chain: located_in contained_in
+holds_over_chain: contained_in located_in
+
+[Typedef]
+id: part_of
+name: part_of
+created_by: erick_antezana
+creation_date: 2008-04-13T01:32:36Z
+modified_by: erick_antezana
+modification_date: 2010-04-13T01:32:36Z
+is_class_level: true
+!TODO This is a TODO

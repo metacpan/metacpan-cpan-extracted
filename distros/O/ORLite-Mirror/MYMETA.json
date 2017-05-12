@@ -1,0 +1,69 @@
+{
+   "abstract" : "Extend ORLite to support remote SQLite databases",
+   "author" : [
+      "Adam Kennedy <adamk@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Install version 1.06, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "ORLite-Mirror",
+   "no_index" : {
+      "directory" : [
+         "example",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.59",
+            "IO::Compress::Bzip2" : "2.008",
+            "IO::Compress::Gzip" : "2.008",
+            "Test::More" : "0.47",
+            "URI" : "1.35"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.59"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::HomeDir" : "0.69",
+            "File::Path" : "2.04",
+            "File::Remove" : "1.42",
+            "File::ShareDir" : "1.00",
+            "File::Spec" : "0.80",
+            "IO::Uncompress::Bunzip2" : "2.008",
+            "IO::Uncompress::Gunzip" : "2.008",
+            "LWP::Online" : "1.07",
+            "LWP::UserAgent" : "5.806",
+            "ORLite" : "1.37",
+            "Params::Util" : "0.33",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://svn.ali.as/cpan/trunk/ORLite-Mirror"
+      },
+      "x_ChangeLog" : "http://fisheye2.atlassian.com/changelog/cpan/trunk/ORLite-Mirror"
+   },
+   "version" : "1.24",
+   "x_module_name" : "ORLite::Mirror"
+}

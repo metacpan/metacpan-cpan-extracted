@@ -1,0 +1,126 @@
+1. Can I have multiple threads simultaneously accessing persistent data with ObjectStore?
+--------------------------------------------------------------------------------------
+This is possible if you use what we call global transactions.You
+can have multiple threads access persistent data as long as no attempt
+is made to access persistent data by one thread while another is
+"in the ObjectStore runtime." This can result in program failure and data
+corruption. You should place a barrier before the end of the transaction
+so that all participating threads complete work on persistent data
+before the end-of-transaction operation is allowed to continue. 
+
+In order to use global transactions you need to use dynamic transaciton
+and pass the enumerator os_transaction::global as the second parameter
+to os_transaction::begin. 
+
+
+2. What do you mean by "in the ObjectStore runtime?"
+---------------------------------------------------
+By "in the ObjectStore run time", we mean during the call to an ObjectStore
+entry point, or within the ObjectStore fault handler.  Persistent data that
+has already been faulted in can be accessed without entering the ObjectStore
+run time.
+
+If one thread is doing a transaction begin or end (either commit or abort), 
+you have a "race" condition with threads that might be trying persistent 
+access; the persistent access threads might be scheduled before the transaction 
+begins or after the transaction ends, which would be an error. In other words, 
+you have to do something like this:
+
+	<assuming the state is no other threads will attempt persistent access>
+	os_transaction::begin();
+	<allow other threads to do persistent access>
+	<do your stuff>
+	<forbid other threads to do persistent access>
+	os_transaction::commit();	/* or abort */
+where the synchronization implied by the <> statements is entirely up to
+your application.
+
+3. Since I get some greater concurrency with global transactions why would
+I ever want to use local transactions instead?
+-----------------------------------------------------------------------------
+Global transactions have extra overhead compared to local transactions, in the form 
+of extra memory management, particularly if there is a lot of cache replacement.
+With global transactions you must handle the synchronization of the threads so that
+no threads attempt to access persistent data while another thread is committing or
+aborting.
+
+4. What happens if thread A is pre-empted by thread B during a page fault
+and thread B causes the same page fault? Is the page fault operation re-entrant?
+--------------------------------------------------------------------------------
+No, it's serialized.  That is, if one thread is in the ObjectStore runtime
+(either because it's handling a fault or because of an API call), another
+thread which faults will stop in the fault handler before doing anything.
+When the original thread exits the fault/API, the lock will be unlocked
+and the thread waiting at the fault handler will proceed.  (The fault handler
+may discover that it needn't have been called, because two threads touched
+the same page; in that case it will just return and all will be well.)
+
+ObjectStore fault handler grabs a lock that is shared with the rest of
+the ObjectStore runtime - so if one thread is in the fault handler, other
+threads will be locked out of the signal handler.  In the scenario above,
+thread B will be locked out of the fault handler until thread A is done.
+
+Also, there's the issue of mapaside - if thread A faults on a page, it will
+not get mapped into the proper place (if mapaside is on, which is the
+default) until the page has been relocated in.  This ensures that thread B
+does not see partially relocated data without triggering a page fault (and
+so getting locked out as described above) for the page that thread A is
+faulting on. 
+
+
+5. If I do not turn on ObjectStore thread locking, do you still do some
+locking under the covers?
+----------------------------------------------------------------------
+No. ObjectStore does not handle any type of syncronization if thread
+locking is turned off.
+
+
+6. Do I get any parallelism in ObjectStore?
+-----------------------------------------
+None of any significance.
+
+
+7. Does every method lock on a mutex upon entry? Or, do you create mutexes only 
+in certain low level routines?
+------------------------------------------------------------------------------
+Virtually all entrypoints lock the mutex.  The exceptions are either trivial
+routines (such as get_ methods that touch only one datum), or things like
+notifications which are designed to be used while another thread is hanging
+inside ObjectStore.
+
+
+8. If I have two threads both doing a lookup in a dictionary, I would prefer to
+serialize the two lookups when and only when it matters, such as page faulting.
+-------------------------------------------------------------------------------
+Since another thread could be modifying the dictionary, we have no choice
+but to lock the mutex inside a lookup.
+
+
+9. Why are there seperate API calls for thread locking in collections and in
+Objectstore in general, and what are the implications of this?
+--------------------------------------------------------------------------
+The original idea was to permit, for example, transient collections
+to be used independent of base ObjectStore.  In the product as it
+exists today, there is only one lock; it turned out that collections
+and the client were too intertwined to separately lock them.
+
+If *either* of the locks are turned on then thread locking is on because they 
+are so intertwined and the only way to turn thread locking off is to turn off 
+both general objectstore and os_collection thread locking?
+
+
+10. If I am using a never-ending (query-server), abort_only transaction
+in MVCC mode is it safe to use multiple threads with thread locking 
+turned off or could this lead to database corruption?
+--------------------------------------------------------------------
+You probably can't corrupt the database, but you can certainly get the
+wrong answer, and are very likely to get an err_internal that will
+crash the client.  If you turn off thread locking, two threads can
+independently fault on ObjectStore data, and they will step on each other.
+
+You should leave thread-locking on.  Normal ObjectStore page caching
+will cause multiple queries that access cached data to proceed without
+any involvement by ObjectStore.  If the concurrency locking in our
+collections limits your performance, you may look into writing your own 
+collection classes (or use some other third-party collections library) that 
+have the concurrency characteristics you need.

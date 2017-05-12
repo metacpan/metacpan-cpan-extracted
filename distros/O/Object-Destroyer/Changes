@@ -1,0 +1,25 @@
+Revision history for Perl extension Object::Destroyer
+
+2.01 Thu 24 Mar 2011
+	- Updating to Module::Install::DSL 1.00
+	- Bump perl version to 5.006 to keep the minimum version test happy
+
+2.00 Wed Dec  6 2006
+	- Added support for missing void context for wrapper
+	- Removed obligatory requirement for Scalar::Util 
+	- Added new method - dismiss - to cancel the Destroyer
+
+1.99 Tue Oct 17 2006
+	- Complete overhaul by Igor Gariev to expand its functionality
+	- Added support for explicit clean-up method name
+	- Added support for clean-up code by code reference 
+	- Added support for AUTOLOAD'ed methods of wrapped objects
+
+1.02 Fri  6 Oct 2006
+	- Moving to new SVN repository
+	- Cleaning up tests
+	- Updating to Module::Install 0.64
+	- Moving to production version
+
+0.1  Sun Jan 11 2004
+	- original version

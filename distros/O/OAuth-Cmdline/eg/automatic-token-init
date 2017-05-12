@@ -1,0 +1,53 @@
+#!/usr/local/bin/perl -w
+###########################################
+# automatic-token-init
+# Mike Schilli, 2016 (m@perlmeister.com)
+###########################################
+use strict;
+use FindBin qw( $Bin );
+use lib "$Bin/../lib";
+use Log::Log4perl qw(:easy);
+# Log::Log4perl->easy_init($DEBUG);
+
+use OAuth::Cmdline::Automatic;
+use OAuth::Cmdline::Mojo;
+
+my $oauth = OAuth::Cmdline::Automatic->new(
+    login_uri     => "https://accounts.automatic.com/oauth/authorize",
+    token_uri     => "https://accounts.automatic.com/oauth/access_token",
+    scope         => "scope:public scope:user:profile scope:location " .
+                     "scope:vehicle:profile scope:vehicle:events " .
+                     "scope:trip scope:behavior",
+);
+
+$oauth->client_init_conf_check( "https://developer.automatic.com" );
+
+my $app = OAuth::Cmdline::Mojo->new(
+    oauth => $oauth,
+);
+
+$app->start( 'daemon', '-l', $oauth->local_uri );
+
+__END__
+
+=head1 NAME
+
+automatic-token-init - Youtube-specific OAuth Token Dance
+
+=head1 SYNOPSIS
+
+    $ automatic-token-init
+
+=head1 DESCRIPTION
+
+See the OAuth::Cmdline::Automatic documentation.
+
+=head1 LEGALESE
+
+Copyright 2016 by Mike Schilli, all rights reserved.
+This program is free software, you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+2016, Mike Schilli <cpan@perlmeister.com>

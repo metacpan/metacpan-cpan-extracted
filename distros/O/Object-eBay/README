@@ -1,0 +1,24 @@
+README for Object-eBay
+
+The distribution Object-eBay provides an object-oriented interface for dealing
+with eBay entities such as Items, Users, etc.  The module Net::eBay (available
+from CPAN or from http://www.net-ebay.org) provides all the eBay API
+infrastructure.  Object::eBay and subclasses are essentially OO sugar on top
+of Net::eBay.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006-2008 Michael Hendricks <michael@ndrix.org>
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

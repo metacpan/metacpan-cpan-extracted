@@ -1,0 +1,33 @@
+Revision history for Object-BlankStr
+
+0.05     2013-09-09 (SHARYANTO)
+
+         - No functional changes. Rebuild with MakeMaker instead of
+           Module::Build because the latter is deprecated from core in 5.19.
+
+
+0.04    2011-08-03 (SHARYANTO)
+
+        [FIXES]
+
+        - Avoid error "Modification of a read-only value attempted" in Perl
+          5.12.4+ (thanks Randy Stauner).
+
+
+0.03    2011-07-28 (SHARYANTO)
+
+        [INCOMPATIBLE CHANGES]
+
+        - No longer stringifies to " \b" but to "". No longer has true value *in
+          all cases* (e.g. print 1 if $obj won't print 1), but die $obj still
+          works as advertised.
+
+
+0.02    2011-07-26 (SHARYANTO)
+
+        - No functional changes. Fix synopsis.
+
+
+0.01    2011-07-26 (SHARYANTO)
+
+        - First release.

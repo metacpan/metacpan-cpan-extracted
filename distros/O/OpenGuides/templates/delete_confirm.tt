@@ -1,0 +1,51 @@
+[% IF delete_version %]
+  [% INCLUDE header.tt page_title = "Confirm delete for version $delete_version of $node_name - $site_name" %]
+[% ELSE %]
+  [% INCLUDE header.tt page_title = "Confirm delete for $node_name - $site_name" %]
+[% END %]
+[% INCLUDE banner.tt %]
+<div id="content">
+
+[% IF !config.content_above_navbar_in_html %]
+  [% INCLUDE navbar.tt %]
+[% END %]
+
+<div id="maincontent">
+
+<h1>Confirm Deletion</h1>
+
+<div class="confirm_deletion_text">
+<p>
+[% IF delete_version %]
+  Are you sure you want to delete version [% delete_version %] of
+  <span class="node_name">[% node_name %]</span>?  This will completely
+  erase this version
+  and you will not be able to get it back.  If all versions are erased
+  then the page will cease to exist.
+[% ELSE %]
+  Are you sure you want to delete
+  <span class="node_name">[% node_name %]</span>?  This will
+  completely erase this page and all its history.
+[% END %]
+If so, please enter the admin
+password. If not, you can <a href="[% cgi_url %]?[% node_param %]">go back to the
+page</a>.
+</p>
+</div>
+
+<form class="confirm_deletion" action="[% cgi_url %]" method="post">
+  <input type="hidden" name="action" value="delete" />
+  <input type="hidden" name="id" value="[% node_name %]" />
+  <input type="hidden" name="version" value="[% delete_version %]" />
+  <label for="password">Password:</label>
+  <input type="password" name="password" id="password" />
+  <input type="submit" value="Delete" />
+</form>
+
+</div>
+
+[% IF config.content_above_navbar_in_html %]
+  [% INCLUDE navbar.tt %]
+[% END %]
+
+[% INCLUDE footer.tt %]

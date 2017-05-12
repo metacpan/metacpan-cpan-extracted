@@ -1,0 +1,21 @@
+---
+abstract: 'A Node.js style AnyEvent class, using MooseX::Event'
+author:
+  - 'Rebecca Turner <becca@referencethis.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300000, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: ONE
+requires:
+  Any::Moose: 0
+  AnyEvent: 0
+  MooseX::Event: v0.2.0
+  Scalar::Util: 0
+resources: {}
+version: v0.2.0

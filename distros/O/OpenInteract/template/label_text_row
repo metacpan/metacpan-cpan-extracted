@@ -1,0 +1,9 @@
+[%########################################
+  label_text_row( label, count, text )
+     Create a row with a label on the left and plain text on the right.
+  ########################################-%]
+
+[%- DEFAULT colspan = 2; -%]  
+[%- INCLUDE label_row_begin( colspan = 1 ) -%]
+[%- INCLUDE data_cell_begin -%][% text %]&nbsp;
+</td></tr>

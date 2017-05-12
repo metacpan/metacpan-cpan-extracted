@@ -1,0 +1,113 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"/>
+<title>Finding all the terms and relationships in a given ontology</title>
+</head>
+<body>
+	
+<h2>Finding and getting elements (e.g. terms, relationships)</h2>
+	
+<ol>
+	<li><a href="#1">Find all the terms in a given ontology.</a></li>
+		
+	<li><a href="#2">Find all the relationships in a given ontology.</a></li>
+		
+	<li><a href="#3">Find all the terms using a regular expression for the ID.</a></li>
+		
+	<li><a href="#4">Get a specific term by name.</a></li>
+		
+	<li><a href="#5">Get a specific term by ID.</a></li>
+
+</ol>
+	
+<ol>
+	<li> <b><a name="1">Find all the terms in a given ontology:</a></b>
+		<pre>
+		
+			use OBO::Parser::OBOParser;
+			
+			my $my_parser = OBO::Parser::OBOParser->new();
+			my $ontology = $my_parser->work("gene_ontology_edit.obo");
+	
+			my @my_terms = @{$ontology->get_terms()}; # get all the terms
+			
+			foreach my $t (@my_terms) {
+				print "The name of the term is: ", $t->name(), ", and its ID is:", $t->id(), "\n";
+			}
+			
+		</pre>
+	</li>
+	
+	<li> <b><a name="2">Find all the relationships in a given ontology:</a></b>
+		<pre>
+		
+			use OBO::Parser::OBOParser;
+			
+			my $my_parser = OBO::Parser::OBOParser->new();
+			my $ontology = $my_parser->work("my_obo_ontology.obo");
+			
+			my @my_rels= @{$ontology->get_relationships()}; # get all the relationships
+			
+			foreach my $r (@my_rels) {
+				print "The ID of the relationhip is: ", $r->id();
+			}
+			
+		</pre>
+	</li>
+
+	<li> <b><a name="3">Find all the terms using a regular expression for the ID:</a></b>
+		<pre>
+		
+			use OBO::Parser::OBOParser;
+			
+			my $my_parser = OBO::Parser::OBOParser->new();
+			my $ontology = $my_parser->work("my_obo_ontology.obo");
+			
+			my @my_terms = @{$ontology->get_terms("APO:G.*")}; # get all the terms with such an ID
+			
+			foreach my $t (@my_terms) {
+				print "The name of the term is: ", $t->name();
+			}
+			
+		</pre>
+	</li>
+	
+	<li> <b><a name="4">Get a specific term by name:</a></b>
+		<pre>
+		
+			use OBO::Parser::OBOParser;
+			
+			my $my_parser = OBO::Parser::OBOParser->new();
+			my $ontology = $my_parser->work("my_obo_ontology.obo");
+			
+			my $my_term = $ontology->get_term_by_name("protein"); # get the term by name
+			
+			print "The ID of my term is: ", $t->id();
+			
+		</pre>
+	</li>
+
+	<li> <b><a name="5">Get a specific term by ID:</a></b>
+		<pre>
+		
+			use OBO::Parser::OBOParser;
+			
+			my $my_parser = OBO::Parser::OBOParser->new();
+			my $ontology1 = $my_parser->work("go.obo");
+			my $ontology2 = $my_parser->work("apo.obo");
+			
+			my $my_term1 = $ontology1->get_term_by_id("GO:00007049"); # get the term by ID
+			my $my_term2 = $ontology2->get_term_by_id("APO:P0000056"); # get the term by ID
+			
+			print "\nThe name of the term1 is: ", $my_term1->name();
+			print "\nThe name of the term2 is: ", $my_term2->name();
+			
+		</pre>
+	</li>
+	
+</ol>
+
+Copyright (c) 2006-2015 by Erick Antezana. All rights reserved.
+
+</body>
+</html>

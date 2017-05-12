@@ -1,0 +1,443 @@
+=head1	NAME
+
+ODF::lpOD - An OpenDocument management interface
+
+=head1	SYNOPSIS
+
+        use ODF::lpOD:
+
+        my $document = odf_document->get("report.odt");
+
+        my $meta = $document->get_part(META);
+        $meta->set_title("The best document format");
+
+        my $content = $document->get_part(CONTENT);
+        my $context = $content->get_body;
+        my $paragraph = $context->get_paragraph(
+                content => "I look for it"
+                );
+        $paragraph->set_text("I found it");
+        $paragraph->set_style("Standout");
+        my $new_paragraph = odf_paragraph->create (
+                                style => "Standard",
+                                text => "A new content"
+                                );
+        $context->append_element($new_paragraph);
+        my $table = odf_table->create (
+                "Main Figures", height => 20, width => 16
+                );
+        $context->insert_element($table, before => $paragraph);
+        my $cell = $table->get_cell("B4");
+        $cell->set_text("Here B4");
+
+        $document->save;
+        exit;
+
+The code example above loads a document from an existing "report.odt" file,
+updates various data in the document, then saves the changes. The following
+actions are done in the document:
+
+1) The title is set to "The best document format";
+
+2) The first paragraph containing "I look for it" is retrieved (this paragraph
+is supposed to exist; otherwise get_paragraph would return undef);
+
+3) The content of the found paragraph is replaced by "I found it", and its
+style is set to "Standout" (this style is supposed to exist or to be defined
+later);
+
+4) A new paragraph, whose text is "A new content" and style is "Standard",
+is created then appended to the document body;
+
+5) A new table whose name is "Main Figures" and size is 20x16 is created then
+inserted just before the first retrieved paragraph;
+
+6) The "B4" cell (i.e. the cell belonging to the 4th row and the 2nd column,
+whatever the document type) is retrieved, and its content is set to "Here B4"
+(the cell data type is automatically set to C<'string'>).
+
+=head1	DESCRIPTION
+
+This module is an office document management interface. It allows the users to
+create or transform office documents, or to extract data from them. It can
+handle files which comply with the ODF standard and whose type is I<text> (odt),
+I<spreadsheet> (ods), I<presentation> (odp) or I<drawing> (odg). It interacts
+directly with the files and doesn't depend on a particular office software.
+
+=head1  ABOUT lpOD
+
+This is the Perl implementation of the lpOD project.
+
+lpOD is a Free Software project that offers, for high level use cases, an
+application programming interface dedicated to document processing with the
+Python, Perl and Ruby languages. It's complying with the I<OASIS Open Document
+Format> (ODF), i.e. the I<ISO/IEC 26300> international standard.
+
+lpOD is designed according to a top-down approach. The API is bound to the
+document functional structure and the user's point of view. As a consequence,
+it may be used without full knowledge of the ODF specification, and allows the
+application developer to be focused on the business needs instead of the low
+level storage concerns.
+
+The lpOD API is object oriented.
+
+=head1  Basic document access principles
+
+The general access to the documents uses the C<odf_document> class. Before
+processing a document, an odf_document instance must be created using one of
+the allowed constructors. While an odf_document object encapsulates the physical
+resource access logic, the real data must be handled through document I<parts>,
+knowing that each part represents a specialized aspect of the document.
+
+Each part contains a set of C<odf_element> objects, knowing that odf_element is
+the common base class for any kind of document simple or complex element (an
+odf_element may be a visible object, such as a paragraph or a table, as well as
+a piece of data that specifies the layout or the behavior of other objects,
+such as a text style or a page layout). Each part contains a I<root> element,
+that is a special odf_element containing all the elements of the part. A part
+may contain a I<body> element, that is a more restricted but in some cases more
+interesting context than the root.
+
+lpOD is a read-write API. However, the changes made by the applications aren't
+automatically persistent. The API provides methods that insert, delete, or
+update elements in memory, but these changes must be explicitly committed using
+other, package-oriented methods, in order to become persistent.
+
+=head2  Global document initialization
+
+A few specialized constructors may be used in order to create odf_document
+objects. All these constructors return an odf_document object in case of
+success, a FALSE value otherwise.
+
+One an odf_document is created, it's content may be wrote back to a persistent
+storage using its C<save> method.
+
+=head3  odf_get_document(source)
+
+Instantiates an C<odf_document> object which is a read-write interface to
+an existing ODF package corresponding to the given source. The package should
+be an ODF-compliant zip file (odt, ods, odp, and so on). Example:
+
+        my $document = odf_get_document("C:\Path\Doc.odt");
+
+C<odf_get_document()> is just a functional way to call the C<get()> constructor
+of the C<odf_document> class; so the example above produce the same effect as
+the following one:
+
+        my $document = odf_document->get("C:\Path\Doc.odt");
+
+The source argument must be provided either as a regular file path or as a
+C<IO::File> object.
+
+=head3  odf_new_document(document_type)
+
+Returns a new odf_document corresponding to the given ODF document type.
+Allowed document types are presently C<'text'>, C<'spreadsheet'>,
+C<'presentation'>, and C<'drawing'>). Example:
+
+        my $document = odf_new_document('spreadsheet');
+
+Knowing that this functional constructor is just a way to call the C<create()>
+method of the C<odf_document> class, the following code is equivalent:
+
+        my $document = odf_document->create('spreadsheet');
+
+Technically, the new document is generated as a clone of an existing template
+document, provided with the lpOD distribution. It operates in the same way as
+C<odf_new_document_from_template>, but the user doesn't need to provide the
+template document.
+
+=head3  odf_new_document_from_template(source)
+
+Returns a new odf_document instantiated from an existing ODF template
+package. Same as C<odf_get_document>, but the source package is read-only.
+
+=head3  save([destination])
+
+This function is a I<method>. It must be called from an odf_document instance.
+
+Without argument, it attempts to write it's content back to the resource that
+was used to create it. A warning is issued and nothing is done if the document
+has been created without source file or from a read-only template (i.e. through
+C<odf_new_document> or C<odf_new_document_from_template>).
+
+This method produces a file whose basic format is the same as the format of
+the source document or template (whatever the target file name, if any).
+
+If the optional parameter C<target> is provided, it's regarded as the storage
+destination. Its value may be a regular file path or a C<IO::File>. This
+parameter is mandatory if the C<odf_document> instance has been created
+through C<odf_new_document_from_template>  or C<odf_new_document_from_type>.
+
+Example:
+
+        $document->save(target => "/myfiles/target.odt");
+
+=head2  Document part initialization and handling
+
+A regular ODF document contains various I<parts>, some of them mandatory.
+The interesting parts in the lpOD scope are C<'content'>, C<'styles'>, C<'meta'>,
+C<'settings'>, and C<'manifest'>.
+
+The odf_document class provides a C<get_part()> method, that must be used with
+an argument that specifies the needed part. Example:
+
+        my $content = $document->get_part(CONTENT);
+        my $meta = $document->get_part(META);
+
+The sequence above gives access to the content and meta parts of a previously
+created C<odf_document> instance.
+
+Beware: if C<get_part()> is called twice or more from the same C<odf_document>
+instance and with the same part designation, it returns the same object. As a
+consequence, after the sequence below, C<$p1> and C<$p2> will be synonyms:
+
+        my $p1 = $document->get_part(CONTENT);
+        my $p2 = $document->get_part(CONTENT);
+
+C<serialize()> returns an XML export of the whole part (the application is then
+responsible of the fate of this export). An optional C<pretty> argument, if set
+to TRUE, specifies that the XML output must be human-readable. Example:
+
+        my $content = $document->get_part(CONTENT);
+        # here some content processing
+        my $xml = $content->serialize(pretty => TRUE);
+
+=head1  Basic ODF element handling
+
+Every C<odf_part> objects provides a low level C<get_element> method whose
+first argument is an XPath expression and the second one a numeric position.
+The numeric argument specifies the order number of the required element among
+the set of elements matching the XPath. If the order number is negative, the
+position is regarded as counted backward from the end. The position is zero-
+based (i.e. a zero value means the first matching element). As an example, the
+code below returns the last paragraph of the document.
+
+        my $document = odf_document->get($source);
+        my $content = $document->get_part(CONTENT);
+        my $p = $part->get_element("//text:p", -1);
+
+However, this way is not the smartest one because it requires the knowledge
+of the ODF schema (and some XPath skills for more complicated cases). There
+are better ways to select the last paragraph of a document (and various other
+objects at any position in a document).
+
+lpOD provides more user-friendly, XPath-free methods for the most used elements
+in the C<CONTENT> part of a document. These methods are provided through the
+C<odf_element> class. Any individual element in a part is an C<odf_element>
+object. There is a shortcut to get the top (or root) element of any part: the
+C<get_root()> method. Once selected, the top element provides all the I<context
+methods> of the lpOD API.
+
+A I<context method> is a method owned by an element (the context) and whose
+effect is related to the children and descendants of this element. So, the
+C<get_xxx> method of a given element is a retrieval method intended to
+select something I<below> the current element. Thanks to the C<get_paragraph>
+element provided by the C<odf_element> class, the last example could be wrote
+as shown below:
+
+        my $document = odf_document->get($source);
+        my $context = $document->get_part(CONTENT)->get_root;
+        my $p = $context->get_paragraph(-1);
+
+In most cases (including the previous example), C<get_root> may be replaced
+by C<get_body>, that return a context containing all the visible elements
+(including the paragraphs).
+
+There is a generic context-based C<get_element> that differs from the part-based
+one. It allows the user to select an element according to its text content, one
+of its attributes, and/or its sequential position in the context. As an example,
+the sequence below displays the name of the last page that uses the draw page
+style "dp1" (assuming we are using a presentation or drawing document):
+
+        my $context = $document->get_part(CONTENT)->get_body;
+        my $page = $context->get_element(
+                'draw:page',
+                attribute       => 'style name',
+                value           => 'dp1',
+                position        => -1
+        );
+        say $page->get_attribute('name');
+
+lpOD provides special name-based retrieval methods for some elements that own
+unique names. For example the instruction below selects the table whose name
+is "T1" (if any):
+
+	$table = $context->get_table_by_name("T1");
+
+The C<meta> document part, unlike others such as the C<content> one, provides
+direct C<get> and C<set> accessors for the content of the usual metadata, so
+there is no need of a context element, as shown below in the following example
+that displays the title of a document:
+
+        my $document = odf_document->get($source);
+        my $meta = $document->get_part(META);
+        say $meta->get_title;
+
+The title (like an other metadata value) may be updated or created with the
+corresponding C<set> accessor:
+
+        $meta->set_title("The new title");
+
+All the properties of a previously selected element are stored in one or more
+I<attributes> and in a I<text>. So, for any C<odf_element> lpOD provides
+corresponding C<get> and C<set> accessors.
+
+C<get_text> returns the current text, while C<set_text> replaces the current
+content by a new text (possibly empty). Without argument, C<get_text> returns
+the text directly contained in the calling element, but with a C<recursive>
+optional named parameter set to C<TRUE>, it returns the concatenated texts of
+all the descendants of the calling element. On the other hand, C<set_text>
+deletes any previous content (i.e. direct text content and embedded elements
+such as bookmarks, variable fields, text segments with special styles, and
+so on).
+
+The C<get_attribute> method requires the name of the needs attribute. This name
+may be the technical name according to the OpenDocument specification, or a more
+simple and significant name. For example, assuming C<$item> is a I<list item>,
+and knowing that such an object may own a so-called C<text:restart-numbering>
+attribute telling that the list numbering must be restarted at this point from
+a given value, the following instruction sets this value to 6:
+
+        $item->set_attribute('restart numbering' => 6);
+
+C<set_attribute> deletes an existing attribute as soon as the given value is
+C<undef>; so the instruction below cancels the C<restart numbering> feature:
+
+        $item->set_attribute('restart numbering' => undef);
+
+Note that C<set_attribute>, provided with a non-null value, automatically
+I<creates> the attribute if it doesn't exist; there is no need to separately
+check an attribute for existence and create it before setting a value.
+
+It's possible to get or set more than one attributes in a single call using
+C<get_attributes> or C<set_attributes>. The first one returns the attributes
+as a hash reference (with the real ODF names), while the second one requires
+a hash reference as argument.
+
+An element may be removed (with all its descendants) using its C<delete> method.
+(Beware: the deletion of a high level element may destroy a lot of content !).
+It's possible to delete the whole content of an element without removing the
+element itself by issuing a C<set_text> with an empty string.
+
+The user is allowed to create a new element using the C<odf_create_element>
+constructor, that requires an appropriate ODF tag (corresponding to the type
+of element) or a valid XML string. Fortunately, lpOD provides a set of
+specialized constructors (such as C<odf_create_paragraph>, C<odf_create_table>,
+and so on) that may be used without knowledge of the XML stuff. Once created
+through such a constructor, the new element is not automatically included in
+a document. To do so, lpOD provides the C<insert_element> and C<append_element>
+methods, both context-based, i.e. called from an existing element that will
+become the parent of the new element. As an example, the sequence below creates
+a new paragraph (with given style and content), then appends it to a selected
+section:
+
+        my $document = odf_document->($source);
+        my $context = $document->get_part(CONTENT)->get_body;
+        my $section = $context->get_section("Prologue");
+        my $paragraph = odf_paragraph->create(
+                style => "Standard", text => "The End of the Beginning"
+                );
+        $section->append_element($paragraph);
+
+Elements may be created by replication of existing elements, thanks to the
+C<clone> method. The result of the instruction below is a copy of an existing
+section (with all its content); this copy is a "free" element (i.e. it's not
+included in any document, and it has no link with its prototype element), so
+it may be inserted elsewhere in the same document or in another document:
+
+        my $section = $context->get_section("Reusable");
+        my $free_section = $section->clone;
+
+=head1  Getting started
+
+=head2  The "Hello Word" example
+
+Unsurprisingly, we propose you to test your lpOD installation and your knowledge
+of the big picture through this simple program:
+
+        use ODF::lpOD;
+
+        my $doc = odf_document->create('text');
+        my $content = $doc->get_part(CONTENT);
+        my $context = $content->get_body;
+        $context->append_element(
+                odf_paragraph->create(
+                        style => "Standard",
+                        text => "Hello World !"
+                        )
+                );
+        $doc->save(target => "helloworld.odt");
+        exit;
+
+If this script runs without warning, open the "helloworld.odt" file using your
+favorite ODF-compliant text processor, and look at the text content. You may
+then introduce more sophistication using the metadata part of the document.
+To do so, you can (for example) insert the lines below somewhere before the
+C<save> instruction (and after the C<odf_document->create()> one).
+
+        my $meta = $doc->get_part(META);
+        $meta->set_title("Hello World Test");
+        $meta->set_creator("Me");
+
+After execution of the extended version, check the author's name and the
+title through the I<File/Properties> dialog of your ODF text editor.
+
+=head2  Using the documentation
+
+The L<ODF::lpOD::Tutorial> is a recommended first reading that may help
+to quickly gain a basic understanding and get started with lpOD. The
+reference documentation is split into the following manual chapters:
+
+=over
+
+=item *
+
+L<ODF::lpOD::Document>: General document packaging and metadata handling.
+
+=item *
+
+L<ODF::lpOD::Element>: Common features, available with any element.
+
+=item *
+
+L<ODF::lpOD::TextElement>: Text containers (paragraphs, headings), and various
+elements that may take place in paragraphs (bookmarks, index marks,
+bibliography marks, text variables and fields).
+
+=item *
+
+L<ODF::lpOD::Table>: Access to tables and their content.
+
+=item *
+
+L<ODF::lpOD::StructuredContainer>: High-level structures such as sections,
+lists, draw pages, shapes, image or text frames, tables of contents.
+
+=item *
+
+L<ODF::lpOD::Style>: Style retrieval, update, or creation
+
+=item *
+
+L<ODF::lpOD::Common>: Common utility functions
+
+=back
+
+An alternative tutorial, intended for French-reading users, is available at
+L<http://jean.marie.gouarne.online.fr/doc/introduction_lpod_perl.pdf>
+
+=head1	AUTHOR/COPYRIGHT
+
+Developer/Maintainer: Jean-Marie Gouarne L<http://jean.marie.gouarne.online.fr>
+Contact: jmgdoc@cpan.org
+
+Copyright (c) 2010 Ars Aperta, Itaapy, Pierlis, Talend.
+Copyright (c) 2014 Jean-Marie Gouarne.
+
+This work was sponsored by the Agence Nationale de la Recherche
+(L<http://www.agence-nationale-recherche.fr>).
+
+License: GPL v3, Apache v2.0 (see LICENSE).
+
+=cut

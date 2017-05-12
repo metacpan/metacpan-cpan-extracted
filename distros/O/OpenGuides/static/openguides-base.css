@@ -1,0 +1,619 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+div#body_wrapper {
+  background: #ebc0fb;
+}
+
+div#banner a {
+  text-decoration: none;
+  color: #000000;
+}
+
+div#summary {
+  display: none;
+}
+
+div#create_new_page {
+  padding-top: 2em;
+}
+
+div.disallowed_characters_note {
+  padding-top: 1em;
+}
+
+form#preferences_form div.set_username, form#preferences_form div.set_preferences {
+  padding-top: 2em;
+}
+
+form#preferences_form div.set_username h2 {
+  padding-bottom: 0.5em;
+}
+
+form#preferences_form {
+  padding-bottom: 2em;
+}
+
+form#preferences_form input#submit {
+  margin-top: 1em;
+}
+
+div#search_results {
+  padding: 1em;
+}
+
+div#search_results li {
+  padding-bottom: 0.5em;
+}
+
+/* Individual nodes */
+
+img#node_image {
+  border: thin solid black;
+}
+
+div#node_map_canvas {
+  width: 240px;
+  height: 180px;
+  border: thin solid black;
+  margin-top: 1em;
+}
+
+/* Edit form. */
+
+h1.edit_form_title {
+  padding-top: 1em;
+}
+
+div.edit_form_actions {
+  text-align: center;
+  padding: 2em 0;
+}
+
+div.edit_form_actions div.preview_edit {
+  float: left;
+  width: 33%;
+}
+
+div.edit_form_actions div.cancel_edit {
+  float: left;
+  width: 33%;
+}
+
+div.edit_form_actions div.commit_edit {
+  float: right;
+  width: 33%;
+}
+
+form#edit_page_form fieldset#main_information {
+  clear: both;
+}
+
+div.edit_form_group label {
+  display: inline-block;
+  padding-top: 1.5em;
+}
+
+
+div.navbar_site_name {
+  display: none;
+}
+
+.hidden {
+  display: none;
+}
+
+@media (min-width: 550px) and (max-width: 799px) {
+  div#node_map_and_image {
+    display: flex;
+    flex-direction: row;
+  }
+
+  div#node_image_box {
+    order: 1;
+    padding-right: 20px;
+  }
+
+  div#node_map_canvas {
+    order: 2;
+  }
+}
+
+@media (max-width: 799px) {
+  p {
+    padding: 1.2em 0 0 0;
+  }
+
+  /* This is the search form along the bottom of the page.  The responsive
+     low-width version has the navbar search form near the bottom already.
+  */
+  div#search_form {
+    display: none;
+  }
+
+  body {
+    background-color: #ebc0fb;
+  }
+
+  h1 {
+    font-size: 110%;
+  }
+
+  h2 {
+    font-size: 105%;
+  }
+
+  div#body_wrapper {
+    margin-left: 1em;
+    margin-right: 1em;
+  }
+
+  div#banner {
+    padding-top: 1em;
+  }
+
+  a#banner_home_link {
+    display: block;
+    float: left;
+    max-width: 85%;
+    font-size: 70%;
+    padding: 0.3em 0.3em 1em 0;
+  }
+
+  a#banner_navbar_link {
+    display: block;
+    float: right;
+    font-size: 70%;
+    padding: 0.3em;
+  }
+
+  div#content {
+    clear: both;
+  }
+
+  div#content_text {
+    line-height: 1.5em;
+  }
+
+  div#content_text ul {
+    padding: 1em 0 0 1em;
+    line-height: 2em;
+  }
+
+  /* Pull up the first element of each list a little, since the preceding
+     paragraph is likely a "heading" or "introduction" to the list (e.g. a
+     list of nodes in this category, or a "see also" section). */
+  div#content_text ul li:first-of-type {
+    margin-top: -1em;
+  }
+
+  /* Make sure the metadata isn't squashed up against the map if no image. */
+  span#node_no_image {
+    display: inline-block;
+    height: 0.5em;
+  }
+
+  ul#general_metadata li, ul#categories_and_locales li, div#navbar div ul li {
+    list-style: none;
+  }
+
+  div#node_location_search, div#navbar {
+    border-top: thin solid black;
+    margin-top: 1em;
+    padding-top: 1em;
+  }
+
+  div#navbar div {
+    float: left;
+    padding-right: 1.5em;
+    max-width: 45%;
+  }
+
+  div#navbar div#navbar_this_page, div#navbar div#navbar_search, div#navbar div.navbar_revision, div#navbar div.navbar_revision div#navbar_version {
+    max-width: 100%;
+  }
+
+  input#nav_search {
+    padding: 0.5em;
+  }
+
+  div#navbar_search input.form_button, div#find_within_distance input.form_button {
+    padding: 0.5em;
+  }
+
+  div#find_within_distance select#distance {
+    padding: 0.5em;
+  }
+
+  div#find_within_distance {
+    padding-bottom: 0.5em;
+  }
+
+  div#navbar div ul {
+    clear: both;
+    padding-bottom: 1.5em;
+  }
+
+  div#navbar div ul li {
+    padding-top: 0.6em;
+    font-size: 90%;
+  }
+
+  div#maincontent {
+    display: flex;
+    flex-direction: column;
+  }
+
+  div#node_title {
+    order: 1;
+  }
+  div#node_map_and_image {
+    order: 2;
+    margin: auto;
+  }
+  div#metadata {
+    order: 3;
+  }
+  div#content_text {
+    order: 4;
+  }
+  div#node_location_search {
+    order: 5;
+  }
+  div#coordinates {
+    order: 6;
+  }
+
+  /* We have this in the navbar, which is at the bottom anyway. */
+  div#version {
+    display: none;
+  }
+
+  div#title_edit_link {
+    display: none;
+  }
+
+  img#node_image {
+    display: block;
+    margin-top: 0.75em;
+    margin-bottom: 0.3em;
+  }
+
+  div#node_image_copyright {
+    font-size: 70%;
+    float: right;
+  }
+  div#node_image_copyright:before {
+    content: "Image";
+  }
+
+  ul#general_metadata li span.metadata_label {
+    display: none;
+  }
+
+  li.telephone {
+    float: left;
+    padding-right: 0.3em;
+  }
+  li.fax {
+    float: left;
+  }
+  li.telephone + li.fax:before {
+    content: "/";
+  }
+  li.address {
+    clear: both;
+  }
+  li.address span.adr {
+    padding-right: 0.3em;
+  }
+  li.website_link, li.opening_hours {
+    clear: both;
+  }
+  ul#categories_and_locales {
+    clear: both;
+    padding-top: 1em;
+  }
+
+  div#footer {
+    padding-bottom: 1em;
+  }
+
+  /* Map and list index views */
+  h2.map_index_header {
+    font-size: 100%; /* Reduced chance of spilling over to two lines. */
+  }
+
+  form.index_nodes {
+    padding: 0.5em 0;
+  }
+
+  form.index_nodes span.category_index, form.index_nodes span.locale_index {
+    white-space: nowrap;
+  }
+
+  form.index_nodes select, form.index_nodes input {
+    padding: 0.5em;
+    margin: 0.3em 0;
+  }
+
+  ol.index_node_list {
+    padding: 1em 0 0 1em;
+    line-height: 2em;
+  }
+
+  div#map_index_node_list {
+    background: #bfabd3;
+    height: 4em;
+    overflow: auto;
+    margin-bottom: 1em;
+    padding: 1em 0 1em 1em;
+  }
+
+  div#map_index_node_list ul {
+    list-style: none;
+    line-height: 1.5em;
+  }
+
+  div#map_index_canvas {
+    width: 100%;
+    height: 450px;
+  }
+
+  /* Recent changes */
+  h2.recentchanges_section_header {
+    padding-top: 1em;
+  }
+
+  table.recentchanges_section td.recentchanges_node_name, table.recentchanges_section td.recentchanges_meta {
+    padding-top: 1em;
+  }
+
+  td.recentchanges_node_name, td.recentchanges_meta {
+    min-width: 8em;
+    padding-right: 0.5em;
+    vertical-align: top;
+  }
+
+  /* Page history and diffs */
+  ul.node_history {
+    list-style: none;
+  }
+
+  ul.node_history li { /* Need to separate the links */
+    padding-top: 1.7em;
+    line-height: 1.7em;
+  }
+
+  table#version_diffs {
+    word-break: break-word;
+  }
+
+  table#version_diffs td.newer_version {
+    padding-right: 0.5em;
+  }
+
+  table#version_diffs td.newer_version, table#version_diffs td.older_version {
+    vertical-align: top;
+  }
+
+  /* User history */
+  div#userstats {
+    padding-top: 1em;
+  }
+
+  div#last_five_edits_by_user h2, div#rss_feeds_for_user h2 {
+    padding: 1em 0;
+  }
+
+  div#userstats ul {
+    list-style: none;
+  }
+
+  div#userstats li {
+    padding-bottom: 1em;
+  }
+
+  /* Page deletion and moderation */
+  div.confirm_deletion_text, div.confirm_moderation_text {
+    padding-bottom: 1em;
+  }
+
+  form.confirm_deletion input, form.confirm_moderation input {
+    padding: 0.5em;
+  }
+
+  form.confirm_deletion label, form.confirm_moderation label[for=password] {
+    display: block;
+    font-weight: bold;
+    padding-bottom: 0.3em;
+  }
+
+  form.confirm_moderation label[for=moderation_flag] {
+    font-weight: bold;
+  }
+
+  form.confirm_moderation label[for=password] {
+    padding-top: 1em;
+  }
+
+  form.confirm_deletion, form.confirm_moderation {
+    padding-bottom: 1em;
+  }
+
+  /* Page creation */
+
+  div#create_new_page form input#pagename {
+    max-width: 95%;
+    padding: 0.5em;
+    margin: 0.5em 0;
+  }
+
+  div#create_new_page form input#go {
+    padding: 0.5em 1em;
+  }
+
+  form#preferences_form div.set_username input {
+    padding: 0.5em;
+    margin: 0.5em 0;
+  }
+
+  form#preferences_form input#submit {
+    padding: 0.5em;
+  }
+
+  ul#prefs_saved_extra_nav {
+    padding: 1em;
+  }
+
+  ul#prefs_saved_extra_nav li {
+    padding-top: 1em;
+  }
+
+  table#wanted_pages tbody tr td {
+    padding-top: 1em;
+    vertical-align: top;
+  }
+
+  table#wanted_pages tbody tr td#action {
+    padding-top: 0.7em;
+  }
+
+  table#wanted_pages tbody tr td#action a {
+    display: inline-block;
+    padding-top: 0.3em;
+  }
+
+  div#backlink_search_results_list ul {
+    padding: 1em;
+    line-height: 2em;
+  }
+
+  /* Things for the advanced search (search.cgi) */
+  form#advanced_search {
+    line-height: 1.5em;
+    padding: 1em 0;
+  }
+  form#advanced_search div.text_search input {
+    max-width: 100%;
+  }
+  form#advanced_search input.form_button {
+    padding: 0.5em 1em;
+    float: right;
+  }
+
+  /* Edit form stuff. */
+  form#edit_page_form div.edit_box textarea, form#edit_page_form div.edit_box input {
+    width: 95%;
+    padding: 0.5em;
+  }
+  fieldset {
+    border: none;
+  }
+  fieldset legend {
+    display: none;
+  }
+  div.edit_form_actions input.form_button, div.edit_form_actions div.cancel_edit a {
+    display: inline-block;
+    padding: 0.7em 0.1em; /* horizontal space can get tight here */
+  }
+  div.preview {
+    clear: both;
+  }
+}
+
+@media (min-width: 800px) {
+  body {
+    background-color: #bfabd3;
+  }
+
+  p {
+    padding: 1em 0 0 0;
+  }
+
+  div#body_wrapper {
+    margin-left: 5%;
+    margin-right: 5%;
+    margin-top: 1.5em;
+    margin-bottom: 1.5em;
+    border: thin solid black;
+  }
+
+  div#maincontent ul {
+    padding: 1em 0 0 1em;
+  }
+
+  div#navbar div ul {
+    padding-left: 2em;
+    padding-bottom: 1em;
+  }
+
+  div#banner {
+    padding: 1.5em 1em 1.5em 1em;
+    border-bottom: thin solid black;
+  }
+
+  a#banner_navbar_link {
+    display: none;
+  }
+
+  div#maincontent {
+    float: left;
+    width: 77%;
+  }
+
+  div#content {
+    padding-left: 1em;
+  }
+
+  div#node_title {
+    padding: 1em 0 0 0;
+  }
+
+  div#title_edit_link {
+    padding-top: 0.5em;
+  }
+
+  div#recent_changes_feeds, div#site_index_feeds {
+    clear: both;
+  }
+
+  div#map_index_node_list {
+    height: 450px;
+    overflow: auto;
+    float: right;
+    width: 20%;
+  }
+
+  div#map_index_canvas {
+    width: 75%;
+    height: 450px;
+  }
+
+  div#node_map_canvas {
+    float: right;
+  }
+
+  div#navbar {
+    border-left: thin solid black;
+    border-bottom: thin solid black;
+    padding: 1em;
+    float: right;
+    width: 18%;
+  }
+
+  div.navbar_group_title {
+    padding-bottom: 0.5em;
+  }
+
+  div#banner a {
+    text-decoration: none;
+    color: #000000;
+  }
+
+  div#summary {
+    display: none;
+  }
+}

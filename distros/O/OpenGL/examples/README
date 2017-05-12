@@ -1,0 +1,14 @@
+NOTE: This example directory is in the process of being refactored
+to use GLUT/FreeGLUT rather than the original GLX/X11 for window
+creation and user interactions.  It has not yet been determined the
+level of compatibility to be maintained between the previous GLX-only
+implementation and the new cross platform one based on *GLUT.
+
+--------------------------------------------------------------------
+
+These are Stan's original examples. Not all will work with all X/OpenGL depths.
+
+Additionally, there is a planets demo (based on an article in EPM/2) by
+Ilya Zakharevich.  The articles explains how to build the demo step by step.
+Different steps are available via the supplied RCS file.
+

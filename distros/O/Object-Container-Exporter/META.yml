@@ -1,0 +1,28 @@
+---
+abstract: 'strong shortcuts to your classes.'
+author:
+  - 'Atsushi Kobayashi <nekokak _at_ gmail _dot_ com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.94
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.02'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Object-Container-Exporter
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Class::Load: 0
+  Class::Singleton: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/nekokak/p5-Object-Container-Exporter.git
+version: 0.03

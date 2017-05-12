@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<SITE ID="Findlaw">
+
+<NAME Lang="en-us">FindLaw Local Search</NAME>
+<INFO Lang="en-us">legal relevant web search</INFO>
+
+<URL Type="More"><![CDATA[
+http://caselaw.findlaw.com_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://caselaw.findlaw.com/scripts/search.pl?CiRestriction=_QUERY_
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_NEXT_"><![CDATA[
+<a href="_NEXT_"><B>More FindLaw Site Matches
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+.</B>___<A HREF="_URL_">_TITLE_</A></B><BR><DD>_PREVIEW_<BR><DD>___See also:
+]]></TEMPLATE>
+</SITE>

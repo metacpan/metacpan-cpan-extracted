@@ -1,0 +1,20 @@
+Revision history for Ormlette
+
+0.005   2013-07-08
+        - Allow double underscore in table name for multi-level packages
+          e.g., foo__bar becomes MyApp::Foo::Bar
+
+0.004   2012-03-07
+        - Reorganized test scripts
+        - Added basic testing for MySQL data store
+        - Added auto-update of dirty objects
+
+0.003   2011-10-02
+        - Fixed bug allowing ->iterate to clobber its caller's $_
+        - Added isa, ignore_root, and ignore_tables options to ->init
+
+0.002   2010-07-14
+        - Fixed build_requires; no change to the actual Ormlette code itself
+
+0.01    2010-07-12
+        - Initial release

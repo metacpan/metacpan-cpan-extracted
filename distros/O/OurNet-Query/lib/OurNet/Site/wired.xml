@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<SITE ID="Wired">
+
+<NAME Lang="en-us">Wired News</NAME>
+<INFO Lang="en-us">daily news search</INFO>
+
+<URL Type="Start"><![CDATA[
+http://www.wired.com/news/news/search_results_news?words=_QUERY_
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+
+<TEMPLATE><![CDATA[
+size="3">___"_URL_"___><b>_TITLE_</b></a>___color="#FF0000">_DATE_</font>___class=body3>_PREVIEW_</font>___<br><br>
+]]></TEMPLATE>
+</SITE>

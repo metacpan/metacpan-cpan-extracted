@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<otrs_package version="1.1">
+	<Name>TicketAutoAssignment</Name>
+	<Version>1.0.1</Version>
+	<Vendor>OTRS AG</Vendor>
+	<URL>http://otrs.org/</URL>
+	<License>GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007</License>
+	<Framework>3.x.x</Framework>
+	<ChangeLog Version="1.0.1" Date="2013-01-25 18:45:21">New Package</ChangeLog>
+	<Description Lang="en">Ticket Auto Assignment Package.</Description>
+	<IntroInstall Lang="en" Title="Install Information" Type="pre">
+		WELCOME! You are about to install the OTRS package TicketAutoAssignment.
+		<br/>
+		ATTENTION: Make sure the group (and|or) role list should be added in configuration item of AutoAssign before execute the script or set the script in cron job.
+	</IntroInstall>
+	<IntroUninstall Lang="en" Title="Uninstallation Information" Type="pre">
+		ATTENTION: If you uninstall this package, customer don't have an feature to auto assignment of ticket.
+	</IntroUninstall>
+	<IntroUpgrade Lang="en" Title="Upgrade Information" Type="pre">
+		WELCOME! You are about to upgrade the OTRS package TicketAutoAssignment.
+	</IntroUpgrade>
+	<CodeInstall Type="post">
+	</CodeInstall>
+	<CodeUninstall Type="pre">
+	</CodeUninstall>
+	<CodeReinstall Type="post">
+	</CodeReinstall>
+	<BuildDate>2013-03-07 17:54:38</BuildDate>
+	<BuildHost>yourhost.example.com</BuildHost>
+	<Filelist>
+		<File Permission="755" Location="bin/otrs.AutoAllocation.pl" Encode="Base64"></File>
+		<File Permission="644" Location="Kernel/Modules/TicketAutoAssignment.pm" Encode="Base64"></File>
+		<File Permission="644" Location="Kernel/Config/Files/TicketAutoAssignment.xml" Encode="Base64"></File>
+
+	</Filelist>
+</otrs_package>

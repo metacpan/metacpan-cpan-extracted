@@ -1,0 +1,22 @@
+Changes
+COPYRIGHT
+Shader.pm
+Shader.pod
+Shader/Common.pm
+Shader/Objects.pm
+Shader/ARB.pm
+Shader/GLSL.pm
+Shader/CG.pm
+INSTALL
+Makefile.PL
+MANIFEST
+README
+t/OpenGL-Shader.t
+shader-test.pl
+fragment.arb
+vertex.arb
+fragment.glsl
+vertex.glsl
+fragment.cg
+vertex.cg
+META.yml                                 Module meta-data (added by MakeMaker)

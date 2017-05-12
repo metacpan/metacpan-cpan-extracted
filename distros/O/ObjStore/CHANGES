@@ -1,0 +1,696 @@
+** 04-26-00 RELEASE 1.59
+
+- Added OSPERL_TMP_DBDIR to mirror OSPERL_SCHEMA_DBDIR.
+
+- NetServer::ProcessTop -> NetServer::Portal
+
+
+** 11-23-99 RELEASE 1.58 [Guru Nanak's Birthday]
+
+- More Makefile flexibility with os_schema_rule_ext.
+
+- osperlserver support for Time::Warp.
+
+- builtin -> List::Util.
+
+
+** 06-23-99 RELEASE 1.57 [STABLE]
+
+- Split up ServerDB.pm into two files for smoother integration with
+posh/qtposh.
+
+- ObjStore::Job::Table::add_log_hook
+
+- Minor code reorg in ObjStore::Serve.
+
+- osperlserver: specific custom client-name.
+
+- zpeek.t: try to find GNU-diff.
+
+
+** 04-21-99 RELEASE 1.56 [STABLE]
+
+- Fix ObjStore::Table3::add() to return the post-translated instead of
+pre-translated record.
+
+- Various updates for Event 0.38: qtposh, ObjStore::Serve,
+ObjStore::Serve::Notify, ObjStore::Job, ObjStore::Job::Table.
+
+- Fixed ObjAV[] = undef.  Added tests.
+
+- Documentation updates.
+
+
+** 03-23-99 RELEASE 1.55 [STABLE]
+
+- Switch to new mailing list.
+
+
+** 03-22-99 RELEASE 1.54 [STABLE]
+
+- Minor updates to ObjStore::Serve and ObjStore::Table3.
+
+- Better searching heuristics for MakeMaker.
+
+- Minor documentation updates.
+
+
+** 02-11-99 RELEASE 1.53 [STABLE]
+
+- osperlserver no longer subscribes to notifications by default.  Use
+the -subscribe_all command-line option for the old behavior.
+
+- ObjStore::Serve no longer initiates dynamic transactions
+automatically.  You must invoke begin_dyn() (in the ObjStore::Serve
+package) to be sure a transaction is open.
+
+- Various documentation updates.
+
+
+** 01-12-99 RELEASE 1.52
+
+- Split FatTree representation into a separate tarball.
+
+- Added ObjStore::REP::Splash::ObjAV, an array that stores only
+pointers to composites.
+
+- Fixed sub-optimal growth heuristics of Splash representations.
+
+- More correct integration between C & perl for APIs with a variable
+number of arguments.
+
+- Factored some tests into ObjStore::Test.
+
+- Updates for Event 0.29.
+
+- Remove deprecated code.
+
+
+** 11-23-98 RELEASE 1.51
+
+- Added more assertions to the API.  A new (transient) memory leak
+debugging mode is available.  See ObjStore::MakeMaker.
+
+- os_smart_object tweaks for ObjStore-Lib-PDL.
+
+- Fixed a bug that caused the save-stack to become corrupted during
+exceptions.  Yikes!
+
+- Fixed transient memory leak trigger when an SV holding a persistent
+object has non-transaction scope.
+
+- Minor fixes to qtposh.
+
+
+** 11-05-98 RELEASE 1.50
+
+- Fixed order of PUTBACK/POPSTACK.
+
+
+** 11-04-98 RELEASE 1.49
+
+- Stargate reengineering for ObjStore::Lib::PDL.
+
+- MIN_PERL_DEFINE clean up for 5.005_53.
+
+- Various API improvements.  Safer safe_rv().  osp_pathexam fixes.
+
+- Safer typemap code.  Added debugging mode for dynacasts. Resolved
+serious name conflict by renaming ObjStore::Server to
+ObjStore::ServerInfo (Gack!!).
+
+- Various tweaks & fixes.
+
+
+** 10-13-98 RELEASE 1.48
+
+- The transient memory leak is finally fixed!!  A patch for 5.005_02
+is bundled with this distribution (see patches/leak.fix).  The patch
+is also planned to be included by default in 5.005_5x.
+
+- Many updates for Event 0.20+.
+
+- Integrated osp_keypack1 into the API.
+
+- Reduced maximum number of keys from eight to four.
+
+
+** 09-26-98 RELEASE 1.47
+
+- WARNING: the fatal_exceptions option is now always OFF.
+
+- Binary API changes are now detected at run-time.  This is more
+consistant with the rest of the perl world.
+
+- Fixed coredump when seeking to an incomplete key.
+
+- Add ObjStore::UNIVERSAL::DELETED method.  Use this flag to announce
+that an object is queued for unconditional destruction.
+
+- ObjStore::Mortician wasn't restarting properly.  Fixed.
+
+- Internal adjustments necessary for ObjStore::Lib::PDL.
+
+- Culled more statistics from ObjStore::Serve.  Switched to safe signal
+handling.
+
+
+** 09-12-98 RELEASE 1.46
+
+- Use PERL5PREFIX to install into a different directory tree.
+
+- Improved ObjStore::Index::POSH_PEEK.  Made pretty.
+
+- Shell-style output redirection >> for posh.
+
+- Improved the design of the ObjStore::Serve::defaultLoop.  Reduced
+excessive statistics.
+
+- Improved ObjStore::Table3::fetch in an array context.
+
+- Added cast-to-integer overloading for ObjStore::UNIVERSAL.  For
+example, $hash{ 0+$object }=1.
+
+- Fixed posh reporting of forced-loaded packages.
+
+- Reduced the number of potential "Attempt to free unreferenced scalar
+during global destruction" warnings (hopefully!).
+
+- Improved various diagnostic messages.
+
+- Documentation corrections & updates.
+
+
+** 08-22-98 RELEASE 1.45
+
+- The == and != operators could give incorrect results in some cases.
+Fixed.
+
+- Fixed nested destruction of Tree::Fat representations.  (Cursors were
+being shared between levels!  Gack!)
+
+
+** 08-05-98 RELEASE 1.44
+
+- Improved backward compatibility with respect to blessings in old
+databases.  (Now that we have old databases...  :-)
+
+- As threatened, new_ref() without arguments now creates a hard
+reference instead of a protected reference.
+
+- Fixed a nasty pathexam problem exposed by ObjStore::REP::HashRecord.
+Sort comparisons were being botched.
+
+
+** 07-28-98 RELEASE 1.43
+
+- Fixed index bugs.  The lexicographical ordering logic was broken.
+Also there was a potential memory corruption problem.
+
+
+** 07-27-98 RELEASE 1.42
+
+- ObjectStore 5.1 is required.  Static linkage is no longer supported.
+OTOH, it is now easy to create persistent C++ objects that are
+seemlessly integrated into perl databases.  Raw C++ performance must
+be sacrificed no longer!  As there is no longer any application
+schema, APIs to configure it have been removed.  A new environment
+variable, OSPERL_SCHEMA_DBDIR, overrides the default schema directory.
+
+Indu Strypundit is quoted as calling this release a tour-de-force of
+technical bravada.  "We suspected that the number forty-two in the
+version might be significant.  It was."
+
+- Many of the core API classes have been through yet another round of
+extensive polishing in preparation for a binary API freeze (or at
+least a chill :-).  The pathexam apparatus has been entirely rewritten
+and is now available at the perl level as ObjStore::PathExam.
+
+- Various osperlserver enhancements including: a -shutdown <when>
+option, an -reload option, and a automatic snapshotting of all
+VERSIONs on startup (see ObjStore::Serve).
+
+- Simplified read-only protocol for indices.  Either keys are
+indexable just once or they must be read-only.
+
+- A few more problems with exception handling were fixed.  Errors were
+not being reported properly in rare circumstances.
+
+- Use the 'methods' command to enquire about available methods in
+posh (5.005 only).
+
+- Schema support for non-ObjStore::Index cursors and ObjStore::Set
+have been dropped.  sync_INC/get_INC is no longer supported.  The
+readonly method is no longer implemented (but you can still check
+easily with eval).
+
+
+** 07-07-98 RELEASE 1.41
+
+- If an object is blessed into a package matching RE m/_fake\:\:/,
+then the package will be ignored (on reads).  A script for generic
+import of CSV files is now a trival exercise.
+
+- os_transaction::checkpoint has been tested and appears to work as
+well as standard transactions.  The performance gain appears
+measurable.
+
+- Prototyped an ObjStore::Index with a (splash) binary heap
+representation.
+
+- Indices now auto-dereference (just once) in the case that references
+are used.
+
+- Transaction deadlocks are no longer re-tried automatically.  If you
+relied on this behavior it is fairly easy to cobble it together
+yourself.  Perl 5.005 will allow die $ref, which makes the
+implementation even closer to trival.
+
+
+** 05-30-98 RELEASE 1.40
+
+- Scrubbed code with Insure++ (Parasoft).  Insure++ is a product
+similar to Purify, except better.  Fixed a bug in the os_Dictionary
+hash representation.
+
+- A better effort is made to vivify the @ISA tree when it is
+(partially) unloadable.  This change is aimed towards allowing the
+creation of databases without any .pm file support (discardible
+scaffolding).
+
+- Relaxed restrictions on comparing index keys of differing type.
+
+- Edit the Makefile.PL to add -DOSP_SAFE_BRIDGE if you still need it!!
+
+
+** 05-10-98 RELEASE 1.39
+
+- Fixed a long standing problem with transaction memory usage.  Memory
+associated with keeping track of persistent objects is now released as
+soon as possible (instead of at the end of the transaction).  A true
+checkpoint is now possible (but insufficiently tested).
+
+- Optionally, during update transactions reference counts are no
+longer affected by reads (this was not the case in prior versions!).
+Efficiency of certain types of updates should be improved.  You will
+need to manually invoke the HOLD method in the rare circumstance that
+a transient variable is the only reference to a persistent object (or
+otherwise risk a SEGV/BUS error).  Due to the gravity of this change,
+the optimization is turned off for 1.39 by default.  In anticipation
+of enabling it, a warning is generated to help pinpoint any problems
+in existing code.  Please test your code against 1.39 before upgrading
+to the next release!!
+
+- Lots of tweaks.  Reorganized transaction code and osperlserver.  All
+allocators should now accept 'transient' as a valid segment.
+ObjStore::Serve and ObjStore::Server supercede the jumbled logic
+initially prototyped in ObjStore::Process.
+
+
+** 04-23-98 RELEASE 1.38
+
+- Support for multiple threads.  Changed ObjStore::Transaction->new()
+to conform the standard method call convention.  While partially
+tested (perl 5.004_64 solaris), additional internal reorganization and
+testing is still needed.
+
+- osperlserver no longer invokes the 'evolve' method upon restart.
+
+- VERSIONs are not longer required for persistent classes.  Instead
+'0.001' is defaulted.  Be aware that you must use a version greater
+than '0.001' once you add an explicit version.
+
+
+** 04-10-98 RELEASE 1.36
+
+- Added ObjStore::Posh::Remote & qtposh.  However, qtposh may not work
+without patches for Event and PerlQt.  Mileage may vary.  (Qt is a
+cross-platform GUI library like Tk.  See http://www.troll.no)
+
+- Various minor fixes.
+
+
+** 04-06-98 RELEASE 1.35
+
+- Another read-only mode is available for ObjStore::Index.  A
+distinction is made between exclusive and shared read-only keys.
+The default mode has been changed to _exclusive_ read-only.
+Also added support for shift and pop.
+
+- Delay object destruction with ObjStore::Mortician.  Also, general
+improvements to the serverization modules.
+
+- Optimized typemap slightly.  Also fixed typemap bugs in
+ObjStore::Index::seek & ObjStore::Index::configure.  Optimized
+reallocation of (persistent) memory in string assignments.  (1.34 code
+was buggy!)
+
+- Overloaded == & != operator tests no longer work if either argument
+is non-persistent.  While this breaks backward compatiblility, I
+believe the extra strictness is worth it.
+
+- The automatic safe_require code was apparently a bit _TOO_ safe.
+Exceptions were been hidden!  Fixed.
+
+- Improved Digital AXP hints.
+
+
+** 03-28-98 RELEASE 1.33
+
+- Stringification of persistent objects can no longer cause
+ObjectStore exceptions.  Error reporting is therefore much more
+robust.
+
+- Use ObjStore::NoInit to delay initialization of the ObjectStore
+library.  This opens time to modify configuration parameters (or
+for forking) before becoming a known OS client.
+
+- First-cut at database job scheduling.  See ObjStore::Job!
+
+- Blessings were not sticking to databases in certain cases.  Fixed.
+
+
+** 03-21-98 RELEASE 1.32
+
+- Major improvements to serverization code.  See osperlserver,
+ObjStore::ServerDB, and ObjStore::Process.  It is likely that not all
+changes are backward compatible to 1.30 (but I'm pretty sure
+improvements will outweigh breakage :-).
+
+- ObjStore::AV::Set now checks for duplicates.
+
+
+** 03-13-98 RELEASE 1.31
+
+- Posh will move directly to a database specified on the command line.
+Also, the default is now mvcc mode.  Fixed a problem with persisting
+command history.
+
+- Changed the behavior ObjStore::AV::Set::exists(...) to be more
+consistent.
+
+- Fixed a problem in the is_evolved() method.
+
+- $ObjStore::TRANSACTION_PRIORITY is now a tied scalar.
+
+- Replaced (get|set)_(read|write)lock_timeout (yikes!) with a single
+perl-style lock_timeout API.
+
+- Reorganized the BOOT section to meet the requirements of the perl
+compiler.  ObjStore::shutdown is now called in an END block to insure
+proper clean up (abort pending transactions, etc.) and initialization
+is now delayed until run-time (vs. compile-time).
+
+
+** 03-06-98 RELEASE 1.30
+
+- Instant, effortless event dispatching for network distributed perl
+objects using dynamic transactions.  (See ObjStore::Process :-)
+
+- Minor changes to ObjStore::Table3 to support multiple index types
+and the notion of a primary index.  Simplified the implementation of
+ObjStore::AV::Set.  Now can be used as an index in an
+ObjStore::Table3.  ObjStore::AV::Set changes are not backward
+compatible.
+
+- Persistent bless logic unnecessarily complains when blessing in
+multiple databases.  Temporarily disabled the imperfect assertion.
+
+- Added subscribe & unsubscribe to Databases & Segments.
+
+- Added 'nextKey' method to ObjStore::HV & ObjStore::Index.  Reserved
+the 'help' method of all persistent objects.
+
+- Tweaks to ObjStore::CSV.
+
+- Defect found and fixed in Tree::Fat.
+
+- Always adding -DDEBUGGING to CFLAGS is wrong.  Fixed.
+
+- posh now persists command history from prior sessions (5.004_58+).
+
+
+** 02-21-98 RELEASE 1.29
+
+- Complete, nesting, tied array support (5.004_58+).
+
+- Rewrote ObjStore::AppInstance to eliminate unnecessarily confusing
+data flow.  The new version is NOT backward compatible.
+
+- Fixed a bug that allowed bad pointers to appear in tree nodes and
+possibly other places.  Instances of this bug occurred rarely.
+
+- Fixed an uninitialized pointer that was causing exceptions to turn
+into BUS errors.  Added more regression tests.
+
+- Fixed a minor bug in ObjStore::Path::Ref.
+
+
+** 02-07-98 RELEASE 1.28
+
+- Relaxed overly strict index behavior.  Fixed performance of add &
+remove for non-unique indices.  Fixed a serious bug when seeking
+unique indices.  Path traverse silently ignores records when there is
+a missing key or undef'd slot.  Fixed index comparison for mixed
+numeric values.  Added more tests.
+
+- Tweaked ObjStore::AVHV evolution code.
+
+- posh accepts [more] command line args.  Command-line perl code is no
+longer partially committed (this was an artifact of the incomplete
+integration between eval and transactions).
+
+- Improved CSV module.
+
+- Try to create the cache directory on startup.  (See $OS_CACHE_DIR)
+
+
+** 01-24-98 RELEASE 1.26
+
+- Preliminary support for exceptions on Digital Unix AXP (and other
+platforms for which ODI exploits ANSI C++ exceptions).
+
+- Fat-Tree representation arrays.
+
+- The Fat-Tree code was re-factored and the memory layout changed.
+Unfortunately, any indices created with a prior version will need to
+be dropped (before upgrading) and re-built (after upgrading).  Either
+this or a schema evolution (yikes!) is necessary.  All other data
+should migrate without a hiccup.
+
+
+** 01-18-98 RELEASE 1.25
+
+- Completed test coverage analysis of the C++ code (with the
+assistance of Devel::CCov).  A number of minor bugs were uncovered and
+fixed.  Most notable bug: splash hashes did not take advantage of
+already empty slots during STORE (I never claimed they were a model of
+efficiency :-).
+
+- Fixed: problems when doing updates while two databases are open, one
+in mvcc mode and one in update mode.  $db->is_writable is now the
+preferred method to determine if you can update data.
+
+- Split each group of collection representations into its own XS file.
+Optimized creation of new persistent objects.  (This may cause
+backward compatibility problems if you were passing an exact
+representation type to a 'new' method.)  The 'new' method will be
+auto-generated at compile-time in a forthcoming release.
+
+
+** 01-10-98 RELEASE 1.24
+
+- The index readonly locking has been tweaked again.  You'll need to
+re-create any indices.  Let me know if I got it right this time!
+
+- Re-organized the logic of blessing with a significant performance
+improvement.  Greatly expanded tracking of version numbers.  Be aware
+that bless now requires all classes throughout the @ISA heirarchy to
+set their $VERSION since is_evolved compares them (and no longer
+compares the @ISA tree).
+
+- Persistent per-class globals via a new $o->stash() method.
+
+- Improved the API for private root data.  Also, moved the private
+root to a separate segment (so it's easier to study memory usage).
+
+- $db->sync_INC uses unshift instead of push.
+
+
+** 01-07-98 EMERGENCY RELEASE 1.23
+
+- Fixed refcnt problems in bless & indices.
+
+- Indices now set readonly locks *ONLY* on fields that are used as
+keys.
+
+- Notification API.
+
+
+** 01-06-98 RELEASE 1.22
+
+- Real indices!  Queries such as /date between qw(Nov97 Jan98)/ are
+now easy!  And you can index on multiple keys: $index->configure(path
+=> "last_name, first_name").
+
+- No longer ignores -MCarp=verbose!
+
+- posh: both cd & ls now use the same path resolver.
+
+- Builds via Makefile.PL.  Ported to Digital Unix 4.0 / AXP.
+
+- The stargate no longer destroys data as it is copied.
+
+- 'new_cursor' now defaults to transient memory.
+
+
+** 12-13-97 RELEASE 1.21
+
+- THE TUTORIAL IS DONE!  See ObjStore::Tutorial!
+
+- Fixed numerous minor bugs; fixed ObjStore::UNIVERSAL::isa;
+significant changes to posh; NOREFS invokation optimized out unless
+the method is present; re-organized the stargate; moved CSV stuff to
+ObjStore::CSV; untested support for kernel threads.
+
+
+** 11-21-97 RELEASE 1.20
+
+- 'bless' now stores the @ISA tree at bless-time.  Use $o->isa($class)
+to query it.  For the transient @ISA, use $o->UNIVERSAL::isa($class).
+
+- Reference support revamped.  Transient references and unprotected
+references are now supported.
+
+- Basic import/export of 2D structure via CSV files (Excel format).
+
+
+** 10-31-97 RELEASE 1.19 (Haloween Edition)
+
+- Emulation of RDBMS tables.  Unstructured perl databases are, well,
+unstructured.  The RDBMS table paradigm is a surprisingly good way to
+structure data.  And since you can store complex nested structures per
+row, add the same row to multiple tables, or nest tables, it's not
+half bad.
+
+- Persistent support for fake hashes (requires 5.004_50+).  Schema
+evolution for the same.
+
+- $o->NOREFS method invoked when an object becomes persistently
+unreachable.
+
+- Transaction support has been complete rewritten.  Nested
+transactions are now fully supported.
+
+- Bless is now non-intrusive and customizable.
+
+
+** 10-11-97 RELEASE 1.17
+
+- PERL / OBJECTSTORE SHELL !!
+
+- First-class cursors for collections.
+
+- osp_copy script to copy databases.  Source code included.
+
+- Support for cross database references.
+
+- 'Sets' deprecated.  The interface is there, but they are
+re-implemented with hashes.
+
+
+** 10-03-97 RELEASE 1.16
+
+- All transient data related to persistent memory is now garbage
+collected immediately after a transaction finishes.  This should fix
+any strange reference count problems that extensive testing has been
+uncovering.  I am very interested to see any examples of code that
+still leaks memory.  To recover memory already lost, a script to copy
+databases is in the works.
+
+- The default stargate now destroys transient data as it is copied
+into the database.  This is necessary to prevent the inadvertant
+creation of uncollectable cyclic structures.
+
+
+** 09-27-97 RELEASE 1.15
+
+- Expanded analysis of Perl, Java, C++, and SQL as database languages.
+
+- Partial arrays.  Mileage may vary.
+
+- Automatic retry in the event of deadlock (69).
+
+- Blessed objects now try to 'require' their class the first time they
+are instantiated in transient memory.
+
+
+** 08-16-97 RELEASE 1.11
+
+- ospeek restricted to show only three instances per class.
+
+
+** 08-11-97 RELEASE 1.10
+
+- Overloaded the stringify operator for persistent objects.
+
+- Important typemap fixes plus other minor stuff.
+
+
+** 08-06-97 RELEASE 1.09
+
+- At our site we are now using osperl for about 2GB worth of data!
+
+- ObjectStore transactions and exceptions now fully integrated into
+Perl.  Cursors have been removed from persistent data; read_only
+transactions now properly supported.  Read_only transactions are
+blazingly fast!
+
+- Regularized allocators.  Specify cardinality when creating containers.
+  new ObjStore::$type($near, $card);  Customize representation selector.
+
+- Regularized peristent typing in preparation for extensibility.
+
+- Peek rewrite with ideas from Data::Dumper.  Peek on circular data
+structures.
+
+- Unions removed from the schema.  This fix makes it easy to evolve
+in the event of future schema enhancements.
+
+- Reference counts are now 32bits wide (and check for overflow :-).
+
+- Static functions (e.g. ObjStore::Segment::of) are now called with ::
+instead of -> for greater efficiency.  You wouldn't want to subclass
+the core classes anyway.
+
+
+** 07-05-97 RELEASE 1.06 
+
+- Improved peek.  Now peek from the command line - 'ospeek <database>'!
+
+
+** RELEASE 1.03
+
+- Can't wait for reasonable tied arrays!  Added array-based Sets.
+They're not tied, but at least they're inefficient.
+
+- Found and fixed problems with reference counting.  Now the tests
+can be run and the database does not grow.
+
+- Blessings now persistent!  (Untested)
+
+
+** RELEASE 1.02
+
+- Added ObjStore::peek($var) - like Data::Dumper except that it works
+better on gigantic databases.  Only three elements are printed from
+large hashes, while small hashes are printed completely.  The meaning
+of 'large' can be customized (not yet).
+
+
+** RELEASE 1.00
+
+- The first release written during our 60 day evaluation.  I knew a
+Perl - ObjectStore combination would be fantastic!  Apparently it is
+my mission to save the world from the unspeakable torture of
+relational databases...I do it gladly! :-)

@@ -1,0 +1,5 @@
+Changes for Perl extension Oz
+
+0.01 Tue 24 May 2011
+	- Create simple abstraction for a single-file Oz script
+	- Added POD and tests to exercise the basic usage of the module

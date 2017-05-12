@@ -1,0 +1,49 @@
+{
+   "abstract" : "checkupdates for aur",
+   "author" : [
+      "3ED <krzysztof1987@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4218",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "OS-CheckUpdates-AUR",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "JSON" : "0",
+            "Try::Tiny" : "0",
+            "WWW::AUR" : "0.19"
+         }
+      }
+   },
+   "provides" : {
+      "OS::CheckUpdates::AUR" : {
+         "file" : "lib/OS/CheckUpdates/AUR.pm",
+         "version" : "0.04"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/artistic-license-2.0.php"
+      ]
+   },
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

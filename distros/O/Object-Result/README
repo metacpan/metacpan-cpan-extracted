@@ -1,0 +1,38 @@
+Object::Result version 0.000003
+
+    This module adds a new keyword to Perl: "result"
+
+    That keyword acts like a "return", but instead of a list of values to
+    return, it takes a single block which specifies the behaviour (i.e. the
+    methods and operator overloading) of an object to be returned.
+
+    The intention is to make it much less onerous to return clean, properly
+    encapsulated objects...instead of returning lists of values or
+    references to arrays or hashes.
+
+
+INSTALLATION
+
+    To install this module, run the following commands:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+
+DEPENDENCIES
+
+    * Keyword::Simple
+
+    * PPI
+
+    * Method::Signatures
+
+
+COPYRIGHT AND LICENCE
+
+    Copyright (C) 2014, Damian Conway
+
+    This library is free software; you can redistribute it and/or modify
+    it under the same terms as Perl itself.

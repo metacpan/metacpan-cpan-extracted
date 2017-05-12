@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+LICENSE.txt
+OzDBnmake.bat
+doc/OzDB.html
+t/OzDB.t
+lib/OzDB.pm
+META.yml                                 Module meta-data (added by MakeMaker)

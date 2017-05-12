@@ -1,0 +1,98 @@
+NAME
+       Object::Registrar - A global registry of objects that can
+       be resolved by names
+
+SYNOPSIS
+       use Object::Registrar;
+
+       my $or = new Object::Registrar();
+
+       $nm->bind('Test/Foo', new Foo());      ## or use register()
+       $nm->bind('Test/Bar', new Bar());
+
+       my $foo = $nm->resolve('Test/Foo');
+       $nm->rebind('Test/Bar', $bar);         ## or use reregister()
+
+       my %objhash = $or->list();
+       my %objhash = $or->list('Test/*');
+
+       my $bool = $or->exists('Test/Foo');
+
+       $or->unbind('Test/Bar');               ## or use unregister()
+
+       ## ----------------------------------- ##
+       ## Typical usage with error handling   ##
+       ## ----------------------------------- ##
+
+       use Object::Registrar;
+       use Error qw(:try);
+
+       my $or = new Object::Registrar();
+       try {
+         $or->resolve('Null');
+       }
+       catch Object::NotFoundException with {
+         my ($ex) = shift;
+         print "Caught NotFoundException: $ex\n";
+       };
+
+DESCRIPTION
+       The Object::Registrar implements is a global registry of
+       objects.  This module makes use of the Singleton Pattern
+       to achieve the desired functionality.
+
+       Using this module an application can register its Object
+       instances in the Registrar with a unique name. Later on in
+       the application these object instances can be retrieved /
+       resolved by providing the unique name.
+
+       The names provided for identifying the Objects can be
+       anything that would be acceptable as a valid hash key in
+       Perl.
+
+       For a detailed description of the Singleton Pattern, refer
+       Design Patterns, Gamma et al, Addison-Wesley, 1995, ISBN
+       0-201-63361-2.
+
+PREREQUISITES
+       Error.pm - Error/exception handling in an OO-ish way
+
+COPYRIGHT
+       Copyright (c) 2001 Arun Kumar U <u_arunkumar@yahoo.com>.
+       All rights reserved.
+
+       This library is free software; you can redistribute it
+       and/or modify it under the same terms as Perl itself.
+
+AUTHORS
+
+    Arun Kumar U <u_arunkumar@yahoo.com>
+
+                            =====================
+
+HOW TO INSTALL IT ?
+
+To install this module, cd to the directory that contains this README
+file and type the following:
+
+    perl Makefile.PL
+    make test
+    make install
+
+To install this module into a specific directory, do:
+perl Makefile.PL PREFIX=/name/of/the/directory
+...the rest is the same...
+
+Please also read the perlmodinstall man page, if available.
+
+Share and Enjoy !!
+
+Arun Kumar U 
+<u_arunkumar@yahoo.com>
+
+-------------------------------------------------------------------------------
+    Only wimps use tape backup: *real* men just upload their important 
+    stuff on ftp, and let the rest of the world mirror it.
+                                                           - Linus Torvalds
+-------------------------------------------------------------------------------
+

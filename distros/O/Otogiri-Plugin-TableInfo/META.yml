@@ -1,0 +1,51 @@
+---
+abstract: 'retrieve table information from database'
+author:
+  - 'Takuya Tsuchida <tsucchi@cpan.org>'
+build_requires:
+  DBD::SQLite: '0'
+  Test::Differences: '0'
+  Test::More: '0'
+  Test::Requires: '0'
+configure_requires:
+  CPAN::Meta: '0'
+  CPAN::Meta::Prereqs: '0'
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.1.1, CPAN::Meta::Converter version 2.141170'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Otogiri-Plugin-TableInfo
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Otogiri::Plugin::TableInfo:
+    file: lib/Otogiri/Plugin/TableInfo.pm
+    version: '0.04'
+  Otogiri::Plugin::TableInfo::Pg:
+    file: lib/Otogiri/Plugin/TableInfo/Pg.pm
+  Otogiri::Plugin::TableInfo::PgKeywords:
+    file: lib/Otogiri/Plugin/TableInfo/PgKeywords.pm
+requires:
+  DBI: '0'
+  DBIx::Inspector: '0'
+  List::MoreUtils: '0'
+  Otogiri: '0.06'
+  Otogiri::Plugin: '0.02'
+  parent: '0'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/tsucchi/p5-Otogiri-Plugin-TableInfo/issues
+  homepage: https://github.com/tsucchi/p5-Otogiri-Plugin-TableInfo
+  repository: git://github.com/tsucchi/p5-Otogiri-Plugin-TableInfo.git
+version: '0.04'

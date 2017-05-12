@@ -1,0 +1,49 @@
+pkgname: mysql
+name: MySQL
+description: MySQL
+version: 5.6.20
+homepage: http://www.perl.org/
+url: http://cdn.mysql.com/Downloads/MySQL-5.6/mysql-5.6.20.tar.gz
+sha1: 10f9ed2bbf3fbf227b799f1c7af3a0c7f7cf4d95
+md5: 71ed71ecc53222a2f03523cd13cf2141
+prefix: /opt/sf/mysql
+
+build: |
+  cmake -DCMAKE_INSTALL_PREFIX=[% PREFIX %] .
+  make
+  make install DESTDIR=[% FAKEROOT %]
+
+maintainer:
+  author: James F Wilkus
+  email: jfwilkus@cpan.org
+  nickname: jfwilkus
+
+prune:
+  directories:
+    - share/norwegian
+    - share/french
+    - share/slovak
+    - share/ukrainian
+    - share/italian
+    - share/korean
+    - share/norwegian-ny
+    - share/bulgarian
+    - share/portuguese
+    - share/romanian
+    - share/spanish
+    - share/german
+    - share/czech
+    - share/japanese
+    - share/polish
+    - share/greek
+    - share/serbian
+    - share/dutch
+    - share/russian
+    - share/swedish
+    - share/hungarian
+    - share/english
+    - share/estonian
+    - share/danish
+
+  files:
+    - sql-bench

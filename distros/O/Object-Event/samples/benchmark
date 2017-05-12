@@ -1,0 +1,38 @@
+#!perl
+
+package foo;
+use common::sense;
+
+use base qw/Object::Event/;
+
+sub new {
+   my $this  = shift;
+   my $class = ref($this) || $this;
+   $class->SUPER::new (@_);
+}
+
+our $cnt;
+sub test : event_cb { $cnt++ }
+
+package main;
+use common::sense;
+
+use Benchmark qw/:all/;
+
+my $f = foo->new;
+
+for (1..10) {
+   $f->reg_cb (test => sub {
+      my ($f) = @_;
+      $foo::cnt++;
+   });
+}
+
+my $ev;
+
+timethese (250000, {
+   simple => sub { $f->event ('test') },
+   method => sub { $f->test }
+});
+
+print "$foo::cnt\n";

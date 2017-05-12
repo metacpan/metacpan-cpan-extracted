@@ -1,0 +1,37 @@
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         OpenInteract
+version:      1.62
+version_from: OpenInteract.pm
+installdirs:  site
+requires:
+    File::Basename:                0
+    File::Copy:                    0
+    IO::Zlib:                      1
+    Compress::Zlib:                1.08
+    Class::Singleton:              1.03
+    HTTP::Request:                 0
+    Mail::RFC822::Address:         0.3
+    Class::Fields:                 0
+    SPOPS:                         0.6
+    File::Path:                    0
+    MIME::Lite:                    2
+    HTML::Entities:                1.13
+    File::Spec:                    0
+    Class::Date:                   1
+    Template:                      2.04
+    Archive::Tar:                  0
+    Carp::Assert:                  0
+    Lingua::Stem:                  0
+    Digest::MD5:                   0
+    File::MMagic:                  0
+    Mail::Sendmail:                0.77
+    Class::Accessor:               0
+    Pod::Usage:                    1.12
+    Text::Sentence:                0
+    Pod::POM:                      0
+    Apache::Request:               0.31
+    Cache::Cache:                  1
+    Apache::Session:               1.5
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.12

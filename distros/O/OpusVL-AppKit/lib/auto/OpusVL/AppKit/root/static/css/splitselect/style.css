@@ -1,0 +1,22 @@
+.js-split-select-inactive {
+    float: left;
+    width: 40%;
+    height: 11em;
+}
+
+.split-select-controls {
+    float: left;
+    width: 5%;
+}
+
+.split-select-controls button {
+    width: 70%;
+    margin: 15%;
+    padding: 0;
+}
+
+.js-split-select-active {
+    float: left;
+    width: 40%;
+    height: 11em;
+}

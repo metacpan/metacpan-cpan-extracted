@@ -1,0 +1,87 @@
+# $File: //depot/OurNet-BBSAgent/BBSAgent/hua.bbs $ $Author: Jedi $
+# $Revision: #4 $ $Change: 2946 $ $DateTime: 2002/01/29 03:18:44 $
+# Contributed by Jedi <Jedi@Jedism.org>
+# zh_TW.Big5: 戀戀半線情
+
+ChangHua Senior High School
+hua.twbbs.org
+
+load maple3.board
+load maple3.session
+load maple3.user
+
+setv cursor	>
+
+=main
+send qqqqqqee
+wait 主功能表
+till 手機
+
+=board_article_fetch_first
+call board $[board]
+send $[article]\n\n
+wait \e[2J
+till \e[1;36;44m
+  or \e[36;44m
+till \e[0;31;47m (
+wait \e[m
+exit
+
+=board_article_fetch_next
+send \n
+till \e[1;36;44m
+  or \e[36;44m
+till \e[0;31;47m (
+wait \e[m
+exit
+
+# 簽名檔 post 前就問
+=article_post_raw
+call board $[board]
+send \cP$[title]\n0\n$[body]
+# clean header
+# send \cS\cY\cY\cY\cY
+# save
+send \cX
+send s\n
+wait (E)繼續編輯 (W)強制寫入？[E]
+  or \e[m
+doif $[1]
+    send w\n
+endo
+send \x20
+doif $[author]
+    call article_edit_author $[author]
+endo # ?
+exit
+
+=article_edit_author
+send \x24E\cY\cY\cY\cY
+# 1 empty 2 from 3 origin 4 --
+send \cXs\n
+wait 文  章  標  題
+exit
+
+=article_edit_raw
+send E$[content]\x18
+wait 讀寫刪暫存檔？
+send s\n
+doif $[postsign]
+  send 0\n
+endo
+send \x20
+doif $[author]
+    call article_edit_author $[author]
+endo
+exit
+
+=message_reply
+send \x12
+wait 回應
+send $[message]\n
+wait [Y]
+send \n
+wait \e[37;45m
+wait \e[m
+send h\x20
+exit

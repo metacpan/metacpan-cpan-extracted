@@ -1,0 +1,139 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"/>
+<title>Exporting ontologies into different formats</title>
+</head>
+<body>
+	
+<h2>Exporting ontologies into different formats</h2>
+	
+<ol>
+	<li><a href="#1">Export a given ontology to OWL format (oboInOwl mapping).</a></li>
+		
+	<li><a href="#2">Export a given ontology to GML format.</a></li>
+		
+	<li><a href="#3">Export a given ontology to XML format.</a></li>
+		
+	<li><a href="#4">Export a given ontology to DOT format.</a></li>
+		
+	<li><a href="#5">Export a given ontology to OBO format (spec 1.2).</a></li>
+	
+	<li><a href="#6">Export a given ontology to RDF format.</a></li>
+
+</ol>
+	
+	<ol>
+	<li> <b><a name="1">Export a given ontology to OWL format (oboInOwl mapping):</a></b>
+		<pre>
+					
+			use OBO::Parser::OBOParser;
+			use strict;
+						
+			my $my_parser = OBO::Parser::OBOParser->new();
+			
+			my $o = $my_parser->work("gene_ontology.obo");
+			
+			# export to OWL: gene_ontology.owl
+			open (FH, ">gene_ontology_by_apo.owl");
+			$o->export('owl', \*FH, \*STDERR, 'http://www.cellcycleontology.org/ontology/owl/', 'http://www.cellcycleontology.org/formats/oboInOwl#');
+			close FH;
+			
+		</pre>
+	</li>
+		
+	<li> <b><a name="2">Export a given ontology to GML format:</a></b>
+		<pre>
+
+			use OBO::Parser::OBOParser;
+			use strict;
+						
+			my $my_parser = OBO::Parser::OBOParser->new();
+			
+			my $o = $my_parser->work("gene_ontology.obo");
+			
+			# export to GML: gene_ontology.gml
+			open (FH, ">gene_ontology_by_apo.gml");
+			$o->export('gml', \*FH);
+			close FH;
+			
+		</pre>
+	</li>
+		
+	<li> <b><a name="3">Export a given ontology to XML format:</a></b>
+		<pre>	
+		
+			use OBO::Parser::OBOParser;
+			use strict;
+						
+			my $my_parser = OBO::Parser::OBOParser->new();
+			
+			my $o = $my_parser->work("gene_ontology.obo");
+					
+			# export to XML: gene_ontology.xml
+			open (FH, ">gene_ontology_by_apo.xml");
+			$o->export('xml', \*FH);
+			close FH;
+			
+		</pre>
+	</li>
+		
+	<li> <b><a name="4">Export a given ontology to DOT format:</a></b>
+		<pre>				
+			
+			use OBO::Parser::OBOParser;
+			use strict;
+						
+			my $my_parser = OBO::Parser::OBOParser->new();
+			
+			my $o = $my_parser->work("gene_ontology.obo");
+						
+			# export to DOT: gene_ontology.dot
+			open (FH, ">gene_ontology_by_apo.dot");
+			$o->export('dot', \*FH);
+			close FH;
+			
+		</pre>
+	</li>
+		
+	<li> <b><a name="5">Export a given ontology to OBO format (spec 1.2):</a></b>
+		<pre>
+		
+			use OBO::Parser::OBOParser;
+			use strict;
+						
+			my $my_parser = OBO::Parser::OBOParser->new();
+			
+			my $o = $my_parser->work("gene_ontology.obo");
+							
+			# export to OBO: gene_ontology.obo
+			open (FH, ">gene_ontology_by_apo.obo");
+			$o->export('obo', \*FH);
+			close FH;
+						
+		</pre>
+	</li>
+		
+	<li> <b><a name="6">Export a given ontology to RDF format:</a></b>
+		<pre>
+		
+			use OBO::Parser::OBOParser;
+			use strict;
+						
+			my $my_parser = OBO::Parser::OBOParser->new();
+			
+			my $o = $my_parser->work("gene_ontology.obo");
+							
+			# export to RDF: gene_ontology.rdf
+			open (FH, ">gene_ontology_by_apo.rdf");
+			$o->export('rdf', \*FH, \*STDERR, 'http://www.cellcycleontology.org/ontology/rdf/');
+			close FH;
+						
+		</pre>
+	</li>
+		
+	</ol>
+
+Copyright (c) 2006-2015 by Erick Antezana. All rights reserved.
+
+</body>
+</html>

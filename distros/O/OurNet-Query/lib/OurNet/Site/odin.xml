@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<SITE ID="Odin">
+
+<NAME Lang="en-us">ODIN</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+ODIN全球WWW搜尋(日本)
+]]></NAME>
+<INFO Lang="en-us">general information web search in Japan</INFO>
+<INFO Lang="zh-tw">general information web search in Japan</INFO>
+
+<URL Type="More"><![CDATA[
+http://odin.ingrid.org_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://odin.ingrid.org/cgi-bin/odin.cgi?key=_QUERY_&go=Search
+]]></URL>
+
+<CHARSET>ja-jp.jis</CHARSET>
+<SCORE>_SCORE_/10</SCORE>
+
+<VAR Name="_NEXT_"><![CDATA[
+<A HREF="_NEXT_">[NEXT
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<DT>___<A HREF="_URL_"___">_TITLE_</A>___score:_SCORE_)</SMALL>___<DD>_PREVIEW_<BR>___<NOBR>(_SIZE_bytes)___<NOBR>_DATE_JST</NOBR>
+]]></TEMPLATE>
+</SITE>

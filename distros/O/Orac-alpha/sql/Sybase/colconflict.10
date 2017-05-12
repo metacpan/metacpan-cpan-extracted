@@ -1,0 +1,94 @@
+/* Procedure copyright(c) 1995 by Edward M Barlow */
+
+/******************************************************************************
+**
+** Name        : sp__colconflict.sp
+**
+** Summary		: list distinct columns in current databases
+**
+******************************************************************************/
+
+:r database
+go
+:r dumpdb
+go
+
+IF EXISTS (SELECT * FROM sysobjects
+           WHERE  name = "sp__colconflict"
+           AND    type = "P")
+   DROP PROC sp__colconflict
+
+go
+
+CREATE PROC sp__colconflict( @objname char(32) = NULL, @show_type char(1)=' ',
+@dont_format char(1) = null)
+/* if @show_type = 'S' will show system tables */
+AS 
+
+set nocount on
+
+if not exists (select * from sysobjects where name=@objname and type='U')
+	select @objname="%"+@objname+"%"
+
+select distinct
+		 column= substring(c.name, 1, 20),
+		 tname=  substring(o.name,1,20),
+		 type =substring(t.name,1,15),
+		 length=c.length,
+		 c.status,
+		 Nulls="not null",
+		 Ident = "identity",
+		 c.prec,
+		 c.scale
+into   #colconflict
+from   syscolumns c, systypes t, sysobjects o
+where  c.id = o.id         /* key */
+and    o.name like @objname
+and    c.number = 0
+and    c.usertype = t.usertype
+and    o.type in ('U', @show_type )
+order  by c.name, o.name, o.uid
+
+update #colconflict
+set type=type+'('+rtrim(convert(char(3),length))+')'
+where type='varchar'
+or    type='char'
+
+update #colconflict
+set type=type+'('+rtrim(convert(char(3),prec))+')'
+where type='decimal'
+
+update #colconflict
+set type=type+'('+rtrim(convert(char(3),prec))+')'
+where type='numeric'
+and   scale=0
+
+update #colconflict
+set type=type
+	+'('
+	+rtrim(convert(char(3),prec))
+	+','
+	+rtrim(convert(char(3),scale))
+	+')'
+where type='numeric'
+and   scale>0
+
+update #colconflict
+set  Nulls='null'
+where status & 8 != 0
+
+select distinct "Column"=t1.column,
+		"Table"=t1.tname,
+		"Defn"=t1.type,
+		"Null"=t1.Nulls
+from #colconflict t1,#colconflict t2
+where t1.column=t2.column
+and t1.type!=t2.type
+/* or   t1.Nulls!=t2.Nulls ) */
+order by t1.column,t1.type,t1.Nulls
+
+drop table #colconflict
+go
+
+GRANT EXECUTE ON sp__colconflict  TO public
+go

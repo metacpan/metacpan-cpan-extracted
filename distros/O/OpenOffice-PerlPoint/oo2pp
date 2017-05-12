@@ -1,0 +1,44 @@
+#!/usr/bin/perl -w
+
+=head1	NAME
+
+oo2pod - PerlPoint generation from an OpenOffice.org document
+
+=head1	SYNOPSIS
+
+Usage : oo2pp <oofilename>
+
+=head1	DESCRIPTION
+
+=cut
+
+# pragma
+use strict;
+
+# load modules
+use Carp;
+use OpenOffice::PerlPoint;
+use Getopt::ArgvFile default=>1, home=>1;
+use Getopt::Long 2.24 qw(:config pass_through);
+
+# declare option hash
+my (%options);
+
+# get startup options
+GetOptions(
+           \%options,
+                      "help",                         # help request;
+                      "imagebufferdir=s",             # image buffer directory;
+          ); 
+
+# check options
+die "[Fatal] Missing image buffer directory option.\n" unless exists $options{imagebufferdir};
+
+# build a converter object
+my $oo2pp=new OpenOffice::PerlPoint(
+                                    file           => $ARGV[0],
+                                    imagebufferdir => $options{imagebufferdir}
+                                   );
+
+# convert document
+print $oo2pp->oo2pp;

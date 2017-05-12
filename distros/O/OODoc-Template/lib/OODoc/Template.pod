@@ -1,0 +1,490 @@
+=head1 NAME
+
+OODoc::Template - Simple template system
+
+=head1 SYNOPSIS
+
+ use OODoc::Template;
+ my $t = OODoc::Template->new;
+
+ my $template = ".....";  # usually read from file
+ my %values   = ( a => 3 );
+
+ # list context keeps parse tree as well
+ my ($output, $tree) = $t->process($template, \%values);
+
+ # scalar context catches output in string
+ my $output = $t->process($template, \%values);
+ my $output = $t->process($tree, \%values);
+ 
+ # void context output to selected file-handle
+ select OUTPUT;
+ $t->process($template, \%values);
+ $t->process($tree, \%values);
+
+=head1 DESCRIPTION
+
+The C<OODoc::Template module> is a light-weight but powerful template
+system, only providing display needs for applications, not behavior.
+Let's start with a promise: this module will never grow into a new
+programming language, as all the other template systems did over time.
+
+There are at least a zillion comparible modules on CPAN, but this
+one is mine ;-)
+
+=head2 Short introduction
+
+If you are used to template systems, then you should read this to
+get a rapid overview on the features implemented by this module.
+
+=over 4
+
+=item
+
+all values which are to be filled in are either passed-in when the
+template is used, or defined within the template files themselves: there
+are no dirty tricks played with name-spaces or such to collect the data.
+
+=item
+
+only the if(data available)-then-else construct is defined: programming
+and text templates concepts should not be merged, simply because that
+is awful.  Programming should be left to programming languages.
+
+=item
+
+the templates are compiled, so a second run within the same program
+will be very fast.
+
+=back
+
+=head1 METHODS
+
+=head2 Constructors
+
+=over 4
+
+=item OODoc::Template-E<gt>B<new>(OPTIONS)
+
+Create a new formatter object.  All OPTIONS are used as global set of
+attributes, so used for each template processing started via this
+object.  Probably, it is a good habit to set the required changes
+of the predefined tags (like C<template> and C<search>) here.
+
+=back
+
+=head2 Processing
+
+=over 4
+
+=item $obj-E<gt>B<process>(STRING|SCALAR|ARRAY, HASH|PAIRS)
+
+The template is passed as unprocessed SCALAR to the STRING, or
+an already parsed template (which is an ARRAY).  Values are
+passed as a HASH or list of PAIRS.
+
+=item $obj-E<gt>B<processFile>(FILENAME, HASH|PAIRS)
+
+Process the content of the file with specified FILENAME.  The current
+value of the C<search> path is used as path to find it.  The returns
+behaves the same as L<process()|OODoc::Template/"Processing">.
+
+If the FILENAME is not found, then C<undef> is returned as output.
+However, then this method is used in VOID context, there is no output:
+then an error is raised in stead.
+
+The result of parsing is cached, so there is no need for optimization:
+call this method as often as you want without serious penalty.
+
+=back
+
+=head2 Internal administration
+
+=over 4
+
+=item $obj-E<gt>B<allValuesFor>(TAG, [ATTRIBUTES, THEN, ELSE])
+
+Collects all values related to TAG in all nestings of values.  The most
+preferred is listed first.
+
+=item $obj-E<gt>B<defineMacro>(TAG, ATTRIBUTES, THEN, ELSE)
+
+=item $obj-E<gt>B<includeTemplate>(TAG, ATTRIBUTES, THEN, ELSE)
+
+This is the implementation for the C<template> tag.
+
+=item $obj-E<gt>B<loadFile>(FILENAME)
+
+Returns a string containing the whole contents of the file, or C<undef>
+if the file was not found.
+
+=item $obj-E<gt>B<popValues>()
+
+Remove one level of values.
+
+=item $obj-E<gt>B<pushValues>(HASH)
+
+Add new level of values to the known list.  The data in the HASH is
+copied, and a reference to the copy returned.  The copy may be changed
+afterwards.
+
+=item $obj-E<gt>B<valueFor>(TAG, [ATTRIBUTES, THEN, ELSE])
+
+Lookup the value for TAG in the known data.  See section L</values>
+about the way this is done.  The ATTRIBUTES (HASH of key-value pairs)
+and THEN/ELSE content text references are used when the TAG relates to
+a code reference which is to produce new values dynamicly.
+
+=back
+
+=head2 Parsing
+
+=over 4
+
+=item $obj-E<gt>B<parse>(STRING, (HASH|PAIRS))
+
+This method is deprecated.  Please use L<process()|OODoc::Template/"Processing">.
+
+=item $obj-E<gt>B<parseAttrs>(STRING)
+
+Returns an ARRAY of PAIRS which will create the attributes for
+the called code fragments.  The STRING syntax is described in the
+DETAILS section of this manual page.
+
+=item $obj-E<gt>B<parseTemplate>(STRING)
+
+Try to understand the STRING. Returned is a reference to a tree which
+needs to be called with the correct values.
+
+=back
+
+=head1 DETAILS
+
+This module works as simple as possible: pass a string to L<process()|OODoc::Template/"Processing">
+with some values to be inserted in the string, and the result is printed
+to STDOUT.
+
+=head2 Getting started
+
+=head3 context
+
+There are three ways to produce output via the template system.  It
+depends in which context you call L<process()|OODoc::Template/"Processing">, where the output goes
+to.
+
+=over 4
+
+=item . VOID context
+
+the output is sent to the selected file-handle:
+
+ use OODoc::Template;
+ my $t = OODoc::Template->new;
+
+ my $template = ".....";  # usually read from file
+ my %values   = ( a => 3 );
+
+ open OUTPUT, ">", $filename or die;
+ select OUTPUT;
+
+ $t->process($template, \%values);
+
+or
+
+ $t->process($template, a => 3);
+
+=item . SCALAR context
+
+the output is returned as string:
+
+ my $output = $t->process($parsed, a => 13);
+
+=item . LIST context
+
+now both the output as the parsed template are returned.  You can reuse
+the parsed templates, improving the performance enormously:
+
+ my ($output, $parsed) = $t->process($template, a => 42);
+
+=back
+
+=head3 prepare for performance
+
+When used in a website, you may want to produce the various templates
+once, before the processes get forked.  Just select the output to
+the null device, and then call all templates once.
+
+   my %top;
+   foreach my $lang ( qw/en nl de/ )
+   {   my ($output, $parsed) = $t->process($template, lang => $lang);
+       $top{$lang} = $parsed;
+   }
+
+   print $t->process($top{nl}, a => 42);
+
+Some processing tricks will seriously hinder the caching of the parsed
+templates.  If you use DYNAMIC, then you are on your own.  If you use
+variables in the filenames for included templates, then you may miss
+the cache.
+
+=head2 Expanding variables
+
+The C<$template> string contains HTML with special comment blocks.  These
+special comment blocks are replaced by the specified C<values>.  The block
+can appear in two shapes (which may provided different output):
+
+   <!--{TAG ATTRIBUTES}-->
+      some text
+   <!--{/TAG}-->
+
+or
+
+   <!--{TAG ATTRIBUTES}-->
+
+The first example shows a I<container>, the second a terminal tag.
+The TAG is one of the specified values. ATTRIBUTES are used when the
+TAG is not a constant value, but dynamically produced.
+
+Containers are used to enclose a region where additional values
+as set.  The TAG is related to an ARRAY of HASHes, which are effeciated
+one after the other, as such creating a loop around this block
+
+=head2 Conditionals
+
+The standard conditional structure, which is used everywhere, is the
+simple container.  When the container has values attached to is (always
+a HASH or ARRAY-of-HASHES filled with key-value pairs), the content
+is displayed.  So, a simple if-then looks like this:
+
+ <!--{want_something ATTRIBUTES}-->
+   ...
+ <!--{/want_something}-->
+
+The optional ATTRIBUTES are extra values set when processing the
+container.  The pre-defined tag C<defined> can be used to only
+set attributes: it's a no-op.
+
+You may decide to be more explicit in the if-then, by using the
+optional C<IF> keyword:
+
+ <!--{IF want_something ATTRIBUTES}-->
+   ...
+ <!--{/want_something}-->
+
+When the TAG starts with C<<NOT >> or C<<NOT_>>, it is used to negate
+the boolean interpretation of the values returned by evaluating the tag:
+
+ <!--{NOT want_something ATTRIBUTES}-->
+   ...
+ <!--{/want_something}-->
+
+An if-then-else looks like this:
+
+ <!--{want_something ATTRIBUTES}-->
+   ...
+ <!--{ELSE want_something}-->
+   ...
+ <!--{/want_something}-->
+
+The C<want_something> tag must produce either a HASH or an ARRAY-of-HASHes
+or C<undef>, because that is what containers do.  Because of parser
+limitations, the 
+
+=head2 Definition
+
+=head3 tags
+
+Tags are barewords (may only contain [0-9a-zA-Z_]), which are looked-up in
+the C<< %values >>, which are passed with L<new()|OODoc::Template/"Constructors"> and L<process()|OODoc::Template/"Processing"> to
+produce a value.
+
+=head3 attributes
+
+Attibutes are values which are used when the text which is to be inserted
+is produced dynamically.  Their syntax is like this:
+
+ # attributes are optionally separated by comma's
+ attrs:  attr , attrs
+       | attr attrs
+
+ # a hash initiation syntax may be used, but single
+ # barewords as well
+ attr:   bareword
+       | bareword => " string " | bareword = " string "
+       | bareword => ' char* '  | bareword = ' char* '
+       | bareword => bareword   | bareword = bareword
+       | bareword => variable   | bareword = variable
+
+ string: ( char | variable ) *
+
+ # pass value produced by other tag
+ variable:
+         '$' tag
+       | '${' tag attrs '}'
+
+A string may contain variables, which are stringified.  This means that
+tags which produce hashes or arrays are not usuable to interpolate.
+
+=head3 values
+
+The values which are related to the tags are rather powerful.  When
+a certain tag can not be found, the value is C<undef>.
+
+=over 4
+
+=item * undef
+
+When the value is C<undef> (explicitly or because it was not found),
+the container or terminator will be skipped.  The whole text simply
+disappears.
+
+=item * string
+
+When the value is a C<string>, that string is inserted.  In case of
+a container, the container's text is not used.
+
+=item * HASH
+
+In case the value is (reference to, of course) a HASH, the values
+of that HASH are remembered.  They are used when parsing the contents
+of the container, and overrule the values defined by encapsulating
+blocks.  The container's text is parsed only once.
+
+The HASH key of C<DYNAMIC> has a special purpose, which is described in
+the next section.  The C<NEXT> key is reserved.
+
+=item * ARRAY of HASHes
+
+When the value is an ARRAY of HASHes, the container is parsed again
+for each HASH.  In practice, this is a C<foreach> loop over the
+array.
+
+=item * CODE
+
+As last option, you can provide a CODE reference.  This function is
+called with the tag, the specified attributes (as HASH reference), the
+container's positive content (then part), and the container's negative
+content (else part).  The content text is passed as reference, to avoid
+needless copying of large strings.
+
+Of course, the C<tag> as first parameter is usually not really
+interesting: in most cases you already know which tag relates to
+the routine.
+
+A list of four elements must be returned: the value to be used,
+a HASH with attributes to be used when processing the container,
+the then-part and the else-part.  In most cases, the latter three
+parameters are the same as when the code is called, but it may as
+well be removed.
+
+=back
+
+=head3 the DYNAMIC value
+
+The procedure of a value lookup is quite straight forward: start with
+the values defined by the innermost block (container) which defined a
+HASH or ARRAY of HASHes, and work the way back through the enclosing
+blocks until the initial values have been reached.
+
+If the tag was not found as key, C<undef> is used.  If the key was found,
+than the related value is treated as described in the previous section.
+
+Working through the list of blocks, a miss on a value HASH will cause
+a second lookup: for the key C<DYNAMIC>.  If a block's set of values
+contains this key, the related CODE reference is called to produce
+a value.  If the produced value is C<undef>, the search will continue
+to outer blocks.  Other results will be treated as any other value.
+
+The C<DYNAMIC> keys may be used like AUTOLOAD: to handle unexpected
+keys.  For instance, used in the initial hash of values (passed to
+the C<parse> method) it can be used to produce warnings on use of
+undefined tags.
+
+=head2 Pre-defined tags
+
+Tags can as well represent procedures, which are executed to produce
+data when filling in templates (via CODE references), or represent
+constants.
+
+Pre-defined values:
+
+=over 4
+
+=item . search STRING|ARRAY
+
+A colon separated list of directories, packed in a STRING or an ARRAY
+of directories, to be searched to find a named template.  All search paths
+are used when a template is being searched for, from inside out defined by
+the nestings.  By default, only the current directory is searched.
+
+=item . markers ARRAY-of-2..4|STRING
+
+The markers are the open and close patterns which enclose tags which
+needs processing. Each element can be a STRING or a regular expression.
+The first two defined the opening of a container, the last two the
+closing.  The third value defaults to the first with a slash appended.
+The fourth value defaults to the second.  You can also use a
+comma-delimited STRING with three or four values.
+
+The markers are initialized as C<< <--{ >>, C<< }--> >>,
+C<< <--{/ >>, and C<< }--> >>.  (I should suffice to define only the
+first two, because the other follow the default production rules).
+
+=back
+
+Pre-defined procedures:
+
+=over 4
+
+=item . define
+
+With this no-op code reference, you set additional values in the
+environment.
+
+=item . macro
+
+A C<name> attribute is required.  Macro blocks are not inserted on the
+place where they are defined, but only on the spot where they are used
+via a C<template> tag.  Only the variables available on the moment of
+application are used, with an exception of the C<markers>, which is taken
+from the definition environment.
+
+=item . template
+
+Insert some template.  The tag requires either a C<file> or a C<macro>
+attribute. The filename must be absolute or relative to one of the
+searched directories.  The macro is the name of a pre-declared macro
+block.
+
+Then the C<file> cannot be found (for instance, when the path name
+contains a language component but that template has not yet be
+translated), then the C<alt> (alternative) is attempted if available.
+
+=back
+
+=head2 White-space removal
+
+The template tags are usually quite large with respect to the output
+that they produce.  Therefore, you often wish to use more lines in
+the template file, than will be present in the output.  However, you
+have to help the output processor.
+
+A backslash (followed by any number of invisible blanks) before a new-line
+will have that new-line, and all following (visually) blank lines removed.
+When the first line with (visual) content starts with a (start or end)
+marker, then the blanks before that are removed as well.  In other cases,
+the blanks are left intact.
+
+=head1 SEE ALSO
+
+This module is part of OODoc-Template distribution version 0.16,
+built on January 11, 2013. Website: F<http://perl.overmeer.net/oodoc-template/>
+
+=head1 LICENSE
+
+Copyrights 2003,2007-2013 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

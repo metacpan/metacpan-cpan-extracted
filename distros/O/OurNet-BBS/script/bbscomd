@@ -1,0 +1,187 @@
+#!/usr/bin/perl
+# $File: //depot/libOurNet/BBS/script/bbscomd $ $Author: autrijus $
+# $Revision: #1 $ $Change: 3790 $ $DateTime: 2003/01/24 19:08:46 $
+
+$VERSION = '1.62_01';
+$REVISION = "rev$1\[\@$2\]" 
+    if ('$Revision: #1 $ $Change: 3790 $' =~ /(\d+)[^\d]+(\d+)/);
+
+=head1 NAME
+
+bbscomd - OurNet BBS Remote Access Daemon
+
+=head1 SYNOPSIS
+
+B<bbscomd> S<[ B<-acdfgGhsx> ]> S<[ B<-b> I<addr> ]> S<[ B<-p>
+    I<port> ]> S<[ B<-u> I<key> ] >
+    S<[ B<-l> I<logfile> ]> S<[ B<-t> I<timeout> ]> S< I<backend>
+    [ I<argument>... ]>
+
+=head1 DESCRIPTION
+
+The bbscomd starts a I<OurNet::BBS::Server> daemon listening on 
+the specified port (default 7979). Remote users could then start
+using the I<OurNet> backend or I<OurNet::BBS::Client> to connect
+like this:
+
+    use OurNet::BBS;
+    my $Remote_BBS = OurNet::BBS->new(OurNet => 'remote.org');
+
+If the C<-f> flag is specified, bbscomd will fork a new process
+to run as daemon. The C<-d> flag turns on debugging.
+
+The C<-u> specifies the pgp keyid or userid used in authorization. 
+If C<-a> is supplied, the server will serve in the I<authenticated>
+mode with additional permission controls. Similarly, C<-c> 
+disallows insecure cipher modes.
+
+The C<-g> flag allows server to assume C<guest> as the user ID on
+a failed Authentication (fallback to AUTH_NONE), with corresponding
+permissions.
+
+Similarly, the C<-G> flag allows the client to authenticate as
+B<ANY> user they wanted to; because of the security risk, this flag
+automatically specifies C<-b localhost> for you. Note that this does
+not assume the behaviour of C<-g>; you'll have to specify C<-gG>
+explicitly to turn on both settings.
+
+The C<-s> flag permits single-connection only. This is primary used
+for single-user situations.
+
+The C<-x> flag assumes default settings on Win32. It's not meant
+to be used on other platforms.
+
+If you don't want to bind all available IPs, specify one using
+the C<-b> flag.
+
+The C<-t> flag sets the C<connection-timeout> option to the Server
+object, which causes a child connection to terminate after an
+inactivity for I<timeout> seconds.
+
+If you want to keep a B<Net::Daemon> styled log file, specify
+the file name to C<-l>.
+
+Please refer to L<OurNet::BBS> modules for more information on
+usage.
+
+=head1 EXAMPLES
+
+Starting a typical MELIX daemon, require authentication, but allowing
+unprivileged guest access:
+
+    % bbscomd -acfg -u melix MELIX /home/melix 2997 350
+
+Starting a localhost-only bridge at port 8080 to another I<OurNet>
+node, with debugging output:
+
+    % bbscomd -d -b 127.0.0.1 -p 8080 OurNet localhost
+
+=cut
+
+use strict;
+use warnings;
+use Getopt::Std;
+use OurNet::BBS;
+use OurNet::BBS::Server;
+
+$|++;
+
+my %args;
+
+if (!@ARGV) {
+    die << ".";
+
+OurNet BBS Remote Access Daemon v$main::VERSION-$main::REVISION
+
+Usage: $0 [-acdfghx] [-b <addr>] [-p <port>] [-u <key>] 
+       <backend> [ <argument>... ]
+
+Type '$0 -h' to see available argument and options.
+
+Copyright 2001-2002 by Autrijus Tang <autrijus\@autrijus.org>.
+
+This program is free software; you can redistribute it and/or 
+modify it under the same terms as Perl itself.
+
+See <http://www.perl.com/perl/misc/Artistic.html>.
+
+.
+}
+
+getopts('acgGb:p:t:u:fdhsx', \%args);
+exec('perldoc', $0) if defined $args{h};
+
+my ($auth, $ciph, $port, $logfile, $timeout,
+    $key, $fork, $debug, $addr, $guest, $anyuser, $single)
+    = @{args}{qw/a c p l t u f d b g G s/};
+
+$guest = $guest ? 'guest' : undef;
+$guest = "*$guest" if $anyuser;
+$auth  = defined($auth) ? $guest ? 7 : 6 : 0;
+$ciph  = $key ? 6 : 2 if defined $ciph;
+$port  ||= 7979;
+
+if ($args{x}) {
+    @ARGV = (
+        'MELIX', -e 'c:/cygwin/home/melix' 
+	    ? 'c:/cygwin/home/melix' 
+	    : 'c:/program files/melix/home/melix'
+    );
+}
+    
+no warnings 'once';
+
+$OurNet::BBS::DEBUG = $debug;
+$OurNet::BBS::Server::LocalAddr = $addr if defined $addr;
+%OurNet::BBS::Server::Options   = (
+    'logfile'		 => $logfile,
+    'connection-timeout' => $timeout,
+);
+
+if ($single) {
+    $OurNet::BBS::Server::Mode = 'single';
+}
+
+my $BBS = OurNet::BBS->new(@ARGV) or die "Cannot link to BBS: @ARGV\n";
+
+print "entering in debug mode, expect lots of outputs\n" 
+    if $OurNet::BBS::DEBUG;
+
+my $pass = '';
+
+if ($key) {
+    require Term::ReadKey;
+    Term::ReadKey::ReadMode('noecho');
+    print "enter passphrase for <$key>: ";
+    $pass = scalar <STDIN>;
+    Term::ReadKey::ReadMode('restore');
+    print "\n";
+}
+
+if (!$fork or !fork()) {
+    print "BBSCOM Daemon starting at port $port...\n";
+
+    $BBS->daemonize($port, $key, $pass, $ciph, $auth, $guest)
+	or die "Failed to daemonize: $!\n";
+}
+
+__END__
+
+=head1 SEE ALSO
+
+L<OurNet::BBS>, L<RPC::PlServer>, L<Net::Daemon>
+
+=head1 AUTHORS
+
+Autrijus Tang E<lt>autrijus@autrijus.orgE<gt>
+
+=head1 COPYRIGHT
+
+Copyright 2001-2002 by Autrijus Tang E<lt>autrijus@autrijus.orgE<gt>.
+
+This program is free software; you can redistribute it and/or 
+modify it under the same terms as Perl itself.
+
+See L<http://www.perl.com/perl/misc/Artistic.html>
+
+=cut

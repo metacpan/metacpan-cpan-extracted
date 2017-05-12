@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<SITE ID="Yahoo.Norway">
+
+<NAME Lang="en-us">Yahoo WWW Search</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+Yahoo¥þ²y·j´M(®¿«Â)
+]]></NAME>
+<INFO Lang="en-us">general information web search in Norway</INFO>
+<INFO Lang="zh-tw">general information web search in Norway</INFO>
+
+<URL Type="More"><![CDATA[
+_MORE_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://search.yahoo.no/search/no?p=_QUERY_&hc=0&hs=0
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_MORE_"><![CDATA[
+<a href="_MORE_">Neste
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<LI><A HREF="_URL_">_TITLE_</A>_PREVIEW_.<
+]]></TEMPLATE>
+</SITE>

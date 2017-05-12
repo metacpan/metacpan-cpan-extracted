@@ -1,0 +1,21 @@
+MANIFEST
+Makefile.PL
+lib/OSS/LDAPops.pm
+lib/OSS/Fileops.pm
+bin/ldapops.pl
+bin/netgroupcache.pl
+examples/ldapops.conf
+examples/netgroupcache.conf
+examples/batchadd.csv
+examples/skeleton-directory.ldif
+examples/nis.schema
+examples/slapd.conf
+examples/access.conf
+examples/ldap.conf
+examples/system-auth
+examples/nsswitch.conf
+examples/changepassword.pl
+examples/notifypasswordexpiry.pl
+examples/ppolicy.ldif
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,48 @@
+Ogg-Vorbis-LibVorbis version 0.01
+=================================
+
+Perl Module to give access to libvorbis functions.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+This module requires Ogg::LibOgg and depends on libogg and libvorbis library.
+
+You will have to install libogg, libogg-devel, libvorbis and libvorbis-devel in Linux 
+BUT only libogg and libtheora in Mac to make this module work (please use your discretion).
+
+Mac OS:
+sudo port install libogg
+sudo port install libtheora
+
+Linux:
+sudo yum install libogg
+sudo yum install libogg-devel
+sudo yum install libtheora
+sudo yum install libtheora-devel
+
+Windows:
+Not Sure, never tested or tried :-)
+
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2012 by Vigith Maurice (vigith@cpan.org, www.vigith.com)
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.9 or,
+at your option, any later version of Perl 5 you may have available.
+
+

@@ -1,0 +1,248 @@
+=encoding utf8
+
+=head1 NAME
+
+OODoc::Text::Default - one default for an option in one subroutine
+
+=head1 INHERITANCE
+
+ OODoc::Text::Default
+   is a OODoc::Text
+   is a OODoc::Object
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+Each L<OODoc::Text::Subroutine|OODoc::Text::Subroutine> can have a list of options, which have
+default values which are each captured in a separate object as described
+in this manual page.
+
+Extends L<"DESCRIPTION" in OODoc::Text|OODoc::Text/"DESCRIPTION">.
+ 
+=head1 OVERLOADED
+
+Extends L<"OVERLOADED" in OODoc::Text|OODoc::Text/"OVERLOADED">.
+ 
+=over 4
+
+=item overload: B<'""' <$stringification>>
+
+Inherited, see L<OODoc::Text/"OVERLOADED">
+
+=item overload: B<'==' $and '!='>
+
+Inherited, see L<OODoc::Text/"OVERLOADED">
+
+=item overload: B<'cmp' <$string $comparison>>
+
+Inherited, see L<OODoc::Text/"OVERLOADED">
+
+=back
+
+=head1 METHODS
+
+Extends L<"METHODS" in OODoc::Text|OODoc::Text/"METHODS">.
+ 
+=head2 Constructors
+
+Extends L<"Constructors" in OODoc::Text|OODoc::Text/"Constructors">.
+ 
+=over 4
+
+=item OODoc::Text::Default-E<gt>B<new>(%options)
+
+ -Option     --Defined in     --Default
+  container    OODoc::Text      new(subroutine)
+  description  OODoc::Text      ''
+  linenr       OODoc::Text      <required>
+  name         OODoc::Text      undef
+  subroutine                    <required>
+  type         OODoc::Text      'Default'
+  value                         <required>
+
+=over 2
+
+=item container => OBJECT
+
+=item description => STRING
+
+=item linenr => INTEGER
+
+=item name => STRING
+
+=item subroutine => OBJECT
+
+The subroutine in which this option lives.
+
+=item type => STRING
+
+=item value => STRING
+
+The value which is related to this default.
+
+=back
+
+=back
+
+=head2 Inheritance knowledge
+
+Extends L<"Inheritance knowledge" in OODoc::Text|OODoc::Text/"Inheritance knowledge">.
+ 
+=over 4
+
+=item $obj-E<gt>B<extends>( [$object] )
+
+Inherited, see L<OODoc::Object/"Inheritance knowledge">
+
+=back
+
+=head2 Attributes
+
+Extends L<"Attributes" in OODoc::Text|OODoc::Text/"Attributes">.
+ 
+=over 4
+
+=item $obj-E<gt>B<container>( [$object] )
+
+Inherited, see L<OODoc::Text/"Attributes">
+
+=item $obj-E<gt>B<description>()
+
+Inherited, see L<OODoc::Text/"Attributes">
+
+=item $obj-E<gt>B<name>()
+
+Inherited, see L<OODoc::Text/"Attributes">
+
+=item $obj-E<gt>B<subroutine>()
+
+Returns the subroutine object for this option.
+
+=item $obj-E<gt>B<type>()
+
+Inherited, see L<OODoc::Text/"Attributes">
+
+=item $obj-E<gt>B<value>()
+
+The value of this default.
+
+=back
+
+=head2 Location
+
+Extends L<"Location" in OODoc::Text|OODoc::Text/"Location">.
+ 
+=over 4
+
+=item $obj-E<gt>B<manual>( [$name] )
+
+Inherited, see L<OODoc::Text/"Location">
+
+=item $obj-E<gt>B<unique>()
+
+Inherited, see L<OODoc::Text/"Location">
+
+=item $obj-E<gt>B<where>()
+
+Inherited, see L<OODoc::Text/"Location">
+
+=back
+
+=head2 Collected
+
+Extends L<"Collected" in OODoc::Text|OODoc::Text/"Collected">.
+ 
+=over 4
+
+=item $obj-E<gt>B<example>($object)
+
+Inherited, see L<OODoc::Text/"Collected">
+
+=item $obj-E<gt>B<examples>()
+
+Inherited, see L<OODoc::Text/"Collected">
+
+=item $obj-E<gt>B<findDescriptionObject>()
+
+Inherited, see L<OODoc::Text/"Collected">
+
+=item $obj-E<gt>B<openDescription>()
+
+Inherited, see L<OODoc::Text/"Collected">
+
+=back
+
+=head2 Commonly used functions
+
+Extends L<"Commonly used functions" in OODoc::Text|OODoc::Text/"Commonly used functions">.
+ 
+=over 4
+
+=item $obj-E<gt>B<filenameToPackage>($filename)
+
+=item OODoc::Text::Default-E<gt>B<filenameToPackage>($filename)
+
+Inherited, see L<OODoc::Object/"Commonly used functions">
+
+=item $obj-E<gt>B<mkdirhier>($directory)
+
+=item OODoc::Text::Default-E<gt>B<mkdirhier>($directory)
+
+Inherited, see L<OODoc::Object/"Commonly used functions">
+
+=back
+
+=head2 Manual Repository
+
+Extends L<"Manual Repository" in OODoc::Text|OODoc::Text/"Manual Repository">.
+ 
+=over 4
+
+=item $obj-E<gt>B<addManual>($manual)
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<mainManual>($name)
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<manuals>()
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<manualsForPackage>($name)
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<packageNames>()
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=back
+
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item Error: manual definition requires manual object
+
+A call to L<addManual()|OODoc::Object/"Manual Repository"> expects a new manual object (a L<OODoc::Manual|OODoc::Manual>),
+however an incompatible thing was passed.  Usually, intended was a call
+to L<manualsForPackage()|OODoc::Object/"Manual Repository"> or L<mainManual()|OODoc::Object/"Manual Repository">.
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of OODoc distribution version 2.01,
+built on November 11, 2015. Website: F<http://perl.overmeer.net/oodoc/>
+
+=head1 LICENSE
+
+Copyrights 2003-2015 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

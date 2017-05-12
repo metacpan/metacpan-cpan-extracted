@@ -1,0 +1,27 @@
+---
+abstract: 'Perl Array handling and conversion between Perl arrays and C array pointers.'
+author:
+  - 'Chris Marshall <chm at cpan dot org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  Devel::CheckOS: '0'
+  ExtUtils::MakeMaker: '6.52'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0402, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: OpenGL-Array
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Test::More: '0'
+resources:
+  bugtracker: https://github.com/devel-chm/OpenGL-Array/issues
+  homepage: http://sourceforge.net/projects/pogl/
+  repository: https://github.com/devel-chm/OpenGL-Array.git
+version: '0.71'

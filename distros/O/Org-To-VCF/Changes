@@ -1,0 +1,56 @@
+Revision history for Org-To-VCF
+
+0.08    2015-09-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.07    2015-08-18 (PERLANCAR)
+
+	- No functional changes.
+
+	- Switch from Log::Any to Log::Any::IfLOG.
+
+
+0.06     2014-08-16 (SHARYANTO) - Happy 19th CPAN Day!
+
+         - [build] CLI scripts are now generated automatically using
+           Dist::Zilla::Plugin::ScriptFromFunc. The plugin is still at 0.01 so the
+           generated script is not as polished as it should be. Stay tuned.
+
+
+0.05     2014-07-23 (SHARYANTO)
+
+         - No functional changes.
+
+         - Update test data [CT].
+
+
+0.04     2014-07-22 (SHARYANTO)
+
+         - No functional changes.
+
+         - Switch CLI scripts from using Perinci::CmdLine to
+           Perinci::CmdLine::Any to reduce size of dependencies.
+
+
+0.03     2014-05-17 (SHARYANTO)
+
+         - No functional changes.
+
+         - Replace File::Slurp with File::Slurp::Tiny.
+
+
+0.02     2014-01-27 (SHARYANTO)
+
+         - Add --noexport-notes option (my addressbook was not importable when I
+           exported notes).
+
+
+0.01     2014-01-27 (SHARYANTO)
+
+         - First release.

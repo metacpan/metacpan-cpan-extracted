@@ -1,0 +1,68 @@
+Outline::Lua
+
+With Outline::Lua you can string-eval Lua code.
+
+Create a Lua object with Outline::Lua::new and register Perl functions
+to it. The Perl functions become available to Lua as Lua functions.
+
+Lua is meant as a safe environment for running user-contributed code, or
+simply so you don't have to write your own domain-specific language for
+your application.
+
+You can find Lua at http://www.lua.org/
+
+A sandbox is fine too!
+
+
+PREREQUISITES
+
+Outline::Lua should compile against Lua 5.0 and above. If it does not,
+please file a bug (see below).
+
+Note that under Ubuntu and possibly other distros, simply installing the
+Lua dev packages will not work. No, I don't know why.
+
+I recommend always building Lua from source. It is really easy. Even I managed it.
+
+Lua can be found at http://www.lua.org/download.html
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Outline::Lua
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Outline-Lua
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Outline-Lua
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Outline-Lua
+
+    Search CPAN
+        http://search.cpan.org/dist/Outline-Lua
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Alastair Douglas
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

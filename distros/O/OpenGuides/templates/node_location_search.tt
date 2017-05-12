@@ -1,0 +1,25 @@
+[% USE CGI %]
+
+<div id="node_location_search">
+  [% IF coord_field_1_value AND coord_field_2_value %]
+    <div id="find_within_distance">
+      <form action="search.cgi">
+        <label for="distance">Find all things within</label>
+        <select name="[% dist_field %]" id="distance">
+          <option value="500">500 metres</option>
+          <option value="1000">1 kilometre</option>
+          <option value="1500">1.5 kilometres</option>
+          <option value="2000">2 kilometres</option>
+        </select>
+        of here.
+        <input type="hidden" name="[% coord_field_1 %]" value="[% coord_field_1_value %]" />
+        <input type="hidden" name="[% coord_field_2 %]" value="[% coord_field_2_value %]" />
+        <input type="submit" name="Go" value="Go" class="form_button" />
+      </form>
+    </div>
+  [% END %]
+  [% TRY %]
+    [% INCLUDE custom_node_location_search.tt %]
+  [% CATCH %]
+  [% END %]
+</div>

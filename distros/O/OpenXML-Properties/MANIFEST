@@ -1,0 +1,19 @@
+Changes
+lib/OpenXML/Properties.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/dependencies.t
+t/openxml_2003.doc
+t/openxml_2003.ppt
+t/openxml_2003.xls
+t/openxml_2010.docx
+t/openxml_2010.pptx
+t/openxml_2010.xlsx
+t/openxml_excel_test.t
+t/openxml_powerpoint_test.t
+t/openxml_test.pl
+t/openxml_word_test.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

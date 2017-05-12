@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<rdf:RDF
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:dc="http://purl.org/dc/elements/1.1/"
+  xmlns:dcterms="http://purl.org/dc/terms/"
+  xmlns:foaf="http://xmlns.com/foaf/0.1/"
+  xmlns:wiki="http://purl.org/rss/1.0/modules/wiki/"
+  xmlns:chefmoz="http://chefmoz.org/rdf/elements/1.0/"
+  xmlns:wn="http://xmlns.com/wordnet/1.6/"
+  xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#"
+  xmlns:os="http://downlode.org/rdf/os/0.1/"
+  xmlns:owl="http://www.w3.org/2002/07/owl#"
+  xmlns="http://www.w3.org/2000/10/swap/pim/contact#"
+>
+
+  <rdf:Description rdf:about="">
+    <dc:title>The Open Guide to London: Sandbox</dc:title>
+    <dc:date>2005-10-13T21:30:24</dc:date>
+    <dcterms:modified>2005-10-13T21:30:24</dcterms:modified>
+    <dc:contributor>Housekeeping Robot</dc:contributor>
+    <dc:source rdf:resource="http://london.openguides.org/index.cgi?Sandbox" />
+    <wiki:version>74</wiki:version>
+    <foaf:topic rdf:resource="#obj" />
+  </rdf:Description>
+
+  <geo:SpatialThing rdf:ID="obj" dc:title="Sandbox">
+    <dc:description>A page for testing the system.</dc:description>
+
+    <!-- categories -->
+
+    <dc:subject>Beer gardens</dc:subject>
+
+    <!-- address and geospatial data -->
+
+    <address>1 High Street</address>
+    <city>London</city>
+    <postalCode>WC5A 2YY</postalCode>
+    <country>United Kingdom</country>
+
+    <foaf:based_near>
+      <wn:Neighborhood>
+        <foaf:name>West End</foaf:name>
+      </wn:Neighborhood>
+    </foaf:based_near>
+
+    <geo:lat>51.362603</geo:lat>
+    <geo:long>-0.092219</geo:long>
+
+
+    <!-- contact information -->
+
+    <phone>020 7456 7890</phone>
+    <fax>020 7654 3210</fax>
+    <foaf:homepage rdf:resource="http://www.mysite.com" />
+    <chefmoz:Hours>24 by 7</chefmoz:Hours>
+  </geo:SpatialThing>
+</rdf:RDF>
+

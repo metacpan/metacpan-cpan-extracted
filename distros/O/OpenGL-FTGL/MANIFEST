@@ -1,0 +1,17 @@
+Changes
+FTGL.xs
+Makefile.PL
+MANIFEST
+ppport.h
+typemap
+README
+t/00_Pod.t
+t/01_PodCoverage.t
+t/02_Create.t
+t/03_BitPix.t
+t/04_OutPolyExt.t
+t/09_Error.t
+t/FreeSansBold.otf
+t/stone.tga
+lib/OpenGL/FTGL.pm
+META.yml                                 Module meta-data (added by MakeMaker)

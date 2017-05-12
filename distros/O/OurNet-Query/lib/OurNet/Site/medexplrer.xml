@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<SITE ID="Medexplrer">
+
+<NAME Lang="en-us">MedExplorer</NAME>
+<INFO Lang="en-us">health/medical relevant service web search</INFO>
+
+<URL Type="Start"><![CDATA[
+post://www.medexplorer.com/search.dbm?words=_QUERY_&category=
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+
+<TEMPLATE><![CDATA[
+&nbsp;&nbsp;<img src="images/redsquare.gif___<a href="_URL_">_TITLE_</a>___
+]]></TEMPLATE>
+</SITE>

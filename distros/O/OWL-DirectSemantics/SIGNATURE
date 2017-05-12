@@ -1,0 +1,127 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 4bc3aef3f5a99239e9d23be24679ed05f45502ed Changes
+SHA1 cc087c3dd6e1b519c680e68cd0231735a68300a0 LICENSE
+SHA1 4d948fb7444e30d9c351c259f295ea4652258ac0 MANIFEST
+SHA1 c39bdda7c16d576483e90779bad5b57bc2e2c672 META.yml
+SHA1 73ea6036e9223204cbe0412bbfa1369b36cd188e Makefile.PL
+SHA1 bec34fd3b5d5e60bdbd8208e712abdfddad94974 README
+SHA1 144a1fd61ad8503894e9b6a7acec0e209044dbc6 TODO
+SHA1 cbc67719077ea33aa0c23e6c3bc90d70b3a07208 bin/rdf2owl
+SHA1 91876b97dd1a4e3afc78ad7f05074b6f55dc1f39 examples/example1.pl
+SHA1 06c410f05488c1612ed66b06d3a86b2580581e4a inc/Module/AutoInstall.pm
+SHA1 8a924add836b60fb23b25c8506d45945e02f42f4 inc/Module/Install.pm
+SHA1 61ab1dd37e33ddbe155907ce51df8a3e56ac8bbf inc/Module/Install/AutoInstall.pm
+SHA1 c04f94f91fa97b9f8cfb5a36071098ab0e6c78e3 inc/Module/Install/AutoManifest.pm
+SHA1 2d0fad3bf255f8c1e7e1e34eafccc4f595603ddc inc/Module/Install/Base.pm
+SHA1 f0e01fff7d73cd145fbf22331579918d4628ddb0 inc/Module/Install/Can.pm
+SHA1 7328966e4fda0c8451a6d3850704da0b84ac1540 inc/Module/Install/Fetch.pm
+SHA1 66d3d335a03492583a3be121a7d888f63f08412c inc/Module/Install/Include.pm
+SHA1 b62ca5e2d58fa66766ccf4d64574f9e1a2250b34 inc/Module/Install/Makefile.pm
+SHA1 1aa925be410bb3bfcd84a16985921f66073cc1d2 inc/Module/Install/Metadata.pm
+SHA1 3b9281ddf7dd6d6f5de0a9642c69333023193c80 inc/Module/Install/Package.pm
+SHA1 4d793c044726e06fe35d8d129b76da2803377f92 inc/Module/Install/Scripts.pm
+SHA1 b86d0385e10881db680d28bde94f275e49e34a27 inc/Module/Install/TrustMetaYml.pm
+SHA1 e4196994fa75e98bdfa2be0bdeeffef66de88171 inc/Module/Install/Win32.pm
+SHA1 c3a6d0d5b84feb3280622e9599e86247d58b0d18 inc/Module/Install/WriteAll.pm
+SHA1 26d58a041cd6b3d21db98b32e8fd1841aae21204 inc/Module/Package.pm
+SHA1 6b807287940754cc31a3db59f2b22e363d5525be inc/Module/Package/Dist/RDF.pm
+SHA1 e31c281782183601e1e057c5914f63269e043932 inc/Scalar/Util.pm
+SHA1 5eae2f71c45a996a296d2445b18d0589307111f0 inc/Scalar/Util/PP.pm
+SHA1 feb933cefe2e3762e8322bd6071a2499f3440da1 inc/YAML/Tiny.pm
+SHA1 8105c0510a773b56840995fb4dd2dc64fe9ddaee inc/unicore/Name.pm
+SHA1 654c9582cfca401dc6f6ae41f3ae4cbaa6dd24d7 lib/OWL/DirectSemantics.pm
+SHA1 764036a6aa0d3702f1db6c203c5a5f51ede0cdf6 lib/OWL/DirectSemantics/Element.pm
+SHA1 5ef6f981af98f6d1099ce388fd633e52a64b5751 lib/OWL/DirectSemantics/Element/Annotation.pm
+SHA1 66cf8fc6ee54a8f0c7740d3e17336b5699928e64 lib/OWL/DirectSemantics/Element/AnnotationProperty.pm
+SHA1 6b56a5e7b2cd5845313d78858cfefa9d202d92e9 lib/OWL/DirectSemantics/Element/AsymmetricObjectProperty.pm
+SHA1 6eb8f86f4bd253f5dbd8a77e28e78699e05b2f59 lib/OWL/DirectSemantics/Element/Class.pm
+SHA1 84b59e326afe90f58ee4a7b7b97b698fc001d259 lib/OWL/DirectSemantics/Element/ClassAssertion.pm
+SHA1 a23db89da522f4c237ef53ccf0b936007ea6ad49 lib/OWL/DirectSemantics/Element/DataAllValuesFrom.pm
+SHA1 3e0937391b478e56a110e4f0d4a5f68388e0e9bd lib/OWL/DirectSemantics/Element/DataComplementOf.pm
+SHA1 a7489c41321989c93fe63713606b21019cfdc196 lib/OWL/DirectSemantics/Element/DataExactCardinality.pm
+SHA1 9c3fbd8a5e65edb4368feccb868f39493d4faf18 lib/OWL/DirectSemantics/Element/DataHasValue.pm
+SHA1 85bfbfffb55ad5d0a5ac5d8a8a3f0bc014e14a97 lib/OWL/DirectSemantics/Element/DataIntersectionOf.pm
+SHA1 81991893a7c45b84da7d29b9ec401dd7b4af6daa lib/OWL/DirectSemantics/Element/DataMaxCardinality.pm
+SHA1 bb381f170314cb440582a46936be6608dd2ad60b lib/OWL/DirectSemantics/Element/DataMinCardinality.pm
+SHA1 827311b8bae40b585758fd56dbbc0ccef7e9ef67 lib/OWL/DirectSemantics/Element/DataOneOf.pm
+SHA1 ac5db11add33e7e5b2ff00f9e2b5bc94d024231b lib/OWL/DirectSemantics/Element/DataProperty.pm
+SHA1 24fe148ec725b314e14c648fbc47895bca0082be lib/OWL/DirectSemantics/Element/DataPropertyAssertion.pm
+SHA1 d8270c91902bad43049ae575d36dcf5196096147 lib/OWL/DirectSemantics/Element/DataPropertyDomain.pm
+SHA1 8e51904d00c802fe06a40326702d6d793c12545a lib/OWL/DirectSemantics/Element/DataPropertyRange.pm
+SHA1 d18fa98ae5b24e2aeb5a1d5da79cae57a74e26aa lib/OWL/DirectSemantics/Element/DataSomeValuesFrom.pm
+SHA1 2e3da16b2950eb81ce0dd0ac22f1d1569642a9ba lib/OWL/DirectSemantics/Element/DataUnionOf.pm
+SHA1 153532c26c6a1f802825252ce4de882c12be0213 lib/OWL/DirectSemantics/Element/Datatype.pm
+SHA1 b51884addfe6f9a5e7fa08e65b8fe239601e0e19 lib/OWL/DirectSemantics/Element/DatatypeDefinition.pm
+SHA1 6471055195476343351cbf0f374ee02ea09fc679 lib/OWL/DirectSemantics/Element/Declaration.pm
+SHA1 8f090534a13b95baf30b4e69ea4fc0e7f2d34f72 lib/OWL/DirectSemantics/Element/DifferentIndividuals.pm
+SHA1 040b63578449418bbff2692d632a49577fa346a9 lib/OWL/DirectSemantics/Element/DisjointClasses.pm
+SHA1 55a6dfbd8e66e10e65ef7ed6d03ab3f6b20ce0fa lib/OWL/DirectSemantics/Element/DisjointDataProperties.pm
+SHA1 7f02044fa723b6fb7543636411e9b9ea5ec0af01 lib/OWL/DirectSemantics/Element/DisjointObjectProperties.pm
+SHA1 fc012964268939dbb0dd01d1d6b3eaf91e6c571b lib/OWL/DirectSemantics/Element/EquivalentClasses.pm
+SHA1 31da7b38b8d0db7c1ea74808b4b64b2a355137af lib/OWL/DirectSemantics/Element/EquivalentDataProperties.pm
+SHA1 3e271a7e0e795b0cf6a617e919b8b9a3d456bd78 lib/OWL/DirectSemantics/Element/EquivalentObjectProperties.pm
+SHA1 8483718b3919b59f46292d41edbc4bd4f1c17122 lib/OWL/DirectSemantics/Element/FunctionalDataProperty.pm
+SHA1 56d3b6511e3038c5c11152874099d43a3277243e lib/OWL/DirectSemantics/Element/FunctionalObjectProperty.pm
+SHA1 baf00d8106d49f236b00a736206fb47d0989d901 lib/OWL/DirectSemantics/Element/InverseFunctionalObjectProperty.pm
+SHA1 ac4496dd73aca526f6cfc5314cd812f64e4e50b3 lib/OWL/DirectSemantics/Element/InverseObjectProperties.pm
+SHA1 d12aa1966058be8bb2ab62bfbd71f9cd4890ccc3 lib/OWL/DirectSemantics/Element/IrreflexiveObjectProperty.pm
+SHA1 1aeaa38de974e3a0de2acc356293c5d39a6908eb lib/OWL/DirectSemantics/Element/NamedIndividual.pm
+SHA1 c1038f84a1f88014e8ccc17f5f6dbe61fb0a6432 lib/OWL/DirectSemantics/Element/ObjectAllValuesFrom.pm
+SHA1 aa01f0cdb757b21b466d00108e5fa41552cb32e8 lib/OWL/DirectSemantics/Element/ObjectComplementOf.pm
+SHA1 1115fe986443c85b71236e382587a851a8741bea lib/OWL/DirectSemantics/Element/ObjectExactCardinality.pm
+SHA1 b7491f02469d8404a3ac9e26922120e2d3df2a45 lib/OWL/DirectSemantics/Element/ObjectHasSelf.pm
+SHA1 4b58a3b7d86367c1a22a3960a3f48d78f39f1ee5 lib/OWL/DirectSemantics/Element/ObjectHasValue.pm
+SHA1 f58327483a199630f29f1fc6c4686e6776a6e82d lib/OWL/DirectSemantics/Element/ObjectIntersectionOf.pm
+SHA1 5799073ae89a61f99491bce0c98f640959643bfe lib/OWL/DirectSemantics/Element/ObjectInverseOf.pm
+SHA1 2dbe76de31702be011f7f15ef4000656378f1550 lib/OWL/DirectSemantics/Element/ObjectMaxCardinality.pm
+SHA1 c414b3cd859cb72aa8ac7ee020afbf31879d2c86 lib/OWL/DirectSemantics/Element/ObjectMinCardinality.pm
+SHA1 9fa72d5d2dfb4a28b230d4090fcf4c1a12370cf0 lib/OWL/DirectSemantics/Element/ObjectOneOf.pm
+SHA1 036614d2448c030c91a9436094942d7406c4d31c lib/OWL/DirectSemantics/Element/ObjectProperty.pm
+SHA1 ea10e58f6119c15a94832e3c0f042322d226a1c4 lib/OWL/DirectSemantics/Element/ObjectPropertyAssertion.pm
+SHA1 612141520ebf899b851386990d4498484103a696 lib/OWL/DirectSemantics/Element/ObjectPropertyDomain.pm
+SHA1 4a8ab7a937ffaefc7bcaf56a9d0a115b5e2a7548 lib/OWL/DirectSemantics/Element/ObjectPropertyRange.pm
+SHA1 e25a5fee5a5080c9e597bc3e825e32adb9ece655 lib/OWL/DirectSemantics/Element/ObjectSomeValuesFrom.pm
+SHA1 776800afa5e6f5635243bd4347a07bb9939a69fe lib/OWL/DirectSemantics/Element/ObjectUnionOf.pm
+SHA1 1f75a8a9cfff545fb32b38003c0f97d463633521 lib/OWL/DirectSemantics/Element/Ontology.pm
+SHA1 73ebd055f8a5ef0d92906055b7813a12096e6e12 lib/OWL/DirectSemantics/Element/ReflexiveObjectProperty.pm
+SHA1 34e9c3fdee11c74be46eb5a43087f7758c44f758 lib/OWL/DirectSemantics/Element/SameIndividual.pm
+SHA1 3bc50454fb439997095561300e745b9e1e0061df lib/OWL/DirectSemantics/Element/SubClassOf.pm
+SHA1 236a87646aa86ea6706dd534984a5be6060cdb4f lib/OWL/DirectSemantics/Element/SubDataPropertyOf.pm
+SHA1 8b854b975e77f16178c939aff83bd8a01bcab5a3 lib/OWL/DirectSemantics/Element/SubObjectPropertyOf.pm
+SHA1 d6f3fe86bb2a1f4c2c3c89b4840bd374f8fec79d lib/OWL/DirectSemantics/Element/SymmetricObjectProperty.pm
+SHA1 14d0222af79b68bab130d95cd0a7ad678b33fc98 lib/OWL/DirectSemantics/Element/TransitiveObjectProperty.pm
+SHA1 0543c8f4bbd4bbea7a3dca9f2f03bffdd0c3e8a8 lib/OWL/DirectSemantics/TraitFor/Element/CardinalityConstraint.pm
+SHA1 efaa7b6f2de5df8b175e26846092e78b45d5dace lib/OWL/DirectSemantics/TraitFor/Element/DataCardinalityConstraint.pm
+SHA1 0796de891ee18323a559ca561031bea7e8638159 lib/OWL/DirectSemantics/TraitFor/Element/ObjectCardinalityConstraint.pm
+SHA1 5dce4b67d8b565581cf7545ba07e6cf3a54679a3 lib/OWL/DirectSemantics/Translator.pm
+SHA1 f0881a0743ee90dda3c56d4d679337b5285a8f16 lib/OWL/DirectSemantics/Writer.pm
+SHA1 64b2e8e8e52a1f370970c27df90ced3587b08161 lib/OWL/DirectSemantics/Writer/Dump.pm
+SHA1 2a3ecd78fd919697ec368278d2403f9085fdd79c lib/OWL/DirectSemantics/Writer/FunctionalSyntax.pm
+SHA1 24c4404738f97f82db56c4b2f503b879bff990b2 lib/RDF/Trine/Serializer/OwlFn.pm
+SHA1 8102c3d07a831fbe6f1e4406b4f21cdf46101ed4 meta/changes.ttl
+SHA1 6af9dfdef79af1d7f4fb577d0607f0941e17549f meta/doap.ttl
+SHA1 018260c2d4ec6f76e287a1aa1b6a0f732da89c7a meta/makefile.ttl
+SHA1 6314f7b9bffdadf5d31d5819643f982fd0833f38 t/01basic.t
+SHA1 b100d7e948285b2db299396b57e5fb39db9deb1d t/02translator.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iEYEARECAAYFAk/sZr8ACgkQzr+BKGoqfTmdcACeMl4DjAFprWVHLn69C1XtfkpA
+neEAoJhUXfePXPvHvRrXC7ZXmz/kVQi0
+=Bk/F
+-----END PGP SIGNATURE-----

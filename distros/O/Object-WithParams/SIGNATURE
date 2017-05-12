@@ -1,0 +1,46 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.63.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 b580dc28836985245fd0272ddab0b90638166d86 Build.PL
+SHA1 2c829dbfad3210dca4f9ac764d859a30d89a74bd Changes
+SHA1 3f0bd07f47c1c68f3b67b7782253dceabe46902b LICENSE
+SHA1 bd65d52d687b61c2627aae35f4624bd79c9e1006 MANIFEST
+SHA1 0e9c474d468e88fd5b770cc43877396b75a87866 MANIFEST.SKIP
+SHA1 714de798b49fe5569773ac750eb9bd30055bfa75 META.yml
+SHA1 0a5ef3b4a363568bcfede5e05f9b81ec23ac5939 Makefile.PL
+SHA1 cabecc0d91bac5e7c84cc9211657c6c4aba2d077 README
+SHA1 52155b8ea784b316961135e5c2de5fc12c87a12a lib/Object/WithParams.pm
+SHA1 ca1a0209441579bee93838d71e4cd9e24f8dd902 t/00-signature.t
+SHA1 59b1a252e2f7209de4500420fe828e627d4605cb t/01-load.t
+SHA1 4ee1fd826dde4d82e3e7010977a145f7ad6b70ae t/data-formvalidator.t
+SHA1 a7fcf9856baa128d4dee8bcda250bcd10c07bbdb t/html-template.t
+SHA1 00731adfc08d5fa53b8f014578377fa1491b1744 t/params.t
+SHA1 f086b69d330de12bce56a9fa8b65ca4d4da70ad3 xt/distmanifest.t
+SHA1 42f220463b607d72e86f9297e767591a68a1da4a xt/hasversion.t
+SHA1 76e878f3aa3044f37fede07af01c5ef6e2ce730d xt/kwalitee.t
+SHA1 5f59fbc20e0125b835550c698a694b97df09c3dc xt/meta.t
+SHA1 7c77fe425347bc7d8504853e27e3d5218457ae12 xt/minimumversion.t
+SHA1 257aab7bbcc37bdbfa6f2ae02a3fc5c0856a37dc xt/perl-critic.t
+SHA1 f51a18380d49d3c6c29e05cd1dfc25efa6239ab0 xt/perlcriticrc
+SHA1 d713fd862edafbecfccb2153603cad4273746f5b xt/pod-coverage.t
+SHA1 8a96ca5f326b34853dbb19b6dcf1c68f05d14ddb xt/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iEYEARECAAYFAkxomgEACgkQIN9eM6kfjrrRgACfSFMT1CvkbzybiCEXfFvktdTc
+7BAAoLnN9rpHWqWTnU8WzL9V4LMkxxuf
+=dF3t
+-----END PGP SIGNATURE-----

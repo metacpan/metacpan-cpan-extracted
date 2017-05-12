@@ -1,0 +1,26 @@
+$Id: README,v 1.2 2003/11/29 14:39:34 nothingmuch Exp $
+
+NAME
+
+Object::Meta::Plugin
+    
+DESCRIPTION
+
+The Object::Meta::Plugin module provides the means to synthesize an object out
+of objects called plugins. These plugins object then interact amongst themselves
+either in pretense that they are the host, or knowing of their status as part of
+a whole.
+
+The main principal is to provide a minimalistic API which can be used to create
+complicated objects from arbitrary parts, as long as the parts agree on what is
+exchanged between them.
+
+This is supposed to be a solution for large scale applications, where modularity
+and customizability is an issue.
+
+Provided the plugins are well behaved, drop in exchange of various ones should
+be very easy.
+
+AUTHOR
+
+Yuval Kogman <nothingmuch@woobling.org>

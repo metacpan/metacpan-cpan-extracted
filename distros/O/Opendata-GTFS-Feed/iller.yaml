@@ -1,0 +1,69 @@
+---
+doctype: dist
+
+header:
+  name: Opendata-GTFS-Feed
+
+add_prereqs_as_authordeps: 1
+
+prereqs:
+  runtime:
+    requires:
+      - perl: 5.010000
+      - Moose
+      - Moose::Role
+      - MooseX::AttributeDocumented
+      - MooseX::AttributeShortcuts
+      - List::Util
+      - List::UtilsBy: 0.04
+      - namespace::autoclean
+      - Types::Standard
+      - Types::Path::Tiny
+      - Types::URI
+      - Type::Tiny
+      - Path::Tiny
+      - Archive::Zip
+      - Archive::Extract
+      - File::BOM
+      - File::Temp
+      - Lingua::EN::Inflect
+      - Text::CSV
+    recommends:
+      - Text::CSV_XS
+  test:
+    requires:
+      - Test::RequiresInternet: 0.02
+      - Try::Tiny
+
+plugins:
+  - +config: Author::CSSON
+
+  - +extend_plugin: Git::GatherDir
+    exclude_match:
+      - ^github/
+
+  - +extend_plugin: Test::EOL
+    finder: ':InstallModules'
+
+  - +extend_plugin: Test::NoTabs
+    finder: ':InstallModules'
+
+  - +extend_plugin: TravisYML
+    pre_install:
+     - cpanm Archive::Extract
+
+---
+doctype: weaver
+
+plugins:
+  - +config: Author::CSSON
+    splint: 1
+
+---
+doctype: cpanfile
+
+---
+doctype: gitignore
+config: Author::CSSON
+always:
+ - /Opendata-GTFS-Feed-*

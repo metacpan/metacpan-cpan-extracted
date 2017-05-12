@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<SITE ID="Yahoo.Japan">
+
+<NAME Lang="en-us">Yahoo WWW Search</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+Yahoo全球WWW搜尋(日本)
+]]></NAME>
+<INFO Lang="en-us">general information web search in Japan</INFO>
+<INFO Lang="zh-tw">general information web search in Japan</INFO>
+
+<URL Type="More"><![CDATA[
+_MORE_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://search.yahoo.co.jp/bin/search?p=_QUERY_&s=o&w=s&n=_HITS_
+]]></URL>
+
+<CHARSET>ja-jp.euc</CHARSET>
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_MORE_"><![CDATA[
+<a href="_MORE_">慼及
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<li> <a href="_URL_">_TITLE_</a>_PREVIEW__LF_
+]]></TEMPLATE>
+</SITE>

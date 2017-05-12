@@ -1,0 +1,150 @@
+=head1 NAME
+
+ORDB::AU::Census2006::BcpCdB36 - ORDB::AU::Census2006 class for the bcp_cd_b36 table
+
+=head1 SYNOPSIS
+
+  TO BE COMPLETED
+
+=head1 DESCRIPTION
+
+TO BE COMPLETED
+
+=head1 METHODS
+
+=head2 select
+
+  # Get all objects in list context
+  my @list = ORDB::AU::Census2006::BcpCdB36->select;
+  
+  # Get a subset of objects in scalar context
+  my $array_ref = ORDB::AU::Census2006::BcpCdB36->select(
+      'where  > ? order by ',
+      1000,
+  );
+
+The C<select> method executes a typical SQL C<SELECT> query on the
+bcp_cd_b36 table.
+
+It takes an optional argument of a SQL phrase to be added after the
+C<FROM bcp_cd_b36> section of the query, followed by variables
+to be bound to the placeholders in the SQL phrase. Any SQL that is
+compatible with SQLite can be used in the parameter.
+
+Returns a list of B<ORDB::AU::Census2006::BcpCdB36> objects when called in list context, or a
+reference to an C<ARRAY> of B<ORDB::AU::Census2006::BcpCdB36> objects when called in scalar
+ context.
+
+Throws an exception on error, typically directly from the L<DBI> layer.
+
+=head2 count
+
+  # How many objects are in the table
+  my $rows = ORDB::AU::Census2006::BcpCdB36->count;
+  
+  # How many objects 
+  my $small = ORDB::AU::Census2006::BcpCdB36->count(
+      'where  > ?',
+      1000,
+  );
+
+The C<count> method executes a C<SELECT COUNT(*)> query on the
+bcp_cd_b36 table.
+
+It takes an optional argument of a SQL phrase to be added after the
+C<FROM bcp_cd_b36> section of the query, followed by variables
+to be bound to the placeholders in the SQL phrase. Any SQL that is
+compatible with SQLite can be used in the parameter.
+
+Returns the number of objects that match the condition.
+
+Throws an exception on error, typically directly from the L<DBI> layer.
+
+=head1 ACCESSORS
+
+
+REMAINING ACCESSORS TO BE COMPLETED
+
+=head1 SQL
+
+The bcp_cd_b36 table was originally created with the
+following SQL command.
+
+  CREATE TABLE bcp_cd_b36 (
+      region_id REAL NOT NULL,
+      b4802 BLOB NOT NULL,
+      b4803 BLOB NOT NULL,
+      b4804 BLOB NOT NULL,
+      b4805 BLOB NOT NULL,
+      b4806 BLOB NOT NULL,
+      b4807 BLOB NOT NULL,
+      b4808 BLOB NOT NULL,
+      b4809 BLOB NOT NULL,
+      b4810 BLOB NOT NULL,
+      b4811 BLOB NOT NULL,
+      b4812 BLOB NOT NULL,
+      b4813 BLOB NOT NULL,
+      b4814 BLOB NOT NULL,
+      b4815 BLOB NOT NULL,
+      b4816 BLOB NOT NULL,
+      b4817 BLOB NOT NULL,
+      b4818 BLOB NOT NULL,
+      b4819 BLOB NOT NULL,
+      b4820 BLOB NOT NULL,
+      b4821 BLOB NOT NULL,
+      b4822 BLOB NOT NULL,
+      b4823 BLOB NOT NULL,
+      b4824 BLOB NOT NULL,
+      b4825 BLOB NOT NULL,
+      b4826 BLOB NOT NULL,
+      b4827 BLOB NOT NULL,
+      b4828 BLOB NOT NULL,
+      b4829 BLOB NOT NULL,
+      b4830 BLOB NOT NULL,
+      b4831 BLOB NOT NULL,
+      b4832 BLOB NOT NULL,
+      b4833 BLOB NOT NULL,
+      b4834 BLOB NOT NULL,
+      b4835 BLOB NOT NULL,
+      b4836 BLOB NOT NULL,
+      b4837 BLOB NOT NULL,
+      b4838 BLOB NOT NULL,
+      b4839 BLOB NOT NULL,
+      b4840 BLOB NOT NULL,
+      b4841 BLOB NOT NULL,
+      b4842 BLOB NOT NULL,
+      b4843 BLOB NOT NULL,
+      b4844 BLOB NOT NULL,
+      b4845 BLOB NOT NULL,
+      b4846 BLOB NOT NULL,
+      b4847 BLOB NOT NULL,
+      b4848 BLOB NOT NULL,
+      b4849 BLOB NOT NULL,
+      b4850 BLOB NOT NULL,
+      b4851 BLOB NOT NULL,
+      b4852 BLOB NOT NULL,
+      b4853 BLOB NOT NULL,
+      b4854 BLOB NOT NULL,
+      b4855 BLOB NOT NULL,
+      b4856 BLOB NOT NULL,
+      b4857 BLOB NOT NULL,
+      b4858 BLOB NOT NULL
+  )
+
+
+=head1 SUPPORT
+
+ORDB::AU::Census2006::BcpCdB36 is part of the L<ORDB::AU::Census2006> API.
+
+See the documentation for L<ORDB::AU::Census2006> for more information.
+
+=head1 COPYRIGHT
+
+Copyright 2009 Adam Kennedy.
+
+This program is free software; you can redistribute
+it and/or modify it under the same terms as Perl itself.
+
+The full text of the license can be found in the
+LICENSE file included with this module.
+

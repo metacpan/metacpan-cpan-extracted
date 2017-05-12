@@ -1,0 +1,9 @@
+[%########################################
+  form_select_options_list( list, label_field, value_field, picked )
+     Cycle through all objects in a list and display an <OPTION> for
+     each.
+  ########################################-%]
+
+[%- FOREACH item = list -%]
+   [%- INCLUDE form_select_option -%]
+[%- END -%]

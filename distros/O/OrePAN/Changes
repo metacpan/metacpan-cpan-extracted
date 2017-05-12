@@ -1,0 +1,39 @@
+Revision history for Perl extension OrePAN
+
+0.08
+
+    - Support latest Path::Class.
+      (NetPenguin++)
+
+0.07
+
+    - re-package to install from CPAN more easily.
+
+0.06
+
+    - suppress warnings at version number comparision.
+      (fixed https://rt.cpan.org/Public/Bug/Display.html?id=81323)
+
+0.05
+
+    - doc enhancement
+
+0.04
+
+    - modernize package
+
+0.03
+
+    - modernize package
+
+0.02
+
+    - added workaround for C::XSAccessor(kazeburo)
+    - doc enhancement
+
+0.01_01
+
+    - releng
+
+0.01    Wed Nov 17 01:57:31 2010
+        - original version

@@ -1,0 +1,167 @@
+NAME
+    Object::Stash - provides a Catalyst-like "stash" method for your class
+
+SYNOPSIS
+     {
+       package MyClass;
+       use Object::New;
+       use Object::Stash 'data';
+     }
+ 
+     use feature 'say';
+     use Data::Printer qw(p);
+     my $obj = MyClass->new;
+     p $obj->data;                     # an empty hashref
+     $obj->data(foo => 1, bar => 2);   # sets values in the 'data' stash
+     $obj->data({foo => 1, bar => 2}); # same
+     p $obj->data;                     # hashref with keys 'foo', 'bar'
+     say $obj->data->{foo};            # says '1'
+ 
+     # Retrieve multiple values
+     my @values = $obj->data(['foo', 'bar']);
+     say $values[0];                   # says '1'
+     say $values[1];                   # says '2'
+ 
+     # Or in scalar context
+     my $values = $obj->data(['foo', 'bar']);
+     say $values->[0];                 # says '1'
+     say $values->[1];                 # says '2'
+
+DESCRIPTION
+    The Catalyst context object has a method called stash, that provides a
+    hashref for storing arbitrary data associated with the object. This is
+    arguably a little hackish - the proper solution might be to create a slot
+    for each piece of information you wish to store, with appropriate accessor
+    methods. But often hackish will do.
+
+    (And there are non-hackish ways of using Object::Stash. Take a look at
+    Web::Magic which uses a private stash - named with a leading underscore -
+    and provides public methods for accessing various things stored inside
+    it.)
+
+    Object::Stash sets up one or more stash methods for your class. How these
+    methods are named depends on how Object::Stash is imported. Object::Stash
+    is a role, like Object::New or Object::ID. This means you import it, but
+    don't inherit from it.
+
+  Default method name
+     package MyClass;
+     use Object::Stash;
+
+    Creates a single method for MyClass objects. The method is called "stash".
+
+  Custom method name
+     package MyClass;
+     use Object::Stash 'data';
+
+    Creates a single method for MyClass objects. The method is called "data".
+
+  Multiple methods
+     package MyClass;
+     use Object::Stash qw/important trivial/;
+
+    Creates two stashes for MyClass objects, called "important" and "trivial".
+    Adding data to one stash will not affect the other stash. You could
+    alternatively write:
+
+     package MyClass;
+     use Object::Stash 'important'
+     use Object::Stash 'trivial';
+
+  Adding stashes to other classes
+     package MyClass;
+     use Object::Stash -package => 'YourClass', 'my_stash';
+
+    Creates a stash called "my_stash" for YourClass objects.
+
+  Utility Functions
+    `Object::Stash->is_stash( $coderef )`
+        Returns true if the method is a stash. For example:
+
+          my $method = MyClass->can('trivial');
+          if (Object::Stash->is_stash($method))
+          {
+            $method->(foo => 1, bar => 2);
+          }
+
+        Can also be called as `Object::Stash::is_stash($coderef)`.
+
+  Stash Storage
+    Stashes are stored "inside-out", meaning that they will work not only with
+    objects which are blessed hashrefs, but also with any other type of object
+    internals. Dumping your object with Data::Dumper or similar will not
+    display the contents of the stashes. (A future release of this module may
+    introduce other storage options, but the current inside-out storage is
+    likely to remain the default.)
+
+    Thanks to Hash::FieldHash, an object's stashes *should* get automatically
+    garbage collected once the object itself is destroyed, unless you've
+    maintained your own references to the stashes.
+
+  Stash Objects
+    While stashes are usually hashrefs, there is also an option to make
+    stashes themselves blessed objects. It's best to illustrate this with an
+    example
+
+     {
+       package MyClass;
+       use Object::New;
+       use Object::Stash 'data', -type => 'object';
+     }
+ 
+     # All this stuff from SYNOPSIS still works...
+     use feature 'say';
+     use Data::Printer qw(p);
+     my $obj = MyClass->new;
+     p $obj->data;                     # an empty hashref
+     $obj->data(foo => 1, bar => 2);   # sets values in the 'data' stash
+     $obj->data({foo => 1, bar => 2}); # same
+     say $obj->data->{foo};            # says '1'
+ 
+     my @values = $obj->data(['foo', 'bar']);
+     say $values[0];                   # says '1'
+     say $values[1];                   # says '2'
+ 
+     my $values = $obj->data(['foo', 'bar']);
+     say $values->[0];                 # says '1'
+     say $values->[1];                 # says '2'
+ 
+     # But now you can retrieve data using accessor methods...
+     say $obj->data->foo;              # says '1'
+ 
+     # The accessors work as not just getters, but setters...
+     $obj->data->foo(99);
+ 
+     # The accessors can be treated as lvalues...
+     $obj->data->foo = 100;
+     $obj->data->foo++;
+ 
+     # Cool, huh?
+     say $obj->data->{foo};            # says '101'
+ 
+     # In case you were wondering...
+     say ref $obj->data;               # says 'Object::Stash::data'
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Object-Stash>.
+
+SEE ALSO
+    Object::New, Object::ID.
+
+    Object::Stash::Util.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2011-2012 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

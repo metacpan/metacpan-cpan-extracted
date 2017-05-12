@@ -1,0 +1,223 @@
+NAME
+    Opsview::REST - Interface to the Opsview REST API
+
+SYNOPSIS
+        use Opsview::REST;
+
+        my $ops = Opsview::REST->new(
+            base_url => 'http://opsview.example.com/rest',
+            user     => 'username',
+            pass     => 'password',
+        );
+
+        # Check status
+        my $status = $ops->status(
+            'hostgroup',
+            'hostgroupid' => [1, 2],
+            'filter'      => 'unhandled',
+        );
+
+        # Configuration methods
+        my $host1 = $ops->create_host(
+            ip                  => '192.168.0.1',
+            name                => 'monitoring-slave',
+            hostgroup           => { name => 'Monitoring Servers' },
+            notification_period => { name => '24x7' },
+        );
+
+        $ops->clone_host(
+            $host1->{object}->{id},
+            name => 'another-host',
+            ip   => '192.168.0.2',
+        );
+
+        # Search methods support complex SQL::Abstract queries
+        my $hosts = $ops->get_hosts(
+            -or => [
+                name => { -like => '%.example.com' },
+                ip   => { -like => '10.25.%' },
+            ],
+        );
+
+        # Update several objects at once
+        map { $_->{check_attempts} = 4 } @{ $hosts->{list} };
+        my $response = $ops->create_or_update_hosts($hosts->{list});
+
+        # ... or only one
+        my $response = $ops->create_or_update_host(
+            name         => 'host1.example.com',
+            snmp_version => '2c',
+        );
+
+        # Reload after make changes in config
+        $ops->reload;
+
+DESCRIPTION
+    Opsview::REST is a set of modules to access the Opsview REST API, which
+    is the recommended method for scripting configuration changes or any
+    other form of integration since version 3.9.0
+
+METHODS
+  new
+    Return an instance of the Opsview::REST.
+
+   Required Arguments
+    base_url
+        Base url where the REST API resides. By default it is under "/rest".
+
+    user
+        Username to login as.
+
+   Other Arguments
+    pass
+    auth_tkt
+        Either the pass or the auth_tkt MUST be passed. It will die horribly
+        if none of these are found.
+
+    ua  A user agent object can be provided here. It should be an HTTP::Tiny
+        subclass.
+
+  get($url)
+    Makes a "GET" request to the API. The response is properly deserialized
+    and returned as a Perl data structure.
+
+  status( $endpoint, [ %args ] )
+    Convenience method to request the "status" part of the API. $endpoint is
+    the endpoint to send the query to. %args is a hash which will get
+    properly translated to URL arguments.
+
+    More info:
+    <http://docs.opsview.com/doku.php?id=opsview-core:restapi:status>
+
+  downtimes
+  create_downtime( %args )
+  delete_downtime( [ %args ] )
+    Downtime related methods.
+
+    More info:
+    <http://docs.opsview.com/doku.php?id=opsview-core:restapi:downtimes>
+
+  events( [ %args ] )
+    Get events. An event is considered to be either:
+
+    *   a host or service changing state
+
+    *   a host or service result during soft failures
+
+    *   a host or service in a failure state where 'alert every failure' is
+        enabled
+
+    More info:
+    <http://docs.opsview.com/doku.php?id=opsview-core:restapi:event>
+
+  acknowledge( [ %args ] )
+    Acknowledge problems.
+
+    More info:
+    <http://docs.opsview.com/doku.php?id=opsview-core:restapi:acknowledge>
+
+  acknowledge_list
+    Lists the problems which the current logged in user has permission to
+    acknowledge.
+
+  reload
+    Initiates a synchronous reload. Be careful: if your opsview reload takes
+    more than 60 seconds to run, this call will time out. The returned data
+    contains the info of the reload.
+
+    More info:
+    <http://docs.opsview.com/doku.php?id=opsview-core:restapi#initiating_an_
+    opsview_reload>
+
+  reload_info
+    Get status of reload.
+
+    More info:
+    <http://docs.opsview.com/doku.php?id=opsview-core:restapi#initiating_an_
+    opsview_reload>
+
+  recheck( [ %args ] )
+    Recheck services or hosts asynchronously. It returns info about the
+    number of hosts and services that will be rechecked.
+
+    More info:
+    <http://docs.opsview.com/doku.php?id=opsview-core:restapi:recheck>
+
+  Config methods for single objects
+   get_*
+   create_*
+   clone_*
+   create_or_update_*
+   delete_*
+    This methods will be generated for the following types of objects:
+    "contact", "role", "servicecheck", "hosttemplate", "attribute",
+    "timeperiod", "hostgroup", "servicegroup", "notificationmethod",
+    "hostcheckcommand", "keyword", "monitoringserver".
+
+    They all except "create", require the object's id. Additionally,
+    "create", "clone" and "create_or_update" accept a list of key-value
+    pairs:
+
+        my $host1 = $ops->create_host(
+            name => 'host1',
+            ip   => '192.168.10.27',
+        );
+
+        $ops->clone_host(
+            $host1->{object}->{id},
+            name => 'host2',
+            ip   => '192.168.10.28',
+        );
+
+        $host->delete($id);
+
+  Config methods for multiple objects
+   get_*
+   create_*
+   create_or_update_*
+    This methods will be generated for the following types of objects:
+    "contacts", "roles", "servicechecks", "hosttemplates", "attributes",
+    "timeperiods", "hostgroups", "servicegroups", "notificationmethods",
+    "hostcheckcommands", "keywords", "monitoringservers".
+
+    "get" accepts complex queries in SQL::Abstract format.
+
+    "create_or_update" is specially useful when you want to update several
+    objects with a single call:
+
+        # First get a list of objects you want to modify
+        my $dbhosts = $ops->get_hosts(
+            name    => { -like => 'db%' },
+        );
+
+        # $dbhosts = {
+        #   summary => { ... },
+        #   list => [ { name => 'db1.example.com , ... }, ... ],
+        # };
+
+        # Modify them as you need
+        map { $_->{check_attempts} = 4 } @{ $dbhosts->{list} };
+
+        # Make the call
+        $ops->create_or_update($dbhosts->{list});
+
+    To know which fields are accepted for each type of object, the format of
+    the responses, and additional info:
+
+    <http://docs.opsview.com/doku.php?id=opsview-core:restapi:config>
+
+SEE ALSO
+    *   <http://www.opsview.org/>
+
+    *   Opsview REST API Documentation
+        <http://docs.opsview.com/doku.php?id=opsview-core:restapi>
+
+AUTHOR
+    *   Miquel Ruiz <mruiz@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Miquel Ruiz.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

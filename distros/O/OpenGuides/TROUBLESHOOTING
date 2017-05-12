@@ -1,0 +1,38 @@
+OpenGuides Troubleshooting Guide
+================================
+
+If you are able to run wiki.cgi from the command line but receive an
+Error 500 when trying to view it in your browser, look for the following
+message in your webserver error logs:
+
+  "Unable to tie -map_name [...] datafiles directory [...] does not exist
+   and cannot be created."
+
+This means that the directory you specified in your configuration as
+"indexing_directory" is inaccessible by the user that your CGI is running
+as.  This might mean one of two things:
+
+ - you've specified an indexing_directory within your own webspace
+   and the user your CGIs are running as - typically 'nobody' or
+   'www-data' - doesn't have permission to write there
+
+or
+
+ - you've specified an indexing_directory in a place that you're not
+   allowed to write to
+
+or a combination of both.  Your ISP or sysadmin might be able to help you
+further with this problem if you can't figure it out yourself; as a start,
+try setting your indexes directory as world-writeable.
+
+----------------------------------------------------------------------
+
+Important note for those using SQLite:
+
+The user your CGI is running as must have write access to not only the
+database file itself, but the directory that the file is in, in order
+that it can write a lockfile. If it doesn't have write access to the
+database file, you'll see errors like "Unhandled error: [DBD::SQLite::db
+do failed...".
+
+----------------------------------------------------------------------

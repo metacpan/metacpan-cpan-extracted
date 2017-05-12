@@ -1,0 +1,20 @@
+---
+name: OCR-PerfectCR
+version: 0.03
+author:
+  - James Mastros <james@mastros.biz>
+abstract: Perfect OCR (if you have perfect input).
+license: perl
+requires:
+  Digest::MD5: 0
+  GD: 0
+  Graphics::ColorObject: 0
+  IO::File: 0
+  Test::More: 0
+  strict: 0
+  warnings: 0
+provides:
+  OCR::PerfectCR:
+    file: lib/OCR/PerfectCR.pm
+    version: 0.03
+generated_by: Module::Build version 0.2611

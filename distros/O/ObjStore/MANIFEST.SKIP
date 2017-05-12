@@ -1,0 +1,4 @@
+^MANIFEST\.bak$
+Makefile(\.old)?$
+\.rej$
+^t/peek.out$

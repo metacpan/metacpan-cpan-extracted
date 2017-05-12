@@ -1,0 +1,9 @@
+
+<h1> Are you sure? </h1>
+<div class="content_block">
+  <p>
+    [% question %]
+  </p>
+</div>
+
+[% form.render | none %]

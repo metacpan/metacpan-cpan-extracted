@@ -1,0 +1,11 @@
+# $File: //depot/OurNet-BBSAgent/BBSAgent/melix.bbs $ $Author: autrijus $
+# $Revision: #7 $ $Change: 2829 $ $DateTime: 2002/01/10 14:54:36 $
+# Contributed by Autrijus Tang <autrijus@autrijus.org>
+# zh_TW.Big5: ¥»¾÷Melix
+
+My Elixir Localhost
+localhost:3001
+
+load melix.board
+load melix.session
+load melix.user

@@ -1,0 +1,90 @@
+Oracle has two versions of a tablespace map.
+The early 1.x version of OEM had a separate tool bundled with the Tuning
+pack extension for OEM.
+It was a fine tool. Three panels. On the left side full height we had a tree
+listing the tablespaces. Open one and it would display the separate
+datafiles. Select either the tablespace or a datafile and it would open two
+panels on the right 2/3 of the window. The top half was divided into two
+parts. On the left was a summary of the currently selected segment and
+extent. It listed the size, in blocks, of the extent and the segment. On the
+right of that summary was a list of segments with segment type, number of
+extents and size. Below, in the lower right quandrant was a graphic display.
+The graphic used three colors. Each extent had a fine black line border. One
+color for unallocated space, one for the currently selected segment and all
+its extents, and a third for allocated, but not selected space. The extents
+were rectangles arranged in horizontal stripes. The extent rectangles were
+scaled to fit the window. As a result a busy tablespace might have so little
+space for each extent that the extents ran together to create a mass of
+black border stripes. The new version of the tablespace map, now
+incorporated with the storage manager,  scrolls but I think the scale is
+fixed. That makes it difficult to see the big picture. Not sure which I
+prefer.
+
+I may be able to install the old version to get you a screen shot of the
+earlier tablespace manager. I'll have to remove all of Oracle from my PC to
+install the old version. It's from single NT ORACLE_HOME days and won't
+install if you have a later installation already on the machine. I'm
+planning to remove and reinstall over the next couple of days. I'll get you
+a picture to work from.
+
+By the way, one handy feature would be a display of the blocksize, or a way
+to display size either in blocks or K or Meg.
+
+Here's a shot of the current version of the tablespace map. This is from a
+system tablespace from before I learned you have to edit sql.bsq to set
+space allocation before creating the database.
+
+
+
+
+I should be able to get you a screen shot of the better earlier tool later
+this week.
+
+By the way, I was very excited to see the pre-announcement of your Oracle
+and Open Source book. I'll be sure to buy it as soon as it's out.
+
+
+ -----Original Message-----
+From: 	Andy Duncan [mailto:andy_j_duncan@yahoo.com] 
+Sent:	Thursday, March 22, 2001 2:27 AM
+To:	Richard Sutherland; Humpage, Steve L
+Subject:	RE: Oracle trigger source bug and workaround
+
+Hi Richard,
+
+> I'm not up-to-date on this Oracle tool, but if it's defragging that
+> interests you, you might want to take a look at the full DDL::Oracle
+> (latest version [with NULL still in WHEN clauses] attached).  It includes
+> defrag.pl, a tool which will do a defrag/reorg, including an option to
+> resize objects to an 'appropriate' extent size (supplied or user defined
+> algorithm).
+
+Can't wait to see all this in Orac! :-)
+
+> > If Orac_dba adds a graphic display of the structure of a tablespace I
+> > and I'll bet many others would be very happy.
+> 
+> Well OK, now there's a spedific request that even I would like.  I don't
+> want to put words in Andy's mouth, but we'll look into it.  [Taste OK,
+> Andy?]
+
+Do you mean by structure, something where you see a tablespace, then all the
+bits and pieces that make it up?  I'll try and think of some SQL today that
+will do that, and run it by you both?
+
+Rgds,
+AndyD
+
+=====
+andy_j_duncan@yahoo.com
+
+O'Reilly's "Oracle and Open Source": 
+=> http://www.oreilly.com/catalog/oracleopen/
+
+Orac, Perl/Tk and Perl DBI Database DBA & Development Tool: 
+=> http://www.perl.com/CPAN-local/modules/by-module/DBI/ANDYDUNC/
+
+__________________________________________________
+Do You Yahoo!?
+Get email at your own domain with Yahoo! Mail. 
+http://personal.mail.yahoo.com/

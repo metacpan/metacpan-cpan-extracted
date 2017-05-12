@@ -1,0 +1,9 @@
+2004-04-14 Version 0.02
+	* fixed bug where receiver could not contain a colon
+	* fixed method invocation bugs, signatures can now contain unnamed
+	  arguments
+	* numerous documentation fixes
+	* the runtime will now try to find a matching method signature
+	  for methods that it can't find immediately (to be
+	  compatible with CamelBones and the PerlObjCBridge in OSX)
+

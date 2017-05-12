@@ -1,0 +1,27 @@
+---
+name: Options
+version: 1.5.2
+author:
+  - 'Phil Christensen, E<lt>phil@bubblehouse.orgE<gt>'
+abstract: Yet another Perl module to provide support for command-line option parsing and usage generation.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  perl: 5.6.1
+recommends:
+  Test::More: 0
+  Test::Pod: '>= 1.0'
+  Test::Pod::Coverage: 0
+  Test::Unit: '>= 0.25'
+  perl: 5.8
+provides:
+  Options:
+    file: lib/Options.pm
+    version: 1.5.2
+  Options::Test:
+    file: lib/Options/Test.pm
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

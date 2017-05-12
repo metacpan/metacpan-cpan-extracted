@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<SITE ID="Vanguarda">
+
+<NAME Lang="en-us">Vanguarda Search</NAME>
+<INFO Lang="en-us">general information web search in Brazil</INFO>
+
+<URL Type="More"><![CDATA[
+post://www.vanguarda.net/cgi-bin/web72321/search.cgi?start=_START_10_1_&words=_QUERY_&mode=OR&collection=/drv1/web/sites/web72321/controls/webdata.txt&maxshow=+10+
+]]></URL>
+<URL Type="Start"><![CDATA[
+post://www.vanguarda.net/cgi-bin/web72321/search.cgi?start=1&words=_QUERY_&mode=OR&collection=/drv1/web/sites/web72321/controls/webdata.txt&maxshow=+10+
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+
+<TEMPLATE><![CDATA[
+<ul>___redirect.cgi?_URL_">_TITLE_</a><br><ul>_PREVIEW_</ul></ul>
+]]></TEMPLATE>
+</SITE>

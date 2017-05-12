@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<SITE ID="NorthernLight">
+
+<NAME Lang="en-us">Northern Light</NAME>
+<INFO Lang="en-us">general information web search</INFO>
+
+<URL Type="More"><![CDATA[
+http://www.northernlight.com_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://www.northernlight.com/nlquery.fcg?qr=_QUERY_&si=&cb=0&cc=&us=025
+]]></URL>
+
+<EXPRESSION>Standard</EXPRESSION>
+
+<VAR Name="_NEXT_"><![CDATA[
+<td valign=middle><a href="_NEXT_"><img src="docs/gif/nextten.gif
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+.&nbsp;&nbsp;___<a href="_URL_">_TITLE_</a>___<b>_SCORE_%___:</b>&nbsp;_PREVIEW_<br>___</tr>
+]]></TEMPLATE>
+</SITE>

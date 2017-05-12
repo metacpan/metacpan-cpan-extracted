@@ -1,0 +1,227 @@
+NAME
+    Object::Util - a selection of utility methods that can be called on
+    blessed objects
+
+SYNOPSIS
+       use Object::Util;
+   
+       # $foo might be undef, but this should not die
+       if ($foo->$_isa("Bar")) {
+          ...;
+       }
+
+DESCRIPTION
+    This module is inspired by Safe::Isa, Object::Tap, and my own OO
+    experiences. It is a hopefully helpful set of methods for working with
+    objects, exposed as lexical coderef variables.
+
+  Rationale
+    Providing methods as coderefs so that you can do:
+
+       $object->$_foo(@args)
+
+    ... is unusual, so probably requires some explanation.
+
+    Firstly some of these methods are designed to be called on either a
+    blessed object or some kind of unblessed reference or value. Calling a
+    method on an unblessed reference like this will croak:
+
+       $ref->foo(@args)
+
+    Ditto calling methods on undef. Coderefs don't suffer from that problem.
+
+    More importantly though, the aim of this module is that these methods
+    should be available for you to call on *any* object. You can only call
+    `$object->foo(@args)` if $object's class implements a method called `foo`,
+    or inherits from a superclass that does. Coderef methods can be called on
+    any object.
+
+    This module adopts the $_foo naming convention pioneered by modules such
+    as Safe::Isa. However (unlike Safe::Isa) the coderefs it provides are
+    *true lexical variables* (a.k.a. `my` variables), not package variables
+    (a.k.a. `our` variables).
+
+  Methods
+   Object construction and manipulation
+    $_new
+        Can be used like `$class->$_new(@args)` to create a new object.
+        Object::Util will use Module::Runtime to *attempt* to load $class if
+        it is not already loaded. $class is expected to provide a method
+        called `new`.
+
+        Can also be used as `$factory->$_new(@args)` to create a new object,
+        where $factory is a coderef or an object overloading `&{}`. In this
+        case, $_new will simply call `$factory->(@args)` and expect that to
+        return an object.
+
+    $_clone
+        If the object provides a `clone` method, calls that. Or if the object
+        appears to be Moose- or Mouse-based, clones it using the metaobject
+        protocol.
+
+        Otherwise takes the naive approach of treating the object as a hashref
+        of attribute values, and creates a new object of the same class.
+
+           # clone overrides some attributes from the original object
+           my $glenda = $glen->$_clone(name => "Glenda", gender => "f");
+
+        That final fallback obviously massively breaks your class'
+        encapsulation, so it should be used sparingly.
+
+    $_with_traits
+        Calling `$class->$_with_traits(@traits)` will return a new class name
+        that does some extra traits. Should roughly support Moose, Mouse, Moo,
+        and Role::Tiny, though combinations of frameworks (e.g. consuming a
+        Moose role in a Mouse class) will not always work.
+
+        If $class is actually a (factory) coderef, then this will only
+        *partly* work. Example:
+
+           my $factory  = sub { Foo->new(@_) };
+           my $instance = $factory->$_with_traits("Bar")->$_new(%args);
+
+        The object $instance should now be a `Foo` object, and should do the
+        `Bar` role, however if `Bar` defines any *attributes*, then $_new will
+        not have initialized them correctly. This is because of the opacity of
+        the $factory: $_with_traits cannot peek inside it and apply traits to
+        the `Foo` class; instead it needs to build $instance and apply the
+        traits to the already-built object. Therefore any behaviour that `Bar`
+        defines for the constructor will have been ignored.
+
+        It is sometimes possible to work around this issue using:
+
+           my $factory  = sub { Foo->new(@_) };
+           my $instance = $factory->$_with_traits("Bar")->$_new(%args);
+           $instance = $instance->$_clone(%args);
+
+    $_extend
+        Calling `$object->$_extend(\@traits, \%methods)` will add some extra
+        roles and/or methods to an existing object.
+
+        Either @traits or %methods may be omitted. That is,
+        `$object->$_extend(\@traits)` will add some traits to an existing
+        object but no new methods, and `$object->$_extend(\%methods)` will add
+        new methods, but no traits. `$object->$_extend()` also works fine, and
+        is a no-op.
+
+        This method always returns $object, which makes it suitable for
+        chaining.
+
+        Like Object::Extend, but with added support for roles.
+
+   Method call modifiers
+    $_call_if_object
+        `$object->$_call_if_object($method => @args)` works like
+        `$object->$method(@args)`, but if $object is undefined, returns
+        `undef` instead of throwing an exception.
+
+        $method may be a method name, or a coderef (anonymous method).
+
+        Same as Safe::Isa.
+
+    $_try
+        `$object->$_try($method => @args)` works like
+        `$object->$method(@args)`, but if *any exception is thrown* returns
+        `undef` instead.
+
+        $method may be a method name, or a coderef (anonymous method).
+
+    $_tap
+        `$object->$_tap($method => @args)` works like
+        `$object->$method(@args)`, but discards the method's return value
+        (indeed it calls the method in void context), and instead returns the
+        object itself, making it useful for chaining.
+
+        $method may be a method name, or a coderef (anonymous method).
+
+        Same as Object::Tap, or the `tap` method in Ruby.
+
+    $_isa
+        `$object->$_isa($class)` works like `isa` as defined in UNIVERSAL, but
+        if $object is undefined, returns false instead of throwing an
+        exception.
+
+        A shortcut for `$object->$_call_if_method(isa => $class)`.
+
+        Same as Safe::Isa.
+
+    $_does
+        `$object->$_does($role)` works like `does` as defined in
+        Moose::Object, but if $object is undefined, returns false instead of
+        throwing an exception.
+
+        A shortcut for `$object->$_call_if_method(does => $role)`.
+
+        Same as Safe::Isa.
+
+    $_DOES
+        `$object->$_DOES($role)` works like `DOES` as defined in UNIVERSAL,
+        but if $object is undefined, returns false instead of throwing an
+        exception.
+
+        A shortcut for `$object->$_call_if_method(DOES => $role)`.
+
+        Same as Safe::Isa.
+
+    $_can
+        `$object->$_can($method)` works like `can` as defined in UNIVERSAL,
+        but if $object is undefined, returns `undef` instead of throwing an
+        exception.
+
+        There is one other significant deviation from the behaviour of
+        UNIVERSAL's `can` method: $_can also returns true if $method is an
+        unblessed coderef. (The behaviour of $method if it is a blessed object
+        -- particularly in the face of overloading -- can be unintuitive, so
+        is not supported by $_can.)
+
+        Similar to Safe::Isa, but not quite the same.
+
+   Object utility methods
+    $_dump
+        Calling `$object->$_dump` returns a Data::Dumper dump of the object,
+        with some useful changes to the default Data::Dumper output. (Same as
+        Data::Dumper::Concise.)
+
+        If the object provides its own `dump` method, this will be called
+        instead.
+
+  Implementation Details
+    B::Hooks::Parser is used to inject these methods into your lexical scope,
+    and `Internals::SvREADONLY` (an internal function built into the Perl
+    core) is used to make them read-only, so you can't do:
+
+       use Object::Util;
+       $_isa = sub { "something else" };
+
+    If this module detects that B::Hooks::Parser cannot be used on your
+    version of Perl, or your Perl is too old to have Internals::SvREADONLY,
+    then it has various fallback routes, but the variables it provides may end
+    up as package (`our`) variables, or not be read-only.
+
+    If the magic works on your version of Perl, but you wish to avoid the
+    magic anyway, you can switch it off:
+
+       use Object::Util magic => 0;
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Object-Util>.
+
+SEE ALSO
+    Safe::Isa, UNIVERSAL, Object::Tap, MooseX::Clone, Data::Dumper::Concise,
+    Object::Extend.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2014 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

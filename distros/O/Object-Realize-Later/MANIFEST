@@ -1,0 +1,25 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Object/Realize/Later.pm
+lib/Object/Realize/Later.pod
+t/10isa.t
+t/20can.t
+t/30realize.t
+t/40autoload.t
+t/41autoload.t
+t/50again.t
+t/60module.t
+t/testmods/A.pm
+t/testmods/A/B.pm
+t/testmods/C.pm
+t/testmods/C/D.pm
+t/testmods/C/D/E.pm
+t/testmods/C/G.pm
+t/testmods/C/G/H.pm
+t/testmods/I.pm
+t/testmods/J.pm
+xt/99pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

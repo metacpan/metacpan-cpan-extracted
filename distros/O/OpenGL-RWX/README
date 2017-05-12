@@ -1,0 +1,50 @@
+NAME
+    OpenGL::RWX - Provides support for loading 3D models from RWX files
+
+SYNOPSIS
+      # Create the object but don't load anything
+      my $model = OpenGL::RWX->new(
+          file => 'mymodel.rwx',
+      );
+      
+  # Load the model into OpenGL
+      $model->init;
+      
+  # Render the model into the current scene
+      $model->display;
+
+DESCRIPTION
+    OpenGL::RWX provides a basic implementation of a RWX file parser.
+
+    Given a file name, it will load the file and parse the contents directly
+    into a compiled OpenGL display list.
+
+    The OpenGL display list can then be executed directly from the RWX
+    object.
+
+    The current implementation is extremely preliminary and functionality
+    will be gradually fleshed out over time.
+
+    In this initial test implementation, the model will only render as a set
+    of points in space using the pre-existing material settings.
+
+SUPPORT
+    Bugs should be reported via the CPAN bug tracker at
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=OpenGL-RWX>
+
+AUTHOR
+    Adam Kennedy <adamk@cpan.org>
+
+SEE ALSO
+    OpenGL
+
+COPYRIGHT
+    Copyright 2010 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

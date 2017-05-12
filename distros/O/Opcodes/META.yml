@@ -1,0 +1,24 @@
+---
+abstract: 'More Opcodes information from opnames.h and opcode.h'
+author:
+  - 'Reini Urban'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.88, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Opcodes
+no_index:
+  directory:
+    - t
+    - inc
+requires: {}
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/rurban/Opcodes
+version: '0.14'

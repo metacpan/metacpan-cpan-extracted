@@ -1,0 +1,28 @@
+---
+abstract: 'Forwards the contents of an OTRS queue to a given email address.'
+author:
+  - 'Paul Waring <paul.waring@manchester.ac.uk>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142690'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: OTRS-ForwardQueue
+requires:
+  Email::Sender::Simple: '0'
+  Email::Sender::Transport::SMTP: '0'
+  Email::Simple: '0'
+  Email::Simple::Creator: '0'
+  Moose: '0'
+  Template: '0'
+  namespace::autoclean: '0'
+  perl: '5.014'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://github.com/pwaring/OTRS-ForwardQueue/issues
+version: '0.13'

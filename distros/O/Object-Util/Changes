@@ -1,0 +1,50 @@
+Object-Util
+===========
+
+Created:      2014-09-08
+Home page:    <https://metacpan.org/release/Object-Util>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Object-Util>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.006	2014-09-16
+
+ [ Documentation ]
+ - Clarify and correct documentation for $_extend.
+
+0.005	2014-09-16
+
+ [ Documentation ]
+ - Restructure and further clarify documentation of methods.
+
+ [ Other ]
+ - Clean up some old `use` statements that were no longer needed.
+ - Delay loading Module::Runtime until it's actually needed.
+ - Make it possible to avoid the B::Hooks::Parser/Internals::SvREADONLY
+   magic.
+
+0.004	2014-09-16
+
+ [ Documentation ]
+ - Document that most places $method is used in the documentation accept
+   either a method name or a coderef.
+ - Fix referenes to $object->$_does($class) (and $_DOES too) where $class
+   should have been $role.
+
+ [ Other ]
+ - Support $object->$_can($method) where $method is a coderef.
+
+0.003	2014-09-16
+
+ - Allow $_with_traits to (mostly) work with factory coderefs.
+ - If an object provides its own dump method, then $_dump should defer to
+   that.
+
+0.002	2014-09-09
+
+ [ Test Suite ]
+ - Fix Mouse-related failures.
+
+ [ Other ]
+ - Added: Add $_extends method.
+
+0.001	2014-09-09	Initial release

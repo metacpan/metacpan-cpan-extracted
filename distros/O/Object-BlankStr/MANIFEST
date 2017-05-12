@@ -1,0 +1,15 @@
+Changes
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Object/BlankStr.pm
+t/00-compile.t
+t/01-basics.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t
+t/release-rinci.t

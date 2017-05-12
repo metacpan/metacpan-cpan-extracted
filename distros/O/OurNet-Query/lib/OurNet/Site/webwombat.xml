@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<SITE ID="WebWombat">
+
+<NAME Lang="en-us">Web Wombat Australian Search Engine</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+Web Wombat¥þ²yWWW·j´M(¿D¬w)
+]]></NAME>
+<INFO Lang="en-us">general information web search</INFO>
+<INFO Lang="zh-tw">general information web search</INFO>
+
+<URL Type="Start"><![CDATA[
+http://www.webwombat.com.au/Wombat?IsIndex=_QUERY_&StartFrom=_START_
+]]></URL>
+
+
+
+<TEMPLATE><![CDATA[
+Title:</B><A HREF="/Go?_URL_">_TITLE_</A>___</B>_PREVIEW_<BR>___(_%)</FONT>_
+]]></TEMPLATE>
+</SITE>

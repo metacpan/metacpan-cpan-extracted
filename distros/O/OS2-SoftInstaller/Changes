@@ -1,0 +1,46 @@
+Revision history for Perl extension OS2::SoftInstaller.
+
+0.01  Thu Sep 12 08:07:27 1996
+	- original version; created by h2xs 1.16
+
+0.02  96/09/14 02:03:05 ilya
+	REPLACEINUSE generated for .exe and .dll.
+	size_date_time coded.
+
+0.03
+	Test uses short names for subpackages (since tmp drive may be FAT).
+	PERL_SHDIR goof removed.
+
+0.04
+	Add an object for CPAN getter.
+	Path for .inf file corrected.
+	plINSTAL.zip autocreated.
+
+0.05
+	Corrected a duplicated id.
+	plINSTALL was written to a wrong dir.
+0.06
+	Better sizes, install testperl.cmd too, patches.zip.
+	Moved .a libraries from site-specific to build-specific archive.
+	echo on in .cmd file.
+
+	Updated to 5.005 style of directory layout.  edit_cfg.pl
+	prompts on successful exit.
+	
+0.07
+	Had F:/perllib hardwired instead of f:/perllib.
+	Un-hardwire $shelldrive and $perllibdir.
+	Maybe will be able to remove tmp working dir.
+	A lot of error detection/report added to edit_cfg.cmd
+
+0.08
+	Un-hardwire remaining directories: $bookdir, $emxdir, $scriptdir.
+	Un-hardwire DLL name.
+	use strict.
+	Do not use rm
+	PODs are in a subdirectory now (fix the install scripts?)
+	Add pfind to the list of installed scripts.
+0.0.9
+	Autofind all the directories.
+	Fix the y2k bug (dates like 1031011 for 2003-10-11).
+	Sizes of components updated to the 5.8.2 values.

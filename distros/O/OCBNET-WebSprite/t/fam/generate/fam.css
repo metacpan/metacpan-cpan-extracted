@@ -1,0 +1,9001 @@
+/* sprite: fam url(../result/generated.png); */
+
+.accept
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/accept.png');
+}
+
+.add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/add.png');
+}
+
+.anchor
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/anchor.png');
+}
+
+.application
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/application.png');
+}
+
+.application-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/application_add.png');
+}
+
+.application-cascade
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/application_cascade.png');
+}
+
+.application-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/application_delete.png');
+}
+
+.application-double
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/application_double.png');
+}
+
+.application-edit
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/application_edit.png');
+}
+
+.application-error
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/application_error.png');
+}
+
+.application-form
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/application_form.png');
+}
+
+.application-form-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/application_form_add.png');
+}
+
+.application-form-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/application_form_delete.png');
+}
+
+.application-form-edit
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/application_form_edit.png');
+}
+
+.application-form-magnify
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/application_form_magnify.png');
+}
+
+.application-get
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/application_get.png');
+}
+
+.application-go
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/application_go.png');
+}
+
+.application-home
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/application_home.png');
+}
+
+.application-key
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/application_key.png');
+}
+
+.application-lightning
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/application_lightning.png');
+}
+
+.application-link
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/application_link.png');
+}
+
+.application-osx
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/application_osx.png');
+}
+
+.application-osx-terminal
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/application_osx_terminal.png');
+}
+
+.application-put
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/application_put.png');
+}
+
+.application-side-boxes
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/application_side_boxes.png');
+}
+
+.application-side-contract
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/application_side_contract.png');
+}
+
+.application-side-expand
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/application_side_expand.png');
+}
+
+.application-side-list
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/application_side_list.png');
+}
+
+.application-side-tree
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/application_side_tree.png');
+}
+
+.application-split
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/application_split.png');
+}
+
+.application-tile-horizontal
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/application_tile_horizontal.png');
+}
+
+.application-tile-vertical
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/application_tile_vertical.png');
+}
+
+.application-view-columns
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/application_view_columns.png');
+}
+
+.application-view-detail
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/application_view_detail.png');
+}
+
+.application-view-gallery
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/application_view_gallery.png');
+}
+
+.application-view-icons
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/application_view_icons.png');
+}
+
+.application-view-list
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/application_view_list.png');
+}
+
+.application-view-tile
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/application_view_tile.png');
+}
+
+.application-xp
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/application_xp.png');
+}
+
+.application-xp-terminal
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/application_xp_terminal.png');
+}
+
+.arrow-branch
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/arrow_branch.png');
+}
+
+.arrow-divide
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/arrow_divide.png');
+}
+
+.arrow-down
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/arrow_down.png');
+}
+
+.arrow-in
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/arrow_in.png');
+}
+
+.arrow-inout
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/arrow_inout.png');
+}
+
+.arrow-join
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/arrow_join.png');
+}
+
+.arrow-left
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/arrow_left.png');
+}
+
+.arrow-merge
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/arrow_merge.png');
+}
+
+.arrow-out
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/arrow_out.png');
+}
+
+.arrow-redo
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/arrow_redo.png');
+}
+
+.arrow-refresh
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/arrow_refresh.png');
+}
+
+.arrow-refresh-small
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/arrow_refresh_small.png');
+}
+
+.arrow-right
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/arrow_right.png');
+}
+
+.arrow-rotate-anticlockwise
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/arrow_rotate_anticlockwise.png');
+}
+
+.arrow-rotate-clockwise
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/arrow_rotate_clockwise.png');
+}
+
+.arrow-switch
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/arrow_switch.png');
+}
+
+.arrow-turn-left
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/arrow_turn_left.png');
+}
+
+.arrow-turn-right
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/arrow_turn_right.png');
+}
+
+.arrow-undo
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/arrow_undo.png');
+}
+
+.arrow-up
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/arrow_up.png');
+}
+
+.asterisk-orange
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/asterisk_orange.png');
+}
+
+.asterisk-yellow
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/asterisk_yellow.png');
+}
+
+.attach
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/attach.png');
+}
+
+.award-star-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/award_star_add.png');
+}
+
+.award-star-bronze-1
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/award_star_bronze_1.png');
+}
+
+.award-star-bronze-2
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/award_star_bronze_2.png');
+}
+
+.award-star-bronze-3
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/award_star_bronze_3.png');
+}
+
+.award-star-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/award_star_delete.png');
+}
+
+.award-star-gold-1
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/award_star_gold_1.png');
+}
+
+.award-star-gold-2
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/award_star_gold_2.png');
+}
+
+.award-star-gold-3
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/award_star_gold_3.png');
+}
+
+.award-star-silver-1
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/award_star_silver_1.png');
+}
+
+.award-star-silver-2
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/award_star_silver_2.png');
+}
+
+.award-star-silver-3
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/award_star_silver_3.png');
+}
+
+.basket
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/basket.png');
+}
+
+.basket-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/basket_add.png');
+}
+
+.basket-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/basket_delete.png');
+}
+
+.basket-edit
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/basket_edit.png');
+}
+
+.basket-error
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/basket_error.png');
+}
+
+.basket-go
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/basket_go.png');
+}
+
+.basket-put
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/basket_put.png');
+}
+
+.basket-remove
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/basket_remove.png');
+}
+
+.bell
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/bell.png');
+}
+
+.bell-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/bell_add.png');
+}
+
+.bell-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/bell_delete.png');
+}
+
+.bell-error
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/bell_error.png');
+}
+
+.bell-go
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/bell_go.png');
+}
+
+.bell-link
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/bell_link.png');
+}
+
+.bin
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/bin.png');
+}
+
+.bin-closed
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/bin_closed.png');
+}
+
+.bin-empty
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/bin_empty.png');
+}
+
+.bomb
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/bomb.png');
+}
+
+.book
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/book.png');
+}
+
+.book-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/book_add.png');
+}
+
+.book-addresses
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/book_addresses.png');
+}
+
+.book-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/book_delete.png');
+}
+
+.book-edit
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/book_edit.png');
+}
+
+.book-error
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/book_error.png');
+}
+
+.book-go
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/book_go.png');
+}
+
+.book-key
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/book_key.png');
+}
+
+.book-link
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/book_link.png');
+}
+
+.book-next
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/book_next.png');
+}
+
+.book-open
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/book_open.png');
+}
+
+.book-previous
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/book_previous.png');
+}
+
+.box
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/box.png');
+}
+
+.brick
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/brick.png');
+}
+
+.brick-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/brick_add.png');
+}
+
+.brick-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/brick_delete.png');
+}
+
+.brick-edit
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/brick_edit.png');
+}
+
+.brick-error
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/brick_error.png');
+}
+
+.brick-go
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/brick_go.png');
+}
+
+.brick-link
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/brick_link.png');
+}
+
+.bricks
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/bricks.png');
+}
+
+.briefcase
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/briefcase.png');
+}
+
+.bug
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/bug.png');
+}
+
+.bug-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/bug_add.png');
+}
+
+.bug-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/bug_delete.png');
+}
+
+.bug-edit
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/bug_edit.png');
+}
+
+.bug-error
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/bug_error.png');
+}
+
+.bug-go
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/bug_go.png');
+}
+
+.bug-link
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/bug_link.png');
+}
+
+.building
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/building.png');
+}
+
+.building-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/building_add.png');
+}
+
+.building-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/building_delete.png');
+}
+
+.building-edit
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/building_edit.png');
+}
+
+.building-error
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/building_error.png');
+}
+
+.building-go
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/building_go.png');
+}
+
+.building-key
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/building_key.png');
+}
+
+.building-link
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/building_link.png');
+}
+
+.bullet-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/bullet_add.png');
+}
+
+.bullet-arrow-bottom
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/bullet_arrow_bottom.png');
+}
+
+.bullet-arrow-down
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/bullet_arrow_down.png');
+}
+
+.bullet-arrow-top
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/bullet_arrow_top.png');
+}
+
+.bullet-arrow-up
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/bullet_arrow_up.png');
+}
+
+.bullet-black
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/bullet_black.png');
+}
+
+.bullet-blue
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/bullet_blue.png');
+}
+
+.bullet-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/bullet_delete.png');
+}
+
+.bullet-disk
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/bullet_disk.png');
+}
+
+.bullet-error
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/bullet_error.png');
+}
+
+.bullet-feed
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/bullet_feed.png');
+}
+
+.bullet-go
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/bullet_go.png');
+}
+
+.bullet-green
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/bullet_green.png');
+}
+
+.bullet-key
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/bullet_key.png');
+}
+
+.bullet-orange
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/bullet_orange.png');
+}
+
+.bullet-picture
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/bullet_picture.png');
+}
+
+.bullet-pink
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/bullet_pink.png');
+}
+
+.bullet-purple
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/bullet_purple.png');
+}
+
+.bullet-red
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/bullet_red.png');
+}
+
+.bullet-star
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/bullet_star.png');
+}
+
+.bullet-toggle-minus
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/bullet_toggle_minus.png');
+}
+
+.bullet-toggle-plus
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/bullet_toggle_plus.png');
+}
+
+.bullet-white
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/bullet_white.png');
+}
+
+.bullet-wrench
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/bullet_wrench.png');
+}
+
+.bullet-yellow
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/bullet_yellow.png');
+}
+
+.cake
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/cake.png');
+}
+
+.calculator
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/calculator.png');
+}
+
+.calculator-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/calculator_add.png');
+}
+
+.calculator-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/calculator_delete.png');
+}
+
+.calculator-edit
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/calculator_edit.png');
+}
+
+.calculator-error
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/calculator_error.png');
+}
+
+.calculator-link
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/calculator_link.png');
+}
+
+.calendar
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/calendar.png');
+}
+
+.calendar-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/calendar_add.png');
+}
+
+.calendar-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/calendar_delete.png');
+}
+
+.calendar-edit
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/calendar_edit.png');
+}
+
+.calendar-link
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/calendar_link.png');
+}
+
+.calendar-view-day
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/calendar_view_day.png');
+}
+
+.calendar-view-month
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/calendar_view_month.png');
+}
+
+.calendar-view-week
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/calendar_view_week.png');
+}
+
+.camera
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/camera.png');
+}
+
+.camera-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/camera_add.png');
+}
+
+.camera-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/camera_delete.png');
+}
+
+.camera-edit
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/camera_edit.png');
+}
+
+.camera-error
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/camera_error.png');
+}
+
+.camera-go
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/camera_go.png');
+}
+
+.camera-link
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/camera_link.png');
+}
+
+.camera-small
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/camera_small.png');
+}
+
+.cancel
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/cancel.png');
+}
+
+.car
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/car.png');
+}
+
+.car-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/car_add.png');
+}
+
+.car-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/car_delete.png');
+}
+
+.cart
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/cart.png');
+}
+
+.cart-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/cart_add.png');
+}
+
+.cart-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/cart_delete.png');
+}
+
+.cart-edit
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/cart_edit.png');
+}
+
+.cart-error
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/cart_error.png');
+}
+
+.cart-go
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/cart_go.png');
+}
+
+.cart-put
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/cart_put.png');
+}
+
+.cart-remove
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/cart_remove.png');
+}
+
+.cd
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/cd.png');
+}
+
+.cd-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/cd_add.png');
+}
+
+.cd-burn
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/cd_burn.png');
+}
+
+.cd-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/cd_delete.png');
+}
+
+.cd-edit
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/cd_edit.png');
+}
+
+.cd-eject
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/cd_eject.png');
+}
+
+.cd-go
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/cd_go.png');
+}
+
+.chart-bar
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/chart_bar.png');
+}
+
+.chart-bar-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/chart_bar_add.png');
+}
+
+.chart-bar-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/chart_bar_delete.png');
+}
+
+.chart-bar-edit
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/chart_bar_edit.png');
+}
+
+.chart-bar-error
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/chart_bar_error.png');
+}
+
+.chart-bar-link
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/chart_bar_link.png');
+}
+
+.chart-curve
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/chart_curve.png');
+}
+
+.chart-curve-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/chart_curve_add.png');
+}
+
+.chart-curve-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/chart_curve_delete.png');
+}
+
+.chart-curve-edit
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/chart_curve_edit.png');
+}
+
+.chart-curve-error
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/chart_curve_error.png');
+}
+
+.chart-curve-go
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/chart_curve_go.png');
+}
+
+.chart-curve-link
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/chart_curve_link.png');
+}
+
+.chart-line
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/chart_line.png');
+}
+
+.chart-line-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/chart_line_add.png');
+}
+
+.chart-line-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/chart_line_delete.png');
+}
+
+.chart-line-edit
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/chart_line_edit.png');
+}
+
+.chart-line-error
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/chart_line_error.png');
+}
+
+.chart-line-link
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/chart_line_link.png');
+}
+
+.chart-organisation
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/chart_organisation.png');
+}
+
+.chart-organisation-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/chart_organisation_add.png');
+}
+
+.chart-organisation-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/chart_organisation_delete.png');
+}
+
+.chart-pie
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/chart_pie.png');
+}
+
+.chart-pie-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/chart_pie_add.png');
+}
+
+.chart-pie-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/chart_pie_delete.png');
+}
+
+.chart-pie-edit
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/chart_pie_edit.png');
+}
+
+.chart-pie-error
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/chart_pie_error.png');
+}
+
+.chart-pie-link
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/chart_pie_link.png');
+}
+
+.clock
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/clock.png');
+}
+
+.clock-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/clock_add.png');
+}
+
+.clock-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/clock_delete.png');
+}
+
+.clock-edit
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/clock_edit.png');
+}
+
+.clock-error
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/clock_error.png');
+}
+
+.clock-go
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/clock_go.png');
+}
+
+.clock-link
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/clock_link.png');
+}
+
+.clock-pause
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/clock_pause.png');
+}
+
+.clock-play
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/clock_play.png');
+}
+
+.clock-red
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/clock_red.png');
+}
+
+.clock-stop
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/clock_stop.png');
+}
+
+.cog
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/cog.png');
+}
+
+.cog-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/cog_add.png');
+}
+
+.cog-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/cog_delete.png');
+}
+
+.cog-edit
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/cog_edit.png');
+}
+
+.cog-error
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/cog_error.png');
+}
+
+.cog-go
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/cog_go.png');
+}
+
+.coins
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/coins.png');
+}
+
+.coins-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/coins_add.png');
+}
+
+.coins-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/coins_delete.png');
+}
+
+.color-swatch
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/color_swatch.png');
+}
+
+.color-wheel
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/color_wheel.png');
+}
+
+.comment
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/comment.png');
+}
+
+.comment-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/comment_add.png');
+}
+
+.comment-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/comment_delete.png');
+}
+
+.comment-edit
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/comment_edit.png');
+}
+
+.comments
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/comments.png');
+}
+
+.comments-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/comments_add.png');
+}
+
+.comments-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/comments_delete.png');
+}
+
+.compress
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/compress.png');
+}
+
+.computer
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/computer.png');
+}
+
+.computer-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/computer_add.png');
+}
+
+.computer-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/computer_delete.png');
+}
+
+.computer-edit
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/computer_edit.png');
+}
+
+.computer-error
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/computer_error.png');
+}
+
+.computer-go
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/computer_go.png');
+}
+
+.computer-key
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/computer_key.png');
+}
+
+.computer-link
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/computer_link.png');
+}
+
+.connect
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/connect.png');
+}
+
+.contrast
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/contrast.png');
+}
+
+.contrast-decrease
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/contrast_decrease.png');
+}
+
+.contrast-high
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/contrast_high.png');
+}
+
+.contrast-increase
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/contrast_increase.png');
+}
+
+.contrast-low
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/contrast_low.png');
+}
+
+.control-eject
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/control_eject.png');
+}
+
+.control-eject-blue
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/control_eject_blue.png');
+}
+
+.control-end
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/control_end.png');
+}
+
+.control-end-blue
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/control_end_blue.png');
+}
+
+.control-equalizer
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/control_equalizer.png');
+}
+
+.control-equalizer-blue
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/control_equalizer_blue.png');
+}
+
+.control-fastforward
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/control_fastforward.png');
+}
+
+.control-fastforward-blue
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/control_fastforward_blue.png');
+}
+
+.control-pause
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/control_pause.png');
+}
+
+.control-pause-blue
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/control_pause_blue.png');
+}
+
+.control-play
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/control_play.png');
+}
+
+.control-play-blue
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/control_play_blue.png');
+}
+
+.control-repeat
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/control_repeat.png');
+}
+
+.control-repeat-blue
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/control_repeat_blue.png');
+}
+
+.control-rewind
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/control_rewind.png');
+}
+
+.control-rewind-blue
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/control_rewind_blue.png');
+}
+
+.control-start
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/control_start.png');
+}
+
+.control-start-blue
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/control_start_blue.png');
+}
+
+.control-stop
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/control_stop.png');
+}
+
+.control-stop-blue
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/control_stop_blue.png');
+}
+
+.controller
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/controller.png');
+}
+
+.controller-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/controller_add.png');
+}
+
+.controller-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/controller_delete.png');
+}
+
+.controller-error
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/controller_error.png');
+}
+
+.creditcards
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/creditcards.png');
+}
+
+.cross
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/cross.png');
+}
+
+.css
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/css.png');
+}
+
+.css-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/css_add.png');
+}
+
+.css-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/css_delete.png');
+}
+
+.css-go
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/css_go.png');
+}
+
+.css-valid
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/css_valid.png');
+}
+
+.cup
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/cup.png');
+}
+
+.cup-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/cup_add.png');
+}
+
+.cup-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/cup_delete.png');
+}
+
+.cup-edit
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/cup_edit.png');
+}
+
+.cup-error
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/cup_error.png');
+}
+
+.cup-go
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/cup_go.png');
+}
+
+.cup-key
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/cup_key.png');
+}
+
+.cup-link
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/cup_link.png');
+}
+
+.cursor
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/cursor.png');
+}
+
+.cut
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/cut.png');
+}
+
+.cut-red
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/cut_red.png');
+}
+
+.database
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/database.png');
+}
+
+.database-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/database_add.png');
+}
+
+.database-connect
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/database_connect.png');
+}
+
+.database-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/database_delete.png');
+}
+
+.database-edit
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/database_edit.png');
+}
+
+.database-error
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/database_error.png');
+}
+
+.database-gear
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/database_gear.png');
+}
+
+.database-go
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/database_go.png');
+}
+
+.database-key
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/database_key.png');
+}
+
+.database-lightning
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/database_lightning.png');
+}
+
+.database-link
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/database_link.png');
+}
+
+.database-refresh
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/database_refresh.png');
+}
+
+.database-save
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/database_save.png');
+}
+
+.database-table
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/database_table.png');
+}
+
+.date
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/date.png');
+}
+
+.date-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/date_add.png');
+}
+
+.date-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/date_delete.png');
+}
+
+.date-edit
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/date_edit.png');
+}
+
+.date-error
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/date_error.png');
+}
+
+.date-go
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/date_go.png');
+}
+
+.date-link
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/date_link.png');
+}
+
+.date-magnify
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/date_magnify.png');
+}
+
+.date-next
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/date_next.png');
+}
+
+.date-previous
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/date_previous.png');
+}
+
+.delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/delete.png');
+}
+
+.disconnect
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/disconnect.png');
+}
+
+.disk
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/disk.png');
+}
+
+.disk-multiple
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/disk_multiple.png');
+}
+
+.door
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/door.png');
+}
+
+.door-in
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/door_in.png');
+}
+
+.door-open
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/door_open.png');
+}
+
+.door-out
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/door_out.png');
+}
+
+.drink
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/drink.png');
+}
+
+.drink-empty
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/drink_empty.png');
+}
+
+.drive
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/drive.png');
+}
+
+.drive-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/drive_add.png');
+}
+
+.drive-burn
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/drive_burn.png');
+}
+
+.drive-cd
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/drive_cd.png');
+}
+
+.drive-cd-empty
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/drive_cd_empty.png');
+}
+
+.drive-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/drive_delete.png');
+}
+
+.drive-disk
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/drive_disk.png');
+}
+
+.drive-edit
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/drive_edit.png');
+}
+
+.drive-error
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/drive_error.png');
+}
+
+.drive-go
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/drive_go.png');
+}
+
+.drive-key
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/drive_key.png');
+}
+
+.drive-link
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/drive_link.png');
+}
+
+.drive-magnify
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/drive_magnify.png');
+}
+
+.drive-network
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/drive_network.png');
+}
+
+.drive-rename
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/drive_rename.png');
+}
+
+.drive-user
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/drive_user.png');
+}
+
+.drive-web
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/drive_web.png');
+}
+
+.dvd
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/dvd.png');
+}
+
+.dvd-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/dvd_add.png');
+}
+
+.dvd-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/dvd_delete.png');
+}
+
+.dvd-edit
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/dvd_edit.png');
+}
+
+.dvd-error
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/dvd_error.png');
+}
+
+.dvd-go
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/dvd_go.png');
+}
+
+.dvd-key
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/dvd_key.png');
+}
+
+.dvd-link
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/dvd_link.png');
+}
+
+.email
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/email.png');
+}
+
+.email-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/email_add.png');
+}
+
+.email-attach
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/email_attach.png');
+}
+
+.email-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/email_delete.png');
+}
+
+.email-edit
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/email_edit.png');
+}
+
+.email-error
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/email_error.png');
+}
+
+.email-go
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/email_go.png');
+}
+
+.email-link
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/email_link.png');
+}
+
+.email-open
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/email_open.png');
+}
+
+.email-open-image
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/email_open_image.png');
+}
+
+.emoticon-evilgrin
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/emoticon_evilgrin.png');
+}
+
+.emoticon-grin
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/emoticon_grin.png');
+}
+
+.emoticon-happy
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/emoticon_happy.png');
+}
+
+.emoticon-smile
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/emoticon_smile.png');
+}
+
+.emoticon-surprised
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/emoticon_surprised.png');
+}
+
+.emoticon-tongue
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/emoticon_tongue.png');
+}
+
+.emoticon-unhappy
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/emoticon_unhappy.png');
+}
+
+.emoticon-waii
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/emoticon_waii.png');
+}
+
+.emoticon-wink
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/emoticon_wink.png');
+}
+
+.error
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/error.png');
+}
+
+.error-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/error_add.png');
+}
+
+.error-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/error_delete.png');
+}
+
+.error-go
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/error_go.png');
+}
+
+.exclamation
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/exclamation.png');
+}
+
+.eye
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/eye.png');
+}
+
+.feed
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/feed.png');
+}
+
+.feed-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/feed_add.png');
+}
+
+.feed-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/feed_delete.png');
+}
+
+.feed-disk
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/feed_disk.png');
+}
+
+.feed-edit
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/feed_edit.png');
+}
+
+.feed-error
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/feed_error.png');
+}
+
+.feed-go
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/feed_go.png');
+}
+
+.feed-key
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/feed_key.png');
+}
+
+.feed-link
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/feed_link.png');
+}
+
+.feed-magnify
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/feed_magnify.png');
+}
+
+.female
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/female.png');
+}
+
+.film
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/film.png');
+}
+
+.film-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/film_add.png');
+}
+
+.film-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/film_delete.png');
+}
+
+.film-edit
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/film_edit.png');
+}
+
+.film-error
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/film_error.png');
+}
+
+.film-go
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/film_go.png');
+}
+
+.film-key
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/film_key.png');
+}
+
+.film-link
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/film_link.png');
+}
+
+.film-save
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/film_save.png');
+}
+
+.find
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/find.png');
+}
+
+.flag-blue
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/flag_blue.png');
+}
+
+.flag-green
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/flag_green.png');
+}
+
+.flag-orange
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/flag_orange.png');
+}
+
+.flag-pink
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/flag_pink.png');
+}
+
+.flag-purple
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/flag_purple.png');
+}
+
+.flag-red
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/flag_red.png');
+}
+
+.flag-yellow
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/flag_yellow.png');
+}
+
+.folder
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/folder.png');
+}
+
+.folder-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/folder_add.png');
+}
+
+.folder-bell
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/folder_bell.png');
+}
+
+.folder-brick
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/folder_brick.png');
+}
+
+.folder-bug
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/folder_bug.png');
+}
+
+.folder-camera
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/folder_camera.png');
+}
+
+.folder-database
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/folder_database.png');
+}
+
+.folder-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/folder_delete.png');
+}
+
+.folder-edit
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/folder_edit.png');
+}
+
+.folder-error
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/folder_error.png');
+}
+
+.folder-explore
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/folder_explore.png');
+}
+
+.folder-feed
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/folder_feed.png');
+}
+
+.folder-find
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/folder_find.png');
+}
+
+.folder-go
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/folder_go.png');
+}
+
+.folder-heart
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/folder_heart.png');
+}
+
+.folder-image
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/folder_image.png');
+}
+
+.folder-key
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/folder_key.png');
+}
+
+.folder-lightbulb
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/folder_lightbulb.png');
+}
+
+.folder-link
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/folder_link.png');
+}
+
+.folder-magnify
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/folder_magnify.png');
+}
+
+.folder-page
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/folder_page.png');
+}
+
+.folder-page-white
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/folder_page_white.png');
+}
+
+.folder-palette
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/folder_palette.png');
+}
+
+.folder-picture
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/folder_picture.png');
+}
+
+.folder-star
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/folder_star.png');
+}
+
+.folder-table
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/folder_table.png');
+}
+
+.folder-user
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/folder_user.png');
+}
+
+.folder-wrench
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/folder_wrench.png');
+}
+
+.font
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/font.png');
+}
+
+.font-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/font_add.png');
+}
+
+.font-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/font_delete.png');
+}
+
+.font-go
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/font_go.png');
+}
+
+.group
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/group.png');
+}
+
+.group-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/group_add.png');
+}
+
+.group-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/group_delete.png');
+}
+
+.group-edit
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/group_edit.png');
+}
+
+.group-error
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/group_error.png');
+}
+
+.group-gear
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/group_gear.png');
+}
+
+.group-go
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/group_go.png');
+}
+
+.group-key
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/group_key.png');
+}
+
+.group-link
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/group_link.png');
+}
+
+.heart
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/heart.png');
+}
+
+.heart-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/heart_add.png');
+}
+
+.heart-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/heart_delete.png');
+}
+
+.help
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/help.png');
+}
+
+.hourglass
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/hourglass.png');
+}
+
+.hourglass-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/hourglass_add.png');
+}
+
+.hourglass-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/hourglass_delete.png');
+}
+
+.hourglass-go
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/hourglass_go.png');
+}
+
+.hourglass-link
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/hourglass_link.png');
+}
+
+.house
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/house.png');
+}
+
+.house-go
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/house_go.png');
+}
+
+.house-link
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/house_link.png');
+}
+
+.html
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/html.png');
+}
+
+.html-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/html_add.png');
+}
+
+.html-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/html_delete.png');
+}
+
+.html-go
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/html_go.png');
+}
+
+.html-valid
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/html_valid.png');
+}
+
+.image
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/image.png');
+}
+
+.image-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/image_add.png');
+}
+
+.image-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/image_delete.png');
+}
+
+.image-edit
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/image_edit.png');
+}
+
+.image-link
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/image_link.png');
+}
+
+.images
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/images.png');
+}
+
+.information
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/information.png');
+}
+
+.ipod
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/ipod.png');
+}
+
+.ipod-cast
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/ipod_cast.png');
+}
+
+.ipod-cast-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/ipod_cast_add.png');
+}
+
+.ipod-cast-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/ipod_cast_delete.png');
+}
+
+.ipod-sound
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/ipod_sound.png');
+}
+
+.joystick
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/joystick.png');
+}
+
+.joystick-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/joystick_add.png');
+}
+
+.joystick-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/joystick_delete.png');
+}
+
+.joystick-error
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/joystick_error.png');
+}
+
+.key
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/key.png');
+}
+
+.key-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/key_add.png');
+}
+
+.key-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/key_delete.png');
+}
+
+.key-go
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/key_go.png');
+}
+
+.keyboard
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/keyboard.png');
+}
+
+.keyboard-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/keyboard_add.png');
+}
+
+.keyboard-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/keyboard_delete.png');
+}
+
+.keyboard-magnify
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/keyboard_magnify.png');
+}
+
+.layers
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/layers.png');
+}
+
+.layout
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/layout.png');
+}
+
+.layout-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/layout_add.png');
+}
+
+.layout-content
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/layout_content.png');
+}
+
+.layout-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/layout_delete.png');
+}
+
+.layout-edit
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/layout_edit.png');
+}
+
+.layout-error
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/layout_error.png');
+}
+
+.layout-header
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/layout_header.png');
+}
+
+.layout-link
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/layout_link.png');
+}
+
+.layout-sidebar
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/layout_sidebar.png');
+}
+
+.lightbulb
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/lightbulb.png');
+}
+
+.lightbulb-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/lightbulb_add.png');
+}
+
+.lightbulb-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/lightbulb_delete.png');
+}
+
+.lightbulb-off
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/lightbulb_off.png');
+}
+
+.lightning
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/lightning.png');
+}
+
+.lightning-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/lightning_add.png');
+}
+
+.lightning-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/lightning_delete.png');
+}
+
+.lightning-go
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/lightning_go.png');
+}
+
+.link
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/link.png');
+}
+
+.link-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/link_add.png');
+}
+
+.link-break
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/link_break.png');
+}
+
+.link-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/link_delete.png');
+}
+
+.link-edit
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/link_edit.png');
+}
+
+.link-error
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/link_error.png');
+}
+
+.link-go
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/link_go.png');
+}
+
+.lock
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/lock.png');
+}
+
+.lock-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/lock_add.png');
+}
+
+.lock-break
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/lock_break.png');
+}
+
+.lock-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/lock_delete.png');
+}
+
+.lock-edit
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/lock_edit.png');
+}
+
+.lock-go
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/lock_go.png');
+}
+
+.lock-open
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/lock_open.png');
+}
+
+.lorry
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/lorry.png');
+}
+
+.lorry-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/lorry_add.png');
+}
+
+.lorry-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/lorry_delete.png');
+}
+
+.lorry-error
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/lorry_error.png');
+}
+
+.lorry-flatbed
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/lorry_flatbed.png');
+}
+
+.lorry-go
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/lorry_go.png');
+}
+
+.lorry-link
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/lorry_link.png');
+}
+
+.magifier-zoom-out
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/magifier_zoom_out.png');
+}
+
+.magnifier
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/magnifier.png');
+}
+
+.magnifier-zoom-in
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/magnifier_zoom_in.png');
+}
+
+.male
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/male.png');
+}
+
+.map
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/map.png');
+}
+
+.map-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/map_add.png');
+}
+
+.map-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/map_delete.png');
+}
+
+.map-edit
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/map_edit.png');
+}
+
+.map-go
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/map_go.png');
+}
+
+.map-magnify
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/map_magnify.png');
+}
+
+.medal-bronze-1
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/medal_bronze_1.png');
+}
+
+.medal-bronze-2
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/medal_bronze_2.png');
+}
+
+.medal-bronze-3
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/medal_bronze_3.png');
+}
+
+.medal-bronze-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/medal_bronze_add.png');
+}
+
+.medal-bronze-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/medal_bronze_delete.png');
+}
+
+.medal-gold-1
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/medal_gold_1.png');
+}
+
+.medal-gold-2
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/medal_gold_2.png');
+}
+
+.medal-gold-3
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/medal_gold_3.png');
+}
+
+.medal-gold-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/medal_gold_add.png');
+}
+
+.medal-gold-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/medal_gold_delete.png');
+}
+
+.medal-silver-1
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/medal_silver_1.png');
+}
+
+.medal-silver-2
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/medal_silver_2.png');
+}
+
+.medal-silver-3
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/medal_silver_3.png');
+}
+
+.medal-silver-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/medal_silver_add.png');
+}
+
+.medal-silver-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/medal_silver_delete.png');
+}
+
+.money
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/money.png');
+}
+
+.money-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/money_add.png');
+}
+
+.money-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/money_delete.png');
+}
+
+.money-dollar
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/money_dollar.png');
+}
+
+.money-euro
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/money_euro.png');
+}
+
+.money-pound
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/money_pound.png');
+}
+
+.money-yen
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/money_yen.png');
+}
+
+.monitor
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/monitor.png');
+}
+
+.monitor-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/monitor_add.png');
+}
+
+.monitor-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/monitor_delete.png');
+}
+
+.monitor-edit
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/monitor_edit.png');
+}
+
+.monitor-error
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/monitor_error.png');
+}
+
+.monitor-go
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/monitor_go.png');
+}
+
+.monitor-lightning
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/monitor_lightning.png');
+}
+
+.monitor-link
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/monitor_link.png');
+}
+
+.mouse
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/mouse.png');
+}
+
+.mouse-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/mouse_add.png');
+}
+
+.mouse-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/mouse_delete.png');
+}
+
+.mouse-error
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/mouse_error.png');
+}
+
+.music
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/music.png');
+}
+
+.new
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/new.png');
+}
+
+.newspaper
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/newspaper.png');
+}
+
+.newspaper-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/newspaper_add.png');
+}
+
+.newspaper-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/newspaper_delete.png');
+}
+
+.newspaper-go
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/newspaper_go.png');
+}
+
+.newspaper-link
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/newspaper_link.png');
+}
+
+.note
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/note.png');
+}
+
+.note-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/note_add.png');
+}
+
+.note-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/note_delete.png');
+}
+
+.note-edit
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/note_edit.png');
+}
+
+.note-error
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/note_error.png');
+}
+
+.note-go
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/note_go.png');
+}
+
+.overlays
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/overlays.png');
+}
+
+.package
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/package.png');
+}
+
+.package-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/package_add.png');
+}
+
+.package-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/package_delete.png');
+}
+
+.package-go
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/package_go.png');
+}
+
+.package-green
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/package_green.png');
+}
+
+.package-link
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/package_link.png');
+}
+
+.page
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page.png');
+}
+
+.page-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_add.png');
+}
+
+.page-attach
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_attach.png');
+}
+
+.page-code
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_code.png');
+}
+
+.page-copy
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_copy.png');
+}
+
+.page-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_delete.png');
+}
+
+.page-edit
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_edit.png');
+}
+
+.page-error
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_error.png');
+}
+
+.page-excel
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_excel.png');
+}
+
+.page-find
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_find.png');
+}
+
+.page-gear
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_gear.png');
+}
+
+.page-go
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_go.png');
+}
+
+.page-green
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_green.png');
+}
+
+.page-key
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_key.png');
+}
+
+.page-lightning
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_lightning.png');
+}
+
+.page-link
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_link.png');
+}
+
+.page-paintbrush
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_paintbrush.png');
+}
+
+.page-paste
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_paste.png');
+}
+
+.page-red
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_red.png');
+}
+
+.page-refresh
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_refresh.png');
+}
+
+.page-save
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_save.png');
+}
+
+.page-white
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_white.png');
+}
+
+.page-white-acrobat
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_white_acrobat.png');
+}
+
+.page-white-actionscript
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_white_actionscript.png');
+}
+
+.page-white-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_white_add.png');
+}
+
+.page-white-c
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_white_c.png');
+}
+
+.page-white-camera
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_white_camera.png');
+}
+
+.page-white-cd
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_white_cd.png');
+}
+
+.page-white-code
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_white_code.png');
+}
+
+.page-white-code-red
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_white_code_red.png');
+}
+
+.page-white-coldfusion
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_white_coldfusion.png');
+}
+
+.page-white-compressed
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_white_compressed.png');
+}
+
+.page-white-copy
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_white_copy.png');
+}
+
+.page-white-cplusplus
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_white_cplusplus.png');
+}
+
+.page-white-csharp
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_white_csharp.png');
+}
+
+.page-white-cup
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_white_cup.png');
+}
+
+.page-white-database
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_white_database.png');
+}
+
+.page-white-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_white_delete.png');
+}
+
+.page-white-dvd
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_white_dvd.png');
+}
+
+.page-white-edit
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_white_edit.png');
+}
+
+.page-white-error
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_white_error.png');
+}
+
+.page-white-excel
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_white_excel.png');
+}
+
+.page-white-find
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_white_find.png');
+}
+
+.page-white-flash
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_white_flash.png');
+}
+
+.page-white-freehand
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_white_freehand.png');
+}
+
+.page-white-gear
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_white_gear.png');
+}
+
+.page-white-get
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_white_get.png');
+}
+
+.page-white-go
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_white_go.png');
+}
+
+.page-white-h
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_white_h.png');
+}
+
+.page-white-horizontal
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_white_horizontal.png');
+}
+
+.page-white-key
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_white_key.png');
+}
+
+.page-white-lightning
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_white_lightning.png');
+}
+
+.page-white-link
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_white_link.png');
+}
+
+.page-white-magnify
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_white_magnify.png');
+}
+
+.page-white-medal
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_white_medal.png');
+}
+
+.page-white-office
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_white_office.png');
+}
+
+.page-white-paint
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_white_paint.png');
+}
+
+.page-white-paintbrush
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_white_paintbrush.png');
+}
+
+.page-white-paste
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_white_paste.png');
+}
+
+.page-white-php
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_white_php.png');
+}
+
+.page-white-picture
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_white_picture.png');
+}
+
+.page-white-powerpoint
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_white_powerpoint.png');
+}
+
+.page-white-put
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_white_put.png');
+}
+
+.page-white-ruby
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_white_ruby.png');
+}
+
+.page-white-stack
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_white_stack.png');
+}
+
+.page-white-star
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_white_star.png');
+}
+
+.page-white-swoosh
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_white_swoosh.png');
+}
+
+.page-white-text
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_white_text.png');
+}
+
+.page-white-text-width
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_white_text_width.png');
+}
+
+.page-white-tux
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_white_tux.png');
+}
+
+.page-white-vector
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_white_vector.png');
+}
+
+.page-white-visualstudio
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_white_visualstudio.png');
+}
+
+.page-white-width
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_white_width.png');
+}
+
+.page-white-word
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_white_word.png');
+}
+
+.page-white-world
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_white_world.png');
+}
+
+.page-white-wrench
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_white_wrench.png');
+}
+
+.page-white-zip
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_white_zip.png');
+}
+
+.page-word
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_word.png');
+}
+
+.page-world
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/page_world.png');
+}
+
+.paintbrush
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/paintbrush.png');
+}
+
+.paintcan
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/paintcan.png');
+}
+
+.palette
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/palette.png');
+}
+
+.paste-plain
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/paste_plain.png');
+}
+
+.paste-word
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/paste_word.png');
+}
+
+.pencil
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/pencil.png');
+}
+
+.pencil-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/pencil_add.png');
+}
+
+.pencil-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/pencil_delete.png');
+}
+
+.pencil-go
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/pencil_go.png');
+}
+
+.phone
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/phone.png');
+}
+
+.phone-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/phone_add.png');
+}
+
+.phone-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/phone_delete.png');
+}
+
+.phone-sound
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/phone_sound.png');
+}
+
+.photo
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/photo.png');
+}
+
+.photo-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/photo_add.png');
+}
+
+.photo-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/photo_delete.png');
+}
+
+.photo-link
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/photo_link.png');
+}
+
+.photos
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/photos.png');
+}
+
+.picture
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/picture.png');
+}
+
+.picture-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/picture_add.png');
+}
+
+.picture-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/picture_delete.png');
+}
+
+.picture-edit
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/picture_edit.png');
+}
+
+.picture-empty
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/picture_empty.png');
+}
+
+.picture-error
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/picture_error.png');
+}
+
+.picture-go
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/picture_go.png');
+}
+
+.picture-key
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/picture_key.png');
+}
+
+.picture-link
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/picture_link.png');
+}
+
+.picture-save
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/picture_save.png');
+}
+
+.pictures
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/pictures.png');
+}
+
+.pilcrow
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/pilcrow.png');
+}
+
+.pill
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/pill.png');
+}
+
+.pill-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/pill_add.png');
+}
+
+.pill-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/pill_delete.png');
+}
+
+.pill-go
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/pill_go.png');
+}
+
+.plugin
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/plugin.png');
+}
+
+.plugin-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/plugin_add.png');
+}
+
+.plugin-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/plugin_delete.png');
+}
+
+.plugin-disabled
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/plugin_disabled.png');
+}
+
+.plugin-edit
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/plugin_edit.png');
+}
+
+.plugin-error
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/plugin_error.png');
+}
+
+.plugin-go
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/plugin_go.png');
+}
+
+.plugin-link
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/plugin_link.png');
+}
+
+.printer
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/printer.png');
+}
+
+.printer-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/printer_add.png');
+}
+
+.printer-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/printer_delete.png');
+}
+
+.printer-empty
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/printer_empty.png');
+}
+
+.printer-error
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/printer_error.png');
+}
+
+.rainbow
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/rainbow.png');
+}
+
+.report
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/report.png');
+}
+
+.report-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/report_add.png');
+}
+
+.report-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/report_delete.png');
+}
+
+.report-disk
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/report_disk.png');
+}
+
+.report-edit
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/report_edit.png');
+}
+
+.report-go
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/report_go.png');
+}
+
+.report-key
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/report_key.png');
+}
+
+.report-link
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/report_link.png');
+}
+
+.report-magnify
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/report_magnify.png');
+}
+
+.report-picture
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/report_picture.png');
+}
+
+.report-user
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/report_user.png');
+}
+
+.report-word
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/report_word.png');
+}
+
+.resultset-first
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/resultset_first.png');
+}
+
+.resultset-last
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/resultset_last.png');
+}
+
+.resultset-next
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/resultset_next.png');
+}
+
+.resultset-previous
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/resultset_previous.png');
+}
+
+.rosette
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/rosette.png');
+}
+
+.rss
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/rss.png');
+}
+
+.rss-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/rss_add.png');
+}
+
+.rss-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/rss_delete.png');
+}
+
+.rss-go
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/rss_go.png');
+}
+
+.rss-valid
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/rss_valid.png');
+}
+
+.ruby
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/ruby.png');
+}
+
+.ruby-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/ruby_add.png');
+}
+
+.ruby-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/ruby_delete.png');
+}
+
+.ruby-gear
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/ruby_gear.png');
+}
+
+.ruby-get
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/ruby_get.png');
+}
+
+.ruby-go
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/ruby_go.png');
+}
+
+.ruby-key
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/ruby_key.png');
+}
+
+.ruby-link
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/ruby_link.png');
+}
+
+.ruby-put
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/ruby_put.png');
+}
+
+.script
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/script.png');
+}
+
+.script-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/script_add.png');
+}
+
+.script-code
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/script_code.png');
+}
+
+.script-code-red
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/script_code_red.png');
+}
+
+.script-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/script_delete.png');
+}
+
+.script-edit
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/script_edit.png');
+}
+
+.script-error
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/script_error.png');
+}
+
+.script-gear
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/script_gear.png');
+}
+
+.script-go
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/script_go.png');
+}
+
+.script-key
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/script_key.png');
+}
+
+.script-lightning
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/script_lightning.png');
+}
+
+.script-link
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/script_link.png');
+}
+
+.script-palette
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/script_palette.png');
+}
+
+.script-save
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/script_save.png');
+}
+
+.server
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/server.png');
+}
+
+.server-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/server_add.png');
+}
+
+.server-chart
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/server_chart.png');
+}
+
+.server-compressed
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/server_compressed.png');
+}
+
+.server-connect
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/server_connect.png');
+}
+
+.server-database
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/server_database.png');
+}
+
+.server-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/server_delete.png');
+}
+
+.server-edit
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/server_edit.png');
+}
+
+.server-error
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/server_error.png');
+}
+
+.server-go
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/server_go.png');
+}
+
+.server-key
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/server_key.png');
+}
+
+.server-lightning
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/server_lightning.png');
+}
+
+.server-link
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/server_link.png');
+}
+
+.server-uncompressed
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/server_uncompressed.png');
+}
+
+.shading
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/shading.png');
+}
+
+.shape-align-bottom
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/shape_align_bottom.png');
+}
+
+.shape-align-center
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/shape_align_center.png');
+}
+
+.shape-align-left
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/shape_align_left.png');
+}
+
+.shape-align-middle
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/shape_align_middle.png');
+}
+
+.shape-align-right
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/shape_align_right.png');
+}
+
+.shape-align-top
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/shape_align_top.png');
+}
+
+.shape-flip-horizontal
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/shape_flip_horizontal.png');
+}
+
+.shape-flip-vertical
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/shape_flip_vertical.png');
+}
+
+.shape-group
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/shape_group.png');
+}
+
+.shape-handles
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/shape_handles.png');
+}
+
+.shape-move-back
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/shape_move_back.png');
+}
+
+.shape-move-backwards
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/shape_move_backwards.png');
+}
+
+.shape-move-forwards
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/shape_move_forwards.png');
+}
+
+.shape-move-front
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/shape_move_front.png');
+}
+
+.shape-rotate-anticlockwise
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/shape_rotate_anticlockwise.png');
+}
+
+.shape-rotate-clockwise
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/shape_rotate_clockwise.png');
+}
+
+.shape-square
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/shape_square.png');
+}
+
+.shape-square-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/shape_square_add.png');
+}
+
+.shape-square-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/shape_square_delete.png');
+}
+
+.shape-square-edit
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/shape_square_edit.png');
+}
+
+.shape-square-error
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/shape_square_error.png');
+}
+
+.shape-square-go
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/shape_square_go.png');
+}
+
+.shape-square-key
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/shape_square_key.png');
+}
+
+.shape-square-link
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/shape_square_link.png');
+}
+
+.shape-ungroup
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/shape_ungroup.png');
+}
+
+.shield
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/shield.png');
+}
+
+.shield-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/shield_add.png');
+}
+
+.shield-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/shield_delete.png');
+}
+
+.shield-go
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/shield_go.png');
+}
+
+.sitemap
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/sitemap.png');
+}
+
+.sitemap-color
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/sitemap_color.png');
+}
+
+.sound
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/sound.png');
+}
+
+.sound-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/sound_add.png');
+}
+
+.sound-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/sound_delete.png');
+}
+
+.sound-low
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/sound_low.png');
+}
+
+.sound-mute
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/sound_mute.png');
+}
+
+.sound-none
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/sound_none.png');
+}
+
+.spellcheck
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/spellcheck.png');
+}
+
+.sport-8ball
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/sport_8ball.png');
+}
+
+.sport-basketball
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/sport_basketball.png');
+}
+
+.sport-football
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/sport_football.png');
+}
+
+.sport-golf
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/sport_golf.png');
+}
+
+.sport-raquet
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/sport_raquet.png');
+}
+
+.sport-shuttlecock
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/sport_shuttlecock.png');
+}
+
+.sport-soccer
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/sport_soccer.png');
+}
+
+.sport-tennis
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/sport_tennis.png');
+}
+
+.star
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/star.png');
+}
+
+.status-away
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/status_away.png');
+}
+
+.status-busy
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/status_busy.png');
+}
+
+.status-offline
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/status_offline.png');
+}
+
+.status-online
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/status_online.png');
+}
+
+.stop
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/stop.png');
+}
+
+.style
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/style.png');
+}
+
+.style-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/style_add.png');
+}
+
+.style-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/style_delete.png');
+}
+
+.style-edit
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/style_edit.png');
+}
+
+.style-go
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/style_go.png');
+}
+
+.sum
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/sum.png');
+}
+
+.tab
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/tab.png');
+}
+
+.tab-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/tab_add.png');
+}
+
+.tab-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/tab_delete.png');
+}
+
+.tab-edit
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/tab_edit.png');
+}
+
+.tab-go
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/tab_go.png');
+}
+
+.table
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/table.png');
+}
+
+.table-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/table_add.png');
+}
+
+.table-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/table_delete.png');
+}
+
+.table-edit
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/table_edit.png');
+}
+
+.table-error
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/table_error.png');
+}
+
+.table-gear
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/table_gear.png');
+}
+
+.table-go
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/table_go.png');
+}
+
+.table-key
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/table_key.png');
+}
+
+.table-lightning
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/table_lightning.png');
+}
+
+.table-link
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/table_link.png');
+}
+
+.table-multiple
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/table_multiple.png');
+}
+
+.table-refresh
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/table_refresh.png');
+}
+
+.table-relationship
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/table_relationship.png');
+}
+
+.table-row-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/table_row_delete.png');
+}
+
+.table-row-insert
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/table_row_insert.png');
+}
+
+.table-save
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/table_save.png');
+}
+
+.table-sort
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/table_sort.png');
+}
+
+.tag
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/tag.png');
+}
+
+.tag-blue
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/tag_blue.png');
+}
+
+.tag-blue-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/tag_blue_add.png');
+}
+
+.tag-blue-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/tag_blue_delete.png');
+}
+
+.tag-blue-edit
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/tag_blue_edit.png');
+}
+
+.tag-green
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/tag_green.png');
+}
+
+.tag-orange
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/tag_orange.png');
+}
+
+.tag-pink
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/tag_pink.png');
+}
+
+.tag-purple
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/tag_purple.png');
+}
+
+.tag-red
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/tag_red.png');
+}
+
+.tag-yellow
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/tag_yellow.png');
+}
+
+.telephone
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/telephone.png');
+}
+
+.telephone-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/telephone_add.png');
+}
+
+.telephone-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/telephone_delete.png');
+}
+
+.telephone-edit
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/telephone_edit.png');
+}
+
+.telephone-error
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/telephone_error.png');
+}
+
+.telephone-go
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/telephone_go.png');
+}
+
+.telephone-key
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/telephone_key.png');
+}
+
+.telephone-link
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/telephone_link.png');
+}
+
+.television
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/television.png');
+}
+
+.television-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/television_add.png');
+}
+
+.television-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/television_delete.png');
+}
+
+.text-align-center
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/text_align_center.png');
+}
+
+.text-align-justify
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/text_align_justify.png');
+}
+
+.text-align-left
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/text_align_left.png');
+}
+
+.text-align-right
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/text_align_right.png');
+}
+
+.text-allcaps
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/text_allcaps.png');
+}
+
+.text-bold
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/text_bold.png');
+}
+
+.text-columns
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/text_columns.png');
+}
+
+.text-dropcaps
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/text_dropcaps.png');
+}
+
+.text-heading-1
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/text_heading_1.png');
+}
+
+.text-heading-2
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/text_heading_2.png');
+}
+
+.text-heading-3
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/text_heading_3.png');
+}
+
+.text-heading-4
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/text_heading_4.png');
+}
+
+.text-heading-5
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/text_heading_5.png');
+}
+
+.text-heading-6
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/text_heading_6.png');
+}
+
+.text-horizontalrule
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/text_horizontalrule.png');
+}
+
+.text-indent
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/text_indent.png');
+}
+
+.text-indent-remove
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/text_indent_remove.png');
+}
+
+.text-italic
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/text_italic.png');
+}
+
+.text-kerning
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/text_kerning.png');
+}
+
+.text-letter-omega
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/text_letter_omega.png');
+}
+
+.text-letterspacing
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/text_letterspacing.png');
+}
+
+.text-linespacing
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/text_linespacing.png');
+}
+
+.text-list-bullets
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/text_list_bullets.png');
+}
+
+.text-list-numbers
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/text_list_numbers.png');
+}
+
+.text-lowercase
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/text_lowercase.png');
+}
+
+.text-padding-bottom
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/text_padding_bottom.png');
+}
+
+.text-padding-left
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/text_padding_left.png');
+}
+
+.text-padding-right
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/text_padding_right.png');
+}
+
+.text-padding-top
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/text_padding_top.png');
+}
+
+.text-replace
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/text_replace.png');
+}
+
+.text-signature
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/text_signature.png');
+}
+
+.text-smallcaps
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/text_smallcaps.png');
+}
+
+.text-strikethrough
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/text_strikethrough.png');
+}
+
+.text-subscript
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/text_subscript.png');
+}
+
+.text-superscript
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/text_superscript.png');
+}
+
+.text-underline
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/text_underline.png');
+}
+
+.text-uppercase
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/text_uppercase.png');
+}
+
+.textfield
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/textfield.png');
+}
+
+.textfield-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/textfield_add.png');
+}
+
+.textfield-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/textfield_delete.png');
+}
+
+.textfield-key
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/textfield_key.png');
+}
+
+.textfield-rename
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/textfield_rename.png');
+}
+
+.thumb-down
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/thumb_down.png');
+}
+
+.thumb-up
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/thumb_up.png');
+}
+
+.tick
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/tick.png');
+}
+
+.time
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/time.png');
+}
+
+.time-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/time_add.png');
+}
+
+.time-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/time_delete.png');
+}
+
+.time-go
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/time_go.png');
+}
+
+.timeline-marker
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/timeline_marker.png');
+}
+
+.transmit
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/transmit.png');
+}
+
+.transmit-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/transmit_add.png');
+}
+
+.transmit-blue
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/transmit_blue.png');
+}
+
+.transmit-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/transmit_delete.png');
+}
+
+.transmit-edit
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/transmit_edit.png');
+}
+
+.transmit-error
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/transmit_error.png');
+}
+
+.transmit-go
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/transmit_go.png');
+}
+
+.tux
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/tux.png');
+}
+
+.user
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/user.png');
+}
+
+.user-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/user_add.png');
+}
+
+.user-comment
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/user_comment.png');
+}
+
+.user-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/user_delete.png');
+}
+
+.user-edit
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/user_edit.png');
+}
+
+.user-female
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/user_female.png');
+}
+
+.user-go
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/user_go.png');
+}
+
+.user-gray
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/user_gray.png');
+}
+
+.user-green
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/user_green.png');
+}
+
+.user-orange
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/user_orange.png');
+}
+
+.user-red
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/user_red.png');
+}
+
+.user-suit
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/user_suit.png');
+}
+
+.vcard
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/vcard.png');
+}
+
+.vcard-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/vcard_add.png');
+}
+
+.vcard-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/vcard_delete.png');
+}
+
+.vcard-edit
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/vcard_edit.png');
+}
+
+.vector
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/vector.png');
+}
+
+.vector-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/vector_add.png');
+}
+
+.vector-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/vector_delete.png');
+}
+
+.wand
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/wand.png');
+}
+
+.weather-clouds
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/weather_clouds.png');
+}
+
+.weather-cloudy
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/weather_cloudy.png');
+}
+
+.weather-lightning
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/weather_lightning.png');
+}
+
+.weather-rain
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/weather_rain.png');
+}
+
+.weather-snow
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/weather_snow.png');
+}
+
+.weather-sun
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/weather_sun.png');
+}
+
+.webcam
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/webcam.png');
+}
+
+.webcam-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/webcam_add.png');
+}
+
+.webcam-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/webcam_delete.png');
+}
+
+.webcam-error
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/webcam_error.png');
+}
+
+.world
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/world.png');
+}
+
+.world-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/world_add.png');
+}
+
+.world-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/world_delete.png');
+}
+
+.world-edit
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/world_edit.png');
+}
+
+.world-go
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/world_go.png');
+}
+
+.world-link
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/world_link.png');
+}
+
+.wrench
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/wrench.png');
+}
+
+.wrench-orange
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/wrench_orange.png');
+}
+
+.xhtml
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/xhtml.png');
+}
+
+.xhtml-add
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/xhtml_add.png');
+}
+
+.xhtml-delete
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/xhtml_delete.png');
+}
+
+.xhtml-go
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/xhtml_go.png');
+}
+
+.xhtml-valid
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/xhtml_valid.png');
+}
+
+.zoom
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/zoom.png');
+}
+
+.zoom-in
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/zoom_in.png');
+}
+
+.zoom-out
+{
+	/* css-ref: fam; */
+	background-repeat: no-repeat;
+	background-position: left top;
+	width: 16px; height: 16px;
+	background-image: url('../sprites/zoom_out.png');
+}

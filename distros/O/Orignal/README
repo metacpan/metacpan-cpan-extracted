@@ -1,0 +1,48 @@
+NAME
+    Orignal - Simple OO/Attribues for perl >5.6
+
+VERSION
+    version 0.04
+
+INSTALLATION
+
+Nothing special need just follow the below.
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Orignal
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Orignal
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Orignal
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Orignal
+
+    Search CPAN
+        http://search.cpan.org/dist/Orignal/
+
+TODO:
+
+Well not much it is about as complete as it will ever get.
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2011 John Scoles
+
+This program is released under the following license: open_source
+

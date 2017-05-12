@@ -1,0 +1,11 @@
+Changes for Perl extension ORLite-Statistics
+
+0.03 Thu  1 Oct 2009
+	- Updating to Module::Install::DSL 0.91
+	- Another trivial bug
+
+0.02 Sun 16 Aug 2009
+	- Fixed a trivial bug
+
+0.01 Sun 16 Aug 2009
+	- Creating initial (trivial) implementation

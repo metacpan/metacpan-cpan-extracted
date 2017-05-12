@@ -1,0 +1,16 @@
+#
+#  Revision history for Perl extension Crypt::Camellia.
+#
+# $Id: Changes,v 0.2 2007/04/07 01:57:59 dankogai Exp dankogai $
+#
+$Revision: 0.2 $ $Date: 2007/04/07 01:57:59 $
+! lib/Object/Prototype.pm
+  POD fixes
+! Makefile.PL
+  #22741: minimal version
+  http://rt.cpan.org/NoAuth/Bug.html?id=#22741
+
+0.01  Sun Oct 22 20:49:41 2006
+	- original version; created by h2xs 1.23 with options
+		-XA -n Object::Prototype
+

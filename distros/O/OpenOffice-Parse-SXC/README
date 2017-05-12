@@ -1,0 +1,35 @@
+OpenOffice/Parse/SXC version 0.02
+=================================
+
+A library allowing you to extract data from SXC (the OpenOffice spreadsheet)
+files.
+
+It also comes with the utility 'sxc2csv', which converts SXC files into CSV
+format.  
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Module XML::Parser
+
+Command line program: unzip
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Desmond Lee.  All rights reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<SITE ID="Yahoo.Asia">
+
+<NAME Lang="en-us">Yahoo WWW Search</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+Yahoo in Asia全球搜尋(中英文)
+]]></NAME>
+<INFO Lang="en-us">general information web search in Asia</INFO>
+<INFO Lang="zh-tw">general information web search in Asia</INFO>
+
+<URL Type="More"><![CDATA[
+http://search.yahoo.com.sg_MORE_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://search.yahoo.com.sg/search/sg?p=_QUERY_&R=Regional%02Countries%02Indonesia%02Islands%02Java%02Cities%02Bogor%02Internet+Services%02Asia+meta+category&n=_HITS_
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_MORE_"><![CDATA[
+<a href="_MORE_">Next
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<LI><A HREF="_URL_">_TITLE_</A>_PREVIEW__EOR_
+]]></TEMPLATE>
+</SITE>

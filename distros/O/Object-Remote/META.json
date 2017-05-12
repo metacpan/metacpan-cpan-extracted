@@ -1,0 +1,51 @@
+{
+   "abstract" : "Call methods on objects in other processes or on other hosts",
+   "author" : [
+      "mst - Matt S. Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.2, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Object-Remote",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::C3" : "0",
+            "Future" : "0.29",
+            "JSON::PP" : "0",
+            "Log::Contextual" : "0.005",
+            "MRO::Compat" : "0",
+            "Module::Runtime" : "0",
+            "Moo" : "1.006",
+            "String::ShellQuote" : "0",
+            "perl" : "5.006",
+            "strictures" : "2"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.004000",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

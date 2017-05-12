@@ -1,0 +1,11 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Apache/OpenIndex.dic
+OpenIndex.pm
+OpenIndex.xs
+OpenIndex/MD5.pm
+OpenIndex/Always.pm
+t/icon.t
+t/test.t

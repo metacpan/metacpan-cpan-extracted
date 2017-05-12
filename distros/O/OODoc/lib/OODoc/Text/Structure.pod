@@ -1,0 +1,328 @@
+=encoding utf8
+
+=head1 NAME
+
+OODoc::Text::Structure - set of paragraphs with examples and subroutines
+
+=head1 INHERITANCE
+
+ OODoc::Text::Structure
+   is a OODoc::Text
+   is a OODoc::Object
+
+ OODoc::Text::Structure is extended by
+   OODoc::Text::Chapter
+   OODoc::Text::Section
+   OODoc::Text::SubSection
+   OODoc::Text::SubSubSection
+
+=head1 SYNOPSIS
+
+ # Cannot be instantiated itself
+
+=head1 DESCRIPTION
+
+The OODoc::Text::Structure class is used as base class for
+the L<OODoc::Text::Chapter|OODoc::Text::Chapter>, L<OODoc::Text::Section|OODoc::Text::Section>, and
+L<OODoc::Text::SubSection|OODoc::Text::SubSection> classes.  Each of these classes group some
+paragraphs of text, probably some examples and some subroutines: they
+provide a structure to the document.
+
+Extends L<"DESCRIPTION" in OODoc::Text|OODoc::Text/"DESCRIPTION">.
+ 
+=head1 OVERLOADED
+
+Extends L<"OVERLOADED" in OODoc::Text|OODoc::Text/"OVERLOADED">.
+ 
+=over 4
+
+=item overload: B<'""' <$stringification>>
+
+Inherited, see L<OODoc::Text/"OVERLOADED">
+
+=item overload: B<'==' $and '!='>
+
+Inherited, see L<OODoc::Text/"OVERLOADED">
+
+=item overload: B<'cmp' <$string $comparison>>
+
+Inherited, see L<OODoc::Text/"OVERLOADED">
+
+=back
+
+=head1 METHODS
+
+Extends L<"METHODS" in OODoc::Text|OODoc::Text/"METHODS">.
+ 
+=head2 Constructors
+
+Extends L<"Constructors" in OODoc::Text|OODoc::Text/"Constructors">.
+ 
+=over 4
+
+=item $obj-E<gt>B<emptyExtension>($container)
+
+Create an I<empty> copy of a structured text element, which is used
+at a higher level of inheritance to collect related subroutines and
+such.
+
+=item OODoc::Text::Structure-E<gt>B<new>(%options)
+
+ -Option     --Defined in     --Default
+  container    OODoc::Text      <required>
+  description  OODoc::Text      ''
+  level                         <required>
+  linenr       OODoc::Text      <required>
+  name         OODoc::Text      undef
+  type         OODoc::Text      <required>
+
+=over 2
+
+=item container => OBJECT
+
+=item description => STRING
+
+=item level => INTEGER
+
+Header level of the text structure.  A chapter will be 1, section 2, and
+subsection 3.
+
+=item linenr => INTEGER
+
+=item name => STRING
+
+=item type => STRING
+
+=back
+
+=back
+
+=head2 Inheritance knowledge
+
+Extends L<"Inheritance knowledge" in OODoc::Text|OODoc::Text/"Inheritance knowledge">.
+ 
+=over 4
+
+=item $obj-E<gt>B<extends>( [$object] )
+
+Inherited, see L<OODoc::Object/"Inheritance knowledge">
+
+=back
+
+=head2 Attributes
+
+Extends L<"Attributes" in OODoc::Text|OODoc::Text/"Attributes">.
+ 
+=over 4
+
+=item $obj-E<gt>B<container>( [$object] )
+
+Inherited, see L<OODoc::Text/"Attributes">
+
+=item $obj-E<gt>B<description>()
+
+Inherited, see L<OODoc::Text/"Attributes">
+
+=item $obj-E<gt>B<level>()
+
+Returns the level of the text structure.  Like in pod and html, a chapter
+will be 1, section 2, and subsection 3.
+
+=item $obj-E<gt>B<name>()
+
+Inherited, see L<OODoc::Text/"Attributes">
+
+=item $obj-E<gt>B<niceName>()
+
+Returns the name of this chapter, section or sub-section beautified to
+normal caps.  If the name does not contain lower-case characters, then
+the whole string is lower-cased, and then the first upper-cased.
+
+=item $obj-E<gt>B<type>()
+
+Inherited, see L<OODoc::Text/"Attributes">
+
+=back
+
+=head2 Location
+
+Extends L<"Location" in OODoc::Text|OODoc::Text/"Location">.
+ 
+=over 4
+
+=item $obj-E<gt>B<findEntry>($name)
+
+Find the chapter, section or subsection with this $name.  The object found
+is returned.
+
+=item $obj-E<gt>B<manual>( [$name] )
+
+Inherited, see L<OODoc::Text/"Location">
+
+=item $obj-E<gt>B<path>()
+
+Represent the location of this chapter, section, or subsection as
+one string, separated by slashes.
+
+example: 
+
+ print $subsect->path; 
+    # may print:  METHODS/Container/Search
+
+=item $obj-E<gt>B<unique>()
+
+Inherited, see L<OODoc::Text/"Location">
+
+=item $obj-E<gt>B<where>()
+
+Inherited, see L<OODoc::Text/"Location">
+
+=back
+
+=head2 Collected
+
+Extends L<"Collected" in OODoc::Text|OODoc::Text/"Collected">.
+ 
+=over 4
+
+=item $obj-E<gt>B<all>($method, $parameters)
+
+Call the $method recursively on this object and all its sub-structures.
+For instance, when C<all> is called on a chapter, it first will call
+the $method on that chapter, than on all its sections and subsections.
+The $parameters are passed with each call.  The results of all calls is
+returned as list.
+
+=item $obj-E<gt>B<example>($object)
+
+Inherited, see L<OODoc::Text/"Collected">
+
+=item $obj-E<gt>B<examples>()
+
+Inherited, see L<OODoc::Text/"Collected">
+
+=item $obj-E<gt>B<findDescriptionObject>()
+
+Inherited, see L<OODoc::Text/"Collected">
+
+=item $obj-E<gt>B<isEmpty>()
+
+Return true if this text structure is only a place holder for something
+found in a super class.  Structured elements are created with
+L<emptyExtension()|OODoc::Text::Structure/"Constructors"> on each sub-class pass the idea of order and to
+collect subroutines to be listed.  However, in some cases, nothing
+is to be listed after all, and in that case, this method returns C<true>.
+
+example: 
+
+ unless($chapter->isEmpty) ...
+
+=item $obj-E<gt>B<openDescription>()
+
+Inherited, see L<OODoc::Text/"Collected">
+
+=back
+
+=head2 Subroutines
+
+Each manual page structure element (chapter, section, and subsection)
+can contain a list of subroutine descriptions.
+
+=over 4
+
+=item $obj-E<gt>B<addSubroutine>($objects)
+
+A subroutine (L<OODoc::Text::Subroutine|OODoc::Text::Subroutine> object) is added to the
+chapter, section, or subsection.
+
+=item $obj-E<gt>B<setSubroutines>(ARRAY)
+
+Sets the subroutines which are related to this text structure, replacing
+the preivous set.  This is used when the manual pages are expanded into
+each-other to simplify working with the inheritance relations.
+
+=item $obj-E<gt>B<subroutine>($name)
+
+Returns the subroutine with the specific name.
+
+=item $obj-E<gt>B<subroutines>()
+
+Returns the list of subroutines which are related to this text object.
+
+=back
+
+=head2 Commonly used functions
+
+Extends L<"Commonly used functions" in OODoc::Text|OODoc::Text/"Commonly used functions">.
+ 
+=over 4
+
+=item $obj-E<gt>B<filenameToPackage>($filename)
+
+=item OODoc::Text::Structure-E<gt>B<filenameToPackage>($filename)
+
+Inherited, see L<OODoc::Object/"Commonly used functions">
+
+=item $obj-E<gt>B<mkdirhier>($directory)
+
+=item OODoc::Text::Structure-E<gt>B<mkdirhier>($directory)
+
+Inherited, see L<OODoc::Object/"Commonly used functions">
+
+=back
+
+=head2 Manual Repository
+
+Extends L<"Manual Repository" in OODoc::Text|OODoc::Text/"Manual Repository">.
+ 
+=over 4
+
+=item $obj-E<gt>B<addManual>($manual)
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<mainManual>($name)
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<manuals>()
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<manualsForPackage>($name)
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<packageNames>()
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=back
+
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item Error: manual definition requires manual object
+
+A call to L<addManual()|OODoc::Object/"Manual Repository"> expects a new manual object (a L<OODoc::Manual|OODoc::Manual>),
+however an incompatible thing was passed.  Usually, intended was a call
+to L<manualsForPackage()|OODoc::Object/"Manual Repository"> or L<mainManual()|OODoc::Object/"Manual Repository">.
+
+=item Error: no level defined for structural component
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of OODoc distribution version 2.01,
+built on November 11, 2015. Website: F<http://perl.overmeer.net/oodoc/>
+
+=head1 LICENSE
+
+Copyrights 2003-2015 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

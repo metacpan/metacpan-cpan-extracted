@@ -1,0 +1,92 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>OzDB - database interface module for OzBot</title>
+<link rev="made" href="mailto:" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<ul>
+
+		<li><a href="#export">EXPORT</a></li>
+	</ul>
+
+	<li><a href="#methods">METHODS</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#copyright_and_license">COPYRIGHT AND LICENSE</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>OzDB - database interface module for OzBot</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<p>use OzDB;</p>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>The OzDB Perl module handles authentication and access control for the OzBot
+based utility bots.  The basic database format is the authentication schema.
+This is based on a numerical ordering authentication system.  If the user's
+Authentication level is higher than that of the command's authentication level
+then the user is authenticated for the command and the command's special
+arguments will be returned to the function.  This is useful for BACKEND
+authentication only, where the usernames are entered by an already physically
+or password authorized connection.  This is for information purposes, and is
+not to be used as an actual database such as MySQL or PgSQL.  This is written
+to faciliate developers with rudimentary information storage and any protected
+information, including passwords, should not be stored in this database.  It
+is simply a method to allow applications to store and retrieve data in an
+arbitrary and extensible format with special delimiters.</p>
+<p>
+</p>
+<h2><a name="export">EXPORT</a></h2>
+<p>None by default.</p>
+<p>
+</p>
+<hr />
+<h1><a name="methods">METHODS</a></h1>
+<ul>
+<li><strong><a name="item_authenticate">$obj-&gt;authenticate(``authuser.db'', ``authcmd.db'', ``$name'', ``$command'');</a></strong><br />
+</li>
+<li><strong><a name="item_add_user">$obj-&gt;add_user(``$authuserdb'', ``$authcmddb'', ``$name'', ``$authlevel'');</a></strong><br />
+</li>
+</ul>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p><a href="http://support.linuxops.net">http://support.linuxops.net</a></p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>NeXeN, aka Osbourne <a href="mailto:nexen@cpan.org">nexen@cpan.org</a></p>
+<p>
+</p>
+<hr />
+<h1><a name="copyright_and_license">COPYRIGHT AND LICENSE</a></h1>
+<p>Copyright (C) 2005 by Daniel Remsburg</p>
+<p>This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.</p>
+
+</body>
+
+</html>

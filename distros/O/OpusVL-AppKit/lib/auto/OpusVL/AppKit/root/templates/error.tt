@@ -1,0 +1,11 @@
+<h2>Sorry, an error has occurred</h2>
+<p>
+Please log out, log back in and try the operation again.
+</p>
+<p>
+If problems persist, then please raise a ticket on the OpusVL
+support tracker.
+</p>
+
+<p><strong>Error details:</strong></p>
+<code>[% finalize_error | none %]</code>

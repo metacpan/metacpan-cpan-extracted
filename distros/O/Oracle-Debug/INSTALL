@@ -1,0 +1,33 @@
+# $Id: INSTALL,v 1.4 2003/07/04 14:57:47 oradb Exp $
+
+INSTALLATION
+
+To install the Oracle side of installation, it is necessary to execute
+the scripts in the ./packages directory via SQL*Plus or similar:
+
+	cd ./packages
+	sqlplus /
+	SQL> @compile
+	exit
+
+Also required are the DBMS_DEBUG packages:
+
+	cd $ORACLE_HOME/rdbms/admin
+	sqlplus /
+	SQL> @pbload
+	exit
+
+To install this Perl module (after having completed the above) type the following from the shell:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+	DBI
+	DBD::Oracle
+

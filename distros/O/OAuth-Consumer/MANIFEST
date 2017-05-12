@@ -1,0 +1,10 @@
+Changes
+lib/OAuth/Consumer.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/sandbox.t
+t/sandbox_thread.t
+t/simple.t
+t/timeout.t
+META.yml                                 Module meta-data (added by MakeMaker)

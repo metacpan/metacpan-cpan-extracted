@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<SITE ID="Goyoyo.Taiwan">
+
+<NAME Lang="en-us">Goyoyo Search</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+悠游中文搜索(繁體)
+]]></NAME>
+<INFO Lang="en-us">general information web search in Taiwan</INFO>
+<INFO Lang="zh-tw">general information web search in Taiwan</INFO>
+
+<URL Type="More"><![CDATA[
+http://www.goyoyo.com.hk_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+post://www.goyoyo.com.hk/gyy/search%20BIG5?query=_QUERY_
+]]></URL>
+
+
+<VAR Name="_NEXT_"><![CDATA[
+<A HREF="_NEXT_"> 接下一頁
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<DT>___<A HREF="_URL_">_TITLE_</A>___相關程度_SCORE_<A HREF___<DD>_PREVIEW_<I>___--- _DATE_</FONT></I>
+]]></TEMPLATE>
+</SITE>

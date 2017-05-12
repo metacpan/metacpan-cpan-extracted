@@ -1,0 +1,28 @@
+# ---------------------------------------------------------------
+# This is a configuration file for owl2perl.
+# Copy it into file 'owl2perl-config.cfg' and edit it to your needs.
+#
+# Your new copy has to be in a directory define by an environment
+# variable OWL_CFG_DIR, or in any directory defined in the
+# Perl's @INC array. Keeping it in this directory is usually fine
+# because the owl2perl code must be found by Perl anyway.
+#
+# $Id: owl2perl-config.cfg.template,v 1.5 2010-03-08 19:29:16 ubuntu Exp $
+# Contact: Edward Kawas <edward.kawas+owl2perl@gmail.com>
+# ---------------------------------------------------------------
+
+[generators]
+outdir = @GENERATED_DIR@
+impl.home = @HOME_DIR@
+
+[log]
+config = @LOG4PERL_FILE@
+#file = @LOGFILE@
+#level = info
+#pattern = "%d (%r) %p> [%x] %F{1}:%L - %m%n"
+
+[xml]
+#parser  = XML::LibXML
+parser = XML::LibXML::SAX
+#parser = XML::LibXML::SAX::Parser
+#parser = XML::SAX::PurePerl

@@ -1,0 +1,44 @@
+---
+abstract: 'integrated argument and option processing'
+author:
+  - 'Mark Lawrence <nomad@null.net>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  File::Spec: 0
+  IO::Capture::Stdout: 0
+  POSIX: 0
+  Test::Fatal: 0
+  Test::More: 0
+  Test::Output: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.08'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: OptArgs
+no_index:
+  directory:
+    - example
+    - inc
+    - t
+    - xt
+  package:
+    - OptArgs::Usage
+    - Getopt::Args::Usage
+requires:
+  Carp: 0
+  Encode: 2.24
+  Exporter::Tidy: 0
+  Getopt::Long: 2.37
+  I18N::Langinfo: 0
+  List::Util: 0
+  Text::Abbrev: 0
+  perl: 5.6.0
+resources:
+  license: http://opensource.org/licenses/gpl-license.php
+  repository: https://github.com/mlawren/p5-OptArgs
+version: 0.1.20

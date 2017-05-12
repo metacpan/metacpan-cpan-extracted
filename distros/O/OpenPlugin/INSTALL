@@ -1,0 +1,71 @@
+INSTALL: OpenPlugin
+=======================
+
+INSTALLATION
+
+To install OpenPlugin, type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Please Note: If you receive any errors during the installation of OpenPlugin,
+please see the "KNOWN INSTALLATION PROBLEMS" section below.
+
+OpenPlugin has a number of drivers available for installation.  It is often
+unnecessary or too time consuming to install all of them.  For that reason,
+OpenPlugin allows you to pick and choose which drivers you wish to install
+dependencies for.  When you run the above 'perl Makefile.PL', you will be given
+a menu to help you install drivers for which you do not already have
+dependencies installed on your system.
+
+At any time, you can go back and run the Makefile.PL to install more drivers.
+
+KNOWN INSTALLATION PROBLEMS
+
+* Digest::SHA1
+
+The File driver for the Cache Plugin requires Digest::SHA1 version 2.02.
+Unfortunatly, Digest::SHA1 fails to compile on certain systems -- notably,
+RedHat 8.0.  If you don't think you need the Cache Plugin, just remove the
+"File" driver from the list of drivers to install when you're at the OpenPlugin
+Installation Screen.  Currently, this is the only driver available for the
+Cache Plugin.  Feel free to write more :-)
+
+* Apache::Session
+
+The Apache::Session module is needed in order for Sessions to work, it's
+currently the only supported Session driver.  Installation of this fails on
+many RedHat 8.0 and 9 systems.  It gives several errors, including:
+
+  t/99dbfile.........Use of uninitialized value in subroutine entry
+
+  Could not open dbm file: No such file or directory
+
+I have found that forcing the install of this module works fine.
+
+* XML::DOM
+
+The XML::DOM module is required for Log::Log4perl.  On RedHat 8.0 and 9, the
+installation of this module fails with the following message:
+
+  t/dom_jp_print........FAILED test 2
+
+This appears to be a known issue with XML::DOM, though a fix is not yet
+available.  Due to the way OpenPlugin interacts with Log4perl, the XML::DOM
+module will actually go unused.  I would just force the install of XML::DOM,
+and hope they come out with a fix for this soon :-)  Doing that does work fine
+for me.
+
+COPYRIGHT
+
+Copyright (c) 2001-2003 Eric Andreychek.  All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+AUTHORS
+
+Eric Andreychek <eric@openthought.net>
+

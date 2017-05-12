@@ -1,0 +1,55 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 0d5002496a301afc8dbb8399ade13a9ea587f38b ChangeLog
+SHA1 5c1ed02e4a3103dd0b3b8a7b580addd911231a31 INSTALL
+SHA1 7f7f48c804dbd34389e2a6e6622f50e9f21bbbc5 LICENSE
+SHA1 a017fecd227861feef42f8ea3ee8738046b91cfd MANIFEST
+SHA1 5696f9533ab04b8bd3bbf54893fa92caf5204569 META.yml
+SHA1 e790b531c5460cb7fe05f7be34e77ee78d7bc281 Makefile.PL
+SHA1 d87bed8fb58ec7c940c2c83e68d9718a7cce85b5 README
+SHA1 554870cb099877439b62db15cac37e74b808af96 dist.ini
+SHA1 00b2e257a32d5ce291f0a63b1f37a3ec1cdb87bd lib/ONE.pm
+SHA1 c8c1d6146443c0b5070f9336db8ceaf3a13f930a lib/ONE/Collect.pm
+SHA1 56b64fb28d2f205da9e42fab713b2170872ef035 lib/ONE/Timer.pm
+SHA1 91fb5b37ddaa1be471bcd0401dd19558dde10050 t/moose.t
+SHA1 aaef789cd3ea1e8feb7eae18ccfc829fd76a0775 t/one.t
+SHA1 b0ddfa50619ee6e84c9265963c1b6082fb3d9ab9 t/pod-coverage.t
+SHA1 b2131e5af08c2702a3742365d55f365e9cc0cf15 t/pod.t
+SHA1 54ed25287b7e1c9ff328eaf126d438438c8a1d48 t/release-minimum-version.t
+SHA1 455d1dd1867212a665ad5ea4126b572411de300c t/release-no-tabs.t
+SHA1 3bb783b8a31b5eaff916bcb8bf7b348ee340ecb5 t/release-portability.t
+SHA1 612226d447015079c046d65932f774304a4b9f20 t/release-synopsis.t
+SHA1 d7221447937ab93002a123801def7be09748c106 t/release-unused-vars.t
+SHA1 a75224d278296dcedbcefd7812dd396a294116d1 t/timer.t
+SHA1 deeca924552a26bdc0a18359c0a7bbc2cdf0aa57 weaver.ini
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iQIcBAEBAgAGBQJOYtXHAAoJEF6ojHedHIiF5f0P/3lcjlQCH6AaVM4XyWtnceHy
+QkuHdUutrdkfY0af2D+o5BTC+pYclbHUaFVDLk6+lqH7f+bqmtoEqUaDlkhu2pyk
+hMhjjeKQZe5itAZfXFwPsSuqxsFbj0AZVDWM5ihyHIc2oszshzKK/nujaFPJFFon
+SZz0PdvKMdtGpL+DZH9Dz3Bv/RWayGLakZ4PPExXf8hujrTaF36sCXjC9Hfyx4D9
+dN9p5Z/FL8DVWHF2fT5iBqHu0I9jKmsClCVmsBq6eiDffc+2k16hJ6ik4gS4weeN
+145USJzA/uulaXYmcYhipl/ILcJ1d9Tckeppa7HBuTqMutjH5JzrXkrr1v8DzHMy
+pwMURdiwV55yahWgeufRxw8nT2PTN+wjG6ZVCJhkYoUWvV1jlczYUg9S+JoCTZQu
+piMKQlAhMGJc57Fjnu1WeYtfdHRt3r6/2W39MhQt+Vq8XSIivO7U+A0YRt0TBTlz
+6fbfxWiblRczhwJTDg9pRrG3GwzhKeskrRnZPsPjVZD5HADCxB8sKIXARLckiZsw
+aDsEAQnbAzMmOFwKDCkqM/T2iihMux6/1AdGxk8sQSd/Oi3Fc+lJYQr2po9t3WH0
+bm6RSaEQ29Em8DY+kqoSIgl6dsAKsyTfVbzzvdbQfq8ukam48hJ52kFsidbzVJ23
+mjDKR2/ciBteSvly8kC2
+=b0wk
+-----END PGP SIGNATURE-----

@@ -1,0 +1,57 @@
+# BOOL						T_IV
+HAB						T_PTROBJ
+HBITMAP						T_PTROBJ
+HDC						T_PTROBJ
+HMQ						T_PTROBJ
+HOBJECT						T_PTROBJ
+HPOINTER					T_PTROBJ
+HSAVEWP						T_PTROBJ
+HWND						T_PTROBJ
+LONG						T_IV
+PCSZ						T_PV
+PDESKTOP					T_PTROBJ
+POBJCLASS					T_PTROBJ
+PSWP						T_PTROBJ
+PSZ						T_PV
+PULONG						T_OPAQUEPTR
+ULONG						T_IV
+__const__ DESKTOP *				T_PTROBJ
+__const__ ICONINFO *				T_PTROBJ
+__const__ SWP *					T_PTROBJ
+
+# Manually added
+HOBJECT_or_error				T_PTROBJ_IS_OK
+HWND_or_error					T_PTROBJ_IS_OK
+HBITMAP_or_error				T_PTROBJ_IS_OK
+HPOINTER_or_error				T_PTROBJ_IS_OK
+
+BOOL						T_IV_IS_OK
+ULONG_error					T_IV_IS_ERROR
+
+
+##################################################################
+INPUT
+T_IV_ISOK
+	$var NOT IMPLEMENTED
+T_PTROBJ_IS_OK
+	$var NOT IMPLEMENTED
+T_IV_IS_ERROR
+	$var NOT IMPLEMENTED
+
+##################################################################
+OUTPUT
+T_IV_IS_OK
+	sv_setiv($arg, (IV)$var);
+	if (!$var)
+	    FillWinError;
+T_PTROBJ_IS_OK
+	if (!$var) {
+	    FillWinError;
+	    SvOK_off($arg);
+	} else
+	    sv_setref_pv($arg, \"${ntype}\", (void*)$var);
+T_IV_IS_ERROR
+	sv_setiv($arg, (IV)$var);
+	if ($var)
+	    FillOSError($var);
+

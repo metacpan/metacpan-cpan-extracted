@@ -1,0 +1,27 @@
+--- #YAML:1.0
+name:               OpenOffice-OODoc
+version:            2.125
+abstract:           The Perl Open OpenDocument Connector
+author:
+    - Jean-Marie Gouarne <jmgdoc@cpan.org>
+license:            LGPL
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Archive::Zip:  1.18
+    File::Find:    1.01
+    File::Temp:    0.12
+    IO::File:      1.14
+    Time::Local:   1.07
+    XML::Twig:     3.32
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

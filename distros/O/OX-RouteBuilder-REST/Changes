@@ -1,0 +1,14 @@
+Revision history for OX::RouteBuilder::REST
+
+0.003   2014-04-04T08:42:34+0200
+    - auto-registering OX::RouteBuilder::REST now works with OX 0.14
+
+
+0.002   2014-03-25T19:15:47+0100
+    - don't include half of cpan (i.e. the contens of my local::lib) in the dist
+      tarball (when will I ever learn to use Dist::Zilla properly?)
+
+
+0.001   2014-03-25T18:57:39+0200
+    - first release
+

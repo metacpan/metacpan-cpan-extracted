@@ -1,0 +1,36 @@
+# Changes for Object::Iterate
+
+1.14 - Wed Oct  8 03:38:23 2014
+	* Bump to release version
+	* Get rid of prereq test, which now happens at release time
+
+
+1.11 - Sun Dec  9 01:08:19 2007
+	* Cleanups for the move from CVS to SVN
+	* No need to upgrade
+
+1.10 - Tue Jan  9 22:38:03 2007
+	* updated copyright and license info
+	* no code changes, so no need to upgrade
+
+1.09 - Thu Jun  8 06:41:22 2006
+	* distro cleanups, bumped version number to stable release.
+	No need to upgrade.
+
+0.53 - Sat Jan 28 12:34:59 2006
+	* Fixed some typoes, upgraded the Test::Manifest use in Makefile.PL
+	* No need to upgrade if you already have Object::Iterate
+
+0.52 - Fri Mar 11 22:24:15 2005
+	* Added POD coverage tests, fixed issues
+	* No code updates: no need to upgrade
+
+0.51 - Fri Mar 11 22:12:48 2005
+	* Added POD coverage tests and fixed those problems
+	* No code changes: no need to upgrade
+
+0.51 - Wed Sep  8 02:27:16 2004
+	* cleaned up the distro (where'd that MANIFEST hide?)
+	* updated the tests and reduced the dependencies
+	* no need to upgrade if you already have the module
+

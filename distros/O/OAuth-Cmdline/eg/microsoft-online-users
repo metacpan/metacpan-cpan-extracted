@@ -1,0 +1,65 @@
+#!/usr/local/bin/perl -w
+###########################################
+# microsoft-online-users
+# Ian Gibbs, 2015
+###########################################
+use strict;
+use OAuth::Cmdline::MicrosoftOnline;
+use LWP::UserAgent;
+use JSON qw( from_json );
+use Text::TabularDisplay;
+use open qw/:std :utf8/;			# Enable UTF-8 output
+use Log::Log4perl qw(:easy);
+Log::Log4perl->easy_init($DEBUG);
+
+my $domain = "";				# The domain you have hosted in Office 365
+
+die("Variable \$domain has not been set. Edit this script before running it\n") unless (length($domain) > 3);
+
+my $oauth = OAuth::Cmdline::MicrosoftOnline->new( );
+
+my $ua = LWP::UserAgent->new();
+$ua->default_header( 
+    $oauth->authorization_headers );
+
+my $resp = $ua->get( "https://graph.windows.net/$domain/users?api-version=1.6&\$top=999" );
+
+if( $resp->is_error ) {
+    die "Error: ", $resp->message();
+}
+
+my $result = from_json( $resp->decoded_content() );
+
+my $table = Text::TabularDisplay->new(("Display name", "First name", "Surname", "Email", "Mobile"));
+for my $user( @{ $result->{ value } } ) {
+	$table->add(($user->{'displayName'}, $user->{'givenName'}, $user->{'surname'}, $user->{'mail'}, $user->{'mobile'}));
+}
+print $table->render."\n";	# Note the enabling of UTF-8 above in case of extended characters in display names
+
+__END__
+
+=head1 NAME
+
+    microsoft-online-users
+
+=head1 SYNOPSIS
+
+    microsoft-online-users
+
+=head1 DESCRIPTION
+
+Ask the Azure AD Graph API for a list of users
+
+Requires that you create a ~/.microsoft-online.yml file first by running 
+eg/microsoft-online-token-init after acquiring a client ID and secret as
+described at https://azure.microsoft.com/en-gb/documentation/articles/active-directory-integrating-applications/
+
+=head1 LEGALESE
+
+Copyright 2015 assigned to Mike Schilli, all rights reserved.
+This program is free software, you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+2015, Ian Gibbs

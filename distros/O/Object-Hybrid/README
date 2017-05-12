@@ -1,0 +1,47 @@
+INSTALLATION
+
+With Perl 5.10 and later or if Module::Build module is installed, the preferred way to install is (commands issued in unpacked distribution directory):
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+On Windows this variant may work better:
+
+	perl Build.PL
+	Build
+	Build test
+	Build install
+
+With perl 5.8, if Module::Build is not installed:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+With perl 5.6 you may need to install Test::More and Module::Build prior to installing this module using Build.PL method as described above.
+
+If above do not apply, not desirable or for some reason not work in your case (e.g. perl 5.6), find lib/Object/Hybrid.pm within distribution and manually copy it into your Perl library directory (any of them) under the Object/Hybrid.pm path. Most likely such manual installation will work perfectly.
+
+If necessary, you can even use Object::Hybrid on perls older than 5.6 - for that install module manually (as just described above) and then modify module's source to replace "no warnings" and "our()" pragma with "$^W = 0" and "use vars qw()" respectively.
+
+DEPENDENCIES
+
+Object::Hybrid is a pure Perl module that has no dependencies other then standard modules (perl 5.6 and newer). However, automated installation process requires perl 5.8 and newer, or Test::More and Module::Build installed. Manual installation requires only hands available :)
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2010 Alexandr Kononoff (parsels@mail.ru). All rights reserved.
+
+This program is free software; you can use, redistribute and/or modify it either under the same terms as Perl itself or, at your discretion, under following Simplified (2-clause) BSD License terms:
+
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+* Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+

@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<SITE ID="Ilse.Belgium">
+
+<NAME Lang="en-us">ILSE search</NAME>
+<INFO Lang="en-us">general information web search in Belgium</INFO>
+
+<URL Type="More"><![CDATA[
+http://www.ilse.be/?COMMAND=search_for&LANGUAGE=NL&ANDOR=BOOLEAN&EXTRACT=short&SEARCH_FOR=_QUERY_&PAGENUM=_START_1_0_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://www.ilse.be/?COMMAND=search_for&LANGUAGE=NL&ANDOR=BOOLEAN&EXTRACT=short&SEARCH_FOR=_QUERY_&PAGENUM=0
+]]></URL>
+
+
+
+<TEMPLATE><![CDATA[
+<DT>___">_SCORE_</FONT>___<A HREF="_URL_">_TITLE_</A>___<BR>_PREVIEW_<FONT FACE=___bytes,
+]]></TEMPLATE>
+</SITE>

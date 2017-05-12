@@ -1,0 +1,16 @@
+[%- DEFAULT object_name = 'Item' -%]
+
+<div align="center">
+
+<h1>[% object_name -%] Inactive</h1>
+
+<table width="50%" border="0" cellpadding="5" cellspacing="0">
+<tr><td align="left">
+
+This item is currently inactive, which generally means it has not yet
+been approved by an administrator. Check back later.
+
+</td></tr>
+</table>
+
+</div>

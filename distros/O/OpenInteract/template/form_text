@@ -1,0 +1,16 @@
+[%########################################
+  form_text( name, value, size, maxlength, field_label )
+     Generate a simple text field.
+
+     Defaults:
+
+        size      = 20
+        maxlength = 50
+  ########################################-%]
+
+[%- DEFAULT size = 20;
+    DEFAULT maxlength = 50; -%]
+[%- field_pre_label -%]
+<input type="text" name="[% name %]" value="[% value %]"
+       size="[% size %]" maxlength="[% maxlength %]">
+[%- field_label -%]

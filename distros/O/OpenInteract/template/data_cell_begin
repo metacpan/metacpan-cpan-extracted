@@ -1,0 +1,8 @@
+[%########################################
+  data_cell_begin( colspan, align )
+     Begin a datarow, taking care of colspan issues.
+  ########################################-%]
+
+[%- SET colspan   = ( colspan > 1 ) ? colspan - 1 : 1;
+    DEFAULT align = 'left'; -%]
+<td colspan="[% colspan %]" align="[% align %]">

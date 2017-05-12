@@ -1,0 +1,47 @@
+#!/usr/local/bin/perl -w
+###########################################
+# microsoft-online-token-init
+# Ian Gibbs, 2015
+###########################################
+use strict;
+use lib 'lib';
+
+use OAuth::Cmdline::MicrosoftOnline;
+use OAuth::Cmdline::Mojo;
+
+my $oauth = OAuth::Cmdline::MicrosoftOnline->new(
+    client_id     => "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+    client_secret => "YYYYYYYYYYYYYYYYYYYYYYYY",
+    login_uri     => "https://login.microsoftonline.com/common/oauth2/authorize",
+    token_uri     => "https://login.microsoftonline.com/common/oauth2/token",
+);
+
+my $app = OAuth::Cmdline::Mojo->new(
+    oauth => $oauth,
+);
+
+$app->start( 'daemon', '-l', $oauth->local_uri );
+
+__END__
+
+=head1 NAME
+
+microsoft-online-token-init - MicrosoftOnline-specific OAuth Token Dance
+
+=head1 SYNOPSIS
+
+    $ microsoft-online-token-init
+
+=head1 DESCRIPTION
+
+See the OAuth::Cmdline::MicrosoftOnline documentation.
+
+=head1 LEGALESE
+
+Copyright 2016 by Mike Schilli, all rights reserved.
+This program is free software, you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+2016, Mike Schilli <cpan@perlmeister.com>

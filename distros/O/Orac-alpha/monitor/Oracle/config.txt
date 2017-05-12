@@ -1,0 +1,9 @@
+redolog^redo^900^1800^
+rollback^roll^99^99.50^
+latch^w2w^99^99.50^
+tablespace^tbsp^5^15^
+slowsql^slow^200^300^
+dc_hit_ratio^dchr^85^90^
+lc_hit_ratio^lchr^98^99^
+bc_hit_ratio^bchr^60^70^
+memsorts^sort^90^95^

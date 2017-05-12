@@ -1,0 +1,16 @@
+Changes for Perl extension ORDB-CPANRT
+
+0.04 Mon 31 Oct 2011
+	- Updating to Module::Install::DSL 1.04
+	- Updating ORLite::Mirror to 1.20
+	- Add age method to determine how stale the data is (in days)
+
+0.03 Tue 11 May 2010
+	- Miscellaneous small pod fixes
+
+0.02 Mon 10 May 2010
+	- Updated to Module::Install::DSL 0.96
+	- Polished for public release
+
+0.01 Mon 17 Aug 2009
+	- Creating the initial implementation

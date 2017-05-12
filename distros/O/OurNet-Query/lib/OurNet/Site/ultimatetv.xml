@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<SITE ID="UltimateTV">
+
+<NAME Lang="en-us">UltimateTV</NAME>
+<INFO Lang="en-us">TV and entertainment information search</INFO>
+
+<URL Type="More"><![CDATA[
+_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://www.ultimatetv.com/home/search/showResults.html?config=htdig&restrict=&exclude=&method=and&foormat=builtin-long&words=_QUERY_
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_NEXT_"><![CDATA[
+<a href="_NEXT_"><img src=/images/buttonr.gif
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<dl><dt><strong><a href="_URL_">_TITLE_</a>___<dd>_PREVIEW_<br>___size=-1>,_SIZE_bytes
+]]></TEMPLATE>
+</SITE>

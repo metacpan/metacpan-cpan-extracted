@@ -1,0 +1,40 @@
+2012-10-17 v1.004 release to CPAN
+ - fix test t/05_nometh.t to not fail on some perl-bleads between 5.17.4 and 5.17.5
+ - have test t/13_nometh.t give clearer error message for some failure
+
+2012-10-14 v1.003 release to CPAN
+ - explicitly require perl 5.008 in metafile and module -- module never 
+    actually worked on older perls
+ - fix a bug in test t/05_nometh.t (where I passed an array instead of hash 
+    to the savenames option)
+ - fix test t/05_nometh.t to work with perl 5.17.5 and higher which
+    allows to call class methods on packages with punctuation name -- 
+    used to explicitly test such methods being forbidden
+ - add new keywords we do not export to by default: 
+    fc evalbytes __FILE__ __LINE__ __PACKAGE__ __SUB__
+ - in testsuite, test for specific warnings only, not for arbitrary warnings
+ - added some new tests, including a test for module working under taint mode
+
+2011-01-26 v1.002 release to CPAN
+ - properly document deref option
+ - method called through Object::Import changing its invocant didn't use to 
+    have any effect, now it changes the imported object
+ - a few new tests (t/09_parm.t, t/10_alias.t)
+ - fix test failures on Windows where I forgot to binmode a handle
+ - fixed some misplaced text in the docs
+
+2010-11-07 v1.001 release to cpan
+ - target package option
+ - distribution stuff: Makefile.PL, README, TODO
+ - some tests
+ - support for IO handles
+ - save list of names exported to hash
+ - add prefix/suffix to names
+ - exclude some special method names, also underscored names
+ - importing with explicit list of method names
+ - documentation with examples
+ - converting to real module
+
+2010-06-13 v1.000
+ - toy prototype at http://www.perlmonks.com/?node_id=849373
+

@@ -1,0 +1,15 @@
+<?xml version="1.1" encoding="UTF-8"?>
+<orze>
+	<var name="fullname"></var>
+	<var name="subject"></var>
+	<var name="keywords"></var>
+	<var name="language"></var>
+	<var name="author"></var>
+	<var name="menu" src="Menu" base="_root_" />
+
+	<page name="index">
+		<var name="title">Index</var>
+		<var name="content" src="Include" file="index"></var>
+	</page>
+
+</orze>

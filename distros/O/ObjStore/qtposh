@@ -1,0 +1,363 @@
+#!/nw/dev/usr/bin/perl -w
+
+use strict;
+use ObjStore;
+use vars qw($DB $Reset);
+
+sub usage {
+    print q"
+Usage: qtposh [switches] database
+  -Idirectory      specify @INC directory (may be used more than once)
+  -[mM]module..    executes `use/no module...' (just like perl)
+  -reset           ignore the stored cursor; start fresh
+  -v               print version number and patchlevel of qtposh (and exit)
+
+";
+    exit;
+}
+
+for (my $arg=0; $arg < @ARGV; $arg++) {
+    my $o = $ARGV[$arg];
+    if ($o =~ m/^ \- (M|m) (\w+) (\=\w+)? $/x ) {
+	my ($way,$m,@im) = ($1,$2,$3?substr($3,1):());
+	eval "require $m";
+	warn, next if $@;
+	if ($way eq 'M') {
+	    $m->import(@im);
+	} else {
+	    $m->unimport(@im);
+	}
+    } elsif ($o =~ m/^-I (\S*) $/x) {
+	my $dir = $1;
+	$dir = $ARGV[++$arg]
+	    if !$dir;
+	if ($dir =~ m{^ \/ }x) {
+	    unshift(@INC, $dir);
+	} else {
+	    require FindBin;
+	    die "qtposh: can't find myself" if ! $FindBin::Bin;
+	    unshift(@INC, "$FindBin::Bin/$dir");
+	}
+    } elsif ($o =~ m/^-reset$/) {
+	++$Reset;
+    } elsif ($o =~ m/^-panic$/) {
+	warn "qtposh: panic ignored (qtposh is unflappable)\n";
+    } elsif ($o =~ m/^-v$/) {
+	require ObjStore;
+	print("qtposh $ObjStore::VERSION (Perl $] ".ObjStore::release_name().")\n");
+	exit;
+    } elsif ($o =~ m/^-h(elp)?$/) {
+	&usage;
+    } elsif ($o !~ m/^-/) {
+	&usage if $DB;
+	$DB = ObjStore::open($o,'mvcc');
+    } else {
+	warn "unknown option '$o' (-h for usage)\n";
+    }
+}
+&usage if !$DB;
+
+package QtREAPER;
+use Qt 2.008;
+use Qt::app;
+use Event 0.42 qw(unloop);
+use vars qw(@ISA $VERSION);
+@ISA = 'Qt::Object';
+$VERSION = '1.02';
+
+use Qt::slots 'shutdown()';
+sub shutdown { 
+    unloop();
+}
+
+my $reaper = QtREAPER->new;
+$reaper->connect($app, 'lastWindowClosed()', 'shutdown()');
+
+my $fd = Qt::xfd();
+Event->io(fd => $fd, timeout => .25, poll => 'r',
+	  cb => sub { $app->processEvents(3000); });
+
+package QtposhAbout;
+use Qt 2.00;
+use vars qw(@ISA);
+@ISA = 'Qt::Dialog';
+
+sub new {
+    my $o = shift->SUPER::new(@_);
+    my (@w,$f,$w,$l);
+    $o->setCaption("About...");
+    $o->resize(350,215);
+
+    $f = $o;
+    $l = Qt::BoxLayout->new($f, Qt::BoxLayout::TopToBottom, 10);
+    push @w,$l;
+    $w = Qt::Label->new("qtposh $ObjStore::VERSION", $f);
+    $w->setAlignment(Qt::AlignCenter);
+    $w->setFont(Qt::Font->new("times", 50, Qt::Font::Black));
+    push @w,$w;
+    $l->addWidget($w,2);
+
+    $w = Qt::Label->new(
+q[
+Copyright © 1998-1999 Joshua Nathaniel Pritikin.  All rights reserved.
+
+qtposh is part of the ObjStore perl extension.  This package is free
+software and is provided "as is" without express or implied warranty.
+It may be used, redistributed and/or modified under the terms of the
+Perl Artistic License (see http://www.perl.com/perl/misc/Artistic.html)
+
+], $f);
+    $w->setFont(Qt::Font->new('helvetica',10));
+    $w->setAlignment(Qt::AlignLeft);
+    push @w,$w;
+    $l->addWidget($w,3);
+
+    $w = Qt::PushButton->new("Ok", $f);
+    $o->connect($w, 'clicked()', 'accept()');
+    push @w, $w;
+    $l->addWidget($w,1);
+
+    $$o{widgets} = \@w;
+    $o;
+}
+
+package Editor;
+use ObjStore;
+use IO::File;
+use Qt;
+use vars qw(@ISA $USER $ABOUT);
+@ISA = qw(Qt::Widget);
+$USER = scalar(getpwuid($>));
+
+sub new {
+    my $o = shift->SUPER::new();
+    $o->resize(500,500);
+    $$o{db} = shift;
+    $o->setCaption("qtposh ".$$o{db}->get_pathname);
+    my @w;
+    my $m = Qt::MenuBar->new($o);
+    push @w, $m;
+
+    my $file = Qt::PopupMenu->new();
+    push @w, $file;
+    $m->insertItem('File', $file);
+    $file->insertItem('&New Window...', $o, 'opendb()');
+    $file->insertSeparator();
+    $file->insertItem('&Open...', $o, 'load()');
+    $file->insertItem('&Save...', $o, 'save()');
+    $file->insertItem('&Print...', $o, 'printer()');
+    $file->insertSeparator();
+    $file->insertItem('&Close Window', $o, 'closepane()');
+
+    my $help = Qt::PopupMenu->new();
+    push @w, $help;
+    $m->insertSeparator;
+    $m->insertItem('Help', $help);
+    $help->insertItem('How Does it Work?...', $o, 'how()');
+    $help->insertItem('Commands...', $o, 'simple_help()');
+    $help->insertSeparator();
+    $help->insertItem('About...', $o, 'about()');
+
+    my $l = Qt::BoxLayout->new($o, Qt::BoxLayout::Down);
+    push @w, $l;
+    $l->addSpacing($m->height()+2);
+
+    $$o{in} = Qt::MultiLineEdit->new($o);
+    $$o{in}->setFocus();
+    $$o{in}->setFrameStyle(Qt::Frame::Box | Qt::Frame::Plain);
+    $$o{in}->setLineWidth(1);
+    $$o{in}->setText("\n\n");
+    $$o{in}->setCursorPosition(10000, 0);
+    $o->connect($$o{in}, 'returnPressed()', 'execute()');
+    $l->addWidget($$o{in},3);
+#    $l->setRowStretch(1,2);
+
+    $l->addSpacing(3);
+    $$o{out} = Qt::MultiLineEdit->new($o);
+    $$o{out}->setFocusPolicy(Qt::Widget::NoFocus);
+    $$o{out}->setFrameStyle(Qt::Frame::Box | Qt::Frame::Plain);
+    $$o{out}->setLineWidth(1);
+    $$o{out}->setReadOnly(1);
+    $$o{out}->setText("connecting to ".$$o{db}->get_pathname."...");
+    $l->addWidget($$o{out},8);
+#    $l->setRowStretch(2,3);
+
+    $l->activate;
+
+    $$o{gui} = \@w;
+    $$o{timer} = Event->timer(interval => 1, cb => [$o,'refresh']);
+    $o->show;
+    $o;
+}
+
+use Qt::slots 'how()';
+sub how {
+    Qt::MessageBox::information(undef, 'How Does it Work?', "
+User input is sent to an ObjStore::Posh::Cursor on the server
+where it is eval'd.  Make sure you don't do anything dangerous.
+An infinite loop will cause the server to hang!
+")
+}
+
+use Qt::slots 'simple_help()';
+sub simple_help {
+    Qt::MessageBox::information(undef, 'Commands', q[
+cd string        # interprets string according to $at->POSH_CD
+cd $at->...      # your expression should evaluate to a persistent ref
+cd ..            # what you expect
+ls
+peek             # ls but more
+raw              # ignore special POSH_PEEK methods
+pwd
+<or any perl statement!>
+]);
+}
+
+sub refresh {
+    my ($o) = @_;
+    if (!$$o{cursor}) {
+	if (!$$o{db}->isa('ObjStore::ServerDB')) {
+	    $$o{out}->setText($$o{db}->get_pathname. " is not an ObjStore::ServerDB");
+	    return;
+	}
+	# check every time through XXX
+	my $top = $$o{db}->hash;
+	my $server = $top->{'ObjStore::ServerInfo'};
+	die "Can't find ServerInfo" if !$server;
+	my $d = time - ($$server{mtime} or 0);
+	if (!$server or $d > 30) {
+	    my $str = do {
+		use integer;
+		if ($d <120) {"$d secs" }
+		elsif ($d < 2*60*60) { $d/60 ." minutes" }
+		elsif ($d < 2*60*60*24) { $d/(60**2)." hours" }
+		else { $d/(60*60*24)." days" }
+	    };
+	    $$o{out}->setText($$o{db}->get_pathname." has not been\nupdated since ".scalar(localtime $$server{mtime})." ($str)");
+	}
+	my $myclass = 'ObjStore::Posh::Remote';
+	my $remote = $top->{ $myclass };
+	if (!$remote) {
+	    $$o{out}->setText("creating $myclass...");
+	    return warn "Can't invoke $top->boot_class"
+		if !$top->can('boot_class');
+	    $top->boot_class($myclass);
+	    return;
+	}
+	$remote->enter($USER);
+	my $state = $remote->{ $USER };
+	if (!$state) {
+	    $$o{out}->setText("creating $ {USER}'s cursor...");
+	    return;
+	}
+	$$o{cursor} = $state->new_ref('transient','hard');
+    }
+    my $c = $$o{cursor}->focus;
+
+    return if ($$o{mtime}||0) == ($$c{mtime}||0);
+    $$o{mtime} = $$c{mtime};
+
+    $$o{out}->deselect();
+    my $t;
+    if ($main::Reset) {
+	$c->init;
+	$main::Reset = 0;
+    } else {
+	begin sub { $t = $c->prompt()."\n\n"; };
+	if ($@) { warn; $c->init; }
+    }
+    $t .= "died: ".$$c{why} if $$c{why};
+    if (ref $$c{out}) {
+	$t .= join("\n", @{ $$c{out} });
+    } elsif ($$c{out}) {
+	$t .= $$c{out}
+    }
+    $$o{out}->setText($t);
+}
+
+use Qt::slots 'execute()';
+sub execute {
+    my ($o) = @_;
+    return if !$$o{cursor};
+    my $c = $$o{cursor}->focus;
+    my $in = $$o{in}->text;
+    my $at = rindex($in, "\n\n");
+    my $send = defined $at? substr($in, $at+2) : $in;
+    $c->execute($send);
+    my $hist = $$c{history};
+    $$o{in}->setText(join("\n\n", ($hist? @$hist: ()), $send) . "\n\n");
+    $$o{in}->setCursorPosition(10000, 0);
+    $$o{in}->setYOffset($$o{in}->totalHeight - $$o{in}->viewHeight);
+}
+
+use Qt::slots ('opendb()', 'load()', 'save()', 'printer()', 'closepane()', 'about()');
+
+sub about {
+    $ABOUT ||= QtposhAbout->new();
+    $ABOUT->show();
+}
+
+sub load {
+    my ($o) = @_;
+    my $fn = Qt::FileDialog::getOpenFileName();
+    return if !$fn;
+    
+    my $in = $$o{in};
+    $in->setAutoUpdate(0);
+    $in->clear();
+
+    my $fh = IO::File->new();
+    $fh->open($fn) or do {
+	Qt::MessageBox::information(undef, 'open', "open $fn: $!");
+	return;
+    };
+    while (<$fh>) {
+	chomp;
+	$in->append($_);
+    }
+
+    $in->setAutoUpdate(1);
+    $in->repaint();
+}
+
+sub save {
+    my ($o) = @_;
+    my $fn = Qt::FileDialog::getSaveFileName();
+    return if !$fn;
+
+    my $fh = IO::File->new();
+    $fh->open(">$fn") or do {
+	Qt::MessageBox::information(undef, 'save', "open >$fn: $!");
+	return
+    };
+    print $fh $$o{out}->text();
+}
+
+sub opendb {
+    Qt::MessageBox::information(undef, "not yet", "Not implemented yet...");
+}
+
+sub printer {
+    Qt::MessageBox::information(undef, "not yet", "Not implemented yet...");
+}
+
+sub closepane {
+    my $o = shift;
+    $o->hide;
+    $o;
+}
+
+sub closeEvent {
+    my ($o,$e) = @_;
+    $$o{timer}->cancel;
+    $o->SUPER::closeEvent($e);
+}
+
+package main;
+use Qt;
+
+Editor->new($DB);
+
+require ObjStore::Serve;
+Event->add_hooks(callback => \&ObjStore::Serve::dyn_begin);
+ObjStore::Serve->defaultLoop;

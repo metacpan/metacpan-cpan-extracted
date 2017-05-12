@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<SITE ID="Nlm">
+
+<NAME Lang="en-us">National Library of Medicine</NAME>
+<INFO Lang="en-us">medical relevant documents search</INFO>
+
+<URL Type="More"><![CDATA[
+http://wwwindex.nlm.nih.gov_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+post://wwwindex.nlm.nih.gov/cgi/htsearch?words=_QUERY_&config=exact&method=or&format=builtin%2Dlong
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_NEXT_"><![CDATA[
+<a href="_NEXT_"><img src=/share/image/buttonr.gif
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<strong><a href="_URL_">_TITLE_</a>___<dd>_PREVIEW_...</tt>___<font size=-1>_DATE_,_SIZE_bytes
+]]></TEMPLATE>
+</SITE>

@@ -1,0 +1,17 @@
+Build.PL
+Changes
+INSTALL
+lib/Operator/Util.pm
+LICENSE
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00-load.t
+t/cross.t
+t/hyper.t
+t/reduce.t
+t/zip.t
+xt/author/kwalitee.t
+xt/author/pod-coverage.t
+xt/author/pod.t

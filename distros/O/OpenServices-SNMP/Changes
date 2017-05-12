@@ -1,0 +1,8 @@
+Revision history for OpenServices-SNMP
+
+0.02    2014-10-31
+        Do not depend on a specific version of Module::Pluggable.
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

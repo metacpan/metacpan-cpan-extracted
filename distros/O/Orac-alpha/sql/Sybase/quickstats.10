@@ -1,0 +1,122 @@
+/* Procedure copyright(c) 1995 by Edward M Barlow */
+
+/************************************************************************\ 
+ Procedure Name:	sp__quickstats
+								          
+ Author:		ed barlow
+
+ Description:		
+        prints quick statistics from server.  Useful for monitoring
+
+\************************************************************************/ 
+:r database
+go
+:r dumpdb
+go
+if exists (select *
+           from   sysobjects
+           where  type = "P"
+           and    name = "sp__quickstats")
+begin
+    drop proc sp__quickstats
+end
+go
+
+create proc sp__quickstats( @starttime datetime=NULL, @noconvert int=NULL ,
+	@dont_format char(1) = null
+	)
+as
+
+declare @conn int, @blk int, @locks int, @tlock int, @runnable int, @time1 datetime, @datestmp float, @mirror_name char(6)
+
+set nocount on
+
+select @time1=getdate()
+
+select @conn=count(*)   from master..sysprocesses where suid>1
+select @blk=count(*)    from master..sysprocesses where blocked!=0
+select @locks=count(*)  from master..syslocks
+select @runnable=count(*)  from master..sysprocesses where cmd!="AWAITING COMMAND" and suid>1
+select @tlock=count(*) from master..syslocks where type=1
+
+if exists (select * from master.dbo.sysdevices where status & 64 != 64)
+	select @mirror_name='None'
+else if exists (select * from master.dbo.sysdevices 
+			  		 where cntrltype=0
+						 and status & 64  = 64
+				 		 and status & 256 = 256 )
+begin
+	 select @mirror_name='Broken'
+end
+else if exists (select * from master.dbo.sysdevices 
+			  		 where cntrltype=0
+						 and status & 64 = 64
+				 		 and status & 512 != 512)
+begin
+	 select @mirror_name='Broken'
+end
+else select @mirror_name='Ok'
+
+declare @lc float, @li float, @lidle float, @ldate datetime
+select @ldate=max(date) from sybsystemprocs..record
+select @lc = busy, @li =io, @lidle =idle
+from   sybsystemprocs..record
+where  date=@ldate
+
+declare @ms_per_tick float
+select @ms_per_tick = convert(int,@@timeticks/1000)
+
+/* numbers here are scaled to give percents  */
+select 	
+	@lc			= ( @@cpu_busy * @ms_per_tick) / 1000 - @lc,
+	@li			= ( @@io_busy * @ms_per_tick) / 1000 - @li,
+	@lidle		= ( @@idle * @ms_per_tick) / 1000 - @lidle
+
+declare @sumtimes float
+select  @sumtimes =   @lc + @li +@lidle
+
+if @starttime is not null
+	  exec   sp__datediff @starttime,'m',@datestmp output
+else select @datestmp=@sumtimes/60.0
+
+if @sumtimes=0 
+	select @sumtimes=1,@lc=1,@li=0,@lidle=0
+
+if @noconvert is not null
+begin
+	select
+		  	blocks=@blk,
+		  	conn=@conn,
+		  	ctime=datediff(ms,@time1,getdate()),
+		  	locks=@locks,
+		  	run=@runnable,
+		  	tlock=@tlock,
+			str(convert(float,(100*@lc))/@sumtimes,5,2) "%busy", 
+			str(convert(float,(100*@li))/@sumtimes,5,2)  "%io ", 
+			str(convert(float,(100*@lidle))/@sumtimes,5,2) "%idle", 
+			"mirror"=@mirror_name,
+			mins=@datestmp
+end
+else
+begin
+
+	select
+		  	blks=convert(char(4),@blk),
+		  	conn=convert(char(4),@conn),
+		  	ctime=convert(char(6),datediff(ms,@time1,getdate())),
+		  	locks=convert(char(5),@locks),
+		  	run=convert(char(4),@runnable),
+		  	tlock=convert(char(5),@tlock),
+			"%cpu"=str(convert(float,(100*@lc))/@sumtimes,5,2),
+			"%io"=str(convert(float,(100*@li))/@sumtimes,5,2) ,
+			"%idle"=str(convert(float,(100*@lidle))/@sumtimes,5,2),
+			/* "mirror"=@mirror_name, */
+		  	minutes=ltrim(str(@datestmp,10,1))
+end
+
+exec sp__add_record "quickstats",2
+
+go
+grant execute on sp__quickstats to public
+go
+

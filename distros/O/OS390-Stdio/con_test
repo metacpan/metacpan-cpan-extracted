@@ -1,0 +1,145 @@
+: # use perl
+    eval 'exec ./perl -Iblib/arch -Iblib/lib -w -S $0 ${1+"$@"}'
+	if 0;
+
+# con_test - a test of the OS390::Stdio::constant() Experter tags.
+# Note that above we expect ./perl.  In other words it is assumed that
+# you named your new statically linked perl binary with the OS390::Stdio
+# module linked in `perl' an that it is in the cwd.  If you called you 
+# perl something_else then invoke this script as:
+#     ./something_else -Iblib/arch -Iblib/lib con_test
+# or simply edit the eval exec line above and s/perl/something_else/.
+
+my $DEBUG = 1;
+
+use strict;
+
+use OS390::Stdio qw(
+        :ALCUNIT_CONSTANTS :DISP_CONSTANTS :DSORG_CONSTANTS :RECFM_CONSTANTS
+        :MISCFL_CONSTANTS :VSAM_CONSTANTS :DSNT_CONSTANTS :PATH_CONSTANTS
+                   );
+
+my ($constant, $define);
+
+my $header = '/usr/include/dynit.h';
+
+if (!-e $header) {
+    warn "$header file not found.";
+    warn "exitting...\n";
+    exit 1;
+}
+
+my $test = 0;
+
+print "1..72\n";
+
+while (<DATA>) {
+    next if (/^#/);
+    my ($con,$def) = split;
+    $constant = undef;
+    $constant = OS390::Stdio::constant($con);
+    if ($def =~ /U/i) {
+        chomp($define = `grep $def $header | grep '#define'`);
+    }
+    else {
+        chomp($define = `grep $def $header | grep '#define' | grep -v 'U'`);
+    }
+    $define =~ s/^\s*#define\s+//;
+    $define =~ s/^\s*$def\s*//;
+    $define =~ s/\s+$//;
+    print "# \$constant = $con, value = $constant, \$define = $define";
+    $test++;
+    if ($define =~ /^0x[0-9A-Fa-f]+$/) { 
+        if (hex($define) == $constant) {
+            print ", decimal ",hex($define),"\nok $test\n";
+        }
+        else {
+            print "\nnot ok $test\n";
+        }
+    }
+    else { print "\nok $test # skipped\n"; }
+}
+
+exit;
+
+__END__
+# ALCUNIT_CONSTANTS
+ALCUNIT_CYL    __CYL
+ALCUNIT_TRK    __TRK
+# DISP_CONSTANTS
+DISP_OLD       __DISP_OLD
+DISP_MOD       __DISP_MOD
+DISP_NEW       __DISP_NEW
+DISP_SHR       __DISP_SHR
+DISP_UNCATLG   __DISP_UNCATLG
+DISP_CATLG     __DISP_CATLG
+DISP_DELETE    __DISP_DELETE
+DISP_KEEP      __DISP_KEEP
+# DSORG_CONSTANTS
+DSORG_unknown  __DSORG_unknown
+DSORG_VSAM     __DSORG_VSAM
+DSORG_GS       __DSORG_GS
+DSORG_PO       __DSORG_PO
+DSORG_POU      __DSORG_POU
+DSORG_DA       __DSORG_DA
+DSORG_DAU      __DSORG_DAU
+DSORG_PS       __DSORG_PS
+DSORG_PSU      __DSORG_PSU
+DSORG_IS       __DSORG_IS
+DSORG_ISU      __DSORG_ISU
+# RECFM_CONSTANTS
+RECFM_M        _M_
+RECFM_A        _A_
+RECFM_S        _S_
+RECFM_B        _B_
+RECFM_D        _D_
+RECFM_V        _V_
+RECFM_F        _F_
+RECFM_U        _U_
+RECFM_FB       _FB_
+RECFM_VB       _VB_
+RECFM_FBS      _FBS_
+RECFM_VBS      _VBS_
+# MISCFL_CONSTANTS
+MISCFL_CLOSE   __CLOSE
+MISCFL_RELEASE __RELEASE
+MISCFL_PERM    __PERM
+MISCFL_CONTIG  __CONTIG
+MISCFL_ROUND   __ROUND
+MISCFL_TERM    __TERM
+MISCFL_DUMMY_DSN __DUMMY_DSN
+MISCFL_HOLDQ   __HOLDQ
+# VSAM_CONSTANTS
+VSAM_KS        __KS
+VSAM_ES        __ES
+VSAM_RR        __RR
+VSAM_LS        __LS
+# DSNT_CONSTANTS
+DSNT_HFS       __DSNT_HFS
+DSNT_PIPE      __DSNT_PIPE
+DSNT_PDS       __DSNT_PDS
+DSNT_LIBRARY   __DSNT_LIBRARY
+# PATH_CONSTANTS
+PATH_OCREAT    __PATH_OCREAT
+PATH_OEXCL     __PATH_OEXCL
+PATH_ONOCTTY   __PATH_ONOCTTY
+PATH_OTRUNC    __PATH_OTRUNC
+PATH_OAPPEND   __PATH_OAPPEND
+PATH_ONONBLOCK __PATH_ONONBLOCK
+PATH_ORDWR     __PATH_ORDWR
+PATH_ORDONLY   __PATH_ORDONLY
+PATH_OWRONLY   __PATH_OWRONLY
+PATH_SISUID    __PATH_SISUID
+PATH_SISGID    __PATH_SISGID
+PATH_SIRUSR    __PATH_SIRUSR
+PATH_SIWUSR    __PATH_SIWUSR
+PATH_SIXUSR    __PATH_SIXUSR
+PATH_SIRWXU    __PATH_SIRWXU
+PATH_SIRGRP    __PATH_SIRGRP
+PATH_SIWGRP    __PATH_SIWGRP
+PATH_SIXGRP    __PATH_SIXGRP
+PATH_SIRWXG    __PATH_SIRWXG
+PATH_SIROTH    __PATH_SIROTH
+PATH_SIWOTH    __PATH_SIWOTH
+PATH_SIXOTH    __PATH_SIXOTH
+PATH_SIRWXO    __PATH_SIRWXO

@@ -1,0 +1,22 @@
+0.10  2013-05-13
+- updated to version 1.3.0 of OIS
+
+0.05  2009-09-15
+- updated to version 1.2.0 of OIS
+  (needs more work...)
+
+0.04  2007-12-04
+- fixed MouseState (I was doing "new MouseState", which meant that
+  any time you set width or height it wouldn't actually affect
+  the MouseState of the Mouse object itself...)
+
+0.03  2007-09-02
+- KeyEvent, MouseEvent wrapped
+- MouseEvent no longer segfaults (I think)
+
+0.02  2007-08-30
+- fixed setEventCallback for Keyboard, Mouse, and JoyStick classes,
+  along with the PerlOIS*Listener classes
+
+0.01  2007-08-28
+- first release

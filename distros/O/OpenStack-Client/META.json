@@ -1,0 +1,32 @@
+{
+   "abstract" : "A nice and tiny OpenStack API client",
+   "author" : [
+      "Alexandra Hrefna Hilmisdóttir <xan@cpanel.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "OpenStack-Client",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/xantronix/openstack-client.git",
+         "web" : "https://github.com/xantronix/openstack-client"
+      }
+   },
+   "version" : "1.0002",
+   "x_serialization_backend" : "JSON::PP version 2.27202"
+}

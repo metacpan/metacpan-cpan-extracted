@@ -1,0 +1,29 @@
+Revision history for Perl extension OpenGL::GLU.
+
+0.03    2017-03-04 07:43:24-05:00
+        - New official release of OpenGL::GLU
+        - Now works windows, unix, macosx
+        - Some missing constants for windows (TODO)
+
+
+0.02_02 2017-03-03 10:43:41-05:00
+        - Fixed missing constants because of out-of-order includes
+	  NOTE: have to have <GL/glu.h> before "const-c.inc"
+	- Added missing gluTessVertex to exports
+	- Fixed tests to fail on fail
+
+
+0.02_01 2017-03-03 09:18:32-05:00
+        - Fix gl.h and glu.h includes for __APPLE__
+          The Apple convention is <OpenGL/gl.h> and <OpenGL/glu.h>
+          where OpenGL is the name of the framework.
+
+
+0.02    2017-02-13 10:26:37-05:00
+        - Change minimum perl version to 5.8
+
+
+0.01    2017-02-11 14:38:50-05:00
+	- original version; created by h2xs 1.23 with options
+		-O -F -DGL_OES_EGL_image=1 -d -n OpenGL::GLU -x -M '^(glu|GLU_)' glu.h
+        - merged in GLU XS from OpenGL

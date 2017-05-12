@@ -1,0 +1,113 @@
+---
+abstract: 'usable ORM'
+author:
+  - 'Viacheslav Tykhanovskyi'
+build_requires:
+  Test::Fatal: '0'
+  Test::More: '0.98'
+  Test::Spec: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.4, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: ObjectDB
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  ObjectDB:
+    file: lib/ObjectDB.pm
+    version: '3.19'
+  ObjectDB::DBHPool:
+    file: lib/ObjectDB/DBHPool.pm
+    version: '3.19'
+  ObjectDB::DBHPool::Connection:
+    file: lib/ObjectDB/DBHPool/Connection.pm
+    version: '3.19'
+  ObjectDB::Exception:
+    file: lib/ObjectDB/Exception.pm
+  ObjectDB::Factory:
+    file: lib/ObjectDB/Factory.pm
+    version: '3.19'
+  ObjectDB::Meta:
+    file: lib/ObjectDB/Meta.pm
+    version: '3.19'
+  ObjectDB::Meta::Relationship:
+    file: lib/ObjectDB/Meta/Relationship.pm
+    version: '3.19'
+  ObjectDB::Meta::Relationship::ManyToMany:
+    file: lib/ObjectDB/Meta/Relationship/ManyToMany.pm
+    version: '3.19'
+  ObjectDB::Meta::Relationship::ManyToOne:
+    file: lib/ObjectDB/Meta/Relationship/ManyToOne.pm
+    version: '3.19'
+  ObjectDB::Meta::Relationship::OneToMany:
+    file: lib/ObjectDB/Meta/Relationship/OneToMany.pm
+    version: '3.19'
+  ObjectDB::Meta::Relationship::OneToOne:
+    file: lib/ObjectDB/Meta/Relationship/OneToOne.pm
+    version: '3.19'
+  ObjectDB::Meta::RelationshipFactory:
+    file: lib/ObjectDB/Meta/RelationshipFactory.pm
+    version: '3.19'
+  ObjectDB::Quoter:
+    file: lib/ObjectDB/Quoter.pm
+    version: '3.19'
+  ObjectDB::Related:
+    file: lib/ObjectDB/Related.pm
+    version: '3.19'
+  ObjectDB::Related::ManyToMany:
+    file: lib/ObjectDB/Related/ManyToMany.pm
+    version: '3.19'
+  ObjectDB::Related::ManyToOne:
+    file: lib/ObjectDB/Related/ManyToOne.pm
+    version: '3.19'
+  ObjectDB::Related::OneToMany:
+    file: lib/ObjectDB/Related/OneToMany.pm
+    version: '3.19'
+  ObjectDB::Related::OneToOne:
+    file: lib/ObjectDB/Related/OneToOne.pm
+    version: '3.19'
+  ObjectDB::RelatedFactory:
+    file: lib/ObjectDB/RelatedFactory.pm
+    version: '3.19'
+  ObjectDB::Stmt:
+    file: lib/ObjectDB/Table.pm
+  ObjectDB::Table:
+    file: lib/ObjectDB/Table.pm
+    version: '3.19'
+  ObjectDB::Util:
+    file: lib/ObjectDB/Util.pm
+    version: '3.19'
+  ObjectDB::With:
+    file: lib/ObjectDB/With.pm
+    version: '3.19'
+recommends:
+  DBIx::Inspector: '0'
+requires:
+  Carp: '0'
+  DBI: '0'
+  Hash::Merge: '0'
+  SQL::Composer: '0.13'
+  Storable: '0'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/vti/object-db/issues
+  homepage: https://github.com/vti/object-db
+  repository: git://github.com/vti/object-db.git
+version: '3.19'
+x_contributors:
+  - 'vti <vti@clarive.com>'
+  - 'vti <viacheslav.t@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

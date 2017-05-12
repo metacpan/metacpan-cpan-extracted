@@ -1,0 +1,54 @@
+{
+   "abstract" : "add and override per-object methods",
+   "author" : [
+      "chocolateboy <chocolate@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.130880",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Object-Extend",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Scalar::Util" : "1.09",
+            "Storable" : "2.05",
+            "perl" : "5.008000"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/chocolateboy/Object-Extend/issues"
+      },
+      "repository" : {
+         "url" : "https://github.com/chocolateboy/Object-Extend"
+      }
+   },
+   "version" : "v0.4.0",
+   "x_test_requires" : {
+      "Test::More" : 0
+   }
+}

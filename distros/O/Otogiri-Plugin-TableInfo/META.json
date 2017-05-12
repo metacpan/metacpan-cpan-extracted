@@ -1,0 +1,91 @@
+{
+   "abstract" : "retrieve table information from database",
+   "author" : [
+      "Takuya Tsuchida <tsucchi@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.1.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Otogiri-Plugin-TableInfo",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::PostgreSQL" : "0",
+            "Test::Spellunker" : "v0.2.7",
+            "Test::mysqld" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBI" : "0",
+            "DBIx::Inspector" : "0",
+            "List::MoreUtils" : "0",
+            "Otogiri" : "0.06",
+            "Otogiri::Plugin" : "0.02",
+            "parent" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "DBD::SQLite" : "0",
+            "Test::Differences" : "0",
+            "Test::More" : "0",
+            "Test::Requires" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Otogiri::Plugin::TableInfo" : {
+         "file" : "lib/Otogiri/Plugin/TableInfo.pm",
+         "version" : "0.04"
+      },
+      "Otogiri::Plugin::TableInfo::Pg" : {
+         "file" : "lib/Otogiri/Plugin/TableInfo/Pg.pm"
+      },
+      "Otogiri::Plugin::TableInfo::PgKeywords" : {
+         "file" : "lib/Otogiri/Plugin/TableInfo/PgKeywords.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tsucchi/p5-Otogiri-Plugin-TableInfo/issues"
+      },
+      "homepage" : "https://github.com/tsucchi/p5-Otogiri-Plugin-TableInfo",
+      "repository" : {
+         "url" : "git://github.com/tsucchi/p5-Otogiri-Plugin-TableInfo.git",
+         "web" : "https://github.com/tsucchi/p5-Otogiri-Plugin-TableInfo"
+      }
+   },
+   "version" : "0.04"
+}

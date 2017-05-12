@@ -1,0 +1,30 @@
+[%- IF error_msg -%]
+
+[%- DEFAULT theme        = OI.theme_properties;
+    SET error_width      = width || theme.error_width;
+    SET error_font_color = font_color || theme.error_font_color;
+    SET error_border     = border_color || theme.error_border_color;
+    SET error_bgcolor    = bgcolor ||theme.error_bgcolor; -%]
+
+<!-- BEGIN of error display -->
+
+<div align="center">
+
+[%- INCLUDE table_bordered_begin( table_width  = error_width,
+                                  border_color = error_border,
+                                  bgcolor      = error_bgcolor ) -%]
+
+<tr><td align="center">
+   <font color="[% error_font_color %]" size="+1"><b>Error</b></font>
+</td></tr>
+<tr><td>
+   <font color="[% error_font_color %]">[% error_msg %]</font>
+</td></tr>
+
+[% PROCESS table_bordered_end -%]
+
+</div>
+
+<!-- END of error display -->
+
+[%- END -%]

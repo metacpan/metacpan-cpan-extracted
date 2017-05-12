@@ -1,0 +1,58 @@
+=head1 NAME
+
+OpenHMD - Collection of modules for using OpenHMD
+
+=head1 DESCRIPTION
+
+OpenHMD is a distribution of modules for utilising OpenHMD within Perl.
+It aims to provide both low level bindings and object-orientated wrappers.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<openhmd.net|http://openhmd.net/>
+
+OpenHMD's website.
+
+=item #openhmd @ freenode
+
+Official IRC channel for OpenHMD
+
+=item L<OpenHMD::Backend::Inline>
+
+Thin binding module for OpenHMD utilising Inline::C
+
+=back
+
+=head1 ACKNOWLEDGEMENTS
+
+=over 4
+
+=item Electric Jungle
+
+Maintaining the CPAN release.
+
+=item Fredrick Hultin and Joey Ferwerda
+
+For their help with the C aspect of this module, answering questions,
+implementing suggested functionality into OpenHMD and generally being very
+encouraging and supportive.
+
+
+=back
+
+=head1 AUTHOR
+
+CandyAngel <candyangel@electricjungle.org>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2015 CandyAngel <candyangel@electricjungle.org>.
+All rights reserved.
+
+This module is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself. See L<perlartistic>.  This program is
+distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.

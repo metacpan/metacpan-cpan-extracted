@@ -1,0 +1,105 @@
+/* Procedure copyright(c) 1995 by Edward M Barlow */
+
+/************************************************************************\ 
+|* Procedure Name:	sp__auditsecurity				
+|*									
+|* Description:		server check security				
+|*										
+|*		Users With Paswords like %Id%				
+|*		Users With Null Passwords				
+|*		Users With Short (<=4 character) Passwords		
+|*		Users With Master,Model, or Tempdb Database As Default			
+|*		Allow Updates is set			
+|*		Checks stupid passwords
+|*									
+|* Usage:		sp__auditsecurity @print_only_errors		
+|*									
+|*    if @print_only_errors is not null then prints only errors		
+|*									
+|* Modification History:						
+|*									
+\************************************************************************/ 
+
+:r database
+go
+:r dumpdb
+go
+
+if exists (select *
+           from   sysobjects
+           where  type = "P"
+           and    name = "sp__auditsecurity")
+begin
+    drop proc sp__auditsecurity
+end
+go
+
+create procedure sp__auditsecurity ( 
+	@print_only_errors int = NULL,
+	@srvname char(30) = NULL,
+	@hostname char(30) = NULL, @dont_format char(1) = null )
+as
+begin
+
+	if @srvname is not null and @hostname is null
+	begin
+		print "MUST PASS BOTH SERVER AND HOST IF EITHER SPECIFIED"
+		return 200
+	end
+
+	create table #error
+	( error_no int not null, msg char(74) not null )
+
+	set nocount on
+
+	INSERT	#error
+	SELECT 	31002,"User "+name+" Has Null Password"
+	from 		master..syslogins 
+	where   	password is null
+	if @@rowcount=0 and @print_only_errors is null 
+		insert #error values (31000, "(No Users With Null Passwords)")
+
+	INSERT	#error
+	SELECT  	31004,"User "+name+" Has "+dbname+" Database As Default"
+	from 		master..syslogins 
+	where   	dbname in ("master","model","tempdb")
+	and		name != "sa"
+	and		name != "probe"
+	if @@rowcount=0 and @print_only_errors is null 
+		insert #error values (31000, "(No Users With Master/Model/Tempdb As Default)")
+
+	INSERT	#error
+	SELECT  	31005,"Allow Updates is Set"
+	from 		master..syscurconfigs 
+	where   	config=102 and value=1
+
+	if @@rowcount=0
+		INSERT	#error
+		SELECT  	31005,"Allow Updates is Set"
+		from 		master..sysconfigures 
+		where   	config=102 and value=1
+
+	if @@rowcount=0 and @print_only_errors is null 
+		insert #error values (31000, "(Allow Updates is Not Set)")
+
+	INSERT	#error
+	SELECT  	31012,"User sa is trusted from "+srvname
+	from 		master..sysremotelogins r, master..sysservers s 
+	where   	r.remoteserverid = s.srvid
+	and	   r.suid=1
+	and	   r.status=1
+	if @@rowcount=0 and @print_only_errors is null 
+		insert #error values (31000, "(No Trusted Remote Logins)")
+
+	if @srvname is null
+		select "Security Violations"=msg
+		from #error
+	else
+		select hostname=@hostname,srvname=@srvname,error_no,db="master",type="a",day=getdate(),"Violation"=msg
+		from #error
+
+	drop table #error
+end
+go
+
+/* no priviliges to any but sa */

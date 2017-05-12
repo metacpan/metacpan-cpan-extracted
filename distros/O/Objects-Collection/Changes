@@ -1,0 +1,23 @@
+Revision history for Perl extension Objects::Collection.
+
+0.01  Wed Dec 21 03:22:55 2005
+	- original version; created by h2xs 1.23 with options
+		-AXc --skip-exporter Objects::Collection
+0.30  23/12/2006
+        - fix pods
+0.32  22/01/2007
+       - AutoSQL::fetch_object - support query
+0.33  
+        - add LazyLoad support
+        - add UnionHash
+0.34  
+        - fix 0 for test on defined 
+	- add expressions (<> ) to key names
+
+0.35
+    - return undef if empty  for _prepare_where
+0.36 
+    - fix Collection/AutoSQL prepare_where for id ==0
+0.37
+    - add Memcached class
+    - add  class for mirror collections

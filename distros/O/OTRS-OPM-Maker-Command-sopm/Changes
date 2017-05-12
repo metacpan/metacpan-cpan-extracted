@@ -1,0 +1,112 @@
+History for OTRS::OPM::Maker::Command::sopm
+===========================================
+
+1.37 2017-04-11
+
+    [IMPROVEMENTS]
+    * add support for KIX - just define 'product: KIX' in the JSON file
+      and CodeXXXX sections are created correctly
+
+1.36 2016-12-01
+
+    [IMPROVEMENTS]
+    * add support for 'Minimum' and 'Maximum' framework version
+
+1.35 2016-07-03
+
+    [MISC]
+    * Define required Perl version
+
+1.34 2016-06-28
+
+    [IMPROVEMENTS]
+    * add support for UniqueCreate and UniqueDrop
+
+1.33 2016-01-07
+
+    [BUGFIX]
+    * When framework version is only OTRS5 the old OTRS3 utils module was loaded, now it loads the necessary OTRS4 utils module
+
+1.32 2016-01-07
+
+    [IMPROVEMENTS]
+    * add support for changes_file in .json file to keep track of the changes in an extra file
+
+1.31 2015-12-03
+
+    [IMPROVEMENTS]
+    * add ColumnDrop handling
+
+1.30 2015-11-30
+
+    [IMPROVEMENTS]
+    * add ForeignKeyDrop handling
+
+1.29 2015-02-17
+
+    [IMPROVEMENTS]
+    * fix db bug: table drops were added in alphabetical order, now they are added in
+      reverse order of definition as they might depend on each other
+
+1.28 2014-12-17
+
+    [IMPROVEMENTS]
+    * support changelog
+
+    [DOCUMENTATION]
+    * fix pod error
+
+1.27 2014-12-10
+
+    [IMPROVEMENTS]
+    * Now you can exclude files from being included
+
+    [DOCUMENTATION]
+    * Add a description
+    * Add some basic examples
+
+1.26 2014-12-09
+
+    [IMPROVEMENTS]
+    * Add warnings when OTRS 3.x files are found (.dtl) and OTRS 4.0 is specified
+    * Update packagesetup routine for OTRS 4.0
+    * Add warning when OTRS 3.x and OTRS 4.x are specified as framework versions
+
+    [TESTS]
+    * moved basic tests to t/base/
+    * new warnings tests in t/warnings/
+    * add tests for OTRS4
+    * add tests for CodeInstall/-Upgrade/-Uninstall
+
+1.25 2014-09-29
+
+    + check column types
+
+1.24 2014-09-28
+
+    + added support for "multiline" inserts
+
+1.23 2014-09-28
+
+    + added support for ForeignKeyCreate
+
+1.21 2014-05-09
+
+     + added xml comment that the .sopm was generated
+     + made CVS tag optional
+
+1.20 2014-04-17
+
+     + improved handling of "Uniques" in table creates
+     + added tests
+
+1.19 2014-04-04
+
+     + improved handling for Intro tags
+     + added tests
+
+1.18 2013-10-31
+
+     + fix bug in "<...Required>": the required version wasn't added
+     + improved tests
+     + add Changes file

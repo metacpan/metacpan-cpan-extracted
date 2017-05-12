@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<SITE ID="Whatuseek">
+
+<NAME Lang="en-us">What-U-Seek Engine</NAME>
+<INFO Lang="en-us">general information web search</INFO>
+
+<URL Type="More"><![CDATA[
+http://element.whatuseek.com/cgi-bin/texis/texis/seek?db=db&defcmd=find&disp=all&grsz=0&proximity=rank&suffixproc=off&thesaurus=0&arg=_QUERY_&jump=_START_20_0_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://element.whatuseek.com/cgi-bin/texis/texis/seek?db=db&defcmd=find&disp=all&grsz=0&proximity=rank&suffixproc=off&thesaurus=0&arg=_QUERY_&jump=0
+]]></URL>
+
+
+
+<TEMPLATE><![CDATA[
+url=_URL_">___>_TITLE_</A>___<BR>_PREVIEW_</FONT><BR>___FACE=HELVETICA>_SCORE_%
+]]></TEMPLATE>
+</SITE>

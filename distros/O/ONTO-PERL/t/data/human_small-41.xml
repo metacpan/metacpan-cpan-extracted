@@ -1,0 +1,1304 @@
+   <entrySet level="2" minorVersion="3" version="5" xmlns="net:sf:psidev:mi" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="net:sf:psidev:mi http://psidev.sourceforge.net/mi/rel25/src/MIF253.xsd">
+     <entry>
+       <source releaseDate="2010-10-07">
+         <names>
+           <shortLabel>European Bioinformatics Institute</shortLabel>
+         </names>
+         <bibref>
+           <xref>
+             <primaryRef db="pubmed" dbAc="MI:0446" id="14681455" refType="primary-reference" refTypeAc="MI:0358"/>
+           </xref>
+         </bibref>
+         <xref>
+           <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0469" refType="primary-reference" refTypeAc="MI:0358"/>
+         </xref>
+         <attributeList>
+           <attribute name="postalAddress">Wellcome Trust Genome Campus, Hinxton, Cambridge, CB10 1SD, United Kingdom</attribute>
+           <attribute name="url">http://www.ebi.ac.uk</attribute>
+         </attributeList>
+       </source>
+       <experimentList>
+         <experimentDescription id="2">
+           <names>
+             <shortLabel>hayes-1998-1</shortLabel>
+             <fullName>DDB, a putative DNA repair protein, can function as a transcriptional partner of E2F1.</fullName>
+           </names>
+           <bibref>
+             <xref>
+               <primaryRef db="pubmed" dbAc="MI:0446" id="9418871" refType="primary-reference" refTypeAc="MI:0358"/>
+             </xref>
+           </bibref>
+           <xref>
+             <primaryRef db="intact" dbAc="MI:0469" id="EBI-1213614" refType="identity" refTypeAc="MI:0356" secondary="hayes-1998-1"/>
+             <secondaryRef db="newt" dbAc="MI:0247" id="9606" refType="target-species" secondary="human"/>
+           </xref>
+           <hostOrganismList>
+             <hostOrganism ncbiTaxId="-1">
+               <names>
+                 <shortLabel>in vitro</shortLabel>
+               </names>
+             </hostOrganism>
+           </hostOrganismList>
+           <interactionDetectionMethod>
+             <names>
+               <shortLabel>pull down</shortLabel>
+               <fullName>pull down</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0096" refType="identity" refTypeAc="MI:0356"/>
+               <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference" refTypeAc="MI:0358"/>
+             </xref>
+           </interactionDetectionMethod>
+           <participantIdentificationMethod>
+             <names>
+               <shortLabel>weight autoradiogra</shortLabel>
+               <fullName>molecular weight estimation by autoradiography</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0821" refType="identity" refTypeAc="MI:0356"/>
+               <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference" refTypeAc="MI:0358"/>
+             </xref>
+           </participantIdentificationMethod>
+           <attributeList>
+             <attribute name="author-list">Hayes S., Shiyanov P., Chen X., Raychaudhuri P.</attribute>
+             <attribute name="journal">Mol. Cell. Biol. (0270-7306)</attribute>
+             <attribute name="publication year">1998</attribute>
+             <attribute name="dataset">Cancer - Interactions investigated in the context of cancer</attribute>
+             <attribute name="contact-email">Pradip@uic.edu</attribute>
+             <attribute name="dataset">Apoptosis - Interactions involving proteins with a function related to apoptosis</attribute>
+           </attributeList>
+         </experimentDescription>
+         <experimentDescription id="11">
+           <names>
+             <shortLabel>tu-2007-2</shortLabel>
+             <fullName>Proteomics analysis of the interactome of N-myc downstream regulated gene 1 and its interactions with the androgen response program in prostate cancer cells.</fullName>
+           </names>
+           <bibref>
+             <xref>
+               <primaryRef db="pubmed" dbAc="MI:0446" id="17220478" refType="primary-reference" refTypeAc="MI:0358"/>
+             </xref>
+           </bibref>
+           <xref>
+             <primaryRef db="intact" dbAc="MI:0469" id="EBI-1191137" refType="identity" refTypeAc="MI:0356" secondary="tu-2007-2"/>
+             <secondaryRef db="newt" dbAc="MI:0247" id="9606" refType="target-species" secondary="human"/>
+           </xref>
+           <hostOrganismList>
+             <hostOrganism ncbiTaxId="9606">
+               <names>
+                 <shortLabel>human-lncap</shortLabel>
+                 <fullName>Human caucasian prostate carcinoma</fullName>
+               </names>
+               <cellType>
+                 <names>
+                   <shortLabel>lncap</shortLabel>
+                   <fullName>Human caucasian prostate adenocarcinoma</fullName>
+                 </names>
+                 <xref>
+                   <primaryRef db="cabri" dbAc="MI:0246" id="ACC 256" refType="identity" refTypeAc="MI:0356"/>
+                   <secondaryRef db="intact" dbAc="MI:0469" id="IA:0167" refType="identity" refTypeAc="MI:0356"/>
+                 </xref>
+               </cellType>
+             </hostOrganism>
+           </hostOrganismList>
+           <interactionDetectionMethod>
+             <names>
+               <shortLabel>anti bait coip</shortLabel>
+               <fullName>anti bait coimmunoprecipitation</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0006" refType="identity" refTypeAc="MI:0356"/>
+               <secondaryRef db="pubmed" dbAc="MI:0446" id="7708014" refType="primary-reference" refTypeAc="MI:0358"/>
+             </xref>
+           </interactionDetectionMethod>
+           <participantIdentificationMethod>
+             <names>
+               <shortLabel>western blot</shortLabel>
+               <fullName>western blot</fullName>
+               <alias>Immuno blot</alias>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0113" refType="identity" refTypeAc="MI:0356"/>
+               <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference" refTypeAc="MI:0358"/>
+             </xref>
+           </participantIdentificationMethod>
+           <attributeList>
+             <attribute name="author-list">Tu LC., Yan X., Hood L., Lin B.</attribute>
+             <attribute name="journal">Mol. Cell Proteomics (1535-9476)</attribute>
+             <attribute name="publication year">2007</attribute>
+             <attribute name="dataset">Cancer - Interactions investigated in the context of cancer</attribute>
+             <attribute name="contact-email">blin@systemsbiology.org</attribute>
+             <attribute name="exp-modification">Cell lysates were immunoprecipitated with the appropriate antibody. The immune complex was then separated by SDS-PAGE followed by western blotting.</attribute>
+           </attributeList>
+         </experimentDescription>
+       </experimentList>
+       <interactorList>
+         <interactor id="4">
+           <names>
+             <shortLabel>ddb2_human</shortLabel>
+             <fullName>DNA damage-binding protein 2</fullName>
+             <alias type="gene name synonym" typeAc="MI:0302">Damage-specific DNA-binding protein 2</alias>
+             <alias type="gene name" typeAc="MI:0301">DDB2</alias>
+             <alias type="gene name synonym" typeAc="MI:0302">UV-damaged DNA-binding protein 2</alias>
+             <alias type="gene name synonym" typeAc="MI:0302">DDB p48 subunit</alias>
+           </names>
+           <xref>
+             <primaryRef db="uniprotkb" dbAc="MI:0486" id="Q92466" refType="identity" refTypeAc="MI:0356" version="SP_76"/>
+             <secondaryRef db="ipi" dbAc="MI:0675" id="IPI00607727"/>
+             <secondaryRef db="ipi" dbAc="MI:0675" id="IPI00607674"/>
+             <secondaryRef db="ipi" dbAc="MI:0675" id="IPI00549348"/>
+             <secondaryRef db="ipi" dbAc="MI:0675" id="IPI00446284"/>
+             <secondaryRef db="ipi" dbAc="MI:0675" id="IPI00021518"/>
+             <secondaryRef db="reactome" dbAc="MI:0467" id="REACT_216"/>
+             <secondaryRef db="refseq" dbAc="MI:0481" id="NP_000098.1"/>
+             <secondaryRef db="rcsb pdb" dbAc="MI:0460" id="3I7L"/>
+             <secondaryRef db="rcsb pdb" dbAc="MI:0460" id="3EI4"/>
+             <secondaryRef db="interpro" dbAc="MI:0449" id="IPR017986"/>
+             <secondaryRef db="interpro" dbAc="MI:0449" id="IPR001680" secondary="WD40"/>
+             <secondaryRef db="interpro" dbAc="MI:0449" id="IPR015943"/>
+             <secondaryRef db="interpro" dbAc="MI:0449" id="IPR011046"/>
+             <secondaryRef db="interpro" dbAc="MI:0449" id="IPR019775"/>
+             <secondaryRef db="interpro" dbAc="MI:0449" id="IPR019782"/>
+             <secondaryRef db="interpro" dbAc="MI:0449" id="IPR019781"/>
+             <secondaryRef db="ensembl" dbAc="MI:0476" id="ENSG00000134574"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0003684" secondary="F:damaged DNA binding"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0009411"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0000209"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0051865"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0000718"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0043234"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0005654"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0019941"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0005515"/>
+             <secondaryRef db="uniprotkb" dbAc="MI:0486" id="Q76E56" refType="secondary-ac" refTypeAc="MI:0360" version="SP_76"/>
+             <secondaryRef db="uniprotkb" dbAc="MI:0486" id="Q76E55" refType="secondary-ac" refTypeAc="MI:0360" version="SP_76"/>
+             <secondaryRef db="uniprotkb" dbAc="MI:0486" id="Q76E54" refType="secondary-ac" refTypeAc="MI:0360" version="SP_76"/>
+             <secondaryRef db="uniprotkb" dbAc="MI:0486" id="B2R875" refType="secondary-ac" refTypeAc="MI:0360" version="SP_101"/>
+             <secondaryRef db="uniprotkb" dbAc="MI:0486" id="Q76E57" refType="secondary-ac" refTypeAc="MI:0360" version="SP_76"/>
+             <secondaryRef db="intact" dbAc="MI:0469" id="EBI-1176171" refType="identity" refTypeAc="MI:0356" secondary="ddb2_human"/>
+           </xref>
+           <interactorType>
+             <names>
+               <shortLabel>protein</shortLabel>
+               <fullName>protein</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0326" refType="identity" refTypeAc="MI:0356"/>
+               <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference" refTypeAc="MI:0358"/>
+               <secondaryRef db="so" dbAc="MI:0601" id="SO:0000358" refType="identity" refTypeAc="MI:0356"/>
+             </xref>
+           </interactorType>
+           <organism ncbiTaxId="9606">
+             <names>
+               <shortLabel>human</shortLabel>
+               <fullName>Homo sapiens</fullName>
+             </names>
+           </organism>
+           <sequence>MAPKKRPETQKTSEIVLRPRNKRSRSPLELEPEAKKLCAKGSGPSRRCDSDCLWVGLAGPQILPPCRSIVRTLHQHKLGRASWPSVQQGLQQSFLHTLDSYRILQKAAPFDRRATSLAWHPTHPSTVAVGSKGGDIMLWNFGIKDKPTFIKGIGAGGSITGLKFNPLNTNQFYASSMEGTTRLQDFKGNILRVFASSDTINIWFCSLDVSASSRMVVTGDNVGNVILLNMDGKELWNLRMHKKKVTHVALNPCCDWFLATASVDQTVKIWDLRQVRGKASFLYSLPHRHPVNAACFSPDGARLLTTDQKSEIRVYSASQWDCPLGLIPHPHRHFQHLTPIKAAWHPRYNLIVVGRYPDPNFKSCTPYELRTIDVFDGNSGKMMCQLYDPESSGISSLNEFNPMGDTLASAMGYHILIWSQEEARTRK</sequence>
+         </interactor>
+         <interactor id="7">
+           <names>
+             <shortLabel>e2f1_human</shortLabel>
+             <fullName>Transcription factor E2F1</fullName>
+             <alias type="gene name synonym" typeAc="MI:0302">Retinoblastoma-binding protein 3</alias>
+             <alias type="gene name synonym" typeAc="MI:0302">PRB-binding protein E2F-1</alias>
+             <alias type="gene name synonym" typeAc="MI:0302">RBBP3</alias>
+             <alias type="gene name synonym" typeAc="MI:0302">Retinoblastoma-associated protein 1</alias>
+             <alias type="gene name" typeAc="MI:0301">E2F1</alias>
+             <alias type="gene name synonym" typeAc="MI:0302">PBR3</alias>
+           </names>
+           <xref>
+             <primaryRef db="uniprotkb" dbAc="MI:0486" id="Q01094" refType="identity" refTypeAc="MI:0356" version="SP_99"/>
+             <secondaryRef db="ipi" dbAc="MI:0675" id="IPI00005630"/>
+             <secondaryRef db="reactome" dbAc="MI:0467" id="REACT_152"/>
+             <secondaryRef db="refseq" dbAc="MI:0481" id="NP_005216.1"/>
+             <secondaryRef db="rcsb pdb" dbAc="MI:0460" id="1O9K"/>
+             <secondaryRef db="rcsb pdb" dbAc="MI:0460" id="1H24"/>
+             <secondaryRef db="rcsb pdb" dbAc="MI:0460" id="2AZE"/>
+             <secondaryRef db="interpro" dbAc="MI:0449" id="IPR015634"/>
+             <secondaryRef db="interpro" dbAc="MI:0449" id="IPR015633"/>
+             <secondaryRef db="interpro" dbAc="MI:0449" id="IPR011991" secondary="Wing_hlx_DNA_bd"/>
+             <secondaryRef db="interpro" dbAc="MI:0449" id="IPR003316" secondary="E2F_TDP"/>
+             <secondaryRef db="ensembl" dbAc="MI:0476" id="ENSG00000101412"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0003700" secondary="F:transcription factor activit"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0005739"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0006350"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0000122" secondary="P:negative regulation of trans"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0000080" secondary="P:G1 phase of mitotic cell cyc"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0008283" secondary="P:cell proliferation"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0006915" secondary="P:apoptosis"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0003714" secondary="F:transcription corepressor ac"/>
+             <secondaryRef db="uniprotkb" dbAc="MI:0486" id="Q92768" refType="secondary-ac" refTypeAc="MI:0360" version="SP_99"/>
+             <secondaryRef db="uniprotkb" dbAc="MI:0486" id="Q13143" refType="secondary-ac" refTypeAc="MI:0360" version="SP_99"/>
+             <secondaryRef db="intact" dbAc="MI:0469" id="EBI-448924" refType="identity" refTypeAc="MI:0356" secondary="e2f1_human"/>
+           </xref>
+           <interactorType>
+             <names>
+               <shortLabel>protein</shortLabel>
+               <fullName>protein</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0326" refType="identity" refTypeAc="MI:0356"/>
+               <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference" refTypeAc="MI:0358"/>
+               <secondaryRef db="so" dbAc="MI:0601" id="SO:0000358" refType="identity" refTypeAc="MI:0356"/>
+             </xref>
+           </interactorType>
+           <organism ncbiTaxId="9606">
+             <names>
+               <shortLabel>human</shortLabel>
+               <fullName>Homo sapiens</fullName>
+             </names>
+           </organism>
+           <sequence>MALAGAPAGGPCAPALEALLGAGALRLLDSSQIVIISAAQDASAPPAPTGPAAPAAGPCDPDLLLFATPQAPRPTPSAPRPALGRPPVKRRLDLETDHQYLAESSGPARGRGRHPGKGVKSPGEKSRYETSLNLTTKRFLELLSHSADGVVDLNWAAEVLKVQKRRIYDITNVLEGIQLIAKKSKNHIQWLGSHTTVGVGGRLEGLTQDLRQLQESEQQLDHLMNICTTQLRLLSEDTDSQRLAYVTCQDLRSIADPAEQMVMVIKAPPETQLQAVDSSENFQISLKSKQGPIDVFLCPEETVGGISPGKTPSQEVTSEEENRATDSATIVSPPPSSPPSSLTTDPSQSLLSLEQEPLLSRMGSLRAPVDEDRLSPLVAADSLLEHVREDFSGLLPEEFISLSPPHEALDYHFGLEEGEGIRDLFDCDFGDLTPLDF</sequence>
+         </interactor>
+         <interactor id="13">
+           <names>
+             <shortLabel>ndrg1_human</shortLabel>
+             <fullName>Protein NDRG1</fullName>
+             <alias type="gene name synonym" typeAc="MI:0302">N-myc downstream-regulated gene 1 protein</alias>
+             <alias type="gene name synonym" typeAc="MI:0302">Differentiation-related gene 1 protein</alias>
+             <alias type="gene name synonym" typeAc="MI:0302">Reducing agents and tunicamycin-responsive protein</alias>
+             <alias type="gene name synonym" typeAc="MI:0302">Nickel-specific induction protein Cap43</alias>
+             <alias type="gene name synonym" typeAc="MI:0302">RTP</alias>
+             <alias type="gene name" typeAc="MI:0301">NDRG1</alias>
+             <alias type="gene name synonym" typeAc="MI:0302">CAP43</alias>
+             <alias type="gene name synonym" typeAc="MI:0302">DRG1</alias>
+             <alias type="gene name synonym" typeAc="MI:0302">Rit42</alias>
+           </names>
+           <xref>
+             <primaryRef db="uniprotkb" dbAc="MI:0486" id="Q92597" refType="identity" refTypeAc="MI:0356" version="SP_73"/>
+             <secondaryRef db="ipi" dbAc="MI:0675" id="IPI00022078"/>
+             <secondaryRef db="refseq" dbAc="MI:0481" id="NP_001128714.1"/>
+             <secondaryRef db="refseq" dbAc="MI:0481" id="NP_006087.2"/>
+             <secondaryRef db="interpro" dbAc="MI:0449" id="IPR004142" secondary="Ndr"/>
+             <secondaryRef db="ensembl" dbAc="MI:0476" id="ENSG00000104419"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0010038" secondary="P:response to metal ion"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0005886"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0005634"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0005856"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0005737"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0005515"/>
+             <secondaryRef db="uniprotkb" dbAc="MI:0486" id="Q9UK29" refType="secondary-ac" refTypeAc="MI:0360" version="SP_73"/>
+             <secondaryRef db="uniprotkb" dbAc="MI:0486" id="Q9NYR6" refType="secondary-ac" refTypeAc="MI:0360" version="SP_73"/>
+             <secondaryRef db="uniprotkb" dbAc="MI:0486" id="O15207" refType="secondary-ac" refTypeAc="MI:0360" version="SP_73"/>
+             <secondaryRef db="uniprotkb" dbAc="MI:0486" id="Q6IBG2" refType="secondary-ac" refTypeAc="MI:0360" version="SP_95"/>
+             <secondaryRef db="intact" dbAc="MI:0469" id="EBI-716486" refType="identity" refTypeAc="MI:0356" secondary="ndrg1_human"/>
+           </xref>
+           <interactorType>
+             <names>
+               <shortLabel>protein</shortLabel>
+               <fullName>protein</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0326" refType="identity" refTypeAc="MI:0356"/>
+               <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference" refTypeAc="MI:0358"/>
+               <secondaryRef db="so" dbAc="MI:0601" id="SO:0000358" refType="identity" refTypeAc="MI:0356"/>
+             </xref>
+           </interactorType>
+           <organism ncbiTaxId="9606">
+             <names>
+               <shortLabel>human</shortLabel>
+               <fullName>Homo sapiens</fullName>
+             </names>
+           </organism>
+           <sequence>MSREMQDVDLAEVKPLVEKGETITGLLQEFDVQEQDIETLHGSVHVTLCGTPKGNRPVILTYHDIGMNHKTCYNPLFNYEDMQEITQHFAVCHVDAPGQQDGAASFPAGYMYPSMDQLAEMLPGVLQQFGLKSIIGMGTGAGAYILTRFALNNPEMVEGLVLINVNPCAEGWMDWAASKISGWTQALPDMVVSHLFGKEEMQSNVEVVHTYRQHIVNDMNPGNLHLFINAYNSRRDLEIERPMPGTHTVTLQCPALLVVGDSSPAVDAVVECNSKLDPTKTTLLKMADCGGLPQISQPAKLAEAFKYFVQGMGYMPSASMTRLMRSRTASGSSVTSLDGTRSRSHTSEGTRSRSHTSEGTRSRSHTSEGAHLDITPNSGAAGNSAGPKSMEVSC</sequence>
+         </interactor>
+         <interactor id="15">
+           <names>
+             <shortLabel>cadh1_human</shortLabel>
+             <fullName>Cadherin-1</fullName>
+             <alias type="gene name synonym" typeAc="MI:0302">Epithelial cadherin</alias>
+             <alias type="gene name synonym" typeAc="MI:0302">Uvomorulin</alias>
+             <alias type="gene name synonym" typeAc="MI:0302">UVO</alias>
+             <alias type="gene name" typeAc="MI:0301">CDH1</alias>
+             <alias type="gene name synonym" typeAc="MI:0302">CDHE</alias>
+             <alias type="gene name synonym" typeAc="MI:0302">CAM 120/80</alias>
+           </names>
+           <xref>
+             <primaryRef db="uniprotkb" dbAc="MI:0486" id="P12830" refType="identity" refTypeAc="MI:0356" version="SP_103"/>
+             <secondaryRef db="ipi" dbAc="MI:0675" id="IPI00025861"/>
+             <secondaryRef db="reactome" dbAc="MI:0467" id="REACT_578"/>
+             <secondaryRef db="reactome" dbAc="MI:0467" id="REACT_13552"/>
+             <secondaryRef db="reactome" dbAc="MI:0467" id="REACT_6900"/>
+             <secondaryRef db="reactome" dbAc="MI:0467" id="REACT_20676"/>
+             <secondaryRef db="refseq" dbAc="MI:0481" id="NP_004351.1"/>
+             <secondaryRef db="rcsb pdb" dbAc="MI:0460" id="3FF8"/>
+             <secondaryRef db="rcsb pdb" dbAc="MI:0460" id="3FF7"/>
+             <secondaryRef db="rcsb pdb" dbAc="MI:0460" id="1O6S"/>
+             <secondaryRef db="rcsb pdb" dbAc="MI:0460" id="2OMZ"/>
+             <secondaryRef db="rcsb pdb" dbAc="MI:0460" id="2OMY"/>
+             <secondaryRef db="rcsb pdb" dbAc="MI:0460" id="2OMX"/>
+             <secondaryRef db="rcsb pdb" dbAc="MI:0460" id="2OMV"/>
+             <secondaryRef db="rcsb pdb" dbAc="MI:0460" id="2OMU"/>
+             <secondaryRef db="rcsb pdb" dbAc="MI:0460" id="2OMT"/>
+             <secondaryRef db="rcsb pdb" dbAc="MI:0460" id="2O72"/>
+             <secondaryRef db="interpro" dbAc="MI:0449" id="IPR020894"/>
+             <secondaryRef db="interpro" dbAc="MI:0449" id="IPR015919"/>
+             <secondaryRef db="interpro" dbAc="MI:0449" id="IPR014868"/>
+             <secondaryRef db="interpro" dbAc="MI:0449" id="IPR000233" secondary="Cadherin_C_term"/>
+             <secondaryRef db="interpro" dbAc="MI:0449" id="IPR002126" secondary="Cadherin"/>
+             <secondaryRef db="ensembl" dbAc="MI:0476" id="ENSG00000039068"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0016342"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0005509"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0071285"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0043296"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0005794"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0005925"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0016328"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0005913"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0015629"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0042993"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0016563"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0050839"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0048471"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0007156" secondary="P:homophilic cell adhesion"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0016021" secondary="C:integral to membrane"/>
+             <secondaryRef db="uniprotkb" dbAc="MI:0486" id="Q4PJ14" refType="secondary-ac" refTypeAc="MI:0360" version="SP_103"/>
+             <secondaryRef db="uniprotkb" dbAc="MI:0486" id="Q16194" refType="secondary-ac" refTypeAc="MI:0360" version="SP_103"/>
+             <secondaryRef db="uniprotkb" dbAc="MI:0486" id="Q15855" refType="secondary-ac" refTypeAc="MI:0360" version="SP_103"/>
+             <secondaryRef db="uniprotkb" dbAc="MI:0486" id="Q14216" refType="secondary-ac" refTypeAc="MI:0360" version="SP_103"/>
+             <secondaryRef db="uniprotkb" dbAc="MI:0486" id="Q13799" refType="secondary-ac" refTypeAc="MI:0360" version="SP_103"/>
+             <secondaryRef db="intact" dbAc="MI:0469" id="EBI-727477" refType="identity" refTypeAc="MI:0356" secondary="cadh1_human"/>
+           </xref>
+           <interactorType>
+             <names>
+               <shortLabel>protein</shortLabel>
+               <fullName>protein</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0326" refType="identity" refTypeAc="MI:0356"/>
+               <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference" refTypeAc="MI:0358"/>
+               <secondaryRef db="so" dbAc="MI:0601" id="SO:0000358" refType="identity" refTypeAc="MI:0356"/>
+             </xref>
+           </interactorType>
+           <organism ncbiTaxId="9606">
+             <names>
+               <shortLabel>human</shortLabel>
+               <fullName>Homo sapiens</fullName>
+             </names>
+           </organism>
+           <sequence>MGPWSRSLSALLLLLQVSSWLCQEPEPCHPGFDAESYTFTVPRRHLERGRVLGRVNFEDCTGRQRTAYFSLDTRFKVGTDGVITVKRPLRFHNPQIHFLVYAWDSTYRKFSTKVTLNTVGHHHRPPPHQASVSGIQAELLTFPNSSPGLRRQKRDWVIPPISCPENEKGPFPKNLVQIKSNKDKEGKVFYSITGQGADTPPVGVFIIERETGWLKVTEPLDRERIATYTLFSHAVSSNGNAVEDPMEILITVTDQNDNKPEFTQEVFKGSVMEGALPGTSVMEVTATDADDDVNTYNAAIAYTILSQDPELPDKNMFTINRNTGVISVVTTGLDRESFPTYTLVVQAADLQGEGLSTTATAVITVTDTNDNPPIFNPTTYKGQVPENEANVVITTLKVTDADAPNTPAWEAVYTILNDDGGQFVVTTNPVNNDGILKTAKGLDFEAKQQYILHVAVTNVVPFEVSLTTSTATVTVDVLDVNEAPIFVPPEKRVEVSEDFGVGQEITSYTAQEPDTFMEQKITYRIWRDTANWLEINPDTGAISTRAELDREDFEHVKNSTYTALIIATDNGSPVATGTGTLLLILSDVNDNAPIPEPRTIFFCERNPKPQVINIIDADLPPNTSPFTAELTHGASANWTIQYNDPTQESIILKPKMALEVGDYKINLKLMDNQNKDQVTTLEVSVCDCEGAAGVCRKAQPVEAGLQIPAILGILGGILALLILILLLLLFLRRRAVVKEPLLPPEDDTRDNVYYYDEEGGGEEDQDFDLSQLHRGLDARPEVTRNDVAPTLMSVPRYLPRPANPDEIGNFIDENLKAADTDPTAPPYDSLLVFDYEGSGSEAASLSSLNSSESDKDQDYDYLNEWGNRFKKLADMYGGGEDD</sequence>
+         </interactor>
+         <interactor id="17">
+           <names>
+             <shortLabel>ctnb1_human</shortLabel>
+             <fullName>Catenin beta-1</fullName>
+             <alias type="gene name synonym" typeAc="MI:0302">Beta-catenin</alias>
+             <alias type="orf name" typeAc="MI:0306">OK/SW-cl.35</alias>
+             <alias type="gene name synonym" typeAc="MI:0302">CTNNB</alias>
+             <alias type="gene name" typeAc="MI:0301">CTNNB1</alias>
+             <alias type="orf name" typeAc="MI:0306">PRO2286</alias>
+           </names>
+           <xref>
+             <primaryRef db="uniprotkb" dbAc="MI:0486" id="P35222" refType="identity" refTypeAc="MI:0356" version="SP_106"/>
+             <secondaryRef db="ipi" dbAc="MI:0675" id="IPI00792321"/>
+             <secondaryRef db="ipi" dbAc="MI:0675" id="IPI00017292"/>
+             <secondaryRef db="reactome" dbAc="MI:0467" id="REACT_21303"/>
+             <secondaryRef db="reactome" dbAc="MI:0467" id="REACT_578"/>
+             <secondaryRef db="reactome" dbAc="MI:0467" id="REACT_11045"/>
+             <secondaryRef db="reactome" dbAc="MI:0467" id="REACT_20676"/>
+             <secondaryRef db="refseq" dbAc="MI:0481" id="NP_001895.1"/>
+             <secondaryRef db="refseq" dbAc="MI:0481" id="NP_001091680.1"/>
+             <secondaryRef db="refseq" dbAc="MI:0481" id="NP_001091679.1"/>
+             <secondaryRef db="rcsb pdb" dbAc="MI:0460" id="3FQR"/>
+             <secondaryRef db="rcsb pdb" dbAc="MI:0460" id="3FQN"/>
+             <secondaryRef db="rcsb pdb" dbAc="MI:0460" id="3DIW"/>
+             <secondaryRef db="rcsb pdb" dbAc="MI:0460" id="2Z6H"/>
+             <secondaryRef db="rcsb pdb" dbAc="MI:0460" id="1P22"/>
+             <secondaryRef db="rcsb pdb" dbAc="MI:0460" id="1LUJ"/>
+             <secondaryRef db="rcsb pdb" dbAc="MI:0460" id="1JPW"/>
+             <secondaryRef db="rcsb pdb" dbAc="MI:0460" id="1JDH"/>
+             <secondaryRef db="rcsb pdb" dbAc="MI:0460" id="1G3J"/>
+             <secondaryRef db="rcsb pdb" dbAc="MI:0460" id="2GL7"/>
+             <secondaryRef db="rcsb pdb" dbAc="MI:0460" id="2G57"/>
+             <secondaryRef db="rcsb pdb" dbAc="MI:0460" id="1TH1"/>
+             <secondaryRef db="rcsb pdb" dbAc="MI:0460" id="1T08"/>
+             <secondaryRef db="rcsb pdb" dbAc="MI:0460" id="1QZ7"/>
+             <secondaryRef db="interpro" dbAc="MI:0449" id="IPR013284"/>
+             <secondaryRef db="interpro" dbAc="MI:0449" id="IPR016024"/>
+             <secondaryRef db="interpro" dbAc="MI:0449" id="IPR000225" secondary="Armadillo"/>
+             <secondaryRef db="interpro" dbAc="MI:0449" id="IPR011989" secondary="ARM-like"/>
+             <secondaryRef db="ensembl" dbAc="MI:0476" id="ENSG00000168036"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0019903"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0042493"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0048145"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0071681"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0071363"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0048471"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0043065"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0008285"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0045294"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0032993"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0010843"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0006350"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0010909"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0070369"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0030997"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0010552"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0016337"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0019900"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0005813"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0016342"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0034747"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0045296"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0016328"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0060070"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0001837"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0008022"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0045765"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0030521" secondary="P:androgen receptor signaling "/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0003713" secondary="F:transcription coactivator ac"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0050681" secondary="F:androgen receptor binding"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0070411"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0004871" secondary="F:signal transducer activity"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0030877"/>
+             <secondaryRef db="uniprotkb" dbAc="MI:0486" id="A8K1L7" refType="secondary-ac" refTypeAc="MI:0360" version="SP_129"/>
+             <secondaryRef db="uniprotkb" dbAc="MI:0486" id="Q8NEW9" refType="secondary-ac" refTypeAc="MI:0360" version="SP_106"/>
+             <secondaryRef db="uniprotkb" dbAc="MI:0486" id="Q9H391" refType="secondary-ac" refTypeAc="MI:0360" version="SP_106"/>
+             <secondaryRef db="uniprotkb" dbAc="MI:0486" id="Q8NI94" refType="secondary-ac" refTypeAc="MI:0360" version="SP_106"/>
+             <secondaryRef db="intact" dbAc="MI:0469" id="EBI-491549" refType="identity" refTypeAc="MI:0356" secondary="ctnb1_human"/>
+           </xref>
+           <interactorType>
+             <names>
+               <shortLabel>protein</shortLabel>
+               <fullName>protein</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0326" refType="identity" refTypeAc="MI:0356"/>
+               <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference" refTypeAc="MI:0358"/>
+               <secondaryRef db="so" dbAc="MI:0601" id="SO:0000358" refType="identity" refTypeAc="MI:0356"/>
+             </xref>
+           </interactorType>
+           <organism ncbiTaxId="9606">
+             <names>
+               <shortLabel>human</shortLabel>
+               <fullName>Homo sapiens</fullName>
+             </names>
+           </organism>
+           <sequence>MATQADLMELDMAMEPDRKAAVSHWQQQSYLDSGIHSGATTTAPSLSGKGNPEEEDVDTSQVLYEWEQGFSQSFTQEQVADIDGQYAMTRAQRVRAAMFPETLDEGMQIPSTQFDAAHPTNVQRLAEPSQMLKHAVVNLINYQDDAELATRAIPELTKLLNDEDQVVVNKAAVMVHQLSKKEASRHAIMRSPQMVSAIVRTMQNTNDVETARCTAGTLHNLSHHREGLLAIFKSGGIPALVKMLGSPVDSVLFYAITTLHNLLLHQEGAKMAVRLAGGLQKMVALLNKTNVKFLAITTDCLQILAYGNQESKLIILASGGPQALVNIMRTYTYEKLLWTTSRVLKVLSVCSSNKPAIVEAGGMQALGLHLTDPSQRLVQNCLWTLRNLSDAATKQEGMEGLLGTLVQLLGSDDINVVTCAAGILSNLTCNNYKNKMMVCQVGGIEALVRTVLRAGDREDITEPAICALRHLTSRHQEAEMAQNAVRLHYGLPVVVKLLHPPSHWPLIKATVGLIRNLALCPANHAPLREQGAIPRLVQLLVRAHQDTQRRTSMGGTQQQFVEGVRMEEIVEGCTGALHILARDVHNRIVIRGLNTIPLFVQLLYSPIENIQRVAAGVLCELAQDKEAAEAIEAEGATAPLTELLHSRNEGVATYAAAVLFRMSEDKPQDYKKRLSVELTSSLFRTEPMAWNETADLGLDIGAQGEPLGYRQDDPSYRSFHSGGYGQDALGMDPMMEHEMGGHHPGADYPVDGLPDLGHAQDLMDGLPPGDSNQLAWFDTDL</sequence>
+         </interactor>
+         <interactor id="28">
+           <names>
+             <shortLabel>calx_human</shortLabel>
+             <fullName>Calnexin</fullName>
+             <alias type="gene name synonym" typeAc="MI:0302">Major histocompatibility complex class I antigen-binding protein p88</alias>
+             <alias type="gene name" typeAc="MI:0301">CANX</alias>
+             <alias type="gene name synonym" typeAc="MI:0302">IP90</alias>
+             <alias type="gene name synonym" typeAc="MI:0302">p90</alias>
+           </names>
+           <xref>
+             <primaryRef db="uniprotkb" dbAc="MI:0486" id="P27824" refType="identity" refTypeAc="MI:0356" version="SP_96"/>
+             <secondaryRef db="ipi" dbAc="MI:0675" id="IPI00941747"/>
+             <secondaryRef db="refseq" dbAc="MI:0481" id="NP_001019820.1"/>
+             <secondaryRef db="refseq" dbAc="MI:0481" id="NP_001737.1"/>
+             <secondaryRef db="interpro" dbAc="MI:0449" id="IPR018124"/>
+             <secondaryRef db="interpro" dbAc="MI:0449" id="IPR008985"/>
+             <secondaryRef db="interpro" dbAc="MI:0449" id="IPR013320"/>
+             <secondaryRef db="interpro" dbAc="MI:0449" id="IPR009033"/>
+             <secondaryRef db="interpro" dbAc="MI:0449" id="IPR001580" secondary="Calreticulin"/>
+             <secondaryRef db="ensembl" dbAc="MI:0476" id="ENSG00000127022"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0005789"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0009306" secondary="P:protein secretion"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0006457"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0005529"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0042470"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0016021"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0051082" secondary="F:unfolded protein binding"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0005509" secondary="F:calcium ion binding"/>
+             <secondaryRef db="uniprotkb" dbAc="MI:0486" id="B2R5V8" refType="secondary-ac" refTypeAc="MI:0360" version="SP_114"/>
+             <secondaryRef db="intact" dbAc="MI:0469" id="EBI-355947" refType="identity" refTypeAc="MI:0356" secondary="calx_human"/>
+           </xref>
+           <interactorType>
+             <names>
+               <shortLabel>protein</shortLabel>
+               <fullName>protein</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0326" refType="identity" refTypeAc="MI:0356"/>
+               <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference" refTypeAc="MI:0358"/>
+               <secondaryRef db="so" dbAc="MI:0601" id="SO:0000358" refType="identity" refTypeAc="MI:0356"/>
+             </xref>
+           </interactorType>
+           <organism ncbiTaxId="9606">
+             <names>
+               <shortLabel>human</shortLabel>
+               <fullName>Homo sapiens</fullName>
+             </names>
+           </organism>
+           <sequence>MEGKWLLCMLLVLGTAIVEAHDGHDDDVIDIEDDLDDVIEEVEDSKPDTTAPPSSPKVTYKAPVPTGEVYFADSFDRGTLSGWILSKAKKDDTDDEIAKYDGKWEVEEMKESKLPGDKGLVLMSRAKHHAISAKLNKPFLFDTKPLIVQYEVNFQNGIECGGAYVKLLSKTPELNLDQFHDKTPYTIMFGPDKCGEDYKLHFIFRHKNPKTGIYEEKHAKRPDADLKTYFTDKKTHLYTLILNPDNSFEILVDQSVVNSGNLLNDMTPPVNPSREIEDPEDRKPEDWDERPKIPDPEAVKPDDWDEDAPAKIPDEEATKPEGWLDDEPEYVPDPDAEKPEDWDEDMDGEWEAPQIANPRCESAPGCGVWQRPVIDNPNYKGKWKPPMIDNPSYQGIWKPRKIPNPDFFEDLEPFRMTPFSAIGLELWSMTSDIFFDNFIICADRRIVDDWANDGWGLKKAADGAAEPGVVGQMIEAAEERPWLWVVYILTVALPVFLVILFCCSGKKQTSGMEYKKTDAPQPDVKEEEEEKEEEKDKGDEEEEGEEKLEEKQKSDAEEDGGTVSQEEEDRKPKAEEDEILNRSPRNRKPRRE</sequence>
+         </interactor>
+         <interactor id="32">
+           <names>
+             <shortLabel>xrcc6_human</shortLabel>
+             <fullName>X-ray repair cross-complementing protein 6</fullName>
+             <alias type="gene name synonym" typeAc="MI:0302">G22P1</alias>
+             <alias type="gene name synonym" typeAc="MI:0302">ATP-dependent DNA helicase II 70 kDa subunit</alias>
+             <alias type="gene name synonym" typeAc="MI:0302">Lupus Ku autoantigen protein p70</alias>
+             <alias type="gene name synonym" typeAc="MI:0302">70 kDa subunit of Ku antigen</alias>
+             <alias type="gene name" typeAc="MI:0301">XRCC6</alias>
+             <alias type="gene name synonym" typeAc="MI:0302">CTC box-binding factor 75 kDa subunit</alias>
+             <alias type="gene name synonym" typeAc="MI:0302">DNA repair protein XRCC6</alias>
+             <alias type="gene name synonym" typeAc="MI:0302">X-ray repair complementing defective repair in Chinese hamster cells 6</alias>
+             <alias type="gene name synonym" typeAc="MI:0302">ATP-dependent DNA helicase 2 subunit 1</alias>
+             <alias type="gene name synonym" typeAc="MI:0302">Thyroid-lupus autoantigen</alias>
+           </names>
+           <xref>
+             <primaryRef db="uniprotkb" dbAc="MI:0486" id="P12956" refType="identity" refTypeAc="MI:0356" version="SP_110"/>
+             <secondaryRef db="ipi" dbAc="MI:0675" id="IPI00644712"/>
+             <secondaryRef db="reactome" dbAc="MI:0467" id="REACT_216"/>
+             <secondaryRef db="reactome" dbAc="MI:0467" id="REACT_6185"/>
+             <secondaryRef db="refseq" dbAc="MI:0481" id="NP_001460.1"/>
+             <secondaryRef db="rcsb pdb" dbAc="MI:0460" id="1JJR"/>
+             <secondaryRef db="rcsb pdb" dbAc="MI:0460" id="1JEY"/>
+             <secondaryRef db="rcsb pdb" dbAc="MI:0460" id="1JEQ"/>
+             <secondaryRef db="interpro" dbAc="MI:0449" id="IPR016194"/>
+             <secondaryRef db="interpro" dbAc="MI:0449" id="IPR003034" secondary="SAP"/>
+             <secondaryRef db="interpro" dbAc="MI:0449" id="IPR005161" secondary="Ku_N"/>
+             <secondaryRef db="interpro" dbAc="MI:0449" id="IPR005160" secondary="Ku_C"/>
+             <secondaryRef db="interpro" dbAc="MI:0449" id="IPR006165" secondary="Ku70"/>
+             <secondaryRef db="interpro" dbAc="MI:0449" id="IPR006164" secondary="Ku"/>
+             <secondaryRef db="ensembl" dbAc="MI:0476" id="ENSG00000196419"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0000783"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0000723"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0008022"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0010552"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0016563"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0010843"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0005958"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0004003" secondary="F:ATP-dependent DNA helicase a"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0005524"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0019047"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0019059"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0005667" secondary="C:transcription factor complex"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0006303" secondary="P:double-strand break repair v"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0006266" secondary="P:DNA ligation"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0003690" secondary="F:double-stranded DNA binding"/>
+             <secondaryRef db="go" dbAc="MI:0448" id="GO:0005624" secondary="C:membrane fraction"/>
+             <secondaryRef db="uniprotkb" dbAc="MI:0486" id="Q9UCQ3" refType="secondary-ac" refTypeAc="MI:0360" version="SP_110"/>
+             <secondaryRef db="uniprotkb" dbAc="MI:0486" id="Q9UCQ2" refType="secondary-ac" refTypeAc="MI:0360" version="SP_110"/>
+             <secondaryRef db="uniprotkb" dbAc="MI:0486" id="Q6FG89" refType="secondary-ac" refTypeAc="MI:0360" version="SP_110"/>
+             <secondaryRef db="intact" dbAc="MI:0469" id="EBI-353208" refType="identity" refTypeAc="MI:0356" secondary="xrcc6_human"/>
+           </xref>
+           <interactorType>
+             <names>
+               <shortLabel>protein</shortLabel>
+               <fullName>protein</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0326" refType="identity" refTypeAc="MI:0356"/>
+               <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference" refTypeAc="MI:0358"/>
+               <secondaryRef db="so" dbAc="MI:0601" id="SO:0000358" refType="identity" refTypeAc="MI:0356"/>
+             </xref>
+           </interactorType>
+           <organism ncbiTaxId="9606">
+             <names>
+               <shortLabel>human</shortLabel>
+               <fullName>Homo sapiens</fullName>
+             </names>
+           </organism>
+           <sequence>MSGWESYYKTEGDEEAEEEQEENLEASGDYKYSGRDSLIFLVDASKAMFESQSEDELTPFDMSIQCIQSVYISKIISSDRDLLAVVFYGTEKDKNSVNFKNIYVLQELDNPGAKRILELDQFKGQQGQKRFQDMMGHGSDYSLSEVLWVCANLFSDVQFKMSHKRIMLFTNEDNPHGNDSAKASRARTKAGDLRDTGIFLDLMHLKKPGGFDISLFYRDIISIAEDEDLRVHFEESSKLEDLLRKVRAKETRKRALSRLKLKLNKDIVISVGIYNLVQKALKPPPIKLYRETNEPVKTKTRTFNTSTGGLLLPSDTKRSQIYGSRQIILEKEETEELKRFDDPGLMLMGFKPLVLLKKHHYLRPSLFVYPEESLVIGSSTLFSALLIKCLEKEVAALCRYTPRRNIPPYFVALVPQEEELDDQKIQVTPPGFQLVFLPFADDKRKMPFTEKIMATPEQVGKMKAIVEKLRFTYRSDSFENPVLQQHFRNLEALALDLMEPEQAVDLTLPKVEAMNKRLGSLVDEFKELVYPPDYNPEGKVTKRKHDNEGSGSKRPKVEYSEEELKTHISKGTLGKFTVPMLKEACRAYGLKSGLKKQELLEALTKHFQD</sequence>
+         </interactor>
+       </interactorList>
+       <interactionList>
+         <interaction id="1">
+           <names>
+             <shortLabel>e2f1-ddb2</shortLabel>
+             <fullName>GST-E2F1 pulls down p48DDB in vitro</fullName>
+           </names>
+           <xref>
+             <primaryRef db="intact" dbAc="MI:0469" id="EBI-1213634" refType="identity" refTypeAc="MI:0356" secondary="e2f1-ddb2"/>
+           </xref>
+           <experimentList>
+             <experimentRef>2</experimentRef>
+           </experimentList>
+           <participantList>
+             <participant id="3">
+               <interactorRef>4</interactorRef>
+               <biologicalRole>
+                 <names>
+                   <shortLabel>unspecified role</shortLabel>
+                   <fullName>unspecified role</fullName>
+                 </names>
+                 <xref>
+                   <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0499" refType="identity" refTypeAc="MI:0356"/>
+                   <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference" refTypeAc="MI:0358"/>
+                 </xref>
+               </biologicalRole>
+               <experimentalRoleList>
+                 <experimentalRole>
+                   <names>
+                     <shortLabel>prey</shortLabel>
+                     <fullName>prey</fullName>
+                   </names>
+                   <xref>
+                     <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0498" refType="identity" refTypeAc="MI:0356"/>
+                     <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference" refTypeAc="MI:0358"/>
+                   </xref>
+                 </experimentalRole>
+               </experimentalRoleList>
+               <featureList>
+                 <feature id="5">
+                   <names>
+                     <shortLabel>region</shortLabel>
+                   </names>
+                   <featureType>
+                     <names>
+                       <shortLabel>35s radiolabel</shortLabel>
+                       <fullName>35s radiolabel</fullName>
+                       <alias>S35</alias>
+                       <alias>35S</alias>
+                       <alias>s35 radiolabelled</alias>
+                     </names>
+                     <xref>
+                       <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0371" refType="identity" refTypeAc="MI:0356"/>
+                       <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference" refTypeAc="MI:0358"/>
+                     </xref>
+                   </featureType>
+                   <featureRangeList>
+                     <featureRange>
+                       <startStatus>
+                         <names>
+                           <shortLabel>undetermined</shortLabel>
+                           <fullName>undetermined sequence position</fullName>
+                         </names>
+                         <xref>
+                           <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0339" refType="identity" refTypeAc="MI:0356"/>
+                           <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference" refTypeAc="MI:0358"/>
+                         </xref>
+                       </startStatus>
+                       <begin position="0"/>
+                       <endStatus>
+                         <names>
+                           <shortLabel>undetermined</shortLabel>
+                           <fullName>undetermined sequence position</fullName>
+                         </names>
+                         <xref>
+                           <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0339" refType="identity" refTypeAc="MI:0356"/>
+                           <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference" refTypeAc="MI:0358"/>
+                         </xref>
+                       </endStatus>
+                       <end position="0"/>
+                     </featureRange>
+                   </featureRangeList>
+                 </feature>
+               </featureList>
+               <hostOrganismList>
+                 <hostOrganism ncbiTaxId="9606">
+                   <names>
+                     <shortLabel>human</shortLabel>
+                     <fullName>Homo sapiens</fullName>
+                   </names>
+                 </hostOrganism>
+               </hostOrganismList>
+             </participant>
+             <participant id="6">
+               <interactorRef>7</interactorRef>
+               <biologicalRole>
+                 <names>
+                   <shortLabel>unspecified role</shortLabel>
+                   <fullName>unspecified role</fullName>
+                 </names>
+                 <xref>
+                   <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0499" refType="identity" refTypeAc="MI:0356"/>
+                   <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference" refTypeAc="MI:0358"/>
+                 </xref>
+               </biologicalRole>
+               <experimentalRoleList>
+                 <experimentalRole>
+                   <names>
+                     <shortLabel>bait</shortLabel>
+                     <fullName>bait</fullName>
+                   </names>
+                   <xref>
+                     <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0496" refType="identity" refTypeAc="MI:0356"/>
+                     <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference" refTypeAc="MI:0358"/>
+                   </xref>
+                 </experimentalRole>
+               </experimentalRoleList>
+               <featureList>
+                 <feature id="8">
+                   <names>
+                     <shortLabel>region</shortLabel>
+                   </names>
+                   <featureType>
+                     <names>
+                       <shortLabel>required to bind</shortLabel>
+                       <fullName>necessary binding site</fullName>
+                     </names>
+                     <xref>
+                       <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0429" refType="identity" refTypeAc="MI:0356"/>
+                       <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference" refTypeAc="MI:0358"/>
+                     </xref>
+                   </featureType>
+                   <featureDetectionMethod>
+                     <names>
+                       <shortLabel>deletion analysis</shortLabel>
+                       <fullName>deletion analysis</fullName>
+                     </names>
+                     <xref>
+                       <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0033" refType="identity" refTypeAc="MI:0356"/>
+                       <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference" refTypeAc="MI:0358"/>
+                     </xref>
+                   </featureDetectionMethod>
+                   <featureRangeList>
+                     <featureRange>
+                       <startStatus>
+                         <names>
+                           <shortLabel>certain</shortLabel>
+                         </names>
+                         <xref>
+                           <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0335" refType="identity" refTypeAc="MI:0356"/>
+                         </xref>
+                       </startStatus>
+                       <begin position="364"/>
+                       <endStatus>
+                         <names>
+                           <shortLabel>certain</shortLabel>
+                         </names>
+                         <xref>
+                           <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0335" refType="identity" refTypeAc="MI:0356"/>
+                         </xref>
+                       </endStatus>
+                       <end position="417"/>
+                     </featureRange>
+                   </featureRangeList>
+                 </feature>
+                 <feature id="9">
+                   <names>
+                     <shortLabel>region</shortLabel>
+                   </names>
+                   <featureType>
+                     <names>
+                       <shortLabel>gst tag</shortLabel>
+                       <fullName>glutathione s tranferase tag</fullName>
+                       <alias>glutathione S-tranferase tag</alias>
+                     </names>
+                     <xref>
+                       <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0519" refType="identity" refTypeAc="MI:0356"/>
+                       <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference" refTypeAc="MI:0358"/>
+                     </xref>
+                   </featureType>
+                   <featureRangeList>
+                     <featureRange>
+                       <startStatus>
+                         <names>
+                           <shortLabel>undetermined</shortLabel>
+                           <fullName>undetermined sequence position</fullName>
+                         </names>
+                         <xref>
+                           <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0339" refType="identity" refTypeAc="MI:0356"/>
+                           <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference" refTypeAc="MI:0358"/>
+                         </xref>
+                       </startStatus>
+                       <begin position="0"/>
+                       <endStatus>
+                         <names>
+                           <shortLabel>undetermined</shortLabel>
+                           <fullName>undetermined sequence position</fullName>
+                         </names>
+                         <xref>
+                           <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0339" refType="identity" refTypeAc="MI:0356"/>
+                           <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference" refTypeAc="MI:0358"/>
+                         </xref>
+                       </endStatus>
+                       <end position="0"/>
+                     </featureRange>
+                   </featureRangeList>
+                 </feature>
+               </featureList>
+             </participant>
+           </participantList>
+           <interactionType>
+             <names>
+               <shortLabel>direct interaction</shortLabel>
+               <fullName>direct interaction</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0407" refType="identity" refTypeAc="MI:0356"/>
+               <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference" refTypeAc="MI:0358"/>
+             </xref>
+           </interactionType>
+           <attributeList>
+             <attribute name="figure legend">3</attribute>
+             <attribute name="comment">Only a trace of p125 DDB subunit bound to E2F1.</attribute>
+             <attribute name="comment">The activation domain of E2F1 is required for the interaction.</attribute>
+             <attribute name="kd">0.0</attribute>
+           </attributeList>
+         </interaction>
+         <interaction id="10">
+           <names>
+             <shortLabel>ndrg1-cdh1</shortLabel>
+             <fullName>NDRG1 coimmunoprecipitates beta-catenin and E-cadherin from LNCaP cell lysate</fullName>
+           </names>
+           <xref>
+             <primaryRef db="intact" dbAc="MI:0469" id="EBI-1191192" refType="identity" refTypeAc="MI:0356" secondary="ndrg1-cdh1"/>
+           </xref>
+           <experimentList>
+             <experimentRef>11</experimentRef>
+           </experimentList>
+           <participantList>
+             <participant id="12">
+               <interactorRef>13</interactorRef>
+               <biologicalRole>
+                 <names>
+                   <shortLabel>unspecified role</shortLabel>
+                   <fullName>unspecified role</fullName>
+                 </names>
+                 <xref>
+                   <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0499" refType="identity" refTypeAc="MI:0356"/>
+                   <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference" refTypeAc="MI:0358"/>
+                 </xref>
+               </biologicalRole>
+               <experimentalRoleList>
+                 <experimentalRole>
+                   <names>
+                     <shortLabel>bait</shortLabel>
+                     <fullName>bait</fullName>
+                   </names>
+                   <xref>
+                     <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0496" refType="identity" refTypeAc="MI:0356"/>
+                     <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference" refTypeAc="MI:0358"/>
+                   </xref>
+                 </experimentalRole>
+               </experimentalRoleList>
+             </participant>
+             <participant id="14">
+               <interactorRef>15</interactorRef>
+               <biologicalRole>
+                 <names>
+                   <shortLabel>unspecified role</shortLabel>
+                   <fullName>unspecified role</fullName>
+                 </names>
+                 <xref>
+                   <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0499" refType="identity" refTypeAc="MI:0356"/>
+                   <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference" refTypeAc="MI:0358"/>
+                 </xref>
+               </biologicalRole>
+               <experimentalRoleList>
+                 <experimentalRole>
+                   <names>
+                     <shortLabel>prey</shortLabel>
+                     <fullName>prey</fullName>
+                   </names>
+                   <xref>
+                     <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0498" refType="identity" refTypeAc="MI:0356"/>
+                     <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference" refTypeAc="MI:0358"/>
+                   </xref>
+                 </experimentalRole>
+               </experimentalRoleList>
+             </participant>
+             <participant id="16">
+               <interactorRef>17</interactorRef>
+               <biologicalRole>
+                 <names>
+                   <shortLabel>unspecified role</shortLabel>
+                   <fullName>unspecified role</fullName>
+                 </names>
+                 <xref>
+                   <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0499" refType="identity" refTypeAc="MI:0356"/>
+                   <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference" refTypeAc="MI:0358"/>
+                 </xref>
+               </biologicalRole>
+               <experimentalRoleList>
+                 <experimentalRole>
+                   <names>
+                     <shortLabel>prey</shortLabel>
+                     <fullName>prey</fullName>
+                   </names>
+                   <xref>
+                     <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0498" refType="identity" refTypeAc="MI:0356"/>
+                     <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference" refTypeAc="MI:0358"/>
+                   </xref>
+                 </experimentalRole>
+               </experimentalRoleList>
+             </participant>
+           </participantList>
+           <interactionType>
+             <names>
+               <shortLabel>association</shortLabel>
+               <fullName>association</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0914" refType="identity" refTypeAc="MI:0356"/>
+               <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference" refTypeAc="MI:0358"/>
+             </xref>
+           </interactionType>
+           <attributeList>
+             <attribute name="figure legend">2 B</attribute>
+             <attribute name="comment">This complex formed when LNCaP cells were androgen-stimulated or -deprived. 
+NDRG1 is dramatically increased after R1881 treatment but levels of E-cadherin and beta-catenin in the NDRG1-IP complex did not increase after exposure to R1881.</attribute>
+             <attribute name="kd">0.0</attribute>
+           </attributeList>
+         </interaction>
+         <interaction id="18">
+           <names>
+             <shortLabel>cdh1-ctnnb1-3</shortLabel>
+             <fullName>E-cadherin coimmunoprecipitates beta-catenin and NDRG1 from LNCaP cell lysate</fullName>
+           </names>
+           <xref>
+             <primaryRef db="intact" dbAc="MI:0469" id="EBI-1191199" refType="identity" refTypeAc="MI:0356" secondary="cdh1-ctnnb1-3"/>
+           </xref>
+           <experimentList>
+             <experimentRef>11</experimentRef>
+           </experimentList>
+           <participantList>
+             <participant id="19">
+               <interactorRef>13</interactorRef>
+               <biologicalRole>
+                 <names>
+                   <shortLabel>unspecified role</shortLabel>
+                   <fullName>unspecified role</fullName>
+                 </names>
+                 <xref>
+                   <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0499" refType="identity" refTypeAc="MI:0356"/>
+                   <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference" refTypeAc="MI:0358"/>
+                 </xref>
+               </biologicalRole>
+               <experimentalRoleList>
+                 <experimentalRole>
+                   <names>
+                     <shortLabel>prey</shortLabel>
+                     <fullName>prey</fullName>
+                   </names>
+                   <xref>
+                     <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0498" refType="identity" refTypeAc="MI:0356"/>
+                     <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference" refTypeAc="MI:0358"/>
+                   </xref>
+                 </experimentalRole>
+               </experimentalRoleList>
+             </participant>
+             <participant id="20">
+               <interactorRef>15</interactorRef>
+               <biologicalRole>
+                 <names>
+                   <shortLabel>unspecified role</shortLabel>
+                   <fullName>unspecified role</fullName>
+                 </names>
+                 <xref>
+                   <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0499" refType="identity" refTypeAc="MI:0356"/>
+                   <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference" refTypeAc="MI:0358"/>
+                 </xref>
+               </biologicalRole>
+               <experimentalRoleList>
+                 <experimentalRole>
+                   <names>
+                     <shortLabel>bait</shortLabel>
+                     <fullName>bait</fullName>
+                   </names>
+                   <xref>
+                     <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0496" refType="identity" refTypeAc="MI:0356"/>
+                     <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference" refTypeAc="MI:0358"/>
+                   </xref>
+                 </experimentalRole>
+               </experimentalRoleList>
+             </participant>
+             <participant id="21">
+               <interactorRef>17</interactorRef>
+               <biologicalRole>
+                 <names>
+                   <shortLabel>unspecified role</shortLabel>
+                   <fullName>unspecified role</fullName>
+                 </names>
+                 <xref>
+                   <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0499" refType="identity" refTypeAc="MI:0356"/>
+                   <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference" refTypeAc="MI:0358"/>
+                 </xref>
+               </biologicalRole>
+               <experimentalRoleList>
+                 <experimentalRole>
+                   <names>
+                     <shortLabel>prey</shortLabel>
+                     <fullName>prey</fullName>
+                   </names>
+                   <xref>
+                     <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0498" refType="identity" refTypeAc="MI:0356"/>
+                     <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference" refTypeAc="MI:0358"/>
+                   </xref>
+                 </experimentalRole>
+               </experimentalRoleList>
+             </participant>
+           </participantList>
+           <interactionType>
+             <names>
+               <shortLabel>association</shortLabel>
+               <fullName>association</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0914" refType="identity" refTypeAc="MI:0356"/>
+               <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference" refTypeAc="MI:0358"/>
+             </xref>
+           </interactionType>
+           <attributeList>
+             <attribute name="figure legend">2 C</attribute>
+             <attribute name="comment">This complex formed when LNCaP cells were androgen-stimulated or -deprived. The amount of NDRG1 pulled down by E-cadherin, and beta-catenin was not changed by R1881
+stimulation.</attribute>
+             <attribute name="kd">0.0</attribute>
+           </attributeList>
+         </interaction>
+         <interaction id="22">
+           <names>
+             <shortLabel>cdh1-ctnnb1-4</shortLabel>
+             <fullName>Beta-catenin coimmunoprecipitates E-cadherin and NDRG1 from LNCaP cell lysate</fullName>
+           </names>
+           <xref>
+             <primaryRef db="intact" dbAc="MI:0469" id="EBI-1191206" refType="identity" refTypeAc="MI:0356" secondary="cdh1-ctnnb1-4"/>
+           </xref>
+           <experimentList>
+             <experimentRef>11</experimentRef>
+           </experimentList>
+           <participantList>
+             <participant id="23">
+               <interactorRef>17</interactorRef>
+               <biologicalRole>
+                 <names>
+                   <shortLabel>unspecified role</shortLabel>
+                   <fullName>unspecified role</fullName>
+                 </names>
+                 <xref>
+                   <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0499" refType="identity" refTypeAc="MI:0356"/>
+                   <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference" refTypeAc="MI:0358"/>
+                 </xref>
+               </biologicalRole>
+               <experimentalRoleList>
+                 <experimentalRole>
+                   <names>
+                     <shortLabel>bait</shortLabel>
+                     <fullName>bait</fullName>
+                   </names>
+                   <xref>
+                     <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0496" refType="identity" refTypeAc="MI:0356"/>
+                     <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference" refTypeAc="MI:0358"/>
+                   </xref>
+                 </experimentalRole>
+               </experimentalRoleList>
+             </participant>
+             <participant id="24">
+               <interactorRef>13</interactorRef>
+               <biologicalRole>
+                 <names>
+                   <shortLabel>unspecified role</shortLabel>
+                   <fullName>unspecified role</fullName>
+                 </names>
+                 <xref>
+                   <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0499" refType="identity" refTypeAc="MI:0356"/>
+                   <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference" refTypeAc="MI:0358"/>
+                 </xref>
+               </biologicalRole>
+               <experimentalRoleList>
+                 <experimentalRole>
+                   <names>
+                     <shortLabel>prey</shortLabel>
+                     <fullName>prey</fullName>
+                   </names>
+                   <xref>
+                     <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0498" refType="identity" refTypeAc="MI:0356"/>
+                     <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference" refTypeAc="MI:0358"/>
+                   </xref>
+                 </experimentalRole>
+               </experimentalRoleList>
+             </participant>
+             <participant id="25">
+               <interactorRef>15</interactorRef>
+               <biologicalRole>
+                 <names>
+                   <shortLabel>unspecified role</shortLabel>
+                   <fullName>unspecified role</fullName>
+                 </names>
+                 <xref>
+                   <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0499" refType="identity" refTypeAc="MI:0356"/>
+                   <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference" refTypeAc="MI:0358"/>
+                 </xref>
+               </biologicalRole>
+               <experimentalRoleList>
+                 <experimentalRole>
+                   <names>
+                     <shortLabel>prey</shortLabel>
+                     <fullName>prey</fullName>
+                   </names>
+                   <xref>
+                     <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0498" refType="identity" refTypeAc="MI:0356"/>
+                     <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference" refTypeAc="MI:0358"/>
+                   </xref>
+                 </experimentalRole>
+               </experimentalRoleList>
+             </participant>
+           </participantList>
+           <interactionType>
+             <names>
+               <shortLabel>association</shortLabel>
+               <fullName>association</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0914" refType="identity" refTypeAc="MI:0356"/>
+               <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference" refTypeAc="MI:0358"/>
+             </xref>
+           </interactionType>
+           <attributeList>
+             <attribute name="figure legend">2 D</attribute>
+             <attribute name="comment">This complex formed when LNCaP cells were androgen-stimulated or -deprived. The amount of NDRG1 pulled down by E-cadherin, and beta-catenin was not changed by R1881
+stimulation.</attribute>
+             <attribute name="kd">0.0</attribute>
+           </attributeList>
+         </interaction>
+         <interaction id="26">
+           <names>
+             <shortLabel>ndrg1-canx-1</shortLabel>
+             <fullName>NDRG1 coimmunoprecipitates CANX from LNCaP cell lysate</fullName>
+           </names>
+           <xref>
+             <primaryRef db="intact" dbAc="MI:0469" id="EBI-1191213" refType="identity" refTypeAc="MI:0356" secondary="ndrg1-canx-1"/>
+           </xref>
+           <experimentList>
+             <experimentRef>11</experimentRef>
+           </experimentList>
+           <participantList>
+             <participant id="27">
+               <interactorRef>28</interactorRef>
+               <biologicalRole>
+                 <names>
+                   <shortLabel>unspecified role</shortLabel>
+                   <fullName>unspecified role</fullName>
+                 </names>
+                 <xref>
+                   <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0499" refType="identity" refTypeAc="MI:0356"/>
+                   <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference" refTypeAc="MI:0358"/>
+                 </xref>
+               </biologicalRole>
+               <experimentalRoleList>
+                 <experimentalRole>
+                   <names>
+                     <shortLabel>prey</shortLabel>
+                     <fullName>prey</fullName>
+                   </names>
+                   <xref>
+                     <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0498" refType="identity" refTypeAc="MI:0356"/>
+                     <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference" refTypeAc="MI:0358"/>
+                   </xref>
+                 </experimentalRole>
+               </experimentalRoleList>
+             </participant>
+             <participant id="29">
+               <interactorRef>13</interactorRef>
+               <biologicalRole>
+                 <names>
+                   <shortLabel>unspecified role</shortLabel>
+                   <fullName>unspecified role</fullName>
+                 </names>
+                 <xref>
+                   <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0499" refType="identity" refTypeAc="MI:0356"/>
+                   <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference" refTypeAc="MI:0358"/>
+                 </xref>
+               </biologicalRole>
+               <experimentalRoleList>
+                 <experimentalRole>
+                   <names>
+                     <shortLabel>bait</shortLabel>
+                     <fullName>bait</fullName>
+                   </names>
+                   <xref>
+                     <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0496" refType="identity" refTypeAc="MI:0356"/>
+                     <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference" refTypeAc="MI:0358"/>
+                   </xref>
+                 </experimentalRole>
+               </experimentalRoleList>
+             </participant>
+           </participantList>
+           <interactionType>
+             <names>
+               <shortLabel>physical association</shortLabel>
+               <fullName>physical association</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0915" refType="identity" refTypeAc="MI:0356"/>
+               <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference" refTypeAc="MI:0358"/>
+             </xref>
+           </interactionType>
+           <attributeList>
+             <attribute name="figure legend">2 E</attribute>
+             <attribute name="comment">The level of Ku70 and CANX in the IP complex was extremely low compared to the supernatant. It was not possible to detect NDRG1 in the IP complexes when the IP was
+performed using anti-Ku70 or anti-CANX antibodies. This is likely due to there being free forms of Ku70 and CANX.</attribute>
+             <attribute name="kd">0.0</attribute>
+           </attributeList>
+         </interaction>
+         <interaction id="30">
+           <names>
+             <shortLabel>ndrg1-g22p1-1</shortLabel>
+             <fullName>NDRG1 coimmunoprecipitates Ku70 from LNCaP cell lysate</fullName>
+           </names>
+           <xref>
+             <primaryRef db="intact" dbAc="MI:0469" id="EBI-1191221" refType="identity" refTypeAc="MI:0356" secondary="ndrg1-g22p1-1"/>
+           </xref>
+           <experimentList>
+             <experimentRef>11</experimentRef>
+           </experimentList>
+           <participantList>
+             <participant id="31">
+               <interactorRef>32</interactorRef>
+               <biologicalRole>
+                 <names>
+                   <shortLabel>unspecified role</shortLabel>
+                   <fullName>unspecified role</fullName>
+                 </names>
+                 <xref>
+                   <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0499" refType="identity" refTypeAc="MI:0356"/>
+                   <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference" refTypeAc="MI:0358"/>
+                 </xref>
+               </biologicalRole>
+               <experimentalRoleList>
+                 <experimentalRole>
+                   <names>
+                     <shortLabel>prey</shortLabel>
+                     <fullName>prey</fullName>
+                   </names>
+                   <xref>
+                     <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0498" refType="identity" refTypeAc="MI:0356"/>
+                     <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference" refTypeAc="MI:0358"/>
+                   </xref>
+                 </experimentalRole>
+               </experimentalRoleList>
+             </participant>
+             <participant id="33">
+               <interactorRef>13</interactorRef>
+               <biologicalRole>
+                 <names>
+                   <shortLabel>unspecified role</shortLabel>
+                   <fullName>unspecified role</fullName>
+                 </names>
+                 <xref>
+                   <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0499" refType="identity" refTypeAc="MI:0356"/>
+                   <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference" refTypeAc="MI:0358"/>
+                 </xref>
+               </biologicalRole>
+               <experimentalRoleList>
+                 <experimentalRole>
+                   <names>
+                     <shortLabel>bait</shortLabel>
+                     <fullName>bait</fullName>
+                   </names>
+                   <xref>
+                     <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0496" refType="identity" refTypeAc="MI:0356"/>
+                     <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference" refTypeAc="MI:0358"/>
+                   </xref>
+                 </experimentalRole>
+               </experimentalRoleList>
+             </participant>
+           </participantList>
+           <interactionType>
+             <names>
+               <shortLabel>physical association</shortLabel>
+               <fullName>physical association</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0915" refType="identity" refTypeAc="MI:0356"/>
+               <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference" refTypeAc="MI:0358"/>
+             </xref>
+           </interactionType>
+           <attributeList>
+             <attribute name="figure legend">2 E</attribute>
+             <attribute name="comment">The level of Ku70 and CANX in the IP complex was extremely low compared to the supernatant. It was not possible to detect NDRG1 in the IP complexes when the IP was
+performed using anti-Ku70 or anti-CANX antibodies. This is likely due to there being free forms of Ku70 and CANX.</attribute>
+             <attribute name="kd">0.0</attribute>
+           </attributeList>
+         </interaction>
+       </interactionList>
+     </entry>
+   </entrySet>

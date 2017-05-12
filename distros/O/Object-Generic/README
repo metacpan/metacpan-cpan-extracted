@@ -1,0 +1,42 @@
+Object-Generic
+
+Object::Generic is class that allows an object to contain 
+key/value pairs which are set and accessed through an interface 
+similar to that of Class::DBI, namely
+ get:  $object->key           or   $object->get('key')
+ set:  $object->key('value')  or   $object->set(key => 'value')
+
+All of these methods are AUTOHANDLE'd on the first invocation,
+and an appropriate subroutine created for subsequent calls.
+By default any key may be used; however, one can define a list
+of allowed keys.
+
+A related class Object::Generic::False allows method chaining 
+without generating errors.  An expression like $object->this->that->those 
+returns an instance of Object::Generic::False and evaluates 
+false (assuming one of the keys 'this', 'that', 'those' has not been set).
+
+And since I use this for web development along with Class::DBI, 
+there's a companion package Object::Generic::Session with 
+a similar interface which inherits from Session.pm, 
+putting its keys and values into a disk file or SQL database.
+Since that piece has more dependencies (Apache::Cookie, Session.pm),
+I've pulled it out into a seperate package.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 Jim Mahoney (mahoney@marlboro.edu)
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

@@ -1,0 +1,47 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'File::Spec' => '0',
+                                      'IO::Handle' => '0',
+                                      'IPC::Open3' => '0',
+                                      'Test::More' => '0',
+                                      'Test::Pod' => '1.41',
+                                      'blib' => '1.01',
+                                      'perl' => '5.006'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'DBIx::Class::Core' => '0',
+                                      'DBIx::Class::EncodedColumn::Crypt::Eksblowfish::Bcrypt' => '0',
+                                      'DBIx::Class::ResultSet' => '0',
+                                      'DBIx::Class::Schema' => '0',
+                                      'DBIx::Class::TimeStamp' => '0',
+                                      'List::MoreUtils' => '0',
+                                      'Moose' => '0',
+                                      'Moose::Role' => '0',
+                                      'base' => '0',
+                                      'namespace::autoclean' => '0',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'Test::DBIx::Class' => '0',
+                                   'Test::More' => '0.96'
+                                 }
+                 }
+     };
+  $x;
+ }

@@ -1,0 +1,63 @@
+
+ Routing Process "ospf 1" with ID 10.188.1.15
+ Start time: 09:26:17.064, Time elapsed: 1d20h
+ Supports only single TOS(TOS0) routes
+ Supports opaque LSA
+ Supports Link-local Signaling (LLS)
+ Supports area transit capability
+ It is an area border router
+ Router is not originating router-LSAs with maximum metric
+ Initial SPF schedule delay 5000 msecs
+ Minimum hold time between two consecutive SPFs 10000 msecs
+ Maximum wait time between two consecutive SPFs 10000 msecs
+ Incremental-SPF disabled
+ Minimum LSA interval 5 secs
+ Minimum LSA arrival 1000 msecs
+ LSA group pacing timer 240 secs
+ Interface flood pacing timer 33 msecs
+ Retransmission pacing timer 66 msecs
+ Number of external LSA 9. Checksum Sum 0x05B39E
+ Number of opaque AS LSA 0. Checksum Sum 0x000000
+ Number of DCbitless external and opaque AS LSA 9
+ Number of DoNotAge external and opaque AS LSA 0
+ Number of areas in this router is 3. 3 normal 0 stub 0 nssa
+ Number of areas transit capable is 0
+ External flood list length 0
+ IETF NSF helper support enabled
+ Cisco NSF helper support enabled
+    Area BACKBONE(0.0.0.0)
+	Number of interfaces in this area is 1
+	Area has no authentication
+	SPF algorithm last executed 00:18:50.196 ago
+	SPF algorithm executed 10 times
+	Area ranges are
+	Number of LSA 8. Checksum Sum 0x03B02C
+	Number of opaque link LSA 0. Checksum Sum 0x000000
+	Number of DCbitless LSA 1
+	Number of indication LSA 0
+	Number of DoNotAge LSA 0
+	Flood list length 0
+    Area 10.188.0.0
+	Number of interfaces in this area is 1
+	Area has no authentication
+	SPF algorithm last executed 00:18:50.200 ago
+	SPF algorithm executed 30 times
+	Area ranges are
+	Number of LSA 7. Checksum Sum 0x02BF14
+	Number of opaque link LSA 0. Checksum Sum 0x000000
+	Number of DCbitless LSA 3
+	Number of indication LSA 0
+	Number of DoNotAge LSA 0
+	Flood list length 0
+    Area 10.188.15.0 (Inactive)
+	Number of interfaces in this area is 1 (1 loopback)
+	Area has no authentication
+	SPF algorithm last executed 00:18:50.200 ago
+	SPF algorithm executed 1 times
+	Area ranges are
+	Number of LSA 7. Checksum Sum 0x042DCE
+	Number of opaque link LSA 0. Checksum Sum 0x000000
+	Number of DCbitless LSA 1
+	Number of indication LSA 1
+	Number of DoNotAge LSA 0
+	Flood list length 0

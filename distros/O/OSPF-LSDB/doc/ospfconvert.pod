@@ -1,0 +1,41 @@
+=head1 NAME
+
+B<ospfconvert> - convert OSPF LSDB file to current version
+
+=head1 SYNOPSIS
+
+B<ospfconvert> [B<-h>] [F<oldospf.yaml>] [F<ospf.yaml>]
+
+=head1 DESCRIPTION
+
+B<ospfconvert> takes an OSPF link state database in YAML format and
+converts it to the current L<OSPF::LSDB> version.
+
+Optionally one input and one output file can be given on command
+line, otherwise stdin and stdout are used.
+
+The options are as follows:
+
+=over 4
+
+=item B<-h>
+
+Show help message and exit.
+
+=back
+
+=head1 DIAGNOSTICS
+
+The program dies if an error occurs.
+Typical errors are invalid YAML format, version of input file is
+newer than this program so it cannot be converted or the content
+of the YAML file is invalid.
+
+=head1 SEE ALSO
+
+L<OSPF::LSDB::YAML>,
+L<OSPF::LSDB>
+
+=head1 AUTHOR
+
+Alexander Bluhm

@@ -1,0 +1,7 @@
+Revision history for OAuth-Simple
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+
+1.02    04.06.2014
+        Custom HTTP headers (for bearer support and others) support.

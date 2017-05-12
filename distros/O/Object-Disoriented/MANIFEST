@@ -1,0 +1,11 @@
+MANIFEST
+Makefile.PL
+lib/Object/Disoriented.pm
+t/01_basic.t
+t/lib/DA.pm
+t/lib/EN.pm
+README
+Changes
+LICENSE
+t/98_pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

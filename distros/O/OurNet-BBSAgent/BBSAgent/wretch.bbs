@@ -1,0 +1,32 @@
+# $File: //depot/OurNet-BBSAgent/BBSAgent/wretch.bbs $ $Author: autrijus $
+# $Revision: #5 $ $Change: 2829 $ $DateTime: 2002/01/10 14:54:36 $
+# Contributed by Smartboy <kcwu@ck.tp.edu.tw>
+# zh_TW.Big5: 無名小站
+
+Wretch
+wretch.twbbs.org
+
+load maple3.board
+
+=main
+send qqqqqqqq
+wait 主功能表
+till 狀態
+
+=board_article_fetch_first
+call board $[board]
+send $[article]\n\n
+wait \e[2J
+till \e[0;37;42m
+  or \e[37;42m
+till \e[31;47m (
+wait \e[m
+exit
+
+=board_article_fetch_next
+send \n
+till \e[0;37;42m
+  or \e[37;42m
+till \e[31;47m (
+wait \e[m
+exit

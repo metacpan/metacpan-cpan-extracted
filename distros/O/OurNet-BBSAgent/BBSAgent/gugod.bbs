@@ -1,0 +1,9 @@
+# $File: //depot/OurNet-BBSAgent/BBSAgent.pm $ $Author: autrijus $
+# $Revision: #29 $ $Change: 2215 $ $DateTime: 2001/10/26 20:46:28 $
+# Contributed by Vgod <vgod@kimo.com.tw>
+# zh_TW.Big5: ÃzÄê§ø
+
+Bowlan
+bbs.gugod.org
+
+load maple3.board

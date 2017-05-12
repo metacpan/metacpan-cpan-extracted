@@ -1,0 +1,26 @@
+---
+name: ORDB-DebianModules-Generator
+version: 0.02
+author:
+  - 'Ryan Niebur <ryanryan52@gmail.com>'
+abstract: generator for the database ORDB::DebianModules points to
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  DBD::SQLite: 0
+  DBI: 0
+  Debian::ModuleList: 0
+build_requires:
+  DBD::SQLite: 0
+  DBI: 0
+  Debian::ModuleList: 0
+  Test::More: 0
+provides:
+  ORDB::DebianModules::Generator:
+    file: lib/ORDB/DebianModules/Generator.pm
+    version: 0.02
+generated_by: Module::Build version 0.33
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

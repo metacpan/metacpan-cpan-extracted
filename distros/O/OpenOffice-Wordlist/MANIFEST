@@ -1,0 +1,15 @@
+Build.PL
+Changes
+MANIFEST
+README
+lib/OpenOffice/Wordlist.pm
+t/00-load.t
+t/01-basic.t
+t/02-basic.t
+t/wbswg6.dic
+t/wbswg5.dic
+Makefile.PL
+META.yml
+examples/dumpwl.pl
+examples/loadwl.pl
+examples/determine.pl

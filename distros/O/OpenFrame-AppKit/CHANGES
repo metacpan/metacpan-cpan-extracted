@@ -1,0 +1,35 @@
+Changes file for OpenFrame::AppKit:
+
+3.03
+	  - bumped up version to 3.03 because some of the module
+    	    versions were retrograding.  It was becoming a bit of
+    	    a pain, and was far easier to make everything higher than
+      	    the highest version of any module.  Pointed out by
+    	    Randal Schwartz.
+  	  - Added Pipeline-3.01 to dependencies.
+
+1.04 (NOT RELEASED YET)
+	- added OpenFrame::AppKit::Segment::DispatchOnURI, which allows
+	  standard segments to be handle uri information rather than
+          only those inheriting from OpenFrame::AppKit::App
+	- better test coverage (checking sessions)
+	- removed dead code from OpenFrame::AppKit::Examples::Hangman
+	  noticed by Paul Makepeace
+
+1.03
+	- added Andrew Ford's patch to have state settings in
+	  entry_points
+	- various bug fixes
+	- much better test coverage
+
+1.02
+	- now supports parameters with existing-but-0 value
+
+1.01
+	- renamed OpenFrame::AppKit::App::NameForm to
+	  OpenFrame::AppKit::Examples::NameForm
+	- new OpenFrame::AppKit::Segment::Images
+	- documentation updates
+
+1.00 ?
+	- released to CPAN

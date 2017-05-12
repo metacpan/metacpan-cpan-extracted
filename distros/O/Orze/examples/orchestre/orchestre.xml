@@ -1,0 +1,81 @@
+<orze>
+	<var name="fullname">Orchestre des Grandes Écoles de Lyon</var>
+	<var name="subject">Orchestre des Grandes Écoles de Lyon</var>
+	<var name="keywords">Orchestre,ENS,ECL,École Normale Supérieure,Lyon,École Centrale,Grandes Écoles,Musique,Classique</var>
+	<var name="language">fr</var>
+	<var name="author">Olivier Schwander</var>
+	<var name="menu" src="Menu" />
+
+	<page name="index">
+		<var name="title">Accueil</var>
+		<var name="content" src="Include" file="bla"></var>
+	</page>
+
+	<page name="repetitions">
+		<var name="title">Répétitions</var>
+		<var name="content">$title</var>
+	</page>
+
+	<page name="concerts">
+		<var name="title">Concerts</var>
+		<var name="content">$title</var>
+	</page>
+
+	<page name="programme">
+		<var name="title">Programme</var>
+		<var name="content">$title</var>
+	</page>
+
+	<page name="histoire">
+		<var name="title">Histoire</var>
+		<var name="content">$title</var>
+	</page>
+
+	<page name="musiciens">
+		<var name="title">Musiciens</var>
+		<var name="content">$title</var>
+	</page>
+
+	<page name="photos" nomenu="1">
+		<var name="title">Photos</var>
+		<var name="content">$title</var>
+		<page name="weo1">
+			<var name="title">Photos WEO1</var>
+			<var name="content">$title</var>
+		</page>
+		<page name="weo2">
+			<var name="title">Photos WEO2</var>
+			<var name="content">$title</var>
+		</page>
+	</page>
+
+	<page name="contacts">
+		<var name="title">Contacts</var>
+		<var name="content">$title</var>
+	</page>
+
+	<page name="liens">
+		<var name="title">Liens</var>
+		<var name="content">$title</var>
+		<var name="menu" src="Menu" />
+	</page>
+
+	<page name="puits">
+		<var name="title">Puits</var>
+		<var name="content">$title</var>
+	</page>
+
+	<page name="cache">
+		<var name="title">Cache</var>
+		<var name="content">$title</var>
+	</page>
+
+	<page name="orchestre" extension="css" driver="Copy"></page>
+	<page name="orchestre-nomenu" extension="css" driver="Copy"></page>
+
+	<page name="logos/logoENSL" extension="png" driver="Copy"></page>
+	<page name="logos/logoEM" extension="png" driver="Copy"></page>
+	<page name="logos/logoECL" extension="png" driver="Copy"></page>
+	<page name="logos/logoENSLSH" extension="png" driver="Copy"></page>
+
+</orze>

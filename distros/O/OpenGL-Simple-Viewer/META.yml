@@ -1,0 +1,13 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         OpenGL-Simple-Viewer
+version:      0.03
+version_from: Viewer.pm
+installdirs:  site
+requires:
+    Math::Quaternion:              0
+    OpenGL::Simple:                0
+    OpenGL::Simple::GLUT:          0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.21

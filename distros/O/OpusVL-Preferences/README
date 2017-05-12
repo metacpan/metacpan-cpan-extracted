@@ -1,0 +1,139 @@
+NAME
+
+    OpusVL::Preferences - Generic DBIC preferences module
+
+VERSION
+
+    version 0.26
+
+SYNOPSIS
+
+    This is a really simple module to pull into result classes so you can
+    attach preferences, rather than have to continually extend the schema
+    definition where its probably not appropriate.
+
+    Say you had an Employees class, and wanted to define the following
+    preferences for a customer:
+
+    grows_plants
+
+    has_untidy_desk
+
+    likes_noodles
+
+    You would set up your Result class as follows:
+
+            package Result::Employee;
+    
+            use strict;
+            use Moose;
+            
+            extends 'DBIx::Class::Core';
+    
+            with 'OpusVL::Preferences::RolesFor::Result::PrfOwner';
+    
+            __PACKAGE__->prf_owner_init;
+    
+            ...
+
+    And the ResultSet class would be:
+
+            package ResultSet::Employee;
+    
+            use strict;
+            use Moose;
+    
+            extends 'DBIx::Class::ResultSet';
+    
+            with 'OpusVL::Preferences::RolesFor::ResultSet::PrfOwner';
+    
+            ...
+
+    This would initialise the class with 3 preferences, set to the
+    appropriate defaults. Within the Employee class, the following methods
+    are exposed to manage the preferences:
+
+ Result Class Methods
+
+  prf_get
+
+    Get the current value of the preference (either the default or local
+    copy as appropriate).
+
+            $p = $employee->prf_get ('grows_plants');    # $p == 1
+
+  prf_set
+
+    Overides the default preference value for the employee in question:
+
+            $employee = prf_set (grows_plants => 0);
+            $p = $employee->prf_get ('grows_plants');    # $p == 0
+
+  prf_reset
+
+    Deletes any local overrides and uses the default
+
+            $employee->prf_reset ('grows_plants');
+            $p = $employee->prf_get ('grows_plants');    # $p == 1
+
+  prf_preferences
+
+    Returns a resultset containing PrfPreference classes.
+
+ ResultSet Methods
+
+  prf_defaults
+
+    Returns a resultset of the default preferences setup for this
+    resultset. Add more results to this object to add more defaults. For
+    example, the following might be in the initdb routine:
+
+            sub initdb
+            {
+                    my $self = shift;
+    
+                    $self->prf_defaults->populate
+                    ([
+                            { name => 'grown_plants'    => default_value => '1' },
+                            { name => 'has_untidy_desk' => default_value => '1' },
+                            { name => 'likes_noodles'   => default_value => '1' },
+                    ]);
+            }
+
+  prf_search
+
+    To be completed. Will allow an Employee resultset to be return using
+    preferences as a search parameter.
+
+BUGS
+
+    None. Past, present and future.
+
+SUPPORT
+
+    You can find documentation for this module with the perldoc command.
+
+        perldoc OpusVL::Preferences
+
+    If you require assistance, support, or further development of this
+    software, please contact OpusVL using the details below:
+
+      * Telephone: +44 (0)1788 298 410
+
+      * Email: community@opusvl.com
+
+      * Web: http://opusvl.com
+
+ACKNOWLEDGEMENTS
+
+AUTHOR
+
+    OpusVL - www.opusvl.com
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2011 by OpusVL - www.opusvl.com.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,0 +1,11 @@
+Revision history for Object-SpaceBackStr
+
+0.02     2013-09-09 (SHARYANTO)
+
+         - No functional changes. Rebuild with MakeMaker instead of
+           Module::Build because the latter is deprecated from core in 5.19.
+
+
+0.01    2011-08-03 (SHARYANTO)
+
+        - First release.

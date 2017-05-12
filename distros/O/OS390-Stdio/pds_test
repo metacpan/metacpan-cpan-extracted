@@ -1,0 +1,132 @@
+: # use perl
+    eval 'exec ./perl -Iblib/arch -Iblib/lib -w -S $0 ${1+"$@"}'
+	if 0;
+
+# pds_test - a test of the OS390::Stdio::pds_mem() function.
+# Note that above we expect ./perl.  In other words it is assumed that
+# you named your new statically linked perl binary with the OS390::Stdio
+# module linked in `perl' an that it is in the cwd.  If you called you 
+# perl something_else then invoke this script as:
+#     ./something_else -Iblib/arch -Iblib/lib pds_test
+# or simply edit the eval exec line above and s/perl/something_else/.
+
+my $DEBUG = 1;
+
+use strict;
+
+use OS390::Stdio qw(get_dcb mvsopen pds_mem sysdsnr);
+
+my $pds_def = shift;
+my $seq_def = shift;
+
+print <<EOPDS;
+
+In order to test the OS390::Stdio::pds_mem() routine
+I will need the name of a readable partitioned data set 
+(PDS) and a readable non PDS (e.g. a sequential data set).
+
+EOPDS
+
+Input_pds:
+
+print "What is the name of your test PDS? ", 
+      $pds_def ? "[$pds_def] " : '';
+
+my $pds_in = <STDIN>;
+print "\n";
+chomp($pds_in);            # rid of linefeed
+if ($pds_def) { $pds_in = ($pds_in) ? $pds_in : $pds_def; }
+my $pds = cleanse_name($pds_in);
+
+if (!sysdsnr($pds)) 
+{
+    warn "Oops that PDS name $pds was not readable.  Let's start over.\n";
+    goto Input_pds;
+}
+my $pdsh = mvsopen($pds,"r");
+my %pds_dcb = get_dcb($pdsh);
+close($pdsh);
+if ($pds_dcb{'dsorg'} !~ 'POPDSdir') 
+{
+    warn "Oops that name $pds was not a PDS. Let's start over.\n";
+    goto Input_pds;
+}
+my @members = pds_mem($pds);
+if (defined($members[0])) {
+    print "OK.  The members of $pds appear to be:\n";
+    foreach my $member (@members) {
+        if (defined($member)) {
+            my $filename = $pds_dcb{filename};
+            $filename =~ s/\'$//;
+            print "$filename($member)'\n";
+        }
+    }
+}
+else {
+    print "Hmm.  There were no members in that PDS $pds apparently.\n";
+}
+
+print <<EOSEQ;
+
+For testing I now need to know the name of a readable data set 
+that is not a PDS.  For example, a sequential data set will do.
+
+EOSEQ
+
+Input_seq:
+
+print "What is the name of your non partitioned test data set? ", 
+       $seq_def ? "[$seq_def] " : '';
+
+my $seq_in = <STDIN>;
+print "\n";
+chomp($seq_in);            # rid of linefeed
+if ($seq_def) { $seq_in = ($seq_in) ? $seq_in : $seq_def; }
+
+my $seq = cleanse_name($seq_in);
+
+if (!sysdsnr($seq)) 
+{
+    warn "Oops that data set name $seq was not readable.  Let's try again.\n";
+    goto Input_seq;
+}
+my $seqh = mvsopen($seq,"r");
+my %seq_dcb = get_dcb($seqh);
+close($seqh);
+if ($seq_dcb{'dsorg'} =~ 'PDSdir') 
+{
+    warn "Oops that data set name $seq was a PDS.  Let's try again.\n";
+    goto Input_seq;
+}
+my @non_members = pds_mem($seq);
+if (!defined($non_members[0]) && $#non_members == 0) {
+    print "\nOK.  Calling pds_mem($seq) gave results as expected.\n";
+}
+else {
+    print "Hmm.  There was a problem.\n";
+    if (defined($non_members[0])) {
+        print "The first element of the return array was defined\n";
+        print "but it should not have been for a non PDS.\n";
+    }
+    if ($#non_members != 0) {
+        print "The number of elements in the return array was not what\n";
+        print "expected for a non PDS.\n";
+    }
+}
+
+sub cleanse_name {
+    my $ds = shift;
+    my $input = $ds;
+    # upcase
+    $ds =~ tr/a-z/A-Z/;
+    # add two leading slashes if necessary
+    $ds = ($ds =~ /^\/\//) ? $ds : "/$ds";
+    $ds = ($ds =~ /^\/\//) ? $ds : "/$ds";
+    # strip any (MEMBER) name
+    # $ds =~ s/\([^\)]*\)//;
+    # strip quotation marks
+    # $ds =~ s/\'//g;
+    if ($ds ne $input) { print "Converting $input to $ds.\n\n"; }
+    return($ds);
+}
+

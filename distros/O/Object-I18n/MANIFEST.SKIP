@@ -1,0 +1,8 @@
+^blib/
+^Makefile$
+^Makefile.old$
+^MANIFEST.bak$
+^pm_to_blib$
+^TODO$
+^Object.*\.tar\.gz$
+\.swp$

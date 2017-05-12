@@ -1,0 +1,39 @@
+[% META appkitfeature_tablesorter = 1 %]
+<h1>Testing the tables</h1>
+<fieldset>
+    <legend>Table test</legend>
+    <table class="tablesorter">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Some control 
+                    <select name="test">
+                        <option value="a">A</option>
+                        <option value="b">B</option>
+                        <option value="c">C</option>
+                    </select>
+                </th>
+                <th>
+                    <label for="test">Another thing </label><input id="test" type="checkbox">
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Someone</td>
+                <td>A</td>
+                <td>A</td>
+            </tr>
+            <tr>
+                <td>Else</td>
+                <td>A</td>
+                <td>A</td>
+            </tr>
+            <tr>
+                <td>Anon</td>
+                <td>A</td>
+                <td>A</td>
+            </tr>
+        </tbody>
+    </table>
+</fieldset>

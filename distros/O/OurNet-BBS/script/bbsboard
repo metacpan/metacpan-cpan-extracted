@@ -1,0 +1,378 @@
+#!/usr/bin/perl -T
+# $File: //depot/libOurNet/BBS/script/bbsboard $ $Author: autrijus $
+# $Revision: #1 $ $Change: 3790 $ $DateTime: 2003/01/24 19:08:46 $
+
+$VERSION = '0.05';
+$REVISION = "rev$1\[\@$2\]" 
+    if ('$Revision: #1 $ $Change: 3790 $' =~ /(\d+)[^\d]+(\d+)/);
+
+use strict;
+
+use MIME::Words ':all';
+use MIME::Parser;
+use Mail::Internet;
+use OurNet::BBS '1.6';
+
+=head1 NAME
+
+bbsboard - Internet to BBS email-post handler
+
+=head1 SYNOPSIS
+
+In F</usr/local/etc/bbs.rc> or F</etc/bbs.rc>;
+
+    # $DUMP     = '/tmp/msgdump.tmp';		# Dump message to disk; halt
+    $MAIL_LOG   = '/var/log/bbsmail.log';	# Log of bbsmail
+    $BOARD_LOG  = '/var/log/bsboard.log';	# Log of bbsboard
+    $SIZE_LIMIT = 204800;			# Size limit of attachments
+    $NO_ATTACH	= '\.(?i-xsm:exe|scr|pif|bat)$';# Block matched attachments
+
+    # Set virutal hosts; The C<bbs.> prefix of keys should be omitted.
+    %DOMAINS = (
+        'elixus.org' => {
+            BASEURL => 'http://elixus.org',
+            WWWHOME => '/srv/www/elixir',
+            PARAM   => ['MELIX', '/home/melix'],
+            OWNER   => 'melix',
+            GROUP   => 'melix',
+        },
+        'cvic.org'  => {
+            BASEURL => 'http://cvic.org',
+            WWWHOME => '/srv/www/cvic',
+            PARAM   => ['CVIC', '/srv/bbs/cvic',
+                         1003, 2500, 1005, 250, 1004, 50000], # needs utmp
+            OWNER   => 'cvic',
+            GROUP   => 'bbs',
+	    PERMIT  => 1, # 'permit' file required to post
+        },
+        'm543.com'  => {
+            BASEURL => 'http://m543.com',
+            WWWHOME => '/srv/www/m543',
+            PARAM   => ['CVIC', '/srv/bbs/m543',
+                         1103, 2500, 1105, 250, 1104, 50000], # needs utmp
+            OWNER   => 'cvic',
+            GROUP   => 'bbs',
+        },
+    );
+
+    # multiple domains, same IP
+    $DOMAINS{'m543.org'}       = $DOMAINS{'music543.org'} =
+    $DOMAINS{'music543.com'}   = $DOMAINS{'m543.com'};
+
+    # fallback using the 'true' hostname
+    $DOMAINS{'geb.elixus.org'} = $DOMAINS{'elixus.org'};
+
+    # default domain for in-site mails
+    $DEFAULT_DOMAIN = 'elixus.org'
+
+To configure it with sendmail, modify F<sendmail.cf> like this:
+
+    ######################################
+    ###   Ruleset 0 -- Parse Address   ###
+    ######################################
+
+    R$+.bbs < @ $=w .>		$#bbsmail $: $1		bbs mail gateway
+    R$+.board < @ $=w .>	$#bbsboard $: $1	bbs board gateway
+
+    # handle locally delivered names
+
+    R$+.bbs			$#bbsmail $:$1		bbs mail gateway
+    R$+.board			$#bbsboard $:$1		bbs board gateway
+
+    ##################################################
+    ###   Local and Program Mailer specification   ###
+    ##################################################
+
+    Mbbsmail,	P=/usr/local/bin/bbsmail, F=lsSDFMuhP, S=10, R=20,
+		A=bbsmail $u
+    Mbbsboard,	P=/usr/local/bin/bbsboard, F=lsSDFMuhP, S=10, R=20,
+		A=bbsboard $u
+
+To feed it a MIME mail directly at the command line:
+
+    % bbsmail < message.txt
+
+=head1 DESCRIPTION
+
+This script relays e-mails sent to C<*.bbs@domain> as mails to
+BBS user mailboxes; it is designed to be a drop-in replacement for
+the MAPLE BBS utility of the same name.
+
+This program could be used serve multiple BBS sites, each distinguished
+by its domain name. MIME encodings, multipart messages, quoted words
+are all handled correctly.
+
+If supplied with a web directory, attachments could be saved for
+later download. You could restrict the max. allowed size of each
+attachments.
+
+If the optional C<HTML::Parse> and C<HTML::FromText> modules were
+installed, HTML-only mails and simple HTML attachments could be
+rendered as plain text.
+
+=head1 CAVEATS
+
+Currently this script does not check proper permissions; you could
+use the C<OurNet> backend to achieve restricted permission. See
+L<bbscomd> for how to run an OurNet node.
+
+However, authentication is currently not implemented; while sending
+password via e-mail is easy, the author finds it distasteful. A
+proper way to parse PGP-signed mail might be the only viable route,
+and any contributions on that front will be most welcomed.
+
+=cut
+
+our ($SIZE_LIMIT, $DUMP, $LOG, $MAIL_LOG, $BOARD_LOG, $NO_ATTACH);
+our (%DOMAINS, $DEFAULT_DOMAIN);
+our ($Postfix, $Element, $Container, $RCFile);
+our ($MsgAttach, $MsgTooLarge, $MsgDownload);
+
+$Postfix	||= '.board';
+$Element	||= 'boards';
+$Container	||= 'articles';
+$RCFile		||= 'bbs.rc';
+$MsgAttach	||= "\n※ [信件夾檔: %s]\n";
+$MsgTooLarge	||= "※ (附加檔案 %s 超過上限: %s 位元組。)\n";
+$MsgDownload	||= "※ (附加檔案可於 %s 下載。)\n";
+
+foreach my $path ('/etc', '/usr/local/etc', '/usr/local/bin', '.') {
+    do "$path/$RCFile" and last if -e "$path/$RCFile";
+}
+
+die 'bbs.rc not found!' unless %DOMAINS;
+
+$DOMAINS{"bbs.$_"} = $DOMAINS{$_} for keys(%DOMAINS);
+
+if ($DUMP) { open _, ">$DUMP"; local $/; print _ <STDIN>; close _; exit 0; }
+
+my $mail = Mail::Internet->new(*STDIN);
+my $timeseq = scalar time;
+
+# Extract headers
+my ($to, $cc, $received, $date, $bcc, $from,
+    $subject, $replyto, $sender, $xorig) = ( map {
+	substr($mail->head->get($_), 0, -1) 
+    } qw/To Cc Received Date Bcc From Subject Reply-To X-Sender X-Originator/,
+);
+
+# Parse MIME Quoted Words
+for ($subject, $from, $to, $sender, $replyto) {
+    if (/=\?\w/) {
+        $_ .= '?=' unless index($_, '?=') > -1;
+        $_ = decode_mimewords($_);
+    }
+}
+
+my $DOMAIN;
+foreach my $dom (keys(%DOMAINS)) {
+    if (index(uc($to), uc("\@".$dom)) > -1) {
+        $DOMAIN = $dom; last;
+    }
+    elsif (index(uc($cc), uc("\@".$dom)) > -1) {
+        $to = $cc;
+        $DOMAIN = $dom; last;
+    }
+    elsif (index(uc($bcc), uc("\@".$dom)) > -1) {
+        $to = $bcc;
+        $DOMAIN = $dom; last;
+    }
+    elsif (index(uc($received), uc("$Postfix\@".$dom)) > -1) {
+	$to = $received;
+	$to =~ s/.* for //s; $to =~ s/;.*//s;
+        $DOMAIN = $dom; last;
+    }
+    elsif (index($received, "-owner\@".$dom) > -1) { # mailing list
+	$to = $received;
+	$to =~ s/.* for //s; $to =~ s/;.*//s;
+        $DOMAIN = $dom; last;
+    }
+    elsif (index($received, "contact\@".$dom) > -1) { # special case
+        $to = 'General.board'; $DOMAIN = $dom; last;
+    }
+    else {
+	$DOMAIN = $DEFAULT_DOMAIN;
+    }
+}
+
+die "Cannot find domain in: $received\n $to $cc $bcc!\n"
+    unless defined($DOMAIN);
+
+my ($BASEURL, $WWWHOME, $OWNER, $GROUP, $PERMIT) = 
+    @{$DOMAINS{$DOMAIN}}{qw/BASEURL WWWHOME OWNER GROUP PERMIT/};
+
+if ($OWNER) {
+    # change ownership / group to the designated id
+    my ($uid, $gid) = (getpwnam($OWNER))[2,3] or die "no uid of $OWNER";
+    $gid = (getgrnam($GROUP))[2] or die "no gid of $GROUP" if $GROUP;
+    ($>, $)) = ($uid, $gid) or die "seteuid/setegid failed: $OWNER, $GROUP";
+}
+
+my $BBS = OurNet::BBS->new(map { untaint($_) } @{$DOMAINS{$DOMAIN}{PARAM}});
+my $OBJ = $BBS->{untaint($Element)};
+
+# Parse sender's address
+my ($user, $nick, $email);
+($nick, $user) = ($1, $2) if (($user = $from) =~ /"?([^"]+)"? <([^>]+)>/);
+$email = $user;
+$user =~ s/(?:.bbs)?\@.+$//i;
+$nick ||= $user;
+
+# Strip to angled brackets
+$to = $1 if $to =~ m/<([^>]+)>/;
+
+my $parser = MIME::Parser->new;
+$parser->output_to_core(1);
+
+my $entity = $parser->parse_data([ @{$mail->header}, "\n", @{$mail->body} ]);
+my ($parsed, $attach) = (0, 0);
+my $body = '';
+
+if ($LOG ||= ($0 =~ /bbsmail/i ? $MAIL_LOG : $BOARD_LOG)) {
+    open _, ">>$LOG";
+    print _ (scalar localtime)." : $to : $from : $subject\n";
+    close _;
+}
+
+# determine the target
+
+die "cannot parse target: $to" unless $to =~ m|^([\w\-]+)(\Q$Postfix\E)?(?:\@.+)?$|i;
+
+my $target = $1;
+
+unless (exists $OBJ->{$target}) {
+    # do case sensitivity check
+    foreach (keys %{$OBJ}) {
+	$target = untaint($_) and last
+	    if (uc($target) eq uc($_) and exists $OBJ->{$_});
+    }
+}
+
+# blocks duplication
+exit 0 if index($xorig, "$target$Postfix\@") > -1;
+
+# check for existence
+die "no such target: $target" unless exists $OBJ->{$target};
+
+my $obj = $OBJ->{$target};
+
+die "no permission settings in $target" if (
+    $PERMIT and ($Container ne 'mailbox') and (
+	!exists($obj->{permit}) or	# no permission file
+	$obj->{permit} =~ /^\s*$/	# empty permission file
+    )
+);
+
+# check {permit} if there's one
+die "no permission to post: $target from $email" unless (
+    not exists($obj->{permit}) or		# 1) no permission
+    $obj->{permit} =~ /^\s*$/ or (		# 2) it's empty
+	grep { $email =~ /^$_$/i } 		# 3) email matches
+	grep { length }				#    nonempty
+	map { s/\\\*/.*/g; s/\\\?/./g; $_ }	#    wildcard-expanded
+	map { quotemeta }			#    escaped
+	map { s/^\s+//; s/\s+$//; $_ }		#    trimmed
+	split(/(?:\015?\012)+/, $obj->{permit})	#    entries
+    )
+);
+
+# post permitted -- handle attachments
+foreach my $chunk ($entity->parts_DFS) {
+    # skip Outlook special case!
+    next if $chunk->head->recommended_filename eq 'winmail.dat';
+
+    if ($chunk->head->recommended_filename) {
+        $body .= sprintf($MsgAttach, $chunk->head->recommended_filename);
+    }
+
+    if ($chunk->effective_type eq 'text/plain' or
+	$chunk->effective_type eq 'message/rfc822') {
+        $body .= eval { $chunk->bodyhandle->as_string };
+        $parsed++;
+    }
+    elsif ($chunk->effective_type eq 'application/pgp-signature') {
+	# ignore signatures for now
+    }
+    elsif ($chunk->effective_type eq 'text/html'
+        and (!$parsed # HTML only! Gasp!
+         or  $chunk->head->recommended_filename)
+	and eval "use HTML::Parse; use HTML::FormatText; 1"
+    ) {
+        # Display HTML attachments.
+        $body .= HTML::FormatText->new(
+            leftmargin => 0, rightmargin => 70
+        )->format(HTML::Parse::parse_html(
+            $chunk->bodyhandle->as_string
+        ));
+    }
+    elsif ($chunk->bodyhandle and $WWWHOME and $BASEURL) {
+        my $file = $chunk->head->recommended_filename
+		|| ('file'.(++$attach).'.dat');
+	exit if defined $NO_ATTACH and $file =~ /$NO_ATTACH/i;
+
+        if ($file =~ /^=\?\w/) {
+            $file .= '?=' unless index($file, '?=') > -1;
+            $file = decode_mimewords($_);
+        }
+
+        $file =~ tr/\\\/\:\*\?\"\<\>\|//;
+
+	my $content;
+
+        if ($file !~ /^\.+$/ and $content = $chunk->bodyhandle->as_string) {
+	    if (length($content) > $SIZE_LIMIT) {
+		$body .= sprintf($MsgTooLarge, $file, $SIZE_LIMIT);
+		next;
+	    }
+
+            next unless mkdir "$WWWHOME/$timeseq"
+		 and open _, ">$WWWHOME/$timeseq/$file";
+            print _ $content;
+            close _;
+
+            $body .= sprintf($MsgDownload, "$BASEURL/$timeseq/$file");
+	}
+    }
+}
+
+$subject =~ s/^\[$target\]\s?//i; # strip mailing list header tag
+
+# do the real work
+$obj->{$Container}{''} = {
+    title  => substr($subject, 0, 60),
+    body   => $body,
+    header => {
+	(map { $_ => substr($mail->head->get($_), 0, -1) } $mail->head->tags),
+        From    => "$email ($nick)",
+        Subject => $subject,
+        Board   => $target,
+        Date    => scalar localtime,
+    },
+};
+
+sub untaint {
+    $_[0] =~ m/(.*)/s; return $1;
+}
+
+1;
+
+__END__
+
+=head1 SEE ALSO
+
+L<OurNet::BBS>, L<bbsmail>.
+
+=head1 AUTHORS
+
+Autrijus Tang E<lt>autrijus@autrijus.orgE<gt>
+
+=head1 COPYRIGHT
+
+Copyright 2001-2002 by Autrijus Tang E<lt>autrijus@autrijus.orgE<gt>.
+
+This program is free software; you can redistribute it and/or 
+modify it under the same terms as Perl itself.
+
+See L<http://www.perl.com/perl/misc/Artistic.html>
+
+=cut

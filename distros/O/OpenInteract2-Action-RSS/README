@@ -1,0 +1,78 @@
+INTRO: OpenInteract2::Action::RSS
+========================================
+
+This is an Action within the OpenInteract2 framework that will fetch,
+cache, and parse XML feeds. The heavy lifting is done by XML::Feed so
+it should work with RSS (0.91, 1.0, 2.0) and Atom feeds.
+
+
+INSTALLATION
+========================================
+
+The standard:
+
+ perl Makefile.PL
+ make 
+ make test
+ make install
+
+
+QUICK START
+========================================
+
+Step 1:
+
+# Define the action type in your server configuration
+# ($WEBSITE_DIR/conf/server.ini)
+
+[action_types]
+...
+rss = OpenInteract2::Action::RSS
+
+Step 2:
+
+# Create an action in your package's conf/action.ini that gets the
+# recent uploads to CPAN, overrides the title from the feed, uses the
+# default display template, and caches the feed and results for three
+# hours:
+
+[myaction]
+action_type  = rss
+feed_url     = http://search.cpan.org/rss/search.rss
+title        = Recent CPAN uploads
+cache_expire = 3h
+
+Step 3:
+
+Profit!
+
+
+DEPENDENCIES
+========================================
+
+This module requires these other modules and libraries:
+
+   OpenInteract2 (1.99 beta 5+)
+   XML::Feed
+
+
+AUTHORS
+========================================
+
+Chris Winters <chris@cwinters.com>
+
+
+COPYRIGHT AND DISCLAIMER
+========================================
+
+OpenInteract2::Action::RSS Copyright (c) 2004-5 Chris Winters. All
+rights reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the Perl Artistic License or the GNU General
+Public License as published by the Free Software Foundation; either
+version 2 of the License (see 'COPYING'), or (at your option) any
+later version.
+
+
+$Id: README,v 1.2 2004/12/02 04:31:30 cwinters Exp $

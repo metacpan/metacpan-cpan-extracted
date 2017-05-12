@@ -1,0 +1,28 @@
+Release history for OAuthomatic
+
+0.0201  2015-01-21
+
+        Fixed error happening on older perls (wrong isa usage).
+
+0.02    2015-01-21
+
+        Dropped dependency Math::Random::MT (this module causes
+        "double free or corruption" issues on newer glibc, at least in
+        some cases). Instead, new nonce generation routine, which
+        guarantees unique nonces in realistic cases.
+
+        Added dependency on Thread::Queue 3.02 (which introduced
+        deque_timed).
+
+        Various documentation fixes.
+
+        Various internal refactorings.
+        
+        Various technical fixes (enabled some, removed some
+        automatical tests, improved metadata, fixed newlines and
+        formatting etc).
+
+0.01    2015-01-20
+
+        First version, released on an unsuspecting world.
+

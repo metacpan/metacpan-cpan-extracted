@@ -1,0 +1,16 @@
+GLenum		T_UV
+GLboolean	T_U_CHAR
+GLbitfield	T_UV
+GLbyte		T_CHAR
+GLshort		T_IV
+GLint		T_IV
+GLsizei		T_IV
+GLubyte		T_U_CHAR
+GLushort	T_UV
+GLuint		T_UV
+GLfloat		T_FLOAT
+GLclampf	T_FLOAT
+GLdouble	T_DOUBLE
+GLclampd	T_DOUBLE
+
+GLubyte *	T_PV

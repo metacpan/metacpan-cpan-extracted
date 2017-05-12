@@ -1,0 +1,321 @@
+#!/usr/bin/perl -w
+package sxc2csv;
+
+use strict;
+use OpenOffice::Parse::SXC qw(csv_quote parse_sxc dump_sxc_file);
+use Data::Dumper;
+use Getopt::Long;
+use IO::File;
+##################################################################
+my $options	= {};
+GetOptions( $options,
+	    "dump", "c", "o", "h", "help", "quote_all", "quote_text", "no_trim",
+	    "columns=s", "worksheets=s", "split_sheets"
+	  );
+if( $options->{h} or $options->{help} ) {			# Usage
+  usage();
+  exit 1;
+}
+
+# -columns used?  Split them and put them back into the options hash:
+
+if( $options->{columns} ) {
+  my @columns	= split /,/, $options->{columns};
+  $options->{columns}	= \@columns;
+}
+
+# Create and configure SXC
+
+my $SXC		= OpenOffice::Parse::SXC->new;
+my $sxc2csv	= sxc2csv->new( $options );			# The object defined in this file, which does csv output
+$SXC->set_data_handler( $sxc2csv );
+
+# If -worksheets was given, then split them into a list and
+# provide it to SXC
+
+my $worksheets	= undef;
+if( $options->{worksheets} ) {
+  $worksheets	= [ split /,/, $options->{worksheets} ];
+  $SXC->set_options( worksheets	=> $worksheets );		# Only these worksheets get processed
+}
+
+
+if( ! @ARGV ) {							# If no files provided, complain!
+  die "No sxc input files!  Run sxc2csv -h for more options.\n"
+}
+
+# Process each file:
+
+while( defined( my $filename = shift ) ) {
+  # Check the file
+  if( ! -f $filename ) {
+    die "Input file '$filename' not found!\n";
+  }
+  # Open it
+  my $CFH	= IO::File->new( "unzip -p $filename content.xml|" )
+    || die "Can't open sxc file '$filename', or file is not in sxc format.\n";
+
+  if( $options->{dump} ) {		# If the -dump option is used, dump the object tree to stdout
+    dump_sxc_file( $filename );
+  }
+  else {				# Process the file normally
+    $sxc2csv->workbook( $SXC, $filename );
+    $SXC->parse( $CFH );
+#    $SXC->parse_file( $filename );
+  }
+}
+##################################################################
+sub usage {
+  print <<EOT
+
+Usage:
+
+    sxc2csv <SXC_FILE> [-c] [-o] [-dump] [-h/-help]
+       [-quote_all] [-quote_text] [-no_trim]
+       [-worksheets <WORKSHEET,>] [-split_sheets]
+       [-columns COL_NUM <,COL_NUM>]
+
+This script converts an Open/Star Office spreadsheet file (SXC) to
+a CSV file.  The resultant csv file(s) will be named the same as
+their sxc source files, with the .sxc extention replaced with .csv.
+If that is not possible, the file will be appended with .csv.
+
+Here are the options:
+
+  -h/-help:    	  This help message
+  -c:		  Pipe the results to STDOUT
+  -o:    	  Overwrite any existing csv files
+  -dump: 	  Instead of converting to csv, use Data::Dumper
+                  to dump the entire XML tree to STDOUT
+  -quote_all:	  Quote ALL cells (overrides -quote_text)
+  -quote_text:	  Quote cells that have any text in them
+  -worksheets sheet1,sheet2,...:
+                  Specify specific sheets to convert
+  -split_sheets:  Split worksheets into their own files
+  -columns N,...: Output only these columns, as a list of comma-
+                  separated numbers.  0 is the first column.
+
+If you specify -worksheets, you can specify the names of the worksheets
+you wish to dump as a comma-separated list.  Only those sheets will
+be dumped.
+
+If -split_sheets is specified, each worksheet in the workbook will
+be saved to it's own file, named FILENAME.SHEETNAME.csv.
+
+You need the program 'unzip' in your path for this tool to work.
+
+EOT
+  ;
+}
+##################################################################
+sub new {
+  my $type		= shift;
+  my $self		= {};
+  bless $self, $type;
+  my $options		= shift || {};
+  $self->{options}	= $options;
+  return $self;
+}
+sub get_option {
+  my $self		= shift;
+  return $self->{options}{shift()};
+}
+
+##################################################################
+# The data_source functions:
+
+# row() gets called for every row in the spreadsheet that we've
+# asked for, or rather, that we haven't asked to be excluded.
+#
+# In this case, we are just outputting to a csv file.  This
+# function doesn't care which file it's outputting to, that's
+# set up in the worksheet() function.
+sub row {
+  my $self		= shift;
+  my $SXC		= shift;
+  my $row		= shift;
+
+  if( ! $self->get_option( "no_trim" ) ) {
+    # Trim emtpy values off the end of the csv (they're blank anyways)
+    while( (! defined $row->[$#$row] or $row->[$#$row] eq "") and $#$row >= 0 ) {
+      pop @$row;
+    }
+  }
+  if( $self->get_option( "quote_all" ) ) {
+    map { $_ = csv_esape( $_ ) } @$row;		# csv quote all cells
+  }
+  elsif( $self->get_option( "quote_text" ) ) {
+    for( @$row ) {				# csv quote any non-numeric cells
+      if( ! /^\d+$/ ) {
+	$_		= csv_quote( $_ );
+      }
+    }
+  }
+  else {					# quote only those fields that need it
+    for( @$row ) {
+      if( /[,"']/ ) {
+	$_	= csv_quote( $_ );
+      }
+    }
+  }
+
+  if( $self->get_option( "columns" ) ) {	# print only specified columns
+    print {$self->{Curr_FH}} join( ",", @{$row}[@{$self->get_option( "columns" )}] ), "\n";
+  }
+  else {					# print all columns
+    print {$self->{Curr_FH}} join( ",", @$row ), "\n";
+  }
+}
+
+# worksheet() is called every time a worksheet start tag is encountered.
+# In this case, we want to set up the appropriate file to output to so
+# that output from row() goes to the right place
+
+sub worksheet {
+  my $self		= shift;
+  my $SXC		= shift;
+  my $worksheet_name	= shift;
+
+  if( $self->get_option( "c" ) ) {
+    $self->{Curr_FH}		= *STDOUT;	# Print to STDOUT if -c option specified
+    return;
+  }
+
+  # Get the filename to use:
+
+  my $filename		= "";
+  if( $self->get_option( "split_sheets" ) ) {
+    # If we're splitting sheets into separate files,
+    # we have to set up a new file for every worksheet.
+    $filename		= $self->{csv_base_name};	# See workbook()
+    if( ! $filename ) {
+      die "Error: 'csv_base_name' not found!";
+    }
+    $filename		.= ".".$worksheet_name.".csv";
+  }
+  else {
+    # Continue using the same filename for all worksheets
+    $filename		= $self->{main_csv_name};	# See workbook()
+    if( ! $filename ) {
+      die "Error: 'main_csv_name' not found!";
+    }
+  }
+
+  # Now, see if we've opened the file already...:
+  # This isn't really necessary, since once a file is done, we never
+  # have to write to it again, and we could detect when only one
+  # filehandle is used for output... but it's already written and
+  # tested...
+
+  if( $self->{Filehandles}{$filename} ) {
+    # Yes, it's open, just use that for the output
+    $self->{Curr_FH}	= $self->{Filehandles}{$filename};
+  }
+  else {
+    # If not, open the file: (if it exists already, but -o has been used, we overwrite)
+    if( ! -f $filename or ( -f $filename and $self->get_option( "o" ) ) ) {
+      my $FH		= IO::File->new( ">$filename" )
+	|| die "Could not open file: '$filename' for write";
+      $self->{Filehandles}{$filename}	= $FH;	# Cache the filehandle
+      $self->{Curr_FH}	= $FH;
+    }
+    else {
+      die "File '$filename' already exists.  Use the -o option to overwrite\n";
+    }
+  }
+}
+
+# We can expect workbook() to be called once.  We use it to set up
+# some object variables.
+
+sub workbook {
+  my $self		= shift;
+  my $SXC		= shift;
+  my $workbook_name	= shift;
+
+  $self->{workbook_name}	= $workbook_name;
+  my $csv_base_name		= $workbook_name;
+  $csv_base_name		=~ s/.sxc$//;
+  $self->{csv_base_name}	= $csv_base_name;
+  $self->{main_csv_name}	= $csv_base_name.".csv";
+}
+# End data_source functions.
+##################################################################
+
+
+1;
+##################################################################
+
+=head1 NAME
+
+sxc2csv - Convert a Star/Open Office SXC (spreadsheet) file to CSV format
+
+=head1 SYNOPSIS
+
+  sxc2csv [-c] [-o] [-h/-help] [-no_trim]
+          [-quote_all] [-quote_text]
+          [-worksheets WORKSHEET_LIST] [-split_sheets]
+          [-columns COL_LIST] [-dump]
+          <SXC_FILES>
+
+=head1 DESCRIPTION
+
+sxc2csv is used to extract a csv file from an OpenOffice spreadsheet file.
+
+=head1 OPTIONS
+
+ -c:	      Output to STDOUT.
+
+ -h/-help:    Display a help message.
+
+ -quote_all:  Quote EVERY CELL in the csv output.  Overrides
+              -quote_text
+
+ -quote_text: Quote any cell that isn't a pure integer.
+
+ -no_trim:    Do not remove the emtpy cells at the end of
+              each row.
+
+ -worksheets: Takes one argument - a comma-separated list of the
+              worksheets to convert to csv.  Only those worksheets
+              will be processed.
+
+              eg: -worksheets Sheet1,Sheet2,Sheet3
+
+ -split_sheets: Write each worksheet to a separate file.  These
+              files are named after the original SXC filename,
+              with the spreadsheet name appended.
+
+ -columns:    Output only these columns, as a comma-separated
+              list of numbers.  0 is the first column.  Negative
+              numbers work also, but the results may not be what
+              you expect.
+
+              eg: -columns 1,4,5  (prints 2nd,5th,6th columns)
+
+ -dump:       Dump the XML tree (XML::Parser::Expat objects).
+              This is used for debugging, but it's also kinda
+              fun.
+
+=head1 WARNINGS
+
+Newlines within cells are removed during the conversion.
+
+
+=head1 MAINTENANCE
+
+In case this program does not work for your spreadsheet, the problem
+is likely not here, but in the relatively untried (as of 2003-02)
+OpenOffice::Parse::SXC module.
+
+Send patches to the email provided below.
+
+=head1 AUTHOR
+
+Desmond Lee <deslee@shaw.ca>
+
+=head1 SEE ALSO
+
+L<OpenOffice::Parse::SXC>.
+
+=cut

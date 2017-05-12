@@ -1,0 +1,117 @@
+#!/usr/bin/perl
+###################################################################################################
+# Copyright 2013/2014 by Marcel Greter
+# This file is part of OCBNET-CSS3 (GPL3)
+####################################################################################################
+
+use strict;
+use warnings;
+
+# load modules
+use File::Slurp;
+use OCBNET::CSS3;
+
+# print more info
+my $verbose = 0;
+
+# parse options
+use Pod::Usage;
+use Getopt::Long;
+use Cwd qw(realpath);
+use File::Basename;
+
+# define a sub to print out the version (minic behaviour of node.js blessc)
+sub version { print "csslint $OCBNET::CSS3::VERSION (CSS Analyzer) [Perl]"; exit 0; };
+
+# get options
+GetOptions (
+	'help|h' => sub { pod2usage(1); },
+	'version|v' => \ &version,
+	'verbose!' => \ $verbose,
+);
+
+# counters
+my @objects;
+my @imports;
+my @selectors;
+
+# some minimalistic error handling
+die "csslint: no input file\n" unless $ARGV[0];
+
+# print final message
+print "starting csslint ", $ARGV[0], "\n";
+
+# read the passed filename (or read from standard input)
+my $code = $ARGV[0] ne '-' ? read_file($ARGV[0]) : join("", <>);
+
+# create a new instance and parse the loaded code
+my $sheet = OCBNET::CSS3::Stylesheet->new->parse($code);
+
+# add first object
+push @objects, $sheet;
+
+# process as long as we have objects
+while (my $object = shift @objects)
+{
+	# process children array
+	if ($object->{'children'})
+	{
+		# add object to counter arrays
+		push @objects, @{$object->{'children'}};
+		push @imports, $object if $object->type eq 'import';
+		push @selectors, $object if $object->type eq 'selector';
+	}
+}
+
+# split imports and selectors by commas
+@imports = map { split /,/, $_->text } @imports;
+@selectors = map { split /,/, $_->text } @selectors;
+
+# KB 262161 outlines the maximum number of stylesheets
+# and rules supported by Internet Explorer 6 to 9.
+# - A sheet may contain up to 4095 rules
+# - A sheet may @import up to 31 sheets
+# - @import nesting supports up to 4 levels deep
+
+# print warnings about exceeded limits
+printf "Too many imports (%s)\n", scalar(@imports) if scalar(@imports) > 31;
+printf "Too many selectors (%s)\n", scalar(@selectors) if scalar(@selectors) > 4095;
+printf "Has %s imports\n", scalar(@imports) if $verbose && scalar(@imports) <= 31;
+printf "Has %s selectors\n", scalar(@selectors) if $verbose && scalar(@selectors) <= 4095;
+
+# print final message
+print "completed csslint ", $ARGV[0], "\n";
+
+####################################################################################################
+####################################################################################################
+
+__END__
+
+=head1 NAME
+
+csslint - CSS analyzer for IE limitiations
+
+=head1 SYNOPSIS
+
+csslint [options] [ source | - ]
+
+ Options:
+   -v, --version      print version
+   -h, --help         print this help
+       --verbose      print import/selector count
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-help>
+
+Print a brief help message with options and exits.
+
+=back
+
+=head1 DESCRIPTION
+
+B<This program> is a analyzer for IE limitiations
+
+=cut

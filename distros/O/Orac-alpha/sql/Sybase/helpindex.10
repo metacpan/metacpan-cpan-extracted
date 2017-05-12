@@ -1,0 +1,270 @@
+/* Procedure copyright(c) 1995 by Edward M Barlow */
+
+/******************************************************************************
+**
+** Name        : sp__helpindex
+**
+** Created By  : Ed Barlow
+**
+******************************************************************************/
+
+:r database
+go
+:r dumpdb
+go
+
+IF EXISTS (SELECT * FROM sysobjects
+           WHERE  name = "sp__helpindex"
+           AND    type = "P")
+   DROP PROC sp__helpindex
+
+go
+
+create proc sp__helpindex(@object char(30)=NULL,@width int=80, @srvname char(30)=NULL, @show_type char(1)=' ', @dont_format char(1) = null)
+/* if show type='S' then add system tables */
+as 
+begin
+declare @type   char(2)                /* the object type */
+
+if @width < 80 and @width <>0
+begin
+   print "Width must exceed 80 columns"
+   return
+end
+
+if @object is not null
+begin
+   select @type=type from sysobjects where id=object_id(@object)
+   if @type is null
+   begin
+      print "Object Not Found"
+   end
+end
+else    select @type=null
+
+create table #indexlist (
+   owner      char(30) not null,
+   uid        smallint not null,
+   name       char(30) not null,
+   index_name char(30) not null,
+   id         int not null,
+   indexid    smallint not null,
+   clust      char(1) null,
+   allow_dup  char(1) null,
+   ign_dup_key char(1) null,
+   uniq       char(1) null,
+   suspect    char(1) null,
+   keylist    char(127) null,
+   status     smallint not null
+)
+
+
+if @type='P '
+begin
+    /* if object is a procedure then find only tables dependent on object */
+   insert into   #indexlist
+   select owner      = user_name(o.uid),
+          o.uid,
+          name       = o.name,
+          index_name = i.name,
+          id = i.id,
+          indexid    = i.indid,
+          clust      = convert(char(1),null),
+          allow_dup  = convert(char(1),null),
+          ign_dup_key  = convert(char(1),null),
+          uniq       = convert(char(1),null),
+          suspect    = convert(char(1),null),
+          keylist    = convert(char(127),"N.A."),
+          status     = i.status
+   from   sysobjects o, sysindexes i, sysdepends d
+   where  i.id   = o.id
+   and    o.type in ("U",@show_type)
+   and    indid > 0
+   and    d.id = object_id(@object)
+   and    d.depid = o.id
+   /* and   o.uid=1 */
+end
+else if @object is null
+begin
+   insert into   #indexlist
+   select owner      = user_name(o.uid),
+          o.uid,
+          name       = o.name,
+          index_name = i.name,
+          id = i.id,
+          indexid    = i.indid,
+          clust      = convert(char(1),null),
+          allow_dup  = convert(char(1),null),
+          ign_dup_key  = convert(char(1),null),
+          uniq       = convert(char(1),null),
+          suspect    = convert(char(1),null),
+          keylist    = convert(char(127),"N.A."),
+          status      = status
+   from   sysobjects o, sysindexes i
+   where  i.id   = o.id
+   and    o.type in ("U",@show_type)
+   and      indid > 0
+   /* and   o.uid=1 */
+end 
+else
+begin
+   insert into   #indexlist
+   select owner      = user_name(o.uid),
+          o.uid,
+          name       = o.name,
+          index_name = i.name,
+          id = i.id,
+          indexid    = i.indid,
+          clust      = convert(char(1),null),
+          allow_dup  = convert(char(1),null),
+          ign_dup_key  = convert(char(1),null),
+          uniq       = convert(char(1),null),
+          suspect    = convert(char(1),null),
+          keylist    = convert(char(127),"N.A."),
+          status      = status
+   from   sysobjects o, sysindexes i
+   where  i.id   = o.id
+   and    o.type in ( "U",@show_type )
+   and    @object=o.name
+   and    indid > 0
+   /* and   o.uid=1 */
+end 
+
+if not exists ( select * from #indexlist )
+begin
+   if @object is null
+   print "No Indexes found in Current Database"
+   return
+end
+
+/* delete multiple rows */
+delete #indexlist
+from   #indexlist a, #indexlist b
+where  a.indexid = 0
+and    b.indexid != 0
+and    a.name = b.name
+
+update #indexlist
+set    clust='Y'
+where  indexid = 1
+
+update #indexlist
+set    uniq = 'Y'
+where  status & 2 = 2
+
+update #indexlist
+set    ign_dup_key = 'Y'
+where  status & 1 = 1
+
+update #indexlist
+set    allow_dup = 'Y'
+where  status & 64 = 64
+
+update #indexlist
+set    suspect = 'Y'
+where  status & 8000 = 8000
+
+declare @count int
+select  @count=1
+
+while ( @count < 17 )   /* 16 appears to be the max number of indexes */
+begin
+
+   if @count=1
+      update #indexlist
+      set    keylist=index_col(name,indexid,1,uid)
+      where  index_col(name,indexid,@count,uid) is not null
+   else
+      update #indexlist
+      set    keylist=rtrim(keylist)+","+index_col(name,indexid,@count,uid)
+      where  index_col(name,indexid,@count,uid) is not null
+
+   if @@rowcount=0   break
+
+   select @count=@count+1
+end
+
+update #indexlist
+set    name=convert(char(30), rtrim(rtrim(substring(owner,1,15)) + "." +name))
+where  owner!="dbo"
+
+if @dont_format is not null
+begin
+   print "   INDEX KEY:     c = clustered            u = unique"
+   print "                  a = allow dup row        s = suspect"
+   print "                  i = ignore dup key "
+   print ""
+   select "Name" = name,
+       c   = isnull(clust,""),
+       u   = isnull(uniq,""),
+       i   = isnull(ign_dup_key,""),
+       a   = isnull(allow_dup,""),
+       s   = isnull(suspect,""),
+       "List of Index Keys"    = keylist,
+		 Index_Name=index_name
+   from #indexlist
+   order by owner,name,indexid
+end
+else
+if @width>0 and @srvname is null
+begin
+   print "   INDEX KEY:     c = clustered            u = unique"
+   print "                  a = allow dup row        s = suspect"
+   print "                  i = ignore dup key "
+   print ""
+end
+
+if @width = 80
+   select "Name" = convert(char(30),rtrim(name)+"."+index_name),
+       c   = isnull(clust,""),
+       u   = isnull(uniq,""),
+       i   = isnull(ign_dup_key,""),
+       a   = isnull(allow_dup,""),
+       s   = isnull(suspect,""),
+       "List of Index Keys"    = convert(char(35),keylist)
+   from #indexlist
+   order by owner,name,indexid
+else if @width>130
+   select "Name" = rtrim(name)+"."+index_name,
+       c   = isnull(clust,""),
+       u   = isnull(uniq,""),
+       i   = isnull(ign_dup_key,""),
+       a   = isnull(allow_dup,""),
+       s   = isnull(suspect,""),
+       "List of Index Keys"    = convert(char(57),keylist)
+   from #indexlist
+   order by owner,name,indexid
+else if @width>100
+   select "Name" = convert(char(40),rtrim(name)+"."+index_name),
+       c   = isnull(clust,""),
+       u   = isnull(uniq,""),
+       i   = isnull(ign_dup_key,""),
+       a   = isnull(allow_dup,""),
+       s   = isnull(suspect,""),
+       "List of Index Keys"    = convert(char(35),keylist)
+   from #indexlist
+   order by owner,name,indexid
+else if @width>89
+   select "Name" = convert(char(40),rtrim(name)+"."+index_name),
+       c   = isnull(clust,""),
+       u   = isnull(uniq,""),
+       i   = isnull(ign_dup_key,""),
+       a   = isnull(allow_dup,""),
+       s   = isnull(suspect,""),
+       "List of Index Keys"    = convert(char(35),keylist)
+   from #indexlist
+   order by owner,name,indexid
+else if @width=0
+   select 
+       @srvname, db_name(),id,indexid,
+             "Keys"    = keylist
+   from #indexlist
+
+return(0)
+
+end
+
+go
+
+grant execute on sp__helpindex to public
+go

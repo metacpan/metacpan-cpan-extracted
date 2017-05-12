@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/Object/Prototype.pm
+t/00-use.t
+t/01-basic.t
+t/02-kingdom.t
+META.yml                                 Module meta-data (added by MakeMaker)

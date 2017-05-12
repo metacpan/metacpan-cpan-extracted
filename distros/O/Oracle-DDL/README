@@ -1,0 +1,130 @@
+NAME
+    Oracle::DDL - Perl class for Oracle batch DML
+
+SYNOPSIS
+      use Oracle::DDL;
+
+      my %cfg = ('conn_string'=>'usr/pwd@db', 'table_name'=>'my_ora_tab');
+      my $ot = Oracle::DDL->new;
+      # or combine the two together
+      my $ot = Oracle::DDL->new(%cfg);
+      my $sql= $ot->prepare(%cfg); 
+      $ot->execute();    # actually create the audit table and trigger
+
+DESCRIPTION
+    This class contains methods to create audit tables and triggers for
+    Oracle tables.
+
+  Object Constructor
+
+   new (%arg)
+
+    Input variables:
+
+      $cs  - Oracle connection string in usr/pwd@db
+      $tn  - Oracle table name without schema
+
+    Variables used or routines called:
+
+      None
+
+    How to use:
+
+       my $obj = new Oracle::DDL;      # or
+       my $obj = Oracle::DDL->new;     # or
+       my $cs  = 'usr/pwd@db';
+       my $tn  = 'my_table'; 
+       my $obj = Oracle::DDL->new(cs=>$cs,tn=>$tn); # or
+       my $obj = Oracle::DDL->new('cs',$cs, 'tn',$tn); 
+
+    Return: new empty or initialized Oracle::DDL object.
+
+METHODS
+    The following are the common methods, routines, and functions defined in
+    this class.
+
+  Exported Tag: All
+
+    The *:all* tag includes all the methods or sub-rountines defined in this
+    class.
+
+      use Oracle::DDL qw(:all);
+
+   add_primary_key($dbh, $tab, $pk, $exe)
+
+    Input variables:
+
+      $dbh - database handler
+      $tab - table name
+      $pk  - primary key column name
+      $exe - whether to execute the SQL statement
+             0 - No (default); 1- Yes.
+
+    Variables used or routines called:
+
+      echoMSG - display message
+
+    How to use:
+
+        $self->add_primary_key(4dbh, 'my_tab', 'id');
+
+    Return: 0|1 - whether it is successful 0 - OK; 1 - failed
+
+   create_table($tab,$crf,$opt)
+
+    Input variables:
+
+      $tab - table name
+      $crf - array ref containing table definition as $crf->[$i]{$itm},
+             where $i is column number and $itm is col,typ,req,wid,dft,etc.
+      $opt - other table related options:
+        dbh           - database handler
+        fn_sql        - output file name for SQL codes
+        fn_log        - log file name for spool off and default to 
+                        fn_sql with the extension replaced with .log
+        fh_sql        - output file handler for SQL codes 
+        action        - whether to return SQL codes
+             SQL (default) - return array ref containing SQL codes
+                   execute SQL codes if dbh is specified
+             TXT - return SQL codes in text and write SQL codes to
+                   output file if fn_sql or fh_sql is specified. 
+             ALL - return SQL codes and 
+                   write to output file if fn_sql or fh_sql is specified
+                   execute SQL statements if dbh is specified
+        public_select - 1 or actual grant statement
+        drop_table    - 1 - drop before creating it; 0 - not drop
+        relax_constraint - 0 - no; 1 - yes
+
+    Variables used or routines called:
+
+      echoMSG - display message
+
+    How to use:
+
+      my $cs = 'usr/pwd\@db';
+      my $dbh = get_dbh($cs);
+      my $fh  = new IO::File "> myfile.sql"; 
+      my %opt = (dbh=>$dbh, fh_sql => $fh,action=>'txt');
+      my $crf = $self->read_tab_def('table.def', 'myTab',',');
+      my $sql = $self->create_table('myTab',${$crf}{mytab},\%opt);
+
+    Return: the result of table creation or the SQL code for creating the
+    table.
+
+HISTORY
+    * Version 0.10
+        This version is to test the concept.
+
+    * Version 0.2
+SEE ALSO (some of docs that I check often)
+        Oracle::Loader, Oracle::Trigger, Oracle::DML, Oracle::DML::Common,
+        CGI::Getopt, File::Xcopy
+
+AUTHOR
+        Copyright (c) 2005 Hanming Tu. All rights reserved.
+
+        This package is free software and is provided "as is" without
+        express or implied warranty. It may be used, redistributed and/or
+        modified under the terms of the Perl Artistic License (see
+        http://www.perl.com/perl/misc/Artistic.html)
+

@@ -1,0 +1,155 @@
+# NAME
+
+Object::RateLimiter - A flood control (rate limiter) object
+
+# SYNOPSIS
+
+    use Object::RateLimiter;
+
+    my $ctrl = Object::RateLimiter->new(
+      events  => 3,
+      seconds => 5
+    );
+
+    # Run some subs, as a contrived example;
+    # no more than 3 in 5 seconds, per our constructor above:
+    my @work = (
+      sub { "foo" },  sub { "bar" },
+      sub { "baz" },  sub { "cake" },
+      # ...
+    );
+
+    while (my $some_item = shift @work) {
+      if (my $delay = $ctrl->delay) {
+        # Delayed $delay (fractional) seconds.
+        # (You might want Time::HiRes::sleep, or yield to event loop, etc)
+        sleep $delay
+      }
+      print $some_item->()
+    }
+
+    # Clear the event history if it's stale:
+    $ctrl->expire;
+
+    # Clear the event history unconditionally:
+    $ctrl->clear;
+
+    # Same as calling ->delay:
+    my $delayed = $ctrl->();
+
+# DESCRIPTION
+
+This is a generic rate-limiter object, implementing the math described in
+[http://www.perl.com/pub/2004/11/11/floodcontrol.html](http://www.perl.com/pub/2004/11/11/floodcontrol.html) via light-weight
+array-type objects.
+
+The algorithm is fairly simple; the article linked above contains an in-depth
+discussion by Vladi Belperchinov-Shabanski (CPAN:
+[http://www.metacpan.org/author/CADE](http://www.metacpan.org/author/CADE)):
+
+    $delay =
+      ( 
+        $oldest_timestamp + 
+        ( $seen_events * $limit_secs / $event_limit ) 
+      )
+      - time()
+
+This module uses [Time::HiRes](https://metacpan.org/pod/Time::HiRes) to provide support for fractional seconds.
+
+See [Algorithm::FloodControl](https://metacpan.org/pod/Algorithm::FloodControl) for a similar module with a functional
+interface & persistent on-disk storage features (for use with CGI
+applications).
+
+## new
+
+    my $ctrl = Object::RateLimiter->new(
+      events  => 3,
+      seconds => 5
+    );
+
+Constructs a new rate-limiter with a clean event history.
+
+Accepts params as a list or a single HASH.
+
+## clear
+
+    $ctrl->clear;
+
+Clear the event history.
+
+## clone
+
+    my $new_ctrl = $ctrl->clone( events => 4 );
+
+Clones an existing rate-limiter; new options can be provided, overriding
+previous settings. 
+
+The new limiter contains a clone of the event history; the old rate-limiter is
+left untouched.
+
+## delay
+
+    if (my $delay = $ctrl->delay) {
+      sleep $delay;  # ... or do something else
+    } else {
+      # Not delayed.
+      do_work;
+    }
+
+    # Same as calling ->delay:
+    my $delay = $ctrl->();
+
+The `delay()` method determines if some work can be done now, or should wait.
+
+When called, event timestamps are considered; if we have exceeded our limit,
+the delay in (possibly fractional) seconds until the event would be
+allowed is returned.
+
+A return value of 0 indicates that the event does not need to wait.
+
+## events
+
+Returns the **events** limit the object was constructed with.
+
+## expire
+
+    $ctrl->expire;
+
+Clears the event history if ["is\_expired"](#is_expired) is true.
+
+Returns true if ["clear"](#clear) was called.
+
+(You're not required to call `expire()`, but it can be useful to save a
+little memory.)
+
+## export
+
+    my $opts = $ctrl->export;
+    # ... later, perhaps after storing/retrieving ...
+    my $recreated = Object::RateLimiter->new($opts);
+
+Exports the current state of the rate-limiter as a reference to a hash; the
+exported hash can be fed to ["new"](#new) to recreate the rate-limiter.
+
+This is useful if the rate-limiter's state must be stored persistently. 
+
+## is\_expired
+
+Returns true if the last seen event is outside of our time window (in other
+words, the event history is stale) or there is no event history.
+
+Also see ["expire"](#expire)
+
+## seconds
+
+Returns the **seconds** limit the object was constructed with.
+
+# AUTHOR
+
+Jon Portnoy <avenj@cobaltirc.org>
+
+Based on the math from [Algorithm::FloodControl](https://metacpan.org/pod/Algorithm::FloodControl) as described in an article
+written by the author:
+[http://www.perl.com/pub/2004/11/11/floodcontrol.html](http://www.perl.com/pub/2004/11/11/floodcontrol.html)
+
+Licensed under the same terms as Perl.

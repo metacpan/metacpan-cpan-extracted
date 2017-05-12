@@ -1,0 +1,60 @@
+{
+   "abstract" : "Perl XS macros re-exported as C functions",
+   "author" : [
+      "Vickenty Fesunov <cpan-ouroboros@setattr.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "freebsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Ouroboros",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "tools"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::ShareDir" : "0",
+            "perl" : "5.018000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "FFI::Platypus" : "0",
+            "FFI::Raw" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/vickenty/ouroboros/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/vickenty/ouroboros",
+         "web" : "https://github.com/vickenty/ouroboros"
+      }
+   },
+   "version" : "0.12",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

@@ -1,0 +1,17 @@
+[%########################################
+  form_textarea( name, value, rows, cols, wrap, field_label )
+     Generate a textarea field.
+
+     Defaults
+
+     cols = 30
+     rows = 3
+     wrap = 'virtual'
+  ########################################-%]
+
+[%- DEFAULT rows = 3;
+    DEFAULT cols = 30;
+    DEFAULT wrap = 'virtual' -%]
+<textarea name="[% name %]" wrap="[% wrap %]"
+          rows="[% rows %]" cols="[% cols %]">[% value %]</textarea>
+[%- field_label -%]

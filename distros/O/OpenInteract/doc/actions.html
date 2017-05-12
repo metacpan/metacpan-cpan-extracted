@@ -1,0 +1,382 @@
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#action table">ACTION TABLE</A></LI>
+	<UL>
+
+		<LI><A HREF="#the action/url connection">The Action/URL Connection</A></LI>
+		<LI><A HREF="#fulfilling the action">Fulfilling the Action</A></LI>
+		<LI><A HREF="#toplevel directives">Top-level Directives</A></LI>
+	</UL>
+
+	<LI><A HREF="#sample configuration">SAMPLE CONFIGURATION</A></LI>
+	<LI><A HREF="#walking through a request">WALKING THROUGH A REQUEST</A></LI>
+	<LI><A HREF="#faq">FAQ</A></LI>
+	<UL>
+
+		<LI><A HREF="#which happens if i can't match an action to the url">Which happens if I can't match an action to the URL?</A></LI>
+		<LI><A HREF="#why doesn't my website's information match the examples">Why doesn't my website's information match the examples?</A></LI>
+		<LI><A HREF="#do i have to define all the information for every action">Do I have to define all the information for every action?</A></LI>
+		<LI><A HREF="#how can i ensure the configuration file's syntax is ok">How can I ensure the configuration file's syntax is ok?</A></LI>
+		<LI><A HREF="#how do i see what actions are currently used">How do I see what actions are currently used?</A></LI>
+	</UL>
+
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#authors">AUTHORS</A></LI>
+	<LI><A HREF="#revision">REVISION</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>OpenInteract Actions - Tell OpenInteract how to respond to requests</P>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This document will describe how Actions work in OpenInteract -- how
+you can configure them, look them up and retrieve content using them.</P>
+<P>
+<HR>
+<H1><A NAME="action table">ACTION TABLE</A></H1>
+<P>The Action Table is the catalog that matches up action names to how
+the action will be accomplished. Each package in OpenInteract must
+specify the actions it implements in the file <CODE>conf/action.perl</CODE>.</P>
+<P>The configuration file is a Perl hashref where the keys are
+lower-cased names which correspond to the first URL chunk. The value
+is a hashref with information about how that action should be
+fulfilled. (Don't worry, it will all make sense shortly.)</P>
+<P>
+<H2><A NAME="the action/url connection">The Action/URL Connection</A></H2>
+<P>First, note that while the action keys must always be lower-case, the
+actual URLs that map to them can be of mixed case. This means that you
+can't have differently-cased URLs of the same word perform different
+actions -- for instance '/NEWS/' and '/news/' will refer to the same
+action.</P>
+<P>The keys in the configuration file correspond to top-level URL
+commands. For instance, in the following URL:</P>
+<PRE>
+ /News/show/?news_id=484</PRE>
+<P>The top-level command is 'News' and the task is 'show'. Once we parse
+the URL we try to match the top-level command to an action from the
+action table.</P>
+<P>
+<H2><A NAME="fulfilling the action">Fulfilling the Action</A></H2>
+<P>Once we match up the action to its implementation information, we need
+to call it. First, what can be in its implementation information?</P>
+<UL>
+<LI>
+<STRONG>class</STRONG> ($)
+<P>The class used to return the content; used with 'method'.</P>
+<P></P>
+<LI>
+<STRONG>method</STRONG> ($) (optional)
+<P>The method run from 'class' to return the content. If not given, use
+the method 'handler'.</P>
+<P></P>
+<LI>
+<STRONG>security</STRONG> (yes|no) (optional)
+<P>Only utilized when the action is a component. Checks whether security
+should be checked when running the action -- 'yes' means security
+should be checked, 'no' means it shouldn't. If not given, use 'yes'.</P>
+<P></P>
+<LI>
+<STRONG>conductor</STRONG> ($) (optional)
+<P>The conductor to use. Currently there is only one conductor ('main'),
+but in the future you might have different conductors -- one for SOAP,
+one for WAP, etc. If not given, use the default conductor, given in
+the '_default_action_info_' action in your 'server.perl' configuration
+file.</P>
+<P></P>
+<LI>
+<STRONG>redir</STRONG> ($) (optional)
+<P>Actions can redirect to an action which actually fulfills it. For
+instance, say we wanted the <STRONG>news</STRONG> package to respond not only to
+'news' but also to 'nouvelles' for your French-speaking
+audience. Instead of repeating the same information in separate places
+(and risk changing only one in the future), you would do something
+like:</P>
+<PRE>
+ 'nouvelles' =&gt; { redir =&gt; 'news' },</PRE>
+<P>Redirects can nest as many levels deep as you need.</P>
+<P></P>
+<LI>
+<STRONG>template</STRONG> ($) (optional)
+<P>For template-only components, the name of the template to run. (Also
+see 'package' below.)</P>
+<P></P>
+<LI>
+<STRONG>package</STRONG> ($) (optional)
+<P>For template-only components, the package the template (specified in
+'template') is in.</P>
+<P></P>
+<LI>
+<STRONG>title</STRONG> ($) (optional)
+<P>Use in boxes only -- the title of the box.</P>
+<P></P>
+<LI>
+<STRONG>weight</STRONG> ($) (optional)
+<P>Use in boxes only -- the weight of the box.</P>
+<P></P></UL>
+<P>
+<H2><A NAME="toplevel directives">Top-level Directives</A></H2>
+<P>The only exception to the above parsing scheme is when the first item
+in the URL is a directive. Directives tell OpenInteract something
+about the request as a whole, generally how it will be displayed.</P>
+<P>For instance, when you move your mouse over the 'Logout' in the
+default user_info_box (found in the <STRONG>base_component</STRONG> package) you'll
+see something like:</P>
+<PRE>
+  <A HREF="http://www.mysite.com/NoTmpl/Logout/?return=/docs/oi_is_great.html">http://www.mysite.com/NoTmpl/Logout/?return=/docs/oi_is_great.html</A></PRE>
+<P>The 'NoTmpl' in this URL is a directive that tells OpenInteract not to
+use a main template at all when displaying content.</P>
+<P>The directives are all listed in your 'server.perl' file under the
+'page_directives' key. The only other directive currently implemented
+is 'Popup', which tells OpenInteract to use the 'simple' template (by
+default this is 'base_simple'). This template typically has very
+little in the way of graphics and layout.</P>
+<P>So when OpenInteract encounters one of these directives, it removes it
+from the URL and saves it for later so the Conductor knows which main
+template to put the content into.</P>
+<P>
+<HR>
+<H1><A NAME="sample configuration">SAMPLE CONFIGURATION</A></H1>
+<P>First, let's take an easy one -- the action.perl file from the <STRONG>base</STRONG>
+package:</P>
+<PRE>
+ $action = {
+            'logout'    =&gt; {
+                'class'     =&gt; 'OpenInteract::Handler::Logout',
+                'security'  =&gt; 'no',
+            },
+            'redirect' =&gt; { 
+                'class'     =&gt; 'OpenInteract::Handler::Redirect',
+                'security'  =&gt; 'no',
+            },
+            'package' =&gt; {
+                'class'     =&gt; 'OpenInteract::Handler::Package',
+                'security'  =&gt; 'yes',
+            },
+ };</PRE>
+<P>This defines four actions: 'logout', 'redirect', 'boxes',
+'package'. You can visualize the action table as:</P>
+<PRE>
+ URL         Action
+ ======================================================
+ /logout     OpenInteract::Handler::Logout-&gt;handler()
+ /redirect   OpenInteract::Handler::Redirect-&gt;handler()
+ /boxes      OpenInteract::Handler::Boxes-&gt;handler()
+ /package    OpenInteract::Handler::Package-&gt;handler()</PRE>
+<P>Next, something a little more interesting. This is taken from the
+<STRONG>news</STRONG> package, distributed with OpenInteract:</P>
+<PRE>
+ $action = {
+           'news'      =&gt; {
+                'class'     =&gt; 'OpenInteract::Handler::News',
+                'security'  =&gt; 'yes',
+            },
+            'latest_news' =&gt; {
+                'class'     =&gt; 'OpenInteract::Handler::News',
+                'method'    =&gt; 'latest',
+                'security'  =&gt; 'no',
+            },
+            'news_tools_box' =&gt; {
+                'template' =&gt; 'news_tools_box',
+                'package'  =&gt; 'news',
+                'title'    =&gt; 'News Tools',
+                'weight'   =&gt; 4,
+                'security' =&gt; 'no',
+            },
+            'latestnews'   =&gt; { redir =&gt; 'latest_news' },
+            'newstoolsbox' =&gt; { redir =&gt; 'news_tools_box' },
+ };</PRE>
+<P>This defines a normal action ('news') an action that is designed to be
+addressed as a component ('latestnews'), a template-only action
+('news_tools_box') and two different spellings which use the redirect
+action. This action table will look like:</P>
+<PRE>
+ URL           Action
+ ====================================================
+ /news         OpenInteract::Handler::News-&gt;handler()
+ /latest_news  OpenInteract::Handler::News-&gt;latest()
+ /latestnews   OpenInteract::Handler::News-&gt;latest()</PRE>
+<P>Additionally, you can call the toolbox two ways:</P>
+<PRE>
+ [% OI.box_add( 'news_tools_box' ) %]
+ [% OI.comp( 'news_tools_box' ) %]</PRE>
+<P>The first is recommended because you can override the default box
+information with your own:</P>
+<PRE>
+ [% OI.box_add( 'news_tools_box', weight = 1, 
+                                  title = 'Okeley-Dokeley-News Box' ) %]</PRE>
+<P>
+<HR>
+<H1><A NAME="walking through a request">WALKING THROUGH A REQUEST</A></H1>
+<P>Now we will walk through a request from the action table's
+perspective. This example will assume the configuration given above
+for the <STRONG>news</STRONG> package has been read in properly.</P>
+<P><STRONG>URL given</STRONG>: /News/show/?news_id=484</P>
+<OL>
+<LI>
+<STRONG>Parse the URL</STRONG>
+<P>This gives us an array with:</P>
+<PRE>
+ ( 'News', 'show' )</PRE>
+<P>The GET parameters are retrieved later.</P>
+<P></P>
+<LI>
+<STRONG>Map the first part of the URL to an action</STRONG>
+<P>The action 'news' does exist (note the case-change -- a URL action is
+lowercased before trying to map it in the action table) and uses the
+handler <CODE>OpenInteract::Handler::News</CODE>.</P>
+<P></P>
+<LI>
+<STRONG>Call the appropriate action</STRONG>
+<P>With the above, we call:</P>
+<PRE>
+ OpenInteract::Handler::News-&gt;handler();</PRE>
+<P>(with the note that 'handler' is defined as the default method in the
+'action_info.default' key of our main website configuration in
+<CODE>conf/server.ini</CODE>)</P>
+<P>This returns the content for the page which is then plugged into the
+main template.</P>
+<P></P></OL>
+<P>
+<HR>
+<H1><A NAME="faq">FAQ</A></H1>
+<P>
+<H2><A NAME="which happens if i can't match an action to the url">Which happens if I can't match an action to the URL?</A></H2>
+<P>There are two distinct cases for this:</P>
+<OL>
+<LI>
+<STRONG>There is no path</STRONG>
+<P>This happens when someone goes to your home page:</P>
+<PRE>
+ <A HREF="http://www.openinteract.org/">http://www.openinteract.org/</A></PRE>
+<P>The file 'home.html' (or 'index.html', or 'default.htm', depending on
+how your webserver handles directory requests) is typically
+``understood'' here by web servers. But since it's not specified
+OpenInteract has no way to know.</P>
+<P>To deal with this, define an action whose key is an empty string. This
+is defined for you in your <CODE>conf/server.ini</CODE> file in your main
+website configuration directory. The key 'action_info.none' holds
+action specifications to take in this case.</P>
+<P></P>
+<LI>
+<STRONG>The path cannot be found</STRONG>
+<P>What happens if someone tries to find the document:</P>
+<PRE>
+ <A HREF="http://www.mysite.com/zaphrod/live/now.html">http://www.mysite.com/zaphrod/live/now.html</A></PRE>
+<P>And you don't have an action mapped to 'zaphrod'? OpenInteract will
+use the action defined in the configuration key
+'action_info.not_found'. Typically this maps to the 'base_page'
+package which treats the path as a normal file request and serves up a
+file from either the filesystem or the directory.</P>
+<P>As an example, for the above request the base page handler would try
+to find either a file or object which has the location
+'/zaphrod/live/now.html'. It would also try '/zaphrod/live/now'
+(without the file extension).</P>
+<P></P></OL>
+<P>
+<H2><A NAME="why doesn't my website's information match the examples">Why doesn't my website's information match the examples?</A></H2>
+<P>Instead of seeing <CODE>OpenInteract::Handler::News</CODE> in your website's
+configuration files , you'll see something similar except with the
+name of your website instead of 'OpenInteract'. Each website needs a
+separate namespace so that each website can customize its handlers and
+keep its data reasonably separate.</P>
+<P>
+<H2><A NAME="do i have to define all the information for every action">Do I have to define all the information for every action?</A></H2>
+<P>No! The <CODE>server.perl</CODE> configuration file also defines the
+'_default_action_info_' key under the 'action' key. Specify
+information that you would like to appear by default in the action
+configuration and at server startup it will be copied to the
+configuration only if a value previously was not defined.</P>
+<P>For instance, in the configuration files above we never (well, except
+once) specified the method to call. That's because we defined it in
+'_default_action_info' to be 'handler'. We also specify the conductor
+to use by default and the template implementation class to use.</P>
+<P>
+<H2><A NAME="how can i ensure the configuration file's syntax is ok">How can I ensure the configuration file's syntax is ok?</A></H2>
+<P>Two ways:</P>
+<OL>
+<LI>
+Run a normal Perl syntax check:
+<PRE>
+ [cwinters@genesee news]$ perl -c conf/action.perl
+ conf/action.perl syntax OK</PRE>
+<P>This is the easiest to do, and you can probably script your editor to
+do this whenever you hit the <CODE>F9</CODE> key or something.</P>
+<P></P>
+<LI>
+Run the 'check_package' command of <CODE>oi_manage</CODE>:
+<PRE>
+ [cwinters@genesee news]$ oi_manage check_package
+ Running check_package...
+ =========================</PRE>
+<PRE>
+   Status of the packages you requested to be checked:
+   news  OK:
+   ++ File (Changes) to show package Changelog: ok
+   ++ File (conf/spops.perl) ok
+   ++ File (conf/action.perl) ok
+   ++ File (OpenInteract/Handler/News.pm) ok
+   ++ File (OpenInteract/SQLInstall/News.pm) ok
+   ++ package.conf: ok
+   ++ MANIFEST files all exist in package: ok
+   ++ All files in package also in MANIFEST: ok</PRE>
+<PRE>
+ =========================
+ Finished with check_package!</PRE>
+<P>This does the same check behind the scenes but does lots of other
+useful checks for you at the same time.</P>
+<P>Here's what happens if the check fails:</P>
+<PRE>
+ [cwinters@genesee news]$ oi_manage check_package
+ [oi_manage]: Using (/opt/OpenInteract) for 'base_dir'.
+ Running check_package...
+ =========================</PRE>
+<PRE>
+   Status of the packages you requested to be checked:
+   news  FAILED!:
+    ++ File (Changes) to show package Changelog: ok
+    -- File (conf/action.perl) cannot be read in.
+       Error reading in perl code: syntax error at
+       (eval 8) line 20, near &quot;} oops&quot;</PRE>
+<PRE>
+    ++ File (conf/spops.perl) ok
+    ++ File (OpenInteract/Handler/News.pm) ok
+    ++ File (OpenInteract/SQLInstall/News.pm) ok
+    ++ package.conf: ok
+    ++ MANIFEST files all exist in package: ok
+    ++ All files in package also in MANIFEST: ok</PRE>
+<PRE>
+ =========================
+ Finished with check_package!</PRE>
+<P>Note that under some circumstances, a failed syntax check will issue a
+segfault instead of listing what actually went wrong. If this happens
+you'll need to check each <CODE>.perl</CODE> file by hand.</P>
+<P></P></OL>
+<P>
+<H2><A NAME="how do i see what actions are currently used">How do I see what actions are currently used?</A></H2>
+<P>The multi-purpose <CODE>oi_manage</CODE> script will list packages from a
+particular website for you. Just run:</P>
+<PRE>
+ oi_mange --website_dir=/home/httpd/myweb.com list_actions</PRE>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><CODE>OpenInteract</CODE> (Apache content handler)</P>
+<P><CODE>OpenInteract::Request</CODE> (action lookup methods)</P>
+<P>
+<HR>
+<H1><A NAME="authors">AUTHORS</A></H1>
+<P>Chris Winters &lt;<A HREF="mailto:chris@cwinters.com">chris@cwinters.com</A>&gt;</P>
+<P>
+<HR>
+<H1><A NAME="revision">REVISION</A></H1>
+<PRE>
+ $Id: actions.html,v 1.2 2002/08/26 05:10:09 lachoy Exp $</PRE>

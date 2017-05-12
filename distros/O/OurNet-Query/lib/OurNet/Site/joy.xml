@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<SITE ID="joy">
+
+<NAME Lang="en-us">JOY</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+JOY全球WWW搜尋(日本)
+]]></NAME>
+<INFO Lang="en-us">Japanese Open Yellowpages, general information web search</INFO>
+<INFO Lang="zh-tw">Japanese Open Yellowpages, general information web search</INFO>
+
+<URL Type="Start"><![CDATA[
+http://search.bnn-net.or.jp/cgi-bin/joy/nph-search.cgi?key=_QUERY_
+]]></URL>
+
+<CHARSET>ja-jp.jis</CHARSET>
+
+
+<TEMPLATE><![CDATA[
+<dt>___<a href="_URL_"___>_TITLE_</a>___<dd>___<dd>_PREVIEW_<p>
+]]></TEMPLATE>
+</SITE>

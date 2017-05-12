@@ -1,0 +1,82 @@
+Revision history for Perl extension OWL2Perl.
+
+1.00
+    * Updated the dependencies required for this module
+    * Updated the datatypes test to fix problems with those running the tests 
+      on systems where spaces are allowed in the path.
+
+0.98.1
+    * Removed the dependency on LS::ID because it was causing installation problems on
+      windows 64 bit machines.
+	
+0.98
+	* updated the version of PLUTO that we require.
+	
+0.97
+
+    THIS RELEASE requires that you re-generate all of your OWL2Perl modules!
+    
+    * fix: when bnodes with properties were added to a class, they had extra
+        stuff being added as well.
+    * fix: some ontologies caused owl2perl to serialize very slowly; modified
+        owl-class.tt to speed up _get_statements.
+    * added a method called clear_statements that removes the statements generated
+        when you use OWL::Utils::serialize or _get_statements.
+    * fix: when parsing ontologies, we ignore restrictions that dont act on
+        specific (declared) properties.
+    * fix: when some classes were generated, they had the same property added
+        greater than once. Duplicates should be filtered out now.
+    * added a 'strict' paramter to OWL::Data::OWL::Class that enables/disables
+      constraint checking (defaults to false)
+    * added a 'model' parameter to generated classes that is of type RDF::Core::Model.
+      This model is populated in calls to get_statements.
+    * removed 'statements' parameter from generated classes.
+    * internal subroutine '_get_statements' now returns an RDF::Core::Enumerator object
+    * better handle of OWL classes that are equivalent to anonymous classes with
+      someValueFrom restrictions.
+    * Utils->serialize() updated to use our RDF::Core::Enumerator rather than an
+      arrayref of statements
+    * Updated the perldoc for generated classes
+    * added a __properties method that keeps track of the object and datatype properties
+      that a particular class has. This information is kept in a hash with keys: 
+      datatypes and objects;
+    
+    TODO - cardinality constraints are now broken for classes that declare the same
+          property > once. 
+0.96
+    * fix uri2package: packages had # or / appended on odd uris ... broke
+      our generated package names
+    * added tests for uri2package
+    * updated some of the tests that create files and/or directories
+      to do better post test cleanup
+    * for those owl classes that have owl:hasValue restrictions, they
+      are now added to the generated OWL class (values are now automatically
+      added).
+    * added some newlines in our test OWL/RDF documents to test for text content
+      handling.
+    * added some new tests for hasValue processing
+    * Version for OWL2Perl.pm matches version of cpans OWL2Perl distribution.
+    * added cardinality constraints (if they exist) for class properties. exceptions
+      are thrown now if you exceed the constraints when adding properties to classes. 
+    
+0.95
+    * generate modules script now checks to see whether or not the
+      install script has been run.
+0.94
+    * updated version of PLUTO required to 0.26
+
+0.93
+    * added 'use OWL::RDF::Predicates::*' statements to owl-class.tt
+    
+0.92
+    * separated the logic contained in owl2perl-generate-modules.pl and placed
+      it into the OWL2Perl module.
+    * added some test cases for the OWL2Perl
+    * Revamped the OWL2Perl pod
+
+0.91
+    * created a serialize method in OWL2Perl::Utils that
+    serializes a list of OWL::Data::OWL::Class objects
+
+0.90 
+    * First version of this module

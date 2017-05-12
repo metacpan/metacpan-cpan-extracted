@@ -1,0 +1,92 @@
+/* Procedure copyright(c) 1995 by Edward M Barlow */
+
+/************************************************************************\
+|* Procedure Name:      sp__helplogin                                   *|
+|*                                                                      *|
+|* Description:                                                         *|
+|*    This Proc Will List                                               *|
+|*    suid, login, defaultdb, remote                                    *|
+|*                                                                      *|
+\************************************************************************/
+
+:r database
+go
+:r dumpdb
+go
+
+if exists (select *
+           from   sysobjects
+           where  type = "P"
+           and    name = "sp__helplogin")
+begin
+    drop proc sp__helplogin
+end
+go
+
+/* The parameter here is for programatic usage...  If anything */
+/* is passed, it will not show password or print anything 		*/
+/* otherwise we need worry if it works on system 10 or not		*/
+create procedure sp__helplogin( @loginname char(30)=null, @dont_format char(1)=NULL )
+as
+begin
+		  if @dont_format is null
+        		print "****** SERVER LOGINS *******"
+
+        		select 	suid,
+                		Login_name = convert(char(14), name),
+                		Default_db = convert(char(14), dbname),
+					 		S= 0,
+					 		L= 0,
+					 		E= 0,
+					 		Sht= convert(char(3),' '),
+					 		Lck= convert(char(3),' '),
+					 		Exp= convert(char(3),' '),
+							Remote=' ',
+							sa = ' ', sso=' ', oper=' '
+        		into    	#tmp
+        		from    	master.dbo.syslogins 
+				where		name = isnull(@loginname,name)		
+
+				update #tmp set Sht='Y' where S=1
+				update #tmp set Lck='Y' where L=1
+				update #tmp set Exp='Y' where E=1
+
+				update #tmp
+				set Remote='Y'
+				from #tmp l, master..sysremotelogins s
+				where l.suid = s.suid
+
+				/* update #tmp	*/
+				/* set  sso='Y'	*/
+				/* from #tmp l, master..sysloginroles s	*/
+				/* where l.suid = s.suid	*/
+				/* and	srid=1	*/
+
+				/* update #tmp	*/
+				/* set  oper='Y'	*/
+				/* from #tmp l, master..sysloginroles s	*/
+				/* where l.suid = s.suid	*/
+				/* and	srid=2	*/
+
+				/* update #tmp	*/
+				/* set  sa='Y'	*/
+				/* from #tmp l, master..sysloginroles s	*/
+				/* where l.suid = s.suid	*/
+				/* and	srid=0	*/
+
+        		select  
+					 Id=convert(char(4),suid),
+					 Login_name,
+                Default_db,
+					 Sht,Lck,Exp,
+					 SA=sa,SSO=sso,Oper=oper,
+					 Remote
+        		from    #tmp t
+        		order by Login_name
+
+   return (0)
+end
+go
+
+grant execute on sp__helplogin to public
+go

@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<SITE ID="FireBall">
+
+<NAME Lang="en-us">FireBall</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+FireBall全球WWW搜尋(德國)
+]]></NAME>
+<INFO Lang="en-us">general information web search in Germany</INFO>
+<INFO Lang="zh-tw">general information web search in Germany</INFO>
+
+<URL Type="More"><![CDATA[
+http://www.fireball.de_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://www.fireball.de/query-fireball.fcg?action=query&pg=express&fmt=.&r=&q=_QUERY_&d0=&d1=&what=german_web
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_NEXT_"><![CDATA[
+<A HREF="_NEXT_" TARGET=_top>n&auml;chste Seite
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<TR><td valign="top"___<a HREF="_URL_">_TITLE_</a>___</td><td>_PREVIEW_<br></font>___szlig;e_SIZEK_K -_DATE_</i><br><br></font>___
+]]></TEMPLATE>
+</SITE>

@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<SITE ID="PC_World.News">
+
+<NAME Lang="en-us">PC World News Search</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+PC World·s»D·j´M
+]]></NAME>
+<INFO Lang="en-us">computer relevant daily news search</INFO>
+<INFO Lang="zh-tw">computer relevant daily news search</INFO>
+
+<URL Type="Start"><![CDATA[
+post://www.pcworld.com/cgi-bin/excite/AT-dailynewssearch.cgi?search=_QUERY_&mode=concept&sp=sp
+]]></URL>
+
+
+
+<TEMPLATE><![CDATA[
+<img border=0 src=___>_SCORE_%_<A HREF="_URL_">_TITLE
+]]></TEMPLATE>
+</SITE>

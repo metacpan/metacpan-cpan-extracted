@@ -1,0 +1,64 @@
+#!/usr/bin/perl -w
+# $File: //depot/libOurNet/FuzzyIndex/bin/fzindex $ $Author: autrijus $
+# $Revision: #1 $ $Change: 1 $ $DateTime: 2002/06/11 15:35:12 $
+
+$VERSION = '1.55';
+
+=head1 NAME
+
+fzindex - FuzzyIndex index utility
+
+=head1 SYNOPSIS
+
+B<fzindex> I<database> S<I<files>|I<globs>>...
+
+=head1 DESCRIPTION
+
+Just run F<fzindex> at command line. The first argument is the Berkeley
+DB file to store index results, remaining arguments being glob patterns
+of files to be indexed.
+
+Example usages:
+
+    % fzindex index.db *.txt    # shell glob
+    % fzindex index.db '*.txt'  # glob string
+
+=cut
+
+use strict;
+use OurNet::FuzzyIndex;
+
+local $/;
+
+my $db = OurNet::FuzzyIndex->new(
+    shift || die "Usage: $0 <indexfile> [files | filespec]\n"
+);
+
+foreach my $file (<@ARGV>) {
+    next if $db->findkey($file);
+
+    print "indexing $file...\n";
+
+    open _, $file or print "*** failed to open $file, skipping.\n" and next;
+    $db->insert($file, <_> || '');
+    close _;
+}
+
+1;
+
+__END__
+
+=head1 AUTHORS
+
+Autrijus Tang E<lt>autrijus@autrijus.orgE<gt>
+
+=head1 COPYRIGHT
+
+Copyright 2001 by Autrijus Tang E<lt>autrijus@autrijus.orgE<gt>.
+
+This program is free software; you can redistribute it and/or 
+modify it under the same terms as Perl itself.
+
+See L<http://www.perl.com/perl/misc/Artistic.html>
+
+=cut

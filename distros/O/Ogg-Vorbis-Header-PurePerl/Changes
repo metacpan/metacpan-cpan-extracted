@@ -1,0 +1,35 @@
+Revision history for Perl extension Ogg::Vorbis::Header::PurePerl.
+
+1.0   Thu Jan  4 14:06:01 PST 2007
+
+	- Massive refactoring for improved performance.
+	  http://svn.slimdevices.com/trunk/server/CPAN/Ogg/Vorbis/Header/PurePerl.pm?rev=2564&view=rev
+
+	- Allow multiple comment keys of the same type for Vorbis comments.
+
+	- Skip ID3 tags if they exist.
+
+	- Ogg tag parser was badly broken and would fail if the amount of tag
+	  data was > 8K or exceeded one page.  Rewrote the comment parsing
+	  routine based on code from Image::ExifTool::Vorbis.  Also fixed the
+	  cover art code as it was also broken: from Andy Grundman
+
+0.05  Wed Jan  7 17:17:54 2004
+	- Fixed "load" method to be more compatible with 
+          Ogg::Vorbis::Header
+	- Added some actual tests.
+	- Actually added a copy of the GPL License to the
+	  package (as promised in the POD documentation).
+
+0.04  Tue Jan  6 16:04:23 2004
+	- Applied patch from Dan Sully to make "startMainData"
+	  accessible from the Info interface.
+
+0.03  Tue Dec  9 14:05:55 2003
+	- Added fix from Robert Moser II for problems with files
+	  with no comments.
+
+0.01  Mon Jan 20 09:52:54 2003
+	- original version; created by h2xs 1.21 with options
+		-XA -n Ogg::Vorbis::Header::PurePerl
+

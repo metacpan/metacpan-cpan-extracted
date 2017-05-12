@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<SITE ID="Jobcop">
+
+<NAME Lang="en-us">Carrer Mosaic Job Database</NAME>
+<INFO Lang="en-us">job information searched by company</INFO>
+
+<URL Type="Start"><![CDATA[
+http://jobs.careermosaic.com/j2/owa/srch.jl?hf=JOBS_DATABASE&co=_QUERY_
+]]></URL>
+
+
+
+<TEMPLATE><![CDATA[
+<A HREF="_URL_">_DATE_ -- _TITLE_</A>
+]]></TEMPLATE>
+</SITE>

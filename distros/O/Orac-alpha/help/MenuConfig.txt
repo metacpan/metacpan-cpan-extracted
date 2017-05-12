@@ -1,0 +1,154 @@
+MenuConfig
+
+Initial Configuration steps
+===========================
+
+The first step is building up the menu.  Assume for now your database is 
+Informix (just replace this with the name of your actual database).
+
+Edit menu/Informix/menu.txt
+===========================
+
+This file is arranged serially, ie. the way it runs downwards, is the way the 
+final menu will be structured.  Here is a full example file below:
+
+Menubutton^struct^
+command^0^0^oi_dbspaces^$main::current_db->onstat_dbspaces^^
+command^0^0^oi_chunks^$main::current_db->onstat_chunks^^
+command^0^0^oi_onconfig_params^$main::current_db->onstat_onconfig_params^^
+separator^
+command^0^0^oi_extents_report^$main::current_db->oncheck_extents^^
+command^0^0^oi_log_rep^$main::current_db->onstat_log_rep^^
+command^0^0^oi_logical_log^$main::current_db->onlog_log^^
+Menubutton^obj^
+cascade^oi_tables^
+casc_command^0^1^oi_tables^$main::current_db->my_func1^$rfm{oi_tabs_form}+0^
+casc_command^0^1^oi_columns^$main::current_db->new_func^'2'+$rfm{oi_form}+0^
+separator^
+command^0^0^oi_synonyms^$main::current_db->dbschema_syns^^
+command^0^0^oi_procedures^$main::current_db->dbschema_procs^^
+command^0^0^oi_proc_list^$main::current_db->dbschema_proc_list^^
+
+Menubutton^tune^
+================
+Each 'Menubutton' defines the top level menu button which appears on the main 
+menu bar.  It has one element, in this case 'tune'.  This refers to a string 
+you'll find in another file txt/English.txt and here's the relevant line from 
+that file:
+
+tune^Tuning^
+
+When Orac starts up, this txt/English.txt file is read, and every line is 
+read into a Perl hash array %lg{}, such that $lg{tune} becomes 'Tuning' when 
+displayed by Orac.  This feature is designed to allow non-English speaking 
+people to configure Orac completely to be in a different language, without 
+changing the program, and only having to edit one file to do it.
+
+We'll get back to txt/English.txt later.
+
+Beneath each 'Menubutton', there are three valid commands:
+
+separator^
+==========
+Straightforward really.  This provides a separator line for the main menu 
+which drops down from the main Menubutton.  Please do not use in cascades.
+
+command^0^0^oi_grants^$main::current_db->dbschema_grants^^
+==========================================================
+
+A straightforward command button is produced, directly below the main Menu 
+option.  The next two options are 1:0 switches
+
+command^oi_grants^0
+        =========
+          
+In this example, this used to tell Orac to set up a flag, to hold a pointer 
+to a command button.  But this has been deprecated.  We may use it later
+however, to do unforeseen things.  For now, just put zero.
+
+command^0^1
+          =
+            
+This is much simpler.  It just tells the command subfunction, whether to clear 
+the screen or not, before running.  The above example would produce:
+
+  -command => sub { main:f_clr(); main::my_function(); .......
+  
+command^0^0 would produce:
+
+  -command => sub { main::my_function(); ........
+  
+  
+command^0^0^oi_chunks^
+            =========
+              
+This option also refers back to the txt/English.txt file, which supplies the 
+name of the button command as it appears on the menu.  Thus, if we look at the 
+txt/English.txt and search for oi_chunks, we find:
+
+oi_chunks^Chunks^
+
+Therefore, the menubutton sub-command will read 'Chunks'
+
+
+command^0^0^oi_threads^$main::current_db->onstat_threads^^
+                       =================================
+                         
+This tells Orac the name of the function which is to be called.  Thus, the 
+above would produce:
+
+  -command => sub { $main::current_db->onstat_threads() ; ..... }
+  
+  
+command^0^1^oi_tables^$main::current_db->my_func^$lg{oi_tables}+'Tables'+'1'+0^
+                                                 =============================
+                                
+This supplies Orac with the exact 'literal' parameters, which it will supply 
+to the named 'my_func' function.  Note the '+' sign to separate values.  The 
+above would produce:
+
+  -command => sub { $main::current_db->my_func(
+                        $lg{oi_tables}, 'Tables', '1', 0) ; .... }
+  
+NB: These parameters, unfortunately for now, are literal strings, to be 
+interpreted as proper variables only later, when the program is actually run.
+
+cascade^oi_tables^
+==================
+
+This produces a 'Cascade' button in the main drop-down menu from the 
+Menubutton.
+
+As before, the 'oi_tables' string is looked up in txt/English.txt, thus:
+
+  oi_tables^Tables^
+  
+This puts up a 'Tables' cascade under the appropriate menu.
+
+
+casc_command^0^1^oi_tables^$main::current_db->f1^$lg{oi_tables}+'Tables'+'1'+0^
+===============================================================================
+
+This is virtually identical to the earlier 'command' option.  Except, it comes 
+under the preceding cascade, rather than under the main Menubutton.
+
+
+The txt/English.txt file
+=========================
+
+Edit this file, to change the language and/or output strings of Orac without 
+changing the file.  It is a simple two column flat-file text file, which 
+supplies the %lg{} Perl hash with all the strings used throughout the program.
+
+Enjoy :-)
+AndyD
+
+(Please let me know if the information in this file is incorrect in any
+way, and I'll change it accordingly.  If there are any other parts of
+Orac you wish to document yourself, please send in the appropriate text
+file, with instructions, and we'll do what we can.  Orac is changing 
+continuously, so this file may get out of date very quickly.  Please let
+us know if this becomes the case.)
+
+
+EOF

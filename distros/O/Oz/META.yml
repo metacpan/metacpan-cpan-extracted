@@ -1,0 +1,37 @@
+---
+abstract: 'Perl interface for executing applications in the Oz programming language'
+author:
+  - 'Adam Kennedy <adamk@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  File::Spec: 0.80
+  Test::More: 0.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.01'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Oz
+name: Oz
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  File::Slurp: 9999.12
+  File::Temp: 0.18
+  File::Which: 0.05
+  File::pushd: 0.99
+  IPC::Run3: 0.037
+  Object::Tiny: 1.01
+  Params::Util: 1.00
+  perl: 5.8.0
+resources:
+  ChangeLog: http://fisheye2.atlassian.com/changelog/cpan/trunk/Oz
+  license: http://dev.perl.org/licenses/
+  repository: http://svn.ali.as/cpan/trunk/Oz
+version: 0.01

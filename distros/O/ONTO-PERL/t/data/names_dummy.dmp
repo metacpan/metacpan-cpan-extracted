@@ -1,0 +1,22 @@
+1	|	all	|		|	synonym	|
+1	|	root	|		|	scientific name	|
+2	|	Bacteria	|	Bacteria <bacteria>	|	scientific name	|
+2	|	Monera	|	Monera <Bacteria>	|	in-part	|
+2	|	Procaryotae	|	Procaryotae <#1>	|	in-part	|
+2	|	Prokaryota	|	Prokaryota <#2>	|	in-part	|
+2	|	Prokaryotae	|	Prokaryotae <#1>	|	in-part	|
+2	|	eubacteria	|		|	genbank common name	|
+2	|	eubacteria	|	Bacteria<blast2>	|	blast name	|
+2	|	not Bacteria Haeckel 1894	|		|	synonym	|
+6	|	Azorhizobium	|		|	scientific name	|
+6	|	Azorhizobium Dreyfus et al. 1988	|		|	synonym	|
+6	|	Azotirhizobium	|		|	equivalent name	|
+9605	|	Homo	|		|	scientific name	|
+9606	|	Homo sapiens	|		|	scientific name	|
+9606	|	human	|		|	genbank common name	|
+9606	|	man	|		|	common name	|
+207598	|	Homo/Pan/Gorilla group	|		|	scientific name	|
+330520	|	Setulipes androsaceus	|		|	scientific name	|
+3702	|	Mikel	|		|	scientific name	|
+335928	|	Xanthobacteraceae	|		|	scientific name	|
+131567	|	biota	|		|	scientific name	|

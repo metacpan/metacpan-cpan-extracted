@@ -1,0 +1,16 @@
+
+Changelog
+MANIFEST
+Makefile.PL
+README
+
+oo2pp
+
+lib/OpenOffice/PerlPoint.pm
+
+t/text.t
+t/text.sxw
+t/text.odt
+t/text-sxw.pp
+t/text-odt.pp
+

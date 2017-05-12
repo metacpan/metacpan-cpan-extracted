@@ -1,0 +1,157 @@
+body {
+	font-family:verdana, arial, helvetica, sans-serif;
+	font-size: 12px;
+	color:#333;
+	background-color:#FFC;
+	}
+
+h1 {
+	font-size:24px;
+	line-height:28px;
+	font-weight:900;
+	color:#001;
+	}
+
+img {
+	border: 0px;
+	}
+
+span.nom {
+	font-variant: small-caps;
+	}
+
+#title {
+	position: absolute;
+	top: 0px;
+	left: 222px;
+	right: 148px;
+	padding: 0px;
+	height: 150px;
+	line-height: 50px;
+	text-align: center;
+	margin-left: 5px;
+	margin-right: 5px;
+	font-family: georgia, serif;
+	font-size: 24px;
+	overflow: hidden;
+	}
+
+#leftear {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	width: 221px;
+	height: 180px;
+	padding: 0px;
+	background: transparent;
+	text-align: center;
+	}
+
+#rightear {
+	position: absolute;
+	top: 0px;
+	right: 0px;
+	height: 180px;
+	padding: 0px;
+	background: transparent;
+	text-align: center;
+	}
+
+#seconnecter {
+	position: absolute;
+	bottom: 0px;
+	left: 0px;
+	text-align: center;
+	overflow: hidden;
+	}
+
+#content {
+	position: absolute;
+	top: 180px;
+	left: 20px;
+	right: 0px;
+	padding:0px;
+	margin: 0 0 0 0;
+	}
+
+#content h2:first-child { margin-top: 0; }
+#content h1:first-child { margin-top: 0; }
+#content p:first-child { margin-top: 0; }
+
+#footer {
+	position: absolute;
+	bottom: 20px
+	left: 240px;
+	right: 0px;
+	padding:0px;
+	margin: 0 0 0 0;
+	}
+
+#Connexion {
+/* #Connexion fieldset.valider { */
+	background-color: #ffd;
+	border: 1px dashed #999;
+	width: 80%;
+	}
+
+
+ul.programme {
+	list-style-type: none;
+	font: normal 12px verdana, arial, sans-serif;
+	background-color:#ffd;
+	border:1px dashed #999;
+	width: 80%;
+	padding: 10px;
+	}
+
+ul.instrumentistes {
+	list-style-type: none;
+	font: normal 15px verdana, arial, sans-serif;
+	background-color:#ffd;
+	border:1px dashed #999;
+	width: 80%;
+	padding: 10px;
+	}
+
+ul.liens {
+	list-style-type: none;
+	font: normal 15px verdana, arial, sans-serif;
+	background-color:#ffd;
+	border:1px dashed #999;
+	width: 80%;
+	padding: 10px;
+	}
+
+ul#menu {
+	position: absolute;
+	top: 180px;
+	left: 10px;
+	font-family: georgia, serif;
+	font-size: 16px;
+	list-style-type: none;
+	width: 221px;
+	padding: 0;
+	margin:0;
+	text-align: center;
+	border-bottom: 1px solid #DDD;
+}
+
+#menu a {
+	text-decoration: none;
+	color: #118;
+}
+
+#menu li:hover {
+	background-color: #FFE;
+}
+
+ul#menu li {
+	padding: 5px;
+	border: 1px solid #DDD;
+	border-bottom: 0;
+	margin: 0;
+	}
+
+ul#menu li.active {
+	font-style: italic;
+	}

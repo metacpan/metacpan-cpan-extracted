@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<SITE ID="Discovery">
+
+<NAME Lang="en-us">Discovery Online</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+µo²{ÀW¹D
+]]></NAME>
+<INFO Lang="en-us">search favorite TV programs on Discovery</INFO>
+<INFO Lang="zh-tw">search favorite TV programs on Discovery</INFO>
+
+<URL Type="More"><![CDATA[
+http://www.discovery.com/cgi-bin/searcher/_START_1_0_?search=_QUERY_&output=title
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://www.discovery.com/cgi-bin/searcher/0?search=_QUERY_&output=title
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+
+<TEMPLATE><![CDATA[
+<b><a href="_URL_">_TITLE_</a>_PREVIEW_<br><br>
+]]></TEMPLATE>
+</SITE>

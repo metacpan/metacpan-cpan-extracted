@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<SITE ID="Usps">
+
+<NAME Lang="en-us">United States Postal Service</NAME>
+<INFO Lang="en-us">mailing relevant information web and file search</INFO>
+
+<URL Type="More"><![CDATA[
+_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+post://www.usps.gov/search97bin/search?mode=Search&category=&label=&UserText=_QUERY_
+]]></URL>
+
+<SCORE>_SCORE_*100</SCORE>
+
+<VAR Name="_NEXT_"><![CDATA[
+[<A HREF="_NEXT_">Next
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+align=center>_SCORE_</td>___<strong>_TITLE_</strong>___<font size=-1>_PREVIEW_</FONT>___or with___<a href="_URL_">search terms highlighted___(_SIZEK_K___B)</FONT>
+]]></TEMPLATE>
+</SITE>

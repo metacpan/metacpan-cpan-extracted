@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<SITE ID="Octor">
+
+<NAME Lang="en-us">OCTOR WWW Search Engine</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+¤K¤ö³½·j´M¾÷
+]]></NAME>
+<INFO Lang="en-us">general information web search in Taiwan</INFO>
+<INFO Lang="zh-tw">general information web search in Taiwan</INFO>
+
+<URL Type="More"><![CDATA[
+http://www.octor.com/cgi-bin/webgetnext2.exe?pid=_PID_&offset=_OFFSET_&output=1&page=_PAGE_&lineno=_LINE_&msg_lang=default
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://www.octor.com/cgi-bin/webgais2.exe?Function=Search&query=_QUERY_&domain=all
+]]></URL>
+
+<SCORE>_SCORE_/10</SCORE>
+<EXPRESSION>Standard</EXPRESSION>
+<CATEGORY>WWW,Regional</CATEGORY>
+
+<VAR Name="_OFFSET_"><![CDATA[
+"offset"   TYPE="hidden" VALUE="_OFFSET_">
+]]></VAR>
+<VAR Name="_LINE_"><![CDATA[
+NAME="lineno"   TYPE="hidden" VALUE="_LINE_">
+]]></VAR>
+<VAR Name="_PAGE_"><![CDATA[
+NAME="page"     TYPE="hidden" VALUE="_PAGE_">
+]]></VAR>
+<VAR Name="_PID_"><![CDATA[
+"pid"      TYPE="hidden" VALUE="_PID_">
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<DT><B>___<A HREF = "_URL_">_TITLE_</A>___<DD>_PREVIEW_<BR>___size:_SIZE_, date:_DATE_, score:_SCORE_</
+]]></TEMPLATE>
+</SITE>

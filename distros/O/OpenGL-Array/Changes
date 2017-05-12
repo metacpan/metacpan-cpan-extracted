@@ -1,0 +1,13 @@
+Revision history for Perl extension OpenGL::Array.
+
+0.71     2017-03-04 07:18:35-05:00
+        - First official CPAN release
+
+
+0.70_02  2017-03-03 09:40:46-05:00
+        - Fix Apple includes for GL (uses <OpenGL/gl.h>)
+
+0.70_01  2017-03-02 10:13:19-05:00
+        - first stand alone version of OpenGL::Array
+	- framework initialize with h2xs
+	- code from Perl OpenGL 0.70

@@ -1,0 +1,40 @@
+Ogg/Vorbis/Header version 0.05
+============================
+
+This module presents an object-oriented interface to Ogg Vorbis files
+which allows user to view Vorbis info and comments and to modify or
+add comments.  
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+Inline::C, libogg, libvorbis, libogg-dev, libvorbis-dev.
+
+Inline::C is available from CPAN.  The libogg and libvorbis libraries
+are available from xiph.org.  They are also available through Debian's
+apt-get and Mandrake's rpmdrake (and perhaps Redhat's up2date).
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2002, Dan Pemstein.  All Rights Reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the
+Free Software Foundation; either version 2 of the License, or (at
+your option) any later version.  A copy of this license is included
+with this module (LICENSE.GPL).
+
+A library for editing Ogg Vorbis comments is distributed with this
+library as unmodified source code (inc/vcedit.h, inc/vcedit.c,
+inc/i18n.h).  This library is Copyright (c) Michael Smith
+<msmith@labyrinth.net.au>.  It is licensed under the GNU Library
+General Public License (LGPL).  A copy of this license is included
+with this module (inc/LICENSE.LGPL).

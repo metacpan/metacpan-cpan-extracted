@@ -1,0 +1,100 @@
+[% USE CGI %]
+<!-- METADATA STARTS -->
+[% IF phone OR fax OR address OR postcode OR formatted_website_text
+       OR hours_text OR map_link OR categories.size OR locales.size OR
+       node_image %]
+<div id="metadata" class="vcard">
+
+  <!-- For the vcard -->
+  <span class="fn" style="display:none">[% node_name %]</span>
+[% IF phone OR fax OR address OR postcode OR formatted_website_text
+      OR hours_text OR map_link %] 
+  <ul id="general_metadata">
+
+    [% IF phone %]
+      <li class="telephone">
+        <span class="metadata_label">Telephone:</span> <span class="tel">[% CGI.escapeHTML(phone) %]</span>
+      </li>
+    [% END %]
+    [% IF fax %]
+      <li class="fax">
+        <span class="metadata_label">Fax:</span> [% CGI.escapeHTML(fax) %]
+      </li>
+    [% END %]
+    [% IF address %]
+      <li class="address">
+        <span class="metadata_label">Address:</span>
+        <span class="adr"><span class="street-address">[% CGI.escapeHTML(address) %]</span><!--, [% default_city %] -->[%# uncomment at left to show city %][% IF responsive AND postcode %], <span class="postal-code">[% postcode %]</span>[% END %]</span>
+        [% TRY %]
+          [% SET auto_map_link_in_address = 1 %]
+          [% INCLUDE custom_auto_map_link.tt %]
+        [% CATCH %]
+          [% IF map_link %]
+            <a href="[% map_link %]" class="external">(map[% UNLESS responsive %] of this place[% END %])</a>
+          [% END %]
+        [% END %]
+      </li>
+    [% ELSE %]
+      [% TRY %]
+        [% INCLUDE custom_auto_map_link.tt %]
+      [% CATCH %]
+        [% IF map_link %]
+          <li class="map">
+            <span class="metadata_label"><a href="[% map_link %]" class="external">Map[% UNLESS responsive %] of this place[% END %]</a></span>
+          </li>
+        [% END %]
+      [% END %]
+    [% END %]
+    [% IF postcode AND !responsive %]
+      <li class="postcode">
+        <span class="metadata_label">Postcode:</span>
+        <span class="adr"><span class="postal-code">[% CGI.escapeHTML(postcode) %]</span></span>
+      </li>
+    [% END %]
+    [% IF formatted_website_text %]
+      <li class="website_link">
+        <span class="metadata_label">Website:</span> <span class="url">[% formatted_website_text %]</span>
+      </li>
+    [% END %]
+    [% IF hours_text %]
+      <li class="opening_hours">
+        <span class="metadata_label">Opening Hours:</span>
+        [% CGI.escapeHTML(hours_text) %]
+      </li>
+    [% END %]
+  </ul>
+[% END %]
+
+[% IF (categories.size AND categories.size > 0)
+   OR (locales.size AND locales.size > 0) %]
+  <ul id="categories_and_locales">
+    [% IF categories.size AND categories.size > 0 %]
+      <li class="categories_list">
+        <span class="metadata_label">Categories:</span>
+        [% FOREACH category = categories %]
+          [% IF category.url != "" %]
+            <a href="[% category.url %]" class="category">[% category.name %]</a>[%- "," UNLESS loop.last %]
+          [% ELSE %]
+            [% category.name %][%- "," UNLESS loop.last %]
+          [% END %]
+        [% END %]
+      </li>
+    [% END %]
+
+    [% IF locales.size AND locales.size > 0 %]
+      <li class="locales_list">
+        <span class="metadata_label">Locales:</span>
+        [% FOREACH locale = locales %]
+          [% IF locale.url != "" %]
+            <a href="[% locale.url %]" class="addr locality">[% locale.name %]</a>[%- "," UNLESS loop.last %]
+          [% ELSE %]
+            [% locale.name %][%- "," UNLESS loop.last %]
+          [% END %]
+        [% END %]
+      </li>
+    [% END %]
+  </ul>
+[% END %]
+</div>
+[% END %]
+<!-- METADATA ENDS -->

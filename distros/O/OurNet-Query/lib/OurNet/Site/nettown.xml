@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<SITE ID="Nettown">
+
+<NAME Lang="en-us">Net Town Search</NAME>
+<INFO Lang="en-us">general information web search in Japan</INFO>
+
+<URL Type="More"><![CDATA[
+post://cgi.members.interq.or.jp/www1/net/cgi-bin/navi/search.cgi?mode=or&key=_QUERY_&start=_START_20_0_
+]]></URL>
+<URL Type="Start"><![CDATA[
+post://cgi.members.interq.or.jp/www1/net/cgi-bin/navi/search.cgi?mode=or&key=_QUERY_&start=0
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+
+<TEMPLATE><![CDATA[
+<dt>___<a href=_URL_>_TITLE_</a>___<dd>_PREVIEW_</dd><p>
+]]></TEMPLATE>
+</SITE>

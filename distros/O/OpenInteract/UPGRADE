@@ -1,0 +1,589 @@
+UPGRADING OPENINTERACT
+========================================
+
+This document has a few pointers for upgrading OpenInteract.
+
+==============================
+QUICK HELP
+==============================
+
+Most of the time, upgrading OpenInteract is as simple as:
+
+ 1) Running the Perl upgrade:
+
+  > cd OpenInteract-1.xx/
+  > perl Makefile.PL
+  > make
+  > make test
+  > make install
+
+This updates all the core OpenInteract:: modules to the versions
+included with the distribution.
+
+ 2) Running the OpenInteract upgrade:
+
+  > oi_manage upgrade --base_dir=/path/to/installation
+
+from the directory where you unpacked the OpenInteract
+distribution. This will upgrade all the core OpenInteract packages in
+the base installation to the versions included with the distribution.
+
+ 3) Once you've done that, you can upgrade packages in the websites at
+ your leisure.
+
+
+==============================
+GENERAL UPGRADE NOTES
+==============================
+
+Always read the 'Changes' file in this directory for more details
+about changes between versions. 
+
+If you have any problems, check the archives of the openinteract-help
+mailing list at:
+
+  http://www.geocrawler.com/lists/3/SourceForge/8429/0/
+
+and if you don't find your solution there, mail the list at:
+
+  openinteract-help@lists.sourceforge.net
+
+--------------------
+Server configuration:
+--------------------
+
+As we improve OpenInteract, we occasionally add new configuration
+options to the 'server.perl' or 'server.ini' file. Since we have not
+yet developed a utility to integrate these changes automatically,
+check here to see what updates there have been between the versions.
+
+
+==============================
+UPGRADING TO 1.59
+==============================
+
+ - Added configuration keys:
+
+    'login.required'      = 0
+    'login.required_url'  = /login.html
+    'login.required_skip' = (list of values)
+
+    'display_info.use_meta_redirect'   = 1
+    'display_info.use_header_redirect' = 0
+
+==============================
+UPGRADING TO 1.51
+==============================
+
+ - Added configuration keys:
+
+    'cache_info.data.cleanup'         = 1
+    'cache_info.data.directory_depth' = 3
+
+ - Renamed configuration keys:
+
+    'cache_info.data.SPOPS'  --> 'cache_info.data.use_spops'
+    'cache_info.data.expire' --> 'cache_info.data.default_expire'
+
+ - Removed configuration keys:
+
+    'cache_info.data.use_ipc'
+    'cache_info.ipc.*'
+
+
+==============================
+UPGRADING TO 1.50
+==============================
+
+ - Added configuration keys:
+
+    'system_alias.site_template' = 'OpenInteract::SiteTemplate'
+    'system_alias.sitetemplate'  = 'OpenInteract::SiteTemplate'
+
+   These are MANDATORY -- OpenInteract will not run without them.
+
+ - If you have templates in the database you will need to run a
+ migration script; please see docs in 'base_template' package.
+
+ - Change configuration key:
+
+   'system_alias.component'  --> 'OpenInteract::Component'
+
+   This is MANDATORY -- OpenInteract will not function properly
+   without it.
+
+ - Removed configuration key (optional)
+
+    'template_info.source'
+
+
+==============================
+UPGRADING TO 1.41
+==============================
+
+NOTE: It's recommended you use SPOPS 0.64 or higher with
+OpenInteract. Otherwise you may have problems creating new objects.
+
+Renamed configuration keys:
+
+     'login.custom_login_handler' => 'login.custom_handler'
+     'login_custom_login_method'  => 'login.custom_method'
+   
+Added configuration key:
+
+     'login.custom_fail_method'
+
+These are optional: doing nothing won't affect operation unless you've
+got a custom login handler defined.
+
+
+==============================
+UPGRADING TO 1.40
+==============================
+
+Added the configuration keys:
+
+   - 'override'->'spops_file'  (as: 'conf/override_spops.ini')
+   - 'override'->'action_file' (as: 'conf/override_action.ini')
+
+   Optional: leaving these out won't affect operation.
+
+   These are used to define the files with global override
+   directives.
+
+Schema changes:
+
+  - Table 'page': renamed 'size' to 'page_size' to get around Oracle
+  reserved word. If you cannot easily change your schema (via an
+  'alter table' or similar statement), then add the following two
+  rules to 'conf/global_override.ini':
+
+--------------------
+[page.field_map]
+action = remove
+value  = size
+
+[page.field_map.page_size]
+action = add
+value  = size
+--------------------
+
+   Everything should work transparently.
+
+PostgreSQL users:
+
+  Instead of relying on the PostgreSQL SERIAL datatype we now manually
+  create a sequence for key generation. However, for compatibility
+  with Oracle the sequence we create has a different name than the one
+  created automatically with the SERIAL datatype. This sequence is
+  coded into each object's SPOPS configuration (conf/spops.conf).
+
+  So you'll need to either:
+
+   * Use the rules in conf/sample-override_spops.ini to override the
+     given sequence name to the one already generated by the SERIAL
+     datatype.
+
+   * Change your schema to replace the SERIAL datatype with 'INT NOT
+     NULL' and create the sequence yourself. (You can find the
+     sequence declaration in the 'struct/' directory for each
+     package.)
+
+  The first item is much easier -- just copy the rules under
+  'POSTGRESQL SERIAL USAGE' from the 'conf/sample-override_spops.ini'
+  file into a new file 'conf/override_spops.ini'. The next time you
+  start your server under 1.40+ the rules should get picked up and
+  everything should work just fine.
+
+
+==============================
+UPGRADING TO 1.38
+==============================
+
+Added the configuration keys:
+
+   - 'session_info'->'cache_user'
+   - 'session_info'->'cache_group'
+   - 'session_info'->'cache_theme'
+     optional: leaving them out won't affect operation
+
+   The value for each is the number of minutes the relevant object can
+   be cached in the user session.
+
+
+==============================
+UPGRADING TO 1.37
+==============================
+
+Configuration changes:
+--------------------
+
+Added the configuration key:
+
+   - 'session_info'->'expires_in'
+     optional: leaving it out won't affect operation
+
+Structure changes:
+--------------------
+
+ - You'll need to drop the table 'content_type' and add it again if
+ you upgrade a website to the newest 'base_page' package. You can add
+ the table again using:
+
+  $ oi_manage install_sql --package=base_page
+
+ will do it (along with issuing a number of errors, but that's ok).
+
+
+==============================
+UPGRADING TO 1.35
+==============================
+
+THIS IS A SUBSTANTIAL UPGRADE. PLEASE READ THIS AND MAKE APPROPRIATE
+CHANGES TO YOUR CONFIGURATION FILE.
+
+
+OpenInteract configuration changes
+--------------------
+
+With the additional option of using a INI-style configuration file, we
+made a number of changes to the server configuration. It's probably
+easiest if you have the sample and your existing file open
+side-by-side for comparison.
+
+   - Moved 'template_ext'
+     to:   'template_info'->'template_ext'
+
+   - Moved 'default_connection_db'
+     to:   'datasource'->'default_connection_db'
+
+   - Moved 'default_connection_ldap'
+     to:   'datasource'->'default_connection_ldap'
+
+   - Moved 'error_object_class'
+     to:   'error'->'error_object_class'
+
+   - Moved 'default_error_handler'
+     to:   'error'->'default_error_handler'
+
+   - Moved 'smtp_host'
+     to:   'mail'->'smtp_host'
+
+   - Moved 'admin_email'
+     to:   'mail'->'admin_email'
+
+   - Moved 'content_email'
+     to:   'mail'->'content_email'
+
+   - Reverse and flatten the 'system_alias' hashref. For instance:
+
+        OpenInteract::Auth => [ qw/ auth auth_user auth_group / ]
+
+     becomes:
+
+        auth       => 'OpenInteract::Auth',
+        auth_user  => 'OpenInteract::Auth',
+        auth_group => 'OpenInteract::Auth',
+
+   - Moved 'action'->'_default_action_info'
+     to:   'action_info'->'default'
+
+   - Moved 'action'->'_notfound'
+     to:   'action_info'->'not_found'
+
+   - Moved 'action'->"''"
+     to:   'action_info'->'none'
+
+   - Moved 'stash_class'
+     to:   'server_info'->'stash_class'
+
+   - Moved 'request_class'
+     to:   'server_info'->'request_class'
+
+   - Moved 'website_name'
+     to:   'server_info'->'website_name'
+
+   - Added 'login'->'always_remember' (boolean; default false)
+
+
+Apache configuration changes
+--------------------
+
+The location and name of the variables set in your Apache
+configuration have changed. Instead of:
+
+  <Location /> 
+      SetHandler  perl-script 
+      PerlSetVar  StashClass  MySite::Stash
+      PerlHandler OpenInteract
+  </Location>
+ 
+
+Change it to:
+
+  PerlSetVar  OIStashClass      MySite::Stash
+
+  <Location /> 
+      SetHandler perl-script 
+      PerlHandler OpenInteract
+  </Location>
+
+So we modified the variable name to be more namespace-friendly and
+moved the declaration to the server rather than the Location.
+
+
+==============================
+UPGRADING TO 1.3
+==============================
+
+This is not as substantial as the upgrade to 1.2, but there are a
+number of new features. These features come with some additional
+configuration options which are all documented in 'Changes'.
+
+The only required new configuration item is:
+
+  {dir}{cache_tt} => '$BASE/cache/tt',
+
+You'll also need to create this directory in any websites you're
+upgrading. For websites created with 'oi_manage create_website' after
+the upgrade, you will not need to create this directory. Also ensure
+that it has permissions so that the website server user has permission
+to create and delete files.
+
+
+==============================
+UPGRADING TO 1.2
+==============================
+
+This is a substantial upgrade. Please read the following notes before
+upgrading.
+
+Briefly:
+
+ - The way we use the Template Tolkit has drastically changed, but the
+ interface is almost entirely the same. There is a script to migrate
+ templates.
+
+ - All templates must have an associated package now
+
+ - There are a number of changes to the server configuration file.
+
+ - All DBI objects need to derive from 'OpenInteract::SPOPS::DBI'
+ rather than 'OpenInteract::SPOPS'
+
+--------------------
+Template changes:
+--------------------
+
+ - To translate all the old templates in one or more directories to
+ new ones, run (from the source distribution directory):
+
+     $ perl script/template_translate.pl directory [ directory, directory ]
+
+   For instance:
+
+     $ perl script/template_translate.pl /devel/pkg/mypkg/template
+
+   All old templates are saved with a .old extension, new ones are
+   saved under the old name.
+
+ - All templates should be processed using
+ 'OpenInteract::Template::Process' instead of
+ 'OpenInteract::Template::Toolkit'. So older packages with something
+ like:
+
+   my $TMPL_CLASS = 'OpenInteract::Template::Toolkit';
+
+   sub listing {
+     ...
+     return $TMPL_CLASS->handler( ... );
+   }
+
+ just change the first line to:
+
+   my $TMPL_CLASS = 'OpenInteract::Template::Process';
+
+ You can also delete the line and use (recommended):
+
+   sub listing {
+     ...
+     return $R->template->handler( ... );
+   }
+
+
+ - You also need to pass BOTH the template name and package to the
+ template processor:
+
+     return $R->template->handler( ..., { db      => 'mytemplate',
+                                          package => 'mypackage' } );
+
+  You'll know you need to do this when you see an error like:
+
+     Cannot process template!file error - Template
+     (::mytemplate) is not in the website common directory and
+     is not in the format 'package::name' at
+     .../OpenInteract/Template/Process.pm line 45.
+ 
+
+--------------------
+Server configuration changes:
+--------------------
+
+ - There are a large number of changes to the server configuration, so
+   it would probably be easiest to open up your existing server
+   configuration and the sample configuration file
+   side-by-side. (There are also documentation updates, which should
+   help.) Copy over information from your existing configuration file
+   to the sample, then save.
+
+ - Add:
+
+    {dir}{template} => '$BASE/template'
+
+    You can store templates here specific to your website and refer to
+    them by template name only.
+
+ - Move:
+
+    {db_info}
+
+   to:
+
+    {db_info}{main}
+
+ - Add:
+
+    {default_connection_db} => 'main'
+
+ - If you're using LDAP, add:
+
+    {default_connection_ldap} => 'main'
+    {ldap_info}{main} => { ...params...}
+
+ - Add:
+
+    {cache}{template}{expires} => 900
+
+ - If you're using MySQL as a session store, change:
+
+     {system_alias}{'OpenInteract::Session::MySQL'} => [ 'session' ]
+
+   to be:
+
+     {system_alias}{'OpenInteract::Session::DBI'}   => [ 'session' ]
+
+
+ - Add:
+
+     {default_objects}{superuser}  => 1
+     {default_objects}{supergroup} => 1
+
+ - Add:
+
+     {id}{user_type}  => 'int'
+     {id}{group_type} => 'int'
+
+    If you're using LDAP, use 'char' instead of 'int'
+
+
+==============================
+UPGRADING FROM 1.06 (AND EARLIER)
+==============================
+
+--------------------
+Table schema changes (field renaming):
+
+  sys_security:
+
+     oid     --> object_id
+     level   --> security_level
+
+  object_track:
+
+     oid     --> object_id
+
+
+--------------------
+Add the line:
+
+  config_type  perl
+
+to your 'conf/base.conf' file.
+
+--------------------
+In 'conf/server.perl'
+
+Add the configuration keys:
+
+  db_info => {
+    sql_install   => '',
+    long_read_len => 65536,
+    long_trunc_ok => 0,
+  }
+
+Change the configuration key:
+
+  system_alias => {
+    'OpenInteract::Cookies' => [ qw/ cookies / ],
+  }
+
+to
+
+  system_alias => {
+    'OpenInteract::Cookies::Apache' => [ qw/ cookies / ],
+  }
+
+ 
+
+==============================
+UPGRADING FROM 1.05 (AND EARLIER)
+==============================
+
+--------------------
+SPOPS/MySQL changes:
+
+If the website authors do not upgrade to the new packages and use the
+'AUTO_INCREMENT' feature of MySQL, they need to add the following line
+to the SPOPS configuration (conf/spops.conf in a package directory)
+for each object:
+
+  increment_field => 1,
+
+The packages distributed with OpenInteract all have this change.
+
+
+--------------------
+Package Repository:
+
+Version 1.06 and higher use an entirely different package repository
+format, so you'll need to do some extra work. (Don't worry, it's not
+much and you only need to do it once.)
+
+To do the upgrade:
+
+ 1) Download the distribution.
+
+ 2) Do the normal Perl install:
+
+  > cd OpenInteract-1.xx/
+  > perl Makefile.PL
+  > make
+  > make test
+  > make install
+
+ 3) Do the upgrade:
+
+  > oi_manage upgrade --base_dir=/path/to/installation
+
+The upgrade should tell you that it has upgraded the base installation
+package repository to the new version. Now you need to upgrade the
+package repository for all the websites:
+
+  > oi_manage upgrade_website_repository --website_dir=/path/to/website
+
+While this should be a seamless upgrade, you MUST restart the Apache
+process to have the changes take effect.
+
+
+========================================
+$Id: UPGRADE,v 1.21 2003/08/13 01:54:43 lachoy Exp $

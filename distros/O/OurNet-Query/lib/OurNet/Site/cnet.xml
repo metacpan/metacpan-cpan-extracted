@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<SITE ID="Cnet">
+
+<NAME Lang="en-us">Search.com</NAME>
+<INFO Lang="en-us">general information web search</INFO>
+
+<URL Type="More"><![CDATA[
+http://search.cnet.com_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://search.cnet.com/Infoseek/1,135,0,0200.html?QUERY=_QUERY_&COLL=WW
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_NEXT_"><![CDATA[
+<A HREF="_NEXT_"><font size=-1 face=Arial, Helvetica>Next
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<li>___<a HREF="_URL_">_TITLE_</a><br>_PREVIEW_</font>.___</li>
+]]></TEMPLATE>
+</SITE>

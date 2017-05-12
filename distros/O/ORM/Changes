@@ -1,0 +1,123 @@
+Revision history for Perl extension ORM.
+
+0.85
+    - Fixed ORM::Expr->_not 
+
+0.84
+    - Fixed Metaprop builder
+    - Fixed overload. Added shorthand methods.
+    - Fixed ORM::Const->tjoin()
+    - Little comment
+    - Optional nontransactional tables support for MySQL. Fixed strings quoting.
+    - Transactions fix + 1st approximation of nested transactions in eval statements.
+    - Temporary objects support
+
+0.83.3
+    - Fixed v0.83.2 error with transactions handlng
+
+0.83.2
+    - Updated Existing documentation
+    - Absence of 'weaken' support is not fatal now
+
+0.83.1
+    - Use transactions in methods of ORM::Db::DBI: 'insert_object',
+      'update_object', 'delete_object'
+    - Improved foreign keys emulation
+    - Fixed few bugs in PgSQL driver
+    - Added 'method' option to ORM::_validate_prop
+    - Added ORM::_rev alias to ORM::_rev_prop
+    - Added ORM::_rev_count alias to ORM::_rev_prop_count
+    - Added ORM::_prop alias to ORM::_property
+    - Added ORM::_prop_id alias to ORM::_property_id
+    - Updated Existing documentation
+
+0.83
+    - ORM::Db::DBI::PgSQL storage driver implemented
+    - Allowed use of multiple object models in one program
+    - several ORM::Expr class-methods now can be called as object
+      methods as well
+    - ORM::Error::short_text() added
+    - Existing documentation updated
+
+0.82.2
+    - Documentation updates and fixes
+
+0.82.1
+    - Error handling using 'upto' method
+    - Little bit more documentation added
+
+0.82
+    - ORM/Tuturial.pod is almost finished
+
+0.81
+    - Added support of 'preload' argument to ORM::Stat
+    - Added support of predefined 'post_filter' to ORM::Stat
+    - Added 'cond' (additonal condition) option to ORM::Metaprop->_rev_expand
+    - Special case handled in 'ORM::Metaprop::new' when method called for
+      class 'ORM::Metaprop'
+    - Added support of meta-properties of 'ORM::Stat' descendants
+    - Added methods 'ORM::_rev_prop' and 'ORM::_rev_prop_count'
+    - Complete some more chapters in ORMtut.pod
+    - Fixed several mistakes in ORMtut.pod
+    - Fixed ORM::Base::import fatal error when ORM::History is disabled
+    - Fixed some warnings in ORM.pm
+
+0.8  Sun Dec  4 18:47:22 2005
+    New features:
+    - Implemented reverse properties
+    - Implemented object linking on arbitrary properties
+    - Modified '_db_type_to_class' to accepts field_name and field_type
+      arguments
+    - Implemented transactions
+    - Modified ORM->stat to add ability to load several objects by one query
+    - Applied cache in ORM::Db::DBI->select_full
+    - Implemented object cache
+    - Denied use of intermediate classes without their own tables, because
+      in opposite case when exist 2 intermediate classes derived from one
+      base class then search through one of child classes also finds
+      objects of second class.
+    - Implemented use of ORM::Expr with 'update'
+    - Added SQL logging feature to ORM::Db
+    - Implemented separate layer for DB operations
+    - Implemented autoreconnect to SQL server after "Mysql server has gone away"
+    - Added method ORM->stat()
+    - Added feature to use sealed classes (when primary table does not contain
+      class field)
+    - Added argument lazy_load to ORM->stat(), which allows to use lazy
+      loaded objects
+    - Implemented lazy loaded objects, two variants:
+      - variant 1: known only 'id' and nothing loaded
+      - variant 2: loaded only tables of primary class
+    - Allowed use of third party classes as object properties
+    - Calculated meta-properties (ORM::Metaprop incapsulates ORM::Expr)
+    - ORM should log changes history via ORM::History
+    - Initial class configuration:
+      - global parameter 'history_is_enabled'
+      - posibility to enable/disable hostory on per class basis
+      - global parameter 'emulate_foreign_keys'
+      - method 'new', 'update', 'delete' should accept argument
+        to enable/disable history for particular operation
+    - Implemented object changes history
+    - Produce separate initial class from ORM for every separate object model
+    - Use ORM::Db->qt to quote table names, ORM::Db->qf to quote field names,
+      ORM::Db->qi to quote aliases
+    - Use ORM::Db->qi to quote table names and field names
+    - Added redefineable method ORM->_db_type_to_class
+
+    Fixes:
+    - Deleted method ORM::Metaprop->_expanded
+    - Reimplement table joins
+    - Fixed automatic loading of related modules
+    - Modified 'update' method
+      - Wrong compare of properties:
+        $arg{prop}->{$prop} ne $self->{_ORM_data}->{$prop}
+      - add check, whether object was changed after it was fetched from DB
+      - ability to update objetc only when its properties are equal
+        to those assumed by user
+    - Fixed _validate_prop
+    - Fixed ORM::Tjoin
+    - ORM::History->rollback should delete rolled back history entries from
+      'history' table
+    - Replaced calls to isa to UNIVERSAL::isa
+    - Stop using obsoletted ORM::db_auth
+    - Move automatic init of 'cdate' properties from ORM to my initial class;

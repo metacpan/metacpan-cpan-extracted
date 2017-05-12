@@ -1,0 +1,27 @@
+<html>
+  <head>
+    <title>Welcome to AppKit</title>
+  </head>
+  <body bgcolor="#ffffff" text="#000000">
+    <h1>Congratulations [% app.name %]</h1>
+    <p>
+      If you can see this message, you have successfully installed the AppKit OpenFrame extension!
+    </p>
+    <p>
+      [% IF app.name %]
+      [% app.name %], why not try playing <a href="/hangman/">hangman?</a>.
+      [% END %]
+    </p>
+    <p>
+      [% UNLESS app.name %]
+      <form method="POST">
+        Why not try a simple application?
+	<p/>
+	What is your name: <input type='text' name='name'><input type="submit">
+      </form>
+      [% END %]
+    </p>
+    <hr>
+    <i>OpenFrame running AppKit 1.00</i>
+  </body>
+</html>

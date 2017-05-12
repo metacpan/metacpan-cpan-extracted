@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<SITE ID="Gais.News.Fuzzy">
+
+<NAME Lang="en-us">GAIS Fuzzy Search</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+GAIS 台灣 BBS/NEWS 自然語言搜尋
+]]></NAME>
+<INFO Lang="en-us">bbs/news search fuzzily in Taiwan</INFO>
+<INFO Lang="zh-tw">bbs/news search fuzzily in Taiwan</INFO>
+
+<URL Type="More"><![CDATA[
+http://sunsite.ccu.edu.tw:8080_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://sunsite.ccu.edu.tw:8080/cgi-bin/n_search.cgi?QUERY=_QUERY_&FUZZY=1&TYPE=%A5%FE%B3%A1&LINE=_HITS_&BOARD=ALL
+]]></URL>
+
+<SCORE>_SCORE_/10</SCORE>
+
+<VAR Name="_NEXT_"><![CDATA[
+<A HREF="_NEXT_">下一頁</A>]
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<tr><td align=right>___</td>_DATE_<a href=___<a href=news://___</a>___<a href=_URL_>_TITLE_</a>_SCORE_</td></tr>
+]]></TEMPLATE>
+</SITE>

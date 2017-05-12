@@ -1,0 +1,55 @@
+TestDB {
+  John => ObjStore::HV (1) {
+     => 'zero',
+    a => ObjStore::AV (1) [
+    ],
+    fatty => ObjStore::AV (1) [
+      undef,
+      32761,
+      32762,
+      ...
+      32850, (at 90)
+    ],
+    h => ObjStore::HV (1) {
+    },
+    heap => ObjStore::Index (1) (0) [
+    ],
+    junk_in_seg => ObjStore::HV (1) {
+      nums => ObjStore::AV (1) [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+      ],
+      sptr => ObjStore::Ref (1) => ObjStore::HV ...
+      strs => ObjStore::HV (1) {
+        a => 'b',
+        c => 'd',
+        e => 'f',
+        g => 'h',
+        i => ObjStore::AV (1) [
+          'a',
+          1,
+        ],
+      },
+    },
+
+    obj => PTest (1) {
+      is => 1,
+    },
+    right => 69,
+
+  },
+  tripwire => ObjStore::HV (1) {
+  },
+},
+count = 156

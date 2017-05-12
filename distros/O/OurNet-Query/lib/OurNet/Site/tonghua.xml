@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<SITE ID="Tonghua">
+
+<NAME Lang="zh-cn"><![CDATA[
+常青藤
+]]></NAME>
+<NAME Lang="en-us">tonghua</NAME>
+<NAME Lang="zh-tw">盽獵妹 (い瓣嘲)</NAME>
+<INFO Lang="zh-cn">general information web search in Mainland China</INFO>
+<INFO Lang="en-us">general information web search in Mainland China</INFO>
+<INFO Lang="zh-tw">general information web search in Mainland China</INFO>
+
+<URL Type="More"><![CDATA[
+_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://search.tonghua.com.cn/bin/search?p=_QUERY_
+]]></URL>
+
+<CHARSET>zh-cn</CHARSET>
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_NEXT_"><![CDATA[
+</ul><center><font size="+1"><a href="_NEXT_">与 <strong> <B>win</B> </strong>一 致 的 后 面 20 条 目
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<LI><A HREF="_URL_">_TITLE_</A>___-_PREVIEW_<
+]]></TEMPLATE>
+</SITE>

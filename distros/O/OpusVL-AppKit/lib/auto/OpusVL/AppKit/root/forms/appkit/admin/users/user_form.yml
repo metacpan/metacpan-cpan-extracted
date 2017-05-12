@@ -1,0 +1,57 @@
+
+---
+indicator: submitbutton
+auto_fieldset: 1
+
+elements:
+
+  - type: Text
+    name: username
+    label: Username
+    constraints:
+      - Required
+      - type: '+OpusVL::AppKit::FormFu::Constraint::AppKitUsername'
+        user_stashkey: thisuser
+
+  - type: Password
+    name: password
+    label: Password
+    model_config:
+      read_only: 1
+    constraints:
+      - type: '+OpusVL::AppKit::FormFu::Constraint::AppKitPassword'
+
+  - type: Text
+    name: name
+    label: Name
+    constraints:
+      - Required
+
+  - type: Text
+    name: email
+    label: Email
+    constraints:
+      - Required
+
+  - type: Text
+    name: tel
+    label: Telephone
+    constraints:
+      - Required
+
+  - type: Radiogroup
+    name: status
+    options:
+       - [ 'enabled',   'Enabled' ]
+       - [ 'disabled',  'Disabled' ]
+       - [ 'deleted',   'Deleted' ]
+    constraints:
+      - Required
+
+  - type: Submit
+    value: Save
+    name: submitbutton
+
+constraints:
+  - SingleValue
+

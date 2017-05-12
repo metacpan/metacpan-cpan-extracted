@@ -1,0 +1,8 @@
+* Make User management UI
+* Have 'users' table 
+* Install templates, images and cgi in a shared directory
+* Write a utility to setup, upgrade and init everything
+* Make the formatter pluggable
+* Pass the config object into the templates and use that.
+
+

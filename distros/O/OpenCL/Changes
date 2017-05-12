@@ -1,0 +1,166 @@
+Revision history for Perl extension OpenCL.
+
+TODO: some convenience methods maybe?
+TODO: async compile/link
+TODO: async $ctx->build_program
+
+1.01 Mon May  7 03:00:53 CEST 2012
+        - missing symbols are again exported with a 0 default value.
+	- do not try to use cl_d3d9.h - the d3d9 extension has been abondoned by khronos.
+
+1.0  Sat May  5 18:43:54 CEST 2012
+	- OpenCL 1.2 is now effectively feature complete (but hardly tested).
+        - mapping a 1d image with default height now works.
+	- implement these 1.2 functions:
+          $device->sub_devices,
+	  $ctx->program_with_built_in_kernels,
+          $ctx->link_program,
+          $program->compile,
+          $kernel->arg_info (and all 5 accessor methods),
+	  $queue->migrate_mem_objects.
+        - implement OpenCL::context.
+        - implement $memory->destructor_callback.
+        - new methods: $mappedimage->get_row/set_row/width/height/depth/element_size.
+        - remove $kernel->set_image[23]d.
+        - add most enum and bitfield symbols to the manpage, for quick reference.
+        - default all constants to -1, instead of having them missing.
+        - try hard to get d3d definitions, when/if possible.
+        - add numerical limits and floating point constants from cl_platform.h.
+        - unify C types for accessors, for further code size decrease.
+
+0.99 Fri May  4 01:31:15 CEST 2012
+	- OpenCL 1.1 is now effectively feature complete.
+	- work around a bug in the nvidia implementation, where build fails with
+          INVALID_BINARY if the compiler runs succesfully but ptxas fails.
+        - explicitly check for 0 size dimensions in nd_range_kernel, as nvidia
+          crashes (and OpenCL probably allows this behaviour).
+        - actually report clSetKernelArg errors in ("OpenCL::Kernel::setf.
+        - setf properly can now properly set local arguments ('z').
+        - using undef to pass null memory buffers now works in set_xxx.
+        - release_gl_texture was missing.
+        - fix/improve/balance gl sharing example.
+        - added non-opengl sharing opengl example.
+        - fixed some documentation links.
+        - fixed a bug where enqueue operations with optional parameters at the
+          end not specified would crash.
+        - implemented clEnqueueMapBuffer/Image/UnmapMemObject, and a "mapped object"
+          abstraction.
+        - both context_from_type methods now properly pass the notify callback.
+        - $platform->context now properly passes CL_CONTEXT_PLATFORM again.
+        - implement clCreateProgramWithBinary.
+        - speed up object constructions by not looking up stashes.
+        - use libebc for fine-tuning.
+        - reduce codesize considerably by disabling inlining on some functions.
+        - speed up many method calls on objects with no subclasses.
+
+0.98 Sat Apr 28 15:31:46 CEST 2012
+	- INCOMPATIBLE CHANGE: $prog->build now wants an array of devices, or undef.
+        - INCOMPATIBLE CHANGE: $queue->enqueue_xxx methods have been renamed to just
+          $queue->xxx, the enqueue_ prefix has been deprecated.
+        - INCOMPATIBLE CHANGE: use ->set_image to set kernel args, ->image[23]d have
+          been deprecated.
+        - new $kernel->setf function to set kernel arguments in one go.
+        - (optional, automatic) anyevent integration.
+        - implement an event queue, use Async::Interrupt for communication.
+        - implement context notification callbacks (untested).
+	- provide a default context notification function that prints to stderr.
+        - implement event callback notifications.
+        - implement build program notifications.
+        - implement an asynchronous program build function.
+        - $ctx->build_program now distinguishes between wrong build invocations
+          and build failures.
+
+0.97 Tue Apr 24 16:56:21 CEST 2012
+	- created $ctx->build_program utility function.
+	- enqueue_acquire/release_gl_objects did not return an event object.
+        - OpenCL::errno did not return the correct value.
+	- allow undef values in event wait lists, for convenience.
+        - implement $program->kernels_in_program.
+        - add opencl 1.2 constants.
+        - implement $ctx->image, $ctx->gl_texture, $platform->unload_compiler,
+          $queue->enqueue_fill_buffer/image, all untested (opencl 1.2).
+        - port image2d and image3d to the opencl 1.2 API.
+        - port enqueue_marker/barrier to the opencl 1.2 API, and croak
+          if the user requests something that 1.1 cannot do when compiled
+          against 1.1. This slightly changes the API for enqueue_barrier,
+          which now checks the context it is called in.
+        - add ->format accessor for CL_IMAGHE_FORMAT.
+	- $object->id function to access internal object id.
+
+0.96 Fri Apr 20 22:23:58 CEST 2012
+        - ->enqueue_write_buffer actually called enqueue_read_buffer. d'oh.
+	- new $kernel->set_local function, to size local buffer arguments.
+	- use finish, not flush, in examples.
+
+0.95 Thu Apr 19 21:25:32 CEST 2012
+	- add lengthy opengl sharing example.
+	- support property lists in CreateContext* calls.
+        - support some opengl sharing extensions
+          (gl_buffer, gl_texture[23]d, gl_renderbuffer).
+        - support some cl_khr_gl_sharing extensions.
+        - add some extension constants (cl_gl.h cl_ext.h, cl_d3d10.h).
+        - auto-generate error codes (and include gl+d3d extensions).
+
+0.92 Mon Apr 16 08:39:21 CEST 2012
+	- work around some bugs in amd's opencl implementation (INVALID_HOST_PTR
+          when value deosn't matter).
+	- minor documentation fix (patch by Maik Hentsche).
+
+0.91 Sun Dec 11 00:05:02 CET 2011
+	- introduce $buffer_obj->sub_buffer_region method and a new class, OpenCL::BufferObj
+          for a subbuffer is a buffer without sub_buffer methods!
+        - support apple using a different location for opencl headers - untested.
+        - be more strict when passing event lists.
+
+0.59 Tue Nov 22 11:44:32 CET 2011
+	- provide $program->binaries method.
+        - provide $queue->enqueue_read_buffer_rect method.
+        - provide $queue->enqueue_write_buffer_rect method.
+	- coalesce like-typed accessor methods into the same xs function and
+          multiple ALIASes - this reduces the OpenCL codesize from 162kb to
+          132kb on my system.
+        - minor doc improvements.
+
+0.55 Sun Nov 20 11:19:25 CET 2011
+	- semi-automatically generate query methods for almost all clGet*Info names.
+	- provide cl_ext.h constants.
+        - provide OpenCL::Image->image_info method.
+        - provide OpenCL::Event->profiling_info method.
+        - provide OpenCL::Kernel->work_group_info method.
+
+0.15 Thu Nov 17 07:22:11 CET 2011
+	- include slice_pitch in enqueue_write_image (can be 0).
+        - check length in enqueue_write_image.
+        - properly calculate size in enqueue_read_image.
+        - likewise, include row_pitch and slice_pitch in image2d and image3d,
+          which must be nonzero right now, too, sorry.
+        - allow undef or missing data scalar for image2d and image3d.
+	- fix enqueue_copy_image prototype.
+        - fix formatting.
+
+0.14 Thu Nov 17 04:04:23 CET 2011
+	- major incompatibilities due to API cleanup, the API should now be
+          mostly stable, if incomplete.
+	- fix prerequisites.
+	- replaced all _simple functions by "full" implementations, with some
+          parameters marked for future expansion - that means their API
+          should be stable from now on:
+             OpenCL::context_from_type_simple    => OpenCL::context_from_type
+             $platform->context_from_type_simple => $platform->context_from_type
+             $dev->context_simple                => $platform->context
+             $ctx->command_queue_simple became   => $ctx->queue
+        - add OpenCL::context function.
+        - officially require C99.
+        - errno value is unspecified after a successful call.
+
+0.03  Wed Nov 16 01:44:26 CET 2011
+	- add some reference documentation for all functions.
+        - add user event support.
+        - implement event wait lists.
+
+0.02  Tue Nov 15 22:15:47 CET 2011
+	- first opencl kernel executed, some example code.
+
+0.01  Tue Nov 15 05:59:00 CET 2011
+	- cloned from Convert::Scalar.
+

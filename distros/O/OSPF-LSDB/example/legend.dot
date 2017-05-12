@@ -1,0 +1,250 @@
+digraph "ospf legend" {
+	node [ color=gray50 fontsize=14 ];
+	edge [ color=gray50 fontsize=8  ];
+	router0 -> network0 -> edgerouter0 [ style=invis ];
+	edgenetwork0 -> linkrouter0 [ style=invis ];
+	linkdst0 -> summarynetwork0 [ style=invis ];
+	router0 [
+		style="solid"
+		shape="box"
+		label="ospf\nrouter"
+	];
+	router1 [
+		peripheries="2"
+		style="solid"
+		shape="box"
+		label="current\nlocation"
+	];
+	router2 [
+		style="bold"
+		shape="box"
+		label="area border\nrouter"
+	];
+	router3 [
+		style="dashed"
+		shape="box"
+		label="summary AS\nboundary router"
+	];
+	{ rank=same; router0; router1; router2; router3; }
+	network0 [
+		style="bold"
+		shape="ellipse"
+		label="transit\nnetwork"
+	];
+	network1 [
+		style="solid"
+		shape="ellipse"
+		label="stub\nnetwork"
+	];
+	network2 [
+		style="dashed"
+		shape="ellipse"
+		label="summary\nnetwork"
+	];
+	network3 [
+		color="gray35"
+		style="solid"
+		shape="egg"
+		label="AS external\nnetwork"
+	];
+	{ rank=same; network0; network1; network2; network3; }
+	edgenetwork0 [
+		style="solid"
+		shape="ellipse"
+		label="network"
+	];
+	edgenetwork1 [
+		style="bold"
+		shape="ellipse"
+		label="transit\nnetwork"
+	];
+	edgenetwork2 [
+		color="gray35"
+		style="solid"
+		shape="egg"
+		label="ASE type 1\nnetwork"
+	];
+	edgenetwork3 [
+		color="gray35"
+		style="solid"
+		shape="egg"
+		label="ASE type 2\nnetwork"
+	];
+	edgerouter0 [
+		style="solid"
+		shape="box"
+		label="router"
+	];
+	edgerouter1 [
+		style="solid"
+		shape="box"
+		label="designated\nrouter"
+	];
+	edgerouter2 [
+		style="solid"
+		shape="box"
+		label="AS boundary\nrouter"
+	];
+	edgerouter3 [
+		style="solid"
+		shape="box"
+		label="AS boundary\nrouter"
+	];
+	edgerouter0 -> edgenetwork0 [
+		taillabel="cost"
+		style="solid"
+		headlabel=".IP"
+	];
+	edgenetwork1 -> edgerouter1 [
+		taillabel=".IP"
+		style="bold"
+	];
+	edgenetwork2 -> edgerouter2 [
+		taillabel=".IP"
+		color="gray35"
+		style="solid"
+		headlabel="cost"
+	];
+	edgenetwork3 -> edgerouter3 [
+		taillabel=".IP"
+		color="gray35"
+		style="dashed"
+		headlabel="cost"
+	];
+	{ rank=same; edgerouter0; edgenetwork1; edgenetwork2; edgenetwork3; }
+	linkrouter0 [
+		style="solid"
+		shape="box"
+		label="router"
+	];
+	linkrouter1 [
+		style="solid"
+		shape="box"
+		label="router"
+	];
+	linkrouter2 [
+		style="solid"
+		shape="box"
+		label="designated\nrouter"
+	];
+	linkrouter3 [
+		style="solid"
+		shape="box"
+		label="router"
+	];
+	linkrouter4 [
+		style="solid"
+		shape="box"
+		label="router"
+	];
+	linkdst0 [
+		style="solid"
+		shape="box"
+		label="router"
+	];
+	linkdst1 [
+		style="bold"
+		shape="ellipse"
+		label="transit\nnetwork"
+	];
+	linkdst2 [
+		style="bold"
+		shape="ellipse"
+		label="transit\nnetwork"
+	];
+	linkdst3 [
+		style="solid"
+		shape="ellipse"
+		label="stub\nnetwork"
+	];
+	linkdst4 [
+		style="solid"
+		shape="box"
+		label="router"
+	];
+	linkrouter0 -> linkdst0 [
+		style="solid"
+		label="point-to-point\nlink"
+	];
+	linkrouter1 -> linkdst1 [
+		style="solid"
+		label="link to\ntransit network"
+	];
+	linkrouter2 -> linkdst2 [
+		style="bold"
+		label="link to\ntransit network"
+	];
+	linkrouter3 -> linkdst3 [
+		style="solid"
+		label="link to\nstub network"
+	];
+	linkrouter4 -> linkdst4 [
+		style="dotted"
+		label="virtual\nlink"
+	];
+	{ rank=same; linkrouter0; linkrouter1; linkrouter2; linkrouter3; linkrouter4; }
+	summarynetwork0 [
+		style="dashed"
+		shape="ellipse"
+		label="summary\nnetwork"
+	];
+	summarynetwork1 [
+		style="dashed"
+		shape="box"
+		label="summary AS\nboundary router"
+	];
+	summarynetwork2 [
+		style="solid"
+		shape="box"
+		label="router and summary \nAS boundary router"
+	];
+	summarynetwork3 [
+		color="gray35"
+		style="solid"
+		shape="egg"
+		label="ASE\nnetwork"
+	];
+	summaryrouter0 [
+		style="bold"
+		shape="box"
+		label="area border\nrouter"
+	];
+	summaryrouter1 [
+		style="bold"
+		shape="box"
+		label="area border\nrouter"
+	];
+	summaryrouter2 [
+		color="black"
+		style="bold"
+		shape="box"
+		label="area border\nrouter"
+	];
+	summaryrouter3 [
+		color="gray35"
+		style="dashed"
+		shape="box"
+		label="summary AS\nboundary router"
+	];
+	summarynetwork0 -> summaryrouter0 [
+		taillabel=".IP"
+		style="dashed"
+		headlabel="cost"
+	];
+	summarynetwork1 -> summaryrouter1 [
+		style="dashed"
+		headlabel="cost"
+	];
+	summarynetwork2 -> summaryrouter2 [
+		color="gray75"
+		style="dashed"
+		headlabel="cost"
+	];
+	summarynetwork3 -> summaryrouter3 [
+		taillabel=".IP"
+		color="gray35"
+		style="solid"
+		headlabel="cost"
+	];
+	{ rank=same; summarynetwork0; summarynetwork1; summarynetwork2; summarynetwork3; }
+}

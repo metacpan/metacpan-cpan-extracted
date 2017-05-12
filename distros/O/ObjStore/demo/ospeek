@@ -1,0 +1,41 @@
+#!/nw/dev/usr/bin/perl -w
+
+package Posh;  #is this the right solution?
+use strict;
+use ObjStore ':ADV';
+use ObjStore::Peeker;
+use Getopt::Long;
+use IO::Handle;
+
+#ObjStore::debug 'PANIC';
+ObjStore::fatal_exceptions(0);
+
+sub usage {
+    print "usage: ospeek [-I dir] [-all] [-addr] [-refcnt] [-raw] <database>\n";
+    exit;
+}
+
+my %opt=();
+GetOptions(\%opt, 'all', 'addr', 'refcnt', 'raw', 'I=s@') or &usage;
+&usage if @ARGV != 1;
+
+for (@{$opt{I}}) { unshift(@INC, $_); }
+
+my $path = shift @ARGV;
+
+my $fh = new IO::Handle;
+$fh->fdopen(fileno(STDOUT),"w") or die "fdopen(STDOUT): $!";
+
+my $db = ObjStore::open($path, 'mvcc');
+begin sub {
+    my $pk = new ObjStore::Peeker(to => $fh, all => $opt{all}, addr => $opt{addr},
+				  refcnt => $opt{refcnt}, pretty => !$opt{raw});
+    $pk->Peek($db);
+    my $count = $pk->Coverage;
+    print $fh "Examined $count persistent slots.\n";
+};
+if ($@) {
+    warn $@;
+    warn "(You might try using 'posh' instead.)\n";
+}
+$fh->flush;

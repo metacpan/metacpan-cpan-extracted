@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<SITE ID="Cade">
+
+<NAME Lang="en-us">Cade? Search</NAME>
+<INFO Lang="en-us">general information web search in Brazil</INFO>
+
+<URL Type="More"><![CDATA[
+_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://busca.cade.com.br/scripts/engine.exe?p1=_QUERY_&p2=1&p3=1
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_NEXT_"><![CDATA[
+<A HREF=_NEXT_>Próxima
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<LI><A HREF="_URL_">_TITLE_</A> -_PREVIEW_.<BR>
+]]></TEMPLATE>
+</SITE>

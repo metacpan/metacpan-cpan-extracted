@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<SITE ID="Dokoda">
+
+<NAME Lang="en-us">DOKODA Search</NAME>
+<INFO Lang="en-us">general information web search in Japan</INFO>
+
+<URL Type="More"><![CDATA[
+http://www.dokoda.com_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+post://www.dokoda.com/scripts/alisesrc.dll?MAINDIR=d:\inetpub\wwwroot\moshix2\ALISE&MAINURL=/ALISE&failed=http://www.dokoda.com/failed.htm&RETURNURL=http://www.dokoda.com/index.htm&type=or&search_string=_QUERY_&NUMBER=0&END=END
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_NEXT_"><![CDATA[
+<font size="+1"><b><a href="_NEXT_">
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<table border=0>___<a href="_URL_">_TITLE_</a>___align="left">_PREVIEW_</td>___</table>
+]]></TEMPLATE>
+</SITE>

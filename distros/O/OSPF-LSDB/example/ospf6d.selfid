@@ -1,0 +1,12 @@
+Router ID: 10.188.1.10
+Uptime: 04:15:32
+SPF delay is 1 sec(s), hold time between two SPFs is 5 sec(s)
+Number of external LSA(s) 12
+Number of areas attached to this router: 1
+
+Area ID: 10.188.0.0
+  Number of interfaces in this area: 3
+  Number of fully adjacent neighbors in this area: 1
+  SPF algorithm executed 5 time(s)
+  Number LSA(s) 5
+

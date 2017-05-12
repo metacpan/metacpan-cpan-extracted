@@ -1,0 +1,70 @@
+---
+name: OurCal
+version: 1.2
+author:
+  - 'Simon Wistow <simon@thegestalt.org>'
+abstract: a simple yet featureful personal calendaring system
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  CGI: 0
+  CGI::Carp: 0
+  Carp: 0
+  Config::INI::Reader: 0
+  DBI: 0
+  Data::ICal::DateTime: 0
+  Data::ICal::Entry::Event: 0
+  DateTime: 0
+  DateTime::Span: 0
+  Digest::MD5: 0
+  File::Path: 0
+  File::Spec: 0
+  HTTP::Date: 0
+  LWP::Simple: 0
+  Lingua::EN::Numbers::Ordinate: 0
+  Module::Pluggable: 0
+  Storable: 0
+  Template: 0
+  Test::More: 0.62
+  Text::Chump: 0
+  UNIVERSAL::require: 0
+  URI::Find::Simple: 0
+provides:
+  OurCal:
+    file: lib/OurCal.pm
+    version: 1.2
+  OurCal::Config:
+    file: lib/OurCal/Config.pm
+  OurCal::Day:
+    file: lib/OurCal/Day.pm
+  OurCal::Event:
+    file: lib/OurCal/Event.pm
+  OurCal::Handler::CGI:
+    file: lib/OurCal/Handler/CGI.pm
+  OurCal::Month:
+    file: lib/OurCal/Month.pm
+  OurCal::Provider:
+    file: lib/OurCal/Provider.pm
+  OurCal::Provider::Cache:
+    file: lib/OurCal/Provider/Cache.pm
+  OurCal::Provider::DBI:
+    file: lib/OurCal/Provider/DBI.pm
+  OurCal::Provider::ICalendar:
+    file: lib/OurCal/Provider/ICalendar.pm
+  OurCal::Provider::Multi:
+    file: lib/OurCal/Provider/Multi.pm
+  OurCal::Span:
+    file: lib/OurCal/Span.pm
+  OurCal::Todo:
+    file: lib/OurCal/Todo.pm
+  OurCal::View:
+    file: lib/OurCal/View.pm
+  OurCal::View::HTML:
+    file: lib/OurCal/View/HTML.pm
+  OurCal::View::ICalendar:
+    file: lib/OurCal/View/ICalendar.pm
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

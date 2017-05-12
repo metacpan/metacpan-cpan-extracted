@@ -1,0 +1,76 @@
+[%- 
+
+    # This is basically where we look at the 'features' hash to see what features have 
+    # been told to turn on/off.
+    # If a feature is turned on, it means css, javascript inc. and javascript source
+    # are included in the header.
+    # To manipulate the header we just change the 'header' hash which we know is used in the wrapper.tt.
+
+IF features.appkitfeature_stdcss;
+    header.css.list.push( "/static/css/layout.css");
+    header.css.list.push( "/static/css/skin.css");
+    header.css.list.push( "/static/css/appnav.css");
+    header.css.list.push( "/static/css/units.css");
+    header.css.list.push( "/static/css/vader/jquery-ui-1.9.0.custom.min.css");
+    SET notifications = c.controller('Modules::Notifications');
+    IF notifications && c.can_access(notifications.action_for('feed'));
+        IF c.config.application_style;
+            header.css.list.push( "/static/css/notification.css");
+        ELSE;
+            header.css.list.push( "/static/css/notification_intranet.css" );
+        END;
+    END;
+    header.css.list.push( "/static/css/overrides.css");
+END;
+
+IF features.appkitfeature_htmleditor;
+    header.js.list.push( "/static/js/wymeditor/jquery.wymeditor.min.js");
+-%]
+[%- htmleditor_jssrc = BLOCK -%]
+    $(function() {
+        $(':submit').addClass('wymupdate');
+        $('.htmleditor').wymeditor({skin:'silver'});
+    });
+[%- END;
+    header.jssrc.list.push(  htmleditor_jssrc );
+END;
+
+IF features.appkitfeature_tablesorter;
+    header.js.list.push( "/static/js/jquery.tablesorter.min.js");
+    header.js.list.push( "/static/js/tablesorter-date-parser.js");
+    header.css.list.push( "/static/css/tablesorter/style.css");
+-%]
+[%- tablesorter_jssrc = BLOCK -%]
+    $(function() {
+        $(".tablesorter").each(function(){
+            var table = $(this);
+            table.tablesorter();
+        });
+        $('.tablesorter th button,.tablesorter th select,.tablesorter th a,.tablesorter th input').closest('th').unbind();
+    });
+[%- END;
+    header.jssrc.list.push( tablesorter_jssrc );
+END;
+
+IF c.config.favicon;
+    header.favicon = c.config.favicon;
+END;
+
+
+    # END
+-%]
+[%- IF features.appkitfeature_splitselect;
+    header.js.list.push( "/static/js/jquery.sortBy.js");
+    header.js.list.push( "/static/js/jquery.split-select.js");
+    header.css.list.push( "/static/css/splitselect/style.css");
+-%]
+[%- splitselect_jssrc = BLOCK -%]
+
+    $(function() {
+        $('.split-select').each(function() {
+            $(this).splitSelect();
+        });
+    });
+[%- END; 
+    header.jssrc.list.push( splitselect_jssrc );
+END -%]

@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<SITE ID="Yam">
+
+<NAME Lang="en-us">Yam WWW Search</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+蕃薯藤台灣WWW搜尋(中英文)
+]]></NAME>
+<INFO Lang="en-us">general information web search in Taiwan</INFO>
+<INFO Lang="zh-tw">general information web search in Taiwan</INFO>
+
+<URL Type="More"><![CDATA[
+_MORE_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://www.yam.com.tw/b5/search/?p=1&k=_QUERY_
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_MORE_"><![CDATA[
+<p><a href="_MORE_">下 20 筆</a><p>
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+◆___href="_URL_">_TITLE_</a>___<dd>_PREVIEW_<
+]]></TEMPLATE>
+</SITE>

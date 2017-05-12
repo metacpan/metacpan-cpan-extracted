@@ -1,0 +1,110 @@
+---
+abstract: 'A complete web application for managing a collaboratively-written guide to a city or town.'
+author:
+  - unknown
+build_requires:
+  Class::Accessor: '0'
+  Config::Tiny: '0'
+  Data::Dumper: '0'
+  File::Path: '0'
+  Module::Build: '0.26'
+configure_requires:
+  Class::Accessor: '0'
+  Config::Tiny: '0'
+  Module::Build: '0.26'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4211, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: OpenGuides
+provides:
+  OpenGuides:
+    file: lib/OpenGuides.pm
+    version: '0.82'
+  OpenGuides::Build:
+    file: lib/OpenGuides/Build.pm
+    version: '0.04'
+  OpenGuides::CGI:
+    file: lib/OpenGuides/CGI.pm
+    version: '0.13'
+  OpenGuides::Config:
+    file: lib/OpenGuides/Config.pm
+    version: '0.10'
+  OpenGuides::Feed:
+    file: lib/OpenGuides/Feed.pm
+    version: '0.03'
+  OpenGuides::JSON:
+    file: lib/OpenGuides/JSON.pm
+    version: '0.05'
+  OpenGuides::RDF:
+    file: lib/OpenGuides/RDF.pm
+    version: '0.15'
+  OpenGuides::Search:
+    file: lib/OpenGuides/Search.pm
+    version: '0.15'
+  OpenGuides::Search::Lucy:
+    file: lib/OpenGuides/Search/Lucy.pm
+    version: '0.01'
+  OpenGuides::Template:
+    file: lib/OpenGuides/Template.pm
+    version: '0.21'
+  OpenGuides::Test:
+    file: lib/OpenGuides/Test.pm
+    version: '0.07'
+  OpenGuides::Utils:
+    file: lib/OpenGuides/Utils.pm
+    version: '0.20'
+recommends:
+  DBD::SQLite: '0'
+  Geo::HelmertTransform: '0'
+  Test::HTML::Content: '0'
+  Test::JSON: '0'
+  Test::Pod: '0'
+  Wiki::Toolkit::Plugin::Ping: '0'
+requires:
+  Algorithm::Diff: '0.13'
+  CGI: '4.08'
+  CGI::Carp: '0'
+  CGI::Cookie: '0'
+  Class::Accessor: '0'
+  Config::Tiny: '0'
+  DBD::SQLite: '0'
+  Data::Dumper: '0'
+  Data::Validate::URI: '0'
+  File::Spec::Functions: '0'
+  File::Temp: '0'
+  Geo::Coordinates::ITM: '0'
+  Geo::Coordinates::OSGB: '0'
+  Geo::Coordinates::UTM: '0'
+  HTML::Entities: '0'
+  JSON: '0'
+  LWP::Simple: '0'
+  List::Util: '0'
+  MIME::Lite: '0'
+  Net::Netmask: '0'
+  POSIX: '0'
+  Parse::RecDescent: '0'
+  Plucene: '0'
+  Template: '2.24'
+  Template::Plugin::JSON::Escape: '0'
+  Time::Piece: '0'
+  URI::Escape: '0'
+  Wiki::Toolkit: '0.84'
+  Wiki::Toolkit::Feed::Atom: '0'
+  Wiki::Toolkit::Feed::RSS: '0'
+  Wiki::Toolkit::Formatter::UseMod: '0.25'
+  Wiki::Toolkit::Plugin::Categoriser: '0'
+  Wiki::Toolkit::Plugin::Diff: '0'
+  Wiki::Toolkit::Plugin::JSON: '0.05'
+  Wiki::Toolkit::Plugin::Locator::Grid: '0'
+  XML::RSS: '0'
+resources:
+  IRC: irc://irc.perl.org/#openguides
+  MailingList: openguides-dev@lists.openguides.org
+  bugtracker: https://github.com/OpenGuides/OpenGuides/issues
+  homepage: http://openguides.org
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/OpenGuides/OpenGuides.git
+version: '0.82'

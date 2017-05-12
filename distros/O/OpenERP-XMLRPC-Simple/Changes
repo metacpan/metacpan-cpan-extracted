@@ -1,0 +1,25 @@
+Revision history for OpenERP-XMLRPC-Simple
+
+0.24      2016-09-03 14:29:51+01:00 Europe/London
+
+  * Fix issue #2: tests hang on Windows.
+  * Really fixed issue #1 this time.
+
+0.23      2016-09-02 11:56:40+01:00 Europe/London
+
+  * Fix #1: allow modules tests to be run in parallel, multiple times by 
+    removing contention on resources.  Port number is generated and temp
+    files are randomly located.
+
+0.22      2016-09-01 10:34:47+01:00 Europe/London
+
+  * Converted distribution to use our own Dist::Zilla author bundle.
+  * Allow write method to take extra parameters to allow context to be passed through.
+
+... various changes not properly recorded, except in git.
+
+0.13    Tue Aug 21, 2012
+  * Corrected license information
+
+0.12    Sat Aug 18, 2012
+  * First CPAN release

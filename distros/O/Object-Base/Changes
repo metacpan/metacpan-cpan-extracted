@@ -1,0 +1,68 @@
+1.15	2017-03-16
+		- README.pod moved in doc
+
+1.14	2017-03-06
+		- POD fixes
+		- Minimum Perl version setted v5.8.8
+
+1.13	2017-02-28
+		- POD & README changes
+
+1.12	2017-02-25
+		- POD changes
+
+1.11	2017-02-20
+		- Fixed bug for threads/forks switch
+		- Expanded tests
+
+1.10	2017-02-16
+		- Fix to 'Fails with all perls except 5.18.0..5.24.x'
+
+1.09	2017-02-15
+		- Object::Exception::dump_trace() indentation fix
+		- Object::Exception msg attribute calling as method
+		- Added $tracelevel in Object::Exception::throw()
+		- $msg arg of Object::Exception::throw() can be as a object of child class Object::Exception
+
+1.08	2017-02-12
+		- Added traceback, dump_trace functions in Object::Exception
+		- Attribute modifiers don't work with ':shared' feature
+
+1.07	2017-02-11
+		- Removed current_value in getter/setter
+
+1.06	2017-02-10
+		- Removed locks and key name check in Object::Base::TieHash::def() for performance
+		- Added individual attribute locks
+		- Improved general locks for thread-safety
+		- Die with 'Object::Base can not be imported at run-time'
+		- Calling Object::Base::attributes() at caller's attributes subroutine
+		- Removed some quotemeta for perfomance and they are not needed
+		- Added 'use SUPER;' for child classes
+		- Added shared_clone for default values if it needs
+		- Added 'not is_shared' condition at sub attr, FETCH, def
+		- Added Object::Exception
+
+1.05	2017-02-08
+		- Added DESTROY method for calling SUPER in parent overriding
+
+1.04	2017-02-07
+		- Object-based attribute locks
+		- Fix to modifiers
+
+1.03	2017-02-06
+		- Allowed attribute redefinition
+		- Added default/getter/setter attribute definitions
+		- Added ':lazy' special attribute
+		- Added internal attribute locks for thread-safety
+		- Added forks support for Perl not built to support threads
+
+1.02	2017-02-01
+		- Attribute name quotemeta fix
+		- Added thread libraries in prerequirements
+
+1.01	2017-01-31
+		- ':shared' attribute shared_clone fix
+
+1.00	2017-01-31
+		- Object::Base first release

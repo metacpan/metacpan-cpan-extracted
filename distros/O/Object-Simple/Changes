@@ -1,0 +1,300 @@
+3.19 (2017-01-04)
+  - add SUPPORT by irc
+    the official IRC channel #object-simple on irc.perl.org
+  - remove DEPRECATED class_attr and dual_attr method
+    These methods was planed to removed at 2017-01-01.
+3.1801 (2016-09-12)
+  - fix and improve document.
+3.18 (2016-09-10)
+  - support Mojo::Base compatible inheritance syntax.
+    use Object::Simple 'Point';
+3.1703 (2016-09-09)
+  - add FAQ "Really enough object-oriented programing with this few features?"
+  - add FAQ "What is benefits comparing with Mojo::Base?"
+  - add FAQ "Why Object::Simple is defferent from Mojo::Base in some points?"
+  - add Class::Tiny to SEE ALSO
+3.1702 (2016-09-02)
+  - improve documents
+3.1701 (2016-09-02)
+  - improve documents
+  - add FAQ
+3.17 (2016-09-01)
+  - add Object::Simple used projects
+  - add "SEE ALSO" section
+  - add benefits of Object::Simple
+  - rename GUIDE to TUTORIAL
+  - add benefits of Object::Simple in list style
+3.16 (2016-05-14)
+  - function exporintg of new, attr is DEPRECATED!
+  - The syntax of multiple key-value arguments is DEPRECATED!
+      has x => 1, y => 2;      
+      __PACAKGE__->attr(x => 1, y => 2);
+3.15
+  - fix licence(This is same as Mojolicious)
+3.14
+  - remove experimental with and role support
+    this is buggy.
+  - remove 5.10 feature on document. This hadn't work from now.
+3.13
+  - fix super class namespace bug
+3.12
+  - fix some role bug
+3.11
+  - add with option and role support(EXPERIMENTAL)
+3.10
+  - suppress warnings "Ambiguous use of *{-} resolved to -". after Perl 5.16
+3.09
+  - use closure to suppress Perl 5.8 warnings
+3.08
+  - improved document
+3.07
+  - Carp module don't import any functions
+3.0625
+  - fixed a little bug
+3.0624
+  - changed BACKWARDS COMPATIBILITY POLICY
+    If a functionality is DEPRECATED, you can know it by DEPRECATED warnings
+    except for attribute method.
+    You can check all DEPRECATED functionalities by document.
+    DEPRECATED functionality is removed after five years,
+    but if at least one person use the functionality and tell me that thing
+    I extend one year each time he tell me it.
+    EXPERIMENTAL functionality will be changed without warnings.
+  - accessor and new method need more performance than userbility,
+    so argument check logic is removed, sorry
+3.0622
+  removed -base flag EXPERIMENTAL status
+  added -base flag inherit feature.
+3.0621
+  added EXPERIMENTAL import -base flag, has function is automatically imported
+3.0620
+  improved portability
+3.0619
+  improved error message
+3.0618
+  updated document
+3.0617
+  updated document
+3.0616
+  can call attr from object
+  can define accessor more easy 
+3.0615
+  updated dcoument
+3.0614
+  updated document
+3.0613
+  deprecated "class_attr" and "dual_attr" because having class variable is not good for Object Oriented programing.
+3.0612
+  updated document
+3.0611
+  updated document
+3.0610
+  updated document
+3.0609
+  cleanup to read code easily in degug
+  improved error messages
+  updated documentation
+3.0608
+  updated documentation
+3.0607
+  updated documentation
+3.0606
+  improved error message
+3.0605
+  improved error message
+3.0604
+  improved error message
+3.0603
+  update document
+3.0602
+  update document
+  I promised backward compatibility of version 3.0601 in this document.
+3.0601
+  rename Object::Simple::Util to Object::Simple::Accessor.
+  update document
+  some cleanup
+3.0501
+  expand accessors to sub reference
+  expand class_attrs
+3.0401
+  add error checking to new() and accessor
+3.0303
+  fix inherit option bug
+3.0302
+  fix class_attr inherit bug
+3.0301
+  pack all file to one file
+  move Object::Simple::Accessor export functionality to Object::Simple
+3.0202
+  fix test bug
+3.0201
+  remove 'Objet::Simple::Old' and 'Object::Simple::OldUtil'
+  rename 'Object::Simple::Base' to 'Object::Simple',
+  rename option name 'clone' to 'inherit'
+  rename 'inherit' option value name
+3.0101
+  'Object::Simple' rename to 'Object::Simple::Old'. 'Object::Simple' became just a name space.(not backword compatible)
+  Simplified 'Object::Simple::Base'(not backword compatible)
+2.1301
+  rename Object::Simple::Base 'hybrid_attr' to 'dual_attr' (not backword compatible)
+2.1204
+  Object::Simple::Util is divided into Object::Simple::InternalUtil
+  Update document
+2.1203
+  Update document
+2.1202
+  Update document
+2.1201
+  Object::Simple::Accessor 'new' method moved to Object::Simple::Base
+2.1101
+  add 'Object::Simple::Util::init_attrs'
+2.1002
+  add 'new' function to 'Object::Simple::Accessor';
+2.1001
+  add 'build' option
+  'auto_build' is deprecated.
+  'initialize' option is deprecated.
+  add 'clone' option
+  'ClassObjectAttr' us deprecated. it is renamed to 'HibridAttr'.
+  Object::Simple::Util is departed to other file.
+  add Object::Simple::Accessor
+  add Object::Simple::Base
+  
+2.0901
+  add 'class_attr' method.
+  discuraged 'delete_class_attr' method
+  descuraged 'exists_class_attr' method
+  update document
+2.0803
+  update document
+2.0802
+  delete document about Translate accessor and Output accessor, these will be deleted in future
+2.0801
+  fix    : when  undef value is passed to new, default value is set
+  change : trigger second argument receive old value(not backword compatible)
+2.0702
+  fix initialize clone 'array' or 'hash' reference copy
+2.0701
+  add initialize accessor option for ClassObjectAttr
+  delete initialize_class_object_attr is deleted(not backward compatibility)
+2.0603
+  initialize_class_object_attr accessor_name is automatically set.
+2.0602
+  fix initialize_class_object_attr method is fail when accessor deref options is specified
+2.0601
+  rename resist_attribute_info to resist_accessor_info
+  add initialize_class_object_attr method
+2.0502
+  fix bag that attribute is not initialize when created by ClassObjectAttr 
+2.0501
+  add ClassObjectAttr code attribute
+  add exists_class_attr method
+  add delete_class_attr method
+2.0402
+  Mixin speed up by deparse method in need
+2.0401
+  remixin is available
+  call_super can be passed only method name(not Backward compatibility)
+2.0301
+  delete Object::Simple::UPPER (not Backward compatibility)
+  delete Object::Simple::MIXINS (not Backward compatibility )
+  delete MODIFY_CODE_ATTRIBUTE when build_class is called
+  mixins SUPER keyword can work good
+  add mixin_methods method
+  add call_super method
+  add call_mixin method
+2.0201
+  add extend options
+  add build_all_classes
+2.0101
+  add resiste_attribute_info. If you call this method, resist attribute_info.
+  you can specify class name at build_class method
+2.0021
+  delete translate option. This change is not forward compatibile.
+  add Translate code attribute. This replace translate option.
+  add Output code attribute. This create accessor for output.
+2.0020
+  refactoring Object::Simple::MIXINS::AUTOLOAD using closure
+  refactoring Object::Simple::UPPER::AUTOLOAD using closure
+2.0019
+  bag fix: meta information class_attr_option isn't merged when mixin class is included.
+2.0018
+  add : Can use Class attribute accessor
+2.0017
+  bag fix: translate accessor setter return $self. getter return value corresponding to context.
+2.0016
+  change : setter return self by default. 
+2.0015
+  refactoring : remove some unnecesary code.
+2.0014
+  baf fix : when accessor is called form class, paccakge variable is set.
+2.0013
+  baf fix : Cannot build class when two package exists in a file
+2.0012
+  change : MIXIN_method -> Object::Simple::MIXINS::method
+  change : UPPER_method -> Object::Simple::UPPER::method
+2.0011
+  document update
+2.0010
+  remove : remove Object::Simple::Error, Object::Simple::Constraint from Build.pl requires
+2.0009
+  add : method UPPER_*****
+2.0008
+  bag fix: MIXINS_method can call super method
+2.0007
+  add   : add AUTOLOAD subroutine to call all mixin class method
+2.0006
+  cahnge: add 'translate' option
+  cahnge: remove alias, remove mixins_rename, trigger is after weaken
+2.0005
+  bag fix: catch up with perl 5.10.0 
+2.0004
+  change: add 'trigger' accessor option
+  change: to be flexible Base class do not load when import method call
+2.0003
+  change method name 'end' to 'build_class'
+2.0002
+  change: when attribute value having 'array' or 'hash' option is set undef value, undef value is set.
+  change: mixin method search order is like Ruby.  1. this class, 2. Mixin class last 3. Mixin class first, 4 Base class
+2.0001
+  add accessor option 'type', 'convert', 'deref'
+  mixins option change like Moose role
+  add 'mixins_rename' option
+1.0003
+  bag fix: occur compile error if a class having auto_build option and its name contain :: is loaded,
+1.0002
+  remove attroption name
+  bag fix: not resist constructor if class name contain ::
+1.0001
+  first stabule release
+0.0209
+  add create_constructor.
+  
+0.0208
+  add unimport methods to difine user's MODIFY_CODE_ATTRIBUTES
+0.0207
+  renamae $META hash key
+0.0206
+  optimize new methods
+0.0205
+  add mixins select options 
+  
+0.0204
+  document is updated
+0.0203
+  remove many options 'type', 'setter_return', 'required'
+  remove method 'error'
+  add options 'chained'
+0.0202
+  mixin format is changed.
+  remove _arrange_args and _init method
+0.0201
+  first release
+0.01_02
+rename Object::Simple::Error attribute 'pkg' to 'class' 
+delete attribute key before pass args to _init 
+remove no need files 
+_arrange_args return hash ref, not hash 
+
+0.01_01 (2008-01-01)
+  first developer release

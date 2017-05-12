@@ -1,0 +1,35 @@
+---
+abstract: 'Run Lua code from a string, rather than embedded.'
+author:
+  - 'Alastair Douglas <altreus@perl.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::Class: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+  ExtUtils::PkgConfig: 1.12
+distribution_type: module
+generated_by: 'Module::Install version 0.87'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Outline-Lua
+no_index:
+  directory:
+    - inc
+    - t
+provides:
+  Outline::Lua:
+    file: lib/Outline/Lua.pm
+    version: 0.11
+  Outline::Lua::Boolean:
+    file: lib/Outline/Lua.pm
+requires:
+  List::Util: 0
+  Scalar::Util: 0
+  overload: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.11

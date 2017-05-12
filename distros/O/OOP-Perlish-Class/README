@@ -1,0 +1,89 @@
+OOP-Perlish-Class
+
+So, why do we want yet another base-class implementation on CPAN? Well,
+OOP and perl5 are not necessarily 100% sympatric, and to that end, many
+developers have contributed OOP frameworks, usually modeling other,
+langauges like C++, smalltalk, etc. However, this framework was
+designed with a slightly different goal in mind; To allow _perl5_ OOP
+without code duplication. Said another way, I wanted to let perl5
+remain perl5, while still providing all the benefits of OOP best
+practices.
+
+The perlboot and perltoot man pages that ship with perl describe one
+particular kind of object, blessed hash references. These have 
+often been forsaken in lieu of inside-out-objects, and other
+lexical trickery. These alternative object types are usually chosen 
+in attempts to "protect" users of your class' from their internals. 
+This level of encapsulation is great, if the language both
+a) allows it, and b) benefits from it. However, perl5 isn't such
+a langauge. There is no way to really protect instance data entirely,
+but more importantly, no particularly compelling reason to do so.
+
+You can encapsulate "within reason", but not at the expense of
+maintainability, legibility, runtime-efficiency, etc.
+
+This OOP framework encapsulates accessor data in inheritable, 
+validatable, immutable, and safe ways, but makes no attempts to really
+"hide" the internals, it simply presumes that if you bypass safeties
+that you know what you are doing, and makes it difficult to do so on
+accident.
+
+More importantly, using this framework, your code will still look like
+perl5 (perhaps slightly prettier in some ways, but still 100% recognizable
+and understandable to any perl programmer maintaining your class)
+
+Here's what this module currently provides for:
+
+   Multiple-Inheritance
+   Mix-ins
+   Meta-programming (class introspection; quite useful with mix-ins)
+   Generational Inheritance (complex hiarchies of inheritance)
+   method overriding/overloading
+   Accessor validation
+   Accessor cascading via validator
+   Singletons
+   Multitons (aka: multi-singletons, keyed singletons, named singletons, singleton-maps)
+   Polymorphism (aka duck-typing for ruby folks)
+   Abstract Classes (aka interfaces, protocols, traits, flavors, roles, class-prototypes, etc)
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc OOP::Perlish::Class
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=OOP-Perlish-Class
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/OOP-Perlish-Class
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/OOP-Perlish-Class
+
+    Search CPAN
+        http://search.cpan.org/dist/OOP-Perlish-Class/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Jamie Beverly
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

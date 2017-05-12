@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<SITE ID="Explorateur_email">
+
+<NAME Lang="en-us">LES PAGES WEB</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+LES PAGES 電子郵件地址查詢
+]]></NAME>
+<INFO Lang="en-us">email address search in France</INFO>
+<INFO Lang="zh-tw">email address search in France</INFO>
+
+<URL Type="More"><![CDATA[
+http://195.101.94.51/pzrecherche?contexte=pz&fenetre=externe&mots=_UPSTR_&medor=e-mail&fichier=*&page=_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://195.101.94.51/pzrecherche?contexte=pz&fenetre=externe&mots=_QUERY_&medor=e-mail&fichier=*
+]]></URL>
+
+
+<VAR Name="_UPSTR_"><![CDATA[
+mots=_UPSTR_&
+]]></VAR>
+<VAR Name="_NEXT_"><![CDATA[
+page=_NEXT_">
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<FONT SIZE="3">___<a href="_URL_">_TITLE_</B></a>___<FONT SIZE="2">_PREVIEW_<BR>
+]]></TEMPLATE>
+</SITE>

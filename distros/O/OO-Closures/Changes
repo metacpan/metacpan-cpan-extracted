@@ -1,0 +1,19 @@
+Version 2009110702
+- Fixed prerequisites
+----
+Version 2009110701
+- Modernized Makefile.PL
+- Added POD and Kwalitee tests
+----
+Version 2009040201
+- Move to git.
+- Modernize structure.
+----
+Revision 1.2  1999/08/02 06:06:04  abigail
+Bug fixes and more efficient use of code (Rick Delaney).
+Free and open software copyright/license.
+Scalar references as methods (to complement for Eiffel like features).
+CPAN friendly module.
+----
+Revision 1.1  1998/10/01 22:54:57  abigail
+Initial revision

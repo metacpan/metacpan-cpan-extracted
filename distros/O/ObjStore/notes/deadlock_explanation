@@ -1,0 +1,203 @@
+SUBJECT:	Explanation of deadlock and how to prevent it
+
+PRODUCT:	ObjectStore
+
+PLATFORM:	all
+
+LANGUAGE:	C++
+
+VERSION:	3.X
+
+DATE:		April 13, 1995
+
+EXPIRATION:	April 13, 1996
+
+KEYWORDS:	deadlock, access_hooks
+
+
+
+QUESTION: 
+
+What is deadlock and how to I prevent it?
+
+
+ANSWER:
+
+In general, deadlock occurs when two or more processes are waiting for locks
+and there is dependency such that none of them will ever get the lock it is
+waiting for (a circular dependency).  For example, Process A is waiting for
+a lock held by Process B which is waiting for a lock held by Process C...
+which is waiting for a lock held by Process N which is waiting for a lock
+held by Process A.  Because the dependency is circular, no process will ever
+get the requested lock.  If deadlock were not detected, all processes
+involved would wait infinitely.
+
+Here's a simple example:
+
+	process     process 
+	   A           B
+
+        Start Txn
+time1	Read[X]     Start Txn   
+time2		    Read[Y]
+time3	Write[Y] . . . . . . . must wait for process B to release its read lock
+time4               Write[X] . must wait for process A to release its read lock 
+
+			       At this point process A is waiting for process B
+			       and process B is waiting for process A.  Neither 
+			       can proceed until the other releases its locks,
+			       but locks are released at the end of the transaction
+			       and neither process can get there because it is 
+			       blocked waiting for a lock.
+			       This is deadlock.
+timeN   End Txn     End Txn 
+
+
+Deadlock can also occur when one process is read-only and the other process
+is updating the db, for example:
+
+	process     process 
+	   A           B
+
+        Start Txn
+time1	Read[X]     Start Txn   
+time2		    Write[Y]
+time3	Read[Y]. . . . . . . . must wait for process B to release its write lock
+time4               Write[X] . must wait for process A to release its read lock 
+
+			       At this point process A is waiting for process B
+			       and process B is waiting for process A.  Neither 
+			       can proceed until the other releases its locks,
+			       but locks are released at the end of the transaction
+			       and neither process can get there because it is 
+			       blocked waiting for a lock.
+			       This is deadlock.
+timeN   End Txn     End Txn 
+
+
+What Happens To Program Data When Deadlock Occurs
+-------------------------------------------------
+The ObjectStore server automatically detects deadlock situations and, when
+they occur, it chooses a "deadlock victim" whose transaction is aborted.  If
+the aborted transaction is a lexical transaction, it is automatically
+retried.  If, however, it is a dynamic transaction, the process is aborted
+with err_deadlock.
+
+When lexical transactions are aborted, the persistent data that has been
+modified during the transaction is reverted to its pre-transaction state.
+Also, stack variables declared within the scope of the transaction go out of
+scope.  Special care must be taken for stack variables whose values have
+been changed within the transaction and for space allocated on the heap
+during the transaction.
+
+person* p1 = NULL;
+int count = 0;
+
+OS_BEGIN_TXN(tx1,0,os_transaction::update)
+{	
+    // This stack variable will go out of scope if this transaction is aborted.
+    int i=0;
+
+    // count is a variable declared outside the scope of this transaction, so 
+    // its value will remain incremented even if the transaction is aborted and
+    // restarted.
+    count++;	
+    cout << "This transaction has been been executed " << count << "times." << endl;
+
+    // Heap allocated space is not deleted if the transaction is aborted, so 
+    // this data will not need to be reallocated again if the transaction is 
+    // aborted and restarted.
+    if (p1 == NULL)
+	p1 = new person("Ann");
+
+    // Heap allocated space will be lost if the pointer is declared inside
+    // the transaction and the transaction is aborted and restarted.
+    person* p2 = new person("Jack");
+
+
+    // Persistently allocated data is removed from the database if the
+    // transaction is aborted.
+    person* p3 = new(db) person("Jack");				
+}
+OS_END_TXN(tx1)
+
+
+How Can I Detect Deadlock in An Application?
+-------------------------------------------- 
+If you run the server in debug mode, you can get information about where the
+deadlock occurs.  Doing this does not require that you modify your source
+code.  To run the server in debug mode, start it using the command "osserver
+-F -v -d 3".  You will need to be root to start the server.
+
+
+Another approach is to add the following calls to your application.  Place
+these lines after objectstore::initialize() and before you open any
+databases.
+
+  objectstore::enable_event_hooks();
+  objectstore::set_default_hooks();
+
+These calls instruct ObjectStore to print information about locks being
+obtained as your application runs.  The information printed indicates the
+type of lock requested and the segment and page of the data requested.  When
+deadlock occurs, you will all applications wait for a second, then you will
+see some applications continue on the deadlock victim's transaction is
+restarted.  Sample event hooks output is:
+
+	Page Fetch(R): [1/0]
+	Page Fetch(R): [0/0]
+	Reloc Page In: [4/2]
+	Page Fault: [0/2]
+	Fault Active(W): [0/2]
+
+Once you have determined the segment/page of the data in contention, you
+must consider what has been stored there and how your application is
+structured to understand why the deadlock is occurring.  ossize -o can be
+useful in determining what object is stored on the page in question.
+
+
+How can I avoid Deadlock ?
+--------------------------
+Its difficult to completely avoid deadlock but here is an approach we
+often recommend to customers.
+
+Create a semaphore object that lives in a segment by itself and have
+every transaction in every process try to acquire a write lock on this on
+the object prior to doing anything else in the transaction. Here is
+some pseudo code to do this:
+
+os_Reference_transient semaphore;
+
+
+
+OS_BEGIN_TXN(tx1, 0, os_transaction::update)  
+
+objectstore::acquire_lock(semaphore.resolve(), os_write_lock,0 );
+ 
+.....
+
+OS_END_TXN(tx1)
+
+
+It should be noted that this approach has troubles when using
+versions and or pvars. 
+
+
+A pvar tries to resolve a root at that the start of a transaction
+which will acquire read locks on segment 0.
+
+
+If you have set the current workspace using versions you will get a
+read lock on the workspace at the start of the transaction.
+
+If you know the transaction will not be accessing version-ed data
+you can avoid this by setting the current workspace to the transient
+workspace before the transaction starts.
+
+This does not need to be done from within a transaction. Here is
+how to do this:
+
+os_workspace::set_current(os_workspace::get_transient());
+
+
+FAQ_reference: deadlock_explanation

@@ -1,0 +1,134 @@
+/* Procedure copyright(c) 1995 by Edward M Barlow */
+
+/******************************************************************************
+**
+** Name        : sp__helpprotect.sp
+**
+******************************************************************************/
+:r database
+go
+:r dumpdb
+go
+
+if exists (select * from sysobjects
+           where  name = "sp__helprotect"
+           and    type = "P")
+begin
+   drop proc sp__helprotect
+end
+go
+create procedure sp__helprotect
+@parameter varchar(30) = NULL	/* name of object or user to check	*/
+as
+declare @type char(2), @uid int, @msg varchar(255)
+
+if @parameter is NULL
+begin
+	print "Must pass parameter"
+end
+	select 	 id,uid,action,protecttype,columns,grantor=0,
+		column_name = convert(varchar(30),NULL)
+		,action_text = convert(varchar(30),NULL)
+		,protecttype_text = convert(varchar(30),NULL)
+		,ending = convert(varchar(30),NULL)
+	into 	#protects
+	from 	sysprotects 
+	where 	1=2
+
+
+	if exists ( select 1 from sysobjects
+				where 	id = object_id(@parameter))
+	begin
+		/* IT IS AN OBJECT */
+		insert 	#protects
+		select 	 id,uid,action,protecttype,columns,grantor=0,
+			"",NULL,NULL,""
+		from   	sysprotects
+		where  	id=object_id(@parameter)
+
+		/* REVOKES ON COLUMNS */
+		insert 	#protects
+		select 	id,uid,action,2,columns,grantor=0,
+			"("+col_name(p.id,c.number)+")",NULL,NULL,""
+		from 	sysprotects p, master.dbo.spt_values c
+		where 	p.columns is not null
+		and 	convert(tinyint,substring(p.columns,c.low,1)) & c.high=0
+		and 	c.type = "P"
+		and 	c.number <= 255
+		and 	c.number>0
+		and 	c.low>1
+		and 	col_name(p.id,c.number) is not null
+		and	id=object_id(@parameter)
+	end
+	else
+	begin
+		/* IS IT A USER */
+		select @uid = uid from sysusers where name=@parameter
+		if @@rowcount = 0 or @uid is null
+		begin
+		   /* 17232, "No user with the specified name exists in the current database." */
+		   exec sp_getmessage 17232, @msg out
+		   print @msg
+		   return (1)
+		end
+
+		insert #protects
+		select 	id,uid,action,2,columns,grantor=0,"",NULL,NULL,""
+		from   sysprotects
+		where  uid=@uid
+
+		/* REVOKES ON COLUMNS */
+		insert 	#protects
+		select 	id,uid,action,2,columns,grantor=0,
+			"("+col_name(p.id,c.number)+")", NULL,NULL,""
+		from 	sysprotects p, master.dbo.spt_values c
+		where 	p.columns is not null
+		and 	convert(tinyint, substring(p.columns, c.low, 1)) & c.high = 0   
+		and 	c.type = "P"
+		and 	c.number <= 255
+		and 	c.number>0
+		and 	c.low>1
+		and 	col_name(p.id,c.number) is not null
+		and	uid=@uid
+	end
+
+update 	#protects
+set    	action_text = name
+from   	master.dbo.spt_values v
+where  	v.type='T'
+and   	v.number = #protects.action
+
+update 	#protects
+set    	protecttype_text = name
+from   	master.dbo.spt_values v
+where  	v.type='T'
+and    	v.number = #protects.protecttype +204
+
+update  #protects
+set	ending = " WITH GRANT OPTION", protecttype_text="GRANT"
+where	protecttype = 0
+
+declare @max_len int
+select @max_len = max(char_length( rtrim(protecttype_text)+" "+rtrim(action_text)+" on "+rtrim(object_name(id))+column_name+" to "+rtrim(user_name(uid))+ending))
+from #protects
+
+if @max_len < 60
+	select substring(rtrim(protecttype_text)+" "+rtrim(action_text)+" on "+rtrim(object_name(id))+column_name+" to "+rtrim(user_name(uid))+ending,1,59)
+	from #protects
+	order by object_name(id),protecttype_text
+else if @max_len < 80
+	select substring(rtrim(protecttype_text)+" "+rtrim(action_text)+" on "+rtrim(object_name(id))+column_name+" to "+rtrim(user_name(uid))+ending,1,79)
+	from #protects
+	order by object_name(id),protecttype_text
+else if @max_len < 132
+	select substring(rtrim(protecttype_text)+" "+rtrim(action_text)+" on "+rtrim(object_name(id))+column_name+" to "+rtrim(user_name(uid))+ending,1,131)
+	from #protects
+	order by object_name(id),protecttype_text
+
+
+return (0)
+go
+
+
+grant execute on sp__helprotect to public
+go

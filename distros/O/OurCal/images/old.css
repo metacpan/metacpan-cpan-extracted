@@ -1,0 +1,31 @@
+a { font-family:verdana, arial, helvetica, sans ; font-size:11px ; color:0000ff ; text-decoration:none }
+a:active { font-family:verdana, arial, helvetica, sans ; font-size:11px ; color:0000ff ; text-decoration:underline }
+a:visited { font-family:verdana, arial, helvetica, sans ; font-size:11px ; color:0000ff }
+a:hover { font-family:verdana, arial, helvetica, sans ; font-size:11px ; color:0000ff ; text-decoration:underline }
+
+a.mainhead { font-family:arial, helvetica, sans ; font-size:22px ; color:323232 ; text-decoration:none }
+a.mainhead:active { font-family:verdana, arial, helvetica, sans ; font-size:22px ; color:323232 ; text-decoration:none }
+a.mainhead:visited { font-family:verdana, arial, helvetica, sans ; font-size:22px ; color:323232 ; text-decoration:none }
+a.mainhead:hover { font-family:verdana, arial, helvetica, sans ; font-size:22px ; color:f5f5f5 ; text-decoration:none }
+
+a.archivehead { font-family:arial, helvetica, sans ; font-size:16px ; color:323232 ; text-decoration:none }
+a.archivehead:active { font-family:verdana, arial, helvetica, sans ; font-size:16px ; color:323232 ; text-decoration:none }
+a.archivehead:visited { font-family:verdana, arial, helvetica, sans ; font-size:16px ; color:323232 ; text-decoration:none }
+a.archivehead:hover { font-family:verdana, arial, helvetica, sans ; font-size:16px ; color:f5f5f5 ; text-decoration:none }
+
+body {scrollbar-arrow-color: 417E99; scrollbar-base-color: 417E99; scrollbar-darkshadow-color: d1d1d1; scrollbar-face-color: efefef; scrollbar-highlight-color: ffffff; scrollbar-shadow-color: d1d1d1}
+
+.mainhead { font-family:arial, helvetica, sans ; font-size:22px ; color:323232 }
+.archivehead { font-family:arial, helvetica, sans ; font-size:16px ; color:323232 }
+.strap { font-family:verdana, arial, helvetica, sans ; font-size:12px ; color:323232 }
+.body { font-family:verdana, arial, helvetica, sans ; font-size:12px ; color:323232 }
+.caption { font-family:verdana, arial, helvetica, sans ; font-size:9px ; font-weight:bold ; color:323232 }
+.author { font-family:verdana, arial, helvetica, sans ; font-size:10px ; font-weight:bold ; color:323232 }
+
+a.readmore { font-family:arial, helvetica, sans ; font-size:10px ;color:323232 ; text-decoration:none }
+a.readmore:active { font-family:verdana, arial, helvetica, sans ;font-size:10px ; color:323232 ; text-decoration:none }
+a.readmore:visited { font-family:verdana, arial, helvetica, sans ;font-size:10px ; color:323232 ; text-decoration:none }
+a.readmore:hover { font-family:verdana, arial, helvetica, sans ;font-size:10px ; color:f5f5f5 ; text-decoration:none }
+
+.readmore { font-family:verdana, arial, helvetica, sans ; font-size:10px ;color:323232 }
+

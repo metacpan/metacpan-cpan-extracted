@@ -1,0 +1,28 @@
+--- #YAML:1.0
+name:               OOPS
+version:            0.2005
+abstract:           Store any object in a RDBMS
+author:
+    - David Muir Sharnoff <cpan@dave.sharnoff.org>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    diagnostics:  0
+    Test::Deep:   0
+requires:
+    DBI:                 1.4
+    Digest::MD5:         0
+    Filter::Util::Call:  0
+    Scalar::Util:        0
+resources:
+    repository:  http://github.com/muir/OOPS
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

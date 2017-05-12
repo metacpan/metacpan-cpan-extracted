@@ -1,0 +1,26 @@
+* win32 ppm
+
+* par file support
+
+* instead of just munging 'infile', create an option for a log/scratch
+  directory that we can use for a default when we need to write to disk
+  (bads, logs, etc)
+
+* support more than one infile, and support diff bad, disc files for each
+
+* lob data
+
+* delimited load - add a constant designating a column to be skipped
+
+* delimited load - allow passing of columns w/out 'column_name' href
+
+* if we can get a DBI connection, we can just pull the column specs out of
+  USER_TAB_COLUMNS
+
+* move Tables and Columns out into classes
+
+* since we can parse out unusable indexes, what should we do w/ them, rebuild?
+
+* should executeLoader return false on warning exit codes, or just on fatal?
+
+$Id: TODO,v 1.8 2004-09-11 04:42:54 ezra Exp $

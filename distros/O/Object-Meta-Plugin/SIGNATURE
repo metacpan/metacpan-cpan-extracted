@@ -1,0 +1,40 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.35.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It would check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 e79c8b0a425b300460b11a4f2741d0a2323d0082 Build.PL
+SHA1 d308b392876a79e39f73ebfea24324e6dda9f4d3 MANIFEST
+SHA1 7015bd071b8501344619cc4317b7a2f59842272a META.yml
+SHA1 e8d1363f0bd65f874302ed6ae0ca9da6b74df3f9 Makefile.PL
+SHA1 147c23f096e8ffe881d7bf101e134d9ff8b9bc63 README
+SHA1 06192f6e417e558d76aacc0912f7dea22788a764 lib/Object/Meta/Plugin.pm
+SHA1 26d5dabc368fda8fda95d81d806f0b0c4c82d503 lib/Object/Meta/Plugin/ExportList.pm
+SHA1 c43aa7b743051b450647eb66429beb9ad0579953 lib/Object/Meta/Plugin/Host.pm
+SHA1 ebb4933d978cb5f27551d112074024d77945e5f0 lib/Object/Meta/Plugin/Useful.pm
+SHA1 1fa90ce12fdaaefad8d0343f5fc324a09ce7ee51 lib/Object/Meta/Plugin/Useful/Generic.pm
+SHA1 ee9b9232111a8ece7d965c992e10016adb3647e6 lib/Object/Meta/Plugin/Useful/Greedy.pm
+SHA1 5c51b2829213bfbb02e88d265bfe0010719bf9da lib/Object/Meta/Plugin/Useful/Meta.pm
+SHA1 8374ef28587a61510d93e2cc49597882246d83be t/basic.t
+SHA1 e69e516d0721618db9bd7dfa82f031425ec19943 t/error_handling.t
+SHA1 c555ead40b5e8f514987f1eb8df3406398df8170 t/extremes.t
+SHA1 dbdb162e1e553305cbddb92131a8c9a3e3d69552 t/greedy.t
+SHA1 ca196f7663b797014b74a5349d57ff8c749eb553 t/lib/OMPTest.pm
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.3 (Darwin)
+
+iD8DBQE/yLIFVCwRwOvSdBgRAnalAJoCwyZ69vq0aX5JbShMiIorYcoLDQCglXgI
+U3Dm5vZJ5P2oPppsHIPg4z8=
+=6Aff
+-----END PGP SIGNATURE-----

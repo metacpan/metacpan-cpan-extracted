@@ -1,0 +1,77 @@
+ONTO-PERL suite
+===============
+
+ONTO-PERL a collection of PERL modules for dealing with any OBO-formatted
+ontology (such as the Gene Ontology). This code distribution gathers 
+object-oriented modules (for dealing with ontology elements such as 
+Term, Relationship, Synonym and so forth), scripts (for typical tasks 
+such as format conversions: obo2rdf, rdf2obo; ONTO-perl provides an 
+extensive documentation as well as several examples that can be easily 
+adapted for specific applications that involve ontology processing), and 
+a set of test files to ensure the suite's implementation quality.
+
+See also:
+
+  1. perldoc ONTO-PERL.pod
+  
+  2. ONTO-PERL: An API supporting the development and analysis of bio-ontologies
+     Antezana E, Egana M, De Baets B, Kuiper M, Mironov V.
+     Bioinformatics (2008) 24 (6): 885-887; doi: 10.1093/bioinformatics/btn042
+
+  3. ONTO-Toolkit: A set of Galaxy tools to deal with OBO-formatted ontologies,
+     Antezana E, Venkatesan A, Mungall C, Mironov V, Kuiper M.
+     BMC Bioinformatics 2010, 11(Suppl 12):S8 doi:10.1186/1471-2105-11-S12-S8
+
+Visit the following URLs:
+
+ - http://search.cpan.org/~easr/ONTO-PERL/
+
+For installing this collection of modules:
+
+	see the file INSTALL
+
+or follow the standard CPAN procedure:
+
+type the following mantra:
+
+	perl -w Makefile.PL
+	make
+	make test
+	make install
+
+Other useful commands:
+
+	make clean	
+	make distcheck
+
+DEPENDENCIES
+============
+
+ONTO-PERL requires the following modules:
+
+1. Date::Manip (> v6.42):
+
+	http://search.cpan.org/dist/Date-Manip/ (MANDATORY)
+
+2. XML::Parser (> v2.34) is used in format conversions (obo2owl and owl2obo)
+
+	http://search.cpan.org/~msergeant/XML-Parser/ (OPTIONAL)
+	
+2. XML::XPath (> v1.13) is used by the IntAct related modules:
+
+   http://search.cpan.org/~msergeant/XML-XPath/ (OPTIONAL)
+
+4. SWISS Knife (> v1.67) is used by the 'UniProtParser':
+
+	ftp://ftp.ebi.ac.uk/pub/software/swissprot/Swissknife (OPTIONAL)	
+
+5. Text::CSV (> v1.32) is used by 'bioportal_csv2obo.pl':
+
+   http://search.cpan.org/~makamaka/Text-CSV/ (OPTIONAL)
+
+COPYRIGHT AND LICENCE
+=====================
+
+Copyright (c) 2006-2015 by Erick Antezana. All rights reserved.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.

@@ -1,0 +1,56 @@
+@prefix :        <http://usefulinc.com/ns/doap#> .
+@prefix dcs:     <http://ontologi.es/doap-changeset#> .
+@prefix dc:      <http://purl.org/dc/terms/> .
+@prefix foaf:    <http://xmlns.com/foaf/0.1/> .
+@prefix my:      <http://purl.org/NET/cpan-uri/dist/OWL-DirectSemantics/> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix toby:    <http://tobyinkster.co.uk/#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+
+my:project :release my:v_0-000_01 .
+my:v_0-000_01
+	a               :Version ;
+	dc:issued       "2011-03-30"^^xsd:date ;
+	:revision       "0.000_01"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/OWL-DirectSemantics-0.000_01.tar.gz> ;
+	rdfs:label      "Hackathon Preview"@en .
+
+my:project :release my:v_0-000_02 .
+my:v_0-000_02
+	a               :Version ;
+	dc:issued       "2011-03-31"^^xsd:date ;
+	:revision       "0.000_02"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/OWL-DirectSemantics-0.000_02.tar.gz> ;
+	dcs:changeset [
+		dcs:item [ rdfs:label "Fixed description for RDF::Trine::Serializer::OwlFn."@en ; a dcs:Documentation ] ;
+		dcs:item [ rdfs:label "Annotation handling improvements."@en ; a dcs:Bugfix ] ;
+		dcs:item [ rdfs:label "Serialize Imports() correctly in OwlFn."@en ; a dcs:Bugfix ] ;
+		dcs:item [ rdfs:label "Automatically determine the URI for the owl:Ontology."@en ; a dcs:Addition ] ;
+		dcs:item [ rdfs:label "Make URI/IRI terminology consistent in OWL::DirectSemantics::Element::Ontology."@en ] ;
+		dcs:versus my:v_0-000_01
+	] .
+
+my:project :release my:v_0-000_03 .
+my:v_0-000_03
+	a               :Version ;
+	dc:issued       "2012-06-28"^^xsd:date ;
+	:revision       "0.000_03"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/OWL-DirectSemantics-0.000_03.tar.gz> ;
+	dcs:changeset [
+		dcs:item [ rdfs:label "General modernization."@en ] ;
+		dcs:item [ rdfs:label "Module::Package::RDF"@en ; a dcs:Packaging ] ;
+		dcs:versus my:v_0-000_02
+	] .
+
+my:project :release my:v_0-001 .
+my:v_0-001
+	a               :Version ;
+	dc:issued       "2012-06-28"^^xsd:date ;
+	:revision       "0.001"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/OWL-DirectSemantics-0.001.tar.gz> ;
+	rdfs:label      "First official release!";
+	dcs:changeset [
+		dcs:item [ rdfs:label "s/use parent/use base/"@en ] ;
+		dcs:versus my:v_0-000_03
+	] .
+

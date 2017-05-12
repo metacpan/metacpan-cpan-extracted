@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<SITE ID="Magellan">
+
+<NAME Lang="en-us">Magellan WWW Search</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+Magellan全球WWW搜尋(英文)
+]]></NAME>
+<INFO Lang="en-us">general information web search</INFO>
+<INFO Lang="zh-tw">general information web search</INFO>
+
+<URL Type="More"><![CDATA[
+http://www.mckinley.com/search.gw?search=_SEARCH_&look=magellan&start=_START_&collection=web&next=Next+Results
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://www.mckinley.com/search.gw?c=web&look=magellan&search=_QUERY_
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+<EXPRESSION>Standard</EXPRESSION>
+<CATEGORY>WWW,General</CATEGORY>
+
+<VAR Name="_SEARCH_"><![CDATA[
+<INPUT TYPE=hidden NAME=search VALUE="_SEARCH_">
+]]></VAR>
+<VAR Name="_START_"><![CDATA[
+<INPUT TYPE=hidden NAME=start VALUE=_START_>
+]]></VAR>
+<VAR Name="_NEXTRESULT_"><![CDATA[
+<INPUT TYPE=submit NAME=next VALUE="_NEXTRESULT_"
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<B><A HREF="_URL_"___>_TITLE_</A>_SCORE_%</B>___</A></FONT><BR>_PREVIEW_<BR>
+]]></TEMPLATE>
+</SITE>

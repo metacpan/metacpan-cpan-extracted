@@ -1,0 +1,38 @@
+OpenThought Changelog                                   http://openthought.net
+                                                        eric at openthought.net
+Key:
+* An internal code change that shouldn't affect most people
+** An optional feature has been added that is probably worth checking out
+*** This is a new feature that will likely require a change in your code
+
+
+Changes since 0.56
+------------------
+
+** Passing an element parameter should now work as documented
+
+** Nasty escaping bug fixed.  Data containing < > & chars would probably not
+have worked as expected.
+
+* Sometimes, XML::Parser::Expat can call the character handler multiple times,
+even before reaching an end tag.  We now properly handle this case by
+concatenating the strings into one, as opposed to making it an array.
+
+
+Changes since 0.55
+------------------
+
+** Updates to the documentation
+
+** Updates to comments
+
+** Now exporting the xml2hash function
+
+
+Changes since 0.54
+------------------
+
+** Moved OpenThought::XML2Hash into it's own package.  It's flexible enough
+that others may wish to make use of it.  However, it may not process enough
+of the XML spec in order to warrant putting it into the XML namespace.
+

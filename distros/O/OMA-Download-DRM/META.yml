@@ -1,0 +1,23 @@
+--- #YAML:1.0
+name:               OMA-Download-DRM
+version:            1.00.07
+abstract:           Perl extension for packing DRM objects according to the OMA DRM 1.0 specification
+author:
+    - Bernard Nauwelaerts <bpgn@cpan.org>
+license:            GPL_3
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Crypt::Rijndael:  0.04
+    MIME::Base64:     0.01
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

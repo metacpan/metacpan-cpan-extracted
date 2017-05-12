@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<SITE ID="Jubii">
+
+<NAME Lang="en-us">Jubii Search</NAME>
+<INFO Lang="en-us">general information web search in Denmark</INFO>
+
+<URL Type="More"><![CDATA[
+_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://soeg.jubii.dk/res.asp?startnummer=1&soegeord=_QUERY_&service=Jubii
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_NEXT_"><![CDATA[
+<A HREF="_NEXT_"><IMG SRC="http://www.jubii.dk/images/n-side.gif
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<li>___<a href="_URL_">_TITLE_</a>___-_PREVIEW_<
+]]></TEMPLATE>
+</SITE>

@@ -1,0 +1,131 @@
+TYPEMAP
+
+const unsigned char *       T_PV
+
+GLbitfield                  T_U_INT
+GLboolean                   T_INT
+GLboolean *                 T_PTR
+const GLboolean *           T_PTR
+const GLboolean **          T_PTR
+GLbyte                      T_INT
+GLbyte *                    T_PTR
+const GLbyte *              T_PTR
+GLchar *                    T_PV
+const GLchar *              T_PV
+GLchar * const *            T_PV
+const GLchar * const *      T_PV
+GLchar **                   T_PV
+GLcharARB                   T_CHAR
+GLcharARB *                 T_PV
+const GLcharARB *           T_PV
+const GLcharARB **          T_PV
+GLenum                      T_INT
+GLenum *                    T_PTR
+const GLenum *              T_PTR
+GLsizei                     T_INT
+GLsizei *                   T_PTR
+const GLsizei *             T_PTR
+GLclampf                    T_FLOAT
+const GLclampf *            T_PTR
+GLclampd                    T_DOUBLE
+const GLclampd *            T_PTR
+GLclampx                    T_INT
+GLdouble                    T_DOUBLE
+GLdouble *                  T_PTR
+const GLdouble *            T_PTR
+GLfixed                     T_INT
+GLfixed *                   T_PTR
+const GLfixed *             T_PTR
+GLfloat                     T_FLOAT
+const GLfloat               T_FLOAT
+GLfloat *                   T_PTR
+const GLfloat *             T_PTR
+GLhalf                      T_FLOAT
+const GLhalf *              T_PTR
+GLhandleARB                 T_INT
+GLhandleARB *               T_PTR
+const GLhandleARB *         T_PTR
+GLint                       T_INT
+const GLint                 T_INT
+const GLint *               T_PTR
+GLintptr                    T_U_INT
+GLintptr *                  T_PTR
+const GLintptr *            T_PTR
+GLintptrARB                 T_U_INT
+GLintptrARB *               T_PTR
+const GLintptrARB *         T_PTR
+GLint64                     T_U_INT
+GLint64 *                   T_PTR
+const GLint64 *             T_PTR
+GLint64EXT                  T_U_INT
+GLint64EXT *                T_PTR
+const GLint64EXT *          T_PTR
+GLuint                      T_U_INT
+GLuint *                    T_PTR
+const GLuint *              T_PTR
+GLushort                    T_U_SHORT
+GLushort *                  T_PTR
+const GLushort *            T_PTR
+GLint                       T_INT
+GLint *                     T_PTR
+GLshort                     T_SHORT
+GLshort *                   T_PTR
+const GLshort *             T_PTR
+GLsizeiptr                  T_U_INT
+GLsizeiptr *                T_PTR
+const GLsizeiptr *          T_PTR
+GLsizeiptrARB               T_U_INT
+GLsync                      T_PTR
+GLbitfield                  T_INT
+GLubyte                     T_U_INT
+GLubyte *                   T_PTR
+const GLubyte *             T_PTR
+GLuint64                    T_U_INT
+GLuint64 *                  T_PTR
+const GLuint64 *            T_PTR
+GLuint64EXT                 T_U_INT
+GLuint64EXT *               T_PTR
+const GLuint64EXT *         T_PTR
+GLhandleARB                 T_U_INT
+GLvdpauSurfaceNV            T_PTR
+GLvoid *                    T_PTR
+const GLvdpauSurfaceNV      T_PTR
+const GLvdpauSurfaceNV *    T_PTR
+void *                      T_PTR
+const void *                T_PTR
+void * *                    T_PTR
+const void * *              T_PTR
+const void * const *        T_PTR
+
+GLVULKANPROCNV              T_PTR
+GLLOGPROCREGAL              T_PTR
+GLDEBUGPROCARB              T_PTR
+GLDEBUGPROCAMD              T_PTR
+GLDEBUGPROC                 T_PTR
+
+cl_context                  T_PTR
+cl_event                    T_PTR
+
+GLXDrawable                 T_PTR
+
+INPUT
+
+T_FASTPTROBJ
+        $var = INT2PTR($type,SvIV($arg));
+
+T_U_INT_ARRAY
+        if( !SvPVOK($var)) {
+            croak(\"Need a packed string of GLuints\");
+        };
+        $var = SvPV_nolen($var);
+
+T_INT_ARRAY
+        if( !SvPVOK($var)) {
+            croak(\"Need a packed string of GLints\");
+        };
+        $var = SvPV_nolen($var);
+
+OUTPUT
+
+T_FASTPTROBJ
+        sv_setref_pv($arg, \"${ntype}\", (void*)$var);

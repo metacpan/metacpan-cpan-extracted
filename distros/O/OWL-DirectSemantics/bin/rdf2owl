@@ -1,0 +1,104 @@
+#!perl
+
+exit(OWL::DirectSemantics::rdf2owl->run(@ARGV)) unless (caller);
+
+package OWL::DirectSemantics::rdf2owl;
+
+use RDF::Trine;
+use OWL::DirectSemantics;
+use LWP::UserAgent;
+use URI::file;
+
+sub run
+{
+	my ($class, @args) = @_;
+	
+	my ($input, $in_type) = (STDIN, 0);
+	if (@args and !ref($args[0]) and $args[0] ne '-')
+	{
+		$input   = shift @args;
+		$in_type = ($input =~ m/^[A-Za-z0-9+\.]{1,12}:/i) ? 2 : 1;
+	}
+	
+	my ($output, $out_type) = (*STDOUT, 0);
+	if (@args and !ref($args[0]) and $args[0] ne '-')
+	{
+		$output   = shift @args;
+		$out_type = ($output =~ m/^[A-Za-z0-9+\.]{1,12}:/i) ? 2 : 1;
+	}
+	
+	my $input_model = $class->build_model($input, $input_type);
+	my $ontology    = OWL::DirectSemantics::Translator
+		->new
+		->translate($input_model);
+	
+	return $class->output($ontology->fs, $output, $out_type);
+}
+
+sub build_model
+{
+	my ($class, $input, $input_type) = @_;
+	my $model = RDF::Trine::Model->temporary_model;
+	
+	if ($input_type == 2) # URL
+	{
+		RDF::Trine::Parser->parse_url_into_model($input, $model);
+	}
+	elsif ($input_type == 1) # File
+	{
+		my $base_uri = $class->filename_to_uri($input);
+		RDF::Trine::Parser->parse_file_into_model($base_uri, $input, $model);
+	}
+	elsif ($input_type == 0) # Handle
+	{
+		my $base_uri = $class->filename_to_uri($^O eq 'MSWin32' ? 'CON' : '/dev/stdin');
+		RDF::Trine::Parser->parse_file_into_model($base_uri, $input, $model);
+	}
+	
+	return $model;
+}
+
+sub filename_to_uri
+{
+	my ($class, $filename) = @_;
+	return URI::file->new($filename)->as_string;
+}
+
+sub output
+{
+	my ($class, $string, $destination, $dest_type) = @_;
+
+	if ($dest_type == 1)
+	{
+		my $fn = $destination;
+		undef($destination);
+		open $destination, '>', $fn;
+		$dest_type--;
+	}
+	
+	if ($dest_type == 0)
+	{
+		print $destination $string;
+		return 0;
+	}
+	elsif ($dest_type == 2)
+	{
+		my $ua = LWP::UserAgent->new(
+			agent => sprintf('%s/%s ', __PACKAGE__, $VERSION),
+			);
+		my $resp = $ua->simple_request(
+			HTTP::Request->new(
+				PUT => $destination,
+				HTTP::Headers->new(
+					'Content-Type' => 'text/owl-functional',
+					),
+				$string,
+				),
+			);
+		return 0 if $resp->is_success;
+		
+		die($resp->status_line . "\n");
+	}
+}
+
+1;

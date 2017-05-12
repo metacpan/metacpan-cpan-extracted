@@ -1,0 +1,2984 @@
+/*****************************************************************************/
+/* Box IDs for sprites
+/*****************************************************************************/
+
+.cf .sprite,
+.player .sprite
+{
+	/* sprite: lores url(../result/generated-lores.png) */
+}
+
+.cf .box
+{
+	padding: 5px;
+	/* css-id: box; */
+	width: 35px; height: 35px;
+}
+
+.cf .flex-x
+{
+	padding: 5px;
+	/* css-id: flex-x; */
+	width: 35px; min-height: 35px;
+}
+
+.cf .flex-y
+{
+	padding: 5px;
+	/* css-id: flex-y; */
+	min-width: 35px; height: 35px;
+}
+
+.cf .flex-xy
+{
+	padding: 5px;
+	/* css-id: flex-xy; */
+	min-height: 35px; min-width: 35px;
+}
+
+/*****************************************************************************/
+/* Fixed WH                                                                  */
+/*****************************************************************************/
+
+.cf DIV.fixed-a
+{
+	/* css-ref: box, lores; */
+	background-repeat: no-repeat;
+	background-image: url('lores/imgs/fixed-left-top-1.png');
+}
+
+.cf DIV.fixed-b
+{
+	/* css-ref: box, lores; */
+	background-repeat: no-repeat;
+	background-position: 5px 5px;
+	background-image: url('lores/imgs/fixed-left-top-2.png');
+}
+
+.cf DIV.fixed-right-a
+{
+	/* css-ref: box, lores; */
+	background-repeat: no-repeat;
+	background-position: right 5px;
+	background-image: url('lores/imgs/fixed-right-top-1.png');
+}
+
+.cf DIV.fixed-right-b
+{
+	/* css-ref: box, lores; */
+	background-repeat: no-repeat;
+	background-position: right 5px;
+	background-image: url('lores/imgs/fixed-right-top-2.png');
+}
+
+.cf DIV.fixed-bottom-a
+{
+	/* css-ref: box, lores; */
+	background-repeat: no-repeat;
+	background-position: 5px bottom;
+	background-image: url('lores/imgs/fixed-left-bottom-1.png');
+}
+
+.cf DIV.fixed-bottom-b
+{
+	/* css-ref: box, lores; */
+	background-repeat: no-repeat;
+	background-position: 5px bottom;
+	background-image: url('lores/imgs/fixed-left-bottom-2.png');
+}
+
+.cf DIV.fixed-right-bottom-a
+{
+	/* css-ref: box, lores; */
+	background-repeat: no-repeat;
+	background-position: right bottom;
+	background-image: url('lores/imgs/fixed-right-bottom-1.png');
+}
+
+.cf DIV.fixed-right-bottom-b
+{
+	/* css-ref: box, lores; */
+	background-repeat: no-repeat;
+	background-position: right bottom;
+	background-image: url('lores/imgs/fixed-right-bottom-2.png');
+}
+
+/*****************************************************************************/
+/* Flexible H                                                                */
+/*****************************************************************************/
+
+.cf DIV.flexible-y-a
+{
+	/* css-ref: flex-x, lores; */
+	background-repeat: no-repeat;
+	background-position: 5px 5px;
+	background-image: url('lores/imgs/fixed-left-top-1.png');
+}
+
+.cf DIV.flexible-y-b
+{
+	/* css-ref: flex-x, lores; */
+	background-repeat: no-repeat;
+	background-position: 5px 5px;
+	background-image: url('lores/imgs/fixed-left-top-2.png');
+}
+
+.cf DIV.flexible-y-right-a
+{
+	/* css-ref: flex-x, lores; */
+	background-repeat: no-repeat;
+	background-position: right 5px;
+	background-image: url('lores/imgs/fixed-right-top-1.png');
+}
+
+.cf DIV.flexible-y-right-b
+{
+	/* css-ref: flex-x, lores; */
+	background-repeat: no-repeat;
+	background-position: right 5px;
+	background-image: url('lores/imgs/fixed-right-top-2.png');
+}
+
+.cf DIV.flexible-y-bottom-a
+{
+	/* css-ref: flex-x, lores; */
+	background-repeat: no-repeat;
+	background-position: 5px bottom;
+	background-image: url('lores/imgs/fixed-left-bottom-1.png');
+}
+
+.cf DIV.flexible-y-bottom-b
+{
+	/* css-ref: flex-x, lores; */
+	background-repeat: no-repeat;
+	background-position: 5px bottom;
+	background-image: url('lores/imgs/fixed-left-bottom-2.png');
+}
+
+.cf DIV.flexible-y-right-bottom-a
+{
+	/* css-ref: flex-x, lores; */
+	background-repeat: no-repeat;
+	background-position: right bottom;
+	background-image: url('lores/imgs/fixed-right-bottom-1.png');
+}
+
+.cf DIV.flexible-y-right-bottom-b
+{
+	/* css-ref: flex-x, lores; */
+	background-repeat: no-repeat;
+	background-position: right bottom;
+	background-image: url('lores/imgs/fixed-right-bottom-2.png');
+}
+
+/*****************************************************************************/
+/* Flexible W                                                                */
+/*****************************************************************************/
+
+.cf DIV.flexible-x-right-a
+{
+	/* css-ref: flex-y, lores; */
+	background-repeat: no-repeat;
+	background-position: right 5px;
+	background-image: url('lores/imgs/fixed-right-top-1.png');
+}
+
+.cf DIV.flexible-x-right-b
+{
+	/* css-ref: flex-y, lores; */
+	background-repeat: no-repeat;
+	background-position: right 5px;
+	background-image: url('lores/imgs/fixed-right-top-2.png');
+}
+
+.cf DIV.flexible-x-a
+{
+	/* css-ref: flex-y, lores; */
+	background-repeat: no-repeat;
+	background-position: 5px 5px;
+	background-image: url('lores/imgs/fixed-left-top-1.png');
+}
+
+.cf DIV.flexible-x-b
+{
+	/* css-ref: flex-y, lores; */
+	background-repeat: no-repeat;
+	background-position: 5px 5px;
+	background-image: url('lores/imgs/fixed-left-top-2.png');
+}
+
+.cf DIV.flexible-x-bottom-a
+{
+	/* css-ref: flex-y, lores; */
+	background-repeat: no-repeat;
+	background-position: 5px bottom;
+	background-image: url('lores/imgs/fixed-left-bottom-1.png');
+}
+
+.cf DIV.flexible-x-bottom-b
+{
+	/* css-ref: flex-y, lores; */
+	background-repeat: no-repeat;
+	background-position: 5px bottom;
+	background-image: url('lores/imgs/fixed-left-bottom-2.png');
+}
+
+.cf DIV.flexible-x-right-bottom-a
+{
+	/* css-ref: flex-y, lores; */
+	background-repeat: no-repeat;
+	background-position: right bottom;
+	background-image: url('lores/imgs/fixed-right-bottom-1.png');
+}
+
+.cf DIV.flexible-x-right-bottom-b
+{
+	/* css-ref: flex-y, lores; */
+	background-repeat: no-repeat;
+	background-position: right bottom;
+	background-image: url('lores/imgs/fixed-right-bottom-2.png');
+}
+
+/*****************************************************************************/
+/* Flexible WH                                                               */
+/*****************************************************************************/
+
+.cf DIV.flexible-a
+{
+	/* css-ref: flex-xy, lores; */
+	background-repeat: no-repeat;
+	background-position: 5px 5px;
+	background-image: url('lores/imgs/fixed-left-top-1.png');
+}
+
+.cf DIV.flexible-b
+{
+	/* css-ref: flex-xy, lores; */
+	background-repeat: no-repeat;
+	background-position: 5px 5px;
+	background-image: url('lores/imgs/fixed-left-top-2.png');
+}
+
+.cf DIV.flexible-right-a
+{
+	/* css-ref: flex-xy, lores; */
+	background-repeat: no-repeat;
+	background-position: right 5px;
+	background-image: url('lores/imgs/fixed-right-top-1.png');
+}
+
+.cf DIV.flexible-right-b
+{
+	/* css-ref: flex-xy, lores; */
+	background-repeat: no-repeat;
+	background-position: right 5px;
+	background-image: url('lores/imgs/fixed-right-top-2.png');
+}
+
+.cf DIV.flexible-bottom-a
+{
+	/* css-ref: flex-xy, lores; */
+	background-repeat: no-repeat;
+	background-position: 5px bottom;
+	background-image: url('lores/imgs/fixed-left-bottom-1.png');
+}
+
+.cf DIV.flexible-bottom-b
+{
+	/* css-ref: flex-xy, lores; */
+	background-repeat: no-repeat;
+	background-position: 5px bottom;
+	background-image: url('lores/imgs/fixed-left-bottom-2.png');
+}
+
+.cf DIV.flexible-right-bottom-a
+{
+	/* css-ref: flex-xy, lores; */
+	background-repeat: no-repeat;
+	background-position: right bottom;
+	background-image: url('lores/imgs/fixed-right-bottom-1.png');
+}
+
+.cf DIV.flexible-right-bottom-b
+{
+	/* css-ref: flex-xy, lores; */
+	background-repeat: no-repeat;
+	background-position: right bottom;
+	background-image: url('lores/imgs/fixed-right-bottom-2.png');
+}
+
+/*****************************************************************************/
+/* Fixed WH - Repeat X                                                       */
+/*****************************************************************************/
+
+.cf DIV.repeat-x-a
+{
+	/* css-ref: box, lores; */
+	background-repeat: repeat-x;
+	background-position: 10px 10px;
+	background-image: url('lores/imgs/fixed-left-top-1.png');
+}
+
+.cf DIV.repeat-x-b
+{
+	/* css-ref: box, lores; */
+	background-repeat: repeat-x;
+	background-position: 5px 5px;
+	background-image: url('lores/imgs/fixed-left-top-2.png');
+}
+
+.cf DIV.repeat-x-right-a
+{
+	/* css-ref: box, lores; */
+	background-repeat: repeat-x;
+	background-position: right 5px;
+	background-image: url('lores/imgs/fixed-right-top-1.png');
+}
+
+.cf DIV.repeat-x-right-b
+{
+	/* css-ref: box, lores; */
+	background-repeat: repeat-x;
+	background-position: right 5px;
+	background-image: url('lores/imgs/fixed-right-top-2.png');
+}
+
+.cf DIV.repeat-x-bottom-a
+{
+	/* css-ref: box, lores; */
+	background-repeat: repeat-x;
+	background-position: 5px bottom;
+	background-image: url('lores/imgs/fixed-left-bottom-1.png');
+}
+
+.cf DIV.repeat-x-bottom-b
+{
+	/* css-ref: box, lores; */
+	background-repeat: repeat-x;
+	background-position: 5px bottom;
+	background-image: url('lores/imgs/fixed-left-bottom-2.png');
+}
+
+.cf DIV.repeat-x-right-bottom-a
+{
+	/* css-ref: box, lores; */
+	background-repeat: repeat-x;
+	background-position: right bottom;
+	background-image: url('lores/imgs/fixed-right-bottom-1.png');
+}
+
+.cf DIV.repeat-x-right-bottom-b
+{
+	/* css-ref: box, lores; */
+	background-repeat: repeat-x;
+	background-position: right bottom;
+	background-image: url('lores/imgs/fixed-right-bottom-2.png');
+}
+
+/*****************************************************************************/
+/* Fixed WH - Repeat Y                                                       */
+/*****************************************************************************/
+
+.cf DIV.repeat-y-a
+{
+	/* css-ref: box, lores; */
+	background-repeat: repeat-y;
+	background-position: 10px 10px;
+	background-image: url('lores/imgs/fixed-left-top-1.png');
+}
+
+.cf DIV.repeat-y-b
+{
+	/* css-ref: box, lores; */
+	background-repeat: repeat-y;
+	background-position: 5px 5px;
+	background-image: url('lores/imgs/fixed-left-top-2.png');
+}
+
+.cf DIV.repeat-y-right-a
+{
+	/* css-ref: box, lores; */
+	background-repeat: repeat-y;
+	background-position: right 5px;
+	background-image: url('lores/imgs/fixed-right-top-1.png');
+}
+
+.cf DIV.repeat-y-right-b
+{
+	/* css-ref: box, lores; */
+	background-repeat: repeat-y;
+	background-position: right 5px;
+	background-image: url('lores/imgs/fixed-right-top-2.png');
+}
+
+.cf DIV.repeat-y-bottom-a
+{
+	/* css-ref: box, lores; */
+	background-repeat: repeat-y;
+	background-position: 5px bottom;
+	background-image: url('lores/imgs/fixed-left-bottom-1.png');
+}
+
+.cf DIV.repeat-y-bottom-b
+{
+	/* css-ref: box, lores; */
+	background-repeat: repeat-y;
+	background-position: 5px bottom;
+	background-image: url('lores/imgs/fixed-left-bottom-2.png');
+}
+
+.cf DIV.repeat-y-right-bottom-a
+{
+	/* css-ref: box, lores; */
+	background-repeat: repeat-y;
+	background-position: right bottom;
+	background-image: url('lores/imgs/fixed-right-bottom-1.png');
+}
+
+.cf DIV.repeat-y-right-bottom-b
+{
+	/* css-ref: box, lores; */
+	background-repeat: repeat-y;
+	background-position: right bottom;
+	background-image: url('lores/imgs/fixed-right-bottom-2.png');
+}
+
+/*****************************************************************************/
+/* Fixed WH - Repeat XY                                                      */
+/*****************************************************************************/
+
+.cf DIV.repeat-xy-a
+{
+	/* css-ref: box, lores; */
+	background-repeat: repeat;
+	background-position: 10px 10px;
+	background-image: url('lores/imgs/fixed-left-top-1.png');
+}
+
+.cf DIV.repeat-xy-b
+{
+	/* css-ref: box, lores; */
+	background-repeat: repeat;
+	background-position: 5px 5px;
+	background-image: url('lores/imgs/fixed-left-top-2.png');
+}
+
+.cf DIV.repeat-xy-right-a
+{
+	/* css-ref: box, lores; */
+	background-repeat: repeat;
+	background-position: right 5px;
+	background-image: url('lores/imgs/fixed-right-top-1.png');
+}
+
+.cf DIV.repeat-xy-right-b
+{
+	/* css-ref: box, lores; */
+	background-repeat: repeat;
+	background-position: right 5px;
+	background-image: url('lores/imgs/fixed-right-top-2.png');
+}
+
+.cf DIV.repeat-xy-bottom-a
+{
+	/* css-ref: box, lores; */
+	background-repeat: repeat;
+	background-position: 5px bottom;
+	background-image: url('lores/imgs/fixed-left-bottom-1.png');
+}
+
+.cf DIV.repeat-xy-bottom-b
+{
+	/* css-ref: box, lores; */
+	background-repeat: repeat;
+	background-position: 5px bottom;
+	background-image: url('lores/imgs/fixed-left-bottom-2.png');
+}
+
+.cf DIV.repeat-xy-right-bottom-a
+{
+	/* css-ref: box, lores; */
+	background-repeat: repeat;
+	background-position: right bottom;
+	background-image: url('lores/imgs/fixed-right-bottom-1.png');
+}
+
+.cf DIV.repeat-xy-right-bottom-b
+{
+	/* css-ref: box, lores; */
+	background-repeat: repeat;
+	background-position: right bottom;
+	background-image: url('lores/imgs/fixed-right-bottom-2.png');
+}
+/*****************************************************************************/
+/* Flexible H - Repeat X                                                     */
+/*****************************************************************************/
+
+.cf DIV.flexible-y-repeat-x-a
+{
+	/* css-ref: flex-x, lores; */
+	background-repeat: repeat-x;
+	background-position: 5px 5px;
+	background-image: url('lores/imgs/fixed-left-top-1.png');
+}
+
+.cf DIV.flexible-y-repeat-x-b
+{
+	/* css-ref: flex-x, lores; */
+	background-repeat: repeat-x;
+	background-position: 5px 5px;
+	background-image: url('lores/imgs/fixed-left-top-2.png');
+}
+
+.cf DIV.flexible-y-repeat-x-right-a
+{
+	/* css-ref: flex-x, lores; */
+	background-repeat: repeat-x;
+	background-position: right 5px;
+	background-image: url('lores/imgs/fixed-right-top-1.png');
+}
+
+.cf DIV.flexible-y-repeat-x-right-b
+{
+	/* css-ref: flex-x, lores; */
+	background-repeat: repeat-x;
+	background-position: right 5px;
+	background-image: url('lores/imgs/fixed-right-top-2.png');
+}
+
+.cf DIV.flexible-y-repeat-x-bottom-a
+{
+	/* css-ref: flex-x, lores; */
+	background-repeat: repeat-x;
+	background-position: 5px bottom;
+	background-image: url('lores/imgs/fixed-left-bottom-1.png');
+}
+
+.cf DIV.flexible-y-repeat-x-bottom-b
+{
+	/* css-ref: flex-x, lores; */
+	background-repeat: repeat-x;
+	background-position: 5px bottom;
+	background-image: url('lores/imgs/fixed-left-bottom-2.png');
+}
+
+.cf DIV.flexible-y-repeat-x-right-bottom-a
+{
+	/* css-ref: flex-x, lores; */
+	background-repeat: repeat-x;
+	background-position: right bottom;
+	background-image: url('lores/imgs/fixed-right-bottom-1.png');
+}
+
+.cf DIV.flexible-y-repeat-x-right-bottom-b
+{
+	/* css-ref: flex-x, lores; */
+	background-repeat: repeat-x;
+	background-position: right bottom;
+	background-image: url('lores/imgs/fixed-right-bottom-2.png');
+}
+
+/*****************************************************************************/
+/* Flexible H - Repeat Y                                                     */
+/*****************************************************************************/
+
+.cf DIV.flexible-y-repeat-y-a
+{
+	/* css-ref: flex-x, lores; */
+	background-repeat: repeat-y;
+	background-position: 5px 5px;
+	background-image: url('lores/imgs/fixed-left-top-1.png');
+}
+
+.cf DIV.flexible-y-repeat-y-b
+{
+	/* css-ref: flex-x, lores; */
+	background-repeat: repeat-y;
+	background-position: 5px 5px;
+	background-image: url('lores/imgs/fixed-left-top-2.png');
+}
+
+.cf DIV.flexible-y-repeat-y-right-a
+{
+	/* css-ref: flex-x, lores; */
+	background-repeat: repeat-y;
+	background-position: right 5px;
+	background-image: url('lores/imgs/fixed-right-top-1.png');
+}
+
+.cf DIV.flexible-y-repeat-y-right-b
+{
+	/* css-ref: flex-x, lores; */
+	background-repeat: repeat-y;
+	background-position: right 5px;
+	background-image: url('lores/imgs/fixed-right-top-2.png');
+}
+
+.cf DIV.flexible-y-repeat-y-bottom-a
+{
+	/* css-ref: flex-x, lores; */
+	background-repeat: repeat-y;
+	background-position: 5px bottom;
+	background-image: url('lores/imgs/fixed-left-bottom-1.png');
+}
+
+.cf DIV.flexible-y-repeat-y-bottom-b
+{
+	/* css-ref: flex-x, lores; */
+	background-repeat: repeat-y;
+	background-position: 5px bottom;
+	background-image: url('lores/imgs/fixed-left-bottom-2.png');
+}
+
+.cf DIV.flexible-y-repeat-y-right-bottom-a
+{
+	/* css-ref: flex-x, lores; */
+	background-repeat: repeat-y;
+	background-position: right bottom;
+	background-image: url('lores/imgs/fixed-right-bottom-1.png');
+}
+
+.cf DIV.flexible-y-repeat-y-right-bottom-b
+{
+	/* css-ref: flex-x, lores; */
+	background-repeat: repeat-y;
+	background-position: right bottom;
+	background-image: url('lores/imgs/fixed-right-bottom-2.png');
+}
+
+
+/*****************************************************************************/
+/* Flexible H - Repeat Y                                                     */
+/*****************************************************************************/
+
+.cf DIV.flexible-y-repeat-xy-a
+{
+	/* css-ref: flex-x, lores; */
+	background-repeat: repeat;
+	background-position: 5px 5px;
+	background-image: url('lores/imgs/fixed-left-top-1.png');
+}
+
+.cf DIV.flexible-y-repeat-xy-b
+{
+	/* css-ref: flex-x, lores; */
+	background-repeat: repeat;
+	background-position: 5px 5px;
+	background-image: url('lores/imgs/fixed-left-top-2.png');
+}
+
+.cf DIV.flexible-y-repeat-xy-right-a
+{
+	/* css-ref: flex-x, lores; */
+	background-repeat: repeat;
+	background-position: right 5px;
+	background-image: url('lores/imgs/fixed-right-top-1.png');
+}
+
+.cf DIV.flexible-y-repeat-xy-right-b
+{
+	/* css-ref: flex-x, lores; */
+	background-repeat: repeat;
+	background-position: right 5px;
+	background-image: url('lores/imgs/fixed-right-top-2.png');
+}
+
+.cf DIV.flexible-y-repeat-xy-bottom-a
+{
+	/* css-ref: flex-x, lores; */
+	background-repeat: repeat;
+	background-position: 5px bottom;
+	background-image: url('lores/imgs/fixed-left-bottom-1.png');
+}
+
+.cf DIV.flexible-y-repeat-xy-bottom-b
+{
+	/* css-ref: flex-x, lores; */
+	background-repeat: repeat;
+	background-position: 5px bottom;
+	background-image: url('lores/imgs/fixed-left-bottom-2.png');
+}
+
+.cf DIV.flexible-y-repeat-xy-right-bottom-a
+{
+	/* css-ref: flex-x, lores; */
+	background-repeat: repeat;
+	background-position: right bottom;
+	background-image: url('lores/imgs/fixed-right-bottom-1.png');
+}
+
+.cf DIV.flexible-y-repeat-xy-right-bottom-b
+{
+	/* css-ref: flex-x, lores; */
+	background-repeat: repeat;
+	background-position: right bottom;
+	background-image: url('lores/imgs/fixed-right-bottom-2.png');
+}
+/*****************************************************************************/
+/* Flexible W - Repeat X                                                     */
+/*****************************************************************************/
+
+.cf DIV.flexible-x-repeat-x-a
+{
+	/* css-ref: flex-y, lores; */
+	background-repeat: repeat-x;
+	background-position: 5px 5px;
+	background-image: url('lores/imgs/fixed-left-top-1.png');
+}
+
+.cf DIV.flexible-x-repeat-x-b
+{
+	/* css-ref: flex-y, lores; */
+	background-repeat: repeat-x;
+	background-position: 5px 5px;
+	background-image: url('lores/imgs/fixed-left-top-2.png');
+}
+
+.cf DIV.flexible-x-repeat-x-right-a
+{
+	/* css-ref: flex-y, lores; */
+	background-repeat: repeat-x;
+	background-position: right 5px;
+	background-image: url('lores/imgs/fixed-right-top-1.png');
+}
+
+.cf DIV.flexible-x-repeat-x-right-b
+{
+	/* css-ref: flex-y, lores; */
+	background-repeat: repeat-x;
+	background-position: right 5px;
+	background-image: url('lores/imgs/fixed-right-top-2.png');
+}
+
+.cf DIV.flexible-x-repeat-x-bottom-a
+{
+	/* css-ref: flex-y, lores; */
+	background-repeat: repeat-x;
+	background-position: 5px bottom;
+	background-image: url('lores/imgs/fixed-left-bottom-1.png');
+}
+
+.cf DIV.flexible-x-repeat-x-bottom-b
+{
+	/* css-ref: flex-y, lores; */
+	background-repeat: repeat-x;
+	background-position: 5px bottom;
+	background-image: url('lores/imgs/fixed-left-bottom-2.png');
+}
+
+.cf DIV.flexible-x-repeat-x-right-bottom-a
+{
+	/* css-ref: flex-y, lores; */
+	background-repeat: repeat-x;
+	background-position: right bottom;
+	background-image: url('lores/imgs/fixed-right-bottom-1.png');
+}
+
+.cf DIV.flexible-x-repeat-x-right-bottom-b
+{
+	/* css-ref: flex-y, lores; */
+	background-repeat: repeat-x;
+	background-position: right bottom;
+	background-image: url('lores/imgs/fixed-right-bottom-2.png');
+}
+
+/*****************************************************************************/
+/* Flexible W - Repeat Y                                                     */
+/*****************************************************************************/
+
+.cf DIV.flexible-x-repeat-y-a
+{
+	/* css-ref: flex-y, lores; */
+	background-repeat: repeat-y;
+	background-position: 5px 5px;
+	background-image: url('lores/imgs/fixed-left-top-1.png');
+}
+
+.cf DIV.flexible-x-repeat-y-b
+{
+	/* css-ref: flex-y, lores; */
+	background-repeat: repeat-y;
+	background-position: 5px 5px;
+	background-image: url('lores/imgs/fixed-left-top-2.png');
+}
+
+.cf DIV.flexible-x-repeat-y-right-a
+{
+	/* css-ref: flex-y, lores; */
+	background-repeat: repeat-y;
+	background-position: right 5px;
+	background-image: url('lores/imgs/fixed-right-top-1.png');
+}
+
+.cf DIV.flexible-x-repeat-y-right-b
+{
+	/* css-ref: flex-y, lores; */
+	background-repeat: repeat-y;
+	background-position: right 5px;
+	background-image: url('lores/imgs/fixed-right-top-2.png');
+}
+
+.cf DIV.flexible-x-repeat-y-bottom-a
+{
+	/* css-ref: flex-y, lores; */
+	background-repeat: repeat-y;
+	background-position: 5px bottom;
+	background-image: url('lores/imgs/fixed-left-bottom-1.png');
+}
+
+.cf DIV.flexible-x-repeat-y-bottom-b
+{
+	/* css-ref: flex-y, lores; */
+	background-repeat: repeat-y;
+	background-position: 5px bottom;
+	background-image: url('lores/imgs/fixed-left-bottom-2.png');
+}
+
+.cf DIV.flexible-x-repeat-y-right-bottom-a
+{
+	/* css-ref: flex-y, lores; */
+	background-repeat: repeat-y;
+	background-position: right bottom;
+	background-image: url('lores/imgs/fixed-right-bottom-1.png');
+}
+
+.cf DIV.flexible-x-repeat-y-right-bottom-b
+{
+	/* css-ref: flex-y, lores; */
+	background-repeat: repeat-y;
+	background-position: right bottom;
+	background-image: url('lores/imgs/fixed-right-bottom-2.png');
+}
+
+
+/*****************************************************************************/
+/* Flexible W - Repeat XY                                                    */
+/*****************************************************************************/
+
+.cf DIV.flexible-x-repeat-xy-a
+{
+	/* css-ref: flex-y, lores; */
+	background-repeat: repeat;
+	background-position: 5px 5px;
+	background-image: url('lores/imgs/fixed-left-top-1.png');
+}
+
+.cf DIV.flexible-x-repeat-xy-b
+{
+	/* css-ref: flex-y, lores; */
+	background-repeat: repeat;
+	background-position: 5px 5px;
+	background-image: url('lores/imgs/fixed-left-top-2.png');
+}
+
+.cf DIV.flexible-x-repeat-xy-right-a
+{
+	/* css-ref: flex-y, lores; */
+	background-repeat: repeat;
+	background-position: right 5px;
+	background-image: url('lores/imgs/fixed-right-top-1.png');
+}
+
+.cf DIV.flexible-x-repeat-xy-right-b
+{
+	/* css-ref: flex-y, lores; */
+	background-repeat: repeat;
+	background-position: right 5px;
+	background-image: url('lores/imgs/fixed-right-top-2.png');
+}
+
+.cf DIV.flexible-x-repeat-xy-bottom-a
+{
+	/* css-ref: flex-y, lores; */
+	background-repeat: repeat;
+	background-position: 5px bottom;
+	background-image: url('lores/imgs/fixed-left-bottom-1.png');
+}
+
+.cf DIV.flexible-x-repeat-xy-bottom-b
+{
+	/* css-ref: flex-y, lores; */
+	background-repeat: repeat;
+	background-position: 5px bottom;
+	background-image: url('lores/imgs/fixed-left-bottom-2.png');
+}
+
+.cf DIV.flexible-x-repeat-xy-right-bottom-a
+{
+	/* css-ref: flex-y, lores; */
+	background-repeat: repeat;
+	background-position: right bottom;
+	background-image: url('lores/imgs/fixed-right-bottom-1.png');
+}
+
+.cf DIV.flexible-x-repeat-xy-right-bottom-b
+{
+	/* css-ref: flex-y, lores; */
+	background-repeat: repeat;
+	background-position: right bottom;
+	background-image: url('lores/imgs/fixed-right-bottom-2.png');
+}
+
+/*****************************************************************************/
+/* Flexible - Repeat X                                                       */
+/*****************************************************************************/
+
+.cf DIV.flexible-repeat-x-a
+{
+	/* css-ref: flex-xy, lores; */
+	background-repeat: repeat-x;
+	background-position: 5px 5px;
+	background-image: url('lores/imgs/fixed-left-top-1.png');
+}
+
+.cf DIV.flexible-repeat-x-b
+{
+	/* css-ref: flex-xy, lores; */
+	background-repeat: repeat-x;
+	background-position: 5px 5px;
+	background-image: url('lores/imgs/fixed-left-top-2.png');
+}
+
+.cf DIV.flexible-repeat-x-right-a
+{
+	/* css-ref: flex-xy, lores; */
+	background-repeat: repeat-x;
+	background-position: right 5px;
+	background-image: url('lores/imgs/fixed-right-top-1.png');
+}
+
+.cf DIV.flexible-repeat-x-right-b
+{
+	/* css-ref: flex-xy, lores; */
+	background-repeat: repeat-x;
+	background-position: right 5px;
+	background-image: url('lores/imgs/fixed-right-top-2.png');
+}
+
+.cf DIV.flexible-repeat-x-bottom-a
+{
+	/* css-ref: flex-xy, lores; */
+	background-repeat: repeat-x;
+	background-position: 5px bottom;
+	background-image: url('lores/imgs/fixed-left-bottom-1.png');
+}
+
+.cf DIV.flexible-repeat-x-bottom-b
+{
+	/* css-ref: flex-xy, lores; */
+	background-repeat: repeat-x;
+	background-position: 5px bottom;
+	background-image: url('lores/imgs/fixed-left-bottom-2.png');
+}
+
+.cf DIV.flexible-repeat-x-right-bottom-a
+{
+	/* css-ref: flex-xy, lores; */
+	background-repeat: repeat-x;
+	background-position: right bottom;
+	background-image: url('lores/imgs/fixed-right-bottom-1.png');
+}
+
+.cf DIV.flexible-repeat-x-right-bottom-b
+{
+	/* css-ref: flex-xy, lores; */
+	background-repeat: repeat-x;
+	background-position: right bottom;
+	background-image: url('lores/imgs/fixed-right-bottom-2.png');
+}
+
+/*****************************************************************************/
+/* Flexible - Repeat Y                                                       */
+/*****************************************************************************/
+
+.cf DIV.flexible-repeat-y-a
+{
+	/* css-ref: flex-xy, lores; */
+	background-repeat: repeat-y;
+	background-position: 5px 5px;
+	background-image: url('lores/imgs/fixed-left-top-1.png');
+}
+
+.cf DIV.flexible-repeat-y-b
+{
+	/* css-ref: flex-xy, lores; */
+	background-repeat: repeat-y;
+	background-position: 5px 5px;
+	background-image: url('lores/imgs/fixed-left-top-2.png');
+}
+
+.cf DIV.flexible-repeat-y-right-a
+{
+	/* css-ref: flex-xy, lores; */
+	background-repeat: repeat-y;
+	background-position: right 5px;
+	background-image: url('lores/imgs/fixed-right-top-1.png');
+}
+
+.cf DIV.flexible-repeat-y-right-b
+{
+	/* css-ref: flex-xy, lores; */
+	background-repeat: repeat-y;
+	background-position: right 5px;
+	background-image: url('lores/imgs/fixed-right-top-2.png');
+}
+
+.cf DIV.flexible-repeat-y-bottom-a
+{
+	/* css-ref: flex-xy, lores; */
+	background-repeat: repeat-y;
+	background-position: 5px bottom;
+	background-image: url('lores/imgs/fixed-left-bottom-1.png');
+}
+
+.cf DIV.flexible-repeat-y-bottom-b
+{
+	/* css-ref: flex-xy, lores; */
+	background-repeat: repeat-y;
+	background-position: 5px bottom;
+	background-image: url('lores/imgs/fixed-left-bottom-2.png');
+}
+
+.cf DIV.flexible-repeat-y-right-bottom-a
+{
+	/* css-ref: flex-xy, lores; */
+	background-repeat: repeat-y;
+	background-position: right bottom;
+	background-image: url('lores/imgs/fixed-right-bottom-1.png');
+}
+
+.cf DIV.flexible-repeat-y-right-bottom-b
+{
+	/* css-ref: flex-xy, lores; */
+	background-repeat: repeat-y;
+	background-position: right bottom;
+	background-image: url('lores/imgs/fixed-right-bottom-2.png');
+}
+
+/*****************************************************************************/
+/* Simple sprite example                                                     */
+/*****************************************************************************/
+
+.cf DIV.sprite-flex-left
+{
+	padding: 4px 5px;
+	width: 53px; height: 45px;
+	/* css-ref: lores; */
+	background-repeat: no-repeat;
+	background-position: 2px 5px;
+	background-image: url('lores/imgs/bg-001a.png');
+}
+.cf DIV.sprite-flex-left.repeat-x
+{
+	padding: 4px 5px;
+	width: 53px; height: 45px;
+	/* css-ref: lores; */
+	background-repeat: repeat-x;
+	background-position: 2px 5px;
+	background-image: url('lores/imgs/bg-001b.png');
+}
+.cf DIV.sprite-flex-left.repeat-y
+{
+	padding: 4px 5px;
+	width: 53px; height: 45px;
+	/* css-ref: lores; */
+	background-repeat: repeat-y;
+	background-position: 2px 5px;
+	background-image: url('lores/imgs/bg-001c.png');
+}
+
+.cf DIV.sprite-flex-top
+{
+	padding: 4px 5px;
+	width: 53px; height: 45px;
+	/* css-ref: lores; */
+	background-repeat: no-repeat;
+	background-position: 5px 2px;
+	background-image: url('lores/imgs/bg-002a.png');
+}
+.cf DIV.sprite-flex-top.repeat-x
+{
+	padding: 4px 5px;
+	width: 53px; height: 45px;
+	/* css-ref: lores; */
+	background-repeat: repeat-x;
+	background-position: 5px 2px;
+	background-image: url('lores/imgs/bg-002b.png');
+}
+.cf DIV.sprite-flex-top.repeat-y
+{
+	padding: 4px 5px;
+	width: 53px; height: 45px;
+	/* css-ref: lores; */
+	background-repeat: repeat-y;
+	background-position: 5px 2px;
+	background-image: url('lores/imgs/bg-002c.png');
+}
+
+.cf DIV.sprite-flex-right
+{
+	padding: 4px 5px;
+	width: 53px; height: 45px;
+	/* css-ref: lores; */
+	background-repeat: no-repeat;
+	background-position: right 5px;
+	background-image: url('lores/imgs/bg-003a.png');
+}
+.cf DIV.sprite-flex-right.repeat-x
+{
+	padding: 4px 5px;
+	width: 53px; height: 45px;
+	/* css-ref: lores; */
+	background-repeat: repeat-x;
+	background-position: right 5px;
+	background-image: url('lores/imgs/bg-003b.png');
+}
+.cf DIV.sprite-flex-right.repeat-y
+{
+	padding: 4px 5px;
+	width: 53px; height: 45px;
+	/* css-ref: lores; */
+	background-repeat: repeat-y;
+	background-position: right 5px;
+	background-image: url('lores/imgs/bg-003c.png');
+}
+
+.cf DIV.sprite-flex-bottom
+{
+	padding: 4px 5px;
+	width: 53px; height: 45px;
+	/* css-ref: lores; */
+	background-repeat: no-repeat;
+	background-position: 5px bottom;
+	background-image: url('lores/imgs/bg-004a.png');
+}
+.cf DIV.sprite-flex-bottom.repeat-x
+{
+	padding: 4px 5px;
+	width: 53px; height: 45px;
+	/* css-ref: lores; */
+	background-repeat: repeat-x;
+	background-position: 5px bottom;
+	background-image: url('lores/imgs/bg-004b.png');
+}
+.cf DIV.sprite-flex-bottom.repeat-y
+{
+	padding: 4px 5px;
+	width: 53px; height: 45px;
+	/* css-ref: lores; */
+	background-repeat: repeat-y;
+	background-position: 5px bottom;
+	background-image: url('lores/imgs/bg-004c.png');
+}
+
+.cf DIV.sprite-flex-bottom-right
+{
+	padding: 4px 5px;
+	width: 53px; height: 45px;
+	/* css-ref: lores; */
+	background-repeat: no-repeat;
+	background-position: right bottom;
+	background-image: url('lores/imgs/bg-005a.png');
+}
+.cf DIV.sprite-flex-bottom-right.repeat-x
+{
+	padding: 4px 5px;
+	width: 53px; height: 45px;
+	/* css-ref: lores; */
+	background-repeat: repeat-x;
+	background-position: right bottom;
+	background-image: url('lores/imgs/bg-005b.png');
+}
+.cf DIV.sprite-flex-bottom-right.repeat-y
+{
+	padding: 4px 5px;
+	width: 53px; height: 45px;
+	/* css-ref: lores; */
+	background-repeat: repeat-y;
+	background-position: right bottom;
+	background-image: url('lores/imgs/bg-005c.png');
+}
+
+/*****************************************************************************/
+/* Player button example                                                     */
+/*****************************************************************************/
+
+A.player
+{
+	width: 200px;
+	height: 150px;
+	display: block;
+	position: relative;
+	border: 3px solid #339999;
+	background-color: #CCCCCC;
+}
+
+A.player .icon-play-big
+{
+	/*
+		css-ref: lores;
+	*/
+	width: 60px;
+	height: 60px;
+	display: block;
+	position: absolute;
+	top: 50%; left: 50%;
+	padding: 10px;
+	margin-top: -30px;
+	margin-left: -30px;
+	background-repeat: no-repeat;
+	background-position: 5px 5px;
+	background-image: url('lores/icons/play-big-active.png');
+}
+
+A.player:focus .icon-play-big,
+A.player:hover .icon-play-big
+{
+	/*
+		css-ref: lores;
+	*/
+	padding: 10px;
+	width: 60px; height: 60px;
+	background-position: 5px 5px;
+	background-repeat: no-repeat;
+	background-image: url('lores/icons/play-big-hover.png');
+}
+
+A.record
+{
+	float: left;
+	color: #FFFFFF;
+	overflow: hidden;
+	margin: 20px 0px;
+	padding: 4px 10px;
+	border-radius: 5px;
+	background-color: #CC00CC;
+}
+
+A.record SPAN
+{
+	float: left;
+}
+
+A.record SPAN.icon-record
+{
+	/*
+		css-ref: lores;
+	*/
+	margin: 5px 5px 5px 0px;
+	width: 10px; height: 10px;
+	background-repeat: no-repeat;
+	background-image: url('lores/icons/record-active.png');
+}
+
+A.record-play
+{
+	float: left;
+	color: #FFFFFF;
+	display: block;
+	overflow: hidden;
+	margin: 20px 0px;
+	padding: 4px 10px;
+	border-radius: 5px;
+	background-color: #CC00CC;
+}
+
+A.record-play SPAN
+{
+	float: left;
+}
+
+A.record-play SPAN.icon-record
+{
+	/*
+		css-ref: lores;
+	*/
+	vertical-align: bottom;
+	display: inline-block;
+	margin: 5px 5px 5px 0px;
+	width: 10px; height: 10px;
+	background-repeat: no-repeat;
+	background-image: url('lores/icons/record-active.png');
+}
+
+A.button
+{
+	margin-right: 20px;
+}
+
+A.button:last-child
+{
+	margin-right: 0px;
+}
+
+A:focus SPAN.icon-record,
+A:hover SPAN.icon-record
+{
+	/*
+		css-ref: lores;
+	*/
+	width: 10px; height: 10px;
+	background-repeat: no-repeat;
+	background-image: url('lores/icons/record-hover.png');
+}
+
+@media
+only screen and (-webkit-min-device-pixel-ratio: 1.05),
+only screen and (   min--moz-device-pixel-ratio: 1.05),
+only screen and (   -moz-min-device-pixel-ratio: 1.05),
+only screen and (     -o-min-device-pixel-ratio: 21/20),
+only screen and (        min-device-pixel-ratio: 1.05),
+only screen and (                min-resolution: 1.05dppx)
+{
+
+	.cf .sprite,
+	.player .sprite
+	{
+		/*
+			css-id: hires;
+			sprite-id: hires;
+			sprite-image: url(../result/generated-hires.png);
+		*/
+	}
+
+	.cf DIV.fixed-a
+	{
+		/* css-ref: box, hires; */
+		background-size: 14px 14px;
+		background-repeat: no-repeat;
+		background-image: url('hires/imgs/fixed-left-top-1.png');
+	}
+
+	.cf DIV.fixed-b
+	{
+		/* css-ref: box, hires; */
+		background-size: 14px 14px;
+		background-repeat: no-repeat;
+		background-position: 5px 5px;
+		background-image: url('hires/imgs/fixed-left-top-2.png');
+	}
+
+	.cf DIV.fixed-right-a
+	{
+		/* css-ref: box, hires; */
+		background-size: 14px 14px;
+		background-repeat: no-repeat;
+		background-position: right 5px;
+		background-image: url('hires/imgs/fixed-right-top-1.png');
+	}
+
+	.cf DIV.fixed-right-b
+	{
+		/* css-ref: box, hires; */
+		background-size: 14px 14px;
+		background-repeat: no-repeat;
+		background-position: right 5px;
+		background-image: url('hires/imgs/fixed-right-top-2.png');
+	}
+
+	.cf DIV.fixed-bottom-a
+	{
+		/* css-ref: box, hires; */
+		background-size: 14px 14px;
+		background-repeat: no-repeat;
+		background-position: 5px bottom;
+		background-image: url('hires/imgs/fixed-left-bottom-1.png');
+	}
+
+	.cf DIV.fixed-bottom-b
+	{
+		/* css-ref: box, hires; */
+		background-size: 14px 14px;
+		background-repeat: no-repeat;
+		background-position: 5px bottom;
+		background-image: url('hires/imgs/fixed-left-bottom-2.png');
+	}
+
+	.cf DIV.fixed-right-bottom-a
+	{
+		/* css-ref: box, hires; */
+		background-size: 14px 14px;
+		background-repeat: no-repeat;
+		background-position: right bottom;
+		background-image: url('hires/imgs/fixed-right-bottom-1.png');
+	}
+
+	.cf DIV.fixed-right-bottom-b
+	{
+		/* css-ref: box, hires; */
+		background-size: 14px 14px;
+		background-repeat: no-repeat;
+		background-position: right bottom;
+		background-image: url('hires/imgs/fixed-right-bottom-2.png');
+	}
+
+	/*****************************************************************************/
+	/* Flexible H                                                                */
+	/*****************************************************************************/
+
+	.cf DIV.flexible-y-a
+	{
+		/* css-ref: flex-x, hires; */
+		border-left-color: #FF0000;
+		border-right-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: no-repeat;
+		background-position: 5px 5px;
+		background-image: url('hires/imgs/fixed-left-top-1.png');
+	}
+
+	.cf DIV.flexible-y-b
+	{
+		/* css-ref: flex-x, hires; */
+		border-left-color: #FF0000;
+		border-right-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: no-repeat;
+		background-position: 5px 5px;
+		background-image: url('hires/imgs/fixed-left-top-2.png');
+	}
+
+	.cf DIV.flexible-y-right-a
+	{
+		/* css-ref: flex-x, hires; */
+		border-left-color: #FF0000;
+		border-right-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: no-repeat;
+		background-position: right 5px;
+		background-image: url('hires/imgs/fixed-right-top-1.png');
+	}
+
+	.cf DIV.flexible-y-right-b
+	{
+		/* css-ref: flex-x, hires; */
+		border-left-color: #FF0000;
+		border-right-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: no-repeat;
+		background-position: right 5px;
+		background-image: url('hires/imgs/fixed-right-top-2.png');
+	}
+
+	.cf DIV.flexible-y-bottom-a
+	{
+		/* css-ref: flex-x, hires; */
+		border-left-color: #FF0000;
+		border-right-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: no-repeat;
+		background-position: 5px bottom;
+		background-image: url('hires/imgs/fixed-left-bottom-1.png');
+	}
+
+	.cf DIV.flexible-y-bottom-b
+	{
+		/* css-ref: flex-x, hires; */
+		border-left-color: #FF0000;
+		border-right-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: no-repeat;
+		background-position: 5px bottom;
+		background-image: url('hires/imgs/fixed-left-bottom-2.png');
+	}
+
+	.cf DIV.flexible-y-right-bottom-a
+	{
+		/* css-ref: flex-x, hires; */
+		border-left-color: #FF0000;
+		border-right-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: no-repeat;
+		background-position: right bottom;
+		background-image: url('hires/imgs/fixed-right-bottom-1.png');
+	}
+
+	.cf DIV.flexible-y-right-bottom-b
+	{
+		/* css-ref: flex-x, hires; */
+		border-left-color: #FF0000;
+		border-right-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: no-repeat;
+		background-position: right bottom;
+		background-image: url('hires/imgs/fixed-right-bottom-2.png');
+	}
+
+	/*****************************************************************************/
+	/* Flexible W                                                                */
+	/*****************************************************************************/
+
+	.cf DIV.flexible-x-right-a
+	{
+		/* css-ref: flex-y, hires; */
+		border-top-color: #FF0000;
+		border-bottom-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: no-repeat;
+		background-position: right 5px;
+		background-image: url('hires/imgs/fixed-right-top-1.png');
+	}
+
+	.cf DIV.flexible-x-right-b
+	{
+		/* css-ref: flex-y, hires; */
+		border-top-color: #FF0000;
+		border-bottom-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: no-repeat;
+		background-position: right 5px;
+		background-image: url('hires/imgs/fixed-right-top-2.png');
+	}
+
+	.cf DIV.flexible-x-a
+	{
+		/* css-ref: flex-y, hires; */
+		border-top-color: #FF0000;
+		border-bottom-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: no-repeat;
+		background-position: 5px 5px;
+		background-image: url('hires/imgs/fixed-left-top-1.png');
+	}
+
+	.cf DIV.flexible-x-b
+	{
+		/* css-ref: flex-y, hires; */
+		border-top-color: #FF0000;
+		border-bottom-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: no-repeat;
+		background-position: 5px 5px;
+		background-image: url('hires/imgs/fixed-left-top-2.png');
+	}
+
+	.cf DIV.flexible-x-bottom-a
+	{
+		/* css-ref: flex-y, hires; */
+		border-top-color: #FF0000;
+		border-bottom-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: no-repeat;
+		background-position: 5px bottom;
+		background-image: url('hires/imgs/fixed-left-bottom-1.png');
+	}
+
+	.cf DIV.flexible-x-bottom-b
+	{
+		/* css-ref: flex-y, hires; */
+		border-top-color: #FF0000;
+		border-bottom-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: no-repeat;
+		background-position: 5px bottom;
+		background-image: url('hires/imgs/fixed-left-bottom-2.png');
+	}
+
+	.cf DIV.flexible-x-right-bottom-a
+	{
+		/* css-ref: flex-y, hires; */
+		border-top-color: #FF0000;
+		border-bottom-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: no-repeat;
+		background-position: right bottom;
+		background-image: url('hires/imgs/fixed-right-bottom-1.png');
+	}
+
+	.cf DIV.flexible-x-right-bottom-b
+	{
+		/* css-ref: flex-y, hires; */
+		border-top-color: #FF0000;
+		border-bottom-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: no-repeat;
+		background-position: right bottom;
+		background-image: url('hires/imgs/fixed-right-bottom-2.png');
+	}
+
+	/*****************************************************************************/
+	/* Flexible WH                                                               */
+	/*****************************************************************************/
+
+	.cf DIV.flexible-a
+	{
+		/* css-ref: flex-xy, hires; */
+		border-left-color: #FF0000;
+		border-right-color: #FF0000;
+		border-top-color: #FF0000;
+		border-bottom-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: no-repeat;
+		background-position: 5px 5px;
+		background-image: url('hires/imgs/fixed-left-top-1.png');
+	}
+
+	.cf DIV.flexible-b
+	{
+		/* css-ref: flex-xy, hires; */
+		border-left-color: #FF0000;
+		border-right-color: #FF0000;
+		border-top-color: #FF0000;
+		border-bottom-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: no-repeat;
+		background-position: 5px 5px;
+		background-image: url('hires/imgs/fixed-left-top-2.png');
+	}
+
+	.cf DIV.flexible-right-a
+	{
+		/* css-ref: flex-xy, hires; */
+		border-left-color: #FF0000;
+		border-right-color: #FF0000;
+		border-top-color: #FF0000;
+		border-bottom-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: no-repeat;
+		background-position: right 5px;
+		background-image: url('hires/imgs/fixed-right-top-1.png');
+	}
+
+	.cf DIV.flexible-right-b
+	{
+		/* css-ref: flex-xy, hires; */
+		border-left-color: #FF0000;
+		border-right-color: #FF0000;
+		border-top-color: #FF0000;
+		border-bottom-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: no-repeat;
+		background-position: right 5px;
+		background-image: url('hires/imgs/fixed-right-top-2.png');
+	}
+
+	.cf DIV.flexible-bottom-a
+	{
+		/* css-ref: flex-xy, hires; */
+		border-left-color: #FF0000;
+		border-right-color: #FF0000;
+		border-top-color: #FF0000;
+		border-bottom-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: no-repeat;
+		background-position: 5px bottom;
+		background-image: url('hires/imgs/fixed-left-bottom-1.png');
+	}
+
+	.cf DIV.flexible-bottom-b
+	{
+		/* css-ref: flex-xy, hires; */
+		border-left-color: #FF0000;
+		border-right-color: #FF0000;
+		border-top-color: #FF0000;
+		border-bottom-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: no-repeat;
+		background-position: 5px bottom;
+		background-image: url('hires/imgs/fixed-left-bottom-2.png');
+	}
+
+	.cf DIV.flexible-right-bottom-a
+	{
+		/* css-ref: flex-xy, hires; */
+		border-left-color: #FF0000;
+		border-right-color: #FF0000;
+		border-top-color: #FF0000;
+		border-bottom-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: no-repeat;
+		background-position: right bottom;
+		background-image: url('hires/imgs/fixed-right-bottom-1.png');
+	}
+
+	.cf DIV.flexible-right-bottom-b
+	{
+		/* css-ref: flex-xy, hires; */
+		border-left-color: #FF0000;
+		border-right-color: #FF0000;
+		border-top-color: #FF0000;
+		border-bottom-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: no-repeat;
+		background-position: right bottom;
+		background-image: url('hires/imgs/fixed-right-bottom-2.png');
+	}
+
+	/*****************************************************************************/
+	/* Fixed WH - Repeat X                                                       */
+	/*****************************************************************************/
+
+	.cf DIV.repeat-x-a
+	{
+		/* css-ref: box, hires; */
+		background-size: 14px 14px;
+		background-repeat: repeat-x;
+		background-position: 10px 10px;
+		background-image: url('hires/imgs/fixed-left-top-1.png');
+	}
+
+	.cf DIV.repeat-x-b
+	{
+		/* css-ref: box, hires; */
+		background-size: 14px 14px;
+		background-repeat: repeat-x;
+		background-position: 5px 5px;
+		background-image: url('hires/imgs/fixed-left-top-2.png');
+	}
+
+	.cf DIV.repeat-x-right-a
+	{
+		/* css-ref: box, hires; */
+		background-size: 14px 14px;
+		background-repeat: repeat-x;
+		background-position: right 5px;
+		background-image: url('hires/imgs/fixed-right-top-1.png');
+	}
+
+	.cf DIV.repeat-x-right-b
+	{
+		/* css-ref: box, hires; */
+		background-size: 14px 14px;
+		background-repeat: repeat-x;
+		background-position: right 5px;
+		background-image: url('hires/imgs/fixed-right-top-2.png');
+	}
+
+	.cf DIV.repeat-x-bottom-a
+	{
+		/* css-ref: box, hires; */
+		background-size: 14px 14px;
+		background-repeat: repeat-x;
+		background-position: 5px bottom;
+		background-image: url('hires/imgs/fixed-left-bottom-1.png');
+	}
+
+	.cf DIV.repeat-x-bottom-b
+	{
+		/* css-ref: box, hires; */
+		background-size: 14px 14px;
+		background-repeat: repeat-x;
+		background-position: 5px bottom;
+		background-image: url('hires/imgs/fixed-left-bottom-2.png');
+	}
+
+	.cf DIV.repeat-x-right-bottom-a
+	{
+		/* css-ref: box, hires; */
+		background-size: 14px 14px;
+		background-repeat: repeat-x;
+		background-position: right bottom;
+		background-image: url('hires/imgs/fixed-right-bottom-1.png');
+	}
+
+	.cf DIV.repeat-x-right-bottom-b
+	{
+		/* css-ref: box, hires; */
+		background-size: 14px 14px;
+		background-repeat: repeat-x;
+		background-position: right bottom;
+		background-image: url('hires/imgs/fixed-right-bottom-2.png');
+	}
+
+	/*****************************************************************************/
+	/* Fixed WH - Repeat Y                                                       */
+	/*****************************************************************************/
+
+	.cf DIV.repeat-y-a
+	{
+		/* css-ref: box, hires; */
+		background-size: 14px 14px;
+		background-repeat: repeat-y;
+		background-position: 10px 10px;
+		background-image: url('hires/imgs/fixed-left-top-1.png');
+	}
+
+	.cf DIV.repeat-y-b
+	{
+		/* css-ref: box, hires; */
+		background-size: 14px 14px;
+		background-repeat: repeat-y;
+		background-position: 5px 5px;
+		background-image: url('hires/imgs/fixed-left-top-2.png');
+	}
+
+	.cf DIV.repeat-y-right-a
+	{
+		/* css-ref: box, hires; */
+		background-size: 14px 14px;
+		background-repeat: repeat-y;
+		background-position: right 5px;
+		background-image: url('hires/imgs/fixed-right-top-1.png');
+	}
+
+	.cf DIV.repeat-y-right-b
+	{
+		/* css-ref: box, hires; */
+		background-size: 14px 14px;
+		background-repeat: repeat-y;
+		background-position: right 5px;
+		background-image: url('hires/imgs/fixed-right-top-2.png');
+	}
+
+	.cf DIV.repeat-y-bottom-a
+	{
+		/* css-ref: box, hires; */
+		background-size: 14px 14px;
+		background-repeat: repeat-y;
+		background-position: 5px bottom;
+		background-image: url('hires/imgs/fixed-left-bottom-1.png');
+	}
+
+	.cf DIV.repeat-y-bottom-b
+	{
+		/* css-ref: box, hires; */
+		background-size: 14px 14px;
+		background-repeat: repeat-y;
+		background-position: 5px bottom;
+		background-image: url('hires/imgs/fixed-left-bottom-2.png');
+	}
+
+	.cf DIV.repeat-y-right-bottom-a
+	{
+		/* css-ref: box, hires; */
+		background-size: 14px 14px;
+		background-repeat: repeat-y;
+		background-position: right bottom;
+		background-image: url('hires/imgs/fixed-right-bottom-1.png');
+	}
+
+	.cf DIV.repeat-y-right-bottom-b
+	{
+		/* css-ref: box, hires; */
+		background-size: 14px 14px;
+		background-repeat: repeat-y;
+		background-position: right bottom;
+		background-image: url('hires/imgs/fixed-right-bottom-2.png');
+	}
+
+	/*****************************************************************************/
+	/* Fixed WH - Repeat XY                                                       */
+	/*****************************************************************************/
+
+	.cf DIV.repeat-xy-a
+	{
+		/* css-ref: box, hires; */
+		background-size: 14px 14px;
+		background-repeat: repeat;
+		background-position: 10px 10px;
+		background-image: url('hires/imgs/fixed-left-top-1.png');
+	}
+
+	.cf DIV.repeat-xy-b
+	{
+		/* css-ref: box, hires; */
+		background-size: 14px 14px;
+		background-repeat: repeat;
+		background-position: 5px 5px;
+		background-image: url('hires/imgs/fixed-left-top-2.png');
+	}
+
+	.cf DIV.repeat-xy-right-a
+	{
+		/* css-ref: box, hires; */
+		background-size: 14px 14px;
+		background-repeat: repeat;
+		background-position: right 5px;
+		background-image: url('hires/imgs/fixed-right-top-1.png');
+	}
+
+	.cf DIV.repeat-xy-right-b
+	{
+		/* css-ref: box, hires; */
+		background-size: 14px 14px;
+		background-repeat: repeat;
+		background-position: right 5px;
+		background-image: url('hires/imgs/fixed-right-top-2.png');
+	}
+
+	.cf DIV.repeat-xy-bottom-a
+	{
+		/* css-ref: box, hires; */
+		background-size: 14px 14px;
+		background-repeat: repeat;
+		background-position: 5px bottom;
+		background-image: url('hires/imgs/fixed-left-bottom-1.png');
+	}
+
+	.cf DIV.repeat-xy-bottom-b
+	{
+		/* css-ref: box, hires; */
+		background-size: 14px 14px;
+		background-repeat: repeat;
+		background-position: 5px bottom;
+		background-image: url('hires/imgs/fixed-left-bottom-2.png');
+	}
+
+	.cf DIV.repeat-xy-right-bottom-a
+	{
+		/* css-ref: box, hires; */
+		background-size: 14px 14px;
+		background-repeat: repeat;
+		background-position: right bottom;
+		background-image: url('hires/imgs/fixed-right-bottom-1.png');
+	}
+
+	.cf DIV.repeat-xy-right-bottom-b
+	{
+		/* css-ref: box, hires; */
+		background-size: 14px 14px;
+		background-repeat: repeat;
+		background-position: right bottom;
+		background-image: url('hires/imgs/fixed-right-bottom-2.png');
+	}
+
+	/*****************************************************************************/
+	/* Flexible H - Repeat X                                                     */
+	/*****************************************************************************/
+
+	.cf DIV.flexible-y-repeat-x-a
+	{
+		/* css-ref: flex-x, hires; */
+		border-left-color: #FF0000;
+		border-right-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: repeat-x;
+		background-position: 5px 5px;
+		background-image: url('hires/imgs/fixed-left-top-1.png');
+	}
+
+	.cf DIV.flexible-y-repeat-x-b
+	{
+		/* css-ref: flex-x, hires; */
+		border-left-color: #FF0000;
+		border-right-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: repeat-x;
+		background-position: 5px 5px;
+		background-image: url('hires/imgs/fixed-left-top-2.png');
+	}
+
+	.cf DIV.flexible-y-repeat-x-right-a
+	{
+		/* css-ref: flex-x, hires; */
+		border-left-color: #FF0000;
+		border-right-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: repeat-x;
+		background-position: right 5px;
+		background-image: url('hires/imgs/fixed-right-top-1.png');
+	}
+
+	.cf DIV.flexible-y-repeat-x-right-b
+	{
+		/* css-ref: flex-x, hires; */
+		border-left-color: #FF0000;
+		border-right-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: repeat-x;
+		background-position: right 5px;
+		background-image: url('hires/imgs/fixed-right-top-2.png');
+	}
+
+	.cf DIV.flexible-y-repeat-x-bottom-a
+	{
+		/* css-ref: flex-x, hires; */
+		border-left-color: #FF0000;
+		border-right-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: repeat-x;
+		background-position: 5px bottom;
+		background-image: url('hires/imgs/fixed-left-bottom-1.png');
+	}
+
+	.cf DIV.flexible-y-repeat-x-bottom-b
+	{
+		/* css-ref: flex-x, hires; */
+		border-left-color: #FF0000;
+		border-right-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: repeat-x;
+		background-position: 5px bottom;
+		background-image: url('hires/imgs/fixed-left-bottom-2.png');
+	}
+
+	.cf DIV.flexible-y-repeat-x-right-bottom-a
+	{
+		/* css-ref: flex-x, hires; */
+		border-left-color: #FF0000;
+		border-right-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: repeat-x;
+		background-position: right bottom;
+		background-image: url('hires/imgs/fixed-right-bottom-1.png');
+	}
+
+	.cf DIV.flexible-y-repeat-x-right-bottom-b
+	{
+		/* css-ref: flex-x, hires; */
+		border-left-color: #FF0000;
+		border-right-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: repeat-x;
+		background-position: right bottom;
+		background-image: url('hires/imgs/fixed-right-bottom-2.png');
+	}
+
+	/*****************************************************************************/
+	/* Flexible H - Repeat Y                                                     */
+	/*****************************************************************************/
+
+	.cf DIV.flexible-y-repeat-y-a
+	{
+		/* css-ref: flex-x, hires; */
+		border-left-color: #FF0000;
+		border-right-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: repeat-y;
+		background-position: 5px 5px;
+		background-image: url('hires/imgs/fixed-left-top-1.png');
+	}
+
+	.cf DIV.flexible-y-repeat-y-b
+	{
+		/* css-ref: flex-x, hires; */
+		border-left-color: #FF0000;
+		border-right-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: repeat-y;
+		background-position: 5px 5px;
+		background-image: url('hires/imgs/fixed-left-top-2.png');
+	}
+
+	.cf DIV.flexible-y-repeat-y-right-a
+	{
+		/* css-ref: flex-x, hires; */
+		border-left-color: #FF0000;
+		border-right-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: repeat-y;
+		background-position: right 5px;
+		background-image: url('hires/imgs/fixed-right-top-1.png');
+	}
+
+	.cf DIV.flexible-y-repeat-y-right-b
+	{
+		/* css-ref: flex-x, hires; */
+		border-left-color: #FF0000;
+		border-right-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: repeat-y;
+		background-position: right 5px;
+		background-image: url('hires/imgs/fixed-right-top-2.png');
+	}
+
+	.cf DIV.flexible-y-repeat-y-bottom-a
+	{
+		/* css-ref: flex-x, hires; */
+		border-left-color: #FF0000;
+		border-right-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: repeat-y;
+		background-position: 5px bottom;
+		background-image: url('hires/imgs/fixed-left-bottom-1.png');
+	}
+
+	.cf DIV.flexible-y-repeat-y-bottom-b
+	{
+		/* css-ref: flex-x, hires; */
+		border-left-color: #FF0000;
+		border-right-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: repeat-y;
+		background-position: 5px bottom;
+		background-image: url('hires/imgs/fixed-left-bottom-2.png');
+	}
+
+	.cf DIV.flexible-y-repeat-y-right-bottom-a
+	{
+		/* css-ref: flex-x, hires; */
+		border-left-color: #FF0000;
+		border-right-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: repeat-y;
+		background-position: right bottom;
+		background-image: url('hires/imgs/fixed-right-bottom-1.png');
+	}
+
+	.cf DIV.flexible-y-repeat-y-right-bottom-b
+	{
+		/* css-ref: flex-x, hires; */
+		border-left-color: #FF0000;
+		border-right-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: repeat-y;
+		background-position: right bottom;
+		background-image: url('hires/imgs/fixed-right-bottom-2.png');
+	}
+
+	/*****************************************************************************/
+	/* Flexible H - Repeat XY                                                     */
+	/*****************************************************************************/
+
+	.cf DIV.flexible-y-repeat-xy-a
+	{
+		/* css-ref: flex-x, hires; */
+		border-left-color: #FF0000;
+		border-right-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: repeat;
+		background-position: 5px 5px;
+		background-image: url('hires/imgs/fixed-left-top-1.png');
+	}
+
+	.cf DIV.flexible-y-repeat-xy-b
+	{
+		/* css-ref: flex-x, hires; */
+		border-left-color: #FF0000;
+		border-right-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: repeat;
+		background-position: 5px 5px;
+		background-image: url('hires/imgs/fixed-left-top-2.png');
+	}
+
+	.cf DIV.flexible-y-repeat-xy-right-a
+	{
+		/* css-ref: flex-x, hires; */
+		border-left-color: #FF0000;
+		border-right-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: repeat;
+		background-position: right 5px;
+		background-image: url('hires/imgs/fixed-right-top-1.png');
+	}
+
+	.cf DIV.flexible-y-repeat-xy-right-b
+	{
+		/* css-ref: flex-x, hires; */
+		border-left-color: #FF0000;
+		border-right-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: repeat;
+		background-position: right 5px;
+		background-image: url('hires/imgs/fixed-right-top-2.png');
+	}
+
+	.cf DIV.flexible-y-repeat-xy-bottom-a
+	{
+		/* css-ref: flex-x, hires; */
+		border-left-color: #FF0000;
+		border-right-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: repeat;
+		background-position: 5px bottom;
+		background-image: url('hires/imgs/fixed-left-bottom-1.png');
+	}
+
+	.cf DIV.flexible-y-repeat-xy-bottom-b
+	{
+		/* css-ref: flex-x, hires; */
+		border-left-color: #FF0000;
+		border-right-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: repeat;
+		background-position: 5px bottom;
+		background-image: url('hires/imgs/fixed-left-bottom-2.png');
+	}
+
+	.cf DIV.flexible-y-repeat-xy-right-bottom-a
+	{
+		/* css-ref: flex-x, hires; */
+		border-left-color: #FF0000;
+		border-right-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: repeat;
+		background-position: right bottom;
+		background-image: url('hires/imgs/fixed-right-bottom-1.png');
+	}
+
+	.cf DIV.flexible-y-repeat-xy-right-bottom-b
+	{
+		/* css-ref: flex-x, hires; */
+		border-left-color: #FF0000;
+		border-right-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: repeat;
+		background-position: right bottom;
+		background-image: url('hires/imgs/fixed-right-bottom-2.png');
+	}
+
+	/*****************************************************************************/
+	/* Flexible W - Repeat X                                                     */
+	/*****************************************************************************/
+
+	.cf DIV.flexible-x-repeat-x-a
+	{
+		/* css-ref: flex-y, hires; */
+		border-top-color: #FF0000;
+		border-bottom-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: repeat-x;
+		background-position: 5px 5px;
+		background-image: url('hires/imgs/fixed-left-top-1.png');
+	}
+
+	.cf DIV.flexible-x-repeat-x-b
+	{
+		/* css-ref: flex-y, hires; */
+		border-top-color: #FF0000;
+		border-bottom-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: repeat-x;
+		background-position: 5px 5px;
+		background-image: url('hires/imgs/fixed-left-top-2.png');
+	}
+
+	.cf DIV.flexible-x-repeat-x-right-a
+	{
+		/* css-ref: flex-y, hires; */
+		border-top-color: #FF0000;
+		border-bottom-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: repeat-x;
+		background-position: right 5px;
+		background-image: url('hires/imgs/fixed-right-top-1.png');
+	}
+
+	.cf DIV.flexible-x-repeat-x-right-b
+	{
+		/* css-ref: flex-y, hires; */
+		border-top-color: #FF0000;
+		border-bottom-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: repeat-x;
+		background-position: right 5px;
+		background-image: url('hires/imgs/fixed-right-top-2.png');
+	}
+
+	.cf DIV.flexible-x-repeat-x-bottom-a
+	{
+		/* css-ref: flex-y, hires; */
+		border-top-color: #FF0000;
+		border-bottom-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: repeat-x;
+		background-position: 5px bottom;
+		background-image: url('hires/imgs/fixed-left-bottom-1.png');
+	}
+
+	.cf DIV.flexible-x-repeat-x-bottom-b
+	{
+		/* css-ref: flex-y, hires; */
+		border-top-color: #FF0000;
+		border-bottom-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: repeat-x;
+		background-position: 5px bottom;
+		background-image: url('hires/imgs/fixed-left-bottom-2.png');
+	}
+
+	.cf DIV.flexible-x-repeat-x-right-bottom-a
+	{
+		/* css-ref: flex-y, hires; */
+		border-top-color: #FF0000;
+		border-bottom-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: repeat-x;
+		background-position: right bottom;
+		background-image: url('hires/imgs/fixed-right-bottom-1.png');
+	}
+
+	.cf DIV.flexible-x-repeat-x-right-bottom-b
+	{
+		/* css-ref: flex-y, hires; */
+		border-top-color: #FF0000;
+		border-bottom-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: repeat-x;
+		background-position: right bottom;
+		background-image: url('hires/imgs/fixed-right-bottom-2.png');
+	}
+
+	/*****************************************************************************/
+	/* Flexible W - Repeat Y                                                     */
+	/*****************************************************************************/
+
+	.cf DIV.flexible-x-repeat-y-a
+	{
+		/* css-ref: flex-y, hires; */
+		border-top-color: #FF0000;
+		border-bottom-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: repeat-y;
+		background-position: 5px 5px;
+		background-image: url('hires/imgs/fixed-left-top-1.png');
+	}
+
+	.cf DIV.flexible-x-repeat-y-b
+	{
+		/* css-ref: flex-y, hires; */
+		border-top-color: #FF0000;
+		border-bottom-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: repeat-y;
+		background-position: 5px 5px;
+		background-image: url('hires/imgs/fixed-left-top-2.png');
+	}
+
+	.cf DIV.flexible-x-repeat-y-right-a
+	{
+		/* css-ref: flex-y, hires; */
+		border-top-color: #FF0000;
+		border-bottom-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: repeat-y;
+		background-position: right 5px;
+		background-image: url('hires/imgs/fixed-right-top-1.png');
+	}
+
+	.cf DIV.flexible-x-repeat-y-right-b
+	{
+		/* css-ref: flex-y, hires; */
+		border-top-color: #FF0000;
+		border-bottom-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: repeat-y;
+		background-position: right 5px;
+		background-image: url('hires/imgs/fixed-right-top-2.png');
+	}
+
+	.cf DIV.flexible-x-repeat-y-bottom-a
+	{
+		/* css-ref: flex-y, hires; */
+		border-top-color: #FF0000;
+		border-bottom-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: repeat-y;
+		background-position: 5px bottom;
+		background-image: url('hires/imgs/fixed-left-bottom-1.png');
+	}
+
+	.cf DIV.flexible-x-repeat-y-bottom-b
+	{
+		/* css-ref: flex-y, hires; */
+		border-top-color: #FF0000;
+		border-bottom-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: repeat-y;
+		background-position: 5px bottom;
+		background-image: url('hires/imgs/fixed-left-bottom-2.png');
+	}
+
+	.cf DIV.flexible-x-repeat-y-right-bottom-a
+	{
+		/* css-ref: flex-y, hires; */
+		border-top-color: #FF0000;
+		border-bottom-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: repeat-y;
+		background-position: right bottom;
+		background-image: url('hires/imgs/fixed-right-bottom-1.png');
+	}
+
+	.cf DIV.flexible-x-repeat-y-right-bottom-b
+	{
+		/* css-ref: flex-y, hires; */
+		border-top-color: #FF0000;
+		border-bottom-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: repeat-y;
+		background-position: right bottom;
+		background-image: url('hires/imgs/fixed-right-bottom-2.png');
+	}
+
+	/*****************************************************************************/
+	/* Flexible W - Repeat XY                                                     */
+	/*****************************************************************************/
+
+	.cf DIV.flexible-x-repeat-xy-a
+	{
+		/* css-ref: flex-y, hires; */
+		border-top-color: #FF0000;
+		border-bottom-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: repeat;
+		background-position: 5px 5px;
+		background-image: url('hires/imgs/fixed-left-top-1.png');
+	}
+
+	.cf DIV.flexible-x-repeat-xy-b
+	{
+		/* css-ref: flex-y, hires; */
+		border-top-color: #FF0000;
+		border-bottom-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: repeat;
+		background-position: 5px 5px;
+		background-image: url('hires/imgs/fixed-left-top-2.png');
+	}
+
+	.cf DIV.flexible-x-repeat-xy-right-a
+	{
+		/* css-ref: flex-y, hires; */
+		border-top-color: #FF0000;
+		border-bottom-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: repeat;
+		background-position: right 5px;
+		background-image: url('hires/imgs/fixed-right-top-1.png');
+	}
+
+	.cf DIV.flexible-x-repeat-xy-right-b
+	{
+		/* css-ref: flex-y, hires; */
+		border-top-color: #FF0000;
+		border-bottom-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: repeat;
+		background-position: right 5px;
+		background-image: url('hires/imgs/fixed-right-top-2.png');
+	}
+
+	.cf DIV.flexible-x-repeat-xy-bottom-a
+	{
+		/* css-ref: flex-y, hires; */
+		border-top-color: #FF0000;
+		border-bottom-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: repeat;
+		background-position: 5px bottom;
+		background-image: url('hires/imgs/fixed-left-bottom-1.png');
+	}
+
+	.cf DIV.flexible-x-repeat-xy-bottom-b
+	{
+		/* css-ref: flex-y, hires; */
+		border-top-color: #FF0000;
+		border-bottom-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: repeat;
+		background-position: 5px bottom;
+		background-image: url('hires/imgs/fixed-left-bottom-2.png');
+	}
+
+	.cf DIV.flexible-x-repeat-xy-right-bottom-a
+	{
+		/* css-ref: flex-y, hires; */
+		border-top-color: #FF0000;
+		border-bottom-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: repeat;
+		background-position: right bottom;
+		background-image: url('hires/imgs/fixed-right-bottom-1.png');
+	}
+
+	.cf DIV.flexible-x-repeat-xy-right-bottom-b
+	{
+		/* css-ref: flex-y, hires; */
+		border-top-color: #FF0000;
+		border-bottom-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: repeat;
+		background-position: right bottom;
+		background-image: url('hires/imgs/fixed-right-bottom-2.png');
+	}
+	/*****************************************************************************/
+	/* Flexible - Repeat X                                                       */
+	/*****************************************************************************/
+
+	.cf DIV.flexible-repeat-x-a
+	{
+		/* css-ref: flex-xy, hires; */
+		border-left-color: #FF0000;
+		border-right-color: #FF0000;
+		border-top-color: #FF0000;
+		border-bottom-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: repeat-x;
+		background-position: 5px 5px;
+		background-image: url('hires/imgs/fixed-left-top-1.png');
+	}
+
+	.cf DIV.flexible-repeat-x-b
+	{
+		/* css-ref: flex-xy, hires; */
+		border-left-color: #FF0000;
+		border-right-color: #FF0000;
+		border-top-color: #FF0000;
+		border-bottom-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: repeat-x;
+		background-position: 5px 5px;
+		background-image: url('hires/imgs/fixed-left-top-2.png');
+	}
+
+	.cf DIV.flexible-repeat-x-right-a
+	{
+		/* css-ref: flex-xy, hires; */
+		border-left-color: #FF0000;
+		border-right-color: #FF0000;
+		border-top-color: #FF0000;
+		border-bottom-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: repeat-x;
+		background-position: right 5px;
+		background-image: url('hires/imgs/fixed-right-top-1.png');
+	}
+
+	.cf DIV.flexible-repeat-x-right-b
+	{
+		/* css-ref: flex-xy, hires; */
+		border-left-color: #FF0000;
+		border-right-color: #FF0000;
+		border-top-color: #FF0000;
+		border-bottom-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: repeat-x;
+		background-position: right 5px;
+		background-image: url('hires/imgs/fixed-right-top-2.png');
+	}
+
+	.cf DIV.flexible-repeat-x-bottom-a
+	{
+		/* css-ref: flex-xy, hires; */
+		border-left-color: #FF0000;
+		border-right-color: #FF0000;
+		border-top-color: #FF0000;
+		border-bottom-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: repeat-x;
+		background-position: 5px bottom;
+		background-image: url('hires/imgs/fixed-left-bottom-1.png');
+	}
+
+	.cf DIV.flexible-repeat-x-bottom-b
+	{
+		/* css-ref: flex-xy, hires; */
+		border-left-color: #FF0000;
+		border-right-color: #FF0000;
+		border-top-color: #FF0000;
+		border-bottom-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: repeat-x;
+		background-position: 5px bottom;
+		background-image: url('hires/imgs/fixed-left-bottom-2.png');
+	}
+
+	.cf DIV.flexible-repeat-x-right-bottom-a
+	{
+		/* css-ref: flex-xy, hires; */
+		border-left-color: #FF0000;
+		border-right-color: #FF0000;
+		border-top-color: #FF0000;
+		border-bottom-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: repeat-x;
+		background-position: right bottom;
+		background-image: url('hires/imgs/fixed-right-bottom-1.png');
+	}
+
+	.cf DIV.flexible-repeat-x-right-bottom-b
+	{
+		/* css-ref: flex-xy, hires; */
+		border-left-color: #FF0000;
+		border-right-color: #FF0000;
+		border-top-color: #FF0000;
+		border-bottom-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: repeat-x;
+		background-position: right bottom;
+		background-image: url('hires/imgs/fixed-right-bottom-2.png');
+	}
+
+	/*****************************************************************************/
+	/* Flexible - Repeat Y                                                       */
+	/*****************************************************************************/
+
+	.cf DIV.flexible-repeat-y-a
+	{
+		/* css-ref: flex-xy, hires; */
+		border-left-color: #FF0000;
+		border-right-color: #FF0000;
+		border-top-color: #FF0000;
+		border-bottom-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: repeat-y;
+		background-position: 5px 5px;
+		background-image: url('hires/imgs/fixed-left-top-1.png');
+	}
+
+	.cf DIV.flexible-repeat-y-b
+	{
+		/* css-ref: flex-xy, hires; */
+		border-left-color: #FF0000;
+		border-right-color: #FF0000;
+		border-top-color: #FF0000;
+		border-bottom-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: repeat-y;
+		background-position: 5px 5px;
+		background-image: url('hires/imgs/fixed-left-top-2.png');
+	}
+
+	.cf DIV.flexible-repeat-y-right-a
+	{
+		/* css-ref: flex-xy, hires; */
+		border-left-color: #FF0000;
+		border-right-color: #FF0000;
+		border-top-color: #FF0000;
+		border-bottom-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: repeat-y;
+		background-position: right 5px;
+		background-image: url('hires/imgs/fixed-right-top-1.png');
+	}
+
+	.cf DIV.flexible-repeat-y-right-b
+	{
+		/* css-ref: flex-xy, hires; */
+		border-left-color: #FF0000;
+		border-right-color: #FF0000;
+		border-top-color: #FF0000;
+		border-bottom-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: repeat-y;
+		background-position: right 5px;
+		background-image: url('hires/imgs/fixed-right-top-2.png');
+	}
+
+	.cf DIV.flexible-repeat-y-bottom-a
+	{
+		/* css-ref: flex-xy, hires; */
+		border-left-color: #FF0000;
+		border-right-color: #FF0000;
+		border-top-color: #FF0000;
+		border-bottom-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: repeat-y;
+		background-position: 5px bottom;
+		background-image: url('hires/imgs/fixed-left-bottom-1.png');
+	}
+
+	.cf DIV.flexible-repeat-y-bottom-b
+	{
+		/* css-ref: flex-xy, hires; */
+		border-left-color: #FF0000;
+		border-right-color: #FF0000;
+		border-top-color: #FF0000;
+		border-bottom-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: repeat-y;
+		background-position: 5px bottom;
+		background-image: url('hires/imgs/fixed-left-bottom-2.png');
+	}
+
+	.cf DIV.flexible-repeat-y-right-bottom-a
+	{
+		/* css-ref: flex-xy, hires; */
+		border-left-color: #FF0000;
+		border-right-color: #FF0000;
+		border-top-color: #FF0000;
+		border-bottom-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: repeat-y;
+		background-position: right bottom;
+		background-image: url('hires/imgs/fixed-right-bottom-1.png');
+	}
+
+	.cf DIV.flexible-repeat-y-right-bottom-b
+	{
+		/* css-ref: flex-xy, hires; */
+		border-left-color: #FF0000;
+		border-right-color: #FF0000;
+		border-top-color: #FF0000;
+		border-bottom-color: #FF0000;
+		background-size: 14px 14px;
+		background-repeat: repeat-y;
+		background-position: right bottom;
+		background-image: url('hires/imgs/fixed-right-bottom-2.png');
+	}
+
+	/*****************************************************************************/
+	/* Simple sprite example                                                     */
+	/*****************************************************************************/
+
+	.cf DIV.sprite-flex-left
+	{
+		padding: 4px 5px;
+		width: 53px; height: 45px;
+		/* css-ref: hires; */
+		background-size: 12px 12px;
+		background-repeat: no-repeat;
+		background-position: 2px 5px;
+		background-image: url('hires/imgs/bg-001a.png');
+	}
+	.cf DIV.sprite-flex-left.repeat-x
+	{
+		padding: 4px 5px;
+		width: 53px; height: 45px;
+		/* css-ref: hires; */
+		background-size: 12px 12px;
+		background-repeat: repeat-x;
+		background-position: 2px 5px;
+		background-image: url('hires/imgs/bg-001b.png');
+	}
+	.cf DIV.sprite-flex-left.repeat-y
+	{
+		padding: 4px 5px;
+		width: 53px; height: 45px;
+		/* css-ref: hires; */
+		background-size: 12px 12px;
+		background-repeat: repeat-y;
+		background-position: 2px 5px;
+		background-image: url('hires/imgs/bg-001c.png');
+	}
+
+	.cf DIV.sprite-flex-top
+	{
+		padding: 4px 5px;
+		width: 53px; height: 45px;
+		/* css-ref: hires; */
+		background-size: 12px 12px;
+		background-repeat: no-repeat;
+		background-position: 5px 2px;
+		background-image: url('hires/imgs/bg-002a.png');
+	}
+	.cf DIV.sprite-flex-top.repeat-x
+	{
+		padding: 4px 5px;
+		width: 53px; height: 45px;
+		/* css-ref: hires; */
+		background-size: 12px 12px;
+		background-repeat: repeat-x;
+		background-position: 5px 2px;
+		background-image: url('hires/imgs/bg-002b.png');
+	}
+	.cf DIV.sprite-flex-top.repeat-y
+	{
+		padding: 4px 5px;
+		width: 53px; height: 45px;
+		/* css-ref: hires; */
+		background-size: 12px 12px;
+		background-repeat: repeat-y;
+		background-position: 5px 2px;
+		background-image: url('hires/imgs/bg-002c.png');
+	}
+
+	.cf DIV.sprite-flex-right
+	{
+		padding: 4px 5px;
+		width: 53px; height: 45px;
+		/* css-ref: hires; */
+		background-size: 13px 12px;
+		background-repeat: no-repeat;
+		background-position: right 5px;
+		background-image: url('hires/imgs/bg-003a.png');
+	}
+	.cf DIV.sprite-flex-right.repeat-x
+	{
+		padding: 4px 5px;
+		width: 53px; height: 45px;
+		/* css-ref: hires; */
+		background-size: 15px 12px;
+		background-repeat: repeat-x;
+		background-position: right 5px;
+		background-image: url('hires/imgs/bg-003b.png');
+	}
+	.cf DIV.sprite-flex-right.repeat-y
+	{
+		padding: 4px 5px;
+		width: 53px; height: 45px;
+		/* css-ref: hires; */
+		background-size: 15px 12px;
+		background-repeat: repeat-y;
+		background-position: right 5px;
+		background-image: url('hires/imgs/bg-003c.png');
+	}
+
+	.cf DIV.sprite-flex-bottom
+	{
+		padding: 4px 5px;
+		width: 53px; height: 45px;
+		/* css-ref: hires; */
+		background-size: 12px 12px;
+		background-repeat: no-repeat;
+		background-position: 5px bottom;
+		background-image: url('hires/imgs/bg-004a.png');
+	}
+	.cf DIV.sprite-flex-bottom.repeat-x
+	{
+		padding: 4px 5px;
+		width: 53px; height: 45px;
+		/* css-ref: hires; */
+		background-size: 12px 12px;
+		background-repeat: repeat-x;
+		background-position: 5px bottom;
+		background-image: url('hires/imgs/bg-004b.png');
+	}
+	.cf DIV.sprite-flex-bottom.repeat-y
+	{
+		padding: 4px 5px;
+		width: 53px; height: 45px;
+		/* css-ref: hires; */
+		background-size: 12px 12px;
+		background-repeat: repeat-y;
+		background-position: 5px bottom;
+		background-image: url('hires/imgs/bg-004c.png');
+	}
+
+	.cf DIV.sprite-flex-bottom-right
+	{
+		padding: 4px 5px;
+		width: 53px; height: 45px;
+		/* css-ref: hires; */
+		background-size: 12px 12px;
+		background-repeat: no-repeat;
+		background-position: right bottom;
+		background-image: url('hires/imgs/bg-005a.png');
+	}
+	.cf DIV.sprite-flex-bottom-right.repeat-x
+	{
+		padding: 4px 5px;
+		width: 53px; height: 45px;
+		/* css-ref: hires; */
+		background-size: 12px 12px;
+		background-repeat: repeat-x;
+		background-position: right bottom;
+		background-image: url('hires/imgs/bg-005b.png');
+	}
+	.cf DIV.sprite-flex-bottom-right.repeat-y
+	{
+		padding: 4px 5px;
+		width: 53px; height: 45px;
+		/* css-ref: hires; */
+		background-size: 12px 12px;
+		background-repeat: repeat-y;
+		background-position: right bottom;
+		background-image: url('hires/imgs/bg-005c.png');
+	}
+
+	/*****************************************************************************/
+	/* Player button example                                                     */
+	/*****************************************************************************/
+
+	A.player
+	{
+		width: 200px;
+		height: 150px;
+		display: block;
+		position: relative;
+		border: 3px solid #339999;
+		background-color: #CCCCCC;
+	}
+
+	A.player .icon-play-big
+	{
+		/*
+			css-ref: hires;
+		*/
+		width: 60px;
+		height: 60px;
+		display: block;
+		position: absolute;
+		top: 50%; left: 50%;
+		padding: 10px;
+		margin-top: -30px;
+		margin-left: -30px;
+		background-repeat: no-repeat;
+		background-position: 5px 5px;
+		background-image: url('hires/icons/play-big-active.png');
+	}
+
+	A.player:focus .icon-play-big,
+	A.player:hover .icon-play-big
+	{
+		/*
+			css-ref: hires;
+		*/
+		padding: 10px;
+		width: 60px; height: 60px;
+		background-position: 5px 5px;
+		background-repeat: no-repeat;
+		background-image: url('hires/icons/play-big-hover.png');
+	}
+
+	A.record
+	{
+		float: left;
+		color: #FFFFFF;
+		overflow: hidden;
+		margin: 20px 0px;
+		padding: 4px 10px;
+		border-radius: 5px;
+		background-color: #CC00CC;
+	}
+
+	A.record SPAN
+	{
+		float: left;
+	}
+
+	A.record SPAN.icon-record
+	{
+		/*
+			css-ref: hires;
+		*/
+		margin: 5px 5px 5px 0px;
+		width: 10px; height: 10px;
+		background-repeat: no-repeat;
+		background-image: url('hires/icons/record-active.png');
+	}
+
+	A.record-play
+	{
+		float: left;
+		color: #FFFFFF;
+		display: block;
+		overflow: hidden;
+		margin: 20px 0px;
+		padding: 4px 10px;
+		border-radius: 5px;
+		background-color: #CC00CC;
+	}
+
+	A.record-play SPAN
+	{
+		float: left;
+	}
+
+	A.record-play SPAN.icon-record
+	{
+		/*
+			css-ref: hires;
+		*/
+		vertical-align: bottom;
+		display: inline-block;
+		margin: 5px 5px 5px 0px;
+		width: 10px; height: 10px;
+		background-repeat: no-repeat;
+		background-image: url('hires/icons/record-active.png');
+	}
+
+	A.button
+	{
+		margin-right: 20px;
+	}
+
+	A.button:last-child
+	{
+		margin-right: 0px;
+	}
+
+	A:focus SPAN.icon-record,
+	A:hover SPAN.icon-record
+	{
+		/*
+			css-ref: hires;
+		*/
+		width: 10px; height: 10px;
+		background-repeat: no-repeat;
+		background-image: url('hires/icons/record-hover.png');
+	}
+
+}

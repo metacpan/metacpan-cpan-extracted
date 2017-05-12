@@ -1,0 +1,10 @@
+lib/Oxford/Calendar.pm
+Changes
+MANIFEST
+Makefile.PL
+t/00_all.t
+t/01_bug_sundays_0th_or_earlier.t
+t/02_bug_nearest_dst.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

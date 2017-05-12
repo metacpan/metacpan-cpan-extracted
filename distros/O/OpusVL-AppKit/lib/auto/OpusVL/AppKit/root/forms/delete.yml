@@ -1,0 +1,15 @@
+---
+elements:
+
+  - type: Submit
+    name: confirm
+    value: Yes
+    attributes:
+      class: "submit submit_ok"
+      
+  - type: Submit
+    name: cancel
+    value: No
+    attributes:
+      class: "submit submit_cancel"
+

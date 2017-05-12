@@ -1,0 +1,17 @@
+Revision history for Odoo-Database-Manager
+ 
+0.03      2016-02-09 19:13:01+00:00 Europe/London
+
+    - hopefully getting README to live in git as well as CPAN
+
+0.02      2016-02-05 17:42:29+00:00 Europe/London
+
+    - dropdb now takes database name as positional argument instead of named argument
+    - dropdb now has POD
+
+0.01      2016-02-05 17:32:08+00:00 Europe/London
+
+    - Initial release
+    - list_databases working
+    - createdb working
+    - dropdb working

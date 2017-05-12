@@ -1,0 +1,368 @@
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#overview">OVERVIEW</A></LI>
+	<LI><A HREF="#getting to $r">GETTING TO $R</A></LI>
+	<LI><A HREF="#relationship with the stash class">RELATIONSHIP WITH THE STASH CLASS</A></LI>
+	<LI><A HREF="#methods returning object or class name">METHODS RETURNING OBJECT OR CLASS NAME</A></LI>
+	<LI><A HREF="#action methods">ACTION METHODS</A></LI>
+	<LI><A HREF="#hash key properties">HASH KEY PROPERTIES</A></LI>
+	<LI><A HREF="#aliases for methods done elsewhere">ALIASES FOR METHODS DONE ELSEWHERE</A></LI>
+	<LI><A HREF="#global information">GLOBAL INFORMATION</A></LI>
+	<LI><A HREF="#authors">AUTHORS</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>OpenInteract::Request - Description and Contents of $R</P>
+<P>
+<HR>
+<H1><A NAME="overview">OVERVIEW</A></H1>
+<P>The variable $R is the framework's request object. It acts as a
+container for other objects, repository for aliases all over the
+system and a place to call methods that deal with actions based on the
+configuration.</P>
+<P>Some objects retrievable through $R:</P>
+<UL>
+<LI>
+The Apache request (or Apache::Request) object
+<P></P>
+<LI>
+A DBI database handle
+<P></P>
+<LI>
+Configuration object
+<P></P>
+<LI>
+Caching object/class
+<P></P>
+<LI>
+Template object
+<P></P>
+<LI>
+Error handler listings
+<P></P>
+<LI>
+Anything else you can think of.
+<P></P></UL>
+<P>You can also determine which class and method a module uses and find
+out what the class name of different SPOPS objects are.</P>
+<P>
+<HR>
+<H1><A NAME="getting to $r">GETTING TO $R</A></H1>
+<P>The $R variable is <STRONG>always present</STRONG>, one per Apache child. It gets
+cleaned up after every request, so there should be no memory leakage
+issues. We can do this because class for $R (OpenInteract::Request) is a
+subclass of <CODE>Class::Singleton</CODE>. This allows us to create the object once
+and have it always ``be there'' when we ask for it.</P>
+<P>To ask for it, we simply need to do this:</P>
+<PRE>
+ my $R = OpenInteract::Request-&gt;instance;</PRE>
+<P>We can do this in any handler, in any object definition class or any
+utility class. If you like, you can include the OpenInteract::Request
+class specifically in your module, but it is not necessary.</P>
+<P>
+<HR>
+<H1><A NAME="relationship with the stash class">RELATIONSHIP WITH THE STASH CLASS</A></H1>
+<P>The 'stash class' must be implmented on a per-application basis. Even
+though you can reach all the classes/objects through $R, $R actually
+passes off the request to the stash class, which is defined in the
+base configuration of your website (<CODE>conf/base.conf</CODE>).</P>
+<P>We do this because you might want to run more than one application or
+website under the OpenInteract framework. It is feasible to do so by
+running each application self-contained, by running the mod_perl
+processes on a nonstandard port number and using a proxy scheme to
+pass requests back to the right set of processes. But this is
+wasteful.</P>
+<P>Instead, we need to ensure that all application-specific information
+is kept in one place, and that $R knows how to get to it. Well, it
+does, so you don't have to worry about it.</P>
+<P>
+<HR>
+<H1><A NAME="methods returning object or class name">METHODS RETURNING OBJECT OR CLASS NAME</A></H1>
+<P>All of the following are actually kept within a lexical variable in
+the stash class.</P>
+<UL>
+<LI>
+<STRONG>$R-&gt;db</STRONG>
+<P>Returns DBI database handle. Most of the time you won't have to deal
+with this since SPOPS does the work behind the scenes, but it's useful
+to know it's there.</P>
+<PRE>
+ my $sth = $R-&gt;db-&gt;prepare( $sql );</PRE>
+<P></P>
+<LI>
+$R-&gt;config
+<P>Returns config object (or maybe just hashref)</P>
+<PRE>
+ my $db_info = $R-&gt;config-&gt;{service}-&gt;{database}-&gt;{main};</PRE>
+<P></P>
+<LI>
+$R-&gt;cache
+<P>Returns cache class name, suitable for adding, clearing, checking,
+etc. [[ NOTE: Currently non-functional ]]</P>
+<PRE>
+ my $rv = $R-&gt;cache-&gt;add( id =&gt; $id, item =&gt; $obj );</PRE>
+<P></P>
+<LI>
+$R-&gt;apache
+<P>Returns Apache (or Apache::Request) object</P>
+<PRE>
+ $R-&gt;apache-&gt;send_http_header();
+</PRE>
+<PRE>
+
+ my $apr = $R-&gt;apache;
+ foreach my $field ( $apr-&gt;param ) {
+   $info-&gt;{ $field } = $apr-&gt;param( $field );
+ }</PRE>
+<P></P>
+<LI>
+$R-&gt;uri
+<P>Returns Apache::URI object</P>
+<PRE>
+ my @path_items = split /\//, $R-&gt;uri-&gt;path();</PRE>
+<P></P>
+<LI>
+$R-&gt;error
+<P>Returns class name of error object.</P>
+<PRE>
+ $R-&gt;error-&gt;throw( { code =&gt; 404, user_msg =&gt; 'la la la' ... });</PRE>
+<P>or:</P>
+<PRE>
+ my $error_class = $R-&gt;error;
+ $error_class-&gt;throw( { code =&gt; 404, ... } );
+ $error_class-&gt;throw( { code =&gt; 505, ... } );</PRE>
+<P>Note that <EM>throw()</EM> is also an alias directly from $R. See below.</P>
+<P></P>
+<LI>
+$R-&gt;session
+<P>Returns the class name of module that creates/saves sessions</P>
+<PRE>
+ $R-&gt;session-&gt;parse_handler;</PRE>
+<P></P>
+<LI>
+$R-&gt;cookies
+<P>Returns the class name of module that parses/sends cookies</P>
+<PRE>
+ $R-&gt;cookie-&gt;parse_handler;</PRE>
+<P></P></UL>
+<P>
+<HR>
+<H1><A NAME="action methods">ACTION METHODS</A></H1>
+<UL>
+<LI>
+$R-&gt;lookup_conductor( [ $module_alias ] )
+<P>Finds out what conductor needs to be called given a particular module.</P>
+<P></P>
+<LI>
+$R-&gt;lookup_module( [ $module_alias ] )
+<P>Returns class name and method of next module in sequence (if no alias
+given) or the module class and method corresponding to $module_alias</P>
+<PRE>
+ my ( $class, $method ) = $R-&gt;lookup_module;
+ my $html = $class-&gt;$method();</PRE>
+<P></P>
+<LI>
+$R-&gt;scrib( $level, $message [, $message, ... ] )
+<P>Logs the $message at $level, which will go to wherever you have
+configured logging for that level to go.</P>
+<P>(Note: not configured yet; not certain we need to do so.)</P>
+<P></P></UL>
+<P>
+<HR>
+<H1><A NAME="hash key properties">HASH KEY PROPERTIES</A></H1>
+<UL>
+<LI>
+$R-&gt;{templates_used}
+<P>Contains a queue (most recent at the head) of template objects used in
+the current request.</P>
+<P>$R-&gt;{main_template_vars}</P>
+<P>Contains a hashref of variables to use when we process the main
+template. Any of the components can add to this during their
+processing phase.</P>
+<P></P>
+<LI>
+$R-&gt;{auth}-&gt;{logged_in}
+<P>True if the user is logged in, false if not.</P>
+<P></P>
+<LI>
+$R-&gt;{auth}-&gt;{user}
+<P>Contains the authenticated user. If the user is not logged in,
+currently it's empty but it will contain the 'not-logged-in' user in
+the near future. The {logged_in} property tells you whether the user
+is logged in or not.</P>
+<PRE>
+ if ( my $u = $R-&gt;{auth}-&gt;{user} ) {
+   print &quot;Hi there $u-&gt;{first_name} $u-&gt;{last_name}&quot;;
+ }</PRE>
+<P></P>
+<LI>
+$R-&gt;{auth}-&gt;{group}
+<P>If there is a valid entry in $R-&gt;{auth}-&gt;{user}, then the list of
+groups the user if a member of will be here</P>
+<PRE>
+ foreach my $group ( @{ $R-&gt;{auth}-&gt;{group} } ) {
+   print &quot;You are a member of group: $group-&gt;{name}&quot;;
+ }</PRE>
+<P></P>
+<LI>
+$R-&gt;{theme}
+<P>The object representing the theme to be used for the current
+request. This should always be defined.</P>
+<PRE>
+ my $props = $R-&gt;{theme}-&gt;all_values;
+ print &quot;Properties used in this theme:\n&quot;;
+ foreach my $prop ( keys %{ $props } ) {
+   print &quot; -- $prop: $props-&gt;{ $prop}\n&quot;;
+ }</PRE>
+<P></P>
+<LI>
+$R-&gt;{session}-&gt;{ $key }
+<P>Allows you to retrieve or set information for a particular session
+$key. The session_id can be retrieved from the {_session_id} key.</P>
+<PRE>
+ $R-&gt;{session}-&gt;{shopping_items}++;</PRE>
+<PRE>
+ my $ssn_id = $R-&gt;{session}-&gt;{_session_id};</PRE>
+<PRE>
+ print &quot;You have &quot;, $R-&gt;{session}-&gt;{shopping_items}, 
+       &quot; in your cart.&quot;;</PRE>
+<P></P>
+<LI>
+$R-&gt;{cookie}-&gt;{in}-&gt;{ $key }
+<P>Returns the information for the incoming cookie specified by $key.</P>
+<PRE>
+ my $session_id = $R-&gt;{cookie}-&gt;{in}-&gt;{session_id};</PRE>
+<P></P>
+<LI>
+$R-&gt;{cookie}-&gt;{out}-&gt;{ $key }
+<P>Set/retrieve information for the outgoing cookie specified by
+$key. Note that the <EM>create_cookie</EM> method knows whether you are
+using the <CODE>CGI</CODE> module or the <CODE>Apache::Cookie</CODE> module for cookie
+parsing/creating.</P>
+<PRE>
+ $R-&gt;cookie-&gt;create_cookie( { name =&gt; 'mycookie', value =&gt; $my_calue, 
+                              path =&gt; '/', expires =&gt; '+3M' } );</PRE>
+<P></P>
+<LI>
+$R-&gt;{time}
+<P>Time this request was started, in number of seconds since the epoch
+format. You can get a more inteligible format by using this value in
+combination with the localtime function.</P>
+<PRE>
+ print &quot;Request started at &quot;, scalar localtime( $R-&gt;{time} );</PRE>
+<P></P>
+<LI>
+$R-&gt;{boxes}
+<P>Components to be used for boxes that the handlers can control. 
+For instance, if I'm in the 'contact' tool, I might want to have the
+'contact_tool_box' box be displayed. So all I do is:</P>
+<PRE>
+ push @{ $R-&gt;{boxes} }, 'contact_tool_box';</PRE>
+<P>And it will be displayed at the right time. Note that order is important.</P>
+<P></P></UL>
+<P>
+<HR>
+<H1><A NAME="aliases for methods done elsewhere">ALIASES FOR METHODS DONE ELSEWHERE</A></H1>
+<UL>
+<LI>
+$R-&gt;throw
+<P>Alias for $R-&gt;error-&gt;throw, which throws an error and calls a
+particular error handler, depending on the type of error you've
+raised.</P>
+<P></P></UL>
+<P>
+<HR>
+<H1><A NAME="global information">GLOBAL INFORMATION</A></H1>
+<P>If your handler is a subclass of <CODE>OpenInteract::SPOPS</CODE>, you don't
+need to instantiate $R for a number of commonly used items.</P>
+<UL>
+<LI>
+global_user_current;
+<P>Returns the object corresponding to the user who is executing
+this request.</P>
+<PRE>
+ my $user = $class-&gt;global_user_current;
+ warn &quot; User: $user-&gt;{first_name} $user-&gt;{last_name}\n&quot;;</PRE>
+<P></P>
+<LI>
+global_group_current;
+<P>Returns a list of groups that the current user belongs to. If there is
+no current user (e.g., the user has not logged in), this will be undef,</P>
+<PRE>
+ my $group_list = $class-&gt;global_group_current || [];
+ foreach my $group ( @{ $group_list } ) {
+   print &quot;You are a member of group: $group-&gt;{name}&quot;;
+ }</PRE>
+<P></P>
+<LI>
+global_user_class
+<P>Returns the class used to manipulate user objects.</P>
+<PRE>
+ my $user = $class-&gt;global_user_class-&gt;fetch_by_username( $username );</PRE>
+<P></P>
+<LI>
+global_group_class
+<P>Returns the class used to manipulate group objects.</P>
+<PRE>
+ my $group = $class-&gt;global_group_class-&gt;fetch( $gid );</PRE>
+<P></P>
+<LI>
+global_error_class
+<P>Returns the class to use when we throw an error.</P>
+<PRE>
+ my $error_class = $class-&gt;global_error_class;
+ $error_class-&gt;throw( { code =&gt; 192, type =&gt; 'db' ... } );</PRE>
+<P></P>
+<LI>
+global_cache_class
+<P>Returns the class we use to cache objects, text, etc.</P>
+<PRE>
+ my $cache_class = $class-&gt;global_cache_class;
+ my $html = $cache_class-&gt;get( 'mykey' ); 
+ if ( ! $html ) {
+   ... generate html ...
+ }
+ return $html;</PRE>
+<P></P>
+<LI>
+global_config
+<P>Returns the configuration object -- basically a hashref with a few
+methods attached. (See <CODE>OpenInteract::Config</CODE>.)</P>
+<PRE>
+ my $conf = $class-&gt;global_config;
+ print &quot;Template Directory: &quot;, $conf-&gt;get_dir( 'template' );</PRE>
+<P></P>
+<LI>
+global_db_handle
+<P>Returns the database handle associated with this request.</P>
+<PRE>
+ my $quoted_value = $R-&gt;db-&gt;quote( &quot;this_value's information&quot; );</PRE>
+<P></P>
+<LI>
+global_secure_class
+<P>Returns the SPOPS class that deals with security, generally
+<CODE>SPOPS::Secure</CODE>.</P>
+<PRE>
+ my $secure_class = $class-&gt;global_secure_class;
+ my $level = $secure_class-&gt;check_security( { ... } );</PRE>
+<P></P>
+<LI>
+global_security_object_class
+<P>Returns the SPOPS (or other) class that implements security objects in
+the system; this is always implemented in the <CODE>base_security</CODE>
+package.</P>
+<PRE>
+ my $sec_obj_class = $class-&gt;global_security_object_class;
+ my $obj = $sec_obj_class-&gt;fetch_match( $class, { ... } );</PRE>
+<P></P></UL>
+<P>
+<HR>
+<H1><A NAME="authors">AUTHORS</A></H1>
+<P>Chris Winters &lt;<A HREF="mailto:chris@cwinters.com">chris@cwinters.com</A>&gt;</P>

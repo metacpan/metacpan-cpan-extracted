@@ -1,0 +1,81 @@
+<style type="text/css">
+<!--
+
+input.submit {
+   color:#555;
+   font-family:'trebuchet ms',helvetica,sans-serif;
+   font-size:10%;
+   font-weight:bold;
+   background-color:#fff;
+}
+
+
+
+table.calendar {
+
+}
+
+table.calendar th {
+
+}
+
+table.calendar td {
+	
+}
+
+table.calendar td.noevent {
+    background-color: #aaa096;
+    font-weight: normal;
+}
+
+table.calendar td.header {
+    background-color: #645a50;
+    font-weight: normal;
+}
+
+table.calendar td.event {
+    background-color: #c0c0c0;
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+table.calendar td.todaynoevent {
+    background-color: #aaa096;
+    border: 2px solid #645a50;
+    font-weight: normal;
+}
+
+table.calendar td.todayevent {
+    background-color: #c0c0c0;
+    border: 2px solid #645a50;
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+
+
+.event    { color: #281e14; font-style: normal; font-weight: bold; font-size: 10px; font-family: Verdana, Geneva, Arial, Helvetica }
+.noevent  { color: #645a50; font-style: normal; font-weight: bold; font-size: 10px; font-family: Verdana, Geneva, Arial, Helvetica }
+
+
+.header   { color: #aaa096; font-style: normal; font-weight: bold; font-size: 15px; font-family: Verdana, Geneva, Arial, Helvetica }
+
+
+
+.bold      { color: #645a50; font-style: normal; font-weight: bold; font-size: 10px; font-family: Verdana, Geneva, Arial, Helvetica }
+.bolddark   { color: #281e14; font-style: normal; font-weight: bold; font-size: 10px; font-family: Verdana, Geneva, Arial, Helvetica }
+.bolditalic     { color: #645a50; font-style: italic; font-weight: bold; font-size: 10px; font-family: Verdana, Geneva, Arial, Helvetica }
+.bolditaliclight      { color: #aaa096; font-style: italic; font-weight: bold; font-size: 10px; font-family: Verdana, Geneva, Arial, Helvetica }
+.boldlight      { color: #aaa096; font-style: normal; font-weight: bold; font-size: 10px; font-family: Verdana, Geneva, Arial, Helvetica }
+.boldwhite { color: #fff; font-style: normal; font-weight: bold; font-size: 10px; font-family: Verdana, Geneva, Arial, Helvetica }
+.plain      { color: #645a50; font-style: normal; font-weight: normal; font-size: 10px; font-family: Verdana, Geneva, Arial, Helvetica }
+.summary      { color: #645a50; font-style: normal; font-weight: normal; font-size: 10px; font-family: Verdana, Geneva, Arial, Helvetica }
+.plaindark   { color: #281e14; font-style: normal; font-weight: normal; font-size: 10px; font-family: Verdana, Geneva, Arial, Helvetica }
+.plainitalic     { color: #645a50; font-style: italic; font-weight: normal; font-size: 10px; font-family: Verdana, Geneva, Arial, Helvetica }
+.plainitaliclight      { color: #aaa096; font-style: italic; font-weight: normal; font-size: 10px; font-family: Verdana, Geneva, Arial, Helvetica }
+.plainlight      { color: #aaa096; font-style: normal; font-weight: normal; font-size: 10px; font-family: Verdana, Geneva, Arial, Helvetica }
+.plainwhite { color: #fff; font-style: normal; font-weight: normal; font-size: 10px; font-family: Verdana, Geneva, Arial, Helvetica }
+a   { text-decoration: none }
+
+-->
+</style>

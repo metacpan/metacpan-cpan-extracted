@@ -1,0 +1,10 @@
+Revision history for Perl extension Otogiri-Plugin-BulkInsert
+
+0.02 2015-10-13T04:00:10Z
+
+    - add txn for performance and consistency (tsucchi++)
+
+0.01 2014-05-26T03:02:28Z
+
+    - original version
+

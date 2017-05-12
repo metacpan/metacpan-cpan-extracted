@@ -1,0 +1,47 @@
+OpenGL-FTGL version 0.01
+========================
+
+This module wraps some functions of the FTGL library.
+
+FTGL is a free C/C++, open source library which makes possible to use
+TrueType or OpenType fonts in an OpenGL application.
+
+This module requires that both the FreeType 2 library
+and the FTGL library have been installed.
+
+* For the FreeType 2 library see:
+    http://www.freetype.org/freetype2/
+  
+* For the FTGL library see:
+    http://ftgl.sourceforge.net/docs/html/index.html 
+
+INSTALLATION
+
+To install this module type the following:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+   
+When building this module, the FreeType 2 and FTGL libraries will need
+to be accessible. If those files are in a location where your compiler
+does not find them by default, then instead of running 'perl Makefile.PL', 
+you'll need to run:
+
+perl Makefile.pl INC="-I/path/to/FreeType2_includes -I/path/to/FTGL_includes"
+ LIBS="-L/path/to/FreeType2_lib -L/path/to/FTGL_lib -lftgl"
+
+DEPENDENCIES
+
+This module requires the Perl modules OpenGL and OpenGL::Image.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2012 by J-L Morel <jl_morel@bribes.orgE>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+

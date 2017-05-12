@@ -1,0 +1,67 @@
+{
+   "abstract" : "A unique identifier for any object",
+   "author" : [
+      "Michael G Schwern <schwern@pobox.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112150",
+   "keywords" : [
+      "id",
+      "identifier",
+      "universal",
+      "object"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Object-ID",
+   "no_index" : {
+      "package" : [
+         "UNIVERSAL"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.88",
+            "version" : "0.77"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.340201"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Hash::FieldHash" : "0.10",
+            "Sub::Name" : "0.03",
+            "perl" : "v5.8.8"
+         }
+      }
+   },
+   "provides" : {
+      "Object::ID" : {
+         "file" : "lib/Object/ID.pm",
+         "version" : "v0.1.2"
+      },
+      "UNIVERSAL::Object::ID" : {
+         "file" : "lib/UNIVERSAL/Object/ID.pm",
+         "version" : "v0.1.2"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/schwern/Object-ID"
+      }
+   },
+   "version" : "v0.1.2"
+}

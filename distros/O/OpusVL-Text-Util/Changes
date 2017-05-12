@@ -1,0 +1,29 @@
+Revision history for OpusVL-Text-Util
+
+0.10      2016-12-23 08:51:11+00:00 Europe/London
+
+        Added new camelcase split function
+        Add Jenkins file to do local Jenkins testing.
+
+0.09      2016-11-04 12:04:08+00:00 Europe/London
+
+        Deal with multiline text in the mask function.
+
+0.08      2016-11-03 20:05:27+00:00 Europe/London
+
+        Ensure the minimum perl version is meaningfully set in the dist
+
+0.07      2016-11-03 20:01:50+00:00 Europe/London
+
+        Upped perl version dependency because we are using a language feature only introduced in 5.14
+
+
+0.06      2016-11-03 16:11:49+00:00 Europe/London
+
+        Added mask_text function.
+        Converted to Dist::Zilla for distribution.
+        Open Sourced.
+
+0.01    2012-08-16
+        First version, released on an unsuspecting world.
+

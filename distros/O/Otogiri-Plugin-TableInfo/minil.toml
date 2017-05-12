@@ -1,0 +1,2 @@
+name = "Otogiri-Plugin-TableInfo"
+badges = ["travis", "coveralls"]

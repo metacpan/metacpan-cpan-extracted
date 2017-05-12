@@ -1,0 +1,29 @@
+OWL-DirectSemantics
+===================
+
+Created:      2011-03-28
+Home page:    <https://metacpan.org/release/OWL-DirectSemantics>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=OWL-DirectSemantics>
+Maintainer:   Toby Inkster <mailto:tobyink@cpan.org>
+
+0.001  2012-06-28  # First official release!
+
+ - s/use parent/use base/
+
+0.000_03  2012-06-28
+
+ - (Packaging) Module::Package::RDF
+ - General modernization.
+
+0.000_02  2011-03-31
+
+ - (Addition) Automatically determine the URI for the owl:Ontology.
+ - (Bugfix) Annotation handling improvements.
+ - (Bugfix) Serialize Imports() correctly in OwlFn.
+ - (Documentation) Fixed description for RDF::Trine::Serializer::OwlFn.
+ - Make URI/IRI terminology consistent in
+   OWL::DirectSemantics::Element::Ontology.
+
+0.000_01  2011-03-30  # Hackathon Preview
+
+

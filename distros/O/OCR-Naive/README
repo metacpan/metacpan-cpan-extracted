@@ -1,0 +1,45 @@
+OCR::Naive - convert images into text in a extremely naive fashion
+==================================================================
+
+The module implements a very simple and unsophisticated OCR by finding all
+known images in a larger image. The known images are mapped to text using the
+preexisting dictionary, and the text lines are returned.
+
+The interesting stuff here is the image finding itself - it is done by a
+regexp! For all practical reasons, images can be easily treated as byte
+strings, and regexps are not exception. For example, one needs to locate an
+image 2x2 in larger 7x7 image. The regexp constructed should be the first
+scanline of smaller image, 2 bytes, verbatim, then 7 - 2 = 5 of any character,
+and finally the second scanline, 2 bytes again. Of course there are some
+quirks, but these explained in API section.
+
+Dictionaries for different fonts can be created interactively by
+"bin/makedict"; the non-interactive recognition is performed by "bin/ocr" which
+is a mere wrapper to this module.
+
+Prerequisites
+=============
+
+Prima
+IPA
+
+Installation
+============
+
+perl Makefile.PL
+make
+make test
+sudo make install
+
+Examples
+========
+
+perl -Iblib/lib bin/makedict -v --dict=examples/dict examples/vim.png
+
+   Run this and see how makedict tries to detect glyphs. Note that it 
+   the first glyph it fails to detect is inverted ('semicolon').
+
+
+perl -Iblib/lib bin/ocr -v --dict=examples/dict examples/xterm.png
+
+   some text must come outt

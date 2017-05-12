@@ -1,0 +1,15 @@
+[%########################################
+  form_select( name(*), list/iterator(*), value_field(*), label_field, 
+               picked, first_label, first_blank, is_multiple, size, field_label )
+     Create a SELECT dropdown box where the options are specified by
+     objects in 'list' or 'iterator'
+  ########################################-%]
+
+[%- INCLUDE form_select_intro -%]
+[%- IF first_label OR first_blank -%]
+  <option value="">[% first_label %]</option>
+[%- END -%]
+[% IF plain       %][% INCLUDE form_select_options_plain_list -%]
+[% ELSIF iterator %][% INCLUDE form_select_options_iterator -%]
+[% ELSE           %][% INCLUDE form_select_options_list -%][% END -%]
+</select> [% field_label %]

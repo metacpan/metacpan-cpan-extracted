@@ -1,0 +1,21 @@
+Changes
+COPYRIGHT
+fn-pointer-xs.inc
+lib/Ouroboros.pm
+lib/Ouroboros/Library.pm
+lib/Ouroboros/Spec.pm
+libouroboros.c
+libouroboros.h
+libouroboros.txt
+Makefile.PL
+MANIFEST
+Ouroboros.xs
+README.md
+t/1-basic.t
+t/2-ffi-platypus.t
+t/2-ffi-raw.t
+t/lib/ATHX.pm
+tools/lib/SpecParser.pm
+tools/regen.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

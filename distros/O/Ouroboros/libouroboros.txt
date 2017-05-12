@@ -1,0 +1,399 @@
+# fn <TAB> return type <TAB> function name <TAB> param1 [<TAB> param2 ]...
+# sizeof <TAB> type - provide size of type in %SIZE_OF
+# const <TAB> name - provide constant value as perl constant.
+# enum <TAB> name - same as above, but don't #ifdef it. Sets undocumented 'macro' flag for ExtUtils::Constant.
+
+# Following metadata can be attached to a fn:
+# #? <text> - POD documentation for following item. Multiple doc lines are concatenated.
+# #: <name> - XS macro name for generating wrapper implementation automatically.
+# #+ <name> - set a specific flag for the item.
+
+# Flags:
+# #+ no_pthx - wrapper function does not have pTHX argument.
+# #+ _needs_sp - force implementation to pass SP as first argument to macro (normally macros just use it directly, but few take it explicitly).
+# #+ _parens - force implementation to have parens after macro invocation (normally they are generated only if there are arguments).
+
+#? Initialize ouroboros_stack_t object. Must be first thing called by a XS-sub. Equivalent to C<dXSARGS> macro automatically inserted by C<xsubpp> into every XS sub.
+fn	void	ouroboros_stack_init	ouroboros_stack_t*
+
+#? Returns number of arguments on Perl stack. Equivalent to C<items> local variable in XS.
+fn	int	ouroboros_stack_items	ouroboros_stack_t*
+
+#: PUTBACK
+fn	void	ouroboros_stack_putback	ouroboros_stack_t*
+
+#? Read a value from the stack. Equivalent of:
+#?
+#?     return ST(a);
+#?
+#? Perl macro: C<ST(n)>
+fn	SV*	ouroboros_stack_fetch	ouroboros_stack_t*	SSize_t
+
+#? Store a value on the stack. Equivalent of:
+#?
+#?     ST(a) = sv;
+#?
+#? Perl macro: C<ST>
+fn	void	ouroboros_stack_store	ouroboros_stack_t*	SSize_t	SV*
+
+#: EXTEND
+#+ _needs_sp
+fn	void	ouroboros_stack_extend	ouroboros_stack_t*	SSize_t
+
+#: PUSHMARK
+#+ _needs_sp
+fn	void	ouroboros_stack_pushmark	ouroboros_stack_t*
+
+#: SPAGAIN
+fn	void	ouroboros_stack_spagain	ouroboros_stack_t*
+
+#: XPUSHs
+fn	void	ouroboros_stack_xpush_sv	ouroboros_stack_t*	SV*
+#: mXPUSHs
+fn	void	ouroboros_stack_xpush_sv_mortal	ouroboros_stack_t*	SV*
+#: mXPUSHi
+fn	void	ouroboros_stack_xpush_iv	ouroboros_stack_t*	IV
+#: mXPUSHu
+fn	void	ouroboros_stack_xpush_uv	ouroboros_stack_t*	UV
+#: mXPUSHn
+fn	void	ouroboros_stack_xpush_nv	ouroboros_stack_t*	NV
+#: mXPUSHp
+fn	void	ouroboros_stack_xpush_pv	ouroboros_stack_t*	const char*	STRLEN
+#: XPUSHmortal
+fn	void	ouroboros_stack_xpush_mortal	ouroboros_stack_t*
+
+#: PUSHs
+fn	void	ouroboros_stack_push_sv	ouroboros_stack_t*	SV*
+#: mPUSHs
+fn	void	ouroboros_stack_push_sv_mortal	ouroboros_stack_t*	SV*
+#: mPUSHi
+fn	void	ouroboros_stack_push_iv	ouroboros_stack_t*	IV
+#: mPUSHu
+fn	void	ouroboros_stack_push_uv	ouroboros_stack_t*	UV
+#: mPUSHn
+fn	void	ouroboros_stack_push_nv	ouroboros_stack_t*	NV
+#: mPUSHp
+fn	void	ouroboros_stack_push_pv	ouroboros_stack_t*	const char*	STRLEN
+#: PUSHmortal
+fn	void	ouroboros_stack_push_mortal	ouroboros_stack_t*
+
+#: SvUPGRADE
+fn	void	ouroboros_sv_upgrade	SV*	svtype
+#: SvNIOK
+fn	U32	ouroboros_sv_niok	SV*
+#: SvNIOKp
+fn	U32	ouroboros_sv_niok_priv	SV*
+#: SvNIOK_off
+fn	void	ouroboros_sv_niok_off	SV*
+#: SvOK
+fn	U32	ouroboros_sv_ok	SV*
+#: SvIOKp
+fn	U32	ouroboros_sv_iok_priv	SV*
+#: SvNOKp
+fn	U32	ouroboros_sv_nok_priv	SV*
+#: SvPOKp
+fn	U32	ouroboros_sv_pok_priv	SV*
+#: SvIOK
+fn	U32	ouroboros_sv_iok	SV*
+#: SvIOK_on
+fn	void	ouroboros_sv_iok_on	SV*
+#: SvIOK_off
+fn	void	ouroboros_sv_iok_off	SV*
+#: SvIOK_only
+fn	void	ouroboros_sv_iok_only	SV*
+#: SvIOK_only_UV
+fn	void	ouroboros_sv_iok_only_uv	SV*
+#: SvIOK_UV
+fn	bool	ouroboros_sv_iok_uv	SV*
+#: SvUOK
+fn	bool	ouroboros_sv_uok	SV*
+#: SvIOK_notUV
+fn	bool	ouroboros_sv_iok_not_uv	SV*
+#: SvNOK
+fn	U32	ouroboros_sv_nok	SV*
+#: SvNOK_on
+fn	void	ouroboros_sv_nok_on	SV*
+#: SvNOK_off
+fn	void	ouroboros_sv_nok_off	SV*
+#: SvNOK_only
+fn	void	ouroboros_sv_nok_only	SV*
+#: SvPOK
+fn	U32	ouroboros_sv_pok	SV*
+#: SvPOK_on
+fn	void	ouroboros_sv_pok_on	SV*
+#: SvPOK_off
+fn	void	ouroboros_sv_pok_off	SV*
+#: SvPOK_only
+fn	void	ouroboros_sv_pok_only	SV*
+#: SvPOK_only_UTF8
+fn	void	ouroboros_sv_pok_only_utf8	SV*
+#: SvVOK
+fn	bool	ouroboros_sv_vok	SV*
+#: SvOOK
+fn	U32	ouroboros_sv_ook	SV*
+#: SvOOK_offset(,*)
+fn	void	ouroboros_sv_ook_offset	SV*	STRLEN*
+#: SvROK
+fn	U32	ouroboros_sv_rok	SV*
+#: SvROK_on
+fn	void	ouroboros_sv_rok_on	SV*
+#: SvROK_off
+fn	void	ouroboros_sv_rok_off	SV*
+
+#: SvIV
+fn	IV	ouroboros_sv_iv	SV*
+#: SvIV_nomg
+fn	IV	ouroboros_sv_iv_nomg	SV*
+#: SvIVX
+fn	IV	ouroboros_sv_iv_raw	SV*
+#: SvIV_set
+fn	void	ouroboros_sv_iv_set	SV*	IV
+
+#: SvUV
+fn	UV	ouroboros_sv_uv	SV*
+#: SvUV_nomg
+fn	UV	ouroboros_sv_uv_nomg	SV*
+#: SvUVX
+fn	UV	ouroboros_sv_uv_raw	SV*
+#: SvUV_set
+fn	void	ouroboros_sv_uv_set	SV*	UV
+
+#: SvNV
+fn	NV	ouroboros_sv_nv	SV*
+#: SvNV_nomg
+fn	NV	ouroboros_sv_nv_nomg	SV*
+#: SvNVX
+fn	NV	ouroboros_sv_nv_raw	SV*
+#: SvNV_set
+fn	void	ouroboros_sv_nv_set	SV*	NV
+
+#: SvPV(,*)
+fn	const char*	ouroboros_sv_pv	SV*	STRLEN*
+#: SvPV_nomg(,*)
+fn	const char*	ouroboros_sv_pv_nomg	SV*	STRLEN*
+#: SvPV_nolen
+fn	const char*	ouroboros_sv_pv_nolen	SV*
+#: SvPV_nomg_nolen
+fn	const char*	ouroboros_sv_pv_nomg_nolen	SV*
+#: SvPVX
+fn	char*	ouroboros_sv_pv_raw	SV*
+#: SvCUR
+fn	STRLEN	ouroboros_sv_pv_cur	SV*
+#: SvCUR_set
+fn	void	ouroboros_sv_pv_cur_set	SV*	STRLEN
+#: SvLEN
+fn	STRLEN	ouroboros_sv_pv_len	SV*
+#: SvLEN_set
+fn	void	ouroboros_sv_pv_len_set	SV*	STRLEN
+#: SvEND
+fn	char*	ouroboros_sv_pv_end	SV*
+
+#: SvRV
+fn	SV*	ouroboros_sv_rv	SV*
+#: SvRV_set
+fn	void	ouroboros_sv_rv_set	SV*	SV*
+
+#: SvTRUE
+fn	bool	ouroboros_sv_true	SV*
+#: SvTRUE_nomg
+fn	bool	ouroboros_sv_true_nomg	SV*
+#: SvTYPE
+fn	svtype	ouroboros_sv_type	SV*
+#: SvFLAGS
+fn	UV	ouroboros_sv_flags	SV*
+#: SvUTF8
+fn	bool	ouroboros_sv_utf8	SV*
+#: SvUTF8_on
+fn	void	ouroboros_sv_utf8_on	SV*
+#: SvUTF8_off
+fn	void	ouroboros_sv_utf8_off	SV*
+#: SvIsCOW
+fn	U32	ouroboros_sv_is_cow	SV*
+#: SvIsCOW_shared_hash
+fn	bool	ouroboros_sv_is_cow_shared_hash	SV*
+
+#: SvTAINTED
+fn	bool	ouroboros_sv_tainted	SV*
+#: SvTAINTED_on
+fn	void	ouroboros_sv_tainted_on	SV*
+#: SvTAINTED_off
+fn	void	ouroboros_sv_tainted_off	SV*
+#: SvTAINT
+fn	void	ouroboros_sv_taint	SV*
+
+#: SvSHARE
+fn	void	ouroboros_sv_share	SV*
+#: SvLOCK
+fn	void	ouroboros_sv_lock	SV*
+#: SvUNLOCK
+fn	void	ouroboros_sv_unlock	SV*
+
+#: SvGAMAGIC
+fn	U32	ouroboros_sv_get_a_magic	SV*
+#: SvMAGIC_set
+fn	void	ouroboros_sv_magic_set	SV*	MAGIC*
+#: SvGETMAGIC
+fn	void	ouroboros_sv_get_magic	SV*
+#: SvSETMAGIC
+fn	void	ouroboros_sv_set_magic	SV*
+
+#: GvSV
+fn	SV*	ouroboros_gv_sv	GV*
+#: GvAV
+fn	AV*	ouroboros_gv_av	GV*
+#: GvHV
+fn	HV*	ouroboros_gv_hv	GV*
+#: GvCV
+fn	CV*	ouroboros_gv_cv	CV*
+
+#: SvSTASH
+fn	HV*	ouroboros_sv_stash	SV*
+#: SvSTASH_set
+fn	void	ouroboros_sv_stash_set	SV*	HV*
+#: CvSTASH
+fn	void	ouroboros_cv_stash	CV*
+#: HvNAME
+fn	const char*	ouroboros_hv_name	HV*
+#: HvNAMELEN
+fn	STRLEN	ouroboros_hv_name_len	HV*
+#: HvNAMEUTF8
+fn	unsigned char	ouroboros_hv_name_utf8	HV*
+#: HvENAME
+fn	const char*	ouroboros_hv_ename	HV*
+#: HvENAMELEN
+fn	STRLEN	ouroboros_hv_ename_len	HV*
+#: HvENAMEUTF8
+fn	unsigned char	ouroboros_hv_ename_utf8	HV*
+
+#: HePV(,*)
+fn	const char*	ouroboros_he_pv	HE*	STRLEN*
+#: HeVAL
+fn	SV*	ouroboros_he_val	HE*
+#: HeHASH
+fn	U32	ouroboros_he_hash	HE*
+#: HeSVKEY
+fn	SV*	ouroboros_he_svkey	HE*
+#: HeSVKEY_force
+fn	SV*	ouroboros_he_svkey_force	HE*
+#: HeSVKEY_set
+fn	SV*	ouroboros_he_svkey_set	HE*	SV*
+#? Unlike macro, returns hash value instead of assigning it to an argument.
+#?
+#? Perl macro: C<PERL_HASH>
+fn	U32	ouroboros_perl_hash	U8*	STRLEN
+
+#: SvREFCNT
+fn	U32	ouroboros_sv_refcnt	SV*
+
+# The next four functions actually wrap SvREFCNT_inc_simple_* macros.
+# SvREFCNT_inc(_void)?(_nn)? are implemented as static functions to force
+# one-time evaluation of their argument - we have it for free because
+# we are wrapping it. These wrappers are necessary because SvREFCNT_*
+# functions are declared as static and their symbols are not exported by Perl
+# executable.
+
+#: SvREFCNT_inc_simple
+fn	SV*	ouroboros_sv_refcnt_inc	SV*
+#: SvREFCNT_inc_simple_NN
+fn	SV*	ouroboros_sv_refcnt_inc_nn	SV*
+#: SvREFCNT_inc_simple_void
+fn	void	ouroboros_sv_refcnt_inc_void	SV*
+#: SvREFCNT_inc_simple_void_NN
+fn	void	ouroboros_sv_refcnt_inc_void_nn	SV*
+
+#: SvREFCNT_dec
+fn	void	ouroboros_sv_refcnt_dec	SV*
+#: SvREFCNT_dec_NN
+fn	void	ouroboros_sv_refcnt_dec_nn	SV*
+
+#: ENTER
+fn	void	ouroboros_enter
+#: LEAVE
+fn	void	ouroboros_leave
+#: SAVETMPS
+fn	void	ouroboros_savetmps
+#: FREETMPS
+fn	void	ouroboros_freetmps
+
+#: PERL_SYS_INIT3
+#+ no_pthx
+fn	void	ouroboros_sys_init3	int*	char***	char***
+#: PERL_SYS_TERM
+#+ no_pthx
+#+ _parens
+fn	void	ouroboros_sys_term
+
+#? Return address of C<PL_sv_undef> global.
+fn	SV*	ouroboros_sv_undef
+#? Return address of C<PL_sv_no> global.
+fn	SV*	ouroboros_sv_no
+#? Return address of C<PL_sv_yes> global.
+fn	SV*	ouroboros_sv_yes
+
+#: GIMME_V
+fn	U32	ouroboros_gimme
+
+#? Execute callback once while capturing Perl exceptions. Second argument is passed to the callback as is and can be NULL.
+#?
+#? This is equivalent of C<XCPT_TRY_START> and C<XCPT_TRY_END> macros, see L<perlguts/Exception Handling>.
+#?
+#? Returns zero if callback was executed successfully and no Perl exceptions were thrown.
+#?
+#? Returns non-zero if Perl exception was thrown while executing callback. After doing cleanups, this value must be passed to L</ouroboros_xcpt_rethrow>.
+#?
+# (note that actual implementation uses different macros, but closely matches implementation of these macros)
+#? Perl macro: C<XCPT_TRY_START> and C<XCPT_TRY_END>
+fn	int	ouroboros_xcpt_try	ouroboros_xcpt_callback_t	void*
+
+#? Continue exception unwinding after unsuccessful call to L</ouroboros_xcpt_try>.
+#?
+# (note that actual implementation uses different macro, but closely matches implementation of XCPT_RETHROW)
+#? Perl macro: C<XCPT_RETHROW>
+fn	void	ouroboros_xcpt_rethrow	int
+
+# Sizes of various types
+sizeof	bool
+sizeof	svtype
+sizeof	PADOFFSET
+sizeof	Optype
+sizeof	ouroboros_stack_t
+
+# Elements of svtype
+# 	perl type	C type	name
+enum	IV	svtype	SVt_NULL
+enum	IV	svtype	SVt_IV
+enum	IV	svtype	SVt_NV
+enum	IV	svtype	SVt_PV
+enum	IV	svtype	SVt_PVIV
+enum	IV	svtype	SVt_PVNV
+enum	IV	svtype	SVt_PVMG
+enum	IV	svtype	SVt_REGEXP
+enum	IV	svtype	SVt_PVGV
+enum	IV	svtype	SVt_PVLV
+enum	IV	svtype	SVt_PVAV
+enum	IV	svtype	SVt_PVHV
+enum	IV	svtype	SVt_PVCV
+enum	IV	svtype	SVt_PVFM
+enum	IV	svtype	SVt_PVIO
+enum	IV	svtype	SVt_LAST
+
+# Assorted SV related flags and constants. SV_CONST is not a const, but all SV_CONST_* are.
+# r !awk '/\#define SV_/ && \!/SV_CHECK_/ && \!/SV_CONST/ { print("const\t" $2) }' sv.h | sort
+# 	perl type	C type	name
+const	UV	U32	SV_CATBYTES
+const	UV	U32	SV_CATUTF8
+const	UV	U32	SV_COW_DROP_PV
+const	UV	U32	SV_COW_OTHER_PVS
+const	UV	U32	SV_COW_SHARED_HASH_KEYS
+const	UV	U32	SV_FORCE_UTF8_UPGRADE
+const	UV	U32	SV_GMAGIC
+const	UV	U32	SV_HAS_TRAILING_NUL
+const	UV	U32	SV_IMMEDIATE_UNREF
+const	UV	U32	SV_MUTABLE_RETURN
+const	UV	U32	SV_NOSTEAL
+const	UV	U32	SV_SKIP_OVERLOAD
+const	UV	U32	SV_SMAGIC
+const	UV	U32	SV_UNDEF_RETURNS_NULL
+const	UV	U32	SV_UTF8_NO_ENCODING
+
+# vim: set ts=12 tw=0 noet

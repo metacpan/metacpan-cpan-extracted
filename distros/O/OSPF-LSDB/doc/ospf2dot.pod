@@ -1,0 +1,139 @@
+=head1 NAME
+
+B<ospf2dot> - convert OSPF LSDB YAML to Graphviz dot
+
+=head1 SYNOPSIS
+
+B<ospf2dot> [B<-46bBceEhlpPsSwWv>] [F<ospf.yaml>] [F<ospf.dot>]
+
+=head1 DESCRIPTION
+
+B<ospf2dot> takes an OSPF link state database in YAML format and
+converts it into a Graphviz dot graph that shows the topology of
+the autonomous system.
+Per default only networks, router and links are displayed.
+Other LSA types have to be turned on explicitly.
+
+The regular color of the graph is gray, each area gets its own
+brightness.
+The OSPF LSDB is checked for consistency.
+Erroneous vertexes or links get colored depending on the detected
+problem.
+The error messages can be displayed as tooltip in an SVG graph or
+printed to stderr.
+
+Optionally one input and one output file can be given on command
+line, otherwise stdin and stdout are used.
+
+The options are as follows:
+
+=over 4
+
+=item B<-4>
+
+Disable IPv6.
+Default is the address family in YAML input file.
+
+=item B<-6>
+
+Enable IPv6.
+Default is the address family in YAML input file.
+
+=item B<-b>
+
+Display AS boundary router summary LSAs.
+
+=item B<-B>
+
+Display AS boundary router summary LSAs aggregated.
+A single node contains all boundary routers advertised from the
+same router.
+
+=item B<-c>
+
+Identical networks are clustered into a subgraph.
+This visualizes duplicate networks.
+
+=item B<-e>
+
+Display AS extrnal LSAs.
+
+=item B<-E>
+
+Display AS extrnal LSAs aggregated.
+A single node contains all external networks advertised from the
+same router.
+
+=item B<-h>
+
+Show help message and exit.
+
+=item B<-l>
+
+Generate legend as dot graph which contains all kinds of nodes and
+edges.
+The corresponding OSPF object is explained.
+Use B<-4> or B<-6> to choose the address family.
+Unimplemented features are displayed in red.
+
+=item B<-p>
+
+Display IPv6 link and intra-area-prefix LSAs.
+
+=item B<-P>
+
+Display IPv6 intra-area-prefix LSAs.
+They are constructed from the link LSAs by the designated router.
+
+=item B<-s>
+
+Display IP network summary LSAs.
+
+=item B<-S>
+
+Display IP network summary LSAs aggregated.
+A single node contains all networks advertised from the same router.
+
+=item B<-w>
+
+Show the most serious warning in the dot graph.
+That warning also accounts for the color.
+If there is no warning, the area is displayed.
+
+Note that this message is always shown as tool tip in SVG graphs.
+
+=item B<-W>
+
+Show the all areas and warnings in the dot graph.
+
+=item B<-v>
+
+Be verbose and print all warnings to stderr.
+
+=back
+
+=head1 EXAMPLES
+
+ ospf2dot -BSE ospf.yaml | dot -Tsvg -o ospf.svg
+
+=head1 DIAGNOSTICS
+
+The program dies if an error occurs.
+Typical errors are invalid YAML format, version of input file is
+newer than this program so it cannot be converted or the content
+of the YAML file is invalid.
+
+=head1 SEE ALSO
+
+L<OSPF::LSDB::View>,
+L<OSPF::LSDB::View6>,
+L<OSPF::LSDB::YAML>,
+L<OSPF::LSDB>
+
+L<ospfview>
+
+dot(1)
+
+=head1 AUTHOR
+
+Alexander Bluhm

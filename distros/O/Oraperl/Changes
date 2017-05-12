@@ -1,0 +1,12 @@
+Revision history for Oraperl
+
+1.51 2013-05-03
+ - Change official git repo to Pythian's.
+
+ [STATISTICS]
+ - code churn: 7 files changed, 21 insertions(+), 12 deletions(-)
+
+1.50 2012-08-17
+ - Oraperl module separated from the main DBD::Release distro, to ease
+   deprecation process.
+

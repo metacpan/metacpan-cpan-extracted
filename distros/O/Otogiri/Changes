@@ -1,0 +1,76 @@
+Revision history for Perl extension Otogiri
+
+0.17 2016-02-02T05:57:36Z
+
+    - INCOMPATIBLE CHANGE [tsucchi]
+      Change a behavior of insert() / fast_insert() as returns a last_insert_id.
+    - reformat a documentation [ytnobody]
+
+0.16 2015-11-13T07:17:24Z
+
+    - add disconnect() [tsucchi]
+    - call disconnect() when reconnect() was called [tsucchi]
+
+0.15 2015-01-11T04:55:43Z
+
+    - automatically reconnect when connection is lost [tsucchi]
+
+0.14 2014-12-18T08:36:13Z
+
+    - using Sunny's last_insert_id(not using LASTVAL()) when $table_name is specified in PostgreSQL [tsucchi]
+
+
+0.13 2014-07-03T12:39:07Z
+    - feature: Add DBIx::Otogiri::Iterator
+    - security fix: add strict mode. 
+      IF YOU WANT TO USE TRADDITIONAL INTERFACE, PLEASE SPECIFY strict => 0 WHEN CALL Otogiri->new(...);
+
+0.12 2014-06-05T08:29:05Z
+    - Stop deflation of parameters when calling delete() method.
+
+0.11 2014-05-30T10:10:49Z
+    - INCOMPATIBLE CHANGE [ytnobody]
+      Remove insert() method and it was became a synonym for fast_insert() method.
+      Previous insert() method will be spinout as Otogiri::Plugin::InsertAndFetch.
+    - Add a synonym fetch() for single() method.
+    - Add a synonym search() for select() method.
+
+0.10 2014-05-13T12:57:51Z
+    - add $self(Otogiri instance) to inflate/deflate 3rd parameter.
+
+0.09 2014-03-18T05:07:22Z
+    - nothing is changed from 0.0.8(previous is unauthorized release)
+
+0.08 2014-03-18T04:14:00Z
+
+    - only for PostgreSQL: using LASTVAL() when sequence name is not passed. [tsucchi]
+    - search_by_sql() accepts empty arrayref. [tsucchi]
+
+0.07 2014-02-25T06:25:04Z
+    - Fix about failure in testing on MSWin32 system [ytnobody]
+      Cause is path separator. 
+
+0.06 2014-01-14T09:12:45Z
+    - incompatible change [ytnobody]
+      Transfer core feature to DBIx::Otogiri
+
+0.05 2013-12-28T15:53:17Z
+    - bug fix: single() returns a void hashref if WHERE-clause is not matched to rows. [ytnobody]
+
+0.04 2013-12-27T00:15:04Z
+    - incompatible change [tsucchi++]
+      search_by_sql($sql, @binds) -> search_by_sql($sql, $binds_aref, $table)
+
+      In previous release, when select/search_by_sql calls inflate method, $table(table name) is not passed to inflate method. 
+      This change enables to pass $table to inflate method.
+
+0.03 2013-11-09T05:00:04Z
+    - bug fix: args for last_inserted_id() [tsucchi++]
+
+0.02 2013-11-08T08:36:37Z
+    - feature: add last_inserted_id() [tsucchi++]
+
+0.01 2013-10-30T06:45:03Z
+
+    - original version
+

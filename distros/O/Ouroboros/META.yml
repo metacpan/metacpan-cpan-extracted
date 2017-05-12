@@ -1,0 +1,30 @@
+---
+abstract: 'Perl XS macros re-exported as C functions'
+author:
+  - 'Vickenty Fesunov <cpan-ouroboros@setattr.net>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  FFI::Platypus: '0'
+  FFI::Raw: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Ouroboros
+no_index:
+  directory:
+    - t
+    - inc
+    - tools
+requires:
+  File::ShareDir: '0'
+  perl: '5.018000'
+resources:
+  bugtracker: https://github.com/vickenty/ouroboros/issues
+  repository: https://github.com/vickenty/ouroboros
+version: '0.12'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

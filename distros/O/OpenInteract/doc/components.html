@@ -1,0 +1,135 @@
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#introduction">INTRODUCTION</A></LI>
+	<LI><A HREF="#what is a component">WHAT IS A COMPONENT?</A></LI>
+	<LI><A HREF="#how to call a component">HOW TO CALL A COMPONENT</A></LI>
+	<LI><A HREF="#how to create a component">HOW TO CREATE A COMPONENT</A></LI>
+	<LI><A HREF="#authors">AUTHORS</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>OpenInteract Guide to Components - Building big things from small pieces</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<P>This document describes what a component is in OpenInteract as well as
+how to create one.</P>
+<P>
+<HR>
+<H1><A NAME="introduction">INTRODUCTION</A></H1>
+<P>Almost all substantive websites have certain graphical (or textual)
+items that are repeated on a large number of pages. These can be as
+simple as a standard copyright notice, or as complicated as a list of
+the most recent forum posts.</P>
+<P>If you find yourself using something in a number of pages, odds are
+that it can be represented as a component. It's a little more work in
+the beginning, but it pays off great dividends the more pages in which
+you use the component, and even greater if you ever have to modify it.</P>
+<P>
+<HR>
+<H1><A NAME="what is a component">WHAT IS A COMPONENT?</A></H1>
+<P>Most generally, a component is any aspect of your page that might be
+used on more than one page. It can also be any aspect of your page
+that you want to make separate so you can make your template
+shorter. All components return fully-formed HTML.</P>
+<P>A component can be very short or very long. It can be 100% static HTML
+or have only enough HTML to format text on the page in a coherent
+manner.</P>
+<P>Technically, just about everything in OpenInteract is a
+component. Even when you call a simple page that displays a form to
+edit an object, you're calling a component. But for consistency, we
+refer to more complicated components as 'handlers'.</P>
+<P>In this idea of everything being a component, you can think of the
+main template as a container for some text and placement of
+components, which can themselves contain components, which can
+themselves contain components...</P>
+<P>The configuration file holds naming information for all
+components. There are two basic types of components: template-only
+components and those with code behind them. The difference in
+configuration is covered below in <A HREF="#how to create a component">How to Create a Component</A>.</P>
+<P>
+<HR>
+<H1><A NAME="how to call a component">HOW TO CALL A COMPONENT</A></H1>
+<P>Calling a component from a template is quite simple:</P>
+<P><STRONG>Example: Calling a component</STRONG></P>
+<P>This example is using the Template Toolkit processing engine (see
+<CODE>OpenInteract::Template::Plugin</CODE> for how to call components).</P>
+<PRE>
+ [% OI.comp( 'component_name', param = value, param = value ... ) %]</PRE>
+<P>The HTML returned by the component will be put in place of the
+component call.</P>
+
+<P>The 'component_name' is a valid OpenInteract <a
+href="actions.html">action</a>. If you want to simply include a
+template, you can use the syntax:</P>
+
+<PRE>
+ [% PROCESS mypkg::mytemplate %]</PRE>
+<P>or with additional parameters:</P>
+<PRE>
+ [% PROCESS mypkg::mytemplate( foo = 'bar', baz = 42 ) %]</PRE>
+
+<p>See <a href="templates.html">additional documentation on
+templates</a> for more.</p>
+
+<P><STRONG>Wrong component name</STRONG></P>
+<P>If the component name is not found, the system will throw an error
+with code 312 and return the string 'Error: Unknown component
+called'. In the future, we'll probably make this message configurable.</P>
+
+<P><STRONG>Passing parameters</STRONG></P>
+<P>The parameters passed into the component follow many of the same rules
+as in the templating module. However, since OpenInteract have the
+standard of having a hashref as the first argument to a
+handler/component, we massage the parameters a little bit.</P>
+<P>Looking into the documentation for the Template Toolkit, you'll see
+subroutine calls like this:</P>
+<PRE>
+ [% sub( param, param, param = value, param = value ) %]</PRE>
+<P>The docs helpfully go on to say that all named parameters are put into
+a single hashref and passed as the <STRONG>last</STRONG> parameter. The Component
+handler takes all of the unnamed parameters and puts them into the
+'_unnamed_' key of the hashref, then passes the hashref as the
+ordinary first argument.</P>
+<P>Example:</P>
+<PRE>
+ [% OI.comp( 'mycomponent', value1, value2, param3 = value3 ) %]</PRE>
+<PRE>
+ sub handler {
+  my $class = shift;
+  my $p     = shift;
+  print &quot; --&gt; Value of param3: $p-&gt;{param3}\n&quot;;
+  print &quot; --&gt; Unnamed: &quot;, join &quot; &gt;&gt; &quot;, @{ $p-&gt;{_unnamed_} }, &quot;\n&quot;; 
+  ...
+ }</PRE>
+<P>Results:</P>
+<PRE>
+ --&gt; Value of param3: value3
+ --&gt; Unnamed: value1 &gt;&gt; value2</PRE>
+<P>Yes, this is an incentive to use named parameters. :) (Or rather, a
+disincentive to using placement parameters.)</P>
+<P>
+<HR>
+<H1><A NAME="how to create a component">HOW TO CREATE A COMPONENT</A></H1>
+<P>Every component simply calls an action. So you could define an action:</P>
+<PRE>
+ googlesearch =&gt; {
+    class  =&gt; 'OpenInteract::Handler::Google',
+    method =&gt; 'search',
+ }</PRE>
+<P>And call a component:</P>
+<PRE>
+ [% OI.comp( 'googlesearch', search_param =&gt; customer.company_name ) %]</PRE>
+<P>This would deposit the results of the method right into your HTML.</P>
+<P>
+<HR>
+<H1><A NAME="authors">AUTHORS</A></H1>
+<P>Chris Winters (<A HREF="mailto:chris@cwinters.com">chris@cwinters.com</A>)</P>

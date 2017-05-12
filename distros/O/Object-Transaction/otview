@@ -1,0 +1,49 @@
+#!/usr/bin/perl
+
+# Copyright (C) 2002 David Muir Sharnoff
+# This may be copied, modified, used, and redistributed under the
+# same terms as Perl itself.
+
+use Object::Transaction;
+use File::Slurp;
+use Storable;
+use Data::Dumper;
+
+*read_file = \&Object::Transaction::_read_file;
+*lock = \&Object::Transaction::_lock;
+*unlock = \&Object::Transaction::_unlock;
+*magic_cookie = \$Object::Transaction::magic_cookie;
+
+my $pager = $ENV{PAGER} || 'more';
+
+for my $file (@ARGV) {
+	lock($file);
+	die "will not overwrite $file.dumped" 
+		if -e "$file.dumped";
+}
+
+my @ff;
+for my $file (@ARGV) {
+	my $frozen = read_file($file);
+	my $ff = $file;
+	$ff =~ s/'/'\\''/g;
+	if (substr($frozen, 0, length($magic_cookie)) eq $magic_cookie) {
+		substr($frozen, 0, length($magic_cookie)) = '';
+		my $obj = Storable::thaw($frozen);
+		my $human = Dumper($obj);
+		die "will not overwrite $file.dumped" 
+			if -e $file.dumped;
+		write_file("$file.dumped", $human);
+		push(@ff, "'$ff.dumped'");
+	} else {
+		print STDERR "Warning: $file isn't an Object::Transaction object\n";
+		push(@ff, "'$ff'");
+	}
+}
+
+system("$pager @ff");
+
+for my $file (@ARGV) {
+	unlink("$file.dumped");
+}
+

@@ -1,0 +1,81 @@
+#!/usr/bin/perl
+# $File: //depot/OurNet-Query/bin/sitequery $ $Author: autrijus $
+# $Revision: #3 $ $Change: 1923 $ $DateTime: 2001/09/28 15:12:04 $
+
+$VERSION = '0.03';
+$REVISION = "rev$1\[\@$2\]" 
+    if ('$Revision: #3 $ $Change: 1923 $' =~ /(\d+)[^\d]+(\d+)/);
+
+=head1 NAME
+
+sitequery - Query multiple sites in parallel
+
+=head1 SYNOPSIS
+
+B<sitequery> S<[ I<site1> I<site2>... ]> I<querystring>
+
+=head1 DESCRIPTION
+
+This script queries the specified sites (defaults to google) for a
+given query string. To see it in action, try this:
+
+    % sitequery perl
+
+=cut
+
+use strict;
+use OurNet::Query;
+
+my %found;
+
+unless (@ARGV) {
+    die << ".";
+
+Site Query v$main::VERSION-$main::REVISION
+
+Usage: $0 [site1 site2...] <querystring>
+
+Copyright 2001 by Autrijus Tang <autrijus\@autrijus.org>.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+See <http://www.perl.com/perl/misc/Artistic.html>.
+
+.
+}
+
+exec('perldoc', $0) if $ARGV[0] eq '-h';
+
+my $query = OurNet::Query->new(pop(@ARGV), 10, @ARGV ? @ARGV : 'google');
+$query->begin(\&callback, 30); # Timeout after 30 seconds
+
+sub callback {
+    local $^W;
+
+    my %entry = @_;
+    my $entry = \%entry;
+
+    unless ($found{$entry{url}}++) {
+	print "[$entry->{title}]\n=> $entry->{url}\n";
+    }
+}
+
+__END__
+
+=head1 SEE ALSO
+
+L<OurNet::Query>, L<OurNet::Site>
+
+=head1 AUTHORS
+
+Autrijus Tang E<lt>autrijus@autrijus.org>
+
+=head1 COPYRIGHT
+
+Copyright 2001 by Autrijus Tang E<lt>autrijus@autrijus.org>.
+
+All rights reserved.  You can redistribute and/or modify
+this module under the same terms as Perl itself.
+
+=cut

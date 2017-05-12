@@ -1,0 +1,90 @@
+[% INCLUDE header.tt page_title = "Admin - $site_name" %]
+[% INCLUDE banner.tt %]
+<div id="content">
+
+[% IF !config.content_above_navbar_in_html %]
+  [% INCLUDE navbar.tt %]
+[% END %]
+
+<div id="maincontent">
+[% IF completed_action %]
+	<br />
+	<div class="admin_completed_action">[% completed_action %]</div>
+[% END %]
+<h2>Site Administration</h2>
+<ul>
+	<li><a href="#nodes">Recent nodes</a></li>
+	<li><a href="#locales">Recent locales</a></li>
+	<li><a href="#categories">Recent categories</a></li>
+	<li><a href="[% cgi_url %]?action=show_needing_moderation">Pages needing moderation</a>
+	<li><a href="[% cgi_url %]?action=show_missing_metadata">Pages missing metadata</a>
+</ul>
+
+<p>The lists below show the 100 most recently modified nodes.</p>
+
+<a name="nodes"></a>
+<table id="nodes">
+<tr><th>Node name</th><th>Current Version</th><th>Last modified</th><th>By</th><th>Moderation</th><th>Actions</th></tr>
+  [% FOREACH node = nodes %]
+     <tr>
+     <td class="admin_name"><a href="[% node.view_url %]">[% node.name %]</a></td>
+     <td class="admin_version">[% node.version %]</td>
+     <td class="admin_lastmode">[% node.last_modified %]</td>
+     <td class="admin_lastmodby">
+         [% node.metadata.username.0 %]
+         <a href="[% node.revert_user_url %]">(revert all)</a>
+     </td>
+     <td class="admin_moderate">[% IF node.moderate %]yes[% ELSE %]no[% END %]</td>
+     <td class="admin_action">
+         <a href="[% node.versions_url %]">View all versions</a> or
+         <a href="[% node.moderation_url %]">Set moderation</a>
+     </td>
+     </tr>
+  [% END %]
+</table>
+
+<br /><br />
+
+<a name="locales"></a>
+<table id="locales">
+<tr><th>Locale name</th><th>Current Version</th><th>Last modified</th><th>Moderation</th><th>Actions</th></tr>
+  [% FOREACH locale = locales %]
+     <tr>
+     <td class="admin_name"><a href="[% locale.view_url %]">[% locale.name %]</a></td>
+     <td class="admin_version">[% locale.version %]</td>
+     <td class="admin_lastmode">[% locale.last_modified %]</td>
+     <td class="admin_moderate">[% IF locale.moderate %]yes[% ELSE %]no[% END %]</td>
+     <td class="admin_action">
+        <a href="[% locale.versions_url %]">View all versions</a> or
+        <a href="[% locale.moderation_url %]">Set moderation</a>
+     </td>
+     </tr>
+  [% END %]
+</table>
+
+<br /><br />
+
+<a name="categories"></a>
+<table id="categories">
+<tr><th>Category name</th><th>Current Version</th><th>Last modified</th><th>Moderation</th><th>Actions</th></tr>
+  [% FOREACH cat = categories %]
+     <tr>
+     <td class="admin_name"><a href="[% cat.view_url %]">[% cat.name %]</a></td>
+     <td class="admin_version">[% cat.version %]</td>
+     <td class="admin_lastmode">[% cat.last_modified %]</td>
+     <td class="admin_moderate">[% IF cat.moderate %]yes[% ELSE %]no[% END %]</td>
+     <td class="admin_action">
+         <a href="[% cat.versions_url %]">View all versions</a> or
+         <a href="[% cat.moderation_url %]">Set moderation</a>
+     </td>
+     </tr>
+  [% END %]
+</table>
+
+</div>
+
+[% IF config.content_above_navbar_in_html %]
+  [% INCLUDE navbar.tt %]
+[% END %]
+
+[% INCLUDE footer.tt %]

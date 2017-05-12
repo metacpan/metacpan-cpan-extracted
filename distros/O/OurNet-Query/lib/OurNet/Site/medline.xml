@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<SITE ID="MedLine">
+
+<NAME Lang="en-us">MEDLINE Search</NAME>
+<INFO Lang="en-us">healthworld information search</INFO>
+
+<URL Type="More"><![CDATA[
+http://www.infotrieve.com/healthworld/_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+post://www.infotrieve.com/healthworld/results.cgi?query0=_QUERY_&field0=_All_&operator1=AND&query1=&field1=TI&operator2=AND&query2=&field2=AU&operator3=AND&query3=&field3=TA&submit=+%26%23160%3B%26%23160%3BSTART+SEARCH%26%23160%3B%26%23160%3B+&numresults=_HITS_&operator4=AND&dbname=med96-97&dbname=med93-95&query4=_All_&field4=LA&field4_mult=+&operator7=AND&query7=_All_&field7=PT&field7_mult=+&operator6=AND&query6=_All_&field6=MH&field6_mult=+&operation=simplesearch&Queries=8
+]]></URL>
+
+
+<VAR Name="_NEXT_"><![CDATA[
+[ <a href="_NEXT_">Show the next
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<tr>___<td>_SCORE_</td>___<td><a href="_URL_">_TITLE_</a>
+]]></TEMPLATE>
+</SITE>

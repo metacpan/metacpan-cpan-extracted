@@ -1,0 +1,30 @@
+NAME
+
+    OpusVL::AppKit::Schema::AppKitAuthDB
+
+VERSION
+
+    version 6
+
+DESCRIPTION
+
+NAME
+
+    OpusVL::AppKit::Schema::AppKitAuthDB - Auth Database for
+    OpusVL::AppKit/FB11
+
+METHODS
+
+ATTRIBUTES
+
+AUTHOR
+
+    Colin Newell <colin@opusvl.com>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2016 by OpusVL.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

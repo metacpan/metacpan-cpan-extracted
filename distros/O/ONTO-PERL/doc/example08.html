@@ -1,0 +1,144 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"/>
+<title>Merging ontologies</title>
+</head>
+<body>
+	
+<h2>Union of ontologies</h2>
+	
+<ol>
+	<li><a href="#1">Find out the union of two given ontologies <i>o1</i> and <i>o4</i>.</a></li>
+
+</ol>
+	
+	<ol>
+	<li> <b><a href="#1">Find out the union of two given ontologies <i>o1</i> and <i>o4</i>:</a></b>
+		<pre>
+		use OBO::Core::Ontology;
+		use OBO::Util::Ontolome;
+		use OBO::Core::Term;
+		use OBO::Core::Relationship;
+		use OBO::Core::RelationshipType;
+		use OBO::Parser::OBOParser;
+	
+	
+		# new ontolome
+		my $ome    = OBO::Util::Ontolome->new();
+		my $onto1  = OBO::Core::Ontology->new();
+		my $onto2  = OBO::Core::Ontology->new();
+		my $onto22 = OBO::Core::Ontology->new();
+	
+		my $onto3 = $ome1->union($onto1, $onto2);
+		my $o3_terms = $onto3->get_number_of_terms();         # should be 0
+		my $o3_rels  = $onto3->get_number_of_relationships(); # should be 0
+	
+		my $n1 = OBO::Core::Term->new();
+		my $n2 = OBO::Core::Term->new();
+	
+		$n1->id("APO:D0000001");
+		$n2->id("APO:D0000001"); # same ID!
+	
+		$n1->name("One");
+		$n2->name("One");
+	
+		$n2->def_as_string("My definition.", "[APO:ea]");
+
+		$onto1->add_term($n1);
+		$onto2->add_term($n2);
+
+		$n1->xref_set_as_string("[DO:0000001]");
+		$n2->xref_set_as_string("[DO:0000002]");
+
+		# $onto1->get_number_of_terms() == 1
+		$onto3 = $ome1->union($onto1, $onto2);
+		# $onto1->get_number_of_terms() == 1
+		# $onto3->get_number_of_terms() == 1
+		# $onto3->get_number_of_relationships() == 0
+
+		my $n = $onto3->get_term_by_id("APO:D0000001");
+		# $n->name() should be "One"
+		# $n->def_as_string() should be "My definition." [APO:ea]
+		# $n->xref_set()->get_set() should have 2 elements
+
+		# more terms in onto1
+		my $n3 = OBO::Core::Term->new();
+		my $n5 = OBO::Core::Term->new();
+		$n3->id("APO:D0000003");
+		$n5->id("APO:D0000005");
+		$n3->name("Three");
+		$n5->name("Five");
+
+		$onto1->add_term($n3);
+		$onto1->add_term($n5);
+
+		# $onto1->get_number_of_terms() should be 3
+
+		# two new relationships
+		my $r51 = OBO::Core::Relationship->new();
+		my $r31 = OBO::Core::Relationship->new();
+
+		$r51->id("APO:D0000005_is_a_APO:D0000001");
+		$r31->id("APO:D0000003_part_of_APO:D0000001");
+		$r51->type("is_a");
+		$r31->type("part_of");
+		$r51->link($n5, $n1); 
+		$r31->link($n3, $n1);
+
+		$onto1->add_relationship($r51);
+		$onto1->add_relationship($r31);
+
+		# $onto1->get_number_of_terms() should be 3
+
+		# more terms in onto2
+		my $n4 = OBO::Core::Term->new();
+		my $n6 = OBO::Core::Term->new();
+		$n4->id("APO:D0000004");
+		$n6->id("APO:D0000006");
+		$n4->name("Four");
+		$n6->name("Six");
+
+		$onto2->add_term($n4);
+		$onto2->add_term($n6);
+
+		# two new relationships
+		my $r42 = OBO::Core::Relationship->new();
+		my $r64 = OBO::Core::Relationship->new();
+
+		$r42->id("APO:D0000004_is_a_APO:D0000001");
+		$r64->id("APO:D0000006_part_of_APO:D0000004");
+		$r42->type("is_a");
+		$r64->type("part_of");
+		$r42->link($n4, $n2); 
+		$r64->link($n6, $n4);
+
+		$onto2->add_relationship($r42);
+		$onto2->add_relationship($r64);
+
+		# $onto1->get_number_of_terms() should be 3
+
+		my $onto4 = $ome1->union($onto1, $onto2);
+
+		# $onto1->get_number_of_terms() should be 3
+		# $onto4->get_number_of_terms() should be 5
+
+		my $nn1 = $onto4->get_term_by_id("APO:D0000001");
+		my @relatives1 = @{$onto4->get_descendent_terms($nn1)};
+		# @relatives1 should have 4 elements
+
+		my $nn6 = $onto4->get_term_by_id("APO:D0000006");
+		my @relatives2 = @{$onto4->get_ancestor_terms($nn6)};
+		# @relatives2 should have 2 elements
+
+		my $nn5 = $onto4->get_term_by_id("APO:D0000005");
+		my @relatives3 = @{$onto4->get_ancestor_terms($nn5)};
+		# @relatives3 should have 1 element
+			
+		</pre>
+	</li>
+	</ol>
+
+Copyright (c) 2006-2015 by Erick Antezana. All rights reserved.
+
+</body>
+</html>

@@ -1,0 +1,48 @@
+Revision history for Perl extension Osgood::Client.
+
+2.0.7   March 15, 2010
+   - Actually honor timeout if it's set in Client for LWP.
+2.0.6   November 23rd, 2009
+    - Fixed missing JSON::Any dep (Thanks Andreas Koenig)
+2.0.5   November 19, 2009
+    - Fix busted M:I
+2.0.4
+    - Fix unecessary inclusion of XML::XPath (thanks Andreas König)
+2.0.3
+    - Fix another missing 'use' in Client.pm
+2.0.2
+    - Fix missing 'use' in Client.pm
+2.0.1
+    - Coerce Str into Url for Osgood::Client
+2.0.0
+    - Ditch custom serialization for MooseX::Storage hotness
+    - Remove all "new Foo" for "Foo->new"
+    - Remove all ()s
+    - Use MooseX::AttributeHelpers in place of custom hash/array management
+    - Change POST response to JSON
+1.1.2
+    - Fix typo in Client's error declaration
+    - Set list to undef when running a query to clear any existing results
+1.1.1
+	  - Documentation fixes
+1.1.0
+    - New serialization backend
+1.0.7
+		- Encode output
+1.0.6
+		- Allow undefined parameter values in Event
+1.0.5
+		- Add some more tests with release of Osgood-Server
+1.0.4
+		- Release to the world.
+1.0.3
+    - Add EventList::get_highest_id
+1.0.2
+    - Query method for retrieving events
+1.0.1
+    - Allow empty EventLists in the Serializer and Deserializer
+    - Add (optional) id addtribute to Event
+    - Add iterator getter to EventList
+
+1.0.0
+    - Rawr

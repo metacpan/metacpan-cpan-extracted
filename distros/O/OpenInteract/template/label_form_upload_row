@@ -1,0 +1,9 @@
+[%########################################
+  label_form_upload_row( label, count, name, field_label )
+     Display a row to upload a file: label on left, file input on right.
+  ########################################-%]
+
+[%- DEFAULT colspan = 2; -%]  
+[%- INCLUDE label_row_begin( colspan = 1 ) -%]
+[%- INCLUDE data_cell_begin %][% INCLUDE form_upload %]
+</td></tr>

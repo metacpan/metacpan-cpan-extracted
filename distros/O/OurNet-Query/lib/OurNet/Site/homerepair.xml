@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<SITE ID="HomeRepair">
+
+<NAME Lang="en-us">Home Repair</NAME>
+<INFO Lang="en-us">household relevant information search</INFO>
+
+<URL Type="Start"><![CDATA[
+http://www.msue.msu.edu/cgi-bin/impsrch/mod02?_QUERY_
+]]></URL>
+
+
+
+<TEMPLATE><![CDATA[
+<LI><A HREF="_URL_">_TITLE_</A>
+]]></TEMPLATE>
+</SITE>

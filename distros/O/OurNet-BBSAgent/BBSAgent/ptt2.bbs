@@ -1,0 +1,11 @@
+# $File: //depot/OurNet-BBSAgent/BBSAgent/ptt2.bbs $ $Author: autrijus $
+# $Revision: #8 $ $Change: 2829 $ $DateTime: 2002/01/10 14:54:36 $
+# Contributed by Smartboy <kcwu@ck.tp.edu.tw>
+# zh_TW.Big5: ·s§å½ð½ð
+
+PTT2
+ptt2.csie.ntu.edu.tw:3003
+
+load maple2.board
+load maple2.session
+setv postsign 1

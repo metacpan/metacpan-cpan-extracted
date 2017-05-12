@@ -1,0 +1,13 @@
+[% MACRO del_form(span, fields) BLOCK %]
+            <form method="POST" action="[% handler.link(span) %]" style="display: inline;"> 
+             <input type="hidden" name="date" value="[% span.date %]" />
+             [% IF handler.need_user %]
+             <input type="hidden" name="user" value="[% handler.user %]" />
+             [% END %]
+             [% FOREACH pair = fields.pairs %]
+             <input type="hidden" name="[% pair.key %]" value="[% pair.value %]">
+             [% END %]
+            &nbsp;
+            <input type="submit" value="[% IF fields.command.length; fields.command; ELSE; "delete"; END %]" style="background-color:#fff; border: none; color:#555; font-family:'trebuchet ms',helvetica,sans-serif;">
+            </form>
+[% END %]

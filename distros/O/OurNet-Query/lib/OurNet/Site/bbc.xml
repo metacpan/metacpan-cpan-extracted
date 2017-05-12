@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<SITE ID="Bbc">
+
+<NAME Lang="en-us">BBC TV Online Search</NAME>
+<INFO Lang="en-us">general information web search</INFO>
+
+<URL Type="Start"><![CDATA[
+http://search.bbc.co.uk/cgi-bin/fx?P=_QUERY_&DB=all&TOPDOC=_START_
+]]></URL>
+
+
+
+<TEMPLATE><![CDATA[
+<b><A HREF="_URL_">_TITLE_</A></b>___<FONT SIZE=2>_PREVIEW_</FONT><BR>___Score:_SCORE_%,___</TD></TR>
+]]></TEMPLATE>
+</SITE>

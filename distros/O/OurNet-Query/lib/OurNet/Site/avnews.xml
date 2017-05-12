@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<SITE ID="AVNews">
+
+<NAME Lang="en-us">Altavista Usenet</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+Altavista Usenet°Q½×¸s·j´M(­^¤å)
+]]></NAME>
+<INFO Lang="en-us">newsgroup discussion search</INFO>
+<INFO Lang="zh-tw">newsgroup discussion search</INFO>
+
+<URL Type="More"><![CDATA[
+http://www.altavista.com_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://www.altavista.com/cgi-bin/query?q=_QUERY_&pg=q&what=news&fmt=.
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+<EXPRESSION>Standard</EXPRESSION>
+<CATEGORY>Usenet,General</CATEGORY>
+
+<VAR Name="_NEXT_"><![CDATA[
+<a href="_NEXT_">[<b>Next
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+">B</a>_DATE_<a href="_URL_">_TITLE_</a>_PREVIEW_<a href="
+]]></TEMPLATE>
+</SITE>

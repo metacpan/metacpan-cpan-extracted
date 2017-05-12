@@ -1,0 +1,582 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<otrs_package version="1.0">
+    <CVS>$Id: MultilevelEscalation.sopm,v 1.0 2013/02/04 14:38:57 en Exp $</CVS>
+    <Name>MultilevelEscalation</Name>
+    <Version>1.0.1</Version>
+    <Framework>3.x.x</Framework>
+    <Vendor>OTRS AG</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007</License>
+    <Description Lang="en">The OTRS::AdminESCL and OTRS::Escalation Core package.</Description>
+    <Description Lang="de">Das OTRS::AdminESCL and OTRS::Escalation Core Paket.</Description>
+    <BuildDate>2013-02-04 12:18:32</BuildDate>
+    <BuildHost>127.0.0.1</BuildHost>
+    <PackageRequired Version="3.x.x">ITSMCore</PackageRequired>
+    <Filelist>
+        <File Permission="644" Location="Kernel/Config/Files/Escalation.xml" Encode="Base64"></File>
+	<File Permission="644" Location="Kernel/Modules/AdminESCL.pm" Encode="Base64"></File>
+	<File Permission="664" Location="Kernel/System/Escalation.pm" Encode="Base64"></File>
+	<File Permission="644" Location="Kernel/Output/HTML/Standard/AdminESCL.dtl" Encode="Base64"></File>
+	<File Permission="755" Location="bin/otrs.Escalation.pl" Encode="Base64"></File>
+	<File Permission="644" Location="var/packagesetup/MultilevelEscalation.pm" Encode="Base64"></File>
+    </Filelist>
+    <DatabaseInstall Type="post">
+        <TableCreate Name="escalation">
+	    <Column Name="sla_id" Required="true" Type="INTEGER"></Column>
+	    <Column Name="notify_type" Required="true" Size="3" Type="VARCHAR"></Column>
+	    <Column Name="level" Required="true" Type="INTEGER"></Column>
+	    <Column Name="notify_to" Size="10" Type="VARCHAR"></Column>
+	    <Column Name="notify_perc" Type="INTEGER"></Column>
+	    <Column Name="valid_id" Required="true" Type="SMALLINT"></Column>
+	    <ForeignKey ForeignTable="sla">
+                <Reference Local="sla_id" Foreign="id"></Reference>
+            </ForeignKey>
+        </TableCreate>
+    </DatabaseInstall>
+    <DatabaseUninstall Type="pre">
+        <TableDrop Name="escalation"/>
+    </DatabaseUninstall>
+    <CodeInstall Type="post"><![CDATA[
+     
+        # define function name
+        my $FunctionName = 'CodeInstall';
+
+        # create the package name
+        my $CodeModule = 'var::packagesetup::' . $Param{Structure}->{Name}->{Content};
+
+        # load the module
+        if ( $Self->{MainObject}->Require($CodeModule) ) {
+
+            # create new instance
+            my $CodeObject = $CodeModule->new( %{$Self} );
+		
+		if ($CodeObject) {
+				
+			# start methode	
+			my $QueryCheckPrimKey = $Self->{DBObject}->Do(
+                            SQL => 'ALTER TABLE escalation ADD PRIMARY KEY(sla_id,notify_type,level)',
+                        );
+			if ($QueryCheckPrimKey) {
+				if ( !$CodeObject->$FunctionName(%{$Self}) ) {
+					$Self->{LogObject}->Log(
+					     Priority => 'error',
+					     Message  => "Could not call method $FunctionName() on $CodeModule.pm."
+					);
+				}
+			}
+			
+			
+			
+			my $QueryCheckNotifications = 'SELECT id FROM notifications WHERE notification_type LIKE "Agent::EscalationMatrix"';
+			my $QueryDel = 'DELETE FROM notifications WHERE notification_type LIKE "Agent::EscalationMatrix"';
+			$Self->{DBObject}->Prepare( SQL => $QueryCheckNotifications );
+			my @NotificationsFields = $Self->{DBObject}->FetchrowArray();
+			if($NotificationsFields[0]) {
+				my $QueryDelete = $Self->{DBObject}->Do(
+				    SQL => $QueryDel,
+				);
+			}
+			
+			
+			
+			my $Type = "Agent::EscalationMatrix";
+			my $Charset = "utf-8";
+			my $Lang = "en";
+			my $Sub = "Ticket Escalation Before <OTRS_CUSTOMER_EMAIL[30]>! (<OTRS_CUSTOMER_SUBJECT[24]>)";
+			my $CreateTime = $Self->{TimeObject}->SystemTime2TimeStamp( SystemTime => $Self->{TimeObject}->SystemTime());
+			my $Txt = "Hi <OTRS_UserFirstname> <OTRS_UserLastname>,   
+				
+				Ticket [<OTRS_TICKET_TicketNumber>] has breached: <OTRS_CUSTOMER_EMAIL[30]>.    
+				
+				Ticket Owner             :  <OTRS_OWNER_UserFirstname> <OTRS_OWNER_UserLastname>.    
+				
+				Ticket Queue            :  <OTRS_CUSTOMER_QUEUE>.    
+				
+				Ticket Priority            :  <OTRS_TICKET_Priority>.    
+				
+				Ticket SLA                 :  <OTRS_TICKET_SLA>.      
+				
+				Please have a look:
+				
+				<OTRS_CONFIG_HttpType>://<OTRS_CONFIG_FQDN>/<OTRS_CONFIG_ScriptAlias>index.pl?Action=AgentZoom;TicketID=<OTRS_TICKET_TicketID>      
+				
+				
+				Regards  
+				OTRS Admin";
+			
+			
+			
+			my $QueryNotificationsAlter_en = $Self->{DBObject}->Do(
+			SQL => "INSERT INTO notifications
+			(notification_type, notification_charset, notification_language, subject, text, content_type, create_by, create_time, change_by, change_time)
+			VALUES (?, ?, ?, ?, ?, 'text/plain', 1, ?, 1, ?)",
+			Bind => [\$Type, \$Charset, \$Lang, \$Sub, \$Txt, \$CreateTime, \$CreateTime,],
+			);
+				
+			if (!$QueryNotificationsAlter_en) {
+				
+				$Self->{LogObject}->Log(
+				    Priority => 'error',
+				    Message  => "Could not insert value for Notifications for 'en' on $CodeModule.pm."
+				);
+				
+			}
+			
+			my $Lang_de = "de";
+			my $Sub_de = "Ticket Eskalation Before <OTRS_CUSTOMER_EMAIL[30]>! (<OTRS_CUSTOMER_SUBJECT[24]>)";
+			my $Txt_de = "Hallo <OTRS_UserFirstname> <OTRS_UserLastname>,
+				
+				das Ticket [<OTRS_TICKET_TicketNumber>] ist eskaliert (has breached in english): <OTRS_CUSTOMER_EMAIL[30]>.    
+				
+				Ticket Owner             :  <OTRS_OWNER_UserFirstname> <OTRS_OWNER_UserLastname>.    
+				
+				Ticket Queue            :  <OTRS_CUSTOMER_QUEUE>.    
+				
+				Ticket Priority            :  <OTRS_TICKET_Priority>.    
+				
+				Ticket SLA                 :  <OTRS_TICKET_SLA>.      
+				
+				Bitte um Bearbeitung:
+				
+				<OTRS_CONFIG_HttpType>://<OTRS_CONFIG_FQDN>/<OTRS_CONFIG_ScriptAlias>index.pl?Action=AgentZoom;TicketID=<OTRS_TICKET_TicketID>      
+				
+				
+				wat betreft
+				OTRS Admin";
+			
+			my $QueryNotificationsAlter_de = $Self->{DBObject}->Do(
+			SQL => "INSERT INTO notifications
+			(notification_type, notification_charset, notification_language, subject, text, content_type, create_by, create_time, change_by, change_time)
+			VALUES (?, ?, ?, ?, ?, 'text/plain', 1, ?, 1, ?)",
+			Bind => [\$Type, \$Charset, \$Lang_de, \$Sub_de, \$Txt_de, \$CreateTime, \$CreateTime,],
+			);
+				
+			if (!$QueryNotificationsAlter_de) {
+				
+				$Self->{LogObject}->Log(
+				    Priority => 'error',
+				    Message  => "Could not insert value for Notifications for 'en' on $CodeModule.pm."
+				);
+				
+			}
+			
+			
+			my $Lang_nl = "nl";
+			my $Sub_nl = "Ticket Escalatie Before <OTRS_CUSTOMER_EMAIL[30]>! (<OTRS_CUSTOMER_SUBJECT[24]>)";
+			my $Txt_nl = "Beste <OTRS_UserFirstname> <OTRS_UserLastname>,
+				
+				Het ticket [<OTRS_TICKET_TicketNumber>] is geëscaleerd (has breached in english): <OTRS_CUSTOMER_EMAIL[30]>.
+				
+				
+				Ticket Owner             :  <OTRS_OWNER_UserFirstname> <OTRS_OWNER_UserLastname>.    
+				
+				Ticket Queue            :  <OTRS_CUSTOMER_QUEUE>.    
+				
+				Ticket Priority            :  <OTRS_TICKET_Priority>.    
+				
+				Ticket SLA                 :  <OTRS_TICKET_SLA>. 
+				
+				
+				(eerste 30 regels zijn weergegeven)
+				
+				<OTRS_CONFIG_HttpType>://<OTRS_CONFIG_FQDN>/<OTRS_CONFIG_ScriptAlias>index.pl?Action=AgentZoom;TicketID=<OTRS_TICKET_TicketID>      
+				
+				
+				wat betreft 
+				OTRS Admin";
+			
+			my $QueryNotificationsAlter_nl = $Self->{DBObject}->Do(
+			SQL => "INSERT INTO notifications
+			(notification_type, notification_charset, notification_language, subject, text, content_type, create_by, create_time, change_by, change_time)
+			VALUES (?, ?, ?, ?, ?, 'text/plain', 1, ?, 1, ?)",
+			Bind => [\$Type, \$Charset, \$Lang_nl, \$Sub_nl, \$Txt_nl, \$CreateTime, \$CreateTime,],
+			);
+				
+			if (!$QueryNotificationsAlter_nl) {
+				
+				$Self->{LogObject}->Log(
+				    Priority => 'error',
+				    Message  => "Could not insert value for Notifications for 'en' on $CodeModule.pm."
+				);
+				
+			}
+			
+			
+			
+		}
+		
+		# error handling
+		else {
+				$Self->{LogObject}->Log(
+				Priority => 'error',
+				Message  => "Could not call method new() on $CodeModule.pm."
+				);
+		}
+	}	
+
+    ]]></CodeInstall>
+    <CodeReinstall Type="post"><![CDATA[
+
+        # define function name
+        my $FunctionName = 'CodeReinstall';
+
+        # create the package name
+        my $CodeModule = 'var::packagesetup::' . $Param{Structure}->{Name}->{Content};
+
+        # load the module
+        if ( $Self->{MainObject}->Require($CodeModule) ) {
+
+            # create new instance
+            my $CodeObject = $CodeModule->new( %{$Self} );
+
+		if ($CodeObject) {
+		    
+		        # start methode
+			if ( !$CodeObject->$FunctionName(%{$Self}) ) {
+				$Self->{LogObject}->Log(
+					Priority => 'error',
+					Message  => "Could not call method $FunctionName() on $CodeModule.pm."
+				);
+			}
+		}
+
+		# error handling
+		else {
+			$Self->{LogObject}->Log(
+			        Priority => 'error',
+				Message  => "Could not call method new() on $CodeModule.pm."
+			);
+		}
+        }
+
+    ]]></CodeReinstall>
+    <CodeUpgrade Type="post"><![CDATA[
+
+        # define function name
+        my $FunctionName = 'CodeUpgrade';
+
+        # create the package name
+        my $CodeModule = 'var::packagesetup::' . $Param{Structure}->{Name}->{Content};
+
+        # The code module has just recently been copied to it's location in the file system.
+        # In a persistent Perl environment an old version of the module might still be loaded,
+        # as watchdogs like Apache2::Reload haven't had a chance to reload it.
+        # So we need to make sure that the new version is being loaded.
+        # Kernel::System::Main::Require() checks the relative file path, so we need to remove that from %INC.
+        # This is only needed in persistent Perl environment, but does no harm in a CGI environment.
+        my $CodeModulePath = $CodeModule;
+        $CodeModulePath =~ s/::/\//g;
+        $CodeModulePath .= '.pm';
+        delete $INC{$CodeModulePath};
+
+        # load the module
+        if ( $Self->{MainObject}->Require($CodeModule) ) {
+
+            # create new instance
+            my $CodeObject = $CodeModule->new( %{$Self} );
+
+		if ($CodeObject) {
+
+                # start methode
+			if ( !$CodeObject->$FunctionName(%{$Self}) ) {
+				$Self->{LogObject}->Log(
+					Priority => 'error',
+					Message  => "Could not call method $FunctionName() on $CodeModule.pm."
+				);
+			}
+		}
+
+		# error handling
+		else {
+			$Self->{LogObject}->Log(
+			        Priority => 'error',
+			        Message  => "Could not call method new() on $CodeModule.pm."
+			);
+		}
+        }
+
+    ]]></CodeUpgrade>
+    <CodeUninstall Type="pre"><![CDATA[
+
+        # define function name
+        my $FunctionName = 'CodeUninstall';
+
+        # create the package name
+        my $CodeModule = 'var::packagesetup::' . $Param{Structure}->{Name}->{Content};
+
+        # load the module
+        if ( $Self->{MainObject}->Require($CodeModule) ) {
+		
+            # create new instance
+            my $CodeObject = $CodeModule->new( %{$Self} );
+		
+		if ($CodeObject) {
+			
+                # start methode
+			my $QueryCheckNotifications1 = 'SELECT id FROM notifications WHERE notification_type LIKE "Agent::EscalationMatrix"';
+			my $QueryDel1 = 'DELETE FROM notifications WHERE notification_type LIKE "Agent::EscalationMatrix"';
+			$Self->{DBObject}->Prepare( SQL => $QueryCheckNotifications1);
+			my @NotificationsField1 = $Self->{DBObject}->FetchrowArray();
+			if($NotificationsField1[0]) {
+				
+				my $QueryDelete1 = $Self->{DBObject}->Do(
+					SQL => $QueryDel1,
+				);
+			}
+			
+			if ( !$CodeObject->$FunctionName(%{$Self}) ) {
+				        $Self->{LogObject}->Log(
+				            Priority => 'error',
+				            Message  => "Could not call method $FunctionName() on $CodeModule.pm."
+				        );
+			}
+			
+		}
+		
+		# error handling
+		else {
+			$Self->{LogObject}->Log(
+				Priority => 'error',
+				Message  => "Could not call method new() on $CodeModule.pm."
+			);
+		}
+        }
+
+    ]]></CodeUninstall>
+    <IntroInstall Type="pre" Title="Install Information" Lang="en"><![CDATA[
+
+        <br/>
+        <strong>WELCOME</strong>
+        <br/>
+        <br/>
+        You are about to install the OTRS package AdminESCL.<br/>
+        <br/>
+        <br/>
+        <strong>ATTENTION</strong>
+        <br/>
+        <br/>
+	<strong>REQUIRED OTRS PACKAGES 3.x.x</strong>
+        <br/>
+        Make sure your database accepts packages over 5 MB in size. A MySQL database for example accepts packages up to 1 MB by default. In this case, the value for max_allowed_packet must be increased. The recommended maximum size accepted is 20 MB.<br/>
+        <br/>
+        <br/>
+        Thank You<br/>
+	<br/>
+        <br/>
+
+    ]]></IntroInstall>
+    <IntroInstall Type="pre" Title="Installation Information" Lang="de"><![CDATA[
+
+        <br/>
+        <strong>WILLKOMMEN</strong>
+        <br/>
+        <br/>
+        Sie sind im Begriff das OTRS-Paket AdminESCL zu installieren.<br/>
+        <br/>
+        <br/>
+        <strong>BENÖTIGTE OTRS-PAKETE 3.x.x</strong>
+        <br/>
+        <strong>ACHTUNG</strong>
+        <br/>
+        <br/>
+        Vergewissern Sie sich, dass ihre Datenbank Pakete mit einer Größe von mehr als 5 MB akzeptiert. Eine MySQL Datenbank akzeptiert beispielsweise standardmäßig Pakete mit einer Größe von maximal 1 MB. In diesem Fall muss der Wert für max_allowed_packet erhöht werden. Empfohlen werden 20 MB.<br/>
+        <br/>
+        <br/>
+        Thank You<br/>
+	<br/>
+        <br/>
+
+    ]]></IntroInstall>
+    <IntroInstall Type="pre" Title="Información de Instalación" Lang="es"><![CDATA[
+
+        <br/>
+        <strong>BIENVENIDO</strong>
+        <br/>
+        <br/>
+        Usted está apunto de instalar el modulo AdminESCL de OTRS.<br/>
+        <br/>
+        <br/>
+        <strong>PAQUETES REQUERIDOS 3.x.x</strong>
+        <br/>
+        <strong>ATENCIÓN</strong>
+        <br/>
+        <br/>
+        Por favor asegúrese que su base de datos acepte paquetes de mas de 5 MB de tamaño. Por ejemplo una base de datos de MySQL acepta paquetes de mas de 1 MB predefinido. En este caso la configuración max_allowed_packet debe ser incrementada. El tamaño recomendado es 20 MB.<br/>
+        <br/>
+        <br/>
+        Thank You<br/>
+	<br/>
+        <br/>
+
+    ]]></IntroInstall>
+    <IntroInstall Type="post" Title="Installation Information" Lang="en"><![CDATA[
+
+        <br/>
+        <strong>NOTICE</strong>
+        <br/>
+        <br/>
+        In order to grant users access to the escalation mail, you need to add user's role to Escalation Matrix.<br/>
+	A new Agent Notifications Item 'Agent::EscalationMatrix' will be added to manage the template for Notification mail.<br/>
+	One need to scheduled a job for the escalation.pl under the path /<OTRS_CONFIG_ScriptAlias>bin.<br/>
+        <br/>
+        <br/>
+        Thank You<br/>
+	<br/>
+        <br/>
+
+    ]]></IntroInstall>
+    <IntroInstall Type="post" Title="Installation Information" Lang="de"><![CDATA[
+
+        <br/>
+        <strong>HINWEIS</strong>
+        <br/>
+        <br/>
+        In order to grant users access to the escalation mail, you need to add user's role to Escalation Matrix.<br/>
+	A new Agent Notifications Item 'Agent::EscalationMatrix' will be added to manage the template for Notification mail.<br/>
+	One need to scheduled a job for the escalation.pl under the path /<OTRS_CONFIG_ScriptAlias>bin.<br/>
+        <br/>
+        <br/>
+        Thank You<br/>
+	<br/>
+        <br/>
+
+    ]]></IntroInstall>
+    <IntroInstall Type="post" Title="Información de Instalación" Lang="es"><![CDATA[
+
+        <br/>
+        <strong>AVISO</strong>
+        <br/>
+        <br/>
+        In order to grant users access to the escalation mail, you need to add user's role to Escalation Matrix.<br/>
+	A new Agent Notifications Item 'Agent::EscalationMatrix' will be added to manage the template for Notification mail.<br/>
+	One need to scheduled a job for the escalation.pl under the path /<OTRS_CONFIG_ScriptAlias>bin.<br/>
+        <br/>
+        <br/>
+        Thank You<br/>
+	<br/>
+        <br/>
+
+    ]]></IntroInstall>
+
+    <IntroUpgrade Type="pre" Title="Upgrade Information" Lang="en"><![CDATA[
+
+        <br/>
+        <strong>WELCOME</strong>
+        <br/>
+        <br/>
+        You are about to upgrade the OTRS package AdminESCL.<br/>
+        <br/>
+        <br/>
+        </strong>ATTENTION</strong>
+        <br/>
+        <br/>
+	<strong>REQUIRED OTRS PACKAGES</strong>
+        <br/>
+	Make sure your database accepts packages over 5 MB in size. A MySQL database for example accepts packages up to 1 MB by default. In this case, the value for max_allowed_packet must be increased. The recommended maximum size accepted is 20 MB.<br/>
+        <br/>
+        <br/>
+        Thank You<br/>
+	<br/>
+        <br/>
+
+    ]]></IntroUpgrade>
+    <IntroUpgrade Type="pre" Title="Upgrade Information" Lang="de"><![CDATA[
+
+        <br/>
+        <strong>WILLKOMMEN</strong>
+        <br/>
+        <br/>
+        Sie sind im Begriff das OTRS-Paket AdminESCL zu aktualisieren.<br/>
+        <br/>
+        <br/>
+        <strong>ACHTUNG</strong>
+        <br/>
+        <br/>
+	<strong>BENÖTIGTE OTRS-PAKETE</strong>
+        <br/>
+	<br/>
+        Vergewissern Sie sich, dass ihre Datenbank Pakete mit einer Größe von mehr als 5 MB akzeptiert. Eine MySQL Datenbank akzeptiert beispielsweise standardmäßig Pakete mit einer Größe von maximal 1 MB. In diesem Fall muss der Wert für max_allowed_packet erhöht werden. Empfohlen werden 20 MB.<br/>
+        <br/>
+        <br/>
+        Thank You<br/>
+	<br/>
+        <br/>
+
+    ]]></IntroUpgrade>
+    <IntroUpgrade Type="pre" Title="Información de Actualización" Lang="es"><![CDATA[
+
+        <br/>
+        <strong>BIENVENIDO</strong>
+        <br/>
+        <br/>
+        Usted está apunto de instalar el modulo AdminESCL de OTRS.<br/>
+	<br/>
+        <br/>
+	<strong>ATENCIÓN</strong>
+        <br/>
+        <br/>
+        <strong>PAQUETES REQUERIDOS</strong>
+        <br/>
+        Por favor asegúrese que su base de datos acepte paquetes de mas de 5 MB de tamaño. Por ejemplo una base de datos de MySQL acepta paquetes de mas de 1 MB predefinido. En este caso la configuración max_allowed_packet debe ser incrementada. El tamaño recomendado es 20 MB.<br/>
+        <br/>
+        <br/>
+        Thank You<br/>
+	<br/>
+        <br/>
+
+    ]]></IntroUpgrade>
+    <IntroUninstall Type="pre" Title="Uninstallation Information" Lang="en"><![CDATA[
+
+        <br/>
+        <strong>ATTENTION</strong>
+        <br/>
+        <br/>
+        If you uninstall this package, all database tables that were created during installation will be DELETED.
+        All data from these tables will be irrevocably lost!
+        <br/>
+        <br/>
+        The block 'Ticket - Escalation Matrix' that was created during package installation will be removed.
+        <br/>
+        <br/>
+        Thank You<br/>
+	<br/>
+        <br/>
+
+    ]]></IntroUninstall>
+    <IntroUninstall Type="pre" Title="Uninstallation Information" Lang="de"><![CDATA[
+
+        <br/>
+        <strong>ACHTUNG</strong>
+        <br/>
+        <br/>
+        Bei der Deinstallation werden die von diesem Paket angelegten Datenbank-Tabellen gelöscht.
+        Alle darin enthaltenen Daten gehen unwiderruflich verloren!
+        <br/>
+        <br/>
+        Die von diesem Paket angelegte Gruppe 'Ticket - Escalation Matrix' wird deaktiviert.
+        <br/>
+        <br/>
+        Thank You<br/>
+	<br/>
+        <br/>
+
+    ]]></IntroUninstall>
+    <IntroUninstall Type="pre" Title="Información de Desinstalación" Lang="es"><![CDATA[
+
+        <br/>
+        <strong>ATENCIÓN</strong>
+        <br/>
+        <br/>
+        Si usted desinstala este paquete, todas las tablas de la base de datos creadas durante la instalación serán borradas.
+        ¡Todos los datos de esas tablas serán irrevocablemente perdidos!.
+        <br/>
+        <br/>
+        El blok 'Ticket - Escalation Matrix' que fue creado durante la instalación será desactivado.
+        <br/>
+        <br/>
+        Thank You<br/>
+	<br/>
+        <br/>
+
+    ]]></IntroUninstall>
+</otrs_package>

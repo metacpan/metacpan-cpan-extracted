@@ -1,0 +1,7 @@
+Revision history for Perl extension Object::Method
+
+0.02    2015-02-11T07:55:56+0100
+	- support cloning better
+
+0.01    Sun Jun 20 17:54:28 2010
+        - original version

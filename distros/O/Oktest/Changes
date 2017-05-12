@@ -1,0 +1,33 @@
+=======
+Changes
+=======
+
+
+Release 0.0103 (2012-10-06)
+---------------------------
+
+* [bugfix] Fix 'run_spec()' to call 'at_end()' blocks in reverse order.
+
+* [bugfix] Fix 'run_spec()' to clear 'at_end()' block list.
+
+
+Release 0.0102 (2011-10-30)
+---------------------------
+
+* [bugfix] Fix POD document.
+
+* [update] Add 'Oktest Internal' section to POD document.
+
+
+Release 0.0101 (2011-10-26)
+---------------------------
+
+* [bugfix] Fix not to install 'Kookbook.pl' into 'lib/perl5' directory.
+
+* [bugfix] Fix 'is_a' and 'not_a' assertions to suppress "Can't locate package" warning on Perl >= 5.10
+
+
+Release 0.0100 (2011-10-26)
+---------------------------
+
+* First public release

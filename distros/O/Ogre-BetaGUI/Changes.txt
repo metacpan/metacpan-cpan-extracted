@@ -1,0 +1,13 @@
+0.04  2009-09-22 | updated for Ogre.pm 0.36
+- Ogre.pm 0.36 requires Ogre 1.6, including its example media,
+  so I updated the docs for how to set up the examples
+
+0.03  2007-12-15 |
+- increase Ogre version requirement to 0.35
+- fixes for Window, GUI, TextInput
+
+0.02  2007-12-09 | itute3 & itute4
+- itute3.pl and itute4.pl examples
+
+0.01  2007-12-02 | initial release
+- itute2.pl example

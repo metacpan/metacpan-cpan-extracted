@@ -1,0 +1,48 @@
+#!/usr/local/bin/perl -w
+###########################################
+# spotify-token-init
+# Mike Schilli, 2014 (m@perlmeister.com)
+###########################################
+use strict;
+use lib 'lib';
+
+use OAuth::Cmdline::Spotify;
+use OAuth::Cmdline::Mojo;
+
+my $oauth = OAuth::Cmdline::Spotify->new(
+    client_id     => "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+    client_secret => "YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY",
+    login_uri     => "https://accounts.spotify.com/authorize",
+    token_uri     => "https://accounts.spotify.com/api/token",
+    scope         => "user-read-private",
+);
+
+my $app = OAuth::Cmdline::Mojo->new(
+    oauth => $oauth,
+);
+
+$app->start( 'daemon', '-l', $oauth->local_uri );
+
+__END__
+
+=head1 NAME
+
+spotify-token-init - Spotify-specific OAuth Token Dance
+
+=head1 SYNOPSIS
+
+    $ spotify-token-init
+
+=head1 DESCRIPTION
+
+See the OAuth::Cmdline::Spotify documentation.
+
+=head1 LEGALESE
+
+Copyright 2016 by Mike Schilli, all rights reserved.
+This program is free software, you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+2016, Mike Schilli <cpan@perlmeister.com>

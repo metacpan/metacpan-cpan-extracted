@@ -1,0 +1,150 @@
+[% IF search_terms %]
+[% node_name = "Search results for $search_terms" %]
+[% ELSE %]
+[% node_name = "Search" %]
+[% END %]
+[% INCLUDE header.tt %]
+[% INCLUDE banner.tt %]
+<div id="content">
+
+  [% IF !config.content_above_navbar_in_html %]
+    [% INCLUDE navbar.tt %]
+  [% END %]
+
+<div id="maincontent">
+  [% IF search_terms %]
+  <h2>Search Results for <em>[% search_terms %]</em></h2>
+    [% IF results.size %]
+      <h3>[% total_num %] matches found, showing [% first_num %] - [% last_num %]</h3>
+    [% END %]
+  [% ELSE %]
+  <h2>Search [% site_name %]</h2>
+  [% END %]
+
+  <p><small>
+    Version [% ss_version %].  See the
+    <a href="[% ss_info_url %]">information page</a> for help and more details.
+  </small></p>
+
+  <form method="get" action="search.cgi" id="advanced_search">
+    [% IF responsive %]
+      <div class="text_search">
+        <label for="search_upper">Find pages containing text:</label>
+        <input type="text" name="search" value="[% IF search_terms %][% search_terms %][% END %]" size="50" maxlength="80" id="search_upper" />
+      </div>
+      <div class="location_search">
+        [% IF coord_field_1 != 'latitude' %]
+          <div class="local_coord_search">
+            within <input type="number" name="[% dist_field %]" value="[% dist %]" size="5" maxlength="5" /> metres of
+            [% coord_field_1_name %] <input type="number" name="[% coord_field_1 %]" value="[% coord_field_1_value %]" size="10" maxlength="10" />,
+            [% coord_field_2_name %] <input type="number" name="[% coord_field_2 %]" value="[% coord_field_2_value %]" size="10" maxlength="10" />
+          </div>
+          or
+        [% END %]
+        <div class="latlong_search">
+          within <input type="number" name="latlong_dist" value="[% dist %]" size="5" maxlength="5" /> metres of
+          latitude (decimal) <input type="number" name="latitude" value="[% latitude %]" size="10" maxlength="10" />,
+          longitude (decimal) <input type="number" name="longitude" value="[% longitude %]" size="10" maxlength="10" />
+        </div>
+        <input type="submit" name="go" class="form_button" value="Go" />
+      </div>
+    [% ELSE %]
+      <table border="1">
+        <tr>
+           <th>
+             <label for="search_upper">Pages containing text:</label>
+           </th>
+           <td>
+             <input type="text" name="search" value="[% IF search_terms %][% search_terms %][% END %]" size="50" maxlength="80" id="search_upper" />
+           </td>
+         </tr>
+        <tr>
+          <th>Location:</th>
+          <td>
+          [% IF coord_field_1 != 'latitude' %]
+            <p>
+              within <input type="text" name="[% dist_field %]" value="[% dist %]" size="5" maxlength="5" /> metres of<br />
+              [% coord_field_1_name %] <input type="text" name="[% coord_field_1 %]" value="[% coord_field_1_value %]" size="10" maxlength="10" />,<br />
+              [% coord_field_2_name %] <input type="text" name="[% coord_field_2 %]" value="[% coord_field_2_value %]" size="10" maxlength="10" />
+            </p>
+          [% END %]
+            <p>
+              within <input type="text" name="latlong_dist" value="[% dist %]" size="5" maxlength="5" /> metres of<br />
+              latitude (decimal) <input type="text" name="latitude" value="[% latitude %]" size="10" maxlength="10" />,<br />
+              longitude (decimal) <input type="text" name="longitude" value="[% longitude %]" size="10" maxlength="10" />
+            </p>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="2" align="right">
+            <input type="submit" name="go" class="form_button" value="Go" />
+          </td>
+        </tr>
+      </table>
+    [% END %]
+  </form>
+
+  [% IF search_terms OR dist %]
+
+    <div id="search_results">
+
+    [% IF results.size %]
+
+      <ol start="[% first_num %]">
+        [% FOREACH result = results %]
+          <li>
+            <a href="[% result.url %]"><b>[% result.name %]</b></a>
+            [% IF result.score %]
+              (score: [% result.score %])
+            [% END %]
+            [% IF result.distance %]
+              ([% result.distance %] metres away)
+            [% END %][% IF result.summary %]
+            <div class="hit_summary">
+            [% result.summary %]
+            </div>[% END %]
+          </li>
+        [% END %]
+      </ol>
+
+      <p>
+      Matches [% first_num %] - [% last_num %] of [% total_num %]. 
+      [% IF (first_num > 20) %]
+        <a href="search.cgi?search=[% search_terms %];[% dist_field %]=[% dist %];[% coord_field_1 %]=[% coord_field_1_value %];[% coord_field_2 %]=[% coord_field_2_value %];next=[% first_num - 21 %]">Previous 20 results</a> 
+      [% END %] 
+      [% IF ((first_num > 20) and next_page_startpos) %]
+      / 
+      [% END %]
+      [% IF next_page_startpos %]
+        <a href="search.cgi?search=[% search_terms %];[% dist_field %]=[% dist %];[% coord_field_1 %]=[% coord_field_1_value %];[% coord_field_2 %]=[% coord_field_2_value %];next=[% next_page_startpos %]">Next 
+        [% IF ((total_num - last_num >= 20)) %]
+          20
+        [% ELSE %]
+          [% total_num - last_num %]
+        [% END %]
+        results</a>
+      [% END %]
+      </p>
+
+    [% ELSE %]
+      <h2>No Items Matched</h2>
+    [% END %]  
+    </div>
+
+    [% UNLESS responsive %]
+      <form method="get" action="search.cgi">
+        <label for="search_lower">Search:</label>
+        <input type="text" name="search" id="search_lower" value="[% search_terms %]" size="50" maxlength="80" value="Search text" onclick="this.value=''" />
+        <input type="submit" name="go" class="form_button" value="Go" />
+      </form>
+    [% END %]
+
+  [% END %]
+
+</div>
+
+[% IF config.content_above_navbar_in_html %]
+  [% INCLUDE navbar.tt %]
+[% END %]
+
+[% INCLUDE footer.tt %]

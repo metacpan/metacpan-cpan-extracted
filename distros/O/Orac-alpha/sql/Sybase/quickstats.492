@@ -1,0 +1,95 @@
+/* Procedure copyright(c) 1995 by Edward M Barlow */
+
+/************************************************************************\ 
+ Procedure Name:	sp__quickstats
+								          
+ Author:		ed barlow
+
+ Description:		
+        prints quick statistics from server.  Useful for monitoring
+
+\************************************************************************/ 
+:r database
+go
+:r dumpdb
+go
+if exists (select *
+           from   sysobjects
+           where  type = "P"
+           and    name = "sp__quickstats")
+begin
+    drop proc sp__quickstats
+end
+go
+
+create proc sp__quickstats( @starttime datetime=NULL, @noconvert int=NULL )
+as
+
+declare @conn int, @blk int, @locks int, @tlock int, @runnable int, @time1 datetime, @datestmp float, @mirror_name char(6)
+
+set nocount on
+
+select @time1=getdate()
+
+select @conn=count(*)   from master..sysprocesses where suid!=1
+select @blk=count(*)    from master..sysprocesses where blocked!=0
+select @locks=count(*)  from master..syslocks
+select @runnable=count(*)  from master..sysprocesses where cmd!="AWAITING COMMAND" and suid!=1
+select @tlock=count(*) from master..syslocks where type=1
+
+if exists (select * from master.dbo.sysdevices where status & 64 != 64)
+	select @mirror_name='None'
+else if exists (select * from master.dbo.sysdevices 
+			  		 where cntrltype=0
+						 and status & 64  = 64
+				 		 and status & 256 = 256 )
+begin
+	 select @mirror_name='Broken'
+end
+else if exists (select * from master.dbo.sysdevices 
+			  		 where cntrltype=0
+						 and status & 64 = 64
+				 		 and status & 512 != 512)
+begin
+	 select @mirror_name='Broken'
+end
+else select @mirror_name='Ok'
+
+if @starttime is not null
+	  exec   sp__datediff @starttime,'m',@datestmp output
+else select @datestmp=NULL
+
+if @noconvert is not null
+begin
+	select
+		  	blocks=@blk,
+		  	conn=@conn,
+		  	ctime=datediff(ms,@time1,getdate()),
+		  	locks=@locks,
+		  	run=@runnable,
+		  	tlock=@tlock,
+		  	busy=@@cpu_busy,
+		  	io=@@io_busy,
+		  	idle=@@idle,
+			"mirror"=@mirror_name,
+			mins=@datestmp
+end
+else
+begin
+
+	select
+		  	blks=convert(char(4),@blk),
+		  	conn=convert(char(4),@conn),
+		  	ctime=convert(char(6),datediff(ms,@time1,getdate())),
+		  	locks=convert(char(5),@locks),
+		  	run=convert(char(4),@runnable),
+		  	tlock=convert(char(5),@tlock),
+		  	cpu=convert(char(9),@@cpu_busy),
+		  	io=convert(char(6),@@io_busy),
+		  	idle=convert(char(9),@@idle),
+			/* "mirror"=@mirror_name, */
+		  	minutes=ltrim(str(@datestmp,10,1))
+end
+go
+grant execute on sp__quickstats to public
+go

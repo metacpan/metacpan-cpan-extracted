@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<SITE ID="Yahoo.Email">
+
+<NAME Lang="en-us">Yahoo People Search</NAME>
+<INFO Lang="en-us">finding one's e-mail</INFO>
+
+<URL Type="More"><![CDATA[
+http://people.yahoo.com_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+post://people.yahoo.com/py/psSearch.py?Pyt=Tps&YY=31905?FirstName=&LastName=_QUERY_&Domain=
+]]></URL>
+
+
+<VAR Name="_NEXT_"><![CDATA[
+<a href="_NEXT_"><b>Next</b>
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+&nbsp;<a href="_URL_">_TITLE_</a>___<a href="mailto:_PREVIEW_">___</td></tr>
+]]></TEMPLATE>
+</SITE>

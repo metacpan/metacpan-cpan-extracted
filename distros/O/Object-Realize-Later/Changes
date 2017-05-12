@@ -1,0 +1,97 @@
+Revision history for Perl extension Object::Realize::Later.
+
+version 0.19: Fri Jan 24 11:09:06 CET 2014
+
+	Improvements:
+	- mv t/99pod.t to xt/ and removed dependency to Test::Pod
+	- changed documentation syntax
+
+version 0.18: Fri Jun  8 16:12:16 CEST 2007
+
+	- add Test::Pod to pre-requisits.
+
+version 0.17: Fri Jun  8 16:09:52 CEST 2007
+
+	- added t/pod.t
+
+	- use oodist to generate documentation
+
+version 0.16: Sun Mar 25 17:10:24 CEST 2007
+
+	- generate pod with OODoc 0.99
+
+	- removed need for version, mkdist, mkdoc
+
+	- removed README.oodoc
+
+version 0.15: Fri Jan  9 11:39:54 CET 2004
+	- [Renat Araslanow] found many mistakes in the docs.
+
+	- [Daniel Axelrod] Realized class which can AUTOLOAD should not
+	  die on 'unknown method'.
+
+version 0.14: Tue Jul 29 2003
+	- [Slaven Rezic] spotted another buglet which was caused by
+	  a missed escape in generated code.
+
+version 0.13: Tue Jul 29 16:11:18 CEST 2003
+	- Module moved to lib/
+	- Documentation now uses OODoc
+	- [Slaven Rezic] added the feature to specify a class which
+	  has a different name than its module.  See new(source_module).
+	  tests in t/60module.t
+	- forgot to include t/50again.t in the distribution
+
+0.12 Mon Jul  7 16:20:32 CEST 2003
+	- [Bjoern Kriews] found a bug in $class->isa($otherclass)
+
+0.11 Tue Jun 10 11:42:01 CEST 2003
+	- [Bjoern Kriews] made proxying of class methods work as well,
+	  without realization.
+	- [Bjoern Kriews] showed that the method name can be stripped
+	  using substr/rindex much faster than by using a regex
+
+0.10 Thu Dec 12 13:20:33 CET 2002
+	- Multi-Level laziness now works as well!  Problem discover
+	  by [Mark Fowler]
+
+0.09 Sat Nov 16 15:05:04 CET 2002
+
+	- Removed reference to (non-existent) Object::Realize::Proxy
+	  in man-page. [Liz Mattijsen]
+
+	- Added location to warn_realization warnings [Slavan Rezic]
+
+0.08 Wed Nov 14 10:35:18 CET 2001
+
+	- Added option `believe_caller'
+
+0.07 Thu Sep 20 17:44:19 CEST 2001
+
+	- Added requirement for Scalar::Util to Makefile.PL
+	  spotted by [Andreas Marcel Riechert]
+
+	- Added README
+	  requested by [Andreas Marcel Riechert]
+
+0.06 Thu Sep 20 16:54:47 CEST 2001
+
+	- Fixed serious bug in AUTOLOAD: forgot to consume one arg.
+
+0.05 Wed Sep 19 14:22:15 CEST 2001
+
+	- Removed need for Memoize
+
+0.02 Mon Sep 10 14:59:22 CEST 2001
+
+	- Added willRealize() to question what an object will become.
+
+	- option `warn' now called `warn_realization'.
+
+	- When 'becomes' specifies code, the reference was stringified.
+	  Fixed and tests added.
+
+0.01 Sun Aug 12 12:00:46 2001
+	- original version; created by h2xs 1.20 with options
+		-AX Object::Realize::Later
+

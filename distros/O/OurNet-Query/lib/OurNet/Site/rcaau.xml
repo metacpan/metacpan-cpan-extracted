@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<SITE ID="Rcaau">
+
+<NAME Lang="en-us">RCAAU</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+RCAAU全球WWW搜尋(日本)
+]]></NAME>
+<INFO Lang="en-us">general information web search in Japan</INFO>
+<INFO Lang="zh-tw">general information web search in Japan</INFO>
+
+<URL Type="Start"><![CDATA[
+http://kuamp.kuamp.kyoto-u.ac.jp/cgi-bin/search.cgi?key=_QUERY_&rm=&am=99999
+]]></URL>
+
+<CHARSET>ja-jp.euc</CHARSET>
+
+
+<TEMPLATE><![CDATA[
+<p><dt><a href="_URL_">_TITLE_</a>___</a>]<br><dd>_PREVIEW_<br>--- [
+]]></TEMPLATE>
+</SITE>

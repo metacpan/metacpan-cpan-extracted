@@ -1,0 +1,89 @@
+NAME
+    OurNet::BBS - Component Object Model for BBS systems
+
+VERSION
+    This document describes version 1.67 of OurNet::BBS, released November
+    11, 2010.
+
+SYNOPSIS
+        use strict;
+        use OurNet::BBS;
+        # use OurNet::BBS 'big5'; # use unicode strings internally
+
+        my $BBS = OurNet::BBS->new({
+            backend => 'MELIX',             # use the Melix BBS backend
+            bbsroot => '/home/melix',       # where to find the BBS data
+        });
+
+        my $brd = $BBS->{boards}{sysop};    # the sysop board
+        my $mtime;
+
+        printf (
+            "This BBS has %d boards, %d groups.\n",
+            scalar keys(%{$BBS->{boards}}),
+            scalar keys(%{$BBS->{groups}}),
+        );
+
+        eval { $mtime = $brd->{articles}->mtime };
+        die "Error: cannot read board $board -- $@\n" if $@;
+
+        printf (
+            "The $board board has %d articles, %d top-level archive entries.\n",
+            $#{$brd->{articles}}, $#{$brd->{archives}},
+        );
+
+        # A simple Sysop board article monitor
+        print "Watching for new articles...\n";
+
+        while (1) {
+            print "=== wait here ($mtime) ===\n";
+            sleep 5 until ($brd->{articles}->refresh);
+
+            foreach my $article (@{$brd->{articles}}) {
+                print "Found article: $article->{title}\n" 
+                    if $article->btime > $mtime;
+            }
+
+            $mtime = $brd->{articles}->mtime;
+        }
+
+DESCRIPTION
+    (Currently, this project exists mainly for historical/archival purposes,
+    not for active development.)
+
+    OurNet-BBS is a cross-protocol distributed network, built as an
+    abstraction layer over telnet BBS-based systems used in Hong Kong, China
+    and Taiwan. It implements a flexible object model for different BBS
+    backends, along with an asymmetric authentication and remote procedure
+    call protocol.
+
+    This project aims to become a *protocol agnostic* middle-ware solution
+    for identity-based information storage & retrieval, much like the
+    Project Jabber's goal toward instant messaging, or Project JXTA's aim
+    toward distributed services.
+
+    For some of its practical uses, search for OurNet::BBSApp on CPAN, and
+    the sample scripts in the eg/ directory in this module's distribution.
+
+HISTORY
+    This section has been moved to the ChangeLog file in the source
+    distribution.
+
+SEE ALSO
+    OurNet::BBS::Tutorial for a general overview of the OurNet::BBS model.
+
+    OurNet::BBS::Roadmap for the design goals, components, and related
+    discussions.
+
+AUTHORS
+    Chia-Liang Kao <clkao@clkao.org>, Audrey Tang <cpan@audreyt.org>.
+
+COPYRIGHT
+    Copyright 2001-2010 by Chia-Liang Kao <clkao@clkao.org>, Audrey Tang
+    <cpan@audreyt.org>.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See <http://www.perl.com/perl/misc/Artistic.html>
+

@@ -1,0 +1,54 @@
+
+ Copyright (c) 2007 Graphcomp. All rights reserved.
+ This program is free software; you can redistribute it and/or
+ modify it under the same terms as Perl itself. 
+
+This module provides methods to load/modify/save images for use
+with OpenGL textures, FBOs and VBOs.
+
+It requires the OpenGL module - version 0.55_03 or newer.
+
+It also requires at least one supported OpenGL::Image imaging engine.
+At this time, the following drivers are supported:
+
+* Targa  - Pure Perl - uncompressed RGBA files (comes with OpenGL::Image).
+* Magick - Requires PerlMagick (v6.3.5 or newer for best performance).
+
+You can find the latest releases and information for installing/using
+these modules at the Perl OpenGL (POGL) Developer's Site:
+http://graphcomp.com/opengl
+
+
+NOTE: as of 1.03, you _must_ call Sync prior to calling native (eg. ImageMagick) APIs
+on an OpenGL::Image object, and call SyncOGA when done with your native calls.
+
+
+Changes:
+
+1.03	Bob "grafman" Free <grafman@graphcomp.com>
+	Revamped Magick.pm to correctly handle alpha channels and sync'g
+	on various platforms.
+
+1.02	Geoff Broadwell
+	Removed redundant documentation from Image.pm
+	Fixed/enhanced priority handling and engine info retrieval
+	  for GetEngines and HasEngine.
+	Cleaned up NewEngine.
+	Cleaned up Image.pod, INSTALL and README.
+
+	Bob "grafman" Free <grafman@graphcomp.com>
+	Fixed version number for OpenGL::Image::Common
+	Enhanced hex_tile.pl
+	Updated OpenGL-Image.t to reflect Geoff's changes
+
+1.01	Bob "grafman" Free <grafman@graphcomp.com>
+	Fixed typo in test app.
+	Added support for 24 bit images in Targa.pm
+	Added support for runlength-encoded images in Targa.pm
+	Fixed non-alpha image handling (eg: JPEGs) for unix in Magick.pm
+	Updated STDERR handling when attempting to load image modules.
+	Added GetPowerOf2.
+	Updated SyncOGA in Magick.pm to handle image resizing.
+	Added hex_tile.pl screensaver
+
+1.00	First release - Bob "grafman" Free <grafman@graphcomp.com>

@@ -1,0 +1,9 @@
+
+verbose = 1  ; emacs-friendly. Value 10 gives detailed explanations
+color = 0    ; emacs-friendly
+
+severity = 4   ; current level (5-critical, 1-everything). FIXME: go down
+
+[TestingAndDebugging::RequireUseStrict]
+equivalent_modules = Moose Moose::Role Modern::Perl Moo
+

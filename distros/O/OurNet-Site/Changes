@@ -1,0 +1,29 @@
+Revision history for Perl extension OurNet::Site.
+
+[v1.2] 
+
+Change 883 on 2001/02/27 by autrijus@autribsd
+
+           * branch out for seperate release 
+
+Change 574 on 2001/03/21 by autrijus@clwin
+
+	* OurNet::Template now extract things properly
+	* add OurNet::Site support with tt2 formats
+
+Change 356 on 2001/01/15 by autrijus@autribsd
+
+	* updated COPYRIGHT information
+	* documentation for LWP::Protocol::bs
+	* use File::Path instead of BBS::Utils::deltree in test cases
+	* finished fzindex and fzquery
+	* bin/ scripts now installs as EXE_FILES
+
+Change 259 on 2000/12/09 by autrijus@autricvic
+
+	crlf.
+
+Change 258 on 2000/12/08 by autrijus@autricvic
+
+	   mega submit for 1.4
+

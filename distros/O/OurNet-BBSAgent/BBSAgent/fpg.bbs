@@ -1,0 +1,47 @@
+# $File: //depot/OurNet-BBSAgent/BBSAgent/fpg.bbs $ $Author: autrijus $
+# $Revision: #5 $ $Change: 2829 $ $DateTime: 2002/01/10 14:54:36 $
+# Contributed by Smartboy <kcwu@ck.tp.edu.tw>
+# zh_TW.Big5: 小魚的紫色花園
+
+Fish's Purple Garden
+fpg.twbbs.org.tw
+
+setv headansi 1;40;32m
+setv headansiend 40;33m
+
+load maple2.board
+setv morehead	m/\e\[([\d;]+)m\x20\x20瀏覽\x20P./
+setv moretail	[q]\e[30m結束\x20\x20\e[0m
+setv pager	Call機
+
+=login
+wait 註冊：
+send $[username]\n$[password]\nn\n
+wait 請詳讀進站畫面的公告，然後輸入「
+  or (Space/Return)
+doif $[2]
+else
+  wait m/\w/
+  send $[1]
+  wait 」繼續：
+endo
+send \nqq
+goto main
+
+=board_list_last
+call board $[board]
+send 1\n\x24\x0c
+wait \x0d>
+till /
+exit
+
+=board_article_fetch_last
+send q
+wait 文章選讀
+exit
+
+=article_edit_author
+send \x24E\x19\x19\x19\x19
+send \x18\n
+wait 文章選讀
+exit

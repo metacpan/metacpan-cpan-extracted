@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<SITE ID="News">
+
+<NAME Lang="en-us">News</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+News¥þ²y·s»D·j´M
+]]></NAME>
+<INFO Lang="en-us">daily news search</INFO>
+<INFO Lang="zh-tw">daily news search</INFO>
+
+<URL Type="More"><![CDATA[
+http://www.news.com_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://www.news.com/Searching/Results/1,18,1,00.html?querystr=_QUERY_
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_NEXT_"><![CDATA[
+<a href="_NEXT_">Next 25
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+&nbsp; <a href="_URL_">_TITLE_</a>,_DATE_<br>
+]]></TEMPLATE>
+</SITE>

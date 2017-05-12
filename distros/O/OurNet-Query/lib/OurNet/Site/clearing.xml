@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<SITE ID="Clearing">
+
+<NAME Lang="en-us">Clearing System Search</NAME>
+<INFO Lang="en-us">government and system information web search in Japan</INFO>
+
+<URL Type="More"><![CDATA[
+post://wwwc.clearing.admix.ne.jp/cgi-bin/operate/su_urlmt_usearch.sh?NEXT=ŽŸ•Å&LINES=_NEXTHITS_&POS=_POS_&SQLRANK=_SRANK_&SQL=_SQL_&QUERY=_QUERYX_&QUERY1=_QUERYY_&QUERY2=&LANG=J&WORD1=_QUERYSTR_&WORD2=&WORD3=&R1=OR&R2=OR&EMPHASIS=ON&URLDECODE=ON
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://wwwc.clearing.admix.ne.jp/cgi-bin/operate/su_urlmt_usearch.sh?EMPHASIS=ON&URLDECODE=ON&SORT=HITS&ORDER=DESC&URL_OPTION=PART&LANG=J&URL=&WORD1=_QUERY_&R1=OR&WORD2=&R2=OR&WORD3=&YEAR1=1970&MONTH1=1&DAY1=01&YEAR2=9999&MONTH2=12&DAY2=31&LANG=J&LINES=_HITS_&B1=%8C%9F%8D%F5%8E%C0%8Ds
+]]></URL>
+
+<CHARSET>ja-jp.jis</CHARSET>
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_POS_"><![CDATA[
+NAME="POS"   VALUE="_POS_">
+]]></VAR>
+<VAR Name="_QUERYX_"><![CDATA[
+NAME="QUERY" VALUE="_QUERYX_">
+]]></VAR>
+<VAR Name="_QUERYSTR_"><![CDATA[
+NAME="WORD1" VALUE="_QUERYSTR_">
+]]></VAR>
+<VAR Name="_QUERYY_"><![CDATA[
+NAME="QUERY1" VALUE="_QUERYY_">
+]]></VAR>
+<VAR Name="_SRANK_"><![CDATA[
+NAME="SQLRANK" VALUE="_SRANK_">
+]]></VAR>
+<VAR Name="_NEXTHITS_"><![CDATA[
+NAME="LINES" VALUE="_NEXTHITS_">
+]]></VAR>
+<VAR Name="_SQL_"><![CDATA[
+NAME="SQL"   VALUE="_SQL_">
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<A HREF="_URL_"___">_TITLE_</A>___<TD COLSPAN="2">_PREVIEW_</TD></TR>
+]]></TEMPLATE>
+</SITE>

@@ -1,0 +1,17 @@
+[%########################################
+  label_form_textarea_row( label, count, name, value, rows, cols, wrap, colspan )
+     Display a row to input text in a textarea (multiline) widget; :
+     label on left, text input on right. If you specify 'colspan' then
+     the widget will appear below the label.
+  ########################################-%]
+
+[%- DEFAULT colspan = 1 -%]
+[%- INCLUDE label_row_begin -%]
+  [% IF colspan > 1 -%]
+</tr>
+<tr bgcolor="[% INCLUDE row_color %]">
+  [% END -%]
+    <td colspan="[% colspan %]">
+      [%- INCLUDE form_textarea -%]
+    </td>
+</tr>

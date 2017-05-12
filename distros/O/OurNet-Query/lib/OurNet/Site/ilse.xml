@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<SITE ID="Ilse">
+
+<NAME Lang="en-us">Ilse WWW Search</NAME>
+<INFO Lang="en-us">general information web search in German</INFO>
+
+<URL Type="More"><![CDATA[
+http://www.ilse.nl/_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://www.ilse.nl/?COMMAND=search_for&LANGUAGE=NL&ANDOR=BOOLEAN&EXTRACT=short&AFTER=&SEARCH_FOR=_QUERY_
+]]></URL>
+
+<EXPRESSION>Boolean</EXPRESSION>
+
+<VAR Name="_NEXT_"><![CDATA[
+<A HREF="_NEXT_"><IMG BORDER=0 SRC="http://icons.ilse.nl/icons/new/Pijl_R_1.gif"
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<DT><B>___COLOR="#FF0000">_SCORE_</FONT></B>___<A HREF="_URL_">_TITLE_</A>___<BR>_PREVIEW_<FONT FACE___<EM>_SIZEK_K bytes,_DATE_</EM>
+]]></TEMPLATE>
+</SITE>

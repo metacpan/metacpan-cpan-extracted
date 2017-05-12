@@ -1,0 +1,11 @@
+* heading 1 >
+** heading 1.1
+An example >:
+ : a fixed width section *bold* >
+Another example:
+ #+BEGIN_EXAMPLE
+ a longer example >
+   second line
+ third line
+ #+END_EXAMPLE
+* heading 2

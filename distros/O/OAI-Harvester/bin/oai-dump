@@ -1,0 +1,36 @@
+#!/usr/bin/perl 
+
+# This script will extract all the records out of a oai-pmh target
+# and store them in a directory of your choosing. 
+#
+# You will see record identifiers on STDOUT as records are being retrieved.
+
+use strict;
+use warnings;
+use Net::OAI::Harvester;
+use Carp qw(carp);
+
+my ($baseURL, $dir) = @ARGV;
+unless ($baseURL and $dir) {
+  print "usage: oai-dump oai-base-url directory\n";
+  print "       eg. oai-dump http://memory.loc.gov/cgi-bin/oai2_0 loc_data\n";
+  exit 1;
+}
+
+# create the directory if necessary
+mkdir $dir unless -d $dir;
+
+## create a harvester
+my $harvester = Net::OAI::Harvester->new(
+     baseURL => $baseURL,
+     dumpDir => $dir 
+);
+
+## list all the records in a repository
+my $records = $harvester->listAllRecords(
+     'metadataPrefix'    => 'oai_dc'
+);
+
+while (my $record = $records->next()) {
+  print $record->header->identifier, "\n";
+}

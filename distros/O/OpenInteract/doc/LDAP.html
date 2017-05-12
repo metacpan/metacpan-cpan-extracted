@@ -1,0 +1,385 @@
+      <h1>OpenInteract and LDAP</h1>
+      
+      <p>With <tt>OpenInteract</tt> 1.2 and <tt>SPOPS</tt> 0.50, you
+      can now use LDAP not only as a datastore for your objects, but
+      also for authenticating users and determining group
+      membership. This document explains how.</p>
+
+      <p>If you can, read this document and follow its instructions
+      before you install and use OpenInteract. Otherwise actions like
+      schema changes can become more difficult.</p>
+
+      <h1>The Pieces</h1>
+
+      <ul>
+
+        <li><tt>SPOPS::LDAP</tt> provides the serialization logic and
+        behavior</li>
+
+        <li><tt>OpenInteract::LDAP</tt> provides centralized
+        connection management</li>
+
+        <li><tt>OpenInteract::SPOPS::LDAP</tt> should be the parent of
+        any OI LDAP data object class.</li>
+
+      </ul>
+
+      <p>Additionally, two packages (base_group and base_user) offer
+      options for storing users and groups in LDAP and doing
+      authentication from there. See below for more.</p>
+
+      <h1>Overall Configuration</h1>
+
+      <p>First, install <tt>SPOPS</tt> version 0.50 or higher and run
+      its tests to ensure that the LDAP portion (<tt>SPOPS::LDAP</tt>)
+      is functioning properly with your LDAP server.</p>
+
+      <p>Next, install <tt>OpenInteract</tt> 1.2 or higher. This
+      includes functionality to manage multiple datasources and
+      connect to LDAP directories.</p>
+
+      <p>Next, make the following modifications to the server
+      configuration file:</p>
+
+      <ul>
+
+        <li>Add relevant connection information to the
+        <tt>{ldap_info}</tt> key. This describes one or more LDAP
+        datasources you will use with your system. The usual suspects
+        -- host, port, base DN -- are there, and you can provide a
+        standard bind DN and password as well. (Examples below.)</li>
+
+        <li>Set the key <tt>{datasource}{default_connection_ldap}</tt>
+        to the connection to be used when an LDAP object doesn't
+        specify a datasource.</li>
+
+      </ul>
+
+      <p>You can test your connection information from
+      <tt>oi_manage</tt>:</p>
+
+        <pre>$ oi_manage --website_dir=/path/to/mysite test_ldap</pre>
+
+      <p>This will go through each of the defined datasources and try
+      to connect and bind given the information in the server
+      configuration file.</p>
+
+      <h1>User/Group Storage and Authentication</h1>
+
+      <p>Storing users and groups for use in OpenInteract
+      authentication makes things a little trickier. This is supported
+      but still in its infancy, so you might scare up a few gotchas
+      here and there.</p>
+
+      <p>You should only need to do the following:</p>
+
+      <ul>
+
+        <li>Modify the SPOPS configuration files for both users
+        (<tt>base_user-x.xx/conf/spops.perl</tt>) and groups
+        (<tt>base_group-x.xx/conf/spops.perl</tt>) or use and tweak
+        the ones supplied under the same path but named
+        <tt>spops.perl.ldap</tt>.</li>
+
+        <li>(slight hack) Create an empty hashref in your
+        <tt>base_user-x.xx/conf/spops.perl</tt> file for the key
+        'has_a'. It should look like this:
+
+<pre>
+  'has_a' => {},
+</pre>
+
+        This is to get around the information being inherited by the
+        parent configuration and will be fixed in a later version.</li>
+
+        <li>(slight hack) Create an empty hashref in your
+        <tt>base_group-x.xx/conf/spops.perl</tt> file for the key
+        'links_to'. It should look like this:
+
+<pre>
+  'links_to' => {},
+</pre>
+
+        This is to get around the information being inherited by the
+        parent configuration and will be fixed in a later version.</li>
+
+        <li>Change the key <tt>{login}-&gt;{crypt_password}</tt> to
+        '0' (LDAP takes care of this for you)</li>
+
+        <li>Modify the server configuration file to set the values for
+        both the <tt>{id}-&gt;{user_type}</tt> and
+        <tt>{id}-&gt;{group_type}</tt> keys to 'char'. Do this before
+        installing OpenInteract since these keys inform the datatypes
+        of other tables, such as <tt>sys_error</tt> which stores
+        errors..</li>
+
+        <li>Modify the server configuration file to set the values for
+        the system users and groups. You can map these to existing
+        users or create new ones. The keys you'll need to modify are:
+
+        <p><tt>{default_objects}-&gt;{superuser}<br>
+              {default_objects}-&gt;{supergroup}<br>
+              {default_objects}-&gt;{public_group}<br>
+              {default_objects}-&gt;{site_admin_group}</tt></p>
+
+        <p>See the discussion about 'Object Security' below for more
+        information about this.</p>
+
+        </li>
+
+        <li>Note that the 'sasl' key in the <tt>{ldap_info}-&gt;{
+        $datasource }</tt> entry has not yet been tested, primarily
+        because we need to setup a development server that has
+        SASL/CRAM-MD5 support properly compiled in..</li>
+
+      </ul>
+
+      <p>If you're having issues authenticating, try the following
+      simple script, setting the variables to appropriate values:</p>
+
+<pre>
+#!/usr/bin/perl
+
+use strict;
+use Net::LDAP;
+
+my $host          = 'localhost';
+my $port          = 389;
+my $bind_dn       = 'cn=Manager,dc=MyCompany,dc=com';
+
+my $bind_password = 'password';
+
+my $ldap = Net::LDAP->new( $host, port => 389 );
+die "Cannot make LDAP connection\n" unless ( $ldap );
+
+my $ldap_msg = $ldap->bind( dn => $bind_dn, password => $bind_password );
+if ( my $code = $ldap_msg->code ) {
+    die "Error during bind (Code: $code)\n", $ldap_msg->error, "\n";
+}
+print "Connect/bind ok.";
+</pre>
+
+      <h1>Object Security</h1>
+
+
+      <h2>Security for Existing Data</h2>
+
+      <p>You might be using LDAP because you have a directory of
+      existing information. If you are doing this, then you need to
+      tell OpenInteract about the security for the objects already in
+      the system.</p>
+
+      <p>The 'base_security' package has a script for automating this
+      fairly common action. You'll need to run the script
+      'create_object_security.pl' found in that package. Here's a sample:</p>
+
+<pre>
+ $ export OIWEBSITE=/path/to/mysite
+ $ cd pkg/base_security-1.xx/script
+ $ perl create_object_security.pl \
+      --class=MyClass::User \
+      --scope=world \
+      --level=read
+ $ perl create_object_security.pl \
+      --class=MyClass::User \
+      --scope=group \
+      --scope_id='site admin' \
+      --level=write
+ $ perl create_object_security.pl \
+      --class=MyClass::Group \
+      --scope=world \
+      --level=read
+ $ perl create_object_security.pl \
+      --class=MyClass::Group \
+      --scope=group \
+      --scope_id='site admin' \
+      --level=write
+</pre>
+
+      <p>You will have to modify 'MyClass::' to your website's
+      namespace and 'site admin' to the ID of your site admin group --
+      whatever you set in the
+      <tt>{default_objects}{site_admin_group}</tt> key of your server
+      configuration.</p>
+
+      <p>These commands will create entries in the security table so
+      that the 'world' security for all users and groups is 'read' and
+      that the site admin group has read/write privileges to all users
+      and groups.</p>
+
+      <p>Run the script with the parameter '--help' to get more
+      information about how to run it.</p>
+
+
+      <h2>Object Creation Security</h2>
+
+      <p>For objects that use security you will need to make a
+      modification to each object's entry in its conf/spops.perl
+      file. For instance, the default security for a lot of objects is
+      specified by something like:</p>
+
+<pre>
+ creation_security => {
+    u => undef,
+    g => { 3 => 'WRITE' },
+    w => 'READ',
+ },
+</pre>
+
+      <p>The '3' in this refers to the 'site admin' group, which is
+      you use DBI as a backend for users and groups will always be
+      true.</p>
+
+      <p>With LDAP, you'll need to change this to be the same as the
+      value you specified in the
+      <tt>{default_objects}{site_admin_group}</tt> key in your server
+      configuration file.</p>
+
+      <p>So assuming you are using 'site admin' as the cn for the site
+      administration group, it might look something like:</p>
+
+<pre>
+ creation_security => {
+    u => undef,
+    g => { 'site admin' => 'WRITE' },
+    w => 'READ',
+ },
+</pre>
+
+      <p>This will probably be handled automatically in a future
+      OpenInteract release. In the meantime, you'll have to change it
+      manually for every object using security in the system. To get a
+      listing of them, go to the URL <tt>/Security/</tt> in your OI
+      site. All the items in the 'Object Classes' list with 'Secure'
+      in the 'Base Security' column need to be modified in this manner.</p>
+      
+
+      <h1>Server Configuration Examples</h1>
+
+      <p>The following defines two connections: 'main' and 'auth'. The
+      first describes a connection using an anonymous bind, while the
+      second specifies a bind DN and password. The second also uses a
+      different port than the first.</p>
+
+<pre>
+     'default_connection_ldap' => 'main',
+     'ldap_info' => {
+           main => {
+              host          => 'ldap.myco.com',
+              port          => 389,
+              bind_dn       => undef,
+              bind_password => undef,
+              base_dn       => 'dc=MyCo,dc=com',
+              timeout       => 120,
+              version       => 2,
+              sasl          => 0,
+              debug         => 0,
+           },
+           auth => {
+              host          => 'ldap.myco.com',
+              port          => 3890,
+              bind_dn       => 'cn=Manager,dc=MyCo,dc=com',,
+              bind_password => 'crystalline',
+              base_dn       => 'dc=MyCo,dc=com',
+              timeout       => 120,
+              version       => 2,
+              sasl          => 0,
+              debug         => 0,
+           },
+     },
+</pre>
+
+      <h1>Object Configuration Examples</h1>
+
+      <p>Here's a sample configuration, from the 'base_user'
+      package. One important thing to note: you <b>do not</b> need to
+      use a full DN for <tt>{ldap_base_dn}</tt> --
+      <tt>OpenInteract::SPOPS::LDAP</tt> overrides the method
+      <tt>base_dn()</tt> and prepends the value from
+      <tt>{ldap_base_dn}</tt> to the value from <tt>{base_dn}</tt> in
+      your datasource.</p>
+
+      <p>So if we were to use the example below with the 'main'
+      datasource, the base DN of these objects would be:</p>
+
+<pre>
+  ou=People                --> From the object
++ dc=MyCo,dc=com           --> From the 'main' datasource
+================
+  ou=People,dc=MyCo,dc=com --> Base DN used
+</pre>
+
+      <p>If you're using multiple datasources, <tt>{ldap_base_dn}</tt>
+      needs to be a hashref with the keys as datasources and the
+      values as the partial base DN for that datasource. See
+      <tt>SPOPS::LDAP::MultiDatasource</tt> for more information.</p>
+
+<pre>
+   'user' => {
+     class        => 'OpenInteract::User',
+     code_class   => 'OpenInteract::User::LDAP',
+     isa          => [ qw/ OpenInteract::User OpenInteract::SPOPS::LDAP  
+                           SPOPS::Utility SPOPS::Secure SPOPS::LDAP / ],
+     field        => [ qw/ cn sn givenname mail userpassword uid objectclass / ],
+     field_map    => { 'last_name' => 'sn', 'first_name' => 'givenname',
+                       'password' => 'userpassword', 'login_name' => 'uid',
+                       'email' => 'mail', user_id => 'uid' },
+     multivalue   => [ 'objectclass' ],
+     id_field     => 'cn',
+     ldap_base_dn => 'ou=People',
+     ldap_object_class => [ qw/ top person inetOrgPerson organizationalPerson / ],
+     ldap_fetch_object_class => 'person',
+     alias        => [],
+     has_a        => {},
+     links_to     => { 'OpenInteract::Group' => 'uniquemember' },
+     fetch_by     => [],
+     creation_security => { 
+        u => undef,
+        g   => { 3 => 'WRITE' },
+        w   => 'READ',
+     },
+     track        => { create => 0, update => 1, remove => 1 },
+     display      => { url => '/User/show/' },
+     name         => sub { return $_[0]->full_name },
+     object_name  => 'User',
+  },
+</pre>
+
+      <h1>Multiple Datasources</h1>
+
+      <p>You can use multiple datasources in two different ways</p>
+
+      <ol>
+
+        <li>Use multiple datasources for the same class. This enables
+        you to search for an entry once and have the search get
+        executed on multiple directories. Read about how this works
+        and how you set it up in
+        <tt>SPOPS::LDAP::MultiDatasource</tt></li>
+
+        <li>Use a single datasource per a class but have multiple
+        directories available. For instance, you might run one LDAP
+        directory for all equipment in your organization and another
+        for all employees and groups.
+
+          <p>For this, you simply need to configure all datasources in
+          your server configuration, then tell each SPOPS class which
+          datasource it should use. To tell a class, you need to use
+          the <tt>{datasource}</tt> key in its configuration:</p>
+
+<pre>
+$config = {
+   class      => 'My::Equipment',
+   isa        => [ 'SPOPS::LDAP' ],
+   datasource => 'equipment',
+};
+</pre>
+
+          <p>This class would use the connection information stored
+          under the key 'equipment' in your server configuration.</p>
+
+          <p>There are other configuration details to be aware of --
+          please see <tt>SPOPS::LDAP::MultiDatasource</tt> for more
+          infromation.</p>
+
+      </ol>

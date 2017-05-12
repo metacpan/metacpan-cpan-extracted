@@ -1,0 +1,339 @@
+
+                Summary Router Link States (Area 23.0.0.0)
+
+LS age: 1103
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Router)
+Link State ID: 172.30.5.5 (ASBR Router ID)
+Advertising Router: 172.16.0.47
+LS Seq Number: 0x80000189
+Checksum: 0x7294
+Length: 28
+Network Mask: 0.0.0.0
+Metric: 11
+
+LS age: 312
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Router)
+Link State ID: 172.30.5.5 (ASBR Router ID)
+Advertising Router: 172.16.0.48
+LS Seq Number: 0x80000077
+Checksum: 0xf717
+Length: 28
+Network Mask: 0.0.0.0
+Metric: 21
+
+LS age: 67
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Router)
+Link State ID: 172.30.7.8 (ASBR Router ID)
+Advertising Router: 172.16.0.47
+LS Seq Number: 0x80000011
+Checksum: 0x352c
+Length: 28
+Network Mask: 0.0.0.0
+Metric: 65572
+
+LS age: 67
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Router)
+Link State ID: 172.30.7.8 (ASBR Router ID)
+Advertising Router: 172.16.0.48
+LS Seq Number: 0x80000011
+Checksum: 0x482f
+Length: 28
+Network Mask: 0.0.0.0
+Metric: 65549
+
+LS age: 433
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Router)
+Link State ID: 172.30.206.206 (ASBR Router ID)
+Advertising Router: 172.16.0.47
+LS Seq Number: 0x8000003f
+Checksum: 0x6146
+Length: 28
+Network Mask: 0.0.0.0
+Metric: 65569
+
+LS age: 434
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Router)
+Link State ID: 172.30.206.206 (ASBR Router ID)
+Advertising Router: 172.16.0.48
+LS Seq Number: 0x8000003f
+Checksum: 0x7449
+Length: 28
+Network Mask: 0.0.0.0
+Metric: 65546
+
+LS age: 1635
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Router)
+Link State ID: 172.30.206.207 (ASBR Router ID)
+Advertising Router: 172.16.0.47
+LS Seq Number: 0x80000040
+Checksum: 0x5f45
+Length: 28
+Network Mask: 0.0.0.0
+Metric: 65570
+
+LS age: 1635
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Router)
+Link State ID: 172.30.206.207 (ASBR Router ID)
+Advertising Router: 172.16.0.48
+LS Seq Number: 0x80000040
+Checksum: 0x7248
+Length: 28
+Network Mask: 0.0.0.0
+Metric: 65547
+
+LS age: 536
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Router)
+Link State ID: 172.31.5.52 (ASBR Router ID)
+Advertising Router: 172.16.0.47
+LS Seq Number: 0x80000323
+Checksum: 0x4bf0
+Length: 28
+Network Mask: 0.0.0.0
+Metric: 10
+
+LS age: 312
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Router)
+Link State ID: 172.31.5.52 (ASBR Router ID)
+Advertising Router: 172.16.0.48
+LS Seq Number: 0x80000077
+Checksum: 0x0ad5
+Length: 28
+Network Mask: 0.0.0.0
+Metric: 20
+
+LS age: 1007
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Router)
+Link State ID: 172.31.5.62 (ASBR Router ID)
+Advertising Router: 172.16.0.47
+LS Seq Number: 0x80000324
+Checksum: 0xee41
+Length: 28
+Network Mask: 0.0.0.0
+Metric: 11
+
+LS age: 312
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Router)
+Link State ID: 172.31.5.62 (ASBR Router ID)
+Advertising Router: 172.16.0.48
+LS Seq Number: 0x80000077
+Checksum: 0xa530
+Length: 28
+Network Mask: 0.0.0.0
+Metric: 20
+
+LS age: 311
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Router)
+Link State ID: 172.31.8.2 (ASBR Router ID)
+Advertising Router: 172.16.0.47
+LS Seq Number: 0x80000077
+Checksum: 0x659d
+Length: 28
+Network Mask: 0.0.0.0
+Metric: 65568
+
+LS age: 1464
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Router)
+Link State ID: 172.31.8.2 (ASBR Router ID)
+Advertising Router: 172.16.0.48
+LS Seq Number: 0x800000a0
+Checksum: 0x26c9
+Length: 28
+Network Mask: 0.0.0.0
+Metric: 65545
+
+LS age: 460
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Router)
+Link State ID: 172.31.206.2 (ASBR Router ID)
+Advertising Router: 172.16.0.47
+LS Seq Number: 0x80000040
+Checksum: 0x492a
+Length: 28
+Network Mask: 0.0.0.0
+Metric: 65568
+
+LS age: 459
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Router)
+Link State ID: 172.31.206.2 (ASBR Router ID)
+Advertising Router: 172.16.0.48
+LS Seq Number: 0x80000040
+Checksum: 0x5c2d
+Length: 28
+Network Mask: 0.0.0.0
+Metric: 65545
+
+LS age: 1416
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Router)
+Link State ID: 172.31.207.2 (ASBR Router ID)
+Advertising Router: 172.16.0.47
+LS Seq Number: 0x80000041
+Checksum: 0x3c35
+Length: 28
+Network Mask: 0.0.0.0
+Metric: 65568
+
+LS age: 1416
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Router)
+Link State ID: 172.31.207.2 (ASBR Router ID)
+Advertising Router: 172.16.0.48
+LS Seq Number: 0x80000041
+Checksum: 0x4f38
+Length: 28
+Network Mask: 0.0.0.0
+Metric: 65545
+
+
+                Summary Router Link States (Area 0.0.0.0)
+
+LS age: 710
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Router)
+Link State ID: 172.16.0.47 (ASBR Router ID)
+Advertising Router: 172.16.0.48
+LS Seq Number: 0x80000323
+Checksum: 0x63f0
+Length: 28
+Network Mask: 0.0.0.0
+Metric: 10
+
+LS age: 312
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Router)
+Link State ID: 172.30.5.5 (ASBR Router ID)
+Advertising Router: 172.16.0.48
+LS Seq Number: 0x80000077
+Checksum: 0xf717
+Length: 28
+Network Mask: 0.0.0.0
+Metric: 21
+
+LS age: 67
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Router)
+Link State ID: 172.30.7.8 (ASBR Router ID)
+Advertising Router: 172.16.0.48
+LS Seq Number: 0x80000011
+Checksum: 0x482f
+Length: 28
+Network Mask: 0.0.0.0
+Metric: 65549
+
+LS age: 434
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Router)
+Link State ID: 172.30.206.206 (ASBR Router ID)
+Advertising Router: 172.16.0.48
+LS Seq Number: 0x8000003f
+Checksum: 0x7449
+Length: 28
+Network Mask: 0.0.0.0
+Metric: 65546
+
+LS age: 1635
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Router)
+Link State ID: 172.30.206.207 (ASBR Router ID)
+Advertising Router: 172.16.0.48
+LS Seq Number: 0x80000040
+Checksum: 0x7248
+Length: 28
+Network Mask: 0.0.0.0
+Metric: 65547
+
+LS age: 312
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Router)
+Link State ID: 172.31.5.52 (ASBR Router ID)
+Advertising Router: 172.16.0.48
+LS Seq Number: 0x80000077
+Checksum: 0x0ad5
+Length: 28
+Network Mask: 0.0.0.0
+Metric: 20
+
+LS age: 312
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Router)
+Link State ID: 172.31.5.62 (ASBR Router ID)
+Advertising Router: 172.16.0.48
+LS Seq Number: 0x80000077
+Checksum: 0xa530
+Length: 28
+Network Mask: 0.0.0.0
+Metric: 20
+
+LS age: 1464
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Router)
+Link State ID: 172.31.8.2 (ASBR Router ID)
+Advertising Router: 172.16.0.48
+LS Seq Number: 0x800000a0
+Checksum: 0x26c9
+Length: 28
+Network Mask: 0.0.0.0
+Metric: 65545
+
+LS age: 459
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Router)
+Link State ID: 172.31.206.2 (ASBR Router ID)
+Advertising Router: 172.16.0.48
+LS Seq Number: 0x80000041
+Checksum: 0x5a2e
+Length: 28
+Network Mask: 0.0.0.0
+Metric: 65545
+
+LS age: 1416
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Router)
+Link State ID: 172.31.207.2 (ASBR Router ID)
+Advertising Router: 172.16.0.48
+LS Seq Number: 0x80000041
+Checksum: 0x4f38
+Length: 28
+Network Mask: 0.0.0.0
+Metric: 65545
+
+
+                Summary Router Link States (Area 51.0.0.0)
+
+LS age: 392
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Router)
+Link State ID: 172.16.0.47 (ASBR Router ID)
+Advertising Router: 172.16.0.48
+LS Seq Number: 0x80000694
+Checksum: 0x7768
+Length: 28
+Network Mask: 0.0.0.0
+Metric: 10
+
+LS age: 361
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Router)
+Link State ID: 172.16.0.48 (ASBR Router ID)
+Advertising Router: 172.16.0.47
+LS Seq Number: 0x80000694
+Checksum: 0x736c
+Length: 28
+Network Mask: 0.0.0.0
+Metric: 10
+

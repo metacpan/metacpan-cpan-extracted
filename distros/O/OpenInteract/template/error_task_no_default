@@ -1,0 +1,21 @@
+
+<div align="center">
+
+<h1>Task Cannot be Completed</h1>
+
+<table width="50%" border="0" cellpadding="5" cellspacing="0">
+
+<tr><td align="left">
+The module you requested does not have a default task
+defined. Therefore your task cannot be completed. An email has already
+been sent to the module author, but if you'd like you can <a
+href="mailto:[% author_email %]">do so yourself</a>.
+</td></tr>
+
+<tr><td align="right">Sincerely,<br>
+The Management
+</td></tr>
+
+</table>
+
+</div>

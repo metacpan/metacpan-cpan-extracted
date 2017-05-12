@@ -1,0 +1,53 @@
+ProgrammingRules
+
+These are the general programming rules we work under for Orac.  They are
+divided into to 2 parts for easier consumption.  Please note that the first
+section is filled with "must", "always", "no", type words; hence, they are
+hard & fast rules (unless Andy let's us bend them. :-)  The second section
+are just suggestions; you really should do them, but if you have a good
+reason, you can break them.  The initial set of rules/suggestions came from
+old orac-dev emails.
+
+As everything else with Orac, we can debate (and change) them anytime we
+want.  So if you have a good reason for change one of these (or adding a
+new one), feel free to post it to the orac-dev list.
+
+Rules:
+* Coding must be in Perl - This disciplines us, and provides a framework in
+  which all future developers will be comfortable, and enables us to stay
+  inside the loop, if Perl should do even more marvellous things in the
+  future, leaving other languages even further behind.
+* No use of outside binaries - Similar to the above, Orac must never make
+  use of outside binaries (eg: take piped in input from a Unix "ls" command,
+  or an Informix "dbschema" command).  This would strictly limit Orac to
+  particular OSes, and development strategies of other products (commercial
+  or otherwise).  Again, a proviso to this is that if strictly necessary,
+  it may be Ok to install Orac database packages in target DBs, to provide
+  functionality.  However, personally speaking, I'd rather avoid this
+  entirely, but, as in the case of Sybase, it may be unavoidable to produce
+  a half-way useful tool, or in future with orac_Oracle, provide constant
+  monitoring type tool sub-sets.  There is some debate on this, currently,
+  amongst the group.
+* Must be OS independent - I want Orac to be completely independent of
+  hardware platform and OS.  In current practice, this means it must work
+  identically on Solaris, Linux and Windows NT.  Particularly outlawed is
+  any use of the system() command - eg: system("cp file1.txt file2.txt").
+* New DB vender code must be in its own module; e.g orac_Oracle.pm,
+  Orac_Informix.pm, ...
+* Any language strings (for buttons/titles/...) that appear on the screen,
+  must be placed in the string catalog, and then used from there.
+* No command-line switches.  Always, the effort should be in the direction
+  of making Orac easier to use and less technical in appearance.
+* No DB-specific entries in "File", "My Tools", "Help".  ("SQL" too?)
+* No non-standard Perl modules, except: pTk, DBI, DBD (for the appropriate
+  DB); unless we distribute them with Orac (to make it easier on the users)
+
+Suggestions:
+* Give your changes of someone else's module to them to make,
+  or get permission from them.  (general courtesy & respect)
+* Try to avoid using code from other DB modules, as they may be
+  changed without you being aware.
+* If at all possibke, no database specific code in orac_dba.pl
+  except the creation statement on the 'new' $current_db instance.
+
+============================================================================

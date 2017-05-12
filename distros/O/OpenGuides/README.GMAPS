@@ -1,0 +1,54 @@
+NOTE: as of version 0.67, OpenGuides has switched from the Google Maps API
+to the open source Leaflet mapping library.  Our Google Maps support is
+out of date and no longer maintained.  To ensure you're using the latest
+mapping code, set
+
+  use_leaflet = 1
+
+in your wiki.conf.
+
+The instructions below are retained for the benefit of legacy users.
+
+----------------------------------------------------------------------
+
+As of 0.52, OpenGuides supports Google Maps using the API. The support has a
+few rough edges that still need ironing out, mostly relating to ellipsoids,
+and for that reason they aren't exposed by default.
+
+To use Google Maps, you need to get an API key from
+http://www.google.com/apis/maps/signup.html. When you've put this value into
+the config file as gmaps_api_key, the maps become available to you in two
+places. Firstly, if you've set "show_gmap_in_node_display", and if the user
+has set their preferences to display Google Maps, any node which has
+location information will get an inset map pinpointing the location.
+Secondly, the URL
+http://.../wiki.cgi?action=index;format=map becomes a large map with a list
+of all nodes (regardless of the user settings). The latter will become very
+slow on any sizable guide (there is work being done on speeding up indexes
+in general - please see the mailing list). If you don't get maps displayed
+when you know that the node has location information, read on.
+
+Ellipsoids and map accuracy
+---------------------------
+
+If you are based in the US and inputting points using latitude/longitude,
+the values in your database will almost certainly correspond to points on
+Google Maps. If so, simply change the "ellipsoid" configuration variable
+to "WGS-84" if it's not already set to this, and your maps will display.
+
+If you are using the British Grid system things are more complicated.
+To display accurate maps, you need to have the optional perl module
+Geo::HelmertTransform installed (libgeo-helmerttransform-perl in Debian).
+If this isn't possible, you can still get Google Maps to display by setting
+the configuration variable force_wgs84 to 1, but points will be offset from
+where they should be, normally by about 50 metres. This is because the
+British Grid uses a different ellipsoid from Google Maps. This is not
+recommended; if you do so, you must make users aware of the flaw and tell
+them not to try and "correct" location data!
+
+You may be unlucky enough to be using the UTM input modes (ie not British
+or Irish National Grid) but have data entered in a mixture of formats.
+This is likely if your users are from the UK, as you may find a mixture of
+WGS-84 and Airy (ie British Grid style) based nodes. In this case, you
+*do* need to correct any that are offset. Only do this if your users
+input Lat/long values rather than grid Eastings/Northings.

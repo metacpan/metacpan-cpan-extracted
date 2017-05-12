@@ -1,0 +1,79 @@
+[% PROCESS header
+    title = day.as_long_string
+%]
+
+[% USE url('/simon/cal/') %]
+
+
+[% INCLUDE bar
+    left_link   = handler.link(day.prev)
+    left        = "<< $day.prev.as_string"
+    right_link  = handler.link(day.next)
+    right       = "$day.next.as_string >>"
+    center      = day.month.as_string
+    center_link = handler.link(day.month)
+%]
+
+
+
+
+<table width="600" border="0" cellpadding="0" cellspacing="0">
+<tr>
+    <td width="10"> &nbsp; </td>
+    <td width="590">
+        <a href="[% handler.link(day) %]"><span class="boldlight">[% day.as_long_string %]</span></a>
+    </td>
+</tr>
+<tr>
+    <td colspan="2" valign="middle" align="center" height="10">
+        <img src="[% image_url %]/dots.gif" width="600" height="1" border="0">
+    </td>
+</tr>
+
+
+[% FOREACH event = day.events %]
+
+<tr>
+    <td width="10"> &nbsp; </td>
+    </td>
+    <td width="590" align="left">
+        <div class="vevent">
+        <abbr class="dtstart" style="visibility:hidden; font-size: 0px;" title="[% day.date %]">[% day.as_long_string %]</abbr>
+        <span class="summary"> 
+            [% event.description FILTER chump %]
+            [% IF event.editable; del_form(day, { "mode" => "del_event", "id" =>  event.id }); END %]
+        </span>
+        </div>
+    </td>
+</tr>
+<tr>
+    <td colspan="2" valign="middle" align="center" height="10">
+        <img src="[% image_url %]/dots.gif" width="600" height="1" border="0">
+    </td>
+</tr>
+
+
+
+[% END %]
+
+
+<tr> 
+    <td width="10"> &nbsp; </td>
+    <td class="header" width="590">
+    <p>&nbsp;</p>
+    [% url = "?date=$day.date" %]
+    [% url = "$url&user=$user" IF user.length %]
+    <form method="POST" action=[% handler.link(day) %] >
+        New event : <input name="description" type="text" size="60" />
+        [% IF handler.need_user %]
+        <input type="hidden" name="user" value="[% handler.user %]" />
+        [% END %]
+        <input type="hidden" name="mode" value="save_event" />
+        <input type="hidden" name="date" value="[% day.date %]" />
+        <input type="image" value="add" valign="middle" src="[% image_url %]/add.gif">
+    </form>
+    </td>
+</tr>
+</table>
+
+[% INCLUDE footer %]

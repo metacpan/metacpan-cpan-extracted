@@ -1,0 +1,120 @@
+{
+   "abstract" : "A package for harvesting metadata using OAI-PMH",
+   "author" : [
+      "Ed Summers <ehs@pobox.com>",
+      "Martin Emmerich <Martin.Emmerich@oew.de>",
+      "Thomas Berger <ThB@gymel.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "keywords" : [
+      "OAI-PMH",
+      "metadata",
+      "harvesting",
+      "protocol"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "OAI-Harvester",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0",
+            "XML::SAX" : "0",
+            "version" : "0.77"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "XML::SAX::ExpatXS" : "0",
+            "XML::SAX::Writer" : "0"
+         },
+         "requires" : {
+            "Carp" : "0",
+            "File::Temp" : "0",
+            "IO::File" : "0",
+            "LWP::UserAgent" : "2.0",
+            "Storable" : "2.0",
+            "URI" : "1.3",
+            "XML::SAX" : "0.12",
+            "XML::SAX::Base" : "1.04",
+            "perl" : "v5.8.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Path" : "0",
+            "IO::Dir" : "0",
+            "LWP::Protocol::https" : "0",
+            "XML::SAX::Writer" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Net::OAI::Base" : {
+         "file" : "lib/Net/OAI/Base.pm",
+         "version" : "1.20"
+      },
+      "Net::OAI::Error" : {
+         "file" : "lib/Net/OAI/Error.pm"
+      },
+      "Net::OAI::GetRecord" : {
+         "file" : "lib/Net/OAI/GetRecord.pm"
+      },
+      "Net::OAI::Harvester" : {
+         "file" : "lib/Net/OAI/Harvester.pm",
+         "version" : "1.20"
+      },
+      "Net::OAI::Identify" : {
+         "file" : "lib/Net/OAI/Identify.pm"
+      },
+      "Net::OAI::ListIdentifiers" : {
+         "file" : "lib/Net/OAI/ListIdentifiers.pm"
+      },
+      "Net::OAI::ListMetadataFormats" : {
+         "file" : "lib/Net/OAI/ListMetadataFormats.pm"
+      },
+      "Net::OAI::ListRecords" : {
+         "file" : "lib/Net/OAI/ListRecords.pm"
+      },
+      "Net::OAI::ListSets" : {
+         "file" : "lib/Net/OAI/ListSets.pm"
+      },
+      "Net::OAI::Record" : {
+         "file" : "lib/Net/OAI/Record.pm"
+      },
+      "Net::OAI::Record::DocumentHelper" : {
+         "file" : "lib/Net/OAI/Record/DocumentHelper.pm",
+         "version" : "1.20"
+      },
+      "Net::OAI::Record::Header" : {
+         "file" : "lib/Net/OAI/Record/Header.pm",
+         "version" : "1.20"
+      },
+      "Net::OAI::Record::NamespaceFilter" : {
+         "file" : "lib/Net/OAI/Record/NamespaceFilter.pm",
+         "version" : "1.20"
+      },
+      "Net::OAI::Record::OAI_DC" : {
+         "file" : "lib/Net/OAI/Record/OAI_DC.pm",
+         "version" : "1.20"
+      },
+      "Net::OAI::ResumptionToken" : {
+         "file" : "lib/Net/OAI/ResumptionToken.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://oai-harvester.sourceforge.net/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "1.20",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

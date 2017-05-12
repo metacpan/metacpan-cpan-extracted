@@ -1,0 +1,13 @@
+Revision history for perl module ONE
+
+v0.2.0    2011-09-04
+- Split On::Event into MooseX::Event and ONE
+
+v0.1.1 2011-08-19
+- Fix issue that was stopping 5.8 from completing the tests.
+- Added once, remove_listener, listeners, renamed trigger to emit, to match
+  the node API.
+
+v0.1.0 2011-08-17
+
+- Initial release, timer only.

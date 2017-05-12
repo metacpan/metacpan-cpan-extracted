@@ -1,0 +1,14 @@
+.gitignore
+bin/generate-debian-modules-database.pl
+Build.PL
+Changes
+lib/ORDB/DebianModules/Generator.pm
+MANIFEST			This list of files
+MANIFEST.SKIP
+private/update.sh
+README
+t/00-load.t
+t/boilerplate.t
+t/pod.t
+Makefile.PL
+META.yml

@@ -1,0 +1,106 @@
+OOTools Latest Versions Changes
+
+Version 2.30 - 2012-03-05
+- maintainance release fixing deprecated warnings and 
+  test case that was broken beause the used syntax for
+  accessing namespaces is not supported by perl anymore since
+  version 5.10
+- new maintainer is Sebastian Knapp <rock@ccls-online.de>
+
+Version 2.21
+- Little documentation improvement
+
+Version 2.2
+- Added Package::props and Package::groups pragmas
+- Added improved tests
+
+Version 2.12
+- Fixed the Class::Util::import function
+
+Version 2.11
+- Changed the Class::Util::classes function
+- Removed  Class::ISA prerequisite
+
+Version 2.1
+- Added the Class::Util::gather function plus tests
+- Added the Class::Util::classes function plus tests
+- Added the Class::Util::blessed function plus tests
+- Minor fix in the Class::Util::load function
+- Removed the 'use base ...' from Object::props and Object::groups packages
+- A few minor POD fixes and changes
+
+Version 2.0
+- Added the Class::Error module and tests
+- Added the Class::Util module and tests
+- Minor change in the Class::constr closure to allow to stop the init subs
+  by returning undef OR a Class::Error object
+- Added the 'skip_autoload' option to Class::constr pragma
+- You can also pass an HASH reference to the constr method
+- Changed the result returned by the group accessor in list context:
+  old version returned the keys of the hash (deprecated since the 1.77)
+  this version returns the whole hash
+
+Version 1.79
+- Fixed a bug related to set *::groups
+- A test addition
+
+Version 1.78
+- Fixed a bug related to naming props and group props with the same name
+- The properties defined with a group get initialized just once
+- Some testing addition and rewrite
+
+Version 1.77
+- WARNING: Deprecated the use of the group accessor in list context
+  when used to retrieve keys: see 'WARNING' POD section
+- Added 'default' option to the Class::constr pragma plus tests
+- Fixed the possibilty of setting twice the same property when copy => 1
+- Minor changes in the constructor closure
+- Added possibility to get a slice of values from groups accessors
+- A few minor improvement and fixes in the groups closure (all the props exist,
+  the groups accessor uses always the props accessor if defined, etc)
+- Added $_ aliasing for the post_process option
+- A few minor POD changes and fixes
+
+Version 1.76
+- Added add_to() method to add props and groups accessors in other packages
+- Added post_process() option to props accessors
+- A few minor POD changes
+
+Version 1.75
+- Constructors can now be called as instance methods
+- Added the 'copy' option to create copy constructors
+- Fixed a bug in the Class::constr (introduced with a patch in version 1.74)
+
+Version 1.74
+- Eliminated version check and installation feedback system
+  ("phone home" opt-out) from Makefile.PL to make Randal L Schwartz happy :-)
+  and sad the author :-(
+
+Version 1.73
+- Minor POD changes
+
+Version 1.72
+- Changed Makefile.PL version check
+
+Version 1.71
+- Fixed validation for constructor arguments
+
+Version 1.7
+- Substancial changes in the internal structure to allow more efficient
+  object destroying: now the objects that uses OOTools get destroyed always
+  when they go out of scope instead in global destruction phase
+- The variable related with the accessor is not tied anymore: this allows to
+  bypass the options and frees object self reference that delayed the
+  destruction until the global destruction phase (i.e. when the script exits).
+
+Version 1.62
+- Added the perl version check to the Makefile.PL
+- Added the possibility to create groups by passing just the name
+  as plain string instead the usual hash reference
+
+Version 1.61
+- Some POD fixes and restyling
+- Fixed bug: groups default option now is working under all circumstances
+
+Version 1.6
+- Added default option for properties group accessors

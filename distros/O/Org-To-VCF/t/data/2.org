@@ -1,0 +1,10 @@
+** mom # [2014-01-25 Sat]                                      :remind_anniv:
+- name :: gillian anderson
+- birthday: [1900-12-27 ]
+- test: test
+- hp :: 0811 000 0002 # [2014-01-25 Sat] new number because phone got stolen
+- work phone :: 022 999 9991 # [2014-01-25 Sat] work only
+- email :: gillian@example.org
+- another note which is
+  multi line
+

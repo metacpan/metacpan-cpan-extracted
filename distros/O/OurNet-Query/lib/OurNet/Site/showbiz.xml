@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<SITE ID="Showbiz">
+
+<NAME Lang="en-us">Mr. Showbiz</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+Mr.Showbiz影視娛樂資訊搜尋(英文)
+]]></NAME>
+<INFO Lang="en-us">movie, TV, and entertainment information search</INFO>
+<INFO Lang="zh-tw">movie, TV, and entertainment information search</INFO>
+
+<URL Type="More"><![CDATA[
+post://utility.mrshowbiz.go.com/cgi/showbiz/newssearch/newssearch.asp?string=_QUERY_&page=_START_1_1_
+]]></URL>
+<URL Type="Start"><![CDATA[
+post://utility.mrshowbiz.go.com/cgi/showbiz/newssearch/newssearch.asp?string=_QUERY_&page=1
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+
+<TEMPLATE><![CDATA[
+<b><a href="_URL_">_TITLE_</a>___(_DATE_)
+]]></TEMPLATE>
+</SITE>

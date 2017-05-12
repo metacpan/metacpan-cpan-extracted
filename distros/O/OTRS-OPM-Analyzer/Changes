@@ -1,0 +1,27 @@
+Change history for OTRS::OPM::Analyzer
+======================================
+
+0.06 2016-09-28
+
+  + made an extra distribution for parser module (OTRS::OPM::Parser)
+
+0.05 2016-09-22
+
+  + add support for Minimum and Maximum in framework settings
+
+0.04 2016-05-27
+
+  + Allow more variants of framework version strings. Users also use "5.x" to say that the package is for all OTRS5 versions
+
+0.03 2014-06-14
+
+  + fix critical bug. As the check method wasn't excluded, only the first role was loaded.
+
+0.02 2014-05-02
+
+  + Add ABSTRACTS to scripts and roles
+  + fix test failure
+
+0.01 2014-01-17T11:00:14
+
+  + initial release

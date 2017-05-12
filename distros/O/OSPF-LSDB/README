@@ -1,0 +1,58 @@
+OSPF::LSDB
+==========
+
+The OSPF::LSDB Perl module and its submodules implement the
+functionality to hold, parse, check, display the content of an OSPF
+link-state database.
+
+OSPF::LSDB          - hold the content of the OSPF link-state database
+OSPF::LSDB::gated   - parse the output from the gated OSPF daemon
+OSPF::LSDB::ospfd   - parse the output from the OpenBSD ospf daemon
+OSPF::LSDB::ospf6d  - parse the output from the OpenBSD ospf6 daemon
+OSPF::LSDB::View    - show the OSPF link-state database as graphviz dot
+OSPF::LSDB::View6   - show the OSPF for IPv6 link-state database as dot
+OSPF::LSDB::YAML    - load and store the OSPF link-state database as YAML
+
+Additionally the OSPFView package contains command-line tools to
+read the link-state database from an ospf daemon.  Then it creates
+a dot graphic which can be displayed with graphviz.  At the moment
+OpenBSD ospfd and ospf6d and gated 3.6 are supported.  Cisco support
+is experimental.
+
+gated2yaml          - convert gated OSPF LSDB to YAML file
+ospf2dot            - convert OSPF LSDB YAML to Graphviz dot
+ospfconvert         - convert OSPF LSDB file to current version
+ospfd2yaml          - convert OpenBSD ospfd or ospf6d lsdb to YAML file
+ospfview            - periodically display OSPF LSDB as Graphviz dot xlib
+ospfview.cgi        - cgi script to display OSPF graph via web server
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module produces Graphviz dot files so you should have this
+software installed.
+http://www.graphviz.org/
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2010-2012 Alexander Bluhm <alexander.bluhm@gmx.net>
+
+Permission to use, copy, modify, and distribute this software for any
+purpose with or without fee is hereby granted, provided that the above
+copyright notice and this permission notice appear in all copies.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.

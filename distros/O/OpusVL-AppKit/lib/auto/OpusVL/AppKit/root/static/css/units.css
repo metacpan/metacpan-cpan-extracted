@@ -1,0 +1,71 @@
+/* This file is for united (unit-ed) values.
+ * <span class="unit unit-currency">50</span>
+ * This allows us to selectively override the display of units for localisation
+ * purposes, and to accurately access values within the DOM without having to
+ * deparse the value-with-unit in the JS or other clients.
+ */
+
+/* Prevent an element's text-transform making the units wrong */
+.unit:after, .unit:before {
+    text-transform: none;
+}
+
+.unit.unit-cc:after,
+.unit.unit-engine-size:after {
+    content: 'cc';
+}
+
+.unit.unit-gram:after {
+    content: 'g';
+}
+
+.unit.unit-kilogram:after {
+    content: 'kg';
+}
+
+.unit.unit-mile:after {
+    content: 'm';
+}
+
+.unit.unit-miles-per-hour:after,
+.unit.unit-mph:after {
+    content: 'mph';
+}
+
+.unit.unit-kilometer-per-hour:after,
+.unit.unit-kph:after {
+    content: 'kph';
+}
+
+.unit.unit-metre:after,
+.unit.unit-meter:after {
+    content: 'm';
+}
+
+.unit.unit-cm:after,
+.unit.unit-centimetre:after,
+.unit.unit-centimeter:after {
+    content: 'cm';
+}
+
+.unit.unit-mm:after,
+.unit.unit-millimetre:after,
+.unit.unit-millimeter:after {
+    content: 'mm';
+}
+
+.unit.unit-grams-per-km:after,
+.unit.unit-co2:after {
+    content: 'g/km'
+}
+
+/* All our appkit sites are currently en-GB. The currency unit allows us to
+ * splice in new CSS for different locales. This will be easier with SASS. */
+.unit.unit-pound-sterling:before,
+.unit.unit-currency:before {
+    content: '£';
+}
+
+.unit.unit-euro:before {
+    content: '€';
+}

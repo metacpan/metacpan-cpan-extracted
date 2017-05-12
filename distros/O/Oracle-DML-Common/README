@@ -1,0 +1,129 @@
+NAME
+    Oracle::DML::Common - Common routines for Oracle DML
+
+SYNOPSIS
+      use Oracle::DML::Common;
+
+      my %cfg = ('conn_string'=>'usr/pwd@db', 'table_name'=>'my_ora_tab');
+      my $ot = Oracle::DML::Common->new;
+      # or combine the two together
+      my $ot = Oracle::DML::Common->new(%cfg);
+      my $sql= $ot->prepare(%cfg); 
+      $ot->execute();    # actually create the audit table and trigger
+
+DESCRIPTION
+    This class contains methods to create audit tables and triggers for
+    Oracle tables.
+
+   new ()
+
+    Input variables:
+
+      %ha  - any hash array containing initial parameters
+
+    Variables used or routines called:
+
+      None
+
+    How to use:
+
+       my $obj = new Oracle::DML::Common;      # or
+       my $obj = Oracle::DML::Common->new;  
+
+    Return: new empty or initialized Oracle::DML::Common object.
+
+    This method constructs a Perl object and capture any parameters if
+    specified.
+
+METHODS
+    The following are the common methods, routines, and functions used by
+    other classes.
+
+  Connection Methods
+
+    The *:db_conn* tag includes sub-rountines for creating and managing
+    database connections.
+
+      use Oracle::DML::Common qw(:db_conn);
+
+    It includes the following sub-routines:
+
+   get_dbh($con, $dtp)
+
+    Input variables:
+
+      $con - Connection string for
+             Oralce: usr/pwd@db (default)
+                CSV: /path/to/file
+           ODBC|SQL: usr/pwd@DSN[:approle/rolepwd]
+      $dtp - Database type: Oracle, CSV, etc
+
+    Variables used or routines called:
+
+      DBI
+      DBD::Oracle
+      Win32::ODBC
+
+    How to use:
+
+      $self->get_dbh('usr/pwd@dblk', 'Oracle');
+      $self->get_dbh('usr/pwd@dblk:approle/rpwd', 'SQL');
+
+    Return: database handler
+
+    If application role is provided, it will activate the application role
+    as well.
+
+   is_object_exist($dbh,$tn,$tp)
+
+    Input variables:
+
+      $dbh - database handler, required.
+      $tn  - table/object name, required.
+             schema.table_name is allowed.
+
+    Variables used or routines called:
+
+      echoMSG    - display messages.
+
+    How to use:
+
+      # whether table 'emp' exist
+      $yesno = $self->is_object_exist($dbh,'emp');
+
+    Return: 0 - the object does not exist; 1 - the object exist;
+
+  Table Methods
+
+    The *:table* tag includes sub-rountines for creating, checking and
+    manipulating tables.
+
+      use Oracle::DML::Common qw(:table);
+
+    It includes the following sub-routines:
+
+HISTORY
+    * Version 0.1
+        This versionwas contained in Oracle::Trigger class.
+
+    * Version 0.2
+        04/29/2005 (htu) - extracted common routines from Oracle::Trigger
+        class and formed Oracle::DML::Common.
+
+    * Version 0.21
+        Remove get_table_definition method to *Oracle::Schema* class.
+
+SEE ALSO (some of docs that I check often)
+        Data::Describe, Oracle::Loader, CGI::Getopt, File::Xcopy,
+        Oracle::Trigger, perltoot(1), perlobj(1), perlbot(1), perlsub(1),
+        perldata(1), perlsub(1), perlmod(1), perlmodlib(1), perlref(1),
+        perlreftut(1).
+
+AUTHOR
+        Copyright (c) 2005 Hanming Tu. All rights reserved.
+
+        This package is free software and is provided "as is" without
+        express or implied warranty. It may be used, redistributed and/or
+        modified under the terms of the Perl Artistic License (see
+        http://www.perl.com/perl/misc/Artistic.html)
+

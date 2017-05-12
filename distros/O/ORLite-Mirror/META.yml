@@ -1,0 +1,46 @@
+---
+abstract: 'Extend ORLite to support remote SQLite databases'
+author:
+  - 'Adam Kennedy <adamk@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  IO::Compress::Bzip2: 2.008
+  IO::Compress::Gzip: 2.008
+  Test::More: 0.47
+  URI: 1.35
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: ORLite::Mirror
+name: ORLite-Mirror
+no_index:
+  directory:
+    - example
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  File::HomeDir: 0.69
+  File::Path: 2.04
+  File::Remove: 1.42
+  File::ShareDir: 1.00
+  File::Spec: 0.80
+  IO::Uncompress::Bunzip2: 2.008
+  IO::Uncompress::Gunzip: 2.008
+  LWP::Online: 1.07
+  LWP::UserAgent: 5.806
+  ORLite: 1.37
+  Params::Util: 0.33
+  perl: 5.6.0
+resources:
+  ChangeLog: http://fisheye2.atlassian.com/changelog/cpan/trunk/ORLite-Mirror
+  license: http://dev.perl.org/licenses/
+  repository: http://svn.ali.as/cpan/trunk/ORLite-Mirror
+version: 1.24

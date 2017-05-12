@@ -1,0 +1,52 @@
+NAME
+    ORDB::CPANMeta::Generator - Generator for the CPAN Meta database
+
+DESCRIPTION
+    This is the module that is used to generate the "CPAN Meta" database.
+
+    For more information, and to access this database as a consumer, see the
+    ORDB::CPANMeta module.
+
+    The bulk of the work done in this module is actually achieved with:
+
+    CPAN::Mini - Fetching the index and dist tarballs
+
+    CPAN::Mini::Visit - Expanding and processing the tarballs
+
+    Xtract - Preparing the SQLite database for distribution
+
+METHODS
+  new
+    The "new" constructor creates a new processor/generator.
+
+  dir
+    The "dir" method returns the directory that the SQLite database will be
+    written into.
+
+  dsn
+    The "dsn" method returns the DBI DSN that is used to connect to the
+    generated database.
+
+  run
+    The "run" method executes the process that will produce and fill the
+    final database.
+
+SUPPORT
+    Bugs should be reported via the CPAN bug tracker at
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=ORDB-CPANMeta-Generator>
+
+    For other issues, contact the author.
+
+AUTHOR
+    Adam Kennedy <adamk@cpan.org>
+
+COPYRIGHT
+    Copyright 2009 - 2012 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

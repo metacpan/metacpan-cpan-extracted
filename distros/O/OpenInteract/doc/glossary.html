@@ -1,0 +1,71 @@
+    <h1>OpenInteract Glossary</h1>
+
+    <dl>
+      <dt>action</dt>
+
+        <dd>An action is a configuration directive that maps a URL to
+        a handler. You setup actions within a package in the
+        <code>action.perl</code> file, and default actions are defined
+        in the <code>server.perl</code> file.</dd>
+
+      <dt>base installation</dt>
+
+      <dd>An OpenInteract base installation is where all versions of
+      all installed packages live. When you create a website or apply
+      a package, the original source for the package lives in the base
+      installation. One base installation can support many separate
+      websites, and you should only ever need to create the base
+      installation once.</dd>
+
+      <dt>handler</dt>
+
+        <dd>A handler is a piece of Perl code that ultimately returns
+        a fragment of HTML, or more generally, text. The handler
+        manages action security and manipulates objects (fetches,
+        creates, saves, removes) and hands the data to the template
+        for display.</dd>
+
+      <dt>package</dt>
+
+        <dd>Unit of distribution for a given functionality. This
+        includes all of the necessary configuration, templates, Perl
+        code, etc. You can install, upgrade and remove packages to or
+        from your website. You configure a package using the
+        <code>action.perl</code> and <code>spops.perl</code> files.</dd>
+
+      <dt>server</dt>
+
+        <dd>An Apache/mod_perl process that runs the code making up
+        one or more websites. You configure the server using
+        <code>httpd.conf</code> and <code>httpd_modperl.conf</code> files.</dd>
+
+      <dt>stash class</dt>
+
+        <dd>A stash class is Perl code that holds objects and other
+        information for a website from request to request. Every
+        website has its own stash class. (Not to be confused with Perl
+        package symbol tables.)</dd>
+
+      <dt>template</dt>
+
+        <dd>A template is a piece of text that contains template
+        processing directives interspersed with other text. Normally
+        in OpenInteract, this will be Template Toolkit processing
+        directives interspersed with HTML.</dd>
+
+      <dt>tool</dt>
+
+        <dd>Loosely speaking, a package implements a tool. This is not
+        exactly true, since a package can choose to implement more
+        than one tool. In general, you will find that there is a
+        one-to-one mapping between a package and a tool. A tool
+        consists of a set of templates that manipulate a common set of
+        objects.</dd>
+
+      <dt>website</dt>
+
+        <dd>An instantiation of the base OpenInteract framework plus a
+        set of user-defined packages. You configure the website using
+        the <code>server.perl</code> file.</dd>
+
+    </dl>

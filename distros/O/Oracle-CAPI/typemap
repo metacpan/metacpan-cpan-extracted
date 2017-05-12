@@ -1,0 +1,41 @@
+CAPICallback					T_PTROBJ
+CAPICapabilityID				T_IV
+CAPIFlag					T_UV
+CAPIHandle					T_PTR
+CAPIHandle *					T_PTROBJ
+CAPISession					T_PTR
+CAPISession *					T_PTROBJ
+CAPIStatus					T_UV
+CAPIStatus *					T_OPAQUEPTR
+CAPIStream					T_PTR
+CAPIStream *					T_PTROBJ
+CAPIUIDSet					T_PTROBJ
+CSDKCondition					T_OPAQUE_STRUCT
+CSDKCondition *					T_PTROBJ
+CSDKOperator					T_IV
+CSDKQuery					T_PTR
+CSDKQuery *					T_PTROBJ
+CSDKRequestResult				T_PTROBJ
+CSDKRequestResult *				T_PTROBJ
+char const * const **				T_PTROBJ
+char const **					T_PTROBJ
+const char *					T_PV
+const char **					T_PTROBJ
+#############################################################################
+INPUT
+T_OPAQUE_STRUCT
+	if (sv_derived_from($arg, \"${ntype}\")) {
+	    STRLEN len;
+	    char  *s = SvPV((SV*)SvRV($arg), len);
+
+	    if (len != sizeof($var))
+		croak(\"Size %d of packed data != expected %d\",
+			len, sizeof($var));
+	    $var = *($type *)s;
+	}
+	else
+	    croak(\"$var is not of type ${ntype}\")
+#############################################################################
+OUTPUT
+T_OPAQUE_STRUCT
+	sv_setref_pvn($arg, \"${ntype}\", (char *)&$var, sizeof($var));

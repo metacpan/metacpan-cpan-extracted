@@ -1,0 +1,17 @@
+Revision history for Object-ForkAware
+
+0.004     2016-10-21 03:35:49Z
+          - reduced prerequisites, updated tooling
+
+0.003     2014-09-07 22:16:29Z
+          - fixed implementation of ->isa and ->can when called as class
+            methods (RT#98096, Graham Knop)
+
+0.002     2014-08-16 21:32:20Z
+          - now building with [@Author::ETHER]
+          - minor documentation tweaks
+          - now also propagating ->VERSION calls to the underlying object
+
+0.001     2013-03-17 16:00:17Z
+          - Initial release.
+

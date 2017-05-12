@@ -1,0 +1,100 @@
+/* Procedure copyright(c) 1996 by Edward Barlow */
+
+:r database
+go
+:r dumpdb
+go
+
+if exists (select * 
+	   from   sysobjects 
+	   where  type = 'P'
+	   and    name = "sp__block")
+begin
+    drop procedure sp__block
+end
+go
+
+create procedure sp__block( @dont_format char(30)=NULL )
+as
+begin
+    declare @msg	varchar(255)
+
+    SET NOCOUNT ON
+
+select l.spid,
+		 p.suid,
+		 l.dbid,
+		 l.id,
+		 objname = convert(char(30),NULL),
+	    ltype = substring(v.name, 1, 15)
+into   #block
+from   master..syslocks l, 
+	   master..spt_values v, 
+	   master..sysprocesses p
+where  l.type = v.number
+and    l.type & 256 = 256		/* -blk locks have bit 256 set */
+and    v.type = "L"
+and    p.spid = l.spid
+
+/*
+if (charindex("sa_role", show_role()) > 0)
+begin
+	update   #block
+	set objname= substring(db_name(dbid)+"."+object_name(id,dbid), 1, 20)
+end
+else
+*/
+begin
+	/* master tempdb or current db */
+	update   #block
+	set objname= substring(db_name(dbid)+"."+object_name(id), 1, 20)
+	where dbid=db_id() or dbid=1 or dbid=2
+
+	update   #block
+	set objname= substring("master"+"."+name, 1, 20)
+	from   #block b, master..sysobjects o
+	where b.dbid=1 
+	and	o.id = b.id
+
+	update   #block
+	set 		objname=db_name(dbid)+"."+convert(char(30),id)
+	where 	objname is null
+end
+
+if @dont_format is null
+select 
+		/* HOLDS LOCK */
+	    "User" = substring(convert(varchar,b.spid)+"-"+suser_name(b.suid),
+			1, 15),
+	   "Locked Table" = convert(char(20),b.objname),
+	   "Lock Type" = b.ltype,
+
+		/* BLOCKED INFO */
+	    "blk pid-usr-cmd" = substring(convert(varchar,p.spid)+"-"+suser_name(p.suid)+"-"+p.cmd
+			,1, 15),
+		 "Time"=convert(char(5),0)
+from    master..sysprocesses p, #block b
+where   b.spid = p.blocked
+order by p.blocked
+else
+select 
+		/* HOLDS LOCK */
+	    "User" = convert(varchar,b.spid)+"-"+suser_name(b.suid),
+	   "Locked Table" = convert(char(30),b.objname),
+	   "Lock Type" = b.ltype,
+
+		/* BLOCKED INFO */
+	    "blk pid-usr-cmd" = convert(varchar,p.spid)+"-"+suser_name(p.suid)+"-"+p.cmd,
+		 "Time"=convert(char(10),0)
+from    master..sysprocesses p, #block b
+where   b.spid = p.blocked
+order by p.blocked
+
+drop table #block
+
+    return (0)
+end
+go
+
+grant execute on sp__block to public
+go

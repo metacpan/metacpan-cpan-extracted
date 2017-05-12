@@ -1,0 +1,36 @@
+0.12    2017-01-19
+        - XSprePUSH removed.
+	- stack_init() resets SP to first argument.
+0.11	2016-10-30
+	- Include enum and constant types in the spec.
+	- Remove SV_CONST_* constants.
+	- Change return type of sv_type() wrapper.
+0.10    2016-10-29
+        - License fixed everywhere to be BSD 2-clause.
+0.09    2016-08-15
+	- Allow to configure storage class for library functions.
+0.08	2016-05-09
+	- Packaging fix (exclude tools/ from the index).
+0.07	2016-05-02
+	- First non-TRIAL release, no changes from 0.06.
+0.06	2016-04-19
+	- Add many SV, HV related macros.
+	- Add accessors for interpreter global variables.
+	- Makefile.PL compatible with older MM.
+	- Packaging fixes.
+0.05	2016-04-13
+	- Install library source along the perl package.
+	- Add SvFLAGS and SvUTF* macros.
+	- Add hash entry related macros.
+	- Fix build on on Windows.
+0.04    2016-04-09
+	- Add exception handling
+	- Test fixes
+0.03	2016-03-26
+	- Packaging fix
+0.02	2016-03-26
+	- Set min perl version to 5.18.0
+	- Doc fixes
+	- More tests
+0.01	2016-03-24
+	- Initial release

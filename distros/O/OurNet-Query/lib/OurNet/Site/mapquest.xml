@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<SITE ID="Mapquest">
+
+<NAME Lang="en-us">MapQuest</NAME>
+<INFO Lang="en-us">finding a place map in United States</INFO>
+
+<URL Type="More"><![CDATA[
+http://www.mapquest.com_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+post://www.mapquest.com/cgi-bin/ia_find?screen=ia-map-form&link=ia-map-result&uid=ua02awea0401sdhg&random=637&event=find_search&code_mode=code_classic&address=&city=_QUERY_&state=&zip=&country=United+States
+]]></URL>
+
+
+<VAR Name="_NEXT_"><![CDATA[
+<A HREF="_NEXT_"><img src="http://mqgraphics.mapquest.com/gif/next.gif
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<A href="_URL_"___<FONT face="Arial" size=1>_TITLE_</A>
+]]></TEMPLATE>
+</SITE>

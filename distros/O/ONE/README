@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution ONE,
+version v0.2.0:
+
+  A Node.js style AnyEvent class, using MooseX::Event
+
+This software is copyright (c) 2011 by Rebecca Turner.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

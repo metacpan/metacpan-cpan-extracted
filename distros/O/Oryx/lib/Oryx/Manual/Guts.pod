@@ -1,0 +1,420 @@
+=head1 NAME
+
+Oryx::Manual::Guts - Oryx internals documentation for developers
+
+=head1 DESCRIPTION
+
+This document is intended for hackers to grant an insight into how Oryx's pieces fit together and is intended for anyone
+wishing to extend Oryx... or for anybody who just wants to know how the sausage is made.
+
+=head1 NOMENCLATURE
+
+Oryx implements an object oriented meta-model, that is, information about persistent classes is carried around, usually as instances
+of meta classes, by the persistent classes themselves, instances of which are your persistent objects.
+
+This makes it difficult to describe a meta-model which has components, or meta-components, which 
+themselves are really just ordinary Perl objects.
+
+Thus we could end up talking about instances of the L<Oryx::Value::String> class being
+associated with an instance of the L<Oryx::Attribute> class when mentioning how they relate to our persistant objects - which are
+themselves L<Oryx::Class> derived instances. All of which can be tricky for the brain (well mine, at any rate) to keep a grip on.
+
+So to make this slightly more coherent, we'll stick to the following nomenclature throughout this document:
+
+=over
+
+=item class
+
+When we say "class" we mean a subclass of C<Oryx::Class> which you can instantiate into "objects" which are persistable in some
+storage backend - usually a database of sorts.
+ 
+=item object
+
+When we refer to "objects" we mean our persistent objects - that is, instances of subclasses of L<Oryx::Class> which we're interested
+in storing in our database.
+
+=item meta-type
+
+We'll use "meta-type" when talking about meta classes of which L<Oryx::Attribute> and L<Oryx::Association> are two examples
+(not to be confused with I<instances> of these described under L<meta-instances> below).
+
+=item meta-instance
+
+These are actually objects themselves (but not of the kind described above under "object") and are considered meta data of the
+"class" in that they hold descriptive information about the "classes". Examples are instances of L<Oryx::Attribute> and 
+L<Oryx::Association>.
+
+=item meta-attribute
+
+When we say: "meta-attribute", what we mean varies. To explain: two methods are available for accessing these and are inherited
+by all meta-types from L<Oryx::MetaClass>. The methods are C<getMetaAttribute> and C<setMetaAttribute>. Exactly what these access depends
+on the context, that is to say, the term "meta" here is relative to the meta-type on which the method is called. So if we say:
+
+    CMS::Page->attributes->{number}->getMetaAttribute('type');
+
+We will get a string representing the type of the value which may be stored in this field of the object, most likely an 'Integer'
+in this case. On the other hand, if we say:
+
+    CMS::Page->association->{paragraphs}->getMetaAttribute('class');
+
+We will get the name of the target class of the 'paragraphs' association, probably C<CMS::Paragraph> in this case, which is a class name -
+in fact a subclass of L<Oryx::Class> - which is not an Oryx meta-type, but in this context, it is meta-data which this association needs
+in order to perform its duty.
+
+=back
+
+=head1 ABSTRACT METAMODEL
+
+Oryx implements an abstract metamodel which can be specialised to work with any storage backend. At the moment relational databases
+and a fast, pure Perl file-based database are supported, but the abstraction of the metamodel should allow one to add support for any
+other storage backend without changing how persistent classes are defined.
+
+This abstract metamodel consist of four base meta-types namely: L<Oryx::Attribute>, L<Oryx::Association>, L<Oryx::Parent> and
+L<Oryx::Class>. L<Oryx::Class> can be regarded as a special case meta-type in that it is the level at which our meta-model joins Perl's
+own built-in object model.
+
+When a persistent class inherits from L<Oryx::Class>, it doesn't have the implementation to be persisted in any given storage back-end,
+that is, the methods for creating, retrieving, updating, etc. are just stubs and will raise an exception if invoked. During a call
+to C<< Oryx->connect(...) >>, however, Oryx looks at the connection arguments and determines which concrete meta-types will
+be used thereafter. This is done by simply pushing either L<Class::DBI::Class> or L<Class::DBM::Class> onto C<@Oryx::Class::ISA>,
+thereby effectively doing dynamic, run-time inheritance. So for example, if we say:
+
+    use Oryx;
+    use CMS::Page;
+     
+    UNIVERSAL::isa(CMS::Page, 'Oryx::Class')            # true
+    UNIVERSAL::isa(CMS::Page, 'Oryx::DBI::Class')       # false
+     
+    Oryx->connect('dbi:Pg:dbnam=foo', $user, $pass);
+    
+    UNIVERSAL::isa(CMS::Page, 'Oryx::DBI::Class')       # true
+
+whereas if we:
+
+    Oryx->connect('dbm:Deep:datapath=/path/to/data');
+    
+    UNIVERSAL::isa(CMS::Page, 'Oryx::DBM::Class')       # true
+
+From this point onwards, the correct concrete meta-types are used and constructed from the class metadata defined in the class' C<$schema>.
+This happens in the class's C<import> hook, but is usually deferred to happen at run-time (instead of compile-time); so in the first
+case above this would be L<Oryx::DBI::Association>, L<Oryx::DBI::Attribute> and L<Oryx::DBI::Parent>.
+The actual C<connect()> call is then delegated to the appropriate storage class: L<Oryx::DBI> or L<Oryx::DBM>, as the case may be.
+These storage classes handle low level connection, pinging the DB and caching database handles (indirectly via L<Ima::DBI>) where applicable.
+
+Each L<Oryx::Class> derivative (or subclass) has any number of instances of the concrete meta-types associated with it.
+At the L<Oryx::Class> level, this is done with inheritable class data using L<Class::Data::Inheritable> (of all things!)
+for creating accessors (or "named closures"), typically by inspecting the C<$schema> class variable, or, in the case of
+L<Oryx::Parent> meta-instances, by inspecting the class' C<@ISA> array.
+
+From our class, we can access the meta-instances as folows:
+
+    @attribs = values %{CMS::Page->attributes};            # all the attributes
+    $assoc  = CMS::Page->associations->{paragraphs};       # single association
+
+L<Oryx::Parent> meta-instances are stored in an array ref, so this access looks a little different:
+
+    @parents = @{CMS::Page->parents};      # all parents
+
+Alternatively you can get all the meta-instances as an array using the convenient C<members> method:
+
+    @members = CMS::Page->members;
+
+This will then contain a list of I<all> the meta-instances describing our C<CMS::Page> class.
+
+B<NOTE:> The meta-instances are constructed using C<import>, so they'll be there after you C<use> the class, but not
+if you just C<require> it.
+
+=head2 meta-types
+
+=over
+
+=item Attributes
+
+Attributes create individual fields of data with each row (columns). Attributes have a field name and a type.
+
+=item Associations
+
+Associations create relationships between Oryx objects. These relationship are mapped using Perl references, arrays, or hashes.
+
+=item Parents
+
+Oryx classes may subclass other Oryx classes, inheriting all fields the parents provide.
+
+=back
+
+These all inherit from a common base meta-type: L<Oryx::MetaClass> and they all implement a common interface described
+therein.
+
+=head1 COMMON INTERFACE
+
+The overall interface of each Oryx object defines six main methods. At the top level, each of these methods may perform some action as well
+as delegating additional actions out to each member class (see L</"meta-types">). Thus, the implementation of each of each of these methods
+in the Oryx class looks something like:
+
+  sub create {
+      # take some action to create the record
+      $_->create(...) foreach $class->members;
+      # finish up, store the data, return
+  }
+
+=over
+
+=item create
+
+This method is called to create a new record in storage.
+
+=item retrieve
+
+This method is called to fetch an object from storage by the object's identifier.
+
+=item update
+
+After making changes to the object, this method records those changes to storage.
+
+=item delete
+
+This method deletes the object. The object is invalid after this method is called and should not be referred to anymore.
+
+=item search
+
+This method is responsible for searching by field and returning an array of matching objects.
+
+=item construct
+
+When searching and retrieving, both instantiate each instance returned using this method.
+
+=back
+
+Each delegated class has a chance to modify the object as necessary during each of these calls.
+
+=head1 CLASSES
+
+Oryx has a few special unique parts that are used to define the rest. The most visible of these parts are the L<Oryx> and L<Oryx::Class> objects.
+
+Each of the following headings describe each group of classes used by Oryx.
+
+=head2 FRONT-END CLASSES
+
+There are two classes that any Oryx user must be familiar with. The rest of the classes in the system work through the meta-model of Oryx and are not necessarily exposed directly to the user. 
+
+In order to establish a connection to storage, the user uses methods of the L<Oryx> class. Then, to define a class, the user typically extends L<Oryx::Class> to automatically configure the class from a meta-model representation.
+
+The third front-end class is L<Oryx::Schema>, which can be subclassed by the user to change groups of classes in the same storage schema.
+
+=over
+
+=item L<Oryx>
+
+This class is responsible for initializing the general state of Oryx. It provides the C<connect()> method which initializes the connection to storage, provides a method for deploying a whole schema, C<deploySchema()>.
+
+=item L<Oryx::Class>
+
+By subclassing this class, an object allows metadata declared in the C<$schema> package variable or XML in the C<__DATA__> section to be parsed and used to build class methods and schema information. Each persistent Oryx object should subclass this class.
+
+=item L<Oryx::Schema>
+
+Provides a basic template for Oryx schemas. The schema used for an object is picked when a connection is made to storage. This schema is used by default. This schema class may be subclassed to change the table prefix for objects in the schema or make other modifications to the schema as a whole.
+
+=back
+
+=head2 META-MODEL IMPLEMENTATION CLASSES
+
+These objects are used under the hood to perform the basic row-level operations for a persistent Oryx class. All Oryx classes ultimately inherit functionality from L<Oryx::MetaClass>. All will inherit functionality from either L<Oryx::DBM::Class> or L<Oryx::DBI::Class> depending on the storage type. 
+
+=over
+
+=item L<Oryx::MetaClass>
+
+This class provides access to an object's metadata.
+
+=item L<Oryx::DBI::Class>
+
+This provides the basic functionality required to store an object into a DBI connected database.
+
+=item L<Oryx::DBM::Class>
+
+This provides the basic functionality required to store an object into a DBM connected database.
+
+=back
+
+=head2 META-MODEL MEMBER CLASSES
+
+The member classes in the meta-model create additional functionality within a database row. These classes are associated with an object as configured by the schema of the class.
+
+=over
+
+=item L<Oryx::Association>
+
+This is the base class for associations. Associations connect one Oryx object instance to another or to a group of others. Exactly how the association functions depends on the association type.
+
+=item L<Oryx::Association::Array>
+
+This is an association class that is used for "Array" associations. This creates a one-to-many mapping. The mapping is performed using a Perl array.
+
+=item L<Oryx::Association::Hash>
+
+This is an association class that is used for "Hash" associations. This creates a named one-to-many mapping. The mapping is performed using a Perl hash.
+
+=item L<Oryx::Association::Reference>
+
+This is an association class that is used for "Reference" associations. This creates a one-to-one mapping. The mapping is performed using a simple Perl reference.
+
+=item L<Oryx::Attribute>
+
+Attributes are added to Oryx objects to include primitive data associated with the object. Each attribute has a type associated with it, which are managed via L<Oryx::Value> classes (see L</"ATTRIBUTE VALUE CLASSES">).
+
+=item L<Oryx::Parent>
+
+One of the main goals of Oryx is to map Perl objects into persistent data storage in a way that fits natrually into Perl's object-model. One of the important features of this object-model is the ability to subclass. The L<Oryx::Parent> delivers the functionality required to make this work seamlessly.
+
+=back
+
+=head2 STORAGE CLASSES
+
+Currently, Oryx supports to types of backing stores via L<DBI> or L<DBM::Deep>. These classes are responsible for making the connections to those objects when the C<connect()> method of L<Oryx> is called. These are also responsible for making the work of deploying objects and schemas happen.
+
+=over
+
+=item L<Oryx::DBI>
+
+This manages connectivity and deployment to a L<DBI> connection.
+
+=item L<Oryx::DBM>
+
+This manages connectivity and deployment to a L<DBM::Deep> connection.
+
+=back
+
+=head2 STORAGE UTILITY CLASSES
+
+These are helpers used by L<Oryx::DBI> and L<Oryx::DBM> to do much of the grunt work over the storage connection.
+
+=over
+
+=item L<Oryx::DBI::Util>
+
+This documents the interface that is actually implemented by drivers. Drivers must implement methods for testing for checking for and manipulating table columns, checking for and manipulating table definitions, manipulating sequences, manipulating indexes, discerning types, and enumerating rows.
+
+=item L<Oryx::DBI::Util::mysql>
+
+This is the driver for L<DBD::mysql> connections.
+
+=item L<Oryx::DBI::Util::Pg>
+
+This is the driver for L<DBD::Pg> connections.
+
+=item L<Oryx::DBI::Util::SQLite>
+
+This is the driver for L<DBD::SQLite> connections.
+
+=item L<Oryx::DBM::Util>
+
+This is the analog for L<Oryx::DBI::Util> that works with L<Oryx::DBM>. Provides functionality for checking for and manipulating tables and sequences.
+
+=back
+
+=head2 DBI STORAGE META-MODEL IMPLEMENTATION CLASSES
+
+These classes all implement the specifics of the L</"META-MODEL MEMBER CLASSES">. These simply implement the functionality for the L<Oryx::DBI> storage object.
+
+=over
+
+=item L<Oryx::DBI::Association>
+
+=item L<Oryx::DBI::Association::Array>
+
+=item L<Oryx::DBI::Association::Hash>
+
+=item L<Oryx::DBI::Association::Reference>
+
+=item L<Oryx::DBI::Attribute>
+
+=item L<Oryx::DBI::Parent>
+
+=back
+
+=head2 DBM STORAGE META-MODEL IMPLEMENTATION CLASSES
+
+These classes all implement the specifics of the L</"META-MODEL MEMBER CLASSES">. These simply implement the functionality for the L<Oryx::DBM> storage object.
+
+=over
+
+=item L<Oryx::DBM::Association>
+
+=item L<Oryx::DBM::Association::Array>
+
+=item L<Oryx::DBM::Association::Hash>
+
+=item L<Oryx::DBM::Association::Reference>
+
+=item L<Oryx::DBM::Attribute>
+
+=item L<Oryx::DBM::Class>
+
+=item L<Oryx::DBM::Parent>
+
+=back
+
+=head2 ATTRIBUTE VALUE CLASSES
+
+These are used by L<Oryx::Attribute> and L<Oryx::Association> members to choose how to validate, load, and store information in each for each column. Each of these is a scalar tie object.
+
+Each of these defined C<TIESCALAR()>, C<FETCH()>, and C<STORE()>. See L<perltie> for more details.
+
+=over
+
+=item L<Oryx::Value>
+
+This provides a default implementation and the general interface for all the others.
+
+=item L<Oryx::Value::Binary>
+
+This provides an implementation for BLOB-style binary data.
+
+=item L<Oryx::Value::Boolean>
+
+This provides an implementation for a binary value of either 0 or 1.
+
+=item L<Oryx::Value::Complex>
+
+This provides an implementation of L<YAML> encoded references.
+
+=item L<Oryx::Value::DateTime>
+
+This provides an implementation of date/time data.
+
+=item L<Oryx::Value::Float>
+
+This provides an implementation of floating point data.
+
+=item L<Oryx::Value::Integer>
+
+This provides an implementation of integer data.
+
+=item L<Oryx::Value::Oid>
+
+This provides an implementation for object identifiers, which are used as primary keys for objects.
+
+=item L<Oryx::Value::String>
+
+This provides an implementation for string data---generally shorter than 256 characters.
+
+=item L<Oryx::Value::Text>
+
+This provides an implementation for long text data.
+
+=back
+
+=head1 ACKNOLWEDGEMENTS
+
+This documentation contributed by Andrew Sterling Hanenkamp E<lt>hanenkamp@cpan.orgE<gt>
+
+=head1 AUTHOR
+
+Copyright (c) 2005 Richard Hundt E<lt>richard NO SPAM AT protea-systems.comE<gt>
+
+=head1 LICENSE
+
+Oryx may be used under the same terms as Perl itself.
+
+=cut

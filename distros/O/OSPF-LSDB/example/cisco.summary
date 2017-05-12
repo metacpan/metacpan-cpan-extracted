@@ -1,0 +1,52 @@
+
+
+            OSPF Router with ID (10.188.1.15) (Process ID 1)
+
+		Summary Net Link States (Area 0.0.0.0)
+
+  LS age: 1508
+  Options: (No TOS-capability, DC, Upward)
+  LS Type: Summary Links(Network)
+  Link State ID: 10.188.1.0 (summary Network Number)
+  Advertising Router: 10.188.1.15
+  LS Seq Number: 80000025
+  Checksum: 0x4336
+  Length: 28
+  Network Mask: /24
+	TOS: 0 	Metric: 1 
+
+  LS age: 144
+  Options: (No TOS-capability, DC, Upward)
+  LS Type: Summary Links(Network)
+  Link State ID: 10.188.49.50 (summary Network Number)
+  Advertising Router: 10.188.1.15
+  LS Seq Number: 80000001
+  Checksum: 0x4CDA
+  Length: 28
+  Network Mask: /32
+	TOS: 0 	Metric: 21 
+
+  LS age: 1508
+  Options: (No TOS-capability, DC, Upward)
+  LS Type: Summary Links(Network)
+  Link State ID: 10.188.50.0 (summary Network Number)
+  Advertising Router: 10.188.1.15
+  LS Seq Number: 80000025
+  Checksum: 0x8AB3
+  Length: 28
+  Network Mask: /24
+	TOS: 0 	Metric: 11 
+
+
+		Summary Net Link States (Area 10.188.0.0)
+
+  LS age: 1508
+  Options: (No TOS-capability, DC, Upward)
+  LS Type: Summary Links(Network)
+  Link State ID: 10.253.4.0 (summary Network Number)
+  Advertising Router: 10.188.1.15
+  LS Seq Number: 80000025
+  Checksum: 0x434
+  Length: 28
+  Network Mask: /22
+	TOS: 0 	Metric: 1 

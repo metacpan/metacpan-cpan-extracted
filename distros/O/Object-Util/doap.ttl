@@ -1,0 +1,144 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/Object-Util/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:develop-suggestion [ doap-deps:on "Dist::Inkt 0.001"^^doap-deps:CpanId ];
+	doap-deps:runtime-requirement [ doap-deps:on "Scalar::Util 1.23"^^doap-deps:CpanId ], [ doap-deps:on "Module::Runtime"^^doap-deps:CpanId ], [ doap-deps:on "Role::Tiny"^^doap-deps:CpanId ], [ doap-deps:on "MooX::Traits::Util"^^doap-deps:CpanId ], [ doap-deps:on "perl 5.006000"^^doap-deps:CpanId ], [ doap-deps:on "List::Util 1.29"^^doap-deps:CpanId ];
+	doap-deps:test-recommendation [ doap-deps:on "Moose 2.0000"^^doap-deps:CpanId ], [ doap-deps:on "Moo 1.000000"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ], [ doap-deps:on "Test::Requires"^^doap-deps:CpanId ], [ doap-deps:on "Test::Fatal"^^doap-deps:CpanId ], [ doap-deps:on "Test::Warnings"^^doap-deps:CpanId ], [
+		doap-deps:on "Test::Without::Module"^^doap-deps:CpanId;
+	];
+	doap-deps:test-suggestion [ doap-deps:on "Mouse 1.00"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=Object-Util>;
+	doap:created         "2014-09-08"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/Object-Util>;
+	doap:homepage        <https://metacpan.org/release/Object-Util>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "Object-Util";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Object-Util/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Object-Util/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Object-Util/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Object-Util/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Object-Util/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Object-Util/v_0-006>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-object-util>;
+	];
+	doap:shortdesc       "a selection of utility methods that can be called on blessed objects".
+
+<http://purl.org/NET/cpan-uri/dist/Object-Util/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Initial release";
+	dc:identifier        "Object-Util-0.001"^^xsd:string;
+	dc:issued            "2014-09-09"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Object-Util-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Object-Util/v_0-002>
+	a                    doap:Version;
+	dc:identifier        "Object-Util-0.002"^^xsd:string;
+	dc:issued            "2014-09-09"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Tests;
+			rdfs:label "Fix Mouse-related failures.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Add $_extends method.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Object-Util-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Object-Util/v_0-003>
+	a                    doap:Version;
+	dc:identifier        "Object-Util-0.003"^^xsd:string;
+	dc:issued            "2014-09-16"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "If an object provides its own dump method, then $_dump should defer to that.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Allow $_with_traits to (mostly) work with factory coderefs.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Object-Util-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Object-Util/v_0-004>
+	a                    doap:Version;
+	dc:identifier        "Object-Util-0.004"^^xsd:string;
+	dc:issued            "2014-09-16"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Support $object->$_can($method) where $method is a coderef.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Document that most places $method is used in the documentation accept either a method name or a coderef.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Fix referenes to $object->$_does($class) (and $_DOES too) where $class should have been $role.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Object-Util-0.004.tar.gz>;
+	doap:revision        "0.004"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Object-Util/v_0-005>
+	a                    doap:Version;
+	dc:identifier        "Object-Util-0.005"^^xsd:string;
+	dc:issued            "2014-09-16"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Restructure and further clarify documentation of methods.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Clean up some old `use` statements that were no longer needed.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Delay loading Module::Runtime until it's actually needed.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Make it possible to avoid the B::Hooks::Parser/Internals::SvREADONLY magic.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Object-Util-0.005.tar.gz>;
+	doap:revision        "0.005"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Object-Util/v_0-006>
+	a                    doap:Version;
+	dc:identifier        "Object-Util-0.006"^^xsd:string;
+	dc:issued            "2014-09-16"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Clarify and correct documentation for $_extend.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Object-Util-0.006.tar.gz>;
+	doap:revision        "0.006"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:nick            "TOBYINK";
+	foaf:page            <https://metacpan.org/author/TOBYINK>.
+

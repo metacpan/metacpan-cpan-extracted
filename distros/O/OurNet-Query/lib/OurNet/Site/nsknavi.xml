@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<SITE ID="NSKNavi">
+
+<NAME Lang="en-us">NSK Navi</NAME>
+<INFO Lang="en-us">general information web search</INFO>
+
+<URL Type="Start"><![CDATA[
+post://search.nsknet.or.jp/cgi-bin/NaviEng?KEYWORD=_QUERY_
+]]></URL>
+
+<CHARSET>ja-jp.euc</CHARSET>
+<SCORE>100-(_RANK_-1)/8</SCORE>
+
+
+<TEMPLATE><![CDATA[
+<DD><A HREF="_URL_"___">_TITLE_</A>_PREVIEW_</DL>
+]]></TEMPLATE>
+</SITE>

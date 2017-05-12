@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<SITE ID="Goo">
+
+<NAME Lang="en-us">goo WWW Search</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+goo全球WWW搜尋(日本)
+]]></NAME>
+<INFO Lang="en-us">general information web search in Japan</INFO>
+<INFO Lang="zh-tw">general information web search in Japan</INFO>
+
+<URL Type="Start"><![CDATA[
+http://www.goo.ne.jp/default.asp?MT=_QUERY_&SM=MC&WTS=ntt&DE=2&DC=100&_v=2
+]]></URL>
+
+<CHARSET>ja-jp.euc</CHARSET>
+
+
+<TEMPLATE><![CDATA[
+<a href="_">_TITLE___<FONT size=-1>_SCORE_%</FONT>___<font color="#888888" size=-1>_URL_</font>___<font color="#888888" size=-1>_SIZE_ bytes&#44; _DATE_</font>___<font size=-1>_PREVIEW_</font>
+]]></TEMPLATE>
+</SITE>

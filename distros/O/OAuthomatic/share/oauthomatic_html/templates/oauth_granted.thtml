@@ -1,0 +1,49 @@
+[%# -*- mode: web; coding: utf-8 -*-
+  #################################################################
+    Page shown after receiving proper redirect with tokens
+    Parameters: 
+       all described in layout.thtml
+       verifier 
+       token
+  ################################################################# -%]
+[% WRAPPER layout.thtml
+       title="Access properly granted" %]
+
+<p>
+    [% app_name %] properly obtained access to [% site_name %].
+</p>
+
+<p>
+    Received verifier (note, this value is somewhat confidential so
+    don't click if your monitor can be watched by other people):
+</p>
+
+<div class="secret_wrapper">
+<div class="show_secret">
+    <span>Click to show.</span>
+</div>
+<div class="secret" style="display: none">
+    <p><b>Token:</b> [% token %]</p>
+    <p><b>Verifier:</b> [% verifier %]</p>
+</div>
+</div>
+
+<p>
+    Close this browser window, it is no longer needed, your application is already continuing
+    it's work.
+</p>
+
+<script>
+ $(document).ready(function() {
+   $(".show_secret").click(function(evt) {
+     $(".secret").show();
+     $(".show_secret").hide();
+   });
+   $(".secret").click(function(evt) {
+     $(".show_secret").show();
+     $(".secret").hide();
+   });
+ });
+</script>
+
+[% END %]

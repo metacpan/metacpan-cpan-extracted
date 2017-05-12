@@ -1,0 +1,43 @@
+---
+abstract: 'An Otogiri plugin that keep compatibility for insert method'
+author:
+  - 'ytnobody <ytnobody@gmail.com>'
+build_requires:
+  DBD::SQLite: 0
+  Test::More: 0.98
+  Test::Time: 0
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v1.0.0, CPAN::Meta::Converter version 2.132140'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Otogiri-Plugin-InsertAndFetch
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Otogiri::Plugin::InsertAndFetch:
+    file: lib/Otogiri/Plugin/InsertAndFetch.pm
+    version: 0.01
+requires:
+  Otogiri: 0.11
+  Otogiri::Plugin: 0
+  perl: 5.008005
+resources:
+  bugtracker: https://github.com/ytnobody/Otogiri-Plugin-InsertAndFetch/issues
+  homepage: https://github.com/ytnobody/Otogiri-Plugin-InsertAndFetch
+  repository: git://github.com/ytnobody/Otogiri-Plugin-InsertAndFetch.git
+version: 0.01
+x_authority: cpan:YTURTLE

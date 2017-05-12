@@ -1,0 +1,31 @@
+---
+abstract: 'An ORLite-based ORM Database API'
+author:
+  - 'Adam Kennedy.'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  LWP::Online: 1.07
+  Test::More: 0.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: ORDB::AU::Census2006
+name: ORDB-AU-Census2006
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  ORLite::Mirror: 1.12
+  Params::Util: 0.38
+  perl: 5.8.5
+resources:
+  ChangeLog: http://fisheye2.atlassian.com/changelog/cpan/trunk/ORDB-AU-Census2006
+  license: http://dev.perl.org/licenses/
+  repository: http://svn.ali.as/cpan/trunk/ORDB-AU-Census2006
+version: 0.01

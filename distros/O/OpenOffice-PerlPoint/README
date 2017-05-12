@@ -1,0 +1,96 @@
+
+
+INTRO
+
+This distribution provides a module OpenOffice::PerlPoint to transform
+OpenOffice documents (and OASIS OpenDocument documents in general)
+into the PerlPoint format, and a script oo2pp that makes
+such conversion simple.
+
+Note: THIS IS ALPHA STATE SOFTWARE.
+
+
+
+INSTALLATION
+
+To run this package successfully a beta version of OpenOffice::OODoc
+(2.001 or better) is required. Please refer to the OODoc mailing list
+for where to get it.
+
+
+As usual, unpack the distribution file and call
+
+ make test install distclean
+
+After that, you should be able to call oo2pp directly.
+
+ oo2pp
+
+Please use option -help to display a short usage message. 
+
+
+DOCUMENTATION
+
+Documentation is provided both with the module and the script
+- inline and in POD format.
+
+
+
+SUPPPORT
+
+A PerlPoint mailing list is set up to discuss usage, ideas,
+bugs, suggestions and translator development. To subscribe,
+please send an empty message to perlpoint-subscribe@perl.org.
+
+If you prefer, you can contact me via perl@jochen-stenzel.de
+as well.
+
+
+
+CREDITS
+
+Thanks to Jean-Marie Gouarné for OpenOffice::OODoc which allows
+to parse OpenOffice and OpenDocument documents with a single,
+well documented framework.
+
+
+AUTHOR
+
+Copyright (c) Jochen Stenzel (perl@jochen-stenzel.de), 2005.
+All rights reserved.
+
+This distribution is free software, you can redistribute it and/or modify it
+under the terms of the Artistic License distributed with Perl version
+5.003 or (at your option) any later version. Please refer to the
+Artistic License that came with your Perl distribution for more
+details.
+
+The Artistic License should have been included in your distribution of
+Perl. It resides in the file named "Artistic" at the top-level of the
+Perl source tree (where Perl was downloaded/unpacked - ask your
+system administrator if you dont know where this is).  Alternatively,
+the current version of the Artistic License distributed with Perl can
+be viewed on-line on the World-Wide Web (WWW) from the following URL:
+http://www.perl.com/perl/misc/Artistic.html.
+
+
+DISCLAIMER
+
+This software is distributed in the hope that it will be useful, but
+is provided "AS IS" WITHOUT WARRANTY OF ANY KIND, either expressed or
+implied, INCLUDING, without limitation, the implied warranties of
+MERCHANTABILITY and FITNESS FOR A PARTICULAR PURPOSE.
+
+The ENTIRE RISK as to the quality and performance of the software
+IS WITH YOU (the holder of the software).  Should the software prove
+defective, YOU ASSUME THE COST OF ALL NECESSARY SERVICING, REPAIR OR
+CORRECTION.
+
+IN NO EVENT WILL ANY COPYRIGHT HOLDER OR ANY OTHER PARTY WHO MAY CREATE,
+MODIFY, OR DISTRIBUTE THE SOFTWARE BE LIABLE OR RESPONSIBLE TO YOU OR TO
+ANY OTHER ENTITY FOR ANY KIND OF DAMAGES (no matter how awful - not even
+if they arise from known or unknown flaws in the software).
+
+Please refer to the Artistic License that came with your Perl
+distribution for more details.
+

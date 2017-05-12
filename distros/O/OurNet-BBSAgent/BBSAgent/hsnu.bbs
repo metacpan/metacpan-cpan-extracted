@@ -1,0 +1,64 @@
+# $File: //depot/OurNet-BBSAgent/BBSAgent/hsnu.bbs $ $Author: autrijus $
+# $Revision: #6 $ $Change: 2830 $ $DateTime: 2002/01/10 15:15:44 $
+# Contributed by Smartboy <kcwu@ck.tp.edu.tw>
+# zh_TW.Big5: 師大附中
+
+Affiliated Senior High School of Taiwan Normal University 
+hsnu.twbbs.org
+
+setv headansi 1;42;33m
+setv headansiend 44;37m
+
+load maple3.board
+
+=login
+wait 以[new]註冊：
+send $[username]\n
+doif $[password]
+    wait 密碼：
+    send $[password]\nn\n
+endo
+send \n\n\n\n
+
+=main
+send qqqqqqqq
+wait 主功能表
+till 傳訊/聊天
+
+=board_list_last
+call board $[board]
+send 1\n\x24\nq
+#wait m/\x0d>\x20+1\x20/
+wait 板主：
+wait \x0d>
+till /
+exit
+
+=board_article_fetch_first
+call board $[board]
+send $[article]\n\n
+wait \e[1;1H
+till m/\e\[1;42;33m P./
+wait (
+till )
+wait \e[0m
+exit
+
+=board_article_fetch_next
+send \x20
+till m/\e\[1;42;33m P./
+wait (
+till )
+wait \e[0m
+exit
+
+=article_post_raw
+call board $[board]
+send \x10$[title]\n0\n$[body]
+# clean header
+send \x13\x19\x19\x19\x19
+# clean tailer (x-origin)
+# send \x14\x19\x19\x19\x19 # deleted by fascist autrijus
+# save
+send \x17\n\x20
+exit

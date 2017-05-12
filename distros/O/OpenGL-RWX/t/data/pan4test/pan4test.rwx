@@ -1,0 +1,14 @@
+# Simple four meter panel..PAN4TEST.RWX
+modelbegin
+clumpbegin
+vertex -.2 .4 0 UV 0 0 #top left
+vertex .2 .4 0 UV 1 0  #top right
+vertex .2 0 0 UV 1 1   #bottom right
+vertex -.2 0 0 UV 0 1  #bottom left
+color .6 .6 .6         #red, green blue
+surface .5 .3 0        #ambient, diffuse, specular
+texturemodes lit foreshorten
+quad 1 2 3 4           #back side
+quad 4 3 2 1           #front side
+clumpend
+modelend

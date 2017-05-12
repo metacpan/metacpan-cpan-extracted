@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<SITE ID="ZDNet">
+
+<NAME Lang="en-us">ZDNet Software Library</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+ZDNet³nÅé¸ê®Æ·j´M
+]]></NAME>
+<INFO Lang="en-us">software information search</INFO>
+<INFO Lang="zh-tw">software information search</INFO>
+
+<URL Type="More"><![CDATA[
+post://www6.zdnet.com/cgi-bin/texis/swlib/hotfiles/search.html?Usrt=rel&Usrchtype=simple&Utext=_QUERY_&mainnext=_START_25_0_&search_max=_START_25_1_
+]]></URL>
+<URL Type="Start"><![CDATA[
+post://www6.zdnet.com/cgi-bin/texis/swlib/hotfiles/search.html?Usrt=rel&Usrchtype=simple&Utext=_QUERY_&mainnext=0&search_max=_START_25_1_
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+
+<TEMPLATE><![CDATA[
+<FONT SIZE=2><b><A HREF="_URL_">_TITLE_</A>_PREVIEW_</FONT>___<TD NOWRAP ALIGN=left>_DATE_</FONT>___<TD ALIGN=left><FONT SIZE=2>___<TD ALIGN=left><FONT SIZE=2>_SIZE_</FONT>___</TR>
+]]></TEMPLATE>
+</SITE>

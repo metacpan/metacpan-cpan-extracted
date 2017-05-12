@@ -1,0 +1,106 @@
+TODO list for Perl module Object::LocalVars
+
+#--------------------------------------------------------------------------#
+# Bugs to squash
+#--------------------------------------------------------------------------#
+
+#--------------------------------------------------------------------------#
+# Tests to write
+#--------------------------------------------------------------------------#
+
+#--------------------------------------------------------------------------#
+# Features for release soon
+#--------------------------------------------------------------------------#
+
+- add introspection method to retrieve list of properties for a class
+
+- EXPORT_OK a default BUILD that automatically populates from a hash_ref
+
+- have property definitions take default value as argument e.g: :Prop( 12 ) or
+  :Prop( [] ), etc.  *Don't* use package variable -- tempting, but vulnerable.
+
+#--------------------------------------------------------------------------#
+# Potential incremental improvements for future releases
+#--------------------------------------------------------------------------#
+
+- update benchmarks
+
+- synonyms for :Prop (:Property :P) and :Method (:Meth :M) etc (:Public,
+  :Private, :Protected)
+
+- @array and %hash with :Prop, etc. attributes
+
+- automethods
+
+- naming $self as something else
+
+- "super" like Spiffy does(?)
+
+- mixin/trait support(?)
+
+#--------------------------------------------------------------------------#
+# Ideas involving substantial API or structural change
+#--------------------------------------------------------------------------#
+
+- switch from package globals for storing data to closures containing anonymous
+  globrefs and coderefs (also need to move TRACKER to lexical closure in Object
+  LocalVars)
+
+- make attributes compatible with Attribute::Handlers -- should be OK as long
+  as they only take effect in the BEGIN phase
+
+- thread shared objects -- use Data::Uniqid or Data::UUID or equivalent to
+  generate ID and store in a registry table (See below for ideas)  (VERY LOW
+  PRIORITY)
+
+#--------------------------------------------------------------------------#
+# Style thoughts -- refine for POD?
+#--------------------------------------------------------------------------#
+
+Write about accessor style -- using name() and set_name().  If I ever
+want to use name(index) or name(key) for @array and %hash property accessors,
+then I need to not use name(val) to set scalars.  set_name should return the
+object, to allow chaining.  
+
+Mutators should be (to paraphrase Bill Clinton) "safe, legal and rare" so
+maybe this doesn't matter much in the end.
+
+#--------------------------------------------------------------------------#
+# Thoughts on thread safety and data sharing
+#--------------------------------------------------------------------------#
+
+Problem of using refaddr has been solved since 0.13 using CLONE.
+
+Sharing objects across threads seems much trickier.  First, the package globals
+holding data all need to be shared.  Next, access has to be coordinated --
+could be done with semaphors in the wrapper or locking the object tracker hash,
+but that blocks everything on that object until the method exits (might be the
+right thing to do.)  Accessors can lock the target before reading/writing the
+same way.  Still ugly if accessing an array or hash-ref -- the method will have
+to lock that, too, I think, or will have to get/store.  Alias of $self should
+still be OK, as that's just aliasing a subroutine argument within the same
+thread.
+
+Smart thing to do is have Object::LocalVars automatically install the right
+versions of locking/sharing subs or otherwise based on whether 
+%INC{"threads/shared.pm"} is defined.  Otherwise, need an
+Object::LocalVars::Shareable module that adds this functionality (at 
+massive speed cost, I'd expect.)
+
+Other potential snags:
+
+- New objects created in one thread will still have data available in other
+  threads due to shared data storage hashes, but won't be easily accessable.
+  Would need to have a way to have a thread pass or return an object UUID to
+  allow another thread to know what to manipulate. (This is probably fine.)
+
+- Object destruction also becomes an issue -- can't destroy data when the
+  reference count goes to zero because the object might exist in the other
+  thread.  Have to disable DESTROY and have users manually destroy UUIDs when
+  they are done with them, or have to keep object counts during CLONE, etc.  
+  Perhaps keep a count of clones in a shared data structure and DESTROY is a
+  no-op unless count is down to 1.  But what about new objects in a thread?  
+  Data will be duplicated, and ID could have been passed over to other thread,
+  so when does data get destroyed then?  Ugh.  If "new_from_id" is possible,
+  then that could increment the count, I suppose.
+

@@ -1,0 +1,10 @@
+[%########################################
+  label_form_select_row( label, name, list/iterator, value_field, label_field,
+                         picked, first_label, is_multiple, size, field_label )
+     Form row with a label and SELECT item.
+  ########################################-%]
+
+[%- DEFAULT colspan = 2; -%]  
+[%- INCLUDE label_row_begin( colspan = 1 ) -%]
+[%- INCLUDE data_cell_begin -%][% INCLUDE form_select -%]
+</td></tr>

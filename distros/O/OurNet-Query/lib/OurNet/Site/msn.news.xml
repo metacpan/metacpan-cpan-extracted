@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<SITE ID="Msn.News">
+
+<NAME Lang="en-us">MSNBC News search</NAME>
+<INFO Lang="en-us">daily news search</INFO>
+
+<URL Type="More"><![CDATA[
+_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://infoseek.go.com/Titles?qt=_QUERY_&sv=MN&col=M2
+]]></URL>
+
+<EXPRESSION>Standard</EXPRESSION>
+<CATEGORY>WWW,General</CATEGORY>
+
+<VAR Name="_NEXT_"><![CDATA[
+<a href="_NEXT_">next
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+asp">_TITLE_</a>___<br>_PREVIEW_<br>___<b>_SCORE_%</b>___&nbsp; _URL_ &nbsp;___(Size_SIZEK_K)
+]]></TEMPLATE>
+</SITE>

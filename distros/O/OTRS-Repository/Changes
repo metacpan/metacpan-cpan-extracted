@@ -1,0 +1,27 @@
+Change history for OTRS::Repository
+===================================
+
+0.05 2014-01-21
+
+  + fix test failures on Win32
+
+0.04 2014-01-20
+
+  + better handling for invalid URLs and invalid XML
+  + add tests
+  + fix test failures on Win32 (Regexp::Common doesn't recognize file://C:/dir/test.xml as valid file-URI)
+
+0.03 2014-01-03
+
+  + fix min required version of List::Util
+  + add feature: list names of all packages
+  + added metainfo to dist.ini
+
+0.02 2014-01-02
+
+  + add feature: search for a specific version of a module
+  + use PodWeaver plugin for dzil
+
+0.01 2014-01-01
+
+  + initial release

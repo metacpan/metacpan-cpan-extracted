@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<SITE ID="Zen">
+
+<NAME Lang="en-us">Zen Search</NAME>
+<INFO Lang="en-us">general information web search</INFO>
+
+<URL Type="More"><![CDATA[
+http://www.zensearch.com/cgi-bin/director/dsearch.pl?n=_START_1_1_&q=_QUERY_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://www.zensearch.com/cgi-bin/director/dsearch.pl?n=1&q=_QUERY_
+]]></URL>
+
+
+
+<TEMPLATE><![CDATA[
+. [_SCORE_%___<A HREF="_URL_"___">_TITLE_</A>___FACE="arial, verdana">_PREVIEW_</FONT>
+]]></TEMPLATE>
+</SITE>

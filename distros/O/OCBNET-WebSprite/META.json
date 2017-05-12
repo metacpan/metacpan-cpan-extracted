@@ -1,0 +1,131 @@
+{
+   "abstract" : "WebSprite generator from annotated CSS",
+   "author" : [
+      "Marcel Greter <marcel.greter@ocbnet.ch>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4205",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "OCBNET-WebSprite",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Which" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0",
+            "Software::License" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Slurp" : "0",
+            "GD" : "0",
+            "OCBNET::CSS3" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "OCBNET::CSS3::Styles::WebSprite" : {
+         "file" : "lib/OCBNET/CSS3/Styles/WebSprite.pm",
+         "version" : "v1.0.0"
+      },
+      "OCBNET::Image" : {
+         "file" : "lib/OCBNET/Image.pm",
+         "version" : "v1.0.1"
+      },
+      "OCBNET::Image::GD" : {
+         "file" : "lib/OCBNET/Image/GD.pm",
+         "version" : "v1.0.2"
+      },
+      "OCBNET::Image::GM" : {
+         "file" : "lib/OCBNET/Image/GM.pm",
+         "version" : "v1.0.1"
+      },
+      "OCBNET::Image::IM" : {
+         "file" : "lib/OCBNET/Image/IM.pm",
+         "version" : "v1.0.1"
+      },
+      "OCBNET::Packer::2D" : {
+         "file" : "lib/OCBNET/Packer/2D.pm",
+         "version" : "v1.0.0"
+      },
+      "OCBNET::WebSprite" : {
+         "file" : "lib/OCBNET/WebSprite.pm",
+         "version" : "v1.0.2"
+      },
+      "OCBNET::WebSprite::Block" : {
+         "file" : "lib/OCBNET/WebSprite/Block.pm",
+         "version" : "v1.0.1"
+      },
+      "OCBNET::WebSprite::Canvas" : {
+         "file" : "lib/OCBNET/WebSprite/Canvas.pm",
+         "version" : "v1.0.1"
+      },
+      "OCBNET::WebSprite::Canvas::Distribute" : {
+         "file" : "lib/OCBNET/WebSprite/Canvas/Distribute.pm",
+         "version" : "v1.0.0"
+      },
+      "OCBNET::WebSprite::Canvas::Layout" : {
+         "file" : "lib/OCBNET/WebSprite/Canvas/Layout.pm",
+         "version" : "v1.0.0"
+      },
+      "OCBNET::WebSprite::Canvas::Optimize" : {
+         "file" : "lib/OCBNET/WebSprite/Canvas/Optimize.pm",
+         "version" : "v1.0.0"
+      },
+      "OCBNET::WebSprite::Canvas::Repeater" : {
+         "file" : "lib/OCBNET/WebSprite/Canvas/Repeater.pm",
+         "version" : "v1.0.0"
+      },
+      "OCBNET::WebSprite::Container" : {
+         "file" : "lib/OCBNET/WebSprite/Container.pm",
+         "version" : "v1.0.0"
+      },
+      "OCBNET::WebSprite::Corner" : {
+         "file" : "lib/OCBNET/WebSprite/Corner.pm",
+         "version" : "v1.0.0"
+      },
+      "OCBNET::WebSprite::Edge" : {
+         "file" : "lib/OCBNET/WebSprite/Edge.pm",
+         "version" : "v1.0.0"
+      },
+      "OCBNET::WebSprite::Fit" : {
+         "file" : "lib/OCBNET/WebSprite/Fit.pm",
+         "version" : "v1.0.0"
+      },
+      "OCBNET::WebSprite::Math" : {
+         "file" : "lib/OCBNET/WebSprite/Math.pm",
+         "version" : "v1.0.0"
+      },
+      "OCBNET::WebSprite::Sprite" : {
+         "file" : "lib/OCBNET/WebSprite/Sprite.pm",
+         "version" : "v1.0.1"
+      },
+      "OCBNET::WebSprite::Stack" : {
+         "file" : "lib/OCBNET/WebSprite/Stack.pm",
+         "version" : "v1.0.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.gnu.org/licenses/gpl-3.0.txt"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/mgreter/OCBNET-WebSprite.git",
+         "web" : "https://github.com/mgreter/OCBNET-WebSprite"
+      }
+   },
+   "version" : "v1.0.2"
+}

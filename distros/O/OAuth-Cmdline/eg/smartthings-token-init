@@ -1,0 +1,46 @@
+#!/usr/local/bin/perl -w
+use strict;
+use lib 'lib';
+
+use OAuth::Cmdline::Smartthings;
+use OAuth::Cmdline::Mojo;
+
+my $base_url = "https://graph-na02-useast1.api.smartthings.com";
+
+my $oauth = OAuth::Cmdline::Smartthings->new(
+  login_uri => "$base_url/oauth/authorize",
+  token_uri => "$base_url/oauth/token",
+  scope     => "app",
+);
+
+$oauth->client_init_conf_check( $base_url );
+
+my $app = OAuth::Cmdline::Mojo->new(
+    oauth => $oauth,
+);
+
+$app->start( 'daemon', '-l', $oauth->local_uri );
+
+__END__
+
+=head1 NAME
+
+smartthings-token-init - Smartthings-specific OAuth Token Dance
+
+=head1 SYNOPSIS
+
+    $ smartthings-token-init
+
+=head1 DESCRIPTION
+
+See the OAuth::Cmdline::Smartthings documentation.
+
+=head1 LEGALESE
+
+Copyright 2016 by Mike Schilli, all rights reserved.
+This program is free software, you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+2016, Mike Schilli <cpan@perlmeister.com>

@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<SITE ID="Study">
+
+<NAME Lang="en-us">Study Web Search</NAME>
+<INFO Lang="en-us">educational relevant information documents search</INFO>
+
+<URL Type="Start"><![CDATA[
+post://www.studyweb.com/custom/cgi-bin/wwwwais?message=If+you+can+see+this,+then+your+browser+can't+support+hidden+fields.&source=index.swish&sourcedir=/www/www.studyweb.com/etc/&maxhits=_HITS_&sorttype=score&host=&port=&searchprog=swish&iconurl=http://www.studyweb.com/share/icons/wwwais&useicons=yes&keywords=_QUERY_
+]]></URL>
+
+<SCORE>_SCORE_/10</SCORE>
+
+
+<TEMPLATE><![CDATA[
+<dt>___<a href="_URL_">_TITLE_</a>___Score: <b>_SCORE_</b>___Size: <b>_SIZEK_kbytes
+]]></TEMPLATE>
+</SITE>

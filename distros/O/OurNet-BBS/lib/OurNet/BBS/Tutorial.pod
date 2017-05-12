@@ -1,0 +1,129 @@
+# $File: //depot/libOurNet/BBS/lib/OurNet/BBS/Tutorial.pod $ $Author: autrijus $
+# $Revision: #1 $ $Change: 3789 $ $DateTime: 2003/01/24 19:07:35 $
+
+=head1 NAME
+
+OurNet::BBS::Tutorial - Introduction to the OurNet-BBS Architecture
+
+=head1 SYNOPSIS
+
+Below are diagrams of typical scenarios that employs different
+B<OurNet::BBS> components. In each diagrams, text in C<[square
+brackets]> denotes a program, C<{curly brackets}> means a physical
+storage, comments are in C<(parentheses)>, and blocks with borders
+like C<+---+> indicates a class of objects.
+
+=head2 Using OurNet to contact remote MELIX BBS
+
+This diagram explains how the B<OurNet> backend may be used to contact
+a remote server running B<bbscomd>, the I<OurNet Server>.
+
+			 (backend)
+ {Shared Memory}--. +---------------------+	 [bbscomd]
+ {Hard Disk Data}-+-|OurNet::BBS::MELIX::*|           |
+		    +---------+-----------+   +--------------+
+			      +->(daemonize)->|OurNet::Server|
+					      +--------------+
+ Server-Side			                     | (xxx.yyy.zzz.www)
+ ~~~(Internet)~~~~~~~~~~~~~~~~~~~~~~~~~~~~<<<<<OurNet Protocol>>>>>~~~~~~
+ Client-Side		    (backend)	             |
+		   +----------------------+  +--------------+
+		   |OurNet::BBS::OurNet::*|--|OurNet::Client|
+		   +----------------------+  +--------------+
+			        |
+	   OurNet::BBS->new({bbsroot=>xxx.yyy.zzz.www})
+		   +--------------------+
+        [ebx]------|OurNet::BBSApp::Sync|
+		   +--------------------+
+
+=head2 Using BBSAgent to contact remote BBS Daemon
+
+This diagram explains how the B<BBSAgent> backend may be used to contact
+a remote server running B<bbsd>, a regular BBS Daemon of Melix, Maple,
+Firebird, or Cola systems.
+
+			[BBS Daemon]-+-{Shared Memory}
+ Server-Side		      |      `-{Hard Disk Data}
+ ~~~(Internet)~~~~~<<<<<Telnet Protocol>>>>>~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ Client-Side		      |
+		     +----------------+                  (include)
+		     |OurNet::BBSAgent|<-{TEMPLATE.bbs}--{*/*.inc}
+		     +----------------+  (=procedures)
+		              |
+		+------------------------+
+		|OurNet::BBS::BBSAgent::*|(backend)
+		+------------------------+
+		              |
+	    OurNet::BBS->new({bbsroot=>'TEMPLATE'})
+		   +--------------------+
+        [ebx]------|OurNet::BBSApp::Sync|
+		   +--------------------+
+
+=head2 The OurNet BBS Component Object Model
+
+This diagrams explains the I<has-a> relationships between all
+B<OurNet::BBS::*> objects. The first row in each box represents
+how to access it from the upper-level C<tie>d object.
+
+ [OurNet::BBS::BACKEND::BBS]->new($bbsroot, @args)...
+ 	  |                 
+ 	  |-------------|--------|--------------|-----------.
+     +----------+ +----------+ +---------+ +------------+ +---------+
+     | {boards} | | {groups} | | {users} | | {sessions} | | {files} |
+     |BoardGroup| |GroupGroup| |UserGroup| |SessionGroup| |FileGroup|
+     +----------+ +----------+ +---------+ +------------+ +---------+
+          |        |   |            |              |           |
+       +-----+     |+-----+        +-----------+ +-------+ +-----------+
+       |{STR}|<----'|{STR}|<--.    |{STR}/[NUM]| | {STR} | |   {STR}   |
+       |Board|<-----|Group|---'    |   User    | |Session| |ScalarFile*|
+       +-----+      +-----+        +-----------+ +-------+ +-----------+
+         ||`--------.		         |`----------.
+         |`-------. `------------.       `---------. `------------.
+ +------------+ +------------+ +-----------+ +------------+ +-----------+
+ | {articles} | | {archives} | |  {STR}    | | {mailbox}  | |   {STR}   |
+ |ArticleGroup| |ArticleGroup| |ScalarFile*| |ArticleGroup| |ScalarFile*|
+ +------------+ +------------+ +-----------+ +------------+ +-----------+
+       |              |`----------.
+ +-----------+ +-----------+ +------------+     
+ |{STR}/[NUM]| |{STR}/[NUM]| |{STR}/[NUM] |<--.
+ |  Article  | |  Article  | |ArticleGroup|---'
+ +-----------+ +-----------+ +------------+
+
+Notes:
+
+=over 4
+
+=item *
+
+A B<Group> or B<GroupGroup> object may contain any number of B<Group>
+and/or B<Board> objects. Similarily, an B<ArticleGroup> object may
+contain any number of B<ArticleGroup> (i.e. an archive directory) and/or
+B<Article> objects.
+
+=item *
+
+B<ScalarFile> refers to the class B<OurNet::ScalarFile>, I<not>
+B<OurNet::BBS::I<BACKEND>::ScalarFile>. All other classes are to be
+preceded with B<OurNet::BBS::I<BACKEND>>.
+
+=item *
+
+The B<STR> means string hash index, B<NUM> means numeric array index,
+accessible using curly and square brackets, respectively.
+
+=back
+
+=head1 AUTHORS
+
+Autrijus Tang E<lt>autrijus@autrijus.orgE<gt>
+
+=head1 COPYRIGHT
+
+Copyright 2001-2002 by Autrijus Tang E<lt>autrijus@autrijus.orgE<gt>.
+
+This document is open document; you can redistribute it and/or
+modify it under the Open Content License.
+
+See L<http://opencontent.org/opl.shtml>
+
+=cut

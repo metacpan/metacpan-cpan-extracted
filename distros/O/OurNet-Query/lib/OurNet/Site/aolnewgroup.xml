@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<SITE ID="AOLneWGroup">
+
+<NAME Lang="en-us">AOL.COM</NAME>
+<INFO Lang="en-us">newsgroup discussion search</INFO>
+
+<URL Type="More"><![CDATA[
+_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://x7.dejanews.com/=aol3/dnquery.xp?query=_QUERY_&Search=Find%21
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+<EXPRESSION>Boolean</EXPRESSION>
+
+<VAR Name="_NEXT_"><![CDATA[
+<a href="_NEXT_"> next </a>
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<a href=_URL_><b>_TITLE_</b></a><br>_PREVIEW_<br>___Posted on_DATE_by
+]]></TEMPLATE>
+</SITE>

@@ -1,0 +1,54 @@
+Revision history for OpusVL-Preferences
+
+0.26      2016-12-14 14:19:22+00:00 Europe/London
+
+  * Added missing pod
+
+0.25      2016-12-14 13:35:17+00:00 Europe/London
+
+  * Updated methods for pulling all the prefs out in datastructures to do 
+    decryption and allow for a hash
+  * Added Jenkinsfile for testing
+
+0.24      2016-11-04 17:10:57+00:00 Europe/London
+
+  * Updated dependency on Postgres module
+
+0.23      2016-11-04 12:01:59+00:00 Europe/London
+
+  * Added field mask function
+  * Added new searchable flag to indicate that it makes sense to search 
+    on a field.
+  * Pod tweaks
+  * Added helper methods for getting an encryption/decryption sub
+  * Updated behaviour to throwing an error when the field prf_get tries to 
+    get doesn't exist
+  * Added support for basic symmetric crypto on values.
+
+0.22      2016-10-26 10:08:43+01:00 Europe/London
+
+  * Provide a clearer error message when a field wasn't setup.
+
+0.21      2016-02-26 08:53:20+00:00 Europe/London
+
+  * Fixed RT 112429, test failures on non english locales.
+  * Switched bug tracking over to github.
+  * Fixed some more pod.
+
+0.20      2016-02-25 16:52:19+00:00 Europe/London
+
+  * Tweaked license/support sections in the POD to 
+    make them generate correctly with dzil.
+
+0.19      2016-02-25 16:27:23+00:00 Europe/London
+
+  * Fixed test broken when converting to Dist::Zilla.
+
+0.18      2016-02-25 16:09:28+00:00 Europe/London
+
+  * Converted to Dist::Zilla and prepared for public release.
+
+0.01    2012-11-29
+
+  * First version, released on an unsuspecting world.
+

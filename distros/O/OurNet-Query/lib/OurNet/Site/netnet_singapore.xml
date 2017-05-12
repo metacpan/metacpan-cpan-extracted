@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<SITE ID="NetNet_Singapore">
+
+<NAME Lang="en-us">NETNET Multimedia Search</NAME>
+<INFO Lang="en-us">in Singapore</INFO>
+
+<URL Type="Start"><![CDATA[
+http://engine3.netnet.com.sg/cgi-bin/iposearch?terms=_QUERY_&max=_HITS_
+]]></URL>
+
+
+
+<TEMPLATE><![CDATA[
+text.gif">___<A HREF="_URL_"___>_TITLE_</A>___(_SCORE_%)___<DD>"_PREVIEW_<BR>
+]]></TEMPLATE>
+</SITE>

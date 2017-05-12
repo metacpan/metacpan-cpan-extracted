@@ -1,0 +1,14 @@
+MANIFEST
+README
+LICENSE
+Todo
+Changes
+Makefile.PL
+lib/OpenGuides/RDF/Reader.pm
+scripts/og_mirror
+t/001_basic.t
+t/pod.t
+t/pod_coverage.t
+t/sandbox.rdf
+t/amt_expresso.rdf
+META.yml                                 Module meta-data (added by MakeMaker)

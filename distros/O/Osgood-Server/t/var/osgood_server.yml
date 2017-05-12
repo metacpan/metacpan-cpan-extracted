@@ -1,0 +1,11 @@
+---
+name: Osgood::Server
+Model::OsgoodDB:
+    schema_class: Osgood::Server::Schema
+    connect_info:
+        - DBI:SQLite:dbname=t/var/osgood.db
+        -
+        -
+        -
+            quote_char: '`'
+            name_sep: .

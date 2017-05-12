@@ -1,0 +1,121 @@
+Revision history for Perl extension OLE::Storage_Lite.
+
+0.19  Tue Nov 24 2009
+
+    ! Fixed bug where the OLE header wasn't been written correctly
+      for files < 7MB. This was causing Spreadsheet::WriteExcel
+      problems in Windows 7.
+
+
+0.18  Wed Dec 31 2008
+
+    ! Fixed internal version numbers.
+
+
+0.17  Tue May 10 2008
+
+    - Rewrote internal date handling functions to avoid
+      Math::BigInt due to further problems introduced by the
+      patch in 0.15.
+      http://rt.cpan.org/Public/Bug/Display.html?id=34567
+      Reported by Andrew Benham.
+
+
+0.16  Tue Feb 19 2008
+
+    - Workaround for HP-UX Perl 5.6 integer bug.
+      Thanks Bob Rose.
+
+    - Fix for binmode() on IO::Scalar.
+      Reported by Tobias Tacke:
+      http://rt.cpan.org/Public/Bug/Display.html?id=32603
+
+
+0.15  Sat Dec 1 2007
+
+    - Fix for OLE::Storage_Lite performance degradation caused
+      by Math::BigInt degradation.
+      http://rt.cpan.org/Public/Bug/Display.html?id=31006
+      Thanks Jonathan Kamens.
+
+
+0.14  Mon Nov 8 2004
+
+    - Return filehandle close() value to caller. Spotted in
+      Spreadsheet::WriteExcel::Big by Edward James and
+      Reidar Johansen.
+
+    - Changed IO::Scalar from a "use" to a "require" and removed
+      the Makefile dependency to make H. Merijn Brand's life easier
+      for some reason. :-)
+
+
+0.13  Sun Aug 1 2004
+
+    - Allowed use of user defined filehandles. This should make the
+      module work with mod_perl and some other applications.
+      https://rt.cpan.org/NoAuth/Bug.html?id=7168
+
+0.12  Thu May 28 2004
+
+    - Applied patch to fix problems when creating very large files.
+      Thanks James Rouzier.
+
+    - Applied patch to allow IO::Scalar as a data destination.
+      Thanks Kyle Burton.
+
+    - Fixed pack() warning in perl5.8 - jmcnamara
+
+0.11  Tue Nov 12  7:40:00 2002
+    - Fix 10,683,904 bytes (20,700) Problem Thank you, John McNamara
+    - Fix Makefile.PL (IO::Scalar), Thank you, Chris Dolan
+
+0.10  Thu Jan 24  6:00:00 2001
+    - Fix Broken file problem + Fixed first release
+          Thank you, Bruno Wolff III
+
+0.09  Fri May 25  6:00:00 2001
+    - Fix small size problem
+          Thank you, Thomas Schachner and John McNamara
+
+    - Fix RootEntry -> Root Entry
+          Thank you, Joergen von Bargen
+
+0.08  Thu Mar 1  22:30:00 2001
+    - Fix case insensitive version for getPpsSearch
+          Thank you, yusuf_najmuddin and sorry Punam Chordia.
+    - Add IO::Scalar prerequire to Makefile.PL
+          Thank you, J. David Blackstone.
+    - Add newFile and append methond to Pps::File
+                                       by Kawai Takanori
+
+0.07  Thu Feb  22 9:00:00 2001
+    - Add case insensitive version for getPpsSearch
+                                       by Kawai Takanori
+          Thank you, Punam Chordia.
+    - Modify save Big file
+                                       by Kawai Takanori
+          Thank you, Bill White.
+
+0.06  Thu Feb  2 12:00:00 2001
+    - Add referrence of scalar and IO::File object support
+                                       by Kawai Takanori
+            Thank you, Jeff Haferman
+
+0.05  Thu Jan  4 14:00:00 2001
+    - Modified Minor mistakes by Kawai Takanori
+            Thank you, Hao Huang and Ian Penman
+
+0.04  Wed Dec  6 11:00:00 2000
+    - Modified Minor mistakes by Kawai Takanori
+            Thank you, Anthony Brock.
+
+0.03  Wed Nov  14 10:00:00 2000
+    - Modified Minor mistakes by Kawai Takanori
+
+0.02  Wed Nov  8 21:00:00 2000
+    - Added STDOUT; created by Kawai Takanori
+
+0.01  Sat Nov  4 16:00:00 2000
+    - original version; created by Kawai Takanori
+

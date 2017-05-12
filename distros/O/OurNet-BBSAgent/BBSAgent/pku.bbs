@@ -1,0 +1,80 @@
+# $File: //depot/OurNet-BBSAgent/BBSAgent/pku.bbs $ $Author: autrijus $
+# $Revision: #5 $ $Change: 2829 $ $DateTime: 2002/01/10 14:54:36 $
+# Contributed by Chia-liang Kao <clkao@clkao.org>
+# zh_TW.Big5: 北京大學
+
+Beijing University
+bbs.pku.edu.cn
+
+load firebird2.board
+
+setv headl \x0d?
+setv headr :\x20(.+?)(?:,\x20.?.?信區:\x20.+)?$
+setv headi 發信人,標\x20\x20題,發信站
+
+setv statustail 帳號[
+
+=login
+wait new
+send $[username].\n # for big5 display
+send $[password]\n
+send nq\nq\nq\nq\nq\nq
+goto main
+
+=board
+call main
+send s\n
+wait 區名
+send $[board]\n\n\x20
+till $[statustail]
+
+=board_list_last
+call board $[board]
+send 1\n\x24
+wait \x0d>
+till \x20
+exit
+
+=board_article_fetch_first
+call board $[board]
+send $[article]\n\n
+wait \e[J
+till \e[1;44;31m[閱讀文章]
+  or \e[1;44;32m下面還有喔
+till 結束
+wait m/\^X\x20?或\x20?p\x20\e\[m/
+  or │\x20\x20\x20\x20\x20\e[m
+exit
+
+=board_article_fetch_next
+send \x20
+till \e[1;44;31m[閱讀文章]
+  or \e[1;44;32m下面還有喔
+till 結束
+wait m/\^X\x20?或\x20?p\x20\e\[m/
+  or │\x20\x20\x20\x20\x20\e[m
+exit
+
+=board_article_fetch_last
+send q
+wait $[statustail]
+exit
+
+=article_post_raw
+call board $[board]
+send \x10
+wait 標題:
+send $[title]\n
+wait 接受:
+send \n
+wait 求救
+send $[body]
+send \eg
+wait 第幾行
+send 1\n
+send \x19\x19\x19\x19
+send \x18
+wait 發表
+send \n
+wait $[statustail]
+exit

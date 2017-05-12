@@ -1,0 +1,21 @@
+---
+abstract: 'Perl extension for converting Month and Day to the Oogaboogo Language.'
+author:
+  - 'Jacob Perkins <jacobperkins@apple.com>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.78, CPAN::Meta::Converter version 2.132661'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Oogaboogo-Date
+no_index:
+  directory:
+    - t
+    - inc
+requires: {}
+version: 0.01

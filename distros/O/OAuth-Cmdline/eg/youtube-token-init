@@ -1,0 +1,47 @@
+#!/usr/local/bin/perl -w
+use strict;
+use FindBin qw( $Bin );
+use lib "$Bin/../lib";
+
+use OAuth::Cmdline::Youtube;
+use OAuth::Cmdline::Mojo;
+
+my $oauth = OAuth::Cmdline::Youtube->new(
+    login_uri     => "https://accounts.google.com/o/oauth2/auth",
+    token_uri     => "https://accounts.google.com/o/oauth2/token",
+    scope         => "https://www.googleapis.com/auth/youtube.readonly",
+    access_type   => "offline",
+);
+
+$oauth->client_init_conf_check( 
+    "https://developers.google.com/identity/protocols/OAuth2?csw=1" );
+
+my $app = OAuth::Cmdline::Mojo->new(
+    oauth => $oauth,
+);
+
+$app->start( 'daemon', '-l', $oauth->local_uri );
+
+__END__
+
+=head1 NAME
+
+youtube-token-init - Youtube-specific OAuth Token Dance
+
+=head1 SYNOPSIS
+
+    $ youtube-token-init
+
+=head1 DESCRIPTION
+
+See the OAuth::Cmdline::Youtube documentation.
+
+=head1 LEGALESE
+
+Copyright 2016 by Mike Schilli, all rights reserved.
+This program is free software, you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+2016, Mike Schilli <cpan@perlmeister.com>

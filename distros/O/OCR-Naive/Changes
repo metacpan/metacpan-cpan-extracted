@@ -1,0 +1,13 @@
+Revision history for Perl extension OCR::Naive
+0.07  Feb 16 2009
+	- minor fixes
+
+0.04  Aug 26 2007
+        - backported for use with older Prima
+
+0.02  Aug 21 2007
+	- documentation added
+
+0.01  Aug 20 2007
+	- original alpha version and proof of concept
+

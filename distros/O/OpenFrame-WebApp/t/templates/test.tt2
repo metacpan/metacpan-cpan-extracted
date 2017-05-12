@@ -1,0 +1,7 @@
+Template::Toolkit test
+
+[% IF test %]
+  TT2 ok!
+[% ELSE %]
+  TT2 template loaded, but 'test' not defined!
+[% END %]

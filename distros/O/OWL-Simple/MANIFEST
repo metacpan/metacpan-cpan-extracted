@@ -1,0 +1,15 @@
+Build.PL
+Changes
+lib/OWL/Simple/Class.pm
+lib/OWL/Simple/OBOWriter.pm
+lib/OWL/Simple/Parser.pm
+LICENSE
+Makefile.PL
+MANIFEST
+META.yml
+README
+scripts/similarity_match.pl
+t/00-load.t
+t/01-parser.t
+t/02-writer.t
+META.json

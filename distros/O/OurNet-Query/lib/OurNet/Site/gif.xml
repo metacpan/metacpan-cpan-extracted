@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<SITE ID="Gif">
+
+<NAME Lang="en-us">GIF WWW Search</NAME>
+<INFO Lang="en-us">general information web search in Japan</INFO>
+
+<URL Type="More"><![CDATA[
+post://gif.fwi.ne.jp/cgi-bin/search.cgi?action=search&Keywords=_QUERY_&start=_START_20_1_
+]]></URL>
+<URL Type="Start"><![CDATA[
+post://gif.fwi.ne.jp/cgi-bin/search.cgi?action=search&Keywords=_QUERY_&start=1
+]]></URL>
+
+<CHARSET>ja-jp.euc</CHARSET>
+
+
+<TEMPLATE><![CDATA[
+<li><a href="_URL_"___>_TITLE_</a> -- _PREVIEW_<br>
+]]></TEMPLATE>
+</SITE>

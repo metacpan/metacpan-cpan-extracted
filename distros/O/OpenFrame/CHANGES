@@ -1,0 +1,20 @@
+3.05
+	- allow passing of a refernce into OpenFrame::Response->message
+
+3.04
+	- fix bug in OpenFrame::Segment::HTTP::Response where we
+          weren't sending back multiple cookies
+
+3.03
+	- pass parameters in init()
+	- removed $self->emit of blobs (slow)
+
+3.02	
+	- added OpenFrame::Argument::Blob to handle browser uploads
+	- more docs
+	- minor change to saofs.pl
+
+3.01
+      -- the Segment::HTTP::Request can now not automatically add
+         the HTTP::Response segment to the pipeline -- done by calling
+	 respond( 0 ) at instantiation time.

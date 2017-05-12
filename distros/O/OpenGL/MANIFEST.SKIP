@@ -1,0 +1,65 @@
+
+#!start included /usr/lib/perl5/5.10/ExtUtils/MANIFEST.SKIP
+# Avoid version control files.
+\bRCS\b
+\bCVS\b
+\bSCCS\b
+,v$
+\B\.svn\b
+\b_darcs\b
+
+# Avoid Makemaker generated and utility files.
+\bMANIFEST\.bak
+\bblib/
+\bMakeMaker-\d
+\bpm_to_blib\.ts$
+\bpm_to_blib$
+\bblibdirs\.ts$         # 6.18 through 6.25 generated this
+
+# Avoid Module::Build generated and utility files.
+\bBuild$
+\b_build/
+
+# Avoid temp and backup files.
+~$
+\.old$
+\#$
+\b\.#
+\.bak$
+\.swp$
+
+# Avoid Devel::Cover files.
+\bcover_db\b
+
+# Don't include extra DLL and lib files
+^FreeGLUT/new.*
+^FreeGLUT/orig.*
+#!end included /usr/lib/perl5/5.10/ExtUtils/MANIFEST.SKIP
+
+EL-ELI.c
+^.*.tar.gz
+^.git
+^Config.pm
+^Makefile$
+^MYMETA.json
+^MYMETA.yml
+^META.yml$
+^OpenGL.bs
+^OpenGL.c
+^OpenGL.o
+^gl-funs.txt
+^gl_exclude.h$
+^gl_util.o
+^gllist
+^pdl.h
+^pogl_\w*\.c
+^pogl_\w*\.o
+cpp.sh
+freeglut-funs-name.txt
+^ogl-calls-in-test.txt
+pogl_gl_funcs.txt
+utils/glversion.exe
+utils/glversion.o
+utils/glversion.txt
+utils/glxinfo.c
+test.png

@@ -1,0 +1,119 @@
+Object-WithParams
+
+Use this module to create objects that do nothing except contain parameters
+defined by you which you can get and set as you wish.  Many modules such as
+L<Data::FormValidator> have methods that accept an object with a param()
+method and this object should be compatible with all of them.
+
+INSTALLATION
+
+If you have the Module::Signature module installed, you can verify the
+integrity of this distribution by typing:
+
+    cpansign -v
+
+Module::Signature requires GnuPG which you can get from: 
+http://www.gnupg.org/download/
+A binary version for Windows is available from that page.
+        
+Then to install this module, run the following commands:
+
+    perl Build.pl
+    ./Build
+    ./Build test
+    ./Build install
+    
+On Windows you don't need to type the preliminary ./
+
+Alternatively, you can do:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+If you are using ActiveState perl on Windows and you don't have a make 
+utility, you can download nmake from:
+http://download.microsoft.com/download/vc15/patch/1.52/w95/en-us/nmake15.exe
+(Replace make with nmake in the instructions above if you are using it.)
+
+If you are using Strawberry perl on Windows, it comes with a make utility 
+called dmake.  (Replace make with dmake in the instructions above if you are
+using it.)
+
+NOTE: At the moment, some of the tests will fail on Windows if the path to the 
+directory you unpacked the distribution in has spaces in it.  Either skip the 
+tests or move to another directory.
+
+DEPENDENCIES
+
+This module is pure perl and should work with any version of perl, 5.006 or 
+greater.
+
+The signature can be tested by installing the following module:
+
+Module::Signature
+
+and setting the environment variable TEST_SIGNATURE to 1.
+
+some tests check whether Object::WithParams is compatible with other modules 
+from CPAN.  In order to run these tests, you will need to install the 
+following modules:
+
+Data::FormValidator    3.15
+HTML::Template         2.1
+Test::LongString
+
+Further tests are contained in the xt subdirectory of the distribution.  Only
+the author really needs to run them but if you want to do so as well, you 
+will need to install the following modules:
+
+Perl::Critic           1.098
+Perl::MinimumVersion   1.20
+Pod::Coverage          0.18
+Pod::Simple            3.07
+Test::CPAN::Meta       0.12
+Test::DistManifest     1.003
+Test::HasVersion       0.012
+Test::Kwalitee
+Test::MinimumVersion   0.008
+Test::Perl::Critic     1.01
+Test::Pod              1.26
+Test::Pod::Coverage    1.08
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Object::WithParams
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Object-WithParams
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Object-WithParams
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Object-WithParams
+
+    Search CPAN
+        http://search.cpan.org/dist/Object-WithParams/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2010, Consolidated Braincells Inc.  All rights reserved.
+
+This distribution is free software; you can redistribute it and/or modify it
+under the terms of either:
+
+a) the GNU General Public License as published by the Free Software
+Foundation; either version 2, or (at your option) any later version, or
+
+b) the Artistic License version 2.0.
+
+The full text of the license can be found in the LICENSE file included
+with this distribution.

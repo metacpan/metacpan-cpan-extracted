@@ -1,0 +1,122 @@
+/* Procedure copyright(c) 1993-1995 by Ed Barlow */
+/* Copied from sp__whodo by simon walker */
+
+:r database
+go
+:r dumpdb
+go
+
+if exists (select * 
+         from   sysobjects 
+         where  type = 'P'
+         and    name = "sp__whodo")
+begin
+    drop procedure sp__whodo
+end
+go
+
+create procedure sp__whodo (@parm varchar(30) = null,
+	@dont_format char(1) = null
+	) 
+as
+begin
+    declare @parmsuid int , @parmdbid int
+ 
+    if @parm is not NULL 
+    begin
+
+        select @parmsuid = suser_id(@parm)
+        if @parmsuid is NULL
+        begin
+			   select @parmdbid = db_id(@parm)
+			   if @parmdbid is null
+			   begin
+               print "No login exists with the supplied name."
+               return (1)
+			   end
+        end
+
+        select 
+			  spid,
+           loginame= substring(suser_name(suid), 1, 9),
+	   	  "cpu" = convert(char(5),cpu%10000),
+	   	  "io"  = convert(char(5),physical_io%10000),
+	   	  "mem" = convert(char(5),memusage%10000),
+           dbname = substring(db_name(dbid), 1, 10),
+           status = convert(char(8), status),
+           cmd,
+           bk = convert(char(2), blocked),
+	        bktime=convert(char(4),isnull(time_blocked,0))
+		  into   #tmp_a
+        from   master..sysprocesses
+        where cmd != "AWAITING COMMAND"
+	     and	  cmd != "NETWORK HANDLER"
+	     and	  cmd != "MIRROR HANDLER"
+	     and	  cmd != "AUDIT PROCESS"
+	     and	  cmd != "CHECKPOINT SLEEP"
+		  and   isnull(@parmdbid,dbid) = dbid
+		  and	  isnull(@parmsuid,suid) = suid
+
+		  update #tmp_a set cpu="HUGE" 
+		  from master..sysprocesses p, #tmp_a t where p.spid = t.spid and p.cpu>10000
+
+		  update #tmp_a set io="HUGE" 
+		  from master..sysprocesses p, #tmp_a t where p.spid = t.spid and p.physical_io>10000
+
+		  update #tmp_a set mem="HUGE" 
+		  from master..sysprocesses p, #tmp_a t where p.spid = t.spid and p.memusage>10000
+
+		  update #tmp_a set spid=0 
+		  from #tmp_a t where t.spid>999
+
+        select "pid" = convert(char(3),spid),
+           loginame, cpu , io  , mem , dbname , status ,
+           cmd, bk , bktime
+		  from   #tmp_a
+    end
+	 else
+	 begin
+
+	 /* NEED TEMP TABLE FOR OVERFLOW */
+    select pid = convert(char(20), spid),
+           loginame= substring(suser_name(suid), 1, 9),
+	   		"cpu" = convert(char(20),cpu),
+	   		"io"  = convert(char(20),physical_io),
+	   		"mem" = convert(char(20),memusage),
+           dbname = substring(db_name(dbid), 1, 10),
+           status = convert(char(8), status),
+           cmd,
+           bk = convert(char(20), blocked),
+	   	  bktime=convert(char(20),isnull(time_blocked,0))
+	 into   #tmp
+    from   master..sysprocesses
+    where  cmd != "AWAITING COMMAND"
+	 and	  cmd != "NETWORK HANDLER"
+	 and	  cmd != "MIRROR HANDLER"
+	 and	  cmd != "AUDIT PROCESS"
+	 and	  cmd != "CHECKPOINT SLEEP"
+
+	 update #tmp set pid = "***"  where char_length(rtrim(ltrim(pid))) > 3
+	 update #tmp set cpu = "HUGE" where char_length(rtrim(ltrim(cpu))) > 5
+	 update #tmp set io  = "HUGE" where char_length(rtrim(ltrim(io))) > 5
+	 update #tmp set mem = "HUGE" where char_length(rtrim(ltrim(mem))) > 5
+
+    select pid = substring(pid,1,3),
+           loginame,
+	   	  cpu = substring(cpu,1,5),
+	   	  io  = substring(io,1,5),
+	   	  mem = substring(mem,1,5),
+           dbname,
+           status,
+           cmd,
+           bk = substring(bk,1,2),
+	   	  bktime=substring(bktime,1,4)
+	  from #tmp
+	 end
+
+    return
+end
+go
+
+grant execute on sp__whodo to public
+go

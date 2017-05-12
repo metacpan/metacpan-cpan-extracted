@@ -1,0 +1,56 @@
+#!perl
+use strict;
+use warnings;
+use OrePAN2::Index;
+use Getopt::Long;
+
+my $version;
+my $p = Getopt::Long::Parser->new(
+    config => [qw(posix_default no_ignore_case auto_help)]
+);
+$p->getoptions(
+    'o=s' => \my $outfilename,
+    'simple!' => \my $simple,
+);
+
+my $outfh = *STDOUT;
+if (defined $outfilename) {
+    open $outfh, '>', $outfilename
+        or die "Cannot open $outfilename for writing: $!";
+}
+
+my $index = OrePAN2::Index->new();
+for my $filename (@ARGV) {
+    $index->load($filename, {replace => 1});
+}
+print {$outfh} $index->as_string({simple => $simple});
+
+__END__
+
+=head1 SYNOPSIS
+
+    % orepan2-merge-index -o merged.txt foo/02packages.details.txt bar/02packages.details.txt.gz
+
+=head1 DESCRIPTION
+
+Combines 2 or more 02packages.details.txt.gz files.
+
+=head1 DEVELOPMENT STATUS
+
+B<Unstable>
+
+=head1 OPTIONS
+
+=head2 o
+
+    % orepan2-merge-index -o merged.txt foo/02packages.details.txt bar/02packages.details.txt.gz
+
+Name of output file
+
+=head2 simple
+
+Use a simple format for 02packages metadata.  This helps avoid merge conflicts.
+
+     > orepan2-merge-index --simple -o merged.txt foo/02packages.details.txt bar/02packages.details.txt.gz
+
+=cut

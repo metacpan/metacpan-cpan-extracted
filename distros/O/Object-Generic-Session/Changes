@@ -1,0 +1,23 @@
+Revision history for Object-Generic-Session
+
+0.12    Nov 29 2005
+	  fixed bug with 'expires', ignored passed value
+
+0.11    Sep 9 2005
+	  commented out __access_count code.
+
+0.1     Aug  19 2005
+	  ->set() now does Apache make_modified
+
+0.04    Aug  18 2005 
+	  better error handling of poorly formed inputs
+
+0.03    June 16 2005
+          fixed error when cookie set but no matching session found
+          loaded apache request $r correctly
+
+0.02    June 13 2005
+	  modified $obj->get to return false() rather than undef
+
+0.01    June  7 2005  - project begun.  See Object::Generic
+

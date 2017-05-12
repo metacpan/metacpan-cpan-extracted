@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<SITE ID="DejaNews">
+
+<NAME Lang="en-us">DejaNews Usenet</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+Deja News °Q½×¸s·j´M
+]]></NAME>
+<INFO Lang="en-us">newsgroup discussion search</INFO>
+<INFO Lang="zh-tw">newsgroup discussion search</INFO>
+
+<URL Type="More"><![CDATA[
+_MORE_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://www.dejanews.com/dnquery.xp?QRY=_QUERY_&defaultOp=AND&LNG=ALL&maxhits=20&ST=QS&format=terse&DBS=2
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+<EXPRESSION>Standard</EXPRESSION>
+<CATEGORY>USENET,General</CATEGORY>
+
+<VAR Name="_MORE_"><![CDATA[
+<b><a href="_MORE_">Next
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+. _DATE_<a href="_URL_">_TITLE_</a>_PREVIEW_<font
+]]></TEMPLATE>
+</SITE>

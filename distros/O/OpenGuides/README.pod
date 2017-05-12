@@ -1,0 +1,59 @@
+=head1 NAME
+
+OpenGuides - A complete web application for managing a collaboratively-written guide to a city or town.
+
+=head1 DESCRIPTION
+
+The OpenGuides software provides the framework for a collaboratively-written
+city guide.  It is similar to a wiki but provides somewhat more structured
+data storage allowing you to annotate wiki pages with information such as
+category, location, and much more.  It provides searching facilities
+including "find me everything within a certain distance of this place".
+Every page includes a link to a machine-readable (RDF) version of the page.
+
+=head1 BUGS AND CAVEATS
+
+UTF8 data are currently not handled correctly throughout.
+
+Other bugs are documented at
+L<https://github.com/OpenGuides/OpenGuides/issues>
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * The Randomness Guide to London, at L<http://london.randomness.org.uk/>, the largest OpenGuides site.
+
+=item * The list of live OpenGuides installs at L<http://openguides.org/>.
+
+=item * L<Wiki::Toolkit>, the Wiki toolkit which does the heavy lifting for OpenGuides.
+
+=back
+
+=head1 FEEDBACK
+
+If you have a question, a bug report, or a patch, or you're interested
+in joining the development team, please contact openguides-dev@lists.openguides.org
+(moderated mailing list, will reach all current developers but you'll have
+to wait for your post to be approved) or file a bug report at
+L<https://github.com/OpenGuides/OpenGuides/issues>
+
+=head1 AUTHOR
+
+The OpenGuides Project (openguides-dev@lists.openguides.org)
+
+=head1 COPYRIGHT
+
+     Copyright (C) 2003-2013 The OpenGuides Project.  All Rights Reserved.
+
+The OpenGuides distribution is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+=head1 CREDITS
+
+Programming by Dominic Hargreaves, Earle Martin, Kake Pugh, and Ivor
+Williams.  Testing and bug reporting by Billy Abbott, Jody Belka,
+Kerry Bosworth, Simon Cozens, Cal Henderson, Steve Jolly, and Bob
+Walker (among others).  Much of the Module::Build stuff copied from
+the Siesta project L<http://siesta.unixbeard.net/>
+

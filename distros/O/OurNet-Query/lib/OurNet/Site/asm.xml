@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<SITE ID="Asm">
+
+<NAME Lang="en-us">ASM Journals Search</NAME>
+<INFO Lang="en-us">biochemical relevant digital journals search</INFO>
+
+<URL Type="More"><![CDATA[
+http://www.journals.asm.org_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://www.journals.asm.org/cgi/search?journalcode=all&volume=&firstpage=&sendit=Search&author1=&author2=&titleabstract=&fulltext=_QUERY_&fmonth=Jan&fyear=1992&tmonth=&tyear=&hits=_HITS_&fdatedef=&tdatedef=
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_NEXT_"><![CDATA[
+<A HREF="_NEXT_">[View Next
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<INPUT TYPE="checkbox"___">_TITLE_<DD>_PREVIEW_<BR>___<A HREF="_URL_">[Abstract___</A>
+]]></TEMPLATE>
+</SITE>

@@ -1,0 +1,4 @@
+
+# XXX: my $badparm_rx      = qr/The following parameter was passed .* but was not listed in the validation options: badparm/;
+# XXX: need to test subcommand_specs
+

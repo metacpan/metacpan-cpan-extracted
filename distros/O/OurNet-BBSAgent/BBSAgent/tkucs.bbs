@@ -1,0 +1,10 @@
+# $File: //depot/OurNet-BBSAgent/BBSAgent/tkucs.bbs $ $Author: autrijus $
+# $Revision: #5 $ $Change: 2829 $ $DateTime: 2002/01/10 14:54:36 $
+# Contributed by Smartboy <kcwu@ck.tp.edu.tw>
+# zh_TW.Big5: 淡江資工地上站
+
+Tamkang University CS Department
+bbs.cs.tku.edu.tw
+
+load firebird2.board
+setv statustail 帳號:[

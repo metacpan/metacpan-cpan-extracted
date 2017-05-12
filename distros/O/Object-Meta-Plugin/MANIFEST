@@ -1,0 +1,19 @@
+Build.PL
+lib/Object/Meta/Plugin.pm
+lib/Object/Meta/Plugin/ExportList.pm
+lib/Object/Meta/Plugin/Host.pm
+lib/Object/Meta/Plugin/Useful.pm
+lib/Object/Meta/Plugin/Useful/Generic.pm
+lib/Object/Meta/Plugin/Useful/Greedy.pm
+lib/Object/Meta/Plugin/Useful/Meta.pm
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/basic.t
+t/error_handling.t
+t/extremes.t
+t/greedy.t
+t/lib/OMPTest.pm
+
+SIGNATURE    Added here by Module::Build

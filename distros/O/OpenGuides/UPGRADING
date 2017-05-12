@@ -1,0 +1,30 @@
+0.61
+        Customized navbar_categories.tt and navbar_locales.tt templates
+        need to be updated:
+        - First of all, your template needs to check for
+            [% config.enable_common_categories %]
+          rather than
+            [% common_categories %]
+          in order to know whether to add this <div> to the navbar or not.
+
+        - Secondly, you need to replace
+            <a href="[% catloc_link %]Category_[% cat %]">
+          with
+            <a href="[% config.script_url _ config.script_name %]?id=Category_[% cat %]">
+
+0.60    The edit form now uses stylable <div>s rather than tables.  You will
+        probably want to provide at least basic styling for these.
+
+0.59    Some CSS was altered; you should check and update your stylesheets.
+        See README.CSS for details.
+        Common categories and locales were moved within the navbar
+
+0.58    No major changes
+
+0.57    Search::InvertedIndex is deprecated; please use Plucene instead.
+
+0.55    Wiki::Toolkit required instead of CGI::Wiki.
+
+0.52    supersearch.cgi is now just search.cgi, so please update templates
+        as appropriate, and consider adding an HTTP redirect to keep old
+        links working.

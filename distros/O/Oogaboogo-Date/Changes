@@ -1,0 +1,6 @@
+Revision history for Perl extension Oogaboogo::Date.
+
+0.01  Thu Oct 17 11:11:28 2013
+	- original version; created by h2xs 1.23 with options
+		-XAn Oogaboogo::Date
+

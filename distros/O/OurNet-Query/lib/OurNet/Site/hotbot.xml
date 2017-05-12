@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<SITE ID="HotBot">
+
+<NAME Lang="en-us">HotBot WWW Search</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+HotBot ¥þ²yWWW·j´M
+]]></NAME>
+<INFO Lang="en-us">general information web search</INFO>
+<INFO Lang="zh-tw">general information web search</INFO>
+
+<URL Type="More"><![CDATA[
+http://www.hotbot.com/?MT=_QUERY_&SM=SC&DV=0&LG=any&RD=RG&FVI=1&FRA=1&FVV=1&FJS=1&DC=10&DE=2&submit=SEARCH&base=_START_10_0_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://www.hotbot.com/?MT=_QUERY_&SM=SC&DV=0&LG=any&RD=RG&FVI=1&FRA=1&FVV=1&FJS=1&DC=10&DE=2&submit=SEARCH&base=0
+]]></URL>
+
+<SCORE>_SCORE_</SCORE>
+<EXPRESSION>Standard</EXPRESSION>
+<CATEGORY>WWW,General</CATEGORY>
+
+
+<TEMPLATE><![CDATA[
+.&nbsp;___<a href=_URL_>_TITLE_</A>___<br>_PREVIEW_<br>___size=1><b>_SCORE_%___<i>_DATE_</i>
+]]></TEMPLATE>
+</SITE>

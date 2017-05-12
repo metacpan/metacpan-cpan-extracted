@@ -1,0 +1,4 @@
+TYPEMAP
+
+OSPV_fatindex2 *	O_OSSVPV
+OSPV_fatindex3 *	O_OSSVPV

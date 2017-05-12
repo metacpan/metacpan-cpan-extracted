@@ -1,0 +1,12 @@
+^\.hg
+^Makefile$
+^blib/
+^MakeMaker-\d
+^pm_to_blib
+^MYMETA\.
+
+~$
+\.orig$
+\.old$
+^#.*#$
+^\.#

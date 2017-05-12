@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<SITE ID="Archie">
+
+<NAME Lang="en-us">NCU Archie FTP search</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+台灣Archie檔案搜尋
+]]></NAME>
+<INFO Lang="en-us">ftp servers and files search in Taiwan</INFO>
+<INFO Lang="zh-tw">ftp servers and files search in Taiwan</INFO>
+
+<URL Type="More"><![CDATA[
+post://archie.edu.tw/cgi-bin/archie.cgi?query=_QUERY_&pathrel=OR&url=http://archie.edu.tw/cgi-bin/archie.cgi&oldquery=_QUERY_&case=Insensitive&oflag=0&maxhits=10&start_site_file=10607&type=Sub+String&strhan=_STRHAN_&start_string=_STARTSTRING_&start_site_prnt=_STARTSITEPRNT_&start_site_stop=_STARTSITESTOP_&&more=YES
+]]></URL>
+<URL Type="Start"><![CDATA[
+post://archie.edu.tw/cgi-bin/archie.cgi?oflag=0&query=_QUERY_&type=Sub+String&case=Insensitive&maxhits=_HITS_&domain1=&domain2=&domain3=&domain4=&domain5=&path=&pathrel=OR&expath=
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+<EXPRESSION>Plain</EXPRESSION>
+<CATEGORY>FTP,Regional</CATEGORY>
+
+<VAR Name="_STARTSITEFILE_"><![CDATA[
+NAME="start_site_file" VALUE="_STARTSITEFILE_">
+]]></VAR>
+<VAR Name="_STARTSTRING_"><![CDATA[
+NAME="start_string" VALUE="_STARTSTRING_">
+]]></VAR>
+<VAR Name="_QUERY_"><![CDATA[
+NAME="oldquery" VALUE="_QUERY_">
+]]></VAR>
+<VAR Name="_STARTSITEPRNT_"><![CDATA[
+NAME="start_site_prnt" VALUE="_STARTSITEPRNT_">
+]]></VAR>
+<VAR Name="_STRHAN_"><![CDATA[
+NAME="strhan" VALUE="_STRHAN_">
+]]></VAR>
+<VAR Name="_STARTSITESTOP_"><![CDATA[
+NAME="start_site_stop" VALUE="_STARTSITESTOP_">
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<b><A HREF="_URL_">___<i>_FILENAME_</i>___<b>日期: </b>_DATE_<b>___檔案大小: </b>_SIZE_<b>
+]]></TEMPLATE>
+</SITE>

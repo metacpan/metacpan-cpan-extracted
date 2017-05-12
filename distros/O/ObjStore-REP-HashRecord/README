@@ -1,0 +1,42 @@
+WHAT THE HECK IS THIS?
+
+  A code generator for optimized database records.
+
+
+DESCRIPTION:
+
+The achievement of top database efficiency demands the use of C++ to
+optimize space requirements and access times of perl data.
+Unfortunately, once we step down from perl to C++ things get a lot
+more complicated (or at least messy).
+
+Suddenly, each database brings with it the baggage of an application
+specific schema and the corresponding C++ support code.  Even worse,
+as the schema evolves, old schemas and code from prior versions must
+continue to be supported or old data will become much less convenient
+to access.  Another alternative, schema evolution, is an enormous
+amount of trouble and should be possible to avoid or at least easy to
+postpone.  The new dump and load facility introduced with OS 5.1 is a
+help but it doesn't squarely address the same problem.
+
+We need to balance two opposing desires:
+
+1. Optimize data using customized C++ objects.
+
+2. Try to minimize the bulk of schema and object code needed for
+ongoing backward compatibility.
+
+
+IMPLEMENTATION:
+
+Just like a relational database.  Records are encoded by field offset
+and type, with all the data manipulations being generic.
+
+
+------------------------------------------------------------------------
+Copyright © 1998-1999 Joshua Nathaniel Pritikin.  All rights reserved.
+
+This package is free software and is provided "as is" without express
+or implied warranty.  It may be used, redistributed and/or modified
+under the terms of the Perl Artistic License (see
+http://www.perl.com/perl/misc/Artistic.html)

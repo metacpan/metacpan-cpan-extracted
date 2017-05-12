@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<SITE ID="WebGather">
+
+<NAME Lang="zh-cn"><![CDATA[
+天网 WWW 资源检索系统
+]]></NAME>
+<NAME Lang="en-us">Webgather WWW Search</NAME>
+<NAME Lang="zh-tw">ㄊ厩ぱ呼穓碝ま篮 (い瓣嘲)</NAME>
+<INFO Lang="zh-cn">general information web search in Mainland China</INFO>
+<INFO Lang="en-us">general information web search in Mainland China</INFO>
+<INFO Lang="zh-tw">general information web search in Mainland China</INFO>
+
+<URL Type="More"><![CDATA[
+http://pccms.pku.edu.cn:8000/cgi-bin/allsearch?word=_QUERY_&B1=%B2%E9%D1%AF&method=Exact&operation=And&dc=All&display=Standard&cdtype=GB&fno=_START_10_0_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://pccms.pku.edu.cn:8000/cgi-bin/allsearch?word=_QUERY_&B1=%B2%E9%D1%AF&method=Exact&operation=And&dc=All&display=Standard&cdtype=GB&fno=0
+]]></URL>
+
+<CHARSET>zh-cn</CHARSET>
+<SCORE>_SCORE_</SCORE>
+
+
+<TEMPLATE><![CDATA[
+<LI>___<a href="_URL_" target=_top> &nbsp &nbsp_TITLE_</a>___摘要：</b><br>_PREVIEW_ ...___最近修改时间：</b>_DATE_&nbsp &nbsp <b>长度：</b>_SIZE_&nbsp &nbsp <b>相关度：</b>
+]]></TEMPLATE>
+</SITE>

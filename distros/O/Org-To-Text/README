@@ -1,0 +1,18 @@
+SYNOPSIS
+
+     use Org::To::Text qw(org_to_text);
+     my $text = org_to_text(source=>$org);
+
+DESCRIPTION
+
+    NOT YET IMPLEMENTED.
+
+SEE ALSO
+
+    For more information about Org document format, visit
+    http://orgmode.org/
+
+    Org::Parser
+
+    Org::To::HTML
+

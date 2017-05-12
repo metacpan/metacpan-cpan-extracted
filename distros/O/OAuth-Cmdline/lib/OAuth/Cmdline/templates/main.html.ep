@@ -1,0 +1,2 @@
+<a href="<%= $login_url %>"
+>Login on <%= $site %></a>

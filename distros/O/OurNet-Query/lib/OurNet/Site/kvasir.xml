@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<SITE ID="Kvasir">
+
+<NAME Lang="en-us">Kvasir Search</NAME>
+<INFO Lang="en-us">general information web search in Norge</INFO>
+
+<URL Type="More"><![CDATA[
+http://search.kvasir.sol.no/ar/_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://search.kvasir.sol.no/ar/search.cgi?language=no&ver=5&mode=or&mengde=web-no&query=_QUERY_
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_NEXT_"><![CDATA[
+<a href="_NEXT_"><FONT color="#cc0000">&gt;&gt;
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<li___<a href="_URL_"___>_TITLE_</a>___<br>_PREVIEW_<li>
+]]></TEMPLATE>
+</SITE>

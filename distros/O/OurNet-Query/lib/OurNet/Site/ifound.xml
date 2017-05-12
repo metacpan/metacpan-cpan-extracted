@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<SITE ID="Ifound">
+
+<NAME Lang="en-us">IFound WWW Search</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+發現者搜尋引擎
+]]></NAME>
+<INFO Lang="en-us">general information web search in Taiwan</INFO>
+<INFO Lang="zh-tw">general information web search in Taiwan</INFO>
+
+<URL Type="Start"><![CDATA[
+http://www.ifound.net.tw/cgi-bin/search?Time=10&box=_QUERY_&country=Taiwan
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/3</SCORE>
+
+
+<TEMPLATE><![CDATA[
+<font color="#FF0080">___<a href="_URL_">_TITLE_</a>___<dd>_PREVIEW_<font color="#800080">
+]]></TEMPLATE>
+</SITE>

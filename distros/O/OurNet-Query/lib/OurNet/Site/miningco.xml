@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<SITE ID="Miningco">
+
+<NAME Lang="en-us">The Mining Co. Guide</NAME>
+<INFO Lang="en-us">general information documents and web search</INFO>
+
+<URL Type="More"><![CDATA[
+_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://search.miningco.com/scripts/query70.asp?terms=_QUERY_&trail=&Site=home&SUName=home&COB=home&TopNode=%2F
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_NEXT_"><![CDATA[
+0 <A HREF="_NEXT_"><IMG SRC="/zimages70z/search/rightarrow_on.gif
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<p>___<a href='_URL_'>_TITLE_</a><br>_PREVIEW_<p>
+]]></TEMPLATE>
+</SITE>

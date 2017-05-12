@@ -1,0 +1,6 @@
+Revision history for Perl extension OMA::DRM.
+
+0.00_01  Tue Jun  6 13:24:04 2006
+	- original version; created by h2xs 1.23 with options
+		-B -X -n OMA::DRM -b 5.8.0
+

@@ -1,0 +1,109 @@
+
+
+            OSPF Router with ID (10.188.1.15) (Process ID 1)
+
+		Router Link States (Area 0.0.0.0)
+
+  LS age: 574
+  Options: (No TOS-capability, DC)
+  LS Type: Router Links
+  Link State ID: 10.188.1.15
+  Advertising Router: 10.188.1.15
+  LS Seq Number: 8000002A
+  Checksum: 0x3448
+  Length: 36
+  Area Border Router
+  Number of Links: 1
+
+    Link connected to: a Transit Network
+     (Link ID) Designated Router address: 10.253.4.99
+     (Link Data) Router Interface address: 10.253.4.99
+      Number of TOS metrics: 0
+       TOS 0 Metrics: 1
+
+
+  LS age: 570
+  Options: (No TOS-capability, No DC)
+  LS Type: Router Links
+  Link State ID: 10.188.1.16
+  Advertising Router: 10.188.1.16
+  LS Seq Number: 8000002D
+  Checksum: 0xDCBD
+  Length: 36
+  Number of Links: 1
+
+    Link connected to: a Transit Network
+     (Link ID) Designated Router address: 10.253.4.99
+     (Link Data) Router Interface address: 10.253.4.98
+      Number of TOS metrics: 0
+       TOS 0 Metrics: 65535
+
+
+
+		Router Link States (Area 10.188.0.0)
+
+  LS age: 148
+  Options: (No TOS-capability, No DC)
+  LS Type: Router Links
+  Link State ID: 10.188.1.10
+  Advertising Router: 10.188.1.10
+  LS Seq Number: 8000005C
+  Checksum: 0x364D
+  Length: 48
+  Number of Links: 2
+
+    Link connected to: a Transit Network
+     (Link ID) Designated Router address: 10.188.50.10
+     (Link Data) Router Interface address: 10.188.50.10
+      Number of TOS metrics: 0
+       TOS 0 Metrics: 10
+
+    Link connected to: a Transit Network
+     (Link ID) Designated Router address: 10.188.1.15
+     (Link Data) Router Interface address: 10.188.1.10
+      Number of TOS metrics: 0
+       TOS 0 Metrics: 10
+
+
+  LS age: 1495
+  Options: (No TOS-capability, DC)
+  LS Type: Router Links
+  Link State ID: 10.188.1.15
+  Advertising Router: 10.188.1.15
+  LS Seq Number: 8000004F
+  Checksum: 0xA6E1
+  Length: 36
+  Area Border Router
+  Number of Links: 1
+
+    Link connected to: a Transit Network
+     (Link ID) Designated Router address: 10.188.1.15
+     (Link Data) Router Interface address: 10.188.1.15
+      Number of TOS metrics: 0
+       TOS 0 Metrics: 1
+
+
+  Routing Bit Set on this LSA
+  LS age: 142
+  Options: (No TOS-capability, No DC)
+  LS Type: Router Links
+  Link State ID: 10.188.50.50
+  Advertising Router: 10.188.50.50
+  LS Seq Number: 80000041
+  Checksum: 0x2E11
+  Length: 48
+  AS Boundary Router
+  Number of Links: 2
+
+    Link connected to: a Stub Network
+     (Link ID) Network/subnet number: 10.188.49.50
+     (Link Data) Network Mask: 255.255.255.255
+      Number of TOS metrics: 0
+       TOS 0 Metrics: 10
+
+    Link connected to: a Transit Network
+     (Link ID) Designated Router address: 10.188.50.10
+     (Link Data) Router Interface address: 10.188.50.50
+      Number of TOS metrics: 0
+       TOS 0 Metrics: 10
+

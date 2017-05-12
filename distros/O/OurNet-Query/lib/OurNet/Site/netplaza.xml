@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<SITE ID="NetPlaza">
+
+<NAME Lang="en-us">NETPLAZA WWW Search</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+NETPLAZA全球WWW搜尋(日本)
+]]></NAME>
+<INFO Lang="en-us">general information web search in Japan</INFO>
+<INFO Lang="zh-tw">general information web search in Japan</INFO>
+
+<URL Type="More"><![CDATA[
+http://search.netplaza.biglobe.ne.jp_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://search.netplaza.biglobe.ne.jp/cgi-bin/search-renew3.cgi?key=_QUERY_&number=10
+]]></URL>
+
+<CHARSET>ja-jp.euc</CHARSET>
+
+<VAR Name="_NEXT_"><![CDATA[
+<A HREF="_NEXT_">慼及矢□斥</A>
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<LI><A HREF="_URL_"___>_TITLE_<!-- URL COMMENT -->_PREVIEW_<HR>
+]]></TEMPLATE>
+</SITE>

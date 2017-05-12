@@ -1,0 +1,13 @@
+OpenStack::Client Changes
+
+Version 1.0002
+
+    * Added custom header support in $client->call()
+
+Version 1.0001
+
+    * Fix bug in selecting endpoints in $auth->service()
+
+Version 1.0000
+
+    * Initial release

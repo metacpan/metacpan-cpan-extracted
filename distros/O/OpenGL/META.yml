@@ -1,0 +1,26 @@
+---
+abstract: 'Perl bindings to the OpenGL API, GLU, and GLUT/FreeGLUT'
+author:
+  - 'Chris Marshall <chm at cpan dot org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: OpenGL
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Test::More: '0'
+resources:
+  bugtracker: http://sourceforge.net/tracker/?group_id=562483&atid=2281758
+  homepage: http://sourceforge.net/projects/pogl/
+  repository: git://pogl.git.sourceforge.net/gitroot/pogl/pogl
+version: '0.70'

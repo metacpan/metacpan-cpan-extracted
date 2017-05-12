@@ -1,0 +1,15 @@
+Changes
+LibVorbis.xs
+Makefile.PL
+MANIFEST
+ppport.h
+README
+fallback/const-c.inc
+fallback/const-xs.inc
+typemap
+lib/Ogg/Vorbis/LibVorbis.pm
+t/encode.t
+t/vorbisfile.t
+t/test.wav
+t/test.ogg
+META.yml                                 Module meta-data (added by MakeMaker)

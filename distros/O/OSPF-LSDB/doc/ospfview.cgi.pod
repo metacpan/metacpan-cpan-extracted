@@ -1,0 +1,112 @@
+=head1 NAME
+
+B<ospfview.cgi> - publish the OSPF LSDB graph on a web server
+
+=head1 SYNOPSIS
+
+http://127.0.0.1/cgi-bin/ospfview.cgi?ipv6=0&external=2
+
+=head1 DESCRIPTION
+
+The cgi script B<ospfview.cgi> allows to publish the link-state
+database of an OSPF router on a web server running there.
+
+The router must run the OpenBSD B<ospfd> or B<ospf6d> routing daemon.
+To make this cgi script work, the web server must have access to
+the F</var/run/ospfd.sock> and F</var/run/ospf6d.sock> UNIX domain
+sockets.
+This can be achieved by file permissions or B<sudo> permissions for
+B<ospfctl> and B<ospf6ctl>.
+The web server must not run chrooted.
+
+The following parameters control the format and content of the
+generated graph.
+The content parameters have numerical values, C<0> disables the
+feature and is the default.
+
+=over 4
+
+=item format
+
+Specify the file format of the generated image.
+The value is passed to the B<dot> B<-T> option.
+Available choices are C<dot>, C<fig>, C<gif>, C<pdf>, C<png>, C<ps>,
+C<ps2>, C<svg>, C<svgz>.
+Default is C<svg>.
+
+=item ipv6
+
+The value C<1> turns on IPv6, C<0> uses IPv4.
+
+=item legend
+
+The value C<1> displays the legend instead of the current OSPF LSDB.
+
+=item summary
+
+The value C<1> adds the network summary-LSAs to the graph.
+With C<2> these LSAs get aggregated.
+Inter-area-prefix-LSAs have not been implemented for IPv6.
+
+=item boundary
+
+The value C<1> adds the boundary router summary-LSAs to the graph.
+With C<2> these LSAs get aggregated.
+Inter-area-router-LSAs have not been implemented for IPv6.
+
+=item external
+
+The value C<1> adds the AS-external-LSAs to the graph.
+With C<2> these LSAs get aggregated.
+
+=item link
+
+The value C<1> adds the link-LSAs to the graph.
+These LSAs exist only for IPv6.
+
+=item intra
+
+The value C<1> adds the network and router intra-area-prefix-LSAs
+to the graph.
+These LSAs exist only for IPv6.
+
+=item cluster
+
+The value C<1> clusters LSAs containing the same network into a
+common rectangle.
+This feature has not been implemented for IPv6.
+
+=item warnings
+
+The value C<1> prints the area and all warnings corresponding to
+the color of the nodes and edges.
+With C<2> only the area or the most severe warning is printed.
+Note that with the C<svg> format, the messages are always available
+as tool tip.
+
+=back
+
+=head1 DIAGNOSTICS
+
+The program dies if an error occurs.
+Check your web server's error log for messages.
+
+=head1 SEE ALSO
+
+L<OSPF::LSDB::View6>,
+L<OSPF::LSDB::View>,
+L<OSPF::LSDB>
+
+dot(1)
+
+=head1 AUTHOR
+
+Alexander Bluhm
+
+=head1 SECURITY CONSIDERATIONS
+
+It is probably not the best idea to publish one's routing topology
+on a public web server.
+This cgi script is intended to debug OSPF in a controlled environment.
+
+The perl taint mode is used to make this cgi script secure.

@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<SITE ID="snap.com">
+
+<NAME Lang="en-us">Snap Search Engine</NAME>
+<INFO Lang="en-us">general information web search</INFO>
+
+<URL Type="More"><![CDATA[
+http://www.snap.com_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://www.snap.com/search/directory/results/1,61,home-0,00.html?keyword=_QUERY_
+]]></URL>
+
+<EXPRESSION>standard</EXPRESSION>
+<CATEGORY>WWW, general</CATEGORY>
+
+<VAR Name="_NEXT_"><![CDATA[
+<a href="_NEXT_"><b>Next</b></a></tr>
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<blockquote><a href="_URL_">_TITLE_</a>___<br>_PREVIEW_<br><font size="-2">
+]]></TEMPLATE>
+</SITE>

@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<SITE ID="StartingPoint">
+
+<NAME Lang="en-us">Starting Point WWW Search</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+Starting Point ¥þ²y WWW ·j´M
+]]></NAME>
+<INFO Lang="en-us">general information web search</INFO>
+<INFO Lang="zh-tw">general information web search</INFO>
+
+<URL Type="More"><![CDATA[
+http://www.stpt.com/_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://www.stpt.com/search.asp?whattosearch=web&query_val=_QUERY_
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_NEXT_"><![CDATA[
+<A HREF="_NEXT_">Next
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<DT> <A HREF="_URL_">_TITLE_</A>___<DD>_PREVIEW_<BR>___- size_SIZEK_KB -_DATE_</SMALL>
+]]></TEMPLATE>
+</SITE>

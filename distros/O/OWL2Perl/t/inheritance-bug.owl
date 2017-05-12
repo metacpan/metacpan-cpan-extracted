@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE rdf:RDF [
+  <!ENTITY this "http://sadiframework.org/ontologies/chebiservice.owl#">
+  <!ENTITY owl "http://www.w3.org/2002/07/owl#">
+  <!ENTITY lsrn "http://purl.oclc.org/SADI/LSRN/">
+  <!ENTITY rdf "http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+  <!ENTITY rdfs "http://www.w3.org/2000/01/rdf-schema#">
+  <!ENTITY xsd "http://www.w3.org/2001/XMLSchema#">
+  <!ENTITY pred "http://sadiframework.org/ontologies/service_objects.owl#">  
+]>
+
+<rdf:RDF
+         xml:base="&this;"
+         xmlns:owl="&owl;"
+         xmlns:lsrn="&lsrn;"
+         xmlns:pred="&pred;"
+         xmlns:rdf="&rdf;"
+         xmlns:rdfs="&rdfs;"
+         xmlns:xsd="&xsd;"
+         xmlns="&this;">
+
+  
+  <!-- in lieu of importing the whole ontology -->
+  <owl:ObjectProperty rdf:about="http://sadiframework.org/ontologies/service_objects.owl#hasCHEBIEntry"/>
+  <owl:Class rdf:about="http://purl.oclc.org/SADI/LSRN/KEGG_COMPOUND_Record"/>
+  
+  <owl:Class rdf:about="http://sadiframework.org/ontologies/chebiservice.owl#getCHEBIEntryFromKEGGCompound_Output">
+    <rdfs:subClassOf rdf:resource="http://purl.oclc.org/SADI/LSRN/KEGG_COMPOUND_Record"/>
+    <rdfs:subClassOf>
+        <owl:Restriction>
+        <owl:minCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:minCardinality>
+        <owl:onProperty rdf:resource="http://sadiframework.org/ontologies/service_objects.owl#hasCHEBIEntry"/>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+  </owl:Class>
+  
+</rdf:RDF>

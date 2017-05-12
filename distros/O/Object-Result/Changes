@@ -1,0 +1,15 @@
+Revision history for Object-Result
+
+0.000001  Sat Apr 12 09:27:33 2014
+       Initial release.
+
+
+
+0.000002  Tue Jul 22 19:28:53 2014
+          No changes logged
+
+
+0.000003  Sat Sep  5 21:10:14 2015
+
+    Avoided problems testing error messages in non-anglophone locales
+    (Danke, Slaven!)

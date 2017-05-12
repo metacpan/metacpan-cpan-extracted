@@ -1,0 +1,7 @@
+Changes
+Build.PL
+MANIFEST
+README
+t/1.t
+lib/Object/Factory/Declarative.pm
+META.yml

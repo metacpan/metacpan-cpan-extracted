@@ -1,0 +1,24 @@
+Revision history for Perl extension OzDB.
+
+0.0.1  Wed Apr  6 15:53:07 2005
+	- original version; created by h2xs 1.23 with options
+		-AXc -n OzDB
+0.0.2-0.1.3  Tuesday May 17 12:23:00 2005
+  - added basic database and
+    a few features.  nexen@linuxops.net
+
+Revision history for CPAN:
+
+0.0.1  Thursday May 19, 2005
+   Version 0.1.3 has been re-released
+   as version 0.0.1 for distribution
+   on CPAN.  This is a technical issue
+   and will not affect any existing
+   implementations.  Please submit any
+   patches, bug requests, feature requests,
+   help requests or other inquiry at
+   http://support.linuxops.net
+   
+0.0.2  Thursday May 19, 2005
+   More CPAN specific changes.
+

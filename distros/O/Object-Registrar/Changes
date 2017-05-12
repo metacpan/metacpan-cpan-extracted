@@ -1,0 +1,5 @@
+Revision history for Perl extension Object::Registrar.
+
+0.01  Thu Nov  1 19:18:02 2001 by Arun Kumar U <u_arunkumar@yahoo.com>
+	- first version; implements basic functionality
+

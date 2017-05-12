@@ -1,0 +1,138 @@
+TYPEMAP
+
+Axis *	O_AXIS
+const Axis *	O_AXIS
+EventArg *	O_EVENTARG
+Exception *	O_EXCEPTION
+InputManager *	O_INPUTMANAGER
+JoyStick *	O_JOYSTICK
+JoyStickEvent *	O_JOYSTICKEVENT
+JoyStickListener *	O_JOYSTICKLISTENER
+JoyStickState *	O_JOYSTICKSTATE
+Keyboard *	O_KEYBOARD
+KeyEvent *	O_KEYEVENT
+KeyListener *	O_KEYLISTENER
+Mouse *	O_MOUSE
+MouseEvent *	O_MOUSEEVENT
+MouseListener *	O_MOUSELISTENER
+MouseState *	O_MOUSESTATE
+const MouseState *	O_MOUSESTATE
+Object *	O_OBJECT
+
+string	STRING
+uint16	T_UV
+OIS_ERROR	T_IV
+Type	T_IV
+ComponentType	T_IV
+KeyCode	T_IV
+TextTranslationMode	T_IV
+Modifier	T_IV
+
+
+INPUT
+
+STRING
+	char * xstmpchr_$var = (char *) SvPV_nolen($arg);
+	$var = xstmpchr_$var;
+
+O_AXIS
+	TMOIS_IN($arg, $var, $type, $Package, $func_name, Axis)
+
+O_EVENTARG
+	TMOIS_IN($arg, $var, $type, $Package, $func_name, EventArg)
+
+O_EXCEPTION
+	TMOIS_IN($arg, $var, $type, $Package, $func_name, Exception)
+
+O_INPUTMANAGER
+	TMOIS_IN($arg, $var, $type, $Package, $func_name, InputManager)
+
+O_JOYSTICK
+	TMOIS_IN($arg, $var, $type, $Package, $func_name, JoyStick)
+
+O_JOYSTICKEVENT
+	TMOIS_IN($arg, $var, $type, $Package, $func_name, JoyStickEvent)
+
+O_JOYSTICKLISTENER
+	TMOIS_IN($arg, $var, $type, $Package, $func_name, JoyStickListener)
+
+O_JOYSTICKSTATE
+	TMOIS_IN($arg, $var, $type, $Package, $func_name, JoyStickState)
+
+O_KEYBOARD
+	TMOIS_IN($arg, $var, $type, $Package, $func_name, Keyboard)
+
+O_KEYEVENT
+	TMOIS_IN($arg, $var, $type, $Package, $func_name, KeyEvent)
+
+O_KEYLISTENER
+	TMOIS_IN($arg, $var, $type, $Package, $func_name, KeyListener)
+
+O_MOUSE
+	TMOIS_IN($arg, $var, $type, $Package, $func_name, Mouse)
+
+O_MOUSEEVENT
+	TMOIS_IN($arg, $var, $type, $Package, $func_name, MouseEvent)
+
+O_MOUSELISTENER
+	TMOIS_IN($arg, $var, $type, $Package, $func_name, MouseListener)
+
+O_MOUSESTATE
+	TMOIS_IN($arg, $var, $type, $Package, $func_name, MouseState)
+
+O_OBJECT
+	TMOIS_IN($arg, $var, $type, $Package, $func_name, Object)
+
+
+OUTPUT
+
+STRING
+	sv_setpvn((SV*)$arg, (char *) ($var.data()), ($var.size()));
+
+O_AXIS
+	TMOIS_OUT($arg, $var, Axis)
+
+O_EVENTARG
+	TMOIS_OUT($arg, $var, EventArg)
+
+O_EXCEPTION
+	TMOIS_OUT($arg, $var, Exception)
+
+O_INPUTMANAGER
+	TMOIS_OUT($arg, $var, InputManager)
+
+O_JOYSTICK
+	TMOIS_OUT($arg, $var, JoyStick)
+
+O_JOYSTICKEVENT
+	TMOIS_OUT($arg, $var, JoyStickEvent)
+
+O_JOYSTICKLISTENER
+	TMOIS_OUT($arg, $var, JoyStickListener)
+
+O_JOYSTICKSTATE
+	TMOIS_OUT($arg, $var, JoyStickState)
+
+O_KEYBOARD
+	TMOIS_OUT($arg, $var, Keyboard)
+
+O_KEYEVENT
+	TMOIS_OUT($arg, $var, KeyEvent)
+
+O_KEYLISTENER
+	TMOIS_OUT($arg, $var, KeyListener)
+
+O_MOUSE
+	TMOIS_OUT($arg, $var, Mouse)
+
+O_MOUSEEVENT
+	TMOIS_OUT($arg, $var, MouseEvent)
+
+O_MOUSELISTENER
+	TMOIS_OUT($arg, $var, MouseListener)
+
+O_MOUSESTATE
+	TMOIS_OUT($arg, $var, MouseState)
+
+O_OBJECT
+	TMOIS_OUT($arg, $var, Object)

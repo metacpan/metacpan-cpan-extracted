@@ -1,0 +1,19 @@
+FOO: [% foo %]
+
+SITE NAME: [% site_name %]
+CGI URL: [% cgi_url %]
+FULL CGI URL: [% full_cgi_url %]
+CONTACT EMAIL: [% contact_email %]
+STYLESHEET: [% stylesheet %]
+HOME LINK: [% home_link %]
+HOME NAME: [% home_name %]
+
+OPENGUIDES VERSION: [% openguides_version %]
+
+NODE NAME: [% node_name %]
+NODE PARAM: [% node_param %]
+
+FORMATTING RULES LINK: [% formatting_rules_link %]
+OMIT FORMATTING LINK: [% omit_formatting_link %]
+
+ENABLE PAGE DELETION: [% enable_page_deletion %]

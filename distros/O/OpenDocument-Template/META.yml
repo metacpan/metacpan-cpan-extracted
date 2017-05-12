@@ -1,0 +1,40 @@
+---
+abstract: 'generate OpenDocument from template'
+author:
+  - 'Keedi Kim - 김도형 <keedi@cpan.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300003, CPAN::Meta::Converter version 2.112621'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: OpenDocument-Template
+requires:
+  Archive::Zip: 0
+  Config::Any: 0
+  Encode: 0
+  File::Path: 0
+  File::Slurp: 0
+  File::Spec::Functions: 0
+  File::pushd: 0
+  Getopt::Long::Descriptive: 0
+  Moose: 0
+  Moose::Role: 0
+  Moose::Util::TypeConstraints: 0
+  MooseX::SemiAffordanceAccessor: 0
+  MooseX::StrictConstructor: 0
+  Template: 0
+  XML::Tidy: 0
+  autodie: 0
+  namespace::autoclean: 0
+  perl: 5.010
+  strict: 0
+  utf8: 0
+  warnings: 0
+resources:
+  repository: http://github.com/keedi/OpenDocument-Template.git
+version: 0.002

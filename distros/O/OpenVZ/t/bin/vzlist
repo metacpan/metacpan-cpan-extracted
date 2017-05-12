@@ -1,0 +1,41 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+if ( @ARGV && $ARGV[0] eq '-Ho' && $ARGV[1] eq 'ctid,name' ) {
+
+  # then we're looking for a ctid,name combination
+  #
+  # there are four possibilities
+  #
+  #   valid, existing ctid      -> STDOUT ctid name
+  #   valid, existing name      -> STDOUT ctid name
+  #   valid, not existing ctid  -> STDERR Container(s) not found
+  #   not existing name         -> STDERR CT ID <name> is invalid.
+
+  if ( $ARGV[2] eq 'invalid_ctid' ) {
+
+    warn "Container(s) not found\n";
+    exit 1;
+
+  } elsif ( $ARGV[2] eq 'invalid_name' ) {
+
+    warn "CT ID $ARGV[2] is invalid.\n";
+    exit 1;
+
+  } elsif ( $ARGV[2] =~ /^(.*?)(?:,(.*))?$/ ) {
+
+    # We assume the caller knows what they're doing here.
+    my ( $ctid, $name ) = ( $1, $2 );
+    print "$ctid\t$name\n";
+    exit 0;
+
+  }
+
+} else { # just return what we were called with
+
+  printf '%s%s', $0, ( @ARGV ? " @ARGV" : '' );
+
+}
+

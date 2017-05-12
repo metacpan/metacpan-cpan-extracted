@@ -1,0 +1,83 @@
+{
+   "abstract" : "Official OVH Perl wrapper upon the OVH RESTful API.",
+   "author" : [
+      ", OVH SAS."
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.4",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "OvhApi",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Digest::SHA1" : "0",
+            "JSON" : "0",
+            "LWP::UserAgent" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "OvhApi" : {
+         "file" : "lib/OvhApi.pm",
+         "version" : "0.2"
+      },
+      "OvhApi::Answer" : {
+         "file" : "lib/OvhApi/Answer.pm",
+         "version" : "0.2"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/pacoesteban/OvhApi/issues"
+      },
+      "homepage" : "https://github.com/pacoesteban/OvhApi",
+      "repository" : {
+         "url" : "git://github.com/pacoesteban/OvhApi.git",
+         "web" : "https://github.com/pacoesteban/OvhApi"
+      }
+   },
+   "version" : "0.2",
+   "x_contributors" : [
+      "Paco Esteban <paco@onna.be>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

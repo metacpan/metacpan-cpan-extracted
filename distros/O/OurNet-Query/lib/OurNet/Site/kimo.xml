@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<SITE ID="kimo">
+
+<NAME Lang="en-us">Kimo WWW Search Engine</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+©_¼¯WWW·j´M¤ÞÀº
+]]></NAME>
+<INFO Lang="en-us">general information web search exactly in Taiwan</INFO>
+<INFO Lang="zh-tw">general information web search exactly in Taiwan</INFO>
+
+<URL Type="More"><![CDATA[
+http://search02.kimo.com.tw/cgi-bin/srchrstfz.pl?DId=_DID_&PId=_PID_&PagePtr=_PAGE_&Type=0&Query=_QUERYSTR_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://search.kimo.com.tw/srchcgi/srchfz.pl?query=_QUERY_&srchcdn=B0&x=18&y=13
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+<EXPRESSION>Standard</EXPRESSION>
+
+<VAR Name="_PAGE_"><![CDATA[
+Hidden name=PagePtr value=_PAGE_>
+]]></VAR>
+<VAR Name="_PID_"><![CDATA[
+Hidden name=PId value=_PID_>
+]]></VAR>
+<VAR Name="_QUERYSTR_"><![CDATA[
+Hidden name=Query value='_QUERYSTR_'>
+]]></VAR>
+<VAR Name="_DID_"><![CDATA[
+Hidden name=DId value=_DID_>
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<UL><A href="_URL_">_TITLE_</A>___<FONT SIZE=-1>_PREVIEW_</FONT></UL>
+]]></TEMPLATE>
+</SITE>

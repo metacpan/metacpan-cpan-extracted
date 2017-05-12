@@ -1,0 +1,477 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <head>
+        <style type="text/css">
+            h2 {
+                margin-top: 2em;
+                margin-left: 2em
+            }
+            
+            h3 {
+                margin-top: 2em;
+                margin-left: 4em
+            }
+            
+            h4 {
+                margin-top: 2em;
+                margin-left: 6em
+            }
+            
+            p {
+                margin-left: 6em
+            }
+            
+            pre {
+                margin-left: 8em;
+                margin-right: 8em;
+                padding: 4px;
+                font-family: monospace;
+                font-size: 125%;
+                background: #eee;
+            }
+        .new {
+	color: #F00;
+}
+        </style>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+        <title>Working with Perl Modules Representing OWL Classes</title>
+    </head>
+<body>
+        <h1>Working with Perl Modules Representing OWL Classes</h1>
+<p>
+            This document summarises the creation and utilization of Perl modules, generated with the owl2perl-generate-modules.pl script, that represent OWL classes and their associated properties.</p>
+        <p>
+            The main thing to understand is that using these perl modules will make your life much more simple with regards to using OWL in your Perl projects. The generated classes extrapolate the OWL semantics and allow you to use any OWL class, datatype property or object property in an object oriented manner.</p>
+        <p>At the end of this tutorial, you should be able to generate perl modules from an OWL file and be able to use these modules in your service provision.</p>
+        <p>Let's now move on towards seeing how this all works.</p>
+<h2>Table of Contents</h2>
+<ul>
+  <ul>
+    <li><a href="#0">Quick Synopsis for the Impatient</a></li>
+    <li><a href="#1">Prerequisites</a></li>
+    <li><a href="#2">Generating Perl Modules from OWL Classes</a></li>
+    <li><a href="#3">Using Perl Modules Representing OWL Classes</a>
+      <ul>
+        <li><a href="#constraints"><em class="new">New</em> Property Constraints (hasValue, minCardinality, maxCardinality) on OWL Classes</a></li>
+      </ul>
+    </li>
+    <li><a href="#4">Putting it all together (a complete example script)</a><br/>
+    </li>
+  </ul>
+  </ul>
+<h3><a name="0"/>Quick Synopsis for the Impatient</h3>
+<p>For those of you that wish to see how to use the Perl modules without reading further (or to refresh your memory), the following is for you!</p>
+<pre>
+# perl modules generated using the following command:
+# owl2perl-generate-modules.pl example.owl
+
+# on windows:
+# owl2perl-generate-modules example.owl
+
+# our use statements (for completion of this example)
+use sadiframework::org::examples::example::AnnotatedGeneID_Record;
+use ontology::dumontierlab::com::hasSymbol;
+use sadiframework::org::ontologies::predicates::hasDescription;
+use sadiframework::org::ontologies::predicates::hasProteinName;
+use sadiframework::org::ontologies::predicates::hasName;
+
+# instantiate a new record
+my $class = new sadiframework::org::examples::example::AnnotatedGeneID_Record(&quot;http://some_uri/for/my/record&quot;);
+
+# set a label
+$class-&gt;label(&quot;this is my label for this record&quot;);
+
+# get the label
+my $label = $class-&gt;label();
+
+# get the the uri for this record
+my $uri = $class-&gt;uri();
+
+# add some symbols to this record (datatype property)
+$class-&gt;add_hasSymbol(ontology::dumontierlab::com::hasSymbol-&gt;new('Some_Gene_Symbol'));
+$class-&gt;add_hasSymbol(ontology::dumontierlab::com::hasSymbol-&gt;new('Another_Gene_Symbol'));
+
+# you can still get/set hasDescription(), hasProteinName() and hasName() (all are datatype properties in this example)
+
+# for imaginary hasReference() object property described <a href="#object_properties">here</a>
+$class-&gt;add_hasReference(new sadiframework::org::examples::example::AnnotatedGeneID_Record(&quot;http://lsrn.org/Gene:642&quot;));
+</pre>
+<h3><a name="1"/>Prerequisites</h3>
+        <p>Of course, the main prerequisite is that you have installed OWL2Perl on your machine. OWL2Perl can be found on <a href="http://search.cpan.org/dist/OWL2Perl/" target="_blank">CPAN</a>. When you install this Perl module onto your computer, you will also be prompted to install any missing Perl modules required by OWL2Perl. After installation, (i.e. make install), you are required to also run an OWL2Perl installation script, owl2perl-install.pl. This is only done the first time that you install OWL2Perl (and sometimes when you upgrading your OWL2Perl codebase; Looking at the README or CHANGES will make it obvious as to when this is required).</p>
+        <p>Another prerequiste for generating Perl modules from OWL is an OWL document! In this tutorial, we will present all OWL that we use for you to download.        </p>
+        <h3><a name="2"/>Generating Perl Modules from OWL Classes</h3>
+        <p>The generation of Perl modules representing OWL entities is done by the owl2perl-generate-modules.pl script, from now on refered to as 'the script', that is installed onto your computer when you install the OWL2Perl perl module.</p>
+        <p>If you run the script without arguments, you are shown something like:</p>
+        <pre>Generate perl modules from OWL files.
+Usage: [-vdsib] owl-class-file
+       [-vdsi] -u owl-class-url
+
+    -u ... owl is from url
+    -s ... show generated code on STDOUT
+           (no file is created, disabled when no data type name given)
+
+    -b ... option to specify the base uri for the owl document (you will be prompted)
+
+    -i ... follow owl import statements
+
+    -v ... verbose
+    -d ... debug
+    -h ... help
+
+Note: This script requires that the PERL module ODO, from IBM Semantic Layered
+      Research Platform be installed on your workstation! ODO is available on CPAN
+      under the name PLUTO.
+</pre>
+        <p>As you can see, the script consumes either a file or url that points to a file containing the OWL entities that you wish to generate Perl modules. Many OWL ontologies import concepts from other files and so the script also allows you to follow these import statements. Additionally for your convenience, the script also allows for showing generated code on STDOUT.</p>
+        <p>For the rest of this document, the following OWL ontology will be used:</p>
+        <pre><a name="owl_doc"></a>&lt;?xml version=&quot;1.0&quot;?&gt;
+&lt;rdf:RDF
+    xmlns:rdf=&quot;http://www.w3.org/1999/02/22-rdf-syntax-ns#&quot;
+    xmlns:xsd=&quot;http://www.w3.org/2001/XMLSchema#&quot;
+    xmlns:rdfs=&quot;http://www.w3.org/2000/01/rdf-schema#&quot;
+    xmlns:owl=&quot;http://www.w3.org/2002/07/owl#&quot;
+    xml:base=&quot;http://sadiframework.org/examples/example.owl#&quot;&gt;
+  &lt;owl:Ontology rdf:about=&quot;&quot;/&gt;
+  
+  &lt;!-- in lieu of importing the whole ontology... --&gt;
+  &lt;owl:DatatypeProperty rdf:about=&quot;http://ontology.dumontierlab.com/hasSymbol&quot;/&gt;
+  &lt;owl:DatatypeProperty rdf:about=&quot;http://sadiframework.org/ontologies/predicates.owl#hasDescription&quot;/&gt;
+  &lt;owl:DatatypeProperty rdf:about=&quot;http://sadiframework.org/ontologies/predicates.owl#hasProteinName&quot;/&gt;
+  &lt;owl:DatatypeProperty rdf:about=&quot;http://sadiframework.org/ontologies/predicates.owl#hasName&quot;/&gt;
+  &lt;owl:Class rdf:about=&quot;http://purl.oclc.org/SADI/LSRN/GeneID_Record&quot;/&gt;
+  
+  &lt;owl:Class rdf:ID=&quot;AnnotatedGeneID_Record&quot;&gt;
+    &lt;rdfs:subClassOf rdf:resource=&quot;http://purl.oclc.org/SADI/LSRN/GeneID_Record&quot;/&gt;
+    &lt;rdfs:subClassOf&gt;
+      &lt;owl:Class&gt;
+        &lt;owl:intersectionOf rdf:parseType=&quot;Collection&quot;&gt;
+          &lt;owl:Restriction&gt;
+            &lt;owl:onProperty rdf:resource=&quot;http://ontology.dumontierlab.com/hasSymbol&quot;/&gt;
+            &lt;owl:minCardinality rdf:datatype=&quot;http://www.w3.org/2001/XMLSchema#int&quot;&gt;0&lt;/owl:minCardinality&gt;
+          &lt;/owl:Restriction&gt;
+          &lt;owl:Restriction&gt;
+            &lt;owl:onProperty rdf:resource=&quot;http://sadiframework.org/ontologies/predicates.owl#hasDescription&quot;/&gt;
+            &lt;owl:minCardinality rdf:datatype=&quot;http://www.w3.org/2001/XMLSchema#int&quot;&gt;0&lt;/owl:minCardinality&gt;
+          &lt;/owl:Restriction&gt;
+          &lt;owl:Restriction&gt;
+            &lt;owl:onProperty rdf:resource=&quot;http://sadiframework.org/ontologies/predicates.owl#hasProteinName&quot;/&gt;
+            &lt;owl:minCardinality rdf:datatype=&quot;http://www.w3.org/2001/XMLSchema#int&quot;&gt;0&lt;/owl:minCardinality&gt;
+          &lt;/owl:Restriction&gt;
+          &lt;owl:Restriction&gt;
+            &lt;owl:onProperty rdf:resource=&quot;http://sadiframework.org/ontologies/predicates.owl#hasName&quot;/&gt;
+            &lt;owl:minCardinality rdf:datatype=&quot;http://www.w3.org/2001/XMLSchema#int&quot;&gt;0&lt;/owl:minCardinality&gt;
+          &lt;/owl:Restriction&gt;
+        &lt;/owl:intersectionOf&gt;
+      &lt;/owl:Class&gt;
+    &lt;/rdfs:subClassOf&gt;
+  &lt;/owl:Class&gt;
+&lt;/rdf:RDF&gt;</pre>
+<p>Please copy and paste the above document into a local file as we will be generating Perl modules from this ontology. Save the document as &quot;example.owl&quot;.</p>
+<p>To begin, issue the following command at the command prompt (omit the <em><strong>.pl</strong> </em>portion on Windows<em>)</em>:</p>
+<pre>owl2perl-generate-modules.pl example.owl</pre>
+<p>You should then see something along the lines of:</p>
+<pre>Generating perl modules for: example.owl
+Parsing schema file: example.owl
+Done.</pre>
+<p>What has happened is that the ontology described above had been parsed and Perl Modules for AnnotatedGeneID_Record (an owl class), hasSymbol, hasName, hasProteinName and hasDescription (all of which are datatype properties) were generated. As well, there was an anonymous class that was generated.</p>
+<p><strong><em>One obvious question is "where are these perl modules being generated"?
+</em></strong></p>
+<p>You can always determine this after generation by looking in the <em><strong>generator.log</strong></em> log file - the message has the INFO level which means it is almost always logged. But, if you want to know in advance here are the rules: </p>
+<ul>
+  <ul>
+    <ul>
+      <li>If there is a generators.outdir parameter in the OWL2Perl configuration file, it is used (by default, this is the directory Perl-OWL2Perl/generated contained in your home directory). </li>
+      <li>Otherwise, the script tries to find an existing directory named 'generated' anywhere in the @INC (a set of directories used by Perl to locate its modules).</li>
+      <li> If this fails, it creates a new directory called 'generated' in the "current" directory.
+      </li>
+    </ul>
+  </ul>
+  </ul>
+<p>Please take some time to investigate the generated files. In the next section, we will explain how we can use these generated modules.</p>
+<h3><a name="3"/>Using Perl Modules Representing OWL Classes</h3>
+        <p>Every generated module that represents an OWL Class ultimately inherits from <a href="http://search.cpan.org/perldoc?OWL::Data::OWL::Class" target="_blank">OWL::Data::OWL::Class</a>. This class defines the methods:</p>
+        <ol>
+          <ol>
+            <ol>
+              <li> label - an RDF label for the class,</li>
+              <li>uri/value - the URI for the entity, and</li>
+              <li>type - the RDF:type of this entity. </li>
+            </ol>
+          </ol>
+        </ol>
+<p>All of these methods can be invoked with or without arguments. When invoked without arguments, the methods act as getters. And when a scalar value is used as an argument, the method acts as a setter.</p>
+<pre>
+# instantiate a new record
+my $class = new sadiframework::org::examples::example::AnnotatedGeneID_Record(&quot;http://some_uri/for/my/record&quot;);
+
+# set a label
+$class-&gt;label(&quot;this is my label for this record&quot;);
+
+# get the label
+my $label = $class-&gt;label();
+
+# get the the uri for this record
+my $uri = $class-&gt;uri();
+</pre>
+<p>OWL properties are similar to their OWL Class counterparts mentioned above. Datatype properties inherit from <a href="http://search.cpan.org/perldoc?OWL::Data::OWL::DatatypeProperty" target="_blank">OWL::Data::OWL::DatatypeProperty</a>, while object properties inherit from <a href="http://search.cpan.org/perldoc?OWL::Data::OWL::ObjectProperty" target="_blank">OWL::Data::OWL::ObjectProperty</a>.</p>
+<p>OWL::Data::OWL::DatatypeProperty defines the following methods:</p>
+<ol>
+  <ol>
+    <ol>
+      <li>value - the value for the property of interest,</li>
+      <li>domain - the domain of this datatype property,</li>
+      <li>range - the range of this datatype property, and</li>
+      <li>uri - the type of this datatype property.</li>
+    </ol>
+  </ol>
+</ol>
+<p>while OWL::Data::OWL::ObjectProperty defines the following, similarly named, methods:</p>
+<ol>
+  <ol>
+    <ol>
+      <li>value - the URI for the subject of this object property,</li>
+      <li>domain - the domain of this property, and</li>
+      <li>range - the range for this property.</li>
+    </ol>
+  </ol>
+</ol>
+<p>Again, all of these methods can be invoked with or without arguments. When invoked without arguments, the methods act as getters. And when a scalar value is used as an argument, the method acts as a setter. </p>
+<p>Some OWL classes, like AnnotatedGeneID_Record, their inherited methods from OWL::Data::OWL::Class, as well as the ability to get/set their own object/datatype properties. For instance, members of the the OWL class <a href="#owl_doc">AnnotatedGeneID_Record</a> have zero or more of the the following datatype properties: hasSymbol, hasDescription, hasName, hasProteinName. The generated Perl module for this OWL class also has the ability to get/set these properties. How you ask? Take a look at the following Perl snippet (yours make look similar) for AnnotatedGeneID_Record:</p>
+<pre>@ISA = qw(
+ OWL::Data::OWL::Class
+ Blank::genid4b2bb18702dc 
+);</pre>
+<p>Notice that our class has @ISA of OWL::Data::OWL::Class (you already knew this!) and Blank::genid4b2bb18702dc. This is generated file for an anonymous OWLclass. If we examine the source for this class, we see the following:</p>
+<pre>#-----------------------------------------------------------------
+# Blank::genid4b2bb18702dc
+# Generated: 18-Dec-2009 08:44:56 PST
+# Contact: Edward Kawas &lt;edward.kawas+owl2perl@gmail.com&gt;
+#-----------------------------------------------------------------
+package Blank::genid4b2bb18702dc;
+
+#use OWL::Base;
+
+use OWL::Data::OWL::Class;
+
+
+no strict;
+use vars qw( @ISA );
+@ISA = qw(
+ OWL::Data::OWL::Class 
+);
+use strict;
+
+# imports 
+use OWL::Data::String;
+use OWL::Data::Integer;
+use OWL::Data::Float;
+use OWL::Data::Boolean;
+use OWL::Data::DateTime;
+
+
+
+use ontology::dumontierlab::com::hasSymbol;
+use sadiframework::org::ontologies::predicates::hasDescription;
+use sadiframework::org::ontologies::predicates::hasProteinName;
+use sadiframework::org::ontologies::predicates::hasName;
+
+{
+    my %_allowed = (
+    
+    
+        <a name="hasSymbol"></a>hasSymbol =&gt; {
+            type =&gt; &#39;ontology::dumontierlab::com::hasSymbol&#39;,
+            is_array =&gt; 1, },
+    
+        <a name="hasDescription"></a>hasDescription =&gt; {
+            type =&gt; &#39;sadiframework::org::ontologies::predicates::hasDescription&#39;,
+            is_array =&gt; 1, },
+    
+        <a name="hasProteinName"></a>hasProteinName =&gt; {
+            type =&gt; &#39;sadiframework::org::ontologies::predicates::hasProteinName&#39;,
+            is_array =&gt; 1, },
+    
+        <a name="hasName"></a>hasName =&gt; {
+            type =&gt; &#39;sadiframework::org::ontologies::predicates::hasName&#39;,
+            is_array =&gt; 1, },
+    
+    );
+
+...
+</pre>
+<p>Notice the methods <a href="#hasSymbol">hasSymbol</a>, <a href="#hasName">hasName</a>, <a href="#hasProteinName">hasProteinName</a>, and <a href="#hasDescription">hasDescription</a>. Each of these methods corresponds to a datatype property that members of the OWL class AnnotatedGeneID_Records can have values for. Additionally, you will notice that each method has 'type' information associated with it. When using the generated Perl OWL classes, if you try to incorrectly set a value of a property with an incorrect type, an exception will be raised.</p>
+<p>Now you might ask yourself, how do I actually use these methods? That's simple! If you only need to set one value for the datatype property, then you simple call the method, e.g. hasSymbol(), and provide the correctly typed argument.</p>
+<pre>$class-&gt;hasSymbol(ontology::dumontierlab::com::hasSymbol-&gt;new('Some_Gene_Symbol'));
+</pre>
+<p>However, if you are required to set multiple values, prepend <em><strong>add_</strong></em><strong></strong>to the method.</p>
+<pre>$class-&gt;add_hasSymbol(ontology::dumontierlab::com::hasSymbol-&gt;new('Some_Gene_Symbol'));
+$class-&gt;add_hasSymbol(ontology::dumontierlab::com::hasSymbol-&gt;new('Another_Gene_Symbol'));
+</pre>
+<p>In addition to the above syntax, you could also set values for the datatype property like so (ignoring their types):</p>
+<pre>
+# add an additional value
+$class-&gt;add_hasSymbol('yet_another_Gene_Symbol');
+# or to add a single value to our class (clearing out any other values)
+$class-&gt;hasSymbol('yet_another_Gene_Symbol');
+</pre>
+<p>This works because OWL2Perl is aware of the type of literal, e.g. <em><strong>ontology::dumontierlab::com::hasSymbol</strong></em>, that you wish to add to the class and automatically types the literal upon addition to the class.</p>
+<p>All datatype properties use this convention.</p>
+<p><a name="object_properties"></a>Object properties are a bit different. Imagine for a second that our instances of our class AnnotatedGeneID_Record also had an object property called <em><strong>hasReference</strong></em>. Then the generated source might look something like:</p>
+<pre>#-----------------------------------------------------------------
+# Blank::genid4b2bb18702dc
+# Generated: 18-Dec-2009 08:44:56 PST
+# Contact: Edward Kawas &lt;edward.kawas+owl2perl@gmail.com&gt;
+#-----------------------------------------------------------------
+package Blank::genid4b2bb18702dc;
+
+#use OWL::Base;
+
+use OWL::Data::OWL::Class;
+
+
+no strict;
+use vars qw( @ISA );
+@ISA = qw(
+ OWL::Data::OWL::Class 
+);
+use strict;
+
+# imports 
+use OWL::Data::String;
+use OWL::Data::Integer;
+use OWL::Data::Float;
+use OWL::Data::Boolean;
+use OWL::Data::DateTime;
+
+use ontology::dumontierlab::com::hasSymbol;
+use ontology::dumontierlab::com::hasReference;
+use sadiframework::org::ontologies::predicates::hasDescription;
+use sadiframework::org::ontologies::predicates::hasProteinName;
+use sadiframework::org::ontologies::predicates::hasName;
+
+{
+    my %_allowed = (
+    
+    
+        hasSymbol =&gt; {
+            type =&gt; &#39;ontology::dumontierlab::com::hasSymbol&#39;,
+            is_array =&gt; 1, },
+    
+        hasDescription =&gt; {
+            type =&gt; &#39;sadiframework::org::ontologies::predicates::hasDescription&#39;,
+            is_array =&gt; 1, },
+    
+        hasProteinName =&gt; {
+            type =&gt; &#39;sadiframework::org::ontologies::predicates::hasProteinName&#39;,
+            is_array =&gt; 1, },
+    
+        hasName =&gt; {
+            type =&gt; &#39;sadiframework::org::ontologies::predicates::hasName&#39;,
+            is_array =&gt; 1, },
+
+         hasReference =&gt; {
+            type =&gt; &#39;OWL::Data::OWL::Class&#39;,
+            # range checking of classes added 
+            post =&gt; sub {
+                my ($self) = shift;
+                my $type = @{$self-&gt;hasReference}[-1];
+                return unless defined $type and $type-&gt;type;
+                my $range = new ontology::dumontierlab::com::hasReference-&gt;range();
+                return unless $range;
+                $range = $self-&gt;uri2package($range);
+                eval {
+                    $range = $range-&gt;new();
+                };
+                return if $@;
+                $self-&gt;throw(&quot;\n&quot; . $type-&gt;type() . &quot;\nis not related to\n&quot; . $range-&gt;type()) unless $type-&gt;isa(ref($range));
+            },
+            is_array =&gt; 1, },
+    
+    );
+
+...</pre>
+<p>So our class now has the additional method hasReference and it accepts arguments of type OWL::Data::OWL::Class. In otherwords, you will have to instantiate classes and pass them as arguments to this method.</p>
+<pre># for single values
+$class-&gt;hasReference(sadiframework::org::examples::example::AnnotatedGeneID_Record-&gt;new(&quot;http://lsrn.org/Gene:642&quot;));
+
+# for setting multiple values
+$class-&gt;add_hasReference(sadiframework::org::examples::example::AnnotatedGeneID_Record-&gt;new(&quot;http://lsrn.org/Gene:642&quot;));
+$class-&gt;add_hasReference(sadiframework::org::examples::example::AnnotatedGeneID_Record-&gt;new(&quot;http://lsrn.org/Gene:123&quot;));</pre>
+<h4><a name="constraints"></a>Property Constraints (hasValue, minCardinality, maxCardinality) on OWL Classes <em class="new">New</em></h4>
+<p>For those classes that constrain their properties with hasValue, minCardinality, and maxCardinality, OWL2Perl ensures that the constraints are followed in any generated source code.</p>
+<p>For those classes that specify the <a href="http://www.w3.org/TR/2004/REC-owl-guide-20040210/#hasValue" target="_blank">owl:hasValue</a> property constraint, OWL2Perl automatically adds the contraint to the generated modules source code. When the generatd module is serialzed as RDF/XML, any statements describing this contraint are serialized as well and require nothing additional.</p>
+<p>For those classes that specify a <a href="http://www.w3.org/TR/2004/REC-owl-guide-20040210/#owl_maxCardinality" target="_blank">owl:maxCardinality</a> property constraint, OWL2Perl automatically performs a check when properties are added to the generated OWL module. If a constraint is violated, an exception is thrown. If you are unsure about whether or not you will exceed any cardinality constraints, it may be wise to wrap calls to <strong><em>add_*</em></strong> in an <em><strong>eval block</strong></em>. For example:</p>
+<pre>foreach (@descriptions) {<br>	eval {$class-&gt;add_hasDescription($_);};
+ # check $@ for any errors
+ # any time you have an error, that 
+ # property is not added to the class<br>}</pre>
+<p>Currently, constraints on the minimum number of properties that a class can have are ignored. However, you can view the these constraints in the generated modules perldoc describing the OWL class of interest.</p>
+<p>When developing code with OWL2Perl, you will  have to add the location of generated modules.  You simply need to add a <em><strong>use lib</strong></em> statement to your Perl script.</p>
+<pre>#for example, 
+use lib '/your_home_directory/Perl-OWL2Perl/generated';</pre>
+<h3><a name="4"></a>Putting it all together (a complete example script)<br/>
+</h3>
+<p>The following illustrates a simple script that utilizes the modules mentioned in this tutorial and outputs RDF/XML describing an instance of a AnnotatedGeneID_Record.</p>
+<pre>#!/usr/bin/perl -w
+use strict;
+
+# add the generated libs to @INC 
+<em><strong># modify this as necessary to point to your generated directory</strong></em>
+use lib &#39;/home/ubuntu/Perl-OWL2Perl/generated&#39;;
+
+# use statements for OWL classes
+use sadiframework::org::examples::example::AnnotatedGeneID_Record;
+use sadiframework::org::ontologies::predicates::hasName;
+use ontology::dumontierlab::com::hasSymbol;
+use sadiframework::org::ontologies::predicates::hasDescription;
+use sadiframework::org::ontologies::predicates::hasProteinName;
+
+# instantiate our OWL class
+my $class =
+  sadiframework::org::examples::example::AnnotatedGeneID_Record-&gt;new(
+                                                  &#39;http://lsrn.org/GeneID:642&#39;);
+# add a label
+$class-&gt;label(&quot;some label&quot;);
+
+# add datatype properties
+$class-&gt;add_hasSymbol(
+              new ontology::dumontierlab::com::hasSymbol(&#39;some symbol value&#39;) );
+$class-&gt;add_hasDescription(
+            new sadiframework::org::ontologies::predicates::hasDescription(
+                                                             &#39;some description&#39;)
+);
+$class-&gt;add_hasProteinName(
+            new sadiframework::org::ontologies::predicates::hasProteinName(
+                                                            &#39;some protein name&#39;)
+);
+$class-&gt;add_hasName(
+                   new sadiframework::org::ontologies::predicates::hasName(
+                                                              &#39;some name value&#39;)
+);
+
+# add another symbol
+$class-&gt;add_hasSymbol(
+           new ontology::dumontierlab::com::hasSymbol(&#39;another symbol value&#39;) );
+
+# here we serialze the OWL class
+use OWL::Utils;
+
+print OWL::Utils::serialize($class);</pre>
+<p>This produces the following RDF/XML:</p>
+<pre>&lt;rdf:RDF
+  xmlns:a=&quot;http://sadiframework.org/ontologies/predicates.owl#&quot;
+  xmlns:c=&quot;http://www.w3.org/2000/01/rdf-schema#&quot;
+  xmlns:b=&quot;http://ontology.dumontierlab.com/&quot;
+  xmlns:rdf=&quot;http://www.w3.org/1999/02/22-rdf-syntax-ns#&quot;&gt;
+  &lt;rdf:Description rdf:about=&quot;http://lsrn.org/GeneID:642&quot;&gt;
+    &lt;rdf:type rdf:resource=&quot;http://sadiframework.org/examples/example.owl#AnnotatedGeneID_Record&quot;/&gt;
+    &lt;c:label&gt;some label&lt;/c:label&gt;
+    &lt;b:hasSymbol&gt;some symbol value&lt;/b:hasSymbol&gt;
+    &lt;b:hasSymbol&gt;another symbol value&lt;/b:hasSymbol&gt;
+    &lt;a:hasDescription&gt;some description&lt;/a:hasDescription&gt;
+    &lt;a:hasProteinName&gt;some protein name&lt;/a:hasProteinName&gt;
+    &lt;a:hasName&gt;some name value&lt;/a:hasName&gt;
+  &lt;/rdf:Description&gt;
+&lt;/rdf:RDF&gt;</pre>
+</body>
+</html>

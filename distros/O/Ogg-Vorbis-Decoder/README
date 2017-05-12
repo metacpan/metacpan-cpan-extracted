@@ -1,0 +1,35 @@
+Ogg::Vorbis::Decoder
+============================
+
+This module provides an object-oriented interface to the decoding
+related functions provided by the Ogg Vorbis development libraries.
+This allows the user to read data from Vorbis streams in pcm format,
+and to seek forwards and backwards through the stream.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+libogg, libvorbis, libogg-dev, libvorbis-dev.
+
+The libogg and libvorbis libraries are available from xiph.org.  They are also
+available through Debian's apt-get and Mandrake's rpmdrake (and perhaps Redhat's up2date).
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2004-2010, Dan Sully.  All Rights Reserved.
+
+Copyright (c) 2003, Dan Pemstein.  All Rights Reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the
+Free Software Foundation; either version 2 of the License, or (at
+your option) any later version.  A copy of this license is included
+with this module (LICENSE.GPL).

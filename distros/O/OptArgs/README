@@ -1,0 +1,499 @@
+NAME
+    OptArgs - integrated argument and option processing
+
+VERSION
+    0.1.20 (2016-04-11)
+
+SYNOPSIS
+        #!/usr/bin/env perl
+        use OptArgs;
+
+        opt quiet => (
+            isa     => 'Bool',
+            alias   => 'q',
+            comment => 'output nothing while working',
+        );
+
+        arg item => (
+            isa      => 'Str',
+            required => 1,
+            comment  => 'the item to paint',
+        );
+
+        my $ref = optargs;
+
+        print "Painting $ref->{item}\n" unless $ref->{quiet};
+
+DESCRIPTION
+    OptArgs processes Perl script *options* and *arguments*. This is in
+    contrast with most modules in the Getopt::* namespace, which deal with
+    options only. This module is duplicated as Getopt::Args, to cover both
+    its original name and yet still be found in the mess that is Getopt::*.
+
+    The following model is assumed by OptArgs for command-line applications:
+
+    Command
+        The program name - i.e. the filename be executed by the shell.
+
+    Options
+        Options are parameters that affect the way a command runs. They are
+        generally not required to be present, but that is configurable. All
+        options have a long form prefixed by '--', and may have a single
+        letter alias prefixed by '-'.
+
+    Arguments
+        Arguments are positional parameters that that a command needs know
+        in order to do its work. Confusingly, arguments can be optional.
+
+    Sub-commands
+        From a users point of view a sub-command is simply one or more
+        arguments given to a Command that result in a particular action.
+        However from a code perspective they are implemented as separate,
+        stand-alone programs which are called by a dispatcher when the
+        appropriate arguments are given.
+
+  Simple Scripts
+    To demonstrate lets put the code from the synopsis in a file called
+    "paint" and observe the following interactions from the shell:
+
+        $ ./paint
+        usage: paint ITEM
+
+          arguments:
+            ITEM          the item to paint
+
+          options:
+            --quiet, -q   output nothing while working
+
+    The "optargs()" function parses the commands arguments according to the
+    "opt" and "arg" declarations and returns a single HASH reference. If the
+    command is not called correctly then an exception is thrown (an
+    "OptArgs::Usage" object) with an automatically generated usage message
+    as shown above.
+
+    Because OptArgs knows about arguments it can detect errors relating to
+    them:
+
+        $ ./paint house red
+        error: unexpected option or argument: red
+
+    So let's add that missing argument definition:
+
+        arg colour => (
+            isa     => 'Str',
+            default => 'blue',
+            comment => 'the colour to use',
+        );
+
+    And then check the usage again:
+
+        $ ./paint
+        usage: paint ITEM [COLOUR]
+
+          arguments:
+            ITEM          the item to paint
+            COLOUR        the colour to use
+
+          options:
+            --quiet, -q   output nothing while working
+
+    It can be seen that the non-required argument "colour" appears inside
+    square brackets indicating its optional nature.
+
+    Let's add another argument with a positive value for the "greedy"
+    parameter:
+
+        arg message => (
+            isa     => 'Str',
+            comment => 'the message to paint on the item',
+            greedy  => 1,
+        );
+
+    And check the new usage output:
+
+        usage: paint ITEM [COLOUR] [MESSAGE...]
+
+          arguments:
+            ITEM          the item to paint
+            COLOUR        the colour to use
+            MESSAGE       the message to paint on the item
+
+          options:
+            --quiet, -q   output nothing while working
+
+    Three dots (...) are postfixed to usage message for greedy arguments. By
+    being greedy, the "message" argument will swallow whatever is left on
+    the comand line:
+
+        $ ./paint house blue Perl is great
+        Painting in blue on house: "Perl is great".
+
+    Note that it doesn't make sense to define any more arguments once you
+    have a greedy argument.
+
+    The order in which options and arguments (and sub-commands - see below)
+    are defined is the order in which they appear in usage messsages, and is
+    also the order in which the command line is parsed for them.
+
+  Sub-Command Scripts
+    Sub-commands are useful when your script performs different actions
+    based on the value of a particular argument. To use sub-commands you
+    build your application with the following structure:
+
+    Command Class
+        The Command Class defines the options and arguments for your
+        *entire* application. The module is written the same way as a simple
+        script but additionally specifies an argument of type 'SubCmd':
+
+            package My::Cmd;
+            use OptArgs;
+
+            arg command => (
+                isa     => 'SubCmd',
+                comment => 'sub command to run',
+            );
+
+            opt help => (
+                isa     => 'Bool',
+                comment => 'print a help message and exit',
+                ishelp  => 1,
+            );
+
+            opt dry_run => (
+                isa     => 'Bool',
+                comment => 'do nothing',
+            );
+
+        The "subcmd" function call is then used to define sub-command names
+        and descriptions, and separate each sub-commands arguments and
+        options:
+
+            subcmd(
+                cmd     => 'start',
+                comment => 'start a machine'
+            );
+
+            arg machine => (
+                isa     => 'Str',
+                comment => 'the machine to start',
+            );
+
+            opt quickly => (
+                isa     => 'Bool',
+                comment => 'start the machine quickly',
+            );
+
+            subcmd(
+                cmd     => 'stop',
+                comment => 'start the machine'
+            );
+
+            arg machine => (
+                isa     => 'Str',
+                comment => 'the machine to stop',
+            );
+
+            opt plug => (
+                isa     => 'Bool',
+                comment => 'stop the machine by pulling the plug',
+            );
+
+        One nice thing about OptArgs is that options are *inherited*. You
+        only need to specify something like a "dry-run" option once at the
+        top level, and all sub-commands will see it if it has been set.
+
+        Additionally, and this is the main reason why I wrote OptArgs, you
+        do not have to load a whole bunch of slow-to-start modules ( I'm
+        looking at you, Moose) just to get a help message.
+
+    Sub-Command Classes
+        These classes do the actual work. The usual entry point would be a
+        method or a function, typically called something like "run", which
+        takes a HASHref argument:
+
+            package My::Cmd::start;
+
+            sub run {
+                my $self = shift;
+                my $opts = shift;
+                print "Starting $opts->{machine}\n";
+            }
+
+
+            package My::Cmd::stop;
+
+            sub run {
+                my $self = shift;
+                my $opts = shift;
+                print "Stoping $opts->{machine}\n";
+            }
+
+    Command Script
+        The command script is what the user runs, and does nothing more than
+        dispatch to your Command Class, and eventually a Sub-Command Class.
+
+            #!/usr/bin/perl
+            use OptArgs qw/class_optargs/;
+            my ($class, $opts) = class_optargs('My::Cmd');
+
+            # Run object based sub-command classes
+            $class->new->run($opts);
+
+            # Or function based sub-command classes
+            $class->can('run')->($opts);
+
+        One advantage to having a separate Command Class (and not defining
+        everything inside a Command script) is that it is easy to run tests
+        against your various Sub-Command Classes as follows:
+
+            use Test::More;
+            use Test::Output;
+            use OptArgs qw/class_optargs/;
+
+            stdout_is(
+                sub {
+                    my ($class,$opts) = class_optargs('My::Cmd','start','A');
+                    $class->new->run($opts);
+                },
+                "Starting A\n", 'start'
+            );
+
+            eval { class_optargs('My::Cmd', '--invalid-option') };
+            isa_ok $@, 'OptArgs::Usage';
+
+            done_testing();
+
+        It is much easier to catch and measure exceptions when the code is
+        running inside your test script, instead of having to fork and parse
+        stderr strings.
+
+FUNCTIONS
+    The following functions are exported (by default except for "dispatch")
+    using Exporter::Tidy.
+
+    arg( $name, %parameters )
+        Define a Command Argument with the following parameters:
+
+        isa Required. Is mapped to a Getopt::Long type according to the
+            following table:
+
+                 optargs         Getopt::Long
+                ------------------------------
+                 'Str'           '=s'
+                 'Int'           '=i'
+                 'Num'           '=f'
+                 'ArrayRef'      's@'
+                 'HashRef'       's%'
+                 'SubCmd'        '=s'
+
+        comment
+            Required. Used to generate the usage/help message.
+
+        required
+            Set to a true value when the caller must specify this argument.
+            Can not be used if a 'default' is given.
+
+        default
+            The value set when the argument is not given. Can not be used if
+            'required' is set.
+
+            If this is a subroutine reference it will be called with a
+            hashref containg all option/argument values after parsing the
+            source has finished. The value to be set must be returned, and
+            any changes to the hashref are ignored.
+
+        greedy
+            If true the argument swallows the rest of the command line. It
+            doesn't make sense to define any more arguments once you have
+            used this as they will never be seen.
+
+        fallback
+            A hashref containing an argument definition for the event that a
+            sub-command match is not found. This parameter is only valid
+            when "isa" is a "SubCmd". The hashref must contain "isa", "name"
+            and "comment" key/value pairs, and may contain a "greedy"
+            key/value pair. The Command Class "run" function will be called
+            with the fallback argument integrated into the first argument
+            like a regular sub-command.
+
+            This is generally useful when you want to calculate a command
+            alias from a configuration file at runtime, or otherwise run
+            commands which don't easily fall into the OptArgs sub-command
+            model.
+
+    class_optargs( $rootclass, [ @argv ] ) -> ($class, $opts)
+        This is a more general version of the "optargs" function described
+        in detail below. It parses @ARGV (or @argv if given) according to
+        the options and arguments as defined in $rootclass, and returns two
+        values:
+
+        $class
+            The class name of the matching sub-command.
+
+        $opts
+            The matching argument and options for the sub-command.
+
+        As an aid for testing, if the passed in argument @argv (not @ARGV)
+        contains a HASH reference, the key/value combinations of the hash
+        will be added as options. An undefined value means a boolean option.
+
+    dispatch( $function, $rootclass, [ @argv ] )
+        [ NOTE: This function is badly designed and is depreciated. It will
+        be removed at some point before version 1.0.0]
+
+        Parse @ARGV (or @argv if given) and dispatch to $function in the
+        appropriate package name constructed from $rootclass.
+
+        As an aid for testing, if the passed in argument @argv (not @ARGV)
+        contains a HASH reference, the key/value combinations of the hash
+        will be added as options. An undefined value means a boolean option.
+
+    opt( $name, %parameters )
+        Define a Command Option. If $name contains underscores then aliases
+        with the underscores replaced by dashes (-) will be created. The
+        following parameters are accepted:
+
+        isa Required. Is mapped to a Getopt::Long type according to the
+            following table:
+
+                 optargs         Getopt::Long
+                ------------------------------
+                 'Bool'          '!'
+                 'Counter'       '+'
+                 'Str'           '=s'
+                 'Int'           '=i'
+                 'Num'           '=f'
+                 'ArrayRef'      's@'
+                 'HashRef'       's%'
+
+        isa_name
+            When $OptArgs::PRINT_ISA is set to a true value, this value will
+            be printed instead of the generic value from "isa".
+
+        comment
+            Required. Used to generate the usage/help message.
+
+        default
+            The value set when the option is not used.
+
+            If this is a subroutine reference it will be called with a
+            hashref containg all option/argument values after parsing the
+            source has finished. The value to be set must be returned, and
+            any changes to the hashref are ignored.
+
+            For "Bool" options setting "default" to a true has a special
+            effect: the the usage message formats it as "--no-option"
+            instead of "--option". If you do use a true default value for
+            Bool options you probably want to reverse the normal meaning of
+            your "comment" value as well.
+
+        alias
+            A single character alias.
+
+        ishelp
+            When true flags this option as a help option, which when given
+            on the command line results in a usage message exception. This
+            flag is basically a cleaner way of doing the following in each
+            (sub) command:
+
+                my $opts = optargs;
+                if ( $opts->{help} ) {
+                    die usage('help requested');
+                }
+
+        hidden
+            When true this option will not appear in usage messages unless
+            the usage message is a help request.
+
+            This is handy if you have developer-only options, or options
+            that are very rarely used that you don't want cluttering up your
+            normal usage message.
+
+        arg_name
+            When $OptArgs::PRINT_OPT_ARG is set to a true value, this value
+            will be printed instead of the generic value from "isa".
+
+    optargs( [ @argv ] ) -> HashRef
+        Parse @ARGV by default (or @argv when given) for the arguments and
+        options defined in the *current package*, and returns a hashref
+        containing key/value pairs for options and arguments *combined*. An
+        error / usage exception object ("OptArgs::Usage") is thrown if an
+        invalid combination of options and arguments is given.
+
+        Note that @ARGV will be decoded into UTF-8 (if necessary) from
+        whatever I18N::Langinfo says your current locale codeset is.
+
+    subcmd( %parameters )
+        Create a sub-command. After this function is called further calls to
+        "opt" and "arg" define options and arguments respectively for the
+        sub-command. The following parameters are accepted:
+
+        cmd Required. Either a scalar or an ARRAY reference containing the
+            sub command name.
+
+        comment
+            Required. Used to generate the usage/help message.
+
+        hidden
+            When true this sub command will not appear in usage messages
+            unless the usage message is a help request.
+
+            This is handy if you have developer-only or rarely-used commands
+            that you don't want cluttering up your normal usage message.
+
+    usage( [$message] ) -> Str
+        Returns a usage string prefixed with $message if given.
+
+OPTIONAL BEHAVIOUR
+    Certain OptArgs behaviour and/or output can be changed by setting the
+    following package-level variables:
+
+    $OptArgs::ABBREV
+        If $OptArgs::ABBREV is a true value then sub-commands can be
+        abbreviated, up to their shortest, unique values.
+
+    $OptArgs::COLOUR
+        If $OptArgs::COLOUR is a true value and "STDOUT" is connected to a
+        terminal then usage and error messages will be colourized using
+        terminal escape codes.
+
+    $OptArgs::SORT
+        If $OptArgs::SORT is a true value then sub-commands will be listed
+        in usage messages alphabetically instead of in the order they were
+        defined.
+
+    $OptArgs::PRINT_DEFAULT
+        If $OptArgs::PRINT_DEFAULT is a true value then usage will print the
+        default value of all options.
+
+    $OptArgs::PRINT_ISA
+        If $OptArgs::PRINT_ISA is a true value then usage will print the
+        type of argument a options expects.
+
+SEE ALSO
+    Getopt::Long, Exporter::Tidy
+
+SUPPORT & DEVELOPMENT
+    This distribution is managed via github:
+
+        https://github.com/mlawren/p5-OptArgs/tree/devel
+
+    This distribution follows the semantic versioning model:
+
+        http://semver.org/
+
+    Code is tidied up on Git commit using githook-perltidy:
+
+        http://github.com/mlawren/githook-perltidy
+
+AUTHOR
+    Mark Lawrence <nomad@null.net>
+
+LICENSE
+    Copyright 2012-2014 Mark Lawrence <nomad@null.net>
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation; either version 3 of the License, or (at your
+    option) any later version.
+

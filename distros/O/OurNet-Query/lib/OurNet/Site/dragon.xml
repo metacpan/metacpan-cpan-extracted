@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<SITE ID="Dragon">
+
+<NAME Lang="en-us">Dragon WWW Search</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+Dragon全球WWW搜尋(日本)
+]]></NAME>
+<INFO Lang="en-us">news,job and lifestyle information search</INFO>
+<INFO Lang="zh-tw">news,job and lifestyle information search</INFO>
+
+<URL Type="More"><![CDATA[
+http://www.dragon.co.jp_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://www.dragon.co.jp/cgi-bin/search/newsearch.cgi?log=0&cate=&item=_HITS_&query=_QUERY_
+]]></URL>
+
+<CHARSET>ja-jp.euc</CHARSET>
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_NEXT_"><![CDATA[
+<A HREF="_NEXT_">≠慼
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<LI><A HREF="_URL_">_TITLE_</A>_PREVIEW_<BR>
+]]></TEMPLATE>
+</SITE>

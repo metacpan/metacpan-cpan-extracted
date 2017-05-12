@@ -1,0 +1,21 @@
+0.011     2014-12-16 18:02:02
+          - go to Test::Spec testing
+
+0.010     2014-12-11 13:29:37
+          - Add check ref type uint filter value
+
+0.009     2014-12-10 16:42:04
+          - Add check SortBy and OrderBy fields validity
+
+0.008     2014-11-14 12:59:26
+          - Add search by created queue
+
+0.007     2014-11-13 22:26:53
+          - Use Time::Piece instead Time::Local in _get_time_slot()
+          - Add exception processing if date parsing fail
+
+0.004     2014-10-20
+          - Add search by article create date
+
+0.003     2014-10-17
+          - Initial release

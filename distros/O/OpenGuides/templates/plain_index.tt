@@ -1,0 +1,4 @@
+[%- FOREACH node = nodes %]
+[%- node.param %]
+
+[%- END %]

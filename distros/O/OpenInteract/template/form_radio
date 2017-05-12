@@ -1,0 +1,7 @@
+[%########################################
+  form_radio( name, value, picked )
+     Radio button -- no label generated, just the button.
+  ########################################-%]
+
+[%- is_picked = ( value == picked ) ? ' CHECKED' : '' -%]
+<input type="radio" name="[% name %]" value="[% value %]"[% is_picked %]>

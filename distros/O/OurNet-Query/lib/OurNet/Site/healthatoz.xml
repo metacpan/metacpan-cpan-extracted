@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<SITE ID="Healthatoz">
+
+<NAME Lang="en-us">Healthatoz Search</NAME>
+<INFO Lang="en-us">health and medicine relevant information search</INFO>
+
+<URL Type="More"><![CDATA[
+_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://ss5a.medconnect.com/cgi-bin/searchsites/pri?keywords=_QUERY_
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_NEXT_"><![CDATA[
+<A HREF="_NEXT_">Next
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<CENTER><A HREF = "_URL_">_TITLE_</A>___Review: </FONT></TD>_PREVIEW_</FONT>___<FONT SIZE = 2 COLOR = "Maroon">
+]]></TEMPLATE>
+</SITE>

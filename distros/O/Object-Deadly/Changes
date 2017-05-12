@@ -1,0 +1,47 @@
+Revision history for Object-Deadly
+
+0.01    2006-08-14
+        First version, released on an unsuspecting world.
+
+0.02    2006-08-14
+        I hate svk.
+
+0.03    2006-08-15
+        Use Devel::StackTrace for better stack traces by default.
+
+0.04    2006-08-15
+        C<...> -> C<< ... >> fixed pod formatting
+        Use Carp::Clan 5.4+ or failover to Carp.
+        Expanded author tests.
+
+0.05    2006-08-15
+        Created ::_safe and ::_unsafe packages for the implementation.
+        Allowed Object::Deadly to get subclassed.
+        Added a list of all known UNIVERSAL methods
+        Added API functions ->get_death, ->kill_UNIVERSAL, ->kill_function
+
+0.06    2006-08-15
+        I'm done now? Right?
+        Removed the version from the pod.
+        Moved the pod to the end. It was distracting.
+        Made t/20deadly.y actually run. It wasn't before.
+
+0.07    2006-09-12
+        Added some trivial documentation to Object::Deadly::_safe.
+        Made Object::Deadly::_safe ok for Lint's StrictOO check.
+        Removed all the isa cache stuff til I can do that sanely.
+        Added a bit more docs.
+        Added acknowledgement section.
+
+0.08    2006-09-13
+        Class methods on Object::Deadly::_unsafe are now delegated
+          away with SUPER::super.
+
+0.09    2006-09-23
+        Carp::Clan 5.4 is available on CPAN now.
+        Use Scalar::Util, English.
+        Added ->new_with( REF )
+        Moved code out of Object::Deadly::_unsafe into
+          Object::Deadly. Only real dead code lives in
+          Object::Deadly::_unsafe now.
+        Check for crucial class methods.

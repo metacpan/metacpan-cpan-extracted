@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<SITE ID="Occ">
+
+<NAME Lang="en-us">Online Career Center</NAME>
+<INFO Lang="en-us">job information search</INFO>
+
+<URL Type="More"><![CDATA[
+http://jobsearch.monster.com/jobsearch.idq?cq=_NEXTSTR_&tm=_TM_&fn=&lv=&in=&st=&ci=&cy=&ct=&co=&cp=&c1=&c2=&bd=MONS&sq=&ah=http%3A%2F%2Fwww%2Eocc%2Ecom%2F&lo=&aj=&mx=&pp=&col=dltc&a=&ss=0&keyNG=%26cy%3D%26st%3D%26ci%3D%26fn%3D%26key%3Dapple&fq=%28apple%29+%26+%28%40OCCBD+%27MONS%27%29&CiBookmark=N%2D3ca63d0%2D9b73%2D1&CiBookmarkSkipCount=50
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://jobsearch.monster.com/jobsearch.idq?cq=_QUERY_&tm=&fn=&lv=&in=&st=&ci=&cy=US&ct=NA&co=&cp=&c1=&c2=&bd=MONS&sq=&ah=http%3A%2F%2Fjobsearch%2Emonster%2Ecom%2F&lo=&aj=&mx=&pp=&col=dltc&ss=0&keyNG=%26cy%3DUS%26st%3D%26ci%3D%26fn%3D%26in%3D%26key%3D_QUERY_&fq=%28apple%29+%26+%28%40OCCCY+%27xUS%27%29+%26+%28%40OCCCT+%27xNA%27%29+%26+%28%40OCCBD+%27MONS%27%29
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_NEXTSTR_"><![CDATA[
+"hidden" name="cq" value="_NEXTSTR_">
+]]></VAR>
+<VAR Name="_TM_"><![CDATA[
+hidden" name="tm" value="_TM_">
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<TD VALIGN=TOP WIDTH=50>___SIZE="-2">_DATE_</FONT>___<a href="_URL_">_TITLE_</a>___2">_PREVIEW_</FONT>___</TR>
+]]></TEMPLATE>
+</SITE>

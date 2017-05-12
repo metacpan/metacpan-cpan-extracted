@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<SITE ID="Bigfoot">
+
+<NAME Lang="en-us">Bigfoot Search</NAME>
+<INFO Lang="en-us">finding one's e-mail</INFO>
+
+<URL Type="More"><![CDATA[
+post://search.bigfoot.com/SEARCH?FormName=Listing&EmailSearch=1&LastName=_QSTR_&FirstName=&State=&City=&SR=_SR_&SBC=_SBC_&MR=_MR_&locale=en&dyn=_DYN_
+]]></URL>
+<URL Type="Start"><![CDATA[
+post://search.bigfoot.com/SEARCH?FormName=Listing&dyn=NoRef:4213&locale=en&EmailSearch=1&WpageSearch=&SearchName=_QUERY_
+]]></URL>
+
+
+<VAR Name="_QSTR_"><![CDATA[
+LastName VALUE="_QSTR_" TYPE=HIDDEN
+]]></VAR>
+<VAR Name="_DYN_"><![CDATA[
+hidden NAME="dyn" Value="_DYN_">
+]]></VAR>
+<VAR Name="_SR_"><![CDATA[
+SR VALUE="_SR_" TYPE=HIDDEN
+]]></VAR>
+<VAR Name="_MR_"><![CDATA[
+MR VALUE="_MR_" TYPE=HIDDEN
+]]></VAR>
+<VAR Name="_SBC_"><![CDATA[
+SBC VALUE="_SBC_" TYPE=HIDDEN
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+color="#006600">_TITLE_</font>___<A HREF="_URL_">_PREVIEW_</A>___</TR>
+]]></TEMPLATE>
+</SITE>

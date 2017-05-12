@@ -1,0 +1,32 @@
+Object-Generic-Session
+
+A web application session object that allows access to internal
+key/value pairs with an interface similar
+to that of Object::Generic and Class::DBI.
+
+Requires Apache::Session, Session.pm, and Object::Generic.
+Hasn't only been tested with Apache 1.3.x.
+
+The test suite currently does little more than see if the module loads;
+the dependencies make it difficulty to run without things
+like Apache servers and MySQL accounts available.
+
+See Object::Generic's documentation for more on the general idea.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 Jim Mahoney (mahoney@marlboro.edu)
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

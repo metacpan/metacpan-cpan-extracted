@@ -1,0 +1,37 @@
+[%########################################
+  search_results_page_listing( table_width, search_results_key, search_id, align,
+                               base_url, total_pages, current_page )
+      Generate a table of the specified width with the search results
+      listing in it.
+
+  Parameters
+      table_width        - width of the table
+      search_results_key - name of field to set the search results key to
+      search_id          - ID to retrieve search results
+      align              - align the listing
+      base_url           - URL to which we append ?$search_results_key=$search_id;pagenum=x
+                           so we can get more search results
+      total_pages        - total pages in resultset
+      current_page       - what page you're on
+
+  Defaults
+      align              - 'right'
+      table_width        - '90%'
+      search_results_key - 'search_id'
+      
+  ########################################-%]
+
+[%- DEFAULT align              = 'right';
+    DEFAULT table_width        = '90%';
+    DEFAULT search_results_key = 'search_id'; -%]
+<table border="0" width="[% table_width %]"
+       cellpadding="2" cellspacing="0">
+<tr><td align="[% align %]">
+[%- return_url = "$base_url?$search_results_key=$search_id" -%]
+<font size="-1">
+[%- PROCESS page_count( total_pages     = total_pages,
+                        current_pagenum = current_page,
+                        url             = return_url ) -%]
+</font>
+</td></tr>
+</table>

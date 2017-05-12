@@ -1,0 +1,18 @@
+Revision history for Perl module OAuth::Consumer
+
+0.03 2013-03-12
+
+ - Better error checking in get_access_token
+ - Small addition in the documentation
+ - Better handling of the oauth verifier
+ - Removed some tests because the service is down
+ - Better error reporting for remote server errors
+
+0.02 2013-02-21
+
+ - Remove the requirement of a Perl with threads
+ - Add the 'thread' mode for getting a verifier
+
+0.01 2013-02-18
+
+ - Initial release

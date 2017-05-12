@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<SITE ID="Eblast">
+
+<NAME Lang="en-us">Encyclopaedia Britannica's Internet Guide</NAME>
+<INFO Lang="en-us">general information web search</INFO>
+
+<URL Type="More"><![CDATA[
+http://www.eblast.com_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://www.eblast.com/search.html?SearchWd=_QUERY_
+]]></URL>
+
+
+<VAR Name="_NEXT_"><![CDATA[
+href="_NEXT_">Next
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<b><a___href="_URL_">_TITLE_</a>___<br>_PREVIEW_<a___</font><br><br>
+]]></TEMPLATE>
+</SITE>

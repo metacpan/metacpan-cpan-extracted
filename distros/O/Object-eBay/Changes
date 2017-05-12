@@ -1,0 +1,99 @@
+---
+version : 0.5.1
+date    : Thu Sep  5 13:53:54 UTC 2013
+changes :
+    FIXES:
+        - CPAN metadata (David Steinbrunner)
+---
+version : 0.5.0
+date    : Tue Aug 10 13:33:39 UTC 2010
+changes :
+    FIXES:
+        - minor test suite corrections
+    NEW:
+        - support for retrieving an item's condition
+---
+version : 0.4.0
+date    : Thu Nov 6 15:22:24 2008 -0700
+changes :
+    FIXES:
+        - minor documentation corrections
+    NEW:
+        - support for retrieving the number of bids on an auction
+        - support for retrieving the current high bidder on an auction
+        - support for retrieving a user's email address
+        - support for retrieving a user's ID (username)
+---
+version : 0.3.2
+date    : Wed Jul 16 17:32:22 MDT 2008
+changes :
+    FIXES:
+        - correctly handle auctions that have no attributes at all
+---
+version : 0.3.1
+date    : Thu Jul 10 23:06:50 MDT 2008
+changes :
+    FIXES:
+        - correctly handle some unusual attribute combinations on auctions
+---
+version : 0.3.0
+date    : Wed Jul  9 15:17:40 MDT 2008
+changes :
+    FIXES:
+        - minor documentation corrections
+    NEW:
+        - support for retrieving item specifics (attributes)
+---
+version : 0.2.0
+date    : Fri Jun 20 17:04:13 MDT 2008
+changes :
+    DEPRECATION:
+        - Use User->is_feedback_private instead of User->feedback_private
+    FIXES:
+        - minor documentation corrections
+        - make Item->is_ended return a Boolean object for consistency
+    NEW:
+        - new true and false methods on the Boolean class
+        - added ListingDetails->start_time
+        - added ListingDetails->start_datetime
+        - added ListingDetails->is_buy_it_now_available
+---
+version : 0.1.0
+date    : Fri Jun 13 14:00:00 MDT 2008
+changes :
+    FIXES:
+        - minor documentation corrections
+    NEW:
+        - added SellingStatus->listing_status
+        - added Item->item_id
+        - provide a URL for browsing the Git repository
+        - added Item->is_ended
+        - added SellingStatus->quantity_sold
+        - added ListingDetails->end_datetime
+---
+version : 0.0.3
+date    : Wed Apr 25 15:40:32 MDT 2007
+changes :
+    FIXES:
+        - Object::eBay::Currency correctly supports boolean context
+    NEW:
+        - buy_it_now_price() method on Item
+        - pictures() method on Item to get picture URLs
+        - mention that source code is available with Git
+        - mention paid development
+---
+version : 0.0.2
+date    : Tue Mar 14 08:28:16 MST 2006
+changes :
+    FIXES:
+        - Correctly handle warnings from eBay API calls
+        - Corrected minor typos in documentation
+        - Throw exceptions when Boolean and Currency are constructed poorly
+    NEW:
+        - Make boolean return values a context-aware object
+---
+version : 0.0.1
+date    : Mon Mar 13 13:36:18 MST 2006
+changes :
+    NEW:
+        - First version

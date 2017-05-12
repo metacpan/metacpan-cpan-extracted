@@ -1,0 +1,27 @@
+OpenGL-XScreenSaver 0.05 - Mon May 13 01:35:07 2013 +0200
+
+    * update bundled Devel::CheckLib, fixes RT 85213
+
+OpenGL-XScreenSaver 0.04 - Sat Feb 20 03:30:04 2010 +0100
+
+    * add dimensions() function to query window dimensions
+
+OpenGL-XScreenSaver 0.03 - Wed Jan 6 20:17:27 2010 +0100
+
+    * the window is now displayed in standalone mode
+    * do not assume that the root window has ID 0x10f, but ask the
+      server
+    * add 11 tests
+
+OpenGL-XScreenSaver 0.02 - Wed Jan 6 15:44:22 2010 +0100
+
+    * check for GL and X11 libraries in Makefile.PL so that unmet dependencies
+      do not generate FAILed test reports
+
+OpenGL-XScreenSaver 0.01 - Wed Jan 6 12:49:20 2010 +0100
+
+    * initial code import from dizzy
+    * bind GL context to a window with some ID
+    * find out correct window ID to draw to
+    * parse and remove XScreenSaver specific command line arguments
+

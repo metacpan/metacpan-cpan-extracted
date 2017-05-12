@@ -1,0 +1,12 @@
+typemap
+Changes
+GLM.xs
+Makefile.PL
+MANIFEST
+ppport.h
+README
+t/OpenGL-GLM.t
+fallback/const-c.inc
+fallback/const-xs.inc
+lib/OpenGL/GLM.pm
+META.yml                                 Module meta-data (added by MakeMaker)

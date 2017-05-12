@@ -1,0 +1,3 @@
+
+FIXME: more tests. While testing against true webservices is not an option, maybe some mocking
+could be used. And if not, at least more coverage for helper functions.

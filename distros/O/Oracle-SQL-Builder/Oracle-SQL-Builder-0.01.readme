@@ -1,0 +1,305 @@
+NAME
+    Oracle::SQL::Builder - Perl extension for building SQL statements.
+
+SYNOPSIS
+      use Oracle::SQL::Builder;
+
+    No automatically exported routines. You have to specifically to import
+    the methods into your package.
+
+      use Oracle::SQL::Builder qw(:sql);
+      use Oracle::SQL::Builder /:sql/;
+      use Oracle::SQL::Builder ':sql';
+
+DESCRIPTION
+    This is a package containing common sub routines that can be used in
+    other programs.
+
+   new (%arg)
+    Input variables:
+
+      any input variable and value pairs 
+
+    Variables used or routines called:
+
+      None
+
+    How to use:
+
+       my $obj = new Oracle::SQL;      # or
+       my $obj = Oracle::SQL->new;     # or
+
+    Return: new empty or initialized Oracle::SQL object.
+
+  Export Tag: sql
+    The *:table* tag includes sub-rountines for accessing Orable tables.
+
+      use Oracle::SQL::Builder qw(:sql);
+
+    It includes the following sub-routines:
+
+   build_sql_stmt($idn,$idv,$hrf,$dft,$acm)
+    Input variables:
+
+      $idn - id/key name
+      $idv - id/key value
+      $hrf - hash ref with column definition. It is from
+             getTableDef method
+      $dft - date format. Default to 'YYYYMMDD.HH24MISS'
+      $acm - add comma. If $acm = 1, then add a comma in 
+             the end.
+
+    Variables used or routines called:
+
+      fmtTime      - get current time
+
+    How to use:
+
+      my $cs  = 'usr/pwd@db';
+      my $dbh = $self->getDBHandler($cs, "Oracle");
+      my $tab = "test_table";
+      my ($cns,$cd1,$hrf) = $self->getTableDef($dbh,$tab,'*','hash');
+      my $dft = 'YYYYMMDD.HH24MISS'; 
+      my $v   = $self->build_sql_stmt('dept',10,$hrf,$dft); 
+
+    Return: value string to be used in SQL statement.
+
+    Any undef or 'null' value of $idv will be translated to '' for
+    insert_records method and 'null' for update_records so that the DBI can
+    handle correctly.
+
+   build_sql_value($k,$v,$ar,$dft,$act)
+    Input variables:
+
+      $k   - column name
+      $v   - column value 
+      $ar  - hash ref for column definition: ${$ar}{$k}{$itm}. 
+             It is from getTableDef with 'hash' type. 
+      $dft - date format. 
+             Default to 'YYYYMMDD.HH24MISS'? - not sure that we need
+             to do that. 
+             It checks the dft in $ar for $k first;
+             If not, then call id_datetime_format to get a format
+             If not, then return undef.
+      $act - action: update|insert
+
+    Variables used or routines called:
+
+      id_datetime_format - get date and time format based on
+              the date and time value provided.
+
+    How to use:
+
+      my $cs  = 'usr/pwd@db';
+      my $dbh = $self->getDBHandler($cs, "Oracle");
+      my $tab = "test_table";
+      my ($cns,$cd1,$ar) = $self->getTableDef($dbh,$tab,'*','hash');
+      my $dft = 'YYYYMMDD.HH24MISS'; 
+      my $v   = $self->build_sql_value('dept',10,$ar,$dft); 
+
+    Return: undef or value string to be used in SQL statement.
+
+      undef  - value string can not be determined if no $k. 
+               Do not use the column in your SQL statement.
+      'NULL' - null if $v is not defined and $v is not required.
+      "''"   - empty string if $v is not defined and data type is CHAR
+              or VARCHAR and NOT NULL. 
+      str    - any value string: number or quoted string
+
+    This method returns the value with proper quotes and format string. For
+    date datatype, it gets date and time format and use it in the TO_DATE
+    function. If the $dft is provided or defined in the $ar for the column,
+    then it convert the $v to the same format as defined in $dft if the $v
+    has different date and time format.
+
+   build_sql_operator($k,$v,$ar)
+    Input variables:
+
+      $k   - column name
+      $v   - column value 
+      $ar  - hash ref for column definition: ${$ar}{$k}{$itm}. 
+             It is from getTableDef with 'hash' type. 
+
+    Variables used or routines called:
+
+      None
+
+    How to use:
+
+      my $cs  = 'usr/pwd@db';
+      my $dbh = $self->getDBHandler($cs, "Oracle");
+      my $tab = "test_table";
+      my ($cns,$cd1,$ar) = $self->getTableDef($dbh,$tab,'*','hash');
+      my $v   = $self->build_sql_operator('dept',10,$ar); 
+
+    Return: SQL operator to be used in SQL statement.
+
+      undef  - could not determine operator based on the inputs
+               Do not use the column in your SQL statement.
+      'LIKE' - match string with wild characters in $v. 
+      'IN'   - $v contains a list of values of string or number 
+               separated by comma.
+      '='    - any number or quote strings 
+
+    This method returns SQL operator based on column data type and the value
+    in $v.
+
+   build_sql_where($str,$ar,$dft)
+    Input variables:
+
+      $str - a string with k1=v1,k2=v2,...
+      $ar  - hash ref for column definition: ${$ar}{$k}{$itm}. 
+             It is from get_table_definition with 'hash' type. 
+      $dft - date format. 
+             Default to 'YYYYMMDD.HH24MISS'? - not sure that we need
+             to do that. 
+             It checks the dft in $ar for $k first;
+             If not, then call id_datetime_format to get a format
+             If not, then return undef.
+
+    Variables used or routines called:
+
+      None
+
+    How to use:
+
+      my $cs  = 'usr/pwd@db';
+      my $dbh = $self->getDBHandler($cs, "Oracle");
+      my $tab = "test_table";
+      my ($cns,$cd1,$ar) = $self->getTableDef($dbh,$tab,'*','hash');
+      my $s = "id=1,ln=tu,fn=han"; 
+      my $whr = $self->build_sql_where($s,$ar,$dft); 
+
+    Return: SQL WHERE clause
+
+   form_sql($dbh,$arf,$rtp)
+    Input variables:
+
+      $dbh - database handler
+      $arf - input array ref. It has the following elements: 
+        act - SQL action such as SELECT, UPDATE, DELETE, etc.
+        tab - target table or view name
+        cns - column names separated by comma
+        where - condition array reference: ${$ar}[$i]{$itm}
+             $i is condition index number
+             $itm are: 
+             cn - column name
+             op - operator such as =, <, >, in, lk, etc
+             cv - value, or values separated by comma
+             so - set operator such as AND or OR
+        group_by - a list of columns separated by comma
+        order_by - a list of columns separated by comma
+        data - data array reference ${$ar}{$cn} 
+        dft - date format
+        rwd - right column width for formating sql statement
+      $rtp - return type: default - SQL statement string
+        where    - just where clause
+        hash     - hash array. It has
+            table - table name
+            cns  - column specification such as '*' or column names
+            columns - column names. If '*', then all the column names.
+            select/update/delete - actions
+            from  - from a table
+            where - where clause
+            group_by - group by clause
+            order_by - order by clause
+            sql   - full SQL statement
+        hash_ref - hash array reference pointing to the above hash
+        sql      - the whole SQL statement  
+
+    Variables used or routines called:
+
+      echoMSG      - echo message
+      isObjExist   - check object existence
+      getTableDef  - get table definitions
+      getTableData - get table data 
+
+    How to use:
+
+      my $cs  = 'usr/pwd@db';
+      my $dbh = $self->getDBHandler($cs, "Oracle");
+      my $drf = $self->getTableData($dbh,$srctab,'*','','hash');
+      my $arf = bless {}, ref($self)||$self;
+         ${$arf}{act} = 'SELECT';
+         ${$arf}{tab} = 'test_tab';
+         ${$arf}{cns} = 'id,name'; 
+         ${$arf}{data} = $drf; 
+      my $tab = "test_table";
+      $self->form_sql($dbh,$arf); 
+
+    Return: string, hash, hash ref based on return type.
+
+   split_cns($str,$len,$chr,$nbk)
+    Input variables:
+
+      $str - string with words or column names separated by comma
+             or by spliting character
+      $len - length allow in a line, default to 65 
+      $chr - spliting character, default to comma
+      $nbk - number of blank space in from of each line. 
+             If this is set, it will return a string with line breaks.
+
+    Variables used or routines called:
+
+      None 
+
+    How to use:
+
+      my $cs  = 'col1, col2, col3, this, is, a multiple,line'; 
+      my @a   = $self->split_cns($cs,10);
+
+    Return: array with lines within length limit or a string.
+
+   genWhere($so,$cn,$op,$cv,$ar,$dft)
+    Input variables:
+
+        $so  - set operator: AND, OR
+        $cn  - column name
+        $op  - operator: =, <=, >=, <>, lk, btw, in, nn, nl, etc.
+        $cv  - column value
+        $ar  - hash array ref: ${$ar}{$cn}{$itm}.
+               $itm: col, typ, wid, max. dec, req, min, dft, and dsp
+        $dft - date format
+    Variables used or routines called:
+
+      None 
+
+    How to use:
+
+      my $whr = $self->build_where('','id','=',1); 
+         $whr .= $self->build_where('Or','name','lk','A'); 
+
+    Return: string - where clause.
+
+   run_sql($dbh,$sfn)
+    Input variables:
+
+        $dbh - datebase handler or connection string 
+               usr/pwd@db: for Oracle 
+        $sfn - sql file name with full path 
+        $hmd - home directory 
+
+    Variables used or routines called:
+
+      None 
+
+    How to use:
+
+      my $dbh = $self-?getDBHandler('usr/pwd@db'); 
+      my $sfn = '/my/dir/sqls/crt1.sql'; 
+         $self->run_sql($dbh, $sfn); 
+
+    Return: the following status codes:
+
+      0 - ok; 
+      1 - no DB handler
+      2 - inproper inputs
+      3 - sql not found
+
+AUTHOR
+    Hanming Tu, hanming_tu@yahoo.com
+
+SEE ALSO (some of docs that I check often)
+    Oracle::Trigger, Oracle:DDL, Oracle::DML, Oracle::DML::Common,
+    Oracle::Loader, etc.
+

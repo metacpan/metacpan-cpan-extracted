@@ -1,0 +1,74 @@
+Net::OAI::Harvester
+-------------------
+
+Net::OAI::Harvester is a Perl library for interacting with OAI-PMH repositories.
+OAI-PMH stands for Open Archives Intitiatve Protocol for Metadata Harvesting.
+More about OAI-PMH can be found at http://www.openarchives.org.
+
+INSTALLATION
+
+You *must* be connected to the Internet to run the test suite.
+
+Either:
+
+perl Build.PL
+Build
+Build test
+Build install
+
+Or:
+
+perl Makefile.PL
+make
+make test
+make install
+
+
+DEPENDENCIES
+
+OAI-PMH is essentially XML over HTTP so rather than reinvent the wheel there
+are a few dependencies.
+
+LWP::UserAgent - for HTTP 
+XML::SAX - for XML parsing
+URI - for url representation
+Storable - for object serialization
+
+You also probably should be using Perl 5.8.0 at least since many repositories 
+contain UTF8 data.
+
+
+TROUBLESHOOTING
+
+See the Changes document for a description of a potentially breaking
+change in custom handler operation introduced in version 1.20.
+
+The test suite recognizes the environment variable NOH_ParserPackage to
+force usage of an specific parser:
+
+NOH_ParserPackage=XML::SAX::PurePerl ./Build test
+
+This is to work around cases where the file ParserDetails.ini of
+XML::SAX::ParserFactory is not (yet) set up properly and the
+expected automatic fallback to XML::SAX::PurePerl somehow fails.
+
+--
+
+It is crucial to have version 1.04 of XML::SAX::Base. This version
+is installed along with the XML-SAX package which is contained in
+the "vendor" tree of the perl libraries on many systems. On CPAN
+there also exists a separate module XML::SAX::Base with version 1.02
+only which is not sufficient and - if installed - typically resides
+in the "site_perl" branch of the libraries, thus taking precedence
+over the newer version. Please make sure to uninstall/remove version 
+1.02 of XML::SAX::Base when you encounter it in your installation.
+
+
+
+COPYRIGHT AND LICENCE
+
+This software is free software and may be distributed under the same
+terms as Perl itself.
+
+Copyright (C) 2003 Ed Summers <ehs@pobox.com>
+

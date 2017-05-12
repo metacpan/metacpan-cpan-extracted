@@ -1,0 +1,27 @@
+---
+abstract: 'checkupdates for aur'
+author:
+  - '3ED <krzysztof1987@gmail.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4218, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: OS-CheckUpdates-AUR
+provides:
+  OS::CheckUpdates::AUR:
+    file: lib/OS/CheckUpdates/AUR.pm
+    version: '0.04'
+requires:
+  JSON: '0'
+  Try::Tiny: '0'
+  WWW::AUR: '0.19'
+resources:
+  license: http://opensource.org/licenses/artistic-license-2.0.php
+version: '0.04'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

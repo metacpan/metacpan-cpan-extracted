@@ -1,0 +1,79 @@
+{
+   "abstract" : "An Otogiri plugin that keep compatibility for insert method",
+   "author" : [
+      "ytnobody <ytnobody@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v1.0.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Otogiri-Plugin-InsertAndFetch",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Otogiri" : "0.11",
+            "Otogiri::Plugin" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "DBD::SQLite" : "0",
+            "Test::More" : "0.98",
+            "Test::Time" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Otogiri::Plugin::InsertAndFetch" : {
+         "file" : "lib/Otogiri/Plugin/InsertAndFetch.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ytnobody/Otogiri-Plugin-InsertAndFetch/issues"
+      },
+      "homepage" : "https://github.com/ytnobody/Otogiri-Plugin-InsertAndFetch",
+      "repository" : {
+         "url" : "git://github.com/ytnobody/Otogiri-Plugin-InsertAndFetch.git",
+         "web" : "https://github.com/ytnobody/Otogiri-Plugin-InsertAndFetch"
+      }
+   },
+   "version" : "0.01",
+   "x_authority" : "cpan:YTURTLE"
+}

@@ -1,0 +1,233 @@
+Revision history for Perl extension OrePAN2
+
+0.46 2017-02-09T04:35:09Z
+    - Process MetaCPAN lookup in chunks (E. Choroba).
+
+0.45 2016-12-07T17:54:13Z
+
+    - Update OrePAN2::Indexer::do_metacpan_lookup() to not do a search for
+      modules if no releases are found. A recent MetaCPAN::Client change
+      caused this search to return all modules if an empty arrayref was
+      passed to it.
+    - Upgrade to v1 of the MetaCPAN API.
+
+0.44 2016-08-22T22:50:26Z
+    - OrePAN2::Repository::gc() now optionally accepts an anonymous sub (Olaf Alders).
+
+0.43 2016-07-30T15:41:31Z
+    - Bump MetaCPAN::Client version to 1.021000 (Mickey Nasriachi)
+    - Fix bug in arrayref handling of MetaCPAN results (Mickey Nasriachi)
+
+0.42 2016-07-19T19:48:29Z
+    - The cli injector now accepts an "author_subdir" option, which allows you
+      to save a tarball to a subdirectory of an authors home directory (Seth
+      Daniel).  https://github.com/tokuhirom/OrePAN2/pull/40 and
+      https://github.com/tokuhirom/OrePAN2/pull/40
+
+0.41 2016-06-24T18:50:00Z
+    - Make 02packages sort order case insensitive (just like PAUSE). Reported
+      by Tatsuhiko Miyagawa. https://github.com/tokuhirom/OrePAN2/issues/38
+
+0.40 2015-07-14T21:34:16Z
+    - Add previously documented but apparently never implemented "simple" flag
+      to orepan2-indexer script (oalders)
+
+0.39 2015-07-03T21:23:23Z
+    - Globally enable dev versions (Chris Weyl).  See discussion at
+      https://github.com/tokuhirom/OrePAN2/pull/36
+    - Use a template for tempdir, for easier identification (Chris Weyl)
+
+0.38 2015-03-19T03:24:55Z
+    - Bump minimum version of Moo to avoid tester failures (oalders)
+
+0.37 2015-03-18T02:51:18Z
+
+    - [BETA] author attribute accepts a code reference,
+      so that you can calculate author whenever injecting distributions (skaji)
+
+0.36 2015-02-09T21:06:09Z
+    - Add OrePAN2::Auditor (oalders)
+
+0.35 2014-12-01T20:26:54Z
+
+    - Revert back to MetaCPAN version (from version_numified) (oalders)
+
+0.34 2014-12-01T14:21:15Z
+
+    - If two packages have the same version, the one which is last in will be preferred (oalders)
+    - OrePAN2::Indexer::make_index() now returns an OrePAN2::Index object (oalders)
+
+0.33 2014-11-22T00:38:07Z
+
+    - Add IO::Socket::SSL to dependencies (Ivan Bessarabov)
+
+0.32 2014-11-18T03:37:27Z
+
+    - Remove MetaCPAN::API, which is now deprecated (oalders)
+    - Use version_numified when getting provides from MetaCPAN (oalders)
+    - Doc updates (Ivan Bessarabov)
+    - Fixed `--author` in orepan2-inject
+
+0.31 2014-09-08T19:51:08Z
+
+    - Fix some undef warnings (miyagawa)
+    - Add an option to use MetaCPAN for provides lookups (oalders)
+    - Update minimum version of Archive::Extract to suppress warnings
+      (tokuhirom)
+
+0.30 2014-05-04T23:54:02Z
+
+    - Use $self->{author} when the option is not provided (Ichito Nagata)
+
+0.29 2014-03-05T06:06:48Z
+
+    - Index new version instead of die.
+
+0.28 2014-02-28T09:00:20Z
+
+    - Added orepan2-gc, orepan2-merge-index
+
+0.27 2014-02-28T07:58:02Z
+
+    - Fixed caching bug.
+
+0.26 2014-02-28T07:44:18Z
+
+    - [EXPERIMENTAL] Added experimental cache mode.
+      (tokuhirom)
+
+0.25 2014-02-28T01:00:53Z
+
+    - Fixed deps
+
+0.24 2014-02-27T20:50:53Z
+
+    - Added OrePAN2::Repository
+      (tokuhirom)
+
+0.23 2014-02-27T19:01:17Z
+
+    - Fixed testing issue
+      (tokuhirom)
+
+0.22 2014-02-27T07:04:18Z
+
+    - Use IO::Zlib instead of PerlIO::gzip.
+      (tokuhirom)
+
+0.21 2014-02-26T09:47:32Z
+
+    - OrePAN2::Indexer: Make temporary file in the same parition.
+        It's required by atomic operation.
+        (tokuhirom)
+
+0.20 2014-02-26T02:34:49Z
+
+    - OrePAN2::Index: add_index does not index the package by default. Added 'replace' option.
+    - OrePAN2::Index: Use hash as internal representation for OrePAN2::Index.
+    - OrePAN2::Index: Fixed gunzip.
+    - OrePAN2::Index: Added delete_index method.
+      (tokuhirom)
+
+0.19 2014-02-26T01:30:14Z
+
+    - OrePAN2::Index: Added methods for parsing
+      (tokuhirom)
+
+0.18 2014-02-26T00:30:30Z
+
+    [INCOMPATIBLE CHANGE]
+    - OrePAN2::Inject#inject_from_* returns the tarball path from darkpan root.
+      (tokuhirom)
+
+0.17 2014-02-26T00:19:04Z
+
+    - OrePAN2::Inject#inject_from_* returns the tarball path.
+      Previous version prints the tarball path in the module.
+      (tokuhirom)
+
+0.16 2013-11-03T10:17:24Z
+
+    - Support cpanm compatible git schemas.
+      git+file://path/to/git/repository.git
+      (songmu)
+
+0.15 2013-09-26T02:51:42Z
+
+    - Change logging level
+      (Suggested by miyagwa)
+
+0.14 2013-09-26T02:00:42Z
+
+    - Fixed bad error message
+      (reported by miyagwa)
+
+0.13 2013-08-27T04:40:32Z
+
+    - Better fall-through for missing or broken META
+      (Chad Granum)
+
+0.12 2013-08-05T03:40:31Z
+
+    - Document about differentiation from OrePAN1
+      (pointed by Mike Doherty)
+
+0.11 2013-08-05T00:34:24Z
+
+    - Inject from CPAN by module name
+      (exodist++)
+
+0.10 2013-08-01T04:23:57Z
+
+    - Switched to Parse::LocalDistribution instead of Module::Metadata.
+      Module::Metadata can't parse localt distribution correctly.
+
+0.09 2013-08-01T03:10:02Z
+
+    [BUG FIX]
+    - Older version fails to create index on the dist does not contains META file.
+      (reported by exodist++)
+
+    [MINOR FIX]
+    - Bump up CPAN::Meta deps on 2.131560.
+
+0.08 2013-07-09T04:37:34Z
+
+    - Put tar file to the right path.
+      (hiratara)
+
+0.07 2013-07-05T01:35:47Z
+
+    - Added `orepan2-inject --author` option
+      (Suggested by ranguard++)
+
+0.06 2013-07-04T05:00:05Z
+
+    - Switch to Module::Metadata instead of Parse::PMFile.
+      (tokuhirom)
+    - set prefix => '' to Module::Metadata->provides(); otherwise defalut 'lib' prefix will be used.
+      (Shoichi Kaji)
+
+0.05 2013-05-25T00:03:26Z
+
+    - fixed deps
+      (tokuhirom)
+
+0.04 2013-05-23T04:55:27Z
+
+    - orepan2-indexer supports --text option for non-gzip-ed index file.
+      (tokuhirom)
+
+0.03 2013-05-19T22:30:11Z
+
+    - Support plain text index generation on library interface.
+      (tokuhirom)
+
+0.02 2013-05-10T03:21:53Z
+
+    - Support no_index
+      (Reported by songmu)
+
+0.01 2013-05-10T01:48:01Z
+
+    - original version

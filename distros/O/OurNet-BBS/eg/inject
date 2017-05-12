@@ -1,0 +1,20 @@
+# $File: //depot/libOurNet/BBS/eg/inject $ $Author: autrijus $
+# $Revision: #1 $ $Change: 1 $ $DateTime: 2002/06/11 15:35:12 $
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use OurNet::BBS;
+use B::Deparse;
+
+# my $bbs = OurNet::BBS->new(OurNet => 'localhost');
+print color('reset');
+
+my $bbs = OurNet::BBS->new(MELIX => '/home/melix');
+
+my $sub = $bbs->INJECT(sub {
+    return $_[0]->{boards}{$_[1]}{bm};
+});
+
+print $sub->('autrijus');

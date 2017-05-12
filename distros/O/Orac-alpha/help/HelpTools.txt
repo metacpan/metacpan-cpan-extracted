@@ -1,0 +1,165 @@
+HelpTools
+
+Intro
+=====
+This is a new Orac feature which can enable you to add your own
+scripts 'interactively' to the program under the 'My Tools' menu.
+
+How 'My Tools' Works
+====================
+*. Basically, you add any number of cascades to the 'My Tools' menu.
+*. You then add any number of buttons to each cascade.
+*. Once you have your cascades and buttons in place, you can
+   attach various pieces of your own SQL to the buttons, and
+   then run them like any other normal Orac reports.
+
+This probably sounds a lot more complicated than it is.  You may
+just like to play with the 'Configure My Tools' menu to see what
+it can do.  I'll run through its main options below:
+
+Add a Cascade to My Tools Menu
+------------------------------
+This option enables you to add a cascade.  As soon as you're 
+finished, your new cascade should immediately be available
+under the 'My Tools' menu, but will not have any buttons attached.
+
+While you're adding the new cascade, you will be asked to enter
+a piece of text, which will later appear on the menu.  For example,
+you may want to call your cascade 'My Tuning SQL Reports'.
+
+Edit Text for Cascade
+---------------------
+You may decide to change the above cascade title, to something 
+more appropriate, once you've added a few buttons which don't
+really relate to the original cascade name.  This is where you
+do it, for example, change the above example to:
+
+   'My Tuning and Hit Ratio Dynamic Reports'
+
+Delete a Cascade
+----------------
+Be careful when using this option.  You will be given a picklist
+of your current cascades, to delete one of them.  If you confirm
+the deletion, all of the buttons under the cascade, and the cascade
+itself will disappear from Orac.
+
+Add a Button to a Cascade
+-------------------------
+Once you have given yourself a cascade, this option allows you to
+attach any number of buttons to it.  Once you have added a button,
+it will automatically appear in the 'My Tools' menu.  Using this
+option, will also send you directly into a screen form where you can
+enter your SQL script.  
+
+NB: Please remember, DBI does not require semi-colons in its
+SQL scripts as may be the case in SQL*Plus.
+
+It is probably best if you test out your new SQL script using a
+tool such as SQL*Plus (under the SYSTEM user), before pasting it
+into the 'edit' session.
+
+Once you have completed your SQL script, it will be immediately
+accessible through the Orac menu, to produce a report in the main
+window.  We'll discuss how best to format this report later.
+
+Edit Text for Button
+--------------------
+Just like the similar option for Cascade, you may want to change
+the name of the button on the menu.  One point to note though, 
+the name of the button (eg: 'Dictionary Cache Ratio'), will also
+be the name of the report output in the main window.
+
+Delete a Button from a Cascade
+------------------------------
+Does what it says really.  You choose a cascade, then choose a
+button, then delete it.  It will immediately disappear from the 
+'My Tools' menu.  Please be careful with this option.  Once you
+have accepted deletion, the button and the attached SQL script
+both disappear.
+
+Edit SQL Attached to Button
+---------------------------
+I find I never get the SQL right first time with any tool.  Orac
+will report any errors in your script.  You can then edit it via 
+this option, and then run it again from the menu until you're happy with
+it.  Alternatively, you may just want to change the SQL script
+formatting and/or content.
+
+Orac will automatically format your SQL report for you, however
+you can influence how it does this.  It will set a minimum report
+field width of 5 characters.  I'll run through a demo report below
+to show you what can happen:
+
+First SQL attempt, under 'Basic Tables Script' button:
+
+   select owner, 
+   table_name
+   from dba_tables
+   order by 1, 2
+
+This gives (first few lines):
+
+   REPORT Basic Tables Script (pppweb):
+   
+   OWNER TABLE_NAME
+   ----- ----------
+     SYS    ACCESS$
+     SYS AQ$_MESSAG
+            E_TYPES
+     SYS AQ$_QUEUE_
+         STATISTICS
+
+
+You may not like this, as the TABLE_NAME column is too short.  To
+overcome this, change your script to:
+
+   select owner much_longer_owner_col, 
+   table_name much_longer_tablename_col
+   from dba_tables
+   order by 1, 2
+
+This gives the following report:
+
+REPORT Basic Tables Script (pppweb):
+
+MUCH_LONGER_OWNER_COL MUCH_LONGER_TABLENAME_COL
+--------------------- -------------------------
+                  SYS                   ACCESS$
+                  SYS         AQ$_MESSAGE_TYPES
+                  SYS      AQ$_QUEUE_STATISTICS
+
+You may much prefer this layout, or you may want to try
+other options such as:
+
+   select owner  owner____________________, 
+   table_name    table_name_______________
+   from dba_tables
+   order by 1, 2
+
+
+My best suggestion is for you to play with the 'My Tools' 
+options, and just see what it can do.  I've only just 
+written this menu option so this is as far as I've got 
+myself, so I can't really tell you any more :-)
+
+
+A Final Note
+------------
+I thrown this option together fairly quickly, after an initial
+suggestion by Jared Still, therefore the source code is
+perhaps a bit messy and probably a bit buggy.  
+
+I will be trying to clean it up, and make it all a bit smoother
+in future versions.  Please mail me with any suggestions you
+have for coming up with a cleaner interface and/or a better
+configuration/arrangement.  All such ideas appreciated.
+
+If in the meantime you develop some handy scripts to sit under the
+'My Tools' option, please mail them to me and I'll try and embed
+them in other menus as 'real' Orac reports.
+
+
+Er...have fun :-)
+
+AndyD
+andy_j_duncan@yahoo.com

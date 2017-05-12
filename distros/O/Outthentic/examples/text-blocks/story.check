@@ -1,0 +1,6 @@
+begin:
+hello
+regexp: .*orld
+jan
+code: print Dumper(dsl()->match_lines())
+end:

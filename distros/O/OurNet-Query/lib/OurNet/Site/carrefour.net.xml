@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<SITE ID="Carrefour.net">
+
+<NAME Lang="en-us">Carrefour.net Search</NAME>
+<INFO Lang="en-us">general information web search in France</INFO>
+
+<URL Type="More"><![CDATA[
+_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://cgi.carrefour.net/recherche?b=0&n=_HITS_&s=_QUERY_&ui=c&serveur=2
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_NEXT_"><![CDATA[
+<a href="_NEXT_">Prochaine page
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<li><b><a href="_URL_">_TITLE_</a>___</font><br>_PREVIEW_<
+]]></TEMPLATE>
+</SITE>

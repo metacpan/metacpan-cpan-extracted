@@ -1,0 +1,11 @@
+#!/usr/bin/perl -w
+use strict;
+
+opendir(T,"t") || die $!;
+my @t = sort grep /\.t$/, readdir(T);
+for my $t (@t)
+{
+  my $f="t/$t"; 
+  print "$f\n"; 
+  system("perl -w -Ilib -MDevel::Cover $f");
+} 

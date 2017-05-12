@@ -1,0 +1,14 @@
+Changes for Perl extension ORDB-CPANTSWeight
+
+0.03 Mon  4 May 2009
+	- Updated Module::Install::DSL to 0.86
+	- Lock user_version to 3
+	- Drop maxage to 1 day
+	- Allow overriding of mirror params
+
+0.02 Sun 26 Apr 2009
+	- Dropping update time to one week
+
+0.01 Sat 25 Apr 2009
+	- Initial experimental release
+	- Adding ORLite::Pod-generated documentation

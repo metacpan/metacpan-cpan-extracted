@@ -1,0 +1,44 @@
+Object::Lazy version 0.15
+=========================
+
+Create objects late from non-owned classes.
+
+This module implements lazy evaluation
+and can create lazy objects from every class.
+
+Creates a dummy object including a subroutine
+which knows how to build the real object.
+
+Later, if a method of the object is called,
+the real object will be built.
+
+Inherited methods from UNIVERSAL.pm are implemented and so overwritten.
+This are isa, DOES, can and VERSION.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    Carp
+    English
+    Params::Validate
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2007 - 2015,
+Steffen Winkler
+steffenw at cpan.org.
+All rights reserved.
+
+This module is free software;
+you can redistribute it and/or modify it
+under the same terms as Perl itself.

@@ -1,0 +1,82 @@
+#!perl
+use strict;
+use warnings;
+use OptArgs qw/dispatch/;
+
+dispatch(qw/run App::optargs/);
+
+__END__
+
+=head1 NAME
+
+optargs - print an OptArgs program command summary
+
+=head1 VERSION
+
+0.1.20 (2016-04-11)
+
+=head1 SYNOPSIS
+
+    optargs CLASS [NAME]
+
+=head1 DESCRIPTION
+
+B<optargs> is a utility for developers writing Perl scripts with
+L<OptArgs>. It prints out the synopsis for every sub-command in a
+program. The results are ordered according to the setting of the
+C<$OptArgs::SORT> variable as set by CLASS.
+
+Note that B<optargs> does a C<use lib 'lib'> to allow your
+in-development class to be loaded in preference to installed versions.
+
+=head1 ARGUMENTS
+
+=over
+
+=item CLASS
+
+OptArgs-based module to map. Required.
+
+=item NAME
+
+Name of the command. If not specified then the last token of CLASS will
+be used as the command name.
+
+=back
+
+=head1 OPTIONS
+
+=over
+
+=item --indent, -i Int
+
+Number of spaces to indent sub-commands. Defaults to 4.
+
+=item --spacer, -s Str
+
+Character to use for indent spaces. Defaults to a single space
+character ' '.
+
+=item --full, -f
+
+Print out the entire usage message instead of just the synopsis.
+
+=back
+
+=head1 SEE ALSO
+
+L<OptArgs>
+
+=head1 AUTHOR
+
+Mark Lawrence <nomad@null.net>
+
+=head1 LICENSE
+
+Copyright 2012-2014 Mark Lawrence <nomad@null.net>
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the
+Free Software Foundation; either version 3 of the License, or (at your
+option) any later version.
+

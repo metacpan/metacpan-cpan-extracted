@@ -1,0 +1,43 @@
+<div class="pager">
+[% page_str = 'page' %]
+[% IF page_query_string %][% page_str = page_query_string %][% END %]
+[% IF pager.current_page == pager.first_page %]
+[% IF !suppress_first_and_last %]
+    <img title="First" alt="First" src="/static/images/controls/pager_first_disabled.png"></img>
+[% END %]
+    <img title="Prev" alt="Prev" src="/static/images/controls/pager_prev_disabled.png"></img>
+[% ELSE %]
+[% IF !suppress_first_and_last %]
+    [% IF params %]
+    <a title="First" href="[% c.request.uri_with( $page_str => pager.first_page, params ) %][% IF tab %]#[% tab %][% END %]" class="pager_first"><img alt="First" src="/static/images/controls/pager_first.png"></img></a>
+    [% ELSE %]
+    <a title="First" href="[% c.request.uri_with( $page_str => pager.first_page ) %][% IF tab %]#[% tab %][% END %]" class="pager_first"><img alt="First" src="/static/images/controls/pager_first.png"></img></a>
+    [% END %]
+[% END %]
+    [% IF params %]
+<a title="Prev" href="[% c.request.uri_with( $page_str => pager.previous_page, params ) %][% IF tab %]#[% tab %][% END %]" class="pager_prev"><img alt="Prev" src="/static/images/controls/pager_prev.png"></img></a>
+    [% ELSE %]
+<a title="Prev" href="[% c.request.uri_with( $page_str => pager.previous_page ) %][% IF tab %]#[% tab %][% END %]" class="pager_prev"><img alt="Prev" src="/static/images/controls/pager_prev.png"></img></a>
+    [% END %]
+[% END %]
+<span>Page [% pager.current_page | html %][% IF pager.last_page %] of [% pager.last_page | html %][% END %]</span>
+[% IF pager.last_page == pager.current_page %]
+[% IF !suppress_first_and_last %]
+    <img title="Next" alt="Next" src="/static/images/controls/pager_next_disabled.png"></img>
+[% END %]
+    <img title="Last" alt="Last" src="/static/images/controls/pager_last_disabled.png"></img>
+[% ELSE %]
+    [% IF params %]
+<a title="Next" href="[% c.request.uri_with( $page_str => pager.next_page, params ) %][% IF tab %]#[% tab %][% END %]" class="pager_next"><img alt="Next" src="/static/images/controls/pager_next.png"></img></a>
+    [% ELSE %]
+<a title="Next" href="[% c.request.uri_with( $page_str => pager.next_page ) %][% IF tab %]#[% tab %][% END %]" class="pager_next"><img alt="Next" src="/static/images/controls/pager_next.png"></img></a>
+    [% END %]
+[% IF !suppress_first_and_last %]
+    [% IF params %]
+<a title="Last" href="[% c.request.uri_with( $page_str => pager.last_page, params ) %][% IF tab %]#[% tab %][% END %]" class="pager_last"><img alt="Last" src="/static/images/controls/pager_last.png"></img></a>
+    [% ELSE %]
+<a title="Last" href="[% c.request.uri_with( $page_str => pager.last_page ) %][% IF tab %]#[% tab %][% END %]" class="pager_last"><img alt="Last" src="/static/images/controls/pager_last.png"></img></a>
+    [% END %]
+[% END %]
+[% END %]
+</div>

@@ -1,0 +1,29 @@
+# $File: //depot/OurNet-BBSAgent/BBSAgent/miou.bbs $ $Author: autrijus $
+# $Revision: #7 $ $Change: 2830 $ $DateTime: 2002/01/10 15:15:44 $
+# Contributed by Smartboy <kcwu@ck.tp.edu.tw>
+# zh_TW.Big5: 貓咪樂園
+
+Miou
+miou.mat.ncku.edu.tw
+
+load maple2.board
+setv moretail	m/\[q\]\e\[30m結束\x20\x20\e\[0?m/
+setv pager	談話:
+
+=login
+wait [new]註冊)：
+send $[username]\n$[password]\nn\nq\x20q\x20q\x20q\x20q
+goto main
+
+=board
+call main
+send s\n
+wait 名稱
+send $[board]\n\x20\x20
+wait 板主：
+till 文章選讀
+
+=board_article_fetch_last
+send q
+wait 文章選讀
+exit

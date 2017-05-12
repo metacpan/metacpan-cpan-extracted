@@ -1,0 +1,9 @@
++{
+    connect_info => [
+        'dbi:Pg:dbname=mydb;myhost.example.com;port=5432',
+        'user_name',
+        'password',
+        { AutoCommit => 1, RaiseError => 1,PrintError => 0, pg_enable_utf8 => 1,}
+    ],
+    exclude_tables => ['table1', 'table2'],
+}

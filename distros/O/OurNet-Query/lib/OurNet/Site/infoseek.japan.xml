@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<SITE ID="InfoSeek.Japan">
+
+<NAME Lang="en-us">Infoseek WWW Search</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+Infoseek 全球WWW搜尋 Japan站
+]]></NAME>
+<INFO Lang="en-us">general information web search in Japan</INFO>
+<INFO Lang="zh-tw">general information web search in Japan</INFO>
+
+<URL Type="More"><![CDATA[
+http://japan.infoseek.com/Titles?_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://japan.infoseek.com/Titles?col=JW&qt=_QUERY_&sv=JP&lk=noframes&nh=10
+]]></URL>
+
+<CHARSET>ja-jp.euc</CHARSET>
+<SCORE>_SCORE_</SCORE>
+<EXPRESSION>Standard</EXPRESSION>
+<CATEGORY>WWW,General</CATEGORY>
+
+<VAR Name="_NEXT_"><![CDATA[
+<a href="/Titles?_NEXT_">慼及10瘀</a></font>
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<a href="___">_TITLE_</b></a><br>_PREVIEW_<br>___<b>_SCORE_%</b>_URL_(Size _SIZEK_K)___ゥ:_DATE_</font><br>___<a href="
+]]></TEMPLATE>
+</SITE>

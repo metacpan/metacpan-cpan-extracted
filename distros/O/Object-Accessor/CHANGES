@@ -1,0 +1,55 @@
+Changes for 0.48    Thu Jun  6 10:16:16 BST 2013
+=================================================
+* Fix typos (David Steinbrunner)
+
+Changes for 0.46    Wed Jan 23 14:09:11 GMT  2013
+=================================================
+* Add deprecate usage to warn if module is loaded
+  from corelib. Object::Accessor is leading core
+  with v5.20.0, but will remain available from
+  CPAN.
+
+Changes for 0.44    Wed Apr 25 14:08:30 BST  2012
+=================================================
+* can() is now fasteh thanks to Vincent Pit
+
+Changes for 0.42    Fri May 13 12:21:50 BST  2011
+=================================================
+* Missed a test using exists, Ikegami RT #68154
+
+Changes for 0.40    Thu May 12 20:41:36 BST  2011
+=================================================
+* Apply patch from Ikegami RT #68154, which
+  avoids use of deprecated exists on array elements.
+
+Changes for 0.38    Fri Jan  7 21:47:51 GMT  2011
+=================================================
+* Apply blead patch from Peter Acklam
+
+Changes for 0.36    Thu Oct  8 09:42:36 BST  2009
+=================================================
+*   Apply patch to fix ABSTRACT in core, RT #49563
+    from Jerry Hedden.
+
+Changes for 0.34    Sun May 18 18:14:05 CEST 2008
+=================================================
+*   Add support for aliasing method names
+
+Changes for 0.32    Thu Oct  5 14:59:29 CEST 2006
+=================================================
+*   Stringification of objects was sometimes causing
+    infinite recursion when overloaded objects called
+    an autoloaded method upon stringification.
+
+Changes for 0.30    Tue Sep 19 15:31:32 CEST 2006
+=================================================
+*   Add callback possibilities to Object::Accessor.
+    Also note these do not work for lvalue objects
+    due to the nature of 'lvalue' in perl. See
+    perldoc perlsub for details, or the CAVEATS
+    section in the documentation.
+
+Changes for 0.21    Sat Aug 12 21:42:05 CEST 2006
+=================================================
+*   Correct implementation of lvalue object
+    accessors.

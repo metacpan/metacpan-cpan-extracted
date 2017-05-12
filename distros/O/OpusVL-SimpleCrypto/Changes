@@ -1,0 +1,35 @@
+Revision history for OpusVL-SimpleCrypto
+
+0.008     2016-11-17 13:56:50+00:00 Europe/London
+
+  - Removed strictures 2.
+
+0.007     2016-11-11 07:03:58+00:00 Europe/London
+
+  - Added missing dependency
+
+0.006     2016-11-02 16:45:30+00:00 Europe/London
+
+  - Getting the public release with a new release plugin sorted.
+
+0.005     2016-11-02 16:03:32+00:00 Europe/London
+
+  - Public release of module to CPAN.
+
+0.004     2016-11-01 14:44:37+00:00 Europe/London
+
+  - Added a quick one liner to print off a new set of keys to the pod
+  - Add a test that ensures we can do the fundamental thing that needs to be done
+
+0.003     2016-10-28 08:57:34+01:00 Europe/London
+
+  - Minor pod tweaks.
+
+0.002     2016-10-28 08:53:43+01:00 Europe/London
+
+  - Added new deterministic encryption methods to allow
+    efficient whole value lookups.
+
+0.001     2016-10-27 18:09:46+01:00 Europe/London
+
+  - Initial version

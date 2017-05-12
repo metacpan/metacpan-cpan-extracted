@@ -1,0 +1,182 @@
+DatabaseMonitor
+
+Orac Automatic Database Monitoring - OracMonitor
+================================================
+This provides you with a way of continuously monitoring important databases
+and automatically flagging online occurences of problems.  First of all
+you input a list of required monitorable databases.  These get stored
+in your local User's directory.  You can then poll these databases on a 
+regular basis (the polling time to be flexible according to your
+requirements).  If any problems occur, red and yellow warning flags will
+appear on your monitoring screen.  You can interrogate these flags, to
+see what has happened, on your target databases.
+
+You can still continue to use all the rest of your Orac facilities while
+this continuous monitoring is in progress.  Currently, this is Mark I of
+the Orac Automatic Database Monitoring Tool.  It will be continuously
+improved for the rest of the life of the Orac program.  If you have any ideas
+for improving it and/or solving particular bugs, please let us know.
+
+At first, we will concentrate on making the database set-ups more flexible,
+so you can move the warning flag parameters up and down, as is required for
+a particular database.  For instance, at the moment, as far as Oracle goes,
+we have a fixed parameter saying Redo logs changing more than once every
+30 minutes gives a yellow warning, changing more than once every 15 minutes
+gives a red warning.  Obviously, you might have batch processing databases
+where quick Redo log switches are acceptable in bursts.  This will be
+catered for in later versions of OracMonitor.  Also, you might not 
+be interested in various reports, on some databases (eg: you may have
+de-facto read-only tablespaces which you know are always 99.99% full).  
+We'll think of a way of enabling you to miss these checks out, on 
+certain databases.
+
+Also, the information you get back on investigating a particular flag, 
+should also become more comprehensive.
+
+
+*. The Screens
+--------------
+There are two screens.  On the first you enter the databases you require
+to be monitored.  You add the database connection string (or "name") which
+is compulsory.  You then enter the DBA User name (eg: "SYSTEM") and the
+respective password.  These two fields are not compulsory, but obviously
+will be needed for correct database connection later, if your database type
+requires them.
+
+We've provided some pretty simple Add, Update, Delete functionality.  The
+"primary" key is the database name.  OracMonitor will only hold one entry
+for each unique database name (or connection string).
+
+There are also three options, for the display of your 2nd 
+monitoring screen:
+
+*. Database Titles
+
+You can switch between displaying the database name above each group of
+buttons, or not displaying the database name.  Not displaying the name
+could save a great deal of room, if you are monitoring many different
+databases.  For convenience, when you set your mouse over any particular
+button, the program will display which database and which flag it refers to,
+therefore you can quickly find out the relevant database, should you need to.
+
+*. Flag Labels
+
+You can also select whether or not you want labels to appear on your 
+red/yellow/green flags on the actual monitoring screen.  Not having
+labels also saves a great deal of room, if you wish to monitor many 
+different databases.  You may choose to keep these labels, for ease of use,
+if you are only monitoring a small handful of databases, or if you have 
+a large screen, or whatever :-)
+
+*. Flag Sizing
+
+In order to allow you to cram many databases onto the screen, you can press
+a button which will make the warning flags smaller.
+
+Once you've added all your databases, and sorted out your options (which
+hopefully will increase in the future), you then "Run" the 2nd screen.
+
+
+*. Launch Screen
+----------------
+Here, you select your polling time.  This can be anything >= 15 seconds, and
+we've defaulted to 60 seconds.  Press start, and the tool will attempt 
+connections to all of your databases, with the parameters provided.  If
+it cannot connect, it shows a Red flag for the "Up" button, and blanks out
+all the rest.  If it can connect, it shows a Green "Up" button, and then
+interrogates the database with various SQL files (described later),
+giving you flags on various information you may require to monitor.
+
+Every 60 seconds (or whatever), it then repeats the process with one 
+exception.  It does not disconnect/reconnect for every poll, but just uses
+the old connection handle, to save the expense of this operation.  If at
+any point, any of the SQL questions fail (eg: because the database has
+been shutdown in the meantime), then the program disconnects/wipes out 
+the connection handle, and sets the "Up" flag to Red, indicating 
+the problem (which may, or may not be, because the database is shutdown).
+
+You then just leave the screen running, and any changes will be visually 
+flagged to you by red/yellow/green buttons.  You can press on relevant buttons
+to look at the thresholds the program is checking for, and what the last
+interrogation revealed.  This information will be expanded in later versions
+of the program.  Also, we will add an emailing facility, if any of the 
+buttons should go from green to red/yellow.
+
+Press the Stop button, if you want to stop the monitoring.  If you then "Exit"
+the program, the program will then disconnect from all the respective 
+databases.  You native windows exiting functionality (eg: the little 'X' on the top right of WinNT windows) can be used, however to prevent unnecessary
+warnings, please 'Stop' the monitoring, and 'Exit' using the Orac buttons
+provided.
+
+*.Files
+-------
+There are two sets of files.  The first set is in your User area, and is
+indicated in the top right of the first monitor screen:
+
+=> $ORAC_HOME/monitor/monitor.txt
+
+The monitor.txt file contains your "table" of databases and connection
+information, eg:
+
+frank^SYSTEM^manager^
+monitor^system^MANAGER^
+mydb7^Aston^Martin^
+
+At this time, the passwords are held 'in clear' and are not encrypted.  If
+we get time, we will try and encrypt these at a later date with whatever
+Perl facility we can find for this.  Ideas on this appreciated.
+
+The 2nd unchanging set of files are under the main distribution, under:
+
+monitor/Oracle/*
+
+(or monitor/Informix/*, monitor/Sybase/* etc)
+
+Here, there is a "config.txt" file, to be described later, and it's related
+SQL files.
+
+*.config.txt file
+-----------------
+
+I'll use an example to show its following four part format:
+
+redolog^Redo^900^1800^
+rollback^Roll^99^99.50^
+
+The first element tells OracMonitor the name of the first SQL file to use, 
+in this case "redolog.sql".  The 2nd tells it the name to use on the actual
+monitoring screen, "Redo", alongside the related button.  However, from 
+the first screen, you do have the option of not displaying these text items,
+along with the flags, if you want to save room on the screen.
+
+The following two fields indicate when the red flag cuts in and when the 
+yellow warning flag cuts in.  The SQL files must be constructed in such a
+way, that the more positive the answer, the better the situation.
+
+In the 'redolog' example above, the 3rd field, 900, indicates that if a 
+RedoLog switch has occured in UNDER 900 seconds (15 mins) then this is RED
+alert.  The 4th field, 1800, gives a YELLOW alert, if the return value of
+the SQL file is <= 1800.  Any answer greater than 1800 (30 mins) and the flag
+stays green.
+
+Similarly, for the 'rollback' entry, less than 99 is bad, and gives RED alert,
+otherwise, less than 99.5 is not good, and gets yellow alert and everything
+over 99.5 stays green.  For Oracle people reading this, the rollback SQL
+file may look familiar:
+
+select 100.00 - 
+(round((sum(waits) / (sum(gets) + .00000001)) * 100,2))
+from v$rollstat
+
+Note, it has been constructed so that the more positive the answer, the 
+better the situation.  The rule for adding more SQL files to OracMonitor,
+is that (for now) they should all be made up in this way.  You may like to
+add some of your own, using the above technique :-)
+
+Rgds,
+AndyD
+andy_j_duncan@yahoo.com
+
+1st October 1999
+
+EOF

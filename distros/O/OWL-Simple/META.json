@@ -1,0 +1,65 @@
+{
+   "abstract" : "A set of modules and scripts for parsing OWL ontologies",
+   "author" : [
+      "Tomasz Adamusiak <tomasz@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110930",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "OWL-Simple",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Temp" : 0,
+            "Test::More" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Benchmark" : 0,
+            "GO::Parser" : 0,
+            "Getopt::Long" : 0,
+            "IO::File" : 0,
+            "IO::Handle" : 0
+         },
+         "requires" : {
+            "List::Util" : 0,
+            "Log::Log4perl" : 0,
+            "Moose" : "0.89",
+            "XML::Parser" : "2.34"
+         }
+      }
+   },
+   "provides" : {
+      "OWL::Simple::Class" : {
+         "file" : "lib/OWL/Simple/Class.pm",
+         "version" : "0.05"
+      },
+      "OWL::Simple::OBOWriter" : {
+         "file" : "lib/OWL/Simple/OBOWriter.pm",
+         "version" : "0.06"
+      },
+      "OWL::Simple::Parser" : {
+         "file" : "lib/OWL/Simple/Parser.pm",
+         "version" : "1.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/gpl-license.php"
+      ]
+   },
+   "version" : "0.51"
+}

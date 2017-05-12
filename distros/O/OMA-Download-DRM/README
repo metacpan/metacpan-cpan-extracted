@@ -1,0 +1,30 @@
+OMA-DRM 
+=======
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Crypt::Rijndael
+  MIME::Base64
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 by Bernard Nauwelaerts
+
+This library is free software; you can redistribute it and/or modify
+it under the terms of GPL version 3. See LICENCE for details.
+
+
+

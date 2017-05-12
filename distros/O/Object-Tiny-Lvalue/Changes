@@ -1,0 +1,51 @@
+Release history for Object-Tiny-Lvalue
+
+1.083 Thu 19 Mar 2015
+	- No functional changes
+	- Further test suite cleanup
+
+1.082 Sat 10 Jan 2015
+	- No functional changes
+	- No longer contains INSTALL file with install-as-root instructions
+
+1.081 Sat 03 Jan 2015
+	- No functional changes
+	- Cleaned up test suite
+
+1.08 Sat 03 Jan 2015
+	- Bumped minimum Perl to 5.6 and made use of available features
+	- Regenerated package
+
+1.07 Sat 05 Jun 2010
+	- No functional changes
+	- Switched to Dist::Zilla to fix package
+
+1.06 Fri 04 Jul 2008
+	- No functional changes
+	- Using strict.pm all the time
+	- Fixing META.yml
+	- Fixed two "it's" into "its" in the documentation. (SHLOMIF)
+
+1.05 Thu 01 Nov 2007
+	- No functional changes
+	- Converted Makefile.PL from Module::Install to EU:MM
+
+1.04 Mon 22 Oct 2007
+	- No functional changes
+	- Upgrading to a newer set of AUTOMATED_TESTING tests
+
+1.03 Tue 04 Sep 2007
+	- Use explicit return in the generated accessors
+	  (makes them 5-10% faster according to benchmarking)
+	- Jonathon Rockway asks why both when we have Class::Accessor::Fast.
+	  (I've added a documentation segment to answer it)
+
+1.02 Wed 09 May 2007
+	- Fixing some POD things
+	- No functional changes
+
+1.01 Fri 23 Mar 2007
+	- Allowing the use of Object::Tiny with sub-classes
+
+1.00 Tue 20 Mar 2007
+	- Initial release

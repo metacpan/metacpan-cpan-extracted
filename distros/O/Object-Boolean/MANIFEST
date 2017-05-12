@@ -1,0 +1,13 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Build.PL
+README
+lib/Object/Boolean.pm
+lib/Object/Boolean/YesNo.pm
+Makefile.PL
+t/02-test-yesno.t
+t/01-test.t
+t/03-other.t
+t/pod-coverage.t
+t/pod.t

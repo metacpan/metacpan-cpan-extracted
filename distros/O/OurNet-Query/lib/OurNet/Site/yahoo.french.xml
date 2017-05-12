@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<SITE ID="Yahoo.French">
+
+<NAME Lang="en-us">Yahoo WWW Search</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+Yahoo全球搜尋(法文)
+]]></NAME>
+<INFO Lang="en-us">general information web search in France</INFO>
+<INFO Lang="zh-tw">general information web search in France</INFO>
+
+<URL Type="More"><![CDATA[
+_MORE_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://search.yahoo.fr/search/fr?p=_QUERY_
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_MORE_"><![CDATA[
+<a href="_MORE_">
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<LI><A HREF="_URL_">_TITLE_</A>_PREVIEW_</UL><p>
+]]></TEMPLATE>
+</SITE>

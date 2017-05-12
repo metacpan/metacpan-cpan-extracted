@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/ObjectDBI.pm
+META.yml                                 Module meta-data (added by MakeMaker)
+t/t01.t
+t/t01.pl

@@ -1,0 +1,93 @@
+[%-
+    # This is the AppKitTT configuration template which is processed before
+    # any other page.
+    # This is the place to define any extra template variables, macros, 
+    # load plugins, and perform any other template setup.
+
+    # process the macros.tt include file..
+    PROCESS macros.tt;
+
+    # define a data structure to hold header data
+    header      = 
+    {
+        title       => '',
+        favicon     => '',
+        css         => [],
+        js          => [ 
+            '/static/js/jquery-1.8.2.min.js',
+            '/static/js/jquery-ui-1.9.0.custom.min.js', 
+            '/static/js/appkit.js',
+            '/static/js/curry.js',
+            '/static/js/jquery.protip.js',
+        ],
+        jssrc       => [],
+    };
+
+    # read in any header modifications from the $c..
+    FOR css IN c.config.extra_css
+        header.css.push( css );
+    END ;
+    FOR css IN c.stash.header.css.list;
+        header.css.push( css );
+    END;
+    FOR js IN c.stash.header.js.list;
+        header.js.push( js );
+    END ;
+
+    # set the status message..
+    IF status_msg.defined && status_msg.length > 0;
+        status_message = status_message _ c.stash.status_msg;
+    END;
+
+    # set the error message..
+    IF error_msg.defined && error_msg.length > 0;
+        error_message = error_message _ c.stash.error_msg;
+    END;
+
+    # define a data structure to hold info on what 'features' are available (and enabled/disabled)...
+    features    =
+    {
+        appkitfeature_stdcss        => 1,
+        appkitfeature_htmleditor    => 0,
+        appkitfeature_tablesorter   => 0,
+        appkitfeature_clipboard     => 0,
+        appkitfeature_splitselect   => 0,
+    };
+
+    # the above 'feature' hashref is a list of available features in this template.
+    # the idea is that you can turn them on/off in the template by using a META
+    # directive at the top of your template. eg. META appkitfeature_tablesorter = 1
+  
+    # process the template meta varibles to alter the header 'features' hash...
+    FOR feat IN features.keys;
+        IF template.$feat.defined;
+            features.$feat = template.$feat;
+        END;
+    END;
+
+    # TBA.
+    # Below, we manage support for versions where Controller methods/properties manipulate the template..
+    FOR css IN c.controller.appkit_css;
+        header.css.list.push( css );
+    END;
+    FOR js IN c.controller.appkit_js;
+        header.js.list.push( js );
+    END;
+    IF c.controller.appkit_features.list.grep('htmleditor').size;
+        features.appkitfeature_htmleditor = 1;
+    END;
+    IF c.controller.appkit_features.list.grep('clipboard').size;
+        features.appkitfeature_clipboard = 1;
+    END;
+    IF c.controller.appkit_features.list.grep('tablesorter').size;
+        features.appkitfeature_tablesorter = 1;
+    END;
+
+    # Resolve dependencies between features
+    IF (features.appkitfeature_tablesorter);
+        features.appkitfeature_clipboard = 1;
+    END;
+
+    # process features.. this puts things into the 'header' varible..
+    PROCESS features.tt;
+-%]

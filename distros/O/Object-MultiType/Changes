@@ -1,0 +1,19 @@
+Revision history for Perl extension Object::MultiType.
+
+0.05  2004-12-20
+    - Fixed minor mistake on hash value of saver.
+
+0.04  2004-01-16
+    - Tied hashes will alwasy return TRUE for: if( %hash ) now.
+
+0.03  Oct 10 2003
+    - Fixed bug with overload ++ and --.
+
+0.02  Sat Jun 3 2:54:05 2003
+    - Added support for booleans.
+
+0.01  Sat May 10 00:37:05 2003
+    - First release!
+    - original version; created by h2xs 1.21 with options
+        -X -A -n Object::MultiType
+

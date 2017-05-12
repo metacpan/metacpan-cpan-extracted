@@ -1,0 +1,9 @@
+/* @override http://localhost:3000/static/css/tablesorter/dialog.css */
+
+div.ui-dialog table.tablesorter a {
+	color: #515151;
+}
+
+div.ui-dialog table.tablesorter th.header {
+	color: #242424;
+}

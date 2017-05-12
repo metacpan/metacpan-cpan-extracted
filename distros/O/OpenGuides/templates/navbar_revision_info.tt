@@ -1,0 +1,16 @@
+[% UNLESS not_editable %]
+  <div class="navbar_revision">
+    [% IF current %]
+      <div id="navbar_version">
+        Page last edited [% last_modified %] (version [% version %]).
+      </div>
+    [% ELSE %]
+      <div id="navbar_this_revision_info">
+        This is version [% version %] of this page (as of [% last_modified %]).
+      </div>
+      <div id="navbar_current_version_link">
+        <a href="[% cgi_url %]?[% node_param %]">View current version.</a>
+      </div>
+    [% END %]
+  </div>
+[% END %]

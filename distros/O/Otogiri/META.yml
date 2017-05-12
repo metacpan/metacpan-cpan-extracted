@@ -1,0 +1,54 @@
+---
+abstract: 'A lightweight medicine for using database'
+author:
+  - 'ytnobody <ytnobody@gmail.com>'
+build_requires:
+  DBD::SQLite: '0'
+  File::Temp: '0'
+  JSON: '0'
+  Mock::Quick: '0'
+  Test::More: '0.98'
+  Test::Requires: '0'
+  Test::Time: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.0, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Otogiri
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  DBIx::Otogiri:
+    file: lib/DBIx/Otogiri.pm
+  DBIx::Otogiri::Iterator:
+    file: lib/DBIx/Otogiri/Iterator.pm
+  Otogiri:
+    file: lib/Otogiri.pm
+    version: '0.17'
+requires:
+  Class::Accessor::Lite: '0'
+  DBIx::Sunny: '0'
+  SQL::Maker: '1.16'
+  SQL::QueryMaker: '0.02'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/ytnobody/Otogiri/issues
+  homepage: https://github.com/ytnobody/Otogiri
+  repository: git://github.com/ytnobody/Otogiri.git
+version: '0.17'
+x_contributors:
+  - 'papix <mail@papix.net>'
+  - 'ytnobody <ytnobody@ytnobody.net>'
+  - 'Takuya Tsuchida <tsucchi@cpan.org>'

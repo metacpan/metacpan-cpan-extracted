@@ -1,0 +1,70 @@
+{
+   "abstract" : "Perl API Bindings to the OSI License API ",
+   "author" : [
+      "Pablo Rodr\u00edguez Gonz\u00e1lez <pablo.rodriguez.gonzalez@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "agpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "OpenSourceOrg-API",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Synopsis" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Const::Fast" : "0",
+            "JSON" : "0",
+            "Moo" : "0",
+            "REST::Client" : "0",
+            "perl" : "5.008",
+            "strict" : "0",
+            "utf8" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::Most" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/pablrod/p5-OpenSourceOrg-API/issues"
+      },
+      "homepage" : "https://github.com/pablrod/p5-OpenSourceOrg-API",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/pablrod/p5-OpenSourceOrg-API.git",
+         "web" : "https://github.com/pablrod/p5-OpenSourceOrg-API"
+      }
+   },
+   "version" : "0.001",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0115"
+}
+

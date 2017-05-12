@@ -1,0 +1,15 @@
+Changes
+Header.pm
+Makefile.PL
+MANIFEST
+README
+test.pl
+test.ogg
+test.ogg.bak
+LICENSE.GPL
+inc/i18n.h
+inc/vcedit.c
+inc/vcedit.h
+inc/LICENSE.LGPL
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,43 @@
+---
+abstract: 'Documentation generator for ORLite'
+author:
+  - '|'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  File::Remove: 1.42
+  File::pushd: 1.00
+  Test::More: 0.47
+  Test::Pod: 1.42
+  Test::Pod::Coverage: 1.08
+  Test::Script: 1.07
+  Test::XT: 0.02
+  autodie: 2.10
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.01'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: ORLite::Pod
+name: ORLite-Pod
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Class::Inspector: 1.23
+  File::Basename: 0
+  File::Path: 2.07
+  File::Spec: 3.2701
+  ORLite: 1.23
+  Params::Util: 1.00
+  Template: 2.20
+  perl: 5.8.0
+resources:
+  ChangeLog: http://fisheye2.atlassian.com/changelog/cpan/trunk/ORLite-Pod
+  license: http://dev.perl.org/licenses/
+  repository: http://svn.ali.as/cpan/trunk/ORLite-Pod
+version: 0.11

@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<SITE ID="Goshen">
+
+<NAME Lang="en-us">Goshen Christian WWW Directory</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+Goshen基督教經文搜尋
+]]></NAME>
+<INFO Lang="en-us">religious web and article search</INFO>
+<INFO Lang="zh-tw">religious web and article search</INFO>
+
+<URL Type="More"><![CDATA[
+http://www.gosearch.net/_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+post://www.gosearch.net/?words=_QUERY_&new=1&oq=
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+<EXPRESSION>Plain</EXPRESSION>
+<CATEGORY>WWW,Religion</CATEGORY>
+
+<VAR Name="_NEXT_"><![CDATA[
+<A HREF="_NEXT_">Next
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<P><A HREF="http://_URL_"___">_TITLE_</A>___<br>_PREVIEW_<br>___Date:_DATE_,___Find similar pages
+]]></TEMPLATE>
+</SITE>

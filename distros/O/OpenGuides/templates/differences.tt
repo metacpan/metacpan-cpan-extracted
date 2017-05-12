@@ -1,0 +1,53 @@
+[% INCLUDE header.tt %]
+[% INCLUDE banner.tt %]
+<div id="content">
+
+[% IF !config.content_above_navbar_in_html %]
+  [% INCLUDE navbar.tt %]
+[% END %]
+
+<div id="maincontent">
+  <h1>
+  [% site_name %] - Differences between [% right_version %] and [% left_version %] of <span class="node_name">[% node_name %]</span>
+  </h1>
+[% IF diff %]
+<table id="version_diffs">
+  <tr>
+    <th class="newer_version"[% UNLESS responsive %] width="50%"[% END %]> [% right_version %] </th>
+    <th class="older_version"[% UNLESS responsive %] width="50%"[% END %]> [% left_version %] </th>
+  </tr>
+[% FOREACH hunk = diff %]
+  <tr>
+    <td class="newer_version">[% hunk.right %]</td>
+    <td class="older_version">[% hunk.left %]</td>
+  </tr>
+[% END %]
+</table><hr>
+[% ELSE %]
+  <h3>Contents are identical</h3>
+[% END %]
+
+[% INCLUDE display_metadata.tt %]
+
+[% content %]
+
+<br clear="all" />
+
+<a href="[% cgi_url %]?action=list_all_versions;id=[% node_param %]">List all versions</a><br />
+
+[% UNLESS responsive %]
+<p>
+<form action="search.cgi" method="get">
+  <input type="text" size="50" name="search" />
+  <input type="submit" name="Go" value="Search" class="form_button" />
+</form>
+</p>
+[% END %]
+
+</div>
+
+[% IF config.content_above_navbar_in_html %]
+  [% INCLUDE navbar.tt %]
+[% END %]
+
+[% INCLUDE footer.tt %]

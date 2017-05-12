@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<SITE ID="CrossWave">
+
+<NAME Lang="en-us">ATLAS</NAME>
+<INFO Lang="en-us">local news and travel information in Japan</INFO>
+
+<URL Type="More"><![CDATA[
+post://www2.crosswave.co.jp/cgi-bin/vbcgi/atlas.exe?Search_Str=_QUERY_&Logical=and&Object=key&Step=_STEP_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://www2.crosswave.co.jp/cgi-bin/vbcgi/atlas.exe?Search_Str=_QUERY_&Object=key&Step=0&Logical=and&Add_Str=
+]]></URL>
+
+
+<VAR Name="_STEP_"><![CDATA[
+<input name="Step" type="hidden" value="_STEP_">
+]]></VAR>
+<VAR Name="_QUERY_"><![CDATA[
+<input name="Search_Str" type="hidden" value="_QUERY_">
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<li><a href="_URL_">_TITLE_</a>_PREVIEW_</ul>
+]]></TEMPLATE>
+</SITE>

@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<SITE ID="Dig">
+
+<NAME Lang="en-us">Disney's Internet Guide</NAME>
+<INFO Lang="en-us">general information search for children</INFO>
+
+<URL Type="More"><![CDATA[
+http://dig.disney.go.com/default.asp?DBT=c&DB=b&SM=MC&CC=1&act=next&_v=2&DC=25&MT=_QUERY_&base=_START_25_0_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://dig.disney.go.com/default.asp?DBT=c&DB=b&SM=MC&CC=1&act=next&_v=2&DC=25&MT=_QUERY_&base=0
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+<CATEGORY>general, children</CATEGORY>
+
+
+<TEMPLATE><![CDATA[
+<font size=-1><a href="_URL_">_TITLE_</A></font>___<TD colspan=3><font size=-1>_PREVIEW_<font></TD></TR>
+]]></TEMPLATE>
+</SITE>

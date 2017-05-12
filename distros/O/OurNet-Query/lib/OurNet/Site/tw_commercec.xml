@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<SITE ID="TW_CommerceC">
+
+<NAME Lang="en-us">Taiwan Commerce Search Engine</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+TCSE台灣商業資訊查詢(中文)
+]]></NAME>
+<INFO Lang="en-us">commercial information search in Taiwan, in Chinese</INFO>
+<INFO Lang="zh-tw">commercial information search in Taiwan, in Chinese</INFO>
+
+<URL Type="More"><![CDATA[
+http://www.commerce.com.tw/cgi-bin/_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://www.commerce.com.tw/cgi-bin/search.cgi?phrase=_QUERY_&tp=10&submit1=Search&di=2
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_NEXT_"><![CDATA[
+<INPUT TYPE=button VALUE="Next Page" onClick="location='_NEXT_'">
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+box24.gif">___<A HREF="_URL_">_TITLE_</A>___COLOR=#000000>_PREVIEW_</FONT><BR>___<HR>
+]]></TEMPLATE>
+</SITE>

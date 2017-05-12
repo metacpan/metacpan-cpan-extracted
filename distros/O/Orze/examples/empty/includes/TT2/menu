@@ -1,0 +1,11 @@
+<div class="menu">
+<ul id="menu">
+[% FOREACH entry = menu %]
+[% IF entry.name == page %]
+<li class="active"><a href="[% root %][% entry.name %].[% entry.extension %]">[% entry.title %]</a></li>
+[% ELSE %]
+<li><a href="[% root %][% entry.name %].[% entry.extension %]">[% entry.title %]</a></li>
+[% END %]
+[% END %]
+</ul>
+</div>

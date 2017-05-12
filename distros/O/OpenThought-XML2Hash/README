@@ -1,0 +1,7 @@
+OpenThought::XML2Hash                                   http://openthought.net
+  Convert XML Datastructures to hashes                  eric at openthought.net
+
+
+OpenThought::XML2Hash is a no nonsense XML Parser.  It's an attempt to create a
+hash out of an XML packet as fast as possible.  It takes an XML file or string
+and returns a hash based on it's contents.

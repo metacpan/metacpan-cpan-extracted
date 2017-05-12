@@ -1,0 +1,300 @@
+RELEASE NOTES: OpenInteract
+=========================
+
+1.62  Thu Sep 30 22:43:23 EDT 2004
+
+ - Bugfix
+
+
+1.61  Sun May 30 11:05:37 EDT 2004
+
+ - Small fixes: one a dependency, one about sending a filehandle, one
+ in oi_manage, and one in a template
+
+
+1.60  Thu Aug 14 18:39:52 EDT 2003
+
+ - Fix for redirect on required login not found
+
+
+1.59  Thu Aug 14 15:58:46 EDT 2003
+
+ - You can now declare that only valid (logged-in) users can see your
+ site.
+
+ - Optionally use HTTP (vs HTML META) redirects
+
+ - Small bugfixes and enhancements
+
+
+1.58  Sun Apr 13 19:52:57 EDT 2003
+
+ - Fixed bug in base_page 
+
+
+1.57  Mon Apr  7 21:08:38 EDT 2003
+
+ - Small bugfixes and enhancements.
+
+
+1.56  Mon Feb 17 16:55:40 EST 2003
+
+ - All packages now use %%DATETIME%% key to specify a datetime field.
+
+ - Backup the package repository and do a check whenever we perform
+ any actions to modify it. This should help with corruption of the
+ repository.
+
+ - Small bugfixes and enhancements.
+
+
+1.55  Fri Dec 20 08:00:48 EST 2002
+
+ - You can customize the temporary library directory in conf/base.conf.
+
+ - Subclassing OpenInteract::UI::Main is now possible.
+
+
+1.54  Thu Nov  7 10:12:00 EST 2002
+
+ - Small bugfix in OI::Handler::GenericDispatcher to fix the incorrect
+ bugfix from earlier. (Doh!)
+
+
+1.53  Thu Nov  7 07:57:11 EST 2002
+
+ - Small bugfix in OI::Handler::GenericDispatcher
+
+
+1.52  Mon Sep 16 16:19:33 EDT 2002
+
+ - Small bugfixes and enhancements. Mostly to fix CPAN version issue.
+
+
+1.51  Sun Sep  8 23:07:24 EDT 2002
+
+ - Generated content can now be cached. See doc/caching.html and
+ OpenInteract::Handler::GenericDispatcher for more information.
+
+ - Small bugfixes and enhancements.
+
+
+1.50  Mon Aug 26 01:37:23 EDT 2002
+
+ - Templates are now read only from the filesystem and the
+ browser-based template editing works again. If you're upgrading and
+ using templates from the database you will need to run a migration
+ script (see 'base_template' docs for more info).
+
+ - Component handler has moved from 'base_component' package, which is
+ no longer used.
+
+ - Documentation updates: much of the docs from the 'base' package are
+ now in HTML in the main docs
+
+ - Small bugfixes.
+
+
+1.41  Tue Aug 13 07:28:10 EDT 2002
+
+ - Add centralized template storage in filesystem, so they will not
+ be overwritten with upgrades
+
+ - Add custom authentication behavior
+
+ - Packages can specify alternate modules to fulfill requirements
+
+ - Small bugfixes and refactorings
+
+
+1.40  Tue May  7 08:54:49 EDT 2002
+
+ - Runs on Oracle (except for sessions)
+
+ - Centralized package configuration customization
+
+ - Expanded ession storage options
+
+
+1.39  Mon Mar  4 07:45:35 EST 2002
+
+ - Bugfix in OpenInteract.pm
+
+ - Potential speedup when finding security for objects/actions
+
+
+1.38  Mon Feb 25 22:27:22 EST 2002
+
+  - You can now tell OI to store user/group/theme objects in the
+  session, saving database hits with every request
+
+  - Small flexbility changes to CommonHandler
+
+  - General bugfixes and updates
+
+
+1.37  Fri Jan 18 17:34:59 EST 2002
+
+  - The 'base_page' package now supports directory handlers, which let
+  you create custom actions for directory index requests.
+
+  - You can now expire inactive sessions. An additional key in the
+  server configuration controls the number of minutes you allow a
+  session to have no activity.
+
+  - General bugfixes and updates.
+
+
+1.36  Sat Dec  1 12:55:16 EST 2001
+
+  - Minor bugfixes, both in core OI modules. Easy upgrade.
+
+
+1.35  Thu Nov 29 00:46:51 EST 2001
+
+  - Tons of configuration changes -- please see UPGRADE if you're
+  upgrading. You can now use a INI-style configuration for the server
+  information.
+
+  - Added 'object_activity' package to display what activity
+  (create/update/delete) has transpired on all objects that choose to
+  participate
+
+  - Replace 'static_page' package with 'base_page' package, with lots
+  of improvements
+
+  - Modified the Apache startup procedure to be cleaner
+
+
+1.30 Mon Oct 15 01:35:03 EDT 2001
+
+  - New OpenInteract::CommonHandler makes common
+  search/display/edit/remove operations extremely simple.
+
+  - New template widgets allow higher level form/page building, and to
+  centralize display elements for site-wide consistency.
+
+  - New package ('lookup') allows lookup table editing without any
+  code
+
+  - Speed up template through properly implemented TT caching and
+  compiling
+
+  - Tons of smaller changes -- see 'Changes' file for more info
+
+
+1.21 Wed Aug 29 15:10:27 EDT 2001
+
+  - Bugfix release: base_security package that shipped with OI 1.2
+  doesn't save the security settings properly.
+
+
+1.2  Tue Aug 28 17:20:44 EDT 2001
+
+  - Requires SPOPS version 0.50 and Class::Date
+
+  - OpenInteract now supports LDAP for object storage as well as
+  authentication.
+
+  - Tighter Template Toolkit support requires translating old
+  templates to new templates.
+
+  - Multiple datastore handles for both LDAP and DBI available.
+
+  - See UPGRADE for extensive changes to configuration file and
+  specifics about template translation.
+
+  - Lots of smaller changes -- see 'Changes' file for more info
+
+
+1.1  Fri Jul 20 07:00:55 EDT 2001
+
+  - Requires SPOPS version 0.41
+
+  - New package 'results_manage' makes it simple to manage and persist
+  search results
+
+  - Many packages use the new SPOPS iterators to return results, which
+  should reduce resource consumption, in some cases dramatically.
+
+  - Many modules were moved from the 'base' package to the core
+  distribution, which will hopefully make the whole process more
+  understandable -- and browseable via 'perldoc'.
+
+  - Lots of smaller changes -- see 'Changes' file for more info
+
+
+1.07  Sun Jun 10 14:31:36 EDT 2001
+
+  * Requires SPOPS version 0.40.
+
+  * OpenInteract now works with Sybase Adaptive Server Enterprise,
+    Sybase Adaptive Server Anywhere, and PostgreSQL. It also works on
+    Win32 systems using ActivePerl, Apache and the mod_perl binaries
+    built by the excellent Randy Kobes.
+
+  * Added additional optional DBI attributes to database configuration
+    in conf/server.perl.
+
+  * You'll need to make changes to the 'sys_security' table -- alter
+    'oid' to be 'object_id' and 'level' to be 'security_level'.
+
+  * You'll need to make changes to the 'object_track' table -- alter
+    'oid' to be 'object_id'
+
+  * Add the line:
+
+    config_type  perl
+
+    To your $WEBSITE/conf/base_config.conf file. The system will still
+    work for now without this change, but it's a backwards
+    compatibility shunt that won't always be there.
+
+  * Add the following keys to your 'conf/server.perl' configuration
+    file:
+
+     {db_info}->{long_read_len} = 65536
+     {db_info}->{long_trunc_ok} = 0
+
+  * Change the following key:
+
+     {system_alias}->{'OpenInteract::Cookies'}
+
+    to:
+
+     {system_alias}->{'OpenInteract::Cookies::Apache'}
+
+    unless you're running on Win32, in which case change it to:
+
+     {system_alias}->{'OpenInteract::Cookies::CGI'}
+   
+  * Lots of small changes -- see 'Changes' file for more info.
+
+
+1.06  Sun Feb 25 15:16:43 EST 2001
+
+  * Package repository format changed. See 'UPGRADE' for upgrading
+    information.
+
+  * Added new keys to server.conf:
+
+     {session_info}->{expiration} = '+3M',
+
+       (allows you to set a default expiration time for the session
+        cookie)
+
+     {system_alias}->{'OpenInteract::PackageRepository'} = 'repository',
+
+       (alias used to reference the repository class)
+
+     {box}->{custom_box_handler} = '',
+
+       (allows you to define a handler to be called on every request
+        to create/inspect/modify boxes)
+
+   * Require new version of SPOPS (0.39); this forces you to set the
+     spops.conf configuration key 'increment_field' to a true value if
+     you want to use AUTO_INCREMENT fields for MySQL.
+
+==========================
+$Id: RELEASE,v 1.34 2004/05/30 15:13:49 lachoy Exp $

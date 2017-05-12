@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<SITE ID="Zeek">
+
+<NAME Lang="en-us">Zeek Search</NAME>
+<INFO Lang="en-us">general information web search in Brazil</INFO>
+
+<URL Type="More"><![CDATA[
+http://busca.zeek.com.br/busca/busca.cfm?p=_QUERY_&stq=_START_10_10_&next=YES&cpl=YES
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://busca.zeek.com.br/busca/busca.cfm?p=_QUERY_&stq=10&next=YES&cpl=YES
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+
+<TEMPLATE><![CDATA[
+<dt>___href="_URL_">_TITLE_</a>___-_PREVIEW_<br>___<br>_DATE_</font>
+]]></TEMPLATE>
+</SITE>

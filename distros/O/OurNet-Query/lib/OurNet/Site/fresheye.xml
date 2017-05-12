@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<SITE ID="fresheye">
+
+<NAME Lang="en-us">Fresheye search</NAME>
+<INFO Lang="en-us">general information web search in Japan</INFO>
+
+<URL Type="More"><![CDATA[
+_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://search.fresheye.com/?kw=_QUERY_&term=monthly
+]]></URL>
+
+<CHARSET>ja-jp.euc</CHARSET>
+<SCORE>100-(_RANK_-1)/2</SCORE>
+<EXPRESSION>boolean</EXPRESSION>
+
+<VAR Name="_NEXT_"><![CDATA[
+<a href="_NEXT_">¼¡¤Î10·ï</a></font>
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+color="darkorange">___<a href="_URL_">_TITLE_</a><br>_PREVIEW_<br>___</tr>
+]]></TEMPLATE>
+</SITE>

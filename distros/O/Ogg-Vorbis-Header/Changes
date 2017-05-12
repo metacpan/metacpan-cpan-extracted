@@ -1,0 +1,20 @@
+Revision history for Perl extension Ogg::Vorbis::Header.
+
+0.01  Tue Dec 31 05:50:10 2002
+	- original version; created by h2xs 1.21 with options
+		-PAXn Ogg::Vorbis::Header
+0.02  Sun Jan  5 04:49:33 CST 2003
+  - write_vorbis() no longer croaks on files with spaces in their
+    names.
+  - Replaced system kludge in write_vorbis() with explicit copy.
+0.03  Wed May 21 05:13:25 CDT 2003
+  - Added fix for non-standard comments which don't contain '='
+		symbols.  Library issues a warning and skips these comments when
+		loading from file.
+
+0.04  Fri Jul 01 19:07:00 BST 2016
+  - Fixed syntax errors in tests.
+
+0.05  Sun Jul 03 06:25:00 BST 2016
+  - Packaging fixes
+

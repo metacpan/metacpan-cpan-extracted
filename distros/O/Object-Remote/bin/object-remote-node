@@ -1,0 +1,6 @@
+#!/usr/bin/env perl
+
+use strictures 1;
+use Object::Remote::Node;
+
+Object::Remote::Node->run;

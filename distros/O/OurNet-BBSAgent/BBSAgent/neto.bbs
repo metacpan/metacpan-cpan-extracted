@@ -1,0 +1,27 @@
+# $File: //depot/OurNet-BBSAgent/BBSAgent/neto.bbs $ $Author: autrijus $
+# $Revision: #7 $ $Change: 2829 $ $DateTime: 2002/01/10 14:54:36 $
+# Contributed by Smartboy <kcwu@ck.tp.edu.tw>
+# zh_TW.Big5: 網際新世界
+
+Neto World
+netoworld.twbbs.org
+
+load maple2.board
+setv moretail	m/\[q\]\e\[30m結束\x20\x20\e\[0?m/
+setv postsign	1
+setv pager	Call機
+
+=board
+call main
+send d\n1\n\n
+send s
+wait 名稱
+send $[board]\n\x20\x20
+wait 板主：
+till 文章選讀
+
+=article_edit_author
+send \x24E\x19\x19\x19\x19
+send \x18\n
+wait 文章選讀
+exit

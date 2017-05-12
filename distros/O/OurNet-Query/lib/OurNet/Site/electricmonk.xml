@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<SITE ID="Electricmonk">
+
+<NAME Lang="en-us">The Electric Monk Search</NAME>
+<INFO Lang="en-us">web concepts search of real English sentences</INFO>
+
+<URL Type="Start"><![CDATA[
+post://209.24.233.65/GoMonk?qUser=_QUERY_&urlnum=_HITS_
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+
+<TEMPLATE><![CDATA[
+&nbsp;<a href="_URL_">_TITLE_</A>___<BR>_PREVIEW_<BR>___
+]]></TEMPLATE>
+</SITE>

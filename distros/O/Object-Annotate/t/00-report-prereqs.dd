@@ -1,0 +1,39 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Test::More' => '0',
+                                      'Test::Pod' => '1.41'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Carp' => '0',
+                                      'Class::DBI' => '0',
+                                      'Sub::Exporter' => '0.92',
+                                      'UNIVERSAL::moniker' => '0.01',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'DBD::SQLite' => '0',
+                                   'DBI' => '0',
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'Fatal' => '0',
+                                   'File::Spec' => '0',
+                                   'Test::More' => '0.96',
+                                   'lib' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

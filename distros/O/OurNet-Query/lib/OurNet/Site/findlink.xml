@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<SITE ID="Findlink">
+
+<NAME Lang="en-us">FindLink.com Search Engine</NAME>
+<INFO Lang="en-us">general information web search</INFO>
+
+<URL Type="More"><![CDATA[
+http://www.findlink.com/searchit/_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://www.findlink.com/searchit/search.cgi?s=_QUERY_&match=or&ul=either&category=catx3dx%3DALL
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_NEXT_"><![CDATA[
+Next 20 </b><a href="_NEXT_">
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+color="#FFFFC1">___<a href="_URL_">_TITLE_</a>___bgcolor="ffffff">_PREVIEW_</font><br>___Updated:_DATE_</font></td></tr></table>
+]]></TEMPLATE>
+</SITE>

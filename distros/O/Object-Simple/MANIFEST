@@ -1,0 +1,14 @@
+Changes
+lib/Object/Simple.pm
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/object-simple.t
+t/object-simple/Some/T2.pm
+t/object-simple/T1.pm
+t/object-simple/T3.pm
+t/object-simple/T3_2.pm
+xt/boilerplate.t
+xt/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

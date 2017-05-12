@@ -1,0 +1,36 @@
+/* Procedure copyright(c) 1995 by Edward M Barlow */
+
+/************************************************************************\ 
+|* Procedure Name:	sp__auditoption
+|*							          
+|* Author:		ed barlow		
+|*								     
+\************************************************************************/ 
+
+:r database
+go
+:r dumpdb
+go
+
+if exists (SELECT *
+           from   sysobjects
+           where  type = "P"
+           and    name = "sp__auditoption")
+begin
+    drop proc sp__auditoption
+end
+go
+
+create procedure sp__auditoption( @srvname char(30) = null,@hostname char(30) =
+null, @dont_format char(1) = null )
+as
+begin
+	select * from sybsecurity..sysauditoptions
+end
+go
+
+grant execute on sp__auditoption  TO public
+go
+
+exec sp__auditoption
+go

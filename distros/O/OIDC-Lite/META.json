@@ -1,0 +1,125 @@
+{
+   "abstract" : "OpenID Connect Library",
+   "author" : [
+      "Ryo Ito <ritou.06@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.4.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "OIDC-Lite",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Crypt::OpenSSL::RSA" : "0",
+            "ExtUtils::MakeMaker" : "6.62",
+            "Test::Mock::LWP::Conditional" : "0",
+            "Test::MockObject" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Accessor::Fast" : "0.34",
+            "Data::Dump" : "1.17",
+            "JSON::WebToken" : "0.10",
+            "JSON::XS" : "0",
+            "MIME::Base64" : "3.11",
+            "OAuth::Lite2" : "0.10",
+            "Params::Validate" : "0.95",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "provides" : {
+      "OIDC::Lite" : {
+         "file" : "lib/OIDC/Lite.pm",
+         "version" : "0.10"
+      },
+      "OIDC::Lite::Client::Token" : {
+         "file" : "lib/OIDC/Lite/Client/Token.pm"
+      },
+      "OIDC::Lite::Client::TokenResponseParser" : {
+         "file" : "lib/OIDC/Lite/Client/TokenResponseParser.pm"
+      },
+      "OIDC::Lite::Client::WebServer" : {
+         "file" : "lib/OIDC/Lite/Client/WebServer.pm"
+      },
+      "OIDC::Lite::Model::AuthInfo" : {
+         "file" : "lib/OIDC/Lite/Model/AuthInfo.pm"
+      },
+      "OIDC::Lite::Model::IDToken" : {
+         "file" : "lib/OIDC/Lite/Model/IDToken.pm"
+      },
+      "OIDC::Lite::Server::AuthorizationHandler" : {
+         "file" : "lib/OIDC/Lite/Server/AuthorizationHandler.pm"
+      },
+      "OIDC::Lite::Server::DataHandler" : {
+         "file" : "lib/OIDC/Lite/Server/DataHandler.pm"
+      },
+      "OIDC::Lite::Server::Endpoint::Token" : {
+         "file" : "lib/OIDC/Lite/Server/Endpoint/Token.pm"
+      },
+      "OIDC::Lite::Server::GrantHandler::AuthorizationCode" : {
+         "file" : "lib/OIDC/Lite/Server/GrantHandler/AuthorizationCode.pm"
+      },
+      "OIDC::Lite::Server::GrantHandlers" : {
+         "file" : "lib/OIDC/Lite/Server/GrantHandlers.pm"
+      },
+      "OIDC::Lite::Server::Scope" : {
+         "file" : "lib/OIDC/Lite/Server/Scope.pm"
+      },
+      "OIDC::Lite::Util::JWT" : {
+         "file" : "lib/OIDC/Lite/Util/JWT.pm"
+      },
+      "Plack::Middleware::Auth::OIDC::ProtectedResource" : {
+         "file" : "lib/Plack/Middleware/Auth/OIDC/ProtectedResource.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ritou/p5-oidc-lite/issues"
+      },
+      "homepage" : "https://github.com/ritou/p5-oidc-lite",
+      "repository" : {
+         "url" : "git://github.com/ritou/p5-oidc-lite.git",
+         "web" : "https://github.com/ritou/p5-oidc-lite"
+      }
+   },
+   "version" : "0.10",
+   "x_contributors" : [
+      "Clément OUDOT <clem.oudot@gmail.com>"
+   ]
+}

@@ -1,0 +1,151 @@
+digraph "ospf lsdb" {
+	node [ color=gray50 fontsize=14 ];
+	edge [ color=gray50 fontsize=8  ];
+	router0 [
+		tooltip="Areas: 0.0.0.0 23.0.0.0"
+		color="black"
+		peripheries="2"
+		style="bold"
+		shape="box"
+		label="0.0.0.1"
+	];
+	router1 [
+		tooltip="Area: 0.0.0.0"
+		color="gray50"
+		style="bold"
+		shape="box"
+		label="0.0.0.2"
+	];
+	router2 [
+		tooltip="Areas: 0.0.0.0 23.0.0.0"
+		color="black"
+		style="bold"
+		shape="box"
+		label="0.0.0.4"
+	];
+	stubnet0 [
+		tooltip="Area: 23.0.0.0"
+		color="gray75"
+		style="solid"
+		shape="ellipse"
+		label="172.23.2.0\n255.255.255.0"
+	];
+	network0 [
+		tooltip="Area: 0.0.0.0"
+		color="gray50"
+		style="bold"
+		shape="ellipse"
+		label="172.0.1.0\n255.255.255.0"
+	];
+	summaryaggregate0 [
+		tooltip="Area: 0.0.0.0"
+		color="gray50"
+		style="dashed"
+		shape="ellipse"
+		label="172.51.5.0/255.255.255.0"
+	];
+	boundaryaggregate0 [
+		tooltip="Area: 0.0.0.0"
+		color="gray50"
+		style="dashed"
+		shape="box"
+		label="0.0.0.3"
+	];
+	externalaggregate1 [
+		tooltip="AS external"
+		color="gray35"
+		style="solid"
+		shape="egg"
+		label="10.0.0.0/255.0.0.0"
+	];
+	externalaggregate0 [
+		tooltip="AS external"
+		color="gray35"
+		style="solid"
+		shape="egg"
+		label="0.0.0.0/0.0.0.0"
+	];
+	router2 -> router0 [
+		tooltip="Area: 23.0.0.0"
+		taillabel="80"
+		color="gray75"
+		style="solid"
+		label="172.23.3.4"
+	];
+	router0 -> router2 [
+		tooltip="Area: 23.0.0.0"
+		taillabel="60"
+		color="gray75"
+		style="solid"
+		label="172.23.3.1"
+	];
+	router0 -> network0 [
+		tooltip="Area: 0.0.0.0"
+		taillabel="50"
+		color="gray50"
+		style="bold"
+		headlabel=".1"
+	];
+	router1 -> network0 [
+		tooltip="Area: 0.0.0.0"
+		taillabel="70"
+		color="gray50"
+		style="solid"
+		headlabel=".2"
+	];
+	router0 -> stubnet0 [
+		tooltip="Area: 23.0.0.0"
+		taillabel="60"
+		color="gray75"
+		style="solid"
+	];
+	router2 -> router1 [
+		tooltip="Area: 0.0.0.0"
+		taillabel="90"
+		color="gray50"
+		style="dotted"
+		label="172.0.4.4"
+	];
+	router1 -> router2 [
+		tooltip="Area: 0.0.0.0"
+		taillabel="70"
+		color="gray50"
+		style="dotted"
+		label="172.0.4.2"
+	];
+	network0 -> router0 [
+		tooltip="Area: 0.0.0.0"
+		taillabel=".1"
+		color="gray50"
+		style="bold"
+	];
+	network0 -> router1 [
+		tooltip="Area: 0.0.0.0"
+		color="gray50"
+		style="solid"
+	];
+	summaryaggregate0 -> router1 [
+		tooltip="Area: 0.0.0.0"
+		color="gray50"
+		style="dashed"
+		headlabel="100"
+	];
+	boundaryaggregate0 -> router1 [
+		tooltip="Area: 0.0.0.0"
+		color="gray50"
+		style="dashed"
+		headlabel="10"
+	];
+	externalaggregate1 -> router1 [
+		tooltip="AS external"
+		color="gray35"
+		headlabel="20"
+		style="solid"
+	];
+	externalaggregate0 -> boundaryaggregate0 [
+		tooltip="AS external"
+		color="gray35"
+		style="dashed"
+		headlabel="30"
+	];
+}

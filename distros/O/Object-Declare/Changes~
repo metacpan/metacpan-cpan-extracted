@@ -1,0 +1,123 @@
+0.23    2016-02-12
+    * Convert the distribution from Module-Install to Dist-Zilla.
+
+    * Start maintaining in a GitHub repository.
+
+    * Add a LICENSE file.
+
+    * Removed trailing whitespace - with a test.
+
+0.22    2007-02-09
+    * Allow declarations in copula callbacks as return value:
+
+        copula => foo => sub { bar is 1, baz is 2 }
+
+    * No longer raise bogus "overload method not found" errors
+      when paritally-formed declarations objects is e.g. printed
+      out for debugging purposes.
+
+0.21    2007-01-26
+
+    * Helper functions for mapping keys are no longer present within
+      dynamic scope of mapping construction callbacks; this allows you
+      to have call a method that has the same name as a mapping key
+      during ->new() and other callbacks.
+
+    * Support for fully qualified fields: "Very::Happy is 42" and
+      "is Very::Happy" are valid even when Very::Happy is not yet loaded.
+
+    * Support for associating coderefs with copula for even more
+      flexible rewriting of arguments:
+
+        copula      => {                # list of words, or a map
+            is  => '',                  #  from copula to label prefixes,
+            are => '',                  #  or to callback that e.g. turns
+            has => sub { has => @_ },   #  "has X" to "has is X" and
+                                        #  "X has 1" to "has is [X => 1]"
+        },
+
+0.20    2007-01-16
+
+    * Sub::Override is no longer a dependency for this module.
+
+    * Values in declarations can now contain nested sub-objects by
+      calling the declarators again:
+
+        column foo => field is column( field is 'foo' );
+
+      Contributed by: Jason Adams
+
+0.13    2006-07-21
+
+    * Introduce the "synonyms" interface, a mapping for alternate
+      spelling for field names.
+
+0.12    2006-07-20
+
+    * The "isn't" keyword in 0.11 broke Test::More, and I can't find a
+      way to reconcile them, so it's now sadly retracted.
+
+0.11    2006-07-20
+
+    * Support the prefix ! operator on declarations, so negated ones
+      such as "!is global" or "!global is $x" now work.
+      Requested by: Jesse Vincent
+
+    * Also introduce the "isn't" negated copula.
+      Requested by: Jesse Vincent
+
+0.10    2006-07-20
+
+    * The "copula" interface now accepts an arbitrary prefix for each
+      copula (defaults to ''), which can be used to distinguish labels
+      built by different copular words.
+
+0.09    2006-07-18
+
+    * The "mapping" interface now accepts arbitrary code reference as the
+      builder function, in addition to class names to call ->new to.
+
+0.08    2006-07-18
+
+    * Added lots of documentation and comments.
+
+    * Now works correctly even if at runtime the symbol table entries
+      created at compile-time get deleted.
+
+0.07    2006-07-18
+
+    * Chained "is foo, is bar, is baz" now works; previously only
+      the first one is recognized.
+      Reported by: Steven Little
+
+0.06    2006-07-17
+
+    * Documentation cleanup; no functional changes.
+
+0.05    2006-07-17
+
+    * Support for ordered declarations, via list-context return of
+      "declare".  In scalar context, it still returns a hash reference.
+
+0.04    2006-07-17
+
+    * Support for plural values via "are":
+
+        column x =>
+            field1 is 'xxx',
+            field2 are 'XXX', 'XXX', # <-- Plural value
+            is field3;
+
+0.03    2006-07-17
+
+    * The declarator can now be exported to another package;
+      this works because internally, each declarator remembers
+      the class mappings and copula it was associated with.
+
+0.02    2006-07-17
+
+    * Documentation cleanup; no functional changes.
+
+0.01    2006-07-17
+
+    * Initial CPAN release.

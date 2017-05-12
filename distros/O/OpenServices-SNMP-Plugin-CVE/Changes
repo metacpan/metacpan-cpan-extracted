@@ -1,0 +1,8 @@
+Revision history for OpenServices-SNMP-Plugin-CVE
+
+0.02    2014-10-31
+        Loosen up versioned dependency on Net::SNMP::*.
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

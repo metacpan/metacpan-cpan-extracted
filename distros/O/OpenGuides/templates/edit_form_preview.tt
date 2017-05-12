@@ -1,0 +1,22 @@
+<div id="maincontent" class="preview">
+  <h2>Preview</h2>
+  <div class="preview_actions">
+    <div class="cancel_edit">
+      <a href="[% cgi_url %]?[% node_param %]">Cancel edit</a>
+    </div>
+    <div class="jump_to_edit_form">
+      <a href="#edit_form_anchor">Jump to edit form</a>
+    </div>
+  </div>
+  [% IF summary %]
+    <div id="summary">[% summary %]</div>
+  [% END %]
+  <div id="node_map_and_image">
+    [% INCLUDE node_image.tt %]
+  </div>
+  [% INCLUDE display_metadata.tt %]
+  <div id="content_text">
+    [% preview_html %]
+  </div>
+</div>
+<br clear="all" />

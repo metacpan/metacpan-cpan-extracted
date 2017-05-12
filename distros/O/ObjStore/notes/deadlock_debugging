@@ -1,0 +1,20 @@
+KEYWORDS:  deadlocks, enable_event_hooks, set_default_hooks
+
+QUESTION:
+
+I suspect there is deadlock in my program.  How could I tracking them
+down?
+
+
+ANSWER:
+
+You can add the following calls after objectstore::initialize() and
+before you open any databases.
+
+  objectstore::enable_event_hooks();
+  objectstore::set_default_hooks();
+
+This will print out information about read/write locks the process
+holds on specific segments/pages.
+
+FAQ_reference: deadlock_debugging

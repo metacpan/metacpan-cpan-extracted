@@ -1,0 +1,5 @@
+[% UNLESS responsive %]<br />[% END %]
+<span class="photo_note" id="photo_note">
+	Photos should be no larger than 320x240
+</span>
+[% UNLESS responsive %]<br />&nbsp;[% END %]

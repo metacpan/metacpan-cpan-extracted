@@ -1,0 +1,26 @@
+# $File: //depot/OurNet-BBSAgent/BBSAgent/maxwell.bbs $ $Author: autrijus $
+# $Revision: #5 $ $Change: 2829 $ $DateTime: 2002/01/10 14:54:36 $
+# Contributed by Autrijus Tang <autrijus@autrijus.org>
+# zh_TW.Big5: 臺大電機Maxwell站
+
+Maxwell
+bbs.ee.ntu.edu.tw
+
+load maple2.board
+
+setv morehead	m/\e\[0?m(?:\e\[\d;\dm)?--More--\x20P\.|\e\[0m\e\[4m請/
+setv moretail	m/\[q\]結束|意鍵繼續...\e\[0m(?:\e\[K)?/
+setv leftparen	m/\(|按/
+setv rightparen	m/\)|任/
+setv cursor	>
+setv pager	(G)oodbye
+setv headi	發信人|作者,標\s+題,發信站|時間
+setv headl	(?:^|\x0d|\e\[2J)
+setv headr	:\x20(.+?)(?:,\x20.+)?\x20*(?:\e\[0m|$)
+setv separator	\e\[0?m\e\[\d;1H
+
+=login
+wait 註冊
+send $[username]\n
+send $[password]\nn\nq\x20q\x20q\x20q\x20q
+goto main

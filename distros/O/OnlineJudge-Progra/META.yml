@@ -1,0 +1,34 @@
+---
+abstract: (Just Another) Programming Tasks Grading System
+author:
+  - 'israel leiva <ilv@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.88, CPAN::Meta::Converter version 2.120351'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+provides:
+	OnlineJudge::Progra:
+      file: lib/OnlineJudge/Progra.pm
+      version: 0.023
+    OnlineJudge::Progra::Test:
+      file: lib/OnlineJudge/Progra/Test.pm
+      version: 0.023
+name: OnlineJudge-Progra
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: 5.008
+  Cwd: 3.36
+  File::Copy: 2.14
+  File::Spec::Functions: 3.3
+  Proc::Killall: 1
+  Test::Simple: 0.98
+version: 0.023

@@ -1,0 +1,10 @@
+OggVorbis_File *	T_PTR
+vorbis_info *  		T_PTR
+vorbis_comment *	T_PTR
+vorbis_dsp_state *	T_PTR
+vorbis_block *	 	T_PTR
+
+ogg_int64_t 		T_NV
+ogg_packet *		T_PTR
+
+float **   		T_PACKED

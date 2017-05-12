@@ -1,0 +1,73 @@
+{
+   "abstract" : "promote Perl primitives (hashes, scalars, arrays, and filehandles), either tie()d or not, to become hybrid objects",
+   "author" : [
+      "Alexandr Kononoff (L<mailto:parsels@mail.ru>)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Object-Hybrid",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Class::Tag" : {
+         "file" : "lib/Class/Tag.pm",
+         "version" : "0.09"
+      },
+      "Object::Hybrid" : {
+         "file" : "lib/Object/Hybrid.pm",
+         "version" : "0.07"
+      },
+      "Object::Hybrid::ARRAY" : {
+         "file" : "lib/Object/Hybrid.pm",
+         "version" : 0
+      },
+      "Object::Hybrid::BASE" : {
+         "file" : "lib/Object/Hybrid.pm",
+         "version" : 0
+      },
+      "Object::Hybrid::Class" : {
+         "file" : "lib/Object/Hybrid.pm",
+         "version" : 0
+      },
+      "Object::Hybrid::GLOB" : {
+         "file" : "lib/Object/Hybrid.pm",
+         "version" : 0
+      },
+      "Object::Hybrid::HASH" : {
+         "file" : "lib/Object/Hybrid.pm",
+         "version" : 0
+      },
+      "Object::Hybrid::SCALAR" : {
+         "file" : "lib/Object/Hybrid.pm",
+         "version" : 0
+      },
+      "PACKAGE_REPLACE" : {
+         "file" : "lib/Object/Hybrid.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.07"
+}

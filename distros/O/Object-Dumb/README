@@ -1,0 +1,37 @@
+SYNOPSIS
+
+     use Object::Dumb;
+    
+     my $obj = Object::Dumb->new;
+     $obj->foo;          # -> 0
+     $obj->bar(1, 2, 3); # -> 0
+
+    You can limit what methods will be available:
+
+     my $obj = Object::Dumb->new(methods => [qw/foo bar/]);
+     $obj->foo; # ok
+     $obj->bar; # ok
+     $obj->baz; # dies
+
+    or:
+
+     my $obj = Object::Dumb->new(methods => qr/^(foo.*|bar.+)$/);
+     $obj->foo;  # ok
+     $obj->barb; # ok
+     $obj->baz;  # dies
+
+    And you can also customize what value the methods will return:
+
+     my $obj = Object::Dumb->new(returns => 1);
+     print $obj->foo; # 1
+
+DESCRIPTION
+
+    This module lets you create a "dumb" object that responds to any method
+    and just returns 0.
+
+    You can customize by limiting what methods the object will respond to,
+    and what value the methods will return.
+
+SEE ALSO
+

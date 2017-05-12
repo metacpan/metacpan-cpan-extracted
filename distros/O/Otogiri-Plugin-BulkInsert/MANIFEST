@@ -1,0 +1,14 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Otogiri/Plugin/BulkInsert.pm
+minil.toml
+t/00_compile.t
+t/01_sqlite.t
+t/02_mysql.t
+t/03_postgresql.t
+META.yml
+MANIFEST

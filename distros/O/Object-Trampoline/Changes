@@ -1,0 +1,116 @@
+Wed Jul 20 13:25:16 CDT 2016
+
+- Add "delayed" to handle dispatch of subrefs.
+- POD for delayed.
+
+Mon Feb  9 08:49:53 CST 2015
+
+- Makefile.PL uses module for version.
+- Add sanity check for prototype of '::' and words only in 
+  trampoline_use.
+
+Thu Jan 22 18:31:59 CST 2015
+
+- 1.40 as string to avoid confusing CPAN indexer.
+
+
+Fri Jul 26 12:09:17 CDT 2013
+
+- v1.30
+- use v5.12.
+- drop "use strict" (now built-in).
+- Remove regex check on prototype, allows using object to dispatch
+  constructor (allows dispatch via factory object).
+- Add overrides for UNIVERSAL class methods that dispatch into 
+  the AUTOLOAD ($trampoline->isa( X ) or can will return correct
+  value).
+
+Tue Jun 12 13:55:35 CDT 2012
+
+- Minor test cleanups.
+- use v5.8.
+
+Wed Jul 22 20:13:17 EDT 2009
+
+- Check that the use succeeded in eval.
+
+- Check for a true value of the class on the
+  way in and constructor on the way out. 
+
+- Replace "ref" with "blessed" to validate
+  object construction.
+
+- Update the tests to use blessed also.
+
+- Added a test for rejecting false classes
+  in the initial construction, failure to 
+  use the class on bounce.
+
+- Module now depends on Symbol (for testing)
+  and Scalar::Util (for operation) also; both
+  are core so it shouldn't cause any pain.
+
+Thu Jan 26 17:43:45 EST 2006
+
+- Fixed typo in eval (dbkliv)
+
+- Update pod.
+
+- Code cleanup: redispatching anon sub blows up with wierd
+  stack error in 5.8.4; not that much code to duplicate.
+
+Wed Jan 25 16:51:15 EST 2006
+
+- use_class got too klutzy due to issues with bookkeeping
+  multiple calling classes. Feh... Added Object::Trampoline::Use
+  that does a use in the caller's package to get the object.
+
+- Upated the POD.
+
+Tue Jan 24 18:00:50 EST 2006
+
+- Add add'l argument for using the construcor class 
+  ('use_class').
+
+- Update pod to reflect add'l argument.
+
+- Still need to add tests for this; but it at least
+  didn't break anything...
+
+Mon Nov 21 17:51:06 EST 2005
+
+- So far so good, up the thing to 1.00, add some 
+  more POD::::.
+
+Mon Nov 21 12:55:16 EST 2005
+
+- Replace single $obj->can with if-block that first
+  attempts to get a subref then uses $obj->$name in
+  order to handle classes whose first non-constructor
+  method is an AUTOLOAD.
+
+- Pod, debugging use.
+
+Fri Nov 18 12:53:41 EST 2005
+
+- POD, example of handle catalog module, notes.
+
+Tue Nov  8 14:26:53 EST 2005
+
+- Typos in POD, comments.
+
+- Added comments to 02.t
+
+
+Tue Nov  1 14:08:06 EST 2005
+
+- Modify Bounce's AUTOLOAD to eval the construction rather
+  than croak if it fails. This handles AUTOLOAD-ed constructors
+  (which $class->can( $name ) fails on). If you're really
+  perverted you can now even use O::T to generate objects of
+  type O::T...
+
+
+Tue Oct 25 10:34:38 EDT 2005
+
+POD, README.

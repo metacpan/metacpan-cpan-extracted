@@ -1,0 +1,62 @@
+{
+   "abstract" : "Perl extension to Modern OpenGL API up to 4.5",
+   "author" : [
+      "Chris Marshall <chm@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0402, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "OpenGL-Modern",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "Data::Dumper" : "0",
+            "Devel::CheckLib" : "0",
+            "Devel::CheckOS" : "0",
+            "ExtUtils::Constant" : "0",
+            "ExtUtils::MakeMaker" : "6.17",
+            "ExtUtils::MakeMaker::CPANfile" : "0.07"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "IO::All" : "0",
+            "Test::InDistDir" : "0",
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/devel-chm/OpenGL-Modern.git",
+         "web" : "https://github.com/devel-chm/OpenGL-Modern"
+      }
+   },
+   "version" : "0.03"
+}

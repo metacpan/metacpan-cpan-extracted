@@ -1,0 +1,10 @@
+Revision history for Perl extension ORDB-Unihan
+
+0.03    2013.03.14
+        bulk load takes too long due to excessive fsync() (Lars Dɪᴇᴄᴋᴏᴡ 迪拉斯)
+
+0.02    2010.06.07
+        fixes for the lastest Unihan.zip structure (Reported by Sean M. Burke)
+
+0.01    2009.07.09
+        a start

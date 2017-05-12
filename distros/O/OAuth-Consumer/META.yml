@@ -1,0 +1,31 @@
+--- #YAML:1.0
+name:               OAuth-Consumer
+version:            0.03
+abstract:           LWP based user agent with OAuth for consumer application
+author:
+    - Mathias Kende <mathias@cpan.org>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  6.3002
+build_requires:
+    LWP::UserAgent:  0
+    Test::Subs:      0.07
+    WWW::Mechanize:  0
+requires:
+    Carp:                0
+    Encode:              0
+    HTML::Entities:      0
+    HTTP::Response:      0
+    IO::Socket::INET:    0
+    LWP::Authen::OAuth:  0
+    perl:                5.008000
+    URI::Escape:         0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.57_05
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

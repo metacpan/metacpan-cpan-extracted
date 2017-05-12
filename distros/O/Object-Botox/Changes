@@ -1,0 +1,38 @@
+Revision history for Object-Botox
+
+1.15	Jul 14, 2011
+	Test Fixes
+		* add Test::More minimum version [http://www.cpantesters.org/cpan/report/7aeb0bd4-ad25-11e0-aeca-9247694f6699]
+		* fix pod [http://www.cpantesters.org/cpan/report/393771ba-ad33-11e0-9285-920756ae7873]
+
+1.13	Jul 12, 2011
+	Bug Fixes
+	 * fix caller to caller() [http://www.cpantesters.org/cpan/report/b06b87ae-abf2-11e0-bf06-7a9c0fe44679]
+
+1.12	Jun 27, 2011
+	Other
+		* re-write documentation, buld module to CPAN.
+
+1.03	May 3, 2011 10:00 AM
+	Improve speed by adding chache for object prototype.
+	Minor fix test & documrntation
+
+1.01	March 10, 2011 12:38 AM
+	Some minor fix.
+	Freeze API
+
+0.099_91 January 30, 2011 10:04 PM
+	Major fix - method |new| now exported by default.
+	Minor fix - setting value return object, instead of value
+
+0.099_9 January 24, 2011 1:50 PM
+        Major bug fix, improve checking new() args,
+        add test and croaking for some name sub in class,
+        many minor fix.
+
+0.099_8 January 21, 2011 1:43 PM
+        Minor fix, improve installer
+
+0.099_7 January 21, 2011 1:09 AM
+        Fix die -> croak, fix test.
+

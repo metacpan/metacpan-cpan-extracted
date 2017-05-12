@@ -1,0 +1,54 @@
+Revision history for Perl extension Object::Lazy.
+
+0.15  Mon Jul  6 22:51:19 2015
+- fixed POD errors, thanks MAUKE
+
+0.14  Sat Aug 31 15:44:11 2013
+- https://rt.cpan.org/Public/Bug/Display.html?id=87867
+
+0.13  Wed Sep 26 06:29:56 2012
+- https://rt.cpan.org/Ticket/Display.html?id=79720
+
+0.12  Sat Aug 18 20:03:37 2012
+- https://rt.cpan.org/Public/Bug/Display.html?id=77170
+  - Build.PL no longer in distribution
+  - use Try::Tiny instead of eval
+- a name for the builder code reference
+
+0.11  Tue May 15 18:48:37 2012
+- added lost dependency
+
+0.10  Sat May 12 21:18:29 2012
+- repaired Makefile.PL
+
+0.09  Mon Nov 15 22:59:46 2010
+- missing build dependency Test::Differences fixed
+
+0.08  Sun Nov 14 07:57:05 2010
+- methods DOES and VERSION implemented
+
+0.07  Wed Sep 29 05:20:56 2010
+- write back object on every build
+  see RT ticket 61506 - Kevin Ryde - can() coderef return
+
+0.06  Tue Jun 02 22:15:00 2009
+- bugfix build dependencies
+
+0.05  Fri May 29 21::00:00 2009
+- bugfix build dependencies
+
+0.04  Thu May 21 22::00:00 2009
+- Perl critic
+- temporary fallback to the old *CORE::GLOBAL::ref (stored at compile time)
+  and not bail out to *CORE::ref
+
+0.03  Sat Aug 02 20:00:00 2008
+- repair POD
+- add example
+- better Kwalitee
+
+0.02  Sun Nov 25 23:00:00 2007
+- Build.pl renamed to Build.PL
+
+0.01  Fri Nov 11 19:00:00 2007
+- fist version

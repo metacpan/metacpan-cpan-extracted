@@ -1,0 +1,45 @@
+0.013     2014-03-25 22:06:27+01:00 Europe/Madrid
+    - Depend on JSON instead of JSON::XS
+
+0.012     2014-02-06 12:39:13 Europe/Madrid
+    - Content-Length header set to 0 in empty POSTs.
+    - Links updated to point to opsview-core instead of opsview-community,
+      wich has been deprecated
+
+0.011     2013-02-09 19:17:44 Europe/Madrid
+    - The constructor accepts the parameter 'ua', which must be an HTTP::Tiny
+      object.
+    - Better exception stringification
+
+0.010     2013-01-07 15:01:03 Europe/Madrid
+    - Tests fixed for perl 5.17
+
+0.008     2012-11-20 04:15:25 Europe/Madrid
+    - Support for rechecks
+    - Apache::AuthTkt recommended dependency, not mandatory
+
+0.007     2012-11-18 20:41:23 Europe/Madrid
+    - Not depending in namespace::autoclean
+    - Support for multiobject config methods
+    - Search suported via get_*s methods
+    - Documentation and synopsis improved
+
+0.006     2012-11-14 03:01:25 Europe/Madrid
+    - Using Moo instead of Moose
+    - Support for single object configuration
+    - AuthTkt testing improved
+
+0.004     2012-01-24 21:32:35 Europe/Madrid
+    - Support for Acknowledges
+
+0.003     2012-01-19 09:18:39 Europe/Madrid
+    - Added missing dependency: namespace::autoclean
+
+0.002     2012-01-12 20:22:49 Europe/Madrid
+    - Support for events
+    - Support for reloads
+    - Support for login via AuthTkt
+
+0.001     2012-01-11 00:14:38 Europe/Madrid
+    - Initial release
+    - Support for Status and Downtimes

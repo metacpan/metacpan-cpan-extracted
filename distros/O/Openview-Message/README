@@ -1,0 +1,42 @@
+OVO::Message version 0.01
+=====================
+
+This module provides access to the HP Openview Operation opcmsg API.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test #TEST_VERBOSE=1 #to see more test verbose output
+   make install
+
+To see the results of 'make test' in the the OVO monitor application,
+
+   export OVO_MSG_GROUP='aValidMsgGroup'
+
+Other EVs supported by make test are:
+
+   OVO_APPLICATION
+   OVO_OBJECT
+
+DEPENDENCIES
+
+This module requires the HP OpenView Operations libaries and includes 
+usually installed in:
+
+  /opt/OV/lib
+  /opt/OV/include
+
+Makefile.PL allows you to specify a different path with
+
+   perl Makefile.PL OV=/path/to/your/OV
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002 Lincoln A. Baxter.  All rights reserved.
+
+This program is free software; you can redistribute it 
+and/or modify it under the same terms as Perl itself. 
+

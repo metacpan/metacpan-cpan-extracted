@@ -1,0 +1,112 @@
+[% INCLUDE header.tt %]
+[% INCLUDE banner.tt %]
+
+<div id="content">
+
+[% IF !config.content_above_navbar_in_html %]
+  [% INCLUDE navbar.tt %]
+[% END %]
+
+<div id="maincontent">
+  <h2>Recent site changes</h2>
+  [% UNLESS since %]
+    [% content %]
+  [% END %]
+
+  [% IF last_viewed %]
+    <p><a href="[% full_cgi_url %]?action=rc;since=[% last_viewed %]">View changes since your last visit to Recent Changes</a>.</p>
+  [% ELSIF since %]
+    <p><a href="[% full_cgi_url %]?action=rc">View the regular Recent Changes page</a>.</p>
+  [% END %]
+
+  [% BLOCK changes %]
+    <table class="recentchanges_section" id="recentchanges_[% days %]" cellpadding="0" cellspacing="0"
+     border="0"
+     summary="Table containing the list of recent changes to this site">
+    [% FOREACH node = nodes %]
+      <tr>
+        <td class="recentchanges_node_name"[% IF responsive %] rowspan="2"[% END %]><a href="[% node.url %]">[% node.name %]</a></td>
+        <td class="recentchanges_meta">
+          [% IF node.version > 1 %]
+            (<a href="[% cgi_url %]?id=[% node.name %];version=[% node.version - 1 %];diffversion=[% node.version %]">diff</a>)
+            (<a href="[% cgi_url %]?action=list_all_versions;id=[% node.name %]">history</a>) 
+          [% ELSE %]
+            (new page)
+          [% END %]
+            [% node.last_modified %]
+          [% IF (node.edit_type == 'Minor tidying')%] (minor edit)[% END %]
+        </td>
+      </tr>
+      <tr>
+        [% UNLESS responsive %]
+          <td></td>
+        [% END %]
+        <td><span class="recentchanges_user">
+          [% host_link = '<a href="' _ cgi_url _ '?host=' _ node.host _ ';action=userstats">' %]
+          [% IF node.host.length AND node.host.length > 15 %]
+            [% host_link = host_link _ '<span title="' _ node.host _ '">' _ node.host.substr( 0, 12 ) _ '...</span></a>' %]
+          [% ELSE %]
+            [% host_link = host_link _ node.host _ '</a>' %]
+          [% END %]
+          [% IF (node.username != 'Anonymous') %]
+            <a href="[% cgi_url %]?username=[% node.username %];action=userstats">[% node.username %]</a>
+            [% IF is_admin AND node.host %]
+              ([% host_link %])
+            [% END %]
+          [% ELSE %]
+            [% host_link %]
+          [% END %]
+          </span> [% IF node.comment %]- [% END %]<span class="recentchanges_comment">[% node.comment %]</span>
+        </td>
+      </tr>
+    [% END %]
+    </table>
+  [% END %]
+
+[% IF since %]
+  <h2>Pages changed since [% since_string %]:</h2>
+  [% IF recent_changes.since %]
+    [% INCLUDE changes nodes = recent_changes.since days = 'since' %]
+  [% ELSE %]
+    <p>No changes made since [% since_string %].</p>
+  [% END %]
+[% ELSE %]
+
+  [% IF recent_changes.1 %]
+    <h2 class="recentchanges_section_header">Pages changed in the last 24 hours:</h2>
+    [% INCLUDE changes nodes = recent_changes.1 days = 1 %]
+  [% END %]
+
+  [% IF recent_changes.7 %]
+    <h2 class="recentchanges_section_header">Pages changed in the last week:</h2>
+    [% INCLUDE changes nodes = recent_changes.7 days = 7 %]
+  [% END %]
+
+  [% IF recent_changes.14 %]
+    <h2 class="recentchanges_section_header">Pages changed in the last fortnight:</h2>
+    [% INCLUDE changes nodes = recent_changes.14 days = 14 %]
+  [% END %]
+
+  [% IF recent_changes.30 %]
+    <h2 class="recentchanges_section_header">Pages changed in the last 30 days:</h2>
+    [% INCLUDE changes nodes = recent_changes.30 days = 30 %]
+  [% END %]
+
+[% END %]
+
+</div>
+
+[% IF config.content_above_navbar_in_html %]
+  [% INCLUDE navbar.tt %]
+[% END %]
+
+<div id="recent_changes_feeds">
+  <p>
+    This list is available as a
+    <a href="[% cgi_url %]?action=rc;format=rss">rss feed</a>
+    and as an
+    <a href="[% cgi_url %]?action=rc;format=atom">atom feed</a>.
+  </p>
+</div>
+
+[% INCLUDE footer.tt %]

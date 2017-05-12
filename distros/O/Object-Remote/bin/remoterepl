@@ -1,0 +1,29 @@
+#!/usr/bin/env perl
+
+use strictures 1;
+use Object::Remote;
+use Eval::WithLexicals;
+use Term::ReadLine;
+use Data::Dumper;
+
+$SIG{INT} = sub { warn "SIGINT\n" };
+
+{ package Data::Dumper; no strict 'vars';
+  $Terse = $Indent = $Useqq = $Deparse = $Sortkeys = 1;
+  $Quotekeys = 0;
+}
+
+#{ no warnings 'once'; $Object::Remote::Connection::DEBUG = 1; }
+
+my $eval = Eval::WithLexicals->new::on($ARGV[0]||'-');
+
+my $read = Term::ReadLine->new('Perl REPL');
+while (1) {
+  my $line = $read->readline('re.pl$ ');
+  exit unless defined $line;
+  my @ret; eval {
+    local $SIG{INT} = sub { die "Caught SIGINT" };
+    @ret = $eval->eval($line); 1;
+  } or @ret = ("Error!", $@);
+  print Dumper @ret;
+}

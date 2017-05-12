@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<SITE ID="Lawcrawler">
+
+<NAME Lang="en-us">LawCrawler Legal Information Search</NAME>
+<INFO Lang="en-us">legal relevant web search</INFO>
+
+<URL Type="More"><![CDATA[
+http://lawcrawler.findlaw.com_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://lawcrawler.findlaw.com/scripts/lc.pl?entry=_QUERY_&sites=wlegal&focus=checked&context=top
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_NEXT_"><![CDATA[
+<A HREF="_NEXT_">Next 10
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+. <A HREF="_URL_">_TITLE_</A>_PREVIEW_<br>___(_SIZE_Bytes)___<I>_DATE_</I>
+]]></TEMPLATE>
+</SITE>

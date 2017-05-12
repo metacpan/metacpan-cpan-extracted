@@ -1,0 +1,22 @@
+Revision history for Orze
+
+1.11 31/03/10
+	Removed Test::Dependencies test
+	Updated dependencies in Build.PL
+	Added documention in Orze module
+
+1.1 30/03/10
+   Correction of the Menu source.
+   Copy driver ignores extension attribute.
+   WARNING: you will need to replace each
+     <page name="foo" extension="bar" driver="Copy"></page>
+   by
+     <page name="foo.bar" driver="Copy"></page>
+
+1.0    11/10/09
+   Object orientation.
+   Still lacks good examples.
+
+0.32   23/04/09
+	First public version since we have doc now.
+

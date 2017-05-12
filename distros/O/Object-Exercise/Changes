@@ -1,0 +1,77 @@
+- 3.02 Tue Jul 21 09:00:49  2015
+
+ - R.I.P. autoderef in 5.23.
+
+- 3.01 Mon Jul 20 15:37:57  2015
+
+ - Add YAML::XS into Makfile.PL
+
+- 3.00 Fri Jul 10 11:01:03  CDT 2015
+
+ - Perl version to "use v5.20" for supported Perl.
+ - Support regex or subref to validate return value. 
+ - Allow flags between tests or within them to set local
+   values.
+ - Allow stacked exection of tests with prior "nofinish" to 
+   avoid calling done_testing after each block of tests.
+ - "finish" in last test block (or as separate block) calls
+   done_testing.
+ - Input test as YAML.
+ - use regex for expect with "regex" flag + text of regex as expect
+   value (workaround for YAML segfaults on regex).
+ - use coderef for expect value to pass test, error, return into a
+   that can return true/false for OK.
+
+- 2.00 Sat Nov 17 17:08:57 CST 2012
+
+ - replace the "-x" interface with simpler X/noX or 
+   x=Y.
+
+ - Single handler for back end in Execute, drops need
+   for separate Benchmark & Common modules.
+
+ - Use Time::HiRes instead of Benchmark.
+
+ - Up the version number to 2.00 to reflect the API changes.
+
+- 1.15 Mon Jun 11 08:44:15 CDT 2012
+
+ -  use v5.12, remove explicit "use strict".
+
+    Fix bug in handling of undef for expected failure.
+    The o
+
+- 1.14 Thu Jun  4 09:48:51 EDT 2009
+
+    POD updates
+
+- 1.13 Mon Mar 31 19:27:27 EDT 2008
+
+ -  Minor Makefile.PL, testfile udpates.
+
+- 1.11 
+
+ -  Minor change in use arg's: -e [optinal name], 
+    -b [optinal name] allow exporting both exercise
+    and benchmark with alternate names; drops -n
+    switch (which only handles one of them).
+
+- 1.10 Wed Jun 27 02:31:07 EDT 2007
+
+ -  Split into separate modules for benchmark, execute 
+    operation. Avoids loading benchmark module if it 
+    won't be used; pushed common variables and utility
+    subs into separate module.
+
+- 1.04 Fri Jun  1 16:42:07 EDT 2007
+
+ -  eval use Time::HiRes then Benchmark qw( :hireswallclock ).
+    If that fails then use Benchmark without the hireswallclock.
+
+- 1.05 Sun Jun  3 15:00:57 EDT 2007
+
+ -  Require Benchmark-1.07, which handles issues with 
+    missing Time::HiRes properly.
+
+ -  Remove begin hacks for dealing with missing Time::HiRes.
+

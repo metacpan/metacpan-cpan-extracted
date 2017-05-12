@@ -1,0 +1,247 @@
+Revision history for Perl extension Net::OAI::Harvester
+
+
+1.20	Mon, Jan 25 00:20:05 CET 2016
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!  INCOMPATIBLE CHANGE introduced with version 1.20  !!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+Up to version 1.15 the metadataHandler was inconsistently fed with input:
+
+ - GetRecord exposed the almost complete XML response to the Handler
+   (including start_document/end_document events)
+ - ListRecords exposed the (OAI)record element (header, metadata and 
+   optional about containers) but did not propagate start_document or
+   end_document events.
+
+In both cases the events for the header tags itself and for the optional
+setSpec subelements had not been forwarded
+
+Version 1.20 introduces a modified behavior for metadataHandler and an
+additional recordHandler:
+ - a metadataHandler will see only the (single) subelement of the OAI metadata
+   element (so for an deleted record it might never be invoced at all)
+ - a recordHandler will see the OAI record element and its subelements 
+
+Therefore a metadataHandler will now be confined to the metadata fragment(s)
+of the response, and the new recordHandler approximates the old behavior of
+ListRecords, however OAI-PMH:identifier and OAI-PMH:datestamp will now be
+properly encapsulated within their OAI-PMH:header element. 
+
+Additionally, two new methods responseDate() and request() allow access
+to the corresponding top-level OAI-PMH elements in all response types.
+A SAX filter of class Net::OAI::Record::DocumentHelper may be used to inject
+start_document and end_document events into the chain if they are needed.
+
+As a temporary measure, you may set $Net::OAI::Harvester::OLDmetadataHandler =1
+to change the behavior of handlers passed as "metadataHandler" into that of
+a recordHandler.
+
+
+1.16_12	Tue, Jan 12 00:20:05 CET 2016
+	- dealing with CPANTS Kwalitee issues, esp. version number mess
+	- new filter class Net::OAI::Record::DocumentHelper for tweaking
+
+1.16_11	Tue, Jan 12 00:20:05 CET 2016
+	- minor cleanup
+
+1.16_10	Mon, Jan 11 01:29:46 CET 2016
+	- renamed alldata() method for accessing recordHandler results
+	  to recorddata()
+	- better propagation of namespace prefix mapping events
+	- Net::OAI::NamespaceFilter with a result() method
+	- Net::OAI::NamespaceFilter tested with XML::SAX::Writer 
+	- AUTHOR formatting
+
+1.16_09 Sun, Feb 14 17:29:39 CET 2014
+	- Net::OAI::NamespaceFilter as kind of generic metadata handler
+	- Queries are now constructed basing on a copy of the Harvester's baseURL
+	- pass parameters to URI->query_form() more reproducably,
+	  (esp. "verb" should now always be first to accommodate some 
+	  allegedly broken repositories)
+	- temporary? tests for correctness of LWP operations
+
+1.16_07	Tue, Apr 30 01:26:40 CEST 2013
+	- added new methods: response(), responseDate(), error()
+	- Smoke still tests failed on 'Bad Host' tests (wrong error codes
+	  induced by HTTP proxies?)
+	- aligned behavior of metadataHandler for listRecords() and
+	  getRecord()
+	- introducing alternative recordHandler for listRecords() and
+	  getRecord()
+	- removed erroneous resumptionToken handling for identify()
+
+1.16_04	Fri Dec  7 09:49:03 CET 2012
+	- consider HTTP proxies in design of t/003.error.t
+	- 'Bad Host' tests failing b/c error code 500 is not the expected
+	   code 404 (due to some recent change in LWP)?
+
+1.16_01 Mon Apr  2 23:14:35 CEST 2012
+	- Modules were not namespace aware.
+	- Add HTTPRetryAfter() method (catches HTTP Retry-After header)
+	- Check responses for Content-Type and charset before parsing
+	- Net::OAI::Header handed up (empty) header elements and other stuff
+	  to the request's metadataHandler
+	- SKIP tests when HTTP errors are encountered
+
+1.15    Thu Feb 02 16:29:31 CEST 2011
+	- one repository used for tests changed identifiers
+
+1.14b   Wed May 18 16:29:31 CEST 2011
+	- Explicit fallback to XML::SAX::PurePerl if we don't get a parser
+	  (we know that XML::SAX::PurePerl has the required features and
+	  does exist): Warn about probably broken XML::SAX installation and
+	  issues with ParserDetails.ini [Fix mainly motivated by reputation
+	  management: Far too many smoke tests failing because of automated
+	  (=> no ParserDetails.ini => broken) installs of XML::SAX]
+1.14a   Tue May 17 18:50:03 CEST 2011
+	- Record::OAI_DC: asString() now returns the string and does not print
+	  any more
+	- Dependencies: XML::SAX::Base 1.04 (as per XML-SAX since 0.11
+	  and opposed to the standalone version on CPAN) is really a necessary
+	  prerequisite! (Thanks to Dave Sheroman for testing this out)
+1.14    Mon May 16 22:57:24 CEST 2011
+	- Installation: Makefile.PL and Build.PL failed if XML::SAX::Expat
+	  was installed and XML::SAX not (probably a border case only with
+	  "standalone" versions of XML::SAX::Base)
+	- Changed messages: ExpatXS should give the mentioned "performance
+	  boost"
+	- Tests: Check if XML::SAX::ParserFactory delivered a parser
+	  introduce NOH_ParserPackage environment variable
+
+1.13    Fri May  9 17:34:15 WEDT 2008 (Thomas Berger <THB at cpan dot org>) 
+	- ListMetadataFormats: namespaces() glued previous names with current;
+	  new methods: namespaces_byprefix() and schemas_byprefix() 
+	- added HTTPError() method for access to underlying HTTP::Response
+	  object (in case of HTTP errors only)
+	  NOTE: file() now will yield undef in this case (was: name of
+	  non-existing file)
+	- baseURL() had trailing garbage when called after a request
+	- enforce tempfile cleanup by adding UNLINK=>1 to all tempfile() calls
+	- Base.pm: avoid tempfile pollution on Win32 when using xml() method
+	- Module::Build support
+	- Tests: Fixed broken nsdl repository URL
+
+1.12    Tue Aug  7 21:48:50 EDT 2007
+	- modified t/055.listallrecords.t to not iterate over records
+	  that are known to cause problems for XML::SAX::PurePerl
+
+1.11    Fri Jul 27 11:47:21 EDT 2007
+	- added oai-dump to MANIFEST
+
+1.1     Fri Jul 27 09:16:35 EDT 2007
+	- added the ability to dump xml files to a directory
+	- trapped xml parsing errors are now always printed to STDERR 
+	- added oai-dump utility
+
+1.0     Wed Jul 27 22:52:42 CDT 2005
+	- resumption token handling now respects custom metadata handlers
+	  (thanks Thorsten Schwander)
+
+0.991   Thu Feb 24 22:07:05 CST 2005
+	- fixed namespaces() so it works
+
+0.99    Tue Feb 22 21:38:16 CST 2005
+	- added namespaces() and schemas() to Net::OAI::ListMetadataFormats
+	  and suitable tests.
+
+0.98    Fri Nov 19 09:41:32 CST 2004
+	- docfix thanks Brian Cassidy
+
+0.97    Tue Aug 30 21:07:05 2004
+	- deprecated Net::OAI::Haverster::debug() in favor of setting
+	  Net::OAI::Harvester::DEBUG. This allows for other packages
+	  to easily report diagnostics. 
+	- fixed test count in identify 010-identify.t
+	- fixed names of utilities in bin
+	- added some docs concerning Net::OAI::Base and passing in
+	  LWP::UserAgent to Net::OAI::Harvester::new().
+
+0.96    Mon Jul 19 22:12:04 2004
+	- Fixed Net::OAI::Harvester to return HTTP level errors
+	- Fixed Net::OAI::Identity to not run together sub descriptions into
+	  the overall repositoryName.
+
+0.95    Thu Apr 1 13:48:54 2004
+	- Fixed behavior of Net::OAI::Record::Header::status()
+	  which wasn't pulling out the status attribute properly. Thanks
+	  Darin Burleigh at wisc.edu. Also added test of status() to 
+	  t/005.header.t
+
+0.94	Thu Dec 11 14:04:12 2003
+	- added listAllIdentifiers() and listAllRecords() which automatically
+	  handle resumption tokens.
+
+0.9	Sun Dec 07 08:45:28 2003 
+	- Net::OAI::ListRecords now uses Storable rather than YAML since
+	  YAML cannot handle utf8 at this time. Also Storable is
+	  significantly faster.
+	- Modified listRecords() to accept metadataHandler parameter for
+	  specifying a custom metadata SAX handler.
+	- Brought getRecord() into synch with listRecords() so that
+	  metadataHandler specifies the package name of the custom metadata 
+	  handler, rather than an actual instance of that class. 
+
+0.86	Wed Nov 26 14:01:21 2003
+	- fixed 5/002.error to not skip ALL THE TIME!
+
+0.85	Wed Nov 26 13:45:23 2003
+	- added note to Net::OAI::Record::OAI_DC.pm to indicate the 
+	  return values in list and scalar contexts. Thanks Jose
+	  Barrueco @ University of Valencia.
+	- beefed up docs in Net::OAI::Identify
+	- modified t/002.error to check parser so that test doesn't fail 
+	  under XML::LibXML
+	- added output message to Makefile.PL encouraging folks to 
+	  use libxml2 parser for increased speed.
+
+0.82	Sat Nov 01 07:40:53 2003
+	- require at least 5.8.0 for installation since this is the recommended
+	  baseline for processing unicode. 
+
+0.81	Fri Oct 24 01:51:03 2003
+	- fixed passing of empty metadataFormat name/value pair when 
+	  listRecords() and listIdentifiers() use a resumption token.
+	  Thanks Patrick Hochstenbach @ LANL.
+
+0.8	Fri Oct 24 09:16:12 2003
+	- better catching of XML errors
+	- added debug() method
+	- added --debug switch to oai-listrecords
+
+0.75	Wed Oct 22 21:51:08 2003
+	- wrapped XML parsing in eval block to trap fatal errors.
+
+0.7	Wed Oct 22 09:58:55 2003
+	- more doc fixes (thanks Martin)
+	- resumptionToken() now returns undef when no resumption token 
+	  was present in the response.
+	- modified bin/oai-listrecords to take advantage of the new return 
+	  convention of resumptionToken().
+	- fixed custom userAgent getting/setting (thanks Martin). 
+
+0.6	Tue Oct 21 17:12:31 2003
+	- fixed several doc errors (thanks Martin Emmerich)
+	- modified list verbs to work with resumption tokens
+	- modified oai-listrecords utility to automatically fetch all 
+	  records using resumption tokens.
+
+0.5	Wed Aug 28 16:57:03 2003
+	- more doc fixes
+
+0.4	Thu Aug 07 17:22:12 2003
+	- fixed doc error (thanks Tajoli Zeno)
+	- fixed warnings that run under new Test::Harness.
+	- explicitly use IO::File
+
+0.3	Mon Jul 28 11:35:37 2003
+	- added asString() method to Net::OAI::Record::OAI_DC
+	- added oai-listrecords utility
+	- modified Makefile.PL to put oai-listsets and oai-listrecords in bin
+
+0.2	Tue Jul 08 09:59:34 2003
+	- updated docs
+
+0.1	Thu May 15 22:37:02 2003
+	- original version
+

@@ -1,0 +1,43 @@
+<meta charset="utf-8">
+<title>[% IF homepage %][% title or c.config.application_name %][% ELSE %][% title or c.controller.appkit_name %][% END %]</title>
+
+[% IF header.favicon %]
+    <link rel="shortcut icon" href="[% header.favicon %]" type="image/png" />
+[% ELSE %]
+    <link rel="shortcut icon" href="/static/images/favicon.png" type="image/png" />
+[% END %]
+
+[% FOR css IN header.css %]
+    <link rel="stylesheet" href="[% css %]" type="text/css" media="all" />
+[% END %]
+<link rel="stylesheet" href="/static/css/print.css" type="text/css" media="print" />
+
+[% FOR js IN header.js %]
+    <script type="text/javascript" src="[% js %]"></script>
+[% END %]
+
+<script type="text/javascript">
+[% FOR jssrc IN header.jssrc %]
+    [% jssrc | none %]
+[% END %]
+</script>
+
+<script type="text/javascript">
+    $(function() {
+        if (document.title == '[% c.controller.appkit_name %]') {
+            var h1 = $('h1:first').text();
+            if (h1) {
+                document.title = h1 + " | " + "[% c.controller.appkit_name %]";
+            }
+        }
+
+        $('.default-tooltip').each(function() {
+            var $this = $(this);
+            var tip = $this.attr('rel') || 'next';
+
+            $this.protip();
+        });
+    });
+</script>
+
+

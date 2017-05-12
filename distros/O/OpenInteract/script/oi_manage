@@ -1,0 +1,4115 @@
+#!/usr/bin/perl
+
+# $Id: oi_manage,v 1.68 2003/11/17 02:17:33 lachoy Exp $
+
+use strict;
+use Cwd                   qw( cwd );
+use Data::Dumper          qw( Dumper );
+use ExtUtils::Manifest;
+use File::Copy            qw( cp );
+use File::Path;
+use Getopt::Long          qw( GetOptions );
+use OpenInteract::Package qw( READONLY_FILE );
+use OpenInteract::PackageRepository;
+use OpenInteract::Startup;
+use Pod::Usage            qw( pod2usage );
+use SPOPS::Secure         qw( :level :scope );
+use SPOPS::HashFile       ();
+use Text::Wrap            qw( wrap );
+
+my $VERSION = sprintf("%d.%02d", q$Revision: 1.68 $ =~ /(\d+)\.(\d+)/);
+
+$Text::Wrap::columns = 60;
+
+use constant DEBUG => 0;
+use constant REPOSITORY_BACKUP => 'oimanagebackup';
+
+# Legitimate commands; anything not listed here will be kicked out and
+# the 'usage' stuff displayed
+
+my %COMMANDS          = map { $_ => 1 }
+                        qw( initial_packages list_packages list_actions list_objects
+                            install upgrade create_skeleton
+                            export_package check_package change_spops_driver
+                            create_website install_sql test_db test_ldap
+                            install_package apply_package upgrade_package
+                            remove_package
+                            install_template dump_template remove_template
+                            refresh_doc refresh_widget update_object
+                            upgrade_website_repository
+                            upgrade_installation_repository );
+
+# These are aliases people might type by accident instead of the
+# proper command; add as necessary (alias on the left, correct command
+# on right)
+
+my %ALIASES           = (
+    input_template  => 'install_template',
+    install_website => 'create_website',
+    test_database   => 'test_db',
+    install_oi      => 'install',
+    action_list     => 'list_actions',
+    object_list     => 'list_objects',
+    upgrade_oi      => 'upgrade',
+    refresh_docs    => 'refresh_doc',
+    refresh_widgets => 'refresh_widget',
+);
+
+my %TMPL_DEPRECATED = map { $_ => 1 } qw( install_template dump_template remove_template );
+
+# Subdirectories used when creating a base installation repository
+
+my @BASE_SUBDIR = qw( conf doc pkg template );
+
+# Subdirectories used when creating a website
+
+my @WEBSITE_SUBDIR    = qw( cache cache/tt cache/content conf data doc error
+                            html html/images logs mail overflow
+                            pkg template test uploads  );
+
+# Packages shipped with OI -- the 'base' packages necessary to run the system
+
+my @WEBSITE_BASE_PKG  = qw( base base_box base_error
+                            base_group base_page base_security base_template
+                            base_theme base_user lookup object_activity
+                            results_manage system_doc );
+
+# Extra packages shipped with OI -- small applications that show how things work
+
+my @WEBSITE_EXTRA_PKG = qw( full_text classified news );
+
+# Files that are copied from the directory where you untar/gz the main
+# OpenInteract distribution into the base installation, when you run
+# the 'install' command
+
+my @INITIAL_FILES     = qw( README INSTALL INSTALL.website COPYING UPGRADE );
+
+# Separator used in output
+
+my $SEP               = '=========================';
+
+# Data used for getting templates into and out of the database
+
+my $TMPL_EXT          = 'tmpl';
+my $META_EXT          = 'meta';
+my $TMPL_DIR          = 'template';
+
+# Class names we use throughout
+
+my $REPOS_CLASS       = 'OpenInteract::PackageRepository';
+my $PKG_CLASS         = 'OpenInteract::Package';
+
+# Address of the openinteract-dev mailing list
+
+my $DEV_LIST          = 'openinteract-dev@lists.sourceforge.net';
+
+{
+    my ( $OPT_help, $OPT_man,
+         $OPT_base_dir, $OPT_website_dir, $OPT_website_name, $OPT_dump_dir,
+         $OPT_object, $OPT_package_file, $OPT_package_dir, $OPT_package_list_file,
+         $OPT_driver, $OPT_sql_action );
+    my ( @OPT_package );
+    GetOptions( 'help|?' => \$OPT_help, 'man' => \$OPT_man,
+                'base_dir=s'          => \$OPT_base_dir,
+                'website_dir=s'       => \$OPT_website_dir,
+                'website_name=s'      => \$OPT_website_name,
+                'package_file=s'      => \$OPT_package_file,
+                'package_list_file=s' => \$OPT_package_list_file,
+                'package_dir=s'       => \$OPT_package_dir,
+                'package=s'           => \@OPT_package,
+                'dump_dir=s'          => \$OPT_dump_dir,
+                'driver=s'            => \$OPT_driver,
+                'object=s'            => \$OPT_object,
+                'sql_action=s'        => \$OPT_sql_action,
+    );
+
+    # Give them the man page if they want (note that 'pod2usage' exits
+    # the script after displaying the page)
+
+    pod2usage( -exitstatus => 0, -verbose => 2 )  if ( $OPT_man );
+
+    # Grab the command -- if it's not there or doesn't exist in the
+    # list of valid commands, then print the basic help page
+
+    my $command = lc shift @ARGV;
+
+    # Allow (for example) 'install-package' to be used for
+    # 'install_package'
+
+    $command =~ s/\-/_/g;
+
+    # If the command is one of the aliases, alias it and let them know
+    # so the user can change his/her behavior.
+
+    if ( $ALIASES{ $command } ) {
+        print "[oi_manage]: Command ($command) is an alias for $ALIASES{ $command }.\n",
+              "Using alias and continuing...\n";
+        $command = $ALIASES{ $command };
+    }
+
+    if ( $TMPL_DEPRECATED{ $command } ) {
+        print "[oi_manage]: Command ($command) has been deprecated since\n",
+              "templates are no longer supported in the database. Please read\n",
+              "doc/templates.html from the source directory or \n",
+              "WEBSITE_DIR/html/oidocs/templates.html from your website for more\n",
+              "information on how templates are used now.\n";
+        exit(0);
+    }
+
+    # Now, see if the user wants help. If no command was given, then
+    # they obviously need some help :)
+
+    $OPT_help++ unless ( $COMMANDS{ $command } );
+    if ( $OPT_help ) {
+        my $msg = '';
+        if ( $command ) {
+            my $valid_commands = _build_valid_commands( '    ' );
+            $msg = "[oi_manage]: $command is not a valid command.\n\nValid commands:"  .
+                   "\n\n    $valid_commands\n";
+        }
+        pod2usage( -exitstatus => 0, -verbose => 1, -msg => $msg ) ;
+    }
+
+    # Easiest to process, so do first
+
+    if ( $command eq 'initial_packages' ) {
+        print "\n[oi_manage]: initial_packages\n\n",
+              "Packages installed when a new website is created:\n$SEP\n",
+              join( "\n", @WEBSITE_BASE_PKG ), "\n";
+        exit(0);
+    }
+
+    # Set any defaults and do initializations
+
+    $REPOS_CLASS->class_initialize;
+
+    if ( ! $OPT_base_dir and $ENV{OPENINTERACT} ) {
+        print "[oi_manage]: Using ($ENV{OPENINTERACT}) for 'base_dir'.\n";
+        $OPT_base_dir = $ENV{OPENINTERACT};
+    }
+    if ( ! $OPT_website_dir and $ENV{OIWEBSITE} ) {
+        print "[oi_manage]: Using ($ENV{OIWEBSITE}) for 'website_dir'.\n";
+        $OPT_website_dir = $ENV{OIWEBSITE};
+    }
+
+    if ( $OPT_package_list_file ) {
+        unless ( -f $OPT_package_list_file ) {
+            die "[oi_manage]: The parameter 'package_list_file' must point to a valid file.\n";
+        }
+        open( PKGLIST, $OPT_package_list_file )
+              || die "[oi_manage]: Cannot open the file ($OPT_package_list_file). Error: $!\n";
+        while( <PKGLIST> ) {
+            chomp;
+            next if ( /^\#/ );
+            next if ( /^\s*$/ );
+            push @OPT_package, $_;
+        }
+        close( PKGLIST );
+    }
+
+    if ( scalar @OPT_package ) {
+
+        # allows --package=x,y --package=z to be combined
+
+        @OPT_package  = split( /,/, join( ',', @OPT_package ) );
+
+        # Allow a special keyword for users to specify all the initial
+        # (base) packages. This allows something like:
+        #
+        #   oi_manage --package=INITIAL ...
+        #   oi_manage --package=INITIAL,mypkg,theirpkg ...
+        #
+        # and the keyword 'INITIAL' will be replaced by all the initial
+        # packages, which can be found by doing 'oi_manage
+        # initial_packages'
+
+        my %pkg_names = map { $_ => 1 } @OPT_package;
+        if ( exists $pkg_names{INITIAL} ) {
+            map { $pkg_names{ $_ } = 1 } @WEBSITE_BASE_PKG;
+            delete $pkg_names{INITIAL};
+            @OPT_package = sort keys %pkg_names;
+        }
+    }
+
+    # Lop off any trailing '/' characters in directories passed in
+
+    s/[\\|\/]$// for ( $OPT_base_dir, $OPT_website_dir, $OPT_package_dir, $OPT_dump_dir );
+
+    # If we've made it down here, we can be certain that $command
+    # actually contains a valid command. Each command section can still
+    # call 'pod2usage' as necessary if there are arguments necessary for
+    # them to run that were not specified.
+
+
+    #
+    # CREATE SKELETON
+    #
+    my ( @error_msg );
+    if ( $command eq 'create_skeleton' ) {
+        unless ( scalar @OPT_package ) {
+            push @error_msg, "Command 'create_skeleton' requires you to specify at least one package name\n";
+        }
+        unless ( -d $OPT_base_dir ) {
+            push @error_msg, "Command 'create_skeleton' requires the parameter " .
+                             "'base_dir' to be defined and exist as a directory\n";
+        }
+        notify_error( @error_msg )  if ( @error_msg );
+        print "Creating package skeleton in current directory.\n$SEP\n\n";
+        foreach my $package_name ( @OPT_package ) {
+            my $repository = $REPOS_CLASS->fetch( undef, { directory => $OPT_base_dir } );
+            my $package_name_new = eval { $PKG_CLASS->create_skeleton( $repository, $package_name ) };
+            my $status = $@ || 'ok';
+            if ( $status eq 'ok' and $package_name ne $package_name_new ) {
+                $status .= " -- package <$package_name> renamed to <$package_name_new>";
+            }
+            printf( "Package %-15s: %s\n", $package_name_new, $status );
+        }
+        print "\n$SEP\nFinished with create_skeleton!\n";
+        exit(0);
+    }
+
+    #
+    # INSTALL
+    #
+    if ( $command eq 'install' ) {
+        unless ( $OPT_base_dir ) {
+            push @error_msg, "Command 'install' requires the parameter 'base_dir' " .
+                             "to be set. Once set, oi_manage will create the directory for you."
+                         }
+        if ( -d $OPT_base_dir ) {
+            push @error_msg, "The directory <$OPT_base_dir> already exists! Command 'install' " .
+                             "wants to create this directory itself. Please remove" .
+                             "or rename the specified directory and rerun the command, " .
+                             "or choose a new one and run the command with the new directory.\n";
+        }
+        unless ( -d 'pkg' ) {
+            push @error_msg, "Command 'install' must be run from the OpenInteract source " .
+                             "directory. Please go there and run this command again.\n";
+    }
+        notify_error( @error_msg )  if ( @error_msg );
+        print "Running install...\n$SEP\n\n";
+        my $status = install_oi({ base_dir => $OPT_base_dir });
+        print "Packages installed:\n",
+              join( "\n", map { print_status_line( $_ ) } @{ $status } ), "\n",
+              "\n$SEP\nInstallation of OpenInteract complete!\n";
+        exit(0);
+    }
+
+    #
+    # UPGRADE
+    #
+    if ( $command eq 'upgrade' ) {
+        unless ( -d $OPT_base_dir ) {
+            push @error_msg, "Command 'upgrade' requires the parameter 'base_dir' to be set to an " .
+                             "OpenInteract base installation directory.";
+        }
+        unless ( -d 'pkg' ) {
+            push @error_msg, "Command 'upgrade' must be run from the OpenInteract source " .
+                             "directory. Please change to that directory run this command again.\n";
+        }
+        notify_error( @error_msg )  if ( @error_msg );
+        print "Running upgrade...\n$SEP\n\n";
+        my $status = upgrade_oi({ base_dir => $OPT_base_dir });
+        my $status_text = '';
+        if ( scalar @{ $status } ) {
+            $status_text = join( "\n", map { print_status_line( $_ ) } @{ $status } ), "\n";
+        }
+        print "Packages upgraded:\n",
+              $status_text,
+              "\n$SEP\nUpgrade of OpenInteract packages complete! You can now ",
+              "use the packages in your websites.\n";
+        exit(0);
+    }
+
+    #
+    # CREATE WEBSITE
+    #
+    if ( $command eq 'create_website' ) {
+        unless ( $OPT_website_name and $OPT_website_dir and -d $OPT_base_dir ) {
+            push @error_msg, "Command 'create_website' requires the parameters " .
+                             "'website_name' and 'website_dir' to be defined and 'base_dir' to " .
+                             "be defined and exist as a directory\n";
+        }
+
+        # Ensure that the website directory doesn't already exist
+
+        if ( -d $OPT_website_dir ) {
+            push @error_msg, "The directory specified in " .
+                             "'website_directory' ($OPT_website_dir) already exists. " .
+                             "Please rename or remove it and then re-run this program.\n\n" ;
+        }
+
+
+        # Ensure that the website name fits Perl naming conventions:
+        # no spaces, cannot begin with number, must begin with alpha
+        # character. Note that Perl lets you begin a package with an
+        # underscore, but we disallow that here. Also, note that '\W'
+        # will NOT match an underscore.
+
+        if ( $OPT_website_name ) {
+
+            if ( $OPT_website_name =~ /\W/ ) {
+                push @error_msg, "The parameter 'website_name' must not have any non-word " .
+                                 "characters except for '_'! (Ok: A-Z, 1-9, '_')";
+            }
+
+            if ( $OPT_website_name =~ /^\d/ ) {
+                push @error_msg, "The parameter 'website_name' must be a valid Perl " .
+                                 "identifier so it cannot begin with a number.";
+            }
+
+            if ( $OPT_website_name =~ /^_/ ) {
+                push @error_msg, "OpenInteract requires that 'website_name' begin with " .
+                                 "a letter, underscores not allowed.";
+            }
+        }
+
+        notify_error( @error_msg )  if ( @error_msg );
+        print "Running create_website...\n$SEP\n\n";
+        my $status = create_website({ website_name => $OPT_website_name,
+                                      website_dir  => $OPT_website_dir,
+                                      base_dir     => $OPT_base_dir });
+        my $pkg_status = join( "\n", map { print_status_line( $_ ) } @{ $status } ), "\n";
+        print <<CREATEMSG;
+Status of the packages installed:
+
+$pkg_status
+
+Please see the file:
+
+ $OPT_website_dir/INSTALL.website
+
+It has information on the next steps needed to get your website up and
+running. You have already accomplished the first two step so you can
+start at step (2) -- 'Configure your website'. Good luck!
+
+$SEP
+Finished creating new website!
+CREATEMSG
+        exit(0);
+    }
+
+    #
+    # LIST PACKAGES
+    #
+    if ( $command eq 'list_packages' ) {
+        unless ( -d $OPT_website_dir or -d $OPT_base_dir ) {
+            push @error_msg, "Command 'list_packages' requires you to specify either " .
+                             "'website_dir' or 'base_dir' as a valid directory\n";
+        }
+        notify_error( @error_msg )  if ( @error_msg );
+        print "Running list_packages...\n$SEP\n\n";
+        list_packages({ base_dir    => $OPT_base_dir,
+                        website_dir => $OPT_website_dir });
+        print "\n$SEP\nFinished listing packages!\n";
+        exit(0);
+    }
+
+    #
+    # LIST ACTIONS
+    #
+    if ( $command eq 'list_actions' ) {
+        unless ( -d $OPT_website_dir ) {
+            push @error_msg, "Command 'list_actions' requires that the parameter 'website_dir' " .
+                             "refer to a valid directory.";
+        }
+        notify_error( @error_msg )  if ( @error_msg );
+        print "Running list_actions...\n$SEP\n\n";
+        my $action_info = list_actions({ website_dir => $OPT_website_dir });
+        foreach my $info ( @{ $action_info } ) {
+            print "ACTION: $info->{action}\n",
+                  "Package:  $info->{package_name} ($info->{package_version})\n";
+            if ( $info->{template} ) {
+                print "Template: $info->{template}\n\n";
+            }
+            else {
+                print "Class:    $info->{class}\n",
+                      "Method:   $info->{method}\n\n";
+            }
+        }
+        print "\n$SEP\nFinished listing actions!\n";
+        exit(0);
+    }
+
+    #
+    # LIST OBJECTS
+    #
+    if ( $command eq 'list_objects' ) {
+        unless ( -d $OPT_website_dir ) {
+            push @error_msg, "Command 'list_objects' requires that the parameter 'website_dir' " .
+                             "refer to a valid directory.";
+        }
+        notify_error( @error_msg )  if ( @error_msg );
+        print "Running list_objects...\n$SEP\n\n";
+        my $object_info = list_objects({ website_dir => $OPT_website_dir });
+        foreach my $info ( @{ $object_info } ) {
+            print "Aliases: $info->{alias}\n",
+                  "Class:   $info->{class}\n\n";
+        }
+        print "\n$SEP\nFinished listing objects!\n";
+        exit(0);
+    }
+
+    #
+    # REFRESH DOC
+    #
+    if ( $command eq 'refresh_doc' ) {
+        unless ( -d $OPT_website_dir ) {
+            push @error_msg, "Command 'refresh_doc' requires that the parameter 'website_dir' " .
+                             "refer to a valid directory.";
+        }
+        notify_error( @error_msg )  if ( @error_msg );
+        print "Running refresh_doc...\n$SEP\n\n";
+        my $doc_status_list = refresh_doc({ website_dir => $OPT_website_dir });
+        my $doc_status = '';
+        foreach my $status ( @{ $doc_status_list } ) {
+            $doc_status .= "$status->{filename}: ";
+            if ( $status->{error} ) {
+                $doc_status .= "Error: $status->{error} ";
+            }
+            else {
+                $doc_status .= "OK ";
+                $doc_status .= "(new file copied) " if ( $status->{copied} );
+                $doc_status .= "(not copied) "      if ( ! $status->{copied} );
+            }
+            $doc_status .= "\n";
+        }
+        print "The following documents were considered:\n\n",
+                $doc_status,
+                "\n$SEP\nFinished refreshing docs!\n";
+        exit(0);
+    }
+
+    #
+    # REFRESH WIDGET
+    #
+    if ( $command eq 'refresh_widget' ) {
+        unless ( -d $OPT_website_dir ) {
+            push @error_msg, "Command 'refresh_widget' requires that the parameter 'website_dir' " .
+                             "refer to a valid directory.";
+        }
+        notify_error( @error_msg )  if ( @error_msg );
+        print "Running refresh_widget...\n$SEP\n\n";
+        my $widget_status_list = refresh_widget({ website_dir => $OPT_website_dir });
+        my $widget_status = '';
+        foreach my $status ( @{ $widget_status_list } ) {
+            $widget_status .= "$status->{filename}: ";
+            if ( $status->{error} ) {
+                $widget_status .= "Error: $status->{error} ";
+            }
+            else {
+                $widget_status .= "OK ";
+                $widget_status .= "(new file copied) " if ( $status->{copied} );
+                $widget_status .= "(not copied) "      if ( ! $status->{copied} );
+            }
+            $widget_status .= "\n";
+        }
+        print "The following widgets were considered:\n\n",
+                $widget_status,
+                "\n$SEP\nFinished refreshing widgets!\n";
+        exit(0);
+    }
+
+    #
+    # EXPORT PACKAGE
+    #
+    if ( $command eq 'export_package' ) {
+        print "Running export_package...\n$SEP\n\n";
+        if ( $OPT_package_dir ) {
+            unless ( -d $OPT_package_dir ) {
+                push @error_msg, "Command 'export_package' requires the 'package_dir' parameter " .
+                                 "to point to an existing directory\n";
+            }
+            unless ( scalar @OPT_package ) {
+                push @error_msg, "Command 'export_package' requires one or more packages to " .
+                                 "be specified if you use the 'package_dir' parameter. You may also simply 'cd' " .
+                                 "to the directory with the package and run this command without any parameters.\n";
+            }
+        }
+        notify_error( @error_msg )  if ( @error_msg );
+        my $status = export_package({ package_dir => $OPT_package_dir,
+                                      package     => \@OPT_package } );
+        print "Status of the packages you requested to be exported:\n",
+              join( "\n", map { print_status_line( $_ ) } @{ $status } ), "\n",
+              "\n$SEP\nFinished export_package!\n";
+        exit(0);
+    }
+
+    #
+    # CHECK PACKAGE
+    #
+    if ( $command eq 'check_package' ) {
+        my $use_dir = 0;
+        if ( $OPT_package_dir and ! -d $OPT_package_dir ) {
+            push @error_msg, "Command 'check_package' requires the parameter " .
+                             "'package_dir' exist as a directory if you choose to specify it.\n";
+            $use_dir++;
+        }
+        if ( $OPT_website_dir and ! -d $OPT_website_dir ) {
+            push @error_msg, "Command 'check_package' requires the parameter " .
+                             "'website_dir' exist as a directory if you choose to specify it.\n";
+            $use_dir++;
+        }
+        if ( $OPT_base_dir and ! -d $OPT_base_dir ) {
+            push @error_msg, "Command 'check_package' requires the parameter " .
+                             "'base_dir' exist as a directory if you choose to specify it.\n";
+            $use_dir++;
+        }
+        if ( $use_dir ) {
+            unless ( scalar @OPT_package ) {
+                push @error_msg, "Command 'check_package' requires that you specify one or more packages " .
+                               "if you specify one of the parameters 'package_dir', 'base_dir', 'website_dir'\n";
+            }
+        }
+        notify_error( @error_msg )  if ( @error_msg );
+        print "Running check_package...\n$SEP\n\n";
+        my $status = [];
+        if ( $OPT_package_dir ) {
+            if ( scalar @OPT_package ) {
+                foreach my $package_name ( @OPT_package ) {
+                    push @{ $status }, $PKG_CLASS->check({ package_dir => "$OPT_package_dir/$package_name" });
+                }
+            }
+            else {
+                push @{ $status }, $PKG_CLASS->check( { package_dir => $OPT_package_dir } );
+            }
+        }
+        elsif ( $use_dir ) {
+            $status = check_installed_package({ package     => \@OPT_package,
+                                                website_dir => $OPT_website_dir,
+                                                base_dir    => $OPT_base_dir });
+        }
+        else {
+            push @{ $status }, $PKG_CLASS->check({ package_dir => cwd });
+        }
+        print "Status of the packages you requested to be checked:\n",
+              join( "\n", map { print_status_line( $_, { same_line => 1 } ) } @{ $status } ), "\n",
+              "\n$SEP\nFinished with check_package!\n";
+        exit(0);
+    }
+
+    #
+    # INSTALL PACKAGE
+    #
+    if ( $command eq 'install_package' ) {
+        unless ( -d $OPT_base_dir ) {
+            push @error_msg, "Command 'install_package' requires the parameter 'base_dir' " .
+                             "to be set to an existing directory\n";
+        }
+        unless ( -f $OPT_package_file ) {
+            push @error_msg, "Command 'install_package' requires the parameter 'package_file' " .
+                             "to be set to an existing package distribution \n";
+        }
+        if ( my $msg = base_dir_permission( $OPT_base_dir ) ) {
+            push @error_msg, "Cannot run 'install_package' because you have " .
+                             "insufficient access to the base installation " .
+                             "directory. (Message: $msg.) Please try this " .
+                             "action again as a user that has sufficient " .
+                             "permission.\n";
+        }
+        notify_error( @error_msg )  if ( @error_msg );
+        print "Running install_package...\n$SEP\n\n";
+        my $repository = $REPOS_CLASS->fetch( undef, { directory => $OPT_base_dir } );
+        $repository->backup({ filename => REPOSITORY_BACKUP });
+        my $num_pkg = scalar @{ $repository->fetch_all_packages };
+        my $pkg = $PKG_CLASS->install_distribution({
+                                        repository => $repository,
+                                        package_file => $OPT_package_file });
+        if ( $pkg ) {
+            print "Installed package: $pkg->{name}-$pkg->{version}\n";
+        }
+        else {
+            print "Error installating package.\n";
+            my $current_num_pkg = scalar @{ $repository->fetch_all_packages };
+            if ( $num_pkg != $current_num_pkg ) {
+                $repository->restore_backup( REPOSITORY_BACKUP );
+            }
+        }
+        print "\n$SEP\nFinished installing package!\n";
+        exit(0);
+    }
+
+    #
+    # APPLY PACKAGE
+    #
+    if ( $command eq 'apply_package' ) {
+        unless ( scalar @OPT_package ) {
+            push @error_msg, "Command 'apply_package' requires one or more package names to install.";
+        }
+        unless ( -d $OPT_website_dir ) {
+            push @error_msg, "Command 'apply_package' requires the parameter " .
+                             "'website_dir' be set to an existing directory\n";
+        }
+        if ( $OPT_base_dir and ! -d $OPT_base_dir ) {
+            push @error_msg, "Command 'apply_package' requires the parameter " .
+                             "'base_dir' be either not set or set to an existing directory\n";
+        }
+        notify_error( @error_msg )  if ( @error_msg );
+        print "Running apply_package...\n$SEP\n\n";
+        my $status = apply_package({ package     => \@OPT_package,
+                                     base_dir    => $OPT_base_dir,
+                                     website_dir => $OPT_website_dir });
+        print "Status of the packages you requested to be applied:\n",
+              join( "\n", map { print_status_line( $_ ) } @{ $status } ), "\n",
+              "\n$SEP\nFinished applying package!\n";
+        exit(0);
+    }
+
+    #
+    # REMOVE PACKAGE
+    #
+    if ( $command eq 'remove_package' ) {
+        unless ( scalar @OPT_package ) {
+            push @error_msg, "Command 'remove_package' requires one or more package names to remove.";
+        }
+        unless ( -d $OPT_website_dir ) {
+            push @error_msg, "Command 'remove_package' requires the parameter " .
+                             "to be set to existing directories\n";
+        }
+        notify_error( @error_msg )  if ( @error_msg );
+        print "Running remove_package...\n$SEP\n\n";
+        my $status = remove_package({ package     => \@OPT_package,
+                                       website_dir => $OPT_website_dir });
+        my $removal_status = join( "\n", map { print_status_line( $_ ) } @{ $status } );
+        print <<RMVMSG;
+Status of the packages you requested for removal:
+
+$removal_status
+
+General Removal Notes:
+
+We removed the information from the package database for the above
+package(s), but we did not remove the files. The package files still
+exist under the directory tree -- if you would like to remove this
+package forever you can simply remove the directories.
+$SEP
+Finished remove_package!
+RMVMSG
+        exit(0);
+    }
+
+    #
+    # UPGRADE PACKAGE
+    #
+    if ( $command eq 'upgrade_package' ) {
+        unless ( scalar @OPT_package ) {
+            push @error_msg, "Command 'upgrade_package' requires one or more package names to remove.";
+        }
+        unless ( -d $OPT_website_dir ) {
+            push @error_msg, "Command 'upgrade_package' requires the parameter 'website_dir' " .
+                             "to be set to an existing directory\n";
+        }
+        notify_error( @error_msg )  if ( @error_msg );
+        print "Running upgrade_package...\n$SEP\n\n";
+        my $status = upgrade_package({ package     => \@OPT_package,
+                                       website_dir => $OPT_website_dir });
+        my $pkg_status = join( "\n", map { print_status_line( $_ ) } @{ $status } );
+        print <<UPGRADEMSG;
+Status of the packages you requested for upgrade:
+
+$pkg_status
+
+General Upgrade Notes:
+
+We removed the information from the package database for the old
+package(s), we did not remove its files -- any modified templates,
+handlers, configuration files, etc. still exist under the old
+directory name. If you made such modifications, you will need to bring
+them to the new version by hand
+
+$SEP
+Finished upgrade_package!
+UPGRADEMSG
+        exit(0);
+    }
+
+    #
+    # INSTALL TEMPLATE
+    #
+    if ( $command eq 'install_template' ) {
+        unless ( scalar @OPT_package ) {
+            push @error_msg, "Command 'install_template' requires one or more package names " .
+                             "for which it should install templates.";
+        }
+        unless ( -d $OPT_website_dir ) {
+            push @error_msg, "Command 'install_template' requires the parameter 'website_dir' " .
+                             "to be set to an existing directory\n";
+        }
+
+        notify_error( @error_msg )  if ( @error_msg );
+        print "Running install_template...\n$SEP\n\n";
+        my $status = install_template({ package     => \@OPT_package,
+                                        website_dir => $OPT_website_dir });
+        my $pkg_status = join( "\n", map { print_status_line( $_ ) } @{ $status } );
+        print <<INSTTMPLMSG;
+Status of the templates you requested for installation:
+
+$pkg_status
+
+$SEP
+Finished install_template!
+INSTTMPLMSG
+        exit(0);
+    }
+
+    #
+    # REMOVE TEMPLATE
+    #
+    if ( $command eq 'remove_template' ) {
+        unless ( scalar @OPT_package ) {
+            push @error_msg, "Command 'remove_template' requires one or more package names " .
+                             "for which it should remove templates.";
+        }
+        unless ( -d $OPT_website_dir ) {
+            push @error_msg, "Command 'remove_template' requires the parameter 'website_dir' " .
+                             "to be set to an existing directory\n";
+        }
+        notify_error( @error_msg )  if ( @error_msg );
+        print "Running remove_template...\n$SEP\n\n";
+        my $status = remove_template({ package     => \@OPT_package,
+                                       website_dir => $OPT_website_dir });
+        my $pkg_status = join( "\n", map { print_status_line( $_ ) } @{ $status } );
+        print <<RMVTMPLMSG;
+Status of the templates you requested for remove:
+
+$pkg_status
+
+$SEP
+Finished remove_template!
+RMVTMPLMSG
+        exit(0);
+    }
+
+    #
+    # DUMP TEMPLATE
+    #
+    if ( $command eq 'dump_template' ) {
+        if ( $OPT_dump_dir and ! -d $OPT_dump_dir ) {
+            push @error_msg, "Command 'dump_template' can use the parameter 'dump_dir' " .
+                             "but if you specify the parameter it must exist as a directory.";
+        }
+        unless ( scalar @OPT_package ) {
+            push @error_msg, "Command 'dump_template' requires one or more package names " .
+                             "for which it should remove templates.";
+        }
+        unless ( -d $OPT_website_dir ) {
+            push @error_msg, "Command 'dump_template' requires the parameter 'website_dir' " .
+                             "to be set to an existing directory\n";
+        }
+        notify_error( @error_msg )  if ( @error_msg );
+        print "Running dump_template...\n$SEP\n\n";
+        my $status = dump_template({ package     => \@OPT_package,
+                                     dump_dir    => $OPT_dump_dir,
+                                     website_dir => $OPT_website_dir });
+        my $pkg_status = join( "\n", map { print_status_line( $_ ) } @{ $status } );
+        print <<DUMPTMPLMSG;
+Status of the templates you requested to dump:
+
+$pkg_status
+
+$SEP
+Finished dump_template!
+DUMPTMPLMSG
+        exit(0);
+    }
+
+    #
+    # SQL INSTALL
+    #
+    if ( $command eq 'install_sql' ) {
+        unless ( scalar @OPT_package ) {
+            push @error_msg, "Command 'install_sql' requires one or more package names to install.";
+        }
+        unless ( -d $OPT_website_dir ) {
+            push @error_msg, "Command 'install_sql' requires the parameter " .
+                             "'website_dir' to be set to an existing directory\n";
+        }
+        notify_error( @error_msg )  if ( @error_msg );
+        print "Running install_sql...\n$SEP\n\n";
+        my $status = install_sql({ package     => \@OPT_package,
+                                   website_dir => $OPT_website_dir,
+                                   action      => $OPT_sql_action });
+        my $pkg_status = join( "\n$SEP\n", map { print_status_line( $_ ) } @{ $status } );
+        my @notes = grep { $_->{note} } @{ $status };
+        my $note_status = '';
+        foreach my $status ( @notes )  {
+            $note_status .= "Package $status->{name}-$status->{version}\n" .
+                            "$status->{note}\n";
+        }
+        $note_status ||= 'none';
+        print <<INSTSQLMSG;
+Status of the packages requested for SQL install:
+
+$pkg_status
+
+Important Notes
+-------------------------
+
+$note_status
+
+$SEP
+Finished install_sql!
+INSTSQLMSG
+        exit(0);
+    }
+
+    #
+    # CHANGE SPOPS DRIVER
+    #
+    if ( $command eq 'change_spops_driver' ) {
+        unless ( -d $OPT_website_dir ) {
+            push @error_msg, "Command 'change_spops_driver' requires the parameter " .
+                             "'website_dir' to be set to an existing directory\n";
+        }
+        unless ( $OPT_driver ) {
+            push @error_msg, "Command 'change_spops_driver' requires the parameter " .
+                             "'driver' set to the new SPOPS driver you want to use. " .
+                             "(e.g.,  'SPOPS::DBI::MySQL' or 'SPOPS::DBI::Pg')";
+        }
+        notify_error( @error_msg )  if ( @error_msg );
+        print "Running change_spops_driver...\n$SEP\n\n";
+        my $status = change_spops_driver({ website_dir => $OPT_website_dir,
+                                           driver      => $OPT_driver });
+        my $changed = ( scalar @{ $status->{changed} } )
+                        ? '--' . join( "\n--", @{ $status->{changed} } )
+                        : '';
+        my $not     = ( scalar @{ $status->{not_changed} } )
+                        ? '--' . join( "\n--", @{ $status->{not_changed} } )
+                        : '';
+        print <<DBMSG;
+
+Files changed:
+$changed
+
+Files not changed:
+$not
+
+$SEP
+Finished change_spops_driver!
+DBMSG
+        exit(0);
+    }
+
+
+    #
+    # UPDATE OBJECTS
+    #
+    if ( $command eq 'update_object' ) {
+        unless ( -d $OPT_website_dir ) {
+            push @error_msg, "Command 'update_object' requires the parameter " .
+                             "'website_dir' to be set to an existing directory\n";
+        }
+        unless ( $OPT_object ) {
+            push @error_msg, "Command 'update_object' requires the parameter " .
+                             "'object' set to the object tag you wish to update " .
+                             "(e.g.,  'basic_page' or 'template')";
+        }
+        notify_error( @error_msg )  if ( @error_msg );
+        print "Running update_object...\n$SEP\n\n";
+        my $status = update_objects({ website_dir => $OPT_website_dir,
+                                      object_tag  => $OPT_object });
+        my $error_msg = ( ref $status->{error} eq 'ARRAY' && scalar @{ $status->{error} } > 0 )
+                          ? join( "\n -- ", scalar @{ $status->{error} }, @{ $status->{error} } )
+                          : 'None';
+        print <<OBMSG;
+Number of objects: $status->{count}
+Objects updated:   $status->{save}
+Errors:            $error_msg
+
+$SEP
+Finished update_object!
+OBMSG
+        exit(0);
+    }
+
+    #
+    # TEST DB
+    #
+    if ( $command eq 'test_db' ) {
+        unless ( -d $OPT_website_dir ) {
+            push @error_msg, "Command 'test_db' requires the parameter " .
+                             "'website_dir' to be set to an existing directory\n";
+        }
+        notify_error( @error_msg )  if ( @error_msg );
+        print "Running test_db...\n$SEP\n\n";
+        my $status = test_db_connection({ website_dir => $OPT_website_dir });
+        my $status_info = print_status_line( $status );
+        print <<DBMSG;
+Status of the database test:
+
+$status_info
+
+$SEP
+Finished test_db!
+DBMSG
+        exit(0);
+    }
+
+    #
+    # TEST LDAP
+    #
+    if ( $command eq 'test_ldap' ) {
+        unless ( -d $OPT_website_dir ) {
+            push @error_msg, "Command 'test_ldap' requires the parameter " .
+                             "'website_dir' to be set to an existing directory\n";
+        }
+        notify_error( @error_msg )  if ( @error_msg );
+        print "Running test_ldap...\n$SEP\n\n";
+        my $status = test_ldap_connection({ website_dir => $OPT_website_dir });
+        my $status_info = print_status_line( $status );
+        print <<DBMSG;
+Status of the LDAP test:
+
+$status_info
+
+$SEP
+Finished test_ldap!
+DBMSG
+        exit(0);
+    }
+
+    if ( $command eq 'upgrade_website_repository' ) {
+        unless ( -d $OPT_website_dir ) {
+            push @error_msg, "Command 'upgrade_repository' requires the paremeter " .
+                             "'website_dir' to be set to an existing directory\n";
+        }
+        notify_error( @error_msg ) if ( @error_msg );
+        print "Modifying repository...\n$SEP\n\n";
+        upgrade_repository( $OPT_website_dir );
+        print "OK\n\n";
+        print "$SEP\nFinished upgrading the website repository!\n";
+        exit(0);
+    }
+
+    if ( $command eq 'upgrade_installation_repository' ) {
+        unless ( -d $OPT_base_dir ) {
+            push @error_msg, "Command 'upgrade_installation_repository' requires the paremeter " .
+                             "'base_dir' to be set to an existing directory\n";
+        }
+        notify_error( @error_msg ) if ( @error_msg );
+        print "Modifying repository...\n$SEP\n\n";
+        upgrade_repository( $OPT_base_dir );
+        print "OK\n\n";
+        print "$SEP\nFinished upgrading the installation repository!\n";
+        exit(0);
+    }
+
+    my $right_now = scalar localtime;
+    die <<NOTSCRIPT;
+Command '$command' is a valid command but it is not scripted yet!
+Please contact the OpenInteract-dev mailing list at
+'$DEV_LIST' with this message. Thanks!
+========================================
+oi_manage version: $VERSION
+Current date:      $right_now
+NOTSCRIPT
+
+}
+
+# This should only be in here for a version or two -- it's used to
+# change a package repository (whether from a website or the base
+# installation) to the new format
+
+sub upgrade_repository {
+    my ( $dir ) = @_;
+    require GDBM_File;
+    my $gdbm_file = join( '/', $dir, 'conf', 'package_install.gdbm' );
+    my $hash_file = join( '/', $dir, $OpenInteract::PackageRepository::PKG_DB_FILE );
+    DEBUG && _w( 1, "Trying to write GDBM repository ($gdbm_file) to text repository ($hash_file)" );
+    my ( %gdbm );
+    tie( %gdbm, 'GDBM_File', $gdbm_file, &GDBM_File::GDBM_READER, 0666 );
+    my $hash = $REPOS_CLASS->new({ filename => $hash_file, perm => 'new' });
+    delete $hash->{perm};
+    delete $hash->{filename};
+    while ( my ( $k, $v ) = each %gdbm ) {
+        next if ( $k eq 'perm' or $k eq 'filename' );
+        my ( $class, $pkg_key ) = split /\-\-/, $k;
+        my ( $data );
+        eval $v;
+        $hash->{ $pkg_key } = $data;
+        DEBUG && _w( 1, "Wrote entry for package ($pkg_key)" );
+    }
+    untie %gdbm;
+    $hash->{META_INF}{base_dir} = $dir;
+    eval { $hash->save({ dumper_level => 1 }) };
+    if ( $@ ) {
+        return undef;
+    }
+    rename( $gdbm_file, "$gdbm_file.old" );
+    return 1;
+}
+
+
+sub _build_valid_commands {
+    my ( $spacer ) = @_;
+    $spacer ||= '';
+    my $valid_commands = undef;
+    my $count = 1;
+    foreach my $command ( sort keys %COMMANDS ) {
+        $valid_commands .= "$command | ";
+        $valid_commands .= "\n$spacer" if ( $count % 4 == 0 );
+        $count++;
+    }
+    $valid_commands =~ s/ \| $//;
+    return $valid_commands;
+}
+
+
+
+sub notify_error {
+    my @msgs = @_;
+    my $error_msg = "[oi_manage]\n";
+    foreach ( @msgs ) {
+        $error_msg .= " -- " . wrap( undef, undef, $_) . "\n\n";
+    }
+    pod2usage( -exitstatus => 0, -verbose => 1,
+               -msg => $error_msg );
+}
+
+
+# Test to see whether this user has permission to write to the base
+# installation directory and the base installation package
+# repository. Returns error message on error, undef on success. (Hey,
+# just like 'system'!)
+
+# We should also test this in the package repository module...
+
+sub base_dir_permission {
+    my ( $base_dir ) = @_;
+    return "Directory not writable!"          unless ( -w $base_dir );
+    return "Repository not writable!"         unless ( -w "$base_dir/conf/package_repository.perl" );
+    return "Package directory not writeable!" unless ( -w "$base_dir/pkg" );
+    return undef;
+}
+
+
+#
+# list_packages
+#
+sub list_packages {
+    my ( $p ) = @_;
+    my $use_dir = $p->{website_dir} || $p->{base_dir};
+    my $repository = $REPOS_CLASS->fetch( undef, { directory => $use_dir });
+    my $pkg_list   = $repository->fetch_all_packages();
+    my $package_location = ( $p->{website_dir} )
+                             ? 'website directory'
+                             : 'installation directory';
+    print "Available packages in the $package_location:\n";
+    foreach my $pkg ( @{ $pkg_list } ) {
+        print "Package:   $pkg->{name}-$pkg->{version}\n",
+              "Installed: $pkg->{installed_on}\n",
+              "Directory: $use_dir/$pkg->{package_dir}\n\n";
+    }
+}
+
+
+
+#
+# refresh_doc
+#
+
+sub refresh_doc {
+    my ( $p ) = @_;
+    my $bc = eval { OpenInteract::Startup->read_base_config({ dir => $p->{website_dir} }) };
+    if ( $@ ) { base_config_file_error({ website_dir => $p->{website_dir},
+                                         error => $@, sub => 'refresh_doc' }) }
+
+    my $base_doc = "$bc->{base_dir}/doc";
+    my $html_doc = "$p->{website_dir}/html/oi_docs";
+    opendir( BASE, $base_doc ) || die "Cannot open base documentation directory! ($!)";
+    opendir( SITE, $html_doc ) || die "Cannot open website documentation directory! ($!)";
+    my %base_info = map { $_ => (stat( "$base_doc/$_" ))[7] }
+                          grep { -f "$base_doc/$_" }
+                          grep ! /old$/,
+                          readdir( BASE );
+    my %site_info = map { $_ => (stat( "$html_doc/$_" ))[7] }
+                          grep { -f "$html_doc/$_" }
+                          grep ! /old$/,
+                          readdir( SITE );
+    close( SITE );
+    close( BASE );
+
+    my @status = ();
+    foreach my $base_filename ( keys %base_info ) {
+        if ( $base_info{ $base_filename } != $site_info{ $base_filename } ) {
+            eval { cp( "$base_doc/$base_filename", "$html_doc/$base_filename" ) || die $! };
+            if ( $@ ) {
+                push @status, { filename => $base_filename, ok => 0, error => $@ };
+            }
+            else {
+                push @status, { filename => $base_filename, ok => 1, copied => 1 };
+            }
+        }
+        else {
+            push @status, { filename => $base_filename, ok => 1, copied => 0 };
+        }
+    }
+    return \@status;
+}
+
+
+#
+# refresh_widget
+#
+
+sub refresh_widget {
+    my ( $p ) = @_;
+    my $bc = eval { OpenInteract::Startup->read_base_config({
+                                             dir => $p->{website_dir} }) };
+    if ( $@ ) {
+        base_config_file_error({ website_dir => $p->{website_dir},
+                                 error => $@, sub => 'refresh_widget' });
+    }
+
+    my $base_widget_dir = "$bc->{base_dir}/template";
+    my $site_widget_dir = "$p->{website_dir}/template";
+    unless ( -d $site_widget_dir ) {
+        File::Path::mkpath( $site_widget_dir, 0775, undef );
+    }
+    opendir( BASE, $base_widget_dir )
+             || die "Cannot open base widget directory! ($!)";
+    opendir( SITE, $site_widget_dir )
+             || die "Cannot open website widget directory! ($!)";
+    my %base_info = map { $_ => (stat( "$base_widget_dir/$_" ))[7] }
+                          grep { -f "$base_widget_dir/$_" }
+                          grep ! /old$/,
+                          readdir( BASE );
+    my %site_info = map { $_ => (stat( "$site_widget_dir/$_" ))[7] }
+                          grep { -f "$site_widget_dir/$_" }
+                          grep ! /old$/,
+                          readdir( SITE );
+    close( SITE );
+    close( BASE );
+
+    my %no_write = map { $_ => 1 } $PKG_CLASS->read_readonly_file( $site_widget_dir );
+
+    my @status = ();
+    foreach my $base_filename ( keys %base_info ) {
+        next if ( $no_write{ $base_filename } );
+        if ( $base_info{ $base_filename } != $site_info{ $base_filename } ) {
+            eval { cp( "$base_widget_dir/$base_filename",
+                       "$site_widget_dir/$base_filename" ) || die $! };
+            if ( $@ ) {
+                push @status, { filename => $base_filename,
+                                ok => 0, error => $@ };
+            }
+            else {
+                push @status, { filename => $base_filename,
+                                ok => 1, copied => 1 };
+            }
+        }
+        else {
+            push @status, { filename => $base_filename, ok => 1, copied => 0 };
+        }
+    }
+    return \@status;
+}
+
+
+#
+# list_actions
+#
+
+sub list_actions {
+    my ( $p ) = @_;
+    my $R = OpenInteract::Startup->setup_static_environment( $p->{website_dir}, '',
+                                                             { temp_lib => 'lazy' } );
+    my $CONFIG = $R->CONFIG;
+    my @actions = ();
+ACTION:
+    foreach my $action ( sort keys %{ $CONFIG->{action} } ) {
+        if ( ! $action or $action =~ /^_/ ) {
+            my $redir_action = $CONFIG->{action}{ $action }{redir};
+            push @actions, { action => "SYSTEM ($action) redirected to ($redir_action)" };
+            next ACTION;
+        }
+        push @actions, { action          => $action,
+                         package_name    => $CONFIG->{action}{ $action }{package_name},
+                         package_version => $CONFIG->{action}{ $action }{package_version},
+                         class           => $CONFIG->{action}{ $action }{class},
+                         method          => $CONFIG->{action}{ $action }{method},
+                         template        => $CONFIG->{action}{ $action }{tmpl_name} };
+    }
+    return \@actions;
+}
+
+
+#
+# list_objects
+#
+
+sub list_objects {
+    my ( $p ) = @_;
+    my $R = OpenInteract::Startup->setup_static_environment( $p->{website_dir}, '',
+                                                             { temp_lib => 'lazy' } );
+    my $CONFIG = $R->CONFIG;
+    my @objects = ();
+OBJECT:
+    foreach my $alias ( sort keys %{ $CONFIG->{SPOPS} } ) {
+        next OBJECT if ( ! $alias or $alias =~ /^_/ );
+        my @alias_list = ( $alias );
+        if ( ref $CONFIG->{SPOPS}{alias} eq 'ARRAY' ) {
+            push @alias_list, @{ $CONFIG->{SPOPS}{alias} };
+        }
+        push @objects, { alias  => join ( ', ', @alias_list ),
+                         class  => $CONFIG->{SPOPS}{ $alias }{class} };
+    }
+    return \@objects;
+}
+
+
+#
+# install_oi
+#
+# requires parameter base_dir be defined but not exist yet.
+
+sub install_oi {
+    my ( $p ) = @_;
+    my $pwd = cwd;
+
+    # Create the new install dir
+
+    if ( -d $p->{base_dir} ) {
+        die "[oi_manage]: Installation directory ($p->{base_dir}) already ",
+            "exists! Please remove it before continuing.\n";
+    }
+    mkdir( $p->{base_dir}, 0775 )
+           || die "Cannot create installation directory! Error: $!";
+
+    # Make our subdirectories
+
+    foreach my $sub_dir ( @BASE_SUBDIR ) {
+        mkdir( "$p->{base_dir}/$sub_dir", 0775 )
+               || die "Cannot create dir ($p->{base_dir}/$sub_dir). Error: $!";
+    }
+
+    # Copy some files that are specified above
+
+    foreach my $file_frag ( @INITIAL_FILES ) {
+        cp( $file_frag, "$p->{base_dir}/$file_frag" )
+            || _w( 0,  "Could not copy ($file_frag) to new dir! Error: $!" );
+    }
+
+    # Now copy over everything in the 'conf/', 'doc/' and 'template/'
+    # directories
+
+COPYDIR:
+    foreach my $dir_name ( qw( conf doc template ) ) {
+        eval { opendir( CPDIR, $dir_name ) || die $! };
+        if ( $@ ) {
+            _w( 0, "Cannot open ($dir_name) for reading! ($@) Continuing..." );
+            next COPYDIR;
+        }
+        my @file_list = grep ! /old$/,
+                             grep { -f "$dir_name/$_" } readdir( CPDIR );
+        closedir( CPDIR );
+        foreach my $file_name ( @file_list ) {
+            cp( "$dir_name/$file_name", "$p->{base_dir}/$dir_name/$file_name" )
+                || _w( 0, "Could not copy file ($dir_name/$file_name)",
+                          "to new directory! Error: $!" );
+        }
+    }
+
+
+    # First match up the package names in our initial and extra list
+    # with the filename of the package distributed. Then install them
+    # to the repository and return the status of the install.
+
+    my $repository = $REPOS_CLASS->new({ directory => $p->{base_dir},
+                                         perm      => 'new' });
+    my $package_match = _match_base_packages( cwd );
+    my @package_status = ();
+
+PKG:
+    foreach my $package_name ( @WEBSITE_BASE_PKG, @WEBSITE_EXTRA_PKG ) {
+        DEBUG && _w( 1, " -- Trying to install package $package_name" );
+        my $status = { ok => 0, name => $package_name };
+        unless ( $package_match->{ $package_name } ) {
+            $status->{msg} = "Cannot match package ($package_name) to file " .
+                             "in distribution! Not installed!";
+            push @package_status, $status;
+        }
+
+        my $pkg = eval { $PKG_CLASS->install_distribution({
+                             repository   => $repository,
+                             package_file => $package_match->{ $package_name } }) };
+        if ( $@ ) {
+            _w( 0, "Error installing: $@" );
+            $status->{msg} = $@;
+        }
+        else {
+            $status->{ok} = 1;
+            $status->{version} = $pkg->{version};
+        }
+        push @package_status, $status;
+    }
+    return \@package_status;
+}
+
+
+
+#
+# upgrade_oi
+#
+#  this could be cleaner but it's quick
+#
+
+sub upgrade_oi {
+    my ( $p ) = @_;
+    my $pwd = cwd;
+
+    # First, see if the package repository is currently in GDBM format
+    # and if so, upgrade it.
+
+    my $gdbm_file = "$p->{base_dir}/conf/package_install.gdbm";
+    DEBUG && _w( 1, "Test to see if GDBM repository ($gdbm_file) exists." );
+    if ( -f $gdbm_file ) {
+        DEBUG && _w( 1, "GDBM-based repository exists, need to transfer",
+                        "contents to text-based." );
+        my $rv = upgrade_repository( $p->{base_dir} );
+        unless ( $rv ) {
+            die <<NOREPOS;
+Failed to upgrade package repository from old GDBM format to new
+text-based format. Please email the openinteract-dev mailing list
+at $DEV_LIST with information about your setup,
+such as OS, Perl version, previous OI version.
+NOREPOS
+        }
+        warn <<REPOSMSG;
+
+ -- I just upgraded your base installation package repository from
+ -- GDBM to the new text-file version. For every website that is
+ -- currently installed, please run:
+ --
+ --     oi_manage upgrade_repository --website_dir=<website_dir>
+ --
+ -- and it will be a seamless transition. If you do not do this the
+ -- websites will fail to run and everybody will tease you!
+
+REPOSMSG
+    }
+
+    # Open up the package repository
+
+    my $repository = $p->{repository} ||
+                     $REPOS_CLASS->fetch( undef, { directory => $p->{base_dir} } );
+    my $base_dir = $repository->{META_INF}{base_dir};
+
+    # Copy some files that are specified above
+
+    foreach my $file_frag ( @INITIAL_FILES ) {
+        rename( "$base_dir/$file_frag",
+                "$base_dir/$file_frag.old" )
+                || _w( 0, "Could not rename $base_dir/$file_frag -> ",
+                          "$base_dir/$file_frag.old" );
+        cp( $file_frag, "$base_dir/$file_frag" )
+            || _w( 0,  "Could not copy ($file_frag) to new dir! Error: $!" );
+    }
+
+    # Now copy over everything in the 'conf/', 'doc/' and 'template/'
+    # directories
+
+COPYDIR:
+    foreach my $dir_name ( qw( conf doc template ) ) {
+        eval { opendir( CPDIR, $dir_name ) || die $! };
+        if ( $@ ) {
+            _w( 0, "Cannot open ($dir_name) for reading! ($@) Continuing..." );
+            next COPYDIR;
+        }
+        eval { File::Path::mkpath( "$base_dir/$dir_name", undef, 0775 ) };
+        if ( $@ ) {
+            _w( 0, "Cannot create path ($base_dir/$dir_name): $@" );
+            next;
+        }
+        my @file_list = grep ! /old$/,
+                             grep { -f "$dir_name/$_" } readdir( CPDIR );
+        closedir( CPDIR );
+        foreach my $file_name ( @file_list ) {
+            rename( "$base_dir/$dir_name/$file_name",
+                    "$base_dir/$dir_name/$file_name.old" );
+            cp( "$dir_name/$file_name", "$base_dir/$dir_name/$file_name" )
+                || _w( 0, "Could not copy file ($dir_name/$file_name) ",
+                          "to new directory! Error: $!" );
+        }
+    }
+
+    # Install all the packages and return the status of installing them
+
+    my $package_match = _match_base_packages( cwd );
+    my @package_status = ();
+
+PKG:
+    foreach my $package_name ( @WEBSITE_BASE_PKG, @WEBSITE_EXTRA_PKG ) {
+        DEBUG && _w( 1, " -- Trying to install package $package_name" );
+        my $status = { ok => 0, name => $package_name };
+        unless ( -f $package_match->{ $package_name } ) {
+            $status->{msg} = "Cannot match $package_name to file in " .
+                             "distribution! Not installed!";
+            push @package_status, $status;
+            next;
+        }
+        my $info = eval { $PKG_CLASS->install_distribution({
+                             repository => $repository,
+                             package_file => $package_match->{ $package_name } }) };
+        DEBUG && _w( 2, "Results of install_distribution() for package ",
+                        "($package_name)\n", Dumper( $info ) );
+
+        # If we get an error, assume it's because this package already
+        # exists; otherwise, just mark the status
+
+        if ( $@ ) {
+            $status->{msg}  = $@;
+        }
+        else {
+            $status->{ok} = 1;
+            $status->{version} = $info->{version};
+        }
+        push @package_status, $status;
+    }
+    return \@package_status;
+}
+
+
+sub _match_base_packages {
+    my ( $dir ) = @_;
+    unless ( -d $dir ) {
+        die "No valid dir specified to find base packages! (Given: $dir)\n";
+    }
+
+    # Match up the package names in our initial and extra list with the
+    # filename of the package distributed
+
+    opendir( PKG, "$dir/pkg/" )
+             || die "Cannot open package dir ($dir/pkg/) for reading! Error: $!";
+    my @package_files = grep { -f "pkg/$_" } grep /\.tar\.gz$/, readdir( PKG );
+    closedir( PKG );
+    my ( %package_match );
+    foreach my $package_file ( @package_files ) {
+        my ( $package_name ) = $package_file =~ /^(.*)\-\d+\.\d+\.tar\.gz$/;
+        $package_match{ $package_name } = "$dir/pkg/$package_file";
+    }
+    DEBUG && _w( 2, "Packages matched: ", Dumper( \%package_match ) );
+    return \%package_match;
+}
+
+
+#
+# check_installed_package
+#
+# wrapper around check_package for installed packages
+#
+# Parameters:
+#   package (\@)
+#   website_dir | base_dir
+
+sub check_installed_package {
+    my ( $p ) = @_;
+    my $app_name = undef;
+    my $use_dir  = $p->{base_dir};
+    if ( $p->{website_dir} ) {
+        $use_dir = $p->{website_dir};
+        my $bc = eval { OpenInteract::Startup->read_base_config({
+                                                  dir => $p->{website_dir} }) };
+        if ( $@ ) {
+            base_config_file_error({ website_dir => $p->{website_dir},
+                                     error       => $@,
+                                     sub         => 'check_installed_package' });
+        }
+        $app_name = $bc->{website_name};
+    }
+    my $repository = $REPOS_CLASS->fetch( undef, { directory => $use_dir } );
+    my @status = ();
+PKG:
+    foreach my $package_name ( @{ $p->{package} } ) {
+        my $info = $repository->fetch_package_by_name({ name => $package_name });
+        unless ( $info ) {
+            push @status, { name => $package_name,
+                            ok   => 0,
+                            msg  => 'Package $package_name not found.' };
+            next PKG;
+        }
+        my $package_dir = join( '/', $use_dir, $info->{package_dir} );
+        push @status, $PKG_CLASS->check({ package_dir  => $package_dir,
+                                          website_name => $app_name,
+                                          package_name => $package_name });
+    }
+    return \@status;
+}
+
+
+#
+# export_package
+#
+
+sub export_package {
+    my ( $p ) = @_;
+    my @status = ();
+    my @dir_list = ();
+    my $pwd = cwd;
+
+    # Each package specified: try to just open up the
+    # $pkg_dir/$pkg_name directory -- this normally works, because
+    # when you're doing batches of packages at once you're probably
+    # (hopefully) doing it from a devel directory where the packages
+    # have no version numbers; if that directory isn't found, we try
+    # to find a directory name that matches the package name plus a
+    # dash and the beginning of a version number. For instance:
+    #
+    # $package_name = 'base';
+    # @dirs = qw( 'base_config', 'base_doodad', 'base-1.02' );
+    #  -- even through the first and second *begin* with 'base' it is
+    #  not followed by a '-' and then a number, so it will only match
+    #  the third.
+
+    if ( ref $p->{package} eq 'ARRAY' and scalar @{ $p->{package} } ) {
+        opendir( PKGDIR, $p->{package_dir} )
+                 || die "Cannot read $p->{package_dir}: $!";
+        my %package_dirs = map { $_ => 1 }
+                               grep ! /^\./,
+                               grep { -d "$p->{package_dir}/$_" }
+                               readdir( PKGDIR );
+        closedir( PKGDIR );
+        DEBUG && _w( 1, "Found package directories: ", Dumper( \%package_dirs ) );
+
+PKG:
+        foreach my $package_name ( @{ $p->{package} } ) {
+            DEBUG && _w( 1, "Trying to export ($package_name)" );
+            my $target_dir = "$p->{package_dir}/$package_name";
+            DEBUG && _w( 1, "Testing target $target_dir" );
+            unless ( -d $target_dir ) {
+                $target_dir = undef;
+                while ( my ( $check_dir, $v ) = each %package_dirs ) {
+                    if ( $check_dir =~ /^$package_name\-\d/ ) {
+                        $target_dir = "$p->{package_dir}/$check_dir";
+                        last;
+                    }
+                }
+                unless ( $target_dir ) {
+                    push @status, { ok   => 0,
+                                    name => $package_name,
+                                    msg  => "Could not find matching directory. No distribution created." };
+                    next PKG;
+                }
+            }
+            DEBUG && _w( 1, "Found target directory $package_name: $target_dir" );
+            push @dir_list, $target_dir;
+        }
+    }
+
+    # If no package_dir specified, just use the current directory,
+    # which is what most people will probably use.
+
+    else {
+        push @dir_list, $pwd;
+    }
+
+    foreach my $package_dir ( @dir_list ) {
+        DEBUG && _w( 1, "Exporting directory: $package_dir" );
+        my $status_info = $PKG_CLASS->export({ directory => $package_dir });
+        if ( scalar @dir_list > 1 and $status_info->{file} ) {
+            my ( $base_file ) = $status_info->{file} =~ m|^.*/(.*)$|;
+            rename( $status_info->{file}, "$pwd/$base_file" );
+            $status_info->{file} = "$pwd/$base_file";
+        }
+        push @status, { ok   => 1,
+                        name => $status_info->{name},
+                        msg  => "Version $status_info->{version} distribution to $status_info->{file}" };
+    }
+    return \@status;
+}
+
+
+
+#
+# create_website
+#
+
+sub create_website {
+    my ( $p ) = @_;
+
+    # Create the main directory and subdirectories
+
+    mkdir( $p->{website_dir}, 0775 )
+           || die "[oi_manage]: Cannot complete comamnd: cannot create ",
+                  "website directory ($p->{website_dir}): $!";
+    foreach my $sub_dir ( @WEBSITE_SUBDIR, $p->{website_name} ) {
+        mkdir ( "$p->{website_dir}/$sub_dir", 0775 )
+                || die "[oi_manage]: Cannot complete command: failed ",
+                       "creating subdir ($p->{website_dir}/$sub_dir): $!";
+    }
+
+    # Copy over all OI system documentation. (This can be refreshed to
+    # the latest version from the base installation with the
+    # 'refresh_doc' oi_manage command.)
+
+    my $html_doc_root = "$p->{website_dir}/html/oi_docs";
+    eval { mkdir( $html_doc_root, 0775 ) || die $! };
+    if ( $@ ) {
+        _w( 0, "Cannot create dir 'html/oi_docs' in website directory, \n",
+               "so I cannot copy OpenInteract documentation to viewable ",
+               "location. Continuing..." );
+    }
+    else {
+        my $oi_doc_root = "$p->{base_dir}/doc";
+        eval { opendir( DOC, $oi_doc_root ) || die $! };
+        if ( $@ ) {
+            _w( 0, "Cannot read system docs from ($oi_doc_root). Please ask\n",
+                   "your system administrator to install it there..\n",
+                   "Continuing without system documentation available." );
+        }
+        else {
+            my @file_list = grep ! /old$/,
+                            grep { -f "$oi_doc_root/$_" }
+                                 readdir( DOC );
+            foreach my $file_name ( @file_list ) {
+                cp( "$oi_doc_root/$file_name", "$html_doc_root/$file_name" )
+                    || _w( 0, "Could not copy ($file_name) from system ",
+                              "documentation directory ($!)." );
+            }
+        }
+    }
+
+    # Copy over all template widgets. (This can be refreshed to the
+    # latest version from the base installatin with the
+    # 'refresh_widgets' oi_manage command.)
+
+    my $site_template_root = "$p->{website_dir}/template";
+    my $base_template_root = "$p->{base_dir}/template";
+    eval { opendir( DOC, $base_template_root ) || die $! };
+    if ( $@ ) {
+        _w( 0, "Cannot read template widgets from ($base_template_root).",
+               "Please ask your administrator to install it there.\n",
+               "Continuing without template widgets available." );
+    }
+    else {
+        my @file_list = grep ! /old$/,
+                             grep { -f "$base_template_root/$_" }
+                             readdir( DOC );
+        foreach my $file_name ( @file_list ) {
+            cp( "$base_template_root/$file_name", "$site_template_root/$file_name" )
+                || _w( 0,  "Could not copy ($file_name) from base template widget ($!)." );
+        }
+        my $template_msg = <<TMPLMSG;
+# These are templates that will not be overwritten
+# when you run 'oi_manage refresh_widget' (one
+# template filename per line)
+
+base_main
+base_simple
+TMPLMSG
+        create_readonly_file( $site_template_root, $template_msg );
+    }
+
+    # Copy over files from the base installation to the website, doing
+    # some key/value replace in the process. (Gee, it might be nice to
+    # use the template toolkit for this, eh?)
+
+    my %file_match = (
+      "conf/sample-apache.dat"              => "conf/apache.dat",
+      "conf/sample-Stash.pm"                => "$p->{website_name}/Stash.pm",
+      "conf/sample-httpd_modperl.conf"      => "conf/httpd_modperl.conf",
+      "conf/sample-httpd_modperl_solo.conf" => "conf/httpd_modperl_solo.conf",
+      "conf/sample-httpd_static.conf"       => "conf/httpd_static.conf",
+      "conf/sample-base.conf"               => "conf/base.conf",
+      "conf/sample-server.perl"             => "conf/server.perl",
+      "conf/sample-server.ini"              => "conf/server.ini",
+      "conf/sample-startup.pl"              => "conf/startup.pl",
+      "conf/sample-override_spops.ini"      => "conf/sample-override_spops.ini",
+      "INSTALL.website"                     => "INSTALL.website"
+    );
+    my $replace_keys = [ '%%INTERACT_DIR%%', '%%WEBSITE_DIR%%',
+                         '%%WEBSITE_NAME%%', '%%STASH_CLASS%%',
+                         "OpenInteract\:\:Sample" ];
+    my $replace_vals = [ $p->{base_dir}, $p->{website_dir},
+                         $p->{website_name}, "$p->{website_name}\:\:Stash",
+                         "$p->{website_name}\:\:" ];
+    foreach my $from_name ( keys %file_match ) {
+        my $from_file = join( '/', $p->{base_dir}, $from_name );
+        my $to_file   = join( '/', $p->{website_dir}, $file_match{ $from_name } );
+        $PKG_CLASS->replace_and_copy({ from_file => $from_file,
+                                       to_file   => $to_file,
+                                       from_text => $replace_keys,
+                                       to_text   => $replace_vals });
+    }
+
+    # First apply all the packages...
+
+    my $status_list = apply_package({ package      => \@WEBSITE_BASE_PKG,
+                                      base_dir     => $p->{base_dir},
+                                      website_name => $p->{website_name},
+                                      website_dir  => $p->{website_dir} });
+
+    # Then create a nowrite flag for the index.html page
+
+    my $html_msg = <<HTMLMSG;
+# If a file is listed here it will not be updated when
+# the package to which it belongs is updated.
+
+index.html
+HTMLMSG
+    create_readonly_file( "$p->{website_dir}/html", $html_msg );
+    return $status_list;
+}
+
+
+
+#
+# apply_package
+#
+# requires: base_dir, website_dir
+
+sub apply_package {
+    my ( $p ) = @_;
+
+    # Grab the base configuration information to find the website_name
+
+    unless ( $p->{base_dir} and $p->{website_name} ) {
+        my $bc = eval { OpenInteract::Startup->read_base_config({ dir => $p->{website_dir} }) };
+        if ( $@ ) {
+            base_config_file_error({ website_dir => $p->{website_dir},
+                                     error       => $@,
+                                     sub         => 'apply_package' });
+        }
+        $p->{website_name} ||= $bc->{website_name};
+        $p->{base_dir}     ||= $bc->{base_dir};
+    }
+    DEBUG && _w( 1, "Incoming info (after base): ", Dumper( $p ) );
+
+    my $CONFIG = OpenInteract::Startup->create_config({ website_dir => $p->{website_dir} });
+
+    my $base_repos    = $REPOS_CLASS->fetch( undef,
+                                             { directory => $p->{base_dir} } );
+    my $website_repos = $REPOS_CLASS->fetch( undef,
+                                             { directory => $p->{website_dir},
+                                               perm      => 'write-new' } );
+
+    # Ensure that the packages passed in are actual packages by
+    # fetching the ones named
+
+    my $pkg_exist = $base_repos->verify_package( @{ $p->{package} } );
+    my $pkg_exist_list = ( ref $pkg_exist eq 'ARRAY' )
+                           ? $pkg_exist : [ $pkg_exist ];
+
+    # We create a hash of all the packages passed in and for each
+    # existing one remove it -- anything left after processing all
+    # packages didn't get processed and is therefore not a verified
+    # (good) package to begin with
+
+    my %pkg_track = map { lc $_ => 1 } @{ $p->{package} };
+    my @status = ();
+
+    # Cycle through the installed packages -- first see if the package
+    # already exists in the website; if not, change a couple of
+    # parameters and run the 'install_to_website' method of the
+    # package, then save the package to our website db
+
+PACKAGE:
+    foreach my $info ( @{ $pkg_exist_list } ) {
+        delete $pkg_track{ lc $info->{name} };
+        DEBUG && _w( 1, "Try to apply package $info->{name}-$info->{version}" );
+        my $this_status = { ok => 0, name => $info->{name} };
+        my $app_pkg = $website_repos->fetch_package_by_name({ name => $info->{name} });
+        if ( $app_pkg ) {
+            $this_status->{msg} = "This package (Version: $app_pkg->{version}) already exists in " .
+                                  "the website. Please run 'upgrade_package' to upgrade it.";
+            push @status, $this_status;
+            next PACKAGE;
+        }
+
+        $website_repos->backup({ filename => REPOSITORY_BACKUP });
+        my $num_pkg = scalar @{ $website_repos->fetch_all_packages() };
+
+        my $website_info = \%{ $info };
+        $this_status->{version}         = $website_info->{version};
+        $website_info->{website_dir}    = $p->{website_dir};
+        $website_info->{website_name}   = $p->{website_name};
+        $website_info->{installed_on}   = $base_repos->now;
+        eval { $PKG_CLASS->install_to_website(
+                            $base_repos, $website_repos, $website_info, $CONFIG ) };
+        if ( $@ ) {
+            $this_status->{msg} = "Cannot install package to website. Error: $@\n";
+            my $current_num_pkg = scalar @{ $website_repos->fetch_all_packages() };
+            if ( $num_pkg != $current_num_pkg ) {
+                $website_repos->restore_backup;
+            }
+        }
+        else {
+
+            # If the status is ok, open up the 'INSTALL' file from the
+            # base installation directory (if it exists) and put it
+            # into the {notes} field of the status. This is used for
+            # upgrade/other notes and displayed in 'print_status_line'
+            # below.
+
+            $this_status->{ok}++;
+            my $notes_file = join( '/', $website_info->{base_dir},
+                                        $website_info->{package_dir}, 'INSTALL' );
+            if ( -f $notes_file ) {
+                eval { open( NOTES, $notes_file ) || die $! };
+                if ( $@ ) {
+                    $this_status->{notes} = "Failed to open package installation " .
+                                            "notes file. Error: $@";
+                }
+                else {
+                    local $/ = undef;
+                    $this_status->{notes} = <NOTES>;
+                    close( NOTES );
+                }
+            }
+        }
+        push @status, $this_status;
+    }
+
+    # Now report status of the packages not verified
+
+    foreach my $pkg_name ( sort keys %pkg_track ) {
+
+        push @status, { ok  => 0,
+                        msg => "Package could not be verified -- either it " .
+                               "doesn't exist in base install or there's " .
+                               "a problem with the base install package." };
+    }
+    return \@status;
+}
+
+
+#
+# remove_package
+#
+# Required: website_dir, package list
+
+sub remove_package {
+    my ( $p ) = @_;
+    my @status = ();
+    my $repository = $REPOS_CLASS->fetch( undef, { directory => $p->{website_dir},
+                                                   perm      => 'write' } );
+
+ PKG:
+    foreach my $package_name ( @{ $p->{package} } ) {
+        my $this_status = { ok => 0, name => $package_name };
+        my $info = $repository->fetch_package_by_name({ name => $package_name });
+        unless ( $info ) {
+            $this_status->{msg} = 'Package does not exist in this website!';
+            push @status, $this_status;
+            next PKG;
+        }
+        $this_status->{version} = $info->{version};
+        eval { $PKG_CLASS->remove( $repository, $info ) };
+        if ( $@ ) {
+            $this_status->{msg} = "Failed to remove. Error: $@";
+        }
+        else {
+            $this_status->{ok}++;
+        }
+        push @status, $this_status;
+    }
+    return \@status;
+}
+
+
+#
+# upgrade_package
+#
+# Accomplish this by removing the old package definition and then
+# applying the new package
+
+sub upgrade_package {
+    my ( $p ) = @_;
+    unless ( $p->{base_dir} ) {
+        my $bc = eval { OpenInteract::Startup->read_base_config({ dir => $p->{website_dir} }) };
+        if ( $@ ) { base_config_file_error({ website_dir => $p->{website_dir},
+                                             error       => $@,
+                                             sub         => 'upgrade_package' }) }
+        $p->{base_dir}     ||= $bc->{base_dir};
+        $p->{website_name} ||= $bc->{website_name};
+    }
+
+    my $CONFIG = OpenInteract::Startup->create_config({ website_dir => $p->{website_dir} });
+
+    my $base_repository    = $REPOS_CLASS->fetch( undef, { directory => $p->{base_dir} } );
+    my $website_repository = $REPOS_CLASS->fetch( undef, { directory => $p->{website_dir},
+                                                           perm      => 'write' } );
+    my @status = ();
+
+PKG:
+    foreach my $package_name ( @{ $p->{package} } ) {
+        my $this_status = { ok => 0, name => $package_name };
+
+        # First, ensure that the package exists in the local app
+
+        my $app_info = $website_repository->fetch_package_by_name({ name => $package_name });
+        unless ( $app_info ) {
+            $this_status->{msg} = "Package does not exist in website -- run " .
+                                  "'apply_package' to install from OpenInteract " .
+                                  "installation to this website. No action taken.";
+            push @status, $this_status;
+            next PKG;
+        }
+
+        # Next, ensure that the package exists in the main app
+
+        my $base_info = $base_repository->fetch_package_by_name({ name => $package_name });
+        unless ( $base_info ) {
+            $this_status->{msg} = "Package does not exist in base install -- cannot upgrade.";
+            push @status, $this_status;
+            next PKG;
+        }
+
+        # Ensure that the versions are different
+
+        unless ( $base_info->{version} > $app_info->{version} ) {
+            $this_status->{msg} = "Installed package ($base_info->{version}) does not have version higher " .
+                                  "than package in website ($app_info->{version}). No action taken.";
+            push @status, $this_status;
+            next PKG;
+        }
+
+        # Looks good; let's do it. First remove the website package
+
+        my $rmv_status = { ok => 0 };
+        my $upg_status = { ok => 0, msg => 'Did not run since remove failed' };
+        my $app_status = { ok => 0 };
+        $PKG_CLASS->remove( $website_repository, $app_info );
+        $rmv_status->{ok}++;
+        $rmv_status->{msg} = "removed package version $app_info->{version} ok";
+
+        # If removal went ok, apply the package from the install directory
+
+        my $website_info = \%{ $base_info };
+        $website_info->{website_name} = $p->{website_name};
+
+        $PKG_CLASS->install_to_website( $base_repository, $website_repository, $website_info, $CONFIG );
+        $upg_status->{ok}++;
+        $upg_status->{msg} = "upgraded to version $base_info->{version}";
+
+        $this_status->{ok}++;
+        $this_status->{msg} = "  Removal: " . print_status_line( $rmv_status, { same_line => 1 } ) . "\n" .
+                              "  Apply:   " . print_status_line( $upg_status, { same_line => 1 } );
+
+        my $notes_file = join( '/', $website_info->{base_dir}, $website_info->{package_dir}, 'UPGRADE' );
+        if ( -f $notes_file ) {
+            eval { open( NOTES, $notes_file ) || die $! };
+            if ( $@ ) {
+                $this_status->{notes} = "Failed to open package installation notes file. Error: $@";
+            }
+            else {
+                local $/ = undef;
+                $this_status->{notes} = <NOTES>;
+                close( NOTES );
+            }
+        }
+
+        push @status, $this_status;
+    }
+    return \@status;
+}
+
+
+
+#
+# install_sql
+#
+
+# TODO: Make this routine less repetitive, now that we've split it
+# into three distinct sections
+
+sub install_sql {
+    my ( $p ) = @_;
+    require OpenInteract::SQLInstall;
+    $p->{action} ||= 'all';
+    my ( $handles, $CONFIG ) = initialize_db_actions({
+                                        website_dir => $p->{website_dir},
+                                        action      => 'install SQL' });
+    my $base_config = OpenInteract::Startup->read_base_config({
+                                        website_dir => $p->{website_dir} });
+    OpenInteract::Startup->create_temp_lib( $base_config );
+
+    # Grab the repository and existing packages
+
+    my $repository     = $REPOS_CLASS->fetch( undef,
+                                              { directory => $p->{website_dir} } );
+    my $pkg_exist      = $repository->verify_package( @{ $p->{package} } );
+    my $pkg_exist_list = ( ref $pkg_exist eq 'ARRAY' )
+                           ? $pkg_exist : [ $pkg_exist ];
+
+    my @status     = ();
+    my %pkg_status = ();
+
+    # These are used by all the steps
+
+    my %args = ( config => $CONFIG, status => 'raw' );
+
+    # Error track -- if we're doing multiple steps we insert the
+    # package name here and successive steps skip them
+
+    my %error_track = ();
+
+    # Go through the packages and do some initial setup
+
+    foreach my $info ( @{ $pkg_exist_list } ) {
+        my $installer_class = OpenInteract::SQLInstall->require_package_installer( $info );
+        $pkg_status{ $info->{name} }{installer} = $installer_class;
+        $pkg_status{ $info->{name} }{version}   = $info->{version};
+        $pkg_status{ $info->{name} }{ok} = 1;
+    }
+
+    # Go through and do the structures first...
+
+    if ( $p->{action} =~ /^(all|structure)$/ ) {
+        foreach my $info ( @{ $pkg_exist_list } ) {
+            DEBUG && _w( 1, "Starting structure install for",
+                            "$info->{name}-$info->{version}" );
+            my $installer_class = $pkg_status{ $info->{name} }{installer};
+            next unless ( $installer_class );
+            $args{package} = $info;
+
+            # TODO: Pass ALL db handles to SQLInstall and let it sort
+            # them out.
+
+            my $struct_status = eval { $installer_class->apply({
+                                              %args, db => $handles->{main},
+                                              action => 'create_structure' }) };
+            if ( $@ ) {
+                $pkg_status{ $info->{name} }{ok} = 0;
+                $error_track{ $info->{name} }++;
+                warn "$@\n";
+            }
+            else {
+                $pkg_status{ $info->{name} }{structure} =
+                                        join( "\n  * ", "Structure:",
+                                                        map { $_->{msg} }
+                                                            @{ $struct_status } );
+                my @notes = grep { defined $_ }
+                                 map { $_->{note} }
+                                     @{ $struct_status };
+                if ( @notes ) {
+                    $pkg_status{ $info->{name} }{note} = join( "\n", @notes );
+                }
+            }
+        }
+    }
+
+    # Disconnect from all handles once... (we reconstruct below)
+
+    foreach my $db ( values %{ $handles } ) {
+        $db->disconnect;
+    }
+
+    # Now create the entire request. Processes (like DBI field
+    # discovery) that depend on the structures should now be happy.
+
+    my $R = initialize_request({ website_dir => $p->{website_dir},
+                                 action      => 'install SQL' });
+
+    # Now install the data and security as needed
+
+    if ( $p->{action} =~ /^(all|all_data|data)$/ ) {
+        foreach my $info ( @{ $pkg_exist_list } ) {
+            DEBUG && _w( 1, "Starting data install for ",
+                            "$info->{name}-$info->{version}" );
+            next if ( $error_track{ $info->{name} } );
+            my $installer_class = $pkg_status{ $info->{name} }{installer};
+            next unless ( $installer_class );
+            $args{package} = $info;
+            my $data_status = eval { $installer_class->apply({
+                                              %args, db => $R->db( 'main' ),
+                                              action => 'install_data' }) };
+            if ( $@ ) {
+                $pkg_status{ $info->{name} }{ok} = 0;
+                $error_track{ $info->{name} }++;
+            }
+            else {
+                $pkg_status{ $info->{name} }{data} =
+                                        join( "\n  * ", 'Data: ',
+                                                        map { $_->{msg} }
+                                                            @{ $data_status } );
+                my @notes = grep { defined $_ }
+                                 map { $_->{note} }
+                                     @{ $data_status };
+                if ( @notes ) {
+                    $pkg_status{ $info->{name} }{note} .= join( "\n", @notes );
+                }
+            }
+        }
+    }
+
+    if ( $p->{action} =~ /^(all|all_data|security)$/ ) {
+        foreach my $info ( @{ $pkg_exist_list } ) {
+            DEBUG && _w( 1, "Starting server install for ",
+                            "$info->{name}-$info->{version}" );
+            next if ( $error_track{ $info->{name} } );
+            my $installer_class = $pkg_status{ $info->{name} }{installer};
+            next unless ( $installer_class );
+            $args{package} = $info;
+            my $security_status = eval { $installer_class->apply({
+                                             %args, action => 'install_security' }) };
+            if ( $@ ) {
+                $pkg_status{ $info->{name} }{ok} = 0;
+                $error_track{ $info->{name} }++;
+            }
+            else {
+                $pkg_status{ $info->{name} }{security} =
+                                join( "\n  * ", 'Security: ',
+                                                map { $_->{msg} }
+                                                    @{ $security_status } );
+                my @notes = grep { defined $_ } map { $_->{note} } @{ $security_status };
+                if ( @notes ) { $pkg_status{ $info->{name} }{note} .= join( "\n", @notes ) }
+            }
+        }
+    }
+
+    foreach my $db ( values %{ $handles } ) {
+        $db->disconnect;
+    }
+
+    foreach my $name ( sort keys %pkg_status ) {
+        my $this_status = { ok      => $pkg_status{ $name }{ok},
+                            name    => $name,
+                            version => $pkg_status{ $name }{version} };
+        if ( $pkg_status{ $name }{installer} ) {
+            my $msg_struct = $pkg_status{ $name }{structure} ||
+                             'No structure installation done.';
+            my $msg_data   = $pkg_status{ $name }{data}      ||
+                             'No data installation done.';
+            my $msg_secure = $pkg_status{ $name }{security}  ||
+                             'No security installation done.';
+            $this_status->{msg} = "\n\n" . join( "\n", $msg_struct,
+                                                       $msg_data,
+                                                       $msg_secure ) ."\n";
+            $this_status->{note} = $pkg_status{ $name }{note};
+        }
+        else {
+            $this_status->{msg} = "No installer defined, no changes " .
+                                  "made for package.\n";
+        }
+        push @status, $this_status;
+    }
+    return \@status;
+}
+
+
+
+#
+# install_template
+#
+
+sub install_template {
+    my ( $p ) = @_;
+    my $R = initialize_request({ website_dir => $p->{website_dir},
+                                 action      => 'install templates' });
+
+    my $TMPL_CLASS = $R->site_template;
+
+    # Get the ID of our admin group for security setting later on
+
+    my $site_admin_id = $R->CONFIG->{default_objects}{site_admin_group};
+
+    # Cycle through the packages in the website package db and bring
+    # in all their templates
+
+    my $repository = $REPOS_CLASS->fetch( undef,
+                                          { directory => $p->{website_dir} } );
+    my $pkg_exist = $repository->verify_package( @{ $p->{package} } );
+    my $pkg_exist_list = ( ref $pkg_exist eq 'ARRAY' )
+                           ? $pkg_exist : [ $pkg_exist ];
+
+    my @status = ();
+
+PACKAGE:
+    foreach my $info ( @{ $pkg_exist_list } ) {
+        my $this_status = { ok => 1, name => $info->{name} };
+        my $this_status_msg = "\n";
+        my $pkg_dir      = join( '/', $info->{website_dir}, $info->{package_dir} );
+        my $template_dir = join( '/', $pkg_dir, $TMPL_DIR );
+
+        # First, find all the .meta files in the package -- every
+        # template must have a .meta file
+
+        opendir( META, $template_dir )
+                 || die "Cannot open directory ($template_dir): $!";
+        my @meta_files = grep { -f "$template_dir/$_" }
+                              grep /\.$META_EXT$/,
+                                   readdir( META );
+        closedir( META );
+
+        # Now cycle through them, read them in and parse them,
+        # constructing a template from either one already saved or
+        # creating a new object, then read the .tmpl file into the
+        # object
+
+        foreach my $meta_file ( @meta_files ) {
+            my $part_meta = $meta_file;
+            $part_meta =~ s/\.$META_EXT$//;
+            my $full_meta = join( '/', $template_dir, $meta_file );
+            my $ti = {};
+            open( MF, $full_meta ) || die "Cannot open ($full_meta): $!";
+            while ( <MF> ) {
+                chomp;
+
+                # skip comments in meta file only
+                next if ( /^\s*\#/ );
+                my ( $action, $info ) = /^(\w+):\s*(.*)$/;
+                if ( $action ) {
+                    $ti->{ $action } = $info;
+                }
+                else {
+                    $ti->{description} .= $_;
+                }
+            }
+
+            # Now, see if we can retrieve an existing template using
+            # the package/name combo
+
+            my $tmpl_list = $TMPL_CLASS->fetch_group({
+                                   where         => 'package = ? AND name = ?',
+                                   value         => [ $ti->{package}, $ti->{name} ],
+                                   skip_security => 1,
+                                   skip_cache    => 1 });
+
+            # ... if so, just set the title and description right now
+
+            my $tmpl = $tmpl_list->[0];
+            if ( $tmpl ) {
+                $tmpl->{title}       = $ti->{title};
+                $tmpl->{description} = $ti->{description};
+                $this_status_msg .= "$ti->{name} found in database " .
+                                    "($tmpl->{template_id}), updating... ";
+            }
+
+            # Otherwise, create a new template object and set all the
+            # parameters available
+
+            else {
+                $tmpl = $TMPL_CLASS->new( $ti );
+                $this_status_msg .= "$ti->{name} being created as new... ";
+            }
+
+            # Read in the full template, which also includes the
+            # script part of the object
+
+            my $full_template_file = join( '/', $template_dir,
+                                                "$part_meta.$TMPL_EXT" );
+            open( TMPL, $full_template_file )
+                  || die "Cannot open template file: $full_template_file: $!";
+            {
+                local $/ = undef;
+                $tmpl->{template} = <TMPL>;
+                my @script_segments = $tmpl->{template} =~ m|<script.*?>(.*?)</script>|gims;
+                $tmpl->{template} =~ s|<script.*?>.*?</script>||gims;
+                $tmpl->{script}    = join( "\n\n", @script_segments );
+            }
+            close( TMPL );
+
+            # Save the object
+
+            eval { $tmpl->save({ skip_security => 1,
+                                 skip_log      => 1,
+                                 skip_cache    => 1 }) };
+            if ( $@ ) {
+                my $ei = SPOPS::Error->get;
+                $this_status_msg .= "failed! Could not save template " .
+                                    "object. Error: $@ -- $ei->{system_msg}";
+            }
+
+            # If save ok, we need to set security
+
+            else {
+                $tmpl->set_security({ scope          => SEC_SCOPE_WORLD,
+                                      security_level => SEC_LEVEL_READ });
+                $tmpl->set_security({ scope          => SEC_SCOPE_GROUP,
+                                      scope_id       => $site_admin_id,
+                                      security_level => SEC_LEVEL_WRITE });
+                $this_status_msg .= "ok! Template saved and security set ok.";
+            }
+            $this_status_msg .= "\n";
+        }
+        $this_status->{msg} = $this_status_msg;
+        push @status, $this_status;
+    }
+    $R->db->disconnect;
+    return \@status;
+}
+
+
+#
+# remove_template
+#
+
+sub remove_template {
+    my ( $p ) = @_;
+    my $R = initialize_request({ website_dir => $p->{website_dir},
+                                 action      => 'remove template' });
+
+    my $TMPL_CLASS = $R->site_template;
+    my @status = ();
+
+    foreach my $package_name ( @{ $p->{package} } ) {
+        my $this_status = { name => $package_name, ok => 1 };
+        my $template_list = $TMPL_CLASS->fetch_group({
+                                             where => 'package = ?',
+                                             value => [ $package_name ] });
+        foreach my $tmpl ( @{ $template_list } ) {
+            eval { $tmpl->remove({ skip_security => 1, skip_log => 1 }) };
+            if ( $@ ) {
+                $this_status->{ok} = 0;
+                push @{ $this_status->{msg_list} },
+                                   "Template $tmpl->{name}: Failed to remove - $@";
+            }
+            else {
+                push @{ $this_status->{msg_list} },
+                                   "Template $tmpl->{name}: removed ok";
+            }
+        }
+        $this_status->{msg} = join( "\n", @{ $this_status->{msg_list} } );
+        $this_status->{msg_list} = undef;
+        push @status, $this_status;
+    }
+    $R->db->disconnect;
+    return \@status;
+}
+
+
+#
+# dump_template
+#
+
+sub dump_template {
+    my ( $p ) = @_;
+    my $R = initialize_request({ website_dir => $p->{website_dir},
+                                 action      => 'dump templates' });
+    my $TMPL_CLASS = $R->site_template;
+    my @status = ();
+
+    my $repository = $REPOS_CLASS->fetch( undef,
+                                          { directory => $p->{website_dir} } );
+    my $pkg_exist = $repository->verify_package( @{ $p->{package} } );
+    my $pkg_exist_list = ( ref $pkg_exist eq 'ARRAY' )
+                           ? $pkg_exist : [ $pkg_exist ];
+
+PKG:
+    foreach my $info ( @{ $pkg_exist_list } ) {
+        my $this_status = { name => $info->{name}, ok => 1 };
+
+        # If we specified a dump directory then just use that; otherwise,
+        # create a dump dir and ensure it's clean before we fill it.
+
+        my $template_dir  = $p->{dump_dir};
+        unless ( $template_dir ) {
+            $template_dir = join( '/', $info->{website_dir},
+                                       $info->{package_dir},
+                                       $TMPL_DIR,
+                                       'dump' );
+            if ( -d $template_dir ) {
+                File::Path::rmtree( $template_dir, undef, undef );
+            }
+            mkdir( $template_dir, 0775 )
+                   || die "[oi_manage]: Cannot create ($template_dir): $!";
+        }
+        my $template_list = $TMPL_CLASS->fetch_group({
+                                  where => 'package = ?',
+                                  value => [ $info->{name} ],
+                                  skip_security => 1 });
+        $this_status->{msg_list} = [];
+        foreach my $tmpl ( @{ $template_list } ) {
+            my $filename = $tmpl->{name};
+            $filename =~ s/[\s=\+!@\#\$%&*()\[\]\\\/]/_/g;
+            my $new_base = "$template_dir/$filename";
+
+            # First dump the template itself, then the script information
+
+            my $template_file = "$new_base.$TMPL_EXT";
+            open( TMPL, "> $template_file" )
+                  || die "Cannot open ($template_file) for writing: $!";
+            print TMPL $tmpl->{template};
+            if ( $tmpl->{script} ) {
+                print TMPL qq(\n\n<script language="Javascript">\n),
+                           qq($tmpl->{script}\n</script>);
+            }
+            close( TMPL );
+
+            # Then do the meta information
+
+            my $meta_file = "$new_base.$META_EXT";
+            open( META, "> $meta_file" )
+                  || die "Cannot open $meta_file for writing: $!";
+            print META "name: $tmpl->{name}\n",
+                       "title: $tmpl->{title}\n",
+                       "package: $info->{name}\n",
+                       "$tmpl->{description}";
+            close( META );
+            push @{ $this_status->{msg_list} }, "Template $tmpl->{name}: dumped ok";
+        }
+        $this_status->{msg} = "directory: $template_dir\n     --" .
+                              join( "\n     --", @{ $this_status->{msg_list} } );
+        $this_status->{msg_list} = undef;
+        push @status, $this_status;
+    }
+    $R->db->disconnect;
+    return \@status;
+}
+
+
+#
+# change_spops_driver
+#
+sub change_spops_driver {
+    my ( $p ) = @_;
+
+    # Go through the packages installed to the website and find all the
+    # 'conf/spops.conf' files
+
+    my $repository = $REPOS_CLASS->fetch( undef,
+                                          { directory => $p->{website_dir} });
+    my $package_list = $repository->fetch_all_packages();
+    my @conf_files = ();
+    foreach my $pkg ( @{ $package_list } ) {
+        my $spops_file = $PKG_CLASS->find_file( $pkg, 'conf/spops.perl' );
+        push @conf_files, $spops_file if ( $spops_file );
+    }
+
+    my %status = ( changed => [], not_changed => [] );
+
+  # Now open up each spops.conf file and check the 'isa' value
+
+    foreach my $spops_file ( @conf_files ) {
+        my ( $is_changed );
+        my $spops_info = SPOPS::HashFile->new({ filename => $spops_file,
+                                                perm     => 'write' });
+        foreach my $spops_alias ( keys %{ $spops_info } ) {
+            next unless ( ref $spops_info->{ $spops_alias }{isa} eq 'ARRAY' );
+            for my $i ( 0 .. ( scalar @{ $spops_info->{ $spops_alias }{isa} } - 1 ) ) {
+                my $class_name = $spops_info->{ $spops_alias }{isa}->[ $i ];
+                if ( $class_name =~ /^SPOPS::DBI::/ ) {
+                    $spops_info->{ $spops_alias }{isa}->[ $i ] = $p->{driver};
+                    $is_changed++;
+                }
+            }
+        }
+        if ( $is_changed ) {
+            $spops_info->save;
+            push @{ $status{changed} }, $spops_file;
+        }
+        else {
+            push @{ $status{not_changed} }, $spops_file;
+        }
+    }
+    return \%status;
+}
+
+#
+# update_objects
+#
+
+sub update_objects {
+    my ( $p ) = @_;
+    my $R = initialize_request({ website_dir => $p->{website_dir},
+                                 action      => 'update objects' });
+    my $object_tag = $p->{object_tag};
+    my $class = $R->$object_tag();
+    unless ( $class ) {
+        die "Cannot find a valid class for the object you specified " .
+            "($p->{object_tag})\n";
+    }
+    my $iter = $class->fetch_iterator({ skip_security => 1 });
+
+    my $status = { count => 0, save => 0, error => [] };
+    my $id_field = $class->id_field;
+    while ( my $object = $iter->get_next ) {
+        $object->has_change;
+        eval { $object->save({ skip_security => 1, skip_log => 1,
+                               skip_cache    => 1 }) };
+        if ( $@ ) {
+            my $ei = SPOPS::Error->get;
+            push @{ $status->{error} }, "Error with ID ($object->{ $id_field }): " .
+                                        $ei->{system_msg};
+        }
+        else {
+            $status->{save}++;
+        }
+        $status->{count}++;
+    }
+    return $status;
+}
+
+
+#
+# test_db_connection
+#
+
+sub test_db_connection {
+    my ( $p ) = @_;
+    require OpenInteract::DBI;
+    my $status = { ok => 1 };
+
+    # Grab the base config, then the config object
+
+    my $bc = eval { OpenInteract::Startup->read_base_config({
+                                                dir => $p->{website_dir} }) };
+    if ( $@ ) {
+        base_config_file_error({ website_dir => $p->{website_dir},
+                                 error       => $@,
+                                 sub         => 'test_db_connection' })
+    }
+    my $C = OpenInteract::Startup->create_config({ base_config => $bc });
+
+    # Perform initial sanity checks
+
+    if ( ref $C->{db_info} ne 'HASH' ) {
+        $status->{msg} = "The key 'db_info' in your configuration must " .
+                         "be a hashref. No connection attempted.";
+    }
+    elsif ( ! scalar keys %{ $C->{db_info} } ) {
+        $status->{msg} = "You have no DBI datasources defined. No " .
+                         "onnection attempted.";
+    }
+    return $status if ( $status->{msg} );
+
+    my @msg = ();
+
+    # Initial checks are done, now scroll through each of the
+    # connection hashrefs and try to make a connection
+
+DBKEY:
+    foreach my $db_key ( keys %{ $C->{db_info} } ) {
+        my $default_status = ( $db_key eq $C->{datasource}{default_connection_db} ||
+                               $db_key eq $C->{default_connection_db} )
+                               ? " (default connection) " : '';
+        push @msg, "\nStatus of connection <<$db_key>>$default_status\n$SEP";
+        if ( ! $C->{db_info}{ $db_key }{dsn} ) {
+            $status->{ok}  = 0;
+            push @msg, "Failed. You must at least define 'dsn' in the " .
+                       "configuration information.";
+            next DBKEY;
+        }
+        my $db = eval { OpenInteract::DBI->connect( $C->{db_info}{ $db_key } ) };
+        if ( $@ ) {
+            my ( $error ) = $@ =~ /failed:\s*(.*)$/;
+            $error ||= $@;
+            if ( $@ =~ /^Connect/ ) {
+                push @msg, "-- Basic connect: failed -- $error",
+                           "-- Use database: not attempted",
+                           "-- Create table: not attempted";
+            }
+            elsif ( $@ =~ /^Use/ ) {
+                push @msg, "-- Basic connect: ok",
+                           "-- Use database: failed -- $error",
+                           "-- Create table: not attempted";
+            }
+            else {
+                push @msg, "-- Other failure: $error";
+            }
+            $status->{ok}   = 0;
+            next DBKEY;
+        }
+
+        unless ( $db and UNIVERSAL::isa( $db, 'DBI::db' ) ) {
+            push @msg, "-- Basic connect: failed (no error, but no database handle returned)",
+                       "-- Use database: not attempted",
+                       "-- Create table: not attempted";
+            $status->{ok} = 0;
+            next DBKEY;
+        }
+
+        my $test_table = 'oi_test_create';
+        push @msg, "-- Basic connect: ok",
+                   "-- Use database: ok";
+        eval { $db->do( "CREATE TABLE $test_table " .
+                        "( oi_id int not null, primary key( oi_id ) )" ) };
+        if ( $@ ) {
+            push @msg, "-- Create table: failed -- $@";
+        }
+        else {
+            push @msg, "-- Create table: ok";
+            eval { $db->do( "DROP TABLE $test_table" ) };
+            if ( $@ ) {
+                push @msg, "(NOTE: 'DROP TABLE' failed -- $@; " .
+                           "please remove table ($test_table) manually.)";
+            }
+        }
+        eval { $db->disconnect };
+        if ( $@ ) {
+            push @msg, "(NOTE: Error trying to disconnect: $@)";
+        }
+    }
+    $status->{msg} = join "\n", @msg;
+    return $status;
+}
+
+
+
+#
+# test_ldap_connection
+#
+
+sub test_ldap_connection {
+    my ( $p ) = @_;
+    require OpenInteract::LDAP;
+    my $status = { ok => 1 };
+
+    # Grab the base config, then the config object
+
+    my $bc = eval { OpenInteract::Startup->read_base_config({
+                                             dir => $p->{website_dir} }) };
+    if ( $@ ) {
+        base_config_file_error({ website_dir => $p->{website_dir},
+                                 error       => $@,
+                                 sub         => 'test_ldap_connection' })
+    }
+    my $C = OpenInteract::Startup->create_config({ base_config => $bc });
+
+    # Perform initial sanity checks
+
+    if ( ref $C->{ldap_info} ne 'HASH' ) {
+        $status->{msg} = "The key 'ldap_info' in your configuration must " .
+                         "be a hashref. No connection attempted.";
+    }
+    elsif ( ! scalar keys %{ $C->{ldap_info} } ) {
+        $status->{msg} = "You have no LDAP datasources defined. No " .
+                         "connection attempted.";
+    }
+    return $status if ( $status->{msg} );
+
+    my @msg = ();
+
+    # Initial checks are done, now scroll through each of the
+    # connection hashrefs and try to make a connection
+
+LDAPKEY:
+    foreach my $ldap_key ( keys %{ $C->{ldap_info} } ) {
+        my $default_status = ( $ldap_key eq $C->{datasource}{default_connection_ldap} ||
+                               $ldap_key eq $C->{default_connection_ldap} )
+                               ? " (default connection) " : '';
+        push @msg, "\nStatus of connection <<$ldap_key>>$default_status\n$SEP";
+        if ( ! $C->{ldap_info}{ $ldap_key }{host} ) {
+            $status->{ok}  = 0;
+            push @msg, "Failed. You must at least define 'host' in the " .
+                       "configuration information.";
+            next LDAPKEY;
+        }
+        elsif ( ! $C->{ldap_info}{ $ldap_key }{base_dn} ) {
+            $status->{ok}  = 0;
+            push @msg, "Failed. You must at least define 'base_dn' in " .
+                       "the configuration information.";
+            next LDAPKEY;
+        }
+        my $ldap = eval { OpenInteract::LDAP->connect_and_bind(
+                                                 $C->{ldap_info}{ $ldap_key } ) };
+        if ( $@ ) {
+            my ( $error ) = $@ =~ /failed:\s*(.*)$/;
+            $error ||= $@;
+            if ( $@ =~ /^Connect/ ) {
+                push @msg, "-- Basic connect: failed -- $error",
+                           "-- Bind to directory: not attempted";
+            }
+            elsif ( $@ =~ /^Bind/ ) {
+                push @msg, "-- Basic connect: ok",
+                           "-- Bind to directory: failed -- $error";
+            }
+            else {
+                push @msg, "-- Other failure: $error";
+            }
+            $status->{ok}   = 0;
+            next LDAPKEY;
+        }
+        push @msg, "-- Basic connect: ok",
+                   "-- Bind to directory: ok";
+    }
+    $status->{msg} = join "\n", @msg;
+    return $status;
+}
+
+
+#
+# create_readonly_file
+#
+
+sub create_readonly_file {
+    my ( $dir, $msg ) = @_;
+    my $no_overwrite_file = join( '/', $dir, READONLY_FILE );
+    open( NOWRITE, "> $no_overwrite_file" )
+          || _w( 0, "Could not create ($no_overwrite_file): $!" );
+    print NOWRITE $msg;
+    close( NOWRITE );
+}
+
+
+#
+# initialize_db_actions
+#
+
+sub initialize_db_actions {
+    my ( $p ) = @_;
+    my $C = OpenInteract::Startup->create_config({
+                                        website_dir => $p->{website_dir} });
+    my %handles = ();
+    require OpenInteract::DBI;
+    foreach my $db_key ( keys %{ $C->{db_info} } ) {
+        $handles{ $db_key } = eval { OpenInteract::DBI->connect(
+                                                  $C->{db_info}{ $db_key } ) };
+        die "Cannot open datasource ($db_key): $@"  if ( $@ );
+    }
+    return ( \%handles, $C );
+}
+
+
+#
+# initialize_request
+#
+
+sub initialize_request {
+    my ( $p ) = @_;
+    my $R = eval { OpenInteract::Startup->setup_static_environment(
+                                                  $p->{website_dir} ) };
+    if ( $@ ) {
+        my $bc = OpenInteract::Startup->read_base_config({
+                                             dir => $p->{website_dir} });
+        my $config_msg = ( ref $bc eq 'HASH' )
+                           ? join( '/', "$p->{website_dir}/conf", $bc->{config_file} )
+                           : 'Could not be determined';
+        my $error_msg = <<MSG;
+[oi_manage]: Failed to $p->{action}.
+
+Error: $@
+
+Configuration file used: $config_msg
+MSG
+        die $error_msg;
+    }
+    return $R;
+}
+
+
+
+sub base_config_file_error {
+    my ( $p ) = @_;
+    my $base_conf_file = OpenInteract::Startup->create_base_config_filename(
+                                                 $p->{website_dir} );
+    my $msg = "[oi_manage]: Failure! Cannot find base configuration or " .
+              "configuration is invalid. Does the file: ($base_conf_file) " .
+              "exist in your website? " .
+              "(Specific error: <$p->{error}> from routine <$p->{sub}>)";
+    die wrap( undef, undef, "$msg\n" );
+}
+
+
+
+sub print_status_line {
+    my ( $status, $opt ) = @_;
+    my $line = '';
+    if ( $status->{name} ) {
+        $line = $status->{name};
+        $line .= " ($status->{version})" if ( $status->{version} );
+        $line .= "\n"  unless ( $opt->{same_line} );
+        $line .= '  ';
+    }
+
+    $line .= ( $status->{ok} ) ? 'OK' : 'FAILED!';
+    my $indent = ( $status->{ok} ) ? '      ' : '           ';
+    $line .= ': ' . wrap( undef, $indent, $status->{msg} )   if ( $status->{msg} );
+    if ( $status->{notes} ) {
+        $line .= "\n\nNotes from Package Author (READ THESE)\n" .
+                 "$status->{notes}\n$SEP\n";
+    }
+    return $line;
+}
+
+
+
+sub _w {
+    my ( $level, @msg ) = @_;
+    return undef if ( DEBUG < $level );
+    my ( $pkg, $file, $line ) = caller;
+    my @ci = caller(1);
+    warn "$ci[3] ($line) >> ", join( ' ', @msg ), "\n";
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+oi_manage - Manage OpenInteract websites and packages
+
+=head1 SYNOPSIS
+
+oi_manage [options] [command]
+
+Administration commands:
+
+   install, upgrade, install_package
+
+Package development commands:
+
+   create_skeleton, export_package, check_package
+
+Website creator commands:
+
+   create_website, apply_package, upgrade_package,
+   remove_package, install_sql, install_template,
+   dump_template, remove_template, refresh_doc,
+   test_db, test_ldap, change_spops_driver
+
+Other commands:
+
+   initial_packages, list_packages, list_actions, list_objects
+
+For more information, run 'oi_manage --man'
+
+=head1 COMMON COMMANDS
+
+Commands by the Administrator:
+
+ install             - Install OpenInteract to base directory
+ upgrade             - Upgrade core OpenInteract packages
+ install_package     - Install package to the base
+
+Commands by the Package Developer:
+
+ create_skeleton     - Create a skeleton package for development
+ export_package      - Export package(s) to distribution file(s)
+ check_package       - Ensure that package passes initial inspection
+
+Commands by the Website Creator:
+
+ create_website      - Create a new website
+ apply_package       - Install a package from base to website
+ upgrade_package     - Upgrade a website package
+ remove_package      - Remove a package from a website
+ install_sql         - Install the SQL for packages
+ install_template    - Install package templates to the database
+ dump_template       - Dump package templates to the filesystem
+ remove_template     - Remove package templates from the database
+ refresh_doc         - Sync website docs to base installation docs
+ update_object       - Re-save all objects in a given class
+ test_db             - Test database settings in 'server.perl'
+ test_ldap           - Test LDAP settings in 'server.perl'
+ change_spops_driver - Change the SPOPS driver for your objects
+
+Other commands:
+
+ initial_packages    - List packages marked as 'initial'
+ list_packages       - List packages installed to app or base
+ list_actions        - List actions currently implemented in website
+ list_objects        - List object classes currently implemented in website
+
+=head1 COMMON OPTIONS
+
+Summary of common options:
+
+ --base_dir           OpenInteract install directory
+ --website_dir        Website install directory
+ --website_name       Website name
+ --package_dir        Directory with package subdirectories (usually devel)
+ --package_file       Distribution file containing an OpenInteract package
+ --package            List packages to operate on
+ --package_list_file  File specifying packages to operate on
+ --dump_dir           Directory to dump stuff into
+ --driver             A generic driver (DBI, SPOPS, etc.)
+ --object             An SPOPS object tag
+ --help               Display brief help
+ --man                Display full help
+
+Details:
+
+ --base_dir=/path/to/OpenInteract
+
+    Name the directory where OpenInteract is installed. You can set
+    the environment variable 'OPENINTERACT' instead of passing the
+    value on the command-line, We recommend you set this environment
+    variable for all OpenInteract users and developers.
+
+ --website_dir=/path/to/OpenInteract/website
+
+    Name the directory where an OpenInteract website is
+    installed. This directory will have the website package database
+    in the 'conf/' directory. You can set the environment variable
+    'OIWEBSITE' instead of passing the value on the command
+    line. However, setting this permanently will cause you problems,
+    so it is best to set on a temporary basis.
+
+ --website_name=MyAppName
+
+    Name of your website. Must be all one word (no underscores or
+    anything), and StudlyCaps are A-OK (in fact, recommended). Note
+    that this name becomes your perl namespace, so all your packages
+    become 'MyAppName::News' and 'MyAppName::WebLink::Handler', etc.
+
+ --package_dir=/path/to/my/devel/packages
+
+    Name the directory where you do your OpenInteract
+    development. This is used by the 'export_package' and the
+    'check_package' commands. This directory can also be where a
+    single package is -- we also look at the 'package' parameter to
+    discern which way to use 'package_dir'.
+
+ --package_file=an-oi-package-x.xx.tar.gz
+
+    OpenInteract packages are distributed in common tarballs, which
+    can be created by the 'export_package' command and installed by
+    the 'install_package' command.
+
+ --package=a,b,c,d  OR --package=a --package=b --package=d
+
+ --package_list_file=/path/to/package_list
+
+    File containing package names, one per line, without version
+    numbers or anything else. Blank lines and lines beginning with a
+    '#' are skipped. You can substitute this wherever you see
+    '--package' specified as a parameter in the discussions below.
+
+ --dump_dir=/path/to/dump/stuff
+
+    Specify a directory where you would like to dump something -- such
+    as the SQL for a package or the templates belonging to a
+    package. Dumping routines typically have a designated place for
+    this (usually the 'dump/' directory in the area pertaining to what
+    is being dumped), but sometimes you might want to put the data
+    elsewhere.
+
+ --driver=SPOPS::DBI::Pg
+
+    Specify some sort of driver -- this can be used to name an SPOPS
+    driver (such as 'SPOPS::DBI::Pg') or a DBD driver ('DBD::mysql')
+    when necessary.
+
+ --object=SPOPS-object-tag
+
+    Specify the name of an SPOPS object tag. This is not an object
+    class but rather the 'alias' by which OpenInteract can refer to an
+    object. For instance, the alias for the template objects is
+    'site_template' and the alias for the page objects stored in the
+    database is 'basic_page'.
+
+ --sql_action=(all|structure|data|security|all_data)
+
+    Specify an action to take with the 'install_sql' command. The
+    action 'all' is the default if not specified. You should not need
+    this often, if at all.
+
+Other options depend on the I<command> you choose and are listed under
+that command below.
+
+=head1 DESCRIPTION
+
+B<oi_manage> is the command-line interface for managing packages
+within OpenInteract and installing new OpenInteract websites. It is
+also useful for developers so they can export their work into a
+I<tar.gz> file for distribution, or install it into the OpenInteract
+package database.
+
+=head1 SHORTCUTS
+
+A few shortcuts that can make your life much simpler.
+
+B<Environment Variables>
+
+=over 4
+
+=item 1.
+
+Set the 'OPENINTERACT' environment variable and never type
+'--base_dir=/blah' again.
+
+=item 2.
+
+Set the 'OIWEBSITE' environment variable and never type
+'--website_dir=/blah' again.
+
+=back
+
+How to do this? If you are on a Linux machine using the I<bash> shell,
+just do:
+
+ export OPENINTERACT=/path/to/base/installation
+
+and
+
+ export OIWEBSITE=/path/to/my/website
+
+If you do not wish to type these in everytime you login, just put them
+in your '.bashrc' or equivalent. (If you do not know what '.bashrc'
+is, ask your friendly sysadmin.)
+
+B<Package Names: INITIAL>
+
+If you are working with the core set of packages necessary to make
+OpenInteract function, you should know about the 'INITIAL' keyword.
+
+The 'INITIAL' keyword can be used in place of a package name when you
+use the '--package' parameter specification. For instance, running:
+
+ oi_manage export_package --package_dir=/my/devel/oi/pkg --package=INITIAL
+
+First replaces 'INITIAL' with the list of initial packages, then runs
+the operation.
+
+You can see the list of initial packages by running:
+
+ $ oi_manage initial_packages
+
+B<Package Names: External File>
+
+If you commonly perform an operation on a number of different packages
+at once, you can store the package names in an external file and refer
+to it when you run 'oi_manage'.
+
+The file format is simple: one package name per line, blank lines and
+lines beginning with a comment ('#') are skipped. The following would
+be a valid file:
+
+ BEGIN---------------
+ # Packages I contribute to
+ news
+
+ # Packages I own and work on
+ photo_album
+ recipe_box
+ bicycle_trip
+ ---------------END
+
+Specify the file to 'oi_manage' using the '--package_list_file'
+parameter specification.
+
+=head1 COMMANDS
+
+The following tools and actions are available from B<oi_manage>:
+
+=head2 INSTALL
+
+Command: install
+
+Required options:
+
+ --base_dir=/path/to/OpenInteract
+
+Install OpenInteract. Note that you must be in the OpenInteract source
+directory to run this command. For instance, a typical installation
+might look like the following sequence:
+
+ >> tar -zxvf OpenInteract-1.01.tar.gz
+ >> cd OpenInteract-1.01
+ >> perl Makefile.PL
+ >> make
+ >> make test
+ >> make install
+ (file 'oi_manage' is now in /usr/local/bin)
+ >> /usr/local/bin/oi_manage --base_dir=/opt/OpenInteract install
+
+You should only ever need to do this once. But just in case, it might
+be a good idea to keep the initial source directory around.
+
+=head2 UPGRADE
+
+Command: upgrade
+
+ --base_dir=/path/to/OpenInteract
+
+Upgrade OpenInteract packages. Note that you must be in the
+OpenInteract source directory to run this command. For instance, a
+typical upgrademight look like the following sequence:
+
+ >> tar -zxvf OpenInteract-1.52.tar.gz
+ >> cd OpenInteract-1.52
+ >> perl Makefile.PL
+ >> make
+ >> make test
+ >> make install
+ (file 'oi_manage' is now in /usr/bin)
+ >> /usr/local/bin/oi_manage --base_dir=/opt/OpenInteract upgrade
+
+While you run the 'install' command only once, you can run the
+'upgrade' command for every new release of OpenInteract that comes
+out. All old documentation files and configuration samples are saved
+with an C<.old> suffix, but they will be overwritten (with the new old
+file) if you run the 'upgrade' command again.
+
+=head2 INITIAL PACKAGES
+
+Command: initial_packages
+
+Just lists the initial package B<oi_manage> is currently configured to
+install when given a 'create_website' command.
+
+=head2 LIST PACKAGES
+
+Command: list_packages
+
+Required options -- one of the following:
+
+ --base_dir=/path/to/OpenInteract
+ --website_dir=/path/to/my_website
+
+List the packages currently installed in a website or in the base
+OI installation.
+
+=head2 LIST ACTIONS
+
+Command: list_actions
+
+Required options:
+
+ --website_dir=/path/to/my_website
+
+Bootstrap an OpenInteract environment from the command line and
+inspect it to see what actions are created in the action table.
+
+Output includes the action name, the package the action is found in,
+and either the class and method used to call it or the template which
+implements it.
+
+This can be extremely useful if you are unsure what actions your
+website currently implements, and for ensuring that you do not chose
+an action for your new package that is already in use elsewhere.
+
+=head2 LIST OBJECTS
+
+Command: list_objects
+
+Required options:
+
+ --website_dir=/path/to/my_website
+
+Bootstrap an OpenInteract environment from the command line and
+inspect it to see what SPOPS objects can be created in the
+environment.
+
+Output is simply the aliases by which the object class are known
+(frequently just one) and the class implementing the object.
+
+=head2 CREATE SKELETON
+
+Command: create_skeleton
+
+Required options:
+
+ --package=mypackagename
+ --base_dir=/path/to/OpenInteract
+
+Creates skeleton package(s) in your current directory for
+development.
+
+This includes:
+
+=over 4
+
+=item *
+
+The necessary directories
+
+=item *
+
+An initial C<package.conf> file
+
+=item *
+
+A documentation template and index
+
+=item *
+
+Commented sample C<conf/spops.perl> and C<conf/action.perl>,
+configuration files
+
+=item *
+
+Commented sample C<OpenInteract/SQLInstall> file
+
+=item *
+
+Commented sample template files in C<template/dummy.meta>, and
+C<template/dummy.tmpl>
+
+=item *
+
+A starter changelog (Changes) and
+
+=item *
+
+A working MANIFEST file along with MANIFEST.SKIP with common patterns
+for files not to include in the MANIFEST.
+
+=back
+
+If you specify multiple packages, multiple directories will be created
+in your current directory.
+
+=head2 EXPORT PACKAGE
+
+Command: export_package
+
+You can run this one of two ways:
+
+=over 4
+
+=item 1.
+
+Export a single package by changing to its directory and running this
+command without any parameters.
+
+=item 2.
+
+Specify the following parameters for multiple packages:
+
+ --package_dir=/path/to/my/packages
+ --package=x (at least one)
+
+All packages you specify that the command can find in the
+'package_dir' directory will get distributions created.
+
+=back
+
+This is a utility for people developing new packages for
+OpenInteract. Some might consider it a Bad Idea to develop packages
+under the base OpenInteract/pkg directory -- for new uninstalled packages
+it is not a problem, but once you start doing that you start working
+on packages in-place, and before you know it everything it out of
+whack. Best not go there.
+
+So what this utility does is peek into a directory for a
+'package.conf' file. This is a simple file with information about your
+package in a simple format. Here is an example:
+
+ name           MyKillerApp
+ version        1.14
+ dependency     YourKillerApp 1.20
+ dependency     TheirLameApp  0.89
+ author         Zippy Doodad (zippy@doodad.com)
+ author         Bolt (bolt@uno.com)
+ url            http://mykillerapp.com/
+ sql_installer  OpenInteract::SQLInstall::MyKillerApp
+ description
+ This package implements what everybody -- especially the town of
+ Ottumwa, Iowa -- thinks is a KillerApp. You will too.
+
+So we read in configuration and ensure you have the required
+fields. (Currently, the fields 'name', 'version' and 'author' are
+required, although no validation is performed on them.)
+
+If the configuration file passes muster, we then check out the
+MANIFEST that accompanies your package. MANIFEST lists the files that
+should be distributed with your package.
+
+If 'export_package' finds any files in MANIFEST not in the directory
+or if it finds files in the directory B<not> specified in MANIFEST, it
+will give you a warning but still create the distribution. You then
+have the option of distributing your package as-is (probably a bad
+idea, but you might have your reasons) or fixing the problem and
+re-creating the distribution. You can go through this process as many
+times as necessary since the 'export_package' command does not change
+any information in your package.
+
+You may also specify a MANIFEST.SKIP file that determines which files
+should not be compared to the MANIFEST to ensure that you do not have
+any extra files floating around. Each line in the MANIFEST.SKIP file
+is a regular expression matching files that should B<not> be included
+in MANIFEST. For example, if you specify in MANIFEST.SKIP:
+
+ \bCVS\b
+
+Then when this command finds files matching this pattern (all your CVS
+directories) in your package directory, it will not complain and tell
+you there are extra files in the directory.
+
+(Since we use L<ExtUtils::Manifest|ExtUtils::Manifest> to manipulate
+the MANIFEST file, including the MANIFEST.SKIP file, you might find it
+helpful to read more about it.)
+
+The command 'create_skeleton' creates a default MANIFEST and
+MANIFEST.SKIP for you, although it is your responsibility to add your
+files to MANIFEST and your exclusion patterns to MANIFEST.SKIP after
+that.
+
+Once we get this file and directory listing, we use them to create a
+B<distribution file> -- just a '.tar.gz' file conforming to certain
+standards -- suitable for installation in another OpenInteract
+installation with the 'install_package' command.
+
+=head2 CHECK PACKAGE
+
+Command: check_package
+
+Required options:
+
+One of the following:
+
+=over 4
+
+=item 1.
+
+None (check the package in the current directory)
+
+=item 2.
+
+Check the package in a particular directory:
+
+ --package_dir=/path/to/my/devel/package
+
+=item 3.
+
+Check one or more packages in a particular website:
+
+ --website_dir=/path/to/my_website
+ --package=x (at least one)
+
+=item 4.
+
+Check one or more packages in the installation directory.
+
+ --base_dir=/path/to/OpenInteract
+ --package=x (at least one)
+
+=back
+
+This command checks that a package has the bare necessities and that
+the files at least pass some basic sanity checks.
+
+Files we check:
+
+ Changes
+ package.conf
+ conf/*.perl
+ *.pm
+ <website-name>/*.pm (if this is a website)
+
+We also ensure that the files found in MANIFEST are all there give you
+a warning if there are extra files in the directory not found in
+MANIFEST.
+
+It is probably a good idea to always run this before you send a
+package to someone else. (Commands like this usually spring from the
+embarrassment of someone else, so learn the lesson :)
+
+This leads to the common idiom of:
+
+ > ... work on package ...
+
+ > cd /my/package/devel/dir
+
+ > oi_manage check_package
+ (all is ok)
+
+ > oi_manage export_package
+
+ > scp mypkg-1.21.tar.gz me@mywebste:/home/httpd/pkg
+
+ > ...
+
+=head2 INSTALL PACKAGE
+
+Command: install_package
+
+Required options:
+
+ --base_dir=/path/to/OpenInteract
+ --package_file=/path/to/package-x.xx.tar.gz
+
+Installs a package from a B<distribution file>, which are just tar.gz
+files with the package information in them. The steps to install the
+package include:
+
+=over 4
+
+=item *
+
+Unpack the distribution and determine the package name and version
+
+=item *
+
+See if that package and version are already installed
+
+=item *
+
+Copy the files to the base OpenInteract directory
+
+=item *
+
+Install the package information to the OpenInteract package database
+
+=back
+
+=head2 CREATE WEBSITE
+
+Command: create_website
+
+Required options:
+
+ --website_name=MyAppName
+ --website_dir=/path/to/my_website
+ --base_dir=/path/to/OpenInteract
+
+Creates a new directory for your website and all the necessary
+subdirectories, so ensure that 'website_dir' does not exist
+yet.
+
+This command also copies over configuration files and replaces various
+keys with ones specific to your website. The program creates a
+simple stash class for you as well as installs the base packages
+necessary for OpenInteract to function.
+
+After running this command, you typically have to only edit some
+configuration files and your website can be up and running! See
+the file C<INSTALL.website> distributed with 0penInteract for
+more information.
+
+=head2 TEST DB
+
+Command: test_db
+
+Required options:
+
+ --website_dir=/path/to/my_website
+
+Tests whether you can establish a connection to all the databases for
+which you have specified parameters in the C<conf/server.perl>
+configuration file. Also test whether the user specified in each
+configuration can create a table. This is generally a good indicator
+of whether the user will have sufficient permissions to run
+OpenInteract, since a user who can create tables typically has full
+read/write privileges to the tables created by the account.
+
+***NOTE***
+
+Just because your database connection works from the command line does
+B<NOT> mean that it will automatically work from your web
+server. Hopefully (for security purposes), your web server runs under
+a user with minimal permissions. This can affect shared library and
+other types of access. In addition, your command-line environment
+might be set up properly to connect to your database while the web
+server environment is not. More is in the entry: I<When I run a perl
+script from the command line, it works, but, when I run it under the
+httpd, it fails!  Why?> in L<DBI::FAQ|DBI::FAQ>.
+
+=head2 TEST LDAP
+
+Command: test_ldap
+
+Required options:
+
+ --website_dir=/path/to/my_website
+
+Test whether you can establish a connection and bind to all the LDAP
+directories for which you have specified parameters in the
+C<conf/server.perl> configuration file.
+
+=head2 REFRESH DOC
+
+Command: refresh_doc
+
+Required options:
+
+ --website_dir=/path/to/my_website
+
+Refreshes documentation to match that in the base installation
+directory. Run this if your sysadmin has installed a new OpenInteract
+version or has downloaded updated documentation for you to use.
+
+The newly refreshed documentation should be immediately available on
+your website at the URL:
+
+ http://mysite.com/oi_docs/
+
+You can also get to it through the 'System Documentation' link found
+in the 'Admin Tools' box.
+
+=head2 REFRESH WIDGET
+
+Command: refresh_widget
+
+Required options:
+
+ --website_dir=/path/to/my_website
+
+Refreshes the template widgets in your website to match the ones in
+the base installation. Note that your old widgets will be renamed to
+'$NAME.old'.
+
+Run this if your sysadmin has installed a new OpenInteract version or
+has downloaded updated widgets for you to use.
+
+The newly refreshed widgets will be available to you immediately on
+the next mod_perl restart, or if the server is not restarted then
+whenever the template cache expires.
+
+You will probably not need this as often as 'refresh_doc' since
+widgets tend to get customized quite heavily.
+
+=head2 APPLY PACKAGE
+
+Command: apply_package
+
+Required options:
+
+ --website_dir=/path/to/my_website
+ --package=x (at least one)
+
+Applies a package from the installed base of packages in OpenInteract
+to your website. (The package must have first been installed with
+'install_package', although future versions of OpenInteract may allow
+you to install a package to a website only.) This includes
+localizing all the files (changing the namespace from 'OpenInteract::'
+to 'MyApp::') and copying all the templates, SQL structures and
+default data/security to your website directory.
+
+APPLYING THE PACKAGE DOES **NOT** INSTALL THE SQL FOR YOU. SEE
+L<INSTALL SQL>.
+
+This option will by default apply the latest version of the available
+package for you. Applying earlier versions is not yet supported.
+
+=head2 REMOVE PACKAGE
+
+Command: remove_package
+
+Required options:
+
+ --website_dir=/path/to/my_website
+ --package=x (at least one)
+
+Removes the package from the website. Note that we do B<not>
+currently support removing the files associated with the package, or
+the templates in the database that belong to the package. If you want
+to truly eradicate your package, you should do the following:
+
+ >> oi_manage --package=mypackage \
+              --website_dir=/path/to/my_website \
+              remove_template
+ >> oi_manage --package=mypackage \
+              --website_dir=/path/to/my_website \
+              remove_package
+ >> cd /path/to/my_website/pkg
+ >> rm -rf mypackage-x.xx
+
+=head2 UPGRADE PACKAGE
+
+Command: upgrade_package
+
+Required options:
+
+ --website_dir=/path/to/my_website
+ --package=x (at least one)
+
+Upgrades a package from the base installation to a website. For
+instance, if your website has the package 'classified-1.04' and
+the base installation has the package 'classified-1.11', then you can
+simply do:
+
+ >> oi_manage --website_dir=/path/to/my_website --package=classified \
+              upgrade_package
+
+Note that the files from the older version of your package are kept
+intact, but they are no longer used. This program does not currently
+support the more complicated task of trying to find the differences
+between your files and the new files -- you are left to your own
+devices.
+
+NOTE: As of OpenInteract 1.41, you can place your templates in a
+subdirectory of the site-wide template directory and maintain them
+throughout package upgrades. For instance, if you are editing
+templates in the package 'recipe_box', you can place your templates
+in:
+
+ $WEBSITE_DIR/template/recipe_box/recipe_listing.tmpl
+ $WEBSITE_DIR/template/recipe_box/recipe_detail.tmpl
+ $WEBSITE_DIR/template/recipe_box/recipe_form.tmpl
+ ...
+
+And when you run an 'upgrade_package' these templates will not be
+overwritten and will continue to be used by the new package.
+
+=head2 CHANGE SPOPS DRIVER
+
+Command: change_spops_driver
+
+Required options:
+
+ --website_dir=/path/to/my_website
+ --driver=SPOPS::Driver::To::Use
+
+Modifies the SPOPS driver used for all the objects in your
+website. OpenInteract ships with all objects configured for the MySQL
+database. You can see this in the 'isa' configuration for the object,
+like this configuration from the User object class:
+
+    ...,
+    'object_name' => 'User',
+    'isa' => [
+      'OpenInteract::SPOPS',
+      'SPOPS::Utility',
+      'SPOPS::Secure',
+      'SPOPS::DBI::MySQL',
+      'SPOPS::DBI'
+    ],
+    ...,
+
+For this, we would replace L<SPOPS::DBI::MySQL|SPOPS::DBI::MySQL> with
+the appropriate SPOPS driver. This will normally take the form
+C<SPOPS::DBI::xxxx>. For example:
+L<SPOPS::DBI::Sybase|SPOPS::DBI::Sybase> or
+L<SPOPS::DBI::Pg|SPOPS::DBI::Pg>.
+
+NOTE: You can accomplish this same task in a more permanent way by
+editing the global override options file for SPOPS. See
+L<OpenInteract::Config::GlobalOverride|OpenInteract::Config::GlobalOverride>
+for details.
+
+=head2 UPDATE OBJECTS
+
+Command: update_object
+
+Required options:
+
+ --website_dir=/path/to/my_website
+ --object=SPOPS-object-tag
+
+This action fetches all instances of a particular object class and
+saves them. This is useful if you have implemented a schema change
+that needs a C<save()> to activate a trigger which fills data.
+
+For instance, a 'last_update' field gets triggered by a save -- by
+running this action you automatically set all objects to a known
+value. Another example would be if your objects use the indexing
+feature of the full_text package -- just run this action and the index
+will be automatically updated.
+
+Output is the number of objects touched, saved successfully and any
+errors encountered.
+
+=head1 SQL COMMANDS
+
+One of the difficulties in any website framework is getting data
+into the framework from somewhere else and getting data out of the
+framework to somewhere else.
+
+OpenInteract provides a flexible framework for the first and the
+seedlings of something for the second. Exporting data into the format
+used by OpenInteract is on the list of things to do and has a
+relatively high priority, although your help could push it over the
+top!
+
+=head2 INSTALL SQL
+
+Command: install_sql
+
+Required options:
+
+ --package=x (at least one)
+ --website_dir=/path/to/my_website
+
+Other options:
+
+ --sql_action=(all|structure|data|security|all_data)
+
+This command goes through a list of packages and installs the initial
+tables and data for each one. It is also empowered to run perl scripts
+that set initial security or do other tasks.
+
+Generally, this works by each package creating an I<Installer Class>
+that is used by
+L<OpenInteract::SQLInstall|OpenInteract::SQLInstall>. The dispatching
+class provides a number of tools for the implementing class so that
+each package does not need to do terribly much. However, if the
+package B<needs> to do quite a bit of customization, it can.
+
+Please see the L<OpenInteract::SQLInstall|OpenInteract::SQLInstall>
+module for more information on how this whole process works.
+
+Also, note that experts -- people who know what they are doing -- can
+specify only parts of the process to run. Again, you should do this
+only if you have a good reason. As an example, you can only run the
+security installation for a particular package like this:
+
+ $ oi_manage install_sql --package=mypkg --sql_action=security
+
+The options for the C<--sql_action> parameter are:
+
+=over 4
+
+=item *
+
+B<all>: Run all three steps. This is the default, and most people will
+never need to specify an action.
+
+=item *
+
+B<structure>: Only install the tables, no data or security.
+
+=item *
+
+B<data>: Only install the data, no tables or security. Note that this
+may leave your setup in an inconsistent state, since you may have data
+not accessible due to lack of security settings.
+
+=item *
+
+B<security>: Only install the security for the data.
+
+=item *
+
+B<all_data>: Run both the 'data' and 'security' steps, but do not
+install the tables.
+
+=back
+
+=head2 DUMP SQL
+
+Command: dump_sql
+
+Required options:
+
+ --package=x (at least one)
+ --website_dir=/path/to/my_website
+
+Useful option:
+
+ --dump_dir=/path/to/dump/sql
+
+Dumps data from the tables and security used by the website into a
+number of files. If 'dump_dir' is specified the files will go there;
+if not, they will go into the 'data/dump/' directory under the
+package specified in the 'website_dir'.
+
+This is still under development. How this will work:
+
+=over 4
+
+=item *
+
+You define parameters in the SQLInstall class for your package that
+determines how you want to dump certain data.
+
+=item *
+
+After running the command in this script, you will have a set of files
+in the C<dump/> subdirectory of one or both of the C<data/> and
+C<struct/> package subdirectories. (Or in the 'dump_dir' that you
+choose) These files can be distributed with the package and used to
+install data on other OpenInteract installations.
+
+=back
+
+=head1 TEMPLATE COMMANDS
+
+This script should help with the whole template editing
+process. Editing templates via the browser interface can be
+tedious. HTML interfaces are, shall we say, not very robust for
+dealing with most data. (Now, if we can only get XEmacs embedded as a
+Mozilla widget for the TEXTAREA item...)
+
+Anyway, most people will naturally prefer editing templates in their
+favorite editor -- say, XEmacs -- and we would like to encourage such
+productive behavior. We support this in two ways:
+
+B<Calling Templates>
+
+This is covered elsewhere, but worth mentioning here. When you call a
+template with a last parameter like the following:
+
+ { db => 'my_template_name', package => 'my_pkg' }
+
+The system first looks in the database for a template with the given
+name. If it is not found, it then looks to the filesystem in the
+specified package. If it is not found there, the system raises an
+error which is displayed onscreen.
+
+What this means is that you can start creating your templates using
+files -- test them, go through umpteen iterations of input-view-debug
+until everything is stable, then add the template to the database for
+performance reasons. You can still update the template from there, but
+the editing cycle once the template is in the database is stretched
+out. (At least for now it is.)
+
+There are two commands to let you transfer templates between the
+filesystem and the database, and one to remove them from the database
+altogether.
+
+=head2 INSTALL TEMPLATE
+
+Command: install_template
+
+Required options:
+
+ --package=x (at least one)
+ --website_dir=/path/to/my_website
+
+Each package has its own directory for templates, and you can choose
+to transfer these files into the database at any time. You can even do
+so once the templates are already in the database -- the system will
+first check to see if a template exists and update its information
+before creating an entirely new one.
+
+Note that all templates require a 'tmpl' file and a 'meta' file. A
+typical 'tmpl' file might be:
+
+ Typical Template File
+ ==============================
+ [% IF user %]
+
+ [%- label = 'User Info'  IF not label -%]
+
+ <table border="0" cellpadding="1" bgcolor="[% th.box_border_color %]"
+        cellspacing="0" width="[% th.box_width %]">
+ <tr><td><font size="+1" color="[% th.box_label_font_color %]">
+     <b>[% label %]</b>
+ </font></td></tr>
+ <tr><td>
+
+   <table border="0" width="100%" cellpadding="4"
+          bgcolor="[% th.box_bgcolor %]" cellspacing="0">
+   <tr><td align="left">
+     <font size="-1" color="[% tg.box_font_color %]">
+      <b>[% user.first_name %] [% user.last_name %]</b> ([% user.login_name %])<br>
+     </font>
+   </td></tr>
+   <tr><td align="right"><font size="-1">
+     <a href="/User/show/?user_id=[% user.user_id %]">Edit my info</a> |
+     <a href="/NoTmpl/Logout/?return=[% return_url %]">Logout</a>
+   </font></td></tr>
+   </table>
+
+ </td></tr>
+ </table>
+
+ [% END %]
+ ==============================
+
+And its accompanying 'meta' file might be:
+
+ Typical Meta File
+ ==============================
+ name: user_info_box
+ title: Box that shows login user information
+ package: base_component
+ Parameters for this component:
+ --user: the user object (returns nothing if it does not exist)
+ --return_url: URL of the current page, which we will come back to if
+ the user logs out
+ --label: What is the label for the box? (default: 'User Info')
+ ==============================
+
+We use the information in the 'meta' file to name or location template
+object when we install the templates.
+
+=head2 DUMP TEMPLATE
+
+Command: dump_template
+
+Required options:
+
+ --package=x (at least one)
+ --website_dir=/path/to/my_website
+
+Useful option:
+
+ --dump_dir=/path/to/dump/stuff
+
+Dumps the templates for a package from the database to the
+filesystem. If you do not specify a 'dump_dir', all dumped templates
+are stored in the directory within a package 'template/dump/' rather
+than just 'template/'. (What you do with the templates after that is
+your business.)
+
+=head2 REMOVE TEMPLATE
+
+Command: remove_template
+
+Required options:
+
+ --package=x (at least one)
+ --website_dir=/path/to/my_website
+
+Removes all templates in the specified package(s) from the database
+used by 'website_dir'.
+
+=head2 OTHER METHODS
+
+If you are adding functionality to this script, these methods can be
+useful.
+
+B<initialize_db_actions( $website_dir, $action )>
+
+This method initializes OpenInteract without mod_perl, reading in the
+configuration, creating an
+L<OpenInteract::Request|OpenInteract::Request> object and connecting
+the database specified in the configuration.
+
+Note that this creates the B<whole> environment -- SPOPS classes are
+created and everything.
+
+Return value is an L<OpenInteract::Request|OpenInteract::Request>
+object ($R).
+
+B<print_status_line>
+
+Display information from a 'status' record. Each status record is a
+hashref which can have the following keys:
+
+ ok
+   True if status is ok, undef/0 otherwise
+
+ name
+   Name of the package
+
+ version
+   Version of the package
+
+ msg
+   Message to accompany status (gets displayed whether status is 'ok'
+   or not)
+
+=head1 EXAMPLES
+
+Some quick examples:
+
+Installing OpenInteract for the first time, to the directory
+'/opt/OpenInteract':
+
+ >> tar -zxvf OpenInteract-1.01.tar.gz
+ >> cd OpenInteract-1.01
+ >> perl Makefile.PL
+ >> make
+ >> make test
+ >> make install
+ >> /usr/local/bin/oi_manage --base_dir=/opt/OpenInteract install
+
+Create a new website:
+
+ >> /usr/local/bin/oi_manage --website_dir=~/OIApp \
+       --website_name=MyOIApp \
+       --base_dir=/opt/OpenInteract create_website
+
+Install a package to the OpenInteract installation directory with a
+file you have downloaded:
+
+ >> /usr/local/bin/oi_manage --base_dir=/opt_OpenInteract \
+       --package_file=/tmp/downloadedpackage-1.41.tar.gz \
+       install_package
+
+Then apply the new package to your website:
+
+ >> /usr/local/bin/oi_manage --website_dir=~/OIApp \
+       --package=downloadedpackage apply_package
+
+Create a new skeleton directory for a package you will develop:
+
+ >> cd ~/OpenInteract
+ >> /usr/local/bin/oi_manage --package=mydevelpackage \
+       create_skeleton
+
+After you have worked on your new package, you want to create a
+distribution file. First, run a check on the package:
+
+ >> /usr/local/bin/oi_manage \
+       --package_dir=~/OpenInteract/mydevelpackage \
+       check_package
+
+If everything looks ok, then export it to a .tar.gz
+
+ >> cd ~/OpenInteract/mydevelpackage
+ >> /usr/local/bin/oi_manage export_package
+
+Install it to the main OpenInteract installation:
+
+ >> /usr/local/bin/oi_manage --base_dir=/opt_OpenInteract \
+       --package_file=~/OpenInteract/mydevelpackage/mydevelpackage-0.01.tar.gz \
+       install_package
+
+And then apply it to your website:
+
+ >> /usr/local/bin/oi_manage --website_dir=~/OIApp \
+       --package=mydevelpackage apply_package
+
+List the website packages to make sure it is there:
+
+ >> /usr/local/bin/oi_manage --website_dir=~/OIApp list_packages
+
+You might want to bring its templates into the website database:
+
+ >> /usr/local/bin/oi_manage --website_dir=~/OIApp \
+       --package=mydevelpackage install_template
+
+And then create the SQL structures:
+
+ >> /usr/local/bin/oi_manage --website_dir=~/OIApp \
+       --package=mydevelpackage install_sql
+
+Moving to a new database -- change the SPOPS classes:
+
+ >> /usr/local/bin/oi_manage --website_dir=~/OIApp \
+       --driver=SPOPS::DBI::Pg change_spops_driver
+
+=head1 TO DO
+
+B<Put this into a module>
+
+The functionality in B<oi_manage> needs to be put into a module
+(likely 'OpenInteract::Manage') and oi_manage modified to simply call
+the methods of that module. This would make it fairly simple to create
+a web front-end to the functions as well. This would make Nate happy
+and would save people from reading this huge (but relatively
+well-organized) script.
+
+B<Progress Indicator>
+
+When you are doing actions on multiple packages -- installing
+OpenInteract, creating a website, etc. -- you do not get feedback as
+the action is happening but rather everything at the end. (See
+Term::ProgressBar for a possible implementation...)
+
+B<Friendly Dependency Finder>
+
+At install_package time, inspect the modules used by the package --
+list_module.dat, ISA, etc. If we find one that is not installed, ask
+the user if he/she would like to install it and use CPAN to do so.
+
+B<File Verification>
+
+Integrate MD5 checksum verification into the system for each file as
+well as for the package distribution on the whole.
+
+B<SQL: Create an Equivalent Dumper>
+
+It would be nice to have a database-independent data dumping program
+that put the data into the format used by
+C<OpenInteract::SQLInstall>. This actually should not be too hard,
+since the format is pretty simple. We might need to add information to
+the object (in C<spops.perl>) so that it can tell which fields are
+'class' fields or other fields that need to be transformed.
+
+=head1 BUGS
+
+None known.
+
+=head1 SEE ALSO
+
+L<OpenInteract::PackageRepository|OpenInteract::PackageRepository>
+
+L<OpenInteract::Package|OpenInteract::Package>
+
+L<OpenInteract::SQLInstall|OpenInteract::SQLInstall>
+
+L<OpenInteract::Startup|OpenInteract::Startup>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2001 intes.net, inc.. All rights reserved.
+
+This script is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=head1 AUTHORS
+
+Chris Winters <chris@cwinters.com>
+
+Christian Lemburg <lemburg@aixonix.de> suffered through early
+versions of this installer and package management system and offered
+insightful feedback.
+
+Nate Haas <nateh@intes.net> and Marcus Baker <mbaker@intes.net> also
+worked with early versions of this installer and provided many helpful
+usability, documentation and functionality comments.
+
+=head1 REVISION
+
+Revision: $Revision: 1.68 $
+
+=cut

@@ -1,0 +1,32 @@
+- Roles:
+
+    cmd_role 'role_name' => (
+        abbrev  => 1,
+        optargs => sub {
+        },
+    );
+
+    subcmd 'App::foo::bar' => (
+        with    => 'role_name',
+        optargs => sub {
+
+            # cmd specific
+        },
+    );
+
+- Do not inherit options from parent commands?
+
+- An Enum type
+    opt things => (
+        isa     => 'Enum',
+        valid   => [qw/one two three/],
+        comment => 'only allows set values',
+    );
+
+- Lots of error checking
+    - No more args after SubCmd
+    - Arg/Opt name same as existing
+    - Use X->new_from(%parameters) in place of BUILDARGS
+    - Croak when two greedy arguments are defined
+
+- Why doesn't CARP_NOT work?

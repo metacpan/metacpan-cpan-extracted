@@ -1,0 +1,103 @@
+---
+abstract: 'Yet another DarkPAN manager.'
+author:
+  - 'tokuhirom <tokuhirom@gmail.com>'
+build_requires:
+  File::Touch: '0'
+  File::Which: '0'
+  PAUSE::Packages: '0'
+  Test::More: '0.98'
+  Test::RequiresInternet: '0.02'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.9, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: OrePAN2
+no_index:
+  directory:
+    - t
+    - xt
+    - tools
+    - test-dist
+provides:
+  OrePAN2:
+    file: lib/OrePAN2.pm
+    version: '0.46'
+  OrePAN2::Auditor:
+    file: lib/OrePAN2/Auditor.pm
+  OrePAN2::CLI::Indexer:
+    file: lib/OrePAN2/CLI/Indexer.pm
+  OrePAN2::CLI::Inject:
+    file: lib/OrePAN2/CLI/Inject.pm
+  OrePAN2::Index:
+    file: lib/OrePAN2/Index.pm
+  OrePAN2::Indexer:
+    file: lib/OrePAN2/Indexer.pm
+  OrePAN2::Injector:
+    file: lib/OrePAN2/Injector.pm
+  OrePAN2::Repository:
+    file: lib/OrePAN2/Repository.pm
+  OrePAN2::Repository::Cache:
+    file: lib/OrePAN2/Repository/Cache.pm
+requires:
+  Archive::Extract: '0.72'
+  Archive::Tar: '0'
+  CPAN::Meta: '2.13156'
+  Class::Accessor::Lite: '0.05'
+  Digest::MD5: '0'
+  File::Path: '0'
+  File::Temp: '0'
+  File::pushd: '0'
+  Getopt::Long: '2.39'
+  HTTP::Tiny: '0'
+  IO::File::AtomicChange: '0'
+  IO::Socket::SSL: '1.42'
+  IO::Uncompress::Gunzip: '0'
+  IO::Zlib: '0'
+  JSON::PP: '0'
+  LWP::UserAgent: '0'
+  List::Compare: '0'
+  MetaCPAN::Client: '2.000000'
+  Moo: '1.007000'
+  MooX::Options: '0'
+  Parse::CPAN::Meta: '1.4414'
+  Parse::CPAN::Packages: '2.39'
+  Parse::LocalDistribution: '0.14'
+  Parse::PMFile: '0.29'
+  Path::Tiny: '0'
+  Pod::Usage: '0'
+  Ref::Util: '0'
+  Try::Tiny: '0'
+  Type::Params: '0'
+  Types::URI: '0'
+  autodie: '0'
+  parent: '0'
+  perl: '5.008005'
+  version: '0.9912'
+resources:
+  bugtracker: https://github.com/tokuhirom/OrePAN2/issues
+  homepage: https://github.com/tokuhirom/OrePAN2
+  repository: git://github.com/tokuhirom/OrePAN2.git
+version: '0.46'
+x_authority: cpan:TOKUHIROM
+x_contributors:
+  - 'Shoichi Kaji <skaji@outlook.com>'
+  - 'Masahiro Honma <hiratara@cpan.org>'
+  - 'Chad Granum <exodist7@gmail.com>'
+  - 'Songmu <y.songmu@gmail.com>'
+  - 'moznion <moznion@gmail.com>'
+  - 'Ichito Nagata <i.nagata110@gmail.com>'
+  - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
+  - 'Ivan Bessarabov <ivan@bessarabov.ru>'
+  - 'Shoichi Kaji <skaji@cpan.org>'
+  - 'Chris Weyl <cweyl@alumni.drew.edu>'
+  - 'Seth Daniel <seth.daniel@openx.com>'
+  - 'Mickey Nasriachi <mickey@cpan.org>'
+  - 'Gregory Oschwald <goschwald@maxmind.com>'
+  - 'E. Choroba <choroba@matfyz.cz>'
+  - 'Olaf Alders <olaf@wundersolutions.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

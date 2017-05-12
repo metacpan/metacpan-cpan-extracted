@@ -1,0 +1,33 @@
+TODO / whishlist for Perl extensions
+  OpenOffice::OOBuilder
+  OpenOffice::OOCBuilder
+
+This list is certainly not complete.
+
+TODO - OOBuilder
+  - get_meta : best way to return it: array, hash or ?
+  - getters for active style
+    not yet implemented because in the future we will probably add
+    ways to get the style of a specifique cell or location
+    maybe we also add the possibility to read an existing document, and make
+    changes to it. This all makes that we have to be careful about this.
+  - Extra setters/getters for meta.xml
+     <dc:language>en-US</dc:language>
+     <meta:editing-cycles>1</meta:editing-cycles>
+     <meta:editing-duration>PT0S</meta:editing-duration>
+      Statistical Data (after meta:user-defined...)
+  - write_styles & write_settings (also getters/setters for this ?)
+  - set page size and page headers
+
+TODO - OOCBuilder
+  - row styles
+  - numeric styles / cell format
+  - cell-format ? (seems with numeric styles, not possible in cell directly)
+  - defrowheight : default row height
+  - in sub set_sheet_name : process name: check valid characters and length ?!
+  - in sub set_colwidth : do we need to check $width ?
+  - set autofilter ?
+
+TESTS
+  - test if zip is available
+  - writing tests

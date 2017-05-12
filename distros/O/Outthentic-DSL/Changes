@@ -1,0 +1,126 @@
+0.2.8 2016-12-27
+
+* fixed bug empty message in within expressions
+
+0.2.7 2016-12-25
+
+* a few minor doc changes for occasional bugs appeared right after 0.2.6
+
+0.2.6 2016-12-25
+
+* documentation release ( made a lot of improvements )
+* added examples/ directory with explanatory code
+* fix for comments in the end of regexps and plain checks
+
+
+0.2.5 2016-12-24
+
+* fixed issues for multiline expressions in validate parser ( third iteration )
+
+0.2.4 2016-12-24
+
+* fixed issues for multiline expressions in validate parser ( second iteration )
+
+0.2.3 2016-12-23
+
+* fixed issues for multiline expressions in validate parser
+
+0.2.2 2016-12-22
+
+* fix for regexps / plain check with trailing spaces
+
+0.2.1 2016-12-22
+
+* fix for inc/Module/Install.pm missed
+
+0.2.0  2016-12-22
+
+* breaking changes - last line in miltiline back slashed expressions should be '\'
+* backported fixes and merged refactored code from Outhentix::DSL
+
+0.1.4 2016-05-05
+
+* asserts - Ruby true|false to Perl 1|0 conversion
+* code and generator handlers changed - external runner modified to allow run Ruby stories with/wo bundler
+
+0.1.3 2016-05-01
+
+* require JSON in dependencies
+
+0.1.2 2016-04-29
+
+* minor documentation changes
+
+
+0.1.1 2016-04-29
+
+* many (hopefully back compatible :) changes concerning integration with Outthentic of version 0.1.*
+* adding asserts expressions
+* documentation improved, cleared and expanded
+
+0.1.0 2016-04-21
+
+* here documents as alternative for back slash delimiters for multiline strings
+* limited support for various languages! Wow!
+
+
+0.0.12 2016-04-03
+
+Generators, validators, code blocks - print evaled code in human friendly manner for easy troubleshooting
+
+0.0.11 2016-03-25
+
+Outthentic::DSL::Context::Range::update_stream bugfix ( it was hard to find though ;-)
+
+0.0.10 2016-03-18
+
+some debug messages are shown at higher level of debug_mod variable
+
+0.0.9 2016-02-15
+
+Improved documentation again
+
+0.0.8 2016-02-15
+
+Improved documentation
+
+0.0.7 2016-02-15
+
+Added Name Outthentic::DSL section to pod to make pod doc  browserable in metacpan
+
+0.0.6 2016-02-15
+
+* ranges expressions !
+* huge refactoring -  context modificators are moved into dedicated classes
+* a big informal introduction started
+
+
+0.0.5 2016-30-01
+
+* TAP output - removes `\r` symbols from matching lines ( within: mode ) to fix broken TAP on linux environment 
+
+0.0.4 2015-11-14
+
+* update context: add some debug messages for debug level >=2
+* block_mode bug fix
+
+0.0.3 2015-11-08
+
+* huge release
+* new features:
+    * within
+    * validator
+    * api clients
+* a lot of refactoring
+* a lot of documentation changes
+* asserts now are not generated in place but returned by \`result' method
+
+0.0.2 2015-10-29
+
+* documentation created
+* various small fixes
+
+0.0.1 2015-10-28
+
+* first cpan release
+

@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<SITE ID="Qvc">
+
+<NAME Lang="en-us">iQVC Shopping</NAME>
+<INFO Lang="en-us">online shopping price list</INFO>
+
+<URL Type="Start"><![CDATA[
+http://www.qvc.com/scripts/Search.dll?SearchItemNumber=&MfrName=_QUERY_&Criteria=&TargetPrice=&AdvName=Search
+]]></URL>
+
+
+
+<TEMPLATE><![CDATA[
+<TD VALIGN=TOP WIDTH=360 ALIGN=LEFT>_<A HREF="_URL_">_TITLE_</A>_PREVIEW_<BR>_
+]]></TEMPLATE>
+</SITE>

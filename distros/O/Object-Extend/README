@@ -1,0 +1,32 @@
+Object-Extend version 0.4.0
+===========================
+
+This module allows objects to be extended with per-object methods, similar to the use of
+singleton methods in Ruby. Object methods are added to an object-specific shim class
+(known as an "eigenclass"), which extends the object's original class. The original class
+is left unchanged.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Scalar::Util
+  Storable
+  Test::More
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2013 by chocolateboy
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.2 or,
+at your option, any later version of Perl 5 you may have available.

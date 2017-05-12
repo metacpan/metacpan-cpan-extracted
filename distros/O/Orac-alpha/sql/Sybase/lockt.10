@@ -1,0 +1,61 @@
+/* Procedure copyright(c) 1996 by Ed Barlow */
+
+:r database
+go
+:r dumpdb
+go
+
+if exists (select * 
+	   from   sysobjects 
+	   where  type = 'P'
+	   and    name = "sp__lockt")
+begin
+    drop procedure sp__lockt
+end
+go
+
+create procedure sp__lockt(@dbname char(30)=NULL,
+	@dont_format char(1) = null
+	)
+as
+if @dbname is null
+	SELECT 	 
+		spid=convert(char(3),l.spid),
+		dbname=convert(char(16),db_name(l.dbid)) ,
+	 	objname=convert(char(16),object_name(l.id, l.dbid)),
+	 	"type"=convert(char(16),v.name)
+    FROM 	master.dbo.syslocks l, 
+		master.dbo.sysprocesses p, 
+		master.dbo.spt_values v 
+    WHERE l.page = 0 
+	 AND l.type = v.number 
+	 AND v.type = 'L' 
+	 AND l.spid = p.spid 
+	 /* AND p.suid <> suser_id()  */
+	 AND not exists ( select * from master.dbo.syslocks l2
+							where l.id = l2.id
+							and   l2.page > 0
+							and	l.spid = l2.spid )
+else
+	SELECT 	 
+		spid=convert(char(3),l.spid),
+		dbname=convert(char(16),@dbname),
+	 	objname=convert(char(16),object_name(l.id, l.dbid)),
+	 	"type"=convert(char(16),v.name)
+   FROM 	master.dbo.syslocks l, 
+		master.dbo.sysprocesses p, 
+		master.dbo.spt_values v 
+   WHERE l.page = 0 
+	AND l.type = v.number 
+	AND v.type = 'L' 
+	AND l.dbid=db_id(@dbname)
+	AND l.spid = p.spid 
+	AND p.suid <> suser_id() 
+	AND not exists ( select * from master.dbo.syslocks l2
+							where l.id = l2.id
+							and   l2.page > 0
+							and	l.spid = l2.spid )
+go
+
+grant execute on sp__lockt to public
+go

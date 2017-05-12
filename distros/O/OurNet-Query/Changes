@@ -1,0 +1,218 @@
+____________________________________________________________________________
+[  1925] By: autrijus@autribsd                     on 2001/09/28 15:12:40
+	Log: * This be OurNet::Query v1.56.
+       Path: lib
+	   + Bundle/Query.pm
+       Path: .
+	   ! Query.pm
+____________________________________________________________________________
+[  1924] By: autrijus@autribsd                     on 2001/09/28 15:12:25
+	Log: * added bundle instructions.
+       Path: .
+	   ! README
+____________________________________________________________________________
+[  1923] By: autrijus@autribsd                     on 2001/09/28 15:12:04
+	Log: * implements ENTITY_STRIP for tt2 backends.
+	     * line up output of sitequery with test.pl's.
+       Path: bin
+	   ! sitequery
+       Path: .
+	   ! Site.pm test.pl
+____________________________________________________________________________
+[  1922] By: autrijus@autribsd                     on 2001/09/28 15:10:23
+	Log: * salvaged the Inforist legacy into depot; most of them are
+	     outdated.
+       Path: lib
+	   + OurNet/Site/abcnews.xml OurNet/Site/acronyms.xml
+	   + OurNet/Site/advalvas.xml OurNet/Site/aladin.xml
+	   + OurNet/Site/aliweb.xml OurNet/Site/altavista.japan.xml
+	   + OurNet/Site/altavista.poland.xml OurNet/Site/altavista.xml
+	   + OurNet/Site/amazon.music.xml OurNet/Site/amazon.video.xml
+	   + OurNet/Site/amazon.xml OurNet/Site/aolnewgroup.xml
+	   + OurNet/Site/aonde.xml OurNet/Site/apa.xml
+	   + OurNet/Site/archie.xml OurNet/Site/arsresource.xml
+	   + OurNet/Site/artsource.xml OurNet/Site/asm.xml
+	   + OurNet/Site/asus.news.xml OurNet/Site/asus.xml
+	   + OurNet/Site/avnews.xml OurNet/Site/awesome.xml
+	   + OurNet/Site/bbc.news.xml OurNet/Site/bbc.xml
+	   + OurNet/Site/bigfoot.xml OurNet/Site/bm.xml
+	   + OurNet/Site/booknow.xml OurNet/Site/buscatnet.xml
+	   + OurNet/Site/businesswire.xml OurNet/Site/byte.xml
+	   + OurNet/Site/cade.xml OurNet/Site/carrefour.net.xml
+	   + OurNet/Site/cei.xml OurNet/Site/chid.xml
+	   + OurNet/Site/chinatimes.xml OurNet/Site/clearing.xml
+	   + OurNet/Site/cnet.xml OurNet/Site/cnn.xml
+	   + OurNet/Site/collegeedge.xml OurNet/Site/compurl.xml
+	   + OurNet/Site/coo.xml OurNet/Site/cozy.xml
+	   + OurNet/Site/crosswave.xml OurNet/Site/cseek.xml
+	   + OurNet/Site/cyberspace.xml OurNet/Site/dejanews.xml
+	   + OurNet/Site/dewa.xml OurNet/Site/dig.xml
+	   + OurNet/Site/dino-online.xml OurNet/Site/discovery.xml
+	   + OurNet/Site/disney.xml OurNet/Site/dokoda.xml
+	   + OurNet/Site/download.xml OurNet/Site/dragon.xml
+	   + OurNet/Site/dreamer.xml OurNet/Site/eblast.xml
+	   + OurNet/Site/ecila.xml OurNet/Site/education_world.xml
+	   + OurNet/Site/eldl.xml OurNet/Site/electricmonk.xml
+	   + OurNet/Site/encyclopedia.xml OurNet/Site/eule.xml
+	   + OurNet/Site/euroseek.xml OurNet/Site/excite.japan.xml
+	   + OurNet/Site/excite.xml OurNet/Site/expedia.xml
+	   + OurNet/Site/explorateur_email.xml OurNet/Site/findlaw.xml
+	   + OurNet/Site/findlink.xml OurNet/Site/fireball.xml
+	   + OurNet/Site/formosa.xml OurNet/Site/foxnews.xml
+	   + OurNet/Site/francite.xml OurNet/Site/fresheye.xml
+	   + OurNet/Site/ftpsearch.xml OurNet/Site/gais.ftp.xml
+	   + OurNet/Site/gais.fuzzy.xml OurNet/Site/gais.news.fuzzy.xml
+	   + OurNet/Site/gais.news.xml OurNet/Site/gais.xml
+	   + OurNet/Site/galaxy.xml OurNet/Site/gif.xml OurNet/Site/goo.xml
+	   + OurNet/Site/goshen.xml OurNet/Site/goto.xml
+	   + OurNet/Site/goyoyo.taiwan.xml OurNet/Site/goyoyo.xml
+	   + OurNet/Site/greenworld.xml OurNet/Site/healthatoz.xml
+	   + OurNet/Site/homerepair.xml OurNet/Site/hotbot.xml
+	   + OurNet/Site/hotwired.xml OurNet/Site/icq.xml
+	   + OurNet/Site/ideal.xml OurNet/Site/ifound.xml
+	   + OurNet/Site/ilse.belgium.xml OurNet/Site/ilse.xml
+	   + OurNet/Site/image.xml OurNet/Site/infobee.xml
+	   + OurNet/Site/infohiway.xml OurNet/Site/infonavigator.xml
+	   + OurNet/Site/infonavihayate.xml OurNet/Site/infopol.xml
+	   + OurNet/Site/infosearch.xml OurNet/Site/infoseek.japan.xml
+	   + OurNet/Site/infoseek.xml OurNet/Site/jobcity.xml
+	   + OurNet/Site/jobcop.xml OurNet/Site/joy.xml
+	   + OurNet/Site/jubii.xml OurNet/Site/jumpcity.xml
+	   + OurNet/Site/kidsclick.xml OurNet/Site/kidshealth.xml
+	   + OurNet/Site/killerapp.xml OurNet/Site/kimo.fuzzy.xml
+	   + OurNet/Site/kimo.xml OurNet/Site/kingbooks.xml
+	   + OurNet/Site/kvasir.xml OurNet/Site/lawcrawler.xml
+	   + OurNet/Site/lets.xml OurNet/Site/linkmaster.xml
+	   + OurNet/Site/linkstar.xml OurNet/Site/lisa.xml
+	   + OurNet/Site/looksmart.xml OurNet/Site/lycos.german.local.xml
+	   + OurNet/Site/lycos.german.xml OurNet/Site/lycos.hot.xml
+	   + OurNet/Site/lycos.image.german.xml OurNet/Site/lycos.image.xml
+	   + OurNet/Site/lycos.japan.xml OurNet/Site/lycos.music.xml
+	   + OurNet/Site/lycos.personal.xml
+	   + OurNet/Site/lycos.sound.german.xml OurNet/Site/lycos.xml
+	   + OurNet/Site/magellan.xml OurNet/Site/mapquest.xml
+	   + OurNet/Site/medexplrer.xml OurNet/Site/medhunt.xml
+	   + OurNet/Site/medline.xml OurNet/Site/mhi.xml
+	   + OurNet/Site/michigan.xml OurNet/Site/miningco.xml
+	   + OurNet/Site/mondou.xml OurNet/Site/monster.xml
+	   + OurNet/Site/ms.www.xml OurNet/Site/ms.xml
+	   + OurNet/Site/msn.news.xml OurNet/Site/muscat.xml
+	   + OurNet/Site/music.xml OurNet/Site/mw.xml
+	   + OurNet/Site/netguide.xml OurNet/Site/netnet_singapore.xml
+	   + OurNet/Site/netplaza.xml OurNet/Site/nettown.xml
+	   + OurNet/Site/neuroscience.xml OurNet/Site/newbot.xml
+	   + OurNet/Site/news.xml OurNet/Site/nlm.xml
+	   + OurNet/Site/nomade.xml OurNet/Site/northernlight.xml
+	   + OurNet/Site/nsknavi.xml OurNet/Site/nsysu.xml
+	   + OurNet/Site/ntt.xml OurNet/Site/occ.xml OurNet/Site/octor.xml
+	   + OurNet/Site/odin.xml OurNet/Site/ondeir.xml
+	   + OurNet/Site/onweb.xml OurNet/Site/openfind.taiwan.bbs.xml
+	   + OurNet/Site/openfind.taiwan.xml OurNet/Site/openfind.xml
+	   + OurNet/Site/opentext.xml OurNet/Site/orientation.africa.xml
+	   + OurNet/Site/orientation.asia.xml
+	   + OurNet/Site/orientation.latinamerica.xml
+	   + OurNet/Site/orientation.xml OurNet/Site/parentsoup.xml
+	   + OurNet/Site/pathfinder.kid.xml
+	   + OurNet/Site/pathfinder.magazine.xml
+	   + OurNet/Site/pathfinder.news.xml OurNet/Site/pathfinder.xml
+	   + OurNet/Site/pc_world.article.xml OurNet/Site/pc_world.file.xml
+	   + OurNet/Site/pc_world.news.xml OurNet/Site/pc_world.xml
+	   + OurNet/Site/planetsearch.xml OurNet/Site/powersearch.xml
+	   + OurNet/Site/pubmed.xml OurNet/Site/qf.xml
+	   + OurNet/Site/qgsearch.xml OurNet/Site/qutation.xml
+	   + OurNet/Site/qvc.xml OurNet/Site/radarvol.xml
+	   + OurNet/Site/rcaau.xml OurNet/Site/rent-a-wreck.xml
+	   + OurNet/Site/rex.xml OurNet/Site/richsurf.xml
+	   + OurNet/Site/scrub.xml OurNet/Site/shareware.xml
+	   + OurNet/Site/showbiz.xml OurNet/Site/sinanet.xml
+	   + OurNet/Site/siteshack.xml OurNet/Site/skicentral.xml
+	   + OurNet/Site/snap.com.xml OurNet/Site/softseek.xml
+	   + OurNet/Site/softwatcher.xml OurNet/Site/sohoo.xml
+	   + OurNet/Site/sportline.xml OurNet/Site/startingpoint.xml
+	   + OurNet/Site/study.xml OurNet/Site/surf.xml
+	   + OurNet/Site/swissguide.xml OurNet/Site/switchboard.xml
+	   + OurNet/Site/techweb.xml OurNet/Site/thunderstone.xml
+	   + OurNet/Site/titan.xml OurNet/Site/todo.xml
+	   + OurNet/Site/toget.xml OurNet/Site/tonghua.xml
+	   + OurNet/Site/tunes.xml OurNet/Site/tw_commerceb.xml
+	   + OurNet/Site/tw_commercec.xml OurNet/Site/tw_commercee.xml
+	   + OurNet/Site/ufo.xml OurNet/Site/ultimatetv.xml
+	   + OurNet/Site/urec.xml OurNet/Site/usatoday.xml
+	   + OurNet/Site/usps.xml OurNet/Site/vanguarda.xml
+	   + OurNet/Site/w6.xml OurNet/Site/wavenavitop.xml
+	   + OurNet/Site/webcrawler.xml OurNet/Site/webgather.xml
+	   + OurNet/Site/webwombat.xml OurNet/Site/whatsite.xml
+	   + OurNet/Site/whatuseek.xml OurNet/Site/whoizzy.xml
+	   + OurNet/Site/winware.xml OurNet/Site/wired.magazine.xml
+	   + OurNet/Site/wired.xml OurNet/Site/yahoo.asia.xml
+	   + OurNet/Site/yahoo.china.xml OurNet/Site/yahoo.email.xml
+	   + OurNet/Site/yahoo.french.xml OurNet/Site/yahoo.german.xml
+	   + OurNet/Site/yahoo.japan.xml OurNet/Site/yahoo.kid.xml
+	   + OurNet/Site/yahoo.norway.xml OurNet/Site/yahoo.taiwan.xml
+	   + OurNet/Site/yahoo.xml OurNet/Site/yam.kid.xml
+	   + OurNet/Site/yam.xml OurNet/Site/yeah.xml OurNet/Site/yes.xml
+	   + OurNet/Site/zdnet.japan.xml OurNet/Site/zdnet.xml
+	   + OurNet/Site/zdnn.xml OurNet/Site/zeek.xml OurNet/Site/zen.xml
+	   ! OurNet/Site/google.tt2
+____________________________________________________________________________
+[  1501] By: autrijus@autribsd                     on 2001/08/02 00:06:22
+	Log: * reflect changes.
+       Path: .
+	   ! Changes
+____________________________________________________________________________
+[  1500] By: autrijus@autribsd                     on 2001/08/02 00:03:12
+	Log: * This be OurNet::Query v1.55.
+       Path: .
+	   ! MANIFEST Query.pm Site.pm test.pl
+____________________________________________________________________________
+[  1499] By: autrijus@autribsd                     on 2001/08/02 00:03:01
+	Log: * google.tt2 wasn't installing itself!
+       Path: Site
+	   - google.tt2
+       Path: lib
+	   + OurNet/Site/google.tt2
+____________________________________________________________________________
+[  1498] By: autrijus@autribsd                     on 2001/08/02 00:02:46
+	Log: * improved _validate() routine to eliminate partial matches
+	     * fixed the bug affecting GET not inside a FOREACH
+	     * AUTOLOAD now display debug message under $::DEBUG
+	     * Template.pm is now 5.6 specific
+       Path: .
+	   ! Template.pm
+____________________________________________________________________________
+[  1493] By: autrijus@autricvic                    on 2001/08/01 00:55:57
+	Log: * Changes update.
+       Path: .
+	   ! Changes
+____________________________________________________________________________
+[  1489] By: autrijus@autricvic                    on 2001/07/28 14:32:51
+	Log: * this be OurNet-Query v1.54.
+       Path: .
+	   ! Query.pm Site.pm Template.pm
+____________________________________________________________________________
+[  1488] By: autrijus@autricvic                    on 2001/07/28 14:32:05
+	Log: * fixes random context and quoting bugs.
+       Path: Site
+	   ! google.tt2
+       Path: bin
+	   ! sitequery
+____________________________________________________________________________
+[  1487] By: autrijus@autribsd                     on 2001/07/28 03:46:10
+	Log: * okay, this might get useful now. major cleanup.
+       Path: .
+	   ! Template.pm
+____________________________________________________________________________
+[  1486] By: autrijus@autribsd                     on 2001/07/27 13:04:34
+	Log: * major speedup for Template using $^N!
+       Path: .
+	   ! Template.pm
+____________________________________________________________________________
+[  1139] By: autrijus@autribsd                     on 2001/06/14 18:46:33
+	Log: * renaming directory in accord to package name change.
+       Path: Site
+	   google.tt2
+       Path: bin
+	   sitequery
+       Path: .
+	   Changes MANIFEST Makefile.PL Query.pm README Site.pm Template.pm
+	   WebBuilder.pm test.pl

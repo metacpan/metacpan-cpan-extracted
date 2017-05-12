@@ -1,0 +1,20 @@
+// input fragment
+struct FragIn
+{
+  float4 color : COLOR0;
+};
+ 
+// output fragment
+struct FragOut
+{
+  float4 color : COLOR0;
+};
+ 
+// fragment shader main entry
+FragOut main(FragIn IN)
+{
+  FragOut OUT;
+  OUT.color   = IN.color; // copy input color to output
+  OUT.color.z = 1.0f; // blue component of color = 1.0f
+  return OUT;
+}

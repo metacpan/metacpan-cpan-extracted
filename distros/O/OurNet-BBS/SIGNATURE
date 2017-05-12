@@ -1,0 +1,175 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.66.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 5f641df256d27169267e8b7c4a7bcfefc93171f4 Changes
+SHA1 579a84b8abd798728028361473114524e836dc2c MANIFEST
+SHA1 88a50d540b84546700714fd04ea159102657d731 META.yml
+SHA1 ef4177ec703f2178353404ed143f1daa2b72befd Makefile.PL
+SHA1 bbab78dc1db20f6559e26cbc03e23e8e65743a51 README
+SHA1 07c126acd790f99ae0e11dd9e2ba26f1be96a2b8 TODO
+SHA1 3d3556124b921ad9f8cefc1ae4d4940a14b86ae7 eg/bbsget
+SHA1 70efaf0e9d4fa9fbd284355fcab3ab08ae6b4937 eg/boardidx
+SHA1 774edf833d79e612a30a81ba2df7e1e350bcb7aa eg/echo-agent
+SHA1 6aff90699e29fd551f160751ff8fcbbc826929cc eg/inject
+SHA1 20c73697e1713638140c719d8eaa19a275ed43a5 inc/Module/AutoInstall.pm
+SHA1 7305dbe2904416e28decb05396988a5d51d578be inc/Module/Install.pm
+SHA1 ca13d9875e1249f6e84f7070be8152c34837955e inc/Module/Install/AutoInstall.pm
+SHA1 129960509127732258570c122042bc48615222e1 inc/Module/Install/Base.pm
+SHA1 cf3356ed9a5bd2f732527ef9e7bc5ef4458c8a93 inc/Module/Install/Can.pm
+SHA1 bf0a3e1977effc2832d7a813a76dce3f31b437b6 inc/Module/Install/Fetch.pm
+SHA1 b501b0df59a5cd235cca473889f82c3d3429f39e inc/Module/Install/Include.pm
+SHA1 b721c93ca5bc9a6aa863b49af15f1b1de6125935 inc/Module/Install/Makefile.pm
+SHA1 026cc0551a0ad399d195e395b46bdf842e115192 inc/Module/Install/Metadata.pm
+SHA1 a615bb050ca0b2d79bfa0224addcb83019a53b09 inc/Module/Install/ReadmeFromPod.pm
+SHA1 d3a4c720c6ec7f8fce7df37002fbc9177fb77050 inc/Module/Install/Scripts.pm
+SHA1 5457015ea5a50e93465bf2dafa29feebd547f85b inc/Module/Install/Win32.pm
+SHA1 051e7fa8063908befa3440508d0584a2497b97db inc/Module/Install/WriteAll.pm
+SHA1 8d7b8710796cf4788e6e0584499a0ee8aa746738 lib/OurNet/BBS.pm
+SHA1 5968174dca210ccce3810b81c06c062d2bdff824 lib/OurNet/BBS.pod
+SHA1 13b856f7ee49bb5c40e6249d0248e2b7fdda705e lib/OurNet/BBS/Authen.pm
+SHA1 78117d530e6b5a4a11956178e849306ee9558374 lib/OurNet/BBS/BBSAgent/Article.pm
+SHA1 d96bbe52b81cdcff0a842f07eb630672a3d90b26 lib/OurNet/BBS/BBSAgent/ArticleGroup.pm
+SHA1 fb5431e06264de1399be7c61ab1ba006fc9cc4d0 lib/OurNet/BBS/BBSAgent/BBS.pm
+SHA1 48deedfd6ad418eed1882d1cc2ff1d67619209c2 lib/OurNet/BBS/BBSAgent/Board.pm
+SHA1 17b49896105f191e036ac1b1faf88a19392d6cc0 lib/OurNet/BBS/BBSAgent/BoardGroup.pm
+SHA1 52c5b1e16c1c4fb0fc4ba3b5389ed4953402a94e lib/OurNet/BBS/Base.pm
+SHA1 b127facfc9643d5ca38ecb09fbd563f66f41d034 lib/OurNet/BBS/CVIC/Article.pm
+SHA1 3a068f6571f2a6794fed7d9024f6ca2d8f6aeee0 lib/OurNet/BBS/CVIC/ArticleGroup.pm
+SHA1 13c61d4a2477ea75012a2e81b4afc80d3cc86a39 lib/OurNet/BBS/CVIC/BBS.pm
+SHA1 06a8611fbd3068d1334dd21c0b97f2b27582dcfd lib/OurNet/BBS/CVIC/Board.pm
+SHA1 94887f0cdc0a595124cfe813ceea15f2d5c284b5 lib/OurNet/BBS/CVIC/BoardGroup.pm
+SHA1 8a5c57bb579a80aacf8ef12917781185143ce82a lib/OurNet/BBS/CVIC/FileGroup.pm
+SHA1 113eb42026a4a3ed27d31075cb7b51780f95c083 lib/OurNet/BBS/CVIC/Group.pm
+SHA1 0d1638cc75c204482a30a65b041459169b4b82bd lib/OurNet/BBS/CVIC/GroupGroup.pm
+SHA1 7827ad2e8ad6d9349c06ddf6f1d8685134c47fe8 lib/OurNet/BBS/CVIC/Session.pm
+SHA1 2de936610517196a7f3c047f6f9886263ed62729 lib/OurNet/BBS/CVIC/SessionGroup.pm
+SHA1 9cb2a09d1c85868967205796c4b8ac3121174727 lib/OurNet/BBS/CVIC/User.pm
+SHA1 838886c307564cf2418e95b719ed6ca30d3af917 lib/OurNet/BBS/CVIC/UserGroup.pm
+SHA1 215568a3b84e5c3a41b61354263ae27e567caf5a lib/OurNet/BBS/Client.pm
+SHA1 26335783f17d44e043fe2534b65ba842d1de78c2 lib/OurNet/BBS/Cola/Article.pm
+SHA1 c6a52649cf8a47fab18ef455efb217fbdaf49110 lib/OurNet/BBS/Cola/ArticleGroup.pm
+SHA1 bacb02a898ff009ce34d960575021b338c400bb5 lib/OurNet/BBS/Cola/BBS.pm
+SHA1 ca6f204953a2174f95817040d1a59b3fe9237216 lib/OurNet/BBS/Cola/Board.pm
+SHA1 78ed6aeae4d767ae0ee0e80d6772df43b035ecb8 lib/OurNet/BBS/Cola/BoardGroup.pm
+SHA1 77304ba8402b5e8f14d130baead0154d928da22d lib/OurNet/BBS/Cola/FileGroup.pm
+SHA1 2081150460685995aae74f7f3ec800f356499b4c lib/OurNet/BBS/Cola/User.pm
+SHA1 43cf2028272692cfc9a18fdd5b821eab7c717357 lib/OurNet/BBS/Cola/UserGroup.pm
+SHA1 6a80eafbe9bbfaba08143b30835802b0b53b018f lib/OurNet/BBS/External/ArticleGroup.pm
+SHA1 0df6c9742a7eac8b7017cbf816e9e523c644d549 lib/OurNet/BBS/External/BBS.pm
+SHA1 56b3c8382b5ba370d8b2f0a99998fa5eb20bf888 lib/OurNet/BBS/External/Board.pm
+SHA1 aad1cea0bc8339f045b3b4cdd6154e27363b8a8a lib/OurNet/BBS/External/BoardGroup.pm
+SHA1 8a71e57c34ffa0ff0b6d3f81c71636752cc1636f lib/OurNet/BBS/Firebird3/Article.pm
+SHA1 a37a57fa477822496007479afd4d2daade92b5c5 lib/OurNet/BBS/Firebird3/ArticleGroup.pm
+SHA1 0311e0a28c1c13eb3d487700f5b3db533e1297f0 lib/OurNet/BBS/Firebird3/BBS.pm
+SHA1 78a9441b971f1d051607f961bf736eab2e043364 lib/OurNet/BBS/Firebird3/Board.pm
+SHA1 c8f5e0f7930ca97bf17b9e1e5284157b9febf1ba lib/OurNet/BBS/Firebird3/BoardGroup.pm
+SHA1 1a4c4caee69ce246385a7bb97bd5144ce35a4e2c lib/OurNet/BBS/Firebird3/FileGroup.pm
+SHA1 99732d7c93c225a14be9c9cbab0ab6fdeca2d539 lib/OurNet/BBS/Firebird3/User.pm
+SHA1 82ab37b02cbfc191fb5ef7a5296584709959fd0a lib/OurNet/BBS/Firebird3/UserGroup.pm
+SHA1 58c41043234598a9419a3abd2f367516e43fdf06 lib/OurNet/BBS/MAPLE2/Article.pm
+SHA1 4e5607ffe90de6dce9a4dbd7488a343d415c2d6a lib/OurNet/BBS/MAPLE2/ArticleGroup.pm
+SHA1 458b883875165f2c0ab1a075699d96fad0d3c398 lib/OurNet/BBS/MAPLE2/BBS.pm
+SHA1 167c0c1ee33a9f0f27c022e082daa0fa90930cab lib/OurNet/BBS/MAPLE2/Board.pm
+SHA1 cf90d5c4d35b6547c1e47bcc493a4c0750399989 lib/OurNet/BBS/MAPLE2/BoardGroup.pm
+SHA1 523f4cafb2dc489ef5df8e8b779ea9aa3e00cb9d lib/OurNet/BBS/MAPLE2/FileGroup.pm
+SHA1 4b3a7d2fe64c724e497744210a7b804dd1ed2563 lib/OurNet/BBS/MAPLE2/GroupGroup.pm
+SHA1 21c0cbc47c44190f0defef979123434d17c180b9 lib/OurNet/BBS/MAPLE2/Session.pm
+SHA1 6cfeceac10d7d1fd7fb78cfd184fc5f283f67385 lib/OurNet/BBS/MAPLE2/SessionGroup.pm
+SHA1 6b515bc133263ca335b1ae20b7d76a2e2ca51875 lib/OurNet/BBS/MAPLE2/User.pm
+SHA1 bb70847e2fcb342a35d48d24340ab182b4585ba5 lib/OurNet/BBS/MAPLE2/UserGroup.pm
+SHA1 0aee95cb4aaaa7047831aa0a54b6ef36589d5a45 lib/OurNet/BBS/MAPLE3/Article.pm
+SHA1 4307497c3d10bcf1febf59b41e7bb333f97dccca lib/OurNet/BBS/MAPLE3/ArticleGroup.pm
+SHA1 4c333288b9a5809605a7c3fba4aab1edfcc040fc lib/OurNet/BBS/MAPLE3/BBS.pm
+SHA1 8a37d6d292d7d619e55c3604837946bdf2882b19 lib/OurNet/BBS/MAPLE3/Board.pm
+SHA1 551adec98e292b8b0a25914db7f0e047074333a4 lib/OurNet/BBS/MAPLE3/BoardGroup.pm
+SHA1 30fd5e6ac6d8c84625c4004b63c636bae229e7d9 lib/OurNet/BBS/MAPLE3/FileGroup.pm
+SHA1 9096f8d1eb1b6d4146106880f13beb359b112e61 lib/OurNet/BBS/MAPLE3/GroupGroup.pm
+SHA1 af71559be102b400431abe7757e9b3b7eeb729d1 lib/OurNet/BBS/MAPLE3/SessionGroup.pm
+SHA1 ce87e6a13600369463b85516bfd8b9293efc46c9 lib/OurNet/BBS/MAPLE3/User.pm
+SHA1 c9bc2bb13a4e02a583777c435344a29b0ead4ecb lib/OurNet/BBS/MAPLE3/UserGroup.pm
+SHA1 3e0fdee71379cf2f719b1091180e9392caaf7cd6 lib/OurNet/BBS/MELIX/Article.pm
+SHA1 2ccf6ae05fc3b8bb46a5b6005ff140ed365c0d67 lib/OurNet/BBS/MELIX/ArticleGroup.pm
+SHA1 3678c5bd8c3b3930ac1ed3cf4137c9163c1e8e58 lib/OurNet/BBS/MELIX/BBS.pm
+SHA1 a3d1b2d7b914a3a94040aae0da562a35ee84dd29 lib/OurNet/BBS/MELIX/Board.pm
+SHA1 7e1ae556cf10960e50962436637c30ba877901b4 lib/OurNet/BBS/MELIX/BoardGroup.pm
+SHA1 063d9af228e20990802c047e0102e59a01f2c3be lib/OurNet/BBS/MELIX/FileGroup.pm
+SHA1 d9ff6b768a1860b696da80b8257d783b6fcd799d lib/OurNet/BBS/MELIX/Group.pm
+SHA1 ad811b48e1ace5468d5ea845b4df8a4c6d470a54 lib/OurNet/BBS/MELIX/GroupGroup.pm
+SHA1 4fe1db10d1d71f405030983ab23ad93cf695fbfc lib/OurNet/BBS/MELIX/Session.pm
+SHA1 37720690c529438d69e8c247a8c1e5d46e9a4f4d lib/OurNet/BBS/MELIX/SessionGroup.pm
+SHA1 e0eaf3a02a4777101f9f12227df7272da387fa71 lib/OurNet/BBS/MELIX/User.pm
+SHA1 586ea54d0fbdfdc8d0505d51d17ad1bee67008ab lib/OurNet/BBS/MELIX/UserGroup.pm
+SHA1 518f5fed70753ef38c61992baecb2737d81dd510 lib/OurNet/BBS/MailBox/Article.pm
+SHA1 9272ada3eac775c863ac7c48fbf43d50747701a0 lib/OurNet/BBS/MailBox/ArticleGroup.pm
+SHA1 0e6bc9a1425f7a172ecd6b1f3b182e753bfd7a53 lib/OurNet/BBS/MailBox/BBS.pm
+SHA1 dc159bf9811bf637acc5f574c33d17ddbb6caace lib/OurNet/BBS/MailBox/Board.pm
+SHA1 69d603ee44d4f523c9bca42d60d5f684b449da62 lib/OurNet/BBS/MailBox/BoardGroup.pm
+SHA1 f5171ed39b3b6fd5ac98b276491de0abf50e7287 lib/OurNet/BBS/NNTP/Article.pm
+SHA1 09a83e0c1e310eba4ba2647cee8aa3f690fba518 lib/OurNet/BBS/NNTP/ArticleGroup.pm
+SHA1 c96369b7ae656d15d5bcc13ab2178c6ebbb5f189 lib/OurNet/BBS/NNTP/BBS.pm
+SHA1 cdcc9fcf81631c938b0637e52aa79f0e7fb8ac98 lib/OurNet/BBS/NNTP/Board.pm
+SHA1 3146a956af4769bad7fe6280dde11533166e4b2d lib/OurNet/BBS/NNTP/BoardGroup.pm
+SHA1 1485db946b496cec9bff39156710c6b77d616cee lib/OurNet/BBS/OurNet/BBS.pm
+SHA1 4117866dcca9a64691019c55d1fab3e354a8da9f lib/OurNet/BBS/PTT/Article.pm
+SHA1 efa44baa400c4f75a1e4d4c5d24b0cad9c796668 lib/OurNet/BBS/PTT/ArticleGroup.pm
+SHA1 7b80b9fff323bd1b34ba733efe476e25e31b6caf lib/OurNet/BBS/PTT/BBS.pm
+SHA1 e4ff07b37b7f2eb891e07bb3a8873cd5988e43d2 lib/OurNet/BBS/PTT/Board.pm
+SHA1 01127e80f9cdef3eb7caf031355ddcc5008b5f0a lib/OurNet/BBS/PTT/BoardGroup.pm
+SHA1 ef80ae23dd2126826c08e0c708a8081066f08de0 lib/OurNet/BBS/PTT/FileGroup.pm
+SHA1 e373f1bd38973744570d6a72d1df4f22edc19348 lib/OurNet/BBS/PTT/SessionGroup.pm
+SHA1 b2a48a812c1957408fbc271645d19a1709281388 lib/OurNet/BBS/PTT/User.pm
+SHA1 8c5a0970b3853484e8a56dee46e177325d42012b lib/OurNet/BBS/PTT/UserGroup.pm
+SHA1 0c562abe254716cd3401070f70f521eac77ec419 lib/OurNet/BBS/RAM/Article.pm
+SHA1 4138f96e61a721a61b95bccb1d571b519fc656be lib/OurNet/BBS/RAM/ArticleGroup.pm
+SHA1 4cfd34791a9179293a6ab461e24ed5cd9d279a3b lib/OurNet/BBS/RAM/BBS.pm
+SHA1 7b0ee9cff820acd93566057772885c87f5dc89d4 lib/OurNet/BBS/RAM/Board.pm
+SHA1 15356da7890ce6c64c95f22df173084d68b4928c lib/OurNet/BBS/RAM/BoardGroup.pm
+SHA1 7c2881f3367549c5bb20c79b75bfecfbe3cf715b lib/OurNet/BBS/RAM/Group.pm
+SHA1 5967731a040b2454962ed8c6146ed82e0620cd7d lib/OurNet/BBS/RAM/GroupGroup.pm
+SHA1 66d7afe8a9d38e5d50e2c5c51492630023942089 lib/OurNet/BBS/RAM/Session.pm
+SHA1 3156cafbc86d2ef5068ad50096d99565d6ade305 lib/OurNet/BBS/RAM/SessionGroup.pm
+SHA1 ebf06683c5d4ac952f5708a5187ca27ca2c3d4aa lib/OurNet/BBS/RAM/User.pm
+SHA1 caa44fb4248eb209d7f929835db5461762287369 lib/OurNet/BBS/RAM/UserGroup.pm
+SHA1 b95578886f1cf66b6846b430036c136216da7d88 lib/OurNet/BBS/Roadmap.pod
+SHA1 220e64809cd6a801a7aab6cac4d0be75fa3de379 lib/OurNet/BBS/ScalarFile.pm
+SHA1 eee46c27070f158e88674289576dd78e4fe65814 lib/OurNet/BBS/Server.pm
+SHA1 cd993663a91321ed923bb7372bc05f64e30457b5 lib/OurNet/BBS/ShmArray.pm
+SHA1 82afdaa2fcbc8edb1e1321f74fc6302cbc1fbd64 lib/OurNet/BBS/ShmScalar.pm
+SHA1 61465f30b55b201f0da2cd81f88283b548301a69 lib/OurNet/BBS/SocketScalar.pm
+SHA1 5fda9e7e4bdf7eae1c422fd9fb2af106865c448c lib/OurNet/BBS/Tutorial.pod
+SHA1 eb787693f051814ddd38d420d8b9e32e19f4e956 lib/OurNet/BBS/Utils.pm
+SHA1 6fa8f3ae82c6a118d4ee360079beeeb417b2b368 script/bbsboard
+SHA1 fc90fe6293906712a3d3c15046de4132093dedae script/bbscomd
+SHA1 8315ea35a1902f25cede7bd9b504bf2579f05ec0 script/bbsmail
+SHA1 41afe2c04bb573b40e283e2b210ed70a47a3f8ba t/--signature.t
+SHA1 25ad12015380aa44fbd1b5f4e6efa89f3ec41728 t/0-Base.t
+SHA1 09b62332eccaeb7baf2f7d962af7f09d36389458 t/1-RAM.t
+SHA1 837c7e84962faff1aada9e5ff62699cda4115c4f t/2-CVIC.t
+SHA1 f3c7620fa6868030a2f6160a5d87218138ff1f27 t/3-MAPLE3.t
+SHA1 42f66e09b8facb924f1cd1cda6318332a197b4e2 t/4-MELIX.t
+SHA1 c86caef7bed8ba7119de976c011d25a55f4127f0 t/5-BBSAgent.t
+SHA1 e7c0880a32983eec1d2f5a06918f3e9ba67dd463 t/6-MailBox.t
+SHA1 5598b6d22e423c8723a18213453e22c900b8a4b4 t/7-OurNet-RAM.t
+SHA1 a07dcc3b507e772b06a77a717d8f489dd1e2682e t/8-OurNet-CVIC.t
+SHA1 6fc86630b2c9223869e366d76793614669a2428d t/9-OurNet-MELIX.t
+SHA1 2cc952d25dd17832a932f3998085ef2a798c4e5a t/stdtests
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (Darwin)
+
+iEYEARECAAYFAkzbYEEACgkQtLPdNzw1AaD7IgCfdxdjqirvg/bplxgJexRNaq3L
+j3kAn2igTR+HBgslYuxg8B8kaJz+bY93
+=aXb/
+-----END PGP SIGNATURE-----

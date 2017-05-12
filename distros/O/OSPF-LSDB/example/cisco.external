@@ -1,0 +1,149 @@
+
+
+            OSPF Router with ID (10.188.1.15) (Process ID 1)
+
+		Type-5 AS External Link States
+
+  Routing Bit Set on this LSA
+  LS age: 137
+  Options: (No TOS-capability, No DC)
+  LS Type: AS External Link
+  Link State ID: 10.188.5.0 (External Network Number )
+  Advertising Router: 10.188.50.50
+  LS Seq Number: 8000003F
+  Checksum: 0x9756
+  Length: 36
+  Network Mask: /24
+	Metric Type: 1 (Comparable directly to link state metric)
+	TOS: 0 
+	Metric: 50 
+	Forward Address: 0.0.0.0
+	External Route Tag: 0
+
+  Routing Bit Set on this LSA
+  LS age: 137
+  Options: (No TOS-capability, No DC)
+  LS Type: AS External Link
+  Link State ID: 10.188.103.0 (External Network Number )
+  Advertising Router: 10.188.50.50
+  LS Seq Number: 8000003F
+  Checksum: 0x5D2E
+  Length: 36
+  Network Mask: /24
+	Metric Type: 1 (Comparable directly to link state metric)
+	TOS: 0 
+	Metric: 50 
+	Forward Address: 0.0.0.0
+	External Route Tag: 0
+
+  Routing Bit Set on this LSA
+  LS age: 137
+  Options: (No TOS-capability, No DC)
+  LS Type: AS External Link
+  Link State ID: 10.188.104.0 (External Network Number )
+  Advertising Router: 10.188.50.50
+  LS Seq Number: 8000003F
+  Checksum: 0x5238
+  Length: 36
+  Network Mask: /24
+	Metric Type: 1 (Comparable directly to link state metric)
+	TOS: 0 
+	Metric: 50 
+	Forward Address: 0.0.0.0
+	External Route Tag: 0
+
+  Routing Bit Set on this LSA
+  LS age: 137
+  Options: (No TOS-capability, No DC)
+  LS Type: AS External Link
+  Link State ID: 10.188.113.0 (External Network Number )
+  Advertising Router: 10.188.50.50
+  LS Seq Number: 8000003F
+  Checksum: 0xEE92
+  Length: 36
+  Network Mask: /24
+	Metric Type: 1 (Comparable directly to link state metric)
+	TOS: 0 
+	Metric: 50 
+	Forward Address: 0.0.0.0
+	External Route Tag: 0
+
+  Routing Bit Set on this LSA
+  LS age: 137
+  Options: (No TOS-capability, No DC)
+  LS Type: AS External Link
+  Link State ID: 10.188.114.0 (External Network Number )
+  Advertising Router: 10.188.50.50
+  LS Seq Number: 8000003F
+  Checksum: 0xE39C
+  Length: 36
+  Network Mask: /24
+	Metric Type: 1 (Comparable directly to link state metric)
+	TOS: 0 
+	Metric: 50 
+	Forward Address: 0.0.0.0
+	External Route Tag: 0
+
+  Routing Bit Set on this LSA
+  LS age: 137
+  Options: (No TOS-capability, No DC)
+  LS Type: AS External Link
+  Link State ID: 10.188.143.0 (External Network Number )
+  Advertising Router: 10.188.50.50
+  LS Seq Number: 8000003F
+  Checksum: 0xA3BF
+  Length: 36
+  Network Mask: /24
+	Metric Type: 1 (Comparable directly to link state metric)
+	TOS: 0 
+	Metric: 50 
+	Forward Address: 0.0.0.0
+	External Route Tag: 0
+
+  Routing Bit Set on this LSA
+  LS age: 137
+  Options: (No TOS-capability, No DC)
+  LS Type: AS External Link
+  Link State ID: 10.188.144.0 (External Network Number )
+  Advertising Router: 10.188.50.50
+  LS Seq Number: 8000003F
+  Checksum: 0x98C9
+  Length: 36
+  Network Mask: /24
+	Metric Type: 1 (Comparable directly to link state metric)
+	TOS: 0 
+	Metric: 50 
+	Forward Address: 0.0.0.0
+	External Route Tag: 0
+
+  Routing Bit Set on this LSA
+  LS age: 137
+  Options: (No TOS-capability, No DC)
+  LS Type: AS External Link
+  Link State ID: 10.188.163.0 (External Network Number )
+  Advertising Router: 10.188.50.50
+  LS Seq Number: 8000003F
+  Checksum: 0xC688
+  Length: 36
+  Network Mask: /24
+	Metric Type: 1 (Comparable directly to link state metric)
+	TOS: 0 
+	Metric: 50 
+	Forward Address: 0.0.0.0
+	External Route Tag: 0
+
+  Routing Bit Set on this LSA
+  LS age: 137
+  Options: (No TOS-capability, No DC)
+  LS Type: AS External Link
+  Link State ID: 10.188.164.0 (External Network Number )
+  Advertising Router: 10.188.50.50
+  LS Seq Number: 8000003F
+  Checksum: 0xBB92
+  Length: 36
+  Network Mask: /24
+	Metric Type: 1 (Comparable directly to link state metric)
+	TOS: 0 
+	Metric: 50 
+	Forward Address: 0.0.0.0
+	External Route Tag: 0

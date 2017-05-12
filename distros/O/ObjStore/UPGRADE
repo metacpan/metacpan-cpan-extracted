@@ -1,0 +1,42 @@
+** Schema Evolution
+
+Great pains have been taken to avoid ever needing to do schema
+evoluation.  However, on occation the base ObjectStore schema must be
+changed to add new flexibility.  If you have a database created with
+an old schema, you will need to evolve it or re-build it.  See the
+following table:
+
+Database Version	Evolve With
+----------------------- ---------------------------------------
+up to 1.16		1.17 (see ** osp_evolve)
+1.17+			Ok
+1.39			re-test without -DOSP_SAFE_BRIDGE
+1.41                    seems fully compatible with 1.42
+1.42			requires ObjectStore 5.1 & shared libraries
+
+Also, it's generally a good idea to test your code with a new release
+before upgrading.  This technology is the absolute latest so you
+should be a little extra careful.
+
+-------------------------------------------------------------------
+
+** osp_copy
+
+You can re-copy your databases with osp_copy.  It is more of a
+proof-of-concept than a useful tool, since it takes about 8-10 times
+at long as osp_evolve.  However, it does do a lot of interesting stuff
+and is written completely in perl.
+
+-------------------------------------------------------------------
+
+** osp_evolve
+
+You must use osp_evolve instead of ossevol.  
+
+  osp_evolve <workdb> <evolvedb>+
+
+osp_evolve is relatively fast.  It took 8 minutes to evolve a 32MB
+database on an Ultra 1 running Solaris.  If you get an error about
+avarray, just add '-i avarray' to the command line.
+
+

@@ -1,0 +1,39 @@
+# $File: //depot/libOurNet/FuzzyIndex/README $ $Author: autrijus $
+# $Revision: #2 $ $Change: 3771 $ $DateTime: 2003/01/24 00:07:20 $
+
+This is the README file for OurNet::FuzzyIndex, an inverted search
+engine for double-byte character sets (currently Big5 only).
+
+* Installation
+
+OurNet::FuzzyIndex uses the standard perl module install process:
+
+perl Makefile.PL
+make
+make test
+make install
+
+If you are on Win32 and without a compiler, please use the pre-
+compiled binaries at http://melix.elixus.org/ instead.
+
+After installation, type "fianjmo" in your command prompt for
+an interactive chat in Traditional Chinese (zh_TW.Big5), which
+comes with the bundled OurNet::ChatBot module.
+
+The "fzindex" and "fzquery" are simple utility commands that
+generates and queries a full-text index db, respectively. Enter
+
+perldoc fzindex
+perldoc fzquery
+
+For examples and usage.
+
+* Copyright
+
+Copyright 2001, 2003 by Autrijus Tang <autrijus@autrijus.org>,
+			Chia-Liang Kao <clkao@clkao.org>.
+
+This program is free software; you can redistribute it and/or 
+modify it under the same terms as Perl itself.
+
+See L<http://www.perl.com/perl/misc/Artistic.html>

@@ -1,0 +1,11 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+Stdio.pm
+Stdio.xs
+test.pl
+con_test
+pds_test
+smf_test
+stdio_cookbook.pod

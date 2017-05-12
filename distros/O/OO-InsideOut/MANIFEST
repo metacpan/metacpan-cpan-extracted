@@ -1,0 +1,20 @@
+Changes
+lib/OO/InsideOut.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-id.t
+t/02-register.t
+t/03-new.t
+t/04-data.t
+t/05-destroy.t
+t/06-threads.t
+t/07-fork.t
+t/Class/Extended.pm
+t/Class/MixedIn.pm
+t/Class/Simple.pm
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

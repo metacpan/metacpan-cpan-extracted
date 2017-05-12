@@ -1,0 +1,7 @@
+^\.git
+^Makefile$
+^blib/
+^pm_to_blib$
+^MANIFEST\.bak$
+.*\.(bs|c|o|tar\.gz)$
+

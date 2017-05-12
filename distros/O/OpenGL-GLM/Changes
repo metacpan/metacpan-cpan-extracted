@@ -1,0 +1,6 @@
+Revision history for Perl extension OpenGL::GLM.
+
+0.01  Wed Nov 23 20:13:04 2005
+	- original version; created by h2xs 1.23 with options
+		-b 5.8.0 -n OpenGL::GLM /home/jon/glm/glm-0.3/glm/glm.h
+

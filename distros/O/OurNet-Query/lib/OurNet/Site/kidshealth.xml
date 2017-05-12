@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<SITE ID="KidsHealth">
+
+<NAME Lang="en-us">KidsHealth</NAME>
+<INFO Lang="en-us">health information of children and teens</INFO>
+
+<URL Type="Start"><![CDATA[
+http://kidshealth.org/cgi-bin/wais/search.pl?_QUERY_
+]]></URL>
+
+
+
+<TEMPLATE><![CDATA[
+<LI><A HREF="_URL_">_TITLE_</A> ___Size:_SIZEK_Kbytes
+]]></TEMPLATE>
+</SITE>

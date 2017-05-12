@@ -1,0 +1,697 @@
+#!/nw/dev/usr/bin/perl -w
+
+use strict;
+package Posh;
+use Carp;
+use vars qw($open_mode $shell_escape @direct);
+
+$open_mode = 'mvcc';
+$shell_escape = 1;
+
+for (my $arg=0; $arg < @ARGV; $arg++) {
+    my $o = $ARGV[$arg];
+    if ($o =~ m/^-update$/) {
+	$open_mode = 'update';
+    } elsif ($o =~ m/^-mvcc$/) {
+	$open_mode = 'mvcc';
+    } elsif ($o =~ m/^-remote$/) {
+	#assume osperlserver is running; create a posh instance; etc...!
+	$open_mode = 'remote';
+    } elsif ($o =~ m/^ \- (M|m) ([\w:]+) (\=\w+)? $/x ) {
+	my ($way,$m,@im) = ($1,$2,$3?substr($3,1):());
+	eval "require $m";
+	warn, next if $@;
+	if ($way eq 'M') {
+	    $m->import(@im);
+	} else {
+	    $m->unimport(@im);
+	}
+    } elsif ($o =~ m/^-I (\S*) $/x) {
+	my $dir = $1;
+	$dir = $ARGV[++$arg]
+	    if !$dir;
+	if ($dir =~ m{^ \/ }x) {
+	    unshift(@INC, $dir);
+	} else {
+	    require FindBin;
+	    die "posh: can't find myself" if ! $FindBin::Bin;
+	    unshift(@INC, "$FindBin::Bin/$dir");
+	}
+    } elsif ($o =~ m/^-noesc (ape)? $/x) {
+	$shell_escape = 0;
+    } elsif ($o !~ m/^-/) {
+	@direct = $o;
+	push @direct, $ARGV[++$arg]
+	    if $ARGV[$arg+1] && $ARGV[$arg+1] !~ m/^-/;
+    } elsif ($o =~ m/^-panic$/) {
+	warn "posh: panic ignored (posh is unflappable)\n";
+    } elsif ($o =~ m/^-v$/) {
+	require ObjStore;
+	print("posh $ObjStore::VERSION (Perl $] ".ObjStore::release_name().")\n");
+	exit;
+    } elsif ($o =~ m/^-h(elp)?$/) {
+	print q"
+Usage: posh [switches] [database [class]]
+  -Idirectory      specify @INC directory (may be used more than once)
+  -mvcc            open databases in mvcc mode
+  -[mM]module..    executes `use/no module...' (just like perl)
+  -noescape        disables !shell escape
+  -update          open databases in update mode
+  -v               print version number (and exit)
+
+";
+	exit;
+    } else {
+	warn "unknown option '$o' (-h for usage)\n";
+    }
+}
+
+# this is probably wrong XXX
+require ObjStore::REP::Splash;
+require ObjStore::REP::ODI;
+#require ObjStore::REP::FatTree;
+
+package input;
+use ObjStore ':ADV';
+use vars qw($at $db $cursor $view);
+
+package RedirSaver;
+# code mostly copied from SelectSaver
+use Carp;
+use Symbol;
+ 
+sub new {
+    @_ >= 1 && @_ <= 2 or croak 'usage: new RedirSaver [FILEHANDLE]';
+    my $fh = select;
+    my $self = bless [$fh], $_[0];
+    select qualify($_[1], caller) if @_ > 1;
+    $self;
+}
+ 
+sub DESTROY {
+    close select;
+    my $this = $_[0];
+    select $$this[0];
+}
+
+package Posh::View;
+BEGIN { require Cwd; *cwd = \&Cwd::fastcwd; }
+use ObjStore ':ADV';
+use ObjStore::Peeker;
+require ObjStore::Path::Ref;
+use Symbol;
+use base 'ObjStore::HV';
+use vars qw($VERSION);
+$VERSION = '1.00';
+
+my $Lser    = new ObjStore::Peeker(depth => 0);
+my $Peeker  = new ObjStore::Peeker(to => 'stdout', depth => 0);
+my $Results = new ObjStore::Peeker(to => 'stdout', vareq => 1);
+
+my $eval_setup = "no strict; package input;\n#line 1 \"input\"\n"; #XXX
+
+sub new {
+    my ($class, $mom) = @_;
+    my $o = $class->SUPER::new($mom);
+    $o->{mom} = $mom;
+    $o;
+}
+
+sub init {
+    my ($o, $prev) = @_;
+    # copy from $prev by default ?
+    $o->{'cwd'} ||= cwd;
+    $o->{db} ||= '';
+    $o->{cursor} ||= new ObjStore::Path::Ref($o);
+}
+
+sub POSH_PEEK {
+    my ($val, $o, $name) = @_;
+    $o->o("You can't peek into posh from posh!  My brain is spinning!");
+}
+
+sub enter {
+    my ($o, $path) = @_;
+    $o->init;
+    if (@Posh::direct) {
+	$o->{db} = undef;
+	$o->{cursor} = ObjStore::Path::Ref->new($o);
+	my $db;
+	my ($dbname,$class) = @Posh::direct;
+	if (-d $dbname) {
+	    $o->{'cwd'} = $dbname;
+	} else {
+	    $db = ObjStore::lookup($dbname);
+	    my $path = $db->get_pathname;
+	    $o->{db} = $path;
+	    $path =~ s| / [^/]* $||x;
+	    $o->{'cwd'} = $path;
+	    # try POSH_ENTER XXX
+	}
+    }
+    chdir($o->{'cwd'}) or $o->{'cwd'} = cwd;
+    if ($o->{db}) {
+	warn "** If a serious error occurs when re-entering '".$path."',\n";
+	warn "** you will need to osrm it and re-run posh (known bug).\n";
+	begin sub {
+	    $o->fetch_db;
+	    $o->{cursor}->open($Posh::open_mode) if $o->{cursor};
+	};
+	if ($@) {
+	    warn "A non-serious error occured while re-entering '$o->{db}':\n$@\n";
+	    $o->{cursor} = new ObjStore::Path::Ref($o);
+	    $o->{db} = '';
+	}
+    }
+    $o->prompt;
+}
+
+sub prompt {
+    my ($o) = @_;
+    my $p;
+    if ($o->{db}) {
+	my $db = $o->fetch_db();
+	my $cs = $o->{cursor};
+	if ($cs and $cs->focus) {
+	    $p = "\$at = ".$cs->focus;
+	} else {
+	    $p = $o->{db};
+	}
+    } else {
+	$p = $o->{'cwd'};
+    }
+    $p;
+}
+
+sub fetch_db {
+    my $view = shift;
+    my $db;
+    $db = ObjStore::lookup($view->{db});
+    if (!$db->is_open) {
+	begin sub { $db->open($Posh::open_mode); };
+	if ($@) {
+	    die if $@ !~ m'permission_denied';
+	    $db->open('mvcc');
+	}
+	$db->import if $db->can('import');
+    }
+    $db;
+}
+
+sub pre_eval {
+    my $view = shift;
+    confess $view if !ref $view;
+    $input::view = $view;
+    if ($view->{cursor}->FETCHSIZE()) {
+	$input::cursor = $view->{cursor};
+	$input::at = $view->{cursor}->focus;
+	$input::db = $input::at->database_of;
+    }
+    elsif ($view->{db}) {
+	$input::at = $view->fetch_db();
+	$input::db = $input::at;
+    } else {
+	$input::at = undef;
+	$input::db = undef;
+    }
+}
+
+sub resolve {
+    my ($o, $path) = @_;
+    my $db = $o->fetch_db;
+    my $cs = $o->{cursor};
+    my @at = ('/', $db, $cs->map(sub { shift->focus }));
+    if ($path =~ m/^\s*$/) {
+	('/', $db)
+    } elsif ($path =~ m,^[\w\/\.\:\-]+$,) {
+	my @path = split(m'/+', $path);
+	for my $c (@path) {
+	    next if $c eq '.';
+	    if ($c eq '..') {
+		pop @at if @at;
+	    } else {
+		my $at = $at[$#at];
+		if ($at->can('POSH_CD')) {
+		    $at = $at->POSH_CD($c);
+		    return if !defined $at;
+		    $at = $at->POSH_ENTER()
+			if blessed $at && $at->can('POSH_ENTER');
+		}
+		push(@at, $at);
+	    }
+	}
+	@at;
+    } else {
+	local($input::db, $input::at, $input::view, $input::cursor);
+	$o->pre_eval;
+	my @r = eval $eval_setup.$path;
+	if ($@) {
+	    print $@;
+	    print "# Type 'help' for help!\n";
+	    ObjStore::Transaction::get_current()->abort();
+	    return;
+	}
+	#@r = (undef) if !@r; XXX is this right?
+	(@at,(@r>1?\@r:@r));
+    }
+}
+
+sub execute {
+    local($input::db, $input::at, $input::view, $input::cursor);
+    my ($o, $input) = @_;
+
+    my $redir;
+    if ($input =~ s/\s(\>\>?) \s* ([\w.\/-]+)$//x) {
+	my $out = gensym;
+	if (!open $out, "$1$2") {
+	    warn "open $1$2: $!";
+	} else {
+	    print "[Output ".($1 eq '>'?'redirected':'appended')." to '$2'...]\n";
+	    $redir = RedirSaver->new($out);
+	}
+    }
+    
+    # Any commands that are not straight perl syntax are
+    # parsed and executed here.  (cd, ls)
+
+    if (!$o->{db}) {
+
+	if ($input =~ m/^ls(.*)$/s) {   #ls
+	    my @ls = `ls -C $1`;		#osls XXX
+	    for my $l (@ls) {
+		print $l;
+	    }
+	    return;
+
+	} elsif ($input =~ m/^cd \s* (.*?) \s* $/sx) {  #cd
+	    my $path = $1;
+	    $path = $ENV{HOME} if !$path;
+
+	    if (-d $path) {
+		chdir($path) or warn "chdir $path: $@";
+		$o->{'cwd'} = cwd;
+	    } elsif ($path =~ m/^ [\w\/\.]+ $/x) {
+		my ($dbname, $class, $inc) = split(m/\s+/, $path);
+		my $db;
+		eval { $db = ObjStore::lookup($dbname); };
+		die $@ if $@ && $@ !~ m'database was not found';
+		if (!$db) {
+		    warn "[creating $dbname]\n";
+		    push(@INC, $inc) if $inc;
+		    $class ||= 'ObjStore::Database';
+		    &ObjStore::require_isa_tree($class);
+		    $db = $class->new(cwd . "/$dbname", 'update', 0666);
+		    $db->get_INC->[0] = $inc if $inc;
+		}
+		$o->{db} = $db->get_pathname;
+	    } else {
+		local($input::db, $input::at, $input::view, $input::cursor);
+		$o->pre_eval;
+		my $r = eval $eval_setup.$path;
+		if ($@) {
+		    print $@;
+		    print "# Type 'help' for help!\n";
+		    return;
+		}
+		if ($r and blessed $r and $r->isa("ObjStore::Database")) {
+		    $o->{db} = $r->get_pathname;
+		} elsif ($r and -d $r) {
+		    chdir($r) or warn "chdir $r: $@";
+		    $o->{'cwd'} = cwd;
+		} else {
+		    $r ||= '(unknown)';
+		    print "# posh: don't know how to cd to '$r'\n";
+		}
+	    }
+
+	    if ($o->{db}) {
+		my $at = $o->fetch_db();
+		my $cs = $o->{cursor};
+		if ($at->can("POSH_ENTER")) {
+		    my $at2 = $at->POSH_ENTER();
+		    if (!blessed $at2) {
+			warn "$at->POSH_ENTER() returned junk ($at2)\n";
+		    } elsif ("$at" eq "$at2") {
+		    } elsif (!$at2->can('_is_persistent') or
+			     !$at2->_is_persistent) {
+			warn "$at->POSH_ENTER() returned junk ($at2)\n";
+		    } else {
+			$cs->PUSH($at2->new_ref($cs, 'unsafe'));
+		    }
+		}
+	    }
+	    return;
+	}
+	
+    } elsif ($o->{db}) {
+
+	my $cs = $o->{cursor};
+	if ($input =~ m/^cd\s*(.*)$/s) {   #cd
+	    my $path = $1;
+	    my $db = ObjStore::lookup($o->{db});
+	    my @at = $o->resolve($path);
+
+	    if (! @at) {
+		print "posh: attempt to resolve '$path' failed\n";
+		print "# Type 'help' for help!\n";
+
+	    } elsif (@at == 1) {
+		while ($cs->depth) { $cs->POP() }
+		$db->close() if $db && $db->is_open;
+		$o->{db} = '';
+
+	    } elsif (@at == 2) {
+		while ($cs->depth) { $cs->POP() }
+
+	    } else {
+		my $ok=1;
+		my $new = new ObjStore::Path::Ref($o);
+		shift @at;
+		shift @at;
+		for my $at (@at) {
+		    if (!blessed $at or !$at->isa('ObjStore::UNIVERSAL')) {
+			$ok=0;
+			print "posh: cannot cd into $at\n";
+			last;
+		    }
+		    $new->PUSH($at->new_ref($new, 'unsafe'));
+		}
+		$o->{cursor} = $new if $ok;
+	    }
+
+	    return;
+
+	} elsif ($input =~ m/^(ls|peek|raw)\s*(.*)$/s) {
+	    my $cmd = $1;
+	    my $path = $2;
+	    my @at = (length $path or !$cs->FETCHSIZE())? $o->resolve($path):$cs->focus;
+	    my $at = $at[$#at];
+	    $Peeker->reset();
+	    local $Peeker->{depth} = 10 if $cmd eq 'raw' || $cmd eq 'peek';
+	    local $Peeker->{pretty} = 0 if $cmd eq 'raw';
+	    $Peeker->Peek($at);
+	    # print join(' ', sort grep(!/^_/, keys %{ methods($fo) }))."\n"; XXX
+	    return;
+	}
+    }
+
+    &pre_eval;
+    my @ret = eval $eval_setup.$input;
+
+    if ($@) {
+	ObjStore::Transaction::get_current()->abort();
+	if ($Posh::open_mode eq 'mvcc' and
+	    $@ =~ m/Operation not allowed during a read-only transaction/i) {
+	    print "# Attempt to write to a read-only database denied.\n";
+	} else {
+	    print $@;
+	}
+	print "# Type 'help' for help!\n";
+    } else {
+	$Results->reset;
+	for (@ret) { $Results->Peek($_) }
+    }
+}
+
+#--------------------------------------------- COMMANDS (not methods)
+package input;
+
+sub help {
+    print '
+Welcome to posh!
+
+Outside of databases:
+   cd <dir>
+   cd <db> [class]     # enters <db> or $class->new("update", 0666)
+   ls <dir>
+   pwd
+
+Inside of databases:
+   cd string           # interprets string according to $at->POSH_CD
+   cd $at->...         # your expression should evaluate to a persistent ref
+   cd ..               # what you expect
+   ls
+   peek                # ls with more detail
+   raw                 # ignore special POSH_PEEK methods
+   methods             # show available methods (perl 5.005 only)
+   pwd
+   ...or any perl statement!
+
+Change transaction mode:
+   read
+   update
+   abort_only
+
+Most commands support limited shell-style output redirection:
+   ... > snap          # send output to snap (overwrite)
+   ... >>snap          # append output to snap
+   ... | cmd           # not implemented!
+or
+   ! <unix shell command>
+
+';
+    if ($at and $at->can('help')) {
+	my $h = $at->help;
+	print $h if $h;
+    }
+    ();
+}
+
+sub debug {
+    'Carp'->import('verbose');
+    ++ $ObjStore::REGRESS;
+    'ObjStore::Peeker'->debug(1);
+}
+
+sub history {
+    # should print out the last N commands...
+}
+
+sub pwd {
+    if (!$view->{db}) {
+	print("$view->{'cwd'}\n");
+    } else {
+	$Lser->reset;
+	print '$db = '.$Lser->Peek($db);
+	for (my $z=0; $z < $view->{cursor}->depth; $z++) {
+	    $Lser->reset;
+	    print '$cursor->['."$z] = ".$Lser->Peek($cursor->focus($z));
+	}
+    }
+    ();
+}
+
+sub methods {
+    my ($ref) = @_;
+    $ref ||= $at;
+    my $pack = ref $ref? ref $ref : $ref;
+    my %result;
+    use attrs;
+    no strict;
+    # magic adapted from Devel::Symdump
+    while (($key,$val) = each(%{*{"$pack\::"}})) {
+	local(*ENTRY) = $val;
+	if (defined $val && defined *ENTRY{CODE}) {
+	    my @a = attrs::get(*ENTRY{CODE});
+	    for (@a) {
+		$result{$key} = $pack if $_ eq 'method';
+	    }
+	}
+    }
+    print "package $pack;\n";
+    print "\@ISA=( ".join(', ', map { "'$_'" } @{"$pack\::ISA"})." );\n";
+    if (keys %result) {
+	my $prefix = "methods: ";
+	print $prefix;
+	my $col= length $prefix;
+	for (sort keys %result) {
+	    do { print "\n".' 'x9; $col=9; } if $col + length > 75;
+	    print "$_ ";
+	    $col += 1+length;
+	}
+	print "\n";
+    } else {
+	print "No methods found.\n"
+    }
+}
+
+package Posh::FakeTerm;
+
+sub new {
+    my ($class) = @_;
+    bless [], $class;
+}
+
+sub readline {
+    my ($o, $pr) = @_;
+    $|=1;
+    print($pr);
+    $|=0;
+    scalar(<>);
+}
+
+sub addhistory {}
+
+package Posh::History;
+use ObjStore;
+use base 'ObjStore::AV';
+use vars qw($VERSION);
+$VERSION='0.01';
+
+sub addhistory {
+    my $o = shift;
+    return if $] <= 5.00458;
+
+    for my $input (@_) {
+	for (my $x=0; $x < @$o; $x++) {
+	    $$o[$x] = undef if $$o[$x] && $$o[$x] eq $input;
+	}
+	push @$o, $input;
+    }
+    do { shift @$o } while (@$o > 100);
+}
+
+package Posh;
+use strict;
+use Carp;
+use IO::Handle;
+use ObjStore ':ADV';
+use ObjStore::AppInstance;
+use vars qw($term @ORINC @HistoryBuf $Unloaded);
+
+@ORINC = @INC;
+$Unloaded = 0;
+
+sub new {
+    my ($class) = @_;
+    my $o = bless {}, $class;
+#    my $o = $class->SUPER::new('posh', pvars => [qw(ttype view)]);
+
+    $o->{user} ||= scalar(getpwuid($>));
+    $o->{app} = ObjStore::AppInstance->new('posh', $o->{user});
+    $o->{ttype} = $open_mode eq 'mvcc'? 'read' : 'update';
+
+#    ObjStore::set_max_retries(0);
+    $ObjStore::TRANSACTION_PRIORITY = 0x100; #don't conflict with real jobs
+    begin('update', sub {
+	      my $t = $o->{app}->top();
+
+	      $t->{view} ||= new Posh::View($t);
+	      $o->{prompt} = $t->{view}->enter($o->{app}->get_pathname());
+
+	      if ($] >= 5.00458) {
+		  for my $typo (@{$t->{history}}) {
+		      next if !$typo;
+		      $term->addhistory($typo);
+		  }
+	      }
+	  });
+    die if $@;
+    $o;
+}
+
+sub run {
+    my ($o) = @_;
+    print("posh $ObjStore::VERSION (Perl $], ".ObjStore::release_name.")\n");
+    my $rc = "$ENV{HOME}/.poshrc";
+    if (-e $rc) {
+	print "[reading $rc...]\n";
+	do $rc;
+    }
+    print "[set for \U$o->{ttype}]\n";
+    while (1) {
+	my $input;
+	eval {
+	    if ($o->{prompt} =~ m/^(.*\n)(.*)$/s) {
+		print $1;
+		$input = $term->readline("$2% ");
+	    } else {
+		$input = $term->readline("$o->{prompt}% ");
+	    }
+	};
+	if ($@) {
+	    warn if $@ !~ /ABORT/;
+	    next;
+	}
+	last if (!defined $input or $input =~ m/^\s*exit\s*$/);
+
+	$input =~ s/^\s*//;
+	if ($input =~ s/^\!// and $shell_escape) {
+	    my $st = system($input);
+	    print "(status=$st)\n" if $st;
+	    next;
+	}
+
+	my $ttype;
+	if ($input =~ m/^cd/) {
+	    $ttype = 'update';
+	} elsif ($input =~ m/^(read|update|abort_only)\s*$/) {
+	    my $mode = $1;
+	    if ($open_mode eq 'mvcc') {
+		print "posh: the database is open in mvcc mode; you can only read\n";
+		next;
+	    }
+	    $o->{ttype} = $mode;
+	    print "[set for \U$mode]\n";
+	    next;
+	} else {
+	    $ttype = $o->{ttype};
+	}
+
+	begin($ttype, sub{
+		  my $top = $o->{app}->top();
+		  my $view = $top->{view};
+
+		  begin sub { $view->execute($input) if $input; };
+		  warn $@ if $@;
+		  $o->{prompt} = $view->prompt()
+		      if $ttype ne 'read';
+
+		  if (!$@ and !ref $input and $input =~ /\S/) {
+		      push @HistoryBuf, $input;
+		      if ($ttype eq 'update') {
+			  $top->{history} = Posh::History->new($top)
+			      if (!$top->{history} ||
+				  !$top->{history}->isa('Posh::History'));
+			  $top->{history}->addhistory(@HistoryBuf);
+			  @HistoryBuf=();
+		      }
+
+		      $term->addhistory($input);
+		  }
+		  if ($ttype eq 'update') {
+		      $o->{app}->modified(1);
+		  }
+	});
+	die if $@;
+
+	if (@ObjStore::UNLOADED != $Unloaded) {
+	    my @n = @ObjStore::UNLOADED[$Unloaded .. $#ObjStore::UNLOADED];
+	    print "[*** posh: The following packages could not be auto-loaded: \n\t".
+		join("\n\t", map { "'$_'" } @n)."]\n";
+	    $Unloaded = @ObjStore::UNLOADED;
+	}
+    }
+    if (@HistoryBuf) {
+	begin 'update', sub {
+	    my $top = $o->{app}->top();
+	    $top->{history}->addhistory(@HistoryBuf)
+		if $top->{history};
+	};
+	# ignore $@
+    }
+}
+
+eval {
+    use Term::ReadLine;
+    $term = new Term::ReadLine('posh');
+    $term->ornaments(1);
+    # do completion on perl?  :-)
+};
+if ($@) {
+    print "** warning: Module 'Term::ReadLine' could not be loaded.\n";
+    $term = new Posh::FakeTerm;
+}
+$SIG{INT} = sub { die "ABORT\n" };
+ObjStore::fatal_exceptions(0);
+(new Posh())->run;

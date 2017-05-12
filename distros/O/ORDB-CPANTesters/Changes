@@ -1,0 +1,35 @@
+Changes for Perl extension ORDB-CPANTesters
+
+0.09 Tue 19 May 2009
+	- Upgrading to Module::Install::DSL 0.88
+	- Allow pass-through of import params
+
+0.08 Sun 26 Apr 2009
+	- Upgrading to Module::Install::DSL 0.85
+	- Dropping refresh time to one week
+
+0.07 Tue 14 Apr 2009
+	- Upgrading to Module::Install::DSL 0.83
+
+0.06 Wed  9 Apr 2009
+	- Upgrading to Module::Install::DSL 0.82
+
+0.05 Sun 29 Mar 2009
+	- Upgrading to Module::Install::DSL 0.81
+	- Upgrading to ORLite::Mirror 1.12
+
+0.04 Wed  4 Feb 2009
+	- Upgrading to Module::Install 0.79
+	- Updating ORLite::Mirror dependency again
+
+0.03 Fri 16 Jan 2009
+	- Updating ORLite::Mirror dependency again
+
+0.02 Fri 16 Jan 2009
+	- Updating to a newer ORLite::Mirror release to reduce the number
+	  of times that the database is pulled.
+	- Updating to a newer ORLite::Pod as it gets closer to completion.
+
+0.01 Thu 15 Jan 2009
+	- Initial experimental release
+	- Adding ORLite::Pod-generated documentation

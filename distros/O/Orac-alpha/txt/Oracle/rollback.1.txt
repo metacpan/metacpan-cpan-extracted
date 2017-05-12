@@ -1,0 +1,17 @@
+
+For equally sized rollback segments, OPTIMAL should be slightly larger
+than the average size.
+
+Shrinks  Average  Analysis and recommendations
+.        Sizes
+.        Shrunk
+-------  -------  -----------------------------------------------------
+Low      Low      If average sizes active is close to Sizes,Optimal
+.                 then the OPTIMAL setting is correct.Otherwise Optimal
+.                 is too large.
+Low      High     Excellent - A good setting for OPTIMAL
+High     Low      OPTIMAL is too small - too many shrinks are being
+.                 performed
+High     High     Periodic long transcationsare probably causing these
+.                 statistics.Set the OPTIMAL parameter higher until
+.                 Shrinks is lower.

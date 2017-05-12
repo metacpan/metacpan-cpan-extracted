@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<SITE ID="Goto">
+
+<NAME Lang="en-us">GoTo.com</NAME>
+<INFO Lang="en-us">general information web search</INFO>
+
+<URL Type="More"><![CDATA[
+http://www.goto.com_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://www.goto.com/d/search/;$sessionid$LIUA5QQAAB201QFIEEJQPUQ?Keywords=_QUERY_
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_NEXT_"><![CDATA[
+<a href="_NEXT_"><font face="Helvetica, Arial" size=2>More
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<td width=590><font face="HELVETICA, ARIAL">___<a href="_URL_">_TITLE_</a>___<font face="HELVETICA, ARIAL" size=-1>_PREVIEW_<br>
+]]></TEMPLATE>
+</SITE>

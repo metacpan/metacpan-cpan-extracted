@@ -1,0 +1,56 @@
+{
+   "abstract" : "A high-level implementation of the OpenAPI specification",
+   "author" : [
+      "Altreus <altreus@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "OpenAPI",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "OpenAPI" : {
+         "file" : "lib/OpenAPI.pm",
+         "version" : "0.001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Altreus/OpenAPI/issues"
+      },
+      "homepage" : "https://github.com/Altreus/OpenAPI",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/Altreus/OpenAPI.git",
+         "web" : "https://github.com/Altreus/OpenAPI"
+      }
+   },
+   "version" : "0.001",
+   "x_contributors" : [
+      "Alastair McGowan-Douglas <altreus@altre.us>"
+   ]
+}
+

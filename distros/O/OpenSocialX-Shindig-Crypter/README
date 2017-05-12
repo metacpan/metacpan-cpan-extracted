@@ -1,0 +1,133 @@
+NAME
+    OpenSocialX::Shindig::Crypter - OpenSocial Shindig Crypter
+
+VERSION
+    version 0.03
+
+SYNOPSIS
+        use OpenSocialX::Shindig::Crypter;
+
+        my $crypter = OpenSocialX::Shindig::Crypter->new( {
+            cipher => 'length16length16',
+            hmac   => 'forhmac_sha1',
+            iv     => 'anotherlength16k'
+        } );
+        my $token = $crypter->create_token( {
+            owner    => $owner_id,
+            viewer   => $viewer_id,
+            app      => $app_id,
+            app_url  => $app_url,
+            domain   => $domain,
+            module_id => $module_id
+        } );
+
+DESCRIPTION
+    Apache Shindig <http://incubator.apache.org/shindig/> is an OpenSocial
+    container and helps you to start hosting OpenSocial apps quickly by
+    providing the code to render gadgets, proxy requests, and handle REST
+    and RPC requests.
+
+    From the article
+    <http://www.chabotc.com/generic/using-shindig-in-a-non-php-or-java-envir
+    ionment/>, we know that we can do 'Application' things in Perl.
+    basically the stuff will be
+
+    *   use Perl OpenSocialX::Shindig::Crypter (this module) to create st=
+        encrypted token through "create_token"
+
+    *   the php "BasicBlobCrypter.php" will unwrap the token and validate
+        it. The file is in the "php" dir of this .tar.gz or you can download
+        it from
+        <http://github.com/fayland/opensocialx-shindig-crypter/raw/master/ph
+        p/BasicBlobCrypter.php>
+
+        you can copy it to the dir of "extension_class_paths" defined in
+        shindig/config/container.php, it will override the default
+        "BasicBlobCrypter.php" provided by shindig.
+
+        and the last thing is to defined the same keys in
+        shindig/config/container.php like:
+
+          'token_cipher_key' => 'length16length16',
+          'token_hmac_key' => 'forhmac_sha1',
+          'token_iv_key'   => 'anotherlength16k',
+
+        remember that "token_iv_key" is new
+
+  METHODS
+    *   new
+
+            my $crypter = OpenSocialX::Shindig::Crypter->new( {
+                cipher => 'length16length16',
+                hmac   => 'forhmac_sha1',
+                iv     => 'anotherlength16k'
+            } );
+
+        "cipher" and "iv" must be 16 chars.
+
+    *   create_token
+
+            my $token = $crypter->create_token( {
+                owner    => $owner_id,
+                viewer   => $viewer_id,
+                app      => $app_id,
+                app_url  => $app_url,
+                domain   => $domain,
+                module_id => $module_id
+            } );
+
+        if you don't know what "module_id" is, you can leave it alone.
+
+    *   wrap
+
+            my $encrypted  = $crypter->wrap({
+                a => 1,
+                c => 3,
+                o => 5
+            } );
+
+        encrypt the hash by Crypt::Rijndael and Digest::SHA and
+        encode_base64 it
+
+    *   unwrap
+
+            my $hash = $crypter->unwrap($encrypted);
+
+        decrypt the above data
+
+    *   deserialize
+
+    *   checkTimestamp
+
+    *   _serializeAndTimestamp
+
+  EXAMPLE
+        use URI::Escape;
+        use MIME::Base64;
+        use OpenSocialX::Shindig::Crypter;
+
+        my $crypter = OpenSocialX::Shindig::Crypter->new( {
+            cipher => $config->{opensocial}->{cipherKey},
+            hmac   => $config->{opensocial}->{hmacKey},
+            iv     => $config->{opensocial}->{ivKey},
+        } );
+        my $security_token = uri_escape( encode_base64( $crypter->create_token( {
+            owner   => $owner_id,
+            viewer  => $viwer_id,
+            app     => $gadget->{id},
+            domain  => $config->{opensocial}->{container},
+            app_url => $gadget->{url},
+        } ) ) );
+
+        # later in tt2 or others
+        # st=$security_token
+
+AUTHOR
+      Fayland Lam <fayland@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2009 by Fayland Lam.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as perl itself.
+

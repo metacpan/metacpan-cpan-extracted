@@ -1,0 +1,156 @@
+NAME
+    Oracle::Schema - Perl class for Oracle Schema Information and Management
+
+SYNOPSIS
+      use Oracle::Schema;
+
+      my %cfg = ('conn_string'=>'usr/pwd@db');
+      my $os = Oracle::Schema->new;
+      # or combine the two together
+      my $os = Oracle::Schema->new('cs'=>'usr/pwd@db');
+      $os->display_objects; 
+
+DESCRIPTION
+    This class includes methods to query (find, retrieve, and compare)
+    objects in an Oracle schema and to manage (create, drop, update, merge,
+    and move) Oracle objects.
+
+  new (cs=>'usr/pwd@db',tn=>'my_table')
+
+    Input variables:
+
+      $cs  - Oracle connection string in usr/pwd@db
+      $tn  - Oracle table name without schema
+
+    Variables used or routines called:
+
+      None
+
+    How to use:
+
+       my $obj = new Oracle::Schema;      # or
+       my $obj = Oracle::Schema->new;     # or
+       my $cs  = 'usr/pwd@db';
+       my $tn  = 'my_table'; 
+       my $obj = Oracle::Schema->new(cs=>$cs,tn=>$tn); # or
+       my $obj = Oracle::Schema->new('cs',$cs, 'tn',$tn); 
+
+    Return: new empty or initialized Oracle::Schema object.
+
+    This method constructs a Perl object and capture any parameters if
+    specified. It creates and defaults the following variables:
+
+      $self->{conn_string} = "";       # or $self->{cs}
+      $self->{table_name}  = "";       # or $self->{tn}  
+
+METHODS
+    The following are the common methods, routines, and functions defined in
+    this class.
+
+  Exported Tag: All
+
+    The *:all* tag includes all the methods or sub-rountines defined in this
+    class.
+
+      use Oracle::Schema qw(:all);
+
+    It includes the following sub-routines:
+
+  Table Methods
+
+    The *:table* tag includes sub-rountines for creating, checking and
+    manipulating tables.
+
+      use Oracle::DML::Common qw(:table);
+
+    It includes the following sub-routines:
+
+   get_table_definition($dbh,$tn,$cns,$otp)
+
+    Input variables:
+
+      $dbh - database handler, required.
+      $tn  - table/object name, required.
+             schema.table_name is allowed.
+      $cns - column names separated by comma.
+             Default is null, i.e., to get all the columns.
+             If specified, only get definition for those specified.
+      $otp - output array type:
+             AR|ARRAY        - returns ($cns,$df1,$cmt)
+             AH1|ARRAY_HASH1 - returns ($cns,$df2,$cmt)
+             HH|HASH         - returns ($cns,$df3,$cmt)
+             AH2|ARRAY_HASH2 - returns ($cns,$df4,$cmt)
+
+    Variables used or routines called:
+
+      echoMSG - display messages.
+
+    How to use:
+
+      ($cns,$df1,$cmt) = $self->getTableDef($dbh,$table_name,'','array');
+      ($cns,$df2,$cmt) = $self->getTableDef($dbh,$table_name,'','ah1');
+      ($cns,$df3,$cmt) = $self->getTableDef($dbh,$table_name,'','hash');
+      ($cns,$df4,$cmt) = $self->getTableDef($dbh,$table_name,'','ah2');
+
+    Return:
+
+      $cns - a list of column names separated by comma.
+      $df1 - column definiton array ref in [$seq][$cnn].
+        where $seq is column sequence number, $cnn is array
+        index number corresponding to column names:
+              0 - cname,
+              1 - coltype,
+              2 - width,
+              3 - scale,
+              4 - precision,
+              5 - nulls,
+              6 - colno,
+              7 - character_set_name.
+      $df2 - column definiton array ref in [$seq]{$itm}.
+        where $seq is column number (colno) and $itm are:
+              col - column name
+              seq - column sequence number
+              typ - column data type
+              wid - column width
+              max - max width
+              min - min width
+              dec - number of decimals
+              req - requirement: null or not null
+              dft - date format
+              dsp - description or comments
+      $df3 - {$cn}{$itm} when $otp = 'HASH'
+        where $cn is column name in lower case and
+              $itm are the same as the above
+      $df4 - [$seq]{$itm} when $otp = 'AH2'
+        where $seq is the column number, and $itm are:
+              cname     - column name (col)
+              coltype   - column data type (typ)
+              width     - column width (wid)
+              scale     - column scale (dec)
+              precision - column precision (wid for N)
+              nulls     - null or not null (req)
+              colno     - column sequence number (seq)
+              character_set_name - character set name
+      $cmt - {$cn}: contains comments for each column 
+
+HISTORY
+    * Version 0.01
+        This version is to set the framework and move the
+        get_table_definition from Oracle:;DML::Common.
+
+    * Version 0.02
+        Added table tag for export.
+
+SEE ALSO (some of docs that I check often)
+        Data::Describe, Oracle::Loader, CGI::Getopt, File::Xcopy,
+        perltoot(1), perlobj(1), perlbot(1), perlsub(1), perldata(1),
+        perlsub(1), perlmod(1), perlmodlib(1), perlref(1), perlreftut(1).
+
+AUTHOR
+        Copyright (c) 2005 Hanming Tu. All rights reserved.
+
+        This package is free software and is provided "as is" without
+        express or implied warranty. It may be used, redistributed and/or
+        modified under the terms of the Perl Artistic License (see
+        http://www.perl.com/perl/misc/Artistic.html)
+

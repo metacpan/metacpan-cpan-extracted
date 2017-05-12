@@ -1,0 +1,8 @@
+[%########################################
+  form_select_intro( name, is_multiple, size )
+     Create the <select> intro tag.
+  ########################################-%]
+
+[%- param_multiple = ( is_multiple ) ? 'MULTIPLE' : '';
+    param_size     = ( size ) ? "SIZE='$size'" : ''; -%]
+<select name="[% name %]" [% param_multiple %] [% param_size %]>

@@ -1,0 +1,121 @@
+PrintSetup
+
+Orac Printing
+=============
+This is a new and fairly experimental departure for Orac.
+
+The printing screen takes the text from calling screen and creates a
+Canvas widget, which it then "populates" with the text.
+
+You have a few main print screen options:
+
+
+*. Print Text
+-------------
+If you have inserted a valid "System Print Command" (more later), you can
+select this option, which will create a PostScript file (as shown in
+the top right of the screen) and then send it via your command, to your
+PostScript printer.
+
+If a PostScript file already existed, this will be overwritten with a
+new one.
+
+
+*. PostScript File
+------------------
+This does pretty much what the last option does, except it does not send
+the newly created PostScript file to a PostScript printer, via a command
+of your choosing.  It simply creates the file.  You may have your own
+PostScript printing tool on your system (such as GhostView), with which
+you view/printout such files.  GhostView is an Open Source tool, which has many
+different versions for many different OSes, including Solaris, Linux and
+Win32.  You may be able to find out more from:
+
+=> http://www.cs.wisc.edu/~ghost/
+
+
+*. Portrait/Landscape Switch
+----------------------------
+This simply toggles your PostScript output file to either be Portrait or
+Landscape, depending on your preference.
+
+
+*. Preferred Printer Paper Size
+-------------------------------
+A complete range of normal Printer Paper sizes are available, for you to 
+select.  The PostScript file you create will be configured accordingly.
+
+
+*. System Print Command
+-----------------------
+At this time, we are going to leave this completely to you.  Basically,
+input a command line string, which will take a filename on your system,
+and send it correctly to your PostScript printer.
+
+We do no validation on the correctness of your command, except check it is
+a string of non-zero length.  Because of the complexity of the many different
+OSes and network configurations out there, we will leave this setup 
+entirely down to you.
+
+For example, under Solaris, you may want to use:
+++++++++++++++++++++++++++++++++++++++++++++++++
+
+=> lp 
+
+(if your default printer is the required PostScript printer)
+
+
+=> lp -d MyPostScriptPrinterName 
+
+(where MyPostScriptPrinterName is not your default system printer)
+
+
+Under WinNT:
++++++++++++
+You may need to do some set-up, to get a valid PostScript command line
+printing command to operate effectively.
+
+You may be able to manage to get "lpr" to work on your NT box.
+
+If you install the "Microsoft TCP/IP Printing" Service and start
+it in the services control panel then lpr becomes available. You can then
+print postscript files (assuming you have a postscript printer) with a
+command such as this:
+
+=> lpr -S MyComputerName -P MyPrinterName -o l 
+
+The -o l option is needed so that the text in the postscript will be
+interpreted by the printer - otherwise you get to look at the real
+postscript code - which is likely not what you want. 
+
+(Thanks to Kevin Kitts for digging out this WinNT information.  If any
+Win32 Users would like to send us more detailed information on this,
+they are very welcome to do so).
+
+
+Save of Options
+---------------
+On exiting Orac, your printing preferences will be stored in your local
+Orac Home directory.  When you start the program up again, you should not
+have to re-input them, on the Printing screen.
+
+
+Future Extension of Orac Printing Options
+=========================================
+If anybody using Orac would like to help us extend the range of Printing 
+options, please let us know.  We are more than happy to receive your
+"new, improved" orac_Print.pm modules, as long as you follow our general
+guidelines of keeping Orac entirely Perl, and entirely OS and Database 
+independent.  Happy Perling :-)
+
+(Unless someone comes forward, we currently intend to do very little more 
+on the printing front, other than this very basic printing capability.  
+This may change, but not in the near-term future.)
+
+Rgds,
+AndyD
+andy_j_duncan@yahoo.com
+
+20th Sept 1999
+
+EOF

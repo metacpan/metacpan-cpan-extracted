@@ -1,0 +1,122 @@
+Revision history for ONTO-PERL
+==============================
+
+0.01  Wed Jun  7 13:05:23 2006
+	- original version; created by h2xs 1.23 with options
+		-AXc -n CCO
+		
+0.xx ...
+
+0.22 Improvements in exports
+
+0.23 obo2owl methods were enhanced
+
+0.24 Ontology.pm has many more functionalities
+
+0.25 GOA parser, OBO parser enhanced
+
+0.26 Enhanced: NCBIParser.pm, GoaParser.pm and Ontology.pm
+
+0.27 obo2owl transformation updated, new modules for dealing with IDs
+
+0.28 Performance improvement (code tuning)
+
+0.29 More adjustments to follow OBO 1.2 spec, Set data structures improved
+
+0.30 In sync with oboInOwl, IntAct modules
+
+0.31 oboInOwl as well as ontology exports to OBO and OWL were improved
+
+0.32 obo2owl and owl2obo scripts updated and improved, OBO and OWL Parsers enhanced
+
+1.0  Ontology union/intersection methods are now available. Many more tests were added and examples of usage
+
+1.01 CPAN test report fixed (SKIP tests when the required modules are missing)
+
+1.02 'subsets' for relationship types are now supported, test improvements
+
+1.03 export order improved (alphabetical way)
+
+1.04 more 'order' improvements in test files
+
+1.05 dates treatment is now WindowsTM compatible
+
+1.06 documentation has been enhanced: many more examples, PODs, etc.
+
+1.07 dbxref's parsing has been relaxed and improved. 'onto-perl' became 'ONTO-PERL' and some files were moved to more meaningful directories
+
+1.08 RDF export is now available (obo2rdf.pl). Improved documentation.
+
+1.09 Minor documentation improvements. Performance improvement for CCO-related modules. 
+
+1.10 Added missing file (obo2rdf.pl)
+
+1.11 Documentation and cosmetic improvements. Minor bug fixes.
+
+1.12 CCO related modules were improved.
+
+1.13 IntAct parser tests fixed. New RDF related modules.
+
+1.14 Fixed issue related to the missing 'lib' directory.
+
+1.15 Fixed issue with URL's that were hard-coded.
+
+1.16 obo2owl ready for Galaxy.
+
+1.17 Added some more scripts.
+
+1.18 Added missing scripts.
+
+1.19 Fixed old bug (multiple relationships between 2 terms). Added 3 more scripts (trimming, get sub-ontology, and get terms by name).
+
+1.20 Fixed DbXref bug (http-like URLs).
+
+1.21 New scripts (get_obsolete_terms.pl and get_root_terms.pl). POD improvements.
+
+1.22 Added get_term_synonyms.pl; Added $VERSION to Ontology.pm; RegExp improvements.
+
+1.23 Added support for 'created_by' and 'creation_date' tags; fixed bug in synonyms parsing.
+
+1.24 Added new classes to deal with OBO ID in a more generic way; added many more tests; fixed bug when a term def was empty.
+
+1.25 IDspaces are now better supported; more tests added; removed unnecessary code.
+
+1.26 IDspaces bug fix; new set: IDspaceSet; code cleaning. Improved exports.
+
+1.27 Closed some TODO's. Some refactoring to comply with the OBO guide. New modules Subset.pm and Map.pm
+
+1.28 Added missing file (SubsetDefSet.pm), which broke many tests. Fixed minor bugs.
+
+1.29 Added missing script (get_terms_and_synonyms.pl), minor bug fixes.
+
+1.30 Code cleaning. Code optimisation, minor bug fixes.
+
+1.31 Croak fixes. CCO modules clean-up.
+
+1.32 Code clean up. Better regexp's. A few new sub's and tests. A few bug fixes. OBO::Core::Ontology->subset_def_set() became OBO::Core::Ontology->subset_def_map()
+
+1.33 CCO modules updated. Minor improvements (e.g. get_relationships_by_(source|target)_term). New modules for instances. Relationship types are added while adding relationship.
+
+1.34 Transitive reduction of ontologies implemented (OBO::Util::Ontolome). Minor performance enhancements. 
+
+1.35 Term and Relationship type synonyms can be updated (based on the same synonym type name if defined). Fixed bug in Synonym.pm. Improved PODs. Dates in 'creation_date' entries are checked. Stricter module versions.
+
+1.36 Term Local Neighbourhood retrieval implemented. Now using croak's instead of die's. Renaming: CCO --> APO. Checks in OBO::Core::Ontology::export() improved. New script for LCA. Bug fix in OBO::Util::SynonymSet::equals(). Some parsers were moved and cleaned.
+
+1.37 Added missing data test file (up.dat). OBO::Core::Ontology::(delete_term()|set_term_id()) improved. Reflexive is_a relationships are now warned and skipped while parsing OBO files. SwissProtToRDF.pm added.
+
+1.38 OBO::Core::Ontology::export is been "cleaned" and modularised (export2obo|rdf|owl|dot|gml|xml). File handles are better in test files. Parsers were improved. 'vis' exports are no longer supported. SwissProtToRDF.t added.
+
+1.39 export2rdf bug fixed; SwissProtToRDF.t now checks if SWISS/Entry.pm is available. OBO::Core::(Instance|Relationship) were enhanced. Initial code to handle 'property_value' tags with instances. Fixed bug in Ontolome::transitive_reduction(). Experimental relationships composition implemented (for is_a and part_of).
+
+1.40 Bug fixed in the parsing of the synonym scope. 'property_value' for OBO::Core::Term.
+
+1.41 property_value code improved. dbxref bug fixed (URLs). UTF-8 support. onto-perl now understands 'default_relationship_id_prefix' and 'treat-xrefs-as-is_a'. All 'scripts (*.pl)' were cleaned. Relationship ID bug fixed. Reporting line counting bug fixed.
+
+1.42 Makefile.PL improved. Subsets for Terms and Instances are now sorted in exports. Unused subsets and synonym type definitions: checked and removed while parsing. Refactoring: is_functional, is_inverse_functional. Check of recommended XML-parser primitives. Bug fix in Ontolome::transitive_closure().
+
+1.43 Makefile.PL adapted: required modules, versions. Improvements in Ontolome::transitive_closure() and Ontology::export2rdf(). New script: bioportal_csv2obo.pl
+
+1.44 Added missing file (bioportal_csv2obo.pl). Update of README and INSTALL.
+
+1.45 Fixed Changes file. Added more tests and checks for OBO::Core::Ontology::get_paths_term_terms_same_rel(). Fixed bug in 'property_value' OBO parser. License harmonisation. New script: go2csv.pl. Scripts got a better interface (GetOptions).

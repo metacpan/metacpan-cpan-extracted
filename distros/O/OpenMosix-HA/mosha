@@ -1,0 +1,13 @@
+#!/usr/bin/perl -w
+use strict;
+use OpenMosix::HA;
+
+my $ha=new OpenMosix::HA;
+# $ha->{clinit_s}='/tmp/clinit.s';
+# warn $ha->{mynode};
+# warn join ' ', $ha->nodes();
+# warn $ha->{clinit_s};
+$ha->clinit;
+# warn $ha->{init}{socket};
+$ha->monitor();
+

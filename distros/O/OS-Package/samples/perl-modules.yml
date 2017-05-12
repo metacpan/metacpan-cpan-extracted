@@ -1,0 +1,14 @@
+pkgname: perl-modules
+name: Perl Modules
+description: Perl Modules
+version: 5.14.4
+homepage: http://www.cpan.org
+prefix: /opt/sf/perl
+
+build: |
+  cpanm -n --local-lib-contained=[% FAKEROOT %][% PREFIX %] Task::Kensho
+
+maintainer:
+  author: James F Wilkus
+  email: jfwilkus@cpan.org
+  nickname: jfwilkus

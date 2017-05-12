@@ -1,0 +1,100 @@
+#!/usr/bin/perl
+# $Id: ocr,v 1.6 2009/02/10 08:04:55 dk Exp $
+
+use strict;
+use subs qw(log);
+
+BEGIN { 
+	local @ARGV; 
+	require Prima::noX11; 
+	require Prima; 
+}
+
+use Getopt::Long;
+use OCR::Naive qw(:all);
+
+my ( 
+	%options,
+	$db, @sorted_glyphs,
+	@curr_ext, @curr_pos, $curr_glyph, $curr_index, $curr_entry,
+);
+
+%options = (
+	verbose  => 0,
+	dict     => 'dict',
+	help     => 0,
+	screen   => 0,
+	sleep    => undef,
+	contrast => 128,
+	minspace => undef,
+);
+
+GetOptions( \%options,
+	'verbose',
+	'help',
+	'screen',
+	'dict=s',
+	'sleep=i',
+	'contrast=i',
+	'minspace=i',
+) or usage();
+
+usage() if $options{help};
+
+my $needarg = $options{screen} ? 0 : 1;
+$needarg == @ARGV or usage();
+
+sub usage
+{
+	print <<USAGE;
+
+$0 - OCR an image
+
+options:
+   --verbose        - be verbose
+   --help           - show this text
+
+   --dict=FILE      - load from dictionary FILE, save changes there
+   --screen         - grab screen instead of loading image
+   --sleep=SEC      - sleep SECONDS before grabbing from screen
+   --contrast=INT   - minimal contrast (0-255) between assumed foreground 
+                      and background. default: 128
+   --minspace=INT   - minimal width in pixel for space. 
+                      calculated automatically by default
+
+USAGE
+	exit 1;
+}
+
+sub log { warn join('',@_), "\n" if $options{verbose} }
+
+my $i;
+unless ( $options{screen}) {
+	log "loading $ARGV[0]" ;
+	$i = Prima::Image-> load( $ARGV[0]);
+	die "Cannot load $ARGV[0]:$@\n" unless $i;
+} else {
+	log "grabbing screen";
+	my $error = Prima::XOpenDisplay();
+	die $error if $error;
+	$::application = Prima::Application-> new;
+	sleep( $options{sleep}) if $options{sleep};
+	$i = $::application-> get_image( 0,0,$::application-> size);
+}
+
+log "loaded ", ( $i-> type & im::BPP), " bpp image ", $i-> width, "x", $i-> height;
+
+# load db
+$db = load_dictionary( $options{dict} );
+die "Cannot open dictionary $options{dict}:$!\n" 
+	unless $db;
+log scalar(keys %$db), " glyphs loaded";
+die "DB is empty, aborting" unless scalar keys %$db;
+
+$i = enhance_image( $i, 
+	verbose      => $options{verbose},
+	min_contrast => $options{contrast},
+);
+
+my @text = recognize( $i, $db, verbose => $options{verbose}, minspace => $options{minspace});
+print "$_\n" for @text;

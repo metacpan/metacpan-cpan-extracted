@@ -1,0 +1,135 @@
+
+                Type-5 AS External Link States
+
+LS age: 872
+LS Type: AS External
+Link State ID: 0.0.0.1
+Advertising Router: 10.188.50.50
+LS Seq Number: 0x80000009
+Checksum: 0x2c80
+Length: 28
+    Flags: *|*|*|*|*|-|-|-
+    Metric: 60 Type: 1
+    Prefix: ::/0
+
+LS age: 872
+LS Type: AS External
+Link State ID: 0.0.0.2
+Advertising Router: 10.188.50.50
+LS Seq Number: 0x80000009
+Checksum: 0xb07b
+Length: 36
+    Flags: *|*|*|*|*|-|-|-
+    Metric: 80 Type: 1
+    Prefix: fdd7:e83e:66bc:102::/64
+
+LS age: 872
+LS Type: AS External
+Link State ID: 0.0.0.3
+Advertising Router: 10.188.50.50
+LS Seq Number: 0x80000009
+Checksum: 0xc753
+Length: 36
+    Flags: *|*|*|*|*|-|-|-
+    Metric: 80 Type: 1
+    Prefix: fdd7:e83e:66bc:112::/64
+
+LS age: 872
+LS Type: AS External
+Link State ID: 0.0.0.4
+Advertising Router: 10.188.50.50
+LS Seq Number: 0x80000009
+Checksum: 0x0fdb
+Length: 36
+    Flags: *|*|*|*|*|-|-|-
+    Metric: 80 Type: 1
+    Prefix: fdd7:e83e:66bc:141::/64
+
+LS age: 872
+LS Type: AS External
+Link State ID: 0.0.0.5
+Advertising Router: 10.188.50.50
+LS Seq Number: 0x80000009
+Checksum: 0x17d1
+Length: 36
+    Flags: *|*|*|*|*|-|-|-
+    Metric: 80 Type: 1
+    Prefix: fdd7:e83e:66bc:142::/64
+
+LS age: 872
+LS Type: AS External
+Link State ID: 0.0.0.6
+Advertising Router: 10.188.50.50
+LS Seq Number: 0x80000009
+Checksum: 0x43a1
+Length: 36
+    Flags: *|*|*|*|*|-|-|-
+    Metric: 80 Type: 1
+    Prefix: fdd7:e83e:66bc:145::/64
+
+LS age: 872
+LS Type: AS External
+Link State ID: 0.0.0.7
+Advertising Router: 10.188.50.50
+LS Seq Number: 0x80000009
+Checksum: 0x4b97
+Length: 36
+    Flags: *|*|*|*|*|-|-|-
+    Metric: 80 Type: 1
+    Prefix: fdd7:e83e:66bc:146::/64
+
+LS age: 872
+LS Type: AS External
+Link State ID: 0.0.0.8
+Advertising Router: 10.188.50.50
+LS Seq Number: 0x80000009
+Checksum: 0x299d
+Length: 36
+    Flags: *|*|*|*|*|-|-|-
+    Metric: 80 Type: 1
+    Prefix: fdd7:e83e:66bc:161::/64
+
+LS age: 872
+LS Type: AS External
+Link State ID: 0.0.0.9
+Advertising Router: 10.188.50.50
+LS Seq Number: 0x80000009
+Checksum: 0x3193
+Length: 36
+    Flags: *|*|*|*|*|-|-|-
+    Metric: 80 Type: 1
+    Prefix: fdd7:e83e:66bc:162::/64
+
+LS age: 872
+LS Type: AS External
+Link State ID: 0.0.0.10
+Advertising Router: 10.188.50.50
+LS Seq Number: 0x80000009
+Checksum: 0x5d63
+Length: 36
+    Flags: *|*|*|*|*|-|-|-
+    Metric: 80 Type: 1
+    Prefix: fdd7:e83e:66bc:165::/64
+
+LS age: 872
+LS Type: AS External
+Link State ID: 0.0.0.11
+Advertising Router: 10.188.50.50
+LS Seq Number: 0x80000009
+Checksum: 0x6559
+Length: 36
+    Flags: *|*|*|*|*|-|-|-
+    Metric: 80 Type: 1
+    Prefix: fdd7:e83e:66bc:166::/64
+
+LS age: 872
+LS Type: AS External
+Link State ID: 0.0.0.12
+Advertising Router: 10.188.50.50
+LS Seq Number: 0x80000009
+Checksum: 0x907f
+Length: 36
+    Flags: *|*|*|*|*|-|-|-
+    Metric: 80 Type: 1
+    Prefix: fdd7:e83e:66bc:213::/64
+

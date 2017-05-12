@@ -1,0 +1,13 @@
+^const-c.inc$
+^const-xs.inc$
+^blib/
+.*~$
+MYMETA.*
+\.o$
+GLU.c$
+GLU.bs$
+^MANIFEST.bak$
+Makefile.old$
+^pm_to_blib$
+^Makefile$
+^.git/

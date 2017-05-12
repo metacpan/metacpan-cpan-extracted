@@ -1,0 +1,330 @@
+
+
+
+Oracle(3)      User Contributed Perl Documentation	Oracle(3)
+
+
+NAME
+       DDL::Oracle - a DDL generator for Oracle databases
+
+VERSION
+       VERSION = 1.05
+
+SYNOPSIS
+	use DBI;
+	use DDL::Oracle;
+
+	my $dbh = DBI->connect(
+				"dbi:Oracle:dbname",
+				"username",
+				"password",
+				{
+				 PrintError => 0,
+				 RaiseError => 1
+				}
+	    );
+
+	# Use default resize and schema options.
+	# query default DBA_xxx tables (could use USER_xxx for non-DBA types)
+	DDL::Oracle->configure(
+				dbh    => $dbh,
+			      );
+
+	# Create a list of one or more objects
+	my $sth = $dbh->prepare(
+	       "SELECT
+		       owner
+		     , table_name
+		FROM
+		       dba_tables
+		WHERE
+		       tablespace_name = 'MY_TBLSP'    -- your mileage may vary
+	       "
+	    );
+
+	$sth->execute;
+	my $list = $sth->fetchall_arrayref;
+
+	my $obj = DDL::Oracle->new(
+				    type  => 'table',
+				    list  => $list,			     );
+				  );
+
+	my $ddl = $obj->create;	     # or $obj->resize;	 or $obj->drop;	 etc.
+
+	print $ddl;    # Use STDOUT so user can redirect to desired file.
+
+
+DESCRIPTION
+
+
+
+
+
+13/Mar/2001		    perl 5.006				1
+
+
+
+
+
+Oracle(3)      User Contributed Perl Documentation	Oracle(3)
+
+
+       Overview
+
+       Designed for Oracle DBA's and users.  It reverse engineers
+       database objects (tables, indexes, users, profiles,
+       tablespaces, roles, constraints, etc.).	It generates DDL
+       to *resize* tables and indexes to the provided standard or
+       to a user defined standard.
+
+       We originally wrote a script to defrag tablespaces, but as
+       DBA's we regularly find a need for the DDL of a single
+       object or a list of objects (such as all of the indexes
+       for a certain table).  So we took all of the DDL statement
+       creation logic out of defrag.pl, and put it into the
+       general purpose DDL::Oracle module, then expanded that to
+       include tablespaces, users, roles, and all other
+       dictionary objects.
+
+       Oracle tablespaces tend to become fragmented (now THAT's
+       an understatement).  Even when object sizing standards are
+       adopted, it is difficult to get 100% compliance from
+       users.  And even if you get a high degree of compliance,
+       objects turn out to be a different size than originally
+       thought/planned -- small tables grow to become large
+       (i.e., hundreds of extents), what was thought would be a
+       large table ends up having only a few rows, etc.	 So the
+       main driver for DDL::Oracle was the object management
+       needs of Oracle DBA's.  The "resize" method generates DDL
+       for a list of tables or indexes.	 For partitioned objects,
+       the "appropriate" size of EACH partition is calculated and
+       supplied in the generated DDL.  The original defrag.pl
+       will be rewritten to use DDL::Oracle, and supplied with
+       its distribution.
+
+       Initialization and Constructor
+
+       configure
+
+       The configure method is used to supply the DBI connection
+       and to set several session level attributes.  These are:
+
+	     dbh      A reference to a valid DBI connection (obtained via
+		      DBI->connect).  This is the only mandatory attribute.
+
+		      NOTE: The user connecting should have SELECT privileges
+			    on the following views (in addition to the DBA or
+			    USER views), but see attributes 'heading' for
+			    exceptions:
+
+				V$DATABASE
+
+
+
+
+
+
+
+
+13/Mar/2001		    perl 5.006				2
+
+
+
+
+
+Oracle(3)      User Contributed Perl Documentation	Oracle(3)
+
+
+			    And, in order to generate CREATE SNAPSHOT LOG
+			    statements, you will also need to create a PUBLIC
+			    SYNONYM for DBA_SNAPSHOT_LOG_FILTER_COLS.  In
+			    order for non-DBA users to do the same, you will
+			    need to grant SELECT on this view to them (e.g.,
+			    to PUBLIC).	 Why Oracle Corp. feels this view is
+			    of no interest to non-replication users is a
+			    mystery to the author.
+
+			    And, in order to generate CREATE INDEX statements
+			    for indexes which have DESCending column(s) and/or
+			    include FUNCTION based column(s), you must have
+			    select privileges on SYS.COL$, wherein the real
+			    name of the column or function definition is held.
+
+	     schema   Defines whether and what to use as the schema for DDL
+		      on objects which use this syntax.	 "1" means use the
+		      owner of the object as the schema; "0" or "" means
+		      omit the schema syntax; any other arbtrary string will
+		      be imbedded in the DDL as the schema.  The default is "1".
+
+	     resize   Defines whether and what to use in resizing segments.
+		      "1" means resize segments using the default algorithm;
+		      "0" or "" means keep the current INITIAL and NEXT
+		      values; any other string will be interpreted as a
+		      resize definition.  The default is "1".
+
+		      To establish a user defined algorithm, define this with
+		      a string consisting of n sets of LIMIT:INITIAL:NEXT.
+		      LIMIT is expressed in Database Blocks.  The highest LIMIT
+		      may contain the string 'UNLIMITED', and in any event will
+		      be forced to be so by DDL::Oracle.
+
+	     view     Defines which Dictionary views to query:	DBA or USER
+		      (e.g., DBA_TABLES or USER_TABLES).  The default is DBA.
+
+	     heading  Defines whether to include a Heading having Host, Instance,
+		      Date/Time, List of generated Objects, etc.  "1" means
+		      include the heading; "0" or "" means to suppress the
+		      heading (and eliminate the query against V$DATABASE).
+		      The default is "1".
+
+	     prompt   Defines whether to include a PROMPT statement along
+		      with the DDL.  If the output is intended for use in
+		      SQL*Plus, this will cause SQL*Plus to display a comment
+		      about each statement before it executes, which can be
+		      helpful in a multi-statement file.  "1" means include
+		      the prompt; "0" or "" means to suppress the prompt.
+
+       new
+
+       The new method is the object constructor.  The two
+       mandatory object definitions are supplied with this
+       method, to wit:
+
+
+
+13/Mar/2001		    perl 5.006				3
+
+
+
+
+
+Oracle(3)      User Contributed Perl Documentation	Oracle(3)
+
+
+	     type    The type of object (e.g., TABLE, INDEX, SYNONYM, family,
+		     etc.).
+
+		     For 'table family', supply the name(s) of tables -- the
+		     DDL will include the table and its:
+			 Comments (Table and Column)
+			 Indexes
+			 Constraints
+			 Triggers
+
+	     list    An arrayref to an array of arrayrefs (as in the DBI's
+		    "fetchall_arrayref" method) containing pairs of owner and
+		     name.
+
+
+       Object methods
+
+       create
+
+       The create method generates the DDL to create the list of
+       Oracle objects.
+
+       drop
+
+       The drop method generates the DDL to drop the list of
+       Oracle objects.
+
+       resize
+
+       The resize method generates the DDL to resize the list of
+       Oracle objects.	The 'type' defined in the 'new' method is
+       limited to 'index' and 'table'.	For tables, this
+       generates an ALTER TABLE MOVE statement; for indexes, it
+       generates an ALTER INDEX REBUILD statement.  If the table
+       or index is partitioned, then a statement for each
+       partition is generated.
+
+       To generate DDL for a single partition of an index or
+       table, define the 'name' as a colon delimited field (e.g.,
+       'name:partition').
+
+       compile
+
+       The compile method generates the DDL to compile the list
+       of Oracle objects.  The 'type' defined in the 'new' method
+       is limited to 'function', 'package', 'procedure',
+       'trigger' and 'view'.
+
+BUGS
+       The generated DDL contains the Schema and Object Name in
+       lower case.  In the case of triggers, this will cause a
+       problem if the "... ON <schema>.<table>" clause is quoted.
+       For example, a trigger on table MY_TABLE in schema ME
+       written as '...BEFORE INSERT ON "ME"."MY_TABLE"...' will
+
+
+
+13/Mar/2001		    perl 5.006				4
+
+
+
+
+
+Oracle(3)      User Contributed Perl Documentation	Oracle(3)
+
+
+       generate the DDL as
+
+	  '... BEFORE INSERT ON "me"."my_table"...'
+
+       There are no plans to change this.
+
+FILES
+	copy_user.pl
+	copy_user.sh
+	ddl.pl
+	defrag.pl
+	query.pl
+
+
+AUTHOR
+	Richard V. Sutherland
+	rvsutherland@yahoo.com
+
+
+COPYRIGHT
+       Copyright (c) 2000, 2001 Richard V. Sutherland.	All
+       rights reserved.	 This module is free software.	It may be
+       used, redistributed, and/or modified under the same terms
+       as Perl itself.	See:
+
+	   http://www.perl.com/perl/misc/Artistic.html
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+13/Mar/2001		    perl 5.006				5
+
+

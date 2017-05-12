@@ -1,0 +1,15 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+LICENCE
+t/OMA-Download-DRM.t
+t/pod.t
+t/pod-coverage.t
+lib/OMA/Download/DRM.pm
+lib/OMA/Download/DRM/CF.pm
+lib/OMA/Download/DRM/REL.pm
+lib/OMA/Download/DRM/REL/XML.pm
+lib/OMA/Download/DRM/REL/WBXML.pm
+image.jpg
+META.yml                                 Module meta-data (added by MakeMaker)

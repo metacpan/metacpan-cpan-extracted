@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<SITE ID="Linkmaster">
+
+<NAME Lang="en-us">LinkMaster Cool Search</NAME>
+<INFO Lang="en-us">multimedia and lifestyle relevant information web search</INFO>
+
+<URL Type="More"><![CDATA[
+post://linkmaster.com/search.cfm?last_item=_LAST_&subject=&features=&term1=_QSTR_&next=_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+post://linkmaster.com/search.cfm?term1=_QUERY_&features=&SUBJECT=
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_LAST_"><![CDATA[
+hidden" name="last_item" value="_LAST_">
+]]></VAR>
+<VAR Name="_QSTR_"><![CDATA[
+hidden" name="term1" value="_QSTR_">
+]]></VAR>
+<VAR Name="_NEXT_"><![CDATA[
+hidden" name="next" value="_NEXT_">
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<a href="_URL_"___><b>_TITLE_</b></font></a>___-_PREVIEW_</font><br>
+]]></TEMPLATE>
+</SITE>

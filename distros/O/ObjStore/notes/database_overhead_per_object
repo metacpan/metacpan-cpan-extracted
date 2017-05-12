@@ -1,0 +1,40 @@
+PLATFORM:    All
+
+OBJECTSTORE: 3.x
+
+DATE:        09/29/94
+
+
+
+
+KEYWORDS:  object, overhead, database, size, allocation
+
+
+
+
+QUESTION:
+
+If I allocate an object in an ObjectStore database, what is the
+overhead in terms of database size per object creation?
+
+
+ANSWER:
+
+There is an associated entry in the info segment for the segment in 
+question for each allocation of the object. This is done in the tag 
+table. The overhead is 16 bits (i.e., 2 bytes) for each singleton (i.e.,
+non-array) allocation, 32 bits for each character array allocation for 
+character arrays <= 255 characters, and 48 bits for each character array
+allocation > 255 characters, or any array allocation of an object of 
+another type.
+
+Also, depending on the size of an object (i.e., if you allocate a "huge" 
+object - one that is >64Kb) there is other overhead caused by alignment 
+constraints. 
+
+Having said this, remember that all database management systems have a 
+certain overhead in object/row allocation - for example, RDBMS's have
+a hidden column - generally called ROWID - that is present for each
+row of every table in the database. This is typically a long datestamp 
+- 4 bytes per row.
+FAQ_reference: database_overhead_per_object

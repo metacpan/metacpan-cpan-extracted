@@ -1,0 +1,95 @@
+---
+abstract: 'automate setup of access to OAuth-secured resources. Intended especially for use in console scripts, ad hoc applications etc.'
+author:
+  - 'Marcin Kasperski <Marcin.Kasperski@mekk.waw.pl>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+  File::Spec: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  Test::CheckDeps: 0.010
+  Test::More: 0.94
+  Test::Most: 0
+  Test::UseAllModules: 0
+  perl: v5.10.0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+  File::ShareDir::Install: 0.06
+  perl: v5.10.0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240'
+keywords:
+  - OAuth
+  - webservice
+  - authorization
+  - http
+  - Net
+  - REST
+  - web-api
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: OAuthomatic
+no_index:
+  directory:
+    - examples
+    - t
+recommends:
+  Passwd::Keyring::Gnome: 0
+  Passwd::Keyring::PWSafe3: 0
+requires:
+  Browser::Open: 0
+  Carp: 0
+  Const::Fast: 0.014
+  Data::Dump: 0
+  Encode: 0
+  Exporter::Shiny: 0
+  File::ShareDir: 1.03
+  HTTP::Body: 0
+  HTTP::Headers: 0
+  HTTP::Request: 0
+  HTTP::Response: 0
+  HTTP::Server::Brick: 0
+  HTTP::Status: 0
+  IO::Interactive: 0
+  IO::Null: 0
+  JSON: 0
+  LWP::UserAgent: 0
+  Module::Pluggable: 0
+  Moose: 0
+  Moose::Role: 0
+  Moose::Util::TypeConstraints: 0
+  MooseX::AttributeShortcuts: 0
+  MooseX::Getopt: 0
+  MooseX::Types::Path::Tiny: 0
+  Net::EmptyPort: 0
+  Net::OAuth: 0
+  Net::SSL: 0
+  Passwd::Keyring::Auto: 0
+  Path::Tiny: 0
+  Proc::Background: 0
+  Role::HasMessage::Errf: 0
+  Role::HasPayload::Merged: 0
+  Scalar::Util: 0
+  StackTrace::Auto: 0
+  Template: 0
+  Thread::Queue: 3.02
+  Throwable: 0
+  Try::Tiny: 0
+  URI: 0
+  URI::QueryParam: 0
+  feature: 0
+  namespace::sweep: 0
+  overload: 0
+  perl: v5.10.0
+  strict: 0
+  threads: 0
+  utf8: 0
+  version: 0
+  warnings: 0
+resources:
+  bugtracker: https://bitbucket.org/Mekk/perl-oauthomatic/issues
+  homepage: http://bitbucket.org/Mekk/perl-oauthomatic
+  repository: http://bitbucket.org/Mekk/perl-oauthomatic
+version: 0.0201

@@ -1,0 +1,51 @@
+NAME
+    Object::Attribute::Cached - cache complex object attributes
+
+SYNOPSIS
+            use Object::Attribute::Cached
+                    attribute1 => sub { shift->some_complex_task },
+                    squared => sub { shift->{num} ** 2 },
+                    uptosquare => sub { 1 .. shift->squared },
+                    squaredsquared => sub { map $_ ** 2, shift->uptosquare };
+
+DESCRIPTION
+    This provides a simple interface to writing simple caching attribute
+    methods.
+
+    It avoids having to write code like:
+
+            sub parsed_query { 
+                    my $self = shift;
+                    $self->{_cached_parsed_query} ||= $self->parse_the_query;
+                    return $self->{_cached_parsed_query};
+            }
+
+    Instead you can just declare:
+
+            use Object::Attribute::Cached
+                    parsed_query => sub { shift->parse_the_query };
+
+CAVEATS
+    We try to allow an attribute to be a lists or hash and examine caller()
+    to try to do the right thing. This will work for simple cases, but if
+    you're running into problems, or trying to do something more complex,
+    it's always safer to use references instead.
+
+AUTHOR
+    Tony Bowden
+
+BUGS and QUERIES
+    Please direct all correspondence regarding this module to:
+    bug-Object-Attribute-Cached@rt.cpan.org
+
+COPYRIGHT AND LICENSE
+      Copyright (C) 2003-2005 Kasei
+
+      This program is free software; you can redistribute it and/or modify it under
+      the terms of the GNU General Public License; either version 2 of the License,
+      or (at your option) any later version.
+
+      This program is distributed in the hope that it will be useful, but WITHOUT
+      ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+      FOR A PARTICULAR PURPOSE.
+

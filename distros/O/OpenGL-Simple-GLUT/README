@@ -1,0 +1,30 @@
+OpenGL::Simple::GLUT version 0.01
+=================================
+
+OpenGL::Simple::GLUT provides an interface to the GLUT utility library
+for OpenGL. Not all of GLUT is supported.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+You probably want to have OpenGL::Simple installed to use this. It
+requires the GLUT and GL libraries; FreeGLUT ought to work as well.
+
+It has been successfully built on linux, IRIX 6.5, and MacOS X ; patches
+welcome for ports to other platforms.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 Jonathan Chin
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

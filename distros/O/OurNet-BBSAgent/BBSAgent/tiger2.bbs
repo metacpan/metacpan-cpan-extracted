@@ -1,0 +1,50 @@
+# $File: //depot/OurNet-BBSAgent/BBSAgent/tiger2.bbs $ $Author: autrijus $
+# $Revision: #5 $ $Change: 2829 $ $DateTime: 2002/01/10 14:54:36 $
+# Contributed by Autrijus Tang <autrijus@autrijus.org>
+# zh_TW.Big5: 虎二站
+
+Tiger2
+bbs.tiger2.net
+
+load maple3.board
+
+# as far as we know, this is a B&W site
+setv separator ────(?:─)+
+setv headl \x20
+setv headr \x20\x20(.+?)(?:,\x20.+)?\x20+$
+setv headi 作者,標題,時間
+
+=login
+wait login：
+send askpass\n
+wait 代號：
+send $[username]\n
+doif $[password]
+    wait 密碼：
+    send $[password]\nn\n
+endo
+send \n\n\n\n
+
+=board_article_fetch_first
+call board $[board]
+send $[article]\n\n
+wait \e[2J
+till \e[0;30;47m
+  or \e[30;47m
+till \e[m
+wait (q)結束
+  or (aA)搜尋作者
+exit
+
+=board_article_fetch_next
+send \n
+till \e[0;30;47m
+  or \e[30;47m
+till \e[m
+wait (q)結束
+  or (aA)搜尋作者
+exit
+
+=board_article_fetch_last
+send q
+till 板主：

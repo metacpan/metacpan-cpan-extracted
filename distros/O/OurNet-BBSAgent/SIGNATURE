@@ -1,0 +1,85 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.23.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It would check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 d1f2507ec4dd3559fd5d50dc83e8cc00251e5365 BBSAgent.pm
+SHA1 8bdf07b91e2f886e01026060de76023e36cd6038 BBSAgent/aquaphoto.bbs
+SHA1 71b865e1803d903b02b3fe3e99cc46cbad1f3942 BBSAgent/bahamut.bbs
+SHA1 a64043d910a1c65a0224989f67d3855ff52eefc0 BBSAgent/bandplaza.bbs
+SHA1 2cfba2bb9f99e7c20b4d7067e8a7679129bca2d4 BBSAgent/birdnest.bbs
+SHA1 75905509efd63a92d12164f8d01a263b983736b3 BBSAgent/cvic.bbs
+SHA1 a1ae66801415785484400d190ed63d1241e039b0 BBSAgent/elixus.bbs
+SHA1 08fc77560ccc2695452fae51cf5ee3f0db268fd3 BBSAgent/firebird.bbs
+SHA1 b597f380acdb94e54e8a9d3d5171bfca2e1734cf BBSAgent/firebird2/base.inc
+SHA1 e6f5c0bc1e0c6af41ac7b25d58a729ffc1d619d0 BBSAgent/firebird2/board.inc
+SHA1 470252d857d41f33e616de7c36f58820cebc971e BBSAgent/firebird3/base.inc
+SHA1 5ce3b0bee580fda5c16f6b452e2ea19e75f80052 BBSAgent/firebird3/board.inc
+SHA1 ad0f2427eb13c5252354cf584ffe1d870bb439ce BBSAgent/fpg.bbs
+SHA1 0e755a37328a9fa84cc708078c1d62e8372e50fd BBSAgent/gugod.bbs
+SHA1 939cbb7fcbf5b91bc17d7e6c7c9d89821d287b3d BBSAgent/home.bbs
+SHA1 3f7bbc21a6b89253762e71a7ceb4de10d78c98d9 BBSAgent/hsnu.bbs
+SHA1 57aec237069ae6bef30bcaa260137d37ce804942 BBSAgent/hua.bbs
+SHA1 1757e62d222820168dc51eee1e74504c65b7351b BBSAgent/kimo.bbs
+SHA1 66deed9064ad59d6bcf583fcf7eede1e0239c61c BBSAgent/kkcity.bbs
+SHA1 d7fe9b3d3de6f2583db316b046066d7d4317ebf3 BBSAgent/kuas.bbs
+SHA1 c2053f610f661bb17dde8172b5f0877bdc290df0 BBSAgent/m543.bbs
+SHA1 a1e00f7d07adf5d0028634133c5ffcb4b63693dc BBSAgent/maple2/base.inc
+SHA1 703a2c6f1de8c1bda115560768b02a02df62b021 BBSAgent/maple2/board.inc
+SHA1 8099b42c276036e5792718589f1b031eed7da230 BBSAgent/maple2/session.inc
+SHA1 36d3c31119638c314a28107871a6613ea393a915 BBSAgent/maple2/user.inc
+SHA1 99b871fec03d09542c6c4076b5399c8291b4a795 BBSAgent/maple3/base.inc
+SHA1 619ae2fbf0f7c913ccac866f76420c777c311965 BBSAgent/maple3/board.inc
+SHA1 beca68c2df8bcdb71e58b51a8bc9aaaf7911bed4 BBSAgent/maple3/session.inc
+SHA1 b164995553fceba8689e0e61ab38f746b638fdc7 BBSAgent/maple3/user.inc
+SHA1 af5c20887ec0cde6aa703382485fdc7a29c558e5 BBSAgent/maxwell.bbs
+SHA1 d3f260681ae6a77917fe060a0e0c4cf14c5213e3 BBSAgent/melix.bbs
+SHA1 e88cadba92b81d17a658cdb03a7ee8a07e33c3da BBSAgent/melix/base.inc
+SHA1 ebe49b87e7958e92ce82f4d4326376f298367d8f BBSAgent/melix/board.inc
+SHA1 c9d5854c97ed0cbb18f1bb37b80abab93b7a3030 BBSAgent/melix/session.inc
+SHA1 bfac363dddd93386b7a6424c65efbafdd90d6f6b BBSAgent/melix/user.inc
+SHA1 7a548b03b95ca50f1190c5643cfbf03840cc42e8 BBSAgent/miou.bbs
+SHA1 95f05d87c99613244440df1e3e75440b7114c9dc BBSAgent/neto.bbs
+SHA1 3709bf6ff7ba5137deb9021f7f2b101c8cb39ef9 BBSAgent/ntu.bbs
+SHA1 c69902fb5919b024d3bab0faa0ca5b64cd625a4e BBSAgent/ofo.bbs
+SHA1 9cc4ded7cb255e2e7c3b23fd5972477ad8f036f8 BBSAgent/openbazaar.bbs
+SHA1 82600c1cdcffa274c87c69b3aff2e386aac436b8 BBSAgent/paradise.bbs
+SHA1 7e3beb32cb4d827d2252bf43c61fcf878c32cfdb BBSAgent/pku.bbs
+SHA1 4856d9f6229f9706b658f60581dd5a93041e4567 BBSAgent/ptt.bbs
+SHA1 b495bcb79a27c0f0e4f76cf3e106cb87c625e901 BBSAgent/ptt2.bbs
+SHA1 c2e0cdd04edab1f05a2a565f9e8532c523d88abf BBSAgent/saloon.bbs
+SHA1 36b9ab57f6b14c3e4c65f5874c94103e17c41392 BBSAgent/sayya.bbs
+SHA1 5e24fa209fb47492776eac84d3490d19548c99c3 BBSAgent/summer.bbs
+SHA1 af4d7d1323220f061c659cc12f8b9cf79d9f5fa6 BBSAgent/terry.bbs
+SHA1 99539dce9b7db3d81a46c8d63adda0b805203a8a BBSAgent/tfg.bbs
+SHA1 c675968302681b5b6d6eddc1e88806e54078df7c BBSAgent/tiger2.bbs
+SHA1 3574c7c3e321bf195f6497b4a648b71f8f4b809f BBSAgent/tkucs.bbs
+SHA1 8e3a47417e2c4c37c1c75e9cc93e0729de7b1ebb BBSAgent/twserv.bbs
+SHA1 a7fe730781562d09932e81469a0251ae99ac6721 BBSAgent/ufo.bbs
+SHA1 736ba7053f1ba044ea033e1a4a6bcfc8c5b8a32e BBSAgent/wretch.bbs
+SHA1 607b17cdfd472272be1c69ea84e9d1290969b1b1 BBSAgent/zoo.bbs
+SHA1 fc6ab22068fa79068d1a8641f1ce0e54cad280f5 Changes
+SHA1 50e0dc2a21f07a4c9f40b192620ce51a196e456c MANIFEST
+SHA1 d5ad4f442cf78a580e8664b244a588180a005172 META.yml
+SHA1 e807030acbb36167870fa69fcb59d7cc58681478 Makefile.PL
+SHA1 e65397485d0de12724d10704e4bbe62f5ec1e5ed README
+SHA1 8afcb24e1a9d06d192516a4a242984fb977503ab t/0-signature.t
+SHA1 bd503374b0afe9e00c0fe58c961d46055bdd357a t/BBSAgent.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.2 (FreeBSD)
+
+iD8DBQE+0KEutLPdNzw1AaARAqMWAJ9MY5XaxLcOtP8iP2JcUtzKUp/zjACggBCh
+ToyMhtKGAR+qwqcMwNfrBpQ=
+=4akK
+-----END PGP SIGNATURE-----

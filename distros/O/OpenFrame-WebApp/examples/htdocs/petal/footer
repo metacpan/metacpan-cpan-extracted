@@ -1,0 +1,4 @@
+    <p/>
+    <hr/>
+    Your session id: <span petal:replace="session/id">id</span><br/>
+    Back to <a href="/index.html">main page</a>.

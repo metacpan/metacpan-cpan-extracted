@@ -1,0 +1,40 @@
+Revision history for OpusVL-SysParams
+
+0.19      2017-01-03 12:17:38+00:00 Europe/London
+
+        Updated version of MooseX::NonMoose to prevent spurious failures
+
+0.18      2016-12-23 05:47:48+00:00 Europe/London
+
+        Make DBIx::Class dependency clearer
+
+0.17      2016-12-22 07:41:17+00:00 Europe/London
+
+        Ensure we have a sufficient version of perl for the module to work
+
+0.16      2016-12-21 09:00:14+00:00 Europe/London
+
+        Made less likely to crash when no type was in historical data.
+        Added documentation and added 1 test for the convert_to method.
+        Added Jenkinsfile for testing
+
+0.15      2016-06-09 10:51:01+01:00 Europe/London
+
+        Fixed type conversion issues - still requires the DB to actually have
+            data types though
+
+0.14      2016-04-28 12:18:12+01:00 Europe/London
+
+        Removed version from POD since it doesn't get updated.
+
+0.13      2016-02-26 09:09:56+00:00 Europe/London
+
+        Converted to Dist::Zilla for releases.
+
+0.02    2011-04-22
+        Added proper json in/out method to support ui for now.  
+        Also added a delete method, again driven by the UI.
+
+0.01    2011-04-21
+        Starter for 10.
+

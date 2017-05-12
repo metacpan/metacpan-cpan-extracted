@@ -1,0 +1,12 @@
+# $File: //depot/OurNet-BBSAgent/BBSAgent/birdnest.bbs $ $Author: autrijus $
+# $Revision: #2 $ $Change: 2829 $ $DateTime: 2002/01/10 14:54:36 $
+# Contributed by Vgod <vgod@kimo.com.tw>
+# zh_TW.Big5: ³¾ºÛ
+
+Birdnest
+birdnest.twbbs.org
+
+load maple2.board
+
+setv pager Call¾÷
+setv moretail	\e[30mµ²§ô\x20\x20\e[0m

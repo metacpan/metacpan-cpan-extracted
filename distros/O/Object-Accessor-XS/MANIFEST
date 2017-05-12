@@ -1,0 +1,10 @@
+XS.pm
+XS.xs
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00_Object-Accessor.t
+t/01_Object-Accessor-Subclassed.t
+META.yml                                 Module meta-data (added by MakeMaker)
+ppport.h
+SIGNATURE

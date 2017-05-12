@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<SITE ID="Todo">
+
+<NAME Lang="en-us">To'Do-PC home Online</NAME>
+<INFO Lang="en-us">general information web search in Taiwan</INFO>
+
+<URL Type="More"><![CDATA[
+http://www.todo.com.tw_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://www.todo.com.tw/cgi-bin/search?key=_QUERY_
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_NEXT_"><![CDATA[
+<a href="_NEXT_">¤U 20
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+¡E<a href="_URL_">_TITLE_</a><br>_PREVIEW_</font>
+]]></TEMPLATE>
+</SITE>

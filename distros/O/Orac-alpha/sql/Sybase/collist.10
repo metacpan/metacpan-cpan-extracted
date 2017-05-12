@@ -1,0 +1,151 @@
+/* Procedure copyright(c) 1995 by Edward M Barlow */
+
+/******************************************************************************
+**
+** Name        : sp__collist.sp
+**
+** Summary		: list distinct columns in current databases
+**
+******************************************************************************/
+
+:r database
+go
+:r dumpdb
+go
+
+IF EXISTS (SELECT * FROM sysobjects
+           WHERE  name = "sp__collist"
+           AND    type = "P")
+   DROP PROC sp__collist
+
+go
+
+CREATE PROC sp__collist( @objname char(32) = NULL, 
+	@show_type char(1)=' ', 
+	@dont_format char(1)=NULL )
+/* if @show_type = 'S' will show system tables */
+AS 
+
+set nocount on
+
+select column= substring(c.name, 1, 20),
+		 tname=  substring(c.name,1,20),
+		 type =substring(t.name,1,15),
+		 length=c.length,
+		 c.status,
+		 Nulls="not null",
+		 Ident = "identity",
+		 c.prec,
+		 c.scale,
+		 c.colid
+into   #collist
+from   syscolumns c, systypes t
+where  1=2
+
+if @objname is null
+begin
+		  insert #collist
+		  select distinct
+					column= substring(c.name, 1, 20),
+					tname=  substring(o.name,1,20),
+					type =substring(t.name,1,15),
+					length=c.length,
+					c.status,
+					Nulls="not null",
+					Ident = "identity",
+					c.prec,
+					c.scale,
+					c.colid
+		  from   syscolumns c, systypes t, sysobjects o
+		  where  c.id = o.id         /* key */
+		  and    c.number = 0
+		  and    c.usertype = t.usertype
+		  and    o.type in ('U', @show_type )
+end 
+else
+begin
+		  insert #collist
+		  select distinct
+					column= substring(c.name, 1, 20),
+					tname=  substring(o.name,1,20),
+					type =substring(t.name,1,15),
+					length=c.length,
+					c.status,
+					Nulls="not null",
+					Ident = "identity",
+					c.prec,
+					c.scale,
+					c.colid
+		  from   syscolumns c, systypes t, sysobjects o
+		  where  c.id = o.id         /* key */
+		  and    o.name = @objname
+		  and    c.number = 0
+		  and    c.usertype = t.usertype
+		  and    o.type in ('U', @show_type )
+end
+
+update #collist
+set type=type+'('+rtrim(convert(char(3),length))+')'
+where type='varchar'
+or    type='char'
+
+update #collist
+set type=type+'('+rtrim(convert(char(3),prec))+')'
+where type='decimal'
+
+update #collist
+set type=type+'('+rtrim(convert(char(3),prec))+')'
+where type='numeric'
+and   scale=0
+
+update #collist
+set type=type
+	+'('
+	+rtrim(convert(char(3),prec))
+	+','
+	+rtrim(convert(char(3),scale))
+	+')'
+where type='numeric'
+and   scale>0
+
+update #collist
+set  Nulls='null'
+where status & 8 != 0
+
+update #collist
+set  Ident=''
+where status & 0x80 = 0
+
+if @dont_format is not null
+begin
+	print "Listing Of User Columns In Database"
+end
+
+if @objname is null
+	select distinct 
+		column,
+		type,
+		Nulls,
+		Ident,
+		"Num Tables"="/* "+convert(char(3),count(*))+" Tables */"
+	from #collist
+	group by column,type,Nulls
+	order by column,type 
+else
+	select distinct 
+		column,
+		type,
+		Nulls,
+		Ident,
+		"Num Tables"="/* column id="+convert(char(4),colid)+" */"
+	from #collist
+	order by colid
+
+drop table #collist
+
+return
+
+go
+
+GRANT EXECUTE ON sp__collist  TO public
+go

@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<SITE ID="Aladin">
+
+<NAME Lang="en-us">Aladin Search</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+Aladin全球WWW搜尋(德國)
+]]></NAME>
+<INFO Lang="en-us">general information web search in Germany</INFO>
+<INFO Lang="zh-tw">general information web search in Germany</INFO>
+
+<URL Type="Start"><![CDATA[
+http://www.aladin.de/cgi-bin/select.cgi?andOr=alle&searchText=_QUERY_&maxHits=10&offset=_START_
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+
+<TEMPLATE><![CDATA[
+" target="_top"><b>_TITLE_</b></a>___<br>_PREVIEW_. _URL_</i>_DATE_<br><br><
+]]></TEMPLATE>
+</SITE>

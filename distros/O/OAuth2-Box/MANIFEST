@@ -1,0 +1,12 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/OAuth2/Box.pm
+t/01_base.t
+t/02_authorization_uri.t
+t/03_authorize.t
+t/Module/HTTPTiny.pm

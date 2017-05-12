@@ -1,0 +1,14 @@
+<div id="navbar_tools">
+  <div class="navbar_group_title">Tools:</div>
+  <ul>
+    <li><a href="[% full_cgi_url %]?action=rc">Recent Changes</a></li>
+[% UNLESS read_only %]
+    <li><a href="[% script_url %]newpage.cgi">Create New Page</a></li>
+[% END %]
+    <li><a href="[% full_cgi_url %]?action=random">Random Page</a></li>
+    <li><a href="[% full_cgi_url %]?action=show_wanted_pages">Wanted Pages</a></li>
+    [% IF prefs.include_geocache_link AND wgs84_lat AND wgs84_long %]
+      <li><a href="http://www.geocaching.com/seek/nearest_cache.asp?origin_lat=[% wgs84_lat %]&amp;origin_long=[% wgs84_long %]">Look for nearby geocaches</a></li>
+    [% END %]
+  </ul>
+</div>

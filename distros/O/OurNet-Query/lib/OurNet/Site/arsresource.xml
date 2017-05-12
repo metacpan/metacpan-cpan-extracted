@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<SITE ID="ArsResource">
+
+<NAME Lang="en-us">World Wide Arts Resources</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+ArtResources 全球藝術資源查詢
+]]></NAME>
+<INFO Lang="en-us">arts relevant information search</INFO>
+<INFO Lang="zh-tw">arts relevant information search</INFO>
+
+<URL Type="Start"><![CDATA[
+http://wwar.com/cgi-bin/newsearch.cgi?output_number=10&dbfile=allrecords.txt&find=_QUERY_&start=_START_
+]]></URL>
+
+
+
+<TEMPLATE><![CDATA[
+(Score: _SCORE_%_<LI><A  HREF="_URL_"__TITLE_</A>_PREVIEW_<P>___
+]]></TEMPLATE>
+</SITE>

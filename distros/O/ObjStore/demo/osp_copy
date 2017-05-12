@@ -1,0 +1,181 @@
+#!/nw/dev/usr/bin/perl -w
+
+package ObjStore::Copier;
+use strict;
+use Carp;
+use ObjStore;
+require ObjStore::AppInstance;
+require ObjStore::Path::Cursor;
+use base 'ObjStore::AppInstance';
+
+sub sid { shift->{key} }
+sub state { shift->{state} }
+sub progress { shift->{progress} }
+
+sub new {
+    my ($class, $from, $to) = @_;
+
+    my $o = $class->SUPER::new('copier', pvars =>
+			       [qw(state progress smap pmap cursor)]);
+
+    ObjStore::set_transaction_priority(0xf000); #be as rude as possible!
+    try_update {
+	# Never use _allow_external_pointers!!
+	# This is necessary only because os_cursor uses a hard pointer. :-(
+	$o->wdb->_allow_external_pointers(1);
+
+	$o->{fdb} = ObjStore::open($from);
+	$o->{fdb}->set_fetch_policy('stream', 1024*8);
+	$from = $o->{fdb}->get_pathname;
+	$o->{tdb} = ObjStore::open($to, 0, 0666);
+	$to = $o->{tdb}->get_pathname;
+#	for ($o->wdb,$o->{tdb}) { $_->set_check_illegal_pointers(1); }
+	$o->{key} = "$from => $to";
+	$o->cache;
+	my $pub = $o->{public};
+	if (! $o->state) {
+	    $o->{'state'} = "begin";
+
+	    $pub->{from} = $from;
+	    $pub->{to} = $to;
+
+	    # cursor
+	    my $cs = $o->{cursor} = new ObjStore::Path::Cursor($pub);
+	    $cs->Push($o->{fdb});
+	    
+	    # segment map
+	    my $sm = $o->{smap} = new ObjStore::HV($pub, 30);
+	    $sm->{ $o->{fdb}->get_default_segment->get_number } =
+		$o->{tdb}->get_default_segment->get_number;
+	    
+	    # pointer map
+	    my $pm = $o->{pmap} = new ObjStore::HV($pub, 200);
+	    $pm->{ $cs->focus->get_pointer_numbers } = 'root';
+	}
+	my $seg = $o->wdb->get_segment($pub->{segment});
+	$seg->set_lock_whole_segment('write');
+	$o->uncache;
+    };
+    $o;
+}
+
+sub clone_ptr {
+    my ($o, $ptr) = @_;
+
+    # check pointer map
+    my $map = $o->{pmap};
+    my $fnum = $ptr->get_pointer_numbers;
+    my $cache = $map->{$fnum};
+    if ($cache) {
+	return ref $cache? $cache->focus : $cache;
+    }
+
+    # check database::of too XXX
+
+    # map segment
+    my $fseg = ObjStore::Segment::of($ptr)->get_number;
+    $o->{smap}{$fseg} = $o->{tdb}->create_segment->get_number
+	if !exists $o->{smap}{$fseg};
+    my $tseg = $o->{tdb}->get_segment($o->{smap}{$fseg});
+
+    # clone it
+    my $clone;
+    if ($ptr->isa("ObjStore::UNIVERSAL::Ref")) {
+	$clone = $ptr->clone_to($tseg, sub { $o->clone_ptr(shift); });
+#	$clone = $o->clone_ptr($ptr->focus)->new_cursor($tseg);
+    } else {
+	$o->{cursor}->Push($ptr);           #queue for deep copy
+	$clone = $ptr->clone_to($tseg);      #return shallow copy
+    }
+    croak "clone $ptr =? undef" if !$clone;
+    $map->{$fnum} = $clone->new_ref($map);
+    $clone;
+}
+
+sub copy {
+    my ($o, $stepsz, $progressor) = @_;
+    my $more;
+    do {
+	try_update {
+	    $o->cache;
+	    my $progress = $o->progress;
+	    my $cs = $o->{cursor};
+	    $more = $cs->depth;
+	    for (my $x=0; $x < $stepsz and $more; $x++) {
+		++ $progress;
+		my @data = $cs->next;
+
+		if (@data == 0) {
+		    $cs->Pop;
+		    $more = $cs->depth;
+		} else {
+		    my $focus = $cs->focus;
+		    my $to = $o->clone_ptr($focus);
+
+		    my @data = map { ref $_? $o->clone_ptr($_) : $_ } @data;
+
+		    if ($o->{debug}) {
+			warn((' 'x$cs->depth)."to : ".$focus." ".
+			      join(',', map {defined $_ ? $_:'undef'} @data)."\n");
+		    }
+
+		    if (ref $to) {
+			$to->STORE(@data);
+		    } elsif ($to eq 'root') {
+			die '@data != 2' if @data != 2;
+			$o->{tdb}->root(@data);
+		    } else { die "$to hm?" }
+		}
+	    }
+	    $o->{'progress'} = $progress;
+	    $o->{'state'} = $more? 'copying' : 'done';
+	    $o->uncache;
+	};
+	$progressor->($o);
+    } while ($more);
+}
+
+package main;
+use strict;
+use Getopt::Long;
+use ObjStore;
+
+# how about comparing databases? XXX
+# need a way to apply pointer maps to another database XXX
+
+sub usage {
+    print "osp_copy [--step 10000] source [source.copy]\n";
+    exit;
+}
+
+my $debug = 0;
+my $step = 20000;
+GetOptions("debug" => \$debug, "step=i" => \$step) or usage();
+usage() if @ARGV < 1;
+
+my ($from, $to) = @ARGV;
+$to = "$from.copy" if !$to;
+
+print "ObjectStore/Perl Database Copier $ObjStore::VERSION\n".localtime()."\n\n";
+
+my $copier = new ObjStore::Copier($from, $to);
+
+my $st = $copier->state;
+
+if ($st eq 'begin') {
+    print "Beginning copy of $from to $to...\n";
+} elsif ($st eq 'copying') {
+    print "Resuming copy after ".$copier->progress." slots...\n";
+} elsif ($st eq 'done') {
+    print "$from has already been successfully copied to $to.\n";
+}
+
+if ($st ne 'done') {
+    $copier->{debug} = $debug;
+    $copier->copy($step, sub {
+	my ($o) = @_;
+	print "  ".localtime().": ".$o->progress." slots copied\n";
+    });
+}
+
+print "  ".localtime().": Success.\n";

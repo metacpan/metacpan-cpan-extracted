@@ -1,0 +1,10 @@
+clip:    glXSwapBuffers;
+double:    glXSwapBuffers;
+fun:	glXSwapBuffers;
+light:    glXSwapBuffers();
+planets:  glXSwapBuffers();
+quest:    glXSwapBuffers;
+quest:    glXSwapBuffers;
+quest:    glXSwapBuffers;
+texhack:    glXSwapBuffers();
+texture:    glXSwapBuffers();

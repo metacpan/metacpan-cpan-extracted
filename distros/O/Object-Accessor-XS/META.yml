@@ -1,0 +1,10 @@
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Object-Accessor-XS
+version:      0.03
+version_from: XS.pm
+installdirs:  site
+requires:
+    Object::Accessor:              0.03
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.12

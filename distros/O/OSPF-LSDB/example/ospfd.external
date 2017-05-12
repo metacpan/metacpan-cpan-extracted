@@ -1,0 +1,955 @@
+
+                Type-5 AS External Link States
+
+LS age: 382
+Options: *|*|-|-|-|-|-|*
+LS Type: AS External
+Link State ID: 0.0.0.0 (External Network Number)
+Advertising Router: 172.30.5.5
+LS Seq Number: 0x800007fa
+Checksum: 0x8538
+Length: 36
+Network Mask: 0.0.0.0
+    Metric type: 1
+    Metric: 1
+    Forwarding Address: 0.0.0.0
+    External Route Tag: -1073741824
+
+LS age: 763
+Options: *|*|-|-|-|-|-|*
+LS Type: AS External
+Link State ID: 0.0.0.0 (External Network Number)
+Advertising Router: 172.30.6.6
+LS Seq Number: 0x80000598
+Checksum: 0x4dd1
+Length: 36
+Network Mask: 0.0.0.0
+    Metric type: 1
+    Metric: 2
+    Forwarding Address: 0.0.0.0
+    External Route Tag: -1073741824
+
+LS age: 720
+Options: *|*|-|-|-|-|-|*
+LS Type: AS External
+Link State ID: 0.0.0.0 (External Network Number)
+Advertising Router: 172.30.7.8
+LS Seq Number: 0x800000ad
+Checksum: 0x33d6
+Length: 36
+Network Mask: 0.0.0.0
+    Metric type: 1
+    Metric: 4
+    Forwarding Address: 0.0.0.0
+    External Route Tag: -1073741824
+
+LS age: 866
+Options: *|*|-|-|-|-|-|*
+LS Type: AS External
+Link State ID: 0.0.0.0 (External Network Number)
+Advertising Router: 172.30.206.206
+LS Seq Number: 0x800000a5
+Checksum: 0x0680
+Length: 36
+Network Mask: 0.0.0.0
+    Metric type: 1
+    Metric: 1
+    Forwarding Address: 0.0.0.0
+    External Route Tag: -1073741824
+
+LS age: 801
+Options: *|*|-|-|-|-|-|*
+LS Type: AS External
+Link State ID: 0.0.0.0 (External Network Number)
+Advertising Router: 172.30.206.207
+LS Seq Number: 0x80000048
+Checksum: 0xc41d
+Length: 36
+Network Mask: 0.0.0.0
+    Metric type: 1
+    Metric: 2
+    Forwarding Address: 0.0.0.0
+    External Route Tag: -1073741824
+
+LS age: 25
+Options: *|*|-|-|-|-|-|*
+LS Type: AS External
+Link State ID: 55.66.77.0 (External Network Number)
+Advertising Router: 172.30.5.5
+LS Seq Number: 0x80000194
+Checksum: 0x293a
+Length: 36
+Network Mask: 255.255.255.0
+    Metric type: 1
+    Metric: 1
+    Forwarding Address: 0.0.0.0
+    External Route Tag: -1073741824
+
+LS age: 1733
+Options: *|*|-|-|-|-|-|*
+LS Type: AS External
+Link State ID: 60.0.0.255 (External Network Number)
+Advertising Router: 172.30.5.5
+LS Seq Number: 0x80000193
+Checksum: 0x5797
+Length: 36
+Network Mask: 255.255.255.0
+    Metric type: 1
+    Metric: 1
+    Forwarding Address: 0.0.0.0
+    External Route Tag: -1073741824
+
+LS age: 1698
+Options: *|*|-|-|-|-|-|*
+LS Type: AS External
+Link State ID: 150.175.240.119 (External Network Number)
+Advertising Router: 172.30.5.5
+LS Seq Number: 0x80000193
+Checksum: 0x552e
+Length: 36
+Network Mask: 255.255.255.248
+    Metric type: 1
+    Metric: 1
+    Forwarding Address: 0.0.0.0
+    External Route Tag: -1073741824
+
+LS age: 102
+Options: *|*|-|-|-|-|-|*
+LS Type: AS External
+Link State ID: 172.16.0.173 (External Network Number)
+Advertising Router: 172.30.5.5
+LS Seq Number: 0x80000194
+Checksum: 0x16a9
+Length: 36
+Network Mask: 255.255.255.255
+    Metric type: 1
+    Metric: 1
+    Forwarding Address: 0.0.0.0
+    External Route Tag: -1073741824
+
+LS age: 109
+Options: *|*|-|-|-|-|-|*
+LS Type: AS External
+Link State ID: 172.16.0.175 (External Network Number)
+Advertising Router: 172.30.5.5
+LS Seq Number: 0x80000194
+Checksum: 0x02bb
+Length: 36
+Network Mask: 255.255.255.255
+    Metric type: 1
+    Metric: 1
+    Forwarding Address: 0.0.0.0
+    External Route Tag: -1073741824
+
+LS age: 487
+Options: *|*|-|-|-|-|-|*
+LS Type: AS External
+Link State ID: 172.16.0.175 (External Network Number)
+Advertising Router: 172.30.6.6
+LS Seq Number: 0x8000059a
+Checksum: 0xe6c9
+Length: 36
+Network Mask: 255.255.255.255
+    Metric type: 1
+    Metric: 2
+    Forwarding Address: 0.0.0.0
+    External Route Tag: -1073741824
+
+LS age: 991
+Options: *|*|-|-|-|-|-|*
+LS Type: AS External
+Link State ID: 172.16.0.176 (External Network Number)
+Advertising Router: 172.30.5.5
+LS Seq Number: 0x80000193
+Checksum: 0xf9c3
+Length: 36
+Network Mask: 255.255.255.255
+    Metric type: 1
+    Metric: 1
+    Forwarding Address: 0.0.0.0
+    External Route Tag: -1073741824
+
+LS age: 1336
+Options: *|*|-|-|-|-|-|*
+LS Type: AS External
+Link State ID: 172.16.0.178 (External Network Number)
+Advertising Router: 172.30.7.8
+LS Seq Number: 0x800000aa
+Checksum: 0xb8e4
+Length: 36
+Network Mask: 255.255.255.255
+    Metric type: 1
+    Metric: 4
+    Forwarding Address: 0.0.0.0
+    External Route Tag: -1073741824
+
+LS age: 594
+Options: *|*|-|-|-|-|-|*
+LS Type: AS External
+Link State ID: 172.16.81.0 (External Network Number)
+Advertising Router: 172.30.7.8
+LS Seq Number: 0x80000011
+Checksum: 0x6830
+Length: 36
+Network Mask: 255.255.255.0
+    Metric type: 1
+    Metric: 4
+    Forwarding Address: 0.0.0.0
+    External Route Tag: -1073741824
+
+LS age: 244
+Options: *|*|-|-|-|-|-|*
+LS Type: AS External
+Link State ID: 172.16.83.0 (External Network Number)
+Advertising Router: 172.30.7.8
+LS Seq Number: 0x80000011
+Checksum: 0x5244
+Length: 36
+Network Mask: 255.255.255.0
+    Metric type: 1
+    Metric: 4
+    Forwarding Address: 0.0.0.0
+    External Route Tag: -1073741824
+
+LS age: 1642
+Options: *|*|-|-|-|-|-|*
+LS Type: AS External
+Link State ID: 172.16.224.16 (External Network Number)
+Advertising Router: 172.30.5.5
+LS Seq Number: 0x80000193
+Checksum: 0x3c50
+Length: 36
+Network Mask: 255.255.255.240
+    Metric type: 1
+    Metric: 1
+    Forwarding Address: 0.0.0.0
+    External Route Tag: -1073741824
+
+LS age: 872
+Options: *|*|-|-|-|-|-|*
+LS Type: AS External
+Link State ID: 172.16.224.47 (External Network Number)
+Advertising Router: 172.30.5.5
+LS Seq Number: 0x80000193
+Checksum: 0x0568
+Length: 36
+Network Mask: 255.255.255.240
+    Metric type: 1
+    Metric: 1
+    Forwarding Address: 0.0.0.0
+    External Route Tag: -1073741824
+
+LS age: 333
+Options: *|*|-|-|-|-|-|*
+LS Type: AS External
+Link State ID: 172.16.224.144 (External Network Number)
+Advertising Router: 172.30.5.5
+LS Seq Number: 0x8000052b
+Checksum: 0xfb74
+Length: 36
+Network Mask: 255.255.255.240
+    Metric type: 1
+    Metric: 1
+    Forwarding Address: 0.0.0.0
+    External Route Tag: -1073741824
+
+LS age: 1320
+Options: *|*|-|-|-|-|-|*
+LS Type: AS External
+Link State ID: 172.16.224.175 (External Network Number)
+Advertising Router: 172.30.5.5
+LS Seq Number: 0x80000193
+Checksum: 0xffec
+Length: 36
+Network Mask: 255.255.255.240
+    Metric type: 1
+    Metric: 1
+    Forwarding Address: 0.0.0.0
+    External Route Tag: -1073741824
+
+LS age: 1446
+Options: *|*|-|-|-|-|-|*
+LS Type: AS External
+Link State ID: 172.16.255.255 (External Network Number)
+Advertising Router: 172.30.5.5
+LS Seq Number: 0x80000193
+Checksum: 0xe08d
+Length: 36
+Network Mask: 255.255.0.0
+    Metric type: 1
+    Metric: 1
+    Forwarding Address: 0.0.0.0
+    External Route Tag: -1073741824
+
+LS age: 63
+Options: *|*|-|-|-|-|-|*
+LS Type: AS External
+Link State ID: 172.16.255.255 (External Network Number)
+Advertising Router: 172.30.6.6
+LS Seq Number: 0x80000a0c
+Checksum: 0xd118
+Length: 36
+Network Mask: 255.255.0.0
+    Metric type: 1
+    Metric: 2
+    Forwarding Address: 0.0.0.0
+    External Route Tag: -1073741824
+
+LS age: 27
+Options: *|*|-|-|-|-|-|*
+LS Type: AS External
+Link State ID: 172.16.255.255 (External Network Number)
+Advertising Router: 172.30.7.8
+LS Seq Number: 0x800000ac
+Checksum: 0xaf9e
+Length: 36
+Network Mask: 255.255.0.0
+    Metric type: 1
+    Metric: 4
+    Forwarding Address: 0.0.0.0
+    External Route Tag: -1073741824
+
+LS age: 170
+Options: *|*|-|-|-|-|-|*
+LS Type: AS External
+Link State ID: 172.16.255.255 (External Network Number)
+Advertising Router: 172.30.206.206
+LS Seq Number: 0x800000a8
+Checksum: 0x7a4c
+Length: 36
+Network Mask: 255.255.0.0
+    Metric type: 1
+    Metric: 1
+    Forwarding Address: 0.0.0.0
+    External Route Tag: -1073741824
+
+LS age: 108
+Options: *|*|-|-|-|-|-|*
+LS Type: AS External
+Link State ID: 172.16.255.255 (External Network Number)
+Advertising Router: 172.30.206.207
+LS Seq Number: 0x8000004b
+Checksum: 0x39e8
+Length: 36
+Network Mask: 255.255.0.0
+    Metric type: 1
+    Metric: 2
+    Forwarding Address: 0.0.0.0
+    External Route Tag: -1073741824
+
+LS age: 1187
+Options: *|*|-|-|-|-|-|*
+LS Type: AS External
+Link State ID: 172.18.5.0 (External Network Number)
+Advertising Router: 172.30.5.5
+LS Seq Number: 0x80000193
+Checksum: 0x91d5
+Length: 36
+Network Mask: 255.255.255.0
+    Metric type: 1
+    Metric: 1
+    Forwarding Address: 0.0.0.0
+    External Route Tag: -1073741824
+
+LS age: 1364
+Options: *|*|-|-|-|-|-|*
+LS Type: AS External
+Link State ID: 172.18.6.255 (External Network Number)
+Advertising Router: 172.30.7.8
+LS Seq Number: 0x80000010
+Checksum: 0x8e54
+Length: 36
+Network Mask: 255.255.255.0
+    Metric type: 1
+    Metric: 4
+    Forwarding Address: 0.0.0.0
+    External Route Tag: -1073741824
+
+LS age: 1175
+Options: *|*|-|-|-|-|-|*
+LS Type: AS External
+Link State ID: 172.18.7.0 (External Network Number)
+Advertising Router: 172.30.7.8
+LS Seq Number: 0x80000010
+Checksum: 0x835e
+Length: 36
+Network Mask: 255.255.255.0
+    Metric type: 1
+    Metric: 4
+    Forwarding Address: 0.0.0.0
+    External Route Tag: -1073741824
+
+LS age: 1014
+Options: *|*|-|-|-|-|-|*
+LS Type: AS External
+Link State ID: 172.18.8.255 (External Network Number)
+Advertising Router: 172.30.7.8
+LS Seq Number: 0x80000010
+Checksum: 0x7868
+Length: 36
+Network Mask: 255.255.255.0
+    Metric type: 1
+    Metric: 4
+    Forwarding Address: 0.0.0.0
+    External Route Tag: -1073741824
+
+LS age: 1199
+Options: *|*|-|-|-|-|E|*
+LS Type: AS External
+Link State ID: 172.18.61.0 (External Network Number)
+Advertising Router: 172.16.0.48
+LS Seq Number: 0x80001cc7
+Checksum: 0x8afc
+Length: 36
+Network Mask: 255.255.255.0
+    Metric type: 1
+    Metric: 0
+    Forwarding Address: 0.0.0.0
+    External Route Tag: 0
+
+LS age: 1653
+Options: *|*|-|-|-|-|-|*
+LS Type: AS External
+Link State ID: 172.18.206.255 (External Network Number)
+Advertising Router: 172.30.206.206
+LS Seq Number: 0x80000040
+Checksum: 0x500e
+Length: 36
+Network Mask: 255.255.255.0
+    Metric type: 1
+    Metric: 1
+    Forwarding Address: 0.0.0.0
+    External Route Tag: -1073741824
+
+LS age: 1396
+Options: *|*|-|-|-|-|-|*
+LS Type: AS External
+Link State ID: 172.18.207.0 (External Network Number)
+Advertising Router: 172.30.206.207
+LS Seq Number: 0x80000042
+Checksum: 0x4514
+Length: 36
+Network Mask: 255.255.255.0
+    Metric type: 1
+    Metric: 2
+    Forwarding Address: 0.0.0.0
+    External Route Tag: -1073741824
+
+LS age: 907
+Options: *|*|-|-|-|-|-|*
+LS Type: AS External
+Link State ID: 172.26.5.0 (External Network Number)
+Advertising Router: 172.30.5.5
+LS Seq Number: 0x80000193
+Checksum: 0x312e
+Length: 36
+Network Mask: 255.255.255.0
+    Metric type: 1
+    Metric: 1
+    Forwarding Address: 0.0.0.0
+    External Route Tag: -1073741824
+
+LS age: 872
+Options: *|*|-|-|-|-|-|*
+LS Type: AS External
+Link State ID: 172.27.5.0 (External Network Number)
+Advertising Router: 172.30.5.5
+LS Seq Number: 0x80000193
+Checksum: 0x2539
+Length: 36
+Network Mask: 255.255.255.0
+    Metric type: 1
+    Metric: 1
+    Forwarding Address: 0.0.0.0
+    External Route Tag: -1073741824
+
+LS age: 837
+Options: *|*|-|-|-|-|-|*
+LS Type: AS External
+Link State ID: 172.28.5.0 (External Network Number)
+Advertising Router: 172.30.5.5
+LS Seq Number: 0x80000193
+Checksum: 0x1944
+Length: 36
+Network Mask: 255.255.255.0
+    Metric type: 1
+    Metric: 1
+    Forwarding Address: 0.0.0.0
+    External Route Tag: -1073741824
+
+LS age: 1014
+Options: *|*|-|-|-|-|-|*
+LS Type: AS External
+Link State ID: 172.28.6.255 (External Network Number)
+Advertising Router: 172.30.7.8
+LS Seq Number: 0x80000010
+Checksum: 0x16c2
+Length: 36
+Network Mask: 255.255.255.0
+    Metric type: 1
+    Metric: 4
+    Forwarding Address: 0.0.0.0
+    External Route Tag: -1073741824
+
+LS age: 825
+Options: *|*|-|-|-|-|-|*
+LS Type: AS External
+Link State ID: 172.28.7.0 (External Network Number)
+Advertising Router: 172.30.7.8
+LS Seq Number: 0x80000010
+Checksum: 0x0bcc
+Length: 36
+Network Mask: 255.255.255.0
+    Metric type: 1
+    Metric: 4
+    Forwarding Address: 0.0.0.0
+    External Route Tag: -1073741824
+
+LS age: 664
+Options: *|*|-|-|-|-|-|*
+LS Type: AS External
+Link State ID: 172.28.8.255 (External Network Number)
+Advertising Router: 172.30.7.8
+LS Seq Number: 0x80000010
+Checksum: 0xffd6
+Length: 36
+Network Mask: 255.255.255.0
+    Metric type: 1
+    Metric: 4
+    Forwarding Address: 0.0.0.0
+    External Route Tag: -1073741824
+
+LS age: 1105
+Options: *|*|-|-|-|-|-|*
+LS Type: AS External
+Link State ID: 172.30.5.0 (External Network Number)
+Advertising Router: 172.30.7.8
+LS Seq Number: 0x80000010
+Checksum: 0x09ce
+Length: 36
+Network Mask: 255.255.255.0
+    Metric type: 1
+    Metric: 4
+    Forwarding Address: 0.0.0.0
+    External Route Tag: -1073741824
+
+LS age: 944
+Options: *|*|-|-|-|-|-|*
+LS Type: AS External
+Link State ID: 172.30.6.255 (External Network Number)
+Advertising Router: 172.30.7.8
+LS Seq Number: 0x80000010
+Checksum: 0xfdd8
+Length: 36
+Network Mask: 255.255.255.0
+    Metric type: 1
+    Metric: 4
+    Forwarding Address: 0.0.0.0
+    External Route Tag: -1073741824
+
+LS age: 522
+Options: *|*|-|-|-|-|-|*
+LS Type: AS External
+Link State ID: 172.37.5.0 (External Network Number)
+Advertising Router: 172.30.5.5
+LS Seq Number: 0x800008bb
+Checksum: 0x47dd
+Length: 36
+Network Mask: 255.255.255.0
+    Metric type: 1
+    Metric: 1
+    Forwarding Address: 0.0.0.0
+    External Route Tag: -1073741824
+
+LS age: 860
+Options: *|*|-|-|-|-|-|*
+LS Type: AS External
+Link State ID: 172.37.5.0 (External Network Number)
+Advertising Router: 172.30.7.8
+LS Seq Number: 0x800000a6
+Checksum: 0x87b2
+Length: 36
+Network Mask: 255.255.255.0
+    Metric type: 1
+    Metric: 4
+    Forwarding Address: 0.0.0.0
+    External Route Tag: -1073741824
+
+LS age: 487
+Options: *|*|-|-|-|-|-|*
+LS Type: AS External
+Link State ID: 172.38.5.0 (External Network Number)
+Advertising Router: 172.30.5.5
+LS Seq Number: 0x80000529
+Checksum: 0x6950
+Length: 36
+Network Mask: 255.255.255.0
+    Metric type: 1
+    Metric: 1
+    Forwarding Address: 0.0.0.0
+    External Route Tag: -1073741824
+
+LS age: 664
+Options: *|*|-|-|-|-|-|*
+LS Type: AS External
+Link State ID: 172.38.6.255 (External Network Number)
+Advertising Router: 172.30.7.8
+LS Seq Number: 0x80000010
+Checksum: 0x9d31
+Length: 36
+Network Mask: 255.255.255.0
+    Metric type: 1
+    Metric: 4
+    Forwarding Address: 0.0.0.0
+    External Route Tag: -1073741824
+
+LS age: 475
+Options: *|*|-|-|-|-|-|*
+LS Type: AS External
+Link State ID: 172.38.7.0 (External Network Number)
+Advertising Router: 172.30.7.8
+LS Seq Number: 0x80000011
+Checksum: 0x903c
+Length: 36
+Network Mask: 255.255.255.0
+    Metric type: 1
+    Metric: 4
+    Forwarding Address: 0.0.0.0
+    External Route Tag: -1073741824
+
+LS age: 314
+Options: *|*|-|-|-|-|-|*
+LS Type: AS External
+Link State ID: 172.38.8.255 (External Network Number)
+Advertising Router: 172.30.7.8
+LS Seq Number: 0x80000011
+Checksum: 0x8546
+Length: 36
+Network Mask: 255.255.255.0
+    Metric type: 1
+    Metric: 4
+    Forwarding Address: 0.0.0.0
+    External Route Tag: -1073741824
+
+LS age: 1266
+Options: *|*|-|-|-|-|-|*
+LS Type: AS External
+Link State ID: 172.61.8.255 (External Network Number)
+Advertising Router: 172.30.7.8
+LS Seq Number: 0x800000aa
+Checksum: 0x3ddd
+Length: 36
+Network Mask: 255.255.255.0
+    Metric type: 1
+    Metric: 4
+    Forwarding Address: 0.0.0.0
+    External Route Tag: -1073741824
+
+LS age: 1196
+Options: *|*|-|-|-|-|-|*
+LS Type: AS External
+Link State ID: 172.63.8.255 (External Network Number)
+Advertising Router: 172.30.7.8
+LS Seq Number: 0x800000aa
+Checksum: 0x25f3
+Length: 36
+Network Mask: 255.255.255.0
+    Metric type: 1
+    Metric: 4
+    Forwarding Address: 0.0.0.0
+    External Route Tag: -1073741824
+
+LS age: 1327
+Options: *|*|-|-|-|-|-|*
+LS Type: AS External
+Link State ID: 172.65.8.255 (External Network Number)
+Advertising Router: 172.31.8.2
+LS Seq Number: 0x800000a5
+Checksum: 0x23f9
+Length: 36
+Network Mask: 255.255.255.0
+    Metric type: 1
+    Metric: 4
+    Forwarding Address: 172.19.7.60
+    External Route Tag: -1073741824
+
+LS age: 1243
+Options: *|*|-|-|-|-|-|*
+LS Type: AS External
+Link State ID: 172.67.8.0 (External Network Number)
+Advertising Router: 172.31.8.2
+LS Seq Number: 0x800000a5
+Checksum: 0x0b10
+Length: 36
+Network Mask: 255.255.255.255
+    Metric type: 1
+    Metric: 4
+    Forwarding Address: 172.19.7.60
+    External Route Tag: -1073741824
+
+LS age: 986
+Options: *|*|-|-|-|-|-|*
+LS Type: AS External
+Link State ID: 172.69.8.255 (External Network Number)
+Advertising Router: 172.30.7.8
+LS Seq Number: 0x80000010
+Checksum: 0x129b
+Length: 36
+Network Mask: 255.255.255.0
+    Metric type: 1
+    Metric: 4
+    Forwarding Address: 0.0.0.0
+    External Route Tag: -1073741824
+
+LS age: 1188
+Options: *|*|-|-|-|-|-|*
+LS Type: AS External
+Link State ID: 172.69.8.255 (External Network Number)
+Advertising Router: 172.31.8.2
+LS Seq Number: 0x800000a5
+Checksum: 0xfb20
+Length: 36
+Network Mask: 255.255.255.0
+    Metric type: 1
+    Metric: 4
+    Forwarding Address: 0.0.0.0
+    External Route Tag: -1073741824
+
+LS age: 916
+Options: *|*|-|-|-|-|-|*
+LS Type: AS External
+Link State ID: 172.71.8.255 (External Network Number)
+Advertising Router: 172.30.7.8
+LS Seq Number: 0x80000010
+Checksum: 0xf9b1
+Length: 36
+Network Mask: 255.255.255.0
+    Metric type: 1
+    Metric: 4
+    Forwarding Address: 0.0.0.0
+    External Route Tag: -1073741824
+
+LS age: 1118
+Options: *|*|-|-|-|-|-|*
+LS Type: AS External
+Link State ID: 172.71.8.255 (External Network Number)
+Advertising Router: 172.31.8.2
+LS Seq Number: 0x800000a5
+Checksum: 0xe336
+Length: 36
+Network Mask: 255.255.255.0
+    Metric type: 1
+    Metric: 4
+    Forwarding Address: 0.0.0.0
+    External Route Tag: -1073741824
+
+LS age: 636
+Options: *|*|-|-|-|-|-|*
+LS Type: AS External
+Link State ID: 172.89.6.255 (External Network Number)
+Advertising Router: 172.30.7.8
+LS Seq Number: 0x80000010
+Checksum: 0x3764
+Length: 36
+Network Mask: 255.255.255.0
+    Metric type: 1
+    Metric: 4
+    Forwarding Address: 0.0.0.0
+    External Route Tag: -1073741824
+
+LS age: 447
+Options: *|*|-|-|-|-|-|*
+LS Type: AS External
+Link State ID: 172.89.7.0 (External Network Number)
+Advertising Router: 172.30.7.8
+LS Seq Number: 0x80000011
+Checksum: 0x2a6f
+Length: 36
+Network Mask: 255.255.255.0
+    Metric type: 1
+    Metric: 4
+    Forwarding Address: 0.0.0.0
+    External Route Tag: -1073741824
+
+LS age: 286
+Options: *|*|-|-|-|-|-|*
+LS Type: AS External
+Link State ID: 172.89.8.255 (External Network Number)
+Advertising Router: 172.30.7.8
+LS Seq Number: 0x80000011
+Checksum: 0x1f79
+Length: 36
+Network Mask: 255.255.255.0
+    Metric type: 1
+    Metric: 4
+    Forwarding Address: 0.0.0.0
+    External Route Tag: -1073741824
+
+LS age: 601
+Options: *|*|-|-|-|-|-|*
+LS Type: AS External
+Link State ID: 172.90.6.255 (External Network Number)
+Advertising Router: 172.30.7.8
+LS Seq Number: 0x80000010
+Checksum: 0x2b6f
+Length: 36
+Network Mask: 255.255.255.0
+    Metric type: 1
+    Metric: 4
+    Forwarding Address: 0.0.0.0
+    External Route Tag: -1073741824
+
+LS age: 412
+Options: *|*|-|-|-|-|-|*
+LS Type: AS External
+Link State ID: 172.90.7.0 (External Network Number)
+Advertising Router: 172.30.7.8
+LS Seq Number: 0x80000011
+Checksum: 0x1e7a
+Length: 36
+Network Mask: 255.255.255.0
+    Metric type: 1
+    Metric: 4
+    Forwarding Address: 0.0.0.0
+    External Route Tag: -1073741824
+
+LS age: 251
+Options: *|*|-|-|-|-|-|*
+LS Type: AS External
+Link State ID: 172.90.8.255 (External Network Number)
+Advertising Router: 172.30.7.8
+LS Seq Number: 0x80000011
+Checksum: 0x1384
+Length: 36
+Network Mask: 255.255.255.0
+    Metric type: 1
+    Metric: 4
+    Forwarding Address: 0.0.0.0
+    External Route Tag: -1073741824
+
+LS age: 496
+Options: *|*|-|-|-|-|-|*
+LS Type: AS External
+Link State ID: 172.93.6.255 (External Network Number)
+Advertising Router: 172.30.7.8
+LS Seq Number: 0x80000011
+Checksum: 0x0591
+Length: 36
+Network Mask: 255.255.255.0
+    Metric type: 1
+    Metric: 4
+    Forwarding Address: 0.0.0.0
+    External Route Tag: -1073741824
+
+LS age: 307
+Options: *|*|-|-|-|-|-|*
+LS Type: AS External
+Link State ID: 172.93.7.0 (External Network Number)
+Advertising Router: 172.30.7.8
+LS Seq Number: 0x80000011
+Checksum: 0xf99b
+Length: 36
+Network Mask: 255.255.255.0
+    Metric type: 1
+    Metric: 4
+    Forwarding Address: 0.0.0.0
+    External Route Tag: -1073741824
+
+LS age: 146
+Options: *|*|-|-|-|-|-|*
+LS Type: AS External
+Link State ID: 172.93.8.255 (External Network Number)
+Advertising Router: 172.30.7.8
+LS Seq Number: 0x80000011
+Checksum: 0xeea5
+Length: 36
+Network Mask: 255.255.255.0
+    Metric type: 1
+    Metric: 4
+    Forwarding Address: 0.0.0.0
+    External Route Tag: -1073741824
+
+LS age: 461
+Options: *|*|-|-|-|-|-|*
+LS Type: AS External
+Link State ID: 172.94.6.255 (External Network Number)
+Advertising Router: 172.30.7.8
+LS Seq Number: 0x80000011
+Checksum: 0xf89c
+Length: 36
+Network Mask: 255.255.255.0
+    Metric type: 1
+    Metric: 4
+    Forwarding Address: 0.0.0.0
+    External Route Tag: -1073741824
+
+LS age: 272
+Options: *|*|-|-|-|-|-|*
+LS Type: AS External
+Link State ID: 172.94.7.0 (External Network Number)
+Advertising Router: 172.30.7.8
+LS Seq Number: 0x80000011
+Checksum: 0xeda6
+Length: 36
+Network Mask: 255.255.255.0
+    Metric type: 1
+    Metric: 4
+    Forwarding Address: 0.0.0.0
+    External Route Tag: -1073741824
+
+LS age: 111
+Options: *|*|-|-|-|-|-|*
+LS Type: AS External
+Link State ID: 172.94.8.255 (External Network Number)
+Advertising Router: 172.30.7.8
+LS Seq Number: 0x80000011
+Checksum: 0xe2b0
+Length: 36
+Network Mask: 255.255.255.0
+    Metric type: 1
+    Metric: 4
+    Forwarding Address: 0.0.0.0
+    External Route Tag: -1073741824
+
+LS age: 711
+Options: *|*|-|-|-|-|-|*
+LS Type: AS External
+Link State ID: 192.168.0.150 (External Network Number)
+Advertising Router: 172.30.5.5
+LS Seq Number: 0x80000193
+Checksum: 0xd258
+Length: 36
+Network Mask: 255.255.255.255
+    Metric type: 1
+    Metric: 1
+    Forwarding Address: 0.0.0.0
+    External Route Tag: -1073741824
+
+LS age: 1635
+Options: *|*|-|-|-|-|-|*
+LS Type: AS External
+Link State ID: 192.168.94.94 (External Network Number)
+Advertising Router: 172.30.5.5
+LS Seq Number: 0x80000193
+Checksum: 0xf60e
+Length: 36
+Network Mask: 255.255.255.255
+    Metric type: 1
+    Metric: 1
+    Forwarding Address: 0.0.0.0
+    External Route Tag: -1073741824
+
+LS age: 1390
+Options: *|*|-|-|-|-|-|*
+LS Type: AS External
+Link State ID: 192.168.194.255 (External Network Number)
+Advertising Router: 172.30.5.5
+LS Seq Number: 0x80000193
+Checksum: 0x56a8
+Length: 36
+Network Mask: 255.255.255.0
+    Metric type: 1
+    Metric: 1
+    Forwarding Address: 0.0.0.0
+    External Route Tag: -1073741824
+

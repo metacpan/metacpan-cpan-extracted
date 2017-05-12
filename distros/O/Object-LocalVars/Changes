@@ -1,0 +1,91 @@
+Revision history for Perl module Object::LocalVars
+
+0.21      2014-02-27 10:40:05-05:00 America/New_York
+
+    [CHANGED]
+
+    - Updated metadata, repo and bug tracker
+
+    - Switched to managing with Dist::Zilla
+
+0.20 Tue Mar 17 12:28:52 EDT 2009
+    - really, fixed the thread test bugs this time (I hope)
+
+0.19 Mon Mar 16 09:09:05 EDT 2009
+    - fixed conditional thread tests
+    - bumped required version to perl 5.8
+
+0.18 Fri Mar 13 08:13:15 EDT 2009
+    - fixed another test bug
+
+0.17 Thu Mar 12 00:46:21 EDT 2009
+    - documented that this module is experimental and unsupported and
+      should not be used for production purposes
+    - fixed some test errors; no functional changes
+
+0.16 Thu Oct  6 22:04:08 EDT 2005
+    - added accessor_style() method to customize accesssor/mutator prefixes
+
+0.15 Sat Oct  1 12:28:02 EDT 2005
+    - private methods now properly wrap attributes when called to ensure that
+      private methods can be called on objects other than $self
+    - switched to using Scalar::Util refaddr to get memory address and removed
+      internal _ident that used "0 + $ref"; this supports objects that overload
+      numerification
+    - added pod and pod coverage tests
+
+0.14 Thu Aug 25 23:28:45 EDT 2005
+    - completely rewrote inheritance code to support multiple inheritance
+      using BUILDALL() method; diamond inheritance handled appropriately
+    - changed default object type to an anonymous scalar
+    - object_base() subroutine added to explicitly use another type of
+      object as the blessed reference
+    - added pod for CLONE (omitted from 0.13)
+    - readonly properties implemented
+    - significantly expanded overall documentation
+
+0.13 Thu Aug 18 07:00:16 EDT 2005
+    - Added CLONE method and supporting structures for thread-creation safety
+    - Need Scalar::Util again for weaken() for CLONE support
+    - Minor optimizations on localization
+    - Cleaned up eval text for wrapper
+    - Refactored accessor and mutator generation
+    - Updated Build_PL requirements again to get a Test::Exception version 
+      that builds cleanly and a Test::More version that is thread-safe
+    - POD fixes in various places
+    - Manually import Exporter's import() for perls before 5.8.x when it
+      was supported by Exporter itself
+    - DESTROY no longer assumes the first superclass can DESTROY, but 
+      finds the first superclass in @ISA that can DESTROY, blesses to that
+      and lets Perl handle the subsequent destruction call.  (Shouldn't be
+      using multiple inheritance with this anyway, but just to be safe...)
+    - Switched to using $obj->isa() style on privacy checks
+    - Added warnings about threads and threads::shared for perl < 5.8
+    - Skips thread tests for perls earlier than 5.8
+    
+0.12 Sun Jul 31 23:11:18 EDT 2005
+    - eliminated need for Scalar::Util for refaddr
+    - moved build_requires to requires to workaround CPANPLUS bug
+    - fixed POD whitespace errors (found on cpan.uwinnipeg.ca, though not
+      on search.cpan.org)
+    - some minor optimization of accessors/mutators
+    - optimization of public method wrapper
+    - updates to example/benchmarking code
+    - started TODO testing on thread safety
+    - fixed (I hope) "noindex" for META.yml
+
+0.11 Wed Jul 27 20:10:21 EDT 2005
+    - Added "noindex" to META.yml for example files
+    - Fixed URL for rt.cpan.org in POD
+    - POD typo fixes and some additional POD
+
+0.10 Wed Jul 27 16:08:45 EDT 2005
+    - first public release as Object::LocalVars (thanks to M. Simon Cavalletto
+      for suggesting this name)
+    - supports public/private/protected properties and class properties
+    - methods are wrapped to locally alias $self and all properties
+    - automatically creates accessors and mutators (if appropriate)
+    - automatically provides new() and DESTROY()
+    - supports PREBUILD, BUILD and DEMOLISH helper functions
+    
+

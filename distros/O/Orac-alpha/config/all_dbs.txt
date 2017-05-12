@@ -1,0 +1,3 @@
+Oracle^SYSTEM^mydb^
+Informix^DBA_INFORMIX^mydb^
+Sybase^sa^Select Database^

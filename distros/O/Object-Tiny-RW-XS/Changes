@@ -1,0 +1,10 @@
+Revision history for Perl extension Object-Tiny-RW-XS
+
+0.03 Thu 18 Jul 2013
+	- Added module to MANIFEST :) http://www.perlmonks.org/?node_id=1045187
+
+0.02 Wed 17 Jul 2013
+	- Added README
+
+0.01 Wed 17 Jul 2013
+	- Initial release

@@ -1,0 +1,323 @@
+=head1 NAME
+
+ObjStore::Reference - a listing of APIs
+
+=head1 SYNOPSIS
+
+Fortunately, you will probably not need to use most of the API.  In
+general, the API mostly mirrors the C<ObjectStore> C<C++> API.  Refer
+to the C<ObjectStore> documentation for exact symantics.
+
+=head1 DESCRIPTION
+
+Primarily, the API is exhibited here to make it seem like this
+extension has a difficult and steep learning curve (it doesn't).
+
+The API for C<::UNIVERSAL> is probably of greatest interest to
+ex-C<C++> developers.
+
+=head2 C<ObjStore>
+
+=over 4
+
+=item * $db = ObjStore::open($pathname, $read_only, $mode);
+
+Also see L<ObjStore::HV::Database>.
+
+=item * $name = ObjStore::release_name()
+
+=item * $version = ObjStore::os_version()
+
+=item * $yes = ObjStore::network_servers_available();
+
+=item * $num = ObjStore::return_all_pages();
+
+=item * $size = ObjStore::get_page_size();
+
+=item * @Servers = ObjStore::get_all_servers();
+
+=item * $in_abort = ObjStore::abort_in_progress();
+
+=item * $num = ObjStore::get_n_databases();
+
+=back
+
+=head2 C<::Server>
+
+=over 4
+
+=item * $name = $s->get_host_name();
+
+=item * $is_broken = $s->connection_is_broken();
+
+=item * $s->disconnect();
+
+=item * $s->reconnect();
+
+=item * @Databases = $s->get_databases();
+
+=back
+
+=head2 C<::Database>
+
+Also see L<ObjStore::HV::Database>.
+
+=over 4
+
+=item * $open_mode = $db->is_open();
+
+=item * $s = $db->create_segment($comment);
+
+=item * $value = $db->root($root_name => sub{ $new_value });
+
+This is the recommended API for roots.  If the given root is not
+found, creates a new one.  Returns the root's current value.
+
+In general, you should try to avoid using roots.  Roots have an
+unnatural API for perl: hashes can nest but roots cannot.  Roots are
+similar to a necessary but annoying accounting detail.  It is much
+better practice to use L<ObjStore::HV::Database> or
+L<ObjStore::ServerDB>.
+
+=item * $s = $db->get_segment($segment_number);
+
+Be aware that this method (correctly) never returns an error.  The
+only way to know which segments are actually created in a database is
+to iterate through C<get_all_segments>.
+
+=item * @Segments = $db->get_all_segments();
+
+=item * $db->close();
+
+=item * $db->destroy();
+
+=item * $db->get_default_segment_size();
+
+=item * $db->get_sector_size();
+
+=item * $db->size();
+
+=item * $db->size_in_sectors();
+
+=item * $ctime = $db->time_created();
+
+=item * $can_write = $db->is_writable();
+
+=item * $db->set_fetch_policy(policy[, blocksize]);
+
+Policy can be one of C<segment>, C<page>, or C<stream>.
+
+=item * $db->set_lock_whole_segment(policy);
+
+Policy can be one of C<as_used>, C<read>, or C<write>.
+
+=item * @Roots = $db->get_all_roots();
+
+=item * $root = $db->create_root($root_name);
+
+=item * $root = $db->find_root($root_name);
+
+=item * $db->destroy_root($root_name);
+
+Destroys the root with the given name if it exists.
+
+=back
+
+=head2 C<::Root>
+
+=over 4
+
+=item * $root->get_name();
+
+=item * $root->get_value();
+
+=item * $root->set_value($new_value);
+
+=item * $root->destroy();
+
+=back
+
+=head2 C<::Transaction>
+
+C<ObjectStore> transactions and exceptions are seemlessly integrated into
+perl.  C<ObjectStore> exceptions cause a C<die> in perl just as perl
+exceptions can cause a transaction abort.
+
+    begin 'update', sub {
+        $top = $db->root('top');
+        $top->{abc} = 3;
+        die "Oops!  abc should not change!";       # aborts the transaction
+    };
+    die if $@;
+
+There are three types of transactions: C<read>, C<update>, and
+C<abort_only>.  The default is C<read>.  Read transaction are
+blindingly fast.
+
+    begin 'read', sub {
+	my $var = $db->root('top');
+	$var->{abc} = 7;	# write to $var triggers exception
+    };
+    die if $@;
+
+(In a read transaction, you are not allowed to modify persistent data.)
+
+=over 4
+
+=item * $T = ObjStore::Transaction::get_current();
+
+=item * $type = $T->get_type();
+
+=item * $pop = $T->get_parent();
+
+=item * $T->prepare_to_commit();
+
+=item * $yes = $T->is_prepare_to_commit_invoked();
+
+=item * $yes = $T->is_prepare_to_commit_completed();
+
+=item * $ObjStore::TRANSACTION_PRIORITY
+
+=item * ObjStore::set_max_retries($oops);
+
+=item * my $oops = ObjStore::get_max_retries();
+
+=item * my $yes = ObjStore::is_lock_contention();
+
+=item * my $type = ObjStore::get_lock_status($ref);
+
+=item * my $tm = ObjStore::lock_timeout($rw);
+
+C<$rw> should be either 'read' or 'write'.  Return value of 1 == 1
+second.  Undef indicates that there is no timeout.
+
+=item * ObjStore::lock_timeout($rw, $tm);
+
+Set lock timeouts.
+
+=back
+
+Dynamic transactions are also available.  See L<ObjStore::Serve>.
+
+=head2 C<::Segment>
+
+=over 4
+
+=item * $s->set_comment($comment);
+
+=item * $s->destroy();
+
+=item * $size = $s->size();
+
+=item * $yes = $s->is_empty();
+
+=item * $yes = $s->is_deleted();
+
+=item * $num = $s->get_number();
+
+=item * $comment = $s->get_comment();
+
+=item * $s->lock_into_cache();
+
+=item * $s->unlock_from_cache();
+
+=item * $s->set_fetch_policy($policy[, $size]);
+
+Policy can be one of C<segment>, C<page>, or C<stream>.
+
+=item * $s->set_lock_whole_segment($policy);
+
+Policy can be one of C<as_used>, C<read>, or C<write>.
+
+=back
+
+=head2 C<::Notification>
+
+Easy event dispatching for network distributed objects.  See
+L<ObjStore::notify>.
+
+=over 4
+
+=item * ObjStore::subscribe(...);
+
+=item * ObjStore::unsubscribe(...);
+
+=item * set_queue_size($size);
+
+=item * ($size, $pending, $overflow) = queue_status();
+
+=item * $fd = _get_fd();
+
+=item * $n = receive([$timeout]);
+
+=item * Receive();
+
+=item * $db = $n->get_database;
+
+=item * $p = $n->focus;
+
+=item * $why = $n->why;
+
+=back
+
+=head2 C<::UNIVERSAL>
+
+All persistent objects inherit from C<ObjStore::UNIVERSAL>.
+
+=over 4
+
+=item * I<overload>
+
+Stringify, boolean & numeric coersion, equality tests.
+
+=item * C<os_class>
+
+Reports the natural persistent class of the object.  All persistent
+objects must have this class in their C<@ISA> tree.
+
+=item * C<rep_class>
+
+Reports the representation's class.
+
+=item * C<bless>
+
+In addition to the usual meaning of bless, ObjStore C<bless> stores
+the current C<@ISA> tree and the C<VERSION> of every member of the
+C<@ISA> tree.
+
+=item * C<$o->isa($baseclass)>
+
+Whether the $baseclass was part of the C<@ISA> tree at the moment of
+blessing.
+
+=item * C<$o->versionof($baseclass)>
+
+Returns the version of the $baseclass (at the moment of blessing).
+
+=item * C<$o->subscribe()> and C<$o->unsubscribe()>
+
+These might not be available per-object.  Only per-segment or
+per-database. XXX
+
+=item * C<$o->notify($why, $when)>
+
+Sends a notification to subscribers.  When can be either 'now' or
+'commit'.  The $when parameter might be required.  [Also under
+consideration is a means to bunch notifications together for batch
+send. XXX]
+
+=item * Of
+
+C<database_of> and C<segment_of> are available as methods.
+
+=item * C<posh>
+
+C<posh> behavior can be customized by adding special methods that are
+detected by C<posh>.  See the L<posh> section.
+
+=back
+
+To make everything seem apparently consistent, C<ObjStore::Database>
+(while not really being a storable object) is lavishly special-cased
+to support most (maybe all!) of the above features.
+

@@ -1,0 +1,4 @@
+Install:
+
+    perl Makefile.PL;
+    make all test install;

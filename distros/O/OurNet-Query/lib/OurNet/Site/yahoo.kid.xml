@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<SITE ID="Yahoo.Kid">
+
+<NAME Lang="en-us">Yahooligans</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+Yahoo ¨àµ£ª©
+]]></NAME>
+<INFO Lang="en-us">web guide for kids</INFO>
+<INFO Lang="zh-tw">web guide for kids</INFO>
+
+<URL Type="More"><![CDATA[
+http://search.yahooligans.com_MORE_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://search.yahooligans.com/search/ligans?p=_QUERY_&b=0&h=s&hc=0
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_MORE_"><![CDATA[
+<a href="_MORE_">Next
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<LI><A HREF="_URL_">_TITLE_</A>_PREVIEW__EOR_
+]]></TEMPLATE>
+</SITE>

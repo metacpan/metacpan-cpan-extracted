@@ -1,0 +1,1 @@
+use Object::HashBase::Test;

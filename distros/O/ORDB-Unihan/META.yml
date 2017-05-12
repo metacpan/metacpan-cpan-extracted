@@ -1,0 +1,29 @@
+---
+abstract: 'An ORM for the published Unihan database'
+author:
+  - 'Fayland Lam <fayland@gmail.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300030, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: ORDB-Unihan
+requires:
+  Archive::Extract: 0.34
+  DBI: 0
+  File::HomeDir: 0.69
+  File::Path: 2.04
+  File::Remove: 1.42
+  File::Spec: 0.80
+  LWP::Online: 0
+  ORLite: 1.22
+  Params::Util: 0.33
+resources:
+  repository: git://github.com/fayland/ordb-unihan.git
+version: 0.03
+x_contributors:
+  - 'fayland <fayland@gmail.com>'

@@ -1,0 +1,52 @@
+# $File: //depot/OurNet-BBSAgent/BBSAgent/cvic.bbs $ $Author: autrijus $
+# $Revision: #12 $ $Change: 3388 $ $DateTime: 2002/03/09 08:23:36 $
+# Contributed by Autrijus Tang <autrijus@autrijus.org>
+# zh_TW.Big5: 人民公社
+
+La Commune
+cvic.org
+
+load maple2.board
+load maple2.session
+load maple2.user
+
+setv cursor ●
+setv morehead m/\e\[0?m\e\[([\d;]+)m\x20\x20瀏覽\x20P./
+setv moretail 結束 # m/\[q\]\e\[30m結束\x20\x20\x20\e\[0?m/
+setv postsign 1
+
+=main
+send \e[D\e[D\e[D\e[D\e[D\e[D
+wait 主功能表
+till [Call機]
+
+=board
+call main
+send 1\n
+send /friends\n
+send E # Edit favorite
+wait 編輯文章
+send \x19$[board]\n\x18
+wait 檔案處理
+send s\n\n
+send /
+wait 名稱：
+send $[board]\n\n\x201\n\nq\n
+wait 板主：
+till 文章選讀
+
+=message
+wait \e[1;33;46m★
+till \e[37;45m\x20
+till \x20\e[0m
+send x
+exit
+
+=message_reply
+idle 2
+send \x12
+wait 炸回去：
+send $[message]\n
+wait [Y]
+send \n 
+exit

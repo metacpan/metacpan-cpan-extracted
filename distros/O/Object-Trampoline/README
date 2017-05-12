@@ -1,0 +1,21 @@
+
+There are times when delaying construction is helpful. My
+favorite example are database handles in a heavily-forked
+Apache server; database-logging error handlers are another
+good one. It may also be helpful for classes to configure
+a handler class and its arguments in a separate place from
+where they are used.
+
+"Trampoline" objects are an interesting OO oddity: they
+turn into something that they weren't to begin with so
+that you get what you need when you want it.
+
+Object::Trampoline produces objects of type
+Object::Trampoline::Bounce, which convert themselves
+into whatever was originally requested the first time
+any method [other than DESTROY] is called on them.  The
+classes each consist of an AUTOLOAD.
+
+The code is pure perl and requires only standard 
+distribution classes (strict and Carp) and should be
+equally usable on any platform supported by Perl.

@@ -1,0 +1,185 @@
+=head1 NAME
+
+ORM::Date - Date handler class.
+
+=head1 SYNOPSIS
+
+  $date = ORM::Date->new( [ 2006, 1, 25 ] );
+  print $date->mysql_date,"\n";
+  $date = $date->diff( [ 0, 0, -2 ] );
+  print $date->mysql_date,"\n";
+
+  The output is:
+  2006-01-25
+  2005-11-25
+
+=head1 DESCRIPTION
+
+This class introduces minimal interface to handle database
+table fields of type 'DATE'. It can be used to store time alogn with
+date, but ORM uses class C<ORM::Datetime> to handle fields of type DATETIME.
+
+Please also consult L<ORM::Datetime> to be sure you know
+how these classes are used by ORM.
+
+If you want to use another class to handle 'DATE' fields,
+please consult:
+
+=over
+
+=item * L<ORM::Tutorial> (THIRD PARTY CLASSES)
+
+=item * L<ORM> (C<_db_type_to_class> method).
+
+=item * L<ORM::Meta>.
+
+=back
+
+=head1 CONSTRUCTORS
+
+=over
+
+=item new( [ $year, $month, $mday, $hour, $min, $sec ] )
+
+Create new C<ORM::Date> object as specified in array reference.
+C<$year> should be exact four digit value.
+C<$month> is number in range between 1 and 12.
+
+If some value is out of range then it is treated as in 
+C<mktime> syscall,
+e.g. C<[2005,10,15,25,15,00]> is the same as C<[2005,10,16,01,15,00]>.
+
+=item new_epoch( $seconds_since_epoch )
+
+Create date object from value of seconds since epoch (as returned by C<time>).
+C<ORM::Date-E<gt>new_epoch( time )> is the same as C<ORM::Date-E<gt>current>.
+
+=item new_mysql( $datetime_string )
+
+Create date object from MySQL DATE or DATETIME string.
+
+=back 
+
+=head1 OBJECT PROPERTIES
+
+=over
+
+=item epoch 
+
+Return seconds since epoch for the date object.
+
+=item sec   
+
+Return 'seconds' part of the date.
+
+=item min   
+
+Return 'minutes' part of the date.
+
+=item hour  
+
+Return 'hours' part of the date.
+
+=item mday  
+
+Return day of month of the date.
+
+=item wday  
+
+Return day of week of the date. Value is as returned by C<localtime>
+in list context.
+
+=item yday  
+
+Return day of year part of the date.
+
+=item month 
+
+Return month of the date.
+
+=item year  
+
+Return year of the date.
+
+=item mysql_date
+
+Return date in MySQL format (YYYY-MM-DD).
+
+=item mysql_time
+
+Return time part of the date in MySQL format (HH:MM:SS).
+
+=item mysql_datetime
+
+Return date and time in MySQL format (YYYY-MM-DD HH:MM:SS).
+
+=item datetime_str
+
+Return date string as returned by C<localtime> in scalar context.
+
+=back
+
+=head1 OBJECT METHODS
+
+=over
+
+=item set_epoch( $epoch )
+
+Change object by resetting its epoch time to C<$epoch> value.
+
+=item copy()
+
+Return copy of the object.
+
+=item diff( [ $year, $month, $mday, $hour, $min, $sec ] )
+
+Return date object with changes applied as specified in argument.
+Out of range values for resulting object are handled as in C<mktime> syscall.
+
+=item date      
+
+Return object itself.
+
+=item datetime  
+
+Return C<ORM::datetime> object containing the same date.
+
+=back
+
+=head1 OVERLOADED OPERATORS
+
+Class C<ORM::Date> overloads following operators:
+
+'>', '<', '>=', '<=', '==', '!=', '<=>', 'cmp'
+
+=head1 SEE ALSO
+
+L<ORM::Datetime>
+
+L<ORM::Meta::ORM::Date>
+
+L<ORM::Meta::ORM::Datetime>
+
+=head1 AUTHOR
+
+Alexey V. Akimov
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2005-2006 Alexey V. Akimov
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+=cut

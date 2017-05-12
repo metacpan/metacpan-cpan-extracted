@@ -1,0 +1,56 @@
+0.004000 - 2016-08-26
+  - Add INET connector
+  - Make strictures dep explicit
+
+0.003006 - 2016-01-10
+  - Produce an error message comprehensible by Class::Load and Module::Runtime
+
+0.003005 - 2015-07-18
+  - Skip non-primary modules in a file to ensure we generate a sane fatpack
+
+0.003004 - 2014-10-04
+  - Explicitly load Moo::HandleMoose::_TypeMap since it isn't loaded sans
+    ithreads but we don't know if the foreign perl requires it
+
+0.003003 - 2014-08-11
+  - Make watchdog test handle death-by-send as well as death-by-receive
+  - Use newer Future API, fix broken test
+
+0.003002 - 2013-03-19
+  - Switch from CPS::Future to Future.pm
+
+0.003001_01 - 2013-02-11
+  - Allow STDERR of remote interpreters to be sent to a
+      connection specific filehandle
+  - Proxy dies() when a method is invoked and the handle is not valid
+  - Introduced the Watchdog class
+  - Added support for local object, tied hashes, and tied
+      arrays in the Connection class
+  - White listed Devel::GlobalDestruction and black listed
+      XSLoader and DynaLoader in FatNode
+  - Dead locks found and partially worked around
+  - Logging system introduced
+  - Propagate errors from FatNode code
+  - Fall back to core non-arch modules in FatNode
+  - Fix module name in Makefile.PL
+
+0.002003 - 2012-07-25
+  - Exclude vendorarch and sitearch from FatNode and ModuleSender
+  - Increase default timeout to 10 seconds
+  - Add Class::C3 as a dependency since it's required for 5.8 remote nodes
+  - SSH options as a separate argument for the SSH connector
+
+0.002002 - 2012-07-23
+  - timeouts for connection setup
+  - support Object::Remote->start::connect
+  - timer support in MiniLoop
+
+0.002001 - 2012-07-18
+  - start::, maybe::start:: and next::
+  - automatic prompting for sudo passwords
+  - allow transfer of glob references
+  - allow loading of classes and packages from __DATA__
+  - allow transfer of scalar references
+
+0.001001 - 2012-07-12
+  - initial release

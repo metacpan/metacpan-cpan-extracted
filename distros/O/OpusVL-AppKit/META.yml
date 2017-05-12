@@ -1,0 +1,583 @@
+---
+abstract: 'Catalyst based application'
+author:
+  - 'OpusVL - www.opusvl.com'
+build_requires:
+  ExtUtils::MakeMaker: '6.36'
+  File::Spec: '0'
+  Test::More: '0.96'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: OpusVL-AppKit
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  Excel::Template::Plus::TTAutoFilter:
+    file: lib/Excel/Template/Plus/TTAutoFilter.pm
+    version: '2.29'
+  HTML::FormFu::Validator::OpusVL::AppKit::CurrentPasswordValidator:
+    file: lib/HTML/FormFu/Validator/OpusVL/AppKit/CurrentPasswordValidator.pm
+    version: '2.29'
+  OpusVL::AppKit:
+    file: lib/OpusVL/AppKit.pm
+    version: '2.29'
+  OpusVL::AppKit::Action::AppKitForm:
+    file: lib/OpusVL/AppKit/Action/AppKitForm.pm
+    version: '2.29'
+  OpusVL::AppKit::Builder:
+    file: lib/OpusVL/AppKit/Builder.pm
+    version: '2.29'
+  OpusVL::AppKit::Controller::AppKit:
+    file: lib/OpusVL/AppKit/Controller/AppKit.pm
+    version: '2.29'
+  OpusVL::AppKit::Controller::AppKit::Admin:
+    file: lib/OpusVL/AppKit/Controller/AppKit/Admin.pm
+    version: '2.29'
+  OpusVL::AppKit::Controller::AppKit::Admin::Access:
+    file: lib/OpusVL/AppKit/Controller/AppKit/Admin/Access.pm
+    version: '2.29'
+  OpusVL::AppKit::Controller::AppKit::Admin::Users:
+    file: lib/OpusVL/AppKit/Controller/AppKit/Admin/Users.pm
+    version: '2.29'
+  OpusVL::AppKit::Controller::AppKit::User:
+    file: lib/OpusVL/AppKit/Controller/AppKit/User.pm
+    version: '2.29'
+  OpusVL::AppKit::Controller::Root:
+    file: lib/OpusVL/AppKit/Controller/Root.pm
+    version: '2.29'
+  OpusVL::AppKit::Controller::Search:
+    file: lib/OpusVL/AppKit/Controller/Search.pm
+    version: '2.29'
+  OpusVL::AppKit::Form::Login:
+    file: lib/OpusVL/AppKit/Form/Login.pm
+    version: '2.29'
+  OpusVL::AppKit::FormFu::Constraint::AppKitPassword:
+    file: lib/OpusVL/AppKit/FormFu/Constraint/AppKitPassword.pm
+    version: '2.29'
+  OpusVL::AppKit::FormFu::Constraint::AppKitUsername:
+    file: lib/OpusVL/AppKit/FormFu/Constraint/AppKitUsername.pm
+    version: '2.29'
+  OpusVL::AppKit::LDAPAuth:
+    file: lib/OpusVL/AppKit/LDAPAuth.pm
+    version: '2.29'
+  OpusVL::AppKit::Model::AppKitAuthDB:
+    file: lib/OpusVL/AppKit/Model/AppKitAuthDB.pm
+    version: '2.29'
+  OpusVL::AppKit::Plugin::AppKit:
+    file: lib/OpusVL/AppKit/Plugin/AppKit.pm
+    version: '2.29'
+  OpusVL::AppKit::Plugin::AppKit::FeatureList:
+    file: lib/OpusVL/AppKit/Plugin/AppKit/FeatureList.pm
+    version: '2.29'
+  OpusVL::AppKit::Plugin::AppKit::Node:
+    file: lib/OpusVL/AppKit/Plugin/AppKit/Node.pm
+    version: '2.29'
+  OpusVL::AppKit::Plugin::AppKitControllerSorter:
+    file: lib/OpusVL/AppKit/Plugin/AppKitControllerSorter.pm
+    version: '2.29'
+  OpusVL::AppKit::RolesFor::Controller::GUI:
+    file: lib/OpusVL/AppKit/RolesFor/Controller/GUI.pm
+    version: '2.29'
+  OpusVL::AppKit::RolesFor::Model::LDAPAuth:
+    file: lib/OpusVL/AppKit/RolesFor/Model/LDAPAuth.pm
+    version: '2.29'
+  OpusVL::AppKit::RolesFor::Plugin:
+    file: lib/OpusVL/AppKit/RolesFor/Plugin.pm
+    version: '2.29'
+  OpusVL::AppKit::TraitFor::Controller::Login::NewSessionIdOnLogin:
+    file: lib/OpusVL/AppKit/TraitFor/Controller/Login/NewSessionIdOnLogin.pm
+    version: '2.29'
+  OpusVL::AppKit::TraitFor::Controller::Login::SetHomePageFlag:
+    file: lib/OpusVL/AppKit/TraitFor/Controller/Login/SetHomePageFlag.pm
+    version: '2.29'
+  OpusVL::AppKit::View::AppKitTT:
+    file: lib/OpusVL/AppKit/View/AppKitTT.pm
+    version: '2.29'
+  OpusVL::AppKit::View::Download:
+    file: lib/OpusVL/AppKit/View/Download.pm
+    version: '2.29'
+  OpusVL::AppKit::View::DownloadFile:
+    file: lib/OpusVL/AppKit/View/DownloadFile.pm
+    version: '2.29'
+  OpusVL::AppKit::View::Email:
+    file: lib/OpusVL/AppKit/View/Email.pm
+    version: '2.29'
+  OpusVL::AppKit::View::Excel:
+    file: lib/OpusVL/AppKit/View/Excel.pm
+    version: '2.29'
+  OpusVL::AppKit::View::JSON:
+    file: lib/OpusVL/AppKit/View/JSON.pm
+    version: '2.29'
+  OpusVL::AppKit::View::PDF::Reuse:
+    file: lib/OpusVL/AppKit/View/PDF/Reuse.pm
+    version: '2.29'
+  OpusVL::AppKit::View::SimpleXML:
+    file: lib/OpusVL/AppKit/View/SimpleXML.pm
+    version: '2.29'
+requires:
+  Catalyst::Action::REST: '0'
+  Catalyst::Action::RenderView: '0'
+  Catalyst::Authentication::Store::DBIx::Class: '0'
+  Catalyst::Controller::HTML::FormFu: '0'
+  Catalyst::Model::DBIC::Schema: '0'
+  Catalyst::Plugin::Authentication: '0'
+  Catalyst::Plugin::Authorization::ACL: '0'
+  Catalyst::Plugin::Authorization::Roles: '0'
+  Catalyst::Plugin::Cache: '0'
+  Catalyst::Plugin::ConfigLoader: '0'
+  Catalyst::Plugin::ConfigLoader::Environment: '0'
+  Catalyst::Plugin::CustomErrorMessage: '0'
+  Catalyst::Plugin::Session: '0'
+  Catalyst::Plugin::Session::State::Cookie: '0'
+  Catalyst::Plugin::Session::Store::FastMmap: '0'
+  Catalyst::Plugin::Static::Simple: '0.3'
+  Catalyst::Plugin::Unicode::Encoding: '0'
+  Catalyst::Runtime: '5.90051'
+  Catalyst::View::Download: '0'
+  Catalyst::View::Email: '0'
+  Catalyst::View::Excel::Template::Plus: '0'
+  Catalyst::View::JSON: '0'
+  Catalyst::View::PDF::Reuse: '0'
+  Catalyst::View::TT: '0'
+  Catalyst::View::TT::Alloy: '0'
+  CatalystX::AppBuilder: '0.00011'
+  CatalystX::SimpleLogin: '0'
+  CatalystX::VirtualComponents: '0'
+  Child: '0'
+  Config::General: '0'
+  Crypt::Eksblowfish::Bcrypt: '0'
+  DBIx::Class::EncodedColumn::Crypt::Eksblowfish::Bcrypt: '0'
+  DBIx::Class::TimeStamp: '0'
+  Devel::InheritNamespace: '0.00003'
+  File::ShareDir: '0'
+  File::Spec: '0'
+  Getopt::Compact: '0'
+  HTML::FormFu::Model::DBIC: '0'
+  List::Util: '0'
+  Moose: '0'
+  MooseX::MethodAttributes::Role: '0'
+  Net::LDAP: '0'
+  OpusVL::AppKit::Schema::AppKitAuthDB: '5'
+  Plack: '0'
+  String::MkPasswd: '0'
+  Template::Alloy: '1.020'
+  Template::AutoFilter: '0'
+  Template::Plugin::DateTime: '0'
+  Test::DBIx::Class: '0'
+  Test::Most: '0'
+  Tree::Simple: '0'
+  Tree::Simple::View: '0'
+  Tree::Simple::VisitorFactory: '0'
+  Try::Tiny: '0'
+  XML::Simple: '0'
+  experimental: '0'
+  parent: '0'
+resources:
+  bugtracker: https://github.com/OpusVL/OpusVL-AppKit/issues
+  repository: git://github.com/OpusVL/OpusVL-AppKit.git
+version: '2.29'
+x_Dist_Zilla:
+  perl:
+    version: '5.020002'
+  plugins:
+    -
+      class: Dist::Zilla::Plugin::Git::GatherDir
+      config:
+        Dist::Zilla::Plugin::GatherDir:
+          exclude_filename: []
+          exclude_match: []
+          follow_symlinks: 0
+          include_dotfiles: 0
+          prefix: ''
+          prune_directory: []
+          root: .
+        Dist::Zilla::Plugin::Git::GatherDir:
+          include_untracked: 0
+      name: '@Filter/@Author::OpusVL/Git::GatherDir'
+      version: '2.036'
+    -
+      class: Dist::Zilla::Plugin::Prereqs::FromCPANfile
+      name: '@Filter/@Author::OpusVL/Prereqs::FromCPANfile'
+      version: '0.08'
+    -
+      class: Dist::Zilla::Plugin::PruneCruft
+      name: '@Filter/@Author::OpusVL/@Starter/PruneCruft'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::ManifestSkip
+      name: '@Filter/@Author::OpusVL/@Starter/ManifestSkip'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::MetaConfig
+      name: '@Filter/@Author::OpusVL/@Starter/MetaConfig'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::MetaProvides::Package
+      config:
+        Dist::Zilla::Plugin::MetaProvides::Package:
+          finder_objects:
+            -
+              class: Dist::Zilla::Plugin::FinderCode
+              name: '@Filter/@Author::OpusVL/@Starter/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
+              version: '6.005'
+        Dist::Zilla::Role::MetaProvider::Provider:
+          Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.001011'
+          inherit_missing: '1'
+          inherit_version: '1'
+          meta_noindex: '1'
+      name: '@Filter/@Author::OpusVL/@Starter/MetaProvides::Package'
+      version: '2.003001'
+    -
+      class: Dist::Zilla::Plugin::MetaNoIndex
+      name: '@Filter/@Author::OpusVL/@Starter/MetaNoIndex'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::MetaYAML
+      name: '@Filter/@Author::OpusVL/@Starter/MetaYAML'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::MetaJSON
+      name: '@Filter/@Author::OpusVL/@Starter/MetaJSON'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::License
+      name: '@Filter/@Author::OpusVL/@Starter/License'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::ReadmeAnyFromPod
+      config:
+        Dist::Zilla::Role::FileWatcher:
+          version: '0.006'
+      name: '@Filter/@Author::OpusVL/@Starter/ReadmeAnyFromPod'
+      version: '0.150250'
+    -
+      class: Dist::Zilla::Plugin::ExecDir
+      name: '@Filter/@Author::OpusVL/@Starter/ExecDir'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::ShareDir
+      name: '@Filter/@Author::OpusVL/@Starter/ShareDir'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::PodSyntaxTests
+      name: '@Filter/@Author::OpusVL/@Starter/PodSyntaxTests'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::Test::ReportPrereqs
+      name: '@Filter/@Author::OpusVL/@Starter/Test::ReportPrereqs'
+      version: '0.021'
+    -
+      class: Dist::Zilla::Plugin::Test::Compile
+      config:
+        Dist::Zilla::Plugin::Test::Compile:
+          bail_out_on_fail: '0'
+          fail_on_warning: author
+          fake_home: 0
+          filename: xt/author/00-compile.t
+          module_finder:
+            - ':InstallModules'
+          needs_display: 0
+          phase: develop
+          script_finder:
+            - ':PerlExecFiles'
+          skips: []
+      name: '@Filter/@Author::OpusVL/@Starter/Test::Compile'
+      version: '2.054'
+    -
+      class: Dist::Zilla::Plugin::MakeMaker
+      config:
+        Dist::Zilla::Role::TestRunner:
+          default_jobs: 1
+      name: '@Filter/@Author::OpusVL/@Starter/MakeMaker'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::Manifest
+      name: '@Filter/@Author::OpusVL/@Starter/Manifest'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::RunExtraTests
+      config:
+        Dist::Zilla::Role::TestRunner:
+          default_jobs: 1
+      name: '@Filter/@Author::OpusVL/@Starter/RunExtraTests'
+      version: '0.028'
+    -
+      class: Dist::Zilla::Plugin::ConfirmRelease
+      name: '@Filter/@Author::OpusVL/@Starter/ConfirmRelease'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::CheckChangesHasContent
+      name: '@Filter/@Author::OpusVL/CheckChangesHasContent'
+      version: '0.008'
+    -
+      class: Dist::Zilla::Plugin::RewriteVersion
+      config:
+        Dist::Zilla::Plugin::RewriteVersion:
+          add_tarball_name: 0
+          finders:
+            - ':ExecFiles'
+            - ':InstallModules'
+          global: 0
+          skip_version_provider: 0
+      name: '@Filter/@Author::OpusVL/RewriteVersion'
+      version: '0.012'
+    -
+      class: Dist::Zilla::Plugin::NextRelease
+      name: '@Filter/@Author::OpusVL/NextRelease'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::PodWeaver
+      config:
+        Dist::Zilla::Plugin::PodWeaver:
+          finder:
+            - ':InstallModules'
+            - ':ExecFiles'
+          plugins:
+            -
+              class: Pod::Weaver::Plugin::EnsurePod5
+              name: '@CorePrep/EnsurePod5'
+              version: '4.012'
+            -
+              class: Pod::Weaver::Plugin::H1Nester
+              name: '@CorePrep/H1Nester'
+              version: '4.012'
+            -
+              class: Pod::Weaver::Plugin::SingleEncoding
+              name: '@Default/SingleEncoding'
+              version: '4.012'
+            -
+              class: Pod::Weaver::Section::Name
+              name: '@Default/Name'
+              version: '4.012'
+            -
+              class: Pod::Weaver::Section::Version
+              name: '@Default/Version'
+              version: '4.012'
+            -
+              class: Pod::Weaver::Section::Region
+              name: '@Default/prelude'
+              version: '4.012'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: SYNOPSIS
+              version: '4.012'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: DESCRIPTION
+              version: '4.012'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: OVERVIEW
+              version: '4.012'
+            -
+              class: Pod::Weaver::Section::Collect
+              name: ATTRIBUTES
+              version: '4.012'
+            -
+              class: Pod::Weaver::Section::Collect
+              name: METHODS
+              version: '4.012'
+            -
+              class: Pod::Weaver::Section::Collect
+              name: FUNCTIONS
+              version: '4.012'
+            -
+              class: Pod::Weaver::Section::Leftovers
+              name: '@Default/Leftovers'
+              version: '4.012'
+            -
+              class: Pod::Weaver::Section::Region
+              name: '@Default/postlude'
+              version: '4.012'
+            -
+              class: Pod::Weaver::Section::Authors
+              name: '@Default/Authors'
+              version: '4.012'
+            -
+              class: Pod::Weaver::Section::Legal
+              name: '@Default/Legal'
+              version: '4.012'
+      name: '@Filter/@Author::OpusVL/PodWeaver'
+      version: '4.006'
+    -
+      class: Dist::Zilla::Plugin::Encoding
+      name: '@Filter/@Author::OpusVL/CommonBinaryFiles'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::Git::Commit
+      config:
+        Dist::Zilla::Plugin::Git::Commit:
+          add_files_in: []
+          commit_msg: v%v%n%n%c
+        Dist::Zilla::Role::Git::DirtyFiles:
+          allow_dirty:
+            - Changes
+            - LICENSE
+            - cpanfile
+            - dist.ini
+          allow_dirty_match: []
+          changelog: Changes
+        Dist::Zilla::Role::Git::Repo:
+          repo_root: .
+        Dist::Zilla::Role::Git::StringFormatter:
+          time_zone: local
+      name: '@Filter/@Author::OpusVL/CommitGeneratedFiles'
+      version: '2.036'
+    -
+      class: Dist::Zilla::Plugin::ExecDir
+      name: '@Filter/@Author::OpusVL/ExecDir'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::ExecDir
+      name: '@Filter/@Author::OpusVL/ScriptDir'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::Git::Tag
+      config:
+        Dist::Zilla::Plugin::Git::Tag:
+          branch: ~
+          changelog: Changes
+          signed: 0
+          tag: v2.29
+          tag_format: v%v
+          tag_message: v%v
+        Dist::Zilla::Role::Git::Repo:
+          repo_root: .
+        Dist::Zilla::Role::Git::StringFormatter:
+          time_zone: local
+      name: '@Filter/@Author::OpusVL/Git::Tag'
+      version: '2.036'
+    -
+      class: Dist::Zilla::Plugin::BumpVersionAfterRelease
+      config:
+        Dist::Zilla::Plugin::BumpVersionAfterRelease:
+          finders:
+            - ':ExecFiles'
+            - ':InstallModules'
+          global: 0
+          munge_makefile_pl: 1
+      name: '@Filter/@Author::OpusVL/BumpVersionAfterRelease'
+      version: '0.012'
+    -
+      class: Dist::Zilla::Plugin::Git::Commit
+      config:
+        Dist::Zilla::Plugin::Git::Commit:
+          add_files_in: []
+          commit_msg: 'Bumped version number'
+        Dist::Zilla::Role::Git::DirtyFiles:
+          allow_dirty:
+            - Changes
+            - dist.ini
+          allow_dirty_match:
+            - (?^:^lib/)
+          changelog: Changes
+        Dist::Zilla::Role::Git::Repo:
+          repo_root: .
+        Dist::Zilla::Role::Git::StringFormatter:
+          time_zone: local
+      name: '@Filter/@Author::OpusVL/CommitVersionBump'
+      version: '2.036'
+    -
+      class: Dist::Zilla::Plugin::Git::Push
+      config:
+        Dist::Zilla::Plugin::Git::Push:
+          push_to:
+            - origin
+          remotes_must_exist: 1
+        Dist::Zilla::Role::Git::Repo:
+          repo_root: .
+      name: '@Filter/@Author::OpusVL/Git::Push'
+      version: '2.036'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: test
+          type: requires
+      name: '@Filter/@Author::OpusVL/TestMoreWithSubtests'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::UploadToCPAN
+      name: '@Filter/UploadToCPAN'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::GitHub::Meta
+      name: '@Filter/GitHub::Meta'
+      version: '0.42'
+    -
+      class: Dist::Zilla::Plugin::TestRelease
+      name: TestRelease
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::Test::CheckBreaks
+      config:
+        Dist::Zilla::Plugin::Test::CheckBreaks:
+          conflicts_module:
+            - Moose::Conflicts
+          no_forced_deps: 0
+        Dist::Zilla::Role::ModuleMetadata:
+          Module::Metadata: '1.000027'
+          version: '0.003'
+      name: Test::CheckBreaks
+      version: '0.017'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':InstallModules'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':IncModules'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':TestFiles'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExtraTestFiles'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExecFiles'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':PerlExecFiles'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ShareFiles'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':MainModule'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':AllFiles'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':NoFiles'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: '@Filter/@Author::OpusVL/@Starter/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
+      version: '6.005'
+  zilla:
+    class: Dist::Zilla::Dist::Builder
+    config:
+      is_trial: '0'
+    version: '6.005'

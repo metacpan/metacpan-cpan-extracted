@@ -1,0 +1,474 @@
+/* @override http://localhost:3030/static/css/layout.css */
+
+/* @override http://localhost:3030/static/css/layout.css */
+
+/* @override http://localhost:3210/static/css/layout.css */
+
+/* @override http://localhost:3000/static/css/layout.css */
+
+/* @override http://localhost:3303/static/css/layout.css */
+
+/* @override http://localhost:3303/static/css/layout.css */
+
+/* @override http://172.16.10.215:3000/static/css/layout.css */
+
+/* @override http://localhost:3000/static/css/layout.css */
+
+/* @override http://localhost:3000/static/css/layout.css */
+
+/* @override http://localhost:3000/static/css/layout.css */
+
+/* @override http://localhost:3000/static/css/layout.css */
+
+/* @override http://localhost:3000/static/css/layout.css */
+
+/* @override http://localhost:3000/static/css/layout.css */
+
+/* @override http://localhost:3000/static/css/layout.css */
+
+body {
+	margin: 0px;
+	padding: 0px;
+}
+
+.clear {
+	clear: both;
+}
+
+/* @group Page */
+
+div#page {
+	width: 960px;
+	margin: 20px auto;
+}
+
+/* @end */
+
+/* @group Header */
+
+
+div#header {
+	position: relative;
+	height: 53px;
+}
+
+/* @group Logo */
+
+div#header_logo {
+	width: 70px;
+	height: 44px;
+	position: absolute;
+	left: 18px;
+	top: 5px;
+	overflow: none;
+}
+
+div#header_logo a {
+	display: block;
+	height: 50px;
+}
+
+/* @end */
+
+/* @group Navigation */
+
+div#header_nav {
+	position: absolute;
+	right: 20px;
+}
+
+div#header_nav ul {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+}
+
+div#header_nav ul li {
+	float: left;
+	margin: 0;
+	height: 35px;
+	padding-left: 20px;
+}
+
+div#header_nav a {
+	display: block;
+	padding-top: 16px;
+	padding-bottom: 20px;
+}
+
+/* @end */
+
+/* @end */
+
+/* @group Body */
+
+div#body {
+	position: relative;
+	padding: 75px 40px 40px;
+}
+
+div.appname {
+	position: absolute;
+	left: 40px;
+	top: 14px;
+	padding-top: 2px;
+	padding-bottom: 20px;
+	padding-left: 50px;
+}
+
+/* @group User Nav */
+
+div#user_nav {
+	position: absolute;
+	right: 42px;
+	top: 21px;
+}
+
+div#user_nav ul {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+}
+
+div#user_nav ul li {
+	float: left;
+	margin: 0;
+	height: 35px;
+	padding-left: 20px;
+}
+
+div#user_nav a {
+	display: block;
+	padding-top: 6px;
+	padding-bottom: 10px;
+}
+
+/* @end */
+
+/* @group Breadcrumbs */
+
+div#breadcrumbs {
+	position: absolute;
+	left: 91px;
+	top: 43px;
+}
+
+/* @end */
+
+
+
+/* @end */
+
+/* @group Application */
+
+/* @group Controls */
+
+/* @group Buttons */
+
+div#button_group_right, div.button_group_right {
+	clear: both;
+	text-align: right;
+}
+
+div#button_group_right a.link_button {
+	margin-left: 8px;
+}
+
+div#button_group_right a.link_button, div.button_group_right a.link_button {
+	margin-left: 8px;
+	margin-right: 0;
+}
+
+/* @end */
+
+
+/* @group Action menu */
+
+ul.control-container {
+	margin: 0;
+	padding: 0;
+	display: inline-block;
+	position: relative;
+}
+
+ul.control-container li.control-edit-small {
+	position: relative;
+	display: inline-block;
+	padding: 0;
+	margin: 0;
+}
+
+ul.control-container li.control-edit-small a {
+	display: block;
+	width: 100%;
+	height: 100%;
+	font-weight: normal;
+	font-style: normal;
+}
+
+ul.control-container li.control-edit-small ul.dropdown {
+	top: 18px;
+	background-color: #eaeaea;
+	border: 1px solid #b4b4b4;
+	position: absolute;
+	padding-right: 4px;
+	z-index: 9;
+	display: none;
+	-webkit-box-shadow: 2px 5px 15px rgba(0,0,0,0.2);
+	-moz-box-shadow: 2px 5px 15px rgba(0,0,0,0.2);
+	box-shadow: 2px 5px 15px rgba(0,0,0,0.2);
+	list-style-type: none;
+	padding-left: 0;
+	font-size: 9pt;
+	background-image: none;
+}
+
+ul.control-container li.control-edit-small ul.dropdown li {
+	padding-top: 0;
+	background-image: none;
+	margin-bottom: -1px;
+	width: 100%;
+	margin-left: 0;
+	padding-left: 0;
+	padding-right: 14px;
+	margin-right: 0;
+}
+
+ul.control-container li.control-edit-small ul.dropdown li a {
+	text-decoration: none;
+	color: #515151;
+	display: block;
+	padding-left: 0;
+	margin-right: 0;
+	padding-left: 4px;
+	padding-bottom: 2px;
+	padding-top: 3px;
+	white-space: nowrap;
+}
+
+ul.control-container li.control-edit-small ul.dropdown li a:hover {
+	background-color: #cacaca;
+}
+
+ul.control-container li.control-edit-small ul.dropdown li a.hover {
+	background-color: #cacaca;
+}
+
+/* @end */
+
+div.version
+{
+    color: #fff;
+	text-align: center;
+    padding-top: 15px;
+	margin-bottom: -20px;
+	font-size: .8em;
+}
+
+
+/* @end */
+
+/* @group Alerts */
+
+div.alert.no-message {
+    display: none;
+}
+
+div.alert {
+	margin-right: 100px;
+	margin-left: 100px;
+	margin-bottom: 7px;
+	text-align: center;
+	-webkit-border-radius: 10px;
+	font-size: .9em;
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+
+div.error {
+	color: #d81e00;
+	background-color: #fff;
+	font-weight: bold;
+}
+
+div.status {
+	color: #006d06;
+	background-color: #fefffe;
+}
+
+/* @end */
+
+/* @group Body */
+
+/* @group Column layout */
+
+div.two_column {
+}
+
+div.two_column div.left_column {
+	width: 49%;
+	float: left;
+	padding-right: 1%;
+}
+
+div.two_column div.right_column {
+	width: 49%;
+	float: left;
+	padding-left: 1%;
+}
+
+/* @end */
+
+div#application_nav {
+	float: left;
+}
+
+div#application_body {
+	padding: 20px 25px;
+}
+
+div.app_body_with_nav {
+	margin-left: 160px;
+}
+
+div.content_block {
+	background-color: #fffefe;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+	padding: 8px 17px 20px;
+	-webkit-box-shadow: 3px 5px 10px rgba(0,0,0,0.2);
+	-moz-box-shadow: 3px 5px 10px rgba(0,0,0,0.2);
+	box-shadow: 3px 5px 10px rgba(0,0,0,0.2);
+	margin-bottom: 11px;
+	position: relative;
+	color: #414141;
+	overflow: auto;
+}
+
+p {
+	font-size: .9em;
+}
+
+/* @end */
+
+
+
+/* @end */
+
+/* @group Dashboard */
+
+div#dashboard {
+	
+}
+
+div#dashboard_col_1 {
+	float: left;
+	width: 406px;
+	margin-right: 16px;
+}
+
+div#dashboard_col_2 {
+	float: left;
+	width: 406px;
+}
+
+/* @end */
+div.role_sidebar {
+    width: 220px;
+    float: left;
+    padding-right: 10px;
+}
+
+#application_body div div div.role_details fieldset form fieldset.checkboxgroup.legend span span {
+    display: block;
+}
+
+div.role_details {
+    float: left;
+    width: 560px;
+}
+
+form#roles ul {
+    list-style: circle outside none;
+}
+
+form#roles li {
+	font-size: .9em;
+}
+
+form#roles li label{
+    color: red;
+    width: 330px;
+}
+
+form#roles li.allowed label{
+    color: green;
+}
+
+form#roles li.app span {
+    color: blue;
+}
+
+.save_indicator
+{
+    display: none;
+	position: absolute;
+	text-align: right;
+	right: 65px;
+	top: 85px;
+	font-size: 0.8em;
+	color: #e11f00;
+	background-color: white;
+	padding: 7px;
+	border-style: solid;
+	border-width: 1px;
+}
+
+.save_indicator.unsaved
+{
+    display: block;
+}
+
+.ajax_indicator
+{
+    display: none;
+	position: absolute;
+	text-align: right;
+	right: 250px;
+	top: 85px;
+	font-size: 0.8em;
+	background-color: white;
+	padding: 7px;
+	border-style: solid;
+	border-width: 1px;
+}
+
+.ajax_indicator.ajax_loading
+{
+    display: block;
+}
+
+.checkboxgroup span span
+{
+    display: block;
+}
+
+.checkboxgroup span span label
+{
+    font-size: 0.8em;
+    width: auto;
+}
+
+div#opusvl {
+	text-align: center;
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+
+.tooltip-tip {
+    display: none;
+    background: white;
+    border: 2px solid gray;
+    padding: 0 1em;
+}

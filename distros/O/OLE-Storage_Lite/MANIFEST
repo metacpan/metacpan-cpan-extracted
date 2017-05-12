@@ -1,0 +1,20 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+
+lib/OLE/Storage_Lite.pm
+
+sample/README
+sample/smpadd.pl
+sample/smpadd_a.pl
+sample/smpaddF.pl
+sample/smplls.pl
+sample/smplls_a.pl
+sample/smpsv.pl
+sample/test.xls
+
+t/00_load.t
+t/01_date_conversion.t
+
+META.yml                                 Module meta-data (added by MakeMaker)

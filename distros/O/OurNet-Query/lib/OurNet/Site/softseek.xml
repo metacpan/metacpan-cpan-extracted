@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<SITE ID="Softseek">
+
+<NAME Lang="en-us">SOFTSEEK.COM Search</NAME>
+<INFO Lang="en-us">software relevant documents search and online download</INFO>
+
+<URL Type="More"><![CDATA[
+_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://search01.softseek.com/cgi-bin/search.cgi?maxresults=025&keywords=_QUERY_&seekindex=index&scope=all&topdleditorsp=all&operatingsystem=all&typeofsoftware=all&dateadded=all&cb=
+]]></URL>
+
+
+<VAR Name="_NEXT_"><![CDATA[
+<A HREF="_NEXT_">[NEXT
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<TD>___COLOR=#808080>_SCORE_%___<A HREF=_URL_>_TITLE_</A>___<BR>_PREVIEW_</FONT> <BR>___</TD></TR>
+]]></TEMPLATE>
+</SITE>

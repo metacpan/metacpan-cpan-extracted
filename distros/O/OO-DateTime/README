@@ -1,0 +1,64 @@
+MISSION STATUS
+
+This is still only at the idea/design stage.  It's originally
+registered as an idea owned by Tim Bunce, but he doesn't have time
+dealing with it.
+
+The big question - do I have time dealing with it?  Maybe.  I hope I
+can get the basic functionallity I need myself ... later in March.
+I don't have the time implementing anything at the moment as I have to
+catch a plane... :)
+
+
+MISSION PHILOSOPHY
+
+My main mission with this module is to approach dates and timestamps
+in an object oriented way.  Tons of functionality and features should
+be available by object methods.  Still it should be a fairly
+lightweight module.  Of course the OO approach will always lead to
+some overheads, but it shouldn't do things that aren't needed - like
+converting from one format to another - before it's really needed.
+
+When searching at CPAN, there is a myriad of different packages
+dealing with date and time troubles.  I don't want to reinvent the
+wheel.  Actually I hate Gregorian dates as much as date parsing in
+general, so I will let others deal with that - as far as possible.
+All I want to do here is to do a little bit of researching into the
+jungle of existing packages, see whitch modules provides what
+functionalities, and make this functionallity available in an object
+oriented way - because as far as I can see, there are no object
+oriented packages for date handling out there (with some exception -
+but those are specialized packages).  I want to bring a bit order into
+all the mess about dates and times.  Anyway, I'm short on time now, so
+for now I will only lean on Date::Manip.  According to the Date::Manip
+pod, the biggest disadvantage with it is that it's slow.  I will
+gladly accept patches witch might speed up this package.
+
+My idea is that this class might be subclassed into different date
+representations.  One object can store the data to several subclasses,
+and as long as the data is available, converting from one type to
+another should be handled almost costlessly by an AUTOLOAD that does
+nothing else than a blessing.  I'll tell more detailed about my
+thoughts later.
+
+I will mainly concentrate on the most trivial subclass;
+Date::Time::UnixTime.  This format is mostly beeing criticized for not
+beeing able to handle historical dates, nor microprecision.  Well,
+since we have no explicit typing in Perl, it's trivial to extend it
+all possible ways - you can have negative numbers, 64 bit should be
+enough for a span of ~554 gigayears, you can use floating point for
+finer precisions ... etc.  Well, I guess it's all implemented as
+decimal numbers using string processing in perl.  I think that sucks a
+bit, but ... hey, it works.
+
+So Date::Time::UnixTime is universal.  All methods should be
+implemented for this subclass, and all subclasses of Date::Time should
+support some methods for importing/exporting to this format.  The
+Date::Time AUTOLOAD will then ensure that misc methods like
+$datetime->strftime("..."), $datetime->cmp($datetime), etc, will
+always work regardless of the original representation.  Again, I will
+tell more detailed about those thoughts later.
+
+Date::Time should support absolute dates as well as relative times,
+and all possible calendar and time systems that anyone cares to
+implement.

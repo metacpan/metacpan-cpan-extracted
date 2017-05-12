@@ -1,0 +1,24 @@
+Revision history for Orignal
+
+0.04    2014-03-01
+	- Another test not correct have '=' when should have '=='
+	- Fixe POD NAME
+
+0.03    2014-03-01
+
+        - Fixed the heading for abstract section in pod
+        - Fixed some tests that where giving false postives see 'blogs.perl.org/users/byterock/2014/03/a-tisket_a-tasket_a_little_perl_hash_basket'
+        - Fixed a few other little things from Neil Bowers https://github.com/neilbowers
+        - Fixed up the POD a little
+
+0.02    2012-05-02
+
+        - Added in some more validation ability.
+
+        - Fixed some typos and a few pod entries
+
+1.01    11/11/2011 11:11:11
+
+        First version, please be kind rewind.
+
+

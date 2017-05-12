@@ -1,0 +1,44 @@
+Revision history for Ovirt
+
+0.06    23 March 2016
+        - fix JSON deps
+
+0.05    15 March 2016
+		- set default api output to json format
+		- fix http encoding on username, domain & password
+		- add list, create, delete vm's snapshot
+		
+
+0.04	1 June 2015
+		- add method to stop all vm
+		- add method to return all running vm
+		- add method for vm IO & network statistics
+		- add method to add, remove and list vm nic
+		- add method to add, remove and list vm disk
+		- fix perldoc 'notes' alignment on Ovirt.pm
+		- fix typo on list method perldoc
+		- use minimal perl v5.10
+		- add network module
+		- add datacenter module
+		- add storage module
+		
+
+0.03	
+		- add display module
+		- fix keys on reference
+		- add more vm attributes to query
+		- add suspend vm method
+
+
+0.02	
+		- fix pod typo on rtrim
+		- add migrate vm 
+		- get host id on each running vm
+		- fix array element bug when specifying id as list method argument
+		- add host module
+
+0.01    
+        First version. support :
+        - list vm, template, cluster
+        - start, stop, reboot, create, remove vm
+	

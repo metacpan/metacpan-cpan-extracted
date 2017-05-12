@@ -1,0 +1,90 @@
+#! /usr/bin/perl
+
+use strict;
+use warnings;
+
+use Pod::Usage;
+use Getopt::Long;
+use File::Basename;
+use XML::Twig;
+
+use Orze;
+
+=encoding utf8
+
+=head1 NAME
+
+Orze - A framework to automate the building of websites
+
+=head1 VERSION
+
+Version 1.11
+
+=cut
+
+our $VERSION = '1.11';
+
+=head1 SYNOPSIS
+
+orze [options] project.xml
+
+=head2 OPTIONS
+
+=cut
+
+# default values for command line
+my %options = (
+    version => 0,
+    pub => 1,
+    help => 0,
+    without => [],
+    );
+
+# parsing command line
+GetOptions(\%options, qw(
+                         version
+                         pub!
+                         help|h
+                         without=s@
+                         ));
+my @without = split(/,/, join(',', @{$options{without}}));
+$options{without} = \@without;
+
+pod2usage({
+    -exitval => 1,
+    -verbose => 2,
+}) if $options{help};
+
+my $file = shift;
+
+pod2usage({
+    -message => "Need a description file !",
+    -exitval => 2,
+    -verbose => 0,
+}) if ! defined($file);
+
+pod2usage({
+    -message => "Unable to read file $file",
+    -exitval => 2,
+    -verbose => 0,
+}) if ! -r $file;
+
+# parsing project file name
+my ($appname, $directory, $suffix) = fileparse($file, qw(\.xml));
+if (!$suffix) {
+    $suffix = ".xml";
+}
+# add script directory to @INC in order to load custom modules
+push @INC, $directory . "/scripts";
+
+# load xml project file
+my $project = XML::Twig->new(
+                            keep_encoding => 1
+                            )
+    ->parsefile($directory . $appname . $suffix);
+$project->set_pretty_print('indented');
+
+###########################################################################
+my $orze = Orze->new($project, %options);
+$orze->compile;
+

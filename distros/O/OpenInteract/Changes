@@ -1,0 +1,2628 @@
+Revision history for Perl extension OpenInteract.
+
+1.62  Thu Sep 30 22:43:23 EDT 2004
+
+Individual:
+
+ * OpenInteract.pm:
+
+   - OI-6: Fix bug when specifying static files to send my filename
+   (vs filehandle). Thanks to Andreas Nolte for reporting.
+
+No packages changed.
+
+
+1.61  Sun May 30 11:05:27 EDT 2004
+
+Individual:
+
+ * Makefile.PL:
+
+   - Added IO::Zlib as dependency since Archive::Tar requires
+   it. Thanks to Teemu for the pointer.
+
+ * OpenInteract.pm:
+
+   - Allow users to set filehandle in $R->{page}{send_file};
+   previously we only allowed a filename; thanks to Teemu for the idea
+   and starting patch.
+
+ * script/oi_manage:
+
+   - Fix bug in 'check_package' where we weren't checking the
+   package_dir argument
+
+ * template/form_select_option:
+
+   - Add 'picked_multiple' argument so you can pass multiple chosen
+   items to a multiple-item select widget.
+
+ * Packages changed:
+
+   OpenInteract     1.60 -> 1.61
+   ----------------------------
+   base:            1.73 -> 1.74
+   base_box:        1.05 -> 1.05
+   base_error:      1.45 -> 1.45
+   base_group:      1.38 -> 1.38
+   base_page:       1.28 -> 1.29
+   base_security:   1.61 -> 1.61
+   base_template:   2.23 -> 2.23
+   base_theme:      1.36 -> 1.36
+   base_user:       1.64 -> 1.64
+   lookup:          1.01 -> 1.01
+   object_activity: 1.04 -> 1.04
+   results_manage:  1.02 -> 1.02
+   system_doc:      1.33 -> 1.33
+   classified:      1.38 -> 1.38
+   full_text:       1.35 -> 1.35
+   news:            1.54 -> 1.54
+
+
+1.60  Thu Aug 14 18:39:52 EDT 2003
+
+Overall:
+
+ * Issue quick fix to URL created when a user isn't logged in and the
+   new feature requiring logins is on. Thanks to Andrew Hurst for the
+   quick spot, although it was a scant 120 seconds after I'd posted
+   1.59 to PAUSE...
+
+
+1.59  Thu Aug 14 15:58:46 EDT 2003
+
+Overall:
+
+ * You can now require all users to login before seeing any part of
+   your site.
+
+ * Actual HTTP redirects are available if you'd like to use them.
+
+ * Several smaller fixes and enhancements.
+
+Individual:
+
+ * Makefile.PL:
+
+   - Add 'Cache::Cache' to dependency list, thanks to Teemu
+   <teemu@ionstream.fi>.
+
+ * conf/sample-server.(ini|perl)
+
+   - Add configuration keys to 'login' and 'display_info'. See
+   'UPGRADE' for listing and sample server configuration file for
+   details.
+
+ * doc/configuration.html:
+
+   - Fix incorrect has_a/links_to configuration references thanks to
+   pointers from Teemu.
+
+ * OpenInteract.pm:
+
+   - Don't always warn about finding db handles, thanks to Andrew
+   Hurst <hurst9@llnl.gov> for pointer and patch.
+
+   - Call ->child_terminate where appropriate (thanks to Chris
+   McDaniel for report that sparked the fix)
+
+   - Be able to set a server configuration variable to force all users
+   of a site to login. (See configuration entries under 'login'.) If
+   set users who aren't logged in will always get sent (internally) to
+   a URL of your choosing. Thanks much to Andrew Hurst for the idea
+   and implementation thoughts.
+
+   - If '$R->{page}{http_redirect}' set to a URL then issue an HTTP
+   redirect. (Thanks to Teemu)
+
+ * OpenInteract/UI/Main.pm:
+
+   - Don't do any processing if '$R->{page}{http_redirect}' set.
+
+ * OpenInteract/Template/Plugin.pm:
+
+   - Add 'theme_fetch()', thanks to Andrew Hurst for the idea and
+   discussion on scope and parameter naming.
+
+ * OpenInteract/UI/Main.pm:
+
+   - Also pass along 'path' to the main template.
+
+Packages updated:
+
+   OpenInteract     1.58 -> 1.59
+   ----------------------------
+   base:            1.72 -> 1.73
+   base_box:        1.05 -> 1.05
+   base_error:      1.45 -> 1.45
+   base_group:      1.38 -> 1.38
+   base_page:       1.24 -> 1.28
+   base_security:   1.60 -> 1.61
+   base_template:   2.23 -> 2.23
+   base_theme:      1.36 -> 1.36
+   base_user:       1.64 -> 1.64
+   lookup:          1.01 -> 1.01
+   object_activity: 1.04 -> 1.04
+   results_manage:  1.02 -> 1.02
+   system_doc:      1.33 -> 1.33
+   classified:      1.38 -> 1.38
+   full_text:       1.34 -> 1.35
+   news:            1.54 -> 1.54
+
+
+1.58  Sun Apr 13 19:52:57 EDT 2003
+
+Overall:
+
+ * Fixed fairly serious bug in base_page package that shipped with
+   1.57.
+
+Packages updated:
+
+   OpenInteract     1.57 -> 1.58
+   ----------------------------
+   base_page:       1.23 -> 1.24
+
+
+1.57  Mon Apr  7 21:08:38 EDT 2003
+
+Overall:
+
+ * Small bugfixes and enhancements.
+
+Individual:
+
+ * INSTALL.website:
+
+   - Modify the sample information for configuring your database
+   connection as it was a little confusing. Thanks to Andrew Hurst
+   <hurst9@llnl.gov> for the pointer.
+
+ * Makefile.PL:
+
+   - Set the unknown version numbers to '0' instead of 'undef' -- as
+   it was EU::MM wasn't picking up the dependency properly. Thanks to
+   Barry Hoggard <barry@tristanmedia.com> for pointing it out.
+
+ * conf/sample-server.ini:
+
+   - Make the sample configuration and description a little clearer as
+   to what's required, what various items are, etc.
+
+ * OpenInteract/Cache.pm:
+
+   - Force scalar context on ->id call.
+
+ * OpenInteract/PackageRepository.pm:
+
+   - Fix ->package_filename to work properly on Win32. Thanks to David
+   C. Reed <dreed@xonos.com> for the fix!
+
+ * OpenInteract/SPOPS.pm:
+
+   - Fix problem with fetching/saving object keys when the object is
+   using a multiple-value primary key. Thanks to damien leri
+   <damien@babelfield.com> for pointing out the problem.
+
+ * OpenInteract/Startup.pm:
+
+   - Fix bug triggered when we cannot bring in all the action or SPOPS
+   classes. (Trying to treat the hashref as an arrayref, oops.)
+
+ * OpenInteract/Template/Plugin.pm:
+
+   - In make_url(), use '&amp;' as a query argument separator rather
+   than a bare '&'. Thanks to damien leri <damien@babelfield.com> for
+   the pointer and Randal for the clarification.
+
+ * script/oi_manage:
+
+   - Fix some typos in the docs -- thanks to Jon <jon@3ev.com> for the
+   pointer.
+
+Packages updated:
+
+   OpenInteract     1.56 -> 1.57
+   ----------------------------
+   base:            1.72 -> 1.72
+   base_box:        1.04 -> 1.05
+   base_error:      1.45 -> 1.45
+   base_group:      1.38 -> 1.38
+   base_page:       1.17 -> 1.23
+   base_security:   1.60 -> 1.60
+   base_template:   2.23 -> 2.23
+   base_theme:      1.36 -> 1.36
+   base_user:       1.61 -> 1.64
+   lookup:          1.01 -> 1.01
+   object_activity: 1.03 -> 1.04
+   results_manage:  1.01 -> 1.02
+   system_doc:      1.33 -> 1.33
+   classified:      1.38 -> 1.38
+   full_text:       1.34 -> 1.34
+   news:            1.54 -> 1.54
+
+
+1.56  Mon Feb 17 16:55:40 EST 2003
+
+Overall:
+
+ * Updated all relevant packages to use the '%%DATETIME%%' key in
+   database schemas since different databases use different types
+   ('datetime', 'timestamp', 'date', 'whenever', etc.)
+
+ * A number of small bugfixes and enhancements. Included in this is an
+   update of package documentation for most packages shipped with the
+   distribution. (Fixes SF Bug #597982)
+
+Individual:
+
+ * conf/sample-override_spops.ini
+
+   - Add 'news_section' as object to be optionally modified for its
+   database type.
+
+ * OpenInteract/Config/Ini.pm:
+
+   - Fixed a few bugs in the INI read/write along with a small
+   documentation note. Thanks much to Isidro Vila Verde <jvv@fe.up.pt>
+   for pointing out the errors and sending along fixes.
+
+ * OpenInteract/Package.pm:
+
+   - Update copy_modules() to return an arrayref of the full
+   destination paths of the modules rather than the module files
+   themselves.
+
+ * OpenInteract/PackageRepository.pm:
+
+   - Add routines to backup and restore from backup.
+
+ * OpenInteract/Session.pm:
+
+   - Set session key 'timestamp' on create
+
+ * OpenInteract/SQLInstall.pm:
+
+   - Add support for '%%DATETIME%%' keyword in schemas to install.
+
+ * OpenInteract/Startup.pm:
+
+   - Do a chmod 0777 on all the files and directories in the templib
+   directory. Fixes SF Bug #657857.
+
+ * OpenInteract/Template/Plugin.pm:
+
+   - Add 'page_title( $title )' method to change the page title from a
+   template.
+
+   - Be sure that boxes added via 'box_add' copy the box parameters
+   (title, weight, etc.) to the right place
+
+ * script/oi_manage:
+
+   - Call repository backup/restore backup when appropriate. This
+   should help with accidental corruption of the repository.
+
+
+Packages updated:
+
+   OpenInteract     1.55 -> 1.56
+   ----------------------------
+   base:            1.70 -> 1.72
+   base_box:        1.01 -> 1.04
+   base_error:      1.43 -> 1.45
+   base_group:      1.37 -> 1.38
+   base_page:       1.15 -> 1.17
+   base_security:   1.58 -> 1.60
+   base_template:   2.22 -> 2.23
+   base_theme:      1.35 -> 1.36
+   base_user:       1.59 -> 1.61
+   lookup:          1.00 -> 1.01
+   object_activity: 1.01 -> 1.03
+   results_manage:  1.00 -> 1.01
+   system_doc:      1.32 -> 1.33
+   classified:      1.36 -> 1.38
+   full_text:       1.33 -> 1.34
+   news:            1.48 -> 1.54
+
+
+1.55  Fri Dec 20 08:00:48 EST 2002
+
+Individual:
+
+ * conf/sample-base.conf:
+
+   - Add 'templib_dir' key which you can use to set the temporary
+   library directory.
+
+ * doc/*:
+
+   - Number of small changes to documentation (internal consistency,
+   etc.). Add sample-server-ini.html for example of recommended server
+   configuration type.
+
+ * OpenInteract/SPOPS.pm:
+
+   - Add 'object_description' which uses the method from SPOPS but
+   adds 'date' if the configured object has 'description_date_field'
+   defined in its configuration.
+
+   - Catch SPOPS log actions for 'delete' and 'remove' to do the same
+   thing (SPOPS for some reason uses delete/remove interchangably...)
+
+ * OpenInteract/Startup.pm:
+
+   - Try to read temporary library directory from base config first
+   (user can customize), otherwise use the same value as
+   previous. Thanks to Andreas Nolte for the suggestion.
+
+ * OpenInteract/UI/Main.pm:
+
+   - Make choosing the main template customizable via
+   subclassing. Thanks to Chris McDaniel <Chris.McDaniel@telus.com>
+   for the idea.
+
+
+Packages updated:
+
+   OpenInteract     1.51 -> 1.55
+   ----------------------------
+   base:            1.70 -> 1.70
+   base_box:        1.01 -> 1.01
+   base_error:      1.43 -> 1.43
+   base_group:      1.37 -> 1.37
+   base_page:       1.00 -> 1.15
+   base_security:   1.58 -> 1.58
+   base_template:   2.21 -> 2.22
+   base_theme:      1.35 -> 1.35
+   base_user:       1.58 -> 1.59
+   lookup:          1.00 -> 1.00
+   object_activity: 1.00 -> 1.01
+   results_manage:  1.00 -> 1.00
+   system_doc:      1.32 -> 1.32
+   classified:      1.36 -> 1.36
+   full_text:       1.32 -> 1.33
+   news:            1.40 -> 1.48
+
+
+1.54  Thu Nov  7 10:12:00 EST 2002
+
+Individual:
+
+ * OpenInteract/Handler/GenericDispatcher.pm:
+
+   - Actually implement the bugfix from 1.53 properly...
+ 
+
+1.53  Thu Nov  7 07:57:11 EST 2002
+
+Individual:
+
+ * OpenInteract/Handler/GenericDispatcher.pm:
+
+   - Don't use the cache unless it's been defined. Thanks to Raúl
+   Romero <raul@bgta.homeip.net> for the bug report.
+
+Package updates: none
+ 
+
+1.52  Mon Sep 16 16:19:33 EDT 2002
+
+Individual:
+
+ * doc/caching.html:
+
+   -Add note about admin users and caching.
+
+ * OpenInteract/ApacheStartup.pm:
+
+   - When cleaning up the content and TT caches, set the permissions
+   on the directories to 0777 so the webserver doesn't complain about
+   not being able to write to the cache.
+
+ * OpenInteract/Component.pm:
+
+   - Fix VERSION so it's newer than 1.50. (How this got downgraded is
+   anyone's guess... probably a pasted VERSION converter w/o a
+   commit.) Thanks to merlyn, as usual.
+
+ * OpenInteract/Handler/GenericDispatcher.pm:
+
+   - If the user is an admin, we neither read from nor write to the
+   cache.
+
+   - If the action parameter 'skip_cache' is set, we neither read from
+   nor write to the cache.
+
+
+Package updates: none
+
+
+1.51  Sun Sep  8 23:07:24 EDT 2002
+
+Individual:
+
+ * conf/sample-server.ini, conf/sample-server.perl:
+
+   - See UPGRADE for details on these:
+
+     o Add configuration keys 'cache_info.data.directory_depth' and
+     'cache_info.data.cleanup'
+     o Rename keys 'cache_info.data.SPOPS' and 'cache_info.data.expire'
+     o Delete keys 'cache_info.ipc.*' and 'cache_info.data.use_ipc'
+
+ * doc/caching.html:
+
+   - Create introduction to caching in OI.
+
+ * OpenInteract.pm:
+
+   - Modify how we setup the cache -- what parameters are used,
+   etc. (Part of caching implementation.)
+
+ * OpenInteract/Cache.pm:
+
+   - Rewrite big chunks of class. Caching now uses an OI object rather
+   than just class methods that can grab an cache implementation
+   object from the ether.
+
+ * OpenInteract/Cache/File.pm:
+
+   - Rewrite to reflect new caching changes, plus use Cache::FileCache
+   rather than the ancient File::Cache. Get rid of old AUTOLOAD stuff.
+
+ * OpenInteract/Cache/IPC.pm:
+
+   - Dump.
+
+ * OpenInteract/Handler/GenericDispatcher.pm:
+
+   - Create caching and cache checking methods for subclasses. You can
+   use these if your module subclasses this class OR if it subclasses
+   OpenInteract::CommonHandler. See intro to caching
+   (doc/caching.html) and POD for this class.
+
+ * OpenInteract/Session/(DBI|File|SQLite).pm:
+
+   - Only return a non-empty session. (Probably unnecessary, but just
+   to be sure...)
+
+ * OpenInteract/Template/Plugin.pm:
+
+   - Fix 'box_add' so that it passes the 'remove' parameter properly
+
+ * OpenInteract/Template/Provider.pm:
+
+   - Return a better error message if we can't find a template in
+   _load().
+
+ * script/oi_manage:
+
+   - Add deprecation message for commands dealing with templates.
+
+Packages updated:
+
+   OpenInteract     1.50 -> 1.51
+   ----------------------------
+   base:            1.70 -> 1.70
+   base_box:        1.00 -> 1.01
+   base_error:      1.43 -> 1.43
+   base_group:      1.37 -> 1.37
+   base_page:       1.00 -> 1.00
+   base_security:   1.58 -> 1.58
+   base_template:   2.21 -> 2.21
+   base_theme:      1.35 -> 1.35
+   base_user:       1.58 -> 1.58
+   lookup:          1.00 -> 1.00
+   object_activity: 1.00 -> 1.00
+   results_manage:  1.00 -> 1.00
+   system_doc:      1.32 -> 1.32
+   classified:      1.36 -> 1.36
+   full_text:       1.32 -> 1.32
+   news:            1.40 -> 1.48
+
+
+1.50  Mon Aug 26 01:37:23 EDT 2002
+
+Overall:
+
+ * Templates are now only stored in the filesystem, and browser-based
+   template editing is back online. If you currently store templates
+   in the filesystem you'll need to run a migration script. See docs
+   in the 'base_template' package for more information.
+
+ * Component handler has moved from the 'base_component' package to
+   the main distribution. The 'base_component' package is no longer
+   used.
+
+ * Documentation updates: much of the docs from the 'base' package are
+   now in HTML in the main docs.
+
+Individual:
+
+ * conf/sample-server.ini, conf/sample-server.perl:
+
+   - Add new mandatory keys 'system_alias.site_template' and
+   'system_alias.sitetemplate' (See UPGRADE for more info)
+
+   - Remove key 'template_info.source' as it's no longer needed
+
+   - Change key 'system_alias.component' to
+   'OpenInteract::Component'. (This is MANDATORY; see UPGRADE for more
+   info.)
+
+ * doc/actions.html; doc/templates.html; doc/packages.html;
+   doc/configuration.html; doc/r_contents.html;
+   doc/error_handling.html:
+
+   - Move documentation from 'base' package to sitewide doc
+   directory.
+
+ * doc/components.html:
+
+   - Move documentation from 'base_component' package to sitewide doc
+   directory.
+
+ * doc/developer.html:
+
+   - Merge changes made by Ben Avery <ben@thesite.org.uk> to bring the
+   document up-to-date.
+
+ * OpenInteract/Package.pm:
+
+   - Only change the 'class' property of action configuration files if
+   it's 'OpenInteract::Handler::Foo' rather than just
+   'OpenInteract::Foo'
+
+   - In check(), include all files from 'template' that are not
+   backups or meta files.
+
+ * OpenInteract/Template.pm, OpenInteract/Template/Toolkit.pm
+
+   - Removed files; these have been deprecated for a long time. Adios!
+
+ * OpenInteract/Template/Provider.pm:
+
+   - Ripped out all template fetching routines since this logic is now
+   in OpenInteract::SiteTemplate (in the base_template package).
+
+
+Packages updated:
+
+   OpenInteract     1.41 -> 1.50
+   ----------------------------
+   base:            1.67 -> 1.70
+   base_box:        0.45 -> 1.00
+   base_error:      1.42 -> 1.43
+   base_group:      1.36 -> 1.37
+   base_page:       0.98 -> 1.00
+   base_security:   1.57 -> 1.58
+   base_template:   1.31 -> 2.21
+   base_theme:      1.34 -> 1.35
+   base_user:       1.57 -> 1.58
+   lookup:          0.20 -> 1.00
+   object_activity: 0.19 -> 1.00
+   results_manage:  0.08 -> 1.00
+   system_doc:      1.29 -> 1.32
+   classified:      1.35 -> 1.36
+   full_text:       1.31 -> 1.32
+   news:            1.39 -> 1.40
+
+
+1.41 Tue Aug 13 07:28:10 EDT 2002
+
+Individual:
+
+ * Makefile.PL:
+
+   - Changed 'Email::Valid' prereq to 'Mail::RFC822::Address', since
+   the latter is available on Win32.
+
+ * OpenInteract.pm:
+
+   - Add call to OpenInteract::Auth->custom_handler() after the other
+   authentication methods have been run.
+
+ * OpenInteract/Auth.pm:
+
+   - Move the custom method as declared in the server configuration to
+   stand on its own rather than after the user logs in
+   successfully. We also renamed a few configuration keys in the
+   'login' group.
+
+ * OpenInteract/CommonHandler.pm:
+
+   - Fixed bug in wizard_search() that was not getting the search
+   results back properly due to a malformed argument capture. (Thanks
+   to Bill Heckel (bill@billheckel.com) for spotting it.)
+
+   - Fixed bug in _search_build_where_clause() so that we properly
+   handle searches with multiple values for a single
+   criterion. (Thanks to Ewald Hinrichs (ewald.hinrichs@applied.de)
+   for the bug report.)
+
+ * OpenInteract/DBI.pm:
+
+   - Added documentation for connection parameter 'db_name'. Thanks to
+   Drew Taylor (drew@drewtaylor.com) for the prod.
+
+ * OpenInteract/Package.pm:
+
+   - In 'package.conf' file, allow 'Module::Foo||Module::Bar||...'
+   syntax to specify alternative modules that can be used for the same
+   purpose. For instance, Win32 does not have an install of
+   Email::Valid, so we use 'Email::Valid||Mail::RFC822::Address' and
+   allow the code that uses this module to use either of them.
+
+ * OpenInteract/Startup.pm:
+
+   - Refactor some of the initialization code. Specifically, remove
+   some functionality regarding the classes tracked to be required en
+   masse and put it in separate methods. Also move this tracking until
+   AFTER the global overrides have been processed.
+
+ * OpenInteract/Template/Plugin.pm:
+
+   - New parameter for date_format(): a true value for 'fill_nbsp'
+   will fill all whitespace in the formatted string with '&nbsp;'
+
+ * OpenInteract/Template/Provider.pm:
+
+   - Allow for package templates to be stored in sitewide template
+   area. These templates should be used for customization since the
+   package may get upgraded and the templates overwritten. This means
+   instead of modifying the template:
+
+     $WEBSITE_DIR/pkg/mypkg/template/foo.tmpl
+
+   You probably want to modify:
+
+     $WEBSITE_DIR/template/mypkg/foo.tmpl
+
+   Since the former will be overwritten with an upgrade to 'mypkg'.
+
+   - Allow templates with the name spec '::foo_template' to be pulled
+   properly from the sitewide template directory
+
+ * conf/sample-server.ini, conf/sample-server.perl:
+
+   Rename configuration keys:
+
+     'login.custom_login_handler' => 'login.custom_handler'
+     'login_custom_login_method'  => 'login.custom_method'
+   
+   Add configuration key:
+
+     'login.custom_fail_method'
+
+Packages updated:
+
+   OpenInteract     1.40 -> 1.41
+   ----------------------------
+   base:            1.67 -> 1.67
+   base_box:        0.45 -> 0.45
+   base_component:  1.30 -> 1.30
+   base_error:      1.42 -> 1.42
+   base_group:      1.36 -> 1.36
+   base_page:       0.98 -> 0.98
+   base_security:   1.57 -> 1.57
+   base_template:   1.31 -> 1.31
+   base_theme:      1.33 -> 1.34
+   base_user:       1.55 -> 1.57
+   lookup:          0.20 -> 0.20
+   object_activity: 0.18 -> 0.19
+   results_manage:  0.08 -> 0.08
+   system_doc:      1.29 -> 1.29
+   classified:      1.35 -> 1.35
+   full_text:       1.31 -> 1.31
+   news:            1.39 -> 1.39
+
+
+1.40  Tue May  7 08:54:49 EDT 2002
+
+Overall:
+
+ - OpenInteract runs on Oracle! Many thanks to Ben Avery
+   <ben@thesite.org.uk> for patient debugging and installs.
+
+ There is one caveat, at least for the time being: you need to use
+ something else to store your sessions. The new
+ OpenInteract::Session::File and OpenInteract::Session::SQLite
+ implementations may help -- you also have the option of implementing
+ with another DBI database.
+
+ - Package configuration customization is much easier now -- you can
+ centralize your modifications in a single file that doesn't get
+ overwritten with package upgrades. See
+ OpenInteract::Config::GlobalOverride notes below and module for
+ details.
+
+ - Different session storage is now available through
+ OpenInteract::Session::File and OpenInteract::Session::SQLite. See
+ more below.
+
+
+Individual:
+
+ * INSTALL.website:
+
+   - Add note about the override_spops.ini file while discussing
+   changing the SPOPS driver.
+
+ * conf/sample-override_spops.ini:
+
+   - Create file with sample override rules you can use. This file
+   gets copied into the $WEBSITE_DIR/conf file whenever you run a
+   'create_website', but upgraders can copy it manually.
+
+ * OpenInteract/CommonHandler.pm:
+
+   - Ensure we pass along parameters to the relevant method whenever
+   we fail a task. This ensures that the initial security (etc.) gets
+   passed along as well. This is still a little messy, but it should
+   work. Thanks to Sloan Seaman for bringing up the issue.
+
+   - Fix documentation of _edit_customize() so it's testing for the
+   right thing. (Thanks to Sloan again.)
+
+ * OpenInteract/Config/GlobalOverride.pm:
+
+   - Add class to process overriding rules for configuration
+   directives. This enables you to make changes to lots of
+   configuration items from one place, overriding the values in a
+   package's 'conf/spops.perl', for example, so you don't have to run
+   'oi_manage change_spops_driver' every time you upgrade the package.
+
+   Note that if you use this along with the 'insert_alter' directives,
+   you must upgrade to SPOPS 0.60, since this feature is new as of
+   that version.
+
+ * OpenInteract/Package.pm:
+
+   - When running check(), stick the package dir at the head of @INC
+   so there's no ambiguity about where the tested modules are coming
+   from. (For instance, if you have the website templib directory in
+   @INC for whatever reason.)
+
+ * OpenInteract/Session/DBI.pm:
+
+   - Allow a datasource to be specified in the server
+   configuration. So you could use a "heavy" database (like Oracle)
+   for most of your application while using a "light" database (like
+   MySQL) for your sessions.
+
+   - Improve documentation for existing features and add docs for new
+   ones.
+
+ * OpenInteract/Session/File.pm:
+
+   - Add implementation for using the filesystem as a session store.
+
+ * OpenInteract/Session/SQLite.pm:
+
+   - Add implementation for using a SQLite database as a session
+   store. (Note that this uses the fairly new Apache::Session::SQLite
+   CPAN module, YMMV.)
+
+ * OpenInteract/SPOPS.pm:
+
+   - Modify how we store and retrieve object tracking information
+   since it's now a normal SPOPS object. Previous interfaces should
+   still hold, except for 'fetch_creator()' which returns a single
+   object (or undef) instead of an arrayref.
+
+ * OpenInteract/SQLInstall.pm:
+
+   - Add translations for Oracle, SQLite and InterBase.
+
+   - Change %%INCREMENT%% for Postgres from 'SERIAL' to 'INT NOT
+   NULL'. Rather than relying on the Postgres auto-sequence naming
+   code, we're going to create our own sequences to be consistent with
+   Oracle. (See UPGRADE for upgrade notes.)
+
+ * OpenInteract/Startup.pm:
+
+   - If relevant files are present, apply
+   OpenInteract::Config::GlobalOverride to SPOPS and action table once
+   they're generated but before they're processed.
+
+ * script/oi_manage:
+
+   - Fixed message returned by initialize_request() on error (Thanks
+   to Sloan Seaman for the spot)
+
+   - Copy over 'conf/sample-override_spops.ini' to website when
+   'create_website' run.
+
+Packages updated:
+
+   OpenInteract     1.39 -> 1.40
+   ----------------------------
+   base:            1.63 -> 1.67
+   base_box:        0.44 -> 0.45
+   base_component:  1.30 -> 1.30
+   base_error:      1.39 -> 1.42
+   base_group:      1.32 -> 1.36
+   base_page:       0.90 -> 0.98
+   base_security:   1.54 -> 1.57
+   base_template:   1.27 -> 1.31
+   base_theme:      1.29 -> 1.33
+   base_user:       1.49 -> 1.55
+   lookup:          0.20 -> 0.20
+   object_activity: 0.11 -> 0.18
+   results_manage:  0.07 -> 0.08
+   system_doc:      1.29 -> 1.29
+   classified:      1.32 -> 1.35
+   full_text:       1.30 -> 1.31
+   news:            1.33 -> 1.39
+
+
+1.39  Mon Mar  4 07:45:35 EST 2002
+
+Individual:
+
+ * OpenInteract.pm:
+
+   - Fix typo in setup_theme() when checking to see whether we should
+   cache the session object. Thanks to Andreas Nolte for pointing out.
+
+ * OpenInteract/SPOPS.pm:
+
+   - For objects using security: add get_security_scopes() to override
+   the method in SPOPS::Secure so we can return the user and groups
+   without hitting the database. Big thanks to Andreas Nolte for
+   pointing this out -- this can potentially be a huge savings on
+   database hits.
+
+
+Packages updated:
+
+   OpenInteract     1.38 -> 1.39
+   ----------------------------
+   base:            1.63 -> 1.63
+   base_box:        0.43 -> 0.44
+   base_component:  1.30 -> 1.30
+   base_error:      1.39 -> 1.39
+   base_group:      1.32 -> 1.32
+   base_page:       0.89 -> 0.90
+   base_security:   1.54 -> 1.54
+   base_template:   1.27 -> 1.27
+   base_theme:      1.29 -> 1.29
+   base_user:       1.49 -> 1.49
+   lookup:          0.20 -> 0.20
+   object_activity: 0.11 -> 0.11
+   results_manage:  0.07 -> 0.07
+   system_doc:      1.29 -> 1.29
+   classified:      1.32 -> 1.32
+   full_text:       1.30 -> 1.30
+   news:            1.33 -> 1.33
+
+
+1.38  Mon Feb 25 22:27:22 EST 2002
+
+Overall:
+
+ - You can now tell OI to cache the user, group and theme objects in
+ the user session. The objects will get refreshed based on the
+ settings in the server config. Thanks to Andreas Nolte
+ <Andreas.Nolte@bertelsmann.de> for the idea and a sample
+ implementation.
+
+ - Small changes to the CommonHandler to add more flexibility
+
+ - The deprecated 'static_page' package is no longer distributed with
+ OI.
+
+
+Individual:
+
+ * conf/sample-server.ini:
+
+   - Added configuration keys session_info->cache_user,
+   session_info->cache_group, session_info->cache_theme. The value for
+   each key is the length of time (in minutes) the object can be
+   cached in the user session.
+
+ * OpenInteract.pm:
+
+   - If session_info->cache_theme set to a positive value, cache the
+   theme in the user's session
+
+ * OpenInteract/Auth.pm:
+
+   - If session_info->cache_user set to a positive value, cache the
+   user object in the user session (only if logged in, etc.)
+
+   - If session_info->cache_group set to a positive value, cache the
+   group object in the user session (only if logged in, etc.)
+
+ * OpenInteract/CommonHandler.pm:
+
+   - Added _edit_post_action_customize() and
+   _remove_post_action_customize() to perform actions after a
+   successful edit or remove.
+
+   - Added MY_SEARCH_ADDITIONAL_PARAMETERS to pass additional
+   information to the SPOPS fetch_iterator() call. Thanks to Ewald
+   Hinrichs <Ewald.Hinrichs@applied.de> for the suggestion.
+
+ * OpenInteract/Template/Process.pm:
+
+   - Changed how the $template object gets initialized: if the
+   'cache_tt' directory is undefined, we ensure that the COMPILE_DIR
+   and COMPILE_EXT settings in $template are also undefined so TT does
+   no compiling to disk. Thanks to John Sequeira <jseq@mediaone.net>
+   for pointing out that compiling couldn't be turned off.
+
+ * script/oi_manage:
+
+   - In test_db_connection(), swap the $@ check and $db check around
+   after the initial connect, and instead of the simple test for
+   existence of $db, check to see that it's a valid DBI handle -- that
+   is, isa('DBI::db') (Thanks to John Sequeira <jseq@mediaone.net> for
+   prompting.)
+
+
+Packages Changed:
+
+The 'Changes' file in each package has details.
+
+   OpenInteract     1.37 -> 1.38
+   ----------------------------
+   base:            1.63 -> 1.63
+   base_box:        0.42 -> 0.42
+   base_component:  1.30 -> 1.30
+   base_error:      1.39 -> 1.39
+   base_group:      1.32 -> 1.32
+   base_page:       0.77 -> 0.89
+   base_security:   1.54 -> 1.54
+   base_template:   1.27 -> 1.27
+   base_theme:      1.29 -> 1.29
+   base_user:       1.47 -> 1.49
+   lookup:          0.20 -> 0.20
+   object_activity: 0.10 -> 0.11
+   results_manage:  0.07 -> 0.07
+   system_doc:      1.29 -> 1.29
+   classified:      1.32 -> 1.32
+   full_text:       1.30 -> 1.30
+   news:            1.33 -> 1.33
+   static_page:     1.53 -> removed
+
+
+1.37  Fri Jan 18 17:34:59 EST 2002
+
+Overall:
+
+ - The base_page package now includes support for directory handlers,
+ which allows you to step in at a directory request and generate
+ specific content for that request. (Previously, index support was
+ only for setting a filename to be used, much like DirectoryIndex in
+ Apache.)
+
+ - Time-expired sessions are now supported -- just add the key
+ 'session_info'->'expires_in' to your server configuration and set it
+ to the number of minutes an inactive session should last. (Setting it
+ to 0/undef == forever)
+
+ - General bugfixes
+
+Structure changes:
+
+ - You'll need to drop the table 'content_type' and add it again if
+ you upgrade a website to the newest 'base_page' package. You can add
+ the table again using:
+
+  $ oi_manage install_sql --package=base_page
+
+ Will do it (along with issuing a number of errors, but that's ok).
+
+Individual:
+
+ * INSTALL.website:
+
+   - Added notes about directory permissions
+
+ * Makefile.PL:
+
+   - Add Class::Accessor and dependencies
+
+ * conf/sample-httpd*.conf:
+
+   - Added definition for 'combined' log, thanks to suggestion from
+   Bill Moseley <moseley@hank.org>
+
+ * conf/sample-server.ini:
+
+   - Added configuration key 'session_info'->'expires_in' so you can
+   control session inactivity expiration
+
+   - Added the key 'template_info'->'cache_size' to control how many
+   templates TT will keep cached in memory
+
+ * conf/sample-server.perl:
+
+   - Updated default actions to refer to 'page' instead of 'basicpage'
+   (Thanks to Andreas Nolte <andreas.nolte@bertelsmann.de> for
+   pointing this out.)
+
+   - Added configuration key 'session_info'->'expires_in' so you can
+   control session inactivity expiration
+
+   - Added the key 'template_info'->'cache_size' to control how many
+   templates TT will keep cached in memory
+
+ * conf/sample-spops.perl:
+
+   - Comment out the 'increment_field' key (if you append a config to
+   the bottom you'll get errors) Thanks to Sloan Seaman for the spot.
+
+ * OpenInteract.pm:
+
+   - Clear out the stack of exceptions in SPOPS::Exception if 0.56 is
+   being used.
+
+   - Add 'check_database()' step that is called before any interaction
+   with the database. This way we should be able to ensure the
+   connection is up and provide a decent error message rather than the
+   'Themes not functioning' one.
+
+ * OpenInteract/ApacheStartup.pm:
+
+   - Win32 wasn't starting up properly due to when we were putting the
+   config info in the OpenInteract package. Fixed -- thanks to John
+   Sequeira <jseq@mediaone.net> for reporting the bug
+
+ * OpenInteract/CommonHandler.pm:
+
+   - Added MY_EDIT_FAIL_TASK, MY_REMOVE_FAIL_TASK and
+   MY_REMOVE_DISPLAY_TASK so that the modules can have better control
+   over what happens on success or failure.
+
+   - create() now passes a true value for 'is_new_object' in addition
+   to a true value for 'edit' so that show() can do the right thing.
+
+   - Added MY_SEARCH_RESULTS_CAP and MY_SEARCH_RESULTS_CAP_FAIL_TASK
+   so a module can define the max number of results that can be
+   returned from a search, and if too many are returned can run a
+   custom task. (See docs for more info.)
+
+   - Added MY_SEARCH_FAIL_TASK so that modules can have better control
+   over what happens when a search fails.
+
+ * OpenInteract/Package.pm:
+
+   - In check() added new check to conf/spops.perl file to ensure that
+   every key in the configuration points to a hashref. (Thanks to
+   Sloan Seaman for the spot.)
+
+   - Added checks to export() to check for existing
+   file/directory. (Thanks to Sloan Seaman for suggesting.)
+
+ * OpenInteract/Session.pm:
+
+   - Add method 'is_session_valid()' that is called every time we
+   create a new session. Currently it checks the
+   'session_info'->'expires_in' key of the server configuration to see
+   if the session has expired after n minutes of inactivity.
+
+ * OpenInteract/Startup.pm:
+
+   - Enable an option to be passed to create_temp_lib -- we check to
+   see if it's set to 'lazy' and if so, we don't try to recreate the
+   temporary lib dir if it already exists.
+
+ * OpenInteract/Utility.pm:
+
+   - Update _clean_attachment_filename() to first remove the website
+   base directory from the filename, then go through the
+   relative/absolute checks. Otherwise you wind up with something
+   like: $WEBSITE_DIR/$WEBSITE_DIR/...
+
+ * script/oi_manage:
+
+   - Fix 'list_actions' and 'list_objects' so that we create an entire
+   static environment as opposed to just the configuration (sets up
+   the temporary lib directory properly); also, use the newly-created
+   'lazy' option so that we don't try to recreate the lib dir if it
+   already exists (this might change)
+
+   - Updated 'test_db_connection()' to ensure a database handle is
+   returned and to wrap $db->disconnect() in eval {} to trap any
+   errors (and report them in the status)
+
+ * template/label_form_upload_row:
+
+   - Widget for displaying a file upload in a row
+
+ * template/table_bordered_begin:
+
+   - Added support for setting the border in the inner table (Thanks
+   to Bill Heckel <bill@billheckel.com> for the patch.)
+
+Packages changed. The 'Changes' file in each package has details.
+
+   OpenInteract     1.36 -> 1.37
+   ----------------------------
+   base:            1.63 -> 1.63
+   base_box:        0.41 -> 0.42
+   base_component:  1.30 -> 1.30
+   base_error:      1.37 -> 1.39
+   base_group:      1.30 -> 1.32
+   base_page:       0.40 -> 0.77
+   base_security:   1.53 -> 1.54
+   base_template:   1.27 -> 1.27
+   base_theme:      1.29 -> 1.29
+   base_user:       1.45 -> 1.47
+   lookup:          0.18 -> 0.20
+   object_activity: 0.10 -> 0.10
+   results_manage:  0.06 -> 0.07
+   system_doc:      1.28 -> 1.29
+   classified:      1.32 -> 1.32
+   full_text:       1.30 -> 1.30
+   news:            1.33 -> 1.33
+   static_page:     1.52 -> 1.53
+
+
+1.36  Sat Dec  1 12:55:16 EST 2001
+
+Overall:
+
+ * Two bugfixes in core modules -- no package changes.
+
+Individual:
+
+ * OpenInteract/CommonHandler.pm:
+
+   - Fixed call in remove() which made the id_field() call against the
+   wrong class, and added a stub for _remove_customize() (Thanks to
+   Andreas Nolte <andreas.nolte@bertelsmann.de> for pointing these
+   out)
+
+ * OpenInteract/Startup.pm:
+
+   - Added MASK argument to mkdir() (optional in 5.6.1, not in 5.5.x;
+   thanks to Randal for pointing this out)
+
+
+1.35  Thu Nov 29 00:46:51 EST 2001
+
+Overall:
+
+ - Lots of configuration file changes. (PLEASE read the 'UPGRADE' file
+ to ensure you get all the changes.) You can now use a .ini-style
+ configuration file instead of the perl data structure file. (Hint:
+ one is a lot easier to read.) The perl-structure config file was also
+ modified quite a bit, and many files throughout OI modified to
+ accommodate the changes. The changes included backward compatibility
+ where possible, so it should be transparent to use an old-style
+ (perl) configuration file with the newer releases.
+
+ - Added 'object_activity' package to browse object activity
+ logs. Hopefully this won't encourage any latent bigbrotherish
+ tendencies you might have...
+
+ - The new package 'base_page' replaces 'static_page'. The new package
+ allows you to edit files in the filesystem and keep the metadata
+ (title, authors, boxes, etc.) in the database while keeping the
+ content elsewhere. Not only can you can also use it to
+ manage non-HTML files (PDFs, Excel spreadsheets, tarballs, etc.), but
+ you can also use its aliasing and URL-mapping features to link to or
+ bring in content from other locations on your site or anywhere on the
+ web. (The URL-mapping is still crude, but it works.)  A migration
+ script is provided.
+
+ - Modified the Apache startup procedures so we have a single, non
+ anonymous child initialization subroutine. This requires small
+ modifications to your Apache configuration -- see 'UPGRADE' for
+ details.
+
+ - Get rid of the monster @INC, re-creating a temporary library
+ directory on every server restart.
+
+Individual:
+
+ * conf/sample-server.perl:
+
+   - Moved 'template_ext' ==> 
+              'template_info'->'template_ext'
+
+   - Moved 'default_connection_db' ==>
+              'datasource'->'default_connection_db'
+
+   - Moved 'default_connection_ldap' ==>
+              'datasource'->'default_connection_ldap'
+
+   - Moved 'error_object_class' ==>
+              'error'->'error_object_class'
+
+   - Moved 'default_error_handler' ==>
+              'error'->'default_error_handler'
+
+   - Moved 'smtp_host' ==>
+              'mail'->'smtp_host'
+
+   - Moved 'admin_email' ==>
+              'mail'->'admin_email'
+
+   - Moved 'content_email' ==>
+              'mail'->'content_email'
+
+   - Reverse and flatten the 'system_alias' hashref. For instance:
+
+        OpenInteract::Auth => [ qw/ auth auth_user auth_group / ]
+
+     becomes:
+
+        auth       => 'OpenInteract::Auth',
+        auth_user  => 'OpenInteract::Auth',
+        auth_group => 'OpenInteract::Auth',
+
+   - Moved 'action'->'_default_action_info' ==>
+              'action_info'->'default'
+
+   - Moved 'action'->'_notfound' ==>
+              'action_info'->'not_found'
+
+   - Moved 'action'->"''" ==>
+              'action_info'->'none'
+
+   - Moved 'stash_class' ==>
+              'server_info'->'stash_class'
+
+   - Moved 'request_class' ==>
+              'server_info'->'request_class'
+
+   - Moved 'website_name' ==>
+              'server_info'->'website_name'
+
+   - Added 'login'->'always_remember' to give sites the option of
+   always remembering logins
+
+ * doc/admin.html: 
+
+   - Fixed html bug noticed by Drew Taylor <drew@drewtaylor.com>
+
+ * doc/fruit-0.09.tar.gz:
+
+   - Updated the simple example package to version 0.09. This version
+   works with OI 1.30+ and includes the new template widgets. Thanks to
+   Steven Devijver <steven@devijver.be> for prompting its revision.
+
+ * OpenInteract.pm:
+
+   - Renamed 'setup_apache' to 'setup_server_interface' but kept old
+   method for backward compatibility
+
+   - Set the content-length in send_static_file()
+
+ * OpenInteract/ApacheStartup.pm:
+
+   - Rewrote much of this so that we do all SPOPS initialization in
+   the ChildInit handler rather than the server handler, since we were
+   in some cases asking for a database handle in the server and never
+   letting it go. (This can be bad.) See 'UPGRADE' for simple but
+   necessary changes to your Apache config.
+
+   - Also modified the startup procedure to read and the child init
+   handler to write information to a package variable in lieu of using
+   PerlSetVar in the configuration file. (Encountered some nastiness
+   on Solaris under 5.005_03/1.3.22/1.26 and the PerlSetVar items not
+   being there. Whatever.)
+
+   - Tell OI::Startup to copy all the relevant package files on
+   *server* startup, since it modifies @INC
+
+ * OpenInteract/Auth.pm:
+
+   - Added 'is_admin()' which checks to see if the user is an
+   administrator. By default this is defined as being the superuser or
+   being a member of the 'site admin' group. You can subclass this
+   class, override the method and specify the class in the server
+   configuration to provide your own criteria for who is an
+   administrator.
+
+   - Broke the 'user()' method down into pieces so it can be
+   overridden more easily. (See docs for details.) Thanks to Stefano
+   di Sandro <stefano@antartide.org> for suggesting it.
+
+   - Honor the new 'login'->'always_remember' setting in the server
+   config.
+
+ * OpenInteract/CommonHandler.pm:
+
+   - Reorganized documentation and added lots of it, documenting every
+   configuration key and customization method.
+
+   - Added the 'notify()' task to send objects in human-readable
+   format over email
+
+   - Added the 'create()' task which is just a wrapper around the
+   'show()' task with certain parameters checked beforehand and set.
+
+ * OpenInteract/UI/Main.pm:
+
+   - Don't assume that the template will be a fully-qualified name, or
+   that a non-qualified name will be in the base_theme package. Also
+   add/clarify some docs.
+
+ * OpenInteract/Package.pm:
+
+   - Files copied from a base_installation package to the website
+   check the contents of a file in the directory (.no_overwrite)
+   before doing so. This way your /index.html file won't get
+   overwritten with each new base_page upgrade.
+
+   - Add copy_modules() method, which copies all the modules from both
+   a website pkg directory and its base pkg directory to a temporary
+   library location.
+
+ * OpenInteract/SPOPS.pm:
+
+   - Removed the html_encode and html_decode methods; they're in the
+   template plugin, and if you really need them elsewhere you can call
+   the HTML::Entities methods by hand.
+
+   - rename 'ruleset_add' -> 'ruleset_factory'
+
+ * OpenInteract/SPOPS/DBI.pm:
+
+   - Added 'discover_fields' SPOPS::ClassFactory behavior, which
+   allows you to leave the 'field' key in your object configuration
+   blank and have it filled at run-time. To use it you must set the
+   'field_discover' key to 'yes' in your object configuration.
+
+ * OpenInteract/Startup.pm:
+
+   - Add create_temp_lib() method to create a temporary library
+   directory, asking each of the packages to copy their relevant
+   module files there.
+
+   - Remove code that relied on putting all the package directories in
+   @INC, and add an extra call to setup_static_environment() to copy
+   the modules for all packages in a website to a temporary library,
+   which is also put in @INC. (For Apache the call to copy is in
+   OI::ApacheStartup)
+
+ * OpenInteract/Template/Plugin.pm:
+
+   - Fixed dumb POD error that prevented 'perldoc' from working
+   (identified itself as OI::Template::Provider in the head - doh!)
+
+   - Add 'is_admin' property to the template plugin that returns
+   whether the current user is an administrator. (See
+   OpenInteract/Auth.pm for what this means.)
+
+   - Add 'server_config' property which returns the results of
+   $R->CONFIG to a template.
+
+ * OpenInteract/Template/Process.pm:
+
+   - Properly catch when we weren't passed content.
+
+ * script/oi_manage:
+
+   - Enable a file in the $WEBSITE_DIR/template directory to specify
+   which templates oi_manage should never overwrite during a
+   'refresh_widget' command. (This file is created when you create a
+   website to include the base_main and base_simple templates.)
+
+   - Don't test for 'VERSION' anymore when doing an upgrade, since the
+   version is now pulled from OpenInteract.pm
+
+  - When creating a new website, mark in .no_overwrite the
+  html/index.html file so it won't be overwritten by package
+  upgrades. Also mark the template/base_main and template/base_simple
+  files.
+
+  - When installing SQL, call OI::Startup->create_temp_lib() directly;
+  other actions that use the full OI environment don't have to do this
+  because it's called in setup_static_environment(), which we can't do
+  when installing SQL due to bootstrapping issues.
+
+ * template/base_(main|simple):
+
+   - Moved the base template and the base 'simple' template (for
+   popups and such) from the 'base_theme' package to the server
+   root. That way they will not get overwritten every time you update
+   the package.
+
+ * template/error_(not_found|task_forbidden|task_no_default):
+
+   - Moved these error messages from the base_error package to the
+   global template directory so they're easier to customize for your
+   site.
+
+ * template/*:
+
+   - Other widget template files had changes too minor to note here.
+
+
+Packages changed:
+
+   OpenInteract     1.30 -> 1.35
+   ----------------------------
+   base:            1.62 -> 1.63
+   base_box:        0.33 -> 0.41
+   base_component:  1.30 -> 1.30
+   base_error:      1.32 -> 1.37
+   base_group:      1.26 -> 1.30
+   base_page:        n/a -> 0.40
+   base_security:   1.51 -> 1.53
+   base_template:   1.27 -> 1.27
+   base_theme:      1.27 -> 1.29
+   base_user:       1.37 -> 1.45
+   lookup:          0.15 -> 0.18
+   object_activity:  n/a -> 0.10
+   results_manage:  0.05 -> 0.06
+   system_doc:      1.25 -> 1.28
+   classified:      1.28 -> 1.32
+   full_text:       1.27 -> 1.30
+   news:            1.33 -> 1.33
+   static_page:     1.51 -> 1.52
+
+
+1.30  Mon Oct 15 01:35:03 EDT 2001
+
+Overall:
+
+ * New Class: OpenInteract::CommonHandler
+
+   - Common web apps (search form, search, display, edit, remove) can
+   now be reduced to a series of configuration steps and templates
+   while still allowing for custom behavior. This makes for very
+   maintainable code and rapid development. See the 'classified'
+   package for an example that uses it.
+
+ * Custom template behaviors:
+
+   - It's now simple to define custom template behaviors across all
+   templates in a website. A package can define plugins or blocks via
+   its configuration. And a website can also step in make variables
+   available to every template.
+
+ * Template performace:
+
+   - Templates are now cached properly, and by default they're
+   compiled as well. This can provide a dramatic performance
+   boost. Also, OpenInteract works flawlessly with the new
+   Template::Stash::XS module, which itself makes templates run up to
+   twice as fast. (Be sure to use version 2.05b or higher of TT.)
+
+ * Template widgets:
+
+   - You can now use common simple widgets to represent display
+   elements. They are entirely optional and use the existing Template
+   Toolkit framework (e.g., 'PROCESS form_text( ... )') for
+   implementation, including being compiled and cached. See
+   'doc/template_widgets.html' for initial documentation on this.
+
+ * New Package: lookup
+
+   - New package 'lookup' allows you to specify parameters for a
+   particular object in your action table and have that object be
+   editable in a table format. This is intended for easily editing
+   lookup tables, since you normally want to be able to edit many
+   values at one time.
+
+Individual:
+
+ * conf/sample-server.perl:
+
+   - Added 'no_promotion' -- if you set it to true we don't send a
+   'X-Powered-By' header.
+
+   - Added 'content_email' - address for a content administrator
+
+   - Added 'template_info'->'custom_variable_class' and
+   'template_info'->'custom_variable_method'. Allows each website to
+   define a handler that can step in just before every template is
+   processed and modify the variables sent to the template. (See
+   OI/Template/Process.pm)
+
+   - Added 'template_info'->'custom_init_class' and
+   'template_info'->'custom_init_method'. Allows each website to
+   define a handler that can step in just before the template object
+   is initialized and modify its configuration.(See
+   OI/Template/Process.pm)
+
+   - Added 'dir'->'cache_tt' key (Template Toolkit caching directory)
+
+   - Added 'template_info'->'compile_cleanup' -- set to true if you want
+   the compile directory cleaned up on server restart
+
+   - Added 'template_info'->'compile_ext' -- set the extension for
+   compiled TT files -- only real propeller-heads might want to do
+   this :-)
+
+   - Added a three fields ('login'->'custom_login_method',
+   'box'->'system_box_method', 'box'->'custom_box_method') so you can
+   control the method used with
+   a custom class; this is completely backward compatible, since the
+   default is always 'handler'
+
+ * conf/sample-spops.perl:
+
+   - updated sample to use 'OpenInteract::SPOPS::DBI' instead of
+   'OpenInteract::SPOPS'
+
+ * conf/sample-Handler.pm:
+
+   - updated sample handler with slightly modified comments; modified
+   how the template is called
+
+ * OpenInteract.pm:
+
+   - Added self-promoting 'X-Powered-By' header. Set 'no_promotion' in
+   server configuration file to true value to override.
+
+   - Changed content handler to an object handler (with '($$)'
+   declaration), changed all methods to class methods (with
+   non-private names) and added documentation about the method names
+   used in case anyone wants to subclass the handler with their own
+   behaviors.
+
+ * OpenInteract/ApacheStartup.pm:
+
+    - Jochen Lillich <geewiz@linuxde.org> noticed that we weren't
+    making the first connection (in ApacheStartup) properly; it didn't
+    really hurt anything, but it left a nasty warning message. Fixed.
+
+    - Cleanup the Template Toolkit compile directory on server restart
+    if new configration key 'template_info'->'compile_cleanup' is true
+
+ * OpenInteract/Auth.pm:
+
+    - Fixed subtle bug when using CGI::Cookie -- setting a cookie
+    expiration to the empty string ('') results in CGI::Cookie issuing
+    an expired cookie; setting it to undef results in a transient
+    (browser-session-based) cookie.
+
+    - Added a 'not-logged-in' user -- it's created automatically when
+    there's no user saved via the session and no login information
+    found. It's a transient rather than saved user and has no access
+    rights.
+
+    - Custom login handler can now have a custom method, so you don't
+    have to use 'handler' (see config addition for this as well).
+
+ * OpenInteract/CommonHandler.pm:
+
+   - Created base handler for most tasks (search form, search,
+   display, edit, remove) so that many actual handlers will just need
+   to specify configuration options. This is extremely cool -- see
+   docs for implementation.
+
+ * OpenInteract/DBI.pm:
+
+   - Option 'trace_level' now avaialble to initialize the database
+    handle using the 'trace()' method.
+
+    - Updated docs to include all options that are processed.
+
+ * OpenInteract/Package.pm:
+
+   - You can now specify 'template_plugin', 'module' and (to be used
+   soon) 'filter' in the package.conf file; 'module' will be checked
+   when the package is installed to the base installation directory --
+   if you do not have a module the package won't get installed;
+   'template_plugin' and 'filter' are (or will be) used later in OI
+   process (see OI/Template/Process.pm)
+
+   - In 'check()', TT complains (rightly) if we do a syntax check and
+   a particular plugin isn't loaded; capture these errors and don't
+   complain if they pop up.
+
+   - In 'check()', TT complains (rightly) if we do a syntax check and
+   a particular file isn't accessible when you have an INCLUDE or
+   PROCESS; since these are frequently used with the new widgets,
+   capture these errors and don't complain if they pop up.
+
+   - In 'check()', perform syntax check on all files in 'widget/'
+   directory
+
+   - When creating an archive with 'export()', die if the archive
+   already exists.
+
+   - In 'install_to_website()', install all the 'widget/*' files to
+   the $WEBSITE_DIR/template directory
+
+   - In '_copy_spops_config_file()' (called when you apply or upgrade a
+   package), check the website configuration when copying over the
+   'creation_security' hashref for each SPOPS object so we can modify
+   the public and site admin group IDs used. (Thanks to Andreas Nolte
+   <andreas.nolte@bertelsmann.de> for pointing this out and putting it
+   higher on the TODO list...)
+
+   - Files copied during package-to-website should not be read-only
+
+ * OpenInteract/SQLInstall.pm:
+
+   - Added new transformation activated by 'transform_to_now' in your
+   data file. (Thanks to Jochen Lillich <jl@teamlinux.de> for
+   prompting.)
+
+ * OpenInteract/Startup.pm:
+
+   - Create $R during main_initialize() and put the stash class in
+   there so we have normal access to the datasource during SPOPS
+   configuration, which is needed if you're using the 'DiscoverField'
+   behavior. (Hopefully it won't screw anything up with parent/child
+   sharing issues, particular wrt DBI handles.)
+
+   - Modify create_config() and read_base_config() so that we can just
+   pass in a website_dir and get back a configuration.
+
+ * OpenInteract/Template/Plugin.pm:
+
+   - Added strftime reference for date_format() template behavior
+
+   - Added 'use_main_template()' so that templates can modify the main
+   template used
+
+ * OpenInteract/Template/Process.pm:
+
+   - initialize() (called from OpenInteract::Request on the first
+   request for the template object) now asks each package in the
+   website if it has any template plugins (specified in
+   'template_plugin' of each 'package.conf' file) and installs them.
+
+   - initialize() also asks each package if it has any BLOCKs to be
+   defined (specified in 'template_block' of each 'package.conf' file)
+   and installs them.
+
+   - You can define a handler in your server configuration which sets
+   options passed to 'Template->new()'. This allows you to define a
+   global set of BLOCKs and have them always be available.
+
+   - In addition you can define custom behavior that can be called
+   just before a template is processed. This includes adding
+   behaviors, plugins, or whatnot to the variables available to a
+   template.
+
+   - Fixed OpenInteract::Template::Provider initialization so it's
+   actually getting the right values. (Duh!) This means caching
+   works now.
+
+   - Use $CONFIG->get_dir( 'cache_tt' ) for the default Template
+   Toolkit compiling directory.
+
+ * OpenInteract/Template/Provider.pm:
+
+   - Process file globs properly; clean up the code a bit to make more
+   understandable.
+
+   - Clean up the compiled filename a little to not have odd ('::')
+   characters.
+
+ * OpenInteract/Utility.pm:
+
+   - Enable 'send_mail()' to take and process attachments that are
+   located underneath the website directory; add documentation for
+   this option as well as more examples of usage.
+
+ * script/oi_manage:
+
+  - Add 'template', 'mail' and 'uploads' to list of directories
+  created when you run 'create_website'; removed 'email'
+
+  - Add 'cache' and 'cache/tt' to list of directories created when
+  you run 'create_website'
+
+  - Modify how/when install_sql creates database handles. (This still
+  needs some work, but it should be ok for now.)
+
+  - Create a $CONFIG object when doing apply_package or
+  upgrade_package and pass it to the install_to_website() method of
+  OpenInteract::Package.
+
+
+Packages changed:
+
+   OpenInteract    1.21 -> 1.30
+   ----------------------------
+   base:           1.60 -> 1.62
+   base_box:       0.30 -> 0.33
+   base_component: 1.25 -> 1.30
+   base_error:     1.30 -> 1.32
+   base_group:     1.25 -> 1.26
+   base_security:  1.46 -> 1.51
+   base_template:  1.27 -> 1.27
+   base_theme:     1.26 -> 1.27
+   base_user:      1.34 -> 1.37
+   lookup:          n/a -> 0.15
+   results_manage: 0.02 -> 0.05
+   static_page:    1.49 -> 1.51
+   system_doc:     1.24 -> 1.25
+   classified:     1.28 -> 1.28
+   full_text:      1.26 -> 1.27
+   news:           1.33 -> 1.33
+
+
+1.21  Wed Aug 29 15:10:27 EDT 2001
+
+Overall:
+
+Quick bugfix release: browser-based security editing doesn't work with
+the package base_security-1.45, which was shipped with OI 1.2. Bug
+fixed and this version ships with base_security-1.46.
+
+Individual:
+
+ * conf/sample-server.perl:
+
+   - Added {login}->{custom_login_handler} key
+
+ * OpenInteract/Auth.pm:
+
+   - Added ability to define custom login behavior by specifying a
+   custom login handler in the configuration. Thanks to Stefano
+   <stefano@antartide.org> for the idea.
+
+Packages changed:
+
+   OpenInteract    1.2  -> 1.21
+   ----------------------------
+   base_security:  1.45 -> 1.46
+
+
+1.2  Tue Aug 28 17:20:44 EDT 2001
+
+Overall:
+
+This release has a number of substantial changes. If you're upgrading,
+please read 'UPGRADE' in the distribution directory.
+
+ * Multiple datastore handles:
+
+   - You can now setup and use multiple datastore (including DBI)
+   handles for objects, so your data can be in as many databases as
+   you require. This entails changes to your server configuration file
+   even if you're not using this feature, please see the entry for
+   'conf/sample-server.perl' below.
+
+ * Tighter Template Toolkit support:
+
+   - OpenInteract now includes a Template Toolkit provider to deliver
+   templates from the filesystem or database, as well as a TT Plugin
+   to provide more consistent (and extensible) template behavior
+   functions. If you're upgrading you need to run a script to
+   translate old templates to new.
+
+ * LDAP support:
+
+   - LDAP can now be used as a datastore. Thanks to MSN Marketing
+   Service Nordwest GmbH for funding development! See doc/LDAP.html
+   for more information about setting up and using LDAP.
+
+ * DBI session support consolidated:
+
+   - All DBI session management uses one class now; if you're
+   upgrading, see the entry for 'conf/sample-server.perl' below for a
+   configuration modification
+
+Individual:
+
+ * conf/sample-httpd_static.conf:
+
+   - Allow the front-end proxy server to deal with '/robots.txt'
+   requests. (Also with '/default.ida' Code Red requests...)
+
+ * conf/sample-httpd_modperl.conf:
+
+   - Add pointer to the standalone mod_perl configuration file
+
+ * conf/sample-httpd_modperl_solo.conf:
+
+   - Create new configuration file for running OpenInteract in a
+   standalone mod_perl environment (no proxy frontend). Thanks to
+   Stephen Adkins <stephen.adkins@officevision.com> for pointing out
+   the usefulness of this.
+
+ * conf/sample-server.perl:
+
+   - Overall: Lots of changes were made to the sample
+   configuration. If you're upgrading it might be a good idea to open
+   the sample configuration and your existing configuration
+   side-by-side, copying values from your existing configuration to
+   the sample as appropriate.
+
+   - See UPGRADE for specific changes.
+
+ * eg/template_translate.pl:
+
+   - Added standalone script to translate old templates to new
+   templates. This only works on files in the filesystem, and you
+   shouldn't need to run it for system packages.
+
+ * OpenInteract.pm:
+
+   - allow users to put OI under different location root -- note that
+   we DO NOT rewrite outbound URLs yet; this just ensures that if OI
+   is under <Location /oi> that a request for '/oi/User/' gets mapped
+   to the '/User/' action
+
+   - paranoid inclusion of stash/other module 'require' calls
+
+   - removed method _connect_to_database(). Datastore (DBI and LDAP)
+   connections are now made on demand (in OpenInteract::Request)
+   rather than all at the beginning of a request. The first time a
+   handle is needed the connection is made, thereafter it's kept in
+   the stash class.
+
+   - removed method _setup_context() since it was a relic of a
+   group_context scheme attempted a while ago. We might bring it back
+   but there's no reason to have it around now.
+
+ * OpenInteract/Auth.pm:
+
+   - Set the result of $user->id rather than $user->{user_id} into the
+   session after a successful login. (Thanks to Andreas Nolte <andreas.nolte@bertelsmann.de>)
+
+ * OpenInteract/Error/System.pm:
+
+   - Put 'package' with all templates being called.
+
+ * OpenInteract/LDAP.pm:
+
+   - Created central class to connect/bind to LDAP directories
+
+ * OpenInteract/Package.pm:
+
+   - Updated 'check()' -- called from 'oi_manage check_package' -- to
+   determine if data import files are valid Perl data structures (also
+   added 'read_data_file()' for this purpose)
+
+   - Modified 'check()' to pass the right directory to read the
+   package configuration
+
+   - Updated 'check()' -- called from 'oi_manage check_package' -- to
+   determine if the templates in a package are syntactically
+   valid. This doesn't mean they'll do what you want, only that
+   they'll parse.
+
+ * OpenInteract/Request.pm:
+
+   - Updated to enable both DBI and LDAP handles to be requested (and
+   stored in the stash) by a connection key.
+
+   - Moved connection logic from OpenInteract.pm to here so we can
+   return DBI and LDAP connections on demand rather than creating them
+   all at once.
+
+ * OpenInteract/Session/DBI.pm:
+
+   - Added functionality to detect when we're using MySQL as a session
+   store and put the extra parameter ('LockHandle') in.
+
+ * OpenInteract/Session/MySQL.pm:
+
+   - Removed. Use 'OpenInteract::Session::DBI' for all DBI session
+   management now.
+
+ * OpenInteract/SPOPS.pm:
+
+   - Removed 'global_db_handle()' and moved to OI/SPOPS/DBI.pm. Note
+   that ALL objects previously using 'OpenInteract::SPOPS' should now
+   use 'OpenInteract::SPOPS::DBI'.
+
+ * OpenInteract/SPOPS/DBI.pm:
+
+   - Created subclass of OI::SPOPS specifically for objects using
+   SPOPS::DBI
+
+ * OpenInteract/SPOPS/LDAP.pm:
+
+   - Created subclass of OI::SPOPS specifically for objects using
+   SPOPS::LDAP
+
+ * OpenInteract/SQLInstall.pm:
+
+   - Created new data transformation 'transform_default_to_id' that
+   allows you to tag fields in your data import and specify values for
+   these fields that are keys in the 'default_objects' hash in your
+   server configuration. See
+   pkg/base_group-x.xx/data/install_security.dat for an example.
+
+ * OpenInteract/Template.pm:
+
+   - Added deprecation warnings (will remove the class soon).
+
+ * OpenInteract/Template/Toolkit.pm:
+
+   - Added deprecation warnings (will remove the class soon).
+
+ * OpenInteract/Template/Context.pm:
+
+   - Added new class: Added custom context so we can avoid the TT
+   template naming syntax of 'prefix::thingy'
+
+ * OpenInteract/Template/Plugin.pm:
+
+   - Added new class: Take all the behaviors out of OI::T::Toolkit,
+   add some new ones, revisit the old ones, add lots of documentation.
+
+ * OpenInteract/Template/Process.pm:
+
+   - Added new class: Port the 'handler()' and 'initialize()' methods
+   from OI::T::Toolkit
+
+ * OpenInteract/Template/Provider.pm:
+
+   - Added new class: Move all the file-or-object finding stuff from
+   OI::Template here, plus take advantage of TT caching, compiling,
+   etc.
+
+ * OpenInteract/UI/Main.pm:
+
+   - Updated to use base template name in 'package::name' format. This
+   way your base template doesn't need to be in the 'base_theme'
+   package.
+
+ * script/oi_manage
+
+   - Added (and documented!) new action 'update_object', which simply
+   fetches all instances of a particular object class and saves
+   them. This is useful if you've implemented a schema change that
+   needs a 'save()' to activate a trigger which fills data. For
+   instance, a 'last_update' field gets triggered by a save -- by
+   running this action you automatically set all objects to a known
+   value. Another example would be if your objects use the indexing
+   feature of the full_text package -- just run this action and the
+   index will be automatically updated.
+
+   - Modified 'test_db' action to check multiple datasources
+
+   - Added (and documented!) new action 'test_ldap' which tests all
+   LDAP connections configured for a particular website.
+
+   - Ensure that 'check_package' can check multiple packages at once
+   (using the '--package_dir' parameter to specify the root of a
+   series of packages)
+
+   - You can now run separate actions with 'install_sql' using the new
+   '--sql_action' parameter. This allows people who need to do so to
+   run the 'structure', 'data' and 'security' steps
+   individually. (Docs added for this too!)
+
+   - Added (and documented!) new action 'list_objects' which lists all
+   the objects that can be created in a website.
+
+ * script/template_translate.pl
+
+   - Created script to translate old templates (using
+   OpenInteract::Template and OpenInteract::Template::Toolkit) to new
+   templates (OpenInteract::Template::Plugin). You must run this to
+   make your templates work properly.
+
+
+   Many packages have changed between versions 1.1 and 1.2. Please see
+   the 'Changes' file in each to find out what was modified.
+
+   OpenInteract    1.1  -> 1.2
+   ----------------------------
+   base:           1.52 -> 1.60
+   base_box:       0.23 -> 0.30
+   base_component: 1.23 -> 1.25
+   base_error:     1.22 -> 1.30
+   base_group:     1.16 -> 1.25
+   base_security:  1.33 -> 1.45
+   base_template:  1.18 -> 1.27
+   base_theme:     1.18 -> 1.26
+   base_user:      1.23 -> 1.34
+   results_manage: 0.02 -> 0.02
+   static_page:    1.40 -> 1.49
+   system_doc:     1.19 -> 1.24
+   classified:     1.19 -> 1.28
+   full_text:      1.25 -> 1.26
+   news:           1.27 -> 1.33
+
+1.1  Fri Jul 20 07:00:48 EDT 2001
+
+ * Shuffled lots of modules out of the 'base' package and into the
+   core distribution:
+
+          OpenInteract.pm
+          OpenInteract/Auth.pm
+          OpenInteract/Cache.pm
+          OpenInteract/Cache/File.pm
+          OpenInteract/Cache/IPC.pm
+          OpenInteract/Cookies.pm
+          OpenInteract/Cookies/CGI.pm
+          OpenInteract/Cookies/Apache.pm
+          OpenInteract/Error/Main.pm
+          OpenInteract/Error/System.pm
+          OpenInteract/Handler/GenericDispatcher.pm
+          OpenInteract/Session.pm
+          OpenInteract/Session/DBI.pm
+          OpenInteract/Session/MySQL.pm
+          OpenInteract/Template.pm
+          OpenInteract/Template/Toolkit.pm
+          OpenInteract/UI/Main.pm
+          OpenInteract/Utility.pm
+
+   As a result, also moved OpenInteract.pod to OpenInteract/Intro.pod
+   since 'perldoc OpenInteract' will bring up the Apache content
+   handler class now.
+
+ * New package: 'results_manage'
+
+   - A new package 'results_manage' has been added to the
+   distribution. This package makes it simple to persist different
+   types of search results from request to request to produce paged
+   output, exportable output, etc. The package is still quite young,
+   so if you have feedback please email
+   openinteract-dev@lists.sourceforge.net.
+
+ * doc/*:
+
+   - Updated all docs -- mostly small changes, but added patch from
+   Christian Lemburg (lemburg@aixonix.de) to doc/developer.html
+   specifying the recommended method of package development.
+
+ * OpenInteract/ApacheStartup.pm:
+
+  - Added a debugging line so we can know when a PerlChildInitHandler
+  is getting run (and for what child).
+
+ * OpenInteract/Package.pm:
+
+   - Thanks to a spot by Reinier Post <rp@win.tue.nl>, you can now
+   have multilevel handlers (e.g.,
+   'OpenInteract::Handler::Entity1::Handler1') in a package --
+   modified the _copy_handler_files() subroutine to use the new
+   _create_full_path() subroutine.
+
+   - Create a _clean_package_name() subroutine that ensures a package
+   name can be used as a Perl namespace.
+
+ * OpenInteract/SPOPS.pm:
+
+   - Added two methods and ruleset to accommodate new way of referring
+   to objects. The new method uses a table 'object_keys' (found in the
+   'base' package) and associates a 32-character key with an object
+   and class.
+
+   Currently this is only used in the modified 'full_text' package,
+   but we expect to change other modules that use a class and object
+   ID (object tracking, object security, etc.) to use this scheme
+   simply because it saves space and should speed up searches.
+
+ * OpenInteract/Startup.pm:
+
+   - die in setup_static_environment() if we cannot read the base
+   configuration information properly. (Generally indicates that the
+   directory given wasn't a valid website directory.)
+
+   - add functionality to setup_static_environment() to create the
+   superuser if given the password to check against.
+
+   - add method 'setup_static_environment_options()' to check for log
+   option '--website_dir' and environment variable OIWEBSITE to pass
+   to 'setup_static_environment()', thus saving lots of copy-n-paste
+   operations around the globe.
+
+ * OpenInteract/Template.pm:
+
+   - Fixed Sourceforge bug 406291, enabling templates to be read from
+   the filesystem. (Paper bag fix -- just made the wrong call to fetch
+   the package information from the repository, and it was never
+   tested. Doh!)
+
+ * script/oi_manage:
+
+   - Check the return value from $PACKAGE->create_skeleton() to see
+   whether the name of the package created differs from the name we
+   wanted to create, and let the user know if they're different.
+
+   - Add the directory 'overflow' to that created by the
+   'create_website' process.
+
+   - Add the package 'results_manage' to the list of core packages
+
+ * Packages
+
+   Many packages have changed. One of the common additions has been
+   the use of the SPOPS::Iterator (or subclass) object to display
+   results, as opposed to retrieving a (potentially long) list of
+   objects to pass to the template. See the 'Changes' file of each
+   package for change details.
+
+   Here are the different versions:
+
+   OpenInteract    1.07 -> 1.1
+   ----------------------------
+   base:           1.42 -> 1.52
+   base_box:       0.20 -> 0.23
+   base_component: 1.18 -> 1.23
+   base_error:     1.21 -> 1.22
+   base_group:     1.16 -> 1.16
+   base_security:  1.30 -> 1.33
+   base_template:  1.17 -> 1.18
+   base_theme:     1.17 -> 1.18
+   base_user:      1.21 -> 1.23
+   results_manage:  n/a -> 0.02
+   static_page:    1.36 -> 1.40
+   system_doc:     1.19 -> 1.19
+   classified:     1.18 -> 1.19
+   full_text:      1.16 -> 1.25
+   news:           1.26 -> 1.27
+
+
+1.07  Sun Jun 10 14:31:36 EDT 2001
+
+ * Overall
+
+   - This version runs on mod_perl/Win32 with a supported database.
+
+   - This version now runs on PostgreSQL (version dependencies
+   unknown) along with Sybase ASE, Sybase ASA, and MS SQL
+   Server. (This is in addition to MySQL from previously.)
+
+   - This version requires SPOPS 0.40, since it's the first version
+   which supports PostgreSQL, along with a few other items.
+
+   - Hopefully debugging is more efficient -- at least when you want
+   to turn debugging off. All files have been changed to use the
+   following construction:
+
+     $R->DEBUG && $R->scrib( 1, "..." );
+
+   so that (the relatively expensive) scrib() method doesn't even get
+   called if debugging isn't turned on for your app.
+
+ * script/oi_manage:
+
+   - fixed typo in method call in remove_template() (thanks to Olaf
+   Stauffer <olaf.stauffer@web.de> for spotting)
+
+   - tiny change so that you can call use the action name
+   'install-template' and 'install_template' synonymously (anyplace
+   you see a '_' you can also use a '-'. Note that this ONLY APPLIES
+   TO COMMANDS, not to parameters.
+
+   - added the command 'change_spops_driver' so you can modify the
+   drivers (e.g., 'SPOPS::DBI::MySQL' -> 'SPOPS::DBI::Sybase') for
+   many objects at once.
+
+   - when you run the 'upgrade_package' command, a file named
+   'UPGRADE' will be displayed in the status. You should put any
+   package-specific upgrading notes here.
+
+   - ensure that the 'website_name' parameter fits our naming
+   conventions (thanks to Nimrod Levy <nlevy@intes.net> for the catch)
+
+   - the 'test_db' command now tries to create a table, which tests
+   whether the given user has such permissions.
+
+   - ensure the user running 'install_package' has permission to write
+   to the base installation directory and to the base package
+   repository.
+
+ * conf/sample-package.pod:
+
+   - Added more headers to the skeleton documentation generated for a
+   package.
+
+ * conf/sample-server.perl: 
+
+   - Changed the default cookie processing class to
+   'OpenInteract::Cookies::Apache'
+   (change from {system_alias}->{'OpenInteract::Cookies'} to
+   {system_alias}->{'OpenInteract::Cookies::Apache'}), since right now
+   everyone is required to have Apache::Request for parameters
+   anyway. Unless you're running Win32, then use
+   {system_alias}->{'OpenInteract::Cookies::CGI'} since
+   Apache::Request had a few hiccups running there.
+
+   - Added 'long_read_len' and 'long_trunc_ok' in the db_info key.
+
+   - Added 'remember_field' to the 'login' key
+
+ * OpenInteract/DBI.pm:
+
+   - Added {LongReadLen} and {LongTruncOk} as database handle
+   properties. **NOTE** If you're upgrading, please add something like
+   the following to your conf/server.perl file:
+
+     db_info => {
+      ...,
+      long_read_len => 65536,
+      long_trunc_ok => 0,
+     },
+
+   There are defaults defined for these but it's better to make them
+   explicit in your configuration. 
+
+ * OpenInteract/Package.pm: 
+
+   - Make various modifications to work under Win32. Primarily to
+   check directory specifications and to accommodate the version of
+   Archive::Tar that is distributed with ActivePerl.
+
+   - Fix _copy_handler_files() to not replace ALL 'OpenInteract'
+   instances in the file/path, just the relevant one (thanks to Olaf
+   Stauffer <olaf.stauffer@web.de> for the spot)
+
+   - Small fixes to error reporting (primarily in
+   install_distribution())
+
+   - Small fix so we don't copy over coderefs from the
+   conf/action.perl and conf/spops.perl files when installing a
+   package from the base installation to a website
+
+ * OpenInteract/PackageRepository.pm:
+
+   - Fixed docs for the 'find_file' method to match the
+   implementation.
+
+   - Pass the package name from 'find_file' to 'fetch_package_by_name'
+   in a hashref rather than by itself (duh)
+
+ * OpenInteract/Request.pm: added 'DEBUG()' method to get (if
+   available) application-level debugging and if not, to use the class
+   variable 'DEBUG'. This allows '$R->DEBUG && $R->scrib( ... )' so
+   that scrib() won't get called if you're not using debugging in your
+   app. Cool.
+
+ * OpenInteract/SPOPS.pm: Updated the object tracking save/retrieval
+   so that it's not using the 'oid' field any longer.
+
+ * OpenInteract/SQLInstall.pm:
+
+   - Fixed Sybase IDENTITY specification (thanks to Harry Danilevsky
+   <hdanilevsky@DeerfieldCapital.com> for pointing it out)
+
+   - Allow user to specify a different database type than the driver
+   name (useful if you're using DBD::ODBC with MS SQL Server, which
+   uses the SPOPS driver 'Sybase' and the DBD driver 'ODBC')
+
+   - Document the 'field_type' parameter when you're specifying SQL
+   statements (rather than SPOPS objects) to be built with the data
+   files (thanks to Harry Danilevsky
+   <hdanilevsky@DeerfieldCapital.com> for pointing it out)
+
+   - New key in struct files: %%INCREMENT_TYPE%%. This allows you to
+   specify linking fields to be the same type -- for instance, an
+   IDENTITY field in T-SQL is NUMERIC( x, y ) while an AUTO_INCREMENT
+   field in MySQL is an INTEGER, as is a SERIAL (sequence) field in
+   PostgreSQL. (Example: 'pkg/base_group/struct/group_table.sql' and
+   'pkg/base_user/struct/user.sql' for the increment, then
+   'pkg/base_group/struct/link_table.sql' for the increment type.)
+
+ * OpenInteract/Startup.pm: require_module() can now take either an
+   arrayref of classes to include or a single class to
+   include. (Previously only an arrayref.)
+
+ * doc/database.html: Added some preliminary instructions for creating
+   a new database and user to work with OpenInteract -- currently only
+   with MySQL and PostgreSQL.
+
+ * Packages
+
+   Many packages have changed. One of the larger-scale changes
+   resulted from renaming the 'level' field in the security object to
+   'security_level'. See the each individual package's 'Changes' file
+   for more details.
+
+   Here are the different versions:
+
+   OpenInteract    1.06 -> 1.07
+   ----------------------------
+   base:           1.30 -> 1.42
+   base_box:       0.14 -> 0.20
+   base_component: 1.14 -> 1.18
+   base_error:     1.14 -> 1.21
+   base_group:     1.11 -> 1.16
+   base_security:  1.20 -> 1.30
+   base_template:  1.11 -> 1.17
+   base_theme:     1.11 -> 1.17
+   base_user:      1.15 -> 1.21
+   static_page:    1.24 -> 1.36
+   system_doc:     1.15 -> 1.19
+   classified:     1.12 -> 1.18
+   full_text:      1.11 -> 1.16
+   news:           1.15 -> 1.26
+
+
+1.06  Sun Feb 25 15:16:43 EST 2001
+
+ * OpenInteract/Package*: Split out previous OpenInteract/Package.pm
+   into OpenInteract/PackageRepository.pm (SPOPS::HashFile object
+   representing a package respository) and OpenInteract/Package.pm
+   (class methods operating on simple hashrefs representing individual
+   packages). In certain ways both are simpler and easier to
+   understand, and this allows you to think of and work with a package
+   repository as a single item rather than solely on individual packages.
+
+   This has a couple of effects:
+
+     1) GDBM is no longer used by OpenInteract. This was the primary
+     motivator behind the change.
+
+     2) You MUST modify all repositories from the old GDBM format to
+     the new format. If you run the new 'upgrade' command from
+     oi_manage when you download and install this distribution the base
+     installation repository will be translated for you. Here's a
+     list of commands for a manual upgrade:
+
+       > tar -zxvf OpenInteract-1.06.tar.gz
+       > cd OpenInteract-1.06
+       > perl Makefile.PL
+       > make
+       > make test
+       > make install
+       > oi_manage upgrade --base_dir=/opt/OpenInteract 
+
+     And if you're using CPAN:
+
+       > perl -MCPAN -e shell
+       cpan> install OpenInteract::Package
+       cpan> exit
+       > cd ~/.cpan/build/OpenInteract-1.06
+       > oi_manage upgrade --base_dir=/opt/OpenInteract 
+
+     However, after you do this you also need to translate the website
+     repositories like this:
+
+       oi_manage upgrade_repository --website_dir=<website-directory>
+
+     If you want to do things the hard way, there's also a script in
+     the 'eg/' directory called 'new_package_repository.pl' which will
+     translate a package repository from GDBM to the new format.
+
+     3) Any code you've written that operates on packages must be
+     redone. Sorry about this, but hopefully not too many people have
+     gone scouting around the package repositories in the first place,
+     and the benefits outweigh the costs at this relatively early
+     stage of OI development.
+
+     Here's a simple example:
+
+     Old: 
+        my $pkg = OpenInteract::Package->fetch_by_name( 
+                                          { name => 'blah',
+                                            directory => '/blah/blah' });
+
+     New:
+        my $repository = OpenInteract::PackageRepository->fetch( 
+                                          undef, { directory => '/blah/blah });
+        my $info = $repository->fetch_package_by_name({ name => 'blah' });
+
+     If you've actually done work with packages and need some help,
+     email Chris <chris@cwinters.com> for more detailed guidelines.
+    
+ * script/oi_manage, OpenInteract/ApacheStartup.pm,
+   OpenInteract/Startup.pm, OpenInteract/SQLInstall.pm: Modified
+   all functions dealing with packages to work with new system.
+ 
+ * OpenInteract/Package.pm: 
+
+   -- Fixed file handling bug in revised module method
+   install_distribution() which checked $_ (empty) rather than
+   $p->{package_file}. Thanks to Takanori Ugai <ugai@jp.fujitsu.com>
+   for the catch and patch.
+
+   -- Fixed new behavior of remove() which removed the directory in
+   addition to the entry from the repository. You can pass in 'remove'
+   as the third argument to have it remove the directory, otherwise
+   the directory is kept, which was the default behavior before the
+   new stuff was written.
+
+   -- Added 'script/' as set of files to be copied over when applying
+   a package from the base installation to a website.
+
+ * conf/sample-server.perl: new keys: 
+
+     {session_info}->{expiration} = '+3M',
+
+     (allows you to set a default expiration time for the session
+     cookie)
+
+     {system_alias}->{'OpenInteract::PackageRepository'} = 'repository',
+
+     (alias used to reference the repository class)
+
+     {box}->{custom_box_handler} = '',
+
+     (allows you to define a handler to be called on every request to
+     create/inspect/modify boxes)
+
+   You'll probably want to copy the items over into your server
+   configuration, although this brings up the interesting point as to
+   how to insert new configuration options into existing
+   websites. Perhaps we need a utility like that used in Win32
+   environments with the registry -- you can distribute a simple file
+   which is used by oi_manage to insert new keys into a website's
+   server.perl file.
+
+ * script/oi_manage:
+
+   -- Modified format to be more readable; added more documentation.
+
+   -- Mdified all calls to 'open_base_config()' to call the routine in
+   OpenInteract::Startup
+
+   -- Added checks for 'website_name' in the 'create_website' command,
+   since the parameter must refer to a valid Perl package identifier.
+
+   -- Added new action 'upgrade' (just like 'install' but we don't
+   create a new directory)
+
+   -- Added new action 'refresh_doc' (allow a website to get the
+   latest version of the documentation in the base installation
+   directory).
+
+ * OpenInteract/Startup.pm: Modified name of parameter passed into
+   'read_base_config()' (shouldn't affect anyone); added
+   'create_base_config_filename()' so we have one place to generate
+   it.
+
+ * OpenInteract/SPOPS.pm: added the URL to view the object to the
+   email sent by notify()
+
+ * doc/admin.html: Cleaned up and added some more information
+
+ * Several packages were also modified, but each of these has its own
+   changelog for the specific changes. Many of the changes were quite
+   small, including conf/spops.perl modifications to accommodate
+   changes in SPOPS key generation (add an 'increment_field => 1' for
+   those classes using a MySQL AUTO_INCREMENT field).
+
+   base:           1.20 -> 1.30
+   base_box:       0.13 -> 0.14
+   base_component: 1.11 -> 1.14
+   base_error:     1.13 -> 1.14
+   base_group:     1.10 -> 1.11
+   base_security:  1.18 -> 1.20
+   base_template:  1.09 -> 1.11
+   base_theme:     1.09 -> 1.11
+   base_user:      1.14 -> 1.15
+   static_page:    1.21 -> 1.24
+   classified:     1.07 -> 1.12
+   full_text:      1.09 -> 1.11
+   news:           1.13 -> 1.15
+
+
+1.05  Thu Feb  1 00:26:14 EST 2001
+
+  Added 'setup_static_environment' to OpenInteract/Startup.pm -- this
+  makes it *incredibly* easy to setup an OI environment outside of
+  Apache/CGI/Web-whatever, allowing you to do data reporting, import,
+  export, etc. 
+
+  Refactored (not 100%, but still pretty well) OpenInteract/Package.pm
+  to be easier to understand, including breaking up longer 'meaty'
+  subroutines into easier-to-digest versions. Added lots of POD
+  documentation as well.
+
+  Added website installation message to 'oi_manage' and modified it to
+  display an 'INSTALL' file whenever the package is installed to a
+  website (either via 'upgrade' or 'apply'). This means that package
+  authors can alert users to potential schema change or other API
+  modifications and be sure that users will see this when the package
+  is applied/upgraded -- minimize potential user excuses :-)
+
+  The basic OpenInteract documentation (included with the Perl
+  distributed in 'doc/') is now copied over to the OpenInteract base
+  installation directory (when you do 'oi_manage install') and is
+  copied from there to a website's HTML directory when you create a
+  new one. This means that the HTML OI documentation is available when
+  you first fire up your browser to see your website.
+
+  Lots of modifications to many packages, including the addition of a
+  new package to the core OpenInteract family: base_box. Let's give
+  him a big hand!
+
+
+1.04  Thu Dec 21 01:01:14 EST 2000
+
+  Modified OpenInteract/Package.pm to accommodate earlier versions of
+  Archive::Tar, which had very different interfaces. Added some more
+  items to the PREREQ piece of Makefile.PL and scrapped the
+  'INSTALLSCRIPT' option to let MakeMaker put the bin files in the
+  "right" place. 
+
+  **NOTE -- this means you should remove all older versions of
+  'oi_manage' that might be someplace like '/usr/local/bin'**
+
+  We now require version 2.00 of the Template Toolkit. Version 1.06+
+  might still work, but it's no longer actively supported.
+
+  Modified scripts/oi_manage to implement a 'list_actions' command,
+  which reads in all your website action.perl files and then tells you
+  all the actions programmed in the system and which package the
+  action comes from.
+
+  Many changes to various packages -- see the changelogs for
+  'base', 'base_security', 'base_theme', 'static_page' and several
+  others.
+
+
+1.03  Nov 30 2000
+
+  Added some modifications to when you install OpenInteract and when
+  you create a new package (OpenInteract/Package.pm;
+  script/oi_manage). Modified documentation in the Developer and Admin
+  guides as well as the two INSTALL documents; got that bulky .GIF out
+  of the distribution, replacing it with a slightly lame Visio
+  drawing (to PNG).
+
+  Relatively minor fixes to the packages news, base_error, base and
+  system_doc. See their 'Changes' files for more info.
+
+  Modified scripts/oi_manage to have the same semantics for
+  'check_package' as for 'export_package' -- that is, you can chdir to
+  the working directory for a package and run the command without any
+  parameters and have a check properly performed.
+
+  (minor) Superficial change in just about every file to modify email
+  'cwinters@intes.net' to 'chris@cwinters.com'. Also changed all RCS
+  '$Header' tags to '$Id'.
+
+
+1.02  Nov 10 2000
+
+  Package management and oi_manage routines are pretty much rock-solid
+  as done from informal testing. We've made new installs and websites
+  by the handful and everything has gone well. Added lots of overall
+  documentation (in the 'doc/' directory) including targeted guides
+  for managers, administrators and developers, plus a glossary, all in
+  HTML format. Eliminated a pretty evil bug in the
+  'OpenInteract/Template.pm' file of the 'base' package which only
+  manifested itself when running more than one website. SQL
+  installation has also been smoothed out and tested in numerous
+  ways. Lots of other little changes (structure, format, etc.).
+
+  Also made some changes to terminology and enforced it throughout. A
+  'base installation' is where you first install OpenInteract (using
+  'oi_manage') and a 'server' is the Apache/mod_perl process. A
+  'website' is a particular instantiation of OpenInteract with its own
+  packages, namespace, etc. The definition for 'package' hasn't really
+  changed, but we've made a package kindasorta synonymous with 'tool',
+  even though a package can contain more than one tool. 
+
+
+1.01  Nov 3 2000
+
+  Lots of new things -- massively overhauled package management
+  (oi_manage and OpenInteract::Package) including scads of
+  documentation and the functions for package removal and upgrade
+  capabilities, you can check a package, get a listing of packages
+  installed to an application or to the base installation, and can now
+  create a 'skeleton' package, which should help out a little bit with
+  development; more documentation in the packages distributed with the
+  system. You can also add or dump a package's templates, test a
+  database connection given the configuration parameters for an
+  application, and (more below) install the SQL structures and data
+  for a package.
+
+  Added the class 'OpenInteract::DBI' which gives us a central
+  location for connecting to a database. Also modified how the
+  configuration file is setup wrt database info.
+
+  All 'module.perl' files will hereafter be known as 'action.perl' --
+  this is so we can better communicate the concept of the 'Action
+  Table' and what it means when you're developing packages and
+  applications.
+
+  Added lots of configuration documentation -- see all the files in
+  'conf/'. The 'spops.perl' and 'action.perl' files are now
+  well-documented and OpenInteract::Package was modified to copy these
+  sample files into a new package when a skeleton is created.
+
+  Also modified the 'full_text' scripts for doing certain actions from
+  the command-line -- these are good scripts to review if you want to
+  create an OpenInteract 'environment' (all the classes created and
+  linked, database handle and config object created, etc.) from a
+  script rather than from mod_perl.
+
+  Added 'OpenInteract::SQLInstall' and modified all of the packages to
+  use its methods as well as translated their incoming structures and
+  data to its format. (This was much more work than it sounds like :)
+
+  Numerous other small-to-medium fixes here and there.
+
+
+1.00  Sep 28 2000
+
+  First public version. Everything is new!

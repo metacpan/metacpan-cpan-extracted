@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<SITE ID="LinkStar">
+
+<NAME Lang="en-us">LinkStar</NAME>
+<INFO Lang="en-us">business information search</INFO>
+
+<URL Type="More"><![CDATA[
+http://www.linkstar.com/linkstar/bin/dosearch-linkstar?_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+post://www.linkstar.com/linkstar/bin/dosearch-linkstar?keywords=_QUERY_&rec-company=&rec-name=&rec-city=&rec-category=&%0Dcb3%0Drec-state=&rec-country=
+]]></URL>
+
+
+<VAR Name="_NEXT_"><![CDATA[
+<a href="/linkstar/bin/dosearch-linkstar?_NEXT_"><img
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<font size+1><strong>_TITLE_</strong>_PREVIEW_</font></td>___Web:</strong> <a href="_URL_">
+]]></TEMPLATE>
+</SITE>

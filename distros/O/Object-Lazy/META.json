@@ -1,0 +1,69 @@
+{
+   "abstract" : "Object::Lazy - create objects late from non-owned classes",
+   "author" : [
+      "Steffen Winkler <steffenw at cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Object-Lazy",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Cwd" : "0",
+            "Params::Validate" : "0",
+            "Test::Differences" : "0.60",
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "Test::NoWarnings" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Test::Pod" : "1.14",
+            "Test::Pod::Coverage" : "1.04"
+         },
+         "requires" : {
+            "Carp" : "0",
+            "Try::Tiny" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Object::Lazy" : {
+         "file" : "lib/Object/Lazy.pm",
+         "version" : "0.15"
+      },
+      "Object::Lazy::Ref" : {
+         "file" : "lib/Object/Lazy/Ref.pm",
+         "version" : "0.12"
+      },
+      "Object::Lazy::Validate" : {
+         "file" : "lib/Object/Lazy/Validate.pm",
+         "version" : "0.12"
+      },
+      "Object::Lazy::Version" : {
+         "file" : "lib/Object/Lazy.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.15",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

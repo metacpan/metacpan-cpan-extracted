@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<SITE ID="Powersearch">
+
+<NAME Lang="en-us">Power Search</NAME>
+<INFO Lang="en-us">general information web search</INFO>
+
+<URL Type="More"><![CDATA[
+http://www.powersearch.com/_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://www.powersearch.com/search.asp?search=_QUERY_&EC=on&YO=on&iPerPage=10&SF=False&PSD=on&WC=on
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_NEXT_"><![CDATA[
+<A HREF='_NEXT_'>NEXT >>
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<STRONG><A HREF='_URL_'>_TITLE_</A>___<DD>_PREVIEW_<BR>___</DL><BR>
+]]></TEMPLATE>
+</SITE>

@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<SITE ID="JumpCity">
+
+<NAME Lang="en-us">JumpCity</NAME>
+<INFO Lang="en-us">general information web search</INFO>
+
+<URL Type="More"><![CDATA[
+http://www.jumpcity.com_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+post://www.jumpcity.com/cgi-bin/search?passed?arg0=key:&arg1=_QUERY_&max_show=_HITS_
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_NEXT_"><![CDATA[
+- <a href="_NEXT_">show next group
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<font size="+1"><b>_TITLE_</b></font>___</a>___" href="_URL_">___<dd><font size="-1">_PREVIEW_</font>
+]]></TEMPLATE>
+</SITE>

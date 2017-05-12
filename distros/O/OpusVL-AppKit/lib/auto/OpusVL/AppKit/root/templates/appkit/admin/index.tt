@@ -1,0 +1,33 @@
+<h1>Settings</h1>
+
+<div class="content_block">
+    <h3>What would you like to change?</h3>
+
+    <ul>
+        [% auth_model = 'Model::AppKitAuthDB' %]
+        [% auth_config = c.config.$auth_model %]
+        [% UNLESS auth_config.traits.match('(?i)LDAP') %]
+            [% IF c.can_access(c.controller('AppKit::User').action_for('change_password')) %]
+                <li>
+                    <a href='[% c.uri_for( c.controller('AppKit::User').action_for('change_password') ) %]'>
+                        Change your password
+                    </a>
+                </li>
+            [% END %]
+        [% END %]
+        [% IF c.can_access(c.controller('AppKit::Admin::Access').action_for('index')) %]
+            <li>
+                <a href='[% c.uri_for( c.controller('AppKit::Admin::Access').action_for('index') ) %]'>
+                    Roles
+                </a>
+            </li>
+        [% END %]
+        [% IF c.can_access(c.controller('AppKit::Admin::Users').action_for('index')) %]
+            <li>
+                <a href='[% c.uri_for( c.controller('AppKit::Admin::Users').action_for('index') ) %]'>
+                    Users
+                </a>
+            </li>
+        [% END %]
+    </ul>
+</div>

@@ -1,0 +1,152 @@
+Revision history for Opendata-GTFS-Feed
+
+0.0202 2016-02-28 22:30:00 UTC
+ [Testing]
+ - Skip zip test if unzip is missing.
+
+ [Stats & Dependency Changes]
+ - 16 files changed, 18 insertions(+), 15 deletions(-)
+
+0.0201 2016-02-25T15:47:12Z UTC
+ [Documentation]
+ - Document attributes again.
+
+ [Stats & Dependency Changes]
+ - 16 files changed, 19 insertions(+), 16 deletions(-)
+ - (run req) ~ List::UtilsBy (any) --> 0.04
+ - (dev req) + Pod::Elemental::Transformer::Splint 0.1201
+
+0.0200 2016-02-25T13:44:34Z UTC
+ [Requirements]
+ - Rewritten to no longer use Moops/Kavorka.
+ - Perl requirement lowered to 5.10 (from 5.14).
+
+ [Testing]
+ - Further attempts to avoid failing tests due to external factors (github
+   sometimes replies with code 599).
+
+ [Stats & Dependency Changes]
+ - 21 files changed, 615 insertions(+), 622 deletions(-)
+ - (run req) + List::Util 1.42
+ - (run req) + List::UtilsBy (any)
+ - (run req) + MooseX::AttributeShortcuts 0.028
+ - (run req) + namespace::autoclean 0.22
+ - (run req) ~ Moose 2.0000 --> 2.1405
+ - (run req) ~ Moose::Role 2.0000 --> (any)
+ - (run req) ~ MooseX::AttributeDocumented (any) --> 0.1003
+ - (run req) ~ Path::Tiny (any) --> 0.072
+ - (run req) ~ Type::Tiny (any) --> 1.000005
+ - (run req) ~ Types::Path::Tiny (any) --> 0.005
+ - (run req) ~ Types::Standard (any) --> 1.000005
+ - (run req) ~ perl 5.014000 --> 5.010000
+ - (run req) - Kavorka
+ - (run req) - List::AllUtils
+ - (run req) - Moops
+ - (run req) - MooseX::StrictConstructor
+ - (run req) - Safe::Isa
+ - (run req) - Sub::Exporter
+ - (run req) - Throwable::X::Types
+ - (run req) - namespace::clean
+ - (test req) + IO::Handle (any)
+ - (test req) + IPC::Open3 (any)
+ - (test req) + Try::Tiny 0.24
+ - (conf req) + ExtUtils::MakeMaker (any)
+ - (conf req) - Module::Build::Tiny
+ - (dev req) + Badge::Depot 0.0103
+ - (dev req) + Badge::Depot::Plugin::Coverage (any)
+ - (dev req) + Badge::Depot::Plugin::Cpantesters (any)
+ - (dev req) + Badge::Depot::Plugin::Kwalitee (any)
+ - (dev req) + Badge::Depot::Plugin::Perl (any)
+ - (dev req) + Badge::Depot::Plugin::Travis (any)
+ - (dev req) + Dist::Zilla 5.000
+ - (dev req) + Dist::Zilla::Plugin::Authority 1.009
+ - (dev req) + Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional
+   0.007
+ - (dev req) + Dist::Zilla::Plugin::ChangeStats::Dependencies::Git 0.0100
+ - (dev req) + Dist::Zilla::Plugin::Clean 0.07
+ - (dev req) + Dist::Zilla::Plugin::DistIller::MetaGeneratedBy (any)
+ - (dev req) + Dist::Zilla::Plugin::Git 2.036
+ - (dev req) + Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch 0.013
+ - (dev req) + Dist::Zilla::Plugin::Git::Commit (any)
+ - (dev req) + Dist::Zilla::Plugin::Git::Contributors 0.017
+ - (dev req) + Dist::Zilla::Plugin::InstallRelease 0.008
+ - (dev req) + Dist::Zilla::Plugin::MakeMaker (any)
+ - (dev req) + Dist::Zilla::Plugin::NextRelease::Grouped 0.0200
+ - (dev req) + Dist::Zilla::Plugin::RewriteVersion::Transitional 0.007
+ - (dev req) + Dist::Zilla::Plugin::Test::Compile 2.054
+ - (dev req) + Dist::Zilla::Plugin::Test::EOF 0.0501
+ - (dev req) + Dist::Zilla::Plugin::Test::EOL 0.18
+ - (dev req) + Dist::Zilla::Plugin::Test::Kwalitee::Extra v0.2.1
+ - (dev req) + Dist::Zilla::Plugin::Test::NoTabs 0.15
+ - (dev req) + Dist::Zilla::Plugin::Test::Version 1.05
+ - (dev req) + Pod::Weaver::Section::Badges 0.0401
+ - (dev req) + Pod::Weaver::Section::GenerateSection 1.01
+ - (dev req) + Test::EOF (any)
+ - (dev req) + Test::EOL (any)
+ - (dev req) + Test::More 0.88
+ - (dev req) + Test::NoTabs 1.4
+ - (dev req) + Test::Version 1
+ - (dev req) ~ Dist::Zilla::Plugin::CheckChangesHasContent (any) --> 0.008
+ - (dev req) ~ Dist::Zilla::Plugin::CopyFilesFromBuild (any) --> 0.151680
+ - (dev req) ~ Dist::Zilla::Plugin::GithubMeta (any) --> 0.54
+ - (dev req) ~ Dist::Zilla::Plugin::MetaProvides::Package (any) -->
+   2.003001
+ - (dev req) ~ Dist::Zilla::Plugin::PodWeaver (any) --> 4.006
+ - (dev req) ~ Dist::Zilla::Plugin::ReadmeAnyFromPod (any) --> 0.150250
+ - (dev req) ~ Dist::Zilla::Plugin::RunExtraTests (any) --> 0.028
+ - (dev req) ~ Dist::Zilla::Plugin::Test::ReportPrereqs (any) --> 0.021
+ - (dev req) ~ Dist::Zilla::Plugin::TravisYML (any) --> 1.15
+ - (dev req) ~ Test::Warnings (any) --> 0.026
+ - (dev req) - Dist::Zilla::Plugin::CheckExtraTests
+ - (dev req) - Dist::Zilla::Plugin::ContributorsFromGit
+ - (dev req) - Dist::Zilla::Plugin::MetaProvides::Class
+ - (dev req) - Dist::Zilla::Plugin::ModuleBuildTiny
+ - (dev req) - Dist::Zilla::Plugin::NextRelease
+ - (dev req) - Dist::Zilla::Plugin::NextVersion::Semantic
+ - (dev req) - Dist::Zilla::Plugin::OurPkgVersion
+ - (dev req) - Dist::Zilla::Plugin::PodnameFromClassname
+ - (dev req) - Dist::Zilla::Plugin::Prereqs::Plugins
+ - (dev req) - Dist::Zilla::Plugin::PreviousVersion::Changelog
+ - (dev req) - Dist::Zilla::Plugin::ReversionOnRelease
+ - (dev req) - Pod::Elemental::Transformer::Splint
+ - (dev req) - Pod::Weaver::Section::Homepage::DefaultCPAN
+ - (dev req) - Pod::Weaver::Section::Source::DefaultGitHub
+ - (dev sug) + Dist::Iller 0.1408
+ - (dev sug) + Dist::Iller::Config::Author::CSSON 0.0309
+
+0.0104 2015-02-22T11:15:08Z CET
+ [Requirements]
+ - New test prereq: Test::RequiresInternet.
+
+ [Testing]
+ - Make sure we can connect to github during http test (otherwise skip
+   test).
+
+0.0103 2015-02-21T22:21:43Z CET
+ [Testing]
+ - The fetch-feed-from-url tests have sometimes been failing due to
+   internal error at Google. The sample feed is now moved to the github
+   repository and fetched from there.
+
+0.0102 2015-02-19T18:27:47Z CET
+ [Requirements]
+ - Added a develop prereq to add link to github.
+
+ [Documentation]
+ - Added link to github repository from pod.
+
+0.0101 2015-02-19T18:10:25Z CET
+ [Meta]
+ - Remove cpanfile, set prereqs in dist.ini.
+ - Setup travis build.
+ - strict and warnings everywhere (already enforced by Moops, but anyway).
+
+ [Requirements]
+ - Listed Archive::Zip as runtime prereq.
+ - A few new dist zilla plugins (dev prereqs).
+
+ [Bug Fixes]
+ - One class used wrong ::Standard module.
+
+0.0100 2015-01-31T19:24:53Z CET
+ - Initial release

@@ -1,0 +1,59 @@
+Revision history for perl distribution Object-Signature-Portable
+
+v0.1.6  2014-09-14
+  [Documentation]
+  - Added more details about alternative encoders.
+
+  - Added design considerations for choosing JSON as a default
+    serializer.
+
+  - Added a note to the POD that this is for fingerprinting an object,
+    and not for public-key signatures. (Thanks to the easily confused
+    and pedantic anonymous commenter.)
+
+  [Other Changes]
+  - Explicit minimum Perl version in module code.
+
+v0.1.5  2014-09-03
+  [Tests]
+  - Tests require Test::Differences, since some CPAN::Testers
+    environments seem to be installing Test::Most without it.
+
+  - Test::Warnings is only used for author tests.
+
+  [Other Changes]
+  - Fixed MANIFEST.SKIP rules.
+
+v0.1.4  2014-09-02
+  [Documentation]
+  - Added note about alternative encoders.
+
+v0.1.3  2014-08-16
+  [Documentation]
+  - Fixed typos in Changes.
+
+  [Other Changes]
+  - Fixed license in Makefile.PL to make CPANTS happy.
+
+v0.1.2  2014-06-04
+  [Documentation]
+  - Fixed typos in POD.
+
+  - Added requirements to README.
+
+  [Other Changes]
+  - Added QA tests to the git repo.
+
+v0.1.1  2014-03-11
+  [Documentation]
+  - Added subsections to the LIMITATIONS section about Portability and
+    Security, and moved a note about the hash algorithm to the latter.
+
+  - Removed details from README.
+
+  [Other Changes]
+  - Removed unnecessary dependency from Makefile.PL.
+
+v0.1.0  2013-12-04
+
+  - First release.

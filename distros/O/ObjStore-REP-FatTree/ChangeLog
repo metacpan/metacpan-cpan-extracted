@@ -1,0 +1,13 @@
+1999-01-12  Joshua Pritikin  <joshua.pritikin@db.com>
+
+	* Release 1.01.
+
+1998-12-14  Joshua Pritikin  <joshua.pritikin@db.com>
+
+	* Added ObjStore::REP::FatTree::ObjAV.  An array that only stores
+ 	pointers to composite objects.  The benefit is 4 bytes per record
+ 	vs. 8 bytes for a general array.
+
+	* Added ObjStore::REP::FatTree::KCIndex.  Caches first and last
+ 	key of node for _much_ better performance on very large tables.
+

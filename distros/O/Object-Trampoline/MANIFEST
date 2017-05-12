@@ -1,0 +1,12 @@
+Changes
+MANIFEST
+META.yml
+Makefile.PL
+README
+lib/Object/Trampoline.pm
+t/00-use.t
+t/01-trampoline-object.t
+t/02-failures.t
+t/03-Universal-Override.t
+t/Broken.pm
+META.json                                Module JSON meta-data (added by MakeMaker)

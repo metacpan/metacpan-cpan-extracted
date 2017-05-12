@@ -1,0 +1,29 @@
+Revision history for OpenServices-SNMP-Plugin-Updates
+
+1.0.1   2017-01-16
+        Fix update detection with more than one whitespace in names.
+
+1.0.0   2017-01-09
+        No further changes, just bump version number to supersede 0.05.
+
+0.1.1   2017-01-09
+        Update MANIFEST.
+
+0.1.0   2017-01-09
+        Fix parsing of security updates on Oracle Enterprise Linux.
+
+0.05    2016-04-18
+        Use parseable XML output from zypper to support SLES 12 and SLES 11 at the same time.
+
+0.04    2014-11-03
+        Do not restrict package prefixes to RHEA, also recognize RHSA as pending updates.
+
+0.03    2014-10-31
+        Loosen up versioned dependency on Net::SNMP::*.
+
+0.02    2014-10-30
+        Prepopulate packages cache during initialization.
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

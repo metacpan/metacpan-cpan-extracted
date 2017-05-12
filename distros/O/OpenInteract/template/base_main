@@ -1,0 +1,65 @@
+[%- DEFAULT theme = OI.theme_properties -%]
+<html>
+ <head>
+  <title>[% page.title %]</title>
+ <script language="javascript">
+<!--
+
+[% page.script %]
+
+[% PROCESS global_javascript %]
+
+// -->
+ </script>
+ </head>
+ <body bgcolor="[% theme.bgcolor %]">
+
+<a href="/"><img src="/images/oi_logo.gif" width="316" height="74" 
+                 border="0" alt="OpenInteract logo"></a>
+<br clear="all">
+<table border="0" width="100%" cellpadding="2" bgcolor="[% theme.main_menu_border_color %]">
+<tr><td>
+<table border="0" width="100%" bgcolor="[% theme.main_menu_bgcolor %]"
+       cellpadding="4" cellspacing="0">
+ <tr align="center" valign="middle">
+   <td><font size="+1">
+       <b><a href="/">Home</a></b> |
+       <b><a href="/User/">Users</a></b> |
+       <b><a href="/Group/">Groups</a></b> |
+       <b><a href="/Page/actions/">Pages</a></b>
+   </td>
+ </tr>
+</table>
+
+</td></tr>
+</table>
+
+<table border="0" width="100%" bgcolor="[% theme.bgcolor %]"
+       cellpadding="1" cellspacing="0">
+ <tr valign="top">
+  <td width="75%" align="left">
+   <br>
+
+[% page.content %]
+
+  </td>
+  <td width="25%" align="right">
+   <br>
+
+[%- IF OI.is_admin; OI.box_add( 'templates_used_box' ); END -%]
+[%- OI.comp( 'boxes' ) -%]
+
+ </td></tr>
+</table>
+
+<hr width="50%" noshade="noshade">
+<p align="center">
+  Questions? Check out <a href="http://www.openinteract.org/">the website</a>
+</p>
+<p align="right">
+ <a href="http://www.openinteract.org/powered_by"><img src="/images/pw_by_oi.gif" width="88" height="31" 
+                                                       border="0" alt="Powered by OpenInteract!"></a>
+</p>
+
+ </body>
+</html>

@@ -1,0 +1,20 @@
+MANIFEST
+Changes
+Makefile.PL
+README
+lib/Object/Exercise.pm
+lib/Object/Exercise/Execute.pm
+t/00-use_ok.t
+t/01-simple-queue.t
+t/02-run-long-list.t
+t/03-bench-long-list.t
+t/04-output-messages.t
+t/05-fail-without-continue.t
+t/06-fail-with-continue.t
+t/07-Single-Benchmark.t
+t/10-GlobalBenchmark.t
+t/11-MultiBenchmark.t
+t/12-Local-Benchmark.t
+t/13-stacked-test.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,11 @@
+# $File: //depot/OurNet-BBSAgent/BBSAgent/elixus.bbs $ $Author: autrijus $
+# $Revision: #10 $ $Change: 2830 $ $DateTime: 2002/01/10 15:15:44 $
+# Contributed by Autrijus Tang <autrijus@autrijus.org>
+# zh_TW.Big5: √¿•ﬂ®Û
+
+Elixir Nexus
+elixus.org
+
+load melix.board
+load melix.session
+load melix.user

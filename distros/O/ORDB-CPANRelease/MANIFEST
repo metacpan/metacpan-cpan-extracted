@@ -1,0 +1,24 @@
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/DSL.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/ORDB/CPANRelease.pm
+lib/ORDB/CPANRelease.pod
+lib/ORDB/CPANRelease/Release.pod
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+MYMETA.json
+README
+t/01_compile.t
+t/02_release.t
+xt/meta.t
+xt/pmv.t
+xt/pod.t

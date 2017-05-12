@@ -1,0 +1,10 @@
+[%########################################
+  label_form_checkbox_row( label, count, name, value, field_label, picked )
+     Display a row to input text: label on left, text input on
+     right. Optional 'checkbox_label' will be to right of checkbox.
+  ########################################-%]
+
+[%- DEFAULT colspan = 2; -%]  
+[%- INCLUDE label_row_begin( colspan = 1 ) -%]
+[%- INCLUDE data_cell_begin -%][% INCLUDE form_checkbox %]
+</td></tr>

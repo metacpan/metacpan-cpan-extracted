@@ -1,0 +1,45 @@
+Revision history for Perl extension OurNet::BBSApp.
+
+[v0.01] 
+
+Change 883 on 2001/02/27 by autrijus@autribsd
+
+           * branch out for seperate release 
+
+Change 644 on 2001/04/12 by autrijus@autricvic
+
+	      * accompany the MAPLE3 delete message with Template.
+
+Change 641 on 2001/04/11 by autrijus@autricvic
+
+	       * Fixed MailList and Templator.
+
+Change 626 on 2001/03/31 by autrijus@autrihome
+
+	* skips Outlook HTML mail attachment
+	* Templator now hides @ style author
+
+Change 544 on 2001/03/08 by autrijus@autrihome
+
+	* YASB in BBSApp::load
+
+Change 543 on 2001/03/08 by autrijus@autrihome
+
+	* BBSApp::run now could serve as class method too
+
+Change 542 on 2001/03/08 by autrijus@autrihome
+
+	* fixed reversed preview (again)
+
+Change 541 on 2001/03/08 by autrijus@autrihome
+
+	BBSApp update
+
+Change 540 on 2001/03/08 by autrijus@autrihome
+
+	fix YASB
+
+Change 539 on 2001/03/08 by autrijus@autrihome
+
+	Initial check-in for OurNet::BBSApp; might not even work
+

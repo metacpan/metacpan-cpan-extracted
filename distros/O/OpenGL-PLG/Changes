@@ -1,0 +1,12 @@
+Revision history for OpenGL-PLG
+
+0.03    2008-09-10/23:20
+        Fixed distro for CPAN
+
+0.02    2008-09-10/15:00
+        POD revisited, better error handling, more tests,
+        and a fix for people who do not have OpenGL installed.
+
+0.01    2008-09-09/21:10
+        First version, released on an unsuspecting world.
+

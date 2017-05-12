@@ -1,0 +1,30 @@
+[%# -*- mode: web; coding: utf-8 -*-
+  #################################################################
+    Page shown after bad reply is obtained from OAuth site.
+    Parameters:
+       all described in layout.thtml
+       oauth_problem
+  ################################################################# -%]
+[% WRAPPER layout.thtml
+       title="Request rejected" %]
+
+<p class="error">
+    Authorization was rejected.
+</p>
+<p>
+    OAuth error code: [% oauth_problem %].
+</p>
+[% IF oauth_problem == "user_refused" %]
+<p>
+    Looks like you rejected OAuth request. Would you change your mind,
+    restart the application and try again.
+</p>
+[% ELSE %]
+<p>
+    Restart app/script and try again, if it still does not work,
+    report error to the application author.
+</p>
+
+[% END %]
+
+[% END %]

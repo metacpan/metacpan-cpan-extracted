@@ -1,0 +1,7 @@
+# These are the Apache modules that are 'require'd at server startup
+# from the class OpenInteract::ApacheStartup
+
+Apache
+Apache::Constants
+Apache::URI
+Apache::Request

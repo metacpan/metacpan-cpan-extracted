@@ -1,0 +1,101 @@
+# NAME
+
+Object::ArrayType::New - Inject constants and constructor for ARRAY-type objects
+
+# SYNOPSIS
+
+    package MyObject;
+    use strict; use warnings;
+    use Object::ArrayType::New
+      [ foo => 'FOO', bar => 'BAR' ];
+    sub foo     { shift->[FOO] }
+    sub bar     { shift->[BAR] ||= [] }
+
+    package main;
+    my $obj = MyObject->new(foo => 'baz');
+    my $foo = $obj->foo; # baz
+    my $bar = $obj->bar; # []
+
+# DESCRIPTION
+
+ARRAY-backed objects are light and fast, but obviously slightly more
+complicated to cope with than just stuffing key/value pairs into a HASH.
+The easiest way to keep track of where things live is to set up some named
+constants to index into the ARRAY -- you can access your indexes by name,
+and gain compile-time typo checking as an added bonus.
+
+A common thing I find myself doing looks something like:
+
+    package MySimpleObject;
+    use strict; use warnings;
+
+    sub TAG () { 0 }
+    sub BUF () { 1 }
+    # ...
+
+    sub new {
+      my $class = shift;
+      my %params = @_ > 1 ? @_ : %{ $_[0] };
+      bless [
+        $params{tag},             # TAG
+        ($params{buffer} || [])   # BUF
+        # ...
+      ], $class
+    }
+    sub tag     { shift->[TAG] }
+    sub buffer  { shift->[BUF] }
+    # ...
+
+... when I'd rather be doing something more like the ["SYNOPSIS"](#synopsis).
+
+This tiny module takes, as arguments to `import`, an ARRAY of pairs mapping a
+`new()` parameter name to the name of a constant. The constant represents the
+item's position in the object's backing ARRAY.
+
+If the **constant**'s name is boolean false, the uppercased parameter name is
+used as the name of the constant:
+
+    use Object::ArrayType::New
+      [ foo => '', bar => '' ];
+    # same as foo => 'FOO', bar => 'BAR'
+
+If the **parameter**'s name is boolean false, there is no construction-time
+parameter. The constant is installed and the appropriate position in the
+backing ARRAY is set to `undef` at construction time; this can be useful for
+private attributes:
+
+    use Object::ArrayType::New
+      [ foo => 'FOO', '' => 'BAR' ];
+    sub foo  { shift->[FOO] ||= 'foo' }
+    sub _bar { shift->[BAR] ||= [] }
+
+An appropriate constructor is generated and installed, as well as constants
+that can be used within the class to index into the `$self` object.
+
+The generated constructor takes parameters as either a list of pairs or a
+single HASH. Parameters not specified at construction time are `undef`.
+
+That's it; no accessors, no defaults, no type-checks, no required attributes,
+nothing fancy. [Class::Method::Modifiers](https://metacpan.org/pod/Class::Method::Modifiers) may be convenient there; the above
+raw Perl example could be written something like:
+
+    use Object::ArrayType::New [ tag => '', buffer => 'BUF' ];
+    sub tag    { shift->[TAG] }
+    sub buffer { shift->[BUF] }
+    use Class::Method::Modifers;
+    around new => sub {
+      my ($orig, $class) = splice @_, 0, 2;
+      my $self = $class->$orig(@_);
+      $self->[BUF] = [] unless defined $self->[BUF];
+      $self
+    };
+
+if `$ENV{OBJECT_ARRAYTYPE_DEBUG}` is true, generated code is printed to
+STDERR before being evaluated.
+
+Constants aren't currently sanity-checked ahead of time; attempting to use
+invalid identifiers will result in vague 'Illegal declaration ...' failures.
+
+# AUTHOR
+
+Jon Portnoy <avenj@cobaltirc.org>

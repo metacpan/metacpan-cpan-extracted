@@ -1,0 +1,14 @@
+[%########################################
+  show_label( label, is_required, required_display, pre_label, post_label )
+     Display a label. If it's required, pass in a true value for
+     'is_required'. If it's required and you don't pass anything in
+     for 'required_display' we use what's in the theme.
+  ########################################-%]
+[%- req = '' -%]
+[% IF is_required -%]
+  [%- IF NOT required_display -%]
+     [%- required_display = OI.theme_properties.required -%]
+  [%- END -%]
+  [%- req = required_display -%]
+[% END %]
+[% pre_label %]<b>[% label %]</b>[% req %][% post_label %]

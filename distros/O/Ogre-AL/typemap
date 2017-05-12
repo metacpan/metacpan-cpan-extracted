@@ -1,0 +1,70 @@
+TYPEMAP
+
+Listener *	O_LISTENER
+const Listener *	O_LISTENER
+Sound *	O_SOUND
+const Sound *	O_SOUND
+SoundManager *	O_SOUNDMANAGER
+const SoundManager *	O_SOUNDMANAGER
+AxisAlignedBox *	O_AXISALIGNEDBOX
+const AxisAlignedBox *	O_AXISALIGNEDBOX
+Vector3 *	O_VECTOR3
+const Vector3 *	O_VECTOR3
+
+String	STRING
+const String	STRING
+Real	T_REAL
+ALboolean	T_IV
+ALenum	T_IV
+ALsizei	T_IV
+Priority	T_IV
+
+
+INPUT
+
+STRING
+	char * xstmpchr_$var = (char *) SvPV_nolen($arg);
+	$var = xstmpchr_$var;
+
+T_REAL
+	$var = (Real)SvNV($arg);
+
+O_LISTENER
+	TMOGREAL_IN($arg, $var, $type, $Package, $func_name, Listener)
+
+O_SOUND
+	TMOGREAL_IN($arg, $var, $type, $Package, $func_name, Sound)
+
+O_SOUNDMANAGER
+	TMOGREAL_IN($arg, $var, $type, $Package, $func_name, SoundManager)
+
+O_AXISALIGNEDBOX
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, AxisAlignedBox)
+
+O_VECTOR3
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, Vector3)
+
+
+OUTPUT
+
+STRING
+	sv_setpvn((SV*)$arg, (char *) ($var.data()), ($var.size()));
+
+T_REAL
+	sv_setnv($arg, (Real)$var);
+
+O_LISTENER
+	TMOGREAL_OUT($arg, $var, Listener)
+
+O_SOUND
+	TMOGREAL_OUT($arg, $var, Sound)
+
+O_SOUNDMANAGER
+	TMOGREAL_OUT($arg, $var, SoundManager)
+
+O_AXISALIGNEDBOX
+	TMOGRE_OUT($arg, $var, AxisAlignedBox)
+
+O_VECTOR3
+	TMOGRE_OUT($arg, $var, Vector3)
+

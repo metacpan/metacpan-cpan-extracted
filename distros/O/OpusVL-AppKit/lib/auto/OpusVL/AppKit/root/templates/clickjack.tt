@@ -1,0 +1,11 @@
+[% UNLESS c.config.no_clickjack_protection || c.stash.no_clickjack_protection %]
+<style id="antiClickjack">body{display:none !important;}</style>
+<script>
+    if(self === top) {
+        var antiClickjack = document.getElementById('antiClickjack');
+        antiClickjack.parentNode.removeChild(antiClickjack);
+    } else {
+        top.location = location;
+    }
+</script>
+[% END %]

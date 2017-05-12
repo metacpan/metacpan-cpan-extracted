@@ -1,0 +1,65 @@
+OWL-Simple
+
+This package contains a set of modules to parse
+an OWL ontology into a hash.
+
+SCRIPTS
+
+The similarity_match.pl compares a list of annotations to 
+another ontology and suggests the best match based on a 
+similarity metric (n-grams). 
+
+Usage:
+    similarity_match.pl (-w owlfile || -o obofile || -m meshfile)
+                        -t targetfile -r resultfile
+                        [--obotarget || --owltarget]
+
+Optional '--obotarget' setting specifies that the target file is an OBO ontology
+Optional '--owltarget' setting specifies that the target file is an OWL ontology
+
+The script expects the first column in the tab delimited input
+flat file to contain the values to be matched. Other columns
+are preserved in the output.
+
+It is also possible to align one ontology to another and the 
+accepted formats are: OWL, OBO, MeSH ASCII (see the optional obotarget
+and owltarget parameters).
+
+INSTALLATION
+
+Use:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+	
+DEPENDENCIES
+
+IO::File
+IO::Handle
+GO::Parser
+Getopt::Long
+Moose
+Log::Log4perl
+List::Util
+XML::Parser
+Benchmark
+
+DOCUMENTATION
+
+After installing, you can find documentation modules and scripts with the perldoc 
+command, e.g.:
+perldoc OWL::Simple::Parser
+perldoc similarity_match.pl
+
+KNOWN ISSUES
+
+COPYRIGHT AND LICENSE
+
+Copyright (c) 2010 European Bioinformatics Institute. All Rights Reserved.
+
+This module is free software; you can redistribute it and/or modify it 
+under GPLv3.
+
+This software is provided "as is" without warranty of any kind.

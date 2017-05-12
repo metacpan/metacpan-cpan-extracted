@@ -1,0 +1,136 @@
+2014-04-30 12:47:20 -0400 Lott Caskey <lottcaskey@gmail.com> 
+
+	* If process is stale, name matches, and server ip does not match, replace process info.
+
+2014-02-22 04:35:32 -0500 Lott Caskey <lottcaskey@gmail.com> 
+
+	* Added "D" option to keepalive options, it uses what would be considered default for that servers profile. Create a server_keepalive_processes table to trake which keepalives are running on which server. The keepalive scripts that can only be run on one server are now aware if the script is running elsewhere, additionally, I have reduced the runtime of each script, so that its load can be more evenly shared across the cluster.
+
+2014-02-20 18:53:58 -0500 Lott Caskey <lottcaskey@gmail.com> 
+
+	* Add osdial_events.
+
+2013-08-01 06:47:20 -0400 Lott Caskey <lottcaskey@gmail.com> 
+
+	* Added sql_dbh and sql_last_insert_id functions.
+
+2013-06-07 07:36:45 -0400 Lott Caskey <lottcaskey@gmail.com> 
+
+	* Check if valid directory on media files.
+
+2013-06-07 03:36:24 -0400 Lott Caskey <lottcaskey@gmail.com> 
+
+	* Allow the sql_connect routine to fail gracefully on secondary connections. It will use the sql_onfail setting for the primary connection.
+
+2012-05-02 16:40:57 +0000 Lott Caskey <lottcaskey@gmail.com> 
+
+	* Do MySQL auto reconnect on lost MySQL handle.
+
+2011-09-27 05:02:06 +0000 Lott Caskey <lottcaskey@gmail.com> 
+
+	* This update contains modifications that allow OSDial to fully support UTF8/Unicode character-sets.  Previously, non-latin support existed, but this was both insecure and incomplete.  All non-UTF8-safe string manipulation and regular expression functions have been identified and have been replaced with routines that, when UTF8 is in use, will use alternative methods to handle multibyte operations, and when UTF8 is not in use, the routines use the standard non-UTF8-safe functions.  There are nearly 500,000 line changes in this revision, the bulk of which is due to rewriting just about every SQL statement so that string fields are properly escaped. Some bugs were discovered and I will touch lightly on them as I summize each section.  bin: SQL rewrites and escaping, added TTS generator to osdial_astgen.pl, added fix to OSDcampaign_stats which would cause it to terminate under certain conditions. agi: SQL rewrites and escaping, added routine to IVR which allows for the selection of dynamically-generated-TTS as any selectable announcement/message/playback. extras/sql: Modified existing SQL files so they do not reference a default character-set (ie, Latin1), Added 3 new options to upgrade_sql.pl --use-latin1, --use-utf8, and --convert, when either of the former two options is used with --convert then the entire database is converted to the character-set indicated by --use-latin1 or --use-utf8 (warning, going from Latin1 to UTF8 is fine, going the other can cause issues if you have multibyte data in the database.)  perl: Added/modified functions having to do with TTS parsing/generation. www: fix include paths.  www/ari: fix minor typing bug.  www/agent: SQL rewrites and escaping, centralize the character-set identification so that it only occurs once, modify email routine to properly encode UTF8 and UTF8 encoded HTML. www/admin: SQL rewrites and escaping, functionalized auth.php so that it can be called from api.php without needing to perform basic auth, modify all functions to be UTF8 safe, modify email routine here as well in order to properly support UTF8 emails, add functions for listing TTS files/extensions, created new function which displays a list of files and TTS entries for the IVR, add TTS extensions to standard extension list, fixed all permissions checks to use the LOG array provided by the auth function, ensure that script and email templating are UTF8-safe, add character-set option to System Settings...note: it cannot be changed here, agent_stats.pl had a wrong variable for its start_date, reformatted real-time detail so that it would display correctly with both UTF8 and Latin1 character-sets, added list_campaigns and list_usergroups functions to the API, added JSON output mode to API.
+
+2011-08-16 15:14:08 +0000 Lott Caskey <lottcaskey@gmail.com> 
+
+	* Add VARDB_onfail option.  When set to 'warn', allows SQL statements to trigger warning instead of dying.
+
+2011-07-27 21:25:32 +0000 Lott Caskey <lottcaskey@gmail.com> 
+
+	* Change mres to mimic php function (strip quotes).
+
+2011-05-15 02:44:39 +0000 Lott Caskey <lottcaskey@gmail.com> 
+
+	* Configuration parsers was setting VARHTTP_path to 'http'.  A split was occurring at the ':'...limited the command to returning 2 fields.
+
+2011-04-26 21:22:09 +0000 Lott Caskey <lottcaskey@gmail.com> 
+
+	* Make load_config public and move DB related config pulls into function.  This allows the config to be 'reloaded'.
+
+2011-03-31 19:56:53 +0000 Lott Caskey <lottcaskey@gmail.com> 
+
+	* Max packet insert size adjustment.
+
+2011-02-10 21:29:54 +0000 Lott Caskey <lottcaskey@gmail.com> 
+
+	* Update copyrights and site links.
+
+2011-02-10 06:50:16 +0000 Lott Caskey <lottcaskey@gmail.com> 
+
+	* Added tts_osdial_parse function to break apart TTS strings into field deliminited phrases, for hashing, caching, and playback.
+
+2011-02-06 19:38:05 +0000 Lott Caskey <lottcaskey@gmail.com> 
+
+	* PreReq PMs for Make..
+
+2011-02-06 19:37:25 +0000 Lott Caskey <lottcaskey@gmail.com> 
+
+	* Use SVN_Version placeholder.
+
+2011-02-06 19:36:47 +0000 Lott Caskey <lottcaskey@gmail.com> 
+
+	* Added for CPAN.
+
+2011-02-04 05:44:37 +0000 Lott Caskey <lottcaskey@gmail.com> 
+
+	* Update Changes/README files for submission to PAUSE/CPAN.
+
+2011-02-04 05:43:22 +0000 Lott Caskey <lottcaskey@gmail.com> 
+
+	* Update of tts-hashing and cache file creation.
+
+2011-01-03 02:48:55 +0000 Lott Caskey <lottcaskey@gmail.com> 
+
+	* Add agi_tts_sayphrase module.
+
+2011-01-02 01:25:27 +0000 Lott Caskey <lottcaskey@gmail.com> 
+
+	* Do not add if it is a directory.
+
+2010-12-24 00:07:08 +0000 Lott Caskey <lottcaskey@gmail.com> 
+
+	* chmod on pattern match.  Fix oct() typos.
+
+2010-12-23 23:36:47 +0000 Lott Caskey <lottcaskey@gmail.com> 
+
+	* Update permissions for web access to media files.
+
+2010-12-23 13:40:28 +0000 Lott Caskey <lottcaskey@gmail.com> 
+
+	* Type on _mimemap.  In media_save_file, mkdir if it doesnt exist.
+
+2010-12-23 09:45:42 +0000 Lott Caskey <lottcaskey@gmail.com> 
+
+	* Add osdial_media and osdial_media_data tables.  Create media_* methods in perl-OSDial.  Add documentation to perl-OSDial.  Create osdial_media_sync.pl.  Add osdial_media_sync.pl to cron.  Add media mimetypes to httpd-osdial.conf.
+
+2010-12-15 11:22:39 +0000 Lott Caskey <lottcaskey@gmail.com> 
+
+	* Added function to load the configuration table on OSDial PM startup.  Add unique index to configuration.
+
+2010-12-15 08:30:12 +0000 Lott Caskey <lottcaskey@gmail.com> 
+
+	* Reformatted server.php.  Added server_stats table.  Added server_profile to servers tables.  Added ArchiveReportPath to configuration.  Added server_profile selection to server.php.  Added ArchiveReportPath option to the Archive Server panel.  Modified osdial_resource_listen and osdial_resource_send to write to database instead of multicast and left multicast code as an option (--multicast).  Added routine to osdial_astgen to update Archive Server properties if blank.  Rewrote AST_audio_archive.pl AST_audio_compress.pl, and AST_sort_recordins.pl ro use Archive Server properties.
+
+2010-07-16 23:57:09 +0000 Lott Caskey <lottcaskey@gmail.com> 
+
+	* GUI-based carrier configuration.
+
+2010-06-04 13:35:10 +0000 Lott Caskey <lottcaskey@gmail.com> 
+
+	* Variable typo.
+
+2010-05-31 18:16:26 +0000 Lott Caskey <lottcaskey@gmail.com> 
+
+	* Modufy sql_connect to allow the specification of the DB to connect too.
+
+2010-04-16 13:27:04 +0000 Lott Caskey <lottcaskey@gmail.com> 
+
+	* Added AGI support to perl-OSDial.
+
+2010-04-16 13:26:43 +0000 Lott Caskey <lottcaskey@gmail.com> 
+
+	* Make perl-OSDial default to vendors Installation.
+
+2010-04-07 10:12:50 +0000 Lott Caskey <lottcaskey@gmail.com> 
+
+	* OSDial Perl module.
+

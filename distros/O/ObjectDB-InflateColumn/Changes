@@ -1,0 +1,6 @@
+Revision history for Perl extension ObjectDB::InflateColumn.
+
+0.01  Thu Nov 17 13:45:07 2011
+	- original version; created by h2xs 1.23 with options
+		-AX ObjectDB::InflateColumn
+

@@ -1,0 +1,48 @@
+[%- USE CGI -%]
+<?xml version="1.0" [%- IF config.http_charset %]encoding="[% config.http_charset %]"[%- END %]?>
+<rdf:RDF
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+  xmlns:dc="http://purl.org/dc/elements/1.1/"
+  xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#"
+  xmlns:foaf="http://xmlns.com/foaf/0.1/"
+  xmlns="http://purl.org/rss/1.0/"
+>
+
+<rdf:Description rdf:about="">
+[% IF criteria_title %]
+  <dc:title>[% CGI.escapeHTML( criteria_title ) %]</dc:title>
+[% ELSE %]
+  <dc:title>RDF index</dc:title>
+[% END %]
+  <foaf:topic rdf:resource="#listing" />
+</rdf:Description>
+
+<!-- [% nodes.size %] nodes found. -->
+
+<rdf:Bag rdf:ID="listing">
+[%- FOREACH node = nodes %]
+[% metadata = node.node_data.metadata %]
+
+  [%- IF metadata.os_x.list.first || metadata.os_y.list.first || metadata.wgs84_lat.list.first || metadata.wgs84_long.list.first ||
+        metadata.locale.list.first || metadata.address.list.first || metadata.postcode.list.first || metadata.map_link.list.first -%]
+    [% nodeType = 'geo:SpatialThing' %]
+  [%- ELSE -%]
+    [% nodeType = 'rdf:Description' %]
+  [%- END -%]
+
+  <rdf:li>
+    <[% nodeType %] rdf:about="[% full_cgi_url %]?id=[% node.param %];format=rdf#obj">
+      <rdfs:seeAlso rdf:resource="[% full_cgi_url %]?id=[% node.param %];format=rdf" />
+      <dc:title>[% node.name %]</dc:title>
+      [% IF metadata.wgs84_lat.list.first AND metadata.wgs84_long.list.first %]
+      <geo:lat>[% metadata.wgs84_lat.list.first %]</geo:lat>
+      <geo:long>[% metadata.wgs84_long.list.first %]</geo:long>
+      [% END %]
+      <link>[% full_cgi_url %]?[% node.param %]</link>
+    </[% nodeType %]>
+  </rdf:li>
+[% END %]
+</rdf:Bag>
+
+</rdf:RDF>

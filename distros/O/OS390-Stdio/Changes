@@ -1,0 +1,131 @@
+##################################################################
+
+Special notes for release 0.008:
+--------------------------------
+Some XS modifications were done to Stdio.xs so that this extension
+should compile under either Perl 5.6.1 (a version where Perl uses stdio) 
+or Perl 5.8.0 (Perl defaults to PerlIO) on z/OS.
+Very big thanks Brad Van Duser and Nick Ing-Simmons.
+
+Test failure reported under z/OS 1.2 with a dynamic loading Perl 5.8.0
+include:
+
+    ok 151
+    dynalloc() failed with error code 9700, info code 50 at test.pl line 535.
+    not ok 152
+    ok 153
+
+    ok 156
+    dynfree() failed with error code 438, info code 50 at test.pl line 567.
+    not ok 157
+    ok 158
+    svc99() failed with error code 484, info code 0 at test.pl line 617.
+    not ok 159
+    ok 160
+
+##################################################################
+
+Special notes for release 0.007:
+--------------------------------
+Nothing special, just some documentation fixes and a Makefile.PL
+fix for compatibility with the MakeMaker that ships with Perl 5.8.0.
+Thanks to Vincent Herried and Brad Van Duser.
+
+##################################################################
+
+Special notes for release 0.006:
+--------------------------------
+The svc99() routine is now functional.
+An smf_record() routine is now available yet will be
+untested by test.pl owing to SMF deployment differences.  See
+the smf_test enclosed program for a way to test smf_record()
+before running `make install`.
+
+The stdio_cookbook.pod document has been expanded.
+
+You now have the option of passing data set names (e.g. partial
+names) to the get_dcb() and getname() routines in addition to still
+being able to pass mvsopen() file handles.
+
+All 161 tests ought to pass for you.
+
+##################################################################
+
+Special notes for release 0.005:
+--------------------------------
+The dynalloc() routine is now functional.
+The dynfree() routine is now functional.
+
+The pds_mem() routine and the internal _pds_mem() function should
+now be a bit more efficient than the previous release.  pds_mem()
+can now list aliases or aliases and non alias members
+depending on the value of an extra optional argument.
+
+* A pds_mem() test has been folded into test.pl, along with a
+  dynalloc() and a dynfree() test.  All 76 tests ought to pass for
+  you.
+
+##################################################################
+
+Special notes for release 0.004:
+--------------------------------
+The pds_mem() routine now does a better job of EXTENDing the 
+perl XS ST-ack and ought to work with PDS'es that have more than
+100 members.  It does not list ALIAS members as was noted
+in testing (and documented in Stdio.pm).  A more extensive
+test of pds_mem() has yet to be written.  All 70 tests ought to
+pass for you though.
+
+##################################################################
+
+Special notes for release 0.003:
+--------------------------------
+The pds_mem() function is now functional.
+
+##################################################################
+
+Special notes for release 0.002:
+--------------------------------
+None of the catalog/VTOC dslist functions (vol_ser dsname_level) work.
+
+The pds_mem() function is not yet operational.
+
+resetpos() and forward() have been added along with regression tests.
+
+The bug in get_dcb() has been fixed.
+
+The bug in mvswrite() has been fixed.
+
+None of the vsam routines [locate() update() delrec()] have been tested
+at all.
+
+##################################################################
+
+
+Special notes for release 0.001:
+--------------------------------
+
+None of the catalog/VTOC functions (vol_ser dsname_level) work
+
+The pds_mem function is not yet operational.
+
+rewind always seems to return undef.
+
+mvswrite can cause trouble, *I do not recommend using it with
+valuable data just yet*.
+
+None of the vsam routines (locate update delrec) have been tested
+at all.
+
+the dsname key from the return value of get_dcb is not working.
+
+make test fails these for me:
+
+not ok 19
+not ok 36
+not ok 39
+not ok 40
+not ok 45
+not ok 53
+
+

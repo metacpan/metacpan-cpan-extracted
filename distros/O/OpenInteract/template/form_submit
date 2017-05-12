@@ -1,0 +1,6 @@
+[%########################################
+  form_submit( name, value, field_label )
+     Submit button
+  ########################################-%]
+
+<input type="submit" value="[% value %]" name="[% name %]"> [% field_label %]

@@ -1,0 +1,998 @@
+NAME
+     OOPS - Object Oriented Persistent Store
+
+SYNOPSIS
+     use OOPS;
+
+     transaction(sub {
+            $oops = new OOPS 
+                    dbi_dsn => $DBI_DSN, 
+                    username => $username, 
+                    password => $password,
+                    table_prefix => "MY",
+                    readonly => 0;
+
+            $oops->commit;
+
+            $oops->{my_1st_bit_of_data} = 'a scalar';
+            $oops->{my_2nd_bit_of_data} = { A => 'hash' };
+            $oops->{my_3rd_bit_of_data} = [ qw(An Array) ];
+            $oops->{my_4rd_bit_of_data} = \'a reference to a scalar, ref, hash, or array' ];
+
+            my $old_value = $oops->{multiple}{level}{dereference};
+
+            my $object = $oops->load_object($integer_object_id);
+
+            my $dbh = $oops->dbh();
+
+            $oops->workaround27555($reference);
+
+            my $was_virtual = $oops->virtual_object(\%{$oops->{some}{hash}, [ $new_value ]);
+
+     });
+
+     my $ref = getref(%hash, 'key')
+
+DESCRIPTION
+    The goal of OOPS is to make perl objects easily and transparently
+    persistent. OOPS handles deeply nested and cross-linked objects -- even
+    object hierarchies that are too large to fit in memory and (with a hint)
+    individual hash tables that are too large for memory. Objects will be
+    demand-loaded into memory as they are accessed. All changes to your
+    object hierarchy will be saved with a single commit().
+
+    Full transactional consistency is the only operational mode. Either all
+    of your changes are saved or none of them are. While your program runs,
+    you will see a consistent view of the data: no other running
+    transactions will change the data you see. If another transaction
+    changes data that you are using then at least one of the transactions
+    must abort. OOPS will die() to abort the transaction.
+
+    OOPS maps all perl objects to the same RDBMS schema. No advance schema
+    definition is required on the part of the user of OOPS. The name of the
+    package (OOPS) comes from the realization that perl's data model is much
+    more complicated than I initially understood. Internally, the RDBMS
+    schema uses four tables: a table of objects, a table of attributes (keys
+    and values), a table of large attributes that are too big to fit in
+    normal (VARCHAR) columns, and a table of counters.
+
+    At this time, OOPS is expecting a web-like work flow:
+
+     create OOPS instance
+
+     access some objects
+
+     modify some objects
+
+     commit
+
+     exit
+
+    If you need more than one transaction in a program, create more than one
+    OOPS instance.
+
+    To make your data persistent, make a reference to your data from the
+    OOPS object. To later retrieve your data, simply access it through the
+    OOPS object.
+
+EXAMPLE PROGRAM
+     use OOPS;
+
+     transaction(sub {
+            my $oops = new OOPS 
+                    dbi_dsn => 'DBI:mysql:database=MY-DATABASE-NAME;host=localhost', 
+                    username => 'MY-USERNAME', 
+                    password => 'MY-PASSWORD',
+                    table_prefix => "MY-TABLE-PREFIX";
+
+            my $p = $oops->{pages}{"/some/path"};
+
+            $p->{next} = $oops->{pages}{"/some/other/path"};
+            $p->{jpgs} = [ read_file("x.jpg"), read_file("y.jpg") ];
+
+            $oops->commit;
+     });
+
+     exit;
+
+SUPPORTED DATA TYPES
+    Perl blessed and unblessed HASHes, REFs, SCALARs, and ARRAYs are
+    supported. Currently, HASH keys may not be longer than 255 characters.
+    Class names may not be more than 128 characters long. References to hash
+    keys and array elements are supported.
+
+    At the current time, large ARRAYs are not efficient. Use HASHes instead
+    if this matters to you. References to array elements and hash values are
+    not efficient.
+
+    Large HASHes are supported by only loading keys as tehy are accessed.
+
+    HASHes, array elements, and REFs are implemented with tie(). ARRAYs are
+    not currently tie()d because of bugs in perl. Multiple references to the
+    same scalar are supported. References to array elements and hash values
+    are supported. Persistent data is reference counted and cycles must be
+    manually broken to assure de-allocation. A persistent data garbage
+    collector OOPS::GC is supplied if you cannot guarantee to break your own
+    cycles.
+
+SUPPORTED PLATFORMS
+    Support for the following RDBMSs are is included:
+
+    PostgreSQL     OOPS 0.2005 has been tested with PostgreSQL version 9.1.3
+                   on Linux. OOPS 0.2002 has been tested with PostgreSQL
+                   version 8.1.8 on Linux. OOPS 0.1004 was tested with
+                   PostgreSQL version 8.1.4 on Linux. OOPS 0.1003 was tested
+                   with 7.4.2 and 7.3.5 on Linux and 7.3.5 on pre-release
+                   DragonflyBSD. Somewhere between 7.4.2 and 8.1.4
+                   PostgreSQL got more strict about TEXT versus BYTEA types.
+                   OOPS 1.003 was using TEXT where it should have been using
+                   BYTEA. Be sure to upgrade OOPS to 0.1004 or later
+                   *before* upgrading PostgreSQL to 8.x or later.
+
+                   Biggest issue: PostgreSQL runs the test suite more slowly
+                   than mysql or SQLite.
+
+                   On rare occaision PostgresSQL will fail with an "ERROR:
+                   duplicate key violates unique constraint" error. If this
+                   happens inside a call to "transaction()" it will
+                   automatically restart. You only need to worry about this
+                   if you are not using "transaction()".
+
+    mysql          OOPS 0.2005 has been tested with mysql 5.1.46 on Linux.
+                   OOPS 0.2003 has been tested with mysql 5.0.45 on Linux.
+                   OOPS 0.2002 has been tested with mysql 5.0.22 on Linux.
+                   OOPS 0.1004 has been tested with mysql 4.1.15 on Linux.
+                   OOPS 0.1003 was tested with mysql 4.0.16 and 4.0.18 using
+                   InnoDB tables.
+
+                   The OOPS schema for mysql does not support large (>256
+                   byte) hash keys.
+
+                   Mysql locking doesn't work correctly. To get correct
+                   behavior, access to the database must be exclusive
+                   <http://bugs.mysql.com/?id=28029>. This problem is fixed
+                   in 5.0.45.
+
+    SQLite2        DBD::SQLite versions 0.x use SQLite 2.x. DBD::SQLite2 is
+                   the continuation of DBD::SQLite version 0.x codebase and
+                   uses SQLite 2.x.
+
+                   DBD::SQLite2 is not 8-bit clean with respect to "\0".
+                   OOPS uses a DBD::SQLite2 feature to translate binary
+                   nulls. A side-effect is that backslash will be doubled
+                   "\" -> "\\" in DBD::SQLite2 (the extras will be removed
+                   transparently by DBD::SQLite2.
+
+                   OOPS does not use the "counters" table with DBD::SQLite2.
+
+    SQLite         DBD::SQLite versions 1.x use SQLite 3.x.
+
+                   DBD::SQLite versions 1.x leak file descriptors and will
+                   eventually die if you create use and destroy too many
+                   OOPS instances. DBD::SQLite versions 1.x cannot pass the
+                   regression suite and may not be reliable in production
+                   use. Use DBD::SQLite2 instead.
+
+                   OOPS does not use the "counters" table with DBD::SQLite.
+
+                   SQLite is not 8-bit clean with respect to "\0". OOPS uses
+                   a DBD::SQLite feature to translate binary nulls. A
+                   side-effect is that backslash will be doubled "\" -> "\\"
+                   in DBD::SQLite (the extras will be removed transparently
+                   by DBD::SQLite. As of 0.2002, OOPS doesn't make use of
+                   the newer (version 1.x) DBD::SQLite features for handling
+                   nulls.
+
+                   To work around the problem with the leaked file
+                   descriptors, on systems that support "/proc", file
+                   descriptors in excess of
+                   $OOPS::sqlite_v3::enable_fd_leak_workaround (500 by
+                   default) that match the sqlite database file will be
+                   closed when new OOPS instances are created. This
+                   sometimes helps. Set
+                   $OOPS::sqlite_v3::enable_fd_leak_workaround to 0 to
+                   disable.
+
+                   Related bug reports:
+                   <http://rt.cpan.org/Ticket/Display.html?id=20286>,
+                   <http://rt.cpan.org/Ticket/Display.html?id=20288>.
+
+    Perl versions 5.8.2 through 5.12.1 are supported. Prior to 5.8.2, it
+    wasn't possible to untie scalars from within the a tied scalar access
+    method. An ugly workaround is possible if there is enough interest.
+
+    OOPS 0.2002 and 0.1004 have been tested on Linux 2.6.15 (Ubuntu 6.06LTS
+    - Dapper Drake). OOPS 0.1003 was tested on Linux 2.4.23 (Debian unstable
+    as of April '04); on FreeBSD 4.9; and on DragonflyBSD prerelease.
+
+    As far as performance goes, mysql and SQLite are both about twice as
+    fast as PostgreSQL for applications that only have one transaction at at
+    time. SQLite and mysql are particularly slow when there are multiple
+    transactions as their lock granularity is the entire database.
+
+    Each RDBMS uses a somewhat different schema.
+
+FUNCTIONS
+    "transaction($funcref, @args)"
+        "transaction()" is a wrapper for a complete transaction.
+        Transactions that fail due to deadlock with other processes will be
+        re-run automatically.
+
+        The first parameter is a reference to a function. Any additional
+        parameters will be passed as parameters to that function. The return
+        value of "transaction()" is the return value of "&$funcref()".
+
+        It is not necessary to use the "transaction()" method. Beware that
+        nearly any operation on persistent date (even read operations) can
+        cause deadlock.
+
+        Any use of persistent data can trigger a deadlock. The
+        "transaction()" function catches this and retries automatically up
+        to $OOPS::transaction_maxtries times (15 times unless you change
+        it). If you don't use "transaction()" you might want to catch the
+        exceptions that "transaction()" catches. To do this, you can regex
+        match $@ against $OOPS::transfailrx.
+
+        Basically, transaction is a slightly fancier version of the
+        following:
+
+         sub transaction
+         {
+                my ($sub, @args) = @_;
+                for (0..15) {
+                        eval {
+                                &$sub(@args);
+                        }
+                        last unless $@;
+                        next if $@ =~ /$OOPS::transfailrx/;
+                        die $@;
+                }
+         }
+
+        The important thing to notice is that your code will be called over
+        and over until the transaction succeeds. This means you should write
+        your code so that it doesn't have any external side effects until
+        after it calls commit().
+
+        The following package variables are available during transactions:
+
+        $OOPS::transaction_tries
+            The number of attempts at this transaction. Starts with 1.
+
+        $OOPS::transaction_maxtries
+            The maximum number of attempts that will be made.
+
+        $OOPS::transaction_failure_sleep
+            The minimum amount of time to "sleep()" if the transaction
+            fails.
+
+        $OOPS::transaction_failure_maxsleep
+            The maximum amount of time to "sleep()" if the transaction
+            fails.
+
+        @OOPS::transaction_rollback
+            A list of functions to call in the event of a transaction
+            rollback (code refs).
+
+    "getref(%hash, $key)"
+        References to tied hash keys are buggy in all perls through 5.8.7
+        (and beyond?). Use "getref(%hash, $key)" to create your reference to
+        a tied hash key. See:
+        <http://rt.perl.org/rt3/Ticket/Display.html?id=27555> and
+        <http://rt.perl.org/rt3/Ticket/Display.html?id=29224>.
+
+         $ref = getref(%hash, $key);
+
+        Alternatively, use "$oops->workaround27555($ref)".
+
+        Getref() and workaround27555() work around all the perl bugs with
+        tied hash key references. Failure to use them may result in
+        unexpected and inconsistent results.
+
+    "walk_hash(%hash, $stride, [ $previous_last_key ])"
+        If you have a large virtual hash, you may want to be able to iterate
+        over the keys in the hash as a bunch of transactions rather than as
+        one transaction.
+
+        Walk_hash() can be called on any HASH. If it isn't an OOPS virtual
+        hash, it will return keys in batches just like if it had been called
+        on an OOPS virtual hash.
+
+        Here is an example of how to use it:
+
+         my $stride = 20;
+         my $done = 0;
+         my $lastkey;
+         while (not $done) {
+                transaction(sub {
+                        my $oops = OOPS->new(...);
+                        my @things = walk_hash(%{$oops->{my_table}}, $stride, $lastkey);
+                        for my $thing (@things) {
+                                # do stuff
+                        }
+                        $lastkey = $things[$#things];
+                        $done = 1 unless @things == $stride;
+                });
+         }
+
+        Here is another example of how to use it (with OOPS::TxHash):
+
+         use OOPS::TxHash;
+
+         my $stride = 20;
+
+         my %real_todo = ( stuff => undef );
+         while (%real_todo) {
+                transaction(sub {
+                        my $th = tie my %todo, 'OOPS::TxHash', \%real_todo or die;
+                        my $oops = OOPS->new(...);
+
+                        if (exists $todo{stuff}) {
+                                my @keys = walk_hash(%{$oops->{stuff}}, $stride, $todo{stuff});
+
+                                for my $k (@keys) {
+                                        # work on $oops->{stuff}{$k}
+                                }
+
+                                $todo{stuff} = $keys[$#keys];
+                                delete $todo{stuff} unless @keys == $stride;
+                        }
+
+                        $oops->commit;
+                        $th->commit;
+                });
+         }
+
+        Here is yet another example (with a wrapper function):
+
+         walk_eval(20, 
+                sub { OOPS->new(...) },
+                sub { my $oops = shift; $oops->{my_table} },
+                sub { 
+                        my ($oops, $thing) = @_;
+                        # do stuff
+                },
+                allatonce => 0
+         );
+
+         sub walk_eval
+         {
+                my ($stride, $get_oops, $get_hash, $agent, %opts) = @_;
+                my $done = 0;
+                my $last = undef;
+                $stride ||= 100;
+                while (! $done) {
+                        transaction(sub {
+                                my $oops = &$get_oops();
+                                my $hash = &$get_hash($oops);
+                                my @items = walk_hash(%$hash, $stride, $last);
+                                if ($opts{allatonce}) {
+                                        &$agent($oops, @items);
+                                } else {
+                                        for my $item (@items) {
+                                                &$agent($oops, $item);
+                                        }
+                                }
+                                $oops->commit();
+                                $last = $items[$#items];
+                                $done = 1 unless @items == $stride;
+                        });
+                }
+         }
+
+PUBLIC CLASS METHODS
+    "OOPS->new(%parameters)"
+        Creates a OOPS object instance. More than one object instance is
+        allowed at the same time. Instances are unaware of each other.
+        Making a reference from a persistent object in one instance to a
+        persistent object in another instance will cause recursive copying
+        from one instance to the other. (Untested).
+
+        The %parameters are documented in the next section.
+
+    "OOPS->initial_setup(%parameters)"
+        Drops and recreates the database tables. Don't use it too often :-)
+        The regression suite drops and re-creates the tables many times.
+
+        The %parameters are documented in the next section.
+
+PARAMETERS FOR NEW
+    The "new()" and "initial_setup()" methods take a hash specification for
+    their behavior. Here are the parameters allowed:
+
+    "dbi_dsn" / $ENV{OOPS_DSN} / $ENV{OOPS_DRIVER} / $ENV{DBI_DSN} /
+    "$ENV{DBI_DRIVER"
+        Many ways to specify the DSN for DBI: as an argument; as an OOPS
+        environment variable; as a DBI environment variable. Use at least
+        one :-) See the DBI documentation for more details.
+
+    "user" / $ENV{OOPS_USER} / $ENV{DBI_USER}
+        Three ways to specify the user for DBI: as an argument; as an OOPS
+        environment variable; as a DBI environment variable. Not required
+        for all databases.
+
+    "password" / $ENV{OOPS_PASS} / $ENV{DBI_PASS}
+        Three ways to specify the password for DBI: as an argument; as an
+        OOPS environment variable; as a DBI environment variable. Not
+        required for all databases.
+
+    "readonly"
+        If true, commit() will be disabled and the transaction isolation
+        level will be set to READ COMMITTED instead of SERIALIZABLE for the
+        databases where this matters (mysql, PostgreSQL). This should be
+        used if you plan to scan across large amounts of data because
+        otherwise everything you read will end up locked. This feature is
+        still experimental (not covered by the test suite).
+
+    "less_caching"
+        If true, iterating over the keys of a virtual hash (see
+        "virtual_object") will not cache the key values in memory. If your
+        virtual hash is too big to fit in memory, this is a very good idea.
+        Alternatively, you can use the "clear_cache" method (below). This
+        feature is still experimental (not covered by the test suite).
+
+    "table_prefix" / $ENV{OOPS_PREFIX}
+        OOPS allows a prefix to be supplied for it's internal table names.
+        If you set a prefix of "FOO_" then it will use a "FOO_object" table
+        instead of an "object" table. This can be set as an argument to
+        "new()" or it can be set with the environment variable $OOPS_PREFIX.
+        This allows multiple separate object spaces to exist within the same
+        backend SQL database. It's intended use is to support testing vs.
+        production environments but it could also be used to segregate
+        object spaces that don't link to each other.
+
+        The current tables and indexes are:
+
+        object         Each row is an object.
+
+        attribute      Each row is an attribute value in an object.
+
+        big            Each row is a large attribute value.
+
+        counters       Counters for things like object ids.
+
+        temp           A temporary table.
+
+        group_index    Object grouping index.
+
+        value_index    Lookup by attribute value.
+
+    "auto_upgrade" / $ENV{OOPS_UPGRADE}
+        The relational schema for OOPS is not same for all versions of OOPS.
+        If this is set, then an older schema will be upgraded to the current
+        schema. If this is not set, then OOPS will use the older schema
+        unchanged. In most cases, this means that OOPS will use a historical
+        version of itself rather than the current version. See the SCHEMA
+        VERSIONS section of this document.
+
+    "auto_initialize" / $ENV{OOPS_INIT}
+        The DBMS must be initialized before it can be used: tables created,
+        a few rows inserted, etc. This can be handled by calling
+        "initial_setup()" or it can be handled automatically by "new()" if
+        "auto_initialize" or $OOPS_AUTO_INIT is set.
+
+    "default_synchronous" / $ENV{OOPS_SYNC}
+        With SQLite, an additional parameter to "OOPS->new()" is recognized:
+        "default_synchronous". Possible values are:
+
+        FULL    Sync() all transactions to disk before returning.
+
+        NORMAL  The default: sync() at critical moments only - protects
+                against program failure, but not all power or OS failures.
+
+        OFF     Don't sync() at all and go really fast.
+
+PUBLIC OBJECT METHODS
+    "->commit()"
+        Writes any changed objects back to the database and commits the
+        transaction. Currently only one commit() call is allowed. Do not
+        access your persistent data after commit() -- it may work but this
+        is not covered well in the regression suite.
+
+    "->virtual_object(\%hash [,$new_value])"
+        Queries [and sets] the load-virtual flag on a persistent hash.
+        Hashes that load virtual will do separate queries for each key
+        rather than load the entire hash. This is a good thing if your has
+        has lots of keys. This flag takes effect the next time the hash is
+        loaded. The value is a perl boolean.
+
+        This may be handled automatically in the future.
+
+    "->workaround27555($reference)"
+        References to tied hash keys are buggy in all perls through 5.12.1
+        (and beyond?). Use workaround27555($reference) to register your new
+        tied hash key references so that they can be transformed into
+        references that actually work correctly.
+
+         $ref = \%hash{$key};
+         $oops->workaround27555($ref);
+
+        "workaround27555()" is harmless if called on other sorts of
+        references so it is safe to use indiscriminately. See
+        <http://rt.perl.org/rt3/Ticket/Display.html?id=27555>.
+
+        Alternatively, use "getref(%hash, $key)".
+
+    "->dbh()"
+        This returns the main DBI database handle used by OOPS. This
+        function is provided for those who want to hand-write queries.
+        Please note: no changes are written to the DBMS by OOPS until
+        "$oops-"commit()>.
+
+    "->load_object($id)"
+        This will load a persistent object by number. It returns the object
+        or undef if the object doesn't exists. This function is provided for
+        those who want to hand-write queries.
+
+    "->clear_cache()"
+        This will clear out some of the cache that oops maintains. It is
+        useful if you're iterating over the keys of a large virtual object
+        and don't want to overflow memory. This feature is still
+        experimental (not covered by the test suite).
+
+    "->lock($ref)"
+        Lock an object or a scalar. While this is never needed for
+        transactional consistentcy within the OOPS data, it can be useful
+        for transactions that have external side-effects like sending an
+        email. In theory, if you pre-lock everything you might change, your
+        transaction will not need to be rolled back due to deadlock. When
+        you lock an object, it is the object record that is locked, not the
+        contents. Locking "\%hash" won't stop another process from modifying
+        "$hash->{key}". Lock "\$hash->{key}" if you want that.
+
+LIMITATIONS, ERRATA, DEVELOPMENT STATUS, BUGS
+    OOPS has been thoroughly tested. The regression suite is very well
+    developed: there is twice as much code in the test suite as there is in
+    the module itself. The suite does over 1.5million tests. I have so much
+    confidence in my test suite, I'm offering a bounty on bugs!
+
+  Limitations
+    OOPS caches in memory all data that is pulled in during a transaction.
+    For "virtual_object" hash'es only, there are ways to prevent absolutely
+    everything from being cached (the "less_caching" contructor agrument and
+    the "clear_cache" method) but for other objects you need to have enough
+    memory to hold everything you touch.
+
+    You can only call ->commit once per OOPS instance. The cache is emptied
+    when the OOPS instance is destroyed. This means that OOPS will be
+    loading up its cache over and over.
+
+  Known bugs in OOPS
+    memory leaks
+        OOPS currently has memory leaks. This may or may not matter to your
+        application. The rate of leakage varies depending on which RDBMS is
+        used. SQLite seems to have the most significant problems. Most of
+        the leaks are not in OOPS itself but in the modules it uses and thus
+        are not easily addressed by changing OOPS.
+
+    delayed DESTROY
+        Additional references to the in-memory copies of persistent data are
+        kept by OOPS. These extra references will prevent DESTROY methods
+        from being called as soon as they otherwise would be. They'll
+        usually be delayed until the OOPS object is itself DESTROYed.
+
+    other magic
+        Other perl magic attributes are not currently stored persistently.
+        Many probably could be supported, but many could not. For example,
+        taint does not work on tied hashes:
+        <http://rt.perl.org/rt3/Ticket/Display.html?id=6758>.
+
+    unreferenced blessed scalars
+        When you bless a reference to a scalar value, the blessing is stored
+        with the scalar, not the reference. The blessing remains even if
+        there is no reference to the scalar. The following code prints
+        "true".
+
+         my $x = 'foobar';
+         my $y = \$x;
+         bless $y, 'baz';
+         $y = 7;
+         $y = \$x;
+         my $z = ref($y);
+         print "true\n" if $z eq 'baz';
+
+        At the current time, OOPS does not store such blessings. OOPS does
+        not remember blessings when there isn't a reference.
+
+    re-blessing the OOPS object
+        Reblessing the OOPS object is not supported.
+
+    DBD::Pg and ASCII NULL
+        DBD::Pg does not easily support ASCII NULL. OOPS has only partial
+        support for ASCII NULL with PostgreSQL. Everthing works, but don't
+        have ASCII NULL in your class names.
+
+    Circular references sometimes break
+        OOPS mostly allows you to make circular self-references:
+
+         my $x;
+         $x = \$x;
+
+        In some (rare) cases circular self-references sometimes break. Since
+        I can't think on any good reason to make a circular self-reference,
+        I'm not going to fix this bug.
+
+    Long hash keys
+        The database schema for OOPS does not support huge hash keys.
+
+  Bugs in perl that effect OOPS
+    References to hash keys
+        Persistent hashes are implemented with tie. There are bugs with
+        perl's implementation of references to tied hash keys. These bugs
+        will be triggered in several situations: creating a reference to
+        tied hash key that doesn't exist yet; deleting a key that has a
+        reference tied to it; assigning through a reference to a key that
+        has multiple references.
+
+        All of the above can either be avoided or you can workaround them by
+        either calling "workaround27555"($YOUR_REFERENCE) whenever you
+        create a tied hash key reference or by using "getref(%hash, $key)"
+        to create your reference.
+
+        The perl bugs are documented in:
+        <http://rt.perl.org/rt3/Ticket/Display.html?id=27555> and
+        <http://rt.perl.org/rt3/Ticket/Display.html?id=29224>.
+
+    "local" and tie
+        "local(%some_tied_hash)" doesn't work right. Thus
+        "local(%some_persistent_hash)" won't work right either:
+        <http://rt.perl.org/rt3/Ticket/Display.html?id=6017>.
+
+    "scalar(%hash)"
+        Tied "scalar(%hash)" support was added in perl 5.8.3 and does not
+        exist in 5.8.2.
+
+    Tied arrays don't work right
+        There are a couple of bugs with tied arrays that prevent OOPS from
+        using them: <http://rt.perl.org/rt3/Ticket/Display.html?id=22570>
+        and <http://rt.perl.org/rt3/Ticket/Display.html?id=22571>. OOPS
+        fully loads arrays into memory to work-around this problem. This
+        isn't a big deal unless you've got big arrays.
+
+        This was fixed in perl 5.10, but OOPS does not yet take advantage of
+        tied arrays.
+
+    SQLite and perl's malloc().
+        If SQLite is used with a perl that has been compiled to use perl's
+        "malloc()", it will report LOTS of "Bad free() ignored (PERL_CORE)"
+        errors. It is not currently known if these errors are harmful beyond
+        generating lots of output to STDERR. The default perl configuration
+        on FreeBSD uses perl's "malloc()".
+
+SCHEMA VERSIONS
+    As OOPS is developed, the database schema that OOPS uses changes.
+
+    OOPS notices if the version of the schema in the DBMS is different than
+    the version the code currently supports. When this happens there are two
+    possibilities: either OOPS will upgrade the schema to the current
+    version or it will use an older version of OOPS to access the data. See
+    the "auto_upgrade" notes in the PARAMETERS FOR NEW section.
+
+    This behavior allows the OOPS module to be upgraded without disrupting
+    installed applications.
+
+DATABASE ADMINISTRATION
+    Like Perl, OOPS uses reference counting. If you have circular data
+    structures and you delete all you references to the circular data
+    structure, you'll leak persistent memory.
+
+    Use OOPS::GC to mop up the leak.
+
+    Previous versions of OOPS have had bugs that caused the reference counts
+    on the persistent data to become inaccurate. Use OOPS::Fsck to fix such
+    problems. Do this before once, before using OOPS::GC.
+
+FUTURE DIRECTIONS
+    OOPS isn't done. There are a bunch of things that I am considering
+    adding to it. If any of these things is important to you, speak up so
+    that I know there is interest...
+
+    fix the bugs
+        There are bugs listed in the DEVELOPMENT STATUS section that could
+        be fixed. First up is fixing the memory leaks that are in OOPS
+        itself.
+
+    code cleanup and general performance enhancements
+        The initial releases of OOPS concentrated on correct behavior and
+        other aspects of the module were somewhat ignored. The code could be
+        cleaned up a bunch.
+
+    perl-syntax SQL query translator
+         SELECT Employee WHERE $Employee->{salary} > 5000
+
+        It's possible to translate perl-syntax queries into real SQL that
+        can be used to query the object store.
+
+    better grouping
+        Objects are loaded in groups rather than individually. There is much
+        room for improvement in choosing how groups are formed. This is
+        largely undeveloped as yet.
+
+    caching
+        Many possibilities. A cache-invalidation daemon to note when objects
+        have changed. Re-verification of touched data from the database.
+        Ability to call commit() more than once.
+
+    weak references
+        Support for persistent weak references is possible.
+
+    external references to objects
+        Currently objects are reference counted internally. You must have a
+        reference to something from an already existing object for it to
+        continue to exist.
+
+    contracts
+        OOPS has to do a lot of scanning of objects to see if they've
+        changed. Explicit notification of changes would improve performance.
+
+        OOPS could call functions before saving and after loading to
+        transform objects for a better or cleaner on-disk representation.
+
+    support for 'base' & accessor methods
+        This isn't something that I care about but maybe someone else does?
+
+    schema enforcement
+        Allow explicit schemas to be defined. Do not save objects that don't
+        conform. Eg: Hash::Util::lock_keys().
+
+    RDBMS -> object mapping
+        Map existing RDBMS schemas into objects.
+
+    data viewer
+        Viewing large datasets of deep and cross-linked data is difficult.
+        Perhaps a CGI-based or Tk-based data navigator would help.
+
+    support for tied data structures
+        It is possible to support storing tied data. The tied object is what
+        would need to be persistent. This would only work on some kinds of
+        ties.
+
+    support for other base types.
+        Right now, just HASH, SCALAR, REF, and ARRAY are supported. Regular
+        expressions, file handles, I don't know it's possible to support
+        code references.
+
+    on-line data migration
+        By doing double updates, OOPS could support live migration from one
+        DBMS to another.
+
+WRITING SQL QUERIES BY HAND
+    If you want to query your data, then until a translator is written, your
+    only choice for making queries is to write them by hand. Using your data
+    does not require a query: anything you've got a reference to will be
+    loaded as you access it. Queries are for performing searches that don't
+    have a perl-object index.
+
+    Each perl HASH, REF/SCALAR, or ARRAY has a row in the "object" table and
+    multiple rows in the "attribute" and "big" tables.
+
+    Here are the columns you'll care about:
+
+    object      There is one row per perl object.
+
+                id        The object id.
+
+                class     The blessed class name (limited to 255
+                          characters).
+
+                otype     The type of object:
+
+                          'H'  A HASH.
+
+                          'A'  An ARRAY.
+
+                          'S'  A SCALAR or REF.
+
+    attribute   This is a table of key/value pairs. The keys correspond to
+                perl hash keys and perl array indexes. The values correspond
+                to perl hash values and array element values.
+
+                id        The object id.
+
+                pkey      The hash key or array index.
+
+                pval      he hash value or array value. Limited to 255
+                          characters.
+
+                ptype     Flags the type of the value. Possible values are:
+
+                          '0'  A normal value. Numeric or string.
+
+                          'B'  An big value. "pval" will be a copy of the
+                               start of the value for the first N
+                               characters. The end of "pval" will be a MD5
+                               checksum of the full big value.
+
+                          'R'  A reference to another object.
+
+    big         This is a table of values that were too large for the normal
+                columns. Even with databases that support wide columns, a
+                separate big table is used so that you don't load large
+                scalars unless you actually need the value.
+
+                id        The object id.
+
+                pkey      The hash key or array index.
+
+                pval      The hash value or array value. Limited to whatever
+                          the underlying database will support as it's
+                          largest blob.
+
+                fragno    Blob fragment number. This column only exists with
+                          SQLite. SQLite has a smallish maximum row size and
+                          so big values must be split into multiple rows.
+
+    REFs are are special. There are several types of REFs: references to
+    scalar values; references to objects; secondary references to scalar
+    values; references to scalar values that are part of another object
+    (references to hash keys and references to array elements).
+
+    The representation of references is designed so that you don't need to
+    care what sort of REF it is when you're doing a query.
+
+    The basic REF is a ref to a value inside another object. An example:
+
+     OBJECT TABLE
+     id             class           otype
+
+     1              OOPS::NamedObj  H
+     383            SCALAR          R
+     384            SCALAR          R
+     385            SCALAR          R
+     386            REF             R
+     400            HASH            H
+     500            ARRAY           A
+
+     ATTRIBUTE TABLE
+     id             pkey            pval            ptype
+
+     1              A500            500             R
+     1              H400            400             R
+     1              R383            383             R
+     1              R384            384             R
+     1              R385            385             R
+     1              R386            386             R
+
+     383            400             'a-key'         0
+
+     384            384             'nopkey'        0
+     384            'nopkey'        'a-value'       0
+
+     385            384             'nopkey'        0
+
+     386            386             'nopkey'        0
+     386            'nopkey'        500             R
+
+     400            'a-key'         'a-value        0
+     400            'another-key'   'another-value' 0
+     400            'A500'          500             R
+
+     500            0               'a-value'       0
+     500            1               'another-value' 0
+
+    HASH 1 is %$oops.
+
+    REF 383 is a reference to the key 'a-key' in object #400 (a HASH).
+
+    REF 384 is a ref to scalar. It uses two rows to make writing queries
+    easier.
+
+    REF 385 is a duplicate reference to a scalar value. It duplicates REF
+    384. In behavior, these two REFs should be identical even though they
+    are represented differently in the database.
+
+    REF 386 is a ref to an object: #500 (an ARRAY).
+
+    HASH 400 is a normal hash.
+
+    ARRAY 500 is a normal hash.
+
+    This example data is what you would end up with after running code like:
+
+     my $oops = new OOPS 
+            dbi_dsn => 'DBI:mysql:database=MY-DATABASE-NAME;host=localhost', 
+            username => 'MY-USERNAME', 
+            password => 'MY-PASSWORD';
+
+     $oops->{A500} = [ 'a-value', 'another-value' ];
+
+     $oops->{H400} = { 
+            'a-key' => 'a-value',
+            'another-key' => 'another-value',
+            'A500' => $oops->{A500},
+     };
+
+     $oops->{R383} = \$oops->{H400}{'a-key'};
+     $oops->workaround27555($oops->{R383});
+
+     $oops->{R384} = \'a-value';
+
+     $oops->{R385} = $oops->{R384};
+
+     $oops->{R386} = \$oops->{A500};
+
+     $oops->commit;
+
+    SQL queries require a bunch of joins to link data structures together.
+    Here are some examples.
+
+    "SELECT Foobar WHERE $Foobar->{xyz} = 'abc'"
+         SELECT object.id
+         FROM   object, attribute
+         WHERE  object.class = 'Foobar'
+         AND    object.id = attribute.id
+         AND    object.otype = 'H'
+         AND    attribute.pkey = 'xyz'
+         AND    attribute.pval = 'abc'
+         AND    attribute.ptype = '0'
+
+    "SELECT Foobar WHERE ${$Foobar->{xyz}} = 'abc'"
+        This example should show why an automatic translator would be a good
+        idea...
+
+         SELECT ohash.object
+         FROM   object AS ohash,
+                attribute AS ahash,
+                object AS oref,
+                attribute AS aref,
+                attribute AS target
+         WHERE  ohash.class = 'Foobar'
+         AND    ohash.otype = 'H'
+         AND    ahash.id = ohash.id
+         AND    ahash.pkey = 'xyz'
+         AND    ahash.ptype = 'R'
+         AND    oref.id = ahash.pval
+         AND    oref.otype = 'S'                # this is the outer ref
+         AND    oref.id = aref.id               
+         AND    aref.pval = target.pkey         # here's the reference indirection
+         AND    target.pval = 'abc'
+         AND    target.ptype = '0'
+
+    If you construct a query like these examples that return object id's,
+    then use "$object = $oops->load_object($id)" to load them into memory.
+
+    I recommend that hand-written queries be read-only as there are
+    additional columns that must be kept consistent. For example, the object
+    table includes a reference count column to handle garbage collection of
+    the persistent data.
+
+RUNNING THE REGRESSION TEST SUITE
+    The regression test suite empties and re-creates the persistent store
+    over and over again. To prevent the accidental erasure of production
+    data, all of the tests require a special environment variable to be set
+    $OOPSTEST_DSN. This variable replaces the normal $DBI_DSN or $OOPS_DSN.
+    Correspondingly there is a $OOPSTEST_USER, $OOPSTEST_PASS, and
+    $OOPSTEST_PREFIX.
+
+    Set these variables to something different than what you use for your
+    production data!
+
+    Most of the tests take a long time to run and are disabled by default.
+    If you can run the full suite in less than six hours please tell me
+    about your configuration.
+
+    Beware mysql logging. On Debian unstable, the default configuration for
+    mysql used to log every SQL statement. Running the test suite to
+    completion will generate several gigabytes of log file. Running out of
+    disk space will cause the tests to fail. On DragonflyBSD the default
+    mysql configuration includes making replication master logs.
+
+THE COMPETITION
+    There are a number of other modules that make perl objects persistent.
+
+    Other object persistence solutions either store data in blobs that
+    cannot be querried or they they're a mapping from a relation database
+    into perl data that does not allow arbitrary data to be stored.
+
+    <http://poop.sourceforge.net/> has an overview of options.
+
+EXAMPLE PROGRAMS
+    The following applications use OOPS: Qpsmtpd::Plugin::Quarantine
+
+LICENSE
+    Copyright(C) 2004-2006 David Muir Sharnoff <muir@idiom.org> Copyright(C)
+    2012 Google, Inc
+
+    OOPS may be used, modifified and redistributed on the same terms as Perl
+    itself.
+

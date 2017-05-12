@@ -1,0 +1,79 @@
+NAME
+    OTRS::SphinxSearch - Implementation of the OTRS search engine by Sphinx
+    search
+
+VERSION
+    version 0.011
+
+SYNOPSIS
+        use OTRS::SphinxSearch;
+        my $sphinx_search = OTRS::SphinxSearch->new(
+            config => $otrs_sphinx_search_config_part, # Optional
+        );
+
+        ... some manipulation with request data ...
+
+        my $results = $sphinx_search->search(
+            SortBy  => $sort_by,            # Optional, default is 'create_time'
+            OrderBy => $order_by,           # Optional, default is 'DESC'
+            Result  => 'ARRAY' | 'COUNT',   # Default is 'ARRAY'
+            %Param,                         # Required
+        );
+
+DESCRIPTION
+    The module is designed as an alternative to the native search OTRS. It
+    serves to generate search queries from OTRS to the full-text search
+    engine Sphinx through module Sphinx::Search. Using this module requires
+    some changes in the OTRS controller: Modules/AgentTikketsearh.pm. These
+    changes relate mainly to the processing of input data. For instance
+    queue names are converted to their IDs. All this is true if you do not
+    want something exotic. Config example of the Sphinx and important parts
+    of the controller are located in the directory "samples/".
+
+METHODS
+  new()
+    Create new OTRS::SphinxSearch object
+
+    Returns: self object
+
+  search()
+    Returns: an array with results or count founded results
+
+  _get_time_slot()
+    Get start and stop time points in UNIX format from calendar format start
+    and stop points
+
+    Returns: Self object with hash refs $self->{time_start}
+    $self->{time_stop}
+
+  _get_time_point
+    Get start and stop time points before or after some time
+
+    Returns: Self object with hash refs $self->{time_start}
+    $self->{time_stop}
+
+CONFIGURATION AND ENVIRONMENT
+    Minimum configuration required to submit name of the index which will be
+    used for searching. Before using this module you will be needed create
+    index. Sample of the Sphinx config you can find in samples/ directory.
+    Also you will be needed override the method which will be get and parse
+    fields of search form. The name of this module is AgentTicketSearch.pm
+    (trimmed version you can look in samples/ directory).
+
+DEPENDENCIES
+    The Sphinx::Search version 0.28 or highter.
+
+SEE ALSO
+    *   <Sphinx:Search>
+
+    *   Time::Piece
+
+AUTHOR
+    Iurii Shikin <shikin@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by REG.RU LLC.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

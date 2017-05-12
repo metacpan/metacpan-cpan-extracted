@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<SITE ID="Chid">
+
+<NAME Lang="en-us">Combined Health Information Database</NAME>
+<INFO Lang="en-us">health relevant information search</INFO>
+
+<URL Type="More"><![CDATA[
+http://chid.aerie.com_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://chid.aerie.com/netacgi/nph-brs?d=CHID&s1=&co1=and&s2=&co2=and&s3=&co3=and&l=_HITS_&Sect1=CINK&op4=and&s4=_QUERY_&pg4=all&co4=and&op5=and&s5=&pg5=all&co5=and&op6=and&s6=&pg6=all&co6=and&op7=and&s7=&pg7=all&Sect2=IMAGE&Sect3=THESOFF&Sect3=PLUROFF&Sect4=HITOFF&p=1&u=%2Fdetail%2Fdetail.html&r=0&f=S
+]]></URL>
+
+
+<VAR Name="_NEXT_"><![CDATA[
+<A  HREF=_NEXT_><IMG ALIGN=MIDDLE SRC=/netaicon/smgif/nxtlstpg.gif
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<TD><A  HREF=_URL_>_TITLE_</A>
+]]></TEMPLATE>
+</SITE>

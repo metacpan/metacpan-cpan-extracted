@@ -1,0 +1,58 @@
+[% IF criteria %]
+  [% INCLUDE header.tt 
+      page_title = "Index of $criteria_title - $site_name"
+   %]
+[% ELSE %]
+  [% INCLUDE header.tt page_title = "Things within $limit of $origin - $site_name" %]
+[% END %]
+[% INCLUDE banner.tt %]
+
+<div id="content">
+
+[% IF !config.content_above_navbar_in_html %]
+  [% INCLUDE navbar.tt %]
+[% END %]
+
+<div id="maincontent">
+<h2>Index of
+  [% IF criteria %]
+    [% links = [] %]
+    [% FOREACH criterion = criteria %]
+      [% links.push( '<a href="' _ cgi_url _ '?' _ criterion.param _ '">' _ criterion.name _ '</a>' ) %]
+    [% END %]
+    [% links.join( ' and ' ) %]
+  [% ELSIF origin -%]
+    things within [%- limit -%] of <a href="[% cgi_url %]?[%- origin_param -%]">[%- origin -%]</a>
+  [% ELSE %]
+    everything on this guide
+  [%- END -%]
+  (<a href="[% feed_base %];format=map">view on a map</a>)
+</h2>
+
+[% INCLUDE index_form.tt %]
+
+<ol class="index_node_list">
+  [% FOREACH node = nodes %]
+     <li><a href="[% cgi_url %]?[% node.param %]">[% node.name %]</a>
+         [% IF node.distance %]([% node.distance %] metres away)[% END %]
+     </li>
+  [% END %]
+</ol>
+</div>
+
+<div id="site_index_feeds">
+  <p>
+    This list is available as
+    <a href="[% feed_base %];format=rdf">rdf</a>,
+    or as a
+    <a href="[% feed_base %];format=rss">rss feed</a>,
+    or as an
+    <a href="[% feed_base %];format=atom">atom feed</a>.
+  </p>
+</div>
+
+[% IF config.content_above_navbar_in_html %]
+  [% INCLUDE navbar.tt %]
+[% END %]
+
+[% INCLUDE footer.tt %]

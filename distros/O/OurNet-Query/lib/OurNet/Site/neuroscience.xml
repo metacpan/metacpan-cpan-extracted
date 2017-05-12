@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<SITE ID="Neuroscience">
+
+<NAME Lang="en-us">Neuroscience Web Search</NAME>
+<INFO Lang="en-us">neural relevant documents search</INFO>
+
+<URL Type="More"><![CDATA[
+post://www.acsiom.org/cgi-bin/nsr/web_evaluate?query=_QUERYSTR_&dataset=server26.ds&dbs=neuro&beg_doc=_NEXT_&num_docs=_UHITS_
+]]></URL>
+<URL Type="Start"><![CDATA[
+post://www.acsiom.org/cgi-bin/nsr/web_evaluate?query=_QUERY_&dataset=server26.ds&dbs=neuro&beg_doc=1&num_docs=_HITS_
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_UHITS_"><![CDATA[
+NAME="num_docs" VALUE="_UHITS_">
+]]></VAR>
+<VAR Name="_NEXT_"><![CDATA[
+NAME="beg_doc" VALUE="_NEXT_">
+]]></VAR>
+<VAR Name="_QUERYSTR_"><![CDATA[
+NAME="query" VALUE="_QUERYSTR_">
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<A HREF="_URL_">_TITLE_</A>___<DD>_PREVIEW_<DT>
+]]></TEMPLATE>
+</SITE>

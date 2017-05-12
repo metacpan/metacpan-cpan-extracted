@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<SITE ID="Orientation.Asia">
+
+<NAME Lang="en-us">Orientation</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+Orientation WWW ·j´M (¨È¬w)
+]]></NAME>
+<INFO Lang="en-us">general information web search in Asia</INFO>
+<INFO Lang="zh-tw">general information web search in Asia</INFO>
+
+<URL Type="More"><![CDATA[
+http://as.orientation.com_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://as.orientation.com/cgi-bin/as/urlsrch?lang=eg&cptr=s&level=1&category=all&page=1&dbselect=RDB&option=Boolean&name=_QUERY_&searchbutton.x=27&searchbutton.y=7
+]]></URL>
+
+<EXPRESSION>Boolean</EXPRESSION>
+
+<VAR Name="_NEXT_"><![CDATA[
+<A HREF="_NEXT_"><FONT COLOR="#000000">[Next]</FONT></A>
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<!-- RECORD HEADER -->___<A HREF="/_URL_"___>_TITLE_</A>___<FONT SIZE=2 FACE="Arial,Helv">_SCORE_%___<!-- RECORD DETAIL: Desc -->_PREVIEW_<BR>
+]]></TEMPLATE>
+</SITE>

@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<SITE ID="FtpSearch">
+
+<NAME Lang="en-us">FTPSearch Service</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+Lycos FTP站台檔案搜尋(英文)
+]]></NAME>
+<INFO Lang="en-us">file download server search</INFO>
+<INFO Lang="zh-tw">file download server search</INFO>
+
+<URL Type="More"><![CDATA[
+http://ftpsearch.lycos.com_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://ftpsearch.lycos.com/cgi-bin/search?type=Case+insensitive+substring+search&hits=_HITS_&matches=&hitsprmatch=&limdom=&limpath=&f1=Size&f2=Name&f3=Date&f4=-&f5=-&f6=-&header=none&sort=none&trlen=20&doit=Search&fancy=on&query=_QUERY_
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+<EXPRESSION>Plain</EXPRESSION>
+<CATEGORY>FTP,General</CATEGORY>
+
+<VAR Name="_NEXT_"><![CDATA[
+<A HREF="_NEXT_">next
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+COLOR="#000000" SIZE=-1><A HREF="_URL_">_TITLE_</A>___<B>_SIZEK_K___-_DATE_<BR>___FTP Site:___">_PREVIEW_</A>___</TD></TR>
+]]></TEMPLATE>
+</SITE>

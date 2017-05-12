@@ -1,0 +1,69 @@
+body {
+    margin: 0;
+    padding: 0;
+}
+body, input, input[type="submit"] {
+    font-size: 14pt;
+    font-family: DejaVu Sans, Helvetica, Arial, sans-serif;
+}
+
+.content {
+    min-height: 12em;
+}
+
+.error {
+    color: red;
+}
+.title {
+    padding: 8pt 16pt 8pt 16pt;
+    background-color: black;
+    color: white;
+}
+.title h1 {
+    font-size: 150%;
+    margin: 0;
+}
+.content {
+    padding: 8pt 16pt 8pt 16pt;
+}
+.footer {
+    padding: 8pt 16pt 8pt 16pt;
+    background-color: black;
+    color: white;
+    font-size: 75%;
+    text-align: right;
+}
+.footer a {
+    color: #CCCCFF;
+}
+.secret_wrapper {
+    width: 80%;
+    height: 8em;
+    margin: auto;
+    padding: 4pt;
+    border: 2px solid grey;
+}
+.show_secret {
+    text-align: center;
+    padding: 3em 1em 3em 1em;
+}
+.secret {
+    padding: 1em;
+}
+
+.form {
+    padding: 1em;
+    border: 2px solid grey;
+    background: #DDD;
+    margin: auto;
+    width: 80%;
+}
+
+.form input {
+    width: 100%;
+    margin: 0.5em;
+}
+
+.form .submit input {
+    width: 50%;
+}

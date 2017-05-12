@@ -1,0 +1,44 @@
+{
+   "abstract" : "PERL modules for manipulating OBO-formatted ontologies, such as the Gene Ontology (GO)",
+   "author" : [
+      "Erick Antezana <erick.antezana -@- gmail.com>, Vladimir Mironov <vladimir.n.mironov -@- gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "ONTO-PERL",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Date::Manip" : "6.42",
+            "ExtUtils::MakeMaker" : "6.84"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Date::Manip" : "6.42",
+            "ExtUtils::MakeMaker" : "6.84"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Date::Manip" : "6.42",
+            "perl" : "5.005"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.45"
+}

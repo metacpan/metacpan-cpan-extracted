@@ -1,0 +1,69 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
+  <head>
+    <title>Sample httpd_modperl.conf File</title>
+  </head>
+
+  <body>
+    <h1>Sample httpd_modperl.conf File</h1>
+
+<pre><font size="-1">
+
+# Change manually:
+#   -- Change '127.0.0.1' to your IP address
+#   -- Change 'webmaster@mycompany.com' to your contact e-mail address
+#   -- Change 'www.mycompany.com' to your website hostname
+#   -- If you wish to run the mod_perl server on a port other than 8080, change it
+
+# NOTE: This is meant to be used in a proxy environment. If you're not
+# running a proxy server in front of this and instead want to run OI
+# standalone, see the file 'httpd_modperl_solo.conf'
+
+# If you're using Named virtual hosts, just remove the 'Listen' line
+
+Listen 127.0.0.1:8080
+&lt;VirtualHost 127.0.0.1:8080&gt;
+Port 8080
+ServerAdmin webmaster@mycompany.com
+ServerName www.mycompany.com
+DocumentRoot %%WEBSITE_DIR%%/html
+
+LogFormat "%h %l %u %t \"%r\" %&gt;s %b \"%{Referer}i\" \"%{User-Agent}i\"" combined
+CustomLog %%WEBSITE_DIR%%/logs/access_log_modperl combined
+ErrorLog  %%WEBSITE_DIR%%/logs/error_log_modperl
+
+# This is necessary so we can bring in the Stash Class properly
+
+&lt;Perl&gt;
+ use lib qw( %%WEBSITE_DIR%% );
+&lt;/Perl&gt;
+
+# This reads in all your SPOPS objects, sets up aliases, database
+# handles, template processing objects, etc.
+
+PerlRequire %%WEBSITE_DIR%%/conf/startup.pl
+
+# This is used to read the 'X-Forwarded-For' header created by the
+# mod_proxy_add_forward.c Apache module that should be compiled into
+# your front-end proxy server. If you don't have this, then every
+# request will appear to come from the proxy server, which can be
+# annoying.
+
+PerlPostReadRequestHandler OpenInteract::ProxyRemoteAddr
+
+PerlSetVar  OIStashClass      %%STASH_CLASS%%
+
+# This sends all incoming requests to the OpenInteract Apache content
+# handler (OpenInteract.pm)
+
+&lt;Location /&gt; 
+    SetHandler perl-script 
+    PerlHandler OpenInteract
+&lt;/Location&gt;
+
+&lt;/VirtualHost&gt;
+
+</font></pre>
+
+  </body>
+</html>

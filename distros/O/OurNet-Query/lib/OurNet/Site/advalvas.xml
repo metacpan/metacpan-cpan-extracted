@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<SITE ID="Advalvas">
+
+<NAME Lang="en-us">Advalvas WWW search</NAME>
+<INFO Lang="en-us">general information web search in Belgium</INFO>
+
+<URL Type="More"><![CDATA[
+http://yellow.advalvas.be_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://yellow.advalvas.be/scripts/yellow002.pl?p=,,,,,,,,,_QUERY_,0
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_NEXT_"><![CDATA[
+<a href=_NEXT_>Next
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<img src="/images/pijlrood.gif_URL_>_TITLE_</a>___color="#000000">_PREVIEW_</font>___</table>
+]]></TEMPLATE>
+</SITE>

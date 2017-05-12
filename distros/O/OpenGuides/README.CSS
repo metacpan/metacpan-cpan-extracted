@@ -1,0 +1,665 @@
+This document specifies all the classes and IDs you can use to create a
+stylesheet for OpenGuides.
+
+Classes
+-------
+
+a.home_link
+    Used in: search_results.tt
+    Purpose: Link to the home page of the site, in the search results page
+
+a.edit_page_link (was div.edit_page_link)
+    Used in: navbar_this_page.tt
+    Purpose: Link to the edit page function, in the navbar
+
+div.admin_completed_action
+    Used in: admin_home.tt
+    Purpose: Display a message confirming the action just taken.
+
+div.confirm_deletion_text
+    Used in: delete_confirm.tt
+    Purpose: Display text asking user to confirm they want to delete a
+             node/version.
+
+div.confirm_moderation_text
+    Used in: moderate_confirm.tt
+    Purpose: Display text asking user to confirm they want to moderate a
+             node/version.
+
+div.disallowed_characters_note
+    Used in: newpage.tt
+    Purpose: Contains text explaining that some characters aren't allowed in
+             node names, and a list of such characters.
+div.disallowed_characters_text
+    Used in: newpage.tt
+    Purpose: Contains text explaining that some characters aren't allowed in
+             node names.
+div.disallowed_characters
+    Used in: newpage.tt
+    Purpose: Contains a list of characters that aren't allowed in node names.
+
+div.edit_form_actions
+    Used in: edit_form_actions.tt
+    Purpose: Contains widgets for previewing, cancelling, and committing an
+             edit.
+div.preview_edit
+    Used in: edit_form_actions.tt
+    Purpose: Contains a button for previewing an edit.
+div.cancel_edit
+    Used in: edit_form_actions.tt, edit_form_preview.tt
+    Purpose: Contains a link for cancelling an edit.
+div.commit_edit
+    Used in: edit_form_actions.tt
+    Purpose: Contains a button for committing an edit.
+
+div.edit_form_group
+    Used in: edit_form.tt openguides_information_boxes.tt node_image_fields.tt
+    Purpose: Handles a single type of data (e.g. locales, phone number,
+             latitude, etc) in the edit form.  Contains a label, an
+             input/select/textarea, and a space where any edit conflict will
+             be flagged up.
+div.edit_box
+    Used in: edit_form.tt openguides_information_boxes.tt node_image_fields.tt
+    Purpose: Contains a input, select, or textarea.
+div.conflict_group
+    Used in: edit_form.tt node_image_fields.tt
+    Purpose: Contains a label and details of an edit conflict for a single
+             type of data.
+div.conflict_box
+    Used in: edit_form.tt node_image_fields.tt
+    Purpose: Contains details of an edit conflict for a single type of data.
+
+div.jump_to_edit_form
+    Used in: edit_form_preview.tt
+    Purpose: Contains a link to jump up or down the page to the edit form,
+             when previewing one's edits.
+
+div.latlong_search
+div.local_coord_search
+div.location_search
+div.text_search
+    Used in: search.tt
+    Purpose: Display inputs for different types of search criteria.  Only
+             appear if the config variable "responsive" is set to true;
+             otherwise, a table is used instead.
+
+div.licence_and_moderation_notes
+    Used in: edit_form.tt
+    Purpose: Contains a description of the guide's licence and details of any
+             moderation of the current node.
+div.licence_notes
+    Used in: edit_form.tt
+    Purpose: Contains a description of the guide's licence.
+div.moderation_warning
+    Used in: edit_form.tt
+    Purpose: Contains details of any moderation of the current node.
+
+div.navbar_group
+    Used in: navbar_*.tt
+    Purpose: Defines a related set of navigation bar functions
+
+div.navbar_group_title
+    Used in: navbar_*.tt
+    Purpose: Titles a related set of navigation bar functions
+
+div.navbar_item
+    Used in: navbar_*.tt
+    Purpose: Defines an item in the navigation bar
+
+div.preview
+    Used in: edit_form_preview.tt
+    Purpose: Container for use with #maincontent when the content is being
+             previewed while editing.
+
+div.preview_actions
+    Used in: edit_form_preview.tt
+    Purpose: Groups together links for cancelling an edit and for jumping
+             up/down the page to the edit form, when previewing one's edits.
+
+div.warning_text
+    Used in: edit_form.tt
+    Purpose: Warns the user that there is an edit conflict
+
+form.confirm_deletion
+    Used in: delete_confirm.tt
+    Purpose: Form for the user to input the moderation password when deleting
+             a node/version.
+
+form.confirm_moderation
+    Used in: moderate_confirm.tt
+    Purpose: Form for the user to input the moderation password when
+             moderating a node.
+
+form.index_nodes
+    Used in: index_form.tt
+    Purpose: Form for user to choose which category and local to display when
+             doing a map or list index.
+
+h1.edit_form_title
+    Used in: edit_form.tt
+    Purpose: Display the main heading on the edit form - e.g. Edit "My Node"
+
+h2.map_index_header
+    Used in: map_index_leaflet.tt
+    Purpose: Display the subheading showing which category and/or locale we're
+             indexing, in the map view.
+
+input.form_button
+    Used in: differences.tt, edit_form.tt, footer.tt, navbar_search.tt,
+             newpage.tt, node.tt, preferences.tt, search.tt
+    Purpose: A standard form button
+
+label.hidden (was span.hidden)
+    Used in: navbar_search.tt
+    Purpose: A label for the search box that will be hidden for users with
+             a CSS-conforming user agent
+
+li.categories_list
+li.locales_list
+li.telephone
+li.address
+li.map
+li.postcode
+li.website_link
+li.opening_hours
+    Used in: display_metadata.tt
+    Purpose: List items containing various metadata bits.
+
+h2.node_name
+    Used in: node.tt
+    Purpose: Displays the node name
+
+h2.recentchanges_section_header
+    Used in: recent_changes.tt
+    Purpose: Sub-header for section showing changes within a given time span.
+
+input.hidden
+    Used in: navbar_search.tt
+    Purpose: Defines content that will be hidden for users with a
+             CSS-conforming user agent
+
+ol.index_node_list
+    Used in: site_index.tt
+    Purpose: List of nodes in given category/locale or within given distance
+             of given point.
+
+span.current_version_title_link
+    Used in: node.tt
+    Purpose: On display of historical versions of nodes, provides a link to
+             the current version.
+
+span.node_name
+    Used in: backlink_results.tt delete_confirm.tt delete_done.tt
+             differences.tt node_history.tt
+    Purpose: Inlines a node name in a snippet of explanatory text,
+             without linking to it.
+
+table.recentchanges_section
+    Used in: recent_changes.tt
+    Purpose: Display recent changes within a given timespan.
+
+td.admin_action
+    Used in: admin_home.tt
+    Purpose: Display possible actions for a node, locale, or category in
+             the "recently edited" table.
+
+td.admin_lastmodby
+    Used in: admin_home.tt
+    Purpose: Display username of the last person to edit a node, locale, or
+             category in the "recently edited" table.
+
+td.admin_lastmode
+    Used in: admin_home.tt
+    Purpose: Display the last-modified time of a node, locale, or category in
+             the "recently edited" table.
+
+td.admin_moderate
+    Used in: admin_home.tt
+    Purpose: Display the moderation status of a node, locale, or category in
+             the "recently edited" table.
+
+td.admin_name
+    Used in: admin_home.tt
+    Purpose: Display the name of a node, locale, or category in the
+             "recently edited" table.
+
+td.admin_version
+    Used in: admin_home.tt
+    Purpose: Display the version number of a node, locale, or category in the
+             "recently edited" table.
+
+td.label
+    Used in: edit_form.tt
+    Purpose: Defines a label for a field
+
+td.newer_version
+td.older_version
+th.newer_version
+th.older_version
+    Used in: differences.tt
+    Purpose: Table cells for displaying chunks of diffs between two versions
+             of a node.
+
+td.recentchanges_comment
+    Used in: recent_changes.tt
+    Purpose: The user's comment on a change
+
+td.recentchanges_meta
+    Used in: recent_changes.tt
+    Purpose: Miscellaneous information about a change
+
+td.recentchanges_node_name
+    Used in: recent_changes.tt
+    Purpose: Name of a node that was changed
+
+td.recentchanges_user
+    Used in: recent_changes.tt
+    Purpose: User who made a change
+
+div.hit_summary
+    Used in: search.tt
+    Purpose: One-line summary of individual search result.
+
+ul.node_history
+    Used in: node_history.tt
+    Purpose: List all versions of a node.
+
+IDs
+---
+
+a#banner_home_link
+    Used in: banner.tt
+    Purpose: A link to the home page in the site banner.
+
+a#banner_navbar_link
+    Used in: banner.tt
+    Purpose: An internal link to the #navbar anchor, appearing in the site
+             banner.  This only appears if the "responsive" config variable is
+             set to true, and should be set to hidden (via CSS) except in
+             narrow-viewport versions which put the navbar at the bottom of the
+             page.
+
+div#backlink_search_results
+    Used in: backlink_results.tt
+    Purpose: Container for the list of nodes which link to a given node.
+
+div#banner
+    Used in: banner.tt
+    Purpose: The site banner/title
+
+div#body_wrapper
+    Used in: header.tt
+    Purpose: Wrap the entire body of the page.
+
+div#content
+div#maincontent
+    Used in: backlink_results.tt, delete_confirm.tt, delete_done.tt,
+	     delete_password_wrong.tt, edit_form.tt,
+	     home_node.tt, newpage.tt, node.tt, node_history.tt, preferences.tt,
+	     recent_changes.tt, search_results.tt, site_index.tt,
+	     search.tt, userstats.tt, wanted_pages.tt, differences.tt
+    Purpose: Defines the main textual content of the page
+             content includes the navbar and footer; maincontent does not
+
+div#coordinates
+    Used in: node.tt
+    Purpose: The physical coordinates of the node
+
+div#create_new_page
+    Used in: newpage.tt
+    Purpose: Contains the form for typing in the new page name, and the note
+             about disallowed characters.
+
+div#find_within_distance
+    Used in: node_location_search.tt
+    Purpose: A section of the node display that allows the user to search
+             for other nodes close by
+
+div#node_location_search
+    Used in: node_location_search.tt
+    Purpose: A section of the node display that contains location based 
+             searches. 
+
+div#node_map_and_image
+    Used in: edit_form_preview.tt, node.tt
+    Purpose: A container for the node map (if shown) and image.  Only appears
+             if the config variable "responsive" is set to true.
+
+div#footer
+    Used in: footer.tt
+    Purpose: The bottom portion of the page
+
+div#footer_delete_link
+    Used in: footer.tt
+    Purpose: Display a "delete this page" link in the footer, if the page is
+    editable, and if page deletion is switched on.
+
+div#header
+    Used in: search_results.tt
+    Purpose: The first part of the page, containing the site name
+
+div#last_five_edits_by_user
+div#rss_feeds_for_user
+div#userstats
+    Used in: userstats.tt
+    Purpose: Containers for various types of user stats.
+
+div#metadata
+    Used in: display_metadata.tt
+    Purpose: The section of the node display with a list of metadata
+
+div#navbar_parent
+    Used in: navbar.tt
+    Purpose: Parent of the navigation bar. If you want to pull bits of the
+              navigation out, and put them next to the main nav bar, you'll
+              want to make this the size of two parts combined, then size
+              them within this.
+
+div#navbar
+    Used in: navbar.tt
+    Purpose: The navigation bar
+
+div#navbar_help
+    Used in: navbar_help.tt
+    Purpose: Display help links, if user has them turned on.
+div#navbar_options
+    Used in: navbar_options.tt
+    Purpose: Display links to options such as "Set username/prefs".
+div#navbar_search
+    Used in: navbar_search.tt
+    Purpose: Display search box and link to advanced search.
+div#navbar_this_page
+    Used in: navbar_this_page.tt
+    Purpose: Display links to this-page stuff such as "Edit this page", if
+    the current page is an editable one.
+div#navbar_tools
+    Used in: navbar_tools.tt
+    Purpose: Display links to tools such as "Recent Changes", "Random Page".
+
+div#navbar_current_version_link
+    Used in: navbar_revision_info.tt
+    Purpose: Display a link to the current version when showing a historical
+    version of an editable node.
+
+div#navbar_last_edited
+    Used in: navbar_revision_info.tt
+    Purpose: Display the last edited time when showing the current version of
+    an editable node.
+
+div#navbar_this_revision_info
+    Used in: navbar_revision_info.tt
+    Purpose: Display the version number and edit time when showing a historical
+    version of an editable node.
+
+div#navbar_version
+    Used in: navbar_revision_info.tt
+    Purpose: Display the version number when showing the current version of
+    an editable node.
+
+div#node_title
+    Used in: node.tt
+    Purpose: Display the node name and an "edit this page" link.
+
+div#nonexistent_node_message
+    Used in: node.tt
+    Purpose: Display message when someone tries to view a nonexistent node.
+
+div#recent
+    Used in: home_node.tt
+    Purpose: Recent changes summary box on the home node
+
+div#home_page_edit_link
+    Used in: home_node.tt
+    Purpose: "Edit this page" link on the home node - only displayed if neither
+    the navbar or the recent changes box are shown, since both those divs also
+    contain an edit link.
+
+div#recent_changes_feeds
+    Used in: recent_changes.tt
+    Purpose: Display links to atom/RSS feeds of the recent changes.
+
+div#search_form
+    Used in: footer.tt
+    Purpose: The search form at the bottom of the page
+
+div#search_results
+    Used in: search.tt
+    Purpose: Container for the list of search results.
+
+div#title_edit_link
+    Used in: node.tt
+    Purpose: Display an "edit this page" link near the node name.
+
+div#version
+    Used in: node.tt
+    Purpose: Text describing the version of the node being displayed
+
+div#node_image_box
+    Used in: display_metadata.tt
+    Purpose: Hold the image for a node.
+    Note: If there is no node image, span#node_no_image will exist instead
+span#node_no_image
+    Used in: display_metadata.tt
+    Purpose: To indicate that there is no image for the node
+img#node_image
+    Used in: display_metadata.tt
+    Purpose: To display the image for a node
+div#node_image_copyright
+    Used in: display_metadata.tt
+    Purpose: To display the name of the copyright holder of a node image, and
+             optionally a link to the licence we're using it under.
+
+div#navbar_starting_points
+    Used in: navbar.tt
+    Purpose: Hold the common locales and categories, if enabled
+div#navbar_locales
+    Used in: navbar_locales.tt
+    Purpose: Hold the common locales, if enabled
+div#navbar_categories
+    Used in: navbar_categories.tt
+    Purpose: Hold the common categories, if enabled
+div#navbar_group_title
+    Used in: navbar_categories.tt, navbar_locales.tt
+    Purpose: Title for the common categories / locales
+ul#navbar_group
+    Used in: navbar_categories.tt, navbar_locales.tt
+    Purpose: Parent list for the common categories / locales
+#navbar_group > li
+    Used in: navbar_categories.tt, navbar_locales.tt
+    Purpose: A common category / locale
+
+fieldset#additional_information
+    Used in: edit_form.tt
+    Purpose: Contains input fields for phone, address, geodata, etc.
+
+fieldset#main_information
+    Used in: edit_form.tt
+    Purpose: Contains input fields for content, categories, locales, and
+             page summary.
+
+fieldset#node_image_fields
+    Used in: node_image_fields.tt
+    Purpose: contains input fields for node image, copyright, etc.
+
+fieldset#openguides_information
+    Used in: openguides_information_boxes.tt
+    Purpose: Contains input widgets for username, comment, and edit type.
+
+form#advanced_search
+    Used in: search.tt
+    Purpose: Form for the user to enter search terms (text and geodata).
+
+form#new_page_form
+    Used in: newpage.tt
+    Purpose: The form for typing in the new page name.
+
+form#preferences_form
+    Used in: preferences.tt
+    Purpose: Form for setting the user's preferences.
+
+input#address
+    Used in: edit_form.tt
+    Purpose: An input field for the address of the node
+
+input#comment
+    Used in: openguides_information_boxes.tt
+    Purpose: An input field for the comment about the change made
+
+input#fax
+    Used in: edit_form.tt
+    Purpose: An input field for the fax number of the node
+
+input#geocache
+    Used in: preferences.tt
+    Purpose: An input field for the preference of whether to display
+             geocache links
+
+input#go
+    Used in: footer.tt, newpage.tt
+    Purpose: A standard button
+
+input#hours
+    Used in: edit_form.tt
+    Purpose: An input field for the opening hours of a node
+
+input#latlong
+    Used in: preferences.tt
+    Purpose: An input field for the display preferences of latitude and
+             longitude
+
+input#map_link
+    Used in: edit_form.tt
+    Purpose: An input field for the map link of the node
+
+input#nav_search
+    Used in: navbar_search.tt
+    Purpose: The search input portion of the navigation bar
+
+input#omit_help
+    Used in: preferences.tt
+    Purpose: An input field for the preference of whether to include
+             help links
+
+input#os_x
+    Used in: edit_form.tt
+    Purpose: An input field for the OS X coordinate of the node
+
+input#os_y
+    Used in: edit_form.tt
+    Purpose: An input field for the OS Y coordinate of the node
+
+input#pagename
+    Used in: newpage.tt
+    Purpose: An input field for choosing the name of a new page
+
+input#password
+    Used in: delete_confirm.tt
+    Purpose: Password field in form for confirming deletion of a node/version.
+
+input#phone
+    Used in: edit_form.tt
+    Purpose: An input field for the telephone number of the node
+
+input#postcode
+    Used in: edit_form.tt
+    Purpose: An input field for the postcode of the node
+	
+input#preview_above
+    Used in: preferences.tt
+    Purpose: An input field for the preference of where to display
+             node previews
+
+input#search
+    Used in: footer.tt
+    Purpose: An input field for the search at the bottom of the page
+
+input#search_lower
+    Used in: search.tt
+    Purpose: An iput field for the lower search in the main search page
+
+input#search_upper
+    Used in: search.tt
+    Purpose: An input field for the upper search in the main search page
+
+input#show_minor
+    Used in: preferences.tt
+    Purpose: An input field for the preference of whether to display
+             minor changes
+
+input#username
+    Used in: openguides_information_boxes.tt, preferences.tt
+    Purpose: An input field for entering the username making changes
+
+input#website
+    Used in: edit_form.tt
+    Purpose: An input field for the web site of the node
+
+select#distance
+    Used in: node.tt
+    Purpose: A selection of how far to search in the "find nearby nodes"
+             function
+
+select#edit_type
+    Used in: openguides_information_boxes.tt
+    Purpose: A selection of whether the change is minor or major
+
+select#metadata_type
+    Used in: missing_metadata.tt
+    Purpose: Display a list of the types of metadata we may wish to check for.
+
+table#categories
+    Used in: admin_home.tt
+    Purpose: Display recently edited categories.
+
+table#locales
+    Used in: admin_home.tt
+    Purpose: Display recently edited locales.
+
+table#needing_moderation
+    Used in: needing_moderation.tt
+    Purpose: Display nodes which have edits pending moderation.
+
+table#nodes
+    Used in: admin_home.tt
+    Purpose: Display recently edited nodes.
+
+    Also used in: missing_metadata.tt
+    Purpose: Display nodes which are missing some metadata.
+
+table#recentchanges
+    Used in: recent_changes.tt
+    Purpose: The main display table of the recent changes page
+
+table#version_diffs
+    Used in: differences.tt
+    Purpose: A table to display diffs between two versions of a node.
+
+textarea#categories
+    Used in: edit_form.tt
+    Purpose: An box to enter the categories of the node
+
+textarea#content_textarea
+    Used in: edit_form.tt
+    Purpose: A box to enter the main conent of the node
+    Note: ID doesn't match class, as IDs have to be globally unique, and we
+           already have a div with ID content
+
+textarea#locales
+    Used in: edit_form.tt
+    Purpose: A box to enter the locales of the node
+
+div#redirect_message
+    Used in: node.tt
+    Purpose: A short message indicating that your reached a node via a redirect
+
+table#wanted_pages
+    Used in: wanted_pages.tt
+    Purpose: A list of all unlinked nodes
+
+div#banner
+    Used in: node.tt
+    Purpose: A one-line summary of what the node is
+
+ul#prefs_saved_extra_nav
+    Used in: preferences.tt
+    Purpose: Offer links to return to site or to edit preferences again.

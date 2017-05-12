@@ -1,0 +1,66 @@
+INSTALLING OPENINTERACT
+=========================
+
+(NOTE: If you're upgrading from version 1.05 or earlier, please read
+the file 'UPGRADE' in this directory.)
+
+
+(1) Run the normal perl install
+
+ perl Makefile.PL
+ make
+ make test (no tests yet...)
+ make install
+
+This procedure will install the base libraries. Normal Perl
+installation rules apply.
+
+OpenInteract uses a number of libraries, and all of them are readily
+available via CPAN. For those on Win32 systems without a compiler,
+most of them are also available via the PPM installation system. Some
+modules requiring compilation are not available via PPM and are
+available at:
+
+ http://openinteract.sourceforge.net/
+
+Instructions for setup and download are located there as well.
+
+(2) Run the OpenInteract install
+
+Without changing directories from the directory where you unpacked the
+OpenInteract distribution, run:
+
+ oi_manage install --base_dir=/path/to/installation
+
+The 'oi_manage' script should have been installed to a publically
+accessible place (e.g., '/usr/local/bin' or '/usr/bin') for you when
+you installed the rest of the library with 'make install'. If not,
+just copy the file 'script/oi_manage' to an accessible place. (You can
+also just run 'script/oi_manage install', but then 'oi_manage' won't
+be accessible to manipulate future websites and configuration
+information. This makes life hard for you. Why do that?)
+
+This command creates the OpenInteract base directory and installs all
+the packages that were distributed with the system.
+
+That's it! OpenInteract is now installed and you should never need to
+do this again. Upgrades to packages and installation of new packages
+are done through the OpenInteract package system (and the 'oi_manage'
+script) and work on existing installations.
+
+
+(3) Read up
+
+Check out the documentation: 
+
+1. INSTALL.website (in this directory): Tells you how to create a new
+OpenInteract website. This document is also copied to the website
+directory when you create it.
+
+2. doc/admin.html: More information about administering OpenInteract,
+including notes about packages, creating websites, and
+building/configuring Apache.
+
+
+=========================
+$Id: INSTALL,v 1.5 2001/10/07 21:12:20 lachoy Exp $

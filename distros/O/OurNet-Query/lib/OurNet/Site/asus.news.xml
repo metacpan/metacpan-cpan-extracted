@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<SITE ID="asus.News">
+
+<NAME Lang="en-us">ASUS Usenet News Search</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+華碩討論群搜尋(中文)
+]]></NAME>
+<INFO Lang="en-us">product relevant discussion search in Chinese</INFO>
+<INFO Lang="zh-tw">product relevant discussion search in Chinese</INFO>
+
+<URL Type="More"><![CDATA[
+http://www.asus.com.tw/scripts/samples/search/query.idq?CiBookMark=_CIBOOKMARK_&CiBookmarkSkipCount=_CiBookmarkSkipCount_&CiMaxRecordsInResultSet=200&CiRestriction=_CiRestriction_&CiMaxRecordsPerPage=_CiBookmarkSkipCount_&CiScope=%5C&TemplateName=query&CiSort=rank%5Bd%5D%2Cwrite%5Bd%5D&HTMLQueryForm=_HTMLQueryForm_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://www.asus.com.tw/scripts/samples/search/queryc.idq?CiMaxRecordsPerPage=_HITS_&TemplateName=query&CiSort=rank%5Bd%5D%2Cwrite%5Bd%5D&HTMLQueryForm=%2FChinese%2Fsearch.html&CiRestriction=_QUERY_&CiScope=%2FProducts%2FNEWS
+]]></URL>
+
+<EXPRESSION>Boolean</EXPRESSION>
+
+<VAR Name="_CiRestriction_"><![CDATA[
+NAME="CiRestriction" VALUE="_CiRestriction_" >
+]]></VAR>
+<VAR Name="_CiBookmarkSkipCount_"><![CDATA[
+NAME="CiBookmarkSkipCount" VALUE="_CiBookmarkSkipCount_" >
+]]></VAR>
+<VAR Name="_CIBOOKMARK_"><![CDATA[
+NAME="CiBookMark" VALUE="_CIBOOKMARK_" >
+]]></VAR>
+<VAR Name="_HTMLQueryForm_"><![CDATA[
+NAME="HTMLQueryForm" VALUE="_HTMLQueryForm_" >
+]]></VAR>
+<VAR Name="_NEXT_"><![CDATA[
+                    VALUE="Next _NEXT_ documents">
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<dt>___<b><a href="_URL_">_TITLE_</a>___</i></b>_PREVIEW_<br>___<font size="-1"> - 大小 _SIZE_ 位元組 - _DATE_ GMT</font>
+]]></TEMPLATE>
+</SITE>

@@ -1,0 +1,14 @@
+.git/
+.svn
+blib
+pm_to_blib
+MANIFEST.bak
+MANIFEST.SKIP~
+cover_db
+tags
+.*\.swp$
+Makefile$
+Makefile.old$
+^OpusVL-SysParams-*
+^.gitignore
+

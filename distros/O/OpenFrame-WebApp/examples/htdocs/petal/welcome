@@ -1,0 +1,18 @@
+<html>
+  <head>
+    <title>OpenFrame-WebApp TT2 Example - Welcome</title>
+  </head>
+  <body>
+    <h1>Welcome</h1>
+
+    Hello <span petal:set="user = session/get 'user'"
+                petal:replace="user/id">user id</span>!
+
+    <p/>
+    Your session will expire in: <span petal:replace="session/expiry">expiry</span>.<br/>
+    You can't log in as a new user until then.
+
+    <xi:include href="./footer"/> 
+
+  </body>
+</html>

@@ -1,0 +1,341 @@
+/* Procedure copyright(c) 1996 by Edward M Barlow */
+
+/******************************************************************************
+**
+** Name        : sp__add_record
+**
+******************************************************************************/
+:r database
+go
+:r dumpdb
+go
+if exists (select * from sysobjects
+           where  name = "sp__monitor"
+           and    type = "P")
+   drop proc sp__monitor
+go
+if exists (select * from sysobjects
+           where  name = "sp__add_record"
+           and    type = "P")
+   drop proc sp__add_record
+
+go
+if exists (select * from sysobjects
+           where  name = "record_backup"
+           and    type = "U")
+   drop table record_backup
+go
+if exists (select * from sysobjects
+           where  name = "record"
+           and    type = "U")
+begin
+   exec sp_rename record,record_backup
+end
+else
+begin
+create table record_backup
+(
+	date datetime,
+	busy 			int ,
+	io 			int ,
+	idle 			int ,
+	connections int ,
+	packet_in 			int ,
+	packet_out 			int ,
+	total_read 		int ,
+	total_write 		int ,
+	total_errors 			int ,
+	description char(30)
+)
+end
+go
+if exists (select * from sysobjects
+           where  name = "sp__show_record"
+           and    type = "P")
+   drop proc sp__show_record
+go
+
+/*---------------------------------------------------------------------------*/
+create table record
+(
+	date datetime,
+	busy 			int ,
+	io 			int ,
+	idle 			int ,
+	connections int ,
+	packet_in 			int ,
+	packet_out 			int ,
+	total_read 		int ,
+	total_write 		int ,
+	total_errors 			int ,
+	description char(30)
+)
+go
+insert record
+select * from record_backup
+go
+	if exists ( select * from record )
+		drop table record_backup
+go
+
+create proc sp__show_record ( @ndays int=30, 
+	@desc char(30)="Daily Record", 
+	@print_long int = null,
+		@dont_format char(1) = null
+		)
+AS
+BEGIN
+
+	declare @dt datetime, @b int, @i int, @id int, @c int
+				,@pi int,@po int,@tr int,@tw int,@te int
+	declare @l_dt datetime, @l_b int, @l_i int, @l_id int, @l_c int
+				,@l_pi int,@l_po int,@l_tr int,@l_tw int,@l_te int
+
+   create table #results (
+		dt datetime,
+		busy int,
+		io   int,
+		idle int,
+		conn int,
+		pin  int ,
+		pout int ,
+		rd   int ,
+		wr   int ,
+		err  int ,
+		notes char(10))
+
+	if ( 
+	select count(*)
+	from   record
+	where description=@desc
+	and   datediff(dd,date,getdate())<@ndays ) <= 1
+	begin
+		print "Insufficient Records To Make Report"
+		return
+	end
+
+	declare record_results cursor for 
+	select 	date,
+				busy,
+				io,
+				idle,
+				connections ,
+				packet_in,packet_out,total_read,total_write,total_errors 
+	from   record
+	where description=@desc
+	and   datediff(dd,date,getdate())<@ndays
+	order by date
+
+	open record_results
+
+	fetch record_results into @l_dt, @l_b, @l_i, @l_id, @l_c
+				,@l_pi ,@l_po ,@l_tr ,@l_tw ,@l_te 
+
+	while ( 1=1 )
+	begin
+		fetch record_results into @dt, @b, @i, @id, @c
+				,@pi ,@po ,@tr ,@tw ,@te 
+
+		if ( @@sqlstatus <> 0 ) break
+
+	
+		if ( @b<@l_b or  @i<@l_i or  @id<@l_id or  @c<@l_c )
+			insert #results select @dt,@b,@i,@id,@c
+				,@pi ,@po ,@tr ,@tw ,@te ,"(Rebooted)"
+		else 
+			insert #results select @dt,@b-@l_b,@i-@l_i,@id-@l_id,@c-@l_c
+				,@pi-@l_pi ,@po-@l_po ,@tr-@l_tr ,@tw-@l_tw ,@te-@l_te , ""
+
+		select @l_b=@b, @l_i=@i, @l_id=@id, @l_c=@c
+				,@l_pi=@pi , @l_po=@po , @l_tr=@tr , @l_tw=@tw , @l_te=@te 
+	end
+
+	close record_results
+	deallocate cursor record_results
+
+	if @print_long is null
+		select date=convert(char(8),dt,1), 
+			str(convert(float,(100*busy))/(busy+io+idle),5,2) "%busy", 
+			str(convert(float,(100*io)) /(busy+io+idle),5,2)  "%io ", 
+			str(convert(float,(100*idle))/(busy+io+idle),5,2) "%idle", 
+			connections=conn  ,notes
+		from #results
+		order by date
+	else
+		select date=convert(char(8),dt,1), 
+			str(convert(float,(100*busy))/(busy+io+idle),5,2) "%busy", 
+			str(convert(float,(100*io)) /(busy+io+idle),5,2)  "%io ", 
+			str(convert(float,(100*idle))/(busy+io+idle),5,2) "%idle", 
+			conn  ,
+			pin  ,
+			pout ,
+			rd   ,
+			wr   ,
+			err  ,
+			notes
+		from #results
+		order by date
+END
+go
+
+/* Inserttype = 1 then 1 row per day */
+/* 			  = 2 then 2 rows period  */
+create proc sp__add_record( @desc char(30)="Daily Record", @inserttype int=1,
+	@dont_format char(1) = null
+	)
+AS
+BEGIN
+		declare @users int, @runnable int, @busy int, @io int,
+			@idle int, @connections int, @packet_in int, @packet_out int,
+			@total_read int, @total_write int, @total_errors int, @now datetime,
+			@curdate datetime
+
+		if @inserttype=1
+		begin
+			select @curdate=convert(datetime,convert(char(8),getdate(),1))
+
+			delete sybsystemprocs..record
+			where date = @curdate
+			and description=@desc
+		end
+		else
+		begin
+			select @curdate=getdate()
+
+			select @now=max(date)
+			from   sybsystemprocs..record
+			where  description=@desc
+
+			delete sybsystemprocs..record
+			where  description=@desc
+			and    date <> @now
+		end
+
+		delete sybsystemprocs..record
+		where datediff(dd,date,getdate())>90
+		and description=@desc
+
+		exec sp__stat2
+		  @users		output,
+		  @runnable 	output,
+		  @busy 		output,
+		  @io 			output,
+		  @idle 		output,
+		  @connections output,
+		  @packet_in 		output,
+		  @packet_out 		output,
+		  @total_read 		output,
+		  @total_write 	output,
+		  @total_errors 		output,
+		  @now			output
+
+
+		insert sybsystemprocs..record
+		select
+			@curdate,
+			@busy 		,
+			@io 			,
+			@idle 		,
+			@connections ,
+			@packet_in 			,
+			@packet_out 		,
+			@total_read 		,
+			@total_write 		,
+			@total_errors 		,
+			@desc
+
+return(0)
+
+END
+go
+print "THE NEXT PROCEDURE MIGHT PRINT AN ERROR 2007 (sysdepends) - Its Recrusive!"
+go
+create proc sp__monitor( @desc char(30)="Daily Record",
+	@dont_format char(1) = null
+	)
+AS
+BEGIN
+		declare @cur_time datetime, @users int, @runnable int, @busy int, @io int,
+			@idle int, @connections int, @packet_in int, @packet_out int,
+			@total_read int, @total_write int, @total_errors int, @now datetime
+
+		declare @l_time datetime, @l_busy int, @l_io int,
+			@l_idle int, @l_connections int, @l_packet_in int, @l_packet_out int,
+			@l_total_read int, @l_total_write int, @l_total_errors int
+
+		select
+			@l_time=date,
+			@l_busy=busy,
+			@l_io=io ,
+			@l_idle=idle,
+			@l_connections=connections,
+			@l_packet_in=packet_in,
+			@l_packet_out=packet_out,
+			@l_total_read=total_read,
+			@l_total_write=total_write,
+			@l_total_errors=total_errors
+		from record
+		where date = convert(datetime,convert(char(8),getdate(),1))
+		and description=@desc
+
+		if @@rowcount = 0
+		begin
+			/* add a record and sleep */
+			exec sp__add_record
+			waitfor delay '00:00:05'
+			exec sp__monitor
+			return
+		end
+
+		/* Current Stats */
+		exec sp__stat2
+		  @users			output,
+		  @runnable 	output,
+		  @busy 			output,
+		  @io 			output,
+		  @idle 			output,
+		  @connections output,
+		  @packet_in 	output,
+		  @packet_out 	output,
+		  @total_read 	output,
+		  @total_write	output,
+		  @total_errors 		output,
+		  @cur_time			output
+
+		/* print some info */
+		declare @secs int
+		select @secs = datediff(ss,@l_time,@cur_time)
+		create table #r ( text varchar(127) )
+		insert #r select "Number Of Users ="+convert(varchar(8),@users)
+		insert #r select "Seconds Since Last Run ="+convert(varchar(8),@secs)
+		insert #r select "Cpu Busy ="+convert(char(4),@busy-@l_busy)
+		insert #r select " Io Busy ="+convert(char(4),@io-@l_io)
+		select * from #r
+
+		/* save some stats for next time */
+		delete sybsystemprocs..record
+		where date = convert(datetime,convert(char(8),getdate(),1))
+		and description=@desc
+
+		insert sybsystemprocs..record
+		select
+			convert(datetime,convert(char(8),getdate(),1)),
+			@busy 		,
+			@io 			,
+			@idle 		,
+			@connections ,
+			@packet_in 			,
+			@packet_out 		,
+			@total_read 		,
+			@total_write 		,
+			@total_errors 		,
+			@desc
+END
+go
+
+grant execute on sp__add_record  TO public
+go
+grant execute on sp__show_record  TO public
+go
+grant execute on sp__monitor  TO public
+go

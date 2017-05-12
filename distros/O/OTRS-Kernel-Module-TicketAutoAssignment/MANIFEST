@@ -1,0 +1,12 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+bin/otrs.AutoAllocation.pl
+dist.ini
+lib/Kernel/Modules/TicketAutoAssignment.pm
+lib/Config/Files/TicketAutoAssignment.xml
+t/00-compile.t

@@ -1,0 +1,1054 @@
+=head1	NAME
+
+ODF::lpOD::Table - Table management
+
+=head1  DESCRIPTION
+
+The present manual page introduces the way lpOD allows the user to handle
+ODF I<tables> and their components, namely the I<columns>, I<rows> and
+I<cells>.
+
+The lpOD API doesn't make differences between document types in this area. So,
+tables are dealed with in the same way for a spreadsheet document (whose content
+is just a set of tables) as for any other document.
+
+A table is an instance of the lpOD C<odf_table> class, knowing that
+C<odf_lpod> is an alias for C<ODF::lpOD::Table>.
+
+An C<odf_table> object is a structured container that holds two sets
+of objects, a set of I<rows> and a set of I<columns>, and that is
+optionally associated with a I<table style>.
+
+The basic information unit in a table is the I<cell>. Every cell is
+contained in a row. Table columns don't contain cells; an ODF column
+holds information related to the layout of a particular column at the
+display time, not content data.
+
+A cell can directly contain one or more paragraphs. However, a cell
+may be used as a container for high level containers, including lists,
+tables, sections and frames.
+
+Every table is identified by a name (which must be unique for the
+document) and may own some optional properties.
+
+=head1  Table creation and retrieval
+
+Like any other C<odf_element>, a table may be created either from scratch
+according to various parameters or by cloning an existing table using the
+generic C<clone> method of C<odf_element>. The second way is the most
+recommended one because, while it looks very easy to create a table with a
+default appearance, a typical convenient layout may require a lot of style
+definitions and is much more difficult to specify by program than through a
+point-and-click interface.
+
+A table is created using C<odf_create_table> with a mandatory name as its first
+argument and the following optional parameters:
+
+=over
+
+=item
+
+C<width>, C<length>: the initial size of the new table (rows and columns),
+knowing that it's zero-sized by default (beware: because cells are contained
+in rows, no cell is created as long as C<width> is less than C<1>);
+
+=item
+
+C<size>: specifies a length and a width (in this order) as a single string
+(the two values are comma-separated); may replace C<length> and C<width>;
+
+=item
+
+C<style>: the name of a table style, already existing or to be defined;
+
+=item
+
+C<cell style>: the style to use by default for every cell in the table;
+
+=item
+
+C<protected>: a boolean that, if C<TRUE>, means that the table should
+be write-protected when the document is edited through a user-oriented,
+interactive application (of course, such a protection doesn't prevent
+an lpOD-based tool from modifying the table)(default is C<FALSE>);
+
+=item 
+
+C<protection key>: a (supposedly encrypted) string that represents
+a password; if this parameter is set and if C<protected> is C<TRUE>,
+a end-user interactive application should ask for a password that matches
+this string before removing the write-protection (beware, such a protection
+is I<not> a security feature);
+
+=item
+
+C<print>: boolean, tells that the table should be printable; default is
+C<TRUE>;
+
+=item
+
+C<print ranges>: the cell ranges to be printed, if some areas are not to be
+printed; the value of this parameter is a space-separated list of cell ranges
+expressed in spreadsheet-style format (ex: C<"E6:K12">).
+
+=back
+
+Once created, a table may be incorporated somewhere using C<insert_element>
+of C<append_element>, like any other C<odf_element>.
+
+I<Caution: a table should not be inserted in any context. For example, a table
+should not be inserted within a paragraph. A bad placement may corrupt the
+document structure. Right contexts are, for example, the document body (in a
+spreadsheet or text document), a section (in a text document) or a table cell
+(knowing that the ODF standard allows nested tables).>
+
+The style of a table may be retrieved or changed at any time using the generic
+C<get_style()> and C<set_style()> accessors.
+
+A table may be retrieved in a document according to its unique name using
+the context-based C<get_table_by_name> method with the name as argument. It
+may be selected by its sequential position in the list of the tables belonging
+to the context, using C<get_table_by_position>, with a zero-based numeric
+argument (possibly counted back from the end if the argument is negative).
+A C<get_table()> method is provided, that works like C<get_table_by_position()>
+if the argument is numeric or like C<get_table_by_name()> otherwise (of course,
+if the name of the desired table looks like a number, there is no choice but
+C<get_table_by_name()> to retrieve it by name). Without argument,
+C<get_table()> returns the first table in the context (if any).
+In addition, it's possible to retrieve a table according to its content,
+through C<get_table_by_content>; this method returns the first table (in
+the order of the document) whose text content matches the given argument,
+which is regarded as a regular expression.
+
+In addition, an application can get all the tables of a given context using
+the C<get_tables()> method, without argument.
+
+An application may retrieve a table from any element that belongs to it, thanks
+to the C<get_parent_table()> method. This method returns C<undef> if the
+calling element is not in a table. Knowing that a paragraph may be included
+in a table cell and that a table cell indirectly belongs to a table, the
+following sequence selects a paragraph matching a given expression and, if the
+paragraph belongs to a table, displays the table name:
+
+    $p = $context->get_paragraph(content => "xyz");
+    die "Content not found\n" unless $p;
+    $t = $p->get_parent_table;
+    say $t ? $t->get_name : "Not in a table";
+
+=head1  Table content retrieval
+
+A table object provides methods that allow to retrieve any column, row or cell
+using its logical position. A position may be expressed using either zero-based
+numeric coordinates, or alphanumeric, spreadsheet-like coordinates. For example
+the top left cell should be addressed either by C<(0,0)> or by C<"A1">. On the
+other hand, numeric coordinates only allow the user to address an object
+relatively to the end of the table. To do so, coordinates are provided as
+negative values. For example, C<(-1,-1)> designates the last cell of the last
+row whatever the table size.
+
+Every table object selection method returns a null value, without error,
+when the given address is out of range.
+
+The number of rows and columns may be got using the C<odf_table> C<get_size>
+method, that returns the heigth then the width.
+
+An individual cell is selected using C<get_cell> with either a pair of
+numeric arguments corresponding to the row then the column, or an alphanumeric
+argument whose first character is a letter. The second argument, if provided,
+is ignored as soon as the first one begins with a letter.
+
+The two following instructions are equivalent and return the second cell of the
+second row in a table (assuming that C<$t> is a previously selected table):
+
+        $cell = $t->get_cell('B2');
+        $cell = $t->get_cell(1, 1);
+
+C<get_row()> selects a table row as an ODF element. This method requires a
+zero-based numeric value.
+
+C<get_column()> works according to the same logic and returns a table column
+ODF element.
+
+The full set of row and column objects may be selected using the table-based
+C<get_rows()> and C<get_columns()> methods. By default these methods
+return respectively the full list of rows or columns. They can be restricted to
+a specified range of rows or columns. The restriction may be expressed through
+two numeric, zero-based arguments indicating the positions of the first and the
+last item of the range. Alternatively, the range may be specified using a more
+"spreadsheet-like" syntax, in only one alphanumeric argument representing the
+visible representation of the range through a GUI; this argument is the
+concatenation of the visible numbers of the starting and ending elements,
+separated by a ":", knowing that "1" is the visible number of the row zero
+while "A" is the visible number or the column zero. As a consequence, the two
+following instructions are equivalent and return a list including the rows from
+5 to 10 belonging to the table I<t>:
+
+        @rows = $t->get_rows(5, 10);
+        @rows = $t->get_rows('6:11');
+
+According to the same logic, each of the two instructions below returns the
+columns from 8 to 15:
+
+        @cols = $t->get_columns(8, 15);
+        @cols = $t->get_columns('I:P');
+
+Once selected, knowing that cells are contained in rows, a row-based
+C<get_cell()> method is provided. When called from a row object,
+C<get_cell()> requires the same parameter as the table-based C<get_column()>
+method. For example, the following sequence returns the same cell as in the
+previous example:
+
+        $r = $t->get_row(1);
+        $c = $r->get_cell(1);
+
+A column-based C<get_cell()> method is provided, too, but it's much less
+efficient and may produce performance issues. In addition, the column-based
+C<get_cell()> may fail with a warning when used in I<read optimize> mode
+(see below).
+
+A row set may be selected according to the content of a specified cell,
+thanks to C<get_rows_by_index()>. The following example selects all the rows
+(if any) where the 'C' cell (i.e. the cell at the 3rd position) contains
+"XYZ":
+
+        @rows = $table->get_rows_by_index(C => "XYZ");
+
+Note that this method allows an alternative syntax; the cell position may be
+specified by its numeric (zero-based) position:
+
+        @rows = $table->get_rows_by_index(2, "XYZ");
+
+The first argument (or the key in hash notation) specifies the "index" (i.e.
+the column that must match a given condition) while the second argument is
+the search value. The result set is selected according to a smart match.
+
+Alternatively, C<get_row_by_index()> returns the first matching row, like
+C<get_rows_by_index()> in scalar context.
+
+Remember that there is no real index in a spreadsheet table; this method
+mimics the use of an arbitrary column as the "key" to select a data set,
+but the underlying mechanism is not a database engine; the rows are scanned
+sequentially, so take care of possible performance issues with large tables.
+
+=head1  Cell range selection
+
+C<get_cells> extracts rectangular ranges of cells in order to allow the
+applications to store and process them out of the document tree, through
+regular 2D tables. The range selection is defined by the coordinates of the
+top left and the bottom right cells of the target area. C<get_cells> allows
+two possible syntaxes, i.e. the spreadsheet-like one and the numeric one.
+The first one requires an alphanumeric argument whose first character is a
+letter and which includes a ':', while the second one requires four numeric
+arguments. As an example, the two following instructions, which are equivalent,
+return a bi-dimensional array corresponding to the cells of the C<B2:D15> area
+of a table:
+
+        @cells = $table->get_cells("B2:D15");
+        @cells = $table->get_cells(1,1,14,3);
+
+Note that, after such a selection, C<$cells[0][0]> contains the "B2" cell of
+the ODF table.
+
+If C<get_cells> is called without argument, the selection covers the whole
+table.
+
+A row object has its own C<get_cells()> method. The row based version of
+C<get_cells()> returns, of course, a one-row table of cell objects. When
+used without argument, it selects all the cells of the row. It may be called
+with either a pair of numeric arguments that represent the start and the end
+positions of the cell range, or an alphanumeric argument (whose the numeric
+content is ignored and should be omitted) corresponding to the start and end
+columns in conventional spreadsheet notation. The following example shows two
+ways to select the same cell range (beginning at the 2nd position and ending
+at the 26th one) in a previously selected row:
+
+        @cells = $r->get_cells('B:Z');
+        @cells = $r->get_cells(1, 25);
+
+The elements of the Perl table returned by C<get_cells> are references to the
+cells of the ODF table (not copies); the Perl table just maps an ODF table
+area, and any cell property change made through this Perl table affects the
+underlying ODF cell.
+
+A column-based version of C<get_cells()> is available, too, but it should be
+avoided with large tables, and it may explicitly fail in C<read optimize> mode.
+
+=head1  Named cell ranges
+
+A spreadsheet may contain cell ranges identified by persistent names. lpOD
+allows the user to retrieve or create such named ranges in some situations.
+
+While it appears in a given table, a named range is not a table element; it's
+defined at the document level, so it's selected or inserted through document-
+based methods.
+
+An existing named range may be selected using C<get_named_range()> from the
+document. The name of the range is the only one required argument:
+
+        my $range = $doc->get_named_range("MyRange");
+
+The returned object is an C<ODF::lpOD::NamedRange>, whose description may be
+got through C<get_properties()>, that returns a hash (in array context) or
+a hash ref (in scalar context) that contains the following items:
+
+=over
+
+=item
+
+C<table>: the name of the table containing the range;
+
+=item
+
+C<start>: the alphanumeric coordinates of the first cell (ex: "C4");
+
+=item
+
+C<end>: the alphanumeric coordinates of the last cell (ex: "F12");
+
+=item
+
+C<range>: the alphanumeric range expression, including the C<start> and
+C<end> values, with a colon as separator (ex: "C4:F12"); this string may
+be used as the argument of the C<get_cells()> table-based method.
+
+=item
+
+C<usage>: the range usage, that can be either C<'none'> or a space-separated
+list that consists of any of the values C<'print-range'>, C<'filter'>,
+C<'repeat-row'> or C<'repeat-column'> (see the ODF specification for details
+about the effects of these options).
+
+=back
+
+The C<ODF::lpOD::NamedRange> class provides a C<get_cells()> method, that
+returns the same results as the table-based C<get_cells()>, but that doesn't
+require any argument. So, the two following sequences produce the same final
+result:
+
+        # first form
+        $p = $doc->get_named_range("RangeName");
+        $table = $doc->get_body->get_table($p->{table});
+        @cells = $table->get_cells($p->{range});
+
+        # second form
+        @cells = $doc->get_named_range("RangeName")->get_cells;
+
+A C<get_cell_values()> method is provided, too. It produces the same result
+as the table-based C<get_cell_values()> method, but, of course, it requires
+only one argument (the data type). Example:
+
+        $r = $doc->get_named_range("RangeName")->get_cell_values('float');
+        say "I found $r->[0] float values in the range";
+        say "...the min is $r->[1] and the max is $r->[2]";
+        say "...and the grand total is $r->[3]";
+
+The possible uses of C<get_cell_values()> are documented in the section
+dedicated to special cell value extractors in the present manual chapter.
+
+The document-based C<set_named_range()> method allows the applications to
+create new named ranges. It requires a unique range name as its first argument.
+The other parameters must be provides according to the same principles as the
+return value of C<get_properties()>, introduced above. As an example, the
+following instruction registers a new range running from "C4" to "F12", whose
+name is "MyArea" in the "Sheet1" table:
+
+        $doc->set_named_range(
+                "MyArea",
+                table   => "Sheet1",
+                range   => "C4:F12"
+        );
+
+The example below creates a named range whose properties are borrowed from
+an existing named range belonging to another document:
+
+        my $range_spec = $doc1->get_named_range("R1")->get_properties;
+        $doc2->set_named_range("R1", $range_spec);
+
+The C<'usage'> parameter is optional; it's default value is C<'none'>.
+
+The return value of C<set_named_range()> is the new named range object.
+
+The properties of an existing named range may be changed at any time using
+C<set_properties()>.
+
+Be careful: while the uniqueness of the name is checked by C<set_named_range()>
+there is no other consistency check. So the user is allowed to register a
+named range without table or range specification, or with a non existent table
+name, or with a range where the starting cell comes after the ending one.
+
+A named range, once retrieved, may be removed using the standard C<delete()>
+element-based method. Example:
+
+        $nr = $doc->get_named_range("MyRange");
+        $nr && $nr->delete;
+
+Note that C<get_named_range()> and C<set_named_range()> work in
+I<spreadsheet documents> only.
+
+=head1  Row and column customization
+
+The objects returned by C<get_row> and C<get_column> can be customized
+using the standard C<set_attribute> or C<set_attributes> method. Possible
+attributes are:
+
+=over
+
+=item
+
+C<default cell style name>: the default style which apply to each cell in the
+column or row unless this cell has no defined style attribute;
+
+=item
+
+C<visibility>: specifies the visibility of the row or column; legal values
+are C<'visible'>, C<'collapse'> and C<'filter'>.
+
+=back
+
+The style may be get or set using C<get_style> or C<set_style>.
+
+=head1  Table expansion and shrinking
+
+=head2  Row and column insertion
+
+A table may be expanded vertically and horizontally, using its C<add_row> and
+C<add_column> methods.
+
+C<add_row> allows the user to insert one or more rows at a given position in
+the table. The new rows are copies of an existing one. Without argument, a
+single row is just appended as the end. A C<number> named parameter specifies
+the number of rows to insert.
+
+An optional C<before> named parameter may be provided; if defined, the value
+of this parameter must be a row number (in numeric, zero-based form) in the
+range of the table; the new rows are created as clones of the row existing at
+the given position then inserted at this position, i.e. I<before> the original
+reference row. A C<after> parameter may be provided instead of C<before>;
+it produces a similar result, but the new rows are inserted I<after> the
+reference row. Note that the two following instructions produce the same
+result (assuming C<$t> is a previously selected or created table):
+
+        $t->add_row(number => 1, after => -1);
+        $t->add_row();
+
+The instruction below creates new rows at the beginning of the table:
+
+        $t->add_row(number => 4, before => 0);
+
+The inserted rows are initialized as clones of the row used as the reference
+through the C<after> or C<before> or of the last existing row if the new
+row in appended at the end. So the new rows (and their cells) inherit the same
+style and content as an existing one.
+
+However, a few options allow the applications to override this default
+behavior:
+
+=over
+
+=item
+
+C<empty>, if set to C<TRUE>, specifies that the new cells will be created
+without content and without data type;
+
+=item
+
+C<style> allows to specify a particular style for the new row; if this
+parameter is provided but set to C<undef>, the new rows are created without
+style (i.e. they take neither the style of the cloned row nor any other
+style);
+
+=item
+
+C<cell style> allows to specify a particular style for every cell in the new
+rows; if this parameter is provided but set to C<undef>, the cells of the new
+rows are created without style.
+
+=back
+
+The C<add_column> method does the same thing with columns as C<add_row>
+for rows, and allows the same options. However, because the cells belong to
+rows, it works according to a very different logic. C<add_column> inserts new
+column objects (clones of an existing column), then it goes through all the
+rows and inserts new cells (cloning the cell located at the reference
+position) in each one.
+
+Of course, it's possible to use C<insert_element> in order to insert a row,
+a column or a cell externally created (or copied from an other table from
+another document), provided that the user carefully checks the consistency of
+the resulting construct. As an example, the following sequence appends a copy
+of the first row of C<$t1> after the 5th row of C<$t2>:
+
+   $to_be_inserted = $t1->get_row(0)->clone;
+   $t2->insert_element($to_be_inserted, after => $t2->get_row(5));
+
+While a table may be expanded vertically using C<add_row>, each row may be
+expanded using the C<odf_row> C<add_cell> method whose parameters and behavior
+are the same as the table-based C<add_row> method.
+
+=head2  Row and column deletion
+
+Rows and columns may be individually deleted using C<delete_row()> and
+C<delete_column()>, respectively. The required argument for these methods is
+the row or column position in the table, i.e. the same as C<get_row()> or
+C<get_column()>.
+
+The common C<delete()> method may be used from a previously selected row or
+column object. So, the two snippets below are equivalent:
+
+        # with delete_row
+        $table->delete_row($row_number);
+
+        # without delete_row
+        $row = $table->get_row($row_number);
+        $row->delete;
+
+Knowing that table cells are contained in row, removing a row automatically
+removes the corresponding cells. The internal logic of C<delete_column()>,
+that removes the cells of the deleted column, behaves as if the cells were
+contained in the columns, too. However, it's possible to delete a column
+without deleting the corresponding cells. To do so, a C<propagate> option must
+be provided and set to C<FALSE>. Such option may put the table in an
+inconsistent state, so it should be used for very special purposes only (such
+as cleaning an inconsistent table).
+
+The C<delete()> method should not be confused with the C<clear()> method that,
+when called from a row or column object, removes the content of every cell
+in the row or column but doesn't remove any cell, row or column.
+
+=head1  Row and column group handling
+
+The content expansion and content selection methods above work with the table
+body. However it's possible to manage groups of rows or columns. A group may
+be created with existing adjacent rows or columns, using C<set_row_group()>
+and C<set_column_group()> respectively. These methods take two arguments, which
+are the numeric positions of the starting and ending elements of the group.
+However, these numeric arguments may be replaced by a single alphanumeric
+range definition argument, so the following instructions are equivalent; both
+create a group including the same 3 columns ("C" to "E"):
+
+        $column_group = $table->set_column_group(3, 5);
+        $column_group = $table->set_column_group("C:E");
+
+The same idea apply to row groups; however, beware that in range alphanumeric
+notation, the numbers represents the spreadsheet end-user point of view, so
+they are one-based; as an example, the two following instructions, that create
+a row group including the rows 3 to 5, are equivalent:
+
+        $row_group = $table->set_row_group(3, 5);
+        $row_group = $table->set_row_group("4:6");
+
+In addition, an optional C<display> named boolean parameter may be provided
+(default=C<TRUE>), instructing the applications about the visibility of the
+group.
+
+Both C<set_row_group()> and C<set_column_group()> return an object which can
+be used later as a context object for any row, column or cell retrieval or
+processing. An existing group may be retrieved according to its numeric
+position using C<get_row_group()> or C<get_column_group()> with the position
+as argument, or without argument to get the first (or the only one) group.
+
+A group can't bring a particular style; it's just visible or not. Once created,
+its visibility may be turned on and off by changing its C<display> value
+through C<set_attribute()>.
+
+Knowing that cells depends on rows, a row group provides the same C<get_cell()>
+method as a table. It provides a C<get_row()> method, while a column group
+provides a C<get_column()> one.
+
+A row group provides a C<add_row()> method, while a column group provides a
+C<add_column()> method. These methods work like their table-based versions,
+and they allow the user to expand the content of a particular group.
+
+Row and column group may be collapsed or expanded using their C<collapse()> and
+C<uncollapse()> methods.
+
+It's possible to delete all the cell contents of a group using C<clear()>.
+This method doesn't remove any row or column; it just erases the content and,
+if any, the style and the annotation of every cell. Beware that the column
+group based version of C<clear()> is much slower than the row group based
+version.
+
+=head1 Table headers
+
+One or more rows or columns in the beginning of a table may be organized as
+a I<header>. Row and columns headers are created using the C<set_row_header()>
+and C<set_column_header()> table-based methods, and retrieved using
+C<get_row_header()> and C<get_column_header()>. A row header object brings its
+own C<add_row()> method, which works like the table-based C<add_row()> but
+appends the new rows in the space of the row header. The same logic applies to
+column headers which have a C<add_column()> method. An optional positive
+integer argument may specify the number or rows or columns to include in the
+header (default=1).
+
+Note that a I<column header> is a I<row> or a set of I<rows> containing
+column titles that should be automatically repeated on every page if the table
+does not fit on a single page, while a I<row headers> is a I<column> or a set
+of I<columns> containing I<row titles>. In the present version, I<row headers>
+are not fully supported.
+
+A table can't directly contain more than one row header and one column header.
+However, a column group can contain a column header, while a row group can
+contain a row header. So the header-focused methods above work with groups as
+well as with tables.
+
+A table header doesn't bring particular properties; it's just a construct
+allowing the author to designate rows and columns that should be automatically
+repeated on every page if the table doesn't fit on a single page.
+
+The ``get_xxx()`` table-based retrieval methods ignore the content of the
+headers. However, it's always possible to select a header, then to used it as
+the context object to select an object using its coordinates inside the header.
+For example, the first instruction below gets the first cell of a table body,
+while the third and third instructions select the first cell of a table header::
+
+   c1 = table.get_cell(0,0)
+   header = table.get_header()
+   c2 = header.get_cell(0,0)
+
+=head1  Individual cell property handling
+
+A cell owns both a I<content> and some I<properties> which may be processed
+separately.
+
+The cell content is a list of one or more ODF elements. While this content is
+generally made of a single paragraph, it may contain several paragraphs and
+various other objects. The user can attach any content element to a cell using
+the standard C<insert_element> method. However, for the simplest (and the
+most usual) cases, it's possible to use C<set_text>. The cell-based
+C<set_text> method diffs from the generic C<odf_element> C<set_text>: it removes
+the previous content elements, if any, then creates a single paragraph with the
+given text as the new content. In addition, this method accepts an optional
+C<style> named parameter, allowing the user to set a paragraph style for the
+new content. To insert more content (i.e. additional paragraphs and/or other
+ODF elements), the needed objects have to be created externally and attached
+to the cell using C<insert_element> or C<append_element>. Alternatively, it's
+possible to remove the existing content (if any) and attach a full set of
+content elements in a single instruction using C<set_content>; this last cell
+method takes a list of arbitrary ODF elements and appends them (in the given
+order) as the new content.
+
+The generic C<group()> method may be used to grab a list of paragraphs in order
+to move them in the cell. As an example, the following instruction moves all
+the paragraphs containing a given substring in a given cell:
+
+    $table->get_cell("B4")->group(
+        $doc->get_body->get_paragraphs(content => "XYZ")
+        );
+
+The C<get_content> cell method returns all the content elements as a list.
+For the simplest cases, the cell-based C<get_text> method directly returns
+the text content as a flat string, without any structural information and
+whatever the number and the type of the content elements.
+
+The cell properties may be read or changes using C<get_xxx> and C<set_xxx>
+methods, where C<xxx> stands for one of the following:
+
+=over
+
+=item
+
+C<style>: the name of the cell style;
+
+=item
+
+C<type>: the cell value type, which may be one of the ODF supported data
+types, used when the cell have to contain a computable value (may be omitted
+with text cells, knowing that the default type is C<'string'>);
+
+=item
+
+C<value>: the numeric computable value of the cell, used when the C<type> is
+defined (for a string cell, C<get_value> and C<set_value> are equivalents
+of C<get_text> and C<set_text>);
+
+=item
+
+C<currency>: the international standard currency unit identifier (ex: EUR,
+USD), used when the C<type> is C<'currency'>;
+
+=item
+
+C<formula>: a calculation formula whose result is a computable value (the
+grammar and syntax of the formula is application-specific and not checked
+by the lpOD API (it's stored as flat text and not interpreted);
+
+=item
+
+C<protect>: boolean (default C<FALSE>), tells the applications that the cell
+can't be edited.
+
+=back
+
+If C<set_currency> is used with a non-null value, then the C<type> of the
+cell is automatically set to C<'currency'>. If C<set_type> forces a type that
+is not C<'currency'>, then the cell currency is unset.
+
+A cell may be annotated using C<set_annotation()>. The cell-based version of
+this method works like the paragraph-based version, described in
+L<ODF::lpOD::TextElement>, but the positioning options are ignored. A cell
+annotation is not linked to a text position and may be attached to an empty
+cell. A C<display> boolean option (whose default is C<FALSE>) may be provided
+in order to make the annotation automatically visible in the sheet.
+
+It's possible to remove all the content and the properties of a cell but its
+style, including any possible formula, annotation, and so on, with the
+C<clear()> method. In addition, C<clear()> removes any multi-row or multi-
+column span.
+
+Note that it's possible to clear the content of all the cells of a row, a
+column, a row group, a column group, or a table, with the respective C<clear()>
+methods of these objects. These methods don't remove the cells themselves.
+However, remember that the column and column group based versions of C<clear()>
+are very slow.
+
+The cell coordinates may be retrieved using C<get_position()>. In scalar
+context, this method returns the local position in the row. In array context,
+it returns the table name, the row number and the column number. In addition,
+C<get_parent_table()> returns the table object itself, while
+C<get_parent_row()> returns the including row.
+
+=head1  Special cell value extractors
+
+A few access methods are available to directly get the value(s) of one ore more
+specified cells, without explicit access to the cell objects. These accessors
+are not syntactic sugar only; they may allow better performances in some
+situations.
+
+=head2  Individual cell value extraction
+
+An application may directly get the value of a specified cell without previous
+selection of the cell object. As an example, the two following instructions
+produce the same result:
+
+        $value = $table->get_cell($row, $column)->get_value;
+        $value = $table->get_cell_value($row, $column);
+
+=head2  Data set extraction or aggregate computation
+
+Alongside the C<get_cells()> method, a C<get_cell_values()> method allows the
+user to get either value lists or basic value aggregates. This method requires
+a regular cell data type as its first argument, followed by a cell range
+specification according to the same logic as C<get_cells()>. The cells whose
+data type is not the given type are ignored. As an example, the following
+example creates a value list whose content comes from all the C<currency>
+cells of the "E2:G10" range:
+
+        @values = $table->get_cell_values('currency', 'E2:G10');
+
+The allowed types are C<string>, C<date>, C<time>, C<float>, C<currency>, and
+C<boolean>. However, a special C<all> indicator may be used as first argument
+instead of a regular data type; if so, all the non-empty cells are selected.
+
+In the resulting 2D list, C<undef> values occupy the places of non-matching
+or empty cells, in order to provide a consistent mapping of the corresponding
+table area.
+
+C<get_cell_values()> may be used as a I<row> or I<column> method. The most
+efficient one is the row-based version. Both return a one-dimension list,
+without null value (the non-matching and empty cells are ignored). So the
+instruction below produces a list of all the C<currency> amounts found between
+(and including) the 3rd and the 8th cells of the 4th row of a table:
+
+        $row = $table->get_row(3);
+        @amounts = $row->get_cell_values('currency', 'C:H');
+
+C<get_cell_values()>, when used in scalar context, returns a small array ref
+whose item 0 is the number of non-empty cells matching the given type in the
+range, and whose the following items depend on the data type. The two
+following positions are the min and the max values for every type but
+C<boolean>; for booleans, they respectively contain the number of true values
+and the number of false values. For the C<string> type, the min and the max
+are selected by default according to the standard Perl C<cmp> string
+comparison function (that is not always convenient for international character
+sets), but the user may provide a custom function (whose external behavior
+must comply with C<cmp>, i.e. whose possible results are -1, 0, 1). An
+additional item, containing the arithmetic sum, is provided at the last
+position for the C<float>, C<currency> and C<percentage> types only. As an
+example, the following code displays the count, the min, the max and the sum
+of the C<float> cells in the "E2:G10" range:
+
+        $r = $table->get_cell_values('float', 'E2:G10');
+        say "I found $r->[0] values";
+        say "...from $r->[1] to $r->[2]";
+        say "...and the grand total is $r->[3]";
+
+=head3  Flat text export
+
+A special C<get_text()> method is provided with tables or row groups. Knowing
+that a table shouldn't directly contain text (the text content, if any, belong
+to cells), this method returns the concatenated contents of all the cells as a
+flat string. It's useful only to allow the applications to quickly check if at
+least one cell contains something, or if a particular substring is present
+somewhere in the table. Note that the returned text doesn't always reflect the
+visible content of the cells: for non-string cells, the exported content is
+the I<value>, not its formatted representation.
+
+=head1  Cell span expansion
+
+A cell may be expanded so it covers one or more adjacent columns and/or rows.
+The cell-based C<set_span()> method allows the user to control this expansion.
+It takes C<rows> and C<columns> as parameters, specifying the number of rows
+and the number of columns covered. The following example selects the "B4" cell
+then expands it over 4 columns and 3 rows:
+
+        $cell = $table->get_cell('B4');
+        $cell->set_span(rows => 3, columns => 4);
+
+The existing span of a cell may be get using C<get_span()>, which returns the
+C<rows> and C<columns> values.
+
+This method changes the previous span of the cell. The default value for each
+parameter is 1, so a C<set_span()> without argument reduces the cell at its
+minimal span.
+
+When a cell is covered due to the span of another cell, it remains present and
+holds its content and properties. However, it's possible to know at any time if
+a given cell is covered or not through the boolean C<is_covered()> cell method.
+In addition, the span values of a covered cell are automatically set to 1, and
+C<set_span()> is forbidden with covered cells.
+
+Note that a cell that spreads over multiple rows and/or columns is reduced to
+the minimal size by C<clear()>.
+
+=head1  Performance issues
+
+The table-oriented access methods perform relatively well against tables
+including up to thousands, if not tens of thousands of cells. So there is no
+performance issue with tables belonging to text documents. On the other hand,
+spreadsheet documents may contain tables whose size in potentially unlimited.
+As soon as you are faced to wrong response times and overloaded CPUs, you may
+consider using the following workarounds, which can (sometimes) improve the
+performances, possibly at the cost of a reduced functionality.
+
+=head2  New table creation
+
+Each time a new empty table is created through C<odf_create_table()> or
+C<odf_table->create()>, a C<expand> optional boolean parameter, whose default
+value is C<FALSE>, is available. This parameter controls the way the table
+is internally stored.
+
+If it's set to C<TRUE>, the table is stored in I<expanded> mode. It's a good
+choice for small tables or for large tables where cells spread over the largest
+part of its area will be populated by the application. On the other hand, large
+spreadsheet tables whose content will remain mostly empty (or filled with
+repetitive values and styles) should not be expanded at the creation time.
+
+The C<expand> option should generally not be changed for spreadsheets. However,
+the user should set it to C<TRUE> for tables included in presentation documents,
+because some ODF-compliant office products (such as LibreOffice Impress)
+apparently can't properly render tables stored in compact form.
+
+While the effect of this option is almost unnoticeable with small tables, the
+full storage expansion of a mid-sized or large table (i.e. thousands of cells)
+may have a significant impact on processing time and memory consumption.
+
+=head2  Accessing cells from rows
+
+Remember that cells belong to rows and rows belong to tables. As a consequence,
+accessing a cell is faster from the row than from the table. So, each time you
+need to get several cells belonging to the same row, you should first get the
+row then use it as the context for subsequent cell accesses. As an illustration,
+each of the two following code snippets scans a whole table and loads the text
+of every cell in a list, but the second one is faster:
+
+        # table scan, way 1
+        my @text = ();
+        my ($l, $w) = $table->get_size;
+        for (my $i = 0 ; $i < $l ; $i++) {
+                for (my $j = 0 ; $j < $w ; $j++) {
+                        push @text, $table->get_cell($i, $j)->get_text;
+                        }
+                }
+
+        # table scan, way 2
+        my @text = ();
+        my ($l, $w) = $table->get_size;
+        for (my $i = 0 ; $i < $l ; $i++) {
+                my $row = $table->get_row($i);
+                for (my $j = 0 ; $j < $w ; $j++) {
+                        push @text, $row->get_cell($j)->get_text;
+                        }
+                }
+
+At a higher level but for the same reasons, C<get_cell()> and C<get_cells()>
+are slower as column group methods that as table or row group methods. In other
+words, when a cell belongs to the intersection of a row group and a column
+group, it may be accessed faster from the table or the row group than from the
+column group.
+
+=head2  Selecting cell values instead of cells
+
+Each time an application needs to get cells in order to extract their values
+without update, the special C<get_cell_value()> and C<get_cell_values()>
+methods should be preferred.
+
+As an example, the two following instructions produce the same result but the
+second one is more efficient in a large table:
+
+        $value = $table->get_cell($row, $column)->get_value;
+        $value = $table->get_cell_value($row, $column);
+
+Similarly, the two following snippets produce the same result set but the
+second one is more efficient (and not only code-saving) than the first
+one in a large spreadsheet:
+
+        # first form
+        @values = ();
+        push @values, scalar $_->get_value
+                for $row->get_cells($start, $end);
+
+        # second form
+        @values = $row->get_cell_values($start, $end);
+
+=head2  Mapping ODF tables with Perl lists
+
+Thanks to C<get_cells()>, you can easily associate a Perl table to a selected
+area in a document table. As an example, the following instruction produces
+a 2D Perl list that maps the "B4:Z50" area in a given table:
+
+        my @cells = $table->get_cells("B4:Z50");
+
+While C<get_cells()> is a costly method, it provides an array of pre-selected
+cells. Beware that C<get_cells()> returns the cells themselves, not copies, so,
+after the instruction above, C<$cells[0][0]> is the "B4" cell of the ODF table,
+while C<$cells[-1][-1]> is the "Z50" cell, and so on. As a consequence, the
+2 instructions below are functionally equivalent, but the second one in much
+faster because there is no need to look for the cell in the XML data structure:
+
+        $text = $table->get_cell("C5")->get_text;
+        $text = $cells[1][1]->get_text;
+
+Using such a mapping doesn't significantly improve the overall performances,
+but it allows the applications to execute the slow job once for all, then
+provide a good interactivity. However, be careful about very large areas:
+using C<get_cells()> to load hundreds of thousands of cells is too slow to be
+practical. In addition, the mapping is no longer accurate as soon as the
+structure of the underlying table is changed due to row/column insertions or
+deletions. For read-only access, have a look at the "read optimized" option
+(introduced below) that could help.
+
+=head2  Working area limitation
+
+The global size of a typical spreadsheet table is by far larger than the size
+of the really used part. As an example, your spreadsheet processor may silently
+store a 65536x1024 table while the last really used cell is, say, Z50,
+so the size of the useful part is 50x26. In such a situation, lpOD can't
+automatically decide what is the useful size, so it processes the full size.
+The first result is a huge time and resource waste. As soon as you know the
+useful size of a table, you can instruct the C<odf_table> instance to ignore
+the extra area, thanks to C<set_working_area()>. The instruction below tells
+that, for the current session, the table will be processed as if its size was
+500x100:
+
+        my $table = $doc->get_body->get_table("Sheet1");
+        $table->set_working_area(500, 100);
+
+Note that this operational restriction has no effect if the real size is
+smaller than the given size. On the other hand, C<set_working_area()> doesn't
+destroy the table content that resides out of the working area, if any; it just
+prevents you from accessing any object beyond your declared limits through
+the official table-oriented methods, namely C<get_row()>, C<get_cell()>, and
+C<get_column()>. However, the "hidden" area remains available for low-level
+hacking with basic element handling methods (for example, if you issue a
+C<get_paragraphs()> from the table object, it will look for all the paragraphs
+belonging to all the real cells of the calling table).
+
+The working area restriction doesn't produce any persistent effect when the
+document is saved.
+
+Note that the C<get_size()> method itself is affected by C<set_working_area()>;
+it returns the declared size, unless the real size is smaller.
+
+You can change the working area according to your current needs. Successive
+calls of C<set_working_area()> are allowed, so the working area may be enlarged
+or reduced at will.
+
+The working area restriction may be removed using C<set_working_area()>
+without argument.
+
+=head2  Read-optimization
+
+As soon as an object is selected using any official table component selector
+(such as C<get_cell()>, C<get_row()>, and so on), lpOD acts by default as if
+this object could be updated or deleted, and as if something (a row, a column
+or a cell) could be inserted before or after it. As a consequence, the internal
+data structure of the spreadsheet may be changed, resulting in useless
+processing if case of read-only access. However, lpOD allows the applications
+to use tables in "read optimized" mode, so it may avoid any update preparation,
+allowing better response times. To activate this mode, the user must set the
+"read optimized" flag to C<TRUE> using C<read_optimize()> like that:
+
+        my $table = $doc->get_body->get_table("Sheet1");
+        $table->read_optimize(TRUE);
+
+Caution: C<read_optimize()> means that you I<assume> that you will not make
+updates; it doesn't I<prevent> you from updating cells, deleting rows, and so
+on. So, be careful: you can corrupt the table and get very strange and
+unpredictable results as soon as you make updates in read optimized mode.
+
+This optimization option is useful for large table area scans, particularly
+with very sparse tables (i.e. tables where significant cells are separated
+by large empty areas). On the other hand, it's not efficient, and at worst may
+increase the response time, for individual access to a cell. In addition, it's
+completely useless with small tables as well as with I<dense> tables (i.e.
+tables without large empty areas and without large sequences of identical
+objects). So don't use it without testing. In some cases, the read-optimize
+mode inhibits the column-based cell retrieval methods, while it may improve
+the response times of table- and row-based retrieval methods.
+
+Note that you can switch this mode off and restore the default behavior at
+any time. You just have to recall C<read_optimize()> with C<FALSE> as argument.
+Like C<set_working_area()>, C<read_optimize()> doesn't produce any persistent
+effect.
+
+However, there is a possible trap, illustrated by the next (wrong) example:
+
+        $table->read_optimize(TRUE);
+        $cell = $table->get_cell("Z26");
+        $table->read_optimize(FALSE);
+        $cell->set_value(1234);
+
+In this sequence, we selected a cell while the table was in "read optimized"
+mode, then we canceled this mode and executed an update. The result is not
+predictable (it will be sometimes right, sometimes wrong). The general
+principle is: avoid updating an object selected in read optimized mode.
+However, there is an important exception: a cell that was selected in read-
+optimized mode may be safely updated if (and only if) its differs from the
+two neighbour cells and if it's belong to a row that differs (by at least one
+cell) from the two neighbour rows. These conditions are almost always met with
+tables whose one of the columns contains identifiers and each of the other
+columns displays data of various types and formats.
+
+On the other hand, the read optimize flag is useless with methods that return
+values and not objects (i.e. C<get_cell_value>, C<get_cell_values>).
+
+=head2  Compacting empty areas
+
+Cells, rows, row groups, tables, columns and column groups own a C<clear()>
+method. When the calling context is a I<table>, a I<row>, or a I<row group>,
+a C<compact> boolean option, whose default is C<FALSE>, is allowed. If this
+option is set to C<TRUE>, the execution of C<clear()> is faster and the
+physical storage of the processed cells is compacted.
+
+This option is recommended in spreadsheet documents only.
+
+B<Caution>: the benefits of the C<compact> option are not effective if the
+cleared area is immediately used as the target of a lot of individual cell
+accesses using C<get_cell()>, knowing that in such case lpOD will have to
+un-compact a lot of cells in the area. As a consequence, this option is not
+recommended when C<clear()> is used to prepare a massive table update.
+
+=head1	AUTHOR/COPYRIGHT
+
+Developer/Maintainer: Jean-Marie Gouarne L<http://jean.marie.gouarne.online.fr>
+Contact: jmgdoc@cpan.org
+
+Copyright (c) 2010 Ars Aperta, Itaapy, Pierlis, Talend.
+Copyright (c) 2011 Jean-Marie Gouarne.
+
+This work was sponsored by the Agence Nationale de la Recherche
+(L<http://www.agence-nationale-recherche.fr>).
+
+License: GPL v3, Apache v2.0 (see LICENSE).
+
+=cut

@@ -1,0 +1,10 @@
+<html>
+<body>
+
+[% date.year  %]<br/>
+[% date.month %]<br/>
+[% date.day   %]<br/>
+
+
+</body>
+</html>

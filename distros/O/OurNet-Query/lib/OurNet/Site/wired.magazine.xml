@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<SITE ID="Wired.Magazine">
+
+<NAME Lang="en-us">Wired Digital</NAME>
+<INFO Lang="en-us">computer relevant information search</INFO>
+
+<URL Type="More"><![CDATA[
+_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://search.hotwired.com/search97/s97.vts?Action=FilterSearch&Filter=docs_filter.hts&ResultTemplate=magazine.hts&Collection=magazine&Query=_QUERY_
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+<EXPRESSION>Boolean</EXPRESSION>
+
+<VAR Name="_NEXT_"><![CDATA[
+<A HREF="_NEXT_">[Next
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+serif" size=2> <B> <A HREF="_URL_">_TITLE_</A>___sans-serif">_PREVIEW_</FONT></TD>
+]]></TEMPLATE>
+</SITE>

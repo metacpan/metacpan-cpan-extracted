@@ -1,0 +1,3452 @@
+
+	gated[11716] version gated-public-3_6 memory dump on ggd05.gg.de at Wed Jun  9 01:45:19 2010
+
+		OpenBSD 4.4-stable (ALG.vpn) #0: Fri May 28 15:35:44 CEST 2010
+    bluhm@g631.genua.de:/build/gg.63/63.D041/ALG.vpn
+
+
+		Started at Wed Jun  2 21:16:06 2010
+
+Tracing:
+	Global:	 all
+	Files:
+		/var/tmp/gated.trace:
+			opened  refcount 13  size 610081  limit 0  files 1048576
+		/var/tmp/ospf.trace:
+			opened  refcount 1  size 679785  limit 0  files 1048576
+		/var/tmp/kernel.trace:
+			opened  refcount 1  size 936831  limit 0  files 1048576
+
+Task State: <NoResolv>
+	Send buffer size 12288 at 8A9F3000
+	Recv buffer size 4096 at 8225E000
+
+Tasks (9) and Timers:
+
+	IF	Priority 10	RtProto Direct
+		Trace options: general state policy task timer
+		Trace file: /var/tmp/gated.trace	size 1048576	files 0
+
+		IF_AGE	<OneShot>
+			last: 01:43:17.868	next: 01:46:17.868
+
+	INET	Priority 15	Socket  7	RtProto INET
+		Trace options: general state policy task timer
+		Trace file: /var/tmp/gated.trace	size 1048576	files 0
+
+	Aggregate	Priority 20	RtBit 1
+		Trace options: general state policy task timer
+		Trace file: /var/tmp/gated.trace	size 1048576	files 0
+
+	RT	Priority 20
+		Trace options: general state policy task timer
+		Trace file: /var/tmp/gated.trace	size 1048576	files 0
+
+	ICMP	Priority 30	Proto   1	Socket  9
+		Trace options: general state policy task timer
+		Trace file: /var/tmp/gated.trace	size 1048576	files 0
+
+	OSPF	Priority 41	Proto  89	Socket 10	RtProto OSPF	RtBit 3
+		Trace options: spf detail packets
+		Trace file: /var/tmp/ospf.trace	size 1048576	files 0
+
+		OSPF_Retransmit
+			last: 01:45:15.190	next: 01:45:20.190	interval: 5
+		OSPF_Adjacency	<OneShot>
+			last: 01:45:09.573	next: 01:45:21.573
+		OSPF_Hello	<HiPrio>
+			last: 01:45:18.190	next: 01:45:22.190	interval: 4
+		OSPF_Lock
+			last: 01:45:15.180	next: 01:45:20.180	interval: 5
+		OSPF_Ack	<HiPrio Inactive>
+		OSPF_LSDBAseAge
+			last: 01:44:53.180	next: 01:45:54.180	interval: 1:01
+		OSPF_LSDBSumAge
+			last: 01:40:57.180	next: 01:55:57.180	interval: 15:00
+		OSPF_LSDBIntAge
+			last: 01:39:53.180	next: 01:54:53.180	interval: 15:00
+		OSPF_LSAGenInt
+			last: 01:21:07.180	next: 01:51:07.180	interval: 30:00
+		OSPF_LSAGenAse
+			last: 01:45:19.180	next: 01:45:26.180	interval: 7
+		OSPF_AseQueue	<Inactive>
+
+	ASPaths	Priority 50
+
+	KRT	Priority 60	Proto 255	Socket  1	RtProto Kernel	RtBit 2
+		Trace options: symbols remnants interface-list request detail packets
+		Trace file: /var/tmp/kernel.trace	size 1048576	files 0
+
+		KRT_IfCheck
+			last: 01:44:39.559	next: 01:45:39.559	interval: 1:00
+		KRT_Timeout	<OneShot Inactive>
+
+	Redirect	Priority 60
+		Trace options: general state policy task timer
+		Trace file: /var/tmp/gated.trace	size 1048576	files 0
+
+		Redirect_Age	<OneShot>
+			last: 01:44:12.200	next: 01:47:12.200
+
+
+	Flash routines:
+
+		OSPF
+
+	Socket read routines:
+
+		1	KRT
+		9	ICMP
+		10	OSPF
+
+	File Descriptors (max 10):
+			0
+			1	Task: KRT	 read rqueue
+			2
+			3
+			4
+			5
+			6	File: /var/run/gated.pid
+			7	Task: INET
+			8
+			9	Task: ICMP	 read rqueue
+			10	Task: OSPF	 read rqueue
+
+Task Blocks:
+	Allocation size:  4096
+
+	Size:     8	N_free: 526	LastAlloc: 7E046218
+	                            runt	Init:        1  Alloc:        0  Free:        0  InUse:        0
+	                  krt_remnant_rt	Init:        1  Alloc:        8  Free:        8  InUse:        0
+	                        iflist_t	Init:        1  Alloc:        0  Free:        0  InUse:        0
+	                  sockaddr_un.in	Init:        1  Alloc:  3677552  Free:  3677053  InUse:      499
+	                       asmatch_t	Init:        1  Alloc:        0  Free:        0  InUse:        0
+
+	Size:    16	N_free: 99	LastAlloc: 7C6B4C20
+	                            runt	Init:        6  Alloc:        0  Free:        0  InUse:        0
+	           task_floating_sockets	Init:        1  Alloc:        1  Free:        0  InUse:        1
+	                   ospf_NBR_LIST	Init:        1  Alloc:    16574  Free:    16574  InUse:        0
+	                  ospf_LSDB_LIST	Init:        1  Alloc:   101440  Free:   101440  InUse:        0
+	                      ospf_HOSTS	Init:        1  Alloc:        0  Free:        0  InUse:        0
+	                   ospf_LSDB_SUM	Init:        1  Alloc:       29  Free:       29  InUse:        0
+	              ospf_config_router	Init:        1  Alloc:        0  Free:        0  InUse:        0
+	               if_primary_list_t	Init:        1  Alloc:        0  Free:        0  InUse:        0
+	                      mask_entry	Init:        1  Alloc:       33  Free:        0  InUse:       33
+	                       asp_trans	Init:        1  Alloc:        0  Free:        0  InUse:        0
+	                     config_list	Init:        1  Alloc:        2  Free:        1  InUse:        1
+	                    config_entry	Init:        1  Alloc:        8  Free:        4  InUse:        4
+	              dest_mask_internal	Init:        1  Alloc:      265  Free:      139  InUse:      126
+
+	Size:    24	N_free: 108	LastAlloc: 7E478360
+	                      task_block	Init:        0  Alloc:       57  Free:        0  InUse:       57
+	                        ospf_LSA	Init:        1  Alloc:       84  Free:       75  InUse:        9
+	             krt_multicast_entry	Init:        1  Alloc:        4  Free:        2  InUse:        2
+	                     ospf_LS_REQ	Init:        1  Alloc:      143  Free:      143  InUse:        0
+	                   ospf_NH_BLOCK	Init:        1  Alloc:      228  Free:      204  InUse:       24
+	                   ospf_nbr_node	Init:        1  Alloc:        6  Free:        3  InUse:        3
+	                            runt	Init:        1  Alloc:        0  Free:        0  InUse:        0
+	                       asp_table	Init:        1  Alloc:        0  Free:        0  InUse:        0
+	                       asp_state	Init:        1  Alloc:        0  Free:        0  InUse:        0
+	                   rt_aggr_entry	Init:        1  Alloc:        0  Free:        0  InUse:        0
+	                     sradix_node	Init:        1  Alloc:       29  Free:        0  InUse:       29
+	                 rt_static_table	Init:        1  Alloc:        1  Free:        0  InUse:        1
+	                          rt_tsi	Init:        1  Alloc:      474  Free:      388  InUse:       86
+	                         rt_walk	Init:        1  Alloc:        0  Free:        0  InUse:        0
+	                      radix_node	Init:        1  Alloc:     1046  Free:      871  InUse:      175
+	                        rt_table	Init:        1  Alloc:        1  Free:        0  InUse:        1
+	                           trace	Init:        1  Alloc:       31  Free:       16  InUse:       15
+
+	Size:    32	N_free: 193	LastAlloc: 8886D660
+	                        task_job	Init:        1  Alloc:     9459  Free:     9459  InUse:        0
+	                        ospf_LSA	Init:        2  Alloc:     3286  Free:     3275  InUse:       11
+	                    OSPF_RT_INFO	Init:        1  Alloc:      522  Free:      463  InUse:       59
+	               ospf_export_entry	Init:        1  Alloc:      738  Free:      738  InUse:        0
+	                    ospf_LS_HDRQ	Init:        1  Alloc:   129014  Free:   129014  InUse:        0
+	                  ospf_NET_RANGE	Init:        1  Alloc:        0  Free:        0  InUse:        0
+	                  krt_delq_entry	Init:        1  Alloc:        0  Free:        0  InUse:        0
+	                   if_addr_entry	Init:        1  Alloc:      345  Free:      224  InUse:      121
+	                    rt_aggr_head	Init:        1  Alloc:        0  Free:        0  InUse:        0
+
+	Size:    40	N_free: 122	LastAlloc: 88EE3DC0
+	                       aux_proto	Init:        1  Alloc:        0  Free:        0  InUse:        0
+	                        ospf_LSA	Init:        2  Alloc:     7472  Free:     7396  InUse:       76
+	                     krt_q_entry	Init:        1  Alloc:      881  Free:      881  InUse:        0
+	                      rt_changes	Init:        1  Alloc:      151  Free:      151  InUse:        0
+	                       adv_entry	Init:        1  Alloc:      223  Free:      115  InUse:      108
+
+	Size:    48	N_free: 73	LastAlloc: 87D97FD0
+	                      trace_file	Init:        1  Alloc:        5  Free:        2  InUse:        3
+	                        ospf_LSA	Init:        1  Alloc:    63803  Free:    63801  InUse:        2
+	                    rip_rip_auth	Init:        1  Alloc:        0  Free:        0  InUse:        0
+	                       ospf_auth	Init:        1  Alloc:        0  Free:        0  InUse:        0
+	                      ospf_ROUTE	Init:        1  Alloc:       99  Free:       88  InUse:       11
+	                         if_info	Init:        1  Alloc:        0  Free:        0  InUse:        0
+	                            runt	Init:        2  Alloc:        0  Free:        0  InUse:        0
+
+	Size:    56	N_free: 23	LastAlloc: 7CC7BCB0
+	                 task_size_block	Init:        0  Alloc:       31  Free:        0  InUse:       31
+	                         rt_head	Init:        1  Alloc:      529  Free:      437  InUse:       92
+
+	Size:    64	N_free: 35	LastAlloc: 82277FC0
+	                      task_timer	Init:        1  Alloc:      158  Free:      143  InUse:       15
+	                        ospf_LSA	Init:        1  Alloc:      299  Free:      298  InUse:        1
+	                            runt	Init:        6  Alloc:        0  Free:        0  InUse:        0
+	                        gw_entry	Init:        1  Alloc:       18  Free:        0  InUse:       18
+
+	Size:    72	N_free: 48	LastAlloc: 813EF3F0
+	                       rt_static	Init:        1  Alloc:       15  Free:        0  InUse:       15
+	                       ospf_LSDB	Init:        1  Alloc:      447  Free:      342  InUse:      105
+
+	Size:    80	N_free: 49	LastAlloc: 7DF25050
+	                        ospf_LSA	Init:        1  Alloc:      377  Free:      375  InUse:        2
+
+	Size:    88	N_free: 27	LastAlloc: 88C32688
+	                        rt_entry	Init:        1  Alloc:     7202  Free:     7093  InUse:      109
+	                         as_path	Init:        1  Alloc:     7207  Free:     7205  InUse:        2
+
+	Size:    96	N_free: 39	LastAlloc: 7CFC0000
+	                        ospf_LSA	Init:        1  Alloc:      931  Free:      928  InUse:        3
+
+	Size:   112	N_free: 35	LastAlloc: 87E61000
+	                        ospf_LSA	Init:        1  Alloc:      299  Free:      298  InUse:        1
+
+	Size:   120	N_free: 0	LastAlloc: 00000000
+	                         as_path	Init:        1  Alloc:        0  Free:        0  InUse:        0
+
+	Size:   136	N_free: 0	LastAlloc: 00000000
+	                            runt	Init:        1  Alloc:        0  Free:        0  InUse:        0
+
+	Size:   144	N_free: 1	LastAlloc: 00000000
+	                            runt	Init:        1  Alloc:        0  Free:        0  InUse:        0
+
+	Size:   176	N_free: 13	LastAlloc: 8918F580
+	                            task	Init:        1  Alloc:       14  Free:        4  InUse:       10
+	                            runt	Init:        1  Alloc:        0  Free:        0  InUse:        0
+
+	Size:   208	N_free: 12	LastAlloc: 8867F4E0
+	                         if_link	Init:        1  Alloc:        7  Free:        0  InUse:        7
+
+	Size:   224	N_free: 0	LastAlloc: 00000000
+	                            runt	Init:        1  Alloc:        0  Free:        0  InUse:        0
+
+	Size:   288	N_free: 0	LastAlloc: 00000000
+	                            runt	Init:        1  Alloc:        0  Free:        0  InUse:        0
+
+	Size:   352	N_free: 0	LastAlloc: 00000000
+	                            runt	Init:        1  Alloc:        0  Free:        0  InUse:        0
+
+	Size:   416	N_free: 1	LastAlloc: 00000000
+	                            runt	Init:        1  Alloc:        0  Free:        0  InUse:        0
+
+	Size:   544	N_free: 1	LastAlloc: 00000000
+	                            runt	Init:        1  Alloc:        0  Free:        0  InUse:        0
+
+	Size:   592	N_free: 3	LastAlloc: 8770A4A0
+	                        ospf_NBR	Init:        1  Alloc:        6  Free:        3  InUse:        3
+
+	Size:   736	N_free: 4	LastAlloc: 89485000
+	                       ospf_INTF	Init:        1  Alloc:        2  Free:        1  InUse:        1
+
+	Size:   784	N_free: 0	LastAlloc: 00000000
+	                            runt	Init:        1  Alloc:        0  Free:        0  InUse:        0
+
+	Size:   792	N_free: 0	LastAlloc: 00000000
+	                            runt	Init:        1  Alloc:        0  Free:        0  InUse:        0
+
+	Size:  1104	N_free: 32	LastAlloc: 00000000
+	                            runt	Init:        1  Alloc:        0  Free:        0  InUse:        0
+
+	Size:  1496	N_free: 40	LastAlloc: 8214D000
+	                         if_addr	Init:        1  Alloc:      206  Free:      182  InUse:       24
+
+	Size:  3304	N_free: 1	LastAlloc: 00000000
+	                            runt	Init:        1  Alloc:        0  Free:        0  InUse:        0
+
+	Size:  4096	N_free: 2	LastAlloc: 8B878000
+	                         rt_list	Init:        1  Alloc:      248  Free:      248  InUse:        0
+
+	Size:  8168	N_free: 0	LastAlloc: 00000000
+	        struct regex_match_stack	Init:        1  Alloc:        0  Free:        0  InUse:        0
+
+	Size: 13080	N_free: 0	LastAlloc: 8118B000
+	                       ospf_AREA	Init:        1  Alloc:        2  Free:        1  InUse:        1
+
+
+Task IF:
+		Physical interfaces: 6	Up: 5
+		INET protocol addresses: 20	Up: 20
+
+	Addresses:
+		127.0.0.1
+			P2P 0	Loop 0	Total 0	Refcount 2	Route: not installed
+		127.0.0.2
+			P2P 0	Loop 0	Total 0	Refcount 1	Route: not installed
+		127.0.0.3
+			P2P 0	Loop 0	Total 0	Refcount 1	Route: not installed
+		127.0.0.4
+			P2P 0	Loop 0	Total 0	Refcount 1	Route: not installed
+		172.16.99.5
+			P2P 0	Loop 0	Total 0	Refcount 1	Route: not installed
+		172.16.101.5
+			P2P 0	Loop 0	Total 0	Refcount 1	Route: not installed
+		172.31.5.51
+			P2P 0	Loop 0	Total 0	Refcount 2	Route: not installed
+		172.31.5.53
+			P2P 0	Loop 0	Total 0	Refcount 1	Route: not installed
+		192.168.100.1
+			P2P 0	Loop 0	Total 0	Refcount 1	Route: not installed
+		172.37.5.5
+			P2P 0	Loop 0	Total 0	Refcount 1	Route: not installed
+		172.30.5.5
+			P2P 0	Loop 0	Total 0	Refcount 1	Route: not installed
+		172.16.224.41
+			P2P 0	Loop 0	Total 0	Refcount 1	Route: not installed
+		172.16.99.224
+			P2P 0	Loop 0	Total 0	Refcount 1	Route: not installed
+		172.16.100.5
+			P2P 0	Loop 0	Total 0	Refcount 1	Route: not installed
+		172.16.224.169
+			P2P 0	Loop 0	Total 0	Refcount 1	Route: not installed
+		172.16.99.232
+			P2P 0	Loop 0	Total 0	Refcount 1	Route: not installed
+		172.16.224.25
+			P2P 0	Loop 0	Total 0	Refcount 1	Route: not installed
+		172.16.224.153
+			P2P 0	Loop 0	Total 0	Refcount 1	Route: not installed
+		150.175.240.114
+			P2P 0	Loop 0	Total 0	Refcount 1	Route: not installed
+		172.18.5.1
+			P2P 0	Loop 0	Total 0	Refcount 1	Route: not installed
+		172.28.5.1
+			P2P 0	Loop 0	Total 0	Refcount 1	Route: not installed
+		172.18.5.129
+			P2P 0	Loop 0	Total 0	Refcount 1	Route: not installed
+		172.38.5.1
+			P2P 0	Loop 0	Total 0	Refcount 1	Route: not installed
+		172.26.5.5
+			P2P 0	Loop 0	Total 0	Refcount 1	Route: not installed
+		172.16.100.8
+			P2P 0	Loop 0	Total 0	Refcount 5	Route: not installed
+		172.18.8.1
+			P2P 0	Loop 0	Total 0	Refcount 5	Route: not installed
+		150.175.240.117
+			P2P 0	Loop 0	Total 0	Refcount 5	Route: not installed
+		172.16.99.227
+			P2P 0	Loop 0	Total 0	Refcount 5	Route: not installed
+		172.16.99.235
+			P2P 0	Loop 0	Total 0	Refcount 5	Route: not installed
+		172.16.224.28
+			P2P 0	Loop 0	Total 0	Refcount 5	Route: not installed
+		172.16.224.44
+			P2P 0	Loop 0	Total 0	Refcount 5	Route: not installed
+		172.16.224.156
+			P2P 0	Loop 0	Total 0	Refcount 5	Route: not installed
+		172.16.224.172
+			P2P 0	Loop 0	Total 0	Refcount 5	Route: not installed
+		172.28.8.1
+			P2P 0	Loop 0	Total 0	Refcount 5	Route: not installed
+		172.18.8.129
+			P2P 0	Loop 0	Total 0	Refcount 5	Route: not installed
+		172.38.8.1
+			P2P 0	Loop 0	Total 0	Refcount 5	Route: not installed
+		172.16.100.7
+			P2P 0	Loop 0	Total 0	Refcount 5	Route: not installed
+		172.26.5.8
+			P2P 0	Loop 0	Total 0	Refcount 5	Route: not installed
+		150.175.240.116
+			P2P 0	Loop 0	Total 0	Refcount 5	Route: not installed
+		172.16.99.226
+			P2P 0	Loop 0	Total 0	Refcount 5	Route: not installed
+		172.16.99.234
+			P2P 0	Loop 0	Total 0	Refcount 5	Route: not installed
+		172.16.224.27
+			P2P 0	Loop 0	Total 0	Refcount 5	Route: not installed
+		172.16.224.43
+			P2P 0	Loop 0	Total 0	Refcount 5	Route: not installed
+		172.16.224.155
+			P2P 0	Loop 0	Total 0	Refcount 5	Route: not installed
+		172.16.224.171
+			P2P 0	Loop 0	Total 0	Refcount 5	Route: not installed
+		172.18.7.1
+			P2P 0	Loop 0	Total 0	Refcount 5	Route: not installed
+		172.18.7.129
+			P2P 0	Loop 0	Total 0	Refcount 5	Route: not installed
+		172.28.7.1
+			P2P 0	Loop 0	Total 0	Refcount 5	Route: not installed
+		172.38.7.1
+			P2P 0	Loop 0	Total 0	Refcount 5	Route: not installed
+		172.26.5.7
+			P2P 0	Loop 0	Total 0	Refcount 5	Route: not installed
+		172.18.6.1
+			P2P 0	Loop 0	Total 0	Refcount 4	Route: not installed
+		150.175.240.115
+			P2P 0	Loop 0	Total 0	Refcount 4	Route: not installed
+		172.16.99.225
+			P2P 0	Loop 0	Total 0	Refcount 4	Route: not installed
+		172.16.99.233
+			P2P 0	Loop 0	Total 0	Refcount 4	Route: not installed
+		172.16.100.6
+			P2P 0	Loop 0	Total 0	Refcount 4	Route: not installed
+		172.16.224.26
+			P2P 0	Loop 0	Total 0	Refcount 4	Route: not installed
+		172.16.224.42
+			P2P 0	Loop 0	Total 0	Refcount 4	Route: not installed
+		172.16.224.154
+			P2P 0	Loop 0	Total 0	Refcount 4	Route: not installed
+		172.16.224.170
+			P2P 0	Loop 0	Total 0	Refcount 4	Route: not installed
+		172.28.6.1
+			P2P 0	Loop 0	Total 0	Refcount 4	Route: not installed
+		172.18.6.129
+			P2P 0	Loop 0	Total 0	Refcount 4	Route: not installed
+		172.38.6.1
+			P2P 0	Loop 0	Total 0	Refcount 4	Route: not installed
+		172.26.5.6
+			P2P 0	Loop 0	Total 0	Refcount 4	Route: not installed
+
+	Local addresses:
+		127.0.0.1
+			P2P 0	Loop 1	Total 1	Refcount 1	Route: not installed
+		127.0.0.2
+			P2P 0	Loop 1	Total 1	Refcount 1	Route: not installed
+		127.0.0.3
+			P2P 0	Loop 1	Total 1	Refcount 1	Route: not installed
+		127.0.0.4
+			P2P 0	Loop 1	Total 1	Refcount 1	Route: not installed
+		172.16.99.5
+			P2P 0	Loop 0	Total 1	Refcount 1	Route: not installed
+		172.16.101.5
+			P2P 0	Loop 0	Total 1	Refcount 1	Route: not installed
+		172.31.5.51
+			P2P 0	Loop 0	Total 1	Refcount 1	Route: not installed
+		172.31.5.53
+			P2P 0	Loop 0	Total 1	Refcount 1	Route: not installed
+		192.168.100.1
+			P2P 0	Loop 0	Total 1	Refcount 1	Route: not installed
+		172.37.5.5
+			P2P 0	Loop 0	Total 1	Refcount 1	Route: not installed
+		172.30.5.5
+			P2P 0	Loop 0	Total 1	Refcount 3	Route: not installed
+		172.16.224.41
+			P2P 0	Loop 0	Total 1	Refcount 1	Route: not installed
+		172.16.99.224
+			P2P 0	Loop 0	Total 1	Refcount 1	Route: not installed
+		172.16.100.5
+			P2P 0	Loop 0	Total 1	Refcount 1	Route: not installed
+		172.16.224.169
+			P2P 0	Loop 0	Total 1	Refcount 1	Route: not installed
+		172.16.99.232
+			P2P 0	Loop 0	Total 1	Refcount 1	Route: not installed
+		172.16.224.25
+			P2P 0	Loop 0	Total 1	Refcount 1	Route: not installed
+		172.16.224.153
+			P2P 0	Loop 0	Total 1	Refcount 1	Route: not installed
+		150.175.240.114
+			P2P 0	Loop 0	Total 1	Refcount 1	Route: not installed
+		172.18.5.1
+			P2P 0	Loop 0	Total 1	Refcount 1	Route: not installed
+		172.28.5.1
+			P2P 0	Loop 0	Total 1	Refcount 1	Route: not installed
+		172.18.5.129
+			P2P 0	Loop 0	Total 1	Refcount 1	Route: not installed
+		172.38.5.1
+			P2P 0	Loop 0	Total 1	Refcount 1	Route: not installed
+		172.26.5.5
+			P2P 0	Loop 0	Total 1	Refcount 1	Route: not installed
+
+	Physical addresses:
+		802.2 0:30:48:75:df:a2
+			Refcount 1
+		802.2 0:30:48:75:df:a3
+			Refcount 1
+		802.2 0:4:23:ae:b6:e2
+			Refcount 1
+		802.2 0:4:23:ae:b6:e3
+			Refcount 1
+
+	Names:
+		bge
+			Refcount 2
+		bge0
+			Refcount 1
+		bge1
+			Refcount 1
+		em
+			Refcount 2
+		em0
+			Refcount 1
+		em1
+			Refcount 1
+		enc
+			Refcount 1
+		enc0
+			Refcount 1
+		lo
+			Refcount 1
+		lo0
+			Refcount 1
+		pflog
+			Refcount 1
+		pflog0
+			Refcount 1
+
+
+	Interfaces:
+
+	bge0	Index 1 Address 802.2 0:30:48:75:df:a2	Change: <>	State: <Up Broadcast Multicast Simplex>
+		Refcount: 11	Up-down transitions: 0
+
+		150.175.240.114
+			Metric: 0	MTU: 1436
+			Refcount: 4	Preference: 0	Down: 120
+			Change: <>	State: <Up Broadcast Multicast Simplex PrimaryAddr UsePrimaryAddr>
+			Broadcast Address:   150.175.240.119
+			Subnet Number: 150.175.240.112		Subnet Mask: 255.255.255.248
+
+		172.16.99.5
+			Metric: 0	MTU: 1436
+			Refcount: 6	Preference: 0	Down: 120
+			Change: <>	State: <Up Broadcast Multicast Simplex PrimaryAddr UsePrimaryAddr>
+			Broadcast Address:   172.16.255.255
+			Subnet Number: 172.16		Subnet Mask: 255.255
+
+		172.16.99.224
+			Metric: 0	MTU: 1436
+			Refcount: 3	Preference: 0	Down: 120
+			Change: <>	State: <Up Broadcast Multicast Simplex UsePrimaryAddr>
+			Broadcast Address:   172.16.255.255
+			Subnet Number: 172.16		Subnet Mask: 255.255
+
+		172.16.99.232
+			Metric: 0	MTU: 1436
+			Refcount: 3	Preference: 0	Down: 120
+			Change: <>	State: <Up Broadcast Multicast Simplex UsePrimaryAddr>
+			Broadcast Address:   172.16.255.255
+			Subnet Number: 172.16		Subnet Mask: 255.255
+
+		172.16.100.5
+			Metric: 0	MTU: 1436
+			Refcount: 3	Preference: 0	Down: 120
+			Change: <>	State: <Up Broadcast Multicast Simplex UsePrimaryAddr>
+			Broadcast Address:   172.16.255.255
+			Subnet Number: 172.16		Subnet Mask: 255.255
+
+		172.16.101.5
+			Metric: 0	MTU: 1436
+			Refcount: 3	Preference: 0	Down: 120
+			Change: <>	State: <Up Broadcast Multicast Simplex UsePrimaryAddr>
+			Broadcast Address:   172.16.255.255
+			Subnet Number: 172.16		Subnet Mask: 255.255
+
+		172.16.224.25
+			Metric: 0	MTU: 1436
+			Refcount: 3	Preference: 0	Down: 120
+			Change: <>	State: <Up Broadcast Multicast Simplex PrimaryAddr UsePrimaryAddr>
+			Broadcast Address:   172.16.224.31
+			Subnet Number: 172.16.224.16		Subnet Mask: 255.255.255.240
+
+		172.16.224.41
+			Metric: 0	MTU: 1436
+			Refcount: 3	Preference: 0	Down: 120
+			Change: <>	State: <Up Broadcast Multicast Simplex PrimaryAddr UsePrimaryAddr>
+			Broadcast Address:   172.16.224.47
+			Subnet Number: 172.16.224.32		Subnet Mask: 255.255.255.240
+
+		172.16.224.153
+			Metric: 0	MTU: 1436
+			Refcount: 3	Preference: 0	Down: 120
+			Change: <>	State: <Up Broadcast Multicast Simplex PrimaryAddr UsePrimaryAddr>
+			Broadcast Address:   172.16.224.159
+			Subnet Number: 172.16.224.144		Subnet Mask: 255.255.255.240
+
+		172.16.224.169
+			Metric: 0	MTU: 1436
+			Refcount: 3	Preference: 0	Down: 120
+			Change: <>	State: <Up Broadcast Multicast Simplex PrimaryAddr UsePrimaryAddr>
+			Broadcast Address:   172.16.224.175
+			Subnet Number: 172.16.224.160		Subnet Mask: 255.255.255.240
+
+	bge1	Index 2 Address 802.2 0:30:48:75:df:a3	Change: <>	State: <Up Broadcast Multicast Simplex>
+		Refcount: 8	Up-down transitions: 0
+
+		172.18.5.1
+			Metric: 0	MTU: 1436
+			Refcount: 3	Preference: 0	Down: 120
+			Change: <>	State: <Up Broadcast Multicast Simplex PrimaryAddr UsePrimaryAddr>
+			Broadcast Address:   172.18.5.255
+			Subnet Number: 172.18.5		Subnet Mask: 255.255.255
+
+		172.18.5.129
+			Metric: 0	MTU: 1436
+			Refcount: 3	Preference: 0	Down: 120
+			Change: <>	State: <Up Broadcast Multicast Simplex UsePrimaryAddr>
+			Broadcast Address:   172.18.5.255
+			Subnet Number: 172.18.5		Subnet Mask: 255.255.255
+
+		172.28.5.1
+			Metric: 0	MTU: 1436
+			Refcount: 3	Preference: 0	Down: 120
+			Change: <>	State: <Up Broadcast Multicast Simplex PrimaryAddr UsePrimaryAddr>
+			Broadcast Address:   172.28.5.255
+			Subnet Number: 172.28.5		Subnet Mask: 255.255.255
+
+		172.31.5.51
+			Metric: 0	MTU: 1436
+			Refcount: 68	Preference: 0	Down: 120
+			Change: <>	State: <Up Broadcast Multicast Simplex PrimaryAddr UsePrimaryAddr>
+			Broadcast Address:   172.31.5.255
+			Subnet Number: 172.31.5		Subnet Mask: 255.255.255
+			Routing protocols active: OSPF
+			proto:  OSPF	State: <AllSPF>
+
+		172.31.5.53
+			Metric: 0	MTU: 1436
+			Refcount: 3	Preference: 0	Down: 120
+			Change: <>	State: <Up Broadcast Multicast Simplex UsePrimaryAddr>
+			Broadcast Address:   172.31.5.255
+			Subnet Number: 172.31.5		Subnet Mask: 255.255.255
+
+		172.38.5.1
+			Metric: 0	MTU: 1436
+			Refcount: 3	Preference: 0	Down: 120
+			Change: <>	State: <Up Broadcast Multicast Simplex PrimaryAddr UsePrimaryAddr>
+			Broadcast Address:   172.38.5.255
+			Subnet Number: 172.38.5		Subnet Mask: 255.255.255
+
+		192.168.100.1
+			Metric: 0	MTU: 1436
+			Refcount: 16	Preference: 0	Down: 120
+			Change: <>	State: <Up Broadcast Multicast Simplex PrimaryAddr UsePrimaryAddr>
+			Broadcast Address:   192.168.100.255
+			Subnet Number: 192.168.100		Subnet Mask: 255.255.255
+
+	em0	Index 3 Address 802.2 0:4:23:ae:b6:e2	Change: <>	State: <Up Broadcast Multicast Simplex>
+		Refcount: 2	Up-down transitions: 0
+
+		172.30.5.5
+			Metric: 0	MTU: 1436
+			Refcount: 7	Preference: 0	Down: 120
+			Change: <>	State: <Up Broadcast Multicast Simplex PrimaryAddr UsePrimaryAddr>
+			Broadcast Address:   172.30.5.255
+			Subnet Number: 172.30.5		Subnet Mask: 255.255.255
+
+	em1	Index 4 Address 802.2 0:4:23:ae:b6:e3	Change: <>	State: <Up Broadcast Multicast Simplex>
+		Refcount: 3	Up-down transitions: 0
+
+		172.26.5.5
+			Metric: 0	MTU: 1436
+			Refcount: 3	Preference: 0	Down: 120
+			Change: <>	State: <Up Broadcast Multicast Simplex PrimaryAddr UsePrimaryAddr>
+			Broadcast Address:   172.26.5.255
+			Subnet Number: 172.26.5		Subnet Mask: 255.255.255
+
+		172.37.5.5
+			Metric: 0	MTU: 1436
+			Refcount: 3	Preference: 0	Down: 120
+			Change: <>	State: <Up Broadcast Multicast Simplex PrimaryAddr UsePrimaryAddr>
+			Broadcast Address:   172.37.5.255
+			Subnet Number: 172.37.5		Subnet Mask: 255.255.255
+
+	enc0	Index 5 	Change: <>	State: <>
+		Refcount: 1	Up-down transitions: 0
+
+	lo0	Index 6 	Change: <>	State: <Up Loopback Multicast>
+		Refcount: 5	Up-down transitions: 0
+
+		127.0.0.1
+			Metric: 0	MTU: 33136
+			Refcount: 7	Preference: 0	Down: 120
+			Change: <>	State: <Up Loopback Multicast PrimaryAddr UsePrimaryAddr>
+			Broadcast Address:   127.0.0.1
+			Subnet Number: 127		Subnet Mask: 255.255.255.255
+
+		127.0.0.2
+			Metric: 0	MTU: 33136
+			Refcount: 2	Preference: 0	Down: 120
+			Change: <>	State: <Up Loopback Multicast PrimaryAddr UsePrimaryAddr>
+			Broadcast Address:   127.0.0.2
+			Subnet Number: 127.0.0.2		Subnet Mask: 255.255.255.255
+
+		127.0.0.3
+			Metric: 0	MTU: 33136
+			Refcount: 2	Preference: 0	Down: 120
+			Change: <>	State: <Up Loopback Multicast PrimaryAddr UsePrimaryAddr>
+			Broadcast Address:   127.0.0.3
+			Subnet Number: 127.0.0.3		Subnet Mask: 255.255.255.255
+
+		127.0.0.4
+			Metric: 0	MTU: 33136
+			Refcount: 2	Preference: 0	Down: 120
+			Change: <>	State: <Up Loopback Multicast PrimaryAddr UsePrimaryAddr>
+			Broadcast Address:   127.0.0.4
+			Subnet Number: 127.0.0.4		Subnet Mask: 255.255.255.255
+
+	pflog0	Index 7 	Change: <>	State: <Up>
+		Refcount: 1	Up-down transitions: 0
+
+
+
+Task INET:
+	IP forwarding: 1	UDP checksums: 1
+
+	Reject address: 127.0.0.1	Blackhole address: 127.0.0.1
+
+	Router ID: 172.30.5.5
+
+	Martians:
+		0.0.0.0          mask 0.0.0.0         Exact
+		0.0.0.0          mask 255             
+		127              mask 255              restrict
+		127              mask 255.255.255     
+		240              mask 240              restrict
+
+
+Task Aggregate:
+
+
+Task RT:
+	Static routes for family INET: (* indicates gateway(s) in use)
+		Radix trie for inet (2) inodes 29 routes 15:
+
+			         +-24+--{192.168.194  
+			      +-16+
+			      |  +-32+--{192.168.94.94  
+			   +--1+
+			   |  |        +-24+--{172.30.7  
+			   |  |     +-23+
+			   |  |     |  +-24+--{172.30.6  
+			   |  |  +-13+
+			   |  |  |  |     +-24+--{172.27.5  
+			   |  |  |  |  +-15+
+			   |  |  |  |  |  +-32+--{172.26.218  
+			   |  |  |  +-14+
+			   |  |  |     +-32+--{172.25.218  
+			   |  +-12+
+			   |     |        +-24+--{172.19.218  
+			   |     |     +-17+
+			   |     |     |  +-24+--{172.19.129  
+			   |     |  +-15+
+			   |     |  |  |  +-24+--{172.18.218  
+			   |     |  |  +-17+
+			   |     |  |     +-24+--{172.18.129  
+			   |     +-14+
+			   |        +-32+--{172.16.0.173  
+			+--0+
+			|  |  +--8+--{127  
+			|  +--1+
+			|     |  +-24+--{60  
+			|     +--4+
+			|        +-24+--{55.66.77  
+
+		55.66.77        mask 255.255.255      preference 60	state <Int Retain Gateway Unicast>
+			Gateway	192.168.100.5(*) 
+
+		60              mask 255.255.255      preference 60	state <Int Retain Gateway Unicast>
+			Gateway	192.168.100.3(*) 
+
+		127             mask 255              preference 0	state <NoAdvise Int Retain Reject Unicast>
+			Interfaces 127.0.0.1 
+
+		172.16.0.173    mask 255.255.255.255  preference 60	state <Int Retain Gateway Unicast>
+			Gateway	192.168.100.4(*) 
+
+		172.18.129      mask 255.255.255      preference 60	state <Int Retain Gateway Unicast>
+			Gateway	192.168.100.2(*) 
+
+		172.18.218      mask 255.255.255      preference 60	state <Int Retain Gateway Unicast>
+			Gateway	192.168.100.4(*) 
+
+		172.19.129      mask 255.255.255      preference 60	state <Int Retain Gateway Unicast>
+			Gateway	192.168.100.2(*) 
+
+		172.19.218      mask 255.255.255      preference 60	state <Int Retain Gateway Unicast>
+			Gateway	192.168.100.4(*) 
+
+		172.25.218      mask 255.255.255.255  preference 60	state <Int Retain Gateway Unicast>
+			Gateway	192.168.100.4(*) 
+
+		172.26.218      mask 255.255.255.255  preference 60	state <Int Retain Gateway Unicast>
+			Gateway	192.168.100.4(*) 
+
+		172.27.5        mask 255.255.255      preference 60	state <Int Retain Gateway Unicast>
+			Gateway	192.168.100.6(*) 
+
+		172.30.6        mask 255.255.255      preference 60	state <Int Retain Gateway Unicast>
+			Gateway	172.30.5.146(*) 
+
+		172.30.7        mask 255.255.255      preference 60	state <Int Retain Gateway Unicast>
+			Gateway	172.30.5.146(*) 
+
+		192.168.94.94   mask 255.255.255.255  preference 60	state <Int Retain Gateway Unicast>
+			Gateway	192.168.100.8(*) 
+
+		192.168.194     mask 255.255.255      preference 60	state <Int Retain Gateway Unicast>
+			Gateway	192.168.100.7(*) 
+
+
+	Gateways referenced by static routes:
+		 172.30.5.146        
+			routes: 0 task: RT
+		 192.168.100.4       
+			routes: 0 task: RT
+		 192.168.100.2       
+			routes: 0 task: RT
+		 192.168.100.3       
+			routes: 0 task: RT
+		 192.168.100.6       
+			routes: 0 task: RT
+		 192.168.100.5       
+			routes: 0 task: RT
+		 192.168.100.7       
+			routes: 0 task: RT
+		 192.168.100.8       
+			routes: 0 task: RT
+
+
+	Bit allocations:
+		1	Aggregate
+		2	KRT	byte index: 0	length: 4
+		3	OSPF	byte index: 4	length: 5
+
+	Masks and addresses:
+
+		Family	Address	Length	Mask
+		inet	3C04B1E0	0	0.0.0.0
+		inet	3C04B1E8	1	128
+		inet	3C04B1F0	2	192
+		inet	3C04B1F8	3	224
+		inet	3C04B200	4	240
+		inet	3C04B208	5	248
+		inet	3C04B210	6	252
+		inet	3C04B218	7	254
+		inet	3C04B220	8	255
+		inet	3C04B228	9	255.128
+		inet	3C04B230	10	255.192
+		inet	3C04B238	11	255.224
+		inet	3C04B240	12	255.240
+		inet	3C04B248	13	255.248
+		inet	3C04B250	14	255.252
+		inet	3C04B258	15	255.254
+		inet	3C04B260	16	255.255
+		inet	3C04B268	17	255.255.128
+		inet	3C04B270	18	255.255.192
+		inet	3C04B278	19	255.255.224
+		inet	3C04B280	20	255.255.240
+		inet	3C04B288	21	255.255.248
+		inet	3C04B290	22	255.255.252
+		inet	3C04B298	23	255.255.254
+		inet	3C04B2A0	24	255.255.255
+		inet	3C04B2A8	25	255.255.255.128
+		inet	3C04B2B0	26	255.255.255.192
+		inet	3C04B2B8	27	255.255.255.224
+		inet	3C04B2C0	28	255.255.255.240
+		inet	3C04B2C8	29	255.255.255.248
+		inet	3C04B2D0	30	255.255.255.252
+		inet	3C04B2D8	31	255.255.255.254
+		inet	3C04B2E0	32	255.255.255.255
+
+Routing Tables:
+	Radix trie for inet (2) inodes 175 routes 92:
+
+		         +-24+--{192.168.194
+		      +-16+
+		      |  |     +-24+--{192.168.100
+		      |  |     |  +-32+--{192.168.100.1
+		      |  |  +-18+
+		      |  |  |  +-32+--{192.168.94.94
+		      |  +-17+
+		      |     |  +-32+--{192.168.0.150
+		      |     +-24+--{192.168
+		   +--1+
+		   |  |        |           +-24+--{172.94.8
+		   |  |        |        +-20+
+		   |  |        |        |  |  +-24+--{172.94.7
+		   |  |        |        |  +-23+
+		   |  |        |        |     +-24+--{172.94.6
+		   |  |        |     +-14+
+		   |  |        |     |  |  +-24+--{172.93.8
+		   |  |        |     |  +-20+
+		   |  |        |     |     |  +-24+--{172.93.7
+		   |  |        |     |     +-23+
+		   |  |        |     |        +-24+--{172.93.6
+		   |  |        |  +-13+
+		   |  |        |  |  |     +-24+--{172.90.8
+		   |  |        |  |  |  +-20+
+		   |  |        |  |  |  |  |  +-24+--{172.90.7
+		   |  |        |  |  |  |  +-23+
+		   |  |        |  |  |  |     +-24+--{172.90.6
+		   |  |        |  |  +-14+
+		   |  |        |  |     |  +-24+--{172.89.8
+		   |  |        |  |     +-20+
+		   |  |        |  |        |  +-24+--{172.89.7
+		   |  |        |  |        +-23+
+		   |  |        |  |           +-24+--{172.89.6
+		   |  |        +-12+
+		   |  |        |  |  +-24+--{172.87.7
+		   |  |        |  +-14+
+		   |  |        |     +-24+--{172.85.7
+		   |  |     +-11+
+		   |  |     |  |     +-24+--{172.71.8
+		   |  |     |  |  +-14+
+		   |  |     |  |  |  +-24+--{172.69.8
+		   |  |     |  +-13+
+		   |  |     |     |  +-32+--{172.67.8
+		   |  |     |     +-14+
+		   |  |     |        +-24+--{172.65.8
+		   |  |  +--9+
+		   |  |  |  |        +-24+--{172.63.8
+		   |  |  |  |     +-14+
+		   |  |  |  |     |  +-24+--{172.61.8
+		   |  |  |  |  +-11+
+		   |  |  |  |  |  |     +-24+--{172.38.8
+		   |  |  |  |  |  |  +-20+
+		   |  |  |  |  |  |  |  |     +-24+--{172.38.7
+		   |  |  |  |  |  |  |  |  +-23+
+		   |  |  |  |  |  |  |  |  |  +-24+--{172.38.6
+		   |  |  |  |  |  |  |  +-22+
+		   |  |  |  |  |  |  |     +-24+--{172.38.5
+		   |  |  |  |  |  +-14+
+		   |  |  |  |  |     +-24+--{172.37.5
+		   |  |  |  +-10+
+		   |  |  |     |              +-24+--{172.31.206
+		   |  |  |     |           +-16+
+		   |  |  |     |           |  |  +-24+--{172.31.8
+		   |  |  |     |           |  +-20+
+		   |  |  |     |           |     +-24+--{172.31.5
+		   |  |  |     |           |        +-32+--{172.31.5.53
+		   |  |  |     |        +-15+
+		   |  |  |     |        |  |     +-24+--{172.30.7
+		   |  |  |     |        |  |  +-23+
+		   |  |  |     |        |  |  |  +-24+--{172.30.6
+		   |  |  |     |        |  +-22+
+		   |  |  |     |        |     +-24+--{172.30.5
+		   |  |  |     |     +-14+
+		   |  |  |     |     |  |  +-24+--{172.28.8
+		   |  |  |     |     |  +-20+
+		   |  |  |     |     |     |     +-24+--{172.28.7
+		   |  |  |     |     |     |  +-23+
+		   |  |  |     |     |     |  |  +-24+--{172.28.6
+		   |  |  |     |     |     +-22+
+		   |  |  |     |     |        +-24+--{172.28.5
+		   |  |  |     |  +-13+
+		   |  |  |     |  |  |     +-24+--{172.27.5
+		   |  |  |     |  |  |  +-15+
+		   |  |  |     |  |  |  |  |  +-32+--{172.26.218
+		   |  |  |     |  |  |  |  +-16+
+		   |  |  |     |  |  |  |     +-24+--{172.26.5
+		   |  |  |     |  |  +-14+
+		   |  |  |     |  |     +-32+--{172.25.218
+		   |  |  |     +-12+
+		   |  |  |        |     +-24+--{172.22.5
+		   |  |  |        |  +-14+
+		   |  |  |        |  |  +-24+--{172.20
+		   |  |  |        +-13+
+		   |  |  |           |                 +-24+--{172.19.222
+		   |  |  |           |              +-21+
+		   |  |  |           |              |  +-24+--{172.19.218
+		   |  |  |           |           +-19+
+		   |  |  |           |           |  |  +-24+--{172.19.206
+		   |  |  |           |           |  +-20+
+		   |  |  |           |           |     |  +-24+--{172.19.198
+		   |  |  |           |           |     +-21+
+		   |  |  |           |           |        +-24+--{172.19.195
+		   |  |  |           |        +-17+
+		   |  |  |           |        |  |     +-24+--{172.19.180
+		   |  |  |           |        |  |  +-19+
+		   |  |  |           |        |  |  |  +-24+--{172.19.171
+		   |  |  |           |        |  +-18+
+		   |  |  |           |        |     +-24+--{172.19.129
+		   |  |  |           |     +-16+
+		   |  |  |           |     |  |  +-24+--{172.19.30
+		   |  |  |           |     |  +-19+
+		   |  |  |           |     |     |  +-24+--{172.19.8
+		   |  |  |           |     |     +-20+
+		   |  |  |           |     |        |     +-24+--{172.19.7
+		   |  |  |           |     |        |  +-23+
+		   |  |  |           |     |        |  |  +-24+--{172.19.6
+		   |  |  |           |     |        +-22+
+		   |  |  |           |     |           +-24+--{172.19.5
+		   |  |  |           |  +-15+
+		   |  |  |           |  |  |        +-24+--{172.18.218
+		   |  |  |           |  |  |     +-19+
+		   |  |  |           |  |  |     |  |  +-24+--{172.18.207
+		   |  |  |           |  |  |     |  +-23+
+		   |  |  |           |  |  |     |     +-24+--{172.18.206
+		   |  |  |           |  |  |  +-17+
+		   |  |  |           |  |  |  |  +-24+--{172.18.129
+		   |  |  |           |  |  +-16+
+		   |  |  |           |  |     |  +-24+--{172.18.61
+		   |  |  |           |  |     +-18+
+		   |  |  |           |  |        |  +-24+--{172.18.8
+		   |  |  |           |  |        +-20+
+		   |  |  |           |  |           |     +-24+--{172.18.7
+		   |  |  |           |  |           |  +-23+
+		   |  |  |           |  |           |  |  +-24+--{172.18.6
+		   |  |  |           |  |           +-22+
+		   |  |  |           |  |              +-24+--{172.18.5
+		   |  |  |           +-14+
+		   |  |  |              |  +-24+--{172.17.2
+		   |  |  |              +-15+
+		   |  |  |                 |        +-28+--{172.16.224.160
+		   |  |  |                 |     +-26+
+		   |  |  |                 |     |  +-28+--{172.16.224.144
+		   |  |  |                 |  +-24+
+		   |  |  |                 |  |  |  +-28+--{172.16.224.32
+		   |  |  |                 |  |  +-26+
+		   |  |  |                 |  |     +-28+--{172.16.224.16
+		   |  |  |                 +-16+--{172.16
+		   |  |  |                    |     +-32+--{172.16.101.5
+		   |  |  |                    |  +-18+
+		   |  |  |                    |  |  |  +-24+--{172.16.83
+		   |  |  |                    |  |  +-22+
+		   |  |  |                    |  |     +-24+--{172.16.81
+		   |  |  |                    +-17+
+		   |  |  |                       |     +-32+--{172.16.0.178
+		   |  |  |                       |  +-30+
+		   |  |  |                       |  |  +-32+--{172.16.0.176
+		   |  |  |                       +-27+
+		   |  |  |                          |  +-32+--{172.16.0.175
+		   |  |  |                          +-30+
+		   |  |  |                             +-32+--{172.16.0.173
+		   |  +--2+
+		   |     +-29+--{150.175.240.112
+		+--0+--{0.0.0.0
+		|  |  +--8+--{127
+		|  |  |     +-32+--{127.0.0.4
+		|  |  |  +-29+
+		|  |  |     |     +-32+--{127.0.0.3
+		|  |  |     |  +-31+
+		|  |  |     |  |  +-32+--{127.0.0.2
+		|  |  |     +-30+
+		|  |  |        +-32+--{127.0.0.1
+		|  +--1+
+		|     |  +-24+--{60
+		|     +--4+
+		|        +-24+--{55.66.77
+
+
+
+	+ = Active Route, - = Last Active, * = Both
+
+
+	Routing table for inet (2):
+		Destinations: 92	Routes: 92
+		Holddown: 0	Delete: 1639	Hidden: 12
+
+	0.0.0.0        	mask 0.0.0.0        
+			entries 2	announce 1
+			TSI:
+				OSPF LSDB seq 80000798
+
+		*Kernel	Preference:  40
+			NextHop: 172.16.0.1     	Interface: 172.16.99.5(bge0)
+			State: <Ext Retain Gateway Static ActiveU Unicast>
+			Age: 148:25:20	Metric: 0	Metric2: 0	Tag: 0
+			Task: KRT
+			Announcement bits(2): 2-KRT 3-OSPF
+			AS Path: IGP (Id 1)
+
+
+		OSPF_ASE	Preference:  -1
+			NextHop: 172.31.5.52    	Interface: 172.31.5.51(bge1)
+			State: <Int Hidden Gateway Unicast>
+			Age: 11:11:35	Metric: 65561	Metric2: -1	Tag: 3221225472
+			Task: OSPF
+			AS Path: IGP (Id 1)
+			Cost: 65561	Area: 51	Type: ASE	AdvRouter: 172.30.206.206
+			Type: 1		Forward: 0.0.0.0	Tag: 0 Path: (0) 0 IGP
+
+
+
+	55.66.77       	mask 255.255.255    
+			entries 1	announce 1
+			TSI:
+				OSPF LSDB seq 80000131
+
+		*Static	Preference:  60
+			NextHop: 192.168.100.5  	Interface: 192.168.100.1(bge1)
+			State: <Int Retain Gateway ActiveU Unicast>
+			Age: 6:57:08	Metric: 0	Metric2: 0	Tag: 0
+			Task: RT
+			Announcement bits(2): 2-KRT 3-OSPF
+			AS Path: IGP (Id 1)
+
+
+
+	60             	mask 255.255.255    
+			entries 1	announce 1
+			TSI:
+				OSPF LSDB seq 80000131
+
+		*Static	Preference:  60
+			NextHop: 192.168.100.3  	Interface: 192.168.100.1(bge1)
+			State: <Int Retain Gateway ActiveU Unicast>
+			Age: 6:57:08	Metric: 0	Metric2: 0	Tag: 0
+			Task: RT
+			Announcement bits(2): 2-KRT 3-OSPF
+			AS Path: IGP (Id 1)
+
+
+
+	127            	mask 255            
+			entries 2	announce 1
+			TSI:
+
+		*Static	Preference:   0
+			NextHop: 127.0.0.1      	Interface: 127.0.0.1(lo0)
+			State: <NoAdvise Int Retain Reject ActiveU Unicast>
+			Age: 6:57:08	Metric: 0	Metric2: 0	Tag: 0
+			Task: RT
+			Announcement bits(1): 2-KRT
+			AS Path: IGP (Id 1)
+
+
+		Kernel	Preference:  40
+			NextHop: 127.0.0.1      	Interface: 127.0.0.1(lo0)
+			State: <NotInstall NoAdvise Ext Retain Gateway Static Unicast>
+			Age: 148:28:40	Metric: 0	Metric2: 0	Tag: 0
+			Task: KRT
+			AS Path: IGP (Id 1)
+
+
+
+	127.0.0.1      	mask 255.255.255.255
+			entries 1	announce 1
+			TSI:
+
+		*Direct	Preference:   0
+			NextHop: 127.0.0.1      	Interface: 127.0.0.1(lo0)
+			State: <NoAdvise Int Retain ActiveU Unicast>
+			Age: 148:28:40	Metric: 1	Metric2: 0	Tag: 0
+			Task: IF
+			Announcement bits(1): 2-KRT
+			AS Path: IGP (Id 1)
+
+
+
+	127.0.0.2      	mask 255.255.255.255
+			entries 1	announce 1
+			TSI:
+
+		*Direct	Preference:   0
+			NextHop: 127.0.0.2      	Interface: 127.0.0.2(lo0)
+			State: <Int Retain ActiveU Unicast>
+			Age: 148:24:50	Metric: 1	Metric2: 0	Tag: 0
+			Task: IF
+			Announcement bits(1): 2-KRT
+			AS Path: IGP (Id 1)
+
+
+
+	127.0.0.3      	mask 255.255.255.255
+			entries 1	announce 1
+			TSI:
+
+		*Direct	Preference:   0
+			NextHop: 127.0.0.3      	Interface: 127.0.0.3(lo0)
+			State: <Int Retain ActiveU Unicast>
+			Age: 148:24:50	Metric: 1	Metric2: 0	Tag: 0
+			Task: IF
+			Announcement bits(1): 2-KRT
+			AS Path: IGP (Id 1)
+
+
+
+	127.0.0.4      	mask 255.255.255.255
+			entries 1	announce 1
+			TSI:
+
+		*Direct	Preference:   0
+			NextHop: 127.0.0.4      	Interface: 127.0.0.4(lo0)
+			State: <Int Retain ActiveU Unicast>
+			Age: 148:24:50	Metric: 1	Metric2: 0	Tag: 0
+			Task: IF
+			Announcement bits(1): 2-KRT
+			AS Path: IGP (Id 1)
+
+
+
+	150.175.240.112	mask 255.255.255.248
+			entries 1	announce 1
+			TSI:
+				OSPF LSDB seq 80000131
+
+		*Direct	Preference:   0
+			NextHop: 150.175.240.114	Interface: 150.175.240.114(bge0)
+			State: <Int Retain ActiveU Unicast>
+			Age: 148:25:21	Metric: 1	Metric2: 0	Tag: 0
+			Task: IF
+			Announcement bits(2): 2-KRT 3-OSPF
+			AS Path: IGP (Id 1)
+
+
+
+	172.16         	mask 255.255        
+			entries 6	announce 1
+			TSI:
+				OSPF LSDB seq 80000131
+
+		*Direct	Preference:   0
+			NextHop: 172.16.99.5    	Interface: 172.16.99.5(bge0)
+			State: <Int Retain ActiveU Unicast>
+			Age: 148:28:40	Metric: 1	Metric2: 0	Tag: 0
+			Task: IF
+			Announcement bits(2): 2-KRT 3-OSPF
+			AS Path: IGP (Id 1)
+
+
+		Direct	Preference:   0/1
+			NextHop: 172.16.99.224  	Interface: 172.16.99.224(bge0)
+			State: <Int Retain Unicast>
+			Age: 148:25:21	Metric: 1	Metric2: 0	Tag: 0
+			Task: IF
+			AS Path: IGP (Id 1)
+
+
+		Direct	Preference:   0/1
+			NextHop: 172.16.99.232  	Interface: 172.16.99.232(bge0)
+			State: <Int Retain Unicast>
+			Age: 148:25:21	Metric: 1	Metric2: 0	Tag: 0
+			Task: IF
+			AS Path: IGP (Id 1)
+
+
+		Direct	Preference:   0/1
+			NextHop: 172.16.100.5   	Interface: 172.16.100.5(bge0)
+			State: <Int Retain Unicast>
+			Age: 148:25:21	Metric: 1	Metric2: 0	Tag: 0
+			Task: IF
+			AS Path: IGP (Id 1)
+
+
+		Direct	Preference:   0/1
+			NextHop: 172.16.101.5   	Interface: 172.16.101.5(bge0)
+			State: <Int Retain Unicast>
+			Age: 148:28:40	Metric: 1	Metric2: 0	Tag: 0
+			Task: IF
+			AS Path: IGP (Id 1)
+
+
+		OSPF_ASE	Preference:  -1
+			NextHop: 172.31.5.52    	Interface: 172.31.5.51(bge1)
+			State: <Int Hidden Gateway Unicast>
+			Age: 11:11:35	Metric: 65561	Metric2: -1	Tag: 3221225472
+			Task: OSPF
+			AS Path: IGP (Id 1)
+			Cost: 65561	Area: 51	Type: ASE	AdvRouter: 172.30.206.206
+			Type: 1		Forward: 0.0.0.0	Tag: 0 Path: (0) 0 IGP
+
+
+
+	172.16.0.173   	mask 255.255.255.255
+			entries 1	announce 1
+			TSI:
+				OSPF LSDB seq 80000131
+
+		*Static	Preference:  60
+			NextHop: 192.168.100.4  	Interface: 192.168.100.1(bge1)
+			State: <Int Retain Gateway ActiveU Unicast>
+			Age: 6:57:08	Metric: 0	Metric2: 0	Tag: 0
+			Task: RT
+			Announcement bits(2): 2-KRT 3-OSPF
+			AS Path: IGP (Id 1)
+
+
+
+	172.16.0.175   	mask 255.255.255.255
+			entries 1	announce 1
+			TSI:
+				OSPF LSDB seq 80000131
+
+		*Kernel	Preference:  40
+			NextHop: 172.16.0.17    	Interface: 172.16.99.5(bge0)
+			State: <Ext Retain Gateway Static ActiveU Unicast>
+			Age: 148:25:20	Metric: 0	Metric2: 0	Tag: 0
+			Task: KRT
+			Announcement bits(2): 2-KRT 3-OSPF
+			AS Path: IGP (Id 1)
+
+
+
+	172.16.0.176   	mask 255.255.255.255
+			entries 1	announce 1
+			TSI:
+				OSPF LSDB seq 80000131
+
+		*Kernel	Preference:  40
+			NextHop: 172.16.0.17    	Interface: 172.16.99.5(bge0)
+			State: <Ext Retain Gateway Static ActiveU Unicast>
+			Age: 148:25:20	Metric: 0	Metric2: 0	Tag: 0
+			Task: KRT
+			Announcement bits(2): 2-KRT 3-OSPF
+			AS Path: IGP (Id 1)
+
+
+
+	172.16.0.178   	mask 255.255.255.255
+			entries 1	announce 1
+			TSI:
+
+		*OSPF_ASE	Preference: 150
+			NextHop: 172.31.5.52    	Interface: 172.31.5.51(bge1)
+			State: <Int Gateway ActiveU Unicast>
+			Age: 7:01:18	Metric: 65567	Metric2: -1	Tag: 3221225472
+			Task: OSPF
+			Announcement bits(1): 2-KRT
+			AS Path: IGP (Id 1)
+			Cost: 65567	Area: 51	Type: ASE	AdvRouter: 172.30.7.8
+			Type: 1		Forward: 0.0.0.0	Tag: 0 Path: (0) 0 IGP
+
+
+
+	172.16.81      	mask 255.255.255    
+			entries 1	announce 1
+			TSI:
+
+		*OSPF_ASE	Preference: 150
+			NextHop: 172.31.5.52    	Interface: 172.31.5.51(bge1)
+			State: <Int Gateway ActiveU Unicast>
+			Age: 6:57:00	Metric: 65567	Metric2: -1	Tag: 3221225472
+			Task: OSPF
+			Announcement bits(1): 2-KRT
+			AS Path: IGP (Id 1)
+			Cost: 65567	Area: 51	Type: ASE	AdvRouter: 172.30.7.8
+			Type: 1		Forward: 0.0.0.0	Tag: 0 Path: (0) 0 IGP
+
+
+
+	172.16.83      	mask 255.255.255    
+			entries 1	announce 1
+			TSI:
+
+		*OSPF_ASE	Preference: 150
+			NextHop: 172.31.5.52    	Interface: 172.31.5.51(bge1)
+			State: <Int Gateway ActiveU Unicast>
+			Age: 6:56:54	Metric: 65567	Metric2: -1	Tag: 3221225472
+			Task: OSPF
+			Announcement bits(1): 2-KRT
+			AS Path: IGP (Id 1)
+			Cost: 65567	Area: 51	Type: ASE	AdvRouter: 172.30.7.8
+			Type: 1		Forward: 0.0.0.0	Tag: 0 Path: (0) 0 IGP
+
+
+
+	172.16.101.5   	mask 255.255.255.255
+			entries 1	announce 1
+			TSI:
+
+		*Kernel	Preference:  40
+			NextHop: 127.0.0.1      	Interface: 127.0.0.1(lo0)
+			State: <Ext Retain Gateway Static ActiveU Unicast>
+			Age: 148:28:40	Metric: 0	Metric2: 0	Tag: 0
+			Task: KRT
+			Announcement bits(1): 2-KRT
+			AS Path: IGP (Id 1)
+
+
+
+	172.16.224.16  	mask 255.255.255.240
+			entries 1	announce 1
+			TSI:
+				OSPF LSDB seq 80000131
+
+		*Direct	Preference:   0
+			NextHop: 172.16.224.25  	Interface: 172.16.224.25(bge0)
+			State: <Int Retain ActiveU Unicast>
+			Age: 148:25:21	Metric: 1	Metric2: 0	Tag: 0
+			Task: IF
+			Announcement bits(2): 2-KRT 3-OSPF
+			AS Path: IGP (Id 1)
+
+
+
+	172.16.224.32  	mask 255.255.255.240
+			entries 1	announce 1
+			TSI:
+				OSPF LSDB seq 80000131
+
+		*Direct	Preference:   0
+			NextHop: 172.16.224.41  	Interface: 172.16.224.41(bge0)
+			State: <Int Retain ActiveU Unicast>
+			Age: 148:25:21	Metric: 1	Metric2: 0	Tag: 0
+			Task: IF
+			Announcement bits(2): 2-KRT 3-OSPF
+			AS Path: IGP (Id 1)
+
+
+
+	172.16.224.144 	mask 255.255.255.240
+			entries 1	announce 1
+			TSI:
+				OSPF LSDB seq 800004c9
+
+		*Direct	Preference:   0
+			NextHop: 172.16.224.153 	Interface: 172.16.224.153(bge0)
+			State: <Int Retain ActiveU Unicast>
+			Age: 148:25:21	Metric: 1	Metric2: 0	Tag: 0
+			Task: IF
+			Announcement bits(2): 2-KRT 3-OSPF
+			AS Path: IGP (Id 1)
+
+
+
+	172.16.224.160 	mask 255.255.255.240
+			entries 1	announce 1
+			TSI:
+				OSPF LSDB seq 80000131
+
+		*Direct	Preference:   0
+			NextHop: 172.16.224.169 	Interface: 172.16.224.169(bge0)
+			State: <Int Retain ActiveU Unicast>
+			Age: 148:25:21	Metric: 1	Metric2: 0	Tag: 0
+			Task: IF
+			Announcement bits(2): 2-KRT 3-OSPF
+			AS Path: IGP (Id 1)
+
+
+
+	172.17.2       	mask 255.255.255    
+			entries 1	announce 1
+			TSI:
+
+		*OSPF	Preference:  10
+			NextHop: 172.31.5.52    	Interface: 172.31.5.51(bge1)
+			State: <Int Gateway ActiveU Unicast>
+			Age: 148:24:35	Metric: 24	Metric2: -1	Tag: 0
+			Task: OSPF
+			Announcement bits(1): 2-KRT
+			AS Path: IGP (Id 1)
+			Cost: 24	Area: 51	Type: SumNet	AdvRouter: 172.16.0.47
+
+
+
+	172.18.5       	mask 255.255.255    
+			entries 2	announce 1
+			TSI:
+				OSPF LSDB seq 80000131
+
+		*Direct	Preference:   0
+			NextHop: 172.18.5.1     	Interface: 172.18.5.1(bge1)
+			State: <Int Retain ActiveU Unicast>
+			Age: 148:25:21	Metric: 1	Metric2: 0	Tag: 0
+			Task: IF
+			Announcement bits(2): 2-KRT 3-OSPF
+			AS Path: IGP (Id 1)
+
+
+		Direct	Preference:   0/1
+			NextHop: 172.18.5.129   	Interface: 172.18.5.129(bge1)
+			State: <Int Retain Unicast>
+			Age: 148:25:21	Metric: 1	Metric2: 0	Tag: 0
+			Task: IF
+			AS Path: IGP (Id 1)
+
+
+
+	172.18.6       	mask 255.255.255    
+			entries 1	announce 1
+			TSI:
+
+		*OSPF_ASE	Preference:  25
+			NextHop: 172.31.5.52    	Interface: 172.31.5.51(bge1)
+			State: <Int Gateway ActiveU Unicast>
+			Age: 6:56:00	Metric: 65567	Metric2: -1	Tag: 3221225472
+			Task: OSPF
+			Announcement bits(1): 2-KRT
+			AS Path: IGP (Id 1)
+			Cost: 65567	Area: 51	Type: ASE	AdvRouter: 172.30.7.8
+			Type: 1		Forward: 0.0.0.0	Tag: 0 Path: (0) 0 IGP
+
+
+
+	172.18.7       	mask 255.255.255    
+			entries 1	announce 1
+			TSI:
+
+		*OSPF_ASE	Preference:  25
+			NextHop: 172.31.5.52    	Interface: 172.31.5.51(bge1)
+			State: <Int Gateway ActiveU Unicast>
+			Age: 6:56:06	Metric: 65567	Metric2: -1	Tag: 3221225472
+			Task: OSPF
+			Announcement bits(1): 2-KRT
+			AS Path: IGP (Id 1)
+			Cost: 65567	Area: 51	Type: ASE	AdvRouter: 172.30.7.8
+			Type: 1		Forward: 0.0.0.0	Tag: 0 Path: (0) 0 IGP
+
+
+
+	172.18.8       	mask 255.255.255    
+			entries 1	announce 1
+			TSI:
+
+		*OSPF_ASE	Preference:  25
+			NextHop: 172.31.5.52    	Interface: 172.31.5.51(bge1)
+			State: <Int Gateway ActiveU Unicast>
+			Age: 6:56:54	Metric: 65567	Metric2: -1	Tag: 3221225472
+			Task: OSPF
+			Announcement bits(1): 2-KRT
+			AS Path: IGP (Id 1)
+			Cost: 65567	Area: 51	Type: ASE	AdvRouter: 172.30.7.8
+			Type: 1		Forward: 0.0.0.0	Tag: 0 Path: (0) 0 IGP
+
+
+
+	172.18.61      	mask 255.255.255    
+			entries 1	announce 1
+			TSI:
+
+		*OSPF_ASE	Preference: 150
+			NextHop: 172.31.5.52    	Interface: 172.31.5.51(bge1)
+			State: <Int Gateway ActiveU Unicast>
+			Age: 148:24:35	Metric: 24	Metric2: -1	Tag: 0
+			Task: OSPF
+			Announcement bits(1): 2-KRT
+			AS Path: Incomplete (Id 2)
+			Cost: 24	Area: 51	Type: ASE	AdvRouter: 172.16.0.48
+			Type: 1		Forward: 0.0.0.0	Tag: 0
+
+
+
+	172.18.129     	mask 255.255.255    
+			entries 1	announce 1
+			TSI:
+
+		*Static	Preference:  60
+			NextHop: 192.168.100.2  	Interface: 192.168.100.1(bge1)
+			State: <Int Retain Gateway ActiveU Unicast>
+			Age: 6:57:08	Metric: 0	Metric2: 0	Tag: 0
+			Task: RT
+			Announcement bits(1): 2-KRT
+			AS Path: IGP (Id 1)
+
+
+
+	172.18.206     	mask 255.255.255    
+			entries 1	announce 1
+			TSI:
+
+		*OSPF_ASE	Preference: 150
+			NextHop: 172.31.5.52    	Interface: 172.31.5.51(bge1)
+			State: <Int Gateway ActiveU Unicast>
+			Age: 11:11:35	Metric: 65561	Metric2: -1	Tag: 3221225472
+			Task: OSPF
+			Announcement bits(1): 2-KRT
+			AS Path: IGP (Id 1)
+			Cost: 65561	Area: 51	Type: ASE	AdvRouter: 172.30.206.206
+			Type: 1		Forward: 0.0.0.0	Tag: 0 Path: (0) 0 IGP
+
+
+
+	172.18.207     	mask 255.255.255    
+			entries 1	announce 1
+			TSI:
+
+		*OSPF_ASE	Preference: 150
+			NextHop: 172.31.5.52    	Interface: 172.31.5.51(bge1)
+			State: <Int Gateway ActiveU Unicast>
+			Age: 11:11:35	Metric: 65561	Metric2: -1	Tag: 3221225472
+			Task: OSPF
+			Announcement bits(1): 2-KRT
+			AS Path: IGP (Id 1)
+			Cost: 65561	Area: 51	Type: ASE	AdvRouter: 172.30.206.206
+			Type: 1		Forward: 0.0.0.0	Tag: 0 Path: (0) 0 IGP
+
+
+
+	172.18.218     	mask 255.255.255    
+			entries 2	announce 1
+			TSI:
+
+		*Kernel	Preference:  40
+			NextHop: 192.168.100.4  	Interface: 192.168.100.1(bge1)
+			State: <Ext Retain Gateway Static ActiveU Unicast>
+			Age: 148:25:20	Metric: 0	Metric2: 0	Tag: 0
+			Task: KRT
+			Announcement bits(1): 2-KRT
+			AS Path: IGP (Id 1)
+
+
+		Static	Preference:  60
+			NextHop: 192.168.100.4  	Interface: 192.168.100.1(bge1)
+			State: <Int Retain Gateway Unicast>
+			Age: 6:57:08	Metric: 0	Metric2: 0	Tag: 0
+			Task: RT
+			AS Path: IGP (Id 1)
+
+
+
+	172.19.5       	mask 255.255.255    
+			entries 1	announce 1
+			TSI:
+
+		*OSPF	Preference:  10
+			NextHop: 172.31.5.52    	Interface: 172.31.5.51(bge1)
+			State: <Int Gateway ActiveU Unicast>
+			Age: 148:24:35	Metric: 14	Metric2: -1	Tag: 0
+			Task: OSPF
+			Announcement bits(1): 2-KRT
+			AS Path: IGP (Id 1)
+			Cost: 14	Area: 51	Type: Net	AdvRouter: 172.20.0.146
+
+
+
+	172.19.6       	mask 255.255.255    
+			entries 1	announce 1
+			TSI:
+
+		*OSPF	Preference:  10
+			NextHop: 172.31.5.52    	Interface: 172.31.5.51(bge1)
+			State: <Int Gateway ActiveU Unicast>
+			Age: 148:24:35	Metric: 24	Metric2: -1	Tag: 0
+			Task: OSPF
+			Announcement bits(1): 2-KRT
+			AS Path: IGP (Id 1)
+			Cost: 24	Area: 51	Type: Stub	AdvRouter: 172.20.0.146
+
+
+
+	172.19.7       	mask 255.255.255    
+			entries 1	announce 1
+			TSI:
+
+		*OSPF	Preference:  10
+			NextHop: 172.31.5.52    	Interface: 172.31.5.51(bge1)
+			State: <Int Gateway ActiveU Unicast>
+			Age: 7:01:18	Metric: 24	Metric2: -1	Tag: 0
+			Task: OSPF
+			Announcement bits(1): 2-KRT
+			AS Path: IGP (Id 1)
+			Cost: 24	Area: 51	Type: Stub	AdvRouter: 172.20.0.146
+
+
+
+	172.19.8       	mask 255.255.255    
+			entries 1	announce 1
+			TSI:
+
+		*OSPF	Preference:  10
+			NextHop: 172.31.5.52    	Interface: 172.31.5.51(bge1)
+			State: <Int Gateway ActiveU Unicast>
+			Age: 148:24:35	Metric: 24	Metric2: -1	Tag: 0
+			Task: OSPF
+			Announcement bits(1): 2-KRT
+			AS Path: IGP (Id 1)
+			Cost: 24	Area: 51	Type: Stub	AdvRouter: 172.20.0.146
+
+
+
+	172.19.30      	mask 255.255.255    
+			entries 1	announce 1
+			TSI:
+
+		*OSPF	Preference:  10
+			NextHop: 172.31.5.52    	Interface: 172.31.5.51(bge1)
+			State: <Int Gateway ActiveU Unicast>
+			Age: 11:11:35	Metric: 34	Metric2: -1	Tag: 0
+			Task: OSPF
+			Announcement bits(1): 2-KRT
+			AS Path: IGP (Id 1)
+			Cost: 34	Area: 51	Type: Stub	AdvRouter: 172.16.0.48
+
+
+
+	172.19.129     	mask 255.255.255    
+			entries 1	announce 1
+			TSI:
+
+		*Static	Preference:  60
+			NextHop: 192.168.100.2  	Interface: 192.168.100.1(bge1)
+			State: <Int Retain Gateway ActiveU Unicast>
+			Age: 6:57:08	Metric: 0	Metric2: 0	Tag: 0
+			Task: RT
+			Announcement bits(1): 2-KRT
+			AS Path: IGP (Id 1)
+
+
+
+	172.19.171     	mask 255.255.255    
+			entries 1	announce 1
+			TSI:
+
+		*OSPF	Preference:  10
+			NextHop: 172.31.5.52    	Interface: 172.31.5.51(bge1)
+			State: <Int Gateway ActiveU Unicast>
+			Age: 11:11:35	Metric: 34	Metric2: -1	Tag: 0
+			Task: OSPF
+			Announcement bits(1): 2-KRT
+			AS Path: IGP (Id 1)
+			Cost: 34	Area: 51	Type: Net	AdvRouter: 172.16.0.68
+
+
+
+	172.19.180     	mask 255.255.255    
+			entries 1	announce 1
+			TSI:
+
+		*OSPF	Preference:  10
+			NextHop: 172.31.5.52    	Interface: 172.31.5.51(bge1)
+			State: <Int Gateway ActiveU Unicast>
+			Age: 11:11:35	Metric: 34	Metric2: -1	Tag: 0
+			Task: OSPF
+			Announcement bits(1): 2-KRT
+			AS Path: IGP (Id 1)
+			Cost: 34	Area: 51	Type: Stub	AdvRouter: 172.16.0.48
+
+
+
+	172.19.195     	mask 255.255.255    
+			entries 1	announce 1
+			TSI:
+
+		*OSPF	Preference:  10
+			NextHop: 172.31.5.52    	Interface: 172.31.5.51(bge1)
+			State: <Int Gateway ActiveU Unicast>
+			Age: 11:11:35	Metric: 65559	Metric2: -1	Tag: 0
+			Task: OSPF
+			Announcement bits(1): 2-KRT
+			AS Path: IGP (Id 1)
+			Cost: 65559	Area: 51	Type: Net	AdvRouter: 172.16.0.68
+
+
+
+	172.19.198     	mask 255.255.255    
+			entries 1	announce 1
+			TSI:
+
+		*OSPF	Preference:  10
+			NextHop: 172.31.5.52    	Interface: 172.31.5.51(bge1)
+			State: <Int Gateway ActiveU Unicast>
+			Age: 11:11:35	Metric: 34	Metric2: -1	Tag: 0
+			Task: OSPF
+			Announcement bits(1): 2-KRT
+			AS Path: IGP (Id 1)
+			Cost: 34	Area: 51	Type: Stub	AdvRouter: 172.16.0.68
+
+
+
+	172.19.206     	mask 255.255.255    
+			entries 1	announce 1
+			TSI:
+
+		*OSPF	Preference:  10
+			NextHop: 172.31.5.52    	Interface: 172.31.5.51(bge1)
+			State: <Int Gateway ActiveU Unicast>
+			Age: 11:11:35	Metric: 65559	Metric2: -1	Tag: 0
+			Task: OSPF
+			Announcement bits(1): 2-KRT
+			AS Path: IGP (Id 1)
+			Cost: 65559	Area: 51	Type: Net	AdvRouter: 172.16.0.68
+
+
+
+	172.19.218     	mask 255.255.255    
+			entries 2	announce 1
+			TSI:
+
+		*OSPF	Preference:  10
+			NextHop: 172.31.5.52    	Interface: 172.31.5.51(bge1)
+			State: <Int Gateway ActiveU Unicast>
+			Age: 11:11:35	Metric: 34	Metric2: -1	Tag: 0
+			Task: OSPF
+			Announcement bits(1): 2-KRT
+			AS Path: IGP (Id 1)
+			Cost: 34	Area: 51	Type: Stub	AdvRouter: 172.16.0.48
+
+
+		Static	Preference:  60
+			NextHop: 192.168.100.4  	Interface: 192.168.100.1(bge1)
+			State: <Int Retain Gateway Unicast>
+			Age: 6:57:08	Metric: 0	Metric2: 0	Tag: 0
+			Task: RT
+			AS Path: IGP (Id 1)
+
+
+
+	172.19.222     	mask 255.255.255    
+			entries 1	announce 1
+			TSI:
+
+		*OSPF	Preference:  10
+			NextHop: 172.31.5.52    	Interface: 172.31.5.51(bge1)
+			State: <Int Gateway ActiveU Unicast>
+			Age: 11:11:35	Metric: 65559	Metric2: -1	Tag: 0
+			Task: OSPF
+			Announcement bits(1): 2-KRT
+			AS Path: IGP (Id 1)
+			Cost: 65559	Area: 51	Type: Net	AdvRouter: 172.16.0.68
+
+
+
+	172.20         	mask 255.255.255    
+			entries 1	announce 1
+			TSI:
+
+		*OSPF	Preference:  10
+			NextHop: 172.31.5.52    	Interface: 172.31.5.51(bge1)
+			State: <Int Gateway ActiveU Unicast>
+			Age: 11:11:45	Metric: 24	Metric2: -1	Tag: 0
+			Task: OSPF
+			Announcement bits(1): 2-KRT
+			AS Path: IGP (Id 1)
+			Cost: 24	Area: 51	Type: Net	AdvRouter: 172.16.0.68
+
+
+
+	172.22.5       	mask 255.255.255    
+			entries 1	announce 1
+			TSI:
+
+		*OSPF	Preference:  10
+			NextHop: 172.31.5.52    	Interface: 172.31.5.51(bge1)
+			State: <Int Gateway ActiveU Unicast>
+			Age: 148:24:35	Metric: 14	Metric2: -1	Tag: 0
+			Task: OSPF
+			Announcement bits(1): 2-KRT
+			AS Path: IGP (Id 1)
+			Cost: 14	Area: 51	Type: Net	AdvRouter: 172.31.5.52
+
+
+
+	172.25.218     	mask 255.255.255.255
+			entries 1	announce 1
+			TSI:
+
+		*Static	Preference:  60
+			NextHop: 192.168.100.4  	Interface: 192.168.100.1(bge1)
+			State: <Int Retain Gateway ActiveU Unicast>
+			Age: 6:57:08	Metric: 0	Metric2: 0	Tag: 0
+			Task: RT
+			Announcement bits(1): 2-KRT
+			AS Path: IGP (Id 1)
+
+
+
+	172.26.5       	mask 255.255.255    
+			entries 1	announce 1
+			TSI:
+				OSPF LSDB seq 80000131
+
+		*Direct	Preference:   0
+			NextHop: 172.26.5.5     	Interface: 172.26.5.5(em1)
+			State: <Int Retain ActiveU Unicast>
+			Age: 148:25:21	Metric: 1	Metric2: 0	Tag: 0
+			Task: IF
+			Announcement bits(2): 2-KRT 3-OSPF
+			AS Path: IGP (Id 1)
+
+
+
+	172.26.218     	mask 255.255.255.255
+			entries 1	announce 1
+			TSI:
+
+		*Static	Preference:  60
+			NextHop: 192.168.100.4  	Interface: 192.168.100.1(bge1)
+			State: <Int Retain Gateway ActiveU Unicast>
+			Age: 6:57:08	Metric: 0	Metric2: 0	Tag: 0
+			Task: RT
+			Announcement bits(1): 2-KRT
+			AS Path: IGP (Id 1)
+
+
+
+	172.27.5       	mask 255.255.255    
+			entries 1	announce 1
+			TSI:
+				OSPF LSDB seq 80000131
+
+		*Static	Preference:  60
+			NextHop: 192.168.100.6  	Interface: 192.168.100.1(bge1)
+			State: <Int Retain Gateway ActiveU Unicast>
+			Age: 6:57:08	Metric: 0	Metric2: 0	Tag: 0
+			Task: RT
+			Announcement bits(2): 2-KRT 3-OSPF
+			AS Path: IGP (Id 1)
+
+
+
+	172.28.5       	mask 255.255.255    
+			entries 1	announce 1
+			TSI:
+				OSPF LSDB seq 80000131
+
+		*Direct	Preference:   0
+			NextHop: 172.28.5.1     	Interface: 172.28.5.1(bge1)
+			State: <Int Retain ActiveU Unicast>
+			Age: 148:25:21	Metric: 1	Metric2: 0	Tag: 0
+			Task: IF
+			Announcement bits(2): 2-KRT 3-OSPF
+			AS Path: IGP (Id 1)
+
+
+
+	172.28.6       	mask 255.255.255    
+			entries 1	announce 0
+			TSI:
+
+		OSPF_ASE	Preference:  -1
+			NextHop: 172.31.5.52    	Interface: 172.31.5.51(bge1)
+			State: <Int Hidden Gateway Unicast>
+			Age: 6:56:00	Metric: 65567	Metric2: -1	Tag: 3221225472
+			Task: OSPF
+			AS Path: IGP (Id 1)
+			Cost: 65567	Area: 51	Type: ASE	AdvRouter: 172.30.7.8
+			Type: 1		Forward: 0.0.0.0	Tag: 0 Path: (0) 0 IGP
+
+
+
+	172.28.7       	mask 255.255.255    
+			entries 1	announce 0
+			TSI:
+
+		OSPF_ASE	Preference:  -1
+			NextHop: 172.31.5.52    	Interface: 172.31.5.51(bge1)
+			State: <Int Hidden Gateway Unicast>
+			Age: 6:56:00	Metric: 65567	Metric2: -1	Tag: 3221225472
+			Task: OSPF
+			AS Path: IGP (Id 1)
+			Cost: 65567	Area: 51	Type: ASE	AdvRouter: 172.30.7.8
+			Type: 1		Forward: 0.0.0.0	Tag: 0 Path: (0) 0 IGP
+
+
+
+	172.28.8       	mask 255.255.255    
+			entries 1	announce 0
+			TSI:
+
+		OSPF_ASE	Preference:  -1
+			NextHop: 172.31.5.52    	Interface: 172.31.5.51(bge1)
+			State: <Int Hidden Gateway Unicast>
+			Age: 6:56:54	Metric: 65567	Metric2: -1	Tag: 3221225472
+			Task: OSPF
+			AS Path: IGP (Id 1)
+			Cost: 65567	Area: 51	Type: ASE	AdvRouter: 172.30.7.8
+			Type: 1		Forward: 0.0.0.0	Tag: 0 Path: (0) 0 IGP
+
+
+
+	172.30.5       	mask 255.255.255    
+			entries 2	announce 1
+			TSI:
+
+		*Direct	Preference:   0
+			NextHop: 172.30.5.5     	Interface: 172.30.5.5(em0)
+			State: <Int Retain ActiveU Unicast>
+			Age: 148:28:22	Metric: 1	Metric2: 0	Tag: 0
+			Task: IF
+			Announcement bits(1): 2-KRT
+			AS Path: IGP (Id 1)
+
+
+		OSPF_ASE	Preference:  -1
+			NextHop: 172.31.5.52    	Interface: 172.31.5.51(bge1)
+			State: <Int Hidden Gateway Unicast>
+			Age: 6:57:35	Metric: 65567	Metric2: -1	Tag: 3221225472
+			Task: OSPF
+			AS Path: IGP (Id 1)
+			Cost: 65567	Area: 51	Type: ASE	AdvRouter: 172.30.7.8
+			Type: 1		Forward: 0.0.0.0	Tag: 0 Path: (0) 0 IGP
+
+
+
+	172.30.6       	mask 255.255.255    
+			entries 3	announce 1
+			TSI:
+
+		*Kernel	Preference:  40
+			NextHop: 172.30.5.146   	Interface: 172.30.5.5(em0)
+			State: <Ext Retain Gateway Static ActiveU Unicast>
+			Age: 148:25:20	Metric: 0	Metric2: 0	Tag: 0
+			Task: KRT
+			Announcement bits(1): 2-KRT
+			AS Path: IGP (Id 1)
+
+
+		Static	Preference:  60
+			NextHop: 172.30.5.146   	Interface: 172.30.5.5(em0)
+			State: <Int Retain Gateway Unicast>
+			Age: 6:57:08	Metric: 0	Metric2: 0	Tag: 0
+			Task: RT
+			AS Path: IGP (Id 1)
+
+
+		OSPF_ASE	Preference:  -1
+			NextHop: 172.31.5.52    	Interface: 172.31.5.51(bge1)
+			State: <Int Hidden Gateway Unicast>
+			Age: 6:57:35	Metric: 65567	Metric2: -1	Tag: 3221225472
+			Task: OSPF
+			AS Path: IGP (Id 1)
+			Cost: 65567	Area: 51	Type: ASE	AdvRouter: 172.30.7.8
+			Type: 1		Forward: 0.0.0.0	Tag: 0 Path: (0) 0 IGP
+
+
+
+	172.30.7       	mask 255.255.255    
+			entries 2	announce 1
+			TSI:
+
+		*Kernel	Preference:  40
+			NextHop: 172.30.5.146   	Interface: 172.30.5.5(em0)
+			State: <Ext Retain Gateway Static ActiveU Unicast>
+			Age: 148:25:20	Metric: 0	Metric2: 0	Tag: 0
+			Task: KRT
+			Announcement bits(1): 2-KRT
+			AS Path: IGP (Id 1)
+
+
+		Static	Preference:  60
+			NextHop: 172.30.5.146   	Interface: 172.30.5.5(em0)
+			State: <Int Retain Gateway Unicast>
+			Age: 6:57:08	Metric: 0	Metric2: 0	Tag: 0
+			Task: RT
+			AS Path: IGP (Id 1)
+
+
+
+	172.31.5       	mask 255.255.255    
+			entries 3	announce 1
+			TSI:
+
+		*Direct	Preference:   0
+			NextHop: 172.31.5.51    	Interface: 172.31.5.51(bge1)
+			State: <Int Retain ActiveU Unicast>
+			Age: 0	Metric: 1	Metric2: 0	Tag: 0
+			Task: IF
+			Announcement bits(1): 2-KRT
+			AS Path: IGP (Id 1)
+
+
+		Direct	Preference:   0/1
+			NextHop: 172.31.5.53    	Interface: 172.31.5.53(bge1)
+			State: <Int Retain Unicast>
+			Age: 148:28:40	Metric: 1	Metric2: 0	Tag: 0
+			Task: IF
+			AS Path: IGP (Id 1)
+
+
+		OSPF	Preference: -10
+			NextHop: 172.31.5.51    	Interface: 172.31.5.51(bge1)
+			State: <NotInstall NoAdvise Int Hidden Gateway Unicast>
+			Age: 148:24:35	Metric: 1	Metric2: -1	Tag: 0
+			Task: OSPF
+			AS Path: IGP (Id 1)
+			Cost: 1	Area: 51	Type: Net	AdvRouter: 172.31.5.62
+
+
+
+	172.31.5.53    	mask 255.255.255.255
+			entries 1	announce 1
+			TSI:
+
+		*Kernel	Preference:  40
+			NextHop: 127.0.0.1      	Interface: 127.0.0.1(lo0)
+			State: <Ext Retain Gateway Static ActiveU Unicast>
+			Age: 148:28:40	Metric: 0	Metric2: 0	Tag: 0
+			Task: KRT
+			Announcement bits(1): 2-KRT
+			AS Path: IGP (Id 1)
+
+
+
+	172.31.8       	mask 255.255.255    
+			entries 1	announce 1
+			TSI:
+
+		*OSPF	Preference:  10
+			NextHop: 172.31.5.52    	Interface: 172.31.5.51(bge1)
+			State: <Int Gateway ActiveU Unicast>
+			Age: 11:11:35	Metric: 65563	Metric2: -1	Tag: 0
+			Task: OSPF
+			Announcement bits(1): 2-KRT
+			AS Path: IGP (Id 1)
+			Cost: 65563	Area: 51	Type: Net	AdvRouter: 172.31.8.2
+
+
+
+	172.31.206     	mask 255.255.255    
+			entries 1	announce 1
+			TSI:
+
+		*OSPF	Preference:  10
+			NextHop: 172.31.5.52    	Interface: 172.31.5.51(bge1)
+			State: <Int Gateway ActiveU Unicast>
+			Age: 11:11:35	Metric: 65560	Metric2: -1	Tag: 0
+			Task: OSPF
+			Announcement bits(1): 2-KRT
+			AS Path: IGP (Id 1)
+			Cost: 65560	Area: 51	Type: Net	AdvRouter: 172.30.206.206
+
+
+
+	172.37.5       	mask 255.255.255    
+			entries 2	announce 1
+			TSI:
+				OSPF LSDB seq 80000859
+
+		*Direct	Preference:   0
+			NextHop: 172.37.5.5     	Interface: 172.37.5.5(em1)
+			State: <Int Retain ActiveU Unicast>
+			Age: 148:28:40	Metric: 1	Metric2: 0	Tag: 0
+			Task: IF
+			Announcement bits(2): 2-KRT 3-OSPF
+			AS Path: IGP (Id 1)
+
+
+		OSPF_ASE	Preference:  -1
+			NextHop: 172.31.5.52    	Interface: 172.31.5.51(bge1)
+			State: <Int Hidden Gateway Unicast>
+			Age: 7:01:18	Metric: 65567	Metric2: -1	Tag: 3221225472
+			Task: OSPF
+			AS Path: IGP (Id 1)
+			Cost: 65567	Area: 51	Type: ASE	AdvRouter: 172.30.7.8
+			Type: 1		Forward: 0.0.0.0	Tag: 0 Path: (0) 0 IGP
+
+
+
+	172.38.5       	mask 255.255.255    
+			entries 1	announce 1
+			TSI:
+				OSPF LSDB seq 800004c7
+
+		*Direct	Preference:   0
+			NextHop: 172.38.5.1     	Interface: 172.38.5.1(bge1)
+			State: <Int Retain ActiveU Unicast>
+			Age: 148:25:21	Metric: 1	Metric2: 0	Tag: 0
+			Task: IF
+			Announcement bits(2): 2-KRT 3-OSPF
+			AS Path: IGP (Id 1)
+
+
+
+	172.38.6       	mask 255.255.255    
+			entries 1	announce 0
+			TSI:
+
+		OSPF_ASE	Preference:  -1
+			NextHop: 172.31.5.52    	Interface: 172.31.5.51(bge1)
+			State: <Int Hidden Gateway Unicast>
+			Age: 6:56:00	Metric: 65567	Metric2: -1	Tag: 3221225472
+			Task: OSPF
+			AS Path: IGP (Id 1)
+			Cost: 65567	Area: 51	Type: ASE	AdvRouter: 172.30.7.8
+			Type: 1		Forward: 0.0.0.0	Tag: 0 Path: (0) 0 IGP
+
+
+
+	172.38.7       	mask 255.255.255    
+			entries 1	announce 0
+			TSI:
+
+		OSPF_ASE	Preference:  -1
+			NextHop: 172.31.5.52    	Interface: 172.31.5.51(bge1)
+			State: <Int Hidden Gateway Unicast>
+			Age: 6:56:00	Metric: 65567	Metric2: -1	Tag: 3221225472
+			Task: OSPF
+			AS Path: IGP (Id 1)
+			Cost: 65567	Area: 51	Type: ASE	AdvRouter: 172.30.7.8
+			Type: 1		Forward: 0.0.0.0	Tag: 0 Path: (0) 0 IGP
+
+
+
+	172.38.8       	mask 255.255.255    
+			entries 1	announce 0
+			TSI:
+
+		OSPF_ASE	Preference:  -1
+			NextHop: 172.31.5.52    	Interface: 172.31.5.51(bge1)
+			State: <Int Hidden Gateway Unicast>
+			Age: 6:56:54	Metric: 65567	Metric2: -1	Tag: 3221225472
+			Task: OSPF
+			AS Path: IGP (Id 1)
+			Cost: 65567	Area: 51	Type: ASE	AdvRouter: 172.30.7.8
+			Type: 1		Forward: 0.0.0.0	Tag: 0 Path: (0) 0 IGP
+
+
+
+	172.61.8       	mask 255.255.255    
+			entries 1	announce 1
+			TSI:
+
+		*OSPF_ASE	Preference: 150
+			NextHop: 172.31.5.52    	Interface: 172.31.5.51(bge1)
+			State: <Int Gateway ActiveU Unicast>
+			Age: 7:01:18	Metric: 65567	Metric2: -1	Tag: 3221225472
+			Task: OSPF
+			Announcement bits(1): 2-KRT
+			AS Path: IGP (Id 1)
+			Cost: 65567	Area: 51	Type: ASE	AdvRouter: 172.30.7.8
+			Type: 1		Forward: 0.0.0.0	Tag: 0 Path: (0) 0 IGP
+
+
+
+	172.63.8       	mask 255.255.255    
+			entries 1	announce 1
+			TSI:
+
+		*OSPF_ASE	Preference: 150
+			NextHop: 172.31.5.52    	Interface: 172.31.5.51(bge1)
+			State: <Int Gateway ActiveU Unicast>
+			Age: 7:01:18	Metric: 65567	Metric2: -1	Tag: 3221225472
+			Task: OSPF
+			Announcement bits(1): 2-KRT
+			AS Path: IGP (Id 1)
+			Cost: 65567	Area: 51	Type: ASE	AdvRouter: 172.30.7.8
+			Type: 1		Forward: 0.0.0.0	Tag: 0 Path: (0) 0 IGP
+
+
+
+	172.65.8       	mask 255.255.255    
+			entries 1	announce 1
+			TSI:
+
+		*OSPF_ASE	Preference: 150
+			NextHop: 172.31.5.52    	Interface: 172.31.5.51(bge1)
+			State: <Int Gateway ActiveU Unicast>
+			Age: 11:11:35	Metric: 28	Metric2: -1	Tag: 3221225472
+			Task: OSPF
+			Announcement bits(1): 2-KRT
+			AS Path: IGP (Id 1)
+			Cost: 28	Area: 51	Type: ASE	AdvRouter: 172.31.8.2
+			Type: 1		Forward: 172.19.7.60	Tag: 0 Path: (0) 0 IGP
+
+
+
+	172.67.8       	mask 255.255.255.255
+			entries 1	announce 1
+			TSI:
+
+		*OSPF_ASE	Preference: 150
+			NextHop: 172.31.5.52    	Interface: 172.31.5.51(bge1)
+			State: <Int Gateway ActiveU Unicast>
+			Age: 11:11:35	Metric: 28	Metric2: -1	Tag: 3221225472
+			Task: OSPF
+			Announcement bits(1): 2-KRT
+			AS Path: IGP (Id 1)
+			Cost: 28	Area: 51	Type: ASE	AdvRouter: 172.31.8.2
+			Type: 1		Forward: 172.19.7.60	Tag: 0 Path: (0) 0 IGP
+
+
+
+	172.69.8       	mask 255.255.255    
+			entries 1	announce 1
+			TSI:
+
+		*OSPF_ASE	Preference: 150
+			NextHop: 172.31.5.52    	Interface: 172.31.5.51(bge1)
+			State: <Int Gateway ActiveU Unicast>
+			Age: 11:11:35	Metric: 65563	Metric2: -1	Tag: 3221225472
+			Task: OSPF
+			Announcement bits(1): 2-KRT
+			AS Path: IGP (Id 1)
+			Cost: 65563	Area: 51	Type: ASE	AdvRouter: 172.31.8.2
+			Type: 1		Forward: 0.0.0.0	Tag: 0 Path: (0) 0 IGP
+
+
+
+	172.71.8       	mask 255.255.255    
+			entries 1	announce 1
+			TSI:
+
+		*OSPF_ASE	Preference: 150
+			NextHop: 172.31.5.52    	Interface: 172.31.5.51(bge1)
+			State: <Int Gateway ActiveU Unicast>
+			Age: 11:11:35	Metric: 65563	Metric2: -1	Tag: 3221225472
+			Task: OSPF
+			Announcement bits(1): 2-KRT
+			AS Path: IGP (Id 1)
+			Cost: 65563	Area: 51	Type: ASE	AdvRouter: 172.31.8.2
+			Type: 1		Forward: 0.0.0.0	Tag: 0 Path: (0) 0 IGP
+
+
+
+	172.85.7       	mask 255.255.255    
+			entries 1	announce 1
+			TSI:
+
+		*OSPF	Preference:  10
+			NextHop: 172.31.5.52    	Interface: 172.31.5.51(bge1)
+			State: <Int Gateway ActiveU Unicast>
+			Age: 11:11:35	Metric: 65575	Metric2: -1	Tag: 0
+			Task: OSPF
+			Announcement bits(1): 2-KRT
+			AS Path: IGP (Id 1)
+			Cost: 65575	Area: 51	Type: Stub	AdvRouter: 172.31.8.2
+
+
+
+	172.87.7       	mask 255.255.255    
+			entries 1	announce 1
+			TSI:
+
+		*OSPF	Preference:  10
+			NextHop: 172.31.5.52    	Interface: 172.31.5.51(bge1)
+			State: <Int Gateway ActiveU Unicast>
+			Age: 11:11:35	Metric: 65575	Metric2: -1	Tag: 0
+			Task: OSPF
+			Announcement bits(1): 2-KRT
+			AS Path: IGP (Id 1)
+			Cost: 65575	Area: 51	Type: Stub	AdvRouter: 172.31.8.2
+
+
+
+	172.89.6       	mask 255.255.255    
+			entries 1	announce 1
+			TSI:
+
+		*OSPF_ASE	Preference: 150
+			NextHop: 172.31.5.52    	Interface: 172.31.5.51(bge1)
+			State: <Int Gateway ActiveU Unicast>
+			Age: 6:56:00	Metric: 65567	Metric2: -1	Tag: 3221225472
+			Task: OSPF
+			Announcement bits(1): 2-KRT
+			AS Path: IGP (Id 1)
+			Cost: 65567	Area: 51	Type: ASE	AdvRouter: 172.30.7.8
+			Type: 1		Forward: 0.0.0.0	Tag: 0 Path: (0) 0 IGP
+
+
+
+	172.89.7       	mask 255.255.255    
+			entries 1	announce 1
+			TSI:
+
+		*OSPF_ASE	Preference: 150
+			NextHop: 172.31.5.52    	Interface: 172.31.5.51(bge1)
+			State: <Int Gateway ActiveU Unicast>
+			Age: 6:56:00	Metric: 65567	Metric2: -1	Tag: 3221225472
+			Task: OSPF
+			Announcement bits(1): 2-KRT
+			AS Path: IGP (Id 1)
+			Cost: 65567	Area: 51	Type: ASE	AdvRouter: 172.30.7.8
+			Type: 1		Forward: 0.0.0.0	Tag: 0 Path: (0) 0 IGP
+
+
+
+	172.89.8       	mask 255.255.255    
+			entries 1	announce 1
+			TSI:
+
+		*OSPF_ASE	Preference: 150
+			NextHop: 172.31.5.52    	Interface: 172.31.5.51(bge1)
+			State: <Int Gateway ActiveU Unicast>
+			Age: 6:56:54	Metric: 65567	Metric2: -1	Tag: 3221225472
+			Task: OSPF
+			Announcement bits(1): 2-KRT
+			AS Path: IGP (Id 1)
+			Cost: 65567	Area: 51	Type: ASE	AdvRouter: 172.30.7.8
+			Type: 1		Forward: 0.0.0.0	Tag: 0 Path: (0) 0 IGP
+
+
+
+	172.90.6       	mask 255.255.255    
+			entries 1	announce 1
+			TSI:
+
+		*OSPF_ASE	Preference: 150
+			NextHop: 172.31.5.52    	Interface: 172.31.5.51(bge1)
+			State: <Int Gateway ActiveU Unicast>
+			Age: 6:56:00	Metric: 65567	Metric2: -1	Tag: 3221225472
+			Task: OSPF
+			Announcement bits(1): 2-KRT
+			AS Path: IGP (Id 1)
+			Cost: 65567	Area: 51	Type: ASE	AdvRouter: 172.30.7.8
+			Type: 1		Forward: 0.0.0.0	Tag: 0 Path: (0) 0 IGP
+
+
+
+	172.90.7       	mask 255.255.255    
+			entries 1	announce 1
+			TSI:
+
+		*OSPF_ASE	Preference: 150
+			NextHop: 172.31.5.52    	Interface: 172.31.5.51(bge1)
+			State: <Int Gateway ActiveU Unicast>
+			Age: 6:56:00	Metric: 65567	Metric2: -1	Tag: 3221225472
+			Task: OSPF
+			Announcement bits(1): 2-KRT
+			AS Path: IGP (Id 1)
+			Cost: 65567	Area: 51	Type: ASE	AdvRouter: 172.30.7.8
+			Type: 1		Forward: 0.0.0.0	Tag: 0 Path: (0) 0 IGP
+
+
+
+	172.90.8       	mask 255.255.255    
+			entries 1	announce 1
+			TSI:
+
+		*OSPF_ASE	Preference: 150
+			NextHop: 172.31.5.52    	Interface: 172.31.5.51(bge1)
+			State: <Int Gateway ActiveU Unicast>
+			Age: 6:56:54	Metric: 65567	Metric2: -1	Tag: 3221225472
+			Task: OSPF
+			Announcement bits(1): 2-KRT
+			AS Path: IGP (Id 1)
+			Cost: 65567	Area: 51	Type: ASE	AdvRouter: 172.30.7.8
+			Type: 1		Forward: 0.0.0.0	Tag: 0 Path: (0) 0 IGP
+
+
+
+	172.93.6       	mask 255.255.255    
+			entries 1	announce 1
+			TSI:
+
+		*OSPF_ASE	Preference: 150
+			NextHop: 172.31.5.52    	Interface: 172.31.5.51(bge1)
+			State: <Int Gateway ActiveU Unicast>
+			Age: 6:56:00	Metric: 65567	Metric2: -1	Tag: 3221225472
+			Task: OSPF
+			Announcement bits(1): 2-KRT
+			AS Path: IGP (Id 1)
+			Cost: 65567	Area: 51	Type: ASE	AdvRouter: 172.30.7.8
+			Type: 1		Forward: 0.0.0.0	Tag: 0 Path: (0) 0 IGP
+
+
+
+	172.93.7       	mask 255.255.255    
+			entries 1	announce 1
+			TSI:
+
+		*OSPF_ASE	Preference: 150
+			NextHop: 172.31.5.52    	Interface: 172.31.5.51(bge1)
+			State: <Int Gateway ActiveU Unicast>
+			Age: 6:56:00	Metric: 65567	Metric2: -1	Tag: 3221225472
+			Task: OSPF
+			Announcement bits(1): 2-KRT
+			AS Path: IGP (Id 1)
+			Cost: 65567	Area: 51	Type: ASE	AdvRouter: 172.30.7.8
+			Type: 1		Forward: 0.0.0.0	Tag: 0 Path: (0) 0 IGP
+
+
+
+	172.93.8       	mask 255.255.255    
+			entries 1	announce 1
+			TSI:
+
+		*OSPF_ASE	Preference: 150
+			NextHop: 172.31.5.52    	Interface: 172.31.5.51(bge1)
+			State: <Int Gateway ActiveU Unicast>
+			Age: 6:56:54	Metric: 65567	Metric2: -1	Tag: 3221225472
+			Task: OSPF
+			Announcement bits(1): 2-KRT
+			AS Path: IGP (Id 1)
+			Cost: 65567	Area: 51	Type: ASE	AdvRouter: 172.30.7.8
+			Type: 1		Forward: 0.0.0.0	Tag: 0 Path: (0) 0 IGP
+
+
+
+	172.94.6       	mask 255.255.255    
+			entries 1	announce 1
+			TSI:
+
+		*OSPF_ASE	Preference: 150
+			NextHop: 172.31.5.52    	Interface: 172.31.5.51(bge1)
+			State: <Int Gateway ActiveU Unicast>
+			Age: 6:56:00	Metric: 65567	Metric2: -1	Tag: 3221225472
+			Task: OSPF
+			Announcement bits(1): 2-KRT
+			AS Path: IGP (Id 1)
+			Cost: 65567	Area: 51	Type: ASE	AdvRouter: 172.30.7.8
+			Type: 1		Forward: 0.0.0.0	Tag: 0 Path: (0) 0 IGP
+
+
+
+	172.94.7       	mask 255.255.255    
+			entries 1	announce 1
+			TSI:
+
+		*OSPF_ASE	Preference: 150
+			NextHop: 172.31.5.52    	Interface: 172.31.5.51(bge1)
+			State: <Int Gateway ActiveU Unicast>
+			Age: 6:56:00	Metric: 65567	Metric2: -1	Tag: 3221225472
+			Task: OSPF
+			Announcement bits(1): 2-KRT
+			AS Path: IGP (Id 1)
+			Cost: 65567	Area: 51	Type: ASE	AdvRouter: 172.30.7.8
+			Type: 1		Forward: 0.0.0.0	Tag: 0 Path: (0) 0 IGP
+
+
+
+	172.94.8       	mask 255.255.255    
+			entries 1	announce 1
+			TSI:
+
+		*OSPF_ASE	Preference: 150
+			NextHop: 172.31.5.52    	Interface: 172.31.5.51(bge1)
+			State: <Int Gateway ActiveU Unicast>
+			Age: 6:56:54	Metric: 65567	Metric2: -1	Tag: 3221225472
+			Task: OSPF
+			Announcement bits(1): 2-KRT
+			AS Path: IGP (Id 1)
+			Cost: 65567	Area: 51	Type: ASE	AdvRouter: 172.30.7.8
+			Type: 1		Forward: 0.0.0.0	Tag: 0 Path: (0) 0 IGP
+
+
+
+	192.168        	mask 255.255.255    
+			entries 1	announce 1
+			TSI:
+
+		*OSPF	Preference:  10
+			NextHop: 172.31.5.52    	Interface: 172.31.5.51(bge1)
+			State: <Int Gateway ActiveU Unicast>
+			Age: 148:24:35	Metric: 14	Metric2: -1	Tag: 0
+			Task: OSPF
+			Announcement bits(1): 2-KRT
+			AS Path: IGP (Id 1)
+			Cost: 14	Area: 51	Type: Net	AdvRouter: 172.31.5.52
+
+
+
+	192.168.0.150  	mask 255.255.255.255
+			entries 1	announce 1
+			TSI:
+				OSPF LSDB seq 80000131
+
+		*Kernel	Preference:  40
+			NextHop: 150.175.240.116	Interface: 150.175.240.114(bge0)
+			State: <Ext Retain Gateway Static ActiveU Unicast>
+			Age: 148:25:20	Metric: 0	Metric2: 0	Tag: 0
+			Task: KRT
+			Announcement bits(2): 2-KRT 3-OSPF
+			AS Path: IGP (Id 1)
+
+
+
+	192.168.94.94  	mask 255.255.255.255
+			entries 1	announce 1
+			TSI:
+				OSPF LSDB seq 80000131
+
+		*Static	Preference:  60
+			NextHop: 192.168.100.8  	Interface: 192.168.100.1(bge1)
+			State: <Int Retain Gateway ActiveU Unicast>
+			Age: 6:57:08	Metric: 0	Metric2: 0	Tag: 0
+			Task: RT
+			Announcement bits(2): 2-KRT 3-OSPF
+			AS Path: IGP (Id 1)
+
+
+
+	192.168.100    	mask 255.255.255    
+			entries 1	announce 1
+			TSI:
+
+		*Direct	Preference:   0
+			NextHop: 192.168.100.1  	Interface: 192.168.100.1(bge1)
+			State: <Int Retain ActiveU Unicast>
+			Age: 148:28:40	Metric: 1	Metric2: 0	Tag: 0
+			Task: IF
+			Announcement bits(1): 2-KRT
+			AS Path: IGP (Id 1)
+
+
+
+	192.168.100.1  	mask 255.255.255.255
+			entries 1	announce 1
+			TSI:
+
+		*Kernel	Preference:  40
+			NextHop: 127.0.0.1      	Interface: 127.0.0.1(lo0)
+			State: <Ext Retain Gateway Static ActiveU Unicast>
+			Age: 148:28:40	Metric: 0	Metric2: 0	Tag: 0
+			Task: KRT
+			Announcement bits(1): 2-KRT
+			AS Path: IGP (Id 1)
+
+
+
+	192.168.194    	mask 255.255.255    
+			entries 1	announce 1
+			TSI:
+				OSPF LSDB seq 80000131
+
+		*Static	Preference:  60
+			NextHop: 192.168.100.7  	Interface: 192.168.100.1(bge1)
+			State: <Int Retain Gateway ActiveU Unicast>
+			Age: 6:57:08	Metric: 0	Metric2: 0	Tag: 0
+			Task: RT
+			Announcement bits(2): 2-KRT 3-OSPF
+			AS Path: IGP (Id 1)
+
+
+
+
+Task ICMP:
+
+Task OSPF:
+	RouterID: 172.30.5.5	Border Router: AS
+	Preference:	Inter/Intra: 10	External: 150
+	Default:	Metric: 1	Tag: 0 Path: (0) 0 EGP	Type: 2
+	SPF count: 123
+	LSAs originated: 8228	received: 75935
+		Router: 299  ASE: 7929
+	Syslog first 16, then every 256
+	Monitor authentication: none
+	Import controls:
+		type 1,2:
+			0.0.0.0          mask 0.0.0.0         Exact restrict
+			                 mask 0.0.0.0         
+			127              mask 255             Exact restrict
+			127.0.0.2        mask 255.255.255.255 Exact restrict
+			127.0.0.3        mask 255.255.255.255 Exact restrict
+			127.0.0.4        mask 255.255.255.255 Exact restrict
+			150.175.240.112  mask 255.255.255.248 Exact restrict
+			172.16           mask 255.255         Exact restrict
+			172.16.0.175     mask 255.255.255.255 Exact restrict
+			172.16.0.176     mask 255.255.255.255 Exact restrict
+			172.16.224.16    mask 255.255.255.240 Exact restrict
+			172.16.224.32    mask 255.255.255.240 Exact restrict
+			172.16.224.144   mask 255.255.255.240 Exact restrict
+			172.16.224.160   mask 255.255.255.240 Exact restrict
+			172.18.5         mask 255.255.255     Exact  preference 25
+			172.18.6         mask 255.255.255     Exact  preference 25
+			172.18.7         mask 255.255.255     Exact  preference 25
+			172.18.8         mask 255.255.255     Exact  preference 25
+			172.18.218       mask 255.255.255     Exact restrict
+			172.26.5         mask 255.255.255     Exact restrict
+			172.28.5         mask 255.255.255     Exact restrict
+			172.28.6         mask 255.255.255     Exact restrict
+			172.28.7         mask 255.255.255     Exact restrict
+			172.28.8         mask 255.255.255     Exact restrict
+			172.30.5         mask 255.255.255     Exact restrict
+			172.30.6         mask 255.255.255     Exact restrict
+			172.30.7         mask 255.255.255     Exact restrict
+			172.31.5         mask 255.255.255     Exact restrict
+			172.31.7         mask 255.255.255     Exact restrict
+			172.31.8         mask 255.255.255     Exact restrict
+			172.37.5         mask 255.255.255     Exact restrict
+			172.38.5         mask 255.255.255     Exact restrict
+			172.38.6         mask 255.255.255     Exact restrict
+			172.38.7         mask 255.255.255     Exact restrict
+			172.38.8         mask 255.255.255     Exact restrict
+			192.168.0.150    mask 255.255.255.255 Exact restrict
+			192.168.100      mask 255.255.255     Exact restrict
+
+	Export controls:
+		type 1:
+			Protocol Kernel  metric 1
+			0.0.0.0          mask 0.0.0.0         Exact
+			                 mask 0.0.0.0          restrict
+			172.16.0.175     mask 255.255.255.255 Exact
+			172.16.0.176     mask 255.255.255.255 Exact
+			172.18.218       mask 255.255.255     Exact restrict
+			172.30.6         mask 255.255.255     Exact restrict
+			172.30.7         mask 255.255.255     Exact restrict
+			192.168.0.150    mask 255.255.255.255 Exact
+			Protocol Direct  metric 1
+			0.0.0.0          mask 0.0.0.0         
+			172.18.5         mask 255.255.255     
+			172.18.6         mask 255.255.255     
+			172.18.7         mask 255.255.255     
+			172.18.8         mask 255.255.255     
+			172.28.5         mask 255.255.255     
+			172.28.6         mask 255.255.255     
+			172.28.7         mask 255.255.255     
+			172.28.8         mask 255.255.255     
+			172.30.5         mask 255.255.255      restrict
+			172.38.5         mask 255.255.255     
+			172.38.6         mask 255.255.255     
+			172.38.7         mask 255.255.255     
+			172.38.8         mask 255.255.255     
+			192.168.100      mask 255.255.255      restrict
+			Protocol Static  metric 1
+			0.0.0.0          mask 0.0.0.0         
+			172.18.129       mask 255.255.255     Exact restrict
+			172.18.218       mask 255.255.255     Exact restrict
+			172.19.129       mask 255.255.255     Exact restrict
+			172.25.218       mask 255.255.255.255 Exact restrict
+			172.26.218       mask 255.255.255.255 Exact restrict
+			172.30.6         mask 255.255.255     Exact restrict
+			172.30.7         mask 255.255.255     Exact restrict
+
+
+	Packets Received:
+	       0: Monitor request                   	  399448: Hello                           
+	      27: DB Description                    	       7: Link-State Req                  
+	  152878: Link-State Update                 	   59417: Link-State Ack                  
+
+	Packets Sent:
+	       0: Monitor response                  	  133632: Hello                           
+	      28: DB Description                    	       7: Link-State Req                  
+	    7661: Link-State Update                 	  122289: Link-State Ack                  
+
+	Errors:
+	       0: IP: bad destination               	       0: IP: bad protocol                
+	       0: IP: received my own packet        	       0: OSPF: bad packet type           
+	       0: OSPF: bad version                 	       0: OSPF: bad checksum              
+	       0: OSPF: bad area id                 	       0: OSPF: area mismatch             
+	       0: OSPF: bad virtual link            	       0: OSPF: bad authentication type   
+	       0: OSPF: bad authentication key      	       0: OSPF: packet too small          
+	       0: OSPF: packet size > ip length     	       0: OSPF: transmit error            
+	       0: OSPF: interface down              	       0: OSPF: unknown neighbor          
+	       0: HELLO: netmask mismatch           	       0: HELLO: hello timer mismatch     
+	       0: HELLO: dead timer mismatch        	       0: HELLO: extern option mismatch   
+	       0: HELLO: router id confusion        	       0: HELLO: virtual neighbor unknown 
+	       0: HELLO: NBMA neighbor unknown      	       0: DD: neighbor state low          
+	       0: DD: router id confusion           	       0: DD: extern option mismatch      
+	       0: DD: unknown LSA type              	       0: LS ACK: neighbor state low      
+	       0: LS ACK: bad ack                   	      12: LS ACK: duplicate ack           
+	       0: LS ACK: Unknown LSA type          	       4: LS REQ: neighbor state low      
+	       0: LS REQ: empty request             	       0: LS REQ: bad request             
+	       2: LS UPD: neighbor state low        	       0: LS UPD: newer self-gen LSA      
+	       0: LS UPD: LSA checksum bad          	     491: LS UPD: received less recent LSA
+	       0: LS UPD: unknown LSA type          
+
+	Area 51:
+		Authtype: none	flags: <>
+		SPF scheduled: <>
+
+		Interface: 172.31.5.51 (bge1)
+			Cost: 1	State: DR Other		Type: Broadcast
+			Priority: 2
+			Designated Router: 172.31.5.62
+			Backup Designated Router: 172.31.5.52
+			Authentication: none
+			Timers:
+				Hello: 4  Poll: 0  Dead: 16  Retrans: 5
+			Neighbors:
+				RouterID: 172.31.5.52    	Address: 172.31.5.52    
+				State: Full	Mode: Slave 	Priority: 1
+				DR: 172.31.5.62	BDR: 172.31.5.52
+				Last Hello: 01:45:17	Last Exchange: 21:20:30
+
+				RouterID: 172.30.6.6     	Address: 172.31.5.61    
+				State: 2 Way	Mode: None  	Priority: 3
+				DR: 172.31.5.52	BDR: 172.31.5.52
+				Last Hello: 01:45:19	Last Exchange: 20:19:17
+
+				RouterID: 172.31.5.62    	Address: 172.31.5.62    
+				State: Full	Mode: Slave 	Priority: 2
+				DR: 172.31.5.62	BDR: 172.31.5.52
+				Last Hello: 01:45:17	Last Exchange: 21:20:31
+
+
+
+		AS Border Routes:
+			172.30.206.206 	Area 51               Cost 65560  AdvRouter 172.30.206.206 
+				Nexthop: 172.31.5.52      Interface: 172.31.5.51(bge1)
+			172.31.5.62    	Area 51               Cost    1  AdvRouter 172.31.5.62    
+				Nexthop: 172.31.5.62      Interface: 172.31.5.51(bge1)
+			172.31.5.52    	Area 51               Cost    1  AdvRouter 172.31.5.52    
+				Nexthop: 172.31.5.52      Interface: 172.31.5.51(bge1)
+			172.16.0.48    	Area 51               Cost   24  AdvRouter 172.16.0.48    
+				Nexthop: 172.31.5.52      Interface: 172.31.5.51(bge1)
+			172.16.0.47    	Area 51               Cost   14  AdvRouter 172.16.0.47    
+				Nexthop: 172.31.5.52      Interface: 172.31.5.51(bge1)
+			172.30.7.8     	Area 51               Cost 65563  AdvRouter 172.30.7.8     
+				Nexthop: 172.31.5.52      Interface: 172.31.5.51(bge1)
+			172.30.5.5     	Area 51               Cost    0  AdvRouter 172.30.5.5     
+			172.31.206.2   	Area 51               Cost 65559  AdvRouter 172.31.206.2   
+				Nexthop: 172.31.5.52      Interface: 172.31.5.51(bge1)
+			172.31.8.2     	Area 51               Cost 65559  AdvRouter 172.31.8.2     
+				Nexthop: 172.31.5.52      Interface: 172.31.5.51(bge1)
+
+		Area Border Routes:
+			172.16.0.48    	Area 51               Cost   24  AdvRouter 172.16.0.48    
+				Nexthop: 172.31.5.52      Interface: 172.31.5.51(bge1)
+			172.16.0.47    	Area 51               Cost   14  AdvRouter 172.16.0.47    
+				Nexthop: 172.31.5.52      Interface: 172.31.5.51(bge1)
+
+		Link State Database:
+		Stub	AdvRtr: 172.31.8.2	Len: 24	Age: 1:00:00	Seq: 00000000
+			Router: 172.85.7 Netmask: 255.255.255 Network: 172.85.7
+			Nexthops(1):
+				172.31.5.52      Interface: 172.31.5.51(bge1)
+
+		Stub	AdvRtr: 172.31.8.2	Len: 24	Age: 1:00:00	Seq: 00000000
+			Router: 172.87.7 Netmask: 255.255.255 Network: 172.87.7
+			Nexthops(1):
+				172.31.5.52      Interface: 172.31.5.51(bge1)
+
+		Stub	AdvRtr: 172.20.0.146	Len: 24	Age: 1:00:00	Seq: 00000000
+			Router: 172.19.6 Netmask: 255.255.255 Network: 172.19.6
+			Nexthops(1):
+				172.31.5.52      Interface: 172.31.5.51(bge1)
+
+		Stub	AdvRtr: 172.20.0.146	Len: 24	Age: 1:00:00	Seq: 00000000
+			Router: 172.19.7 Netmask: 255.255.255 Network: 172.19.7
+			Nexthops(1):
+				172.31.5.52      Interface: 172.31.5.51(bge1)
+
+		Stub	AdvRtr: 172.20.0.146	Len: 24	Age: 1:00:00	Seq: 00000000
+			Router: 172.19.8 Netmask: 255.255.255 Network: 172.19.8
+			Nexthops(1):
+				172.31.5.52      Interface: 172.31.5.51(bge1)
+
+		Stub	AdvRtr: 172.16.0.68	Len: 24	Age: 1:00:00	Seq: 00000000
+			Router: 172.19.198 Netmask: 255.255.255 Network: 172.19.198
+			Nexthops(1):
+				172.31.5.52      Interface: 172.31.5.51(bge1)
+
+		Stub	AdvRtr: 172.16.0.48	Len: 24	Age: 1:00:00	Seq: 00000000
+			Router: 172.19.218 Netmask: 255.255.255 Network: 172.19.218
+			Nexthops(1):
+				172.31.5.52      Interface: 172.31.5.51(bge1)
+
+		Stub	AdvRtr: 172.16.0.48	Len: 24	Age: 1:00:00	Seq: 00000000
+			Router: 172.19.180 Netmask: 255.255.255 Network: 172.19.180
+			Nexthops(1):
+				172.31.5.52      Interface: 172.31.5.51(bge1)
+
+		Stub	AdvRtr: 172.16.0.48	Len: 24	Age: 1:00:00	Seq: 00000000
+			Router: 172.19.30 Netmask: 255.255.255 Network: 172.19.30
+			Nexthops(1):
+				172.31.5.52      Interface: 172.31.5.51(bge1)
+
+		Router	AdvRtr: 172.31.8.2	Len: 72	Age: 9:39	Seq: 8000004c
+			RouterID: 172.31.8.2	Area Border: Off	AS Border: On
+				Type: Transit net	Cost: 4
+				DR: 172.31.8.2	Address: 172.31.8.2
+				Type: Transit net	Cost: 16
+				DR: 172.19.7.68	Address: 172.19.7.8
+				Type: Stub net	Cost: 16
+				Network: 172.85.7	NetMask: 255.255.255
+				Type: Stub net	Cost: 16
+				Network: 172.87.7	NetMask: 255.255.255
+			Nexthops(1):
+				172.31.5.52      Interface: 172.31.5.51(bge1)
+
+		Router	AdvRtr: 172.30.5.5	Len: 36	Age: 24:13	Seq: 8000012d
+			RouterID: 172.30.5.5	Area Border: Off	AS Border: On
+				Type: Transit net	Cost: 1
+				DR: 172.31.5.62	Address: 172.31.5.51
+
+		Router	AdvRtr: 172.16.0.69	Len: 96	Age: 18:40	Seq: 8000067b
+			RouterID: 172.16.0.69	Area Border: Off	AS Border: Off
+				Type: Transit net	Cost: 65535
+				DR: 172.19.222.68	Address: 172.19.222.69
+				Type: Transit net	Cost: 65535
+				DR: 172.19.206.68	Address: 172.19.206.69
+				Type: Transit net	Cost: 65535
+				DR: 172.19.195.68	Address: 172.19.195.69
+				Type: Transit net	Cost: 65535
+				DR: 172.19.171.68	Address: 172.19.171.69
+				Type: Transit net	Cost: 65535
+				DR: 172.19.7.68	Address: 172.19.7.69
+				Type: Transit net	Cost: 65535
+				DR: 172.20.0.68	Address: 172.20.0.69
+			Nexthops(1):
+				172.31.5.52      Interface: 172.31.5.51(bge1)
+
+		Router	AdvRtr: 172.30.206.206	Len: 36	Age: 15:24	Seq: 8000004a
+			RouterID: 172.30.206.206	Area Border: Off	AS Border: On
+				Type: Transit net	Cost: 1
+				DR: 172.31.206.1	Address: 172.31.206.1
+			Nexthops(1):
+				172.31.5.52      Interface: 172.31.5.51(bge1)
+
+		Router	AdvRtr: 172.16.0.47	Len: 36	Age: 12:38	Seq: 80000642
+			RouterID: 172.16.0.47	Area Border: On	AS Border: On
+				Type: Transit net	Cost: 10
+				DR: 172.22.5.5	Address: 172.22.5.47
+			Nexthops(1):
+				172.31.5.52      Interface: 172.31.5.51(bge1)
+
+		Router	AdvRtr: 172.31.5.62	Len: 60	Age: 29:38	Seq: 8000099d
+			RouterID: 172.31.5.62	Area Border: Off	AS Border: On
+				Type: Transit net	Cost: 2
+				DR: 172.31.5.62	Address: 172.31.5.62
+				Type: Transit net	Cost: 14
+				DR: 172.19.5.146	Address: 172.19.5.6
+				Type: Transit net	Cost: 14
+				DR: 192.168.0.5	Address: 192.168.0.6
+			Nexthops(1):
+				172.31.5.62      Interface: 172.31.5.51(bge1)
+
+		Router	AdvRtr: 172.31.5.52	Len: 72	Age: 15:35	Seq: 8000084f
+			RouterID: 172.31.5.52	Area Border: Off	AS Border: On
+				Type: Transit net	Cost: 13
+				DR: 172.22.5.5	Address: 172.22.5.5
+				Type: Transit net	Cost: 1
+				DR: 172.31.5.62	Address: 172.31.5.52
+				Type: Transit net	Cost: 13
+				DR: 172.19.5.146	Address: 172.19.5.5
+				Type: Transit net	Cost: 13
+				DR: 192.168.0.5	Address: 192.168.0.5
+			Nexthops(1):
+				172.31.5.52      Interface: 172.31.5.51(bge1)
+
+		Router	AdvRtr: 172.20.0.146	Len: 84	Age: 11:38	Seq: 80000a7d
+			RouterID: 172.20.0.146	Area Border: Off	AS Border: Off
+				Type: Transit net	Cost: 10
+				DR: 172.20.0.68	Address: 172.20.0.146
+				Type: Transit net	Cost: 10
+				DR: 172.19.5.146	Address: 172.19.5.146
+				Type: Stub net	Cost: 10
+				Network: 172.19.6	NetMask: 255.255.255
+				Type: Stub net	Cost: 10
+				Network: 172.19.7	NetMask: 255.255.255
+				Type: Stub net	Cost: 10
+				Network: 172.19.8	NetMask: 255.255.255
+			Nexthops(1):
+				172.31.5.52      Interface: 172.31.5.51(bge1)
+
+		Router	AdvRtr: 172.31.206.2	Len: 48	Age: 21:03	Seq: 8000004c
+			RouterID: 172.31.206.2	Area Border: Off	AS Border: On
+				Type: Transit net	Cost: 1
+				DR: 172.31.206.1	Address: 172.31.206.2
+				Type: Transit net	Cost: 13
+				DR: 172.19.206.68	Address: 172.19.206.1
+			Nexthops(1):
+				172.31.5.52      Interface: 172.31.5.51(bge1)
+
+		Router	AdvRtr: 172.16.0.68	Len: 108	Age: 18:39	Seq: 80002155
+			RouterID: 172.16.0.68	Area Border: Off	AS Border: Off
+				Type: Transit net	Cost: 65535
+				DR: 172.19.222.68	Address: 172.19.222.68
+				Type: Transit net	Cost: 65535
+				DR: 172.19.206.68	Address: 172.19.206.68
+				Type: Stub net	Cost: 10
+				Network: 172.19.198	NetMask: 255.255.255
+				Type: Transit net	Cost: 65535
+				DR: 172.19.195.68	Address: 172.19.195.68
+				Type: Transit net	Cost: 65535
+				DR: 172.19.171.68	Address: 172.19.171.68
+				Type: Transit net	Cost: 65535
+				DR: 172.19.7.68	Address: 172.19.7.68
+				Type: Transit net	Cost: 65535
+				DR: 172.20.0.68	Address: 172.20.0.68
+			Nexthops(1):
+				172.31.5.52      Interface: 172.31.5.51(bge1)
+
+		Router	AdvRtr: 172.30.6.6	Len: 36	Age: 22:11	Seq: 8000099e
+			RouterID: 172.30.6.6	Area Border: Off	AS Border: On
+				Type: Transit net	Cost: 2
+				DR: 172.31.5.52	Address: 172.31.5.61
+
+		Router	AdvRtr: 172.16.0.48	Len: 84	Age: 2:20	Seq: 80001c77
+			RouterID: 172.16.0.48	Area Border: On	AS Border: On
+				Type: Stub net	Cost: 10
+				Network: 172.19.218	NetMask: 255.255.255
+				Type: Stub net	Cost: 10
+				Network: 172.19.180	NetMask: 255.255.255
+				Type: Transit net	Cost: 10
+				DR: 172.19.171.68	Address: 172.19.171.48
+				Type: Stub net	Cost: 10
+				Network: 172.19.30	NetMask: 255.255.255
+				Type: Transit net	Cost: 10
+				DR: 172.20.0.68	Address: 172.20.0.48
+			Nexthops(1):
+				172.31.5.52      Interface: 172.31.5.51(bge1)
+
+		Router	AdvRtr: 172.30.7.8	Len: 36	Age: 1:01	Seq: 8000004c
+			RouterID: 172.30.7.8	Area Border: Off	AS Border: On
+				Type: Transit net	Cost: 4
+				DR: 172.31.8.2	Address: 172.31.8.1
+			Nexthops(1):
+				172.31.5.52      Interface: 172.31.5.51(bge1)
+
+		Net	AdvRtr: 172.16.0.68	Len: 32	Age: 1:36	Seq: 80000555
+			Router: 172.19.222.68 Netmask: 255.255.255 Network: 172.19.222
+			Attached Router: 172.16.0.69
+			Attached Router: 172.16.0.68
+			Nexthops(1):
+				172.31.5.52      Interface: 172.31.5.51(bge1)
+
+		Net	AdvRtr: 172.31.8.2	Len: 32	Age: 9:39	Seq: 80000042
+			Router: 172.31.8.2 Netmask: 255.255.255 Network: 172.31.8
+			Attached Router: 172.31.8.2
+			Attached Router: 172.30.7.8
+			Nexthops(1):
+				172.31.5.52      Interface: 172.31.5.51(bge1)
+
+		Net	AdvRtr: 172.31.5.52	Len: 32	Age: 15:35	Seq: 800002c4
+			Router: 172.22.5.5 Netmask: 255.255.255 Network: 172.22.5
+			Attached Router: 172.31.5.52
+			Attached Router: 172.16.0.47
+			Nexthops(1):
+				172.31.5.52      Interface: 172.31.5.51(bge1)
+
+		Net	AdvRtr: 172.20.0.146	Len: 36	Age: 23:20	Seq: 80000916
+			Router: 172.19.5.146 Netmask: 255.255.255 Network: 172.19.5
+			Attached Router: 172.31.5.52
+			Attached Router: 172.31.5.62
+			Attached Router: 172.20.0.146
+			Nexthops(1):
+				172.31.5.52      Interface: 172.31.5.51(bge1)
+
+		Net	AdvRtr: 172.30.206.206	Len: 32	Age: 15:24	Seq: 80000042
+			Router: 172.31.206.1 Netmask: 255.255.255 Network: 172.31.206
+			Attached Router: 172.30.206.206
+			Attached Router: 172.31.206.2
+			Nexthops(1):
+				172.31.5.52      Interface: 172.31.5.51(bge1)
+
+		Net	AdvRtr: 172.16.0.68	Len: 32	Age: 3:38	Seq: 8000055c
+			Router: 172.19.195.68 Netmask: 255.255.255 Network: 172.19.195
+			Attached Router: 172.16.0.69
+			Attached Router: 172.16.0.68
+			Nexthops(1):
+				172.31.5.52      Interface: 172.31.5.51(bge1)
+
+		Net	AdvRtr: 172.16.0.68	Len: 36	Age: 1:18	Seq: 800002bf
+			Router: 172.19.206.68 Netmask: 255.255.255 Network: 172.19.206
+			Attached Router: 172.31.206.2
+			Attached Router: 172.16.0.69
+			Attached Router: 172.16.0.68
+			Nexthops(1):
+				172.31.5.52      Interface: 172.31.5.51(bge1)
+
+		Net	AdvRtr: 172.31.5.52	Len: 32	Age: 15:35	Seq: 800005e5
+			Router: 192.168.0.5 Netmask: 255.255.255 Network: 192.168
+			Attached Router: 172.31.5.52
+			Attached Router: 172.31.5.62
+			Nexthops(1):
+				172.31.5.52      Interface: 172.31.5.51(bge1)
+
+		Net	AdvRtr: 172.16.0.68	Len: 36	Age: 1:00	Seq: 8000055e
+			Router: 172.19.7.68 Netmask: 255.255.255 Network: 172.19.7
+			Attached Router: 172.31.8.2
+			Attached Router: 172.16.0.69
+			Attached Router: 172.16.0.68
+			Nexthops(1):
+				172.31.5.52      Interface: 172.31.5.51(bge1)
+
+		Net	AdvRtr: 172.16.0.68	Len: 32	Age: 3:36	Seq: 800002b8
+			Router: 172.19.198.68 Netmask: 255.255.255 Network: 172.19.198
+			Attached Router: 172.31.199.2
+			Attached Router: 172.16.0.68
+
+		Net	AdvRtr: 172.31.5.62	Len: 36	Age: 29:38	Seq: 80000146
+			Router: 172.31.5.62 Netmask: 255.255.255 Network: 172.31.5
+			Attached Router: 172.31.5.62
+			Attached Router: 172.30.5.5
+			Attached Router: 172.31.5.52
+			Nexthops(1):
+				172.31.5.51      Interface: 172.31.5.51(bge1)
+
+		Net	AdvRtr: 172.16.0.68	Len: 40	Age: 11:46	Seq: 800002b5
+			Router: 172.20.0.68 Netmask: 255.255.255 Network: 172.20
+			Attached Router: 172.16.0.69
+			Attached Router: 172.16.0.48
+			Attached Router: 172.20.0.146
+			Attached Router: 172.16.0.68
+			Nexthops(1):
+				172.31.5.52      Interface: 172.31.5.51(bge1)
+
+		Net	AdvRtr: 172.16.0.68	Len: 36	Age: 2:12	Seq: 80000292
+			Router: 172.19.171.68 Netmask: 255.255.255 Network: 172.19.171
+			Attached Router: 172.16.0.69
+			Attached Router: 172.16.0.48
+			Attached Router: 172.16.0.68
+			Nexthops(1):
+				172.31.5.52      Interface: 172.31.5.51(bge1)
+
+		SumNet	AdvRtr: 172.16.0.48	Len: 28	Age: 13:05	Seq: 80000634
+			LSID: 172.17.2	Network: 172.17.2	Netmask: 255.255.255	Cost: 10
+			Nexthops(1):
+				172.31.5.52      Interface: 172.31.5.51(bge1)
+
+		SumNet	AdvRtr: 172.16.0.47	Len: 28	Age: 12:38	Seq: 80000634
+			LSID: 172.17.2	Network: 172.17.2	Netmask: 255.255.255	Cost: 10
+			Nexthops(1):
+				172.31.5.52      Interface: 172.31.5.51(bge1)
+
+		SumASB	AdvRtr: 172.16.0.48	Len: 28	Age: 13:05	Seq: 80000634
+			RouterID: 172.16.0.47	Cost: 10
+
+		SumASB	AdvRtr: 172.16.0.47	Len: 28	Age: 12:38	Seq: 80000634
+			RouterID: 172.16.0.48	Cost: 10
+
+	Next hops:
+		150.175.240.114	Direct  	intf 150.175.240.114	refcount 1
+		172.16.99.5	Direct  	intf 172.16.99.5    	refcount 1
+		172.16.99.224	Direct  	intf 172.16.99.224  	refcount 1
+		172.16.99.232	Direct  	intf 172.16.99.232  	refcount 1
+		172.16.100.5	Direct  	intf 172.16.100.5   	refcount 1
+		172.16.101.5	Direct  	intf 172.16.101.5   	refcount 1
+		172.16.224.25	Direct  	intf 172.16.224.25  	refcount 1
+		172.16.224.41	Direct  	intf 172.16.224.41  	refcount 1
+		172.16.224.153	Direct  	intf 172.16.224.153 	refcount 1
+		172.16.224.169	Direct  	intf 172.16.224.169 	refcount 1
+		172.18.5.1	Direct  	intf 172.18.5.1     	refcount 1
+		172.18.5.129	Direct  	intf 172.18.5.129   	refcount 1
+		172.26.5.5	Direct  	intf 172.26.5.5     	refcount 1
+		172.28.5.1	Direct  	intf 172.28.5.1     	refcount 1
+		172.30.5.5	Direct  	intf 172.30.5.5     	refcount 1
+		172.31.5.51	Direct  	intf 172.31.5.51    	refcount 3
+		172.31.5.52	Neighbor	intf 172.31.5.51    	refcount 138
+		172.31.5.53	Direct  	intf 172.31.5.53    	refcount 1
+		172.31.5.61	Neighbor	intf 172.31.5.51    	refcount 1
+		172.31.5.62	Neighbor	intf 172.31.5.51    	refcount 3
+		172.37.5.5	Direct  	intf 172.37.5.5     	refcount 1
+		172.38.5.1	Direct  	intf 172.38.5.1     	refcount 1
+		192.168.100.1	Direct  	intf 192.168.100.1  	refcount 1
+
+	Summary AS Border Routes:
+
+	AS Externals (66):
+
+		AdvRtr: 172.30.206.206	Len: 36	Age: 3:13	Seq: 80000047
+		LSID: 0.0.0.0	Network: 0.0.0.0	Netmask: 0.0.0.0	Cost: 1
+		Type: 1	Forward: 0.0.0.0	Tag: 192
+		Nexthops(1):
+			172.31.5.52      Interface: 172.31.5.51(bge1)
+
+		AdvRtr: 172.30.7.8	Len: 36	Age: 11:34	Seq: 80000047
+		LSID: 0.0.0.0	Network: 0.0.0.0	Netmask: 0.0.0.0	Cost: 4
+		Type: 1	Forward: 0.0.0.0	Tag: 192
+
+		AdvRtr: 172.30.6.6	Len: 36	Age: 8:25	Seq: 80000537
+		LSID: 0.0.0.0	Network: 0.0.0.0	Netmask: 0.0.0.0	Cost: 2
+		Type: 1	Forward: 0.0.0.0	Tag: 192
+
+		AdvRtr: 172.30.5.5	Len: 36	Age: 2:35	Seq: 80000798
+		LSID: 0.0.0.0	Network: 0.0.0.0	Netmask: 0.0.0.0	Cost: 1
+		Type: 1	Forward: 0.0.0.0	Tag: 192
+
+		AdvRtr: 172.30.5.5	Len: 36	Age: 1:46	Seq: 800004c9
+		LSID: 172.16.224.144	Network: 172.16.224.144	Netmask: 255.255.255.240	Cost: 1
+		Type: 1	Forward: 0.0.0.0	Tag: 192
+
+		AdvRtr: 172.30.7.8	Len: 36	Age: 10:38	Seq: 8000000f
+		LSID: 172.28.8.255	Network: 172.28.8	Netmask: 255.255.255	Cost: 4
+		Type: 1	Forward: 0.0.0.0	Tag: 192
+		Nexthops(1):
+			172.31.5.52      Interface: 172.31.5.51(bge1)
+
+		AdvRtr: 172.30.7.8	Len: 36	Age: 10:38	Seq: 8000000f
+		LSID: 172.38.6.255	Network: 172.38.6	Netmask: 255.255.255	Cost: 4
+		Type: 1	Forward: 0.0.0.0	Tag: 192
+		Nexthops(1):
+			172.31.5.52      Interface: 172.31.5.51(bge1)
+
+		AdvRtr: 172.30.7.8	Len: 36	Age: 10:10	Seq: 8000000f
+		LSID: 172.89.6.255	Network: 172.89.6	Netmask: 255.255.255	Cost: 4
+		Type: 1	Forward: 0.0.0.0	Tag: 192
+		Nexthops(1):
+			172.31.5.52      Interface: 172.31.5.51(bge1)
+
+		AdvRtr: 172.30.7.8	Len: 36	Age: 9:35	Seq: 8000000f
+		LSID: 172.90.6.255	Network: 172.90.6	Netmask: 255.255.255	Cost: 4
+		Type: 1	Forward: 0.0.0.0	Tag: 192
+		Nexthops(1):
+			172.31.5.52      Interface: 172.31.5.51(bge1)
+
+		AdvRtr: 172.30.7.8	Len: 36	Age: 9:28	Seq: 8000000f
+		LSID: 172.16.81	Network: 172.16.81	Netmask: 255.255.255	Cost: 4
+		Type: 1	Forward: 0.0.0.0	Tag: 192
+		Nexthops(1):
+			172.31.5.52      Interface: 172.31.5.51(bge1)
+
+		AdvRtr: 172.16.0.48	Len: 36	Age: 26:32	Seq: 80001c67
+		LSID: 172.18.61	Network: 172.18.61	Netmask: 255.255.255	Cost: 0
+		Type: 1	Forward: 0.0.0.0	Tag: 0
+		Nexthops(1):
+			172.31.5.52      Interface: 172.31.5.51(bge1)
+
+		AdvRtr: 172.30.7.8	Len: 36	Age: 7:50	Seq: 8000000f
+		LSID: 172.93.6.255	Network: 172.93.6	Netmask: 255.255.255	Cost: 4
+		Type: 1	Forward: 0.0.0.0	Tag: 192
+		Nexthops(1):
+			172.31.5.52      Interface: 172.31.5.51(bge1)
+
+		AdvRtr: 172.30.7.8	Len: 36	Age: 7:29	Seq: 8000000f
+		LSID: 172.38.7	Network: 172.38.7	Netmask: 255.255.255	Cost: 4
+		Type: 1	Forward: 0.0.0.0	Tag: 192
+		Nexthops(1):
+			172.31.5.52      Interface: 172.31.5.51(bge1)
+
+		AdvRtr: 172.30.7.8	Len: 36	Age: 7:15	Seq: 8000000f
+		LSID: 172.94.6.255	Network: 172.94.6	Netmask: 255.255.255	Cost: 4
+		Type: 1	Forward: 0.0.0.0	Tag: 192
+		Nexthops(1):
+			172.31.5.52      Interface: 172.31.5.51(bge1)
+
+		AdvRtr: 172.30.6.6	Len: 36	Age: 3:50	Seq: 80000539
+		LSID: 172.16.0.175	Network: 172.16.0.175	Netmask: 255.255.255.255	Cost: 2
+		Type: 1	Forward: 0.0.0.0	Tag: 192
+
+		AdvRtr: 172.30.5.5	Len: 36	Age: 27:19	Seq: 80000131
+		LSID: 172.16.0.175	Network: 172.16.0.175	Netmask: 255.255.255.255	Cost: 1
+		Type: 1	Forward: 0.0.0.0	Tag: 192
+
+		AdvRtr: 172.30.7.8	Len: 36	Age: 7:01	Seq: 8000000f
+		LSID: 172.89.7	Network: 172.89.7	Netmask: 255.255.255	Cost: 4
+		Type: 1	Forward: 0.0.0.0	Tag: 192
+		Nexthops(1):
+			172.31.5.52      Interface: 172.31.5.51(bge1)
+
+		AdvRtr: 172.30.5.5	Len: 36	Age: 27:12	Seq: 80000131
+		LSID: 172.16.0.173	Network: 172.16.0.173	Netmask: 255.255.255.255	Cost: 1
+		Type: 1	Forward: 0.0.0.0	Tag: 192
+
+		AdvRtr: 172.30.7.8	Len: 36	Age: 6:26	Seq: 8000000f
+		LSID: 172.90.7	Network: 172.90.7	Netmask: 255.255.255	Cost: 4
+		Type: 1	Forward: 0.0.0.0	Tag: 192
+		Nexthops(1):
+			172.31.5.52      Interface: 172.31.5.51(bge1)
+
+		AdvRtr: 172.30.5.5	Len: 36	Age: 25:55	Seq: 80000131
+		LSID: 55.66.77	Network: 55.66.77	Netmask: 255.255.255	Cost: 1
+		Type: 1	Forward: 0.0.0.0	Tag: 192
+
+		AdvRtr: 172.30.7.8	Len: 36	Age: 4:48	Seq: 80000010
+		LSID: 172.38.8.255	Network: 172.38.8	Netmask: 255.255.255	Cost: 4
+		Type: 1	Forward: 0.0.0.0	Tag: 192
+		Nexthops(1):
+			172.31.5.52      Interface: 172.31.5.51(bge1)
+
+		AdvRtr: 172.30.5.5	Len: 36	Age: 25:06	Seq: 80000131
+		LSID: 60.0.0.255	Network: 60	Netmask: 255.255.255	Cost: 1
+		Type: 1	Forward: 0.0.0.0	Tag: 192
+
+		AdvRtr: 172.30.7.8	Len: 36	Age: 4:41	Seq: 80000010
+		LSID: 172.93.7	Network: 172.93.7	Netmask: 255.255.255	Cost: 4
+		Type: 1	Forward: 0.0.0.0	Tag: 192
+		Nexthops(1):
+			172.31.5.52      Interface: 172.31.5.51(bge1)
+
+		AdvRtr: 172.30.7.8	Len: 36	Age: 4:20	Seq: 80000010
+		LSID: 172.89.8.255	Network: 172.89.8	Netmask: 255.255.255	Cost: 4
+		Type: 1	Forward: 0.0.0.0	Tag: 192
+		Nexthops(1):
+			172.31.5.52      Interface: 172.31.5.51(bge1)
+
+		AdvRtr: 172.30.5.5	Len: 36	Age: 24:31	Seq: 80000131
+		LSID: 150.175.240.119	Network: 150.175.240.112	Netmask: 255.255.255.248	Cost: 1
+		Type: 1	Forward: 0.0.0.0	Tag: 192
+
+		AdvRtr: 172.30.7.8	Len: 36	Age: 4:06	Seq: 80000010
+		LSID: 172.94.7	Network: 172.94.7	Netmask: 255.255.255	Cost: 4
+		Type: 1	Forward: 0.0.0.0	Tag: 192
+		Nexthops(1):
+			172.31.5.52      Interface: 172.31.5.51(bge1)
+
+		AdvRtr: 172.30.7.8	Len: 36	Age: 3:45	Seq: 80000010
+		LSID: 172.90.8.255	Network: 172.90.8	Netmask: 255.255.255	Cost: 4
+		Type: 1	Forward: 0.0.0.0	Tag: 192
+		Nexthops(1):
+			172.31.5.52      Interface: 172.31.5.51(bge1)
+
+		AdvRtr: 172.30.7.8	Len: 36	Age: 3:38	Seq: 80000010
+		LSID: 172.16.83	Network: 172.16.83	Netmask: 255.255.255	Cost: 4
+		Type: 1	Forward: 0.0.0.0	Tag: 192
+		Nexthops(1):
+			172.31.5.52      Interface: 172.31.5.51(bge1)
+
+		AdvRtr: 172.30.5.5	Len: 36	Age: 23:35	Seq: 80000131
+		LSID: 172.16.224.16	Network: 172.16.224.16	Netmask: 255.255.255.240	Cost: 1
+		Type: 1	Forward: 0.0.0.0	Tag: 192
+
+		AdvRtr: 172.30.5.5	Len: 36	Age: 23:28	Seq: 80000131
+		LSID: 192.168.94.94	Network: 192.168.94.94	Netmask: 255.255.255.255	Cost: 1
+		Type: 1	Forward: 0.0.0.0	Tag: 192
+
+		AdvRtr: 172.30.7.8	Len: 36	Age: 2:00	Seq: 80000010
+		LSID: 172.93.8.255	Network: 172.93.8	Netmask: 255.255.255	Cost: 4
+		Type: 1	Forward: 0.0.0.0	Tag: 192
+		Nexthops(1):
+			172.31.5.52      Interface: 172.31.5.51(bge1)
+
+		AdvRtr: 172.30.7.8	Len: 36	Age: 1:25	Seq: 80000010
+		LSID: 172.94.8.255	Network: 172.94.8	Netmask: 255.255.255	Cost: 4
+		Type: 1	Forward: 0.0.0.0	Tag: 192
+		Nexthops(1):
+			172.31.5.52      Interface: 172.31.5.51(bge1)
+
+		AdvRtr: 172.30.206.206	Len: 36	Age: 20:57	Seq: 80000045
+		LSID: 172.16.255.255	Network: 172.16	Netmask: 255.255	Cost: 1
+		Type: 1	Forward: 0.0.0.0	Tag: 192
+		Nexthops(1):
+			172.31.5.52      Interface: 172.31.5.51(bge1)
+
+		AdvRtr: 172.30.7.8	Len: 36	Age: 29:18	Seq: 80000046
+		LSID: 172.16.255.255	Network: 172.16	Netmask: 255.255	Cost: 4
+		Type: 1	Forward: 0.0.0.0	Tag: 192
+
+		AdvRtr: 172.30.6.6	Len: 36	Age: 26:20	Seq: 800009aa
+		LSID: 172.16.255.255	Network: 172.16	Netmask: 255.255	Cost: 2
+		Type: 1	Forward: 0.0.0.0	Tag: 192
+
+		AdvRtr: 172.30.5.5	Len: 36	Age: 20:19	Seq: 80000131
+		LSID: 172.16.255.255	Network: 172.16	Netmask: 255.255	Cost: 1
+		Type: 1	Forward: 0.0.0.0	Tag: 192
+
+		AdvRtr: 172.30.5.5	Len: 36	Age: 19:23	Seq: 80000131
+		LSID: 192.168.194.255	Network: 192.168.194	Netmask: 255.255.255	Cost: 1
+		Type: 1	Forward: 0.0.0.0	Tag: 192
+
+		AdvRtr: 172.30.5.5	Len: 36	Age: 18:13	Seq: 80000131
+		LSID: 172.16.224.175	Network: 172.16.224.160	Netmask: 255.255.255.240	Cost: 1
+		Type: 1	Forward: 0.0.0.0	Tag: 192
+
+		AdvRtr: 172.30.5.5	Len: 36	Age: 16:00	Seq: 80000131
+		LSID: 172.18.5	Network: 172.18.5	Netmask: 255.255.255	Cost: 1
+		Type: 1	Forward: 0.0.0.0	Tag: 192
+
+		AdvRtr: 172.30.206.206	Len: 36	Age: 16:17	Seq: 80000043
+		LSID: 172.18.206.255	Network: 172.18.206	Netmask: 255.255.255	Cost: 1
+		Type: 1	Forward: 0.0.0.0	Tag: 192
+		Nexthops(1):
+			172.31.5.52      Interface: 172.31.5.51(bge1)
+
+		AdvRtr: 172.30.7.8	Len: 36	Age: 22:18	Seq: 8000000f
+		LSID: 172.18.6.255	Network: 172.18.6	Netmask: 255.255.255	Cost: 4
+		Type: 1	Forward: 0.0.0.0	Tag: 192
+		Nexthops(1):
+			172.31.5.52      Interface: 172.31.5.51(bge1)
+
+		AdvRtr: 172.30.7.8	Len: 36	Age: 21:50	Seq: 80000046
+		LSID: 172.16.0.178	Network: 172.16.0.178	Netmask: 255.255.255.255	Cost: 4
+		Type: 1	Forward: 0.0.0.0	Tag: 192
+		Nexthops(1):
+			172.31.5.52      Interface: 172.31.5.51(bge1)
+
+		AdvRtr: 172.30.5.5	Len: 36	Age: 12:44	Seq: 80000131
+		LSID: 172.16.0.176	Network: 172.16.0.176	Netmask: 255.255.255.255	Cost: 1
+		Type: 1	Forward: 0.0.0.0	Tag: 192
+
+		AdvRtr: 172.30.206.206	Len: 36	Age: 13:08	Seq: 80000043
+		LSID: 172.18.207	Network: 172.18.207	Netmask: 255.255.255	Cost: 1
+		Type: 1	Forward: 0.0.0.0	Tag: 192
+		Nexthops(1):
+			172.31.5.52      Interface: 172.31.5.51(bge1)
+
+		AdvRtr: 172.30.7.8	Len: 36	Age: 20:40	Seq: 80000046
+		LSID: 172.61.8.255	Network: 172.61.8	Netmask: 255.255.255	Cost: 4
+		Type: 1	Forward: 0.0.0.0	Tag: 192
+		Nexthops(1):
+			172.31.5.52      Interface: 172.31.5.51(bge1)
+
+		AdvRtr: 172.30.5.5	Len: 36	Age: 11:20	Seq: 80000131
+		LSID: 172.26.5	Network: 172.26.5	Netmask: 255.255.255	Cost: 1
+		Type: 1	Forward: 0.0.0.0	Tag: 192
+
+		AdvRtr: 172.30.5.5	Len: 36	Age: 10:45	Seq: 80000131
+		LSID: 172.16.224.47	Network: 172.16.224.32	Netmask: 255.255.255.240	Cost: 1
+		Type: 1	Forward: 0.0.0.0	Tag: 192
+
+		AdvRtr: 172.30.5.5	Len: 36	Age: 10:45	Seq: 80000131
+		LSID: 172.27.5	Network: 172.27.5	Netmask: 255.255.255	Cost: 1
+		Type: 1	Forward: 0.0.0.0	Tag: 192
+
+		AdvRtr: 172.30.7.8	Len: 36	Age: 19:30	Seq: 80000046
+		LSID: 172.63.8.255	Network: 172.63.8	Netmask: 255.255.255	Cost: 4
+		Type: 1	Forward: 0.0.0.0	Tag: 192
+		Nexthops(1):
+			172.31.5.52      Interface: 172.31.5.51(bge1)
+
+		AdvRtr: 172.30.7.8	Len: 36	Age: 19:09	Seq: 8000000f
+		LSID: 172.18.7	Network: 172.18.7	Netmask: 255.255.255	Cost: 4
+		Type: 1	Forward: 0.0.0.0	Tag: 192
+		Nexthops(1):
+			172.31.5.52      Interface: 172.31.5.51(bge1)
+
+		AdvRtr: 172.30.5.5	Len: 36	Age: 10:10	Seq: 80000131
+		LSID: 172.28.5	Network: 172.28.5	Netmask: 255.255.255	Cost: 1
+		Type: 1	Forward: 0.0.0.0	Tag: 192
+
+		AdvRtr: 172.31.8.2	Len: 36	Age: 4:15	Seq: 80000043
+		LSID: 172.65.8.255	Network: 172.65.8	Netmask: 255.255.255	Cost: 4
+		Type: 1	Forward: 172.19.7.60	Tag: 192
+		Nexthops(1):
+			172.31.5.52      Interface: 172.31.5.51(bge1)
+
+		AdvRtr: 172.30.7.8	Len: 36	Age: 17:59	Seq: 8000000f
+		LSID: 172.30.5	Network: 172.30.5	Netmask: 255.255.255	Cost: 4
+		Type: 1	Forward: 0.0.0.0	Tag: 192
+		Nexthops(1):
+			172.31.5.52      Interface: 172.31.5.51(bge1)
+
+		AdvRtr: 172.30.5.5	Len: 36	Age: 8:04	Seq: 80000131
+		LSID: 192.168.0.150	Network: 192.168.0.150	Netmask: 255.255.255.255	Cost: 1
+		Type: 1	Forward: 0.0.0.0	Tag: 192
+
+		AdvRtr: 172.31.8.2	Len: 36	Age: 2:52	Seq: 80000043
+		LSID: 172.67.8	Network: 172.67.8	Netmask: 255.255.255.255	Cost: 4
+		Type: 1	Forward: 172.19.7.60	Tag: 192
+		Nexthops(1):
+			172.31.5.52      Interface: 172.31.5.51(bge1)
+
+		AdvRtr: 172.30.7.8	Len: 36	Age: 16:28	Seq: 8000000f
+		LSID: 172.18.8.255	Network: 172.18.8	Netmask: 255.255.255	Cost: 4
+		Type: 1	Forward: 0.0.0.0	Tag: 192
+		Nexthops(1):
+			172.31.5.52      Interface: 172.31.5.51(bge1)
+
+		AdvRtr: 172.30.7.8	Len: 36	Age: 16:28	Seq: 8000000f
+		LSID: 172.28.6.255	Network: 172.28.6	Netmask: 255.255.255	Cost: 4
+		Type: 1	Forward: 0.0.0.0	Tag: 192
+		Nexthops(1):
+			172.31.5.52      Interface: 172.31.5.51(bge1)
+
+		AdvRtr: 172.30.7.8	Len: 36	Age: 16:00	Seq: 8000000f
+		LSID: 172.69.8.255	Network: 172.69.8	Netmask: 255.255.255	Cost: 4
+		Type: 1	Forward: 0.0.0.0	Tag: 192
+
+		AdvRtr: 172.31.8.2	Len: 36	Age: 1:56	Seq: 80000043
+		LSID: 172.69.8.255	Network: 172.69.8	Netmask: 255.255.255	Cost: 4
+		Type: 1	Forward: 0.0.0.0	Tag: 192
+		Nexthops(1):
+			172.31.5.52      Interface: 172.31.5.51(bge1)
+
+		AdvRtr: 172.30.7.8	Len: 36	Age: 15:18	Seq: 8000000f
+		LSID: 172.30.6.255	Network: 172.30.6	Netmask: 255.255.255	Cost: 4
+		Type: 1	Forward: 0.0.0.0	Tag: 192
+		Nexthops(1):
+			172.31.5.52      Interface: 172.31.5.51(bge1)
+
+		AdvRtr: 172.30.7.8	Len: 36	Age: 14:50	Seq: 8000000f
+		LSID: 172.71.8.255	Network: 172.71.8	Netmask: 255.255.255	Cost: 4
+		Type: 1	Forward: 0.0.0.0	Tag: 192
+
+		AdvRtr: 172.31.8.2	Len: 36	Age: 46	Seq: 80000043
+		LSID: 172.71.8.255	Network: 172.71.8	Netmask: 255.255.255	Cost: 4
+		Type: 1	Forward: 0.0.0.0	Tag: 192
+		Nexthops(1):
+			172.31.5.52      Interface: 172.31.5.51(bge1)
+
+		AdvRtr: 172.30.7.8	Len: 36	Age: 13:54	Seq: 80000042
+		LSID: 172.37.5	Network: 172.37.5	Netmask: 255.255.255	Cost: 4
+		Type: 1	Forward: 0.0.0.0	Tag: 192
+		Nexthops(1):
+			172.31.5.52      Interface: 172.31.5.51(bge1)
+
+		AdvRtr: 172.30.5.5	Len: 36	Age: 4:55	Seq: 80000859
+		LSID: 172.37.5	Network: 172.37.5	Netmask: 255.255.255	Cost: 1
+		Type: 1	Forward: 0.0.0.0	Tag: 192
+
+		AdvRtr: 172.30.7.8	Len: 36	Age: 13:19	Seq: 8000000f
+		LSID: 172.28.7	Network: 172.28.7	Netmask: 255.255.255	Cost: 4
+		Type: 1	Forward: 0.0.0.0	Tag: 192
+		Nexthops(1):
+			172.31.5.52      Interface: 172.31.5.51(bge1)
+
+		AdvRtr: 172.30.5.5	Len: 36	Age: 4:20	Seq: 800004c7
+		LSID: 172.38.5	Network: 172.38.5	Netmask: 255.255.255	Cost: 1
+		Type: 1	Forward: 0.0.0.0	Tag: 192
+
+
+Task ASPaths:
+	Id 1	Refs 107 Hash 0  Lengths: Path 0, Seg 0, Attr 0, Aggr 0, Alloc'd 32
+		Path: IGP
+	Id 2	Refs 1 Hash 32  Lengths: Path 0, Seg 0, Attr 0, Aggr 0, Alloc'd 32
+		Path: Incomplete
+
+Task KRT:
+	Options: <>	Kernel support: <Reject Blackhole VarMask Host>
+	Remnant timeout: 3:00
+	Routes in kernel: 27	Limit: unlimited
+	Flash install limit: 20	Flash install routes: interface
+	Background install limit: 120	Background install routes: low
+	Kernel install state: normal
+
+	Interface add/delete/change queue: 0 queued
+	High priority deletion queue: 0 queued
+	High priority change queue: 0 queued
+	High priority add queue: 0 queued
+	Normal priority deletion queue: 0 queued
+	Normal priority change queue: 0 queued
+	Normal priority add queue: 0 queued
+	IP Multicast default interfaces:
+		224.0.0.5      	refcount 1  flags <Installed>
+		224.0.0.6      	refcount 1  flags <Installed>
+
+
+Task Redirect:
+	Redirects: off	Preference: 30	Import controls:
+
+
+
+
+Done

@@ -1,0 +1,24 @@
+---
+abstract: 'Class building as simple as it gets and FAST'
+author:
+  - 'Steffen Mueller <smueller@cpan.org>'
+build_requires:
+  Test::More: 0.47
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Object::Tiny::XS
+name: Object-Tiny-XS
+no_index:
+  directory:
+    - inc
+    - t
+    - examples
+requires:
+  Class::XSAccessor: 0.11
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.01

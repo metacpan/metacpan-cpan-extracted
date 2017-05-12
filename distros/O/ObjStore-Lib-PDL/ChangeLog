@@ -1,0 +1,31 @@
+1999-01-12  Joshua Pritikin  <joshua.pritikin@db.com>
+
+	* Release 0.92.
+
+1998-11-06  Joshua Pritikin  <joshua.pritikin@db.com>
+
+	* Avoid leaving a trail of corrupted SVs.  Added tests.
+
+1998-10-30  Joshua Pritikin  <joshua.pritikin@db.com>
+
+	* Split into two classes PDL & cursor for easy C++ manipulation.
+
+1998-10-27  Joshua Pritikin  <joshua.pritikin@db.com>
+
+	* Allow direct C++ manipulation in other modules.  MakeMaker.pm &
+ 	etc.
+
+	* Optimized at/set methods.
+
+1998-10-26  Joshua Pritikin  <joshua.pritikin@db.com>
+
+	* Fix schema tag to match name of perl library.
+
+1998-10-21  Joshua Pritikin  <joshua.pritikin@db.com>
+
+	* Fix too many bugs to count.
+
+1998-09-26  Joshua Pritikin  <joshua.pritikin@db.com>
+
+	* Try to do something smart about checking type compatibility.
+

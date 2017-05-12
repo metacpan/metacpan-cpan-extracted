@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<SITE ID="Thunderstone">
+
+<NAME Lang="en-us">Thunderstone Website Index</NAME>
+<INFO Lang="en-us">general information web search</INFO>
+
+<URL Type="More"><![CDATA[
+http://search.thunderstone.com_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://search.thunderstone.com/texis/websearch/?q=_QUERY_&c=
+]]></URL>
+
+
+<VAR Name="_NEXT_"><![CDATA[
+<a href=_NEXT_>More..
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<dt>___<a href=_URL_>_TITLE_</a><dd>_PREVIEW_<tt>___-_SCORE_%</tt><br>
+]]></TEMPLATE>
+</SITE>

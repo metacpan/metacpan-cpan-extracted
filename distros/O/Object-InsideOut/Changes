@@ -1,0 +1,574 @@
+Revision history for Perl extension Object::InsideOut.
+
+4.04 Wed Mar  1 04:59:11 2017
+	- Fix for threads::shared < 0.96
+
+4.03 Sun Feb 26 17:14:40 2017
+	- Update to use threads::shared::is_shared
+
+4.02 Thu Aug 27 00:57:06 2015
+	- Remove errant debugging code - D'oh!
+
+3.99 Sat Aug 22 00:35:03 2015
+	- Fix array_ref subtype checking on assignment
+
+3.98 Thu Oct  3 19:04:26 2013
+	- User string compare for version checks
+
+3.97 Thu Nov 15 13:34:15 2012
+	- Fix for panic during destroy from Krzysztof Lewicki
+
+3.96 Mon Oct  1 12:22:50 2012
+	- Tweaks in tests for changes in core warning messages
+
+3.95 Tue Jul 24 13:30:57 2012
+	- Delete on arrays is deprecated (removed last vestage)
+
+3.94 Wed May  9 17:29:23 EDT 2012
+	- Delete on arrays is deprecated
+
+3.93 Mon Apr  9 13:45:35 2012
+	- Allow :Handle to work with non-OIO classes per contribution by Damian Conway
+
+3.92 Tue Mar  6 14:42:27 2012
+	- Added readonly fields per contribution by Damian Conway
+
+3.91 Wed Feb 22 16:35:09 2012
+	- Added sequential defaults per contribution by Damian Conway
+	- Extended delegator capabilities per contribution by Damian Conway
+
+3.89 Thu Feb 16 19:08:31 2012
+	- Added generated defaults per contribution by Damian Conway
+
+3.88 Thu Jan 26 14:56:59 2012
+	- Update build prereqs
+
+3.87 Thu Jan 19 13:46:51 2012
+	- Added missing test file for delegators
+
+3.86 Thu Jan 19 04:37:33 2012
+	- Added delegators per contribution by Damian Conway
+
+3.85 Wed Jan 11 06:01:11 2012
+	- Fix some 'used only once' warnings
+
+3.84 Tue Oct 11 22:42:26 2011
+	- Fixed bug in string dump of objects
+
+3.83 Thu Oct  6 23:53:04 2011
+	- Fix bug with NOT_SHARED in threads::shared app
+	- Document error caused by returning non-shared objects from threads
+
+3.82 Tue Sep 27 23:28:33 2011
+	- Fix obj ID reuse for shared objects in threaded app
+	- Documented limitation regarding removing shared internal objects
+
+3.81 Tue Mar 22 02:20:49 2011
+	- Faster initialization (from O(n^3) to O(n))
+
+3.79 Fri Dec 24 18:06:02 2010
+	- Bundle update
+
+3.78 Fri Dec 24 15:35:25 2010
+	- POD update
+
+3.77 Tue Dec 21 14:29:37 2010
+	- Test fixes for $@ changes
+	- Test change for ??? syntax error
+
+3.76 Mon Nov 15 00:01:50 2010
+	- Skip some more shared tests under 5.8.8 and prior
+
+3.75 Tue Nov  9 15:01:06 2010
+	- Skip some shared tests under 5.8.8 and prior
+
+3.74 Tue Nov  9 02:16:45 2010
+	- threads::shared version number in test
+
+3.73 Mon Nov  8 18:53:00 2010
+	- Fix obj ID handling for shared objects in threaded app
+
+3.72 Mon Oct 18 21:15:53 2010
+	- Fix obj ID handling for non-shared objects in threaded app
+
+3.71 Wed Oct 13 18:25:20 2010
+	- Fixed a memory leak
+
+3.69 Tue Sep 28 20:38:53 2010
+	- Fix test counts in t/27-exception.t
+
+3.68 Thu Sep 23 17:09:21 2010
+	- POD note to 'use threads' in DBI applications [bug #58394]
+	- Allow warnings for unhandled args
+
+3.67 Mon May 17 23:22:44 2010
+	- More fixes for $@ changes
+
+3.66 Fri May 14 13:31:04 2010
+	- More fixes for $@ changes
+
+3.65 Fri May  7 19:05:34 2010
+	- Fix tests for $@ changes that will be coming with Perl 5.14
+
+3.64 Mon Mar  8 17:59:51 2010
+	- Added tests related to shared object destruction
+
+3.63 Fri Mar  5 13:11:48 EST 2010
+	- Fix for shared object destruction bug
+
+3.62 Thu Mar  4 04:24:02 2010
+	- Extended the change in v3.59 to Perl 5.8.9
+
+3.61 Wed Mar  3 21:37:19 2010
+	- Code cleanup
+
+3.59 Wed Mar  3 19:11:50 2010
+	- Fixed shared object destruction when using Thread::Queue
+
+3.58 Wed Dec 23 12:45:55 2009
+	- Support type checking for scalar refs
+
+3.57 Thu Nov  5 01:42:26 2009
+	- Check args to ->isa()/->can()
+
+3.56 Wed Jul 29 19:11:02 2009
+	- Changed label that was a keyword
+
+3.55 Fri May  8 11:38:53 2009
+	- Upgraded dependencies to Exception::Class 1.29
+
+3.54 Wed Feb 18 18:04:51 2009
+	- Doc update only
+
+3.53 Wed Feb 18 15:34:20 2009
+	- Handle unnamed fields when using Storable
+	- Cache some object initialization activities
+
+3.52 Mon Oct 27 11:16:19 2008
+	- Upgraded dependencies to Exception::Class 1.26
+
+3.51 Thu Oct 23 20:18:23 2008
+	- Fix issues with Exception::Class 1.25
+
+3.49 Fri Oct 17 18:33:46 2008
+	- Call all :Destroy methods before deleting field data
+
+3.48 Wed Oct 15 20:05:20 2008
+	- Fix runtime loading of classes with multiple inheritance
+
+3.47 Mon Oct  6 18:50:26 2008
+	- Proper implementation of ->isa()/->can()
+
+3.46 Fri Oct  3 21:01:59 2008
+	- Support Test::MockObject
+
+3.45 Fri Jul 11 18:58:46 2008
+	- Don't clone deep internally held objects
+
+3.44 Fri Jul 11 17:39:35 2008
+	- Don't clone internally held objects
+
+3.43 Tue Jun 24 18:05:10 2008
+	- Added 'scalar' type checking
+
+3.42 Fri Jun 13 17:35:27 2008
+	- End all tests with exit(0) and fix SKIPs
+	- Recommended modules in META.yml
+
+3.41 Fri May 16 11:16:30 EDT 2008
+	- Changed function shared_clone() to clone_shared() in Util.pm
+	- Handle circular refs when cloning data
+
+3.39 Mon Mar 10 20:25:30 2008
+	- Catch unhandled params to ->new()
+
+3.38 Tue Feb 26 16:54:46 2008
+	- No shared copying if no threads
+
+3.37 Tue Feb 19 19:01:56 2008
+	- Fix another preformance issue with reclaiming object IDs
+	- Fix testing under Perl 5.8.0
+
+3.36 Fri Feb 15 19:45:37 2008
+	- Shared copies of refs of refs
+
+3.35 Fri Dec 21 15:18:29 2007
+	- Set min threads::shared version when overloading '==' operator
+	    for shared objects
+	- Added a countdown indicator to Term::YAPI
+
+3.34 Wed Nov 28 01:47:52 2007
+	- Fix preformance issue with reclaiming object IDs
+
+3.33 Fri Nov  9 13:16:56 2007
+	- Fix overload tests
+
+3.32 Thu Nov  8 21:57:28 2007
+	- Skip overload test file if no threads
+
+3.31 Thu Nov  8 19:22:42 2007
+	- Overload the '==' operator for shared objects
+
+3.29 Wed Nov  7 18:20:56 2007
+	- Fix to dump (Bug #30527)
+	- Additional fix to UNIVERSAL::isa call (Bug #30533)
+
+3.28 Wed Nov  7 01:34:02 2007
+	- Fix to UNIVERSAL::isa call (Bug #30533)
+
+3.27 Sat Nov  3 01:23:30 2007
+	- Make :Default({}) work as expected
+	- Added ->endtime() method to Term::YAPI
+
+3.26 Mon Sep 17 23:59:28 2007
+	- Support ANSI color sequences in Term::YAPI
+
+3.25 Tue Sep 11 17:29:00 2007
+	- Capability to install Term::YAPI (fixed)
+
+3.24 Tue Sep 11 17:07:07 2007
+	- Capability to install Term::YAPI
+
+3.23 Tue Sep 11 16:17:44 2007
+	- Localize error vars in DESTROY
+
+3.22 Fri Sep  7 19:34:23 2007
+	- Enhancements to Term::YAPI in examples dir
+	- POD spelling test (maintainer only)
+
+3.21 Fri Aug 17 15:46:35 2007
+	- Faster object creation
+
+3.19 Tue Jun 26 16:19:02 2007
+	- Less use of BEGIN blocks
+	- Fixed a threads::shared issue
+
+3.18 Fri Jun  8 18:31:32 2007
+	- Fixed secure mode breakage caused by MRMA upgrade
+
+3.17 Fri May 11 19:43:53 2007
+	- Fix for pseudo-forks
+
+3.16 Thu May 10 17:41:38 2007
+	- Minor mod for CPAN's PAUSE indexer
+
+3.15 Thu May 10 17:19:55 2007
+	- Modified (and documented) object initialization sequence
+	- Improved file versioning
+	- Subversion repository on Google
+
+3.14 Mon Mar 26 15:35:57 EDT 2007
+	- Fix to Foreign.pm (courtesy of Michael Houghton)
+	- Updated version numbers in POD
+
+3.13 Mon Mar 19 09:36:46 EDT 2007
+	- Fix recursion bug caused by bad :Automethod
+
+3.12 Thu Mar 15 08:07:53 EDT 2007
+	- Fix for classes permissions
+
+3.11 Sun Feb 18 19:22:45 EST 2007
+	- Handle pseudo-forks
+
+3.09 Fri Feb 16 22:21:05 EST 2007
+	- Exemptions for :Restricted/:Private accessors
+
+3.08 Wed Dec 27 09:13:28 EST 2006
+	- Apply defaults before :Init is called
+	- Do initialize() in CLONE_SKIP
+	- Fix to handling :Default values
+
+3.07 Wed Dec 20 08:22:30 EST 2006
+	- Fixed bug with :Name attribute
+
+3.06 Mon Dec 11 15:03:13 EST 2006
+	- Updates to Bundle::Object::InsideOut
+	- Skip certain tests under 5.8.0
+
+3.05 Fri Dec  8 20:02:17 EST 2006
+	- Catch when threads::shared loaded after OIO initialized
+
+3.04 Fri Dec  8 13:17:51 EST 2006
+	- Added :Default(...) for :Field's
+
+3.03 Thu Dec  7 13:41:40 EST 2006
+	- Fixed ->can() for cumulative/chained automethods
+	- Fixed using overloads with :Cumulative/:Chained
+
+3.01 Tue Dec  5 16:36:42 EST 2006
+	- :Restricted/:Private classes
+	- Exemptions for :Restricted :Cumulative/:Chained
+	- Separate POD file
+	- Internal code rework
+
+2.25 Thu Nov 30 13:29:36 EST 2006
+	- Exemptions for :Restricted/:Private
+	- Partial compatibility with Attribute::Params::Validate
+
+2.24 Mon Nov 27 14:58:01 EST 2006
+	- Catch missing 'name' param in field attributes
+
+2.23 Tue Nov 14 16:08:13 EST 2006
+	- Rework of :Cumulative/:Chained code
+
+2.22 Tue Nov 14 13:43:53 EST 2006
+	- Fixed using :Restricted with :Cumulative/:Chained
+
+2.21 Mon Nov 13 10:09:24 EST 2006
+	- Added subtype-checking for list/array/array_ref
+	- Improvements to Term::YAPI in examples dir
+
+2.19 Thu Nov  2 14:07:17 EST 2006
+	- Added more dependencies to Bundle::Object::InsideOut
+
+2.18 Wed Nov  1 07:51:27 EST 2006
+	- Fixes to Bundle::Object::InsideOut syntax
+
+2.17 Tue Oct 31 13:07:01 EST 2006
+	- Added Bundle::Object::InsideOut
+
+2.16 Mon Oct 23 13:30:32 EDT 2006
+	- Another fix for the :Type attribute
+	- Noted in POD that the PPM version of Want is bad
+
+2.15 Fri Oct 20 15:46:06 EDT 2006
+	- Fixed bug with :Type attribute
+
+2.14 Tue Oct 17 11:38:26 EDT 2006
+	- Fixed bug with 'require' on empty classes
+
+2.12 Fri Oct 13 14:42:50 EDT 2006
+	- Metadata requires Perl 5.8.0 or later
+
+2.08 Wed Oct 11 15:18:36 EDT 2006
+	- Runtime inheritance with ->add_class
+
+2.07 Tue Oct 10 15:47:44 EDT 2006
+	- Added :SECURE mode
+
+2.06 Mon Oct  9 16:04:09 EDT 2006
+	- Added :hash_only flag
+	- Added SECURITY section to POD
+
+2.05 Fri Oct  6 15:42:30 EDT 2006
+	- Implemented :MergeArgs for methods
+
+2.04 Tue Oct  3 15:01:30 EDT 2006
+	- Removed :lvalue method from meta tests
+
+2.03 Tue Oct  3 14:40:26 EDT 2006
+	- Added introspection
+	- Document My::Class->create_field()
+	- Added examples/YAPI.pm
+	- Added POD tests
+
+2.02 Sat Sep 23 17:57:11 EST 2006
+	- Completed redesign on field attributes
+	  (Backwards compatibility maintained.  See POD for details.)
+	- Support argument preprocessing on set accessors
+	- Fixed handling of weak fields in dump()
+	- Want module not used by default
+	  (Still required for :lvalue accessors)
+	- Removed 'process_args' from Object::InsideOut::Util
+	  (Hope no one was using it.  It wasn't documented.)
+
+2.01 Tue Sep 19 11:00:15 EDT 2006
+	- Started redesign on field attributes
+		Changed  :Field(..., 'Weak' => 1)
+		     To  :Field(...) :Weak
+		Changed  :Field(..., 'Deep' => 1), etc.
+		     To  :Field(...) :Deep
+		Changed  :Field(..., 'Name' => 'foo')
+		     To  :Field(...) :Name(foo)
+	  (Multiple attributes can be line wrapped! See POD.)
+	- Optimized 'set' accessor code
+	- Added option to suppress use of Want module
+	- Documented that attribute handlers need to come first in a class
+
+1.52 Fri Sep  1 15:58:25 EDT 2006
+	- Support class-specified attribute handlers
+	- Made Want module optional
+
+1.51 Wed Aug 30 11:08:30 EDT 2006
+	- Added 'All/Std_All'+'Arg' field declarations keywords
+	- More method chaining support
+	- Require Want 0.12 or later
+	- Document $SIG{'__DIE__'} interference issues
+
+1.49 Tue Aug  8 14:15:43 EDT 2006
+	- Support for :lvalue accessor generation
+
+1.48 Thu Aug  3 12:15:20 EDT 2006
+	- Reworked multiple error handling
+
+1.47 Tue Aug  1 15:50:28 EDT 2006
+	- Workaround Perl's "in cleanup" bug
+
+1.46 Thu Jul 27 16:56:35 EDT 2006
+	- Fix masking of $@ by 'eval's in :DESTROY subroutines
+	- Documented limitation with namespace 'DB'
+
+1.45 Tue Jun 27 14:09:44 EDT 2006
+	- Added :PreInit subroutines
+
+1.44 Fri Jun 23 13:57:15 EDT 2006
+	- Fix file versioning for PAUSE
+
+1.43 Fri Jun 23 12:56:29 EDT 2006
+	- Moved exception code to Exception.pm
+	- Versioned all .pm files
+	- Caution against returning objects from threads
+
+1.42 Thu May  4 11:26:15 EDT 2006
+	- Fixed object ID reclamation
+
+1.41 Thu Apr 27 11:53:01 EDT 2006
+	- Documented that cloning does not clone internally held objects
+
+1.39 Thu Apr 27 11:11:01 EDT 2006
+	- Fixed bug whereby cloning was duplicating objects
+
+1.38 Sun Mar  5 21:39:00 EST 2006
+	- Bug fix for standard accessors with private permissions
+
+1.37 Wed Feb 15 13:58:15 EST 2006
+	- Parameter preprocessing (courtesy of Berkan Eskikaya)
+
+1.36 Wed Feb  8 11:43:14 EST 2006
+	- Support 'weakened' fields
+
+1.35 Fri Feb  3 11:59:38 EST 2006
+	- Workaround for Perl 5.8.4/5.8.5 bug
+
+1.34 Wed Feb  1 17:28:09 EST 2006
+	- Insure proper 'import' for 'threads::shared' in Util.pm
+	- Fix for Storable bug (courtesy of Matthijs Bomhoff)
+	- Delayed loading for various OIO features
+	- Added singleton class example to POD
+	- Documented 'use base' cases in POD
+
+1.33 Wed Jan 18 23:24:43 EST 2006
+	- Compatible with Exporter - example in POD
+
+1.32 Wed Jan 18 13:36:31 EST 2006
+	- Compatible with Attribute::Handlers
+
+1.31 Sat Jan 14 04:33:22 EST 2006
+	- Fix to module importation bug (#17055)
+	- Documented that Object::InsideOut objects are 'readonly'
+	- Documented direct data fetching in class code
+
+1.29 Mon Jan  9 09:29:54 EST 2006
+	- Added 'private' and 'restricted' acessors
+
+1.28 Fri Jan  6 16:01:41 EST 2006
+	- Exported methods don't override parents' methods
+	- Internal: Removed 'caller_level' in ->die()
+
+1.27 Wed Dec 28 08:57:06 EST 2005
+	- Added '::storable' flag
+
+1.26 Wed Dec 21 13:54:26 EST 2005
+	- Suppress import() invoked via inheritance
+	- Only put 'Object::InsideOut' in base class @ISAs
+
+1.25 Wed Dec 21 09:55:17 EST 2005
+	- Use 'B' module to find subroutine names
+	- Changed author's email address
+	- Test fixes for Perl 5.6.X bug
+
+1.24 Fri Dec 16 10:21:00 2005
+	- Support foreign classes that only export object methods
+
+1.23 Mon Dec 12 10:04:30 2005
+	- Deep object cloning, and deep field cloning
+	- Handle creating shared objects when using Storable
+
+1.22 Fri Dec 09 12:55:00 2005
+	- Support object serialization using the Storable module
+
+1.21 Thu Dec 08 11:47:20 2005
+	- Minor fix to :Field declaration handling code
+
+1.19 Thu Dec 08 10:41:10 2005
+	- Store clone of :InitArgs 'Default's if ref
+
+1.18 Wed Dec 07 11:59:35 2005
+	- Can inherit from non-Object::InsideOut classes
+	- create_field() requires 3 args
+
+1.17 Fri Dec 02 12:29:40 2005
+	- Handle ->class::method(), ->SUPER::method(), and
+	  ->class::SUPER::method() in :Automethods
+	- Handle ->can('class::method') and ->can('class::SUPER::method')
+
+1.16 Thu Dec 01 13:51:50 2005
+	- Preclude name collisions in ->dump()
+	- Added installation check for Scalar::Util::weaken()
+
+1.15 Tue Nov 29 13:16:40 2005
+	- Added create_field() for dynamic field creation
+
+1.14 Wed Nov 23 08:15:30 2005
+	- User-specified 'set' method return type
+	- Removed deprecated _DUMP and INITIALIZE
+
+1.13 Mon Nov 21 11:10:00 2005
+	- POD fixup
+
+1.12 Mon Nov 21 11:03:00 2005
+	- Support custom type checking for initializers and accessors
+
+1.11 Fri Nov 18 08:41:00 2005
+	- Eliminated internal use of each()
+
+1.1 Thu Nov 17 13:53:20 2005
+	- Fixed bug with each(%{$obj}) on results object
+	- Filled in 'holes' in POD
+	- Workable version numbering
+
+1.04.00 Wed Nov 16 16:24:00 2005
+	- Added chaining and accumulation for :Automethods
+	- Chained methods don't return a results object in scalar context
+
+1.03.00 Tue Nov 15 11:03:40 2005
+	- Changed structure for object serialization output
+
+1.02.00 Tue Nov 15 10:13:05 2005
+	- Added ->set() method for object sharing support
+
+1.01.00 Mon Nov 14 14:49:40 2005
+	- Added object serialization support - deprecated _DUMP
+
+1.00.00 Fri Nov 11 15:27:00 2005
+	- Can now use array-based object fields - up to 40% faster
+	- Deprecated INITIALIZE - no longer needed
+
+0.07.00 Thu Nov 10 08:50:00 2005
+	- Verify ${} is not overloaded
+	- Require Scalar::Util 1.10 or later, and Test::More 0.50 or later
+	- Verified on Perl 5.6.0 through 5.9.2
+
+0.06.00 Thu Nov 03 14:44:20 2005
+	- Handle ->can('SUPER::method')
+
+0.05.00 Thu Nov 03 10:48:05 2005
+	- More tests (and fixes to a couple of bugs they turned up)
+
+0.04.00 Wed Nov 02 16:05:00 2005
+	- Added specifier for 'standard' (i.e., get_X/set_X) accessor methods
+	- More tests (and fixes to a couple of bugs they turned up)
+
+0.03.00 Tue Nov 01 15:41:00 2005
+	- Added :Chained method attribute
+	- Renamed Cumulative.pm to Results.pm
+	- Added INITIALIZE() subroutine to overcome CHECK/INIT phase issues
+	  with mod_perl and with runtime loading of classes
+
+0.02.00 Mon Oct 31 14:27:30 2005
+	- Error trapping on user-supplied subroutines
+	- Added Build.PL
+
+0.01.00 Mon Oct 31 13:15:00 2005
+	- Initial release
+

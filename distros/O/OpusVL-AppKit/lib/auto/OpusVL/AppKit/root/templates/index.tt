@@ -1,0 +1,123 @@
+<h1> Welcome to [% c.config.application_name %] </h1>
+
+<div id="dashboard">
+    <h2>Dashboard</h2>
+    <div id="dashboard_col_1"></div>
+    <div id="dashboard_col_2"></div>
+    <div class="clear"></div>
+</div>
+
+[% FOR portlet IN portlets %]
+    <div class="portlet [% portlet.name | lower | remove('\W+') %]">
+        <div class="portlet_name">
+            [% portlet.name %]
+        </div>
+        <div class="portlet_content">
+            [% portlet.html | none %]
+        </div>
+    </div>
+[% END %]
+    
+<script language="JavaScript">
+  $(function() {
+    var col_id = 1;
+    $(".portlet").each(function() {
+      $(this).appendTo($("#dashboard_col_" + col_id));
+      col_id++;
+      if (col_id > 2) {
+        col_id = 1;
+      }
+    });
+  });
+</script>
+
+
+[% IF c.debug && iwant_to_see_messy_debug_output %]
+    <ul>
+        <li> 
+            AppKit Controllers
+        </li> 
+    [% FOR myc IN c.appkit_controllers.sort  %]
+        <li> 
+            [% myc.appkit_name %]
+    
+            [% IF myc.home_action %]
+    
+                [% IF c.can_access( myc.home_action.actionpath ) %]
+    
+                    <a href='[% c.uri_for( myc.action_for( myc.home_action.actionname ) ) %]'>
+                        Home
+                    </a>
+    
+                    [% IF myc.appkit_icon %]
+                        <img src='[% myc.appkit_icon %]'>
+                    [% END %] 
+    
+                [% END %] 
+    
+            [% END %] 
+        </li>
+    [% END %]
+    </ul>
+    
+    <ul>
+        <li> 
+            AppKit Navigation
+        </li> 
+    [% FOR nav IN navigation %]
+        <li>
+            <a href='[% nav.uri %]'>
+                [% nav.text %]
+            </a>
+        </li>
+    [% END %]
+    </ul>
+    
+    <ul>
+        <li> 
+            PORTLETS
+        </li>
+    
+    
+    
+    [% FOR portlet IN portlets %]
+        <li>
+            [% portlet.name %]
+        </li>
+    [% END %]
+    
+    </ul>
+    
+    <ul>
+    [% IF c.user %]
+    
+        <li> 
+            <p>
+                User logged in: [% c.user.id %]  
+                <br>
+                Has the following roles:
+            </p>
+        </li>
+    
+        [% FOR r IN c.user.roles %]
+            <li> [% r %] </li>
+        [% END %]
+    
+        <li>
+            <a href='/logout'>
+                Logout
+            </a>
+        </li>
+    
+    [% ELSE %]
+    
+        <li>
+            <a href='/login'>
+                Login
+            </a>
+        </li>
+    
+    [% END %]
+    </ul>
+
+[% END %]

@@ -1,0 +1,19 @@
+# This file provides instructions for packaging.
+
+@prefix :    <http://purl.org/NET/cpan-uri/terms#>.
+@prefix nfo: <http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#>.
+
+<http://purl.org/NET/cpan-uri/dist/OWL-DirectSemantics/project>
+	:perl_version_from   _:main;
+	:version_from        _:main;
+	:readme_from         _:main;
+	:install_script      _:script;
+	:requires            "LWP::UserAgent 0";  # for bin/rdf2owl
+	:requires            "Module::Pluggable 0";
+	:requires            "Moose 2.02";
+	:requires            "RDF::Trine 0.135";
+	:test_requires       "Test::More 0.61";
+	:requires            "URI 1.30".
+
+_:main   nfo:fileName "lib/OWL/DirectSemantics.pm".
+_:script nfo:fileName "bin/rdf2owl".

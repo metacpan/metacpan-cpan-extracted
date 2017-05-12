@@ -1,0 +1,180 @@
+NAME
+    OpenERP::XMLRPC::Client - XMLRPC Client tweaked for OpenERP interaction.
+
+SYNOPSIS
+            my $erp = OpenERP::XMLRPC::Client->new( dbname => 'terp', username => 'admin', password => 'admin', host => '127.0.0.1', port => '8069' )       
+            my $partner_ids = $erp->object_execute( 'res.partner', 'search', [ 'name', 'ilke', 'abc' ] );
+
+            # READ a res.partner object
+            my $partner = $erp->read( 'res.partner', $id );
+
+            print "You Found Partner:" . $partner->{name} . "\n";
+
+DESCRIPTION
+    I have tried to make this extendable so made use of moose roles to
+    structure the calls to the different methods available from the openerp
+    rpc.
+
+    This makes use of the MooseX::Role::XMLRPC::Client to communicate via
+    rpc.
+
+    This module was built to be used by another OpenERP::XMLRPC::Simple and
+    handles openerp specific rpc interactions. It could be used by something
+    else to access openerp rpc services.
+
+NAME
+    OpenERP::XMLRPC::Client - XML RPC Client for OpenERP
+
+Parameters
+            username                - string - openerp username (default: 'admin')
+            password                - string - openerp password (default: 'admin')
+            dbname                  - string - openerp database name (default: 'terp')
+            host                    - string - openerp rpc server host (default: '127.0.0.1' )
+            port                    - string - openerp rpc server port (default: 8069)
+            proto                   - string - openerp protocol (default: http) .. untested anything else.
+
+Attributes
+            openerp_uid             - int           - filled when the connection is logged in.
+            base_rpc_uri    - string        - used to hold uri the rpc is currently pointing to.
+            openerp_rpc             - L<RPC::XML::Client> - Provided by L<MooseX::Role::XMLRPC::Client>
+
+METHODS
+    These methods re-present the OpenERP XML RPC but in a slightly more user
+    friendly way.
+
+    The methods have been tested using the 'res.partner' object name and the
+    demo database provided when you install OpenERP.
+
+  BUILD
+    When the object is instanciated, this method is run. This calls
+    openerp_login.
+
+  openerp_login
+    Logs the client in. Called automatically when the object is created.
+
+  openerp_logout
+    Basically a no-op.
+
+  object_execute
+    Low level method for making a call to the Open ERP server. Normally
+    called by a wrapper function like create or read.
+
+  object_exec_workflow
+    Makes an 'exec_workflow' call to Open ERP.
+
+  report_report
+    Sends a 'report' call to Open ERP.
+
+  report_report_get
+    Sends a 'report_get' call to Open ERP.
+
+  change_uri
+    OpenERP makes methods available via different URI's, this method is used
+    to change which URI the rpc client is pointing at.
+
+    Arguments: $_[0] - object ref. ($self) $_[1] - string (e.g.
+    "xmlrpc/object") base uri path.
+
+    Returns: string - the old uri - the one this new one replaced.
+
+  read ( OBJECTNAME, [IDS] )
+    Can pass this a sinlge ID or an ARRAYREF of ID's, it will return an
+    ARRAYREF of OBJECT records (HASHREF's).
+
+    Example: $partner = $erp->read('res.partner', 1 ); print "This is the
+    returned record name:" . $partner->[0]->{name} . "\n";
+
+            $partners = $erp->read('res.partner', [1,2] );
+            print "This is the returned record 1:" .  $partners->[0]->{name} . "\n";
+            print "This is the returned record 2:" .  $partners->[1]->{name} . "\n";
+
+    Returns: ArrayRef of HashRef's - All the objects with IDs passed.
+
+  search ( OBJECTNAME, [ [ COLNAME, COMPARATOR, VALUE ] ] )
+    Used to search and return IDs of objects matching the searcgh.
+
+    Returns: ArrayRef of ID's - All the objects ID's matching the search.
+
+    Example: $results = $erp->search('res.partner', [ [ 'name', 'ilke',
+    'abc' ] ] ); print "This is the 1st ID found:" . $results->[0] . "\n";
+
+  create ( OBJECTNAME, { COLNAME => COLVALUE } )
+    Returns: ID - the ID of the object created.
+
+    Example: $new_id = $erp->create('res.partner', { 'name' => 'new company
+    name' } );
+
+  update ( OBJECTNAME, ID, { COLNAME => COLVALUE } )
+    Returns: boolean - updated or not.
+
+    Example: $success = $erp->update('res.partner', 1, { 'name' => 'changed
+    company name' } );
+
+  delete ( OBJECTNAME, ID )
+    Returns: boolean - deleted or not.
+
+    Example: $success = $erp->delete('res.partner', 1 );
+
+  field_info ( OBJECTNAME )
+    Returns: hash containing all field info, this contains field names and
+    field types.
+
+  model_fields ( OBJECTNAME )
+    Returns: hash containing all the models fields.
+
+  get_defaults ( OBJECTNAME, [ FIELDS ] )
+    Returns: hash containing the default values for those fields.
+
+  search_detail ( OBJECTNAME, [ [ COLNAME, COMPARATOR, VALUE ] ], CONTEXT )
+    Used to search and read details on a perticular OBJECT. This uses
+    'search' to find IDs, then calls 'read' to get details on each ID
+    returned.
+
+    Returns: ArrayRef of HashRef's - All the objects found with all their
+    details.
+
+    Example: $results = $erp->search_detail('res.partner', [ [ 'name',
+    'ilke', 'abc' ] ] ); print "This is the 1st found record name:" .
+    $results->[0]->{name} . "\n";
+
+    The "CONTEXT" argument is optional. This allows a hasref containing the
+    current search context to be provided, e.g.
+
+     my $results = $erp->search_detail(
+         'stock.location',
+         [
+             ['usage' => '=' => 'internal']
+         ],
+         {
+             active_id => $self->id,
+             active_ids => [$self->id],
+             active_model => 'product.product',
+             full => 1,
+             product_id => $self->id,
+             search_default_in_location => 1,
+             section_id => undef,
+             tz => undef,
+         }
+     )
+
+  read_single ( OBJECTNAME, ID )
+    Pass this a sinlge ID and get a single OBJECT record (HASHREF).
+
+    Example: $partner = $erp->read_single('res.partner', 1 ); print "This
+    name of partner with ID 1:" . $partner->{name} . "\n";
+
+    Returns: HashRef - The objects data
+
+SEE ALSO
+    RPC::XML::Client
+
+AUTHOR
+    Benjamin Martin <ben@madeofpaper.co.uk> Colin Newell <colin@opusvl.com>
+    Jon Allen (JJ) <jj@opusvl.com>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2010-2012 OpusVL
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

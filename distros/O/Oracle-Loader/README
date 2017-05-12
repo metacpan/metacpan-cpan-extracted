@@ -1,0 +1,755 @@
+NAME
+    Oracle::Loader - Perl extension for creating Oracle PL/SQL and control
+    file.
+
+SYNOPSIS
+      use Oracle::Loader;
+
+      $ldr = Oracle::Loader->new;
+      $ldr->init;                     # only sets vbm(N),direct(N),reset(Y)
+      $ldr->init(%args);              # set variables based on hash array
+      $ldr->sync;                     # syncronize variables 
+      $ldr->cols_ref($arf_ref);       # column definition array ref
+      $ldr->param->dat_fn($fn);       # assign $fn to dat_fn
+      $ldr->conn->Oracle($i, $v);     # assign $v to the connection array
+      $ldr->disp_param;               # display parameters 
+      $ldr->crt_sql;                  # create PL/SQL file 
+      $ldr->crt_ctl;                  # create control file 
+      $ldr->crt_sql($crf,$fh,$apd,$tab,$rst);
+      $ldr->crt_sql($crf,$fn,$apd,$tab,$rst);
+      $ldr->crt_ctl($crf,$fh,$apd,$dat,$rst);
+      $ldr->crt_ctl($crf,$fn,$apd,$dat,$rst);
+      $ldr->create($typ,$cns,$sfn,$phm);
+      $ldr->load($typ,$cns,$ctl,$phm,$log);
+      $ldr->batch($typ,$cns,$sdr,$phm,$ext);
+      $ldr->report_results($typ,$cns,$sdr,$ofn,$ext);
+      $ldr->report_errors($typ,$cns,$sdr,$ofn,$ext);
+      $ldr->read_log($sub,$log,$rno);
+
+      $rv      = $ldr->param->sql_fn; # get sql file name
+      $rv      = $ldr->param->dat_fn; # get data file name
+      $rv      = $ldr->param->vbm;    # the same as the above
+      $ary_ref = $ldr->cols_ref;      # get column def array ref
+      %ary     = $ldr->get_param;     # get all the parameters
+  
+    Notation and Conventions
+
+       $ldr    a display object
+       $crf    column definition array reference
+       $fh     a file handler
+       $fn     an output file name 
+       $apd    N/Y, append to output file or not
+       $tab    table name
+       $dat    input data file name 
+       $rst    Y/N, whether to reset the corresponding variables
+       $typ    database type: Oracle, MSSQL, CSV, etc
+       $cns    connection string: usr/pwd@db
+       $sfn    sql program file name
+       $ctl    sqldr control file name
+       $sdr    source directory where definition files stored
+       $phm    program home directory
+       $log    sqlldr log file name
+       $ext    definiton file extension such as '.def', '.var', etc.
+       $sub    calling sub: result (report_results) or 
+               error (report_errors)
+
+       $drh    Driver handle object (rarely seen or used in applications)
+       $h      Any of the $??h handle types above
+       $rc     General Return Code  (boolean: true=ok, false=error)
+       $rv     General Return Value (typically an integer)
+       @ary    List of values returned from the database, typically a row 
+               of data
+       $rows   Number of rows processed (if available, else -1)
+       $fh     A filehandle
+       undef   NULL values are represented by undefined values in perl
+       \%attr  Reference to a hash of attribute values passed to methods
+
+DESCRIPTION
+    This is my seocnd object-oriented Perl program. The Loader module
+    creates data definition language (DDL) codes for creating tables and
+    control file to be used to load data into the tables. It creates DDL
+    codes based on column definitons contained in an array or read from a
+    definition file. It also has reporting functions to generate SQL*Load
+    error reports and load result reports.
+
+    The column definition array could be built from Data::Describe module.
+    It is actually an array with hash members and contains these hash
+    elements ('col', 'typ', 'wid', 'max', 'min', 'dec', 'dft', 'req', and
+    'dsp') for each column. The subscripts in the array are in the format of
+    $ary[$col_seq]{$hash_ele}. The hash elements are:
+
+      col - column name
+      typ - column type, 'N' for numeric, 'C' for characters, 
+            'D' for date
+      max - maximum length of the record in the column
+      wid - column width. It is the max of the column length. If 
+            'wid' presents, the max and min are not needed.
+      min - minimum length of the record in the column
+      dec - maximun decimal length of the record in the column
+      dft - date format string, e.g., YYYY/MM/DD, 
+            MON/DD/YYYY HH24:MI:SS
+      req - whether there is null or zero length records in the 
+            column only 'NOT NULL' is shown
+      dsp - column description 
+
+    The module will use column definitons to create DDL codes and control
+    file using *crt_sql* and *crt_ctl* methods.
+
+METHODS
+    * the constructor new()
+        Without any input, i.e., new(), the constructor generates an empty
+        object. If any argument is provided, the constructor expects them in
+        the hash array format, i.e., in pairs of key and value.
+
+    * init(%attr)
+        Input variables:
+
+          %attr - argument hash array 
+
+        Variables used or methods called:
+
+          param - get attribute value 
+          conn  - get connection information
+          sync  - syncronize the variables
+
+        How to use:
+
+          # use default value to initialize the object
+          $self->init; 
+          $self->init(%a); # use %a to initialize
+
+        Return: the initialized object.
+
+        This method initiates the parameters for the object.
+
+    * sync (%args)
+        Input variables:
+
+          %args - argument hash array 
+
+        Variables used or methods called:
+
+          param - get attribute value 
+          conn  - get connection information
+          sync  - syncrolize the variables
+
+        How to use:
+
+          # use default value to syncronile the object
+          $self->sync; 
+          $self->sync(%a); # use %a to syncronize
+
+        Return: the initialized object.
+
+        This method syncronizes the parameters.
+
+    * debug($n)
+        Input variables:
+
+          $n   - a number between 0 and 100. It specifies the
+                 level of messages that you would like to
+                 display. The higher the number, the more 
+                 detailed messages that you will get.
+
+        Variables used or methods called: None.
+
+        How to use:
+
+          $self->debug(2);     # set the message level to 2
+          print $self->debug;  # print current message level
+
+        Return: None.
+
+        The debug level will be set to $n.
+
+    * disp_param
+        Input variables: None
+
+        Variables used or methods called: None.
+
+        How to use:
+
+          $self->display;    
+
+        Return: none.
+
+        This method displays the parameters and their values.
+
+    * read_definitoin ($dfn, $typ)
+        Input variables:
+
+          $dfn - definition file name. If not specified, 
+                 I<param->def_fn> method will be called.
+          $typ - definition file type. Not implemented at 
+                 this version.
+
+        Variables used or methods called: None.
+
+          param->def_fn - get definition file name
+          param->reset  - reset parameters?
+          cols_ref      - get/set column reference
+
+        How to use:
+
+          $self->read_definition($fn); 
+
+        Return: none.
+
+        This method reads a column definition file and sets the definition
+        column array. It espects the definiton file to contain one column
+        definition per line with vertical bar delimiting the definition.
+        Here are the definitions:
+
+          1. SAS Dataset Name and Path|
+          2. ASCII File Name and Path|
+          3. Variable Name|
+          4. Variable Length|
+          5. Variable Type (1=num 2=char 3=date)|
+          6. Variable Date Format|
+          7. Variable Label|
+          8. All Values Exist?
+
+        Here is an example:
+
+          #SAS|ASCII|VarName|VarLength|VarType|DateFmt|VarLabel|NotNull
+          ||STUDYNO|3|number||Study Number|not null
+          ||CENTERNO|3|number||Center Number|
+          ||PATIENTS|7|number||Center Patients|
+          ||VISITS|7|number||Center Patients|
+          ||RECORDS|7|number||Center Patients|
+          ||Fax_In|6.1|number||Mean # Days from Visit to Fax In|
+          ||DB_Entry|6.1|number||Mean # Days from Visit to DB entry|
+          ||DB_Clean|6.1|number||Mean # Days from Visit to DB clean|
+          ||clean_now|5.1|number||Percent Records Clean Now|
+          ||job_id|9|number||Report Job number|not null
+
+    * crt_sql($arf,$ofn,$apd,$tab,$rst,$drp)
+        Input variables:
+
+          $arf - array ref containing column definitions.
+                 If not specified, it defaults to I<cols_ref>. 
+          $ofn - output file name. The file will contains
+                 the sql codes. It defaults to I<out_fh> or
+                 I<sql_fn>.
+          $apd - whether to append if the output file 
+                 exists. It defaults to I<param->append>.
+          $tab - database table name. It defaults to
+                 I<param->dbtab>.
+          $rst - whether to reset parameters based on the
+                 specified parameters here. It defaults to
+                 I<param->reset>.
+          $drp - whether to drop the table before create it.
+                 The default is 'Y'. 
+
+        Variables used or methods called:
+
+          param  - get parameters
+
+        How to use:
+
+          $self->crt_sql($arf, 'mysql.sql','Y', 'mytab'); 
+
+        Return: create PL/SQL codes for creating Oracle tables.
+
+        This method creates PL/SQL codes based on the columns defined in the
+        definition array. You can access the array reference as
+        ${$arf}[$i]{$k}. The $k could be 'col', 'typ', 'wid', 'max', 'min',
+        'dec', 'dft', and 'req'. Some special keys are stored in the first
+        element of the array, i.e., ${$arf}[0]. They are
+
+          table_name - table name. It is used as the last 
+                       resource in getting a table name.  
+          table_desc - table title/description used to 
+                       create table comments. 
+
+    * crt_ctl ($arf, $ofn, $apd, $dat, $rst, $drp)
+        Input variables:
+
+          $arf - array ref containing column definitions.
+                 If not specified, it defaults to I<cols_ref>. 
+          $ofn - output file name. The file will contains
+                 the sql codes. It defaults to I<out_fh>
+                 or I<ctl_fn>.
+          $apd - whether to append if the output file 
+                 exists. It defaults to I<param->append>.
+          $dat - input data file name. It defaults to
+                 I<param->dat_fn>.
+          $rst - whether to reset parameters based on the
+                 specified parameters here. It defaults to
+                 I<param->reset>.
+          $drp - whether drop records before appending
+
+        Variables used or methods called:
+
+          param  - get parameters
+
+        How to use:
+
+          $self->crt_sql($arf, 'mysql.ctl','N', 'mytxt.dat'); 
+
+        Return: create control file to be used by sql*loader.
+
+        This method creates a SQL*Loader control file.
+
+    * check_infile ($ctl,$typ)
+        Input variables:
+
+          $ctl - control file name
+          $typ - routine type: load, create, etc.
+
+        Variables used or methods called:
+
+          echoMSG   - echo messages
+
+        How to use:
+
+          $self->check_infile($inf);
+
+        Return: boolean, i.e., 1 for OK, 0 for not OK.
+
+        This method checks whether there is INFILE parameter in control
+        file, whether the infile exisit and has non-zero size.
+
+    * create ($typ, $cns, $sfn, $phm)
+        Input variables:
+
+          $typ - DB type: Oracle, MSSQL, etc. It defaults to
+                 Oracle
+          $cns - connection string: usr/pwd@db
+          $sfn - sql file name
+          $phm - program (sqlldr) home directory 
+
+        Variables used or methods called:
+
+          param   - class method to get parameters
+
+        How to use:
+
+          $self->create; 
+          $self->create('', 'usr/pwd@db'); 
+
+        Return: None.
+
+        This method creates the tables by running SQL*Plus or other program
+        corresponding to its database.
+
+    * load ($typ, $cns, $ctl, $phm, $log)
+        Input variables:
+
+          $typ - DB type: Oracle, MSSQL, etc. It defaults to
+                 Oracle
+          $cns - connection string: usr/pwd@db
+          $ctl - control file name
+          $phm - program (sqlldr) home directory 
+          $log - log file name
+
+        Variables used or methods called:
+
+          param   - class method to get parameters
+
+        How to use:
+
+          $self->load; 
+          $self->load('', 'usr/pwd@db'); 
+
+        Return: None.
+
+        This method loads that data into a corresponding table. For Oracle,
+        sqlldr is used to load the data into the table.
+
+    * batch ($typ, $cns, $sdr, $phm, $ext)
+        Input variables:
+
+          $typ - DB type: Oracle, MSSQL, etc. It defaults to
+                 Oracle
+          $cns - connection string: usr/pwd@db
+          $sdr - source directory containing all the definition files
+          $phm - program (sqlplus, sqlldr, etc.) home directory 
+          $ext - definition file extension such as "def", "var", etc.
+                 It uses 'def_ex' if it is set, otherwise default to
+                 'def'.
+
+        Variables used or methods called:
+
+          param   - class method to get parameters
+          crt_sql - create PL/SQL codes
+          crt_ctl - create Oracle control file
+
+        How to use:
+
+          $self->batch; 
+          $self->batch('', 'usr/pwd@db', '/my/load/dir'); 
+
+        Return: None.
+
+        This method calls *read_definition*, *crt_sql*, *crt_ctl*, *create*,
+        *load* methods to run through all the definition files in a source
+        directory.
+
+    * read_log ($typ, $ifn, $rno)
+        Input variables:
+
+          $typ - type of information that is extracted from the log file.
+                 The types are: result or error
+          $ifn - log file name
+          $rno - record number
+
+        Variables used or methods called:
+
+          param   - class method to get parameters
+          sort_array    - sort a numeric array 
+          compressArray - compress an array of numbers 
+                          into a list of range or comma 
+                          delimited numbers
+
+        How to use:
+
+          $self->read_log('','mylog.log');
+
+        Return: None.
+
+        This method reads a SQL*Loader log file and return loading result or
+        loading errors based on request.
+
+    * report_results ($typ, $cns, $sdr, $ofn, $ext)
+        Input variables:
+
+          $typ - database type: Oracle, MSSQL
+          $cns - connection string: usr/pwd@db
+          $sdr - source directory containing all the 
+                 definition files
+          $ofn - output file name  
+          $ext - log file extension such as "log", "lst",
+                 etc.
+
+        Variables used or methods called:
+
+          param    - class method to get parameters
+          read_log - read an Oracle log file
+
+        How to use:
+
+          $self->report_results;
+
+        Return: None.
+
+        This method reads all the SQL*Loader log files in a load directory
+        and generates a nice report with the following fields:
+
+           1 - Success Rate
+           2 - Oracle table name
+           3 - Rows successfully loaded
+           4 - Rows not loaded due to data errors
+           5 - Rows not loaded because all WHEN clauses were 
+               failed
+           6 - Rows not loaded because all fields were null
+           7 - Total logical records skipped
+           8 - Total logical records read
+           9 - Total logical records rejected
+          10 - Total logical records discarded
+          11 - Start time
+          12 - End time
+          13 - Elapsed time
+          14 - CPU time
+
+    * report_errors ($typ, $cns, $sdr, $ofn, $ext)
+        Input variables:
+
+          $typ - database type: Oracle, MSSQL
+          $cns - connection string: usr/pwd@db
+          $sdr - source directory containing all the 
+                 definition files
+          $ofn - output file name  
+          $ext - log file extension such as "log", "lst",
+                 etc.
+
+        Variables used or methods called:
+
+          param    - class method to get parameters
+          read_log - read an Oracle log file
+
+        How to use:
+
+          $self->report_errors;
+
+        Return: None.
+
+        This method reads all the SQL*Loader log files in a load directory
+        and generates a nice error report with the following information:
+
+          SQL*Loader error report
+          ========================
+          # Output format:
+          # ORA-#####   counts
+          # ORA-#####:table_name:colum_name (count) record range
+
+FAQ
+  What are the parameters?
+
+                CSV = []                            
+             DirSep = /                             
+             Oracle = [DBI:Oracle:orcl,usrid,userpwd]
+         add_center =                               
+             append = N                             
+             bad_fn = /dlb/data/S083/load/s083p001.bad
+           cols_ref = ARRAY(0x1787a4)               
+             commit = N                             
+               conn = ConnType::CSV,ConnType::Oracle
+             ctl_fn = /dlb/data/S083/load/s083p001.ctl
+             dat_fn = /dlb/data/S083/load/s083p001.dat
+            db_type = Oracle                        
+             dbconn = usrid/userpwd@orcl          
+             dbhome = /export/home/oracle7          
+              dbpwd = userpwd                       
+              dbsid = orcl                          
+              dbtab = p083p001                      
+               dbts = data_ts                       
+              dbusr = userid                       
+             def_fn = /dlb/data/S083/load/s083p001.def
+             direct = N                             
+             dis_fn = /dlb/data/S083/load/s083p001.dis
+             log_fn = /dlb/data/S083/load/s083p001.log
+             out_fh =                               
+          overwrite = Y                             
+          relax_req = Y                             
+              reset = Y                             
+              spool = /tmp/xx_tst.lst               
+             sql_fn = /tmp/xx_tst.sql               
+            src_dir =                               
+       study_number =                               
+            ts_iext = 21k                           
+            ts_next = 2k                            
+                vbm = Y                             
+
+    * database parameters
+        Currently only two connection types are available: CSV and Oracle.
+        None of them has been implemented to use in creating tables or
+        loading data. This consideration is intended to be implemented in
+        the future versions.
+
+        You can get the connection information using these methods:
+
+            # create the loader object
+            $ldr = new Oracle::Loader;
+            # get CSV connection array reference
+            $a = $ldr->conn->CSV;   
+            # get Oracle connection array reference
+            $b = $ldr->conn->Oracle;
+            # output the contents
+            print "CSV: @$a\n";
+            print "Oracle: @$b\n"; 
+
+        You can set the connection using these methods:
+
+            $ldr->conn->CSV(0, "DBI:CSV:f_dir=/tmp");
+            $ldr->conn->Oracle(0, "DBI:Oracle:sidxx");
+            $ldr->conn->Oracle(1, "usrid");
+            $ldr->conn->Oracle(2, "usrpwd");
+          Or 
+            $ldr->param->dbconn("usrid/usrpwd@db");
+            $ldr->sync;
+          Or
+            $ldr->param->dbsid('sidxx');
+            $ldr->param->dbusr('orausr');
+            $ldr->param->dbpwd('orapwd');
+            $ldr->sync;
+
+        Other database parameters:
+
+            # set Oracle tablespace name
+            $ldr->param->dbts('USER_DATA'); 
+            # set tablespace intial extent
+            $ldr->param->ts_iext('10k'); 
+            # set tablespace next extent
+            $ldr->param->ts_next('5k');
+            # set table name
+            $ldr->param->dbtab('s083ae'); 
+            # set database type
+            $ldr->param->db_type('Oracle');
+            # database executable home directory
+            $ldr->param->dbhome('/export/home/oracle7');
+
+    * input/output file names
+        There are two ways to run this program: in single or batch mode. If
+        it runs in single mode the input file name defined in *def_fn* is
+        used; otherwise, the definiton files in the source directory are
+        searched. The source directory is defined through parameter
+        *src_dir*. These are the parameters related to input files:
+
+            # set definition file name
+            $ldr->param->def_fn('/tmp/load/s083p001.def');
+            # set source directory containing all the definition 
+            # files
+            $ldr->param->src_dir('/data/S083/load'); 
+
+        The important parameter is *cols_ref*. This parameter is re-set by
+        running *read_definition* method. If we did not set *def_fn* or
+        *src_dir*, we can set *cols_ref* parameter directly, and the action
+        methods such as *crt_sql* and *crt_ctl* will use the array
+        referenced by *cols_ref* parameter to create SQL and control files.
+        You could use Data::Describe module to form column definitions and
+        pass the reference to *cols_ref* in the Loader.
+
+        These are the parameters related to SQL file:
+
+            # set sql file name
+            $ldr->param->sql_fn('/tmp/xx_tst.sql');
+            # set spool file name 
+            $ldr->param->spool('/tmp/xx_tst.lst');
+
+        The only parameters related to report file names are *study_number*
+        and *src_dir*. If no report file name is specified in
+        *report_results* or *report_errors* methods, the report file name is
+        formed using *study_number*. If no *study_number*, then the
+        directory name one level above *src_dir* is used. For instance, if
+        we have
+
+            $ldr->param->study_number('90');
+            $ldr->param->src_dir('/tmp/S083/load'); 
+
+        then the report file names are 'S090_ldr.rst' and 'S090_ldr.err' for
+        result report and error report respectively. The report files will
+        be resided under '/tmp/S083/load'. If we reset the *study_number* to
+        null, then the report file names will be 'S083_ldr.rst' and
+        'S083_ldr.err' for result and error reports respectively.
+
+        These are the parameters related to control file:
+
+            # set control file name
+            $ldr->param->ctl_fn('/tmp/load/s083p001.ctl');
+            # set data file name for SQL*Loader
+            $ldr->param->dat_fn('/tmp/load/s083p001.dat');
+            # set discard file name
+            $ldr->param->dis_fn('/tmp/load/s083p001.dis');
+            # set bad file name
+            $ldr->param->bad_fn('/tmp/load/s083p001.bad');
+            # set log file name
+            $ldr->param->log_fn('/tmp/load/s083p001.log');
+
+        If an output file handler is defined, the SQL codes or control codes
+        will be written to the file handler. The *sql_fn* or *ctl_fn* will
+        be ignored.
+
+    * boolean parameters
+        The boolean parameters are used to turn on or off some of the
+        features or functions this program have. They use Y or N (or null).
+        Here is a list of the parameters (the first one is the default
+        value):
+
+          add_center (N/Y): whether to add center number or 
+                            foreign key to all the tables.
+              append (N/Y): whether to append the output to 
+                            existing file such as SQL or 
+                            control file.
+              commit (N/Y): whether to actually create tables 
+                            and load data into the tables.
+              direct (N/Y): whether to use direct path in 
+                            SQL*Loader to load data into the 
+                            tables.
+           overwrite (N/Y): whether to over write existing files 
+                            if they already exist. 
+           relax_req (Y/N): whether to relax the constraints 
+                            defined in the definition file. If 
+                            yes, then only the constraints in 
+                            column names containing 'ID' are 
+                            enabled.
+               reset (Y/N): whether to re-set the parameters if 
+                            new values are passed in through a 
+                            method such as I<crt_sql>, I<crt_ctl>, 
+                            I<load>, I<create>, etc.
+                 vbm (N/Y): whether to display more information 
+                            about the progress.                             
+
+    * miscellaneous parameters
+        We only have one miscellaneous parameter, i.e., *DirSep*. It is
+        currently set to '/' for Unix system. It could be determined by
+        using Perl special variable - '$^O' ('$OSNAME'). Here is how to
+        change it to NT directory separater:
+
+            $ldr->param->DirSep('\\');
+
+  How to create a Loader object?
+
+    You can create an empty Loader object using the following methods:
+
+      $ldr = Oracle::Loader->new();
+      $ldr = new Oracle::Loader;
+
+    If you have an hash array %p containing all the parameters, you use the
+    array to initialize the object:
+
+      $ldr->init(%p);
+
+    You can create your hash array to define your object attributes as the
+    following:
+
+      %p = (
+        'vbm'       => 'Y',    # use verbose mode 
+         'cols_ref' => \@C,    # array_ref for col defs
+        );
+      $ldr = Oracle::Loader->new(%attr);
+
+  How to change the array references in the display object
+
+    You can pass data and column definition array references to display
+    objects using the object constructor *new* or using the *set* methods:
+
+      $ldr = Oracle::Loader->new($arf, $crf); 
+      $ldr->set_data_ref(\@new_array);
+      $ldr->set_cols_ref(\@new_defs);     
+
+  How to access the object?
+
+    You can get the information from the object through all the methods
+    described above without providing a value for the parameters.
+
+  Future Implementation
+
+    Although it seems a simple task, it requires a lot of thinking to get it
+    working in an object-oriented frame. Intented future implementation
+    includes
+
+    * add MSSQL type so that it can create T-SQL codes and DTS codes
+    * a debugger option
+        A method can also be implemented to turn on/off the debugger.
+
+    * a logger option
+        This option will allow output and/or debbuging information to be
+        logged.
+
+CODING HISTORY
+    * Version 0.01
+        12/10/2000 (htu) - Initial coding
+
+    * Version 1.00
+        02/15/2001 (htu) - major restructuring
+
+    * Version 1.01
+        02/15/2001 (htu) - quote Oracle key words
+
+    * Version 1.02
+        02/15/2004 - removed dependence from Data::subs for sort_array and
+        compressArray methods.
+
+    * Version 1.03
+        6/15/2004 (htu) - added pre-requisite module Class::Struct in the
+        test script.
+
+    * Version 1.04
+        7/19/2004 (htu) - removed some unrelated inline comments and try to
+        find out why it failed the test on CPAN while it runs ok on my
+        computer.
+
+SEE ALSO (some of docs that I check often)
+    Data::Describe, perltoot(1), perlobj(1), perlbot(1), perlsub(1),
+    perldata(1), perlsub(1), perlmod(1), perlmodlib(1), perlref(1),
+    perlreftut(1).
+
+AUTHOR
+    Copyright (c) 2000-2001 Hanming Tu. All rights reserved.
+
+    This package is free software and is provided "as is" without express or
+    implied warranty. It may be used, redistributed and/or modified under
+    the terms of the Perl Artistic License (see
+    http://www.perl.com/perl/misc/Artistic.html)
+

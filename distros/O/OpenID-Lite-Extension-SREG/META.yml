@@ -1,0 +1,26 @@
+---
+abstract: 'SREG extension plugin for OpenID::Lite'
+author:
+  - 'Lyo Kato, <lyo.kato@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.850'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: OpenID-Lite-Extension-SREG
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  List::MoreUtils: 0
+  OpenID::Lite: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.01

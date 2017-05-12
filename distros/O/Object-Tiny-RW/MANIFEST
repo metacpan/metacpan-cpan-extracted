@@ -1,0 +1,18 @@
+Changes
+examples/benchmark.pl
+examples/Foo_Bar_Accessor.pm
+examples/Foo_Bar_Accessor2.pm
+examples/Foo_Bar_Tiny.pm
+examples/Foo_Bar_Tiny2.pm
+lib/Object/Tiny/RW.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/01_compile.t
+t/02_main.t
+t/03_subclass.t
+t/97_meta.t
+t/98_pod.t
+t/99_pmv.t

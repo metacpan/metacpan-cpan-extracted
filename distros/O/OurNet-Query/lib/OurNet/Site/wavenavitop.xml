@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<SITE ID="WavenaviTop">
+
+<NAME Lang="en-us">Wave WWW Search</NAME>
+<INFO Lang="en-us">general information web search in Japan</INFO>
+
+<URL Type="More"><![CDATA[
+http://www.wave.co.jp_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://www.wave.co.jp/wave/cgi-bin/search.cgi?keyword=_QUERY_&switch1=off
+]]></URL>
+
+<CHARSET>ja-jp.euc</CHARSET>
+
+<VAR Name="_NEXT_"><![CDATA[
+<A HREF="_NEXT_">¼¡¤Î 
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<A HREF="http://_URL_">_TITLE_</A>_PREVIEW_</UL>
+]]></TEMPLATE>
+</SITE>

@@ -1,0 +1,32 @@
+---
+indicator: submitok
+auto_fieldset: 0
+elements:
+  - type: Block
+    attributes:
+      class: "content_block feature_help"
+    elements:
+
+      - type: Repeatable
+        name: features
+        auto_id: "%n"
+        elements:
+
+          - type: Hidden
+            name: id
+
+          - type: Text
+            label: Feature
+            name: feature_description
+
+  - type: Submit
+    name: submitok
+    value: OK
+    attributes:
+      class: "submit submit_ok"
+  - type: Submit
+    name: cancel
+    value: Cancel
+    attributes:
+      class: "submit submit_cancel"
+

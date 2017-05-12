@@ -1,0 +1,66 @@
+<br clear="all" />
+
+[% UNLESS omit_footer_search_form %]
+  <div id="search_form">
+    <form action="search.cgi" method="get">
+      <strong><label for="search">Search [% site_name %]:</label></strong> <input type="text" size="50" name="search" id="search" value="Search text" onclick="this.value=''" /> 
+      <input type="submit" name="Go" value="Go" id="go" class="form_button" />
+    </form>
+  </div>
+[% END %]
+
+<div id="footer">
+  [% BLOCK delete_link %]
+    [% IF enable_page_deletion AND is_admin AND NOT not_deletable %]
+      <div id="footer_delete_link">
+        <a href="[% full_cgi_url %]?id=[% node_param %];action=delete">Delete page</a> (admins only)
+      </div>
+    [% END %]
+  [% END %]
+
+  [% TRY %]
+    [% INCLUDE custom_footer_credits.tt %]
+  [% CATCH %]
+    [% INCLUDE delete_link %]
+    <p>
+      Powered by <a href="[% full_cgi_url%]?action=about">OpenGuides [% openguides_version %]</a>.
+      [% IF read_only %]
+        This guide is in read-only mode.
+      [% END %]
+    </p>
+    [% IF licence_name %]
+      <p>
+        This work is licensed under the 
+        [% IF licence_url %]
+          <a href="[% licence_url %]">[% licence_name %]</a>
+        [% ELSE %]
+          [% licence_name %]
+        [% END %]
+        licence
+        [% IF licence_info_url %]
+           (<a href="[% licence_info_url %]">more info</a>)
+        [% END %]
+      </p>
+    [% END %]
+  [% END %]
+
+</div>
+</div>
+</div>
+
+  [% IF config.google_analytics_key %]
+    <script type="text/javascript">
+    var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+    document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+
+    <script type="text/javascript">
+      try {
+       var pageTracker = _gat._getTracker("[% config.google_analytics_key %]");
+       pageTracker._trackPageview();
+      } catch(err) {}
+    </script>
+  [% END %]
+
+</body>
+</html>

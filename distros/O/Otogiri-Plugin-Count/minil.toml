@@ -1,0 +1,6 @@
+name = "Otogiri-Plugin-Count"
+badges = ["travis", "coveralls"]
+authority="cpan:TSUCCHI"
+
+module_maker="ModuleBuildTiny"
+

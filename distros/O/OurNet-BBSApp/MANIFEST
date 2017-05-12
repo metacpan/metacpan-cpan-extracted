@@ -1,0 +1,17 @@
+MANIFEST
+README
+Changes
+Makefile.PL
+test.pl
+BBSApp.pm
+BBSApp/Arena.pm
+BBSApp/Board.pm
+BBSApp/CmdPerm.pm
+BBSApp/Consensus.pm
+BBSApp/Issue.pm
+BBSApp/MailList.pm
+BBSApp/Monitor.pm
+BBSApp/Proposal.pm
+BBSApp/Schedule.pm
+BBSApp/Templator.pm
+bin/bbsappd

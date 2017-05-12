@@ -1,0 +1,45 @@
+---
+abstract: 'Official OVH Perl wrapper upon the OVH RESTful API.'
+author:
+  - ', OVH SAS.'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.4, CPAN::Meta::Converter version 2.150005'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: OvhApi
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  OvhApi:
+    file: lib/OvhApi.pm
+    version: '0.2'
+  OvhApi::Answer:
+    file: lib/OvhApi/Answer.pm
+    version: '0.2'
+requires:
+  Digest::SHA1: '0'
+  JSON: '0'
+  LWP::UserAgent: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/pacoesteban/OvhApi/issues
+  homepage: https://github.com/pacoesteban/OvhApi
+  repository: git://github.com/pacoesteban/OvhApi.git
+version: '0.2'
+x_contributors:
+  - 'Paco Esteban <paco@onna.be>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

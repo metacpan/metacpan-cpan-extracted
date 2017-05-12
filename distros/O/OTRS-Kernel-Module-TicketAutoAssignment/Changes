@@ -1,0 +1,34 @@
+Revision history for Kernel-Modules-TicketAutoAssignment1.0.1
+
+1.0.1  2013-02-28
+ - Decode @ARGV properly, arguments now can include non-ascii chars.
+
+
+1.0.1.7 2013-02-24
+ - Specified minimum perl version to 5.8.7 to fix test failures.
+
+
+1.0.1.6 2013-02-22
+ - Corrected POD UserLogin command line option.
+ - Improved STDIN handling.
+ - Closes file handle after reading body contents.
+
+
+1.0.1.5 2013-02-21
+ - Added option to include ticket auto asignement from a XML option.
+
+
+1.0.1.4 2013-02-20
+ - Make it work on perls < 5.16.
+
+
+1.0.1.3 2013-02-19
+ - Fixed dependencies in dist.ini.
+
+
+1.0.1.2 2013-02-18
+ - POD fix. Specified OTRS 3.1 as minimum version.
+
+
+1.0.1.1 2013-02-17
+ - Initial version packaged for CPAN.

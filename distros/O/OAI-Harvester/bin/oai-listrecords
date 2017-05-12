@@ -1,0 +1,93 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+oai-listrecords - list records in an OAI-PMH archive
+
+=head1 SYNOPSIS
+
+    oai-listrecords --baseURL=http://preprint.chemweb.com/CPS/OAI
+	[ --metadataPrefix --from --until --set ]
+
+=head1 DESCRIPTION
+
+A command line utility to listing the sets that belong to an OAI-PMH 
+archive.
+
+=head1 AUTHORS
+
+=over 4 
+
+=item * Ed Summers <ehs@pobox.com>
+
+=back
+
+=cut
+
+use strict;
+use Getopt::Long;
+use Net::OAI::Harvester;
+use Pod::Usage;
+
+my ( $url, $metadataPrefix, $from, $until, $set, $debug ); 
+
+GetOptions(
+    'baseURL:s'		=> \$url,
+    'metadataPrefix:s'	=> \$metadataPrefix,
+    'from:s'		=> \$from,
+    'until:s'		=> \$until,
+    'set:s'		=> \$set,
+    'debug!'		=> \$debug,
+);
+
+if ( !$metadataPrefix ) { 
+    print STDERR "no --metadataPrefix specified so defaulting to oai_dc\n";
+    $metadataPrefix = 'oai_dc';
+}
+
+if ( !$url or !$metadataPrefix ) { 
+    pod2usage( { -verbose => 0 } );
+}
+
+my $harvester = Net::OAI::Harvester->new( baseURL => $url );
+$Net::OAI::Harvester::DEBUG = 1 if $debug;
+
+my %opts = ( 'metadataPrefix'	=> $metadataPrefix );
+$opts{ 'from' } = $from if $from;
+$opts{ 'until' } = $until if $until;
+$opts{ 'set' } = $set if $set;
+
+my $records = $harvester->listRecords( %opts );
+my $finished = 0;
+
+while ( ! $finished ) { 
+
+    if ( $records->errorCode() ) { 
+	print STDERR $records->errorString(); 
+	## if bad xml print out the response
+	if ( $records->errorCode() eq 'xmlParseError' ) { 
+	    open( FILE, $records->file() );
+	    print while ( <FILE> );
+	    close( FILE );
+	}
+	exit(1);
+    }
+
+    while ( my $r = $records->next() ) { 
+	print $r->header()->identifier(),"\n";
+	print $r->metadata()->asString(),"\n\n";
+    }
+
+    my $resumptionToken = $records->resumptionToken();
+    if ( $resumptionToken ) { 
+	$opts{ resumptionToken } = $resumptionToken->token();
+	print STDERR "using resuption token: ",$resumptionToken->token(),"\n";
+	$records = $harvester->listRecords( 
+	    resumptionToken => $resumptionToken->token()
+	);
+    } else { 
+	$finished = 1;
+    }
+
+}
+

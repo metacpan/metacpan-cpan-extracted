@@ -1,0 +1,255 @@
+NAME
+    Oracle::Trigger - Perl class for creating Oracle triggers
+
+SYNOPSIS
+      use Oracle::Trigger;
+
+      my %cfg = ('conn_string'=>'usr/pwd@db', 'table_name'=>'my_ora_tab');
+      my $ot = Oracle::Trigger->new;
+      # or combine the two together
+      my $ot = Oracle::Trigger->new(%cfg);
+      my $sql= $ot->prepare(%cfg); 
+      $ot->execute();    # actually create the audit table and trigger
+
+      # call the methods directly
+      my $sql = $ot->create_data_trigger($tn,$cns,$dbh,$trg,$aud); 
+      my $ar  = $ot->create_data_audit($tn,$cns,$dbh,$aud,$drp); 
+
+DESCRIPTION
+    This class contains methods to create audit tables and triggers for
+    Oracle tables.
+
+  new (conn_string=>'usr/pwd@db',table_name=>'my_table')
+
+    Input variables:
+
+      $cs  - Oracle connection string in usr/pwd@db
+      $tn  - Oracle table name without schema
+
+    Variables used or routines called:
+
+      None
+
+    How to use:
+
+       my $obj = new Oracle::Trigger;      # or
+       my $obj = Oracle::Trigger->new;     # or
+       my $cs  = 'usr/pwd@db';
+       my $tn  = 'my_table'; 
+       my $obj = Oracle::Trigger->new(cs=>$cs,tn=>$tn); # or
+       my $obj = Oracle::Trigger->new('cs',$cs, 'tn',$tn); 
+
+    Return: new empty or initialized Oracle::Trigger object.
+
+    This method constructs a Perl object and capture any parameters if
+    specified. It creates and defaults the following variables:
+
+      $self->{conn_string} = "";       # or $self->{cs}
+      $self->{table_name}  = "";       # or $self->{tn}  
+
+METHODS
+    The following are the common methods, routines, and functions defined in
+    this class.
+
+  Exported Tag: All
+
+    The *:all* tag includes all the methods or sub-rountines defined in this
+    class.
+
+      use Oracle::Trigger qw(:all);
+
+    It includes the following sub-routines:
+
+   prepare($cs, $tn, $tp)
+
+    Input variables:
+
+      $cs  - Oracle connection string in usr/pwd@db
+      $tn  - Oracle table name without schema
+      $tp  - trigger type
+             DATA - trigger to audit a table. This is the default.
+
+    Variables used or routines called:
+
+      Debug::EchoMessage
+        echoMSG - display message
+      {cs} - connection string
+      {tn} - table name 
+      {drop_audit}   - whether to drop audit table if it exists
+      {audit_table}  - audit table name, default to aud${$tn}
+      {trigger_name} - trigger name, default to trg${$tn}
+
+    How to use:
+
+      my $ar = $self->prepare('usr/pwd@db','my_tab');
+
+    Return: $hr - a hash array ref containing the following keys:
+
+      dbh         - the database handler
+      sql_audit   - SQL statement for creating the audit table
+      sql_trigger - SQL statement for creating the trigger
+
+    This method performs the following tasks:
+
+      1) create a database handler
+      2) check the existance of the table 
+      3) generate script for creating audit table
+      4) generate script for creating trigger
+
+    And it sets the following internal variable as well:
+
+      {dbh} - database handler
+      {sql_audit} - sql statements to create audit table
+      {sql_trigger} - sql statement to create trigger
+
+   execute($typ)
+
+    Input variables:
+
+      $typ - action type:
+             TRIGGER - create trigger only 
+             AUDIT   - create audit table only
+             default - null and will create both
+
+    Variables used or routines called:
+
+      {dbh} - database handler
+      {sql_audit} - sql statements to create audit table
+      {sql_trigger} - sql statement to create trigger
+
+    How to use:
+
+      my $status = $self->execute();
+      $self->execute();
+
+    Return: 0|1: 0 - OK; 1 - failed
+
+    This method submits the sql statement to Oracle server to create audit
+    table or trigger or both. The default is to create both. If the audit
+    table exists, it will skip creating the audit table. You either need to
+    manually drop the table or set {drop_audit} to '1' before you run
+    prepare().
+
+   create_data_trigger($tn, $cns, $dbh, $trg, $aud)
+
+    Input variables:
+
+      $tn  - Oracle table name without schema
+      $cns - a list of column names separated by comma
+      $dbh - database handler
+      $trg - trigger name defaults to "TRG${$tn}"
+      $aud - audit table name defaults to "AUD${$tn}"
+
+    Variables used or routines called:
+
+    How to use:
+
+      my $tn = 'mytab'; 
+      my $tg = 'mytab_trg';
+      my $cns = 'id,name';
+      my $dbh = $self->get_dbh('usr/pwd@db'); 
+      # No DB connection: $tn,$cns and default trigger name to trg${$tn}:
+      my $sql = $self->create_data_trigger($tn,$cns); 
+      # Need DB connection: $tn,$dbh
+      $sql = $self->create_data_trigger($tn,'',$dbh,$tg);  
+      # table does not exist, $cns will be used; if table exists, then
+      # $cns will be checked agaign column names from table
+      $sql = $self->create_data_trigger($tn,$cns,$dbh);  
+
+    Return: $sql - SQL statement to create a DATA trigger.
+
+    This method performs the following tasks:
+
+      1) check inputs, table name is required
+      2) check the existance of the table. 
+      3) compose columns
+      4) compose SQL code for creating trigger
+
+    An empty string will be returned if the inputs do not meet one of the
+    following cases: a) table name and column list are provided; b) table
+    name and database handler are provided so that column names are obtained
+    from the table; c) table name, column list, and database handler are
+    provided, then column names are obtained from the table and compared
+    with the column list are well. None existing columns in the column list
+    will be excluded from trigger.
+
+   create_data_audit($tn, cnsp, $dbh, $aud, $drp)
+
+    Input variables:
+
+      $tn  - source table name without schema
+      $cns - column names separated by comma
+      $dbh - database handler
+      $aud - audit table name
+      $drp - whether to drop audit table before creating it
+             default is 0 (no)
+
+    Variables used or routines called:
+
+    How to use:
+
+      my $tn  = 'mytab'; 
+      my $aud = 'aud$mytab';
+      my $dbh = $self->get_dbh('usr/pwd@db');
+      # create audit table 
+      # and default audit name is aud${$tn}:
+      my $ar = $self->create_data_audit($tn,$cns); 
+
+      # give a trigger name
+      $sql = $self->create_data_audit($tn,$tg);  
+      # table does not exist, but colun names are provided:
+      $sql = $self->create_data_audit($tn,'','id,name');  
+      # if $dbh is provided, the table existence will be checked
+      $sql = $self->create_data_audit($tn,'','',$dbh);
+
+    Return: $ar - array ref containing SQL statements for dropping and
+    creating audit table.
+
+    This method performs the following tasks:
+
+      1) check inputs, table name is required
+      2) check the existance of the table. 
+      3) compose columns
+      4) compose SQL code for creating trigger
+
+    An empty string will be returned if the inputs do not meet one of the
+    following cases: a) table name and column list are provided; b) table
+    name and database handler are provided so that column names are obtained
+    from the table; c) table name, column list, and database handler are
+    provided, then column names are obtained from the table and compared
+    with the column list are well. None existing columns in the column list
+    will be excluded from trigger.
+
+HISTORY
+    * Version 0.1
+        This version is to test the procedures and create DATA trigger.
+
+        04/22/2005 (htu) - finished creating DATA trigger rountines.
+
+    * Version 0.2
+        04/29/2005 (htu) - modified some descriptions and moved the common
+        routines to Oracle::DML::Common.
+
+    * Version 0.21
+        Since get_table_definition is moved to Oracle::Schema, we change it
+        here to use Oracle::Schema.
+
+    * Version 0.22
+        Re-wrote *prepare* method so that it can prepare SQL statments based
+        on trigger type.
+
+        Added *create_data_trigger* and *create_data_audit* methods.
+
+SEE ALSO (some of docs that I check often)
+        Data::Describe, Oracle::Loader, CGI::Getopt, File::Xcopy,
+        perltoot(1), perlobj(1), perlbot(1), perlsub(1), perldata(1),
+        perlsub(1), perlmod(1), perlmodlib(1), perlref(1), perlreftut(1).
+
+AUTHOR
+        Copyright (c) 2005 Hanming Tu. All rights reserved.
+
+        This package is free software and is provided "as is" without
+        express or implied warranty. It may be used, redistributed and/or
+        modified under the terms of the Perl Artistic License (see
+        http://www.perl.com/perl/misc/Artistic.html)
+

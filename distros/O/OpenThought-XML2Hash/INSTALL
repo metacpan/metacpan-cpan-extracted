@@ -1,0 +1,14 @@
+#!/usr/bin/head
+OpenThought::XML2Hash Installation                      http://openthought.net
+                                                        eric at openthought.net
+
+This file will give you instructions on how to install the
+OpenThought::XML2Hash module.
+
+ tar zxvf OpenThought-XML2Hash-x.xx.tar.gz
+ cd openthought-xml2hash-x.xx
+ su
+ perl Makefile.pl
+ make
+ make test
+ make install

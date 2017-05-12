@@ -1,0 +1,7 @@
+[% SET url.start = "http://www.google.com/search?q=${query}&num=${hits}&meta=hl%3Dzh-TW%26lr%3Dlang_zh-TW&safe=off" %]
+[% SET score = "100-($rank-1)/2" %]
+[% FOREACH entry %]
+<p><a href=[% url %]>[% title %]</a><br><font size=-1>[% preview %]<br><font 
+[% _ %]
+[% END %]<center>[% _ %]
+<td nowrap><a href=[% nextpage %]><img src

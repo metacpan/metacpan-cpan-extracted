@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<SITE ID="Siteshack">
+
+<NAME Lang="en-us">SiteShack Search</NAME>
+<INFO Lang="en-us">general information web search</INFO>
+
+<URL Type="More"><![CDATA[
+http://www.siteshack.com/_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+post://www.siteshack.com/search.phtml?p=0&B1=Search+!&key=_QUERY_
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_NEXT_"><![CDATA[
+<a href="_NEXT_">further Entries
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<b><a href="_URL_">_TITLE_</a></b> --_PREVIEW_</td></tr>
+]]></TEMPLATE>
+</SITE>

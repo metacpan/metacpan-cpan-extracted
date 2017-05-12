@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<SITE ID="TechWeb">
+
+<NAME Lang="en-us">TechWeb News</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+TechWeb 技術文件檢索
+]]></NAME>
+<INFO Lang="en-us">technical documents and news search</INFO>
+<INFO Lang="zh-tw">technical documents and news search</INFO>
+
+<URL Type="More"><![CDATA[
+http://www.techweb.com/se/_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://www.techweb.com/se/techsearch.cgi?newsearch=true&collname=current&queryText=_QUERY_&publication=All&sorted=true
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+<EXPRESSION>Boolean</EXPRESSION>
+<CATEGORY>WWW,Computer,Media,News</CATEGORY>
+
+<VAR Name="_NEXT_"><![CDATA[
+<A HREF="_NEXT_">next
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<b><a href="_URL_"___">_TITLE_</a>___</font><br>_PREVIEW_<p>
+]]></TEMPLATE>
+</SITE>

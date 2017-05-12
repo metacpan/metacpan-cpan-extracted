@@ -1,0 +1,19 @@
+<div class="edit_form_actions">
+  <div class="preview_edit">
+    <input type="submit" name="preview" value="Preview changes"
+     class="form_button" />
+  </div>
+  <div class="cancel_edit">
+    <a href="[% cgi_url %]?[% node_param %]">Cancel edit</a>
+  </div>
+  <div class="commit_edit">
+    [% IF moderate %]
+      <input type="submit" name="Save" class="form_button"
+       value="Save changes for moderation" />
+    [% ELSE %]
+      <input type="submit" name="Save" class="form_button"
+       value="Save changes" />
+    [% END %]
+  </div>
+</div>
+

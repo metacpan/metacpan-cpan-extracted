@@ -1,0 +1,81 @@
+=head1 NAME
+
+B<gated2yaml> - convert B<gated> OSPF LSDB to YAML file
+
+=head1 SYNOPSIS
+
+B<gated2yaml>
+[B<-D> F<dump>]
+[B<-h>]
+[B<-H> I<user@host>]
+[B<-S> I<skip>]
+[F<ospf.yaml>]
+
+=head1 DESCRIPTION
+
+B<gated2yaml> takes the OSPF link state database of the gated routing
+daemon and converts it into a YAML file.
+
+The F<gated_dump> file containing the LSDB can be passed via command
+line.
+If no file is given, the B<gdc> command line tool is invoked to
+gather the information dynamically.
+For that the user must be I<root> to access the B<gdc> programm.
+If necessary B<sudo> is used for calling B<gdc> to gain privileges.
+
+Optionally one output file can be given on command line, otherwise
+stdout is used.
+
+The options are as follows:
+
+=over 4
+
+=item B<-D> F<dump>
+
+File describing the internal state of the B<gated> process including
+the OSPF link state database.
+It can be obtained via B<gdc dump> manually.
+If the file path is not given, B<gdc dump> is called automatically
+and it is assumed that B<gated> writes its dump file to
+F</var/tmp/gated_dump>.
+
+=item B<-h>
+
+Show help message and exit.
+
+=item B<-H> I<user@host>
+
+The specified user and host are used for ssh login and run B<gdc
+dump> there.
+
+=item B<-S> I<skip>
+
+The F<gated_dump> file may contain several state snapshots separated
+each starting with a form feed.
+With this parameter greater than 0 not the first one is used.
+
+=back
+
+=head1 EXAMPLES
+
+ gated2yaml | ospf2dot | dot
+
+=head1 DIAGNOSTICS
+
+The program dies if an error occurs.
+Typical errors are B<gdc> failure or parsing errors of the F<gated_dump>
+file.
+
+=head1 SEE ALSO
+
+L<OSPF::LSDB::gated>,
+L<OSPF::LSDB::YAML>,
+L<OSPF::LSDB>
+
+L<ospf2dot>
+
+gdc(8)
+
+=head1 AUTHOR
+
+Alexander Bluhm

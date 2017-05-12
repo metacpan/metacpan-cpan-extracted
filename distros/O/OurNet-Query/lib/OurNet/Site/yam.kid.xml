@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<SITE ID="Yam.Kid">
+
+<NAME Lang="en-us">Yam Search</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+番薯藤兒童休閒娛樂搜尋 (中英文)
+]]></NAME>
+<INFO Lang="en-us">information for kids search in Taiwan</INFO>
+<INFO Lang="zh-tw">information for kids search in Taiwan</INFO>
+
+<URL Type="More"><![CDATA[
+http://kids.yam.com.tw_MORE_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://kids.yam.com.tw/b5/search?k=_QUERY_
+]]></URL>
+
+
+<VAR Name="_MORE_"><![CDATA[
+<p><a href="_MORE_">下 20 筆</a><p>
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<dt>___<a href="_URL_">_TITLE_</a>___<dd>_PREVIEW_<
+]]></TEMPLATE>
+</SITE>

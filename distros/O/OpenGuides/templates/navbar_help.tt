@@ -1,0 +1,14 @@
+[% UNLESS omit_help_links %]
+  <div id="navbar_help">
+    <div class="navbar_group_title">Help:</div>
+    <ul>
+      <li><a href="[% full_cgi_url %]?FAQ">FAQ</a></li>
+      <li><a href="[% full_cgi_url %]?How_To_Get_Started">How To Get Started</a></li>
+      [% IF formatting_rules_link %]
+        <li><a href="[% formatting_rules_link %]">[% formatting_rules_node %]</a></li>
+      [% END %]
+      <li><a href="[% full_cgi_url %]?Wiki_Etiquette">Wiki Etiquette</a></li>
+    </ul>
+</div>
+[% END %]
+

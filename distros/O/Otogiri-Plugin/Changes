@@ -1,0 +1,17 @@
+Revision history for Perl extension Otogiri-Plugin
+
+0.03 2014-06-07T07:47:02Z
+
+    - add document HOW TO MAKE YOUR PLUGIN
+    - requires latest Otogiri(0.12). this version is fixed deflate bug
+    - add missing dependency(DBD::SQLite)
+
+0.02 2014-01-15T01:34:05Z
+
+    - support for latest Otogiri
+    - document fix
+
+0.01 2013-12-24T01:41:12Z
+
+    - original version
+

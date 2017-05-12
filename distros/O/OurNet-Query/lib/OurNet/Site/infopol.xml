@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<SITE ID="Infopol">
+
+<NAME Lang="en-us">InfoPol Search</NAME>
+<INFO Lang="en-us">general information web search in Poland</INFO>
+
+<URL Type="More"><![CDATA[
+http://www.info.pl/cgi-bin/query.cgi?pg=_START_1_0_&q=_QUERY_&next.x=&next.y=
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://www.info.pl/cgi-bin/query.cgi?pg=0&q=_QUERY_&next.x=&next.y=
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+
+<TEMPLATE><![CDATA[
+.  <a href="_URL_">_TITLE_</a><BR>_PREVIEW_<BR>http:
+]]></TEMPLATE>
+</SITE>

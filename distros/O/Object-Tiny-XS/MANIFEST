@@ -1,0 +1,23 @@
+Changes
+examples/benchmark.pl
+examples/Foo_Bar_Accessor.pm
+examples/Foo_Bar_Accessor2.pm
+examples/Foo_Bar_Tiny.pm
+examples/Foo_Bar_Tiny2.pm
+examples/Foo_Bar_Tiny_XS.pm
+examples/Foo_Bar_Tiny_XS2.pm
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Object/Tiny/XS.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+t/01_compile.t
+t/02_main.t
+t/03_subclass.t

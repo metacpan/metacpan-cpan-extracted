@@ -1,0 +1,11 @@
+{
+  "op_host": "https://ce-prev-version.gluu.org",
+  "oxd_host_port":8099,
+  "authorization_redirect_uri" : "https://oxd-perl-example.com/login.cgi",
+  "post_logout_redirect_uri" : "https://oxd-perl-example.com/logout.cgi",
+  "scope" : [ "openid", "profile","uma_protection","uma_authorization" ],
+  "application_type" : "web",
+  "response_types" : ["code"],
+  "grant_types":["authorization_code"],
+  "acr_values" : [ "basic", "duo","u2f","gplus", "oxpush2" ]
+}

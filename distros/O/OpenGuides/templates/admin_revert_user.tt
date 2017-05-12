@@ -1,0 +1,25 @@
+[% INCLUDE header.tt page_title = "Revert changes by $by" %]
+[% INCLUDE banner.tt %]
+<div id="content">
+[% INCLUDE navbar.tt %]
+<div id="maincontent">
+
+<h1>Confirm Revert of changes by [% by_type %] [% by %]</h1>
+<p>
+</p>
+<form action="[% cgi_url %]" method="post">
+  <input type="hidden" name="action" value="revert_user" />
+  <input type="hidden" name="[% by_type %]" value="[% by %]" />
+  <strong>Password:</strong>
+  <input type="password" name="password" />
+  <input type="submit" value="Go!" />
+</form>
+
+<ul>
+[% FOREACH edit = edits %]
+  <li>[% edit.name %] - v[% edit.version %]
+[% END %]
+</ul>
+
+</div>
+[% INCLUDE footer.tt %]

@@ -1,0 +1,38 @@
+--- #YAML:1.0
+name: Object-Meta-Plugin
+version: 0.01
+license: perl
+distribution_type: module
+requires:
+  Tie::RefHash: '>= 1.3'
+  perl: 5.8.0
+recommends:
+  Devel::Symdump: '>= 2.0'
+build_requires: {}
+conflicts: {}
+provides:
+  Object::Meta::Plugin:
+    file: lib/Object/Meta/Plugin.pm
+    version: 0.01
+  Object::Meta::Plugin::ExportList:
+    file: lib/Object/Meta/Plugin/ExportList.pm
+    version: 0.01
+  Object::Meta::Plugin::Host:
+    file: lib/Object/Meta/Plugin/Host.pm
+    version: 0.01
+  Object::Meta::Plugin::Host::Context:
+    file: lib/Object/Meta/Plugin/Host.pm
+    version: 0.01
+  Object::Meta::Plugin::Host::Context::Offset:
+    file: lib/Object/Meta/Plugin/Host.pm
+    version: 0.01
+  Object::Meta::Plugin::Useful:
+    file: lib/Object/Meta/Plugin/Useful.pm
+  Object::Meta::Plugin::Useful::Generic:
+    file: lib/Object/Meta/Plugin/Useful/Generic.pm
+    version: 0.01
+  Object::Meta::Plugin::Useful::Greedy:
+    file: lib/Object/Meta/Plugin/Useful/Greedy.pm
+  Object::Meta::Plugin::Useful::Meta:
+    file: lib/Object/Meta/Plugin/Useful/Meta.pm
+generated_by: Module::Build version 0.21

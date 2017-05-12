@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<SITE ID="SkiCentral">
+
+<NAME Lang="en-us">SkiCentral</NAME>
+<INFO Lang="en-us">skiing relevant information search</INFO>
+
+<URL Type="More"><![CDATA[
+http://skicentral.com_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://skicentral.com/cgi/search1?search=_QUERY_&options=any&sort=alphabetic&new=all&show=_HITS_&pop=all
+]]></URL>
+
+
+<VAR Name="_NEXT_"><![CDATA[
+<BR><A HREF="_NEXT_"><B>Next
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+) <A HREF="_URL_">_TITLE_</A>___<DD>_PREVIEW_</DT>
+]]></TEMPLATE>
+</SITE>

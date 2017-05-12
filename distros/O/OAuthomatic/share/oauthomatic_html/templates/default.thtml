@@ -1,0 +1,23 @@
+[%# -*- mode: web; coding: utf-8 -*-
+  ######################################################################
+    Page shown on unexpected urls.
+    Parameters: 
+    - all described in layout.thtml
+  ###################################################################### -%]
+[% WRAPPER layout.thtml
+       title="OAuthomatic embedded webserver" %]
+
+<p>
+    This is temporary web server, running locally to help you grant
+    application [% app_name %] access to services provided by
+    [% site_name %].
+</p>
+
+<p>
+    You visited url which should not be, in normal circumstances,
+    visited. If you were redirected here, or application spawned this
+    page for you, this means some error in [% app_name %] or in
+    OAuthomatic (or, less likely, in [% site_name %]).
+</p>
+
+[% END %]

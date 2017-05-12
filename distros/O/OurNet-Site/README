@@ -1,0 +1,40 @@
+This is the README file for OurNet::Site, OurNet::Query and
+OurNet::Template, a scriptable query and template extraction 
+tools, by Elixir Group and OurInternet Inc.
+
+* Installation
+
+libOurNet uses the standard perl module install process:
+
+perl Makefile.PL
+make
+make install
+
+* Copyright
+
+Copyright 2001 by Autrijus Tang <autrijus@autrijus.org>.
+
+All rights reserved.  You can redistribute and/or modify
+this bundle under the same terms as Perl itself.
+
+* Introduction
+
+The contents of most web services are formatted in ill-structured HTML,
+makes it extremely difficult to incorporate other site's services into
+your own. Even if such hand-coded attempts are made, the lack of
+streamlined representation forbids you from integrating other service's
+contents, or re-formats them into the same style.
+
+Take searching as an example: currently, most meta-search packages limits
+you to a fixed array of popular general-purpose Search Engines, and are
+incapable of take advantage of each one's unique services. The same
+limitation also applies to price-comparison services, special-purpose
+monitor sites (e.g. financial "stock watcher"), etc.
+
+OurNet::Query delivers a totally customizable engine to automatically
+monitor any web service's contents, and "wrap" them into any format -
+XML, RSS, database, or HTML templates - without any hard coding. Totally
+transparent to the end-user, they will feel as if these results are
+offered by the same source, hence makes it very easy to build a site
+filled with richly news, services and related contents.
+

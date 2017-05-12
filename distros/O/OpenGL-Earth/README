@@ -1,0 +1,33 @@
+NAME
+    OpenGL::Earth
+
+SYNOPSIS
+    Mmh... I don't think you can use this module directly. Better look at
+    the "bin" folder.
+
+DESCRIPTION
+    It's an attempt to write an OpenGL Perl program that can display a fancy
+    rotating planet, while also displaying useful geographic information on
+    it.
+
+    The development is in a really really early stage now (Jan 2009). Don't
+    expect miracles.
+
+    It's basically a 10-years old OpenGL C program, translated to Perl like
+    8 years ago, and then butchered and reassembled by yours truly during
+    some nightly hacking sessions.
+
+    The Earth texture that comes with this distribution is a stripped down
+    version (1024x512) of the original hi-res (4096x2048) I downloaded from
+    Celestia Motherlode, if I remember correctly.
+
+    If you want to use the higher resolution texture, either find it yourself,
+    or write me, or generate one by yourself with the bin/build_texture.pl
+    utility I wrote. You will need the mighty Imager module for that.
+
+AUTHORS
+    Cosimo Streppone, <cosimo@cpan.org>
+
+COPYRIGHT
+    This code comes with the same terms as Perl itself.
+

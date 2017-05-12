@@ -1,0 +1,966 @@
+<h1>OpenInteract Administrator's Guide</h1>
+
+    <P>This document goes over issues concerning system
+    administrators, including mod_perl/Apache compilation and
+    configuration, tips for running multiple websites under one
+    mod_perl server, package configuration, logging, error reporting
+    and caching.</p>
+
+    <p>While you're reading, it would be handy to have within reach
+    the <a href="glossary.html">OpenInteract Glossary</a> to lookup
+    certain terms (like 'website', 'handler', 'package', etc.).
+      
+    <h1>oi_manage</h1>
+
+    <p>Distributed with OpenInteract is the script
+    <code>oi_manage</code>. If you installed OpenInteract via the
+    normal Perl mechanisms, you should have it in your
+    <code>/usr/bin</code> or <code>/usr/local/bin</code> directory so
+    it's always accessible. (You might also ensure that
+    <code>/usr/local/bin</code> is in your path and your users' paths,
+    or that you create a symlink from <code>/usr/bin/oi_manage</code>
+    to <code>/usr/local/bin/oi_manage</code>.)</p>
+    
+    <p>This script takes care of many actions for you. Here's a list
+    and a brief description of each:
+
+    <pre><font size="-1">
+Commands by the Administrator:
+
+ install             - Install OpenInteract to base directory
+ upgrade             - Upgrade core OpenInteract packages
+ install_package     - Install package to the base
+
+Commands by the Package Developer:
+
+ create_skeleton     - Create a skeleton package for development
+ export_package      - Export package(s) to distribution file(s)
+ check_package       - Ensure that package passes initial inspection
+
+Commands by the Website Creator:
+
+ create_website      - Create a new website
+ apply_package       - Install a package from base to website
+ upgrade_package     - Upgrade a website package
+ remove_package      - Remove a package from a website
+ install_sql         - Install the SQL for packages
+ install_template    - Install package templates to the database
+ dump_template       - Dump package templates to the filesystem
+ remove_template     - Remove package templates from the database
+ refresh_doc         - Sync website docs to base installation docs
+ test_db             - Test database settings in 'server.perl'
+ change_spops_driver - Change the SPOPS driver for your objects
+
+Other commands:
+
+ initial_packages    - List packages marked as 'initial'
+ list_packages       - List packages installed to app or base
+ list_actions        - List actions currently implemented in website
+    </font></pre>
+
+    <p>You can read an <a href="oi_manage.html">online text
+    version</a> of the documentation for <code>oi_manage</code> For
+    the most up-to-date information, do a <code>perldoc
+    oi_manage</code> from the command line to view the extensive
+    documentation.
+
+    <h1>OpenInteract</h1>
+    
+    <p>This section reviews installation, layout and gives a very broad
+      overview of the packaging system.
+
+    <h2>Shortcuts</h2>
+    
+    <p>There are two environment variables you can use too make your
+      typing life easier:</p>
+
+    <ul>
+      <li><tt><b>OPENINTERACT</b></tt>: Base installation directory
+      (used in place of <tt>--base_dir</tt></li>
+      <li><tt><b>OIWEBSITE</b></tt>: Website directory (used in place
+      of <tt>--website_dir</tt></li>
+    </ul>
+
+    <p>We encourage you to use these as much as possible. However, we
+    continue to use the long form in the examples below.</p>
+      
+
+    <h2>Installation</h2>
+    
+    <p>Installation of OpenInteract is very simple. First, you need to
+    install the Perl module in the normal fashion. (CPAN or by-hand.) 
+    Next, run:</p>
+      
+<pre><font size="-1">
+ cd /path/where/I/unpacked/OpenInteract-x.xx
+ oi_manage install --base_dir=/path/to/install
+</font></pre>
+
+    <p>Easy! Read the <code>INSTALL</code> and
+    <code>INSTALL.website</code> files that were packaged with the
+    OpenInteract distribution for more details.
+
+    <h2>Layout</h2>
+
+    <p>OpenInteract is composed of two pieces: the installation and
+    the websites. The installation is what you create when you run the
+    <code>oi_manage install</code> command above.
+
+    <p>And you refer to it when you create new websites:
+
+<pre><font size="-1">
+ oi_manage create_website --base_dir=/path/to/install \
+                          --website_dir=/path/to/website \
+                          --website_name=MySite
+</font></pre>
+
+    <p>Thereafter, the website keeps the information for the base
+    installation directory in its <code>conf/base.conf</code> file
+    described below. So you shouldn't need to refer to the
+    installation directory too often. (Developers need to know it when
+    they are developing packages, but that's a separate issue.)
+      
+    <h2>Packages: Installing and Upgrading</h2>
+
+    <p>So OpenInteract exists in two parts: the installation and the
+    various websites that use the installation.  When users who run
+    the websites want to add new functionality by installing a new
+    package or upgrading an existing one, they must first add the
+    package to the OpenInteract installation and then apply it to the
+    website.
+      
+    <p>The OpenInteract installation maintains a copy of every version
+    of every package ever installed to the system. This might seem
+    backwards or unnecessary, but it ensures that different websites
+    can use and continue to use different versions of the same
+    packages. This should allow you to accommodate different types of
+    users: bleeding-edge developers who always play with new versions
+    of packages and stay-the-line website maintainers who just want
+    everything to work the same day after day.
+
+    <p>Fortunately, the <code>oi_manage</code> script makes this whole
+    process easy for us:
+
+    <p><b>Install a new package to the installation:</b>
+
+<pre><font size="-1">
+ oi_manage install_package --package_file=/path/to/file.tar.gz \
+                           --base_dir=/path/to/install
+</font></pre>
+
+    <p><b>Install a new version of an existing package to the installation:</b>
+
+<pre><font size="-1">
+ oi_manage install_package --package_file=/path/to/file.tar.gz \
+                           --base_dir=/path/to/install
+</font></pre>
+
+    <p>Hey, those two were the same thing! It's true. Since the
+    installation maintains a copy of every version of every package,
+    it doesn't actually 'upgrade' a package in the installation.
+
+    <p>This just emphasizes the main point: when you install a package
+    to the OpenInteract installation, you're simply making it
+    available for the websites that are using this installation.
+
+    <p><b>Apply an installed package to a website:</b>
+
+<pre><font size="-1">
+ oi_manage apply_package --package=newpackage \
+                         --website_dir=/path/to/website 
+</font></pre>
+
+    <p><b>Upgrade to a new version installed package for a website:</b>
+
+<pre><font size="-1">
+ oi_manage upgrade_package --package=newpackage \
+                           --website_dir=/path/to/website
+</font></pre>
+
+    <p>Ah, now those two commands were different. This shows that a
+    website can only have <b>one version</b> of a particular package
+    installed. If you try to <code>apply_package</code> for a package
+    that has already been applied to a website, you'll get an error
+    and no action will be taken. In this case you need to use
+    <code>upgrade_package</code>.
+
+    <p>The docs for <code>oi_manage</code> discuss this next point but
+    it's worth repeating: when you use <code>upgrade_package</code>,
+    you merely update the registry information for the website. You
+    also install new data and structure, object configuration,
+    templates, handlers and everything else.
+
+    <p>However, the system does <b>not</b> remove the old files. The
+    system does not know if you want to keep the changes you've made
+    or discard them, so it simply keeps the old directory around and
+    allows you to copy information back and forth as you need. But
+    this old directory is <b>not</b> used by the system anymore, and
+    if you make changes to files in the old package directory they
+    will not be reflected in the website.
+
+
+    <H1>Configuration File Formats</H1>
+
+    <P>We generally use one of three formats. If you create new
+    configuration files, try to stick to these naming schemes.
+
+    <P><B>.conf</B>
+
+    <P>Typical configuration file format: information separated into
+    key-value pairs (separated by whitespace), blank lines and lines
+    that begin with a comment (#) are skipped.
+
+    <P>Example:
+
+<pre><font size="-1">
+  MyValue              emmet otter
+  HerValue   fraggle rock
+  TheirValue  jughandle
+   # ringo   starr
+</font></pre>
+
+    <p>Parsing this would return a hashref:
+
+<pre><font size="-1"> { 
+   MyValue    =&gt; 'emmet otter',
+   HerValue   =&gt; 'fraggle rock',
+   TheirValue =&gt; 'jughandle'
+ }
+</font></pre>
+
+    <p><b>.dat</b>
+
+    <P>Very simple: one item per line. Blank lines and lines beginning
+    with a comment (#) are skipped entirely.
+
+    <P>Example:
+
+<pre><font size="-1"> 
+ MyClass
+ HerClass
+ TheirClass
+ #RingoClass
+</font></pre>
+
+    <P>Parsing this would return an arrayref:
+
+<pre><font size="-1"> 
+  [ 'MyClass', 'HerClass', 'TheirClass' ]
+</font></pre>
+
+    <p><b>.perl</b>
+
+    <P>This file is a full-fledged perl data structure, dumped to a
+    file using <code>Data::Dumper</code>. It can be any type of
+    structure, but it's normally used to represent a hashref
+    containing all sorts of different types of information. It's also
+    fairly easy to edit such a file using your favorite plain-text
+    file editor.
+      
+    <P>When reading this type of configuration, we just return the
+    data structure saved in the file -- if the file is an arrayref, we
+    return an arrayref.
+
+    <P>When we use this structure to save information for objects
+    (such as the <code>OpenInteract::Config::PerlFile</code> object),
+    we never save class information about the object, just the data.
+    We can always re-bless the structure after it's eval'd in.
+
+    <P>Example:
+
+<pre><font size="-1">
+ $data = {
+          'db_info' =&gt; {
+            'db_owner'    =&gt; '',
+            'username'    =&gt; 'test',
+            'password'    =&gt; '',
+            'dsn'         =&gt; 'mydb',
+            'db_name'     =&gt; 'myopeninteract',
+            'driver_name' =&gt; 'mysql',
+          },
+          ...
+ };
+</font></pre>
+
+
+    <H1>Website Configuration</H1>
+
+    <p>All files referenced in this section are contained in the home
+    directory of the website. For instance, if you install a website
+    using:
+
+<pre><font size="-1">
+ oi_manage create_website --base_dir=/path/to/install \
+                          --website_dir=/path/to/website \
+                          --website_name=MySite
+</font></pre>
+
+    <p>The files described here would be in
+    <code>/path/to/website</code>.</p>
+
+    <p>We start with the simple files first and then get into the main
+    configuration file.</p>
+
+    <h2>File: conf/base.conf</h2>
+
+    <P>This is one of the most important configuration files in
+    OpenInteract -- fortunately, nobody should never need to edit it.
+    <code>:-)</code> This file allows
+    <code>OpenInteract::Startup</code> to bootstrap all the
+    configuration information by supplying information for the class
+    that reads in the data for the server configuration
+    (<code>OpenInteract::Config::PerlFile</code> by default), the base
+    directory for this application, the name of the configuration
+    directory and file. You can also specify the Request class
+    (<code>OpenInteract::Request</code> by default) and a Stash class
+    (no default specified -- every application needs to have its
+    own).</p>
+      
+    <P>Example:
+
+<pre><font size="-1">
+base_dir         /opt/OpenInteract
+website_dir      /home/httpd/mysite.com
+website_name     MySite
+config_type      perl
+config_class     OpenInteract::Config::PerlFile
+config_dir       conf
+config_file      server.perl
+request_class    OpenInteract::Request
+stash_class      MySite::Stash
+</font></pre>
+
+    <h2>File: conf/apache.dat</h2>
+
+    <P>List the classes needed by mod_perl in the
+    <CODE>Apache::</CODE> class. You should never need to change
+    this.</p>
+
+    <h2>File: conf/package_repository.perl</h2>
+
+    <p>This is not a configuration file but included here for
+    completeness. It is a text-based file (a Perl data structure in
+    <code>Data::Dumper</code> format) and includes information about
+    the packages in the website. You should never need to edit this
+    file, but it's in a text-based format just in case you do.</p>
+
+    <h2>File: conf/server.perl</h2>
+
+    <p>This is the main website configuration file and you may find
+    yourself editing this quite often in the beginning and then every
+    once in a while thereafter. The file is quite well-commented so
+    you have the information about what/how to configure next to the
+    actual data to change.</p>
+
+    <p>When you create a new website using <code>oi_manage</code> you
+    get a starter <code>server.perl</code> file with a number of items
+    filled in. (View the <a href="sample-server-perl.html">sample
+    server.perl</a> file -- note that keys surrounded with '%%' will
+    be replaced when you create a website with
+    <code>oi_manage</code>.</p>
+
+    <p>This configuration is always available within the OpenInteract
+    environment (as an <code>OpenInteract::Config</code> object) to
+    developers and is read in anew every time the server starts. If
+    you change the file while the server is running the changes are
+    <b>not</b> picked up by the running server. You need to restart to
+    make the change happen. (This might change as the need
+    arises.)</p>
+      
+    <p>The file itself is formatted in Perl and you can edit it with
+    your favorite plain-text editor. You should be able to check
+    whether it is syntactically valid by doing:</p>
+      
+<pre><font size="-1">
+ perl -wc server.perl
+</font></pre>
+
+    <p>This won't tell you whether it's <b>functionally</b>
+    valid, but it's a first step. Note that there is a routine in
+    <code>oi_manage</code> that allows you to check whether the
+    parameters defined in <code>server.perl</code> will allow a
+    database connection to be made:
+
+<pre><font size="-1">
+ oi_manage test_db --website_dir=/path/to/my/website
+</font></pre>
+
+    <h3>Website Directories</h3>
+
+    <p>The actual names of all directories are determined by this
+    website configuration file as well. Here is an example with some
+    commonly-used directories:</p>
+
+<pre>
+     'dir' => {
+       'base'     => undef, # replaced in OpenInteract::Startup
+       'interact' => undef, # replaced in OpenInteract::Startup
+       'error'    => '$BASE/error',
+       'html'     => '$BASE/html',
+       'log'      => '$BASE/logs',
+       'cache'    => '$BASE/cache',
+       'config'   => '$BASE/conf',
+       'data'     => '$BASE/data',
+       'mail'     => '$BASE/mail',
+       'overflow' => '$BASE/overflow',
+       'help'     => '$HTML/help',
+       'download' => '$HTML/downloads',
+       'upload'   => '$BASE/uploads',
+     },
+</pre>
+
+    <p>Note that the 'dir' entry is one of the few places in the
+    configuration where you can use expandable macros to determine the
+    configuration value. As you might guess '$HTML' expands to find
+    what the entry for 'html' is, which then depends on the value for
+    'base' is. You are not restricted to using the '$HTML' and '$BASE'
+    macros.</p>
+
+    <p>Also, you can refer to '$BASE' even though the entry for 'base'
+    is undefined. The standard <code>startup.pl</code> reads the value for
+    'website_dir' set in the httpd.conf and sets it dynamically once
+    the config file is read in. This way you should only have to set
+    your directory in one location. (And we should fix the slightly
+    confusing naming scheme as well...)</p>
+
+    <p>Below are brief descriptions of what each directory should
+    hold.</p>
+
+<ul>
+
+  <li><b>base</b>: The root directory for this application. By
+  default, everything needed for this application is under this
+  directory. (This is set dynamically in the <code>startup.pl</code>
+  file so anything you set in the configuration file will be
+  overwritten.)</li>
+
+  <li><b>interact</b>: The base installation directory. (This is set
+  in the <code>startup.pl</code> file so anything you set in the
+  configuration file will be overwritten.)</li>
+
+  <li><b>error</b>: If OpenInteract cannot save an error to the
+  database, it will save the error (in <code>Data::Dumper</code>
+  format) to this directory, using the ID of the error as a
+  filename. Note that the error browser does not currently view these
+  items, but this may change in the future.</li>
+
+  <li><b>html</b>: The root directory for static web pages and
+  images.</li>
+
+  <li><b>log</b>: Directory where logs are kept. This needs to be
+  writeable by the webserver user.</li>
+  
+  <li><b>cache</b>: If you're using the default caching module that
+  utilizes the filesystem, the caching will be done in this
+  directory. This needs to be writeable by the webserver user.</li>
+
+  <li><b>config</b>: Where all the configuration information is kept;
+  this includes SPOPS class definitions, module configuration, and the
+  main configuration file itself. The C<<code>startup.pl</code>> file
+  is also kept here.</li>
+
+  <li><b>data</b>: Not typically used in webserver operation, but
+  usually where any data are kept, usually in a raw (CSV, bcp, etc.) 
+  format before being massaged and put into the database. Also used
+  for pre-formed SQL statements to load data into the database. If a
+  package you download has default data it needs to load, those data
+  can be kept here.</li>
+
+  <li><b>mail</b>: Some applications may use asynchronous email
+  services, where the system requests an email be sent but actually a
+  file is written out with the necessary information and a time batch
+  job (via cron) processes the mail at regular intervals. The files
+  written for the batch job are written to this directory. This
+  directory must be writeable by the webserver user.</li>
+
+  <li><b>overflow</b>: Often a search may be run that returns more
+  information than is desired to fit on the screen. You can use this
+  directory to hold intermediate results and retrieve them later. Note
+  that this might be eliminated in favor of caching at a later
+  date. This directory must be writeable by the webserver user.</li>
+
+  <li><b>help</b>: Directory where help files may be kept.</li>
+
+  <li><b>download</b>: Directory to put generated files that users
+  need to access. For instance, you might generate a CSV and DBF file
+  to hold exported search results, put the files here and offer the
+  user links to this directory to download them. This directory must
+  be writeable by the webserver user.</li>
+
+  <li><b>upload</b>: Directory where we can put uploaded files. This
+  directory should not be in the HTML tree but it must be writeable by
+  the webserver user.</li>
+
+ </ul>
+
+    <h2>Aliases per Website</h2>
+
+    <p>As a convenience, OpenInteract allows you to setup aliases so
+    you do not have to put all sorts of class names in your code. For
+    instance, instead of using a hardcoded classname:<p>
+
+<pre>
+ my $user = eval { OpenInteract::User->fetch( $uid ) };
+</pre>
+
+    <p>You can use:</p>
+
+<pre>
+ my $user = eval { $R->user->fetch( $uid ) };
+</pre>
+
+    <p>These aliases are setup automatically from the SPOPS classes,
+    and you're also given the opportunity to setup any additional
+    aliases using the 'system_aliases' configuration key. Here's an
+    example:</p>
+
+<pre>
+ 'system_alias' => {
+   'OpenInteract::Cookies::Apache'    => [ qw/ cookies / ],
+   'OpenInteract::Session::MySQL'     => [ qw/ session / ],
+   'OpenInteract::Template::Toolkit'  => [ qw/ template / ],
+   'OpenInteract::PackageRepository'  => [ qw/ repository / ],
+   'OpenInteract::Package'            => [ qw/ package / ],
+   'OpenInteract::Error'              => [ qw/ error / ],
+   'OpenInteract::Auth'               => [ qw/ auth auth_user auth_group / ],
+   '%%WEBSITE_NAME%%::Security'       => [ qw/ security_object object_security security / ],
+   'SPOPS::Secure'                    => [ qw/ secure / ],
+   'OpenInteract::Error::Main'        => [ qw/ error_handler / ],
+   'OpenInteract::Handler::Component' => [ qw/ component / ],
+ },
+</pre>
+
+    <p>As you can see, you can setup multiple aliases to refer to the
+    same class. For instance, any of the following will return the
+    class 'OpenInteract::Auth':</p>
+
+<pre>
+ $R->auth
+ $R->auth_user
+ $R->auth_group
+</pre>
+
+    <p>Note that using aliases like this is an as-yet-unmeasured
+    performance hit, because every time you call the alias, $R needs
+    to determine which application you're using so it can return the
+    correct alias. This is a manifestation of the problem with running
+    more than one application on the same server: what happens if two
+    entirely separate applications want to setup an alias for
+    'news'?</p>
+
+    <p>You should never need to setup the alises by hand -- the
+    standard <code>startup.pl</code> file will take care of this for
+    you. However, if you're curious... You can setup the alises by
+    calling:</p>
+
+<pre>
+ my $hr_alias = OpenInteract::Request->ALIAS;
+</pre>
+
+    <p>Which returns a hashref to you. Any changes you make will be
+    reflected in the master list of aliases. The hashref is setup as
+    follows:</p>
+
+<pre>
+ $hr->{ $alias }->{ $stash_class } = $aliased_class;
+</pre>
+
+    <p>So when you're setting up the aliases, you need to be sure and
+    include your $stash_class in the alias, or else you'll get all
+    kinds of errors.</p>
+
+    <p>Finally, we push the task of initializing the aliases
+    (translating them into subroutines so they will execute quickly)
+    into the ChildInitHandler, so we can ensure that all the
+    applications have had their chance to modify the alias information
+    before we create the subroutines.</p>
+
+    <h2>Website Logging</h2>
+
+    <p>All debugging messages generated by the OpenInteract system are
+    put into STDERR, which in apache is sent to the error log. You can
+    always get the debugging level of the current website by
+    running:</p>
+
+<pre>
+ my $website_debug_level = $R->DEBUG;
+</pre>
+
+   <p>A common logging idiom, using the
+   C<OpenInteract::Request-E<gt>scrib()> method is:</p>
+
+<pre>
+  $R->DEBUG && $R->scrib( 1, "My debugging message" );
+</pre>
+
+    <p>This first checks to see if debugging is on and only then calls
+    the C<scrib()> method.</p>
+
+    <p>SPOPS modules do not obey this debugging level, and if you want
+    to get debugging information from them you need to set the package
+    variable <code>$SPOPS::DEBUG</code>. This turns on debugging for
+    all SPOPS calls across websites.</p>
+
+
+    <h1>Caching</h1>
+
+    <p>OpenInteract comes hooks for caching. While the caching
+    framework is fairly generic (you could cache data in a SQL
+    database or DBM file if you wished), the default caching mechanism
+    is uses the <code>File::Cache</code> module and the
+    filesystem. The module is fairly good about keeping the cache
+    under a certain size (set in the configuration file), and you can
+    also control the 'depth', which means that it creates
+    subdirectories for the cache entries rather than putting them all
+    into one big directory. Again, this is set in the configuration
+    file. It's worth experimenting with this function as it works on
+    your filesystem: journaling filesystems might be able to handle
+    many thousands of entries in a single directory, whereas others
+    might start having performance degradations after more than 500.</p>
+
+    <p>Most (all?) modern filesystems will put frequently accessed
+    files into an in-memory cache, which can be a big win for
+    caching. However, if yours does not one alternative is to put the
+    caching directory itself in memory by using a RAM disk. Setting up
+    such a filesystem is beyond the scope of this document.</p>
+
+
+    <H1>Apache</H1>
+
+    <p>NOTE: DO NOT restart the Apache/mod_perl process using the
+    <tt>HUP</tt> signal. Your modules will not get reloaded
+    properly.</p>
+
+    <h2>Proxy Setup</h2>
+    
+    <p>OpenInteract depends on a persistent Perl environment within a
+    web server. Currently, the best alternative is <a
+    href="http://perl.apache.org/">mod_perl</a>.
+
+    <p>mod_perl is extremely powerful, but this power can come at a
+    price. Embedding Perl into Apache uses more resources
+    (particularly memory) than just using Apache alone. A number of
+    developers have experimented with various ways of minimizing the
+    memory footprint of mod_perl, and one of the easiest and best
+    performing methods is to use a proxy server.
+
+    <p>This is described in great detail in the mod_perl guide under
+    the <a href="http://perl.apache.org/guide/strategy.html">Choosing
+    the Right Strategy</a> heading. But we'll summarize here:
+      
+    <ol>
+
+      <li>Setup a plain Apache server with mod_proxy and mod_rewrite
+      to listen to port 80 for your website. (We describe the build
+      process below.)</li>
+
+      <li>Tell this server to deal with static file requests (images,
+      movies, PDFs, etc.)</li>
+
+      <li>Proxy all other requests back to a heavier mod_perl server.</li>
+        
+      <li>Receive the information back from the mod_perl server and
+      send to the client.</li>
+
+    </ol>
+
+    <p>The benefits of this are:
+
+    <ol>
+      
+      <li>Resource-hogging mod_perl processes do not serve static
+      files -- if they did, you'd need more of the processes.</li>
+
+      <li>The front-end proxy is able to feed data back to the client
+      at whatever rate it needs without taking up many resources the
+      entire time. For instance, users reaching your website with
+      modems can tie up a web server process for much longer than
+      users who are on some sort of broadband network. If the process
+      is small it's not such a big deal.</li>
+
+      <li>Since they are separate, you can make changes to the (heavy)
+      back-end and mask them by the (light) front-end. This is a great
+      help when things are going wrong with the back-end and you don't
+      want users to see nasty error pages.</li>
+
+      <li>Also since they are separate, you can very easily move the
+      back-end process to an entirely separate machine (or machines,
+      using some sort of DNS or load-balancing manipulation) if the
+      need arises.</li>
+
+    </ol>
+
+    <p>Running OpenInteract in this environment is <b>strongly</b>
+    recommended, and it comes with configuration files that make it
+    easier to do the Right Thing.</p>
+
+    <H2>Building Apache: Proxy and mod_perl</H2>
+    
+    <p>First, you need to get the <code>mod_proxy_add_forward</code>
+      module make available by Ask Bjoern Hansen. Retrieve it from: 
+      <a href="http://develooper.com/code/mpaf/mod_proxy_add_forward.c">http://develooper.com/code/mpaf/mod_proxy_add_forward.c</a></p>
+
+    <p>Once you've retrieved the file, copy it into the
+    <code>src/modules/extra</code> directory of your Apache source
+    code directory. An example of the 'activate-module' and
+    'enable-module' directives to put this module into your Apache is
+    below in the as well as in the source code for
+    <code>mod_proxy_add_forward</code> itself.</p>
+      
+    <p>Once you've retrieved the extra module and copied it to the
+    right place, you can create apache and mod_perl with the following
+    steps. Note that this assumes you have not installed apache from
+    source before and that you're installing to the directory
+    <code>/usr/local/apache</code> -- modify as needed.</p>
+
+<pre><font size="-1">
+ 1.  &gt;&gt; tar -zxvf apache-1.3.12.tar.gz
+
+ 2.  &gt;&gt; tar -zxvf mod_perl-1.24.tar.gz
+
+ 3.  &gt;&gt; cd apache-1.3.12
+
+ 4.  &gt;&gt; ./configure --prefix=/usr/local/apache \ 
+                --enable-module=rewrite --enable-module=proxy \
+                --activate-module=src/modules/extra/mod_proxy_add_forward.c \
+                --enable-module=proxy_add_forward
+
+ 5.  &gt;&gt; make
+
+ 6.  &gt;&gt; make install
+ (proxy server binary is now installed as /usr/local/apache/bin/httpd)
+
+ 7.  &gt;&gt; cd ../mod_perl-1.24
+
+ 8.  &gt;&gt; perl Makefile.PL EVERYTHING=1
+ # Configure mod_perl with ../apache_1.3.12/src ? [y]
+
+ 9.  &gt;&gt; y
+ # Shall I build httpd in ../apache_1.3.12/src for you? [y]
+
+ 10. &gt;&gt; y
+
+ 11. &gt;&gt; make
+
+ 12. &gt;&gt; make test
+
+ (note: if this fails due to an error with URI::URL, set the
+ environment variable 'PERL_HTTP_URI_CLASS' to 'URI::URL', with
+ something like:
+
+    # export PERL_HTTP_URI_CLASS=URI::URL
+
+ 13. &gt;&gt; make install
+ (mod_perl Perl modules are now installed)
+
+ 14. &gt;&gt; cp ../apache-1.3.12/src/httpd /usr/local/apache/bin/httpd_modperl
+ (mod_perl-enabled Apache is now installed)
+</font></pre>
+
+    <p>This is a very simple method for creating both a lightweight
+    proxy Apache binary and a heavyweight mod_perl-enabled Apache
+    binary. See the <a
+    href="http://perl.apache.org/guide/"><EM>mod_perl Guide</EM></a>
+    for many, many more details about building mod_perl.</p>
+
+    <P>It is strongly recommended that you do <B>not</B>
+    build mod_perl using DSOs and that you do <B>not</B> use
+    pre-built versions such as those supplied by RedHat with its
+    RPMs. However, using the DSO mechanism probably works fine for the
+    front-end proxy server.</p>
+
+    <h2>Configuration Overview</h2>
+    
+    <p>Use <code>oi_manage</code>! Use <code>OI_MANAGE</code>! Use
+      <code><b>OI_MANAGE</b></code>!
+
+    <p>The <code>oi_manage</code> script included with OpenInteract
+    performs a number of tasks for you that make your life much
+    easier. When you run the <code>create_website</code> command along
+    with the appropriate parameters, <code>oi_manage</code> will copy
+    configuration files from the base installation to your website
+    directory and customize them for your website's parameters for
+    you.</p>
+
+    <p>For instance, two of the files that are copied to your
+    website's <code>conf/</code> directory are
+    <code>httpd_static.conf</code> and
+    <code>httpd_modperl.conf</code>.  (See <a
+    href="sample-httpd-static.html">httpd_static.conf</a> and <a
+    href="sample-httpd-modperl.html">httpd_modperl.conf</a> -- the
+    items marked with '%%' are replaced in the customization process.) 
+    You will still need to edit a few parameters in them --
+    <code>oi_manage</code> is pretty smart, but it can't find out
+    which IP address you want your website to listen to! -- but much
+    of it is filled in for you.</p>
+
+    <h2>Static Apache Configuration</h2>
+    
+    <p>After you've run <code>oi_manage</code>, you will need to
+    modify a few parameters in the static Apache configuration file.
+
+    <ol>
+
+      <li><b>IP address</b>: Do a search-replace for '127.0.0.1' with
+      the IP address you want the website to listen to. Note that if
+      you're using named virtual hosts you will not want to keep the
+      <code><a target="_blank"
+      href="http://www.apache.org/docs/mod/core.html#listen">Listen</a></code>
+      directive. You will also need to specify the <code><a
+      target="_blank"
+      href="http://www.apache.org/docs/mod/core.html#namevirtualhost">NameVirtualHost</a></code>
+      directive in your main Apache configuration file.</li>
+
+      <li><b>ServerAdmin</b>: Change the value for the 'ServerAdmin'
+      key</li>
+        
+      <li><b>ServerName</b>: Change the value for the 'ServerName'
+      key</li>
+
+    </ol>
+
+    <p>Proxy configuration is fairly simple. Every rule (starting with
+    <code>RewriteRule</code>) is processed in order. Once a rule is
+    met, no further rules are processed unless the satisfied rule
+    specifies it.</p>
+
+    <p>The default proxy configuration assumes that the only static
+    files you will want to serve directly from the proxy server are
+    images. This action is specified by this line:</p>
+
+<pre><font size="-1">
+ RewriteRule ^/images - [L]
+</font></pre>
+
+    <p>If you want to add other locations that will be entirely served
+    by the lightweight server, just add them after this line. For
+    example, if my website had a directory '/forms' where we kept PDF
+    versions of forms for our customers to fill out, I could add:</p>
+      
+<pre><font size="-1">
+ RewriteRule ^/forms - [L]
+</font></pre>
+
+    <p>And every URL beginning with <code>/forms</code> will be
+    answered by the front-end lightweight server. The <code>[L]</code>
+    stands for "Local" and means that you want this server (the proxy
+    server) to handle the request.</p>
+
+    <p>The only word of warning here is that as an administrator you
+    might need to keep an eye on what the back-end server is using for
+    URLs. For instance, say I entered this <code>/forms</code>
+    configuration directive and later a developer on the back-end
+    server tries to configure OpenInteract to perform a certain action
+    when given the <code>/forms</code> URL. Unless the developer knows
+    that the front-end server is answering all the <code>/forms</code>
+    URLs, she will have a very frustrating time trying to figure out
+    why her handler isn't responding.</p>
+
+
+    <h2>mod_perl Configuration</h2>
+
+    <p>After you've run <code>oi_manage</code>, you will need to
+    modify a few parameters in the mod_perl Apache configuration file.</p>
+
+    <ol>
+
+      <li><b>IP address</b>: Do a search-replace for '127.0.0.1' with
+      the IP address you want the website to listen to.</li>
+
+      <li><b>ServerAdmin</b>: Change the value for the 'ServerAdmin'
+      key</li>
+
+      <li><b>ServerName</b>: Change the value for the 'ServerName'
+      key</li>
+
+      <li><b>Port</b>: (optional) Do a search-replace for the default
+      value of '8080' with whatever port you want to run the mod_perl
+      server on</li>
+
+    </ol>
+
+    <p><em>(Note: You can skip the remainder of this section if you
+    just want to get something up and running. The
+    <code>oi_manage</code> script takes care of all this for you. But
+    if you're curious, read on.)</em>
+
+    <P>Four separate items need to be customized in the
+    <code>conf/httpd_modperl.conf</code> file:</p>
+
+    <P><b>First</b>, define the library paths for this website. Note
+    that this is applied on a server-wide basis, so be careful of
+    namespace clashes.</p>
+
+    <P>Example:</p>
+
+<pre><font size="-1">
+ &lt;Perl&gt;
+  use lib qw( /home/httpd/mysite.com );
+ &lt;/Perl&gt;
+</font></pre>
+
+    <P><b>Second</b>, define a parameter that allow us to bootstrap
+    our configuration object which contains the rest of everything we
+    need to know.  The parameter is 'StashClass' you set it to a value
+    that OpenInteract can use for a website's stash class.</p>
+
+    <P>Example:</p>
+
+<pre><font size="-1">
+ PerlSetVar StashClass      MySite::Stash
+</font></pre>
+
+    <P><b>Third</b>, you need to bring in your
+    <code>startup.pl</code>. (Information on what is done in the
+    <code>startup.pl</code> is found in the <EM>OpenInteract
+    Developer's Guide</EM>.)</p>
+
+<pre><font size="-1">
+ PerlRequire /home/httpd/mysite.com/conf/startup.pl
+</font></pre>
+
+    <P><b>Fourth</b> and finally, we need to ensure that every request
+    coming in goes through a single Apache content handler:
+    <code>OpenInteract.pm</code>.  (This module is located in the
+    <CODE>base</CODE> package.) To enable this, just do:</p>
+
+<pre><font size="-1">
+ &lt;Location /&gt; 
+  SetHandler perl-script 
+  PerlHandler OpenInteract
+ &lt;/Location&gt;
+</font></pre>
+
+    <P>This Apache content handler is in the <CODE>base</CODE> package
+    since it's part of the base functionality of the framework. We can
+    just say "OpenInteract" in the httpd.conf file because we have
+    already included the library in our <code>startup.pl</code>.</p>
+
+    <h2>Running Multiple Websites on One Server</h2>
+
+    <P>OpenInteract is a fairly heavyweight application. Its numerous
+    modules and, more importantly, package versioning necessitate that
+    each application run under its own mod_perl server. Multiple
+    applications can easily be run on the same machine, and can share
+    the same base package repository. But experience has shown that
+    trying to run multiple applications under the same set of
+    processes is nearly impossible unless everything is kept perfectly
+    in sync. And that never, ever happens.</p>
+
+    <h1>Suggested Readings</h1>
+
+    <ul>
+
+      <li><b>mod_perl Guide</b><br> 
+        <a href="http://perl.apache.org/guide/">http://perl.apache.org/guide/</A></li>
+
+      <li><b>General Apache documentation</b><br>
+        <a href="http://www.apache.org/docs/">http://www.apache.org/docs/</a></li>
+
+      <li><b>mod_rewrite manual</b><br>
+        <a href="http://www.apache.org/docs/mod/mod_rewrite.html">http://www.apache.org/docs/mod/mod_rewrite.html</a></li>
+
+      <li><b>Apache Virtual Host documentation</b><br>
+        <a href="http://www.apache.org/docs/vhosts/index.html">http://www.apache.org/docs/vhosts/index.html</a></li>
+
+    </ul>

@@ -1,0 +1,177 @@
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#introduction">INTRODUCTION</A></LI>
+	<LI><A HREF="#package contents">PACKAGE CONTENTS</A></LI>
+	<LI><A HREF="#how do i create a package">HOW DO I CREATE A PACKAGE?</A></LI>
+	<LI><A HREF="#what's in a package object">WHAT'S IN A PACKAGE OBJECT?</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#authors">AUTHORS</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>OpenInteract Packages - Managing and distributing applications</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<P>This document describes the packaging system in OpenInteract.</P>
+<P>
+<HR>
+<H1><A NAME="introduction">INTRODUCTION</A></H1>
+<P>A package is all the code, SQL structures, configuration information
+and anything else necessary to implement functionality in
+OpenInteract.</P>
+<P>In OpenInteract, packages implement the actual application
+functionality. OpenInteract handles the storage interface (e.g.,
+putting your objects in a database), dispatches URL requests to your
+objects (this is called <EM>handling</EM> an <EM>action</EM>), security,
+authentication and authorization, and session management.</P>
+<P>Applications need to define objects, which is how an application
+handles its state. It also needs to define how the objects are to be
+manipulated, which users can access them and how functionality is
+exposed to the user (by way of a URL to action mapping).</P>
+<P>Obviously, OpenInteract comes with tools to install, uninstall and
+query currently installed packages. This greatly simplifies the task
+of creating, testing and distributing your application.</P>
+<P>
+<HR>
+<H1><A NAME="package contents">PACKAGE CONTENTS</A></H1>
+<P>What goes into a package? In general, you will find:</P>
+<UL>
+<LI>
+Perl module code: This can include handler code, SPOPS object code and
+installation code.
+<P></P>
+<LI>
+Configuration: Generally this includes two files in the <CODE>conf/</CODE>
+directory: <CODE>action.perl</CODE> and <CODE>spops.perl</CODE>, both of which are
+discussed further below.
+<P></P>
+<LI>
+Templates and Components: Graphical interface to package
+functionality. Normally these are HTML files interspersed with
+template processing commands which makes the data the package manages
+visible to the user.
+<P></P>
+<LI>
+Installation information: This includes the <CODE>package.conf</CODE> file along
+with the SQL installation class.
+<P></P>
+<LI>
+Package data structures and data: These are used by the SQL
+installation class to install tables and any initial data needed by
+the package. These data can also be installed to other tables in
+OpenInteract.
+<P></P>
+<LI>
+Documentation: The 'create_skeleton' command of <CODE>oi_manage</CODE> will
+create a preliminary POD file for you which documents your
+package. You are strongly encouraged to fill in the blanks and add
+meaningful detail along with any other necessary files to let people
+know what functionality your package provides.
+<P></P></UL>
+<P>
+<HR>
+<H1><A NAME="how do i create a package">HOW DO I CREATE A PACKAGE?</A></H1>
+<P>The <CODE>oi_manage</CODE> script included with OpenInteract will create a basic
+package skeleton for you. Here's an example:</P>
+<PRE>
+ oi_manage --package=mypackage --base_dir=/tmp/OpenInteract \
+           create_skeleton</PRE>
+<P>Will create the following files:</P>
+<PRE>
+ mypackage                      # Main directory
+ mypackage/package.conf         # Basic package configuration (name, ...)
+ mypackage/MANIFEST             # List of files in package
+ mypackage/MANIFEST.SKIP        # Regexes to skip when creating MANIFEST
+ mypackage/conf                 # Configuration directory
+ mypackage/conf/spops.perl      # Persistent object(s) configuration
+ mypackage/conf/action.perl     # Action(s) configuration
+ mypackage/data                 # Package data/security directory
+ mypackage/doc                  # Documentation directory
+ mypackage/doc/mypackage.pod    # Starter documentation
+ mypackage/doc/titles           # Map documentation name to subject
+ mypackage/struct               # Package table definition directory
+ mypackage/template             # Template directory
+ mypackage/script               # Tools program directory
+ mypackage/html                 # Static html directory
+ mypackage/html/images          # Image directory
+ mypackage/OpenInteract         # Object hierarchy directory
+ mypackage/OpenInteract/Handler # Package handler directory</PRE>
+<P>You will normally need to edit/add the following:</P>
+<PRE>
+ mypackage/package.conf         # Add name, version, author information
+ mypackage/MANIFEST             # Add names of distribution files
+ mypackage/conf/spops.perl      # Describe the objects your package uses
+ mypackage/conf/action.perl     # Map URLs to handlers in your package
+ mypackage/data                 # Specify the initial data and security
+ mypackage/struct               # Describe the tables used to store your objects
+ mypackage/template             # HTML to display and manipulate your objects
+ mypackage/OpenInteract         # Optional Perl modules defining object behavior
+ mypackage/OpenInteract/Handler # Manipulate objects for desired functionality
+ mypackage/doc/mypackage.pod    # Last but not least, tell the world about it</PRE>
+<P>By the way, the MANIFEST file can be created automatically. (Perl is
+great.) Here's how:</P>
+<PRE>
+ &gt;&gt; cd /path/to/mypackage
+ &gt;&gt; perl -MExtUtils::Manifest -e 'ExtUtils::Manifest::mkmanifest()'</PRE>
+<P>That's it! If you have an old 'MANIFEST' file in the directory it will
+be copied to 'MANIFEST.bak'. Also note that files matching patterns in
+the 'MANIFEST.SKIP' file will not be included.</P>
+<P>
+<HR>
+<H1><A NAME="what's in a package object">WHAT'S IN A PACKAGE OBJECT?</A></H1>
+<P>Now that you've created a package already, you've seen most of its
+contents. (The ones you care about, anyway.) However, each package is
+a <CODE>OpenInteract::Package</CODE> object -- a normal SPOPS object.</P>
+<P>OpenInteract maintains a registry of installed packages in a central
+location. (To find the file, go to the <CODE>conf/</CODE> directory of your base
+OpenInteract installation. The <CODE>package_install.gdbm</CODE> holds the
+information.)</P>
+<P>This registry includes meta information about all currently installed
+packages -- author, install date, version, etc. You can browse the
+information using a command-line tool (named <CODE>oi_manage</CODE>) to see what
+is currently installed, along with querying the information to find
+dependencies, authors, etc.</P>
+<P><STRONG>Properties of the OpenInteract::Package object:</STRONG></P>
+<P><STRONG>name</STRONG> ($)</P>
+<P>Name of package</P>
+<P><STRONG>version</STRONG> ($)</P>
+<P>Version of package</P>
+<P><STRONG>author</STRONG> (\@)</P>
+<P><CODE>Author(s)</CODE> of package, full name and email address is used for each
+entry; the list should be sorted in order of importance</P>
+<P><STRONG>url</STRONG> ($)</P>
+<P>Web address with more information about the package</P>
+<P><STRONG>description</STRONG> ($)</P>
+<P>Two or three paragraphs about the package</P>
+<P><STRONG>notes</STRONG> ($)</P>
+<P>Notes about this particular installation of a package.</P>
+<P><STRONG>sql_installer</STRONG> ($)</P>
+<P>Name of class which will get called by <CODE>OpenInteract::SQLInstall</CODE> to
+install the SQL structures, data and security necessary for this package.</P>
+<P><STRONG>last_updated_on</STRONG> ($)</P>
+<P>Date this package was last updated</P>
+<P><STRONG>last_updated_by</STRONG> ($)</P>
+<P>User who updated this package</P>
+<P><STRONG>installed_on</STRONG> ($)</P>
+<P>Date this package was installed</P>
+<P><STRONG>installed_by</STRONG> ($)</P>
+<P>User who installed this package</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><CODE>OpenInteract::Package</CODE></P>
+<P><CODE>OpenInteract::PackageRepository</CODE></P>
+<P>
+<HR>
+<H1><A NAME="authors">AUTHORS</A></H1>
+<P>Chris Winters &lt;<A HREF="mailto:chris@cwinters.com">chris@cwinters.com</A>&gt;</P>
+<P>Christian Lemburg &lt;<A HREF="mailto:lemburg@aixonix.de">lemburg@aixonix.de</A>&gt;</P>

@@ -1,0 +1,5 @@
+[% UNLESS node_param == 'Home' %]
+  <div class="navbar_site_name">
+    <a href="[% full_cgi_url %]">[% site_name %]</a>
+  </div>
+[% END %]

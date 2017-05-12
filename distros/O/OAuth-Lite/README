@@ -1,0 +1,33 @@
+NAME
+    OAuth::Lite - OAuth framework
+
+SYNOPSIS
+  CONSUMER SIDE
+
+    See OAuth::Lite::Consumer
+
+  SERVICE PROVIDER SIDE
+
+    See OAuth::Lite::ServerUtil.
+
+    or if you want to build server on mod_perl2, See
+    OAuth::Lite::Server::mod_perl2.
+
+DESCRIPTION
+    This framework allows you to make "OAuth Consumer Application" / "OAuth
+    Service Provider" easily.
+
+SEE ALSO
+    http://oauth.net/
+
+    OAuth::Lite::Consumer OAuth::Lite::ServerUtil
+    OAuth::Lite::Server::mod_perl2
+
+AUTHOR
+    Lyo Kato, `lyo.kato _at_ gmail.com'
+
+COPYRIGHT AND LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.6 or, at
+    your option, any later version of Perl 5 you may have available.
+

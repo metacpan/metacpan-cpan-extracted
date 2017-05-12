@@ -1,0 +1,16 @@
+Revision history for Perl extension OrePAN2-Server
+
+0.04 2013-11-03T16:23:11Z
+    - modify document that CPAN::Uploader document support  upload uri
+
+0.03 2013-11-03T15:03:20Z
+    - return 405 against to access /authenquery by none post request
+    - use local (not remote) git repo in test
+    - maintainance document
+
+0.02 2013-11-01T09:01:37Z
+    - fix typo in document 
+
+0.01 2013-11-01T08:51:22Z
+    - original version
+

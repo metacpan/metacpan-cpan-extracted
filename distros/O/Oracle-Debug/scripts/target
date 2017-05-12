@@ -1,0 +1,10 @@
+#!/usr/local/bin/perl -w
+
+# $Id: target,v 1.6 2003/05/16 16:44:00 oradb Exp $
+
+use strict;
+use Oracle::Debug;
+my $o_debug = Oracle::Debug->new();
+$o_debug->target;
+exit 0;
+

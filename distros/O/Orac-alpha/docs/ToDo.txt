@@ -1,0 +1,76 @@
+ToDo
+
+This is the Orac Master ToDo list.  It contains items that have been suggested
+and are under serious consideration by one or more developers.  However, there
+are no promises that any of these will ever get done. :-)
+
+This table has 4 columns:  Suggester (who suggested it), Date (the date of the
+email to the orac-dev list), Developer (who has agreed to work on the task to
+make it happen), Task (a description of the item).
+
+Suggester  Date    Developer    Task
+=========  ======  =========    =============================================
+KevinB     990714               Add graphing of DB stats.  (There may be
+                                problems with GD & GIFGRAPH, consider
+                                alternatives.)
+all        990722  KevinK       A CM system w/ remote ability (CVS?)
+KevinB     990729               Add a Makefile, to handle "install", creation
+                                of man pages, etc.  It MUST be very simple
+                                to use.
+AndyD      990823               Create online functionality, such as graphs
+                                which continuously monitor a database for you
+                                in, say, a little graphed window which you can
+                                leave at the top of a screen.
+KevinB     990830               Can we get resize handles on all windows?
+BruceA     990831               Mysql support
+BruceA     990831               Postgresql support
+BruceA     990831               DBD::ODBC + DBD::Proxy support of existing
+                                database type
+BruceA     990831               Document orac_dba.pl
+KevinB     990903               Document orac_Base variable/flags,
+                                e.g. dont_need_ps, etc.
+BruceA     990921               Add an input for refresh interval to
+                                live_update()
+
+
+Then we have the wish list.  These are also things we'd like done, but aren't
+nearly as important functionally.
+
+Suggester  Date    Developer    Task
+=========  ======  =========    =============================================
+KevinK     990625               A call hierarchy (function & callback,
+                                cflow-like info)
+AndyD      990707               Language selectable online, at start-up
+                                (change GUI)
+KevinB     990710               Add Help button in menubar, add "About" &
+                                "Tutorial", "ReadMe", etc.
+KevinB     990812               Add an "Options/Preferences" dialog under
+                                "File", it would handle:  language, colors,
+                                fonts, Look&Feel, ... [Use Storable module?]
+KevinB     990816               Consider adding a "Print" feature (just ASCII).
+KevinB     990903               Consider rewriting orac_dba.pl to match new
+                                style.
+TomL       990920               Something to consider with the monitoring 
+                                tools is we may need a client/server style 
+                                mode.  The monitors run on the server and 
+                                are stored in some form (dbm, csv, dbms <<- 
+                                my vote).  Also, lets consider an "export" 
+                                and "import" of these stats to a history 
+                                container.  Lastly, consider the
+                                presentation of the information.  Do we 
+                                present IO as a funnel with data
+                                flowing through it, or just numbers?
+                                Database bench mark is also good.  You know 
+                                the day you leave the users always call to 
+                                complain everything is running slow.
+
+Cast of characters:
+AlexS   = Alex Shnir
+AndyD   = Andy Duncan
+BruceA  = Bruce Albrecht
+KevinB  = Kevin Brannen
+KevinK  = Kevin Kitts
+SeanH   = Sean Hull
+TomL    = Thomas Lowery
+
+============================================================================

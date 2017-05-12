@@ -1,0 +1,14 @@
+# $Id: config,v 1.6 2003/07/09 15:54:30 oradb Exp $
+
+# login info for the database etc.
+
+my $h_conf = {
+	'datasrc' => 'dbi:Oracle:sid=RFI;host=localhost;port=1521', 
+	'user'		=> 'oradb',
+	'pass'		=> 'oradb',
+	'logfile'	=> './oradb.log',
+	'comms'	  => './oradb.com',
+	'table'	  => 'oradb_table',
+	'params'  => { AutoCommit => 1, RaiseError => 1 },
+};
+

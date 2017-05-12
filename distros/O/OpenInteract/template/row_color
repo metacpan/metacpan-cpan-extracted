@@ -1,0 +1,12 @@
+[%########################################
+  row_color( count, color )
+     Retrieve the row color for row 'count' (default: 1 ). You can
+     also pass in 'color' which overrides (kind of pointless, but it
+     can be useful).
+  ########################################-%]
+[%- IF color %][% color -%]
+[%- ELSE -%]
+  [%- DEFAULT theme = OI.theme_properties;
+      DEFAULT count = 1; -%]
+  [%- ( count mod 2 == 0 ) ? theme.even_color : theme.odd_color -%]
+[%- END -%]

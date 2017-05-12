@@ -1,0 +1,29 @@
+# $File: //depot/OurNet-BBSAgent/BBSAgent/bahamut.bbs $ $Author: autrijus $
+# $Revision: #4 $ $Change: 2829 $ $DateTime: 2002/01/10 14:54:36 $
+# Contributed by Vgod <vgod@kimo.com.tw>
+# zh_TW.Big5: 巴哈姆特電玩資訊站
+
+Bahamut
+bahamut.org
+
+load maple3.board
+
+=board_article_fetch_first
+call board $[board]
+send $[article]\n\n
+wait \e[2J
+till \e[0;34;46m
+  or \e[34;46m
+till \e[31;47m (
+  or \e[1;31;47m (
+wait \e[m
+exit
+
+=board_article_fetch_next
+send \n
+till \e[0;34;46m
+  or \e[34;46m
+till \e[31;47m (
+  or \e[1;31;47m (
+wait \e[m
+exit

@@ -1,0 +1,15 @@
+-l=100  # max line length = 100
+-i=4    # indentation is 4 spaces
+-ci=4   # continuation indentation
+-vt=0   # block brace vertical tightness
+-vtc=0  # do not place the closing token at the end of the list
+-cti=0  # for closing tokens use indentation defined by next lower level
+-pt=1   # add parens padding when there is more than one token
+-bt=1   # add brace padding when there is more than one token
+-sbt=1  # add square bracket padding when there is more than one token
+-bbt=1  # add block brace padding when there is more than one token
+-nsfs   # no loop semicolon spaces
+-nolq   # do not outdent long quotes
+-bbao
+-nola
+-ndnl   # do not delete old newlines

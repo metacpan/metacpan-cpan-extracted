@@ -1,0 +1,468 @@
+=head1 NAME
+
+stdio_cookbook - recipes and examples for the use of OS390::Stdio
+
+=head1 DESCRIPTION
+
+Examplary documentation for some of the more commonly encountered
+data set handling tasks is provided along with reference material
+that would not easily fit into the OS390::Stdio.pm pod.
+
+=head1 NAMES and data set handles
+
+To access data set names that are outside of the hierarchical file
+system (HFS) prepend two solidus (or forward slash) characters C<//> to the name.
+If you do not use a default high level qulialifier then also enclose the fully
+qualified name in single quotation marks C<'>.
+
+For example the SYS1.PARMLIB PDS could be opened with:
+
+    $handle = mvsopen("//'SYS1.PARMLIB'","r");
+    if (defined($handle)) {
+        # SYS1.PARMLIB ios open , read from $handle
+    }
+    else {
+        warn "unable to mvsopen //'SYS1.PARMLIB'";
+    }
+
+As another example if my default HLQ is PVHP then I can mvsopen the
+'PVHP.SAMPLE.SET' data set for reading and writing with the 
+shorthand name:
+
+    $file_handle = mvsopen("//SAMPLE.SET","w+");
+
+
+=head1 mvsopen() modes
+
+The second "mode" argument to mvsopen() corresponds to the mode argument to
+fopen() in the C programming language.  From the 
+B<C/C++ Run-Time Library Reference> document we find the following
+modes:
+
+=over 4
+
+=item "r"
+
+Open a text file for reading. (The file must exist.)
+
+=item "w"
+
+Open a text file for writing. If the "w" mode is specified
+for a ddname that has DISP=MOD, the behavior is the same
+as if "a" had been specified. Otherwise, if the file already
+exists, its contents are destroyed.
+
+=item "a"
+
+Open a text file in append mode for writing at the end of
+the file.  mvsopen() creates the file if it does not exist.
+
+=item "r+"
+
+Open a text file for both reading and writing. (The file
+must exist.)
+
+=item "w+"
+
+Open a text file for both reading and writing. If the "w+"
+mode is specified for a ddname that has DISP=MOD, the
+behavior is the same as if "a+" had been specified.
+Otherwise, if the file already exists, its contents are
+destroyed.
+
+=item "a+"
+
+Open a text file in append mode for reading or updating at
+the end of the file. mvsopen() creates the file if it does
+not exist.
+
+=item "rb"
+
+Open a binary file for reading. (The file must exist.)
+
+=item "wb"
+
+Open an empty binary file for writing. If the "wb" mode is
+specified for a ddname that has DISP=MOD, the behavior is
+the same as if "ab" had been specified. Otherwise, if the
+file already exists, its contents are destroyed.
+
+=item "ab"
+
+Open a binary file in append mode for writing at the end
+of the file.  mvsopen() creates the file if it does not
+exist.
+
+=item "rt"
+
+Open a text file for reading. (The file must exist.)
+
+=item "wt"
+
+Open a text file for writing. If the file already exists,
+its contents are destroyed.
+
+=item "at"
+
+Open a text file in append mode for writing at the end of
+the file.  mvsopen() creates the file if it does not exist.
+
+=item "r+b" or "rb+"
+
+Open a binary file for both reading and writing. (The file
+must exist.)
+
+=item "w+b" or "wb+"
+
+Open an empty binary file for both reading and writing. If
+the "w+b" (or "wb+") mode is specified for a ddname that has
+DISP=MOD, the behavior is the same as if "ab+" had been
+specified.  Otherwise, if the file already exists, its
+contents are destroyed.
+
+=item "a+b" or "ab+"
+
+Open a binary file in append mode for writing at the end
+of the file.  mvsopen() creates the file if it does not
+exist.
+
+=item "r+t" or "rt+"
+
+Open a text file for both reading and writing. (The file
+must exist.)
+
+=item "w+t" or "wt+"
+
+Open a text file for both reading and writing. If the file
+already exists, its contents are destroyed.
+
+=item "a+t" or "at+"
+
+Open a text file in append mode for writing at the end of
+the file.  mvsopen() creates the file if it does not exist.
+
+=back
+
+There are all sorts of extra things that you can tuck into
+the second "mode" argument to mvsopen() as well.  For example:
+
+=over 4
+
+=item acc=C<value>
+
+Indicator of the direction of the access of the VSAM data set.
+C<value> can be "fwd" or "bwd".
+
+=item blksize=C<value>
+
+Specifies the maximum length, in bytes, of a physical block of
+records.
+
+=item byteseek
+
+Indicator to allow byte seeks for a binary file.  See also seek
+and tell in L<perlfunc>.
+
+=item lrecl=C<value>
+
+Specifies the length, in bytes, for fixed length records and the
+maximum length for variable length records.
+
+=item recfm=A
+
+ASA print control characters.
+
+=item recfm=F
+
+Fixed length unbloccked.
+
+=item recfm=FA
+
+Fixed-length, ASA print-control characters
+
+=item recfm=FB
+
+Fixed-length, blocked
+
+=item recfm=FM
+
+Fixed-length, machine print-control codes
+
+=item recfm=FS
+
+Fixed-length, unblocked, standard
+
+=item recfm=FBA
+
+Fixed-length, blocked, ASA print-control characters
+
+=item recfm=FBM
+
+Fixed-length, blocked, machine print-control codes
+
+=item recfm=FBS
+
+Fixed-length, unblocked, standard ASA print-control characters
+
+=item recfm=FSA
+
+Fixed-length, unblocked, standard, ASA print-control characters
+
+=item recfm=FSM
+
+Fixed-length, unblocked, standard, machine print-control codes
+
+=item recfm=FBSA
+
+Fixed-length, blocked, standard, ASA print-control characters
+
+=item recfm=FBSM
+
+Fixed-length, blocked, standard, machine print-control codes
+
+=item recfm=U
+
+Undefined-length
+
+=item recfm=UA
+
+Undefined-length, ASA print control characters
+
+=item recfm=UM
+
+Undefined-length, machine print control codes
+
+=item recfm=V
+
+Variable, unblocked
+
+=item recfm=VA
+
+Variable, ASA print-control characters
+
+=item recfm=VB
+
+Variable, blocked
+
+=item recfm=VM
+
+Variable, machine print-control codes
+
+=item recfm=VS
+
+Variable, unblocked, spanned
+
+=item recfm=VBA
+
+Variable, blocked, ASA print-control characters
+
+=item recfm=VBM
+
+Variable, blocked, machine print-control codes
+
+=item recfm=VBS
+
+Variable, blocked, spanned
+
+=item recfm=VSA
+
+Variable, unblocked, spanned, ASA print-control characters  
+
+=item recfm=VSM
+
+Variable, unblocked, spanned, machine print-control codes
+
+=item recfm=VBSA
+
+Variable, blocked, spanned, ASA print-control characters
+
+=item recfm=VBSM
+
+Variable, blocked, spanned, machine print-control codes
+
+=item recfm=*
+
+Existing file attributes are used if file is opened in write mode.
+
+Note:  Using recfm=* is only valid for existing DASD data sets. 
+It is ignored in all other cases.
+
+=item rls=C<value>
+
+Indicates the VSAM RLS (Record Level Sharing) access mode in which a 
+VSAM file is to be opened.  This keyword is ignored for non-VSAM files. 
+The following values are valid: "nri" - No Read Integrity, 
+"cr" - Consistent Read         
+
+=item space
+
+Space attributes for MVS data sets.  Within the parameter you cannot 
+have any embedded blanks.
+
+=item type=memory
+
+This parameter identifies this file as a memory file that is accessible 
+only from C (or Perl) programs.
+
+=item type=memory (hiperspace)
+
+If you are using MVS/ESA, you can specify the HIPERSPACE suboption to 
+open a hiperspace memory file.
+
+=item type=record
+
+This parameter specifies that the file is to be opened for sequential 
+record I/O. The file must be opened as a binary file; otherwise, 
+mvsopen() fails.  Read and write operations are done with the sysread() 
+and mvswrite() functions. This is the default mvsopen() mode for 
+accessing VSAM clusters.
+
+=item asis
+
+Indicates that the file name is not to be converted to uppercase but 
+used as is. This option is the default under POSIX. It is also the default 
+for HFS file names.
+
+=item password=C<sekrit>
+
+Specifies the password for a VSAM data set.
+
+=item noseek
+
+Indicates that the stream may not use any of the reposition functions.  
+This may improve performance. 
+
+=back
+
+=head1 dynalloc() and dynfree() example
+
+Here is an example of the use of dynalloc() and dynfree() with JCL
+DD card equivalent statements in comments on the right hand side:
+
+    use OS390::Stdio qw(&dynalloc &dynfree);
+    my %dyn_hash = (
+        "ddname" => "MYDD",              # //MYDD DD
+        "dsname" => "PVHP.MYDSN",        # //     DSN=PVHP.MYDSN,
+        "status" => 4,                   # //     DISP=(NEW,   
+        "normdisp" => 2,                 # //               CATLG),
+        "alcunit" => '\001',             # //     SPACE=(CYL,
+        "primary" => 2,                  # //             (2,
+        "secondary" => 1,                # //               1),
+        "misc_flags" => (2 | 8),         # //                RLSE,CONTIG),
+        "dsorg" => 0x4000,               # //     DSORG=PS,
+        "recfm" => 0x80 + 0x04 + 0x02,   # //     RECFM=FAM,
+        "lrecl" => 121,                  # //     LRECL=121,
+        "blksize" => 12100               # //     BLKSIZE=12100
+    );
+    if (dynalloc(\%dyn_hash)) {
+
+        # use //'PVHP.MYDSN' data set
+
+    }
+    else {
+        die "unable to dynalloc $dyn_hash{dsname}";
+    }
+    if (!dynfree(\%dyn_hash)) {
+        warn "unable to dynfree $dyn_hash{dsname)}"
+    }
+
+Here is an example that allocates SPACE for being a PDS directory
+(with 3 directory cylinders):
+
+    use OS390::Stdio qw(&dynalloc);
+    if ( dynalloc (
+           {  # <-- this curly brace creates an anonymous hash ref
+        ddname =>    "ALLOC",        # //ALLOC DD
+        dsname =>    "PVHP.MYPDS",   # //      DSN=PVHP.MYPDS,
+        status =>    0x04,           # //      DISP=(NEW,   
+        normdisp =>  0x02,           # //               CATLG,
+        conddisp =>  0x04,           # //               DELETE),
+        alcunit =>   '\x01',         # //      SPACE=(CYL,
+        primary =>   2,              # //             (2,,
+        dirblk  =>   3,              # //                3),
+        misc_flags => (0x02 | 0x08), # //                RLSE,CONTIG),
+        recfm =>     0x80 + 0x10,    # //      RECFM=FB,
+        lrecl =>     80,             # //      LRECL=80,
+        blksize =>   12100           # //      BLKSIZE=12100
+           }  # close the anonymous hash ref
+                  ) 
+    {
+        print "PDS allocated\n";
+    }
+    else 
+    {
+        warn "PDS not allocated"; 
+    }
+
+=head1 smf_record() tips
+
+Note that calling smf_record() successfully may require authorization 
+and/or special system set up.  Setting up SMF is discussed in IBM 
+document number GC28-1783-08 and UNIX system services access to SMF 
+is also discussed in document number SC28-1890-08.  Types, sub-types 
+and record formats are discussed in the former document.
+
+=head1 svc99() hash reference and text units
+
+svc99() must be passed a hash reference with only certain keys allowed.
+One of the more important key/value pairs in the hash ref is the
+S99TXTPP text unit array reference.  As an example consider the allocation
+of a data set like so (which assumes that PVHP is your HLQ):
+
+    my $hash_ref = {(
+    S99RBLN => 20,      # length of request block
+    S99VERB => 1,       # verb for dsname allocation
+    S99FLAG1 => 16384,  # do not use existing allocation
+    S99TXTPP =>         # "text" units array ref
+        [ (
+       "\0\x02\0\x01\0\x0CPVHP.EXAMPLE",  # DSN=EXAMPLE 
+       "\0\x05\0\x01\0\x01\x02",          # DISP=(,CATLG) 
+       "\0\x07\0\0",                      # SPACE=(TRK,... 
+       "\0\x0A\0\x01\0\x03\0\0\x14",      #  primary=20 
+       "\0\x0B\0\x01\0\x03\0\0\x01",      #  secondary=1) 
+       "\0\x30\0\x01\0\x02\0\x50",        # BLKSIZE=80 
+       "\0\x3C\0\x01\0\x02\0\x40\0",      # DSORG=PS 
+       "\0\x42\0\x01\0\x02\0\x50",        # LRECL=80 
+        ) ],
+               )};
+    if (svc99($hash_ref)) {
+        print "EXAMPLE was allocated.\n";
+    }
+    else {
+        print "was unable to allocated DSNMAE=EXAMPLE\n";
+    }
+
+Note that the text units start with a null character then a key code number.
+For a listing of what these numbers should be consult the "//'SYS1.MACLIB(IEFZB4D2)'"
+member for a listing of relevant mnemonics.  For example the UNIT is at x15 so 
+that one could specify a UNIT=SYSDA with:
+
+       "\0\x15\0\x01\0\x05SYSDA2",        # UNIT=SYSDA
+
+Note that the last characters in a given array element are data, whereas the
+second to last may indicate the data field length.  For example, if the above
+EXAMPLE allocation had been instead written with \x09 rather than \x0C as:
+
+       "\0\x02\0\x01\0\x09PVHP.EXAMPLE",  # DSN=EXAM 
+
+and if the call to svc99() succeeds with that, then "//'PVHP.EXAM'" would
+be allocated rather than "//'PVHP.EXAMPLE'".
+
+=head1 REFERENCES
+
+The discussion of mvsopen() modes was adapted from:
+
+ EDCLB010: OS/390 V2R8.0 C/C++ Run-Time Library Reference
+ Document Number SC28-1663-O5
+ Table 21.  Values for the Positional Parameter
+ Table 22.  Keyword Parameters for File Mode 
+
+ OS/390 V2R8.0 MVS System Management Facilities (SMF)
+ Document number GC28-1783-08
+
+ OS/390 V2R8.0 UNIX System Services Planning
+ Document number SC28-1890-08
+ Chapter 16: Using SMF Records
+
+=cut
+

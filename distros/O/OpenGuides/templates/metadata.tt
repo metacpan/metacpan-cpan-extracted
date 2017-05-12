@@ -1,0 +1,24 @@
+[% INCLUDE header.tt 
+      page_title = "Metadata of type $type - $site_name"
+	  feed_base = "$cgi_url?action=metadata;type=$type"
+%]
+[% INCLUDE banner.tt %]
+<div id="content">
+[% INCLUDE navbar.tt %]
+<div id="maincontent">
+<h2>Metadata Listing - Things of type [% type %]</h2>
+<ol>
+  [% FOREACH md = metadata %]
+     <li>
+        [% IF may_descend %]<a href="[% cgi_url %]?action=metadata;type=[% md %]">[% END %][% md %][% IF may_descend %]</a>[% END %]
+     </li>
+  [% END %]
+</ol>
+</div>
+
+<p>
+  This list is available as
+  <a href="[% cgi_url %]?action=metadata;type=[% type %];format=json">json</a>.
+</p>
+
+[% INCLUDE footer.tt %]

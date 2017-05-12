@@ -1,0 +1,49 @@
+---
+abstract: 'This distribution aids in the automatic generation of perl modules from owl ontologies.'
+author:
+  - ", Edward Kawas\r"
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: OWL2Perl
+no_index:
+  directory:
+    - bin/scripts
+    - inc
+    - lib/OWL/Generators/templates
+    - share
+    - t
+requires:
+  Carp: 0
+  Class::Inspector: 1.17
+  Config::Simple: 4.58
+  Cwd: 3.33
+  File::HomeDir: 0.97
+  File::Path: 2.08
+  File::ShareDir: 1
+  File::Spec: 3.33
+  HTTP::Date: 5.81
+  HTTP::Request: 0
+  IO::Prompt: 0.99.2
+  IO::String: 1.08
+  LWP: 0
+  Log::Log4perl: 1.12
+  PLUTO: 0.3
+  Params::Util: 0.38
+  RDF::Core: 0.51
+  Scalar::Util: 1.2
+  Template: 2.22
+  URI: 1.4
+  Unicode::String: 2.09
+  Want: 0.18
+resources:
+  license: http://opensource.org/licenses/bsd-license.php
+version: 1.00

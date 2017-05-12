@@ -1,0 +1,8 @@
+Petal test
+
+<?if name="test"?>
+  Petal ok!
+<?else?>
+  Petal template loaded, but 'test' not defined!
+<?end?>
+

@@ -1,0 +1,12 @@
+Server: BaseHTTP/0.3 Python/2.5.2
+Content-type: text/xml
+Content-length: 129
+
+<?xml version='1.0'?>
+<methodResponse>
+<params>
+<param>
+<value><boolean>1</boolean></value>
+</param>
+</params>
+</methodResponse>

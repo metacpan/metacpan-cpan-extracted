@@ -1,0 +1,73 @@
+SUBJECT:        ObjectStore functions that create transient objects
+
+PRODUCT:        ObjectStore
+
+PLATFORM:       All
+
+LANGUAGE:       C++
+
+VERSION:        4.x
+
+DATE:           May 1, 1997
+
+EXPIRATION:     April 30, 1998
+
+KEYWORDS:       memory, leaks, cleanup
+
+
+QUESTION:
+
+What ObjectStore calls create transient objects which need
+to be explicitly deleted by the application using them?
+
+ANSWER:
+
+This may not be an exhaustive list, but it is a working
+list of all ObjectStore calls that require cleanup in
+order to avoid memory leaks:
+
+
+objectstore::acquire_lock()                                 if os_lock_timeout_exception* returned
+objectstore::compact()
+os_Collection::query()
+os_collection::query()
+os_collection::get_indexes()
+os_coll_query::create()                                      if cache_query=0
+os_coll_rep_descriptor::rep_name()
+os_configuration::get_alternative_names()
+os_configuration::get_name()
+os_database::get_database_references()
+os_database::get_dirman_host_name()
+os_database::get_file_host_name()
+os_database::get_host_name()
+os_database::get_pathname()
+os_database::get_relative_directory()
+os_dbutil::expand_global()
+os_dbutil::list_directory()
+os_index_name::get_path_name()
+os_index_path::create()
+os_Reference::dump()
+os_reference::dump()
+os_Reference_local::dump()
+os_reference_local::dump()
+os_Reference_protected::dump()
+os_reference_protected::dump()
+os_Reference_protected_local::dump()
+os_reference_protected_local::dump()
+os_Reference_this_DB::dump()
+os_reference_this_DB::dump()
+os_Reference_transient::dump()
+os_reference_transient::dump()
+os_Reference_version::dump()
+os_reference_version::dump()
+os_segment::get_comment()
+os_segment::get_database_references()
+os_segment::get_access_control()
+os_segment_access::get_primary_group()
+os_server::get_host_name()
+os_transaction::begin()
+os_transaction::get_name()
+os_type::get_string()
+os_version_handle::get_name()
+
+FAQ_reference: calls_to_cleanup_after

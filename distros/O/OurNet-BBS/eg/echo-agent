@@ -1,0 +1,106 @@
+#!/usr/bin/perl
+# $File: //depot/libOurNet/BBS/eg/echo-agent $ $Author: autrijus $
+# $Revision: #1 $ $Change: 1 $ $DateTime: 2002/06/11 15:35:12 $
+
+$VERSION = '0.01';
+
+use strict;
+use OurNet::BBS 1.64;
+
+=head1 NAME
+
+echo-agent - Demonstration of OurNet BBS Session interface
+
+=head1 SYNOPSIS
+
+B<echo-agent> S<[ B<-o> ]> S<[ I<username> ]>
+
+=head1 DESCRIPTION
+
+This script implements a simple BBS user that echos back your
+messages. Currently, only B<CVIC>, B<MELIX> and B<OurNet> backends
+support the C<msg> and C<cb_msg> API.
+
+If the B<-o> flag is specified, this agent connects to the local
+B<bbscomd> server; otherwise, the default shared memory and path
+for MELIX BBS is assumed.
+
+=cut
+
+my $useOurNet = shift if $ARGV[0] eq '-o';
+
+my $dieflag; # has the user said '!quit'?
+$SIG{INT} = 1 ? sub { $dieflag = 1 } : sub { $% = 1 };
+
+# the main coderef used to handle callback.
+my $callback = sub {
+    my ($caller, $message, $pid) = @_;
+    print "$caller: $message\n";
+    return "$caller: $message";
+};
+
+my $bbs = OurNet::BBS->new($useOurNet ? (
+    backend		=> 'OurNet',
+    bbsroot		=> 'localhost',
+) : {
+    backend		=> 'MELIX',
+    bbsroot		=> '/home/melix',
+    brdshmkey		=> 2997,
+    maxboard		=> 350,
+    sessionshmkey	=> 1998,
+    maxsession		=> 300,
+}) or die $!;
+
+my $id = shift || 'echo-agent';
+
+$bbs->{sessions}{''} = {
+    userid   => $id,
+    username => shift || $0,
+    uid      => 999,
+    ufo      => 11,
+    uptime   => time(),
+};
+
+my $session = $bbs->{sessions}->lastref or die 'no session';
+
+$session->{cb_msg} = sub {
+    my ($from, $message) = @_;
+    my ($pid, $userid) = ref($from) 
+	? @{$from}{qw/pid userid/} : ('unknown', $from);
+
+    if (my $response = $callback->($userid, $message, $pid)) {
+	$from->{msg} = [$id, $response] unless $useOurNet;
+	$dieflag = 1 if $message eq '!quit';
+    }
+};
+
+print "echo-agent initialized; send '!quit' or press Ctrl-C to exit.\n";
+
+while (1) {
+    exit if $dieflag;
+    $session->{uptime} = time();
+    sleep(1);
+};
+
+END { $session->DESTROY }
+
+__END__
+
+=head1 SEE ALSO
+
+L<OurNet::BBS>, L<bbscomd>.
+
+=head1 AUTHORS
+
+Autrijus Tang E<lt>autrijus@autrijus.orgE<gt>
+
+=head1 COPYRIGHT
+
+Copyright 2001-2002 by Autrijus Tang E<lt>autrijus@autrijus.orgE<gt>.
+
+This program is free software; you can redistribute it and/or 
+modify it under the same terms as Perl itself.
+
+See L<http://www.perl.com/perl/misc/Artistic.html>
+
+=cut

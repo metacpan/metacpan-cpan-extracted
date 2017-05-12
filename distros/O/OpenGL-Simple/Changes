@@ -1,0 +1,15 @@
+Revision history for Perl extension OpenGL::Simple.
+
+0.01  Sat Dec 28 00:19:36 2002
+	- original version; created by h2xs 1.21 with options
+		-A -a -n OpenGL::Simple
+
+0.02  Sat Aug 28 15:07:00 BST 2004
+        - merged patches from Max Maischein and Autrijus Tang to fix
+          Makefile.PL on win32 and FreeBSD respectively.
+        - added gluLookAt
+
+0.03  Thu Nov 10 13:19:51 GMT 2005
+        - Added a bunch more calls, although the evaluator and pixel
+          calls still need finishing off.
+        - Some small fixes to build on MacOS.

@@ -1,0 +1,370 @@
+#!/usr/bin/perl
+# $Id: makedict,v 1.3 2007/08/29 12:03:23 dk Exp $
+
+use strict;
+use subs qw(log);
+
+BEGIN { local @ARGV; require Prima; }
+
+use Prima qw(Application ImageViewer Label InputLine Buttons MsgBox);
+use Getopt::Long;
+use IPA;
+use IPA::Geometry qw(rotate90);
+use OCR::Naive qw(:all);
+
+my ( 
+	%options, $rename_db,
+	$i, $display,
+	$db, @sorted_glyphs,
+	@curr_ext, @curr_pos, $curr_glyph, $curr_index, $curr_entry,
+);
+
+%options = (
+	verbose  => 0,
+	dict     => 'dict',
+	help     => 0,
+);
+
+GetOptions( \%options,
+	'verbose',
+	'help',
+	'dict=s',
+) or usage();
+
+usage() if $options{help};
+
+1 == @ARGV or usage();
+
+sub usage
+{
+	print <<USAGE;
+
+$0 - create a font dictionary for later OCR::Simple recognition from an image.
+The image bust be one or more lines of text, where lines must be divided with
+al least one pixel of horizontal space, and glyphs must not be overlapped.
+
+options:
+   --verbose   - be verbose
+   --help      - show this text
+
+   --dict=FILE - load from dictionary FILE, save changes there
+
+USAGE
+	exit 1;
+}
+
+sub log { warn join('',@_), "\n" if $options{verbose} }
+
+log "loading $ARGV[0]";
+
+$i = Prima::Image-> load( $ARGV[0]);
+die "Cannot load $ARGV[0]:$@\n" unless $i;
+
+log "loaded ", ( $i-> type & im::BPP), " bpp image ", $i-> width, "x", $i-> height;
+
+# load db
+if ( -f $options{dict}) {
+	$db = load_dictionary( $options{dict} );
+	die "Cannot open dictionary $options{dict}:$!\n" 
+		unless $db;
+	log scalar(keys %$db), " glyphs loaded";
+	$rename_db = 1;
+} else {
+	warn "Cannot open dictionary '$options{dict}': will create a new file\n";
+}
+
+$i = enhance_image( $i, verbose => $options{verbose});
+$display = $i-> bitmap;
+
+sub split_horizontal
+{
+	my $i = shift;
+	# split by horizontal lines
+	my $linesize = int(( $i->width * ( $i-> type & im::BPP) + 31) / 32) * 4;
+	my $data     = $i-> data;
+	my @chunks   = ([0,0]);
+	my $h        = $i-> height;
+	my $w        = $i-> width;
+	my $empty    = "\0" x $w;
+	for ( my $j = 0; $j < $h; $j++) {
+		if ( substr( $data, $j * $linesize, $w) eq $empty) {
+			if ( $chunks[-1]-> [1] > 0) {
+				push @chunks, [0,0];
+			}
+		} else {
+			$chunks[-1]-> [0] = $j if $chunks[-1]-> [1] == 0;
+			$chunks[-1]-> [1]++;
+		}
+	}
+
+	log "split $w:$h into ", scalar(@chunks), "chunks";
+	
+	return 
+		map { $i-> extract( 0, $$_[0], $w, $$_[1]) } 
+		grep { $$_[1] > 0 } 
+		@chunks;
+}
+
+sub cut_horizontal
+{
+	my $i = shift;
+	# cut horizontal lines hanging on and off
+	my $linesize = int(( $i->width * ( $i-> type & im::BPP) + 31) / 32) * 4;
+	my $data     = $i-> data;
+	my @chunks   = ([0,0]);
+	my $h        = $i-> height;
+	my $w        = $i-> width;
+	my $empty    = "\0" x $w;
+	for ( my $j = 0; $j < $h; $j++) {
+		if ( substr( $data, $j * $linesize, $w) eq $empty) {
+			if ( $chunks[-1]-> [1] > 0) {
+				push @chunks, [0,0];
+			}
+		} else {
+			$chunks[-1]-> [0] = $j if $chunks[-1]-> [1] == 0;
+			$chunks[-1]-> [1]++;
+		}
+	}
+	@chunks = grep { $$_[1] > 0 } @chunks;
+	
+	my $y  = $chunks[0]->[0];
+	my $dy = $chunks[-1]->[0] - $y + $chunks[-1]->[1];
+	return $i if $y == 0 and $dy == $h;
+	return $i-> extract( 0, $chunks[0]->[0], $w, $chunks[-1]->[0] - $chunks[0]->[0] + $chunks[-1]->[1]);
+}
+
+
+# extract individual glyphs
+{
+	my $unknowns = 0;
+	my @glyphs = 
+		map { cut_horizontal( $_) }
+		map { rotate90( $_, 0) }
+		map { split_horizontal( $_) }
+		map { rotate90( $_, 1) }
+		split_horizontal( $i);
+	
+
+	for ( @glyphs) {
+		$_-> type( im::BW);
+	
+		my $d = image2db_key($_);
+		next if exists $db-> {$d};
+
+		$unknowns++;
+
+		$db-> { $d } = {
+			width  => $_-> width,
+			height => $_-> height,
+			text   => undef,
+			image  => $_,
+		};
+	}
+
+	log " $unknowns glyphs found, let's try the interactive recognize:\n";
+}
+
+my $w = Prima::MainWindow-> create(
+	name => 'makedict',
+);
+
+my $divx = 100;
+my $fh   = $w-> font-> height;
+my $divy = $fh * 5;
+
+my $iv = $w-> insert( ImageViewer => 
+	alignment  => ta::Center,
+	valignment => ta::Center,
+	origin     => [ 0, $divy],
+	size       => [ $w-> width, $w-> height - $divy ],
+	growMode   => gm::Client,
+	image      => $display,
+);
+
+my $iv2 = $w-> insert( ImageViewer => 
+	backColor  => 0x404040,
+	alignment  => ta::Center,
+	valignment => ta::Center,
+	origin     => [ 0, 0],
+	size       => [ $divx, $divy ],
+	growMode   => gm::Floor,
+);
+
+$divx += 10;
+
+my $l  = $w-> insert( Label => 
+	origin     => [ $divx, $divy - $fh * 1.5 ],
+	height     => $fh,
+	text       => 'Enter the corresponding letter and select the action: ',
+	growMode   => gm::GrowLoX,
+);
+my $ii = $w-> insert( InputLine => 
+	origin     => [ $l-> right, $divy - $fh * 1.5 ],
+	text       => '',
+	current    => 1,
+	growMode   => gm::GrowLoX,
+);
+
+
+sub next_glyph
+{{
+ 	$w-> text(
+		"makedict - finding glyph " .
+		($curr_index + 1).
+		" out of " . 
+		scalar(@sorted_glyphs)
+	);
+
+	my $key = $sorted_glyphs[ $curr_index++];
+	my $val = $curr_entry = $db-> { $key };
+
+	if ( $curr_index > @sorted_glyphs) {
+		# no more glyphs
+	 	$w-> text("makedict");
+		$iv2-> image( undef);
+		$w-> b1-> enabled(0);
+		$w-> b2-> enabled(0);
+		$w-> b3-> enabled(1);
+		return $curr_glyph = undef;
+	} elsif ( not defined $val->{text}) {
+		# require manual input
+	 	$w-> text("makedict - expecting manual input");
+		$w-> b1-> enabled(1);
+		$w-> b2-> enabled(1);
+		$w-> b3-> enabled(1);
+		$ii-> text('');
+		my $im = $val-> {image};
+		@curr_pos = find_images( $i, $im, 1);
+		redo unless @curr_pos;
+		@curr_ext = $im-> size;
+		$display-> color( cl::Set);
+		$display-> rop( rop::XorPut);
+		$display-> bar( $$_[0], $$_[1], $$_[0] + $curr_ext[0], $$_[1] + $curr_ext[1])
+			for @curr_pos;
+		$iv-> repaint;
+		$iv2-> image( $im);
+		return $curr_glyph = $im;
+	} else {
+		# automatic 
+		$w-> b1-> enabled(0);
+		$w-> b2-> enabled(0);
+		$w-> b3-> enabled(0);
+		my $im = $val-> {image};
+	 	my @curr_ext = $im-> size;
+	 	log "finding $val->{text} [@curr_ext]";
+	 	my @curr_pos = find_images( $i, $im, 1);
+		redo unless @curr_pos;
+	 
+	 	$iv2-> image( $im);
+		$display-> color( cl::Clear);
+		$display-> rop( rop::CopyPut);
+	 	$display-> bar( $$_[0], $$_[1], $$_[0] + $curr_ext[0], $$_[1] + $curr_ext[1])
+	 		for @curr_pos;
+	 	$i-> put_image( @$_, $im, rop::Blackness)
+	 		for @curr_pos;
+	 	$iv-> repaint;
+	 	$iv-> update_view;
+	 	$iv2-> update_view;
+	 	$::application-> yield;
+	 	unless ( $w-> alive) {
+	 		log "aborted";
+	 		exit;
+	 	}
+		redo;
+	}
+}}
+
+sub end_glyph
+{
+	my $cancel = shift;
+	if ( $cancel) {
+		$display-> color( cl::Set );
+		$display-> rop( rop::XorPut);
+	} else {
+		$display-> color( cl::Black);
+		$display-> rop( rop::CopyPut);
+	}
+	$ii-> text('');
+	$display-> bar( $$_[0], $$_[1], $$_[0] + $curr_ext[0], $$_[1] + $curr_ext[1])
+		for @curr_pos;
+	$iv-> repaint;
+
+	unless ( $cancel) {
+		$i-> put_image( @$_, $curr_glyph, rop::Blackness)
+			for @curr_pos;
+	}
+	@curr_pos = ();
+}
+
+$w-> insert( Button => 
+	name       => 'b1',
+	origin     => [ $divx + 5, 5 ],
+	default    => 1,
+	text       => '~Record this letter or text',
+	enabled    => 0,
+	growMode   => gm::GrowLoX,
+	onClick    => sub {
+		my $t = $ii-> text;
+		return message('Empty text?') unless length $t;
+		end_glyph(0);
+
+		$curr_entry-> {text} = $t;
+
+		next_glyph();
+	},
+);
+
+$w-> insert( Button => 
+	name       => 'b2',
+	origin     => [ 5 + $w-> b1-> right, 5 ],
+	text       => '~Skip this glyph',
+	enabled    => 0,
+	growMode   => gm::GrowLoX,
+	onClick    => sub {
+		end_glyph(1);
+		next_glyph();
+	},
+);
+
+$w-> insert( Button => 
+	name       => 'b3',
+	origin     => [ 5 + $w-> b2-> right, 5 ],
+	text       => 'E~xit and save changed',
+	enabled    => 0,
+	growMode   => gm::GrowLoX,
+	onClick    => sub {
+		if ( $rename_db) {
+			rename $options{dict}, "$options{dict}.bak" or 
+				warn "Cannot rename $options{dict} to $options{dict}.bak:$!\n";
+		}
+		unless ( save_dictionary( $options{dict}, $db)) {
+			message( "Cannot save '$options{dict}':$!\n");
+			return;
+		}
+		close F;
+			log "saved ", scalar( keys %$db), " in $options{dict}\n";
+		exit;
+	},
+);
+
+$w-> insert( Button => 
+	name       => 'b4',
+	origin     => [ 5 + $w-> b3-> right, 5 ],
+	growMode   => gm::GrowLoX,
+	text       => '~Quit without saving',
+	onClick    => sub { exit },
+);
+
+my $delta = $w-> width - 5 - $w-> b4-> right;
+if ( $delta > 0) {
+	$_-> left( $_-> left + $delta) for ($l,$ii,map{$w->bring($_)}qw(b1 b2 b3 b4));
+	$iv2-> width( $iv2-> width + $delta);
+}
+
+# sort glyphs from dict the by area
+$curr_index = 0;
+@sorted_glyphs = suggest_glyph_order( $db);
+
+next_glyph;
+
+run Prima;

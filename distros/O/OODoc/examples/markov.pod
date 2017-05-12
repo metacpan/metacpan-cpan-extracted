@@ -1,0 +1,73 @@
+=encoding utf8
+
+=head1 NAME
+
+My::Name::Space - just an example
+
+=head1 SYNOPSIS
+
+ my $obj = My::Name::Space->new;
+ $obj->print;
+
+=head1 DESCRIPTION
+
+General description of the module.  Some people make this very long,
+before the start of the explanation of the functions or methods.  My
+preference is to explain only the really really important stuff which
+should be read by everyone.  All less import things are kept in a
+chapter named DETAILS after the explanation of functions and stuff such
+that important things come first.
+
+=head1 OVERLOADED
+
+=head1 METHODS
+
+take whatever you need in the order you wish to define it (order of the
+chapters is only determined by the output templates of the formatter)
+
+=head2 Constructors
+
+It is useful to use sections to group methods or functions when the number
+of them grows large.  The methods and functions will get sorted
+alphabetically, and you do not want the "new" to disappear far down in
+the list.
+
+=over 4
+
+=item $obj-E<gt>B<clone>()
+
+Make a copy of the object.
+
+=item $obj-E<gt>B<new>(OPTIONS)
+
+Create a new object.  Read all about the =option, =default, =example, and
+so on in the manual-page of the OODoc::Parser::Markov.
+
+=back
+
+=head2 Accessors
+
+And so on.  Do not forget the C<=cut>'s!
+
+=head1 FUNCTIONS
+
+=head1 DETAILS
+
+Here I put the detailed explanation, especially about how different methods
+and functions work together.
+
+Again: do not forget the next line!!!
+
+=head1 SEE ALSO
+
+This module is part of OODoc distribution version 2.01,
+built on November 11, 2015. Website: F<http://perl.overmeer.net/oodoc/>
+
+=head1 LICENSE
+
+Copyrights 2003-2015 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

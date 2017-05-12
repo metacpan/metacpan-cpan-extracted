@@ -1,0 +1,47 @@
+{
+   "abstract" : "Customize Multilevel Escalation from GUI Interface.",
+   "author" : [
+      "Basu Rohit <rohitbasu@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300030, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "agpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Kernel-System-Escalation",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Encode" : "0",
+            "Encode::Locale" : "0",
+            "Getopt::Long" : "0",
+            "Pod::Usage" : "0",
+            "SOAP::Lite" : "0",
+            "perl" : "5.008007"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/basurohit77/Kernel-System-Escalation/issues"
+      },
+      "homepage" : "https://github.com/basurohit77/Kernel-System-Escalation",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/basurohit77/Kernel-System-Escalation.git",
+         "web" : "https://github.com/basurohit77/Kernel-System-Escalation"
+      }
+   },
+   "version" : "1.0.1"
+}
+

@@ -1,0 +1,17 @@
+[%# -*- mode: web; coding: utf-8 -*-
+  #################################################################
+    Page used to confirm tokens entered
+  ################################################################# -%]
+[% WRAPPER layout.thtml
+       title="Enter application tokens" %]
+
+<p>
+    Tokens for [% app_name %] were entered. You will be (or maybe
+    already are) redirected to access-granting page.
+</p>
+
+<p>
+    Close this browser window, it is no longer needed.
+</p>
+
+[% END %]

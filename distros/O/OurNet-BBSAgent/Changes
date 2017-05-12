@@ -1,0 +1,54 @@
+____________________________________________________________________________
+[  6077] By: autrijus                              on 2003/05/25  10:48:47
+        Log: * 1.61.
+	   ! BBSAgent.pm Makefile.PL
+____________________________________________________________________________
+[  5476] By: autrijus                              on 2003/04/27  15:59:30
+        Log: * yao chung chang contributed inf.bbs.
+	   + BBSAgent/inf.bbs
+	   ! MANIFEST
+____________________________________________________________________________
+[  3678] By: autrijus                              on 2003/01/20  02:06:16
+        Log: * changes and signatures.
+	   + SIGNATURE
+	   ! Changes
+____________________________________________________________________________
+[  3676] By: autrijus                              on 2003/01/20  02:03:38
+        Log: * Okay, this be 1.60 for real.
+	   ! MANIFEST
+____________________________________________________________________________
+[  3675] By: autrijus                              on 2003/01/20  02:00:09
+        Log: * last-minute change: home.cvic.org is now ip-only.
+	   ! BBSAgent/home.bbs
+____________________________________________________________________________
+[  3674] By: autrijus                              on 2003/01/20  01:51:45
+        Log: * This be 1.60.
+	   ! BBSAgent.pm
+____________________________________________________________________________
+[  3673] By: autrijus                              on 2003/01/20  01:51:29
+        Log: * add various modern infrustrucures.
+             * ditch AutoInstall since we're not probing anything.
+	  +> t/0-signature.t
+	   ! MANIFEST Makefile.PL README
+____________________________________________________________________________
+[  3672] By: autrijus                              on 2003/01/20  01:50:52
+        Log: * add sayya.bbs (was cynix).
+	   + BBSAgent/sayya.bbs
+____________________________________________________________________________
+[  3671] By: autrijus                              on 2003/01/20  01:47:29
+        Log: * the DNS doesn't resolve; we assume it's gone.
+	   - BBSAgent/cynix.bbs
+____________________________________________________________________________
+[  3631] By: autrijus                              on 2003/01/19  09:13:27
+        Log: * add m543.
+	   + BBSAgent/m543.bbs
+	   ! MANIFEST
+____________________________________________________________________________
+[   465] By: gugod                                 on 2002/07/22  22:47:08
+        Log: ...
+	   ! BBSAgent/ptt2.bbs
+____________________________________________________________________________
+[   453] By: anonymous                             on 2002/07/22  04:06:23
+        Log: /* gugod */
+             posting problem solved.
+	   ! BBSAgent/ptt2.bbs

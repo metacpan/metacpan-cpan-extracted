@@ -1,0 +1,262 @@
+#!/bin/sh
+
+#	to install just run 
+#	   configure 
+#  or
+#		configure $SERVER $SA_LOGIN $SA_PASSWORD $DATABASE 
+#
+#	if parameters are not passed it will ask you for them
+
+# only print these lines if not in batch mode
+myecho()
+{
+	echo $*
+}
+
+NUMARGS=$#
+
+[ $NUMARGS -eq 4 ] && echo "Batch Configure: $*"
+
+NNL=""
+myecho "Testing Setup..."
+if [ -z "$SYBASE" ]
+then
+	myecho "Sybase Environment Variable Not Set Up"
+	exit
+fi
+ISQL=$SYBASE/bin/isql
+if [ ! -x "$ISQL" ]
+then
+	myecho "$ISQL not executable"
+	exit
+fi
+
+TMPFILE="/tmp/$0.$$"
+case "`echo 'x\c'`" in
+	'x\c') # BSD
+		ECHON="echo -n"
+		NNL=""  
+		;;
+	x)	# SYS V
+		ECHON="echo"
+		NNL="\c"		 
+		;;
+	*) 
+		echo "$0 quitting: cant setup echo"
+		exit 1;;
+esac
+
+SERVER=$1
+SALOGIN=$2
+PASSWD=$3
+DATABASE=$4
+[ -z "$DATABASE" ] && BATCH="TRUE";
+
+#  first some up front stuff:
+VERSION=`cat VERS*`
+
+[ $NUMARGS -ne 4 ] && clear
+if [ $NUMARGS -ne 4 ] 
+then
+myecho "Extended Sybase Stored Procedure Package $VERSION"
+
+myecho "Copyright (c) 1995-7 by Edward Barlow"
+myecho "======================================"
+myecho ""
+myecho "You are installing a FREE set of Sybase stored procedures, designed to"
+myecho "extend the Sybase system procedures. These procedures provide additional"
+myecho "functionality and provide new ways to look at the data provided by"
+myecho "Sybase in their System Tables.  They also provide many new formats"
+myecho "that allows users, developers, and administrators to see the data"
+myecho "they want in the format they want.  I think the procedures are a"
+myecho "MUST for managing your sybase environment."
+myecho ""
+myecho "Details on your right to use are described in the README file."
+myecho "In summary, you are free to use this software for personal and/or"
+myecho "professional use. You are free to redistribute it so long as you make"
+myecho "no money from this software and do not include any part of it in any"
+myecho "packages which you sell. Please read the README file for further"
+myecho "details.  I request that you inform me of Bugs/Fixes/or potential"
+myecho "extensions.  At the end of this install, I ask you to register"
+myecho "with me at sqltech@tiac.net. Complete documentation is available"
+myecho "in the microsoft word for windows 6.0 document man.doc."
+myecho ""
+myecho "If you like this set of procedures, check out my web site at:"
+myecho ""
+myecho " http://www.tiac.net/users/sqltech"
+myecho ""
+myecho "Where I have placed a variety of Free and Shareware Sybase software"
+myecho "and where the latest version of this software should be stored."
+myecho ""
+$ECHON "Hit Return to Continue"${NNL}
+fi
+
+[ $NUMARGS -ne 4 ] && read ans2
+myecho ""
+
+myecho "Environment Check Succeeded"
+myecho ""
+myecho "This script requires that you have the sa password for the server"
+myecho " you wish to install on.  As always, when installing scripts into"
+myecho " master or sybsystemprocs, it is recommended that a dump be taken."
+myecho ""
+myecho "I have fully tested this package on 4.8, 4.9.1, and Sybase 10.  The "
+myecho " package loads and works fine on System 11, but does not yet take"
+myecho " advantage of any System 11 Features (give me hints here).  There"
+myecho " are a few functions that will not load on pre 4.8 versions because"
+myecho " they use functions that are not available in those versions."
+myecho ""
+
+if [ -z "$SERVER" ]
+then
+	$ECHON "Please enter SQL Server DSQUERY [$DSQUERY]: "${NNL}
+	read SERVER
+	[ -z "$SERVER" ] && SERVER=$DSQUERY
+	[ -z "$SERVER" ] && exit 1
+fi
+
+if [ -z "$DATABASE" ]
+then
+	myecho ""
+	$ECHON "IS THIS SERVER SYSTEM 10 or 11? (y or n)"${NNL}
+	read ans
+else
+	ans='N'
+	[ "$DATABASE" = "sybsystemprocs" ] && ans='Y'
+fi
+
+if [ "$ans" != "y" -a "$ans" != "Y" ]
+then
+	 ISTEN="n"
+	 DEFDB="master"
+	 cp auditdb.492		  auditdb.sql
+	 cp helpcolumn.492		  helpcolumn.sql
+	 cp badindex.492		  badindex.sql
+	 cp helpindex.492		  helpindex.sql
+	 cp auditsecurity.492 auditsecurity.sql
+	 cp block.492		  block.sql
+	 cp colconflict.492	  colconflict.sql
+	 cp collist.492	  collist.sql
+	 cp colnull.492	  colnull.sql
+	 cp helpdb.492	  helpdb.sql
+	 cp helplogin.492 helplogin.sql
+	 cp helpprotect.492	  helpprotect.sql
+	 cp lock.492		  lock.sql
+	 cp lockt.492		  lockt.sql
+	 cp revtable.492	  revtable.sql
+	 cp syntax.492	  syntax.sql
+	 cp whodo.492	  whodo.sql
+	 cp quickstats.492	  quickstats.sql
+	 rm -f record.sql 
+else 
+	 ISTEN="y"
+	 DEFDB="sybsystemprocs"
+	 cp record.10		  record.sql
+	 cp quickstats.10		  quickstats.sql
+	 cp auditdb.10		  auditdb.sql
+	 cp helpindex.10		  helpindex.sql
+	 cp helpcolumn.10		  helpcolumn.sql
+	 cp badindex.10		  badindex.sql
+	 cp auditsecurity.10 auditsecurity.sql
+	 cp helplogin.10 	  helplogin.sql
+	 cp lock.10		  	  lock.sql
+	 cp lockt.10		  lockt.sql
+	 cp block.10		  block.sql
+	 cp collist.10	  	  collist.sql
+	 cp colnull.10	  colnull.sql
+	 cp colconflict.10	  colconflict.sql
+	 cp revtable.10	  revtable.sql
+	 cp whodo.10	  whodo.sql
+	 cp helpdb.10	  helpdb.sql
+	 cp helpprotect.10	  helpprotect.sql
+	 cp syntax.10		  syntax.sql
+fi
+
+myecho ""
+myecho "Note: On System 10, you should install into the database sybsystemprocs"
+myecho " and on pre 10 releases, you should use master"
+myecho ""
+[ -z "$DATABASE" ] && $ECHON "Enter Database To Install Into [$DEFDB]: "${NNL}
+
+[ -z "$DATABASE" ] && read DATABASE
+[ -z "$DATABASE" ] && DATABASE=$DEFDB
+rm -f database
+
+echo "use $DATABASE" > database
+echo "dump tran $DATABASE with truncate_only" > dumpdb
+myecho ""
+myecho "Note: the following command will be issued prior to each install:"
+cat dumpdb
+
+if [ $NUMARGS -ne 4 ]
+then
+	myecho ""
+	$ECHON "Please enter SQL Server administrator ACCOUNT (sa): "${NNL}
+	read SALOGIN
+	[ -z "$SALOGIN" ] && SALOGIN=sa
+
+	myecho ""
+	$ECHON "Please enter SQL Server administrator (sa) Password: "${NNL}
+	stty -echo
+	read PASSWD
+	stty echo
+fi
+
+# testing login to server
+# Test to see if you can log in
+myecho ""
+myecho "Testing Login To Server"
+$ISQL  -U$SALOGIN -P$PASSWD -S$SERVER -o$TMPFILE <<EOF
+print "           Login Successful"
+go
+EOF
+
+if [ $? != 0 ]
+then
+	myecho "*** Unable To Login ***"
+	myecho ""
+	cat $TMPFILE
+	exit
+fi
+rm -f $TMPFILE
+
+myecho ""
+[ $NUMARGS -ne 4 ] && $ECHON "Continue Install into database $DATABASE? (y or n): "${NNL}
+[ $NUMARGS -eq 4 ] && ans='Y'
+[ $NUMARGS -ne 4 ] && read ans
+if [ "$ans" != "y" -a "$ans" != "Y" ]
+then
+	 echo "Quitting As Per User Instructions"
+	 exit
+fi
+
+# some files must be installed after the others are all in 
+PASS_2_FILES="helpobject.sql helpdb.sql help.sql helpdevice.sql server.sql"
+[ "$ISTEN" = "y" ] && PASS_2_FILES="$PASS_2_FILES record.sql"
+PASS_2_FILES="$PASS_2_FILES quickstats.sql"
+
+echo $PASS_2_FILES > $TMPFILE
+for file in `ls *.sql`
+do
+	x=`grep $file $TMPFILE`
+	[ -n "$x" ] && continue
+	myecho "installing $file"
+	$ISQL -U$SALOGIN -S$SERVER -P$PASSWD -i$file
+done
+
+for file in $PASS_2_FILES
+do
+	myecho "installing $file"
+	$ISQL -U$SALOGIN -S$SERVER -P$PASSWD -i$file
+done
+
+rm -f auditdb.sql auditsecurity.sql helplogin.sql lock.sql lockt.sql block.sql
+rm -f collist.sql revtable.sql whodo.sql helpdb.sql helpprotect.sql syntax.sql
+rm -f colnull.sql colconflict.sql revindex.sql record.sql helpcolumn.sql badindex.sql
+rm -f helpindex.sql quickstats.sql
+
+rm -f $TMPFILE
+
+myecho ""
+myecho "Package installation successful.  Enjoy."
+

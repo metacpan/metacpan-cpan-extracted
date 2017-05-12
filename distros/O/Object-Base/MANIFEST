@@ -1,0 +1,15 @@
+Changes
+COPYRIGHT
+doc/README.pod
+lib/Object/Base.pm
+lib/Object/Exception.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+README.md
+t/Object-Base.t
+t/Object-Exception.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,14 @@
+<html>
+  <head>
+    <title>OpenFrame-WebApp Petal Example</title>
+  </head>
+  <body>
+    <h1>Hello World!</h1>
+
+    This page was rendered with
+    <a href="http://search.cpan.org/author/JHIVER/Petal">Petal</a>.
+
+    <xi:include href="./footer"/> 
+
+  </body>
+</html>

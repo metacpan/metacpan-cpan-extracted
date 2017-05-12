@@ -1,0 +1,608 @@
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#introduction">INTRODUCTION</A></LI>
+	<LI><A HREF="#file format">FILE FORMAT</A></LI>
+	<LI><A HREF="#openinteract">OPENINTERACT</A></LI>
+	<UL>
+
+		<LI><A HREF="#serverspecific configuration">Server-specific Configuration</A></LI>
+	</UL>
+
+	<LI><A HREF="#spops">SPOPS</A></LI>
+	<LI><A HREF="#packages and configuration">PACKAGES AND CONFIGURATION</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#authors">AUTHORS</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Configuring OpenInteract - Modify how the server works and objects interact</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<P>This document has detailed information on how to configure
+OpenInteract and SPOPS.</P>
+<P>
+<HR>
+<H1><A NAME="introduction">INTRODUCTION</A></H1>
+<P>Configuration is one of the primary ways you can influence how
+OpenInteract functions. You can specify different databases to use,
+directories, cache information, session management and more.</P>
+<P>SPOPS requires that every object you create have a set of metadata
+that can be used to create the class. Most of the time you don't even
+need to write any code -- that code is created on-the-fly whenever you
+start your mod_perl server. (Setting sufficiently high debugging
+options in <CODE>SPOPS</CODE> for use in
+<CODE>SPOPS::ClassFactory</CODE> will show you how much code
+is created.)</P>
+<P>
+<HR>
+<H1><A NAME="file format">FILE FORMAT</A></H1>
+<P>We generally use four formats throughout OpenInteract. If you create
+new configuration files, try to stick to these naming schemes.</P>
+<P><STRONG>.conf</STRONG></P>
+<P>Typical configuration file format: information separated into
+key-value pairs, blank lines and lines that begin with a comment (#)
+are skipped.</P>
+<P>Example:</P>
+<PRE>
+  MyValue    emmet otter
+  HerValue   fraggle rock
+ TheirValue  jughandle
+   # ringo   starr</PRE>
+<P>Parsing this would return a hashref:</P>
+<PRE>
+ { 
+   MyValue =&gt; 'emmet otter',
+   HerValue =&gt; 'fraggle rock',
+   TheirValue =&gt; 'jughandle'
+ }</PRE>
+<P><STRONG>.dat</STRONG></P>
+<P>Very simple: one item per line. Blank lines and lines beginning with a
+comment (#) are skipped entirely.</P>
+<P>Example:</P>
+<PRE>
+ MyClass
+ HerClass
+ TheirClass
+ #RingoClass</PRE>
+<P>Parsing this would return an arrayref:</P>
+<PRE>
+ [ 'MyClass', 'HerClass', 'TheirClass' ]</PRE>
+<P>Note: This will probably be phased out in the future.</P>
+<P><STRONG>.ini</STRONG></P>
+<P>The time-tested and easily-edited INI file format. This represents
+nested data without allowing configuration information that has an
+upper-bound on complexity.</P>
+<P>If you've never seen it before, it looks like this:</P>
+<PRE>
+ [section]
+ key = value
+ key2 = value</PRE>
+<P>This would evaluate to:</P>
+<PRE>
+ { section =&gt; { key =&gt; 'value',
+                key2 =&gt; 'value' } }</PRE>
+<P>OpenInteract comes with its own INI reader implementation which has a
+few extra features:</P>
+<DL>
+<DT><STRONG><A NAME="item_multi%2Dlevel_sections"><STRONG>multi-level sections</STRONG></A></STRONG><BR>
+<DD>
+Instead of specifying a single level in the section you can specify
+two. (You can do more than two as well, but we put an artificial limit
+so as to prevent configuration complexity.)
+<PRE>
+ [section subsection]
+ key = value
+ key2 = value</PRE>
+<P>This would evaluate to:</P>
+<PRE>
+ { section =&gt; { subsection =&gt; { key =&gt; 'value',
+                                key2 =&gt; 'value' } } }</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_multivalued_keys"><STRONG>multivalued keys</STRONG></A></STRONG><BR>
+<DD>
+You can set multiple values in a key:
+<PRE>
+ [section]
+ key = value
+ key = value2
+ key2 = value</PRE>
+<P>Which would evaluate to:</P>
+<PRE>
+ { section =&gt; { key =&gt; [ 'value', 'value2' ],
+                key2 =&gt; 'value' } }</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_Global_values"><STRONG>Global values</STRONG></A></STRONG><BR>
+<DD>
+Entries under the key 'Global' will be saved at the top level of the
+configuration object:
+<PRE>
+ [Global]
+ DEBUG = 1
+ server_name = My Server!</PRE>
+<P>Which would evaluate to:</P>
+<P>{ DEBUG =&gt; 1,
+  server_name =&gt; 'My Server!' }</P>
+<P></P></DL>
+<P>See <A HREF="/OpenInteract/Config/Ini.html">OpenInteract::Config::Ini</A> for more
+information.</P>
+<P><STRONG>.perl</STRONG></P>
+<P>This file is a full-fledged perl data structure, dumped to a file
+using <A HREF="/Data/Dumper.html">Data::Dumper</A>. It can be any type of structure,
+but it's normally used to represent a hashref containing all sorts of
+different types of information. It's also fairly easy to edit such a
+file using your favorite plain-text file editor.</P>
+<P>When reading this type of configuration, we just return the data
+structure saved in the file -- if the file is an arrayref, we return
+an arrayref.</P>
+<P>When we use this structure to save information for objects (such as
+the <A HREF="/OpenInteract/Config/PerlFile.html">OpenInteract::Config::PerlFile</A>
+object), we never save class information about the object, just the
+data. We can always re-bless the structure after it's eval'd in.</P>
+<P>Example:</P>
+<PRE>
+ $data = {
+          'db_info' =&gt; {
+            'db_owner' =&gt; '',
+            'username' =&gt; 'cwinters',
+            'password' =&gt; '',
+            'dsn' =&gt; 'DBI:mysql:database=mysql',
+            'db_name' =&gt; 'interact',
+          },
+          ...
+ };</PRE>
+<P>
+<HR>
+<H1><A NAME="openinteract">OPENINTERACT</A></H1>
+<P>There are two primary levels of configuration in OpenInteract: the
+server and the package. Typically, your application will have its own
+set of server files and a set of configuration files with each
+application.</P>
+<P>
+<H2><A NAME="serverspecific configuration">Server-specific Configuration</A></H2>
+<P><STRONG>File: /conf/base.conf</STRONG></P>
+<P>This is one of the most important configuration files in
+OpenInteract. This file allows
+<A HREF="/OpenInteract/Startup.html">OpenInteract::Startup</A> to bootstrap all the
+configuration information by supplying information for the class that
+reads in the data for the server configuration
+(<A HREF="/OpenInteract/Config/PerlFile.html">OpenInteract::Config::PerlFile</A> by
+default), the base directory for this application, the name of the
+configuration directory and file. You can also specify the Request
+class (<A HREF="/OpenInteract/Request.html">OpenInteract::Request</A> by default) and
+a Stash class (no default specified -- every application needs to have
+its own).</P>
+<P>Example:</P>
+<PRE>
+ base_dir         /opt/OpenInteract
+ website_dir      /home/httpd/oitest
+ website_name     OITest
+ config_type      ini
+ config_class     OpenInteract::Config::IniFile
+ config_dir       conf
+ config_file      server.ini
+ request_class    OpenInteract::Request
+ stash_class      OITest::Stash
+ templib_dir      /home/httpd/oitest/tmplib</PRE>
+<P><STRONG>File: /conf/apache.dat</STRONG></P>
+<P>List the classes needed by mod_perl in the <CODE>Apache::</CODE> class. The only
+ones you might need to change are <A HREF="/Apache/StatINC.html">Apache::StatINC</A>
+(shouldn't be used on production servers).</P>
+<P><STRONG>File: /conf/server.ini</STRONG></P>
+<P>This file controls a many fundamental aspects of your application:
+which directories to use, how to connect to a database, how to
+configure a cache, etc.</P>
+<P>In addition, you can setup aliases to use within your application,
+calling the alias from $R. (See <EM>Description and Contents of $R</EM> for
+more information.) And there is some basic information required by
+SPOPS located here as well.</P>
+<P>When you create a website your <CODE>server.ini</CODE> file is initialized with
+sensible values. It also has quite a bit of explanation about the
+values there and where they're used.
+=head2 Package-specific Configuration</P>
+<P><STRONG>File: pkg/$pkg/conf/action.perl</STRONG></P>
+<P>This file contains directives that register modules and components
+with the server. Each module and component in the system has a unique
+identifier -- you can use the OpenInteract script
+<EM>scripts/find_modules.pl</EM> (note, not yet available - CW) to product a
+list of current modules and components.</P>
+<P>Here is an example of a module.perl file, from the OpenInteract
+package <EM>contact</EM>:</P>
+<PRE>
+ $module = {
+            'person'     =&gt; {
+                'module'    =&gt; 'person',
+                'class'     =&gt; 'OpenInteract::Handler::Person',
+            },
+            'address'     =&gt; {
+                'path'      =&gt; 'Address',
+                'module'    =&gt; 'address',
+                'class'     =&gt; 'OpenInteract::Handler::Address',
+                'tool'      =&gt; 'contact',
+            },
+            'contact'     =&gt; {
+                'path'      =&gt; 'Contact',
+                'module'    =&gt; 'contact',
+                'class'     =&gt; 'OpenInteract::Handler::Contact',
+                'tool'      =&gt; 'contact',
+            },
+           'addresslist' =&gt; {
+                'class'     =&gt; 'OpenInteract::Handler::Address',
+                'method'    =&gt; 'listing',
+                'module'    =&gt; 'addresslist',
+                'conductor' =&gt; 'null',
+                'security'  =&gt; 'no',
+                'tool'      =&gt; 'contact',
+            },
+            ...
+ };</PRE>
+<P>The first three list standard modules -- they rely on the second part
+of the URL to perform an action. For example, calling the URL
+'/Person/' would simply run the default method in the
+<CODE>OpenInteract::Handler::Person</CODE> class, while calling '/Person/show/'
+would call the 'show' method of that same class.</P>
+<P>The fourth item ('addresslist') specifies a <STRONG>component</STRONG>. (See
+<EM>OpenInteract Guide to Components</EM> for more information about what a
+component is and does.) Briefly, there are two types of components:
+template-based and code-based. Template-based components do <STRONG>not</STRONG>
+need to be specified in the <EM>pkg/$pkg/conf/module.perl</EM> file -- you
+can simply call them by the name you give the template.</P>
+<P>The second type of component, code-based, must be specified in the
+configuration. This type of component is basically indistinguishable
+from a module, except for the fact that you cannot call more than one
+method on it, and that it's meant to be part of a page rather than an
+entire page. Code-based components wrap class and method names into
+one easily used call.</P>
+<P>The code-based component can use an entirely separate class from other
+modules, or it can 'poach' a method from a classed used as a normal
+module. The latter is what we do in the fourth configuration item
+above. When we call the 'addresslist' component, we're just returning
+the results of the method call
+<CODE>OpenInteract::Handler::Address-&amp;gt;listing</CODE>.</P>
+<P>Currently, the module does not list parameters that can be passed to
+a component, although this might exist in a future version of
+OpenInteract.</P>
+<P><STRONG>NOTE</STRONG>: We may add a great deal of information in this file in the
+near future as an effort to enable multiple applications to use the
+same handlers.</P>
+<P>Also, see the entry for <EM>pkg/$pkg/conf/spops.perl</EM> below.</P>
+<P>
+<HR>
+<H1><A NAME="spops">SPOPS</A></H1>
+<P><STRONG>File: pkg/$pkg/conf/spops.perl</STRONG></P>
+<P>The file <STRONG>pkg/$pkg/conf/spops.perl</STRONG> is extremely important to the
+operation of OpenInteract. Each package defines the SPOPS objects it
+uses through this file. A vast majority of these objects have <EM>no
+class files</EM> behind them, meaning that when we define a class
+<CODE>OpenInteract::DataObject</CODE>, there is likely no file anywhere in the
+system titled <CODE>OpenInteract/DataObject.pm</CODE> as is traditional with perl
+objects.</P>
+<P>Instead, we take the metadata specified in the
+<STRONG>pkg/$pkg/conf/spops.perl</STRONG> file and create classes on the fly for the
+objects when the server is started. These classes include
+configuration information for the class, an inheritance hierarchy to
+determine the various behaviors of this class, and methods to deal
+with inter-relationships of objects.</P>
+<P>Here is an example of a file, found in <STRONG>pkg/news/conf/spops.perl</STRONG>:</P>
+<PRE>
+  $spops = {
+      'news' =&gt; {
+        class        =&gt; 'OpenInteract::News',
+        isa          =&gt; [ qw/ OpenInteract::Linked  OpenInteract::Grouped  
+                              OpenInteract::SPOPS::DBI  SPOPS::Secure  
+                              SPOPS::DBI::MySQL  SPOPS::DBI / ],
+        field        =&gt; [ qw/ news_id posted_on posted_by title 
+                              news_item active expires_on active_on / ],
+        id_field     =&gt; 'news_id',
+        no_insert    =&gt; [ qw/ news_id / ],
+        no_update    =&gt; [ qw/ news_id posted_on / ],
+        skip_undef   =&gt; [ qw/ active expires_on / ],
+        sql_defaults =&gt; [ qw/ active / ],
+        key_table    =&gt; 'news',
+        base_table   =&gt; 'news',
+        field_alter  =&gt; {},
+        alias        =&gt; [],
+        has_a        =&gt; { 'OpenInteract::User' =&gt; [ 'posted_by' ] },
+        links_to     =&gt; {},
+        creation_security =&gt; {
+           u   =&gt; { level =&gt; 'WRITE' },
+           g   =&gt; undef,
+           w   =&gt; { level =&gt; 'READ'},
+        },
+        as_string_order =&gt; [ qw/ title news_item posted_on / ],
+        as_string_label =&gt; { title =&gt; 'Title', 
+                             news_item =&gt; 'News Item',
+                             posted_on =&gt; 'Posted On' },
+        track =&gt; {
+           create =&gt; 1, update =&gt; 1, remove =&gt; 1
+        },
+        display =&gt; { url =&gt; '/News/show/', class =&gt; 'OpenInteract::Handler::News', method =&gt; 'show' },
+        linkterm =&gt; 1,
+        name =&gt; sub { return $_[0]-&gt;{title} },
+        object_name =&gt; 'News',
+      },
+      ...
+ };</PRE>
+<P>We'll break this down, field by field, and discuss what each does, the
+data it expects, and how the data you enter are used.</P>
+<P><EM>name</EM> ($)</P>
+<P>'news' in the example above -- this is the primary alias you will use
+to access the object class through $R. For instance, using the example
+above, calling: <CODE>$R-&amp;gt;news</CODE> would return <CODE>OpenInteract::News</CODE>.</P>
+<P>Note that you can setup additional aliases for the same class using
+the <EM>alias</EM> field of the configuration (more below).</P>
+<P><EM>class</EM> ($)</P>
+<P>Name the class used by this object. Most of the time, you can make up
+something completely arbitrary -- since there is no code file behind
+most classes, what you name them doesn't really matter, as long as you
+always access the class name through $R and the alias method mentioned
+in <EM>name</EM>, above.</P>
+<P>As we discuss below in <A HREF="#packages and configuration">PACKAGES AND CONFIGURATION</A>, you can use the
+fact that most SPOPS classes are created using no code to your
+advantage. For instance, if you have multiple OpenInteract
+applications running on the same mod_perl server, you might need to
+differentiate among different implementations of the same class -- one
+site needs a <CODE>OpenInteract::News</CODE> class that includes full-text
+searching, another needs the same class without full-text
+searching. The first can define in its application-specific
+<STRONG>pkg/news/conf/spops.perl</STRONG> file the following:</P>
+<PRE>
+  $spops = {
+      'news' =&gt; {
+        class        =&gt; 'SiteOne::News',
+        isa          =&gt; [ qw/ OpenInteract::FullText OpenInteract::Linked  
+                              OpenInteract::Grouped  OpenInteract::SPOPS::DBI
+                              SPOPS::Secure  SPOPS::DBI::MySQL  
+                              SPOPS::DBI / ],
+      },
+      ...
+ };</PRE>
+<P>While the other site can define in <STRONG>its</STRONG> application-specific
+<STRONG>pkg/news/conf/spops.perl</STRONG> file the following:</P>
+<PRE>
+  $spops = {
+      'news' =&gt; {
+        class        =&gt; 'SiteTwo::News',
+        isa          =&gt; [ qw/ OpenInteract::Linked  
+                              OpenInteract::Grouped  OpenInteract::SPOPS::DBI
+                              SPOPS::Secure  SPOPS::DBI::MySQL  
+                              SPOPS::DBI / ],
+      },
+      ...
+ };</PRE>
+<P>In the eyes of perl, they are two entirely separate classes since they
+have different names for 'class'. But they use the same alias -- that
+is, you can use <CODE>$R-&amp;gt;</CODE>news-&amp;gt;fetch_group( ... )&gt; in both
+applications when you use a news object -- as well as the same field
+names, table definitions, etc.</P>
+<P><EM>isa</EM> (\@)</P>
+<P>List the parents of this class. The number of classes a SPOPS class
+typically inherit from might make traditional object-oriented
+programmers cringe. However, many of these classes implement only a
+few public methods. And most are very task-specific -- for intance,
+the <CODE>OpenInteract::Linked</CODE>, <CODE>OpenInteract::Grouped</CODE> and
+<CODE>OpenInteract::FullText</CODE> classes listed in the examples above really only
+exist to create rules within a class. And some of the SPOPS classes
+(such as <CODE>SPOPS::DBI::MySQL</CODE> might implement only one or two methods
+to deal with a function such as generating primary key values.</P>
+<P>See the writeup in <EM>class</EM> to see how we can manipulate the values in
+'isa' to get different behaviors for the same implmentation of a
+class, just using a different class name.</P>
+<P>Note that the order of the 'isa' field is extremely important, just as
+it is in perl. You generally want to list classes first that have more
+specific implementations -- for example, listing <CODE>SPOPS::Secure</CODE>
+before any of the <CODE>SPOPS::DBI</CODE> classes in the example above, since
+the former overrides methods in the latter.</P>
+<P><EM>field</EM> (\@)</P>
+<P>List the fields used by this class. Order does not really matter,
+although it's traditional to put the key field first.</P>
+<P><EM>id_field</EM> ($)</P>
+<P>Name the field used by this class to uniquely identify a
+record. Currently SPOPS does not support objects identified by
+multiple key fields.</P>
+<P><EM>no_insert</EM> (\@)</P>
+<P>List the fields that should not be used when creating a new
+record. For many implementations that use auto-generated primary key
+values (either through a sequence or auto-incrementing field), you
+will want to include the 'id_field' here. Another field might be a
+timestamp field which is generated automatically by the database.</P>
+<P><EM>no_update</EM> (\@)
+</P>
+<PRE>
+
+List the fields that should not be used when updating an existing
+record. Typical fields include the id_field (because you don't want
+people manipulating the primary key) or timestamp fields.</PRE>
+<P><EM>skip_undef</EM> (\@)</P>
+<P>List the fields for which you do not wish to include in new or updated
+records if they are undefined. For instance, you may have defined a
+default value for the field 'active' -- all new records default to
+``active = 'no''' since you want an administrator to approve the record
+before making it live.</P>
+<P>In some databases, the default value will get put in only if the field
+and a value are not specified in the INSERT or UPDATE statements. This
+list allows you to skip over those fields</P>
+<P><EM>sql_defaults</EM> (\@)</P>
+<P>List the fields which have a default value in the database. When a new
+record is created, we re-fetch the record if there are defaults
+because we don't want the information in an object to ever be
+inconsistent with what is in the database. So if, as in the example in
+<EM>skip_undef</EM>, you have the default set to 'no' for the field
+'active', you want the object to reflect this after you insert it.</P>
+<P><EM>key_table</EM> ($) (optional, specific to <CODE>SPOPS::DBI::Keypool</CODE>)</P>
+<P>Name the table to use when retrieving a key from the key pool.</P>
+<P><EM>base_table</EM> ($)</P>
+<P>Name the table used for this class. Do not include any database or
+ownership information.</P>
+<P><EM>field_alter</EM> (\%) (optional)</P>
+<P>Sometimes you want to retrieve the data in a pre-formatted fashion
+from the database, such as for date fields. This allows you to tell
+the database to use database-specific commands to return the same
+information in a different format.</P>
+<P>For example, you could return dates in MySQL in a different format
+using:</P>
+<PRE>
+  field_alter  =&gt; { 
+       posted_on =&gt; q/DATE_FORMAT( posted_on, '%a %b %d %h:%i %p' )/,
+  },</PRE>
+<P>This command will be passed to the database on any calls to
+<CODE>$obj-&amp;gt;fetch</CODE> or <CODE>$obj-&amp;gt;fetch_group</CODE> and the formatted data
+returned.</P>
+<P><EM>alias</EM> (\@) (optional)</P>
+<P>List additional aliases that you'd like to use to refer to this class.</P>
+<P><EM>has_a</EM> (\%) (optional)</P>
+<P>List the objects that this object can 'contain' by virtue of having a
+key field from another object as one of its properties. When the
+server is started, the SPOPS configuration automatically sets up
+methods to access this separate object from the original object.</P>
+<P>If you only contain one of a particular object, you'll frequently use
+the same name for the key field as the object you're containing. For
+example, if you have a <CODE>OpenInteract::User</CODE> object in your object, you
+might use the field 'user_id' to denote the property.</P>
+<P>To retrieve an object that is using the same key field name, just
+refer to the class of the object.</P>
+<P>Example. Given the following configuration definition:</P>
+<PRE>
+ $spops = {
+    'user' =&gt; {
+        ...,
+        has_a        =&gt; { 'OpenInteract::Theme' =&gt; [ 'theme_id' ], },
+        ...,
+    },
+ };</PRE>
+<P>You can retrieve the 'theme' object associated with a particular user
+by simply calling:</P>
+<PRE>
+ my $theme_obj = $user_object-&gt;theme;</PRE>
+<P>You can also contain more than one of a particular object -- which is
+why the 'theme' key points to an arrayref in the previous example. A
+different naming scheme is used for those objects that do <STRONG>not</STRONG> have
+the same key field name as the object they're associated with.</P>
+<P>For these fields, you call the object by appending '_&amp;gt;object_name&amp;lt;' to
+the name of the property. So if an object has the key field for
+<CODE>OpenInteract::User</CODE> in a field titled 'posted_by', you can retrieve the
+object associated with that field by calling:
+<CODE>$user_object-&amp;gt;posted_by_user</CODE>.</P>
+<P>Example. Given the following configuration definition, slightly
+altered from the previous one:</P>
+<PRE>
+ $spops = {
+    'user' =&gt; {
+        ...,
+        has_a        =&gt; { 'OpenInteract::Theme' =&gt; [ 'theme_id', 'parent_derived_from' ], },
+        ...,
+    },
+ };</PRE>
+<P>You can make the following calls to get the 'theme' objects.</P>
+<PRE>
+ my $theme_obj = $user_object-&gt;theme;
+ my $parent_them_obj = $user_object-&gt;parent_derived_from_theme;</PRE>
+<P><EM>links_to</EM> (\%) (optional)</P>
+<P>This functionality is similar to the <EM>has_a</EM> field, but instead of
+containing a single object, an object can be associated with a number
+of objects. Here we associate this relationship by specifying the class
+of the related object and the table by which the objects are related.</P>
+<P>When we configure the SPOPS objects, we create three methods for each
+association: &amp;lt;name-of-object&amp;gt;, &amp;lt;name-of_object&amp;gt;_add and
+&amp;lt;name-of-object&amp;gt;_remove.</P>
+<P>Example. Given the following configuration definition:</P>
+<PRE>
+ $spops = {
+    'user' =&gt; {
+        ...,
+        links_to     =&gt; { 'OpenInteract::Group' =&gt; 'sys_group_user' },
+        ...,
+    },
+ };</PRE>
+<P>We can do the following:
+</P>
+<PRE>
+
+ my $group_obj_list = $user_obj-&gt;group;
+ my $added = $user-&gt;group_add( [ $group_obj, $group_obj, ... ] );
+ my $added = $user-&gt;group_add( [ $group_id, $group_id, ... ] );
+ my $removed = $user-&gt;group_remove( [ $group_obj, $group_obj, ... ] );
+ my $removed = $user-&gt;group_remove( [ $group_id, $group_id, ... ] );</PRE>
+<P>The <EM>group_add</EM> and <EM>group_remove</EM> methods in the example don't
+remove any groups or users, just the links between them.</P>
+<P><STRONG>NOTE</STRONG>: The functionality for this is still being worked on -- in
+particular, we might differentiate in the future between objects that
+are linked via a link table (a many-to-many relationship) and objects
+that are linked via a single field in a separate table (a one-to-many
+relationship).</P>
+<P>We will also figure out a clean way to retrieve a group of associated
+objects in a particular order. For example:</P>
+<PRE>
+ my $group_obj_list = $user_obj-&gt;group( { order =&gt; 'name' } );</PRE>
+<P>Which you cannot do now with objects that are using a link table to
+hold the associations.</P>
+<P><EM>creation_security</EM> (\%)</P>
+<P>Specify the intial creation security for this object. Currently, this
+is a pretty blunt instrument -- you specify either a level (e.g.,
+'WRITE', 'READ', 'NONE' for all three scopes (u == 'SEC_SCOPE_USER', g
+== 'SEC_SCOPE_GROUP', w == 'SEC_SCOPE_WORLD'). You can also specify a
+hashref with a key 'code' and list a class and method that will
+install the security for this object whenever one is created.</P>
+<P>This behavior will likely be overrided by <EM>Security Policies</EM>, which
+will be administered from a browser interface.</P>
+<P><EM>as_string_order</EM> (\@) (optional)</P>
+<P>List the fields you'd like to use when the <CODE>as_string()</CODE> method of
+the object is called. If you do not specify this and/or the
+<EM>as_string_label</EM> keys, SPOPS will create a representation of the
+object for you.</P>
+<P><EM>as_string_label</EM> (\%) (optional)</P>
+<P>Give the fieldnames labels when outputting the object as a string.</P>
+<P><EM>track</EM> (\%)</P>
+<P>Specify how you want to track modifications made to this object -- a
+true value for any of 'create', 'update' or 'remove' will log that
+modification, along with the user who made it and the date and time it
+was made.</P>
+<P><EM>display</EM> (\%)</P>
+<P>Control how this object is displayed. The most-used field is 'url',
+which is a base url to which a query string with the ID field and its
+value is added.</P>
+<P>You can also specify 'class' and 'method', for future use of a handler
+which simply takes a class name and object ID and returns the display
+for that object.</P>
+<P><EM>name</EM> (\&amp;)</P>
+<P>How can you name each specific object? This should be a code reference
+that takes the object as a parameter and returns the name for an
+object -- for instance, for a news story it would be the title. For a
+record in a contact database it might be the full name of a person.</P>
+<P><EM>object_name</EM> ($)</P>
+<P>What is the generic name for this object? For instance, 'News' for
+news items, 'Classified ad' for classified objects, etc.</P>
+<P>
+<HR>
+<H1><A NAME="packages and configuration">PACKAGES AND CONFIGURATION</A></H1>
+<P>When the server reads in the packages and the configuration for each
+package, it creates the necessary SPOPS classes on the fly. However,
+if you're running multiple applications on one server or if you want
+to modify the features of an OpenInteract package, you need to be able
+to override information specified in the configuration files.</P>
+<P>Fortunately, you don't need to do a full copy-and-paste of the
+original configuration information. You can override specified fields
+of information in the original configuration by specifying those
+fields. All other information is inherited from the default.</P>
+<P>So in your <CODE>pkg/$pkg/conf/spops.perl</CODE> file, you can specify a new
+'class' and 'isa' for an object, keeping all the other information
+intact so that the tables and default data for the objects will still
+be applicable.</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><CODE>&lt;Data::Dumper</CODE></P>
+<P><CODE>SPOPS::ClassFactory</CODE></P>
+<P><CODE>OpenInteract::Startup</CODE></P>
+<P>
+<HR>
+<H1><A NAME="authors">AUTHORS</A></H1>
+<P>Chris Winters &lt;<A HREF="mailto:chris@cwinters.com">chris@cwinters.com</A>&gt;</P>

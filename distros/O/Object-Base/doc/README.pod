@@ -1,0 +1,79 @@
+=head1 MODULES
+
+=head2 Object::Base
+
+Multi-threaded base class to establish a class deriving relationship with parent classes
+
+See more L<https://metacpan.org/pod/Object::Base>
+
+=head2 Object::Exception
+
+Multi-threaded exception class
+
+See more L<https://metacpan.org/pod/Object::Exception>
+
+=head1 INSTALLATION
+
+To install this module type the following
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+from CPAN
+
+	cpan -i Object::Base
+
+=head1 DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+=over
+
+=item *
+
+threads
+
+=item *
+
+threads::shared
+
+=item *
+
+forks
+
+=item *
+
+SUPER
+
+=back
+
+=head1 REPOSITORY
+
+B<GitHub> L<https://github.com/orkunkaraduman/p5-Object-Base>
+
+B<CPAN> L<https://metacpan.org/release/Object-Base>
+
+=head1 AUTHOR
+
+Orkun Karaduman <orkunkaraduman@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2017  Orkun Karaduman <orkunkaraduman@gmail.com>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+=cut

@@ -1,0 +1,180 @@
+[% USE CGI %]
+[% USE JSON.Escape %]
+[% INCLUDE header.tt %]
+[% INCLUDE banner.tt %]
+
+[% IF categories.size OR locales.size %]
+  <div id="content" class="[% FOREACH cat = categories %]cat_[% cat.name.lower.replace( ' ', '_' ) %][%- " " UNLESS (loop.last AND !locales.size) %][% END %][% FOREACH loc=locales %]loc_[% loc.name.lower.replace( ' ', '_' ) %][%- " " UNLESS loop.last %][% END %]">
+[% ELSE %]
+  <div id="content">
+[% END %]
+
+[% IF !config.content_above_navbar_in_html %]
+  [% INCLUDE navbar.tt %]
+[% END %]
+<div id="maincontent" class="hreview">
+[% IF oldid %]
+<div id="redirect_message">(redirected from <a href="[% full_cgi_url %]?id=[% oldid %];redirect=0">[% oldid.replace('_', ' ') %]</a>)</div>
+[% END %]
+
+[% IF responsive %]
+  <div id="node_map_and_image">
+[% END %]
+
+[% IF wgs84_lat AND wgs84_long AND display_google_maps %]
+  [% IF config.use_leaflet %]
+    <div id="node_map_canvas"></div>
+    <script type="text/javascript">
+      map_div_id = 'node_map_canvas';
+      centre_lat = [% wgs84_lat %];
+      centre_long = [% wgs84_long %];
+      function add_markers() {
+        var position = new L.LatLng( [% wgs84_lat %], [% wgs84_long %] );
+        marker = new L.Marker( position, { icon: new gicon() } );
+        map.addLayer( marker );
+        marker.bindPopup( [% node_name.json %] );
+      }
+    </script>
+  [% ELSIF gmaps_api_key %]
+    <div id="map" style="float:right; width: 300px; height: 200px"></div>
+    <script defer="defer" type="text/javascript">
+    //<![CDATA[
+      var map = new GMap(document.getElementById("map"));
+      map.addControl(new GSmallMapControl());
+      map.centerAndZoom(new GPoint([% wgs84_long %], [% wgs84_lat %]), 3);
+      var point0 = new GPoint([% wgs84_long %], [% wgs84_lat %]);
+      var marker0 = new GMarker(point0,baseIcon);
+      GEvent.addListener(marker0, "click", function() {
+        marker0.openInfoWindowHtml("[% node_name %]");
+        });
+      map.addOverlay(marker0);
+    //]]>
+    </script>
+  [% END %]
+[% END %]
+
+[% INCLUDE node_image.tt %]
+
+[% IF responsive %]
+  </div>
+[% END %]
+
+<div id="node_title">
+[% IF current %]
+  [% IF config.backlinks_in_title AND is_indexable_node %]
+    [% IF index_type == 'category' %]
+      [% params = ';cat=' _ index_value.lower | html %]
+    [% ELSIF index_type == 'locale' %]
+      [% params = ';loc=' _ index_value.lower | html %]
+    [% END %]
+    <h2 class="node_name"><a href="[% cgi_url %]?action=index[% params %]">[% node_name %]</a></h2>
+  [% ELSIF config.backlinks_in_title %]
+    <h2 class="node_name"><a href="[% cgi_url %]?action=show_backlinks;id=[% CGI.escape(node_name) %]">[% node_name %]</a></h2>
+  [% ELSE %]
+    <h2 class="node_name">[% node_name %]</h2>
+  [% END %]
+[% ELSE %]
+  <h2><em>
+  [% IF moderated %]
+    Historical
+  [% ELSE %]
+    Un-moderated
+  [% END %]
+    version [% version %] of
+    <span class="node_name">[% node_name %]</span></em>
+    <span class="current_version_title_link">
+      <a href="[% cgi_url %]?[% node_param %]">(view current version)</a>
+    </span>
+  </h2>
+[% END %]
+[% IF empty_node %]
+</div>
+<div id="nonexistent_node_message">We don't have a node called "[% node_name %]".
+[% UNLESS read_only %]
+Would you like to <a href="[% full_cgi_url %]?action=edit;id=[% node_param %]">create it</a>?
+[% END %]
+</div>
+[% ELSE %]
+<div id="title_edit_link">
+[% UNLESS read_only %]
+<a href="[% full_cgi_url %]?action=edit;id=[% node_param %]">Edit this page</a>
+[% END %]
+</div>
+</div>
+[% INCLUDE display_metadata.tt %]
+
+<!-- NODE CONTENT STARTS -->
+<div id="content_text" class="description">
+[% content %]
+</div>
+<!-- NODE CONTENT ENDS -->
+
+[% TRY %]
+  [% INCLUDE custom_node.tt %]
+[% CATCH %]
+[% END %]
+
+[% INCLUDE node_location_search.tt %]
+
+[% IF (latitude AND longitude) OR (os_x AND os_y) OR (osie_x AND osie_y) %]
+<div id="coordinates" class="geo">
+[% END %]
+[% IF os_x AND os_y %]
+  <small>OS X co-ord: 
+    <abbr class="osgb_x" title="[% CGI.escapeHTML(os_x) %]">[% CGI.escapeHTML(os_x) %]</abbr>
+  </small>
+  &nbsp;&nbsp;&nbsp;
+  <small>OS Y co-ord: 
+    <abbr class="osgb_y" title="[% CGI.escapeHTML(os_y) %]">[% CGI.escapeHTML(os_y) %]</abbr>
+  </small>
+  &nbsp;&nbsp;&nbsp;
+[% ELSIF osie_x AND osie_y %]
+  <small>OS IE X co-ord: 
+    <abbr class="osie_x" title="[% CGI.escapeHTML(osie_x) %]">[% CGI.escapeHTML(osie_x) %]</abbr>
+  </small>
+  &nbsp;&nbsp;&nbsp;
+  <small>OS IE Y co-ord: 
+    <abbr class="osie_y" title="[% CGI.escapeHTML(osie_y) %]">[% CGI.escapeHTML(osie_y) %]</abbr>
+  </small>
+  &nbsp;&nbsp;&nbsp;
+[% END %]
+[% IF latitude AND longitude %]
+  <small>
+    (Latitude: 
+    <!-- titles using the wgs84 versions here are for microformats -->
+    <abbr class="latitude" title="[% wgs84_lat %]">[% latitude %]</abbr>
+	Longitude: 
+	<abbr class="longitude" title="[% wgs84_long %]">[% longitude %]</abbr>)
+  </small>
+[% END %]
+[% IF (latitude AND longitude) OR (os_x AND os_y) OR (osie_x AND osie_y)%]
+</div>
+[% END %]
+
+<div id="version">
+[% IF current %]
+  Last edited [% last_modified %]
+  [% IF version == 1 %]
+    (version [% version %])
+  [% ELSE %]
+    (version [% version %];
+    <a href="[% cgi_url %]?id=[% node_param %];version=[% version - 1 %];diffversion=[% version %]">diff</a>).
+  [% END %]
+[% ELSE %]
+  This is version <span class="version">[% version %]</span> 
+  (as of [% last_modified %]). 
+  <a href="[% cgi_url %]?[% node_param %]">View current version.</a> 
+[% END %]
+[% IF version AND version > 1 %]
+<a href="[% cgi_url %]?action=list_all_versions;id=[% node_param %]">List all
+versions.</a>
+[% END %]
+</div>
+[% END %]
+</div>
+
+[% IF config.content_above_navbar_in_html %]
+  [% INCLUDE navbar.tt %]
+[% END %]
+
+[% INCLUDE footer.tt %]

@@ -1,0 +1,24 @@
+#!/usr/bin/perl -swI.. -I../lib
+##
+## pdataref  - Persistent Data Ref.  Non-OO usage. 
+##
+## $Date: 1998/12/20 17:22:01 $
+## $Revision: 0.10 $
+## $State: Exp $
+## $Author: root $
+##
+## Copyright (c) 1998, Vipul Ved Prakash.  All rights reserved.
+## This code is free software; you can redistribute it and/or modify
+## it under the same terms as Perl itself.
+
+use Persistence::Object::Simple; 
+
+@list = 0..100;
+Persistence::Object::Simple::commit ( undef, __Fn => '/tmp/datarefs/numbers',
+                                          Data => \@list,
+                                    );
+
+$list = Persistence::Object::Simple::load
+            ( undef, __Fn => '/tmp/datarefs/numbers' );
+
+$" = "\n"; print "@$list";                                                        

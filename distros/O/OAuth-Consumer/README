@@ -1,0 +1,434 @@
+NAME
+    OAuth::Consumer - LWP based user agent with OAuth for consumer
+    application
+
+SYNOPSIS
+    OAuth is a protocol to allow a user to authorize an application to
+    access on its behalf ressources on a server without giving its password
+    to the application. To achieve this aim OAuth have a fairly complicated
+    3-steps authentication mechanism which require to user to go to a
+    website to authenticate itself. The authentication response is then
+    sent-back by the user itself through a callback mechanism.
+
+    OAuth::Consumer hide away to complexity of this process, including the
+    set-up of a callback webserver which can be called by the user browser
+    when its authentication is performed.
+
+    This library is oriented toward desktop application, it could possibly
+    be used in a web application but I have not tried it (and the LWP setup
+    may not be the most appropiate in this case).
+
+    Authenticating your application with OAuth to access some user's
+    ressources is a matter of requesting and authorising a *token*. This can
+    be done with the following steps:
+
+      use OAuth::Consumer;
+  
+      my $ua = OAuth::Consumer->new(
+                    oauth_consumer_key => 'key',
+                    oauth_consumer_secret => 'secret'
+                    oauth_request_token_url => 'http://provider/oauth/request_token',
+                    oauth_authorize_url => 'http://provider/oauth/authorize',
+                    oauth_access_token_url => 'http://provider/oauth/access_token'
+            );
+  
+      my $verifer_url = $ua->get_request_token();
+  
+      print "You should authentify yourself at this URL: $verifier_url\n";
+  
+      my ($token, $secret) = $ua->get_access_token()
+
+    At this point, $ua is an OAuth enabled LWP user-agent that you can use
+    to access OAuth protected ressources. You should save the $token and
+    $secret that you got and, in a later session, you may just do the
+    following to gain access to the protected ressources:
+
+      my $ua = OAuth::Consumer->new(
+                    oauth_consumer_key => 'key',
+                    oauth_consumer_secret => 'secret'
+                    oauth_token_=> $token,
+                    oauth_token_secret => $secret
+            );
+
+DESCRIPTION
+    As OAuth::Consumer is a high-level library, this documentation does not
+    describe precisely the OAuth protocol. You may find documentation on
+    this protocol on these websites:
+
+    <http://markdown.io/https://raw.github.com/Dynalon/Rainy/master/docs/OAU
+    TH.md>
+    <http://hueniverse.com/oauth/guide/authentication/>
+    <http://code.google.com/p/oauthconsumer/wiki/UsingOAuthConsumer>
+    <http://tools.ietf.org/html/rfc5849>
+
+CONSTRUCTOR
+      my $ua = OAuth::Consumer->new(%args);
+
+    The OAuth::Consumer constructor gives you an LWP::UserAgent object
+    (well, strictly speaking this is an LWP::Authen::OAuth object, but you
+    should not use directly the method of this module). This object is able
+    to authenticate using the OAuth 1.0 or 1.0a protocol (but not OAuth
+    2.0).
+
+    You can give to the constructor any LWP::UserAgent arguments. The
+    OAuth::Consumer constructor expects some additionnal arguments described
+    here:
+
+    *   "oauth_consumer_key" and "oauth_consumer_secret"
+
+        These values are specific to your application. Depending on the
+        service you are trying to access, you may either choose them
+        arbitrarily, you may be given them by the service provider (e.g. on
+        your application page after registration for Twitter or Google), or
+        they may be fixed to some specific values.
+
+        If you specify nothing, the default value of "anyone" is used for
+        both (some OAuth provider are known to accept this -- e.g. the
+        Tomboy sync service -- this may not be the case of the service you
+        are trying to access).
+
+    *   "oauth_token" and "oauth_token_secret"
+
+        The whole point of the OAuth protocol is for an application to get
+        an access token and an associated secret. The consumer key and
+        secret are associated to an application, but the token and its
+        secret are associated to a specific user of this application.
+
+        If you already have those (e.g. some service provider, like Twitter,
+        will give it to your user on there)
+
+    *   "oauth_request_token_url", "oauth_authorize_url", and
+        "oauth_access_token_url"
+
+        These are the OAuth endpoints. If you already have an "oauth_token"
+        and "oauth_token_secret" then you do not need these endpoints,
+        otherwise they should be provided to you by the service provider.
+
+        Some service provider will provide already authorised tokens and as
+        such will not provide an "oauth_authorize_url". In this case, you
+        should give 'null' for this parameter and use the 'manual' type for
+        "oauth_verifier_type" (see below).
+
+    *   "oauth_version"
+
+        You may specify the oauth version to use. Currently only version
+        '1.0' and '1.0a' are supported by the library. The default is
+        '1.0a', you may need to revert to '1.0' with some server.
+
+    *   "oauth_consumer_signature"
+
+        Only the "HMAC-SHA1" signature mode is supported for now (which
+        happens to be the default value of this option). So you should not
+        use this argument.
+
+    *   "oauth_callback"
+
+        This parameter allows you to specify the where the user will be sent
+        by the service provider once he has authorised your application. If
+        you do not specify anything for this parameter, it default to
+        "http://localhost:port" where "port" is a randomly chosen port where
+        the library will listen for the end of the authorisation procedure.
+
+        You should not overide this value unless you are familiar with the
+        OAuth protocol and you know what you are doing.
+
+        Some service providers (such as Google), allow the special value
+        'oob' (out of band) which will redirect the user to a web page which
+        will show the verifier value. This value may then be passed as
+        parameter to the "get_access_token" method. This 'oob' value is the
+        default when the "oauth_verifier_type" is "manual" (see just below).
+
+    *   "oauth_verifier_type"
+
+        This parameter allows to specify how the verifier code is received
+        by your application. Currently the library support three modes. The
+        default is 'blocking'. In this mode, a call to "get_access_token"
+        will be blocking until the user complete its authentication process
+        at the url given as the result of the "get_request_token" call.
+        During this time, the library will have set up a small web server
+        which will wait to be triggered by the user browser at the end of
+        this authentication.
+
+        If this setting is not working for you, you may use an
+        "oauth_verifier_type" of 'manual'. In this case, no web server is
+        set up by the library and you must supply the *verifier* code
+        manually to the "get_access_token" method. This verifier may be
+        entered by your user (some service provider will show it to your
+        user) or you may read eat programatically (e.g. performing the
+        authorisation process with WWW::Mechanize directed at the URL which
+        is given back by the "get_request_token" method).
+
+        The "manual" mode is the default if you supply an "oauth_callback"
+        argument to the constructor.
+
+        Finally there is the "thread" mode. This mode is similar in
+        functionnalities to the "blocking" mode except that the small web
+        server (which get the result of the authentication) is run in a
+        separate thread. This enable you more flexibilities as you can
+        complete the authentication process (be it by your user or with a
+        programatic method) before calling the "get_access_token".
+        Obviously, you will need a Perl with threads enabled to use this
+        mode.
+
+        You should also note that in "thread" mode the library itself is not
+        thread-safe! It plays with the "ALARM" handler and as such it should
+        be called from the main thread of the program. Also, there may not
+        be multiple concurently running OAuth::Consumer object (that is
+        in-between the "get_request_token" and "get_access_token" call) if
+        you are in "thread" mode.
+
+    *   "oauth_verifier_valid_msg" and "oauth_verifier_invalid_msg"
+
+        You can use these two options to customise the message that the user
+        get after its authentication in the browser. You may either pass a
+        string of text which will be embedded in a small web page, or you
+        may pass a complete web page (which must then start with the
+        "<'<html"'>> tag to be recognised) which will be used as-is. In the
+        later case the argument must be UTF-8 encoded (not in Perl internal
+        string representation) with all HTML entities properly escaped (but
+        no checks at all will be performed on the argument beyond the test
+        for the first tag).
+
+    *   "oauth_verifier_timeout"
+
+        This parameter set the timeout value in the "get_access_token"
+        method call. That is, the time the user have to performs its
+        authentication on the service provider website. This parameter is
+        ignored when "oauth_verifier_type" is "manual".
+
+        The default value is 180 (3 minutes). You may set it to "undef" to
+        completely remove any timeout.
+
+METHODS
+    The methods described here allow you to get an authorised access token
+    and its associated secret. If you already have those (maybe from
+    previous call to these methods) then you do not need them.
+
+    An OAuth::Consumer object is also an LWP::UserAgent object and as such
+    you can use any method of the LWP::UserAgent class with an
+    OAuth::Consumer object. If your object is properly identified you may
+    use it directly (e.g. with its "get" or "post" method) to access OAuth
+    protected ressources (that is, directly after it is constructed if you
+    provided valid "oauth_token" and "oauth_token_secret" to the
+    constructor, or after a call to "get_request_token"/"get_access_token"
+    if you need a new token).
+
+  get_request_token
+      my $verifer_url = $ua->get_request_token(%args)
+
+    This call initiates a new authorisation procedure. It does not expect
+    any arguments but you can provide any additionnal OAuth argument
+    required by your service provider. Example of such argument are
+    "xoauth_displayname", "scope", or "realm". You should look at the
+    documentation of your service provider to know which arguments it
+    expects. These arguments will be added as POST arguments in the OAuth
+    query. If you need to pass them as GET arguments (in the url of the
+    query), then you should modify yourself the "oauth_request_token_url"
+    that you give to the constructor of the class.
+
+    On success, this method returns a string containing an URL to which the
+    application user should be directed to authorise your application to
+    access to the service provider on behalf of this user. At the end of its
+    authorisation the user's browser will be automatically redirected to a
+    small web server set up by the library. This web server will
+    automatically read the "verifier" code that is given by the service
+    provider.
+
+    You may also use this "verifer_url" to programatically authorise your
+    request (e.g. with WWW::Mechanize).
+
+    Finally, if your service provider does not need you to authenticate your
+    token then the return value may be ignored and you may directly call the
+    "get_access_token" method. In that case you must set the
+    "oauth_verifier_type" to "manual" to prevent the application from
+    blocking.
+
+    The method will "croak" in case of error.
+
+  get_access_token
+      my ($token, $secret) = $ua->get_access_token(%args)
+
+    Once you have redirected your user to the verifier url, you can call
+    this method. It will block until the user finishes authenticating itself
+    on the service provider's website. If this process takes more time than
+    the value of the "oauth_verifier_timeout" parameter (in the constructor)
+    then the method will croak with the following message: 'Timeout error
+    while waiting for a callback connection'. You can trap this error (with
+    "eval") and, optionnaly, restart the call to "get_access_token" (which
+    will wait for the same duration) if the "oauth_verifier_type" is
+    "blocking" (you may not call this function more than once per call to
+    "get_request_token" in "thread" mode).
+
+    If the "oauth_verifier_type" parameter is 'blocking' you must call this
+    function as soon as you have instructed your user to authenticate at the
+    *verifier* URL.
+
+    If the "oauth_verifier_type" parameter is 'manual' then this function
+    will not block. But then you *must* specify an "oauth_verifier" named
+    argument to this function with its value being the value of the verifier
+    that you got (your user may have entered it in your application if your
+    using out-of-bound verification).
+
+    If your service provider does not require you to verify the request
+    token (and as such did not give you an "oauth_authorize_url"). You must
+    use 'manual' mode with a dummy "oauth_authorize_url" in the constructor
+    and you should pass an empty value to the "oauth_verifier" argument of
+    this method.
+
+    All other arguments in the %args hash will be passed with the *access
+    token* query. To the author knowledge, no service providers require any
+    arguments with this query (as opposed to the *request token* query).
+
+    Finally, this function plays with the "alarm" function and associated
+    handler. So you should not rely on alarm handler set accross this
+    function call.
+
+EXAMPLES
+  Getting an access token and secret
+    Here are the steps to follow to request an access token from a ressource
+    provider. To achieve this, you need the 3 endpoints URL that should be
+    described in the documentation of the API of the provider. You also need
+    a consumer key and secret. Depending on the provider and the service,
+    these value may be fixed to a specific value or you may need to register
+    your application at the provider website to get them.
+
+    Some providers require extra arguments for the "get_request_token" call.
+    These arguments are not mendatory in the OAuth specification but you
+    should check the API documentation of your service provider to know what
+    it expects.
+
+      my $ua = OAuth::Consumer->new(
+            oauth_consumer_key      => 'my-consumer-key',
+            oauth_consumer_secret   => 'my-consumer-secret',
+            oauth_request_token_url => 'http://oauth-provider.example.com/request_token',
+            oauth_access_token_url  => 'http://oauth-provider.example.com/access_token',
+            oauth_authorize_url     => 'http://oauth-provider.example.com/authorize',
+      );
+  
+      my $verifier_url = $ua->get_request_token(
+            scope              => 'http://oauth-provider.example.com/scope1',
+            xoauth_displayname => 'My Application Name'
+      );
+  
+      # Send your user to $verifier_url to authenticate or use a WWW::Mechanize
+      # robot to performs the authentication programatically. In this later case,
+      # you should use the "oauth_verifier_type => thread" argument in the call to
+      # new to ensure that the authentication can terminate before the call to
+      # get_access_token.
+  
+      my ($token, $secret) = $ua->get_access_token();
+  
+      $r = $ua->get('http://oauth-provider.example.com/protected_ressource');
+
+    At the end of this procedure you should store the $token and $secret
+    values as they should remains valid (usually service providers do not
+    expire those). You can then use them directly in a future session.
+
+  Getting an access token and secret with out-of-bound (OOB) verifier
+    If your service provider will not redirect your user to OAuth::Consumer
+    validation page, or if it is not feasible to ask the user to use his
+    browser on the same machine as where the program is running, you may use
+    out-of-bound verification where the user will be shown the verification
+    code and can then enter it in your application.
+
+    Not all service provider support the "oob" callback scheme, so the
+    example below may not work correctly. An alternative is to redirect the
+    user to a web page that you control and that will show the user the
+    verification code. Some practice about this are discussed on this web
+    page:
+    <https://sites.google.com/site/oauthgoog/oauth-practices/auto-detecting-
+    approval>.
+
+      my $ua = OAuth::Consumer->new(
+            oauth_consumer_key      => 'my-consumer-key',
+            oauth_consumer_secret   => 'my-consumer-secret',
+            oauth_verifier_type     => 'manual',
+            oauth_request_token_url => 'http://oauth-provider.example.com/request_token',
+            oauth_access_token_url  => 'http://oauth-provider.example.com/access_token',
+            oauth_authorize_url     => 'http://oauth-provider.example.com/authorize',
+      );
+  
+      my $verifier_url = $ua->get_request_token();
+  
+      print "Please, authenticate yourself at: $verifier_url\n";
+      print "Type in the verification code that you got: ";
+      my $verifier = <STDIN>;
+  
+      my ($token, $secret) = $ua->get_access_token(oauth_verifier => $verifier);
+  
+      $r = $ua->get('http://oauth-provider.example.com/protected_ressource');
+
+    Be carefull that a verifier URL may not remain valid for a long time
+    (usual expiration time is around an hour).
+
+  Using an access token and secret
+    If you saved your user specific access token and secret from a previous
+    session or if your service provider does not allow for the
+    authentication procedure and, instead, gives directly the token and its
+    secret to your user on some web page (e.g. this is what Twitter does),
+    then you can directly use these value in the constructor of the
+    OAuth::Consumer object and completely skip the authentication procedure.
+
+      my $ua = OAuth::Consumer->new(
+            oauth_consumer_key      => 'my-consumer-key',
+            oauth_consumer_secret   => 'my-consumer-secret',
+            oauth_token             => $token,
+            oauth_token_secret      => $secret
+      );
+  
+      $r = $ua->get('http://oauth-provider.example.com/protected_ressource');
+
+    However, you should check your response code in case the token has been
+    revoked or has expired (in which cases you will probably get a status
+    code of 401 or 403, but some servers return a 500 status code).
+
+  Two-legged request (tokenless or consumer mode)
+    Some service provider only require a your consumer key to authorise the
+    access to some protected ressource. This is called two-legged request
+    (as opposed to the normal three-legged mode) or tokenless mode.
+
+    In this case, once you got your consumer key and secret (probably from
+    your application page on the service provider website) you can just use
+    those to access protected ressource.
+
+      my $ua = OAuth::Consumer->new(
+            oauth_consumer_key      => 'my-consumer-key',
+            oauth_consumer_secret   => 'my-consumer-secret',
+      );
+  
+      $r = $ua->get('http://oauth-provider.example.com/two-legged_ressource');
+
+CAVEATS
+    *   Currently only the OAuth 1.0 and 1.0a are supported. The OAuth 2.0
+        protocol is quiet different from the 1.0 version (and varies greatly
+        from one service provider to an other) so there is no plan currently
+        to upgrade thise library to it.
+
+    *   Only the "HMAC-SHA1" signature mode is supported in the OAuth
+        message. This is partly due to the fact that this is the only mode
+        supported by the LWP::Authen::OAuth library from which
+        OAuth::Consumer is inheriting and also to the fact that this mode is
+        supported by all major OAuth enabled service provider. Let me know
+        if you need another signature mode.
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-oauth-consumer@rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=OAuth-Consumer>.
+
+SEE ALSO
+    LWP::Authen::OAuth, LWP::UserAgent, OAuth::Simple, Net::OAuth,
+    OAuth::Lite, Net::OAuth::Simple, OAuth::Lite::Consumer
+
+AUTHOR
+    Mathias Kende (mathias@cpan.org)
+
+VERSION
+    Version 0.03 (March 2013)
+
+COPYRIGHT & LICENSE
+    Copyright 2013 © Mathias Kende. All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

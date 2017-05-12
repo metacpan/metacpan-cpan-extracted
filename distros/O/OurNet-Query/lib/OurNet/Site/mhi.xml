@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<SITE ID="Mhi">
+
+<NAME Lang="en-us">Medical Library Search Engine for Patients</NAME>
+<INFO Lang="en-us">medicine and health documents search</INFO>
+
+<URL Type="Start"><![CDATA[
+http://www.medhelp.org/mhli/search6.exe?jstart=1&keywords=_QUERY_&Submit=Submit
+]]></URL>
+
+
+
+<TEMPLATE><![CDATA[
+<LI> <A HREF="_URL_">_TITLE_</A>_PREVIEW_</LI>
+]]></TEMPLATE>
+</SITE>

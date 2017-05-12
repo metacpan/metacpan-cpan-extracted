@@ -1,0 +1,23 @@
+[%########################################
+  table_bordered_begin( table_width, bgcolor, border_width,
+                        inner_border_width, border_color)
+     Begin a bordered table. Border color is set in theme, just pass
+     in the table width (no default) and border width (in pixels, default: 2)
+  ########################################-%]
+
+[%- DEFAULT theme              = OI.theme_properties; 
+    DEFAULT border_width       = 2; 
+    DEFAULT inner_border_width = 0; 
+    DEFAULT border_color       = theme.border_color;
+    DEFAULT bgcolor            = theme.bgcolor;
+    DEFAULT internal_padding   = 5;
+    SET internal_padding = '0' IF internal_padding == 'none';
+    SET width = ( table_width ) ? "width='$table_width'" : '' -%]
+<table border="0" cellspacing="0" [% width -%]
+       bgcolor="[% border_color %]" 
+       cellpadding="[% border_width %]">
+<tr><td>
+
+  <table border="[% inner_border_width %]" width="100%"          
+         cellpadding="[% internal_padding %]" cellspacing="0"
+         bgcolor="[% bgcolor %]">

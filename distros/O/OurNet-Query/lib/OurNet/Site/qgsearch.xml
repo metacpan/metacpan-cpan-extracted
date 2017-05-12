@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<SITE ID="QGSearch">
+
+<NAME Lang="en-us">Quest Game Wizard</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+Quest Game ¹CÀ¸ºëÆF
+]]></NAME>
+<INFO Lang="en-us">fantastic game information search</INFO>
+<INFO Lang="zh-tw">fantastic game information search</INFO>
+
+<URL Type="Start"><![CDATA[
+http://quest.in2000.com/qgchk.asp?key=_QUERY_
+]]></URL>
+
+
+
+<TEMPLATE><![CDATA[
+<A HREF="_URL_">_TITLE_</A>___<LI>_PREVIEW_<LI>_SCORE_%<LI>_DATE_</UL>
+]]></TEMPLATE>
+</SITE>

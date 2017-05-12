@@ -1,0 +1,18 @@
+
+ To install the OpenGL::Shader module, please follow these instructions:
+
+ 1. Install the OpenGL module first - you need at least version 0.55
+    See the Perl OpenGL (POGL) Developer's Site:
+    http://graphcomp.com/opengl
+ 
+ 2. Run 'perl Makefile.PL'
+
+ 3. Run 'make' ('nmake' on Windows).
+ 
+ 4. Run 'make test' ('nmake test' on Windows).
+    Note: to run this test, you must have GLUT installed, and be able to create
+    a GL context (window).
+ 
+ 5. If all is well, run 'sudo make install' ('nmake install' on Windows)
+    to install OpenGL::Shader on your system.
+

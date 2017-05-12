@@ -1,0 +1,21 @@
+Revision history for Perl module Object::Dependency
+
+0.41 2014/03/14
+
+ - Doc fixes
+ - added stuck.t
+ - added dump_graph_string
+ - unlock no longer clears active flag
+ - new dependencies no longer clear active flag
+ - rework stuck dependencies code, add tests
+ - added more tests, updated documenation
+
+0.32 2011/06/28
+
+ - Added is_dependency()
+
+0.31 2010/07/23
+
+ - Object::Dependency split off from Proc::JobQueue.
+   Allow non-objects (but not undef).
+

@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<SITE ID="Todo">
+
+<NAME Lang="en-us">ToGet-PC home Software Bank</NAME>
+<INFO Lang="en-us">general sharewares to download</INFO>
+
+<URL Type="More"><![CDATA[
+http://www.todo.com.tw_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://www.toget.com.tw/cgi-bin/download/search.pl?searchterm=_QUERY_&methodx=Keyword
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_NEXT_"><![CDATA[
+<a href="_NEXT_">下 20
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+-標題>_TITLE_</b>___-引言>_PREVIEW_<a href=_URL_>
+]]></TEMPLATE>
+</SITE>

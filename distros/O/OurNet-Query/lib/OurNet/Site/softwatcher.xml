@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<SITE ID="SoftWatcher">
+
+<NAME Lang="en-us">SoftWatcher Software search</NAME>
+<INFO Lang="en-us">software and files download</INFO>
+
+<URL Type="Start"><![CDATA[
+post://www.softwatcher.com/pc/action.lasso?-search?-db=softwatcher&-lay=find&-response=%2Fpc%2Fsearch.lasso&-maxrecords=25&-sortfield=company&-sortfield=product&-sortfield=version&-sortorder=descending&-noresults=%2Fpc%2Fsearch2.lasso&platform=pc&-operator=cn&search=_QUERY_&-skiprecords=_START_25_
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+
+<TEMPLATE><![CDATA[
+<td width="380">___return true" target="_blank">_TITLE_</b></a></font>___<a href="_URL_"___">_SIZEK_k___Geneva, Helvetica" size="2">&nbsp;&nbsp;_PREVIEW_</font></td>
+]]></TEMPLATE>
+</SITE>

@@ -1,0 +1,15 @@
+select * from sysmaster:"informix".sysptprof
+where dbsname != 'sysmaster'
+   and (lockreqs != 0
+     or lockwts != 0
+     or deadlks != 0
+     or lktouts != 0
+     or isreads != 0
+     or iswrites != 0
+     or isrewrites != 0
+     or isdeletes != 0
+     or bufreads != 0
+     or bufwrites != 0
+     or seqscans != 0
+     or pagreads != 0
+     or pagwrites != 0)

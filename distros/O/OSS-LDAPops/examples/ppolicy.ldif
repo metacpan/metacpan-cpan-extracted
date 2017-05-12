@@ -1,0 +1,24 @@
+# people, auth.example.net
+dn: ou=pwpolicies,dc=auth,dc=example,dc=net
+ou: pwpolicies
+objectClass: top
+objectClass: organizationalUnit
+dn: cn=default,ou=pwpolicies,dc=auth,dc=example,dc=net
+objectclass: device
+objectClass: pwdPolicy
+objectClass: pwdPolicyChecker
+cn: default
+#pwdMaxAge: 0
+#pwdExpireWarning: 0
+#pwdInHistory: 0
+#pwdCheckQuality: 0
+#pwdMaxFailure: 0
+#pwdLockout: FALSE
+#pwdLockoutDuration: 0
+#pwdGraceAuthNLimit: 0
+#pwdFailureCountInterval: 0
+#pwdMustChange: FALSE
+pwdMinLength: 6
+pwdAllowUserChange: TRUE
+#pwdSafeModify: FALSE
+pwdAttribute: 2.5.4.35

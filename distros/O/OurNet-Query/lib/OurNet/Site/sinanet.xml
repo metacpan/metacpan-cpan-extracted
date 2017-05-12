@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<SITE ID="Sinanet">
+
+<NAME Lang="en-us">Sina Net Search</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+My Sina做自己-搜尋引擎(繁體)
+]]></NAME>
+<INFO Lang="en-us">general information web search in Traditional Chinese</INFO>
+<INFO Lang="zh-tw">general information web search in Traditional Chinese</INFO>
+
+<URL Type="More"><![CDATA[
+http://ipoinc2.sinanet.com_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://ipoinc2.sinanet.com/ipo-cgi/iposearchsnn?web=sites&db=ALL&code=1&trans=1&theColls=++&terms=_QUERY_&vers=15239
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_NEXT_"><![CDATA[
+<A HREF="_NEXT_">&nbsp Next
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<DT>___<A HREF="_URL_" >_TITLE_</A>___<DD>_PREVIEW_<IMG ALIGN=MIDDLE
+]]></TEMPLATE>
+</SITE>

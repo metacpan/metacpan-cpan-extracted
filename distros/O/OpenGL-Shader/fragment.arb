@@ -1,0 +1,8 @@
+!!ARBfp1.0
+TEMP color;
+MUL color, fragment.texcoord[0].y, 2;
+ADD color, 1, -color;
+ABS color, color;
+ADD result.color, 1.01, -color;
+MOV result.color.a, 1;
+END

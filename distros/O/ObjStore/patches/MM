@@ -1,0 +1,73 @@
+makemaker@franz.ww.tu-berlin.de
+
+This patch allows an extension to link & test against a shared
+library that it itself builds.  Can this be included in the upcoming
+5.005 release?  I am not subscribed to the makemaker list.  Should I
+CC to p5p?
+
+Index: lib/ExtUtils/Liblist.pm
+####### src/ => src
+--- perl5.004_70//lib/ExtUtils/Liblist.pm	Tue Jun  9 23:46:40 1998
++++ src/lib/ExtUtils/Liblist.pm	Tue Jul  7 17:16:43 1998
+@@ -68,6 +68,20 @@
+ 	  next;
+ 	}
+ 
++	# Does this extension build shared libraries that it
++	# also links against?
++	if ($self->{BLIB_LIBS} and $self->{BLIB_LIBS}{"-l$thislib"}) {
++	    my @L = @{$self->{BLIB_LIBS}{"-l$thislib"}};
++	    for (@L) { s/^-[LR]// }
++	    warn "'-l$thislib' will be built in $L[0]\n\tand installed in $L[1]\n"
++		if $verbose;
++	    $found++;
++	    push @ldloadlibs, "-L$L[0]", "-l$thislib";
++	    push @extralibs, "-L$L[1]";
++	    push @ld_run_path, $L[1] unless $ld_run_path_seen{ $L[1] }++;
++	    next;
++	}
++
+ 	my($found_lib)=0;
+ 	foreach $thispth (@searchpath, @libpath){
+ 
+Index: lib/ExtUtils/MM_Unix.pm
+Prereq:  1.126 
+####### src/ => src
+--- perl5.004_70//lib/ExtUtils/MM_Unix.pm	Mon Jul  6 04:03:30 1998
++++ src/lib/ExtUtils/MM_Unix.pm	Tue Jul  7 17:18:18 1998
+@@ -491,7 +491,7 @@
+ };
+     my($tmp);
+     for $tmp (qw/
+-	 EXTRALIBS LDLOADLIBS BSLOADLIBS LD_RUN_PATH
++        EXTRALIBS LDLOADLIBS BSLOADLIBS LD_RUN_PATH TEST_DL_OVERRIDE
+ 	 /) {
+ 	next unless defined $self->{$tmp};
+ 	push @m, "$tmp = $self->{$tmp}\n";
+@@ -1883,6 +1883,8 @@
+ 	    last;
+ 	}
+     }
++    $self->{TEST_DL_OVERRIDE} ||= "LD_LIBRARY_PATH=".
++	$self->catdir(qw/ $(INST_ARCHLIB) auto $(FULLEXT) /);
+ 
+     if ( $self->{OBJECT} ) {
+ 	$self->{OBJECT} =~ s!\.o(bj)?\b!\$(OBJ_EXT)!g;
+@@ -3156,7 +3158,7 @@
+ 
+ sub test_via_harness {
+     my($self, $perl, $tests) = @_;
+-    $perl = "PERL_DL_NONLAZY=1 $perl" unless $Is_Win32;
++    $perl = "PERL_DL_NONLAZY=1 \$(TEST_DL_OVERRIDE) $perl" unless $Is_Win32;
+     "\t$perl".q! -I$(INST_ARCHLIB) -I$(INST_LIB) -I$(PERL_ARCHLIB) -I$(PERL_LIB) -e 'use Test::Harness qw(&runtests $$verbose); $$verbose=$(TEST_VERBOSE); runtests @ARGV;' !."$tests\n";
+ }
+ 
+@@ -3168,7 +3170,7 @@
+ 
+ sub test_via_script {
+     my($self, $perl, $script) = @_;
+-    $perl = "PERL_DL_NONLAZY=1 $perl" unless $Is_Win32;
++    $perl = "PERL_DL_NONLAZY=1 \$(TEST_DL_OVERRIDE) $perl" unless $Is_Win32;
+     qq{\t$perl}.q{ -I$(INST_ARCHLIB) -I$(INST_LIB) -I$(PERL_ARCHLIB) -I$(PERL_LIB) }.qq{$script
+ };
+ }

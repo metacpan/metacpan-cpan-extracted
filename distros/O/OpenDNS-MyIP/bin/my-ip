@@ -1,0 +1,37 @@
+#!/usr/bin/perl
+# ABSTRACT: Get your public IP address
+# PODNAME: my-ip
+
+use strict;
+use warnings;
+
+use OpenDNS::MyIP qw(get_ip);
+
+print get_ip()."\n";
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+my-ip - Get your public IP address
+
+=head1 VERSION
+
+version 1.152350
+
+=head1 AUTHOR
+
+Petr Kletecka <pek@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Petr Kletecka.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

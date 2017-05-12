@@ -1,0 +1,24 @@
+Changes.txt
+MANIFEST			This list of files
+Makefile.PL
+OLD_INSTALL
+README.txt
+ogreal-r130.diff
+typemap
+examples/README.txt
+examples/basic.pl
+examples/directional.pl
+examples/doppler.pl
+examples/multichannel.pl
+examples/resources.cfg
+lib/Ogre/AL.pm
+lib/Ogre/AL/Listener.pm
+lib/Ogre/AL/Sound.pm
+lib/Ogre/AL/SoundManager.pm
+perlOgreAL.h
+AL.xs
+xs/Listener.xs
+xs/Sound.xs
+xs/SoundManager.xs
+t/000_use.t
+META.yml                                 Module meta-data (added by MakeMaker)

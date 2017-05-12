@@ -1,0 +1,197 @@
+#!/usr/bin/perl
+###################################################################################################
+# Copyright 2013/2014 by Marcel Greter
+# This file is part of OCBNET-WebSprite (GPL3)
+####################################################################################################
+
+use strict;
+use warnings;
+
+# load modules
+use Pod::Usage;
+use Getopt::Long;
+use File::Slurp;
+use File::chdir;
+use File::Basename;
+
+# load the main websprite module
+use OCBNET::CSS3::Styles::WebSprite;
+
+###################################################################################################
+
+# load 3rd party module
+use File::Which qw(which);
+
+# override core glob (case insensitive)
+use File::Glob qw(:globally :nocase bsd_glob);
+
+###################################################################################################
+
+# define a sub to print out the version and exit
+sub version { print "spriteset $OCBNET::WebSprite::VERSION (CSS sprite-set generator) [Perl]"; exit 0; };
+
+###################################################################################################
+
+# init options
+my $debug = 0;
+my $compress = 0;
+
+# get options
+GetOptions (
+	'compress|x:i' => \$compress,
+	'help|h' => sub { pod2usage(1); },
+	'version|v' => \ &version,
+	'debug|d:i' => \ $debug,
+);
+
+# initialize options if they are not defined
+# $debug = defined $debug && $debug == 0 ? 1 : $debug || 0;
+# $compress = defined $compress && $compress == 0 ? 1 : $compress || 0;
+
+###################################################################################################
+# calulcate value from opimizer range
+###################################################################################################
+
+sub range
+{
+	# get options for range calculation
+	my ($value, $from, $to, $max) = @_;
+	# expand/contract from 0-9 into from-to range
+	my $val = int(($to - $from) / 9 * $value + $from + 0.5);
+	# assert for range maximum
+	return $val < $max ? $val : $max;
+}
+
+###################################################################################################
+# get commandline argument for optimizers
+###################################################################################################
+
+sub cmdline
+{
+	if ($_[0] eq 'optipng')
+	{
+		# get the optimization level (1 to 9)
+		my $olvl = range($compress, 0.5, 6.5, 9);
+		# return commandline for process
+		return sprintf("%s -o%d --quiet \"%s\"", $_[1], $olvl, $_[2]);
+	}
+	elsif ($_[0] eq 'advpng')
+	{
+		# get the optimization level (1 to 4)
+		my $lvl = range($compress, 1, 5, 4);
+		# return commandline for process
+		return sprintf("%s -z -%d --quiet \"%s\"", $_[1], $lvl, $_[2]);
+	}
+	elsif ($_[0] eq 'advdef')
+	{
+		# get the optimization level (1 to 4)
+		my $lvl = range($compress, 1, 5, 4);
+		# return commandline for process
+		return sprintf("%s -z -%d --quiet \"%s\"", $_[1], $lvl, $_[2]);
+	}
+}
+
+###################################################################################################
+# main program - execute websprite
+###################################################################################################
+
+# main program variables
+my $css; my $files = [];
+
+# create the main websprite object
+my $spriteset = OCBNET::WebSprite->new;
+
+# process css files
+if (scalar(@ARGV))
+{
+	# process all input files
+	foreach my $file (@ARGV)
+	{
+		# read file from given filepath
+		# relative to current directory
+		my $data = read_file($file);
+		# change current directory
+		# urls are relative to css
+		$CWD = dirname $file;
+		# pass the whole file data and process
+		$css = $spriteset->create(\ $data, $files);
+	}
+}
+# or from stdin
+else
+{
+	# read the whole stdin into memory and process
+	$css = $spriteset->create(join("", <>), $files);
+}
+
+###################################################################################################
+# after main program - compress sprites
+###################################################################################################
+
+if ($compress)
+{
+	# maybe do mutliple optimization runs
+	# will call optimizers after each other
+	my $redo = 1;
+	# search for an optimizer program
+	foreach my $exe ('optipng', 'advpng', 'advdef')
+	{
+		# use which or glob to find the executable
+		my @exes = which($exe) || bsd_glob($exe);
+		# test if we have a valid result that exists and is executable
+		next unless scalar @exes == 1 && -e $exes[0] && -x _ && ! -d _;
+		# found a optimizer program
+		foreach my $path (@{$files})
+		{
+			# get the command line string for execution
+			my $cmdline = cmdline($exe, $exes[0], $path);
+			# print command line on debug
+			warn $cmdline if $debug;
+			# execute the command line string (only warn on error)
+			system $cmdline and warn "error executing $cmdline";
+		}
+		# execute more optimizers?
+		last if $redo -- > 0;
+	}
+	# EO each possible optimizer
+}
+
+###################################################################################################
+# finally output the new css
+###################################################################################################
+
+print $css->render;
+
+####################################################################################################
+####################################################################################################
+
+__END__
+
+=head1 NAME
+
+spriteset - CSS spriteset generator
+
+=head1 SYNOPSIS
+
+spriteset [options] [filepath]
+
+ Options:
+   -v, --version      print version
+   -h, --help         print this help
+   -x, --compress=[0-9]     compress spritesets
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-help>
+
+Print a brief help message with options and exits.
+
+=back
+
+=head1 DESCRIPTION
+
+B<This program> is a CSS spriteset generator from annotated css.
+
+=cut

@@ -1,0 +1,24 @@
+<div align="center">
+
+<h1>File not found</h1>
+
+<table width="50%" border="0" cellpadding="5" cellspacing="0">
+
+<tr><td align="left">
+The URL you entered does not correspond to a page currently on
+this website. Please check the url and try again. 
+</td></tr>
+
+<tr><td align="right">Sincerely,<br>
+The Management
+</td></tr>
+
+[% IF err.referer %]
+<tr><td>
+ <a href="[% err.referer %]">Back</a> to the page that brought you here
+</td></tr>
+[% END %]
+
+</table>
+
+</div>

@@ -1,0 +1,11 @@
+# $File: //depot/OurNet-BBSAgent/BBSAgent/bandplaza.bbs $ $Author: autrijus $
+# $Revision: #3 $ $Change: 2829 $ $DateTime: 2002/01/10 14:54:36 $
+# Contributed by Autrijus Tang <autrijus@autrijus.org>
+# zh_TW.Big5: 台灣音樂革命軍
+
+Band Plaza
+bbs.bandplaza.com
+
+load melix.board
+load melix.session
+load melix.user

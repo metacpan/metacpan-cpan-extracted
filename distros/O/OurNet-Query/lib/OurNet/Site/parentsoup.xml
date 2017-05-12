@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<SITE ID="Parentsoup">
+
+<NAME Lang="en-us">Parent Soup Search</NAME>
+<INFO Lang="en-us">babysitting and parenting relevant documents search</INFO>
+
+<URL Type="More"><![CDATA[
+_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://search.ivillage.com/cgi-bin/search?Action=Search&ServerKey=Primary&ResultTemplate=psoup.hts&SearchPage=%2Fsearch97%2Fsamples%2Fforms%2Fpsoup.htm&Company=Parent+Soup&queryText=_QUERY_&Collection=ParentSoup-Parentsoup
+]]></URL>
+
+<SCORE>_SCORE_*100</SCORE>
+
+<VAR Name="_NEXT_"><![CDATA[
+<A HREF="_NEXT_">[Next]
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<br>(_SCORE_)___<a href="_URL_">_TITLE_</a>___&nbsp;_PREVIEW_<br>___<center>_SIZEK_k</center>
+]]></TEMPLATE>
+</SITE>

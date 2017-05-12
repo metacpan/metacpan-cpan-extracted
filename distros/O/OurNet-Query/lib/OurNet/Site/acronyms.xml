@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<SITE ID="Acronyms">
+
+<NAME Lang="en-us">Acronyms</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+Acronyms ­^¤åÁY¼g¡BÂ²¼g¦r¬d¸ß
+]]></NAME>
+<INFO Lang="en-us">acronyms and abbreviations query</INFO>
+<INFO Lang="zh-tw">acronyms and abbreviations query</INFO>
+
+<URL Type="Start"><![CDATA[
+http://www.ucc.ie/cgi-bin/acronym?_QUERY_
+]]></URL>
+
+
+
+<TEMPLATE><![CDATA[
+<dt><b><a href="_URL_">_TITLE_</a>_PREVIEW_</dd>
+]]></TEMPLATE>
+</SITE>

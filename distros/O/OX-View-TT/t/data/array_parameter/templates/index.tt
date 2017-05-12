@@ -1,0 +1,8 @@
+<b>[% content %]</b>
+<p>[% some_scalar %]</p>
+[% FOREACH elem IN  some_array %]
+<span>[% elem %]</span>
+[% END %]
+[% FOREACH elem IN  other_array %]
+<span>[% elem %]</span>
+[% END %]

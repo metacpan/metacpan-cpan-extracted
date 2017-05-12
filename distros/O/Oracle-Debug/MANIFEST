@@ -1,0 +1,23 @@
+# $Id: MANIFEST,v 1.13 2003/07/30 15:25:11 oradb Exp $
+
+Changes
+README
+INSTALL
+Makefile.PL
+MANIFEST
+Oracle/Debug.pm
+demo/oradb
+packages/compile.sql
+packages/body.sql
+packages/function.sql
+packages/header.sql
+packages/package.sql
+packages/procedure.sql
+packages/xrun.sql
+packages/table.sql
+packages/trigger.sql
+scripts/config
+scripts/debug
+scripts/target
+t/oradb.t
+

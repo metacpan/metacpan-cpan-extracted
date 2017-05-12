@@ -1,0 +1,18 @@
+Revision history for OpenOffice-Wordlist
+
+0.04	2010-05-22
+
+	New dist after fixing some test errors.
+
+0.03	2010-05-17
+	Include test files ;)
+
+0.02	2010-05-16
+	Fix problem with utf-8 coding and length prefix.
+	Add main section to be called if no caller.
+	Add some examples programs.
+	More tests, fix docs.
+
+0.01    2010-05-15
+        First version, released on an unsuspecting world.
+

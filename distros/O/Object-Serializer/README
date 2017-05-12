@@ -1,0 +1,90 @@
+NAME
+    Object::Serializer - General Purpose Object Serializer
+
+VERSION
+    version 0.000011
+
+SYNOPSIS
+        package Point;
+
+        use Moo;
+        use parent 'Object::Serializer';
+
+        has 'x' => (is => 'rw');
+        has 'y' => (is => 'rw');
+
+        package main;
+
+        my $point = Point->new(x => 10, y => 10);
+
+        # serialize the class instance into a hash
+        my $hash = $point->serialize; # { __CLASS__ => 'Point', x => 10, y => 10 }
+
+DESCRIPTION
+    Getting objects into an ideal format for passing representations in and
+    out of applications can be a real pain. Object::Serializer is a fast and
+    simple pure-perl framework-agnostic type-less none-opinionated
+    light-weight primitive general purpose object serializer which tries to
+    help make object serialization easier. This module is useful in
+    situations when you have blessed objects you wish to produce hash
+    representations from which you can store directly or convert to JSON,
+    YAML, or XML. This module does not currently support deserialization.
+
+METHODS
+  serialize
+    The serialize method expects an object and returns a serialized
+    (hashified) version of that object.
+
+        my $hash = $self->serialize;
+        my $hash = $self->serialize($object);
+        my $hash = $self->serialize($object, marker => undef); # no marker
+
+  serialization_strategy_for
+    The serialization_strategy_for method expects a reftype and a
+    sub-routine. This method registers a custom serialization strategy which
+    will be used during the collapsing of the reference type specified.
+
+        CLASS->serialization_strategy_for(
+            REFTYPE => sub { ... }
+        );
+
+EXTENSION
+    Object::Serializer can be used as a serializer independently, however,
+    it is primarily designed to be used as a base class for your classes or
+    roles. By default, Object::Serializer doesn't do anything special for
+    you in the way of serialization, in-fact, it is little more than a
+    wrapper around Data::Dumper. Additionally, you can hook into the
+    serialization process by defining your serialization strategy using your
+    own custom serialization routines which will be executed whenever a
+    specific reference type is encountered. The following syntax is what you
+    might use to register your own custom serialization strategy. This
+    example registers a custom serializer that is executed globally whenever
+    a DateTime object is found.
+
+        Object::Serializer->serialization_strategy_for(
+            DateTime => sub { pop->iso8601 }
+        );
+
+    Additionally, you can register a serialization strategy to be used only
+    when invoked by a specific class. The following syntax is what you might
+    use to register a serialization strategy to be executed only for a
+    specific class:
+
+        Point->serialization_strategy_for(
+            DateTime => sub { pop->iso8601 }
+        );
+
+CAVEATS
+    Circular references are problematic and should be avoided, you can
+    weaken or otherwise handle them yourself then re-assemble them later as
+    a means toward getting around this.
+
+AUTHOR
+    Al Newkirk <anewkirk@ana.io>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Al Newkirk.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

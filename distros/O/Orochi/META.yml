@@ -1,0 +1,34 @@
+---
+abstract: 'A DI Container For Perl'
+author:
+  - 'Daisuke Maki C<< <daisuke@endeworks.jp> >>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::MockObject: 0
+  Test::More: 0.88
+  UNIVERSAL::can: 0
+  UNIVERSAL::isa: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Orochi
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Data::Visitor: 0
+  Module::Pluggable: 0
+  Moose: 0.93_01
+  Path::Router: 0
+  Sub::Exporter: 0
+  namespace::clean: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/lestrrat/Orochi.git
+version: 0.00010

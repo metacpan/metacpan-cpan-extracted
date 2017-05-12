@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<SITE ID="PC_World.Article">
+
+<NAME Lang="en-us">PC World</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+PC World¤å¥óÀË¯Á
+]]></NAME>
+<INFO Lang="en-us">computer relevant documents search</INFO>
+<INFO Lang="zh-tw">computer relevant documents search</INFO>
+
+<URL Type="Start"><![CDATA[
+post://www.pcworld.com/cgi-bin/excite/AT-site_articlessearch.cgi?search=_QUERY_&mode=concept
+]]></URL>
+
+
+
+<TEMPLATE><![CDATA[
+<img border=0 src=___>_SCORE_%_<A HREF="_URL_">_TITLE
+]]></TEMPLATE>
+</SITE>

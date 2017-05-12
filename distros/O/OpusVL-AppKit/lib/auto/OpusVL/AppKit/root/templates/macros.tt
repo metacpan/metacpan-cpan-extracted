@@ -1,0 +1,16 @@
+[%-
+    IF c.debug;
+        # define a debug() macro directed to Catalyst's log
+        MACRO debug(message) CALL c.log.debug(message);
+    END;
+-%]
+
+[% MACRO date_long(dt) BLOCK %][% c.controller.date_long(dt) %][% END %]
+
+[% MACRO date_short(dt) BLOCK %][% c.controller.date_short(dt) %][% END %]
+
+[% MACRO london_date(dt) BLOCK %][% c.controller.london_date(dt) %][% END %]
+
+[% MACRO time_long(dt) BLOCK %][% c.controller.time_long(dt) %][% END %]
+
+[% MACRO time_short(dt) BLOCK %][% c.controller.time_short(dt) %][% END %]

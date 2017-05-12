@@ -1,0 +1,39 @@
+#header, #user_nav, .appname, #breadcrumbs, #application_nav
+{
+    display: none;
+}
+
+.link_button, .tlMenu
+{
+    display: none !important;
+}
+
+#body, #application_body
+{
+    background-color: white !important;
+    border: none !important;
+}
+
+.content_block
+{
+    overflow: visible !important;
+    padding-top: 0 !important;
+}
+
+.content_block, #application_body
+{
+    -webkit-box-shadow: none !important;
+    -moz-box-shadow: none !important;
+    box-shadow: none !important;
+}
+
+.app_body_with_nav
+{
+    margin-left: 0 !important;
+}
+
+input, textarea
+{
+    background-color: #ffffff !important;
+    color: #000000;
+}

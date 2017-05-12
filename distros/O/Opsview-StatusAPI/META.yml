@@ -1,0 +1,29 @@
+---
+abstract: 'Module to help you query the Opsview Status API'
+author:
+  - 'Jose Luis Martinez (jlmartinez@capside.com)'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::Pod: 0
+  Test::Simple: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.97'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Opsview-StatusAPI
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Carp: 0
+  HTTP::Request: 0
+  JSON::Any: 0
+  LWP::UserAgent: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.01

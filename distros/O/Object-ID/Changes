@@ -1,0 +1,54 @@
+v0.1.2  Sat Sep 24 21:49:25 PDT 2011
+  Bug Fixes
+  * Quiet overzealous "v-string in use/require non-portable" warning from
+    Perl 5.10.0.
+
+
+v0.1.1  Thu May 20 14:17:23 PDT 2010
+  Distribution Changes
+  * Lowered the requirement on version.pm to 0.77 (what came with 5.10.1) at the
+    request of Debian to make packaging easier. [rt.cpan.org 57650]
+
+
+v0.1.0  Wed May  5 18:06:31 PDT 2010
+  New Features
+  * Now works back to 5.8.8
+
+  Performance
+  * 2x performance boost on the first call to object_id() for each object
+    thanks to Hash::FieldHash.
+
+  Bug Fixes
+  * object_id() will work with threads, but object_uuid() will not.
+    Will fix itself when Data::UUID fixes threads.
+
+
+v0.0.5  Sun May  2 10:26:55 PDT 2010
+  Bug Fixes
+  * Work with classes that use namespace::autoclean
+
+
+v0.0.4  Sat May  1 13:53:39 PDT 2010
+  Distribution fixes
+  * I said I don't provide UNIVERSAL!
+
+
+v0.0.3  Sat May  1 13:24:24 PDT 2010
+  Distribution fixes
+  * Trying again to convince PAUSE we don't provide UNIVERSAL
+
+
+v0.0.2  Sat May  1 11:15:41 PDT 2010
+  New Features
+  * Added a README and explicit license
+
+  Distribution Fixes
+  * Don't say we provide UNIVERSAL
+
+
+v0.0.1  Sat May  1 09:01:51 PDT 2010
+  New Features
+  * Object::ID role to give objects a unique identifier
+  * $obj->object_id returns a unique object identifier for any object
+  * $obj->object_uuid does the same but returns a UUID (Data::UUID required)
+  * UNIVERSAL::Object::ID makes the methods available to all objects

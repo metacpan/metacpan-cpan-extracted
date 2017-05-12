@@ -1,0 +1,13 @@
+<div id="navbar_search">
+  <div class="navbar_group_title">Search:</div>
+  <ul>
+    <li>
+      <form method="get" action="[% script_url %]search.cgi">
+        <input type="hidden" name="action" value="search" />
+        <input type="text" size="15" name="search" id="nav_search" value="Search text" onfocus="this.value=''" /> <label for="nav_search" class="hidden">Search text</label>
+        <input type="submit" value="Go" class="form_button" />
+      </form>
+    </li>
+    <li><a href="[% script_url %]search.cgi">Advanced Search</a></li>
+  </ul>
+</div>

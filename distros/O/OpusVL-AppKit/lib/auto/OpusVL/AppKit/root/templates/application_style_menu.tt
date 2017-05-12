@@ -1,0 +1,108 @@
+<div id="appMenuBar">
+    <ul class="appkit_mega_menu">
+        [% apps = c.menu_data %]
+        [% FOR app IN apps %]
+            <li class="appkit_mega_menu_item">
+                <a href="#">[% app.controller.appkit_name %]</a>
+                <div class="appkit_mega_menu_content [% c.generate_class_name(app.controller.appkit_name) %]">
+                    <div>
+                        <div class="menu_column">
+                            [% FOR group IN app.actions %]
+                                [% IF group.group %]
+                                    <div class="appkit_mega_menu_group [% c.generate_class_name(group.group) %]">
+                                        <p>
+                                            [% group.group %]
+                                        </p>
+                                        <ul>
+                                            [% FOR action IN group.actions %]
+                                                [% IF (action.controller.appkit_method_group == group.group) %]
+                                                    <li><a href="[% c.uri_for(action.controller.action_for(action.actionname)) %]">[% action.value %]</a></li>
+                                                [% END %]
+                                            [% END %]
+                                        </ul>
+                                    </div>
+                                [% END %]
+                            [% END %]
+                        </div>
+                    
+                    </div>
+
+                </div>
+            </li>
+        [% END %]
+    </ul>
+</div>
+
+<script type="text/javascript">
+    $(function() {
+        var appkit_mega_menu_open = false;
+        
+        $('li.appkit_mega_menu_item > a').each(function() {
+            $(this).click(function() {
+                if (appkit_mega_menu_open) {
+                    if ($(this).parent().hasClass('appkit_mega_menu_open')) {
+                        $(this).parent().removeClass('appkit_mega_menu_open');
+                        appkit_mega_menu_open = false;
+                    } else {
+                        $('li.appkit_mega_menu_item').each(function(){$(this).removeClass('appkit_mega_menu_open')});
+                        $(this).parent().addClass('appkit_mega_menu_open');                        
+                    }
+                } else {
+                    $(this).parent().addClass('appkit_mega_menu_open');
+                    appkit_mega_menu_open = true;
+                }
+                
+                return false;
+            });
+            
+            $(this).mouseover(function(){
+                if (appkit_mega_menu_open) {
+                    if ($(this).parent().hasClass('appkit_mega_menu_open')) {
+                        // already open so do nothing
+                    } else {
+                        $('li.appkit_mega_menu_item').each(function(){$(this).removeClass('appkit_mega_menu_open')});
+                        $(this).parent().addClass('appkit_mega_menu_open'); 
+                    }
+                }
+            });
+        });
+        
+        $('div.appkit_mega_menu_content').click(function(eventObject){
+            if($(eventObject.target).is("a")) {
+                return true;
+            } else {
+                return false;
+            }
+        });
+        
+        $(window).click(function(){
+            $('li.appkit_mega_menu_item').each(function(){$(this).removeClass('appkit_mega_menu_open')});
+            appkit_mega_menu_open = false;
+        });
+
+        
+        $('.appkit_mega_menu_item').each(function() {
+            var total = 0;
+            var menu = $(this);
+            menu.find('.appkit_mega_menu_group').each(function() {
+                var height = $(this).height();
+                total += height;
+            });
+            if(total > 200) { // split into 2 columns
+                var menu_column = menu.find('.menu_column');
+                var new_column = $('<div class="menu_column"></div>');
+                menu_column.after(new_column);
+                var half_height = total / 2;
+                var height_so_far = 0;
+                menu.find('.appkit_mega_menu_group').each(function() {
+                    if(height_so_far > half_height) {
+                        $(this).appendTo(new_column);
+                    } else {
+                        var height = $(this).height();
+                        height_so_far += height;
+                    }
+                });
+            }
+        });
+    });
+</script>

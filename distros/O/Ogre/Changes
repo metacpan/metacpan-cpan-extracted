@@ -1,0 +1,173 @@
+0.60 2013-05-26 | support Ogre = 1.8 (not 1.9 yet)
+- patch from Mattia Barbon to fix compilation in Ogre 1.8
+  (1.9 is coming soon, so not going to bother with 1.7 anymore)
+- uploaded code to https://github.com/slanning/perl-ogre
+- more patches to fix for Ogre 1.9.1
+  - I removed references to Ogre::ProgressiveMesh; it wasn't really used,
+    and seems they maybe renamed it to ProgressiveMeshGenerator
+  - 1.9 isn't supported yet; there were some substantial API changes
+
+0.50 2010-12-14 | support Ogre >= 1.7.2
+- dropping support for versions of Ogre before 1.7.2 (released 2010-11-03)
+- removed Readonly (optional) dependence (for one example)
+- ported to 1.7.2
+
+0.40 2009-10-07 | fixed GTK support, kinda
+- minor API improvements
+- added Ogre::Timer
+
+0.39 2009-10-04 | getWorldPosition, getWorldOrientation removed
+- API change for Ogre 1.6, these are not in Renderable and have
+  been renamed in Node to _getDerivedPosition and _getDerivedOrientation
+
+0.38 2009-10-03 | render Ogre in SDL-perl
+- added currentGLContext param for Root->createRenderWindow,
+  which at least in Linux allows rendering Ogre in SDL's GL context
+- added sdlrobot.pl example
+
+0.37 2009-09-22 | update examples
+- the instructions in the examples directory still said to use
+  Ogre 1.4 media, but in fact 1.6 media are required now
+  due to incompatibilities
+
+0.36 2009-09-15 | update for Ogre version 1.6
+- this breaks a little backward-compatibility, but not enough
+  to affect any of the examples. I doubt I'll worry about
+  maintaining version 1.4 (1.7 is coming out soon...)
+- there is plenty of work to be done; I just removed/renamed
+  enough to get it to compile
+
+0.35 2007-12-15 | Ogre::AL (new module)
+- new (separate) CPAN module Ogre::AL, which is a binding for
+  the OpenAL audio library and lets you attach sounds to scene nodes
+- added three Perl-specific methods to OverlayManager, to account for
+  C++ casting (see note for 0.33): createTextAreaOverlayElement,
+  createPanelOverlayElement, createBorderPanelOverlayElement,
+  which are all variations of createOverlayElement; also wrapped
+  those three classes while I was at it
+- added -Wno-write-strings to Makefile.PL if you compile with
+  g++ >= 4.2, otherwise you would get literally a thousand warnings
+  which I have no control over (I think these might be gone
+  in perl 5.10, so I also check for that)
+- bumped up OIS requirement in Ogre::ExampleListener to version 0.04
+- added more operator overloads to Degree and Radian
+- wrapped Ogre::MaterialManager to fix Ogre::BetaGUI
+
+0.34 2007-12-09 | scene query enhancements
+- wrapped SceneQuery, ManualObject, and AxisAlignedBox methods
+  (for Ogre::BetaGUI itute3.pl and itute4.pl examples)
+  note: for ManualObject, still not the constructor/destructor,
+  though it can be created through SceneManager
+- wrapped createPlaneBoundedVolumeQuery in SceneManager,
+  which takes an array ref of PlaneBoundedVolume* instead of
+  a PlaneBoundedVolumeList (which is a std::vector)
+- added more support for RegionSceneQuery and its subclasses
+
+0.33 2007-12-04 | Ogre::BetaGUI (new module)
+- new (separate) CPAN module Ogre::BetaGUI; see it and its itute2.pl example
+  demonstrating a mouse cursor
+- added createOverlayContainer method to OverlayManager.xs;
+  this Perl-specific method is equivalent to createOverlayElement
+  but returns an OverlayContainer (static_cast) instead
+- fixed Quaternion operator overloading
+- added Vector2 constructor/destructor, tests
+
+0.32 2007-11-26 | lighting.pl
+- added lighting.pl example
+- implemented Controller<Real>, ControllerValue<Real>, ControllerFunction<Real>
+  for use with lighting example; note that Controller<Real> is called ControllerReal
+  in the Perl binding
+- fixed a little bug with setDiffuseColour/setSpecularColour of Ogre::Light
+- (internal) renamed PerlOGREListener.h to PerlOGRECallback.h, etc. (generalized from
+  listener to any callback class in Perl, in particular to handle
+  ControllerValue and ControllerFunction)
+
+0.31 2007-11-17 | terrain.pl
+- added terrain.pl example
+- wrapped RaySceneQuery class, among others
+- updated docs (note: I need to update the gendocs.pl script,
+  so there are some weird things like "$bool enabled" instead
+  of "bool $enabled")
+
+0.30 2007-11-16 | skeletalanim.pl
+- added skeletalanim.pl example
+- wrapped more classes, again to get the example working
+- improved Vector3 and Quaternion operator overloading,
+  so now the robot rotates in animate.pl instead of moonwalking
+- fixed a few places where I'd neglected to put the return value
+  of some methods into RETVAL, so segfaults would happen
+- added init-class.pl and strip-api-docs.pl genscripts
+  that I use for generating/initializing new classes
+
+0.29 2007-11-14 | cameratrack.pl, particleFX.pl
+- added cameratrack.pl and particleFX.pl examples
+- wrapped many classes, mainly to make the examples work
+- fixed a tiny bug in Ogre::ExampleFrameListener
+- note: one reason there was a 2-month gap between releases
+  was that I tried to write a script to generate the entire API;
+  the aftermath of that attempt is genscripts/genxsubs.pl,
+  but I've given up on it for now
+
+0.28 2007-09-16 | gtk2-perl and wxPerl
+- added a VERY EXPERIMENTAL feature to allow Ogre's render window to be
+  an existing Gtk2 or Wx window instead of the defaultly generated one.
+  See README.txt for details (you have to have gtk2 libs/headers installed).
+  I kind of got it working for Gtk2, see examples/gtk2robot.pl.
+  I couldn't get examples/wx.pl to actually work yet, though it's no longer
+  segfaulting at least. (I think the Ogre window is underneath the other ones,
+  i.e it's the "parent" window.)
+- wrapped more methods in RenderWindow, Viewport
+
+0.27 2007-09-12 | constants
+- API CHANGE: fixed constants, adding all enums (and genconsts.pl script);
+  now you export them normally, not call as static methods.
+  Some export tags changed, too; they're all named after the corresponding
+  enum's name now. (Note: OIS constants are still "broken".)
+  Thanks to Vladimir Olenin for pointing me to `gccxml`, which was used
+  in parsing the C++ headers.
+
+0.26 2007-09-09 | documentation
+- added some documentation (and gendocs.pl script which generates it)
+- added DegRad typemap to handle both Degree or Radian types,
+  so now Degree and Radian are interchangeable like in the C++ API
+  (and wrapping those methods is simpler :)
+
+0.25 2007-09-07 | animate.pl
+- added animate.pl example, which demos animation
+  (note: this is still a little incomplete, so the robot moonwalks
+   part of the way)
+
+0.24 2007-09-06 | minor improvements
+- added typemap for Real and changed all occurrences of float to Real
+  (which can be float or double)
+- added constructors, overloaded (bool) operators, tests to:
+  ColourValue, ConfigFile, Degree, Plane, Quaternion, Radian, Vector3
+
+0.23 2007-09-04 | sky.pl
+- moved ExampleFrameListener and ExampleApplication packages from
+  examples/buffered.pl out under Ogre/ , so they can be used by other
+  applications
+- added sky.pl example, which implements OGRE's "Basic Tutorial 3"
+- fixed unbuffered input in the Example* classes
+- wrapped a lot of SceneManager
+
+0.22 2007-09-02 | buffered.pl
+- added buffered.pl, which implements OGRE's "Basic Tutorial 5"
+
+0.21 2007-09-01 |
+- added WindowEventListener functionality, though not "tested" yet
+  (working on another example)
+
+0.20 2007-08-30 | ninja.pl, listeningninja.pl
+- added ninja.pl example, along with necessary wrappers
+  to get it to work (you also need to install OIS,
+  which I just uploaded to CPAN)
+- also added listeningninja.pl example, along with
+  FrameListener functionality
+- wrapped several other classes, but not fully yet;
+  will have another example next release
+
+0.1  2007-08-26 | robot.pl
+(Note: I accidentally put version 0.1 instead of 0.01)
+- first release, minimal wrapping
+- includes robot.pl example

@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<SITE ID="InfoSeek">
+
+<NAME Lang="en-us">Infoseek WWW Search</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+Infoseek全球WWW搜尋(英文)
+]]></NAME>
+<INFO Lang="en-us">general information web search</INFO>
+<INFO Lang="zh-tw">general information web search</INFO>
+
+<URL Type="More"><![CDATA[
+_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://infoseek.go.com/Titles?col=UG&qt=_QUERY_&sv=IS&lk=noframes&nh=10
+]]></URL>
+
+<SCORE>_SCORE_</SCORE>
+<EXPRESSION>Standard</EXPRESSION>
+<CATEGORY>WWW,General</CATEGORY>
+
+<VAR Name="_NEXT_"><![CDATA[
+<a href="_NEXT_"><font size="-1">Next
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+face="Arial,Helvetica" size=-1>___<b><a href="_URL_">_TITLE_</a>___<br>_PREVIEW_<br>___<font size="-1">_SCORE_%___Date:_DATE_</b>___Size_SIZEK_K,___</font>
+]]></TEMPLATE>
+</SITE>

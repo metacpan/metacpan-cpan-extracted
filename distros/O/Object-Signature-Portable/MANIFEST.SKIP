@@ -1,0 +1,21 @@
+.*~$
+.*\.(bak|old)$
+\.git/.*
+\.gitignore
+
+^Makefile$
+^MYMETA.*
+
+^blib/
+^pm_to_blib$
+
+Object-Signature-Portable-.*/
+Object-Signature-Portable-.*\.tar\.gz
+
+# QA tests not needed in distribution
+
+^xt/
+
+# Travis CI
+
+^\.travis\.yml$

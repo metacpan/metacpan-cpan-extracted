@@ -1,0 +1,53 @@
+SUBJECT:     hints_on_allocating_large_objects
+
+PLATFORM:    all
+
+OBJECTSTORE: all
+
+DATE:	     APRIL 1995
+
+KEYWORDS:    allocate large size
+
+QUESTION:
+
+I am creating and deleting large objects (greater than 64K) and I note
+that my database size seems to be getting very large compared with the
+aggregate size of my stored objects.
+
+ANSWER:
+
+You need to treat large objects with a little consideration.
+ObjectStore has two mechanisms for allocating small and large data, by
+large I mean any object which exceeds 64K. If you are adding and deleting
+large objects, there is considerable scope for fragmentation to occur,
+hence visible as database growth.
+
+Fragmentation is particularly prevalent when adding and deleting data
+of varying size, for if you are growing an object by deleting then
+replacing it with the new larger version. It is the nature of any
+memory allocation system that fragmentation can never be eliminated
+on all circumstances, but with careful thought it is possible to
+reduce its effect.
+
+One method for reducing the effect is to make good use of pre-sizing
+where possible. For example if you know that an objects is going to
+grow in size and you have an upper limit on the size it will ever
+attain, reserve a block this size up front. If an upper limit is not
+known, or this method will be too inefficient, a compromise can be
+reached whereby you can presize in increasing steps. For example, the
+first time you allocate the data you might reserve 100K.  When the
+object grows larger than 100K, you research 120K and so on.  Although
+some fragmentation will probably still occur, it is likely to be less
+pronounced than if you did no presizing at all.
+
+The alternative solution is to use reserve a large chunk of memory and 
+implement your own bespoke allocation algorithm.  This has the advantage that
+you know what growth patterns will exist in your application, and can program
+the allocator accordingly.
+
+In general however, each application is different and it is impossible
+to provide hard and fast rules of thumb that will work in all cases.
+For those interested in learning more on this and other performance
+topics, Object Design offer regular 'Performance Tuning Courses'.
+Details are available on request.
+FAQ_reference: hints_on_allocating_large_objects

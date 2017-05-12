@@ -1,0 +1,122 @@
+---
+abstract: 'Parse, manipulate and render CSS files'
+author:
+  - 'Marcel Greter <marcel.greter@ocbnet.ch>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0
+  Software::License: 0
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4205, CPAN::Meta::Converter version 2.120921'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: OCBNET-CSS3
+provides:
+  OCBNET::CSS3:
+    file: lib/OCBNET/CSS3.pm
+    version: v0.2.7
+  OCBNET::CSS3::DOM::Block:
+    file: lib/OCBNET/CSS3/DOM/Block.pm
+    version: v0.2.5
+  OCBNET::CSS3::DOM::Comment:
+    file: lib/OCBNET/CSS3/DOM/Comment.pm
+    version: v0.2.5
+  OCBNET::CSS3::DOM::Comment::Options:
+    file: lib/OCBNET/CSS3/DOM/Comment/Options.pm
+    version: v0.2.5
+  OCBNET::CSS3::DOM::Extended:
+    file: lib/OCBNET/CSS3/DOM/Extended.pm
+    version: v0.2.5
+  OCBNET::CSS3::DOM::Extended::Charset:
+    file: lib/OCBNET/CSS3/DOM/Extended/Charset.pm
+    version: v0.2.5
+  OCBNET::CSS3::DOM::Extended::FontFace:
+    file: lib/OCBNET/CSS3/DOM/Extended/FontFace.pm
+    version: v0.2.5
+  OCBNET::CSS3::DOM::Extended::Import:
+    file: lib/OCBNET/CSS3/DOM/Extended/Import.pm
+    version: v0.2.5
+  OCBNET::CSS3::DOM::Extended::Keyframes:
+    file: lib/OCBNET/CSS3/DOM/Extended/Keyframes.pm
+    version: v0.2.5
+  OCBNET::CSS3::DOM::Extended::Media:
+    file: lib/OCBNET/CSS3/DOM/Extended/Media.pm
+    version: v0.2.5
+  OCBNET::CSS3::DOM::Extended::Namespace:
+    file: lib/OCBNET/CSS3/DOM/Extended/Namespace.pm
+    version: v0.2.5
+  OCBNET::CSS3::DOM::Extended::Page:
+    file: lib/OCBNET/CSS3/DOM/Extended/Page.pm
+    version: v0.2.5
+  OCBNET::CSS3::DOM::Extended::Supports:
+    file: lib/OCBNET/CSS3/DOM/Extended/Supports.pm
+    version: v0.2.5
+  OCBNET::CSS3::DOM::Extended::Viewport:
+    file: lib/OCBNET/CSS3/DOM/Extended/Viewport.pm
+    version: v0.2.5
+  OCBNET::CSS3::DOM::Property:
+    file: lib/OCBNET/CSS3/DOM/Property.pm
+    version: v0.2.5
+  OCBNET::CSS3::DOM::Selector:
+    file: lib/OCBNET/CSS3/DOM/Selector.pm
+    version: v0.2.5
+  OCBNET::CSS3::DOM::Text:
+    file: lib/OCBNET/CSS3/DOM/Text.pm
+    version: v0.2.5
+  OCBNET::CSS3::DOM::Whitespace:
+    file: lib/OCBNET/CSS3/DOM/Whitespace.pm
+    version: v0.2.5
+  OCBNET::CSS3::Property::Background:
+    file: lib/OCBNET/CSS3/Styles/Background.pm
+    version: v0.2.5
+  OCBNET::CSS3::Regex::Background:
+    file: lib/OCBNET/CSS3/Regex/Background.pm
+    version: v0.2.5
+  OCBNET::CSS3::Regex::Base:
+    file: lib/OCBNET/CSS3/Regex/Base.pm
+    version: v0.2.7
+  OCBNET::CSS3::Regex::Colors:
+    file: lib/OCBNET/CSS3/Regex/Colors.pm
+    version: v0.2.6
+  OCBNET::CSS3::Regex::Comments:
+    file: lib/OCBNET/CSS3/Regex/Comments.pm
+    version: v0.2.5
+  OCBNET::CSS3::Regex::Numbers:
+    file: lib/OCBNET/CSS3/Regex/Numbers.pm
+    version: v0.2.5
+  OCBNET::CSS3::Regex::Selectors:
+    file: lib/OCBNET/CSS3/Regex/Selectors.pm
+    version: v0.2.5
+  OCBNET::CSS3::Regex::Stylesheet:
+    file: lib/OCBNET/CSS3/Regex/Stylesheet.pm
+    version: v0.2.5
+  OCBNET::CSS3::Styles:
+    file: lib/OCBNET/CSS3/Styles.pm
+    version: v0.2.5
+  OCBNET::CSS3::Styles::Common:
+    file: lib/OCBNET/CSS3/Styles/Common.pm
+    version: v0.2.5
+  OCBNET::CSS3::Styles::Font:
+    file: lib/OCBNET/CSS3/Styles/Font.pm
+    version: v0.2.5
+  OCBNET::CSS3::Styles::Margin:
+    file: lib/OCBNET/CSS3/Styles/Margin.pm
+    version: v0.2.5
+  OCBNET::CSS3::Styles::Padding:
+    file: lib/OCBNET/CSS3/Styles/Padding.pm
+    version: v0.2.5
+  OCBNET::CSS3::Styles::References:
+    file: lib/OCBNET/CSS3/Styles/References.pm
+    version: v0.2.5
+  OCBNET::CSS3::Stylesheet:
+    file: lib/OCBNET/CSS3/Stylesheet.pm
+    version: v0.2.5
+requires:
+  File::Slurp: 0
+resources:
+  license: http://www.gnu.org/licenses/gpl-3.0.txt
+  repository: https://github.com/mgreter/OCBNET-CSS3.git
+version: v0.2.7

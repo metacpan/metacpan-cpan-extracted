@@ -1,0 +1,10 @@
+[%########################################
+  header_row( labels )
+     Row with header cells.
+  ########################################-%]
+
+<tr valign="bottom" align="center">
+[% FOREACH label = labels -%]
+   [% INCLUDE header_cell -%]
+[% END -%]
+</tr>

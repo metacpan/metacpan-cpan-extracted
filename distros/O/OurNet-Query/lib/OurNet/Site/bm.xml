@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<SITE ID="Bm">
+
+<NAME Lang="en-us">BookMarks-AlterNex Search</NAME>
+<INFO Lang="en-us">general information web search in Brazil</INFO>
+
+<URL Type="More"><![CDATA[
+http://www.bookmarks.com.br/cgi-bin/Axei/axeiSearch?DB=0&QUERY=_NEXTSTR_&OP=or&SUBSET=SUBSET&FROM=_FROM_&SIZE=_SIZE_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://www.bookmarks.com.br/cgi-bin/Axei/axeiSearch?SearchFor=_QUERY_&mode=or
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_SIZE_"><![CDATA[
+HIDDEN NAME=SIZE VALUE=_SIZE_>
+]]></VAR>
+<VAR Name="_FROM_"><![CDATA[
+HIDDEN NAME=FROM VALUE=_FROM_>
+]]></VAR>
+<VAR Name="_NEXTSTR_"><![CDATA[
+HIDDEN NAME=QUERY VALUE="_NEXTSTR_">
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<LI><B><A HREF="_URL_">_TITLE_</A></B> (Size:_SIZE_)<BR><I>_PREVIEW_</I><BR>(Escore de busca:___)
+]]></TEMPLATE>
+</SITE>

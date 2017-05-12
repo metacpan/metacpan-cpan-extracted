@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<SITE ID="Cei">
+
+<NAME Lang="zh-cn"><![CDATA[
+CEI陓洘絳瑤
+]]></NAME>
+<NAME Lang="en-us">CEI Message Search</NAME>
+<NAME Lang="zh-tw">CEI信息導航 (中國大陸)</NAME>
+<INFO Lang="zh-cn">general information web search in Mainland China</INFO>
+<INFO Lang="en-us">general information web search in Mainland China</INFO>
+<INFO Lang="zh-tw">general information web search in Mainland China</INFO>
+
+<URL Type="Start"><![CDATA[
+post://in.cei.gov.cn/cgi-bin/searchs.dll?OptionSearchs?Key=_QUERY_&Where=0&StartRecord=1&DB=2&RecordSum=0&IfChinese=Y&Logic=AND&ItemsPerPage=50
+]]></URL>
+
+<CHARSET>zh-cn</CHARSET>
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+
+<TEMPLATE><![CDATA[
+).___<a href="_URL_">_TITLE_</a>_PREVIEW_</td></tr></font>
+]]></TEMPLATE>
+</SITE>

@@ -1,0 +1,37 @@
+---
+abstract: 'provides a Catalyst-like "stash" method for your class'
+author:
+  - 'Toby Inkster <tobyink@cpan.org>'
+  - 'TOBYINK <tobyink@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 0
+generated_by: 'Moose::Meta::Class::__ANON__::SERIAL::9 version , CPAN::Meta::Converter version 2.140640'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Object-Stash
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  Object::Stash:
+    file: lib/Object/Stash.pm
+    version: '0.006'
+  Object::Stash::Util:
+    file: lib/Object/Stash/Util.pm
+resources:
+  X_identifier: http://purl.org/NET/cpan-uri/dist/Object-Stash/project
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=Object-Stash
+  homepage: https://metacpan.org/release/Object-Stash
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/tobyink/p5-object-stash.git
+version: '0.006'

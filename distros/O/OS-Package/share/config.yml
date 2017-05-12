@@ -1,0 +1,13 @@
+user_config: ~/.ospkg/config.yml
+dir:
+  base: "~/.ospkg"
+  repository: "~/.ospkg/distfiles"
+  configs: "~/.ospkg/configs"
+  packages: "~/.ospkg/packages"
+package:
+  user: root
+  group: root
+  category: application
+plugin:
+  solaris:
+    "5.10": "OS::Package::Plugin::Solaris::SVR4"

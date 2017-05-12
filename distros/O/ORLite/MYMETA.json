@@ -1,0 +1,61 @@
+{
+   "abstract" : "Extremely light weight SQLite-specific ORM",
+   "author" : [
+      "Adam Kennedy <adamk@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Install version 1.06, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "ORLite",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.59",
+            "Test::More" : "0.47",
+            "Test::Script" : "1.06"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.59"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBD::SQLite" : "1.27",
+            "DBI" : "1.607",
+            "File::Path" : "2.08",
+            "File::Remove" : "1.40",
+            "File::Spec" : "0.80",
+            "File::Temp" : "0.20",
+            "Params::Util" : "1.00",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://svn.ali.as/cpan/trunk/ORLite"
+      },
+      "x_ChangeLog" : "http://fisheye2.atlassian.com/changelog/cpan/trunk/ORLite"
+   },
+   "version" : "1.98",
+   "x_module_name" : "ORLite"
+}

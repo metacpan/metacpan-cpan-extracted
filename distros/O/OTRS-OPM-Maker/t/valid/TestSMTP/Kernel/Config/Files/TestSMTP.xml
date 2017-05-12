@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<otrs_config version="1.0" init="Application">
+    <CVS>$Id: TestSMTP.xml,v 1.1 2011/02/12 22:57:22 reb Exp $</CVS>
+    <ConfigItem Name="TestSMTP::RealRecipients" Required="0" Valid="1">
+        <Description Translatable="1">Those recipients are not replaced.</Description>
+        <Group>TestSMTP</Group>
+        <SubGroup>Core</SubGroup>
+        <Setting>
+            <Array>
+                <Item>you@your-company.tld</Item>
+                <Item>qa@your-company.tld</Item>
+            </Array>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="TestSMTP::SendTo" Required="0" Valid="1">
+        <Description Translatable="1">All mails that are not sent to RealRecipients are sent to those mail addresses.</Description>
+        <Group>TestSMTP</Group>
+        <SubGroup>Core</SubGroup>
+        <Setting>
+            <Array>
+                <Item>you@your-company.tld</Item>
+                <Item>your_boss@your-company.tld</Item>
+                <Item>qa@your-company.tld</Item>
+            </Array>
+        </Setting>
+    </ConfigItem>
+</otrs_config>

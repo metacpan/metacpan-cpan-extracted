@@ -1,0 +1,139 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+
+[%- USE today = DateTime(today = 1); -%]
+
+<html>
+    <head>
+
+    [% PROCESS wrapper_head.tt %]
+    [% PROCESS clickjack.tt %]
+
+    </head>
+    <body[% IF c.config.installation_type %] class="[% c.config.installation_type | lc | html %]"[% END %]>
+        <div id="page">
+            [% IF c.config.AppKit.ie_compatability %]
+            <!--[if lte IE [% c.config.AppKit.ie_compatability %]]>
+                <style type="text/css">
+                    #browser-incompat {
+                        display:block;
+                        position:absolute;
+                        top:0;
+                        left:0;
+                        width:400px;
+                        background-color: #ffffcc;
+                        border: 1px solid #000;
+                        padding: 10px;
+                        z-index:9999;
+                        font-size:12px;
+                    }
+                    #browser-incompat a {
+                        font-weight:bold !important;
+                        color: #003962 !important;
+                        font-size: 12px !important;
+                    }
+                </style>
+                <div id="browser-incompat">
+                    <p>You are using an unsupported browser. To enjoy full use of this application, please upgrade to <a href="https://www.google.com/chrome">Google Chrome</a>, <a href="http://www.mozilla.org/en-US/firefox/new/">Mozilla Firefox</a>, or <a href="http://windows.microsoft.com/en-US/internet-explorer/downloads/ie">Microsoft Internet Explorer</a> (version [% c.config.AppKit.ie_compatability + 1 %] or higher).</p>
+                    <p><small>Click anywhere in this box to close the message</small></p>
+                </div>
+            <![endif]-->
+            [% END %]
+            <div id="header">
+                <div id="header_logo">
+                    <a href="[% c.uri_for(c.controller('Root').action_for('index')) %]"></a>
+                </div>
+                <div id="header_nav">
+                    <ul>
+                        <li id="header_home">
+                            <a href="[% c.uri_for(c.controller('Root').action_for('index')) %]">Home</a>
+                        </li>
+                        [% SET notifications = c.controller('Modules::Notifications') %]
+                        [% IF notifications && c.can_access(notifications.action_for('feed')) %]
+                            <li>
+                            [% PROCESS modules/notifications/message_icon.tt %]
+                        [% END %]
+
+                        [% IF c.can_access(c.controller('Search').action_for('index')) %]
+                            <li id="header_search">
+                                <a href="#" id="appKitSearch_anchor">Search</a>
+                            </li>
+                        [% END %]
+                        <li id="header_applications">
+                            <a href="#" id="appList_anchor">Applications</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div id="body">
+                [% PROCESS user_header.tt %]
+
+                <div class="ajax_indicator">Loading...</div>
+                <div class="save_indicator">You have unsaved changes</div>
+                <div class="form_indicator"><p><strong>Working...</strong></p><p>Do not click "Refresh" in your browser.</p></div>
+
+                <div id="application">
+                    [% PROCESS intranet_left_menu.tt %]
+
+                    [% IF before_content %]
+                    [% before_content | none %]
+                    [% END %]
+                    <div id="application_body"[% IF c.controller.navigation_actions.size > 0 %] class="app_body_with_nav"[% END %]>
+                        [% IF status_message.defined %]
+                            <div class="alert status">
+                                [% status_message %]
+                            </div>
+                        [% END %]
+                        [% IF error_message.defined %]
+                            <div class="alert error">
+                                [% error_message %]
+                            </div>
+                        [% END %]
+                        
+                        [% content | none %]
+
+                        <div class="clear"></div>
+                    </div>
+                    [% IF version %]
+                    <div class="version">
+                        [% IF c.config.AppKit.override_footer %]
+                            [% SET str_footer = c.config.AppKit.override_footer %]
+                            [% IF str_footer.search('AK_') %]
+                                [% USE date %]
+                                [% str_footer = str_footer.replace('AK_VERSION', version) %]
+                                [% str_footer = str_footer.replace('AK_YEAR', date.format(now(), "%Y")) %]
+                                [% str_footer = str_footer.replace('AK_COPY', '&copy;') %]
+                            [% END %]
+                        [% str_footer | none %]
+                        [% ELSE %]
+                        This is [% c.config.application_name || c.config.name %] [% version | html %]
+                        [% END %]
+                    </div>
+                    [% END %]
+                </div>
+
+                [% PROCESS intranet_app_menu.tt %]
+
+                [% IF c.can_access(c.controller('Search').action_for('index')) %]
+                [% PROCESS intranet_search_box.tt %]
+                [% END %]
+            </div>
+        </div>
+        
+        <div id="opusvl">
+            <a href="http://www.opusvl.com" target="_blank"><img src="/static/images/built_with_flexibase.png" border="0"></a>
+        </div>
+        
+   <!--     <script language="JavaScript" type="text/javascript" src="js/appkit.js"></script>
+        <script language="JavaScript">
+            explorePerl.addEvents('explore_anchor', 'explorePerl');  
+        </script>   -->
+        [% IF c.config.AppKit.ie_compatability %]
+        <script type="text/javascript">
+            $('#browser-incompat').click(function() {
+                $(this).fadeOut('fast');
+            });
+        </script>
+        [% END %]
+    </body>
+</html>
+

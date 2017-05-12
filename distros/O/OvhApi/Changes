@@ -1,0 +1,13 @@
+Revision history for Perl extension OvhApi
+
+0.2 2016-09-12T21:28:00Z
+
+    - first CPAN release, hopefully.
+    - updated dependencies.
+
+0.1 2016-09-12T21:20:12Z
+
+    - original version.
+    - Imported from https://eu.api.ovh.com/wrappers/OvhApi-perl-1.1.zip
+    -  Copyright to OVH SAS.
+

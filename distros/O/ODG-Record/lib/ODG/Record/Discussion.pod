@@ -1,0 +1,118 @@
+=head1 DISCUSSION
+
+This document maintains some thoughts of Record Iterators and Moose.
+
+ODG::Record is designed for efficient streaming, i.e. accessing
+one-record-at-a-time. For conventional record iterators, a new row 
+object is created for each record, slots are initialized, data are 
+filled and types are checked. Not all of this is desirable.
+
+=head1 Object Recycling
+
+If every row based record, populates in the same manner, it is hugely
+inefficient to instantiate a new object for each record. This is 
+especially true of Moose-based class. ( This is not a knock against
+Moose.  ODG::Record uses Moose extensively. )  
+
+The approach taken by this module is to instantiate a single object and
+changing the data for that object.  To do this, a ArrayRef data slot is
+created. When the next record is used.  The ArrayRef is pointed to a
+different Array, i.e. the next record.  In not incurring the expensive 
+of object instantiation for each record we have a huge performance win.
+(See tables below.)
+
+The downside is that the checking / validation in new object creation
+is lost. This may or not be acceptable depending on the situation.
+Generally, when the records are well-defined and well-maintained,  
+i.e. from a database, this is not an issue.  The data from one record 
+to the next is fairly consistent.  
+
+Encapsulation is also be lost.  Again, whether this is acceptable
+depends on the situation.  There are several methods of object 
+recycling ( as opposed to creating a new object).  They are: 
+
+Notably, encapsulation is not lost for the entire object.  It is done 
+only for the attributes that point to the _data slot.  These are 
+identified by the meta-attribute trait, index, as well as a non-negative
+integer specifying the position in the ArrayRef.
+
+
+=head1 Performance 
+
+The _data slot can be accessed in a number of ways:
+
+* creating a new ODG::Recrod object.
+* using a standard accessor, 
+* using an lvalue accessor (not officially supported
+  by Moose -and- may break encapsulation.  ( Since this is Moose,  
+  other Moose techniques can be used for validation, e.g. after method)
+* direct access (breaks encapsulation).    
+
+
+=head2 _data assignment performance
+
+Here is a comparison of methods for placing new data in the record
+object on an Intel(R) Xeon(TM) CPU 3.06GHz processor:
+
+  Data has 5 elements: 1..5
+                      Rate    new object moose accessor lvalue moose direct access
+  new object        1268/s            --           -99%        -100%         -100%
+  moose accessor  222222/s        17428%             --         -56%          -78%
+  lvalue moose    500000/s        39337%           125%           --          -50%
+  direct access  1000000/s        78775%           350%         100%            --
+
+
+  Data has 25 elements: 1..25
+                     Rate    new object moose accessor  lvalue moose direct access
+  new object       1243/s            --           -99%         -100%         -100%
+  moose accessor 166667/s        13308%             --          -37%          -54%
+  lvalue moose   266667/s        21353%            60%            --          -27%
+  direct access  363636/s        29155%           118%           36%            --
+  
+  
+  new object      : ODG::Record->new( _data => [ 1..5] } );
+  moose accessor  : $record->data( [ 1..5 ] ) 
+  lvalue moose    : $record->data = [ 1..5 ] 
+  direct access   : $record->{_data} = [ 1.5 ]
+ 
+
+In real situations, there is probably not much of a difference between
+the last three techniques, other bottleneck are likely to occur in the
+the code such as I/O ability to return > 100k/s.
+   
+
+=head1 RecordSet
+
+This idea can be extended to a RecordSet where the _data slot contains
+an ArrayRef[ArrayRef].  A pointer object is then used to identify the 
+current record.  This may be advantageous when batching is more appropriate.  
+Some reasons for this might be related to:
+
+    * I/O constraints, especially latency provide for more 
+      efficient processing through batch methods
+
+    * Processing requires look-backs or look-aheads
+
+    * Processing benefits from batch methods. i.e. records
+      are sorted in order and one event needs to be triggered
+      for all records of one type.  
+ 
+An example of a RecordSet is demonstrated at:
+
+    http://code2.0beta.co.uk/moose/svn/Moose/trunk/t/200_examples/008_record_set_iterator.t
+
+This demonstration is not efficient since it seems that each 
+record object requires instantiation (costly).  
+
+
+=head1 Metadata 
+
+In the original incarnations of this module, metadata was placed in a 
+seperate _metadata slot. This was overkill, since the only metadata 
+needed was the record order. Starting at version 0.30. The metadata is 
+implemented using Moose meta-attribute traits.  Please see: 
+
+L<MooseX::Meta::Attribute::Index> module. 
+
+You are allowed to place other attribute in the ODG::Record class, but
+be careful not to conflict with the name of your fields in the record.

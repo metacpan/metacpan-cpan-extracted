@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<SITE ID="Radarvol">
+
+<NAME Lang="en-us">Radar UOL Search</NAME>
+<INFO Lang="en-us">general information web search in Brazil</INFO>
+
+<URL Type="Start"><![CDATA[
+http://www.radaruol.com.br/rU01msn80E66B5C4703CBA41DB47B90B57EA2D5B/?MT=_QUERY_&SM=B&DC=10&RG=.br&RD=RG&OPs=R&_v=2&base=_START_&act.next=NEXT
+]]></URL>
+
+
+
+<TEMPLATE><![CDATA[
+<TD nowrap><a href=_URL_>_TITLE_</A>___<FONT size=-1>_SCORE_%___<TD colspan=3>_PREVIEW_</TD>___color=#888888>_SIZE_bytes___&#44;_DATE_</FONT></TD></TR>
+]]></TEMPLATE>
+</SITE>

@@ -1,0 +1,40 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.21.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It would check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 da39a3ee5e6b4b0d3255bfef95601890afd80709 Changes
+SHA1 80b49f4b26c640db91f64cf4ea4959822caea2d0 ChatBot.pm
+SHA1 94fa196b8da9f7420a05054b9115cb5977bbd428 FuzzyIndex.pm
+SHA1 95b294918622704216af5d11d566edad5c7baef8 FuzzyIndex.xs
+SHA1 256cfcd517a9c94e19950ae272da340bacfba35c MANIFEST
+SHA1 909699e24ce7f25958af8d91fb93846c5e36691a MANIFEST.SKIP
+SHA1 0a0b32d7fd4ae280f22f9b61c743f1ec844c206d Makefile.PL
+SHA1 714cea7817145cef6ce0398206bcfceadd810602 README
+SHA1 150e96c7e842b0c7ae2d5b332c84a39dbd46f06a avltree.c
+SHA1 4d555408deb434b1be65d88a67f1409f2ac542e2 avltree.h
+SHA1 97222e0826df0048a00c0da2147e0df300b413cd bin/fianjmo
+SHA1 ee9e8ac5c882ed6375a46d64a383df9933122a8c bin/fzindex
+SHA1 be9d8a6f41af49b5e9afd4a883f6bfe2c38ce820 bin/fzquery
+SHA1 539817d9ac2b09146341ecbadb4d42a69de5dd78 parse.c
+SHA1 1fc8076d44c1d8651c05211be043c9b74207f588 ppport.h
+SHA1 706caf3e11d198452cb63885443d9b65695912e6 t/FuzzyIndex.t
+SHA1 b36f6d0866bebabf0f0e2788cea7365819384bc3 t/Index-ChatBot.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.1 (FreeBSD)
+
+iD8DBQE+MITGtLPdNzw1AaARAqxuAKCScncDt9tJ6QRCoC4+hDiHnWol9ACgjQnl
+4Z/cotIg1Ao1FztpqXhb7UE=
+=E3XX
+-----END PGP SIGNATURE-----

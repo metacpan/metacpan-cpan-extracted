@@ -1,0 +1,24 @@
+---
+abstract: 'General Purpose Object Serializer'
+author:
+  - 'Al Newkirk <anewkirk@ana.io>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.130880'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Object-Serializer
+requires:
+  Data::Dumper: 0
+  Scalar::Util: 0
+  perl: 5.010
+resources:
+  bugtracker: https://github.com/alnewkirk/Object-Serializer/issues
+  homepage: http://search.cpan.org/dist/Object-Serializer/
+  repository: git://github.com/alnewkirk/Object-Serializer.git
+version: 0.000011

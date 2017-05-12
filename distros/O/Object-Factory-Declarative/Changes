@@ -1,0 +1,21 @@
+Revision history for Perl extension Object::Factory::Declarative.
+
+0.03  Wed Mar 15 18:50:56 2006
+	- original version; created by h2xs 1.23 with options
+		-AOX -n Method::Declarative -b 5.6.0 --skip-exporter --skip-autoloader -v 0.03
+    - Based on (unreleased) HTML::Template::Loader 0.02
+
+0.04  Wed Mar 15 21:11:20 2006
+    - Moved to Object::Factory::Declarative namespace
+    - Added argument expansion to arguments to factory method.
+
+0.05  Thu Mar 16 19:44:21 2006
+    - Added an external interface.
+    - Changed argument expansion context to be the class or object calling
+      the declared object in all cases.
+
+0.06  Mon Jun  5 15:05:05 2006
+    - Fixed test script.
+
+0.07  Sun Nov  5 20:44:04 2006
+    - Supressed annoying warning messages.

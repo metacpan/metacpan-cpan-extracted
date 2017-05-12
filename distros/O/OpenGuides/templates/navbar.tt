@@ -1,0 +1,20 @@
+<div id="navbar_parent">
+<div id="navbar">
+
+  [% INCLUDE navbar_home_link.tt %]
+  [% INCLUDE navbar_tools.tt %]
+  [% INCLUDE navbar_help.tt %]
+  [% INCLUDE navbar_admin.tt %]
+  [% INCLUDE navbar_options.tt %]
+  [% INCLUDE navbar_search.tt %]
+  [% INCLUDE navbar_this_page.tt %]
+ <div id="navbar_starting_points">
+  [% INCLUDE navbar_categories.tt %]
+  [% INCLUDE navbar_locales.tt %]
+ </div>
+[% UNLESS empty_node %]
+  [% INCLUDE navbar_revision_info.tt %]
+[% END %]
+
+</div>
+</div>

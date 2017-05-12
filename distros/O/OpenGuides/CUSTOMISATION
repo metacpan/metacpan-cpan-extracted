@@ -1,0 +1,68 @@
+It is not recommended that you amend the supplied templates - they
+contain logic and therefore can have bugs, they may have new features
+added in the future and so on.
+
+From OpenGuides 0.41, some of the supplied templates will optionally
+call out to other template fragments that you can put in a custom template
+path (by default custom-templates/). If custom templates do not exist then
+sensible default wording will be used instead.
+
+The names of all custom templates will be prefixed with custom_.
+
+The custom templates currently supported are:
+
+ - custom_header.tt
+   Will be included at the very end of the <head> element on every page.
+
+ - custom_licence.tt
+   Will be included at the top of the page editing form.
+
+ - custom_footer_credits.tt
+   Will be included in a <div id="footer"> at the base of every page.
+   You may wish to take advantage of the supplied TT variables
+     - [% delete_link %]
+       Will supply a link to delete the page, if and only if your
+       wiki.conf has deletion turned on.
+     - [% openguides_version %]
+       Contains the version of OpenGuides that your site is running on.
+
+ - custom_banner.tt
+   Will be included in a <div id="banner"> at the top of every page.
+   You may wish to take advantage of the supplied TT variables
+    - [% site_name %]
+      Contains the value supplied in wiki.conf as the name of the site.
+
+ - custom_node.tt
+   Will be included just below the main wiki content in node.tt.
+
+ - custom_autocreate_content.tt
+   You can control the text that gets put into the content field of any
+   autocreated category/locale nodes by putting it in this template.
+   The following TT variables will be available to the template:
+     - [% index_type %]
+       e.g. "Category" - note that the first letter is capitalised
+     - [% index_value %]
+       e.g. "Vegan-friendly" - capitalisation just as typed in the edit form
+     - [% node_name %]
+       e.g. "Category Vegan-Friendly" - the full, "official" name of the
+       autocreated node
+
+ - custom_auto_map_link.tt
+   Used to include map links. The TT variable map_link will contain the
+   map link from the node data, which you may wish to display. If the
+   template is being called from within an address class, the
+   auto_map_link_in_address TT variable will be set.
+   Note: at least one of phone, fax, address, postcode, website,
+         hours_text, map_link is required for this hook to be called,
+         but you should not rely on this behaviour.
+
+- custom_node_location_search.tt
+  Used to add more location based searches on a node page for example nearest
+  tube station. Located after the find all things within * of here form.
+
+Requests for further custom inserts are welcomed.
+
+If you include your own versions of other (non custom_) templates in
+custom-templates they will override the installed files, and this may
+cause you problems. We would much rather that you let us know what we could
+do to make your customisations possible within custom_ templates.

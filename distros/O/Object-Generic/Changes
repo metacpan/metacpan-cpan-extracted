@@ -1,0 +1,26 @@
+Revision history for Object-Generic
+
+0.13    Sep 26 2005
+	added ability to keep an error message within Object::Generic::False
+
+0.12    Sep 26 2005
+	fixed bug in Object::Generic::exists; crashed if key wasn't passed.
+
+0.11    Sep 8 2005
+	updated the documentation; changed version number upward
+	to match Object::Generic::Session's as of this date.
+
+0.03    Sep 8 2005
+	added $obj->remove('key') and $class->define_accessors(@keys) methods
+
+0.02    June 13 2005
+        added $obj->keys and $obj->exists('key') methods,
+	for compatability with Session.pm
+
+0.01    June 7 2005
+	template created with
+           $ module-starter \ 
+	     --module=Object::Generic,Object::Generic::False, \ 
+             --author="Jim Mahoney" --email=mahoney@marlboro.edu
+        added 1st attempt at code for Generic.pm and Generic/False.pm
+          

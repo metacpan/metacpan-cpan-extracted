@@ -1,0 +1,45 @@
+######################################################################
+# INPUT/OUTPUT maps
+#
+# O_*		-> opaque blessed objects
+# O_OBJECT	-> link an opaque C or C++ object to a blessed Perl object.
+#
+######################################################################
+
+TYPEMAP
+
+osp_bridge *		T_PTRREF
+os_server *		O_OBJSTORE
+os_database *		O_OBJSTORE
+os_database_root *	O_OBJSTORE
+os_DLL_schema_info *	O_OBJSTORE
+os_segment *		O_OBJSTORE
+os_notification *	O_OBJSTORE
+osp_txn *		O_OBJSTORE
+OSSVPV *		O_OSSVPV
+OSPV_Container *	O_OSSVPV
+OSPV_Generic *		O_OSSVPV
+OSPV_Ref2 *		O_OSSVPV
+OSPV_Cursor2 *		O_OSSVPV
+OSPV_Ref *		O_OSSVPV
+OSPV_Cursor *		O_OSSVPV
+
+######################################################################
+INPUT
+
+O_OBJSTORE
+	$var = ($type) typemap_any::decode($arg);
+
+O_OSSVPV
+	ospv_bridge * ${var}_bridge = osp_thr::sv_2bridge($arg, 1);
+	$var = ($type) ${var}_bridge->ospv();
+
+######################################################################
+OUTPUT
+
+O_OBJSTORE
+	$arg = osp_thr::any_2sv($var, CLASS);
+
+O_OSSVPV
+	croak("not implemented");
+

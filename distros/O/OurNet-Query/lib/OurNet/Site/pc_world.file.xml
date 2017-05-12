@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<SITE ID="PC_World.File">
+
+<NAME Lang="en-us">PC World Shareware Search</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+PC World¦@¨É³nÅé·j´M
+]]></NAME>
+<INFO Lang="en-us">sharing applications and files search</INFO>
+<INFO Lang="zh-tw">sharing applications and files search</INFO>
+
+<URL Type="Start"><![CDATA[
+http://www.pcworld.com/cgi-bin/database/file_search2.pl?search=_QUERY_&mode=concept&sp=sp
+]]></URL>
+
+
+
+<TEMPLATE><![CDATA[
+<A HREF="/cgi-bin/database/file_body.pl?ID=_URL_">_TITLE_</B>___<FONT SIZE="-1">_PREVIEW_</FONT>
+]]></TEMPLATE>
+</SITE>

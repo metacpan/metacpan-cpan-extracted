@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<SITE ID="Urec">
+
+<NAME Lang="en-us">Unite REseaux du CNRS</NAME>
+<INFO Lang="en-us">general information web search in France</INFO>
+
+<URL Type="More"><![CDATA[
+http://web.urec.fr_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+post://web.urec.fr/cgi-bin/htsearch?config=htdig&restrict=&exclude=&method=and&format=Long&words=_QUERY_&submit=Chercher
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_NEXT_"><![CDATA[
+<a href="_NEXT_"><img src=/images/buttonr.gif
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<strong><a href="_URL_">_TITLE_</a>___<dd>_PREVIEW_</tt></b><br>
+]]></TEMPLATE>
+</SITE>

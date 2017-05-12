@@ -1,0 +1,50 @@
+Menubutton^srv^
+command^0^1^db_crt^$main::current_db->create_database^
+command^0^1^dev_crt^$main::current_db->create_device^
+command^0^1^dev_dump_crt^$main::current_db->create_dump_device^
+command^0^1^login_crt^$main::current_db->create_login^
+command^0^1^rem_srv_crt^$main::current_db->create_remote_server^
+separator^
+command^0^1^srv_prop^$main::current_db->show_server_info^$main::lg{srv_prop}+'srv_prop'^
+command^0^1^srv_stat^$main::current_db->show_server_stat^$main::lg{srv_stat}+'srv_stat'^
+separator^
+command^0^1^tbl_crt^$main::current_db->create_table^
+command^0^1^ind_crt^$main::current_db->create_index^
+Menubutton^obj^
+command^0^0^defaults^$main::current_db->generic_hlist^'Defaults'+'.'^
+command^0^0^groups^$main::current_db->generic_hlist^'Groups'+'.'^
+command^0^0^indexs^$main::current_db->generic_hlist^'Indexes'+'.'^
+command^0^0^procs^$main::current_db->generic_hlist^'Procedures'+'.'^
+command^0^0^rules^$main::current_db->generic_hlist^'Rules'+'.'^
+command^0^0^tabs^$main::current_db->generic_hlist^'Tables'+'.'^
+command^0^0^trggrs^$main::current_db->generic_hlist^'Triggers'+'.'^
+command^0^1^segments^$main::current_db->generic_hlist^'Segments'+'.'^
+command^0^0^systabs^$main::current_db->generic_hlist^'System Tables'+'.'^
+command^0^0^users^$main::current_db->generic_hlist^'Users'+'.'^
+command^0^0^views^$main::current_db->generic_hlist^'Views'+'.'^
+command^0^1^i_dat_typs^$main::current_db->generic_hlist^'Datatypes'+'.'^
+separator^
+command^0^1^ls_all^$main::current_db->generic_hlist^'All Objects'+'.'^
+Menubutton^user^
+command^0^1^logdon_usrs^$main::current_db->show_sql^'curr_users_syb'+'1'+$main::lg{logdon_usrs}^
+command^0^1^user_summ^$main::current_db->show_sql^'actv_users_syb'+'1'+$main::lg{user_summ}^
+command^0^1^curr_procs^$main::current_db->show_sql^'who_do_syb'+'1'+$main::lg{curr_procs}^
+command^0^1^reg_usrs^$main::current_db->show_sql^'user_reg_syb'+'1'+$main::lg{reg_usrs}^
+separator^
+command^0^1^lcks_held^$main::current_db->show_sql^'lcks_syb'+'1'+$main::lg{lcks_held}^
+command^0^1^what_sql_users^$main::current_db->dbcc_pss^'What SQL Users Executing'+'.'^
+command^0^1^what_memory^$main::current_db->dbcc_memusage^'What`s in memory?'+'.'^
+Menubutton^diag^
+cascade^diag^
+add_cascade_button^diag_ind^
+cascade^frag^
+add_cascade_button^frag_ind^
+Menubutton^rev^
+command^0^1^db_recr_sql^$main::current_db->syb_reverse_db^$main::lg{db_recr_sql}+'db_recr_sql'^
+command^0^1^login_rev^$main::current_db->syb_reverse_login^$main::lg{login_rev}+'login_rev'^
+cascade^tbl_rev^
+add_cascade_button^tbl_rev^
+command^0^1^dev_rev^$main::current_db->syb_reverse_dev^$main::lg{dev_rev}+'dev_rev'^
+separator^
+command^explain_plan^0^explain_plan^$main::current_db->explain_plan^^
+

@@ -1,0 +1,18 @@
+Revision history for Perl extension OpenInteract2::Action::RSS.
+
+0.10  Sun Jul  3 15:12:33 EDT 2005
+
+  - Break apart the process() so that subclassing and overriding
+  certain parts of the process is easier; document the different parts
+  subclasses can override.
+
+  - Add documentation note about fetching a feed using cron/wget and
+  referencing the file rather than the URL in your action.
+
+0.03  Sun Dec  5 15:45:07 EST 2004
+
+  - Errors should be displayed as content -- don't use 'add_error()'.
+
+0.02  Wed Dec  1 22:51:10 EST 2004
+
+  - First version, everything is new! (At least as far as you know.)

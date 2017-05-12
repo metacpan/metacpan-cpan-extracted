@@ -1,0 +1,52 @@
+NAME
+    OpenGuides::RDF::Reader - Parse and return OpenGuides metadata from RDF
+
+SYNOPSIS
+      use OpenGuides::RDF::Reader;
+      use WWW::Mechanize;
+      ...
+      my $agent = WWW::Mechanize->new;
+      $agent->get("http://fooville.openguides.org/?id=Red_Lion;format=rdf");
+      my %metadata = parse_rdf($agent->content);
+
+DESCRIPTION
+    The OpenGuides software deliberately exposes data collected on the town
+    wiki sites, making it available to other websites as RDF / XML. This
+    functionality is provided by the module OpenGuides::RDF supplied in the
+    OpenGuides distribution.
+
+    What OpenGuides::RDF::Reader does is the reverse process, i.e. take XML
+    RDF data and turn it back into a hash with keys comprising the metadata
+    fields in OpenGuides. The main use of this is for guide replication.
+
+  parse_rdf
+    This exported subroutine takes a string containing RDF and returns a
+    list of metadata key value pairs.
+
+BUGS
+    Please report any bugs in this module using http://rt.cpan.org/ or
+    posting to bugs-openguides-rdf-reader (at) rt.cpan.org.
+
+SUPPORT
+    For discussion of all matters relating to OpenGuides, there is a mailing
+    list http://openguides.org/mm/listinfo/openguides-dev.
+
+AUTHOR
+            Ivor Williams
+            CPAN ID: IVORW
+         
+            ivorw-openguides (at) xemaps.com
+            http://openguides.org/
+
+COPYRIGHT
+    This program is free software licensed under the...
+
+            The General Public License (GPL)
+            Version 2, June 1991
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+
+SEE ALSO
+    OpenGuides.
+

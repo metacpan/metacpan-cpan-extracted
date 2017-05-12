@@ -1,0 +1,14 @@
+---
+abstract: 'Object::Releaser -- Remove properties from an object when the releaser goes out of scope.'
+author:
+    - "Miko O'Sullivan <miko@idocs.com>"
+generated_by: home grown
+license: perl
+name: Object-Releaser
+provides:
+    Object::Releaser:
+        file: lib/Object/Releaser.pm
+        version: 0.12
+requires:
+    perl: 5.003
+version: 0.12

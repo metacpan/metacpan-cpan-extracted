@@ -1,0 +1,24 @@
+#!dmake
+
+CC=gcc.exe
+CCFLAGS=-DWIN32 -DHAVE_FREEGLUT
+
+LINK=g++.exe
+LDFLAGS=-L../FreeGLUT -lfreeglut -L/usr/lib/W32API -lopengl32
+
+
+all: glversion.txt
+
+clean:
+	-if exist "glversion.txt" del "glversion.txt"
+	-if exist "glversion.exe" del "glversion.exe"
+	-if exist "glversion.o" del "glversion.o"
+
+glversion.txt: glversion.exe
+	glversion > glversion.txt
+
+glversion.exe: glversion.o
+	$(LINK) -o glversion.exe glversion.o $(LDFLAGS)
+
+glversion.o: glversion.c makefile.mingw
+	$(CC) $(CCFLAGS) -c glversion.c

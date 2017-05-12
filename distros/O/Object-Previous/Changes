@@ -1,0 +1,22 @@
+1.1012: Fri Apr 02 2010
+   - Slaven_Rezic via RT, "Previous.xs:61: error: 'const struct
+     block_sub' has no member named 'hasargs'"
+
+1.1011: Wed Jul 08 2009
+   - worst bug ever: I'm jettero@cpan.org, not paul@cpan.org
+
+1.1010: Wed Jul 08 2009
+   - Doc bugs (very indirectly) found by Hans Dieter Pearcey
+
+1.2: Sun May  3 18:33:49 EDT 2009
+   - doc updates, dist updates, etc
+
+1.1: Wed Oct 29 08:33:39 EDT 2008
+   - roflmao: I quit using version.pm but left it in the pm
+
+1.1: Thu Aug  7 15:49:49 EDT 2008
+    - version.pm is incompatible with EU::MM and
+    - removed the Autoloader from the .pm
+
+1.0.0:  Sat Jun  7 19:59:19 EDT 2008
+    - finished the pure perl and XS versions

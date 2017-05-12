@@ -1,0 +1,88 @@
+#!/usr/bin/perl
+
+##########################################################################
+# Copyright (c) 2010-2012 Alexander Bluhm <alexander.bluhm@gmx.net>
+#
+# Permission to use, copy, modify, and distribute this software for any
+# purpose with or without fee is hereby granted, provided that the above
+# copyright notice and this permission notice appear in all copies.
+#
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+# ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+# ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+# OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+##########################################################################
+
+use strict;
+use warnings;
+use Getopt::Long qw(:config posix_default bundling);
+use OSPF::LSDB::ospfd;
+use OSPF::LSDB::ospf6d;
+use OSPF::LSDB::YAML;
+
+sub usage(@) {
+    print STDERR "Error: @_\n" if @_;
+    print STDERR <<EOF;
+Convert OpenBSD ospfd or ospf6d link state database to YAML file.
+If the ospfctl content files are not given on the command line,
+ospfctl is invoked on the local machine.
+
+Usage: $0 [-46h] [-B boundary] [-E external] [-H user\@host]
+  [-I selfid] [-N network] [-R router] [-S summary] [ospf.yaml]
+    -4           use ospfd (default)
+    -6           use ospf6d instead of ospfd
+    -h           help, print usage
+    -B boundary  file containg output of 'ospfctl show database asbr'
+    -E external  file containg output of 'ospfctl show database external'
+    -H user\@host use ssh to login into user\@host to run ospfctl there
+    -I selfid    file containg output of 'ospfctl show summary'
+    -L link      file containg output of 'ospf6ctl show database link'
+    -N network   file containg output of 'ospfctl show database network'
+    -P intra     file containg output of 'ospf6ctl show database intra'
+    -R router    file containg output of 'ospfctl show database router'
+    -S summary   file containg output of 'ospfctl show database summary'
+    ospf.yaml    output file, default stdout
+EOF
+    exit(2);
+}
+
+sub main() {
+    my %files;
+    my $ipv6;
+    my $ssh;
+    GetOptions(
+	'4'   => sub { $ipv6 = 0 },
+	'6'   => sub { $ipv6 = 1 },
+	'h'   => sub { usage() },
+	'B=s' => \$files{boundary},
+	'E=s' => \$files{external},
+	'H=s' => \$ssh,
+	'I=s' => \$files{selfid},
+	'L=s' => \$files{link},
+	'N=s' => \$files{network},
+	'P=s' => \$files{intra},
+	'R=s' => \$files{router},
+	'S=s' => \$files{summary},
+    ) or usage("Bad option");
+    usage("Only one arguments allowed") if @ARGV > 1;
+    unless ($ipv6) {
+	usage("Option -L also needs -6") if $files{link};
+	usage("Option -P also needs -6") if $files{intra};
+    }
+
+    my $class = $ipv6 ? 'OSPF::LSDB::ospf6d' : 'OSPF::LSDB::ospfd';
+    my $ospfd = $class->new(ssh => $ssh);
+    $ospfd->parse(%files);
+
+    my $yaml = OSPF::LSDB::YAML->new($ospfd);
+    if (@ARGV > 0) {
+	$yaml->DumpFile($ARGV[0]);
+    } else {
+	print $yaml->Dump();
+    }
+}
+
+main();

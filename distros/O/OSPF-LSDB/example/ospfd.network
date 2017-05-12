@@ -1,0 +1,209 @@
+
+                Net Link States (Area 23.0.0.0)
+
+LS age: 348
+Options: *|*|-|-|-|-|E|*
+LS Type: Network
+Link State ID: 172.17.2.48 (address of Designated Router)
+Advertising Router: 172.16.0.48
+LS Seq Number: 0x80001305
+Checksum: 0xe2aa
+Length: 32
+Network Mask: 255.255.255.0
+    Attached Router: 172.16.0.47
+    Attached Router: 172.16.0.48
+
+
+                Net Link States (Area 0.0.0.0)
+
+LS age: 1737
+Options: *|*|-|-|-|-|E|*
+LS Type: Network
+Link State ID: 172.17.1.48 (address of Designated Router)
+Advertising Router: 172.16.0.48
+LS Seq Number: 0x80001bd2
+Checksum: 0x2694
+Length: 32
+Network Mask: 255.255.255.0
+    Attached Router: 172.16.0.45
+    Attached Router: 172.16.0.48
+
+
+                Net Link States (Area 51.0.0.0)
+
+LS age: 1007
+Options: *|*|-|-|-|-|E|*
+LS Type: Network
+Link State ID: 172.19.5.146 (address of Designated Router)
+Advertising Router: 172.20.0.146
+LS Seq Number: 0x80000976
+Checksum: 0xe6de
+Length: 36
+Network Mask: 255.255.255.0
+    Attached Router: 172.31.5.52
+    Attached Router: 172.31.5.62
+    Attached Router: 172.20.0.146
+
+LS age: 1468
+Options: *|*|-|-|-|-|E|*
+LS Type: Network
+Link State ID: 172.19.7.68 (address of Designated Router)
+Advertising Router: 172.16.0.68
+LS Seq Number: 0x800005bd
+Checksum: 0x238c
+Length: 36
+Network Mask: 255.255.255.0
+    Attached Router: 172.31.8.2
+    Attached Router: 172.16.0.69
+    Attached Router: 172.16.0.68
+
+LS age: 1540
+Options: *|*|-|-|-|-|E|*
+LS Type: Network
+Link State ID: 172.19.171.68 (address of Designated Router)
+Advertising Router: 172.16.0.68
+LS Seq Number: 0x800002f1
+Checksum: 0x6959
+Length: 36
+Network Mask: 255.255.255.0
+    Attached Router: 172.16.0.69
+    Attached Router: 172.16.0.48
+    Attached Router: 172.16.0.68
+
+LS age: 1626
+Options: *|*|-|-|-|-|E|*
+LS Type: Network
+Link State ID: 172.19.195.68 (address of Designated Router)
+Advertising Router: 172.16.0.68
+LS Seq Number: 0x800005bb
+Checksum: 0xe8e5
+Length: 32
+Network Mask: 255.255.255.0
+    Attached Router: 172.16.0.69
+    Attached Router: 172.16.0.68
+
+LS age: 1624
+Options: *|*|-|-|-|-|E|*
+LS Type: Network
+Link State ID: 172.19.198.68 (address of Designated Router)
+Advertising Router: 172.16.0.68
+LS Seq Number: 0x80000317
+Checksum: 0xf4e9
+Length: 32
+Network Mask: 255.255.255.0
+    Attached Router: 172.31.199.2
+    Attached Router: 172.16.0.68
+
+LS age: 471
+Options: *|*|-|-|-|-|E|*
+LS Type: Network
+Link State ID: 172.19.206.68 (address of Designated Router)
+Advertising Router: 172.16.0.68
+LS Seq Number: 0x8000033f
+Checksum: 0x2cd3
+Length: 40
+Network Mask: 255.255.255.0
+    Attached Router: 172.31.206.2
+    Attached Router: 172.31.207.2
+    Attached Router: 172.16.0.69
+    Attached Router: 172.16.0.68
+
+LS age: 1504
+Options: *|*|-|-|-|-|E|*
+LS Type: Network
+Link State ID: 172.19.222.68 (address of Designated Router)
+Advertising Router: 172.16.0.68
+LS Seq Number: 0x800005b4
+Checksum: 0xcced
+Length: 32
+Network Mask: 255.255.255.0
+    Attached Router: 172.16.0.69
+    Attached Router: 172.16.0.68
+
+LS age: 314
+Options: *|*|-|-|-|-|E|*
+LS Type: Network
+Link State ID: 172.20.0.68 (address of Designated Router)
+Advertising Router: 172.16.0.68
+LS Seq Number: 0x80000315
+Checksum: 0x2ec3
+Length: 40
+Network Mask: 255.255.255.0
+    Attached Router: 172.16.0.69
+    Attached Router: 172.16.0.48
+    Attached Router: 172.20.0.146
+    Attached Router: 172.16.0.68
+
+LS age: 547
+Options: *|*|-|-|-|-|-|*
+LS Type: Network
+Link State ID: 172.22.5.5 (address of Designated Router)
+Advertising Router: 172.31.5.52
+LS Seq Number: 0x80000324
+Checksum: 0x5b18
+Length: 32
+Network Mask: 255.255.255.0
+    Attached Router: 172.31.5.52
+    Attached Router: 172.16.0.47
+
+LS age: 1416
+Options: *|*|-|-|-|-|-|*
+LS Type: Network
+Link State ID: 172.31.5.62 (address of Designated Router)
+Advertising Router: 172.31.5.62
+LS Seq Number: 0x800001a6
+Checksum: 0x901a
+Length: 36
+Network Mask: 255.255.255.0
+    Attached Router: 172.31.5.62
+    Attached Router: 172.30.5.5
+    Attached Router: 172.31.5.52
+
+LS age: 1040
+Options: *|*|-|-|-|-|-|*
+LS Type: Network
+Link State ID: 172.31.8.2 (address of Designated Router)
+Advertising Router: 172.31.8.2
+LS Seq Number: 0x800000a2
+Checksum: 0x154a
+Length: 32
+Network Mask: 255.255.255.0
+    Attached Router: 172.31.8.2
+    Attached Router: 172.30.7.8
+
+LS age: 1731
+Options: *|*|-|-|-|-|-|*
+LS Type: Network
+Link State ID: 172.31.206.1 (address of Designated Router)
+Advertising Router: 172.30.206.206
+LS Seq Number: 0x80000042
+Checksum: 0xf21f
+Length: 32
+Network Mask: 255.255.255.0
+    Attached Router: 172.30.206.206
+    Attached Router: 172.31.206.2
+
+LS age: 1367
+Options: *|*|-|-|-|-|-|*
+LS Type: Network
+Link State ID: 172.31.207.2 (address of Designated Router)
+Advertising Router: 172.31.207.2
+LS Seq Number: 0x80000042
+Checksum: 0xe1f6
+Length: 32
+Network Mask: 255.255.255.0
+    Attached Router: 172.31.207.2
+    Attached Router: 172.30.206.207
+
+LS age: 547
+Options: *|*|-|-|-|-|-|*
+LS Type: Network
+Link State ID: 192.168.0.5 (address of Designated Router)
+Advertising Router: 172.31.5.52
+LS Seq Number: 0x80000645
+Checksum: 0x2c5e
+Length: 32
+Network Mask: 255.255.255.0
+    Attached Router: 172.31.5.52
+    Attached Router: 172.31.5.62
+

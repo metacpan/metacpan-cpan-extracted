@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<SITE ID="Coo">
+
+<NAME Lang="en-us">Coo WWW Search</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+»Å¯¸·j´M¤ÞÀº
+]]></NAME>
+<INFO Lang="en-us">general information web search in Taiwan</INFO>
+<INFO Lang="zh-tw">general information web search in Taiwan</INFO>
+
+<URL Type="More"><![CDATA[
+http://Search.coo.com.tw/?show_page=_START_1_1_&keyword=_QUERY_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://Search.coo.com.tw/?show_page=1&keyword=_QUERY_
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+
+<TEMPLATE><![CDATA[
+<td width=500 align=left valign=top>_TITLE_<i>___?url=_URL_">___</a><br>_-->_PREVIEW___</tr>
+]]></TEMPLATE>
+</SITE>

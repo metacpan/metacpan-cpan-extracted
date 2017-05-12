@@ -1,0 +1,246 @@
+# ABSTRACT: General Purpose Object Serializer
+package Object::Serializer;
+
+use utf8;
+use Data::Dumper ();
+
+our %PORTER;
+our $MARKER = '__CLASS__';
+
+# VERSION
+
+=head1 SYNOPSIS
+
+    package Point;
+
+    use Moo;
+    use parent 'Object::Serializer';
+
+    has 'x' => (is => 'rw');
+    has 'y' => (is => 'rw');
+
+    package main;
+
+    my $p = Point->new(x => 10, y => 10);
+
+    # serialize the class into a hash
+    my $p1 = $p->serialize; # creates { __CLASS__ => 'Point', x => 10, y => 10 }
+
+    # deserialize the hash into a class
+    my $p2 = $p->deserialize($p1);
+
+=head1 DESCRIPTION
+
+Serializing blessed objects suck. In-general, formatting data structures and
+objects into an ideal format for passing representations in and out of
+applications is a pain. Make it stop. Object::Serializer is a fast and simple
+pure-perl framework-agnostic type-less none-opinionated light-weight primative
+general purpose object serializer. It was made in the likeness of MooseX::Storage
+but designed to be used with Moo and others.
+
+=head1 EXTENSION
+
+Object::Serializer has no constructor and is primarily designed to be used as a
+base class for your own classes or roles. By default, Object::Serializer doesn't
+do anything magical for you in the way of serialization, however, you can easily
+hook into the serialization process by defining your own custom serialization
+routines. The following sytax is what you might use to register your own
+custom serializers:
+
+    Object::Serializer->serialize::object(
+        DateTime => (
+            expand   => sub { shift->to_epoch },
+            collapse => sub { DateTime->from_epoch(shift) }
+        )
+    );
+
+This method call registers a custom serializer that is executed globally
+whenever a DateTime object if found. The expand and collapse coderefs suggest
+what will happen on deserialization and serialization respectively,
+additionally, you can register custom serializers to only be used when invoked
+by a specific class. The following sytax is what you might use to register a
+custom serializer with a specific class:
+
+    Point->serialize::object(
+        DateTime => (
+            expand   => sub { shift->to_epoch },
+            collapse => sub { DateTime->from_epoch(shift) }
+        )
+    );
+
+=head1 CAVEAT
+
+Circular references are specifically disallowed, however if you break the cycles
+yourself then re-assemble them later you can get around this.
+
+=cut
+
+sub new {
+    bless {}, shift
+}
+
+sub _hashify {
+    my ($self, $object) = @_;
+    return unless $object;
+
+    local $Data::Dumper::Terse      = 1;
+    local $Data::Dumper::Indent     = 0;
+    local $Data::Dumper::Useqq      = 1;
+    local $Data::Dumper::Deparse    = 1;
+    local $Data::Dumper::Quotekeys  = 0;
+    local $Data::Dumper::Sortkeys   = 1;
+    local $Data::Dumper::Deepcopy   = 1;
+    local $Data::Dumper::Purity     = 0;
+
+    my $subject = Data::Dumper::Dumper($object);
+
+    my $grammar = do {
+        use Regexp::Grammars;
+        qr{
+            bless <.left_paren>
+                (?: <.escape> | <.paren_pair> | <.brace_pair> |  <.non_paren> )*
+            <.right_paren>
+                (?=(?:(?:(?:[^"\\]++|\\.)*+"){2})*+(?:[^"\\]++|\\.)*+$)
+
+            <rule: paren_pair>
+                \(  (?: <escape> | <paren_pair> | <brace_pair> | [^()] )*  \)
+
+            <rule: brace_pair>
+                \{  (?: <escape> | <paren_pair> | <brace_pair> | [^{}] )*  \}
+
+            <token: escape>       \\ .
+            <token: left_paren>   \(
+            <token: right_paren>  \)
+            <token: non_paren>    [^()]
+        }xms;
+    };
+
+    while ($subject =~ /$grammar/) {
+        my $after = my $before = (values(%/))[0];
+        my $class = $1 if $after =~ s/,\s?'([\w:]+)'\s?\)$//;
+        my $head  = "'$MARKER' => '$class',";
+
+        $after   =~ s/^bless\(\s?{/{$head/;
+        $after   = $after;
+        $before  = quotemeta $before;
+        $subject =~ s/$before/$after/g;
+    }
+
+    return eval qq{ my \$VAR1 = $subject; };
+}
+
+sub _portify {
+    my ($self, $which, $data) = @_;
+    return $data unless defined $data;
+
+    my $reftype = ref $data;
+    return $data unless defined $reftype;
+
+    my $direction;
+    for my $class (ref $self, __PACKAGE__) {
+        my $porter = $PORTER{$class};
+        next unless 'HASH' eq ref $porter;
+
+        my $target = $porter->{$reftype};
+        next unless 'HASH' eq ref $target;
+
+        $direction = $target->{$which};
+        undef $direction unless 'CODE' eq ref $direction;
+    }
+
+    return $data unless defined $direction;
+    return $direction->($data);
+}
+
+sub _perform_serialization {
+    my ($self, $object) = @_;
+    return unless $object;
+
+    my $data;
+
+    if ('ARRAY' eq ref $object) {
+        $data = [];
+        for my $val (@{$object}) {
+            push @{$data} => $self->_perform_serialization($val);
+        }
+    }
+    elsif ('HASH' eq ref $object) {
+        $data = {};
+        while (my($key, $val) = each(%{$object})) {
+            if ('HASH' eq ref $val) {
+                $data->{$key} = $self->_perform_serialization($val);
+            }
+            else {
+                $data->{$key} = $val;
+            }
+        }
+        if (exists $data->{$MARKER} and my $class = $data->{$MARKER}) {
+            $data = $self->_portify('collapse', bless({%{$data}}, $class));
+        }
+    }
+    else {
+        $data = $self->_portify('collapse', $object);
+    }
+
+    return $data;
+}
+
+sub serialize {
+    my ($self, $object) = @_;
+    return unless $object // $self;
+    return $self->_perform_serialization($self->_hashify($object // $self));
+}
+
+sub _perform_deserialization {
+    my ($self, $object) = @_;
+    return unless $object;
+
+    my $data;
+
+    if ('ARRAY' eq ref $object) {
+        $data = [];
+        for my $val (@{$object}) {
+            push @{$data} => $self->_perform_deserialization($val);
+        }
+    }
+    elsif ('HASH' eq ref $object) {
+        $data = {};
+        while (my($key, $val) = each(%{$object})) {
+            if ('HASH' eq ref $val) {
+                $data->{$key} = $self->_perform_deserialization($val);
+            }
+            else {
+                $data->{$key} = $val;
+            }
+        }
+        if (my $class = delete $data->{$MARKER}) {
+            $data = $self->_portify('expand', bless({%{$data}}, $class));
+        }
+    }
+    else {
+        $data = $self->_portify('expand', $object);
+    }
+
+    return $data;
+}
+
+sub deserialize {
+    my ($self, $object) = @_;
+    return unless $object;
+    return $self->_perform_deserialization($self->_hashify($object));
+}
+
+sub serialize::object {
+    my ($namespace, $reftype, %attributes) = @_;
+
+    die "Couldn't register type serializer due to invalid arguments" unless
+        $namespace && $reftype && (
+            'CODE' eq ref $attributes{collapse} ||
+            'CODE' eq ref $attributes{expand}
+        )
+    ;
+
+    return $PORTER{ref($namespace) // $namespace}{$reftype} = {%attributes};
+}
+
+1;

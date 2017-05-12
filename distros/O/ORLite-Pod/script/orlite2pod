@@ -1,0 +1,117 @@
+#!/usr/bin/perl
+
+# See POD documentation at the end of the file
+
+use 5.006;
+use strict;
+use Getopt::Long ();
+use Params::Util ();
+use ORLite::Pod  ();
+
+our $VERSION = '0.11';
+
+my $AUTHOR = undef;
+my $EMAIL  = undef;
+my $YEAR   = undef;
+my $RT     = undef;
+Getopt::Long::GetOptions(
+	'author=s' => \$AUTHOR,
+	'email=s'  => \$EMAIL,
+	'year=s'   => \$YEAR,
+	'rt'       => \$RT,
+);
+
+unless ( -d 'lib' ) {
+	die("Failed to find lib directory");
+}
+unshift @INC, 'lib';
+
+my $class = shift;
+unless ( Params::Util::_CLASS($class) ) {
+	usage();
+}
+eval "use $class { show_progress => 1 };";
+if ( $@ ) {
+	die("Failed to load $class: $@");
+}
+
+print "Creating ORLite::Pod instance...\n";
+my %params = (
+	from => $class,
+	to   => 'lib',
+);
+if ( defined $AUTHOR ) {
+	$params{author} = $AUTHOR;
+}
+if ( defined $EMAIL ) {
+	$params{email} = $EMAIL;
+}
+if ( defined $YEAR ) {
+	$params{year} = $YEAR;
+}
+if ( $RT ) {
+	$params{rt} = 1;
+}
+my $pod = ORLite::Pod->new( %params );
+
+print "Starting POD generation run...\n";
+$pod->run;
+
+exit(0);
+
+sub usage { print <<'END_TEXT'; exit(0); }
+Usage: orlite2pod Class::Name
+
+  --author NAME     # The name of the author
+  --email  EMAIL    # The contact email address of the author
+  --year   1234     # The first year of release of the distribution
+  --rt              # Should a link to rt.cpan.org be added to SUPPORT
+
+END_TEXT
+
+__END__
+
+=pod
+
+=head1 NAME
+
+orlite2pod - Documentation generator frontend for ORLite
+
+=head1 SYNOPSIS
+
+  orlite2pod Class::Name
+
+=head1 DESCRIPTION
+
+F<orlite2pod> is the command line front-end for L<ORLite::Pod>.
+
+You should run this in the root directory of a distribution,
+and provide it with the class in your distribution that is the
+root of an L<ORLite> ORM.
+
+An additional C<--author> option can be set to set the name of the
+author to be used when generating the POD files.
+
+=head1 SUPPORT
+
+Bugs should be reported via the CPAN bug tracker at
+
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=ORLite-Pod>
+
+For other issues, contact the author.
+
+=head1 AUTHOR
+
+Adam Kennedy E<lt>adamk@cpan.orgE<gt>
+
+=head1 COPYRIGHT
+
+Copyright 2009 - 2010 Adam Kennedy.
+
+This program is free software; you can redistribute
+it and/or modify it under the same terms as Perl itself.
+
+The full text of the license can be found in the
+LICENSE file included with this module.
+
+=cut

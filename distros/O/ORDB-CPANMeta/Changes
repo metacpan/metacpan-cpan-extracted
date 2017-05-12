@@ -1,0 +1,14 @@
+Changes for Perl extension ORDB-CPANMeta
+
+0.10 Wed 22 Jul 2009
+	- Updating to match ORDB::CPANMeta::Generator 0.10
+	- Added schema lock for user_version 10
+
+0.03 Tue 30 Jun 2009
+	- Correcting the module name in 01_compilt.
+
+0.02 Sat 27 Jun 2009
+	- Updated to new data source url
+
+0.01 Mon  1 Jun 2009
+	- Created the initial implementation

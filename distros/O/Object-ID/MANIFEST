@@ -1,0 +1,23 @@
+.perlcriticrc
+.perltidyrc
+Build.PL
+Changes
+inc/MyBuilder.pm
+lib/Object/ID.pm
+lib/UNIVERSAL/Object/ID.pm
+LICENSE
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+README
+t/00compile.t
+t/autoclean.t
+t/destroy.t
+t/immutable.t
+t/lib/AutoCleanWidget.pm
+t/role.t
+t/threads.t
+t/universal.t
+t/uuid.t
+META.json
+SIGNATURE    Added here by Module::Build

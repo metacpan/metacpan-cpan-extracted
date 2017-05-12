@@ -1,0 +1,29 @@
+
+<table border="0" cellpadding="0" cellspacing="0" width="640" height="40">
+    <tr height="40">
+
+    <td height="40" width="20" align="right"><img src="[% image_url %]/bar_left_end.gif" width="20" height="40" border="0" alt=""></td>
+
+    <td height="40" width="80" background="[% image_url %]/bar_left.gif" valign="middle"> 
+        <a href="[% left_link %]"><span class="plain"><span class="number">[% left %]</span></span></a> 
+    </td>
+
+    <td height="40" width="430" background="[% image_url %]/bar_right.gif" valign="middle" align="center">
+
+    <a href="[% center_link %]"><center><span class="plain"><span class="number">[% center %]</span></span></center></a>
+
+    </td>
+
+    <td height="40" width="80" background="[% image_url %]/bar_left.gif" align="right" valign="middle">
+        <a href="[% right_link %]"><span class="plain"><span class="number">[% right %]</span></span></a>
+    </td>
+
+    <td height="40" width="20"><img width="20" height="40" border="0" alt="" src="[% image_url %]/bar_right_end.gif"></td>
+
+    </tr>
+</table>
+[% IF handler.user.length %] 
+<p>
+Logged in as: [% handler.user %] [% del_form(calendar.span, { "mode" => "del_cookie", "command" => "logout" }) %]
+</p>
+[% END %]

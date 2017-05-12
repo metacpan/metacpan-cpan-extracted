@@ -1,0 +1,92 @@
+<fieldset id="node_image_fields">
+  <legend>Image to illustrate this page</legend>
+
+  <div class="edit_form_group" id="node_image_group">
+    <label for="node_image_input">
+      [% IF conflict %]
+        Current image:
+      [% ELSE %]
+        URL of image:
+      [% END %]
+    </label>
+    <div class="edit_box">
+      <input type="text" size="50" id="node_image_input" name="node_image"
+       value="[% node_image %]" />
+      [% INCLUDE node_photo_notes.tt %]
+    </div>
+    [% IF conflict %]
+      <div class="conflict_group">
+        <label>Your image:</label>
+        <div class="conflict_box">
+          [% CGI.escapeHTML(new_node_image) %]
+        </div>
+      </div>
+    [% END %]
+  </div>
+  
+  <div class="edit_form_group" id="node_image_copyright_group">
+    <label for="node_image_copyright_input">
+      [% IF conflict %]
+        Current copyright holder:
+      [% ELSE %]
+        Name of image copyright holder:
+      [% END %]
+    </label>
+    <div class="edit_box">
+      <input type="text" size="50" id="node_image_copyright_input"
+       name="node_image_copyright" value="[% node_image_copyright %]" />
+    </div>
+    [% IF conflict %]
+      <div class="conflict_group">
+        <label>Your copyright holder:</label>
+        <div class="conflict_box">
+          [% CGI.escapeHTML(new_node_image_copyright) %]
+        </div>
+      </div>
+    [% END %]
+  </div>
+
+  <div class="edit_form_group" id="node_image_licence_group">
+    <label for="node_image_licence">
+      [% IF conflict %]
+        Current licence:
+      [% ELSE %]
+        URL of image licence:
+      [% END %]
+    </label>
+    <div class="edit_box">
+      <input type="text" size="50" id="node_image_licence"
+       name="node_image_licence" value="[% node_image_licence %]" />
+    </div>
+    [% IF conflict %]
+      <div class="conflict_group">
+        <label>Your licence:</label>
+        <div class="conflict_box">
+          [% CGI.escapeHTML(new_node_image_licence) %]
+        </div>
+      </div>
+    [% END %]
+  </div>
+
+  <div class="edit_form_group" id="node_image_info_group">
+    <label for="node_image_url">
+      [% IF conflict %]
+        Current info page:
+      [% ELSE %]
+        URL of image's info page:
+      [% END %]
+    </label>
+    <div class="edit_box">
+      <input type="text" size="50" id="node_image_url"
+       name="node_image_url" value="[% node_image_url %]" />
+    </div>
+    [% IF conflict %]
+      <div class="conflict_group">
+        <label>Your info page:</label>
+        <div class="conflict_box">
+          [% CGI.escapeHTML(new_node_image_url) %]
+        </div>
+      </div>
+    [% END %]
+  </div>
+</fieldset>

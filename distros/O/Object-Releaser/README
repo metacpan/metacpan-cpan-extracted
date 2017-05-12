@@ -1,0 +1,125 @@
+NAME
+
+    Object::Releaser -- Remove properties from an object when the releaser
+    goes out of scope.
+
+SYNOPSIS
+
+    Remove all hash reference elements:
+
+     $object = {a=>1, b=>2, c=>3};
+     $releaser = Object::Releaser->new($object);
+     undef $releaser;
+     # object still exists but has no elements
+
+    Remove only hash reference elements a and b:
+
+     $object = {a=>1, b=>2, c=>3};
+     $releaser = Object::Releaser->new($object);
+     $releaser->set_keys(qw{a b});
+     undef $releaser;
+     # object has element c but not a and b
+
+    Cancel the release, don't release anything:
+
+     $object = {a=>1, b=>2, c=>3};
+     $releaser = Object::Releaser->new($object);
+     $releaser->dismiss();
+     undef $releaser;
+     # object is not changed
+
+DESCRIPTION
+
+    Object::Releaser provides the ability to delete all or some of the
+    elements from a hash reference when the releaser goes out of scope.
+    This is done by creating the releaser, passing in the object to be
+    released as the sole argument:
+
+     $releaser = Object::Releaser->new($object);
+
+    When $releaser goes out of scope, all elements in $object are deleted.
+
+    If you only want specific elements deleted, set those elements with
+    $releaser->set_keys(). So, for example, the following lines set the
+    releaser to delete elements a and b from the object, but not any other
+    elements:
+
+     $releaser = Object::Releaser->new($object);
+     $releaser->set_keys(qw{a b});
+
+ALTERNATIVES
+
+    Object::Destroyer provides very similar functionality. It provides for
+    more complex situations and has greater flexibility. Object::Releaser
+    fulfills one simple function: deleting elements from a hashref.
+
+    If you just want to avoid circular references, you might want to use
+    weaken in the Scalar::Util module (which is built into Perl as of
+    version 5.6.0).
+
+INSTALLATION
+
+    Array::OneOf can be installed with the usual routine:
+
+     perl Makefile.PL
+     make
+     make test
+     make install
+
+METHODS
+
+ new
+
+    Creates an Object::Releaser object. The single argument is the object
+    to be released when $releaser goes out of scope:
+
+     $releaser = Object::Releaser->new($object);
+
+    If you do nothing else, then all elements in $object will be deleted
+    when $releaser goes out of scope.
+
+ set_keys
+
+    Tells the releaser to only delete specified keys from the object. For
+    example, the code:
+
+     $releaser->set_keys(qw{a b});
+
+    sets the releaser so that only elements a and b are deleted.
+
+ delete_all
+
+    delete_all does the opposite of set_keys: it sets the releaser to
+    delete all keys from the target object. Use delete_all if you
+    previously used set_keys to set deletion for specific keys, but now
+    want to go back to deleting all keys:
+
+     $releaser = Object::Releaser->new($object);
+     $releaser->set_keys(qw{a b});
+     $releaser->delete_all();
+
+TERMS AND CONDITIONS
+
+    Copyright (c) 2013 by Miko O'Sullivan. All rights reserved. This
+    program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. This software comes with NO
+    WARRANTY of any kind.
+
+AUTHOR
+
+    Miko O'Sullivan miko@idocs.com
+
+VERSION
+
+    Version 0.10 February 17, 2013
+
+      Initial release
+
+    Version 0.11 February 21, 2013
+
+      Fixed bug: incorrect number of test in test plan.
+
+    Version 0.12 April 25, 2014
+
+      Fixed error in META.yml.
+

@@ -1,0 +1,16 @@
+QtPosh 2.00 Project
+
+- GUI toolkit will be PerlQt 2.000+.
+
+- Hypertext click-to-nagivate interface.
+
+- Code needs to be reorganized to maximize sharing:
+  posh
+  ObjStore::Peeker
+  ObjStore::Posh::*
+
+- POSH_PEEK needs to be redesigned to integrate with hyperlinks.
+
+- Things should work mostly the same whether the database is being
+accessed directly or via osperlserver.
+

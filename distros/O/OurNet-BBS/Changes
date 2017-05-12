@@ -1,0 +1,273 @@
+[Changes for 1.67 - 2011-11-11]
+
+* Do not attempt to build for Perl 5.10+, as this module depends on pseudohashes.
+
+* Modernize the build process again to the latest Module::Install release.
+
+* Add this notice to README:
+
+    (Currently, this project exists mainly for historical/archival purposes,
+    not for active development.)
+
+----
+
+v1.66 Thu Oct 30 19:41:27 CST 2003
+    Modernise the build process, and correctly depend on a non-broken,
+    freshly-released if.pm, version 0.04.
+
+v1.65 Sun May 25 14:44:37 CST 2003
+    Adds transcoding support; "use OurNet::BBS 'big5'" now turns internal
+    data into Unicode strings, and encode/decoded with on-disk data in big5.
+
+    Better support for MAPLE3's User objects.
+
+    Built-in file locking support, so concurrent access to the same disk
+    asset no longer cause race conditions.
+
+    Supports OurNet::BBS->new('OurNet', OurNet::BBS->new(...), $username)
+    for on-disk authentication.
+
+    Full Group support for MELIX systems implemented.
+
+v1.64 Thu Feb  7 05:31:46 CST 2002
+    Better parsing of NNTP-style BBSAgent articles.
+
+    The bbsboard utilitiy now respects the board's {permit} settings.
+
+    Reconnection is supported in OurNet::Client.
+
+    New "-s" (non-forking) flag for bbscomd.
+
+    New "-G" flag for bbscomd to allow login as any user.
+
+    Hash components now has the "KEYS" method.
+
+    Major overhaul in UserGroup work to provide consistent behaviour.
+
+    Introduces experimental Firebird3 backend (User and Board only).
+
+    Relaxed Makefile.PL requirements; no install of MailBox by default.
+
+    Removed ExtUtils so it has to be fetched from CPAN manually.
+
+    The eg/ directory now contains some sample scripts.
+
+    Prefers the use of hashref by-name new() syntax in examples and
+    tests.
+
+    The hashref constructor syntax is accepted by OurNet backend.
+
+    Split documentation about roadmap to OurNet::BBS::Roadmap.
+
+v1.63, Mon Dec 10 20:21:38 CST 2001
+    Added three simple diagrams in OurNet::BBS::Tutorial.
+
+    A longer timeout (60 sec) is now used by BBSAgent.
+
+    Fixed installation glitches reported by pudge.
+
+    Remove unused MELIX toplevel fields "usershmkey" and "maxuser".
+
+    Group semantic in MAPLE3 and MELIX finally worked.
+
+    The dependency to Test::More 0.31+ is now handled.
+
+    Better diagnostics from the test process.
+
+    Updated document to cut down sales-talk and beef up spelling.
+
+    New ciphers Crypt::DES_EDE3 and Crypt::Rijndael_PP are supported.
+
+    The NNTP backend now handles "id" and "title" predicably.
+
+    Fixed a bbscomd bug of not detecting wrong passphrases.
+
+    Secure communication via CIPH_PGP is restored.
+
+    If the gnupg keyring is suddenly unavailable, Server can now
+    accomodate.
+
+    The auto-installer ExtUtils::AutoInstall is now less buggy.
+
+    MIME QuotedPrint handling of bbsboard/bbsmail has been improved.
+
+v1.62, Mon Oct 15 07:48:58 CST 2001
+    No longer depends on GnuPG::Interface to run.
+
+    The OurNet protocol has been updated to 0.4 with callback support.
+
+    Assigning a coderef directly (but not inside refs) via OurNet now
+    works.
+
+    New, write-only External backend to utilize sendmail and the like.
+
+    Tainting check should now work on bbsboard and bbsmail.
+
+    GC stability on perl v5.6.x is much better.
+
+    A revised, more flexible Makefile.PL.
+
+v1.61, Fri Sep 28 00:53:46 CST 2001
+    Adds a read-only, experimental Cola backend.
+
+    Implements re-authentication for Server.
+
+    Bundles bbsboard and bbsmail utilities.
+
+    The BBSAgent backend now has a logfile property for debugging use.
+
+    Permission model and group support for CVIC.
+
+    Fixes various Base namespace pollution bugs.
+
+    Public key-based login is working now.
+
+    Additional Server options could be set in
+    %OurNet::BBS::Server::Options.
+
+    Introduced the Bundle::OurNet namespace.
+
+v1.6, Mon Sep 3 23:07:36 CST 2001
+    Changed Server and Client's default port from 7978 to 7979.
+
+    Complete ArticleGroup permission model for MELIX.
+
+    A <-g> options now enables bbscomd to accept guest-privileged
+    connections.
+
+    Delete board / articles now works in file-based backends.
+
+    Changed DBI to RAM; it has nothing to do with DBI anyway.
+
+    Integrated the new set of design documents into manpage.
+
+v1.6-delta, Mon Aug 28 01:47:18 CST 2001
+    Session support for MELIX backend.
+
+    Purged LWP support from tree; nobody's using it anyway.
+
+    Fixed context problems of NNTP and OurNet backends.
+
+    The OurNet protocol could now pass back arguments by reference.
+
+    Passes tests on Win32 now.
+
+    Post-back of BBSAgent and SessionGroup fixed.
+
+v1.6-gamma, Thu Aug 16 17:37:12 CST 2001
+    The test cases in "t/" are now numbered, and OurNet-based tests
+    added. For the first time, all tests pass.
+
+    Implemented "{'owner'}" fetch for CVIC groups.
+
+    The chrono-ahead algorithm now works correctly for all backends, so
+    there will no longer be duplicate "Message-ID"s.
+
+    Fixed the MAPLE3 backend's incestuous relationship with MELIX.
+
+    Upgraded the Authen protocol to v0.3. Setting the flag
+    $OurNet::BBS::BYPASS_NEGOTIATION now bypasses handshaking
+    altogether.
+
+v1.6-beta, Tue Aug 14 03:31:10 CST 2001
+    A streamlined "t/stdtest" base now applies to all three file-based
+    backends.
+
+    The "{''} = ..." STORE-as-PUSH semantics is fully supported.
+
+    Group metadata unified into hash-based "{owner|title|id}".
+
+    Compatibility for perl 5.7.x, including line disciplines.
+
+    The long-timed 'extra test' heisenbug has been eliminated.
+
+v1.6-alpha, Sun Aug 12 19:03:08 CST 2001
+    Added the HISTORY section in manpage.
+
+    Rewritten Base to be "overload"-based.
+
+    Eliminated ArrayProxy and pseudohashes.
+
+    Uses Test::More instead of Test.
+
+    Improved MIME and mail address parsing regexes.
+
+    A much faster and robust NNTP backend.
+
+    The DBI backend rewritten to indicate style change.
+
+v1.56, Mon Jul 23 02:12:06 2001
+    File access via FileGroup components.
+
+    Group support for MAPLE3 with a twisted API.
+
+    Proper permission control for nearly all components.
+
+    Unix-style mailbox support via the MailBox backend.
+
+    CR/LF bug on Win32 eliminated.
+
+v1.55, Wed Jun 20 06:17:16 2001
+    The full OurNet authentication model.
+
+    Fixed UserGroup for MAPLE* backends.
+
+    A new Message-ID formula.
+
+    Fixed core dump in various, but not all, places.
+
+    Massive speed increase.
+
+v1.54, Wed Jun 13 11:43:12 2001
+    This version implements the new OurNet (formerly known as PlClient)
+    asymmetric-key based authentication model, article/board permission
+    model for M3 backends, numerous bug fixes, win32 support, and much,
+    much more.
+
+v1.53, Sat Jun 9 11:09:26 2001
+    Full bbscomd support; PlClient is now a valid backend. (autrijus)
+
+    Finally fixed the internal object model; using multiple backends was
+    broken due to back-propagation of initvar() variables. (autrijus)
+
+    STORE into MAPLE* backends should now update shm correctly.
+    (autrijus)
+
+    Improved BBSAgent error handling for fail-safe operations. (clkao)
+
+    Fixed hazard caused by remote empty (or deleted) articles. (clkao)
+
+    Nickname support for MAPLE2/CVIC is reimplemented. (clkao)
+
+    BBSAgent now matches nickname even in pathetic cases. (smartboy)
+
+v1.52, Wed Jun 6 05:53:54 2001
+    Clean-up release to fix many 1.51 glitches, with added documentation
+    and test cases added.
+
+v1.51, Sat Jun 2 07:05:18 2001
+    Forked out from "libOurNet" distribution.
+
+    Vastly improved support for BBSAgent backend to support ebx, with
+    many parsing enhancement and templates from smartboy.
+
+v1.4-alpha4, Fri Mar 23 03:21:14 2001
+    Integrated the MAPLE3 backend.
+
+v1.4-alpha3, Fri Jan 12 04:57:17 2001
+    First Win32 (ppm) release.
+
+v1.4-alpha2, Mon Jan 15 07:39:00 2001
+    Adds LWP::Protocol support and Session components.
+
+v1.4-alpha, Fri Jan 12 04:54:29 2001
+    First CPAN release, featuring the BBSAgent backend.
+
+v1.3, Fri Dec 29 05:40:11 2000
+    Provides simple remote access via OurNet::BBS::PlClient.
+
+v1.2, Thu Dec 7 05:02:39 2000
+    Backend abstraction revised; added PTT backend by gugod.
+
+v1.1, Tue Nov 21 19:00:33 2000
+    Initial commit, with CVIC as the only backend.

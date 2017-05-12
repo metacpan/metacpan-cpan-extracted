@@ -1,0 +1,11 @@
+# $File: //depot/OurNet-BBSAgent/BBSAgent/ufo.bbs $ $Author: autrijus $
+# $Revision: #2 $ $Change: 2829 $ $DateTime: 2002/01/10 14:54:36 $
+# Contributed by Whiteg <whiteg@elixus.org>
+# zh_TW.Big5: 中正資工女生八卦站
+
+Chung-Cheng University CS Girl's Gossip
+ufo.cs.ccu.edu.tw:3001
+
+load melix.board
+load melix.session
+load melix.user

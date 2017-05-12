@@ -1,0 +1,12 @@
+Makefile.PL
+Build.PL
+META.yml
+Changes
+example.pl
+MANIFEST
+README
+lib/Options.pm
+lib/Options/Test.pm
+t/pod.t
+t/pod-coverage.t
+t/options.t

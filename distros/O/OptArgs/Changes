@@ -1,0 +1,145 @@
+0.1.20 (2016-04-11)
+
+    New Features:
+        - None in this release but it might be worth you taking a look
+          at the upcoming OptArgs2 for a cleaner and more flexible
+          re-implementation.
+
+    Authoring:
+        - Clean up empty Changes entries
+
+0.1.19_1 (2016-03-03)
+
+    Enhancements:
+        - New $OptArgs::PRINT_DEFAULT option for displaying default
+          values in usage messages (Mario Domgoergen)
+        - New $OptArgs::PRINT_ISA option for displaying option
+          types in usage messages (Mario Domgoergen)
+
+0.1.18 (2015-11-27)
+
+    New Features:
+        - Setting "default" to true on a Bool option causes it to
+          appear as "--no-bool" in the usage. You will want to reverse
+          the meaning of the "comment" if you use this feature.
+
+    Enhancements:
+        - App::optargs: don't require loaded class and application
+          classes to be the same.
+        - Remove some code duplication
+
+0.1.16 (2014-10-01)
+
+    API Changes:
+        - The dispatch() function has been marked as depreciated,
+          although it will remain in place for a while. The
+          class_optargs() function should be used instead.
+
+    New Features:
+        - New class_optargs() function for more caller flexibility
+
+0.1.14 (2014-06-16)
+
+   Bug Fixes:
+      - Support "command SUBCMD(with fallback) FALLBACK_ARG"
+
+0.1.12 (2014-06-11)
+
+    Enhancements:
+       - Put POD back into .pm files; metacpan looks odd when separate.
+
+    Bug Fixes:
+       - Depend on Encode version 2.24 which should allow OptArgs to
+         work on old versions of Perl on *BSD. Closes
+         https://rt.cpan.org/Ticket/Display.html?id=95888.
+       - Generate Getopt::Args in Makefile.PL instead of in a Git
+         commit hook which will work with the new release method.
+         Closes https://github.com/mlawren/p5-OptArgs/issues/10.
+
+0.1.10 (2014-05-07)
+
+    Enhancements:
+        - Enable build/run/test on MSWin32 environments
+        - Small code cleanups
+
+0.1.8 (2014-03-17)
+
+    Bug Fixes:
+        - Several "s/-/_/g" regex's were missing the final "g". Without
+          the global replacement, sub commands that had more than one
+          '-' in them would fail to be found during dispatch.  Closes
+          https://github.com/mlawren/p5-OptArgs/issues/8.
+
+0.1.6 (2014-02-13)
+
+    Enhancements:
+        - Program VERSION is displayed for help at top level
+
+    Bug Fixes:
+        - Don't index Getop::Args::Usage
+        - Ensure default CODE refs are executed in arg/opt definition
+          order. Closes https://github.com/mlawren/p5-OptArgs/issues/7.
+
+0.1.4 (2013-12-23)
+
+    Enhancements:
+        - Add "[OPTIONS]" to usage line when options exist
+        - Allow fallbacks to be hidden
+
+    Bug Fixes:
+        - Make App::optargs respect the value of $SORT
+        - Ensure a fallback subcommand is also sorted according to $SORT
+        - Sort option list according to $SORT
+
+0.1.2 (2013-05-20)
+
+    New Features:
+        - Sub-commands can now be optionally abbreviated by setting
+          $OptArgs::ABBREV (Thanks to Robbin Bonthond)
+        - Sub-commands can now be optionally sorted by setting
+          $OptArgs::SORT (Thanks to Robbin Bonthond)
+        - (The above require a minor version number upgrade)
+
+    Enhancements:
+        - Document colourized output behaviour
+        - Improved usage output: simpler colour scheme, more info
+        - Improved tests
+
+    Bug Fixes:
+        - Do not assume consistent hash key order in tests
+        - Do not count negative Int/Num arguments as unknown options
+
+0.0.4 (2012-08-21)
+
+    New Features:
+        - Convert HASHrefs to options in dispatch()
+
+    Enhancements:
+        - Greater flexibility for "fallback" sub-commands.
+
+    Bug Fixes:
+        - Stop adding sub-command key/values to the optargs hashref
+
+0.0.3 (2012-08-04)
+
+    API Changes:
+        - "subcmd" now requires a HASH like "opt" and "arg"
+
+    New Features:
+        - New "hidden" parameter for subcmd()
+
+    Enhancements:
+        - Better check for utf8 aware environment in tests
+
+0.0.2 (2012-07-31)
+
+    Enhancements:
+        - Make hidden options visible when when help is requested.
+        - Duplicate OptArgs as Getopt::Args
+
+    Bug Fixes:
+        - None.
+
+0.0.1 (2012-07-30)
+
+    Initial Release.

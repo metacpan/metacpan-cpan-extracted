@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<SITE ID="ABCNews">
+
+<NAME Lang="en-us">ABCNEWS</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+ABCNEWS ·s»D·j´M
+]]></NAME>
+<INFO Lang="en-us">daily news search</INFO>
+<INFO Lang="zh-tw">daily news search</INFO>
+
+<URL Type="More"><![CDATA[
+http://search.abcnews.go.com/query.html?rq=0&col=abcweb&col=abcfile&qp=&qt=_QUERY_&qs=&qc=abcweb+abcfile&ws=0&qm=0&st=_START_10_1_&nh=10&lk=1&rf=1&oq=&rq=0
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://search.abcnews.go.com/query.html?rq=0&col=abcweb&col=abcfile&qp=&qt=_QUERY_&qs=&qc=abcweb+abcfile&ws=0&qm=0&st=1&nh=10&lk=1&rf=1&oq=&rq=0
+]]></URL>
+
+
+
+<TEMPLATE><![CDATA[
+<table cellspacing=0 cellpadding=1 width="100%">___<a href="_URL_">_TITLE_</a></b></font><br>_PREVIEW_<br>___align=right>_SCORE_%___</table>
+]]></TEMPLATE>
+</SITE>

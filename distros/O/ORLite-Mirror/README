@@ -1,0 +1,132 @@
+NAME
+    ORLite::Mirror - Extend ORLite to support remote SQLite databases
+
+SYNOPSIS
+      # Regular ORLite on a readonly SQLite database
+      use ORLite 'path/mydb.sqlite';
+      
+  # The equivalent for a remote (optionally compressed) SQLite database
+      use ORLite::Mirror 'http://myserver/path/mydb.sqlite.gz';
+      
+  # All available additional options specified
+      use ORLite::Mirror {
+          url           => 'http://myserver/path/mydb.sqlite.gz',
+          maxage        => 3600,
+          show_progress => 1,
+          env_proxy     => 1,
+          prune         => 1,
+          index         => [
+              'table1.column1',
+              'table1.column2',
+          ],
+      };
+
+DESCRIPTION
+    ORLite provides a readonly ORM API when it loads a readonly SQLite
+    database from your local system.
+
+    By combining this capability with LWP, ORLite::Mirror goes one step
+    better and allows you to load a SQLite database from any arbitrary URI
+    in readonly form as well.
+
+    As demonstrated in the synopsis above, you using ORLite::Mirror in the
+    same way, but provide a URL instead of a file name.
+
+    If the URL explicitly ends with a '.gz' or '.bz2' then ORLite::Mirror
+    will decompress the file before loading it.
+
+OPTIONS
+    ORLite::Mirror adds an extensive set of options to those provided by the
+    underlying ORLite library.
+
+  url
+    The compulsory "url" parameter should be a string containing the remote
+    location of the SQLite database we will be mirroring.
+
+    ORLite::Mirror supports downloading the database compressed, and then
+    transparently decompressing the file locally. Compression support is
+    controlled by the extension on the remote database.
+
+    The extensions ".gz" (for gunzip) and ".bz2" (for bunzip2) are currently
+    supported.
+
+  maxage
+    The optional "maxage" parameter controls how often ORLite::Mirror should
+    check the remote server to see if the data has been updated.
+
+    This allows programs using the database to start quickly the majority of
+    the time, but continue to receive automatic updates periodically.
+
+    The value is the number of integer seconds we should avoid checking the
+    remote server for. The default is 86400 seconds (one 24 hour day).
+
+  show_progress
+    The optional "show_progress" parameter will be passed through to the
+    underlying LWP::UserAgent that will fetch the remote database file.
+
+    When set to true, it causes a progress bar to be displayed on the
+    terminal as the database file is downloaded.
+
+  env_proxy
+    The optional "env_proxy" parameter will be passed through to the
+    underlying LWP::UserAgent that will fetch the remote database file.
+
+    When set to true, it causes LWP::UserAgent to read the location of a
+    proxy server from the environment.
+
+  prune
+    The optional "prune" parameter should be used when the surrounding
+    program wants to avoid leaving files on the host system.
+
+    It causes any files or directories created during the operation of
+    ORLite::Mirror to be deleted on program exit at "END"-time.
+
+  index
+    One challenge when distributing SQLite database is the quantity of data
+    store on disk to support the indexes on your database.
+
+    For a moderately indexed database where all primary and foreign key
+    columns have indexes, the amount of data in the indexes can be nearly as
+    large as the data stored for the tables themselves.
+
+    Because each user of the database module will be interested in different
+    things, the indexes that the original creator chooses to place on the
+    database may not even be used at all and other valuable indexes may not
+    exist at all.
+
+    To allow sufficiently flexibility, we recommend that SQLite database be
+    distributed without any indexes. This greatly reduces the file size and
+    download time for the database file.
+
+    The optional "index" parameter should then be used by each different
+    consumer of that module to index just the columns that are of specific
+    interest and will be used in the queries that will be run on the
+    database.
+
+    The value should be set to an "ARRAY" reference containing a list of
+    column names in "tablename.columnname" form.
+
+      index => [
+          'table1.column1',
+          'table1.column2',
+      ],
+
+SUPPORT
+    Bugs should be reported via the CPAN bug tracker at
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=ORLite-Mirror>
+
+    For other issues, contact the author.
+
+AUTHOR
+    Adam Kennedy <adamk@cpan.org>
+
+COPYRIGHT
+    Copyright 2008 - 2012 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

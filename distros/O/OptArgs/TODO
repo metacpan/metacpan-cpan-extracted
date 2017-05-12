@@ -1,0 +1,8 @@
+* Handle/detect where a SubCmd is defined but no sub commands are.
+
+* Convert ishelp parameter into a 'Help' isa type
+
+* display the default in the usage
+
+* check the value of @ARGV in tests to make sure we are getting
+ everything when everything is ok

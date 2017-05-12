@@ -1,0 +1,19 @@
+Changes.txt
+MANIFEST			This list of files
+META.yml                                 Module meta-data (added by MakeMaker)
+Makefile.PL
+README.txt
+examples/README.txt
+examples/bguires.zip
+examples/itute2.pl
+examples/itute3.pl
+examples/itute4.pl
+examples/resources.cfg
+lib/Ogre/BetaGUI.pm
+lib/Ogre/BetaGUI/BetaGUIListener.pm
+lib/Ogre/BetaGUI/Button.pm
+lib/Ogre/BetaGUI/Callback.pm
+lib/Ogre/BetaGUI/GUI.pm
+lib/Ogre/BetaGUI/TextInput.pm
+lib/Ogre/BetaGUI/Window.pm
+t/000_use.t

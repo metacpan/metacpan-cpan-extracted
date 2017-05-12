@@ -1,0 +1,109 @@
+[%# -*- mode: web; coding: utf-8 -*-
+  #################################################################
+    Page used internally to prompt for application tokens
+    Parameters:
+       all described in layout.thtml
+
+       errors_found - set if validation failed
+       error.<field_name> - error related to given field
+       value.<field_name> - value of given field
+  ################################################################# -%]
+[% WRAPPER layout.thtml
+       title="Enter client key and secret" %]
+
+[% DEFAULT errors_found = 0 
+           error = {}
+           value = {} %]
+
+<p>
+    You need to configure client key for [% app_name %] use of [% site_name %].
+</p>
+
+<p>Please, using another browser window, visit 
+[% IF site_client_creation_page %]
+    <a target="_blank" href="[% site_client_creation_page %]">[% site_client_creation_desc | html %]</a>,
+[% ELSE %]
+    [% site_client_creation_desc | html %],
+[% END %]
+    create new application there and enter below it's credentials.
+</p>
+
+[% IF errors_found %]
+<p class="error">
+    Submitted data is invalid. Please, try again. 
+</p>
+[% END %]
+
+<div class="form">
+    <form action="" method="POST">
+        <table>
+        <tr>
+            <td><label for="client_key">Client&nbsp;key:</label></td>
+            <td><input type="text" name="client_key" size="60" value="[% value.client_key | html %]" /></td>
+        </tr>
+[% IF error.client_key %]
+        <tr><td></td><td class="error">[% error.client_key | html %]</td></tr>
+[% END %]
+        <tr>
+            <td><label for="client_secret">Client&nbsp;secret:</label></td>
+            <td><input type="text" name="client_secret" size="60" value="[% value.client_secret | html %]"/></td>
+[% IF error.client_secret %]
+        <tr><td></td><td class="error">[% error.client_secret | html %]</td></tr>
+[% END %]
+        </tr>
+        <tr>
+            <td></td>
+            <td class="submit"><input type="submit" name="OK" value="Submit"/></td>
+        </tr>
+        </table>
+    </form>
+</div>
+
+[% IF site_client_creation_help %]
+<h4>[% site_name %] specific instructions</h4>
+<p>
+    [% site_client_creation_help | html %]
+</p>
+[% END %]
+
+<h4>Help</h4>
+
+<p>
+    Client key (may be also called <em>application id</em>, <em>consumer key</em> 
+    or similarly) identifies which application is using [% site_name
+    %].  Client secret is associated confidential value, used to prove
+    client has right to use this key. Together, they fulfill role
+    similar to username and password, but they identify application,
+    not user (sites may use those values to check resource usage on
+    per application basis, lock misbehaving applications, reach
+    application author in case of problems, etc). 
+</p>
+<p>
+    You are asked to enter them because author of the script or
+    application you use decided not to publish his own values (in case
+    of Perl script it is difficult to keep secret hidden). You may
+    reuse the same client over multiple machines or share it within a
+    team, but it is not recommended to publish it on the internet (you
+    may be held responsible for API misuse, would someone copy
+    credentials you allocated and use them with bad intent).
+</p>
+<p>
+    The fact that you create those values in no means allows
+    application to access your own data on [% site_name %]. Permission
+    to access actual data  will be asked separately and may apply
+    to different account/accounts (you may use different [% site_name %]
+    account to create client, and different account(s) for actual work).
+</p>
+    The values you enter will be preserved for future runs of this
+    script on this computer.
+</p>
+<p>
+    The form above is submitted locally, to the temporary webserver
+    spawned by [% app_name %] to lead you through OAuth initial
+    sequence (<em>you peeked at this page source to make sure it is really so,
+    didn't you?</em>).
+</p>
+
+
+
+[% END %]

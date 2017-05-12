@@ -1,0 +1,19 @@
+CHANGES
+MANIFEST			This list of files
+Makefile.PL
+README
+apache.pl
+apache/bin/apachectl.default
+apache/bin/startup.pl.default
+apache/conf/httpd.conf.default
+apache/conf/magic
+apache/conf/mime.types
+apache/logs/README
+lib/OpenFrame/Example/Apache2Simple.pm
+lib/OpenFrame/Segment/Apache2.pm
+lib/OpenFrame/Segment/Apache2/NoImages.pm
+lib/OpenFrame/Segment/Apache2/Request.pm
+lib/OpenFrame/Segment/Apache2/Response.pm
+t/apache.t
+webpages/index.html
+webpages/leon.jpg

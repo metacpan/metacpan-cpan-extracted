@@ -1,0 +1,8 @@
+UniProtKB	O94639	zrt1		GO:0033217	PMID:18203864	IMP		P	Zinc-regulated transporter 1	zrt1|SPBC16D10.06|ZRT1_SCHPO	protein	taxon:4896	20080125	GeneDB_Spombe		
+UniProtKB	O94639	zrt1		GO:0005783	GO_REF:0000004	IEA	SP_KW:KW-0256	C	Zinc-regulated transporter 1	zrt1|SPBC16D10.06|ZRT1_SCHPO	protein	taxon:4896	20101016	UniProtKB		
+UniProtKB	O94639	zrt1		GO:0005783	PMID:16823372	IDA		C	Zinc-regulated transporter 1	zrt1|SPBC16D10.06|ZRT1_SCHPO	protein	taxon:4896	20091111	GeneDB_Spombe		
+UniProtKB	O94639	zrt1		GO:0005789	GO_REF:0000023	IEA	SP_SL:SL-0097	C	Zinc-regulated transporter 1	zrt1|SPBC16D10.06|ZRT1_SCHPO	protein	taxon:4896	20101016	UniProtKB		
+UniProtKB	O94639	zrt1		GO:0016020	GO_REF:0000002	IEA	InterPro:IPR003689	C	Zinc-regulated transporter 1	zrt1|SPBC16D10.06|ZRT1_SCHPO	protein	taxon:4896	20101016	InterPro		
+UniProtKB	O94639	zrt1		GO:0016020	GO_REF:0000004	IEA	SP_KW:KW-0472	C	Zinc-regulated transporter 1	zrt1|SPBC16D10.06|ZRT1_SCHPO	protein	taxon:4896	20101016	UniProtKB		
+UniProtKB	O94639	zrt1		GO:0016021	GO_REF:0000002	IEA	InterPro:IPR004698	C	Zinc-regulated transporter 1	zrt1|SPBC16D10.06|ZRT1_SCHPO	protein	taxon:4896	20101016	InterPro		
+UniProtKB	O94639	zrt1		GO:0016021	GO_REF:0000004	IEA	SP_KW:KW-0812	C	Zinc-regulated transporter 1	zrt1|SPBC16D10.06|ZRT1_SCHPO	protein	taxon:4896	20101016	UniProtKB		

@@ -1,0 +1,20 @@
+<div id="appKitSearch" class="tlMenu">
+<div class="tlMenu_top">
+    <div class="tlMenu_tl"></div>
+    <div class="tlMenu_tr"></div>
+</div>
+<div class="tlMenu_mid">
+    <div class="tlMenu_ml">
+        <p>Search</p>
+        <form action="/search" method="get">
+            <input type="text" name="q" style="margin-left:17px;margin-right:16px;margin-bottom:7px;">
+        </form>
+    </div>
+    <div class="tlMenu_mr"></div>
+</div>
+<div class="tlMenu_bot">
+    <div class="tlMenu_bl"></div>
+    <div class="tlMenu_br"></div>
+</div>
+</div>
+

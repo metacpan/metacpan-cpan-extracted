@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<SITE ID="Switchboard">
+
+<NAME Lang="en-us">Switchboard Find</NAME>
+<INFO Lang="en-us">finding one's email on web</INFO>
+
+<URL Type="More"><![CDATA[
+_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://www.switchboard.com/bin/cgiemail.dll?SR=&MEM=1&F=&L=_QUERY_&Submit=Search
+]]></URL>
+
+
+<VAR Name="_NEXT_"><![CDATA[
+<a href="_NEXT_">Next Matches
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<tr border=0___SIZE=2><B>_TITLE_</B>___<A HREF="_URL_">_PREVIEW_</A>___</TD></TR>
+]]></TEMPLATE>
+</SITE>

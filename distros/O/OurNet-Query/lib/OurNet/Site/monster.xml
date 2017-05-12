@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<SITE ID="Monster">
+
+<NAME Lang="en-us">Monster WWW Search</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+怪獸台灣WWW搜尋(中英文)
+]]></NAME>
+<INFO Lang="en-us">general information web search in Taiwan</INFO>
+<INFO Lang="zh-tw">general information web search in Taiwan</INFO>
+
+<URL Type="More"><![CDATA[
+_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://www.monster.com.tw/cgi-bin/search.cgi?key=_QUERY_
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+<EXPRESSION>Standard</EXPRESSION>
+<CATEGORY>WWW,Regional</CATEGORY>
+
+<VAR Name="_NEXT_"><![CDATA[
+[<a href="_NEXT_">下頁
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<dt>___<a href="_URL_">_TITLE_</a><dd>_PREVIEW_</font>___<font size="-3">_DATE_</cite><p>
+]]></TEMPLATE>
+</SITE>

@@ -1,0 +1,62 @@
+SYNOPSIS
+
+     use Org::To::VCF qw(org_to_vcf);
+    
+     my $res = org_to_vcf(
+         source_file   => 'addressbook.org', # or source_str
+         #target_file  => 'addressbook.vcf', # defaults return the VCF in $res->[2]
+         #include_tags => [...], # default exports all tags
+         #exclude_tags => [...], # behavior mimics emacs's include/exclude rule
+     );
+     die "Failed" unless $res->[0] == 200;
+
+DESCRIPTION
+
+    Export contacts in Org document to VCF (vCard addressbook).
+
+    My use case: I maintain my addressbook in an Org document
+    addressbook.org which I regularly export to VCF and then import to
+    Android phones.
+
+    How contacts are found in an Org document: each contact is written in
+    an Org headline (of whatever level) in a rather free-form format, e.g.:
+
+     ** dad # [2014-01-25 Sat]  :remind_anniv:
+     - fullname :: frasier crane
+     - birthday :: [1900-01-02 ]
+     - cell :: 0811 000 0001
+     - some note
+     *** TODO get dad's jakarta office number
+
+    Todo items (headline with todo labels) are currently excluded.
+
+    Contact fields are searched in list items. Currently Indonesian and
+    English phrases are supported. If name field is not found, the title of
+    the headline is used. I use timestamps a lot, so currently timestamps
+    are stripped from headline titles.
+
+    Perl-style comments (with # to the end of the line) are allowed.
+
+    Org-contacts format is also supported, where fields are stored in a
+    properties drawer:
+
+     * Friends
+     ** Dave Null
+     :PROPERTIES:
+     :EMAIL: dave@null.com
+     :END:
+     This is one of my friend.
+     *** TODO Call him for the party
+
+SEE ALSO
+
+    For more information about Org document format, visit
+    http://orgmode.org/
+
+    Org::Parser
+
+    Text::vCard
+
+    Org-contacts:
+    http://julien.danjou.info/projects/emacs-packages#org-contacts
+

@@ -1,0 +1,316 @@
+Changes for Perl extension ORLite
+
+1.98 Sat 29 Sep 2012
+	- When setting pragmas in void context, skip reading the changed
+	  pragma back out of the database pointlessly.
+	- Removed legacy support for static ->delete('where ...')
+
+1.97 Mon 21 May 2012
+	- Use reproducible longdouble in tests (HMBRAND)
+
+1.96 Mon 27 Feb 2012
+	- Fixed a crash in the legacy delete emulation where the condition
+	  clause provided was a constant or read-only.
+
+1.95 Mon 27 Feb 2012
+	- Fixed a fatal rowid big when generating in array mode
+
+1.94 Mon 27 Feb 2012
+	- Fixed a fatal rowid bug when a table had a single non-INTEGER
+	  primary key.
+	- Fixed bug in affinity detection code to now set REAL and
+	  NUMERIC affinity correctly.
+
+1.93 Mon 27 Feb 2012
+	- The previous release 1.92 was done with a missing commit,
+	  this release restores that missing code.
+
+1.92 Mon 27 Feb 2012
+	- Add the ->delete_where method for bulk deletion
+	- Always do the initial metadata scan using ReadOnly => 1.
+	- When generating readonly, DBI connections use ReadOnly => 1 too.
+	- Quote identifiers more correctly via $dbh->quote_identifier.
+	- Temporarily restory the static delete call to prevent breaking
+	  Padre and other applications still using the old version of
+	  delete.
+
+1.91 Thu 23 Feb 2012
+	- Calculate column affinity types in the metadata preparation phase
+	- Throw an exception when tables contain BLOB types and the database
+	  is unicode, as the blob data will be corrupted.
+	- Improved testing for blobs and unicode, and TODO a known problem
+
+1.90 Tue 21 Feb 2012
+	- Removed x_rowid parameter and make the rowid logic compulsory.
+	- Removed x_update parameter and make update method compulsory at
+	  the table level but do not generate on the root level.
+	- As a result, ORLite now supports creating and updating objects
+	  even when they come from tables without primary keys.
+	- Pending release as 2.00 once clarifying documentation is written.
+
+1.54 Tue 21 Feb 2012
+	- Added experimental x_rowid parameter to maintain SQLite rowids in
+	  the objects
+
+1.53 Tue 21 Feb 2012
+	- Add a ->id convenience method alias when table 'foo' has a single
+	  numeric primary key 'foo_id' so you can use $foo->id
+
+1.52 Sat 21 Jan 2012
+	- Added initial unicode => 1 support (MEMOWE)
+	- Bumped Params::Util dependency to 1.0 for *LIKE fixes (ADAMK)
+
+1.51 Fri 25 Nov 2011
+	- Module::Install::DSL updated to 1.04
+	- Automatically load overlay classes if there exist. That is, where a
+	  Foo/TableName.pm module exists in addition to the automatically
+	  generated Foo::TableName class.
+
+1.50 Tue 7 Jun 2011
+	- Removed normalize as a supported parameter, normalizing columns turns
+	  out not to work in practice. However, we always normalize tables to
+	  get the class name for the table as that seems to result in class
+	  names that make much more sense.
+
+1.49 Wed 1 Jun 2011
+	- Adding normalize support to turn columnName into column_name
+
+1.48 Fri 21 Jan 2011
+	- Initial support for shim => 1 to simplify customisation (ADAMK)
+
+1.47 Wed 8 Dec 2010
+	- Adding readonly support for views (ADAMK)
+
+1.46 Tue 30 Nov 2010
+	- Bumped File::Path dependency to 2.08 to prevent test failures
+	  from the one shipped with Perl 5.8.9 (AZAWAWI)
+	- Added experimental base class ->update support (ADAMK)
+	- Added the qname attributes to the generator structs to simplify
+	  and improve readability of SQL fragment strings (ADAMK)
+
+1.45 Sun  8 Aug 2010
+	- Adding initial support for cache => $directory (ADAMK)
+
+1.44 Fri 23 Jul 2010
+	- Upgrading to Module::Install::DSL 1.00 (ADAMK)
+	- Adding the per-table table_info method to get the columns (ADAMK)
+	- Adding tests for the per-table metadata methods (ADAMK)
+
+1.43 Mon 10 May 2010
+	- Ensure 100% of tables and columns are quoted correctly (ADAMK)
+
+1.42 Tue 16 Mar 2010
+	- Signficantly expanded documentation on the per-table class
+	  and the methods created for it (Breno G. de Oliveira)
+
+1.41 Tue  9 Mar 2010
+	- Added the root ->connected method to allow for some
+	  light introspection in unusual situations (such as
+	  knowing if it's safe to spawn an off-the-books
+	  ->connect'tion, or to detect if we are in a transaction).
+	- Added documentation for the ->connect method, with suitably
+	  strident warnings about the dangers of deadlocking.
+
+1.40 Mon  1 Fed 2010
+	- Fixed backwards test skipping logic
+
+1.39 Fri 29 Jan 2010
+	- Typo in the tests, they now run >= instead of > 1.05
+
+1.38 Thu 28 Jan 2010
+	- When using array => 1 on classes that we can create, add a ->set
+	  method for setting parameters in the object safely.
+
+1.37 Thu 28 Jan 2010
+	- Adding experimental support for the array => 1 option.
+
+1.36 Wed 27 Jan 2010
+	- Rolled back the Template::Tiny conversion as it ended up slowing
+	  down the code generation too much. I shall struggle on under the
+	  old method.
+
+1.35 Wed 27 Jan 2010
+	- Adding experimental support for accelerated XS accessors
+	  using Class::XSAccessor. ORLite itself will not introduce a
+	  dependency on this module, consumers of this feature will need
+	  to do it themselves.
+
+1.34 Tue 26 Jan 2010
+	- Major Change: Moved code generation from raw string appending to
+	  using Template::Tiny instead. This will enable some new and more
+	  complex improvements to the generated code.
+	- Added tests for the cleanup code.
+
+1.33 Sun 24 Jan 2010
+	- When in the Perl debugger and on Perl 5.8.9 or newer,
+	  use the $^P | 0800 in preference to dval (and always
+	  use it even when $DEBUG is off).
+
+1.32 Fri 15 Jan 2010
+	- Each generated class now cleans up its own persistant
+	  connection, rather than allowing it to fall through to the
+	  deeper DBI cleanup.
+	- To allow for persistant connections to readonly database,
+	  we now always built transaction support for all databases.
+	  However, for readonly databases we do not build the commit
+	  method and you may only use the rollback method to end them.
+	- Significantly expanded the Pod documentation to provide
+	  documentation on all of the import options.
+	- Add support for a cleanup option to import, which is single
+	  explicit statement to be called on the database when the
+	  process is shutting down. This should typically be used
+	  ensure that a SQLite database is VACUUM'ed regularly (and at
+	  a time when it hopefully won't impact the user much).
+
+1.31 Sat  2 Jan 2010
+	- Adding explicit versioned-use lines to the generated code (in case
+	  the generated code is used independantly to its creation)
+
+1.30 Sat  2 Jan 2010
+	- Switching to a production release, CPAN Testers looks ok
+	- Update DBD::SQLite dependency to 1.27. Some of the metadata pragmas
+	  have changed, and we don't want to have to support both the old and
+	  new versions.
+	- ORLite will now correctly use RaiseError => 1, PrintError => 0 when
+	  itself introspecting the schema, so a corrupted SQLite database
+	  won't result in silent failure and the larger parent application
+	  won't crash in unpredictable ways.
+
+1.29_03 Thu  1 Oct 2009
+	- Reverse the prune deletion order
+	- Apply recursive delete flag
+
+1.29_02 Tue 29 Sep 2009
+	- Changed ->load to use selectrow_hashref
+	- Allow ->load calls for multiple-columns primary keys
+	- All connections now explicitly RaiseError => 1 for correctness
+	- All connections now explicitly PrintError => 0 to avoid spewing
+	  stuff to STDOUT/STDERR unexpectedly in embedded scenarios.
+	- Remove most explicit error handling and allow the native DBI
+	  errors to cascade upwards instead.
+
+1.29_01 Mon 28 Sep 2009
+	- Adding first experimental implementation of ->load
+
+1.28 Fri 25 Sep 2009
+	- Adding ->prune method that so that pruning can also be done
+	  in subclasses.
+	- Apply rel2abs to pruned directories so they still get deleted
+	  even when our current directory moves.
+
+1.27 Fri 25 Sep 2009
+	- Adding test script for the prune feature
+
+1.26_01 Fri 25 Sep 2009
+	- Adding the prune option to have ORLite to track every file and
+	  directory it creates and remove them during END phase.
+	  (This should be especially handy in test scripts)
+
+1.25 Sat 15 Aug 2009
+	- Adding base and table metadata methods to each class to support
+	  the creation of support/extension methods
+
+1.24 Sat 15 Aug 2009
+	- Adding support for an iterate method
+
+1.23 Thu 11 Jun 2009 
+	- Fixed a bug in method ->delete which deleted more than the actual
+	  object in case the primary key consist of more than one column.
+	  Added basic support for such primary keys with more than one column.
+
+1.22 Mon  1 Jun 2009
+	- Updated to Module::Install::DSL 0.91
+	- Split out debug/eval as (undocument) dval function
+	- App support for a (currently undocumented) 'append'
+	  param to allow sub-classes like ORLite::Mirror to merge
+	  in additional code to the generated class.
+
+1.21 Sun 24 May 2009
+	- Updated to Module::Install::DSL 0.88
+	- Added commit_begin and rollback_begin to allow persisting
+	  of the connection between successive transactions.
+
+1.20 Thu 12 Feb 2009
+	- Auto-create parent directory for ORLite files
+	- Add root method ->sqlite which returns the path to the
+	  sqlite file for that database.
+
+1.19 Tue  3 Feb 2009
+	- Adding support for using a CODE reference in the 'create'
+	  parameter, so that the schema setup can be provided directly
+	  in the ORLite initialisation.
+
+1.18 Wed 14 Jan 2009
+	- Adding an ->orlite method to return the version number of the
+	  ORLite module that was used to generate the distribution.
+
+1.17 Sat  3 Jan 2009
+	- Adding a ->truncate method to each table
+
+1.16 Sat 14 Dec 2008
+	- The fact that I didn't need to change ORLite for ORLite::Migrate
+	  suggests that it's stable enough for general use (pending 2.0)
+
+0.15 Wed 24 Sep 2008
+	- Adding support for writable pragmas
+	- Adding tests for pragmas, schema_version and user_version
+
+0.14 Tue 23 Sep 2008
+	- Removed the last remnants of %ORLite::DSN and %ORLite::DBH.
+	- Added support for the "create" param to allow database creation
+
+0.13 Fri 19 Sep 2008
+	- Fixed critical bug introduced in 0.10 or somewhere around there,
+	  where column accessors were not defined for readonly classes.
+	  (This fatally killed ORLite::Mirror)
+
+0.12 Mon 15 Sep 2008
+	- Don't store the database values in a shared hash any more
+	  (Makes the classes self-contained and able to run without ORLite)
+        - Add a tables param to the import, to allow the base database
+          connectivity class to be created without the table classes.
+
+0.11 Tue  9 Sep 2008
+	- If we aren't debugging we don't need to write the temp file
+
+0.10 Wed  6 Aug 2008
+        - Quote all column names for explicitness
+
+0.09 Fri 11 Jul 2008
+	- Adding pragma method to the top package
+	- Adding user_version import param to provide the ability
+	  to lock the Perl code against a known-good schema.
+
+0.08 Tue 24 Jun 2008
+	- Adding an experimental -DEBUG option
+
+0.07 Wed 28 May 2008
+	- Actually trust the package param
+
+0.06 Wed 28 May 2008
+	- Don't add transaction support if we are readonly
+
+0.05 Tue 27 May 2008
+	- Minor bug fixes in the ->import method
+	- Correcting the RT link in the POD.
+
+0.04 Tue 27 May 2008
+	- Added ->import( \%hash ) support.
+	- Added support for custom passing of the target package.
+	- Added support for readonly database loading
+	  (We need this for doing mirrored remote db support)
+	- Autodetect readonly SQLite files
+
+0.03 Thu 22 May 2008
+	- Added initial foreign key support
+	- Added the POD documentation for ORLite root packages
+	- Added File::Spec dependency
+
+0.02 Mon 19 May 2008
+	- Added class and instance ->delete
+	- Added ->new
+	- Added ->insert
+	- Added ->create
+
+0.01 Fri 16 May 2008
+	- Created an initial experimental support with only ->select

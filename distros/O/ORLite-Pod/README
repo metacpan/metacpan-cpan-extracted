@@ -1,0 +1,51 @@
+NAME
+    ORLite::Pod - Documentation generator for ORLite
+
+SYNOPSIS
+      my $generator = ORLite::Pod->new(
+          from   => 'My::Project::DB',
+          to     => 'My-Project/lib',
+          author => 'Adam Kennedy',
+          email  => 'adamk@cpan.org',
+      );
+      
+  $generator->run;
+
+DESCRIPTION
+    The biggest downside of ORLite is that because it can generate you an
+    entire ORM in one line of code, you can have a large an extensive API
+    without anywhere for documentation for the API to exist.
+
+    The result is quick efficient creation of APIs that nobody can
+    understand or use :)
+
+    ORLite::Pod was created to fix this problem by allowing you to keep your
+    slimline Perl module as is, but generating a tree of .pod files
+    alongside the regular modules containing the documentation for the API.
+
+    ORLite::Pod connects directly to a loaded ORLite instance, interrogating
+    it to find the database it connects to, and discovering which tables
+    have or don't have classes generated for them.
+
+    TO BE COMPLETED
+
+METHODS
+SUPPORT
+    Bugs should be reported via the CPAN bug tracker at
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=ORLite-Pod>
+
+    For other issues, contact the author.
+
+AUTHOR
+    Adam Kennedy <adamk@cpan.org>
+
+COPYRIGHT
+    Copyright 2009 - 2011 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

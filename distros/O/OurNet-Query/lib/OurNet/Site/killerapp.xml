@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<SITE ID="Killerapp">
+
+<NAME Lang="en-us">KillerApp Express Shopper</NAME>
+<INFO Lang="en-us">computer and peripheral prices search and shopping</INFO>
+
+<URL Type="More"><![CDATA[
+http://express.killerapp.com_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://express.killerapp.com/cgi/crunch/products.asp?platform=ALL&keywords=_QUERY_
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_NEXT_"><![CDATA[
+<a href=_NEXT_>[next
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+color=555555>_PREVIEW_</font></td>___<a href="_URL_">_TITLE_</a>___</tr>
+]]></TEMPLATE>
+</SITE>

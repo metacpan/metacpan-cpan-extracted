@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<SITE ID="NewBot">
+
+<NAME Lang="en-us">NewsBot</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+NewsBot·s»D·j´M
+]]></NAME>
+<INFO Lang="en-us">daily news search</INFO>
+<INFO Lang="zh-tw">daily news search</INFO>
+
+<URL Type="More"><![CDATA[
+http://www.newbot.com_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://www.newbot.com/news/news.asp?q1=_QUERY_&submit=GO&cat=&dr=-1w&srt=date&hit=0
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+<EXPRESSION>Standard</EXPRESSION>
+
+<VAR Name="_NEXT_"><![CDATA[
+<a href="_NEXT_">next
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+.</b>&nbsp;<a href='_URL_'>_TITLE_</a>___Date:</b>&nbsp;_DATE_</font>___color="#000000">_PREVIEW_</font><br>___From:</b> <a href="
+]]></TEMPLATE>
+</SITE>

@@ -1,0 +1,15 @@
+<div id="banner">
+  [% TRY %]
+    [% INCLUDE custom_banner.tt %]
+  [% CATCH %]
+    <h1>
+      <a id="banner_home_link" href="[% home_link %]">[% site_name %]</a>
+      [% IF responsive %]
+        <a id="banner_navbar_link" href="#navbar">Menu</a>
+      [% END %]
+    </h1>
+    [% IF summary AND node_name != home_name %]
+        <div id="summary">[% summary %]</div>
+    [% END %]
+  [% END %]
+</div>

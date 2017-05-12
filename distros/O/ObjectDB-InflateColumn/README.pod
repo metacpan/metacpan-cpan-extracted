@@ -1,0 +1,91 @@
+=head1 NAME
+
+ObjectDB::InflateColumn - automatically create references from column data
+
+=head1 SYNOPSIS
+
+    package MyApp::ObjectDB;        
+    use base qw(ObjectDB);  
+    use ObjectDB::InflateColumn;
+    
+    .....
+    
+    1;    
+    
+    # in your table classes
+    package MyApp::ORM::SomeTokenAction;    
+    use base 'MyApp::ObjectDB';
+    
+    # some schema description
+    __PACKAGE__->schema(
+        table          => 'some_token_action',
+        columns        => [qw/id token .... data/],
+        primary_keys   => ['id'],
+        auto_increment => 'id',
+    );
+    
+    use JSON;
+    my $json = JSON->new;
+    
+    # describe infalte
+    __PACKAGE__->schema->inflate_column(
+        'data', 
+        {
+            inflate => sub { $json->allow_nonref->encode($_[0]) },
+            deflate => sub { $json->utf8(1)->decode($_[0]) },
+        }
+    );
+    
+    # =============================================================
+    
+    # in main code
+    package main;
+    use MyApp::ORM::SomeTokenAction;
+    
+    # create entity
+    my $token_entity = MyApp::ORM::SomeTokenAction->new(token => ...);    
+    $token_entity->inflate_column('data', {some_key => 'some_value'});
+    $token_entity->column('data');            # string '{"some_key":"some_value"}'
+    $token_entity->inflate_column('data');    # real hash {"some_key":"some_value"}
+    $token_entity->create;
+    
+    # or load
+    my $token_entitys = MyApp::ORM::SomeTokenAction->find(where => [token => ...]);
+    $token_entitys->[0]->column('data');            # string '{"some_key":"some_value"}'
+    $token_entitys->[0]->inflate_column('data');    # real hash {"some_key":"some_value"}
+    
+    # or something else from ObjectDB
+    
+=head1 DESCRIPTION
+
+There's similar L<DBIx::Class::InflateColumn>, but created for L<ObjectDB>.
+
+This module make export some methods to L<ObjectDB::Schema> and L<ObjectDB>.
+
+=head1 METHODS
+
+=head2 new for ObjectDB::Schema
+
+=head3 inflate_column($col_name, {inflate => sub {}, deflate => sub{}})
+
+By default 'inflate' and 'deflate' will be set to B<sub{ $_[0] }>.
+
+=head2 new for ObjectDB
+
+=head3 inflate_column($col_name[, $new_val])
+
+Accessor for inflate column.
+
+=head1 SOURSE
+
+    git@github.com:mrRico/p5-ObjectDB-InflateColumn.git
+
+=head1 SEE ALSO
+
+L<ObjectDB>
+
+=head1 AUTHOR
+
+mr.Rico <catamoose at yandex.ru>
+
+=cut

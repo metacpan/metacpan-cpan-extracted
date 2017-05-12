@@ -1,0 +1,10 @@
+Revision history for Object-Dumb
+
+0.02    2016-06-16 (PERLANCAR)
+
+	- Allow customizing allowed methods & return value of dumb object.
+
+
+0.01    2015-02-21 (PERLANCAR)
+
+        - First release.

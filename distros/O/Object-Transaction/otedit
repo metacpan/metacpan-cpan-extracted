@@ -1,0 +1,81 @@
+#!/usr/bin/perl
+
+# Copyright (C) 2002 David Muir Sharnoff
+# This may be copied, modified, used, and redistributed under the
+# same terms as Perl itself.
+
+use Object::Transaction;
+use File::Slurp;
+use Storable;
+use Data::Dumper;
+
+*read_file = \&Object::Transaction::_read_file;
+*lock = \&Object::Transaction::_lock;
+*unlock = \&Object::Transaction::_unlock;
+*magic_cookie = \$Object::Transaction::magic_cookie;
+
+my $edit = $ENV{EDITOR} || 'vi';
+
+for my $file (@ARGV) {
+	lock($file);
+	die "will not overwrite $file.dumped" 
+		if -e "$file.dumped";
+}
+
+my @ff;
+for my $file (@ARGV) {
+	my $frozen = read_file($file);
+	substr($frozen, 0, length($magic_cookie)) eq $magic_cookie
+		or die "corrupt file: $file";
+	substr($frozen, 0, length($magic_cookie)) = '';
+	my $obj = Storable::thaw($frozen);
+	my $human = Dumper($obj);
+	die "will not overwrite $file.dumped" 
+		if -e $file.dumped;
+	write_file("$file.dumped", $human);
+	my $ff = $file;
+	$ff =~ s/'/'\\''/g;
+	push(@ff, "'$ff.dumped'");
+}
+
+system("$edit @ff");
+
+for my $file (@ARGV) {
+	FILE:
+	{
+		my $human = read_file("$file.dumped");
+		my $obj;
+		eval " \$obj = $human ";
+		if ($@) {
+			for (;;) {
+				print "problem when editing $file: $@\n";
+				print "A(bort) S(kip) R(etry)?";
+				my $ans = <STDIN>;
+				if ($ans =~ /^a/i) {
+					exit(0);
+				} elsif ($ans =~ /^s/i) {
+					$skip{$file} = 1;
+					next FILE;
+				} elsif ($ans =~ /^r/i) {
+					my $ff = $file;
+					$ff =~ s/'/'\\''/g;
+					system("$edit '$ff.dumped'");
+					redo FILE;
+				}
+			}
+		}
+	}
+}
+for my $file (@ARGV) {
+	next if $skip{$file};
+	my $human = read_file("$file.dumped");
+	my $obj;
+	eval " \$obj = $human ";
+	next if $@;
+	write_file($file, $magic_cookie, Storable::nfreeze($obj));
+}
+
+for my $file (@ARGV) {
+	unlink("$file.dumped");
+}
+

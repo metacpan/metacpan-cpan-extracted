@@ -1,0 +1,11 @@
+Changes
+MANIFEST
+Makefile.PL
+WinObject.pm
+WinObject.pm.h2xs
+WinObject.xs
+WinObject.xs.h2xs
+open_settings.h
+test.pl
+typemap
+typemap.h2xs

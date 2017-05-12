@@ -1,0 +1,111 @@
+[% PROCESS header
+    title = month.as_string
+%]
+
+[% USE url ('/simon/cal/') %]
+
+[% this_month= month.date.replace("-01$","") %]
+
+
+[% INCLUDE bar
+    left_link=handler.link(month.prev)
+    left="<< $month.prev.as_string"
+
+    right_link=handler.link(month.next)
+    right="$month.next.as_string >>"
+
+    center_link=handler.link(month)
+    center=month.as_string
+%]
+
+
+
+
+[% cheight = 86 * (1+month.number_of_weeks) %]
+[% cwidth  = 86 * 7  %]
+[% cell    = 29 %]
+[% width   = cwidth  + cell + cell  %]
+[% height  = cheight + cell + cell  %]
+
+
+<table width="[% width %]" height="[% height %]" border="0" cellpadding="0" cellspacing="0">
+    <tr height="29">
+        <td width="29"  height="29"><img src="[% image_url %]/top_left.gif" width="29" height="29" alt=""  border="0"></td>
+        <td width="582" height="29"><img src="[% image_url %]/top.gif" width="[% cwidth %]" height="29" border="0" alt=""></td>
+        <td width="29"  height="29"><img src="[% image_url %]/top_right.gif" width="29" height="29" alt="" border="0"></td>
+    </tr>
+    <tr height="[% cheight %]">
+        <td width="29"           height="[% cheight %]"><img src="[% image_url %]/left.gif" width="29" height="[% cheight %]" border="0" alt=""></td>
+        <td width="[% cwidth %]" height="[% cheight %]" bgcolor="#ffffff" align="center" valign="middle">
+            [% INCLUDE calendar month=month width=cwidth height=cheight %]
+        </td>
+        <td width="29"           height="[% cheight %]"><img src="[% image_url %]/right.gif" width="29" height="[% cheight %]" border="0" alt=""></td>
+    </tr>
+    <tr height="29">
+        <td width="29" height="29"><img src="[% image_url %]/bottom_left.gif" width="29" height="29" border="0" alt=""></td>
+        <td width="[% cwidth %]" height="29"><img src="[% image_url %]/bottom.gif" width="[% cwidth %]" height="29" border="0" alt=""></td>
+        <td width="29" height="29"><img src="[% image_url %]/bottom_right.gif" width="29" height="29" border="0" alt=""></td>
+    </tr>
+</table>
+
+
+<table width="600" border="0" cellpadding="0" cellspacing="0">
+<tr>
+        <td width="10"> &nbsp; </td>
+        <td width="590">
+                <span class="boldlight">[% day.as_string %]</span>
+        </td>
+</tr>
+<tr>
+        <td colspan="2" valign="middle" align="center" height="10">
+                <img src="[% image_url %]/dots.gif" width="600" height="1" border="0">
+        </td>
+</tr>
+
+
+[% FOREACH todo =  calendar.todos %]
+
+<tr>
+        <td width="10"> &nbsp; </td>
+        </td>
+        <td width="590" align="left">
+        [% IF todo.for %]<span class="bolddark">[% todo.for %]&nbsp;</span>[% END %]
+        <span class="plain"> 
+             [% todo.description FILTER chump %]
+             [% del_form(month, {"mode" => "del_todo", "id" => todo.id }) %]
+         </span>
+        </td>
+</tr>
+<tr>
+        <td colspan="2" valign="middle" align="center" height="10">
+                <img src="[% image_url %]/dots.gif" width="600" height="1" border="0">
+        </td>
+</tr>
+
+
+
+[% END %]
+
+
+<tr> 
+       <td width="10"> &nbsp; </td>
+        <td class="header" width="590">
+        <p>&nbsp;</p>
+        <form method="POST" action="[% handler.link(month) %]">
+                New todo : <input name="description" type="text" size="60" />
+                [% IF handler.need_user %] 
+                <input type="hidden" name="user" value="[% handler.user %]" />
+                [% END %]
+                <input type="hidden" name="mode" value="save_todo" />
+                <input type="image" value="add" valign="middle" src="[% image_url %]/add.gif">
+        </form>
+        </td>
+</tr>
+</table>
+
+
+
+
+
+
+[% INCLUDE footer %]

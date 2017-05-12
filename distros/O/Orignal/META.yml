@@ -1,0 +1,25 @@
+---
+abstract: 'Very simple properties/attributes/fields for Perl'
+author:
+  - 'John Scoles <byterock@hotmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.9, CPAN::Meta::Converter version 2.120351'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Orignal
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Test::More: 0
+  perl: 5.006001
+resources:
+  repository: git://github.com/byterock/Orignal.git
+version: 0.04

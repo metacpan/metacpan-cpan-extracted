@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<SITE ID="LycosS.Sound.German">
+
+<NAME Lang="en-us">Lycos German Sound Search</NAME>
+<INFO Lang="en-us">sounds and audio files search in German</INFO>
+
+<URL Type="More"><![CDATA[
+http://www-german.lycos.com_MORE_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://www-german.lycos.com/cgi-bin/pursuit?cat=sounds&maxhits=_HITS_&matchmode=or&terse=verbose&query=_QUERY_
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_MORE_"><![CDATA[
+<A HREF="_MORE_">&gt;&gt;
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+) <a href="_URL_">_TITLE_</a>___Bewertung:_SCORE_%___Beschreibung:_PREVIEW_<font size=-1>___(_SIZEK_k___)_DATE_</em>
+]]></TEMPLATE>
+</SITE>

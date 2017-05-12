@@ -1,0 +1,419 @@
+This file documents the revision history for Perl extension OpusVL::AppKit.
+
+2.29      2017-01-03 20:16:49+00:00 Europe/London
+
+   * Added test to ensure we're not failing because of moose breakages
+
+2.28      2017-01-03 12:55:05+00:00 Europe/London
+
+   * Push version number back down to one that is on CPAN
+   * Added missing dep
+
+2.27      2017-01-03 12:30:15+00:00 Europe/London
+
+   * Ensure we have a high enough version of our dependency
+     OpusVL::AppKit::Schema::AppKitAuthDB.
+
+2.26      2016-12-23 11:21:05+00:00 Europe/London
+
+   * Kill the sorting if we detect a button too
+   * Quick hack to allow display of dates in London time zone
+   * Added Jenkinsfile for testing
+   * Ensure we test the release
+
+2.25      2016-06-28 14:02:03+01:00 Europe/London
+
+   * Split auth database into a new module, OpusVL::AppKit::Schema::AppKitAuthDB
+
+2.24      2016-05-16 11:03:13+01:00 Europe/London
+
+    * A new release to fix META.json
+    * Fixed the landing documentation, at least
+
+2.23      2016-05-13 10:41:58+01:00 Europe/London
+
+    * Cache tests are now only run by request (because they only intermittently
+      work)
+    * Logs are no longer buffered. This is useful in `docker logs`
+    * 403 page can now have a custom "access denied" message
+
+2.22      2016-04-28 12:59:31+01:00 Europe/London
+
+    * Allow link_button class to be applied to anything.
+    * A <span class="hint"> draws a ? in a circle.
+    * Allow annotations to be added beside the features on the roles.
+
+2.21      2016-03-14 12:35:13+00:00 Europe/London
+
+    * Removed default mail server from config since it won't make
+      sense for most applications.
+
+2.20      2016-03-07 09:28:28+00:00 Europe/London
+    * Upped version number of dependency to ensure we don't
+      end up with a broken version.
+
+2.19      2016-03-03 14:15:30+00:00 Europe/London
+
+    * Added missing dependency.
+
+2.18      2016-02-26 16:07:09+00:00 Europe/London
+
+    * Converted to Dist::Dilla.
+
+    * Added support for new config parameter to allow the insertion of extra
+      css files into the head section.  This is extra_css.
+    * Allow HSTS header Strict-Transport-Security to be turned on with ssl_only config setting.
+
+    * Ensured our applications continue to work with HTML::FormFu.  If you want to 
+      ditch all it's classes set the 'no_formfu_classes' config setting and FormFu
+      will stop adding all the extra classes onto all the html it renders.
+
+    * Added installation_type configuration setting that will be inserted into
+      the class of the body element on the application style apps.  This allows
+      for differences in config to be targetted by CSS.  e.g. staging and live.
+    * Added basic click jack protection by default.  Use no_clickjack_protection 
+      config setting, or in the stash to disable.
+    * Added extra javascript to the tab setup to highlight errors appearing
+      in the tabs.
+
+    * Fixed flash to stash config setting so it uses newer config setting - that 
+      also prevents setting the secure cookies setting in the config from 
+      causing the setting from being dropped.
+    * Added an ajax ongoing indicator
+    * Create a new session id when we login.
+    * Updated the authentication to not trip over REST controllers.
+
+1.47
+
+    * Fixed minor alloy template problem with the global search.
+
+1.45
+
+    * Added a small change to the intranet_wrapper.tt that checks for a customer using the Catalyst config file.
+      This was needed for Eazy Collect to include the Notifications in the top navigation.
+
+1.42
+
+    * Switched to jQuery 1.7.1 - the motivation for doing this was the warnings
+      Webkit has been producing, complaining that a feature the old version was using 
+      is now deprecated.  More information is here, http://bugs.jquery.com/ticket/10531
+
+1.41
+
+    * Fixed a problem that caused the appkit to crash sometimes because the feature
+      list got blown away from the cache.
+
+1.40
+
+    * Added appkit_js option to load external Javascript sources from the controller
+        __PACKAGE__->config(
+            appkit_js => [qw( /static/js/main.js /static/js/jquery.tooltip.js )],
+        );
+
+1.39
+
+    * Added 'Description' attribute to actions. Use it to add a title attribute to the left-side menu links.
+        sub action_name
+            : Local
+            : Args(0)
+            : NavigationName('Blah')
+            : Description('This will be the title')
+
+1.37
+
+* Implemented enabled/disabled user controls so that users are now disabled
+  as suggested in the UI.
+* Help urls added which creates links to an on-line help system (e.g. a CMS or Wiki) 
+  based on the private_path of each page of your application.
+
+    To enable it, add the following settings to your app's config file:
+
+    help_link on
+    help_link_base_url http://172.16.128.132/index.php/
+    help_link_separator "_"
+    help_link_text Help
+    help_link_target "_aquarius_help"
+
+1.36
+
+* Update Mega Menu (application style) to work on Firefox and corrected
+  issue with menu option ordering at the same time.  This may require css
+  overrides for the individual menus within your applications css.
+  Extra classes have been added to the generated menu HTML to aid this.
+* Fixed issue with CustomErrorHandler finding view to use unreliably.
+
+1.35
+
+* Added ability to use LDAP auth for authentication while still storing
+  user information in the database.
+  To integrate this with Catalyst you need to add the trait 
+  OpusVL::AppKit::RolesFor::Model::LDAPAuth to your model and apply the role
+  OpusVL::AppKit::RolesFor::Schema::LDAPAuth to your schema class.
+  Read the perldoc for the modules for more information on configuration.
+  The password changing facilities should obviously be turned off if you 
+  are managing your passwords via LDAP.  The 'Features' on the auth roles
+  have been split out to make this easy to do.  In the places where a form
+  is still essential and the password field normally appears, the password
+  field has been hidden.  This should avoid any confusion.
+
+1.34 
+
+* Added autofilter of html for the xml templates used by Excel::Template::Plus
+  by default to prevent issues with < and & in data.
+
+1.33
+
+* Renabled the table sorter for Linux.
+
+1.32
+
+* Fixed a goof in the role that pulls injects the DBIC objects into another
+  schema.
+
+1.31
+
+* Application style menu and css has been reorganised.
+* Rolled out change to form directory since it appears to do bad things
+  and isn't really used yet.
+
+1.30
+
+* Fixed portlets html so it doesn't get mangled by Template::Alloy
+* Added add_breadcrumb and add_final_crumb methods to the controller role
+  to simplify adding breadcrumbs to an application.
+* Added yml files and .db files to the list of ignored extensions when serving
+  static content to slightly mitigate the risk posed by bug 1014.  
+* Added appkit form directory so forms from it's directory can be included in 
+  other modules.  They can not be used directly as the form for an action, but 
+  can be sucked in as part of an include.  That's down to the way the AppKitForm
+  attribute works.
+
+1.29
+
+* Added a new role to allow the easy merging of the AppKitAuthDB into another schema.
+  OpusVL::AppKit::RolesFor::Schema::AppKitAuthDB
+* Switched view template engine from TT2 to Template::Alloy
+  Note that this has slightly different syntax in places and doesn't like
+  spaced after function names.  i.e. c.uri_for (action) won't work.
+  See https://opusvl-intranet/wiki/index.php/Conversion_to_Alloy for information about 
+  the differences.  The key thing you need to do is to unescape raw html content.  For
+  instance [% form %] should be changed to [% form.render | none %] which will prevent
+  the html being escaped.
+
+1.28
+
+* Integrated Excel view that makes use of Excel::Template::Plus.
+* Added a method to the role for making plugins easier to setup.
+  OpusVL::AppKit::RolesFor::Plugin->add_paths(__PACKAGE__).  This replaces
+  the add_form_path method in the previous release.
+
+1.27
+
+* Added a new role for the plugin to allow the update of the HTML::FormFu config to 
+  allow multiple paths to be used.  Call add_form_path to use it.
+
+  If you want the forms from your AppKitX module to be included in the general forms
+  search path for all modules add this into the main modules code where you do your 
+  setup_components.
+
+    # at the top
+    with 'OpusVL::AppKit::RolesFor::Plugin';
+
+    # in after 'setup_components'
+    $class->add_form_path(__PACKAGE__); # ''
+
+  For an example of it in use look at OpusVL::AppKitX::ResultsetSearch
+
+* Added hooks for the notification system in the application wrapper html.
+* Added a standard 'delete.yml' template in the root folder for most of the
+  delete forms where you just want a yes/no choice.
+
+1.26
+
+* Fixed an anoying bug where we duplicated menu items when doing grouped controllers in the intranet
+  style menu.
+
+1.25
+
+* Auth no longer examines auto actions to allow for other forms of auth before our access
+  control on the actions kicks in.
+* not_found and access_denied actions now clear current_view stash setting to prevent
+  issues if you get an access denied or not found bounce after setting that in the auto for
+  something like a json view.
+* Fixed the final private action that was broken by the new AppKitFeature attributes.
+
+1.24
+
+* Various bug fixes to the feature auth code added in 1.21.  
+* Made regex for spotting 'end' actions less likely to catch legitimate actions like 'client_suspend'
+  thereby excluding them from the regular auth procedures.
+
+1.23
+
+* Minor bug fix for bug introduced in 1.21.
+* Tweaked release notes (this file) to mention dataset change.
+
+1.22
+
+* Fixed broken tests to make it install cleanly.  Note to self: run make test before rolling a release.
+
+1.21
+
+* IMPORTANT: This release has changed the appkit auth db so if you have it stored in Postgres you 
+  will need to add a couple of tables and if you have your own DBIx::Class classes for the authdb
+  you will need to regenerate them.
+
+    CREATE TABLE "aclfeature" (
+      "id" serial NOT NULL,
+      "feature" text NOT NULL,
+      PRIMARY KEY ("id")
+    );
+
+    CREATE TABLE "aclfeature_role" (
+      "aclfeature_id" integer NOT NULL,
+      "role_id" integer NOT NULL,
+      PRIMARY KEY ("aclfeature_id", "role_id")
+    );
+    CREATE INDEX "aclfeature_role_idx_aclfeature_id" on "aclfeature_role" ("aclfeature_id");
+    CREATE INDEX "aclfeature_role_idx_role_id" on "aclfeature_role" ("role_id");
+
+    ALTER TABLE "aclfeature_role" ADD FOREIGN KEY ("aclfeature_id")
+      REFERENCES "aclfeature" ("id") ON DELETE CASCADE ON UPDATE CASCADE DEFERRABLE;
+
+    ALTER TABLE "aclfeature_role" ADD FOREIGN KEY ("role_id")
+      REFERENCES "role" ("id") ON DELETE CASCADE ON UPDATE CASCADE DEFERRABLE;
+
+  If you have your own DBIC class add this to the bottom of the Result::AclFeature class,
+
+    __PACKAGE__->many_to_many( roles => 'aclfeature_roles', 'role');
+
+* Added 2 level access permissions that allow the grouping of related actions into features to make
+  role administration simpler.  To do this apply the AppKitFeature attribute.  Specify multiple features
+  like this,
+
+  sub action_name 
+    : Local
+    : AppKitFeature('Feature 1,Feature 2')
+
+  Note that what you put here is what is displayed on the user interface.  Apply the feature to all 
+  actions you need to execute as part of your feature, including the various auto actions.
+
+  Note that you cannot specify multiple attributes against an action marked Private.  In order to 
+  mark those actions with the attributes change the Private to Feature.  For a more detailed 
+  explanation of this problem see bug 773 in bugzilla.
+
+* Added method groups for the new application style menus.  Menus are divided into applications, 
+  groups, then actions.  Applications are defined as they are now.  Groups are defined as a class
+  attribute, appkit_method_group.  
+  
+* It is also possible to sort all the parts of the menu.  To sort the actions use the 
+  :NavigationOrder(2) attribute.  To sort the groups use the appkit_method_group_order attribute on 
+  the class.
+
+  To sort the applicaitons use the appkit_app_order configuration setting.  This should be a list 
+  of classes (using the injected names).  If you're unsure what to put add the key and put in a 
+  bogus value and when your app is run it will complain and tell you what classes it is expecting.
+
+    $config->{appkit_app_order} = [
+        qw/TestApp::Controller::ExtensionA TestApp::Controller::ExtensionB TestApp::Controller::Test/
+    ];
+
+  If you have less classes mentioned than there are you will get a warning like this after catalyst has
+  loaded,
+
+    [warn] Application order is not completely set.  Update your appkit_app_order config setting
+    [warn] Expecting these controllers to be specified TestApp::Controller::ExtensionB, TestApp::Controller::ExtensionA, TestApp::Controller::Test
+
+* Moved permissions cache to a proper cache.  This prevents the issue where permissions were
+  changed and other users on the server didn't see the changes. (Bug 224)
+
+
+0.20
+
+* Moved the date_short, date_long, time_short and time_long DateTime formatting functions
+  to the controller (via OpusVL::AppKit::RolesFor::Controller::GUI) and update the macros
+  to call those functions so that we have consistency.  You can now access those functions
+  from both your controllers and your TT templates.
+* Fixed the module version number reporting so if you do perl -MOpusVL::AppKit\ 9999 it will
+  report the correct version number.
+
+0.19
+
+* Added a facility for managing which roles can manage other roles.  This allows users to 
+  manage roles without needing to have them assigned.  See bug 235 for more details.
+  Two new tables have been added to support this facility.  The need to be added to your
+  appkit auth schema.
+
+  CREATE TABLE roles_allowed 
+  (
+      role integer not null references role(id) on delete cascade, 
+      role_allowed integer not null references role(id) on delete cascade, 
+      primary key (role, role_allowed)
+  );
+  CREATE TABLE role_admin
+  (
+      role_id integer not null references role(id) on delete cascade, 
+      primary key(role_id)
+  );
+
+
+0.18
+
+* Changed submit button to say save on user roles saving.
+* Added a not_found action for producing a 404 because default isn't terribly logical.
+
+0.17
+
+* Now allow portlets to not be displayed.  All they need to do is return a status of 404
+  for their response.  i.e. $c->res->status(404);.  Be careful with calls to detach within
+  the portlets because they may cause the whole process to break down.  The Portlet 
+  construction is done by the index page 'visiting' each portlet as if it was a page and then
+  constructing it's page from all of their responses.
+
+0.16 
+
+* Added support for case insensitive logins
+
+0.15
+
+* Added human readable 404 and 403 pages.  Do a forward to /default and /access_denied to use them.
+* Added a password reset feature.
+* If a user is logged in and tries to access a page they aren't allowed to they will
+  be shown 403 instead of a login screen so that it's clearer that they aren't
+  allowed access.
+
+0.14
+
+The previous revisions changes are rolled up into this release for simplicity.
+
+* Resized the images for the buttons so long buttons don't glitch.
+* Disabled copy to clipboard function on tables in linux (because it didn't work).
+* Tidy up <title> tag on pages using a combination of the template and javascript.
+* Prevent users from being able to create a blank role.
+* Wide applications menu should no longer visually glitch.
+* A subtle application version number footer is now possible by turning on 
+  the appkit_display_app_version parameter
+* Added a facility to allow the AppKitForm attribute to be extended to allow 
+  an attribute to be generated that doesn't call process on the form.
+* Added a facility to poke in a bit of HTML content as 'before_content' before 
+  the application_body div.
+* Tweaked the JSON view to just expose the json stash key.
+* Added a pager control.  Simply process pager.tt, i.e,
+  [% PROCESS pager.tt pager = mypager %]
+* Login process now redirects the user to the page they were trying to access before.
+* Fixed a bug where the appkit menu on the left wouldn't display if there was only a 
+  single element.
+* Added a facility to allow the menu options from multiple controllers to be merged
+  using by setting the appkit_shared_module property on the controllers to the same
+  string.
+* Added a facility to allow for pages to be available to users that aren't logged in.
+  To do this create a role called PUBLIC.
+* Improved the change password dialog so that it asks for your original password before
+  allowing you to change your password.
+* Added a simple XML view that makes use of XML::Simple.
+* Added a stylesheet for printing that hides most of the chrome.
+* Added missing dependencies to the makefile.
+* Improved the test coverage.
+
+0.01  2010-03-04 10:49:32
+        - initial revision, generated by Catalyst

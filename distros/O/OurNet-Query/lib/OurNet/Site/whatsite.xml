@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<SITE ID="WhatSite">
+
+<NAME Lang="en-us">WhatSite Chinese Web</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+WhatSite «z¶ë WWW ·j´M(¨È¬w)
+]]></NAME>
+<INFO Lang="en-us">general information web search in Asia</INFO>
+<INFO Lang="zh-tw">general information web search in Asia</INFO>
+
+<URL Type="More"><![CDATA[
+http://www.whatsite.com_MORE_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://www.whatsite.com/main/search.cgi?keyword=_QUERY_&start=0&REXP=OR&x=39&y=14
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+<EXPRESSION>Standard</EXPRESSION>
+<CATEGORY>WWW,Regional</CATEGORY>
+
+<VAR Name="_MORE_"><![CDATA[
+<A HREF="_MORE_">¡i¤U ¤@ ­¶¡j</A>
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<ul><li><A HREF="_URL_">_TITLE_</A>___<br>_PREVIEW_</li>
+]]></TEMPLATE>
+</SITE>

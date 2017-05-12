@@ -1,0 +1,9 @@
+COPYING
+Changelog
+INSTALL
+MANIFEST
+Makefile.PL
+README
+lib/OpenThought/XML2Hash.pm
+t/01_require.t
+t/02_xml2hash.t

@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<SITE ID="Chinatimes">
+
+<NAME Lang="en-us">China Times Search</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+中時電子報檢索(台灣)
+]]></NAME>
+<INFO Lang="en-us">daily news search in Taiwan</INFO>
+<INFO Lang="zh-tw">daily news search in Taiwan</INFO>
+
+<URL Type="More"><![CDATA[
+post://210.71.221.245/scripts/chinatimes/iscstext.exe?DB=ChinaTimes&Function=ListDoc&Brief=_BRIEF_&From=_FROM_&Rows=_ROWS_
+]]></URL>
+<URL Type="Start"><![CDATA[
+post://210.71.221.245/scripts/chinatimes/iscstext.exe?DB=ChinaTimes&Function=Search&FY=&FM=&FD=&TY=&TM=&TD=&LOR=1&QRY=_QUERY_&QRYF=0&REV=1&MAX=100
+]]></URL>
+
+
+<VAR Name="_ROWS_"><![CDATA[
+HIDDEN NAME=Rows VALUE=_ROWS_>
+]]></VAR>
+<VAR Name="_FROM_"><![CDATA[
+HIDDEN NAME=From VALUE=_FROM_>
+]]></VAR>
+<VAR Name="_BRIEF_"><![CDATA[
+HIDDEN NAME=Brief VALUE=_BRIEF_>
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<LI___><A HREF="_URL_">_TITLE_</A><br>【_DATE_中___相似程度_SCORE_%
+]]></TEMPLATE>
+</SITE>

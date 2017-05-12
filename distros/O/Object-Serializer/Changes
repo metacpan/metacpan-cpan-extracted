@@ -1,0 +1,202 @@
+==================================================
+Changes from 2012-11-11 00:00:00 +0000 to present.
+==================================================
+
+---------------------------------------------
+version 0.000011 at 2013-11-11 20:20:48 +0000
+---------------------------------------------
+
+  Change: 5d8acb8df63f57caf8bf9cbc3d150023cecb06e9
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-11-11 15:20:39 +0000
+
+    fix bug registering serialization-strategies and cleaning-up closures 
+
+---------------------------------------------
+version 0.000010 at 2013-11-11 08:41:17 +0000
+---------------------------------------------
+
+  Change: fbbc17985cb4c959875b2598e450ad9de24bb747
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-11-11 03:41:17 +0000
+
+    v0.000010 
+
+  Change: e8b9ddd2cd84417f8906cc0138f331a0d1d134a6
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-11-11 03:41:06 +0000
+
+    added strict and warnings and ignores them where appropriate 
+
+---------------------------------------------
+version 0.000009 at 2013-11-11 08:24:58 +0000
+---------------------------------------------
+
+  Change: 05cb1f3a6a9d6a4b0c3aaaba0628f193b655a1f4
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-11-11 03:24:58 +0000
+
+    v0.000009 
+
+  Change: 92a901e7c8df14a09f3ba9cb3c975a5a2cb9ca67
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-11-11 03:24:39 +0000
+
+    refactored, less code, better execution 
+
+---------------------------------------------
+version 0.000008 at 2013-11-11 05:31:56 +0000
+---------------------------------------------
+
+  Change: 11036cd8b28f0232b38e6da332de261d614e264c
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-11-11 00:31:56 +0000
+
+    v0.000008 
+
+  Change: 248b03d7a421ca982a3b695a12bb1dfcaf43454b
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-11-11 00:31:17 +0000
+
+    removed deserialization functionality 
+
+---------------------------------------------
+version 0.000007 at 2013-09-16 01:41:47 +0000
+---------------------------------------------
+
+  Change: d55f16a94091706b93de767ebc061837cc3f54f2
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-09-15 21:41:47 +0000
+
+    v0.000007 
+
+  Change: 47034ae007aaec3a94c1c4d154caed62b289fdb9
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-09-15 21:40:47 +0000
+
+    updated Changes 
+
+  Change: c3489995d7c6147f70ee04c7ac8b729f6417cb06
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-09-15 21:39:53 +0000
+
+    ability to tag during serialization/deserialization process 
+
+---------------------------------------------
+version 0.000006 at 2013-09-15 20:17:22 +0000
+---------------------------------------------
+
+  Change: 4d08ef4b675e9795c0a7d4b2c192a9683e3e7294
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-09-15 16:17:22 +0000
+
+    v0.000006 
+
+  Change: ca1857466994c59880164a694245fbc1f0647bd6
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-09-15 16:17:07 +0000
+
+    added the ability to serialize without tagging 
+
+  Change: 4dbac6b3c1f6219070fb8afc2e696eb91fe490a6
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-09-15 05:04:15 +0000
+
+    miscellaneous changes (not worth mentioning) 
+
+---------------------------------------------
+version 0.000005 at 2013-09-14 22:08:40 +0000
+---------------------------------------------
+
+  Change: 4989d761d07070f5fd85054bf6a0a49c6f708c1f
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-09-14 18:08:40 +0000
+
+    v0.000005 
+
+  Change: 892e35f6db91236b253a803606c5574e8b4d6c9b
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-09-14 18:08:29 +0000
+
+    updated documentation 
+
+---------------------------------------------
+version 0.000004 at 2013-09-14 21:46:21 +0000
+---------------------------------------------
+
+  Change: a8ffdb314947a8e224884a86a70c49d275f372e7
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-09-14 17:46:21 +0000
+
+    v0.000004 
+
+  Change: ab6edbc384ac036e28dba4e319e54b2c572efefc
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-09-14 17:46:08 +0000
+
+    new approach toward hashifying objects, removed Regexp::Grammars
+    dependency 
+
+---------------------------------------------
+version 0.000003 at 2013-09-14 06:30:16 +0000
+---------------------------------------------
+
+  Change: 2949f6e06101ac1e98d9478dd1b28e84ed48f4ea
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-09-14 02:30:16 +0000
+
+    v0.000003 
+
+  Change: 94448b9de0686350d86634b0f741ea020c7cdd85
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-09-14 02:29:54 +0000
+
+    update Changes 
+
+  Change: aa66aa6ee8e708d6746171b6d550a2e126d0dd11
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-09-14 02:28:07 +0000
+
+    initial release 
+
+---------------------------------------------
+version 0.000002 at 2013-09-14 06:09:09 +0000
+---------------------------------------------
+
+  Change: ef809bc489fc0508ae95eb38bb51cd4e4de71376
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-09-14 02:09:09 +0000
+
+    v0.000002 
+
+  Change: f47c01ef8696d51bd71115f9e8fa3866a0ef7e59
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-09-14 02:08:17 +0000
+
+    fixed more typos and dependency misspelling 
+
+---------------------------------------------
+version 0.000001 at 2013-09-14 06:01:53 +0000
+---------------------------------------------
+
+  Change: 740256ef73a61e18a28fecf2536917894b275fea
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-09-14 02:01:53 +0000
+
+    v0.000001 
+
+  Change: eb67c8d92ece729466ff154c86f5294264c6aaed
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-09-14 02:01:41 +0000
+
+    created Changes 
+
+  Change: fab6b09ccb4badec2a32d9e81de5d1cbbe776729
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-09-14 02:00:36 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

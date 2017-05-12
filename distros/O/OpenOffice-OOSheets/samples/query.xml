@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<opt>
+  <query source="src1" table="sheet1" value="0" param_description="Parametr su" addr="C11" param_id="0\1" />
+  <query source="buhgal" table="Sheet1" description="Parametr 12" addr="Q46" />
+  <query source="buhgal" table="Sheet1" description="Parametr 15" addr="D39" />
+  <query source="buhgal" table="Sheet2" description="Parametr 10" addr="D27" />
+  <query source="buhgal" table="Sheet1" description="Parametr 13" addr="D43" />
+  <config workgroup="MY" srcname="src1" password="11" filepath="smb://192.168.1.90/d/ZAGAS/Document.swx" username="guestt" />
+  <config srcname="buhgal" filepath="file:///home/zag/tmp/OOP/doc.sxc" />
+</opt>

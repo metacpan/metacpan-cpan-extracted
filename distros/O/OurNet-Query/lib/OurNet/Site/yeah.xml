@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<SITE ID="Yeah">
+
+<NAME Lang="en-us">Yeah WWW Search</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+Yeah WWW 穓碝 (い瓣嘲)
+]]></NAME>
+<INFO Lang="en-us">general information web search in Mainland China</INFO>
+<INFO Lang="zh-tw">general information web search in Mainland China</INFO>
+
+<URL Type="More"><![CDATA[
+post://www.yeah.net/cgi-bin/search/search.cgi?key=_QUERY_&key=开始搜索&ofs=_START_50_0_
+]]></URL>
+<URL Type="Start"><![CDATA[
+post://www.yeah.net/cgi-bin/search/search.cgi?key=_QUERY_&key=开始搜索&ofs=0
+]]></URL>
+
+<CHARSET>zh-cn</CHARSET>
+<SCORE>_SCORE_/10</SCORE>
+
+
+<TEMPLATE><![CDATA[
+<dl><DT>___href=_URL_>_TITLE_</a> [___<dd><font color=#ff8800>___<dd>_PREVIEW_</dl>
+]]></TEMPLATE>
+</SITE>

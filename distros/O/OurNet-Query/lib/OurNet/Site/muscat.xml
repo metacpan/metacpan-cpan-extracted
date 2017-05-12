@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<SITE ID="Muscat">
+
+<NAME Lang="en-us">Muscat Computing Information Search</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+Muscat 電腦資訊檢索
+]]></NAME>
+<INFO Lang="en-us">computer relevant web search</INFO>
+<INFO Lang="zh-tw">computer relevant web search</INFO>
+
+<URL Type="Start"><![CDATA[
+http://www.muscat.co.uk/search/?P=_QUERY_&DB=muscatweb
+]]></URL>
+
+<EXPRESSION>Standard</EXPRESSION>
+<CATEGORY>WWW,Computer</CATEGORY>
+
+
+<TEMPLATE><![CDATA[
+arial"><A HREF="_URL_"___>_TITLE_</A><BR>_PREVIEW_.</FONT>___Score:_SCORE_%, Matching:
+]]></TEMPLATE>
+</SITE>

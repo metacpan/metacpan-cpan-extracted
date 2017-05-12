@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<SITE ID="InfoNavigator">
+
+<NAME Lang="en-us">InfoNavigator WWW Search</NAME>
+<INFO Lang="en-us">general information web search in Japan</INFO>
+
+<URL Type="More"><![CDATA[
+post://infonavi.infoweb.or.jp/cgi-bin/infonavigator2?WAISaction=search&WAISjopt=navi3%3A10000&WAISdbName=%2Fwww%2Fwais%2Findexes_all%2Fnavi_form&WAIStmpDir=%2Fwww%2Ftmp&WAISlogFile=%2Fvar%2Fwais%2Flogs%2Faccess.log&WAIStemplate=results2.html&WAISqueryReport=none&WAIShighLight=off&stringswk=_STRINGSWK_&WAISmaxHits=_WAISMAXHITS_&WAISpageName=index.html%3A2&WAISDISPLAYMIN=_WAISDISPLAYMIN_&WAISDISPLAYMAX=_WAISDISPLAYMAX_&WAISDISPLAYNUM=_WAISDISPLAYNUM_&WAISqueryRule=%24stringswk&WAISRelevance=
+]]></URL>
+<URL Type="Start"><![CDATA[
+post://infonavi.infoweb.or.jp/cgi-bin/infonavigator2?WAISqueryString=_QUERY_&WAISaction=search&WAISjopt=navi1%3A10000&WAISlogFile=%2Fvar%2Fwais%2Flogs%2Faccess.log&WAIStmpDir=%2Fwww%2Ftmp&WAIStemplate=results2.html&WAISqueryReport=none&WAIShighLight=off&WAISPageName=index.html%3A1&WAISdisplayNum=%24WAISmaxHits&WAISmaxHits=20&WAISdbName=%2Fwww%2Fwais%2Findexes_all%2Fnavi_form
+]]></URL>
+
+<CHARSET>ja-jp.euc</CHARSET>
+
+<VAR Name="_WAISMAXHITS_"><![CDATA[
+<input type="hidden" name="WAISmaxHits" value=_WAISMAXHITS_>
+]]></VAR>
+<VAR Name="_WAISDISPLAYNUM_"><![CDATA[
+<input type="hidden" name="WAISDISPLAYNUM" value=_WAISDISPLAYNUM_>
+]]></VAR>
+<VAR Name="_STRINGSWK_"><![CDATA[
+<input type="hidden" name="stringswk" value="_STRINGSWK_">
+]]></VAR>
+<VAR Name="_WAISDISPLAYMIN_"><![CDATA[
+<input type="hidden" name="WAISDISPLAYMIN" value=_WAISDISPLAYMIN_>
+]]></VAR>
+<VAR Name="_WAISDISPLAYMAX_"><![CDATA[
+<input type="hidden" name="WAISDISPLAYMAX" value=_WAISDISPLAYMAX_>
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<DL><DT>___<A HREF="_URL_">_TITLE_</A>_PREVIEW_</DT>
+]]></TEMPLATE>
+</SITE>

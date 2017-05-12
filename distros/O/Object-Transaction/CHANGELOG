@@ -1,0 +1,75 @@
+
+= 2002/11/15	1.01
+
+Object::Transaction is now in production use.
+
+The underlying object is no longer locked during loading.  If you
+have a preload() method, be aware that the object is no longer
+locked during the preload() call.
+
+The new() method is no longer something to override.  It has been
+replaced with initialize().  If you had a new method, that's
+okay, but make sure to call cache() from within it.
+
+Objects may now move during transactions.  If the file()
+method returns something different than it did before the
+transaction, the object will be moved.  It used to crash.
+
+Method invocations like C<presave()> may how have side-effects that
+effect the transaction like invoking C<savelater()> an another
+object.
+
+To create a reference to a persisted object, a new method is provided:
+->objectref().  This can be turned into an object with ->loadref().
+
+When used with mod_perl, the object cache will be automatically
+cleared each web hit.
+
+Added otedit & otview.
+
+Many bugs fixed.
+
+= 2000/03/04	0.95
+
+Bugs fixed
+
+	* loading an object could cause DATACHANGE exception.  Fixed.
+
+= 2000/01/30	0.94
+
+Bugs fixed
+
+	* locks should be released on transaction failure
+	* untaint file contents before thawing
+	* don't allow calls to save() or commit() from within {pre|post}save()
+	* various deadlock situations
+	* presave() can now change the location of the state file
+
+New callback:
+
+	* precommit() added to allow changed objects to change other objects
+	  prior to commit.
+
+New method: 
+
+	* old() provides pre-transaction value of object
+
+= 1999/11/19	0.93
+
+Carey Evans <c.evans@clear.net.nz> points out that I really should use
+autoflush if I'm going to use sync.  Fixed.
+
+= 1999/11/18	0.92
+
+Now storing in network byte order with a header on each file.
+
+postload now receives the id as an argument.
+
+= 1999/11/16	0.91
+
+Ported to perl 5.005_03.
+
+= 1999/11/15	0.9
+
+Inital revision.
+

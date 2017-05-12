@@ -1,0 +1,120 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+ "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="[% language %]">
+<head profile="http://a9.com/-/spec/opensearch/1.1/">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  [% IF responsive %]
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  [% END %]
+  [% IF page_title %]
+    <title>[% page_title %]</title>
+    <meta name="DC.title" content="[% page_title %]" />
+  [% ELSE %]
+    <title>[% node_name %] - [% site_name %]</title>
+    <meta name="DC.title" content="[% node_name %] - [% site_name %]" />
+  [% END %]
+    <meta name="DC.publisher" content="[% site_name %]" />
+  [% IF node_image %]
+    <meta property="og:title" content="[% node_name %]" />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="[% full_cgi_url %]?[% node_param %]" />
+    <meta property="og:image" content="[% node_image %]" />
+  [% END %]
+  [% IF contact_email %]
+    <link rev="made" href="mailto:[% contact_email %]" />
+  [% END %]
+
+  [% IF page_description %]
+    <meta name="description" content="[% page_description %]" />
+  [% ELSIF summary %]
+    <meta name="description" content="[% summary %]" />
+  [% END %]
+
+  [% IF (categories.size AND categories.size > 0)
+     OR (locales.size AND locales.size > 0) %]
+    <meta name="keywords" content="[% IF categories.size AND
+categories.size > 0 %][% FOREACH category = categories %][%
+category.name %][%- ", " %][% END %][% END %][% IF locales.size AND
+locales.size > 0 %][% FOREACH locale = locales %][% locale.name %][%-
+", " UNLESS loop.last %][% END %][% END %]" />
+  [% END %]
+
+  [% SET leaflet_version='0.7.5' %]
+
+  [% IF stylesheet %]
+    <link rel="stylesheet" href="[% stylesheet %]" type="text/css" title="Stylesheet for [% site_name %]" />
+  [% ELSE %]
+    <link rel="stylesheet" href="[% config.static_url %]openguides-base.css" type="text/css" title="Basic OpenGuides stylesheet" />
+  [% END %]
+  [% IF config.use_leaflet %]
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-[% leaflet_version %]/leaflet.css" />
+  [% END %]
+
+  [% IF feed_base %]
+    <link rel="alternate" type="application/rss+xml" title="Page as RSS" href="[% feed_base %];format=rss" />
+    <link rel="alternate" type="application/atom+xml" title="Page as Atom" href="[% feed_base %];format=atom" />
+  [% END %]
+  [% IF wgs84_lat AND wgs84_long %]
+    <meta name="ICBM" content="[% wgs84_lat %], [% wgs84_long %]" />
+    <meta name="geo.position" content="[% wgs84_lat %], [% wgs84_long %]" />
+  [% END %]
+    <link rel="alternate"
+          type="application/rss+xml"
+          title="[% site_name %] - Recent Changes (RSS 1.0)"
+          href="[% full_cgi_url %]?action=rc;format=rss" />
+    <link rel="alternate"
+          type="application/atom+xml"
+          title="[% site_name %] - Recent Changes (Atom)"
+          href="[% full_cgi_url %]?action=rc;format=atom" />
+    <link rel="search"
+          type="application/opensearchdescription+xml"
+          title="Search the site '[% site_name %]'"
+          href="[% full_cgi_url %]?action=about;format=opensearch"  />
+  [% IF licence_url %]
+    <link rel="copyright" href="[% licence_url %]" />
+  [% END %]
+  [% IF deter_robots %]
+    <meta name="robots" content="noindex,nofollow" />
+  [% END %]
+  [% UNLESS not_editable %]
+    <link rel="alternate" type="application/wiki" title="Edit this page!"
+     href="[% source_site or full_cgi_url %]?id=[% node_param %];action=edit" />
+  [% END %]
+
+  [% IF display_google_maps %]
+    [% IF config.use_leaflet %]
+      <script
+         src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"
+         type="text/javascript"></script>
+      <script src="http://cdn.leafletjs.com/leaflet-[% leaflet_version %]/leaflet.js"
+              type="text/javascript"></script>
+      <script src="[% config.static_url %]map-leaflet.js"
+              type="text/javascript"></script>
+    [% ELSIF enable_gmaps AND gmaps_api_key %]
+      <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=[% gmaps_api_key %]" type="text/javascript"></script>
+    [% END %]
+  [% END %]
+
+  [% TRY %]
+    [% INCLUDE custom_header.tt %]
+  [% CATCH %]
+  [% END %]
+
+</head>
+<body>
+  <div id="body_wrapper">
+  [% IF !config.use_leaflet AND enable_gmaps AND display_google_maps
+     AND gmaps_api_key %]
+    <script defer="defer" type="text/javascript">
+      //<![CDATA[
+        var baseIcon = new GIcon();
+        baseIcon.image = "http://www.google.com/mapfiles/marker.png";
+        baseIcon.shadow = "http://www.google.com/mapfiles/shadow50.png";
+        baseIcon.iconSize = new GSize(10, 17);
+        baseIcon.shadowSize = new GSize(20, 17);
+        baseIcon.iconAnchor = new GPoint(5, 17);
+        baseIcon.infoWindowAnchor = new GPoint(9, 2);
+        baseIcon.infoShadowAnchor = new GPoint(9, 12);
+      //]]>
+    </script>
+  [% END %]

@@ -1,0 +1,29 @@
+---
+abstract: 'Read/Write custom properties from Microsoft documents in OpenXML format (MS Office 2007 onwards).'
+author:
+  - 'Ananth Venugopal <ananthbv@gmail.com>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112150'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: OpenXML-Properties
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Archive::Zip: 0
+  Data::Dumper: 0
+  File::Basename: 0
+  Moose: 0
+  Readonly: 0
+  String::Random: 0
+  XML::XPath: 0
+  perl: 5.006
+version: 0.02

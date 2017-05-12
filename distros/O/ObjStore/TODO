@@ -1,0 +1,183 @@
+--------------------------------------------------------------------
+TODO      DOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTO      TODO
+
+
+If you are interested in contributing, please subscribe to the osperl
+mailing list.  Send email to majordomo@listbox.com with 'subscribe
+osperl' in the body of your message.
+
+
++ IDEAS +
+
+tied pvar
+  coderef to retrieve data from the database
+  cached during the transaction
+  refreshed if in a new transaction
+
+$hash->{seg} = $db->create_segment('foo'); #blows up (get_number missing!)
+
+try overload $${} to autoderef references
+
+sort tests into appropriate directories
+
+PERL_MM_OPT?
+
+split ObjStore::Serve stuff into its own tarball?
+  + improve organization
+  + better advertising
+  - annoying to install
+
+disable autoload per class via some API
+  deprecate _fake:: junk
+
+die with a ref!
+
+read the installed ObjStore::Config for defaults
+
+tests
+  pathexam.t - test all comparison branches
+  each POSH_PEEK method
+
+any traverse2 should check for RV (&die)
+
+performance
+  think about avoiding string copies again?
+  modification counters?
+  can BLESS be faster? (at least the first time?)
+  bless: should cache transient refs?
+  AVHV: should create a transient ref to the layout?
+  can easily cache whether object needs AVHV style traverse
+  _private_root_data XS? XXX
+
+Index
+  PUSH & UNSHIFT: just verify the order is correct?
+
+RE-THINK:
+  sub isa { _isa(@_, 1); }
+  sub versionof { _versionof(@_, 1); }
+  sub is_evolved { _is_evolved(@_, 1); }
+
+patches
+  PERL_OBJECT / ExCxx !!
+  VTBL collections implementation!
+  XSthr.h?
+  fold osp_croak back into perl?
+  MakeMaker patch for blib shared libraries?
+
+ObjectStore 6.0
+  version info should be stored in a separate root with a fixed data structure
+  make OSPV pure virtual!
+  unions?
+
+
++ VAGUE POSSIBILITIES +
+
+ObjStore::ServerDB::Top
+  POSH_PEEK - maybe try to require stuff before UNLOADED can happen?
+
+threads
+  optional transaction-level mutex to debug data accesses?
+
+pathexam
+  It is feasible to skip load_path if the index matches...?  Hm.
+
+make all depreciated stuff autoloaded
+
+-MObjStore=-Dflags ?
+
+transactions
+  prevent more than one thread from using a local transaction? (safe mode?)
+  begin('update!',...): force switch to update?
+
+qtposh
+  AVHV looks different depending whether it goes through resolve??!
+  resolve failures seem not to get reported?
+  share more code between posh & qtposh
+  hyperlink interface!
+&
+  word wrap, but it doesn't seem to be supported
+  optionally distinguish between return and enter keys?
+
+posh
+  -e
+  merge with ObjStore::Posh::Cursor
+  display style?  web integration?  cgi-posh?
+  hyperlink interface!
+
+$ref->notify('m1', 'batch'); ???
+
+ObjStore::Index configure
+  unique index duplicate row behavior?
+  read-only keys?
+
+configure(...) : relax parameter limitation
+
+split all the server goodies into a separate package?
+
+switch representations dynamically?
+  cursor syncronization: check os_typespec?
+  do arrays first
+  lock representation... hm...?
+  generate 'new' methods at compile time?
+
+permutation magic for AVHV
+  ObjStore::Index::_(un)protect?
+
+translate('transient', $persistent) ??
+
+move ObjStore::subscribe back into ObjStore::Notification?
+
+optimize splash suite
+  hash performance sucks
+  arrays are inefficient?
+
+get_database
+  factor
+  os_server::get_databases() ignores bless; yikes!
+
+prune excessive debugging hooks
+
+posh
+  Multiple sessions per user?  Who cares?
+  Call system() when in ufs?  How about rawfs?
+Peeker
+  fix comma - $o->comma, then check in $o->nl
+  fix for "$at = " prefix ?
+
+script to insure consistent podding? (get Pod::Parser?)
+
+assignment to $SIG{SEGV} should not reset SEGV handler
+
+transaction hooks?
+
+factor error messages like diagnostics.pm?
+
+ObjStore::File - Use a FatTree of 4K buffers?
+
+automatically spooge $ObjStore::RUN_TIME if @ISA changes?
+
+install HTML versions of the pod files & gif image
+
+notifications
+  notify should in/out string length!  #SE057480_O#
+
+change_schema_key:
+  delete database INC, checksum %INC, light up security flags?
+  open: require each %INC, verify checksums (unless some flags is set)
+  TAINTing?
+
+Make XS code more efficient.  (How?)
+
+Evolve the schema to eliminate this harmless annoyance:  The object at 0xdff30194(</elvis/export2/os/tmp/perltest | 2 | 194>)(type "OSPV_hvdict"), contains a pointer at 0xdff301a0(OSPV_hvdict::OSPV_Generic::OSPV_Container::OSSVPV.classname) with the illegal value 0xe0582d28. The declared type "char" is incompatible with the type of the object at address </elvis/export2/os/tmp/perltest | 4 | 2d28>(OSPV_avarray::OSPV_Generic::OSPV_Container::OSSVPV::os_virtual_behavior|vtbl{os_virtual_behavior*}).  The type of this object is: OSPV_avarray.
+
+
++ BIGGISH PROJECTS +
+
+Needed is a more flexible hash table that can serve to replace
+os_Dictionary and also be used as an ObjStore::Index.
+
+optional pool allocation of numeric types [why bother??]
+  configurable block size
+  store offset in xiv!
+  think about performance
+

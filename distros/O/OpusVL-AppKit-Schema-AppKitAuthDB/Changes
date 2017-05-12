@@ -1,0 +1,29 @@
+6         2017-01-19 12:09:38+00:00 Europe/London
+
+  - User email column is now CITEXT. Consuming modules will have to install the
+    extension:
+
+       CREATE EXTENSION IF NOT EXISTS citext WITH SCHEMA public
+
+    This requires a version of psql that has it, i.e. 8.4 or higher
+
+
+5         2016-07-14 21:24:52+01:00 Europe/London
+
+  - Added more missing dependencies
+
+4         2016-07-14 20:54:13+01:00 Europe/London
+
+  - Added missing dependency
+
+3         2016-07-01 15:57:08+01:00 Europe/London
+
+  - Added basic test.
+
+2         2016-07-01 15:56:33+01:00 Europe/London
+
+  - Added many to many link for aclfeatures.
+
+1         2016-06-28 14:01:44+01:00 Europe/London
+
+  - First version.

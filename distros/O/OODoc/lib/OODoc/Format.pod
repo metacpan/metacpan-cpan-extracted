@@ -1,0 +1,610 @@
+=encoding utf8
+
+=head1 NAME
+
+OODoc::Format - base class for all OODoc formatters
+
+=head1 INHERITANCE
+
+ OODoc::Format
+   is a OODoc::Object
+
+ OODoc::Format is extended by
+   OODoc::Format::Html
+   OODoc::Format::Pod
+
+=head1 SYNOPSIS
+
+ # Never instantiated directly.
+
+=head1 DESCRIPTION
+
+A formater produces manual pages in some way or an other which contain
+(parts of) the module documentation.  Each formatter class is based on
+this OODoc::Format class, which should not be instantiated directly.
+By far most users will never explicitly create a formatter by themselves:
+it is created implicitly when L<OODoc::create()|OODoc/"Formatter"> is called on a L<OODoc|OODoc>
+object.
+
+Currently available formatters:
+
+=over 4
+
+=item * L<OODoc::Format::Pod|OODoc::Format::Pod>
+
+Simple formatter, which has the layout of the produced POD manual pages
+hard-coded in it's body.  The only way to adapt the structure of the
+pages is by extending the class, and thereby overrule some of the
+methods which produce the text.  Not much of a problem for experienced
+Object Oriented programmers.
+
+=item * L<OODoc::Format::Pod2|OODoc::Format::Pod2>
+
+This formatter uses the same methods to generate the manual page as
+defined by L<OODoc::Format::Pod|OODoc::Format::Pod>, but the general layout of the page
+can be configured using templates.
+
+You have to install L<Bundle::Template::Magic> to use this feature.
+
+=item * L<OODoc::Format::Pod3|OODoc::Format::Pod3>
+
+The whole formatter, implemented as template in L<OODoc::Template|OODoc::Template>, a
+very light weighted template system.
+
+You have to install L<OODoc::Template> to use this feature.
+
+=item * L<OODoc::Format::Html|OODoc::Format::Html>
+
+Produce HTML by filling in templates. This module requires
+L<Bundle::Template::Magic> and the ability to run cgi scripts.
+
+=back
+
+Extends L<"DESCRIPTION" in OODoc::Object|OODoc::Object/"DESCRIPTION">.
+ 
+=head1 OVERLOADED
+
+Extends L<"OVERLOADED" in OODoc::Object|OODoc::Object/"OVERLOADED">.
+ 
+=head1 METHODS
+
+Extends L<"METHODS" in OODoc::Object|OODoc::Object/"METHODS">.
+ 
+=head2 Constructors
+
+Extends L<"Constructors" in OODoc::Object|OODoc::Object/"Constructors">.
+ 
+=over 4
+
+=item OODoc::Format-E<gt>B<new>(%options)
+
+ -Option  --Default
+  manifest  undef
+  project   <required>
+  version   <required>
+  workdir   <required>
+
+=over 2
+
+=item manifest => OBJECT
+
+=item project => STRING
+
+The short name of this project (module), set by L<OODoc::new(project)|OODoc/"METHODS">.
+
+=item version => STRING
+
+Many manual pages will contain the version of the project.  This can
+be any STRING, although blanks are not advised.
+
+=item workdir => DIRECTORY
+
+The DIRECTORY where the output will be placed.  If it does not exist,
+it will be created for you.
+
+=back
+
+=back
+
+=head2 Inheritance knowledge
+
+Extends L<"Inheritance knowledge" in OODoc::Object|OODoc::Object/"Inheritance knowledge">.
+ 
+=over 4
+
+=item $obj-E<gt>B<extends>( [$object] )
+
+Inherited, see L<OODoc::Object/"Inheritance knowledge">
+
+=back
+
+=head2 Attributes
+
+=over 4
+
+=item $obj-E<gt>B<manifest>()
+
+Returns the L<OODoc::Manifest|OODoc::Manifest> object which maintains the names
+of created files.
+
+=item $obj-E<gt>B<project>()
+
+Returns the name of this project.
+
+=item $obj-E<gt>B<version>()
+
+Returns the version string of this project.  This version may
+contains any character, so should be handled with care.
+
+=item $obj-E<gt>B<workdir>()
+
+Returns the name of the work directory: the top location for all
+the output files.
+
+=back
+
+=head2 Page generation
+
+=over 4
+
+=item $obj-E<gt>B<cleanup>($manual, STRING)
+
+Takes the STRING and cleans it up to be in the right format for the
+current formatter.  The cleaning up is parser dependent, and therefore
+the parser of the manual is addressed to do the work.
+
+=item $obj-E<gt>B<createManual>(%options)
+
+ -Option        --Default
+  append          undef
+  format_options  []
+  manual          <required>
+  project         <required>
+  template        undef
+
+=over 2
+
+=item append => STRING|CODE
+
+=item format_options => ARRAY
+
+An ARRAY which contains a list of options which are the defaults
+for formatting a chapter.
+
+=item manual => MANUAL
+
+The manual to be formatted.
+
+=item project => STRING
+
+The name of this project, which will appear on many pages.
+
+=item template => LOCATION
+
+Some formatters support templates to descibe the output of the pages.
+The valid values for this option differs per formatter.
+
+=back
+
+=item $obj-E<gt>B<createOtherPages>(%options)
+
+Create other pages which come with the set of formatted manuals.  What
+the contents of these pages is depends on the formatter.  Some formatters
+simply ignore the functionality of this method as a whole: they do not
+support data-files which are not manuals.
+
+ -Option --Default
+  process  undef
+  source   undef
+
+=over 2
+
+=item process => REGEXP
+
+Selects files to be processed from the source directory.  Other files
+are copied without modification.  What happens with the selected
+files is formatter dependent.
+
+=item source => DIRECTORY
+
+The location of the DIRECTORY which contains files which are part of
+the produced set of documentation, but not copied per manual page
+but only once.
+
+=back
+
+=item $obj-E<gt>B<showChapter>(%options)
+
+You can pass all %options about formatting to this method.  They will passed
+to the related methods.  So: the list of options you can pass here is much
+longer: the combination of everything possible for all show* methods.
+
+ -Option                    --Default
+  chapter                     <required>
+  manual                      <required>
+  output                      <required>
+  show_inherited_chapters     'REFER'
+  show_inherited_sections     'REFER'
+  show_inherited_subsections  'REFER'
+
+=over 2
+
+=item chapter => CHAPTER
+
+=item manual => MANUAL
+
+=item output => FILE
+
+=item show_inherited_chapters => 'NO'|'REFER'|'EXPAND'
+
+=item show_inherited_sections => 'NO'|'REFER'|'EXPAND'
+
+REFER means that inherited sections are simply listed as reference
+to the manual page which describes it.
+
+=item show_inherited_subsections => 'NO'|'REFER'|'EXPAND'
+
+=back
+
+=item $obj-E<gt>B<showExamples>(%options)
+
+ -Option  --Default
+  examples  <required>
+  manual    <required>
+  output    <required>
+
+=over 2
+
+=item examples => ARRAY
+
+=item manual => MANUAL
+
+=item output => FILE
+
+=back
+
+=item $obj-E<gt>B<showOptionExpand>(%options)
+
+ -Option --Default
+  default  <required>
+  manual   <required>
+  option   <required>
+  output   <required>
+
+=over 2
+
+=item default => OBJECT
+
+=item manual => OBJECT
+
+=item option => OBJECT
+
+=item output => FILE
+
+=back
+
+=item $obj-E<gt>B<showOptionTable>(%options)
+
+ -Option --Default
+  manual   <required>
+  options  <required>
+  output   <required>
+
+=over 2
+
+=item manual => OBJECT
+
+=item options => ARRAY
+
+=item output => FILE
+
+=back
+
+=item $obj-E<gt>B<showOptionUse>(%options)
+
+ -Option --Default
+  default  <required>
+  manual   <required>
+  option   <required>
+  output   <required>
+
+=over 2
+
+=item default => OBJECT
+
+=item manual => OBJECT
+
+=item option => OBJECT
+
+=item output => FILE
+
+=back
+
+=item $obj-E<gt>B<showOptionalChapter>($name, %options)
+
+=item $obj-E<gt>B<showOptions>(%options)
+
+The options shown are B<not> the %options passed as argument, but the
+options which belong to the subroutine being displayed.
+
+ -Option                --Default
+  manual                  <required>
+  options                 <required>
+  show_described_options  'EXPAND'
+  show_inherited_options  'USE'
+
+=over 2
+
+=item manual => OBJECT
+
+=item options => ARRAY
+
+=item show_described_options => 'NO'|'LIST'|'USE'|'EXPAND'
+
+=item show_inherited_options => 'NO'|'LIST'|'USE'|'EXPAND'
+
+=back
+
+=item $obj-E<gt>B<showRequiredChapter>($name, %options)
+
+=item $obj-E<gt>B<showStructureExpanded>(%options)
+
+ -Option               --Default
+  show_chapter_examples  'EXPAND'
+
+=over 2
+
+=item show_chapter_examples => 'NO'|'EXPAND'
+
+The I<chapter examples> are all examples which are not subroutine
+related: examples which come at the end of a chapter, section, or
+subsection.
+
+=back
+
+=item $obj-E<gt>B<showStructureRefer>(%options)
+
+=item $obj-E<gt>B<showSubroutine>( <@> )
+
+ -Option                --Default
+  last                    0
+  manual                  <required>
+  output                  <selected filehandle>
+  show_described_options  'EXPAND'
+  show_diagnostics        'NO'
+  show_examples           'EXPAND'
+  show_inherited_options  'USE'
+  show_option_table       'ALL'
+  show_sub_description    'DESCRIBED'
+  show_subroutine         'EXPAND'
+  subroutine              <required>
+
+=over 2
+
+=item last => BOOLEAN
+
+=item manual => MANUAL
+
+=item output => FILE
+
+=item show_described_options => 'NO'|'LIST'|'USE'|'EXPAND'
+
+=item show_diagnostics => 'NO'|'EXPAND'
+
+Diagnostics (error and warning messages) are defined per subroutine,
+but are usually not listed with the subroutine.  The POD formatter's
+default behavior, for instance, puts them all in a separate DIAGNOSTICS
+chapter per manual page.
+
+=item show_examples => 'NO'|'EXPAND'
+
+=item show_inherited_options => 'NO'|'LIST'|'USE'|'EXPAND'
+
+=item show_option_table => 'NO'|'INHERITED'|'DESCRIBED'|'ALL'
+
+=item show_sub_description => 'NO'|'DESCRIBED'|'REFER'|'ALL'
+
+Included the description of the use of the subroutines, which
+comes before the options are being explained.  C<NO> will cause
+the description to be ignored, C<DESCRIBED> means that only
+text which was written in the manual-page at hand is included,
+C<REFER> means that a reference to inherited documentation is
+made, and with C<ALL> the inherited texts are expanded into this
+file as well.
+
+=item show_subroutine => 'NO'|'NAMES'|'USE'|'EXPAND'
+
+=item subroutine => OBJECT
+
+=back
+
+=item $obj-E<gt>B<showSubroutineDescription>(%options)
+
+ -Option    --Default
+  manual      <required>
+  output      <required>
+  subroutine  <required>
+
+=over 2
+
+=item manual => OBJECT
+
+=item output => FILE
+
+=item subroutine => OBJECT
+
+=back
+
+=item $obj-E<gt>B<showSubroutineName>(%options)
+
+ -Option    --Default
+  last        0
+  manual      <required>
+  output      <required>
+  subroutine  <required>
+
+=over 2
+
+=item last => BOOLEAN
+
+=item manual => OBJECT
+
+=item output => FILE
+
+=item subroutine => OBJECT
+
+=back
+
+=item $obj-E<gt>B<showSubroutineUse>(%options)
+
+ -Option    --Default
+  manual      <required>
+  output      <required>
+  subroutine  <required>
+
+=over 2
+
+=item manual => OBJECT
+
+=item output => FILE
+
+=item subroutine => OBJECT
+
+=back
+
+=item $obj-E<gt>B<showSubroutines>(%options)
+
+ -Option                --Default
+  manual                  <required>
+  output                  <selected filehandle>
+  show_described_options  'EXPAND'
+  show_described_subs     'EXPAND'
+  show_diagnostics        'NO'
+  show_examples           'EXPAND'
+  show_inherited_options  'USE'
+  show_inherited_subs     'USE'
+  show_option_table       'ALL'
+  show_subs_index         'NO'
+  subroutines             []
+
+=over 2
+
+=item manual => MANUAL
+
+=item output => FILE
+
+=item show_described_options => 'NO'|'LIST'|'USE'|'EXPAND'
+
+=item show_described_subs => 'NO'|'NAMES'|'USE'|'EXPAND'
+
+=item show_diagnostics => 'NO'|'EXPAND'
+
+=item show_examples => 'NO'|'EXPAND'
+
+=item show_inherited_options => 'NO'|'LIST'|'USE'|'EXPAND'
+
+=item show_inherited_subs => 'NO'|'NAMES'|'USE'|'EXPAND'
+
+=item show_option_table => 'NO'|'DESCRIBED'|'INHERITED'|'ALL'
+
+=item show_subs_index => 'NO'|'NAMES'|'USE'
+
+=item subroutines => ARRAY
+
+=back
+
+=back
+
+=head2 Commonly used functions
+
+Extends L<"Commonly used functions" in OODoc::Object|OODoc::Object/"Commonly used functions">.
+ 
+=over 4
+
+=item $obj-E<gt>B<filenameToPackage>($filename)
+
+=item OODoc::Format-E<gt>B<filenameToPackage>($filename)
+
+Inherited, see L<OODoc::Object/"Commonly used functions">
+
+=item $obj-E<gt>B<mkdirhier>($directory)
+
+=item OODoc::Format-E<gt>B<mkdirhier>($directory)
+
+Inherited, see L<OODoc::Object/"Commonly used functions">
+
+=back
+
+=head2 Manual Repository
+
+Extends L<"Manual Repository" in OODoc::Object|OODoc::Object/"Manual Repository">.
+ 
+=over 4
+
+=item $obj-E<gt>B<addManual>($manual)
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<mainManual>($name)
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<manual>($name)
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<manuals>()
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<manualsForPackage>($name)
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<packageNames>()
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=back
+
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item Error: formatter does not know the version.
+
+=item Error: formatter has no project name.
+
+A formatter was created without a name specified for the project at
+hand.  This should be passed with L<new(project)|OODoc::Format/"METHODS">.
+
+=item Error: manual definition requires manual object
+
+A call to L<addManual()|OODoc::Object/"Manual Repository"> expects a new manual object (a L<OODoc::Manual|OODoc::Manual>),
+however an incompatible thing was passed.  Usually, intended was a call
+to L<manualsForPackage()|OODoc::Object/"Manual Repository"> or L<mainManual()|OODoc::Object/"Manual Repository">.
+
+=item Warning: missing required chapter $name in $manual
+
+=item Error: no working directory specified.
+
+The formatter has to know where the output can be written.  This
+directory must be provided via L<new(workdir)|OODoc::Format/"METHODS">, but was not specified.
+
+=item Warning: unknown subroutine type $type for $name in $manual
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of OODoc distribution version 2.01,
+built on November 11, 2015. Website: F<http://perl.overmeer.net/oodoc/>
+
+=head1 LICENSE
+
+Copyrights 2003-2015 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

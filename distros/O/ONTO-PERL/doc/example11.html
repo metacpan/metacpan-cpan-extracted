@@ -1,0 +1,236 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"/>
+<title>Manipulating Ontology Terms</title>
+</head>
+<body>
+
+<h2>Manipulating Ontology Terms</h2>
+	
+<ol>
+	<li><a href="#1">Manipulating Ontology Terms (names, IDs, xref's, definitions, and so forth).</a></li>
+
+</ol>
+	
+<ol>
+	<li> <b><a href="#1">Manipulating Ontology Terms (names, IDs, xref's, definitions, and so forth):</a></b>
+		<pre>
+			
+			use OBO::Core::Term;
+			use OBO::Core::Def;
+			use OBO::Util::DbxrefSet;
+			use OBO::Core::Dbxref;
+			use OBO::Core::Synonym;
+			use strict;
+			
+			# three new terms
+			my $n1 = OBO::Core::Term->new();
+			my $n2 = OBO::Core::Term->new();
+			my $n3 = OBO::Core::Term->new();
+			
+			# setting up id's
+			$n1->id("APO:P0000001");
+			$n2->id("APO:P0000002");
+			$n3->id("APO:P0000003");
+			
+			# name, namespace, code for term n1
+			my $my_idspace = $n1->idspace();      # should be "APO"
+			my $my_subns   = $n1->subnamespace(); # should be "P"
+			my $my_code    = $n1->code();         # should be "0000001"
+			
+			# alt_id
+			$n1->alt_id("APO:P0000001_alt_id");
+			$n2->alt_id("APO:P0000002_alt_id1", "APO:P0000002_alt_id2", "APO:P0000002_alt_id3", "APO:P0000002_alt_id4");
+			
+			my @n2_alt_ids = $n2->alt_id()->get_set(); # get all the alternative ids of n2
+			
+			# n3 has no alt ids; therefore, $n3->alt_id()->get_set() is empty
+			
+			# subset
+			$n1->subset("APO:P0000001_subset");
+			$n2->subset("APO:P0000002_subset1", "APO:P0000002_subset2", "APO:P0000002_subset3", "APO:P0000002_subset4");
+			
+			my @n2_subsets = $n2->subset(); # get all the subsets of n2
+			
+			# n3 has no subsets; therefore, $n3->subsets() is empty
+			
+			# name
+			$n1->name("One");
+			$n2->name("Two");
+			$n3->name("Three");
+			
+			if (!$n1->is_obsolete()) { # if n1 is not obsolete
+				$n1->is_obsolete(1);   # make it obsolete
+			}
+			
+			if ($n1->is_obsolete()) { # if n1 is obsolete
+				$n1->is_obsolete(0);  # make it non-obsolete
+			}
+			
+			if (!$n1->is_anonymous()) { # if n1 is not anonymous
+				$n1->is_anonymous(1);   # make it anonymous
+			}
+
+			if ($n1->is_anonymous()) { # if n1 is anonymous
+				$n1->is_anonymous(0);  # make it non-anonymous
+			}
+			
+			# synonyms
+			my $syn1 = OBO::Core::Synonym->new();
+			$syn1->type('EXACT');         # set the type of synonym
+			
+			my $def1 = OBO::Core::Def->new();
+			$def1->text("Hola mundo1");   # set a definition
+			
+			my $sref1 = OBO::Core::Dbxref->new();
+			$sref1->name("APO:vm");       # set the DB and ACC of the dbxref
+			
+			my $srefs_set1 = OBO::Util::DbxrefSet->new();
+			$srefs_set1->add($sref1);
+			$def1->dbxref_set($srefs_set1);
+			$syn1->def($def1);
+			$n1->synonym_set($syn1);
+			
+			my $syn2 = OBO::Core::Synonym->new();
+			$syn2->type('BROAD');         # set the type of synonym
+			
+			my $def2 = OBO::Core::Def->new();
+			$def2->text("Hola mundo2");   # set a definition
+			
+			my $sref2 = OBO::Core::Dbxref->new();
+			$sref2->name("APO:ls");       # set the DB and ACC of the dbxref
+			
+			$srefs_set1->add_all($sref1);
+			my $srefs_set2 = OBO::Util::DbxrefSet->new();
+			$srefs_set2->add_all($sref1, $sref2);
+			$def2->dbxref_set($srefs_set2);
+			$syn2->def($def2);
+			$n2->synonym_set($syn2);
+			
+			# n3 has no synonyms so far; therefore, $n3->synonym_set() is empty, let's add some...
+			
+			my $syn3 = OBO::Core::Synonym->new();
+			$syn3->type('BROAD');
+			
+			my $def3 = OBO::Core::Def->new();
+			$def3->text("Hola mundo2");
+			
+			my $sref3 = OBO::Core::Dbxref->new();
+			$sref3->name("APO:ls");
+			
+			my $srefs_set3 = OBO::Util::DbxrefSet->new();
+			$srefs_set3->add_all($sref1, $sref2);
+			$def3->dbxref_set($srefs_set3);
+			$syn3->def($def3);
+			$n3->synonym_set($syn3);
+			
+			# getting synonyms
+			if (($n1->synonym_set())[0]->equals($syn1)) {
+				# the synonym has been properly set
+			}
+			
+			if (($n2->synonym_set())[0]->equals($syn2)) {
+				# the synonym has been properly set
+			}
+			
+			if (($n3->synonym_set())[0]->equals($syn3)) {
+				# the synonym has been properly set
+			}
+			
+			if (($n2->synonym_set())[0]->type() eq 'BROAD') {
+				# the synonym type has been properly set
+			}
+			
+			if (($n2->synonym_set())[0]->def()->equals(($n3->synonym_set())[0]->def())) {
+				# the definition of the synonym has been properly set
+			}
+			
+			if (($n2->synonym_set())[0]->equals(($n3->synonym_set())[0])) {
+				# both sets hold the same synonyms
+			}
+			
+			# checking the synonym as strings
+			if (($n2->synonym_as_string())[0] eq "\"Hola mundo2\" [APO:ls, APO:vm]") {
+				# should enter here
+			}
+			
+			# setting a sysnonym as string
+			$n2->synonym_as_string("Hello world2", "[APO:vm2, APO:ls2]", "EXACT");
+			# as a result, the following should be TRUE:
+			(($n2->synonym_as_string())[0] eq "\"Hello world2\" [APO:ls2, APO:vm2]");
+			(($n2->synonym_as_string())[1] eq "\"Hola mundo2\" [APO:ls, APO:vm]");
+			
+			# xref
+			my $xref1 = OBO::Core::Dbxref->new();
+			my $xref2 = OBO::Core::Dbxref->new();
+			my $xref3 = OBO::Core::Dbxref->new();
+			my $xref4 = OBO::Core::Dbxref->new();
+			my $xref5 = OBO::Core::Dbxref->new();
+			
+			$xref1->name("XAPO:vm");
+			$xref2->name("XAPO:ls");
+			$xref3->name("XAPO:ea");
+			$xref4->name("XAPO:vm");
+			$xref5->name("XAPO:ls");
+			
+			my $xrefs_set = OBO::Util::DbxrefSet->new();
+			$xrefs_set->add_all($xref1, $xref2, $xref3, $xref4, $xref5);
+			$n1->xref_set($xrefs_set);
+			if ($n1->xref_set()->contains($xref3)){
+				# should enter here
+			}
+			my $xref_length = $n1->xref_set()->size(); # should be 3
+			
+			# xref_set_as_string
+			my @empty_refs = $n2->xref_set_as_string(); # no refs so far
+			$n2->xref_set_as_string("[YAPO:vm, YAPO:ls, YAPO:ea \"Erick Antezana\"] {opt=first}");
+			# then get them back:
+			my @xrefs_n2 = $n2->xref_set()->get_set();
+			
+			# def
+			my $def = OBO::Core::Def->new();
+			$def->text("Hola mundo");
+			my $ref1 = OBO::Core::Dbxref->new();
+			my $ref2 = OBO::Core::Dbxref->new();
+			my $ref3 = OBO::Core::Dbxref->new();
+			
+			$ref1->name("APO:vm");
+			$ref2->name("APO:ls");
+			$ref3->name("APO:ea");
+			
+			my $refs_set = OBO::Util::DbxrefSet->new();
+			$refs_set->add_all($ref1,$ref2,$ref3);
+			$def->dbxref_set($refs_set);
+			$n1->def($def);
+			my $hola_numdo = $n1->def()->text(); should be "Hola mundo"
+			
+			my $ dbxref_set_size = $n1->def()->dbxref_set()->size(); # should be 3
+			
+			#set definition
+			$n2->def($def);
+			
+			# def as string
+			my $n2_def_as_string = $n2->def_as_string(); # should be "Hola mundo" [APO:ea, APO:ls, APO:vm]
+			
+			$n2->def_as_string("This is a dummy definition", "[APO:vm, APO:ls, APO:ea \"Erick Antezana\" {opt=first}]");
+			my $n2_def_text = $n2->def()->text(); # should be "This is a dummy definition"
+			
+			# get them back:
+			my @refs_n2 = $n2->def()->dbxref_set()->get_set();
+			
+			# definition as string
+			$n2_def_as_string = $n2->def_as_string(); # should be "This is a dummy definition" [APO:ea "Erick Antezana" {opt=first}, APO:ls, APO:vm]
+			
+			# OBO tag: 'disjoint_from'
+			$n2->disjoint_from($n1->id(), $n3->id());
+			my @dis = sort {$a cmp $b} $n2->disjoint_from(); # two elements
+			
+		</pre>
+	</li>
+	
+</ol>
+
+Copyright (c) 2006-2015 by Erick Antezana. All rights reserved.
+
+</body>
+</html>

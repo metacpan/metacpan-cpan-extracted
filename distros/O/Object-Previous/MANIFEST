@@ -1,0 +1,16 @@
+.perlcriticrc
+Changes
+MANIFEST
+Makefile.PL
+Previous.pm
+Previous.pod
+Previous.xs
+README
+pp_caller.txt
+t/01_load.t
+t/02_use_pure_perl.t
+t/03_use_xs.t
+t/04_xs_too_mortal.t
+t/critic.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

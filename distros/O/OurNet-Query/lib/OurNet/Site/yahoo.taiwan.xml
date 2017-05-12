@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<SITE ID="Yahoo.Taiwan">
+
+<NAME Lang="zh-cn"><![CDATA[
+Yahoo 雅虎中文 (繁体中文)
+]]></NAME>
+<NAME Lang="en-us">Yahoo WWW Search</NAME>
+<NAME Lang="zh-tw">Yahoo 懂いゅ (羉砰いゅ)</NAME>
+<INFO Lang="zh-cn">general information web search in Big5 Chinese</INFO>
+<INFO Lang="en-us">general information web search in Big5 Chinese</INFO>
+<INFO Lang="zh-tw">general information web search in Big5 Chinese</INFO>
+
+<URL Type="More"><![CDATA[
+http://search.chinese.yahoo.com_STR_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://search.chinese.yahoo.com/search/big5?y=b&p=_QUERY_&n=_HITS_
+]]></URL>
+
+<CHARSET>zh-tw</CHARSET>
+<SCORE>100-(_RANK_-1)/2</SCORE>
+<EXPRESSION>Standard</EXPRESSION>
+
+<VAR Name="_STR_"><![CDATA[
+<a href="_STR_"> 
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<LI><A HREF="_URL_">_TITLE_</A>_PREVIEW__EOR_
+]]></TEMPLATE>
+</SITE>

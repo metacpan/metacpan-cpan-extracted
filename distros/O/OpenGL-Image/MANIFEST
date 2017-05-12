@@ -1,0 +1,16 @@
+Changes
+COPYRIGHT
+hex_tile.pl
+Image.pm
+Image.pod
+Image/Common.pm
+Image/Magick.pm
+Image/Targa.pm
+INSTALL
+Makefile.PL
+MANIFEST
+README
+t/OpenGL-Image.t
+test.png
+
+META.yml                                 Module meta-data (added by MakeMaker)

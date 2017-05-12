@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<SITE ID="CyberSpace">
+
+<NAME Lang="en-us">CyberSpace Search</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+CyberSpace全球WWW搜尋(日本)
+]]></NAME>
+<INFO Lang="en-us">general information web search in Japan</INFO>
+<INFO Lang="zh-tw">general information web search in Japan</INFO>
+
+<URL Type="More"><![CDATA[
+http://search.csj.co.jp/lookup-main.cgi?key=_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://search.csj.co.jp/lookup-main.cgi?key=_QUERY_&max=10&off=0&cond=and&meta=1
+]]></URL>
+
+<CHARSET>ja-jp.jis</CHARSET>
+
+<VAR Name="_NEXT_"><![CDATA[
+<A HREF="lookup.cgi?key=_NEXT_">
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<LI><A HREF="_URL_">_TITLE_</A>_PREVIEW_<P>
+]]></TEMPLATE>
+</SITE>

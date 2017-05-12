@@ -1,0 +1,79 @@
+------------------------------------------------------------ INSTALLATION
+
+
+Tested Configurations:
+
+
++ perl 5.005_02 (fails some tests but mostly okay)
+  perl 5.005_53 (passes all tests)
+
+
++ Solaris 2.5.1 (2.6 should work too)
+
+  SC4.0 18 Oct 1995 C++ 4.1 / ObjectStore 5.1
+
+  ** REQUIRED: ODI fix #13866 (_Rep_desc_type_table::dope_compatible
+               forgets to fixup name key in name hash table)
+
+
+-------------------------------------------------------------------------
+*** BUILD STEPS
+
+0. If you want to install into a non-default directory tree, set the
+PERL5PREFIX environment variable.
+
+1. edit ./lib/ObjStore/Config.pm
+
+2. cd API; perl Makefile.PL; make install
+
+3. cd ..; perl Makefile.PL
+
+4. make
+
+5. LD_LIBRARY_PATH=blib/arch/auto/ObjStore make test  (or somesuch)
+
+6. make install
+
+You have to install the API separately before building the rest of the
+package since everything depends on libosperl.so being in the right
+place.  (There must be a better way?)
+
+-------------------------------------------------------------------------
+*** TEST SUITE
+
+- ./t/zpeek.t is very sensitive to the success of the other tests.
+
+- Keep running 'make test' until the database size matches.  It takes
+me about three tries.  If it will not match, there is probably a
+serious reference count problem.  If you are feeling paranoid, you can
+check that object counts do not increase between runs with 'ossize -c
+<database>'.
+
+-------------------------------------------------------------------------
+*** TROUBLE SHOOTING
+
+- Depending on the platform and whether you built perl to a shared or
+static library, you might need to disable perl's malloc.  This does
+not seem to be necessary on Solaris 2.X.
+
+- If you need to get a stack trace of an ObjectStore exceptions,
+you'll need to use the following breakpoints:
+
+  # optional
+  stop in osp_croak
+  stop in Perl_croak
+  stop in `libc.so.1`abort
+
+  # manditory
+  stop in `ObjStore.so`XS_ObjStore__SEGV_reason
+  ignore SEGV
+  cont
+
+- Send any problem reports to the mailing list!
+
+-------------------------------------------------------------------------
+
+Once you succeed on a system not listed (above) please send a note to
+perl-objectstore@parallax.co.uk announcing your success!
+
+-------------------------------------------------------------------------

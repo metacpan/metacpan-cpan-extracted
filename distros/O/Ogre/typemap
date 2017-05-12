@@ -1,0 +1,1001 @@
+TYPEMAP
+
+## BEGIN NORMAL TYPEMAPS
+AnimableObject *	O_ANIMABLEOBJECT
+AnimableValue *	O_ANIMABLEVALUE
+Animation *	O_ANIMATION
+AnimationControllerFunction *	O_ANIMATIONCONTROLLERFUNCTION
+AnimationState *	O_ANIMATIONSTATE
+AnimationStateSet *	O_ANIMATIONSTATESET
+AnimationTrack *	O_ANIMATIONTRACK
+AxisAlignedBox *	O_AXISALIGNEDBOX
+AxisAlignedBoxSceneQuery *	O_AXISALIGNEDBOXSCENEQUERY
+Billboard *	O_BILLBOARD
+BillboardChain *	O_BILLBOARDCHAIN
+BillboardSet *	O_BILLBOARDSET
+Bone *	O_BONE
+BorderPanelOverlayElement *	O_BORDERPANELOVERLAYELEMENT
+Camera *	O_CAMERA
+ColourValue *	O_COLOURVALUE
+ConfigFile *	O_CONFIGFILE
+ControllerFunctionReal *	O_CONTROLLERFUNCTIONREAL
+ControllerManager *	O_CONTROLLERMANAGER
+ControllerReal *	O_CONTROLLERREAL
+ControllerValueReal *	O_CONTROLLERVALUEREAL
+DataStream *	O_DATASTREAM
+DegRad *	O_DEGRAD
+Degree *	O_DEGREE
+EdgeData *	O_EDGEDATA
+Entity *	O_ENTITY
+FrameEvent *	O_FRAMEEVENT
+Frustum *	O_FRUSTUM
+GpuProgram *	O_GPUPROGRAM
+GpuProgramParameters *	O_GPUPROGRAMPARAMETERS
+HardwareBuffer *	O_HARDWAREBUFFER
+HardwareBufferManager *	O_HARDWAREBUFFERMANAGER
+HardwareIndexBuffer *	O_HARDWAREINDEXBUFFER
+HardwareOcclusionQuery *	O_HARDWAREOCCLUSIONQUERY
+HardwarePixelBuffer *	O_HARDWAREPIXELBUFFER
+HardwareVertexBuffer *	O_HARDWAREVERTEXBUFFER
+IndexData *	O_INDEXDATA
+InstancedGeometry *	O_INSTANCEDGEOMETRY
+IntersectionSceneQuery *	O_INTERSECTIONSCENEQUERY
+KeyFrame *	O_KEYFRAME
+Light *	O_LIGHT
+Log *	O_LOG
+LogManager *	O_LOGMANAGER
+ManualObject *	O_MANUALOBJECT
+ManualResourceLoader *	O_MANUALRESOURCELOADER
+Material *	O_MATERIAL
+MaterialManager *	O_MATERIALMANAGER
+Matrix3 *	O_MATRIX3
+Matrix4 *	O_MATRIX4
+Mesh *	O_MESH
+MeshManager *	O_MESHMANAGER
+MeshPtr *	O_MESHPTR
+MovableObject *	O_MOVABLEOBJECT
+MultiRenderTarget *	O_MULTIRENDERTARGET
+Node *	O_NODE
+NodeAnimationTrack *	O_NODEANIMATIONTRACK
+NumericAnimationTrack *	O_NUMERICANIMATIONTRACK
+Overlay *	O_OVERLAY
+OverlayContainer *	O_OVERLAYCONTAINER
+OverlayElement *	O_OVERLAYELEMENT
+OverlayManager *	O_OVERLAYMANAGER
+PanelOverlayElement *	O_PANELOVERLAYELEMENT
+Particle *	O_PARTICLE
+ParticleAffector *	O_PARTICLEAFFECTOR
+ParticleEmitter *	O_PARTICLEEMITTER
+ParticleSystem *	O_PARTICLESYSTEM
+ParticleSystemRenderer *	O_PARTICLESYSTEMRENDERER
+Pass *	O_PASS
+PassthroughControllerFunction *	O_PASSTHROUGHCONTROLLERFUNCTION
+PatchMesh *	O_PATCHMESH
+Plane *	O_PLANE
+PlaneBoundedVolume *	O_PLANEBOUNDEDVOLUME
+PlaneBoundedVolumeListSceneQuery *	O_PLANEBOUNDEDVOLUMELISTSCENEQUERY
+Pose *	O_POSE
+Quaternion *	O_QUATERNION
+Radian *	O_RADIAN
+Ray *	O_RAY
+RaySceneQuery *	O_RAYSCENEQUERY
+RegionSceneQuery *	O_REGIONSCENEQUERY
+RenderOperation *	O_RENDEROPERATION
+RenderQueue *	O_RENDERQUEUE
+RenderSystem *	O_RENDERSYSTEM
+RenderSystemCapabilities *	O_RENDERSYSTEMCAPABILITIES
+RenderTarget *	O_RENDERTARGET
+RenderTexture *	O_RENDERTEXTURE
+RenderWindow *	O_RENDERWINDOW
+Renderable *	O_RENDERABLE
+Resource *	O_RESOURCE
+ResourceGroupManager *	O_RESOURCEGROUPMANAGER
+ResourceManager *	O_RESOURCEMANAGER
+RibbonTrail *	O_RIBBONTRAIL
+Root *	O_ROOT
+ScaleControllerFunction *	O_SCALECONTROLLERFUNCTION
+SceneManager *	O_SCENEMANAGER
+SceneNode *	O_SCENENODE
+SceneQuery *	O_SCENEQUERY
+ScriptLoader *	O_SCRIPTLOADER
+ShadowCaster *	O_SHADOWCASTER
+Skeleton *	O_SKELETON
+SkeletonInstance *	O_SKELETONINSTANCE
+SkeletonManager *	O_SKELETONMANAGER
+Sphere *	O_SPHERE
+SphereSceneQuery *	O_SPHERESCENEQUERY
+StaticGeometry *	O_STATICGEOMETRY
+StringInterface *	O_STRINGINTERFACE
+SubEntity *	O_SUBENTITY
+SubMesh *	O_SUBMESH
+TagPoint *	O_TAGPOINT
+Technique *	O_TECHNIQUE
+TextAreaOverlayElement *	O_TEXTAREAOVERLAYELEMENT
+Texture *	O_TEXTURE
+TextureManager *	O_TEXTUREMANAGER
+TextureUnitState *	O_TEXTUREUNITSTATE
+TimeIndex *	O_TIMEINDEX
+Timer *	O_TIMER
+TransformKeyFrame *	O_TRANSFORMKEYFRAME
+Vector2 *	O_VECTOR2
+Vector3 *	O_VECTOR3
+Vector4 *	O_VECTOR4
+VertexAnimationTrack *	O_VERTEXANIMATIONTRACK
+VertexBufferBinding *	O_VERTEXBUFFERBINDING
+VertexData *	O_VERTEXDATA
+VertexDeclaration *	O_VERTEXDECLARATION
+VertexElement *	O_VERTEXELEMENT
+Viewport *	O_VIEWPORT
+WaveformControllerFunction *	O_WAVEFORMCONTROLLERFUNCTION
+WindowEventListener *	O_WINDOWEVENTLISTENER
+const AnimationControllerFunction *	O_ANIMATIONCONTROLLERFUNCTION
+const AnimationStateSet *	O_ANIMATIONSTATESET
+const AnimationTrack *	O_ANIMATIONTRACK
+const AxisAlignedBox *	O_AXISALIGNEDBOX
+const Billboard *	O_BILLBOARD
+const Bone *	O_BONE
+const BorderPanelOverlayElement *	O_BORDERPANELOVERLAYELEMENT
+const Camera *	O_CAMERA
+const Camera *	O_CAMERA
+const ColourValue *	O_COLOURVALUE
+const ControllerFunctionReal *	O_CONTROLLERFUNCTIONREAL
+const ControllerManager *	O_CONTROLLERMANAGER
+const ControllerReal *	O_CONTROLLERREAL
+const ControllerValueReal *	O_CONTROLLERVALUEREAL
+const DataStream *	O_DATASTREAM
+const HardwareVertexBuffer *	O_HARDWAREVERTEXBUFFER
+const Light *	O_LIGHT
+const Material *	O_MATERIAL
+const Matrix4 *	O_MATRIX4
+const Mesh *	O_MESH
+const Node *	O_NODE
+const NodeAnimationTrack *	O_NODEANIMATIONTRACK
+const NumericAnimationTrack *	O_NUMERICANIMATIONTRACK
+const OverlayElement *	O_OVERLAYELEMENT
+const PanelOverlayElement *	O_PANELOVERLAYELEMENT
+const Pass *	O_PASS
+const PassthroughControllerFunction *	O_PASSTHROUGHCONTROLLERFUNCTION
+const Plane *	O_PLANE
+const PlaneBoundedVolume *	O_PLANEBOUNDEDVOLUME
+const Quaternion *	O_QUATERNION
+const Radian *	O_RADIAN
+const Ray *	O_RAY
+const RenderSystemCapabilities *	O_RENDERSYSTEMCAPABILITIES
+const Renderable *	O_RENDERABLE
+const Resource *	O_RESOURCE
+const ScaleControllerFunction *	O_SCALECONTROLLERFUNCTION
+const SkeletonManager *	O_SKELETONMANAGER
+const Sphere *	O_SPHERE
+const SubEntity *	O_SUBENTITY
+const SubMesh *	O_SUBMESH
+const Technique *	O_TECHNIQUE
+const TextAreaOverlayElement *	O_TEXTAREAOVERLAYELEMENT
+const Texture *	O_TEXTURE
+const TextureUnitState *	O_TEXTUREUNITSTATE
+const TimeIndex *	O_TIMEINDEX
+const Timer *	O_TIMER
+const Vector3 *	O_VECTOR3
+const Vector4 *	O_VECTOR4
+const VertexAnimationTrack *	O_VERTEXANIMATIONTRACK
+const VertexElement *	O_VERTEXELEMENT
+const WaveformControllerFunction *	O_WAVEFORMCONTROLLERFUNCTION
+## END NORMAL TYPEMAPS
+
+String	STRING
+const String	STRING
+uint32	T_U_LONG
+uint16	T_U_SHORT
+uint8	T_UV
+uint	T_UV
+uchar	T_U_CHAR
+Real	T_REAL
+ResourceHandle	T_UV
+WorldFragment *	S_WORLDFRAGMENT
+const WorldFragment *	S_WORLDFRAGMENT
+ManualObjectSection *	S_MANUALOBJECTSECTION
+const ManualObjectSection *	S_MANUALOBJECTSECTION
+NameValuePairList	T_MAPSTRSTR
+
+
+INPUT
+
+STRING
+	char * xstmpchr_$var = (char *) SvPV_nolen($arg);
+	$var = xstmpchr_$var;
+
+T_REAL
+	$var = (Real)SvNV($arg);
+
+## set a NameValuePairList from a hashref input
+## this is not working yet, or at least not used anywhere
+T_MAPSTRSTR
+	const char *key;
+	I32 klen;
+	SV *hval;
+	HV *paramsHash = (HV *)SvRV($arg);
+	hv_iterinit(paramsHash);
+	while ((hval = hv_iternextsv(paramsHash, (char **)&key, &klen))) {
+		// xxx: not sure if this checking is sufficient
+		if (SvPOK(hval))
+			$var[key] = SvPV(hval, klen);
+	}
+
+S_WORLDFRAGMENT
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, SceneQuery::WorldFragment)
+
+S_MANUALOBJECTSECTION
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, ManualObject::ManualObjectSection)
+
+O_DEGRAD
+	TMOGRE_DEGRAD_IN($arg, $var, $Package, $func_name)
+
+O_CONTROLLERFUNCTIONREAL
+	TMOGRE_CONTFUNC_IN($arg, $var)
+
+O_CONTROLLERVALUEREAL
+	TMOGRE_CONTVAL_IN($arg, $var)
+
+O_ANIMABLEOBJECT
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, AnimableObject)
+
+O_ANIMABLEVALUE
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, AnimableValue)
+
+O_ANIMATION
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, Animation)
+
+O_ANIMATIONCONTROLLERFUNCTION
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, AnimationControllerFunction)
+
+O_ANIMATIONSTATE
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, AnimationState)
+
+O_ANIMATIONSTATESET
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, AnimationStateSet)
+
+O_ANIMATIONTRACK
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, AnimationTrack)
+
+O_AXISALIGNEDBOX
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, AxisAlignedBox)
+
+O_AXISALIGNEDBOXSCENEQUERY
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, AxisAlignedBoxSceneQuery)
+
+O_BILLBOARD
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, Billboard)
+
+O_BILLBOARDCHAIN
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, BillboardChain)
+
+O_BILLBOARDSET
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, BillboardSet)
+
+O_BONE
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, Bone)
+
+O_BORDERPANELOVERLAYELEMENT
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, BorderPanelOverlayElement)
+
+O_CAMERA
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, Camera)
+
+O_COLOURVALUE
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, ColourValue)
+
+O_CONFIGFILE
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, ConfigFile)
+
+O_CONTROLLERMANAGER
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, ControllerManager)
+
+O_CONTROLLERREAL
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, ControllerReal)
+
+O_DATASTREAM
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, DataStream)
+
+O_DEGREE
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, Degree)
+
+O_EDGEDATA
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, EdgeData)
+
+O_ENTITY
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, Entity)
+
+O_FRUSTUM
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, Frustum)
+
+O_FRAMEEVENT
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, FrameEvent)
+
+O_GPUPROGRAM
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, GpuProgram)
+
+O_GPUPROGRAMPARAMETERS
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, GpuProgramParameters)
+
+O_HARDWAREBUFFER
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, HardwareBuffer)
+
+O_HARDWAREBUFFERMANAGER
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, HardwareBufferManager)
+
+O_HARDWAREINDEXBUFFER
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, HardwareIndexBuffer)
+
+O_HARDWAREOCCLUSIONQUERY
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, HardwareOcclusionQuery)
+
+O_HARDWAREPIXELBUFFER
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, HardwarePixelBuffer)
+
+O_HARDWAREVERTEXBUFFER
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, HardwareVertexBuffer)
+
+O_INDEXDATA
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, IndexData)
+
+O_INSTANCEDGEOMETRY
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, InstancedGeometry)
+
+O_INTERSECTIONSCENEQUERY
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, IntersectionSceneQuery)
+
+O_KEYFRAME
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, KeyFrame)
+
+O_LIGHT
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, Light)
+
+O_LOG
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, Log)
+
+O_LOGMANAGER
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, LogManager)
+
+O_MANUALOBJECT
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, ManualObject)
+
+O_MANUALRESOURCELOADER
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, ManualResourceLoader)
+
+O_MATERIAL
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, Material)
+
+O_MATERIALMANAGER
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, MaterialManager)
+
+O_MATRIX3
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, Matrix3)
+
+O_MATRIX4
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, Matrix4)
+
+O_MESH
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, Mesh)
+
+O_MESHMANAGER
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, MeshManager)
+
+O_MESHPTR
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, MeshPtr)
+
+O_MOVABLEOBJECT
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, MovableObject)
+
+O_MULTIRENDERTARGET
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, MultiRenderTarget)
+
+O_NODE
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, Node)
+
+O_NODEANIMATIONTRACK
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, NodeAnimationTrack)
+
+O_NUMERICANIMATIONTRACK
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, NumericAnimationTrack)
+
+O_OVERLAY
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, Overlay)
+
+O_OVERLAYCONTAINER
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, OverlayContainer)
+
+O_OVERLAYELEMENT
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, OverlayElement)
+
+O_OVERLAYMANAGER
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, OverlayManager)
+
+O_PANELOVERLAYELEMENT
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, PanelOverlayElement)
+
+O_PARTICLE
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, Particle)
+
+O_PARTICLEAFFECTOR
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, ParticleAffector)
+
+O_PARTICLEEMITTER
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, ParticleEmitter)
+
+O_PARTICLESYSTEM
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, ParticleSystem)
+
+O_PARTICLESYSTEMRENDERER
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, ParticleSystemRenderer)
+
+O_PASS
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, Pass)
+
+O_PASSTHROUGHCONTROLLERFUNCTION
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, PassthroughControllerFunction)
+
+O_PATCHMESH
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, PatchMesh)
+
+O_PLANE
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, Plane)
+
+O_PLANEBOUNDEDVOLUME
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, PlaneBoundedVolume)
+
+O_PLANEBOUNDEDVOLUMELISTSCENEQUERY
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, PlaneBoundedVolumeListSceneQuery)
+
+O_POSE
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, Pose)
+
+O_QUATERNION
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, Quaternion)
+
+O_RADIAN
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, Radian)
+
+O_RAY
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, Ray)
+
+O_RAYSCENEQUERY
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, RaySceneQuery)
+
+O_REGIONSCENEQUERY
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, RegionSceneQuery)
+
+O_RESOURCE
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, Resource)
+
+O_RESOURCEGROUPMANAGER
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, ResourceGroupManager)
+
+O_RESOURCEMANAGER
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, ResourceManager)
+
+O_RENDERABLE
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, Renderable)
+
+O_RENDEROPERATION
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, RenderOperation)
+
+O_RENDERQUEUE
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, RenderQueue)
+
+O_RENDERSYSTEM
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, RenderSystem)
+
+O_RENDERSYSTEMCAPABILITIES
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, RenderSystemCapabilities)
+
+O_RENDERTARGET
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, RenderTarget)
+
+O_RENDERTEXTURE
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, RenderTexture)
+
+O_RENDERWINDOW
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, RenderWindow)
+
+O_RIBBONTRAIL
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, RibbonTrail)
+
+O_ROOT
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, Root)
+
+O_SCALECONTROLLERFUNCTION
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, ScaleControllerFunction)
+
+O_SCENEMANAGER
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, SceneManager)
+
+O_SCENENODE
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, SceneNode)
+
+O_SCENEQUERY
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, SceneQuery)
+
+O_SCRIPTLOADER
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, ScriptLoader)
+
+O_SHADOWCASTER
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, ShadowCaster)
+
+O_SKELETON
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, Skeleton)
+
+O_SKELETONINSTANCE
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, SkeletonInstance)
+
+O_SKELETONMANAGER
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, SkeletonManager)
+
+O_SPHERE
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, Sphere)
+
+O_SPHERESCENEQUERY
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, SphereSceneQuery)
+
+O_STATICGEOMETRY
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, StaticGeometry)
+
+O_STRINGINTERFACE
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, StringInterface)
+
+O_SUBENTITY
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, SubEntity)
+
+O_SUBMESH
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, SubMesh)
+
+O_TAGPOINT
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, TagPoint)
+
+O_TECHNIQUE
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, Technique)
+
+O_TEXTAREAOVERLAYELEMENT
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, TextAreaOverlayElement)
+
+O_TEXTURE
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, Texture)
+
+O_TEXTUREMANAGER
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, TextureManager)
+
+O_TEXTUREUNITSTATE
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, TextureUnitState)
+
+O_TIMEINDEX
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, TimeIndex)
+
+O_TIMER
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, Timer)
+
+O_TRANSFORMKEYFRAME
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, TransformKeyFrame)
+
+O_VECTOR2
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, Vector2)
+
+O_VECTOR3
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, Vector3)
+
+O_VECTOR4
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, Vector4)
+
+O_VERTEXANIMATIONTRACK
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, VertexAnimationTrack)
+
+O_VERTEXBUFFERBINDING
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, VertexBufferBinding)
+
+O_VERTEXDATA
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, VertexData)
+
+O_VERTEXDECLARATION
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, VertexDeclaration)
+
+O_VERTEXELEMENT
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, VertexElement)
+
+O_VIEWPORT
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, Viewport)
+
+O_WAVEFORMCONTROLLERFUNCTION
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, WaveformControllerFunction)
+
+O_WINDOWEVENTLISTENER
+	TMOGRE_IN($arg, $var, $type, $Package, $func_name, WindowEventListener)
+
+
+OUTPUT
+
+STRING
+	sv_setpvn((SV*)$arg, (char *) ($var.data()), ($var.size()));
+
+T_REAL
+	sv_setnv($arg, (Real)$var);
+
+S_WORLDFRAGMENT
+	TMOGRE_OUT($arg, $var, SceneQuery::WorldFragment)
+
+S_MANUALOBJECTSECTION
+	TMOGRE_OUT($arg, $var, ManualObject::ManualObjectSection)
+
+O_ANIMABLEOBJECT
+	TMOGRE_OUT($arg, $var, AnimableObject)
+
+O_ANIMABLEVALUE
+	TMOGRE_OUT($arg, $var, AnimableValue)
+
+O_ANIMATION
+	TMOGRE_OUT($arg, $var, Animation)
+
+O_ANIMATIONCONTROLLERFUNCTION
+	TMOGRE_OUT($arg, $var, AnimationControllerFunction)
+
+O_ANIMATIONSTATE
+	TMOGRE_OUT($arg, $var, AnimationState)
+
+O_ANIMATIONSTATESET
+	TMOGRE_OUT($arg, $var, AnimationStateSet)
+
+O_ANIMATIONTRACK
+	TMOGRE_OUT($arg, $var, AnimationTrack)
+
+O_AXISALIGNEDBOX
+	TMOGRE_OUT($arg, $var, AxisAlignedBox)
+
+O_AXISALIGNEDBOXSCENEQUERY
+	TMOGRE_OUT($arg, $var, AxisAlignedBoxSceneQuery)
+
+O_BILLBOARD
+	TMOGRE_OUT($arg, $var, Billboard)
+
+O_BILLBOARDCHAIN
+	TMOGRE_OUT($arg, $var, BillboardChain)
+
+O_BILLBOARDSET
+	TMOGRE_OUT($arg, $var, BillboardSet)
+
+O_BONE
+	TMOGRE_OUT($arg, $var, Bone)
+
+O_BORDERPANELOVERLAYELEMENT
+	TMOGRE_OUT($arg, $var, BorderPanelOverlayElement)
+
+O_CAMERA
+	TMOGRE_OUT($arg, $var, Camera)
+
+O_COLOURVALUE
+	TMOGRE_OUT($arg, $var, ColourValue)
+
+O_CONFIGFILE
+	TMOGRE_OUT($arg, $var, ConfigFile)
+
+O_CONTROLLERMANAGER
+	TMOGRE_OUT($arg, $var, ControllerManager)
+
+O_CONTROLLERREAL
+	TMOGRE_OUT($arg, $var, ControllerReal)
+
+O_CONTROLLERFUNCTIONREAL
+	TMOGRE_OUT($arg, $var, ControllerFunctionReal)
+
+O_CONTROLLERVALUEREAL
+	TMOGRE_OUT($arg, $var, ControllerValueReal)
+
+O_DATASTREAM
+	TMOGRE_OUT($arg, $var, DataStream)
+
+O_DEGREE
+	TMOGRE_OUT($arg, $var, Degree)
+
+O_EDGEDATA
+	TMOGRE_OUT($arg, $var, EdgeData)
+
+O_ENTITY
+	TMOGRE_OUT($arg, $var, Entity)
+
+O_FRUSTUM
+	TMOGRE_OUT($arg, $var, Frustum)
+
+O_FRAMEEVENT
+	TMOGRE_OUT($arg, $var, FrameEvent)
+
+O_GPUPROGRAM
+	TMOGRE_OUT($arg, $var, GpuProgram)
+
+O_GPUPROGRAMPARAMETERS
+	TMOGRE_OUT($arg, $var, GpuProgramParameters)
+
+O_HARDWAREBUFFER
+	TMOGRE_OUT($arg, $var, HardwareBuffer)
+
+O_HARDWAREBUFFERMANAGER
+	TMOGRE_OUT($arg, $var, HardwareBufferManager)
+
+O_HARDWAREINDEXBUFFER
+	TMOGRE_OUT($arg, $var, HardwareIndexBuffer)
+
+O_HARDWAREOCCLUSIONQUERY
+	TMOGRE_OUT($arg, $var, HardwareOcclusionQuery)
+
+O_HARDWAREPIXELBUFFER
+	TMOGRE_OUT($arg, $var, HardwarePixelBuffer)
+
+O_HARDWAREVERTEXBUFFER
+	TMOGRE_OUT($arg, $var, HardwareVertexBuffer)
+
+O_INDEXDATA
+	TMOGRE_OUT($arg, $var, IndexData)
+
+O_INSTANCEDGEOMETRY
+	TMOGRE_OUT($arg, $var, InstancedGeometry)
+
+O_INTERSECTIONSCENEQUERY
+	TMOGRE_OUT($arg, $var, IntersectionSceneQuery)
+
+O_KEYFRAME
+	TMOGRE_OUT($arg, $var, KeyFrame)
+
+O_LIGHT
+	TMOGRE_OUT($arg, $var, Light)
+
+O_LOG
+	TMOGRE_OUT($arg, $var, Log)
+
+O_LOGMANAGER
+	TMOGRE_OUT($arg, $var, LogManager)
+
+O_MANUALOBJECT
+	TMOGRE_OUT($arg, $var, ManualObject)
+
+O_MANUALRESOURCELOADER
+	TMOGRE_OUT($arg, $var, ManualResourceLoader)
+
+O_MATERIAL
+	TMOGRE_OUT($arg, $var, Material)
+
+O_MATERIALMANAGER
+	TMOGRE_OUT($arg, $var, MaterialManager)
+
+O_MATRIX3
+	TMOGRE_OUT($arg, $var, Matrix3)
+
+O_MATRIX4
+	TMOGRE_OUT($arg, $var, Matrix4)
+
+O_MESH
+	TMOGRE_OUT($arg, $var, Mesh)
+
+O_MESHMANAGER
+	TMOGRE_OUT($arg, $var, MeshManager)
+
+O_MESHPTR
+	TMOGRE_OUT($arg, $var, MeshPtr)
+
+O_MOVABLEOBJECT
+	TMOGRE_OUT($arg, $var, MovableObject)
+
+O_MULTIRENDERTARGET
+	TMOGRE_OUT($arg, $var, MultiRenderTarget)
+
+O_NODE
+	TMOGRE_OUT($arg, $var, Node)
+
+O_NODEANIMATIONTRACK
+	TMOGRE_OUT($arg, $var, NodeAnimationTrack)
+
+O_NUMERICANIMATIONTRACK
+	TMOGRE_OUT($arg, $var, NumericAnimationTrack)
+
+O_OVERLAY
+	TMOGRE_OUT($arg, $var, Overlay)
+
+O_OVERLAYCONTAINER
+	TMOGRE_OUT($arg, $var, OverlayContainer)
+
+O_OVERLAYELEMENT
+	TMOGRE_OUT($arg, $var, OverlayElement)
+
+O_OVERLAYMANAGER
+	TMOGRE_OUT($arg, $var, OverlayManager)
+
+O_PANELOVERLAYELEMENT
+	TMOGRE_OUT($arg, $var, PanelOverlayElement)
+
+O_PARTICLE
+	TMOGRE_OUT($arg, $var, Particle)
+
+O_PARTICLEAFFECTOR
+	TMOGRE_OUT($arg, $var, ParticleAffector)
+
+O_PARTICLEEMITTER
+	TMOGRE_OUT($arg, $var, ParticleEmitter)
+
+O_PARTICLESYSTEM
+	TMOGRE_OUT($arg, $var, ParticleSystem)
+
+O_PARTICLESYSTEMRENDERER
+	TMOGRE_OUT($arg, $var, ParticleSystemRenderer)
+
+O_PASS
+	TMOGRE_OUT($arg, $var, Pass)
+
+O_PASSTHROUGHCONTROLLERFUNCTION
+	TMOGRE_OUT($arg, $var, PassthroughControllerFunction)
+
+O_PATCHMESH
+	TMOGRE_OUT($arg, $var, PatchMesh)
+
+O_PLANE
+	TMOGRE_OUT($arg, $var, Plane)
+
+O_PLANEBOUNDEDVOLUME
+	TMOGRE_OUT($arg, $var, PlaneBoundedVolume)
+
+O_PLANEBOUNDEDVOLUMELISTSCENEQUERY
+	TMOGRE_OUT($arg, $var, PlaneBoundedVolumeListSceneQuery)
+
+O_POSE
+	TMOGRE_OUT($arg, $var, Pose)
+
+O_QUATERNION
+	TMOGRE_OUT($arg, $var, Quaternion)
+
+O_RADIAN
+	TMOGRE_OUT($arg, $var, Radian)
+
+O_RAY
+	TMOGRE_OUT($arg, $var, Ray)
+
+O_RAYSCENEQUERY
+	TMOGRE_OUT($arg, $var, RaySceneQuery)
+
+O_REGIONSCENEQUERY
+	TMOGRE_OUT($arg, $var, RegionSceneQuery)
+
+O_RESOURCE
+	TMOGRE_OUT($arg, $var, Resource)
+
+O_RESOURCEGROUPMANAGER
+	TMOGRE_OUT($arg, $var, ResourceGroupManager)
+
+O_RESOURCEMANAGER
+	TMOGRE_OUT($arg, $var, ResourceManager)
+
+O_RENDERABLE
+	TMOGRE_OUT($arg, $var, Renderable)
+
+O_RENDEROPERATION
+	TMOGRE_OUT($arg, $var, RenderOperation)
+
+O_RENDERQUEUE
+	TMOGRE_OUT($arg, $var, RenderQueue)
+
+O_RENDERSYSTEM
+	TMOGRE_OUT($arg, $var, RenderSystem)
+
+O_RENDERSYSTEMCAPABILITIES
+	TMOGRE_OUT($arg, $var, RenderSystemCapabilities)
+
+O_RENDERTARGET
+	TMOGRE_OUT($arg, $var, RenderTarget)
+
+O_RENDERTEXTURE
+	TMOGRE_OUT($arg, $var, RenderTexture)
+
+O_RENDERWINDOW
+	TMOGRE_OUT($arg, $var, RenderWindow)
+
+O_RIBBONTRAIL
+	TMOGRE_OUT($arg, $var, RibbonTrail)
+
+O_ROOT
+	TMOGRE_OUT($arg, $var, Root)
+
+O_SCALECONTROLLERFUNCTION
+	TMOGRE_OUT($arg, $var, ScaleControllerFunction)
+
+O_SCENEMANAGER
+	TMOGRE_OUT($arg, $var, SceneManager)
+
+O_SCENENODE
+	TMOGRE_OUT($arg, $var, SceneNode)
+
+O_SCENEQUERY
+	TMOGRE_OUT($arg, $var, SceneQuery)
+
+O_SCRIPTLOADER
+	TMOGRE_OUT($arg, $var, ScriptLoader)
+
+O_SHADOWCASTER
+	TMOGRE_OUT($arg, $var, ShadowCaster)
+
+O_SKELETON
+	TMOGRE_OUT($arg, $var, Skeleton)
+
+O_SKELETONINSTANCE
+	TMOGRE_OUT($arg, $var, SkeletonInstance)
+
+O_SKELETONMANAGER
+	TMOGRE_OUT($arg, $var, SkeletonManager)
+
+O_SPHERE
+	TMOGRE_OUT($arg, $var, Sphere)
+
+O_SPHERESCENEQUERY
+	TMOGRE_OUT($arg, $var, SphereSceneQuery)
+
+O_STATICGEOMETRY
+	TMOGRE_OUT($arg, $var, StaticGeometry)
+
+O_STRINGINTERFACE
+	TMOGRE_OUT($arg, $var, StringInterface)
+
+O_SUBENTITY
+	TMOGRE_OUT($arg, $var, SubEntity)
+
+O_SUBMESH
+	TMOGRE_OUT($arg, $var, SubMesh)
+
+O_TAGPOINT
+	TMOGRE_OUT($arg, $var, TagPoint)
+
+O_TECHNIQUE
+	TMOGRE_OUT($arg, $var, Technique)
+
+O_TEXTAREAOVERLAYELEMENT
+	TMOGRE_OUT($arg, $var, TextAreaOverlayElement)
+
+O_TEXTURE
+	TMOGRE_OUT($arg, $var, Texture)
+
+O_TEXTUREMANAGER
+	TMOGRE_OUT($arg, $var, TextureManager)
+
+O_TEXTUREUNITSTATE
+	TMOGRE_OUT($arg, $var, TextureUnitState)
+
+O_TIMEINDEX
+	TMOGRE_OUT($arg, $var, TimeIndex)
+
+O_TIMER
+	TMOGRE_OUT($arg, $var, Timer)
+
+O_TRANSFORMKEYFRAME
+	TMOGRE_OUT($arg, $var, TransformKeyFrame)
+
+O_VECTOR2
+	TMOGRE_OUT($arg, $var, Vector2)
+
+O_VECTOR3
+	TMOGRE_OUT($arg, $var, Vector3)
+
+O_VECTOR4
+	TMOGRE_OUT($arg, $var, Vector4)
+
+O_VERTEXANIMATIONTRACK
+	TMOGRE_OUT($arg, $var, VertexAnimationTrack)
+
+O_VERTEXBUFFERBINDING
+	TMOGRE_OUT($arg, $var, VertexBufferBinding)
+
+O_VERTEXDATA
+	TMOGRE_OUT($arg, $var, VertexData)
+
+O_VERTEXDECLARATION
+	TMOGRE_OUT($arg, $var, VertexDeclaration)
+
+O_VERTEXELEMENT
+	TMOGRE_OUT($arg, $var, VertexElement)
+
+O_VIEWPORT
+	TMOGRE_OUT($arg, $var, Viewport)
+
+O_WAVEFORMCONTROLLERFUNCTION
+	TMOGRE_OUT($arg, $var, WaveformControllerFunction)
+
+O_WINDOWEVENTLISTENER
+	TMOGRE_OUT($arg, $var, WindowEventListener)

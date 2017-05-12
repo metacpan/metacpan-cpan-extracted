@@ -1,0 +1,231 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use WWW::Mechanize;
+use Getopt::Long;
+use Pod::Usage;
+use OpenGuides::RDF::Reader;
+use XML::RSS;
+use Data::Dumper;
+use OpenGuides;
+use OpenGuides::Config;
+use CGI::Wiki::Plugin::Locator::UTM;
+
+our $VERSION = 0.04;
+my $help = 0;
+my $list_version = 0;
+my $days=0;
+my $scrape=0;
+my ($site,$config_file);
+
+GetOptions(
+	'site=s' => \$site,
+	'config=s' => \$config_file,
+	'days=i' => \$days,
+	'scrape!' => \$scrape,
+	'help+' => \$help,
+	'version!' => \$list_version,
+	) || pod2usage( -verbose => 0 );
+
+(print STDERR "$0 version $VERSION\n\n"), exit 0
+	if $list_version;
+
+pod2usage( -verbose => $help) if $help || !($site && $config_file);
+
+=head1 NAME
+
+og_mirror - Replicate an OpenGuides site
+
+=head1 SYNOPSIS
+
+  og_mirror --site http://from.site.url/ --config /path/to/wiki.conf [--days 1] [--scrape]
+
+=head1 DESCRIPTION
+
+This is a script to mirror the contents from another OpenGuides website.
+It can be run from a cron job to update periodically.
+
+To initially load the wiki, run the script without the --days option. Then,
+the script can be run periodically with the --days option, to keep the site
+in line.
+
+=head1 OPTIONS
+
+=over 4
+
+=item C<--site>
+
+Specify the guide website to mirror from.
+
+=item C<--config | -c>
+
+Path to the config file for the wiki on the localhost.
+
+=item C<--days | -d>
+
+Number of days back to look at in the RSS feed. Omit this option to work
+in "hoover" mode. 
+
+=item C<--scrape>
+
+If the OpenGuides site is prior to 0.51, it will not support format=raw.
+Specify the option --scrape to use HTML scraping of the edit form of
+action=edit instead.
+
+=item C<--help | -h>
+
+Show this list of options.
+
+=item C<--help --help | -h -h>
+
+Display man page.
+
+=item C<--version>
+
+Show the mirror script's version number
+
+=back
+
+=head1 HISTORY
+
+   0.01 18-Oct-2005 Initial version
+
+   0.02 19-Oct-2005 Exclude updates for pages that haven't changed
+
+   0.03 29-Oct-2005 Add HTML scraping option for guides that don't have format=raw
+                    Check source URL against database for mirroring multiple guides 
+
+=head1 BUGS
+
+Please report any bugs in this package using http://rt.cpan.org/ or posting to
+bugs-openguides-rdf-reader (at) rt.cpan.org.
+
+=head1 SUPPORT
+
+For discussion of all matters relating to OpenGuides, there is a mailing list
+http://openguides.org/mm/listinfo/openguides-dev.
+
+=head1 AUTHOR
+
+	Ivor Williams
+	CPAN ID: IVORW
+	 
+	ivorw-openguides (at) xemaps.com
+	http://openguides.org/
+
+=head1 COPYRIGHT
+
+Copyright (C) Ivor Williams, 2005
+
+This program is free software; you can redistribute
+it and/or modify it under the same terms as Perl itself.
+
+=cut
+
+my $agent = WWW::Mechanize->new();
+
+my $config = OpenGuides::Config->new( file => $config_file );
+my $guide = OpenGuides->new( config => $config );
+my $wiki = $guide->wiki;
+my $locator = CGI::Wiki::Plugin::Locator::UTM->new;
+$wiki->register_plugin( plugin => $locator );
+$locator->og_config($config);
+
+my @pagelist = $days ? get_recent_changes($agent, $site, $days) :
+	get_all_pages($agent, $site);
+
+$|=1;
+
+for (@pagelist) {
+    chomp;
+    print $_,":";
+
+    my %meta = eval { get_page_metadata($agent, $site, $_) };
+    (print "Failed to parse metadata\n$@\n"),next if $@;
+    
+#    print Dumper \%meta;
+    my $text = $scrape ? scrape_page_content($agent, $site, $_) :
+    			get_page_content($agent, $site, $_);
+
+#    print $text;
+
+    populate_local_wiki($wiki, $_, $text, \%meta, $locator);
+}
+
+sub get_all_pages {
+    my ($ua, $url) = @_;
+
+    $ua->get("$url?action=index;format=plain");
+
+    split /\n/,$ua->content;
+}
+
+sub get_recent_changes {
+    my ($ua, $url, $days) = @_;
+
+    $ua->get("$url?action=rss;days=$days");
+    my $rss = XML::RSS->new;
+    $rss->parse($ua->content);
+    reverse map {$_->{title}} @{$rss->{items}};
+}
+
+sub get_page_metadata {
+    my ($ua, $url, $page) = @_;
+
+    $ua->get("$url?id=$page;format=rdf");
+
+    my $rdf = $ua->content;
+
+    parse_rdf($rdf);
+}
+
+sub get_page_content {
+    my ($ua, $url, $page) = @_;
+
+    $ua->get("$url?id=$page;format=raw");
+
+    $ua->content;
+}
+
+sub scrape_page_content {
+    my ($ua, $url, $page) = @_;
+    
+    $ua->get("$url?id=$page;action=edit");
+
+    for ($ua->forms) {
+        my $in = $_->find_input('content');
+	return $in->value if $in;
+    }
+
+    undef;
+}
+
+sub populate_local_wiki {
+    my ($wiki, $page, $content, $metadata, $pl) = @_;
+
+    my %metadata = map { 
+        my $md = $metadata->{$_};
+        $_, ref($md) ? $md : [$md] }
+        keys %$metadata;
+    my $node = $wiki->formatter->node_param_to_node_name( $page );
+    my %old_data = $wiki->retrieve_node($node);
+    
+    if ($old_data{version}) {
+        my $from = $old_data{metadata}{source}[0];
+        (print "Skipping as source URL is $from\n"), return
+            if $from ne $metadata->{source};
+        (print "Unchanged\n"), return
+            if $old_data{metadata}{version}[0] == $metadata->{version};
+	    print "Updating... ";
+    }
+    else {
+        print "Creating... ";
+    }
+
+    $pl->pre_write( $node, $content, \%metadata );
+    my $written = $wiki->write_node( $node, $content,
+        $old_data{checksum}, \%metadata);
+    print $written ? "Done\n" : "Failed\n";
+}

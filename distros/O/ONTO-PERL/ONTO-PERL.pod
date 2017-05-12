@@ -1,0 +1,80 @@
+# $Id: ONTO-PERL.pod 2015-02-16 16:21:45Z erick.antezana $
+#
+# see also - http://search.cpan.org/~easr/ONTO-PERL/
+#
+# This library is free software; you can redistribute it and/or modify
+# it under the same terms as Perl itself, either Perl version 5.8.7 or,
+# at your option, any later version of Perl 5 you may have available.
+
+=head1 NAME
+
+ONTO-PERL           - PERL modules for OBO-formatted ontologies
+
+=head1 DESCRIPTION
+
+  ONTO-PERL a collection of PERL modules for dealing with OBO-formatted 
+  ontologies (like the Gene Ontology). This code distribution gathers 
+  object-oriented modules (to handle ontology elements such as a Term, 
+  a Relationship, a Synonym, and so forth), scripts (for typical tasks 
+  such as format conversions: obo2owl, owl2obo; besides, there are also
+  many examples that can be easily adapted for specific applications), and 
+  a comprehensive set of test files for ensuring its implementation quality.
+
+Citing ONTO-PERL:
+
+  If you use ONTO-PERL in your work, you are kindly requested to cite:
+ 
+    ONTO-PERL: An API supporting the development and analysis of bio-ontologies
+    E. Antezana; M. Egana; B. De Baets; M. Kuiper; V. Mironov
+    Bioinformatics 2008; doi: 10.1093/bioinformatics/btn042
+
+See also:
+
+  1. perldoc ONTO-PERL.pod
+  
+  2. ONTO-Toolkit: A set of Galaxy tools to deal with OBO-formatted ontologies,
+     Antezana E, Venkatesan A, Mungall C, Mironov V, Kuiper M.
+     BMC Bioinformatics 2010, 11(Suppl 12):S8 doi:10.1186/1471-2105-11-S12-S8
+
+Files in ONTO-PERL:
+
+  README                        Readme file
+
+  INSTALL                       How to install ONTO-PERL (requirements)
+
+  LICENSE                       ONTO-PERL's license
+
+  ONTO-PERL-x.y.tar.gz          ONTO-PERL API: version x.y (gzip file)
+
+  Changes                       Description about the changes in ONTO-PERL
+
+Remark:
+
+  ONTO-PERL is provided "as-is". The current version is stable; 
+  nonetheless, improvements are expected as well as feedback is 
+  very welcome. Please visit constantly this repository for checking 
+  up-to-date versions of this distribution.
+
+Contact:
+
+  Any comments, suggestions can be addressed to: 
+
+   Erick Antezana
+   <erick.antezana -@- gmail.com>
+
+=head1 AUTHOR
+
+Erick Antezana, E<lt>erick.antezana -@- gmail.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2006-2015 by Erick Antezana. All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.7 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut
+
+package ONTO-PERL;
+1;

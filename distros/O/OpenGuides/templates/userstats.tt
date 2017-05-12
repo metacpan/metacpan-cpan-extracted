@@ -1,0 +1,64 @@
+[% USE CGI %]
+[% INCLUDE header.tt page_title = "User stats for $username - $site_name" %]
+[% INCLUDE banner.tt %]
+<div id="content">
+
+[% IF !config.content_above_navbar_in_html %]
+  [% INCLUDE navbar.tt %]
+[% END %]
+
+<div id="maincontent">
+<div id="userstats">
+<h2>
+  User Stats for
+    [% IF username %]
+      [% username %]
+    [% ELSE %]
+      [% host %]
+    [% END %]
+</h2>
+
+[% content %]
+
+<div id="last_five_edits_by_user">
+<h2>
+  Last five edits made by
+  [% IF username %]
+    <a href="[% full_cgi_url %]?[% username_param %]">[% username %]</a>:
+  [% ELSE %]
+    [% host %]:
+  [% END %]
+</h2>
+
+<ul>
+[% FOREACH node = last_five_nodes %]
+  <li>[% node.last_modified %]
+      <a href="[% node.url %]">[% node.name %]</a>
+      [% IF node.comment %]
+        [[% node.comment %]]
+      [% END %]
+  </li>
+[% END %]
+</ul>
+</div>
+
+[% IF username %]
+  <div id="rss_feeds_for_user">
+  <h2>Personalised RSS feeds:</h2>
+  <ul>
+    <li><a href="[% full_cgi_url %]?action=rc;format=rss;username=[% CGI.escape(username) %];items=10">Last ten edits made by [% username %]</a></li>
+    <li><a href="[% full_cgi_url %]?action=rc;format=rss;username=[% CGI.escape(username) %];items=20">Last twenty edits made by [% username %]</a></li>
+    <li><a href="[% full_cgi_url %]?action=rc;format=rss;username=[% CGI.escape(username) %];items=10;ignore_minor_edits=1">Last ten edits made by [% username %], ignoring minor edits</a></li>
+    <li><a href="[% full_cgi_url %]?action=rc;format=rss;username=[% CGI.escape(username) %];items=20;ignore_minor_edits=1">Last twenty edits made by [% username %], ignoring minor edits</a></li>
+  </ul>
+  </div>
+[% END %]
+
+</div>
+</div>
+
+[% IF config.content_above_navbar_in_html %]
+  [% INCLUDE navbar.tt %]
+[% END %]
+
+[% INCLUDE footer.tt %]

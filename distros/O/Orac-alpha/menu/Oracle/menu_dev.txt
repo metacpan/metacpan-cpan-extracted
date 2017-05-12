@@ -1,0 +1,16 @@
+Menubutton^devel^
+cascade^data_obj^
+casc_command^0^1^oi_tables^$main::current_db->dev_tables^'TABLE'^
+casc_command^0^1^indexs^$main::current_db->dev_tables^'INDEX'^
+casc_command^0^1^views^$main::current_db->dev_tables^'VIEW'^
+casc_command^0^1^oi_synonyms^$main::current_db->dev_tables^'SYNONYM'^
+casc_command^0^1^seqs^$main::current_db->dev_tables^'SEQUENCE'^
+casc_command^0^1^oi_synonyms^$main::current_db->dev_tables^'SYNONYM'^
+casc_command^0^1^constrnts^$main::current_db->dev_tables^'CONSTRAINT'^
+separator^
+cascade^pl_sql^
+casc_command^0^1^oi_procedures^$main::current_db->dev_tables^'PROCEDURE'^
+casc_command^0^1^funcs^$main::current_db->dev_tables^'FUNCTION'^
+casc_command^0^1^pck_hds^$main::current_db->dev_tables^'PACKAGE'^
+casc_command^0^1^pck_bods^$main::current_db->dev_tables^'PACKAGE_BODY'^
+casc_command^0^1^trggrs^$main::current_db->dev_tables^'TRIGGER'^

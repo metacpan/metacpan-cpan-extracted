@@ -1,0 +1,33 @@
+Changes for Perl extension ORDB-CPANUploads
+
+1.08 Wed 2 Nov 2011
+	- Upgrading to Module::Install::DSL 1.04
+	- Adding separate latest and latest_datetime
+	- Moving age method to return in days
+
+1.07 Wed 3 Aug 2011
+	- Upgrading to Module::Install::DSL 1.01
+	- Adding the age method
+
+1.06 Mon 29 Nov 2010
+	- Upgrading to Module::Install::DSL 1.00
+	- Upgrading various dependencies
+
+1.05 Sun  3 Jan 2010
+	- Upgrading to Module::Install::DSL 0.91
+	- Upgrading Params::Util dependency to production version
+	- Upgrading ORLite::Mirror dependency to a number of bugs
+
+0.04 Tue 19 May 2009
+	- Upgrading to Module::Install::DSL 0.88
+	- Adding support for import params
+
+0.03 Sun 26 Apr 2009
+	- Upgrading to Module::Install::DSL 0.85
+	- Dropping update time to one week
+
+0.02 Wed  9 Apr 2009
+	- Upgrading to Module::Install::DSL 0.82
+
+0.01 Sun 29 Mar 2009
+	- Creating the initial implementation

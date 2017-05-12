@@ -1,0 +1,14 @@
+---
+indicator: submitok
+auto_fieldset: 0
+elements:
+  - type: Submit
+    name: submitok
+    value: OK
+    attributes:
+      class: "submit submit_ok"
+  - type: Submit
+    name: cancel
+    value: Cancel
+    attributes:
+      class: "submit submit_cancel"

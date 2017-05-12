@@ -1,0 +1,25 @@
+MANIFEST
+META.yml
+README
+ARTISTIC
+GPL
+CHANGES
+Makefile.PL
+TODO
+lib/Object/Import.pm
+t/00_require.t
+t/01_basic.t
+t/02_auto.t
+t/03_bigint.t
+t/04_handle.t
+t/05_nometh.t
+t/06_deref.t
+t/07_mary.t
+t/08_target.t
+t/09_parm.t
+t/10_alias.t
+t/11_exporter.t
+t/12_taint.t
+t/13_meta.t
+
+META.json                                Module JSON meta-data (added by MakeMaker)

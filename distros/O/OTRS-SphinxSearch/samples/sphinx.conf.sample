@@ -1,0 +1,143 @@
+source connection
+{
+    type          = mysql
+    sql_host      = localhost
+    sql_user      = <otrs_db_user>
+    sql_pass      = <otrs_db_pass>
+    sql_db        = <otrs_db_name>
+    sql_sock      = /var/run/mysqld/mysqld.sock
+}
+
+source static : connection
+{
+    sql_field_string    = tn
+    sql_field_string    = title
+    sql_field_string    = customer_id
+    sql_field_string    = customer_user_id
+    sql_field_string    = a_from
+    sql_field_string    = a_to
+    sql_field_string    = a_cc
+    sql_field_string    = a_subject
+    sql_field_string    = a_body
+    sql_attr_uint       = ticket_state_id
+    sql_attr_uint       = queue_id
+    sql_attr_uint       = ticket_priority_id
+    sql_attr_uint       = user_id
+    sql_attr_uint       = create_by
+    sql_attr_uint       = change_by
+    sql_attr_uint       = ticket_lock_id
+    sql_attr_uint       = type_id
+    sql_attr_uint       = responsible_user_id
+    sql_attr_uint       = service_id
+    sql_attr_uint       = sla_id
+    sql_attr_uint       = archive_flag
+    sql_attr_timestamp  = create_time
+    sql_attr_timestamp  = change_time
+    sql_attr_timestamp  = escalation_time
+
+    sql_query_pre       = SET NAMES utf8
+    sql_query_pre       = SET group_concat_max_len=4096
+    sql_query_range     = SELECT MIN(id),MAX(id) FROM `ticket`
+    sql_range_step      = 1000
+    sql_ranged_throttle = 10 # in msec
+
+    sql_query = \
+        SELECT \
+            st.id                      AS `id`, \
+            st.tn                      AS `tn`, \
+            REPLACE(REPLACE(st.title,'<',''),'>','')                   AS `title`, \
+            REPLACE(REPLACE(st.customer_id,'<',''),'>','')             AS `customer_id`, \
+            REPLACE(REPLACE(st.customer_user_id,'<',''),'>','')        AS `customer_user_id`, \
+            GROUP_CONCAT(REPLACE(REPLACE(sa.a_from,'<',''),'>',''))    AS `a_from`, \
+            GROUP_CONCAT(REPLACE(REPLACE(sa.a_to,'<',''),'>',''))      AS `a_to`, \
+            GROUP_CONCAT(REPLACE(REPLACE(sa.a_cc,'<',''),'>',''))      AS `a_cc`, \
+            GROUP_CONCAT(REPLACE(REPLACE(sa.a_subject,'<',''),'>','')) AS `a_subject`, \
+            GROUP_CONCAT(REPLACE(REPLACE(sa.a_body,'<',''),'>',''))    AS `a_body`, \
+            st.ticket_state_id         AS `ticket_state_id`, \
+            st.queue_id                AS `queue_id`, \
+            st.ticket_priority_id      AS `ticket_priority_id`, \
+            st.user_id                 AS `user_id`, \
+            st.create_by               AS `create_by`, \
+            st.change_by               AS `change_by`, \
+            st.ticket_lock_id          AS `ticket_lock_id`, \
+            st.type_id                 AS `type_id`, \
+            st.responsible_user_id     AS `responsible_user_id`, \
+            st.service_id              AS `service_id`, \
+            st.sla_id                  AS `sla_id`, \
+            st.archive_flag            AS `archive_flag`, \
+            st.create_time_unix        AS `create_time`, \
+            UNIX_TIMESTAMP(st.change_time)                  AS `change_time`, \
+            UNIX_TIMESTAMP(st.escalation_time)              AS `escalation_time`, \
+        FROM `ticket` AS `st` \
+        INNER JOIN `article` AS `sa` ON sa.ticket_id = st.id \
+        WHERE st.queue_id NOT IN (2,3,51) AND \
+              NOT ( sa.article_sender_type_id = 2 AND \
+              sa.article_type_id = 1 ) AND \
+              st.id BETWEEN $start AND $end \
+        GROUP BY st.id
+
+    sql_attr_multi = uint a_create_time from ranged-query \
+        ;SELECT `ticket_id`, `incoming_time` FROM `article` \
+         WHERE \
+              NOT (article_sender_type_id = 2 AND \
+              article_type_id = 1) AND \
+               `id` BETWEEN $start AND $end \
+        ;SELECT MIN(id),MAX(id) FROM `article`
+}
+
+index static
+{
+    type              = plain
+    source            = static
+    path              = /opt/sphinxsearch/var/data/rt/static
+
+    morphology        = lemmatize_ru_all
+    stopwords         = /opt/sphinxsearch/var/data/dicts/stopwords.txt
+    min_infix_len     = 1
+    html_strip        = 1
+    index_exact_words = 1
+    expand_keywords   = 1
+    dict              = keywords
+    mlock             = 0
+    charset_table     = 0..9, A..Z->a..z, a..z, U+410..U+42F->U+430..U+44F, U+430..U+44F, U+451->U+435, U+2B, U+2D, U+5F # +, -, _
+    blend_chars       = U+2E, U+3A, U+2F, U+40 # ., :, /, @
+    blend_mode        = trim_none, trim_head, trim_tail
+}
+
+indexer
+{
+    mem_limit                       = 256M
+}
+
+searchd
+{
+    listen                          = /opt/sphinxsearch/var/run/searchd.sock
+    listen                          = 127.0.0.1:9312
+    listen                          = 127.0.0.1:9306:mysql41
+
+    log                             = /opt/sphinxsearch/var/log/searchd.log
+    query_log                       = /opt/sphinxsearch/var/log/sphinx-query.log
+    read_timeout                    = 5
+    client_timeout                  = 300
+    max_children                    = 30
+    persistent_connections_limit    = 30
+    pid_file                        = /opt/sphinxsearch/var/run/searchd.pid
+    max_matches                     = 1000
+    seamless_rotate                 = 1
+    preopen_indexes                 = 1
+    unlink_old                      = 1
+    mva_updates_pool                = 2M
+    max_packet_size                 = 8M
+    max_filters                     = 256
+    max_filter_values               = 4096
+    max_batch_queries               = 32
+    workers                         = threads # for RT to work
+    binlog_path                     = /opt/sphinxsearch/var/data # binlog.001 etc will be created there
+    collation_server                = utf8_general_ci
+    collation_libc_locale           = ru_RU.UTF-8
+}
+
+common
+{
+    lemmatizer_base = /opt/sphinxsearch/var/data/dicts
+}

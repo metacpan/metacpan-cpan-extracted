@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<SITE ID="Looksmart">
+
+<NAME Lang="en-us">LookSmart WWW Search</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+LookSmart全球WWW搜尋(英文)
+]]></NAME>
+<INFO Lang="en-us">general information web search</INFO>
+<INFO Lang="zh-tw">general information web search</INFO>
+
+<URL Type="More"><![CDATA[
+http://www.looksmart.com_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://www.looksmart.com/r_search?l&look=&key=_QUERY_
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_NEXT_"><![CDATA[
+<a href="_NEXT_">NEXT
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<a href="http://_URL_">_TITLE_</a><br>_PREVIEW_<br>___LookSmart category -
+]]></TEMPLATE>
+</SITE>

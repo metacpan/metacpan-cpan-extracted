@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<SITE ID="Infosearch">
+
+<NAME Lang="en-us">InfoSearch WWW Search</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+InfoSearch生活資訊網站搜尋
+]]></NAME>
+<INFO Lang="en-us">general information web search in Taiwan</INFO>
+<INFO Lang="zh-tw">general information web search in Taiwan</INFO>
+
+<URL Type="More"><![CDATA[
+http://search.is.net.tw/Harvest/cgi-bin/All.pl?query=_QUERY_&host=search.is.net.tw%3A8500&broker=All&start_t=_START_20_0_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://search.is.net.tw/Harvest/cgi-bin/All.pl?query=_QUERY_&host=search.is.net.tw%3A8500&broker=All&start_t=0
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+
+<TEMPLATE><![CDATA[
+width="100%"><a href="_URL_">_TITLE_</a>___<br>_PREVIEW_</table>
+]]></TEMPLATE>
+</SITE>

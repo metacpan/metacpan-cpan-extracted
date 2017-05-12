@@ -1,0 +1,35 @@
+=head1 NAME
+
+%%NAME%% - This package will do everything!
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+=head1 OBJECTS
+
+No objects created by this package.
+
+=head1 ACTIONS
+
+No actions defined in this package.
+
+=head1 RULESETS
+
+No rulesets defined in this package.
+
+=head1 ERRORS
+
+No custom error handlers defined in this package.
+
+=head1 BUGS 
+
+None known.
+
+=head1 TO DO
+
+=head1 SEE ALSO
+
+=head1 AUTHORS
+
+Who AmI <me@whoami.com>

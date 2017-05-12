@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<SITE ID="Formosa">
+
+<NAME Lang="en-us">Formosa WWW Search</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+ºÖº¸¼¯¨F¯¸¥x¯Á¤Þ
+]]></NAME>
+<INFO Lang="en-us">general information web search in Taiwan</INFO>
+<INFO Lang="zh-tw">general information web search in Taiwan</INFO>
+
+<URL Type="Start"><![CDATA[
+post://www.formosa.com.tw/AddLinks/scripts/FSearch.idc?txtLinkName=_QUERY_&B1=·j´M
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+
+<TEMPLATE><![CDATA[
+MyUrl=_URL_">_TITLE_</a>___<br>_PREVIEW_</p>
+]]></TEMPLATE>
+</SITE>

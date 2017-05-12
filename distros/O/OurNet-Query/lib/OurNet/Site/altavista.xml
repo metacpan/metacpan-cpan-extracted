@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<SITE ID="Altavista">
+
+<NAME Lang="en-us">Altavista</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+Altavista全球WWW搜尋(中英文)
+]]></NAME>
+<INFO Lang="en-us">general information web search</INFO>
+<INFO Lang="zh-tw">general information web search</INFO>
+
+<URL Type="More"><![CDATA[
+http://www.altavista.com_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://www.altavista.com/cgi-bin/query?pg=q&q=_QUERY_&what=web&fmt=.
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+<EXPRESSION>Standard</EXPRESSION>
+<CATEGORY>WWW,General</CATEGORY>
+
+<VAR Name="_NEXT_"><![CDATA[
+<a href="_NEXT_">[<b>Next
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+. </b><a href="_URL_">_TITLE_</a>___<dd>_PREVIEW_<b>URL:___Last modified_DATE_ - ___page
+]]></TEMPLATE>
+</SITE>

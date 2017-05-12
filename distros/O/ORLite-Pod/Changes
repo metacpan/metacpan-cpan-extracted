@@ -1,0 +1,43 @@
+Changes for Perl extension ORLite-Pod
+
+0.11 Thu 21 Jul 2011
+	- Fixing whitespace separation on the ->create method
+
+0.10 Sun 11 Jul 2010
+	- Fixing a small typo
+
+0.09 Sun 11 Jul 2010
+	- Upgraded to Module::Install::DSL 1.00
+	- Ditch SQL::Beautify and do it ourself (better)
+	- Fixing a few minor bits and pieces
+
+0.08 Tue 11 May 2010
+	- Upgraded to Module::Install::DSL 0.96
+	- Removed the ORLite version number
+	- Adding POD for more methods.
+	- Fixing a variety of POD bugs
+
+0.07 Wed 29 Jul 2009
+	- Add support for --email to orlite2pod
+	- Don't trust the original database creator
+	- Instead, beautify all SQL ourself
+
+0.06 Thu 15 Jan 2009
+	- Add support for --author to orlite2pod
+	- Add support for --rt to orlite2pod
+
+0.05 Thu 15 Jan 2009
+	- Using the select method instead of new as a "loaded" detector
+
+0.04 Thu 15 Jan 2009
+	- Switching from print statements to Template Toolkit
+	- orlite2pod will "use" the class instead of "require"
+
+0.03 Thu 15 Jan 2009
+	- Adding the bulk of the per-table documeation (first pass)
+
+0.02 Wed 14 Jan 2009
+	- Hiding the HEREDOC stuff behind leading pipes
+
+0.01 Wed 14 Jan 2009
+	- Creating initial highly experimental release

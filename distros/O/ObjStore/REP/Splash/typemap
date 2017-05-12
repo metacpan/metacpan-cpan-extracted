@@ -1,0 +1,3 @@
+TYPEMAP
+
+OSPV_splashheap *	O_OSSVPV

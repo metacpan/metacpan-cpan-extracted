@@ -1,0 +1,102 @@
+NAME
+    Object::Deadly - An object that dies whenever examined
+
+SYNOPSIS
+      use Object::Deadly;
+      use Test::Exception 'lives_ok';
+      
+  # Test that a few functions inspect their parameters safely
+      lives_ok { some_function( Object::Deadly->new ) } 'some_function';
+      lives_ok { Dumper( Object::Deadly->new ) } 'Data::Dumper';
+
+DESCRIPTION
+    This object is meant to be used in testing. All possible overloading and
+    method calls die. You can pass this object into methods which are not
+    supposed to accidentally trigger any potentially overloading.
+
+    This problem arose when testing Data::Dump::Streamer and Carp. The
+    former was triggering overloaded object methods instead of just dumping
+    their data. Data::Dump::Streamer is now safe for overloaded objects but
+    it wouldn't have been unless it hadn't have been tested with a deadly,
+    overloaded object.
+
+DEALING WITH DEATH
+    TODO
+
+METHODS
+    "Object::Deadly->new()"
+    "Object::Deadly->new( MESSAGE )"
+        The class method "Object::Deadly->new" returns an "Object::Deadly"
+        object. Dies with a stack trace and a message when evaluated in any
+        context. The default message contains a stack trace from where the
+        object is created.
+
+    "Object::Deadly->kill_function( FUNCTION NAME )"
+    "Object::Deadly->kill_function( FUNCTION NAME, DEATH CODE REF )"
+        The class method kill_function accepts a function name like "isa",
+        "can", or similar and creates a function in the
+        "Object::Deadly::_unsafe" class of the same name.
+
+        An optional second argument is a code reference to die with. This
+        defaults to "Object::Deadly->can( '_death' )".
+
+    "Object::Deadly->kill_UNIVERSAL"
+        This class method kills all currently known UNIVERSAL functions so
+        they can't be called on a "Object::Deadly" object. This includes a
+        list of methods known to the author and then an inspection of
+        UNIVERSAL::.
+
+    "Object::Deadly->get_death"
+        Returns the function "Object::Deadly::_death".
+
+PRIVATE FUNCTIONS
+    The following functions are all private and not meant for public
+    consumption.
+
+    "_death( $obj )"
+        This function temporarilly reblesses the object into
+        "Object::Deadly::_safe", extracts the message from inside of it, and
+        "confess"'s with it. If possible this will be Carp::Clan::confess.
+
+AUTHOR
+    Joshua ben Jore, "<jjore at cpan.org>"
+
+BUGS
+    Please report any bugs or feature requests to "bug-object-deadly at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Object-Deadly>. I will
+    be notified, and then you'll automatically be notified of progress on
+    your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+      perldoc Object::Deadly
+
+    You can also look for information at:
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Object-Deadly>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Object-Deadly>
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Object-Deadly>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Object-Deadly>
+
+ACKNOWLEDGEMENTS
+    Yves Orton and Yitzchak Scott-Thoennes.
+
+COPYRIGHT & LICENSE
+    Copyright 2006 Joshua ben Jore, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

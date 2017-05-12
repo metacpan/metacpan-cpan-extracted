@@ -1,0 +1,64 @@
+First queue:
+    - Dual error handling mechanism implemented, now errors can be
+      handled using exceptions
+    - FreeBSD port autogeneration script
+    - HTML docs autogeneration script
+    - Rewrite modules to use exceptions as necessary
+    - Implement auto transaction rollback after exception
+    - Add quotation methods for different types of data
+    - Improve ORM::Error, create ORM::Error::Db
+    - Implement multifield properties
+    - Implement arbitrary/multified object's ID
+    - Autodetect ID from primary key
+    - Deny modifying parts of multified IDs
+    - Access to database schemes other than default
+    - Optimize ORM::Expr:_between
+    - Add 'grouping' flag to ORM::Tjoin object, forcing ORM::Db driver to group
+      result set by object's id (after it is complete replace 'SELECT DISTINCT' with plain 'SELECT')
+    - ORM::Stat::stat method, using subqueries
+    - Use transactions in 'new', 'update', 'delete' by default
+    - Implement storage drivers:
+       - ORM::Db::Backup
+       - ORM::Db::Replicated (to work with replicated DB in 'one master many slaves' mode)
+       - ORM::Db::DBI::MySQLemTa (emulate transactions for non-transactional MySQL)
+       - ORM::Db::Merged (to represent many DBs with the same schemes as one solid DB)
+    - Add 'preload' argument to 'find' method
+    - Temporary objects support:
+      - 'find' and 'new' methods can return temporary objects
+      - 'update' and 'delete' don't write to DB for temporary objects
+      - 'serialized' returns string containing object content, that string is useful
+        to construct object.
+      - Add 'make_permanent' object method
+      - Add 'make_permanent' class method, to have ability to implement optimized INSERT of many objects
+    - ORM::Filter descendants should check its argument types
+    - Implement permissions to use ORM::Expr with 'update'
+    - Die if '_ORM_refs' table contains information about property missing in class
+    - Die if 'filter' argument to 'find' method is not an ORM::Expr
+    - Documentation
+      - Manual pages
+      - Object model example
+    - ORM tools
+      - Object model web-browsing
+      - Create Perl modules and database tables from UML
+      - Refactoring tools:
+        - move property to descendant class
+        - move property to base class
+        - create class and its table templates
+    - Suspended object creation
+      ( Should accept argument 'make_permanent', telling to replace suspended object by permanent one )
+    - Cyclic perl references resolution
+    - Use of multiple tables for one class (statistics storage)
+
+Second queue:
+    - Support temporary tables and views for 'ORM::Stat'
+    - Events (Triggers)
+    - Tests for ORM::History
+    - Initial class configuration:
+      - Parameter to enable/disable autoload of descendants classes and property classes
+        in 'stat' and 'find' methods, user can rely on Class::Autouse instead.
+    - Method stat should autoload descendants classes and property classes
+    - Methods 'stat' and 'find' should accept argument telling not to autoload
+      descendants classes and property classes
+    - Die if 'class' is an empty string
+    - Arbitrary field to use as 'class' field
+    - lazy_load on per field basis

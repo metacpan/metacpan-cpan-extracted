@@ -1,0 +1,114 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/Object-Stash/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=Object-Stash>;
+	doap:created         "2011-11-28"^^xsd:date;
+	doap:download-page   <https://metacpan.org/release/Object-Stash>;
+	doap:homepage        <https://metacpan.org/release/Object-Stash>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      [
+		a foaf:Person;
+		foaf:mbox <mailto:tobyink@cpan.org>;
+		foaf:name "Toby Inkster";
+	];
+	doap:name            "Object-Stash";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Object-Stash/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Object-Stash/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Object-Stash/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Object-Stash/v_0-003001>, <http://purl.org/NET/cpan-uri/dist/Object-Stash/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Object-Stash/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Object-Stash/v_0-006>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-object-stash>;
+	];
+	doap:shortdesc       "provides a Catalyst-like \"stash\" method for your class".
+
+<http://purl.org/NET/cpan-uri/dist/Object-Stash/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Initial release";
+	dc:issued            "2011-11-28"^^xsd:date;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Object-Stash-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Object-Stash/v_0-002>
+	a                    doap:Version;
+	dc:issued            "2011-11-30"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [ rdfs:label "Test case for stash destruction." ], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Pretty important fieldhashes compile-time-versus-run-time fix.";
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/Object-Stash/v_0-001>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Object-Stash-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Object-Stash/v_0-003001>
+	a                    doap:Version;
+	dc:issued            "2011-12-02"^^xsd:date;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Object-Stash-0.003001.tar.gz>;
+	doap:revision        "0.003001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Object-Stash/v_0-003>
+	a                    doap:Version;
+	dc:issued            "2011-12-01"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "List correct dependencies.";
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/Object-Stash/v_0-002>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Object-Stash-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Object-Stash/v_0-004>
+	a                    doap:Version;
+	dc:issued            "2011-12-03"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Update to newer Module::Package::RDF.";
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/Object-Stash/v_0-003>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Object-Stash-0.004.tar.gz>;
+	doap:revision        "0.004"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Object-Stash/v_0-005>
+	a                    doap:Version;
+	dc:issued            "2011-12-03"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Retrieve multiple values from a stash by passing it an arrayref.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Blessed stashes with getters/setters.";
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/Object-Stash/v_0-004>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Object-Stash-0.005.tar.gz>;
+	doap:revision        "0.005"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Object-Stash/v_0-006>
+	a                    doap:Version;
+	dc:identifier        "Object-Stash-0.006"^^xsd:string;
+	dc:issued            "2014-09-10"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Switch to Dist::Inkt.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Object-Stash-0.006.tar.gz>;
+	doap:revision        "0.006"^^xsd:string.
+

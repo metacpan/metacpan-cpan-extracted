@@ -1,0 +1,28 @@
+[% INCLUDE header.tt page_title = "Failed to find random page" %]
+[% INCLUDE banner.tt %]
+<div id="content">
+  [% INCLUDE navbar.tt %]
+  <div id="maincontent">
+
+    <div class="random_page_failure_message">
+      <p>
+        [% IF category AND locale %]
+          Couldn't find a random page in category [% category %] and locale
+          [% locale %].
+        [% ELSIF category %]
+          Couldn't find a random page in category [% category %].
+        [% ELSIF locale %]
+          Couldn't find a random page in locale [% locale %].
+        [% ELSE %]
+          Couldn't find a random page.
+        [% END %]
+      </p>
+
+      <p>If you think this is a mistake, please report it to the guide
+      administrator.</p>
+
+      <p><a href="[% full_cgi_url %]">Return to the home page.</a></p>
+    </div>
+
+  </div>
+[% INCLUDE footer.tt %]

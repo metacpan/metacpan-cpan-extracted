@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<SITE ID="Mondou">
+
+<NAME Lang="en-us">Mondou</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+Mondou全球WWW搜尋(日本)
+]]></NAME>
+<INFO Lang="en-us">general information web search in Japan</INFO>
+<INFO Lang="zh-tw">general information web search in Japan</INFO>
+
+<URL Type="Start"><![CDATA[
+http://kuamp.kuamp.kyoto-u.ac.jp/cgi-bin/search.cgi?key=_QUERY_&rm=&am=_HITS_&tp=ex
+]]></URL>
+
+<CHARSET>ja-jp.euc</CHARSET>
+
+
+<TEMPLATE><![CDATA[
+<p><dt><a href="_URL_">___<dd>_TITLE_<br>___--- [_SCORE_]
+]]></TEMPLATE>
+</SITE>

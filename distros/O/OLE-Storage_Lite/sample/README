@@ -1,0 +1,32 @@
+Files
+    smplls.pl  : displays PPS structure of specified file
+    smpadd.pl  : appends dummy PPS file to specified file
+    smpsv.pl   : saves new OLE file
+    test.xls   : Excel file for test
+    addtest.xls: added PPS by smpadd.pl
+
+    smpadd_a.pl: same as smpadd.pl (in 4 patterns)
+    smplls_a.pl: same as smplls.pl (in 3 patterns)
+
+    smpaddF.pl : same as smpadd.pl with file feature
+
+Example:
+> perl smplls.pl test.xls
+00    1 'Root Entry' (pps 0)                          ROOT 15.11.1659 00:26:00
+01      1 'Workbook' (pps 1)                          FILE       1000 bytes
+02      2 ' SummaryInformation' (pps 2)               FILE       1000 bytes
+03      3 ' DocumentSummaryInformation' (pps 3)       FILE       1000 bytes 
+
+> perl smpadd.pl test.xls
+> perl smplls.pl add_test.xls
+00    1 'Root Entry' (pps 0)                          ROOT 15.11.1659 00:26:00
+01      1 'Workbook' (pps 3)                          FILE       1000 bytes
+02      2 ' SummaryInformation' (pps 2)               FILE       1000 bytes
+03      3 ' DocumentSummaryInformation' (pps 1)       FILE       1000 bytes
+04      4 'Last Added' (pps 5)                        FILE          6 bytes
+05      5 'Length 0' (pps 4)                          FILE          0 bytes
+
+> perl smpadd_a.pl test.xls > stdout.xls
+> perl smplls_a.pl test.xls
+...
+

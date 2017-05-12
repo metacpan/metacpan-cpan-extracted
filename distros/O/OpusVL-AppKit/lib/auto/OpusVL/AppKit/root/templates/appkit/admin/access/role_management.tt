@@ -1,0 +1,29 @@
+
+<h1> Role Management </h1>
+
+    <div>
+
+        <div>
+
+            [% PROCESS appkit/admin/access/side_bar.tt %]
+
+            <div class="role_details">
+
+[%# IF role.roles_allowed_roles.defined && roles.roles_allowed_roles.size > 0 %]
+
+                <fieldset>
+                    <legend>
+                        Roles that are administered by [% c.stash.role.role %] 
+                    </legend>
+
+                    [% form.render | none %]
+
+                </fieldset>
+
+[%# END %]
+
+            </div>
+        </div> 
+    </div>
+
+

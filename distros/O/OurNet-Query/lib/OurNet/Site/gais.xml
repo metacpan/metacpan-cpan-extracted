@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<SITE ID="Gais">
+
+<NAME Lang="en-us">GAIS WWW Search</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+GAIS¥xÆWWWW·j´M
+]]></NAME>
+<INFO Lang="en-us">general information web search exactly in Asia</INFO>
+<INFO Lang="zh-tw">general information web search exactly in Asia</INFO>
+
+<URL Type="More"><![CDATA[
+http://gais.cs.ccu.edu.tw/cgi-bin/webgetnext2.exe?pid=_PID_&page=_PAGE_&msg_lang=default&group=_GROUP_&index=_INDEX_&group_by=-1&chinese=0&match=0
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://gais.cs.ccu.edu.tw/cgi-bin/webgais2.exe?match=exact&msg_lang=default&group_by=none&query=_QUERY_
+]]></URL>
+
+<SCORE>_SCORE_/10</SCORE>
+<EXPRESSION>Standard</EXPRESSION>
+<CATEGORY>WWW,Regional</CATEGORY>
+
+<VAR Name="_INDEX_"><![CDATA[
+"index"    TYPE="hidden" VALUE="_INDEX_">
+]]></VAR>
+<VAR Name="_GROUP_"><![CDATA[
+"group"    TYPE="hidden" VALUE="_GROUP_">
+]]></VAR>
+<VAR Name="_PAGE_"><![CDATA[
+"page"     TYPE="hidden" VALUE="_PAGE_">
+]]></VAR>
+<VAR Name="_PID_"><![CDATA[
+"pid"      TYPE="hidden" VALUE="_PID_">
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<DT><B>___<A HREF = "_URL_">_TITLE_</A>___<DD>_PREVIEW_<BR>___- <FONT___COLOR="#0070a0">_SIZEK_</FONT>___COLOR="#0070a0">_DATE_</FONT>___COLOR="#0070a0">_SCORE_</FONT>___</DD></DL>
+]]></TEMPLATE>
+</SITE>

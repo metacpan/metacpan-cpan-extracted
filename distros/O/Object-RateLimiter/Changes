@@ -1,0 +1,65 @@
+Revision history for Perl module Object::RateLimiter
+
+1.004001 2016-02-02
+
+  - Fix ->clone (busted in v1.3.1), better tests for same
+
+  - Add ->TO_JSON hook (alias for ->export)
+
+1.003001 2016-02-02
+
+  - Improved support for persistence; add ->export method & constructor
+    support for re-creating a previously exported (possibly for storage)
+    rate-limiter
+
+1.002001 2015-01-24
+
+  - Add Role::Object::RateLimiter
+
+  - 'use strictures 2' for saner fatal warnings behavior
+
+1.001003 2014-12-15
+
+  - POD clarifications
+
+  - Minor optimizations & syntactical cleanups
+
+  - Packaging; switch to dependency tracking via 'cpanfile'
+
+1.001002 2013-12-15
+
+  - Use Object::ArrayType::New
+
+1.001001 2013-09-01
+
+  - Add $obj->() call syntax as a shortcut for ->delay()
+
+1.000000 2013-08-24
+
+  - Minor cleanups; call interface stable-enough
+
+0.002000 2013-08-21
+
+  - Add ->is_expired method
+
+  - Minor optimizations & cleanups
+
+0.001004 2013-08-21
+
+  - Broken link in POD
+
+0.001003 2013-08-21
+
+  - Allow $obj->new()
+
+  - POD and test tweaks
+
+  - Add examples/incr.pl
+
+0.001002 2013-08-19
+
+  - POD and test fixups
+
+0.001001 2013-08-19
+
+  - Initial release

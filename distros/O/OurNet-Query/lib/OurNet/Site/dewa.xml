@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<SITE ID="Dewa">
+
+<NAME Lang="en-us">DEWA.COM Search</NAME>
+<INFO Lang="en-us">general information web search</INFO>
+
+<URL Type="More"><![CDATA[
+_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://www.dewa.com/cgi-bin/search.cgi?k=_QUERY_&b=o
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_NEXT_"><![CDATA[
+<a href="_NEXT_">Next
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+- <strong>___<a href="_URL_">_TITLE_</a>___<blockquote>_PREVIEW_</blockquote>
+]]></TEMPLATE>
+</SITE>

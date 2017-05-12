@@ -1,0 +1,14 @@
+An ObjStore::Index optimized for insert performance.
+
+- Representation is a link-list of OSPVptr arrays.
+
+- Caches keys for the first record in a block for better random seek
+performance.
+
+- Optimistic indexing constraints; No read-only protection.
+
+The design may seem strange but the performance implications of
+persistent memory are also strange.  Whether this is an optimal
+solution is still unknown.
+
+I'm beginning to think I'm foolish for avoiding templates.  OTOH...

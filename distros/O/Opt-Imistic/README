@@ -1,0 +1,14 @@
+To install
+
+  $ dzil install
+
+To use
+
+  use Opt::Imistic;
+  
+After this line, %ARGV is populated with the parsed @ARGV. See
+example.pl for a demo.
+
+See the POD for more details
+
+  perldoc Opt::Imistic

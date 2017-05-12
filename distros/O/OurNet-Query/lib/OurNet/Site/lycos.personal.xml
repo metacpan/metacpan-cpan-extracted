@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<SITE ID="Lycos.Personal">
+
+<NAME Lang="en-us">Lycos Personal Homepages Search</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+Lycos個人站台搜尋
+]]></NAME>
+<INFO Lang="en-us">personal web search</INFO>
+<INFO Lang="zh-tw">personal web search</INFO>
+
+<URL Type="More"><![CDATA[
+http://www.lycos.com_MORE_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://www.lycos.com/cgi-bin/pursuit?adv=%26adv%3B&cat=homepage&matchmode=or&query=_QUERY_&maxhits=_HITS_
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_MORE_"><![CDATA[
+<A HREF="_MORE_">Next Page
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+Master Cylinder $ -->_URL_">_TITLE_</a>___<br>_PREVIEW_<br>___</font>
+]]></TEMPLATE>
+</SITE>

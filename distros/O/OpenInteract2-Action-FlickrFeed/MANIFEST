@@ -1,0 +1,10 @@
+Changes
+Build.PL
+Makefile.PL
+MANIFEST
+META.yml
+README
+lib/OpenInteract2/Action/FlickrFeed.pm
+t/00base.t
+t/98_pod.t
+t/99_pod_coverage.t

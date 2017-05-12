@@ -1,0 +1,38 @@
+=head1 NAME
+
+ObjStore::Lib::PDL - Persistent PDL-compatible matrices
+
+=head1 SYNOPSIS
+
+    use PDL::Lite;
+    use ObjStore::Lib::PDL;
+
+    begin 'update', sub {
+      my $pdl = ObjStore::Lib::PDL->new($near,
+			  { Datatype => PDL::float(), Dims => [3,3] });
+
+      $pdl->slice(":,4")->clump(2) *= 2;  #or whatever
+    };
+    die if $@;
+
+=head1 DESCRIPTION
+
+The main thing of interest is that dimensions are arranged in memory
+such that the last dimension is the most packed.  For example, in a
+PDL of dimensions [3,3,3] the following locations are sequential in
+memory:
+
+  [2,1,0]
+  [2,1,1]
+  [2,1,2]
+
+Whereas the follow three elements are separated by relatively large gaps:
+
+  [0,2,1]
+  [1,2,1]
+  [2,2,1]
+
+Be aware that this memory layout convention is dependent on the
+implementation of PDL.  However, it is very unlikely to change.
+
+=cut

@@ -1,0 +1,6 @@
+Revision history for Perl extension Ogg::Vorbis::LibVorbis.
+
+0.01  Sun Sep 11 15:40:47 2011
+	- original version; created by h2xs 1.23 with options
+		-n Ogg::Vorbis::LibVorbis -b 5.8.0 vorbis/codec.h vorbis/vorbisenc.h vorbis/vorbisfile.h
+

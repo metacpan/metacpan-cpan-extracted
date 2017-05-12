@@ -1,0 +1,20 @@
+[%- DEFAULT theme = OI.theme_properties -%]
+<html>
+ <head><title>[% page.title %]</title>
+ <script language="javascript">
+<!--
+
+[% page.script %]
+
+[%- PROCESS global_javascript -%]
+
+// -->
+ </script>
+
+ </head>
+<body bgcolor="[% theme.bgcolor %]">
+
+[% page.content %]
+
+</body>
+</html>

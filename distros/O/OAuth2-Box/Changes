@@ -1,0 +1,16 @@
+History for OAuth2::Box
+=======================
+
+* 0.03 2013-09-15T13:54:22
+
+  Add versions to prereqs
+  switch to MetaResources plugin for dzil
+
+* 0.02 2013-09-11T16:03:15
+
+  Testing read-only accessors differ when Class::XSAccessor is installed or not.
+  Fixed t/01_base.t (thanks CPANTesters!)
+
+* 0.01 2013-09-09T10:53:20
+
+  initial release

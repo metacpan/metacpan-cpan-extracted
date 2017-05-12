@@ -1,0 +1,47 @@
+OpenGL-PLG
+
+This is the README file for the OpenGL::PLG module. This concerns only the installation procedure, so please refer to the POD for usage (just type 'perldoc OpenGL;;PLG' after the installation, or find it on search.cpan.org).
+
+OpenGL::PLG is a class for OpenGL polygon objects. It lets you easily create and manipulate 3d polygon models. It also reads and writes files in raw PLG format, dumps OpenGL code and renders the 3d model (if you have Perl OpenGL installed).
+
+See the "Changes" file for a complete version changelog. Stay tuned for new features and enhancements!
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc OpenGL::PLG
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=OpenGL-PLG
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/OpenGL-PLG
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/OpenGL-PLG
+
+    Search CPAN
+        http://search.cpan.org/dist/OpenGL-PLG
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Breno G. de Oliveira
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

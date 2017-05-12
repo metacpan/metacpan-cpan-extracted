@@ -1,0 +1,6 @@
+Revision history for Perl extension ObjectDBI.
+
+0.01  Tue Feb  6 13:12:56 2007
+	- original version; created by h2xs 1.23 with options
+		-AXcfn ObjectDBI
+

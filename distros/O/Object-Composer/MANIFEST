@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/001_use.t
+t/002_loading.t
+t/003_loading.t
+lib/Object/Composer.pm

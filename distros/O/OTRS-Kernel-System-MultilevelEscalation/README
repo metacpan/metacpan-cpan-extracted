@@ -1,0 +1,172 @@
+
+
+This archive contains the distribution Kernel-System-Escalation,
+version 1.0.1:
+
+  Create tickets in OTRS and have a ecsalation level set on the ticket automatically on the ticket depending on the user group the ticket belongs to.
+
+This software is Copyright (c) 2012 by OTRS BV.
+
+This is free software, licensed under:
+
+The GNU Affero General Public License, Version 3, November 2007
+
+
+Multilevel Escalation mail
+=============================
+
+1.       System Details
+============================
+
+
+1.1	System Environment
+OTRS is perl based web framework for HelpDesk and IT Service Management. It runs on linux/unix based system on commodity hardware.
+
+1.2	Requirement References
+New work flow development for Multi level escalation of ticket.
+New Interface for Escalation Notification Configuration.
+Adding new table in database to hold the Multilevel Matrix.
+Adding new module under System which interact with the table. 
+Adding new module to interact with the GUI interfaces.
+Syconfig based configuration for No. of levels allowed for   Notification and in each level what type(owner/responsible,role/group) of agents will get notifications
+Add new dtl file with customized feature of the above requirements.
+Notification message should be based on Notification Template System available in OTRS
+Adding new cron job script for the above requirement.
+
+1.3	 New Multilevel Escalation mail
+Send multilevel escalation mail to multiple role of user for a particular ticket before it get escalated.
+1.3.1	Description
+Customer create a ticket under a queue. The ticket get assigned to an agent. The system check the ticket and find out the SLA of the ticket. Then according to the Escalation Matrix defined in the database for that particular SLA, the system checks and compare the time elapsed for the ticket. Before the ticket get escalated the system generates a mail and sen it to the intended recipients.
+1.3.2	Flow of Events
+Customer create a ticket under a queue. The ticket get assigned to an agent. The system has a functionality to hold a multilevel escalation matrix to different roles of user for a particular ticket. This definitions can be reconfigured by the Administrator at any time. According to the defined definition and the SLA of a particular ticket the system fetch the records of escalation from the table. The system then calculate the time elapsed for that particular ticket and compare the maximum percentage the ticket can spend on that particular stage (First Response, Update Time, Solution Time) for a particular level (NotifyI, NotifyII, NotifyIII). If the percentage elapsed is more or equal to a particular level, then the users who are related to that level will receive mail from the system as notification.
+Another feature is the customization of the multilevel escalation template by developer without changing the core(system) module.
+
+1.4	Definitions, Acronyms and Abbreviations
+NotifyI, NotifyII, NotifyIII are the three level of Escalation, of which NotifyI is the lowest level and NotifyIII is the highest one
+
+1.5	Design Constraints
+There is no such design constrains, A new escalation table is implemented in the database to make this project very independent.
+
+1.6	Assumptions
+1.6.1            Reusable Components/COTS identified
+Two new modules (Escalation.pm and AdminESCL.pm) are developed which can be reused for different other purposes.
+
+1.7	Dependencies
+		The new modules developed have dependencies with SLA.pm, the OTRS framework module
+
+
+1.8	System Environment
+
+1) Determination of Integration Sequence
+Databse table should be integrated first then the package for both the new module should be implemented, then the pl file should be implemented as cron job
+2) Integration Environment
+OTRS 3.0 Frameworkor above.
+3) Integration Procedure and Criteria
+use command:
+1. cd /opt/otrs
+2. find `perl -e 'print "@INC"'` -name '*.pm' -print | tee ~/Perl-OTRS-modules-installed.txt
+3. cat Perl-OTRS-modules-installed.txt | grep “Escalation.pm”
+  should be under /opt/otrs/Kernel/System/
+4. cat Perl-OTRS-modules-installed.txt | grep “AdminESCL.pm”
+  should be under /opt/otrs/Kernel/Module/
+
+
+2.	External Interfaces
+================================
+
+2.1	External Interfaces Provided
+External interfaces for admin is provided by OTRS framework, An addition for Escalation is there in Escalation.xml file. (A new entry under group Ticket and subgroup 'Frontend::Admin::ModuleRegistration' is made.
+Path= /opt/otrs/Kernel/Config/File/Escalation.xml
+
+2.2	External Interfaces Used
+For AdminESCL.pm execution a new dtl file is introduced named  AdminESCL.dlt under the path '/opt/otrs/Kernel/Output/HTML/Standard/'
+
+
+3.	Use Cases
+====================
+
+3.1	Creating Escalation Matrix for different level of user on a particular ticket on different set of SLA:
+3.1.1	Description
+Here the SLA is directly proportional to Priority. For each Priority a defined SLA was already there. Now for each SLA three different type of timing is given i.e. FirstResponse Time, UdpateTime, Solution Time. Now for each type of timing we need to develop three level of notification according to the level of user.
+The user's will will be getting the mail if the time frame defined is over.
+The design is made in such a way that the level of notification can be increased or decreased by not affecting the Database architecture.
+3.1.2	Flow of Events
+A. The administrator edit the Escalation Matrix
+B. Provides the escalation percentage by selecting the Notify level (user with particular Role)
+C.	Save to make the permanent change in the database.
+D. The cron job will check each open ticket and verify its different escalation level from the database table, if over will send mail to user
+
+3.2	Edit the Escalation Matrix.
+3.2.1	Description
+If and when required the administrator can edit the Escalation Matrix to do the required changes.
+3.2.2	Flow of Events
+A. Administrator can edit the Escalation Matrix any time.
+
+
+4.	Detailed Design
+=========================
+
+
+1. File Path at a glance after Instalation
+ <File Permission="644" Location="Kernel/Config/Files/Escalation.xml" Encode="Base64"></File>
+ <File Permission="644" Location="Kernel/Modules/AdminESCL.pm" Encode="Base64"></File>
+ <File Permission="664" Location="Kernel/System/Escalation.pm" Encode="Base64"></File>
+ <File Permission="644" Location="Kernel/Output/HTML/Standard/AdminESCL.dtl" Encode="Base64"></File>
+ <File Permission="755" Location="bin/otrs.Escalation.pl" Encode="Base64"></File>
+ <File Permission="644" Location="var/packagesetup/MultilevelEscalation.pm" Encode="Base64"></File>
+
+2. A new table is introduced in the database
+CREATE TABLE escalation (
+    sla_id INTEGER NOT NULL,
+    notify_type VARCHAR (3) NOT NULL,
+    level INTEGER NOT NULL,
+    notify_to VARCHAR (10) NULL,
+    notify_perc INTEGER NOT NULL,
+    valid_id SMALLINT NOT NULL,
+    PRIMARY KEY(sla_id,notify_type,level)
+    );
+
+3. Add new constrain in the database
+ALTER TABLE escalation ADD CONSTRAINT FK_escalation_sla_id_id FOREIGN KEY (sla_id) REFERENCES sla (id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+4. Two pm files need to be installed:
+The webframe module in /opt/otrs/Kernel/Module/AdminESCL.pm to support GUI
+The system core module in /opt/otrs/Kernel/System/Escalation.pm to support DB
+
+5. A new dtl file in /opt/otrs/Kernel/Output/HTML/Standard/AdminESCL.dtl
+
+6. Edition in /opt/otrs/Kernel/Config/File/Escalation.xml
+
+7. Lastly the Apache need to be restarted.
+
+8. Lastly a cron job CronESCL.pl need to be run 
+
+
+5.	Software Detailed Design
+==================================
+
+5.1.	Creating Escalation Matrix for different level of user on a particular ticket on different set of SLA.
+Pseudo code:
+?	Administrator click the Escalation Matrix under the Admin tab.
+?	Select the SLA for which the matrix need to be entered.
+?	The module helps to select the Notify type and the corresponding Notify level.
+?	When save the module checks the validity and entered in the database table.
+
+5.2.	Edit of the Escalation Matrix.
+Pseudo code:
+?	Administrator click the Escalation Matrix under the Admin tab.
+?	Select the SLA for which the matrix need to be edited.
+?	The module helps to fetch valid record from the database and show in the GUI.
+?	Edition of any file need to be validated by the module and saved in the database table.
+?	Invalid record will be clear from the table if tried to be entered
+
+
+6.	Responsibilities
+===========================
+
+A. Administrator is responsible for adding escalation matrix for different level. 
+B. Administrator opens, enter and save valid entry.
+C. Administrator can edit the Escalation matrix when required.
+D. Administrator can change the level of notification by minor change in pm and dtl file.
+E. The cron job need to be restart
+

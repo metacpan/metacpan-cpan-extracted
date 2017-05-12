@@ -1,0 +1,6 @@
+Changes
+lib/OpenInteract2/Action/RSS.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00base.t

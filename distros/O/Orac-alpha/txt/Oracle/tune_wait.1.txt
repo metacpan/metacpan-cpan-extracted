@@ -1,0 +1,20 @@
+
+Notes:
+----------------------------------------------------------------
+
+1.    Not all waits are shown.
+
+2.    Buffer busy waits may be caused by free list contention
+.     for specific tables (create more free lists if neccesary)
+.     or by insufficient rollback segments or extents
+
+3.    Free buffer waits may be caused by excessive disk sorts
+
+4.    Enqueue waits may indicate contention for table or row
+.     locks (do you have foreign keys defined without indexes?)
+
+5.    Examine v$latch (or run latch_sta.sql) if latch waits are 
+.     significant
+
+6.    Excessive log file write or sync waits may be caused by a
+.     high value for LOG_BUFFER

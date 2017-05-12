@@ -1,0 +1,26 @@
+0.03 -- 2005-12-06
+  -- Cache HSV/RGB conversions, giving a massive speed improvement.
+  -- Improve handling of edges of the image -- don't cut off the bottommost
+     and leftmost edges, allow for characters that go all the way to the
+     right edge.
+  -- Improve handling of non-black backgrounds.  FIXME: these will throw off
+     calculation of the foreground color -- red on white shows as fg color
+     180 instead of 0.
+  -- FIXME: Document bgrgb attribute of recognized bits?
+  -- FIXME: Much better documentation of charmap.  Put update-charmap in
+     examples?
+
+0.02 -- 2005-11-25
+  -- Correct a stupid error -- I uploaded a not-the-most-recent tarball.
+  -- Turns out that the PNG files made by GD aren't as portable as I'd 
+     like -- that is, it doesn't produce exactly byte-for-byte the same png
+     when run on the same image on different computers... so the md5 sums 
+     are no longer based on the PNG, but on my own image format.  This 
+     makes charmap files portable between computers.  (But not compatable 
+     with charmaps from 0.01, which shouldn't be a problem, as it was only 
+     out for 4 days.)
+  -- inc version
+
+0.01 -- 2005-11-21
+  -- This is the initial revision.  There are no changes.
+

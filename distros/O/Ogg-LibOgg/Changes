@@ -1,0 +1,10 @@
+Revision history for Perl extension Ogg::LibOgg.
+
+0.02  Wed Mar 03 16:27:55 2011
+       - changed the pod for hyperlinks
+       - added get_ogg_page
+
+0.01  Sun Mar 13 12:32:11 2011
+	- original version; created by h2xs 1.23 with options
+		-A -n Ogg::LibOgg
+

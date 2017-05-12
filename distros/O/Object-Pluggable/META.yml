@@ -1,0 +1,33 @@
+---
+abstract: 'A base class for creating plugin-enabled objects'
+author:
+  - 'Chris Williams <chris@bingosnet.co.uk>'
+  - 'Hinrik Örn Sigurðsson <hinrik.sig@gmail.com>'
+build_requires:
+  Pod::Parser: 1.36
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.102341, CPAN::Meta::Converter version 2.101670'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Object-Pluggable
+no_index:
+  directory:
+    - t
+    - utils
+    - examples
+requires:
+  Task::Weaken: 0
+  constant: 1.17
+  perl: 5.006
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Object-Pluggable
+  homepage: http://search.cpan.org/dist/Object-Pluggable/
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/hinrik/object-pluggable.git
+version: 1.29
+x_authority: cpan:HINRIK

@@ -1,0 +1,97 @@
+Revision history for Perl extension OAuth::Lite2.
+
+0.11 2016-08-18T14:25:05Z
+    - Force numeric context for 'expires_in'.
+        - https://github.com/ritou/p5-oauth-lite2/pull/8
+          Thanks to GeJ
+
+0.10 2014-07-31T09:30:02Z
+    - add errors defined in RFC6749
+
+0.09 2014-07-22T07:36:43Z
+    - rename grant_type to external_service
+    - rename params for grant_type=external_service
+
+0.08 2014-06-03T07:54:41Z
+    - add support for new grant types
+        - "urn:ietf:params:oauth:grant-type:federated-assertion" : obtain access_token from external service assertion
+
+0.07 2013-11-08T16:12:48Z
+    - replace JSON to JSON::XS
+
+0.06 2013-10-15T09:10:21Z
+    - update POD by matthewfranglen
+        - https://github.com/ritou/p5-oauth-lite2/pull/1
+        - https://github.com/ritou/p5-oauth-lite2/pull/2
+    - add support for two new grant types
+        - "grouping_refresh_token" : obtain access_token from refresh_token of the same grouped client
+        - "server_state" : for CSRF Protection of Authorization Code grant
+    - fix some bugs and WARNINGs
+
+0.05 2013-07-30T05:16:26Z
+    - rebuild
+
+0.04 2013-07-30T04:46:27Z
+    - fixed some bugs and WARNINGs
+        - migrated to Minilla
+        - removed podchecker's WARNINGs
+        - fixed uuv for parsing Basic Auth header
+        - fixed tests for Perl 5.18.0 env
+        - used authorization_basic method to generate basic authorization header
+        - removed unused method
+
+0.03  Sun Mar 03 00:57:00 2013
+    - bugfix by ritou
+        - https://github.com/lyokato/p5-oauth-lite2/pull/8
+        - https://github.com/lyokato/p5-oauth-lite2/pull/7
+
+0.02_03  Wed Jun 20 17:40:00 2012
+    - bugfix by ritou
+        - https://github.com/lyokato/p5-oauth-lite2/pull/6
+
+0.02_01  Sat Jun 15 09:20:00 2012
+    - updated to draft27 spec
+        - https://github.com/lyokato/p5-oauth-lite2/pull/5
+          Thanks to ritou
+
+0.01_14  Mon Nov 7 19:50:00 2011
+    - removed non-SSL warning
+
+0.01_13  Wed Sep 14 15:43:00 2011
+    - fixed typo thanks to fukumura
+
+0.01_12  Tue May 17 19:43:00 2011
+    - client credentials grant handler now works as expected when client_user_id == 0
+
+0.01_10  Thu Mar 17 13:28:00 2011
+    - removed Context. Now, DataHandler has request object, and you pick it up
+      by DataHandler::request.
+
+0.01_09  Mon Feb 14 17:07:00 2011
+    - added client_secret value as parameter for get_client_user_id method
+
+0.01_08  Mon Feb 14 17:07:00 2011
+    - support client_credentials profile
+
+0.01_07  Tue Jan 04 10:40:00 2010
+    - added last_request/last_response on clients to access
+      HTTP::Request/HTTP::Response internally used.
+      https://github.com/lyokato/p5-oauth-lite2/issues#issue/4
+
+0.01_06  Tue Nov 10 00:12:00 2010
+    - accepted pull request http://github.com/lyokato/p5-oauth-lite2/pull/3 
+
+0.01_05  Tue Oct 05 01:00:00 2010
+    - accepted pull request http://github.com/lyokato/p5-oauth-lite2/pull/1
+
+0.01_04  Tue Sep 9 03:22:00 2010
+    - fixed exception: inefficient -> insufficient
+
+0.01_03  Tue Aug 02 16:25:00 2010
+    - fixed model classes. changed setting for Params::Validatea
+
+0.01_02  Tue Jul 27 09:27:00 2010
+    - fixed dependency setting in Makefile.PL
+
+0.01_01  Wed Jul 22 12:31:00 2010
+    - initial release for draft-v10

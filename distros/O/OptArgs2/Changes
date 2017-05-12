@@ -1,0 +1,45 @@
+0.0.9 (2016-12-03)
+
+    Enhancements:
+        - Sub commands are always called and no longer depend on a
+          particular SubCmd arg type. The arg isa='SubCmd' type is now
+          simply a usage pressentation instruction.
+
+0.0.8 (2016-10-17)
+
+    New Features:
+        - New "usage()" function
+
+    Dependencies:
+        - Require at least Perl 5.10 for "//=" support.
+
+0.0.6 (2016-07-03)
+
+    Bug Fixes:
+        - Fix command name handling broken by /r fixes in 0.0.2.
+        - Correctly pass the option value to triggers
+        - Use "--counter" in usage message for Counter options instead
+          of "--counter="
+
+0.0.4 (2016-05-21)
+
+    Bug Fixes:
+        - One more /r fixup
+        - Build lib/Getopt/Args2.pm from Build.PL
+
+0.0.2 (2016-05-18)
+
+    Bug Fixes:
+        - Remove the other uses of /r in regexes that I missed in
+          the previous version.
+
+0.0.1_2 (2016-05-10)
+
+    Bug Fixes:
+        - Don't use the /r modifier (non-destructive substitution) on
+          regex replacements as it is not supported by Perl's earlier
+          than 5.14.
+
+0.0.1_1 (2016-05-09)
+
+    Initial release.

@@ -1,0 +1,95 @@
+[%# A template for an owl datatype property.
+    ===========================
+    Expected/recognized parameters:
+    obj ... a OWL::Data::Def::DatatypeProperty object
+      
+-%]
+#-----------------------------------------------------------------
+# [% obj.module_name %]
+# Generated: [% USE Date (format = '%d-%b-%Y %H:%M:%S %Z') %][% Date.format %]
+# Contact: Edward Kawas <edward.kawas+owl2perl@gmail.com>
+#-----------------------------------------------------------------
+package [% obj.module_name %];
+
+use [% obj.module_parent %];
+
+no strict;
+use vars qw( @ISA );
+@ISA = qw( [% obj.module_parent %] );
+use strict;
+
+{
+    my %_allowed = (
+
+    );
+
+    sub _accessible {
+        my ( $self, $attr ) = @_;
+        exists $_allowed{$attr} or $self->SUPER::_accessible($attr);
+    }
+
+    sub _attr_prop {
+        my ( $self, $attr_name, $prop_name ) = @_;
+        my $attr = $_allowed{$attr_name};
+        return ref($attr) ? $attr->{$prop_name} : $attr if $attr;
+        return $self->SUPER::_attr_prop( $attr_name, $prop_name );
+    }
+}
+
+#-----------------------------------------------------------------
+# init
+#-----------------------------------------------------------------
+sub init {
+    my ($self) = shift;
+    $self->SUPER::init();
+    [% IF obj.range %]
+    # set the range of this datatype property
+    $self->range('[% obj.range %]');
+    [%- END -%]
+    [% IF obj.domain %]
+    # set the domain for this datatype property
+    $self->domain('[% obj.domain %]');
+    [%- END -%]
+    [% IF obj.uri %]
+    # set the uri for this datatype property
+    $self->uri('[% obj.uri %]');
+    [%- END %]
+    # set the value of this datatype property
+    $self->value('some value');
+    
+    
+}
+
+1;
+__END__
+
+=head1 NAME
+
+[% obj.module_name %] - a datatype propery
+
+=head1 SYNOPSIS
+
+  use [% obj.module_name %];
+  my $property = [% obj.module_name %]->new();
+
+  # get the domain of this property
+  my $domain = $property->domain;
+
+  # get the range of this property
+  my $range = $property->range;
+
+  # get the uri for this property
+  my $uri = $property->uri;
+
+  [% IF obj.uri %]
+  # set the value for a resource that 
+  # [% obj.uri %] is 
+  # a predicate on 
+  $property->value('some literal value');
+  [% END %]
+
+=head1 DESCRIPTION
+
+I<Inherits from>: L<[% obj.parent %]|[% obj.module_parent %]>
+
+=cut

@@ -1,0 +1,23 @@
+==============
+ Design Notes
+==============
+
+1. Errors
+
+Exceptions thrown via the Error module will double as error flags that can
+be localized.  No Errors should be thown in the Pipeline Segments -- this is
+the level where they should be caught and dealt with.
+
+
+2. Wrappers & Factories
+
+Wrappers have been used wherever a large number of implementation options
+are available (ie: template systems, sessions, etc).
+
+Though not necessary, Factory classes can help protect the programmer from
+changes in design, and will hopefully lead to higher code re-use.
+
+
+
+__
+EOF

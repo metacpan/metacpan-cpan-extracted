@@ -1,0 +1,458 @@
+NAME
+    Object::Transaction - Virtual base class for transactions on files
+    containing serialized hash objects
+
+SYNOPSIS
+            use Object::Transaction;
+
+            transaction($coderef, @codeargs);
+            commit();
+            abandon();
+            $there_is_a_pending_transaction = transaction_pending()
+        
+            package Pkg;
+
+            @ISA = qw(Object::Transaction);
+
+            use Object::Transaction;
+
+            $obj = sub new { ... }
+            sub file($ref,$id) { ... }
+
+            $obj = load Pkg $id;
+            $obj->savelater();
+            $obj->save();
+            $obj->removelater();
+            $obj->remove();
+            $obj->commit();
+            $obj->uncache();
+            $obj->abandon();
+            $oldobj = $obj->old();
+
+            $reference = $obj->objectref();
+            $obj = $reference->loadref();
+
+            $id = sub id { ... }
+            $restart_commit = sub precommit() { }
+            @passby = sub presave($old) { ... }
+            sub postsave($old,@passby) { ... }
+            $newid = sub preload($id) { .... }
+            sub postload() { ... }
+            sub preremove() { ... }
+            sub postremove() { ... }
+
+DESCRIPTION
+    Object::Transaction provides transaction support for hash-based objects
+    that are stored one-per-file using Storable. Multiuser access is
+    supported. In the future, serializing methods other than Storable will
+    be supported.
+
+    Object::Transaction is a virtual base class. In order to use it, you
+    must inherit from it and override the "new" method and the "file"
+    method.
+
+    Optomistic locking is used: it is possible that a transaction will fail
+    because the data that is is based upon has changed out from under it.
+
+EXAMPLE
+            package User;
+
+            @ISA = qw(Object::Transaction);
+
+            use Object::Transaction;
+
+            my $top = "/some/path";
+
+            sub new { 
+                    my ($package, $login) = @_;
+                    die unless getpwnam($login);
+                    return bless { UID => getpwnam($login) };
+            }
+
+            sub file { 
+                    my ($ref, $id) = @_;
+                    $id = $ref->id() unless $id;
+                    return "$top/users/$id/data.storable";
+            }
+
+            sub id {
+                    my ($this) = @_;
+                    return $this->{UID};
+            }
+
+            sub preload
+            {
+                    my ($id) = @_;
+                    return if getpwuid($id);
+                    return getpwnam($id) if getpwnam($id);
+                    die;
+            }
+
+            sub postload
+            {
+                    my ($this) = @_;
+                    my ($name,$passwd,$uid,$gid,$quota,$comment,$gcos,$dir,
+                            $shell,$expire) = getpwuid($this->{UID});
+                    $this->{SHELL} = $shell;
+            }
+
+            sub presave
+            {
+                    my ($this, $old) = @_;
+                    my $id = $this->{UID};
+                    mkdir("$top/users/$id", 0700);
+                    delete $this->{SHELL};
+            }
+
+            sub postsave
+            {
+                    goto &postload;
+            }
+
+            sub postremove
+            {
+                    delete from pw file...
+            }
+
+            my $joe = new User "joe";
+            $joe->savelater();
+
+            my $fred = new User "fred";
+            $fred->savelater();
+
+            $joe->commit();
+
+METHODS PROVIDED
+    Object::Transaction provides the following methods.
+
+    "load($id)"    "load" is the way to bring an object into memory. It is
+                   usually invoked as "my $obj = load MyObject $id".
+
+                   There are two opportunities to customize the behavior of
+                   "load": "preload" for things that should happen before
+                   loading and "postload" for things that should happen
+                   after loading.
+
+                   Object::Transaction caches objects that are loaded. This
+                   is done both for performance reasons and to make sure
+                   that only one copy of an object is in memory at a time.
+                   If caching is not desired, the "uncache" method must be
+                   invoked after loading.
+
+
+
+    "savelater()"  "savelater" is the usual method of saving an object. The
+                   object is not saved at the time that "savelater" is
+                   invoked. It is actually saved when "commit" is invoked.
+
+                   There are two opportunities to customize the behavior of
+                   "savelater": "presave" for things that should happen
+                   before saving and "postsave" for things that should
+                   happen after saving. These are invoked when the object is
+                   actually being saved.
+
+    "save()"       Simply "savelater" combined with a "commit".
+
+
+
+    "removelater()"
+                   "removelater" is the usual method of removing an object.
+                   The object is not removed at the time that "removelater"
+                   is invoked. It is actually removed when "commit" is
+                   invoked.
+
+                   There are two opporunities to customize the behavior of
+                   "removelater": "preremove" for things that should happen
+                   before removing and "postremove" for things that should
+                   happen after removing. These are invoked when the object
+                   is actually being removed.
+
+    "remove()"     Simply "removelater" combined with a "commit"
+
+
+
+    "commit()"     "commit" writes all pending changes to disk. Either all
+                   changes will be saved or none of them will. Deadlocks are
+                   avoided by locking files in order.
+
+                   Object::Transaction uses opportunistic locking. Commit
+                   can fail. If it fails, it will "die" with a message that
+                   begins "DATACHANGE: file". It is advisable to wrap your
+                   entire transaction inside an eval so that it can be
+                   re-tried in the event that the data on disk changed
+                   between the time is was loaded and commited.
+
+                   In the event of a commit failure, the object cache will
+                   be reset. Do not keep any old references to objects after
+                   such a failure. To avoid keeping old references, it is
+                   advised that the first "load()" call happen inside the
+                   "eval".
+
+    "transaction($funcref,@args)"
+                   "transaction()" is a wrapper for a complete transaction.
+                   Transactions that fail due to opportunistic locking
+                   problems will be re-run automatically. Beware
+                   side-effects!
+
+                   The first parameter is a reference to a function. Any
+                   additional parameters will be passed as parameters to
+                   that function. The return value of "transaction()" is the
+                   return value of "&$funcref()".
+
+                   It is not necessary to use the "transaction()" method.
+                   Just beware that "commit()", "save()", and "remove()" can
+                   fail. "transaction()" will keep trying until it suceeds;
+                   it failes for a reason other than an opportunistic
+                   locking problem; or it gives up because it has had too
+                   many (more than $ObjTransLclCnfg::maxtries) failures.
+
+                   It is important that objects not be cached from one
+                   invocation of "transaction()" to another. The following
+                   would fail badly.
+
+                           my $obj1 = load MyObject $obj1;
+
+                           my $p = fork();
+
+                           transaction(sub {
+                                   $obj1->savelater();
+                                   commit();
+                           });
+
+                   To fix it, move the object load to inside the
+                   "transaction()" call.
+
+    "transaction_pending()"
+                   "transaction_pending()" returns true if there is a
+                   transaction pending. (savelater() called, but commit()
+                   not yet called).
+
+
+
+    "abandon()"    As an alternative to "commit", all changes may be
+                   abandoned. Calling "abandon()" does not undo changes made
+                   to the in-memory copies of objects.
+
+
+
+    "uncache()"    Object::Transaction caches all objects. To flush an
+                   object from Object::Transaction's cache, invoke the
+                   "uncache" method on the object.
+
+                   Be careful when doing this -- it makes it possible to
+                   have more than one copy of the same object in memory.
+
+                   "uncache()" can be invoked as a class method rather than
+                   an object method ("Object::Transaction-"uncache()>). When
+                   invoked as a class method, the entire cache is flushed.
+
+    "readlock()"   By default Object::Transaction does not lock objects
+                   unless they are being modified.
+
+                   The "readlock()" method insures that objects are properly
+                   locked and unchanged during a transaction even if they
+                   are not being modified. "savelater()" takes precedence
+                   over "readlock()" so they can be combined freely.
+
+                   Paranoid programmers should use "readlock()" on most
+                   objects.
+
+                   "readlock()" doesn't actually lock objects, it just
+                   verifies that they haven't changed when the transaction
+                   commits.
+
+    "old()"        Return the previous version of an object. Previous is
+                   only loosely defined.
+
+    "objectref()"  Objectref creates a tiny object that is a reference to an
+                   object. The reference can be turned back into the object
+                   by invoking "loadref()". For example:
+
+                           $reference = $object->objectref();
+
+                           $object = $reference->loadref();
+
+                   The reference is suitable for persistant storage as a
+                   member in a persistant object.
+
+    "cache()"      Objects are cached so that multiple loads of the same
+                   identifier result in only one object in memory. Newly
+                   created objects that are created with
+                   "Object::Transaction::new" will be put in the cache
+                   immediately. If an object is created some other way, and
+                   there is chance that it will be "load()"ed before the
+                   tranaction commits, there is the potential for a problem.
+                   Invoking "cache()" puts an object into the cache so that
+                   "load()" won't fail.
+
+REQUIRED METHODS TO OVERRIDE
+    The following methods must be overriden.
+
+    "initialize"   Object::Transaction provides a contructor. The
+                   constructor provide delegates much of the work to a
+                   callback that you can override: "initialize()".
+
+    "file($ref,$id)"
+                   You must provide a function that returns the filename
+                   that an object is stored in. The "file" method can be
+                   invoked in two ways: as an object method call without an
+                   $id parameter; or as a class method call with an $id
+                   parameter.
+
+OPTIONAL METHODS TO OVERRIDE
+    The following methods may be overridden.
+
+
+
+    "preload($id)" "preload()" is invoked as nearly the first step of
+                   "load". It is generally used to make sure that the $id is
+                   valid. "preload()" is a class method rather than an
+                   object method.
+
+                   The return value of "preload" is a replacement $id. For
+                   example, it might be called as "preload("Joe")" to load
+                   the user named Joe, but if users are numbered rather than
+                   named it could return the number for Joe. A return value
+                   of undef is ignored.
+
+                   No lock on the underlying file is present at the time
+                   "preload" or "postload" is called.
+
+    "postload($id)"
+                   "postload" is invoked after the object has been loaded
+                   into memory but before transaction completeness is
+                   checked.
+
+                   The underlying file is not locked at the time that
+                   "postload" is invoked. Previous versions of
+                   Object::Transaction locked the underlying object while
+                   "postload" was invoked.
+
+                   If a transaction rollback is required, "postload" will be
+                   invoked again after the object has been reverted to its
+                   pre-transaction state.
+
+
+
+    "presave($old)"
+                   "presave()" is invoked just before an object is written
+                   to disk.
+
+                   Objects are stored on disk in the file specified by the
+                   "file" method. The directory in which that file resides
+                   must exist by the time "presave()" finishes. "presave"
+                   should make the directory if it isn't already made.
+
+                   The underlying file may or may not be locked at the time
+                   "presave" is invoked.
+
+                   "presave" can be invoked as a side-effect of "load" if
+                   the object must roll back to a previous version.
+
+                   The parameter $old is a copy of the object as of the time
+                   it was first loaded into memory.
+
+                   Any return values from "presave" will be remembered and
+                   passed to "postsave".
+
+                   "presave" may not invoke "save()", "commit()", or
+                   "savelater()".
+
+
+
+    "postsave($old,@psv)"
+                   "postsave" is invoked after an object has been written to
+                   disk.
+
+                   The underlying file is always locked at the time
+                   "postsave" is invoked.
+
+                   Invocations of "presave" and "postsave" are always
+                   paired.
+
+                   The parameter $old is a copy of the object as of the time
+                   it was first loaded into memory.
+
+                   The parameter @psv is the return value from "presave".
+
+                   "postsave" may not invoke "save()", "commit()", or
+                   "savelater()".
+
+
+
+    "precommit($old)"
+                   "precommit" is invoked just before files are locked in
+                   "commit()". This is before "presave()".
+
+                   Unlike "presave()" and "postsave()", "precommit()" may
+                   use "savelater()" to add new objects to the transaction.
+                   If it does so, it must return a true value.
+
+
+
+    "id()"         Object::Transaction expects to be able to find the unique
+                   identifier (id) for each object as "$obj-"{'ID'}>. If
+                   that isn't the case, you can override the "id" function
+                   to provide an alternative.
+
+    "new()"        The new method that Object::Transaction defines is
+                   minimal. It does a callback to "initialize()" as an
+                   additional hook for customization.
+
+PUBLIC MEMBER DATA
+    The following data members are used by Object::Transaction.
+
+    "ID"           Object::Transaction expect to find the id for an object
+                   in "$obj-"{'ID'}>. This can be overridden by defining
+                   your own "id" function.
+
+    "OLD"          When an object is loaded into memory a copy is made. The
+                   copy can be found at "$obj-"{OLD}>. The copy should not
+                   be modified. The copy is explicitly passed to "presave"
+                   and "postsave".
+
+PRIVATE MEMBER DATA
+    Object::Transaction adds a few data members to each object for its own
+    internal use.
+
+    These are:
+
+            __frozen
+            __transfollowers
+            __transleader
+            __rollback
+            __removenow
+            __toremove
+            __transdata
+            __readonly
+            __trivial
+            __atcommit
+            __poison
+
+    None of these should be touched.
+
+FUNCTIONS
+    There are a few functions exported by Object::Transaction. These
+    functions are also available as methods. They are "transaction()",
+    "transaction_pending()", "uncache()", "commit()", and "abandon()".
+
+BUGS
+    A program or computer crash at just the wrong moment can allow an object
+    that should be deleted to escape deletion. Any future attempt to access
+    such an object will cause it to self-destruct.
+
+    In some situations objects will be saved even if niether "save()" nor
+    "savelater()" is invoked. This happens if "readlock()" is used and the
+    transaction leader object (one per transaction) choosen turns out to be
+    an object for which only "readlock()" was called.
+
+AUTHOR
+    David Muir Sharnoff <muir@idiom.com>
+
+COPYRIGHT
+    Copyright (C) 1999-2002, Internet Journals Corporation
+    <www.bepress.com>. Copyright (C) 2002, David Muir Sharnoff. All rights
+    reserved. License hearby granted for anyone to use this module at their
+    own risk. Please feed useful changes back to David Muir Sharnoff
+    <muir@idiom.com>.
+

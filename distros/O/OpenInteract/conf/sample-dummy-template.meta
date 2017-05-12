@@ -1,0 +1,9 @@
+# Identifies it uniquely within a package (e.g., 'myobj_list')
+name:     your-template-name
+# Name displayed in template list, brief (e.g., 'Listing of my objects')
+title:    title of template
+# The package name where this template resides
+package:  this-package-name
+# Everything else is description and can be as long as you wish
+This template lists my objects and is step 102 of my plan 
+for world domination.

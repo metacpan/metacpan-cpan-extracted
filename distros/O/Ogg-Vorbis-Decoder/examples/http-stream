@@ -1,0 +1,44 @@
+#!/usr/bin/perl -w
+
+# $Id: http-stream,v 1.1.1.1 2004/03/07 16:59:56 daniel Exp $
+# write out a wav file from an ogg stream
+
+use strict;
+use Audio::Wav;
+use Net::HTTP;
+use Ogg::Vorbis::Decoder;
+
+my $details = {
+	'bits_sample'       => 16,
+	'sample_rate'       => 44100,
+	'channels'          => 2,
+};
+
+sub main {
+
+	my $wav = Audio::Wav->new();
+	my $write = $wav->write('out.wav', $details);
+
+	my $http = Net::HTTP->new(
+		'Host' => 'neptuner.orbislumen.net:8000'
+	) || die $!;
+
+        $http->write_request(GET => '/seattletech.ogg', 'User-Agent' => "Mozilla/5.0");
+
+	# we don't care
+        my ($code, $mess, %h) = $http->read_response_headers;
+
+	my $decoder = Ogg::Vorbis::Decoder->open($http);
+
+	my $buffer;
+	while (my $len = $decoder->sysread($buffer)) {
+
+		last if $len <= 0;
+
+        	$write->write_raw($buffer);
+	}
+
+	$write->finish();
+}
+
+main();

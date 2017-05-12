@@ -1,0 +1,231 @@
+# --
+# AdminESCL.dtl - provides HTML form for AdminESCL
+# Copyright (C) 2001-2010 OTRS AG, http://otrs.org/
+# --
+# $Id: AdminESCL.dtl,v 1.8 2010/12/06 16:52:53 en Exp $
+# $OldId: AdminESCL.dtl,v 1.36 2010/11/05 17:38:16 ub Exp $
+# --
+# This software comes with ABSOLUTELY NO WARRANTY. For details, see
+# the enclosed file COPYING for license information (AGPL). If you
+# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# --
+
+<!-- dtl:block:Overview -->
+<div class="MainBox ARIARoleMain LayoutFixedSidebar SidebarFirst">
+    <h1>$Text{"SLA Escalation Management"}</h1>
+
+   <div class="SidebarColumn">
+
+<!-- dtl:block:ActionList -->
+        <div class="WidgetSimple">
+            <div class="Header">
+                <h2>$Text{"Actions"}</h2>
+            </div>
+             <div class="Content">
+                <ul class="ActionList">
+
+<!-- dtl:block:ActionOverview -->
+                    <li>
+                        <a href="$Env{"Baselink"}Action=$Env{"Action"}" class="CallForAction"><span>$Text{"Go Escalation overview"}</span></a>
+                    </li>
+<!-- dtl:block:ActionOverview -->
+
+<!-- dtl:block:ActionAdd -->
+                      <li>
+                        <a href="$Env{"Baselink"}Action=Admin" class="CallForAction"><span>$Text{"Go to Admin overview"}</span></a>
+                        </a>
+                    </li>
+<!-- dtl:block:ActionAdd -->
+                </ul>
+            </div>
+       </div>
+<!-- dtl:block:ActionList -->
+    </div>
+
+    <div class="ContentColumn">
+        <div class="WidgetSimple">
+<!-- dtl:block:OverviewList -->
+            <div class="Header">
+                <h2>$Text{"List"}</h2>
+            </div>
+            <div class="Content">
+
+                <table class="DataTable">
+                    <thead>
+                        <tr>
+                            <th>$Text{"SLA"}</th>
+                            <th>$Text{"Service"}</th>
+                            <th>$Text{"Comment"}</th>
+                            <th>$Text{"Valid"}</th>
+                            <th>$Text{"Changed"}</th>
+                            <th>$Text{"Created"}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+<!-- dtl:block:NoDataFoundMsg -->
+                        <tr>
+                            <td colspan="6">
+                                $Text{"No data found."}
+                            </td>
+                        </tr>
+<!-- dtl:block:NoDataFoundMsg -->
+<!-- dtl:block:OverviewListRow -->
+                        <tr>
+                            <td><a class="AsBlock" href="$Env{"Baselink"}Action=$Env{"Action"};Subaction=ESCLEdit;SLAID=$LQData{"SLAID"}">$QData{"Name"}</a></td>
+                            <td>$Text{"$Data{"Service"}"}</td>
+                            <td title="$QData{"Comment"}">$QData{"Comment","26"}</td>
+                            <td>$Text{"$Data{"Valid"}"}</td>
+                            <td>$TimeShort{"$QData{"ChangeTime"}"}</td>
+                            <td>$TimeShort{"$QData{"CreateTime"}"}</td>
+                        </tr>
+<!-- dtl:block:OverviewListRow -->
+                    </tbody>
+                </table>
+            </div>
+<!-- dtl:block:OverviewList -->
+
+<!-- dtl:block:ESCLEdit -->
+            <div class="Header">
+<!-- dtl:block:HeaderEdit -->
+                <h2>$Text{"SLA Escalation Matrix"}</h2>
+<!-- dtl:block:HeaderEdit -->
+            </div>
+            <div class="Content">
+
+                <form action="$Env{"CGIHandle"}" method="post" class="Validate">
+                    <input type="hidden" name="Action" value="$Env{"Action"}"/>
+                    <input type="hidden" name="Subaction" value="ESCLSave"/>
+                    <input type="hidden" name="SLAID" value="$QData{"SLAID"}"/>
+                    <fieldset class="TableLike">
+
+                        <label for="Name">$Text{"SLA"}:</label>
+                        <div class="Field">
+                            <input type="text" readonly="readonly" name="Name" id="Name" value="$QData{"Name"}" class="W50pc Validate_Required $QData{"NameInvalid"}" maxlength="200"/>
+                            <div id="NameError" class="TooltipErrorMessage"><p>$Text{"This field is required."}</p></div>
+                            <div id="NameServerError" class="TooltipErrorMessage"><p>$Text{"This field is required."}</p></div>
+                        </div>
+                        <div class="Clear"></div>
+# ---
+# ITSM
+# ---
+
+                        <label for="FirstResponseTime">$Text{"First response time"} ($Text{"minutes"}):</label>
+                        <div class="Field">
+                            <input type="text" readonly="readonly" name="FirstResponseTime" id="FirstResponseTime" value="$QData{"FirstResponseTime"}" class="W50px Validate_Number" maxlength="10"/>
+                            <div id="FirstResponseTimeError" class="TooltipErrorMessage"><p>$Text{"Please write only numbers!"}</p></div>
+                            <p>
+                            (<label>$Text{"Notify I "}</label><label for="FirstResponseRole1"></label> $Data{"FirstResponseRole1OptionStrg"}<label for="FirstResponseNotify1"></label> $Data{"FirstResponseNotify1OptionStrg"}
+                             <label>$Text{"Notify II "}</label><label for="FirstResponseRole2"></label> $Data{"FirstResponseRole2OptionStrg"}<label for="FirstResponseNotify2"></label> $Data{"FirstResponseNotify2OptionStrg"}
+                             <label>$Text{"Notify III "}</label><label for="FirstResponseRole3"></label> $Data{"FirstResponseRole3OptionStrg"}<label for="FirstResponseNotify3"></label> $Data{"FirstResponseNotify3OptionStrg"})
+                            </p>
+                            <p class="FieldExplanation">
+                                $Text{"0 = no escalation"} - 24 $Text{"hours"} = 1440 $Text{"minutes"} - $Text{"Only business hours are counted."}
+                            </p>
+                        </div>
+                        <div class="Clear"></div>
+
+                        <label for="UpdateTime">$Text{"Update time"} ($Text{"minutes"}):</label>
+                        <div class="Field">
+                            <input type="text" readonly="readonly" name="UpdateTime" id="UpdateTime" value="$QData{"UpdateTime"}" class="W50px Validate_Number" maxlength="10"/>
+                            <div id="UpdateTimeError" class="TooltipErrorMessage"><p>$Text{"Please write only numbers!"}</p></div>
+                            <p>
+                            (<label>$Text{"Notify I "}</label><label for="UpdateRole1"></label> $Data{"UpdateRole1OptionStrg"}<label for="UpdateNotify1"></label> $Data{"UpdateNotify1OptionStrg"}
+                             <label>$Text{"Notify II "}</label><label for="UpdateRole2"></label> $Data{"UpdateRole2OptionStrg"}<label for="UpdateNotify2"></label> $Data{"UpdateNotify2OptionStrg"}
+                             <label>$Text{"Notify III "}</label><label for="UpdateRole3"></label> $Data{"UpdateRole3OptionStrg"}<label for="UpdateNotify3"></label> $Data{"UpdateNotify3OptionStrg"})
+                            </p>
+                            <p class="FieldExplanation">
+                                $Text{"0 = no escalation"} - 24 $Text{"hours"} = 1440 $Text{"minutes"} - $Text{"Only business hours are counted."}
+                            </p>
+                        </div>
+                        <div class="Clear"></div>
+
+                        <label for="SolutionTime">$Text{"Solution time"} ($Text{"minutes"}):</label>
+                        <div class="Field">
+                            <input type="text" readonly="readonly" name="SolutionTime" id="SolutionTime" value="$QData{"SolutionTime"}" class="W50px Validate_Number" maxlength="10"/>
+                            <div id="SolutionTimeError" class="TooltipErrorMessage"><p>$Text{"Please write only numbers!"}</p></div>
+                            <p>
+                            (<label>$Text{"Notify I "}</label><label for="SolutionRole1"></label> $Data{"SolutionRole1OptionStrg"}<label for="SolutionNotify1"></label> $Data{"SolutionNotify1OptionStrg"}
+                             <label>$Text{"Notify II "}</label><label for="SolutionRole2"></label> $Data{"SolutionRole2OptionStrg"}<label for="SolutionNotify2"></label> $Data{"SolutionNotify2OptionStrg"}
+                             <label>$Text{"Notify III "}</label><label for="SolutionRole3"></label> $Data{"SolutionRole3OptionStrg"}<label for="SolutionNotify3"></label> $Data{"SolutionNotify3OptionStrg"})
+                            </p>
+                            <p class="FieldExplanation">
+                                $Text{"0 = no escalation"} - 24 $Text{"hours"} = 1440 $Text{"minutes"} - $Text{"Only business hours are counted."}
+                            </p>
+                        </div>
+                        <div class="Clear"></div>
+# ---
+# ITSM
+# ---
+
+# ---
+
+<!-- dtl:block:SLAItem -->
+<!-- dtl:block:InputKey -->
+                        <label for="$QData{"Name"}">$Text{"$Data{"Label"}"} $Text{"$Data{"Key"}"}:</label>
+                        <div class="Field">
+                            <input type="text" name="$QData{"Name"}" id="$QData{"Name"}" value="$QData{"SelectedID"}" class="W50pc"/>
+                        </div>
+                        <div class="Clear"></div>
+<!-- dtl:block:InputKey -->
+<!-- dtl:block:Input -->
+                        <label for="$QData{"Name"}">$Text{"$Data{"Label"}"}:</label>
+                        <div class="Field">
+                            <input type="text" name="$QData{"Name"}" id="$QData{"Name"}" value="$QData{"SelectedID"}" class="W50pc"/>
+                            <p class="FieldExplanation">
+                                $Text{"$Data{"Desc"}"}
+                            </p>
+                        </div>
+                        <div class="Clear"></div>
+<!-- dtl:block:Input -->
+<!-- dtl:block:TextArea -->
+                        <label for="$QData{"Name"}">$Text{"$Data{"Label"}"}:</label>
+                        <div class="Field">
+                            <textarea name="$QData{"Name"}" id="$QData{"Name"}" rows="$QData{"Rows"}" cols="$QData{"Cols"}">$QData{"SelectedID"}</textarea>
+                            <p class="FieldExplanation">
+                                $Text{"$Data{"Desc"}"}
+                            </p>
+                        </div>
+                        <div class="Clear"></div>
+
+<!-- dtl:block:TextArea -->
+<!-- dtl:block:Option -->
+                        <label for="$QData{"Name"}">$Text{"$Data{"Label"}"} $Text{"$Data{"Key"}"}:</label>
+                        <div class="Field">
+                            $Data{"Option"}
+                            <p class="FieldExplanation">
+                                $Text{"$Data{"Desc"}"}
+                            </p>
+                        </div>
+                        <div class="Clear"></div>
+<!-- dtl:block:Option -->
+<!-- dtl:block:Upload -->
+                        <label for="$QData{"Name"}">$Text{"$Data{"Label"}"} $Text{"$Data{"Key"}"}:</label>
+                        <div class="Field">
+                            <input name="$QData{"Name"}" id="$QData{"Name"}" type="file" class="fixed"/>
+                            <a href="">$QData{"Filename"}</a>
+                        </div>
+                        <div class="Clear"></div>
+<!-- dtl:block:Upload -->
+<!-- dtl:block:Password -->
+                        <label for="$QData{"Name"}">$Text{"$Data{"Label"}"} $Text{"$Data{"Key"}"}:</label>
+                        <div class="Field">
+                            <input type="password" name="$QData{"Name"}" id="$QData{"Name"}" value="" class="W50pc"/>
+                        </div>
+                        <div class="Clear"></div>
+<!-- dtl:block:Password -->
+<!-- dtl:block:SLAItem -->
+                        <div class="Field SpacingTop">
+                            <button class="Primary" type="submit" value="$Text{"Submit"}">$Text{"Submit"}</button>
+                            $Text{"or"}
+                            <a href="$Env{"Baselink"}Action=$Env{"Action"}">$Text{"Cancel"}</a>
+                        </div>
+                        <div class="Clear"></div>
+                    </fieldset>
+                </form>
+            </div>
+<!-- dtl:block:ESCLEdit -->
+        </div>
+    </div>
+    <div class="Clear"></div>
+</div>
+<!-- dtl:block:Overview -->

@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<SITE ID="Qutation">
+
+<NAME Lang="en-us">Quotations</NAME>
+<INFO Lang="en-us">academic information search</INFO>
+
+<URL Type="Start"><![CDATA[
+post://www.columbia.edu/cgi-bin/aglimpse?dbname=Bartlett&serverhost=gserv&serverport=8611&urlpath=%2Facis%2Fbartleby%2Fbartlett&indexdir=%2Fh%2Fcnet%2Fwebindex%2Facis%2Fbartleby%2Fbartlett&whole=&maxfiles=_HITS_&maxlines=8&query=_QUERY_
+]]></URL>
+
+
+
+<TEMPLATE><![CDATA[
+<dl><dt><a href="_URL_">_TITLE_</a>_PREVIEW_</dl>
+]]></TEMPLATE>
+</SITE>

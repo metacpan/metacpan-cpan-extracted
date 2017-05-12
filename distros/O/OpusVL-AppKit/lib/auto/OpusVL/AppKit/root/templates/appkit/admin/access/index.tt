@@ -1,0 +1,35 @@
+
+<h1> Access Control </h1>
+
+<table>
+
+    <caption>
+        Your Roles
+    </caption>
+
+[% FOR role IN c.user.roles %]
+
+    <tr>
+        <td>
+            [% role %]
+        </td>
+        <td>
+            <a href='[% c.uri_for( c.controller('AppKit::Admin::Access').action_for('show_role'),     [ role ] ) %] '>show</a>
+            <a href='[% c.uri_for( c.controller('AppKit::Admin::Access').action_for('delete_role'),   [ role ] ) %] '>del</a>
+        </td>
+    </tr>
+
+[% END %]
+
+
+</table>
+
+
+
+<form method='POST' action='[% c.uri_for( c.controller('AppKit::Admin::Access').action_for('addrole') )  %]'>
+
+    <input type='text' name='rolename' value=''>
+    <input type='submit' name='add_role' value='Add Role'>
+
+</form>
+

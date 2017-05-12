@@ -1,0 +1,206 @@
+OpenInteract: A robust web application framework built to run under Apache and mod_perl.
+
+QUICK INSTALL
+=========================
+
+ - Read the 'INSTALL' file also located in this directory.
+
+ - If you're upgrading from version 1.05 or earlier, please read the
+ UPGRADE file in this directory.
+
+WHAT IS IT?
+=========================
+
+OpenInteract is an extensible application server using Apache and
+mod_perl built for developers but also to be manageable almost
+entirely via the web browser. It includes:
+
+ - A robust system of components built on templates that can access
+ your data just about any way that you can think of.
+
+ - A very flexible separation of presentation and data access: you can
+ use one template for accessing data from different sources (e.g., a
+ listing of users from the system, from an LDAP server, from an NT/SMB
+ authentication controller, etc.) or you can use one set of data to
+ fill multiple templates.
+
+ - A consistent security mechanism allowing you to control security
+ for users and groups not only at the task level, but also at the
+ individual data object level.
+
+ - A simple user and group-management system that allows users to
+ create their own accounts and an administrator to assign them to one
+ or more groups.
+
+ - A convenient packaging system that makes it simple for developers
+ to distribute code, configuration and all other information necessary
+ for an application. It also makes the installation and upgrading
+ processes very straightforward and simple.
+
+ - An integrated, database-independent method for distributing data
+ necessary for a package. You should be able to install any
+ package on any database that's been tested with OpenInteract. (Some
+ of this work must be done by the package authors, but OpenInteract
+ tries to make this as painless as possible.)
+
+OpenInteract uses a number of CPAN modules, relying heavily on the
+following:
+
+ - SPOPS (Simple Perl Object Persistence with Security, which was
+ developed in tandem with this framework)
+
+ - Template Toolkit (version 2+ is required)
+ 
+ - Apache::Session
+
+Many others are also used -- why reinvent the wheel when there are so
+many lying around and so many interesting problems to conquer? 
+
+OpenInteract is usable *right now*, out of the box. That doesn't mean
+we're sitting on our laurels -- we're working on a number of different
+features to OpenInteract which will be added soon to a separate file
+'TODO', found in this directory.
+
+
+HOW DO I INSTALL IT?
+=========================
+
+(1) Read and follow the directions in INSTALL.
+
+(2) Read and follow the directions in INSTALL.
+
+(3) Return to step (1).
+
+
+IS THERE MORE INFORMATION?
+=========================
+
+Check out the HTML documents in the 'doc/' directory where you
+unpacked this distribution. These documents are also copied to the
+base installation directory when you install OpenInteract and from
+there to individual websites as you create them. This way someone
+creating a website can see the docs through her browser.
+
+Documentation also comes in the individual packages and modules within
+the packages. Some packages are better documented than others, but
+we're working on bringing them all up to a stellar level.
+
+
+WHAT NEXT?
+=========================
+
+We're interested in your feedback on a number of topics. In particular:
+
+ - How did you find the installation process? Was OpenInteract simple
+ to install and configure?
+
+ - How easy was it for you to create an application, install its SQL
+ structures and data and import its templates?
+
+ - Which documentation do you feel is lacking?
+
+As you might tell, we're keenly aware that installation and initial
+understanding can be a big barrier to entry with a fairly substantial
+application like this. Feedback is crucial for us to plug the holes.
+
+We also hope to extend certain features (such as users and groups) to
+different types of data sources, like LDAP directories. Other
+applications of OpenInteract really depend on what you'd like it to
+do!
+
+Updates can be found at:
+
+ http://www.openinteract.org/
+
+and
+
+ http://sourceforge.net/projects/openinteract/
+
+
+FINALLY
+=========================
+
+Thanks for trying out OpenInteract! If you have any questions,
+comments, thoughts, diatribes, e-mail them to Chris Winters
+<chris@cwinters.com>.
+
+
+COPYRIGHT AND DISCLAIMERS
+=========================
+
+OpenInteract is Copyright (c) 2001-2002 intes.net, inc.. All rights
+reserved.
+
+The OpenInteract library(**) is free software; you can redistribute it
+and/or modify it under the terms of the Perl Artistic License or the
+GNU General Public License as published by the Free Software
+Foundation; either version 2 of the License (see 'COPYING'), or (at
+your option) any later version.
+
+**"OpenInteract library" includes the core 'OpenInteract::' files: 
+
+ OpenInteract
+ OpenInteract::ApacheStartup
+ OpenInteract::Auth
+ OpenInteract::CommonHandler
+ OpenInteract::Config
+ OpenInteract::Config::GlobalOverride
+ OpenInteract::Config::Ini
+ OpenInteract::Config::IniFile
+ OpenInteract::Config::PerlFile
+ OpenInteract::Cookies::Apache
+ OpenInteract::Cookies::CGI
+ OpenInteract::DBI
+ OpenInteract::Error
+ OpenInteract::Error::Main
+ OpenInteract::Error::System
+ OpenInteract::Handler::GenericDispatcher
+ OpenInteract::LDAP
+ OpenInteract::Package
+ OpenInteract::PackageRepository
+ OpenInteract::Request
+ OpenInteract::Session
+ OpenInteract::Session::DBI
+ OpenInteract::Session::File
+ OpenInteract::Session::SQLite
+ OpenInteract::SPOPS
+ OpenInteract::SPOPS::DBI
+ OpenInteract::SPOPS::LDAP
+ OpenInteract::SQLInstall
+ OpenInteract::Startup
+ OpenInteract::Template::Context
+ OpenInteract::Template::Plugin
+ OpenInteract::Template::Process
+ OpenInteract::Template::Provider
+ OpenInteract::UI::Main
+ OpenInteract::Utility
+
+along the default configuration and documentation, etc. This also
+includes the core packages:
+
+ base
+ base_box
+ base_component
+ base_error
+ base_group
+ base_page
+ base_security
+ base_template
+ base_theme
+ base_user
+ lookup
+ object_activity
+ results_manage
+ system_doc
+
+and the following application packages:
+
+ classified
+ full_text
+ news
+
+Every other package, whether developed by intes.net, inc. or other
+party, is licensed under its own terms.
+
+=========================
+$Id: README,v 1.7 2002/05/07 05:35:33 lachoy Exp $

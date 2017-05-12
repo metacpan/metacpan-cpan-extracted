@@ -1,0 +1,66 @@
+
+=== version history of OODoc::Template
+
+version 0.16: Fri Jan 11 10:00:05 CET 2013
+	Improvements:
+	- use Log::Report for errors
+	- attributes can be quoted with '' and "" to permit \W
+
+version 0.15: Sun Jan  8 00:42:22 CET 2012
+
+	Improvements:
+	- do not run t/pod.t in devel environment.
+
+	Fixes:
+	- fix memory leak in object creation.
+	- missing "use File::Spec" in ::Template
+	  rt.cpan.org #73810 [Andreas Koenig]
+
+version 0.14: Mon Oct 20 09:38:36 CEST 2008
+
+	Improvements:
+	- accept dots and dashes in tags (macro names and variables)
+
+version 0.13: Mon Feb  4 22:24:18 CET 2008
+
+	Changes:
+	- macro name is not added to the attributes.
+
+version 0.12: Mon Jul 30 08:50:47 CEST 2007
+	Changes:
+	- the terminating /a in <!--{a}-->B<!--{a}-->C<!--{/a}-->
+	  now closes the first a, was the second.
+
+	Improvements:
+	- <!--{a}-->xx<!--{/a}--> was not permitted if a was a
+	  value (before, only ARRAY and HASH were permitted to control
+	  a container).  Now, a defined value with enable the block.
+	- report error when HASH or ARRAY are used where single value
+	  is needed.
+
+version 0.11: Fri Jul 27 11:32:08 CEST 2007
+	Changes:
+	- own code refs must pass back $attrs, $then, and $else
+
+	Improvements:
+	- test process() in VOID context via IO::Scalar, if IO::Scalar
+	  is installed
+	- skip test which uses open to ref-scalar when Perl < 5.8.0
+	- be more solid in handling missing data
+	- alternative (default) for missing template file
+	- added example for template file/alt
+	- produce error when part of attributes are not understood
+	- avoid need for quotes when a variable is part of an attribute value
+
+version 0.10: Tue Jul 24 23:39:55 CEST 2007
+	- Everything changed, except the concept.
+	- real tests!
+
+version 0.02: Fri Jun  8 17:14:26 CEST 2007
+	- Added t/00run.t to MANIFEST to stop complaints from
+	  the (automatic) distribution testers.
+	- added t/pod.t
+	- adapted to oodist
+
+version 0.01: Mon Oct 27 10:22:29 CET 2003
+	- Initial version of code and documentation.

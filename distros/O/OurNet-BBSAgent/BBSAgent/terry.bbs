@@ -1,0 +1,10 @@
+# $File: //depot/OurNet-BBSAgent/BBSAgent/terry.bbs $ $Author: autrijus $
+# $Revision: #3 $ $Change: 2829 $ $DateTime: 2002/01/10 14:54:36 $
+# Contributed by Smartboy <kcwu@ck.tp.edu.tw>
+# zh_TW.Big5: 交大資工克萊恩大地
+
+Terry
+terry.dragon2.net
+
+load maple3.board
+setv separator \x0d(?:\e\[36m(?:─)+)|(?:\e\[47;34m\x20路徑.+)\x20+\e\[m\e\[\d+;1H

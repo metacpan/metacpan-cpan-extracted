@@ -1,0 +1,9 @@
+0.03  2009-10-05 | added multichannel.pl example
+(will add PlayPen demo, but need to add addSoundFinishedHandler
+and addSoundLoopedHandler callback handlers)
+
+0.02  2009-10-04 | update for Ogre 1.6 and OIS 1.2
+- requires Ogre 1.6 and OIS 1.2 now,
+  no backward-compatibility intended
+
+0.01  2007-12-15 | initial release

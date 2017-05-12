@@ -1,0 +1,35 @@
+---
+version: 0.05
+date:    2011-06-08
+changes:
+- Fixed tests on earlier versions of Perl than 5.10
+- No functional changes
+---
+version: 0.04
+date:    2011-06-07
+changes:
+- Added tests for Perl 5.10 operators
+- Updated documentation
+- No functional changes
+---
+version: 0.03
+date:    2011-02-21
+changes:
+- reduce now supports chaining comparison ops
+- reduce now DWIMs when passed zero- or single-element lists
+- zip and cross now prohibit an opstring argument and always use 'infix:,'
+- zipwith and crosswith now require an opstring argument
+- hyper now supports hashes
+- hyper now supports unary op distribution in multi-dimensional structures
+---
+version: 0.02
+date:    2011-02-15
+changes:
+- Added lots of documentation
+- Added author tests
+- No functional changes
+---
+version: 0.01
+date:    2011-02-14
+changes:
+- First release

@@ -1,0 +1,1001 @@
+<h1>OpenInteract Developer's Guide</h1>
+
+<h1>Introduction</h1>
+
+<p>First, have you read the Illustrated Manager's Guide to
+OpenInteract and the OpenInteract Administrator's Guide?
+
+<P>We will take the following approach to explaining how things work
+in OpenInteract: first, we give you some overview information (you
+have read the stuff referred to in last paragraph, have you?), then we
+will explain things in a little more detail, and finally, along the
+way, we will show you how to build a simple package that displays data
+from a database (following tradition, this will be the famous fruit
+example database (table fruit, fields id, name, taste, price), so
+things don't get too complicated.</p>
+
+
+<h1>Packages</h1>
+
+<P>
+A package is all the code, SQL structures, initial data, configuration
+information and anything else necessary to implement functionality in
+OpenInteract.
+
+<P>
+In OpenInteract, packages implement the actual application
+functionality.  OpenInteract handles the storage interface (e.g.,
+putting your objects in a database), dispatches URL requests to your
+objects (this is called <EM>handling</EM> an <EM>action</EM>),
+security, authentication and authorization, and session management.
+
+<P>
+Applications need to define objects, which is how an application handles
+its state. It also needs to define how the objects are to be manipulated,
+which users can access them and how functionality is exposed to the user
+(by way of a URL-to-action mapping).
+
+<P>
+What goes into a package? In general, you will find:
+
+<UL>
+
+<LI><b>Perl module code</b>: This can include handler code, SPOPS object code
+and installation code.
+
+<LI><b>Configuration</b>: Generally this includes two files in the
+<code>conf/</code> directory: <code>action.perl</code> and
+<code>spops.perl</code>, both of which are discussed further below.
+
+<LI><b>Templates and Components</b>: Graphical interface to package
+functionality.  Normally these are HTML files interspersed with
+template processing commands which makes the data the package manages
+visible to the user.
+
+<LI><b>Installation information</b>: This includes the
+<code>package.conf</code> file along with the SQL installation class.
+
+<LI><b>Package data structures and data</b>: These are used by the SQL
+installation class to install tables and any initial data needed by
+the package. These data can also be installed to other tables in
+OpenInteract.
+
+<LI><b>Documentation</b>: The 'create_skeleton' command of
+<code>oi_manage</code> will create a preliminary POD file for you
+which documents your package.  You are strongly encouraged to fill in
+the blanks and add meaningful detail along with any other necessary
+files to let people know what functionality your package provides.
+
+</ul>
+
+<p>(If you are experiencing problems with the terms, take a look at
+the <a href="glossary.html">glossary</a> we provided. Even if you
+don't have problems with the terms we use, it might be a good idea to
+do so now.)
+
+<h1>Example: The Start</h1>
+
+<P>Obviously, OpenInteract comes with tools to install, uninstall and
+query currently installed packages. This greatly simplifies the task
+of creating, testing and distributing your application.
+
+<P>We will now set up a skeleton package (we don't want to do all this
+from scratch):
+
+<pre><font size="-1">
+$ oi_manage --base_dir /tmp/OpenInteract/ --package fruit create_skeleton
+Creating package skeleton in current directory.
+=========================
+
+Package fruit          : ok
+
+=========================
+Finished with create_skeleton!
+</font></pre>
+
+<p>Let's see what it did for us:
+
+<pre><font size="-1">
+$ find fruit/
+fruit/
+fruit/conf
+fruit/conf/spops.perl
+fruit/conf/action.perl
+fruit/data
+fruit/doc
+fruit/doc/fruit.pod
+fruit/doc/titles
+fruit/struct
+fruit/template
+fruit/template/dummy.meta
+fruit/template/dummy.tmpl
+fruit/script
+fruit/html
+fruit/html/images
+fruit/OpenInteract
+fruit/OpenInteract/Handler
+fruit/OpenInteract/SQLInstall
+fruit/OpenInteract/SQLInstall/Fruit.pm
+fruit/MANIFEST.SKIP
+fruit/package.conf
+fruit/Changes
+fruit/MANIFEST
+</font></pre>
+
+<p>
+Now, what does all this stuff mean to you?
+
+<P>
+<PRE><FONT SIZE="-1"> 
+fruit                      # Main directory
+fruit/conf                 # Configuration directory
+fruit/conf/spops.perl      # Persistent object(s) configuration
+fruit/conf/action.perl     # Action(s) configuration
+fruit/data                 # Package data/security directory
+fruit/doc                  # Documentation directory
+fruit/doc/fruit.pod        # Starter documentation
+fruit/doc/titles           # Map documentation name to subject
+fruit/struct               # Package table definition directory
+fruit/template             # Template directory
+fruit/template/dummy.meta  # Starter template meta file
+fruit/template/dummy.tmpl  # Starter template file
+fruit/script               # Tools program directory
+fruit/html                 # Static html directory
+fruit/html/images          # Image directory
+fruit/OpenInteract         # Object hierarchy directory
+fruit/OpenInteract/Handler # Package handler directory
+fruit/OpenInteract/SQLInstall # SQL installation handler directory
+fruit/OpenInteract/SQLInstall/Fruit.pm # Skeleton for SQL setup handler
+fruit/MANIFEST.SKIP        # Regexes to skip when creating MANIFEST
+fruit/package.conf         # Basic package configuration (name, author, ...)
+fruit/Changes              # Changelog of your package
+fruit/MANIFEST             # List of files in package
+</FONT></PRE>
+
+<P>
+You will normally need to edit/add the following:
+
+<P>
+<PRE><FONT SIZE="-1">
+mypkg/package.conf         # Add name, version, author information
+mypkg/MANIFEST             # Add names of distribution files
+mypkg/Changes              # Let people know about what you've improved/fixed
+mypkg/conf/spops.perl      # Describe the objects your package uses
+mypkg/conf/action.perl     # Map URLs to handlers in your package
+mypkg/data                 # Specify the initial data and security
+mypkg/struct               # Describe the tables used to store your objects
+mypkg/template             # HTML to display and manipulate your objects
+mypkg/OpenInteract         # Optional Perl modules defining object behavior
+mypkg/OpenInteract/Handler # Manipulate objects for desired functionality
+mypkg/doc/mypkg.pod        # Last but not least, tell the world about it
+</FONT></PRE>
+
+<P>
+By the way, the MANIFEST file can be created automatically. (Perl is
+great.) Here's how:
+
+<P>
+<PRE><FONT SIZE="-1"> 
+$ cd /path/to/mypackage
+$ perl -MExtUtils::Manifest -e 'ExtUtils::Manifest::mkmanifest()'
+</FONT></PRE>
+
+<P>That's it! If you have an old 'MANIFEST' file in the directory it
+will be copied to 'MANIFEST.bak'. Also note that files matching
+patterns in the 'MANIFEST.SKIP' file will not be included.
+
+<p>Now we'll step through what makes up a package and along the way
+edit the necessary files to make our own package.
+
+<H1>Package composition</H1>
+
+<P>
+Now that you've created a package already, you've seen most of its
+contents. (The ones you care about, anyway.) However, each package is
+a <code>OpenInteract::Package</code> object -- a normal SPOPS
+object. (An <a href="spops_overview.html">SPOPS overview</a> is
+included with this documentation, and you can find out much more from
+<code>perldoc SPOPS::Manual</code>.)
+
+<P>OpenInteract maintains a registry of installed packages in a central
+location. (To find the file, go to the <code>conf/</code> directory of
+your base OpenInteract installation. The
+<code>package_repository.perl</code> holds the information.)
+
+<P>This registry includes meta information about all currently
+installed packages -- author, install date, version, etc. You can
+browse the information using a command-line tool (named
+<code>oi_manage</code>) to see what is currently installed, along with
+querying the information to find dependencies, authors, etc.
+
+
+<h2>package.conf: General package information</h2>
+
+<p>
+Now, we need to edit our package information. We does this to identify
+our package to OpenInteract.
+
+<pre><font size="-1">
+$ cd fruit/
+$ cat package.conf
+name           fruit
+version        0.01
+author         Who AmI <me@whoami.com>
+url            http://www.whereami.com/
+sql_installer  OpenInteract::SQLInstall::Fruit
+description
+Description of your package goes here.
+</font></pre>
+
+<p>After some editing...</p>
+
+<pre><font size="-1">
+$ cat package.conf
+name           fruit
+version        0.01
+author         wizards@openinteract.org
+url            http://www.openinteract.org/
+sql_installer  OpenInteract::SQLInstall::Fruit
+description 
+Demo package for showing how to build an OpenInteract package.
+Traditional style, fruit flavor.
+</font></pre>
+
+<p>The only non-obvious thing here is the <code>sql_installer</code>
+stuff - it is the name of a class that contains code that tells the
+<code>oi_manage</code> tool how to setup the database structure and
+the initial data for your package. When you run the command
+<code>create_skeleton</code>, <code>oi_manage</code> creates a simple
+one for you to which you'll have to add names of SQL files and
+installer data files as needed.</p>
+
+
+<h2>conf/spops.perl: Describe package objects</h2>
+
+<p>Now we need to define the objects that we want to use to show our
+fruit data to the world.  We do this by editing the
+<code>spops.perl</code> file. This file is in fact just input for a
+template processing mechanism somewhere deep in the OpenInteract
+framework that will generate Perl code for your object.
+
+<pre><font size="-1">
+$ cat conf/spops.perl
+# This is a sample spops.perl file. Its purpose is to define the
+# objects that will be used in your package. Each of the keys is
+# commented below.
+
+# If you do not plan on defining any objects for your package, then
+# you can skip this discussion and leave the file as-is.
+
+# Note that you must edit this file by hand -- there is no web-based
+# interface for editing a package's spops.perl (or other)
+# configuration files.
+
+# You can have any number of entries in this file, although they
+# should all be members of the single hashref (any name is ok) in the
+# file.
+
+# The syntax for this file is checked when you do a 'check_package'
+# with the 'oi_manage' tool -- this is a good idea to do.
+
+# Finally, you can retrieve this information (some in a slightly
+# different format) at anytime by doing:
+#
+#   my $hashref = $object_class->CONFIG;
+# or
+#   my $hashref = $R->object-alias->CONFIG;
+
+# For more information about the SPOPS configuration process, see
+# 'perldoc SPOPS::Configure' and 'perldoc SPOPS::Configure::DBI'
+
+$spops = {
+
+# 'object-alias' - Defines how you can refer to the object class
+# within OpenInteract. For portability and a host of other reasons, OI
+# sets up aliases for the SPOPS object classes so you can refer to
+# them from $R. For instance, if you are in an application 'MyApp':
+#
+#  my $user_class = $R->user;
+#  print ">> User Class: <<$user_class>
+#
+#  Output: '>> User Class: <<MyApp::User>>'
+#
+# This way, your application can do:
+#
+#  my $object = $R->myobjectalias->fetch( $object_id );
+#
+# and not care about the different application namespaces and such.
+#
+# Note that the 'alias' key allows you to setup additional aliases for
+# this object class.
+
+#            'user' => {
+
+# class - Defines the class this object will be known by. When you
+# develop you'll refer to it here as 'OpenInteract::Blah' -- when the
+# package is applied to a website, the class will be modified by
+# OpenInteract to be in that website's namespace.
+
+#              class        => 'OpenInteract::User',
+
+# code_class - Perl module from which we read subroutines into the
+# namespace of this class. This is *entirely optional*, only needed if
+# you have additional behaviors to program into our object.
+
+#              code_class   => 'OpenInteract::User',
+
+# isa - Define the parents of this class. Every class should have at
+# least 'OpenInteract::SPOPS::DBI' or 'OpenInteract::SPOPS::LDAP' and
+# some sort of SPOPS implementation, usually 'SPOPS::DBI'
+
+#              isa          => [ qw/ OpenInteract::SPOPS::DBI  SPOPS::Secure
+#                                    SPOPS::DBI::MySQL  SPOPS::DBI / ],
+
+# field - List of fields/properties of this object
+
+#              field        => [ qw/ user_id first_name last_name email
+#                                    login_name password theme_id / ],
+
+# id_field - Name of primary key field -- this only identifies the
+# object uniquely. You still need to deal with generating new values,
+# either by an auto-incrementing mechanism (in which case you need to
+# use the appropriate SPOPS::DBI class) or something else.
+
+#              id_field     => 'user_id',
+
+# increment_field - Whether to use (or be aware of) auto-incrementing
+# features of your database driver.
+
+#              increment_field => 1,
+
+# no_insert - Fields for which we should not try to insert
+# information, ever. If you're using a SPOPS implementation (e.g.,
+# 'SPOPS::DBI::MySQL') which generates primary key values for you, be
+# sure to put your 'id_field' value here.
+
+#              no_insert    => [ qw/ user_id / ],
+
+# no_update - Fields we should never update
+
+#              no_update    => [ qw/ user_id / ],
+
+# skip_undef - Values for these fields will not be inserted/updated at
+# all if the value within the object is undefined. This, along with
+# 'sql_defaults', allows you to specify default values.
+
+#              skip_undef   => [ qw/ theme_id / ],
+
+# sql_defaults - List fields for which a default is defined. Note that
+# SPOPS::DBI will re-fetch the object after first creating it if you
+# have fields listed here to ensure that the object always reflects
+# what's in the database.
+
+#              sql_defaults => [ qw/ theme_id / ],
+
+# base_table - Name of the table we store the object tinformation
+# in. Note that if you have 'db_owner' defined in your application's
+# 'server.perl' file (in the 'db_info' key), then SPOPS will prepend
+# that (along with a period) to the table name here. For instance, if
+# the db_owner is defined to 'dbo', we would use the table name
+# 'dbo.sys_user'
+
+#              base_table   => 'sys_user',
+
+# alias - Additional aliases to use for referring to this object
+# class. For instance, if we put 'project_user' here we'd be able to
+# retrieve this class name by using '$R->user' AND '$R->project_user'.
+
+#              alias        => [],
+
+# has_a - Define a 'has-a' relationship between objects from this
+# class and any number of other objects. Each key in the hashref is an
+# object class (which gets translated to your app's class when you
+# apply the package to an application) and the value is an arrayref of
+# field names. The field name determines the name of the routine
+# created: if the field name matches up with the 'id_field' of that
+# class, then we create a subroutine named for the object's
+# 'object-alias' field. If the field name does not match, we append
+# '_{object_alias}' to the end of the field. (See 'perldoc
+# SPOPS::Configre' for more.)
+
+#              has_a        => { 'OpenInteract::Theme' => [ 'theme_id' ], },
+
+# links_to - Define a 'links-to' relationship between objects from
+# this class and any number of other objects. This may be modified
+# soon -- see 'perldoc SPOPS::Configure::DBI' for more.
+
+#              links_to     => { 'OpenInteract::Group' => 'sys_group_user' },
+
+# creation_security - Determine the security to apply to newly created
+# objects from this class. (See 'SPOPS::Secure')
+
+#              creation_security => {
+#                 u   => 'WRITE',
+#                 g   => { 3 => 'WRITE' },
+#                 w   => 'READ',
+#              },
+
+# track - Which actions should we log? True value logs action, false
+# value does not.
+
+#              track => {
+#                 create => 0, update => 1, remove => 1
+#              },
+
+# display - Allow the object to be able to generate a URL to display itself.
+
+#              display => { url => '/User/show/', class => 'OpenInteract::Handler::User', method =>
+ 'show' },
+
+# name - Either a field name or a coderef (first and only arg =
+# object) to generate a name for a particular object.
+
+#              name => sub { return $_[0]->full_name },
+
+# object_name - Name of this class of objects
+
+#              object_name => 'User',
+#            },
+
+};
+</font></pre>
+
+<p>Wow, that was quite a mouthful. Do we really need all this stuff?
+Yes. But it's actually easy to modify. And it has a lot of comments,
+as you might have noticed. Just follow the online instructions. BTW,
+you are expected to edit this stuff, and to uncomment all the lines
+that do apply to you.</p>
+
+<p>After some editing, showing only the defined fields...</p>
+
+<pre><font size="-1">
+$ cat conf/spops.perl
+$spops = {
+            'fruit' => {
+              class        => 'OpenInteract::Fruit',
+              isa          => [ qw/ OpenInteract::SPOPS::DBI  SPOPS::Secure
+                                    SPOPS::DBI::MySQL  SPOPS::DBI / ],
+              field        => [ qw/ id name taste price / ], 
+              id_field     => 'id',
+              increment_field => 1,
+              sequence_name => 'oi_fruit_seq',
+              no_insert    => [ qw/ id / ],
+              no_update    => [ qw/ id / ],
+              base_table   => 'fruit',
+              creation_security => {
+                 u   => 'WRITE',
+                 g   => { 3 => 'WRITE' },
+                 w   => 'READ',
+              },
+              track => { create => 1, update => 1, remove => 1 },
+              display => { url => '/Fruit/' },
+              name => 'name', 
+              object_name => 'fruit',
+            },
+};
+</font></pre>
+
+
+<h2>struct/ and data/: Describe SQL structures and data</h2>
+
+<p>Having defined our Fruit object, we will specify the table
+structure in the database that is used to store our Fruit
+objects. Additionally, we will specify some initial data to go into
+those tables.
+
+<p>All SQL data structures go into the <code>struct/</code> directory,
+and you should have only one table per file.</p>
+
+<p>[ ... editing ... ]</p>
+
+<pre><font size="-1">
+$ cat struct/fruit.sql
+create table fruit (
+    id &#037;&#037;INCREMENT&#037;&#037;,
+    name varchar(255),
+    taste varchar(255),
+    price varchar(255),
+    primary key (id)
+)
+</font></pre>
+
+<p>That funny <code>&#037;&#037;INCREMENT&#037;&#037;</code> thing in
+there is an OpenInteract feature: it tells OpenInteract to
+automatically generate an id for every object we insert into the
+table, making an "autoincrement id" command for most
+databases. However, databases like Oracle, PostgreSQL and InterBase,
+doesn't support autoincrementing fields, and we need to manage this
+with a <code>sequence</code>. (In InterBase parlance this is a
+<code>generator</code>.)</p>
+
+<p>Due to this we need to create a file for the sequence (for
+PostgreSQL and Oracle) and for the generator. Note that we need to
+make the sequence/generator name the same as we set in our
+<code>conf/spops.perl</code> file under the <code>sequence_name</code>
+key. (Normally we'd also create a special Oracle-friendly version of
+the table, but since this is a demo and the <code>varchar</code>
+(vs. <code>varchar2</code>) fields will serve our purpose we'll skip
+this step.)</p>
+
+<p>[ ... editing ... ]</p>
+
+<pre><font size="-1">
+$ cat struct/fruit_sequence.sql
+CREATE SEQUENCE oi_fruit_seq
+
+$ cat struct/fruit_generator.sql
+CREATE GENERATOR oi_fruit_seq
+</font></pre>
+
+
+<p>Now, some data. All data goes into the (you guessed it!)
+<code>data/</code> directory in your package.</p>
+
+<p>[ ... editing ... ]</p>
+
+<pre><font size="-1">
+$ cat data/fruit-initial-data.perl
+$data = [
+    { 
+        spops_class => 'OpenInteract::Fruit',
+        field_order => [ qw( name taste price ) ],
+    }, 
+    [ "Apple", "slightly sour", "1.00" ],
+    [ "Banana", "sweet", "1.00" ],
+    [ "Cherry", "red", "0.05" ],
+    [ "Tomato", "yes, this is a fruit - look it up in the dictionary", "1.00" ],
+];
+
+</font></pre>
+
+<p>Yes, this is actually a Perl data structure, and not SQL. It's more
+database-independent that way.</p>
+
+<p>We have now to create a special class that will do the setup for
+our data in the database. We just edit the template provided for us.
+Note how we handle the special cases for Oracle, PostgreSQL and
+InterBase users, and how this could be extended to manage any other
+nonstandard database users.</p>
+
+<p>[ ... editing ... ]</p>
+
+<pre><font size="-1">
+$ cat OpenInteract/SQLInstall/Fruit.pm
+(including the non-commented lines)
+package OpenInteract::SQLInstall::Fruit;
+
+use strict;
+use vars qw( %HANDLERS );
+
+@OpenInteract::SQLInstall::Fruit::ISA = qw( OpenInteract::SQLInstall );
+
+my %files = (
+ tables     => [ 'fruit.sql' ],
+ tables_seq => [ 'fruit.sql', 'fruit_sequence.sql' ],
+ tables_ib  => [ 'fruit.sql', 'fruit_generator.sql' ],
+ data     => [ 'fruit-initial-data.dat' ],
+ security => [ 'install_security.dat' ],
+);
+
+%HANDLERS = (
+ create_structure => { '_default_' => [ 'create_structure',
+                                        { table_file_list => $files{tables} } ],
+                       'Pg'        => [ 'create_structure',
+                                        { table_file_list => $files{tables_seq} } ],
+                       'Oracle'    => [ 'create_structure',
+                                        { table_file_list => $files{tables_seq} } ],
+                       'InterBase' => [ 'create_structure',
+                                        { table_file_list => $files{tables_ib} } ],
+ },
+ install_data     => { '_default_' => [ 'install_data',
+                                        { data_file_list => $files{data} } ] },
+ install_security => { '_default_' => [ 'install_data',
+                                        { data_file_list => $files{security} } ] },
+);
+
+1;
+</font></pre>
+
+<p>Since we're just in development, we won't actually install these
+structures and data just yet. We'll do that below once we're done
+editing templates and other information.</p>
+
+<h2>template/: display your objects</h2>
+
+<p>Now we have a nice little table in our database (at least in
+theory), and objects that will be able to fetch and store themselves
+there. But we still need to show this to the world. That's where
+templates come in.</p>
+
+<P>Basically, a template is just a file of text that contains special
+directives that will be processed by a template processor (the
+Template Toolkit in this case). Our package will define a handler that
+gets the objects from the database, and hand their attribute values
+over to the template processor. The template processor in turn will
+replace the template directives in the file with the corresponding
+object attribute values. You will usually have more than one template.</p>
+
+
+<p>Some template basics (you should take the time to read the <a
+href="templates.html">OpenInteract template documentation</a> - for
+more advanced uses of templates, you might want to have a look at the
+documentation for the Template Toolkit.</p>
+
+<P>
+<PRE><FONT SIZE="-1"> &lt;p&gt;Welcome back 
+   &lt;font color=&quot;red&quot;&gt;[% OI.login.full_name %]&lt;/font&gt;!&lt;/p&gt;
+</FONT></PRE>
+
+<P>
+When run through the template processing engine with a normal user
+object in the 'login' key of the 'OI' plugin, this will result in:</p>
+
+<PRE><FONT SIZE="-1"> &lt;p&gt;Welcome back 
+   &lt;font color=&quot;red&quot;&gt;Charlie Brown&lt;/font&gt;!&lt;/p&gt;
+</FONT></PRE>
+
+<P>So the information between the ' and ' symbols
+('OI.login.full_name') was replaced by other text which was dependent
+on the user who was viewing the page. If another user viewed the page,
+she might have seen:
+
+<P>
+<PRE><FONT SIZE="-1"> &lt;p&gt;Welcome back 
+   &lt;font color=&quot;red&quot;&gt;Peppermint Patty&lt;/font&gt;!&lt;/p&gt;
+</FONT></PRE>
+
+<P>OpenInteract provides a number of information and behaviors for you
+in every template you write. However, you can also provide your
+templates access to query results from the various data stores that
+SPOPS provides.</p>
+
+
+<P>Now, let's start building our own:
+
+<p>[ ... editing again ... ]</p>
+
+<pre><font size="-1">
+$ cat template/fruit-display.tmpl
+&lt;h1&gt;Fruits in store&lt;/h1&gt;
+&lt;p&gt;This is what is in store right now:&lt;/p&gt;
+
+&lt;div align="center"&gt;
+
+[% INCLUDE table_bordered_begin( table_width = '50%' ) -%]
+
+[% INCLUDE header_row( labels = [ 'Item', 'Description', 'Price (in local units)' ] ) -%]
+
+[% FOREACH fruit = fruits_in_store -%]
+&lt;tr valign="top" bgcolor="[% PROCESS row_color( count = loop.count ) %]"&gt;
+  &lt;td&gt;[% fruit.name %]&lt;/td&gt;
+  &lt;td&gt;[% fruit.taste %]&lt;/td&gt;
+  &lt;td&gt;[% fruit.price %]&lt;/td&gt;
+&lt;/tr&gt;
+[% END -%]
+
+[% INCLUDE table_bordered_end -%]
+
+</div>
+
+&lt;p&gt;Thank you for looking at our modest fruit assortment!
+&lt;p&gt;The Management
+</font></pre>
+
+<p>Eek, that looks a little scary at first! All those square-bracket
+tags are special directives for the <a
+href="http://www.template-toolkit.org/">Template Toolkit</a>, a very
+powerful system which provides its own "mini language" to allow
+processing commands to be inserted into the HTML which describe common
+elements, and any data passed to the template processor. Don't worry
+too much for now about all these tags, but notice the way it loops
+over the <code>fruits_in_store</code> data from our fruit table, and
+writes out the name, taste and price of each row.</p>
+
+
+<h2>OpenInteract/Handler/: Manipulate objects for desired functionality</h2>
+
+<p>Now, the fun part! We will write a handler that fetches our objects
+from the database, puts the data into our template, and returns the
+resulting HTML for handing it off to the browser.</p>
+
+<p>[ ... editing again ... ]</p>
+
+<pre><font size="-1">
+$ cat OpenInteract/Handler/Fruit.pm
+package OpenInteract::Handler::Fruit;
+
+use strict;
+
+$OpenInteract::Handler::Fruit::VERSION = '0.02';
+$OpenInteract::Handler::Fruit::author = 'chris@cwinters.com';
+
+sub handler {
+  my ( $class, $p ) = @_;
+  my $R = OpenInteract::Request->instance;
+  my ( $error_msg );
+  my $fruits = eval { $R->fruit->fetch_group({ 'order' => 'name' }) };
+  if ( $@ ) {
+      $error_msg = "Found error when trying to fetch fruit: " .
+                   SPOPS::Error->get->{system_msg};
+  }
+  my $params = { fruits_in_store => $fruits, error_msg => $error_msg };
+  $R->{page}{title} = 'All Fruit in Store';
+  return $R->template->handler( {}, $params,
+                                { name => 'fruit::fruit-display' } );
+}
+
+1;
+</font></pre>
+
+<h2>conf/action.perl:  Map URLs to handlers in your package</h2>
+
+<p>Well, after having written this handler - how will it get called by
+the user?</p>
+
+<p>This is what the <code>conf/action.perl</code> file is
+for. Remember, it maps URLs to handlers. (See <a
+href="actions.html">this guide to actions</a> for more
+information.) So, we simply put in a URL (we just make one up -
+that's the nice thing with dynamic web pages), and map it to our
+handler routine. Then, we the user types in the URL, or clicks on a
+link that contains the URL, our handler will magically get called,
+returns its HTML, and the user can have a look at our Fruit objects.</p>
+
+<p>[ ... editing again ... ]</p>
+
+<pre><font size="-1">
+
+$ cat conf/action.perl
+(only non-commented lines shown)
+$action = {
+   'fruit' => {
+     class   => 'OpenInteract::Handler::Fruit',
+     method  => 'handler',
+   },
+};
+</font></pre>
+
+
+<h2>doc/mypackage.pod - Last but not least, tell the world about it</h2>
+
+<p>Documentation of the Fruit package is left as an exercise for the
+reader. Go read <code>perldoc perlpod</code>. A starter documentation
+file is available in <code>doc/package.pod</code> when you run
+<code>oi_manage</code> to create a package skeleton. (Aren't we nice?)</p>
+
+<h2>MANIFEST - Add names of distribution files</h2>
+
+<p>Now we need to install our package. And for that, we need to
+package it up. So, which files do we need in there? Well, a first
+approximation would be just all the files in the current directory and
+its subdirectories.  This can be done automatically. (Perl is great.)
+Here's how:
+
+<PRE><FONT SIZE="-1"> 
+$ cd fruit
+$ perl -MExtUtils::Manifest -e 'ExtUtils::Manifest::mkmanifest()'
+</FONT></PRE>
+
+<P>
+That's it! If you have an old 'MANIFEST' file in the directory it will be
+copied to 'MANIFEST.bak'. Also note that files matching patterns in the
+'MANIFEST.SKIP' file will not be included. Cool.
+
+<h1>Installing our package</h1>
+
+<p>(See also the <a href="admin.html">Administrator's Guide to
+OpenInteract</a>.)
+
+<p>
+This is the sequence of commands that will install our package
+(together with the output):
+
+<p>Preparing the package for distribution:
+
+<pre><font size="-1">
+
+$ perl -MExtUtils::Manifest -e 'ExtUtils::Manifest::mkmanifest()'
+Added to MANIFEST: Changes
+Added to MANIFEST: MANIFEST
+Added to MANIFEST: OpenInteract/Handler/Fruit.pm
+Added to MANIFEST: OpenInteract/SQLInstall/Fruit.pm
+Added to MANIFEST: conf/action.perl
+Added to MANIFEST: conf/spops.perl
+Added to MANIFEST: data/fruit-initial-data.perl
+Added to MANIFEST: doc/fruit.pod
+Added to MANIFEST: doc/titles
+Added to MANIFEST: package.conf
+Added to MANIFEST: struct/fruit.sql
+Added to MANIFEST: struct/fruit_generator.sql
+Added to MANIFEST: struct/fruit_sequence.sql
+Added to MANIFEST: template/fruit-display.tmpl
+
+$ oi_manage --package_dir ./ check_package
+Running check_package...
+=========================
+
+Status of the packages you requested to be checked:
+fruit  OK: 
+-- File (conf/action.perl) ok
+-- File (conf/spops.perl) ok
+-- File (OpenInteract/SQLInstall/Fruit.pm) ok
+-- File (OpenInteract/Handler/Fruit.pm) ok
+-- package.conf: ok
+-- MANIFEST files exist: ok
+-- MANIFEST extra file check: ok
+
+
+=========================
+Finished with check_package!
+
+$ oi_manage export_package
+Running export_package...
+=========================
+
+Package fruit: checking MANIFEST for discrepancies
+Looks good
+
+Package fruit: checking filesystem for files not in MANIFEST
+Looks good
+
+Status of the packages you requested to be exported:
+fruit
+  OK: Version 0.12 distribution to /home/oi_wizards/work/OpenInteract/doc/fruit/fruit-0.12.tar.gz
+
+=========================
+Finished export_package!
+</font></pre>
+
+<p>Installing the package into the local OpenInteract package
+registry:</p>
+
+<pre><font size="-1">
+$ oi_manage --base_dir /tmp/OpenInteract --package_file fruit-0.01.tar.gz install_package
+Running install_package...
+=========================
+
+Installed package: fruit-0.01
+
+=========================
+Finished installing package!
+</font></pre>
+
+<p>Applying the package to our website:
+
+<pre><font size="-1">
+$ oi_manage --base_dir /tmp/OpenInteract --website_dir /home/oi_wizards/work/myOI --package fruit apply_package
+Running apply_package...
+=========================
+
+Status of the packages you requested to be applied:
+fruit (0.12)
+  OK
+
+=========================
+Finished applying package!
+</font></pre>
+
+
+<p>Setting up tables and data:
+
+<pre><font size="-1">
+$ oi_manage --base_dir /tmp/OpenInteract --website_dir /home/oi_wizards/work/myOI --package fruit test_db
+Running test_db...
+=========================
+
+Status of the database test:
+OK: 
+ -- Basic connect: ok
+ -- Basic use database: ok
+
+=========================
+Finished test_db!
+
+$ oi_manage --base_dir /tmp/OpenInteract --website_dir /home/oi_wizards/work/myOI --package fruit install_sql
+Running install_sql...
+=========================
+
+Status of the packages requested for SQL install:
+fruit (0.11)
+  OK: 
+      
+      Structure:
+        * Created table from (fruit.sql): ok
+        * Created table from (fruit_sequence.sql): ok
+      Data: 
+        * Created (4) SPOPS objects (from
+      fruit-initial-data.dat): ok
+      Security: 
+        * Created (8) SPOPS objects (from
+      install_security.dat): ok
+
+Important Notes
+-------------------------
+
+none
+
+=========================
+Finished install_sql!
+</font></pre>
+
+<p>The package is installed now. After restarting the Apache server,
+typing in the URL we provided above ('fruit' from the
+<code>conf/action.perl</code> we edited above) shows our modest fruit
+assembly. See how easy it is to prepare dynamic web pages with
+OpenInteract.
+
+<h1>The next steps - Suggested Readings</h1>
+
+<p>For any real-world application, you will obviously have to do
+better than our little fruit example.  But you are a developer. We
+will not insult your intelligence by providing you with hundreds of
+pages of little modifications to our fruit example. You now need to
+dive into the details. Here's how to.
+
+<p>Read more documentation (see the online system documentation in
+your installation - you can get it by clicking on the "System
+Documentation" tab in the Admin Tools section once you get
+OpenInteract running. If you don't, see the podfiles in the various
+packages.)
+
+<ul>
+<li><a href="templates.html">OpenInteract Templates</a>: Find out what
+how templates are processed and which information and behaviors are
+available to all templates
+
+<li><a href="actions.html">OpenInteract Actions</a>: Learn how URLs
+map to handlers
+
+<li><a href="components.html">OpenInteract Components</a>: What are
+components? What can I do with them?
+
+<li><a href="packages.html">OpenInteract Packages</a>: Details about
+how packages work
+
+<li><a href="security.html">Security in OpenInteract and SPOPS</a>:
+Find out how security works
+
+<li><a href="r_contents.html">Description and Contents of $R</a>: The
+$R ("big R") variable
+
+<li><a href="error_handling.html">Error Handling in OpenInteract</a>:
+Learn how OI handles errors
+
+<li>The SPOPS documentation spells out all the important facts about
+the database interface layer, and more details about security. See
+<code>SPOPS::Manual</code> for an overview and pointers to more
+information.
+
+<li><b>Template Toolkit</b>: all the gory details on writing template
+code <br> <code>perldoc Template</code> or<br> <a
+href="http://www.template-toolkit.org/">http://www.template-toolkit.org/</a>
+
+<li><b>Guide to POD: Plain Old Documentation</b><br> <code>perldoc
+perlpod</code> or<br> <a
+href="http://www.perldoc.com/perl5.6/pod/perlpod.html">http://www.perldoc.com/perl5.6/pod/perlpod.html</a>
+
+<li><b>mod_perl Guide</b>: This should be mandatory reading for
+ anyone administering or developing under mod_perl<br>
+ <A HREF="http://perl.apache.org/guide/">http://perl.apache.org/guide/</A></li>
+
+</ul>
+
+<p>Study how other people did it:
+
+<ul>
+
+ <li>The 'fruit' demo we put together above is distributed in the
+<code>eg/</code> directory where you unpacked OpenInteract.
+
+ <li>The News package is a good start.
+
+ <li>The Classified package is another simple package.
+
+</ul>
+
+<p>Experiment! (Some things will just work ... hopefully!)
+
+<p>Good luck ... we hope you will have fun! And remember the old LISP
+motto (by Alan Perlis):
+
+<p><cite>Invent and fit - have fits and reinvent!</cite>

@@ -1,0 +1,47 @@
+
+
+            OSPF Router with ID (10.188.1.15) (Process ID 1)
+
+		Net Link States (Area 0.0.0.0)
+
+  Routing Bit Set on this LSA
+  LS age: 580
+  Options: (No TOS-capability, DC)
+  LS Type: Network Links
+  Link State ID: 10.253.4.99 (address of Designated Router)
+  Advertising Router: 10.188.1.15
+  LS Seq Number: 80000001
+  Checksum: 0x77D0
+  Length: 32
+  Network Mask: /22
+	Attached Router: 10.188.1.15
+	Attached Router: 10.188.1.16
+
+
+		Net Link States (Area 10.188.0.0)
+
+  Routing Bit Set on this LSA
+  LS age: 1502
+  Options: (No TOS-capability, DC)
+  LS Type: Network Links
+  Link State ID: 10.188.1.15 (address of Designated Router)
+  Advertising Router: 10.188.1.15
+  LS Seq Number: 8000004D
+  Checksum: 0x1582
+  Length: 32
+  Network Mask: /24
+	Attached Router: 10.188.1.15
+	Attached Router: 10.188.1.10
+
+  Routing Bit Set on this LSA
+  LS age: 1739
+  Options: (No TOS-capability, No DC)
+  LS Type: Network Links
+  Link State ID: 10.188.50.10 (address of Designated Router)
+  Advertising Router: 10.188.1.10
+  LS Seq Number: 80000042
+  Checksum: 0x5AEC
+  Length: 32
+  Network Mask: /24
+	Attached Router: 10.188.50.50
+	Attached Router: 10.188.1.10

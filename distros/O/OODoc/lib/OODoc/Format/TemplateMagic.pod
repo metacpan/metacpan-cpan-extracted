@@ -1,0 +1,49 @@
+=encoding utf8
+
+=head1 NAME
+
+OODoc::Format::TemplateMagic - helpers to simplify use of Template::Magic
+
+=head1 INHERITANCE
+
+ OODoc::Format::TemplateMagic is extended by
+   OODoc::Format::Pod2
+
+=head1 SYNOPSIS
+
+ # Never instantiated directly.
+
+=head1 DESCRIPTION
+
+=head1 METHODS
+
+=over 4
+
+=item $obj-E<gt>B<zoneGetParameters>($zone|STRING)
+
+Takes a Template::Magic::Zone object to process the text after the
+tag.  You may also specify a string, for instance a modified
+attribute list.  The return is a list of key-value pairs with data.
+
+example: of valid arguments
+
+ <!--{examples expand NO list ALL}-->   # old style
+ <!--{examples expand => NO, list => ALL}-->
+ <!--{examples expand => NO,
+         list => ALL}-->
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of OODoc distribution version 2.01,
+built on November 11, 2015. Website: F<http://perl.overmeer.net/oodoc/>
+
+=head1 LICENSE
+
+Copyrights 2003-2015 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

@@ -1,0 +1,70 @@
+NAME
+    Object::Prototype - Prototypal Object Model a la Javascript
+
+SYNOPSIS
+      use Object::Prototype;
+      use What::Ever;
+      my $classical = What::Ever->new();
+      $classical->foo("bar");
+      is $classical->foo, "bar";
+      my $prototypal = Object::Prototype->new();
+      $prototypal->foo # bar, of course;
+      $prototypal->prototype( baz => sub { shift->foo . shift->bar });
+      $prototypal->baz() # foobar
+      $classical->baz()  # croaks
+
+DESCRIPTION
+    Object::Prototype implements JavaScript-like prototypal object system.
+    If you are familiar with JavaScript's object system, you should have no
+    problem using this module. If you are not, please read
+    <http://www.crockford.com/javascript/>.
+
+    There is one advantage over JavaScript, however. As the example above,
+    you can start with conventional, classical, perlish object as the
+    prototype. To find how it is done, just see the source.
+
+  EXPORT
+    None.
+
+  METHODS
+    new($obj [, \%methods ])
+      Deeply clones $obj and make it a prototypal object. You can optionally
+      add methods by passing a hashref like this;
+
+        { method => sub { ... }, method2 => sub { ... } }
+
+      Which is a shorthand for
+
+        my $p = Object::Prototype->new($obj);
+        $p->prototype( method  => sub { ... } );
+        $p->prototype( method2 => sub { ... } );
+
+    prototype($methname [ => \&code ]);
+      Accessor/Mutator of the object. You can implement the singleton method
+      that way.
+
+    constructor()
+      Returns the constructor object. Consider this as prototypal SUPER.
+
+        $p->prototype(method => sub{
+          my $self   = shift;
+          my $retval = $self->constructor->method(@_);
+          # do whatever to $retval
+          return $retval
+        });
+
+SEE ALSO
+    Class::SingletonMethod, Class::Classless
+
+    <http://www.crockford.com/javascript/>
+
+AUTHOR
+    Dan Kogai, <dankogai@dan.co.jp>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2006 by Dan Kogai
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.8 or, at
+    your option, any later version of Perl 5 you may have available.
+

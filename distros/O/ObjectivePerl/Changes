@@ -1,0 +1,6 @@
+Revision history for Perl extension ObjectivePerl.
+
+0.01  Mon Apr  5 21:14:24 2004
+	- original version; created by h2xs 1.22 with options
+		-AX -b 5.6.0 -n ObjectivePerl
+

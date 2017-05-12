@@ -1,0 +1,20 @@
+ >I have a question about using mmap independent of ObjectStore (but
+ >in the same process).
+ >
+ >I read the documentation for:
+ >   objectstore::set_reserve_as_mode(os_boolean new_mode)
+ >
+ >Does this have a performance impact on Solaris 2.x?
+
+No.
+
+ >If so, can I reserve address space before the mmap and
+ >turn off reserve address space after the mmap?
+
+No.  It's only done at initialization time.
+
+ >What is the usual way of solving this problem?  Or is
+ >it a problem?
+
+It's not a problem for you.
+

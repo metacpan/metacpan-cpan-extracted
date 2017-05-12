@@ -1,0 +1,393 @@
+=head1 NAME
+
+ORDB::AU::Census2006::BcpCdB44 - ORDB::AU::Census2006 class for the bcp_cd_b44 table
+
+=head1 SYNOPSIS
+
+  TO BE COMPLETED
+
+=head1 DESCRIPTION
+
+TO BE COMPLETED
+
+=head1 METHODS
+
+=head2 select
+
+  # Get all objects in list context
+  my @list = ORDB::AU::Census2006::BcpCdB44->select;
+  
+  # Get a subset of objects in scalar context
+  my $array_ref = ORDB::AU::Census2006::BcpCdB44->select(
+      'where  > ? order by ',
+      1000,
+  );
+
+The C<select> method executes a typical SQL C<SELECT> query on the
+bcp_cd_b44 table.
+
+It takes an optional argument of a SQL phrase to be added after the
+C<FROM bcp_cd_b44> section of the query, followed by variables
+to be bound to the placeholders in the SQL phrase. Any SQL that is
+compatible with SQLite can be used in the parameter.
+
+Returns a list of B<ORDB::AU::Census2006::BcpCdB44> objects when called in list context, or a
+reference to an C<ARRAY> of B<ORDB::AU::Census2006::BcpCdB44> objects when called in scalar
+ context.
+
+Throws an exception on error, typically directly from the L<DBI> layer.
+
+=head2 count
+
+  # How many objects are in the table
+  my $rows = ORDB::AU::Census2006::BcpCdB44->count;
+  
+  # How many objects 
+  my $small = ORDB::AU::Census2006::BcpCdB44->count(
+      'where  > ?',
+      1000,
+  );
+
+The C<count> method executes a C<SELECT COUNT(*)> query on the
+bcp_cd_b44 table.
+
+It takes an optional argument of a SQL phrase to be added after the
+C<FROM bcp_cd_b44> section of the query, followed by variables
+to be bound to the placeholders in the SQL phrase. Any SQL that is
+compatible with SQLite can be used in the parameter.
+
+Returns the number of objects that match the condition.
+
+Throws an exception on error, typically directly from the L<DBI> layer.
+
+=head1 ACCESSORS
+
+
+REMAINING ACCESSORS TO BE COMPLETED
+
+=head1 SQL
+
+The bcp_cd_b44 table was originally created with the
+following SQL command.
+
+  CREATE TABLE bcp_cd_b44 (
+      region_id REAL NOT NULL,
+      b6863 BLOB NOT NULL,
+      b6864 BLOB NOT NULL,
+      b6865 BLOB NOT NULL,
+      b6866 BLOB NOT NULL,
+      b6867 BLOB NOT NULL,
+      b6868 BLOB NOT NULL,
+      b6869 BLOB NOT NULL,
+      b6870 BLOB NOT NULL,
+      b6871 BLOB NOT NULL,
+      b6872 BLOB NOT NULL,
+      b6873 BLOB NOT NULL,
+      b6874 BLOB NOT NULL,
+      b6875 BLOB NOT NULL,
+      b6876 BLOB NOT NULL,
+      b6877 BLOB NOT NULL,
+      b6878 BLOB NOT NULL,
+      b6879 BLOB NOT NULL,
+      b6880 BLOB NOT NULL,
+      b6881 BLOB NOT NULL,
+      b6882 BLOB NOT NULL,
+      b6883 BLOB NOT NULL,
+      b6884 BLOB NOT NULL,
+      b6885 BLOB NOT NULL,
+      b6886 BLOB NOT NULL,
+      b6887 BLOB NOT NULL,
+      b6888 BLOB NOT NULL,
+      b6889 BLOB NOT NULL,
+      b6890 BLOB NOT NULL,
+      b6891 BLOB NOT NULL,
+      b6892 BLOB NOT NULL,
+      b6893 BLOB NOT NULL,
+      b6894 BLOB NOT NULL,
+      b6895 BLOB NOT NULL,
+      b6896 BLOB NOT NULL,
+      b6897 BLOB NOT NULL,
+      b6898 BLOB NOT NULL,
+      b6899 BLOB NOT NULL,
+      b6900 BLOB NOT NULL,
+      b6901 BLOB NOT NULL,
+      b6902 BLOB NOT NULL,
+      b6903 BLOB NOT NULL,
+      b6904 BLOB NOT NULL,
+      b6905 BLOB NOT NULL,
+      b6906 BLOB NOT NULL,
+      b6907 BLOB NOT NULL,
+      b6908 BLOB NOT NULL,
+      b6909 BLOB NOT NULL,
+      b6910 BLOB NOT NULL,
+      b6911 BLOB NOT NULL,
+      b6912 BLOB NOT NULL,
+      b6913 BLOB NOT NULL,
+      b6914 BLOB NOT NULL,
+      b6915 BLOB NOT NULL,
+      b6916 BLOB NOT NULL,
+      b6917 BLOB NOT NULL,
+      b6918 BLOB NOT NULL,
+      b6919 BLOB NOT NULL,
+      b6920 BLOB NOT NULL,
+      b6921 BLOB NOT NULL,
+      b6922 BLOB NOT NULL,
+      b6923 BLOB NOT NULL,
+      b6924 BLOB NOT NULL,
+      b6925 BLOB NOT NULL,
+      b6926 BLOB NOT NULL,
+      b6927 BLOB NOT NULL,
+      b6928 BLOB NOT NULL,
+      b6929 BLOB NOT NULL,
+      b6930 BLOB NOT NULL,
+      b6931 BLOB NOT NULL,
+      b6932 BLOB NOT NULL,
+      b6933 BLOB NOT NULL,
+      b6934 BLOB NOT NULL,
+      b6935 BLOB NOT NULL,
+      b6936 BLOB NOT NULL,
+      b6937 BLOB NOT NULL,
+      b6938 BLOB NOT NULL,
+      b6939 BLOB NOT NULL,
+      b6940 BLOB NOT NULL,
+      b6941 BLOB NOT NULL,
+      b6942 BLOB NOT NULL,
+      b6943 BLOB NOT NULL,
+      b6944 BLOB NOT NULL,
+      b6945 BLOB NOT NULL,
+      b6946 BLOB NOT NULL,
+      b6947 BLOB NOT NULL,
+      b6948 BLOB NOT NULL,
+      b6949 BLOB NOT NULL,
+      b6950 BLOB NOT NULL,
+      b6951 BLOB NOT NULL,
+      b6952 BLOB NOT NULL,
+      b6953 BLOB NOT NULL,
+      b6954 BLOB NOT NULL,
+      b6955 BLOB NOT NULL,
+      b6956 BLOB NOT NULL,
+      b6957 BLOB NOT NULL,
+      b6958 BLOB NOT NULL,
+      b6959 BLOB NOT NULL,
+      b6960 BLOB NOT NULL,
+      b6961 BLOB NOT NULL,
+      b6962 BLOB NOT NULL,
+      b6963 BLOB NOT NULL,
+      b6964 BLOB NOT NULL,
+      b6965 BLOB NOT NULL,
+      b6966 BLOB NOT NULL,
+      b6967 BLOB NOT NULL,
+      b6968 BLOB NOT NULL,
+      b6969 BLOB NOT NULL,
+      b6970 BLOB NOT NULL,
+      b6971 BLOB NOT NULL,
+      b6972 BLOB NOT NULL,
+      b6973 BLOB NOT NULL,
+      b6974 BLOB NOT NULL,
+      b6975 BLOB NOT NULL,
+      b6976 BLOB NOT NULL,
+      b6977 BLOB NOT NULL,
+      b6978 BLOB NOT NULL,
+      b6979 BLOB NOT NULL,
+      b6980 BLOB NOT NULL,
+      b6981 BLOB NOT NULL,
+      b6982 BLOB NOT NULL,
+      b6983 BLOB NOT NULL,
+      b6984 BLOB NOT NULL,
+      b6985 BLOB NOT NULL,
+      b6986 BLOB NOT NULL,
+      b6987 BLOB NOT NULL,
+      b6988 BLOB NOT NULL,
+      b6989 BLOB NOT NULL,
+      b6990 BLOB NOT NULL,
+      b6991 BLOB NOT NULL,
+      b6992 BLOB NOT NULL,
+      b6993 BLOB NOT NULL,
+      b6994 BLOB NOT NULL,
+      b6995 BLOB NOT NULL,
+      b6996 BLOB NOT NULL,
+      b6997 BLOB NOT NULL,
+      b6998 BLOB NOT NULL,
+      b6999 BLOB NOT NULL,
+      b7000 BLOB NOT NULL,
+      b7001 BLOB NOT NULL,
+      b7002 BLOB NOT NULL,
+      b7003 BLOB NOT NULL,
+      b7004 BLOB NOT NULL,
+      b7005 BLOB NOT NULL,
+      b7006 BLOB NOT NULL,
+      b7007 BLOB NOT NULL,
+      b7008 BLOB NOT NULL,
+      b7009 BLOB NOT NULL,
+      b7010 BLOB NOT NULL,
+      b7011 BLOB NOT NULL,
+      b7012 BLOB NOT NULL,
+      b7013 BLOB NOT NULL,
+      b7014 BLOB NOT NULL,
+      b7015 BLOB NOT NULL,
+      b7016 BLOB NOT NULL,
+      b7017 BLOB NOT NULL,
+      b7018 BLOB NOT NULL,
+      b7019 BLOB NOT NULL,
+      b7020 BLOB NOT NULL,
+      b7021 BLOB NOT NULL,
+      b7022 BLOB NOT NULL,
+      b7023 BLOB NOT NULL,
+      b7024 BLOB NOT NULL,
+      b7025 BLOB NOT NULL,
+      b7026 BLOB NOT NULL,
+      b7027 BLOB NOT NULL,
+      b7028 BLOB NOT NULL,
+      b7029 BLOB NOT NULL,
+      b7030 BLOB NOT NULL,
+      b7031 BLOB NOT NULL,
+      b7032 BLOB NOT NULL,
+      b7033 BLOB NOT NULL,
+      b7034 BLOB NOT NULL,
+      b7035 BLOB NOT NULL,
+      b7036 BLOB NOT NULL,
+      b7037 BLOB NOT NULL,
+      b7038 BLOB NOT NULL,
+      b7039 BLOB NOT NULL,
+      b7040 BLOB NOT NULL,
+      b7041 BLOB NOT NULL,
+      b7042 BLOB NOT NULL,
+      b7043 BLOB NOT NULL,
+      b7044 BLOB NOT NULL,
+      b7045 BLOB NOT NULL,
+      b7046 BLOB NOT NULL,
+      b7047 BLOB NOT NULL,
+      b7048 BLOB NOT NULL,
+      b7049 BLOB NOT NULL,
+      b7050 BLOB NOT NULL,
+      b7051 BLOB NOT NULL,
+      b7052 BLOB NOT NULL,
+      b7053 BLOB NOT NULL,
+      b7054 BLOB NOT NULL,
+      b7055 BLOB NOT NULL,
+      b7056 BLOB NOT NULL,
+      b7057 BLOB NOT NULL,
+      b7058 BLOB NOT NULL,
+      b7059 BLOB NOT NULL,
+      b7060 BLOB NOT NULL,
+      b7061 BLOB NOT NULL,
+      b7062 BLOB NOT NULL,
+      b7063 BLOB NOT NULL,
+      b7064 BLOB NOT NULL,
+      b7065 BLOB NOT NULL,
+      b7066 BLOB NOT NULL,
+      b7067 BLOB NOT NULL,
+      b7068 BLOB NOT NULL,
+      b7069 BLOB NOT NULL,
+      b7070 BLOB NOT NULL,
+      b7071 BLOB NOT NULL,
+      b7072 BLOB NOT NULL,
+      b7073 BLOB NOT NULL,
+      b7074 BLOB NOT NULL,
+      b7075 BLOB NOT NULL,
+      b7076 BLOB NOT NULL,
+      b7077 BLOB NOT NULL,
+      b7078 BLOB NOT NULL,
+      b7079 BLOB NOT NULL,
+      b7080 BLOB NOT NULL,
+      b7081 BLOB NOT NULL,
+      b7082 BLOB NOT NULL,
+      b7083 BLOB NOT NULL,
+      b7084 BLOB NOT NULL,
+      b7085 BLOB NOT NULL,
+      b7086 BLOB NOT NULL,
+      b7087 BLOB NOT NULL,
+      b7088 BLOB NOT NULL,
+      b7089 BLOB NOT NULL,
+      b7090 BLOB NOT NULL,
+      b7091 BLOB NOT NULL,
+      b7092 BLOB NOT NULL,
+      b7093 BLOB NOT NULL,
+      b7094 BLOB NOT NULL,
+      b7095 BLOB NOT NULL,
+      b7096 BLOB NOT NULL,
+      b7097 BLOB NOT NULL,
+      b7098 BLOB NOT NULL,
+      b7099 BLOB NOT NULL,
+      b7100 BLOB NOT NULL,
+      b7101 BLOB NOT NULL,
+      b7102 BLOB NOT NULL,
+      b7103 BLOB NOT NULL,
+      b7104 BLOB NOT NULL,
+      b7105 BLOB NOT NULL,
+      b7106 BLOB NOT NULL,
+      b7107 BLOB NOT NULL,
+      b7108 BLOB NOT NULL,
+      b7109 BLOB NOT NULL,
+      b7110 BLOB NOT NULL,
+      b7111 BLOB NOT NULL,
+      b7112 BLOB NOT NULL,
+      b7113 BLOB NOT NULL,
+      b7114 BLOB NOT NULL,
+      b7115 BLOB NOT NULL,
+      b7116 BLOB NOT NULL,
+      b7117 BLOB NOT NULL,
+      b7118 BLOB NOT NULL,
+      b7119 BLOB NOT NULL,
+      b7120 BLOB NOT NULL,
+      b7121 BLOB NOT NULL,
+      b7122 BLOB NOT NULL,
+      b7123 BLOB NOT NULL,
+      b7124 BLOB NOT NULL,
+      b7125 BLOB NOT NULL,
+      b7126 BLOB NOT NULL,
+      b7127 BLOB NOT NULL,
+      b7128 BLOB NOT NULL,
+      b7129 BLOB NOT NULL,
+      b7130 BLOB NOT NULL,
+      b7131 BLOB NOT NULL,
+      b7132 BLOB NOT NULL,
+      b7133 BLOB NOT NULL,
+      b7134 BLOB NOT NULL,
+      b7135 BLOB NOT NULL,
+      b7136 BLOB NOT NULL,
+      b7137 BLOB NOT NULL,
+      b7138 BLOB NOT NULL,
+      b7139 BLOB NOT NULL,
+      b7140 BLOB NOT NULL,
+      b7141 BLOB NOT NULL,
+      b7142 BLOB NOT NULL,
+      b7143 BLOB NOT NULL,
+      b7144 BLOB NOT NULL,
+      b7145 BLOB NOT NULL,
+      b7146 BLOB NOT NULL,
+      b7147 BLOB NOT NULL,
+      b7148 BLOB NOT NULL,
+      b7149 BLOB NOT NULL,
+      b7150 BLOB NOT NULL,
+      b7151 BLOB NOT NULL,
+      b7152 BLOB NOT NULL,
+      b7153 BLOB NOT NULL,
+      b7154 BLOB NOT NULL,
+      b7155 BLOB NOT NULL,
+      b7156 BLOB NOT NULL,
+      b7157 BLOB NOT NULL,
+      b7158 BLOB NOT NULL,
+      b7159 BLOB NOT NULL,
+      b7160 BLOB NOT NULL,
+      b7161 BLOB NOT NULL,
+      b7162 BLOB NOT NULL
+  )
+
+
+=head1 SUPPORT
+
+ORDB::AU::Census2006::BcpCdB44 is part of the L<ORDB::AU::Census2006> API.
+
+See the documentation for L<ORDB::AU::Census2006> for more information.
+
+=head1 COPYRIGHT
+
+Copyright 2009 Adam Kennedy.
+
+This program is free software; you can redistribute
+it and/or modify it under the same terms as Perl itself.
+
+The full text of the license can be found in the
+LICENSE file included with this module.
+

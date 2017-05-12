@@ -1,0 +1,307 @@
+=head1 NAME
+
+OpenHMD::Backend::Inline - Binding for the OpenHMD C library, using Inline::C
+
+=head1 SYNOPSIS
+
+This synopsis is available as eg/openhmd-backend-inline.pl
+
+    use OpenHMD::Backend::Inline qw(:all);
+
+    my $context = ohmd_ctx_create() or die 'Failed to create context';
+
+    my $count = ohmd_ctx_probe($context);
+    die sprintf 'Failed to probe devices: %s', ohmd_ctx_get_error($context)
+        if $count < 0;
+    printf "Devices: %i\n\n", $count;
+
+    my $print_gets = sub {
+        my ($title, $index, $type) = @_;
+        my $value = ohmd_list_gets($context, $index, $type);
+
+        printf "    %-8s:   %s\n", $title, $value;
+    };
+
+    foreach my $index (0 .. $count - 1) {
+        printf "Device %i\n", $index;
+        $print_gets->('Vendor', $index, $OHMD_VENDOR);
+        $print_gets->('Product', $index, $OHMD_PRODUCT);
+        $print_gets->('Path', $index, $OHMD_PATH);
+        print "\n";
+    }
+
+    my $device = ohmd_list_open_device($context, 0);
+    die sprintf 'Failed to open device: %s', ohmd_ctx_get_error($context)
+        if !$device;
+
+    my $geti = sub {
+        my $type = shift;
+        my $buffer = pack 'i';
+        my $status = ohmd_device_geti($device, $type, $buffer);
+        die 'Failed to get integer: %s', ohmd_ctx_get_error($context)
+            if $status != $OHMD_S_OK;
+        return unpack 'i', $buffer;
+    };
+
+    my @resolution = (
+        $geti->($OHMD_SCREEN_HORIZONTAL_RESOLUTION),
+        $geti->($OHMD_SCREEN_VERTICAL_RESOLUTION),
+    );
+    printf "%-20s:   %i x %i\n", 'Resolution', @resolution;
+
+    my $print_getf = sub {
+        my ($title, $size, $type) = @_;
+        my $buffer = pack sprintf 'f%i', $size;
+        my $status = ohmd_device_getf($device, $type, $buffer);
+        die 'Failed to get float: %s', ohmd_ctx_get_error($context)
+            if $status != $OHMD_S_OK;
+
+        printf "%-20s:   %s\n", (
+            $title,
+            join ' ', map { sprintf '% 6f', $_ } unpack 'f*', $buffer,
+        );
+    };
+
+    $print_getf->('Horizontal Size',  1, $OHMD_SCREEN_HORIZONTAL_SIZE);
+    $print_getf->('Vertical Size',    1, $OHMD_SCREEN_VERTICAL_SIZE);
+    $print_getf->('Lens Separation',  1, $OHMD_LENS_HORIZONTAL_SEPARATION);
+    $print_getf->('Lens Position',    1, $OHMD_LENS_VERTICAL_POSITION);
+    $print_getf->('Left Eye FoV',     1, $OHMD_LEFT_EYE_FOV);
+    $print_getf->('Right Eye FoV',    1, $OHMD_RIGHT_EYE_FOV);
+    $print_getf->('Left Eye Aspect',  1, $OHMD_LEFT_EYE_ASPECT_RATIO);
+    $print_getf->('Right Eye Aspect', 1, $OHMD_RIGHT_EYE_ASPECT_RATIO);
+    $print_getf->('Distortion K',     6, $OHMD_DISTORTION_K);
+    print "\n";
+
+    $print_getf->('Default IPD', 1, $OHMD_EYE_IPD);
+    my $buffer = pack 'f', 0.55;
+    my $status = ohmd_device_setf($device, $OHMD_EYE_IPD, $buffer);
+    die sprintf 'Failed to set value: %s', ohmd_ctx_get_error($context)
+        if $status != $OHMD_S_OK;
+    $print_getf->('Set IPD', 1, $OHMD_EYE_IPD);
+    print "\n";
+
+    foreach my $tick (0 .. 10) {
+        ohmd_ctx_update($context);
+        $print_getf->('Rotation Quaternion', 4, $OHMD_ROTATION_QUAT);
+        select undef, undef, undef, 0.1;
+    }
+
+    $status = ohmd_close_device($device);
+    die sprintf 'Failed to close device: %s', ohmd_ctx_get_error($context)
+        if $status != $OHMD_S_OK;
+
+    ohmd_ctx_destroy($context);
+
+=head1 DESCRIPTION
+
+OpenHMD::Backend::Inline is a thin wrapper for the OpenHMD C library, using
+Inline::C.
+
+=head1 FUNCTIONS
+
+OpenHMD::Backend::Inline implements the following functions, which can be
+imported individually or using the C<:functions> tag.
+
+=head2 ohmd_close_device
+
+    my $status = ohmd_close_device($device);
+
+Closes a device.
+
+=head2 ohmd_ctx_create
+
+    my $context = ohmd_ctx_create();
+
+Create a new OpenHMD context.
+
+=head2 ohmd_ctx_destroy
+
+    ohmd_ctx_destroy($context);
+
+Destroy an OpenHMD context.
+
+=head2 ohmd_ctx_get_error
+
+    my $error = ohmd_ctx_get_error($context);
+
+Gets the latest human readable error message.
+
+=head2 ohmd_ctx_probe
+
+    my $device_count = ohmd_ctx_probe($context);
+
+Probes for supported devices and returns the count of found devices.
+
+=head2 ohmd_ctx_update
+
+    ohmd_ctx_update($context);
+
+Updates an OpenHMD context.
+
+=head2 ohmd_device_getf
+
+    my $status = ohmd_device_getf($device, $type, $out);
+
+Populate $out with the float values for $type as a packed string.
+
+    # Get the rotation quaternion
+    my $out = pack 'f4';
+    my $status = ohmd_device_getf($device, $OHMD_ROTATION_QUAT, $out);
+    my @quaternion = unpack 'f*', $out;
+
+=head2 ohmd_device_geti
+
+    my $status = ohmd_device_geti($device, $type, $out);
+
+Populate $out with the integer values for $type as a packed string.
+
+    # Get the horizontal resolution
+    my $out = pack 'i1';
+    my $status = ohmd_device_geti(
+        $device,
+        $OHMD_SCREEN_HORIZONTAL_RESOLUTION,
+        $out,
+    );
+    my $horizontal = unpack 'i*', $out;
+
+=head2 ohmd_device_setf
+
+    my $status = ohmd_device_setf($device, $type, $in);
+
+Sets float values for $type.
+
+    # Set the IPD to 0.6
+    my $in = pack 'f1', 0.6;
+    my $status = ohmd_device_getf($device, $OHMD_EYE_IPD, $in);
+
+=head2 ohmd_list_gets
+
+    my $string = ohmd_list_gets($context, $index, $type);
+
+Gets the string value of $type for device at $index.
+
+    # Get vendor of device at index 1
+    my $vendor = ohmd_list_gets($context, 1, $OHMD_VENDOR);
+
+=head2 ohmd_list_open_device
+
+    my $device = ohmd_list_open_device($context, $index);
+
+Opens the device at $index.
+
+    # Open the default device
+    my $device = ohmd_list_open_device($context, 0);
+
+=head1 CONSTANTS
+
+OpenHMD::Backend::Inline provides the following constants, which can be
+imported individually or using the C<:constants> tag.
+
+=head2 Float
+
+    $OHMD_DISTORTION_K
+    $OHMD_EYE_IPD
+    $OHMD_LEFT_EYE_ASPECT_RATIO
+    $OHMD_LEFT_EYE_FOV
+    $OHMD_LEFT_EYE_GL_MODELVIEW_MATRIX
+    $OHMD_LEFT_EYE_GL_PROJECTION_MATRIX
+    $OHMD_LENS_HORIZONTAL_SEPARATION
+    $OHMD_LENS_VERTICAL_POSITION
+    $OHMD_POSITION_VECTOR
+    $OHMD_PROJECTION_ZFAR
+    $OHMD_PROJECTION_ZNEAR
+    $OHMD_RIGHT_EYE_ASPECT_RATIO
+    $OHMD_RIGHT_EYE_FOV
+    $OHMD_RIGHT_EYE_GL_MODELVIEW_MATRIX
+    $OHMD_RIGHT_EYE_GL_PROJECTION_MATRIX
+    $OHMD_ROTATION_QUAT
+    $OHMD_SCREEN_HORIZONTAL_SIZE
+    $OHMD_SCREEN_VERTICAL_SIZE
+
+=head2 Integer
+
+    $OHMD_SCREEN_HORIZONTAL_RESOLUTION
+    $OHMD_SCREEN_VERTICAL_RESOLUTION
+
+=head2 Status
+
+    $OHMD_S_INVALID_PARAMETER
+    $OHMD_S_OK
+    $OHMD_S_UNKNOWN_ERROR
+    $OHMD_S_USER_RESERVED
+
+=head2 String
+
+    $OHMD_PATH
+    $OHMD_PRODUCT
+    $OHMD_VENDOR
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<openhmd.net|http://openhmd.net/>
+
+OpenHMD's website.
+
+=item #openhmd @ freenode
+
+Official IRC channel for OpenHMD
+
+=back
+
+=head1 DEPENDENCIES
+
+OpenHMD::Backend::Inline depends on the following modules.
+
+=over 4
+
+=item Carp
+
+Throwing errors from the callers perspective.
+
+=item Const::Fast
+
+Exportable, read-only constants.
+
+=item Exporter
+
+Exporting constants and functions.
+
+=item Inline::C
+
+Access to C functions from Perl.
+
+=back
+
+=head1 ACKNOWLEDGEMENTS
+
+=over 4
+
+=item Fredrick Hultin and Joey Ferwerda
+
+For their help with the C aspect of this module, answering questions,
+implementing suggested functionality into OpenHMD and generally being very
+encouraging and supportive.
+
+=item NefariousMoogle
+
+Reviewed documentation.
+
+=back
+
+=head1 AUTHOR
+
+CandyAngel <candyangel@electricjungle.org>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2015 CandyAngel <candyangel@electricjungle.org>.
+All rights reserved.
+
+This module is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself. See L<perlartistic>.  This program is
+distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.

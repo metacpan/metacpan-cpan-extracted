@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<SITE ID="USAToday">
+
+<NAME Lang="en-us">USA TODAY</NAME>
+<INFO Lang="en-us">updating news search</INFO>
+
+<URL Type="More"><![CDATA[
+http://search.usatoday.com/plweb-cgi/_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+post://search.usatoday.com/plweb-cgi/fastweb?search?view=default&operation=simplesearch&db63=news;life;weather;sports;money;olympic;elect&query=_QUERY_&numresults=_HITS_
+]]></URL>
+
+<EXPRESSION>Boolean</EXPRESSION>
+
+<VAR Name="_NEXT_"><![CDATA[
+<a href="_NEXT_">[Next]</a>
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<tr align=left valign=top>___<td>_SCORE_</td>___<td><a href="_URL_"___onMouseOver="___" >_TITLE_</a>___<td>_PREVIEW_</td>___<td>_SIZE_</td>
+]]></TEMPLATE>
+</SITE>

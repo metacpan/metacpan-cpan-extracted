@@ -1,0 +1,51 @@
+[% IF moderation_action == 'set_moderation' %]
+  [% INCLUDE header.tt page_title = "Change moderation status of $node_name" %]
+[% ELSE %]
+  [% INCLUDE header.tt page_title = "Moderate a version of $node_name" %]
+[% END %]
+[% INCLUDE banner.tt %]
+<div id="content">
+
+[% IF !config.content_above_navbar_in_html %]
+  [% INCLUDE navbar.tt %]
+[% END %]
+
+<div id="maincontent">
+
+<h1>Confirm Moderation</h1>
+
+<div class="confirm_moderation_text">
+<p>
+[% IF moderation_action == 'set_moderation' %]
+  You are about to change the moderation flag on 
+[% ELSE %]
+  You are about to moderate a version of
+[% END %]
+<span class="node_name">[% node_name %]</span>.
+To do so, please enter the admin password. If not, you can 
+<a href="[% cgi_url %]?action=admin">go back to the admin page</a>.
+</p>
+</div>
+
+<form class="confirm_moderation" action="[% cgi_url %]" method="post">
+  <input type="hidden" name="action" value="[% moderation_action %]" />
+  <input type="hidden" name="id" value="[% node_param %]" />
+[% IF moderation_action == 'set_moderation' %]
+  <label for="moderation_flag">Moderation Required:</label>
+  <input type="checkbox" name="moderation_flag" id="moderation_flag" [% IF moderation_flag %]checked="yes"[% END %] />
+  <br />
+[% ELSE %]
+  <input type="hidden" name="version" value="[% version %]" />
+[% END %]
+  <label for="password">Password:</label>
+  <input type="password" name="password" id="password" />
+  <input type="submit" value="Go!" />
+</form>
+
+</div>
+
+[% IF config.content_above_navbar_in_html %]
+  [% INCLUDE navbar.tt %]
+[% END %]
+
+[% INCLUDE footer.tt %]

@@ -1,0 +1,40 @@
+GLUnurbs *              T_PTROBJ
+GLUnurbsObj *           T_PTROBJ
+GLUquadric *            T_PTROBJ
+GLUquadricObj *         T_PTROBJ
+GLUtesselator *         T_PTROBJ
+
+GLbitfield              T_INT
+GLboolean               T_BOOL
+GLboolean               T_U_CHAR
+GLbyte                  T_INT
+GLcharARB               T_CHAR
+GLclampd                T_DOUBLE
+GLclampf                T_FLOAT
+GLdouble                T_DOUBLE
+GLenum                  T_INT
+GLenum                  T_UV
+GLenum format           T_PTROBJ
+GLfloat                 T_FLOAT
+GLhandleARB             T_U_INT
+GLint                   T_INT
+GLint                   T_IV
+GLshort                 T_SHORT
+GLsizei                 T_INT
+GLsizei                 T_IV
+GLubyte                 T_U_INT
+GLuint                  T_U_INT
+GLushort                T_U_SHORT
+PGLUtess *              T_PTROBJ
+_GLUfuncptr             T_PTROBJ
+const GLdouble *        T_PTROBJ
+GLdouble *              T_PTROBJ
+const GLfloat *         T_PTROBJ
+GLfloat *               T_PTROBJ
+const GLint *           T_PTROBJ
+GLint *                 T_PTROBJ
+const void *            T_PTROBJ
+
+const GLubyte *         T_PV
+
+GLvoid *                T_PTR

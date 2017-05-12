@@ -1,0 +1,95 @@
+1.126   2014-05-28
+  - Test script (lpod_test) bug fix.
+1.125   2014-05-21
+  - MIN_PERL_VERSION is now 5.10.1.
+1.124   2014-05-20
+  - Field.pm: fixed 'lexical_subs' error.
+1.123	2014-05-20
+  - All modules: removed 'lexical_subs' from 'use experimental' statement. 
+1.122   2014-04-30
+  - All modules: transitional workaround for 5.18 'experimental' warnings.
+  - Common.pm: allowed XML pretty print option change; cleaned is_true().
+  - Element.pm: API conflict fix for set_first_child(), set_last_child().
+  - Style.pm, Document.pm: get_styles() bug fix.
+  - TextElement.pm: set_text() bug fix.
+1.121   2012-05-15
+  - StructuredContainer.pm: list creation bug fix.
+  - Style.pm, Element.pm: outline style bug fix #76905; list style bug fix.
+  - Document.pm: improved and documented content(), meta(), styles(),
+  manifest() shortcuts; added syntactic sugar.
+  - Table.pm: improved ODF::lpOD::NamedRange->create().
+1.120   2012-03-28
+  - Document.pm, Element.pm: added export() as synonym of serialize();
+  added 'indent' as synonym of 'pretty'.
+  - Field.pm: bug fix in set_value(); added specific get_text() and set_text().
+  - Element.pm: added get_element_by_name(); created ODF::lpOD::NamedRange.
+  - Table.pm: added ODF::lpOD::NamedRange.
+  - Document.pm, Field.pm: set_variable() bug fix #75515; added
+  get_named_range(), set_named_range(); get_body() improvement.
+1.119   2012-02-21
+  - StructuredContainer.pm: image frames automatic sizing improved.
+  - Common.pm: image_size() and load_file() bug fix (#74974) and improvements.
+  - Document.pm: add_image_file() improved, file import through URLs now
+  supported.
+1.118   2012-02-05
+  - StructuredContainer.pm: improved image frame related stuff.
+  - Document.pm: allowed remote part load.
+  - Makefile.PL: XML::Twig 3.34 allowed again.
+  - Element.pm: set_attribute(), get_attribute() made safe for call with undef
+  attribute name; added document_type(); added insert() and append(); allowed
+  XML loading from remote URLs.
+  - Common.pm: added signature(); remote file handling utilities.
+  - Style.pm: Added specific stuff for cell styles in presentations; added
+  fill() for GraphicStyle and CellStyle; added set_shadow() for graphic and
+  table styles; fixed some issues related to backgrounds and borders.
+  - Doc update.
+1.117   2012-01-20
+  - Makefile.PL, MANIFEST: File::Type, Image::Size, LWP::Simple now required;
+  XML::Twig 3.37 required; lpod_test utility added.
+  - StructuredContainer.pm: improved image frame accessor.
+  - Table.pm: specific insert_element() method for cells.
+  - Common.pm: file_parse improvement.
+  - Document.pm: add_image_file() improvement & doc fix.
+  - StrucruredContainer.pm, Common.pm: odf_structured_container really used
+  - Doc cleaning.
+  - Element.pm: code indent cleaning.
+1.116   2011-08-05
+  - TextElement.pm: bug fix #70100; positioning logic change in the
+  split_content() utility, affecting set_span() and set_hyperlink().
+  - TextElement.pm: allowed 'length' with set_bookmark(), set_index_mark()...
+  - t/test01_write.t: no longer uses Image::Size.
+  - Element.pm: bug fix #69989; get_element() now allows '/' in search strings.
+  - Element.pm: improved replace(), created count_matches().
+  - Common.pm: added count_substrings() internal utility.
+  - Doc cleaning.
+1.115   2011-06-30
+  - Cosmetic code & doc cleaning.
+  - Element.pm: ensured insert_element() always returns the inserted element;
+  prevented from inserting an already inserted element.
+  - StructuredContainer.pm: improved odf_section customization.
+1.114   2011-05-23
+  - Common.pm: alert messages to STDERR only; more regular code indent.
+  - StructuredContainer.pm: new get_title() draw page method.
+  - Various doc clarifications.
+1.113   2011-05-11
+  - TextElement.pm: bug fix in set_note(), improved get_text() recursive.
+  - StructuredContainer.pm: new odf_toc methods.
+  - Style.pm: underline options improvement, doc error fix (#67409),
+  added register()/insert() method, 'stroke-.*' attribute handling improvement.
+  - Documentation: clarified some details, fixed errors and typos.
+1.111   2011-03-30
+  - Table.pm: Added out of range security to get_rows() and get_cells();
+  improved cell span handling.
+  - Document.pm: Added the 'handlers' and 'roots' options with get_part().
+  - TextElement.pm: Added reference mark support methods.
+  - Detail change in t/test01_write.t.
+  - Doc improvements.
+1.110   2011-03-10
+  - Added change log in the distribution.
+  - TextStyle: added 'variant' option.
+  - Document: XML indent if debug mode, added register_style() as an alias
+  for insert_style(); bug fix in get_style().
+  - Element.pm: Bug fixes and improvements regarding XML imports.
+  - Style.pm : Number style handling improvement.
+  - All: many comment changes.
+  - Doc updates.

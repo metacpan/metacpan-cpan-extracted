@@ -1,0 +1,65 @@
+/* Be careful to only edit the *.tmpl file. [-*-C-*- source] */
+
+#ifndef _tv_setup_
+#define _tv_setup_
+
+#include <osp-preamble.h>
+#include <osperl.h>
+
+/*
+  Why 41?
+  - Trade-off between array operations and tree operations.
+  - 41 slots gives 2.25 bytes per element average overhead & 41 is a prime number
+  - Turns out around 164K records per MB.
+*/
+#define TnWIDTH		41
+
+// #define TV_TEST
+
+#define NEW_TN(ret, near)\
+	NEW_OS_OBJECT(ret, os_segment::of(near), TN::get_os_typespec(), TN)
+
+#define TnDATA_T		OSPVptr
+#define TV_PLANT_DAT(d)
+#define TV_UPROOT_DAT(d)
+#define TV_UNSET_DAT(d)		d.set_undef()
+
+#define TnCLEARSLOT(k,d)	d.FORCEUNDEF()
+
+#define TnSTOREDATA_T OSSVPV*
+#define TnDAT_ASSIGN(lval,rval) lval = rval
+#define TnFETCHDATA_T OSSVPV**
+#define TnDAT_FETCH(lval,rval) *lval = rval
+
+//#define TV_DUMP
+//#define TV_ESEEK_DEBUG
+#define TV_DAT_2STRING(dat) \
+	(sprintf(tmpbuf, "%s(0x%p)", dat->os_class(&na), dat), tmpbuf)
+
+
+#define TV_ESEEK_FDECL \
+int dex3tc_seek(XPVTC *tc, int unique, osp_pathexam &exam)
+
+#if 0
+#define TV_ESEEK_SETUP						\
+STMT_START {							\
+  int kx;							\
+  DEBUG_index(warn("seek [%d]", exam.keycnt));			\
+  for (kx=0; kx < exam.keycnt; kx++) {				\
+    DEBUG_index(warn("key = %s", exam.keys[kx]->stringify()));	\
+  }								\
+} STMT_END
+#endif /*0*/
+
+#define TV_ARG osp_pathexam &exam
+#define TV_THIS exam
+
+#define TV_KEYCACHE	osp_keypack1 tn_kcache[2];
+#define TV_KCACHE_LOAD(key,dat,kc)	exam.load_keypack1(dat, kc)
+
+#define TV_ESEEK_CMP(cmp,k,d) cmp=exam.compare(d, 0)
+#define TV_ESEEK_CMPf(cmp,kc) cmp=exam.compare(kc, 0)
+
+#include "tv.public"
+
+#endif

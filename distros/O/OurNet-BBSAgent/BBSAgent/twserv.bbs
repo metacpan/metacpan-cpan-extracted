@@ -1,0 +1,195 @@
+# $File: //depot/OurNet-BBSAgent/BBSAgent/twserv.bbs $ $Author: autrijus $
+# $Revision: #4 $ $Change: 2829 $ $DateTime: 2002/01/10 14:54:36 $
+# Contributed by Chia-liang Kao <clkao@clkao.org>
+# zh_TW.Big5: 台灣文化資訊站
+
+TWServ
+tw.twbbs.org
+
+setv headansi 1;32;40m
+setv headansiend 33m
+
+=login
+wait 帳號：
+send $[username]\n$[password]\n\n\n\n
+goto main
+
+=main
+send \e[D\e[D\e[D\e[D\e[D\e[D
+wait 主功能表
+till Call機
+
+=message
+wait [1;33;46m\xa1\xb9
+till \x1b\x5b37;45m\x20
+till \x20\x1b\x5b\x6d
+exit
+
+=message_reply
+send \x12
+wait 水球丟過去
+send $[message]\n
+wait [Y/n]?
+send \n
+wait \x20\x1b\x5b\x6d
+exit
+
+=message_send
+call talk_users
+send /
+wait 代號：
+send $[receiver]\nw
+wait ]:
+send $[message]\n
+wait [Y/n]?
+send \n
+wait \e[m
+exit
+
+=talk
+call main
+send t\n
+wait 聊天說話
+till 扣機
+
+=talk_users
+call talk
+send u\n
+wait 使用者列表
+till 使用者列表
+
+=logoff
+call main
+send g\ng\n\n\n\n
+
+
+# bad
+
+=mail
+call main
+send m\n
+wait 電子郵件
+till Call機
+
+=mail_send
+call mail
+send s\n
+wait 代號：
+send $[receiver]\n
+wait 主題：
+send $[subject]\n
+wait 編輯文章
+send $[content]\x18
+wait 檔案處理
+send s\n\n
+wait 底稿
+doif $[savelocal]
+    send \n
+else
+    send n\n
+endo
+send \n
+
+=board
+send s
+wait 名稱
+send $[board]\n\x20\nq\n
+wait 板主：
+till 文章選讀
+
+=board_list_last
+call board $[board]
+send 1\n\x24
+wait ●
+till /
+exit
+
+=board_article_select
+call board $[board]
+send $[article]\n\nq\n
+wait ●
+till 文章選讀
+exit
+
+=board_article_desc
+send q\n
+wait ●
+till 文章選讀
+exit
+
+=board_article_fetch_first
+call board $[board]
+send $[article]\n\n
+#send \n
+till m/\e\[([\d;]+)m\x20\x20瀏覽\x20P./
+  or \x07
+doif $[2]
+    call die
+endo
+wait (
+till )
+wait \e[30m結束\x20\x20\x20\x20\x20\e[0m
+exit
+
+=board_article_fetch_next
+send \x20
+till m/\e\[([\d;]+)m\x20\x20瀏覽\x20P./
+wait (
+till )
+wait \e[30m結束\x20\x20\x20\x20\x20\e[0m
+exit
+
+=board_article_fetch_last
+send qq
+wait 文章選讀
+exit
+
+=article_post_raw
+call board $[board]
+send \x10$[title]\n0\n$[body]\x18\n\n
+doif $[author]
+    call article_edit_author $[author]
+endo
+exit
+
+=article_edit_author
+send \x24E\x19\x19\x19\x19\x14\x19\x19\x19\x18\nT\n\x01\x0b$[author]\n\ny\n
+wait 文章選讀
+exit
+
+=chat_enter
+call talk
+send c\n\n
+wait →
+
+=chat_room
+send /j $[room]\n
+wait [$[room]]
+exit
+
+=chat_say
+send $[message]\n
+wait $[message]
+exit
+
+=chat_listen
+wait ;1H
+till :\x20
+  or *\x20
+till \e[
+exit
+
+=chat_leave
+send /bye\n
+wait [C]
+send c\n
+goto main
+
+=chat_message_send
+send /m $[caller] $[message]\n
+wait $[message]
+exit
+
+=send_enter
+send \n
+exit

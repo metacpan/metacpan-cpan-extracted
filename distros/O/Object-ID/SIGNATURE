@@ -1,0 +1,45 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 893aa2038b35266055d32e4906a6e5227df41327 .perlcriticrc
+SHA1 b1792a796e85dfbf8a74b4d1ad41ad32ddea48bb .perltidyrc
+SHA1 1eae695235653dfdeabd343fe83a5add17b11aa2 Build.PL
+SHA1 cb8a49cc2d81f261790f2ebe7a6a3078643cbe0a Changes
+SHA1 61c777820e70593419593ecb9680c5839f611595 LICENSE
+SHA1 f893af334763db3d658d5b349bb2e663d341a016 MANIFEST
+SHA1 f1ae8c236fb9a727ebec5bb70de2d4dd6e2f7c28 MANIFEST.SKIP
+SHA1 40776f8cbaeba3b797e589ef92e94625725c896b META.json
+SHA1 b33fbea74a2b31ec8dbe7a94727f736bf09848b2 META.yml
+SHA1 ab5e9533c1d96ad404782c4df0bdef47ceacd052 README
+SHA1 d51b8f82f755d2e8e456ad5e0b7195e92d07a3e4 inc/MyBuilder.pm
+SHA1 54002aac4b97d60a2d3333f3c888776e18c194ed lib/Object/ID.pm
+SHA1 3a6091e59f96fef0cf76d3c76a78e72057a18167 lib/UNIVERSAL/Object/ID.pm
+SHA1 0c48cd304451ed6f7b82cad9c870981a44d6a92d t/00compile.t
+SHA1 3f78f31d53e9c28f8367da10ba3056ab73dac263 t/autoclean.t
+SHA1 2285e395d39771a7554aae46aff6991e0096f942 t/destroy.t
+SHA1 33325fa08e39a7c0c92720ac51fb71d4cb3e20fd t/immutable.t
+SHA1 179dcdc43b067802aff5cdc6e58bfee7a06f8d0a t/lib/AutoCleanWidget.pm
+SHA1 edf20baf017122f5c7ac77b50416302698ec0b66 t/role.t
+SHA1 a5224407abd07c1ff17f5f606bccd48ad354bed5 t/threads.t
+SHA1 552f3aacb7e6b655d6b17170b1239c286a786bbc t/universal.t
+SHA1 83cb8b8988721d987a096d44a132ae84ac821959 t/uuid.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.18 (Darwin)
+
+iEYEARECAAYFAk5+svMACgkQWMohlhD1QyfYkQCfeW89O98Ggi+fUN08S9NgOMUg
+Q4AAnjmFT7Jw6dDywEf8hjUZPOXatech
+=/Efu
+-----END PGP SIGNATURE-----

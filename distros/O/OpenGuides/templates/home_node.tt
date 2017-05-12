@@ -1,0 +1,58 @@
+[% INCLUDE header.tt %]
+
+[% INCLUDE banner.tt %]
+
+<div id="content">
+
+[% IF navbar_on_home_page AND !config.content_above_navbar_in_html %]
+  [% INCLUDE navbar.tt %]
+[% END %]
+
+[% IF !navbar_on_home_page AND !config.recent_changes_on_home_page AND !read_only %]
+  <div id="home_page_edit_link">
+    <a href="[% cgi_url %]?action=edit;id=[% node_param %]">Edit this page</a>
+  </div>
+[% END %]
+
+<div id="maincontent">
+  [% IF config.recent_changes_on_home_page %]
+    <div id="recent">
+
+      <h3>Ten most <a href="[% cgi_url %]?action=rc">recent changes</a>
+          (<a href="[% full_cgi_url %]?action=rc;format=rss">RSS</a>):</h3>
+
+      <dl>
+        [% FOREACH node = recent_changes %]
+          <dt><a href="[% node.url %]">[% node.name %]</a>
+            [% IF node.version == "1" %]
+              [new]
+            [% END %]
+          </dt>
+          [% IF node.comment or node.username %]
+            <dd>
+              [% node.comment %]
+              [% IF node.username %]
+                <b><small>([% node.username %])</small></b>
+              [% END %]
+            </dd>
+          [% END %]
+        [% END %]
+      </dl>
+
+[% UNLESS read_only %]
+      <p><b><a href="[% cgi_url %]?action=edit;id=[% node_param %]">Edit
+      this page</a></b></p>
+[% END %]
+
+    </div>
+  [% END %]
+
+  [% content %]
+
+</div>
+
+[% IF navbar_on_home_page AND config.content_above_navbar_in_html %]
+  [% INCLUDE navbar.tt %]
+[% END %]
+
+[% INCLUDE footer.tt %]

@@ -1,0 +1,16 @@
+---
+name: OpenInteract2-Action-FlickrFeed
+version: 0.02
+author:
+  - Chris Winters <chris@cwinters.com>
+abstract: OpenInteract2 action to retrieve a Flickr feed and display it through a template
+license: perl
+requires:
+  OpenInteract2::Action::RSS: 0.10
+build_requires:
+  Test::More: 0.4
+provides:
+  OpenInteract2::Action::FlickrFeed:
+    file: lib/OpenInteract2/Action/FlickrFeed.pm
+    version: 0.02
+generated_by: Module::Build version 0.2611

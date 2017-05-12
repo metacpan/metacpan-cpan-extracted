@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<SITE ID="Qf">
+
+<NAME Lang="en-us">QuestFinder Search</NAME>
+<INFO Lang="en-us">general information web search</INFO>
+
+<URL Type="More"><![CDATA[
+http://www.questfinder.com/search/_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://www.questfinder.com/search/search.cgi?s=_QUERY_&category=catx3dx%3DALL&match=or&ul=either
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_NEXT_"><![CDATA[
+Next 20 </b><a href="_NEXT_">
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<td bgcolor="99CCCC">_URL_">_TITLE_</a>___color="FFFFFF">_PREVIEW_<br>___Updated:_DATE_</font></td>
+]]></TEMPLATE>
+</SITE>

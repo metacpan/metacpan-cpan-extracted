@@ -1,0 +1,6 @@
+language: perl
+before_script: cpanm Module::Install::CPANfile Module::Install Module::Install::AuthorTests
+perl:
+  - 5.16
+  - 5.14
+  - 5.18

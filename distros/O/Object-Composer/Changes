@@ -1,0 +1,9 @@
+Revision history for Perl extension Object::Composer.
+
+0.0.1  Fri Feb  5 15:39:02 2010
+	- original version; created by h2xs 1.23 with options
+
+
+0.0.2  Tue Mar  2 18:22:00 2010
+        - Documentation Changes; Redundant comments removed
+

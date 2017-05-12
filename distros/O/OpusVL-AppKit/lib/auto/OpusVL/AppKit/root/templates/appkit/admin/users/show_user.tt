@@ -1,0 +1,195 @@
+
+<h1> Users  </h1>
+
+    <div>
+
+        <div class="two_column">
+
+            <div class="left_column">
+                <fieldset>
+                    <legend>
+                        Available Users
+                    </legend>
+
+                        <table>
+
+                    [% FOR myuser IN c.stash.users %]
+                            <tr>
+                                <td> 
+                        [% myuser.username %]
+                                </td> 
+                                <td> 
+                        <a href='[% c.uri_for( c.controller('AppKit::Admin::Users').action_for('show_user'),    [ myuser.id ] ) %] '>details</a>
+                                </td> 
+                                <td> 
+                        <a href='[% c.uri_for( c.controller('AppKit::Admin::Users').action_for('delete_user'),   [ myuser.id ] ) %] '>del</a>
+                                </td> 
+[% IF c.can_access(c.controller('AppKit::Admin::Users').action_for('reset_password')) %]
+                                <td> 
+                        <a href='[% c.uri_for( c.controller('AppKit::Admin::Users').action_for('reset_password'),   [ myuser.id ] ) %] '>reset</a>
+                                </td> 
+[% END %]
+                            </tr>
+                    [% END %]
+
+                            <tr>
+                                <td colspan=3> 
+                                    <a href='[% c.uri_for( c.controller('AppKit::Admin::Users').action_for('adduser'))  %]'>add</a>   
+                                </td> 
+                            </tr>
+                        </table>
+
+                </fieldset>
+
+            </div>
+
+            <div class="right_column">
+
+                [% IF c.stash.thisuser %]
+
+                    <fieldset>
+                        <legend>
+                            Roles for [% c.stash.thisuser.username %]
+                        </legend>
+
+                    <form method='POST' action='[% c.uri_for( c.controller('AppKit::Admin::Users').action_for('show_user'), [ c.stash.thisuser.id ] )  %]'>
+
+                    [% FOR role IN c.stash.roles %]
+
+                        [% role.input | none %]
+                        [% role.role %]
+                        <br>
+
+                    [% END %]
+
+                        <input type='submit' name='savebutton'      value='Save'>
+                        <input type='submit' name='cancelbutton'    value='Cancel'>
+                    </form>
+
+                    </fieldset>
+
+                    <fieldset>
+                        <legend>
+                           Details for [% c.stash.thisuser.username %]
+                        </legend>
+                        <table>
+                            <tr>
+                                <td> [% c.stash.thisuser.email %]   </td>
+                            </tr>
+                            <tr>
+                                <td> [% c.stash.thisuser.name %]      </td>
+                            </tr>
+                            <tr>
+                                <td> [% c.stash.thisuser.tel %]       </td>
+                            </tr>
+                            <tr>
+                                <td> 
+                                    <a href='[% c.uri_for( c.controller('AppKit::Admin::Users').action_for('edit_user'), [ c.stash.thisuser.id ] )  %]'>edit</a>   
+                                </td> 
+                            </tr>
+                        </table>
+                    </fieldset>
+                    <fieldset>
+                        <legend>Log in attempts</legend>
+                        <table>
+                            <tr>
+                                <td>Last Login:</td>
+                                <td>[% date_long(thisuser.last_login) %]</td>
+                            </tr>
+                            <tr>
+                                <td>Last Failed Login:</td>
+                                <td>[% date_long(thisuser.last_failed_login) %]</td>
+                            </tr>
+                        </table>
+                    </fieldset>
+
+
+                    <fieldset>
+                        <legend>
+                            Parameters for [% c.stash.thisuser.username %]
+                        </legend>
+
+                        <ul>
+                        [% FOR up IN c.stash.thisuser.users_parameters %]
+                            <li>
+                                [% up.parameter.parameter %] 
+                                   ( [% up.value %] )
+                                <a href='[% c.uri_for( c.controller('AppKit::Admin::Users').action_for('delete_parameter'), [ c.stash.thisuser.id ] ) _ "/" _ up.parameter.id  %]'> Remove </a>
+                            </li>
+                        [% END %]
+                        </ul>
+
+                        <form method='POST' action='[% c.uri_for( c.controller('AppKit::Admin::Users').action_for('add_parameter'), [ c.stash.thisuser.id ] )  %]'>
+                            <select name='parameter_id' onchange='get_param_value_entry_box( this.options[ this.selectedIndex].value );'>
+                                <option value=''> -- Please Select -- </option>
+                            [% FOR param IN c.model('AppKitAuthDB::Parameter').all %]
+                                <option value='[% param.id %]'>[% param.parameter %]</option>
+                            [% END %]
+                            </select>
+
+                            <span id='param_value'>
+                            </span>
+
+                        </form>
+                    </fieldset>
+
+                [% END %]
+
+            </div>
+        </div>
+    </div>
+
+<script language='javascript'>
+function get_param_value_entry_box( paramid )
+{
+
+    var spanid = 'param_value';
+    var wrapper = document.getElementById(spanid);
+
+    if ( ! wrapper )
+    {
+        alert ("could not find wrapping span by id:" + spanid );    
+        return 0;
+    }
+
+    // clear out wrapper..
+    while ( wrapper.childNodes.length >= 1 )
+    {
+        wrapper.removeChild( wrapper.firstChild );       
+    } 
+
+    // if we have a param id, lets draw a method to input a value.....
+    if ( paramid )
+    {
+        // create the submit button..
+        var subbutt = document.createElement('input');
+        subbutt.setAttribute ("type", "submit");
+        subbutt.setAttribute ("name", "add_parameter");
+        subbutt.setAttribute ("value", "Add/Update Value");
+
+        // create the input..
+        // var input = document.createElement('input');
+        // input.setAttribute ("type", "text");
+        // input.setAttribute ("name", "parameter_value");
+        // input.setAttribute ("value", "");
+
+        // create span to hold input value..
+        var input = document.createElement('span');
+        input.setAttribute ("id", "parameter_value_wrapper");
+        
+        // add the new elements to the wrapper..
+        wrapper.appendChild( input );
+        wrapper.appendChild( subbutt );
+
+        var ajax_url = "[% c.uri_for( c.controller('AppKit::Admin::Users').action_for('get_parameter_input'), [ c.stash.thisuser.id ] ) %]" + "/" + paramid;
+
+        // make ajax call to get input box(s)..
+        $.ajax({
+            url: ajax_url,
+            success: function(data) {
+                $('#parameter_value_wrapper').html(data);
+            }
+        });
+    }
+}
+</script>

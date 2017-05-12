@@ -1,0 +1,8 @@
+
+<h1> Validate Login </h1>
+
+<p>
+    You are required to validate your login with an additional security check. Please fill out the form below
+</p>
+
+[% form.render | none %]

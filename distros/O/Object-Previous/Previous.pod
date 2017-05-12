@@ -1,0 +1,86 @@
+=head1 NAME
+
+Object::Previous - find the instance of the object that called your function
+
+=head1 SYNOPSIS
+
+    package Human;
+    use Object::Previous;
+
+    sub new { bless {hit_points=>(7+int rand 6)} }
+    sub hurt_us {
+        my $body = shift;
+           $body->{hit_points} -= shift;
+
+        if( (int rand 10) == 0 ) {
+            # every once in a while, damaging bodies hurts the sword:
+
+            my $sword = previous_object();
+               $sword->hurt_us(1+int rand 4);
+        }
+    }
+
+    package Sword;
+    sub new { bless {hit_points=>2} }
+    sub hurt_human {
+        my $sword = shift;
+        my $target = shift;
+
+        $target->hurt_us( 1+int rand 8 );
+    }
+    sub hurt_us {
+        my $sword = shift;
+           $sword->{hit_points} -= shift;
+
+        if( $sword->{hit_points} <= 0 ) {
+            warn "the attacker's sword broke!";
+        }
+    }
+
+=head1 previous_object
+
+L</previous_object> either returns the blessed ref of the caller or C<undef>
+if it is not possible to find it.
+
+=head1 CAVEATS
+
+If you tinker with the C<@_> in the caller object, L</previous_object> won't
+work.  Curiously, certain ways of tinkering don't hurt and others do.
+
+    my $self = shift; # doesn't hurt previous_object()
+    shift while @_;   # doesn't hurt previous_object()
+    splice @_, 0, 30; # doesn't hurt previous_object()
+
+    unshift @_, "borked"; # breaks previous_object();
+    @_ = ();              # breaks previous_object();
+
+Another caveat is that almost everyone thinks this is a really bad idea and/or
+bad practice.  
+
+The only place I've ever seen it actually used in practice is for security in
+MudOS (LPC, not Perl).  LPC has a native previous_object function.  It's used to
+make sure calling objects are really admin-shells or really the mob they're
+supposed to be -- anywhere you wouldn't want someone to just be able to pass in
+an appropriate object to subvert the security.
+
+=head1 AUTHOR(S)
+
+Most of the code was ripped from Perl and from L<http://perlmonks.org/>, but it
+was glued together by me.
+
+Paul Miller C<< <jettero@cpan.org> >>
+
+I am using this software in my own projects...  If you find bugs, please please
+please let me know. :) Actually, let me know if you find it handy at all.  Half
+the fun of releasing this stuff is knowing that people use it.
+
+=head1 COPYRIGHT
+
+Copyright (c) 2007-2010 Paul Miller
+
+Licensed under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+perl(1), L<Devel::Stacktrace>, L<http://perlmonks.org/?node_id=690713>,
+L<http://perlmonks.org/?node_id=690795>, cop.h, pp_ctl.c

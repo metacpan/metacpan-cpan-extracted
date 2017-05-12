@@ -1,0 +1,367 @@
+# $File: //depot/libOurNet/BBS/lib/OurNet/BBS/Roadmap.pod $ $Author: autrijus $
+# $Revision: #1 $ $Change: 3789 $ $DateTime: 2003/01/24 19:07:35 $
+
+=head1 NAME
+
+OurNet::BBS::Roadmap - The OurNet-BBS development roadmap
+
+=head1 SYNOPSIS
+
+There are several design goals for the OurNet-BBS:
+
+=head2 Secure Communication & Storage
+
+The most fundamental weakness of thin-client architectures
+is the vulnerability of tampering, either by intercepting
+transmissions or preying on unencrypted data stored on
+the centralized server. Therefore, OurNet-BBS I<MUST> provide
+means to retrieve, forward and store data securely.
+
+=head2 Multiple Representation Paradigms
+
+In order to translate between heterogeneous services within
+a common network, OurNet-BBS I<MUST> accept both storage-based
+(eg. HTTP/FreeNet/LDAP) and message-based (eg. Jabber/XML-RPC)
+renderings, and be able to render into corresponding formats
+(eg. HTML/XML/MIME).
+
+=head2 Decentralized Syndication Support
+
+Monolithic, single point-of-failure servers has remained 
+as the state of art in telnet-based BBS networks since the
+very beginning, which leads to its incapability to leverage
+viewers, services and computing resources on client machines
+as well as the high failure rate in on-line services.
+
+While not an end in itself, OurNet-BBS I<MUST> provide a
+clearly defined layer for writing inter-operable agent and
+services in a server-less environment, either by utilizing
+existing networks (eg. Gnutella, JXTA, FreeNet) or by
+creating its own network. 
+
+=head1 COMPONENTS
+
+Since OurNet-BBS is a large undertaking, its various components
+are relatively independent with each other, and are better viewed
+as sub-projects working collaboratively.
+
+=head2 BBS Backends
+
+OurNet-BBS I<MUST> provide backends for all major
+telnet-based BBS systems, akin to B<DBD::*> database
+access drivers.
+
+These backends I<SHOULD> support all existing services
+available through telnet-based interfaces, including
+boards, articles, nested archives, board classes, user
+info, mailbox, sessions, instant message, and chat rooms.
+
+Backend developers are strongly encouraged to actively
+abstract similar file-based operations among components,
+via the B<OurNet::BBS::Base> object framework.
+
+All backends I<MUST> provide the same interface for Board,
+Article and User components, and I<SHOULD> support Group
+and Session wherever applicable.
+
+=over 4
+
+=item MAPLE2 / SOB / PTT / ProBBS (a.k.a. CVIC)
+
+Instead of supporting the common subset of all M2 variants,
+OurNet-BBS I<SHOULD> provide a complete coverage to their
+unique feature and formats, and inherit as many common
+components from MAPLE2 as possible.
+
+=item MAPLE3 / MELIX
+
+Because of the uncoordinated and heavily forked status of GPL'ed
+MAPLE3 code, OurNet-BBS I<MAY> choose to ignore unpolished
+features (eg. Board Class), and to target MELIX's implementation
+instead.
+
+MELIX's handling of MIME header and scripting language support
+I<SHOULD> be utilized as the reference implementation, until
+another system appears with superior capabilities.
+
+=item FireBird2 / FireBird3 / ColaBBS
+
+In addition to offering transparent access between Maple and
+FireBird series, OurNet-BBS I<MAY> implement FireBird-specific
+features available through its telnet interface, if possible.
+
+=item RexchenBBS / TwolightBBS / ...
+
+Newer BBS systems unrelated to the Eagles-Phoenix ancestry
+also I<MAY> be supported, if under substantial usage and/or
+offers advanced features as OurNet-BBS' representation layer.
+
+=back
+
+=head2 Wrapper Backends
+
+These backends I<SHOULD> map their native data representation
+into traditional ones, and I<MAY> offer additional options
+to control their behavior. They I<SHOULD NOT> break any
+semantics common to all traditional backends.
+
+=over 4
+
+=item RAM
+
+This is the skeleton implementation which I<MUST> support
+common subsets of all possible components, and serve as a
+reference for resolving conflicts between backends. It also
+I<MUST NOT> rely on any on-disk storage or operating system
+dependent features.
+
+=item BBSAgent
+
+Because most existing BBS sites will not offer OurNet-BBS
+service overnight, a translation layer over their telnet
+interfaces I<MUST> be supported.
+
+This backend I<SHOULD> implement FETCH interfaces of
+Article, Board, User and Session components, and I<MAY>
+provide STORE interfaces to them.
+
+See L</Agent Platform> for a discussion on telnet-based agent
+scripting interfaces.
+
+=item External
+
+The External backend I<SHOULD> launch external programs for each
+C<STORE> or C<FETCH> actions performed on its components; it is
+used to e.g. gateway all C<STORE> attempts to a mailer, as a
+BBS <=> Mailing list gateway.
+
+=item NNTP
+
+For transparent synchronization with Usenet nodes, this
+backend I<MUST> implement a RFC977-compliant client,
+and I<SHOULD> transmit MIME data without loss.
+
+This backend I<MUST> supported Article and Board components,
+and I<MAY> provide a Group component.
+
+=item POP3 / MailBox / IMAP / SMTP
+
+These backends I<MUST> support read/write operations with
+consistency, and I<SHOULD> transmit MIME data without loss.
+
+Two or more protocols I<MAY> be combined to provide a
+read/write interface.
+
+=item DBI
+
+This backend I<MUST> support MySQL, PostgreSQL, MS SQL and
+Oracle DBDs. It I<MUST> provide a reference schema of
+necessary fields for each components, and I<SHOULD> accept
+other schemata using clear-defined configuration methods.
+
+=back
+
+=head2 Content Rendering
+
+Some representation layers, such as stateless HTTP, does not allow
+a transparent integration. Nevertheless, OurNet-BBS I<SHOULD> provide
+rendering tools to perform batch import / export against different
+targets.
+
+=over 4
+
+=item WebBBS Plug-in
+
+This CGI-based interface I<MUST> be capable of handling user
+sessions, authentication and have customizable templates.
+It also I<SHOULD NOT> depend on any specific backend's 
+behavior.
+
+=item Web Framework Integration
+
+In addition to stand-alone dynamic rendering, OurNet-BBS also
+I<MAY> offer integration support to major web frameworks
+(eg. Slash, Zope, etc). Such integrations I<SHOULD> render
+OurNet objects into HTML format without loss, and vice versa.
+
+=item Cross-Backend Migration Kit
+
+Since not every backends support all OurNet-BBS components,
+it is sometimes necessary for sites using existing systems
+to convert to MELIX, in order to fully utilize the OurNet-BBS
+platform.
+
+Such migration kits I<MUST> preserve static data as much as
+possible, and I<SHOULD> retain the same structure and content
+in the OurNet perspective.
+
+=back
+
+=head2 Service Transports
+
+The service transports allows interoperability between OurNet-BBS
+objects and other distributed systems.
+
+=over 4
+
+=item OurNet-RPC / XML-RPC
+
+=item Jabber
+
+=item CORBA / SOAP / EJB / LDAP / etc
+
+OurNet-BBS I<MAY> also offer additional bindings to these
+protocols, provided that there are corresponding needs.
+
+=back
+
+=head2 Decentralized Networking
+
+OurNet-BBS I<SHOULD> layer itself on top of a distributed
+computing network that allows Server-to-Server communications.
+
+=over 4
+
+=item Discovery
+
+=item Messaging
+
+=item Authentication
+
+=item Syndication
+
+=back
+
+=head2 Agent Platform
+
+The medium-term goal for OurNet-BBS is to become a backend-independent
+Agent platform, consisting of all interconnected OurNet nodes. It is
+therefore necessary to offer a common set of API and infrastructure
+to encourage people writing OurNet Agents.
+
+=over 4
+
+=item Telnet Agents
+
+Besides static storage handled by backends, many Internet services
+needs to interact with OurNet (eg. BBS, IRC and Telnet) lacks a
+cleanly-defined API layer. Thus, a generic wrapper module is needed.
+
+This module I<MUST> provide an object-oriented interface to those
+services, by simulating as a virtual user with action defined by
+a script language. This language I<MUST> support both flow-control
+and event-driven interfaces.
+
+=item Access Control
+
+This module I<MUST> support both traditional C<crypt()>-based
+and asymmetric authentications. It also I<SHOULD> negotiate among
+multiple available ciphers. The permission model I<MUST> allow
+user-defined fine grained control, including ACL, Opcode locking,
+and respects the default settings of each backends.
+
+=item Transportable Objects
+
+This module I<MUST> allow ircbot-like agents to deserialize 
+and walk through nodes, to translating requests across heterogeneous
+services. It also I<MUST> allow each signed objects to be distributed
+and discovered across OurNet, so each node could look at the source
+code, run it in a Safe compartment, and if they like it, they could
+sign it to vouch for its integrity. 
+
+=back
+
+=head2 Documentation
+
+The documentation set of OurNet-BBS is distributed under the
+B<OurNet::BBS::*> namespace.
+
+=over 4
+
+=item Architecture and Philosophy
+
+=item Interface and Samples
+
+=item Test Cases With Comments
+
+=item Backend Developer's Guide
+
+=item Agent Developer's Guide
+
+=back
+
+=head1 MILESTONES
+
+=head2 Milestone 0
+
+This milestone gives the baseline of basic functionalities,
+and a working prototype of RPC + Access Control network.
+It also includes man pages and overviews.
+
+    backend:	MAPLE2, PTT, MAPLE3, MELIX.
+    wrapper:	RAM, BBSAgent, NNTP, MailBox.
+    transport:	OurNet-RPC.
+    agent:	Telnet Agents, Access Control (MELIX).
+
+=head2 Milestone 1
+
+This milestone aims to provide a working public beta based on
+old client/server model. It will focus on core stability, a
+complete test case, and introductory materials.
+
+    agent:	Access Control (MAPLE2).
+    rendering:	Migration Toolkit.
+    document:	Architecture & Philosophy,
+		Interfaces & Samples,
+		Test Cases With Comments.
+
+=head2 Milestone 2
+
+This milestone is for co-operability toward developers. It
+will have a fully-functional reference implementation of
+Web rendering, as well as a procedural interface suitable
+to bindings with other languages. An experimental discovery
+network should be formed by this milestone.
+
+    wrapper:	POP3/SMTP.
+    transport:	XML-RPC.
+    rendering:	WebBBS Plug-in.
+    network:	Discovery.
+    document:	Backend Developer's Guide.
+
+=head2 Milestone 3
+
+Cross-node messaging, presence and session management are the
+main purpose for this milestone. By this release, we should
+also gradually move away from depending on text-file based
+storage.
+
+    transport:	Jabber.
+    wrapper:	DBI.
+    network:	Messaging, Authentication.
+
+=head2 Milestone 4
+
+This milestone turns existing OurNet network into a true Agent
+Platform, by offering intention- and subscription- based
+syndication between nodes.
+
+    rendering:	Web Framework Integration.
+    network:	Syndication.
+    agent:	Transportable Objects.
+    document:	Agent Developer's Guide.
+
+=head1 AUTHORS
+
+Autrijus Tang E<lt>autrijus@autrijus.orgE<gt>
+
+=head1 COPYRIGHT
+
+Copyright 2001-2002 by Autrijus Tang E<lt>autrijus@autrijus.orgE<gt>.
+
+This document is open document; you can redistribute it and/or
+modify it under the Open Content License.
+
+See L<http://opencontent.org/opl.shtml>
+
+=cut

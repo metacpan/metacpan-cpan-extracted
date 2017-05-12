@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<SITE ID="Rent-a-wreck">
+
+<NAME Lang="en-us">Rent A Wreck</NAME>
+<INFO Lang="en-us">lease information searched by cities</INFO>
+
+<URL Type="Start"><![CDATA[
+http://rent-a-wreck.com/scripts/findcity1.cgi/?city=_QUERY_
+]]></URL>
+
+
+
+<TEMPLATE><![CDATA[
+<a href="_URL_">_TITLE_</a>
+]]></TEMPLATE>
+</SITE>

@@ -1,0 +1,87 @@
+{
+   "abstract" : "Object-oriented interface to the eBay API",
+   "author" : [
+      "Michael Hendricks  <michael@ndrix.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4005, CPAN::Meta::Converter version 2.130880",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Object-eBay",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Std" : "v0.0.8",
+            "Net::eBay" : "0.28",
+            "Scalar::Util" : "1.02"
+         }
+      }
+   },
+   "provides" : {
+      "Object::eBay" : {
+         "file" : "lib/Object/eBay.pm",
+         "version" : "v0.5.1"
+      },
+      "Object::eBay::Attribute" : {
+         "file" : "lib/Object/eBay/Attribute.pm",
+         "version" : "v0.5.1"
+      },
+      "Object::eBay::Attributes" : {
+         "file" : "lib/Object/eBay/Attributes.pm",
+         "version" : "v0.5.1"
+      },
+      "Object::eBay::Boolean" : {
+         "file" : "lib/Object/eBay/Boolean.pm",
+         "version" : "v0.5.1"
+      },
+      "Object::eBay::Condition" : {
+         "file" : "lib/Object/eBay/Condition.pm",
+         "version" : "v0.5.1"
+      },
+      "Object::eBay::Currency" : {
+         "file" : "lib/Object/eBay/Currency.pm",
+         "version" : "v0.5.1"
+      },
+      "Object::eBay::Item" : {
+         "file" : "lib/Object/eBay/Item.pm",
+         "version" : "v0.5.1"
+      },
+      "Object::eBay::ListingDetails" : {
+         "file" : "lib/Object/eBay/ListingDetails.pm",
+         "version" : "v0.5.1"
+      },
+      "Object::eBay::SellingStatus" : {
+         "file" : "lib/Object/eBay/SellingStatus.pm",
+         "version" : "v0.5.1"
+      },
+      "Object::eBay::User" : {
+         "file" : "lib/Object/eBay/User.pm",
+         "version" : "v0.5.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/mndrix/Object-eBay"
+      }
+   },
+   "version" : "v0.5.1"
+}

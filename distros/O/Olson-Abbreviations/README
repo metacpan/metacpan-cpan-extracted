@@ -1,0 +1,44 @@
+Olson-Abbreviations
+
+Olson-Abbreviations is module that does very little, but would probably
+elimited 100 SLOC in about 20 modules on CPAN. And, it'll do that little bit
+much better.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Olson::Abbreviations
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Olson-Abbreviations
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Olson-Abbreviations
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Olson-Abbreviations
+
+    Search CPAN
+        http://search.cpan.org/dist/Olson-Abbreviations/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Evan Carroll
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

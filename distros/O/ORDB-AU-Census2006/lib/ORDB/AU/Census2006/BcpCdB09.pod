@@ -1,0 +1,207 @@
+=head1 NAME
+
+ORDB::AU::Census2006::BcpCdB09 - ORDB::AU::Census2006 class for the bcp_cd_b09 table
+
+=head1 SYNOPSIS
+
+  TO BE COMPLETED
+
+=head1 DESCRIPTION
+
+TO BE COMPLETED
+
+=head1 METHODS
+
+=head2 select
+
+  # Get all objects in list context
+  my @list = ORDB::AU::Census2006::BcpCdB09->select;
+  
+  # Get a subset of objects in scalar context
+  my $array_ref = ORDB::AU::Census2006::BcpCdB09->select(
+      'where  > ? order by ',
+      1000,
+  );
+
+The C<select> method executes a typical SQL C<SELECT> query on the
+bcp_cd_b09 table.
+
+It takes an optional argument of a SQL phrase to be added after the
+C<FROM bcp_cd_b09> section of the query, followed by variables
+to be bound to the placeholders in the SQL phrase. Any SQL that is
+compatible with SQLite can be used in the parameter.
+
+Returns a list of B<ORDB::AU::Census2006::BcpCdB09> objects when called in list context, or a
+reference to an C<ARRAY> of B<ORDB::AU::Census2006::BcpCdB09> objects when called in scalar
+ context.
+
+Throws an exception on error, typically directly from the L<DBI> layer.
+
+=head2 count
+
+  # How many objects are in the table
+  my $rows = ORDB::AU::Census2006::BcpCdB09->count;
+  
+  # How many objects 
+  my $small = ORDB::AU::Census2006::BcpCdB09->count(
+      'where  > ?',
+      1000,
+  );
+
+The C<count> method executes a C<SELECT COUNT(*)> query on the
+bcp_cd_b09 table.
+
+It takes an optional argument of a SQL phrase to be added after the
+C<FROM bcp_cd_b09> section of the query, followed by variables
+to be bound to the placeholders in the SQL phrase. Any SQL that is
+compatible with SQLite can be used in the parameter.
+
+Returns the number of objects that match the condition.
+
+Throws an exception on error, typically directly from the L<DBI> layer.
+
+=head1 ACCESSORS
+
+
+REMAINING ACCESSORS TO BE COMPLETED
+
+=head1 SQL
+
+The bcp_cd_b09 table was originally created with the
+following SQL command.
+
+  CREATE TABLE bcp_cd_b09 (
+      region_id REAL NOT NULL,
+      b1247 BLOB NOT NULL,
+      b1248 BLOB NOT NULL,
+      b1249 BLOB NOT NULL,
+      b1250 BLOB NOT NULL,
+      b1251 BLOB NOT NULL,
+      b1252 BLOB NOT NULL,
+      b1253 BLOB NOT NULL,
+      b1254 BLOB NOT NULL,
+      b1255 BLOB NOT NULL,
+      b1256 BLOB NOT NULL,
+      b1257 BLOB NOT NULL,
+      b1258 BLOB NOT NULL,
+      b1259 BLOB NOT NULL,
+      b1260 BLOB NOT NULL,
+      b1261 BLOB NOT NULL,
+      b1262 BLOB NOT NULL,
+      b1263 BLOB NOT NULL,
+      b1264 BLOB NOT NULL,
+      b1265 BLOB NOT NULL,
+      b1266 BLOB NOT NULL,
+      b1267 BLOB NOT NULL,
+      b1268 BLOB NOT NULL,
+      b1269 BLOB NOT NULL,
+      b1270 BLOB NOT NULL,
+      b1271 BLOB NOT NULL,
+      b1272 BLOB NOT NULL,
+      b1273 BLOB NOT NULL,
+      b1274 BLOB NOT NULL,
+      b1275 BLOB NOT NULL,
+      b1276 BLOB NOT NULL,
+      b1277 BLOB NOT NULL,
+      b1278 BLOB NOT NULL,
+      b1279 BLOB NOT NULL,
+      b1280 BLOB NOT NULL,
+      b1281 BLOB NOT NULL,
+      b1282 BLOB NOT NULL,
+      b1283 BLOB NOT NULL,
+      b1284 BLOB NOT NULL,
+      b1285 BLOB NOT NULL,
+      b1286 BLOB NOT NULL,
+      b1287 BLOB NOT NULL,
+      b1288 BLOB NOT NULL,
+      b1289 BLOB NOT NULL,
+      b1290 BLOB NOT NULL,
+      b1291 BLOB NOT NULL,
+      b1292 BLOB NOT NULL,
+      b1293 BLOB NOT NULL,
+      b1294 BLOB NOT NULL,
+      b1295 BLOB NOT NULL,
+      b1296 BLOB NOT NULL,
+      b1297 BLOB NOT NULL,
+      b1298 BLOB NOT NULL,
+      b1299 BLOB NOT NULL,
+      b1300 BLOB NOT NULL,
+      b1301 BLOB NOT NULL,
+      b1302 BLOB NOT NULL,
+      b1303 BLOB NOT NULL,
+      b1304 BLOB NOT NULL,
+      b1305 BLOB NOT NULL,
+      b1306 BLOB NOT NULL,
+      b1307 BLOB NOT NULL,
+      b1308 BLOB NOT NULL,
+      b1309 BLOB NOT NULL,
+      b1310 BLOB NOT NULL,
+      b1311 BLOB NOT NULL,
+      b1312 BLOB NOT NULL,
+      b1313 BLOB NOT NULL,
+      b1314 BLOB NOT NULL,
+      b1315 BLOB NOT NULL,
+      b1316 BLOB NOT NULL,
+      b1317 BLOB NOT NULL,
+      b1318 BLOB NOT NULL,
+      b1319 BLOB NOT NULL,
+      b1320 BLOB NOT NULL,
+      b1321 BLOB NOT NULL,
+      b1322 BLOB NOT NULL,
+      b1323 BLOB NOT NULL,
+      b1324 BLOB NOT NULL,
+      b1325 BLOB NOT NULL,
+      b1326 BLOB NOT NULL,
+      b1327 BLOB NOT NULL,
+      b1328 BLOB NOT NULL,
+      b1329 BLOB NOT NULL,
+      b1330 BLOB NOT NULL,
+      b1331 BLOB NOT NULL,
+      b1332 BLOB NOT NULL,
+      b1333 BLOB NOT NULL,
+      b1334 BLOB NOT NULL,
+      b1335 BLOB NOT NULL,
+      b1336 BLOB NOT NULL,
+      b1337 BLOB NOT NULL,
+      b1338 BLOB NOT NULL,
+      b1339 BLOB NOT NULL,
+      b1340 BLOB NOT NULL,
+      b1341 BLOB NOT NULL,
+      b1342 BLOB NOT NULL,
+      b1343 BLOB NOT NULL,
+      b1344 BLOB NOT NULL,
+      b1345 BLOB NOT NULL,
+      b1346 BLOB NOT NULL,
+      b1347 BLOB NOT NULL,
+      b1348 BLOB NOT NULL,
+      b1349 BLOB NOT NULL,
+      b1350 BLOB NOT NULL,
+      b1351 BLOB NOT NULL,
+      b1352 BLOB NOT NULL,
+      b1353 BLOB NOT NULL,
+      b1354 BLOB NOT NULL,
+      b1355 BLOB NOT NULL,
+      b1356 BLOB NOT NULL,
+      b1357 BLOB NOT NULL,
+      b1358 BLOB NOT NULL,
+      b1359 BLOB NOT NULL,
+      b1360 BLOB NOT NULL
+  )
+
+
+=head1 SUPPORT
+
+ORDB::AU::Census2006::BcpCdB09 is part of the L<ORDB::AU::Census2006> API.
+
+See the documentation for L<ORDB::AU::Census2006> for more information.
+
+=head1 COPYRIGHT
+
+Copyright 2009 Adam Kennedy.
+
+This program is free software; you can redistribute
+it and/or modify it under the same terms as Perl itself.
+
+The full text of the license can be found in the
+LICENSE file included with this module.
+

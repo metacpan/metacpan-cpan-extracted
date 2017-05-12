@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<otrs_config version="1.0" init="Config">
+<CVS>$Id: TicketAutoAssignment.xml,v 1.10 2010/11/04 21:43:22 cg Exp $</CVS>
+
+	<ConfigItem Name="Core::Ticket::AutoAssign###ConfigurationItems" Required="0" Valid="1">
+		<Description Lang="en">Configuration items for auto ticket assignment</Description>
+		<Group>AutoAssign</Group>
+		<SubGroup>Core::Ticket::AutoAssign</SubGroup>
+		<Setting>
+			<Hash>
+				<Item Key="RoleList"></Item>
+				<Item Key="GroupList"></Item>
+				<Item Key="MaxInactiveInterval">15</Item>
+				<Item Key="TicketSearchLimit">400</Item>
+			</Hash>
+		</Setting>
+	</ConfigItem>
+
+	<ConfigItem Name="Frontend::Module###TicketAutoAssignment" Required="0" Valid="1">
+		<Description Translatable="1">Frontend module registration for the agent interface.</Description>
+		<Group>Ticket</Group>
+		<SubGroup>Frontend::Agent::ModuleRegistration</SubGroup>
+		<Setting>
+			<FrontendModuleReg>
+				<Description>TicketAutoAssignment</Description>
+				<Title>TicketAutoAssignment</Title>
+				<NavBarName>Ticket</NavBarName>
+			</FrontendModuleReg>
+		</Setting>
+	</ConfigItem>
+
+</otrs_config>
+

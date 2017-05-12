@@ -1,0 +1,65 @@
+---
+name: Orze
+version: 1.11
+author:
+  - 'Olivier Schwander <iderrick@cpan.org>'
+abstract: Another static website generator
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  Test::More: 0
+requires:
+  Data::Dump: 0
+  DateTime: 0
+  File::Copy::Recursive: 0
+  HTML::Entities: 0
+  Image::Thumbnail: 0
+  Pod::Simple::XHTML: 0
+  String::Escape: 0
+  Template: 0
+  Text::Markdown: 0
+  XML::RSS: 0
+  XML::Twig: 0
+  YAML: 0
+configure_requires:
+  Module::Build: 0.340201
+provides:
+  Orze:
+    file: lib/Orze.pm
+    version: 1.11
+  Orze::Drivers:
+    file: lib/Orze/Drivers.pm
+  Orze::Drivers::Copy:
+    file: lib/Orze/Drivers/Copy.pm
+  Orze::Drivers::Llgal:
+    file: lib/Orze/Drivers/Llgal.pm
+  Orze::Drivers::RSS:
+    file: lib/Orze/Drivers/RSS.pm
+  Orze::Drivers::Section:
+    file: lib/Orze/Drivers/Section.pm
+  Orze::Drivers::Template:
+    file: lib/Orze/Drivers/Template.pm
+  Orze::Drivers::Thumb:
+    file: lib/Orze/Drivers/Thumb.pm
+  Orze::Modules:
+    file: lib/Orze/Modules.pm
+    version: 1
+  Orze::Sources:
+    file: lib/Orze/Sources.pm
+  Orze::Sources::Include:
+    file: lib/Orze/Sources/Include.pm
+  Orze::Sources::Markdown:
+    file: lib/Orze/Sources/Markdown.pm
+  Orze::Sources::Menu:
+    file: lib/Orze/Sources/Menu.pm
+  Orze::Sources::Pandoc:
+    file: lib/Orze/Sources/Pandoc.pm
+  Orze::Sources::Pod:
+    file: lib/Orze/Sources/Pod.pm
+  Orze::Sources::YAML:
+    file: lib/Orze/Sources/YAML.pm
+generated_by: Module::Build version 0.340201
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

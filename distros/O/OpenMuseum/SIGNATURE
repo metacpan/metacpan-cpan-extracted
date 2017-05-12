@@ -1,0 +1,32 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.70.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 8d0b57a569287f494cedf6966049e76c4f5f6b23 Changes
+SHA1 834a279f3ba2ba9448a1089efe9a52eac53cbe2e MANIFEST
+SHA1 6692ac266153c5678af1ddef025bac6afdae9685 Makefile.PL
+SHA1 7a05c7671b9635db195db4304b7aa57db73dbc8c README
+SHA1 786a2ad1e0a18a8daf1fef2ccde19df3ecf5dea3 lib/OpenMuseum.pm
+SHA1 fb93424e8a4b4c5de237a839e3621cc6e8cf97d4 t/00-load.t
+SHA1 3e86d3e277d4233e55b8a4555bf6edf2dcdf7bd0 t/manifest.t
+SHA1 898aef3ac1bdafaccea9cd7d25b34965408ade63 t/pod-coverage.t
+SHA1 a572bbed348e70b106f01fa02fee8b8edd6735d5 t/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.13 (GNU/Linux)
+
+iF4EAREIAAYFAlFLtqUACgkQxjuW+7r78/9zxQD/cWavM60c6hodYMkL4k6VDWlY
+yPY/juPhCMwiIRdFvigA/19ybFVg8iT7nq2s4J6Zex9K0iqV/oyuOH8M0SGtaFu7
+=lllt
+-----END PGP SIGNATURE-----

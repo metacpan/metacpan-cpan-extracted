@@ -1,0 +1,58 @@
+digraph "OSPFView" {
+	router0 [
+		color="gray48"
+		peripheries="2"
+		style="bold"
+		shape="box"
+		label="OSPF"
+		fontsize=24
+		height=.1
+		width=.1
+	];
+	network1 [
+		color="gray48"
+		style="bold"
+		shape="ellipse"
+		label="View"
+		fontsize=24
+		height=.1
+		width=.1
+	];
+	router0 -> network1 [
+		color="gray48"
+		style="bold"
+		weight=1
+	];
+	network1 -> router0 [
+		color="gray48"
+		style="bold"
+		weight=1
+	];
+	size="1,1"
+	ratio="fill"
+	margin=0
+	nodesep=.3
+	ranksep=.2
+	{ rank="same"; router0; network0; }
+	{ rank="same"; router1; network1; }
+	router1 [
+		label=""
+		height=.1
+		width=.1
+		fixedsize="true"
+		shape="box"
+		style="invis"
+	];
+	network0 [
+		label=""
+		height=.1
+		width=.1
+		fixedsize="true"
+		shape="ellipse"
+		style="invis"
+	];
+	router0  -> router1  [ style="invis" ];
+	network0 -> network1 [ style="invis" ];
+	router0  -> network0 [ style="invis" ];
+	router1  -> network1 [ style="invis" ];
+};

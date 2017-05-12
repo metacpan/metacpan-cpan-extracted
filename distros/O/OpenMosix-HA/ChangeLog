@@ -1,0 +1,85 @@
+2003-04-14 01:14  stevegt
+
+	* TODO, mosha, lib/OpenMosix/HA.pm: docs done
+
+2003-04-07 00:42  stevegt
+
+	* MANIFEST, Makefile.PL, TODO, lib/OpenMosix/HA.pm,
+	t/1110scangroups.t, t/5010monitor.t, t/utils.pl: better pre and
+	post cleanup; well-behaved enough for beta; needs doc work
+
+2003-04-04 23:44  stevegt
+
+	* t/master/proc/hpc/nodes/: 1/status, 2/status, 3/status: start
+	using bit 2 of /proc/hpc/nodes/*/status
+
+2003-04-04 23:42  stevegt
+
+	* Makefile.PL, TODO, mosha, lib/OpenMosix/HA.pm,
+	t/1110scangroups.t, t/utils.pl: remove hastat and clinitstat on
+	DESTROY; fix nodes() tests; remove need for Devel::Trace; import
+	'mosha' CLI script
+
+2003-04-04 22:49  stevegt
+
+	* TODO, lib/OpenMosix/HA.pm, t/1010nodes.t, t/1020nodebase.t,
+	t/1040init.t, t/1045quorum.t, t/1050haltall.t, t/1060hastat.t,
+	t/1064stomith.t, t/1070getlatest.t, t/1080gethactl.t,
+	t/1090getcltab.t, t/1100compile_metrics.t, t/1110scangroups.t,
+	t/5010monitor.t, t/utils.pl, t/master/mfs1/1/var/mosix-ha/cltab:
+	start using bit 2 of /proc/hpc/nodes/*/status
+
+2003-04-04 12:21  stevegt
+
+	* t/: 1090getclinittab.t, master/mfs1/1/var/mosix-ha/clinitstat,
+	master/mfs1/1/var/mosix-ha/clinittab,
+	master/mfs1/2/var/mosix-ha/clinitstat: rename clinit* to cl*
+
+2003-04-04 12:12  stevegt
+
+	* MANIFEST, TODO, lib/OpenMosix/HA.pm, t/1064stomith.t,
+	t/1070getlatest.t, t/1090getclinittab.t, t/1090getcltab.t,
+	t/1110scangroups.t, t/utils.pl,
+	t/master/mfs1/1/var/mosix-ha/clinittab,
+	t/master/mfs1/1/var/mosix-ha/cltab,
+	t/master/mfs2/1/var/mosix-ha/clinittab,
+	t/master/mfs2/1/var/mosix-ha/cltab: start using bit 2 of
+	/proc/hpc/nodes/*/status, rename clinit* to cl*
+
+2003-04-01 20:17  stevegt
+
+	* lib/OpenMosix/HA.pm, t/utils.pl: remove need for GraphViz
+
+2003-04-01 20:09  stevegt
+
+	* MANIFEST, lib/OpenMosix/HA.pm: update MANIFEST
+
+2003-04-01 18:03  stevegt
+
+	* TODO, lib/OpenMosix/HA.pm, t/1010nodes.t, t/1020nodebase.t,
+	t/1030mosnode.t, t/1040init.t, t/1045quorum.t, t/1050haltall.t,
+	t/1060hastat.t, t/1064stomith.t, t/1070getlatest.t,
+	t/1080gethactl.t, t/1090getclinittab.t, t/1090getcltab.t,
+	t/1100compile_metrics.t, t/1110scangroups.t, t/5010monitor.t,
+	t/test_coverage, t/utils.pl,
+	t/master/mfs1/1/var/mosix-ha/clinitstat,
+	t/master/mfs1/1/var/mosix-ha/clinittab,
+	t/master/mfs1/1/var/mosix-ha/clstat,
+	t/master/mfs1/1/var/mosix-ha/cltab,
+	t/master/mfs1/1/var/mosix-ha/hactl,
+	t/master/mfs1/2/var/mosix-ha/clinitstat,
+	t/master/mfs1/2/var/mosix-ha/clstat,
+	t/master/mfs1/2/var/mosix-ha/hactl,
+	t/master/mfs2/1/var/mosix-ha/clinitstat,
+	t/master/mfs2/1/var/mosix-ha/clinittab,
+	t/master/mfs2/1/var/mosix-ha/clstat,
+	t/master/mfs2/1/var/mosix-ha/cltab,
+	t/master/mfs2/1/var/mosix-ha/hactl: all 239 test cases pass, no
+	monitor test cases yet, going to try on real cluster
+
+2003-03-17 16:11  stevegt
+
+	* LICENSE, MANIFEST, MANIFEST.SKIP, Makefile.PL, README, gen,
+	lib/OpenMosix/HA.pm, t/01_ini.t: starting to migrate in code from
+	lab
+

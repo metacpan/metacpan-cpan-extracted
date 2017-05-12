@@ -1,0 +1,161 @@
+Revision history for Org-To-HTML
+
+0.21    2016-12-24 (PERLANCAR)
+
+	- [Bugfix] Avoid linebreak \n when an inline element e.g. link is
+	  at the end of line of text.
+
+	- Add hooks: before_export_element, after_export_element.
+
+
+0.20    2016-12-24 (PERLANCAR)
+
+	- Move CLI script org-to-html to App-OrgUtils to reduce
+	  dependencies of this dist.
+
+
+0.19    2016-11-14 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Add a note about using org-mode for 'serious' exporting.
+
+
+0.18    2016-11-14 (PERLANCAR)
+
+	- Allow org_to_html() to be used by subclass (add internal argument
+	  _class).
+
+
+0.17    2016-11-06 (PERLANCAR)
+
+	- Set Org document object's ignore_unknown_settings to 1; Replace
+	  File::Slurp::Tiny with File::Slurper.
+
+
+0.16    2015-09-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.15    2015-08-18 (PERLANCAR)
+
+	- No functional changes.
+
+	- Switch from Log::Any to Log::Any::IfLOG.
+
+
+0.14     2014-08-16 (SHARYANTO) - Happy 19th CPAN Day!
+
+         - [build] CLI scripts are now generated automatically using
+           Dist::Zilla::Plugin::ScriptFromFunc. The plugin is still at 0.01 so the
+           generated script is not as polished as it should be. Stay tuned.
+
+
+0.13    2014-07-22 (SHARYANTO)
+
+        - No functional changes.
+
+        - Switch CLI scripts from using Perinci::CmdLine to
+          Perinci::CmdLine::Any to reduce size of dependencies.
+
+
+0.12    2014-05-17 (SHARYANTO)
+
+        - No functional changes.
+
+        - Replace File::Slurp with File::Slurp::Tiny.
+
+
+0.11    2014-01-29 (SHARYANTO)
+
+        - Replace newlines in non-PRE text with space, so resulting HTML is more
+          copy-pasteable to web forms (which sometimes interprets newlines as
+          <br />).
+
+
+0.10    2014-01-25 (SHARYANTO)
+
+        - Forgot to move _included_children() to superclass Org::To::Base.
+
+
+0.09    2014-01-25 (SHARYANTO)
+
+        - Bugfix: Have not yet loaded String::Escape when logging.
+
+        - Internal refactoring to make base class more usable by
+          Org::To::vCard::Addressbook (and other subclasses).
+
+
+0.08    2013-09-11 (SHARYANTO)
+
+        - No functional changes. Add 'use experimental smartmatch' for Perl
+          5.18+.
+
+
+0.07    2012-03-22 (SHARYANTO)
+
+        - No functional changes. Replace Sub::Spec::CmdLine with
+          Perinci::CmdLine.
+
+
+0.06    2011-08-11 (SHARYANTO)
+
+        - No functional changes.
+
+        [INCOMPATIBLE CHANGES]
+
+        - Update to Org::Parser 0.18 (Org::Element::ShortExample becomes
+          Org::Element::FixedWidthSection).
+
+
+0.05    2011-08-02 (SHARYANTO)
+
+        - No functional changes.
+
+        [INCOMPATIBLE CHANGES]
+
+        - Rename dist from Org-Export-HTML to Org-To-HTML; rename function
+          export_org_to_html to org_to_html.
+
+
+0.04    2011-06-16 (SHARYANTO)
+
+        - No functional changes. Internal changes: split base class
+          (Org::Export::Base) and role (Org::Export::Role) to allow for other
+          exporter classes.
+
+
+0.03    2011-05-25 (SHARYANTO)
+
+        [ENHANCEMENTS]
+
+        - Provide OO interface.
+
+
+0.02    2011-05-23 (SHARYANTO)
+
+        [ENHANCEMENTS]
+
+        - Parse Org::Element::ShortExample.
+
+        - Add CSS class to blocks.
+
+        - Add options: naked, css_url.
+
+        [BUG FIXES]
+
+        - Encode HTML entities.
+
+        [ETC]
+
+        - Add tests.
+
+
+0.01    2011-03-23 (SHARYANTO)
+
+        - First release.

@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<SITE ID="Artsource">
+
+<NAME Lang="en-us">Art Resource</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+ArtResource 視覺藝術資源查詢
+]]></NAME>
+<INFO Lang="en-us">visual arts relevant information search</INFO>
+<INFO Lang="zh-tw">visual arts relevant information search</INFO>
+
+<URL Type="Start"><![CDATA[
+http://artresources.com/search/search.results.ihtml?f=_QUERY_&s=i&h=o
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+<EXPRESSION>Boolean</EXPRESSION>
+
+
+<TEMPLATE><![CDATA[
+<font face="Verdana, Arial" size=-1>___<a href="_URL_">_TITLE_</a>_PREVIEW_</td></tr>
+]]></TEMPLATE>
+</SITE>

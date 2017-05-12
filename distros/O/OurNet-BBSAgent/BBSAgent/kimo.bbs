@@ -1,0 +1,50 @@
+# $File: //depot/OurNet-BBSAgent/BBSAgent/kimo.bbs $ $Author: autrijus $
+# $Revision: #3 $ $Change: 2829 $ $DateTime: 2002/01/10 14:54:36 $
+# Contributed by Smartboy <kcwu@ck.tp.edu.tw>
+# zh_TW.Big5: Yahoo!奇摩大摩域
+
+Yahoo! Kimo
+bbs.kimo.com.tw
+
+setv headansi 1;32;40m
+setv headansiend 33m
+
+load maple3.board
+
+=login
+wait 代號：
+send $[username]\n
+doif $[password]
+    wait 密碼：
+    send $[password]\nn\n
+endo
+send \ny\n\n\n
+
+=main
+send qqqqqqqq
+wait 主功能表
+till 大哥大
+
+=board
+call main
+send s\n
+wait 名稱
+send $[board]\n\x20\x20
+wait 板主：
+wait 文  章  標  題
+
+=board_article_fetch_first
+call board $[board]
+send $[article]\n\n
+wait \e[2J
+till \e[1;33;44m
+till \e[33;44m (
+wait \e[m
+exit
+
+=board_article_fetch_next
+send \n
+till \e[1;33;44m
+till \e[33;44m (
+wait \e[m
+exit

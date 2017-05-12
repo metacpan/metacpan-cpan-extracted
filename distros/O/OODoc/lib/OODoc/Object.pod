@@ -1,0 +1,151 @@
+=encoding utf8
+
+=head1 NAME
+
+OODoc::Object - base class for all OODoc classes.
+
+=head1 INHERITANCE
+
+ OODoc::Object is extended by
+   OODoc
+   OODoc::Format
+   OODoc::Manifest
+   OODoc::Manual
+   OODoc::Parser
+   OODoc::Text
+
+=head1 SYNOPSIS
+
+ # Never instantiated directly.
+
+=head1 DESCRIPTION
+
+Any object used in the OODoc module is derived from this OODoc::Object
+class.  This means that all functionality in this class is provided
+for all of the other classes.
+
+=head1 OVERLOADED
+
+=head1 METHODS
+
+=head2 Constructors
+
+=over 4
+
+=item OODoc::Object-E<gt>B<new>(%options)
+
+Create a new object (instantiation).  All objects in OODoc are created
+the same way: they carry a list of key-value pairs as option.  For
+examples, see the description of this method in the manual page of
+the specific object.
+
+The validity of the options for C<new> is checked, in contrary to the
+options when used with many other method defined by OODoc.
+
+=back
+
+=head2 Inheritance knowledge
+
+=over 4
+
+=item $obj-E<gt>B<extends>( [$object] )
+
+Close to all elements used within OODoc can have an inheritance relation.
+The returned object is extended by the current object.  Multiple inheritance
+is not supported here.
+
+=back
+
+=head2 Commonly used functions
+
+=over 4
+
+=item $obj-E<gt>B<filenameToPackage>($filename)
+
+=item OODoc::Object-E<gt>B<filenameToPackage>($filename)
+
+example: 
+
+ print $self->filenameToPackage('Mail/Box.pm'); # prints Mail::Box
+
+=item $obj-E<gt>B<mkdirhier>($directory)
+
+=item OODoc::Object-E<gt>B<mkdirhier>($directory)
+
+Creates this $directory and all its non-existing parents.
+
+=back
+
+=head2 Manual Repository
+
+All manuals can be reached everywhere in the program: it is a global
+collection.
+
+=over 4
+
+=item $obj-E<gt>B<addManual>($manual)
+
+The $manual will be added to the list of known manuals.  The same package
+name can appear in more than one manual.  This OBJECT shall be of type
+L<OODoc::Manual|OODoc::Manual>.
+
+=item $obj-E<gt>B<mainManual>($name)
+
+Returns the manual of the named package which contains the primar
+documentation for the code of the package $name.
+
+=item $obj-E<gt>B<manual>($name)
+
+Returns the manual with the specified name, or else C<undef>.
+
+=item $obj-E<gt>B<manuals>()
+
+All manuals are returned.
+
+=item $obj-E<gt>B<manualsForPackage>($name)
+
+Returns a list package objects which are related to the specified $name.
+One $name can appear in more than one file, and therefore a list is
+returned.
+
+=item $obj-E<gt>B<packageNames>()
+
+Returns the names of all defined packages.
+
+=back
+
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item Warning: Unknown option $name
+
+You have used the option with $name, which is not defined with the
+instantiation (the C<new> method) of this object.
+
+=item Warning: Unknown options @names
+
+You have used more than one option which is not defined to instantiate
+the object.
+
+=item Error: manual definition requires manual object
+
+A call to L<addManual()|OODoc::Object/"Manual Repository"> expects a new manual object (a L<OODoc::Manual|OODoc::Manual>),
+however an incompatible thing was passed.  Usually, intended was a call
+to L<manualsForPackage()|OODoc::Object/"Manual Repository"> or L<mainManual()|OODoc::Object/"Manual Repository">.
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of OODoc distribution version 2.01,
+built on November 11, 2015. Website: F<http://perl.overmeer.net/oodoc/>
+
+=head1 LICENSE
+
+Copyrights 2003-2015 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

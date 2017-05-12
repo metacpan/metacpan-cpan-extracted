@@ -1,0 +1,2342 @@
+digraph "ospf lsdb" {
+	node [ color=gray50 fontsize=14 ];
+	edge [ color=gray50 fontsize=8  ];
+	router18 [
+		tooltip="Area: 51.0.0.0"
+		color="gray83"
+		style="solid"
+		shape="box"
+		label="172.31.181.2"
+	];
+	router15 [
+		tooltip="Area: 51.0.0.0"
+		color="gray83"
+		style="solid"
+		shape="box"
+		label="172.31.33.2"
+	];
+	router13 [
+		tooltip="Area: 51.0.0.0"
+		color="gray83"
+		style="solid"
+		shape="box"
+		label="172.31.5.52"
+	];
+	router10 [
+		tooltip="Area: 51.0.0.0"
+		color="gray83"
+		style="solid"
+		shape="box"
+		label="172.30.171.172"
+	];
+	router9 [
+		tooltip="Area: 51.0.0.0"
+		color="gray83"
+		style="solid"
+		shape="box"
+		label="172.30.171.171"
+	];
+	router19 [
+		tooltip="Area: 51.0.0.0"
+		color="gray83"
+		style="solid"
+		shape="box"
+		label="172.31.182.2"
+	];
+	router17 [
+		tooltip="Area: 51.0.0.0"
+		color="gray83"
+		style="solid"
+		shape="box"
+		label="172.31.172.2"
+	];
+	router16 [
+		tooltip="Area: 51.0.0.0"
+		color="gray83"
+		style="solid"
+		shape="box"
+		label="172.31.171.2"
+	];
+	router2 [
+		tooltip="Areas: 0.0.0.0 51.0.0.0"
+		color="black"
+		style="bold"
+		shape="box"
+		label="172.16.0.45"
+	];
+	router4 [
+		tooltip="Areas: 0.0.0.0 51.0.0.0"
+		color="black"
+		style="bold"
+		shape="box"
+		label="172.30.5.5"
+	];
+	router8 [
+		tooltip="Area: 51.0.0.0"
+		color="gray83"
+		style="solid"
+		shape="box"
+		label="172.30.30.33"
+	];
+	router14 [
+		tooltip="Area: 51.0.0.0"
+		color="gray83"
+		style="solid"
+		shape="box"
+		label="172.31.5.62"
+	];
+	router7 [
+		tooltip="Area: 51.0.0.0"
+		color="gray83"
+		style="solid"
+		shape="box"
+		label="172.30.6.6"
+	];
+	router5 [
+		tooltip="Area: 51.0.0.0"
+		color="gray83"
+		style="solid"
+		shape="box"
+		label="172.16.0.37"
+	];
+	router12 [
+		tooltip="Area: 51.0.0.0"
+		color="gray83"
+		style="solid"
+		shape="box"
+		label="172.30.180.182"
+	];
+	router3 [
+		tooltip="Areas: 0.0.0.0 51.0.0.0"
+		color="black"
+		style="bold"
+		shape="box"
+		label="172.16.146.6"
+	];
+	router0 [
+		tooltip="Areas: 51.0.0.0 23.0.0.0"
+		color="black"
+		style="bold"
+		shape="box"
+		label="172.16.0.47"
+	];
+	router11 [
+		tooltip="Area: 51.0.0.0"
+		color="gray83"
+		style="solid"
+		shape="box"
+		label="172.30.180.181"
+	];
+	router6 [
+		tooltip="Area: 51.0.0.0"
+		color="gray83"
+		style="solid"
+		shape="box"
+		label="172.20.0.146"
+	];
+	router1 [
+		tooltip="Areas: 0.0.0.0 51.0.0.0 23.0.0.0"
+		color="black"
+		peripheries="2"
+		style="bold"
+		shape="box"
+		label="172.16.0.48"
+	];
+	subgraph "cluster 172.19.8.0/255.255.255.0" { stubnet2 [
+		tooltip="Area: 51.0.0.0"
+		color="gray83"
+		style="solid"
+		shape="ellipse"
+		label="172.19.8.0\n255.255.255.0"
+	] };
+	subgraph "cluster 172.19.7.0/255.255.255.0" { stubnet1 [
+		tooltip="Area: 51.0.0.0"
+		color="gray83"
+		style="solid"
+		shape="ellipse"
+		label="172.19.7.0\n255.255.255.0"
+	] };
+	subgraph "cluster 172.19.6.0/255.255.255.0" { stubnet0 [
+		tooltip="Area: 51.0.0.0"
+		color="gray83"
+		style="solid"
+		shape="ellipse"
+		label="172.19.6.0\n255.255.255.0"
+	] };
+	subgraph "cluster 172.19.180.0/255.255.255.0" { network5 [
+		tooltip="Area: 51.0.0.0"
+		color="gray83"
+		style="bold"
+		shape="ellipse"
+		label="172.19.180.0\n255.255.255.0"
+	] };
+	subgraph "cluster 172.19.5.0/255.255.255.0" { network2 [
+		tooltip="Area: 51.0.0.0"
+		color="gray83"
+		style="bold"
+		shape="ellipse"
+		label="172.19.5.0\n255.255.255.0"
+	] };
+	subgraph "cluster 172.17.2.0/255.255.255.0" { network0 [
+		tooltip="Area: 23.0.0.0"
+		color="gray66"
+		style="bold"
+		shape="ellipse"
+		label="172.17.2.0\n255.255.255.0"
+	] };
+	subgraph "cluster 172.31.181.0/255.255.255.0" { network12 [
+		tooltip="Area: 51.0.0.0"
+		color="gray83"
+		style="bold"
+		shape="ellipse"
+		label="172.31.181.0\n255.255.255.0"
+	] };
+	subgraph "cluster 172.31.172.0/255.255.255.0" { network11 [
+		tooltip="Area: 51.0.0.0"
+		color="gray83"
+		style="bold"
+		shape="ellipse"
+		label="172.31.172.0\n255.255.255.0"
+	] };
+	subgraph "cluster 172.31.5.0/255.255.255.0" { network8 [
+		tooltip="Area: 51.0.0.0"
+		color="gray83"
+		style="bold"
+		shape="ellipse"
+		label="172.31.5.0\n255.255.255.0"
+	] };
+	subgraph "cluster 172.19.171.0/255.255.255.0" { network4 [
+		tooltip="Area: 51.0.0.0"
+		color="gray83"
+		style="bold"
+		shape="ellipse"
+		label="172.19.171.0\n255.255.255.0"
+	] };
+	subgraph "cluster 172.19.30.0/255.255.255.0" { network3 [
+		tooltip="Area: 51.0.0.0"
+		color="gray83"
+		style="bold"
+		shape="ellipse"
+		label="172.19.30.0\n255.255.255.0"
+	] };
+	subgraph "cluster 172.31.182.0/255.255.255.0" { network13 [
+		tooltip="Area: 51.0.0.0"
+		color="gray83"
+		style="bold"
+		shape="ellipse"
+		label="172.31.182.0\n255.255.255.0"
+	] };
+	subgraph "cluster 172.31.171.0/255.255.255.0" { network10 [
+		tooltip="Area: 51.0.0.0"
+		color="gray83"
+		style="bold"
+		shape="ellipse"
+		label="172.31.171.0\n255.255.255.0"
+	] };
+	subgraph "cluster 192.168.0.0/255.255.255.0" { network14 [
+		tooltip="Area: 51.0.0.0"
+		color="gray83"
+		style="bold"
+		shape="ellipse"
+		label="192.168.0.0\n255.255.255.0"
+	] };
+	subgraph "cluster 172.17.1.0/255.255.255.0" { network1 [
+		tooltip="Area: 0.0.0.0"
+		color="gray50"
+		style="bold"
+		shape="ellipse"
+		label="172.17.1.0\n255.255.255.0"
+	] };
+	subgraph "cluster 172.31.33.0/255.255.255.0" { network9 [
+		tooltip="Area: 51.0.0.0"
+		color="gray83"
+		style="bold"
+		shape="ellipse"
+		label="172.31.33.0\n255.255.255.0"
+	] };
+	subgraph "cluster 172.22.5.0/255.255.255.0" { network7 [
+		tooltip="Area: 51.0.0.0"
+		color="gray83"
+		style="bold"
+		shape="ellipse"
+		label="172.22.5.0\n255.255.255.0"
+	] };
+	subgraph "cluster 172.20.0.0/255.255.255.0" { network6 [
+		tooltip="Area: 51.0.0.0"
+		color="gray83"
+		style="bold"
+		shape="ellipse"
+		label="172.20.0.0\n255.255.255.0"
+	] };
+	subgraph "cluster 172.22.5.0/255.255.255.0" { summary10 [
+		tooltip="Areas: 0.0.0.0 23.0.0.0"
+		color="black"
+		style="dashed"
+		shape="ellipse"
+		label="172.22.5.0\n255.255.255.0"
+	] };
+	subgraph "cluster 172.19.8.0/255.255.255.0" { summary5 [
+		tooltip="Areas: 0.0.0.0 23.0.0.0"
+		color="black"
+		style="dashed"
+		shape="ellipse"
+		label="172.19.8.0\n255.255.255.0"
+	] };
+	subgraph "cluster 172.31.182.0/255.255.255.0" { summary16 [
+		tooltip="Areas: 0.0.0.0 23.0.0.0"
+		color="black"
+		style="dashed"
+		shape="ellipse"
+		label="172.31.182.0\n255.255.255.0"
+	] };
+	subgraph "cluster 172.20.0.0/255.255.255.0" { summary9 [
+		tooltip="Areas: 0.0.0.0 23.0.0.0"
+		color="black"
+		style="dashed"
+		shape="ellipse"
+		label="172.20.0.0\n255.255.255.0"
+	] };
+	subgraph "cluster 172.19.6.0/255.255.255.0" { summary3 [
+		tooltip="Areas: 0.0.0.0 23.0.0.0"
+		color="black"
+		style="dashed"
+		shape="ellipse"
+		label="172.19.6.0\n255.255.255.0"
+	] };
+	subgraph "cluster 172.17.2.0/255.255.255.0" { summary18 [
+		tooltip="Areas: 0.0.0.0 51.0.0.0"
+		color="black"
+		style="dashed"
+		shape="ellipse"
+		label="172.17.2.0\n255.255.255.0"
+	] };
+	subgraph "cluster 192.168.0.0/255.255.255.0" { summary17 [
+		tooltip="Areas: 0.0.0.0 23.0.0.0"
+		color="black"
+		style="dashed"
+		shape="ellipse"
+		label="192.168.0.0\n255.255.255.0"
+	] };
+	subgraph "cluster 172.31.33.0/255.255.255.0" { summary12 [
+		tooltip="Areas: 0.0.0.0 23.0.0.0"
+		color="black"
+		style="dashed"
+		shape="ellipse"
+		label="172.31.33.0\n255.255.255.0"
+	] };
+	subgraph "cluster 172.31.171.0/255.255.255.0" { summary13 [
+		tooltip="Areas: 0.0.0.0 23.0.0.0"
+		color="black"
+		style="dashed"
+		shape="ellipse"
+		label="172.31.171.0\n255.255.255.0"
+	] };
+	subgraph "cluster 172.17.1.0/255.255.255.0" { summary0 [
+		tooltip="Areas: 51.0.0.0 23.0.0.0"
+		color="black"
+		style="dashed"
+		shape="ellipse"
+		label="172.17.1.0\n255.255.255.0"
+	] };
+	subgraph "cluster 172.31.5.0/255.255.255.0" { summary11 [
+		tooltip="Areas: 0.0.0.0 23.0.0.0"
+		color="black"
+		style="dashed"
+		shape="ellipse"
+		label="172.31.5.0\n255.255.255.0"
+	] };
+	subgraph "cluster 172.19.180.0/255.255.255.0" { summary8 [
+		tooltip="Areas: 0.0.0.0 23.0.0.0"
+		color="black"
+		style="dashed"
+		shape="ellipse"
+		label="172.19.180.0\n255.255.255.0"
+	] };
+	subgraph "cluster 172.31.181.0/255.255.255.0" { summary15 [
+		tooltip="Areas: 0.0.0.0 23.0.0.0"
+		color="black"
+		style="dashed"
+		shape="ellipse"
+		label="172.31.181.0\n255.255.255.0"
+	] };
+	subgraph "cluster 172.19.30.0/255.255.255.0" { summary6 [
+		tooltip="Areas: 0.0.0.0 23.0.0.0"
+		color="black"
+		style="dashed"
+		shape="ellipse"
+		label="172.19.30.0\n255.255.255.0"
+	] };
+	subgraph "cluster 172.31.172.0/255.255.255.0" { summary14 [
+		tooltip="Areas: 0.0.0.0 23.0.0.0"
+		color="black"
+		style="dashed"
+		shape="ellipse"
+		label="172.31.172.0\n255.255.255.0"
+	] };
+	subgraph "cluster 172.19.171.0/255.255.255.0" { summary7 [
+		tooltip="Areas: 0.0.0.0 23.0.0.0"
+		color="black"
+		style="dashed"
+		shape="ellipse"
+		label="172.19.171.0\n255.255.255.0"
+	] };
+	subgraph "cluster 172.19.7.0/255.255.255.0" { summary4 [
+		tooltip="Areas: 0.0.0.0 23.0.0.0"
+		color="black"
+		style="dashed"
+		shape="ellipse"
+		label="172.19.7.0\n255.255.255.0"
+	] };
+	subgraph "cluster 172.19.5.0/255.255.255.0" { summary2 [
+		tooltip="Areas: 0.0.0.0 23.0.0.0"
+		color="black"
+		style="dashed"
+		shape="ellipse"
+		label="172.19.5.0\n255.255.255.0"
+	] };
+	summaryaggregate0 [
+		tooltip="Areas: 51.0.0.0 23.0.0.0"
+		color="black"
+		style="dashed"
+		shape="ellipse"
+		label="172.17.3.0/255.255.255.0"
+	];
+	externalaggregate0 [
+		tooltip="AS external"
+		color="gray35"
+		style="solid"
+		shape="egg"
+		label="0.0.0.0/0.0.0.0\n172.16.0.0/255.255.0.0\n172.18.172.0/255.255.255.0"
+	];
+	externalaggregate3 [
+		tooltip="AS external"
+		color="gray35"
+		style="solid"
+		shape="egg"
+		label="0.0.0.0/0.0.0.0\n150.175.240.112/255.255.255.248\n172.16.0.0/255.255.0.0\n172.16.0.175/255.255.255.255\n172.16.224.16/255.255.255.240\n172.16.224.32/255.255.255.240\n172.16.224.144/255.255.255.240\n172.16.224.160/255.255.255.240\n172.18.6.0/255.255.255.0\n172.28.6.0/255.255.255.0\n172.38.6.0/255.255.255.0\n172.51.5.0/255.255.255.0\n192.168.0.150/255.255.255.255\n192.168.200.0/255.255.255.0\n192.168.208.0/255.255.255.0\n192.168.222.16/255.255.255.240\n192.168.222.32/255.255.255.240\n192.168.222.144/255.255.255.240\n192.168.222.160/255.255.255.240"
+	];
+	externalaggregate7 [
+		tooltip="AS external"
+		color="gray35"
+		style="solid"
+		shape="egg"
+		label="172.18.61.0/255.255.255.0"
+	];
+	externalaggregate5 [
+		tooltip="AS external"
+		color="gray35"
+		style="solid"
+		shape="egg"
+		label="0.0.0.0/0.0.0.0\n172.16.0.0/255.255.0.0\n172.18.181.0/255.255.255.0"
+	];
+	externalaggregate2 [
+		tooltip="AS external"
+		color="gray35"
+		style="solid"
+		shape="egg"
+		label="0.0.0.0/0.0.0.0\n172.16.0.0/255.255.0.0\n172.18.171.0/255.255.255.0"
+	];
+	externalaggregate6 [
+		tooltip="AS external"
+		color="gray35"
+		style="solid"
+		shape="egg"
+		label="0.0.0.0/0.0.0.0\n60.0.0.0/255.255.255.0\n150.175.240.112/255.255.255.248\n172.16.0.0/255.255.0.0\n172.16.0.175/255.255.255.255\n172.16.224.16/255.255.255.240\n172.16.224.32/255.255.255.240\n172.16.224.144/255.255.255.240\n172.16.224.160/255.255.255.240\n172.18.5.0/255.255.255.0\n172.18.25.0/255.255.255.0\n172.18.26.0/255.255.255.0\n172.19.25.0/255.255.255.0\n172.19.26.0/255.255.255.0\n172.27.5.0/255.255.255.0\n172.28.5.0/255.255.255.0\n172.38.5.0/255.255.255.0\n172.51.5.0/255.255.255.0\n192.168.0.150/255.255.255.255\n192.168.200.0/255.255.255.0\n192.168.208.0/255.255.255.0\n192.168.222.16/255.255.255.240\n192.168.222.32/255.255.255.240\n192.168.222.160/255.255.255.240"
+	];
+	externalaggregate1 [
+		tooltip="AS external"
+		color="gray35"
+		style="solid"
+		shape="egg"
+		label="0.0.0.0/0.0.0.0\n172.16.0.0/255.255.0.0\n172.18.32.0/255.255.255.0\n172.18.33.0/255.255.255.0"
+	];
+	externalaggregate4 [
+		tooltip="AS external"
+		color="gray35"
+		style="solid"
+		shape="egg"
+		label="0.0.0.0/0.0.0.0\n172.16.0.0/255.255.0.0\n172.18.182.0/255.255.255.0"
+	];
+	router19 -> network5 [
+		tooltip="Area: 51.0.0.0"
+		taillabel="14"
+		color="gray83"
+		style="bold"
+		headlabel=".182"
+	];
+	router18 -> network5 [
+		tooltip="Area: 51.0.0.0"
+		taillabel="13"
+		color="gray83"
+		style="solid"
+		headlabel=".181"
+	];
+	router1 -> network5 [
+		tooltip="Area: 51.0.0.0"
+		taillabel="10"
+		color="gray83"
+		style="solid"
+		headlabel=".48"
+	];
+	router13 -> network2 [
+		tooltip="Area: 51.0.0.0"
+		taillabel="13"
+		color="gray83"
+		style="solid"
+		headlabel=".5"
+	];
+	router14 -> network2 [
+		tooltip="Area: 51.0.0.0"
+		taillabel="14"
+		color="gray83"
+		style="solid"
+		headlabel=".6"
+	];
+	router6 -> network2 [
+		tooltip="Area: 51.0.0.0"
+		taillabel="10"
+		color="gray83"
+		style="bold"
+		headlabel=".146"
+	];
+	router0 -> network0 [
+		tooltip="Area: 23.0.0.0"
+		taillabel="10"
+		color="gray66"
+		style="bold"
+		headlabel=".47"
+	];
+	router1 -> network0 [
+		tooltip="Area: 23.0.0.0"
+		taillabel="10"
+		color="gray66"
+		style="solid"
+		headlabel=".48"
+	];
+	router18 -> network12 [
+		tooltip="Area: 51.0.0.0"
+		taillabel="1"
+		color="gray83"
+		style="bold"
+		headlabel=".2"
+	];
+	router11 -> network12 [
+		tooltip="Area: 51.0.0.0"
+		taillabel="1"
+		color="gray83"
+		style="solid"
+		headlabel=".1"
+	];
+	router17 -> network11 [
+		tooltip="Area: 51.0.0.0"
+		taillabel="1"
+		color="gray83"
+		style="solid"
+		headlabel=".2"
+	];
+	router10 -> network11 [
+		tooltip="Area: 51.0.0.0"
+		taillabel="2"
+		color="gray83"
+		style="bold"
+		headlabel=".1"
+	];
+	router7 -> network8 [
+		tooltip="Area: 51.0.0.0"
+		taillabel="2"
+		color="gray83"
+		style="solid"
+		headlabel=".61"
+	];
+	router13 -> network8 [
+		tooltip="Area: 51.0.0.0"
+		taillabel="1"
+		color="gray83"
+		style="solid"
+		headlabel=".52"
+	];
+	router14 -> network8 [
+		tooltip="Area: 51.0.0.0"
+		taillabel="2"
+		color="gray83"
+		style="bold"
+		headlabel=".62"
+	];
+	router4 -> network8 [
+		tooltip="Area: 51.0.0.0"
+		taillabel="1"
+		color="gray83"
+		style="solid"
+		headlabel=".51"
+	];
+	router17 -> network4 [
+		tooltip="Area: 51.0.0.0"
+		taillabel="13"
+		color="gray83"
+		style="bold"
+		headlabel=".172"
+	];
+	router16 -> network4 [
+		tooltip="Area: 51.0.0.0"
+		taillabel="13"
+		color="gray83"
+		style="solid"
+		headlabel=".171"
+	];
+	router1 -> network4 [
+		tooltip="Area: 51.0.0.0"
+		taillabel="10"
+		color="gray83"
+		style="solid"
+		headlabel=".48"
+	];
+	router15 -> network3 [
+		tooltip="Area: 51.0.0.0"
+		taillabel="14"
+		color="gray83"
+		style="bold"
+		headlabel=".33"
+	];
+	router1 -> network3 [
+		tooltip="Area: 51.0.0.0"
+		taillabel="10"
+		color="gray83"
+		style="solid"
+		headlabel=".48"
+	];
+	router19 -> network13 [
+		tooltip="Area: 51.0.0.0"
+		taillabel="2"
+		color="gray83"
+		style="bold"
+		headlabel=".2"
+	];
+	router12 -> network13 [
+		tooltip="Area: 51.0.0.0"
+		taillabel="2"
+		color="gray83"
+		style="solid"
+		headlabel=".1"
+	];
+	router16 -> network10 [
+		tooltip="Area: 51.0.0.0"
+		taillabel="1"
+		color="gray83"
+		style="solid"
+		headlabel=".2"
+	];
+	router9 -> network10 [
+		tooltip="Area: 51.0.0.0"
+		taillabel="1"
+		color="gray83"
+		style="bold"
+		headlabel=".1"
+	];
+	router13 -> network14 [
+		tooltip="Area: 51.0.0.0"
+		taillabel="13"
+		color="gray83"
+		style="bold"
+		headlabel=".5"
+	];
+	router14 -> network14 [
+		tooltip="Area: 51.0.0.0"
+		taillabel="14"
+		color="gray83"
+		style="solid"
+		headlabel=".6"
+	];
+	router2 -> network1 [
+		tooltip="Area: 0.0.0.0"
+		taillabel="10"
+		color="gray50"
+		style="bold"
+		headlabel=".45"
+	];
+	router3 -> network1 [
+		tooltip="Area: 0.0.0.0"
+		taillabel="1"
+		color="gray50"
+		style="solid"
+		headlabel=".6"
+	];
+	router1 -> network1 [
+		tooltip="Area: 0.0.0.0"
+		taillabel="10"
+		color="gray50"
+		style="solid"
+		headlabel=".48"
+	];
+	router15 -> network9 [
+		tooltip="Area: 51.0.0.0"
+		taillabel="2"
+		color="gray83"
+		style="solid"
+		headlabel=".2"
+	];
+	router8 -> network9 [
+		tooltip="Area: 51.0.0.0"
+		taillabel="2"
+		color="gray83"
+		style="bold"
+		headlabel=".1"
+	];
+	router13 -> network7 [
+		tooltip="Area: 51.0.0.0"
+		taillabel="13"
+		color="gray83"
+		style="solid"
+		headlabel=".5"
+	];
+	router0 -> network7 [
+		tooltip="Area: 51.0.0.0"
+		taillabel="10"
+		color="gray83"
+		style="bold"
+		headlabel=".47"
+	];
+	router5 -> network6 [
+		tooltip="Area: 51.0.0.0"
+		taillabel="10"
+		color="gray83"
+		style="solid"
+		headlabel=".37"
+	];
+	router2 -> network6 [
+		tooltip="Area: 51.0.0.0"
+		taillabel="10"
+		color="gray83"
+		style="solid"
+		headlabel=".45"
+	];
+	router3 -> network6 [
+		tooltip="Area: 51.0.0.0"
+		taillabel="1"
+		color="gray83"
+		style="solid"
+		headlabel=".6"
+	];
+	router6 -> network6 [
+		tooltip="Area: 51.0.0.0"
+		taillabel="10"
+		color="gray83"
+		style="bold"
+		headlabel=".146"
+	];
+	router1 -> network6 [
+		tooltip="Area: 51.0.0.0"
+		taillabel="10"
+		color="gray83"
+		style="solid"
+		headlabel=".48"
+	];
+	router6 -> stubnet2 [
+		tooltip="Area: 51.0.0.0"
+		taillabel="10"
+		color="gray83"
+		style="solid"
+	];
+	router6 -> stubnet1 [
+		tooltip="Area: 51.0.0.0"
+		taillabel="10"
+		color="gray83"
+		style="solid"
+	];
+	router6 -> stubnet0 [
+		tooltip="Area: 51.0.0.0"
+		taillabel="10"
+		color="gray83"
+		style="solid"
+	];
+	router4 -> router3 [
+		tooltip="Area: 0.0.0.0"
+		taillabel="24"
+		color="gray50"
+		style="dotted"
+		label="172.31.5.51"
+	];
+	router3 -> router4 [
+		tooltip="Area: 0.0.0.0"
+		taillabel="12"
+		color="gray50"
+		style="dotted"
+		label="172.20.0.6"
+	];
+	network5 -> router19 [
+		tooltip="Area: 51.0.0.0"
+		taillabel=".182"
+		color="gray83"
+		style="bold"
+	];
+	network5 -> router1 [
+		tooltip="Area: 51.0.0.0"
+		color="gray83"
+		style="solid"
+	];
+	network5 -> router18 [
+		tooltip="Area: 51.0.0.0"
+		color="gray83"
+		style="solid"
+	];
+	network2 -> router13 [
+		tooltip="Area: 51.0.0.0"
+		color="gray83"
+		style="solid"
+	];
+	network2 -> router14 [
+		tooltip="Area: 51.0.0.0"
+		color="gray83"
+		style="solid"
+	];
+	network2 -> router6 [
+		tooltip="Area: 51.0.0.0"
+		taillabel=".146"
+		color="gray83"
+		style="bold"
+	];
+	network0 -> router1 [
+		tooltip="Area: 23.0.0.0"
+		color="gray66"
+		style="solid"
+	];
+	network0 -> router0 [
+		tooltip="Area: 23.0.0.0"
+		taillabel=".47"
+		color="gray66"
+		style="bold"
+	];
+	network12 -> router18 [
+		tooltip="Area: 51.0.0.0"
+		taillabel=".2"
+		color="gray83"
+		style="bold"
+	];
+	network12 -> router11 [
+		tooltip="Area: 51.0.0.0"
+		color="gray83"
+		style="solid"
+	];
+	network11 -> router10 [
+		tooltip="Area: 51.0.0.0"
+		taillabel=".1"
+		color="gray83"
+		style="bold"
+	];
+	network11 -> router17 [
+		tooltip="Area: 51.0.0.0"
+		color="gray83"
+		style="solid"
+	];
+	network8 -> router14 [
+		tooltip="Area: 51.0.0.0"
+		taillabel=".62"
+		color="gray83"
+		style="bold"
+	];
+	network8 -> router4 [
+		tooltip="Area: 51.0.0.0"
+		color="gray83"
+		style="solid"
+	];
+	network8 -> router13 [
+		tooltip="Area: 51.0.0.0"
+		color="gray83"
+		style="solid"
+	];
+	network8 -> router7 [
+		tooltip="Area: 51.0.0.0"
+		color="gray83"
+		style="solid"
+	];
+	network4 -> router17 [
+		tooltip="Area: 51.0.0.0"
+		taillabel=".172"
+		color="gray83"
+		style="bold"
+	];
+	network4 -> router1 [
+		tooltip="Area: 51.0.0.0"
+		color="gray83"
+		style="solid"
+	];
+	network4 -> router16 [
+		tooltip="Area: 51.0.0.0"
+		color="gray83"
+		style="solid"
+	];
+	network3 -> router15 [
+		tooltip="Area: 51.0.0.0"
+		taillabel=".33"
+		color="gray83"
+		style="bold"
+	];
+	network3 -> router1 [
+		tooltip="Area: 51.0.0.0"
+		color="gray83"
+		style="solid"
+	];
+	network13 -> router19 [
+		tooltip="Area: 51.0.0.0"
+		taillabel=".2"
+		color="gray83"
+		style="bold"
+	];
+	network13 -> router12 [
+		tooltip="Area: 51.0.0.0"
+		color="gray83"
+		style="solid"
+	];
+	network10 -> router9 [
+		tooltip="Area: 51.0.0.0"
+		taillabel=".1"
+		color="gray83"
+		style="bold"
+	];
+	network10 -> router16 [
+		tooltip="Area: 51.0.0.0"
+		color="gray83"
+		style="solid"
+	];
+	network14 -> router13 [
+		tooltip="Area: 51.0.0.0"
+		taillabel=".5"
+		color="gray83"
+		style="bold"
+	];
+	network14 -> router14 [
+		tooltip="Area: 51.0.0.0"
+		color="gray83"
+		style="solid"
+	];
+	network1 -> router3 [
+		tooltip="Area: 0.0.0.0"
+		color="gray50"
+		style="solid"
+	];
+	network1 -> router1 [
+		tooltip="Area: 0.0.0.0"
+		color="gray50"
+		style="solid"
+	];
+	network1 -> router2 [
+		tooltip="Area: 0.0.0.0"
+		taillabel=".45"
+		color="gray50"
+		style="bold"
+	];
+	network9 -> router8 [
+		tooltip="Area: 51.0.0.0"
+		taillabel=".1"
+		color="gray83"
+		style="bold"
+	];
+	network9 -> router15 [
+		tooltip="Area: 51.0.0.0"
+		color="gray83"
+		style="solid"
+	];
+	network7 -> router13 [
+		tooltip="Area: 51.0.0.0"
+		color="gray83"
+		style="solid"
+	];
+	network7 -> router0 [
+		tooltip="Area: 51.0.0.0"
+		taillabel=".47"
+		color="gray83"
+		style="bold"
+	];
+	network6 -> router3 [
+		tooltip="Area: 51.0.0.0"
+		color="gray83"
+		style="solid"
+	];
+	network6 -> router5 [
+		tooltip="Area: 51.0.0.0"
+		color="gray83"
+		style="solid"
+	];
+	network6 -> router2 [
+		tooltip="Area: 51.0.0.0"
+		color="gray83"
+		style="solid"
+	];
+	network6 -> router1 [
+		tooltip="Area: 51.0.0.0"
+		color="gray83"
+		style="solid"
+	];
+	network6 -> router6 [
+		tooltip="Area: 51.0.0.0"
+		taillabel=".146"
+		color="gray83"
+		style="bold"
+	];
+	summary10 -> router0 [
+		tooltip="Area: 23.0.0.0"
+		taillabel=".0"
+		color="gray66"
+		style="dashed"
+		headlabel="10"
+	];
+	summary10 -> router1 [
+		tooltip="Area: 23.0.0.0"
+		taillabel=".0"
+		color="gray66"
+		style="dashed"
+		headlabel="33"
+	];
+	summary10 -> router2 [
+		tooltip="Area: 0.0.0.0"
+		taillabel=".0"
+		color="gray50"
+		style="dashed"
+		headlabel="33"
+	];
+	summary10 -> router1 [
+		tooltip="Area: 0.0.0.0"
+		taillabel=".0"
+		color="gray50"
+		style="dashed"
+		headlabel="33"
+	];
+	summary10 -> router3 [
+		tooltip="Area: 0.0.0.0"
+		taillabel=".0"
+		color="gray50"
+		style="dashed"
+		headlabel="24"
+	];
+	summary10 -> router4 [
+		tooltip="Area: 0.0.0.0"
+		taillabel=".0"
+		color="gray50"
+		style="dashed"
+		headlabel="14"
+	];
+	summary5 -> router0 [
+		tooltip="Area: 23.0.0.0"
+		taillabel=".0"
+		color="gray66"
+		style="dashed"
+		headlabel="33"
+	];
+	summary5 -> router1 [
+		tooltip="Area: 23.0.0.0"
+		taillabel=".0"
+		color="gray66"
+		style="dashed"
+		headlabel="20"
+	];
+	summary5 -> router2 [
+		tooltip="Area: 0.0.0.0"
+		taillabel=".0"
+		color="gray50"
+		style="dashed"
+		headlabel="20"
+	];
+	summary5 -> router1 [
+		tooltip="Area: 0.0.0.0"
+		taillabel=".0"
+		color="gray50"
+		style="dashed"
+		headlabel="20"
+	];
+	summary5 -> router3 [
+		tooltip="Area: 0.0.0.0"
+		taillabel=".255"
+		color="gray50"
+		style="dashed"
+		headlabel="11"
+	];
+	summary5 -> router4 [
+		tooltip="Area: 0.0.0.0"
+		taillabel=".255"
+		color="gray50"
+		style="dashed"
+		headlabel="24"
+	];
+	summary16 -> router0 [
+		tooltip="Area: 23.0.0.0"
+		taillabel=".0"
+		color="gray66"
+		style="dashed"
+		headlabel="45"
+	];
+	summary16 -> router1 [
+		tooltip="Area: 23.0.0.0"
+		taillabel=".0"
+		color="gray66"
+		style="dashed"
+		headlabel="12"
+	];
+	summary16 -> router2 [
+		tooltip="Area: 0.0.0.0"
+		taillabel=".0"
+		color="gray50"
+		style="dashed"
+		headlabel="22"
+	];
+	summary16 -> router1 [
+		tooltip="Area: 0.0.0.0"
+		taillabel=".0"
+		color="gray50"
+		style="dashed"
+		headlabel="12"
+	];
+	summary16 -> router3 [
+		tooltip="Area: 0.0.0.0"
+		taillabel=".255"
+		color="gray50"
+		style="dashed"
+		headlabel="13"
+	];
+	summary16 -> router4 [
+		tooltip="Area: 0.0.0.0"
+		taillabel=".255"
+		color="gray50"
+		style="dashed"
+		headlabel="36"
+	];
+	summary9 -> router0 [
+		tooltip="Area: 23.0.0.0"
+		taillabel=".0"
+		color="gray66"
+		style="dashed"
+		headlabel="33"
+	];
+	summary9 -> router1 [
+		tooltip="Area: 23.0.0.0"
+		taillabel=".0"
+		color="gray66"
+		style="dashed"
+		headlabel="10"
+	];
+	summary9 -> router2 [
+		tooltip="Area: 0.0.0.0"
+		taillabel=".0"
+		color="gray50"
+		style="dashed"
+		headlabel="10"
+	];
+	summary9 -> router1 [
+		tooltip="Area: 0.0.0.0"
+		taillabel=".0"
+		color="gray50"
+		style="dashed"
+		headlabel="10"
+	];
+	summary9 -> router3 [
+		tooltip="Area: 0.0.0.0"
+		taillabel=".255"
+		color="gray50"
+		style="dashed"
+		headlabel="1"
+	];
+	summary9 -> router4 [
+		tooltip="Area: 0.0.0.0"
+		taillabel=".255"
+		color="gray50"
+		style="dashed"
+		headlabel="24"
+	];
+	summary3 -> router0 [
+		tooltip="Area: 23.0.0.0"
+		taillabel=".0"
+		color="gray66"
+		style="dashed"
+		headlabel="33"
+	];
+	summary3 -> router1 [
+		tooltip="Area: 23.0.0.0"
+		taillabel=".0"
+		color="gray66"
+		style="dashed"
+		headlabel="20"
+	];
+	summary3 -> router2 [
+		tooltip="Area: 0.0.0.0"
+		taillabel=".0"
+		color="gray50"
+		style="dashed"
+		headlabel="20"
+	];
+	summary3 -> router1 [
+		tooltip="Area: 0.0.0.0"
+		taillabel=".0"
+		color="gray50"
+		style="dashed"
+		headlabel="20"
+	];
+	summary3 -> router3 [
+		tooltip="Area: 0.0.0.0"
+		taillabel=".255"
+		color="gray50"
+		style="dashed"
+		headlabel="11"
+	];
+	summary3 -> router4 [
+		tooltip="Area: 0.0.0.0"
+		taillabel=".255"
+		color="gray50"
+		style="dashed"
+		headlabel="24"
+	];
+	summary18 -> router1 [
+		tooltip="Area: 0.0.0.0"
+		taillabel=".0"
+		color="gray50"
+		style="dashed"
+		headlabel="10"
+	];
+	summary18 -> router2 [
+		tooltip="Area: 51.0.0.0"
+		taillabel=".0"
+		color="gray83"
+		style="dashed"
+		headlabel="20"
+	];
+	summary18 -> router0 [
+		tooltip="Area: 51.0.0.0"
+		taillabel=".0"
+		color="gray83"
+		style="dashed"
+		headlabel="10"
+	];
+	summary18 -> router1 [
+		tooltip="Area: 51.0.0.0"
+		taillabel=".0"
+		color="gray83"
+		style="dashed"
+		headlabel="10"
+	];
+	summary18 -> router3 [
+		tooltip="Area: 51.0.0.0"
+		taillabel=".255"
+		color="gray83"
+		style="dashed"
+		headlabel="11"
+	];
+	summary18 -> router4 [
+		tooltip="Area: 51.0.0.0"
+		taillabel=".255"
+		color="gray83"
+		style="dashed"
+		headlabel="34"
+	];
+	summary17 -> router0 [
+		tooltip="Area: 23.0.0.0"
+		taillabel=".0"
+		color="gray66"
+		style="dashed"
+		headlabel="23"
+	];
+	summary17 -> router1 [
+		tooltip="Area: 23.0.0.0"
+		taillabel=".0"
+		color="gray66"
+		style="dashed"
+		headlabel="33"
+	];
+	summary17 -> router2 [
+		tooltip="Area: 0.0.0.0"
+		taillabel=".0"
+		color="gray50"
+		style="dashed"
+		headlabel="33"
+	];
+	summary17 -> router1 [
+		tooltip="Area: 0.0.0.0"
+		taillabel=".0"
+		color="gray50"
+		style="dashed"
+		headlabel="33"
+	];
+	summary17 -> router3 [
+		tooltip="Area: 0.0.0.0"
+		taillabel=".255"
+		color="gray50"
+		style="dashed"
+		headlabel="24"
+	];
+	summary17 -> router4 [
+		tooltip="Area: 0.0.0.0"
+		taillabel=".255"
+		color="gray50"
+		style="dashed"
+		headlabel="14"
+	];
+	summary12 -> router0 [
+		tooltip="Area: 23.0.0.0"
+		taillabel=".0"
+		color="gray66"
+		style="dashed"
+		headlabel="45"
+	];
+	summary12 -> router1 [
+		tooltip="Area: 23.0.0.0"
+		taillabel=".0"
+		color="gray66"
+		style="dashed"
+		headlabel="12"
+	];
+	summary12 -> router2 [
+		tooltip="Area: 0.0.0.0"
+		taillabel=".0"
+		color="gray50"
+		style="dashed"
+		headlabel="22"
+	];
+	summary12 -> router1 [
+		tooltip="Area: 0.0.0.0"
+		taillabel=".0"
+		color="gray50"
+		style="dashed"
+		headlabel="12"
+	];
+	summary12 -> router3 [
+		tooltip="Area: 0.0.0.0"
+		taillabel=".0"
+		color="gray50"
+		style="dashed"
+		headlabel="13"
+	];
+	summary12 -> router4 [
+		tooltip="Area: 0.0.0.0"
+		taillabel=".0"
+		color="gray50"
+		style="dashed"
+		headlabel="36"
+	];
+	summary13 -> router0 [
+		tooltip="Area: 23.0.0.0"
+		taillabel=".0"
+		color="gray66"
+		style="dashed"
+		headlabel="44"
+	];
+	summary13 -> router1 [
+		tooltip="Area: 23.0.0.0"
+		taillabel=".0"
+		color="gray66"
+		style="dashed"
+		headlabel="11"
+	];
+	summary13 -> router2 [
+		tooltip="Area: 0.0.0.0"
+		taillabel=".0"
+		color="gray50"
+		style="dashed"
+		headlabel="21"
+	];
+	summary13 -> router1 [
+		tooltip="Area: 0.0.0.0"
+		taillabel=".0"
+		color="gray50"
+		style="dashed"
+		headlabel="11"
+	];
+	summary13 -> router3 [
+		tooltip="Area: 0.0.0.0"
+		taillabel=".0"
+		color="gray50"
+		style="dashed"
+		headlabel="12"
+	];
+	summary13 -> router4 [
+		tooltip="Area: 0.0.0.0"
+		taillabel=".0"
+		color="gray50"
+		style="dashed"
+		headlabel="35"
+	];
+	summary0 -> router1 [
+		tooltip="Area: 23.0.0.0"
+		taillabel=".0"
+		color="gray66"
+		style="dashed"
+		headlabel="10"
+	];
+	summary0 -> router2 [
+		tooltip="Area: 51.0.0.0"
+		taillabel=".0"
+		color="gray83"
+		style="dashed"
+		headlabel="10"
+	];
+	summary0 -> router1 [
+		tooltip="Area: 51.0.0.0"
+		taillabel=".0"
+		color="gray83"
+		style="dashed"
+		headlabel="10"
+	];
+	summary0 -> router3 [
+		tooltip="Area: 51.0.0.0"
+		taillabel=".0"
+		color="gray83"
+		style="dashed"
+		headlabel="1"
+	];
+	summary0 -> router4 [
+		tooltip="Area: 51.0.0.0"
+		taillabel=".0"
+		color="gray83"
+		style="dashed"
+		headlabel="25"
+	];
+	summary11 -> router0 [
+		tooltip="Area: 23.0.0.0"
+		taillabel=".0"
+		color="gray66"
+		style="dashed"
+		headlabel="11"
+	];
+	summary11 -> router1 [
+		tooltip="Area: 23.0.0.0"
+		taillabel=".0"
+		color="gray66"
+		style="dashed"
+		headlabel="21"
+	];
+	summary11 -> router2 [
+		tooltip="Area: 0.0.0.0"
+		taillabel=".0"
+		color="gray50"
+		style="dashed"
+		headlabel="21"
+	];
+	summary11 -> router1 [
+		tooltip="Area: 0.0.0.0"
+		taillabel=".0"
+		color="gray50"
+		style="dashed"
+		headlabel="21"
+	];
+	summary11 -> router3 [
+		tooltip="Area: 0.0.0.0"
+		taillabel=".0"
+		color="gray50"
+		style="dashed"
+		headlabel="12"
+	];
+	summary11 -> router4 [
+		tooltip="Area: 0.0.0.0"
+		taillabel=".0"
+		color="gray50"
+		style="dashed"
+		headlabel="1"
+	];
+	summary8 -> router0 [
+		tooltip="Area: 23.0.0.0"
+		taillabel=".0"
+		color="gray66"
+		style="dashed"
+		headlabel="43"
+	];
+	summary8 -> router1 [
+		tooltip="Area: 23.0.0.0"
+		taillabel=".0"
+		color="gray66"
+		style="dashed"
+		headlabel="10"
+	];
+	summary8 -> router2 [
+		tooltip="Area: 0.0.0.0"
+		taillabel=".0"
+		color="gray50"
+		style="dashed"
+		headlabel="20"
+	];
+	summary8 -> router1 [
+		tooltip="Area: 0.0.0.0"
+		taillabel=".0"
+		color="gray50"
+		style="dashed"
+		headlabel="10"
+	];
+	summary8 -> router3 [
+		tooltip="Area: 0.0.0.0"
+		taillabel=".255"
+		color="gray50"
+		style="dashed"
+		headlabel="11"
+	];
+	summary8 -> router4 [
+		tooltip="Area: 0.0.0.0"
+		taillabel=".255"
+		color="gray50"
+		style="dashed"
+		headlabel="34"
+	];
+	summary15 -> router0 [
+		tooltip="Area: 23.0.0.0"
+		taillabel=".0"
+		color="gray66"
+		style="dashed"
+		headlabel="44"
+	];
+	summary15 -> router1 [
+		tooltip="Area: 23.0.0.0"
+		taillabel=".0"
+		color="gray66"
+		style="dashed"
+		headlabel="11"
+	];
+	summary15 -> router2 [
+		tooltip="Area: 0.0.0.0"
+		taillabel=".0"
+		color="gray50"
+		style="dashed"
+		headlabel="21"
+	];
+	summary15 -> router1 [
+		tooltip="Area: 0.0.0.0"
+		taillabel=".0"
+		color="gray50"
+		style="dashed"
+		headlabel="11"
+	];
+	summary15 -> router3 [
+		tooltip="Area: 0.0.0.0"
+		taillabel=".0"
+		color="gray50"
+		style="dashed"
+		headlabel="12"
+	];
+	summary15 -> router4 [
+		tooltip="Area: 0.0.0.0"
+		taillabel=".0"
+		color="gray50"
+		style="dashed"
+		headlabel="35"
+	];
+	summary6 -> router0 [
+		tooltip="Area: 23.0.0.0"
+		taillabel=".0"
+		color="gray66"
+		style="dashed"
+		headlabel="43"
+	];
+	summary6 -> router1 [
+		tooltip="Area: 23.0.0.0"
+		taillabel=".0"
+		color="gray66"
+		style="dashed"
+		headlabel="10"
+	];
+	summary6 -> router2 [
+		tooltip="Area: 0.0.0.0"
+		taillabel=".0"
+		color="gray50"
+		style="dashed"
+		headlabel="20"
+	];
+	summary6 -> router1 [
+		tooltip="Area: 0.0.0.0"
+		taillabel=".0"
+		color="gray50"
+		style="dashed"
+		headlabel="10"
+	];
+	summary6 -> router3 [
+		tooltip="Area: 0.0.0.0"
+		taillabel=".255"
+		color="gray50"
+		style="dashed"
+		headlabel="11"
+	];
+	summary6 -> router4 [
+		tooltip="Area: 0.0.0.0"
+		taillabel=".255"
+		color="gray50"
+		style="dashed"
+		headlabel="34"
+	];
+	summary14 -> router0 [
+		tooltip="Area: 23.0.0.0"
+		taillabel=".0"
+		color="gray66"
+		style="dashed"
+		headlabel="44"
+	];
+	summary14 -> router1 [
+		tooltip="Area: 23.0.0.0"
+		taillabel=".0"
+		color="gray66"
+		style="dashed"
+		headlabel="11"
+	];
+	summary14 -> router2 [
+		tooltip="Area: 0.0.0.0"
+		taillabel=".0"
+		color="gray50"
+		style="dashed"
+		headlabel="21"
+	];
+	summary14 -> router1 [
+		tooltip="Area: 0.0.0.0"
+		taillabel=".0"
+		color="gray50"
+		style="dashed"
+		headlabel="11"
+	];
+	summary14 -> router3 [
+		tooltip="Area: 0.0.0.0"
+		taillabel=".255"
+		color="gray50"
+		style="dashed"
+		headlabel="12"
+	];
+	summary14 -> router4 [
+		tooltip="Area: 0.0.0.0"
+		taillabel=".255"
+		color="gray50"
+		style="dashed"
+		headlabel="35"
+	];
+	summary7 -> router0 [
+		tooltip="Area: 23.0.0.0"
+		taillabel=".0"
+		color="gray66"
+		style="dashed"
+		headlabel="43"
+	];
+	summary7 -> router1 [
+		tooltip="Area: 23.0.0.0"
+		taillabel=".0"
+		color="gray66"
+		style="dashed"
+		headlabel="10"
+	];
+	summary7 -> router2 [
+		tooltip="Area: 0.0.0.0"
+		taillabel=".0"
+		color="gray50"
+		style="dashed"
+		headlabel="20"
+	];
+	summary7 -> router1 [
+		tooltip="Area: 0.0.0.0"
+		taillabel=".0"
+		color="gray50"
+		style="dashed"
+		headlabel="10"
+	];
+	summary7 -> router3 [
+		tooltip="Area: 0.0.0.0"
+		taillabel=".0"
+		color="gray50"
+		style="dashed"
+		headlabel="11"
+	];
+	summary7 -> router4 [
+		tooltip="Area: 0.0.0.0"
+		taillabel=".0"
+		color="gray50"
+		style="dashed"
+		headlabel="34"
+	];
+	summary4 -> router0 [
+		tooltip="Area: 23.0.0.0"
+		taillabel=".0"
+		color="gray66"
+		style="dashed"
+		headlabel="33"
+	];
+	summary4 -> router1 [
+		tooltip="Area: 23.0.0.0"
+		taillabel=".0"
+		color="gray66"
+		style="dashed"
+		headlabel="20"
+	];
+	summary4 -> router2 [
+		tooltip="Area: 0.0.0.0"
+		taillabel=".0"
+		color="gray50"
+		style="dashed"
+		headlabel="20"
+	];
+	summary4 -> router1 [
+		tooltip="Area: 0.0.0.0"
+		taillabel=".0"
+		color="gray50"
+		style="dashed"
+		headlabel="20"
+	];
+	summary4 -> router3 [
+		tooltip="Area: 0.0.0.0"
+		taillabel=".0"
+		color="gray50"
+		style="dashed"
+		headlabel="11"
+	];
+	summary4 -> router4 [
+		tooltip="Area: 0.0.0.0"
+		taillabel=".0"
+		color="gray50"
+		style="dashed"
+		headlabel="24"
+	];
+	summary2 -> router0 [
+		tooltip="Area: 23.0.0.0"
+		taillabel=".0"
+		color="gray66"
+		style="dashed"
+		headlabel="23"
+	];
+	summary2 -> router1 [
+		tooltip="Area: 23.0.0.0"
+		taillabel=".0"
+		color="gray66"
+		style="dashed"
+		headlabel="20"
+	];
+	summary2 -> router2 [
+		tooltip="Area: 0.0.0.0"
+		taillabel=".0"
+		color="gray50"
+		style="dashed"
+		headlabel="20"
+	];
+	summary2 -> router1 [
+		tooltip="Area: 0.0.0.0"
+		taillabel=".0"
+		color="gray50"
+		style="dashed"
+		headlabel="20"
+	];
+	summary2 -> router3 [
+		tooltip="Area: 0.0.0.0"
+		taillabel=".0"
+		color="gray50"
+		style="dashed"
+		headlabel="11"
+	];
+	summary2 -> router4 [
+		tooltip="Area: 0.0.0.0"
+		taillabel=".0"
+		color="gray50"
+		style="dashed"
+		headlabel="14"
+	];
+	summaryaggregate0 -> router0 [
+		tooltip="Area: 51.0.0.0"
+		color="gray83"
+		style="dashed"
+		headlabel="10"
+	];
+	summaryaggregate0 -> router0 [
+		tooltip="Area: 23.0.0.0"
+		color="gray66"
+		style="dashed"
+		headlabel="10"
+	];
+	router18 -> router0 [
+		tooltip="Area: 23.0.0.0"
+		color="gray66"
+		style="dashed"
+		headlabel="43"
+	];
+	router18 -> router1 [
+		tooltip="Area: 23.0.0.0"
+		color="gray66"
+		style="dashed"
+		headlabel="10"
+	];
+	router18 -> router2 [
+		tooltip="Area: 0.0.0.0"
+		color="gray50"
+		style="dashed"
+		headlabel="20"
+	];
+	router18 -> router1 [
+		tooltip="Area: 0.0.0.0"
+		color="gray50"
+		style="dashed"
+		headlabel="10"
+	];
+	router18 -> router3 [
+		tooltip="Area: 0.0.0.0"
+		color="gray50"
+		style="dashed"
+		headlabel="11"
+	];
+	router18 -> router4 [
+		tooltip="Area: 0.0.0.0"
+		color="gray50"
+		style="dashed"
+		headlabel="34"
+	];
+	router15 -> router0 [
+		tooltip="Area: 23.0.0.0"
+		color="gray66"
+		style="dashed"
+		headlabel="43"
+	];
+	router15 -> router1 [
+		tooltip="Area: 23.0.0.0"
+		color="gray66"
+		style="dashed"
+		headlabel="10"
+	];
+	router15 -> router2 [
+		tooltip="Area: 0.0.0.0"
+		color="gray50"
+		style="dashed"
+		headlabel="20"
+	];
+	router15 -> router1 [
+		tooltip="Area: 0.0.0.0"
+		color="gray50"
+		style="dashed"
+		headlabel="10"
+	];
+	router15 -> router3 [
+		tooltip="Area: 0.0.0.0"
+		color="gray50"
+		style="dashed"
+		headlabel="11"
+	];
+	router15 -> router4 [
+		tooltip="Area: 0.0.0.0"
+		color="gray50"
+		style="dashed"
+		headlabel="34"
+	];
+	router13 -> router0 [
+		tooltip="Area: 23.0.0.0"
+		color="gray66"
+		style="dashed"
+		headlabel="10"
+	];
+	router13 -> router1 [
+		tooltip="Area: 23.0.0.0"
+		color="gray66"
+		style="dashed"
+		headlabel="20"
+	];
+	router13 -> router2 [
+		tooltip="Area: 0.0.0.0"
+		color="gray50"
+		style="dashed"
+		headlabel="20"
+	];
+	router13 -> router1 [
+		tooltip="Area: 0.0.0.0"
+		color="gray50"
+		style="dashed"
+		headlabel="20"
+	];
+	router13 -> router3 [
+		tooltip="Area: 0.0.0.0"
+		color="gray50"
+		style="dashed"
+		headlabel="11"
+	];
+	router13 -> router4 [
+		tooltip="Area: 0.0.0.0"
+		color="gray50"
+		style="dashed"
+		headlabel="1"
+	];
+	router10 -> router0 [
+		tooltip="Area: 23.0.0.0"
+		color="gray66"
+		style="dashed"
+		headlabel="44"
+	];
+	router10 -> router1 [
+		tooltip="Area: 23.0.0.0"
+		color="gray66"
+		style="dashed"
+		headlabel="11"
+	];
+	router10 -> router2 [
+		tooltip="Area: 0.0.0.0"
+		color="gray50"
+		style="dashed"
+		headlabel="21"
+	];
+	router10 -> router1 [
+		tooltip="Area: 0.0.0.0"
+		color="gray50"
+		style="dashed"
+		headlabel="11"
+	];
+	router10 -> router3 [
+		tooltip="Area: 0.0.0.0"
+		color="gray50"
+		style="dashed"
+		headlabel="12"
+	];
+	router10 -> router4 [
+		tooltip="Area: 0.0.0.0"
+		color="gray50"
+		style="dashed"
+		headlabel="35"
+	];
+	router9 -> router0 [
+		tooltip="Area: 23.0.0.0"
+		color="gray66"
+		style="dashed"
+		headlabel="44"
+	];
+	router9 -> router1 [
+		tooltip="Area: 23.0.0.0"
+		color="gray66"
+		style="dashed"
+		headlabel="11"
+	];
+	router9 -> router2 [
+		tooltip="Area: 0.0.0.0"
+		color="gray50"
+		style="dashed"
+		headlabel="21"
+	];
+	router9 -> router1 [
+		tooltip="Area: 0.0.0.0"
+		color="gray50"
+		style="dashed"
+		headlabel="11"
+	];
+	router9 -> router3 [
+		tooltip="Area: 0.0.0.0"
+		color="gray50"
+		style="dashed"
+		headlabel="12"
+	];
+	router9 -> router4 [
+		tooltip="Area: 0.0.0.0"
+		color="gray50"
+		style="dashed"
+		headlabel="35"
+	];
+	router19 -> router0 [
+		tooltip="Area: 23.0.0.0"
+		color="gray66"
+		style="dashed"
+		headlabel="43"
+	];
+	router19 -> router1 [
+		tooltip="Area: 23.0.0.0"
+		color="gray66"
+		style="dashed"
+		headlabel="10"
+	];
+	router19 -> router2 [
+		tooltip="Area: 0.0.0.0"
+		color="gray50"
+		style="dashed"
+		headlabel="20"
+	];
+	router19 -> router1 [
+		tooltip="Area: 0.0.0.0"
+		color="gray50"
+		style="dashed"
+		headlabel="10"
+	];
+	router19 -> router3 [
+		tooltip="Area: 0.0.0.0"
+		color="gray50"
+		style="dashed"
+		headlabel="11"
+	];
+	router19 -> router4 [
+		tooltip="Area: 0.0.0.0"
+		color="gray50"
+		style="dashed"
+		headlabel="34"
+	];
+	router17 -> router0 [
+		tooltip="Area: 23.0.0.0"
+		color="gray66"
+		style="dashed"
+		headlabel="43"
+	];
+	router17 -> router1 [
+		tooltip="Area: 23.0.0.0"
+		color="gray66"
+		style="dashed"
+		headlabel="10"
+	];
+	router17 -> router2 [
+		tooltip="Area: 0.0.0.0"
+		color="gray50"
+		style="dashed"
+		headlabel="20"
+	];
+	router17 -> router1 [
+		tooltip="Area: 0.0.0.0"
+		color="gray50"
+		style="dashed"
+		headlabel="10"
+	];
+	router17 -> router3 [
+		tooltip="Area: 0.0.0.0"
+		color="gray50"
+		style="dashed"
+		headlabel="11"
+	];
+	router17 -> router4 [
+		tooltip="Area: 0.0.0.0"
+		color="gray50"
+		style="dashed"
+		headlabel="34"
+	];
+	router16 -> router0 [
+		tooltip="Area: 23.0.0.0"
+		color="gray66"
+		style="dashed"
+		headlabel="43"
+	];
+	router16 -> router1 [
+		tooltip="Area: 23.0.0.0"
+		color="gray66"
+		style="dashed"
+		headlabel="10"
+	];
+	router16 -> router2 [
+		tooltip="Area: 0.0.0.0"
+		color="gray50"
+		style="dashed"
+		headlabel="20"
+	];
+	router16 -> router1 [
+		tooltip="Area: 0.0.0.0"
+		color="gray50"
+		style="dashed"
+		headlabel="10"
+	];
+	router16 -> router3 [
+		tooltip="Area: 0.0.0.0"
+		color="gray50"
+		style="dashed"
+		headlabel="11"
+	];
+	router16 -> router4 [
+		tooltip="Area: 0.0.0.0"
+		color="gray50"
+		style="dashed"
+		headlabel="34"
+	];
+	router4 -> router0 [
+		tooltip="Area: 23.0.0.0"
+		color="gray66"
+		style="dashed"
+		headlabel="11"
+	];
+	router4 -> router1 [
+		tooltip="Area: 23.0.0.0"
+		color="gray66"
+		style="dashed"
+		headlabel="21"
+	];
+	router4 -> router2 [
+		tooltip="AS boundary router 172.30.5.5 is router in same area 0.0.0.0."
+		color="blue"
+		style="dashed"
+		headlabel="21"
+	];
+	router4 -> router1 [
+		tooltip="AS boundary router 172.30.5.5 is router in same area 0.0.0.0."
+		color="blue"
+		style="dashed"
+		headlabel="21"
+	];
+	router8 -> router0 [
+		tooltip="Area: 23.0.0.0"
+		color="gray66"
+		style="dashed"
+		headlabel="45"
+	];
+	router8 -> router1 [
+		tooltip="Area: 23.0.0.0"
+		color="gray66"
+		style="dashed"
+		headlabel="12"
+	];
+	router8 -> router2 [
+		tooltip="Area: 0.0.0.0"
+		color="gray50"
+		style="dashed"
+		headlabel="22"
+	];
+	router8 -> router1 [
+		tooltip="Area: 0.0.0.0"
+		color="gray50"
+		style="dashed"
+		headlabel="12"
+	];
+	router8 -> router3 [
+		tooltip="Area: 0.0.0.0"
+		color="gray50"
+		style="dashed"
+		headlabel="13"
+	];
+	router8 -> router4 [
+		tooltip="Area: 0.0.0.0"
+		color="gray50"
+		style="dashed"
+		headlabel="36"
+	];
+	router14 -> router0 [
+		tooltip="Area: 23.0.0.0"
+		color="gray66"
+		style="dashed"
+		headlabel="11"
+	];
+	router14 -> router1 [
+		tooltip="Area: 23.0.0.0"
+		color="gray66"
+		style="dashed"
+		headlabel="20"
+	];
+	router14 -> router2 [
+		tooltip="Area: 0.0.0.0"
+		color="gray50"
+		style="dashed"
+		headlabel="20"
+	];
+	router14 -> router1 [
+		tooltip="Area: 0.0.0.0"
+		color="gray50"
+		style="dashed"
+		headlabel="20"
+	];
+	router14 -> router3 [
+		tooltip="Area: 0.0.0.0"
+		color="gray50"
+		style="dashed"
+		headlabel="11"
+	];
+	router14 -> router4 [
+		tooltip="Area: 0.0.0.0"
+		color="gray50"
+		style="dashed"
+		headlabel="1"
+	];
+	router7 -> router0 [
+		tooltip="Area: 23.0.0.0"
+		color="gray66"
+		style="dashed"
+		headlabel="11"
+	];
+	router7 -> router1 [
+		tooltip="Area: 23.0.0.0"
+		color="gray66"
+		style="dashed"
+		headlabel="21"
+	];
+	router7 -> router2 [
+		tooltip="Area: 0.0.0.0"
+		color="gray50"
+		style="dashed"
+		headlabel="21"
+	];
+	router7 -> router1 [
+		tooltip="Area: 0.0.0.0"
+		color="gray50"
+		style="dashed"
+		headlabel="21"
+	];
+	router7 -> router3 [
+		tooltip="Area: 0.0.0.0"
+		color="gray50"
+		style="dashed"
+		headlabel="12"
+	];
+	router7 -> router4 [
+		tooltip="Area: 0.0.0.0"
+		color="gray50"
+		style="dashed"
+		headlabel="1"
+	];
+	router12 -> router0 [
+		tooltip="Area: 23.0.0.0"
+		color="gray66"
+		style="dashed"
+		headlabel="45"
+	];
+	router12 -> router1 [
+		tooltip="Area: 23.0.0.0"
+		color="gray66"
+		style="dashed"
+		headlabel="12"
+	];
+	router12 -> router2 [
+		tooltip="Area: 0.0.0.0"
+		color="gray50"
+		style="dashed"
+		headlabel="22"
+	];
+	router12 -> router1 [
+		tooltip="Area: 0.0.0.0"
+		color="gray50"
+		style="dashed"
+		headlabel="12"
+	];
+	router12 -> router3 [
+		tooltip="Area: 0.0.0.0"
+		color="gray50"
+		style="dashed"
+		headlabel="13"
+	];
+	router12 -> router4 [
+		tooltip="Area: 0.0.0.0"
+		color="gray50"
+		style="dashed"
+		headlabel="36"
+	];
+	router3 -> router0 [
+		tooltip="Area: 23.0.0.0"
+		color="gray66"
+		style="dashed"
+		headlabel="33"
+	];
+	router3 -> router1 [
+		tooltip="Area: 23.0.0.0"
+		color="gray66"
+		style="dashed"
+		headlabel="10"
+	];
+	router3 -> router2 [
+		tooltip="AS boundary router 172.16.146.6 is router in same area 0.0.0.0."
+		color="blue"
+		style="dashed"
+		headlabel="10"
+	];
+	router3 -> router1 [
+		tooltip="AS boundary router 172.16.146.6 is router in same area 0.0.0.0."
+		color="blue"
+		style="dashed"
+		headlabel="10"
+	];
+	router11 -> router0 [
+		tooltip="Area: 23.0.0.0"
+		color="gray66"
+		style="dashed"
+		headlabel="44"
+	];
+	router11 -> router1 [
+		tooltip="Area: 23.0.0.0"
+		color="gray66"
+		style="dashed"
+		headlabel="11"
+	];
+	router11 -> router2 [
+		tooltip="Area: 0.0.0.0"
+		color="gray50"
+		style="dashed"
+		headlabel="21"
+	];
+	router11 -> router1 [
+		tooltip="Area: 0.0.0.0"
+		color="gray50"
+		style="dashed"
+		headlabel="11"
+	];
+	router11 -> router3 [
+		tooltip="Area: 0.0.0.0"
+		color="gray50"
+		style="dashed"
+		headlabel="12"
+	];
+	router11 -> router4 [
+		tooltip="Area: 0.0.0.0"
+		color="gray50"
+		style="dashed"
+		headlabel="35"
+	];
+	router0 -> router2 [
+		tooltip="Area: 0.0.0.0"
+		color="gray50"
+		style="dashed"
+		headlabel="33"
+	];
+	router0 -> router1 [
+		tooltip="Area: 0.0.0.0"
+		color="gray50"
+		style="dashed"
+		headlabel="10"
+	];
+	router0 -> router3 [
+		tooltip="Area: 0.0.0.0"
+		color="gray50"
+		style="dashed"
+		headlabel="24"
+	];
+	router0 -> router4 [
+		tooltip="Area: 0.0.0.0"
+		color="gray50"
+		style="dashed"
+		headlabel="14"
+	];
+	router0 -> router1 [
+		tooltip="AS boundary router 172.16.0.47 is router in same area 51.0.0.0."
+		color="blue"
+		style="dashed"
+		headlabel="10"
+	];
+	router1 -> router2 [
+		tooltip="AS boundary router 172.16.0.48 is router in same area 51.0.0.0."
+		color="blue"
+		style="dashed"
+		headlabel="10"
+	];
+	router1 -> router0 [
+		tooltip="AS boundary router 172.16.0.48 is router in same area 51.0.0.0."
+		color="blue"
+		style="dashed"
+		headlabel="10"
+	];
+	externalaggregate0 -> router10 [
+		tooltip="AS external"
+		color="gray35"
+		headlabel="2"
+		style="solid"
+	];
+	externalaggregate3 -> router7 [
+		tooltip="AS external"
+		color="gray35"
+		headlabel="2"
+		style="solid"
+	];
+	externalaggregate7 -> router1 [
+		tooltip="AS external"
+		color="gray35"
+		headlabel="0"
+		style="solid"
+	];
+	externalaggregate5 -> router11 [
+		tooltip="AS external"
+		color="gray35"
+		headlabel="1"
+		style="solid"
+	];
+	externalaggregate2 -> router9 [
+		tooltip="AS external"
+		color="gray35"
+		headlabel="1"
+		style="solid"
+	];
+	externalaggregate6 -> router4 [
+		tooltip="AS external"
+		color="gray35"
+		headlabel="1"
+		style="solid"
+	];
+	externalaggregate1 -> router8 [
+		tooltip="AS external"
+		color="gray35"
+		headlabel="2"
+		style="solid"
+	];
+	externalaggregate4 -> router12 [
+		tooltip="AS external"
+		color="gray35"
+		headlabel="2"
+		style="solid"
+	];
+}

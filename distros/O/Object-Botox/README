@@ -1,0 +1,79 @@
+Object-Botox
+
+Object::Botox writed for easy object creation by default constructor and support managment properties,
+inherited by children of prototyping class.
+
+To create parent module:
+   
+	package Parent;
+
+	use Botox;
+        
+  # strictly named constant PROTOTYPE !
+	use constant PROTOTYPE => {
+                'prop1_ro' => 1 ,
+                'prop2' => 'abcde'
+                };
+	
+	1; 
+
+after that we are create instanse:
+
+	package main;
+	use Data::Dumper;
+	
+	# change default value for prop1
+	my $foo = new Parent( { prop1 => 888888 } );
+	
+	print Dumper($foo);
+
+outputs get to us:
+
+	$VAR1 = bless( {
+			'Parent::prop1' => 888888,
+			'Parent::prop2' => 'abcde'
+			 }, 'Parent' );
+
+ok, in short it is like Mouse, but simple.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Object::Botox
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Object-Botox
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Object-Botox
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Object-Botox
+
+    Search CPAN
+        http://search.cpan.org/dist/Object-Botox/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2011 Meettya
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

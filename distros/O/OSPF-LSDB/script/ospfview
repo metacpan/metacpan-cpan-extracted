@@ -1,0 +1,216 @@
+#!/usr/bin/perl
+
+##########################################################################
+# Copyright (c) 2012 Alexander Bluhm <alexander.bluhm@gmx.net>
+#
+# Permission to use, copy, modify, and distribute this software for any
+# purpose with or without fee is hereby granted, provided that the above
+# copyright notice and this permission notice appear in all copies.
+#
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+# ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+# ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+# OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+##########################################################################
+
+use strict;
+use warnings;
+use File::Temp;
+use Getopt::Long qw(:config posix_default bundling);
+use IO::Handle;
+use POSIX;
+use Time::HiRes qw(time sleep);
+use OSPF::LSDB::ospfd;
+use OSPF::LSDB::ospf6d;
+use OSPF::LSDB::View;
+use OSPF::LSDB::View6;
+use OSPF::LSDB::YAML;
+
+sub usage(@) {
+    print STDERR "Error: @_\n" if @_;
+    print STDERR <<EOF;
+Periodically poll OSPF database from routing daemon and display it on X11.
+
+Usage: $0 [-46bBcdDeEhlpPsSwWv] [-H user\@host] [-I interval]
+    -4           disable IPv6
+    -6           enable IPv6
+    -b           generate other area AS boundary router summary
+    -B           aggregate other area AS boundary router summary
+    -c           cluster identical networks
+    -d           show OSPF database diff between updates
+    -D           dump OSPF database after updates as YAML to stdout
+    -e           generate AS external networks
+    -E           aggregate AS external networks
+    -h           help, print usage
+    -H user\@host use ssh to login into user\@host to run ospfctl there
+    -I interval  query interval in seconds, default 5
+    -l           generate legend
+    -p           generate link and intra-area-prefix
+    -P           generate intra-area-prefix
+    -s           generate other area network summary
+    -S           aggregate other area network summary
+    -w           show most serious warning in dot graph
+    -W           show all warnings and areas in dot graph
+    -v           be verbose, print warnings to stdout
+EOF
+    exit(2);
+}
+
+sub main() {
+    my $diff;
+    my $dump;
+    my $interval = 5;
+    my $ipv6;
+    my $legend;
+    my $ssh;
+    my %todo;
+    GetOptions(
+	'4'   => sub { $ipv6 = 0 },
+	'6'   => sub { $ipv6 = 1 },
+	'b'   => sub { $todo{boundary}{generate}  = 1 },
+	'B'   => sub { $todo{boundary}{aggregate} = 1 },
+	'c'   => sub { $todo{cluster} = 1 },
+	'd'   => \$diff,
+	'D'   => \$dump,
+	'e'   => sub { $todo{external}{generate}  = 1 },
+	'E'   => sub { $todo{external}{aggregate} = 1 },
+	'h'   => sub { usage() },
+	'H=s' => \$ssh,
+	'I=i' => \$interval,
+	'l'   => \$legend,
+	'p'   => sub { $todo{prefix}{generate}    = 1 },
+	'P'   => sub { $todo{prefix}{aggregate}   = 1 },
+	's'   => sub { $todo{summary}{generate}   = 1 },
+	'S'   => sub { $todo{summary}{aggregate}  = 1 },
+	'w'   => sub { $todo{warning}{single} = 1 },
+	'W'   => sub { $todo{warning}{all} = 1 },
+	'v'   => sub { $todo{verbose} = 1 },
+    ) or usage("Bad option");
+    usage("No arguments allowed") if @ARGV > 0;
+
+    foreach my $option (qw(boundary external prefix summary warning)) {
+	if (keys %{$todo{$option} || {}} > 1) {
+	    my $opt = substr($option, 0, 1);
+	    usage("Options -$opt and -".uc($opt)." used together");
+	}
+    }
+
+    if ($todo{prefix}) {
+	$todo{intra}{generate} = 1;
+	$todo{link}{generate} = 1 if $todo{prefix}{generate};
+    }
+
+    my($pid, $fh, $gone);
+    $SIG{INT} = sub {
+	kill SIGTERM, $pid if $pid;
+	$SIG{'INT'}  = 'DEFAULT';
+	kill SIGINT, $$;
+    };
+    $SIG{CHLD} = sub {
+	if ($pid && ! kill(0, $pid)) {
+	    $gone = 1;
+	}
+    };
+
+    my $class = $ipv6 ? 'OSPF::LSDB::View6' : 'OSPF::LSDB::View';
+    my @cmd = qw(dot -Txlib);
+    if ($legend) {
+	my $dot = $class->legend();
+	$gone = 0;
+	$pid = open($fh, '|-', @cmd)
+	    or die "Open pipe to '@cmd' failed: $!";
+	print $fh $dot, "\n";
+	# work around the non interruptable wait in CORE::close.
+	IO::Handle::flush($fh);
+	POSIX::close(fileno($fh));
+	pause();
+	unless (close($fh)) {
+	    die "'@cmd' failed: $?" if WIFSIGNALED($?) &&
+		WTERMSIG($?) != SIGTERM;
+	}
+	undef $pid;
+	exit 0;
+    }
+
+    my($oldtime, $oldyaml);
+    for (;;) {
+	my $time = time();
+	if ($oldtime) {
+	    my $sleeptime = $interval - ($time - $oldtime);
+	    if ($sleeptime > 0) {
+		sleep($sleeptime);
+		$time += $sleeptime;
+	    }
+	}
+	$oldtime = $time;
+
+	my $ospfclass = $ipv6 ? 'OSPF::LSDB::ospf6d' : 'OSPF::LSDB::ospfd';
+	my $ospf = $ospfclass->new(ssh => $ssh);
+	eval { $ospf->parse(); };
+	if ($@) {
+	    warn $@;
+	    if ($pid) {
+		kill SIGTERM, $pid;
+		unless (close($fh)) {
+		    die "'@cmd' failed: $?" if WIFSIGNALED($?) &&
+			WTERMSIG($?) != SIGTERM;
+		}
+		undef $pid;
+	    }
+	    next;
+	}
+
+	my $yamlospf = OSPF::LSDB::YAML->new($ospf);
+	if (defined $ipv6 && $ipv6 != $yamlospf->ipv6()) {
+	    die "Address family does not match -4 and -6 options.\n";
+	}
+	my $yaml = $yamlospf->Dump();
+	$yaml =~ s/^\s+(age|sequence): .*$//mg;
+	next if $oldyaml && $oldyaml eq $yaml && ! $gone;
+	if ($dump) {
+	    print $yaml;
+	}
+	if ($diff && $oldyaml) {
+	    my %args = (
+		SUFFIX => ".yaml",
+		TEMPLATE => "ospfview-XXXXXXXXXX",
+		TMPDIR => 1,
+		UNLINK => 1
+	    );
+	    my $old = File::Temp->new(%args);
+	    print $old $oldyaml;
+	    my $new = File::Temp->new(%args);
+	    print $new $yaml;
+	    system('diff', '-up', $old->filename, $new->filename);
+	}
+	$oldyaml = $yaml;
+
+	my $view = $class->new($ospf);
+	my $dot = $view->graph(%todo);
+	if ($todo{verbose}) {
+	    my @errors = $view->get_errors;
+	    print map { "$_\n" } @errors, "" if @errors;
+	}
+
+	if ($pid) {
+	    kill SIGTERM, $pid;
+	    unless (close($fh)) {
+		die "'@cmd' failed: $?" if WIFSIGNALED($?) &&
+		    WTERMSIG($?) != SIGTERM;
+	    }
+	    undef $pid;
+	}
+	$gone = 0;
+	$pid = open($fh, '|-', @cmd)
+	    or die "Open pipe to '@cmd' failed: $!";
+	print $fh $dot, "\n";
+	# work around the wait in CORE::close.
+	IO::Handle::flush($fh);
+	POSIX::close(fileno($fh));
+    }
+}
+
+main();

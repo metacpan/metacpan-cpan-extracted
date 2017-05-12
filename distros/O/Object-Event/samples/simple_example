@@ -1,0 +1,35 @@
+#!/opt/perl/bin/perl
+package test;
+
+use Object::Event;
+
+our @ISA = qw/Object::Event/;
+
+sub new {
+   my $c = shift;
+   my $self = $c->SUPER::new (@_);
+
+   # register on the 'up' event and then call the 'down' event
+   $self->reg_cb (up => sub { $self->event ('down'); });
+
+   $self
+}
+
+sub up {
+   my ($self) = @_;
+
+   $self->event ('up'); # genereate an internal up event
+}
+
+package main;
+
+my $t = test->new;
+
+$t->reg_cb ( # reg_cb registers on a set of specific events
+   down => sub {
+      my ($t) = @_;
+      print "Yay, we got down again...\n";
+   }
+);
+
+$t->up; # test will emit the 'down' even we registered upon above

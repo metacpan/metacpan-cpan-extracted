@@ -1,0 +1,9 @@
+Revision history for Perl extension OOSheets.
+
+0.01  Thu May 13 08:08:21 2004
+	- original version; created by h2xs 1.23 with options
+		-AX --skip-autoloader OOSheets
+
+0.70  Wen  Aug  2004 16:30:34 
+	- finished tests. Upload to cpan.org
+	

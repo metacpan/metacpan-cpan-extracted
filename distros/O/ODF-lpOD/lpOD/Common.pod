@@ -1,0 +1,281 @@
+=head1	NAME
+
+ODF::lpOD::Common - Common utilities provided by the Perl lpOD library
+
+=head1  DESCRIPTION
+
+This manual page describes miscellaneous functions and auxiliary features of
+the lpOD Perl implementation that are not directly linked to the lpOD functional
+specification.
+
+=head1  Data conversion and type checking utilities
+
+The utilities introduced in this section are implemented as exported functions.
+They may be used without package or object reference.
+
+=head3  is_true(value),
+
+Returns C<TRUE> if the given value may be regarded as true (in the Perl lpOD
+implementation). The usual Perl true values are interpreted as C<TRUE>, with a
+few exceptions. The strings C<'false'>, C<'no'>, and C<'off'>, like 0,
+C<undef>, and the empty string, are regarded as C<FALSE>.
+
+Note that the standard ODF false value is the string C<'false'>; so it's
+correctly interpreted as false by C<is_true()>.
+
+The common constants C<TRUE> and C<FALSE> (corresponding to 1 and 0) may be
+used by the applications.
+
+=head3  is_false(value)
+
+Returns C<TRUE> if the given value is either a regular Perl false value or one
+of the strings C<'false'>, C<'no'>, C<'off'>. Returns C<FALSE> otherwise.
+
+=head3  odf_boolean(value)
+
+Translates into an ODF-compliant boolean value (i.e. C<'true'> or C<'false'>)
+an arbitrary value. The result may be used as the value of any ODF
+boolean attribute. Examples:
+
+        say odf_boolean(0);             # "false"
+        say odf_boolean(undef);         # "false"
+        say odf_boolean("All right");   # "true"
+        say odf_boolean('no');          # "false"
+        say odf_boolean(123);           # "true"
+
+=head3  is_odf_datatype(type)
+
+Returns C<TRUE> if the given argument is the name of a valid ODF data type for
+table cells or variable fields, C<FALSE> otherwise. For example, the first
+instruction below returns C<TRUE> and the second one returns C<FALSE>:
+
+        $check1 = is_odf_datatype('float');
+        $check2 = is_odf_datatype('complexType');
+
+=head3  odf_value(value, type)
+
+Converts the given value according to the given type (which must be a regular
+ODF data type), and checks it if the value is already in ODF format.
+
+The following example formats the current system date so the result may be
+used as the value of a date field in a document:
+
+        $odf_date = odf_value(time(), 'date');
+
+The following instruction returns C<"2011-09-30T19:55:03">, i.e. it translates
+a numeric time into a ISO-8601, ODF-compliant alphanumeric date:
+
+        $d = odf_value(1317405303, 'date');
+
+This function returns C<undef> if the given value is not compatible with the
+given type.
+
+I<Note: this function doesn't work for any type in the present version.>
+
+=head3  iso_date(time)
+
+Translates a numeric C<time> into an ISO-8601, ODF-compliant date.
+
+Without argument, returns the current date in ODF-compliant format.
+
+=head3  numeric_date(odf_date)
+
+Translates an ODF-formatted date (ISO-8601) into a Perl computable C<time>
+value.
+
+=head3  translate_coordinates(alpha_spreadsheet_coordinates)
+
+Returns the zero-based row number and column number according to a string
+representing spreadsheet-like coordinates. For example "A1" gives (0, 0),
+"Z10" gives (9, 25), and so on. Note that the row number comes first in the
+result, while the column letter comes first in the argument.
+
+=head3  translate_range(alpha_spreadsheet_range)
+
+Returns the zero-based numeric coordinates of the two positions that define
+a range in a spreadsheet, according to an alphanumeric range expression. As
+an example, "B4:F12" gives (3, 1, 11, 5). Note that the given string must be
+separated in two part by a colon; each part is translated according to the
+same logic as C<translate_coordinates()>, producing a list of 4 values.
+
+=head1  External file control
+
+These functions are provided for specific physical operations of ODF
+document parts.
+
+=head3  file_parse(file_path)
+
+This utility is a variant of the standard C<File::Basename::fileparse>
+function, mainly for internal use by lpOD.
+
+In scalar context, extracts the full file name (i.e. including the suffix, if
+any) from the given string, that is supposed to be a full path (URL or local).
+
+In array context, returns the path, then the full name (including the suffix,
+if any), then the suffix itself (without the dot). Beware that such a behavior
+is not exactly the same as C<File::Basename::fileparse>.
+
+The following example will return C<("logo.png", "/usr/share/images/", "png")>:
+
+        ($base, $path, $suffix) = file_parse("/usr/share/images/logo.png");
+
+This one will return C<("mydoc.odt", "http://mydomain.com/", "odt")>:
+
+        ($base, $path, $suffix) = file_parse("http://mydomain.com/mydoc.odt");
+
+This last one will just return C<"mydoc.odt">:
+
+        $base = file_parse("http://mydomain.com/mydoc.odt");
+
+=head3  file_type(file_path)
+
+Returns the MIME type of the resource corresponding to the given file path, or
+C<undef> (without error) if the resource is not available, if the C<File::Type>
+module is not installed, or if the resource is not supported by C<File::Type>.
+
+I<Beware: This function uses the C<File::Type> logic and doesn't determine the
+type according to the file name suffix.>
+
+=head3  image_size(image [, document => $doc])
+
+Returns the size, expressed in I<points> (C<pt>), of the image corresponding to
+the given resource, or C<undef> (without error) if the resource is not
+available, or if the image type is not supported by C<Image::Size>.
+
+The argument may be a local file path, a regular URL, a file handle, or the
+reference of a in-memory buffer (scalar reference). If a C<document> optional
+parameter is provided, its value must be a C<odf_document> object and the first
+argument is interpreted as a I<document part identifier>; in such a situation,
+the image resource is looked for in the given document, allowing the user to
+get the orginal size of an image file previously loaded in the ODF file by
+another application.
+
+In scalar context, the return value (if defined) is an array ref of 2 strings
+(the width and the height), each one containing a numeric value and terminated
+by "pt". This array ref may be directly used in order to set the size of a
+rectangular shape through the lpOD API (typically, in order to adjust the size
+of the object that will contain the image). In array context, C<image_size()>
+returns a list of 2 numeric values, namely the width and the height (both in
+points, but without the "pt" suffix).
+
+=head1  General configuration
+
+Some methods are provided by the C<lpod> pseudo-object in order to get or set
+some configuration parameters.
+
+=head3  Installation information
+
+The C<info> method returns some information about the current lpOD
+installation, as a string in scalar context, or as a hash in array context.
+
+For example, the instruction 'say scalar lpod->info' produces an information
+string containing "ODF::lpOD", the CPAN package build date, and the current
+installation path, like in the example below:
+
+ ODF::lpOD 1.106 2011-02-15T15:07:39 /usr/lib/perl5/site_perl/5.10.0/ODF/lpOD
+
+There is a C<signature> method that produces the same result as the
+scalar value of C<info>.
+
+The C<installation_path> method returns the path of the C<ODF::lpOD> module
+installation in the user's file system.
+
+=head3  Color name translation
+
+Knowing that lpOD allows the user to specify color codes for various objects,
+some codes may be replaced by symbolic names. A few hundreds of symbolic names
+and the corresponding values are defined by default, according to a standard
+Xorg/RGB vocabulary. The user may add custom color names thanks to
+C<load_color_map()>, whose argument is the full path of a RGB text file whose
+format complies with the typical Xorg "rgb.txt".
+
+The C<unload_color_map()> removes every color name for the current process,
+while C<load_color_map()> without argument restores the default name/code
+mapping. C<load_color_map()> may be used repeatedly in order to cumulate
+several RGB files.
+
+Two explicit color translation functions are provided:
+
+=over
+
+=item
+
+C<color_code(name)> : returns the color code corresponding to the given color
+name, if known; ex: C<color_code('antique white')> produces '#faebd7'; returns
+C<undef> if the name is unknown;
+
+=item
+
+C<color_name(code)> : returns a symbolic name, if any, corresponding to the
+given color code; ex: C<color_name('#faebd7')> returns 'antique white'; returns
+C<undef> if no name is known for this code.
+
+=back
+
+Beware that different names may correspond to the same code, so at the end of
+the sequence below, C<$a> may differ from C<$b>:
+
+        $c = color_code($a);
+        $b = color_name($c);
+
+=head3  Character sets handling
+
+lpOD is (as soon as possible) locale- and platform- neutral, so its default
+input and output character set is always C<utf8> unless the user makes an
+explicit alternative selection.
+
+All the text/attribute oriented methods of the C<odf_element> may automatically
+convert the processed content from or to the local character set of the user.
+The default character set is C<utf8>. If the user provides non-utf8 content,
+the input character set must be declared using the C<set_input_charset()>, that
+is a lpOD installation method (not a document method). Example:
+
+        lpod->set_input_charset('iso-8859-1');
+
+If the user wants to get non-utf8 outputs from any content-extraction method,
+the output character set must be declared in a similar way through
+C<set_output_charset()>:
+
+        lpod->set_output_charset('iso-8859-1');
+
+Input and output charsets may be changed at any time, so the user may, for
+example, successively insert texts using various encodings (that could prove
+useful for document generation from heterogeneous sources).
+
+Beware that the input and output charsets are not always the same. The user
+could want, for example, populate a document from non-utf8 web pages, and
+in the same session export some content from the same to document to local
+log files or the console, that may require C<utf8> or a another character set
+(depending of the user's locale).
+
+The currently active character sets may be checked using C<get_input_charset()>
+and C<get_output_charset()> (as methods of the C<lpod> pseudo-object).
+
+For the list of supported character sets, see the documentation of the Perl
+C<Encode> module.
+
+=head3  Warning information
+
+The "lpod->debug()" method, when called with C<TRUE> of C<FALSE> as argument,
+switches on or off the debug flag. If this flag is I<on>, the call stack is
+displayed with every error message of the lpOD API.
+
+A so-called C<alert()> function may be used by the applications with one or
+more strings as arguments; if the debug flag is C<FALSE>, it just produces a
+C<warn> (with a line break) for each argument; if the debug flag is C<TRUE>,
+it's a wrapper for C<Carp::cluck()> (so it outputs the call stack trace).
+
+=head1	AUTHOR/COPYRIGHT
+
+Developer/Maintainer: Jean-Marie Gouarne L<http://jean.marie.gouarne.online.fr>
+Contact: jmgdoc@cpan.org
+
+Copyright (c) 2010 Ars Aperta, Itaapy, Pierlis, Talend.
+Copyright (c) 2014 Jean-Marie Gouarne.
+
+This work was sponsored by the Agence Nationale de la Recherche
+(L<http://www.agence-nationale-recherche.fr>).
+
+License: GPL v3, Apache v2.0 (see LICENSE).
+
+=cut

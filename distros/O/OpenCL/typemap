@@ -1,0 +1,97 @@
+cl_bool			T_BOOL
+cl_char			T_IV
+cl_uchar		T_UV
+cl_short		T_IV
+cl_ushort		T_UV
+cl_int			T_IV
+cl_uint			T_UV
+cl_long			T_IV
+cl_ulong		T_UV
+cl_double		T_NV
+cl_float		T_NV
+cl_half			T_UV
+
+cl_bitfield			T_UV
+cl_device_fp_config		T_UV
+cl_device_exec_capabilities	T_UV
+cl_platform_info		T_UV
+cl_device_type			T_UV
+cl_device_info			T_UV
+cl_device_mem_cache_type	T_UV
+cl_device_local_mem_type	T_UV
+cl_device_partition_property_ext T_UV
+cl_context_info			T_UV
+cl_command_queue_properties	T_UV
+cl_command_queue_info		T_UV
+cl_mem_flags			T_UV
+cl_mem_info			T_UV
+cl_mem_object_type		T_UV
+cl_map_flags			T_UV
+cl_image_info			T_UV
+cl_profiling_info		T_UV
+cl_channel_order		T_UV
+cl_channel_type			T_UV
+cl_event_info			T_UV
+cl_addressing_mode		T_UV
+cl_filter_mode			T_UV
+cl_sampler_info			T_UV
+cl_program_info			T_UV
+cl_program_build_info		T_UV
+cl_build_status			T_IV
+cl_kernel_info			T_UV
+cl_kernel_work_group_info	T_UV
+cl_kernel_arg_info		T_UV
+cl_kernel_arg_address_qualifier	T_UV
+cl_kernel_arg_access_qualifier	T_UV
+cl_kernel_arg_type_qualifier	T_UV
+cl_command_type			T_UV
+cl_mem_migration_flags		T_UV
+
+cl_context_properties * context_properties
+
+cl_GLenum		T_UV
+cl_GLint		T_IV
+cl_GLuint		T_UV
+
+cl_gl_object_type	T_UV
+cl_gl_texture_info	T_UV
+cl_gl_platform_info	T_UV
+cl_gl_context_info	T_UV
+
+OpenCL::Platform	clobj_ni
+OpenCL::Device		clobj
+OpenCL::SubDevice	clobj_ni
+OpenCL::Context		clobj_ni
+OpenCL::Queue		clobj_ni
+OpenCL::Memory		clobj
+OpenCL::Buffer		clobj
+OpenCL::BufferObj	clobj_ni
+OpenCL::Image		clobj
+OpenCL::Memory_ornull	clobj_ornull
+OpenCL::Buffer_ornull	clobj_ornull
+OpenCL::Image_ornull	clobj_ornull
+OpenCL::Sampler		clobj_ni
+OpenCL::Program		clobj_ni
+OpenCL::Kernel		clobj_ni
+OpenCL::Event		clobj
+OpenCL::UserEvent	clobj_ni
+
+OpenCL::Mapped		mapped
+
+INPUT
+
+context_properties
+	$var = SvCONTEXTPROPERTIES (cv, \"$var\", $arg, 0, 0)
+
+clobj
+	$var = ($type)SvCLOBJ (cv, \"$var\", $arg, \"${ntype}\")
+
+clobj_ni
+	$var = ($type)SvCLOBJ_ni (cv, \"$var\", $arg, stash_${(my $x = $ntype) =~ s/OpenCL:://; \lc $x})
+
+clobj_ornull
+	$var = SvOK ($arg) ? ($type)SvCLOBJ (cv, \"$var\", $arg, \"${\substr $ntype, 0, -7}\") : 0
+
+mapped
+	$var = SvMAPPED ($arg);
+

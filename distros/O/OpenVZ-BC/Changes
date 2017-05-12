@@ -1,0 +1,8 @@
+Revision history for OpenVZ-BC
+
+0.02    Sun Aug 10 04:58:42 CDT 2008
+        - Added missing changelog entry for 0.01.
+        - Fixed "hash" to return VPSID 0 as well.
+
+0.01    Fri Aug 8 05:50:18 CDT 2008
+        - Initial release.

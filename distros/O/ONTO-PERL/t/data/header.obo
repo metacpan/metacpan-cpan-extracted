@@ -1,0 +1,129 @@
+format-version: 1.4
+data-version:3.2
+ontology:APO
+date: 28:03:2011 13:57
+saved-by: easr
+auto-generated-by: ONTO-PERL 1.32
+import: ulo.obo
+subsetdef: Citrus "Term used for citrus"
+subsetdef: Rice "Term used for rice"
+subsetdef: Tomato "Term used for tomato"
+synonymtypedef: common_name "common name" EXACT
+synonymtypedef: systematic_synonym "Systematic synonym" EXACT
+idspace: APO http://www.cellcycleontology.org/ontology/APO "cell cycle ontology terms"
+default_relationship_id_prefix: OBO_REL
+default-namespace: apo
+remark: <p>This file holds some fake terms.</p>
+treat-xrefs-as-equivalent: TEST
+treat-xrefs-as-equivalent: EQUI
+treat-xrefs-as-is_a: CL
+treat-xrefs-as-is_a: LC
+
+[Term]
+id: APO:F0000000
+name: uno
+def: "uno" [FO:ea]
+subset: Citrus
+subset: Rice
+synonym: "blood vessel formation from pre-existing blood vessels" EXACT systematic_synonym []
+synonym: "one" EXACT [FO:ea]
+
+[Term]
+id: APO:F0000001
+name: uno punto uno
+def: "one dot one" [FO:15892874]
+subset: Tomato
+synonym: "one period one" EXACT common_name [FO:15892874]
+synonym: "thing" BROAD [FO:12345]
+xref: TEST:EASR-0000001
+xref: TEST:EASR-0000002
+xref: TEST:EASR-0000003
+xref: TEST:EASR-0000004
+is_a: APO:F0000000 ! uno
+
+[Term]
+id: APO:F0000002
+name: dos
+def: "two" [FO:15892874]
+synonym: "twee" EXACT [FO:15892874]
+disjoint_from: APO:F0000001 ! uno punto uno
+
+[Term]
+id: APO:F0000003
+is_anonymous: true
+name: dos punto uno
+def: "two point two" [FO:ea]
+synonym: "two period two" EXACT [FO:ea]
+xref: TEST:T0000003
+xref: EQUI:T0000003
+is_a: APO:F0000002 ! implied link automatically realized ! dos 
+
+[Term]
+id: APO:F0000004
+is_anonymous: true ! verdadero
+name: dos punto dos
+def: "two point three" [FO:ea]
+subset: Tomato
+synonym: "two period three" EXACT [FO:ea]
+is_a: APO:F0000002 ! dos
+property_value: latest_modification_date "2012-11-09T17:27:58Z" xsd:date
+
+[Term]
+id: APO:F0000005
+name: ghost town
+property_value: home_of APO:Casper
+property_value: lastest_modification_by "erick" xsd:string 
+property_value: number_of_human_permanent_residents "0" xsd:positiveInteger
+created_by: erick_antezana
+creation_date: 2012-11-08T08:55:12Z
+
+[Term]
+id: APO:F0000006
+name: myoblast
+namespace: cell
+def: "A precursor cell of the myogenic lineage that develops from the mesoderm. They undergo proliferation, migrate to their various sites, and then differentiate into the appropriate form of myocytes." [GOC:tfm, MESH:A11.635]
+
+[Term]
+id: APO:F0000007
+name: fusion competent myoblast
+namespace: cell
+def: "A myoblast that is committed to a myotube-specific program of differentiation but not yet fused. It undergoes very limited additional proliferation. After fusion, it will take on a muscle identity specified by a `muscle founder cell` (CL:0008006)." [PMID:22274696]
+is_a: APO:F0000006 ! myoblast
+relationship: RO:0002203 CL:0008003 ! develops into somatic muscle myotube
+
+[Instance]
+id: APO:erick
+name: Erick Antezana
+instance_of: APO:man
+property_value: married_to APO:cecilia
+property_value: shoe_size "8" xsd:positiveInteger
+
+[Instance]
+id: APO:cecilia
+name: Cecilia Rodriguez
+instance_of: APO:woman
+property_value: likes APO:icecream
+property_value: married_to APO:erick
+property_value: shoe_size "7" xsd:positiveInteger
+
+[Typedef]
+id: RO:0002203
+name: develops into
+is_transitive: true
+inverse_of: develops_from ! develops_from
+
+[Typedef]
+id: contained_in
+name: contained in
+
+[Typedef]
+id: is_a
+name: is_a
+builtin: true
+def: "A number is another number if this last one has the same integer part" [FO:15892874]
+subset: Tomato
+exact_synonym: "is_subtype_of" []
+xref_analog: owl:subClassOf
+is_anti_symmetric: true
+is_reflexive: true
+is_transitive: true

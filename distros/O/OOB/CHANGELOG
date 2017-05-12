@@ -1,0 +1,67 @@
+0.12	31 March 2012
+	Checked that it runs with 5.14.2.
+
+	8 April 2008
+	Some pod fixes and clarifications.
+
+	Changed internal storage to improve efficiency: values are more likely
+	to be stored by namespace, rather than by value.
+
+0.11	5 March 2008
+	Minimal Perl version now 5.005 (as we use Test::More, we cannot support
+	before that).  Also removes "use warnings" when installing on perls
+	before 5.6, and installs on later versions if they were removed.
+	Fixed last "out of bounds" in the Makefile.
+
+0.10	5 March 2008
+	Fixed typo in the CORE::bless stealing code.  Spotted while showing
+	code at the Amsterdam PM meeting.
+
+0.09	4 March 2008
+	Added specific tests for proper destruction functionality, after
+	advisement of demerphq about potential problems of calling methods
+	(and DESTROY) on blessed Perl data-structures of which the original
+	ref was lost in earlier versions of Perl.
+
+0.08	3 March 2008
+	Fixed issue with "Carp::croak" on 5.10.0.
+
+0.07	2 March 2008
+	Made the OOB namespace as clean as possible by moving all subroutines
+	but "import", "AUTOLOAD" and "DESTROY" to the OOB::function package.
+
+	Added CAVEATS section to the pod, to point out possible problems with
+	late loading of OOB and the use of the built-in ref() and blessed()
+	function.  Pointed out by John Lodin.
+
+	Added support for handling (re-)blessing objects.
+
+0.06	29 February 2008
+	Now requires Sub::Identify as a prerequisite.
+
+0.05	29 February 2008
+	Added many more tests.
+
+	Can now also specify allowable attributes at compile time with
+	parameters to "use".
+
+	Now cloaks OOB from ref() and Scalar::Util::blessed(), so that
+	checks on the refs don't suddenly change behaviour because an
+	attribute has been added.
+
+0.04	29 February 2008
+	Removed use of prototypes altogether, so that we're not hindered by
+	older, more limited, prototype capabilities of Perl before 5.8.0.
+
+	Dave Rolsky pointed out I meant "out-of-band" rather than
+	"out-of-bounds".  Documentation adapted accordingly.
+
+0.03	29 February 2008
+	Renamed to OOB, at the suggestion of abeltje.
+
+0.02	28 February 2008
+	Removed "our" from $VERSION to get a clean compile on 5.005005,
+	reported by srezic@cpan.org.
+
+0.01	27 February 2008
+	First version of oob.

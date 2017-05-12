@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<SITE ID="PathFinder">
+
+<NAME Lang="en-us">PathFinder</NAME>
+<INFO Lang="en-us">general information web search</INFO>
+
+<URL Type="More"><![CDATA[
+_MORE_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://cgi.pathfinder.com/cgi-bin/altavista/pshell?venue=pathfinder&q=_QUERY_&pg=aq&date=all&x=26&y=11
+]]></URL>
+
+<SCORE>_SCORE_/10</SCORE>
+<EXPRESSION>Boolean</EXPRESSION>
+<CATEGORY>WWW</CATEGORY>
+
+<VAR Name="_MORE_"><![CDATA[
+<a href="_MORE_"><IMG SRC="/search/altavista/images/morebut1.gif"
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<P><dt>___<a href="_URL_">_TITLE_</a>_PREVIEW_<br>___ - size _SIZEK_K-_DATE_- Relevancy:_SCORE_</cite>
+]]></TEMPLATE>
+</SITE>

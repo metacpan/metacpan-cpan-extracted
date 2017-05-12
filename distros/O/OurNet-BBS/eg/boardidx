@@ -1,0 +1,100 @@
+#!/usr/bin/perl
+# $File: //depot/libOurNet/BBS/eg/boardidx $ $Author: autrijus $
+# $Revision: #2 $ $Change: 3803 $ $DateTime: 2003/01/24 22:02:43 $
+
+$VERSION  = '0.01';
+
+=head1 NAME
+
+boardidx - BBS Board .DIR Builder
+
+=head1 SYNOPSIS
+
+B<boardidx> S<[ B<-h> ]>S<[ B<-b> I<backend> ]>S<[ B<-r> I<bbsroot> ]> I<boards>...
+
+=head1 DESCRIPTION
+
+This script rebuilds the F<.DIR> files for the boards specified.
+It's only tested on the default B<MELIX> backend, but B<MAPLE2>,
+B<MAPLE3>, B<PTT>, B<Cola>, B<Firebird3> and B<CVIC> should also
+be valid values for the B<-b> option.
+
+You may specify an alternate BBS location using the F<-r> option.
+
+=cut
+
+# as requested by DEBBY, 2001/10/7 09:09PM                                    
+
+use strict;
+use warnings;
+
+use if ($^O eq 'MSWin32'), open => (IN => ':bytes', OUT => ':bytes');
+use if $OurNet::BBS::Encoding, open => ":encoding($OurNet::BBS::Encoding)";
+
+use Getopt::Std;
+use OurNet::BBS;
+
+my %args;
+getopts('b:r:h', \%args);
+
+exec('perldoc', $0) if defined $args{h};
+
+die "Usage: $0 [-b backend] [-r bbsroot] <boards>..." unless @ARGV;
+
+my $bbs  = OurNet::BBS->new($args{b} || 'MELIX',
+    $args{r} ||= (-e ('/home/melix') 
+	? '/home/melix' : 'c:/progra~1/melix/home/melix')
+);
+
+local $/;
+
+foreach my $brd (@ARGV) {
+    print "processing [$brd]...\n";
+
+    my $board = $bbs->{boards}{$brd}{articles};
+
+    my $path = do {
+	no strict 'refs';
+	join ('/', $args{r}, ${ref($bbs->{boards}{$brd})."::PATH_BRD"}, $brd);
+    };
+
+    my @files = (<$path/*/*>);                 
+    my @A;
+
+    foreach my $file (@files) {
+	open _, $file;         
+	my ($head, $body) = split ("\n\n", scalar <_>, 2);
+	push @A, {                                       
+	    header => { map { split(/:\s+/, $_, 2) } split(/\n+/, $head) },
+	    body   => $body,                                               
+	};                  
+    }     
+
+    foreach my $obj (sort {
+	$a->{header}{'Message-ID'} cmp $b->{header}{'Message-ID'}
+    } @A) {
+	print $obj->{header}{Subject}."\n";                                                  
+	$board->{''} = $obj;               
+    }                       
+}
+
+__END__
+
+=head1 SEE ALSO
+
+L<OurNet::BBS>.
+
+=head1 AUTHORS
+
+Autrijus Tang E<lt>autrijus@autrijus.orgE<gt>
+
+=head1 COPYRIGHT
+
+Copyright 2001-2002 by Autrijus Tang E<lt>autrijus@autrijus.orgE<gt>.
+
+This program is free software; you can redistribute it and/or 
+modify it under the same terms as Perl itself.
+
+See L<http://www.perl.com/perl/misc/Artistic.html>
+
+=cut

@@ -1,0 +1,8 @@
+0.003     2016-03-09 22:40:12+11:00 Australia/Melbourne
+ - Destroy symbol table for generated class when object is destroyed
+
+0.002     2014-08-12 12:47:43+10:00 Australia/Melbourne
+ - Detect circular references
+
+0.001     2014-08-09 21:21:50+10:00 Australia/Melbourne
+ - First release

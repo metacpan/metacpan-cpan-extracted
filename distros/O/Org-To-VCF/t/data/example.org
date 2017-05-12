@@ -1,0 +1,38 @@
+* family
+** dad # [2014-01-25 Sat]                                      :remind_anniv:
+- fullname :: frasier crane
+- birthday :: [1900-01-02 ]
+- cell :: 0811 000 0001
+** mom # [2014-01-25 Sat]                                      :remind_anniv:
+- name :: gillian anderson
+- birthday :: [1900-12-27 ]
+- hp :: 0811 000 0002 # [2014-01-25 Sat] new number because phone got stolen
+- hp :: 0855 999 9991 # [2014-01-25 Sat] work only
+** jinny II                                                :remind_anniv:pet:
+- birthday :: [2011-05-01 ]
+* friends
+** alice # [2014-01-25 Sat]
+- some note
+- email <alice@example.org>
+- address 1: 123th sesame street, bandung
+- address 2: 124th cikapayang street, bandung # work
+** bob                                                         :remind_anniv:
+- good friend from high school, lost contact after he went to bulgaria though.
+  now he's back in bandung.
+- [2014-01-18 Sat] met him in TSM, he said that he's starting a new practice.
+  but he might also move to jakarta if things aren't going well here.
+- home phone :: 022 1234567
+- note: some interpersing note
+- work phone :: 022 555 1234 # don't call after 7pm
+- some other random note
+*** TODO some todo item which is not a contact
+** TODO charlie
+* others
+* org-contacts
+- demonstrate org-contacts format
+** Dave Null
+ :PROPERTIES:
+ :EMAIL: dave@null.com
+ :END:
+ This is one of my friend.
+ *** TODO Call him for the party

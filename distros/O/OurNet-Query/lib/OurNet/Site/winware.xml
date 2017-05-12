@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<SITE ID="Winware">
+
+<NAME Lang="en-us">Shareware.com</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+µøµ¡¦@¨É³nÅé·j´M
+]]></NAME>
+<INFO Lang="en-us">Microsoft windows sharing applications and files search</INFO>
+<INFO Lang="zh-tw">Microsoft windows sharing applications and files search</INFO>
+
+<URL Type="More"><![CDATA[
+_MORE_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://search.shareware.com/code/engine/Find?logop=and&cfrom=quick&orfile=True&hits=_HITS_&category=MS-Windows%28all%29&search=_QUERY_
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+<EXPRESSION>Boolean</EXPRESSION>
+<CATEGORY>FTP,General</CATEGORY>
+
+<VAR Name="_MORE_"><![CDATA[
+Display:<tt><strong> <a href="_MORE_">NEXT
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<td align=right valign=top><br><a href="_URL_">_TITLE_</a>___<font size="-1"><strong><br>___<br>___<br>_SIZEK_K___<td valign=top align=left><br>_PREVIEW_</td>
+]]></TEMPLATE>
+</SITE>

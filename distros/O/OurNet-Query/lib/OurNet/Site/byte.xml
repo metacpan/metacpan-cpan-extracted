@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<SITE ID="Byte">
+
+<NAME Lang="en-us">Byte Magazine</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+Byte Âø»x¥þ¤åÀË¯Á
+]]></NAME>
+<INFO Lang="en-us">online magazine documents index search</INFO>
+<INFO Lang="zh-tw">online magazine documents index search</INFO>
+
+<URL Type="More"><![CDATA[
+http://www.byte.com/_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://www.byte.com/search?queryText=_QUERY_&SEARCH-97=Search
+]]></URL>
+
+<EXPRESSION>Standard</EXPRESSION>
+<CATEGORY>WWW,Computer,Media</CATEGORY>
+
+<VAR Name="_NEXT_"><![CDATA[
+<A HREF="_NEXT_">[Next]
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<font size=-1>(_SCORE_%)___<a href="_URL_">_TITLE_</a><br>_PREVIEW_<br>
+]]></TEMPLATE>
+</SITE>

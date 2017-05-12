@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<SITE ID="Lycos.Japan">
+
+<NAME Lang="en-us">Lycos WWW Search</NAME>
+<INFO Lang="en-us">general information web search in Japan</INFO>
+
+<URL Type="More"><![CDATA[
+http://www.lycos.co.jp/cgi-bin/pursuit?query=_QUERY_&npl=matchmode%3Dand%26adv%3D1&cat=jp&npl1=ignore%3Dfq&fq=&maxhits=10&results=default&first=_START_10_1_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://www.lycos.co.jp/cgi-bin/pursuit?query=_QUERY_&npl=matchmode%3Dand%26adv%3D1&cat=jp&npl1=ignore%3Dfq&fq=&maxhits=10&results=default&first=1
+]]></URL>
+
+
+
+<TEMPLATE><![CDATA[
+></A>　<A HREF="_URL_">_TITLE_</A>___<!---->_PREVIEW_<BR>_SCORE_%</B>___サイズ　_SIZEK_k___)<BR>
+]]></TEMPLATE>
+</SITE>

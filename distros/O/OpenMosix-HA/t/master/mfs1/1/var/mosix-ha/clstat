@@ -1,0 +1,5 @@
+Cluster::Init::Group foo start DONE
+Cluster::Init::Group bar start DONE
+Cluster::Init::Group del start DONE
+Cluster::Init::Group pln plan DONE
+Cluster::Init::Group bad test FAILED

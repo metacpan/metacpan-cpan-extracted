@@ -1,0 +1,14 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+bin/otrs.Escalation.pl
+dist.ini
+lib/Kernel/Modules/AdminESCL.pm
+lib/Kernel/System/Escalation.pm
+lib/Kernel/Output/HTML/Standard/AdminESCL.dtl
+lib/Config/Files/Escalation.xml
+t/00-compile.t

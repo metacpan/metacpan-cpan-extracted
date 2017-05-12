@@ -1,0 +1,302 @@
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#what is a template">WHAT IS A TEMPLATE?</A></LI>
+	<LI><A HREF="#creating your own template">CREATING YOUR OWN TEMPLATE</A></LI>
+	<UL>
+
+		<LI><A HREF="#accessing other templates">Accessing Other Templates</A></LI>
+	</UL>
+
+	<LI><A HREF="#template types">TEMPLATE TYPES</A></LI>
+	<LI><A HREF="#how does the process work">HOW DOES THE PROCESS WORK?</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#authors">AUTHORS</A></LI>
+	<LI><A HREF="#copyright">COPYRIGHT</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>OpenInteract Templates - Using templates in OpenInteract</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<P>This document reviews how the templating system works in
+OpenInteract. Template processing is at the heart of OpenInteract, and
+it is important to understand it well.</P>
+<P>
+<HR>
+<H1><A NAME="what is a template">WHAT IS A TEMPLATE?</A></H1>
+<P><STRONG>The Basics</STRONG></P>
+<P>A template is simply HTML combined with directives meant for the
+template processing engine. Here's an example:</P>
+<PRE>
+ &lt;p&gt;Welcome back 
+   &lt;font color=&quot;red&quot;&gt;[% OI.login.full_name %]&lt;/font&gt;!&lt;/p&gt;</PRE>
+<P>When run through the template processing engine with a normal user
+object in the 'login' key, this will result in:</P>
+<PRE>
+ &lt;p&gt;Welcome back 
+   &lt;font color=&quot;red&quot;&gt;Charlie Brown&lt;/font&gt;!&lt;/p&gt;</PRE>
+<P>So the information between the '[%' and '%]' symbols
+('login.full_name') was replaced by other text which was dependent on
+the user who was viewing the page. If another user viewed the page,
+she might have seen:</P>
+<PRE>
+ &lt;p&gt;Welcome back 
+   &lt;font color=&quot;red&quot;&gt;Peppermint Patty&lt;/font&gt;!&lt;/p&gt;</PRE>
+<P>OpenInteract provides a number of tools for you in every template you
+write. However, you can also provide your templates access to query
+results from the various data stores that SPOPS provides.</P>
+<P>
+<HR>
+<H1><A NAME="creating your own template">CREATING YOUR OWN TEMPLATE</A></H1>
+<P>The general strategy behind OpenInteract applications is a well-known
+one: separate the display of data from how the data are retrieved or
+operated on.</P>
+<P>To this end, the code behind an OpenInteract application normally just
+retrieves some data using parameters supplied by the user and then
+hands it off to the template. The template doesn't care how the data
+were retrieved -- it just knows what is supposed to be there. The
+template and code enter into a sort of contract -- the template
+expects certain data which both the code and the system provide.</P>
+<P>So, let's do an example. Let's say you want to display a list of users
+who have accessed the system in the last n minutes. Your code might
+have a subroutine like this:</P>
+<PRE>
+ my $DEFAULT_TIME_LIMIT = 30;</PRE>
+<PRE>
+ sub list_time_limit {
+  my ( $class, $p ) = @_;
+  my $R = OpenInteract::Request-&gt;instance;
+  my $time_limit = $R-&gt;apache-&gt;param( 'time_limit' ) ||
+                   $DEFAULT_TIME_LIMIT;</PRE>
+<PRE>
+  # This SQL is Sybase-specific, but should be clear
+  my $where = 'datediff( minute, last_access, getdate() ) &lt;= 30';</PRE>
+<PRE>
+  # Note: 'fetch_group' returns an arrayref of objects.
+  my $user_list = eval { $R-&gt;user-&gt;fetch_group({ 
+                            where =&gt; $where,
+                            order =&gt; 'last_access'
+                         }) };
+  my %params = ( user_list =&gt; $user_list, time_limit =&gt; $time_limit );
+  return $R-&gt;template-&gt;handler( {}, \%params,
+                                { name =&gt; 'mypkg::user_list' } );
+ }</PRE>
+<P>(The actual code would have lots of good things like error checking,
+but this is just an example.)</P>
+<P>Note that we simply passed a hashref of variables to the template
+processing class (found from calling the 'template' alias on <CODE>$R</CODE>;
+this is normally mapped to <CODE>OpenInteract::Template::Process</CODE>). We
+didn't say how they should be displayed or any such thing.</P>
+<P>And your template might look like:</P>
+<PRE>
+ [%- DEFAULT theme = OI.theme_properties -%]
+ &lt;h2&gt;User Listing&lt;/h2&gt;</PRE>
+<PRE>
+ &lt;p&gt;Users with accesses in the last &lt;b&gt;[% time_limit %]&lt;/b&gt; minutes.</PRE>
+<PRE>
+ &lt;table border=&quot;0&quot; cellpadding=&quot;4&quot;&gt;
+  &lt;tr align=&quot;center&quot; valign=&quot;bottom&quot; bgcolor=&quot;[% theme.head_bgcolor %]&quot;&gt;
+    &lt;td&gt;&lt;b&gt;Username&lt;/b&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;b&gt;Full Name&lt;/b&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;b&gt;Last Access&lt;/b&gt;&lt;/td&gt;
+  &lt;/tr&gt;</PRE>
+<PRE>
+ [% FOREACH user_object = user_list %]
+  &lt;tr align=&quot;center&quot; valign=&quot;middle&quot;&gt;
+    &lt;td&gt;[% user_object.login_name %]&lt;/td&gt;
+    &lt;td&gt;[% user_object.full_name %]&lt;/td&gt;
+    &lt;td&gt;[% user_object.last_access %]&lt;/td&gt;
+  &lt;/tr&gt;
+ [% END %]
+</PRE>
+<PRE>
+
+ &lt;/table&gt;</PRE>
+<P>There are a few things at work here:</P>
+<OL>
+<LI>
+We're using the scalar variable 'time_limit'. Since this is a simple
+scalar, we can just refer to it by name in the template as a variable:
+<PRE>
+ [% time_limit %]</PRE>
+<P>and the contents of the variable will replace this directive.</P>
+<P></P>
+<LI>
+We loop through the variable 'user_list' which we passed to the
+template. The directive:
+<PRE>
+ [% FOREACH user_object = user_list %]</PRE>
+<P>is very similar to the <CODE>foreach</CODE> loop in perl -- for every thing in
+the list 'user_list', we assign that thing to the variable
+'user_object' which we can then use within the loop.</P>
+<P>Within the loop we use both properties of the user object
+('login_name' and 'last_access') and call a method on the object
+('full_name').</P>
+<PRE>
+ &lt;td&gt;[% user_object.full_name %]&lt;/td&gt;</PRE>
+<P>One of the nice features of the Template Toolkit is that it treats
+objects and hashrefs in much the same way, using the dot notation. So
+'user_object.full_name' could transparently translate to either:</P>
+<PRE>
+ $user_object-&gt;{full_name}
+ $user_object-&gt;full_name()</PRE>
+<P>Here we're using the 'user_object' variable (obviously) as an
+object. But we could modify the perl code to instead get all the
+information about the user and combine it with other information into
+a hashref and feed it to the same template. If we were to do this, we
+would not have to modify <STRONG>a single line</STRONG> of our template.</P>
+<P></P>
+<LI>
+We grab the current theme keys and values using the <CODE>OI</CODE> plugin. This
+plugin is available in every template processed by OI; it has a number
+of properties available regarding the current request as well as a
+number of useful functions. See <CODE>OpenInteract::Template::Plugin</CODE> for
+the scoop.
+<P></P></OL>
+<P>Now, what if we wanted to change the display of the data? We could
+replace the 'user_list' template with the following:</P>
+<PRE>
+ &lt;h2&gt;User Listing&lt;/h2&gt;</PRE>
+<PRE>
+ &lt;p&gt;Users with accesses in the last &lt;b&gt;[% time_limit %]&lt;/b&gt; minutes.</PRE>
+<PRE>
+ &lt;ul&gt;
+ [% FOREACH user_object = user_list %]
+  &lt;li&gt;[% user_object.full_name %] ([% user_object.login_name %])
+       accessed the system at [% user_object.last_access %]&lt;/li&gt;
+ [% END %]
+ &lt;/ul&gt;</PRE>
+<P>If we did this, we would not have to change <STRONG>a single line</STRONG> of our
+back-end code, since the ``contract'' between the code and template
+hasn't changed. This contract specifies that the code will provide a
+list of user objects and a time limit to the template. Even though the
+template uses these data somewhat differently now, the code is
+isolated from this change and indeed never cares about it.</P>
+<P>
+<H2><A NAME="accessing other templates">Accessing Other Templates</A></H2>
+<P>You can access any template available to OI through a slight
+manipulation of the normal TT syntax. We've created a custom template
+provider so that the <CODE>PROCESS</CODE> and <CODE>INCLUDE</CODE> commands use the OI
+template loader rather than the default TT one. This allows you to
+treat your templates like components available from everywhere. You
+can do this with a number of the global templates shipped with
+OpenInteract. For instance, the command:</P>
+<PRE>
+ [% PROCESS form_hidden( name = &quot;foo&quot;, value = &quot;bar&quot; ) %]</PRE>
+<P>Will produce:</P>
+<PRE>
+ &lt;input type=&quot;hidden&quot; name=&quot;foo&quot; value=&quot;bar&quot;&gt;</PRE>
+<P>And you can create a 'list' component for your objects</P>
+<PRE>
+ # This is in mypkg::my_list
+ &lt;ul&gt;
+ [% FOREACH foo = foo_list %]
+   &lt;li&gt;[% foo.name %] ([% foo.count %])
+ [% END %]
+ &lt;/ul&gt;</PRE>
+<P>and use it in different ways:</P>
+<PRE>
+ [% IF foo_list.size &gt; 0 -%]
+   # The 'foo_list' variable will get passed into the PROCESS scope
+   [% PROCESS mypkg::my_list -%]
+ [% ELSE %]
+   No members available
+ [% END %]</PRE>
+<PRE>
+ [% FOREACH foo_parent = foo_parent_list -%]
+   [% foo_parent.title %]
+   Members:
+   # Specify the 'foo_list variable explicitly
+   [% PROCESS mypkg::my_list( foo_list = foo_parent.children ) %]
+ [% END %]</PRE>
+
+<P>See the <CODE>Template::Manual::Directives</CODE> for the
+difference between INCLUDE and PROCESS; a brief example is in the <a
+href="template_widgets.html">OI Template Widgets</a> example.</P>
+
+<P>
+<HR>
+<H1><A NAME="template types">TEMPLATE TYPES</A></H1>
+<P>As of version 1.50, all templates in OI are stored in the
+filesystem. There are two types of templates:</P>
+<UL>
+<LI><STRONG><A NAME="item_Global_templates">Global templates</A></STRONG><BR>
+
+Found in <CODE>$WEBSITE_DIR/template</CODE>; some of these are also
+known as <a href="template_widgets.html">template widgets</a>.
+
+<P></P>
+<LI><STRONG><A NAME="item_Global_package_templates">Global package templates</A></STRONG><BR>
+
+Found in <CODE>$WEBSITE_DIR/template/$PACKAGE</CODE>
+<P></P>
+<LI><STRONG><A NAME="item_Package_templates">Package templates</A></STRONG><BR>
+
+Found in <CODE>$WEBSITE_DIR/pkg/$PACKAGE-$VERSION/template</CODE>
+<P></P></UL>
+<P>When OI is asked for a template without a package, it will only look
+in the Global directory. If not found, it will return an error.</P>
+<P>When OI looks for a template with a package, it first looks in the
+global package directory, then the package directory. Templates in the
+global package template directory override those in the package
+template directory</P>
+<P>When you first apply a package, its templates are found in the package
+directory. When you upgrade that package, the templates in the old
+package directory are no longer accessible to OI (without manual
+intervention). This proved annoying whenever you would modify
+templates in a package and then upgrade the package: you'd need to
+copy the templates from the old package to the new package.</P>
+<P>Now, whenever you edit a template via the browser OI will
+automatically save it in the global package directory. When you
+upgrade the package, the templates will still be in the global package
+directory and still override the ones in the package template
+directory.</P>
+<P>
+<HR>
+<H1><A NAME="how does the process work">HOW DOES THE PROCESS WORK?</A></H1>
+<P>Template processing is at the heart of OpenInteract, and it is very
+important to understand it well. (The authors have been bitten more
+times than they'd care to admin from not realizing all implications of
+the process.)</P>
+<P>The class involved in processing the templates is
+<CODE>OpenInteract::Template::Process</CODE>, but there are a number of helper
+classes also. When OpenInteract is initialized it creates a single
+<CODE>$template</CODE> object that is reused for all templates. This means it
+has access to the same cached information as the other requests, which
+can speedup your requests greatly.</P>
+<P>OI also allows you to step into this initialization process and have
+some input. See the docs in the module for more infomration on this.</P>
+<P>The other class you will encounter is
+<CODE>OpenInteract::Template::Plugin</CODE>, which is a Template Toolkit plugin
+available to all templates processed by OI. See the extensive module
+docs for the functions and properties available and examples of their
+use.</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+
+<P><CODE>OpenInteract::Template::Process</CODE></P>
+<P><CODE>OpenInteract::Template::Plugin</CODE></P>
+<P><CODE>OpenInteract::Template::Provider</CODE></P>
+<P><CODE>Template Toolkit</CODE></P>
+
+<P><A HREF="http://www.template-toolkit.org/">http://www.template-toolkit.org/</A></P>
+<P>
+<HR>
+<H1><A NAME="authors">AUTHORS</A></H1>
+<P>Chris Winters &lt;<A HREF="mailto:chris@cwinters.com">chris@cwinters.com</A>&gt;</P>
+<P>
+<HR>
+<H1><A NAME="copyright">COPYRIGHT</A></H1>
+<P>Copyright (c) 2001-2002 intes.net, inc.. All rights reserved.</P>
+<P>This script is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.</P>

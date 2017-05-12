@@ -1,0 +1,64 @@
+SYNOPSIS
+
+     use Org::To::HTML qw(org_to_html);
+    
+     # non-OO interface
+     my $res = org_to_html(
+         source_file   => 'todo.org', # or source_str
+         #target_file  => 'todo.html', # defaults return the HTML in $res->[2]
+         #html_title   => 'My Todo List', # defaults to file name
+         #include_tags => [...], # default exports all tags.
+         #exclude_tags => [...], # behavior mimics emacs's include/exclude rule
+         #css_url      => '/path/to/my/style.css', # default none
+         #naked        => 0, # if set to 1, no HTML/HEAD/BODY will be output.
+     );
+     die "Failed" unless $res->[0] == 200;
+    
+     # OO interface
+     my $oeh = Org::To::HTML->new();
+     my $html = $oeh->export($doc); # $doc is Org::Document object
+
+DESCRIPTION
+
+    Export Org format to HTML. To customize, you can subclass this module.
+
+    A command-line utility is included: org-to-html.
+
+    Note that this module is just a simple exporter, for "serious" works
+    you'll probably want to use the exporting features or org-mode
+    <http://orgmode.org>.
+
+ATTRIBUTES
+
+ naked => BOOL
+
+    If set to true, export_document() will not output HTML/HEAD/BODY
+    wrapping element. Default is false.
+
+ html_title => STR
+
+    Title to use in TITLE element. If unset, defaults to "(no title)" when
+    exporting.
+
+ css_url => STR
+
+    If set, export_document() will output a LINK element pointing to this
+    CSS.
+
+METHODS
+
+new(%args)
+
+ $exp->export_document($doc) => HTML
+
+    Export document to HTML.
+
+SEE ALSO
+
+    For more information about Org document format, visit
+    http://orgmode.org/
+
+    Org::Parser
+
+    org-to-html
+

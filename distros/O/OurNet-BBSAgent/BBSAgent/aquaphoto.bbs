@@ -1,0 +1,19 @@
+# $File: //depot/OurNet-BBSAgent/BBSAgent/aquaphoto.bbs $ $Author: autrijus $
+# $Revision: #2 $ $Change: 2829 $ $DateTime: 2002/01/10 14:54:36 $
+
+Aquaphoto
+aquaphoto.twbbs.org
+
+load maple2.board
+
+setv pager Call¾÷
+setv moretail   \e[30mµ²§ô\x20\x20\e[0m
+
+=login
+wait login
+send bbs\n
+wait µù¥U¡G
+send $[username]\n
+send $[password]\n
+send n\nn\nq\x20q\x20q\x20q\x20q
+goto main

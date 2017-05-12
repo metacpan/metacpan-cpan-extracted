@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<SITE ID="WebCrawler">
+
+<NAME Lang="en-us">WebCrawler WWW Search</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+WebCrawler¥þ²yWWW·j´M
+]]></NAME>
+<INFO Lang="en-us">general information web search</INFO>
+<INFO Lang="zh-tw">general information web search</INFO>
+
+<URL Type="More"><![CDATA[
+http://webcrawler.com/cgi-bin/WebQuery?search=_QUERY_&showSummary=true&start=_START_25_0_&perPage=25
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://webcrawler.com/cgi-bin/WebQuery?search=_QUERY_&showSummary=true&start=0&perPage=25
+]]></URL>
+
+<EXPRESSION>Boolean</EXPRESSION>
+<CATEGORY>WWW,Sports</CATEGORY>
+
+
+<TEMPLATE><![CDATA[
+COLOR="#006699">_SCORE_%___<A HREF=_URL_>_TITLE_</A>_PREVIEW_<NOBR><A HREF="
+]]></TEMPLATE>
+</SITE>

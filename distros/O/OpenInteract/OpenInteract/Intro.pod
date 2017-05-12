@@ -1,0 +1,458 @@
+=pod
+
+=head1 NAME
+
+OpenInteract - A robust web application framework built to run under Apache and mod_perl
+
+=head1 DESCRIPTION
+
+OpenInteract is an extensible application server using Apache and
+mod_perl built for developers but also to be manageable almost
+entirely via the web browser. It includes:
+
+=over 4
+
+=item *
+
+A robust system of components built on templates that can access your
+data just about any way that you can think of.
+
+=item *
+
+A very flexible separation of presentation and data access: you can
+use one template for accessing data from different sources using one
+template (e.g., a listing of users from the system, from an LDAP
+server, from an NT/SMB authentication controller, etc.) or you can use
+one set of data to fill multiple templates.
+
+=item *
+
+A consistent security mechanism allowing you to control security for
+users and groups not only at the task level, but also at the
+individual data object level.
+
+=item *
+
+A simple user and group-management system that allows users to create
+their own accounts and an administrator to assign them to one or more
+groups.
+
+=item *
+
+A convenient packaging system that makes it simple for developers to
+distribute code, configuration and all other information necessary for
+an application. It also makes the installation and upgrading processes
+very straightforward and simple.
+
+=item *
+
+An integrated, database-independent method for distributing data
+necessary for a package. You should be able to install any package on
+any database that's been tested with OpenInteract. (Some of this work
+must be done by the package authors, but OpenInteract tries to make
+this as painless as possible.)
+
+=back
+
+=head2 Dependencies
+
+OpenInteract uses a number of CPAN modules, relying heavily on the
+following required modules:
+
+L<SPOPS|SPOPS> (Simple Perl Object Persistence with Security). This
+module was developed in tandem with this framework but stands on its
+own as a full-featured object serialization system. It also implements
+security.
+
+L<Template Toolkit|Template>. This is the best templating environment
+available for Perl. Version 2 has major performance improvements and
+also includes usability enhancements. It's also required by OI.
+
+L<Apache::Session|Apache::Session>. Provide datasource-independent
+means of session management.
+
+Many others are also used -- why reinvent the wheel when there are so
+many other well-built ones already around around and so many
+interesting problems to conquer?
+
+OpenInteract is usable B<right now>, out of the box. That doesn't mean
+we're sitting on our laurels -- we're working on a number of different
+features to OpenInteract which will be added soon to the 'TODO' file
+found in the OpenInteract source directory.
+
+=head1 INSTALLATION
+
+A file 'INSTALL' is included with the OpenInteract distribution. It
+shows you the simple steps needed for installation. If you ask this
+question on a mailing list (below), someone will likely post:
+
+=over 4
+
+=item 1
+
+Read and follow the directions in INSTALL.
+
+=item 2
+
+Read and follow the directions in INSTALL.
+
+=item 3
+
+Return to step (1).
+
+=back
+
+=head1 DOCUMENTATION
+
+OpenInteract comes with a few forms of documentation:
+
+=over 4
+
+=item *
+
+B<System-wide>: These files are in HTML format and are geared for
+people first learning about OpenInteract, whether from a
+content-management view, developer view or administration view. You
+can find them in the C<doc/> directory of the source distribution --
+open up the C<index.html> file for a table of contents.
+
+The files are also installed with every website. Once you have the
+website up and running, go to:
+
+http://mywebsite.com/SystemDoc/
+
+And click on B<View OpenInteract Documentation>.
+
+=item *
+
+B<Package>: These files come in the C<doc/> subdirectory of every
+package and give you some idea of what the package does and how you
+can do it. Some packages (like C<base>) come with documentation that
+describe integral system functionality.
+
+To view the package documentation, go to:
+
+http://mywebsite.com/SystemDoc/
+
+And click on B<View Package Documentation>. This lists the packages
+currently installed and the available documentation for each.
+
+Note that package documentation is somewhat lacking right now, but
+we're in the process of fixing this. In the meantime, check out the
+B<Module> documentation below.
+
+=item *
+
+B<Module>: Normal Perl documentation can/should be found in the
+modules that actually do the work. Since OpenInteract uses its own
+packaging system you won't be able to find them via C<perldoc> as
+usual. (You could circumvent this by putting the package directory in
+the base installation in C<PERL5LIB>, but this isn't recommended.)
+
+Instead, you can use the browser interface and go to:
+
+http://mywebsite.com/SystemDoc/
+
+And choose B<View SPOPS/OpenInteract Module Documentation>. This gives
+you a web interface to view the modules (And yes, it looks fine
+through lynx.)
+
+Similarly, you can click on B<View Perl Module Documentation> and see
+all the other Perl modules used by OpenInteract. Click on the module
+name and you'll be able to see the docs online. This is especially
+helpful for the B<Template Toolkit>, which comes with a huge amount of
+documentation.
+
+=back
+
+=head1 FEEDBACK
+
+We're interested in your feedback on a number of topics. In particular:
+
+=over 4
+
+=item *
+
+How did you find the installation process? Was OpenInteract simple to
+install and configure?
+
+=item *
+
+How easy was it for you to create a website, install its SQL
+structures and data and import its templates?
+
+=item *
+
+Which documentation do you feel is lacking? 
+
+=back
+
+As you might tell, we're keenly aware that installation and initial
+understanding can be a big barrier to entry with a fairly substantial
+application like this. Feedback is crucial for us to plug the holes.
+
+We also hope to extend certain features (such as users and groups) to
+different types of data sources, like LDAP directories. Other
+applications of OpenInteract really depend on what you'd like it to
+do!
+
+Updates can be found in two places:
+
+CVS access, mailing list information and archives, bug tracking.
+
+  http://sourceforge.net/projects/openinteract/
+
+Latest news, package repository, everything else.
+
+ http://www.openinteract.org/
+
+=head1 CONTACT
+
+Thanks for trying out OpenInteract! If you have any questions,
+comments, thoughts, diatribes, check out the various OpenInteract
+mailing lists, hosted at SourceForge at the above URL.
+
+=head1 COPYRIGHT
+
+OpenInteract is Copyright (c) 2001-2002 intes.net, inc.. All rights reserved.
+
+The OpenInteract library(**) is free software; you can redistribute it
+and/or modify it under the terms of the Perl Artistic License or the
+GNU General Public License as published by the Free Software
+Foundation; either version 2 of the License (see the file C<COPYING>
+in the source distribution), or (at your option) any later version.
+
+**"OpenInteract library" includes the core 'OpenInteract::' files: 
+
+=over 4
+
+=item *
+
+OpenInteract
+
+=item *
+
+OpenInteract::ApacheStartup
+
+=item *
+
+OpenInteract::Auth
+
+=item *
+
+OpenInteract::Cache
+
+=item *
+
+OpenInteract::Cache::File
+
+=item *
+
+OpenInteract::Cache::IPC
+
+=item *
+
+OpenInteract::CommonHandler
+
+=item *
+
+OpenInteract::Component
+
+=item *
+
+OpenInteract::Config
+
+=item *
+
+OpenInteract::Config::GlobalOverride.pm
+
+=item *
+
+OpenInteract::Config::Ini.pm
+
+=item *
+
+OpenInteract::Config::IniFile.pm
+
+=item *
+
+OpenInteract::Config::PerlFile
+
+=item *
+
+OpenInteract::Cookies::Apache
+
+=item *
+
+OpenInteract::Cookies::CGI
+
+=item *
+
+OpenInteract::DBI
+
+=item *
+
+OpenInteract::Error
+
+=item *
+
+OpenInteract::Error::Main
+
+=item *
+
+OpenInteract::Error::System
+
+=item *
+
+OpenInteract::Handler::GenericDispatcher
+
+=item *
+
+OpenInteract::LDAP
+
+=item *
+
+OpenInteract::Package
+
+=item *
+
+OpenInteract::PackageRepository
+
+=item *
+
+OpenInteract::Request
+
+=item *
+
+OpenInteract::Session
+
+=item *
+
+OpenInteract::Session::DBI
+
+=item *
+
+OpenInteract::SPOPS
+
+=item *
+
+OpenInteract::SPOPS::DBI
+
+=item *
+
+OpenInteract::SPOPS::LDAP
+
+=item *
+
+OpenInteract::SQLInstall
+
+=item *
+
+OpenInteract::Startup
+
+=item *
+
+OpenInteract::Template::Context
+
+=item *
+
+OpenInteract::Template::Plugin
+
+=item *
+
+OpenInteract::Template::Process
+
+=item *
+
+OpenInteract::Template::Provider
+
+=item *
+
+OpenInteract::UI::Main
+
+=item *
+
+OpenInteract::Utility
+
+=back
+
+Along with the core packages:
+
+=over 4
+
+=item *
+
+base
+
+=item *
+
+base_box
+
+=item *
+
+base_error
+
+=item *
+
+base_group
+
+=item *
+
+base_page
+
+=item *
+
+base_security
+
+=item *
+
+base_system_documentation
+
+=item *
+
+base_template
+
+=item *
+
+base_theme
+
+=item *
+
+base_user
+
+=item *
+
+lookup
+
+=item *
+
+object_activity
+
+=item *
+
+results_manage
+
+=back
+
+And the following application packages:
+
+=over 4
+
+=item *
+
+classified
+
+=item *
+
+full_text
+
+=item *
+
+news
+
+=back
+
+Every other package, whether developed by intes.net, inc. or other
+party, is licensed under its own terms.
+
+=cut

@@ -1,0 +1,404 @@
+=head1 NAME
+
+ObjStore::Internals - a few notes on the implementation
+
+=head1 SYNOPSIS
+
+You don't have to understand anything about the technical
+implementation.  Just know that:
+
+=over 4
+
+=item *
+
+C<ObjectStore> is outrageously powerful; sophisticated; and even
+over-engineered.
+
+=item *
+
+The perl interface is optimized to be fun and easy.  Since
+C<ObjectStore> is also blindingly fast, you can happily leave
+relational databases to collect dust on the bookshelf where they
+belong.
+
+=back
+
+So basically, you don't have to understand anything to a greater
+depth.  It's not necessary.  You've arrived.  You will be successful.
+However, more detail follows.  If you like to turn things inside-out,
+read on!
+
+=head1 DESCRIPTION
+
+=head2 Perl & C<C++> APIs: What's The Difference?
+
+Most stuff should be roughly the same.  The few exceptions have
+generally arisen because there was a perl way to make the interface
+more programmer friendly.
+
+=over 4
+
+=item *
+
+Transactions are perlified.
+
+=item *
+
+Some static methods sit directly under C<ObjStore::> instead of under
+their own classes.  (Easier to import.)
+
+=item *
+
+Databases are always blessed according to your pleasure.
+
+=item * 
+
+C<lookup>, C<open>, C<is_open>, and C<lock_timeout> are augmented with
+multi-color, pop-tart style interfaces.
+
+=back
+
+=head2 Why not just store perl data with the usual perl structures?
+
+=over 4
+
+=item * CHANGE CONTROL
+
+As perl evolves, new data layouts are introduced.  These changes
+must not cause database compatibility problems.
+
+=item * BINARY COMPATIBILITY
+
+Perl doesn't have to worry about binary compatibility between
+platforms.  Databases do.  In addition, databases impose a number of
+restrictions on persistent data layout that would be onerous and
+sub-optimal if adopted by perl.
+
+=item * MEMORY USAGE
+
+Perl often trades memory for speed.  This is the wrong trade for a
+database.  Memory usage is much more of a concern when data sets can
+be as large or larger than ten million megabytes.  A few percent
+difference in compactness can be quite noticable.
+
+=back
+
+=head2 Bless
+
+If you are a suspicious person (like my mom) you might have suspected
+that the ObjStore module installs its own version of C<bless>.
+Natually it does!  The augmented C<bless> implements extra quality
+assurance to insure that blessings are correctly stored persistently.
+For example:
+
+    package Scottie;
+    use ObjStore;
+    use base 'ObjStore::HV';
+
+    sub new {
+        my ($class, $near) = @_;
+        $class->SUPER::new($near, { fur => 'buffy' });
+    }
+
+    my Scottie $dog = Scottie->new($db);
+
+Persistent C<bless> also does some extra work to make evolution
+easier.  It stores the current C<@ISA> tree along with the C<$VERSION>
+of every class in the C<@ISA> tree.  Furthermore, the C<isa> method is
+overridden such that it reports according to the moment of the
+C<bless>.  Similarly, the C<versionof> method lets you query the saved
+C<$VERSION>s.  This may be helpful when doing evolution, as you can
+compare the old C<@ISA> and C<$VERSION>s to figure out what to change
+(and how).  C<UNIVERSAL::can> is unmodified.
+
+Technically speaking, C<bless> is re-implemented such that it can be
+extended by the I<bless from> and the I<bless to> classes via the
+C<BLESS> method.  Both the I<bless from> and I<bless to> operations
+are funnelled through a single C<BLESS> method like this:
+
+  sub BLESS {
+      my ($r1,$r2);
+      if (ref $r1) { warn "$r1 leaving ".ref $r1." for a new life in $r2\n"; }
+      else         { warn "$r2 entering $r1\n"; }
+      $r1->SUPER::BLESS($r2);
+  }
+
+=head2 UNLOADED
+
+Generic tools such as C<posh> or C<ospeek> must C<bless> objects when
+reading from an arbitrary database.  To C<bless>, there must be
+information about the inheritance tree.  To try to get it, unknown
+classes found in a database are C<require>'d.  However, the C<require>
+may fail.  If it does fail, a package must be faked-up and
+C<${"${package}::UNLOADED"}> is set to true.  This flag is used to
+signal that the @ISA tree should not be considered authoritative for a
+particular package.
+
+=head2 Representation
+
+All values take a minimum of 8 bytes (OSSV).  These 8 bytes are used
+to store 16-bits of type information, a pointer, and a general purpose
+16-bit value.
+
+  value stored                   extra allocation (in addition to OSSV)
+  ------------------------------ -------------------------------------
+  undef                          none
+  pointer                        none
+  16-bit signed integers         none
+  32-bit signed integers         4 byte block (OSPV_iv)
+  double                         8 byte block (OSPV_nv)
+  string                         length of string (char*)
+  object (ref or container)      sizeof object (see subclasses of OSSVPV)
+                                 additional references take no extra space
+  bless                          .5-1k bytes per class (zero per object)
+
+Since 32-bit integers and doubles are fairly common and should be
+stored densely, a pool allocation algorithm is planned.
+
+The ODI FAQ also states: I<In addition, there is an associated entry
+in the info segment for the segment in question for each allocation of
+the object. This is done in the tag table. The overhead is 16 bits
+(i.e., 2 bytes) for each singleton (i.e., non-array) allocation, 32
+bits for each character array allocation for character arrays E<lt>=
+255 characters, and 48 bits for each character array allocation E<gt>
+255 characters, or any array allocation of an object of another type.
+Also, depending on the size of an object (i.e., if you allocate a
+"huge" object - one that is E<gt>64Kb) there is other overhead caused
+by alignment constraints.>
+
+If this seems like a lot of overhead, consider that it is not really
+possible to directly compare these numbers to RDBMS statistics.  At
+least we can say that relational data can be stored with much less
+duplication when moved into C<ObjectStore>.  This is unquestionably
+true when you tailor your own C++ extensions to fit data access
+patterns.
+
+=head2 Representation Limitations
+
+Most of these limitations are planned to be removed with the release
+of C<ObjectStore> 6.0.
+
+=over 4
+
+=item *
+
+Exact width types are preferred.  Specify number of bits per
+integer when possible.  It is still mostly unresolved as to how to
+deal with 64-bit integer types.
+
+=item *
+
+Try to be as binary compatible as possible between different
+platforms.  N-bit width types generally need n-bit alignment.  For
+example, 32-bit integers must usually be stored with 32-bit alignment.
+
+=item *
+
+Unions are not supported.  (Don't even think about it! :-)
+
+=item *
+
+Variable length structures are probably not supported.  For example:
+
+  struct varstr {
+    int refcnt;
+    char string[0];  # sized via malloc
+  };
+
+Instead, you must allocate an array separately:
+
+  struct varstr {
+    int refcnt;
+    char *string;    # string = malloc(sizeof(char) * len)
+  };
+
+=item *
+
+Changing the layout of structures after they are stored in a database
+is generally a nightmare.  Instead it is recommended that a version
+number be appended to the name of the structure (e.g. mystruct1,
+mystruct2, mystruct3) and all support code be kept indefinitely.
+
+=back
+
+=head2 Go Extension Crazy
+
+Add your own C<C++> representation.  New families of objects can
+inherit from C<ObjStore::UNIVERSAL>.  Suppose you want highly
+optimized, persistent bit vectors?  Or matrics?  No problem.
+
+Documentation is slim, but don't let that stop you.  There are many
+examples.  See the included representations and also
+L<ObjStore::REP::HashRecord> & L<ObjStore::Lib::PDL>.
+
+=head2 Typemap
+
+The typemap is complicated because of the need to insure that
+persistent data is not accessed outside of its transaction.
+
+  OODB[SCALAR1 SCALAR2]
+         |        |
+       BRIDGE  BRIDGE
+         |        |
+  PERL[SCALAR1 SCALAR2]
+  
+A bridge has two owners: perl and the current transaction.  The bridge
+and the scalar have different lifetimes.  The scalar lives for
+MIN(perl,txn), while the bridge must live for MAX(perl,txn) (or at
+least until perl is done).
+
+Persistent refcnts are only (can only) be updated during update
+transactions.  Fortunately, read-only transactions pose no problem:
+refcnts cannot be updated but object cannot be deleted either.
+
+Bridges are also used to store transient cursors associated with
+collections.  For example, suppose you need to iterate over a hash
+during a read transaction.  The hash is read-only so you create the
+cursor transiently and store it in the bridge.
+
+[XXX also mention dynacast stuff]
+
+=head2 Notes On The Source Code
+
+=over 4
+
+=item *
+
+Functions or methods starting with '_' are internal to the C<ObjStore>
+extension.  They are subject to change (entirely) without notice.
+
+=item *
+
+Avoid C<const>, privacy & templates.  C<C++> sucks!  Long live C<C++>!
+
+=item *
+
+The relationship between references and cursors is strange.  It's
+probably best not to think about it.
+
+=back
+
+=head1 RELATED RESEARCH
+
+ ftp://ftp.cs.utexas.edu/pub/garbage/texas/README
+
+ http://cs-tr.cs.cornell.edu:80/Dienst/UI/1.0/Display/ncstrl.utexas_cs/CS-TR-98-07
+
+ http://www.usenix.org/publications/library/proceedings/usenix98/full_papers/saito/saito_html/saito.html
+
+ http://theory.lcs.mit.edu/~cilk/
+
+=head1 BUGS
+
+=over 4
+
+=item * UNFORGEABLE NOTIFICATION SENDER INFORMATION
+
+ODI feature request #13632: It would be very useful to know which
+client sent a given notification.  While the client I<could> fill in
+this information as part of the notification, the C<osserver> already
+knows the sender's client# and could pass this information
+transparently to subscribers.  The additional overhead be just 2 bytes
+per received notification.
+
+=item * CROSS DATABASE POINTERS
+
+This feature is highly deprecated and will likely be discontinued,
+but at the moment you can allow cross database B<pointers> with:
+
+  $db->_allow_external_pointers;    #never do this!
+
+But you should avoid this if at all possible.  Using real pointers
+will affect refcnts, even between two different databases.  Your
+refcnts will be wrong if you simply C<osrm> a random database.  This
+will cause some of your data to become permenently un-deletable.
+Currently, there is no way to safely delete un-deletable data.
+
+Instead, you can use references or cursors to refer to data in other
+databases.  References may use the C<os_reference_protected> class
+which is designed precisely to address this problem.  Refcnts will not
+be updated remotely, but you'll still be protected from accessing
+deleted objects or removed databases.  (Imagine the freedom. :-)
+
+=item * C<ObjStore::AVHV> EVOLUTION
+
+Indexed records temporarily cannot be evolved due to const-ness.  For
+now, it is recommended that records be removed, changed, and re-added
+to the table when changing indexed fields.
+
+=item * WIN32
+
+There might be issues with threads and signal handlers.  I'm not sure
+since I don't use Microsoft products regularly.
+
+=item * C<MOP>
+
+This is not a general purpose C<ObjectStore> editor with complete
+C<MOP> support.  Actually, I don't think this is a bug!
+
+=item * HIGH VOLITILITY
+
+Everything is subject to change without notice.  (But backward
+compatibility will be preserved when possible. :-)
+
+=item * POOR QUALITY DOCUMENTATION
+
+I didn't get a Ph.D in English.  Sorry!
+
+=back
+
+=head1 WHY?
+
+While there have been huge gains in software quality in the form of
+GNU, Perl, Apache, Linux, Qt, and Mozilla, the world has been slogging
+along in the dark ages (the 1960s in fact) with respect to database
+technology.  After avoiding relational databases for years, I sensed a
+combination of ObjectStore and Perl could offer the same level of
+quality and simplicity that I find invaluable in addressing the
+hurdles I face as a software professional.
+
+Combining ObjectStore & Perl might seem obvious in hindsight (doesn't
+it always?!) but it is my conviction that it was something more than
+luck and hard work that gave me the insight to imagine and implement
+this technology years before it would be recognized and adopted.  If
+you will suspend disbelief for a moment, I would like to invite you
+imagine a hypothetical situation.  What if you found someone who was
+absolutely convincing in their understanding of the truth?  What if
+you had an opportunity to spend time with them?  What would you do?
+
+Designing software requires a basic subtlety of awareness.  To be
+successful you must be able to fluctuate fluidly between the place of
+reason and the place of silent knowledge.  The place of concern is the
+forerunner to the place of reason.  Similarly, the place of unbending
+intent is the forerunner to the place of silent knowledge.  Happily,
+this technique is not limited to software design exclusively.
+
+Not that there is anything wrong with software design.  Computers have
+an evolutionary function. They (can) help people to understand the
+difference between the mechanical and the non-mechanical aspects of
+themselves.  Computers are *entirely* mechanical.  Don't believe the
+anthropomorphisms.  Computers cannot create anything without our help;
+they only do as they are instructed.  Probably this is easy to see.
+However, many people seem to have difficulty seeing what should be
+equally obvious: the pure, non-mechanical principle in themselves.
+
+Ask yourself these questions: Who is the software designer?  Who
+imagines?  Who moves the fingers to type?  IMHO, to try to know
+yourself is the most worthy and worthwhile goal.  Therefore, evolution
+is served by making software available that is very similar to our
+mechanical thinking processes.  By understanding this type of
+software, one is aided in understanding how the brain works.  (I am
+not referring exclusively to the field of artificial intelligence.
+The brain is a data processor in the broadest sense and the algorithms
+of artificial intelligence are only a part of that.)
+
+I have clear intention as to why I am developing this software and why
+I am (foolishly!) giving it away for free.  By contributing to the
+evolution of others' understanding, I in fact contribute to my own
+evolution.  The better one understands, the less time is wasted in
+states of confusion.  As you learn how this database works, you will
+assimilate the perspectives that I have deliberately distilled.  If
+you wish to pursue this to a greater depth, please consider visiting
+http://www.purposeofcompetition.org .  Best of luck.
+
+=cut

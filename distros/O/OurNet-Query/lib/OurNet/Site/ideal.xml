@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<SITE ID="Ideal">
+
+<NAME Lang="en-us">International Digital Electronic Access Library</NAME>
+<INFO Lang="en-us">science relevant journals documents search</INFO>
+
+<URL Type="More"><![CDATA[
+http://galileo.idealibrary.com_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://galileo.idealibrary.com/ideal-cgi/idealsearch?collection=academic&Category=all&Journal=all&searchSelect1=all&search1=_QUERY_&searchLogic1=OR&searchSelect2=all&search2=&searchLogic2=AND&searchSelect3=all&search3=&articleGroupSize=_HITS_&sortMethod=Relevance
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_NEXT_"><![CDATA[
+<A HREF="_NEXT_">Next
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<p><b>_TITLE_</b><br>_PREVIEW_<a href="___Guest Users:___HREF="_URL_">___<P></P>
+]]></TEMPLATE>
+</SITE>

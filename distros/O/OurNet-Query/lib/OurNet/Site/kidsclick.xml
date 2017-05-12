@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<SITE ID="Kidsclick">
+
+<NAME Lang="en-us">KidsClick Web Search</NAME>
+<INFO Lang="en-us">general information web search for kids</INFO>
+
+<URL Type="Start"><![CDATA[
+http://sunsite.berkeley.edu/cgi-bin/searchkids.pl?keywords=_QUERY_&searchtype=all
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+
+<TEMPLATE><![CDATA[
+<DT><A HREF="_URL_">_TITLE_</A>___<DD>_PREVIEW_]
+]]></TEMPLATE>
+</SITE>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<database>
+		<default>local</default>
+		<local>
+			<name>greenspan_osgood</name>
+			<host>127.0.0.1</host>
+			<port>3306</port>
+			<username>root</username>
+			<password></password>
+		</local>
+	</database>
+</configuration>

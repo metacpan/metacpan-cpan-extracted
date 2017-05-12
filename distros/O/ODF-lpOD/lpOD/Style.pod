@@ -1,0 +1,1648 @@
+=head1	NAME
+
+ODF::lpOD::Style - Styles management
+
+=head1  DESCRIPTION
+
+This manual page describes the C<odf_style> class and its specialized
+derivatives.
+
+C<odf_style> is an alias for C<ODF::lpOD::Style>.
+
+A style object controls the formatting and/or layout properties of a family of
+content objects. It's identified by its own name and its family.
+
+The lpOD API to update the properties of existing styles, and to replicate the
+features of existing styles. It allows the user to build new styles from
+scratch as well.
+
+The full styling of a graphically sophisticated document could require a lot
+of complex code, because a lot of layout graphical rendering options are
+available. As a consequence, it's recommended to reuse and customize existing
+styles each time it's possible, instead of hardcoding fully new styles, in
+order to maintain a reasonable ratio between the style related and the content
+related coding efforts.
+
+=head1 Common style features
+
+Any style is created through a common C<odf_create_style()> function with the
+family as its mandatory first argument. A name, that is the identifier of
+the style in the given family, is generally required. So, a typical style
+creation instruction looks like:
+
+    $s = odf_create_style('text', name => 'MyTextStyleName');
+
+The C<create()> constructor of the C<odf_style> class may be used instead of
+the C<odf_create_style()> functional constructor, so the instruction below
+produces the same effects as the previous one:
+
+   $s = odf_style->create('text', name => 'MyTextStyleName');
+
+This example creates a named text style without any property. The properties
+are optionally passed as named parameters.
+
+Note that in order to be really available in a document, a style, once created,
+must be registered in this document using C<insert_style()>
+or C<register_style>, that is a C<odf_document> method, introduced below.
+
+Additional named parameters may be required according to the family. An optional
+C<parent> argument, whose value is the name of another common style of
+the same family (existing or to be created), can be provided to
+C<odf_create_style>, knowing that a style inherits (but can override) all the
+properties of its parent. A C<display name> additional parameter may be
+provided; if set, this parameter designates a visible name that may differ from
+the internal name. It's possible to copy (instead of inherit) all the properties
+of an existing style of the same family, through a C<clone> option, knowing that
+C<clone> and C<parent> are mutually exclusive options. The code example below
+produces two text styles whose properties are the same as "MyTextStyleName", but
+the first one will be affected by later changes of the base style while the
+second one is independent:
+
+   odf_create_style('text', name => 'NewStyle1', parent => 'MyTextStyleName');
+   $proto = doc->get_style('text', 'MyTextStyleName');
+   odf_create_style('text', name => 'NewStyle2', clone => $proto);
+
+An effective style name, unique for the family, is required as soon as the
+style is attached to a document, unless it's inserted as a I<default style>.
+This name may be set or changed with C<set_name()> after the style creation.
+When a style is used as a default style, its name and display name are
+meaningless and ignored. The family and the name constitute the absolute
+identifier of a style in a document.
+
+The parent of an existing style may be read or changed using the style-based
+C<get_parent_style()> or C<set_parent_style()> method. Beware that
+C<get_parent_style()> is not the same as C<get_parent()>; the last one is a
+generic, low level utility method (see L<ODF::lpOD::Element>).
+
+C<get_parent_style()> returns the I<name> of the parent style, if any. This
+name may be used to retrieve the parent style object with the document-based
+C<get_style()> method. Symmetrically, the argument of C<set_parent_style()>
+should be a style name (if this argument is a valid style object, lpOD tries
+to replace it by its name).
+
+Note that an I<automatic style> can't be used as the I<parent> of another
+(common or automatic) style; a style can inherit from a common style only.
+However, lpOD will not warn if you specify the name of an automatic style
+(or the name of a not yet registered style) as a parent, knowing that you are
+allowed to create, change or move the parent style later.
+
+Some styles may have a I<class> property, that is an informative attribute, and
+that should not be confused with the I<family>. A family is an application-
+defined property, used in order to identify a set of styles belonging to various
+families, for retrieval needs.
+
+When attached to a document, a style provides a C<get_parent_styles()> method
+that returns the full set of inherited styles, if any. Knowing that this method
+works in the context of a document where the parent styles are supposed to be
+registered and available, the returned list is made of style objects, not
+style names. The main purpose of this method is to allow the applications to
+check and, if needed, to extract all the dependencies of a given style in order
+to replicate it in another document.
+
+The register a new style in a document, the generic C<insert_element()> and
+C<append_element()> method are not appropriate. The document-based
+C<insert_style()> method, that partly hides the complex ODF style storage
+logic, must be used instead:
+
+   $doc->insert_style($s);
+
+C<insert_style()> requires a style object as its only one mandatory argument.
+It's return value is the style itself.
+
+Remember that C<register_style()> is an alias of C<insert_style()>.
+
+Alternatively, it's possible to register a style using the C<register()> method
+of the C<odf_style> class. So, the two following instructions, assuming that
+C<$doc> is a C<odf_document> and C<$s> is a C<odf_style>, are equivalent:
+
+   $doc->register_style($s);
+   $s->register($doc);
+
+Note that the C<register()> method of C<odf_style> allows the same optional
+parameters as the C<insert_style()> or C<register_style()> document-based
+method, provided that these parameters come after the mandatory argument that
+specifies the target document.
+
+A style should not be registered in a document when it's already registered
+in another document. If you need to replicate a style in multiple documents,
+you should make copies:
+
+   $style->clone->register($_) for @many_documents;
+
+A style may be created "in place" by C<insert_style()> if the first
+argument is an array ref instead of an existing style element. The array ref
+must contain the arguments of C<odf_create_style()> in the same order. So the
+two instructions below (that create and register a text style whose font weight
+is bold) are equivalent:
+
+   $doc->insert_style(
+        odf_create_style('text', name => "MyText", weight => 'bold')
+        );
+   $doc->insert_style(['text', name => "MyText", weight => 'bold']);
+
+An optional boolean parameter whose name is C<default> is allowed with
+C<insert_style()>; if provided and set to C<TRUE>, this parameter means that
+the style is registered as a I<default style>. A default style is a style that
+automatically applies to elements whose style is not explicitly specified. A
+document can contain at most one default style for a style family, so any
+registration of a default style replaces any existing default style of the same
+family. So the following example sets a default paragraph style whose alignment
+rule is C<'justify'>:
+
+   $ps = odf_create_style('paragraph', align => 'justify');
+   $doc->insert_style($ps, default => TRUE);
+
+Note that the instruction below is equivalent:
+
+   $ps = odf_create_style('paragraph', align => 'justify')
+            ->register($doc, default => TRUE);
+
+Such a default style definition means that, in the document, every paragraph
+without specified style will be justified.
+
+All styles can't be used as default styles. Default styles are allowed
+for the following families: C<paragraph>, C<text>, C<section>, C<table>,
+C<table column>, C<table row>, C<table cell>, C<table page>, C<chart>,
+C<drawing page>, C<graphic>, C<presentation>, C<control> and C<ruby>.
+
+An existing style may be retrieved in a document using the C<get_style()>
+document-based method. This method requires a family as its first argument and
+allows a style name as a second, optional argument. If the name is missing,
+this method tries to retrieve the default style for the given family, if any.
+
+The following example extracts a paragraph style, so-called "MyParagraph", from
+a document and attaches a clone of this style as a default style of another
+document; the old default paragraph style of the target document (if any) is
+automatically replaced:
+
+   $ps = $doc1->get_style('paragraph', 'MyParagraphStyle')->clone;
+   $doc2->insert_style($ps, default => TRUE);
+
+These two instructions may be replaced by the following:
+
+   $doc1->get_style('paragraph', 'MyParagraphStyle')
+            ->clone
+            ->register($doc2, default => TRUE);
+
+Knowing that a style may be C<automatic> or not, and that it may be stored
+in the C<CONTENT> or C<STYLE> part of a document, C<insert_style()> silently
+selects the options that work in most typical situations according to the
+style family. However, it's sometimes useful or necessary to store a style
+in a specific, non default way. To do so, C<insert_style()> (and its
+derivatives) allows the following additional options:
+
+=over
+
+=item *
+
+C<automatic>: boolean; if C<TRUE>, the style is stored as automatic, if
+C<FALSE>, it's stored as common, and if C<undef>, it's stored according to
+the lpOD's choice (that depends on the style family);
+
+=item *
+
+C<part>: may be C<CONTENT> or C<STYLE> (note that as soon as the storage part
+is C<CONTENT>, the style will be I<automatic>, whatever the value of the
+C<automatic> parameter, if any).
+
+=back
+
+These two last options are ignored if C<default> is C<TRUE>.
+
+Now, back to the style customization.
+
+While a style is identified by name and family, it owns one or more sets of
+properties. A style property is a particular layout or formatting behavior.
+The API provides a generic C<set_properties()> method which allows the user to
+set these properties, while C<get_properties()> returns the existing properties
+as an associative array.
+
+However, some styles have more than one property set.
+
+As an example, a paragraph style owns so-called "paragraph properties"
+and/or "text properties" (see below). In such a situation, an additional
+C<area> parameter, whose value identifies the particular property set, with
+C<set_properties()>. Of course, the same C<area> parameter applies to
+C<get_properties()>.
+
+Some styles allow the applications to specify a I<background>. Such a background
+is sometimes characterized by the RGB, 3-bytes hexadecimal code of an arbitrary
+color, with a leading "#". However some styles allow the use of background image
+instead of or in combination with a color. In order to deal with these
+possibilities, a C<set_background()> is provided; this method (which works
+with some style objects only) is used with a C<color> and/or a C<url> named
+parameters. The C<color> value range is #000000-#ffffff, while C<url> should
+be set to the URL of the graphic resource. If C<url> is set, some additional
+optional parameters may be provided, in order to control the way the image is
+displayed in the background, namely:
+
+=over
+
+=item
+
+C<position>: a string that specifies the horizontal and vertical positions
+of the image, through one or two comma-separated words (in any order) among
+C<center>, C<left>, C<right>, C<top>, C<bottom> (default: C<center>);
+
+=item
+
+C<repeat>: specifies whether a background image is repeated or stretched,
+whose possible values are ``no-repeat`` meaning that the image should be
+displayed once, ``repeat`` to repeat the image in order to fill the whole
+background, and ``stretch`` to extend the image in order to fill the
+whole background;
+
+=item
+
+C<opacity>: the percentage of opacity;
+
+=item
+
+C<filter>: an application-specific filter to that is used to load and process
+the graphic file, according to the image format.
+
+=back
+
+To remove the background color or image (i.e. to set the background to the
+default, that is transparent), the user just have to call C<set_background()>
+with C<color> and C<url> set to C<undef>.
+
+A style that apply in some way to a rectangular area (ex: shape, frame,
+paragraph) other than a page may have visible borders and a shadow. Borders are
+specified using C<border xxx> attributes where C<xxx> is either C<left>,
+C<right>, C<top> or C<bottom>; if all the borders are the same, a single
+C<border> property is convenient. The value of a border property is a 3-part
+string that describes the thickness, the line style and the line color
+(according to the XSL/FO grammar), like C<"0.1cm solid #000000"> for a one
+millimeter solid black line. The shadow is specified through a C<shadow>
+property whose value is a 3-part string describing the color and the size, like
+C<"#808080 0.18cm 0.18cm">.
+
+A style can be inserted as either I<common> (or named and visible for the
+user of a typical office application) or I<automatic>, according to a boolean
+C<automatic> option, whose default value is C<FALSE>. A common style may have
+a secondary unique name which is its C<display name>, which can be set through
+an additional option. With the exception of this optional property, and a
+few other ones, there is no difference between automatic and common style
+definitions. However, they are two major semantic differences. First, an
+automatic style can't be inherited. Second, the automatic styles are not
+displayed as available and reusable styles in the graphical user interface
+of a typical interactive office software.
+
+Defaults styles and common styles are automatically inserted in the C<STYLES>
+document part. But automatic styles may be inserted, at the user's choice, in
+C<CONTENT> or C<STYLES>. The default is C<CONTENT> but C<STYLES> may be
+specified through a C<part> optional parameter of C<insert_style()>. The user
+must check that any automatic style is inserted in the same document part as
+the element that uses it (so, an automatic style must be inserted in C<STYLES>
+if it's used by another style defined in this part).
+
+Of course, a style is really in use when one or more content objects
+explicitly reference it through its style property.
+
+The API allows the user to retrieve and select an existing style by name and
+family. The display name, if set, may be used as a replacement of the name
+for retrieval.
+
+Once selected, a style could be removed from the document through a standard
+level 0 element deletion method.
+
+Note: For some style properties that specify a I<color> (such as a background
+color, a font color, and so on), the color value may be provided as a symbolic
+name, such as "yellow", "navy blue" or "dark slate grey" instead of a numeric
+code. The allowed color names are those defined in standard Xorg RGB files.
+However, the user can add custom color names, thanks to a C<load_color_map()>
+utility, introduced in L<ODF::lpOD::Common>.
+
+=head1  Text styles
+
+A text style can be defined either to control the layout of a text container,
+i.e. a paragraph, or to control a text range inside a paragraph. So the API
+allows the user to handle two families of text styles, so called I<text>
+and I<paragraph>. For any style in the text or paragraph families, the I<text>
+class is recommended.
+
+=head2  Text family
+
+A text style (i.e. a style whose family is C<text>, whatever its optional
+class) is a style which directly applies to characters (whatever the layout
+of the containing paragraph). So, it can bear any property directly
+related to the font and its representation. The most used properties are
+the font name, the font size, the font style (ex: normal, oblique, etc),
+the text color, the text background color (which may differ from the
+common background color of the paragraph).
+
+A text style may apply to any text span in any text paragraph. However some ODF
+editing or viewing applications don't fully support them in some situations. For
+example, OpenOffice.org doesn't currently allow the use of I<common> text styles
+with spreadsheets, while it allows I<common> and I<automatic> text styles in text
+documents.
+
+A text style can apply to one or more text spans; see the "Text spans"
+section. It can be used as the default text style of a document. In addition,
+an existing text style may be reused to set the text properties of a paragraph
+style (see below).
+
+The example hereafter creates a text style, so called "My Colored Text",
+using Times New Roman, 14-sized navy blue bold italic characters with
+a yellow background:
+
+   $s = odf_create_style('text',
+                        name            => 'MyColoredText',
+                        'display name'  => 'My Colored Text',
+                        font            => 'Times New Roman',
+                        size            => '14pt',
+                        weight          => 'bold',
+                        style           => 'italic',
+                        color           => '#000080'
+                        );
+   $s->set_background(color => '#ffff00');
+
+This new style could be inserted using C<insert_style()> then retrieved and
+changed later using C<get_style()> then the C<set_properties()> method of the
+style object. For example, the following code modifies an existing text style
+definition so the font size is increased to 16pt and the color turns green:
+
+   $s = $document->get_style('text', 'MyColoredText');
+   $s->set_properties(size => '16pt', color => '#00ff00');
+
+The C<set_properties()> method may be used in order to delete a property,
+without replacement; to do so, the target property must be set to C<undef>.
+
+Note that C<set_properties()> can't change any identifying attribute such
+as name, family or display name.
+
+The lpOD level 1 API allows the applications to set any property without
+ODF compliance checking. The compliant property set for text styles is
+described in the section §15.4 of the OASIS ODF specification. Beware,
+some of them are not supported by any ODF text processor or viewer.
+
+The API allows the user to set any attribute using its official name
+according to the ODF specification (§15.4). For example, the properties
+which control the character name and size are respectively
+C<fo:font-name> and C<fo:font-size>. However, the API allows the use of
+mnemonic shortcuts for a few, frequently required properties, namely:
+
+=over
+
+=item
+
+C<font>: font name;
+
+=item
+
+C<size>: font size (absolute with unit or percentage with '%');
+
+=item
+
+C<weight>: font weight, which may be C<normal>, C<bold>, or one of the
+official nine numeric values from C<100> to C<900> (§15.4.32);
+
+=item
+
+C<style>: to specify whether to use normal or italic font face; the
+legal values are C<normal>, C<italic> and C<oblique>;
+
+=item
+
+C<variant>: may be set to C<'small-caps'> in order to display the text a small
+capitalized letters;
+
+=item
+
+C<color>: the color of the characters (i.e. foreground color), provided
+as a RGB, 6-digit hexadecimal string with a leading '#';
+
+=item
+
+C<underline style>: to specify if and how text is underlined; possible values
+are C<solid> (for a continuous line), C<dotted>, C<dash>, C<long dash>,
+C<dot dash>, C<dot dot dash>, C<wave>, and C<none>;
+
+=item
+
+C<underline>: same as C<underline style>;
+
+=item
+
+C<underline width>: the width of the underline; possible values are C<auto>,
+C<normal>, C<bold>, C<thin>, C<dash>, C<medium>, C<thick>;
+
+=item
+
+C<underline color>: the color that is used to underline text (as a color code
+or symbolic color name); if the value is 'font-color', the current text color
+is used for underlining;
+
+=item
+
+C<underline mode>: specifies whether underlining is applied to words only or
+continuously; if the value is 'words' or 'skip-white-space', the spaces are not
+underlined, even if they are included in the underlined text span, while the
+whole text span is underlined if the value is 'continuous' (that is usually the
+default if this property is not set);
+
+=item
+
+C<display>: to specify if the text should by displayed or hidden;
+possible values are C<true> (meaning visible) C<none> (meaning hidden)
+or C<condition> (meaning that the text is to be visible or hidden
+according to a condition defined elsewhere).
+
+=item
+
+C<language>: to specify a language code (ex: 'de' for German, 'fr' for
+French);
+
+=item
+
+C<country>: to specify a country code (ex: 'DE' for Germany, 'FR' for
+France).
+
+=back
+
+A text style may have a background color, but not a background image.
+
+=head2  Paragraph family
+
+A paragraph style apply to paragraphs at large, i.e. to ODF paragraphs and
+headings, which are the common text containers. It controls the layout of both
+the text content and the container, so its definition is made of two distinct
+parts, the I<text> part and the I<paragraph> part.
+
+The text part of a paragraph style definition may have exactly the same
+properties as a regular text style. The rules are defined by the §15.4 of the
+OASIS 1.1 ODF specification, and the API provides the same property shortcuts as
+for a text style creation. Practically, this text part defines the default text
+style that apply to the text content of the paragraph; any property in this part
+may be overridden as soon as one or more text spans with explicit styles are
+defined inside the paragraphs.
+
+The creation of a full-featured paragraph style takes two steps. The first one
+is a regular C<odf_create_style()> instruction, with C<paragraph> as the value
+of the family mandatory argument, a name parameter (unless the user just wants
+to create a default style) and any number of named paragraph properties. The
+second (optional) step consists of appending a I<text> part to the new paragraph
+style; it can be accomplished, at the user's choice, either by specifying a
+previously defined text style element, or by explicitly defining new text
+properties, through the C<set_properties()> method with the C<area> option set
+to C<text>. In the second case, the prototype text style is provided through
+the C<clone> parameter.
+
+Assuming that a "MyColoredText" text style has been defined according to the
+text style creation example above, the following sequence creates a new
+paragraph style whose text part is a clone of "MyColoredText", and whose
+paragraph part features are the text justification, a first line 5mm indent,
+a black, continuous, half-millimiter border line with a bottom-right, one
+millimeter grey shadow, with other possible properties inherited from a
+"Standard" style:
+
+   $ps = odf_create_style(
+                        'paragraph',
+                        name            => 'BorderedShadowed',
+                        'display name'  => 'Strange Boxed Paragraph',
+                        parent          => 'Standard',
+                        align           => 'justify',
+                        indent          => '5mm',
+                        border          => '0.5mm solid #000000',
+                        shadow          => '#808080 1mm 1mm'
+                        );
+   $ts = $document->get_style('text', 'MyColoredText');
+   $ps->set_properties(area => 'text', clone => $ts);
+
+Note that "MyColoredText" is reused by copy, not by reference; so the new
+paragraph style will not be affected if "MyColoredText" is changed or deleted
+later.
+
+The value of the C<clone> parameter, if any, may be a I<paragraph> style
+element instead of a I<text> style element, provided that the given paragraph
+style contains a I<text> part; so the text part of the given paragraph style (and
+this part only) is used as the prototype.
+
+Among the creation option for a paragraph style, a C<master page> parameter
+may be set in order to specify the style of the page where the paragraphs
+using the style will appear. A paragraph whose style has a C<master page>
+option is the first of a new page (in other words, a paragraph whose style
+owns a C<master page> property is automatically preceded by a page break unless
+it's the first paragraph of the document content). This option may be checked
+and changed in existing paragraph styles using the C<get_master_page()> and
+C<set_master_page()> accessors.
+
+The API allows the user to set any attribute using its official name according
+to the ODF specification related to the paragraph formatting properties (§15.5).
+However, the API allows the use of mnemonic shortcuts for a few, frequently
+required properties, namely:
+
+=over
+
+=item
+
+C<align>: text alignment, whose legal values are C<start>, C<end>, C<left>,
+C<right>, C<center>, or C<justify>;
+
+=item
+
+C<align-last>: to specify how to align the last line of a justified paragraph,
+legal values are C<start>, C<end>, C<center>;
+
+=item
+
+C<indent>: to specify the size of the first line indent, if any;
+
+=item
+
+C<widows>: to specify the minimum number of lines allowed at the top of a page
+to avoid paragraph widows;
+
+=item
+
+C<orphans>: to specify the minimum number of lines required at the bottom of a
+page to avoid paragraph orphans;
+
+=item
+
+C<together>: to control whether the lines of a paragraph should be kept together
+on the same page or column, possible values being C<always> or C<auto>;
+
+=item
+
+C<margin>: to control all the margins of the paragraph;
+
+=item
+
+C<margin xxx> (where C<xxx> is C<left>, C<right>, C<top> or C<bottom>): to
+control the margins of the paragraph separately;
+
+=item
+
+C<border>: a 3-part string to specify the thickness, the line style and the line
+color (according to the XSL/FO grammar);
+
+=item
+
+C<border xxx> (where C<xxx> is C<left>, C<right>, C<top> or C<bottom>): the same
+as C<border> but to specify a particular border for one side;
+
+=item
+
+C<shadow>: a 3-part string to specify the color and the size of the shadow;
+
+=item
+
+C<padding>: the space around the paragraph;
+
+=item
+
+C<padding xxx> (where C<xxx> is C<left>, C<right>, C<top> or C<bottom>): to
+specify the space around the paragraph side by side;
+
+=item
+
+C<keep with next>: to specify whether or not to keep the paragraph and the next
+paragraph together on a page or in a column, possible values are C<always> or
+C<auto>;
+
+=item
+
+C<break xxx> (where C<xxx> is C<before> or C<after>): to specify if a page or
+column break must be inserted before or after any paragraph using the style,
+legal values are C<page>, C<column>, C<auto>.
+
+=back
+
+A paragraph style may have a background color or image.
+
+=head1  Font declarations
+
+Every font name that is used in a text style (or in a paragraph text property)
+must be I<declared> in the document, either in the C<CONTENT> part or in the
+C<STYLES> part. The basic rule is that a font declaration must appear in the
+part where the corresponding font name appears in a style definition.
+
+So, both the C<STYLES> and C<CONTENT> ODF XML part objects provide methods
+for dealing with font declarations.
+
+C<set_font_declaration()> allows the user to put a font declaration in the
+calling C<odf_xmlpart> object. This method requires a font name (unique for
+the part) as its first argument. Some additional named parameters may be
+provided:
+
+=over
+
+=item
+
+C<family>: the font family, whose default is the font name itself;
+
+=item
+
+C<family generic>: the generic font family name (ex: "roman");
+
+=item
+
+C<pitch>: specifies whether a font has a fixed or variable width;
+
+=item
+
+C<adornments>: adornments, like "bold" or "italic" that can be used to
+locate a font in addition to the family name;
+
+=item
+
+C<charset>: the character set of the font.
+
+=back
+
+For details about these options, see ODF 1.1 §14.6 and §15.4, knowing that
+each option corresponds to a C<style:font-xxx> ODF attribute where C<xxx> is the
+option name.
+
+C<set_font_declaration()> deletes and replaces any previously existing
+font corresponding to the given name. It returns the font declaration object,
+that is a C<odf_element>.
+
+C<set_font_declaration()> may be used as a C<odf_document()> method; in this
+context, it inserts the same font declaration in C<CONTENT> and C<STYLES>.
+
+C<get_font_declaration()> is a C<odf_xmlpart> method allowing to select an
+existing font declaration by name (if any). The returned object may be deleted
+or cloned as any other C<odf_element>.
+
+=head1  List family
+
+A list style is a set of styles that control the formatting properties of
+the list items at every hierarchical level. As a consequence, a list style
+is a named container including a particular style definition for each level;
+in other words a list style is a set of list level styles.
+
+The API allows the user to create a list style (if not previously existing
+in the document), and to create, retrieve and update it for any level.
+
+A new list style, available for later insertion in a document, is created
+through the C<odf_create_style()> function. The only mandatory argument is
+the style family, which is C<list>. However, a name is generally required as
+the second argument, knowing that a style list can't presently be used as a
+default style; an error is raised at any attempt to attach a nameless list
+style using C<insert_style()> or C<register_style()>. An optional display name
+argument is allowed (if the style list is about to be used as a common style);
+if  provided, the display name should be unique as well.
+
+An existing list style object provides a C<set_level_style()> method,
+allowing the applications to set or change the list style properties for a
+given level. This method requires the level number as its first argument,
+then a C<type> named parameter may be provided. The level is a positive (non
+zero) integer value that identifies the hierarchical position. The type
+specifies what kind of item mark is should be selected for the level; the
+possible types are C<number>, C<bullet> or C<image>. The default is C<number>.
+
+If the C<bullet> type is selected, the affected items will be displayed after
+a special character (the "bullet"), which must be provided as a C<character>
+named argument, whose value is an UTF-8 character.
+
+If the C<image> type is selected, the image resource must be linked through
+a C<url> parameter; the affected items will be displayed after a graphical
+mark whose content is the corresponding image file.
+
+A C<number> list level type means that any affected list item will be marked
+with a leading computed number such as "1", "i", "(a)", or any auto-
+incremented value, whose formatting will be controlled according to other
+list level style properties (or to the default behavior of the viewer for
+ordered lists). With the C<number> type, its possible to provide C<prefix>
+and/or C<suffix> options, which provide strings to be displayed before and
+after the number. Other optional parameters are:
+
+=over
+
+=item
+
+C<style>: the text style to use to format the number;
+
+=item
+
+C<display levels>: the number of levels whose numbers are displayed at the
+current level (ex: if display-levels is 3, so the displayed number could
+be something like "1.1.1");
+
+=item
+
+C<format>: the number format (typically "1" for a simple number display),
+knowing that if this parameter is null the number is not visible;
+
+=item
+
+C<start value>: the first number of a list item of the current level.
+
+=back
+
+The following example shows the way to create a new list style then
+to set some properties for levels 1 to 3, each one with a different type:
+
+   $ls = odf_create_style('list', name => 'ListStyle1');
+   $ls->set_level_style(
+        1, type => 'number', format => "1", prefix => ' ', suffix => '. '
+        );
+   $ls->set_level_style(
+        2, type => 'bullet', character => '-'
+        );
+   $ls->set_level_style(
+        3, type => 'image', url => 'bullet.jpg'
+        );
+
+The C<set_level_style()> method returns an ODF element, representing the list
+level style definition, and which could be processed later through any element-
+or style-oriented function.
+
+A list level style definition may be extended using its own C<set_properties()>
+method, allowing the user to set properties that can't be covered by the
+C<set_level_style()> parameters. These properties are:
+
+=over
+
+=item
+
+C<space before>: the indent level, i.e. the space before the number for all
+paragraphs at this level;
+
+=item
+
+C<min label width>: the minimum width of the item labels at this level;
+
+=item
+
+C<min label distance>: the minimum distance between the number and the text
+of the item;
+
+=item
+
+C<align>: the alignment of the item label relatively to the width as set
+through C<min label width>; may be 'center', 'start', 'end';
+
+=item
+
+C<font>: the name of a font that is used to display a bullet character (for
+bullet list level styles);
+
+=item
+
+C<width> and C<height>: the width and height of the image (for image list
+level styles); note that there is no default size, so these parameters must
+be set in order to make the image visible.
+
+=item
+
+C<size>: a syntactic shortcut that replaces C<width> and C<height>; if
+provided, this option may be either a comma-separated string containing
+the width then the height, or an array ref of two strings in the same order.
+
+=back
+
+The next example shows the way to set a level 1 number list level style with
+a 1cm indent and a 5mm minimal space between the label and the item text:
+
+        $ls->set_level_style(1, type => 'number', format => '1')
+                ->set_properties(
+                        'space before'          => '1cm',
+                        'min label distance'    => '5mm'
+                        );
+
+The following example sets a level 2 image list level style using a previously
+loaded image file, with a 2x2mm image size and a 3mm minimal space between the
+image and the item text:
+
+        $img = $doc->add_image_file('/home/pictures/bullet.png');
+        $ls->set_level_style(2, type => 'image', url => $img)
+                ->set_properties(
+                        size                    => '2mm, 2mm',
+                        'min label distance'    => '3mm'
+                );
+
+See L<ODF::lpOD::Document> for details about the C<add_image_file()> method
+used in this example.
+
+It's possible to avoid an explicit call to C<set_properties()> in order to
+set the display attributes of a list level style; C<set_level_style()>
+allows the user to specify these attributes as a hash ref through a
+C<properties> optional parameter. It's just syntactic sugar: if this option
+is set, C<set_level_style()> automatically calls C<set_properties()> with
+the given content. So the last instruction of the previous example could be
+replaced by the following one:
+
+        $ls->set_level_style(
+                2, type => 'image', url => $img,
+                properties => {
+                        size                    => '2mm, 2mm',
+                        'min label distance'    => '3mm'
+                        }
+                );
+
+An individual list level style may be reloaded through C<get_level_style()>,
+with the level number as its only one argument; it returns a regular ODF element
+(or C<undef> if the given level is not defined for the calling list style).
+
+It's possible to reuse an existing list level style definition at another level
+in the same list style, or at any level in another list style, or in another
+document. To do so, the existing level style (previously extracted by any mean,
+including the C<get_level_style()> method) must be provided as a special
+C<clone> parameter to C<set_level_style()>. The following example reuses the
+level 3 style of "ListStyle1" to define or change the level 5 style of
+"ListStyle2":
+
+   $ls1 = $document->get_style('list', 'ListStyle1');
+   $source = $ls1->get_level_style(3);
+   $ls2 = $document->get_style('list', 'ListStyle2');
+   $ls2->set_level_style(5, clone => $source);
+
+The object returned by C<set_level_style()> or C<get_level_style()> is
+similar to an ODF style object, without the name and the family. So the generic
+C<set_properties()> method may be used later in order to set any particular
+property for any list level style. Possible properties are described in section
+§14.10 of the ODF specification.
+
+Every list level style definition in a list style is optional; so it's not
+necessary to define styles for levels that will not be used in the target
+document. The C<set_level_style()> method may be used with an already defined
+level; in such a situation, the old level style is replaced by the new one. So
+it's easy to clone an existing list style then modify it for one or more levels.
+
+=head1  Outline style
+
+According to the ODF specification, "the outline style is a list style that
+is applied to all headings within a text document where the heading's paragraph
+style does not define a list style to use itself".
+
+Practically, the outline style is a particular list style which controls the
+layout of a particular hierarchical list. In other words, it's a list
+of default styles for headings according to their respective hierarchical
+levels.
+
+The outline style, like any list style, should define a style for each level
+in use in the document.
+
+The API allows the user to initialize the outline style (if not previously
+existing in the document), and to create, retrieve and update it for any level.
+
+The C<get_style()> method allows the user to get access to the outline
+style structure; to do so, C<outline> must be provided in place of the family
+argument. The returned object is a nameless list style; it may be
+cloned in order to be reused as the outline style for another document, or as
+an ordinary list style (provided that it's later named). If the outline style
+is not initialized yet, C<get_style()> returns a null value for the C<outline>
+family.
+
+If needed, the outline style can be created through C<odf_create_style()>
+with C<outline> as the style family and without name, then attached using
+C<insert_style()>. The style for each individual level may be set, retrieved
+and changed at any time using the object-based C<set_level_style()> and
+C<get_level_style()> methods.
+
+Unlike with regular list styles, the C<type> option of C<set_level_style()>
+is ignored with the outline style; the type is automatically C<number> (i.e.
+the outline style is always a numbered list style).
+
+The API allows the user to set style attributes for any level, knowing that a
+level is identified by a positive integer starting from 1. With the current
+version of the lpOD level 1 API, a few outline level style attributes are
+supported, namely:
+
+=over
+
+=item
+
+C<prefix>: a string that should be displayed before the heading number;
+
+=item
+
+C<suffix>: a string that should be displayed before the heading number;
+
+=item
+
+C<format>: the number display format (ex: 1, "A");
+
+=item
+
+C<display levels>: the number of levels whose numbers are displayed at
+the current level;
+
+=item
+
+C<start value>: the first number of a heading at this level;
+
+=item
+
+C<style>: the name of the style to use to format the number (that is a
+regular text style).
+
+=back
+
+As an example, the following code retrieves the default style for the level 4
+headings:
+
+   $os = $document->get_style('outline');
+   $head4 = $os->get_level_style(4);
+
+The next example sets some properties for any level 1 heading, namely a
+numbering starting from 5 and the use of capital letters between parentheses
+as numbers:
+
+   $os = $document->get_style('outline');
+   $os->set_level_style(
+        1,
+        start_value => 5, prefix => '(', suffix => ')', format => 'A'
+        ):
+
+According to the example above, the default numbering scheme for level 1
+headings will be "(E)", "(F)", "(G)", and so on.
+
+Attributes and properties which are not explicitly supported through predefined
+parameter names in the present version of the API could always be set through
+the element-oriented methods of the level 0 API, knowing that
+C<get_level_style()> returns a regular element.
+
+=head1  Table-related styles
+
+The API supports 4 kinds of styles that control various table formatting
+properties. While a table style specifies the global formatting properties of
+a table, row, column and cell styles allow a specific layout control for each
+table component.
+
+=head2  Table styles
+
+A table style specifies the external size, borders and background of a table.
+It may be created through C<odf_create_style()> with C<table> as style family,
+the usual C<name> parameter, and the following parameters:
+
+=over
+
+=item
+
+C<width>: the table width (in length, not in columns), provided either in
+absolute values or as a percentage of the page width; both absolute and
+relative values may be provided as a string, separated by a comma, if needed;
+
+=item
+
+C<margin>: to control all the margins of the table;
+
+=item
+
+C<margin xxx> (where C<xxx> is C<left>, C<right>, C<top> or C<bottom>): to
+control the margins of the table separately;
+
+=item
+
+C<align>: to specify the table alignment scheme, with C<left>, C<right>,
+C<center>, C<margins> as possible values;
+
+=item
+
+C<together>: to control whether the rows of the table should be kept together
+on the same page or column, possible values being ``always`` or ``auto``;
+
+=item
+
+C<keep with next>: to specify whether or not to keep the paragraph and the
+next paragraph together on a page or in a column, possible values are
+C<always> or C<auto>; default is C<auto>;
+
+=item
+
+C<break xxx> (where C<xxx> is C<before> or C<after>): to specify if a page
+or column break must be inserted before or after any paragraph using the
+style, legal values are C<page>, C<column>, C<auto>; default is C<auto>;
+
+=item
+
+C<display>: boolean property that specifies if a table is visible or not;
+default is C<true>.
+
+=back
+
+The table styles support the C<set_background()> method and may have a
+C<shadow> property. However, while a table covers a rectangular area, the
+C<border xxx> properties are not defined at the table style level; the borders
+are cell properties.
+
+A C<set_shadow()> method is available; its options are the same as the
+C<set_shadow()> method for graphic styles.
+
+=head2   Cell styles
+
+A cell style is created using C<odf_create_style()> with C<table cell> as the
+family. A C<data style> may be provided as an optional parameter, which is
+recommended as soon as the style is about to be used for numeric cells. The
+value of this parameter is the identifier or a I<number style>.
+
+Once created, a cell style may be customized using C<set_properties()>. See
+§15.11 in the ODF specification for the full list of possible properties.
+However, C<set_properties()>, when used from a cell style object, allows the
+following shortcuts for the most used attributes:
+
+=over
+
+=item
+
+C<border>, C<border top>, C<border left>, C<border right>,
+C<border bottom>, in the same way as other rectangular area styles;
+
+=item
+
+C<shadow>: idem.
+
+=back
+
+The C<set_background()> method is allowed with C<color> or C<url> (while C<url>
+may be replaced by C<image>). Note that for this kind of style the C<url> or
+C<image> is not a standard link but a symbolic resource name depending on
+the viewer. More generally, C<set_background()> works with cell styles in the
+same way as with graphic styles.
+
+I<Caution>: The most used ODF presentation software tools don't handle tables
+and table-related styles in the same way as ODF text or spreadsheet processors.
+If C<set_background()> is executed when the cell style object is not registered
+in a document, lpOD doesn't know the type of the target document, so it selects
+a default behavior that is appropriate for text and spreadsheet documents. If
+the target document type is a presentation, the user should ensure that the
+style is registered before calling C<set_background()>. Alternatively, it's
+possible to use the C<fill()> method, that works for presentation table cells.
+
+=head2  Column styles
+
+A column style is created using C<odf_create_style()> with C<table column> as
+the family. It may be customized using C<set_properties()>.
+
+The most necessary property is C<width>, which may be an absolute width (i.e.
+a string containing the number and the length unit), a relative length (i.e.
+a string containing a number followed by a star), or both (comma-separated).
+See §15.9.1 in the ODF specification for details about the relative widths.
+
+Optionally, a C<optimal width> boolean property may be provided, to specify
+that the column width should be recalculated automatically if some content in
+the column changes.
+
+The C<break xxx> parameters (where C<xxx> is C<before> or C<after>), are
+allowed to specify if a page or column break must be inserted before or after
+any column using the style, legal values are C<page>, C<column>, C<auto>;
+default is C<auto>.
+
+=head2  Row styles
+
+A row style is created using C<odf_create_style()> with C<table row> as
+the family. It may be customized using C<set_properties()>.
+
+The most necessary property is C<height>, knowing that, according to the standard,
+the default height is the height of the tallest item in the row. The content of
+this property must be an absolute height, provided as a string containing the
+number and the length unit. If the length unit is omitted, it's automatically
+set to "cm" by the lpOD API.
+
+The C<break xxx> parameters (where C<xxx> is C<before> or C<after>), are
+allowed to specify if a page or column break must be inserted before or after
+any row using the style, legal values are C<page>, C<column>, C<auto>;
+default is C<auto>.
+
+The row style supports the common C<set_background()> method.
+
+=head1  Graphic styles
+
+A graphic style apply to frames, i.e. to image or text box containers.
+
+It controls the way the content is displayed. Knowing that a frame may
+include text and/or graphics, a graphic style may own B<graphic>, B<paragraph>
+and/or B<text> properties, so its full definition may require three distinct
+areas.
+
+A graphic style may be created through the generic C<odf_create_style()>
+constructor, with C<graphic> as family and the common optional parameters
+(C<name>, C<display name>, C<parent>). Other parameters, if any, are regarded
+as properties for the B<graphic> area.
+
+The user can get or set any property in an existing graphic style through
+C<get_properties()> or C<set_properties()> with the appropriate C<area>
+option, whose possible values are C<graphic>, C<text>, and C<paragraph>.
+The default area is C<graphic>.
+
+The B<text> and B<paragraph> properties are the same as those of a paragraph
+style (see above).
+
+The B<graphic> properties must be provided according to the ODF specification.
+
+Some frequently used properties may be set through the following optional
+parameters:
+
+=over
+
+=item
+
+C<border>: a 3-part string to specify the thickness, the line style and the line
+color (according to the XSL/FO grammar); for example '1mm solid #000080' means
+defines a one-millimeter thick continuous, navy blue border;
+
+=item
+
+C<shadow>: a 3-part string to specify the color, the vertical shift and the
+horizontal shift of the shadow (for example '#808080 1mm 1mm' defines a grey
+shadow whose horizontal and vertical thickness is 1 millimeter);
+
+=item
+
+C<'margin xxx'> where 'xxx' may be C<left>, C<right>, C<top>, or C<bottom>,
+specifies the external margins, i.e. the reserved space between the frame and
+the surrounding text (number and length unit, like '1cm');
+
+=item
+
+C<'red'>, C<'green'>, and/or C<'blue'> specify a color correction parameter,
+provided as a positive or negative percentage (a trailing percent sign should
+appear in the given value);
+
+=item
+
+C<padding>: the space between the border and the content (number and length
+unit, like '1cm');
+
+=back
+
+A lot of other parameters are allowed; to get a full list, the user shoud have
+a look at the I<Graphic styles> chapter in the public ODF specification. Note
+that many ot them are C<draw> options, i.e. their names begin with the C<draw>
+prefix; so if an option is set without prefix, lpOD generally regard it as
+a C<draw> option. Among the exceptions, the C<wrap> and C<run through> options
+correspond to ODF attributes whose prefix is C<style>, while C<clip> stands for
+C<fo:clip>; lpOD can handle these exceptions, so the prefix is not required
+with these options, too.
+
+The C<set_background()> method may be used in the same way as with other style
+families. Example:
+
+      my $fs = odf_style->create(
+         'graphic',
+         name     => "MyFrameStyle",
+         border   => "1.5mm wave #00aa00"
+      );
+      $fs->set_background(color => 'yellow');
+
+A graphic style supports optional I<shadow> parameters. Thanks to the
+C<set_shadow()> method, the most used ones may be easily handled. This
+method may be used with the following options:
+
+=over
+
+=item
+
+C<color> specifies the color of the shadow; the default is black;
+
+=item
+
+C<offset> controls the horizontal and vertical offset of the shadow; these
+two values may be provided either as a comma-separated string or as a string
+list reference; each one may be positive ot negative and should include a
+trailing length unit string; the default is C<['3mm', '3mm']>, giving a
+bottom-right 3mm shadow. Starting from the previous example, the following
+instruction adds a light green shadow whose origin point is located 4mm west
+and 2mm south from the origin point of the related object.
+
+        $sc->set_shadow(color => 'light green', offset => '-4mm, 2mm');
+
+=back
+
+The following example creates a graphic style with 50% transparency, 10% green
+color adjustment and 5% luminance adjustment, for frames that will appear in
+the background:
+
+        $gs = odf_create_style(
+                'graphic',
+                name            => 'MyFilter',
+                'image opacity' => '50%',
+                green           => '10%',
+                luminance       => '5%',
+                wrap            => 'run-through',
+                'run through'   => 'background'
+                );
+
+A graphic style may be filled with a I<gradient>; to do so, a C<fill> option
+whose value is C<'gradient'> must be provided, and a C<'fill gradient name'>
+parameter must specify the unique name of a gradient.
+
+=head1  Gradient styles
+
+A gradient is built using C<odf_create_style()> with C<'gradient'> as family.
+It requires a C<name> (unique) parameter as other styles. Its possible options
+are described by the ODF specification in §14.14.1. However, these options
+may be used without the "draw:" prefix. Example:
+
+        $gradient = odf_create_style(
+                'gradient',
+                name            => "GR1",
+                style           => 'axial',
+                angle           => 450,
+                start_color     => '#ffffcc',
+                end_color       => '#ffcc99',
+                start_intensity => '100%',
+                end_intensity   => '95%'
+                );
+
+=head1  Page styles
+
+A page style definition, so-called I<master page>, is I<a template for pages in
+a document>. It directly defines the static content I<that is displayed on all
+pages> that use it (such as headers and footers). In addition, a
+I<master page> is associated to a I<page layout>, defined as a separate object
+that describes I<the physical properties or geometry of a page, for example,
+page size, margins, header height, and footer height>. The same I<page layout>
+may be used through several I<master pages>.
+
+In I<text documents>, the pages are not statically defined; they are dynamically
+generated by the viewing/printing applications according to their content
+(which changes each time a piece of content is inserted, deleted or moved. As a
+consequence, a master page is not used in the same way as, say, a paragraph
+style or a list style, because there is no persistent text page object which
+could directly contain a reference to a page style. A master page is essentially
+referred to through page breaks. For example, each time a forced page break is
+inserted, it's possible to specify the master page of the following page. In
+addition, any master page may own a property that tells what should be the
+master page to use after the current page (for example, a "Right page" style
+may be defined in order to ensure that any page using it will be followed by
+a page that will use a "Left page" style and vice-versa). However, beyond the
+end user's point of view, a page break is not an ODF object; it's implemented
+through the C<master page> optional property of a I<paragraph style>.
+
+Master page objects (and the corresponding I<page layouts>) apply to
+presentation and drawing documents, too. However, the page style model is very
+different (and much more complicated) for these documents than for text
+documents. This model uses master pages, page layouts, and two additional
+style-related objects, namely *presentation page layouts* and
+*presentation page styles*.
+
+Drawing and presentation documents use statically defined draw pages. As a
+consequence, the link between every draw page and its master page and other
+style-related objects is static and specified through explicit properties of
+the draw page.
+
+=head2  Master pages
+
+A master page is created and retrieved the same way as other styles.
+
+To create a master page through the generic C<odf_create_style()> function,
+the family argument is C<master page> and it's followed by an arbitrary
+optional C<name> parameter, that may be provided later, but that is mandatory
+when the style is attached to a document using the C<odf_document> based
+C<insert_style()> method.
+
+A master page may, like other styles, have a display name distinct from its
+name. In addition, a full master page definition allows the following named
+parameters:
+
+=over
+
+=item
+
+C<layout>: the unique name of a *page layout*, existing or to be defined
+in the same document (see later the lpOD specifications about the page layout
+objects);
+
+=item
+
+C<next>: the master page to apply to the following page, as soon as the
+current page is entirely filled, knowing that the current master page is used
+for the next page by default.
+
+=back
+
+As any other ODF element, a master page object inherits the generic
+C<insert_element()> and C<append_element()> methods that allow the user to
+attach any other ODF element to it. Beware that such attachments are unchecked,
+and that the user should not integrate any kind of element in a master page.
+
+A unique name is required at insert time; C<insert_style()> raises an error at
+any attempt to attach a nameless master page to a document. On the other hand,
+C<insert_style()> can attach a master page without layout name, but the
+visible result is not predictable and depends on the default page layout of
+the printing application.
+
+The C<parent> parameter is not allowed in master page creation, as long as
+there is no explicit inheritance mechanism in the ODF specification for this
+kind of styles. However an existing master page definition is always reusable
+using the C<clone> option.
+
+=head2  Page headers and footers
+
+Page headers and footers are optional components of master pages; they are just
+containers for almost any kind of document content elements (such as regular
+paragraphs, tables, images and so on). They are created "in place" using special
+master page methods, namely C<set_header()> and C<set_footer()>. Each of
+these methods returns an ODF element that can be used later as a context to
+append content elements. The following example creates a page style with a
+header and a footer, each one containing a single paragraph:
+
+        $mp = odf_create_style('master page', name => 'MyNewPageStyle');
+        $h = $mp->set_header;
+        $h->append_element(
+                odf_create_paragraph(
+                        text    => 'Header text',
+                        style   => 'Standard'
+                        )
+                );
+        $f = $mp->set_footer;
+        $f->append_element(
+                odf_create_paragraph(
+                        text    => 'Footer text',
+                        style   => 'Standard'
+                        )
+                );
+
+It's possible to call C<set_header()> and C<set_footer()> with one or more
+existing ODF elements as arguments, so the given elements are directly
+put in the header or footer.
+
+Every C<set_header()> or C<set_footer()> removes and replaces any previously
+existing header/footer. It's always possible to retrieve the header or the
+footer using C<get_header()> or C<get_footer()>, and to remove them using
+C<delete_header()> and C<delete_footer()>.
+
+Note that the header and footer extensions of a master page don't include any
+layout information; the style of the header and footer of a master page is
+specified through the header and footer extensions of the corresponding page
+layout.
+
+=head2  Background objects
+
+A page master doesn't include any direct page background specification, knowing
+that the background color and/or the background image are defined by the
+I<page layout> that is used by the page master (see below).
+
+However, it's possible to attach I<frames> to a master page (through
+C<insert_element()> and C<append_element()>). Frames are containers for
+various kinds of content elements, including graphical ones, so they provide a
+practical way to compose backgrounds. However, the user should check the
+compatibility with the target displaying/printing applications according to
+the document type. Simply put, frames attached to master pages are common in
+presentation documents, not in text document.
+
+=head2  Page layouts
+
+Page layouts are generally invisible for the end users, knowing that a typical
+ODF-compliant text processor regards them as extensions of the main page styles,
+namely I<master pages>. However, a page layout is defined through the lpOD API
+using the same logic as other style objects. It may be created using
+C<odf_create_style()> with C<"page layout"> as the family argument and a
+unique I<name> parameter (mandatory when the object is attached to a document).
+The C<display name> optional parameter is ignored for this kind of style. On the
+other hand, a specific C<page usage> parameter, whose legal values are
+C<all>, C<left>, C<right>, C<mirrored> (default: C<all>) allows the
+user to specify the type of pages that the page layout should generate.
+
+The list of other possible properties that may be set with page layouts through
+C<odf_create_style()> is described in section §15.2 of the ODF specification;
+some of these properties may be set using the following lpOD mnemonics:
+
+=over
+
+=item
+
+C<height> and C<width>: the page size values, in regular ODF-compliant
+notation (ex: '21cm');
+
+=item
+
+C<size>: the page size, as two comma-separated values in a single string,
+the width coming first; this option is a shortcut that may replace C<width>
+and C<height> (ex: '21cm, 29.7cm');
+
+=item
+
+C<number format>, C<number prefix>, and C<number suffix>: the format,
+prefix and suffix which define the default number representation for page
+styles, which is used to display page numbers within headers and footers;
+
+=item
+
+C<paper tray>: to specify the paper tray to use when printing the document;
+it's a proprietary information knowing that the paper tray names depend on
+the printer model; however, this property, if defined, may be safely set to
+C<default>, so the default tray specified in the printer configuration
+settings will be used;
+
+=item
+
+C<orientation>: specifies the orientation of the printed page, may be
+C<portrait> or C<landscape> (default: C<portrait>);
+
+=item
+
+C<margin xxx> (where C<xxx> is C<left>, C<right>, C<top> or C<bottom>):
+to control the margins of the page;
+
+=item
+
+C<margin>, to specify the same width for all the margins;
+
+=item
+
+C<border xxx> (where C<xxx> is C<left>, C<right>, C<top>, or C<bottom>):
+a 3-part string to specify the thickness, the line style and the line color
+(according to the XSL/FO grammar);
+
+=item
+
+C<border>: a 3-part string to specify the thickness, the line style and the
+line color (according to the XSL/FO grammar), for all the four borders;
+
+=item
+
+C<footnote height>: defines the maximum amount of space on the page that a
+footnote can occupy.
+
+=back
+
+Page layout objects support the C<set_background()> method, allowing to set
+a background color or a background image.
+
+A page layout object may have a header and/or a footer extension, respectively
+set using C<set_header()> and/or C<set_footer()>. These methods, when used
+with a page layout object, allow the applications to extend the page layout in
+order to specify layout information that control the header and the footer of
+the master page(s) that use the page layout. Of course, the layout properties
+are not the same as the content properties. Knowing that headers and footers
+may have different margins and borders than the page body, C<set_header()> and
+C<set_footer()> accept the same margin- and border-related named parameters
+as C<odf_create_style()> when used to create a page layout. On the other hand,
+C<set_header()> and C<set_footer()> return ODF elements that support the
+generic C<set_background()> method; so it's possible to use this method
+separately from the page layout main object and from both its header and
+footer extensions, allowing the user to set specific backgrounds in the 3 parts
+of the affected page.
+
+A page layout style may specify a columned page. A C<set_columns()> method,
+called from a page layout object, does the job with the number of columns as
+a first argument and a C<gap> optional name parameter that specifies the gap
+between columns. By default, all columns have the same width. If the first
+argument is missing or less than 2, then the page layout is no longer columned.
+It's possible to set extra properties in order to specify each column
+individually and to define a separator line between columns, through the
+low-level (lpOD 1) API.
+
+=head1  Presentation page layouts
+
+A presentation page layout (whose use is optional with a draw page) is not
+really a style. However, it's described  and designed as a style in the ODF
+specification, so it's processed as a style through the lpOD API. Practically,
+a presentation page layout typically comes from a template presentation
+document and consists of a set of placeholders, each one specifying the class
+and the coordinates of a shape (see §14.15 then §9.6 in the ODF specification
+for details), knowing that a placeholder indicates a location in a page where
+the user must fill in some information.
+
+Like other styles, a presentation page layout is identified by a C<name> and
+owns an optional C<display name>. It's created by the C<odf_create_style()>
+generic style constructor, with C<presentation page layout> as family name.
+Remember that this family is B<not> related by any mean to the C<page layout>
+family.
+
+Once created, a presentation page layout is populated using its element-specific
+C<set_placeholder()> method. This method can either append a previously created
+(and free) placeholder object, or create and append a new placeholder.
+
+When used for creation, C<set_placeholder()> must be called with the
+presentation object class (specified as a string) as its first argument.
+The possible values are those of the §9.6.1 in the ODF specification, namely
+C<title>, C<outline>, C<subtitle>, C<text>, C<graphic>, C<object>,
+C<chart>, C<table>, C<orgchart>, C<page>, C<notes>, C<handout>.
+
+In addition, the following properties must be provided with
+C<set_placeholder()>:
+
+=over
+
+=item
+
+C<position>, the coordinates of the placeholder, as a list of 2 strings
+containing the X and Y positions (each string specifies the number
+and the unit, ex. "1cm", "2pt");
+
+=item
+
+C<size>, the absolute size of the placeholder, provided in the same format
+as the position, in length or percentage.
+
+=back
+
+The object class argument may be replaced by a valid placeholder element
+(previously cloned from an existing placeholder or by any other mean). If so,
+this element is used as is, and the position/size parameters are ignored.
+
+The C<get_placeholders()> method allows the user to get all the placeholder
+elements belonging to the calling presentation page layout object as a list.
+Each one may me individually deleted, cloned, or updated. From a given
+placeholder element, C<set_position()>, C<get_position()>, C<set_size()>,
+and C<get_size()> allow the user to set or get the coordinates and/or the
+size.
+
+The C<set_placeholder()> method always returns the inserted placeholder
+element.
+
+=head1  Data styles
+
+The display format of some typed data containers, such as table cells, may be
+specified through appropriate I<data styles>. A data style may be registered
+in a document using C<insert_style()> or C<register_style()> as usual.
+
+There is no specific data style constructor. The developers should
+preferentially use data styles previously defined in template documents.
+However, it's possible to import a data style from an XML string (provided
+by the application or previously exported from another document/location
+through the generic element-based C<serialize()> method). Remember that a
+typical "blind" style import from an XML source (whatever the style family)
+may look like:
+
+        $doc->insert_style(odf_element->create($xml));
+
+In order to specify a currency display format whose name is "N110", with a
+leading dollar sign, followed by a space, then by one or more integer digits
+and two decimal digits, the content of the C<$xml> string above should be:
+
+        <number:currency-style style:name="N110">
+          <number:currency-symbol>$</number:currency-symbol>
+          <number:text> </number:text>
+          <number:number number:decimal-places="2"
+                         number:min-integer-digits="1"
+                         number:grouping="true"/>
+        </number:currency-style>
+
+A data style may be retrieved using the document-based C<get_style()> method,
+with 3 arguments (instead of 2). The first argument must be C<'data'>, the
+second one is the data style type, and the last one is the individual style
+name. The allowed data types are C<'number'>, C<'percentage'>, C<'currency'>,
+C<'date'>, C<'time'>, C<'boolean'>, and C<'text'>. As an example, the
+instructions below try to select a currency data style and a boolean one, whose
+respective names are "MyMoney" and "YesNo":
+
+        my $cs = $doc->get_style('data', 'currency', 'MyMoney');
+        my $bs = $doc->get_style('data', 'boolean', 'YesNo');
+
+
+=head1  Inter-document style replication
+
+A special, document-based C<substitute_styles()>, allows the user to remove
+any existing style registered in the current document and to replace them
+by copies of the styles registered in another document. This method requires
+either the path/name of the ODF source file, or an already created
+odf_document instance. The most simple (and drastic) use looks like in the
+following instruction:
+
+        $doc->substitute_styles("pretty_styled_file.odt");
+
+This method allows the applications to use and reuse ODF files as style
+databases. Be careful: in order to avoid name collisions and/or unresolved
+dependencies, this method deletes every previously defined style in the
+calling document before importing the styles of the source document, so it
+must be used I<before> any style creation or customization.
+
+The effects of C<substitute_styles()> may be restricted to a particular area
+through options. For example, if you want do keep your local automatic styles,
+you can exclude them from the substitution as shown below:
+
+        $doc->substitute_styles(
+                "pretty_styled_file.odt"
+                automatic       => FALSE
+                );
+
+The C<substitute_styles()> options are C<automatic>, C<common> (for the
+I<common> styles), C<master> (for the I<master pages> and similar styles),
+and C<fonts> (for the I<font declarations>). All these options are set to
+C<TRUE> by default. Switching an option to C<FALSE> may be risky unless you
+really know that you want, because complex dependencies may exist between
+styles registered in different areas.
+
+Alternatively, you can use C<substitute_styles()> as a I<part-based> method,
+so the substitution works only with this part. As an example, the following
+sequence substitutes only the font declarations registered in the C<CONTENT>
+parts of the document:
+
+        $doc->get_part(CONTENT)->substitute_styles(
+                "pretty_styled_file.odt",
+                automatic       => FALSE,
+                fonts           => TRUE
+                );
+
+Knowing that the C<CONTENT> part (according to the ODF rules) can't contain
+common or master styles, the C<common> and C<master> options are automatically
+set to C<FALSE> when C<substitute_styles()> is used from this part.
+
+Of course, the bulk style substitution in not the only way to import styles
+registered elsewhere. Thanks to C<get_style()> and C<get_styles()>, styles
+may be picked individually or by family, cloned and registered locally by
+C<insert_style()> or C<register_style()>.
+
+=head1	AUTHOR/COPYRIGHT
+
+Developer/Maintainer: Jean-Marie Gouarne L<http://jean.marie.gouarne.online.fr>
+Contact: jmgdoc@cpan.org
+
+Copyright (c) 2010 Ars Aperta, Itaapy, Pierlis, Talend.
+Copyright (c) 2011 Jean-Marie Gouarne.
+
+This work was sponsored by the Agence Nationale de la Recherche
+(L<http://www.agence-nationale-recherche.fr>).
+
+License: GPL v3, Apache v2.0 (see LICENSE).
+
+=cut

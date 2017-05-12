@@ -1,0 +1,88 @@
+NAME
+
+Object::Import - a perl module that lets you import methods of a perl
+object or class to a package as plain functions.
+
+USAGE
+
+    use Object::Import $object;
+    foo(@bar); # now means $object->foo(@bar);
+
+
+See the pod documentation in the Object::Import module for more details
+on how to use this module.
+
+DEPENDENCIES
+
+Perl version 5.8 or later is required to use this module.
+If you have perl version 5.10.0 or later, you shouldn't need any more prerequisites to use this module.
+Otherwise, you may need to install the following modules.
+
+    mro OR MRO::Compat
+    Scalar::Util
+    Test::More *
+    File::Temp *
+    Math::BigInt *
+
+(The modules marked with a star are needed only for testing.)
+
+This is a pure perl module, so you won't need a C compiler to build it.
+
+INSTALLING
+
+First, you should get the latest release of the module from CPAN,
+under the distribution name Object-Import.
+
+After that, you can install the module like any other perl module that
+uses ExtUtils::MakeMaker.  For example, use these commands.
+
+   tar xzf Object-Import-1.VVV.tar.gz
+   cd Object-Import-1.VVV
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Where 1.VVV is the version number of the module you've got.  
+
+If you're not familiar with the procedure of installing a perl module,
+you may want to read 
+"http://search.cpan.org/~rjbs/perl-5.16.1/pod/perlmodinstall.pod"
+
+SEE ALSO
+
+Class::Exporter, Scope::With, Sub::Exporter, Acme::Nooo
+
+BUGS
+
+Please report bugs using the CPAN bug tracker (under the distribution
+name Object-Import), or, failing that, to C<ambrus@math.bme.hu>.
+
+CREDITS
+
+The primary author and maintainer of this module is Zsban Ambrus
+C<ambrus@math.bme.hu>.  Some of the code was written by Max Maischein, who
+also gave the motivation to turn a prototype to the full module you see.
+Thanks to exussum0 for the original inspiration.
+
+COPYING
+
+Copyright (C) Zsban Ambrus 2010
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of either the GNU General Public License version 3, 
+as published by the Free Software Foundation; or the "Artistic License"
+which comes with perl.  
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+A copy of the GNU General Public License can be found in the
+source tree of this module under the name "GPL", or else see
+"http://www.gnu.org/licenses/".  A copy of the Artistic License can
+be found in the source tree under the name "ARTISTIC", or else see
+"http://search.cpan.org/~rjbs/perl-5.16.1/pod/perlartistic.pod".
+
+

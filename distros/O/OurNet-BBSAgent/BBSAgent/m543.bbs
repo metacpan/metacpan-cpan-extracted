@@ -1,0 +1,21 @@
+# $File: //depot/libOurNet/BBSAgent/BBSAgent/m543.bbs $ $Author: autrijus $
+# $Revision: #1 $ $Change: 3631 $ $DateTime: 2003/01/19 09:13:27 $
+# Contributed by Autrijus Tang <autrijus@autrijus.org>
+# zh_TW.Big5: 音樂五四三
+
+Music 543
+m543.com
+
+load melix.board
+load melix.session
+load melix.user
+
+=board
+call main
+send 6\n/
+wait \e[7m
+send $[board]\n\n\x20\x20
+wait \e[;H\e[2J\e[1;44;37m
+wait \e[44m
+wait \e[m
+

@@ -1,0 +1,316 @@
+INSTALLING AN OPENINTERACT WEBSITE
+========================================
+
+This document should help you install an OpenInteract website. (Think
+of OpenInteract as two parts: the installation and any number of
+websites. Without a website, the installation is pretty useless, and a
+website cannot exist without the installation.)
+
+
+(1) Install a website
+
+Be sure OpenInteract is installed and note its directory. This is
+referred to as the 'base_dir' below.
+
+Assuming that the directory you specified for the scripts packaged
+with OpenInteract is in your path, you can then install a new
+website:
+
+ $ oi_manage --base_dir=%%INTERACT_DIR%% \
+             --website_name=%%WEBSITE_NAME%% \
+             --website_dir=%%WEBSITE_DIR%% \
+             create_website
+
+This creates a new website in the 'website_dir' you specified
+and installs all the packages necessary to run OpenInteract. (If the
+'website_dir' directory already exists the command will fail.)
+
+
+(2) Configure the website.
+
+When you install a website, you also get a few configuration
+files. Most of the values in the files have been filled in for you,
+but some have not.
+
+With a plaintext editor (emacs, vi, pico, etc.) Edit the file:
+
+ %%WEBSITE_DIR%%/conf/server.ini
+
+Change the following values:
+
+ [mail]
+ smtp_host = 127.0.0.1
+
+   Set to an available server to use for an SMTP host. If you don't
+   know, check whether localhost (127.0.0.1) works.
+
+
+ [mail]
+ admin_email = admin@mycompany.com
+
+   Set to your email address. You can change this later if you want.
+
+
+ [db_info]
+
+   This tells OpenInteract how to connect to your database. Here are
+   some sample values:
+
+      [db_info main]
+      driver_name   = mysql
+      dsn           = mydbname
+      username      = dbuser
+      password      = dbpassword
+      db_name       = 
+      db_owner      =
+      sql_install   =
+      long_read_len = 65536
+      long_trunc_ok = 0
+
+   Note that you can configure multiple datasources -- 'main' is the
+   default and is used when you don't specify a 'dataource'
+   configuration value in your SPOPS object. To specify another one,
+   just copy-and-paste the above, then change:
+
+     [db_info main]
+
+   to:
+
+     [db_info newdatasource]
+
+ [ldap_info]
+
+   Skip this step if you're not using LDAP.
+
+   This tells OpenInteract how to connect to your LDAP
+   directories. Here are some sample values:
+
+      [ldap_info main]
+      host          = localhost
+      port          = 389
+      bind_dn       =
+      bind_password =
+      base_dn       = dc=mycompany,dc=com
+      timeout       = 120
+      version       = 2
+      sasl          = 0
+      debug         = 0
+
+   Note that you can configure multiple datasources -- 'main' is the
+   default and is used when you don't specify a 'dataource'
+   configuration value in your SPOPS object. (See example above under
+   'db_info' for creating a new one.)
+
+ [session_info]
+
+   If you're using MySQL as your SQL database, you can leave this
+   alone. Otherwise you'll probably want to change it to whatever is
+   relevant for you (e.g., 'Apache::Session::Postgres',
+   'Apache::Session::File', ...)
+
+That's it!
+
+(Note that you might want to be careful with permissions used on this
+file since it has sensitive username/password information.)
+
+There are, of course, many other modifications you can make to the
+server configuration, but these changes should get you up and running.
+
+(3) Create your database and test the connection
+
+If the database for which you entered information in the previous step
+isn't created, do so now. (The specific action for doing this depends
+on the database you're using. You might need to talk to an
+administrator to perform the action.)
+
+Once the database is created, you can test the database connection
+from OpenInteract's point of view:
+
+ $ oi_manage --website_dir=%%WEBSITE_DIR%% test_db
+
+If everything comes back marked 'ok', then you're in good shape.
+
+Similarly, if you're also using LDAP you can run:
+
+ $ oi_manage --website_dir=%%WEBSITE_DIR%% test_ldap
+
+
+(4) Change SPOPS classes (optional)
+
+OpenInteract comes configured to work with the MySQL DBMS. If you're
+not using MySQL, you need to tell OpenInteract to use a different
+SPOPS database driver. Otherwise you'll get lots of messages like:
+
+  =========================
+  static_page (1.31)
+    OK:
+
+      Structure:
+        * Created table from (basic_page.sql): ok
+      Data:
+        * install_data for Pg: no action taken
+      Security:
+        * Error: Cannot create SPOPS object!
+      Basic: Record saved, but ID of record unknown at
+      .../SPOPS/SPOPS/Key/DBI/HandleField.pm line 39.
+
+      Error: Cannot retrieve just-inserted ID from table
+      using field (mysql_insertid)
+
+
+Below is a mapping of databases to parameters. Use the appropriate
+parameter when running the following command:
+
+ $ oi_manage --website_dir=%%WEBSITE_DIR%% \
+             --driver=? change_spops_driver
+
+Database        Command
+==============  ===========================
+PostgreSQL      --driver=SPOPS::DBI::Pg
+Sybase ASA/ASE  --driver=SPOPS::DBI::Sybase
+MS SQL Server   --driver=SPOPS::DBI::Sybase
+MySQL           --driver=SPOPS::DBI::MySQL
+Oracle          --driver=SPOPS::DBI::Oracle
+
+(MySQL given just in case you need to change it back!)
+
+*****NOTE*****
+
+As of version 1.40 there is a more permanent way to do
+this.
+
+ - Create a file %%WEBSITE_DIR%%/conf/override_spops.ini
+
+ - Open the file %%WEBSITE_DIR%%/conf/sample-override_spops.ini and
+ copy the first 10 entries under 'REPLACE SPOPS DRIVER' and use the
+ above table of database mappings to modify the relevant entries as
+ directed.
+
+
+(5) Install SQL files and data
+
+If you'd like, go into the 'pkg/' directory and explore the files in
+each package's 'data/' and 'struct' directories. These will be
+executed in the next step, but if you'd like to change information go
+ahead. 
+
+Run the command:
+
+ $ oi_manage --website_dir=%%WEBSITE_DIR%% \
+             --package=INITIAL \
+             install_sql
+
+(Note: capitalization of 'INITIAL' is important!)
+
+This installs the SQL structures and initial data for the packages
+shipped with OpenInteract. Hopefully all the statements and programs
+execute with an 'ok' status.
+
+Be sure to view the status messages! Some packages might install
+default information and give you details about that information in
+these messages. 
+
+For instance, the 'base_user' package creates a 'superuser' user
+object and assigns it a random eight-character password. This password
+is displayed in the status messages, and if you chose 'crypt_password'
+in your configuration file you will NEVER be able to know the password
+for the superuser. If this happens, you can just drop the database,
+recreate it and re-run the 'install_sql' command.
+
+
+(6) Change Directory Permissions
+
+(NOTE: Win32 servers can skip this step, since the webserver usually
+has sufficient permission for OpenInteract.)
+
+To enable caching, browser editing/uploading of files you'll need to
+modify the permissions on a few directories. The user who owns the
+directories should be the same as the user your webserver runs as --
+most of the time this is 'nobody'.
+
+To do this, just run:
+
+ $ cd %%WEBSITE_DIR%%
+ $ chown -R nobody html/
+ $ chown -R nobody cache/
+ $ chown -R nobody overflow/
+ $ chown -R nobody uploads/
+
+
+(7) Edit Apache virtual host configuration
+
+Using the static/modperl configuration assumes that you have already
+setup a front-end proxy configuration as discussed at the following
+URLs:
+
+ http://perl.apache.org/guide/strategy.html#Alternative_architectures_for_ru
+ http://perl.apache.org/guide/scenario.html#One_Light_and_One_Heavy_Server_w
+ http://perl.apache.org/guide/scenario.html#mod_proxy
+
+Further, OpenInteract assumes that if you're running the proxy server
+configuration you've setup the front-end to pass the IP address to the
+back-end, as described in:
+
+ http://perl.apache.org/guide/scenario.html#Getting_the_Remote_Server_IP_in_
+
+The OpenInteract Administrator's Guide (found in doc/admin.html) has
+details about building the different servers. It's definitely worth
+the time to read about this setup because it can help OpenInteract be
+a big success for you.
+
+Edit the files:
+
+ %%WEBSITE_DIR%%/conf/httpd_static.conf
+ %%WEBSITE_DIR%%/conf/httpd_modperl.conf
+
+And follow the directions there.
+
+If you want to run OpenInteract without a proxy server in front, just
+edit the file:
+
+ %%WEBSITE_DIR%%/conf/httpd_modperl_solo.conf
+
+And only bring that in (see next step).
+
+If you're not using virtual hosts, then copy the information within
+the <VirtualHost></VirtualHost> tags into your main config file and
+skip the next step.
+
+
+(8) Edit Apache configuration
+
+If you're using the proxy server setup:
+
+  In your static httpd server configuration, add the line:
+
+    Include %%WEBSITE_DIR%%/conf/httpd_static.conf
+
+  and in your mod_perl httpd server configuration, add the line:
+
+    Include %%WEBSITE_DIR%%/conf/httpd_modperl.conf
+
+If you're using the solo mod_perl setup:
+
+    Include %%WEBSITE_DIR%%/conf/httpd_modperl_solo.conf
+
+(9) Run Apache!
+
+Startup Apache as you normally would, and hopefully everything will
+be up and running!
+
+
+(10) Connect to your website
+
+Open up a web browser to your hostname or IP address. You should see a
+welcome page. Login with the username 'superuser' and the password you
+saw in step (4). 
+
+Create a new user for yourself (click on the 'Users - new' link in the
+Admin Tools box), and then assign the user to the 'site admin' group
+(click on 'Groups - list' in the Admin Tools box and then the name of
+the 'site admin' group to pull up a form).
+
+Now: have some fun!
+
+========================================
+$Id: INSTALL.website,v 1.14 2003/02/22 17:32:56 lachoy Exp $

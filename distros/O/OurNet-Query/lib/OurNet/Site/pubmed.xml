@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<SITE ID="Pubmed">
+
+<NAME Lang="en-us">PubMed Medline Query</NAME>
+<INFO Lang="en-us">medical relevant information and journals search</INFO>
+
+<URL Type="More"><![CDATA[
+post://www.ncbi.nlm.nih.gov/htbin-post/Entrez/query?db=m_p?form=6&db=m&dispmax=_HITSTR_&term=_QSTR_&retrievestring=&totaluids=_ALL_&relentrezdate=No+Limit&doclistpage=_PAGE_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://www.ncbi.nlm.nih.gov/htbin-post/Entrez/query?form=4&db=m&term=_QUERY_&dispmax=_HITS_&relentrezdate=No+Limit
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_ALL_"><![CDATA[
+totaluids" VALUE="_ALL_">
+]]></VAR>
+<VAR Name="_QSTR_"><![CDATA[
+term" VALUE="_QSTR_">
+]]></VAR>
+<VAR Name="_PAGE_"><![CDATA[
+OPTION SELECTED>_PAGE_<
+]]></VAR>
+<VAR Name="_HITSTR_"><![CDATA[
+dispmax" VALUE="_HITSTR_">
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<INPUT TYPE="checkbox"___<A HREF="_URL_">_TITLE_</A>___<BR><DD>_PREVIEW_</DL>
+]]></TEMPLATE>
+</SITE>

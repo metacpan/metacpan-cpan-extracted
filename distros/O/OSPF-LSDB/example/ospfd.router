@@ -1,0 +1,442 @@
+
+                Router Link States (Area 23.0.0.0)
+
+LS age: 536
+Options: *|*|-|-|-|-|E|*
+LS Type: Router
+Link State ID: 172.16.0.47
+Advertising Router: 172.16.0.47
+LS Seq Number: 0x80000324
+Checksum: 0x3b2f
+Length: 36
+Flags: *|*|*|*|*|-|E|B
+Number of Links: 1
+
+    Link connected to: Transit Network
+    Link ID (Designated Router address): 172.17.2.48
+    Link Data (Router Interface address): 172.17.2.47
+    Metric: 10
+
+LS age: 721
+Options: *|*|-|-|-|-|E|*
+LS Type: Router
+Link State ID: 172.16.0.48
+Advertising Router: 172.16.0.48
+LS Seq Number: 0x80001ccb
+Checksum: 0x9e08
+Length: 36
+Flags: *|*|*|*|*|-|E|B
+Number of Links: 1
+
+    Link connected to: Transit Network
+    Link ID (Designated Router address): 172.17.2.48
+    Link Data (Router Interface address): 172.17.2.48
+    Metric: 10
+
+
+                Router Link States (Area 0.0.0.0)
+
+LS age: 721
+Options: *|*|-|-|-|-|E|*
+LS Type: Router
+Link State ID: 172.16.0.48
+Advertising Router: 172.16.0.48
+LS Seq Number: 0x80001ccb
+Checksum: 0xcdf8
+Length: 36
+Flags: *|*|*|*|*|-|E|B
+Number of Links: 1
+
+    Link connected to: Stub Network
+    Link ID (Network ID): 172.17.1.0
+    Link Data (Network Mask): 255.255.255.0
+    Metric: 10
+
+
+                Router Link States (Area 51.0.0.0)
+
+LS age: 361
+Options: *|*|-|-|-|-|E|*
+LS Type: Router
+Link State ID: 172.16.0.47
+Advertising Router: 172.16.0.47
+LS Seq Number: 0x800006a2
+Checksum: 0x2cd7
+Length: 36
+Flags: *|*|*|*|*|-|E|B
+Number of Links: 1
+
+    Link connected to: Transit Network
+    Link ID (Designated Router address): 172.22.5.5
+    Link Data (Router Interface address): 172.22.5.47
+    Metric: 10
+
+LS age: 1546
+Options: *|*|-|-|-|-|E|*
+LS Type: Router
+Link State ID: 172.16.0.48
+Advertising Router: 172.16.0.48
+LS Seq Number: 0x80001cd6
+Checksum: 0xbc29
+Length: 84
+Flags: *|*|*|*|*|-|E|B
+Number of Links: 5
+
+    Link connected to: Stub Network
+    Link ID (Network ID): 172.19.218.0
+    Link Data (Network Mask): 255.255.255.0
+    Metric: 10
+
+    Link connected to: Stub Network
+    Link ID (Network ID): 172.19.180.0
+    Link Data (Network Mask): 255.255.255.0
+    Metric: 10
+
+    Link connected to: Transit Network
+    Link ID (Designated Router address): 172.19.171.68
+    Link Data (Router Interface address): 172.19.171.48
+    Metric: 10
+
+    Link connected to: Stub Network
+    Link ID (Network ID): 172.19.30.0
+    Link Data (Network Mask): 255.255.255.0
+    Metric: 10
+
+    Link connected to: Transit Network
+    Link ID (Designated Router address): 172.20.0.68
+    Link Data (Router Interface address): 172.20.0.48
+    Metric: 10
+
+LS age: 727
+Options: *|*|-|-|-|-|E|*
+LS Type: Router
+Link State ID: 172.16.0.68
+Advertising Router: 172.16.0.68
+LS Seq Number: 0x800021b5
+Checksum: 0xe233
+Length: 108
+Flags: *|*|*|*|*|-|-|-
+Number of Links: 7
+
+    Link connected to: Transit Network
+    Link ID (Designated Router address): 172.19.222.68
+    Link Data (Router Interface address): 172.19.222.68
+    Metric: 65535
+
+    Link connected to: Transit Network
+    Link ID (Designated Router address): 172.19.206.68
+    Link Data (Router Interface address): 172.19.206.68
+    Metric: 65535
+
+    Link connected to: Stub Network
+    Link ID (Network ID): 172.19.198.0
+    Link Data (Network Mask): 255.255.255.0
+    Metric: 10
+
+    Link connected to: Transit Network
+    Link ID (Designated Router address): 172.19.195.68
+    Link Data (Router Interface address): 172.19.195.68
+    Metric: 65535
+
+    Link connected to: Transit Network
+    Link ID (Designated Router address): 172.19.171.68
+    Link Data (Router Interface address): 172.19.171.68
+    Metric: 65535
+
+    Link connected to: Transit Network
+    Link ID (Designated Router address): 172.19.7.68
+    Link Data (Router Interface address): 172.19.7.68
+    Metric: 65535
+
+    Link connected to: Transit Network
+    Link ID (Designated Router address): 172.20.0.68
+    Link Data (Router Interface address): 172.20.0.68
+    Metric: 65535
+
+LS age: 728
+Options: *|*|-|-|-|-|E|*
+LS Type: Router
+Link State ID: 172.16.0.69
+Advertising Router: 172.16.0.69
+LS Seq Number: 0x800006db
+Checksum: 0xa7fb
+Length: 96
+Flags: *|*|*|*|*|-|-|-
+Number of Links: 6
+
+    Link connected to: Transit Network
+    Link ID (Designated Router address): 172.19.222.68
+    Link Data (Router Interface address): 172.19.222.69
+    Metric: 65535
+
+    Link connected to: Transit Network
+    Link ID (Designated Router address): 172.19.206.68
+    Link Data (Router Interface address): 172.19.206.69
+    Metric: 65535
+
+    Link connected to: Transit Network
+    Link ID (Designated Router address): 172.19.195.68
+    Link Data (Router Interface address): 172.19.195.69
+    Metric: 65535
+
+    Link connected to: Transit Network
+    Link ID (Designated Router address): 172.19.171.68
+    Link Data (Router Interface address): 172.19.171.69
+    Metric: 65535
+
+    Link connected to: Transit Network
+    Link ID (Designated Router address): 172.19.7.68
+    Link Data (Router Interface address): 172.19.7.69
+    Metric: 65535
+
+    Link connected to: Transit Network
+    Link ID (Designated Router address): 172.20.0.68
+    Link Data (Router Interface address): 172.20.0.69
+    Metric: 65535
+
+LS age: 305
+Options: *|*|-|-|-|-|E|*
+LS Type: Router
+Link State ID: 172.20.0.146
+Advertising Router: 172.20.0.146
+LS Seq Number: 0x80000add
+Checksum: 0x12e7
+Length: 84
+Flags: *|*|*|*|*|-|-|-
+Number of Links: 5
+
+    Link connected to: Transit Network
+    Link ID (Designated Router address): 172.20.0.68
+    Link Data (Router Interface address): 172.20.0.146
+    Metric: 10
+
+    Link connected to: Transit Network
+    Link ID (Designated Router address): 172.19.5.146
+    Link Data (Router Interface address): 172.19.5.146
+    Metric: 10
+
+    Link connected to: Stub Network
+    Link ID (Network ID): 172.19.6.0
+    Link Data (Network Mask): 255.255.255.0
+    Metric: 10
+
+    Link connected to: Stub Network
+    Link ID (Network ID): 172.19.7.0
+    Link Data (Network Mask): 255.255.255.0
+    Metric: 10
+
+    Link connected to: Stub Network
+    Link ID (Network ID): 172.19.8.0
+    Link Data (Network Mask): 255.255.255.0
+    Metric: 10
+
+LS age: 1066
+Options: *|*|-|-|-|-|-|*
+LS Type: Router
+Link State ID: 172.30.5.5
+Advertising Router: 172.30.5.5
+LS Seq Number: 0x8000018d
+Checksum: 0x36d2
+Length: 36
+Flags: *|*|*|*|*|-|E|-
+Number of Links: 1
+
+    Link connected to: Transit Network
+    Link ID (Designated Router address): 172.31.5.62
+    Link Data (Router Interface address): 172.31.5.51
+    Metric: 1
+
+LS age: 1012
+Options: *|*|-|-|-|-|-|*
+LS Type: Router
+Link State ID: 172.30.6.6
+Advertising Router: 172.30.6.6
+LS Seq Number: 0x800009fd
+Checksum: 0x5536
+Length: 36
+Flags: *|*|*|*|*|-|E|-
+Number of Links: 1
+
+    Link connected to: Transit Network
+    Link ID (Designated Router address): 172.31.5.52
+    Link Data (Router Interface address): 172.31.5.61
+    Metric: 2
+
+LS age: 45
+Options: *|*|-|-|-|-|-|*
+LS Type: Router
+Link State ID: 172.30.7.8
+Advertising Router: 172.30.7.8
+LS Seq Number: 0x800000b1
+Checksum: 0xfb45
+Length: 36
+Flags: *|*|*|*|*|-|E|-
+Number of Links: 1
+
+    Link connected to: Transit Network
+    Link ID (Designated Router address): 172.31.8.2
+    Link Data (Router Interface address): 172.31.8.1
+    Metric: 4
+
+LS age: 1731
+Options: *|*|-|-|-|-|-|*
+LS Type: Router
+Link State ID: 172.30.206.206
+Advertising Router: 172.30.206.206
+LS Seq Number: 0x80000054
+Checksum: 0x13e4
+Length: 36
+Flags: *|*|*|*|*|-|E|-
+Number of Links: 1
+
+    Link connected to: Transit Network
+    Link ID (Designated Router address): 172.31.206.1
+    Link Data (Router Interface address): 172.31.206.1
+    Metric: 1
+
+LS age: 1576
+Options: *|*|-|-|-|-|-|*
+LS Type: Router
+Link State ID: 172.30.206.207
+Advertising Router: 172.30.206.207
+LS Seq Number: 0x80000049
+Checksum: 0x4bb1
+Length: 36
+Flags: *|*|*|*|*|-|E|-
+Number of Links: 1
+
+    Link connected to: Transit Network
+    Link ID (Designated Router address): 172.31.207.2
+    Link Data (Router Interface address): 172.31.207.1
+    Metric: 2
+
+LS age: 547
+Options: *|*|-|-|-|-|-|*
+LS Type: Router
+Link State ID: 172.31.5.52
+Advertising Router: 172.31.5.52
+LS Seq Number: 0x800008af
+Checksum: 0x286a
+Length: 72
+Flags: *|*|*|*|*|-|E|-
+Number of Links: 4
+
+    Link connected to: Transit Network
+    Link ID (Designated Router address): 172.22.5.5
+    Link Data (Router Interface address): 172.22.5.5
+    Metric: 13
+
+    Link connected to: Transit Network
+    Link ID (Designated Router address): 172.31.5.62
+    Link Data (Router Interface address): 172.31.5.52
+    Metric: 1
+
+    Link connected to: Transit Network
+    Link ID (Designated Router address): 172.19.5.146
+    Link Data (Router Interface address): 172.19.5.5
+    Metric: 13
+
+    Link connected to: Transit Network
+    Link ID (Designated Router address): 192.168.0.5
+    Link Data (Router Interface address): 192.168.0.5
+    Metric: 13
+
+LS age: 1416
+Options: *|*|-|-|-|-|-|*
+LS Type: Router
+Link State ID: 172.31.5.62
+Advertising Router: 172.31.5.62
+LS Seq Number: 0x800009fd
+Checksum: 0xbc19
+Length: 60
+Flags: *|*|*|*|*|-|E|-
+Number of Links: 3
+
+    Link connected to: Transit Network
+    Link ID (Designated Router address): 172.31.5.62
+    Link Data (Router Interface address): 172.31.5.62
+    Metric: 2
+
+    Link connected to: Transit Network
+    Link ID (Designated Router address): 172.19.5.146
+    Link Data (Router Interface address): 172.19.5.6
+    Metric: 14
+
+    Link connected to: Transit Network
+    Link ID (Designated Router address): 192.168.0.5
+    Link Data (Router Interface address): 192.168.0.6
+    Metric: 14
+
+LS age: 1040
+Options: *|*|-|-|-|-|-|*
+LS Type: Router
+Link State ID: 172.31.8.2
+Advertising Router: 172.31.8.2
+LS Seq Number: 0x800000b3
+Checksum: 0x11e7
+Length: 72
+Flags: *|*|*|*|*|-|E|-
+Number of Links: 4
+
+    Link connected to: Transit Network
+    Link ID (Designated Router address): 172.31.8.2
+    Link Data (Router Interface address): 172.31.8.2
+    Metric: 4
+
+    Link connected to: Transit Network
+    Link ID (Designated Router address): 172.19.7.68
+    Link Data (Router Interface address): 172.19.7.8
+    Metric: 16
+
+    Link connected to: Stub Network
+    Link ID (Network ID): 172.85.7.0
+    Link Data (Network Mask): 255.255.255.0
+    Metric: 16
+
+    Link connected to: Stub Network
+    Link ID (Network ID): 172.87.7.0
+    Link Data (Network Mask): 255.255.255.0
+    Metric: 16
+
+LS age: 1671
+Options: *|*|-|-|-|-|-|*
+LS Type: Router
+Link State ID: 172.31.206.2
+Advertising Router: 172.31.206.2
+LS Seq Number: 0x800000c7
+Checksum: 0x725c
+Length: 48
+Flags: *|*|*|*|*|-|E|-
+Number of Links: 2
+
+    Link connected to: Transit Network
+    Link ID (Designated Router address): 172.31.206.1
+    Link Data (Router Interface address): 172.31.206.2
+    Metric: 1
+
+    Link connected to: Transit Network
+    Link ID (Designated Router address): 172.19.206.68
+    Link Data (Router Interface address): 172.19.206.206
+    Metric: 13
+
+LS age: 1367
+Options: *|*|-|-|-|-|-|*
+LS Type: Router
+Link State ID: 172.31.207.2
+Advertising Router: 172.31.207.2
+LS Seq Number: 0x80000080
+Checksum: 0x59b4
+Length: 48
+Flags: *|*|*|*|*|-|E|-
+Number of Links: 2
+
+    Link connected to: Transit Network
+    Link ID (Designated Router address): 172.31.207.2
+    Link Data (Router Interface address): 172.31.207.2
+    Metric: 2
+
+    Link connected to: Transit Network
+    Link ID (Designated Router address): 172.19.206.68
+    Link Data (Router Interface address): 172.19.206.207
+    Metric: 14
+

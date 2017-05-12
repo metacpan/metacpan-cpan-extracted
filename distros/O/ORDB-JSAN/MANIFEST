@@ -1,0 +1,25 @@
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/DSL.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/ORDB/JSAN.pm
+lib/ORDB/JSAN/Author.pod
+lib/ORDB/JSAN/Distribution.pod
+lib/ORDB/JSAN/Library.pod
+lib/ORDB/JSAN/Release.pod
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/01_compile.t
+t/02_release.t
+t/97_meta.t
+t/98_pod.t
+t/99_pmv.t

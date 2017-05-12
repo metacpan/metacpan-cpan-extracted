@@ -1,0 +1,31 @@
+Object::Properties
+
+This is a class builder with a minimal API that can be used as a drop-in
+upgrade for Object::Tiny. It adds support support for field validation
+and read-write fields, realised as lvalue methods. Validation for lvalue
+writes will be efficient in XS-capable environments but will still
+function, slowly, in other situations.
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by Aristotle Pagaltzis.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

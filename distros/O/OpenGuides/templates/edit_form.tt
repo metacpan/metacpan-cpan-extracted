@@ -1,0 +1,372 @@
+[% USE CGI %]
+[% INCLUDE header.tt page_title = "Edit $node_name - $site_name" %]
+<div id="content">
+[% IF read_only %]
+[% INCLUDE read_only.tt %]
+[% ELSE %]
+  <h1 class="edit_form_title">Edit &quot;[% node_name %]&quot;</h1>
+
+  [% IF conflict %]
+    <div class="warning_text">
+      Someone has committed changes to this page since you began editing.
+      You will need to manually merge your changes into the new version.
+    </div>
+  [% END %]
+
+  [% IF validate_failed %]
+    <div class="warning_text">
+      <p>
+        Your input was invalid:
+      </p>
+      <ul>
+      [% FOREACH error = validate_failed %] 
+        <li>[% error %]</li>
+      [% END %]
+      </ul>
+      <p>
+        Please correct your input data and try again.
+      </p>
+  [% END %]
+
+  [% IF preview_html AND preview_above_edit_box %]
+    [% INCLUDE edit_form_preview.tt %]
+  [% END %]
+
+  <a name="edit_form_anchor"></a>
+  <form id="edit_page_form" action="[% cgi_url %]" method="post"
+   enctype="application/x-www-form-urlencoded">
+
+    <div class="licence_and_moderation_notes">
+      <div class="licence_notes">
+        [% TRY %]
+          [% INCLUDE custom_licence.tt %]
+        [% CATCH %]
+        [% END %]
+      </div>
+      [% IF moderate %]
+        <div class="moderation_warning">
+          Please note that this page is moderated so your changes will not
+          appear immediately. Please be patient.
+        </div>
+      [% END %]
+    </div>
+
+    [% INCLUDE edit_form_actions.tt %]
+
+    <fieldset id="main_information">
+      <legend>Main information</legend>
+
+      <div class="edit_form_group" id="content_group">
+        <label for="content_textarea">
+          [% IF conflict %]
+            Current content:
+          [% ELSE %]
+            Content:
+          [% END %]
+        </label>
+        <div class="edit_box">
+          <textarea name="content" id="content_textarea" rows="21"
+           cols="70" wrap="virtual">[% content %]</textarea>
+        </div>
+        [% IF conflict %]
+          <div class="conflict_group">
+            <label>Your content:</label>
+            <div class="conflict_box">
+              [% CGI.escapeHTML(new_content) %]
+            </div>
+          </div>
+        [% END %]
+      </div>
+
+      [%# NOTE: The whitespace in the next two textareas is deliberate, to
+          avoid getting bogus tabs and blank lines in the textarea content.
+          Please do not reintroduce this bug.  Test on more than one
+          browser. #%]
+
+      <div class="edit_form_group" id="locales_group">
+        <label for="locales">
+          [% IF conflict %]
+            Current locales:
+          [% ELSE %]
+            Locales (one per line) (<a href="[% full_cgi_url %]?Category_Locales" target="_blank">view all locales in a new window)</a>:
+          [% END %]
+        </label>
+        <div class="edit_box">
+          <textarea name="locales" id="locales" rows="5" cols="70">[% FOREACH locale = locales %][% locale.name %]
+[% END %]</textarea>
+        </div>
+        [% IF conflict %]
+          <div class="conflict_group">
+            <label>Your locales:</label>
+            <div class="conflict_box">
+              [% FOREACH locale = new_locales %]
+                [% CGI.escapeHTML(locale) %]<br/>
+              [% END %]
+            </div>
+          </div>
+        [% END %]
+      </div>
+
+      <div class="edit_form_group" id="categories_group">
+        <label for="categories">
+          [% IF conflict %]
+            Current categories:
+          [% ELSE %]
+            Categories (one per line) (<a href="[% full_cgi_url %]?Category_Category" target="_blank">view all categories in a new window)</a>:
+          [% END %]
+        </label>
+        <div class="edit_box">
+          <textarea name="categories" id="categories" rows="5" cols="70">[% FOREACH category = categories %][% category.name %]
+[% END %]</textarea>
+        </div>
+        [% IF conflict %]
+          <div class="conflict_group">
+            <label>Your categories:</label>
+            <div class="conflict_box">
+              [% FOREACH category = new_categories %]
+                [% CGI.escapeHTML(category) %]<br/>
+              [% END %]
+            </div>
+          </div>
+        [% END %]
+      </div>
+
+      <div class="edit_form_group" id="summary_group">
+        [% IF conflict %]
+          <label for="summary_input">Current summary:</label>
+        [% ELSE %]
+          <label for="summary_input">One-line summary of this page:</label>
+        [% END %]
+        <div class="edit_box">
+          <input type="text" size="50" id="summary_input" name="summary"
+           value="[% summary %]" />
+        </div>
+        [% IF conflict %]
+          <div class="conflict_group">
+            <label>Your summary:</label>
+            <div class="conflict_box">
+              [% new_summary %]
+            </div>
+          </div>
+        [% END %]
+      </div>
+    </fieldset>
+
+    <fieldset id="additional_information">
+      <legend>Additional information</legend>
+
+      <div class="edit_form_group" id="phone_group">
+        [% IF conflict %]
+          <label for="phone">Current phone:</label>
+        [% ELSE %]
+          <label for="phone">Phone:</label>
+        [% END %]
+        <div class="edit_box">
+          <input type="text" size="50" id="phone" name="phone"
+           value="[% phone %]" />
+        </div>
+        [% IF conflict %]
+          <div class="conflict_group">
+            <label>Your phone:</label>
+            <div class="conflict_box">
+              [% CGI.escapeHTML(new_phone) %]
+            </div>
+          </div>
+        [% END %]
+      </div>
+
+      <div class="edit_form_group" id="fax_group">
+        [% IF conflict %]
+          <label for="fax">Current fax:</label>
+        [% ELSE %]
+          <label for="fax">Fax:</label>
+        [% END %]
+        <div class="edit_box">
+          <input type="text" size="50" id="fax" name="fax"
+            value="[% fax %]" />
+        </div>
+        [% IF conflict %]
+          <div class="conflict_group">
+            <label>Your fax:</label>
+            <div class="conflict_box">
+              [% CGI.escapeHTML(new_fax) %]
+            </div>
+          </div>
+        [% END %]
+      </div>
+
+      <div class="edit_form_group" id="website_group">
+        [% IF conflict %]
+          <label for="website">Current website:</label>
+        [% ELSE %]
+          <label for="website">Website:</label>
+        [% END %]
+        <div class="edit_box">
+          <input type="text" size="50" id="website" name="website"
+           value="[% website %]" />
+        </div>
+        [% IF conflict %]
+          <div class="conflict_group">
+            <label>Your website:</label>
+            <div class="conflict_box">
+              [% CGI.escapeHTML(new_website) %]
+            </div>
+          </div>
+        [% END %]
+      </div>
+
+      <div class="edit_form_group" id="hours_group">
+        <label for="hours">
+          [% IF conflict %]
+            Current opening hours:
+          [% ELSE %]
+            Opening hours:
+          [% END %]
+        </label>
+        <div class="edit_box">
+          <input type="text" size="50" id="hours" name="hours_text"
+           value="[% hours_text %]" />
+        </div>
+        [% IF conflict %]
+          <div class="conflict_group">
+            <label>Your opening hours:</label>
+            <div class="conflict_box">
+              [% CGI.escapeHTML(new_hours_text) %]
+            </div>
+          </div>
+        [% END %]
+      </div>
+
+      <div class="edit_form_group" id="address_group">
+        <label for="address">
+          [% IF conflict %]
+            Current address:
+          [% ELSE %]
+            Address:
+          [% END %]
+        </label>
+        <div class="edit_box">
+          <input type="text" size="50" id="address" name="address"
+           value="[% address %]" />
+        </div>
+        [% IF conflict %]
+          <div class="conflict_group">
+            <label>Your address:</label>
+            <div class="conflict_box">
+              [% CGI.escapeHTML(new_address) %]
+            </div>
+          </div>
+        [% END %]
+      </div>
+
+      <div class="edit_form_group" id="postcode_group">
+        <label for="postcode">
+          [% IF conflict %]
+            Current postcode:
+          [% ELSE %]
+            Postcode:
+          [% END %]
+        </label>
+        <div class="edit_box">
+          <input type="text" size="50" id="postcode" name="postcode"
+           value="[% postcode %]" />
+        </div>
+        [% IF conflict %]
+          <div class="conflict_group">
+            <label>Your postcode:</label>
+            <div class="conflict_box">
+              [% CGI.escapeHTML(new_postcode) %]
+            </div>
+          </div>
+        [% END %]
+      </div>
+
+      <div id="coord_fields_group">
+
+        <div class="edit_form_group" id="coord_field_1_group">
+          <label for="[% coord_field_1 %]">
+            [% IF conflict %]
+              Current [% coord_field_1_name %]:
+            [% ELSE %]
+              [% coord_field_1_name %]:
+            [% END %]
+          </label>
+          <div class="edit_box">
+            <input type="text" size="50" id="[% coord_field_1 %]"
+             name="[% coord_field_1 %]" value="[% coord_field_1_value %]" />
+          </div>
+          [% IF conflict %]
+            <div class="conflict_group">
+              <label>Your [% coord_field_1_name %]:</label>
+              <div class="conflict_box">
+                [% CGI.escapeHTML(new_coord_field_1_value) %]
+              </div>
+            </div>
+          [% END %]
+        </div>
+
+        <div class="edit_form_group" id="coord_field_2_group">
+          <label for="[% coord_field_2 %]">
+            [% IF conflict %]
+              Current [% coord_field_2_name %]:
+            [% ELSE %]
+              [% coord_field_2_name %]:
+            [% END %]
+          </label>
+          <div class="edit_box">
+            <input type="text" size="50" id="[% coord_field_2 %]"
+             name="[% coord_field_2 %]" value="[% coord_field_2_value %]" />
+          </div>
+          [% IF conflict %]
+            <div class="conflict_group">
+              <label>Your [% coord_field_2_name %]:</label>
+              <div class="conflict_box">
+                [% CGI.escapeHTML(new_coord_field_2_value) %]
+              </div>
+            </div>
+          [% END %]
+        </div>
+
+      </div>
+
+      <div class="edit_form_group" id="map_link_group">
+        <label for="map_link">
+          [% IF conflict %]
+            Current map link:
+          [% ELSE %]
+            Map link:
+          [% END %]
+        </label>
+        <div class="edit_box">
+          <input type="text" size="70" id="map_link" name="map_link"
+           value="[% map_link %]" />
+        </div>
+        [% IF conflict %]
+          <div class="conflict_group">
+            <label>Your map link:</label>
+            <div class="conflict_box">
+              [% CGI.escapeHTML( new_map_link ) %]
+            </div>
+          </div>
+        [% END %]
+      </div>
+
+    </fieldset>
+
+    [% IF config.enable_node_image %]
+      [% INCLUDE node_image_fields.tt %]
+    [% END %]
+
+    [% INCLUDE openguides_information_boxes.tt %]
+
+    [% INCLUDE edit_form_actions.tt %]
+
+    <input type="hidden" name="title" value="[% node_name %]" />
+    <input type="hidden" name="checksum" value="[% checksum %]" />
+  </form>
+
+  [% IF preview_html AND NOT preview_above_edit_box %]
+    [% INCLUDE edit_form_preview.tt %]
+  [% END %]
+[% END %]
+[% INCLUDE footer.tt omit_footer_search_form = 1 %]

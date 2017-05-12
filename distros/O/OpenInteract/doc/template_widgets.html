@@ -1,0 +1,301 @@
+    <h1>OpenInteract: Template Widgets</h1>
+
+      <p>As of version 1.30, OpenInteract supports the idea of
+      template widgets. A widget is a common element into which you
+      can just plug in text or parameters to customize it. For
+      example, an 'INPUT' element of type 'TEXT' is a particular type
+      of widget -- you can customize its size, name, and default value.</p>
+
+      <p>Widgets can also include other widgets. Such as a row that
+      uses the 'INPUT TEXT' widget described above to create a labeled
+      input field, with a label on the left and the input widget on
+      the right.</p>
+
+      <p>One of the main benefits of using these over HTML is that
+      these are centralized -- a change in one place enacts changes
+      throughout your site. All column headers can look a certain way
+      and be changed easily, all textboxes can be consistent and you
+      can create widgets specific to your site and needs -- such as
+      for inputting dates or money, or displaying addresses-- for a
+      consistent user interface.</p>
+
+      <p>Here's an example:</p>
+
+      <table border="0" bgcolor="#eeeeee">
+      <tr><td>
+<pre>
+[%########################################
+  form_text( name, value, size, maxlength, field_label )
+     Generate a simple text field.
+
+     Defaults:
+
+        size      = 20
+        maxlength = 50
+  ########################################-%]
+
+[%- DEFAULT size      = 20;
+    DEFAULT maxlength = 50; -%]
+[%- field_pre_label -%]
+&lt;input type="text" name="[% name %]" value="[% value %]"
+       size="[% size %]" maxlength="[% maxlength %]"&gt;
+[%- field_label -%]
+</pre>
+      </td></tr>
+      </table>
+
+      <p>And you would reference this like:</p>
+
+      <table border="0" bgcolor="#eeeeee">
+      <tr><td>
+<pre>
+[% INCLUDE form_text( name = "batting_average", value = ".389" size = 5 ) -%]
+</pre>
+      </td></tr>
+      </table>
+
+      <p>And when the template is processed, get in return:</p>
+
+      
+      <table border="0" bgcolor="#eeeeee">
+      <tr><td>
+<pre>
+&lt;input type="text" name="batting_average" value=".389"
+       size="5" maxlength="50"&gt;
+</pre>
+      </td></tr>
+      </table>
+
+      <p>Calling widgets from other widgets is just as simple:</p>
+
+      <table border="0" bgcolor="#eeeeee">
+      <tr><td>
+<pre>
+[%########################################
+  label_form_text_row( label, count, name, value, field_label )
+     Display a row to input text: label on left, text input on right.
+
+     Defaults:
+
+        colspan = 2
+  ########################################-%]
+
+[%- DEFAULT colspan = 2; -%]  
+[%- INCLUDE label_row_begin( colspan = 1 ) -%]
+[%- INCLUDE data_cell_begin %][% INCLUDE form_text %]
+&lt;/td&gt;&lt;/tr&gt;
+</pre>
+      </td></tr>
+      </table>
+
+      <p>Here we call three separate items, two of which
+      ('label_row_begin' and 'data_cell_begin') aren't really
+      'widgets' but rather just named areas for common code. This
+      might be called:</p>
+
+      <table border="0" bgcolor="#eeeeee">
+      <tr><td>
+<pre>
+[% INCLUDE label_form_text_row( label = 'Batting Average', name = 'batting_average',
+                                value = '.389', size = 5 ) -%]
+</pre>
+      </td></tr>
+      </table>
+
+      <p>And result in:</p>
+
+      <table border="0" bgcolor="#eeeeee">
+      <tr><td>
+<pre>
+&lt;tr valign="middle"&gt;
+  &lt;td align="right"&gt;&lt;b&gt;Batting Average&lt;/b&gt;&lt;/td&gt;
+  &lt;td align="right"&gt;
+    &lt;input type="text" name="batting_average" value=".389"
+           size="5" maxlength="50"&gt;
+  &lt;/td&gt;
+&lt;/tr&gt;
+</pre>
+      </td></tr>
+      </table>
+
+      <p>And you're not restricted to simple fill-in elements
+      either. You can represent a common data-oriented widget -- such
+      as a drop-down box representing countries your company services
+      -- in this manner as well. Here's how such a call might
+      look:</p>
+
+      <table border="0" bgcolor="#eeeeee">
+      <tr><td>
+<pre>
+[%# Use USA as default, antagonizing the rest of the world...-%]
+[%- picked_country = user.country || 'United States' -%]
+[% INCLUDE label_form_country_select( label = 'Countries', name = 'country',
+                                      picked = picked_country ) -%]
+</pre>
+      </td></tr>
+      </table>
+
+      <p>Using this, the page designer doesn't care how many countries
+      the company services, whether a new one has been added to the
+      list, etc. Just make the call and the graphic element will be
+      created the same way every time.</p>
+
+      <p>Using these template widgets you can build a library of
+      display elements very quickly.</p>
+
+      <h1>What widgets are included?</h1>
+
+      <p>As of version 1.30, OpenInteract comes with the following
+      widgets:</p>
+
+      <ul>
+        <li>data_cell_begin</li>
+        <li>form_checkbox</li>
+        <li>form_hidden</li>
+        <li>form_radio</li>
+        <li>form_select</li>
+        <li>form_select_intro</li>
+        <li>form_select_option</li>
+        <li>form_select_options_iterator</li>
+        <li>form_select_options_list</li>
+        <li>form_submit</li>
+        <li>form_submit_row</li>
+        <li>form_text</li>
+        <li>form_textarea</li>
+        <li>header_cell</li>
+        <li>header_row</li>
+        <li>label_form_checkbox_row</li>
+        <li>label_form_radio_row</li>
+        <li>label_form_select_row</li>
+        <li>label_form_textarea_row</li>
+        <li>label_form_text_row</li>
+        <li>label_row</li>
+        <li>label_row_begin</li>
+        <li>label_text_row</li>
+        <li>row_color</li>
+        <li>search_results_page_listing</li>
+        <li>show_label</li>
+        <li>table_bordered_begin</li>
+        <li>table_bordered_end</li>
+      </ul>
+
+      <p>Every website has its own copy of the widgets in the website
+      <tt>template/</tt> directory, so if you want to modify the
+      appearance of any of these items, you can. For instance, if you
+      want to pass in a Spanish equivalent for labels, you can modify
+      'show_label', which is currently the ultra-simple:</p>
+
+      <table border="0" bgcolor="#eeeeee">
+      <tr><td>
+<pre>
+[%########################################
+  show_label( label )
+     Display a label.
+  ########################################-%]
+&lt;b&gt;[% label %]&lt;/b&gt;
+</pre>
+      </td></tr>
+      </table>
+
+      <p>with:</p>
+
+     <table border="0" bgcolor="#eeeeee">
+      <tr><td>
+<pre>
+[%########################################
+  show_label( label, spanish )
+     Display a label (displaying spanish version if available)
+  ########################################-%]
+&lt;b&gt;[% label %]&lt;/b&gt; [% IF spanish %](&lt;em&gt;[% spanish %]&lt;em&gt;)[% END -%]
+</pre>
+      </td></tr>
+      </table>
+
+
+      <h1>How are widgets included?</h1>
+
+      <p>When you create a website you have a number of widgets
+      installed by default in the <code>$WEBSITE_DIR/template</code>
+      directory. These widgets will never be overwritten unless you
+      ask them to be (via the <code>oi_manage refresh_widget</code>
+      command) and they are specific to your website. You can add new
+      ones, remove existing ones -- whatever you like</p>
+
+      <p>If you have an existing website and want the widgets with OI
+      1.30+, just run:</p>
+
+      <pre>
+       $ export OIWEBSITE=/path/to/my/website
+       $ oi_manage refresh_widget
+      </pre>
+
+
+      <h1>Gotchas</h1>
+
+      <p>The Template Toolkit docs warn about this, but it's worth
+      reiterating. You can use either the <tt>INCLUDE</tt> or
+      <tt>PROCESS</tt> directives to run these widgets. The difference
+      between them is subtle.</p>
+
+      <ul>
+
+        <li><tt>INCLUDE</tt> ensures that variables you modify within
+        the widget (even with a <tt>DEFAULT</tt>) are localized to the
+        widget.</li>
+
+        <li><tt>PROCESS</tt> does not localize variables within the
+        widget -- any changes you make in the widget are propogated
+        outside the widget.</li>
+
+      </ul>
+
+      <p>For instance, say you have the following:</p>
+
+<pre>
+      [% PROCESS form_text( name = 'this', value = 'that' ) %]
+      [% PROCESS form_select( name = 'them', list = object_list,
+                              value_field = 'id', label_field = 'full_name' ) %]
+</pre>
+
+      <p>You'd be extremely surprised to find your SELECT box being 20
+      rows long! that's because inside the 'form_text' widget there's
+      a statement:</p>
+
+<pre>
+      [% DEFAULT size = 20 %]
+</pre>
+
+      <p>Since we didn't pass any value for 'size' into 'form_text',
+      it's set to 20. But the tricky part is that this value is
+      <b>also</b> passed into the 'form_select' widget since it's in
+      our environment and we didn't pass it explicitly in the
+      <tt>PROCESS</tt> call.</p>
+
+      <p>You could argue that instead of using <tt>DEFAULT</tt> we
+      should do something like:</p>
+
+<pre>
+      [% text_size = size || 20 %]
+</pre>
+
+      <p>So that the common variable 'size' isn't set as a
+      side-effect. And that's a valid argument. But then as a widget
+      writer you have to have knowledge of the variables the other
+      widgets are using. And as a widget user you have to have
+      knowledge of what happens inside the widget.</p>
+
+      <p>With these potential pitfalls, why use <tt>PROCESS</tt> at
+      all? The Template Toolkit manual states that using
+      <tt>PROCESS</tt> is a little faster. So you have a trade-off to
+      make: a little speed for knowledge that things will work like
+      you think they will.</p>
+
+      <p>The template widgets shipped with OpenInteract fall on the
+      side of being able to sleep at night -- every widget works like
+      you think it should. (Or at least how <b>someone</b> thought it
+      should.) You can always change them for you site if you like, but
+      we've found it's better to use <tt>INCLUDE</tt> and not deal
+      with the potential headaches. If you're sure the widget won't
+      have any side effects -- that it doesn't have any
+      <tt>DEFAULT</tt> or other variable modification statements --
+      then go ahead and use <tt>PROCESS</tt>.</p>

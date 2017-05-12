@@ -1,0 +1,67 @@
+Object/Lexical version 0.01
+===========================
+
+ABSTRACT
+
+Object::Lexical provides syntactic sugar to create objects.
+
+Normal C<my> variables are used for instance data. C<$this> is automatically
+read off of the argument stack. This follows "real" OO languages, where
+user code need not concern itself with helping the language implement objects.
+
+Normal OO Perl code is ugly, hard to read, tedious to type, and error prone.
+The C<$self->{field}> syntax is cumbersome, and using an object field with
+a built in, like C<push()>, requires syntax beyond novice Perl programmers:
+C<push @{$self->{field}}, $value>.
+Spelling field names wrong results in hard to find bugs: the hash autovivicates,
+and no "variables must be declared" warning is issued.
+
+
+SYNOPSIS
+
+  package MyPackage;
+
+  use Object::Lexical; # 'nononlex', 'noexport', 'nowrap';
+
+  sub new {
+
+    my $counter;
+    our $this;
+
+    *inc = sub { $counter++ };
+
+    *dec = sub { $counter-- };
+
+    *inc3x = sub {
+      $this->inc() for(1..3);
+    };
+
+    instance();
+
+  }
+
+
+INSTALLATION
+
+To install this module, type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  PadWalker
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003, Scott Walters
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

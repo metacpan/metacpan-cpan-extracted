@@ -1,0 +1,31 @@
+Changes
+eg/automatic-token-init
+eg/google-drive-files
+eg/google-drive-token-init
+eg/microsoft-online-token-init
+eg/microsoft-online-users
+eg/smartthings-fetch
+eg/smartthings-token-init
+eg/spotify-token-init
+eg/spotify-user-playlists
+eg/youtube-channels
+eg/youtube-token-init
+lib/OAuth/Cmdline.pm
+lib/OAuth/Cmdline/Automatic.pm
+lib/OAuth/Cmdline/GoogleDrive.pm
+lib/OAuth/Cmdline/MicrosoftOnline.pm
+lib/OAuth/Cmdline/Mojo.pm
+lib/OAuth/Cmdline/Smartthings.pm
+lib/OAuth/Cmdline/Spotify.pm
+lib/OAuth/Cmdline/templates/main.html.ep
+lib/OAuth/Cmdline/Youtube.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+MYMETA.json
+MYMETA.yml
+README
+t/001Basic.t
+t/002Smartthings.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

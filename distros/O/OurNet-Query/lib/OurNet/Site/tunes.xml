@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<SITE ID="Tunes">
+
+<NAME Lang="en-us">Tunes.com</NAME>
+<INFO Lang="en-us">music information search by Album title</INFO>
+
+<URL Type="More"><![CDATA[
+http://www.tunes.com/tunes-cgi2/tunes/query_action/4?query_type=release&substring=_QUERY_&nskip=_START_10_0_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://www.tunes.com/tunes-cgi2/tunes/query_action/4?query_type=release&substring=_QUERY_&nskip=0
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+
+<TEMPLATE><![CDATA[
+sans-serif" size=-2><a___href=_URL_>_TITLE_</a>___<br>_PREVIEW_<br>___</font></td>
+]]></TEMPLATE>
+</SITE>

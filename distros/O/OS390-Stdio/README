@@ -1,0 +1,229 @@
+
+Welcome to the OS390::Stdio module.
+
+In order to build this extension to perl you must get
+the gzipped tape archive over to OS/390 or z/OS (you could ftp in binary mode, 
+or you could cp over an nfs mount with no XLAT parameter set, or you
+could OPUT the file, or ... ).
+
+In summary the steps you then need to execute are:
+
+    gunzip OS390-Stdio-0.008.tar.gz
+    pax -ofrom=ISO8859-1,to=IBM-1047  -rf OS390-Stdio-0.008.tar
+    cd OS390-Stdio-0.008
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+If your perl is built to only allow static linking (as is common on OS/390 
+or z/OS) then be sure to also run:
+
+    make inst_perl
+
+In more detail each of the above steps are:
+
+Unpack the ASCII source code archive (the gunzip can be done on a non 
+OE/USS machine if necessary, in which case you'd ftp over the *.tar file
+in binary mode, but only if you do not have gunzip installed on the
+mainframe):
+
+    gunzip OS390-Stdio-0.008.tar.gz
+
+From the OE/USS shell unpack the archive specifying that you want
+an ASCII -> EBCDIC conversion to take place:
+
+    pax -ofrom=ISO8859-1,to=IBM-1047 -rf OS390-Stdio-0.008.tar
+
+which might also have been executed as:
+
+    pax -o to=IBM-1047,from=ISO8859-1 -r < OS390-Stdio-0.008.tar
+
+then configure and build (see `perldoc ExtUtils::MakeMaker` for more
+information on building staticially linked perl extensions and other 
+options to pass to perl on the `perl Makefile.PL` step, as well as
+the section "Build tips" below for more info):
+
+    cd OS390-Stdio-0.008
+    perl Makefile.PL  [-DNO_WARN_IF_NOT_PDS]
+    make
+
+That is, on the second step there you could run either:
+
+    perl Makefile.PL
+
+or you could run:
+
+    perl Makefile.PL  -DNO_WARN_IF_NOT_PDS
+
+just before running make.
+
+(optional) now make a static perl binary:
+
+    make perl
+
+now run the regression test:
+
+    make test
+
+(see also the section "Regression testing tips" below for more info).
+
+If things look "OK" then install (this may require UID=0 or simply 
+write privileges to the appropriate directories):
+
+    make install
+
+(optional) install the statically linked rebuild perl binary:
+
+    make inst_perl
+
+
+"Documentation"
+---------------
+Documentation is within Stdio.pm and should be available with:
+
+    perldoc OS390::Stdio
+
+There are also examples of working data set handling code in test.pl,
+as well as in stdio_cookbook.pod and pds_test.  This latter program can 
+be run after `make test` and it will prompt you for some valid data 
+set names. 
+
+You can find the gzip and gunzip programs as well as GNU make at:
+
+    http://www.mks.com/
+
+
+"Build tips"
+------------
+
+I've had no luck with versions of perl prior to 5.005_02.  Hence I
+would recommend that you try that or preferrably an even later 
+version of perl.  I've also noted that the build works just fine 
+on these:
+
+    $ uname -v -r
+    07.00 02
+    $ uname -v -r
+    10.00 02
+
+I've also noted that the build worked fine for V0.003 of this
+extension on these:
+
+    $ uname -v -r
+    05.00 02
+    $ uname -v -r
+    06.00 02
+
+But this extension has trouble with __dyninit_t and fldata_t 
+structs on:
+
+    $ uname -v -r
+    03.00 01
+
+I'd be happy to resolve those build problems with someone - send
+me a unified or context diff of the changes you had to make.  Thanks.
+
+Also, I might like to rename this module to ???::Stdio (that is, 
+zOS::Stdio, S390::Stdio, zSeries::Stdio ???) if possible or necessary.  
+As far as I know the C runtime extensions that this perl extension exploits are 
+also available on VSE/ESA and VM/CMS (I have been informed that they
+are not available under BS2000/POSIX-BC, and I doubt they are available 
+under any non-mainframe OS).  Of course I would be willing to rename 
+mvsopen() and mvswrite() if such generalization proves feasible (I'd consider 
+s390open() and s390write() if they didn't have a soon-to-expire 
+timestamp in them, perhaps zseriesopen() and zserieswrite()?).  Any help 
+with such a project would be greatly appreciated since I do not have 
+routine access to VSE or VM (and have also lost access to OS/390 and z/OS).
+Thank you.
+
+"Regression testing tips"
+-------------------------
+
+I no longer have access to z/OS, but I have received a report that
+when this extension is built under a dynamic loading Perl 5.8.0 for 
+z/OS 1.2 that the following test anomalies/failures appear during 
+the run of `make test`:
+
+    ok 151
+    dynalloc() failed with error code 9700, info code 50 at test.pl line 535.
+    not ok 152
+    ok 153
+
+    ok 156
+    dynfree() failed with error code 438, info code 50 at test.pl line 567.
+    not ok 157
+    ok 158
+    svc99() failed with error code 484, info code 0 at test.pl line 617.
+    not ok 159
+    ok 160
+
+I would appreciate any help anyone could offer in assisting with the
+effort to track down and reproduce those test failures.
+
+In general, in order to see more of what the regression tests are doing 
+when they run look for the %ENV varaibles to set, set them, then re-run 
+the `make test` suite.
+e.g.:
+
+   $ grep ENV test.pl
+   my $DIAG = $ENV{'OS390_STDIO_DIAG'};
+   my $GORY = $ENV{'OS390_STDIO_GORY'};
+
+So in order to see diagnostics but not gory details I run:
+
+   $ export OS390_STDIO_DIAG='1'
+   $ make test
+
+Any time after the `make perl` or `make test` step it should be posible to run 
+the pds_test test via:
+
+   ./pds_test
+
+Then answer the questions that arise.  The pds_test script will ask for 
+a PDS name and a non-PDS data set name, and will attempt to read 
+the DCB and MEMBER list from each as a means of testing pds_mem().  
+See also the comments at the head of pds_test for other tips on 
+running it.
+
+There is also an smf_test program for testing the smf_record()
+routine on systems that have SMF running (and whose SMF.BPX facility
+allows a perl program to write to SMF).
+
+Please see the stdio_cookbook.pod document for recipes
+on how to use OS390::Stdio.
+
+By the way, you now have the option of passing data set names (e.g. partial
+names) to the get_dcb() and getname() routines in addition to still
+being able to pass mvsopen() file handles.
+
+##################################################################
+
+Special notes for release 0.008:
+--------------------------------
+Some XS modifications were done to Stdio.xs so that this extension
+should compile under either Perl 5.6.1 (a version where Perl uses stdio) 
+or Perl 5.8.0 (Perl defaults to PerlIO) on z/OS.
+Very big thanks Brad Van Duser and Nick Ing-Simmons.
+
+TODO:
+
+Fix the test failures reported on z/OS 1.2 with dynaloading Perl 5.8.0.
+
+None of the catalog/VTOC dslist functions (vol_ser dsname_level) work.
+I am beginning to suspect that I may need to use either an ISPF callable 
+interface (ISPEXEC,) or perhaps assembler calls to either DADSM LOCATE or
+perhaps CVAFFILT and CVAFTST && CVAFSEQ layered in via 
+C<#pragma linkage(CVAF*,OS)>.  Help with such programming tasks would be 
+appreciated (I wonder why it is that a routine was not put into the C 
+run-time library? :-).
+
+None of the vsam routines [locate() update() delrec()] have been 
+tested at all.  Any volunteers to write tests?
+
+##################################################################
+
+See the Changes file for older information.
+
+Peter Prymmer
+

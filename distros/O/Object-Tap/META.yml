@@ -1,0 +1,16 @@
+---
+abstract: 'Tap into a series of method calls to alter an object'
+author:
+  - 'Matt S Trout (mst) <mst@shadowcat.co.uk>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+  Module::Build::Tiny: 0.036
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Object-Tap
+version: 1.000004

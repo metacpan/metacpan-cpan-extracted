@@ -1,0 +1,165 @@
+# NAME
+
+OpenDocument::Template - generate OpenDocument from template
+
+# VERSION
+
+version 0.002
+
+# SYNOPSIS
+
+    use OpenDocument::Template;
+    
+
+    my $ot = OpenDocument::Template->new(
+        config       => 'dcf.yml',
+        template_dir => 'templates',
+        src          => 'dcf-template.odt',
+        dest         => 'dcf.odt',
+    );
+    $ot->generate;
+
+# DESCRIPTION
+
+This module needs two files, template ODT file and config file.
+`OpenDocument::Template` supports [Config::Any](http://search.cpan.org/perldoc?Config::Any) configuration file types.
+The config file describes which files in ODT have to updated.
+Following YAML file is a sample configuration.
+
+    ---
+    templates:
+      styles.xml:
+        meta:
+          title: SILEX Contacts
+      content.xml:
+        people:
+          - nick:  yongbin
+            name:  Yongbin Yu
+            tel:   010-W2W1-0256
+            email: yongbinxxx@gmail.com
+            memo:  SILEX CEO.
+          - nick:  keedi
+            name:  Keedi Kim
+            tel:   010-2511-6XY3
+            email: keedyyy@gmail.com
+            memo:  Perl Manua
+          - nick:  mintegrals
+            name:  Minsun Lee
+            tel:   010-YZZ3-5XY6
+            email: mintegrzzz@gmail.com
+            memo:  MC.Miniper
+          - nick:  aanoaa
+            name:  홍형석
+            tel:   010-31X2-0X00
+            email: aanoxxx@gmail.com
+            memo:  Mustache Mania
+          - nick:  JEEN
+            name:  이종진
+            tel:   010-6W3Z-WX1Y
+            email: aiateyyy@gmail.com
+            memo:  Keyboard Warrior
+          - nick:  rumidier
+            name:  조한영
+            tel:   010-6X66-2Y0X
+            email: rumidzzz@gmail.com
+            memo:  Wild Horse
+
+With above configuration, you must have two template files,
+`styles.xml` and `content.xml`.
+And each additional data will be used when template
+files is processed.
+
+You can extract `styles.xml` and `content.xml`
+from your OpenDocument file by hand.
+Or use `od-update.pl` tools which is a part of OpenDocument::Template.
+First make your own ODT file, then make table for address book.
+Then fill contents with `meta.` or `person.` prefix like
+`meta.title`, `person.nick`, `person.email`, ... etc.
+
+Then run following command.
+
+    od-update.pl -c addressbook.yml -s addressbook-template.odt  -t template/ -p '(meta|person)\.'
+
+After that, you got two xml files which are formatted
+using [XML::Tidy](http://search.cpan.org/perldoc?XML::Tidy) under `template` directory.
+And `meta.title` will be turned into `[% meta.title | xml %]` and
+`person.email` will be turned into `[% person.email | xml %]`.
+It uses [Template](http://search.cpan.org/perldoc?Template) module so, check it to see specific syntax.
+Maybe you need to edit and add more Template Toolkit syntax,
+like loop or control statements.
+In this case, you need loop statement in `content.xml`
+to display each person's information.
+
+        ...
+        [% FOR person IN people %]
+        <table:table-row>
+          <table:table-cell table:style-name="표1.A2" office:value-type="string">
+            <text:p text:style-name="P4">[% person.nick | xml %]</text:p>
+          </table:table-cell>
+          <table:table-cell table:style-name="표1.A2" office:value-type="string">
+            <text:p text:style-name="P4">[% person.name | xml %]</text:p>
+          </table:table-cell>
+          <table:table-cell table:style-name="표1.A2" office:value-type="string">
+            <text:p text:style-name="P4">[% person.tel | xml %]</text:p>
+          </table:table-cell>
+          <table:table-cell table:style-name="표1.A2" office:value-type="string">
+            <text:p text:style-name="P4">[% person.email | xml %]</text:p>
+          </table:table-cell>
+          <table:table-cell table:style-name="표1.E2" office:value-type="string">
+            <text:p text:style-name="P4">[% person.memo | xml %]</text:p>
+          </table:table-cell>
+        </table:table-row>
+        [% END %]
+        ...
+
+After editing template xml file then run following command,
+then you can get result ODT file.
+
+    od-gen.pl -c addressbook.yml -t template/ -s addressbook-template.odt -d addressbook-result.odt
+
+# ATTRIBUTES
+
+## config
+
+Config file path or hash reference.
+Support various config files, check [Config::Any](http://search.cpan.org/perldoc?Config::Any) for detail.
+
+## template_dir
+
+Template directory which contains template file
+to replace from source OpenDocument.
+Default path is a current directory.
+
+## src
+
+Source open document file path
+
+## dest
+
+Destination open document file path
+
+## encoding
+
+Encoding to apply template.
+Default encoding is 'utf8'.
+
+# METHODS
+
+## new
+
+Create new OpenDocument::Template object.
+
+## generate
+
+Generate new OpenDocument from source document, template and data.
+
+# AUTHOR
+
+Keedi Kim - 김도형 <keedi@cpan.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2011 by Keedi Kim.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

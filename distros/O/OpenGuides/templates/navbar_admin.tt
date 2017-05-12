@@ -1,0 +1,12 @@
+[% IF is_admin %]
+  <div id="navbar_admin">
+    <div class="navbar_group_title">Admin:</div>
+    <ul>
+      <li><a href="[% full_cgi_url %]?action=admin">Site Administration</a></li>
+      <li><a href="[% full_cgi_url %]?action=show_needing_moderation">Pages needing moderation</a></li>
+[% IF enable_page_deletion AND NOT not_deletable %]
+       <li><a href="[% full_cgi_url %]?id=[% node_param %];action=delete">Delete page</a></li>[% END %]
+    </ul>
+</div>
+[% END %]
+

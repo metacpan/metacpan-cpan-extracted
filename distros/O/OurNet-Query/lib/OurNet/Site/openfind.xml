@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<SITE ID="OpenFind_TW">
+
+<NAME Lang="en-us">Openfind</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+Openfind ¬d¸ß(¥xÆW)
+]]></NAME>
+<INFO Lang="en-us">general web and bbs search in Taiwan</INFO>
+<INFO Lang="zh-tw">general web and bbs search in Taiwan</INFO>
+
+<URL Type="More"><![CDATA[
+http://www.openfind.com.tw/cgi-bin/Taiwan/webgetnext2.exe?pid=_PID_&page=_PAGE_&database=TW&msg_lang=default&group=_GROUP_&index=_INDEX_&group_by=_GROUPB_&chinese=0&match=0
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://www.openfind.com.tw/cgi-bin/Taiwan/webgais2.exe?query=_QUERY_&database=TW&group_by=site
+]]></URL>
+
+<SCORE>_SCORE_/10</SCORE>
+<EXPRESSION>Standard</EXPRESSION>
+<CATEGORY>WWW,Regional</CATEGORY>
+
+<VAR Name="_INDEX_"><![CDATA[
+"index" TYPE="hidden" VALUE="_INDEX_">
+]]></VAR>
+<VAR Name="_GROUP_"><![CDATA[
+"group" TYPE="hidden" VALUE="_GROUP_">
+]]></VAR>
+<VAR Name="_PAGE_"><![CDATA[
+"page" TYPE="hidden" VALUE="_PAGE_">
+]]></VAR>
+<VAR Name="_PID_"><![CDATA[
+"pid" TYPE="hidden" VALUE="_PID_">
+]]></VAR>
+<VAR Name="_GROUPB_"><![CDATA[
+"group_by" TYPE="hidden" VALUE="_GROUPB_">
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<DT><B>___<A HREF = "_URL_">_TITLE_</A>___<DD>_PREVIEW_<BR>___size:_SIZE_, date:_DATE_, score:_SCORE_</
+]]></TEMPLATE>
+</SITE>

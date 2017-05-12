@@ -1,0 +1,68 @@
+NAME
+    ORDB::Unihan - An ORM for the published Unihan database
+
+VERSION
+    version 0.03
+
+SYNOPSIS
+        use ORDB::Unihan;
+
+        # dbh way
+        my $dbh = ORDB::Unihan->dbh;
+        my $sql = 'SELECT val FROM unihan WHERE hex = 3402 AND type="RSUnicode"';
+        my $sth = $dbh->prepare($sql);
+
+        # simple way
+        ORDB::Unihan->selectrow_array($statement);
+
+        # or ORLite way
+        my $vals = ORDB::Unihan::Unihan->select(
+            'where hex = ?', '3402'
+        );
+
+DESCRIPTION
+    TO BE COMPLETED
+
+  METHODS
+    perldoc ORLite, plus
+
+    *   sqlite_path
+
+            my $sqlite_path = ORDB::Unihan->sqlite_path();
+
+        where the Unihan.sqlite is
+
+  TABLE
+      CREATE TABLE unihan (
+        "hex" CHAR(5) NOT NULL,
+        "type" VARCHAR(18) NOT NULL,
+        "val" VARCHAR(255),
+        PRIMARY KEY ("hex", "type")
+      )
+
+    hex the Unicode scalar value as U+[x]xxxx. 'hex' is [x]xxxx without U+
+
+    type
+        one of Cangjie, Cantonese, CihaiT, Cowles, Definition, HanYu,
+        IRGHanyuDaZidian, IRGKangXi, IRG_GSource, IRG_JSource, IRG_TSource,
+        Mandarin, Matthews, OtherNumeric, Phonetic, RSAdobe_Japan1_6,
+        RSUnicode, SemanticVariant, Matthews, TotalStrokes
+
+    val the value for "hex" and "type"
+
+AUTHOR
+    Fayland Lam <fayland@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Fayland Lam.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+POD ERRORS
+    Hey! The above document had some coding errors, which are explained
+    below:
+
+    Around line 271:
+        You forgot a '=back' before '=head1'
+

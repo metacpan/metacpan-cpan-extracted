@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<SITE ID="PlanetSearch">
+
+<NAME Lang="en-us">PlanetSearch WWW Search</NAME>
+<INFO Lang="en-us">general information web search, update weekly</INFO>
+
+<URL Type="More"><![CDATA[
+http://www.planetsearch.com/_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://www.planetsearch.com/?a=1&index=1&text=_QUERY_
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_NEXT_"><![CDATA[
+<A HREF="/_NEXT_"><IMG SRC=/search/gifs/p_arror.gif
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<TD COLSPAN=2 ROWSPAN=2>___<A HREF="_URL_">_TITLE_</A>___<B>Summary:</B>_PREVIEW_, <FONT SIZE=-1>___<B>Date:</B>_DATE_,
+]]></TEMPLATE>
+</SITE>

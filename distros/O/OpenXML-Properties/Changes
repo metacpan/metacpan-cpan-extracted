@@ -1,0 +1,8 @@
+Revision history for OpenXML-Properties
+
+0.01    29-NOV-2012
+        First version, released on an unsuspecting world.
+
+0.02    11-DEC-2012
+        Seocond version, changes to remove worldwriteable components
+        and to add META.yml

@@ -1,0 +1,19 @@
+README for OOB
+
+This module makes it possible to assign any out-of-band data (attributes)
+to any Perl data structure with both a functional and an object oriented
+interface.
+
+Version:
+ 0.12
+
+Required Modules:
+ Scalar::Util (1.14)
+ Sub::Identify (0.02)
+
+The build is standard:
+
+perl Makefile.PL
+make
+make test
+make install

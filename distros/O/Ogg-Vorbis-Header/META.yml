@@ -1,0 +1,24 @@
+---
+abstract: 'An object-oriented interface to Ogg Vorbis information and comment fields.'
+author:
+  - 'Dan Pemstein <dan@lcws.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  Inline::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Ogg-Vorbis-Header
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Inline: '0.44'
+  Inline::C: '0'
+version: '0.05'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

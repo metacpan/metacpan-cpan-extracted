@@ -1,0 +1,23 @@
+# this one generator is multiline
+generator:              \
+    [ qw(               \
+        id              \
+        title           \
+        body            \
+        userId          \
+     )                  \
+                        
+    ];                  \
+
+
+# this one generator is multiline
+generator: [         \
+        'regexp: id',              \
+        'regexp: title',           \
+        'regexp: body',            \
+        'regexp: userId',          \
+                        
+    ];                             \
+
+
+

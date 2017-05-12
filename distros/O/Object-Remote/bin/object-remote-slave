@@ -1,0 +1,14 @@
+#!/usr/bin/env perl
+
+use strictures 1;
+use Object::Remote::Connector::UNIX;
+use Object::Remote;
+
+my $c = Object::Remote::Connector::UNIX->new->connect($ARGV[0]);
+
+$c->register_class_class_handler;
+
+$c->remote_object(id => 'master')->register_slave(
+  pid => $$,
+  argv => \@ARGV
+)->run;

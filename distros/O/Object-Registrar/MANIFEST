@@ -1,0 +1,9 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+TODO
+test.pl
+lib/Object/AlreadyBound.pm
+lib/Object/NotFoundException.pm
+lib/Object/Registrar.pm

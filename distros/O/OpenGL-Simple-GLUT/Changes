@@ -1,0 +1,11 @@
+Revision history for Perl extension OpenGL::Simple::GLUT.
+
+0.01  Sun Apr 13 16:52:44 2003
+	- original version; created by h2xs 1.22 with options
+		-A -n OpenGL::Simple::GLUT
+0.02  Sun Jul 18 23:28:45 BST 2004
+        - added a few more constants
+        - allowed callback deletion by passing zero as a callback.
+
+0.03  Sat Aug 28 15:02:07 BST 2004
+        - Merged Autrijus Tang's patch to build on FreeBSD.

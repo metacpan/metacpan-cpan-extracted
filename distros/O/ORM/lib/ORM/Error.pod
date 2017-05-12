@@ -1,0 +1,100 @@
+=head1 NAME
+
+ORM::Error - Error container class.
+
+=head1 SYNOPSIS
+
+  $error = ORM::Error->new;
+  Music::Song->find( error=>$error );
+  
+  print "Fatal error\n" if( $error->fatal );
+  print "Some error\n" if( $error->any );
+  
+  $error->add_fatal( "Initiate fatal error" );
+  $error->add_warn( "Initiate warning" );
+  
+  print $error->text;
+
+=head1 CONSTRUCTORS
+
+=over
+
+=item new()
+
+Constructor. Takes no argument. Returns empty error container.
+
+=back 
+
+=head1 OBJECT METHODS
+
+=over
+
+=item C<add_fatal( $error_message )>
+
+Add fatal error message to a container. Return value is undefined.
+
+=item C<add_warn( $error_message )>
+
+Add warning to a container. Return value is undefined.
+
+=item C<upto( $error_container )>
+
+If C<$error_container> is specified then send all errors from C<$self>
+container to C<$error_container> or do nothing otherwise.
+Return value is undefined.
+
+=item C<DESTROY>
+
+In future implementations will throw exception if errors
+were ignored by programmer.
+
+=back
+
+=head1 OBJECT PROPERTIES
+
+=over
+
+=item fatal()
+
+Takes no argument. Returns true if container has at least one fatal error.
+
+=item any()
+
+Takes no argument. Returns true if container is not empty.
+
+=item text()
+
+Takes no argument. Returns plain text description of errors from container.
+
+=back
+
+=head1 SEE ALSO
+
+L<ORM>
+
+L<ORM::Tutorial>
+
+=head1 AUTHOR
+
+Alexey V. Akimov
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2005-2006 Alexey V. Akimov
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+=cut
+

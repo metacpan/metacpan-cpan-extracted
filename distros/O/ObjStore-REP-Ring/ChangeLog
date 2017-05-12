@@ -1,0 +1,10 @@
+1998-10-15  Joshua Pritikin  <joshua.pritikin@db.com>
+
+	* Release 0.02.
+
+1998-10-13  Joshua Pritikin  <joshua.pritikin@db.com>
+
+	* add() wasn't working in a few independent ways.
+
+	* FETCHSIZE/FETCH were doing writes.  Oop!
+

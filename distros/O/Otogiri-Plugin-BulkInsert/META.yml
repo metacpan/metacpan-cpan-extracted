@@ -1,0 +1,42 @@
+---
+abstract: 'bulk insert for Otogiri'
+author:
+  - 'ytnobody <ytnobody@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+  Test::Requires: '0'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.5.0, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Otogiri-Plugin-BulkInsert
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Otogiri::Plugin::BulkInsert:
+    file: lib/Otogiri/Plugin/BulkInsert.pm
+    version: '0.02'
+requires:
+  Otogiri: '0.09'
+  Otogiri::Plugin: '0'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/ytnobody/Otogiri-Plugin-BulkInsert/issues
+  homepage: https://github.com/ytnobody/Otogiri-Plugin-BulkInsert
+  repository: git://github.com/ytnobody/Otogiri-Plugin-BulkInsert.git
+version: '0.02'
+x_authority: cpan:YTURTLE
+x_contributors:
+  - 'Takuya Tsuchida <tsucchi@cpan.org>'

@@ -1,0 +1,31 @@
+######################################################################
+Revision history for Perl extension OAuth::Cmdline
+
+0.06 (2016/11/11)
+    (ms) Added support for Smartthings Web API
+
+0.05 (2016/08/05)
+    (ms) Ian Gibbs added support for Microsoft Online
+    (ms) Automatic.com OAuth flow now supported including 
+         eg/automatic-token-init script.
+    (ms) Added http_get() method for submitting calls including the
+         authentication header
+    (ms) Added support for Youtube analytics
+
+0.04 (2014/10/08)
+    (ms) umask() call now localized
+    (ms) Added access_type=offline ([rt.cpan.org #99372]) since Google
+         apparently won't sent a refresh token in some cases if it's not
+         set.
+
+0.03  2014/09/27
+    (ms) Added token_expire to force a refresh of the access token
+
+0.02  2014/07/20
+    (ms) Works now with the Google Drive API
+    (ms) Using site-specific classes now, OAuth::Cmdline::GoogleDrive,
+         OAuth::Cmdline::Spotify, etc. to deal with minor differences
+         in the sites' OAuth implementation.
+
+0.01  2014/07/12
+    (ms) Where it all began.

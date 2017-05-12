@@ -1,0 +1,12 @@
+[%########################################
+  label_row_begin( label, align, valign, count, colspan ) 
+     Display the row start and label for a text/form element
+     row. Defaults: align = 'right', colspan = 1, valign = 'middle'
+  ########################################-%]
+[%- DEFAULT colspan = 1;
+    SET row_valign  = valign || 'middle';
+    SET label_align = align  || 'right'; -%]
+<tr valign="[% row_valign %]" bgcolor="[% INCLUDE row_color %]">
+    <td align="[% label_align %]" colspan="[% colspan %]">
+      [%- PROCESS show_label -%]
+    </td>

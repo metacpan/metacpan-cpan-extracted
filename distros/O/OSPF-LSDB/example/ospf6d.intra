@@ -1,0 +1,47 @@
+
+                Intra Area Prefix Link States (Area 10.188.0.0)
+
+LS age: 882
+LS Type: Intra Area (Prefix)
+Link State ID: 1.0.0.0
+Advertising Router: 10.188.1.10
+LS Seq Number: 0x8000000b
+Checksum: 0x3756
+Length: 128
+Referenced LS Type: Router
+Referenced Link State ID: 0.0.0.0
+Referenced Advertising Router: 10.188.1.10
+Number of Prefixes: 8
+    Prefix: fdd7:e83e:66bc:1::/64
+    Prefix: fdd7:e83e:66bc:102::/64
+    Prefix: fdd7:e83e:66bc:112::/64
+    Prefix: fdd7:e83e:66bc:141::/64
+    Prefix: fdd7:e83e:66bc:142::/64
+    Prefix: fdd7:e83e:66bc:161::/64
+    Prefix: fdd7:e83e:66bc:162::/64
+    Prefix: 2a01:198:262:1::/64
+
+LS age: 831
+LS Type: Intra Area (Prefix)
+Link State ID: 0.0.0.1
+Advertising Router: 10.188.50.50
+LS Seq Number: 0x80000009
+Checksum: 0x13c6
+Length: 176
+Referenced LS Type: Network
+Referenced Link State ID: 0.0.0.1
+Referenced Advertising Router: 10.188.50.50
+Number of Prefixes: 12
+    Prefix: 2a01:198:262:1::/64
+    Prefix: fdd7:e83e:66bc:1::/64
+    Prefix: fdd7:e83e:66bc:103::/64
+    Prefix: fdd7:e83e:66bc:104::/64
+    Prefix: fdd7:e83e:66bc:113::/64
+    Prefix: fdd7:e83e:66bc:114::/64
+    Prefix: fdd7:e83e:66bc:143::/64
+    Prefix: fdd7:e83e:66bc:144::/64
+    Prefix: fdd7:e83e:66bc:163::/64
+    Prefix: fdd7:e83e:66bc:164::/64
+    Prefix: fdd7:e83e:66bc:211::/64
+    Prefix: fdd7:e83e:66bc:212::/64
+

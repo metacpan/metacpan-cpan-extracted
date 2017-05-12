@@ -1,0 +1,51 @@
+README: OpenPlugin
+=======================
+
+OpenPlugin is a Plugin manager for web applications.
+
+There are many web application frameworks out there, and each seems to have
+it's own method of handling sessions, user authentication, datasource
+management, logging, etc.  OpenPlugin's goal is to make one unified system,
+capable of handling those needs for all web application frameworks.  OpenPlugin
+offers an interface, plugin, and drivers for each plugin -- you get to choose
+what plugins you want loaded, and the exact driver for how that plugin will
+function.
+
+For example, OpenPlugin provides an API for logging.  But OpenPlugin doesn't
+choose where it logs, thats up to you and your application.  You can have it
+log to a file, STDERR, Syslog, or anything you want.  If the driver you want
+doesn't exist, simply create one!
+
+The following is a list of the current plugins with their drivers:
+
+Plugin      Description                     Drivers
+------      -----------                     -------
+Application Subclasses CGI::Application     N/A
+Auth        User Authentication             PAM, SMB
+Cache       Cache data                      File
+Config      Read/Write config files         conf(ro), ini, perl, XML(ro)
+Cookie      Generate Cookies                Apache, CGI
+Datasource  Manage datasource connections   DBI, LDAP
+Exception   Exception Handling              N/A
+HttpHeader  Manipulate HTTP Headers         Apache, Apache2, CGI
+Log         Logs messages                   Any offered by Log::Log4perl
+Param       Retrieve GET & POST params      Apache, Apache2, CGI
+Request     View request related data       Apache, Apache2, CGI
+Session     Manage sessions                 Any offered by Apache::Session
+Upload      Handle file uploads             Apache, CGI
+
+
+COPYRIGHT
+
+Copyright (c) 2001-2003 Eric Andreychek.  All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+AUTHORS
+
+Eric Andreychek <eric@openthought.net>
+
+Thanks to Chris Winters for helping this project get started.  Although he's
+quite busy these days, this project wouldn't be where it is today if it weren't
+for his efforts early on.

@@ -1,0 +1,11 @@
+OCS::Client - Simple interface to OCS's SOAP API
+
+OCS (http://www.ocsinventory-ng.org/) is an inventory system for IT
+assets.
+
+Copyright (c) 2012 by CPqD (http://www.cpqd.com.br/)
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+Home page: http://search.cpan.org/dist/OCS-Client/

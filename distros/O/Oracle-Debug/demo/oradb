@@ -1,0 +1,36 @@
+# $Id: oradb,v 1.2 2003/07/19 10:40:16 oradb Exp $
+
+Oracle requires a target session and a debugger session.
+
+First just run the target script, when the prompt appears, run the debug session. 
+
+Recompile the requisite procedure (rc) and when that hangs (or retry), return to
+the target session and execute the procedure, which should in turn hang the 
+target session, but release the debug session for commands and feedback.
+
+# oradb demo
+
+./scripts/debug                 ./scripts/target          
+--------------------------      --------------------------
+                                oradb>
+oradb>rc xproc PROCEDURE   
+                                oradb>xproc('arg1')                                       
+oradb>src
+oradb>b xproc 6
+oradb>n
+oradb>s
+oradb>c
+oradb>q
+oradb>...
+
+
+
+
+
+
+
+
+
+
+
+

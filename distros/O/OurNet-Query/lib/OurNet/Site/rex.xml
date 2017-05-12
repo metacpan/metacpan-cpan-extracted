@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<SITE ID="Rex">
+
+<NAME Lang="en-us">REX Search</NAME>
+<INFO Lang="en-us">general information web search</INFO>
+
+<URL Type="More"><![CDATA[
+http://rex.skyline.net/_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://rex.skyline.net/rexclient.cgi?f=0&terms=_QUERY_&r=_HITS_&boolean=or
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_NEXT_"><![CDATA[
+<A HREF=_NEXT_>Next
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<UL><DL><DT><A HREF=_URL_>_TITLE_</A><DD>_PREVIEW_<DD><B>
+]]></TEMPLATE>
+</SITE>

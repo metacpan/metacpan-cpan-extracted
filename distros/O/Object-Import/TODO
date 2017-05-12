@@ -1,0 +1,27 @@
+TODO for Object::Import perl module
+
+= bugs =
+
+= features =
+- options to exclude subs inherited from some packages,
+    and maybe some defaults (like Exporter)
+- options to exclude subs imported from some packages (like Carp, Scalar::Util, etc)
+    and maybe some defaults (popular non-OO modules)
+- maybe even an option to skip all functions compiled to other packages (and imported)?
+- weak referencing the object:
+    this can be done in two ways (deref on in both cases): 
+    either with an option to make the functions keep only a weak reference to the scalar,
+    or by the scalar being a weak object itself.  
+- maybe make it so that methods with names conflicting with builtins are exported ucfirsted
+    (this may not be a good idea)
+
+= documentation =
+- perl can dispatch methods to filehandles -- how does this come up in code and docs?
+
+= distribution =
+
+= external =
+- examine how Symbol::Qualify doesn't work for non-ascii names, possibly patch and report
+- write patches to B::Keywords
+
+

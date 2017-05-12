@@ -1,0 +1,68 @@
+=head1 NAME
+
+OurCal::Setup - how to set up OurCal
+
+=head1 METHOD
+
+=head2 GET THE CODE
+
+Either check the code out from 
+
+    https://svn.unixbeard.net/simon/OurCal
+
+or get it off CPAN.
+
+=head2 INSTALL THE DEPENDENCIES
+
+OurCal has a bunch of dependencies although most of them are fairly 
+standard - you probably have a large swathe of them, especially things 
+like C<LWP::Simple> and C<Template>. You only need 
+C<Data::ICal::DateTime> if you want C<.ics> support>.
+
+=head2 MAKE AN INSTANCE
+
+If you've checked out into a web accessible directory then you're pretty 
+much good to go, other than making sure everything is readable and 
+executable by the web server process.
+
+Otherwise you'll need to make a web accessible directory, copy 
+C<index.cgi>, C<templates> and C<images> there and make those web 
+accessible.
+
+=head2 WRITE A CONFIG
+
+C<OurCal::Config> will help better with this but as a suggested config.
+
+    image_dir = images
+
+    [providers]
+    providers = default
+
+    [default]
+    type = dbi
+    dsn  = dbi:SQLite:db/ourcal.db
+
+Then create a C<db> directory and make it writeable by the web process.
+
+=head2 SETUP THE DATABASE
+
+There's all the SQL you need in the C<sql> directory.
+
+=head2 YOU'RE GOOD TO GO
+
+Feel free to add other C<.ics> files both remote and local.
+
+=cut
+
+
+
+
+
+
+
+
+
+
+
+
+

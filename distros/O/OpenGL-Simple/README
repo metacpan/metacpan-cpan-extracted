@@ -1,0 +1,33 @@
+OpenGL::Simple version 0.01
+===========================
+
+This module provides another interface to OpenGL. It does not support
+all of OpenGL, but some functions which are supported are also given a
+polymorphic interface.
+
+This module should run on Linux and MacOS X. 
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+OpenGL::Simple requires the Imager module to be installed, as well as the GL
+and GLU libraries.
+
+It has been successfully built on linux, IRIX 6.5, and MacOS X ; patches
+welcome for ports to other platforms.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 Jonathan Chin
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

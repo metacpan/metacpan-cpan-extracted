@@ -1,0 +1,20 @@
+[% IF node_image %]
+  <div id="node_image_box">
+    [% IF node_image_url %]<a href="[% node_image_url %]">[% END %]
+    <img id="node_image" src="[% node_image %]"
+         alt="Picture of [% node_name %]" />
+    [% IF node_image_url %]</a>[% END %]
+    [% IF node_image_copyright %]
+      <div id="node_image_copyright">
+        [% IF node_image_licence %]
+          <a href="[% node_image_licence %]">&copy;
+            [% node_image_copyright %]</a>
+        [% ELSE %]
+          &copy; [% node_image_copyright %]
+        [% END %]
+      </div>
+    [% END %]
+  </div>
+[% ELSE %]
+  <span id="node_no_image" />
+[% END %]

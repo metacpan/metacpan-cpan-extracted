@@ -1,0 +1,84 @@
+[%# A template for an object property.
+    ===========================
+    Expected/recognized parameters:
+    obj ... a OWL::Data::Def::ObjectProperty object
+      
+-%]
+#-----------------------------------------------------------------
+# [% obj.module_name %]
+# Generated: [% USE Date (format = '%d-%b-%Y %H:%M:%S %Z') %][% Date.format %]
+# Contact: Edward Kawas <edward.kawas+owl2perl@gmail.com>
+#-----------------------------------------------------------------
+package [% obj.module_name %];
+
+use [% obj.module_parent %];
+
+no strict;
+use vars qw( @ISA );
+@ISA = qw( [% obj.module_parent %] );
+use strict;
+
+{
+    my %_allowed = (
+
+    );
+
+    sub _accessible {
+        my ( $self, $attr ) = @_;
+        exists $_allowed{$attr} or $self->SUPER::_accessible($attr);
+    }
+
+    sub _attr_prop {
+        my ( $self, $attr_name, $prop_name ) = @_;
+        my $attr = $_allowed{$attr_name};
+        return ref($attr) ? $attr->{$prop_name} : $attr if $attr;
+        return $self->SUPER::_attr_prop( $attr_name, $prop_name );
+    }
+}
+
+#-----------------------------------------------------------------
+# init
+#-----------------------------------------------------------------
+sub init {
+    my ($self) = shift;
+    $self->SUPER::init();
+    [% IF obj.range %]
+    # set the range of this object property
+    $self->range('[% obj.range %]');
+    [%- END -%]
+    [% IF obj.domain %]
+    # set the domain for this object property
+    $self->domain('[% obj.domain %]');
+    [%- END -%]
+    [% IF obj.uri %]
+    # set the uri for this object property
+    $self->uri('[% obj.uri %]');
+    [%- END %]
+}
+
+1;
+__END__
+
+=head1 NAME
+
+[% obj.module_name %] - an object propery
+
+=head1 SYNOPSIS
+
+  use [% obj.module_name %];
+  my $property = [% obj.module_name %]->new();
+
+  # get the domain of this property
+  my $domain = $property->domain;
+
+  # get the range of this property
+  my $range = $property->range;
+
+  # get the uri for this property
+  my $uri = $property->uri;
+
+=head1 DESCRIPTION
+
+I<Inherits from>: L<[% obj.parent %]|[% obj.module_parent %]>
+
+=cut

@@ -1,0 +1,2134 @@
+NAME
+    OpenCL - Open Computing Language Bindings
+
+SYNOPSIS
+     use OpenCL;
+
+DESCRIPTION
+    This is an early release which might be useful, but hasn't seen much
+    testing.
+
+  OpenCL FROM 10000 FEET HEIGHT
+    Here is a high level overview of OpenCL:
+
+    First you need to find one or more OpenCL::Platforms (kind of like
+    vendors) - usually there is only one.
+
+    Each platform gives you access to a number of OpenCL::Device objects,
+    e.g. your graphics card.
+
+    From a platform and some device(s), you create an OpenCL::Context, which
+    is a very central object in OpenCL: Once you have a context you can
+    create most other objects:
+
+    OpenCL::Program objects, which store source code and, after building for
+    a specific device ("compiling and linking"), also binary programs. For
+    each kernel function in a program you can then create an OpenCL::Kernel
+    object which represents basically a function call with argument values.
+
+    OpenCL::Memory objects of various flavours: OpenCL::Buffer objects (flat
+    memory areas, think arrays or structs) and OpenCL::Image objects (think
+    2D or 3D array) for bulk data and input and output for kernels.
+
+    OpenCL::Sampler objects, which are kind of like texture filter modes in
+    OpenGL.
+
+    OpenCL::Queue objects - command queues, which allow you to submit memory
+    reads, writes and copies, as well as kernel calls to your devices. They
+    also offer a variety of methods to synchronise request execution, for
+    example with barriers or OpenCL::Event objects.
+
+    OpenCL::Event objects are used to signal when something is complete.
+
+  HELPFUL RESOURCES
+    The OpenCL specs used to develop this module - download these and keept
+    hema round, they are required reference material:
+
+       http://www.khronos.org/registry/cl/specs/opencl-1.1.pdf
+       http://www.khronos.org/registry/cl/specs/opencl-1.2.pdf
+       http://www.khronos.org/registry/cl/specs/opencl-1.2-extensions.pdf
+
+    OpenCL manpages:
+
+       http://www.khronos.org/registry/cl/sdk/1.1/docs/man/xhtml/
+       http://www.khronos.org/registry/cl/sdk/1.2/docs/man/xhtml/
+
+    If you are into UML class diagrams, the following diagram might help -
+    if not, it will be mildly confusing (also, the class hierarchy of this
+    module is much more fine-grained):
+
+       http://www.khronos.org/registry/cl/sdk/1.2/docs/man/xhtml/classDiagram.html
+
+    Here's a tutorial from AMD (very AMD-centric, too), not sure how useful
+    it is, but at least it's free of charge:
+
+       http://developer.amd.com/zones/OpenCLZone/courses/Documents/Introduction_to_OpenCL_Programming%20Training_Guide%20%28201005%29.pdf
+
+    And here's NVIDIA's OpenCL Best Practises Guide:
+
+       http://developer.download.nvidia.com/compute/cuda/3_2/toolkit/docs/OpenCL_Best_Practices_Guide.pdf
+
+BASIC WORKFLOW
+    To get something done, you basically have to do this once (refer to the
+    examples below for actual code, this is just a high-level description):
+
+    Find some platform (e.g. the first one) and some device(s) (e.g. the
+    first device of the platform), and create a context from those.
+
+    Create program objects from your OpenCL source code, then build
+    (compile) the programs for each device you want to run them on.
+
+    Create kernel objects for all kernels you want to use (surprisingly,
+    these are not device-specific).
+
+    Then, to execute stuff, you repeat these steps, possibly resuing or
+    sharing some buffers:
+
+    Create some input and output buffers from your context. Set these as
+    arguments to your kernel.
+
+    Enqueue buffer writes to initialise your input buffers (when not
+    initialised at creation time).
+
+    Enqueue the kernel execution.
+
+    Enqueue buffer reads for your output buffer to read results.
+
+EXAMPLES
+  Enumerate all devices and get contexts for them.
+    Best run this once to get a feel for the platforms and devices in your
+    system.
+
+       for my $platform (OpenCL::platforms) {
+          printf "platform: %s\n", $platform->name;
+          printf "extensions: %s\n", $platform->extensions;
+          for my $device ($platform->devices) {
+             printf "+ device: %s\n", $device->name;
+             my $ctx = $platform->context (undef, [$device]);
+             # do stuff
+          }
+       }
+
+  Get a useful context and a command queue.
+    This is a useful boilerplate for any OpenCL program that only wants to
+    use one device,
+
+       my ($platform) = OpenCL::platforms; # find first platform
+       my ($dev) = $platform->devices;     # find first device of platform
+       my $ctx = $platform->context (undef, [$dev]); # create context out of those
+       my $queue = $ctx->queue ($dev);     # create a command queue for the device
+
+  Print all supported image formats of a context.
+    Best run this once for your context, to see whats available and how to
+    gather information.
+
+       for my $type (OpenCL::MEM_OBJECT_IMAGE2D, OpenCL::MEM_OBJECT_IMAGE3D) {
+          print "supported image formats for ", OpenCL::enum2str $type, "\n";
+      
+          for my $f ($ctx->supported_image_formats (0, $type)) {
+             printf "  %-10s %-20s\n", OpenCL::enum2str $f->[0], OpenCL::enum2str $f->[1];
+          }
+       }
+
+  Create a buffer with some predefined data, read it back synchronously,
+then asynchronously.
+       my $buf = $ctx->buffer_sv (OpenCL::MEM_COPY_HOST_PTR, "helmut");
+
+       $queue->read_buffer ($buf, 1, 1, 3, my $data);
+       print "$data\n";
+
+       my $ev = $queue->read_buffer ($buf, 0, 1, 3, my $data);
+       $ev->wait;
+       print "$data\n"; # prints "elm"
+
+  Create and build a program, then create a kernel out of one of its
+functions.
+       my $src = '
+          kernel void
+          squareit (global float *input, global float *output)
+          {
+            $id = get_global_id (0);
+            output [id] = input [id] * input [id];
+          }
+       ';
+
+       my $prog = $ctx->build_program ($src);
+       my $kernel = $prog->kernel ("squareit");
+
+  Create some input and output float buffers, then call the
+'squareit' kernel on them.
+       my $input  = $ctx->buffer_sv (OpenCL::MEM_COPY_HOST_PTR, pack "f*", 1, 2, 3, 4.5);
+       my $output = $ctx->buffer (0, OpenCL::SIZEOF_FLOAT * 5);
+
+       # set buffer
+       $kernel->set_buffer (0, $input);
+       $kernel->set_buffer (1, $output);
+
+       # execute it for all 4 numbers
+       $queue->nd_range_kernel ($kernel, undef, [4], undef);
+
+       # enqueue a synchronous read
+       $queue->read_buffer ($output, 1, 0, OpenCL::SIZEOF_FLOAT * 4, my $data);
+
+       # print the results:
+       printf "%s\n", join ", ", unpack "f*", $data;
+
+  The same enqueue operations as before, but assuming an out-of-order queue,
+showing off barriers.
+       # execute it for all 4 numbers
+       $queue->nd_range_kernel ($kernel, undef, [4], undef);
+
+       # enqueue a barrier to ensure in-order execution
+       $queue->barrier;
+
+       # enqueue an async read
+       $queue->read_buffer ($output, 0, 0, OpenCL::SIZEOF_FLOAT * 4, my $data);
+
+       # wait for all requests to finish
+       $queue->finish;
+
+  The same enqueue operations as before, but assuming an out-of-order queue,
+showing off event objects and wait lists.
+       # execute it for all 4 numbers
+       my $ev = $queue->nd_range_kernel ($kernel, undef, [4], undef);
+
+       # enqueue an async read
+       $ev = $queue->read_buffer ($output, 0, 0, OpenCL::SIZEOF_FLOAT * 4, my $data, $ev);
+
+       # wait for the last event to complete
+       $ev->wait;
+
+  Use the OpenGL module to share a texture between OpenCL and OpenGL and draw some julia
+set flight effect.
+    This is quite a long example to get you going - you can also download it
+    from <http://cvs.schmorp.de/OpenCL/examples/juliaflight>.
+
+       use OpenGL ":all";
+       use OpenCL;
+
+       my $S = $ARGV[0] || 256; # window/texture size, smaller is faster
+
+       # open a window and create a gl texture
+       OpenGL::glpOpenWindow width => $S, height => $S;
+       my $texid = glGenTextures_p 1;
+       glBindTexture GL_TEXTURE_2D, $texid;
+       glTexImage2D_c GL_TEXTURE_2D, 0, GL_RGBA8, $S, $S, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0;
+
+       # find and use the first opencl device that let's us get a shared opengl context
+       my $platform;
+       my $dev;
+       my $ctx;
+
+       for (OpenCL::platforms) {
+          $platform = $_;
+          for ($platform->devices) {
+             $dev = $_;
+             $ctx = $platform->context ([OpenCL::GLX_DISPLAY_KHR, undef, OpenCL::GL_CONTEXT_KHR, undef], [$dev])
+                and last;
+          }
+       }
+
+       $ctx
+          or die "cannot find suitable OpenCL device\n";
+
+       my $queue = $ctx->queue ($dev);
+
+       # now attach an opencl image2d object to the opengl texture
+       my $tex = $ctx->gl_texture2d (OpenCL::MEM_WRITE_ONLY, GL_TEXTURE_2D, 0, $texid);
+
+       # now the boring opencl code
+       my $src = <<EOF;
+       kernel void
+       juliatunnel (write_only image2d_t img, float time)
+       {
+         int2 xy = (int2)(get_global_id (0), get_global_id (1));
+         float2 p = convert_float2 (xy) / $S.f * 2.f - 1.f;
+
+         float2 m = (float2)(1.f, p.y) / fabs (p.x); // tunnel
+         m.x = fabs (fmod (m.x + time * 0.05f, 4.f) - 2.f);
+
+         float2 z = m;
+         float2 c = (float2)(sin (time * 0.01133f), cos (time * 0.02521f));
+
+         for (int i = 0; i < 25 && dot (z, z) < 4.f; ++i) // standard julia
+           z = (float2)(z.x * z.x - z.y * z.y, 2.f * z.x * z.y) + c;
+
+         float3 colour = (float3)(z.x, z.y, atan2 (z.y, z.x));
+         write_imagef (img, xy, (float4)(colour * p.x * p.x, 1.));
+       }
+       EOF
+
+       my $prog = $ctx->build_program ($src);
+       my $kernel = $prog->kernel ("juliatunnel");
+
+       # program compiled, kernel ready, now draw and loop
+
+       for (my $time; ; ++$time) {
+          # acquire objects from opengl
+          $queue->acquire_gl_objects ([$tex]);
+
+          # configure and run our kernel
+          $kernel->setf ("mf", $tex, $time*2); # mf = memory object, float
+          $queue->nd_range_kernel ($kernel, undef, [$S, $S], undef);
+
+          # release objects to opengl again
+          $queue->release_gl_objects ([$tex]);
+
+          # wait
+          $queue->finish;
+
+          # now draw the texture, the defaults should be all right
+          glTexParameterf GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST;
+
+          glEnable GL_TEXTURE_2D;
+          glBegin GL_QUADS;
+             glTexCoord2f 0, 1; glVertex3i -1, -1, -1;
+             glTexCoord2f 0, 0; glVertex3i  1, -1, -1;
+             glTexCoord2f 1, 0; glVertex3i  1,  1, -1;
+             glTexCoord2f 1, 1; glVertex3i -1,  1, -1;
+          glEnd;
+
+          glXSwapBuffers;
+
+          select undef, undef, undef, 1/60;
+       }
+
+  How to modify the previous example to not rely on GL sharing.
+    For those poor souls with only a sucky CPU OpenCL implementation, you
+    currently have to read the image into some perl scalar, and then modify
+    a texture or use glDrawPixels or so).
+
+    First, when you don't need gl sharing, you can create the context much
+    simpler:
+
+       $ctx = $platform->context (undef, [$dev])
+
+    To use a texture, you would modify the above example by creating an
+    OpenCL::Image manually instead of deriving it from a texture:
+
+       my $tex = $ctx->image2d (OpenCL::MEM_WRITE_ONLY, OpenCL::RGBA, OpenCL::UNORM_INT8, $S, $S);
+
+    And in the draw loop, intead of acquire_gl_objects/release_gl_objects,
+    you would read the image2d after the kernel has written it:
+
+       $queue->read_image ($tex, 0, 0, 0, 0, $S, $S, 1, 0, 0, my $data);
+
+    And then you would upload the pixel data to the texture (or use
+    glDrawPixels):
+
+       glTexSubImage2D_s GL_TEXTURE_2D, 0, 0, 0, $S, $S, GL_RGBA, GL_UNSIGNED_BYTE, $data;
+
+    The fully modified example can be found at
+    <http://cvs.schmorp.de/OpenCL/examples/juliaflight-nosharing>.
+
+  Julia sets look soooo 80ies.
+    Then colour them differently, e.g. using orbit traps! Replace the loop
+    and colour calculation from the previous examples by this:
+
+      float2 dm = (float2)(1.f, 1.f);
+
+      for (int i = 0; i < 25; ++i)
+        {
+          z = (float2)(z.x * z.x - z.y * z.y, 2.f * z.x * z.y) + c;
+          dm = fmin (dm, (float2)(fabs (dot (z, z) - 1.f), fabs (z.x - 1.f)));
+        }
+
+      float3 colour = (float3)(dm.x * dm.y, dm.x * dm.y, dm.x);
+
+    Also try "-10.f" instead of "-1.f".
+
+DOCUMENTATION
+  BASIC CONVENTIONS
+    This is not a one-to-one C-style translation of OpenCL to Perl - instead
+    I attempted to make the interface as type-safe as possible by
+    introducing object syntax where it makes sense. There are a number of
+    important differences between the OpenCL C API and this module:
+
+    *   Object lifetime managament is automatic - there is no need to free
+        objects explicitly ("clReleaseXXX"), the release function is called
+        automatically once all Perl references to it go away.
+
+    *   OpenCL uses CamelCase for function names (e.g. "clGetPlatformIDs",
+        "clGetPlatformInfo"), while this module uses underscores as word
+        separator and often leaves out prefixes ("OpenCL::platforms",
+        "$platform->info").
+
+    *   OpenCL often specifies fixed vector function arguments as short
+        arrays ("size_t origin[3]"), while this module explicitly expects
+        the components as separate arguments ("$orig_x, $orig_y, $orig_z")
+        in function calls.
+
+    *   Structures are often specified by flattening out their components as
+        with short vectors, and returned as arrayrefs.
+
+    *   When enqueuing commands, the wait list is specified by adding extra
+        arguments to the function - anywhere a "$wait_events..." argument is
+        documented this can be any number of event objects. As an extsnion
+        implemented by this module, "undef" values will be ignored in the
+        event list.
+
+    *   When enqueuing commands, if the enqueue method is called in void
+        context, no event is created. In all other contexts an event is
+        returned by the method.
+
+    *   This module expects all functions to return "OpenCL::SUCCESS". If
+        any other status is returned the function will throw an exception,
+        so you don't normally have to to any error checking.
+
+  CONSTANTS
+    All "CL_xxx" constants that this module supports are always available in
+    the "OpenCL" namespace as "OpenCL::xxx" (i.e. without the "CL_" prefix).
+    Constants which are not defined in the header files used during
+    compilation, or otherwise are not available, will have the value 0 (in
+    some cases, this will make them indistinguishable from real constants,
+    sorry).
+
+    The latest version of this module knows and exports the constants listed
+    in <http://cvs.schmorp.de/OpenCL/constiv.h>.
+
+  OPENCL 1.1 VS. OPENCL 1.2
+    This module supports both OpenCL version 1.1 and 1.2, although the
+    OpenCL 1.2 interface hasn't been tested much for lack of availability of
+    an actual implementation.
+
+    Every function or method in this manual page that interfaces to a
+    particular OpenCL function has a link to the its C manual page.
+
+    If the link contains a 1.1, then this function is an OpenCL 1.1
+    function. Most but not all also exist in OpenCL 1.2, and this module
+    tries to emulate the missing ones for you, when told to do so at
+    compiletime. You can check whether a function was removed in OpenCL 1.2
+    by replacing the 1.1 component in the URL by 1.2.
+
+    If the link contains a 1.2, then this is a OpenCL 1.2-only function.
+    Even if the module was compiled with OpenCL 1.2 header files and has an
+    1.2 OpenCL library, calling such a function on a platform that doesn't
+    implement 1.2 causes undefined behaviour, usually a crash (But this is
+    not guaranteed).
+
+    You can find out whether this module was compiled to prefer 1.1
+    functionality by ooking at "OpenCL::PREFER_1_1" - if it is true, then
+    1.1 functions generally are implemented using 1.1 OpenCL functions. If
+    it is false, then 1.1 functions missing from 1.2 are emulated by calling
+    1.2 fucntions.
+
+    This is a somewhat sorry state of affairs, but the Khronos group choose
+    to make every release of OpenCL source and binary incompatible with
+    previous releases.
+
+  PERL AND OPENCL TYPES
+    This handy(?) table lists OpenCL types and their perl, PDL and
+    pack/unpack format equivalents:
+
+       OpenCL    perl   PDL       pack/unpack
+       char      IV     -         c
+       uchar     IV     byte      C
+       short     IV     short     s
+       ushort    IV     ushort    S
+       int       IV     long?     l
+       uint      IV     -         L
+       long      IV     longlong  q
+       ulong     IV     -         Q
+       float     NV     float     f
+       half      IV     ushort    S
+       double    NV     double    d
+
+  GLX SUPPORT
+    Due to the sad state that OpenGL support is in in Perl (mostly the
+    OpenGL module, which has little to no documentation and has little to no
+    support for glX), this module, as a special extension, treats context
+    creation properties "OpenCL::GLX_DISPLAY_KHR" and
+    "OpenCL::GL_CONTEXT_KHR" specially: If either or both of these are
+    "undef", then the OpenCL module tries to dynamically resolve
+    "glXGetCurrentDisplay" and "glXGetCurrentContext", call these functions
+    and use their return values instead.
+
+    For this to work, the OpenGL library must be loaded, a GLX context must
+    have been created and be made current, and "dlsym" must be available and
+    capable of finding the function via "RTLD_DEFAULT".
+
+  EVENT SYSTEM
+    OpenCL can generate a number of (potentially) asynchronous events, for
+    example, after compiling a program, to signal a context-related error
+    or, perhaps most important, to signal completion of queued jobs (by
+    setting callbacks on OpenCL::Event objects).
+
+    The OpenCL module converts all these callbacks into events - you can
+    still register callbacks, but they are not executed when your OpenCL
+    implementation calls the actual callback, but only later. Therefore,
+    none of the limitations of OpenCL callbacks apply to the perl
+    implementation: it is perfectly safe to make blocking operations from
+    event callbacks, and enqueued operations don't need to be flushed.
+
+    To facilitate this, this module maintains an event queue - each time an
+    asynchronous event happens, it is queued, and perl will be interrupted.
+    This is implemented via the Async::Interrupt module. In addition, this
+    module has AnyEvent support, so it can seamlessly integrate itself into
+    many event loops.
+
+    Since Async::Interrupt is a bit hard to understand, here are some case
+    examples:
+
+   Don't use callbacks.
+    When your program never uses any callbacks, then there will never be any
+    notifications you need to take care of, and therefore no need to worry
+    about all this.
+
+    You can achieve a great deal by explicitly waiting for events, or using
+    barriers and flush calls. In many programs, there is no need at all to
+    tinker with asynchronous events.
+
+   Use AnyEvent
+    This module automatically registers a watcher that invokes all
+    outstanding event callbacks when AnyEvent is initialised (and block
+    asynchronous interruptions). Using this mode of operations is the safest
+    and most recommended one.
+
+    To use this, simply use AnyEvent and this module normally, make sure you
+    have an event loop running:
+
+       use Gtk2 -init;
+       use AnyEvent;
+
+       # initialise AnyEvent, by creating a watcher, or:
+       AnyEvent::detect;
+
+       my $e = $queue->marker;
+       $e->cb (sub {
+          warn "opencl is finished\n";
+       })
+
+       main Gtk2;
+
+    Note that this module will not initialise AnyEvent for you. Before
+    AnyEvent is initialised, the module will asynchronously interrupt perl
+    instead. To avoid any surprises, it's best to explicitly initialise
+    AnyEvent.
+
+    You can temporarily enable asynchronous interruptions (see next
+    paragraph) by calling "$OpenCL::INTERRUPT-"unblock> and disable them
+    again by calling "$OpenCL::INTERRUPT-"block>.
+
+   Let yourself be interrupted at any time
+    This mode is the default unless AnyEvent is loaded and initialised. In
+    this mode, OpenCL asynchronously interrupts a running perl program. The
+    emphasis is on both *asynchronously* and *running* here.
+
+    Asynchronously means that perl might execute your callbacks at any time.
+    For example, in the following code (*THAT YOU SHOULD NOT COPY*), the
+    "until" loop following the marker call will be interrupted by the
+    callback:
+
+       my $e = $queue->marker;
+       my $flag;
+       $e->cb (sub { $flag = 1 });
+       1 until $flag;
+       # $flag is now 1
+
+    The reason why you shouldn't blindly copy the above code is that busy
+    waiting is a really really bad thing, and really really bad for
+    performance.
+
+    While at first this asynchronous business might look exciting, it can be
+    really hard, because you need to be prepared for the callback code to be
+    executed at any time, which limits the amount of things the callback
+    code can do safely.
+
+    This can be mitigated somewhat by using
+    "$OpenCL::INTERRUPT->scope_block" (see the Async::Interrupt
+    documentation for details).
+
+    The other problem is that your program must be actively *running* to be
+    interrupted. When you calculate stuff, your program is running. When you
+    hang in some C functions or other block execution (by calling "sleep",
+    "select", running an event loop and so on), your program is waiting, not
+    running.
+
+    One way around that would be to attach a read watcher to your event
+    loop, listening for events on "$OpenCL::INTERRUPT->pipe_fileno", using a
+    dummy callback ("sub { }") to temporarily execute some perl code.
+
+    That is then awfully close to using the built-in AnyEvent support above,
+    though, so consider that one instead.
+
+   Be creative
+    OpenCL exports the Async::Interrupt object it uses in the global
+    variable $OpenCL::INTERRUPT. You can configure it in any way you like.
+
+    So if you want to feel like a real pro, err, wait, if you feel no risk
+    menas no fun, you can experiment by implementing your own mode of
+    operations.
+
+  THE OpenCL PACKAGE
+    $int = OpenCL::errno
+        The last error returned by a function - it's only valid after an
+        error occured and before calling another OpenCL function.
+
+    $str = OpenCL::err2str [$errval]
+        Converts an error value into a human readable string. If no error
+        value is given, then the last error will be used (as returned by
+        OpenCL::errno).
+
+        The latest version of this module knows the error constants listed
+        in <http://cvs.schmorp.de/OpenCL/errstr.h>.
+
+    $str = OpenCL::enum2str $enum
+        Converts most enum values (of parameter names, image format
+        constants, object types, addressing and filter modes, command types
+        etc.) into a human readable string. When confronted with some random
+        integer it can be very helpful to pass it through this function to
+        maybe get some readable string out of it.
+
+        The latest version of this module knows the enumaration constants
+        listed in <http://cvs.schmorp.de/OpenCL/enumstr.h>.
+
+    @platforms = OpenCL::platforms
+        Returns all available OpenCL::Platform objects.
+
+        <http://www.khronos.org/registry/cl/sdk/1.1/docs/man/xhtml/clGetPlat
+        formIDs.html>
+
+    $ctx = OpenCL::context_from_type $properties, $type =
+    OpenCL::DEVICE_TYPE_DEFAULT, $callback->($err, $pvt) = $print_stderr
+        Tries to create a context from a default device and platform type -
+        never worked for me. Consider using "$platform->context_from_type"
+        instead.
+
+        type: OpenCL::DEVICE_TYPE_DEFAULT, OpenCL::DEVICE_TYPE_CPU,
+        OpenCL::DEVICE_TYPE_GPU, OpenCL::DEVICE_TYPE_ACCELERATOR,
+        OpenCL::DEVICE_TYPE_CUSTOM, OpenCL::DEVICE_TYPE_ALL.
+
+        <http://www.khronos.org/registry/cl/sdk/1.1/docs/man/xhtml/clCreateC
+        ontextFromType.html>
+
+    $ctx = OpenCL::context $properties, \@devices, $callback->($err, $pvt) =
+    $print_stderr)
+        Create a new OpenCL::Context object using the given device
+        object(s). Consider using "$platform->context" instead.
+
+        <http://www.khronos.org/registry/cl/sdk/1.1/docs/man/xhtml/clCreateC
+        ontext.html>
+
+    OpenCL::wait_for_events $wait_events...
+        Waits for all events to complete.
+
+        <http://www.khronos.org/registry/cl/sdk/1.1/docs/man/xhtml/clWaitFor
+        Events.html>
+
+    OpenCL::poll
+        Checks if there are any outstanding events (see "EVENT SYSTEM") and
+        invokes their callbacks.
+
+    $OpenCL::INTERRUPT
+        The Async::Interrupt object used to signal asynchronous events (see
+        "EVENT SYSTEM").
+
+    $OpenCL::WATCHER
+        The AnyEvent watcher object used to watch for asynchronous events
+        (see "EVENT SYSTEM"). This variable is "undef" until AnyEvent has
+        been loaded *and* initialised (e.g. by calling "AnyEvent::detect").
+
+  THE OpenCL::Object CLASS
+    This is the base class for all objects in the OpenCL module. The only
+    method it implements is the "id" method, which is only useful if you
+    want to interface to OpenCL on the C level.
+
+    $iv = $obj->id
+        OpenCL objects are represented by pointers or integers on the C
+        level. If you want to interface to an OpenCL object directly on the
+        C level, then you need this value, which is returned by this method.
+        You should use an "IV" type in your code and cast that to the
+        correct type.
+
+  THE OpenCL::Platform CLASS
+    @devices = $platform->devices ($type = OpenCL::DEVICE_TYPE_ALL)
+        Returns a list of matching OpenCL::Device objects.
+
+    $ctx = $platform->context_from_type ($properties, $type =
+    OpenCL::DEVICE_TYPE_DEFAULT, $callback->($err, $pvt) = $print_stderr)
+        Tries to create a context. Never worked for me, and you need devices
+        explicitly anyway.
+
+        <http://www.khronos.org/registry/cl/sdk/1.1/docs/man/xhtml/clCreateC
+        ontextFromType.html>
+
+    $ctx = $platform->context ($properties, \@devices, $callback->($err,
+    $pvt) = $print_stderr)
+        Create a new OpenCL::Context object using the given device
+        object(s)- a OpenCL::CONTEXT_PLATFORM property is supplied
+        automatically.
+
+        <http://www.khronos.org/registry/cl/sdk/1.1/docs/man/xhtml/clCreateC
+        ontext.html>
+
+    $packed_value = $platform->info ($name)
+        Calls "clGetPlatformInfo" and returns the packed, raw value - for
+        strings, this will be the string (possibly including terminating
+        \0), for other values you probably need to use the correct "unpack".
+
+        It's best to avoid this method and use one of the following
+        convenience wrappers.
+
+        <http://www.khronos.org/registry/cl/sdk/1.1/docs/man/xhtml/clGetPlat
+        formInfo.html>
+
+    $platform->unload_compiler
+        Attempts to unload the compiler for this platform, for endless
+        profit. Does nothing on OpenCL 1.1.
+
+        <http://www.khronos.org/registry/cl/sdk/1.2/docs/man/xhtml/clUnloadP
+        latformCompiler.html>
+
+    $string = $platform->profile
+        Calls "clGetPlatformInfo" with "OpenCL::PLATFORM_PROFILE" and
+        returns the result.
+
+    $string = $platform->version
+        Calls "clGetPlatformInfo" with "OpenCL::PLATFORM_VERSION" and
+        returns the result.
+
+    $string = $platform->name
+        Calls "clGetPlatformInfo" with "OpenCL::PLATFORM_NAME" and returns
+        the result.
+
+    $string = $platform->vendor
+        Calls "clGetPlatformInfo" with "OpenCL::PLATFORM_VENDOR" and returns
+        the result.
+
+    $string = $platform->extensions
+        Calls "clGetPlatformInfo" with "OpenCL::PLATFORM_EXTENSIONS" and
+        returns the result.
+
+  THE OpenCL::Device CLASS
+    $packed_value = $device->info ($name)
+        See "$platform->info" for details.
+
+        type: OpenCL::DEVICE_TYPE_DEFAULT, OpenCL::DEVICE_TYPE_CPU,
+        OpenCL::DEVICE_TYPE_GPU, OpenCL::DEVICE_TYPE_ACCELERATOR,
+        OpenCL::DEVICE_TYPE_CUSTOM, OpenCL::DEVICE_TYPE_ALL.
+
+        fp_config: OpenCL::FP_DENORM, OpenCL::FP_INF_NAN,
+        OpenCL::FP_ROUND_TO_NEAREST, OpenCL::FP_ROUND_TO_ZERO,
+        OpenCL::FP_ROUND_TO_INF, OpenCL::FP_FMA, OpenCL::FP_SOFT_FLOAT,
+        OpenCL::FP_CORRECTLY_ROUNDED_DIVIDE_SQRT.
+
+        mem_cache_type: OpenCL::NONE, OpenCL::READ_ONLY_CACHE,
+        OpenCL::READ_WRITE_CACHE.
+
+        local_mem_type: OpenCL::LOCAL, OpenCL::GLOBAL.
+
+        exec_capabilities: OpenCL::EXEC_KERNEL, OpenCL::EXEC_NATIVE_KERNEL.
+
+        command_queue_properties:
+        OpenCL::QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE,
+        OpenCL::QUEUE_PROFILING_ENABLE.
+
+        partition_properties: OpenCL::DEVICE_PARTITION_EQUALLY,
+        OpenCL::DEVICE_PARTITION_BY_COUNTS,
+        OpenCL::DEVICE_PARTITION_BY_COUNTS_LIST_END,
+        OpenCL::DEVICE_PARTITION_BY_AFFINITY_DOMAIN.
+
+        affinity_domain: OpenCL::DEVICE_AFFINITY_DOMAIN_NUMA,
+        OpenCL::DEVICE_AFFINITY_DOMAIN_L4_CACHE,
+        OpenCL::DEVICE_AFFINITY_DOMAIN_L3_CACHE,
+        OpenCL::DEVICE_AFFINITY_DOMAIN_L2_CACHE,
+        OpenCL::DEVICE_AFFINITY_DOMAIN_L1_CACHE,
+        OpenCL::DEVICE_AFFINITY_DOMAIN_NEXT_PARTITIONABLE.
+
+        <http://www.khronos.org/registry/cl/sdk/1.1/docs/man/xhtml/clGetDevi
+        ceInfo.html>
+
+    @devices = $device->sub_devices (\@properties)
+        Creates OpencL::SubDevice objects by partitioning an existing
+        device.
+
+        <http://www.khronos.org/registry/cl/sdk/1.2/docs/man/xhtml/clCreateS
+        ubDevices.html>
+
+    $device_type = $device->type
+        Calls "clGetDeviceInfo" with "OpenCL::DEVICE_TYPE" and returns the
+        result.
+
+    $uint = $device->vendor_id
+        Calls "clGetDeviceInfo" with "OpenCL::DEVICE_VENDOR_ID" and returns
+        the result.
+
+    $uint = $device->max_compute_units
+        Calls "clGetDeviceInfo" with "OpenCL::DEVICE_MAX_COMPUTE_UNITS" and
+        returns the result.
+
+    $uint = $device->max_work_item_dimensions
+        Calls "clGetDeviceInfo" with
+        "OpenCL::DEVICE_MAX_WORK_ITEM_DIMENSIONS" and returns the result.
+
+    $int = $device->max_work_group_size
+        Calls "clGetDeviceInfo" with "OpenCL::DEVICE_MAX_WORK_GROUP_SIZE"
+        and returns the result.
+
+    @ints = $device->max_work_item_sizes
+        Calls "clGetDeviceInfo" with "OpenCL::DEVICE_MAX_WORK_ITEM_SIZES"
+        and returns the result.
+
+    $uint = $device->preferred_vector_width_char
+        Calls "clGetDeviceInfo" with
+        "OpenCL::DEVICE_PREFERRED_VECTOR_WIDTH_CHAR" and returns the result.
+
+    $uint = $device->preferred_vector_width_short
+        Calls "clGetDeviceInfo" with
+        "OpenCL::DEVICE_PREFERRED_VECTOR_WIDTH_SHORT" and returns the
+        result.
+
+    $uint = $device->preferred_vector_width_int
+        Calls "clGetDeviceInfo" with
+        "OpenCL::DEVICE_PREFERRED_VECTOR_WIDTH_INT" and returns the result.
+
+    $uint = $device->preferred_vector_width_long
+        Calls "clGetDeviceInfo" with
+        "OpenCL::DEVICE_PREFERRED_VECTOR_WIDTH_LONG" and returns the result.
+
+    $uint = $device->preferred_vector_width_float
+        Calls "clGetDeviceInfo" with
+        "OpenCL::DEVICE_PREFERRED_VECTOR_WIDTH_FLOAT" and returns the
+        result.
+
+    $uint = $device->preferred_vector_width_double
+        Calls "clGetDeviceInfo" with
+        "OpenCL::DEVICE_PREFERRED_VECTOR_WIDTH_DOUBLE" and returns the
+        result.
+
+    $uint = $device->max_clock_frequency
+        Calls "clGetDeviceInfo" with "OpenCL::DEVICE_MAX_CLOCK_FREQUENCY"
+        and returns the result.
+
+    $bitfield = $device->address_bits
+        Calls "clGetDeviceInfo" with "OpenCL::DEVICE_ADDRESS_BITS" and
+        returns the result.
+
+    $uint = $device->max_read_image_args
+        Calls "clGetDeviceInfo" with "OpenCL::DEVICE_MAX_READ_IMAGE_ARGS"
+        and returns the result.
+
+    $uint = $device->max_write_image_args
+        Calls "clGetDeviceInfo" with "OpenCL::DEVICE_MAX_WRITE_IMAGE_ARGS"
+        and returns the result.
+
+    $ulong = $device->max_mem_alloc_size
+        Calls "clGetDeviceInfo" with "OpenCL::DEVICE_MAX_MEM_ALLOC_SIZE" and
+        returns the result.
+
+    $int = $device->image2d_max_width
+        Calls "clGetDeviceInfo" with "OpenCL::DEVICE_IMAGE2D_MAX_WIDTH" and
+        returns the result.
+
+    $int = $device->image2d_max_height
+        Calls "clGetDeviceInfo" with "OpenCL::DEVICE_IMAGE2D_MAX_HEIGHT" and
+        returns the result.
+
+    $int = $device->image3d_max_width
+        Calls "clGetDeviceInfo" with "OpenCL::DEVICE_IMAGE3D_MAX_WIDTH" and
+        returns the result.
+
+    $int = $device->image3d_max_height
+        Calls "clGetDeviceInfo" with "OpenCL::DEVICE_IMAGE3D_MAX_HEIGHT" and
+        returns the result.
+
+    $int = $device->image3d_max_depth
+        Calls "clGetDeviceInfo" with "OpenCL::DEVICE_IMAGE3D_MAX_DEPTH" and
+        returns the result.
+
+    $uint = $device->image_support
+        Calls "clGetDeviceInfo" with "OpenCL::DEVICE_IMAGE_SUPPORT" and
+        returns the result.
+
+    $int = $device->max_parameter_size
+        Calls "clGetDeviceInfo" with "OpenCL::DEVICE_MAX_PARAMETER_SIZE" and
+        returns the result.
+
+    $uint = $device->max_samplers
+        Calls "clGetDeviceInfo" with "OpenCL::DEVICE_MAX_SAMPLERS" and
+        returns the result.
+
+    $uint = $device->mem_base_addr_align
+        Calls "clGetDeviceInfo" with "OpenCL::DEVICE_MEM_BASE_ADDR_ALIGN"
+        and returns the result.
+
+    $uint = $device->min_data_type_align_size
+        Calls "clGetDeviceInfo" with
+        "OpenCL::DEVICE_MIN_DATA_TYPE_ALIGN_SIZE" and returns the result.
+
+    $device_fp_config = $device->single_fp_config
+        Calls "clGetDeviceInfo" with "OpenCL::DEVICE_SINGLE_FP_CONFIG" and
+        returns the result.
+
+    $device_mem_cache_type = $device->global_mem_cache_type
+        Calls "clGetDeviceInfo" with "OpenCL::DEVICE_GLOBAL_MEM_CACHE_TYPE"
+        and returns the result.
+
+    $uint = $device->global_mem_cacheline_size
+        Calls "clGetDeviceInfo" with
+        "OpenCL::DEVICE_GLOBAL_MEM_CACHELINE_SIZE" and returns the result.
+
+    $ulong = $device->global_mem_cache_size
+        Calls "clGetDeviceInfo" with "OpenCL::DEVICE_GLOBAL_MEM_CACHE_SIZE"
+        and returns the result.
+
+    $ulong = $device->global_mem_size
+        Calls "clGetDeviceInfo" with "OpenCL::DEVICE_GLOBAL_MEM_SIZE" and
+        returns the result.
+
+    $ulong = $device->max_constant_buffer_size
+        Calls "clGetDeviceInfo" with
+        "OpenCL::DEVICE_MAX_CONSTANT_BUFFER_SIZE" and returns the result.
+
+    $uint = $device->max_constant_args
+        Calls "clGetDeviceInfo" with "OpenCL::DEVICE_MAX_CONSTANT_ARGS" and
+        returns the result.
+
+    $device_local_mem_type = $device->local_mem_type
+        Calls "clGetDeviceInfo" with "OpenCL::DEVICE_LOCAL_MEM_TYPE" and
+        returns the result.
+
+    $ulong = $device->local_mem_size
+        Calls "clGetDeviceInfo" with "OpenCL::DEVICE_LOCAL_MEM_SIZE" and
+        returns the result.
+
+    $boolean = $device->error_correction_support
+        Calls "clGetDeviceInfo" with
+        "OpenCL::DEVICE_ERROR_CORRECTION_SUPPORT" and returns the result.
+
+    $int = $device->profiling_timer_resolution
+        Calls "clGetDeviceInfo" with
+        "OpenCL::DEVICE_PROFILING_TIMER_RESOLUTION" and returns the result.
+
+    $boolean = $device->endian_little
+        Calls "clGetDeviceInfo" with "OpenCL::DEVICE_ENDIAN_LITTLE" and
+        returns the result.
+
+    $boolean = $device->available
+        Calls "clGetDeviceInfo" with "OpenCL::DEVICE_AVAILABLE" and returns
+        the result.
+
+    $boolean = $device->compiler_available
+        Calls "clGetDeviceInfo" with "OpenCL::DEVICE_COMPILER_AVAILABLE" and
+        returns the result.
+
+    $device_exec_capabilities = $device->execution_capabilities
+        Calls "clGetDeviceInfo" with "OpenCL::DEVICE_EXECUTION_CAPABILITIES"
+        and returns the result.
+
+    $command_queue_properties = $device->properties
+        Calls "clGetDeviceInfo" with "OpenCL::DEVICE_QUEUE_PROPERTIES" and
+        returns the result.
+
+    $ = $device->platform
+        Calls "clGetDeviceInfo" with "OpenCL::DEVICE_PLATFORM" and returns
+        the result.
+
+    $string = $device->name
+        Calls "clGetDeviceInfo" with "OpenCL::DEVICE_NAME" and returns the
+        result.
+
+    $string = $device->vendor
+        Calls "clGetDeviceInfo" with "OpenCL::DEVICE_VENDOR" and returns the
+        result.
+
+    $string = $device->driver_version
+        Calls "clGetDeviceInfo" with "OpenCL::DRIVER_VERSION" and returns
+        the result.
+
+    $string = $device->profile
+        Calls "clGetDeviceInfo" with "OpenCL::DEVICE_PROFILE" and returns
+        the result.
+
+    $string = $device->version
+        Calls "clGetDeviceInfo" with "OpenCL::DEVICE_VERSION" and returns
+        the result.
+
+    $string = $device->extensions
+        Calls "clGetDeviceInfo" with "OpenCL::DEVICE_EXTENSIONS" and returns
+        the result.
+
+    $uint = $device->preferred_vector_width_half
+        Calls "clGetDeviceInfo" with
+        "OpenCL::DEVICE_PREFERRED_VECTOR_WIDTH_HALF" and returns the result.
+
+    $uint = $device->native_vector_width_char
+        Calls "clGetDeviceInfo" with
+        "OpenCL::DEVICE_NATIVE_VECTOR_WIDTH_CHAR" and returns the result.
+
+    $uint = $device->native_vector_width_short
+        Calls "clGetDeviceInfo" with
+        "OpenCL::DEVICE_NATIVE_VECTOR_WIDTH_SHORT" and returns the result.
+
+    $uint = $device->native_vector_width_int
+        Calls "clGetDeviceInfo" with
+        "OpenCL::DEVICE_NATIVE_VECTOR_WIDTH_INT" and returns the result.
+
+    $uint = $device->native_vector_width_long
+        Calls "clGetDeviceInfo" with
+        "OpenCL::DEVICE_NATIVE_VECTOR_WIDTH_LONG" and returns the result.
+
+    $uint = $device->native_vector_width_float
+        Calls "clGetDeviceInfo" with
+        "OpenCL::DEVICE_NATIVE_VECTOR_WIDTH_FLOAT" and returns the result.
+
+    $uint = $device->native_vector_width_double
+        Calls "clGetDeviceInfo" with
+        "OpenCL::DEVICE_NATIVE_VECTOR_WIDTH_DOUBLE" and returns the result.
+
+    $uint = $device->native_vector_width_half
+        Calls "clGetDeviceInfo" with
+        "OpenCL::DEVICE_NATIVE_VECTOR_WIDTH_HALF" and returns the result.
+
+    $device_fp_config = $device->double_fp_config
+        Calls "clGetDeviceInfo" with "OpenCL::DEVICE_DOUBLE_FP_CONFIG" and
+        returns the result.
+
+    $device_fp_config = $device->half_fp_config
+        Calls "clGetDeviceInfo" with "OpenCL::DEVICE_HALF_FP_CONFIG" and
+        returns the result.
+
+    $boolean = $device->host_unified_memory
+        Calls "clGetDeviceInfo" with "OpenCL::DEVICE_HOST_UNIFIED_MEMORY"
+        and returns the result.
+
+    $device = $device->parent_device_ext
+        Calls "clGetDeviceInfo" with "OpenCL::DEVICE_PARENT_DEVICE_EXT" and
+        returns the result.
+
+    @device_partition_property_exts = $device->partition_types_ext
+        Calls "clGetDeviceInfo" with "OpenCL::DEVICE_PARTITION_TYPES_EXT"
+        and returns the result.
+
+    @device_partition_property_exts = $device->affinity_domains_ext
+        Calls "clGetDeviceInfo" with "OpenCL::DEVICE_AFFINITY_DOMAINS_EXT"
+        and returns the result.
+
+    $uint = $device->reference_count_ext
+        Calls "clGetDeviceInfo" with "OpenCL::DEVICE_REFERENCE_COUNT_EXT"
+        and returns the result.
+
+    @device_partition_property_exts = $device->partition_style_ext
+        Calls "clGetDeviceInfo" with "OpenCL::DEVICE_PARTITION_STYLE_EXT"
+        and returns the result.
+
+  THE OpenCL::Context CLASS
+    An OpenCL::Context is basically a container, or manager, for a number of
+    devices of a platform. It is used to create all sorts of secondary
+    objects such as buffers, queues, programs and so on.
+
+    All context creation functions and methods take a list of properties
+    (type-value pairs). All property values can be specified as integers -
+    some additionally support other types:
+
+    OpenCL::CONTEXT_PLATFORM
+        Also accepts OpenCL::Platform objects.
+
+    OpenCL::GLX_DISPLAY_KHR
+        Also accepts "undef", in which case a deep and troubling hack is
+        engaged to find the current glx display (see "GLX SUPPORT").
+
+    OpenCL::GL_CONTEXT_KHR
+        Also accepts "undef", in which case a deep and troubling hack is
+        engaged to find the current glx context (see "GLX SUPPORT").
+
+    $prog = $ctx->build_program ($program, $options = "")
+        This convenience function tries to build the program on all devices
+        in the context. If the build fails, then the function will "croak"
+        with the build log. Otherwise ti returns the program object.
+
+        The $program can either be a "OpenCL::Program" object or a string
+        containing the program. In the latter case, a program objetc will be
+        created automatically.
+
+    $queue = $ctx->queue ($device, $properties)
+        Create a new OpenCL::Queue object from the context and the given
+        device.
+
+        <http://www.khronos.org/registry/cl/sdk/1.1/docs/man/xhtml/clCreateC
+        ommandQueue.html>
+
+        Example: create an out-of-order queue.
+
+           $queue = $ctx->queue ($device, OpenCL::QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE);
+
+    $ev = $ctx->user_event
+        Creates a new OpenCL::UserEvent object.
+
+        <http://www.khronos.org/registry/cl/sdk/1.1/docs/man/xhtml/clCreateU
+        serEvent.html>
+
+    $buf = $ctx->buffer ($flags, $len)
+        Creates a new OpenCL::Buffer (actually OpenCL::BufferObj) object
+        with the given flags and octet-size.
+
+        flags: OpenCL::MEM_READ_WRITE, OpenCL::MEM_WRITE_ONLY,
+        OpenCL::MEM_READ_ONLY, OpenCL::MEM_USE_HOST_PTR,
+        OpenCL::MEM_ALLOC_HOST_PTR, OpenCL::MEM_COPY_HOST_PTR,
+        OpenCL::MEM_HOST_WRITE_ONLY, OpenCL::MEM_HOST_READ_ONLY,
+        OpenCL::MEM_HOST_NO_ACCESS.
+
+        <http://www.khronos.org/registry/cl/sdk/1.1/docs/man/xhtml/clCreateB
+        uffer.html>
+
+    $buf = $ctx->buffer_sv ($flags, $data)
+        Creates a new OpenCL::Buffer (actually OpenCL::BufferObj) object and
+        initialise it with the given data values.
+
+    $img = $ctx->image ($self, $flags, $channel_order, $channel_type, $type,
+    $width, $height, $depth = 0, $array_size = 0, $row_pitch = 0,
+    $slice_pitch = 0, $num_mip_level = 0, $num_samples = 0, $*data =
+    &PL_sv_undef)
+        Creates a new OpenCL::Image object and optionally initialises it
+        with the given data values.
+
+        channel_order: OpenCL::R, OpenCL::A, OpenCL::RG, OpenCL::RA,
+        OpenCL::RGB, OpenCL::RGBA, OpenCL::BGRA, OpenCL::ARGB,
+        OpenCL::INTENSITY, OpenCL::LUMINANCE, OpenCL::Rx, OpenCL::RGx,
+        OpenCL::RGBx.
+
+        channel_type: OpenCL::SNORM_INT8, OpenCL::SNORM_INT16,
+        OpenCL::UNORM_INT8, OpenCL::UNORM_INT16, OpenCL::UNORM_SHORT_565,
+        OpenCL::UNORM_SHORT_555, OpenCL::UNORM_INT_101010,
+        OpenCL::SIGNED_INT8, OpenCL::SIGNED_INT16, OpenCL::SIGNED_INT32,
+        OpenCL::UNSIGNED_INT8, OpenCL::UNSIGNED_INT16,
+        OpenCL::UNSIGNED_INT32, OpenCL::HALF_FLOAT, OpenCL::FLOAT.
+
+        type: OpenCL::MEM_OBJECT_BUFFER, OpenCL::MEM_OBJECT_IMAGE2D,
+        OpenCL::MEM_OBJECT_IMAGE3D, OpenCL::MEM_OBJECT_IMAGE2D_ARRAY,
+        OpenCL::MEM_OBJECT_IMAGE1D, OpenCL::MEM_OBJECT_IMAGE1D_ARRAY,
+        OpenCL::MEM_OBJECT_IMAGE1D_BUFFER.
+
+        <http://www.khronos.org/registry/cl/sdk/1.2/docs/man/xhtml/clCreateI
+        mage.html>
+
+    $img = $ctx->image2d ($flags, $channel_order, $channel_type, $width,
+    $height, $row_pitch = 0, $data = undef)
+        Creates a new OpenCL::Image2D object and optionally initialises it
+        with the given data values.
+
+        <http://www.khronos.org/registry/cl/sdk/1.1/docs/man/xhtml/clCreateI
+        mage2D.html>
+
+    $img = $ctx->image3d ($flags, $channel_order, $channel_type, $width,
+    $height, $depth, $row_pitch = 0, $slice_pitch = 0, $data = undef)
+        Creates a new OpenCL::Image3D object and optionally initialises it
+        with the given data values.
+
+        <http://www.khronos.org/registry/cl/sdk/1.1/docs/man/xhtml/clCreateI
+        mage3D.html>
+
+    $buffer = $ctx->gl_buffer ($flags, $bufobj)
+        Creates a new OpenCL::Buffer (actually OpenCL::BufferObj) object
+        that refers to the given OpenGL buffer object.
+
+        flags: OpenCL::MEM_READ_WRITE, OpenCL::MEM_READ_ONLY,
+        OpenCL::MEM_WRITE_ONLY.
+
+        http://www.khronos.org/registry/cl/sdk/1.1/docs/man/xhtml/clCreateFr
+        omGLBuffer.html
+
+    $img = $ctx->gl_texture ($flags, $target, $miplevel, $texture)
+        Creates a new OpenCL::Image object that refers to the given OpenGL
+        texture object or buffer.
+
+        target: GL_TEXTURE_1D, GL_TEXTURE_1D_ARRAY, GL_TEXTURE_BUFFER,
+        GL_TEXTURE_2D, GL_TEXTURE_2D_ARRAY, GL_TEXTURE_3D,
+        GL_TEXTURE_CUBE_MAP_POSITIVE_X, GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
+        GL_TEXTURE_CUBE_MAP_POSITIVE_Z, GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
+        GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, GL_TEXTURE_CUBE_MAP_NEGATIVE_Z,
+        GL_TEXTURE_RECTANGLE/GL_TEXTURE_RECTANGLE_ARB.
+
+        http://www.khronos.org/registry/cl/sdk/1.2/docs/man/xhtml/clCreateFr
+        omGLTexture.html
+
+    $img = $ctx->gl_texture2d ($flags, $target, $miplevel, $texture)
+        Creates a new OpenCL::Image2D object that refers to the given OpenGL
+        2D texture object.
+
+        http://www.khronos.org/registry/cl/sdk/1.1/docs/man/xhtml/clCreateFr
+        omGLTexture2D.html
+
+    $img = $ctx->gl_texture3d ($flags, $target, $miplevel, $texture)
+        Creates a new OpenCL::Image3D object that refers to the given OpenGL
+        3D texture object.
+
+        http://www.khronos.org/registry/cl/sdk/1.1/docs/man/xhtml/clCreateFr
+        omGLTexture3D.html
+
+    $ctx->gl_renderbuffer ($flags, $renderbuffer)
+        Creates a new OpenCL::Image2D object that refers to the given OpenGL
+        render buffer.
+
+        http://www.khronos.org/registry/cl/sdk/1.1/docs/man/xhtml/clCreateFr
+        omGLRenderbuffer.html
+
+    @formats = $ctx->supported_image_formats ($flags, $image_type)
+        Returns a list of matching image formats - each format is an
+        arrayref with two values, $channel_order and $channel_type, in it.
+
+        <http://www.khronos.org/registry/cl/sdk/1.1/docs/man/xhtml/clGetSupp
+        ortedImageFormats.html>
+
+    $sampler = $ctx->sampler ($normalized_coords, $addressing_mode,
+    $filter_mode)
+        Creates a new OpenCL::Sampler object.
+
+        addressing_mode: OpenCL::ADDRESS_NONE,
+        OpenCL::ADDRESS_CLAMP_TO_EDGE, OpenCL::ADDRESS_CLAMP,
+        OpenCL::ADDRESS_REPEAT, OpenCL::ADDRESS_MIRRORED_REPEAT.
+
+        filter_mode: OpenCL::FILTER_NEAREST, OpenCL::FILTER_LINEAR.
+
+        <http://www.khronos.org/registry/cl/sdk/1.1/docs/man/xhtml/clCreateS
+        ampler.html>
+
+    $program = $ctx->program_with_source ($string)
+        Creates a new OpenCL::Program object from the given source code.
+
+        <http://www.khronos.org/registry/cl/sdk/1.1/docs/man/xhtml/clCreateP
+        rogramWithSource.html>
+
+    ($program, \@status) = $ctx->program_with_binary (\@devices, \@binaries)
+        Creates a new OpenCL::Program object from the given binaries.
+
+        <http://www.khronos.org/registry/cl/sdk/1.1/docs/man/xhtml/clCreateP
+        rogramWithBinary.html>
+
+        Example: clone an existing program object that contains a
+        successfully compiled program, no matter how useless this is.
+
+           my $clone = $ctx->program_with_binary ([$prog->devices], [$prog->binaries]);
+
+    $program = $ctx->program_with_built_in_kernels (\@devices,
+    $kernel_names)
+        Creates a new OpenCL::Program object from the given built-in kernel
+        names.
+
+        <http://www.khronos.org/registry/cl/sdk/1.2/docs/man/xhtml/clCreateP
+        rogramWithBuiltInKernels.html>
+
+    $program = $ctx->link_program (\@devices, $options, \@programs,
+    $cb->($program) = undef)
+        Links all (already compiled) program objects specified in @programs
+        together and returns a new OpenCL::Program object with the result.
+
+        <http://www.khronos.org/registry/cl/sdk/1.2/docs/man/xhtml/clLinkPro
+        gram.html>
+
+    $packed_value = $ctx->info ($name)
+        See "$platform->info" for details.
+
+        <http://www.khronos.org/registry/cl/sdk/1.1/docs/man/xhtml/clGetCont
+        extInfo.html>
+
+    $uint = $context->reference_count
+        Calls "clGetContextInfo" with "OpenCL::CONTEXT_REFERENCE_COUNT" and
+        returns the result.
+
+    @devices = $context->devices
+        Calls "clGetContextInfo" with "OpenCL::CONTEXT_DEVICES" and returns
+        the result.
+
+    @property_ints = $context->properties
+        Calls "clGetContextInfo" with "OpenCL::CONTEXT_PROPERTIES" and
+        returns the result.
+
+    $uint = $context->num_devices
+        Calls "clGetContextInfo" with "OpenCL::CONTEXT_NUM_DEVICES" and
+        returns the result.
+
+  THE OpenCL::Queue CLASS
+    An OpenCL::Queue represents an execution queue for OpenCL. You execute
+    requests by calling their respective method and waiting for it to
+    complete in some way.
+
+    Most methods that enqueue some request return an event object that can
+    be used to wait for completion (optionally using a callback), unless the
+    method is called in void context, in which case no event object is
+    created.
+
+    They also allow you to specify any number of other event objects that
+    this request has to wait for before it starts executing, by simply
+    passing the event objects as extra parameters to the enqueue methods. To
+    simplify program design, this module ignores any "undef" values in the
+    list of events. This makes it possible to code operations such as this,
+    without having to put a valid event object into $event first:
+
+       $event = $queue->xxx (..., $event);
+
+    Queues execute in-order by default, without any parallelism, so in most
+    cases (i.e. you use only one queue) it's not necessary to wait for or
+    create event objects, althoguh an our of order queue is often a bit
+    faster.
+
+    $ev = $queue->read_buffer ($buffer, $blocking, $offset, $len, $data,
+    $wait_events...)
+        Reads data from buffer into the given string.
+
+        <http://www.khronos.org/registry/cl/sdk/1.1/docs/man/xhtml/clEnqueue
+        ReadBuffer.html>
+
+    $ev = $queue->write_buffer ($buffer, $blocking, $offset, $data,
+    $wait_events...)
+        Writes data to buffer from the given string.
+
+        <http://www.khronos.org/registry/cl/sdk/1.1/docs/man/xhtml/clEnqueue
+        WriteBuffer.html>
+
+    $ev = $queue->copy_buffer ($src, $dst, $src_offset, $dst_offset, $len,
+    $wait_events...)
+        <http://www.khronos.org/registry/cl/sdk/1.1/docs/man/xhtml/clEnqueue
+        CopyBuffer.html>
+
+        $eue->read_buffer_rect ($buf, cl_bool blocking, $buf_x, $buf_y,
+        $buf_z, $host_x, $host_y, $host_z, $width, $height, $depth,
+        $buf_row_pitch, $buf_slice_pitch, $host_row_pitch,
+        $host_slice_pitch, $data, $wait_events...)
+
+        http://www.khronos.org/registry/cl/sdk/1.1/docs/man/xhtml/clEnqueueR
+        eadBufferRect.html
+
+    $ev = $queue->write_buffer_rect ($buf, $blocking, $buf_y, $host_x,
+    $host_z, $height, $buf_row_pitch, $host_row_pitch, $data,
+    $wait_events...)
+        http://www.khronos.org/registry/cl/sdk/1.1/docs/man/xhtml/clEnqueueW
+        riteBufferRect.html
+
+    $ev = $queue->copy_buffer_to_image ($src_buffer, $dst_image,
+    $src_offset, $dst_x, $dst_y, $dst_z, $width, $height, $depth,
+    $wait_events...)
+        <http://www.khronos.org/registry/cl/sdk/1.1/docs/man/xhtml/clEnqueue
+        CopyBufferToImage.html>
+
+    $ev = $queue->read_image ($src, $blocking, $x, $y, $z, $width, $height,
+    $depth, $row_pitch, $slice_pitch, $data, $wait_events...)
+        $row_pitch (and $slice_pitch) can be 0, in which case the OpenCL
+        module uses the image width (and height) to supply default values.
+
+        <http://www.khronos.org/registry/cl/sdk/1.1/docs/man/xhtml/clEnqueue
+        ReadImage.html>
+
+    $ev = $queue->write_image ($src, $blocking, $x, $y, $z, $width, $height,
+    $depth, $row_pitch, $slice_pitch, $data, $wait_events...)
+        $row_pitch (and $slice_pitch) can be 0, in which case the OpenCL
+        module uses the image width (and height) to supply default values.
+        <http://www.khronos.org/registry/cl/sdk/1.1/docs/man/xhtml/clEnqueue
+        WriteImage.html>
+
+    $ev = $queue->copy_image ($src_image, $dst_image, $src_x, $src_y,
+    $src_z, $dst_x, $dst_y, $dst_z, $width, $height, $depth,
+    $wait_events...)
+        <http://www.khronos.org/registry/cl/sdk/1.1/docs/man/xhtml/clEnqueue
+        CopyImage.html>
+
+    $ev = $queue->copy_image_to_buffer ($src_image, $dst_image, $src_x,
+    $src_y, $src_z, $width, $height, $depth, $dst_offset, $wait_events...)
+        <http://www.khronos.org/registry/cl/sdk/1.1/docs/man/xhtml/clEnqueue
+        CopyImageToBuffer.html>
+
+    $ev = $queue->copy_buffer_rect ($src, $dst, $src_x, $src_y, $src_z,
+    $dst_x, $dst_y, $dst_z, $width, $height, $depth, $src_row_pitch,
+    $src_slice_pitch, $dst_row_pitch, $dst_slice_pitch, $wait_event...)
+        Yeah.
+
+        <http://www.khronos.org/registry/cl/sdk/1.1/docs/man/xhtml/clEnqueue
+        CopyBufferToImage.html>.
+
+    $ev = $queue->fill_buffer ($mem, $pattern, $offset, $size, ...)
+        Fills the given buffer object with repeated applications of
+        $pattern, starting at $offset for $size octets.
+
+        <http://www.khronos.org/registry/cl/sdk/1.2/docs/man/xhtml/clEnqueue
+        FillBuffer.html>
+
+    $ev = $queue->fill_image ($img, $r, $g, $b, $a, $x, $y, $z, $width,
+    $height, $depth, ...)
+        Fills the given image area with the given rgba colour components.
+        The components are normally floating point values between 0 and 1,
+        except when the image channel data type is a signe dor unsigned
+        unnormalised format, in which case the range is determined by the
+        format.
+
+        <http://www.khronos.org/registry/cl/sdk/1.2/docs/man/xhtml/clEnqueue
+        FillImage.html>
+
+    $ev = $queue->task ($kernel, $wait_events...)
+        <http://www.khronos.org/registry/cl/sdk/1.1/docs/man/xhtml/clEnqueue
+        Task.html>
+
+    $ev = $queue->nd_range_kernel ($kernel, \@global_work_offset,
+    \@global_work_size, \@local_work_size, $wait_events...)
+        Enqueues a kernel execution.
+
+        \@global_work_size must be specified as a reference to an array of
+        integers specifying the work sizes (element counts).
+
+        \@global_work_offset must be either "undef" (in which case all
+        offsets are 0), or a reference to an array of work offsets, with the
+        same number of elements as \@global_work_size.
+
+        \@local_work_size must be either "undef" (in which case the
+        implementation is supposed to choose good local work sizes), or a
+        reference to an array of local work sizes, with the same number of
+        elements as \@global_work_size.
+
+        <http://www.khronos.org/registry/cl/sdk/1.1/docs/man/xhtml/clEnqueue
+        NDRangeKernel.html>
+
+    $ev = $queue->migrate_mem_objects (\@mem_objects, $flags,
+    $wait_events...)
+        Migrates a number of OpenCL::Memory objects to or from the device.
+
+        flags: OpenCL::MIGRATE_MEM_OBJECT_HOST,
+        OpenCL::MIGRATE_MEM_OBJECT_CONTENT_UNDEFINED
+
+        <http://www.khronos.org/registry/cl/sdk/1.2/docs/man/xhtml/clEnqueue
+        MigrateMemObjects.html>
+
+    $ev = $queue->acquire_gl_objects ([object, ...], $wait_events...)
+        Enqueues a list (an array-ref of OpenCL::Memory objects) to be
+        acquired for subsequent OpenCL usage.
+
+        <http://www.khronos.org/registry/cl/sdk/1.1/docs/man/xhtml/clEnqueue
+        AcquireGLObjects.html>
+
+    $ev = $queue->release_gl_objects ([object, ...], $wait_events...)
+        Enqueues a list (an array-ref of OpenCL::Memory objects) to be
+        released for subsequent OpenGL usage.
+
+        <http://www.khronos.org/registry/cl/sdk/1.1/docs/man/xhtml/clEnqueue
+        ReleaseGLObjects.html>
+
+    $ev = $queue->wait_for_events ($wait_events...)
+        <http://www.khronos.org/registry/cl/sdk/1.1/docs/man/xhtml/clEnqueue
+        WaitForEvents.html>
+
+    $ev = $queue->marker ($wait_events...)
+        <http://www.khronos.org/registry/cl/sdk/1.2/docs/man/xhtml/clEnqueue
+        MarkerWithWaitList.html>
+
+    $ev = $queue->barrier ($wait_events...)
+        <http://www.khronos.org/registry/cl/sdk/1.2/docs/man/xhtml/clEnqueue
+        BarrierWithWaitList.html>
+
+    $queue->flush
+        <http://www.khronos.org/registry/cl/sdk/1.1/docs/man/xhtml/clFlush.h
+        tml>
+
+    $queue->finish
+        <http://www.khronos.org/registry/cl/sdk/1.1/docs/man/xhtml/clFinish.
+        html>
+
+    $packed_value = $queue->info ($name)
+        See "$platform->info" for details.
+
+        <http://www.khronos.org/registry/cl/sdk/1.1/docs/man/xhtml/clGetComm
+        andQueueInfo.html>
+
+    $ctx = $command_queue->context
+        Calls "clGetCommandQueueInfo" with "OpenCL::QUEUE_CONTEXT" and
+        returns the result.
+
+    $device = $command_queue->device
+        Calls "clGetCommandQueueInfo" with "OpenCL::QUEUE_DEVICE" and
+        returns the result.
+
+    $uint = $command_queue->reference_count
+        Calls "clGetCommandQueueInfo" with "OpenCL::QUEUE_REFERENCE_COUNT"
+        and returns the result.
+
+    $command_queue_properties = $command_queue->properties
+        Calls "clGetCommandQueueInfo" with "OpenCL::QUEUE_PROPERTIES" and
+        returns the result.
+
+   MEMORY MAPPED BUFFERS
+    OpenCL allows you to map buffers and images to host memory (read: perl
+    scalars). This is done much like reading or copying a buffer, by
+    enqueuing a map or unmap operation on the command queue.
+
+    The map operations return an "OpenCL::Mapped" object - see "THE
+    OpenCL::Mapped CLASS" section for details on what to do with these
+    objects.
+
+    The object will be unmapped automatically when the mapped object is
+    destroyed (you can use a barrier to make sure the unmap has finished,
+    before using the buffer in a kernel), but you can also enqueue an unmap
+    operation manually.
+
+    $mapped_buffer = $queue->map_buffer ($buf, $blocking=1,
+    $map_flags=OpenCL::MAP_READ|OpenCL::MAP_WRITE, $offset=0, $size=undef,
+    $wait_events...)
+        Maps the given buffer into host memory and returns an
+        "OpenCL::MappedBuffer" object. If $size is specified as undef, then
+        the map will extend to the end of the buffer.
+
+        map_flags: OpenCL::MAP_READ, OpenCL::MAP_WRITE,
+        OpenCL::MAP_WRITE_INVALIDATE_REGION.
+
+        <http://www.khronos.org/registry/cl/sdk/1.1/docs/man/xhtml/clEnqueue
+        MapBuffer.html>
+
+        Example: map the buffer $buf fully and replace the first 4 bytes by
+        "abcd", then unmap.
+
+           {
+             my $mapped = $queue->map_buffer ($buf, 1, OpenCL::MAP_WRITE);
+             substr $$mapped, 0, 4, "abcd";
+           } # asynchronously unmap because $mapped is destroyed
+
+    $mapped_image = $queue->map_image ($img, $blocking=1,
+    $map_flags=OpenCL::MAP_READ|OpenCL::MAP_WRITE, $x=0, $y=0, $z=0,
+    $width=undef, $height=undef, $depth=undef, $wait_events...)
+        Maps the given image area into host memory and return an
+        "OpenCL::MappedImage" object.
+
+        If any of $width, $height and/or $depth are "undef" then they will
+        be replaced by the maximum possible value.
+
+        <http://www.khronos.org/registry/cl/sdk/1.1/docs/man/xhtml/clEnqueue
+        MapImage.html>
+
+        Example: map an image (with OpenCL::UNSIGNED_INT8 channel type) and
+        set the first channel of the leftmost column to 5, then explicitly
+        unmap it. You are not necessarily meant to do it this way, this
+        example just shows you the accessors to use :)
+
+           my $mapped = $queue->map_image ($image, 1, OpenCL::MAP_WRITE);
+
+           $mapped->write ($_ * $mapped->row_pitch, pack "C", 5)
+              for 0 .. $mapped->height - 1;
+
+           $mapped->unmap;.
+           $mapped->wait; # only needed for out of order queues normally
+
+    $ev = $queue->unmap ($mapped, $wait_events...)
+        Unmaps the data from host memory. You must not call any methods that
+        modify the data, or modify the data scalar directly, after calling
+        this method.
+
+        The mapped event object will always be passed as part of the
+        $wait_events. The mapped event object will be replaced by the new
+        event object that this request creates.
+
+  THE OpenCL::Memory CLASS
+    This the superclass of all memory objects - OpenCL::Buffer,
+    OpenCL::Image, OpenCL::Image2D and OpenCL::Image3D.
+
+    $packed_value = $memory->info ($name)
+        See "$platform->info" for details.
+
+        <http://www.khronos.org/registry/cl/sdk/1.1/docs/man/xhtml/clGetMemO
+        bjectInfo.html>
+
+    $memory->destructor_callback ($cb->())
+        Sets a callback that will be invoked after the memory object is
+        destructed.
+
+        <http://www.khronos.org/registry/cl/sdk/1.1/docs/man/xhtml/clSetMemO
+        bjectDestructorCallback.html>
+
+    $mem_object_type = $mem->type
+        Calls "clGetMemObjectInfo" with "OpenCL::MEM_TYPE" and returns the
+        result.
+
+    $mem_flags = $mem->flags
+        Calls "clGetMemObjectInfo" with "OpenCL::MEM_FLAGS" and returns the
+        result.
+
+    $int = $mem->size
+        Calls "clGetMemObjectInfo" with "OpenCL::MEM_SIZE" and returns the
+        result.
+
+    $ptr_value = $mem->host_ptr
+        Calls "clGetMemObjectInfo" with "OpenCL::MEM_HOST_PTR" and returns
+        the result.
+
+    $uint = $mem->map_count
+        Calls "clGetMemObjectInfo" with "OpenCL::MEM_MAP_COUNT" and returns
+        the result.
+
+    $uint = $mem->reference_count
+        Calls "clGetMemObjectInfo" with "OpenCL::MEM_REFERENCE_COUNT" and
+        returns the result.
+
+    $ctx = $mem->context
+        Calls "clGetMemObjectInfo" with "OpenCL::MEM_CONTEXT" and returns
+        the result.
+
+    $mem = $mem->associated_memobject
+        Calls "clGetMemObjectInfo" with "OpenCL::MEM_ASSOCIATED_MEMOBJECT"
+        and returns the result.
+
+    $int = $mem->offset
+        Calls "clGetMemObjectInfo" with "OpenCL::MEM_OFFSET" and returns the
+        result.
+
+    ($type, $name) = $mem->gl_object_info
+        Returns the OpenGL object type (e.g. OpenCL::GL_OBJECT_TEXTURE2D)
+        and the object "name" (e.g. the texture name) used to create this
+        memory object.
+
+        <http://www.khronos.org/registry/cl/sdk/1.1/docs/man/xhtml/clGetGLOb
+        jectInfo.html>
+
+  THE OpenCL::Buffer CLASS
+    This is a subclass of OpenCL::Memory, and the superclass of
+    OpenCL::BufferObj. Its purpose is simply to distinguish between buffers
+    and sub-buffers.
+
+  THE OpenCL::BufferObj CLASS
+    This is a subclass of OpenCL::Buffer and thus OpenCL::Memory. It exists
+    because one cna create sub buffers of OpenLC::BufferObj objects, but not
+    sub buffers from these sub buffers.
+
+    $subbuf = $buf_obj->sub_buffer_region ($flags, $origin, $size)
+        Creates an OpenCL::Buffer objects from this buffer and returns it.
+        The "buffer_create_type" is assumed to be
+        "OpenCL::BUFFER_CREATE_TYPE_REGION".
+
+        <http://www.khronos.org/registry/cl/sdk/1.1/docs/man/xhtml/clCreateS
+        ubBuffer.html>
+
+  THE OpenCL::Image CLASS
+    This is the superclass of all image objects - OpenCL::Image1D,
+    OpenCL::Image1DArray, OpenCL::Image1DBuffer, OpenCL::Image2D,
+    OpenCL::Image2DArray and OpenCL::Image3D.
+
+    $packed_value = $image->image_info ($name)
+        See "$platform->info" for details.
+
+        The reason this method is not called "info" is that there already is
+        an "->info" method inherited from "OpenCL::Memory".
+
+        <http://www.khronos.org/registry/cl/sdk/1.1/docs/man/xhtml/clGetImag
+        eInfo.html>
+
+    ($channel_order, $channel_data_type) = $image->format
+        Returns the channel order and type used to create the image by
+        calling "clGetImageInfo" with "OpenCL::IMAGE_FORMAT".
+
+    $int = $image->element_size
+        Calls "clGetImageInfo" with "OpenCL::IMAGE_ELEMENT_SIZE" and returns
+        the result.
+
+    $int = $image->row_pitch
+        Calls "clGetImageInfo" with "OpenCL::IMAGE_ROW_PITCH" and returns
+        the result.
+
+    $int = $image->slice_pitch
+        Calls "clGetImageInfo" with "OpenCL::IMAGE_SLICE_PITCH" and returns
+        the result.
+
+    $int = $image->width
+        Calls "clGetImageInfo" with "OpenCL::IMAGE_WIDTH" and returns the
+        result.
+
+    $int = $image->height
+        Calls "clGetImageInfo" with "OpenCL::IMAGE_HEIGHT" and returns the
+        result.
+
+    $int = $image->depth
+        Calls "clGetImageInfo" with "OpenCL::IMAGE_DEPTH" and returns the
+        result.
+
+    $GLenum = $gl_texture->target
+        Calls "clGetGLTextureInfo" with "OpenCL::GL_TEXTURE_TARGET" and
+        returns the result.
+
+    $GLint = $gl_texture->gl_mipmap_level
+        Calls "clGetGLTextureInfo" with "OpenCL::GL_MIPMAP_LEVEL" and
+        returns the result.
+
+  THE OpenCL::Sampler CLASS
+    $packed_value = $sampler->info ($name)
+        See "$platform->info" for details.
+
+        <http://www.khronos.org/registry/cl/sdk/1.1/docs/man/xhtml/clGetSamp
+        lerInfo.html>
+
+    $uint = $sampler->reference_count
+        Calls "clGetSamplerInfo" with "OpenCL::SAMPLER_REFERENCE_COUNT" and
+        returns the result.
+
+    $ctx = $sampler->context
+        Calls "clGetSamplerInfo" with "OpenCL::SAMPLER_CONTEXT" and returns
+        the result.
+
+    $addressing_mode = $sampler->normalized_coords
+        Calls "clGetSamplerInfo" with "OpenCL::SAMPLER_NORMALIZED_COORDS"
+        and returns the result.
+
+    $filter_mode = $sampler->addressing_mode
+        Calls "clGetSamplerInfo" with "OpenCL::SAMPLER_ADDRESSING_MODE" and
+        returns the result.
+
+    $boolean = $sampler->filter_mode
+        Calls "clGetSamplerInfo" with "OpenCL::SAMPLER_FILTER_MODE" and
+        returns the result.
+
+  THE OpenCL::Program CLASS
+    $program->build (\@devices = undef, $options = "", $cb->($program) =
+    undef)
+        Tries to build the program with the given options. See also the
+        "$ctx-"build> convenience function.
+
+        If a callback is specified, then it will be called when compilation
+        is finished. Note that many OpenCL implementations block your
+        program while compiling whether you use a callback or not. See
+        "build_async" if you want to make sure the build is done in the
+        background.
+
+        Note that some OpenCL implementations act up badly, and don't call
+        the callback in some error cases (but call it in others). This
+        implementation assumes the callback will always be called, and leaks
+        memory if this is not so. So best make sure you don't pass in
+        invalid values.
+
+        Some implementations fail with "OpenCL::INVALID_BINARY" when the
+        compilation state is successful but some later stage fails.
+
+        options: "-D name", "-D name=definition", "-I dir",
+        "-cl-single-precision-constant", "-cl-denorms-are-zero",
+        "-cl-fp32-correctly-rounded-divide-sqrt", "-cl-opt-disable",
+        "-cl-mad-enable", "-cl-no-signed-zeros",
+        "-cl-unsafe-math-optimizations", "-cl-finite-math-only",
+        "-cl-fast-relaxed-math", "-w", "-Werror", "-cl-std=CL1.1/CL1.2",
+        "-cl-kernel-arg-info", "-create-library", "-enable-link-options".
+
+        build_status: OpenCL::BUILD_SUCCESS, OpenCL::BUILD_NONE,
+        OpenCL::BUILD_ERROR, OpenCL::BUILD_IN_PROGRESS.
+
+        <http://www.khronos.org/registry/cl/sdk/1.1/docs/man/xhtml/clBuildPr
+        ogram.html>
+
+    $program->build_async (\@devices = undef, $options = "", $cb->($program)
+    = undef)
+        Similar to "->build", except it starts a thread, and never fails
+        (you need to check the compilation status form the callback, or by
+        polling).
+
+    $program->compile (\@devices = undef, $options = "", \%headers = undef,
+    $cb->($program) = undef)
+        Compiles the given program for the given devices (or all devices if
+        undef). If $headers is given, it must be a hashref with include name
+        => OpenCL::Program pairs.
+
+        <http://www.khronos.org/registry/cl/sdk/1.2/docs/man/xhtml/clCompile
+        Program.html>
+
+    $packed_value = $program->build_info ($device, $name)
+        Similar to "$platform->info", but returns build info for a previous
+        build attempt for the given device.
+
+        binary_type: OpenCL::PROGRAM_BINARY_TYPE_NONE,
+        OpenCL::PROGRAM_BINARY_TYPE_COMPILED_OBJECT,
+        OpenCL::PROGRAM_BINARY_TYPE_LIBRARY,
+        OpenCL::PROGRAM_BINARY_TYPE_EXECUTABLE.
+
+        <http://www.khronos.org/registry/cl/sdk/1.1/docs/man/xhtml/clGetBuil
+        dInfo.html>
+
+    $kernel = $program->kernel ($function_name)
+        Creates an OpenCL::Kernel object out of the named "__kernel"
+        function in the program.
+
+        <http://www.khronos.org/registry/cl/sdk/1.1/docs/man/xhtml/clCreateK
+        ernel.html>
+
+    @kernels = $program->kernels_in_program
+        Returns all kernels successfully compiled for all devices in
+        program.
+
+        http://www.khronos.org/registry/cl/sdk/1.1/docs/man/xhtml/clCreateKe
+        rnelsInProgram.html
+
+    $build_status = $program->build_status ($device)
+        Calls "clGetProgramBuildInfo" with "OpenCL::PROGRAM_BUILD_STATUS"
+        and returns the result.
+
+    $string = $program->build_options ($device)
+        Calls "clGetProgramBuildInfo" with "OpenCL::PROGRAM_BUILD_OPTIONS"
+        and returns the result.
+
+    $string = $program->build_log ($device)
+        Calls "clGetProgramBuildInfo" with "OpenCL::PROGRAM_BUILD_LOG" and
+        returns the result.
+
+    $binary_type = $program->binary_type ($device)
+        Calls "clGetProgramBuildInfo" with "OpenCL::PROGRAM_BINARY_TYPE" and
+        returns the result.
+
+    $packed_value = $program->info ($name)
+        See "$platform->info" for details.
+
+        <http://www.khronos.org/registry/cl/sdk/1.1/docs/man/xhtml/clGetProg
+        ramInfo.html>
+
+    $uint = $program->reference_count
+        Calls "clGetProgramInfo" with "OpenCL::PROGRAM_REFERENCE_COUNT" and
+        returns the result.
+
+    $ctx = $program->context
+        Calls "clGetProgramInfo" with "OpenCL::PROGRAM_CONTEXT" and returns
+        the result.
+
+    $uint = $program->num_devices
+        Calls "clGetProgramInfo" with "OpenCL::PROGRAM_NUM_DEVICES" and
+        returns the result.
+
+    @devices = $program->devices
+        Calls "clGetProgramInfo" with "OpenCL::PROGRAM_DEVICES" and returns
+        the result.
+
+    $string = $program->source
+        Calls "clGetProgramInfo" with "OpenCL::PROGRAM_SOURCE" and returns
+        the result.
+
+    @ints = $program->binary_sizes
+        Calls "clGetProgramInfo" with "OpenCL::PROGRAM_BINARY_SIZES" and
+        returns the result.
+
+    @blobs = $program->binaries
+        Returns a string for the compiled binary for every device associated
+        with the program, empty strings indicate missing programs, and an
+        empty result means no program binaries are available.
+
+        These "binaries" are often, in fact, informative low-level assembly
+        sources.
+
+        <http://www.khronos.org/registry/cl/sdk/1.1/docs/man/xhtml/clGetProg
+        ramInfo.html>
+
+  THE OpenCL::Kernel CLASS
+    $packed_value = $kernel->info ($name)
+        See "$platform->info" for details.
+
+        <http://www.khronos.org/registry/cl/sdk/1.1/docs/man/xhtml/clGetKern
+        elInfo.html>
+
+    $string = $kernel->function_name
+        Calls "clGetKernelInfo" with "OpenCL::KERNEL_FUNCTION_NAME" and
+        returns the result.
+
+    $uint = $kernel->num_args
+        Calls "clGetKernelInfo" with "OpenCL::KERNEL_NUM_ARGS" and returns
+        the result.
+
+    $uint = $kernel->reference_count
+        Calls "clGetKernelInfo" with "OpenCL::KERNEL_REFERENCE_COUNT" and
+        returns the result.
+
+    $ctx = $kernel->context
+        Calls "clGetKernelInfo" with "OpenCL::KERNEL_CONTEXT" and returns
+        the result.
+
+    $program = $kernel->program
+        Calls "clGetKernelInfo" with "OpenCL::KERNEL_PROGRAM" and returns
+        the result.
+
+    $packed_value = $kernel->work_group_info ($device, $name)
+        See "$platform->info" for details.
+
+        <http://www.khronos.org/registry/cl/sdk/1.1/docs/man/xhtml/clGetKern
+        elWorkGroupInfo.html>
+
+    $int = $kernel->work_group_size ($device)
+        Calls "clGetKernelWorkGroupInfo" with
+        "OpenCL::KERNEL_WORK_GROUP_SIZE" and returns the result.
+
+    @ints = $kernel->compile_work_group_size ($device)
+        Calls "clGetKernelWorkGroupInfo" with
+        "OpenCL::KERNEL_COMPILE_WORK_GROUP_SIZE" and returns the result.
+
+    $ulong = $kernel->local_mem_size ($device)
+        Calls "clGetKernelWorkGroupInfo" with
+        "OpenCL::KERNEL_LOCAL_MEM_SIZE" and returns the result.
+
+    $int = $kernel->preferred_work_group_size_multiple ($device)
+        Calls "clGetKernelWorkGroupInfo" with
+        "OpenCL::KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE" and returns the
+        result.
+
+    $ulong = $kernel->private_mem_size ($device)
+        Calls "clGetKernelWorkGroupInfo" with
+        "OpenCL::KERNEL_PRIVATE_MEM_SIZE" and returns the result.
+
+    $packed_value = $kernel->arg_info ($idx, $name)
+        See "$platform->info" for details.
+
+        <http://www.khronos.org/registry/cl/sdk/1.2/docs/man/xhtml/clGetKern
+        elArgInfo.html>
+
+    $kernel_arg_address_qualifier = $kernel->arg_address_qualifier ($idx)
+        Calls "clGetKernelArgInfo" with
+        "OpenCL::KERNEL_ARG_ADDRESS_QUALIFIER" and returns the result.
+
+    $kernel_arg_access_qualifier = $kernel->arg_access_qualifier ($idx)
+        Calls "clGetKernelArgInfo" with
+        "OpenCL::KERNEL_ARG_ACCESS_QUALIFIER" and returns the result.
+
+    $string = $kernel->arg_type_name ($idx)
+        Calls "clGetKernelArgInfo" with "OpenCL::KERNEL_ARG_TYPE_NAME" and
+        returns the result.
+
+    $kernel_arg_type_qualifier = $kernel->arg_type_qualifier ($idx)
+        Calls "clGetKernelArgInfo" with "OpenCL::KERNEL_ARG_TYPE_QUALIFIER"
+        and returns the result.
+
+    $string = $kernel->arg_name ($idx)
+        Calls "clGetKernelArgInfo" with "OpenCL::KERNEL_ARG_NAME" and
+        returns the result.
+
+    $kernel->setf ($format, ...)
+        Sets the arguments of a kernel. Since OpenCL 1.1 doesn't have a
+        generic way to set arguments (and with OpenCL 1.2 it might be rather
+        slow), you need to specify a format argument, much as with "printf",
+        to tell OpenCL what type of argument it is.
+
+        The format arguments are single letters:
+
+           c   char
+           C   unsigned char
+           s   short
+           S   unsigned short
+           i   int
+           I   unsigned int
+           l   long
+           L   unsigned long
+
+           h   half float (0..65535)
+           f   float
+           d   double
+
+           z   local (octet size)
+
+           m   memory object (buffer or image)
+           a   sampler
+           e   event
+
+        Space characters in the format string are ignored.
+
+        Example: set the arguments for a kernel that expects an int, two
+        floats, a buffer and an image.
+
+           $kernel->setf ("i ff mm", 5, 0.5, 3, $buffer, $image);
+
+    $kernel->set_TYPE ($index, $value)
+    $kernel->set_char ($index, $value)
+    $kernel->set_uchar ($index, $value)
+    $kernel->set_short ($index, $value)
+    $kernel->set_ushort ($index, $value)
+    $kernel->set_int ($index, $value)
+    $kernel->set_uint ($index, $value)
+    $kernel->set_long ($index, $value)
+    $kernel->set_ulong ($index, $value)
+    $kernel->set_half ($index, $value)
+    $kernel->set_float ($index, $value)
+    $kernel->set_double ($index, $value)
+    $kernel->set_memory ($index, $value)
+    $kernel->set_buffer ($index, $value)
+    $kernel->set_image ($index, $value)
+    $kernel->set_sampler ($index, $value)
+    $kernel->set_local ($index, $value)
+    $kernel->set_event ($index, $value)
+        This is a family of methods to set the kernel argument with the
+        number $index to the give $value.
+
+        Chars and integers (including the half type) are specified as
+        integers, float and double as floating point values,
+        memory/buffer/image must be an object of that type or "undef",
+        local-memory arguments are set by specifying the size, and sampler
+        and event must be objects of that type.
+
+        Note that "set_memory" works for all memory objects (all types of
+        buffers and images) - the main purpose of the more specific
+        "set_TYPE" functions is type checking.
+
+        Setting an argument for a kernel does NOT keep a reference to the
+        object - for example, if you set an argument to some image object,
+        free the image, and call the kernel, you will run into undefined
+        behaviour.
+
+        <http://www.khronos.org/registry/cl/sdk/1.1/docs/man/xhtml/clSetKern
+        elArg.html>
+
+  THE OpenCL::Event CLASS
+    This is the superclass for all event objects (including
+    OpenCL::UserEvent objects).
+
+    $ev->wait
+        Waits for the event to complete.
+
+        <http://www.khronos.org/registry/cl/sdk/1.1/docs/man/xhtml/clWaitFor
+        Events.html>
+
+    $ev->cb ($exec_callback_type, $callback->($event,
+    $event_command_exec_status))
+        Adds a callback to the callback stack for the given event type.
+        There is no way to remove a callback again.
+
+        <http://www.khronos.org/registry/cl/sdk/1.1/docs/man/xhtml/clSetEven
+        tCallback.html>
+
+    $packed_value = $ev->info ($name)
+        See "$platform->info" for details.
+
+        <http://www.khronos.org/registry/cl/sdk/1.1/docs/man/xhtml/clGetEven
+        tInfo.html>
+
+    $queue = $event->command_queue
+        Calls "clGetEventInfo" with "OpenCL::EVENT_COMMAND_QUEUE" and
+        returns the result.
+
+    $command_type = $event->command_type
+        Calls "clGetEventInfo" with "OpenCL::EVENT_COMMAND_TYPE" and returns
+        the result.
+
+    $uint = $event->reference_count
+        Calls "clGetEventInfo" with "OpenCL::EVENT_REFERENCE_COUNT" and
+        returns the result.
+
+    $uint = $event->command_execution_status
+        Calls "clGetEventInfo" with "OpenCL::EVENT_COMMAND_EXECUTION_STATUS"
+        and returns the result.
+
+    $ctx = $event->context
+        Calls "clGetEventInfo" with "OpenCL::EVENT_CONTEXT" and returns the
+        result.
+
+    $packed_value = $ev->profiling_info ($name)
+        See "$platform->info" for details.
+
+        The reason this method is not called "info" is that there already is
+        an "->info" method.
+
+        <http://www.khronos.org/registry/cl/sdk/1.1/docs/man/xhtml/clGetProf
+        ilingInfo.html>
+
+    $ulong = $event->profiling_command_queued
+        Calls "clGetEventProfilingInfo" with
+        "OpenCL::PROFILING_COMMAND_QUEUED" and returns the result.
+
+    $ulong = $event->profiling_command_submit
+        Calls "clGetEventProfilingInfo" with
+        "OpenCL::PROFILING_COMMAND_SUBMIT" and returns the result.
+
+    $ulong = $event->profiling_command_start
+        Calls "clGetEventProfilingInfo" with
+        "OpenCL::PROFILING_COMMAND_START" and returns the result.
+
+    $ulong = $event->profiling_command_end
+        Calls "clGetEventProfilingInfo" with "OpenCL::PROFILING_COMMAND_END"
+        and returns the result.
+
+  THE OpenCL::UserEvent CLASS
+    This is a subclass of OpenCL::Event.
+
+    $ev->set_status ($execution_status)
+        Sets the execution status of the user event. Can only be called
+        once, either with OpenCL::COMPLETE or a negative number as status.
+
+        execution_status: OpenCL::COMPLETE or a negative integer.
+
+        <http://www.khronos.org/registry/cl/sdk/1.1/docs/man/xhtml/clSetUser
+        EventStatus.html>
+
+  THE OpenCL::Mapped CLASS
+    This class represents objects mapped into host memory. They are
+    represented by a blessed string scalar. The string data is the mapped
+    memory area, that is, if you read or write it, then the mapped object is
+    accessed directly.
+
+    You must only ever use operations that modify the string in-place - for
+    example, a "substr" that doesn't change the length, or maybe a regex
+    that doesn't change the length. Any other operation might cause the data
+    to be copied.
+
+    When the object is destroyed it will enqueue an implicit unmap operation
+    on the queue that was used to create it.
+
+    Keep in mind that you *need* to unmap (or destroy) mapped objects before
+    OpenCL sees the changes, even if some implementations don't need this
+    sometimes.
+
+    Example, replace the first two floats in the mapped buffer by 1 and 2.
+
+       my $mapped = $queue->map_buffer ($buf, ...
+       $mapped->event->wait; # make sure it's there
+
+       # now replace first 8 bytes by new data, which is exactly 8 bytes long
+       # we blindly assume device endianness to equal host endianness
+       # (and of course, we assume iee 754 single precision floats :)
+       substr $$mapped, 0, 8, pack "f*", 1, 2;
+
+    $ev = $mapped->unmap ($wait_events...)
+        Unmaps the mapped memory object, using the queue originally used to
+        create it, quite similarly to "$queue->unmap ($mapped, ...)".
+
+    $bool = $mapped->mapped
+        Returns whether the object is still mapped - true before an "unmap"
+        is enqueued, false afterwards.
+
+    $ev = $mapped->event
+        Return the event object associated with the mapped object.
+        Initially, this will be the event object created when mapping the
+        object, and after an unmap, this will be the event object that the
+        unmap operation created.
+
+    $mapped->wait
+        Same as "$mapped->event->wait" - makes sure no operations on this
+        mapped object are outstanding.
+
+    $bytes = $mapped->size
+        Returns the size of the mapped area, in bytes. Same as "length
+        $$mapped".
+
+    $ptr = $mapped->ptr
+        Returns the raw memory address of the mapped area.
+
+    $mapped->set ($offset, $data)
+        Replaces the data at the given $offset in the memory area by the new
+        $data. This method is safer than direct manipulation of $mapped
+        because it does bounds-checking, but also slower.
+
+    $data = $mapped->get ($offset, $length)
+        Returns (without copying) a scalar representing the data at the
+        given $offset and $length in the mapped memory area. This is the
+        same as the following substr, except much slower;
+
+           $data = substr $$mapped, $offset, $length
+
+  THE OpenCL::MappedBuffer CLASS
+    This is a subclass of OpenCL::Mapped, representing mapped buffers.
+
+  THE OpenCL::MappedImage CLASS
+    This is a subclass of OpenCL::Mapped, representing mapped images.
+
+    $pixels = $mapped->width
+    $pixels = $mapped->height
+    $pixels = $mapped->depth
+        Return the width/height/depth of the mapped image region, in pixels.
+
+    $bytes = $mapped->row_pitch
+    $bytes = $mapped->slice_pitch
+        Return the row or slice pitch of the image that has been mapped.
+
+    $bytes = $mapped->element_size
+        Return the size of a single pixel.
+
+    $data = $mapped->get_row ($count, $x=0, $y=0, $z=0)
+        Return $count pixels from the given coordinates. The pixel data must
+        be completely contained within a single row.
+
+        If $count is "undef", then all the remaining pixels in that row are
+        returned.
+
+    $mapped->set_row ($data, $x=0, $y=0, $z=0)
+        Write the given pixel data at the given coordinate. The pixel data
+        must be completely contained within a single row.
+
+AUTHOR
+     Marc Lehmann <schmorp@schmorp.de>
+     http://home.schmorp.de/
+

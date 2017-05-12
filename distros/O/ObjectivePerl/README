@@ -1,0 +1,51 @@
+ObjectivePerl version 0.04
+==========================
+Changes in version 0.04:
+* Fixed the commenting-out bug
+* Fixed the docs to explain message-passing
+  correctly (since the new CamelBones compatibility
+  mode added a new message-signature test)
+
+Changes in version 0.03:
+* Added a debug mode with flags to allow debugging
+  of messaging and/or source filtering
+* Added CamelBones compatibility
+* Added return types and argument types (optional, but required
+  for CamelBones compatibility)
+* Fixed many parsing and messaging bugs
+
+ObjectivePerl version 0.01
+==========================
+
+ObjectivePerl is an extension to perl (written entirely
+in perl) that allows programmers to use a variant of
+Objective-C syntax in perl modules.  It allows:
+* very clean class definitions
+* true instance variables
+* advanced message signatures and argument passing
+* instance/class method specification
+If you're not interested in any of those things, don't
+use ObjectivePerl!  But if you are, go right ahead...
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Filter::Simple
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 kyle dawkins, central park software
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 

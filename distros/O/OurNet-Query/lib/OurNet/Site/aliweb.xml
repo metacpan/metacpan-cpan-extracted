@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<SITE ID="Aliweb">
+
+<NAME Lang="en-us">ALIWEB Search</NAME>
+<INFO Lang="en-us">general information web search</INFO>
+
+<URL Type="Start"><![CDATA[
+http://www.nexor.com/public/aliweb/search/cgi-bin/form?query=_QUERY_&searchtype=Substring&types=Any&titlefield=on&descriptionfield=on&keywordfield=on&showdescription=on&showurl=on&domain=&hits=_HITS_
+]]></URL>
+
+
+
+<TEMPLATE><![CDATA[
+<DT>___<A HREF="_URL_">_TITLE_</A>___<DD>_PREVIEW_<br>
+]]></TEMPLATE>
+</SITE>

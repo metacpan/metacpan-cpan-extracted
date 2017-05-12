@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<SITE ID="Ms.WWW">
+
+<NAME Lang="en-us">MSN Internet Search</NAME>
+<INFO Lang="en-us">general information web search</INFO>
+
+<URL Type="More"><![CDATA[
+http://search.msn.com/_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://search.msn.com/results.asp?MT=_QUERY_&RS=CHECKED&CO=_HITS_&UN=doc&Form=Basic
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_NEXT_"><![CDATA[
+href='_NEXT_'>next
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+.</b> </SPAN>___' HREF="_URL_">_TITLE_</A>___clsResultAb'>_PREVIEW_</SPAN>
+]]></TEMPLATE>
+</SITE>

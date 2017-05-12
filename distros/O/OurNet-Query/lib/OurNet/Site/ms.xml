@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<SITE ID="Ms">
+
+<NAME Lang="en-us">Microsoft Search</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+微軟網站搜尋(英文)
+]]></NAME>
+<INFO Lang="en-us">MS relevant information search</INFO>
+<INFO Lang="zh-tw">MS relevant information search</INFO>
+
+<URL Type="More"><![CDATA[
+http://search.microsoft.com/results.asp?SearchString=_QUERY_&Boolean=BOOLEAN&intCat=10&SPath=&SName=&pg=_START_1_1_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://search.microsoft.com/results.asp?SearchString=_QUERY_&Boolean=BOOLEAN&intCat=10&SPath=&SName=&pg=1
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+<EXPRESSION>Standard</EXPRESSION>
+<CATEGORY>WWW,Computer</CATEGORY>
+
+
+<TEMPLATE><![CDATA[
+<a href="_URL_">_TITLE_</a>___Excerpt from this page:_PREVIEW_<BR>___</tr>
+]]></TEMPLATE>
+</SITE>

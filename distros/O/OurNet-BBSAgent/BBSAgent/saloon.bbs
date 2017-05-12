@@ -1,0 +1,51 @@
+# $File: //depot/OurNet-BBSAgent/BBSAgent/saloon.bbs $ $Author: autrijus $
+# $Revision: #4 $ $Change: 3252 $ $DateTime: 2002/02/25 09:51:34 $
+# Contributed by Anonymous User
+# zh_TW.Big5: 煮酒論英雄茶棧
+
+Saloon
+saloon.twbbs.org
+
+load maple2.board
+setv postsign 1
+setv cursor →
+setv pager	呼叫器
+
+=login
+wait 代號：
+send $[username]\n
+send $[password]\n
+send n\nq\x20q\x20q\x20q\x20q
+goto main
+
+=main
+send \e[D\e[D\e[D\e[D\e[D\e[D
+wait 茶棧菜單
+till $[pager]
+
+=board
+send s
+wait 名稱
+send $[board]\n\x20\x20
+wait 板主：
+till 進階指令
+
+=board_article_fetch_last
+send qq
+wait 進階指令
+exit
+
+=board_list_author
+call board $[board]
+send a$[author]\n
+wait $[cursor]
+till 進階指令
+exit
+
+=article_edit_author
+send \x24E\x19\x19\x19\x19
+# 1 empty 2 from 3 origin 4 --
+send \x14\x19\x19
+send \x18\n
+wait 進階指令
+exit

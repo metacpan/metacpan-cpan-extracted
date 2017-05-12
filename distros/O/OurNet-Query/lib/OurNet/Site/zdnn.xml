@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<SITE ID="Zdnn">
+
+<NAME Lang="en-us">ZDN News</NAME>
+<INFO Lang="en-us">daily news search</INFO>
+
+<URL Type="More"><![CDATA[
+http://xlink.zdnet.com_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+post://xlink.zdnet.com/cgi-bin/texis/xlink/xlink/search.html?Uref=ZDNN&Utext=_QUERY_&Uat=&Uch=ZDNN&Utqt=and&Utype=D&Udat=All&Udn=1&Udt=month&Usm=03&Usd=27&Usy=1998&Uem=03&Ued=27&Uey=1998&Unbr=10&Urt=D&x=25&y=13
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+<EXPRESSION>Standard</EXPRESSION>
+
+<VAR Name="_NEXT_"><![CDATA[
+Get results <A HREF=_NEXT_>
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<td align=left bgcolor=#FFFF___<a href="_URL_"___">_TITLE_</a>___&nbsp;--&nbsp;_PREVIEW_<br>___[ZDNN, _DATE_]</b>___</tr>
+]]></TEMPLATE>
+</SITE>

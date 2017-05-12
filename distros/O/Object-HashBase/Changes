@@ -1,0 +1,23 @@
+0.005     2017-02-10 21:46:32-08:00 America/Los_Angeles
+
+    - Spelling fix in POD
+
+0.004     2017-02-09 20:40:37-08:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Add ability to get a list of attributes
+    - Add hashref and arrayref constructors
+    - Cache $class->can('init') for Test2 performance
+    - Add docs for deprecated and read-only setters
+    - Better inline tokens, do not rely on VERSION
+
+0.003     2016-12-10 21:50:47-08:00 America/Los_Angeles
+
+    - Do not use autoload
+
+0.002     2016-12-09 12:48:28-08:00 America/Los_Angeles
+
+    - Fix test packages
+
+0.001     2016-12-09 12:43:01-08:00 America/Los_Angeles
+
+    - Initial Release

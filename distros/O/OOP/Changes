@@ -1,0 +1,29 @@
+Revision history for Perl extension OOP.
+
+Version 1.01
+------------
+This version fixes two serious bugs that made it a little difficult to
+work with OOP.
+
+One of the fixes covers the addition of exists() support for data
+structures used as parameters. Until now it was not possible to check
+whether or not an element existed in a hash. This fixes it.
+
+The second bug relates to the writeAccess property in a hash context.
+Until now the writeAccess property would be effective only to the 
+elements created (in which case anything was possible).  Now it 
+properly checks the parent structure to see what properties to take on.
+
+Version 1.00
+------------
+The first release of the OOP module handles properties that are passed
+to the constructor of any module.  It permits a developer to define
+various rules these properties have to follow in order for the custom
+module to function.  Thus, if a developer distributes a module he or she
+can now rest easy that the intended parameters are passed along with
+proper values before the modules can be used.
+
+No other functionality is added as this release serves more of a
+foundation for things to come.  I'm taking baby steps here.  Suggestions
+are welcome!
+

@@ -1,0 +1,45 @@
+#!/nw/dev/u/bin/perl -w
+
+use strict;
+use ObjStore ':ADV';
+use Getopt::Long;
+
+sub usage {
+    print "usage: osp_hack (dump|destory) db segment\n";
+    exit;
+}
+
+my %opt;
+#GetOptions(\%opt, 'segment=i');
+&usage if @ARGV != 3;
+
+my $cmd = shift @ARGV;
+my $path = shift @ARGV;
+my $seg = shift @ARGV;
+
+if ($cmd eq 'dump') {
+    my $db = ObjStore::open($path, 'mvcc');
+    begin sub {
+	my $s = $db->get_segment($seg);
+	die "Database $path doesn't contain segment $seg" if !$s;
+	my $c = $s->new_cursor;
+	my $xx=0;
+	for ($c->first; $c->more; $c->next) {
+	    my $str = $c->current(1);
+	    my @junk = unpack("c*", $str);
+	    print "[$xx]\n";
+	    print join(" ", @junk)."\n";
+	    print join(" ", map { chr } @junk)."\n";
+	    $xx++;
+	}
+    };
+} elsif ($cmd eq 'destroy') {
+    my $db = ObjStore::open($path, 'update');
+    begin 'update', sub {
+	my $s = $db->get_segment($seg);
+	die "Database $path doesn't contain segment $seg" if !$s;
+	$s->_destroy;
+    };
+} else {
+    &usage;
+}

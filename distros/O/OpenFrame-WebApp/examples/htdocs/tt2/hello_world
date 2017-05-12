@@ -1,0 +1,14 @@
+<html>
+  <head>
+    <title>OpenFrame-WebApp TT2 Example</title>
+  </head>
+  <body>
+    <h1>Hello World!</h1>
+
+    This page was rendered with
+    <a href="http://search.cpan.org/author/ABW/Template-Toolkit">Template::Toolkit</a>.
+
+    [% INCLUDE 'htdocs/tt2/footer' %]
+
+  </body>
+</html>

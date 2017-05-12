@@ -1,0 +1,669 @@
+
+                Summary Net Link States (Area 23.0.0.0)
+
+LS age: 536
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Network)
+Link State ID: 172.19.5.0 (Network ID)
+Advertising Router: 172.16.0.47
+LS Seq Number: 0x80000323
+Checksum: 0x76f9
+Length: 28
+Network Mask: 255.255.255.0
+Metric: 23
+
+LS age: 312
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Network)
+Link State ID: 172.19.5.0 (Network ID)
+Advertising Router: 172.16.0.48
+LS Seq Number: 0x80000077
+Checksum: 0xb26e
+Length: 28
+Network Mask: 255.255.255.0
+Metric: 20
+
+LS age: 536
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Network)
+Link State ID: 172.19.6.0 (Network ID)
+Advertising Router: 172.16.0.47
+LS Seq Number: 0x80000323
+Checksum: 0xcf95
+Length: 28
+Network Mask: 255.255.255.0
+Metric: 33
+
+LS age: 312
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Network)
+Link State ID: 172.19.6.0 (Network ID)
+Advertising Router: 172.16.0.48
+LS Seq Number: 0x80000077
+Checksum: 0xa778
+Length: 28
+Network Mask: 255.255.255.0
+Metric: 20
+
+LS age: 536
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Network)
+Link State ID: 172.19.7.0 (Network ID)
+Advertising Router: 172.16.0.47
+LS Seq Number: 0x80000323
+Checksum: 0xc49f
+Length: 28
+Network Mask: 255.255.255.0
+Metric: 33
+
+LS age: 312
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Network)
+Link State ID: 172.19.7.0 (Network ID)
+Advertising Router: 172.16.0.48
+LS Seq Number: 0x800014c1
+Checksum: 0xcbf4
+Length: 28
+Network Mask: 255.255.255.0
+Metric: 20
+
+LS age: 536
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Network)
+Link State ID: 172.19.8.0 (Network ID)
+Advertising Router: 172.16.0.47
+LS Seq Number: 0x80000323
+Checksum: 0xb9a9
+Length: 28
+Network Mask: 255.255.255.0
+Metric: 33
+
+LS age: 312
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Network)
+Link State ID: 172.19.8.0 (Network ID)
+Advertising Router: 172.16.0.48
+LS Seq Number: 0x80000077
+Checksum: 0x918c
+Length: 28
+Network Mask: 255.255.255.0
+Metric: 20
+
+LS age: 311
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Network)
+Link State ID: 172.19.30.0 (Network ID)
+Advertising Router: 172.16.0.47
+LS Seq Number: 0x80000077
+Checksum: 0x8b66
+Length: 28
+Network Mask: 255.255.255.0
+Metric: 43
+
+LS age: 311
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Network)
+Link State ID: 172.19.171.0 (Network ID)
+Advertising Router: 172.16.0.47
+LS Seq Number: 0x80000077
+Checksum: 0x76ed
+Length: 28
+Network Mask: 255.255.255.0
+Metric: 43
+
+LS age: 1541
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Network)
+Link State ID: 172.19.171.0 (Network ID)
+Advertising Router: 172.16.0.48
+LS Seq Number: 0x80000ec0
+Checksum: 0x68c4
+Length: 28
+Network Mask: 255.255.255.0
+Metric: 10
+
+LS age: 311
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Network)
+Link State ID: 172.19.180.0 (Network ID)
+Advertising Router: 172.16.0.47
+LS Seq Number: 0x80000077
+Checksum: 0x1348
+Length: 28
+Network Mask: 255.255.255.0
+Metric: 43
+
+LS age: 311
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Network)
+Link State ID: 172.19.195.0 (Network ID)
+Advertising Router: 172.16.0.47
+LS Seq Number: 0x80000077
+Checksum: 0x074f
+Length: 28
+Network Mask: 255.255.255.0
+Metric: 65568
+
+LS age: 1538
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Network)
+Link State ID: 172.19.195.0 (Network ID)
+Advertising Router: 172.16.0.48
+LS Seq Number: 0x80000ecc
+Checksum: 0x45c3
+Length: 28
+Network Mask: 255.255.255.0
+Metric: 65545
+
+LS age: 311
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Network)
+Link State ID: 172.19.198.0 (Network ID)
+Advertising Router: 172.16.0.47
+LS Seq Number: 0x80000077
+Checksum: 0x4cfc
+Length: 28
+Network Mask: 255.255.255.0
+Metric: 43
+
+LS age: 1553
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Network)
+Link State ID: 172.19.198.0 (Network ID)
+Advertising Router: 172.16.0.48
+LS Seq Number: 0x800002eb
+Checksum: 0x7078
+Length: 28
+Network Mask: 255.255.255.0
+Metric: 20
+
+LS age: 311
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Network)
+Link State ID: 172.19.206.0 (Network ID)
+Advertising Router: 172.16.0.47
+LS Seq Number: 0x80000077
+Checksum: 0x8dbd
+Length: 28
+Network Mask: 255.255.255.0
+Metric: 65568
+
+LS age: 1541
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Network)
+Link State ID: 172.19.206.0 (Network ID)
+Advertising Router: 172.16.0.48
+LS Seq Number: 0x80000ebf
+Checksum: 0xe525
+Length: 28
+Network Mask: 255.255.255.0
+Metric: 65545
+
+LS age: 308
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Network)
+Link State ID: 172.19.218.0 (Network ID)
+Advertising Router: 172.16.0.47
+LS Seq Number: 0x80000077
+Checksum: 0x6fc5
+Length: 28
+Network Mask: 255.255.255.0
+Metric: 43
+
+LS age: 311
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Network)
+Link State ID: 172.19.222.0 (Network ID)
+Advertising Router: 172.16.0.47
+LS Seq Number: 0x80000077
+Checksum: 0xdc5e
+Length: 28
+Network Mask: 255.255.255.0
+Metric: 65568
+
+LS age: 1538
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Network)
+Link State ID: 172.19.222.0 (Network ID)
+Advertising Router: 172.16.0.48
+LS Seq Number: 0x80000ecb
+Checksum: 0x1dd1
+Length: 28
+Network Mask: 255.255.255.0
+Metric: 65545
+
+LS age: 312
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Network)
+Link State ID: 172.20.0.0 (Network ID)
+Advertising Router: 172.16.0.47
+LS Seq Number: 0x80000077
+Checksum: 0x66b2
+Length: 28
+Network Mask: 255.255.255.0
+Metric: 33
+
+LS age: 1546
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Network)
+Link State ID: 172.20.0.0 (Network ID)
+Advertising Router: 172.16.0.48
+LS Seq Number: 0x80001430
+Checksum: 0xcb96
+Length: 28
+Network Mask: 255.255.255.0
+Metric: 10
+
+LS age: 536
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Network)
+Link State ID: 172.22.5.0 (Network ID)
+Advertising Router: 172.16.0.47
+LS Seq Number: 0x80000323
+Checksum: 0xcfaa
+Length: 28
+Network Mask: 255.255.255.0
+Metric: 10
+
+LS age: 312
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Network)
+Link State ID: 172.22.5.0 (Network ID)
+Advertising Router: 172.16.0.48
+LS Seq Number: 0x80000077
+Checksum: 0x11ff
+Length: 28
+Network Mask: 255.255.255.0
+Metric: 33
+
+LS age: 536
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Network)
+Link State ID: 172.31.5.0 (Network ID)
+Advertising Router: 172.16.0.47
+LS Seq Number: 0x80000323
+Checksum: 0x6d03
+Length: 28
+Network Mask: 255.255.255.0
+Metric: 11
+
+LS age: 312
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Network)
+Link State ID: 172.31.5.0 (Network ID)
+Advertising Router: 172.16.0.48
+LS Seq Number: 0x80000077
+Checksum: 0x2ce7
+Length: 28
+Network Mask: 255.255.255.0
+Metric: 21
+
+LS age: 311
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Network)
+Link State ID: 172.31.8.0 (Network ID)
+Advertising Router: 172.16.0.47
+LS Seq Number: 0x80000077
+Checksum: 0xaf52
+Length: 28
+Network Mask: 255.255.255.0
+Metric: 65572
+
+LS age: 1464
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Network)
+Link State ID: 172.31.8.0 (Network ID)
+Advertising Router: 172.16.0.48
+LS Seq Number: 0x800000a0
+Checksum: 0x707e
+Length: 28
+Network Mask: 255.255.255.0
+Metric: 65549
+
+LS age: 433
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Network)
+Link State ID: 172.31.206.0 (Network ID)
+Advertising Router: 172.16.0.47
+LS Seq Number: 0x8000003f
+Checksum: 0x77fe
+Length: 28
+Network Mask: 255.255.255.0
+Metric: 65569
+
+LS age: 434
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Network)
+Link State ID: 172.31.206.0 (Network ID)
+Advertising Router: 172.16.0.48
+LS Seq Number: 0x8000003f
+Checksum: 0x8a02
+Length: 28
+Network Mask: 255.255.255.0
+Metric: 65546
+
+LS age: 1416
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Network)
+Link State ID: 172.31.207.0 (Network ID)
+Advertising Router: 172.16.0.47
+LS Seq Number: 0x80000041
+Checksum: 0x72ff
+Length: 28
+Network Mask: 255.255.255.0
+Metric: 65570
+
+LS age: 1416
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Network)
+Link State ID: 172.31.207.0 (Network ID)
+Advertising Router: 172.16.0.48
+LS Seq Number: 0x80000041
+Checksum: 0x8503
+Length: 28
+Network Mask: 255.255.255.0
+Metric: 65547
+
+LS age: 311
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Network)
+Link State ID: 172.85.7.0 (Network ID)
+Advertising Router: 172.16.0.47
+LS Seq Number: 0x80000077
+Checksum: 0xa818
+Length: 28
+Network Mask: 255.255.255.0
+Metric: 65584
+
+LS age: 1464
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Network)
+Link State ID: 172.85.7.0 (Network ID)
+Advertising Router: 172.16.0.48
+LS Seq Number: 0x800000a0
+Checksum: 0x6944
+Length: 28
+Network Mask: 255.255.255.0
+Metric: 65561
+
+LS age: 311
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Network)
+Link State ID: 172.87.7.0 (Network ID)
+Advertising Router: 172.16.0.47
+LS Seq Number: 0x80000077
+Checksum: 0x902e
+Length: 28
+Network Mask: 255.255.255.0
+Metric: 65584
+
+LS age: 1464
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Network)
+Link State ID: 172.87.7.0 (Network ID)
+Advertising Router: 172.16.0.48
+LS Seq Number: 0x800000a0
+Checksum: 0x515a
+Length: 28
+Network Mask: 255.255.255.0
+Metric: 65561
+
+LS age: 536
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Network)
+Link State ID: 192.168.0.0 (Network ID)
+Advertising Router: 172.16.0.47
+LS Seq Number: 0x80000323
+Checksum: 0xa526
+Length: 28
+Network Mask: 255.255.255.0
+Metric: 23
+
+LS age: 312
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Network)
+Link State ID: 192.168.0.0 (Network ID)
+Advertising Router: 172.16.0.48
+LS Seq Number: 0x80000077
+Checksum: 0x640b
+Length: 28
+Network Mask: 255.255.255.0
+Metric: 33
+
+
+                Summary Net Link States (Area 0.0.0.0)
+
+LS age: 716
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Network)
+Link State ID: 172.17.2.0 (Network ID)
+Advertising Router: 172.16.0.48
+LS Seq Number: 0x80000323
+Checksum: 0x275a
+Length: 28
+Network Mask: 255.255.255.0
+Metric: 10
+
+LS age: 312
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Network)
+Link State ID: 172.19.5.0 (Network ID)
+Advertising Router: 172.16.0.48
+LS Seq Number: 0x80000077
+Checksum: 0xb26e
+Length: 28
+Network Mask: 255.255.255.0
+Metric: 20
+
+LS age: 312
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Network)
+Link State ID: 172.19.6.0 (Network ID)
+Advertising Router: 172.16.0.48
+LS Seq Number: 0x80000077
+Checksum: 0xa778
+Length: 28
+Network Mask: 255.255.255.0
+Metric: 20
+
+LS age: 312
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Network)
+Link State ID: 172.19.7.0 (Network ID)
+Advertising Router: 172.16.0.48
+LS Seq Number: 0x800014c1
+Checksum: 0xcbf4
+Length: 28
+Network Mask: 255.255.255.0
+Metric: 20
+
+LS age: 312
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Network)
+Link State ID: 172.19.8.0 (Network ID)
+Advertising Router: 172.16.0.48
+LS Seq Number: 0x80000077
+Checksum: 0x918c
+Length: 28
+Network Mask: 255.255.255.0
+Metric: 20
+
+LS age: 1541
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Network)
+Link State ID: 172.19.171.0 (Network ID)
+Advertising Router: 172.16.0.48
+LS Seq Number: 0x80000ec1
+Checksum: 0x66c5
+Length: 28
+Network Mask: 255.255.255.0
+Metric: 10
+
+LS age: 1538
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Network)
+Link State ID: 172.19.195.0 (Network ID)
+Advertising Router: 172.16.0.48
+LS Seq Number: 0x80000ecc
+Checksum: 0x45c3
+Length: 28
+Network Mask: 255.255.255.0
+Metric: 65545
+
+LS age: 1553
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Network)
+Link State ID: 172.19.198.0 (Network ID)
+Advertising Router: 172.16.0.48
+LS Seq Number: 0x80000683
+Checksum: 0x3518
+Length: 28
+Network Mask: 255.255.255.0
+Metric: 20
+
+LS age: 1541
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Network)
+Link State ID: 172.19.206.0 (Network ID)
+Advertising Router: 172.16.0.48
+LS Seq Number: 0x80000ebf
+Checksum: 0xe525
+Length: 28
+Network Mask: 255.255.255.0
+Metric: 65545
+
+LS age: 1538
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Network)
+Link State ID: 172.19.222.0 (Network ID)
+Advertising Router: 172.16.0.48
+LS Seq Number: 0x80000ecb
+Checksum: 0x1dd1
+Length: 28
+Network Mask: 255.255.255.0
+Metric: 65545
+
+LS age: 1546
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Network)
+Link State ID: 172.20.0.0 (Network ID)
+Advertising Router: 172.16.0.48
+LS Seq Number: 0x80001430
+Checksum: 0xcb96
+Length: 28
+Network Mask: 255.255.255.0
+Metric: 10
+
+LS age: 312
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Network)
+Link State ID: 172.22.5.0 (Network ID)
+Advertising Router: 172.16.0.48
+LS Seq Number: 0x80000077
+Checksum: 0x11ff
+Length: 28
+Network Mask: 255.255.255.0
+Metric: 33
+
+LS age: 312
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Network)
+Link State ID: 172.31.5.0 (Network ID)
+Advertising Router: 172.16.0.48
+LS Seq Number: 0x80000077
+Checksum: 0x2ce7
+Length: 28
+Network Mask: 255.255.255.0
+Metric: 21
+
+LS age: 1464
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Network)
+Link State ID: 172.31.8.0 (Network ID)
+Advertising Router: 172.16.0.48
+LS Seq Number: 0x800000a0
+Checksum: 0x707e
+Length: 28
+Network Mask: 255.255.255.0
+Metric: 65549
+
+LS age: 434
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Network)
+Link State ID: 172.31.206.0 (Network ID)
+Advertising Router: 172.16.0.48
+LS Seq Number: 0x8000003f
+Checksum: 0x8a02
+Length: 28
+Network Mask: 255.255.255.0
+Metric: 65546
+
+LS age: 1416
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Network)
+Link State ID: 172.31.207.0 (Network ID)
+Advertising Router: 172.16.0.48
+LS Seq Number: 0x80000041
+Checksum: 0x8503
+Length: 28
+Network Mask: 255.255.255.0
+Metric: 65547
+
+LS age: 1464
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Network)
+Link State ID: 172.85.7.0 (Network ID)
+Advertising Router: 172.16.0.48
+LS Seq Number: 0x800000a0
+Checksum: 0x6944
+Length: 28
+Network Mask: 255.255.255.0
+Metric: 65561
+
+LS age: 1464
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Network)
+Link State ID: 172.87.7.0 (Network ID)
+Advertising Router: 172.16.0.48
+LS Seq Number: 0x800000a0
+Checksum: 0x515a
+Length: 28
+Network Mask: 255.255.255.0
+Metric: 65561
+
+LS age: 312
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Network)
+Link State ID: 192.168.0.0 (Network ID)
+Advertising Router: 172.16.0.48
+LS Seq Number: 0x80000077
+Checksum: 0x640b
+Length: 28
+Network Mask: 255.255.255.0
+Metric: 33
+
+
+                Summary Net Link States (Area 51.0.0.0)
+
+LS age: 361
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Network)
+Link State ID: 172.17.2.0 (Network ID)
+Advertising Router: 172.16.0.47
+LS Seq Number: 0x80000694
+Checksum: 0x41cc
+Length: 28
+Network Mask: 255.255.255.0
+Metric: 10
+
+LS age: 392
+Options: *|*|-|-|-|-|E|*
+LS Type: Summary (Network)
+Link State ID: 172.17.2.0 (Network ID)
+Advertising Router: 172.16.0.48
+LS Seq Number: 0x80000694
+Checksum: 0x3bd1
+Length: 28
+Network Mask: 255.255.255.0
+Metric: 10
+

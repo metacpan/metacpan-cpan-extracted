@@ -1,0 +1,37 @@
+=======================
+ OpenFrame-WebApp Todo
+=======================
+
+1. Write more Segments
+
+Loaders of all sorts.  Including:
+	Session::UrlLoader
+	Session::QueryLoader
+
+More Decliners.
+
+
+3. Tests library
+
+Move repeated test code into t/lib.
+
+
+4. Configuration
+
+Use Pipeline::Config for example app?  And other examples?  This would
+make the purpose & usage of each segment more clear.
+
+
+5. Localization hooks?
+
+Shoud we stick something in the pipe to do localization for everything?  Or
+should each class know how to localize whatever it needs to?
+
+(moved down in priority: maybe all localization can be done in templates?)
+
+
+x. Misc
+
+
++--
+ Steve Purkis <spurkis@epn.nu>

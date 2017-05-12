@@ -1,0 +1,521 @@
+OpenGuides installation instructions
+====================================
+
+
+If while following the instructions below or while trying to use your
+OpenGuides install you see an error that you don't understand, please
+consult the TROUBLESHOOTING file.
+
+For details about installing multiple OpenGuides sites on a single
+server, or installing OpenGuides into a directory that isn't where
+your system Perl library is, see further down this file.
+
+* Basic installation
+
+Unpack the distribution (using for example 'tar' or 'WinZip'), and set
+your working directory to be the top level of the distribution.
+
+If you have an existing "wiki.conf" configuration file and you wish
+to keep using the values in that, copy it to this directory.
+
+Now execute the following commands:
+
+perl Build.PL
+perl Build
+perl Build test
+perl Build install
+
+The very first of these commands asks a number of questions regarding
+the installation.
+
+
+  "Skip OpenGuides configuration?"
+
+Answer "n" to this question unless you really know what you're doing.
+It's mainly there for developers. (If you already have a configuration
+file, and wish to use it without the build script asking you this
+question, run Build.PL with the option --force. This will also skip
+the "Continue with install?" question.)
+
+
+  "What type of database do you want the site to run on?"
+
+Answer "postgres", "mysql", or "sqlite".
+
+
+  "What's the name of the database that this site runs on?"
+  "...the database user that can access that database?"
+  "...the password that they use to access the database?"
+
+You should create (or ask your ISP/sysadmin to create) a database
+specifically for the use of OpenGuides.  If you have more than one
+OpenGuides installation, for example if you run guides for more than
+one city, each installation will need its own database.
+
+
+  "...the machine that the database is hosted on? (blank if local"
+
+If the database is running on a local machine with username/password
+authentication then just press RETURN to skip this question.  If it
+is running on a local machine with IDENT authentication then you may
+need to answer "localhost" to this question.  If it is running on a
+remote machine then enter the full hostname of that machine.
+
+
+  "What do you want the script to be called?"
+
+The default is for the main script to be called "wiki.cgi", but
+you may prefer to name it after your city - "leeds-guide.cgi" for
+example.  Note that your webserver may be configured to only allow
+execution of scripts ending in, for example, ".cgi"
+
+
+  "What directory should I install it in?"
+
+You need to pick a directory for the OpenGuides software to be
+installed in.  This must be one known to the webserver as containing
+CGI scripts.  You will need to have write permission on this directory
+when you come to run "perl Build install"; unless this is a private
+directory belonging to you then this might require an 'su' or 'sudo'
+to root under Unix.
+
+
+  "What directory should I install the templates in?"
+  "Where should I look for custom templates?"
+
+Normally these will be in the install directory, but they can be anywhere.
+Custom templates are intended to be user-modified, so you might want to
+put them somewhere in /etc.
+
+
+  "What URL does the install directory map to?"
+
+Give the full address needed to access the installation directory with
+a web browser - for example http://openguide.example.org/
+
+
+  "Do you want me to munge a custom lib path into the scripts?"
+
+If you have installed some or all of the required Perl modules (or indeed
+the OpenGuides modules themselves) into a private directory, you will
+need to tell the scripts where to find these modules.  Enter the paths
+to search here just as you would enter them in a 'use lib qw( ... );'
+in a Perl script.
+
+
+  "Do you want to use Lucy for searching?"
+
+This is currently experimental - don't say "yes" to this question unless
+you know what you're doing.
+
+If you are changing to Lucy from another search method (Plucene or
+Search::InvertedIndex), you will need to do two things:
+    - either delete your old indexes (they're just files in the index
+      directory) or use a different index directory
+    - reindex your entire wiki (see reindex.pl in the examples/
+      directory of this distribution)
+
+
+  "Do you want to use Plucene for searching?"
+
+This question is no longer asked, but documentation here is retained for
+the benefit of people upgrading.
+
+If you are changing to Plucene from Search::InvertedIndex, you will
+need to do two things:
+    - either delete your old indexes (they're just files in the index
+      directory) or use a different index directory
+    - reindex your entire wiki (see reindex.pl in the examples/
+      directory of this distribution)
+
+
+  "What directory can I use to store indexes in for searching?"
+
+You need a directory to store files used as indexes for the site. The
+user that your script will run as will need write permission on this
+directory.  Under some webserver configurations this might be a
+dedicated user - 'nobody' or 'www-data' for example, but for many
+multi-user systems this will just be yourself.
+
+
+  "What module would you like to use to munge node content before indexing
+  for the search? (optional, only works with Plucene and Lucy)"
+
+The module you choose should have a method called "search_content_munger",
+which accepts a string containing the node content, and returns a string
+(which may be the same string) containing the content as you would like it
+to be indexed for the search.
+
+
+  "Do you want to enable page deletion?"
+  "Please specify a password for the site admin."
+
+The default is to disable page deletion.  If you choose to enable the
+page deletion mechanism then you will need to add a password to your
+wiki.conf by answering the question above or manually using a line such as
+  admin_pass = putyourpasswordhere
+Users who know this password will be able to delete unwanted pages -
+along with all their history - from your wiki.
+*** USE WITH CAUTION.  DELETED PAGES CANNOT BE RECOVERED. ***
+
+
+  "What's the URL of the site's stylesheet?  If you don't enter one here,
+  the basic OpenGuides stylesheet will be used instead.
+
+Supplying an answer to this question is optional.  If you do not supply
+your own stylesheet, your guide will use the basic OpenGuides stylesheet
+instead (this is automatically installed in your static content directory
+regardless of your answer to the present question).
+
+
+  "What's the wiki called?"
+
+This is a title which will appear at the top of every page.  If you have
+more than one OpenGuides installation at the same site then each should
+have a unique name, since this name is used to manage user preferences.
+
+
+  "Do you want the navigation bar included on the home page?"
+
+Answer "y" or "n".
+
+
+  "Do you want the ten most recent changes included on the home page?"
+
+Answer "y" or "n".
+
+
+  "Do you want the Random Page link to avoid returning a locale page?
+  "Do you want the Random Page link to avoid returning a category page?
+
+Answer "y" or "n".  The defaults are "n", which means that Random Page is as
+likely to return a category or locale page as anything else.  If the category
+and locale pages on your Guide are generally just lists of things in that
+category/locale, you probably want to pick "y" here.  If, on the other hand,
+your category/locale pages generally have substantial content of their own,
+you may prefer to choose "n".
+
+
+  "Do you want the content to appear above the navbar in the HTML?"
+
+Answer "y" or "n".  The default is "n", for reasons of backwards
+compatibility with existing stylesheets, but the recommended answer is
+"y", as this will help search engines to find the most relevant parts
+of your pages.
+
+
+  "What should the home page of the wiki be called?"
+  "How would you describe the wiki?"
+
+Self-explanatory.
+
+
+  "What city is the wiki based in?"
+  "What country is the wiki based in?"
+
+If the wiki will not be city or country specific you can leave either or
+both of these blank.
+
+
+  "Contact email address for the wiki admin?"
+
+Self explanatory.
+
+
+  "What language will the site be in? (Please give an ISO language code.)"
+
+eg "en" for English, "it" for Italian.
+See http://ftp.ics.uci.edu/pub/ietf/http/related/iso639.txt
+
+
+  "What's the name of the node or page to use for the text formatting
+   rules link?"
+  "What URL do you want to use for the text formatting rules"
+
+From 0.19, OpenGuides allows users to choose whether or not to have a
+permanent link to the text formatting rules node or page in their navbar.
+You need to put the name of that node or URL in here for it to work, though.
+You might want to call the node "Text Formatting Examples",
+"Text Formatting Rules", "House Style" or whatever.
+
+Note that these the latter question will override the former, so if you
+want to use a local node make sure to leave the latter blank.
+
+  "Make node titles link to node backlinks (C2 style)?"
+
+This refers to turning titles into links which bring up a list of referring
+pages. This was the convention with older wikis ("C2" refers to the original
+wiki at http://c2.com/cgi/wiki), but is not intuitive.
+
+  "Do you want to use the Leaflet mapping library?"
+
+Answer "y" or "n", but "y" is recommended.  In version 0.67 of OpenGuides,
+we switched from using the Google Maps API to the open source Leaflet mapping
+library.  For now, Google Maps support is retained for legacy reasons, but is
+deprecated and will be removed in the future.  We therefore recommend that
+you answer "y" to this question.
+
+  "Would you like to display a map on every node that has geodata?"
+
+Answer "y" or "n".  Note that an answer of "y" will only take effect if you've
+either chosen to use the Leaflet mapping library, or you've supplied a Google
+Maps API key.  Note further that users can choose to turn this off in their
+preferences.
+
+  "Do you have a Google Maps API key to use with this guide?"
+
+As of version 0.67 of OpenGuides, we recommend using the Leaflet mapping
+library instead of Google Maps - our Google Maps support is out of date and
+no longer maintained.  However, if you do want to use Google Maps, you need
+to register with Google to get an API key. Visit
+http://www.google.com/apis/maps/signup.html and follow the
+instructions. Paste the great long string into the console window where you
+are installing. See README.GMAPS for more information.
+
+  "What is the longitude of the centre point of a map to draw for your guide?"
+  "What is the latitude of the centre point of a map to draw for your guide?"
+
+This is only necessary if you're using Google Maps - our Leaflet code will
+figure this out for you.  If you do choose to use Google Maps, it's probably
+a good idea to pick some notionally central point for your
+guide. For example, Carfax for Oxford, Charing Cross for London. As a
+convenience, you may paste in a Google Maps URL for the centre longitude
+question and the (long,lat) will be parsed out from the URL.
+
+  "What default zoom level shall we use for Google Maps?"
+  "What default zoom level shall we use for Google Maps in the search results?"
+
+The defaults are probably appropriate in most cases.
+
+  "Forcibly treat stored lat/long data as if they used the WGS84 ellipsoid?"
+
+Default this answer if you don't know what it means.
+
+  "Do you have a Google Analytics key to use with this guide?"
+
+If you'd like to use Google Analytics to track the traffic on your guide,
+visit http://www.google.com/analytics/ to sign up for a key.  The answer to
+this question is the string in quotes in the HTML fragment they ask you to
+paste into your HTML, something along the lines of _uacct = "UA-1234567-1"
+- it's the UA-1234567-1 part that you need to put in here.  If you've
+forgotten your key, go to Analytics Settings, click "Edit" under Settings,
+then click "Check Status" in the top right-hand corner of the box with grey
+stripes.
+
+
+  "What licence will you use for the guide?"
+
+We strongly recommend that you think at the outset about the licence your
+guide will use, for maximum usefulness. In particular for a guide that will
+be on the OpenGuides network, we recommend the
+"Creative Commons Attribution-ShareAlike 2.5" licence.
+
+  "What is the URL to your licence?"
+
+If you used our recommendation above the URL you will want here is:
+http://creativecommons.org/licenses/by-sa/2.5/
+
+  "What is the URL to your local page about your licensing policy?"
+
+You should probably include a page on your wiki about your local licensing
+policy, but you can leave this blank for now if you don't have one yet.
+
+  "What module would you like to use for spam detection? (optional)"
+
+The module you choose should have a method called "looks_like_spam", which
+accepts a hash with content and metadata as keys, and returns true or false
+to the question of whether the edit should be considered to be spam.
+
+  "What module would you like to use to define custom macros? (optional)"
+
+The module you choose should have a method called "custom_macros", which
+takes arguments macros => \%macros, where the keys of %macros are regexps
+and the values are subs.  It should return a hash similar to %macros.
+See OpenGuides::Utils for the macros defined in core OpenGuides.
+
+  "What directory should we install static content (CSS, images, javascript)
+   to?"
+
+OpenGuides comes with some static content which will be installed
+automatically.
+
+  "What is the URL corresponding to the static content?"
+
+You will need to configure the above directory in your web server, then
+input the URL the content will be visible at here.
+
+  "Should we send email notifications when a moderated node is edited?"
+
+For spam avoidance, you can configure certain nodes to require moderation.
+To ensure that such edits are noticed, OpenGuides can email you.
+
+  "Should the guide be read-only (no edits permitted)?"
+
+If you want to switch your guide to read-only, either temporarily (e.g. all
+the moderators are going on holiday) or permanently (e.g. the guide is now
+just an archive), answer "y" here.  You can reverse this decision at any time.
+
+  "Should the site be mobile-friendly (responsive)?"
+
+As of version 0.82, fresh OpenGuides installs are mobile-friendly.  If
+you have an existing site and wish to make it mobile-friendly, you should
+answer "y" here AND make sure any of the templates you've overridden with
+custom versions are brought up to date with the current core templates.
+The easiest way to do this is to run diffs between the main templates and
+your own versions, and make sure there are no differences other than the
+ones you intend.
+
+  "Distance calculation methods available are:
+      1) British National Grid
+      2) Irish National Grid
+      3) UTM ellipsoid
+   Which would you like to use?"
+
+  (and if you choose UTM ellipsoid)
+  "Which ellipsoid would you like to use? (eg 'Airy', 'WGS-84')"
+
+See http://www.vterrain.org/Projections/ for how this all works.
+A UTM (Universal Transverse Mercator) ellipsoid maps latitude and
+longitude to eastings and northings on a square grid, which allows
+more accurate distance calculations within the guide.  The British and
+Irish National Grids are scaled and parametrised versions of UTM
+ellipsoids (Airy 1830 in the British case, Modified Airy in the Irish).
+
+Please note that at the moment there is no provision for changing your
+mind later about which ellipsoid to use, but it shouldn't be too hard
+to write a conversion script so don't worry too much about picking the
+wrong one.  However do note that once you've entered some location
+data you should not change this value in the config file without running
+some kind of converter.
+
+If you decide to use the British or Irish National Grid, your users
+will be able to choose between entering location data as lat/long
+or as grid co-ordinates.
+
+You must have Geo::Coordinates::OSGB installed to use the British
+National Grid, Geo::Coordinates::ITM to use the Irish National
+Grid, and Geo::Coordinates::UTM to use a UTM ellipsoid.
+
+If you want to use a UTM ellipsoid, WGS-84 is the best choice, as it
+will allow you to use the mapping support with the minimum of fuss.
+
+* Dependency errors
+
+If, after you have answered these questions, the build script complains
+about missing dependencies, don't panic! Simply install them from CPAN and
+then try again. Note that a wiki.conf file will have been written out at
+this point, so if you retain it you won't have to answer all the questions
+again.
+
+* Custom templates and CSS
+
+Once you have installed OpenGuides you may wish to edit templates that
+provide site-specific design. These templates are stored in the directory
+custom-templates/ by default and are described in the file CUSTOMISATION.
+
+The id and class tags used for the CSS in OpenGuides are specified in
+README.CSS.
+
+* Security
+
+The installer will try to create (or modify an existing) a .htaccess file
+to protect wiki.conf, which contains sensitive data (ie passwords).
+However we cannot tell whether apache (or any other web server you may be
+using) is using this file, so you should check that it functioning and that
+you cannot access wiki.conf over HTTP.
+
+You should also configure wiki.conf with the minimum permissions required
+so that local users cannot read the file. This is difficult to automate,
+but the file should be probably be mode 0640, owned by root or an admin
+user, and set to the group the web server runs with.
+
+* Web server configuration
+
+In order to let your web server serve up OpenGuides correctly, you will
+have to tell it to recognise your installation directory as one
+containing CGI scripts. However you can make your URLs nicer by
+employing mod_rewrite as well. The following Apache configuration
+directives show how:
+
+	Alias /myguide /usr/lib/cgi-bin/myguide
+	<Directory /usr/lib/cgi-bin/myguide>
+	    Options FollowSymLinks Indexes ExecCGI
+	    RewriteEngine on
+	    RewriteBase /myguide/
+	    RewriteRule ^$      wiki.cgi        [L]
+	</Directory>
+	Redirect /cgi-bin/myguide/ http://www.example.com/myguide/
+
+You will of course need to make the appropriate substitutions for
+your site. You also need to make sure that mod_rewrite is enabled in
+your web server before adding such a configuration. The final step in
+this URL tidying is to tell OpenGuides that the main CGI script can be
+assumed to be called from the root of the install directory; do this by
+setting the script name to be empty in wiki.conf:
+
+	# what do you want the script to be called?
+	script_name =
+
+Currently the Build script does not support this value, so you will
+have to make sure that you fix this up after an upgrade.
+
+* Custom install locations
+
+If you wish to install the OpenGuides modules in a private directory,
+you will need to specify this when you run the Build.PL.
+
+If you are using version 0.20 or newer of Module::Build, do:
+
+  perl Build.PL install_path=lib=/path/to/my/modules/ \
+		install_path=script=/path/to/my/bin/ \
+        install_path=arch=/path/to/my/modules/auto/ \
+		install_path=libdoc=/path/to/my/man/ \
+		install_path=bindoc=/path/to/my/man/
+
+Or for earlier versions of Module::Build, do:
+
+  perl Build.PL config='sitelib=/path/to/my/modules/'
+
+If any or all of the modules required by the OpenGuides scripts are in
+a private directory, then you'll need to tell the scripts where to find
+them. See the section above about munging in a custom lib path.
+
+----------------------------------------------------------------------
+
+Important note for those using SQLite:
+
+The user your CGI is running as must have write access to not only the
+database file itself, but the directory that the file is in, in order
+that it can write a lockfile. If it doesn't have write access to the
+database file, you'll see errors like "Unhandled error: [DBD::SQLite::db
+do failed...".
+
+----------------------------------------------------------------------
+
+* Multiple installations
+
+If you want to run multiple OpenGuides sites on one machine, you can use
+some tricks to make life easier. This isn't currently part of the official
+install routine, but will generally work. In the rest of this section we
+will assume that you already have a working OpenGuides install for a
+single site.
+
+Make a directory for the new site, and populate it with a set of symlinks
+to the main installation directory (ie. for wiki.cgi, supersearch.cgi,
+newpage.cgi, preferences.cgi, and the templates directory). wiki.conf
+will not be a symlink, since this will differ from the original site.
+In this case, simply copy the wiki.conf from the original install and
+modify it in the obvious way; most importantly, by giving it a different
+database name (we'll create the database in a moment). Don't forget to
+set up a separate directory for indices for the new site.
+
+Normally, the database is created by the installation process described
+above; however since we only want one copy of the modules and CGI
+programs, it isn't appropriate to run them again. So we will make use of
+the utility program "cgi-wiki-setupdb" which is included with the
+Wiki::Toolkit distribution. Documentation for this command can be found in
+its man page; run this with the appropriate arguments to create the
+new database.
+
+Once the key step of setting up the database has been performed, and the
+web server configured appropriately, the new site should be ready to go!

@@ -1,0 +1,13 @@
+[%########################################
+  form_submit_row( name, value, count, colspan, reset, reset_label )
+    Display a row with a right-aligned submit button. If reset is true
+    then we also include a reset button.
+  ########################################-%]
+
+[%- DEFAULT colspan = 2 -%]
+<tr bgcolor="[% INCLUDE row_color %]" align="right">
+   <td colspan="[% colspan %]">
+     [%- IF reset %][% INCLUDE form_reset( value = reset_label ) %][% END -%]
+     [%- INCLUDE form_submit -%]
+   </td>
+</tr>

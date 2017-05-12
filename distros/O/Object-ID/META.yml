@@ -1,0 +1,39 @@
+---
+abstract: 'A unique identifier for any object'
+author:
+  - 'Michael G Schwern <schwern@pobox.com>'
+build_requires:
+  Test::More: 0.88
+  version: 0.77
+configure_requires:
+  Module::Build: 0.340201
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.112150'
+keywords:
+  - id
+  - identifier
+  - universal
+  - object
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Object-ID
+no_index:
+  package:
+    - UNIVERSAL
+provides:
+  Object::ID:
+    file: lib/Object/ID.pm
+    version: v0.1.2
+  UNIVERSAL::Object::ID:
+    file: lib/UNIVERSAL/Object/ID.pm
+    version: v0.1.2
+requires:
+  Hash::FieldHash: 0.10
+  Sub::Name: 0.03
+  perl: v5.8.8
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/schwern/Object-ID
+version: v0.1.2

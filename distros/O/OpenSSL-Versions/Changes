@@ -1,0 +1,13 @@
+Revision history for OpenSSL-Versions
+
+0.002   2012/03/12
+
+        Fix the return value of parse_openssl_version_number in list context.
+        
+        Convert README to markdown format for GitHub,
+
+0.001   2012/03/12
+
+        First version that correctly parses OPENSSL_VERSION_NUMBER in all
+        available versions of OpenSSL
+

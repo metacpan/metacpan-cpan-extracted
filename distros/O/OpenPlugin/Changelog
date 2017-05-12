@@ -1,0 +1,246 @@
+OpenPlugin Changelog                                    http://openthought.net
+                                                        eric at openthought.net
+
+Key:
+* An internal code change or bugfix, this shouldn't affect existing code
+** An optional feature has been added that is probably worth checking out
+*** This is a new feature that will likely require a change in your code
+
+Changes since 0.10
+------------------
+
+* Really add the template for custom exception modules this time.  Whoops.
+
+* Cleaned up the Exception Plugin's log_throw method
+
+* Updated / fixed documentation
+
+* Added more comments where appropriate
+
+* Added more tests
+
+* Disabled the Apache2 Upload plugin, it doesn't work yet.
+
+* The Apache2 Httpheader driver should now work with the most recent mod_perl
+(1.99_09).
+
+* Untaint the session directory
+
+** Exception properties can now be accessed using accessor methods instead of
+as hash keys.  Instead of $@->state->{filename}, you can now say $@->filename.
+For now, the old method will remain for backwards compatability.
+
+
+Changes since 0.09
+------------------
+
+* Numerous documentation additions and updates
+
+* It appears that File::Basename::dirname doesn't like being given a blank
+parameter anymore (5.8.0+).  If you got an error about "fileparse(): need a
+valid pathname", that should be taken care of now.  Thanks to Alex Beamish for
+finding and reporting this one.
+
+* Calling an invalid plugin with an OpenPlugin object now produces a more
+useful error message.
+
+* The documentation for creating subclasses to the Exception Plugin were
+incorrect.  They have been corrected.
+
+* The fetch call in the Session plugin should always return undef if the
+session has expired.
+
+** Included a template for how to create custom exception modules.
+
+** The Exception plugin now allows you to catch and then rethrow exceptions
+if desired.
+
+** The Exception plugin has a new method called log_throw, which first logs a
+message, then raises an exception.  The throw method by itself no longer logs
+the message.
+
+** The log plugin now checks to see who is calling it, so it can act
+differently based on the caller.  This is one of the major benefits of
+Log4perl, and now OpenPlugin is able to make use of it.  You just need to add
+new "loggers" to the config file to define different logging methods.
+
+** Added mod_perl 2.0 support via the Apache2 driver.  Currently, there is no
+Cookie or Upload plugin available with this driver, but Request, Param, and
+Httpheader are working.
+
+** The Session plugin now properly supports Apache::Session drivers in addition
+to just "file".  Specifically, DBI was tested, but others should work too.
+
+
+Changes since 0.08
+------------------
+
+* Fixed a problem where using the CGI driver together with
+OpenPlugin::Application caused an infinite loop.  Yikes.
+
+* Fixed a problem with the return value of
+OpenPlugin::CGI::HttpHeader::send_outgoing.  It should not return anything, but
+had been returning true (1).
+
+* There were some nasty problems with the CGI drivers that slipped through,
+those should be fixed now.
+
+* Fixed a problem in OpenPlugin::Upload::CGI where upload() was being called on
+the wrong object.
+
+** Provided aliases for some common functions in the
+cookie/httpheader/param/upload plugins. The sub get() is now an alias for
+get_incoming(), set() is an alias for set_outgoing(), and send() is an alias
+for send_outgoing().
+
+** Created an init parameter which can be used to override certain defaults
+
+
+Changes since 0.06
+------------------
+
+* Refactored the entire OpenPlugin engine.  Theoretically, it should still work
+the same, but it's much easier to read.
+
+* The httpheader plugin was not properly checking to see if there are outgoing
+cookies, and always thought there were.  That should be fixed now.
+
+* There was a bug with passing in an existing CGI object, that should work now.
+
+* Fixed directory creation problem with the OpenPlugin::Session::Apache module
+running under taint mode.
+
+* Moved some code in the main Apache Session driver module into the init
+method, that should make sessions a bit faster.
+
+* Changed the internal logging for OpenPlugin to utilize the improved logging
+features (namely, Log4perl).
+
+* Sessions weren't being properly instanciated, unless you explicitely called
+create(), which should be unnecessary.
+
+* Now untainting the session_id when calling delete().
+
+* Numerous internal cleanups and improvements
+
+** Created the Request plugin, which acts as a parent plugin to Cookie,
+HttpHeader, Param, and Upload.
+
+** Any plugin may now use multiple drivers.  Using
+"$OP->authenticate->authenticate('user', 'pass')" implies usage of a default
+driver (whatever you define 'default' as), and
+"$OP->authenticate('DBI')->authenticate('user', 'pass')" would use the DBI
+driver.
+
+** Now works properly under Perl 5.005_03, it used to only work on versions
+5.6.0 and above.
+
+** Major renovations to the installation script.  It now allows you to pick and
+choose which drivers to install.
+
+** Significant documentation updates.
+
+** Update the code and docs for the Exception module.  All the functions
+available in it should now work as advertised.
+
+*** Expanded the capabilities of the logging facility, and added a new log
+driver called 'Log4perl'.  This driver, as you might expect, uses
+Log::Log4perl.  In doing so, OpenPlugin's log interface has changed to be more
+like Log4perl's.  The old 'log' function will continue to work for this
+release, but is deprecated.
+
+*** Changed the name of the Apache::Session driver from Apache to ApacheSession.
+I don't want anyone to think that the driver is mod_perl only.
+
+*** Improved the namespace of parameters passed to OpenPlugin's new() method.
+This makes a lot of things better, but unfortunatly breaks existing
+applications.  For example, when being used under mod_perl, instead of saying
+something like $OP = OpenPlugin->new( $config_src, { apache_req => $r }, you
+will now say $OP = OpenPlugin->new( config => { src => $src }, request =>
+{ apache => $r } );
+
+*** The OpenPlugin::Application plugin now makes proper use of
+CGI::Application.  In doing so, the method of passing in parameters has changed
+slightly.  Instanciating an OpenPlugin::Application object will now look
+something like:  my $app = MyApp->new( PARAMS => { config => { src =>
+/path/to/OpenPlugin.conf } } );.  The difference is the use of the PARAMS key.
+
+
+Changes since 0.05
+------------------
+
+* Moved duplicate functionality from the config drivers to the config plugin
+
+* Moved duplicate functionality from the log drivers to the log plugin
+
+* Fixed bug in cookie where the domain was not being set
+
+* Fixed bug where an id would sometimes not be generated for the cache plugin
+
+** Created an OpenPlugin.conf file for OpenPlugin related configuration data
+
+** Added a 'conf' driver to the Config plugin, using the Config::General
+module (which does Apache style configs)
+
+** Added 24 new tests to the test suite
+
+** Added a delete() method to cache and session
+
+
+Changes since 0.04
+------------------
+
+* More fixes to the exception handling
+
+** Huge additions to the documentation (but there still isn't enough!)
+
+*** Reworked the API for sessions and caching, the two are now uniform, and
+they make much more sense.
+
+
+Changes since 0.03
+------------------
+
+* When a driver is loaded, it's init() function is called if it has one
+
+* Fixed up the exception handling plugin, it now works as it should
+
+** Many additions to the documentation
+
+** Created a module called OpenPlugin::Application, modeled after CGI::App
+
+** Implemented Upload plugin
+
+** Implemented Apache driver for Upload plugin
+
+** Implemented DBI authentication driver
+
+*** Major restructuring and bugfixes to Param, Httpheader, and Cookie
+
+*** Datasource no longer returns a status, but instead throws an exception if
+there is a problem
+
+
+Changes since 0.02
+------------------
+
+* Fixed a bunch of bugs
+
+** Created a working implementation for all base plugins
+
+** Added to documentation
+
+
+Changes since 0.01
+------------------
+
+** Have a working implementation of most desired plugins.
+
+** Created at least one driver for every plugin
+
+
+0.01  Sun Oct 28 21:59:30 EST 2001
+----------------------------------
+
+* Testing version, not much to see here.
+

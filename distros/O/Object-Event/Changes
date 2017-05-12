@@ -1,0 +1,72 @@
+Revision history for Object-Event:
+
+1.23    Thu Aug  4 10:52:32 CEST 2011
+        - added small safety-check to unreg_cb.
+
+1.22    Thu Mar 10 17:17:58 CET 2011
+        - fixed a bug where event methods were not registered correctly.
+        - found a bug with using the guard to track cb registrations.
+
+1.21    Thu Nov  5 19:37:58 CET 2009
+        - fixed a bug in the legacy forward code to support the old
+          AnyEvent::XMPP API.
+
+1.2     Thu Nov  5 00:01:47 CET 2009
+        - removed hand_event_methods_down and inherit_event_methods_from
+          in favour of the event_cb attribute, which made inheriting event
+          method much easier.
+        - added event_cb alias attribute parameter to be able to specify
+          multiple package method event handlers for an object.
+        - added some debugging functionality.
+
+1.101   Fri Sep  4 14:24:58 CEST 2009
+        - fixed stupid bug in event method, returning always false
+          (added test for that now).
+        - using common::sense now.
+
+1.1     Sun Aug  9 18:05:08 CEST 2009
+        - fixed some really wrong documentation (i.e.: about return values of
+          the event method).
+        - added init method for cases where you can't use the Object::Event
+          constructor.
+        - testing for undefined $self in the guard destructor.
+        - added 'handles' method to query whether handlers exist.
+        - made the 'event' method return true or false in case
+          handlers ran.
+
+1.0     Mon Mar 16 21:23:02 CET 2009
+        - added stop/continue feature.
+        - deprecated forward feature.
+          (will be kept until AnyEvent::XMPP 0.4 is replaced by the new
+           AnyEvent::XMPP, in around 1 year probably.)
+        - added support for arbitrary priorities.
+        - added syntactic sugar for using method calling syntax
+          as event invocation.
+
+0.7     Wed Feb 18 11:56:40 CET 2009
+        NOTE: This is the last release which will contain the add_forward
+        feature. The next release will contain some minor incompatible changes.
+
+        - added unreg_my_set method.
+        - fixed bug in _while_referenced implementation
+          and added tests (by Pedro Melo)
+        - some more tests.
+        - added ::Methods syntactic sugar. Please note that the next
+          version might contain some incompatible changes here.
+
+0.6     Tue Sep 23 15:13:23 CEST 2008
+        - recursive event calling now also should work properly.
+
+0.4     Tue Apr 15 12:48:11 CEST 2008
+        - events can now be registered from within the
+          callbacks for the same object and event safely.
+
+0.3     Fri Mar 21 11:35:03 CET 2008
+        - fixed a serious bug in stop_event
+
+0.2     Fri Mar 21 01:38:12 CET 2008
+        - forgot a simple test for the event handling
+        - added an example
+
+0.1     Thu Mar 20 13:18:12 CET 2008
+        - initial release

@@ -1,0 +1,28 @@
+---
+abstract: 'Interface to the Opsview REST API'
+author:
+  - 'Miquel Ruiz <mruiz@cpan.org>'
+build_requires:
+  Test::Deep: 0
+  Test::Exception: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.009, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Opsview-REST
+requires:
+  HTTP::Tiny: 0.014
+  JSON: 0
+  Moo: 0
+  Try::Tiny: 0
+  URI: 0
+resources:
+  bugtracker: https://github.com/miquelruiz/Opsview-REST/issues
+  homepage: http://metacpan.org/release/Opsview-REST/
+  repository: git://github.com/miquelruiz/Opsview-REST.git
+version: 0.013

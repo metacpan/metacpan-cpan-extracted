@@ -1,0 +1,49 @@
+Revision history for Perl extension Oracle::SQLLoader.
+
+0.1  2004-09-01
+  * First Release.
+
+0.2  2004-09-03
+  * tons more POD
+  * replace $FLOAT type with $DECIMAL
+  * renamed Oracle::SQLLoader::executeSqlldr to Oracle::SQLLoader::executeLoader
+  * implemented trailing nullcols option
+  * support column_length option to addColumn
+  * get more stats - start/end times as epoch, cpu/elapsed seconds
+  * removed parfile references
+
+0.3  2004-09-06
+  * win32 support
+  * removed generate parfile
+  * moved control file generation code to private variables
+  * more pod formatting
+  * added stats match for unusable indexes
+  * added start/end epochs and cpu/elapsed time stats
+  * fixed "length" instead of "width"
+  * mandate username and password arguments if no $ENV{ORACLE_USERID}
+
+0.4  2004-09-10
+  * append sid to userid
+  * check sqlldr exit code for success/warning/error
+  * parse error messages (not discards) out of the load log and make them
+    available with the rest of the stats
+  * added warn vs error cases to delimited and fixed length tests
+  * findProgram now returns any matched full path to executables
+
+0.5  2005-02-15 
+  * make utility calls class or instance methods
+
+0.6  2005-06-01
+  * removed bad close call on undefined filehandle, pointed out by Eric von Kuegelgen
+
+07 2005-07-24
+  * first run of test cases failed due to drop of nonexistent table
+  * doc fix - 'cleanup' option
+
+08 2006-03-21
+  * John Huckelba pointed out that single-record load results caused log parsing to fail; fixed and added test case
+  * added tests for when_clause, check number discarded
+
+09 2006-06-22
+  * Craig Pearlman contributed quite a few fixes, including getting options to behave properly
+  * added tests for direct loads

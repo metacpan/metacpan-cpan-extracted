@@ -1,0 +1,60 @@
+
+                Link (Type-8) Link States (Area 10.188.0.0 Interface em0)
+
+LS age: 892
+LS Type: Link
+Link State ID: 0.0.0.1 (Interface ID of Advertising Router)
+Advertising Router: 10.188.1.10
+LS Seq Number: 0x80000009
+Checksum: 0x3baf
+Length: 140
+Options: *|*|-|R|-|*|E|V6
+Link Local Address: fe80::215:58ff:fe7c:cb62
+Number of Prefixes: 8
+    Prefix: fdd7:e83e:66bc:1::/64
+    Prefix: fdd7:e83e:66bc:102::/64
+    Prefix: fdd7:e83e:66bc:112::/64
+    Prefix: fdd7:e83e:66bc:141::/64
+    Prefix: fdd7:e83e:66bc:142::/64
+    Prefix: fdd7:e83e:66bc:161::/64
+    Prefix: fdd7:e83e:66bc:162::/64
+    Prefix: 2a01:198:262:1::/64
+
+
+                Link (Type-8) Link States (Area 10.188.0.0 Interface tun0)
+
+LS age: 892
+LS Type: Link
+Link State ID: 0.0.0.6 (Interface ID of Advertising Router)
+Advertising Router: 10.188.1.10
+LS Seq Number: 0x80000009
+Checksum: 0x1832
+Length: 56
+Options: *|*|-|R|-|*|E|V6
+Link Local Address: fe80::fce1:baff:fed1:2c6c
+Number of Prefixes: 1
+    Prefix: fdd7:e83e:66bc:211::/64
+
+LS age: 831
+LS Type: Link
+Link State ID: 0.0.0.1 (Interface ID of Advertising Router)
+Advertising Router: 10.188.50.50
+LS Seq Number: 0x80000009
+Checksum: 0x9f9e
+Length: 188
+Options: *|*|-|R|-|*|E|V6
+Link Local Address: fe80::5054:ff:fe12:3450
+Number of Prefixes: 12
+    Prefix: fdd7:e83e:66bc:1::/64
+    Prefix: 2a01:198:262:1::/64
+    Prefix: fdd7:e83e:66bc:103::/64
+    Prefix: fdd7:e83e:66bc:104::/64
+    Prefix: fdd7:e83e:66bc:113::/64
+    Prefix: fdd7:e83e:66bc:114::/64
+    Prefix: fdd7:e83e:66bc:143::/64
+    Prefix: fdd7:e83e:66bc:144::/64
+    Prefix: fdd7:e83e:66bc:163::/64
+    Prefix: fdd7:e83e:66bc:164::/64
+    Prefix: fdd7:e83e:66bc:211::/64
+    Prefix: fdd7:e83e:66bc:212::/64
+

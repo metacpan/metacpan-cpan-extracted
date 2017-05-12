@@ -1,0 +1,12 @@
+[%########################################
+  label_row( align, valign, colspan, color )
+     Display a simple label row. Default of 'align' is 'center',
+     'colspan' is 2, 'valign' is 'bottom'
+  ########################################-%]
+
+[%- DEFAULT colspan = 2;
+    DEFAULT color   = '#ffffe0'; 
+    DEFAULT align   = 'center';
+    DEFAULT valign  = 'bottom'; -%]
+[%- INCLUDE label_row_begin() -%]
+</tr>

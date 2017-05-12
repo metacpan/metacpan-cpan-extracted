@@ -1,0 +1,102 @@
+=head1 NAME
+
+OurNet::BBS - Component Object Model for BBS systems
+
+=head1 VERSION
+
+This document describes version 1.67 of OurNet::BBS, released
+November 11, 2010.
+
+=head1 SYNOPSIS
+
+    use strict;
+    use OurNet::BBS;
+    # use OurNet::BBS 'big5'; # use unicode strings internally
+
+    my $BBS = OurNet::BBS->new({
+	backend	=> 'MELIX',		# use the Melix BBS backend
+	bbsroot	=> '/home/melix',	# where to find the BBS data
+    });
+
+    my $brd = $BBS->{boards}{sysop};	# the sysop board
+    my $mtime;
+
+    printf (
+        "This BBS has %d boards, %d groups.\n",
+        scalar keys(%{$BBS->{boards}}),
+        scalar keys(%{$BBS->{groups}}),
+    );
+
+    eval { $mtime = $brd->{articles}->mtime };
+    die "Error: cannot read board $board -- $@\n" if $@;
+
+    printf (
+        "The $board board has %d articles, %d top-level archive entries.\n",
+        $#{$brd->{articles}}, $#{$brd->{archives}},
+    );
+
+    # A simple Sysop board article monitor
+    print "Watching for new articles...\n";
+
+    while (1) {
+        print "=== wait here ($mtime) ===\n";
+        sleep 5 until ($brd->{articles}->refresh);
+
+        foreach my $article (@{$brd->{articles}}) {
+            print "Found article: $article->{title}\n" 
+		if $article->btime > $mtime;
+        }
+
+        $mtime = $brd->{articles}->mtime;
+    }
+
+=head1 DESCRIPTION
+
+(Currently, this project exists mainly for historical/archival
+purposes, not for active development.)
+
+OurNet-BBS is a cross-protocol distributed network, built as an
+abstraction layer over telnet BBS-based systems used in Hong Kong,
+China and Taiwan. It implements a flexible object model for
+different BBS backends, along with an asymmetric authentication
+and remote procedure call protocol.
+
+This project aims to become a I<protocol agnostic> middle-ware
+solution for identity-based information storage & retrieval,
+much like the Project Jabber's goal toward instant messaging,
+or Project JXTA's aim toward distributed services.
+
+For some of its practical uses, search for B<OurNet::BBSApp>
+on CPAN, and the sample scripts in the F<eg/> directory in this
+module's distribution.
+
+=head1 HISTORY
+
+This section has been moved to the F<ChangeLog> file in the
+source distribution.
+
+=head1 SEE ALSO
+
+L<OurNet::BBS::Tutorial> for a general overview of the B<OurNet::BBS>
+model.
+
+L<OurNet::BBS::Roadmap> for the design goals, components, and related
+discussions.
+
+=head1 AUTHORS
+
+Chia-Liang Kao E<lt>clkao@clkao.orgE<gt>,
+Audrey Tang E<lt>cpan@audreyt.orgE<gt>.
+
+=head1 COPYRIGHT
+
+Copyright 2001-2010 by
+Chia-Liang Kao E<lt>clkao@clkao.orgE<gt>,
+Audrey Tang E<lt>cpan@audreyt.orgE<gt>.
+
+This program is free software; you can redistribute it and/or 
+modify it under the same terms as Perl itself.
+
+See L<http://www.perl.com/perl/misc/Artistic.html>
+
+=cut

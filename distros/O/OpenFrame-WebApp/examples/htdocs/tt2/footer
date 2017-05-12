@@ -1,0 +1,4 @@
+    <p/>
+    <hr/>
+    Your session id: [% session.id %]<br/>
+    Back to <a href="/index.html">main page</a>.

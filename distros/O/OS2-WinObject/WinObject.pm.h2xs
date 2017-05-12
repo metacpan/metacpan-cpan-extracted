@@ -1,0 +1,249 @@
+package OS2::WinObject;
+
+use strict;
+use Carp;
+use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS $AUTOLOAD);
+
+require Exporter;
+require DynaLoader;
+use AutoLoader;
+
+@ISA = qw(Exporter DynaLoader);
+
+# Items to export into callers namespace by default. Note: do not export
+# names by default without a very good reason. Use EXPORT_OK instead.
+# Do not simply export all your public functions/methods/constants.
+
+# This allows declaration	use OS2::WinObject ':all';
+# If you do not need this, moving things directly into @EXPORT or @EXPORT_OK
+# will save memory.
+%EXPORT_TAGS = ( 'all' => [ qw(
+	CO_FAILIFEXISTS
+	CO_REPLACEIFEXISTS
+	CO_UPDATEIFEXISTS
+	OPEN_AUTO
+	OPEN_BATTERY
+	OPEN_CONTENTS
+	OPEN_DEFAULT
+	OPEN_DETAILS
+	OPEN_HELP
+	OPEN_PALETTE
+	OPEN_PROMPTDLG
+	OPEN_RUNNING
+	OPEN_SETTINGS
+	OPEN_STATUS
+	OPEN_TREE
+	OPEN_USER
+	PMERR_INVALID_FLAG
+	PMERR_INVALID_HPTR
+	PMERR_INVALID_HWND
+	PMERR_INV_HDC
+	PMERR_WPDSERVER_IS_ACTIVE
+	PMERR_WPDSERVER_NOT_STARTED
+	SWP_ACTIVATE
+	SWP_DEACTIVATE
+	SWP_EXTSTATECHANGE
+	SWP_FOCUSACTIVATE
+	SWP_FOCUSDEACTIVATE
+	SWP_HIDE
+	SWP_MAXIMIZE
+	SWP_MINIMIZE
+	SWP_MOVE
+	SWP_NOADJUST
+	SWP_NOAUTOCLOSE
+	SWP_NOREDRAW
+	SWP_RESTORE
+	SWP_SHOW
+	SWP_SIZE
+	SWP_ZORDER
+	CopyObject
+	CreateObject
+	DeregisterObjectClass
+	DestroyObject
+	EnumObjectClasses
+	FreeFileIcon
+	IsSOMDDReady
+	IsWPDServerReady
+	LoadFileIcon
+	MoveObject
+	OpenObject
+	QueryActiveDesktopPathname
+	QueryDesktopBkgnd
+	QueryDesktopWindow
+	QueryObject
+	QueryObjectPath
+	QueryObjectWindow
+	QueryWindowPos
+	RegisterObjectClass
+	ReplaceObjectClass
+	RestartSOMDD
+	RestartWPDServer
+	RestoreWindowPos
+	SaveObject
+	SaveWindowPos
+	SetDesktopBkgnd
+	SetFileIcon
+	SetMultWindowPos
+	SetObjectData
+	SetWindowPos
+	ShutdownSystem
+	StoreWindowPos
+) ] );
+
+@EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
+
+@EXPORT = (
+
+);
+$VERSION = '0.01';
+
+sub AUTOLOAD {
+    # This AUTOLOAD is used to 'autoload' constants from the constant()
+    # XS function.  If a constant is not found then control is passed
+    # to the AUTOLOAD in AutoLoader.
+
+    my $constname;
+    ($constname = $AUTOLOAD) =~ s/.*:://;
+    croak "& not defined" if $constname eq 'constant';
+    my $val = constant($constname, @_ ? $_[0] : 0);
+    if ($! != 0) {
+	if ($! =~ /Invalid/ || $!{EINVAL}) {
+	    $AutoLoader::AUTOLOAD = $AUTOLOAD;
+	    goto &AutoLoader::AUTOLOAD;
+	}
+	else {
+		croak "Your vendor has not defined OS2::WinObject macro $constname";
+	}
+    }
+    {  no strict 'refs';
+       # Next line doesn't help with older Perls; in newers: no such warnings
+       # local $^W = 0;		# Prototype mismatch: sub XXX vs ()
+       *$AUTOLOAD = sub () { $val };
+    }
+    goto &$AUTOLOAD;
+}
+
+bootstrap OS2::WinObject $VERSION;
+
+# Preloaded methods go here.
+
+# Autoload methods go after =cut, and are processed by the autosplit program.
+
+1;
+__END__
+# Below is the stub of documentation for your module. You better edit it!
+
+=head1 NAME
+
+OS2::WinObject - Perl extension for blah blah blah
+
+=head1 SYNOPSIS
+
+  use OS2::WinObject;
+  blah blah blah
+
+=head1 DESCRIPTION
+
+Stub documentation for OS2::WinObject was created by h2xs. It looks like the
+author of the extension was negligent enough to leave the stub
+unedited.
+
+Blah blah blah.
+
+=head2 EXPORT
+
+None by default.
+
+=head2 Exportable constants
+
+  CO_FAILIFEXISTS
+  CO_REPLACEIFEXISTS
+  CO_UPDATEIFEXISTS
+  OPEN_AUTO
+  OPEN_BATTERY
+  OPEN_CONTENTS
+  OPEN_DEFAULT
+  OPEN_DETAILS
+  OPEN_HELP
+  OPEN_PALETTE
+  OPEN_PROMPTDLG
+  OPEN_RUNNING
+  OPEN_SETTINGS
+  OPEN_STATUS
+  OPEN_TREE
+  OPEN_USER
+  PMERR_INVALID_FLAG
+  PMERR_INVALID_HPTR
+  PMERR_INVALID_HWND
+  PMERR_INV_HDC
+  PMERR_WPDSERVER_IS_ACTIVE
+  PMERR_WPDSERVER_NOT_STARTED
+  SWP_ACTIVATE
+  SWP_DEACTIVATE
+  SWP_EXTSTATECHANGE
+  SWP_FOCUSACTIVATE
+  SWP_FOCUSDEACTIVATE
+  SWP_HIDE
+  SWP_MAXIMIZE
+  SWP_MINIMIZE
+  SWP_MOVE
+  SWP_NOADJUST
+  SWP_NOAUTOCLOSE
+  SWP_NOREDRAW
+  SWP_RESTORE
+  SWP_SHOW
+  SWP_SIZE
+  SWP_ZORDER
+
+=head2 Exportable functions
+
+When accessing these functions from Perl, prefix C<Win> should be removed.
+
+  HOBJECT WinCopyObject (HOBJECT hObjectofObject, HOBJECT hObjectofDest,
+    ULONG ulReserved)
+  HOBJECT WinCreateObject (PCSZ pszClassName, PCSZ pszTitle, PCSZ pszSetupString,
+    PCSZ pszLocation, ULONG ulFlags)
+  BOOL WinDeregisterObjectClass (PCSZ pszClassName)
+  BOOL WinDestroyObject (HOBJECT hObject)
+  BOOL WinEnumObjectClasses (POBJCLASS pObjClass, PULONG pulSize)
+  BOOL WinFreeFileIcon (HPOINTER hptr)
+  BOOL WinIsSOMDDReady (void )
+  BOOL WinIsWPDServerReady (void )
+  HPOINTER WinLoadFileIcon (PCSZ pszFileName, BOOL fPrivate)
+  HOBJECT WinMoveObject (HOBJECT hObjectofObject, HOBJECT hObjectofDest,
+    ULONG ulReserved)
+  BOOL WinOpenObject (HOBJECT hObject, ULONG ulView, BOOL fFlag)
+  BOOL WinQueryActiveDesktopPathname (PSZ pszPathName, ULONG ulSize)
+  BOOL WinQueryDesktopBkgnd (HWND hwndDesktop, PDESKTOP pdsk)
+  HWND WinQueryDesktopWindow (HAB hab, HDC hdc)
+  HOBJECT WinQueryObject (PCSZ pszObjectID)
+  BOOL WinQueryObjectPath (HOBJECT hobject, PSZ pszPathName, ULONG ulSize)
+  HWND WinQueryObjectWindow (HWND hwndDesktop)
+  BOOL WinQueryWindowPos (HWND hwnd, PSWP pswp)
+  BOOL WinRegisterObjectClass (PCSZ pszClassName, PCSZ pszModName)
+  BOOL WinReplaceObjectClass (PCSZ pszOldClassName, PCSZ pszNewClassName,
+    BOOL fReplace)
+  ULONG WinRestartSOMDD (BOOL fState)
+  ULONG WinRestartWPDServer (BOOL fState)
+  BOOL WinRestoreWindowPos (PCSZ pszAppName, PCSZ pszKeyName, HWND hwnd)
+  BOOL WinSaveObject (HOBJECT hObject, BOOL fAsync)
+  BOOL WinSaveWindowPos (HSAVEWP hsvwp, PSWP pswp, ULONG cswp)
+  HBITMAP WinSetDesktopBkgnd (HWND hwndDesktop, __const__ DESKTOP *pdskNew)
+  BOOL WinSetFileIcon (PCSZ pszFileName, __const__ ICONINFO *pIconInfo)
+  BOOL WinSetMultWindowPos (HAB hab, __const__ SWP *pswp, ULONG cswp)
+  BOOL WinSetObjectData (HOBJECT hObject, PCSZ pszSetupString)
+  BOOL WinSetWindowPos (HWND hwnd, HWND hwndInsertBehind, LONG x, LONG y,
+    LONG cx, LONG cy, ULONG fl)
+  BOOL WinShutdownSystem (HAB hab, HMQ hmq)
+  BOOL WinStoreWindowPos (PCSZ pszAppName, PCSZ pszKeyName, HWND hwnd)
+
+
+=head1 AUTHOR
+
+A. U. Thor, a.u.thor@a.galaxy.far.far.away
+
+=head1 SEE ALSO
+
+perl(1).
+
+=cut

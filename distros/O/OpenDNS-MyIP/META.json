@@ -1,0 +1,54 @@
+{
+   "abstract" : "Get your public IP address",
+   "author" : [
+      "Petr Kletecka <pek@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "OpenDNS-MyIP",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AutoLoader" : "0",
+            "Carp" : "0",
+            "Exporter" : "0",
+            "Net::DNS" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "vars" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/petrkle/opendns-myip/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/petrkle/opendns-myip.git",
+         "web" : "https://github.com/petrkle/opendns-myip"
+      }
+   },
+   "version" : "1.152350"
+}
+

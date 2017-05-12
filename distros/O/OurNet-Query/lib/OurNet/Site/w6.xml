@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<SITE ID="W6">
+
+<NAME Lang="en-us">W6.NET Search</NAME>
+<INFO Lang="en-us">general information web search</INFO>
+
+<URL Type="More"><![CDATA[
+http://www.w6.net/searchit/_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+post://www.w6.net/searchit/search.cgi?category=catx3dx=ALL&?s=_QUERY_&match=or&category=catx3dx=ALL&ul=either
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_NEXT_"><![CDATA[
+Next 20 </b><a href="_NEXT_">
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+) </b></font> <a href="_URL_">_TITLE_</a>___bgcolor="ffffff">_PREVIEW_<br>___Updated:_DATE_</font></td></tr>
+]]></TEMPLATE>
+</SITE>

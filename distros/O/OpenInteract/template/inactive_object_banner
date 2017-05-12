@@ -1,0 +1,8 @@
+[% IF object.active == 'no' OR object.is_active == 'no' -%]
+  [%- DEFAULT theme = OI.theme_properties -%]
+<table width="100%" bgcolor="#000000">
+<tr><td align="center">
+  <font size="+1" color="#ffffff"><b>INACTIVE OBJECT</b></font>
+</td></tr>
+</table>
+[% END -%]

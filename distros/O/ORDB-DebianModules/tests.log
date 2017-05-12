@@ -1,0 +1,15 @@
+t/00-load.t ...... 
+Dubious, test returned 1 (wstat 256, 0x100)
+Failed 1/1 subtests 
+t/boilerplate.t .. ok
+t/pod.t .......... ok
+
+Test Summary Report
+-------------------
+t/00-load.t    (Wstat: 256 Tests: 1 Failed: 1)
+  Failed test:  1
+  Non-zero exit status: 1
+t/boilerplate.t (Wstat: 0 Tests: 3 Failed: 0)
+  TODO passed:   3
+Files=3, Tests=5,  0 wallclock secs ( 0.04 usr  0.00 sys +  0.41 cusr  0.02 csys =  0.47 CPU)
+Result: FAIL

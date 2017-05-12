@@ -1,0 +1,22 @@
+---
+name: ORDB-DebianModules
+version: 0.01
+author:
+  - 'Ryan Niebur <ryanryan52@gmail.com>'
+abstract: An ORLite-based ORM Database API
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  ORLite::Mirror: 1.15
+  Params::Util: 0
+build_requires:
+  Test::More: 0
+provides:
+  ORDB::DebianModules:
+    file: lib/ORDB/DebianModules.pm
+    version: 0.01
+generated_by: Module::Build version 0.33
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

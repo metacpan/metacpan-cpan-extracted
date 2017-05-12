@@ -1,0 +1,30 @@
+---
+abstract: 'Module/App to build and test OTRS packages'
+author:
+  - 'Renee Baecker <reneeb@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: OTRS-OPM-Maker
+requires:
+  App::Cmd: '0'
+  File::Basename: '0'
+  File::Find::Rule: '0'
+  Getopt::Long: '0'
+  MIME::Base64: '0'
+  Path::Class: '0'
+  Sys::Hostname: '0'
+  Test::LongString: '0'
+  XML::LibXML: '0'
+  XML::LibXML::PrettyPrint: '0'
+resources:
+  bugtracker: http://github.com/reneeb/OTRS-OPM-Maker/issues
+  homepage: http://github.com/reneeb/OTRS-OPM-Maker
+  repository: http://github.com/reneeb/OTRS-OPM-Maker.git
+version: '0.11'

@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<SITE ID="Cozy">
+
+<NAME Lang="en-us">Cozy Cabin Search</NAME>
+<INFO Lang="en-us">general information web search</INFO>
+
+<URL Type="More"><![CDATA[
+post://www.cozycabin.com/cgi-bin/urlsrch.cgi?searchstring=_QSTR_&sh=_HTML_&db=_DB_
+]]></URL>
+<URL Type="Start"><![CDATA[
+post://www.cozycabin.com/cgi-bin/urlsrch.cgi?searchstring=_QUERY_
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_QSTR_"><![CDATA[
+searchstring" VALUE="_QSTR_">
+]]></VAR>
+<VAR Name="_HTML_"><![CDATA[
+sh" VALUE="_HTML_">
+]]></VAR>
+<VAR Name="_DB_"><![CDATA[
+db" VALUE="_DB_">
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<LI><A HREF=_URL_>_TITLE_</A>  :_PREVIEW_</B><BR>
+]]></TEMPLATE>
+</SITE>

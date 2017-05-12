@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<SITE ID="Ntt">
+
+<NAME Lang="en-us">Nippon Telegraph and Telephone Corporation WWW Search</NAME>
+<INFO Lang="en-us">general information in Japan</INFO>
+
+<URL Type="More"><![CDATA[
+http://ntt-info.mcnet.ne.jp/info-bin/_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://ntt-info.mcnet.ne.jp/info-bin/super-gw.pl?all=_QUERY_
+]]></URL>
+
+<CHARSET>ja-jp.euc</CHARSET>
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_NEXT_"><![CDATA[
+<A HREF="_NEXT_">¼¡¤Î 10 ·ï
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<DD><IMG_<A HREF="_URL_">_TITLE_</A>__¼ý½¸Æü: </B>_DATE_<BR>__PREVIEW_<BR>___</UL>
+]]></TEMPLATE>
+</SITE>

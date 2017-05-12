@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<SITE ID="Lets">
+
+<NAME Lang="en-us">Let's Search</NAME>
+<INFO Lang="en-us">general information web search in Japan</INFO>
+
+<URL Type="More"><![CDATA[
+post://www.info2000.co.jp/cgi-bin/search.cgi?s1=none&s2=none&s3=none&s4=_QUERY_&s5=_START_1_0_
+]]></URL>
+<URL Type="Start"><![CDATA[
+post://www.info2000.co.jp/cgi-bin/search.cgi?s1=none&s2=none&s3=none&s4=_QUERY_&s5=0
+]]></URL>
+
+<CHARSET>ja-jp.jis</CHARSET>
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+
+<TEMPLATE><![CDATA[
+snkal09.gif"><A HREF="_URL_"___">_TITLE_&nbsp;</A>___<FONT SIZE =1 COLOR=#000000>_PREVIEW_nbsp;</FONT>___</TR>
+]]></TEMPLATE>
+</SITE>

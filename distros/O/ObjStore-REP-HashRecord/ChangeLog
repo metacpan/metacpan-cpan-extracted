@@ -1,0 +1,36 @@
+1999-01-12  Joshua Pritikin  <joshua.pritikin@db.com>
+
+	* Release 0.96.
+
+1998-12-23  Joshua Pritikin  <joshua.pritikin@db.com>
+
+	* Avoid warning more than a few times about deprecated key names.
+
+1998-11-20  Joshua Pritikin  <joshua.pritikin@db.com>
+
+	* Switch from custom generated code to standard HV.
+
+1998-09-29  Joshua Pritikin  <joshua.pritikin@db.com>
+
+	* Switch to manual API version check.
+
+1998-09-26  Joshua Pritikin  <joshua.pritikin@db.com>
+
+	* Check binary API version at run-time.
+
+1998-09-10  Joshua Pritikin  <joshua.pritikin@db.com>
+
+	* Fixed index logic that was writing in read-only situations.
+
+1998-09-08  Joshua Pritikin  <joshua.pritikin@db.com>
+
+	* os_class method declaration is now optional.
+
+1998-08-31  Joshua Pritikin  <joshua.pritikin@db.com>
+
+	* Use PERL5PREFIX to install into a different directory tree.
+
+1998-08-19  Joshua Pritikin  <joshua@eq1062.wks.na.deuba.com>
+
+	* osp_str stores 'undef'
+

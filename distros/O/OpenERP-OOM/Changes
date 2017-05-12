@@ -1,0 +1,55 @@
+Revision history for OpenERP-OOM
+
+0.44      2016-09-01 12:45:41+01:00 Europe/London
+
+        Pass through context on updates.  This prevents translation issues.
+
+0.43      2016-08-17 16:44:27+01:00 Europe/London
+
+        Breaking change: Simplified setup of _source property.
+        The linked objects had a _source method added that linked back to the OpenERP object.
+        This now relies on the object having a Moose style read/write property named _source
+        and it will fill that in if present.  Otherwise the _source will not be setup.
+
+        This prevents problems with phantom database because the old code was setting up
+        methods on classes, so it was potentially causing issues with new Result objects
+        created outside the management of this module where they would have a _source method
+        pointing to the last OpenERP object seen.
+
+0.42    Thu May 18, 2016
+        Odoo presents timestamps in UTC, so need to construct DateTime objects explicitly in that timezone
+         instead of a "Floating" timezone
+
+0.41    Thu May 17, 2016
+        Fixed fallback order when parsing dates and timestamps read from Odoo
+
+0.14    Fri Sept 21, 2012
+        Finally started to make sure we send the context information 
+        relating to translation, specifically we send lang: en_GB in the
+        context whenever we do a read to ensure the data is translated.
+
+        The language sent is configurable on the schema object and is simply
+        named lang.
+
+        # FIXME: this might be a bad idea if we aren't doing it on writes too.
+
+0.13    Sept 11, 2012 
+        (internal release)
+        Added new method named search_limited_fieldsfor doing searches.
+        It avoids pulling down the data for every field when constructing 
+        the objects after finding their ids.
+
+        Removed some old debug references to Data::Dumper.
+
+0.12    Tue Aug 21, 2012
+        Small fixes before CPAN release at YAPC::Europe 2012
+
+0.11    Mon Aug 20, 2012
+        Changed to open source license
+        First CPAN release
+
+0.02 - 0.10  Internal OpusVL releases
+
+0.01    Wed Mar 2, 2011
+        First version, released on an unsuspecting world.
+

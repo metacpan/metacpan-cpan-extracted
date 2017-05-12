@@ -1,0 +1,442 @@
+<HTML>
+<HEAD>
+<TITLE>NAME</TITLE>
+<LINK REV="made" HREF="mailto:root@genesee.cwinters.com">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#basics">BASICS</A></LI>
+	<LI><A HREF="#error == object">ERROR == OBJECT</A></LI>
+	<LI><A HREF="#error messages">ERROR MESSAGES</A></LI>
+	<LI><A HREF="#error handling framework">ERROR HANDLING FRAMEWORK</A></LI>
+	<UL>
+
+		<LI><A HREF="#throwing an error">Throwing an Error</A></LI>
+	</UL>
+
+	<LI><A HREF="#error handlers">ERROR HANDLERS</A></LI>
+	<UL>
+
+		<LI><A HREF="#leaving messages">Leaving Messages</A></LI>
+		<LI><A HREF="#specifying a custom error handler">Specifying a Custom Error Handler</A></LI>
+	</UL>
+
+	<LI><A HREF="#spops errors">SPOPS ERRORS</A></LI>
+	<LI><A HREF="#error codes">ERROR CODES</A></LI>
+	<LI><A HREF="#error types">ERROR TYPES</A></LI>
+	<LI><A HREF="#authors">AUTHORS</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Error Handling in OpenInteract</P>
+<P>
+<HR>
+<H1><A NAME="basics">BASICS</A></H1>
+<P>Error handling in any individual application can get a little
+tricky. Creating a framework that accommodate all types of
+applications is much trickier!</P>
+<P>We've tried to navigate the shoals of flexibility, robustness and
+completeness. This solution does not entirely satisfy all three
+critieria, but it should do well enough in all to create applications
+that can handle anything that comes their way. It should also be
+extensible enough so that if you see a shortcoming, you can fix it
+yourself fairly easily.</P>
+<P>
+<HR>
+<H1><A NAME="error == object">ERROR == OBJECT</A></H1>
+<P>First: every error thrown is an object. This object has a number of
+parameters which can be set in two different ways (more on that
+below).</P>
+<P><STRONG>Error Parameters</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_code"><STRONG>code</STRONG></A></STRONG><BR>
+<DD>
+Number indicating severity/handler
+<P></P>
+<DT><STRONG><A NAME="item_type"><STRONG>type</STRONG></A></STRONG><BR>
+<DD>
+Something like db/security/authenticate/email/...
+<P></P>
+<DT><STRONG><A NAME="item_system_msg"><STRONG>system_msg</STRONG></A></STRONG><BR>
+<DD>
+Additional info for the admin, including detailed error messages.
+<P></P>
+<DT><STRONG><A NAME="item_user_msg"><STRONG>user_msg</STRONG></A></STRONG><BR>
+<DD>
+Brief description, suitable for showing to a user. (Not too detailed.)
+This is not the message that <STRONG>must</STRONG> be shown to a user, however,
+since the error handler is free to tell the user whatever it wishes.
+<P></P>
+<DT><STRONG><A NAME="item_package"><STRONG>package</STRONG></A></STRONG><BR>
+<DD>
+From what package was the error raised?
+<P></P>
+<DT><STRONG><A NAME="item_file"><STRONG>file</STRONG></A></STRONG><BR>
+<DD>
+From what filename was the error raised? (Usually this will be just
+about the same as the package, but you can not only have more than one
+package per file, you can have a package created entirely
+dynamically.)
+<P></P>
+<DT><STRONG><A NAME="item_line"><STRONG>line</STRONG></A></STRONG><BR>
+<DD>
+From what line of code was the error raised?
+<P></P>
+<DT><STRONG><A NAME="item_module"><STRONG>module</STRONG></A></STRONG><BR>
+<DD>
+From what module was the error raised?
+<P></P>
+<DT><STRONG><A NAME="item_user_id"><STRONG>user_id</STRONG></A></STRONG><BR>
+<DD>
+Who made the request?
+<P></P>
+<DT><STRONG><A NAME="item_session_id"><STRONG>session_id</STRONG></A></STRONG><BR>
+<DD>
+What session was the request using?
+<P></P>
+<DT><STRONG><A NAME="item_browser"><STRONG>browser</STRONG></A></STRONG><BR>
+<DD>
+User agent as given by the browser
+<P></P>
+<DT><STRONG><A NAME="item_time"><STRONG>time</STRONG></A></STRONG><BR>
+<DD>
+when was the error thrown?
+<P></P>
+<DT><STRONG><A NAME="item_notes"><STRONG>notes</STRONG></A></STRONG><BR>
+<DD>
+Additional stuff, including more detailed information than is in
+system_msg (SQL statements, etc.)
+<P></P></DL>
+<P>This object can ``do'' a few actions: notify someone that it was raised
+and its details, save itself into a file, log or database. We don't
+necessarily <STRONG>want</STRONG> to log every error, however. Otherwise we will get
+a lot of fairly useless errors that will wind up obscuring the
+meaningful stuff.</P>
+<P>Since an error object is just another SPOPS object, you can do
+anything with it that you do with a SPOPS object:</P>
+<PRE>
+ my $err = OpenInteract::Error-&gt;new;
+ $err-&gt;{code} = 718;
+ $err-&gt;{user_msg} = &quot;Press the 'any' key&quot;;
+ $err-&gt;{system_msg} = &quot;User is a dingdong&quot;;
+ $err-&gt;{type} = 'user error';
+ $err-&gt;save;</PRE>
+<P>The only thing different about this object than any other is that the
+error object registers a handler that takes hold if it fails to save
+properly that dumps the error to the filesystem for review. These
+errors are dumped into the directory labeled 'error' in the
+configuration and are currently not part of the error browser
+tool. (Other SPOPS objects <STRONG>can</STRONG> do this, of course, but the Error
+object is the only one that comes this way out of the box.)</P>
+<P>
+<HR>
+<H1><A NAME="error messages">ERROR MESSAGES</A></H1>
+<P>You can also set error messges to be used in a later throw. There are
+two reasons for this. First, the OpenInteract framework is tied fairly
+closely to the SPOPS data abstraction layer. An error in SPOPS is
+handled by saving all relevant information about the error into
+package variables in the <EM>SPOPS::Error</EM> namespace. A brief message
+about the error is then sent back to the user through the use of
+<EM>die</EM>, and the detailed information can be retrieved through the
+<EM>get()</EM> class method. For instance:</P>
+<PRE>
+ my $id = eval { $object-&gt;save };
+ if ( $@ ) {
+    my $info = SPOPS::Error-&gt;get;
+    while ( my ( $k, $v ) = each %{ $info } ) {
+      print &quot;Error info -- $k: $v\n&quot;;
+   }
+ }</PRE>
+<P>Since OpenInteract uses something suspiciously similar, you might see
+the following idiom many times:</P>
+<PRE>
+ my $id = eval { $object-&gt;save };
+ if ( $@ ) {
+    Interact::Error-&gt;set( SPOPS::Error-&gt;get );
+    $R-&gt;throw( { code =&gt; 404 } );
+ }</PRE>
+<P>Which basically just says: ``take all the error information from SPOPS,
+send it over to Interact and throw an error that uses that information
+by default.''</P>
+<P>Similarly, you might wish (for readability and consistency) to use the
+same idiom even when the error is not being thrown by SPOPS:</P>
+<PRE>
+ eval { sendmail( %msg ) || die $Mail::Sendmail::error };
+ if ( $@ ) {
+   Interact::Error-&gt;set( { system_msg =&gt; $@, type =&gt; 'email',
+                           user_msg =&gt; 'Cannot send email',
+                           extra =&gt; \%msg } );
+   $R-&gt;throw( { code =&gt; 544 } );
+ }</PRE>
+<P>You can always throw an error with all the information passed
+explicitly as well (more below). It's all up to you.</P>
+<P>
+<HR>
+<H1><A NAME="error handling framework">ERROR HANDLING FRAMEWORK</A></H1>
+<P>The <EM>error handling framework</EM> uses these objects to determine proper
+actions resulting from them. Here's how that works:</P>
+<OL>
+<LI>
+When an error is first raised (or 'thrown'), we create an object and
+put the passed parameters into it, put other parameters (browser,
+user/session_id, time, calling information). We do <STRONG>not</STRONG> save it to
+the database or filesystem yet.
+<P></P>
+<LI>
+We pass the error object to the error dispatcher. This is a system
+handler which knows about the different error codes and the actions to
+take based on information from the server configuration. The error
+dispatcher finds out from the request object ($R) what module we're
+currently in so it can determine the proper error handlers to use.
+<P></P>
+<LI>
+The dispatcher then queries each of the error handlers specified by
+the module to see if it can deal with the error. If it can deal with
+the handler, it returns a code reference that is then called by the
+dispatcher, with the error object sent as the first (and only)
+argument. If a coderef is not returned by the series of classes that
+act as error handlers, the dispatcher calls the system handler, which
+can catch and deal with all errors.
+<P></P></OL>
+<P>
+<H2><A NAME="throwing an error">Throwing an Error</A></H2>
+<P>We saw an example of what throwing an error looks like above, but now
+we'll just define all the parameters explicitly rather than using the
+<EM>get()</EM>/<EM>set()</EM> class method syntax. (Note that you can execute the
+<EM>throw()</EM> method using the object class or, for convenience, from
+$R.)</P>
+<PRE>
+ eval { $class-&gt;open_file( $filename ) };
+ if ( $@ ) {
+   $R-&gt;throw( { code =&gt; 444, type =&gt; 'handler',
+                user_msg =&gt; 'Could not retrieve list of groups.',
+                system_msg =&gt; &quot;Error: $@&quot;,
+                notes =&gt; { filename =&gt; $filename } } );
+ }</PRE>
+<P>Note that you do <STRONG>not</STRONG> need to throw an error every time an error
+might occur. (Otherwise your applications might get a little
+complicated...) Generally, you only want to throw an error when you
+either want to let the system keep track of a particular occurrence,
+when you want the system to take control of the current request, or
+when you want to report a message back to the user.</P>
+<P>You can also throw an error when you're in the development stage to
+track the status of a task, and remove the error throw when you move
+to production code.</P>
+<P>
+<HR>
+<H1><A NAME="error handlers">ERROR HANDLERS</A></H1>
+<P>The code that handles the error can be arbitrarily simple or
+complex. The code can define new content / user_interface handlers for
+the current request or generate its own content and skip the content
+handler phase altogether.</P>
+<P>The error handler also decides whether to <EM>save()</EM> the error object or
+not. Many times you do not wish to save an error since it might be
+very common, thus cluttering up the log and obscuring real problems.</P>
+<P>The code that handles the error can decide to return to the existing
+process or short-circuit and skip to the next step. For instance, if
+during a content handler I get an error with the database connection,
+I likely don't want to go any further in the operation since I'll keep
+getting errors. In that case, my error handler should issue a generic
+'die;' command.</P>
+<P>An eval {}; block will capture any die; commands within the handler
+(or any of its called procedures) and allow you to skip the remainder
+of the handler while still going on to the next step.</P>
+<P>If the handler returns without calling die(), it can return:</P>
+<DL>
+<DT><STRONG><A NAME="item_undef"><STRONG>undef</STRONG></A></STRONG><BR>
+<DD>
+code can continue, no change to display
+<P></P>
+<DT><STRONG><A NAME="item_scalar"><STRONG>scalar</STRONG></A></STRONG><BR>
+<DD>
+code can continue, but return value of procedure is requested to be
+scalar, and most of the time you will simply return the scalar
+<P></P>
+<DT><STRONG><A NAME="item_hashref"><STRONG>hashref</STRONG></A></STRONG><BR>
+<DD>
+code can continue and output should be augmented by information in
+hashref; often the output can be simply dereferenced and put into the
+parameters to be interpolated into your template.
+<P>The hashref can include any sort of information your application needs.</P>
+<P></P></DL>
+<P>Practically speaking, you almost always either return nothing or
+return a hashref of useful information. If you want something to be
+displayed, just <CODE>die()</CODE> with it.</P>
+<P>
+<H2><A NAME="leaving messages">Leaving Messages</A></H2>
+<P>The handler can also 'leave messages' for later handlers or
+components. For instance, if a user logs in with incorrect
+credentials, the error handler can leave a message for the 'login_box'
+component. When the 'login_box' component is called, it has access to
+its error messages in the template (the implementation TBD) and can
+use the messages as it wishes.</P>
+<P>To ensure the messages do not step on each other, they are stored in a
+fairly deep hierarchy. Here's a detail of each step:</P>
+<DL>
+<DT><STRONG><A NAME="item_ERROR_HOLD"><STRONG>$ERROR_HOLD</STRONG> ($)</A></STRONG><BR>
+<DD>
+Package variable $OpenInteract::Error::ERROR_HOLD, also exported on
+request from OpenInteract::Error
+<P></P>
+<DT><STRONG><A NAME="item_%24R%2D%3E%7B_%24ERROR_HOLD_%7D_%28%5C%25%29"><STRONG>$R-&gt;{ $ERROR_HOLD }</STRONG> (\%)</A></STRONG><BR>
+<DD>
+Hashref whose keys are the components that will use the error
+messages.
+<P></P>
+<DT><STRONG><A NAME="item_%24R%2D%3E%7B_%24ERROR_HOLD_%7D%2D%7B_%24component"><STRONG>$R-&gt;{ $ERROR_HOLD }-</STRONG>{ $component }&gt;. (\%)</A></STRONG><BR>
+<DD>
+Hashref whose keys are the tags for the actual error messages.
+<P></P></DL>
+<P>The second level (hashref stored in ($R-&amp;gt;{ $ERROR_HOLD }) is always
+available to the templates under the variable name 'error_hold'. So
+your template might look something like this:</P>
+<PRE>
+ [%- IF error_hold.loginbox.bad_login %]
+   &lt;tr align=&quot;center&quot;&gt;
+     &lt;td colspan=&quot;2&quot;&gt;&lt;font color=&quot;#ff0000&quot;&gt;
+      [% error_hold.loginbox.bad_login %]
+     &lt;/font&gt;&lt;/td&gt;&gt;
+   &lt;/tr&gt;
+ [% END -%]</PRE>
+<P>Where 'loginbox' is the name of the component, and 'bad_login' is the
+place the template will look for a particular messge. Further
+refinement might modify this so that the variable 'error_hold' only
+has the messages destined for that particular component.</P>
+<P>
+<H2><A NAME="specifying a custom error handler">Specifying a Custom Error Handler</A></H2>
+<P>As noted below, the system reserves the first 25 entries at each
+severity level for system-level messages and errors. But what if you
+want to write your own error handler?</P>
+<P>For instance, say you want to know when a particular user</P>
+<P>
+<HR>
+<H1><A NAME="spops errors">SPOPS ERRORS</A></H1>
+<P>We mentioned this briefly above, but it's worth going over again.</P>
+<P>SPOPS, the data abstraction layer used on OpenInteract, deals with all
+errors by setting error information in SPOPS::Error package variables,
+then calling <CODE>die()</CODE> with a simple message indicating the nature of the
+error.</P>
+<P>The reason for this separation is twofold. First is a design decision:
+SPOPS, while it was developed in tandem with OpenInteract, is a
+separate package which cannot have any dependencies on
+OpenInteract. Doing so would give is a nightmare. Second, the errors
+thrown by SPOPS cannot know any context -- SPOPS::DBI might know if
+you were trying to save something or remove something, but it doesn't
+know how to redirect an error if found. You might wish to throw a
+different error if a user record is not created versus whether a news
+object is not created.</P>
+<P>The list of information in SPOPS::Error is shorter than that tracked
+in Interact::Error, since SPOPS::Error does not need to know user
+context, browser being used, session information, etc.</P>
+<P>
+<HR>
+<H1><A NAME="error codes">ERROR CODES</A></H1>
+<P>Severity is based on the error code. The lower the code, the more
+severe. The levels are modeled after syslog and many other unix
+programs.</P>
+<P>The system reserves the first 25 entries in each error code level. You
+can override it if you wish, but you'd better know what you're doing.</P>
+<P><STRONG>Severity levels:</STRONG></P>
+<OL>
+<LI><STRONG><A NAME="item_%2D_099"><STRONG>000 - 099</STRONG></A></STRONG><BR>
+
+<STRONG>emerg</STRONG>: system is unusable
+<P></P>
+<LI><STRONG><A NAME="item_%2D_199"><STRONG>100 - 199</STRONG></A></STRONG><BR>
+
+<STRONG>alert</STRONG>: action must be taken immediately
+<P></P>
+<LI><STRONG><A NAME="item_%2D_299"><STRONG>200 - 299</STRONG></A></STRONG><BR>
+
+<STRONG>crit</STRONG>: critical conditions
+<P></P>
+<LI><STRONG><A NAME="item_%2D_399"><STRONG>300 - 399</STRONG></A></STRONG><BR>
+
+<STRONG>err</STRONG>: error conditions
+<P></P>
+<LI><STRONG><A NAME="item_%2D_499"><STRONG>400 - 499</STRONG></A></STRONG><BR>
+
+<STRONG>warning</STRONG>: warning conditions
+<P></P>
+<LI><STRONG><A NAME="item_%2D_599"><STRONG>500 - 599</STRONG></A></STRONG><BR>
+
+<STRONG>notice</STRONG>: normal but significant condition
+<P></P>
+<LI><STRONG><A NAME="item_%2D_699"><STRONG>600 - 699</STRONG></A></STRONG><BR>
+
+<STRONG>info</STRONG>: informational
+<P></P>
+<LI><STRONG><A NAME="item_%2D_799"><STRONG>700 - 799</STRONG></A></STRONG><BR>
+
+<STRONG>debug</STRONG>: debug-level messages
+<P></P></OL>
+<P>
+<HR>
+<H1><A NAME="error types">ERROR TYPES</A></H1>
+<P>(incomplete)</P>
+<P>Database errors ('db')</P>
+<P><STRONG>Examples</STRONG></P>
+<UL>
+<LI>
+db handle not available (expired, not connected properly)
+<P></P>
+<LI>
+db user has no permission to perform operation
+<P></P>
+<LI>
+primary key violation
+<P></P>
+<LI>
+foreign key violation
+<P></P>
+<LI>
+uniqueness (index) constraint violation
+<P></P>
+<LI>
+bad table name
+<P></P>
+<LI>
+bad field name
+<P></P></UL>
+<P>Authentication errors ('authenticate')</P>
+<P><STRONG>Examples</STRONG></P>
+<UL>
+<LI>
+user does not exist
+<P></P>
+<LI>
+bad password
+<P></P></UL>
+<P>Authorization errors ('authorize')</P>
+<P><STRONG>Examples</STRONG></P>
+<UL>
+<LI>
+user cannot perform action requested (general, not object specific)
+(this overlaps with security and might get phased out
+<P></P></UL>
+<P>Security errors ('security')</P>
+<P>Infrastructure ('infrastructure')</P>
+<P><STRONG>Examples</STRONG></P>
+<UL>
+<LI>
+something has gone wrong internally (this can be bad)
+<P></P></UL>
+<P>Others?</P>
+<P>
+<HR>
+<H1><A NAME="authors">AUTHORS</A></H1>
+<P>Chris Winters (<A HREF="mailto:chris@cwinters.com">chris@cwinters.com</A>)</P>
+
+</BODY>
+
+</HTML>

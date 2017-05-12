@@ -1,0 +1,447 @@
+---
+abstract: 'the hardest working two letters in Perl'
+author:
+  - 'Stevan Little <stevan.little@iinteractive.com>'
+  - 'Jesse Luehrs <doy@tozt.net>'
+build_requires:
+  File::Spec: '0'
+  HTTP::Request: '0'
+  HTTP::Request::Common: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Path::Router: '0.11'
+  Plack::App::Path::Router::PSGI: '0'
+  Plack::Component: '0'
+  Plack::Middleware: '0'
+  Plack::Test: '0'
+  Test::Fatal: '0'
+  Test::More: '0.88'
+  Test::Path::Router: '0'
+  Test::Requires: '0'
+  lib: '0'
+  utf8: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.014, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: OX
+no_index:
+  namespace:
+    - OX::Meta
+  package:
+    - OX::Types
+    - OX::Application::Role::Sugar
+    - OX::Util
+provides:
+  Bread::Board::LifeCycle::Request:
+    file: lib/Bread/Board/LifeCycle/Request.pm
+    version: '0.14'
+  OX:
+    file: lib/OX.pm
+    version: '0.14'
+  OX::Application:
+    file: lib/OX/Application.pm
+    version: '0.14'
+  OX::Application::Role::Request:
+    file: lib/OX/Application/Role/Request.pm
+    version: '0.14'
+  OX::Application::Role::RouteBuilder:
+    file: lib/OX/Application/Role/RouteBuilder.pm
+    version: '0.14'
+  OX::Application::Role::Router:
+    file: lib/OX/Application/Role/Router.pm
+    version: '0.14'
+  OX::Application::Role::Router::Path::Router:
+    file: lib/OX/Application/Role/Router/Path/Router.pm
+    version: '0.14'
+  OX::Application::Role::RouterConfig:
+    file: lib/OX/Application/Role/RouterConfig.pm
+    version: '0.14'
+  OX::Request:
+    file: lib/OX/Request.pm
+    version: '0.14'
+  OX::Response:
+    file: lib/OX/Response.pm
+    version: '0.14'
+  OX::Role:
+    file: lib/OX/Role.pm
+    version: '0.14'
+  OX::RouteBuilder:
+    file: lib/OX/RouteBuilder.pm
+    version: '0.14'
+  OX::RouteBuilder::Code:
+    file: lib/OX/RouteBuilder/Code.pm
+    version: '0.14'
+  OX::RouteBuilder::ControllerAction:
+    file: lib/OX/RouteBuilder/ControllerAction.pm
+    version: '0.14'
+  OX::RouteBuilder::HTTPMethod:
+    file: lib/OX/RouteBuilder/HTTPMethod.pm
+    version: '0.14'
+requires:
+  Bread::Board: '0'
+  Bread::Board::Container: '0'
+  Bread::Board::Declare: '0.11'
+  Bread::Board::LifeCycle::Singleton: '0'
+  Carp: '0'
+  Class::Load: '0.10'
+  List::MoreUtils: '0'
+  Moose: '2.1005'
+  Moose::Exporter: '0'
+  Moose::Role: '0'
+  Moose::Util: '0'
+  Moose::Util::TypeConstraints: '0'
+  Path::Router: '0.11'
+  Plack: '1.0012'
+  Plack::App::Path::Router::Custom: '0.05'
+  Plack::App::URLMap: '0'
+  Plack::Middleware::Conditional: '0'
+  Plack::Middleware::HTTPExceptions: '0'
+  Plack::Util: '0'
+  Scalar::Util: '0'
+  Try::Tiny: '0'
+  Web::Request: '0.05'
+  Web::Response: '0'
+  namespace::autoclean: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/iinteractive/OX/issues
+  homepage: http://metacpan.org/release/OX
+  repository: git://github.com/iinteractive/OX.git
+version: '0.14'
+x_Dist_Zilla:
+  perl:
+    version: '5.018002'
+  plugins:
+    -
+      class: Dist::Zilla::Plugin::FileFinder::Filter
+      name: WeaverFiles
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: test
+          type: requires
+      name: '@DOY/TestMoreDoneTesting'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::GatherDir
+      name: '@DOY/GatherDir'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::PruneCruft
+      name: '@DOY/PruneCruft'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::ManifestSkip
+      name: '@DOY/ManifestSkip'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::MetaYAML
+      name: '@DOY/MetaYAML'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::License
+      name: '@DOY/License'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::Readme
+      name: '@DOY/Readme'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::RunExtraTests
+      config:
+        Dist::Zilla::Role::TestRunner:
+          default_jobs: 1
+      name: '@DOY/RunExtraTests'
+      version: '0.018'
+    -
+      class: Dist::Zilla::Plugin::ExecDir
+      name: '@DOY/ExecDir'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::ShareDir
+      name: '@DOY/ShareDir'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::MakeMaker
+      config:
+        Dist::Zilla::Role::TestRunner:
+          default_jobs: 1
+      name: '@DOY/MakeMaker'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::Manifest
+      name: '@DOY/Manifest'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::TestRelease
+      name: '@DOY/TestRelease'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::ConfirmRelease
+      name: '@DOY/ConfirmRelease'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::MetaConfig
+      name: '@DOY/MetaConfig'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::MetaJSON
+      name: '@DOY/MetaJSON'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::NextRelease
+      name: '@DOY/NextRelease'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::CheckChangesHasContent
+      name: '@DOY/CheckChangesHasContent'
+      version: '0.006'
+    -
+      class: Dist::Zilla::Plugin::PkgVersion
+      name: '@DOY/PkgVersion'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::Authority
+      name: '@DOY/Authority'
+      version: '1.006'
+    -
+      class: Dist::Zilla::Plugin::PodCoverageTests
+      name: '@DOY/PodCoverageTests'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::PodSyntaxTests
+      name: '@DOY/PodSyntaxTests'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::NoTabsTests
+      config:
+        Dist::Zilla::Plugin::Test::NoTabs:
+          module_finder:
+            - ':InstallModules'
+          script_finder:
+            - ':ExecFiles'
+      name: '@DOY/NoTabsTests'
+      version: '0.06'
+    -
+      class: Dist::Zilla::Plugin::EOLTests
+      name: '@DOY/EOLTests'
+      version: '0.02'
+    -
+      class: Dist::Zilla::Plugin::Test::Compile
+      config:
+        Dist::Zilla::Plugin::Test::Compile:
+          filename: t/00-compile.t
+          module_finder:
+            - ':InstallModules'
+          script_finder:
+            - ':ExecFiles'
+      name: '@DOY/Test::Compile'
+      version: '2.039'
+    -
+      class: Dist::Zilla::Plugin::Metadata
+      name: '@DOY/Metadata'
+      version: '3.03'
+    -
+      class: Dist::Zilla::Plugin::MetaResources
+      name: '@DOY/MetaResources'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::Git::Check
+      name: '@DOY/Git::Check'
+      version: '2.020'
+    -
+      class: Dist::Zilla::Plugin::Git::Commit
+      name: '@DOY/Git::Commit'
+      version: '2.020'
+    -
+      class: Dist::Zilla::Plugin::Git::Tag
+      name: '@DOY/Git::Tag'
+      version: '2.020'
+    -
+      class: Dist::Zilla::Plugin::Git::NextVersion
+      name: '@DOY/Git::NextVersion'
+      version: '2.020'
+    -
+      class: Dist::Zilla::Plugin::ContributorsFromGit
+      name: '@DOY/ContributorsFromGit'
+      version: '0.006'
+    -
+      class: Dist::Zilla::Plugin::MetaProvides::Package
+      config:
+        Dist::Zilla::Plugin::MetaProvides::Package:
+          finder_objects:
+            -
+              class: Dist::Zilla::Plugin::FinderCode
+              name: '@DOY/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
+              version: '5.014'
+        Dist::Zilla::Role::MetaProvider::Provider:
+          inherit_missing: '1'
+          inherit_version: '1'
+          meta_noindex: '1'
+      name: '@DOY/MetaProvides::Package'
+      version: '2.000001'
+    -
+      class: Dist::Zilla::Plugin::PodWeaver
+      config:
+        Dist::Zilla::Plugin::PodWeaver:
+          finder:
+            - WeaverFiles
+          plugins:
+            -
+              class: Pod::Weaver::Plugin::EnsurePod5
+              name: '@CorePrep/EnsurePod5'
+              version: '4.006'
+            -
+              class: Pod::Weaver::Plugin::H1Nester
+              name: '@CorePrep/H1Nester'
+              version: '4.006'
+            -
+              class: Pod::Weaver::Plugin::SingleEncoding
+              name: '@Default/SingleEncoding'
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Name
+              name: '@Default/Name'
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Version
+              name: '@Default/Version'
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Region
+              name: '@Default/prelude'
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: SYNOPSIS
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: DESCRIPTION
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: OVERVIEW
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Collect
+              name: ATTRIBUTES
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Collect
+              name: METHODS
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Collect
+              name: FUNCTIONS
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Leftovers
+              name: '@Default/Leftovers'
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Region
+              name: '@Default/postlude'
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Authors
+              name: '@Default/Authors'
+              version: '4.006'
+            -
+              class: Pod::Weaver::Section::Legal
+              name: '@Default/Legal'
+              version: '4.006'
+      name: '@DOY/PodWeaver'
+      version: '4.005'
+    -
+      class: Dist::Zilla::Plugin::UploadToCPAN
+      name: '@DOY/UploadToCPAN'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::AutoPrereqs
+      name: AutoPrereqs
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: runtime
+          type: requires
+      name: Prereqs
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: develop
+          type: requires
+      name: DevelopRequires
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::MetaNoIndex
+      name: MetaNoIndex
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::ContributorsFromGit
+      name: ContributorsFromGit
+      version: '0.006'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':InstallModules'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':IncModules'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':TestFiles'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExecFiles'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ShareFiles'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':MainModule'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':AllFiles'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':NoFiles'
+      version: '5.014'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: '@DOY/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
+      version: '5.014'
+  zilla:
+    class: Dist::Zilla::Dist::Builder
+    config:
+      is_trial: '0'
+    version: '5.014'
+x_authority: cpan:STEVAN
+x_contributors:
+  - 'Alex J. G. Burzyński <ajgb@cpan.org>'
+  - 'Caleb Cushing <xenoterracide@gmail.com>'
+  - 'Jason May <jason.a.may@gmail.com>'
+  - 'John SJ Anderson <genehack@genehack.org>'
+  - 'Justin Hunter <justin.d.hunter@gmail.com>'
+  - 'Thomas Klausner <domm@plix.at>'
+  - 'Tomohiro Hosaka <bokutin@bokut.in>'
+  - 'danielr <danielr@caymus.gtsgroup.cz>'

@@ -1,0 +1,122 @@
+format-version: 1.0
+date: 28:06:2006 13:57
+saved-by: easr
+auto-generated-by: easr
+synonymtypedef: diminutivo "diminutivo" NARROW
+default-namespace: apo
+remark: <p>This file holds the Upper Level Ontology in APO.</p>
+
+[Term]
+id: APO:B9999999
+name: continuant
+def: "Entities which endure, or continue to exist, through time while undergoing different sort of changes, including changes of place." [PMID:15892874]
+exact_synonym: "endurant" [PMID:15892874]
+broad_synonym: "thing" [PMID:15892874]
+synonym: "cosa" []
+synonym: "cosita" diminutivo []
+is_a: APO:B0000000 ! entity
+
+[Term]
+id: APO:B0000000
+name: entity
+def: "A process or continuant." [APO:Bea]
+
+[Term]
+id: APO:B9999998
+name: process
+def: "Entities that unfold themselves in successive temporal phases." [PMID:15892874]
+exact_synonym: "perdurant" [PMID:15892874]
+broad_synonym: "ocurrent" [PMID:15892874]
+is_a: APO:B0000000 ! entity
+
+[Term]
+id: APO:B9999997
+name: gene
+def: "A ± locatable \"region\" of genomic sequence, corresponding to a unit of inheritance, which is associated with regulatory regions, transcribed regions and/or other functional sequence regions." [SO:0000704]
+is_a: APO:B9999999 ! continuant
+exact_synonym: "a gene" []
+exact_synonym: "un gene" []
+exact_synonym: "un gen" []
+relationship: part_of APO:B9999992 ! complex
+
+[Term]
+id: APO:B9999996
+name: protein
+is_a: APO:B9999999 ! continuant
+relationship: part_of APO:B9999992 ! complex
+
+[Term]
+id: APO:B9999995
+name: transcript
+def: "An RNA synthesized on a DNA or RNA template by an RNA polymerase." [SO:0000673]
+is_a: APO:B9999999 ! continuant
+
+[Term]
+id: APO:B9999994
+name: interaction
+is_a: APO:B9999998 ! process
+
+[Term]
+id: APO:B9999993
+name: small molecule
+is_a: APO:B9999999 ! continuant
+exact_synonym: "petit molecule" []
+exact_synonym: "pequena molecula" []
+exact_synonym: "kleine molecule" []
+
+[Term]
+id: APO:B9999992
+name: complex
+is_a: APO:B9999999 ! continuant
+
+[Term]
+id: APO:B9999991
+name: organism
+def: "A biological entity whose ..." [APO:Bea]
+is_a: APO:B9999999 ! continuant
+
+[Term]
+id: APO:B9999990
+name: human
+def: "..." [APO:Bea]
+is_a: APO:B9999991 ! organism
+
+[Term]
+id: APO:B9999989
+name: arabidopsis thaliana
+def: "..." [APO:Bea]
+is_a: APO:B9999991 ! organism
+
+[Term]
+id: APO:B9999988
+name: sacaromises cerevisiae
+def: "..." [APO:Bea]
+is_a: APO:B9999991 ! organism
+
+[Term]
+id: APO:B9999987
+name: sacaromises pombe
+def: "..." [APO:Bea]
+is_a: APO:B9999991 ! organism
+
+[Term]
+id: APO:B9999986
+name: pathway
+is_a: APO:B9999998 ! process
+
+[Typedef]
+id: is_a
+name: is_a
+builtin: true
+def: "For continuants: C is_a C' if and only if: given any c that instantiates C at a time t, c instantiates C' at t. For processes: P is_a P' if and only if: that given any p that instantiates P, then p instantiates P'." [PMID:15892874]
+comment: The is_a relationship is considered axiomatic by the obo file format specification
+exact_synonym: "is_subtype_of" []
+xref_analog: owl:subClassOf
+is_reflexive: true
+is_anti_symmetric: true
+is_transitive: true
+
+[Typedef]
+id: part_of
+name: part of
+is_transitive: true

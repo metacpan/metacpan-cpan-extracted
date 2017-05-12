@@ -1,0 +1,7 @@
+BEGIN:VCARD
+FN:gillian anderson
+BDAY:1900-12-27
+NOTE:note: - some note
+test: test
+TEL;TYPE=mobile:+628559999991
+END:VCARD

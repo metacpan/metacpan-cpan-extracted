@@ -1,0 +1,61 @@
+OVERVIEW
+
+OWL2Perl is a generator of Perl modules from owl
+ontologies.
+
+OWL2Perl reads in owl ontologies and produces Perl
+modules that you can use in your perl projects.
+
+INSTALLATION
+
+	To install this module type the following:
+	
+	   perl Makefile.PL
+	   make
+	   make test
+	   make install
+
+	To install this module on WinOS:
+	
+		perl Makefile.PL
+		nmake
+		nmake test
+		nmake install
+	
+	If you have any problems installing prerequisite modules,
+	you may find it easier to use ActiveStates ppm utility.
+
+GETTING STARTED
+
+The module OWL2Perl has some documentation to
+get you started and we suggest that you go there first!
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Carp
+PLUTO (derived from ODO)
+File::Spec
+Config::Simple
+File::HomeDir
+File::ShareDir
+Log::Log4perl
+HTTP::Date
+Template
+Params::Util
+Class::Inspector
+Unicode::String
+IO::String
+RDF::Core
+Test::More
+IO::Prompt - unless you are using Windows
+Want - unless you are using Windows
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2010 Edward Kawas. All Rights Reserved.
+
+This module is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+This software is provided "as is" without warranty of any kind.

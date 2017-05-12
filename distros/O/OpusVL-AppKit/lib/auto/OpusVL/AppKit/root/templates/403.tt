@@ -1,0 +1,9 @@
+<h2>[% IF permission_denied_message %][% permission_denied_message %][% ELSE %]403 Sorry, you don't have permission to look at this page.[% END %]</h2>
+<p>
+[% IF permission_denied_body %][% permission_denied_body %][% ELSE %]Please try another url.[% END %]
+</p>
+<p>
+<a href="/">Home</a>
+</p>
+
+

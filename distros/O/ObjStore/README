@@ -1,0 +1,75 @@
+=head1 NAME
+
+ObjStore - Perl Extension For C<ObjectStore> OODBMS
+
+=head1 SYNOPSIS
+
+Like perl?  Sick of SQL?  Ready to try something new?  This extension
+implements something like a relational database management system,
+except that s/SQL/Perl/ig.
+
+
+=head1 PREREQUISITES
+
+- ObjectStore 5.1 (see http://www.odi.com; evaluations are available!)
+
+- Perl 5.005_03 or 5.005_5x
+
+- Exception::Cxx (only on some operating systems; send email)
+
+See http://www.perl.com/CPAN/authors/id/JPRIT/ !
+
+
+=head1 IS THIS FOR GENERIC C++ OBJECTSTORE OR ONLY PERL?
+
+> I was sort of hoping I'd be able to use perl to write quick-and-dirty data
+> manipulation scripts to mess around with my databases that are used by my
+> C++ applications. I don't know if I'd ever need that, but it sounded like
+> a useful thing to have in the toolbox, so to speak.
+
+My experience with ObjectStore is that it is very low-level.  This is
+an advantage for applications that require the highest level of
+performance.  However, there is nothing that I do with databases that
+needs such extreme degrees of optimization.
+
+Rather, I value ease of use and ease of change slightly above raw
+performance.  When I designed the perl interface, I was always trying
+to optimize for these priorities.  For example, I decided to start
+with a common, generic schema.  While this requires planning early in
+development, it gains some big advantages: All perl databases are
+compatible.  All perl databases will never I<require> schema
+evolution.  All perl databases can be edited with a standard perl
+shell.
+
+Even so, ObjectStore's recent support of DLL schemas allows the
+seemless integration of application specific C++ objects.  For
+example, a code generator is available (L<ObjStore-REP-HashRecord>)
+that creates optimized records (ordered, typed tuple of fields -- like
+a C structure declaration).  Recently, I also got PDL properly
+integrated (L<ObjStore-Lib-PDL>).  PDL is a perl extension for matrix
+mathematics.
+
+I believe the uncommon ability to integrate with everything at the
+lowest level (C) while still remaining maximally generic and easy to
+query is unique among database architectures.
+
+
+see ./INSTALL for hints on installation
+see ./UPGRADE if you are starting from a prior releases
+see ./TODO for a list of stuff in the tuit queue
+see ./CHANGES for a visionary perspective
+
+
+Send any questions or comments to osperl@listbox.com.
+
+If you'd like to subscribe to the mailing list, send email to
+majordomo@listbox.com with 'subscribe osperl' in the body of your
+message.  Thanks!
+
+-------------------------------------------------------------------------
+Copyright © 1997-2000 Joshua Nathaniel Pritikin.  All rights reserved.
+
+This package is free software and is provided "as is" without express
+or implied warranty.  It may be used, redistributed and/or modified
+under the terms of the Perl Artistic License (see
+http://www.perl.com/perl/misc/Artistic.html)

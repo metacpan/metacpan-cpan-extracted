@@ -1,0 +1,842 @@
+=head1	NAME
+
+ODF::lpOD::StructuredContainer - High-level structures other than tables
+
+=head1  DESCRIPTION
+
+This manual page is related to the I<sections>, I<item lists>, I<draw pages>,
+I<frames>, and I<drawing shapes>.
+
+These element types are implemented through the C<odf_section>, C<odf_list>,
+C<odf_draw_page>, C<odf_frame>, C<odf_rectangle>, C<odf_ellipse>, C<odf_line>,
+and C<odf_connector> classes.
+
+=head1   Item lists
+
+A list is a structured object that contains an optional list header followed by
+any number of list items. The list header, if defined, contains one or more
+paragraphs that are displayed before the list. A list item can contain
+paragraphs, headings, or lists. Its properties are C<style>, that is an
+appropriate list style, and C<continue numbering>, a boolean value that, if
+true, means that if the numbering style of the preceding list is the same as
+the current list, the number of the first list item in the current list is the
+number of the last item in the preceding list incremented by one
+(default=false).
+
+A list is created using the C<odf_create_list()> function or the C<create()>
+class method of C<odf_list>, then inserted using C<insert_element()> as usual.
+
+A list header is created "in place" with C<set_header()>, called from a list
+element; this method returns an ODF element that can be used later as a context
+to append paragraphs in the header. Alternatively, it's possible to call the
+list-based C<set_header()> with one or more existing paragraphs as arguments,
+so these paragraphs are immediately incorporated in the new list header. Note
+that every use of C<set_header()> replaces any existing header by a new one.
+
+Regular list items are created in place (like the optional list header) using
+C<add_item()> which creates one or more new items and inserts them at a
+position which depends on optional parameters, according to the same kind
+of logic than the table-based C<add_row()> method. Without any argument, a
+single item is appended at end of the list. An optional C<before> named
+parameter may be provided; if defined, the value of this parameter must be an
+item number (in numeric, zero-based form) in the range of the list; the new
+items are inserted I<before> the original item that existed at the given
+position. Alternatively, a C<after> parameter may be provided instead of
+C<before>; it produces a similar result, but the new items are inserted
+I<after> the given position. If a additional I<number> parameter is provided
+with a integer value, the corresponding number of identical items are
+inserted in place.
+
+By default, a new item is created empty. However, as a shortcut for the most
+common cases, it's possible to directly create it with a text content. To do
+so, the text content must be provided through a C<text> parameter; an
+optional C<style> parameter, whose value is a regular paragraph style, may be
+provided too. The new item is then created with a single paragraph as content
+(that is the most typical situation).
+
+Another optional C<start value> parameter may be set in order to restart the
+numbering of the current list at the given value. Of course, this start value
+apply to the first inserted item if C<add_item()> is used to create many items
+in a single call.
+
+C<add_item()> returns the newly created list of item elements. In addition,
+an existing item may be selected in the list context using C<get_item()> with
+its numeric position. A list item is an ODF element, so any content element
+may be attached to it using C<insert_element()> or C<append_element()>.
+
+Note that, unlike headings, list items don't have an explicit level property.
+All the items in an ODF list have the same level. Knowing that a list may be
+inside an item belonging to another list, the hierarchy is represented by the
+structural list imbrication, not by item attributes.
+
+A list may be retrieved using the context-based C<get_list()> method, whose
+optional parameters are the same as C<get_element()>. A C<get_list_by_id()>
+method selects a list according to its (optional) identifier. In addition,
+C<get_lists()> selects the item lists contained in the context according
+to the same rules as C<get_elements()>.
+
+=head1  Sections
+
+A section is a named region in a text document. It's a high level container that
+can include one or more content elements of any kind (including sections, that
+may be nested).
+
+The purpose of a section is either to assign certain formatting properties to a
+document region, or to include an external content.
+
+A section is created using C<odf_create_section> with a mandatory name
+as the first argument and the following optional parameters:
+
+=over
+
+=item
+
+C<style>: the name of a section style, already existing or to be defined;
+
+=item
+
+C<url>: the URL of an external resource that will provide the content of the
+section; if this option is set, the C<protected> option is set to C<TRUE> by
+default; note that lpOD doesn't check for the availability of the resource,
+which should be available when the processed document is displayed through
+an ODF viewer, but which is not needed to run the program;
+
+=item
+
+C<source>: same as C<url>;
+
+=item
+
+C<protected>: a boolean that, if C<TRUE>, means that the section should
+be write-protected when the document is edited through a user-oriented,
+interactive application (of course, such a protection doesn't prevent
+an lpOD-based tool from modifying the table)(default is C<FALSE>);
+
+=item
+
+C<protection key>: a (supposedly encrypted) string that represents
+a password; if this parameter is set and if C<protected> is C<TRUE>,
+a end-user interactive application should ask for a password that matches
+this string before removing the write-protection (beware, such a protection
+is I<not> a security feature);
+
+=item
+
+C<display>: tells that the section should be visible; legal values are C<TRUE>,
+C<FALSE>, and the string C<'condition'>; the default is C<TRUE>; note that if
+this option is set to C<'condition'> an additional C<condition> parameter
+should be provided according to the ODF specification (§4.4.1), but this
+parameter is neither checked nor documented in lpOD.
+
+=back
+
+A new section may be inserted or appended somewhere using C<insert_element>
+or C<append_element>. (Of course, an existing section may be copied and
+pasted thanks to the common C<clone> method.)
+
+The following code appends a new write-protected section whose content will
+come from an external ODF text document at the end of the document body:
+
+      $body = $doc->get_body;
+      $body->append_element(
+            odf_section->create(
+                  "ExternalDocument",
+                  url => "/home/documents/report.odt"
+                  )
+            );
+
+A section may be retrieved using C<get_section()> with the unique name of the
+needed section as argument, while C<get_sections()> returns all the
+sections (if any) of the context.
+
+A section may be retrieved from any element of its direct or indirect content,
+thanks to the C<get_parent_section()> method. This method returns C<undef> if
+the calling element is not included in a section. As an example, the example
+below selects the first paragraph whose text matches a given expression in
+the whole document content, then displays the section name if this paragraph
+belongs to a section:
+
+   $p = $doc->get_body->get_paragraph(content => "xyz")
+      or die "No matching paragraph\n";
+   $section = $p->get_parent_section;
+   say $section ? $section->get_name : "Not in a section";
+
+An existing section may be used as the context for any element retrieval,
+update, creation or deletion. As examples, the following sequence appends a
+new paragraph to a supposedly existing section:
+
+   $section = $context->get_section("My Section");
+   $section->append_element(
+      odf_create_paragraph(text => "Section end")
+      );
+
+Thanks to the C<group()> method, it's possible to move a set of existing
+elements into a section. As an example, the example below grabs all the
+tables of a given document and moves them in a newly created section:
+
+   my $context = $doc->get_body;
+   my $section = $context->append_element(
+      odf_create_section("Tables")
+      );
+   $section->group($context->get_tables);
+
+Note that C<group()> is a generic C<odf_element> method that could be used to
+move anything into anything. However, this method is not recommended with
+elements other than sections, unless the user have a good knowledge of the ODF
+semantics. While a section can host a large variety of content elements, other
+objects have much more restrictive composition rules, and inappropriate
+groupings may result in severe inconsistencies.
+
+=head1  Draw pages
+
+Draw pages are structured containers belonging to presentation or drawing
+documents. They shouldn't appear in text or spreadsheet documents.
+
+A draw page can contain forms, drawing shapes, frames, presentation animations,
+and/or presentation notes (§9.1.4 in the ODF specification).
+
+A draw page is created using C<odf_create_draw_page()> and integrated through
+C<insert_element()> or C<append_element()>. Note that a draw page should be
+inserted at the document body level, knowing that it's a top level content
+element.
+
+A draw page must have an identifier (unique for the document) and may have the
+following parameters, to be set at creation time or later:
+
+=over
+
+=item
+
+C<name>: an optional, but unique if provided, name (which may be made visible
+for the end-users); this parameter is strongly recommended knowing that some
+ODF applications don't preserve the draw page identifier, so the name remains
+the only stable identifier;
+
+=item
+
+C<style>: the name of a drawing page style (existing or to be defined);
+
+=item
+
+C<master>: the name of a master page whose structure is appropriate for
+draw pages (beware, a master page defined for a text document don't always
+fit for draw pages);
+
+=item
+
+C<layout>: the name of a I<presentation page layout> as defined
+in §14.15 of the ODF specification (if such a layout is used); beware, such
+objects are neither similar nor related to general I<page layouts> as defined
+in §14.3 (a general page layout may be used through a I<master page> only,
+and should never be directly connected to a draw page) (sorry, this confusing
+vocabulary is not a choice of the lpOD team)
+
+=back
+
+The following example creates a draw page with these usual parameters and
+integrates it as the last page of a presentation document::
+
+        $dp = odf_create_draw_page(
+                'xyz1234',
+                name    => 'Introduction',
+                style   => 'DrawPageOneStyle',
+                master  => 'DrawPageOneMaster',
+                layout  => 'DrawPageOneLayout'
+                );
+        $context->append_element($dp);
+
+All these parameters may retrieved or changed later using C<get_attributes()>
+and C<set_attributes()> with draw page objects.
+
+An existing draw page may be retrieved in a given context (that should be the
+document body or root) through C<get_draw_page()> with the identifier as
+argument. This methods attempt to retrieve a draw page whose identifier matches
+the argument, then, in case of failure, it looks for a draw page whose name
+matches. Alternatively, the user can explicitly select a draw page by name
+using C<get_draw_page_by_name()> or according to its zero-based position in
+the document using C<get_draw_page_by_position()>. The whole list of draw
+pages may be returned by C<get_draw_pages()>.
+
+Populating a draw page doesn't require element-specific methods, knowing that:
+
+=over
+
+=item
+
+all the fixed parts, the layout and the background are defined by the
+associated C<style>, C<master> and C<layout>;
+
+=item
+
+all the content objects are created separately and attached to the draw page
+using the regular C<insert_element()> or C<append_element()> method from
+the draw page object.
+
+=back
+
+The C<get_title()> method, when applied to a draw page, tries to get the title
+text box of the page, and returns the text content of the first paragraph
+found in it, if set. The first frame whose presentation class is C<title>, if
+any, is assumed to be the title text box. Beware that there is no
+C<set_title()> method for draw pages.
+
+The following sequence, assuming the given file is a presentation document,
+displays the name and (if defined) the title of every draw page:
+
+      $doc = odf_get_document($filename);
+      $context = $doc->get_body;
+      foreach my $p ($context->get_draw_pages) {
+            my $n = $p->get_name // '<no name>';
+            my $t = $p->get_title // '<no title>';
+            say sprintf("%s %s", $n, $t);
+            }
+
+If the draw page doesn't contain any frame whose class is C<title>, or if its
+title frame doesn't contain any paragraph, C<get_title()> returns C<undef>.
+
+=head1  Frames
+
+A frame is a rectangular container that may contain text boxes or images. It
+may contain other kinds of elements that are not presently covered by the lpOD
+level 1 specification.
+
+A frame is created using C<odf_create_frame()> with the following properties:
+
+=over
+
+=item
+
+C<name>: the optional name of the object;
+
+=item
+
+C<id>: an arbitrary string, that is the unique identifier of the frame;
+
+=item
+
+C<title>: a free informative title;
+
+=item
+
+C<description>: a free informative description;
+
+=item
+
+C<style>: the name of a graphic style for the frame;
+
+=item
+
+C<position>, the coordinates of the frame, as a list of 2 strings or as 2
+comma-separated fields in a single string, containing the X and Y positions,
+each string specifying the number and the unit (ex. "1cm", "2pt");
+
+=item
+
+C<size>: the size, provided either in absolute values like the position, as
+percentages, or using the special keywords C<scale> or C<scale-min> (see
+ODF §9.3 for details); both absolute and relative values may be provided as
+a string, separated by a comma, if needed, like "10cm, 12%"; or as a list of
+2 strings;
+
+=item
+
+C<z index>: an optional sequence number that allows the user to assign a
+particular order of rendering, knowing that frames are rendered by default
+according to their sequential position in the document tree;
+
+=item
+
+C<class>: an optional presentation class, such as C<title>, C<subtitle>,
+C<outline>, C<graphic>, etc (see the "Class" subsection in ODF §9.6.1 for the
+whole list of legal values).
+
+=back
+
+For an existing frame, the properties above may be read or changed using
+C<get_xxx()> or C<set_xxx()> methods where "xxx" designates the appropriate
+property.
+
+A frame may be inserted in place through the standard C<insert_element()>
+method, but the behavior depends on the context.
+
+Once attached to something, a frame may be associated to a clickable hyperlink
+through the C<set_hyperlink()> that requires a C<url> parameter specifying the
+URL. Optionally, a significant name may be provided through a C<name>
+parameter. Beware that this hyperlink is not related to the content of the
+frame; it only specifies a link that should be activated by an interactive
+viewer when the user will click in the frame. Caution: this method is
+prohibited as long as the frame element is free (i.e. non-attached), so it
+can't be used with a created but not inserted frame.
+
+It's possible to retrieve the hyperlink associated to a frame (if any) through
+C<get_hyperlink()>. The returned object is not the URL, it's a regular element
+whose URL may be read or changed using C<get_url()> or C<set_url()>.
+
+In a text document, a frame may be attached to the document body, as long as
+it's anchored to a page; as an consequence, a C<page> parameter must be
+provided with the page number. The example below inserts a new frame that
+will appear in the first page, assuming that the document type is C<text>:
+
+        $doc->get_body->insert_element(
+                odf_frame->create(
+                        name            => "FR1",
+                        text            => "Example",
+                        size            => "8cm, 3cm",
+                        position        => "2cm, 3.5cm",
+                        page            => 1
+                )
+        );
+
+Note that a page-anchored frame should be attached to a text document body
+through C<insert_element()> without option, and not C<append_element()>,
+knowing that typical ODF viewers can't properly render if it's not stored
+I<before> any other visible content.
+
+Simply put, with the exception above, a frame is anchored to the calling
+context element. The ODF elements that may insert a frame in the present
+lpOD API are *draw pages*, *paragraphs*, *tables*, and *cells*.
+
+The sequence hereafter inserts a frame immediately after the 5th paragraph
+of a document; to do so, an empty paragraph is inserted at the right position
+then used to host the frame:
+
+        $context = $doc->get_body;
+        $p = $context->insert_element(
+                odf_paragraph->create,
+                after   => $context->get_paragraph(position => 4)
+        );
+        $p->insert_element(
+                odf_frame->create(
+                        name    => "FR2",
+                        size    => "12cm, 8cm",
+                        text    => "In the box"
+                )
+        );
+
+In a presentation or drawing document, the calling element is typically a draw
+page.
+
+When C<insert_element()> is called from a paragraph, an optional C<offset>
+parameter, specifying the position in the text where the frame will be inserted,
+may be provided (the default position is the beginning of the paragraph).
+
+The way to attach a frame to a table cell is not the same in a text document
+as in a spreadsheet document. lpOD tries to hide the differences provided that
+the attachement is done when the cell itself is already attached to a document.
+On the other hand, if the target cell is not attached, lpOD doesn't know what
+will be the document type and silently selects the attachment method that works
+for text documents.
+
+An existing frame may be selected using C<get_frame()> from any context with
+the frame name as argument.
+
+It's possible, of course, to populate a frame using C<insert_element()> or
+C<append_element()> from the frame itself. However, the API provides frame-
+specific methods in order to directly create and incorporate the most common
+objects in a frame context, namely *text boxes* and *images*. These methods are
+respectively:
+
+=over
+
+=item
+
+C<set_text_box()>, which requires no argument, but which may be called with
+a list of existing ODF elements that could become a valid content for a
+text box (paragraphs, item lists, etc); this method returns an object that
+may be later used to insert additional content;
+
+=item
+
+C<set_image()>, which creates an image element that will cover the whole
+area of the frame; the first argument is the external of internal path to
+the image file; alternatively, if C<set_image()> is called with an
+existing ODF image element as argument, this element is incorporated as is
+without creation; C<set_image()> returns the new (or newly inserted) ODF
+image element; a C<load> boolean option is allowed and, if set to C<TRUE>,
+specifies that the external file whose path is provided as the first
+argument must be loaded in the ODF package (works only if the calling frame
+is attached to a document); a C<size> optional parameter allows the
+application to explicitly force a particular size.
+
+The following example loads a image file according to a given URL in the
+document package, associates it to the calling C<odf_frame> object, and
+resizes the frame according to given width and height:
+
+        $frame->set_image(
+                "http://my.images/logo.png",
+                load    => TRUE,
+                size    => "5cm, 8cm"
+                );
+
+If no C<size> parameter is provided and if the calling frame has no previously
+defined size, then C<set_image()> tries to automatically detect the size of
+the given resource. Note that such detection may be very costly, especially
+if the image resource is remote. The best option definitely consists of
+providing an explicit size each time this size may be known and/or fixed by the
+application.
+
+Caution: The C<load> option can't work if the calling frame is not in a
+document, because the storage space of the image is the document container, not
+the frame.
+
+=back
+
+=head1  Images
+
+An image element may be created out of any document with C<odf_create_image()>.
+This constructor requires only one named parameter, that is either C<url> or
+C<content>. The first one is a link to a graphic resource, while the second
+one is the binary content of an image in BASE64 encoding.
+
+These properties may be retrieved or changed later using C<get_uri()>,
+C<set_uri()>, C<get_content()>, C<set_content()>.
+
+An image should be incorporated in a document through a I<frame>. In most
+situations, the applications don't need to explicitly create and handle image
+objects, that may be more easily set through the image frame constructor (see
+below).
+
+=head1  Frames including text boxes or images
+
+Knowing that a frame is in most situations created as a text box or image
+container, the C<odf_create_text_frame()> and C<odf_create_image_frame()>
+constructors allow the user to directly create a frame with the appropriate
+content. Each one requires a mandatory argument in first position (before the
+usual frame parameters).
+
+Note that C<odf_create_text_frame()> and C<odf_create_image_frame()> are
+just syntactic variants for the following instructions, respectively:
+
+        odf_frame->create(text => $text [, options]);
+        odf_frame->create(image => $resource [, options]);
+
+For C<odf_create_text_frame()> the first argument is either a text string or
+an ODF text element. In the first case the string is used as the content of
+the text box. In the second case the text element is used as is as the content
+of the text box.
+
+For C<odf_create_image_frame()> the first argument is the link to the internal
+or external image resource.
+
+If the C<size> parameter is not set, lpOD internally uses L<Image::Size> in
+order to set it to the original image size of the given resource. Beware that
+such an automatic size detection may be very costly, so the user should
+provide explicit frame sizes in any intensive application.
+
+Note that the L<ODF::lpOD::Document> class provides a C<add_image_file()>
+method that can import external image files in the ODF package. In array
+context, this method returns both the internal path of the image and, if
+possible, the original image size.
+
+Caution: the automatic image sizing feature provided by lpOD uses the I<point>
+(pt) as length unit, not an absolute length unit (such as the millimeter or the
+inch); so it may ensure a correct aspect ratio but the real display size may
+depend on the rendering environment.
+
+The following sequence imports an image file, creates a frame that uses it,
+then attach the frame to a newly appended paragraph (so the image will appear
+at the very end of a text document):
+
+        my ($path, $size) = $doc->add_image_file('/home/images/logo.png');
+        my $frame = odf_create_image_frame($path, size => $size);
+        my $paragraph = $doc->get_body->append_element(odf_create_paragraph);
+        $paragraph->append_element($frame);
+
+The same job could be done another way:
+
+        my $frame = odf_frame->create;
+        my $paragraph = $doc->get_body->append_element(odf_create_paragraph);
+        $paragraph->append_element($frame);
+        $frame->set_image('/home/images/logo.png', load => TRUE);
+
+Note that it's strongly recommended, each time it's possible, to set an
+application-provided size, in order to avoid the costly automatic size
+detection.
+
+Beware that a size of 0x0 is sometimes interpreted as "original size" by
+the office software. If so, the best option consists of providing a C<size>
+parameter set to C<"0,0">: it may avoid useless processing, because the
+frame is automatically sized by the rendering software, instead of being
+extracted by lpOD.
+
+=head1  Drawing shapes
+
+=head2  Common Drawing Shape Attributes
+
+The currently covered shapes are C<line>, C<rectangle>, C<ellipse>, and
+C<connector>.
+
+A shape is created using an C<odf_create_xxx()> constructor, where C<xxx> is of
+course replaced by a shape name from the list above, that returns an
+C<odf_shape> object.
+
+The common properties that may be set through shape constructor named parameters are:
+
+=over
+
+=item
+
+C<name>: an optional name, that should be unique;
+
+=item
+
+C<id>: an optional identifier, that must be unique;
+
+=item
+
+C<style>: the name of the graphic style of the shape;
+
+=item
+
+C<text style>: the style that is used to format the text that can be added
+to this shape, if any (if defined, must be a paragraph style);
+
+=item
+
+C<layer>: the optional name of the layer in the layer set of the document, if
+the graphics are layered;
+
+=item
+
+C<transform>: a list of transformations that can be applied to a shape,
+provided as a string where the transform definitions are separated by commas
+or spaces (ex.: C<rotate(45), scale(10, 12)>); see ODF 1.1 §9.2.15 for the
+supported transformations;
+
+=item
+
+C<title> and C<description>: see below.
+
+=back
+
+Note that, while the C<name> property is not specified as unique in the
+standard, OpenOffice.org prevents the end-user from providing non-unique names
+to drawing shapes. On the other hand, OpenOffice.org currently neither uses nor
+preserves the C<id> property in text documents, but needs it to implement the
+connectors in presentation documents. So, we presently recommend the use of
+C<name>, with unique values, as soon as the applications need persistent shape
+identifiers.
+
+A shape may be provided with a I<title> and a I<description> (which are non-
+displayed but persistent metadata), through the C<set_title()> and
+C<set_description()> methods. These informative data may be retrieved using
+C<get_title()> and C<get_description()>.
+
+A shape may be attached to a text element using C<insert_element()> or
+C<append_element()>.
+When C<insert_element()> is called from a paragraph, an optional C<offset>
+parameter, specifying the position in the text where the shape will be inserted,
+may be provided (the default position is the beginning of the paragraph).
+
+For some shapes, the following properties must be provided:
+
+=over
+
+=item
+
+C<position>, the coordinates of the frame, as a list of 2 strings
+containing the X and Y positions (each string specifies the number
+and the unit, ex. "1cm", "2pt");
+
+=item
+
+C<size>: the size, provided using the same format and rules as the position.
+
+=back
+
+However, the C<position> and C<size> properties don't apply to some particular
+shapes, such as I<lines> and I<connectors> (see below).
+
+A shape becomes visible when it's inserted somewhere using the generic
+C<insert_element()> method.
+
+In a text document, a frame may be attached at the document level, as long as
+it's anchored to a page; as an consequence, a C<page> parameter must be
+provided with the page number. Without this C<page> property, lpOD anchors the
+shape to the first page by default.
+
+Simply put, with the exception above, a shape is anchored to the calling
+context element.
+
+Optionally, regular text paragraphs may be embedded in a shape. Unlike the name,
+the title and the description, this paragraph will be visible. There is no
+shape-specific method for that; the generic C<append_element()> method, called
+from the C<odf_shape> object, allows the user to insert a paragraph in a shape.
+The given paragraph may have its own style, whose properties override those of
+the shape C<text style>.
+
+=head2  Rectangles and Ellipses
+
+Rectangles and ellipses are created with C<odf_create_rectangle()> and
+C<odf_create_ellipse()>, respectively, using the common properties described
+above, including C<size> and C<position>.
+
+The following example, supposed to work with a text document, creates a
+rectangle anchored to the first page with given position, size, title,
+description. Then a text paragraph is written in it:
+
+        $context = $document->get_part(CONTENT)->get_body;
+        $rectangle = odf_create_rectangle(
+                name => "Rectangle1", id => "R1", page => 1
+                );
+        $rectangle->set_title("The rectangle");
+        $rectangle->set_description("The description of the rectangle");
+        $context->insert_element($rectangle);
+        $paragraph = odf_create_paragraph(
+                text => 'The text in the shape', style => 'Standard'
+                );
+        $rectangle->append_element($paragraph);
+
+=head2  Lines and Connectors
+
+A line is created using C<odf_create_line()>, with the standard shape
+parameters with the exception of C<size> and C<position>.
+
+The size and the position are defined by line-specific C<start> and C<end>
+properties, each one representing the coordinates of an extremity, in the same
+format as the C<position> property of some other shapes.
+
+A connector is created using C<odf_create-connector()>. It may be defined with
+the same parameters as a line, but can support a more sophisticated
+configuration, through the following specific properties:
+
+=over
+
+=item
+
+C<connected shapes>: the name of the start and end shapes that are linked
+through the connector (as a pair of strings);
+
+=item
+
+C<glue points>: the numbers of the glue points in the start and end shapes,
+respectively (glue points are designated points on the area of a drawing object
+to which a connector shape can connect, see ODF 1.1 §9.2.19);
+
+=item
+
+C<type>: the connector type, knowing that allowed values are C<standard>,
+C<lines>, C<line>, and C<curve>.
+
+=back
+
+=head1   Tables of contents
+
+A table of contents (TOC) is represented by an C<odf_toc> object, which is
+created using the C<odf_create_toc()> constructor.
+
+Note that a C<odf_toc> object is a descriptor that specifies parameters for
+automatic generation by a typical, ODF-compliant text processor. The TOC is
+not automatically filled by lpOD.
+
+=head2   TOC creation
+
+A table of contents is created as a free element using the C<odf_create_toc()>
+constructor, with a mandatory unique name as its first argument, and the
+following parameters:
+
+=over
+
+=item
+
+C<title>: an optional title (to be displayed at the TOC head), whose
+default value is the given name;
+
+=item
+
+C<style>: the name of a section style applying to the TOC;
+
+=item
+
+C<protected>: a boolean flag that tells the editing applications if the
+  section is write-protected (default=C<TRUE>);
+
+=item
+
+C<outline level>: specifies the last outline level to be used used when
+generating the TOC from headings; if this parameter is omitted, all the
+outline levels are used by default;
+
+=item
+
+C<use outline>: a boolean flag that specifies if the TOC must be generated
+from headings (default=C<TRUE>);
+
+=item
+
+C<use index marks>: a boolean flag that specifies if the TOC must be
+generated from index marks (default=C<FALSE>).
+
+=back
+
+A table of contents object, after creation, may be put somewhere in a
+document using a generic method such as C<insert_element()>. Note that such
+an object should be inserted in the C<CONTENT> part of a text document only.
+
+=head2   TOC retrieval
+
+An existing table of contents may be retrieved by name using the part
+method C<get_toc()>. Note that this method works with the C<CONTENT> part
+only.
+
+It's possible to retrieve the full list of the TOCs in the document content
+through C<get_tocs()>, without argument.
+
+=head2   TOC methods
+
+The C<odf_toc> elements provide the following methods:
+
+=over
+
+=item
+
+C<get_body()> returns the table/index body, that is the context for any
+visible content; this content (once generated by a text processor) is typically
+made of a sequence of paragraphs;
+
+=item
+
+C<get_name()> and C<set_name()> to get or set the internal unique name;
+
+=item
+
+C<get_title()> and C<set_title()> to get or change the display TOC title;
+with C<set_title()>, the first argument is the text of the title, and a
+C<style> named parameter is allowed to specify a paragraph style for the title;
+
+=item
+
+C<get_outline_level()> and C<set_outline_level()> to get or change the
+current outline level property;
+
+=item
+
+C<get_use_outline()> and C<set_use_outline()> to get or set the use outline
+flag;
+
+=item
+
+C<get_use_index_marks()> and C<set_use_index_marks()> to get or set the use
+index marks flag.
+
+=item
+
+C<get_protected()> and C<set_protected()> to get or set the current protection
+status.
+
+=back
+
+=head1	AUTHOR/COPYRIGHT
+
+Developer/Maintainer: Jean-Marie Gouarne L<http://jean.marie.gouarne.online.fr>
+Contact: jmgdoc@cpan.org
+
+Copyright (c) 2010 Ars Aperta, Itaapy, Pierlis, Talend.
+Copyright (c) 2011 Jean-Marie Gouarne.
+
+This work was sponsored by the Agence Nationale de la Recherche
+(L<http://www.agence-nationale-recherche.fr>).
+
+License: GPL v3, Apache v2.0 (see LICENSE).
+
+=cut

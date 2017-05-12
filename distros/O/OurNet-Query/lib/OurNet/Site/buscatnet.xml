@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<SITE ID="Buscatnet">
+
+<NAME Lang="en-us">BuscaNet Search</NAME>
+<INFO Lang="en-us">general information web search in Brazil</INFO>
+
+<URL Type="More"><![CDATA[
+post://www.busca.net/cgi-bin/busca.pl?action=busca&palchave=_QUERY_&tema=&first=_START_10_1_
+]]></URL>
+<URL Type="Start"><![CDATA[
+post://www.busca.net/cgi-bin/busca.pl?action=busca&palchave=_QUERY_&tema=&first=1
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+
+<TEMPLATE><![CDATA[
+<tr><td___<A HREF="_URL_">_TITLE_</A>___COLOR=##000000>_PREVIEW_</FONT>___inserção:_DATE_<br>___</tr></table>
+]]></TEMPLATE>
+</SITE>

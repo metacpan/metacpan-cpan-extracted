@@ -1,0 +1,36 @@
+[% INCLUDE header.tt page_title = "Pages Needing Moderation - $site_name" %]
+[% INCLUDE banner.tt %]
+<div id="content">
+
+[% IF !config.content_above_navbar_in_html %]
+  [% INCLUDE navbar.tt %]
+[% END %]
+
+<div id="maincontent">
+<h2>Pages Needing Moderation</h2>
+<p>
+These are nodes which have been created/edited, but not yet moderated.
+</p>
+<table id="needing_moderation" style="width:90%">
+<tr><th>Node name</th><th>Pending Version</th><th>Latest Moderated Version</th><th>Action</th></tr>
+  [% FOREACH node = nodes %]
+     <tr>
+     <td>[% node.name %]</td>
+     <td align="center">[% node.version %]</td>
+     <td align="center">[% node.moderated_version %]</td>
+     <td><a href="[% node.moderate_url %]">Moderate this version</a>
+         or <a href="[% node.delete_url %]">Delete this version</a>
+         or <a href="[% node.view_url %]">View this version</a>
+         or <a href="[% node.diff_url %]">See changes</a>
+     </td>
+     </tr>
+  [% END %]
+</table>
+
+</div>
+
+[% IF config.content_above_navbar_in_html %]
+  [% INCLUDE navbar.tt %]
+[% END %]
+
+[% INCLUDE footer.tt %]

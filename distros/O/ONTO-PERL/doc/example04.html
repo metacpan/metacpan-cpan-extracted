@@ -1,0 +1,216 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"/>
+<title>Find the intersection of two ontologies</title>
+</head>
+<body>
+
+<h2>Intersection of ontologies</h2>
+	
+<ol>
+	<li><a href="#1">Find out the intersection of two given ontologies <i>o1</i> and <i>o3</i>.</a></li>
+
+</ol>
+	
+	<ol>
+	<li> <b><a name="1">Find out the intersection of two given ontologies <i>o1</i> and <i>o3</i>:</a></b>
+		<pre>
+				use OBO::Core::Ontology;
+				use OBO::Util::Ontolome;
+				use OBO::Core::Term;
+				use OBO::Core::Relationship;
+				use OBO::Core::RelationshipType;
+				use OBO::Parser::OBOParser;
+				
+				my $ome  = OBO::Util::Ontolome->new();			
+				
+				my $o1  = OBO::Core::Ontology->new();
+				
+				# Create some terms
+				my $d5   = OBO::Core::Term->new();
+				my $d2   = OBO::Core::Term->new();
+				my $d6   = OBO::Core::Term->new();
+				my $d1   = OBO::Core::Term->new();
+				my $d7   = OBO::Core::Term->new();
+				my $d8   = OBO::Core::Term->new();
+				my $d10  = OBO::Core::Term->new();
+				my $d11  = OBO::Core::Term->new();
+				my $d20  = OBO::Core::Term->new();
+				my $d21  = OBO::Core::Term->new();
+				my $d32  = OBO::Core::Term->new();
+				my $d23  = OBO::Core::Term->new();
+				my $d24  = OBO::Core::Term->new();
+				my $d25  = OBO::Core::Term->new();
+				my $d26  = OBO::Core::Term->new();
+				my $d27  = OBO::Core::Term->new();
+				my $d28  = OBO::Core::Term->new();
+				my $d29  = OBO::Core::Term->new();
+		
+				# Set the IDs of the just created terms
+				$d5->id("5");
+				$d2->id("2");
+				$d6->id("6");
+				$d1->id("1");
+				$d7->id("7");
+				$d8->id("8");
+				$d10->id("10");
+				$d11->id("11");
+				$d20->id("20");
+				$d21->id("21");
+				$d32->id("32");
+				$d23->id("23");
+				$d24->id("24");
+				$d25->id("25");
+				$d26->id("26");
+				$d27->id("27");
+				$d28->id("28");
+				$d29->id("29");
+		
+				# Set the names of the just created terms
+				$d5->name("5");
+				$d2->name("2");
+				$d6->name("6");
+				$d1->name("1");
+				$d7->name("7");
+				$d8->name("8");
+				$d10->name("10");
+				$d11->name("11");
+				$d20->name("20");
+				$d21->name("21");
+				$d32->name("32");
+				$d23->name("23");
+				$d24->name("24");
+				$d25->name("25");
+				$d26->name("26");
+				$d27->name("27");
+				$d28->name("28");
+				$d29->name("29");
+		
+				# Create a relationship
+				my $r = 'is_a';
+				$o1->add_relationship_type_as_string($r, $r);
+				
+				# Connect the terms using the 'create_rel' function
+				$o1->create_rel($d5,$r,$d2);
+				$o1->create_rel($d2,$r,$d6);
+				$o1->create_rel($d2,$r,$d1);
+				$o1->create_rel($d2,$r,$d7);
+				$o1->create_rel($d7,$r,$d8);
+				$o1->create_rel($d7,$r,$d11);
+				$o1->create_rel($d1,$r,$d10);
+				$o1->create_rel($d1,$r,$d8);
+				$o1->create_rel($d5,$r,$d23);
+				$o1->create_rel($d11,$r,$d28);
+				$o1->create_rel($d28,$r,$d29);
+				$o1->create_rel($d8,$r,$d27);
+				$o1->create_rel($d27,$r,$d26);
+				$o1->create_rel($d10,$r,$d24);
+				$o1->create_rel($d24,$r,$d25);
+				$o1->create_rel($d25,$r,$d26);
+				$o1->create_rel($d6,$r,$d20);
+				$o1->create_rel($d20,$r,$d21);
+				$o1->create_rel($d20,$r,$d32);
+				$o1->create_rel($d21,$r,$d25);
+				
+				# Create another ontology
+				my $o3  = OBO::Core::Ontology->new();
+				
+				# Create some new terms			
+				my $de5   = OBO::Core::Term->new();
+				my $de2   = OBO::Core::Term->new();
+				my $de6   = OBO::Core::Term->new();
+				my $de1   = OBO::Core::Term->new();
+				my $de7   = OBO::Core::Term->new();
+				my $de8   = OBO::Core::Term->new();
+				my $de10  = OBO::Core::Term->new();
+				my $de11  = OBO::Core::Term->new();			
+				my $de20  = OBO::Core::Term->new();
+				my $de21  = OBO::Core::Term->new();
+				my $de32  = OBO::Core::Term->new();
+				my $de23  = OBO::Core::Term->new();
+				my $de24  = OBO::Core::Term->new();
+				my $de25  = OBO::Core::Term->new();
+				my $de26  = OBO::Core::Term->new();
+				my $de27  = OBO::Core::Term->new();
+				my $de28  = OBO::Core::Term->new();
+				my $de29  = OBO::Core::Term->new();
+	
+				# Set the IDs of the just created terms			
+				$de5->id("5");
+				$de2->id("2");
+				$de6->id("6");
+				$de1->id("1");
+				$de7->id("7");
+				$de8->id("8");
+				$de10->id("10");
+				$de11->id("11");
+				$de20->id("20");
+				$de21->id("21");
+				$de32->id("32");
+				$de23->id("23");
+				$de24->id("24");
+				$de25->id("25");
+				$de26->id("26");
+				$de27->id("27");
+				$de28->id("28");
+				$de29->id("29");
+	
+				# Set the names of the just created terms			
+				$de5->name("5");
+				$de2->name("2");
+				$de6->name("6");
+				$de1->name("1");
+				$de7->name("7");
+				$de8->name("8");
+				$de10->name("10");
+				$de11->name("11");
+				$de20->name("20");
+				$de21->name("21");
+				$de32->name("32");
+				$de23->name("23");
+				$de24->name("24");
+				$de25->name("25");
+				$de26->name("26");
+				$de27->name("27");
+				$de28->name("28");
+				$de29->name("29");
+	
+				# Add another relationships
+				my $s = 'part_of';			
+				$o3->add_relationship_type_as_string($r, $r);
+				$o3->add_relationship_type_as_string($s, $s);
+						
+				# Connext the terms	
+				$o3->create_rel($de5,$r,$de8);
+				$o3->create_rel($de8,$r,$de11);
+				$o3->create_rel($de11,$r,$de28);
+				$o3->create_rel($de28,$r,$de26);
+				$o3->create_rel($de28,$s,$de29); # part_of !!!
+				$o3->create_rel($de5,$r,$de24);
+				$o3->create_rel($de24,$r,$de23);
+	
+				# Find the intersection of o1 and o3
+				my $ontito = $ome->intersection($o1, $o3);
+	
+				my $n = $ontito->get_number_of_terms();         # $n should be 8			
+				my $w = $ontito->get_number_of_relationships(); # $w should be 6
+				
+				$ontito->has_relationship_id("5_is_a_8");       # TRUE
+				$ontito->has_relationship_id("8_is_a_26");      # TRUE
+				$ontito->has_relationship_id("5_is_a_26");      # FALSE
+				$ontito->has_relationship_id("5_is_a_11");      # TRUE
+				$ontito->has_relationship_id("11_is_a_28");     # TRUE
+				$ontito->has_relationship_id("5_is_a_28");      # FALSE
+				$ontito->has_relationship_id("28_part_of_29");  # FALSE
+				$ontito->has_relationship_id("5_is_a_29");      # FALSE
+				$ontito->has_relationship_id("11_is_a_29");     # FALSE
+				$ontito->has_relationship_id("5_is_a_24");      # TRUE
+				$ontito->has_relationship_id("5_is_a_23");      # TRUE
+			</pre>
+	</li>
+	</ol>
+
+Copyright (c) 2006-2015 by Erick Antezana. All rights reserved.
+
+</body>
+</html>

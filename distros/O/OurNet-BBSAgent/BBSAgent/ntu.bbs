@@ -1,0 +1,72 @@
+# $File: //depot/OurNet-BBSAgent/BBSAgent/ntu.bbs $ $Author: autrijus $
+# $Revision: #2 $ $Change: 2829 $ $DateTime: 2002/01/10 14:54:36 $
+# Contributed by Annies <Annies.bbs@cvic.org>
+# zh_TW.Big5: 台大計中椰林風情站
+
+Taiwan University Computer Center
+bbs.ntu.edu.tw
+
+setv headansi 0;47;34m
+setv headansiend 44;37m
+
+=login
+wait 代號：
+send $[username]\n
+doif $[password]
+    wait 密碼：
+    send $[password]\nn\n
+endo
+send \n\n\n\n
+
+=main
+send qqqqqqee
+wait 主功能表
+till Pager
+
+=logoff
+call main
+send q\n\n\n\n
+exit
+
+=board
+call main
+send s\n
+wait 名稱
+send $[board]\n$\x20\x20
+wait 板主：
+wait 文  章  標  題
+
+=board_list_last
+call board $[board]
+send 1\n\x24h\x20 # 1, $, h, space
+wait 板主：
+wait \x0d>
+till /
+exit
+
+=board_article_fetch_first
+call board $[board]
+send $[article]\n\n
+wait \e[2J
+till \e[0;37;44m 瀏覽
+  or \e[37;44m 文章選讀
+till 求助
+  or 回應
+wait ←(q)\e[30m結束\x20\e[m
+  or 搜尋作者\x20\e[0m
+exit
+
+=board_article_fetch_next
+send \x20
+till \e[0;37;44m 瀏覽
+  or \e[37;44m 文章選讀
+till 求助
+  or 回應
+wait ←(q)\e[30m結束\x20\e[m
+  or 搜尋作者\x20\e[0m
+exit
+
+=board_article_fetch_last
+send c
+till 板主：
+exit

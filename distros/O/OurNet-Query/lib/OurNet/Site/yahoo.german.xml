@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<SITE ID="Yahoo.German">
+
+<NAME Lang="en-us">Yahoo WWW Search</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+Yahoo全球搜尋(德文)
+]]></NAME>
+<INFO Lang="en-us">general information web search in German</INFO>
+<INFO Lang="zh-tw">general information web search in German</INFO>
+
+<URL Type="More"><![CDATA[
+_MORE_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://search.yahoo.de/search/de?o=1&d=y&za=default&h=s&g=0&n=_HITS_&p=_QUERY_
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_MORE_"><![CDATA[
+<CENTER>[<B><A HREF="_MORE_">Weitere
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<LI><A HREF="_URL_">_TITLE_</A>_PREVIEW__EOR_
+]]></TEMPLATE>
+</SITE>

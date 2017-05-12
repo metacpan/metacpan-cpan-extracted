@@ -1,0 +1,58 @@
+NAME
+    ORLite::Profile - Experimental Aspect-Oriented Profiler for ORLite
+
+SYNOPSIS
+      # Load your ORLite database
+      use My::ORLiteDB;
+      
+  # Load the profiler
+      use ORLite::Profile;
+      
+  # Stimulate the load you want to profile here.
+      # When the program exists, the profiling data
+      # will ne printed to STDERR.
+
+DESCRIPTION
+    ORLite::Profile is an experimental profiler for ORLite. It currently
+    serves as an experimental test-bed for more wide-scoped DBI profiling
+    and monitoring modules.
+
+    It weaves Aspect-based profiling logic into the DBI layer, below the
+    ORLite logic itself.
+
+    At the present time, the main purpose of this module is to examine the
+    aggregate total time spent in the connect, prepare, and execute tasks.
+
+    I hope to expand this in the future to capture more interesting types of
+    data.
+
+Using This Module
+    This module has no interface and takes no options.
+
+    You just load it after your ORLite-based class is loaded, and then
+    generate some test load.
+
+    When the program exits, the profing information is written to STDERR.
+
+SUPPORT
+    Bugs should be reported via the CPAN bug tracker at
+
+    <http://rt.cpan.org/Public/Dist/Display.html?Name=ORLite-Profile>
+
+    For other issues, contact the author.
+
+AUTHOR
+    Adam Kennedy <adamk@cpan.org>
+
+SEE ALSO
+    ORLite::Mirror, ORLite::Migrate
+
+COPYRIGHT
+    Copyright 2008 - 2009 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

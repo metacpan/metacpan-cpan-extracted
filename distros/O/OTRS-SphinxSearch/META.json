@@ -1,0 +1,72 @@
+{
+   "abstract" : "Implementation of the OTRS search engine by Sphinx search",
+   "author" : [
+      "Iurii Shikin <shikin@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "OTRS-SphinxSearch",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::EOL" : "0",
+            "Test::More" : "0",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Version" : "1"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Readonly" : "0",
+            "Sphinx::Search" : "0.28",
+            "Time::Piece" : "0",
+            "perl" : "5.006001",
+            "strict" : "0",
+            "vars" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "Test::MockTime" : "0",
+            "Test::More" : "0",
+            "Test::Spec" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/regru/ORTS-SphinxSearch/issues"
+      },
+      "homepage" : "https://metacpan.org/release/ORTS-SphinxSearch",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/regru/ORTS-SphinxSearch.git",
+         "web" : "https://github.com/regru/ORTS-SphinxSearch"
+      }
+   },
+   "version" : "0.011"
+}
+

@@ -1,0 +1,466 @@
+Orac  --  DBA GUI tool for Perl/Tk; Oracle, Informix and Sybase
+
+THIS IS A DEVELOPMENT VERSION OF ORAC, AND AN ATTEMPT TO ADD ORACLE 
+DEVELOPMENT TOOLS TO ORAC, AS WELL AS DBA ONES.  FOR STABLE DBA USAGE,
+UNTIL FURTHER NOTICE, USE THE Orac-1.2.0 DOWNLOAD.
+
+   Copyright (c) 1998,1999,2000,2001 Andy Duncan, England
+
+   email:         andy_j_duncan@yahoo.com
+   CPAN id:       CPAN/authors/id/A/AN/ANDYDUNC
+
+=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+
+        Orac runs over the *Web* using a Netscape Perl/Tk Plug-In
+        created by Frank Holt.  Please run up Orac, and go to Help
+        information for more details (help/WebPlugIn.txt).
+=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+
+
+NB: ....Oracle Development Usage Gradually Being Added...
+    .........By Andy Duncan & Richard Sutherland.........
+
+NB: ....Further Oracle DBA Development Gradually Being Added...
+    ..................By Richard Sutherland....................
+
+NB: This README file does not contain all of the information within
+the Orac distribution.  For more specialised information, please go
+to our "docs" or "help" directories.
+
+Orac-1.2.0 is the latest stable version of Orac.  You may wish
+to download this if you have any problems with these later development
+versions, if you are a DBA.
+
+TERMS AND CONDITIONS OF USE:
+
+   You may distribute under the terms of either the GNU General Public
+   License or the Artistic License, as specified in the Perl README file,
+   with the exception that it cannot be placed on a CD-ROM or similar media
+   for commercial distribution without the prior approval of the author.
+
+PLEASE NOTE:
+
+   Some of the Oracle SQL scripts which come with this Perl program,
+   are copyrighted to Brian Lomasky.  Please seek clarification from
+   Brian before you extend the use of these SQL scripts beyond this
+   Perl program.  Such scripts can be easily identified by the header:
+
+   /* From Oracle Scripts, O Reilly and Associates, Inc. */
+   /* Copyright 1998 by Brian Lomasky, DBA Solutions, Inc., */
+   /* lomasky@earthlink.net */
+
+WARNING:
+
+IN NO EVENT SHALL THE AUTHORS OR DISTRIBUTORS BE LIABLE TO ANY PARTY
+FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES
+ARISING OUT OF THE USE OF THIS SOFTWARE, ITS DOCUMENTATION, OR ANY
+DERIVATIVES THEREOF, EVEN IF THE AUTHORS HAVE BEEN ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
+
+THE AUTHORS AND DISTRIBUTORS SPECIFICALLY DISCLAIM ANY WARRANTIES,
+INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.  THIS SOFTWARE
+IS PROVIDED ON AN "AS IS" BASIS, AND THE AUTHORS AND DISTRIBUTORS HAVE
+NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR
+MODIFICATIONS.
+
+PREREQUISITES (For Everybody)
+
+   At least: perl5.6.0
+
+             DBI-1.10
+
+             Tk800.000
+
+             Latest relevant DBD database driver for DBI-1.10
+             (eg: For Oracle DBD-Oracle-1.xx)
+
+   Oracle developers will also require Richard Sutherland's DDL::Oracle
+   module.  We are using:
+
+             DDL-Oracle-1.07.tar.gz 
+
+   This (or the latest version) is available from:
+
+   http://www.perl.com/CPAN-local/modules/by-authors/id/R/RV/RVSUTHERL/
+
+   For an indefinite period, the latest DDL::Oracle package will
+   come automatically with the Orac download.  This may change.  If you
+   go to the DDL directory within this distribution, you will also
+   see the tools which come with the DDL::Oracle release, which may
+   be of some use to you.
+
+ORACLE DEVELOPER GRAPHICAL OPTION:
+
+   If you have DBD-Chart installed, Oracle developers also acquire
+   a graphical option automatically.
+
+   1.  You can get hold of DBD-Chart from:
+
+       => http://home.earthlink.net/~darnold/dbdchart/
+
+       This module also requires the installation of GD.pm and the full
+       instructions for installing this are within the DBD-Chart
+       documentation. Hopefully GD.pm will eventually become part
+       of the standard Perl distribution.
+    
+   2.  Use of DBD-Chart also requires the separate Perl/Tk installation of
+       Tk::JPEG (at least version 2.005) which is available from:
+    
+       => http://www.perl.com/CPAN-local/modules/by-module/Tk/
+    
+       Tk::JPEG is also available on ActiveState for ActivePerl.
+
+LINUX USERS:
+
+   There are some further notes at the end of this README file
+   for Linux users.
+
+WINDOWS NT USERS:
+
+   There are some further notes at the end of this README file
+   for Windows NT users.
+
+REALLY QUICK START GUIDE:
+
+   perl orac_dba.pl <RETURN>
+
+
+SLIGHTLY LESS QUICK START GUIDE (based upon Oracle on Solaris):
+
+*). Load perl5.6.0, DBD-Oracle-1.06, DBI-1.14 & Tk800.022
+*). Unzip (gzip -d, gunzip) the Orac-x.y.z.tar.gz file
+*). Untar (tar xvf) the Orac-x.y.z.tar file
+*). Set ORACLE_HOME in your environment
+*). Run orac_dba.pl, first making sure the top line of the
+    file has the right Perl string address, eg:
+        => #!/usr/local/bin/perl
+    Or run it with the Perl program directly, 'perl orac_dba.pl'.
+*). Most things should be fairly straightforward after that.
+
+
+NOTE ON USER CUSTOMISATIONS
+
+User customisations (e.g., last DB accessed and user tool menus) go to either:
+   1) If $ORAC_HOME (%ORAC_HOME% for Windows) exists, to that directory
+   2) If on Windows, %USERPROFILE%/orac
+   3) $HOME/.orac
+
+Users no longer have to cd into the Orac distribution directory.  On
+Unix systems, you could have a symbolic link from
+/usr/local/bin/orac_dba.pl to the Orac distribution directory.  On
+Windows machines, you could have a shortcut to the Orac_dba.pl
+(although this doesn't work from the command line).  $ORAC_HOME can be
+set to a shared directory if users want to share their user
+customisations.
+
+
+ABOUT Orac:
+
+Preamble: This tool was originally developed on an Ultra-5 Sun Solaris 2.6 Sun
+workstation.  There may be incompatibilities on your workstation, which may
+need a little source code tinkering.  Our apologies.  Please mail us if this
+is the case.  Even better, email us the coded up solution :-)
+
+Orac is a Perl/Tk tool written in order to store many different and hopefully
+useful SQL scripts within one central easy-to-use interface repository.
+It is a Read-Only 'as is' GUI tool (ie: no DDL, DML, transactions, commits or
+rollbacks, only selects)* and will be updated continuously to improve its
+functionality and GUI-ness simplicity.  If you have any useful SQL scripts,
+which you would like to be included within Orac, or requirements which you
+think may be useful to others, please mail them to me and we'll try and embed
+them in the next release.
+
+If you read through the revision history below, you'll see many such ideas
+have been taken up, and are now integral parts of the main Orac tool.
+
+Simple graphical ideas for turning difficult-to-read database information
+into useful pictures are particularly welcomed, as is functionality
+not currently supplied within other GUI tools.  General ideas for improving
+Orac (which began life as a SQL script for killing rogue Oracle processes)
+are always welcomed.  We hope you both enjoy using Orac, and save 
+yourself some time by using it.
+
+*Occasionally, this rule is bent a little to allow such tool extensions as
+our 'Explain Plan' functionality for Oracle users.
+
+
+Orac Hall of Fame, in alphabetical surname order:
+
+Bruce Albrecht
+Kevin Brannen
+Andy Duncan <andy_j_duncan@yahoo.com> Oracle Devel Work
+Sean Hull
+Kevin Kitts
+Thomas Lowery
+Charles Wolfe, Guru
+Alex Shnir
+Richard Sutherland <rvsutherland@yahoo.com> Oracle DBA & Devel Work
+
+FUTURE OF Orac:
+
+There is no plan.  We're just going to keep going until they take us away.
+
+
+REVISION HISTORY:
+-----------------
+Vers Date   Comment
+---- ----   -------
+0.01 Jan 99
+0.02 Jan 99 Original code revised to make more stable on other platforms.
+            Removed all '-font' usage and wrapped some statements in 'eval'
+            statements to prevent premature shutdowns.  Also took all SQL
+            out of program and placed in flat files to be called
+            as-and-when necessary (also allows for easier SQL modification).
+0.03 Feb 99 After further comments, radical revision carried out to
+            shrink Orac into 1 Perl script, rather than numerous heavy
+            modules.  Also revised Orac to use Tk4 partly to remove errors
+            for people using Tk4, and because the new 'Learning Perl/Tk'
+            manual recommends G. Sarathy's Win32 binary executable, which
+            currently uses Tk4.  Preparing code for first port away from
+            Solaris 2.6 UNIX.
+            Thanks to Tim Bunce for constructive criticism.
+0.04 Apr 99 Adjustments after first DBI-Users release.
+0.05 Apr 99 More Adjustments after first DBI-Users release.
+            Thanks in particular to Sean Hull for support.
+0.06 Apr 99 Cleaned up a few extraneous debug statements.  Decided to not
+            attempt ports, after hearing from some Linux users that
+            Orac ran "out-of-the-box", also NT and my mind do not fit
+            together.  Also, must add more functionality.
+            Tasklist this time, resizing of windows should be better.
+            Hit Ratios values should be clearer.
+            Thanks especially to Kevin Kitts.
+0.07 May 99 More Buggette cleaning, and better screen resizing on Form.
+            MTS support, under the Tuning button (thanks to Steve Shaw).
+            Background colour option added (thanks to Honza Pazdziora)
+            under File option.
+            Language Independence added, edit the txt/language.txt file
+            to change all Orac Menus, buttons etc, to your own text.
+            New 'My Tools' menu Option created to add your own SQL
+            reports on-the-fly.
+            (thanks to Jared Still for the inspiration on this one)
+            Addition of 'User' field on main database connection
+            screen to allow DBAs to use secure system-like users,
+            with more security conscious permissions.
+            (Thanks to Kevin Kitts for this one).
+Orac-1.0.0  New numbering system.  This is a rename of ORAC-DBA-0.07,
+            and the latest totally 'stable' version.
+            We are now using an Orac-x.y.z numbering system such that:
+               x is the major version number
+               y is the minor version number
+               z is the minor minor version number
+            When 'y' is 'even', Orac is stable, when 'odd', Orac
+            is developmental (though we still recommend its download as
+            we do not relase REALLY experimental versions).
+Orac-1.1.0  First of new Developmental 1.1.z Series
+            Finally got round to adding 'Interactive Form' for all
+            the Oracle Views in the database, accessible by 'Object' menu.
+            Added Orac icons for various iconizable windows.
+            (Thanks to Edmund Mergl for sending us a coded patch).
+            After an email from Kevin Brannen, and a fit of madness,
+            decided to try and make Orac database independent.  Are
+            we all mad?  Maybe, but it's fun, fun, fun in Orac City.
+            (Thanks to Charles Wolfe for sending us some extremely
+            valuable installation information.  He is a God-like
+            Guru of a Class A1 nature)
+            Thanks to Guy Harrison for allowing us to adapt his scripts
+            from his excellent High-Performance Tuning manual.
+            Many of these scripts have now been used in this version
+            of Orac, and much more will be done later to improve our
+            use of them.
+            Added SQL Browser/Explain Plan for Oracle
+            Better report formatting
+            Current Oracle future plans include a 'dbish' window,
+            Further non-Oracle database (particularly Informix) functionality,
+            Eventual addition of Sybase functionality.
+            More help files, comments in code,
+            More modularity,
+            +whatever else you'd like us to add?
+Orac-1.1.1  (Oracle) Neater 'Explain Plan' utility, On-the-fly SQL execution
+            utility.  Tidied a few 'uninitialized variable bugs'.
+Orac-1.1.2  (Informix) More functionality added. (Oracle) More tidying, plus
+            better/quicker use of config files, and use of SQL Browser without
+            PLAN_TABLE in db.
+Orac-1.1.3  A lot of file tidying for Oracle, and further Informix additions.
+            May be a little flaky, and tidied up in the 1.1.4 release.
+Orac-1.1.4 -
+Orac-1.1.7  Private releases changing code from 'structured'
+            - ok, spaghetti  :) - to the beginnings of object-oriented code.
+            one known bug, under Oracle, the special buttons on 'MTS
+            statistics', and 'whos locking who' screens, not working
+            correctly.  This will be sorted out in 1.1.8 (promise).
+Orac-1.1.8  Back to public releases of developing code.
+            First cut of orac_Shell.
+            Total use of generic_hlist() rather than gn_hl().
+            Further improvement of windows handling.
+            Known Oracle Bug with some interactive buttons, still on ice.
+Orac-1.1.9  Small fix in orac_Base for show_sql() and also had
+            to replace all the orac_Show() calls with the generic
+            $dialog->Show function, to prevent screen lock-ups
+            on NT.
+Orac-1.1.10 A lot more tidying.
+Orac-1.1.11 Additional Oracle items on menus.
+Orac-1.1.12 Bug fixes for Orac-1.1.11 (thanks Duc)
+Orac-1.1.13 More patches, plus latest orac_Shell
+Orac-1.1.14 More of the same.
+Orac-1.1.15 Gradual Addition of Alex's Sybase functionality.
+            + multi-user functionality added by Bruce Albrecht
+Orac-1.1.16 Private releases of 1.1.15 tidied up, and put together
+            for this public release.
+Orac-1.1.17 private: Further changes to orac_Shell, new orac_Sybase,
+            brand new orac_FileSelect module.
+Orac-1.1.18 -
+Orac-1.1.25 Many incremental private releases making as many windows
+            as possible independent, adding Font abilities, limited
+            Print options and a generalised File viewer.  Also
+            much more use of icons to ease use of program.  Functionally
+            not much different from 1.1.16 but hopefully a lot easier,
+            and a lot more pleasant to use.
+Orac-1.1.26 First public release of 'new-look' iconized, independent
+            windowed Orac.  Hope you like it!  :-)  (I do)
+Orac-1.1.27 -
+Orac-1.1.30 Incremental early development of Monitoring + bug fixes,
+            + other bits
+Orac-1.1.31 Public Release of OracMonitor.
+Orac-1.1.32 -
+Orac-1.1.33 Tidying, fixing etc,etc - thanks to Sean Kamath - and
+            attempts at code reduction.  Thanks to Edmund Mergl for
+            initial 8i fix.  More to be found I'm sure.
+Orac-1.1.34 Cleaning up newly introduced bugs.
+Orac-1.1.35 Horrible bug fix for ActiveState not requiring ORACLE_HOME,
+            where unixlike does.
+Orac-1.1.36 Attempt on Monitor fix.  Steve Humpage 'join' to 'catfile'
+            fix for backward compatibility.
+Orac-1.1.37 New orac_Sybase from Alex.
+Orac-1.1.38 -
+Orac-1.1.40 Final 1.1 KevinB Informix change, +changes to Shell
+Orac-1.1.41 -
+Orac-1.1.43 - ... Shell development, trying to fix Monitor Bug
+Orac-1.1.44 Monitor Bug is an Oracle-Linux bug.  Oracle have been told
+            and hopefully will fix in later Oracle version.
+Orac-1.1.45 Bits and Bobs.
+Orac-1.1.46 Final Beta release of Tom's Shell program + addition of
+            primitive help for getting OracWeb going.
+Orac-1.1.47 Mix-up on Beta module versions, should now be sorted out.
+Orac-1.1.48 Change on Oracle curr_users_orac.1.sql script by Andre Seesink
+            +other code changes by Andre marked in files :-)
+Orac-1.1.49 Last Andre Seesink and Duncan Lawie upgrades, plus bug fix
+            by DCL :-)
+Orac-1.1.50 Slight changes, + more commenting and switching within the
+            orac_Monitor module, which, after a consensus vote, will be kept
+            within the distribution for later improvement despite problems.
+            If you'd like to make this 100% kosher, please write and let
+            us know :)
+Orac-1.1.51 Heck and blast, a typo on my part.  Whoops, sorry fellas! :-)
+Orac-1.2.0  After no adverse reports on 1.1.51, this is that release
+            with this README file name and the program's version number
+            changed.  Thanks to everyone who's helped us get this far.
+            We ain't finished yet.
+Orac-1.2.1  Yep, it HAS been a while, but let's get this monkey running
+            again.  The VERY early beginnings of developer support
+            for Oracle developers using Richard Sutherland's DDL option.
+            Thanks to Andy Campbell, Sun employee and DBA genius! :-)
+Orac-1.2.2  Much more embodiement of Richard Sutherland's DDL-Oracle
+            coded by RVS and AndyD.  This version of Oracle now automatically 
+            incorporates the latest version of DDL::Oracle.  Automatic
+            detection of DBA or normal development user.  Wishlists
+            are welcome of where Oracle Development functionality
+            should go next.  We're just making this up as we go along! :-)
+Orac-1.2.3  On the Oracle DBA side, Richard Sutherland has added a new 
+            instance method -- show_space -- to DDL::Oracle.  It produces 
+            a space analysis report similar to the old 
+            Tab_FreeSpace.99.sql and Index_FreeSpace.99.sql.  These are
+            now no longer called, therefore we move closer to full GPL.
+            On the VERY experimental Oracle developer side of life, Andy
+            has added further developer options based on DDL-Oracle,
+            and a graphics option, if Perl has GD, Tk::PNG and DBD::Chart
+            installed.  AD fixed some disconnection warning errors
+            and the menu switches between Oracle developer and DBA.
+
+Orac-alpha-1.2.4  Upgrade to Perl 5.6.0.  Lots of other fiddly bits to do
+                  with charting, but these still very ALPHA.
+Orac-alpha-1.2.5  More development stuff, and Richard has extended
+                  DDL::Oracle usage to cover even more Oracle8i areas.
+Orac-alpha-1.2.5  Couple more graphs added, graphical library now
+                  required, Tk::JPEG, because it is available on CPAN for
+                  UNIX, and ActiveState, for ActivePerl.
+
+EXTRA NOTES FOR LINUX USERS:
+
+Originally provided by Kevin Kitts.
+
+Requirements for Running Orac (under Linux)
+-----------------------------------------------
+perl 5.05
+Tk 800_015 perl module (www.cpan.org)
+DBI/DBD perl modules (www.hermetica.com)
+Orac Download the latest stable version (or
+development version if looking for latest functionality)
+
+Using Orac under Linux
+--------------------------
+I've found a number of problems running Orac under RedHat 5.2. In order
+to get things to work it was necessary to get the latest *source* rpm for
+perl and rebuild perl. The man pages for rpm will explain how to do this
+rebuild - it is very straightforward. Also, the latest version of the
+perl Tk module (800_015) will be required as well. Lastly, you'll need
+to get the DBI/DBD modules and compile them.
+
+Make sure that you can get sql*plus to work first. If that works, make sure
+that the DBI/DBD make tests pass. If all of the above condtions hold true
+you should have no problem running Orac.
+
+KNOWN LINUX-ORACLE BUG
+
+There is a known Oracle-Linux bug, which may cause the Orac Monitor to fail
+when attempting to connect to recently shutdown databases.  Oracle have been
+informed, and will hopefully fix bug in a future release.  This is a general
+OCI bug, and has caused problems with other programs.  One workround is not
+to use Orac Monitor, but if this required, if you don't need LOBS etc then 
+you could try recompiling DBI with 'perl Makefile.PL -8'.  See DBI README
+for more details on this.
+
+This bug may also occur on other OSes, but cannot be replicated on Solaris.
+
+EXTRA NOTES FOR WINDOWS NT USERS:
+
+Using Orac under Windows NT
+-------------------------------
+Environment required:
+
+Basic Perl Requirement:
+
+*. ActivePerl
+
+Packages on top:
+
+*. DBD-Oracle8 (or DBD-Sybase etc)
+*. DBI
+*. Tk
+
+*. Install the ActivePerl binary distribution
+from ActiveState.com
+
+*. Then download and install the binaries for the
+various modules (Tk, DBI, DBD-Oracle8, etc)
+from ActiveState's Perl package site via PPM.
+
+Then download Orac-x.y.z, install and run.
+(probably always best to use latest version)
+
+The ActiveState URLs are:
+
+=> http://www.activestate.com/
+
+Download
+--------
+You can download the latest Orac via:
+
+=> ftp://ftp.funet.fi/pub/languages/perl/CPAN/authors/id/A/AN/ANDYDUNC/
+
+We have altered the DBI->connect routine to try a couple
+of different versions-on-a-theme, to allow non-unix
+boxes to connect remotely.  If you still cannot connect
+remotely, you may have to slightly change the DBI->connect
+statements to give DBI the right configuration for your
+remote database connection.
+
+EOF

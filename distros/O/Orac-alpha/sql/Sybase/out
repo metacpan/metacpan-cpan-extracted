@@ -1,0 +1,65 @@
+Constraints.99.sql:exec sp_revconstraint %s
+Datatypes.99.sql:exec sp__revtype %s
+Grants.99.sql:sp__helprotect '%s'
+Indexes.99.sql:exec sp_revindex "%s"
+Procedures.99.sql:exec sp__helptext %s
+RelatedProcedures.99.sql:exec sp__helpdepends %s, 'stored procedure'
+RelatedTriggers.99.sql:exec sp__helpdepends %s, 'trigger'
+System Tables.99.sql:exec sp__revtable %s
+Tables.99.sql:exec sp__revtable %s
+Triggers.99.sql:exec sp__helptext %s
+Users.4.sql:exec sp__helpuser
+Users.99.sql:exec sp__revuser %s
+Views.99.sql:exec sp__helptext %s
+actv_users_syb.1.sql:exec sp__whoactive
+bad_index.1.sql:exec sp__badindex
+curr_users_syb.1.sql:exec sp__who
+io_stat.1.sql:sp__iostat
+lcks_syb.1.sql:exec sp__lock
+login_rev.1.sql:create procedure sp__revlogin( @dont_format char(1) = null)
+login_rev.1.sql:			"exec sp_addlogin '"+name+"','N.A.','"+dbname+"'"
+login_rev.1.sql:			"exec sp_addlogin '"+name+"','N.A.','"+dbname+"','"+language+"'"
+login_rev.1.sql:			"exec sp_addlogin '"+name+"','"+convert(varchar(30),password)+"','"+dbname+"'"
+login_rev.1.sql:			"exec sp_addlogin '"+name+"','"+convert(varchar(30),password)+"','"+dbname+"','"+language+"'"
+rev_db.1.sql:create procedure sp__revdb 
+rev_db.1.sql:from master.dbo.spt_values v
+rev_dev.1.sql:create procedure sp__revdevice ( @dont_format char(1) = null)
+rev_dev.1.sql:	   master..spt_values v
+rev_dev.1.sql:select 	"exec sp_addumpdevice 'disk','"+ltrim(rtrim(d.name))+"','"+ltrim(rtrim(d.phyname))+"',2",2
+rev_tbl.1.sql:CREATE PROC sp__revtable(@objname char(50)=NULL)
+rev_tbl.1.sql:  SELECT convert(varchar(70), "Usage: sp__revtable @objname")
+rev_tbl.1.sql:		@buffer=' ' + substring(c.name+space(30),1,@maxnamelen) 
+rev_tbl.1.sql:	   SELECT @buffer = substring(@buffer+space(24-@maxdfltlen ),1,
+rev_tbl.1.sql:  	   SELECT @buffer = substring(@buffer+space(24-@maxdfltlen ),1,
+rev_tbl.1.sql:        exec sp_getmessage 17461, @msg out 
+rev_tbl.1.sql:  EXEC sp_getmessage 18024, @msg out 
+rev_tbl.1.sql:        **  Display if this key is referenced by other table
+rev_tbl.1.sql:CREATE TABLE  #spconstrtab (
+rev_tbl.1.sql:  /* spare2      int                    NOT NULL, */
+rev_tbl.1.sql:       INSERT INTO #spconstrtab
+rev_tbl.1.sql:       INSERT INTO #spconstrtab
+rev_tbl.1.sql:UPDATE #spconstrtab
+rev_tbl.1.sql:FROM sysusermessages u, #spconstrtab c
+rev_tbl.1.sql:  SELECT @len1 = max(datalength(constraint_name)) FROM #spconstrtab
+rev_tbl.1.sql:  SELECT @len2 = max(datalength(constraint_desc)) FROM #spconstrtab
+rev_tbl.1.sql:	FROM #spconstrtab
+rev_tbl.1.sql:          FROM #spconstrtab
+rev_tbl.1.sql:      FROM #spconstrtab
+rev_tbl.1.sql:		FROM #spconstrtab
+rev_tbl.1.sql:  SELECT @len1 = max(datalength(constraint_name)) FROM #spconstrtab
+rev_tbl.1.sql:  SELECT @len2 = max(datalength(constraint_msg )) FROM #spconstrtab
+rev_tbl.1.sql:  SELECT @len3 = max(datalength(constraint_desc)) FROM #spconstrtab
+rev_tbl.1.sql:    FROM #spconstrtab
+rev_tbl.1.sql:		FROM #spconstrtab
+rev_tbl.1.sql:	FROM #spconstrtab
+rev_tbl.1.sql:   DROP TABLE #spconstrtab
+rev_tbl.1.sql:create procedure sp__helprotect
+rev_tbl.1.sql:	from 	sysprotects 
+rev_tbl.1.sql:		from   	sysprotects
+rev_tbl.1.sql:		from 		sysprotects p, master.dbo.spt_values c
+rev_tbl.1.sql:		from   	sysprotects p
+rev_tbl.1.sql:		from 	sysprotects p, master.dbo.spt_values c
+rev_tbl.1.sql:from   	master.dbo.spt_values v
+rev_tbl.1.sql:from   	master.dbo.spt_values v
+user_reg_syb.1.sql:exec sp__helplogin
+who_do_syb.1.sql:exec sp__whodo

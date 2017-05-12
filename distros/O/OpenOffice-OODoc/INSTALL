@@ -1,0 +1,143 @@
+OpenOffice::OODoc installation (2010-01-06)
+
+SYSTEM REQUIREMENTS
+
+	Perl		>= 5.8.0
+	Archive::Zip	>= 1.18
+	XML::Twig	>= 3.32
+	Time::Local	>= 1.07
+	File::Temp	>= 0.12
+
+INSTALLATION FROM THE CPAN DISTRIBUTION
+
+	Uncompress the distribution archive, enter the OpenOffice-OODoc-x.xxx
+	directory and (as system administrator), type the following commands:
+
+		perl Makefile.PL [options]
+		make test
+		make install
+
+	For MSWin32, "make" can be replaced by "nmake". If the Microsoft NMAKE
+	utility is not present in your environment, you can get it at
+	http://download.microsoft.com/download/vc15/Patch/1.52/W95/EN-US/Nmake15.exe
+	
+	If Archive::Zip and XML::Twig are already installed, this CPAN
+	installation works without a C compiler, because OpenOffice::OODoc is
+	pure Perl. Otherwise, if these required modules are not installed and
+	if you don't have a C development environment, you should use another
+	distribution (such as the PPM one for ActivePerl, if available) instead,
+	knowing that the CPAN Archive::Zip and XML::Twig distributions can
+	indirectly bring a lot of C source code.
+
+	You will be prompted for the local character set (default = utf8), an
+	optional color map (default = none), the working directory path
+	(default = current directory of each application), and the default
+	file format (OOo 1.0 or ODF, default = ODF). The defaults are convenient
+	is most situations; however the following explanations could prove
+	useful.
+	
+	The default local character set is 'utf8', but it may be anyone of the
+	character sets supported by the Encode Perl module. The standard ODF
+	internal character set is always utf8 but the OpenOffice::OODoc module
+	transparently allows the applications to deal with the text content as
+	if it was natively in their local, possibly non-utf8 character set. The
+	appropriate transcoding is automatically provided, according to the
+	declared local character set.
+	
+	The role of the optional color map file is to allow the programmer to
+	use symbolic names instead of RGB values for color attributes, knowing
+	that OpenOffice::OODoc allows the applications to specify color
+	parameters in some situation (characters, backgrounds, shapes, borders,
+	and so on). Each line of this configuration file, if provided, should
+	have the following structure:
+	
+	        R G B name
+	        
+	where 'R', 'G' and 'B' are integer values in the 0-255 range for red,
+	green and blue, and 'name' is an arbitrary symbolic name for the given
+	RGB combination. Example:
+	
+	        135 206 235     SkyBlue
+	
+	The line above in the color map file allows the application programmer
+	to use "SkyBlue" as a replacement for the [135,206,235] list with a
+	color definition function. Such a file may be created by the user or
+	borrowed to the environment. For example, the standard RGB file that is
+	available in a typical X-Window or Xorg environment may be used as is or
+	customized (this file is often located at /etc/X11/rgb.txt on Unix-like
+	platforms, and it may be downloaded on any non-Unix platform).
+	
+	The choice of the working directory may be a sensitive choice in
+	constrained environments and/or for long-running processes, while it's
+	generally not an issue in a typical office environment. Each time a
+	document is created or updated, OpenOffice::OODoc generates intermediate
+	files which are automatically deleted after use (some of them can remain
+	in case of crash only). The default path is ".", meaning that these
+	intermediate files will be created in the current directory of each
+	application; if needed, it may be replaced by any absolute or relative
+	path. In distributed environments, it's recommended to specify a
+	location in a local filesystem for performance reasons.
+
+        For historical reasons, OpenOffice::OODoc supports both the primary
+        OpenOffice.org 1.0 file format (now deprecated) and the present standard
+        Open Document Format (ODF). By default, ODF is the preferred format,
+        and it's strongly recommended to let this configuration parameter
+        unchanged. The choice of a preferred format doesn't prevent the
+        applications to process documents in the other format; the format that
+        is declared as "preferred" will just be selected to create any new
+        document, but OpenOffice::OODoc will not change the format of an
+        existing document. Be careful: knowing that the legacy OpenOffice.org
+        1.0 format is disappearing, it will not necessarily supported by future 
+        versions of OpenOffice::OODoc. OpenOffice::OODoc currently supports
+	ODF 1.0 to 1.2; however, it doesn't include any validating feature, so
+	the users are not prevented from using its API to insert custom,
+	non-standard XML constructs in the documents.
+
+	- the preferred file format, to be used when you create a new
+	document from scratch (answer "1" for OpenOffice.org, "2" for OASIS
+	OpenDocument Format, default is "2").
+
+	The interactivity can be avoided by the --noprompt option.
+	The parameters can be provided at the command line with (respectively)
+	the --encoding <encoding>, --colormap <file>, --workdir <path> and
+	--format <number> options. Example:
+	
+	perl Makefile.PL --noprompt --workdir "C:\Temp" --encoding "cp1252"
+
+	The full customization step can be avoided with the --noconfig option.
+	If this option is used, all the default values are installed.
+	
+	These options define installation-level default values only; each of
+	these values can be overridden by the applications (thanks, for
+	example, to the odfLocalEncoding(), odfWorkingDirectory() and
+	odfLoadColorMap() functions). The installation-level options are stored
+	in a XML file (OODoc/config.xml) below the installation directory.
+	This file can be manually edited at any time after the installation
+	in order to change any parameter.
+	
+	A variable $OpenOffice::OODoc::INSTALLATION_DATE is available for the
+	applications; it contains the installation date in ISO-8601 format.
+	If the customization has been skipped (due to the --noconfig option),
+	this variable contains the packaging date of the distribution.
+	Caution, this value is significant if the installation has been done
+	from the original CPAN distribution only.
+
+	The date of the original CPAN package is provided by the variable
+	$OpenOffice::OODoc::BUILD_DATE.
+
+	If the installation is successful, the test procedure generates a
+	document, writes some content in it, and checks the result. This
+	document is named 'odftest.odt' or 'ootest.sxw' (according to your
+	default file format) and resides in the working directory of the
+	installation. You can later check this document with a compatible
+	text processor or viewer.
+
+	A Perl executable script, oodoc_version, is provided in the package.
+	After a successful installation using the CPAN distribution,
+	this script displays the version number, the package build date,
+	and the installation path. A more sophisticated script, oodoc_test,
+	is provided as an executable example; this script generates a document
+	which may be checked using an ODF-compatible text processor. Be careful,
+	while both oodoc_version and oodoc_test are provided in the original
+	CPAN distribution, they are not necessarily available in any derived
+	OpenOffice::OODoc package.

@@ -1,0 +1,17 @@
+Changes
+INSTALL
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+lib/Ormlette.pm
+t/00-init.t
+t/01-root.t
+t/02-table.t
+t/03-load.t
+t/04-autoupdate.t
+t/70-mysql.t
+t/release-eol.t
+t/release-no-tabs.t

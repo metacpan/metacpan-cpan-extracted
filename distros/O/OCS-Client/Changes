@@ -1,0 +1,59 @@
+Revision history for OCS-Client. -*- text -*-
+
+0.013     2016-10-09 11:15:28-03:00 America/Sao_Paulo
+
+        [Changes]
+
+        - The new global hash %OCS::Client::ACCOUNT_INFO may be used to
+          register the server's specific administrative data.
+
+0.012     2015-09-08 08:57:48-03:00 America/Sao_Paulo
+
+0.011     2014-11-02 17:16:09 America/Sao_Paulo
+
+        [Changes]
+
+        - Add field 'HW Guidelines'.
+
+0.010     2014-06-11 08:15:05-03:00 America/Sao_Paulo
+
+        [Changes]
+
+        - Add fields: 'PA', 'Diretoria', and 'Nota Fiscal'.
+
+        [Fixes]
+
+        - Check if a field is known before using it.
+
+0.009     2012-04-24 08:07:42 America/Sao_Paulo
+
+	The HARDWARE section doesn't need to be forced into an array.
+
+0.008     2012-04-24 07:51:21 America/Sao_Paulo
+
+	ForceArray to all prunnable sections.
+
+0.007     2012-04-21 18:08:31 America/Sao_Paulo
+
+	Add a custom READ file to be shown in GitHub.
+
+0.006     2012-04-20 22:55:50 America/Sao_Paulo
+
+	Add the examples/ocssvn.pl script.
+
+0.005     2012-04-20 08:56:59 America/Sao_Paulo
+
+	Prune a little bit more information.
+
+0.004     2012-04-19 12:12:02 America/Sao_Paulo
+
+	Define constants to make it easier to specify the CHECKSUM and
+	WANTED parameters.
+
+0.003     2012-04-12 11:36:36 America/Sao_Paulo
+
+	Fix URI munging in constructor.
+
+0.002    2012-04-11
+
+	First release.

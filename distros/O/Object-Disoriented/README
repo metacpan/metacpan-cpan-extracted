@@ -1,0 +1,44 @@
+NAME
+    Object::Disoriented - remove object-orientation from modules
+
+SYNOPSIS
+        use Object::Disoriented HTML::Fraction => qw<tweak>;
+
+        print tweak($html);
+
+DESCRIPTION
+    Some Perl modules have interfaces that seem object-oriented interfaces,
+    but for no apparent reason. For example, Léon Brocard's
+    otherwise-excellent HTML::Fractions module insists you use it in an OO
+    manner:
+
+        my $fractionifier = HTML::Fraction->new;
+        print $fractionifier->tweak($html);
+
+    There's never anything interesting in the instance. You have to spend
+    code on creating the instance, and then you have to pass that spurious
+    instance to each call.
+
+    I think that's pretty tedious; I'd much rather just have functions to
+    call. Enter Object::Disoriented.
+
+    Object::Disoriented is only used with "use". The first argument is the
+    name of the unnecessarily-OO class; the class gets loaded if need be.
+    Subsequent arguments are the names of the functions you want:
+
+        use Object::Disoriented HTML::Fraction => qw<tweak tweak_frac>;
+
+    Object::Disoriented internally creates an instance of the class you
+    name. The names you ask for are exported into your namespace; they are
+    freshly-created functions which just call the appropriate methods on the
+    instance it created for.
+
+    If you want to disorient two or more modules in a single Perl package,
+    just use Object::Disoriented more than once:
+
+        use Object::Disoriented HTML::Fraction => qw<tweak tweak_frac>;
+        use Object::Disoriented CGI::Simple    => qw<param upload_info>;
+
+SEE ALSO
+    HTML::Fraction, CGI::Simple
+

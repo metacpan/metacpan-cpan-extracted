@@ -1,0 +1,20 @@
+Changes history for OpenGL-Earth
+
+  0.05   2014-01-26
+
+         Removed hard dependency on Linux::Input::Wiimote.
+         If you want Wiimote support, you can install it on your own.
+         L::I::W doesn't build out of the box, so CPAN install of OpenGL::Earth
+         would fail miserably. [RT#79833]
+
+  0.04   ...
+
+         Changes lost in some dead laptop 
+
+  0.01   2009-01-25
+
+         Just found some time to package this experiment
+         as a CPAN distribution. Will improve over time, I hope.
+
+
+

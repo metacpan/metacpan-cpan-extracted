@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<SITE ID="NetGuide">
+
+<NAME Lang="en-us">NetGuide</NAME>
+<INFO Lang="en-us">general information web and article search</INFO>
+
+<URL Type="More"><![CDATA[
+http://www.netguide.com/Search/Results?bFullText=1&searchwhat=ngl&sequenceNumber=&query=_QUERY_&ResultStartArticle=_START_10_1_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://www.netguide.com/Search/Results?bFullText=1&searchwhat=ngl&sequenceNumber=&query=_QUERY_&ResultStartArticle=1
+]]></URL>
+
+
+
+<TEMPLATE><![CDATA[
+        <A HREF = "_URL_"___>_TITLE_</A>
+]]></TEMPLATE>
+</SITE>

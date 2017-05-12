@@ -1,0 +1,54 @@
+OAuth-Simple
+
+Simple OAuth authorization on your site
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc OAuth::Simple
+
+You can also look for information at:
+
+    Github
+        https://github.com/Foxcool/OAuth-Simple
+
+    Bugs & Issues
+        https://github.com/Foxcool/OAuth-Simple/issues
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=OAuth-Simple
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/OAuth-Simple
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/OAuth-Simple
+
+    Search CPAN
+        http://search.cpan.org/dist/OAuth-Simple/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2012 Alexander Babenko
+
+Module created for http://setup.ru
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

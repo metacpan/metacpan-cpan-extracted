@@ -1,0 +1,12 @@
+Revision history for Perl extension OpenGL::Simple::Viewer.
+
+0.01  Thu Jul 15 22:09:55 2004
+	- original version; created by h2xs 1.22 with options
+		-XAn OpenGL::Simple::Viewer -b 5.6.1
+
+0.02 Thu Jul 22 15:52:27 BST 2004
+        - Added Simon Cozens' molecule viewer script
+
+0.03 Sat Aug 28 09:49:09 BST 2004
+        - Added the script to MANIFEST (doh!) and included some of the
+          old-style basic_* functions.

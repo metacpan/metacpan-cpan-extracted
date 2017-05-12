@@ -1,0 +1,19 @@
+<div align="center">
+
+<h1>Task is Forbidden</h1>
+
+<table width="50%" border="0" cellpadding="5" cellspacing="0">
+
+<tr><td align="left">
+You cannot accomplish the task you have requested due to 
+security restrictions. If you believe there is a mistake, please
+contact <a href="mailto:[% admin_email %]">The Administrator</a>.
+</td></tr>
+
+<tr><td align="right">Sincerely,<br>
+The Management
+</td></tr>
+
+</table>
+
+</div>

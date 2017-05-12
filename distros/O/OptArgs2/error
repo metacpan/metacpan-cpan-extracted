@@ -1,0 +1,13 @@
+use strict;
+use lib 'lib';
+use warnings;
+use OptArgs2;
+
+# Why doesn't this croak with this line instead of inside OptArgs2?
+opt one => (
+    isa => 'Bool',
+    comment => 'sfd',
+    ishelp => 1,
+    trigger => sub {},
+);
+    

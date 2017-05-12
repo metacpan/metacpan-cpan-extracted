@@ -1,0 +1,16 @@
+
+
+            OSPF Router with ID (10.188.1.15) (Process ID 1)
+
+		Summary ASB Link States (Area 0.0.0.0)
+
+  LS age: 159
+  Options: (No TOS-capability, DC, Upward)
+  LS Type: Summary Links(AS Boundary Router)
+  Link State ID: 10.188.50.50 (AS Boundary Router address)
+  Advertising Router: 10.188.1.15
+  LS Seq Number: 80000001
+  Checksum: 0xCE60
+  Length: 28
+  Network Mask: /0
+	TOS: 0 	Metric: 11 

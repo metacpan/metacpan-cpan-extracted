@@ -1,0 +1,135 @@
+--- #YAML:1.0
+name: OpenFrame-WebApp
+version: 0.04
+license: perl
+distribution_type: module
+requires:
+  Cache::Cache: 1.01
+  OpenFrame: 3.00
+  Pipeline: 3.04
+  Time::ParseDate: 2003.0
+recommends: {}
+build_requires:
+  Module::Build: 0.19
+  Test::More: 0.01
+conflicts: {}
+provides:
+  OpenFrame::WebApp:
+    file: lib/OpenFrame/WebApp.pm
+    version: 0.04
+  OpenFrame::WebApp::Error:
+    file: lib/OpenFrame/WebApp/Error.pm
+    version: 1.3
+  OpenFrame::WebApp::Error::Abstract:
+    file: lib/OpenFrame/WebApp/Error/Abstract.pm
+    version: 1.2
+  OpenFrame::WebApp::Error::LoadClass:
+    file: lib/OpenFrame/WebApp/Error/LoadClass.pm
+    version: 1.1
+  OpenFrame::WebApp::Factory:
+    file: lib/OpenFrame/WebApp/Factory.pm
+    version: 1.5
+  OpenFrame::WebApp::Segment::Decline:
+    file: lib/OpenFrame/WebApp/Segment/Decline.pm
+    version: 1.2
+  ? |-
+    OpenFrame::WebApp::Segment::Decline::SessionInStore
+:
+    file: |-
+      lib/OpenFrame/WebApp/Segment/Decline/SessionInStore.pm
+    version: 1.1
+  OpenFrame::WebApp::Segment::Decline::StaticContent:
+    file: |-
+      lib/OpenFrame/WebApp/Segment/Decline/StaticContent.pm
+    version: 1.1
+  ? |-
+    OpenFrame::WebApp::Segment::Decline::TemplateInStore
+:
+    file: |-
+      lib/OpenFrame/WebApp/Segment/Decline/TemplateInStore.pm
+    version: 1.1
+  OpenFrame::WebApp::Segment::Decline::UserInSession:
+    file: |-
+      lib/OpenFrame/WebApp/Segment/Decline/UserInSession.pm
+    version: 1.1
+  OpenFrame::WebApp::Segment::Decline::UserInStore:
+    file: |-
+      lib/OpenFrame/WebApp/Segment/Decline/UserInStore.pm
+    version: 1.1
+  OpenFrame::WebApp::Segment::Session:
+    file: lib/OpenFrame/WebApp/Segment/Session.pm
+    version: 1.2
+  OpenFrame::WebApp::Segment::Session::CookieLoader:
+    file: |-
+      lib/OpenFrame/WebApp/Segment/Session/CookieLoader.pm
+    version: 1.3
+  OpenFrame::WebApp::Segment::Session::Loader:
+    file: lib/OpenFrame/WebApp/Segment/Session/Loader.pm
+    version: 1.6
+  OpenFrame::WebApp::Segment::Session::Saver:
+    file: lib/OpenFrame/WebApp/Segment/Session/Saver.pm
+    version: 1.2
+  OpenFrame::WebApp::Segment::Template:
+    file: lib/OpenFrame/WebApp/Segment/Template.pm
+    version: 1.2
+  OpenFrame::WebApp::Segment::Template::Loader:
+    file: lib/OpenFrame/WebApp/Segment/Template/Loader.pm
+    version: 1.1
+  OpenFrame::WebApp::Segment::User:
+    file: lib/OpenFrame/WebApp/Segment/User.pm
+    version: 1.2
+  OpenFrame::WebApp::Segment::User::EnvLoader:
+    file: lib/OpenFrame/WebApp/Segment/User/EnvLoader.pm
+    version: 1.2
+  OpenFrame::WebApp::Segment::User::Loader:
+    file: lib/OpenFrame/WebApp/Segment/User/Loader.pm
+    version: 1.2
+  OpenFrame::WebApp::Segment::User::RequestLoader:
+    file: lib/OpenFrame/WebApp/Segment/User/RequestLoader.pm
+    version: 1.1
+  OpenFrame::WebApp::Segment::User::SaveInSession:
+    file: lib/OpenFrame/WebApp/Segment/User/SaveInSession.pm
+    version: 1.2
+  OpenFrame::WebApp::Segment::User::Session:
+    file: lib/OpenFrame/WebApp/Segment/User/Session.pm
+    version: 1.1
+  OpenFrame::WebApp::Segment::User::SessionLoader:
+    file: lib/OpenFrame/WebApp/Segment/User/SessionLoader.pm
+    version: 1.1
+  OpenFrame::WebApp::Session:
+    file: lib/OpenFrame/WebApp/Session.pm
+    version: 1.7
+  OpenFrame::WebApp::Session::CacheBase:
+    file: lib/OpenFrame/WebApp/Session/CacheBase.pm
+    version: 1.1
+  OpenFrame::WebApp::Session::Factory:
+    file: lib/OpenFrame/WebApp/Session/Factory.pm
+    version: 1.4
+  OpenFrame::WebApp::Session::FileCache:
+    file: lib/OpenFrame/WebApp/Session/FileCache.pm
+    version: 1.4
+  OpenFrame::WebApp::Session::MemCache:
+    file: lib/OpenFrame/WebApp/Session/MemCache.pm
+    version: 1.2
+  OpenFrame::WebApp::Template:
+    file: lib/OpenFrame/WebApp/Template.pm
+    version: 1.13
+  OpenFrame::WebApp::Template::Error:
+    file: lib/OpenFrame/WebApp/Template/Error.pm
+    version: 1.3
+  OpenFrame::WebApp::Template::Factory:
+    file: lib/OpenFrame/WebApp/Template/Factory.pm
+    version: 1.2
+  OpenFrame::WebApp::Template::Petal:
+    file: lib/OpenFrame/WebApp/Template/Petal.pm
+    version: 1.7
+  OpenFrame::WebApp::Template::TT2:
+    file: lib/OpenFrame/WebApp/Template/TT2.pm
+    version: 1.10
+  OpenFrame::WebApp::User:
+    file: lib/OpenFrame/WebApp/User.pm
+    version: 1.5
+  OpenFrame::WebApp::User::Factory:
+    file: lib/OpenFrame/WebApp/User/Factory.pm
+    version: 1.3
+generated_by: Module::Build version 0.19_03

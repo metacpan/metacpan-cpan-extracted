@@ -1,0 +1,55 @@
+#!/usr/bin/perl
+
+$VERSION = '0.01';
+
+=head1 NAME
+
+sitequery - Metaseach multiple sites
+
+=head1 SYNOPSIS
+
+    % sitequery [site1 site2...] <querystring>
+
+=head1 DESCRIPTION
+
+This script queries the specified site (defaults to google)
+for a given querystring.
+
+=cut
+
+use strict;
+use OurNet::Query;
+
+my %found;
+
+die "Usage: $0 [site1 site2...] <querystring>" unless @ARGV;
+
+my $query = OurNet::Query->new(pop(@ARGV), 10, @ARGV || 'google');
+$query->begin(\&callback, 30); # Timeout after 30 seconds
+
+sub callback {
+    local $^W;
+
+    my %entry = @_;
+    my $entry = \%entry;
+
+    unless ($found{$entry{url}}++) {
+	print "[$entry->{title}]\n=> $entry->{url}\n\n";
+    }
+}
+
+__END__
+
+=head1 AUTHORS
+
+Autrijus Tang E<lt>autrijus@autrijus.org>
+
+=head1 COPYRIGHT
+
+Copyright 2001 by Autrijus Tang E<lt>autrijus@autrijus.org>.
+
+All rights reserved.  You can redistribute and/or modify
+this module under the same terms as Perl itself.
+
+=cut
+

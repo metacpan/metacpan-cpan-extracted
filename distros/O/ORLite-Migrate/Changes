@@ -1,0 +1,43 @@
+Changes for Perl extension ORLite-Migrate
+
+1.10 Thu 2 Feb 2012
+	- Providing a timeline value implies create if undefined
+
+1.09 Mon 24 Oct 2011
+	- Spelling fix (gregoa herrmann)
+	- Updating to Module::Install 1.04
+
+1.08 Wed 12 Oct 2011
+	- Adds support support for class based timelines
+	- Removed ORLite::Migrate::Perl as complex cases can now use the
+	  class based timelines.
+
+1.07 Thu 25 Mar 2010
+	- Updating Module::Install::DSL to 0.95
+	- Fixed #46999 - Fixing the IPC::Run3 error checks to actually work
+	  (Bug report and patch provided by Troels Liebe Bentsen)
+
+1.06 Sat  9 Jan 2010
+	- Cloned in a copy of Padre::Perl as ORLite::Migrate::Perl
+	- Switch to using cperl
+
+1.05 Sat 26 Sep 2009
+	- Some additional tweaks to the prune support
+
+1.04 Sat 26 Sep 2009
+	- Upgrade to Module::Install::DSL 0.91
+	- Added missing prereq for Params::Util 0.37
+	- Adding support for ORLite's prune feature
+	- Test scripts now run with prune enabled
+
+0.03 Sun 19 Apr 2009
+	- Updating to Module::Install::DSL 0.83
+	- Copied in ORLite::Migrate::Patch from Padre::DB::Patch
+
+0.02 Mon 16 Feb 2009
+	- Updating to Module::Install 0.79
+	- Support creation of database in subdirectories
+	- Updating ORLite minimum version
+
+0.01 Fri 13 Dec 2008
+	- Create an initial experimental implementation

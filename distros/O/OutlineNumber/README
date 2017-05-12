@@ -1,0 +1,26 @@
+Number/OutlineNumber version 1.00
+===========================
+
+Create objects that represent Outline Numbering.
+Has operations to increment, indent and outdent.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires no other modules and libraries:
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002 Pete M. Wilson
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 

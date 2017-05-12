@@ -1,0 +1,15 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/OpenSocialX/Shindig/Crypter.pm
+php/BasicBlobCrypter.php
+sample/crypt.php
+sample/crypt.pl
+t/00-load.t
+t/01-baisc.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

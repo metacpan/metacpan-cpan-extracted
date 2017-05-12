@@ -1,0 +1,319 @@
+en:required
+
+required!
+
+en:Unzip
+
+Unzip
+
+en:Upload
+
+Upload
+
+en:Delete
+
+Delete
+
+en:MkDir
+
+MkDir
+
+en:MkFile
+
+MkFile
+
+en:Copy
+
+Copy
+
+en:Move
+
+Move
+
+en:Edit
+
+Edit
+
+en:Rename
+
+Rename
+
+en:Help
+
+Help
+
+en:SetGID
+
+SetGID
+
+en:Revoke
+
+Revoke
+
+en:Debug
+
+Debug
+
+en:src
+
+Select Item
+
+en:dst
+
+Destination
+
+en:group
+
+Group
+
+en:browse
+
+Browse
+
+en:uid
+
+User ID (UID)
+
+en:EnableUID
+
+Enable User
+
+en:DisableUID
+
+Disable User
+
+en:EnableGID
+
+Enable GID
+
+en:DisableGID
+
+Disable GID
+
+en:Return
+
+Return
+
+en:View
+
+View
+
+en:Undo
+
+Undo
+
+en:Quit
+
+Quit
+
+en:Save
+
+Save
+
+en:RevokeName
+
+No ID number or name provided
+
+en:Revoked
+
+The following have been revoked
+
+en:NoUsers
+
+No user or group revoke information available
+
+en:NoFrames
+
+Sorry, your browser can not display frames.  Select the following:
+
+en:warning
+
+WARNING
+
+en:error
+
+ERROR
+
+en:User
+
+User
+
+en:FileOpen
+
+File Open
+
+en:FileLocked
+
+File locked
+
+en:NotLocked
+
+Could not lock file. Try again.
+
+en:EditLast
+
+Last edit information
+
+en:Access
+
+Access
+
+en:Time
+
+Time
+
+en:internal
+
+internal
+
+en:mode
+
+ mode=:UNKNOWN
+
+en:command
+
+ command:UNKNOWN
+
+en:min
+
+Select more items!
+
+en:max
+
+Too many items selected!
+
+en:SourcePath
+
+Bad source path
+
+en:create
+
+Can't create file
+
+en:ProcDstRoot
+
+Destination goes below the root directory
+
+en:CopyRecusive
+
+Recursive copy detected
+
+en:CheckedOut
+
+Currently has checked out
+
+en:DestCheck
+
+Check destination path
+
+en:forbid
+
+Forbidden: 
+
+en:DirConflict
+
+Source directory but a destination file
+
+en:DestExists
+
+Destination exists
+
+en:AdminAccess
+
+Admin access denied
+
+en:ParentAccess
+
+Parent access denied
+
+en:DestAccess
+
+Destination access denied
+
+en:FileRead
+
+File Read
+
+en:SourceAccess
+
+Source access denied
+
+en:GIDbad
+
+GID name not found
+
+en:GIDset
+
+GID not set
+
+en:NotText
+
+Item is not a text file
+
+en:FileTooBig
+
+File size is larger than
+
+en:DestDir
+
+Destination is not a directory
+
+en:DestOpen
+
+Destination open
+
+en:write
+
+write
+
+en:DestPath
+
+Bad destination path
+
+en:IndexOf
+
+Index of
+
+fr:Header
+
+R&eacute;pertoire de
+
+en:Parent
+
+Parent&nbsp;Directory
+
+fr:Parent
+
+R&eacute;pertoire&nbsp;pr&eacute;c&eacute;dent
+
+en:Name
+
+Name
+
+fr:Name
+
+Fichier
+
+en:Description
+
+Description
+
+fr:Description
+
+Description
+
+en:LastModified
+
+Last Modified
+
+fr:LastModified
+
+Derni&egrave;re Modifications
+
+en:Size
+
+Size
+
+fr:Size
+
+Taille

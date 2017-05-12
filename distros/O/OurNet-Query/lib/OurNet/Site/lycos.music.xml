@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<SITE ID="Lycos.Music">
+
+<NAME Lang="en-us">Lycos Sounds Search</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+Lycos聲音與音樂搜尋
+]]></NAME>
+<INFO Lang="en-us">music web and audio files search</INFO>
+<INFO Lang="zh-tw">music web and audio files search</INFO>
+
+<URL Type="More"><![CDATA[
+http://www.lycos.com_MORE_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://www.lycos.com/cgi-bin/pursuit?adv=%26adv%3B&cat=sounds&matchmode=or&query=_QUERY_&maxhits=_HITS_
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_MORE_"><![CDATA[
+<A HREF="_MORE_">Next Page
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<a href="_URL_">_TITLE_</a>___<BR>(_SIZEK_k___) &nbsp;[_DATE_]
+]]></TEMPLATE>
+</SITE>

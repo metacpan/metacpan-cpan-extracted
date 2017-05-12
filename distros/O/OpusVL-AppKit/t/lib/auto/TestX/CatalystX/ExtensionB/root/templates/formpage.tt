@@ -1,0 +1,14 @@
+
+
+<h2> BooksDB Testing </h2>
+<ul>
+[% FOR book IN books %]
+    <li> [% book.title %] </li>
+[% END %]
+</ul>
+
+
+<h2> Form Testing </h2>
+[% form.render | none %]
+
+

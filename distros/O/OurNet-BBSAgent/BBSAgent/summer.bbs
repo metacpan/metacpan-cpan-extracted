@@ -1,0 +1,19 @@
+# $File: //depot/OurNet-BBSAgent/BBSAgent/summer.bbs $ $Author: autrijus $
+# $Revision: #4 $ $Change: 2829 $ $DateTime: 2002/01/10 14:54:36 $
+# Contributed by Smartboy <kcwu@ck.tp.edu.tw>
+# zh_TW.Big5: 建中烏魯木齊
+
+Chien-Kuo High School
+summer.ck.tp.edu.tw
+
+load maple2.board
+setv moretail	m/\[q\]\e\[30m結束\x20\x20\e\[0?m/
+setv pager	摳機
+
+=article_edit_author
+send \x24E\x19\x19\x19\x19
+# 1-2 from,origin 3 --
+send \x14\x19\x19\x19
+send \x18\n
+wait 文章選讀
+exit

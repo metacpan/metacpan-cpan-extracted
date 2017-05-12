@@ -1,0 +1,667 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"/>
+<title>Working with an Ontology</title>
+</head>
+<body>
+	
+<h2>Working with an Ontology</h2>
+	
+<ol>
+	<li><a href="#1">Manipulating an Ontology.</a></li>
+		
+	<li><a href="#2">Getting sub-ontologies from a given ontology.</a></li>
+	
+	<li><a href="#3">Get paths from a given term A to a term B and/or from A to a set of given terms.</a></li>
+
+</ol>
+	
+<ol>
+	<li> <b><a name="1">Manipulating an Ontology:</a></b>
+		<pre>
+			
+			use OBO::Core::Ontology;
+			use OBO::Core::Term;
+			use OBO::Core::Relationship;
+			use OBO::Core::RelationshipType;
+			use OBO::Core::SynonymTypeDef;
+			use OBO::Parser::OBOParser;
+			use OBO::Util::TermSet;
+			
+			# three new terms
+			my $n1 = OBO::Core::Term->new();
+			my $n2 = OBO::Core::Term->new();
+			my $n3 = OBO::Core::Term->new();
+			
+			# new ontology
+			my $onto = OBO::Core::Ontology->new();
+			
+			if ($onto->get_number_of_terms() == 0 && $onto->get_number_of_relationships()) {
+				# the ontology is empty !
+				# terms are added later...
+			}
+			
+			$n1->id("APO:P0000001");
+			$n2->id("APO:P0000002");
+			$n3->id("APO:P0000003");
+			
+			$n1->name("One");
+			$n2->name("Two");
+			$n3->name("Three");
+			
+			my $def1 = OBO::Core::Def->new();
+			$def1->text("Definition of One");
+			my $def2 = OBO::Core::Def->new();
+			$def2->text("Definition of Two");
+			my $def3 = OBO::Core::Def->new();
+			$def3->text("Definition of Tres");
+			$n1->def($def1);
+			$n2->def($def2);
+			$n3->def($def3);
+			
+			$n1->xref_set_as_string("[GO:0000001]");
+			$n2->xref_set_as_string("[GO:0000002]");
+			$n3->xref_set_as_string("[GO:0000003]");
+			
+			$onto->add_term($n1);
+			$onto->add_term($n2);
+			$onto->add_term($n3);
+			
+			if ($onto->has_term($n1) && $onto->has_term($n2) && $onto->has_term($n3)) {
+				# should enter here
+			}
+			
+			# modifying a term name directly
+			$n3->name("Trej");
+			# now: $onto->get_term_by_id("APO:P0000003")->name() should be "Trej"
+			
+			# modifying a term name via the ontology
+			$onto->get_term_by_id("APO:P0000003")->name("Three");
+			# now: $onto->get_term_by_id("APO:P0000003")->name() should be "Three"
+			# now: $onto->get_number_of_terms() should be 3
+			# now: $onto->get_number_of_relationships() should still be 0
+			
+			$onto->delete_term($n1);
+			# now: $onto->has_term($n1) should be FALSE
+			# now: $onto->get_number_of_terms() should be 2
+			# now: $onto->get_number_of_relationships() should still be 0
+			
+			$onto->add_term($n1);
+			# now: $onto->has_term($n1) should be 1
+			# now: $onto->get_number_of_terms() should be 3
+			# now: $onto->get_number_of_relationships() should be 0
+			
+			# new term
+			my $n4 = OBO::Core::Term->new();
+			$n4->id("APO:P0000004");
+			$n4->name("Four");
+			my $def4 = OBO::Core::Def->new();
+			$def4->text("Definition of Four");
+			$n4->def($def4);
+			# now: $onto->has_term($n4) is FALSE
+			$onto->delete_term($n4);
+			# now: $onto->has_term($n4) is still FALSE
+			$onto->add_term($n4);
+			# now: $onto->has_term($n4) should be TRUE
+			
+			# add term as string
+			my $new_term = $onto->add_term_as_string("APO:P0000005", "Five");
+			$new_term->def_as_string("This is a dummy definition", "[APO:vm, APO:ls, APO:ea \"Erick Antezana\"]");
+			# now: $onto->has_term($new_term) should be 1
+			# now: $onto->get_term_by_id("APO:P0000005")->equals($new_term) should be TRUE
+			# now: $onto->get_number_of_terms() should be 5
+			
+			my $n5 = $new_term; 
+			
+			# five new relationships
+			my $r12 = OBO::Core::Relationship->new();
+			my $r23 = OBO::Core::Relationship->new();
+			my $r13 = OBO::Core::Relationship->new();
+			my $r14 = OBO::Core::Relationship->new();
+			my $r35 = OBO::Core::Relationship->new();
+			
+			# setting up IDs
+			$r12->id("APO:P0000001_is_a_APO:P0000002");
+			$r23->id("APO:P0000002_part_of_APO:P0000003");
+			$r13->id("APO:P0000001_participates_in_APO:P0000003");
+			$r14->id("APO:P0000001_participates_in_APO:P0000004");
+			$r35->id("APO:P0000003_part_of_APO:P0000005");
+			
+			# setting up the relationship types
+			$r12->type("is_a");
+			$r23->type("part_of");
+			$r13->type("participates_in");
+			$r14->type("participates_in");
+			$r35->type("part_of");
+			
+			# linking terms:
+			$r12->link($n1, $n2); 
+			$r23->link($n2, $n3);
+			$r13->link($n1, $n3);
+			$r14->link($n1, $n4);
+			$r35->link($n3, $n5);
+			
+			# get all terms
+			my $c = 0;
+			my %h;
+			# now: $onto->has_term_id("APO:P0000003") should be TRUE
+			# now: $onto->has_term_id("APO:P0000033") should be FALSE
+			
+			foreach my $t (@{$onto->get_terms()}) {
+				if ($t->id() eq "APO:P0000003"){
+					# now: $onto->has_term($t) should be TRUE
+					$onto->set_term_id($t, "APO:P0000033");
+					# now: $onto->has_term($t) should be TRUE
+					$t = $onto->get_term_by_id("APO:P0000033");
+				}
+				
+				$t->name("Uj") if ($t->id() eq "APO:P0000001");
+			
+				$h{$t->id()} = $t;
+				$c++;	
+			}
+			
+			# now: $onto->has_term_id("APO:P0000003") should be FALSE
+			# $onto->has_term_id("APO:P0000033") should be TRUE
+			
+			# now: $onto->get_number_of_terms() should be 5
+			# now: $c should be 5
+			
+			# now: $h{"APO:P0000001"}->name() eq "Uj"    should be TRUE since the name has been changed above
+			# now: $h{"APO:P0000002"}->name() eq "Two"   should be TRUE
+			# now: $h{"APO:P0000033"}->name() eq "Three" should be TRUE since the ID has been changed above
+			# now: $h{"APO:P0000004"}->name() eq "Four"  should be TRUE
+			# now: $h{"APO:P0000005"}->name() eq "Five"  should be TRUE
+			
+			# modifying a term ID via the ontology
+			# now: $onto->set_term_id($onto->get_term_by_id("APO:P0000033"), "APO:P0000003")->id() eq "APO:P0000003" should be TRUE
+			# now: $onto->has_term_id("APO:P0000003") should be TRUE
+			# now: $onto->has_term_id("APO:P0000033") should be FALSE
+			# now: $onto->get_number_of_terms() should be 5
+			
+			# get terms with argument
+			my @processes = sort {$a->id() cmp $b->id()} @{$onto->get_terms("APO:P.*")};
+			# now: @processes should have 5 elements
+			
+			my @odd_processes = sort {$a->id() cmp $b->id()} @{$onto->get_terms("APO:P000000[35]")};
+			# now: @odd_processes should have 1 element
+			# now: $odd_processes[0]->id() eq "APO:P0000003" should be TRUE
+			# now: $odd_processes[1]->id() eq "APO:P0000005" should be TRUE
+			# now: $onto->idspace_as_string() eq "" should be TRUE
+			
+			$onto->idspace_as_string("APO", "http://www.cellcycle.org/ontology/APO", "cell cycle ontology terms");
+			# now: $onto->idspace()->local_idspace() eq "APO" should be TRUE
+			
+			my @same_processes = @{$onto->get_terms_by_subnamespace("P")};
+			# now: @same_processes should be identical to @processes
+			
+			my @no_processes = @{$onto->get_terms_by_subnamespace("p")};
+			# now: @no_processes should be empty
+			
+			# get terms
+			# now: $onto->get_term_by_id("APO:P0000001")->name() eq "Uj" should be TRUE
+			# now: $onto->get_term_by_name("Uj")->equals($n1)  should be TRUE
+			
+			$n1->synonym_as_string("Uno", "[APO:ls, APO:vm]", "EXACT");
+			# now: ($n1->synonym_as_string())[0] should be  "Uno" [APO:ls, APO:vm]"
+			
+			$n1->synonym_as_string("One", "[APO:ls, APO:vm]", "BROAD");
+			# now: $onto->get_term_by_name_or_synonym("Uno")->equals($n1) should be TRUE (needs to be EXACT)
+			# now: $onto->get_term_by_name_or_synonym("One") eq '' should be TRUE (undef due to BROAD)
+			# now: $onto->get_term_by_name("Two")->equals($n2) should be TRUE
+			# now: $onto->get_term_by_name("Three")->equals($n3) should be TRUE
+			# now: $onto->get_term_by_name("Four")->equals($n4) should be TRUE
+			
+			# xref's
+			# now: $onto->get_term_by_xref("GO", "0000001")->equals($n1) should be TRUE
+			# now: $onto->get_term_by_xref("GO", "0000002")->equals($n2) should be TRUE
+			# now: $onto->get_term_by_xref("GO", "0000003")->equals($n3) should be TRUE
+			
+			# contains
+			# now: $onto->get_terms_by_name("Uj")->contains($n1) should be TRUE
+			# now: $onto->get_terms_by_name("Two")->contains($n2) should be TRUE
+			# now: $onto->get_terms_by_name("Three")->contains($n3) should be TRUE
+			# now: $onto->get_terms_by_name("Four")->contains($n4) should be TRUE
+			
+			# add relationships
+			$onto->add_relationship($r12);
+			# now: $onto->get_relationship_by_id("APO:P0000001_is_a_APO:P0000002")->head()->id() should be "APO:P0000002"
+			# now: $onto->has_relationship_id("APO:P0000001_is_a_APO:P0000002") should be TRUE
+			
+			my @relas = @{$onto->get_relationships_by_target_term($onto->get_term_by_id("APO:P0000002"))};
+			# now: $relas[0]->id()          should be "APO:P0000001_is_a_APO:P0000002"
+			# now: $relas[0]->tail()->id()  should be "APO:P0000001"
+			# now: $relas[0]->head()->id()  should be "APO:P0000002"
+			
+			# add relationships
+			$onto->add_relationship($r23);
+			$onto->add_relationship($r13);
+			$onto->add_relationship($r14);
+			$onto->add_relationship($r35);
+			
+			# now: $onto->get_number_of_terms() should be 5
+			# now: $onto->get_number_of_relationships() should be 5
+			
+			# add relationships and terms linked by this relationship
+			my $n11 = OBO::Core::Term->new();
+			my $n21 = OBO::Core::Term->new();
+			$n11->id("APO:P0000011"); 
+			$n11->name("One one"); 
+			$n11->def_as_string("Definition One one", "");
+			$n21->id("APO:P0000021"); 
+			$n21->name("Two one"); 
+			$n21->def_as_string("Definition Two one", "");
+			
+			my $r11_21 = OBO::Core::Relationship->new();
+			$r11_21->id("APO:L0001121"); $r11_21->type("r11-21");
+			$r11_21->link($n11, $n21);
+			$onto->add_relationship($r11_21); # adds to the ontology the terms linked by this relationship
+			# now: $onto->get_number_of_terms() should be 7
+			# now: $onto->get_number_of_relationships() should be 6
+			
+			# get all the relationships
+			my %hr;
+			foreach my $r (@{$onto->get_relationships()}) {
+				$hr{$r->id()} = $r;
+			}
+			# now: $hr{"APO:P0000001_is_a_APO:P0000002"}->head()->equals($n2) should be TRUE
+			# now: $hr{"APO:P0000002_part_of_APO:P0000003"}->head()->equals($n3) should be TRUE
+			# now: $hr{"APO:P0000001_participates_in_APO:P0000003"}->head()->equals($n3) should be TRUE
+			# now: $hr{"APO:P0000001_participates_in_APO:P0000004"}->head()->equals($n4) should be TRUE
+			
+			# recover a previously stored relationship
+			# now: $onto->get_relationship_by_id("APO:P0000001_participates_in_APO:P0000003")->equals($r13) should be TRUE
+			# now: $onto->has_relationship_id("APO:P0000001_participates_in_APO:P0000003") should be TRUE
+			
+			# get children
+			my @children = @{$onto->get_child_terms($n1)}; 
+			# now: @children should be 0
+			
+			@children = @{$onto->get_child_terms($n3)}; 
+			# now: @children should have 1 element
+			my %ct;
+			foreach my $child (@children) {
+				$ct{$child->id()} = $child;
+			} 
+			# now: $ct{"APO:P0000002"}->equals($n2) should be TRUE
+			# now: $ct{"APO:P0000001"}->equals($n1) should be TRUE
+			
+			@children = @{$onto->get_child_terms($n2)};
+			# now: @children should have one element
+			# now: $children[0]->id should be "APO:P0000001"
+			
+			# get parents
+			my @parents = @{$onto->get_parent_terms($n3)};
+			# now: @parents should have 1 element
+			@parents = @{$onto->get_parent_terms($n1)};
+			# now: @parents should have 3 element
+			
+			@parents = @{$onto->get_parent_terms($n2)};
+			# now: @parentsshould have 1 element
+			# now: $parents[0]->id should be "APO:P0000003"
+			
+			# get all descendents
+			my @descendents1 = @{$onto->get_descendent_terms($n1)};
+			# now: @descendents1 should have 0 elements
+			my @descendents2 = @{$onto->get_descendent_terms($n2)};
+			# now: @descendents2 should have 1 element
+			# now: $descendents2[0]->id should be "APO:P0000001"
+			my @descendents3 = @{$onto->get_descendent_terms($n3)};
+			# now: @descendents3 should have 2 elements
+			my @descendents5 = @{$onto->get_descendent_terms($n5)};
+			# now: @descendents5 should have 3 elements
+			
+			# get all ancestors
+			my @ancestors1 = @{$onto->get_ancestor_terms($n1)};
+			# now: @ancestors1 should have 4 elements
+			my @ancestors2 = @{$onto->get_ancestor_terms($n2)};
+			# now: @ancestors2) should have 2 elements
+
+			my @ancestors3 = @{$onto->get_ancestor_terms($n3)};
+			# now: @ancestors3) should have 1 element
+			
+			# get descendents by term subnamespace
+			@descendents1 = @{$onto->get_descendent_terms_by_subnamespace($n1, 'P')};
+			# now: @descendents1 should have 0 elements
+			@descendents2 = @{$onto->get_descendent_terms_by_subnamespace($n2, 'P')}; 
+			# now: @descendents2 should have 1 element
+			# now: $descendents2[0]->id should be "APO:P0000001"
+			
+			@descendents3 = @{$onto->get_descendent_terms_by_subnamespace($n3, 'P')};
+			# now: @descendents3 should have 2 elements
+			@descendents3 = @{$onto->get_descendent_terms_by_subnamespace($n3, 'R')};
+			# now: @descendents3 should have 0 elements
+			
+			# get ancestors by term subnamespace
+			@ancestors1 = @{$onto->get_ancestor_terms_by_subnamespace($n1, 'P')};
+			# now: @ancestors1) should have 4 elements
+			@ancestors2 = @{$onto->get_ancestor_terms_by_subnamespace($n2, 'P')}; 
+			# now: @ancestors2 should have 2 elements
+			@ancestors3 = @{$onto->get_ancestor_terms_by_subnamespace($n3, 'P')};
+			# now: @ancestors3 should have 1 element
+			@ancestors3 = @{$onto->get_ancestor_terms_by_subnamespace($n3, 'R')};
+			# now: @ancestors3) should have 0 elements			
+			
+			# three new relationships types
+			my $r1 = OBO::Core::RelationshipType->new();
+			my $r2 = OBO::Core::RelationshipType->new();
+			my $r3 = OBO::Core::RelationshipType->new();
+			
+			$r1->id("is_a");
+			$r2->id("part_of");
+			$r3->id("participates_in");
+			
+			$r1->name("is a");
+			$r2->name("part_of");
+			$r3->name("participates_in");
+			
+			# add relationship types
+			$onto->add_relationship_type($r1);
+			# now: $onto->has_relationship_type($r1) should be TRUE
+			# now: $onto->has_relationship_type($onto->get_relationship_type_by_id("is_a")) should be TRUE
+			# now: $onto->has_relationship_type($onto->get_relationship_type_by_name("is a")) should be TRUE
+			# now: $onto->has_relationship_type_id("is_a") should be TRUE
+			
+			$onto->add_relationship_type($r2);
+			# now: $onto->has_relationship_type($r2) should be TRUE
+			# now: $onto->has_relationship_type_id("part_of") should be TRUE
+			
+			$onto->add_relationship_type($r3);
+			# now: $onto->has_relationship_type($r3) should be TRUE
+			# now: $onto->has_relationship_type_id("participates_in") should be TRUE
+			# now: $onto->get_number_of_relationship_types() should be 3
+			
+			# get descendents or ancestors linked by a particular relationship type 
+			my $rel_type1 = $onto->get_relationship_type_by_name("is a");
+			my $rel_type2 = $onto->get_relationship_type_by_name("part_of");
+			my $rel_type3 = $onto->get_relationship_type_by_name("participates_in");
+			
+			my @descendents7 = @{$onto->get_descendent_terms_by_relationship_type($n5, $rel_type1)};
+			# now: @descendents7 should have 0 element
+			@descendents7 = @{$onto->get_descendent_terms_by_relationship_type($n5, $rel_type2)};
+			# now: @descendents7 should have 2 elements
+			@descendents7 = @{$onto->get_descendent_terms_by_relationship_type($n2, $rel_type1)};
+			# now: @descendents7 should have 1 element
+			@descendents7 = @{$onto->get_descendent_terms_by_relationship_type($n3, $rel_type3)};
+			# now: @descendents7 should have 1 element
+			
+			my @ancestors7 = @{$onto->get_ancestor_terms_by_relationship_type($n1, $rel_type1)};
+			# now: @ancestors7 should have 1 element
+			@ancestors7 = @{$onto->get_ancestor_terms_by_relationship_type($n1, $rel_type2)};
+			# now: @ancestors7 should have 0 elements
+			@ancestors7 = @{$onto->get_ancestor_terms_by_relationship_type($n1, $rel_type3)};
+			# now: @ancestors7 should have 2 elements
+			@ancestors7 = @{$onto->get_ancestor_terms_by_relationship_type($n2, $rel_type2)};
+			# now: @ancestors7 should have 2 elements
+			
+			# add relationship type as string
+			my $relationship_type = $onto->add_relationship_type_as_string("has_participant", "has_participant");
+			# $onto->has_relationship_type($relationship_type) should be TRUE
+			# $onto->get_relationship_type_by_id("has_participant")->equals($relationship_type) should be TRUE
+			# $onto->get_number_of_relationship_types() should be 4
+			
+			# get relationship types
+			my @rt = @{$onto->get_relationship_types()};
+			# now: @rt should have 4 elements
+			my %rrt;
+			foreach my $relt (@rt) {
+				$rrt{$relt->name()} = $relt;
+			}
+			# now: $rrt{"is a"}->name() should be "is a"
+			# now: $rrt{"part_of"}->name() should be "part_of"
+			# now: $rrt{"participates_in"}->name() should be "participates_in"
+			
+			# now: $onto->get_relationship_type_by_id("is_a")->name() should be "is a"
+			# now: $onto->get_relationship_type_by_name("is a")->id() should be "is_a"
+			# now: $onto->get_relationship_type_by_name("part_of")->id() should be "part_of"
+			# now: $onto->get_relationship_type_by_name("participates_in")->id() should be "participates_in"
+			
+			# get_relationships_by_(source|target)_term
+			my @rtbs = @{$onto->get_relationships_by_source_term($n1)};
+			
+			my %rtbsh;
+			foreach my $rel (@rtbs) {
+				$rtbsh{$rel->type()} = $rel->type();
+			}
+			# now: $rtbsh{"participates_in"} should be "participates_in"
+			# now: $rtbsh{"is_a"} should be "is_a"
+			
+			my @rtbt = @{$onto->get_relationships_by_target_term($n3)};
+			
+			my %rtbth;
+			foreach my $rel (@rtbt) {
+				$rtbth{$rel->type()} = $rel->type();
+			}
+			# now: $rtbth{"participates_in"} should be "participates_in");
+			# now: $rtbth{"part_of"} should be "part_of");
+			
+			# get_head_by_relationship_type
+			my @heads_n1 = @{$onto->get_head_by_relationship_type($n1, $onto->get_relationship_type_by_name("participates_in"))};
+			my %hbrt;
+			foreach my $head (@heads_n1) {
+				$hbrt{$head->id()} = $head;
+			}
+			# now: $hbrt{"APO:P0000003"}->equals($n3) should be TRUE
+			# now: $hbrt{"APO:P0000004"}->equals($n4) should be TRUE
+			# now: @{$onto->get_head_by_relationship_type($n1, $onto->get_relationship_type_by_name("is a"))}[0]->equals($n2) should be TRUE
+			
+			# get_tail_by_relationship_type
+			# now: @{$onto->get_tail_by_relationship_type($n3, $onto->get_relationship_type_by_name("participates_in"))}[0]->equals($n1) should be TRUE
+			# now: @{$onto->get_tail_by_relationship_type($n2, $onto->get_relationship_type_by_name("is a"))}[0]->equals($n1) should be TRUE
+			
+			# export
+			$onto->remarks("This is a test ontology");
+			$onto->export('obo', \*STDOUT); # by default in OBO format (spec 1.4)
+			
+			# subontology_by_terms
+			my $terms = OBO::Util::TermSet->new();
+			$terms->add_all($n1, $n2, $n3);
+			my $so = $onto->subontology_by_terms($terms);
+			# now: $so->get_number_of_terms() should be 3
+			# now: $so->has_term($n1) should be TRUE
+			# now: $so->has_term($n2) should be TRUE
+			# now: $so->has_term($n3) should be TRUE
+			
+			$n1->name("mitotic cell cycle");
+			$n2->name("cell cycle process");
+			$n3->name("re-entry into mitotic cell cycle after pheromone arrest");
+			
+			# now: $onto->get_term_by_name("mitotic cell cycle")->equals($n1) should be TRUE
+			# now: $onto->get_term_by_name("cell cycle process")->equals($n2) should be TRUE
+			# now: $onto->get_term_by_name("re-entry into mitotic cell cycle after pheromone arrest")->equals($n3) should be TRUE
+			
+			# now: $onto->get_terms_by_name("mitotic cell cycle")->contains($n1) should be TRUE
+			# now: $onto->get_terms_by_name("cell cycle process")->contains($n2) should be TRUE
+			# now: $onto->get_terms_by_name("re-entry into mitotic cell cycle after pheromone arrest")->contains($n3) should be TRUE
+			
+			# now: $onto->get_terms_by_name("mitotic cell cycle")->size() should be 2
+			# now: $onto->get_terms_by_name("mitotic cell cycle")->contains($n1) should be TRUE
+			# now: $onto->get_terms_by_name("mitotic cell cycle")->contains($n3) should be TRUE
+			
+			# now: ($onto->get_terms_by_name("cell cycle process")->get_set())[0]->id() should be identical to $n2->id()
+			# now: ($onto->get_terms_by_name("re-entry into mitotic cell cycle after pheromone arrest")->get_set())[0]->id() should be identical to $n3->id()
+			
+			# now: $onto->get_terms_by_name("cell cycle")->size() should be 3
+			$so->imports("o1", "02");
+			$so->date("11:03:2007 21:46");
+			$so->data_version("09:03:2007 19:30");
+			$so->idspace_as_string("APO", "http://www.cellcycleontology.org/ontology/APO", "cell cycle terms");
+			# now: $so->idspace->local_idspace() should be "APO"
+			# now: $so->idspace->uri() should be "http://www.cellcycleontology.org/ontology/APO"
+			# now: $so->idspace->description() should be "cell cycle terms"
+			
+			$so->remarks("This is a test ontology");
+			$so->subsets("Jukumari Term used for jukumari", "Jukucha Term used for jukucha");
+			my $std1 = OBO::Core::SynonymTypeDef->new();
+			my $std2 = OBO::Core::SynonymTypeDef->new();
+			$std1->synonym_type_def_as_string("acronym", "acronym", "EXACT");
+			$std2->synonym_type_def_as_string("common_name", "common name", "EXACT");
+			$so->synonym_type_def_set($std1, $std2);
+			$n1->subset("Jukumari");
+			$n1->subset("Jukucha");
+			$n2->def_as_string("This is a dummy definition", "[APO:vm, APO:ls, APO:ea \"Erick Antezana\"] {opt=first}");
+			$n1->xref_set_as_string("APO:ea");
+			$n3->synonym_as_string("This is a dummy synonym definition", "[APO:vm, APO:ls, APO:ea \"Erick Antezana\"] {opt=first}", "EXACT");
+			$n3->alt_id("APO:P0000033");
+			$n3->namespace("cellcycle");
+			$n3->is_obsolete("1");
+			$n3->union_of("GO:0001");
+			$n3->union_of("GO:0002");
+			$n2->intersection_of("GO:0003");
+			$n2->intersection_of("part_of GO:0004");
+			
+			# export the ontology to OWL
+			$so->export('owl', \*FH, \*STDERR, 'http://www.cellcycleontology.org/ontology/owl/', 'http://www.cellcycleontology.org/formats/oboInOwl#');
+			
+			# export the ontology to OBO
+			$so->export('obo', \*STDOUT, \*STDERR);
+			
+			# now: $onto->get_number_of_relationships() should be 6
+			$onto->create_rel($n4, 'part_of', $n5);
+			# now: $onto->get_number_of_relationships() should be 7
+			
+		</pre>
+	</li>
+
+	<li> <b><a name="2">Getting sub-ontologies from a given ontology:</a></b>
+		<pre>
+			
+			my $my_parser = OBO::Parser::OBOParser->new();
+			my $alpha_onto = $my_parser->work("my_onto.obo");
+			
+			my $root = $alpha_onto->get_term_by_id("MYO:0000003");
+			my $sub_o1 = $alpha_onto->get_subontology_from($root);
+			
+			$root = $alpha_onto->get_term_by_id("MYO:0000002");
+			my $sub_o2 = $alpha_onto->get_subontology_from($root);
+			
+			$root = $alpha_onto->get_term_by_id("MYO:0000014");
+			my $sub_o3 = $alpha_onto->get_subontology_from($root);
+			
+		</pre>
+	</li>
+
+	<li> <b><a name="3">Get paths from a given term A to a term B and/or from A to a set of given terms:</a></b>
+		<pre>
+			
+			# get paths from term1 to term2
+			
+			my $o1  = OBO::Core::Ontology->new();
+			my $d5  = OBO::Core::Term->new();
+			my $d2  = OBO::Core::Term->new();
+			my $d6  = OBO::Core::Term->new();
+			my $d1  = OBO::Core::Term->new();
+			my $d7  = OBO::Core::Term->new();
+			my $d8  = OBO::Core::Term->new();
+			my $d10 = OBO::Core::Term->new();
+			my $d11 = OBO::Core::Term->new();
+			
+			my $d20  = OBO::Core::Term->new();
+			my $d21  = OBO::Core::Term->new();
+			my $d32  = OBO::Core::Term->new();
+			my $d23  = OBO::Core::Term->new();
+			my $d24  = OBO::Core::Term->new();
+			my $d25  = OBO::Core::Term->new();
+			my $d26  = OBO::Core::Term->new();
+			my $d27  = OBO::Core::Term->new();
+			my $d28  = OBO::Core::Term->new();
+			my $d29  = OBO::Core::Term->new();
+			
+			$d5->id("5");
+			$d2->id("2");
+			$d6->id("6");
+			$d1->id("1");
+			$d7->id("7");
+			$d8->id("8");
+			$d10->id("10");
+			$d11->id("11");
+			
+			$d20->id("20");
+			$d21->id("21");
+			$d32->id("32");
+			$d23->id("23");
+			$d24->id("24");
+			$d25->id("25");
+			$d26->id("26");
+			$d27->id("27");
+			$d28->id("28");
+			$d29->id("29");
+			
+			
+			$d5->name("5");
+			$d2->name("2");
+			$d6->name("6");
+			$d1->name("1");
+			$d7->name("7");
+			$d8->name("8");
+			$d10->name("10");
+			$d11->name("11");
+			
+			$d20->name("20");
+			$d21->name("21");
+			$d32->name("32");
+			$d23->name("23");
+			$d24->name("24");
+			$d25->name("25");
+			$d26->name("26");
+			$d27->name("27");
+			$d28->name("28");
+			$d29->name("29");
+			
+			my $r = 'is_a';
+			$o1->add_relationship_type_as_string($r, $r);
+			$o1->create_rel($d5,$r,$d2);
+			$o1->create_rel($d2,$r,$d6);
+			$o1->create_rel($d2,$r,$d1);
+			$o1->create_rel($d2,$r,$d7);
+			$o1->create_rel($d7,$r,$d8);
+			$o1->create_rel($d7,$r,$d11);
+			$o1->create_rel($d1,$r,$d10);
+			$o1->create_rel($d1,$r,$d8);
+			
+			
+			$o1->create_rel($d5,$r,$d23);
+			$o1->create_rel($d11,$r,$d28);
+			$o1->create_rel($d28,$r,$d29);
+			$o1->create_rel($d8,$r,$d27);
+			$o1->create_rel($d27,$r,$d26);
+			$o1->create_rel($d10,$r,$d24);
+			$o1->create_rel($d24,$r,$d25);
+			$o1->create_rel($d25,$r,$d26);
+			$o1->create_rel($d6,$r,$d20);
+			$o1->create_rel($d20,$r,$d21);
+			$o1->create_rel($d20,$r,$d32);
+			$o1->create_rel($d21,$r,$d25);
+			
+			# get paths from term1 to term2
+			my @ref_paths = $o1->get_paths_term1_term2($d5->id(), $d26->id());
+			# now: @ref_paths should have 4 elements
+			
+			# get paths from term1 to term2
+			@ref_paths = $o1->get_paths_term1_term2($d5->id(), $d29->id());
+			# now: @ref_paths should have 1 element
+			
+			my @p = ("5_is_a_2", "2_is_a_7", "7_is_a_11", "11_is_a_28", "28_is_a_29");
+			
+			foreach my $ref_path (@ref_paths) {
+				foreach my $tt (@$ref_path) {
+					# now: $tt->id() shoudl be identical to shift @p
+				}
+			}
+			
+			my $stop  = OBO::Util::Set->new();
+			map {$stop->add($_->id())} @{$o1->get_terms()};
+			
+			# get the paths from a given term to a given set of terms
+			my @pref1 = $o1->get_paths_term_terms($d5->id(), $stop);
+			# now: @pref1 should have 23 elements, i.e., 23 paths
+			
+		</pre>
+	</li>
+	
+</ol>
+
+Copyright (c) 2006-2015 by Erick Antezana. All rights reserved.
+
+</body>
+</html>

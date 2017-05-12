@@ -1,0 +1,20 @@
+Revision history for Perl module OpenGuides::RDF::Reader
+
+0.05 Sun Dec 18 2005
+    Add coordinate convertion to og_mirror
+
+0.04 Sat Oct 29 2005
+	Include og_mirror script in the distribution, 
+	as requested by Dominic Hargreaves.
+
+0.03 Sun Oct 16 2005
+	Make returned keys consistent with metadata_type column
+
+0.02 Wed Oct 12 2005
+	Accommodated inconsistent output from OpenGuides 0.50
+	See RT ticket #15073
+
+0.01 Wed Oct 12 2005
+    - original version; created by ExtUtils::ModuleMaker 0.43
+
+

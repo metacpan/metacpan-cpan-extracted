@@ -1,0 +1,134 @@
+NAME
+    Object::AutoAccessor - Accessor class by using AUTOLOAD
+
+SYNOPSIS
+      use Object::AutoAccessor;
+  
+      my $struct = {
+          foo => {
+              bar => {
+                  baz => 'BUILD OK',
+              },
+          },
+      };
+  
+      # Now let's easily accomplish it.
+      my $obj = Object::AutoAccessor->build($struct);
+  
+      print $obj->foo->bar->baz; # prints 'BUILD OK'
+  
+      # OK, now reverse it!
+      $obj->foo->bar->baz('TO HASHREF');
+      my $hashref = $obj->as_hashref;
+      print $hashref->{foo}->{bar}->{baz}; # prints 'TO HASHREF';
+  
+      # Of course, new() can be used.
+      $obj = Object::AutoAccessor->new();
+  
+      # setter methods
+      $obj->foo('bar');
+      $obj->set_foo('bar');
+      $obj->param(foo => 'bar');
+  
+      # getter methods
+      $obj->foo();
+      $obj->get_foo();
+      $obj->param('foo');
+  
+      # $obj->param() is compatible with HTML::Template->param()
+      my @keywords = $obj->param();
+      my $val = $obj->param('hash');
+      $obj->param(key => 'val');
+  
+      my $tmpl = HTML::Template->new(..., associate => [$obj], ...);
+
+DESCRIPTION
+    Object::AutoAccessor is a Accessor class to get/set values by AUTOLOADed
+    method automatically. Moreover, param() is compatible with
+    "HTML::Template" module, so you can use Object::AutoAccessor object for
+    "HTML::Template"'s "associate" option.
+
+METHODS
+    new ( [ OPTIONS ] )
+        Create a new Object::AutoAccessor object. Then you can use several
+        options to control object's behavior.
+
+    build ( HASHREF, [ OPTIONS ] )
+        Create a new object and accessors easily from given hashref
+        structure. Then you can use several options to control object's
+        behavior.
+
+    as_hashref ( )
+        Reconstruct and returns hashref from Object::AutoAccessor object.
+
+    new_node ( NAME, [ OPTIONS ] )
+        Create a new Object::AutoAccessor object as child instance by
+        renew() .
+
+    node ( NAME, [ NAME, ... ] )
+        An accessor method for child instance of Object::AutoAccessor
+        object.
+
+    has_node ( NAME )
+        If object has child instance then it return TRUE.
+
+    renew ( [ OPTIONS ] )
+        Create a new Object::AutoAccessor object to remaining current
+        options.
+
+    KEY ( [ VALUE ] )
+        This method provides an accessor that methodname is same as keyname
+        by using AUTOLOAD mechanism.
+
+          # setter methods
+          $obj->foo('bar');
+          $obj->set_foo('bar');
+          $obj->param(foo => 'bar');
+  
+          # getter methods
+          $obj->foo();
+          $obj->get_foo();
+          $obj->param('foo');
+
+    param ( [ KEY => VALUE, ... ] )
+        This method is compatible with param() method of HTML::Template
+        module.
+
+          # set value
+          $obj->param(foo => 'bar');
+          $obj->param(
+            foo => 'bar',
+            bar => [qw(1 2 3)],
+            baz => { one => 1, two => 2, three => 3 }
+          );
+  
+          # get value
+          $obj->param('foo'); # got 'bar'
+  
+          # get list keys of parameters
+          @keys = $obj->param();
+
+    autoload ( BOOLEAN )
+        This is the method to switch behavior of the
+        AUTOLOADed-accessor-method. If set to 0, the object cannot use the
+        AUTOLOADed-accessor-method such as foo() , set_foo() and get_foo()
+        but param() .
+
+          $obj->new_node('foo')->param(bar => 'baz');
+  
+          $obj->autoload(1);
+          $baz = $obj->foo->bar; # OK
+  
+          $obj->autoload(0);
+          $baz = $obj->node('foo')->param('bar'); # OK
+          $baz = $obj->foo->bar;                  # NG
+
+AUTHOR
+    Copyright 2005-2006 Michiya Honda, <pia@cpan.org> All rights reserved.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    HTML::Template.
+

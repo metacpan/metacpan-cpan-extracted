@@ -1,0 +1,18 @@
+use inc::Module::Install;
+name 'OAuth-Lite';
+all_from 'lib/OAuth/Lite.pm';
+build_requires 'Test::More';
+requires 'LWP';
+requires 'UNIVERSAL::require'     => '0.11';
+requires 'URI'                    => '1.35';
+requires 'Class::Accessor'        => '0.31';
+requires 'Class::ErrorHandler'    => '0.01';
+requires 'Class::Data::Accessor'  => '0.04001';
+requires 'Digest::SHA'            => '5.45';
+requires 'Crypt::OpenSSL::RSA'    => '0.25';
+requires 'Crypt::OpenSSL::Random' => '0.04';
+requires 'List::MoreUtils'        => '0.21';
+requires 'MIME::Base64'           => '3.07';
+requires 'Compress::Zlib'         => '2.001';
+auto_include;
+WriteAll;

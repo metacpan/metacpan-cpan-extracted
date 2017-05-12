@@ -1,0 +1,196 @@
+THIS FILE HAS BEEN SUPERSCEDED BY HTML DOCUMENTATION THAT CAN BE FOUND
+ON http://www.tiac.net/users/sqltech.  
+
+Ed
+
+Below is the old version 3.0 documentation for those of you who dont have
+web browsers.
+
+============
+EXTENDED SYBASE STORED PROCEDURES V3.0
+Copyright (c) 1995-7 By Edward Barlow
+======================================
+
+
+Enclosed is a FREE set of Sybase stored procedures that extend the Sybase
+provided procedures. These procedures provide additional functionality and 
+provide new ways to look at the data provided by Sybase in their System Tables.
+They also provide many new formats that allows users, developers, and 
+administrators to see the data they want in the format they want.  I think 
+the procedures are a MUST for managing your sybase environment.
+
+This version has been tested under 4.8, 4.9, and System 10. The procedures
+are free of all known bugs.
+
+All procedure names start with "sp__". This naming convention ensures that 
+the procedures, when run, will be available from any database and that, 
+when they are run, the database context will be the current database. 
+Thus, if you are in the statsdb database, you can get the space used in 
+statsdb by running sp__dbspace.
+
+I am interested in any thoughts about how to expand these procedures.  
+Please send me any comments and suggestions (see below for address).
+
+Full documentation is included in the file man.doc.  This is a microsoft word
+for windows 6.0 document.  There is also a file man.txt which is the 
+documentation in text format (which might be hard to read due to line breaks).
+
+EXTRACTION OF FILES
+===================
+
+If you received a tar file:
+--------------------------------
+The library is released as tar file.  untar that file to create the 
+subdirectory procs and follow instructions in the readme file (this file).  
+See the sample script at the end of this section.
+
+	# the next command extracts into a directory called procs
+	tar xvf proc200.tar
+	cd procs
+	# optionally edit the files database and dumpdb if system 10
+	# the next command installs on servers
+	configure
+
+If you recieved a zip file:
+---------------------------
+unzip the file.  There IS NO AUTO CONFIGURATION UTILITY FOR DOS.  Sorry.
+If someone who knows dos shell would write one, it would be greatly
+appreciated, but i dont have the foggiest idea how (i would need a command
+line isql...).  
+
+INSTALATION OF PROCEDURES
+=========================
+These procedures reside in the master database (in Sybase 4.9.2) or 
+in the sybsystemprocs database of system 10.  To install these procedures, 
+run the command configure. As the master or sybsystemprocs database will be 
+modified by these procedures, it is suggested that you dump that database 
+before you load the procedures. The script for each procedure will issue 
+a "dump tran $database with truncate_only" prior to the addition of 
+the procedure so that log space (which is generally small) will not 
+be filled.  
+
+USAGE, RESALE AND COPYRIGHT
+===========================
+I am releasing this library as freeware.  I ask that you try the software and
+register when you install (the configure utility prompts you to send me an 
+email).  Redistribute the package at will (see below).  Tell your friends.
+Give me access to procedures that you have written for future versions.  Tell 
+me about bugs.  Be nice - I am making no money off this.
+
+You are allowed to use this software so long as all copyright 
+notices and the README file are not altered and so long as no money is made 
+by the sale of this software (i.e. you cant include it in a commercial 
+package without permission). If you would like to "make money" or include 
+the code in a commercial package, I ask that you decide on a "fair" price 
+and create some form of "fair" agreeement. Make two copies, sign them both, 
+and send them to the author (Edward Barlow). If the agreement seems fair, 
+I will sign both and send one copy back to you, and we will have a deal.  
+I have put significant effort into this code and, while my primary purpose 
+is to create software for people to use, I expect a fair shake from anybody 
+who can profit from my endeavors. 
+
+UNINSTALL
+=========
+SQL statements to uninstall this package are contained in the file cleanup.SQL.
+If running on System 10 the dumpdb and database files should be modified as
+mentioned above.
+
+WARANTY
+=======
+This software is provided as-is. No warranties or guarantees 
+are made. To the best of my knowledge, any bugs or outstanding issues 
+are documented in the file "BUGS" that comes with the source code. 
+Please notify me of any things that can be done to make this a better package.  
+
+ONE CHEAP PLUG
+==============
+I do unix & sybase consulting work in the New York Area.  Get in touch if 
+you think I might be of assistance.  I have developed some nice commercial
+software that can be used for Sybase security and performance audits and
+am able to personally perform these for a reasonable price.  I also have
+a really nice package that can automate system administration (real time
+system monitoring, multi server id administration, historical reports, 
+application performance audits, configuration reporting, and nightly sybase 
+scheduling). My phone is (212) 366-1137.  My email is sqltech@tiac.net.
+
+FINAL NOTE
+==========
+All procedures in this package are copyright (c) 1994-6 by Edward Barlow
+and / or Simon Walker of the SQL Workshop Ltd.  A few of the procedures are
+copyright by other authors (documented), and all procedures are distributed
+here with permission.  Special thanks to Desiree Johnson for her help.
+
+A copyof this package can be found on:
+
+SQL Technlogies home page at http://www.tiac.net/users/sqltech
+Sybase Things web page at http://sybase.pnl.gov:2080/Sybase/barlow.
+
+Edward Barlow
+ebarlow@pipeline.com
+45 5th Ave #12A
+New York, NY 10003
+
+========================================================
+
+MODIFIED SYBASE PROCEDURES
+sp__depends			Better sp_depends
+sp__help				Better sp_help
+sp__helpdb			Database Information
+sp__helpdevice		Break down database devices into a nice report
+sp__helpgroup		List groups in database by access level
+sp__helpindex		Shows indexes by table
+sp__helpsegment	Segment Information
+sp__helpuser		Lists users in current database by group (include aliases)
+sp__lock				Lock information 
+sp__who				sp_who that fits on a page
+
+AUDIT PROCEDURES
+sp__auditsecurity	Security Audit On Server
+sp__auditdb			Audit Current Database For Potential Problems
+sp__checkkey		Get master detail relationships
+
+SYSTEM ADMINISTRATOR PROCEDURES
+sp__block			Blocking processes.
+sp__dbspace			Summary of current database space information. 
+sp__dumpdevice		Listing of Dump devices
+sp__helpdbdev		Show how Databases use Devices
+sp__helplogin		Show logins and remote logins to server
+sp__helpmirror		Shows mirror information, discover broken mirrors
+sp__segment			Segment Information
+sp__server			Server summary report (very useful)
+sp__vdevno			Who's who in the device world
+
+DBA PROCEDURES
+sp__badindex	   give information about bad indexes (nulls, bad statistics...)
+sp__collist			list all columns in database
+sp__flowchart		Makes flowchart of procedure nesting (tougher than it looks)
+sp__indexspace		Space used by indexes in database
+sp__noindex			list of tables without indexes.
+sp__helpcolumns	show columns for given table
+sp__helpdefault	list defaults (part of objectlist)
+sp__helpobject		list objects 
+sp__helpproc 		list procs (part of objectlist)
+sp__helprule		list rules (part of objectlist)
+sp__helptable		list tables (part of objectlist)
+sp__helptrigger 	list triggers (part of objectlist)
+sp__helpview		list views  (part of objectlist)
+sp__trigger			Useful synopsis report of current database trigger schema
+
+REVERSE ENGINEERING
+sp__revalias		get alias script for current db
+sp__revdb			get db creation script for server
+sp__revdevice		get device creation script
+sp__revgroup 		get group script for current db
+sp__revindex		get indexes script for current db
+sp__revlogin		get logins script for server
+sp__revmirror		get mirroring script for server
+sp__revuser			get user script for current db
+sp__revtable		get table creation script for current db
+
+OTHER PROCEDURES
+sp__bcp				Create unix script to bcp in/out database
+sp__date				Who can remember all the date styles?
+sp__quickstats		Quick dump of server summary information
+sp__iostat			loops n times and shows active processes
+sp__ls				Lists specific objects
+

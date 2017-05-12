@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<SITE ID="Bbc.News">
+
+<NAME Lang="en-us">BBC News Search</NAME>
+<INFO Lang="en-us">daily news search</INFO>
+
+<URL Type="More"><![CDATA[
+http://news.bbc.co.uk/scripts/query.idq?CiRestriction=_QUERY_&CiMaxRecordsPerPage=32&CiScope=%2FHi&TemplateName=query&CiSort=rank%5Bd%5D&CiBookmarkSkipCount=_START_25_0_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://news.bbc.co.uk/scripts/query.idq?CiRestriction=_QUERY_&CiMaxRecordsPerPage=32&CiScope=%2FHi&TemplateName=query&CiSort=rank%5Bd%5D&CiBookmarkSkipCount=0
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+
+<TEMPLATE><![CDATA[
+<b><a href="_URL_">_TITLE_</a>___<TD VALIGN="top"><FONT FACE="arial, helvetica" SIZE=2>_PREVIEW_<br>___<font size=-1>_DATE_</font>___</cite>
+]]></TEMPLATE>
+</SITE>

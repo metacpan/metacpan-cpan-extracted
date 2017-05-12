@@ -1,0 +1,263 @@
+#!/opt/bin/perl
+
+# almost every "if" or "?" in this file indicates a place where the OpenCL
+# designers fucked it up - each time you have to remember an exception to
+# the naming rules.
+
+use common::sense;
+
+my %classmap = qw(
+   platform          Platform
+   device            Device
+   context           Context
+   event             Event
+   profiling         Event
+   mem               Memory
+   image             Image
+   gl_texture	     Image
+   sampler           Sampler
+   program           Program
+   program_build     Program
+   kernel            Kernel
+   kernel_work_group Kernel
+   kernel_arg_info   Kernel
+   command_queue     Queue
+);
+
+my %typemap = (
+   # getinfo.txt        c type, constructor, pod
+   cl_bool         => ['cl_bool', 'value [i] ? &PL_sv_yes : &PL_sv_no', 'boolean'],
+   #char            => ['char', 'newSVpvn (value, size)', 'string'],
+   char            => ['char', 'newSVpv (value, 0)', 'string'], # all these are 0-terminated strings, and the driver often appends a \0
+   size_t          => ['size_t', 'newSVuv (value [i])', 'int'],
+   "void*"         => ['void *', 'newSVuv ((IV)(intptr_t)value [i])', 'ptr_value'],
+   cl_platform_id  => ['cl_platform_id', 'OpenCL::Platform'],
+   Context         => ['cl_context', 'OpenCL::Context', 'ctx'],
+   Device          => ['cl_device_id', 'OpenCL::Device', 'device'],
+   cl_device_id    => ['cl_device_id', 'OpenCL::Device', 'device'],
+   Memory          => ['cl_mem', 'OpenCL::Memory', 'mem'],
+   Program         => ['cl_program', 'OpenCL::Program', 'program'],
+   CommandQueue    => ['cl_command_queue', 'OpenCL::Queue', 'queue'],
+   cl_context_properties => ['cl_context_properties', 'newSVuv ((UV)value [i])', 'property_int'],
+   cl_program_binary_type => ['cl_program_binary_type', 'newSVuv ((UV)value [i])', 'binary_type'],
+);
+
+
+# try to re-use types with same representation in C - if we
+# ever overload bitfields etc. then we need to remove all
+# typesimplify code.
+my %typesimplify;
+{
+   open my $h, "<CL/cl.h" or die "CL/cl.h: $!";
+
+   while (<$h>) {
+      $typesimplify{$2} = $1
+         if /typedef\s+(cl_\S+)\s+(cl_\S+);/;
+   }
+}
+
+{
+   my %tmap = (
+      T_IV => "newSViv (value [i])",
+      T_UV => "newSVuv (value [i])",
+   );
+
+   open my $fh, "<typemap"
+      or die "typemap: $!";
+
+   while (<$fh>) {
+      next if /^INPUT$/;
+      my ($name, $type) = split /\s+/, $_;
+      if ($tmap{$type}) {
+         $typemap{$name} = [$name, $tmap{$type}, substr $name, 3];
+      }
+   }
+}
+
+sub patch($$$$) {
+   my ($file, $beg, $end, $contents) = @_;
+
+   {
+      local $/;
+
+      open my $fh, "<$file"
+         or die "$file: $!";
+
+      my $data = <$fh>;
+      $data =~ s/^(\Q$beg\E\n).*?\n(\Q$end\E\n)/$1\n$contents$2/sm
+         or die "$file: couldn't find $beg/$end";
+
+      open my $fh2, ">$file~"
+         or die "$file~: $!";
+
+      syswrite $fh2, $data;
+   }
+
+   rename "$file~", $file;
+}
+
+for my $CLASS (qw(platform device context command_queue mem image sampler program program_build kernel kernel_work_group kernel_arg event profiling gl_texture)) {
+   open my $fh, "<getinfo.txt"
+      or die "getinfo.txt: $!";
+
+   my $POD;
+   my @funcs;
+   my %alias;
+
+   while (<$fh>) {
+      chomp;
+      my ($class, $name, $ctype) = split /\s*,\s*/, $_, 3;
+      next unless $class eq "cl_$CLASS\_info";
+      next if $name eq "CL_IMAGE_FORMAT"; # struct
+      next if $name eq "CL_PROGRAM_BINARIES"; # needs multiple calls
+
+      $ctype =~ s/cl:://g;
+      $ctype =~ s/::size_t/size_t/g;
+
+      my $cbase = $class;
+      $cbase =~ s/_(.)/\U$1/g;
+      $cbase =~ s/Gl(?=[A-Z])/GL/g;
+      $cbase =~ s/^cl//;
+      $cbase =~ s/Info$//;
+      $cbase = "MemObject"      if $cbase eq "Mem";
+      $cbase = "EventProfiling" if $cbase eq "Profiling";
+
+      my $real_class = $CLASS;
+      $real_class = "program" if $real_class eq "program_build";
+      $real_class = "kernel"  if $real_class eq "kernel_work_group";
+      $real_class = "kernel"  if $real_class eq "kernel_arg";
+      $real_class = "event"   if $real_class eq "profiling";
+
+      my $perl_name = lc $name;
+      $perl_name =~ s/^cl_//;
+      $perl_name =~ s/^$real_class\_//;
+      $perl_name =~ s/^queue\_//;
+
+      my $extra_args;
+      my $extra_perl_args;
+      my $extra_xs_args;
+
+      if ($CLASS eq "program_build" || $CLASS eq "kernel_work_group") {
+         $extra_args      = ', device';
+         $extra_perl_args = ' ($device)';
+         $extra_xs_args   = ', OpenCL::Device device';
+      }
+
+      if ($CLASS eq "kernel_arg") {
+         $extra_args      = ', idx';
+         $extra_perl_args = ' ($idx)';
+         $extra_xs_args   = ', cl_uint idx';
+      }
+
+      my $dynamic;
+      my $nelem = "size / sizeof (*value)";
+
+      if ($ctype eq "STRING_CLASS") {
+         $ctype   = "VECTOR_CLASS<char>";
+         $nelem   = "1";
+         $dynamic = 1;
+      }
+
+      my $type = $ctype;
+      my $array = 0;
+
+      if ($type =~ s/^VECTOR_CLASS<\s*(.*)>$/$1/) {
+         $dynamic = 1;
+         $array   = 1;
+      } elsif ($type =~ s/<(\d+)>$//) {
+         $dynamic = 1;
+         $array   = 1;
+      }
+
+      $type = $typemap{$type}
+         or die "$name: no mapping for $ctype";
+
+      my $perltype = $type->[2];
+
+      if ($array && $nelem ne "1") {
+         $perltype = "\@${perltype}s";
+      } else {
+         $perltype = "\$$perltype";
+      }
+
+      (my $perlenum = $name) =~ s/^CL_/OpenCL::/ or die;
+
+      $POD .= "=item $perltype = \$$real_class->$perl_name$extra_perl_args\n\nCalls C<clGet${cbase}Info> with C<$perlenum> and returns the result.\n\n";
+
+      # XS1 contains the function before ALIAS, XS2 the function afterwards (the body)
+      # after we generate the bdoy we look for an identical body generated earlier
+      # and simply alias us to the earlier xs function, to save text size.
+      my ($XS1, $XS2);
+
+      $XS1 = "void\n"
+           . "XXXNAMEXXX (OpenCL::$classmap{$real_class} self$extra_xs_args)\n";
+      $XS2 = " PPCODE:\n";
+
+      my $stype = $type->[0]; # simplified type
+      $stype = $typesimplify{$stype} while exists $typesimplify{$stype};
+
+      if ($dynamic) {
+        $XS2 .= " size_t size;\n"
+              . " NEED_SUCCESS (Get${cbase}Info, (self$extra_args, ix,    0,     0, &size));\n"
+              . " $stype *value = tmpbuf (size);\n"
+             . " NEED_SUCCESS (Get${cbase}Info, (self$extra_args, ix, size, value,     0));\n";
+      } else {
+        $XS2 .= " $stype value [1];\n"
+              . " NEED_SUCCESS (Get${cbase}Info, (self$extra_args, ix, sizeof (value), value, 0));\n";
+      }
+      
+      if ($array && $nelem ne "1") {
+         $XS2 .= " int i, n = $nelem;\n"
+               . " EXTEND (SP, n);\n"
+               . " for (i = 0; i < n; ++i)\n";
+      } else {
+         $XS2 .= " EXTEND (SP, 1);\n"
+               . " const int i = 0;\n"
+      }
+
+      if ($type->[1] =~ /^OpenCL::(\S+)$/) {
+         my $oclass = $1;
+         $oclass = "MemObject"    if $oclass eq "Memory";
+         $oclass = "CommandQueue" if $oclass eq "Queue";
+
+         my $stash = lc $type->[1];
+         $stash =~ s/opencl:://;
+         $stash =~ s/::/_/g;
+
+         $XS2 .= " NEED_SUCCESS (Retain$oclass, (value [i]));\n" unless $oclass eq "Platform" || $oclass eq "Device";
+         $XS2 .= " PUSH_CLOBJ (stash_$stash, value [i]);\n";
+      } else {
+         $XS2 .= " PUSHs (sv_2mortal ($type->[1]));\n";
+      }
+
+      $XS2 .= "\n";
+
+      if (my $alias = $alias{"$XS1$XS2"}) {
+         push @$alias, [$perl_name, $name];
+      } else {
+         push @funcs, [$XS1, (my $alias = [[$perl_name, $name]]), $XS2];
+         $alias{"$XS1$XS2"} = $alias;
+      }
+   }
+
+   my $XS;
+
+   # this very dirty and ugly code is a very dirty and ugly code size optimisation.
+   for (@funcs) {
+      $_->[0] =~s /^XXXNAMEXXX/$_->[1][0][0]/m;
+
+      if (@{ $_->[1] } == 1) { # undo ALIAS
+         $_->[2] =~ s/\bix\b/$_->[1][0][1]/g;
+         $_->[1] = "";
+      } else {
+         $_->[1] = " ALIAS:\n" . join "", sort, map " $_->[0] = $_->[1]\n", @{ $_->[1] };
+      }
+      $XS .= join "", @$_;
+   }
+
+   warn "patching class $CLASS\n";
+
+   patch "OpenCL.xs", "#BEGIN:$CLASS"               , "#END:$CLASS"               , $XS;
+   patch "OpenCL.pm", "=for gengetinfo begin $CLASS", "=for gengetinfo end $CLASS", $POD;
+}
+

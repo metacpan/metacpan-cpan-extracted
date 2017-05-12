@@ -1,0 +1,7 @@
+Revision history for Perl extension ObjectRowMap.
+
+0.11  Mon Dec 30 01:19:05 2002
+	- original version; created by h2xs 1.21 with options
+		-AX -n ObjectRowMap
+		Works for me, no warrenty of any kind, see pod for more
+

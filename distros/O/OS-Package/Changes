@@ -1,0 +1,40 @@
+Revision history for OS-Package
+
+0.2.7 2015-06-23
+
+ - Add repository directory option
+
+0.2.6 2014-09-29
+
+ - Fix log entry
+
+0.2.5 2014-09-28
+
+ - POD update
+
+0.2.4 2014-09-28
+
+ - Fix sprintf error in SVR4 plugin [GH-2]
+ - Add missing dependency
+
+0.2.3 2014-09-27
+
+ - POD updates
+
+0.2.2 2014-09-27
+
+ - update email address
+
+0.2.1 2014-09-27
+
+ - Add github metadata
+
+0.2.0 2014-09-27
+
+ - Add build tag option
+ - Add init command
+ - ospkg configuration stored in ~/.ospkg by default
+
+0.1.0 2014-09-11
+
+ - Initial Release

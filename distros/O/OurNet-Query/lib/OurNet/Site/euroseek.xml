@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<SITE ID="EuroSeek">
+
+<NAME Lang="en-us">EuroSeek</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+EuroSeek ¼Ú¬w¯¸¥x¬d¸ß
+]]></NAME>
+<INFO Lang="en-us">general information web search in Europe</INFO>
+<INFO Lang="zh-tw">general information web search in Europe</INFO>
+
+<URL Type="More"><![CDATA[
+http://www.euroseek.net_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://www.euroseek.net/query?iflang=uk&query=_QUERY_&domain=world&lang=world
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_NEXT_"><![CDATA[
+<A HREF="_NEXT_">Next &gt;&gt;</A>
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<TD COLSPAN=2 VALIGN=TOP>___<A HREF="_URL_">_TITLE_</A>___<FONT COLOR=#800040>_PREVIEW_</FONT></TD></TR>___WIDTH=40%><FONT SIZE=-1>_DATE_</NOBR>
+]]></TEMPLATE>
+</SITE>

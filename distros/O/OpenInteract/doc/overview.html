@@ -1,0 +1,337 @@
+<H1>Introduction to OpenInteract</H1>
+
+<P>
+OpenInteract is an apache / mod_perl based application server that
+implements database connectivity and security through the SPOPS object
+framework.
+
+<P>
+SPOPS (Simple Perl Object Persistence with Security) is an object-oriented
+application framework that provides object persistency and security
+services to your applications.
+
+<P>
+<H1>What you get with OpenInteract</H1>
+<UL>
+<LI>
+<P>
+bootstrap modules
+
+<LI>
+<P>
+package installer
+
+<LI>
+<P>
+base packages (the real OpenInteract)
+
+<LI>
+<P>
+SPOPS (Simple Perl Object Persistence with Security)
+
+<LI>
+<P>
+fully functional demo application packages
+
+</UL>
+<P>
+<H1>What you can do with OpenInteract</H1>
+<UL>
+<LI>
+<P>
+use it: create your own applications by configuring the installed
+application packages
+
+<LI>
+<P>
+adapt it: adapt OpenInteract to your storage technology needs by
+configuring SPOPS
+
+<LI>
+<P>
+extend it: extend OpenInteract by writing new applications using the
+framework provided by the base installation
+
+</UL>
+<P>
+<H1>Why are we doing this?</H1>
+<P>
+Almost every web-based application needs to deal with certain issues:
+
+<UL>
+<LI><A NAME="item_Authentication">Authentication: How do I know who is viewing a particular page
+or making a particular request?</A>
+<LI>Security: is this person allowed to make this request?
+<LI><A NAME="item_Display">Display: How can I ensure all pages look the same? How can I
+make a change in one location and have it percolate down into the
+entire site?</A>
+<LI>Sessions: how can i track information from request to request?
+<LI><A NAME="item_Data">Data: How can I deal with data consistently? How can I add new
+types of data to the system easily? How can I relate disparate data
+objects?</A>
+<LI><A NAME="item_Performance">Performance: How can I minimize database queries as well as
+computation needed to create commonly-used graphical elements?</A>
+</UL>
+<P>
+OpenInteract takes care of all these questions, in addition to others. It
+is based on open standards and is itself an open source application,
+meaning that nothing is hidden from you if you choose to investigate how
+something is done. You can even improve how OpenInteract works and
+contribute your modifications back to the community which itself will be
+improving and adding to the system.
+
+<P>
+<H1>What you need to know</H1>
+
+<P>
+<STRONG>Level of Knowledge</STRONG>
+
+<P>
+If you want to make substantial changes to the system, or add substantial
+functionality, you're going to need to know Perl. There's really no way
+around this fact. Any reasonably complicated system is going to demand more
+from its users, and OpenInteract is no exception.
+
+<P>
+That said, developing applications under the OpenInteract framework is
+quite simple. You don't need to write code to create SPOPS objects, just
+create a configuration entry for it. And many applications are simple
+enough that you can use one of the included tools as a template.
+
+<P>
+Configuration files are in Perl form, although the setup is quite
+intuitive and should be easy to modify.
+
+<P>
+<STRONG>It's not ASP/PHP/...</STRONG>
+
+<P>
+OpenInteract is built from the ground-up on perl, and it will remain so. We
+will not rewrite it in PHP -- although you're free to do so yourself if you
+like. Perl has been called the 'duct tape of the Internet' for good reason:
+it makes available an astonishing array of possibilities while still
+remaining fairly simple. We want OpenInteract to be able to do just about
+anything you can do with a web application, while still taking care of most
+of the stuff that nobody likes to deal with.
+
+<P>
+<STRONG>Creating Templates</STRONG>
+
+<P>
+The syntax for using the recommended templating scheme (Template Toolkit)
+is quite straightforward, and if you've done any web template programming
+you'll probably pick it up within a half-hour, if not sooner. Most
+templates that come with the system use only a few constructs, and the
+syntax is simple enough to understand quickly yet powerful enough to enable
+any number of tasks.
+
+<P>
+<H1>How it works (briefly)</H1>
+<P>
+OpenInteract implements a mod_perl content handler that takes all requests.
+It parses the URL and maps it to a module which will generate the content
+for the page. (That module can in turn call any number of other modules,
+but that's getting into details.)
+
+<P>
+The content handler calls separate modules to parse cookies, create a
+session to compensate for the stateless http request paradigm, and ensures
+that the user is properly authenticated. It passes the module information
+to the user interface handler, which calls the module and puts it into the
+site template so every page looks the same.
+
+<P>
+OpenInteract also handlers errors in a uniform fashion, enables database
+connection pooling, and manages user interface elements (colors, fonts and
+otherwise) through a web interface.
+
+<P>
+<H1>Requirements</H1>
+<P>
+There are a number of requirements for OpenInteract:
+
+<P>
+<STRONG>Perl</STRONG>
+
+
+
+<P>
+You must have Perl installed on your system, and its version must be
+greater than 5.004. (We have run systems for months on 5.005_03 and
+5.6.1 with no issues.)
+
+<P>
+<STRONG>apache</STRONG>
+
+
+
+<P>
+You must have apache installed on your system. OpenInteract has been
+successfully tested with version 1.3.12.
+
+<P>
+<STRONG>mod_perl</STRONG>
+
+
+
+<P>
+The mod_perl apache module must be installed and successfully working. You
+will probably also be able to use PerlEx on Windows NT/2000 machines in the
+near future, but this is not yet built.
+
+<P>
+The <EM>OpenInteract Administrator's Guide</EM> has some basic instructions for building mod_perl and apache from source,
+which is strongly recommended.
+
+<P>
+<STRONG>RDBMS</STRONG>
+
+
+
+<P>
+Currently, OpenInteract works <STRONG>only</STRONG> with a relational database system, also known as a SQL database. It may in
+the future be adapted to use BerkeleyDB or an object database, but
+currently it's a RDBMS or nothing.
+
+<P>
+Don't have such a system? Don't fret! High-quality systems are available
+for free. The MySQL database is a very fast, very functional database that
+is both free in terms of cost and is open source. MySQL does not support
+traditional database constructs such as transactions, stored procedures,
+triggers and foreign keys (among others), but it works well with
+OpenInteract
+
+<P>
+If you use the Linux operating system, you can use either MySQL or a free
+version of Sybase Adaptive Server Enterprise. Version 11.0.3.3 has been
+made available free of cost for both production and deployment, although
+this does not include official support. Sybase ASE requires more
+administration, but it is definitely a heavyweight database with likely all
+the features you will need.
+
+<P>
+<STRONG>DBI</STRONG>
+
+
+
+<P>
+Perl's Database Interface provides a generic interface to myriad databases;
+the SPOPS::DBI data handler relies heavily on DBI not only for retrieval,
+storage and removal of data, but also for querying the database for
+metadata about field types.
+
+<P>
+<STRONG>Template Toolkit</STRONG>
+
+
+
+<P>
+The Template Toolkit is a very robust and mature templating system.
+Although OpenInteract is setup so that you can use different templating
+implementations (including your own), Template Toolkit is strongly
+recommended. All of the templates included with OpenInteract use the
+Template Toolkit.
+
+
+<H1>Data abstraction: SPOPS</H1>
+<P>
+One of the ways that OpenInteract sets itself apart from other web
+application frameworks is the data abstraction subsystem, called SPOPS
+(Simple Perl Object Persistence with Security). SPOPS allows you to add
+definitions for data objects and have them be available throughout your
+application.
+
+<H1>Security</H1>
+<P>
+The last 'S' in SPOPS stands for Security. Security is built into the SPOPS
+from the beginning. If a user does not have access to view a particular
+data object, the system never even knows that it exists.
+
+<P>
+Enabling an object to use security is as simple as a few lines in the SPOPS
+configuration. Afterward, you can set the security for the entire world, or
+on a per-group and per-user basis. Each user and group can have specific
+permissions to an object, and the most specific permission is always
+utilized. 
+
+<P>
+The SPOPS security model is also utilized for tasks, not just objects. For
+instance, you might want to establish a policy that states all users who
+are not logged in can view events, but they cannot add new ones. This sort
+of policy is simple to create. 
+
+<P>
+<H1>Configuration</H1>
+<P>
+Configuration of OpenInteract is done through human-readable and editable
+text files. There are a number of files, but this is to allow application
+packages to exist independently of one another. This also enables each
+configuration file to be brief and to the point.
+
+<P>
+<H1>Error handling</H1>
+<P>
+OpenInteract has a fairly robust error handling system that allows certain
+errors to simply be logged into the system, others to trigger a
+notification to an administrator or module author, and others to change
+what the user sees onscreen.
+
+<P>
+In addition, the system ships with a very capable error browsing
+application that allows you to filter errors by date or type, making it
+easy to pinpoint problems in your website.
+
+<P>
+<H1>Users and groups</H1>
+<P>
+OpenInteract uses a very simple, flexible and standard scheme of users and
+groups. The scheme is characterized by the following:
+
+<UL>
+
+<LI>The system comes configured with a superuser and a supergroup. The
+superuser and the members of the supergroup can do anything and see
+anything
+
+<li>You can create as many users and groups as you like, and users can
+create their own accounts through a web browser.
+
+<LI>A user can belong to more than one group.
+
+<LI>A user cannot belong to a group for which he/she does not have
+read access.
+
+</UL>
+
+<P>
+That's it.
+
+<P>
+<H1>Templates</H1>
+<P>
+Just about everything you see in OpenInteract is a template. You can
+develop your own module for filling the template with data, but we
+recommend you use the Template Toolkit, which is robust, mature and under
+active development.
+
+<P>
+You can edit templates using a web browser interface. In the future, you
+will also be able to edit a template and its meta information via a
+separate, more expressive interface such as Perl/Tk, Java or perhaps even
+Dreamweaver.
+
+<P>
+<H1>Themes</H1>
+
+<p>The appearance of an OpenInteract application is almost entirely
+controlled by a theme. A theme defines the appearance of background
+colors, fonts, border colors of boxes, and standard graphical elements
+like bullets, etc. Themes implement the notion of "style sheets" in
+OpenInteract. (This is not to be confused with Cascading Style Sheets,
+which are a different means to control the appearance of raw HTML.)
+
+<p>You can define as many themes as you like, inheriting most
+attributes from a parent theme and only overriding a few. Setting the
+theme to be used is as simple as a few clicks, and you can develop
+themes behind the scenes, testing out and tweaking the appearance,
+then rolling it out for everyone.

@@ -1,0 +1,5 @@
+UniProtKB	Q6NMC8	Q6NMC8_ARATH		GO:0000074	GOA:interpro	IEA	InterPro:IPR006671	P	At4g37630: At4g37630		protein	taxon:3702	20060908	UniProtKB
+UniProtKB	P56794	RK20_ARATH		GO:0000027	GOA:hamap	IEA	HAMAP:MF_00382	P	rpl20, AtCg00660: Chloroplast 50S ribosomal protein L20	IPI00538740	protein	taxon:3702	20060908	UniProtKB
+UniProtKB	Q6XJG8	Q6XJG8_ARATH		GO:0000074	GOA:interpro	IEA	InterPro:IPR002015	P	RPN1b: 26S proteasome subunit RPN1b	IPI00657061	protein	taxon:3702	20060908	UniProtKB
+UniProtKB	Q84JF0	Q84JF0_ARATH		GO:0000103	GOA:interpro	IEA	InterPro:IPR002891	P	At5g67520: Putative adenylylsulfate kinase	IPI00522320	protein	taxon:3702	20060908	UniProtKB
+UniProtKB	P56794	RK20_ARATH		GO:0000103	GOA:interpro	IEA	InterPro:IPR002891	P	rpl20, AtCg00660: Chloroplast 50S ribosomal protein L20	IPI00522320	protein	taxon:3702	20060908	UniProtKB

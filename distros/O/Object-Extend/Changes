@@ -1,0 +1,26 @@
+Revision history for Perl extension Object::Extend.
+
+0.4.0 Sun Oct 27 02:07:03 2013
+    - allow SINGLETON to be imported
+
+0.3.0 Sun Oct 27 00:27:51 2013
+    - bump minimum perl version to 5.8.0
+
+0.2.0 Thu Sep 12 22:01:05 2013
+    - rename EIGENCLASS -> SINGLETON
+    - ensure correctness when ref addresses are recycled:
+        - recycled.t
+    - reuse eigenclasses when safe:
+        - cache.t
+    - ensure reblessed objects behave as expected:
+        - rebless.t
+
+0.1.1 Tue Sep 3 17:41:42 2013
+    - doc cleanup
+
+0.1.0 Tue Sep 3 03:50:59 2013
+    - use Scalar::Util::refaddr to ensure eigenclass names aren't broken by overloading
+    - fix doc nit
+
+0.0.1 Mon Sep 2 21:37:07 2013
+    - original version; created by h2xs 1.23 with options h2xs -AXn Object::Extend

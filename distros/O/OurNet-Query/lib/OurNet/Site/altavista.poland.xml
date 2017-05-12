@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<SITE ID="Altavista.Poland">
+
+<NAME Lang="en-us">AltaVista</NAME>
+<INFO Lang="en-us">general information documents in Poland</INFO>
+
+<URL Type="More"><![CDATA[
+http://www.altavista.pl_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://www.altavista.pl/cgi-bin/query?pg=q&fmt=.&q=_QUERY_
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_NEXT_"><![CDATA[
+<a href="_NEXT_">  [ Nastepny
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<dt><a href="_URL_">_TITLE_</a><dd>_PREVIEW_<br><cite>
+]]></TEMPLATE>
+</SITE>

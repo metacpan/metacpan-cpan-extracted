@@ -1,0 +1,9 @@
+---
+utils:
+  config: D:/Git/OPAR/OTRS-OPM-Analyzer/conf
+  perltidy:
+    config: perltidyrc
+  perlcritic:
+    config: perlcriticrc
+general:
+  perl_version: 5.008001

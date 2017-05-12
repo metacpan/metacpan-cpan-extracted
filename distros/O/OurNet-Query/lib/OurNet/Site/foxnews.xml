@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<SITE ID="FoxNews">
+
+<NAME Lang="en-us">FOX News</NAME>
+<INFO Lang="en-us">daily news search</INFO>
+
+<URL Type="More"><![CDATA[
+post://www.foxnews.com/search/cgi-bin/search.pl?lastQuery=_LASTQUERY_&sort=date&action=FilterSearch&QueryZip=_QUERYZIP_&Filter=foxnews_search_filter.hts&ResultTemplate=foxnews_result_list.hts&QueryText=_QUERYTEXT_&Collection=foxnews&Collection=foxnews.wires&Collection=foxnews.market&SortSpec=Timestamp+desc&ResultStart=_RESULTSTART_&ResultCount=_RESULTCOUNT_&x=26&y=7
+]]></URL>
+<URL Type="Start"><![CDATA[
+post://www.foxnews.com/search/cgi-bin/search.pl?action=FilterSearch&Filter=foxnews_search_filter.hts&query=_QUERY_&days=60&wires=foxnews&sort=date&BUTTON.x=18&BUTTON.y=8
+]]></URL>
+
+<EXPRESSION>Boolean</EXPRESSION>
+
+<VAR Name="_STARTFROM_"><![CDATA[
+<input type="hidden" name="startFrom" value="_STARTFROM_">
+]]></VAR>
+<VAR Name="_QUERY_"><![CDATA[
+<input type="hidden" name="query" value="_QUERY_">
+]]></VAR>
+<VAR Name="_RESULTCOUNT_"><![CDATA[
+<input type=hidden name=ResultCount value="_RESULTCOUNT_">
+]]></VAR>
+<VAR Name="_QUERYZIP_"><![CDATA[
+<input type=hidden name=QueryZip value="_QUERYZIP_">
+]]></VAR>
+<VAR Name="_LASTQUERY_"><![CDATA[
+<INPUT TYPE="hidden" NAME="lastQuery" Value="_LASTQUERY_">
+]]></VAR>
+<VAR Name="_QUERYTEXT_"><![CDATA[
+<input type=hidden name=QueryText value="_QUERYTEXT_">
+]]></VAR>
+<VAR Name="_RESULTSTART_"><![CDATA[
+<input type=hidden name=ResultStart value="_RESULTSTART_">
+]]></VAR>
+<VAR Name="_SESSIONID_"><![CDATA[
+<input type="hidden" name="sessionId" value="_SESSIONID_">
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<!-- result -->_DATE_</B></TD>___<FONT COLOR="#CD0033">_SCORE_%___<A HREF="_URL_"___>_TITLE_</A>_PREVIEW_</TD>
+]]></TEMPLATE>
+</SITE>

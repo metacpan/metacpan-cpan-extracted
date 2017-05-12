@@ -1,0 +1,37 @@
+Changelog for OpenFrame::Segment::Apache
+
+1.20 Wed Nov  5 14:09:44 GMT 2003
+	- require OpenFrame instead of OpenFrame::AppKit
+
+1.10 Wed Sep  3 15:00:54 BST 2003
+	- applied patch from Arthur Bergman to check for an Apache
+          binary in the TEST_APACHE environment variable and to add
+          Apache::Cookie as dependency
+	- moved to Module::Build
+
+1.05 Thu Dec 19 15:43:55 GMT 2002
+	- minor code cleanup
+	- cookies are now stringified rather than extracted, so the
+	  programmer retains control over them
+	- use the request scheme rather than blindly assuming HTTP
+          (HTTPS should now work properly)
+
+1.04 Fri Sep 27 13:04:20 BST 2002
+	- fix embarrassing bug where cookies weren't being sent properly
+
+1.03 Thu Sep 26 16:27:48 BST 2002
+	- hmmm, a lot of releases today
+	- now use the new OpenFrame::Argument::Blob so that file
+	uploading works in the new OpenFrame way
+
+1.02 Thu Sep 26 15:28:13 BST 2002
+	- new OpenFrame::Segment::Apache::NoImages which lets Apache
+	serve images for us (and framework to make this work and tests
+	to check it works)
+
+1.01 Wed Sep 25 16:32:14 BST 2002
+	- redirects now work (with tests)
+
+1.00 Tue Aug 27 10:58:42 BST 2002
+	- first release
+

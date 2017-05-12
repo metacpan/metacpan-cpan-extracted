@@ -1,0 +1,13 @@
+MANIFEST
+CHANGELOG
+README
+Makefile.PL
+lib/OOB.pm
+t/001basic.t
+t/010cloak.t
+t/020object.t
+t/030function.t
+t/040blessed.t
+t/050cleanup.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

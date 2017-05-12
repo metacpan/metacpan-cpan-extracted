@@ -1,0 +1,14 @@
+<form class="index_nodes" action="[% cgi_url %]" method="get">
+  <input type="hidden" name="action" value="index" />
+  [% IF centre_lat OR no_nodes_on_map %]
+    [%# this is how we know we're doing format=map! %]
+    <input type="hidden" name="format" value="map" />
+  [% END %]
+  [% FOREACH field = index_form_fields %]
+    <span class="[% field.type | html %]_index">
+      [% field.type.ucfirst | html %]:
+      [% field.html %]
+    </span>
+  [% END %]
+  <input type="submit" value="Search" />
+</form>

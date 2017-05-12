@@ -1,0 +1,25 @@
+---
+abstract: 'PERL modules for manipulating OBO-formatted ontologies, such as the Gene Ontology (GO)'
+author:
+  - 'Erick Antezana <erick.antezana -@- gmail.com>, Vladimir Mironov <vladimir.n.mironov -@- gmail.com>'
+build_requires:
+  Date::Manip: '6.42'
+  ExtUtils::MakeMaker: '6.84'
+configure_requires:
+  Date::Manip: '6.42'
+  ExtUtils::MakeMaker: '6.84'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: ONTO-PERL
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Date::Manip: '6.42'
+  perl: '5.005'
+version: '1.45'

@@ -1,0 +1,11 @@
+Changes
+LibOgg.xs
+Makefile.PL
+MANIFEST
+ppport.h
+README
+typemap
+t/Ogg-LibOgg.t
+t/test.ogg
+lib/Ogg/LibOgg.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,36 @@
+Here are some notes strictly for developers of this
+OWL2Perl module!
+
+If you plan on modifying this distribution and you
+obtain the code from a repository and NOT from CPAN,
+please make sure that you have Module::Install
+installed on your machine!
+
+Other than that, if you are maintaining this module,
+you need to make sure that you never commit the
+following files:
+
+    META.yml, MANIFEST
+
+Basically, the files are created when you plan on
+creating the distribution file for upload to CPAN.
+
+Assuming you want to create the distribution, do*:
+
+   perl Makefile.PL
+   make manifest
+   make distribution
+   make realclean
+
+A OWL2Perl-###.tar.gz (where ### is the version number)
+file can then be found from the ./ directory. Upload
+this file to cpan.
+
+
+* Of course, I didn't mention that you need to update
+the version of the distribution in the Makefile.PL file.
+If you don't, then you wont be able to upload to CPAN.
+
+Good luck!
+
+Eddie

@@ -1,0 +1,32 @@
+Oracle-CAPI version 1.03
+=================
+
+A perl XS wrapper to ctapi.h from the Oracle Collaboration Suite CAPI SDK (CSDK). This was built and
+tested against OCS version 9.0.4.2 on Linux.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+Make sure the Oracle CAPI SDK (CSDK) lib is visible (ln -s .../where_CAPI/lib lib - try $ORACLE_HOME/ocal/sdk/lib)
+Make sure ctapi.h is visible in this directory as well (ln -s .../where_CAPI/include/ctapi.h - try $ORACLE_HOME/ocal/sdk/include/ctapi.h)
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Oracle CAPI SDK c lib (CSDK):
+-lcapi -lclntsh -lctcore
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 Reed Sandberg
+All rights reserved. This program is free software; you can redistribute
+it and/or modify it under the same terms as Perl itself.
+

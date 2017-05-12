@@ -1,0 +1,34 @@
+Revision history for Perl extension Object-Tiny
+
+1.07 Wed 21 Sep 2011
+	- allow 'undef' values be set via accessor (KMX)
+
+1.06 Fri  4 Jul 2008
+	- No functional changes
+	- Using strict.pm all the time
+	- Fixing META.yml
+	- Fixed two "it's" into "its" in the documentation. (SHLOMIF)
+
+1.05 Thu  1 Nov 2007
+	- No functional changes
+	- Converted Makefile.PL from Module::Install to EU:MM
+
+1.04 Mon 22 Oct 2007
+	- No functional changes
+	- Upgrading to a newer set of AUTOMATED_TESTING tests
+
+1.03 Tue  4 Sep 2007
+	- Use explicit return in the generated accessors
+	  (makes them 5-10% faster according to benchmarking)
+	- Jonathon Rockway asks why both when we have Class::Accessor::Fast.
+	  (I've added a documentation segment to answer it)
+
+1.02 Wed  9 May 2007
+	- Fixing some POD things
+	- No functional changes
+
+1.01 Fri 23 Mar 2007
+	- Allowing the use of Object::Tiny with sub-classes
+
+1.00 Tue 20 Mar 2007
+	- Initial release

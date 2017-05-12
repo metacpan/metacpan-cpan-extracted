@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<SITE ID="Music">
+
+<NAME Lang="en-us">MusicSearch</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+MusicSearch音樂資訊檢索
+]]></NAME>
+<INFO Lang="en-us">musical relevant information search</INFO>
+<INFO Lang="zh-tw">musical relevant information search</INFO>
+
+<URL Type="More"><![CDATA[
+_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://www.musicsearch.com/global/search/search.cgi?QUERY=_QUERY_
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+<EXPRESSION>Standard</EXPRESSION>
+<CATEGORY>WWW,Art</CATEGORY>
+
+<VAR Name="_NEXT_"><![CDATA[
+<a href="_NEXT_">Next
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<li> <a href="_URL_">_TITLE_</a>
+]]></TEMPLATE>
+</SITE>

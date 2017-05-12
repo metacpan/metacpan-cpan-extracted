@@ -1,0 +1,253 @@
+<h1>Introduction to SPOPS</h1>
+
+<h2>Introduction</h2>
+
+<P>
+SPOPS -- or Simple Perl Object Persistence with Security -- allows you
+to easily define the structure of an object and to save, fetch or
+remove it any time thereafter. It is intended for SQL databases (using
+the DBI), but you can adapt it to use any storage mechanism for
+accomplishing these tasks. SPOPS also implements security on a
+per-object basis (authentication and authorization).
+
+<P>
+The goals of this module are: 
+
+<UL>
+<LI>
+<P>
+Make it easy to define the parameters of an object
+
+<LI>
+<P>
+Make it easy to do common operations (fetch, save, remove)
+
+<LI>
+<P>
+Get rid of as much SQL as possible, but do not impose a cumbersome
+framework on the developer
+
+<LI>
+<P>
+Make applications easily portable from one database to another
+
+<LI>
+<P>
+Include flexibility to allow extensions 
+
+<LI>
+<P>
+Allow the developer to simply issue SQL statements and work with
+normal datasets
+
+<li>Create a transparent security framework for data that is
+independent of the data source.
+
+</UL>
+
+<h1>Persistence</h1>
+
+<h2>Classes</h2>
+
+<P>
+SPOPS (Simple Perl Object Persistence with Security) provides a
+framework to make your application objects persistent (meaning, you
+can store them somewhere, e.g., in a relational database), and to
+control access to them (the usual user/group access rights stuff).
+
+<p>You will configure SPOPS by means of configuration files, and SPOPS
+will create the necessary classes and objects for your application on
+the fly. You can of course have your own code implement additional
+object behavior -- extending the default SPOPS object behavior with
+your methods. However, if SPOPS shall know about your classes and
+objects, you will have to tell it -- by configuring it.
+
+<P>
+The typical class hierarchy for an SPOPS object looks like this:
+
+<P>
+<PRE><FONT SIZE="-1">
+     --------------------------
+    |SPOPS                     |
+     --------------------------
+                ^
+                |
+     --------------------------
+    |SPOPS::MyStorageTechnology|
+     --------------------------
+                ^
+                |
+     --------------------------
+    |SPOPS::MyApplicationClass |
+     --------------------------
+</FONT></PRE>
+<DL>
+<DT><STRONG>SPOPS</STRONG><DD>
+<P>Abstract base class, provides persistency and security framework (fetch,
+save, remove)</p>
+
+</dd>
+<DT><STRONG>SPOPS::MyStorageTechnology</STRONG></dt>
+<DD>
+<P>Concrete base class, provides technical implementation of framework for a
+particular storage technology (e.g., Filesystem, RDBMS, LDAP, ... )</p>
+
+<P>Example: SPOPS::DBI, SPOPS::GDBM, SPOPS::Imperia ...</p>
+</dd>
+
+<DT><STRONG>SPOPS::MyApplicationClass</STRONG></dt>
+<DD>
+<P>User class, provides semantic implementation of framework (configuration of
+parent class, e.g., database connection strings, field mappings, ... )
+
+<P>Example: MyApplication::User, MyApplication::Document, ...</p>
+
+</DL>
+
+<P>
+The individual objects in a package should not care how the objects
+are being stored, they should just know that when they call
+<EM>fetch()</EM> with a unique ID that the object magically
+appears. Similarly, all the object should know is that it calls
+<EM>save()</EM> on itself and can reappear at any later date with the
+proper invocation.
+
+<H2>SPOPS Object States</H2>
+<P>
+Basically, each SPOPS object is always in one of two states: 
+
+<UL>
+<LI>
+<P>
+Runtime State
+
+<LI>
+<P>
+Persistency State
+
+</UL>
+<P>
+In Runtime State, the object representation is based on a hash of
+attributes. The object gets notified about any changes to it through the
+<CODE>tie(3)</CODE> mechanism.
+
+<P>
+In Persistency State, the object exists in some persistent form, that is,
+it is stored in a database, or written out to a file.
+
+<P>
+You can control what happens to the object when it gets written to its
+persistent form, or when it is deleted, or fetched from its storage form,
+by implementing a simple API: <CODE>fetch(),</CODE> <CODE>save(),</CODE>
+<CODE>remove().</CODE>
+
+<PRE><FONT SIZE="-1">
+     -------------         save, remove         -----------------
+    |Runtime State|     -------------------&gt;   |Persistency State|
+     -------------      &lt;------------------     -----------------
+                              fetch
+</FONT></PRE>
+
+<h1>Security</h1>
+
+<H2>Overview of security</H2>
+
+<P>
+By adding this module into the hierarchy for an SPOPS object class,
+you implement a transparent per-object security system. This security
+system relies on a few things being implemented:
+
+<UL>
+<LI>A spops class implementing users
+<LI>A spops class implementing groups
+<LI>A spops class implementing security objects
+</UL>
+
+<P>
+Security is implemented with a number of methods that are called
+within the SPOPS implementation module. For instance, every time you
+call <CODE>fetch()</CODE> on an object, the system first determines
+whether you have rights to do so.  Similar callbacks are located in
+<CODE>save()</CODE> and <CODE>remove()</CODE>. If you do not either
+define the method in your SPOPS implementation or use this module, the
+action will always be allowed.
+
+<P>
+We use a Unix-style permission scheme, separating the scope into:
+USER, GROUP and WORLD from most- to least-specific. (This is abbreviated as
+U/G/W.) When we check permissions, we check whether a security level is
+defined for the most-specific item first, then work our way up to the
+least specific. 
+
+<P>
+Even though we use the U/G/W scheme from Unix, we are not constrained by
+its history. There is no strict 'ownership' assigned to an object as there
+is to a Unix file. Instead, an object can have assigned to it permissions
+from any number of users, and any number of groups.
+
+<P>
+There are three settings for any object combined with a specific scope:
+
+<P>
+<PRE><FONT SIZE="-1"> NONE:  The scope is barred from even seeing the object.
+ READ:  The scope can read the object but not save it.
+ WRITE: The scope can read, write and delete the object.
+</FONT></PRE>
+
+<P>
+(To be explicit: WRITE permission implies READ permission as well; if a
+scope has WRITE permission for an object, it can do anything with it,
+including remove it.)
+
+<H2>Security rules</H2>
+<P>
+With security, there are some important assumptions. These rules are laid
+out here.
+
+<UL>
+<LI><A NAME="item_The">The most specific security wins. This means that you might
+have set permissions on an object to be SEC_LEVEL_WRITE for
+SEC_LEVEL_WORLD, but if the user who is logged in has SEC_LEVEL_NONE,
+permission will be denied.</A>
+<LI><A NAME="item_All">All objects must have a WORLD permission. Configuration for
+your SPOPS object must include the initial_security hash. The only
+required field is 'WORLD', which defines the default WORLD permission
+for newly-created objects. If you do not include this, the system will
+automatically set the WORLD permission to SEC_LEVEL_NONE, which is
+probably not what you want.</A>
+</UL>
+<P>
+For instance, look at an object that represents a news notice posted:
+
+<P>
+<PRE><FONT SIZE="-1"> Object Class: MyApp::News
+ Object ID:    1625
+</FONT></PRE>
+<P>
+<PRE><FONT SIZE="-1"> ------------------------------------------------
+ | SCOPE | SCOPE_ID |  NONE  |  READ  |  WRITE  |
+ ------------------------------------------------
+ | USER  | 71827    |        |   X    |         |
+ | USER  | 6351     |   X    |        |         |
+ | USER  | 9182     |        |        |    X    |
+ | GROUP | 762      |        |   X    |         |
+ | GROUP | 938      |        |        |    X    |
+ | WORLD |          |        |   X    |         |
+ ------------------------------------------------
+</FONT></PRE>
+<P>
+From this, we can say:
+
+<UL>
+<LI><A NAME="item_User">User 6351 can never view this notice. Even though the user
+might be a part of a group that can; even though WORLD has READ
+permission. Since the user is explicitly forbidden from viewing the
+notice, nothing else matters.</A>
+<LI><A NAME="item_If">If a different User (say, 21092) who belongs to both Group 762
+and Group 938 tries to determine permission for this object, that User
+will have WRITE permission since the system returns the highest
+permission granted by all Group memberships.</A>
+<LI><A NAME="item_Any">Any user who is not specified here and who does not belong to
+either Group 762 or Group 938 will get READ permission to the object,
+reverting to the permission for the scope WORLD.</A>
+</UL>

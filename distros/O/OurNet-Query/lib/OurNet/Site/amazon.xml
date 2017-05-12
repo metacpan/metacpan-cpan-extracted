@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<SITE ID="Amazon">
+
+<NAME Lang="en-us">Amazon Search</NAME>
+<INFO Lang="en-us">searching information and estimating of a book</INFO>
+
+<URL Type="More"><![CDATA[
+post://www.amazon.com/exec/obidos/subsequent-query/qid=913026211/002-8524298-1542033?subsequent-query=_QSTR_&start=_START_&hint2=_HIN2_&hint3=_HIN3_&hint4=_HIN4_&hint5=_HIN5_&domain=_DOM_
+]]></URL>
+<URL Type="Start"><![CDATA[
+post://www.amazon.com/exec/obidos/generic-quicksearch-query/002-8524298-1542033?mode=books&keyword-query=_QUERY_&Go=Go
+]]></URL>
+
+
+<VAR Name="_HIN3_"><![CDATA[
+hidden" name="hint3" value="_HIN3_">
+]]></VAR>
+<VAR Name="_QSTR_"><![CDATA[
+subsequent-query" value="_QSTR_">
+]]></VAR>
+<VAR Name="_HIN4_"><![CDATA[
+hidden" name="hint4" value="_HIN4_">
+]]></VAR>
+<VAR Name="_HIN5_"><![CDATA[
+hidden" name="hint5" value="_HIN5_">
+]]></VAR>
+<VAR Name="hidden" name="domain" value=""><![CDATA[
+">hidden" name="domain" value="SCORE	100-(y-1)/2
+]]></VAR>
+<VAR Name="_START_"><![CDATA[
+hidden" name="start" value="_START_">
+]]></VAR>
+<VAR Name="_HIN2_"><![CDATA[
+hidden" name="hint2" value="_HIN2_">
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<dt><b><a href="_URL_">_TITLE_</a>___<dd>_PREVIEW_<p>
+]]></TEMPLATE>
+</SITE>

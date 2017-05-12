@@ -1,0 +1,19 @@
+[% INCLUDE header.tt page_title = "Access denied" %]
+[% INCLUDE banner.tt %]
+
+[% IF !config.content_above_navbar_in_html %]
+  [% INCLUDE navbar.tt %]
+[% END %]
+
+<div id="maincontent">
+  <h1>Access denied</h1>
+
+  <p>Your Internet host address has been banned from accessing this site. If you
+  believe this to be in error, please contact the guide administrator.</p>
+</div>
+
+[% IF config.content_above_navbar_in_html %]
+  [% INCLUDE navbar.tt %]
+[% END %]
+
+[% INCLUDE footer.tt %]

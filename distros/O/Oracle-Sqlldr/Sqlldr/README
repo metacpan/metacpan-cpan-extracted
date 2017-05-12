@@ -1,0 +1,57 @@
+Oracle/Sqlldr version 0.13
+==========================
+
+Oracle::Sqlldr - Perl wrapper around Oracle's sqlldr utility.
+Oracle::Sqlldr is an object-oriented class that provides a convenient
+Perl wrapper around Oracle's sqlldr utility.
+
+SQL*Loader (I<sqlldr>) is the utility to use for high performance
+data loading from a text file into a an Oracle database.
+
+#!/usr/local/bin/perl
+
+use strict;
+use warnings;
+use Oracle::Sqlldr;
+
+my $sqlldr = Oracle::Sqlldr->new(-db=>'thedb');
+
+$sqlldr->warnings(-status=>'on');
+$sqlldr->table(-name=>'animals');
+$sqlldr->user(-name=>'scott');
+$sqlldr->pass(-word=>'tiger');
+$sqlldr->fieldsterminatedby(-symbol=>',');
+$sqlldr->datafile(-file=>'animals.dat');
+$sqlldr->controlfile(-file=>'animals.ctr');
+$sqlldr->logfile(-file=>'animals.log');
+$sqlldr->badfile(-file=>'animals.bad');
+$sqlldr->discardfile(-file=>'animals.dis');
+
+$sqlldr->create_controlfile() or die "cannot create the controlfile";
+$sqlldr->write_controlfile() or die "cannot write controlfile";
+
+my $r = $sqlldr->execute() or die "cannot execute sqlldr";
+
+print "output from Oracle::Sqlldr: $r\n";
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+Perl
+Oracle client
+
+COPYRIGHT AND LICENCE
+
+Released under the same terms as Perl.
+
+Copyright (C) 2005 Andrew McGregor
+

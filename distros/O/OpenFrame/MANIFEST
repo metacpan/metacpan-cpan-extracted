@@ -1,0 +1,24 @@
+CHANGES
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+lib/OpenFrame.pm
+lib/OpenFrame/Cookie.pm
+lib/OpenFrame/Cookies.pm
+lib/OpenFrame/Object.pm
+lib/OpenFrame/Request.pm
+lib/OpenFrame/Response.pm
+lib/OpenFrame/Argument/Blob.pm
+lib/OpenFrame/Segment/ContentLoader.pm
+lib/OpenFrame/Segment/HTTP/Request.pm
+lib/OpenFrame/Segment/HTTP/Response.pm
+saofs.pl
+t/00object.t
+t/01request.t
+t/02http_request.t
+t/03argument.t
+t/04response.t
+t/98compile.t
+webpages/index.html
+META.yml                                Module meta-data (added by MakeMaker)

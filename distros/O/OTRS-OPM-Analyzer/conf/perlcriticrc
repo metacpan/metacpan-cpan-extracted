@@ -1,0 +1,23 @@
+[TestingAndDebugging::RequireUseStrict]
+severity = 5
+set_themes = opr
+
+[TestingAndDebugging::RequireUseWarnings]
+severity = 5
+set_themes = opr
+
+[CodeLayout::ProhibitHardTabs]
+severity = 5
+set_themes = opr
+
+[CodeLayout::ProhibitParensWithBuiltins]
+severity = 5
+set_themes = opr
+
+[ControlStructures::ProhibitUnlessBlocks]
+severity = 5
+set_themes = opr
+
+[Documentation::PodSpelling]
+severity = 5
+set_themes = opr

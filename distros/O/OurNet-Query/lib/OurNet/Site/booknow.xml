@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<SITE ID="Booknow">
+
+<NAME Lang="en-us">Book Now Search</NAME>
+<INFO Lang="en-us">searching information and estimating of a book</INFO>
+
+<URL Type="Start"><![CDATA[
+post://www.booksnow.com/cgi-bin/tame.exe/booksnow/result.tam?&uu=2394738?searchfield=title&category=&search_text=_QUERY_&maxhits=_HITS_&sb1.button.2=Find+match+now!
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+
+<TEMPLATE><![CDATA[
+arial" size="2"><A href="_URL_">_TITLE_</A>___<BR></form>_PREVIEW_</NOBR><p>
+]]></TEMPLATE>
+</SITE>

@@ -1,0 +1,19 @@
+#+TODO: TODO AA BB | FIXED CC
+
+* These are todo items (red)
+** TODO ID=1; RES=todo; NOTE=default and defined above
+** AA ID=2; RES=todo; NOTE=defined above
+** BB ID=3; RES=todo; NOTE=defined above
+** ab ID=4; RES=todo; NOTE=defined below
+
+* These are done todo items (green)
+** FIXED ID=5; RES=todo,done; NOTE=defined after vertical bar
+** CC ID=6; RES=todo,done; NOTE=defined after vertical bar
+** ac ID=7; RES=todo,done; NOTE=last keyword defined is assumed a done state
+
+* These are not todo items
+** DONE ID=8; RES=; NOTE=default but not defined
+** Bb ID=9; RES=; NOTE=different case
+** Cc ID=10; RES=; NOTE=different case
+
+#+TODO: ab ac

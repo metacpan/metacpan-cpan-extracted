@@ -1,0 +1,28 @@
+---
+abstract: "parse OTRS repositories' otrs.xml files to search for add ons"
+author:
+  - 'Renee Baecker <github@renee-baecker.de>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300039, CPAN::Meta::Converter version 2.132830'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: OTRS-Repository
+requires:
+  HTTP::Tiny: 0.036
+  List::Util: 1.33
+  Moo: 1.003001
+  Regexp::Common: 2013031301
+  Scalar::Util: 1.33
+  Test::More: 0.99
+  XML::LibXML: 2.0106
+  perl: 5.008009
+resources:
+  bugtracker: http://github.com/reneeb/OTRS-Repository/issues
+  homepage: http://github.com/reneeb/OTRS-Repository
+  repository: http://github.com/reneeb/OTRS-Repository.git
+version: 0.05

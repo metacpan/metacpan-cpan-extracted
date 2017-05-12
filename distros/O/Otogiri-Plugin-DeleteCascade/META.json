@@ -1,0 +1,78 @@
+{
+   "abstract" : "Otogiri Plugin for cascading delete by following FK columns",
+   "author" : [
+      "Takuya Tsuchida <tsucchi@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v1.0.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Otogiri-Plugin-DeleteCascade",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBIx::Inspector" : "0",
+            "Otogiri" : "0.12",
+            "Otogiri::Plugin" : "0.02",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "DBD::SQLite" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Otogiri::Plugin::DeleteCascade" : {
+         "file" : "lib/Otogiri/Plugin/DeleteCascade.pm",
+         "version" : "0.04"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tsucchi/p5-Otogiri-Plugin-DeleteCascade/issues"
+      },
+      "homepage" : "https://github.com/tsucchi/p5-Otogiri-Plugin-DeleteCascade",
+      "repository" : {
+         "url" : "git://github.com/tsucchi/p5-Otogiri-Plugin-DeleteCascade.git",
+         "web" : "https://github.com/tsucchi/p5-Otogiri-Plugin-DeleteCascade"
+      }
+   },
+   "version" : "0.04"
+}

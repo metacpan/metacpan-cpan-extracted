@@ -1,0 +1,1140 @@
+==================================================
+Changes from 2013-11-03 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 0.13 at 2014-11-03 13:41:39 +0000
+-----------------------------------------
+
+  Change: ffa0a5415bd2d5c242c2f35c6badd5fd983174c2
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-11-03 13:40:39 +0000
+
+    Version 0.13 
+
+  Change: 0da1e8a14d71cab95ae2cbca69b1b8b49ca9fbce
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-11-03 13:39:29 +0000
+
+    Fix typo in example code
+
+    Thanks to Claas Hilbrecht for spotting this. 
+
+  Change: f1c6002cd1aaadf2ebcdb2a88bc390ef51672ba8
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-10-02 11:14:36 +0000
+
+    Bump version to 0.12 
+
+  Change: 6147179ad90d4dd6cb61939e48239c33c441b648
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-10-02 11:13:59 +0000
+
+    Update from address in OrigHeader 
+
+  Change: 64d5c3e95307c5f1dd3c46810a9b296b2576a9f3
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-10-02 10:39:33 +0000
+
+    Bump version to 0.11 
+
+  Change: 84ab7ec7d9c6e0daba1c17f4787456d41bf4d2e9
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-10-02 10:39:16 +0000
+
+    Configurable From address 
+
+  Change: 4dc9ea5663932222d3499c99cd757f0182223149
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-10-01 09:55:45 +0000
+
+    Bump version to 0.10 
+
+  Change: 893b948a6204cfe8f1d3e2068cd23376d3722db7
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-10-01 09:55:31 +0000
+
+    Fix incorrect method call 
+
+  Change: 9b3501899c0db02f1eddfae0629c186ae43dbb55
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-09-30 12:54:29 +0000
+
+    Bump to version 0.09 
+
+  Change: 231266b0a3f1c2ee48f8e27f929cba57750dd24e
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-09-30 12:18:18 +0000
+
+    Allow customer notification template to be changed 
+
+  Change: 6ee14bb174fc80fd32805c87e2a3488638b75d35
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-09-11 13:34:32 +0000
+
+    Update tested versions
+
+    Have now tested with 3.3.9 
+
+  Change: 91bad7d31c98c986dc1b22d2001df8ff1c4f625c
+  Author: Paul Waring <paul@xk7.net>
+  Date : 2014-04-29 21:34:14 +0000
+
+    Bump version to 0.07 
+
+  Change: cf25a6b975f380fcd6c889e0be160e439fa2d86c
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-24 10:48:40 +0000
+
+    Make options read-only
+
+    No need to change them after being supplied in constructor. 
+
+  Change: 3f8a72ae22f80788602d26c03e41377be95d1bbe
+  Author: Paul Waring <paul@xk7.net>
+  Date : 2014-04-18 20:06:26 +0000
+
+    Bump version to 0.06 
+
+  Change: 74f2fbe971d99b4fd41b0b1d2bb2b0c896d5e774
+  Author: Paul Waring <paul@xk7.net>
+  Date : 2014-04-18 20:05:49 +0000
+
+    Generate CHANGES file from Git log 
+
+  Change: 6b89cd54bc401713833bf104f4e196075f0d6306
+  Author: Paul Waring <paul@xk7.net>
+  Date : 2014-04-18 17:07:41 +0000
+
+    Bump version to 0.05 
+
+  Change: 01f5a0fa1ddd1661e266bf4d0dea2a86877c04dc
+  Author: Paul Waring <paul@xk7.net>
+  Date : 2014-04-18 17:07:02 +0000
+
+    Correct INI file syntax. 
+
+  Change: 04c8c26c11346d9e438bf28e002a1f02d103cf6c
+  Author: Paul Waring <paul@xk7.net>
+  Date : 2014-04-18 17:03:56 +0000
+
+    Set explict link for Bugtracker
+
+    Failing to set link explicitly results in the default of rt.cpan.org
+    being used.
+
+    Uses Dist::Zilla::Plugin::Bugtracker to magically set the relevant
+    metadata.
+
+    Fixes #9 
+
+  Change: b40062aea4b32af9450d068fc3168c984133276e
+  Author: Paul Waring <paul@xk7.net>
+  Date : 2014-04-18 17:03:30 +0000
+
+    Update issues link to reflect change of repository name 
+
+  Change: 775767cb59acf5206e94ad9d74040cf62d89fcd9
+  Author: Paul Waring <paul@xk7.net>
+  Date : 2014-04-18 13:29:37 +0000
+
+    Bump version to 0.0.4 
+
+  Change: f3eb93c924ff6021c4fb6d0a4543a345b9f90c12
+  Author: Paul Waring <paul@xk7.net>
+  Date : 2014-04-18 13:28:40 +0000
+
+    Reduce README.md to bare minimum.
+
+    All documentation is now contained within the module. README.md
+    exists purely as an aid to those accessing the project through
+    GitHub. 
+
+  Change: f603e57221fb01ab6528190d6d188ac73cd7275f
+  Author: Paul Waring <paul@xk7.net>
+  Date : 2014-04-18 13:28:20 +0000
+
+    Remove IO::Interactive from dependencies in README 
+
+  Change: 0a5e59e49fbd53d9be98e049b03d309750c8cc3d
+  Author: Paul Waring <paul@xk7.net>
+  Date : 2014-04-18 13:25:50 +0000
+
+    Convert documentation to use Pod::Weaver.
+
+    Pod::Weaver automatically creates parts of the documentation using
+    other parts of the code, e.g. VERSION is taken from $VERSION. 
+
+  Change: 107f45f99e84d27d4432c07a04c47476d6842fbd
+  Author: Paul Waring <paul@xk7.net>
+  Date : 2014-04-18 13:17:51 +0000
+
+    Bump version number 
+
+  Change: 3a3825c516931554f5d7bd9591cd13ca97d5976d
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-17 11:37:27 +0000
+
+    Update documentation
+
+    Document process_queue method and remove IO::Interactive dependency
+    (technically this applies to OTRS and not this module). 
+
+  Change: d6c6ac473cf208dca96d1c9dfccf52c9e5bb5f21
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-16 15:35:38 +0000
+
+    Bump version number 
+
+  Change: 53137c123b777211e3702de98e5ac89fbeaade0b
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-15 12:11:36 +0000
+
+    Update cron job documentation
+
+    Don't need to specify local::lib on the command line, just the
+    directory where it resides. 
+
+  Change: 061c3334cc528fe9d37bd2e6909f808e4f4dffe7
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-14 16:30:04 +0000
+
+    Document how to use module in a script under cron 
+
+  Change: 7acb0b93fc3cd307214f1ac6b65456f7cbe934e1
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-14 15:54:43 +0000
+
+    Remove environment file
+
+    No longer used, simpler example is available in POD. 
+
+  Change: 41e76717b20dffde39b9735377365f2aeb87d17a
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-14 11:41:17 +0000
+
+    Documentation updates 
+
+  Change: 9ce8ddc76e0a6f1605260ed6ab69875c4f180244
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-11 15:48:25 +0000
+
+    Document tested OTRS version 
+
+  Change: bdf8acd339afd7cd7e4be49d7e8a04c37a3a2573
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-11 15:27:34 +0000
+
+    Newline at end of file 
+
+  Change: e8a708f7935bc805a3985d872cf453da0ece74d2
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-11 13:48:04 +0000
+
+    Bump minimum Perl version to 5.14
+
+    Even Debian stable has this now, so not an onerous requirement. Code
+    may still work under lower versions. 
+
+  Change: 9878fbfb719207051957f9690e98e389ef45179f
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-11 13:40:05 +0000
+
+    Automatically find dependencies in Dist::Zilla
+
+    Make sure we skip all the Kernel:: modules, as these are part of OTRS
+    and *not* in CPAN. 
+
+  Change: f5c80ce63c75c874a11f8e7ec7efbd92ecf07fc5
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-11 13:33:45 +0000
+
+    Update .gitignore to reflect new name 
+
+  Change: b293327f5ae1ceb6feaea6a72603526f4e26c065
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-11 13:29:17 +0000
+
+    Change distribution name
+
+    Dist::Zilla replaces double colon (::) with hyphen (-) 
+
+  Change: b4cd9e7397829cb433a4f9cad1f453f74c829b05
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-11 13:26:23 +0000
+
+    Update Dist::Zilla file to reflect new name 
+
+  Change: 0f6851467a685e29f4d38ae6cc7e123900297971
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-11 13:25:55 +0000
+
+    Update documentation to reflect name change
+
+    Missed this one in previous commit. 
+
+  Change: 9c158861a0e0c64b576f741b4c004d20994355c0
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-11 13:23:35 +0000
+
+    Change module name
+
+    Now under the OTRS:: namespace, to distinguish from other queue
+    forwarding mechanisms and in preparation for submission to CPAN. 
+
+  Change: e64d5cb2fd8709a102360866a068ec704f1452e5
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-11 13:22:57 +0000
+
+    Move module to subdirectory
+
+    Preparation for name change 
+
+  Change: 4a53d6eebc71a4831bff55339fb6a26ccdc34daf
+  Author: Paul Waring <paul@xk7.net>
+  Date : 2014-04-10 15:03:33 +0000
+
+    Reinstate OrigHeader.
+
+    Seems we do still need this, even though it appears not to be used
+    anywhere. Reinstating but with subject updated to match Article. 
+
+  Change: 6a94c41049292bdcb1a26de0fcea05af5cdba61f
+  Author: Paul Waring <paul@xk7.net>
+  Date : 2014-04-10 15:02:27 +0000
+
+    Removing OrigHeader configuration.
+
+    Not convinced that this is necessary now that we are using
+    ArticleSend. 
+
+  Change: ff5d21fd596c8ecc3e228b877196b41634faa99e
+  Author: Paul Waring <paul@xk7.net>
+  Date : 2014-04-10 13:42:57 +0000
+
+    Ticket needs to be passed as hashref. 
+
+  Change: 2f087716bcf3c22f2832972cefbc5f991274469c
+  Author: Paul Waring <paul@xk7.net>
+  Date : 2014-04-10 13:40:44 +0000
+
+    Ticket should be passed as hash, not scalar. 
+
+  Change: 16e3b3bd614bee9fde4e3bc6d3b93324372057f0
+  Author: Paul Waring <paul@xk7.net>
+  Date : 2014-04-10 13:36:48 +0000
+
+    Pass full ticket details to notify customer template. 
+
+  Change: 68b06e8ef3bb08005565816280e03bfe733f12ee
+  Author: Paul Waring <paul@xk7.net>
+  Date : 2014-04-10 11:59:22 +0000
+
+    Set some variables for use in notification template, and use a
+    slightly more descriptive Subject. 
+
+  Change: 058f24a9d9b28477c1c76c44bdea4aaeedbe4681
+  Author: Paul Waring <paul@xk7.net>
+  Date : 2014-04-10 11:40:36 +0000
+
+    Ignore some more temporary files and scripts. 
+
+  Change: 67187cf7471af0ae84d61e5a0a24cee215dd52db
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-09 14:34:50 +0000
+
+    Remove whitespace
+
+    Causes warning in podchecker 
+
+  Change: 29e33682f2b2eaa3af80134a75c5d25aaf31f0b7
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-09 13:55:30 +0000
+
+    Documenting all possible options 
+
+  Change: 0b11b449cbba3b2c83cbf164cad9e54e3551950d
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-09 13:40:27 +0000
+
+    Must leave a newline between items 
+
+  Change: 4de8d8016214d2f471f99ca4311512e1f5d96863
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-09 13:39:31 +0000
+
+    Documenting functions 
+
+  Change: 05db383e4cd166b4507ec1b83f993e1459c61955
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-09 13:21:50 +0000
+
+    Add debugging option
+
+    Only show debugging messages if this flag is set in %options 
+
+  Change: dda58e1fcdccd99cfdc70504dc17c185449c18d1
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-08 15:36:36 +0000
+
+    Version number should be quoted 
+
+  Change: d67d971ffc591ffdcafc123e82dafa988d613aeb
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-08 15:30:36 +0000
+
+    Required Perl 5.12 or higher 
+
+  Change: 7a08ef3a124e804db1167616d4a773bb74e5c107
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-08 15:18:29 +0000
+
+    POD update
+
+    No need for quotes around email address 
+
+  Change: 866f4eb5a51d395deae14a55b9db2ae7eb01cf00
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-08 15:12:52 +0000
+
+    Convert tabs to spaces 
+
+  Change: bb2f964d0dbc2932bd4462228e6f6e6caf271346
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-08 15:11:45 +0000
+
+    Document Template dependency 
+
+  Change: c1b259d447fb070439107e8ceaf0cc32cf4776f3
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-08 14:23:36 +0000
+
+    Ignore files produced by Dist::Zilla 
+
+  Change: 806eaf1d6531e4a31ea92ad2f57e8ca6a2b4f05f
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-08 14:22:31 +0000
+
+    Remove explicit licence file
+
+    This will be produced automatically using Dist::Zilla 
+
+  Change: 1a0380116891c709f1e073af507362aac34a52ae
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-08 14:18:35 +0000
+
+    Set version to that of main module 
+
+  Change: a81895dfddc4a0f3af5a0976f45298267d1c32c5
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-08 14:14:27 +0000
+
+    .gitignore file 
+
+  Change: 3a526abcbecd0c0710443a70de02af178950e441
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-08 14:06:39 +0000
+
+    Correct Charset typo 
+
+  Change: 3f367d29c0932b4b0b985bdc9b5d52153409d7e7
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-08 14:05:12 +0000
+
+    More Dist::Zilla information 
+
+  Change: 1077620dfb00a67ba17548cf6f29af369ed631a8
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-08 14:04:59 +0000
+
+    Use ArticleSend instead of ArticleCreate
+
+    ArticleCreate appears to create a ticket but not send the email. 
+
+  Change: 9a759e55fc10eefe6ab8fcc300835547bca23fdb
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-08 13:23:24 +0000
+
+    Skeleton Dist::Zilla file 
+
+  Change: 2bc327414f044cc3202ca31b567e5aaaf3d292b6
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-08 13:21:42 +0000
+
+    Remove NoAgentNotify parameter 
+
+  Change: b0fbb545a514ca0f6db2c6899b2ef271f71905b1
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-08 13:20:16 +0000
+
+    Set extra OrigHeader values 
+
+  Change: 637a3aabb9db2692c01e731d546eca551acf2c73
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-08 13:18:23 +0000
+
+    Set OrigHeader when creating ticket
+
+    Required for auto-response. 
+
+  Change: 0ff08543e40333b1ac138980edd3aba590c68c29
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-08 13:10:31 +0000
+
+    Don't disable agent notification 
+
+  Change: b5a3634239ae4f1476f25c758e3c80a70642ad9c
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-08 12:59:22 +0000
+
+    Add From and AutoResponseType fields 
+
+  Change: 8f3755d466cace47180c7a3658ef1b213d73187c
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-08 12:53:52 +0000
+
+    Must specify content type and charset 
+
+  Change: 15b1a7c2bd14c628ee5551ab702736bac95ec095
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-08 12:51:14 +0000
+
+    SenderType should be 'system' for auto emails 
+
+  Change: 91fabae923139f1ec15973a6f04014c79a91e60f
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-08 12:50:17 +0000
+
+    HistoryComment is required field 
+
+  Change: 8b0403d3366ecfcd3234f67101e9f40704fedb52
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-08 12:47:13 +0000
+
+    Create new article when ticket forwarded 
+
+  Change: 131ccc5d5ae40558992df70108ef175df3ac575b
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-08 12:28:56 +0000
+
+    Sample template to notify customer of forwarding 
+
+  Change: 7abccb49de654deb17d3be030881f7c6a6d5481f
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-08 12:23:08 +0000
+
+    Extra documentation and comments 
+
+  Change: 7f62fac7509b0ce88ac5a371f01058f70a286bff
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-08 11:54:05 +0000
+
+    Remove example script
+
+    This is now contained within the synopsis section of the module
+    documentation. 
+
+  Change: b10e22d313e62ee8f09c9e541c46f511aaa5268d
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-07 16:02:20 +0000
+
+    Remove TODO list
+
+    All items have now been logged as GitHub issues. 
+
+  Change: 27d10337152c86b4b55dc5bb7e3736770140aca4
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-07 16:01:46 +0000
+
+    Moving TODO list items to issues 
+
+  Change: 2cdd498191ecb898f37aef468363c104bc7498fc
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-07 15:55:26 +0000
+
+    Moving TODO list items to issues
+
+    Easier to manage and track progress. 
+
+  Change: 4b8419ad5fb8ea0b39a687c3905c81c1f3491a21
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-07 15:07:23 +0000
+
+    Synopsis documentation 
+
+  Change: 7086377b3464fac0746e21264f8a1a7ad76c30a8
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-07 15:04:55 +0000
+
+    Additional documentation 
+
+  Change: 5db78679ef7c97091624171d4a5d154a90476fa3
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-07 15:02:28 +0000
+
+    Further info on Perl module dependencies 
+
+  Change: de83b985ae16fadfacc2dc46f64c416ac6f84686
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-07 14:55:49 +0000
+
+    Use simple email address for envelope from
+
+    $first_article{'From'} can include the name (e.g. Example
+    <from@example.org>) 
+
+  Change: 6453c33fc8950f1f1cae6feb53dfae7094f848ec
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-07 14:49:17 +0000
+
+    Fix syntax error
+
+    ArticleFirstArticle returns a hash, not a scalar. 
+
+  Change: 4eec2cedc69e1d4b3a76072eb48392c8630b7b02
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-07 14:48:03 +0000
+
+    Updated TODO list 
+
+  Change: 9502f3cdbd365443db2cbffce88337789c66dc1f
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-07 14:47:38 +0000
+
+    Obtain body of forwarded mail from first article
+
+    Every Ticket contains a number of Articles, the first of which should
+    be the original support request. 
+
+  Change: 8df107a2dd1403a7bb680b5d84f94109ccd8e979
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-07 14:46:58 +0000
+
+    Correct use of queue filter
+
+    Filtering by single queue involves passing a list with only one
+    element (using Queue => 'QueueName' means no queue filtering is
+    performed). 
+
+  Change: dc34b7695eb4749b509c181ee46646f1a31bd48f
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-07 13:54:25 +0000
+
+    Use existing object instead of class 
+
+  Change: f5188510a9420e419e45a651e32c14be7ab4ec60
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-07 13:52:05 +0000
+
+    Declare variable before use 
+
+  Change: e3ca4641ebc8b37d3a54fc9e2c66628525386d18
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-07 13:49:49 +0000
+
+    Add support for emailing tickets 
+
+  Change: fdb77782a7c428e49d4638b7ee61a6e4d09d1179
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-07 13:01:12 +0000
+
+    Updated example script 
+
+  Change: 5b9d2edee3890469e88914a1b25bb38366785b62
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-07 12:54:58 +0000
+
+    Include necessary email modules 
+
+  Change: 7b7605fb9f591ab9aa3f59d91638f28c57f1df68
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-07 12:26:58 +0000
+
+    Allow locking, history and closing of tickets to be disabled 
+
+  Change: d44410970ca717c60e6dbcecdc41cc062bd26e9f
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-04 16:29:18 +0000
+
+    Further documentation 
+
+  Change: 64381133d17c02dfe6f45787410ccd1b1f23a7c7
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-04 16:26:04 +0000
+
+    Link to Perl manual pages for dependencies 
+
+  Change: a1d88378d7b8409de86a0a29b7a13821b02ecf11
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-04 16:23:57 +0000
+
+    Need linebreaks between items 
+
+  Change: 9902955653f57a593f0956d04575eb3410fe1e46
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-04 16:23:22 +0000
+
+    Specify indent level 
+
+  Change: e1a057c48ab92b797a04d6c72e7454539cc58fa0
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-04 16:21:20 +0000
+
+    Adding POD documentation 
+
+  Change: db5b4a44e4d8427ee6d0ae5832a0d241dced1d59
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-04 16:00:59 +0000
+
+    Improvements to environment script 
+
+  Change: e14564151aa3912eb922dc2cf07ea7fcf2030abb
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-04 15:47:04 +0000
+
+    Move library paths from module to environment 
+
+  Change: 8c9189526557c80fe28c37da1700ca8e760c4ca3
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-04 15:35:01 +0000
+
+    Updated TODO 
+
+  Change: b015d6194dc582b988b02d63418b2afacb53aa68
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-04 15:26:53 +0000
+
+    Fix message name 
+
+  Change: 76c4afe3f943c520edcfb57ebd44befcce29a244
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-04 15:18:03 +0000
+
+    Fix syntax errors 
+
+  Change: 71949a09af98439606859ea6511518e37f5bbe09
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-04 15:16:52 +0000
+
+    Process queue code 
+
+  Change: 6f3fd75fa970b69de4f78b0072c36080e54393de
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-04 15:16:37 +0000
+
+    Example script 
+
+  Change: 7477f30ac1d13ff3e6da5cd6bb0e86a2155cf1d0
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-04 15:16:30 +0000
+
+    Updated TODO list 
+
+  Change: 145a60850613362b4ad4a90a7d7e0f7e8d4587fd
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-04 15:04:33 +0000
+
+    Fix syntax error 
+
+  Change: efc0e82bd743f515c34a0425da43b74b57312fb0
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-04 15:03:47 +0000
+
+    Fix syntax error 
+
+  Change: adfeb76edc6be5702e7b81f53cd648981072f940
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-04 15:03:05 +0000
+
+    Fix syntax error 
+
+  Change: 61a83f3338e7bb29d339c8d1fe654040c1dbf4cd
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-04 15:02:13 +0000
+
+    Allow TempDir to be overwritten through options 
+
+  Change: 4427c70a94d96dfe617fef8f484b49fd316c1ec1
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-04 14:58:34 +0000
+
+    Correct dereferencing syntax
+
+    Was using () instead of {}. Long day. 
+
+  Change: 70a4f278711ff7bb86bebac62f473371e87d7a35
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-04 14:55:39 +0000
+
+    Dereference into separate variable 
+
+  Change: 24981bfe4bbedadcaa7b4c1bd6dbaeda623de460
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-04 14:53:35 +0000
+
+    Dereference query 
+
+  Change: 65c0f301431fdbf6543a0eae1eed7cd407a3462d
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-04 14:50:42 +0000
+
+    Use traits correctly
+
+    Traits add methods to the object, not the hash reference. 
+
+  Change: e3c0ddd72433f52a303159630f191856bed1fa1b
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-04 14:45:57 +0000
+
+    Fix syntax error
+
+    'traits' should be used instead of 'trait' in Moose 
+
+  Change: 585af320f4a5bfe6c61d277780a8bc81ebd285e0
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-04 14:44:51 +0000
+
+    Fix syntax error 
+
+  Change: 1c79604ecc04d0df98a411b0ddb71b9587a32a00
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-04 14:42:57 +0000
+
+    Replace %query with $self->query 
+
+  Change: 20f457ae658e7f640a26fe1f7394215882599bde
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-04 14:37:08 +0000
+
+    Re-enable traits 
+
+  Change: c780b5029ccb0f4959211b08e4eef39e8019eb4b
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-04 14:32:20 +0000
+
+    Copy $self->query to force derefencing 
+
+  Change: 71cd3d6df9605fe04fef6085dd4b6b469c2b7720
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-04 14:27:19 +0000
+
+    Fix syntax 
+
+  Change: cc2eb41333395c5ab05c1d1a5f2d501d4713f10d
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-04 14:25:56 +0000
+
+    Dereference query when passing as a parameter
+
+    TicketSearch expects a hash, not a hash reference. 
+
+  Change: 1273e2be6eb45c6a5c30cf8be928340cfc800697
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-04 14:19:22 +0000
+
+    Access HashRef directly instead of using traits 
+
+  Change: 7d9e736057bf147d6c638d41a36248e45991bb1b
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-04 14:06:26 +0000
+
+    Fix syntax error 
+
+  Change: 4344a85779e4997466258da8d613f052467b58b9
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-04 14:05:20 +0000
+
+    Define set option function in traits 
+
+  Change: 445ad6738636e0f2d77dd5e668aef9ac7234c897
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-04 14:03:19 +0000
+
+    Minor syntax tweaks 
+
+  Change: 6f01abe70c63c2e0f38433f24ff583d504338f51
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-04 13:59:53 +0000
+
+    Initialise all OTRS objects 
+
+  Change: 84e01785d04cc2874f3eb90354b8269833bab679
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-04 13:39:06 +0000
+
+    Require a hashref of options
+
+    These will specify options such as the email address where tickets
+    should be forwarded to. 
+
+  Change: 389159f79bfb4a5f163c26f8bb85cce03c7e6715
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-04 13:38:11 +0000
+
+    Change options to query
+
+    Query makes more sense as a name - keep things separate from options
+    (e.g. where to send forwarded tickets) 
+
+  Change: a3075723df0188853d3da57e38f7d53df04608f4
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-04 13:37:36 +0000
+
+    Updated TODO list 
+
+  Change: 4b45cdd3c570b442e5ff1b4456fbfa0317a47e77
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-04 13:36:57 +0000
+
+    Add namespace::autoclean dependency 
+
+  Change: ee6f9595d9ad4815b3c1358833b4b451ce7b259f
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-04 13:32:37 +0000
+
+    Use Moose best practice
+
+    As defined in Moose::Manual::BestPractices
+
+    Specifically: 1. Auto clean to remove imported symbols. 2. Make
+    immutable for performance improvement, since we don't need to modify
+    the class later. 3. Make attributes required or set sensible
+    defaults. 
+
+  Change: 2f8359d0c50cfe5c4a373cbe2332cc894da448b8
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-04 13:08:39 +0000
+
+    Change ForwardQueue to use Moose 
+
+  Change: 62a8fa2e166990b25568ce5eca1012f0f56818a5
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-04 13:08:30 +0000
+
+    Document dependencies 
+
+  Change: a8b203961f701c619d02781067dd82f6217097e2
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-04 12:45:19 +0000
+
+    Remove sample scripts
+
+    Will rewrite these in due course, once ForwardQueue module is
+    complete. 
+
+  Change: 6141b3fa1e70343e3848395f733b5da673c6dffb
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-04 12:42:25 +0000
+
+    Options needs to be a reference in constructor
+
+    Failure to use reference causes following error:
+
+    "Odd number of elements in anonymous hash" 
+
+  Change: 62391275e3e37c64eb144a77dec97c9752dd4280
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-04 12:40:05 +0000
+
+    Change assignment in constructor 
+
+  Change: da9e94e1bf1e22b86a704db5ad8bb673c08e1278
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-04 12:38:31 +0000
+
+    Basic constructor for ForwardQueue
+
+    Based on perlobjc reference:
+
+    http://perldoc.perl.org/perlobj.html 
+
+  Change: 14630430bc7db77ca8b0c873583acee1425e025e
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-04 12:27:06 +0000
+
+    OTRS modules import 
+
+  Change: 02b59985061ea4e5db8a69dc2cdfa9273a494fa0
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-04 12:25:50 +0000
+
+    TODO list 
+
+  Change: 034908db60f43587b182851125fbecf3391018ed
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-03 15:46:58 +0000
+
+    Fix syntax error 
+
+  Change: 3fd2143b1238dba7ef871b23b834353e81b44120
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-03 15:46:21 +0000
+
+    Ignore ticket number for now
+
+    Just fetch 10 tickets, to see if UserID parameter makes a difference. 
+
+  Change: 88ece6ef4179ef1f2831ff2b78b146eeb9fa7eaa
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-03 15:38:30 +0000
+
+    Use different temporary directory for cache 
+
+  Change: 094b13a228441df26c91a4cc4d21b3c8c9db968a
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-03 15:01:27 +0000
+
+    Dump query for debugging 
+
+  Change: 9d4cd473616863a530abb740a97e0fb91519d0ea
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-03 15:00:17 +0000
+
+    Reinstate ticket number search
+
+    Reason this wasn't working was because the ticket number was
+    incorrect. 
+
+  Change: 091e06ccf7ed99e7a95364269b0d8f36536554ad
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-03 14:58:54 +0000
+
+    Search for all tickets
+
+    Limit to 20, but avoid filtering by ticket number for now. 
+
+  Change: 86497d91888ffa8bf58099e7d94f475fb52bd9a2
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-03 14:58:36 +0000
+
+    Skeleton constructor 
+
+  Change: 8c2acea0582e5f0c6a26b9558d5066457d724a7e
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-03 14:56:21 +0000
+
+    Return search results as a hash 
+
+  Change: a508f9bec6c14bfb7ba56440ad59e93fba027820
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-03 12:33:12 +0000
+
+    Use Data::Dumper::Simple to show ticket data 
+
+  Change: 57b98ec582fa62c74edce08087bdabfc0a0de612
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-02 16:37:34 +0000
+
+    Count results whilst testing 
+
+  Change: cc308cbe15f1c4ec8789932a0dd9b555b2a35806
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-02 16:36:11 +0000
+
+    Use TicketNumber field instead of TicketID 
+
+  Change: 78ea62518d8849545f9d8f4184522a077a7babad
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-02 16:33:49 +0000
+
+    Print results 
+
+  Change: 2d029004afdc72b16d9b45010632bb24aae41500
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-02 16:32:56 +0000
+
+    Fix syntax error 
+
+  Change: f0d6950c3fa6289ffc662e8737e238eab402e0e2
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-02 16:32:13 +0000
+
+    UserID parameter is required 
+
+  Change: 278259b30a09c8fd5786152f95a68629be42c561
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-02 16:26:11 +0000
+
+    Search for tickets 
+
+  Change: 914d8a9669363f3e2fc8be69561a016ff4c260ea
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-02 15:28:26 +0000
+
+    Create ticket object
+
+    Use example from documentation in Kernel/System/Ticket.pm 
+
+  Change: 7bd22b659a5241845ecd2278d7af8060513e5011
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-02 15:15:46 +0000
+
+    Use instance method instead of static method 
+
+  Change: a8694c77653c4ee128730f517ba0d51ef813ec63
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-02 15:11:10 +0000
+
+    Use correct index for $ARGV
+
+    Forgot that Perl stores script name in $0 rather than $ARGV[0] 
+
+  Change: 22d7cdf0eda483c26fb2ae6ff441ca2e7f83d31b
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-02 15:07:10 +0000
+
+    Use full module path for TicketSearch 
+
+  Change: d1b4fbe578b30f15059524ebafa7f79ef2c88fa5
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-02 15:04:00 +0000
+
+    Simple 'find ticket' script 
+
+  Change: 6f5d0752c48feff0415dcaf2946aa87df60522f8
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-02 14:38:16 +0000
+
+    Import OTRS modules 
+
+  Change: 4e5327e9febec16c541ecc9f1acc3d1d3e6dc1ad
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-02 14:36:07 +0000
+
+    Search in lib subdirectory for modules 
+
+  Change: baae3e54162d00d704133c98ab654fd1a3dd843b
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-02 14:34:39 +0000
+
+    Move module to lib subdirectory 
+
+  Change: 1cc86bad0e6abd48770ea0ada9ac7c4ab0b253b7
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-02 14:33:12 +0000
+
+    Modules have to return true 
+
+  Change: ad314348b2598a40889080aeb5c75817fab5f010
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-02 14:31:37 +0000
+
+    Skeleton files
+
+    Module and script 
+
+  Change: 731f787d265c4b19944abd8076b2ce83d5474fb1
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-02 12:00:26 +0000
+
+    Updating README 
+
+  Change: b1be97c7cc6b8024fa4c994ba3ff6471bfcf25ad
+  Author: Paul Waring <paul@xk7.net>
+  Date : 2014-04-02 03:49:25 +0000
+
+    Initial commit 
+
+================
+End of releases.
+================

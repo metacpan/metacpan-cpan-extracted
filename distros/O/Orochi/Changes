@@ -1,0 +1,46 @@
+Changes
+=======
+
+0.00010 - Jul 28 2011
+    - Work with new Moose (gardejo)
+
+0.00009 - Mar 05 2010
+    - Add Test::MockObject as a dependency. Addresses rt #55237
+    - No code change
+
+0.00008 - Feb 25 2010
+    - Something in Moose internals is causing a functional mismatch when
+      checking out if a meta class does a meta role. Work around it
+
+0.00007 - Dec 14 2009
+    - Properly terminate searching for parent classes when a MooseX::Orochi
+      meta class is found.
+    - Don't clone the parent injection if you already implement one
+
+0.00006 - Dec 11 2009
+    - Add missing Module::Pluggable dependency
+    - Better protect against non-Moose, non-Orochi objects in inject_class
+
+0.00005 - Oct 19 2009
+    - Do the post-expand processing for arguments, too
+    - Use a newly created element when processing arguments, thus
+      circumventing Perl's optimization that reuses local arrays
+    - Fix debug level check
+
+0.00004 - Oct 19 2009
+    - Fix circular bind dependency for setter injections
+
+0.00003 - Oct 19 2009
+    - Fix the DSL prototype for bind_value with cascading binds
+
+0.00002 - Oct 16 2009
+    - Cache the expanded value when an injection runs
+
+0.00001 - Oct 08 2009
+    - Save some memory by sharing Data::Visitor (this may change later)
+    - Use the new Moose attribute traits
+    - Fix the unimport method in MooseX::Orochi
+    - Fix inherited bind specification by properly cloning the metaclass
+
+0.00001_01 - Oct 05 2009
+    - Initial release

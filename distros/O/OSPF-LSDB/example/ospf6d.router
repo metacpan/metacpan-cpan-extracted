@@ -1,0 +1,35 @@
+
+                Router Link States (Area 10.188.0.0)
+
+LS age: 887
+LS Type: Router
+Link State ID: 0.0.0.0
+Advertising Router: 10.188.1.10
+LS Seq Number: 0x8000000a
+Checksum: 0x8383
+Length: 40
+Flags: *|*|*|*|*|-|E|-
+Options: *|*|-|R|-|*|E|V6
+Number of Links: 1
+
+    Link (Interface ID 0.0.0.6) connected to: Transit Network
+    Designated Router ID: 10.188.50.50
+    DR Interface ID: 0.0.0.1
+    Metric: 10
+
+LS age: 831
+LS Type: Router
+Link State ID: 0.0.0.0
+Advertising Router: 10.188.50.50
+LS Seq Number: 0x8000000a
+Checksum: 0xf3be
+Length: 40
+Flags: *|*|*|*|*|-|E|-
+Options: *|*|-|R|-|*|E|V6
+Number of Links: 1
+
+    Link (Interface ID 0.0.0.1) connected to: Transit Network
+    Designated Router ID: 10.188.50.50
+    DR Interface ID: 0.0.0.1
+    Metric: 10
+

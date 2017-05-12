@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<SITE ID="Cseek">
+
+<NAME Lang="zh-cn"><![CDATA[
+Cseek 梓祩
+]]></NAME>
+<NAME Lang="en-us">Cseek Search</NAME>
+<NAME Lang="zh-tw">Cseek WWW 搜尋(中國大陸)</NAME>
+<INFO Lang="zh-cn">general information web search in Mainland China</INFO>
+<INFO Lang="en-us">general information web search in Mainland China</INFO>
+<INFO Lang="zh-tw">general information web search in Mainland China</INFO>
+
+<URL Type="More"><![CDATA[
+http://www.cseek.com/homepage/cgi/srchengine.cgi?searchcgi=%2Fhomepage%2Fcgi%2F&PreviousPage=%2Fhomepage%2Fstart.html&resulthomepage=&searchkey=_QUERY_&all=yes&sortby=1&note=&adslevel=0&show=&levelkey=&search.x=26&search.y=31&page=_START_1_1_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://www.cseek.com/homepage/cgi/srchengine.cgi?searchcgi=%2Fhomepage%2Fcgi%2F&PreviousPage=%2Fhomepage%2Fstart.html&resulthomepage=&searchkey=_QUERY_&all=yes&sortby=1&note=&adslevel=0&show=&levelkey=&search.x=26&search.y=31&page=1
+]]></URL>
+
+<CHARSET>zh-cn</CHARSET>
+<SCORE>100*_SCORE_</SCORE>
+
+
+<TEMPLATE><![CDATA[
+. <a href="_URL_">_TITLE_</a>___][_SCORE_]<BR>___潠賡ㄩ_PREVIEW_<BR>
+]]></TEMPLATE>
+</SITE>

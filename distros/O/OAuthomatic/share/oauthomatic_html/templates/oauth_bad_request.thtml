@@ -1,0 +1,28 @@
+[%# -*- mode: web; coding: utf-8 -*-
+  #################################################################
+    Page shown after bad reply is obtained from OAuth site.
+    Parameters:
+       all described in layout.thtml
+  ################################################################# -%]
+[% WRAPPER layout.thtml
+       title="Unexpected reply" %]
+
+<p class="error">
+    Invalid or unknown reply obtained.
+</p>
+<p>
+    If you were redirected here from [% site_name %] after granting
+    access to [% app_name %], this means something does not work
+    properly.
+</p>
+<p>
+    Please make note of URL shown in the browser (but <b>do not</b> post
+    it anywhere as-is – it may contain values which should be treated
+    as confidential, mask them before quoting).
+</p>
+<p>
+    Restart app/script and try again, if it still does not work,
+    report error to the application author.
+</p>
+
+[% END %]

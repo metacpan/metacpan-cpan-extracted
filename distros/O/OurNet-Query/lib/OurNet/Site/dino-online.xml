@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<SITE ID="Dino-Online">
+
+<NAME Lang="en-us">Dino-Online Search</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+Dino-Online全球WWW搜尋(德國)
+]]></NAME>
+<INFO Lang="en-us">general information web search in Germany</INFO>
+<INFO Lang="zh-tw">general information web search in Germany</INFO>
+
+<URL Type="More"><![CDATA[
+_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://www.dino-online.de/dscgi/suche?query=_QUERY_&Bereichauswahl=FULL&Maschine=Dino
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_NEXT_"><![CDATA[
+<A href="_NEXT_">Weiter</A>
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+100%"> <A HREF="_URL_">_TITLE_</A>_PREVIEW_</TABLE>
+]]></TEMPLATE>
+</SITE>

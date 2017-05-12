@@ -1,0 +1,25 @@
+---
+abstract: 'attach method to objects instead of classes.'
+author:
+  - 'Kang-min Liu <gugod@gugod.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.14'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Object-Method
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+resources:
+  license: http://opensource.org/licenses/mit-license.php
+  repository: git://github.com/gugod/Object-Method.git
+version: '0.02'

@@ -1,0 +1,29 @@
+Object-Recorder
+
+This module makes it possible to record method calls issued to a set of objects
+inti a serializable container which can later be replayed, perfoming the actual
+method calls.
+
+This can be useful for several reasons. For instance, it could be used in the
+creation of task objects which would then be processed by a cluster of worker
+servers, without the need to update the worker code for each new type of task.
+
+It seems that this feature could also be useful in some sort of caching scheme 
+besides being useful in distributed systems in general.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 Nilson Santos Figueiredo Junior.
+Copyright (C) 2007 Picturetrail, Inc.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

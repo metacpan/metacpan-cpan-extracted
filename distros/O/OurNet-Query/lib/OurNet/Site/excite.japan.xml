@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<SITE ID="Excite.Japan">
+
+<NAME Lang="en-us">Excite Search</NAME>
+<INFO Lang="en-us">general information web search in Japan</INFO>
+
+<URL Type="Start"><![CDATA[
+http://www.excite.co.jp/search.gw?s=_QUERY_&c=japan&showSummary=true&perPage=_HITS_&lk=excite_jp
+]]></URL>
+
+<CHARSET>ja-jp.jis</CHARSET>
+
+
+<TEMPLATE><![CDATA[
+color=#990000>_SCORE_%___exciteSearch_another_window.gif___<a href="_URL_">_TITLE_</a>___<ul>_PREVIEW_</font></ul>
+]]></TEMPLATE>
+</SITE>

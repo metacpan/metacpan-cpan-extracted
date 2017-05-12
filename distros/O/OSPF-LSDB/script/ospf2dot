@@ -1,0 +1,122 @@
+#!/usr/bin/perl
+
+##########################################################################
+# Copyright (c) 2010-2012 Alexander Bluhm <alexander.bluhm@gmx.net>
+#
+# Permission to use, copy, modify, and distribute this software for any
+# purpose with or without fee is hereby granted, provided that the above
+# copyright notice and this permission notice appear in all copies.
+#
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+# ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+# ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+# OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+##########################################################################
+
+use strict;
+use warnings;
+use File::Slurp;
+use Getopt::Long qw(:config posix_default bundling);
+use OSPF::LSDB::View;
+use OSPF::LSDB::View6;
+use OSPF::LSDB::YAML;
+
+sub usage(@) {
+    print STDERR "Error: @_\n" if @_;
+    print STDERR <<EOF;
+Convert OSPF LSDB in YAML format to dot file used by Graphviz.
+
+Usage: $0 [-46bBceEhlpPsSwWv] [ospf.yaml] [ospf.dot]
+    -4          disable IPv6
+    -6          enable IPv6
+    -b          generate other area AS boundary router summary
+    -B          aggregate other area AS boundary router summary
+    -c          cluster identical networks
+    -e          generate AS external networks
+    -E          aggregate AS external networks
+    -h          help, print usage
+    -l          generate legend
+    -p          generate link and intra-area-prefix
+    -P          generate intra-area-prefix
+    -s          generate other area network summary
+    -S          aggregate other area network summary
+    -w          show most serious warning in dot graph
+    -W          show all warnings and areas in dot graph
+    -v          be verbose, print warnings to stderr
+    ospf.yaml   input file, default stdin
+    ospf.dot    output file, default stdout
+EOF
+    exit(2);
+}
+
+sub main() {
+    my %todo;
+    my $ipv6;
+    my $legend;
+    GetOptions(
+	'4'   => sub { $ipv6 = 0 },
+	'6'   => sub { $ipv6 = 1 },
+	'b'   => sub { $todo{boundary}{generate}  = 1 },
+	'B'   => sub { $todo{boundary}{aggregate} = 1 },
+	'c'   => sub { $todo{cluster} = 1 },
+	'e'   => sub { $todo{external}{generate}  = 1 },
+	'E'   => sub { $todo{external}{aggregate} = 1 },
+	'h'   => sub { usage() },
+	'l'   => \$legend,
+	'p'   => sub { $todo{prefix}{generate}    = 1 },
+	'P'   => sub { $todo{prefix}{aggregate}   = 1 },
+	's'   => sub { $todo{summary}{generate}   = 1 },
+	'S'   => sub { $todo{summary}{aggregate}  = 1 },
+	'w'   => sub { $todo{warning}{single} = 1 },
+	'W'   => sub { $todo{warning}{all} = 1 },
+	'v'   => sub { $todo{verbose} = 1 },
+    ) or usage("Bad option");
+    usage("Only two arguments allowed") if @ARGV > 2;
+
+    foreach my $option (qw(boundary external prefix summary warning)) {
+	if (keys %{$todo{$option} || {}} > 1) {
+	    my $opt = substr($option, 0, 1);
+	    usage("Options -$opt and -".uc($opt)." used together");
+	}
+    }
+
+    if ($todo{prefix}) {
+	$todo{intra}{generate} = 1;
+	$todo{link}{generate} = 1 if $todo{prefix}{generate};
+    }
+
+    if ($legend) {
+	my $class = $ipv6 ? 'OSPF::LSDB::View6' : 'OSPF::LSDB::View';
+	print $class->legend();
+	exit 0;
+    }
+
+    my $yaml = OSPF::LSDB::YAML->new();
+    if (@ARGV > 0) {
+	$yaml->LoadFile($ARGV[0]);
+    } else {
+	local $/;
+	$yaml->Load(<STDIN>);
+    }
+
+    if (defined $ipv6 && $ipv6 != $yaml->ipv6) {
+	die "Address family of yaml file does not match -4 and -6 options.\n";
+    }
+    my $class = $yaml->ipv6 ? 'OSPF::LSDB::View6' : 'OSPF::LSDB::View';
+    my $view = $class->new($yaml);
+    my $dot = $view->graph(%todo);
+    if ($todo{verbose}) {
+	my @errors = $view->get_errors;
+	warn map { "$_\n" } @errors if @errors;
+    }
+    if (@ARGV > 1) {
+	write_file($ARGV[1], $dot);
+    } else {
+	print $dot;
+    }
+}
+
+main();

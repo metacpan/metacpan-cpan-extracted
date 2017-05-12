@@ -1,0 +1,4 @@
+BOOL						T_IV
+HWND						T_PTROBJ
+LHANDLE						T_PTROBJ
+ULONG						T_IV

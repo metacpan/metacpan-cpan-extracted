@@ -1,0 +1,196 @@
+/* Procedure copyright(c) 1995 by Edward M Barlow */
+
+/************************************************************************\ 
+|* Procedure Name:   sp__auditdb
+|*                            
+|* Author:      ed barlow      
+|*                             
+|* Description:
+|*               
+|*    Checks Common Database Problems
+|*   - Lists users in group public
+|*   - List users aliased to another non dbo user         
+|*   - list users without logins      
+|*   - list aliases without logins               
+|*   - list objects owned by a non - dbo
+|*   - find any objects with syslogins in it
+|* - find any objects with public access
+|* - database has not been tran dumped in over a day???
+|* - Object with no text in syscomments
+|* - text in syscomments with no object
+|*   num tables without ever having update stats run on them
+|*                  
+|* Usage:      sp__auditdb 
+|*                        
+\************************************************************************/ 
+
+:r database
+go
+:r dumpdb
+go
+
+if exists (SELECT *
+           from   sysobjects
+           where  type = "P"
+           and    name = "sp__auditdb")
+begin
+    drop proc sp__auditdb
+end
+go
+
+/* If servrname is set, select srvname,getdate,errors */
+create procedure sp__auditdb( @srvname char(30) = null,@hostname char(30) =
+null, @dont_format char(1) = null )
+as
+begin
+   if @srvname is not null and @hostname is null
+   begin
+      print "MUST PASS BOTH SERVER AND HOST IF EITHER SPECIFIED"
+      return 200
+   end
+
+   create table #error
+   (  error_no int not null, 
+      msg char(74) not null 
+   )
+
+   set nocount on
+
+/*   - List users aliased to another non dbo user         */
+   INSERT   #error
+   SELECT   31100,"Login "+convert(char(14),m.name)+" is aliased to "+convert(char(14),u.name)
+   from      sysusers u, master.dbo.syslogins m,sysalternates a
+   where      a.suid = m.suid
+   and        u.uid  != u.gid
+   and      a.altsuid=u.suid
+   and      a.altsuid>1
+
+/*   - list aliases without logins               */
+   INSERT #error
+   select  31007,"suid "+rtrim(convert(char(10),a.suid))+" lacks login and is aliased to "+u.name
+   from   sysusers u,sysalternates a
+   where   u.uid!=u.gid and a.altsuid=u.suid and u.suid>=0
+   and      suser_name(a.suid) is null
+
+/*   - list users without logins               */
+   INSERT #error
+   select  31008,"user "+u.name+" can use db but lacks login suid="+rtrim(convert(char(10),suid))
+   from    sysusers u
+   where   u.uid!=u.gid and u.suid>=0
+   and     suser_name(suid) is null
+
+/*   - list objects owned by a non - dbo            */
+   INSERT   #error
+   SELECT distinct 31101,"User "+user_name(uid)+" Has "+convert(char(6),count(*))+" Objects"
+   from   sysobjects where uid!=1
+   group by uid
+
+   if( db_name() != "sybsystemprocs" )
+   begin
+      /* proc exists with same name as system proc */
+       INSERT   #error
+      SELECT 31102,"Object "+name+" in sybsystemprocs - Trojan Horse"
+      from    sysobjects
+      where name in ( select name from sybsystemprocs..sysobjects )
+      and name not in ( select name from master..sysobjects )
+      and    type='P'
+      and    name like "sp_%"
+   end
+
+   if( db_name() != "master" and db_name() != "sybsystemprocs" )
+   begin
+         /* proc exists with same name as system proc */
+         INSERT   #error
+         SELECT 31102,"Object "+name+" in master - Trojan Horse"
+         from    sysobjects 
+         where name in ( select name from master..sysobjects )
+         and   name not in ( select name from model..sysobjects )
+         and    type='P'
+
+/*   - find any objects with syslogins in it            */ 
+   
+/* Check if any groups exist - if not print message */
+         if not exists (
+            SELECT * 
+            from sysusers
+            where uid=gid
+            and   uid!=0
+            and   uid not in ( select uid from model..sysusers )
+         )
+         begin
+            INSERT   #error
+            SELECT  31104,"No Groups Exist In Database "+db_name()
+            where db_name() not in 
+               ('tempdb','master','sybsystemprocs','sybsecurity','model')
+         end
+         else
+         begin
+/*   - Lists users in group public               */
+            INSERT   #error
+            SELECT   31105,"User "+n1.name+" is a member of group public"
+            from     sysusers n1
+            where    gid=0
+            and      uid!=gid
+            and      uid>1
+   
+            INSERT   #error
+            SELECT    distinct 31106,"Group Public "+rtrim(v.name)+" access to "+convert(char,count(*))+" objects"
+            from    sysobjects o,sysprotects p,master..spt_values v
+            where   o.type!='S'
+            and   v.type   ='T'
+            and   v.number = p.action
+            and     o.id     = p.id
+            and     p.protecttype!=206
+            and     p.uid    =  0
+            and   p.action in (193,195,196,197,224)
+            group by v.name
+         end
+   end
+
+/*   - Time since last dump               */
+      INSERT #error
+      select  31009,"database "+db_name()+" has not been tran dumped in "
+            +convert(char(4),datediff(hh,dumptrdate,getdate()))
+            +" hours"
+      from    master..sysdatabases
+      where   dbid=db_id()
+      and     datediff(hh,dumptrdate,getdate())>24
+      and     dbid not in (
+      select distinct usg.dbid from master.dbo.sysusages usg where usg.segmap
+      != 4   and   usg.segmap&4 = 4   ) 
+      and status & 8 = 0
+
+      INSERT    #error
+      select    31010,convert(char(6),count(*))+" Objects Have No Comments"
+      from      sysobjects
+      where     id not in (select id from syscomments)
+      and       type in ('V','D','TR','R','P')
+
+      /*
+      INSERT    #error
+      select     31011,"Comments for id "+rtrim(convert(char(20),id))+" have no object"
+      from       syscomments
+      where    object_name(id) is null
+      */
+
+	INSERT 	#error
+	select 	31012,convert(char(6),count(*))+" Tables Have rows but have never had update statistics run"
+	from    sysindexes i, sysobjects o
+	where  	distribution=0
+     	and   	rowcnt(doampg) > 0
+     	and   	used_pgs(i.id, doampg,ioampg) > 10
+	and 	o.id = i.id
+	and 	o.type != 'S'
+
+      DELETE    #error
+      where     substring(msg,1,1) = "0"
+
+   if @srvname is null
+      select Error=msg from #error
+   else
+      select host=@hostname,srvname=@srvname,error_no,db=db_name(),type="a",day=getdate(),msg from #error 
+
+   drop table #error
+end
+go
+

@@ -1,0 +1,16 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         OpenGuides-RDF-Reader
+version:      0.05
+version_from: lib/OpenGuides/RDF/Reader.pm
+installdirs:  site
+requires:
+    CGI::Wiki::Plugin::Locator::UTM: 0.04
+    Pod::Usage:                    0
+    Test::Simple:                  0.44
+    WWW::Mechanize:                0
+    XML::RSS:                      0
+    XML::Simple:                   0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

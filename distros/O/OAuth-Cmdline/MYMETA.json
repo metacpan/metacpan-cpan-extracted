@@ -1,0 +1,53 @@
+{
+   "abstract" : "OAuth2 for command line applications using web services",
+   "author" : [
+      "Mike Schilli <cpan@perlmeister.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "OAuth-Cmdline",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTTP::Request::Common" : "1",
+            "JSON" : "1",
+            "LWP::UserAgent" : "1",
+            "Log::Log4perl" : "1",
+            "MIME::Base64" : "1",
+            "Moo" : "1",
+            "URI" : "1",
+            "YAML" : "0.9"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "http://github.com/mschilli/oauth-cmdline.git"
+      }
+   },
+   "version" : "0.06"
+}

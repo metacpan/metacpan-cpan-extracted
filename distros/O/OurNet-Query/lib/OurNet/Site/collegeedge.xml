@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<SITE ID="CollegeEdge">
+
+<NAME Lang="en-us">CollegeEdge</NAME>
+<INFO Lang="en-us">campus information search</INFO>
+
+<URL Type="More"><![CDATA[
+http://www.collegeedge.com/scripts/search/CE_SRCH.idq?CiBookMark=_CIBOOKMARK_&CiBookmarkSkipCount=_SKIPCOUNT_&CiMaxRecordsInResultSet=3000&CiRestriction=_QUERY_&CiMaxRecordsPerPage=_MAXRECORDSPERPAGE_&CiScope=%2F&TemplateName=CE_Srch&CiSort=rank%5Bd%5D&HTMLQueryForm=%252SEARCH%2Fce_srch.stm
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://www.collegeedge.com/scripts/SEARCH/CE_SRCH.IDQ?CiRestriction=_QUERY_&CiMaxRecordsPerPage=_HITS_&CiScope=%2F&TemplateName=CE_Srch&CiSort=rank%5Bd%5D&HTMLQueryForm=%2SEARCH/ce_srch.stm
+]]></URL>
+
+
+<VAR Name="_CIBOOKMARK_"><![CDATA[
+NAME="CiBookMark" VALUE="_CIBOOKMARK_" >
+]]></VAR>
+<VAR Name="_MAXRECORDSPERPAGE_"><![CDATA[
+NAME="CiMaxRecordsPerPage" VALUE="_MAXRECORDSPERPAGE_" >
+]]></VAR>
+<VAR Name="_QUERY_"><![CDATA[
+NAME="CiRestriction" VALUE="_QUERY_" >
+]]></VAR>
+<VAR Name="_SKIPCOUNT_"><![CDATA[
+NAME="CiBookmarkSkipCount" VALUE="_SKIPCOUNT_" >
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<b><a href="_URL_">_TITLE_</a></b>___</i></b>_PREVIEW_<br>___<font size=-1> - size_SIZE_bytes -_DATE_</font>
+]]></TEMPLATE>
+</SITE>

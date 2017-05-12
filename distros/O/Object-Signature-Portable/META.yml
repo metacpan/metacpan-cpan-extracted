@@ -1,0 +1,36 @@
+---
+abstract: 'generate portable fingerprints of objects'
+author:
+  - 'Robert Rothenberg C<< <rrwo@cpan.org> >> (on behalf of Foxtons, Ltd.)'
+  - 'Robert Rothenberg <rrwo@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::Differences: 0
+  Test::Most: 0
+  Test::Warnings: 0
+  if: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.10'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Object-Signature-Portable
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Crypt::Digest: 0
+  Exporter::Lite: 0
+  JSON::MaybeXS: 0
+  perl: 5.01
+  version: 0.77
+resources:
+  license: http://www.perlfoundation.org/artistic_license_2_0
+  repository: git://github.com/robrwo/Object-Signature-Portable.git
+version: 0.001006

@@ -1,0 +1,71 @@
+=head1 NAME
+
+ORM::Datetime - Date and time handler class.
+
+=head1 SYNOPSIS
+
+  $date = ORM::Datetime->new( [ 2006, 1, 25, 10, 0, 0 ] );
+  print $date->mysql_datetime,"\n";
+  $date = $date->diff( [ 0, 0, -2, 0, 0, -70 ] );
+  print $date->mysql_datetime,"\n";
+
+  The output is:
+  2006-01-25 10:00:00
+  2005-11-25 09:58:50
+
+=head1 DESCRIPTION
+
+This class introduces minimal interface to handle database
+table fields of type 'DATETIME'. This class is descendant of
+<ORM::Date> and behaves almost the same with few differences.
+
+To see interface of the class please refer to C<ORM::Date>.
+Members that behaves different than in C<ORM::Date> are listed below:
+
+=head1 CONSTRUCTORS
+
+=over
+
+=item current()
+
+Create date object corresponding to current date and time.
+Opposite to C<ORM::Date> hour, minutes and seconds values
+are set to current and not to zeroes.
+
+=item earlier24h()
+
+Create date object corresponding to yesterday date and current time.
+Opposite to C<ORM::Date> hour, minutes and seconds values
+are set to current and not to zeroes.
+
+=back
+
+=head1 SEE ALSO
+
+L<ORM::Date>
+
+L<ORM::Meta::ORM::Datetime>
+
+=head1 AUTHOR
+
+Alexey V. Akimov
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2005-2006 Alexey V. Akimov
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+=cut

@@ -1,0 +1,50 @@
+Revision history for Object-Enum
+
+0.074   2014-05-29
+        
+				Fixed clone to keep cloned objects value
+				Added readonly/immutable support
+
+0.073   2014-05-19
+
+        Convert to Dist::Zilla
+        Add Travis CI
+        Add basic interface tests
+
+0.072   2008-04-03 hdp
+
+        fix RT#27281
+
+0.071   2007-06-28 hdp
+
+        rename 'spawn' to 'clone', add optional value argument
+        avoid warning on setting to undef (from RJBS)
+
+0.070   Mon Aug 28 17:35:56 EDT 2006
+
+        Freshen Module::Install
+
+0.06    Thu Mar 23 13:07:18 EST 2006
+
+        Fix 'redefine' warnings for is_*/set_*
+
+0.05    Thu Mar 23 12:08:43 EST 2006
+
+        Make set_* methods chainable
+
+0.04    Thu Mar 23 11:55:20 EST 2006
+
+        Make 'Enum' export curry-happy
+
+0.03    Wed Mar 22 18:52:44 EST 2006
+
+        Bump version number to make CPAN happy
+
+0.02    Wed Mar 22 00:25:43 EST 2006
+
+        Adding missing dep for Sub::Install
+
+0.01    Tue Mar 21 23:22:07 EST 2006
+
+        First version, released on an unsuspecting world.
+

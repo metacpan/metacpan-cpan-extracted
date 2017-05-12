@@ -1,0 +1,56 @@
+<div id="user_nav">
+    <ul>
+        [% IF c.user %]
+            <li id="user_details">
+                Welcome, [% c.user.name %]<br>
+                [% date_long(today) %]
+            </li>
+        [% END %]
+        [% IF c.can_access( 'appkit/admin/index' ) %]
+            <li id="user_settings">
+                <a href="[% c.uri_for( c.controller('AppKit::Admin').action_for('index') ) %]">Settings</a>
+            </li>
+        [% END %]
+        [% IF (c.config.help_link.match('(?i)^on$')) %]
+            <li id="help_link">
+                [% path = c.action.private_path %]
+                [% path = path.replace('^\/', '') %]
+                [% IF c.config.help_link_separator %]
+                    [% path = path.replace('/', c.config.help_link_separator) %]
+                [% END %]
+                <a href="[% c.config.help_link_base_url %][% path %]"[% IF c.config.help_link_target %] target="[% c.config.help_link_target %]"[% END %]>[% c.config.help_link_text || 'Help' %]</a>
+            </li>
+        [% END %]
+        <li id="user_logout">
+            [% IF c.user %]
+                <a href="[% c.uri_for( c.controller('Login').action_for('logout') ) %]">Logout</a>
+            [% ELSE %]
+                <a href="[% c.uri_for( c.controller('Login').action_for('login') ) %]">Login</a>
+            [% END %]
+        </li>
+    </ul>
+</div>
+[% IF homepage %]
+    <div class="appname" id="appname_home">
+        [% c.config.application_name %]
+    </div>
+[% ELSE %]
+    <div class="appname" id="appname_[% c.controller.appkit_name | replace('\s+','_') | lower | html %]">
+        [% c.controller.appkit_name %]
+    </div>
+[% END %]
+<div id="breadcrumbs">
+    [% IF breadcrumbs %]
+        <a href="[% c.uri_for(c.controller('Root').action_for('index')) %]">Home</a> &gt;
+        [% FOREACH crumb IN breadcrumbs %]
+            [% IF loop.last %]
+                [% crumb.name | html %]
+            [% ELSE %]
+                <a href="[% crumb.url or crumb.uri %]">[% crumb.name | html %]</a> &gt;
+            [% END %]
+        [% END %]
+    [% ELSE %]
+        Home
+    [% END %]
+</div>
+

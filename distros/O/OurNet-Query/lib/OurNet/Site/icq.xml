@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<SITE ID="Icq">
+
+<NAME Lang="en-us">ICQ Web Search</NAME>
+<INFO Lang="en-us">general information web search</INFO>
+
+<URL Type="Start"><![CDATA[
+http://www.icqit.com/default.asp?MT=_QUERY_&DC=_HITS_
+]]></URL>
+
+
+
+<TEMPLATE><![CDATA[
+<B><A HREF="_URL_">_TITLE_</A>___color="#999999">_SCORE_%___</I>___color="#000000">_PREVIEW_</FONT>___color="#999999">_DATE_</FONT></TD></TR>
+]]></TEMPLATE>
+</SITE>

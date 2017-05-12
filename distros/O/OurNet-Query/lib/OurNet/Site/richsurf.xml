@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<SITE ID="RichSurf">
+
+<NAME Lang="en-us">RichSurf WWW Search</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+RichSurf WWW ·j´M
+]]></NAME>
+<INFO Lang="en-us">general information web search in Mainland China</INFO>
+<INFO Lang="zh-tw">general information web search in Mainland China</INFO>
+
+<URL Type="More"><![CDATA[
+http://search.sina.com.cn/cgi-bin/search_dir/_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://search.sina.com.cn/cgi-bin/search_dir/search.cgi?_searchkey=_QUERY_&_andor=or
+]]></URL>
+
+<CHARSET>zh-cn</CHARSET>
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_NEXT_"><![CDATA[
+<a href="_NEXT_">ÏÂ 25 ¸ö
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<LI>___&_href=_URL_">_TITLE_</a>_PREVIEW_<font size=-1 color=gray>
+]]></TEMPLATE>
+</SITE>

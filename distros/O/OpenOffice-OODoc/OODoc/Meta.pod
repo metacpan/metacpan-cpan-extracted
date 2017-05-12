@@ -1,0 +1,366 @@
+=head1	NAME
+
+OpenOffice::OODoc::Meta - Access to document metadata
+
+=head1	DESCRIPTION
+
+The OpenOffice::OODoc::Meta class is a specialist derivative of
+OpenOffice::OODoc::XPath for XML members which describe the metadata
+of ODF documents.
+
+=head2	Methods
+
+=head3	Constructor : OpenOffice::OODoc::Meta->new(<parameters>)
+
+        Short Form: odfMeta(<parameters>)
+
+        See OpenOffice::OODoc::XPath->new (or odfXPath)
+
+        Returns an OpenDocument connector allowing subsequent access to
+	the metadata of a well-formed, ODF-compliant document.
+	
+	The XML member loaded by default is 'meta.xml'.
+
+        Example:
+
+            $my meta	= odfMeta(file => 'document.odt');
+
+        returns a new object which represents the metadata of the
+        ODF document "document.odt".
+
+=head3	addKeyword(text)
+
+        Adds the given text to the list of document keywords if not already
+        found.
+
+        Example:
+
+            $meta->addKeyword("document management");
+            $meta->addKeyword("office");
+            $meta->addKeyword("tech watch");
+
+=head3	creation_date()
+
+        Without argument, returns the document's creation date in
+        ISO-8601 format (i.e. the ODF-compliant date format).
+
+        Example of returned value:
+
+            2008-11-12T08:22:50
+
+	The returned value can be converted in standard numeric time format
+	with the ooTimelocal() function.
+
+	With argument, inserts the given string (without checking) as the
+        creation date. The argument, if any, must comply with the ODF
+	(ISO-8601) date format. The ooLocaltime() function can be used in
+	order to convert a regular Perl time() value in ODF.
+
+	A conventional editing software should never changes this value, but
+	this method allows the user to read or write it.
+
+	See also date().
+
+=head3	creator()
+
+        Without argument, returns the document creator's name. The creator
+	is generally the author of the last update. See also initial_creator().
+
+        With argument, modifies the document author's name.
+
+=head3	date()
+
+        Without argument, returns the document's date of last modification,
+        in ISO-8601 format.
+
+        With argument, inserts the given string (without checking) as the
+        last modification date. The argument, if any, must comply with the
+	ODF date format (ISO-8601). The odfLocaltime() function can be used
+	in order to convert a regular Perl time() value in ODF format.
+
+	The returned value can be converted in standard numeric time format
+	with the ooTimelocal() function.
+
+=head3	description()
+
+        Without argument, returns the contents of the document properties
+        "Description" field.
+
+        With argument, inserts the given text in the "Description" field.
+
+=head3	editing_cycles()
+
+        Without argument, returns the number of edit sessions (i.e. saves,
+        under an ODF-compliant editing software). Or, technically, the number
+	of versions.
+
+        With argument, modifies this number without checking.
+        
+        See also increment_editing_cycles().
+
+=head3	editing_duration()
+
+        Without argument, returns the total editing time for the document,
+        in ISO-8601 date/time format.
+
+        For example, the returned string can be:
+
+            P2DT11H27M33S
+
+        which in this case means that the document has been edited for 2
+        days, 11 hours, 27 minutes and 33 seconds.
+
+        With argument, forces a new value into this property without
+        checking.
+
+=head3	generator()
+
+        Without argument, returns a label representing the signature of the
+        software which generated the document. Example of signature:
+
+        "OpenOffice.org/3.1$Unix OpenOffice.org_project/310m11$Build-9399"
+
+        With argument, inserts any signature.
+
+=head3	getTemplate()
+
+	Returns information about the template that is linked to the current
+	document, if any.
+
+	In scalar context, the returned information is the location (URL) of
+	the template, or undef if the document isn't linked to any template.
+
+	In array context, the returned values are, in this order, the location
+	of the template document, the date and time when the template was last
+	modified prior to being used to create the current document, then the
+	title of the template document.
+
+	See also unlinkTemplate().
+
+=head3	getUserProperty(name)
+
+	Retrieves the content of the user-defined property corresponding to the
+	given name, if any.
+	
+	The argument may be an already retrieved user-defined property element
+	reference instead of a name. 
+
+	In scalar context, returns the value only.
+	In array context, returns the data type (1st) and the value (2nd).
+
+	Returns undef if the property is not defined.
+
+	See also setUserProperty().
+
+=head3  getUserPropertyElement(name)
+
+        Like getUserProperty(), but the return value is the user property
+        element instead of its value and/or type. Returns undef if the given
+        property is not defined (or if the given object is not a user-defined
+        property element).
+
+=head3  getUserPropertyElements()
+
+	Returns the list of all the existing user-defined property elements.
+
+=head3  increment_editing_cycles()
+
+        Adds 1 to the editing cycle count that is stored in the document, and
+        returns the new count. This count should be incremented each time
+        the document is edited through an ODF-compliant application.
+        
+        See also editing_cycles().
+
+=head3	initial_creator()
+
+	Like creator(), but apply to the creator of the first version of the
+	document. The OOo desktop software never updates this value, but this
+	method allows the user to read or write it.	
+
+=head3	keywords()
+
+        Without argument, returns a list of the document's keywords. In a
+        list context, the result is a table where each element is a keyword.
+        In a scalar context, the keywords are returned in a single character
+        string, each of which is separated by a comma and a space.
+
+        With arguments, adds a list of keywords to the existing one. The
+        only checking carried out is to see if the keyword already exists,
+        if so it is not added.
+
+=head3	language()
+
+        Without argument, returns the content of the language variable.
+        Example:
+
+            fr_FR
+
+        With argument, changes the content of this variable without
+        checking.
+
+=head3	removeKeyword(keyword)
+
+        Removes the given keyword if it exists.
+
+=head3	removeUserProperty(name)
+
+	Deletes the user-defined property corresponding to the given name (does
+	nothing if the given property is not defined in the document).
+
+=head3	removeUserProperties()
+
+	Deletes all the existing user-defined properties and returns the number
+	or really deleted elements (does nothing and returns 0 if no user
+	property is defined in the document).
+
+=head3	setUserProperty(name, type => value_type, value => text)
+
+	Creates or updates a user-defined property with the given data type and
+	the given value.
+	
+	According to the ODF specification, the presently allowed data types in
+	a meta property are float, date, time, boolean and string.
+	However, the given type is not checked so the application can provide any
+	abritrary type.
+
+	While the consistency between the type and the value is not checked, the
+	ODF compliance requires 'true' or 'false' for a boolean, and the ISO-8601
+	format for a date (see odfLocaltime()).
+
+	Example:
+
+		$meta->setUserProperty
+			(
+			"Approved",
+			type => 'boolean', value => 'false'
+			);
+		$meta->setUserProperty
+			(
+			"Circulation",
+			type => 'string', value => "Internal"
+			);
+		$meta->setUserProperty
+			(
+			"Release date",
+			type => 'date', value => '2010-01-01'
+			);
+		$meta->setUserProperty
+			(
+			"Release number",
+			type => 'float', value => 5.4
+			);
+	
+        The 'type' option allows to change the data type of an existing user-
+        defined property. However, if a new property is created without 'type'
+        option, the 'string' type is selected by default.
+
+	The return value reflects the new status of the user defined item,
+	in the same format as with getUserProperty().
+
+=head3	statistic()
+
+        Without argument, returns a hash which represents the entire
+        "statistics" section of the metadata. The content depends on the
+        type of document.
+
+	Text
+
+		'meta:table-count'	=> number of tables
+		'meta:image-count'	=> number of images
+		'meta:object-count'	=> number of OLE objects
+		'meta:page-count'	=> number of pages
+		'meta:paragraph-count'	=> number of paragraphs
+		'meta:word-count'	=> number of words
+		'meta:character-count'	=> number of characters
+
+        Spreadsheet
+
+		'meta:table-count'	=> number of sheets
+		'meta:cell-count'	=> number of non-empty cells
+		'meta:object-count'	=> number of objects (images, etc.)
+
+        Example:
+
+            my $meta	= odfMeta->new("invoice.ods");
+            my %stat	= $meta->statistic;
+            print 	"This invoice contains " .
+            	"$stat{'meta:cell-count'} cells and "	.
+            	"$stat{'meta:table-count'} pages\n";
+
+        With arguments, you can modify (or falsify ?!) all or some of the
+        statistical data and even create attributes which are not created by
+        the office software. Arguments are passed in pairs [key => value] and
+	handled without checking.
+
+        Example:
+
+            $meta->statistic
+            	('meta:table-count' => '4', 'status' => 'OK');
+
+        This example forces the number of tables to 4 (whatever the reality)
+        and adds an arbitrary attribute 'status' with value 'OK'.
+	
+	Note : Such forced attributes do not upset the function of
+        the office software which ignores them. They could therefore be useful
+	in programs which handle documents out of reach of the end user.
+        However, if such a document is then edited or updated by a typical
+	end-user desktop application, these "foreign" attributes could be lost
+	and and replaced by what this application considers to be the "real"
+	values to those attributes it manages.
+
+=head3	subject()
+
+        Without argument, returns the document's subject.
+
+        With argument, adds a new subject to the document.
+
+=head3	title()
+
+        Without argument, returns the document's title.
+
+        With argument, adds a new title to the document.
+
+=head3	unlinkTemplate()
+
+	Removes the reference to a template document, if any, ensuring that
+	the document no longer depends on any external template.
+
+=head3	user_defined()
+
+        Returns the list of the user defined fields of the document.
+
+        The list is returned in the form of a hash elements whose keys represent
+	the field names and whose values represent their content.
+
+        By supplying a similar hash of elements as an argument, this method
+	deletes and replaces the existing content. However, if the number of
+	provided items is less than the numbers of existing user defined
+	properties, the exceding properties are left unchanged.
+
+	Warning: this method is deprecated. Newer methods such as
+	setUserProperty(), getUserProperty(), removeUserProperties(),
+	getUserPropertyElements(), and getUserPropertyElements() should be
+	preferred. 
+
+=head3	version()
+
+	Synonym of editing_cycles().
+
+=head2	Properties
+
+        As for OpenOffice::OODoc::XPath
+
+=head1	AUTHOR/COPYRIGHT
+
+Developer/Maintainer: Jean-Marie Gouarne L<http://jean.marie.gouarne.online.fr>
+
+Contact: jmgdoc@cpan.org
+
+Copyright 2004-2010 by Genicorp, S.A. L<http://www.genicorp.com>
+
+Initial English version of the reference manual by Graeme A. Hunter
+(graeme.hunter@zen.co.uk).
+
+License: GNU Lesser General Public License v2.1
+
+=cut

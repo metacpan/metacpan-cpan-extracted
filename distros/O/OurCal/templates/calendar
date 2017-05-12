@@ -1,0 +1,34 @@
+<table width="[% width %]" height="[% height %]" class="calendar" cellpadding="1" cellspacing="2">
+<tr height="83">
+[% FOREACH day = ['Mon' 'Tue' 'Wed' 'Thu' 'Fri' 'Sat' 'Sun'] %]
+<td class="header" width="83" height="83" align="center">[% day %]</td>
+[% END %]
+</tr>
+
+[% days = month.days %]
+<tr height="83">
+[% FOREACH [2..days.0.day_of_week] %]
+    <td width="83" height="83" class="noevent">&nbsp;</td>
+[% END %]
+[% FOREACH day = days %]
+        [% IF day.has_events %]
+                [% class='event' %]
+        [% ELSE %]
+                [% class='noevent' %]
+        [% END %]
+        [% IF day.is_today %]
+                [% tdclass = "today$class" %]
+        [% ELSE %]
+                [% tdclass= "$class" %]
+        [% END %]
+    <td class="[% tdclass %]" width="83" height="83" align="center"><a href="[% handler.link(day) %]" class="[% class %]">[% day.day_of_month %]</a></td>
+[% IF day.day_of_week==7 && !day.is_last_day_of_month %]
+</tr>
+<tr height="83">
+[% END %]
+[% END %]
+[% FOREACH [days.-1.day_of_week .. 6] %]
+<td width="83" height="83" class="noevent">&nbsp;</td>
+[% END %]
+</tr>
+</table>

@@ -1,0 +1,52 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"/>
+<title> Merging several and disjoint OBO ontologies from the same IDspace</title>
+</head>
+<body>
+	
+<h2>Ontology merging</h2>
+<ol>
+	<li><a href="#1">Simple merging of several and disjoint OBO ontologies from the same IDspace.</a></li>
+
+</ol>
+	
+<ol>
+	<li> <b><a href="#1">Simple merging of several and disjoint OBO ontologies from the same IDspace:</a></b>
+		<pre>
+		
+			use OBO::Parser::OBOParser;
+			
+			my $my_parser = OBO::Parser::OBOParser->new();
+			my $result = OBO::Core::Ontology->new();
+			
+			$result->idspace_as_string("APO", "http://www.cellcycle.org/ontology/APO");
+			$result->default_namespace("cellcycle_ontology");
+			$result->remarks("Simple Merged Ontology");
+			
+			foreach my $onto_file (@ARGV) {
+				my $ontology = $my_parser->work($onto_file);
+				$result->idspace($ontology->idspace());
+				$result->subsets($ontology->subsets()->get_set());
+			
+				foreach my $rel (@{$ontology->get_relationships()}){
+					$result->add_relationship($rel);
+					my $rel_type = $ontology->get_relationship_type_by_id($rel->type());
+					$result->has_relationship_type($rel_type) || $result->add_relationship_type($rel_type);
+				}
+			
+				foreach my $term (@{$ontology->get_terms()}){
+					$result->add_term($term);
+				}
+			}
+			
+			$result->export('obo', \*STDOUT);    # export back in OBO format the simple merged ontology
+			
+		</pre>
+	</li>
+</ol>
+
+Copyright (c) 2006-2015 by Erick Antezana. All rights reserved.
+
+</body>
+</html>

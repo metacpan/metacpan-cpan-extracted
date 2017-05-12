@@ -1,0 +1,6 @@
+Revision history for Perl extension Oracle::Sqlldr.
+
+0.11  Fri Apr  1 12:56:30 2005
+	- original version; created by h2xs 1.21 with options
+		-XA -n Oracle::Sqlldr
+

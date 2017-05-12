@@ -1,0 +1,32 @@
+Revision history for Perl extension OpenInteract2::Observer::UsePerlPost.
+
+0.05  Sun Jan 16 17:19:12 EST 2005
+
+  - At the request of some use.perl users (and for the clarity of what
+  you're writing), replace all <img ...> tags with links to the actual
+  image and text from the 'alt' attribute describing what it is. (You
+  are using alt attributes, right?)
+
+
+0.04  Sat Dec 18 21:11:20 EST 2004
+
+  - Replace all <pre></pre> instances with <ecode></ecode>
+
+
+0.03  Thu Dec 16 13:11:15 EST 2004
+
+  - Fix bug in creating URL for deployment -- you couldn't run this
+  outside of an HTTP request. Now we rely on the new server
+  configuration key 'Global.server_host' to tell us where the server
+  is when we're not running in an HTTP request.
+
+
+0.02  Thu Dec  9 23:41:21 EST 2004
+
+  - Allow action to set 'use_perl_skip' to not add this particular
+  object as a journal entry.
+
+
+0.01  Mon Dec  6 00:45:16 EST 2004
+
+  - First version, everything is new!

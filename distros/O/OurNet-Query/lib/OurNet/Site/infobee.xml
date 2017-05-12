@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<SITE ID="Infobee">
+
+<NAME Lang="en-us">NTT Directory Search</NAME>
+<INFO Lang="en-us">general information web search in Japan</INFO>
+
+<URL Type="More"><![CDATA[
+post://navi.ntt.co.jp/cgi-bin/ntt-dir-tret?display=適合度順&next=_NEXT_&start=_START_&n_of_fb=0
+]]></URL>
+<URL Type="Start"><![CDATA[
+post://navi.ntt.co.jp/cgi-bin/ntt-dir-tret?keyword=_QUERY_&condition=いずれかの語を含み、&cond=all&display=適合度順
+]]></URL>
+
+<CHARSET>ja-jp.euc</CHARSET>
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_START_"><![CDATA[
+name="start" value="_START_">
+]]></VAR>
+<VAR Name="_NEXT_"><![CDATA[
+name="next" value="_NEXT_">
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+?open=_URL_">_TITLE_</A><DD>_PREVIEW_<DD><FONT SIZE="-1">___登録日:_DATE_)
+]]></TEMPLATE>
+</SITE>

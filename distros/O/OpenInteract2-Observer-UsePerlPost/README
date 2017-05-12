@@ -1,0 +1,104 @@
+INTRO: OpenInteract2::Observer::UsePerlPost
+========================================
+
+This is an Observer within the OpenInteract2 framework that will post
+an object to your use.perl journal. The actual module is fairly simple
+glue since we're just reacting to an event published by OI2 and the
+posting is done for us by Net::Blogger
+
+
+INSTALLATION
+========================================
+
+The standard:
+
+ perl Makefile.PL
+ make 
+ make test
+ make install
+
+
+QUICK START
+========================================
+
+Step 1.
+
+# In $WEBSITE_DIR/conf/observer.ini
+
+# Declare the observer
+
+[observer]
+...
+useperl = OpenInteract2::Observer::UsePerlPost
+
+# Map the observer to an action 'news'
+[map]
+useperl = news
+
+Step 2.
+
+Glue your action to the observer:
+
+ [news]
+ ...
+ use_perl_subject  = subject
+ use_perl_content  = news_item
+ use_perl_user_id  = 9999
+ use_perl_password = sekrit
+
+Step 2 1/2. (optional)
+
+Add a footer to the content to be posted:
+
+ [news]
+ ...
+ use_perl_footer = <p>Posted from <a href="http://www.cwinters.com/>cwinters.com</a>; <a href="$LINK">read original</a></p>
+
+Step 2 2/3 (optional)
+
+Set debugging to on, which means the article will not be posted but
+you'll see in the log the data that would have been sent.
+
+ [news]
+ use_perl_debug = yes
+
+Step 3.
+
+Restart the server and create new 'news' objects.
+
+Step 4.
+
+Profit!
+
+For more: 'perldoc OpenInteract2::Observer::UsePerlPost"
+
+
+DEPENDENCIES
+========================================
+
+This module requires these other modules and libraries:
+
+   OpenInteract2 (1.99 beta 5+)
+   Net::Blogger
+
+
+AUTHORS
+========================================
+
+Chris Winters <chris@cwinters.com>
+
+
+COPYRIGHT AND DISCLAIMER
+========================================
+
+OpenInteract2::Observer::UsePerlPost Copyright (c) 2004-5 Chris
+Winters. All rights reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the Perl Artistic License or the GNU General
+Public License as published by the Free Software Foundation; either
+version 2 of the License (see 'COPYING'), or (at your option) any
+later version.
+
+
+$Id: README,v 1.3 2005/01/17 00:06:59 cwinters Exp $

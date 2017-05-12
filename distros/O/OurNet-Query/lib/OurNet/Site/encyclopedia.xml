@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<SITE ID="Encyclopedia">
+
+<NAME Lang="en-us">Encyclopedia.com from Electric Library</NAME>
+<INFO Lang="en-us">general information documents search</INFO>
+
+<URL Type="Start"><![CDATA[
+post://encyclopedia.com/cgi-bin/AT-articlessearch.cgi?search=_QUERY_&sp=sp
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+
+<TEMPLATE><![CDATA[
+result HREF="_URL_">_TITLE_</A>___<i>Summary</i>:_PREVIEW_</ul>
+]]></TEMPLATE>
+</SITE>

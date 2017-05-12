@@ -1,0 +1,369 @@
+#!/usr/bin/perl -w
+# $File: //depot/libOurNet/BBS/t/stdtests $ $Author: autrijus $
+# $Revision: #3 $ $Change: 8639 $ $DateTime: 2003/10/30 12:12:52 $
+
+$|++;
+use strict;
+use constant IsWin32 => ($^O eq 'MSWin32');
+
+use File::Path;
+use File::Spec;
+use File::Basename;
+use Test::More 0.32;
+
+sub BEGIN {
+    no strict 'refs';
+    no warnings qw/once redefine/;
+
+    # XXX kluge against insufficient granularity on file timestamps
+    *{'OurNet::BBS::Base::timestamp'} = sub {
+        $_[0]->{ $_[2] || 'mtime' } = $_[1] and return;
+    };
+
+    if (ref($::BBS) eq 'HASH') {
+        plan skip_all => 'RPC::PlServer not installed'
+          unless (eval "use RPC::PlServer; 1;");
+
+        $OurNet::BBS::BYPASS_NEGOTIATION = 1;
+        OurNet::BBS->new($::BBS)->daemonize(7977) if $ARGV[0];
+    }
+    else {
+
+        # local BBS: test for compliation
+        my $manifest = File::Spec->catfile(dirname($0), '..', 'MANIFEST');
+        open $::MANIFEST, $manifest or die "cannot open $manifest";
+    }
+
+}
+
+our($pid, $TODO, $Heading);
+
+my $BBS      = $::BBS;
+my $IsClient = ref($BBS) eq 'HASH';
+my $backend  = $1 if $BBS =~ m/OurNet::BBS::([^:]+)::/;
+my @modules  = grep { m|BBS/$backend| } <$::MANIFEST> and close $::MANIFEST
+  if $backend and $::MANIFEST;
+
+# the extra test is use_ok('Win32::Process')
+plan tests => 44 + @modules + ($IsClient and IsWin32);
+
+## Compilation ###############################################################
+
+require_ok("OurNet::$_") foreach map {
+    chomp;
+    s'/'::'g;
+    s'.pm'';
+    s'lib::OurNet::'';
+    $_;
+} @modules;
+
+## Connectivity ##############################################################
+
+if ($IsClient) {
+
+    # OurNet connectivity
+
+    if (IsWin32) {
+        use_ok('Win32::Process') or die $^E;    # the extra test
+        Win32::Process::Create($pid, $^X, qq($^X "$0" 1), 0, 32, '.');
+    }
+    else {
+        ok(exec($^X, $0, 1), 'fork()') unless $pid = fork;
+    }
+
+    for (1 .. 20) {
+        last if $BBS = eval {
+            OurNet::BBS->new(
+                {
+                    backend  => 'OurNet',
+                    bbsroot  => 'localhost',
+                    peerport => 7977
+                }
+            );
+        };
+
+        sleep 1;
+    }
+
+    die "cannot connect: $@" unless $BBS;
+}
+
+_dump() if $ARGV[0];    # dump object guts
+
+## Base ######################################################################
+$Heading = 'base';
+
+is($BBS->REF, $BBS->module('BBS'), __('constructor'));
+
+my $brd = $BBS->{boards}{test};    # XXX: if we don't do this, tests fail.
+
+# make a board...
+$BBS->{boards}{test} = {
+    title => 'before coderef',
+    bm    => 'sysop',
+};
+
+# XXX: has to assign coderef directly
+$brd->{title} = sub { 1 };
+is($brd->{title}->(), 1, __('callback'));
+$brd->{title} = 'after coderef';
+
+## Board #####################################################################
+$Heading = 'board';
+
+eq_array([ keys(%{ $BBS->{boards} }) ], ['test'], __('all keys'));
+is($BBS->{boards}{test}{bm}, 'sysop', __('metadata'));
+is($brd, $BBS->{boards}{test}, __('board fetch'));
+
+## Article ###################################################################
+$Heading = 'article';
+
+is($brd->{articles}, $brd->{articles}, __('equality'));
+
+# push #1
+push (
+    @{ $brd->{articles} },
+    {
+        header => {
+            Subject => 'test title',
+            From    => 'user',
+        },
+        body => 'bodie 0',
+    }
+);
+
+my $art = $brd->{articles};
+is($#{$art}, 0, __('fetchsize'));
+is($art->[0]{author}, 'user', __('push + metadata'));
+isnt($art->[0]->REF, $art->REF, __('REF context'));
+
+# append (store-as-push) #1
+$brd->{articles}{''} = {
+    title  => 'hashy title',
+    author => 'xyzzy',
+    body   => 'bodie 1',
+};
+
+is($brd->{articles}[1]{title}, 'hashy title', __("store-as-push"));
+
+# append #2
+$brd->{articles}{''} = {
+    title  => 'random title',
+    author => 'smart',
+    body   => 'bodie 2',
+};
+
+my $head = $brd->{articles}[2]{header};
+is($brd->{articles}[2]{header}{From}, 'smart', __('header'));
+
+isnt(
+    $brd->{articles}[1]{header}{Date}, $brd->{articles}[2]{header}{Date},
+    __('chrono-ahead')
+);
+
+like($brd->{articles}[2]{body}, qr/bodie/, __('body fetch'));
+is(index($brd->{articles}[2]{header}{'Message-ID'}, '@'), 38, __('msgid'));
+
+$brd->{articles}{''} = $brd->{articles}[2];
+is(
+    $brd->{articles}[2]{header}{From}, $brd->{articles}[3]{header}{From},
+    __('push by reference')
+);
+
+$brd->{articles}[-1]{body} = 'bodie 3';    # fix for the foreach test below
+
+# alternative access
+my $id = $brd->{articles}[2]{id};
+like($brd->{articles}{$id}{body}, qr/bodie/, __('fetch via id'));
+
+# nested fetch
+TODO: {
+    local $TODO = 'nested fetch breaks OurNet' if $IsClient;
+    like(
+        $brd->{articles}{ $brd->{articles}[2]{id} }{body}, qr/bodie/,
+        __('nested fetch via id')
+    );
+}
+
+$brd->{articles}->purge unless $BBS->REF =~ /RAM/;
+
+# set #1
+$brd->{articles}[0] = {
+    author => 'changed author',
+    title  => 'changed title',
+    body   => $brd->{articles}[0]{body},
+};
+is($brd->{articles}[0]{title}, 'changed title', __('attribute store'));
+
+# foreach iteration
+my $flag = 0;
+foreach my $index (0 .. $#{ $brd->{articles} }) {    # can't use @{} for OurNet
+    my $t = $brd->{articles}[$flag];
+    is($t->{body}, "bodie $flag", __("foreach ($flag)"));
+    ok($t->mtime, __("mtime for ($flag)"));
+
+    unless ($flag++) {
+        $BBS->{boards}{kitty} = {
+            title => 'test board',
+            bm    => 'sysop',
+        };
+        is($BBS->{boards}{kitty}{bm}, 'sysop', __('access inside loop'));
+    }
+}
+
+# each interation
+while (my ($k, $v) = each(%{ $brd->{articles} })) {
+    is($v->{title}, $brd->{articles}{$k}{title}, __('each %{}'));
+    ok($flag-- > 0, __("key count consistency ($k)"));
+}
+
+## Archive ###################################################################
+$Heading = 'archive';
+
+TODO: {
+    local $TODO = __('push array via OurNet fails') if $IsClient;
+
+    # archiving
+    push @{ $brd->{archives} }, @{ $brd->{articles} };
+    like($brd->{archives}[1]{title}, qr/hashy title/, __('push & access'));
+}
+
+# archive directory
+push (
+    @{ $brd->{archives} },
+    bless(
+      {
+          title  => 'Random Directory',
+          author => 'random',
+    },
+    $brd->module('ArticleGroup'))
+);
+
+# is store successful?
+is($brd->{archives}[-1]{author}, 'random', __('create via bless'));
+
+# push into new dir
+push (
+    @{ $brd->{archives}[-1] },
+    {
+        title  => 'turandot',
+        author => 'aida',
+        body   => 'satva',
+    }
+);
+
+is($brd->{archives}[-1]->name, $brd->{archives}[-1]{id}, __('by-name fetch'));
+
+TODO: {
+    local $TODO = 'push array via OurNet fails' if $IsClient;
+    like($brd->{archives}[4][0]{title}, qr/turandot/, __('new dir'));
+
+    local $TODO = ($BBS->backend eq 'RAM') ? $TODO : undef;
+    like($brd->{archives}[-1][0]{title}, qr/turandot/, __('negative index'));
+}
+
+## Group ####################################################################
+$Heading = 'group';
+
+my $grp;
+
+SKIP: {
+    skip(__('no groups for this backend'), 2) unless eval {
+        $BBS->{groups}{home} = {
+            owner => 'autrijus',
+            title => 'home sweet home',
+        };
+    };
+
+    # new group
+    $grp = $BBS->{groups}{home};
+    is(join ('', keys(%{ $BBS->{groups} })), 'home', __('keys'));
+
+    TODO: {
+
+        local $TODO = 'todo: CVIC deletion on Win32 File System'
+          if IsWin32
+          and !$IsClient
+          and $BBS->backend eq 'CVIC';
+
+        # group inside group
+        ++$BBS->{groups}{rainbow}{home};
+        is_deeply([ sort { $a cmp $b } keys(%{ $BBS->{groups} }) ],
+            [qw/home rainbow/], __('modification'));
+    }
+}
+
+SKIP: {
+    TODO: {
+        skip(__('no groups for this backend'), 1) unless $grp;
+
+        local $TODO = 'todo: CVIC deletion'
+           if $BBS->backend eq 'CVIC';
+
+        # delete group
+        delete $BBS->{groups}{home};
+
+        like(
+            join ('', keys(%{ $BBS->{groups}{rainbow} })), qr/^(?!.*home).*$/,
+            __('delete')
+        );
+    }
+}
+
+no strict 'refs';
+
+my %brdmap = (
+    MAPLE3 => 'brd',
+    MELIX  => 'brd',
+    PTT    => 'board',
+    CVIC   => 'board',
+    MAPLE2 => 'board',
+);
+
+my $path_brd = ${ $BBS->module('BoardGroup') . '::PATH_BRD' }
+  || $brdmap{ $BBS->backend };
+
+## Cleanup ###################################################################
+$Heading = 'cleanup';
+
+SKIP: {
+    skip(__('no $PATH_BRD for deletion'), 1) unless $path_brd;
+
+    # delete board
+    delete $BBS->{boards}{test};
+    ok(!(-e "$::prefix/$path_brd/test/.DIR"), __('board delete'));
+}
+
+is($BBS, $BBS, __('object consistency'));
+
+exit;
+
+## Utilities #################################################################
+
+sub __ { return "[$Heading] @_"; }
+
+sub _dump {
+    my $T = tied(%{ ${$BBS}->[1] });
+
+    print '$BBS:                     ' . "$BBS\n";
+    print ' ${$BBS}:                 ' . "${$BBS}\n";
+    print '  ${$BBS}->[EGO]:         ' . "${$BBS}->[EGO()]\n";
+    print '   ${$BBS}->[0]{_ego}:    ' . "${$BBS}->[0]{_ego} # top\n";
+    print '   ${$BBS}->[0][0]:       ' . "${$BBS}->[0][0] # phash keys\n";
+    print '   ${$BBS}->[0][1]:       ' . "${$BBS}->[0][1] # phash: backend\n";
+    print '  ${$BBS}->[HASH]:        ' . "${$BBS}->[1] # hash accessor\n";
+    print '   tied(%{${$BBS}->[1]}): ' . "$T # \$T\n";
+    print '    ${$T}:                ' . "${$T}\n";
+    print '     ${$T}->[EGO]:        ' . "${$T}->[EGO()] # same as above\n";
+    print '      ${$T}->[0]{_ego}:   ' . "${$T}->[0]{_ego} # top\n";
+    print '     ${$T}->[FLAG]:       ' . "${$T}->[FLAG()] # HASH\n";
+}
+
+END {
+    if ($::pid) {
+        UNIVERSAL::can($pid, 'Kill') ? $pid->Kill(1) : kill(1, $::pid);
+        File::Path::rmtree([$::prefix], 0, 1) if $::prefix;
+    }
+}
+
+__END__

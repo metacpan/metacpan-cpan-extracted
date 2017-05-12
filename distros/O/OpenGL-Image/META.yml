@@ -1,0 +1,11 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         OpenGL-Image
+version:      1.03
+version_from: Image.pm
+installdirs:  site
+requires:
+    OpenGL:                        0.55_03
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

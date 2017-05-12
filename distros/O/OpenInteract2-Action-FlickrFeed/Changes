@@ -1,0 +1,13 @@
+Revision history for Perl extension OpenInteract2-Action-FlickrFeed.
+
+0.02  Wed Sep 21 00:21:46 EDT 2005
+
+      Simple change: be able to limit number of photos displayed.
+
+
+0.01  Sun Jul  3 22:35:08 EDT 2005
+
+      Initial version implementing a simple extension to
+      OpenInteract2::Action::RSS so we can provide data parsed from
+      the entry content.
+

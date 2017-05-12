@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<SITE ID="Apa">
+
+<NAME Lang="en-us">PsychCrawler</NAME>
+<INFO Lang="en-us">psychological relevant documents search</INFO>
+
+<URL Type="More"><![CDATA[
+http://www.psychcrawler.com/plweb-cgi/_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+post://www.psychcrawler.com/plweb-cgi/fastweb?search?view=psychcr&db1=books&db2=journals&db3=practice&db5=rural&db7=science&db8=helping&db9=samhsa&db10=psytimes&db11=ce&db12=monitor&db14=ed&query=_QUERY_&operation=simplesearch&numresults=_HITS_
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_NEXT_"><![CDATA[
+<i><a href="_NEXT_">Show the next
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<a href="_URL_" onMouseOver="window___>_TITLE_</a>___,size_SIZE_,___, score_SCORE_</font>
+]]></TEMPLATE>
+</SITE>

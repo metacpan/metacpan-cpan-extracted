@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<SITE ID="Swissguide">
+
+<NAME Lang="en-us">SwissGuide Search Engine</NAME>
+<INFO Lang="en-us">general information web search in Switzerland</INFO>
+
+<URL Type="More"><![CDATA[
+http://194.230.86.13/search/Result.asp?ct=Swissguide&so=rank%5Bd%5D&qu=%40all++%28+_QUERY_+%29&sh=_START_10_0_&StartRecordNum=_START_10_1_&DisplayText=_QUERY_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://194.230.86.13/search/Result.asp?ct=Swissguide&so=rank%5Bd%5D&qu=%40all++%28+_QUERY_+%29&sh=0&StartRecordNum=_START_10_1_&DisplayText=_QUERY_
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+
+<TEMPLATE><![CDATA[
+<FONT SIZE=2 FACE=ARIAL>_TITLE_<br>_URL_</a>___<font size=1 FACE=ARIAL>_PREVIEW_<i>___Modified&nbsp;_DATE_&nbsp;___Size&nbsp;_SIZE_&nbsp;___</tr>
+]]></TEMPLATE>
+</SITE>

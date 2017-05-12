@@ -1,0 +1,25 @@
+---
+abstract: 'An Object With Params'
+author:
+  - 'Jaldhar H. Vyas <jaldhar@braincells.com>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Object-WithParams
+provides:
+  Object::WithParams:
+    file: lib/Object/WithParams.pm
+    version: 0.3
+requires:
+  perl: 5.006
+resources:
+  homepage: http://jaldhar.github.com/Object-WithParams
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/jaldhar/Object-WithParams
+version: 0.3

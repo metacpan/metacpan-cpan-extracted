@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<SITE ID="Titan">
+
+<NAME Lang="en-us">TITAN WWW Search</NAME>
+<INFO Lang="en-us">general information web search in Japan</INFO>
+
+<URL Type="More"><![CDATA[
+http://titan.mcnet.ne.jp/super/bin/_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://titan.mcnet.ne.jp/super/bin/super-gw.pl?all=_QUERY_&mode=loose&title=&anchor=&maxnum=_HITS_&search=ej&page=japanese
+]]></URL>
+
+<CHARSET>ja-jp.euc</CHARSET>
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_NEXT_"><![CDATA[
+<A HREF="_NEXT_">¼¡¤Î
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+blueball.gif">_<A HREF="_URL_">_TITLE_</A>__SCORE_)___<BR>_PREVIEW_<
+]]></TEMPLATE>
+</SITE>

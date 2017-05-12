@@ -1,0 +1,57 @@
+{
+   "abstract" : "OX::RouteBuilder which routes to an action method in a controller class based on HTTP verbs",
+   "author" : [
+      "Thomas Klausner <domm@cpan.org>",
+      "Validad GmbH http://validad.com"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "OX-RouteBuilder-REST",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moose" : "0",
+            "OX::RouteBuilder" : "0",
+            "Try::Tiny" : "0",
+            "namespace::autoclean" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "OX" : "0",
+            "Plack::Test" : "0",
+            "Test::More" : "0",
+            "Test::Path::Router" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/domm/OX-RouteBuilder-REST.git",
+         "web" : "http://github.com/domm/OX-RouteBuilder-REST"
+      }
+   },
+   "version" : "0.003"
+}
+

@@ -1,0 +1,94 @@
+{
+   "abstract" : "OS Package Management System",
+   "author" : [
+      "James F Wilkus <jfwilkus@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "OS-Package",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::ShareDir::Install" : "0.06"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::EOL" : "0",
+            "Test::More" : "0",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Spelling" : "0.12"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Archive::Extract" : "0",
+            "Cwd" : "0",
+            "DateTime::Format::DateManip" : "0",
+            "Digest::MD5" : "0",
+            "Digest::SHA" : "0",
+            "English" : "0",
+            "Env" : "0",
+            "Exporter" : "0",
+            "File::Basename" : "0",
+            "File::Copy" : "0",
+            "File::Path" : "0",
+            "File::ShareDir" : "0",
+            "File::Temp" : "0",
+            "FileHandle" : "0",
+            "Getopt::Long" : "0",
+            "HTTP::Tiny" : "0",
+            "Hash::AsObject" : "0",
+            "IPC::Cmd" : "0",
+            "Log::Dispatch" : "0",
+            "Log::Log4perl" : "0",
+            "Module::Load" : "0",
+            "Moo" : "0",
+            "POSIX" : "0",
+            "Path::Tiny" : "0",
+            "Pod::Usage" : "0",
+            "Role::Tiny" : "0",
+            "Template" : "0",
+            "Time::Piece" : "0",
+            "Try::Tiny" : "0",
+            "Types::Standard" : "0",
+            "YAML::Any" : "0",
+            "base" : "0",
+            "perl" : "v5.14.0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "DateTime::Format::DateManip" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jfwilkus/OS-Package/issues"
+      },
+      "homepage" : "https://github.com/jfwilkus/OS-Package",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/jfwilkus/OS-Package.git",
+         "web" : "https://github.com/jfwilkus/OS-Package"
+      }
+   },
+   "version" : "0.2.7"
+}
+

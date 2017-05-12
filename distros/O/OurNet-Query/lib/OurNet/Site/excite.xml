@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<SITE ID="Excite">
+
+<NAME Lang="en-us">Excite Search</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+Excite ¥þ²ywww¬d¸ß
+]]></NAME>
+<INFO Lang="en-us">general information web search</INFO>
+<INFO Lang="zh-tw">general information web search</INFO>
+
+<URL Type="More"><![CDATA[
+http://search.excite.com/search.gw?c=web&s=_QUERYSTR_&showSummary=true&start=_START_&perPage=_HITS_&next=Next+Results
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://search.excite.com/search.gw?c=web&search=_QUERY_
+]]></URL>
+
+<EXPRESSION>Plain</EXPRESSION>
+<CATEGORY>WWW,General</CATEGORY>
+
+<VAR Name="_START_"><![CDATA[
+<INPUT TYPE=hidden NAME=start VALUE=_START_>
+]]></VAR>
+<VAR Name="_QUERYSTR_"><![CDATA[
+<INPUT TYPE=hidden NAME=s VALUE="_QUERYSTR_">
+]]></VAR>
+<VAR Name="_HITS_"><![CDATA[
+NAME=perPage VALUE=_HITS_>
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<SMALL>_SCORE_% </SMALL>___<A HREF="_URL_">_TITLE_</A>_PREVIEW_<BR><SMALL>
+]]></TEMPLATE>
+</SITE>

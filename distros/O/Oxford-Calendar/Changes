@@ -1,0 +1,130 @@
+2.11  2016-10-26
+    - New copyright
+    - Modernise Makefile.PL
+    - Update URLs to University web site
+    - Update calendar from information in
+      https://www.ox.ac.uk/about/facts-and-figures/dates-of-term
+
+2.10  2015-02-10
+    - Update URLs to University web site
+    - Update calendar from information in
+      http://www.ox.ac.uk/about/facts-and-figures/dates-of-term
+
+2.09  2014-01-08
+    - Update calendar from information in
+      http://www.ox.ac.uk/about_the_university/university_year/dates_of_term.html
+      (thanks, Stephen Gower; RT#91925)
+    - Correct out of date reference to Computing Services
+      (thanks, Stephen, Gower; RT#91926)
+
+2.08  2013-02-12
+    - Update calendar from information in
+      http://www.ox.ac.uk/gazette/2012-2013/7february2013-no5014/councilandmaincommittees/#112333
+
+2.07  2012-06-26
+    - Correct incorrect data for Michaelmas 2017 (RT#78048)
+
+2.06  2012-06-09
+    - Update calendar from information in
+      http://www.ox.ac.uk/gazette/2011-2012/26january2012-no4976/councilandmaincommittees/#65714
+
+2.05  2011-08-21
+    - Correct Georgian -> Gregorian in documentation
+    - Improve first example in documentation: use say rather than
+      print; use ToOx in scalar context; explicitly use Date::Calc
+      (fixes RT#66439) (thanks, David Sheldon)
+    - Clarify form of arguments for FromOx (fixes RT#66440)
+    - Switch to Time::Piece for some calculations; fixes bug
+      when calculating Oxford dates out of term near a DST change
+      (RT#64539)
+
+2.04  2010-05-03
+    - Update calendar from information in
+      http://www.ox.ac.uk/gazette/2009-10/weekly/110310/acts.htm#2Ref
+    - Bugfix: fix incorrect week number from ToOx for Sundays in week
+      0 or earlier of term (thanks to Tim Bagot for the fix)
+
+2.03  2009-04-26
+    - Update calendar from information in
+      http://www.ox.ac.uk/gazette/2008-9/weekly/120309/acts.htm#2Ref
+
+2.02  2008-06-05
+    - Fix POD formatting problems (fixes RT#36481)
+      [thanks to Will Thompson for pointing this out]
+
+2.01  2008-03-21
+    - Update calendar from information in
+      http://www.ox.ac.uk/gazette/2007-8/weekly/190308/acts.htm#3Ref
+
+2.0   2008-01-16
+
+    INCOMPATIBLE CHANGES:
+
+    - ToOx will return an array if called in array context;
+      this will break code that does 'print ToOx(..)' directly
+    - The string returned by ToOx no longer has a trailing full stop.
+    - ToOx will return undef, rather than an error string if a date
+      requested is not in term time (if full_term or ext_term was
+      specifed)
+    - Parse will return undef, rather than an error string, if the
+      string could not be parsed
+    - ToOx and FromOx will die if the date requested is not in the internal
+      database; if appropriate, you should eval calls to these functions
+      and perform appropriate error handling.
+    - The format of the YAML database has changed.
+
+    OTHER CHANGES:
+
+    - Improve documention to describe the Oxford date format and add
+      references to the University (fixes RT#27365)
+    - Move Calendar.pm to lib/, and test.pl to t/ (and convert to using
+      Test::More)
+    - General refactoring and cleanup
+    - Changes from Aaron Wilson:
+      - ToOx can be called in multiple modes with different levels
+        of strictness (fixes RT#27366).
+    - Changes inspired by Janet McKnight:
+      - The module calculates the Oxford terms from the definition laid
+        out in University Regulations as well as the reckoning of dates
+        of full term (also fixes RT#27366).
+    - Reference to CPAN RT in documentation
+    - ToOx can be called with a 'confirmed' option, which ignores dates
+      marked as provisional (fixes RT#31289).
+    
+1.8   2007-05-27
+    - New maintainer: Dominic Hargreaves <dom@cpan.org>
+    - Convert built-in data to YAML and add more dates
+    - Support reading data from an external YAML file
+    - Remove support for fetching data from University web pages, as this
+      functionality is fragile and has broken.
+    - Run perltidy on Calendar.pm in line with
+      Damien Conway's Best Practices
+
+1.7   2005-01-04
+    - Corrected terms 2004-2006 (which were incorrectly given as 2003)
+    - Term dates before 2004 are not shown on the OU website; always
+      pre-load them
+
+1.6   2004-11-20
+    - New maintainer: Eugene van der Pijll <pijll@cpan.org>
+    - Added terms 2004-2006 to internal database
+
+2002-11-26 09:06  simon
+
+	* MANIFEST: Yes, we are a Debian module.
+
+2002-11-26 09:03  simon
+
+	* Calendar.pm: Keep internal database going for another few years.
+
+2002-06-17 19:21  simon
+
+	* Calendar.pm: Fix ugly "week 0" bug
+
+2002-05-02 19:27  simon
+
+	* Calendar.pm, Changes, MANIFEST, Makefile.PL, test.pl,
+	debian/changelog, debian/control, debian/files, debian/rules: 
+	
+	Bring calendar under version control.
+

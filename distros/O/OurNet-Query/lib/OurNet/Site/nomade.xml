@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<SITE ID="Nomade">
+
+<NAME Lang="en-us">Nomade Guide</NAME>
+<INFO Lang="en-us">general information web search in France</INFO>
+
+<URL Type="More"><![CDATA[
+http://av.nomade.fr/av.asp?s=_QUERYSTR_&stq=_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://av.nomade.fr/av.asp?s=_QUERY_&f=N&l=L
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+<VAR Name="_NEXT_"><![CDATA[
+&stq=_NEXT_">
+]]></VAR>
+<VAR Name="_QUERYSTR_"><![CDATA[
+av.asp?s=_QUERYSTR_&stq=
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+NOSHADE><A HREF="_URL_">_TITLE_</A><BR>_PREVIEW_<BR><FONT SIZE=1>
+]]></TEMPLATE>
+</SITE>

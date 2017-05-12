@@ -1,0 +1,6 @@
+[%########################################
+  form_reset( value )
+     Reset button
+  ########################################-%]
+[%- DEFAULT value = 'Reset' -%]
+<input type="reset" value="[% value %]">

@@ -1,0 +1,16 @@
+# $File: //depot/OurNet-BBSAgent/BBSAgent/zoo.bbs $ $Author: autrijus $
+# $Revision: #4 $ $Change: 2829 $ $DateTime: 2002/01/10 14:54:36 $
+# zh_TW.Big5: ¤£¨}¤û
+
+Zoo
+zoo.twbbs.org
+
+load maple2.board
+
+setv moretail	m/\[q\]\e\[30mµ²§ô\e\[201m/
+setv cursor	¡÷
+
+=login
+wait µù¥U
+send $[username]\n$[password]\nn\nq\x20q\x20q\x20q\x20q
+goto main

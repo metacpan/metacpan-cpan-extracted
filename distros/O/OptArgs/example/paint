@@ -1,0 +1,82 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+use Data::Dumper;
+use OptArgs;
+
+$OptArgs::COLOUR++;
+$OptArgs::PRINT_DEFAULT++;
+$OptArgs::PRINT_ISA++;
+
+opt help => (
+    isa     => 'Bool',
+    comment => 'print a help message and exit',
+    alias   => 'h',
+    ishelp  => 1,
+);
+
+opt quiet => (
+    isa     => 'Bool',
+    alias   => 'q',
+    comment => 'output nothing while working',
+);
+
+opt hidden => (
+    isa     => 'Bool',
+    alias   => 'q',
+    comment => 'you will never see this comment',
+    hidden  => 1,
+);
+
+opt bool => (
+    isa     => 'Bool',
+    comment => 'example of a default-true Boolean option',
+    default => 1,
+);
+
+opt iopt => (
+    isa     => 'Int',
+    comment => 'example of a default-true Integer option',
+    alias   => 'i',
+    default => 8,
+);
+
+opt sopt => (
+    isa     => 'ArrayRef',
+    comment => 'example of an arrayref option',
+    alias   => 's',
+    default => 'some text',
+);
+
+opt xopt => (
+    isa      => 'ArrayRef',
+    isa_name => 'XY',
+    comment  => 'example isa_name',
+    alias    => 'x',
+    default  => 'some text',
+);
+
+arg item => (
+    isa      => 'Str',
+    required => 1,
+    comment  => 'the item to paint',
+);
+
+arg colour => (
+    isa     => 'Str',
+    default => 'blue',
+    comment => 'the colour to use',
+);
+
+arg message => (
+    isa     => 'Str',
+    comment => 'the message to paint on the item',
+    default => 'a boring message',
+    greedy  => 1,
+);
+
+print Dumper(optargs);
+

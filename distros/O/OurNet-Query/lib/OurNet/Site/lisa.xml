@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<SITE ID="Lisa">
+
+<NAME Lang="en-us">Lisa Search</NAME>
+<INFO Lang="en-us">general information web search for women in Japan</INFO>
+
+<URL Type="More"><![CDATA[
+http://www.lisa.co.jp_NEXT_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://www.lisa.co.jp/cgi-bin/lisa_search/fsearchj.cgi?from=0&n=20&index=lisa&key=_QUERY_
+]]></URL>
+
+<CHARSET>ja-jp.jis</CHARSET>
+<SCORE>_SCORE_/10</SCORE>
+
+<VAR Name="_NEXT_"><![CDATA[
+<A HREF="_NEXT_">[NEXT
+]]></VAR>
+
+<TEMPLATE><![CDATA[
+<DT><B><A HREF="_URL_">___._TITLE_</A>___(score:_SCORE_)</SMALL>___<DD>_PREVIEW_.<BR>___<NOBR>(_SIZE_bytes___<NOBR>_DATE_</NOBR></SMALL>
+]]></TEMPLATE>
+</SITE>

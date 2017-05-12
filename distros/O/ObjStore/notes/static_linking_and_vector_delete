@@ -1,0 +1,184 @@
+SUBJECT:        Static Linking and Vector Delete
+ 
+PRODUCT:        ObjectStore
+ 
+PLATFORM:       Solaris
+ 
+LANGUAGE:       C, C++
+ 
+VERSION:        ALL
+ 
+DATE:           8/30/96
+ 
+EXPIRATION:     8/30/97
+ 
+KEYWORDS:       C++, compiler, sun
+
+QUESTION:	A customer complains of the runtime error:
+
+
+
+   ERROR: 'delete[]' does not correspond to any 'new'
+
+This is Solaris2.4 with the 3.1 CAFE extensions installed.
+
+ANSWER:
+
+	Apply  **SUN's Solaris Patches, so they appear by a showrev -p:
+
+	Patch: 101242-09  Obsoletes:   Packages: SUNWlibC 5.4,PATCH=09
+**vdelx	Patch: 101910-08  Obsoletes:   Packages: SPROcpl.4 3.0.1,PATCH=30, SPROlang.3 3.0.1,PATCH=30
+
+	Assure CC is called with the -vdelx flag
+
+	Does the stack trace show vector_delete() or vector_deletex()?
+	ObjectStore requires vector_deletex not vector_delete().
+
+This problem usually occurs when you statically link libC.
+
+Type:
+	ldd <executable name>
+		&
+	dump -Lv <executable name>
+
+The libos.so should always be first, so that our definition of delete appears
+before libC's definition. When you statically link, with libC, the vector_delete
+symbol is resolved, hence it will not grab the shared library definition that
+ObjectStore provides.
+
+************************************************************
+
+If the patch is installed verify that there is a link from libC.so.5 to libC.so
+
+************************************************************
+We have also seen this error when allocating an object
+with new of size 0. As a temporary workaround, please
+do not invoke 'new' with 0 size.
+
+
+************************************************************
+
+I have attached an analysis of ObjectStore 4.0, ldd and dump -Lv so that you
+can see the expected symbol resolution order. Collections and the OS_Dictionary
+class make internal calls to delete a persistent arrays, that is why you may
+see this problem occur when using this code.
+
+Sample Trace:
+
+   [1] kill(0x0, 0x6, 0x1, 0x0, 0xeecc0780, 0xeed2fe18), at 0xeeca1838
+     [2] abort(0x12, 0x8, 0xffffffff, 0x0, 0x0, 0x7509c1), at 0xeec6d7ec
+     [3] _vector_delete_(0x750938, 0x8, 0xef347520, 0xef4225d0, 0xef347520, 0x0), at 0x3515b0
+     [4] _CM::__remove(0x73c1c0, 0x7a9f30, 0x76bdc0, 0xefffd444, 0x0, 0xefffd438), at 0xef37e3c4
+     [5] _CM::__remove(0x73c1c0, 0x7a9f30, 0x76bdc0, 0x0, 0x0, 0x0), at 0xef37e478
+     [6] _Token_to_qnode_xlat_mappings::connect_related_qnodes(0x74af10, 0xefffd59c, 0xef1ee7b8, 0x8, 0x0, 0x7a9190), at 0xef2060b8
+     [7] _OSRTQ_Query_Token::optimize(0x7a9f98, 0x0, 0xef44d720, 0x0, 0xef44d6f8, 0x1), at 0xef21c940
+     [8] static _OSRTQ_Translator::query_finish_translation(0x76c898, 0x3eaf3c, 0xef44d6f4, 0xef29af68, 0x0, 0x0), at 0xef25b17c
+     [9] static _OSRTQ_Translator::do_translation(0x3eaf30, 0x3eaf3c, 0xef25aea8, 0xef25b0d8, 0xef25b3e0, 0x1000), at 0xef25abb0
+     [10] _OSRTQ_initialize_and_translate(0x0, 0x67a528, 0xef27e93c, 0xef27e954, 0x3eaf30, 0x3eaf3c), at 0xef1e4664
+     [11] static _OSRTQ_Coll_Query::create(0x3eaf30, 0x3eaf3c, 0x0, 0x1, 0x67a528, 0x0), at 0xef1e0578
+     [12] static os_coll_query::create_pick(0x3eaf30, 0x3eaf3c, 0x67a528, 0x0, 0x0, 0x0), at 0xef1dddd8
+   =>[13] IxImagePool::findImagesByID(__ptr_return = 0xefffdb68, this = 0xe5660004, imageId = 0x765760 "KO500000000000000000000", exactMatch = 0), line 462 in "/vobs/imacts/im/src/IxImagePool.cc"
+     [14] IxQuery::filterByID(this = 0x76a558, plan = 0x83eb80, workingList = 0x765780), line 128 in "/vobs/imacts/im/src/IxQueryFilters.cc"
+     [15] IxQuery::run(this = 0x76a558, workingList = 0x765780), line 319 in "/vobs/imacts/im/src/IxQuery.cc"
+     [16] IxQuery::run(this = 0x76a558, refine = '\0', refine_images = (nil)), line 482 in "/vobs/imacts/im/src/IxQuery.cc"
+     [17] IxQueryManager::run(this = 0x76a538, refine = '\0'), line 265 in "/vobs/imacts/ia/src/IxQueryManager.cc"
+     [18] IxQueryByID::run(this = 0x76a538, __UNNAMED_ARG__1__ = '\0'), line 244 in "/vobs/imacts/ia/src/IxQueryByID.cc"
+     [19] static IxQueryByID::runXTCB(__UNNAMED_ARG__1__ = 0x75f3d8, clientData = 0x76a538, __UNNAMED_ARG__2__ = 0xefffe7e4), line 348 in "/vobs/imacts/ia/src/IxQueryByID.cc"
+     [20] ActivateCommon(0x75f3d8, 0x6ae060, 0xef712368, 0xef709acc, 0x0, 0x0), at 0xef64654c
+     [21] HandleActions(0x75f3d8, 0xefffeae4, 0x6e7ca0, 0x0, 0x6e9c1c, 0x6e77f8), at 0xef532000
+     [22] _XtTranslateEvent(0x75f3d8, 0xefffeae4, 0x8000, 0x5, 0xef54f41c, 0x75f408), at 0xef532bb4
+     [23] DispatchEvent(0xefffeae4, 0x75f3d8, 0x8, 0x7acc20, 0x7, 0x1), at 0xef515bdc
+     [24] DecideToDispatch(0xefffeae4, 0x6d10b4, 0x8, 0x75f3d8, 0x75f3d8, 0x0), at 0xef5162f0
+     [25] XtDispatchEvent(0xefffeae4, 0xefffeae4, 0x69c674, 0x0, 0x1, 0x69c668), at 0xef5163d0
+     [26] IxMotifApp::processEvents(this = 0x69bae8), line 107 in "/vobs/imacts/gui/src/IxMotifApp.cc"
+     [27] main(argc = 2, argv = 0xeffff134), line 162 in "/vobs/imacts/ia/src/imactsIA.cc"
+
+mukluk% ldd ossize
+        libosmop.so.sun.4.0 =>   /opt/ODI/OS4.0/sunpro/lib/libosmop.so.sun.4.0
+        liboscol.so.sun.4.0 =>   /opt/ODI/OS4.0/sunpro/lib/liboscol.so.sun.4.0
+        libosqry.so.sun.4.0 =>   /opt/ODI/OS4.0/sunpro/lib/libosqry.so.sun.4.0
+        libosdbu.so.sun.4.0 =>   /opt/ODI/OS4.0/sunpro/lib/libosdbu.so.sun.4.0
+        libos.so.sun.4.0 =>      /opt/ODI/OS4.0/sunpro/lib/libos.so.sun.4.0
+        libosthr.so.sun.4.0 =>   /opt/ODI/OS4.0/common/lib/libosthr.so.sun.4.0
+        libosu.so.sun.4.0 =>     /opt/ODI/OS4.0/common/lib/libosu.so.sun.4.0
+        libsocket.so.1 =>        /usr/lib/libsocket.so.1
+        libposix4.so.1 =>        /usr/lib/libposix4.so.1
+        libm.so.1 =>     /usr/lib/libm.so.1
+        libC.so.5 =>     /usr/lib/libC.so.5
+        libw.so.1 =>     /usr/lib/libw.so.1
+        libthread.so.1 =>        /usr/lib/libthread.so.1
+        libc.so.1 =>     /usr/lib/libc.so.1
+        libnsl.so.1 =>   /usr/lib/libnsl.so.1
+        libdl.so.1 =>    /usr/lib/libdl.so.1
+        libintl.so.1 =>  /usr/lib/libintl.so.1
+
+kuruma% dump -Lv ossize
+ 
+ossize:
+ 
+  **** DYNAMIC SECTION INFORMATION ****
+.dynamic :
+[INDEX] Tag      Value
+[1]     NEEDED   libosmop.so.sun.4.0
+[2]     NEEDED   liboscol.so.sun.4.0
+[3]     NEEDED   libosqry.so.sun.4.0
+[4]     NEEDED   libosdbu.so.sun.4.0
+[5]     NEEDED   libos.so.sun.4.0
+[6]     NEEDED   libosthr.so.sun.4.0
+[7]     NEEDED   libosu.so.sun.4.0
+[8]     NEEDED   libsocket.so.1
+[9]     NEEDED   libposix4.so.1
+[10]    NEEDED   libm.so.1
+[11]    NEEDED   libC.so.5
+[12]    NEEDED   libw.so.1
+[13]    NEEDED   libthread.so.1
+[14]    NEEDED   libc.so.1
+[15]    INIT     0x1df34
+[16]    FINI     0x1df6c
+[17]    RPATH    /opt/ODI/OS4.0/common/lib:/opt/ODI/OS4.0/sunpro/lib:/opt/ODI/OS4.0/cfront/lib
+[18]    HASH     0x100e8
+[19]    STRTAB   0x142a8
+[20]    STRSZ    0x67de
+[21]    SYMTAB   0x116d8
+[22]    SYMENT   0x10
+[23]    DEBUG    0x0
+[24]    PLTGOT   0x2e190
+[25]    PLTSZ    0x108
+[26]    PLTREL   0x7
+[27]    JMPREL   0x1aaac
+[28]    RELA     0x1aa88
+[29]    RELASZ   0x12c
+[30]    RELAENT  0xc
+mukluk% 
+
+kuruma% rsh mukluk showrev -p 
+Patch: 101242-09  Obsoletes:   Packages: SUNWlibC 5.4,PATCH=09
+Patch: 101910-08  Obsoletes:   Packages: SPROcpl.4 3.0.1,PATCH=30, SPROlang.3 3.0.1,PATCH=30
+Patch: 101910-04  Obsoletes:   Packages: SPROcpl.3 3.0.1,PATCH=101910-04
+Patch: 101945-13  Obsoletes: 101918-01,101975-01,101983-03  Packages: SUNWarc.2 11.5.1,REV=94.07.15.22.10,PATCH=19, SUNWcar.2 11.5.1,REV=94.07.15.22.0,PATCH=18, SUNWcsr.2 11.5.1,REV=94.07.15.22.10,PATCH=42, SUNWcsu.2 11.5.1,REV=94.07.22.14.32,PATCH=45, SUNWhea.2 11.5.1,REV=94.07.15.22.10,PATCH=5, UNWkvm.2 11.5.1,REV=94.07.15.22.10,PATCH=12
+Patch: 102007-01  Obsoletes:   Packages: SUNWcsr.3 11.5.1,REV=94.07.15.22.10,PATCH=10
+Patch: 102039-01  Obsoletes:   Packages: SUNWcsu.3 11.5.1,REV=94.07.22.14.32,PATCH=12
+Patch: 102057-04  Obsoletes:   Packages: SUNWxwplt.2 3.4.18,REV=0.94.07.15,PATCH=4
+Patch: 102070-01  Obsoletes:   Packages: SUNWcsu.4 11.5.1,REV=94.07.22.14.32,PATCH=22
+Patch: 101714-03  Obsoletes:   Packages: SUNWprsto.2 Dev Release 12/08/94
+
+
+
+**SUN's patches can be obtained through an authorized SUN representative.
+  SunSoft Support Services can be accessed through the World Wide Web via
+	  http://www.sun.com:80/cgi-bin/show?sales-n-service/sunsoft.html
+
+
+
+
+FAQ_reference: static_linking_and_vector_delete
+
+   Allocating  "new"s with 0 size may also be causing this error.
+
+
+
+
+
+
+
+

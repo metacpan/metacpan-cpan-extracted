@@ -1,0 +1,20 @@
+[% INCLUDE header %]
+
+[% IF NOT nomenu %]
+[% INCLUDE menu %]
+[% END %]
+
+<div id="content">
+[% FOREACH section = sections %]
+  <h2> [% section.title %] </h2>
+  <ul class="instrumentistes">
+	[% FOREACH sub = section.submenu %]
+	<li><a href="[% sub.path %][% sub.name %]">[% sub.title %]</a></li>
+	[% END %]
+  </ul>
+[% END %]
+
+  [% content %]
+<!-- </div> -->
+
+[% INCLUDE footer %]

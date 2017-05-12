@@ -1,0 +1,513 @@
+
+All changes where made by Mark Overmeer <perl@overmeer.net>, unless
+explicitly stated otherwise.
+
+version 2.01: Wed 11 Nov 12:27:52 CET 2015
+
+	Fixes:
+	- PODTAIL.txt from file should have a blank line added before
+	  to avoid to pod statements without separating blank.
+	- accept =encoding
+	- overload has no parameters to display
+	- html_stylesheet processing in HTML(1) formatter
+	- show functions in example template
+	- DETAILS overview repeated inherited references
+
+	Improvements:
+	- bin/oodist remove warnings about use of qw()
+	- explicitly use tar with --format=gnu (not posix, to avoid
+	  PaxHeaders poluting the extracted directories)
+	- refer to docs in base class, in case of inheritance
+	- remove many of the empty inherited heads which show-up empty
+	- =pod :html, the ':' becomes optional. perlpod has both.
+	- ::MarkOv blanks between parens and [] or <> in formatted call
+	- ::MarkOv change some texts
+	- changed documentation style
+
+version 2.00: Fri Jan 11 09:59:08 CET 2013
+
+	Changes:
+
+	- translated errors to use Log::Report.  Removed the 'verbose'
+	  parameters everywhere.
+
+	- removal of discontinued Template::Magick for HTML output. New
+	  template based way of producing HTML.
+
+	- functions without parameters will be formatted in Pod with
+	  empty parenthesis.
+
+	Fixes:
+
+	- ci_method should not show class option indented.
+
+	- general cleanups for consistent code layout.
+
+	- fix F<> translation [Nigel Metheringham]
+
+	Improvements:
+
+	- new ::Parser::Markov tag =package when there is no
+	  package statement possible.
+
+	- added bin/oodist option --(no)tests
+
+	- use ::Pod::writeTable(width) as minimum width, not absolute.
+
+version 1.06: Wed Jan 26 16:08:25 CET 2011
+
+	Changes:
+
+	- oodist: pod3 formatter is the new default, because Template::Magic
+	  (pod2) is not supported anymore.
+
+	Fixes:
+
+	- do not include INHERITANCE header when there is no info in it.
+
+	- avoid memory leak via code-refs
+
+	- merge problem with subsections, but names and data
+
+	Improvements:
+
+	- oodist: run tests with 'prove'
+
+	- oodist: also run tests in 'xt/' sub-directory
+
+	- new method OODoc::Manual::index();
+
+	- pod: far more condensed output and other cleanups
+
+version 1.05: Mon Jan 26 12:57:32 CET 2009
+
+	Fixes:
+
+	- slightly improved copyright date generation.
+
+	- fix L<> links to pages within the set:  :: -> _
+
+	- broken links on front-page. [Offer Kaye]
+
+	Improvements:
+
+	- do not run t/pod.t in devel environment.
+
+version 1.04: Thu Jun 12 09:50:01 CEST 2008
+
+	Fixes:
+
+	- recover then temp symlink for raw package already exists.
+
+	- wrong $VERSION insert with Parse::RecDescend output, where
+	  code starts on same name as package statement.
+
+	Changes:
+
+	- variables used in PODTAIL and PMHEAD files will be filled-in.
+
+	Improvements:
+
+	- OODoc::Parser::new(skip_links) can be used to avoid complaints
+	  about external manual which do not have a package file.  Also
+	  SKIP_LINKS in Makefile.PL with oodist.
+
+	- PODTAIL and PMHEAD can also be set in the Makefile.PL
+
+	- Add "SEE ALSO", COPYRIGHTS and LICENSE to the html template
+
+	- Permit chapter names with quotes in HTML template, to allow
+	  blanks and other special characters in the name.
+
+version 1.03: Fri Mar 14 14:27:12 CET 2008
+
+	Changes:
+
+	- In the HTML output, the manual page X::Y::Z will not referred
+	  to under its name, because that causes various problems with
+	  hrefs, and is not portable under Windows.  The packages will
+	  be addressed as X_Y_Z.  Thanks to [Joop Ringelberg] for paving
+	  this path.
+
+	Fixes:
+
+	- fix in HTML front page [Robert.Locke]
+
+	- remove complaints about "Attempt to reload" for Perl5.10
+
+	Improvements:
+
+	- verbosity in the "get package relations" phase.
+
+	- raw package created by oodist will unpack in a sub-dir,
+	  named <pkg>-<version>-raw
+
+version 1.02: Fri Nov  9 11:04:39 CET 2007
+
+	Fixes:
+
+	- check for OODoc::Text::Structure::isEmpty() was flawed.
+
+	- stop parsing a pm file when a __DATA__ line is found.
+
+	- fixed typos in example
+
+	Changes:
+
+	- make the default for examples screem less in manual-pages:
+	  change format from "I<Example:>" into "example:"
+
+	- the explanation of diagnostics in POD get indented.
+
+	- extracted Template::Magic helpers from OODoc::Format into
+	  OODoc::Format::TemplateMagic
+
+	- in HTML, chapters become H2, not H1.  etc
+
+	Improvements:
+
+	- implemented OODoc::Format::Pod3 which uses OODoc::Template
+	  this is the new default for oodist.
+
+	- added subsubsections/head4
+
+	- the inheritence information is added as chapter to the
+	  manual page before the formatters get their turn.
+
+version 1.01: Mon Jun 18 21:28:28 CEST 2007
+
+	Fixes:
+
+	- add IO::Scalar to pre-requisits (thanks to CPAN-testers).
+
+version 1.00: Thu Jun 14 12:07:08 CEST 2007
+
+	Fixes:
+
+	- OODoc::Manifest skipped MANIFEST lines with comments in them.
+
+	- pure POD files where emptied in the cleanup process.
+
+	Changes:
+
+	- the options with show a '=>' between key and value, to make
+	  it more clear that an option is described.
+
+	Improvements:
+
+	- oodist adds a README when not provided.
+
+	- oodist uses Test::Pod to check correctness of produced
+	  POD files.
+
+	- oodist uses "make distdir" and "make disttest", replacing
+	  "make" and "make test"
+
+version 0.99: Sun Mar 25 17:26:46 CEST 2007
+
+	Fixes:
+
+	- Don't write [ -d $dir ], where you mean -d $dir; this is Perl,
+	  no Shell-script.
+
+	Changes:
+
+	- option podtail and pmhead loose their abbreviation
+
+	- moved DIAGNOSTICS chapter in Pod and Pod2 produced man-pages
+	  to after the DETAILS chapter, which is more conformant to
+	  unix manpages.
+
+	- POD.TAIL renamed to PODTAIL.txt, PM.HEAD renamed to PMHEAD.txt,
+	  both for Windows portability.
+
+	Improvements:
+
+	- in added comment for pm, the copyright and contrib information
+	  split to have both their own line: was often too wide together.
+
+	- new option --test / -t  which will not move the distribution
+	  and its raw counterpart to the final location.
+
+	- Empty "Defined in" columns in option lists are removed
+
+	- Html will show boundary around option list, to distiguish it
+	  cleared from the other method documentation.
+
+	- Package HTML with HTML_PACKAGE/--html-package options in
+	  oodist.
+
+version 0.98: Tue Dec 19 13:45:40 CET 2006
+
+	Fixes:
+
+	- oodist: do not attempt to create HTML if the templates do
+	  no exist.
+
+	Improvements:
+
+	- oodist: firstyear can be more complex.
+
+	- oodist: little work-around with OODOC_VERSION variable to
+	  be able to use raw OODoc version in private development
+	  environment.
+
+	- produced pod will have superfluous blank lines removed.
+
+version 0.97: Wed Dec 13 14:40:19 CET 2006
+
+	Fixes:
+
+	- Each resulting pm file had a # before the first character.
+
+version 0.96: Mon Dec 11 15:19:12 CET 2006
+
+	Fixes:
+
+	- No "die" but "warn" when a module which is investigated
+	  for docs contains errors or croaks in the code.
+
+	Improvements:
+
+	- Now also reports counts of documented options.
+
+	- added bin/oodist, which avoids the need to write an own script
+	  to produce real POD.
+
+	- use oodist for OODoc, which make mkdist/mkdoc as expired
+	  examples.
+
+	- created README which contains README.examples.
+
+	- check for "code accidentally captured in pod" made more
+	  selective.
+
+	- add a 'notice' to all stripped pm files.
+
+version 0.95: Tue Sep 26 13:18:49 CEST 2006
+
+	Fixes:
+
+	- Again, the solution with podlators logic doesn't work on
+	  all formatters.  Now I really got fed-up and made a markup
+	  cleaner (tested in t/10nomarkup.t).
+	  Thanks to [Slavan Rezic] for the investigations.
+
+	Improvements:
+
+	- Test the useability of all OODoc pm's in t/00work.t.
+
+version 0.94: Mon Sep 18 10:54:39 CEST 2006
+
+	Fixes:
+
+	- tables now created with S<< >>, avoiding the use of a Pod::Man
+	  bug.  Requires podlators 2.0.5
+
+version 0.93: Wed Jul 26 12:10:08 CEST 2006
+
+	Fixes:
+
+	- forgot to include examples/markov.pm in the MANIFEST
+
+	- Pod2 formatter did by default not include the FUNCTIONS chapter.
+
+	- Pod2 did not always add a blank line before pod-start.
+
+	Improvements:
+
+	- in Inheritance list, use 'is an' iso 'is a' before vowel
+
+version 0.92: Tue Jul 25 10:50:11 CEST 2006
+
+	Fixes:
+
+	- quite a number of typos in the docs.
+
+	- option lists in produced pod had many blanks at the end of each
+	  line because of superflous padding.
+
+	- Pod::Man bug will cause verbatim text not to be scanned for
+	  C<> and friends unless connected to a non-verbatim block.
+	  Now, this is avoided for the option-list.
+
+	Improvements:
+
+	- test of module existence (when used in M<>) has changed, to
+	  be more understandible.
+
+	- improved doc in OODoc and OODoc::Parser
+
+	- adding "in scope of $pkg" to error message about missing NAME
+	  chapter.
+
+	- added examples/markov.pm, as a kind of explenatory template
+	  for the Markov parser, on request by [Pete Stein]
+
+
+version 0.91: Fri May 20 10:45:37 CEST 2005
+
+	Fixes:
+
+	- in OODoc/Format/Pod.pm, $show->Apppend has one 'p' to many.
+	  [Pontus Bergöö and Carl Humphrey]
+
+version 0.90: Tue Aug 24 09:26:52 CEST 2004
+
+	Fixes:
+
+	- Inheritance in HTML didn't remove <pre> when using multiple
+	  inheritance.
+
+	- =option with missing default crashed.
+
+	Improvements:
+
+	- The 'version' file can contain complex strings, like
+	     $VERSION = '0.0.2'
+	  The first sequence of digits and dots is taken.
+
+	- Abbreviated some of the error messages.
+
+	- options, sections and subroutines do understand most of
+	  multiple inheritance.
+
+version 0.10: Wed Jan 21 09:48:08 CET 2004
+
+	Fixes:
+
+	- Packages without manuals are skipped.
+
+	- Text::MagicTemplate has been renamed to Template::Magic::HTML
+
+version 0.09: Tue Sep 30 09:59:06 CEST 2003
+
+	Fixes:
+
+	- Text::MagicTemplate 2.11 destroys the template which is passed
+	  to output(), so we need to make a copy first.
+
+version 0.08: Mon Sep  8 17:12:02 CEST 2003
+
+	Fixes:
+
+	- Adapted to Text::MagicTemplate release 2.11, which is not
+	  compatible with older versions :-(
+
+	- OODoc::Format::Pod(2) could not format =function
+ 
+	- When the same distribution was created for the second time
+	  in a row, some files could be missing from the MANIFEST.
+
+	Improvements:
+
+	- Added Object::Realize::Later to the examples (orl.tar.gz).
+	  It can't get any simpler.
+
+	- Added Bundle::Text::MagicTemplate to the pre-requisits
+
+version 0.07: Tue Jul 29 14:06:38 CEST 2003
+
+	Fixes:
+
+	- OODoc::Parser::Markov will add target=_blank to links produced
+	  from L<http://>
+
+	- OODoc::Parser::Markov does not change < into &lt; within
+	  =for :html and =begin :html
+
+	Improvements:
+
+	- Moved all modules into lib/
+
+	- Added everything what is needed to merge the documentation of
+	  multiple modules (especially useful to produce one huge HTML
+	  version of related modules)
+
+	- The version for the distribution is automatically taken from
+	  a file named version or VERSION in the source directory of the
+	  files.
+
+	- L<> links in verbatim for pod is replaced by text, because
+	  most podlaters do not know better.
+
+	- The example of OODoc use with MailBox shows how to combine
+	  multiple modules into one doc tree.
+
+version 0.06: Sun Jul  6 19:44:23 CEST 2003
+
+	Fixes:
+
+	- OODoc::Parser::Markov mutulated ampersants in the HTML output:
+          was: & --> \amp;    became:   & --> \&amp;
+
+	- filenames in MANIFEST file made relative to that file
+
+	- make head1 really equivalent to chapter
+
+	- OODoc::Parser::Markov does add blank lines to output POD if
+	  the author did not include them around pod statements.  Superfluous
+	  blanks are removed.
+
+	Improvements:
+
+	- OODoc::Format::Html copies mode of template file.
+
+	- Included Mail::Box example set-up, which will grow to become
+	  the most complicated demonstration of possibilities.
+
+	- Support of L<> in OODoc::Parser::Markov with all features
+	  defined by perlpod.
+
+	- $chapter->findEntry looks for chapters, sections, subsections
+	  with a certain name: an index entry.
+
+	- Implemented =begin/=end understanding for OODoc/Parser/Markov
+	  for both Html as Pod formatters.
+
+	- Implemented =for understanding for OODoc/Parser/Markov
+	  for both Html as Pod formatters.
+
+	- Implemented =begin :html and =for :html understanding for
+	  OODoc/Parser/Markov, for both Html as Pod formatters.
+
+	- The example of MailBox is much more complex, now more than
+	  one distribution is included into MailBox's html website.
+
+version 0.05: Tue May  6 12:19:17 CEST 2003
+
+	The Markov parser syntax has not changed, but nearly everything
+	else did.
+
+	Improvements:
+	- Many improvements in the produced HTML, especially when
+	  more than one manual page is produced for a single packages
+	  OODoc is now able to produce Mail::Box documentation, which
+	  is huge and complex.
+	- Added examples/mimetypes.tar.gz as very simple set-up
+
+version 0.04: Thu May  1 13:25:37 CEST 2003
+
+	Improvements:
+	- Producing HTML
+	- Added examples/oodoc.tar.gz and accompanying files
+	- Renamed OODoc::Format::PodTemplate into OODoc::Format::Pod2,
+	  because there may be more template based formatters into POD
+	  later.
+
+version 0.03: Wed Apr  2 14:47:00 CEST 2003
+
+	Improvements:
+	- Added OODoc::Format::PodTemplate
+	- Minor reorderings in OODoc::Format::Pod
+
+version 0.02: Tue Apr  1 13:52:33 CEST 2003
+
+	Improvements:
+	- handling of format_options
+	- appending text to POD
+	- documentation about POD configuration
+
+version 0.01: March 30, 2003
+
+	Initial implementation

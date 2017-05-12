@@ -1,0 +1,126 @@
+=head1 NAME
+
+B<ospfd2yaml> - convert OpenBSD B<ospfd> or B<ospf6d> LSDB to YAML file
+
+=head1 SYNOPSIS
+
+B<ospfd2yaml>
+[B<-B> F<boundary>]
+[B<-E> F<external>]
+[B<-h>]
+[B<-H> I<user@host>]
+[B<-I> F<selfid>]
+[B<-N> F<network>]
+[B<-R> F<router>]
+[B<-S> F<summary>]
+[F<ospf.yaml>]
+
+=head1 DESCRIPTION
+
+B<ospfd2yaml> takes the OSPF link state database of the OpenBSD
+B<ospfd> or B<ospf6d> and converts it into a YAML file.
+
+The several input files containing the LSDB can be passed via command
+line.
+If a file is not given, the B<ospfctl> or B<ospf6ctl> command line
+tool is invoked on the local machine to gather the information
+dynamically.
+For that the user must be I<root> or in group I<wheel> to access
+the F<ospfd.sock> or F<ospf6d.sock>.
+If necessary B<sudo> is used for calling B<ospfctl> or B<ospf6ctl>
+to gain privileges.
+
+Optionally one output file can be given on command line, otherwise
+stdout is used.
+
+The options are as follows:
+
+=over 4
+
+=item B<-4>
+
+Use B<ospfd> and B<ospfctl> as input for the OSPF v2 database.
+This is the default.
+
+=item B<-6>
+
+Use B<ospf6d> and B<ospf6ctl> as input for the OSPF v3 database.
+
+=item B<-B> F<boundary>
+
+File describing the AS boundary routers summary-LSAs.
+It can be obtained with B<ospfctl show database asbr>.
+
+=item B<-E> F<external>
+
+File describing the AS-external-LSAs.
+It can be obtained with B<ospfctl show database external>.
+
+=item B<-h>
+
+Show help message and exit.
+
+=item B<-H> I<user@host>
+
+The specified user and host are used for ssh login and run B<ospfctl>
+there.
+
+=item B<-I> F<selfid>
+
+File describing the router from witch the LSDB has been taken.
+It can be obtained with B<ospfctl show summary>.
+
+=item B<-L> F<link>
+
+File describing the Link-LSAs.
+It can be obtained with B<ospf6ctl show database link>.
+This option may only be used with B<-6>.
+
+=item B<-N> F<network>
+
+File describing the network-LSAs.
+It can be obtained with B<ospfctl show database network>.
+
+=item B<-P> F<intra>
+
+File describing the Intra-Area-Prefix-LSAs.
+It can be obtained with B<ospf6ctl show database intra>.
+This option may only be used with B<-6>.
+
+=item B<-R> F<router>
+
+File describing the router-LSAs.
+It can be obtained with B<ospfctl show database router>.
+
+=item B<-S> F<summary>
+
+File describing the network summary-LSAs.
+It can be obtained with B<ospfctl show database summary>.
+
+=back
+
+=head1 EXAMPLES
+
+ ospfd2yaml | ospf2dot | dot
+
+=head1 DIAGNOSTICS
+
+The program dies if an error occurs.
+Typical errors are B<ospfctl> or B<ospf6ctl> failure or parsing
+errors of the LSDB files.
+
+=head1 SEE ALSO
+
+L<OSPF::LSDB::ospfd>,
+L<OSPF::LSDB::ospf6d>,
+L<OSPF::LSDB::YAML>,
+L<OSPF::LSDB>
+
+L<ospf2dot>
+
+ospfctl(8),
+ospf6ctl(8)
+
+=head1 AUTHOR
+
+Alexander Bluhm

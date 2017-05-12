@@ -1,0 +1,8 @@
+Revision history for Object::Attribute::Cached
+
+1.00  Sat Sep  3 22:07:52 UTC 2005
+	- Tidy documentation of using a list or hash as an attribute.
+
+0.92  Tue Nov  4 17:41:34 GMT 2003
+	- first CPAN version
+

@@ -1,0 +1,16 @@
+[% INCLUDE header.tt %]
+[% INCLUDE banner.tt %]
+<div id="content">
+[% INCLUDE navbar.tt %]
+<div id="maincontent">
+<h2>Search Results for [% search_terms %]</h2>
+		<p>
+		[% num_results %] pages found:
+		</p>
+		<ul>
+		[% FOREACH hit = results %]
+			<li><a href="[% cgi_url %]?[% hit.url %]">[% hit.title %]</a></li>
+		[% END %]
+		</ul></td>
+</div>
+[% INCLUDE footer.tt %]

@@ -1,0 +1,15 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Object-Deadly
+version:      0.09
+version_from: lib/Object/Deadly.pm
+installdirs:  site
+requires:
+    Carp::Clan:                    5.4
+    Devel::StackTrace:             0
+    Devel::Symdump:                0
+    Scalar::Util:                  0
+    Test::Exception:               0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

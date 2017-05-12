@@ -1,0 +1,63 @@
+pkgname: perl
+name: Perl
+description: Perl
+version: 5.14.4
+homepage: http://www.perl.org/
+url: http://www.cpan.org/src/5.0/perl-5.14.4.tar.gz
+sha1: 2fdbbf39b3bbd79e42a7cf42fc05bf9891f077a1
+md5: d2648c500f3169ab754bbfb30731fbe4
+prefix: /opt/sf/perl
+
+build: |
+  ./Configure -de \
+    -Dprefix=[% PREFIX %] \
+    -Dldflags="-L/usr/sfw/lib -L/usr/ccs/bin -L/usr/lib" \
+    -Dccflags="-I/usr/sfw/include" \
+    -Dlibpth="/usr/sfw/lib /usr/lib /usr/ccs/lib"
+  make
+  make install DESTDIR=[% FAKEROOT %]
+
+maintainer:
+  author: James F Wilkus
+  email: jfwilkus@cpan.org
+  nickname: jfwilkus
+
+prune:
+  files:
+    - bin/a2p
+    - bin/c2ph
+    - bin/config_data
+    - bin/corelist
+    - bin/cpan2dist
+    - bin/cpanp
+    - bin/cpanp-run-perl
+    - bin/dprofpp
+    - bin/enc2xs
+    - bin/find2perl
+    - bin/h2ph
+    - bin/h2xs
+    - bin/instmodsh
+    - bin/json_pp
+    - bin/libnetcfg
+    - bin/perlbug
+    - bin/perlivp
+    - bin/perlthanks
+    - bin/piconv
+    - bin/pl2pm
+    - bin/pod2html
+    - bin/pod2latex
+    - bin/pod2man
+    - bin/pod2text
+    - bin/pod2usage
+    - bin/podchecker
+    - bin/podselect
+    - bin/psed
+    - bin/pstruct
+    - bin/ptar
+    - bin/ptardiff
+    - bin/ptargrep
+    - bin/s2p
+    - bin/shasum
+    - bin/splain
+    - bin/xsubpp
+

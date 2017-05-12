@@ -1,0 +1,10 @@
+[%- USE CGI -%]
+[% INCLUDE header.tt %]
+
+<h1>ERROR</h1>
+
+[% CGI.escapeHTML(message) | html_para %]
+
+<a href="[% return_url %]">Click here to return and try again.</a>
+
+[% INCLUDE footer.tt %]

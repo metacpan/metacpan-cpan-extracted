@@ -1,0 +1,6 @@
+Revision history for Perl extension Oracle::Trace.
+
+0.01  Wed Dec 17 15:50:13 2003
+	- original version; created by h2xs 1.23 with options
+		-X -A -n Oracle::Trace
+

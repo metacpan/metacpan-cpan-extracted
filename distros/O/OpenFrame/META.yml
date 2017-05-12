@@ -1,0 +1,17 @@
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         OpenFrame
+version:      3.05
+version_from: lib/OpenFrame.pm
+installdirs:  site
+requires:
+    File::Temp:                    0.01
+    Pipeline:                      2.00
+    Test::Simple:                  0.01
+    IO::Null:                      0.01
+    HTTP::Request:                 0.01
+    File::Type:                    0.01
+    Test::More:                    0.01
+    CGI::Cookie:                   0.01
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.12

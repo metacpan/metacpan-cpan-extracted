@@ -1,0 +1,292 @@
+format-version: 1.4
+date: 09:02:2007 13:57
+saved-by: vlmir
+auto-generated-by: ONTO-PERL 1.29
+default-namespace: test_ontology
+subsetdef: goslim_candida "Candida GO slim"
+subsetdef: goslim_generic "Generic GO slim"
+subsetdef: goslim_goa "GOA and proteome slim"
+subsetdef: goslim_pir "PIR GO slim"
+subsetdef: goslim_plant "Plant GO slim"
+subsetdef: goslim_yeast "Yeast GO slim"
+subsetdef: gosubset_prok "Prokaryotic GO subset"
+subsetdef: PSI-MI_slim "Subset of PSI-MI"
+
+[Term]
+id: GRAO:0000000
+name: biological entity
+def: "A biological process or continuant." [GRAO:vm]
+synonym: "biological-entity" EXACT [GRAO:vm]
+
+[Term]
+id: GRAO:0000001
+name: biological continuant
+def: "Biological entities which endure, or continue to exist, through time while undergoing different sort of changes, including changes of place." [PMID:15892874, GRAO:vm]
+synonym: "biological endurant" EXACT [PMID:15892874]
+synonym: "biological thing" BROAD [PMID:15892874]
+is_a: GRAO:0000000 ! biological entity
+
+[Term]
+id: GRAO:0000002
+name: biological process
+def: "Biological entities that unfold themselves in successive temporal phases." [PMID:15892874, GRAO:vm]
+synonym: "biological ocurrent" BROAD [PMID:15892874]
+synonym: "biological perdurant" EXACT [PMID:15892874]
+is_a: GRAO:0000000 ! biological entity
+disjoint_from: GRAO:0000001 ! biological continuant
+
+[Term]
+id: GRAO:0000003
+name: gene
+def: "Each of the units of heredity which (except for polygenes) may be regarded as the controlling agents in the expression of single phenotypic characters and are usually segments of a chromosome at fixed positions relative to each other." [http://www.oed.com, GRAO:ea]
+is_a: GRAO:0000001 ! biological continuant
+
+[Term]
+id: GRAO:0000004
+name: gene product
+def: "A gene product, such as a protein, or transcript, ocurring in, or formed by, living systems." [GRAO:vm]
+is_a: GRAO:0000001 ! biological continuant
+
+[Term]
+id: GRAO:0000005
+name: protein
+def: "Proteins are polymeric macromolecules composed of one or more long chains of amino acids linked by peptide bonds, usually coiled and folded into complex globular or fibrous structures." [http://www.oed.com, GRAO:ea]
+is_a: GRAO:0000004 ! gene product
+
+[Term]
+id: GRAO:0000006
+name: modified protein
+def: "A protein which underwent any sort of post-tranlational modification (e.g. phosphorylation)" [GRAO:vm]
+is_a: GRAO:0000005 ! protein
+
+[Term]
+id: GRAO:0000007
+name: kegg_cluster
+def: "A cluster of ortholgous genes/proteins." [GRAO:vm]
+is_a: GRAO:0000001 ! biological continuant
+
+[Term]
+id: GRAO:0000008
+name: kegg_pathway
+def: "A biochemical pathway." [GRAO:vm]
+is_a: GRAO:0000001 ! biological continuant
+
+[Term]
+id: NCBI:9606
+name: Homo sapiens
+is_a: GRAO:0000001 ! biological continuant
+
+[Term]
+id: NCBI:10090
+name: Mus musculus
+is_a: GRAO:0000001 ! biological continuant
+
+[Term]
+id: NCBI:10116
+name: Rattus norvegicus
+is_a: GRAO:0000001 ! biological continuant
+
+[Term]
+id: NCBI:4896
+name: Schizosaccharomyces pombe
+is_a: GRAO:0000001 ! biological continuant
+
+[Term]
+id: UniProtKB:O14460
+is_a: GRAO:0000005 ! protein
+relationship: has_source NCBI:4896 ! Schizosaccharomyces pombe
+
+[Term]
+id: GO:0033217
+name: regulation of transcription from RNA polymerase II promoter in response to iron ion starvation
+namespace: biological_process
+def: "Modulation of the frequency, rate or extent of transcription from an RNA polymerase II promoter as a result of a stimulus indicating the organism is deprived of iron ions." [GOC:mah]
+synonym: "regulation of transcription from RNA polymerase II promoter in response to iron deficiency" EXACT []
+is_a: GRAO:0000002 ! biological process
+
+[Term]
+id: GO:0005783
+name: endoplasmic reticulum
+namespace: cellular_component
+def: "The irregular network of unit membranes, visible only by electron microscopy, that occurs in the cytoplasm of many eukaryotic cells. The membranes form a complex meshwork of tubular channels, which are often expanded into slitlike cavities called cisternae. The ER takes two forms, rough (or granular), with ribosomes adhering to the outer surface, and smooth (with no ribosomes attached)." [ISBN:0198506732 "Oxford Dictionary of Biochemistry and Molecular Biology"]
+subset: goslim_candida
+subset: goslim_generic
+subset: goslim_pir
+subset: goslim_plant
+subset: goslim_yeast
+synonym: "ER" EXACT []
+xref: NIF_Subcellular:sao1036339110
+xref: Wikipedia:Endoplasmic_reticulum
+is_a: GRAO:0000001 ! biological continuant
+
+[Term]
+id: GO:0005789
+name: endoplasmic reticulum membrane
+namespace: cellular_component
+def: "The lipid bilayer surrounding the endoplasmic reticulum." [GOC:mah]
+synonym: "ER membrane" EXACT []
+is_a: GRAO:0000001 ! biological continuant
+
+[Term]
+id: GO:0016020
+name: membrane
+namespace: cellular_component
+def: "Double layer of lipid molecules that encloses all cells, and, in eukaryotes, many organelles; may be a single or double lipid bilayer; also includes associated proteins." [GOC:mah, ISBN:0815316194]
+subset: goslim_candida
+subset: goslim_goa
+subset: goslim_pir
+subset: goslim_plant
+subset: goslim_yeast
+subset: gosubset_prok
+xref: Wikipedia:Biological_membrane
+is_a: GRAO:0000001 ! biological continuant
+
+[Term]
+id: GO:0016021
+name: integral to membrane
+namespace: cellular_component
+def: "Penetrating at least one phospholipid bilayer of a membrane. May also refer to the state of being buried in the bilayer with no exposure outside the bilayer. When used to describe a protein, indicates that all or part of the peptide sequence is embedded in the membrane." [GOC:go_curators]
+subset: gosubset_prok
+synonym: "transmembrane" RELATED [GOC:mah]
+xref: Wikipedia:Transmembrane_protein
+is_a: GRAO:0000001 ! biological continuant
+
+[Term]
+id: MI:0407
+name: direct interaction
+def: "Interaction that is proven to involve only its interactors." [PMID:14755292]
+subset: PSI-MI_slim
+is_a: MI:0915 ! physical association
+
+[Term]
+id: MI:0914
+name: association
+def: "Molecules that are experimentally shown to be associated potentially by sharing just one interactor. Often associated molecules are co-purified by a pull-down or coimmunoprecipitation and share the same bait molecule." [PMID:14755292]
+subset: PSI-MI_slim
+is_a: GRAO:0000002 ! biological process
+
+[Term]
+id: MI:0915
+name: physical association
+def: "Molecules that are experimentally shown to belong to the same functional or structural complex." [PMID:14755292]
+subset: PSI-MI_slim
+is_a: MI:0914 ! association
+
+[Term]
+id: MOD:00000
+name: protein modification
+is_a: ULO:0000001 ! biological material entity
+relationship: part_of SO:0000104 ! protein
+
+[Typedef]
+id: is_a
+name: is a
+
+[Typedef]
+id: codes_for
+name: codes for
+def: "g encodes for p where g a Gene and p is a Protein." [CCO:ea]
+synonym: "encodes" EXACT [CCO:ea]
+xref: CCO_REL:codes_for
+
+[Typedef]
+id: encoded_by
+name: is encoded by
+def: "p is encoded by g where p is a Protein and g a Gene." [CCO:ea]
+synonym: "is coded by" EXACT [CCO:ea]
+synonym: "is produced by" EXACT [CCO:ea]
+xref: CCO_REL:encoded_by
+
+[Typedef]
+id: has_source
+name: has source
+def: "o has_source O where o is a gene or gene product and O an organism." [CCO:ea]
+xref: CCO_REL:has_source
+
+[Typedef]
+id: has_ortholog
+name: has ortholog
+
+[Typedef]
+id: has_coortholog
+name: has coortholog
+
+[Typedef]
+id: has_inparalog
+name: has inparalog
+
+[Typedef]
+id: has_function
+name: has function
+def: "Relation between an independent continuant and a function." [GOC:cjm]
+comment: heart has_function to-pump-blood
+is_a: bearer_of ! is bearer of
+inverse_of: function_of ! is function of
+
+[Typedef]
+id: has_participant
+name: has participant
+def: "P has_participant C if and only if: given any process p that instantiates P there is some continuant c, and some time t, such that: c instantiates C at t and c participates in p at t" [PMID:15892874]
+comment: Has_participant is a primitive instance-level relation between a process, a continuant, and a time at which the continuant participates in some way in the process. The relation obtains, for example, when this particular process of oxygen exchange across this particular alveolar membrane has_participant this particular sample of hemoglobin at this particular time.
+inverse_of: participates_in ! participates in
+
+[Typedef]
+id: located_in
+name: is located in
+def: "C located_in C' if and only if: given any c that instantiates C at a time t, there is some c' such that: c' instantiates C' at time t and c *located_in* c'. (Here *located_in* is the instance-level location relation.)" [PMID:15892874]
+comment: Location as a relation between instances: The primitive instance-level relation c located_in r at t reflects the fact that each continuant is at any given time associated with exactly one spatial region, namely its exact location. Following we can use this relation to define a further instance-level location relation - not between a continuant and the region which it exactly occupies, but rather between one continuant and another. c is located in c1, in this sense, whenever the spatial region occupied by c is part_of the spatial region occupied by c1.    Note that this relation comprehends both the relation of exact location between one continuant and another which obtains when r and r1 are identical (for example, when a portion of fluid exactly fills a cavity), as well as those sorts of inexact location relations which obtain, for example, between brain and head or between ovum and uterus
+is_reflexive: true
+is_transitive: true
+is_a: overlapped_by ! is overlapped by
+holds_over_chain: contained_in located_in
+holds_over_chain: located_in contained_in
+holds_over_chain: located_in part_of
+holds_over_chain: part_of located_in
+
+[Typedef]
+id: participates_in
+name: participates in
+inverse_of: has_participant ! has participant
+holds_over_chain: participates_in part_of
+
+[Typedef]
+id: transformation_of
+name: is transformation of
+def: "Relation between two classes, in which instances retain their identity yet change their classification by virtue of some kind of transformation. Formally: C transformation_of C' if and only if given any c and any t, if c instantiates C at time t, then for some t', c instantiates C' at t' and t' earlier t, and there is no t2 such that c instantiates C at t2 and c instantiates C' at t2." [PMID:15892874]
+comment: When an embryonic oenocyte (a type of insect cell) is transformed into a larval oenocyte, one and the same continuant entity preserves its identity while instantiating distinct classes at distinct times. The class-level relation transformation_of obtains between continuant classes C and C1 wherever each instance of the class C is such as to have existed at some earlier time as an instance of the distinct class C1 (see Figure 2 in paper). This relation is illustrated first of all at the molecular level of granularity by the relation between mature RNA and the pre-RNA from which it is processed, or between (UV-induced) thymine-dimer and thymine dinucleotide. At coarser levels of granularity it is illustrated by the transformations involved in the creation of red blood cells, for example, from reticulocyte to erythrocyte, and by processes of development, for example, from larva to pupa, or from (post-gastrular) embryo to fetus or from child to adult. It is also manifest in pathological transformations, for example, of normal colon into carcinomatous colon. In each such case, one and the same continuant entity instantiates distinct classes at different times in virtue of phenotypic changes.
+is_transitive: true
+inverse_of: transforms_into ! transforms into
+
+[Typedef]
+id: transforms_into
+name: transforms into
+xref: CCO_REL:transforms_into
+inverse_of: transformation_of ! is transformation of
+
+[Typedef]
+id: part_of_cluster
+name: part of cluster
+
+[Typedef]
+id: participates_in_pathway
+name: participates in pathway
+
+[Typedef]
+id: part_of
+name: part of
+
+[Typedef]
+id: function_of
+name: function of
+
+[Typedef]
+id: bearer_of
+name: bearer of
+
+[Typedef]
+id: contained_in
+name: contained in
+
+[Typedef]
+id: overlapped_by
+name: overlapped by

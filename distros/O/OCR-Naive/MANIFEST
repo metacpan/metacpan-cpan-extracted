@@ -1,0 +1,14 @@
+Naive.pm
+Changes
+MANIFEST
+Makefile.PL
+README
+bin/ocr
+bin/makedict
+t/01_load.t
+t/98_pod.t
+t/99_pod_coverage.t
+examples/dict
+examples/vim.png
+examples/xterm.png
+META.yml                                 Module meta-data (added by MakeMaker)

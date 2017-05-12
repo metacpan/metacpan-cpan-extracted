@@ -1,0 +1,5 @@
+dzil:
+  build: .
+  command: test
+  volumes:
+    - .:/dist/

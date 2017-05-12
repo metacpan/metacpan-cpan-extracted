@@ -1,0 +1,4 @@
+---
+- 'dbi:Pg:dbname=test'
+- test
+- test

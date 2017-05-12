@@ -1,0 +1,975 @@
+=head1	NAME
+
+ODF::lpOD::Document - General ODF package handling and metadata
+
+=head1  DESCRIPTION
+
+This manual page describes the C<odf_document>, the common features of any
+C<odf_part> of a C<odf_document>, and the particular features of the
+C<odf_meta> and C<odf_manifest> parts (that handle the global document metadata
+and the manifest of the associated container).
+
+Every C<odf_document> is associated with a C<odf_container> that encapsulates
+all the physical access logic. On the other hand, every C<odf_document> is
+made of several components so-called I<parts>. The lpOD API is mainly focused
+on parts that describe the global metadata, the text content, the layout and
+the structure of the document, and that are physically stored according to an
+XML schema. The common lpOD class for these parts is C<odf_xmlpart> (whose Perl
+implementation is the C<ODF::lpOD::XMLPart> package).
+
+lpOD provides specialized classes for the conventional ODF XML parts, namely
+C<odf_meta>, C<odf_content>, C<odf_styles>, C<odf_settings>, C<odf_manifest>.
+
+In order to process particular pieces of content in the most complex parts,
+i.e. C<odf_content> and C<odf_styles>, the C<odf_element> class and its various
+specialized derivatives are available. They are described in other chapters of
+the lpOD documentation.
+
+=head1  Document initialization and termination
+
+Any access to a document requires a valid C<odf_document> instance, that may be
+created from an existing document or from scratch, using one of the constructors
+introduced below. Once created, this instance gives access to individual parts
+through the C<get_part()> method.
+
+Knowing that the API is object oriented, a document instance initialization is
+done through a C<odf_document->new()> class method; however, lpOD provides a
+functional wrapper for each use case of this method.
+
+=head3  odf_create_document(doc_type)
+
+See C<odf_new_document(doc_type)>.
+
+=head3  odf_get_document(uri)
+
+This function creates a read-write document instance from an existing resource
+(i.e. a physical, local or remote, ODF file). The returned object is
+associated to the ODF resource, which may be updated. The required argument is
+the URI (or file path) of the resource.
+
+Example:
+
+        my $doc = odf_get_document("C:\MyDocuments\test.odt");
+
+If the C<save> method of C<odf_document> is later used without explicit target,
+the document is wrote back to the same resource (if this resource is not
+read-only).
+
+Alternatively, the argument may be a C<IO::File> corresponding to an open,
+seekable file handle:
+
+        my $fh = IO::File->new("test.odt", "r");
+        my $doc = odf_get_document($fh);
+
+=head3  odf_new_document_from_template(uri)
+
+Same as C<odf_get_document>, but the ODF resource is used in read only mode,
+i.e. it's used as a template in order to generate other ODF physical documents.
+
+Some metadata of the new document are initialized to the following values:
+
+=over
+
+=item
+
+the creation and modification dates are set to the current date;
+
+=item
+
+the creator and initial creator are set to the owner of the current process
+as reported by the operating system (if this information is available);
+
+=item
+
+the number of editing cycles is set to 1;
+
+=item
+
+the "ODF::lpOD" string followed by the lpOD version number is used as the
+generator identifier string;
+
+=back
+
+Each piece of metadata may be changed later by the application.
+
+=head3  odf_new_document(doc_type)
+
+Unlike other constructors, this one generates a C<odf_document> instance from
+scratch. Technically, it's a variant of C<odf_new_document_from_template>, but
+the default template (provided with the lpOD library) is used. The required
+argument specifies the document type, that must be C<'text'>, C<'spreadsheet'>,
+C<'presentation'>, or C<'drawing'>. The new document instance is not persistent;
+no file is created before an explicit use of the C<save> method.
+
+The following example creates a spreadsheet document instance:
+
+        my $doc = odf_new_document('spreadsheet');
+
+Note that the instructions below are equivalent:
+
+        my $doc = odf_create_document('spreadsheet');
+        my $doc = odf_document->create('spreadsheet');
+
+The real content of the instance depends on the default template.
+
+A set of valid template ODF files is transparently installed with the standard
+lpOD distribution. Advanced users may use their own template files. To do so,
+they have to replace the ODF files present in the C<templates> sub directory of
+the lpOD installation; the path to the lpOD installation may be retrieved
+through the lpod->installation_path common function. The user-provided template
+files must have the same names.
+
+Some metadata are initialized in the same way as with
+C<odf_new_document_from_template>.
+
+=head3  Document instance termination
+
+In a long running process, as soon as a document instance is no longer used,
+it's strongly recommended to issue an explicit call to its C<forget()>
+method. Without explicit destructor call, the allocated memory is not
+automatically released when the object goes out of scope. This functional
+constraint comes mainly from deliberately implemented circular references that
+allow the applications to navigate back and forth between objects through
+direct links.
+
+=head1  Document MIME type check and control
+
+=head3  get_mimetype
+
+Returns the MIME type of the document (i.e. the full string that identifies
+the document type). An example of regular ODF MIME type is:
+
+        application/vnd.oasis.opendocument.text
+
+=head3  set_mimetype(new_mimetype)
+
+Allows the user to force a new arbitrary MIME type (not to use in ordinary
+lpOD applications !).
+
+=head1  Access to individual document parts
+
+=head3  get_part(name [options])
+
+Generic C<odf_document> method allowing access to any I<part> of a previously
+created document instance, including parts that are not handled by lpOD.
+The lpOD library provides symbolic constants that represent the ODF usual
+XML parts: C<CONTENT>, C<STYLES>, C<META>, C<MANIFEST>, C<SETTINGS>.
+
+This instruction returns the I<CONTENT> part of a document as a C<odf_content>
+object:
+
+        $content = $document->get_part(CONTENT);
+
+With C<MIMETYPE> as argument, C<get_part()> returns the MIME type of the
+document as a text string, i.e. the same result as C<get_mimetype()>.
+
+Note that C<get_part(CONTENT)> may be replaced by the C<content()> accessor,
+so the short form of the instruction above is:
+
+        $content = $document->content;
+
+The parts are loaded for read-write use by default. However, a C<update>
+boolean option may be provided; if set to C<FALSE>, this option instructs
+lpOD that the loaded part will not be persistently changed. In such case, the
+part is not really in "read-only" mode, knowing that the user can always
+insert, update or delete any element, but the changes regarding this part are
+not committed in the ODF file when the C<save()> method is used. However, the
+user can make an XML export reflecting these changes at any time through the
+part-based C<serialize()> method.
+
+For special purposes with XML parts, get_part() may be called with optional
+C<handlers> and/or C<roots> parameters that specify a custom behavior during
+the parsing time, before the full document availability. These parameters are
+respectively linked to the C<twig_handlers> and C<twig_roots> options of the
+underlying XML::Twig API, so you can find details about them in the
+L<XML::Twig> documentation. The value of each one must be a hash reference
+whose keys are XML tags and values are user-defined function references.
+
+The given handlers are triggered each time the corresponding XML tags are found
+by the XML parser when the part is loaded, before any other processing. As an
+example, the following sequence displays the total number of paragraphs found
+in a document content, knowing that 'text:p' is the ODF tag for paragraphs:
+
+        my $doc = odf_get_document($filename);
+        my $count = 0;
+        my $content = $doc->get_part(
+                CONTENT,
+                handlers    => {
+                    'text:p'    => sub { $count++ }
+                    }
+                );
+        say "This document contains $count paragraphs";
+
+Of course there are more user-friendly ways to count objects once the document
+part is loaded, and this feature is probably not needed in most cases. However,
+it's the most efficient way to process elements "on the fly" in huge documents.
+
+Note that the C<handlers> option works only when the document part is loaded
+for the first time. So, in the following sequence, it will not work because
+the C<CONTENT> part is implicitly and automatically loaded and parsed by
+C<get_body()> (knowing that the I<body> context is located inside the
+C<CONTENT>):
+
+        sub process_paragraph   { say "Hello paragraph !" }
+        $doc = odf_document->get($filename);
+        $context = $doc->get_body;
+        $content = $doc->get_part(
+                CONTENT,
+                handlers        => {
+                        'text:p'   => \&process_paragraph
+                        }
+                );
+
+The user-defined callback function receives 2 arguments. The first one is the
+XML::Twig instance internally used by lpOD to handle the XML part (you can
+ignore it as long as you work with ODF::lpOD documented features only). The
+second one is the parsed ODF element itself.
+
+Remember that every key in the handlers hash may be a quoted regexp in order
+to provide more flexibility. If, in the code example above, C<'text:p'> is
+replaced by C<qr'text:(p|h)'>, then the corresponding handler is triggered for
+paragraphs and headings (knowing that 'text:h' is the ODF tag for headings).
+
+The C<roots> option produces a more drastic effect. If this option is set,
+C<get_part()> ignores any XML content outside of the given roots (with the
+exception of the root element of the XML part). As an example, the instruction
+below instructs C<get_part()> to load the I<'office:automatic-styles'> element
+only in the C<CONTENT> part:
+
+        my $content = $doc->get_part(
+                CONTENT,
+                roots   => {
+                    'office:automatic-styles' => TRUE
+                    }
+                );
+
+In the example above, a specified root tag is specified with an associated
+C<TRUE> value. The given value may be a user-defined function as well; if so,
+the given function is triggered each time the given XML tag is processed, in
+the same way as with the C<handler> option. The next example illustrates the
+fastest way to parse a large document just to extract and display its headings
+(i.e. the I<'text:h'> elements), without any other processing (this code, with
+some more output presentation sugar, could be used in order to quickly export
+a table of content):
+
+        sub say_heading_text {
+                my ($twig, $heading) = @_;
+                say $heading->get_text;
+                }
+
+        $doc->get_part(
+                CONTENT,
+                roots   => {
+                        'text:h' => \&say_heading_text
+                        }
+                );
+
+Remember that, after such a sequence, the loaded content includes only the
+root element and the I<'text:h'> elements.
+
+The C<roots> option allows the applications to avoid performance issues when
+they just need to get a read-only access to particular portions of huge
+documents. On the other hand, this option should not be used when the part is
+loaded for update, because it would produce truncated and inconsistent
+documents. So, as soon as C<roots> is set, the default value of the C<update>
+option is silently set to C<FALSE> (but the user can explicitly set this option
+to C<TRUE>... and live with the consequences).
+
+Caution: These options work only with a previously existing document, and if
+the given part has not been already loaded.
+
+C<get_part()> may be used in order to get any other document part, such as an
+image or any other non-XML part. To do so, the real path of the needed part
+must be specified instead of one of the XML part symbolic names. As an example,
+the instruction below returns the binary content of an image:
+
+        $img = $document->get_part('Pictures/logo.jpg');
+
+In such a case, the method returns the data as an uninterpreted sequence of
+bytes.
+
+(Remember that images files included in an ODF package are stored in a
+C<Pictures> folder.)
+
+Returns C<undef> if case of failure.
+
+There is a shortcut for C<get_part()> for each part in C<CONTENT>, C<STYLES>,
+C<META>, and C<MANIFEST>, that is an accessor whose name is the part name in
+lower case. It's just syntactic sugar. As an example, the two following
+instruction are equivalent:
+
+        $part = $doc->get_part(CONTENT);
+        $part = $doc->content;
+
+A special C<get_body()> or C<body()> accessor is available. C<get_body()> is
+mainly a part-based method, introduced later, but, when called from a document
+object, it returns the body element of the C<CONTENT> part. So the four
+instructions below are equivalent:
+
+        $context = $doc->get_body;
+        $context = $doc->get_part(CONTENT)->get_body;
+        $context = $doc->content->get_body;
+        $context = $doc->body;
+
+Note that C<get_body()> may be called with an optional argument that specifies
+the type of content, typically C<'text'>, C<'spreadsheet'>, C<'presentation'>,
+or C<'drawing'>. Of course, a well-formed ODF document should contain only one
+body and its content type depends on the document type (for example the content
+type of a text document is always C<'text'>). Providing a content type to
+C<get_body()> is just a way among others to check the document type, knowing
+that this method returns C<undef> if the given content type doesn't match the
+real one. Example:
+
+        my $context = $doc->get_body('spreadsheet');
+        if ($context) {
+                # do something
+        } else {
+                alert "We are not in spreadsheet context !";
+                exit;
+        }
+
+=head3  get_parts
+
+Returns the list of the document parts.
+
+=head1  Accessing data inside a part
+
+Everything in the part is stored as a set of C<odf_element> instances. So, for
+complex parts (such as C<CONTENT>) or parts that are not explicitly covered in
+the present documentation, the applications need to get access to an "entry
+point" that is a particular element. The most used entry points are the C<root>
+and the C<body>. Every part handler provides the C<get_root()> and C<get_body()>
+methods, each one returning a C<odf_element> instance, that provides all the
+element-based features (including the creation, insertion or retrieval of other
+elements that may become in turn working contexts).
+
+For those who know the ODF XML schema, two part-based methods allow the
+selection of elements according to XPath expressions, namely C<get_element()>
+and C<get_elements()>. The first one requires an I<XPath> expression and a
+positional number; it returns the element corresponding to the given position
+in the result set of the XPath expression (if any). The second one returns
+the full result set (i.e. a list of C<odf_element> instances). For example,
+the instructions below return respectively the first paragraph and all the
+paragraphs of a part (assuming C<$part> is a previously selected document part):
+
+        my $paragraph = $part->get_element('text:p', 0);
+        my @paragraphs = $part->get_elements('text:p');
+
+Beware that such instructions should not appear in a real application,
+knowing that lpOD provides more user-friendly methods to retrieve paragraphs
+(see L<ODF::lpOD::TextElement>).
+
+Note that the position argument of C<get_element> is zero-based, and that it
+may be a negative value (if so, it specifies a position counted backward from
+the last matching element, -1 being the position of the last one).
+
+So a large part of the lpOD functionality is described with the C<odf_element>
+class, i.e. L<ODF::lpOD::Element>.
+
+=head1  Global document metadata
+
+From the handler provided by C<get_part(META)> (or C<meta()>), several pieces
+of document metadata may be directly get or set.
+
+=head2  Simple metadata accessors
+
+Most metadata are just text strings. The user may read or write each one using
+a C<get_xxx> or C<set_xxx> accessor, where "xxx" is the lpOD name of a
+particular property. The presently supported simple properties are:
+
+=over
+
+=item
+
+C<creation_date>: the date of the initial version of the document, expressed
+in ISO-8601 date format
+
+=item
+
+C<creator>: the name of the user who created the current version of the
+document
+
+=item
+
+C<description>: the long description of the document
+
+=item
+
+C<editing_cycles>: the number of edit sessions (may be regarded as a version
+number)
+
+=item
+
+C<editing_duration>: the total editing time through interactive software,
+expressed as a time delta in ISO-8601 format
+
+=item
+
+C<generator>: the signature of the application that created the document
+
+=item
+
+C<initial_creator>: the name of the user who created the first version of the
+document
+
+=item
+
+C<language>: the ISO code of the main language used in the document
+
+=item
+
+C<modification_date>: the date of the last modification (i.e. of the current
+version)
+
+=item
+
+C<subject>: the subject (or short description) of the document
+
+=item
+
+C<title>: the title of the document.
+
+=back
+
+When used without argument, some C<set> accessors may automatically set default
+values, according to the capabilities of the run time environment.
+For C<set_creation_date()> and C<set_modification_date()>, the default
+is the current system date. For C<set_creator()> and C<set_initial_creator()>,
+the default is the identifier of the current system user. For
+C<set_generator()> the default is the system name of the current program (as
+it would appear in a command line) or, if not available, the current process
+identifier. If the execution environment can't provide such information, no
+default value is provided. C<set_editing_cycles()>, without argument,
+increments the C<editing_cycles> indicator by 1.
+
+Both C<set_creation_date> and C<set_modification_date> allow the user to provide
+the date in the ODF-compliant (ISO-8601) format, or in numeric format (like the
+Perl C<time> format). In the second case, the provided time is automatically
+converted in the required format. Of course, the numeric format is more
+convenient for time calculations.
+
+The instruction below, for example, sets the modification date to one hour
+earlier than the current system time:
+
+        $meta->set_modification_date(time() - 3600);
+
+The corresponding C<get_> accessors always return the dates in their storage
+format. However, the lpOD library provides a C<numeric_date> that translates a
+regular ISO date into a Perl numeric C<time> value (a symmetric C<iso_date>
+global function translates a Perl C<time> into a ISO date).
+
+Examples of use:
+
+        $meta->set_title("The lpOD Cookbook");
+        $meta->set_creator("The lpOD Project team");
+        $meta->set_modification_date;
+        my $old_version = $meta->get_editing_cycles;
+        $meta->set_editing_cycles;
+
+=head2  Document statistics
+
+The global document statistics (as defined in the §3.1.18 of the ODF 1.1
+specification) may be get or set using the C<get_statistics> and
+C<set_statistics> accessors. The first one returns the statistic properties as
+a hash reference. The second one takes a hash reference with the same structure,
+containing the attribute names and values. The following example displays the
+page count of the document (assuming it's a text document):
+
+        my $meta = $document->meta;
+        my $stat = $meta->get_statistics;
+        say $meta->{'meta:page-count'};
+
+Note that nothing prevents the applications from using C<set_statistics> to
+set any arbitrary figure.
+
+=head2  Keywords
+
+The document metadata include a list of keywords (possibly empty). This list
+may be used or changed.
+
+=head3  get_keywords
+
+Knowing that a document may be "tagged" by one or more keywords, C<odf_meta> provides a C<get_keywords> method that returns the list of the current keywords as a comma-separated string.
+
+=head3  set_keywords(string_of_keywords)
+
+C<set_keywords> allows the user to set a full list of keywords, provided as a single comma-separated string; the provided list replaces any previously existing keyword; this method, used without argument or with an empty string, just removes all the keywords. Example:
+
+        $meta->set_keywords("ODF, OpenDocument, Python, Perl, Ruby, XML")
+
+The spaces after the commas are ignored, and it's not possible to set a keyword that contains comma(s) through C<set_keywords>.
+
+=head3  set_keyword(keyword)
+
+C<set_keyword> appends a new, given keyword to the list; it's neutral if the given keyword is already present; it allows commas in the given keyword (but we don't recommend such a practice).
+
+=head3  check_keyword(keyword)
+
+C<check_keyword> returns C<TRUE> if its argument (which may be a regular expression)
+matches an existing keyword, or C<FALSE> if the keyword is not present.
+
+=head3  remove_keyword(expression)
+
+C<remove_keyword> deletes any keyword that matches the argument (which may be a regular expression).
+
+=head2  User-defined metadata
+
+Each user-defined metadata element has a unique name (or key), a value and a data type.
+
+=head3  get_user_field(name)
+
+Retrieves a user-defined field according to its name (that should be unique for
+the document). In scalar context, returns the value of the field. In array
+context, returns the value and the data type.
+
+The regular ODF data types are C<float>, C<date>, C<time>, C<boolean>, and
+C<string>.
+
+=head3  get_user_fields
+
+The C<odf_meta> API provides a C<get_user_fields> method that returns a list
+whose each element is a hash ref whose (self-documented) keys are C<name>,
+C<value>, and C<type>.
+
+As an example, the following loop displays the name, the value and the type of
+each use field in the metadata part of a document:
+
+        my $doc = odf_get_document($source);
+        my $meta = $doc->meta;
+        foreach my $uf ($meta->get_user_fields) {
+                say "Name   " . $uf->{name} .
+                    "Value  " . $uf->{value} .
+                    "Type   " . $uf->{type}
+                }
+
+=head3  set_user_fields()
+
+Allows the applications to set or change all the user-defined items.
+Its argument is a list of hash refs with the same structure as the result of
+C<get_user_fields()>.
+
+=head3  set_user_field(name, value, type)
+
+Creates or changes a user field. The first argument is the name (identifier).
+The last argument is the data type, which must be ODF-compliant (see
+C<get_user_field>). If the type is not specified, it's default value is
+C<'string'>. If the type is C<date>, the value is automatically converted in
+ISO-8601 format if provided as a numeric C<time> value.
+
+Examples:
+
+        $meta->set_user_field("Development status", "Working draft");
+        $meta->set_user_field("Security status", "Classified");
+        $meta->set_user_field("Ready for release", FALSE, "boolean");
+
+=head1  How to persistently update a document
+
+Every part may be updated using specific methods that creates, change or remove
+elements, but this methods don't produce any persistent effect.
+
+The updates done in a given part may be either exported as an XML string, or
+returned to the C<odf_document> instance from which the part depends. With the
+first option, the user is responsible of the management of the exported XML
+(that can't be used as is through a typical office application), and the
+original document is not persistently changed. The second option instructs the
+C<odf_document> that the part has been changed and that this change should be
+reflected as soon as the physical resource is wrote back. However, a part-based
+method can't directly update the resource. The changes may be made persistent
+through a C<save()> method of the C<odf_document> object.
+
+=head3  export
+
+Same as C<serialize()>, introduced below.
+
+=head3  serialize
+
+This part-based method returns a full XML export of the part. The returned XML
+string may be stored somewhere and used later in order to create or replace a
+part in another document, or to feed another application.
+
+This method may be ignored by users who just need to save created or changed
+documents in a regular compressed ODF format, because the document-based
+C<save()> method does the whole job.
+
+A C<indent> or C<pretty> named option may be provided. If set to C<TRUE>, this
+option specifies that the XML export should be indented, so as human-readable
+as possible. The default value of this option is C<FALSE>.
+
+The example below returns a conveniently indented XML representation of the
+content part of a document:
+
+        $doc = odf_document->get("C:\MyDocuments\test.odt");
+        $part = $doc->get_part(CONTENT);
+        $xml = $part->serialize(indent => TRUE);
+
+Note that this XML export is not affected by the encoding/decoding mechanism
+that works for user content, so it's character set doesn't depend on the custom
+text output character set possibly selected through the C<set_output_charset()>
+method introduced in L<ODF::lpOD::Common>.
+
+lpOD allow the applications to export individually selected XML elements
+instead of full XML parts; to do so, a C<serialize()> or C<export()> element-
+based method is provided (see L<ODF::lpOD::Element>).
+
+=head3  store
+
+This part-based method stores the present state (possibly changed) of the part
+in a temporary, non-persistent space, waiting for the execution of the next
+call of the document-based C<save()> method.
+
+This method may be ignored by users who just need to save created or changed
+documents in a regular compressed ODF format, because the document-based
+C<save()> method does the whole job.
+
+The following example selects the C<CONTENT> part of a document, removes the
+last paragraph of this content, then sends back the changed content to the
+document, that in turn is made persistent:
+
+        $content = $document->get_part(CONTENT);
+        $p = $content->get_body->get_paragraph(-1);
+        $p->delete;
+        $content->store;
+        $document->save;
+
+Like C<serialize()>, C<store()> allows the C<pretty> option, in order
+to store human-readable XML in the file that will be generated by C<save> (for
+debugging only).
+
+Note that C<store()> doesn't write anything on a persistent storage support;
+it just instructs the C<odf_document> that this part needs to be updated.
+
+The explicit use of C<store()> to commit the changes made in an individual
+part is not mandatory. When the whole document is made persistent through the
+document-based C<save()> method, each part is automatically stored by default.
+However, this automatic storage may be deactivated using C<needs_update()>.
+
+=head3  needs_update(TRUE/FALSE)
+
+This part-based method allows the user to prevent the automatic storage of
+the part when the C<save()> method of the corresponding C<odf_document> is
+executed.
+
+As soon as a document part is used, either explicitly through the C<get_part()>
+document method or indirectly, it may be modified. By default, the document-
+based C<save()> method stores back in the container every part that may have
+been used. The user may change this default behavior using the part-based
+C<needs_update()> method, whose argument is C<TRUE> or C<FALSE>.
+
+In the example below, the application uses the C<CONTENT> and C<META> parts,
+but the C<META> part only is really updated, whatever the changes made in
+the C<CONTENT>:
+
+        $doc = odf_get_document('source.odt');
+        $content = $doc->get_part(CONTENT);
+        $meta = $doc->get_part(META)
+        #...
+        $content->needs_update(FALSE);
+        $doc->save();
+
+Note that C<needs_update(FALSE)> deactivates the automatic update only; the
+explicit use of the C<store()> part-based method remains always effective.
+
+=head3  add_file
+
+This document-based method stores an external file "as is" in the document
+container, without interpretation. The mandatory argument is the path of the
+source file, provided according to either the local file system rules or
+an URL.
+
+If the path contains a ":" and if this sign is preceded by anything other
+than a single letter, then it's regarded as a remote URL. So, as examples,
+a path that looks like "http:..." is supposed to be aimed at a distant
+resource, while "C:\...", "/xxx/yyy..." and "aaa" are supposed to specify
+local files. As soon as a resource is regarded as remote, lpOD tries to load
+it through C<LWP::Simple>, so you should read the C<LWP::Simple> documentation
+for details about the supported protocols. Beware that this module is not
+required at the ODF::lpOD installation time, and that C<add_file()> will just
+fail, without fatal error, as long as it's called with remote URLs when
+C<LWP::Simple> is not installed.
+
+Optional named parameters C<path> and C<type> are allowed; C<path> specifies
+the I<destination> path in the ODF package, while C<type> is the MIME type of the
+added resource. Note that the C<path> parameter is by no mean related to the
+source path specified by the first argument.
+
+As an example, the instruction below inserts a binary image file available
+in the current directory in the "Thumbnails" folder of the document package:
+
+        $document->add_file(
+                "http://images.somewhere/logo.png",
+                path => "Thumbnails/thumbnail.png"
+                );
+
+If the C<path> parameter is omitted, the destination folder in the package is
+either C<Pictures> if the source is identified as an image file (caution: such
+a recognition may not work with any image type in any environment) or the root
+folder.
+
+The following example creates an entry whose every property is specified:
+
+        $document->add_file(
+                "portrait.jpg",
+                path    => "Pictures/portrait.jpg",
+                type    => "image/jpeg"
+                );
+
+If the C<type> option is not provided, lpOD attempts to automatically determine
+the MIME type using C<File::Type>, provided that the file is available in the
+local file system. If the file format is not recognized, lpOD doesn't provide
+any default value, so the mime type of the resource is not registered in the
+document. Note that right MIME types are not absolutely required by typical
+ODF-compatible software but that it's a good practice to provide them when
+possible.
+
+The return value is the destination path. If the imported file is an image,
+this return value may be used as a reference each time the corresponding image
+is inserted in the document through a C<frame> (for details about the ways to
+insert image frames in documents, see L<ODF::lpOD::StructuredContainer>).
+
+This method may be used in order to import an external XML file as a replacement
+of a conventional ODF XML part without interpretation. As an example, the
+following instruction replaces the C<STYLES> part of a document by an arbitrary
+file:
+
+        $document->add_file("custom_styles.xml", path => STYLES);
+
+(For mnemonic reasons, it's possible to replace C<path> by C<part>, knowing that
+each I<part> of a document is practically identified by a I<path> in the
+physical archive.)
+
+Note that the physical effect of C<add_file()> is not immediate; the file is
+really added (and the source is really required) only when the C<save()>
+method, introduced below, is called. As a consequence, any update that could be
+done in a document part loaded using C<add_file()> is lost. According to the
+same logic, a document part loaded using C<add_file()> is never available in
+the current document instance; it becomes available if the current instance
+is made persistent through a C<save()> call and if a new instance is created
+using the saved package with C<odf_get_document>.
+
+=head3  add_image_file
+
+Specialized derivative of C<add_file()>, to be used in order to import image
+files used in the document without explicit C<type> and C<path> parameters.
+
+In scalar context, the return value is the same as C<add_file()>, so it may be
+used as the image reference in order to associate the image to a C<frame> that
+will make it visible in the document (see L<ODF::lpOD::StructuredContainer>).
+
+In array context, C<add_image_file()> returns the image reference then (if
+everything is right) the image size. This size (if defined) may be used to set
+the size of the corresponding image container in the document (see the "Frames"
+section in L<ODF::lpOD::StructuredContainer>), like in the following example:
+
+        my ($link, $size) = $doc->add_image_file('/home/images/logo.png');
+        my $frame = odf_create_image_frame($link, size => $size);
+
+However, the automatic size detection works only if the image file is
+recognized by L<Image::Size> (fortunately, the most popular formats, such as
+PNG, JPG, BMP, XPM, TIFF and others are supported).
+
+If the C<type> option is not set, lpOD attempts to determine the MIME type
+using C<File::Type>, but a specific rule applies in case of failure.
+If the type is not automatically recognized, then lpOD arbitrarily
+concatenates the suffix of the file name to the "image/" string (so if the
+source file name is "foo.jpeg" then the supposed MIME type is "image/jpeg"),
+that may hopefully provide a correct MIME type in some situations. And if
+nothing works (i.e. if there is no application-provided type, if C<File::Type>
+doesn't answer, and if there is no file suffix), then the type is set to
+"image/unknown". Users are encouraged to avoid such a result, but, fortunately,
+a wrong MIME type doesn't prevent a typical ODF-compatible office software to
+correctly render an image in a document (provided that the image format is
+really supported, that doesn't depend on lpOD).
+
+Note that it's strongly recommended to avoid any intensive use of
+C<add_image_file()> in array context, especially in long running processes
+and/or with remote resources, knowing that, in order to get the image size,
+lpOD immediately loads the file and stores it in memory. If
+C<add_image_file()> is called in scalar context, the effective file load is
+deferred until the ODF target file is generated by C<save()>.
+
+=head3  set_part
+
+Allows the user to create or replace a document part using data in memory.
+The first argument is the target ODF part, while the second one is the source
+string.
+
+=head3  del_part
+
+Deletes a part in the document package. The deletion is physically done through
+the subsequent call of C<save()>. The argument may be either the symbolic
+constant standing for a conventional ODF XML part or the real path of
+the part in the package.
+
+The following sequence replaces (without interpretation) the current document
+content part by an external content:
+
+        $document->del_part(CONTENT);
+        $document->add_file("/somewhere/stuff.xml", path => CONTENT);
+
+Note that the order of these instructions is not significant; when C<save()>
+is called, it executes all the deletions then all the part insertions and/or
+updates.
+
+=head3  save
+
+This method is provided by the C<odf_document>. If the document instance is
+associated with a regular ODF resource available for update (meaning that it
+has been created using C<odf_get_container> and that the user has a write
+access to the resource), the resource is wrote back and reflects all the
+changes previously committed by one or more document parts using their
+respective C<store> methods.
+
+The general form of a document processing sections looks like that:
+
+        $doc = odf_get_document($filepath);
+        # various document updates
+        $doc->save;
+
+As an example, the sequence below updates a ODF file according to changes made
+in the C<META> and C<CONTENT> parts:
+
+        my $doc = odf_get_document("/home/users/jmg/report.odt");
+        my $meta = $doc->get_part(META);
+        my $content = $doc->get_part(CONTENT);
+        # meta updates are made here
+        # content updates are made here
+        $document->save;
+
+The C<save()> method allows a C<pretty> option in order to get human-readable
+XML in the resulting ODF files. Warning: this feature is intended for debugging
+only and must be avoided in production, knowing that it may insert indesirable
+spaces in the text contents and increase the file size. Example:
+
+		$document->save(pretty => TRUE);
+
+The C<pretty> feature may be in some way customized through the
+XML_PRETTY_PRINT() global setting function, that allows the application to
+select a particular XML export style. The default is 'indented'; other legal
+values are 'nice', 'indented_c', 'indented_a', 'indented_close_tag', 'cvs',
+'wrapped', 'record', 'record_c', 'nsgmls' and 'none'. For details about the
+effects of each option, see C<set_pretty_print()> in L<XML::Twig>.
+
+In the following example, the XML is stored according to the 'nsgmls' style:
+
+		XML_PRETTY_PRINT('nsgmls');
+		$document->save(pretty => TRUE);
+
+An optional C<target> parameter may be provided to C<save()>. If set, this
+parameter specifies an alternative destination for the file (it produces the
+same effect as the "File/Save As" feature of a typical office software).
+The C<target> option is always allowed, but it's mandatory with C<odf_document>
+instances created using a C<odf_new_document_from...> constructor.
+
+=head1  Manifest
+
+The manifest part of a document holds the list of the files included in the
+container associated to the C<odf_document>. It's represented by a
+C<odf_manifest> object, that is a particular C<odf_xmlpart>.
+
+Each included file is represented by a C<odf_file_entry> object, whose
+properties are
+
+=over
+
+=item
+
+C<path>: full path of the file in the container;
+
+=item
+
+C<type> : the media type (or MIME type) of the file.
+
+=back
+
+=head2 Initialization
+
+A C<odf_manifest> instance is created through the C<get_part()> method of
+C<odf_document>, with C<MANIFEST> as part selector:
+
+        $manifest = $document->get_part(MANIFEST);
+
+=head2  Entry access
+
+The full list of manifest entries may be obtained using C<get_entries()>.
+
+It's possible to restrict the list with an optional C<type> parameter whose
+value is a string of a regular expression. If C<type> is set, then the method
+returns the entries whose media type string matches the given expression.
+
+As an example, the first instruction below returns the entries that correspond
+to XML parts only, while the next one returns all the XML entries, including
+those whose type is not "text/xml" (such as "application/rdf+xml"), and the
+last returns all the "image/xxx" entries (whatever the image format):
+
+        @xmlp_entries = $manifest->get_entries(type => 'text/xml');
+        @xml_entries = $manifest->get_entries(type => 'xml');
+        @image_entries = $manifest->get_entries(type => 'image');
+
+An individual entry may be selected according to its C<path>, knowing that the
+path is the entry identifier. The C<get_entry()> method, whose mandatory
+argument is the C<path>, does the job. The following instruction returns the
+entry that stands for a given image resource included in the package (if any):
+
+        $img_entry = $manifest->get_entry('Pictures/13BE2000BDD8EFA.jpg');
+
+=head2  Entry creation and removal
+
+Once selected, an entry may be deleted using the generic C<delete> method.
+The C<del_entry()> method, whose mandatory argument is an entry path, deletes
+the corresponding entry, if any. If the given entry doesn't exist, nothing is
+done. The return value is the removed entry, or C<undef>.
+
+A new entry may be added using the C<set_entry()> method. This method requires
+a unique path as its mandatory argument. A C<type> optional named parameter
+may be provided, but is not required; without C<type> specification, the media
+type remains empty. This method returns the new entry object, or a null value
+in case of failure. The example below adds an entry corresponding to an image
+file:
+
+        $manifest->set_entry('Pictures/xyz.jpg', type => 'image/jpeg');
+
+If C<set_entry()> is called with the same path as an existing entry, the old
+entry is removed and replaced by the new one.
+
+If the entry path is a folder, i.e. if its last character is "/", then the
+media type is automatically set to an empty value. However, this rule doesn't
+apply to the root folder, i.e. "/", whose type should be the MIME type of the
+document.
+
+Beware: adding or removing a manifest entry doesn't automatically add or remove
+the corresponding file in the container, and there is no automatic consistency
+check between the real content of the part and the manifest.
+
+=head2  Entry property handling
+
+An individual manifest entry is a C<odf_file_entry> object, that is a
+particular C<odf_element> object.
+
+It provides the C<get_path()>, C<set_path()>, C<get_type()>, C<set_type()>
+accessors, to get or set the C<path> and C<type> properties. There is no check
+with C<set_type()>, so the user is responsible for the consistency between the
+given type and the real content of the corresponding file. On the other hand,
+C<set_path()> fails if the given C<path> is already used by another entry;
+but there is no other check regarding this property, so the user must check the
+consistency between the given path and the real path of the corresponding
+resource.
+
+If C<set_path()> puts a path whose last character is "/", the media type of
+the entry is automatically set to an empty string. However, for users who know
+exactly what they do, C<set_type()> allows to force a non-empty type I<after>
+C<set_path()>.
+
+=head1	AUTHOR/COPYRIGHT
+
+Developer/Maintainer: Jean-Marie Gouarne L<http://jean.marie.gouarne.online.fr>
+Contact: jmgdoc@cpan.org
+
+Copyright (c) 2010 Ars Aperta, Itaapy, Pierlis, Talend.
+Copyright (c) 2011 Jean-Marie Gouarne.
+
+This work was sponsored by the Agence Nationale de la Recherche
+(L<http://www.agence-nationale-recherche.fr>).
+
+License: GPL v3, Apache v2.0 (see LICENSE).
+
+=cut

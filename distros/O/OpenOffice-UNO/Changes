@@ -1,0 +1,37 @@
+Revision history for Perl extension OpenOffice::UNO.
+
+0.07  Mon Jul  5 20:25:54 CEST 2010
+	- Released 0.06_01 without changes.
+
+0.06_01  Sun Jul  4 19:56:43 CEST 2010
+	- Build fixes for Perl 5.12 and for -Duselongdouble.
+
+0.06  Mon Mar 23 21:35:22 CET 2009
+	- OpenOffice.org 3.0 compatibility.
+	- Perl 5.10 compatibility.
+	- Mac OS X compatibility.
+	- when method invocation gives an error, report to Perl the original
+	  exception, not the wrapper exception.
+
+0.05  Sun Jun 29 17:19:32 CEST 2008
+	- correctly handle Unicode when passing data from Perl to UNO
+	  (passing Unicode from UNO to Perl was already OK)
+	- add support for creating values of a specific type
+	  (mostly useful for sequence types).
+
+0.04  Fri Sep 21 20:09:31 CEST 2007
+	- compile and run under Windows
+
+0.03  Sat Sep  1 19:06:08 CEST 2007
+	- improve the build system to work more reliably out of the box
+	- convert UNO exceptions to Perl exceptions
+	- rename the module from Perluno to OpenOffice::UNO
+	- tested with OOo 2.0 and 2.2
+	- initial CPAN release
+
+0.02  Tue Jan 07 19:47:30 2006
+	- update for OOo2.0.1
+
+0.01  Sat Aug 16 11:13:39 2003
+	- original version; created by h2xs 1.22 with options
+		-A UNO

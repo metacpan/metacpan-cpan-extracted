@@ -1,0 +1,60 @@
+Revision history for Perl extensions
+  OpenOffice::OOBuilder
+  OpenOffice::OOCBuilder
+
+Bug reports and questions can be sent to <oobuilder(at)maygill.com>.
+Attention: make sure the word <oobuilder> is in the subject or
+body of your e-mail. Otherwhise your e-mail will be taken as
+spam and will not be read.
+
+0.09 23/07/2007
+       OOCBuilder
+        - maximum number of supported sheets augmented to 64
+        - bugfix in setdata: did only work on sheet 1, must
+          work on active sheet
+       OOBuilder
+        - removed from encode sub
+          $data=~ s/([^\x20-\x7F])/'&#' . ord($1) . ';'/gse; # from http://perl-xml.sourceforge.net/faq/#encoding_conversion
+          this was only needed for systems that did not support unicode
+        - fixed bug in enocde_data : converting & must be done before all others
+0.08 22/02/2005
+       OOBuilder: Windows now also supported: from now on using
+                  Archive::Zip instead of the linux zip utility
+                  with a system call. [thanks to Magnus Nufer]
+         If you don't want to use Archive::Zip, and you are on a Linux
+         system with access to a zip program, take a look at the
+         OOBuilder.pm file, search for 'zip', and you will find some
+         instructions how to change this.
+         If you do so, please let me know. If enough people want this to be
+         an option, I'll try to implement that in one of the next releases.
+0.07 11/11/2004
+       OOCBuilder: right-align didn't work: fixed
+0.06 12/09/2004
+       OOCBuilder: getters for location of active cell in numbers
+                   cell id's : spreadsheet notation like A5, AD516, ...
+                   documentation updated
+                   example2.pl added
+0.05 31/08/2004
+       OOBuilder: added getters for Meta.xml data
+                  added empty subs for writing styles.xml and settings.xml
+                   both files are not really necessary to create a working
+                   openoffice document (is in the TODO list)
+                  added pod documentation
+       OOCBuilder: added pod documentation
+0.04 30/07/2004
+       OOBuilder: set styles to be used within OOCBuilder
+                  generate method updated to write styles.xml and Manifest
+       OOCBuilder: set_colwidth, set_rowheight implemented
+0.03 26/07/2004
+       OOCBuilder: add_sheet, goto_sheet, set_sheet_name implemented
+       Documentation started: still lots todo
+0.02 25/07/2004
+       creation OOCBuilder.pm
+         goto_xy, set_data, set_data_xy implemented
+         generate content.xml
+0.01 23/07/2004
+       creation OOBuilder.pm
+       Meta.xml data support
+
+
+

@@ -1,0 +1,159 @@
+Revision history for OpenGbg
+
+0.1402 2016-08-12 22:07:56 UTC
+ [Bug Fixes]
+ - Types::DateTime is (currently) broken with recent releases of
+   DateTime::Locale, so add a custom DateTime type for now.
+
+ [Stats & Dependency Changes]
+ - 25 files changed, 43 insertions(+), 31 deletions(-)
+ - (run req) ~ DateTime 1.05 --> 1.36
+ - (run req) ~ Moose 2.1400 --> 2.1803
+ - (run req) - Types::DateTime
+ - (dev req) + Dist::Zilla::Plugin::PromptIfStale (any)
+ - (dev sug) ~ Dist::Iller::Config::Author::CSSON 0.0309 --> 0.0312
+
+0.1401 2016-05-05T10:21:46Z UTC
+ [API Changes]
+ - Deprecated 'measurement' in
+   OpenGbg::Service::AirQuality::GetLatestMeasurement. All methods and
+   attributes in OpenGbg::Service::AirQuality::Measurement are now
+   available directly on ::GetLatestMeasurement.
+
+ [Enhancements]
+ - Added convenience method 'is_open' to OpenGbg::Service::Bridge.
+
+ [Stats & Dependency Changes]
+ - 30 files changed, 167 insertions(+), 61 deletions(-)
+ - (run req) ~ DateTime (any) --> 1.05
+ - (run req) ~ MooseX::AttributeShortcuts (any) --> 0.028
+ - (run req) ~ Path::Tiny (any) --> 0.072
+ - (run req) ~ Type::Tiny (any) --> 1.000005
+ - (run req) ~ Types::Path::Tiny (any) --> 0.005
+ - (run req) ~ namespace::autoclean 0.18 --> 0.22
+ - (run req) ~ perl 5.010001 --> 5.010000
+ - (dev req) + Badge::Depot 0.0103
+ - (dev req) + Badge::Depot::Plugin::Coverage (any)
+ - (dev req) + Badge::Depot::Plugin::Cpantesters (any)
+ - (dev req) + Badge::Depot::Plugin::Kwalitee (any)
+ - (dev req) + Badge::Depot::Plugin::Perl (any)
+ - (dev req) + Badge::Depot::Plugin::Travis (any)
+ - (dev req) + Dist::Zilla 5.000
+ - (dev req) + Dist::Zilla::Plugin::Authority 1.009
+ - (dev req) + Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional
+   0.007
+ - (dev req) + Dist::Zilla::Plugin::ChangeStats::Dependencies::Git 0.0100
+ - (dev req) + Dist::Zilla::Plugin::Git 2.036
+ - (dev req) + Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch 0.013
+ - (dev req) + Dist::Zilla::Plugin::Git::Commit (any)
+ - (dev req) + Dist::Zilla::Plugin::MetaConfig (any)
+ - (dev req) + Dist::Zilla::Plugin::NextRelease::Grouped 0.0200
+ - (dev req) + Dist::Zilla::Plugin::RewriteVersion::Transitional 0.007
+ - (dev req) + Pod::Weaver::Section::GenerateSection 1.01
+ - (dev req) + Test::EOF (any)
+ - (dev req) + Test::Version 1
+ - (dev req) ~ Dist::Zilla::Plugin::CheckChangesHasContent (any) --> 0.008
+ - (dev req) ~ Dist::Zilla::Plugin::Clean (any) --> 0.07
+ - (dev req) ~ Dist::Zilla::Plugin::CopyFilesFromBuild (any) --> 0.151680
+ - (dev req) ~ Dist::Zilla::Plugin::Git::Contributors (any) --> 0.017
+ - (dev req) ~ Dist::Zilla::Plugin::GithubMeta (any) --> 0.54
+ - (dev req) ~ Dist::Zilla::Plugin::InstallRelease (any) --> 0.008
+ - (dev req) ~ Dist::Zilla::Plugin::MetaProvides::Package (any) -->
+   2.003001
+ - (dev req) ~ Dist::Zilla::Plugin::PodWeaver (any) --> 4.006
+ - (dev req) ~ Dist::Zilla::Plugin::ReadmeAnyFromPod (any) --> 0.150250
+ - (dev req) ~ Dist::Zilla::Plugin::RunExtraTests (any) --> 0.028
+ - (dev req) ~ Dist::Zilla::Plugin::Test::Compile (any) --> 2.054
+ - (dev req) ~ Dist::Zilla::Plugin::Test::EOF (any) --> 0.0501
+ - (dev req) ~ Dist::Zilla::Plugin::Test::EOL (any) --> 0.18
+ - (dev req) ~ Dist::Zilla::Plugin::Test::Kwalitee::Extra (any) --> v0.2.1
+ - (dev req) ~ Dist::Zilla::Plugin::Test::NoTabs (any) --> 0.15
+ - (dev req) ~ Dist::Zilla::Plugin::Test::ReportPrereqs (any) --> 0.021
+ - (dev req) ~ Dist::Zilla::Plugin::Test::Version (any) --> 1.05
+ - (dev req) ~ Dist::Zilla::Plugin::TravisYML (any) --> 1.15
+ - (dev req) ~ Pod::Weaver::Section::Badges (any) --> 0.0401
+ - (dev req) ~ Test::More (any) --> 0.88
+ - (dev req) ~ Test::NoTabs (any) --> 1.4
+ - (dev req) ~ Test::Warnings (any) --> 0.026
+ - (dev req) - Dist::Iller::Config::Author::CSSON
+ - (dev req) - Dist::Zilla::Plugin::MetaProvides::Class
+ - (dev req) - Dist::Zilla::Plugin::NextRelease
+ - (dev req) - Dist::Zilla::Plugin::NextVersion::Semantic
+ - (dev req) - Dist::Zilla::Plugin::OurPkgVersion
+ - (dev req) - Dist::Zilla::Plugin::PodnameFromClassname
+ - (dev req) - Dist::Zilla::Plugin::Prereqs::Plugins
+ - (dev req) - Dist::Zilla::Plugin::PreviousVersion::Changelog
+ - (dev req) - Dist::Zilla::Plugin::ReversionOnRelease
+ - (dev req) - Pod::Weaver::Section::Homepage::DefaultCPAN
+ - (dev req) - Pod::Weaver::Section::Source::DefaultGitHub
+ - (dev sug) + Dist::Iller 0.1408
+ - (dev sug) + Dist::Iller::Config::Author::CSSON 0.0309
+
+0.1400 2016-01-28T17:09:08Z UTC
+ [API Changes]
+ - Breaking changes on StyrOchStall: Removed the extra method call to
+   ->stations or ->station.
+
+ [Requirements]
+ - Replaced Throwable::X with Throwable::SugarFactory.
+ - Removed dependency on Moops/Kavorka; should now work on 5.10+ (instead
+   of 5.14+).
+
+ [Other Changes]
+ - Rebuilt with dzil plugins in Dist::Iller::Config::Author::CSSON.
+ - Moved OpenGbg::Handler into OpenGbg since the wrapping is no longer
+   necessary.
+
+ [Bug Fixes]
+ - get_bike_stations did not work correctly. Fixed and added test.
+
+0.1302 2015-01-17T16:26:43Z CET
+ [Bug Fixes]
+ - Added 1; to all Moops classes (had test failures).
+
+0.1301 2015-01-16T18:25:04Z CET
+ [Meta]
+ - Uses @Author::CSSON dist zilla bundle, expanded
+ - Modules added to provides
+ - Renamed OpenGbg::Standard::Moops -> ::Imports
+ - Bumped required version of Syntax::Feature::Qs, which no longer uses
+   Syntax::Feature::Simple::V2
+
+ [Enhancements]
+ - Added strict and warnings to all non-Moops classes
+
+ [Documentation]
+ - Reformatted (now built with Pod::Weaver)
+ - Added PODNAME to those that need it
+
+0.1300 2014-12-18T01:31:19Z CET
+ [Meta]
+ - Linked Github repo/issues.
+
+ [New Features]
+ - Implemented Traffic Camera service.
+
+0.1201 2014-12-17T02:13:06Z CET
+ [Documentation]
+ - Added link to the Bridge service.
+
+0.1200 2014-12-17T02:02:04Z CET
+ [New Features]
+ - Implemented the Bridge service.
+
+ [Documentation]
+ - Minor fixes.
+
+0.1101 2014-12-16T01:19:53Z CET
+ [Documentation]
+ - Various typos, mistakes and improvements.
+
+0.1100 2014-12-15T19:31:03Z CET
+ [New Features]
+ - Implemented the Air Quality service.
+
+ [Documentation]
+ - Fixed some faulty synopsises.
+
+0.1000 2014-12-15T00:19:51Z CET
+ - Initial release

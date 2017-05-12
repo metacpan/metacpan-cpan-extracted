@@ -1,0 +1,63 @@
+{
+   "abstract" : "A base class for creating plugin-enabled objects",
+   "author" : [
+      "Chris Williams <chris@bingosnet.co.uk>",
+      "Hinrik \u00c3\u0096rn Sigur\u00c3\u00b0sson <hinrik.sig@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.102341, CPAN::Meta::Converter version 2.101670",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Object-Pluggable",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "utils",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Pod::Parser" : "1.36",
+            "Test::More" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Task::Weaken" : 0,
+            "constant" : "1.17",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Object-Pluggable@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Object-Pluggable"
+      },
+      "homepage" : "http://search.cpan.org/dist/Object-Pluggable/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/hinrik/object-pluggable.git",
+         "web" : "http://github.com/hinrik/object-pluggable"
+      }
+   },
+   "version" : "1.29",
+   "x_authority" : "cpan:HINRIK"
+}
+

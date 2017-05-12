@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<SITE ID="BusinessWire">
+
+<NAME Lang="en-us">Business Wire</NAME>
+<INFO Lang="en-us">daily news search</INFO>
+
+<URL Type="More"><![CDATA[
+http://search.businesswire.com/query.html?qm=1&col=&qt=_QUERY_&st=_START_25_1_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://search.businesswire.com/query.html?qm=1&col=&qt=_QUERY_&st=1
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+
+<TEMPLATE><![CDATA[
+% <a href="_URL_">_TITLE_</a></b><br>
+]]></TEMPLATE>
+</SITE>

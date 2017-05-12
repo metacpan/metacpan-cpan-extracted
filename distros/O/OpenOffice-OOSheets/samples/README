@@ -1,0 +1,17 @@
+OpenOffice::OOSheets demo.
+
+DEPENDENCIES
+
+* Filesys::SmbClient
+* Text::Iconv
+* Archive::Zip
+
+
+Change query.xml for you spreadsheets sources.
+Run sample as:
+
+$> ./get_sheets_data.pl < query.xml >outresults.xml
+
+
+
+Copyright (C) 2004 by Zahatski Aliaksndr

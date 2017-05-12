@@ -1,0 +1,86 @@
+#!/usr/bin/perl
+# $File: //depot/libOurNet/BBS/eg/bbsget $ $Author: autrijus $
+# $Revision: #1 $ $Change: 1 $ $DateTime: 2002/06/11 15:35:12 $
+
+$VERSION = '0.01';
+
+use strict;
+use OurNet::BBS 1.64;
+
+=head1 NAME
+
+bbsget - Fetch and print articles in a remote Telnet-BBS
+
+=head1 SYNOPSIS
+
+B<bbsget> S<[ B<-d> ]> I<bbsname> I<board> S<I<login>[:I<password>]> S<[ I<recno>... ]>
+
+=head1 DESCRIPTION
+
+This script logs into a remote BBS supported by the B<BBSAgent>
+backend. The I<bbsname> should be one of the C<*.bbs> descriptors,
+and I<board> is any board name within that BBS.
+
+The third argument is usually C<guest>, but it may also be a
+colon-delimited I<login>:I<password> string.
+
+You may specify one or more I<recno>, or accept the default -1
+(the last article). Note that it counts from 0, and negative
+indices means to count backwards.
+
+Debug messages are printed if the B<-d> flag is specified.
+
+=head1 EXAMPLE
+
+To display the last article of melix board in the Elixus BBS:
+
+    % ./bbsget elixus melix
+
+=cut
+
+$OurNet::BBS::DEBUG = shift if $ARGV[0] eq '-d';
+
+my ($site, $board, $login) = splice(@ARGV, 0, 3);
+
+die "Usage: $0 [-d] bbsname boardname login[:password] [recno...]\n"
+    unless $site and $board;
+
+my $BBS = OurNet::BBS->new({
+    backend	=> 'BBSAgent',
+    bbsroot	=> $site,
+    login	=> $login,
+});
+
+my $brd = $BBS->{boards}{$board}{articles};
+
+foreach my $recno (@ARGV ? @ARGV : -1) {
+    my $art = $brd->[$recno];
+
+    foreach my $key (sort keys(%{$art->{header}})) {
+	print "$key: $art->{header}{$key}\n";
+    }
+
+    print "-" x 80;
+    print $art->{body};
+}
+
+__END__
+
+=head1 SEE ALSO
+
+L<OurNet::BBS>, L<OurNet::BBSAgent>.
+
+=head1 AUTHORS
+
+Autrijus Tang E<lt>autrijus@autrijus.orgE<gt>
+
+=head1 COPYRIGHT
+
+Copyright 2001-2002 by Autrijus Tang E<lt>autrijus@autrijus.orgE<gt>.
+
+This program is free software; you can redistribute it and/or 
+modify it under the same terms as Perl itself.
+
+See L<http://www.perl.com/perl/misc/Artistic.html>
+
+=cut

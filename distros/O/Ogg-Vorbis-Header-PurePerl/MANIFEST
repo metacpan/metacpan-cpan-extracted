@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+PurePerl.pm
+README
+test.pl
+test.ogg
+ogginfo.pl
+LICENSE.GPL
+META.yml                                 Module meta-data (added by MakeMaker)

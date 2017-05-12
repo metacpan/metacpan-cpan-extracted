@@ -1,0 +1,24 @@
+NAME
+    OpenVZ::BC - Perl access to OpenVZ Beancounter Data
+
+SYNOPSIS
+    use OpenVZ::BC;
+    my $bc = OpenVZ::BC->new;
+    my $resources = $bc->hash;
+
+DESCRIPTION
+    Gives Perl access to OpenVZ beancounter data. This data is typically
+    stored in /proc/user_beancounters or /proc/bc/resources. By default, we
+    use /proc/bc/resources, but this can be overridden as described below.
+
+AUTHOR
+    Dusty Wilson
+    Megagram Managed Technical Services
+    http://www.megagram.com/
+
+COPYRIGHT
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.

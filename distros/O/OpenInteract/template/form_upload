@@ -1,0 +1,7 @@
+[%########################################
+  form_upload( name, field_pre_label, field_label )
+     Generate a form upload field.
+  ########################################-%]
+[%- field_pre_label -%]
+<input type="file" name="[% name %]" >
+[%- field_label -%]

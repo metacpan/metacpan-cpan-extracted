@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<SITE ID="Aonde">
+
+<NAME Lang="en-us">Aonde Search</NAME>
+<INFO Lang="en-us">general information web search in Brazil</INFO>
+
+<URL Type="More"><![CDATA[
+http://www.aonde.com/cgi/consulta2.cgi?keys=_QUERY_&search_type=or&numero_inicial=_START_20_0_
+]]></URL>
+<URL Type="Start"><![CDATA[
+http://www.aonde.com/cgi/consulta2.cgi?keys=_QUERY_&search_type=or&numero_inicial=0
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+
+<TEMPLATE><![CDATA[
+layout.gif> <a href=_URL_>_TITLE_</a> -_PREVIEW_</b></font><br>
+]]></TEMPLATE>
+</SITE>

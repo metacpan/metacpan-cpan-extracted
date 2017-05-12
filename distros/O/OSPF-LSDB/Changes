@@ -1,0 +1,175 @@
+1.07 2012-09-19
+    - I give up running perl -Tc on CPAN testers for all platforms.
+      skip the -Tc subtest in syntax-cgi.t if it might create problems
+
+1.06 2012-09-18
+    - ospfview recognizes when the dot process dies and restarts it
+    - add @INC to syntax-cgi to increase chances that CPAN testers pass
+
+1.05 2012-09-03
+    - test that an ancient yaml file without version can be converted
+    - show intra-area router prefix as octagon in ipv6 legend
+    - next try to fix perl taint mode syntax-cgi test for cpantesters
+    - make ospfview.cgi save to ospf6 file name when ipv6 is used
+    - fix typos in ospfview.cgi man page, from Stuart Henderson
+
+1.04 2012-08-16
+    - check ospfd socket permissions instead of user id before invoking sudo
+    - add pdf and zipped svg to ospfview.cgi formats
+    - add man page for ospfview.cgi
+    - rework logic of ospfview.cgi parameters
+    - fix perl taint mode syntax-cgi test for CPAN
+
+1.03 2012-08-11
+    - intra-area-network-LSAs create missing networks
+    - ospfview kills dot view when there is no ospfd available
+    - fix ipv6 designated transit link detection
+    - ospfview warns but continues when ospf parse fails
+    - add syntax and taint mode check for cgi scripts
+    - add ospfview.cgi to display the ospf graph by a web server
+
+1.02 2012-06-30
+    - test parsing ospf6d intra-area-prefix-LSAs and link-LSAs
+    - empty prefix arrays may not exist, OSPF::LSDB::View6 must not die
+    - fix parsing of ospf6d intra-area-prefix-LSA router prefix options
+    - if -H user@host is given, use ssh to login and receive lsdb from there
+    - make tests independent from version number in examples
+    - minimum perl version is 5.10.0
+
+1.01 2012-06-14
+    - fix links in pod see also
+    - test scripts with do instead of executing perl
+    - eval script with do for usage test
+    - use Test::Strict for syntax check
+    - test that syntax check processes all files
+    - test dot syntax only if graphviz is installed
+    - add missing prerequisites
+
+1.00 2012-06-11
+    - add readme for CPAN
+    - move Net::OSPF to OSPF::LSDB to be CPAN compliant
+
+0.53 2012-06-10
+    - no more red in IPv6 legend, all features have been implemented
+    - interface reuse checks for IPv6 were too strict
+    - add IPv6 tests for pointtopoint and virtual
+    - fix link-LSA and intra-area-prefix-LSA in legend
+    - make edge from link-LSA to network or transit net
+    - keep track of transit net interfaces in transitnets
+    - check duplicate IPv6 router LSID correctly
+    - sort Net::OSPF::View methods according to LSA types
+    - command line switches -p and -P enable prefix LSAs
+    - add intra-area-prefix-LSA with type router to Net::OSPF::View6
+    - add intra-area-prefix-LSA with type network to Net::OSPF::View6
+    - parse intra-area-prefix-LSA from ospf6d
+    - adapt link and intra area prefix in legend
+    - add link-LSA to Net::OSPF::View6
+    - parse link-LSA from ospf6d
+
+0.52 2012-06-02
+    - make legend consistent with implemented features
+    - check boundary router advertized by itself
+    - check for multiple link state IDs at summary, boundary, external LSAs
+    - add address field to IPv6 boundary router containing the LSID
+    - support for intra-area-router-LSAs to allow boundary tests
+    - deduplicate create_router for IPv6
+    - support for intra-area-prefix-LSAs to allow summary tests
+    - use Test::Pod for checking pod files
+    - make error messages about designated router less confusing
+    - deduplicate code in Net::OSPF::View6 by removing unneeded functions
+    - legend displays unimplemended IPv6 features in red
+
+0.51 2012-04-19
+    - write manual page for ospfview
+    - ospfview -D -d can print yaml dump or diff when database changes
+    - script ospfview periodically polls ospfd and displays dot graph on X11
+    - implement legend with OSPF for IPv6
+    - test ospf6d parser and fix bugs
+    - use more specific regex in parsers, they should never match with .*
+    - split validator into IPv4 and IPv6 part to validate yaml properly
+    - test ospf6d example files
+    - start with dot tests for IPv6
+
+0.50 2012-04-16
+    - experimental OSPF for IPv6 support
+    - convert graph and legend functions to class methods to allow inheritance
+    - pimp error messages about designated router
+    - add Net::OSPF::View6, buggy and limited functionality
+    - boolean method Net::OSPF->ipv6 tells ospf database version
+    - rudimentary ospf6d parsing, Regexp::IPv6 required
+    - let ospfd2yaml -6 use Net::OSPF::ospf6d
+    - add Net::OSPF::ospf6d, not finished yet
+    - add intranetworks, intrarouters, links to yaml for IPv6
+    - add ipv6 flag to yaml file, major version bump
+
+0.43 2012-04-14
+    - fix typo in *2yaml manual pages
+    - add ciscoospf2yaml script and manual page to installation set
+
+0.42 2012-04-14
+    - check for consistent designated router for network
+    - check for consistent designated router of transit network
+    - check for networks without or with only one attached router
+    - check for symmetric point-to-point and virtual links
+    - check for duplicate point-to-point interface address
+    - check for duplicate transit net interface address
+    - check if transit link from router to network is symmetric
+    - check if link from network to router is symmetric
+    - check if link-state-ID of router-LSA is equal to advertising router
+    - only aggregate indentical network summary-LSAs for different areas
+    - Cisco output format changes frequently, catch more cases
+    - test for Cisco OSPF parser
+    - manual page for Net::OSPF::Cisco and ciscoospf2yaml
+    - implement Net::OSPF::Cisco and ciscoospf2yaml for basic Cisco
+      IOS OSPF support
+
+0.41 2010-09-16
+    - manual page for Net::OSPF, Net::OSPF::View, Net::OSPF::YAML,
+      Net::OSPF::ospfd, Net::OSPF::gated modules
+
+0.40 2010-08-02
+    - save link state ID of router-LSA in database
+    - improve error handling of Net::OSPF::ospfd parser
+    - better test for Net::OSPF::ospfd parser
+    - test ospf2dot, ospf2yaml, gated2yaml, ospfconvert perl scripts
+    - options check for ospf2dot
+    - fix ospfconvert output file
+    - test usage of all perl scripts
+    - add -h help option for ospfconvert
+    - test pod syntax check for manual pages
+    - manual page for ospf2dot, ospfd2yaml, gated2yaml, ospfconvert scripts
+    - change version numbering from X.Y to X.YY
+
+0.3 2010-06-24
+    - verbose switch for warnings in graph or stderr
+    - show area and error messages as tooltips
+    - proper name and color for ase
+    - reorganize color checking and handling
+    - convert Net::OSPF::View->legend() into a class function without $self
+    - remove global variables from Net::OSPF::View
+    - remove N="nodename" in graph
+    - change organization of router links, yaml format changes
+
+0.2 2010-06-14
+    - convert version and validate automatically at yaml load
+    - method validate dies on error
+    - converter for different yaml file versions
+    - modularize gated2yaml into Net::OSPF::gated
+    - import gated2yaml
+    - modularize ospfd2yaml into Net::OSPF::ospfd
+    - use module members in Net::OSPF::View
+
+0.1 2010-06-9
+    - ospfd2yaml writes version
+    - add cpansign signature
+    - add test for files in example directory
+    - ospf2dot uses Net::OSPF
+    - use YAML::Syck as it is much faster than YAML
+    - import existing test
+    - add version number to ospf yaml file
+    - use Data::Validate::Struct to implement input validation
+    - import existing code and scripts
+    - start sourceforge project
+    - start work on public version
+
+0.0 2010-06-04

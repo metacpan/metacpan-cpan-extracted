@@ -1,0 +1,19 @@
+Things on my Agenda:
+    - check wether IPv6 pointtopoint and virtual neighbor interface matches
+    - test link-LSAs and intra-area-prefix-LSAs
+    - more dot6 tests
+    - better IPv6 support
+    - check that intra-area-prefix network consists of link LSAs
+    - check for link-local prefixes
+    - check for prefixes longer than prefixlen
+    - router with summary or boundary has to have B bit
+    - router with virtual link has to have V bit
+    - router with ase has to have E bit
+    - better Cisco support
+    - display forward address
+    - check gated dump skip feature really works
+    - visualize the age and sequence number
+    - visualize costs with edge weight
+    - map router id to host name via dns
+    - input filter for more ospf daemons
+    - replace "while each" with "foreach sort keys" for invariable results

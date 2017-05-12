@@ -1,0 +1,158 @@
+Revision history for Perl extension OAuth::Lite.
+
+1.34 Tue Jun 02 16:57:00 2015
+    - relocated author tests. merged pull-request https://github.com/lyokato/p5-oauth-lite/pull/6
+      Thanks to laouji.
+
+1.32 Sun Jan 05 11:00:00 2014
+    - fixed invalid way to normalize params.
+      But it breaks backward compatibility, so you can switch behaviour 
+      by $OAuth::Lite::USE_DEPRECATED_NORMALIZER.
+      Currently this value is set as 1 by default to keep backward compatibility.
+      https://github.com/lyokato/p5-oauth-lite/pull/5
+      Thanks to ninjinkun
+    
+1.31 Wed Jul 20 14:43:00 2011
+    - merged pull-request from tokuhirom. https://github.com/lyokato/p5-oauth-lite/pull/3
+
+1.30 Wed Feb 8 16:11:00 2011
+    - Now Response::from_encoded doesn't use chomp and trim both CRLF and LF
+
+1.29 Wed Jan 26 16:46:00 2011
+    - Now Token::from_encoded doesn't use chomp and trim both CRLF and LF
+
+1.28 Sun Jan 16 14:23:00 2011
+    - fixed typo
+      Thanks to tokuhirom.
+      https://github.com/tokuhirom/p5-oauth-lite/commit/8ff53996564ca70e3adb717b253e082955b9548e
+
+1.26 Tue Mar 09 16:08:00 2010
+    - bigfix: Util::normalize_request_url
+      OAuth Core 1.0a section 9.1.2 says that URL scheme and authority MUST be lowercase.
+
+      added document for OAuth::Lite::Problems for Pod::Coverage.
+
+1.25 Fri Feb 19 11:39:00 2010
+    - added obtain_access_token, and obtain_reuqest_token methods to Consumer
+      class because get_access_token is not flexible.
+      of cource, you can continue to use get_access_token for backward compatibility
+      if you don't need to handle extensions, such like session-extension or xAuth.
+
+      and added example/twitter_xauth.pl
+
+1.24  Tue Feb 9 10:57:00 2010
+
+    - Improved problems matching, hash lookup is faster than linear search +
+      function call.
+    - Added CONSUMER_KEY_REFUSED, PERMISSION_DENIED
+        Thanks to Ishikawa.
+
+    - fixed normalized_parameter for invlid key order
+        Thanks to hidek.
+
+    http://github.com/lyokato/p5-oauth-lite/commit/2a1b1ce5169b9494feeb3c661ef02e60a548ae00
+    http://github.com/ishikawa/p5-oauth-lite/commit/4fed3f78a46c4cc135608274d5825c3b6c507029
+    http://github.com/ishikawa/p5-oauth-lite/commit/03b9cf94494b2db206494259a622b337150d4865
+    http://github.com/ishikawa/p5-oauth-lite/commit/1b18cac370de4daf7e417d2f59a6a177494d253a
+    http://github.com/ishikawa/p5-oauth-lite/commit/f300a719db71221c7993114e4002fd6ec49458e3
+    http://github.com/ishikawa/p5-oauth-lite/commit/1fcaa9e0f2eab50b1901e8d54a1e70b5e9fb70b5
+
+1.23  Tue Nov 10 12:35:00 2009
+    - applied patches from ishikawa-san.
+      now Token as_encoded results with oauth_confirmed for Rev-A.
+
+    - encoding method fixed not to force encoding to UTF8. uri_escape_utf8 -> uri_escape
+      uri_escpae_utf8 is not convient when another encoding is needed,
+      for example, some cell-phone requires not-UTF8 encoding.
+      thanks to weboo.
+
+1.22  Tue Oct 29 12:15:00 2009
+    - added OAuth::Lite::Agent for default.
+      This added 'gzip' to Accept-Encoding header.
+      And fixed document to use $res->decoded_content;
+
+1.21  Tue Oct 13 12:29:00 2009
+    - updated for OAuth Core 1.0 Rev A
+      and added example/twitter.pl
+
+1.20  Tue Oct 13 11:07:00 2009
+    - merged kzys's pull request.
+      to work with duplicated-parameters such like "id=1&id=2"
+
+1.19  Mon Apr 20 10:44:00 2009
+    - server::mod_perl2 handles ServerUtil as non-strict mode.
+
+1.18  Mon Apr 20 10:44:00 2009
+    - added non-strict mode on ServerUtil.
+      set strict=>0, then doesn't check if request has unsupported parameters or not.
+
+1.17  Wed Apr 08 16:58:00 2009
+    - removed duplicated code.
+      removed 'lc' on normalizing request uri.
+
+1.16  Wed Apr 01 17:12:00 2009
+    - oops! removed debug code.
+
+1.15  Mon Mar 30 18:12:00 2009
+    - added OAuth Request Body Hash support.
+      see http://oauth.googlecode.com/svn/spec/ext/body_hash/1.0/drafts/4/spec.html
+
+1.14  San Oct 19 15:37:00 2008
+    - Consumer and Util now can handle arrayref parameters for such as checkbox values.
+      Thanks to Evaldas Imbrasas.
+
+1.13  Thu Oct 08 10:34:00 2008
+    - Consumer now doesn't inherit LWP::UserAgent but delegate.
+    - Server::mod_perl2: fixed point that building regularized uri for proxy usage. borrowed code from Catalyst::Engine::Apache.
+    - Server::mod_perl2 now pushes error response according to OAuth Problem Reporting. but not completed yet.
+    - Server::mod_perl2 now handles XRDS if you set XRDSLocation on httpd.conf or directly override 'build_xrds' method, according to OAuth Discovery spec.
+
+1.12  Tue Aug 12 17:58:00 2008
+    - bugfix: Consumer doesn't pass extra params when using Header authorization.
+    - Server::mod_perl2 now handles parameters correctly.
+
+1.10  Tue Aug 12 15:43:00 2008
+    - Consumer::get_request_token can be passed extra params.
+      Now you can pass the value except for uri or realm.
+      For example "scope" value for Google-OAuth.
+    - Server::mod_perl2 now got new APIs and can control
+      Consumer Request extention.
+
+1.09  Mon Mar 31 15:47:00 2008
+    - Consumer::url_to_authorize and Consumer::get_access_token now can handles
+      empty token.
+
+1.08  Mon Mar 10 16:03:00 2008
+    - rt #33943
+      added Content-Length header in case request method is POST or PUT,
+      at the end of Consumer::gen_oauth_request.
+      Thanks, TOMI.
+
+1.07  Sun Jan 20 15:12:00 2008
+	- put sorting process into building query-string process.
+	  The hash keys order is deferrent between perl environments.
+		So, some tests failed.
+
+1.06  Fri Jan 18 18:28:00 2008
+	- changed not to use syntax like 'any {...} qw/FOO BAR/'.
+	  it seems to cause error on perl5.6
+
+1.05  Thu Jan 17 10:15:00 2008
+  - added inc/Module/Install to MANIFEST
+
+1.04  Wed Jan 16 15:30:00 2008
+  - fixed not to import methods when require bytes
+
+1.03  Wed Jan 16 14:22:00 2008
+  - added delegation methods on ServerUtil
+
+1.02  Wed Jan 16 13:50:00 2008
+  - fixed document
+  - fixed Makefile.PL
+
+1.01  Tue Jan 15 11:14:00 2008
+  - improved documentation
+
+1.00  Tue Jan  8 17:54:29 2008
+  - initial release
+

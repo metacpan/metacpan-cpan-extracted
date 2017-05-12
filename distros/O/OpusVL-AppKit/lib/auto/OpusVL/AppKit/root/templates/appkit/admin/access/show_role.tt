@@ -1,0 +1,46 @@
+
+<h1> Access Roles  </h1>
+
+    <div>
+
+        <div>
+
+            [% PROCESS appkit/admin/access/side_bar.tt %]
+
+            <div style="float:left; clear:right;">
+            [% IF access_control_role_tree.defined %]
+
+                <fieldset>
+                    <legend>
+                        Access Tree for [% c.stash.role.role %] 
+                    </legend>
+
+                    <form id="roles" method='POST' action='[% c.uri_for( c.controller('AppKit::Admin::Access').action_for('show_role'), [ c.stash.role.role ] )  %]'>
+                        [% IF appkit_features  %]
+                        <ul>
+                        [% FOREACH app IN appkit_features.keys %]
+                        <li class="app"><span>[% app | html %]<span></li>
+                        <ul>
+                        [% FOREACH feature IN appkit_features.$app.keys %]
+                        <li [% IF appkit_features.$app.$feature %]class="allowed"[% END %]><input type="checkbox" id="feature_[% app| html %]/[% feature| html %]" name="feature_[% app| html %]/[% feature| html %]"[% IF appkit_features.$app.$feature %] checked="checked"[% END %] value="allow">
+                        <label for="feature_[% app| html %]/[% feature| html %]">[% feature| html %][% IF descriptions.$app.$feature %] [[% descriptions.$app.$feature %]][% END %]</label>
+                        </li>
+                        [% END %]
+                        </ul>
+                        [% END %]
+                        [% END %]
+                        </ul>
+                        [% access_control_role_tree.expandAll | none %]
+                        <input type='submit' name='savebutton'      value='Save'>
+                        <input type='submit' name='cancelbutton'    value='Cancel'>
+                    </form>
+
+                </fieldset>
+
+            [% END %]
+
+            </div>
+        </div> 
+    </div>
+
+

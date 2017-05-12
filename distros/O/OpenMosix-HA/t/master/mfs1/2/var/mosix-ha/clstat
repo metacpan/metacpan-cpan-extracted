@@ -1,0 +1,3 @@
+Cluster::Init::Group foo stop DONE
+Cluster::Init::Group bar stop RUNNING
+Cluster::Init::Group baz test PASSED

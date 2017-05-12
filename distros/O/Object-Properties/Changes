@@ -1,0 +1,14 @@
+Release history for Object-Properties
+
+TODO some mechanism to declare required fields is probably inevitable...
+
+1.002 Wed 25 May 2016
+	- No more erroneous dependency on Import::Into
+	- Packaging changes
+
+1.001 Thu 19 Mar 2015
+	- No functional changes
+	- Switch from inline lives_and in tests to Test::Lives
+
+1.000 Mon 26 Jan 2015
+	- Initial release

@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<SITE ID="Nsysu">
+
+<NAME Lang="en-us">NSYSU ftp Server</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+中山大學檔案伺服器
+]]></NAME>
+<INFO Lang="en-us">files download service</INFO>
+<INFO Lang="zh-tw">files download service</INFO>
+
+<URL Type="Start"><![CDATA[
+post://ftp.nsysu.edu.tw/cgi-bin/fileSearch.cgi?T1=_QUERY_&line=_HITS_
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+
+<TEMPLATE><![CDATA[
+名稱符合: <A HREF="_URL_">_TITLE_</A>
+]]></TEMPLATE>
+</SITE>

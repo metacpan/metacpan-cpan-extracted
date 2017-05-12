@@ -1,0 +1,218 @@
+[% INCLUDE header.tt page_title = "Set username/preferences" %]
+[% INCLUDE banner.tt %]
+<div id="content">
+
+  [% IF !config.content_above_navbar_in_html %]
+    [% INCLUDE navbar.tt %]
+  [% END %]
+
+<div id="maincontent">
+[% IF show_form %]
+
+  <form id="preferences_form" action="preferences.cgi" method="post">
+    <div class="set_username">
+    <h2>Username</h2>
+    <label for="username">How you wish to be identified in Recent Changes:</label>
+    <input type="text" size="20" id="username" name="username" value="[% prefs.username %]" />
+    </div>
+
+    <div class="set_preferences">
+    <h2>Preferences</h2>
+
+    <p>
+    [% IF prefs.preview_above_edit_box %]
+      <input type="checkbox" id="preview_above" name="preview_above_edit_box" value="1" checked="1" />
+    [% ELSE %]
+      <input type="checkbox" id="preview_above" name="preview_above_edit_box" value="1" />
+    [% END %]
+    <label for="preview_above">Put the preview above the edit area when previewing a page edit.</label>
+    </p>
+
+    <p>
+    [% IF prefs.include_geocache_link %]
+      <input type="checkbox" id="geocache" name="include_geocache_link" value="1" checked="1" />
+    [% ELSE %]
+      <input type="checkbox" id="geocache" name="include_geocache_link" value="1" />
+    [% END %]
+    <label for="geocache">Include &#8220;Look for nearby geocaches&#8221; link in navbar.</label>
+    </p>
+
+    <p>
+    [% IF prefs.latlong_traditional %]
+      <input type="checkbox" id="latlong" name="latlong_traditional" value="1" checked="1" />
+    [% ELSE %]
+      <input type="checkbox" id="latlong" name="latlong_traditional" value="1" />
+    [% END %]
+    <label for="latlong">Display latitude and longitude as degrees and minutes instead of decimal.</label>
+    </p>
+
+    <p>
+    [% IF prefs.omit_help_links %]
+      <input type="checkbox" id="omit_help" name="omit_help_links" value="1" checked="1" />
+    [% ELSE %]
+      <input type="checkbox" id="omit_help" name="omit_help_links" value="1" />
+    [% END %]
+    <label for="omit_help">Omit help links from navbar.</label>
+    </p>
+
+    <p>
+    [% IF prefs.show_minor_edits_in_rc %]
+      <input type="checkbox" id="show_minor" name="show_minor_edits_in_rc" value="1" checked="1" />
+    [% ELSE %]
+      <input type="checkbox" id="show_minor" name="show_minor_edits_in_rc" value="1" />
+    [% END %]
+    <label for="show_minor">Include &#8220;minor edits&#8221; in Recent Changes.</label>
+    </p>
+
+    <p>
+    [% IF prefs.is_admin %]
+      <input type="checkbox" id="is_admin" name="is_admin" value="1" checked="1" />
+    [% ELSE %]
+      <input type="checkbox" id="is_admin" name="is_admin" value="1" />
+    [% END %]
+    <label for="is_admin">Show admin related links</label>
+    </p>
+
+    <p>
+      [% IF prefs.track_recent_changes_views %]
+        <input type="checkbox" id="track_recent_changes_views" name="track_recent_changes_views" value="1" checked="1" />
+      [% ELSE %]
+        <input type="checkbox" id="track_recent_changes_views" name="track_recent_changes_views" value="1" />
+      [% END %]
+      <label for="track_recent_changes_views">Track my visits to Recent Changes and offer me a link for &#8220;changes since I last viewed Recent Changes&#8221;.</label>
+    </p>
+
+    [% IF ( config.use_leaflet OR gmaps_api_key )
+       AND config.show_gmap_in_node_display %]
+      <p>
+        [% IF prefs.display_google_maps %]
+          <input type="checkbox" id="display_google_maps" name="display_google_maps" value="1" checked="1" />
+        [% ELSE %]
+          <input type="checkbox" id="display_google_maps" name="display_google_maps" value="1" />
+        [% END %]
+        <label for="display_google_maps">Display a map on every page with geodata.</label>
+      </p>
+    [% END %]
+
+    <p>
+      <label for="default_edit_type">Default edit type:</label>
+      <select name="default_edit_type" id="default_edit_type">
+        [% IF prefs.default_edit_type == 'normal' %]
+          <option value="normal" selected="1">Normal edit</option>
+          <option value="tidying">Minor tidying</option>
+        [% ELSE %]
+          <option value="normal">Normal edit</option>
+          <option value="tidying" selected="1">Minor tidying</option>
+        [% END %]
+      </select>
+    </p>
+
+    <p>
+      <label for="cookie_expires">Preferences expire:</label>
+      <select name="cookie_expires" id="cookie_expires">
+        [% IF prefs.cookie_expires == 'month' %]
+          <option value="month" selected="1">in one month</option>
+          <option value="year">in one year</option>
+          <option value="never">never</option>
+        [% ELSIF prefs.cookie_expires == "year" %]
+          <option value="month">in one month</option>
+          <option value="year" selected="1">in one year</option>
+          <option value="never">never</option>
+        [% ELSE %]
+          <option value="month">in one month</option>
+          <option value="year">in one year</option>
+          <option value="never" selected="1">never</option>
+        [% END %]
+      </select>
+    </p>
+    </div>
+
+    <input id="submit" type="submit" value="Set it" class="form_button" />
+    <input type="hidden" name="action" value="set_preferences" />
+    [% IF return_to_url %]
+      <input type="hidden" name="return_to_url"
+             value="[% return_to_url | html %]" />
+    [% END %]
+  </form>
+
+[% ELSE %]
+
+  <h1>Username/preferences saved</h1>
+
+  <p>Username set to &#8220;[% prefs.username %]&#8221;.</p>
+
+  <p>Preview area shown
+    [% IF prefs.preview_above_edit_box %]
+      above
+    [% ELSE %]
+      below
+    [% END %]
+  edit box.</p>
+
+  <p>&#8220;Look for nearby geocaches&#8221; link
+    [% UNLESS prefs.include_geocache_link %] not [% END %]
+  included in navbar.</p>
+
+  <p>Latitude and longitude displayed as
+    [% IF prefs.latlong_traditional %]
+      degrees and minutes.
+    [% ELSE %]
+      decimal.
+    [% END %]
+  </p>
+
+  <p>Help links will
+    [% IF prefs.omit_help_links %] not [% END %]
+    be included in navbar.
+  </p>
+
+  <p>Admin links will
+    [% UNLESS prefs.is_admin %] not [% END %]
+    be included in navbar.
+  </p>
+  <p>Minor edits
+    [% UNLESS show_minor_edits_in_rc %] not [% END %]
+  included in Recent Changes.</p>
+
+  <p>Your visits to Recent Changes will
+    [% UNLESS prefs.track_recent_changes_views %] not [% END %]
+  be tracked.</p>
+
+  [% IF ( config.use_leaflet OR gmaps_api_key )
+     AND config.show_gmap_in_node_display %]
+    <p>Maps will
+      [% UNLESS prefs.display_google_maps %] not [% END %]
+    be displayed on pages with geodata.</p>
+  [% END %]
+
+  <p>Default edit type set to
+    [% IF prefs.default_edit_type == 'normal' %]
+      &#8220;Normal edit&#8221;.
+    [% ELSE %]
+      &#8220;Minor tidying&#8221;.
+    [% END %]
+  </p>
+
+  <p>Your preferences will
+    [% IF prefs.cookie_expires == 'never' %]
+      never expire.
+    [% ELSIF prefs.cookie_expires == 'year' %]
+      expire in one year.
+    [% ELSE %]
+      expire in one month.
+    [% END %]
+  </p>
+
+<ul id="prefs_saved_extra_nav">
+  <li><a href="[% IF return_to_url %][% return_to_url | html %][% ELSE %][% full_cgi_url %][% END %]">Return to [% site_name %]</a></li>
+  <li><a href="preferences.cgi">Change preferences</a></li>
+</ul>
+
+[% END %]
+</div>
+
+[% IF config.content_above_navbar_in_html %]
+  [% INCLUDE navbar.tt %]
+[% END %]
+
+[% INCLUDE footer.tt %]

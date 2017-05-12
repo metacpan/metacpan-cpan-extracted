@@ -1,0 +1,112 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <title>Databases and OpenInteract</title>
+  </head>
+
+  <body>
+<!-- <template_status>no_parse</template_status> -->
+    <h1>Databases and OpenInteract</h1>
+
+
+    <p>OpenInteract is designed to work with one or more relational
+    database systems (RDBMS). Thanks to SPOPS, it can be flexible
+    about which one it uses. But you still need to do some initial
+    setup work to ensure your database is prepared.</p>
+
+    <p>This document describes the different procedures necessary to
+    use OpenInteract with the databases it supports. It does not cover
+    setting up the various RDBMS packages themselves and assumes you
+    have a database server up and running.</p>
+
+    <p>In the discussion below we use a few variables. These will, of
+    course, depend on your DBMS.</p>
+
+    <ul>
+
+      <li><code>$ADMINUSER</code>: A user with sufficient
+      administrative rights to create a database</li>
+
+      <li><code>$ADMINPASSWORD</code>: The password for
+      <code>$ADMINUSER</code></li>
+
+      <li><code>$DBNAME</code>: The name you give your database.</li>
+
+      <li><code>$WEBUSER</code>: The user that is going to access this
+      database via OpenInteract. This user must be able to create and
+      drop tables as well as modify data within those tables.</li>
+
+      <li><code>$WEBPASSWORD</code>: The password for
+      <code>$WEBUSER</code></li>
+
+    </ul>
+
+    <p>The following also assumes that the command-line utilities
+    executed (e.g., 'mysql', 'psql', 'isql') are installed and on your
+    PATH. If not, setup your PATH so they're accessible for executing
+    or ask your friendly local DBA to do this for you.</p>
+
+    <h1>MySQL</h1>
+
+    <p>To create a database, run the following command:</p>
+
+    <code>
+  $ mysqladmin --user=$ADMINUSER --password=$ADMINPASSWORD create $DBNAME
+    </code>
+
+    <p>Once the database is created, ensure that the
+    non-administrative user you've chosen to use with OpenInteract has
+    full access to it. The following will create a new user with
+    access to your database:</p>
+
+    <pre>
+ $ mysql --user=$ADMINUSER --password=$ADMINPASSWORD $DBNAME
+ mysql> GRANT ALL ON $DBNAME.* TO $WEBUSER@localhost 
+ mysql> IDENTIFIED BY '$WEBPASSWORD'\g
+    </pre>
+
+    <p>You probably also need to give this user permission to use the
+    'mysql' database:</p>
+
+    <pre>
+ mysql> GRANT SELECT ON mysql.* TO $WEBUSER@localhost 
+ mysql> IDENTIFIED BY '$WEBPASSWORD'\g
+    </pre>
+
+    <p>Once you're done with these statements, leave the mysql shell
+    and reload the grant tables:</p>
+
+    <pre>
+ $ mysqladmin --user=$ADMINUSER --password=$ADMINPASSWORD reload
+    </pre>
+
+    <h1>PostgreSQL</h1>
+
+    <p>To create a database, run the following command:</p>
+
+    <pre>
+  $ createdb $DBNAME
+    </pre>
+
+    <p>Once you've created the database, you can create a user:</p>
+
+    <pre>
+  $ psql $DBNAME
+  psql> create user $WEBUSER 
+  psql> with password '$WEBPASSWORD' nocreatedb nocreateuser\g
+    </pre>
+
+    <h1>Sybase ASE</h1>
+
+    <p><em>(coming soon)</em></p>
+
+    <h1>Sybase ASA</h1>
+
+    <p><em>(coming soon)</em></p>
+
+    <h1>MS SQL Server</h1>
+
+    <p><em>(coming soon)</em></p>
+
+  </body>
+</html>

@@ -1,0 +1,2 @@
+name = "Otogiri-Plugin"
+badges = ["travis", "coveralls"]

@@ -1,0 +1,35 @@
+* todo
+** TODO proper escaping
+** TODO handle conflict in translation of target -> anchor
+** TODO parse per-file options (12.2 Export options)
+ #+TITLE:       the title to be shown (default is the buffer name)
+ #+AUTHOR:      the author (default taken from user-full-name)
+ #+DATE:        a date, fixed, or a format string for format-time-string
+ #+EMAIL:       his/her email address (default from user-mail-address)
+ #+DESCRIPTION: the page description, e.g. for the XHTML meta tag
+
+and so on.
+** TODO template
+** TODO option to split output into several files
+** TODO per-file html navigation
+** table
+*** TODO export TableVLine
+*** TODO adjust width based on first row's width definition
+*** TODO adjust td align based on first row's alignment
+*** TODO table caption
+Get it from settings:
+
+ #+CAPTION: A long table
+ #+LABEL: tbl:long
+ |...|...|
+ |...|...|
+
+or we can also wait until Org parser does this for us.
+
+** block
+*** TODO parse block options
+** TODO footnote
+** link
+*** TODO proper translation of Org links into HTML links
+** list
+*** TODO set bullet style

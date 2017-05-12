@@ -1,0 +1,18 @@
+Changes
+LibTheora.xs
+Makefile.PL
+MANIFEST
+ppport.h
+README
+typemap
+lib/Ogg/Theora/LibTheora.pm
+t/encoder.t
+t/extras.t
+t/decoder.t
+t/enc_pic1.raw
+t/enc_pic2.raw
+t/enc_pic3.raw
+t/theora.ogg
+
+
+META.yml                                 Module meta-data (added by MakeMaker)

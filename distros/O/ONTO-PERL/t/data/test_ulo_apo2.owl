@@ -1,0 +1,341 @@
+<?xml version="1.0"?>
+<rdf:RDF
+	xmlns="http://www.cellcycleontology.org/obo/owl/"
+	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+	xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+	xmlns:owl="http://www.w3.org/2002/07/owl#"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+	xmlns:oboInOwl="http://www.cellcycleontology.org/formats/oboInOwl#"
+	xmlns:oboContent="http://www.cellcycleontology.org/obo/owl/"
+	xml:base="http://www.cellcycleontology.org/obo/owl/"
+>
+<owl:AnnotationProperty rdf:about="http://www.cellcycleontology.org/formats/oboInOwl#hasURI"/>
+<owl:AnnotationProperty rdf:about="http://www.cellcycleontology.org/formats/oboInOwl#hasAlternativeId"/>
+<owl:AnnotationProperty rdf:about="http://www.cellcycleontology.org/formats/oboInOwl#hasDate"/>
+<owl:AnnotationProperty rdf:about="http://www.cellcycleontology.org/formats/oboInOwl#hasVersion"/>
+<owl:AnnotationProperty rdf:about="http://www.cellcycleontology.org/formats/oboInOwl#hasDbXref"/>
+<owl:AnnotationProperty rdf:about="http://www.cellcycleontology.org/formats/oboInOwl#hasDefaultNamespace"/>
+<owl:AnnotationProperty rdf:about="http://www.cellcycleontology.org/formats/oboInOwl#hasNamespace"/>
+<owl:AnnotationProperty rdf:about="http://www.cellcycleontology.org/formats/oboInOwl#hasDefinition"/>
+<owl:AnnotationProperty rdf:about="http://www.cellcycleontology.org/formats/oboInOwl#hasExactSynonym"/>
+<owl:AnnotationProperty rdf:about="http://www.cellcycleontology.org/formats/oboInOwl#hasNarrowSynonym"/>
+<owl:AnnotationProperty rdf:about="http://www.cellcycleontology.org/formats/oboInOwl#hasBroadSynonym"/>
+<owl:AnnotationProperty rdf:about="http://www.cellcycleontology.org/formats/oboInOwl#hasRelatedSynonym"/>
+<owl:AnnotationProperty rdf:about="http://www.cellcycleontology.org/formats/oboInOwl#hasSynonymType"/>
+<owl:AnnotationProperty rdf:about="http://www.cellcycleontology.org/formats/oboInOwl#hasSubset"/>
+<owl:AnnotationProperty rdf:about="http://www.cellcycleontology.org/formats/oboInOwl#inSubset"/>
+<owl:AnnotationProperty rdf:about="http://www.cellcycleontology.org/formats/oboInOwl#savedBy"/>
+<owl:AnnotationProperty rdf:about="http://www.cellcycleontology.org/formats/oboInOwl#replacedBy"/>
+<owl:AnnotationProperty rdf:about="http://www.cellcycleontology.org/formats/oboInOwl#consider"/>
+<owl:Class rdf:about="http://www.cellcycleontology.org/formats/oboInOwl#DbXref"/>
+<owl:Class rdf:about="http://www.cellcycleontology.org/formats/oboInOwl#Definition"/>
+<owl:Class rdf:about="http://www.cellcycleontology.org/formats/oboInOwl#Subset"/>
+<owl:Class rdf:about="http://www.cellcycleontology.org/formats/oboInOwl#Synonym"/>
+<owl:Class rdf:about="http://www.cellcycleontology.org/formats/oboInOwl#SynonymType"/>
+<owl:Class rdf:about="http://www.cellcycleontology.org/formats/oboInOwl#ObsoleteClass"/>
+<owl:ObjectProperty rdf:about="http://www.cellcycleontology.org/formats/oboInOwl#ObsoleteProperty"/>
+
+<owl:Ontology rdf:about="">
+	<oboInOwl:hasDate>28:06:2006 13:57</oboInOwl:hasDate>
+	<oboInOwl:savedBy>easr</oboInOwl:savedBy>
+	<oboInOwl:hasDefaultNamespace>apo</oboInOwl:hasDefaultNamespace>
+	<rdfs:comment><p>This file holds the Upper Level Ontology in APO.</p></rdfs:comment>
+</owl:Ontology>
+
+<owl:Class rdf:about="http://www.cellcycleontology.org/obo/owl/APO#APO_U0000000">
+	<rdfs:label xml:lang="en">cell-cycle entity</rdfs:label>
+	<oboInOwl:hasDefinition>
+		<oboInOwl:Definition>
+			<rdfs:label xml:lang="en">A process or continuant.</rdfs:label>
+			<oboInOwl:hasDbXref>
+				<oboInOwl:DbXref>
+					<rdfs:label>APO:ea</rdfs:label>
+					<oboInOwl:hasURI rdf:datatype="http://www.w3.org/2001/XMLSchema#anyURI">http://www.cellcycleontology.org/obo/owl/APO#APO_ea</oboInOwl:hasURI>
+				</oboInOwl:DbXref>
+			</oboInOwl:hasDbXref>
+		</oboInOwl:Definition>
+	</oboInOwl:hasDefinition>
+	<oboInOwl:hasExactSynonym>
+		<oboInOwl:Synonym>
+			<rdfs:label xml:lang="en">cell cycle entity</rdfs:label>
+			<oboInOwl:hasDbXref>
+				<oboInOwl:DbXref>
+					<rdfs:label>APO:ea</rdfs:label>
+					<oboInOwl:hasURI rdf:datatype="http://www.w3.org/2001/XMLSchema#anyURI">http://www.cellcycleontology.org/obo/owl/APO#APO_ea</oboInOwl:hasURI>
+				</oboInOwl:DbXref>
+			</oboInOwl:hasDbXref>
+		</oboInOwl:Synonym>
+	</oboInOwl:hasExactSynonym>
+</owl:Class>
+
+<owl:Class rdf:about="http://www.cellcycleontology.org/obo/owl/APO#APO_U0000001">
+	<rdfs:label xml:lang="en">continuant</rdfs:label>
+	<oboInOwl:hasDefinition>
+		<oboInOwl:Definition>
+			<rdfs:label xml:lang="en">Entities which endure, or continue to exist, through time while undergoing different sort of changes, including changes of place.</rdfs:label>
+			<oboInOwl:hasDbXref>
+				<oboInOwl:DbXref>
+					<rdfs:label>PMID:15892874</rdfs:label>
+					<oboInOwl:hasURI rdf:datatype="http://www.w3.org/2001/XMLSchema#anyURI">http://www.cellcycleontology.org/obo/owl/PMID#PMID_15892874</oboInOwl:hasURI>
+				</oboInOwl:DbXref>
+			</oboInOwl:hasDbXref>
+		</oboInOwl:Definition>
+	</oboInOwl:hasDefinition>
+	<oboInOwl:hasExactSynonym>
+		<oboInOwl:Synonym>
+			<rdfs:label xml:lang="en">endurant</rdfs:label>
+			<oboInOwl:hasDbXref>
+				<oboInOwl:DbXref>
+					<rdfs:label>PMID:15892874</rdfs:label>
+					<oboInOwl:hasURI rdf:datatype="http://www.w3.org/2001/XMLSchema#anyURI">http://www.cellcycleontology.org/obo/owl/PMID#PMID_15892874</oboInOwl:hasURI>
+				</oboInOwl:DbXref>
+			</oboInOwl:hasDbXref>
+		</oboInOwl:Synonym>
+	</oboInOwl:hasExactSynonym>
+	<oboInOwl:hasBroadSynonym>
+		<oboInOwl:Synonym>
+			<rdfs:label xml:lang="en">thing</rdfs:label>
+			<oboInOwl:hasDbXref>
+				<oboInOwl:DbXref>
+					<rdfs:label>PMID:15892874</rdfs:label>
+					<oboInOwl:hasURI rdf:datatype="http://www.w3.org/2001/XMLSchema#anyURI">http://www.cellcycleontology.org/obo/owl/PMID#PMID_15892874</oboInOwl:hasURI>
+				</oboInOwl:DbXref>
+			</oboInOwl:hasDbXref>
+		</oboInOwl:Synonym>
+	</oboInOwl:hasBroadSynonym>
+	<rdfs:subClassOf rdf:resource="http://www.cellcycleontology.org/obo/owl/APO#APO_U0000000"/>
+	<owl:disjointWith rdf:resource="http://www.cellcycleontology.org/obo/owl/APO#APO_U0000002"/>
+</owl:Class>
+
+<owl:Class rdf:about="http://www.cellcycleontology.org/obo/owl/APO#APO_U0000002">
+	<rdfs:label xml:lang="en">process</rdfs:label>
+	<oboInOwl:hasDefinition>
+		<oboInOwl:Definition>
+			<rdfs:label xml:lang="en">Entities that unfold themselves in successive temporal phases.</rdfs:label>
+			<oboInOwl:hasDbXref>
+				<oboInOwl:DbXref>
+					<rdfs:label>PMID:15892874</rdfs:label>
+					<oboInOwl:hasURI rdf:datatype="http://www.w3.org/2001/XMLSchema#anyURI">http://www.cellcycleontology.org/obo/owl/PMID#PMID_15892874</oboInOwl:hasURI>
+				</oboInOwl:DbXref>
+			</oboInOwl:hasDbXref>
+		</oboInOwl:Definition>
+	</oboInOwl:hasDefinition>
+	<oboInOwl:hasExactSynonym>
+		<oboInOwl:Synonym>
+			<rdfs:label xml:lang="en">perdurant</rdfs:label>
+			<oboInOwl:hasDbXref>
+				<oboInOwl:DbXref>
+					<rdfs:label>PMID:15892874</rdfs:label>
+					<oboInOwl:hasURI rdf:datatype="http://www.w3.org/2001/XMLSchema#anyURI">http://www.cellcycleontology.org/obo/owl/PMID#PMID_15892874</oboInOwl:hasURI>
+				</oboInOwl:DbXref>
+			</oboInOwl:hasDbXref>
+		</oboInOwl:Synonym>
+	</oboInOwl:hasExactSynonym>
+	<oboInOwl:hasBroadSynonym>
+		<oboInOwl:Synonym>
+			<rdfs:label xml:lang="en">ocurrent</rdfs:label>
+			<oboInOwl:hasDbXref>
+				<oboInOwl:DbXref>
+					<rdfs:label>PMID:15892874</rdfs:label>
+					<oboInOwl:hasURI rdf:datatype="http://www.w3.org/2001/XMLSchema#anyURI">http://www.cellcycleontology.org/obo/owl/PMID#PMID_15892874</oboInOwl:hasURI>
+				</oboInOwl:DbXref>
+			</oboInOwl:hasDbXref>
+		</oboInOwl:Synonym>
+	</oboInOwl:hasBroadSynonym>
+	<rdfs:subClassOf rdf:resource="http://www.cellcycleontology.org/obo/owl/APO#APO_U0000000"/>
+	<owl:disjointWith rdf:resource="http://www.cellcycleontology.org/obo/owl/APO#APO_U0000001"/>
+</owl:Class>
+
+<owl:Class rdf:about="http://www.cellcycleontology.org/obo/owl/APO#APO_U0000003">
+	<rdfs:label xml:lang="en">biopolymer</rdfs:label>
+	<oboInOwl:hasDefinition>
+		<oboInOwl:Definition>
+			<rdfs:label xml:lang="en">A polymer, such as a protein, nucleic acid, or transcript, ocurring in, or formed by, living systems.</rdfs:label>
+			<oboInOwl:hasDbXref>
+				<oboInOwl:DbXref>
+					<rdfs:label>APO:ea</rdfs:label>
+					<oboInOwl:hasURI rdf:datatype="http://www.w3.org/2001/XMLSchema#anyURI">http://www.cellcycleontology.org/obo/owl/APO#APO_ea</oboInOwl:hasURI>
+				</oboInOwl:DbXref>
+			</oboInOwl:hasDbXref>
+		</oboInOwl:Definition>
+	</oboInOwl:hasDefinition>
+	<oboInOwl:hasExactSynonym>
+		<oboInOwl:Synonym>
+			<rdfs:label xml:lang="en">bio-polymer</rdfs:label>
+			<oboInOwl:hasDbXref>
+				<oboInOwl:DbXref>
+					<rdfs:label>APO:ea</rdfs:label>
+					<oboInOwl:hasURI rdf:datatype="http://www.w3.org/2001/XMLSchema#anyURI">http://www.cellcycleontology.org/obo/owl/APO#APO_ea</oboInOwl:hasURI>
+				</oboInOwl:DbXref>
+			</oboInOwl:hasDbXref>
+		</oboInOwl:Synonym>
+	</oboInOwl:hasExactSynonym>
+	<rdfs:subClassOf rdf:resource="http://www.cellcycleontology.org/obo/owl/APO#APO_U0000001"/>
+</owl:Class>
+
+<owl:Class rdf:about="http://www.cellcycleontology.org/obo/owl/APO#APO_U0000004">
+	<rdfs:label xml:lang="en">gene</rdfs:label>
+	<oboInOwl:hasDefinition>
+		<oboInOwl:Definition>
+			<rdfs:label xml:lang="en">A locatable region of genomic sequence, corresponding to a unit of inheritance, which is associated with regulatory regions, transcribed regions and%2For other functional sequence regions.</rdfs:label>
+			<oboInOwl:hasDbXref>
+				<oboInOwl:DbXref>
+					<rdfs:label>SO:0000704</rdfs:label>
+					<oboInOwl:hasURI rdf:datatype="http://www.w3.org/2001/XMLSchema#anyURI">http://www.cellcycleontology.org/obo/owl/SO#SO_0000704</oboInOwl:hasURI>
+				</oboInOwl:DbXref>
+			</oboInOwl:hasDbXref>
+		</oboInOwl:Definition>
+	</oboInOwl:hasDefinition>
+	<oboInOwl:hasDbXref>
+		<oboInOwl:DbXref>
+			<rdfs:label>SO:0000704</rdfs:label>
+			<oboInOwl:hasURI rdf:datatype="http://www.w3.org/2001/XMLSchema#anyURI">http://www.cellcycleontology.org/obo/owl/SO#SO_0000704</oboInOwl:hasURI>
+		</oboInOwl:DbXref>
+	</oboInOwl:hasDbXref>
+	<rdfs:subClassOf rdf:resource="http://www.cellcycleontology.org/obo/owl/APO#APO_U0000003"/>
+	<owl:disjointWith rdf:resource="http://www.cellcycleontology.org/obo/owl/APO#APO_U0000005"/>
+</owl:Class>
+
+<owl:Class rdf:about="http://www.cellcycleontology.org/obo/owl/APO#APO_U0000005">
+	<rdfs:label xml:lang="en">protein</rdfs:label>
+	<oboInOwl:hasDefinition>
+		<oboInOwl:Definition>
+			<rdfs:label xml:lang="en">One or more polypeptides which may, or may not, be covalently bonded, and which assume a native secondary and tertiary structure.</rdfs:label>
+			<oboInOwl:hasDbXref>
+				<oboInOwl:DbXref>
+					<rdfs:label>SO:0000358</rdfs:label>
+					<oboInOwl:hasURI rdf:datatype="http://www.w3.org/2001/XMLSchema#anyURI">http://www.cellcycleontology.org/obo/owl/SO#SO_0000358</oboInOwl:hasURI>
+				</oboInOwl:DbXref>
+			</oboInOwl:hasDbXref>
+		</oboInOwl:Definition>
+	</oboInOwl:hasDefinition>
+	<oboInOwl:hasDbXref>
+		<oboInOwl:DbXref>
+			<rdfs:label>SO:0000358</rdfs:label>
+			<oboInOwl:hasURI rdf:datatype="http://www.w3.org/2001/XMLSchema#anyURI">http://www.cellcycleontology.org/obo/owl/SO#SO_0000358</oboInOwl:hasURI>
+		</oboInOwl:DbXref>
+	</oboInOwl:hasDbXref>
+	<rdfs:subClassOf rdf:resource="http://www.cellcycleontology.org/obo/owl/APO#APO_U0000003"/>
+	<owl:disjointWith rdf:resource="http://www.cellcycleontology.org/obo/owl/APO#APO_U0000004"/>
+</owl:Class>
+
+<owl:Class rdf:about="http://www.cellcycleontology.org/obo/owl/APO#APO_U0000006">
+	<rdfs:label xml:lang="en">transcript</rdfs:label>
+	<oboInOwl:hasDefinition>
+		<oboInOwl:Definition>
+			<rdfs:label xml:lang="en">An RNA synthesized on a DNA or RNA template by an RNA polymerase.</rdfs:label>
+			<oboInOwl:hasDbXref>
+				<oboInOwl:DbXref>
+					<rdfs:label>SO:0000673</rdfs:label>
+					<oboInOwl:hasURI rdf:datatype="http://www.w3.org/2001/XMLSchema#anyURI">http://www.cellcycleontology.org/obo/owl/SO#SO_0000673</oboInOwl:hasURI>
+				</oboInOwl:DbXref>
+			</oboInOwl:hasDbXref>
+		</oboInOwl:Definition>
+	</oboInOwl:hasDefinition>
+	<oboInOwl:hasDbXref>
+		<oboInOwl:DbXref>
+			<rdfs:label>SO:0000673</rdfs:label>
+			<oboInOwl:hasURI rdf:datatype="http://www.w3.org/2001/XMLSchema#anyURI">http://www.cellcycleontology.org/obo/owl/SO#SO_0000673</oboInOwl:hasURI>
+		</oboInOwl:DbXref>
+	</oboInOwl:hasDbXref>
+	<rdfs:subClassOf rdf:resource="http://www.cellcycleontology.org/obo/owl/APO#APO_U0000003"/>
+</owl:Class>
+
+<owl:Class rdf:about="http://www.cellcycleontology.org/obo/owl/APO#APO_U0000007">
+	<rdfs:label xml:lang="en">interaction</rdfs:label>
+	<oboInOwl:hasDefinition>
+		<oboInOwl:Definition>
+			<rdfs:label xml:lang="en">Any reciprocal or mutual action or effect between two continuants.</rdfs:label>
+			<oboInOwl:hasDbXref>
+				<oboInOwl:DbXref>
+					<rdfs:label>APO:ea</rdfs:label>
+					<oboInOwl:hasURI rdf:datatype="http://www.w3.org/2001/XMLSchema#anyURI">http://www.cellcycleontology.org/obo/owl/APO#APO_ea</oboInOwl:hasURI>
+				</oboInOwl:DbXref>
+			</oboInOwl:hasDbXref>
+		</oboInOwl:Definition>
+	</oboInOwl:hasDefinition>
+	<rdfs:subClassOf rdf:resource="http://www.cellcycleontology.org/obo/owl/APO#APO_U0000002"/>
+</owl:Class>
+
+<owl:Class rdf:about="http://www.cellcycleontology.org/obo/owl/APO#APO_U0000008">
+	<rdfs:label xml:lang="en">pathway</rdfs:label>
+	<oboInOwl:hasDefinition>
+		<oboInOwl:Definition>
+			<rdfs:label xml:lang="en">A chain of interactions undergone by a given biopolymer or molecular entity in a particular organism.</rdfs:label>
+			<oboInOwl:hasDbXref>
+				<oboInOwl:DbXref>
+					<rdfs:label>APO:ea</rdfs:label>
+					<oboInOwl:hasURI rdf:datatype="http://www.w3.org/2001/XMLSchema#anyURI">http://www.cellcycleontology.org/obo/owl/APO#APO_ea</oboInOwl:hasURI>
+				</oboInOwl:DbXref>
+			</oboInOwl:hasDbXref>
+		</oboInOwl:Definition>
+	</oboInOwl:hasDefinition>
+	<rdfs:subClassOf rdf:resource="http://www.cellcycleontology.org/obo/owl/APO#APO_U0000002"/>
+</owl:Class>
+
+<owl:Class rdf:about="http://www.cellcycleontology.org/obo/owl/APO#APO_U0000009">
+	<rdfs:label xml:lang="en">small molecule</rdfs:label>
+	<oboInOwl:hasDefinition>
+		<oboInOwl:Definition>
+			<rdfs:label xml:lang="en">A small structural unit of matter consisting of one or more atoms.</rdfs:label>
+			<oboInOwl:hasDbXref>
+				<oboInOwl:DbXref>
+					<rdfs:label>APO:ea</rdfs:label>
+					<oboInOwl:hasURI rdf:datatype="http://www.w3.org/2001/XMLSchema#anyURI">http://www.cellcycleontology.org/obo/owl/APO#APO_ea</oboInOwl:hasURI>
+				</oboInOwl:DbXref>
+			</oboInOwl:hasDbXref>
+		</oboInOwl:Definition>
+	</oboInOwl:hasDefinition>
+	<rdfs:subClassOf rdf:resource="http://www.cellcycleontology.org/obo/owl/APO#APO_U0000001"/>
+</owl:Class>
+
+<owl:Class rdf:about="http://www.cellcycleontology.org/obo/owl/APO#APO_U0000010">
+	<rdfs:label xml:lang="en">complex</rdfs:label>
+	<oboInOwl:hasDefinition>
+		<oboInOwl:Definition>
+			<rdfs:label xml:lang="en">Any distinct chemical species in which two or more identical or nonidentical chemical species are associated.</rdfs:label>
+			<oboInOwl:hasDbXref>
+				<oboInOwl:DbXref>
+					<rdfs:label>APO:ea</rdfs:label>
+					<oboInOwl:hasURI rdf:datatype="http://www.w3.org/2001/XMLSchema#anyURI">http://www.cellcycleontology.org/obo/owl/APO#APO_ea</oboInOwl:hasURI>
+				</oboInOwl:DbXref>
+			</oboInOwl:hasDbXref>
+		</oboInOwl:Definition>
+	</oboInOwl:hasDefinition>
+	<rdfs:subClassOf rdf:resource="http://www.cellcycleontology.org/obo/owl/APO#APO_U0000001"/>
+</owl:Class>
+
+<owl:ObjectProperty rdf:about="http://www.cellcycleontology.org/obo/owl/APO#is_a">
+	<rdfs:label xml:lang="en">is_a</rdfs:label>
+	<rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">The is_a relationship is considered axiomatic by the obo file format specification, and by OWL</rdfs:comment>
+	<oboInOwl:hasDefinition>
+		<oboInOwl:Definition>
+			<rdfs:label xml:lang="en">For continuants%3A C is_a C' if and only if%3A given any c that instantiates C at a time t, c instantiates C' at t. For processes%3A P is_a P' if and only if%3A that given any p that instantiates P, then p instantiates P'.</rdfs:label>
+			<oboInOwl:hasDbXref>
+				<oboInOwl:DbXref>
+					<rdfs:label>PMID:15892874</rdfs:label>
+					<oboInOwl:hasURI rdf:datatype="http://www.w3.org/2001/XMLSchema#anyURI">http://www.cellcycleontology.org/obo/owl/PMID#PMID_15892874</oboInOwl:hasURI>
+				</oboInOwl:DbXref>
+			</oboInOwl:hasDbXref>
+		</oboInOwl:Definition>
+	</oboInOwl:hasDefinition>
+	<oboInOwl:hasExactSynonym>
+		<oboInOwl:Synonym>
+			<rdfs:label xml:lang="en">is_subtype_of</rdfs:label>
+		</oboInOwl:Synonym>
+	</oboInOwl:hasExactSynonym>
+	<rdf:type rdf:resource="http://www.w3.org/2002/07/owl#TransitiveProperty"/>
+	<oboInOwl:hasDbXref>
+		<oboInOwl:DbXref>
+			<rdfs:label>owl:subClassOf</rdfs:label>
+			<oboInOwl:hasURI rdf:datatype="http://www.w3.org/2001/XMLSchema#anyURI">http://www.cellcycleontology.org/obo/owl/owl#owl_subClassOf</oboInOwl:hasURI>
+		</oboInOwl:DbXref>
+	</oboInOwl:hasDbXref>
+</owl:ObjectProperty>
+
+</rdf:RDF>
+
+<!--
+Generated with onto-perl: t/OBOParser.t, Fri Jun 15 16:37:30 CEST 2007
+
+-->

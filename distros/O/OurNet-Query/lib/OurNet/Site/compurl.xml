@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<SITE ID="Compurl">
+
+<NAME Lang="en-us">Companies URL Search</NAME>
+<INFO Lang="en-us">business information web search in Japan</INFO>
+
+<URL Type="Start"><![CDATA[
+http://com.navi.ntt.co.jp/cgi-bin/URL-tret-ret.pl?keywords=_QUERY_&server=comdb&port=25601&sort=new&comment=on
+]]></URL>
+
+<CHARSET>ja-jp.euc</CHARSET>
+<SCORE>100-(_RANK_-1)/2</SCORE>
+
+
+<TEMPLATE><![CDATA[
+<LI><A HREF="_URL_">_TITLE_</A>___<I>_PREVIEW_<BR><BR>
+]]></TEMPLATE>
+</SITE>

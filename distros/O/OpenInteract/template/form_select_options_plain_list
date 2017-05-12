@@ -1,0 +1,10 @@
+[%########################################
+  form_select_options_plain_list( value_list, label_list, picked )
+     Cycle through all objects in a list and display an <OPTION> for
+     each.
+  ########################################-%]
+[%- FOREACH idx = [ 0..value_list.max ] -%]
+   [%- SET label = ( label_list.$idx ) ? label_list.$idx : value_list.$idx;
+       SET value = value_list.$idx -%]
+   [%- INCLUDE form_select_option -%]
+[%- END -%]

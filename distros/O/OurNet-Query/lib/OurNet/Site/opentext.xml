@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<SITE ID="OpenText">
+
+<NAME Lang="en-us">Livelink Pinstripe</NAME>
+<NAME Lang="zh-tw"><![CDATA[
+OpenText商業WWW搜尋(中英文)
+]]></NAME>
+<INFO Lang="en-us">the source for business knowledge</INFO>
+<INFO Lang="zh-tw">the source for business knowledge</INFO>
+
+<URL Type="More"><![CDATA[
+post://pinstripe.opentext.com/otcgi/cgills-921.exe?sumrgn=summ&sumrgn=size&sumrgn=url&sumrgn=kwic&query=_QUERY_&query=&rgn=NAICS&From=_START_10_1_&SIZE=10
+]]></URL>
+<URL Type="Start"><![CDATA[
+post://pinstripe.opentext.com/otcgi/cgills-921.exe?sumrgn=summ&sumrgn=size&sumrgn=url&sumrgn=kwic&query=_QUERY_&query=&rgn=NAICS&From=1&SIZE=10
+]]></URL>
+
+<SCORE>100-(_RANK_-1)/2</SCORE>
+<EXPRESSION>Standard</EXPRESSION>
+
+
+<TEMPLATE><![CDATA[
+<LI><A TARGET="_top" HREF="_URL_">_TITLE_</A>___(size:_SIZEK_k)___<CODE><B>___</CODE><BR>_PREVIEW_</LI>
+]]></TEMPLATE>
+</SITE>

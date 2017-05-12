@@ -1,0 +1,4 @@
+Changes for Perl extension OpenGL-List
+
+0.01 to be released
+	- Creating initial implemention with only glpList

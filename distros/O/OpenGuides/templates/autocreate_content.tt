@@ -1,0 +1,2 @@
+Things in [% IF index_type == "Category" %]this category[% ELSE %][% index_value %][% END %] (@MAP_LINK [[[% node_name %]|view them on a map]]):
+@INDEX_LIST [[[% node_name %]]]

@@ -1,0 +1,21 @@
+Revision history for Outline-Lua
+
+0.10    2009-05-26
+        Now you can register Perl variables with Lua. Not all types are supported; only:
+          - numbers
+          - booleans
+          - strings
+          - tables (arrayrefs and hashrefs)
+
+        Func refs are to come; I can't think of a good way of doing objects fully yet but
+        I have ideas.
+
+0.03    2009-05-18
+        The version info in the pm was wrong so the tests failed when installing from cpan.
+
+0.02    Not long after
+        The docs were wrong!
+
+0.01    At some point
+        First version, released on an unsuspecting world.
+

@@ -1,0 +1,224 @@
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#basics">BASICS</A></LI>
+	<LI><A HREF="#implementation">IMPLEMENTATION</A></LI>
+	<UL>
+
+		<LI><A HREF="#setup of database">Setup of database</A></LI>
+		<LI><A HREF="#security as object">Security as object</A></LI>
+	</UL>
+
+	<LI><A HREF="#using security">USING SECURITY</A></LI>
+	<LI><A HREF="#default object permissions">DEFAULT OBJECT PERMISSIONS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#authors">AUTHORS</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Security - Security objects and actions in OpenInteract and SPOPS</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<P>This document will discuss how security works in both OpenInteract and
+SPOPS.</P>
+<P>
+<HR>
+<H1><A NAME="basics">BASICS</A></H1>
+<P>There are two layers of security in OpenInteract:</P>
+<OL>
+<LI><STRONG><A NAME="item_Action_security">Action security</A></STRONG><BR>
+
+<LI><STRONG><A NAME="item_Data_security">Data security</A></STRONG><BR>
+
+</OL>
+<P>Action security specifies whether a particular user can generally
+accomplish a particular task. Data security determines whether the
+user can perform a particular action on a particular object, or even
+see the object at all. The distinction between the two is important,
+because the two are implemented in a unified fashion. This method of
+implementation is a good thing, but it might be confusing to
+newcomers.</P>
+<P>
+<HR>
+<H1><A NAME="implementation">IMPLEMENTATION</A></H1>
+<P>Every SPOPS class can have security implemented by putting the class
+'SPOPS::Secure' in the @ISA. Removing security from the class is as
+simple as removing 'SPOPS::Secure' from the @ISA, but note that doing
+so will not remove the actual security objects that were previously
+created.</P>
+<P>
+<H2><A NAME="setup of database">Setup of database</A></H2>
+<P>Here's an idea of how the table for security objects is setup (using
+MySQL syntax):</P>
+<PRE>
+ CREATE TABLE security (
+  sid        int not null auto_increment,
+  object_id  varchar(200) not null,
+  class      varchar(20) not null,
+  scope      char(1) not null,
+  scope_id   varchar(16) not null default 'world',
+  level      char(1) not null,
+  primary key  ( sid ),
+  unique       ( object_id, class, scope, scope_id )
+ )</PRE>
+<P>Some notes on this table:</P>
+<UL>
+<LI><STRONG><A NAME="item_sid">sid</A></STRONG><BR>
+
+a unique number is necessary for each security object
+<P></P>
+<LI><STRONG><A NAME="item_object_id">object_id</A></STRONG><BR>
+
+represents the unique ID for the object being secured
+<P></P>
+<LI><STRONG><A NAME="item_class">class</A></STRONG><BR>
+
+the class of the object being secured, e.g. ('MyApp::User')
+<P></P>
+<LI><STRONG><A NAME="item_scope">scope</A></STRONG><BR>
+
+w (world) | g (group) | u (user)
+<P></P>
+<LI><STRONG><A NAME="item_scope_id">scope_id</A></STRONG><BR>
+
+the ID of the user or group for which the scope holds; the default
+takes hold when we do not specify a scope_id, which should only be
+when we specify a scope of 'w'
+<P></P>
+<LI><STRONG><A NAME="item_level">level</A></STRONG><BR>
+
+1 (none) | 4 (read) | 8 (write) (actual numbers not final; use the
+exported constants from <A HREF="/SPOPS/Secure.html">the SPOPS::Secure manpage</A>)
+<P></P></UL>
+<P>We use <A HREF="#item_sid"><CODE>sid</CODE></A> as a primary key but also enforce uniqueness to ensure
+we do not try to specify two different levels of security for the user
+or group (or for the whole world) on the same object.</P>
+<P>
+<H2><A NAME="security as object">Security as object</A></H2>
+<P>Each setting to an object is itself an object. In this manner we can
+use the SPOPS framework to create/edit/remove security settings. (Note
+that if you modify the 'SPOPS::Impl::SecurityObj' class to use
+'SPOPS::Secure' in its @ISA, you'll probably collapse the Earth in a
+self-referential object definition cycle. Don't do that.)</P>
+<P>The Security object has some extra methods:</P>
+<UL>
+<LI><STRONG><A NAME="item_fetch_by_obj">fetch_by_obj( $object, \%scope_info )</A></STRONG><BR>
+
+allows you to fetch all the security settings for an object, or to
+restrict by any number of users or any number of groups:
+<PRE>
+ my $sec_obj_class = 'SPOPS::Impl::SecurityObj';
+ my \%levels = $sec_obj_class-&gt;fetch_by_obj( $msg_obj );
+ print &quot;World security: $levels-&gt;{world}\n&quot;;
+ foreach my $gid ( keys %{ $levels-&gt;{group} } ) {
+   print &quot;Group $gid security: $levels-&gt;{group}-&gt;{ $gid }\n&quot;;
+ }
+ foreach my $uid ( keys %{ $levels-&gt;{user} } ) {
+   print &quot;User $uid security: $levels-&gt;{user}-&gt;{ $uid }\n&quot;;
+ }</PRE>
+<P></P>
+<LI><STRONG><A NAME="item_fetch_match">fetch_match( $object, \%scope_info )</A></STRONG><BR>
+
+See if there are any existing security objects matching the parameters
+you pass in. Basically, you're saying: ``I have an object and a user,
+are there any current security settings with these characteristics?''
+You're not finding out the security <STRONG>level</STRONG> for that object and
+scope, but a specific security object.
+<PRE>
+ my $sec_obj = $sec_class-&gt;fetch_match( $obj, 
+                                        { scope =&gt; SEC_SCOPE_USER,
+                                          scope_id =&gt; $user-&gt;id } );
+ if ( ! $sec_obj ) { ... }</PRE>
+<P></P></UL>
+<P>
+<HR>
+<H1><A NAME="using security">USING SECURITY</A></H1>
+<P>Security is interwoven into SPOPS. So when you try to perform any
+action upon an object, its security is checked. (You need to ensure
+that you tell SPOPS how to create User and Group objects, and how to
+retrieve the object mapping to the User performing the current
+request.)</P>
+<P>For instance, when you do a simple fetch on a class that has
+implemented security:</P>
+<PRE>
+ my $file = eval { FileClass-&gt;fetch( $id ); };</PRE>
+<P>SPOPS first ensures that the current user can READ it before fetching
+it. It does so by checking the permissions that have been previously
+set on an object. If the current user has no permissions on the
+object, SPOPS throws a security error explaining that the current user
+has no permission to see the requested object. Since this is not a
+fatal error, your action can continue working but display an
+error to the user, or whatever you want.</P>
+<P>You can check for this as follows:</P>
+<PRE>
+ my $file = eval { FileClass-&gt;fetch( $id ) };
+ if ( $@ ) {
+    my $ei = SPOPS::Error-&gt;get;
+    if ( $ei-&gt;{type} eq 'security' ) {
+        warn &quot;You do not have permission to look at item $id&quot;;
+    }
+    else {
+        warn &quot;Error when trying to retrieve item $id: $ei-&gt;{system_msg}&quot;;
+    }
+ }</PRE>
+<P>Similarly, if you try to retrieve a group of objects, SPOPS will only
+return those objects for which the current user has READ (or higher)
+permission. You can determine which objects the user has WRITE access
+to by inspecting the object property {tmp_security_level}, which is
+always set by the <CODE>fetch()</CODE> method. For instance:</P>
+<PRE>
+ my $obj = eval { FileClass-&gt;fetch( $id ) };
+ if ( $obj-&gt;{tmp_security_level} == SEC_LEVEL_READ ) { 
+    warn &quot;User has READ access&quot;;
+ }
+ elsif ( $obj-&gt;{tmp_security_level} == SEC_LEVEL_WRITE ) { 
+    warn &quot;User has WRITE access&quot;;
+ }</PRE>
+<P>If you try to write (create, update or remove) an object, SPOPS
+ensures that the current user has permission to do so. Note that while
+updating or removing an object is fairly simple -- we just check the
+permissions on the existing item -- creating an object is somewhat
+more difficult.</P>
+<P>Creating an object can be very application specific. For instance, if
+you're implementing a file explorer program the permission to upload a
+new file (or create a new file object) depends on the user's
+permission for the directory object the file is being uploaded to. If
+the user only has READ permission, then creating a new file is
+prohibited. However, WRITE permission allows the file to be uploaded
+properly.</P>
+<P>And once the object has been created, what other users/groups should
+have permission and at what level? Since this is very
+application-specific, so SPOPS does not impose a particular behavior
+on your objects. Instead, it allows you to setup default permissions
+on the class. (See below.)</P>
+<P>
+<HR>
+<H1><A NAME="default object permissions">DEFAULT OBJECT PERMISSIONS</A></H1>
+<P>Even though we've covered object security and data security, there
+remains a little hole.</P>
+<P>Each class can have default permissions setup. This should hopefully
+alleviate the need to create specific security_* handlers for your
+class. For instance, you can specify that you want all users to be
+able to create objects of a particular class and each created object
+will have READ permissions for all groups the user belongs to.</P>
+<P>In the future, we will implement a 'Security Policy' which tells the
+system what you or members of your group should do when creating an
+object. Currently, the permissions are specified in the SPOPS object
+configuration file using the 'initial security' key.</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><CODE>SPOPS::Secure</CODE></P>
+<P><CODE>SPOPS::Secure::Hierarchy</CODE></P>
+<P>
+<HR>
+<H1><A NAME="authors">AUTHORS</A></H1>
+<P>Chris Winters &lt;<A HREF="mailto:chris@cwinters.com">chris@cwinters.com</A>&gt;</P>

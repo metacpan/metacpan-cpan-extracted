@@ -1,0 +1,31 @@
+- remove Event code from monitor daemon
+- intercept SIGTERM, SIGINT, SIGQUIT, SIGHUP; call haltwait and exit
+
+redirect child stdout, stderr to syslog
+
+convert monitor daemon to DFA
+
+use version or begin/end strings in hactl and hatab to ensure they are
+valid before copying
+
+consider both status and clstat in quorum check and stomith -- split
+off as separate isalive() function
+
+make quorum count persistent -- store on disk
+
+detect INITTAB_NOK
+
+- documentation in progress; about 25% correct, 25% wrong, 50% missing
+- it currently spits out debug messages every few seconds
+- quorum counting accidentally counts nodes that are up but not running
+  OpenMosix::HA; easy fix
+    
+
+finish mosha
+
+stomith test 7 failed on node21
+
+write monitor test cases
+
+clean up and make uniform PASS/PASSED/FAIL/FAILED in HA and Init
+
