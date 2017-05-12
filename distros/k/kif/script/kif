@@ -1,0 +1,506 @@
+#!/usr/bin/perl
+#
+# Revision History:
+#
+#   25-Nov-2002 Dick Munroe (munroe@csworks.com)
+#       Add ix86 with Grub support.
+#       Break the packages out into separate files and directories.
+#
+#   26-Nov-2002 Dick Munroe (munroe@csworks.com)
+#       Change the order of construction so that cleaning happens first.
+#
+#   31-Dec-2002 Dick Munroe (munroe@csworks.com)
+#       Add documentation.
+#       Add -h and --help switches.
+#
+#   18-May-2003 Dick Munroe (munroe@csworks.com)
+#       Fixes for potential problems with leakage of package variables in
+#       all helper classes.
+#
+#   19-May-2003 Dick Munroe (munroe@csworks.com)
+#       Add a version switch.
+#       Make clean phase more reliable.
+#       Isolate all kif related classes in the KIF namespace.
+#       This required a major restructuring of the directory structure
+#       and as a consequence this is now version 2 of kif.
+#
+#   20-May-2003 Dick Munroe (munroe@csworks.com)
+#       Backport to 5.6.1
+#
+
+use 5.6.1 ;
+use strict ;
+
+use Getopt::Long qw(:config bundling) ;
+use KIF::Build::alpha ;
+use KIF::Build::ix86 ;
+use KIF::Build::ppc ;
+use Pod::Usage ;
+use StanzaFile ;
+
+our $VERSION = "2.01" ;
+
+#
+# The IK Actions vary depending on architecture, but are basically
+# a way to determine what the user wants to do.  The overall flow
+# of control (by default) is:
+#
+#       Make clean
+#       Make Dependencies
+#       Make Kernel
+#       Make Modules
+#       Make Modules Install
+#       Modify Bootloader
+#       Move files
+#           Kernel
+#           Compressed kernel (generated from kernel via gzip)
+#           System.map
+#           Configuration file
+#       Move kernel files.
+#       Make symbolic links
+#       Make kernel module dependencies
+#       Update initrd
+#
+# The start and end are parameters in argv as follows:
+#
+
+my @theIKActions = ('clean',
+		    'dependencies',
+		    'kernel',
+		    'modules',
+		    'modules_install',
+		    'bootloader',
+		    'movefiles',
+		    'links',
+		    'depmod',
+		    'initrd') ;
+
+sub actionIndex
+{
+    my $theString = shift ;
+    my $theIndex = 0 ;
+    
+    foreach (@theIKActions)
+    {
+	return $theIndex if (m/^$theString/i) ;
+	$theIndex++ ;
+    } ;
+
+    die "Unknown action: $theString" ;
+} ;
+
+my $theBuildArchitecture = `uname -m` ;
+my $theBuildDirectory = `pwd` ;
+my $theHelpFlag ;
+my $theLogFile ;
+my $theNoBootloaderFlag ;
+my $theNoCleanFlag ;
+my $theNoDependenciesFlag  ;
+my $theNoDepmodFlag  ;
+my $theNoInitrdFlag ;
+my $theNoKernelFlag ;
+my $theNoLinksFlag ;
+my $theNoModulesFlag ;
+my $theNoModulesInstallFlag ;
+my $theNoMovefilesFlag ;
+my $theTestFlag ;
+my $theVerboseFlag ;
+my $theVersionFlag ;
+
+chomp($theBuildArchitecture) ;
+chomp($theBuildDirectory) ;
+
+GetOptions('architecture|a=s' => \$theBuildArchitecture,
+	   'directory|d=s'    => \$theBuildDirectory,
+	   'help|h'           => \$theHelpFlag,
+	   'log=s'            => \$theLogFile,
+	   'nobootloader'     => \$theNoBootloaderFlag,
+	   'noclean'          => \$theNoCleanFlag,
+	   'nodepmod'         => \$theNoDepmodFlag,
+	   'nodependencies'   => \$theNoDependenciesFlag,
+	   'noinitrd'         => \$theNoInitrdFlag,
+	   'nokernel'         => \$theNoKernelFlag,
+	   'nolinks'          => \$theNoLinksFlag,
+	   'nomodules'        => \$theNoModulesFlag,
+           'nomodules_install' => \$theNoModulesInstallFlag,
+	   'nomoveflags'      => \$theNoMovefilesFlag,
+	   'test'             => \$theTestFlag,
+	   'verbose|v+'       => \$theVerboseFlag,
+	   'version|V'        => \$theVersionFlag) ;
+
+#
+# If help was asked for, just print it out.
+#
+
+if ($theHelpFlag)
+{
+    pod2usage({ -message => "Usage: kif\n", -exitval => 2, -verbose => 2 }) ;
+} ;
+
+#
+# If the version was asked for, just print it out.
+#
+
+if ($theVersionFlag)
+{
+    print $VERSION,"\n" ;
+    exit ;
+} ;
+
+#
+# The default ik activity is to run all actions.
+#
+
+if (scalar(@ARGV) < 1)
+{
+    $ARGV[0] = 'clean' ;
+} ;
+
+if (scalar(@ARGV) < 2)
+{
+    $ARGV[1] = 'initrd' ;
+} ;
+
+my $theBeginningActionIndex = &actionIndex($ARGV[0]) ;
+my $theEndingActionIndex = &actionIndex($ARGV[1]) ;
+
+#
+# Actions must appear in order.
+#
+
+die "Actions $theIKActions[$theBeginningActionIndex] and $theIKActions[$theEndingActionIndex] are out of order" 
+    if ($theBeginningActionIndex > $theEndingActionIndex) ;
+
+#
+# Now set up the actions on a per architecture basis.
+#
+
+my $theBuildObject ;
+
+$theBuildObject = new KIF::Build::alpha(directory => $theBuildDirectory,
+				        log => $theLogFile,
+					test => $theTestFlag,
+					verbose => $theVerboseFlag) if ($theBuildArchitecture eq 'alpha') ;
+
+$theBuildObject = new KIF::Build::ix86(directory => $theBuildDirectory,
+				       log => $theLogFile,
+				       test => $theTestFlag,
+				       verbose => $theVerboseFlag) if ($theBuildArchitecture =~ m/^i\d86$/) ;
+
+$theBuildObject = new KIF::Build::ppc(directory => $theBuildDirectory,
+				      log => $theLogFile,
+				      test => $theTestFlag,
+				      verbose => $theVerboseFlag) if ($theBuildArchitecture eq 'ppc') ;
+
+#
+# Make sure common bits and pieces of the build environment are sane.
+#
+
+$theBuildObject->validate() ;
+
+#
+# Validate the boot configuration files.
+#
+
+$theBuildObject->bootloader->validate($theBuildObject) ;
+
+#
+# Run the build and installation.
+#
+
+my $theIndex ;
+
+for ($theIndex = $theBeginningActionIndex; $theIndex <= $theEndingActionIndex; $theIndex++)
+{
+  SWITCH:
+    {
+	if (($theIndex == 0) && (!$theNoCleanFlag)) { $theBuildObject->doClean(); last SWITCH; } ;
+	if (($theIndex == 1) && (!$theNoDependenciesFlag)) { $theBuildObject->doDependencies(); last SWITCH; } ;
+	if (($theIndex == 2) && (!$theNoKernelFlag)) { $theBuildObject->doKernel(); last SWITCH; } ;
+	if (($theIndex == 3) && (!$theNoModulesFlag)) { $theBuildObject->doModules(); last SWITCH; } ;
+	if (($theIndex == 4) && (!$theNoModulesInstallFlag)) { $theBuildObject->doModules_install(); last SWITCH; } ;
+	if (($theIndex == 5) && (!$theNoBootloaderFlag)) { $theBuildObject->doBootloader(); last SWITCH; } ;
+	if (($theIndex == 6) && (!$theNoMovefilesFlag)) { $theBuildObject->doMovefiles(); last SWITCH; } ;
+	if (($theIndex == 7) && (!$theNoLinksFlag)) { $theBuildObject->doLinks(); last SWITCH; } ;
+	if (($theIndex == 8) && (!$theNoDepmodFlag)) { $theBuildObject->doDepmod(); last SWITCH; } ;
+	if (($theIndex == 9) && (!$theNoInitrdFlag)) { $theBuildObject->doInitrd(); last SWITCH; } ;
+    } ;
+} ;
+
+=pod
+
+=head1 NAME
+
+kif - kernel installation facility
+
+=head1 SYNOPSIS
+
+Automate the building and installation of Linux kernels.  Manage the necessary
+configuration files for each installed Linux kernel.
+
+kif [options] [startingPhase [endingPhase]]
+
+=head1 DESCRIPTION
+
+kif and it's associated perl modules provide a framework for building and
+installing Linux kernels.  It is extensible and can be made to handle any
+combination of architectures and boot loaders.  Version 1.00 handles:
+
+=over
+
+=item *
+
+ppc (Macintosh), BootX
+
+=item *
+
+alpha, aboot
+
+=item *
+
+ix86, GRUB and LILO
+
+=back
+
+any and all extensions made for other processor architectures and
+boot loaders will be greatfully included.
+
+The kernel installation process is broken into "phases".  These phases define
+what kif is to do.  Be default kif begins at the first phase and goes to the
+last.  kif may be instructed to begin and end at any desired phase.  The phases
+and their purposes are:
+
+=over
+
+=item *
+
+clean - [default starting phase if no starting phase is specified]
+from the build directory (by default, the current directory) save a 
+copy of .config and include/linux/autoconf.h, clean the directory (distclean is
+used), and restore .config and include/linux/autoconf.h.  .config and
+autoconf.h may be missing although if you haven't generated a valid .config
+file for the current build, then do so before continuing.  The timestamps
+of all files are maintained to preserve any time dependent tests done by
+the kernel build itself.
+
+If there is no valid autoconf.h or the .config file is newer, then the
+autoconf.h file is regenerated using "make oldconfig".
+
+=item *
+
+dependencies - using the current .config and autoconf.h rebuild the 
+dependencies in the build directory.  This is done via "make dep".
+
+=item *
+
+kernel - compile and link the kernel.  This is done via the appropriate
+architecture dependent make command, e.g., make bzImage for ix86 architectures.
+
+=item *
+
+modules - compile and link the specified modules.  This is done via "make
+modules".
+
+=item *
+
+modules_install - install the modules in the appropriate directory beneath
+/lib/modules.  Remember to modify buildDirectory/Makefile to include the
+appropriate version information to get the modules put in the "right" place.
+
+=item *
+
+bootloader - modify the bootloader configuration file(s) to make the new kernel
+the default bootable image.  This is also the first place in which the current
+system gets altered, e.g., an ix86 architecture using lilo will have it's boot
+block modified at this point.  The original bootloader configuration files are
+saved with an extension of .old.
+
+=item *
+
+movefiles - .config, autoconf.h, System.map, vmlinux, and any architecture
+dependent files are copied to the appropriate place(s) and tagged with the
+current release information to make the unique and identifiable.
+
+=item *
+
+links - all necessary symbolic links are constructed.
+
+=item *
+
+depmod - The necessary system module dependency information is build using the
+appropriate System.map for the new kernel.
+
+=item *
+
+initrd - [default ending phase if no ending phase is specified]
+Generate the initrd file for this kernel image if an initrd file
+for this kernel already exists or the bootloader configuration file defines
+an initrd file for this image.
+
+=back
+
+=head1 OPTIONS
+
+=over
+
+=item -a architecture | --architecture=architecture
+
+By default the current architecture.  Used to select the appropriate perl
+modules for building on the specified architecture.  The value of this
+option may be any valid Linux architecture as returned by "uname -a".  Not
+all valid architectures may be supported at any given time.
+
+=item -d buildDirectory | --directory=buildDirectory
+
+The path to the directory containing the source for the Linux kernel and
+modules.  If omitted it defaults to the current working directory.
+
+=item -h | --help
+
+Produce this pod.
+
+=item --log=logfile
+
+The path to the file into which the output of kif is to be written.
+
+=item Phase Suppression Options - are of the form noPhaseName where PhaseName
+is any of the valid phases.  Inclusion of one of these options causes the
+specified phase of the build process to be skipped if it would normally be
+executed.
+
+=over
+
+=item --nobootloader
+
+=item --noclean
+
+=item --nodepmod
+
+=item --nodependencies
+
+=item --noinitrd
+
+=item --nokernel
+
+=item --nolinks
+
+=item --nomodules
+
+=item --nomodules_install
+
+=item --nomoveflags
+
+=back
+
+=item --test
+
+Run kif but do not execute any commands.  This is mostly useful in conjunction
+with the verbose option, below.
+
+=item -v | --verbose
+
+These may be used more than once to increase the verbosity of the output.
+
+=item -V | --version
+
+Print the current version number.
+
+=back
+
+=head1 FILES
+
+All files saved or written by kif will be "tagged" with the version information
+extracted from the make file present in the build directory.  It is the
+responsibility of the user to modify the make file as appropriate to allow
+kif to work sanely.  The collection of information defining the current
+release of the kernel is called the "releaseTag".
+
+Not all of the following files exist on each system.  Not all systems use
+/boot as the place to store kernel images.
+
+=over
+
+=item /boot/etc/aboot.conf 
+
+The aboot configuration file used to boot this 
+kernel.
+
+=item /boot/autoconf.h-releaseTag 
+
+The autoconf.h generated when this kernel
+was built.
+
+=item /boot/config-releaseTag 
+
+The .config file used to generate autoconf.h
+when this kernel was built.
+
+=item /boot/grub/grub.conf 
+
+The grub configuration file used to boot this 
+kernel.
+
+=item /boot/initrd-releaseTag.img 
+
+The initrd file genereated for this kernel.
+
+=item /boot/System.map-releaseTag 
+
+The system map for this kernel.
+
+=item /boot/vmlinux 
+
+Symbolic link to the appropriate default uncompressed 
+Linux kernel.
+
+=item /boot/vmlinux-releaseTag 
+
+The uncompressed Linux kernel image.
+
+=item /boot/vmlinuz 
+
+Symbolic link to the appropriate default compressed
+Linux kernel.
+
+=item /boot/vmlinuz-releaseTag 
+
+The compressed Linux kernel image.
+
+=item /etc/lilo.conf 
+
+The lilo configuration file used to boot this kernel.
+
+=item /lib/modules/releaseTag/
+
+The modules associated with the Linux kernel.
+
+=back
+
+=head1 Getting kif
+
+The CVS sources and release kits are available from SourceForge at:
+
+    http://sf.net/projects/kif
+
+The latest released version is also available from my PAUSE directory at:
+
+    http://backpan.cpan.com/authors/id/M/MU/MUNROER/kif
+
+The latest development version is available from my website at:
+
+    http://www.csworks.com/download/
+
+=head1 Author
+
+Dick Munroe (munroe@csworks.com).  I'm looking for work (contract or permanent).  I
+do a lot more than just hack Perl.  Take a look at my:
+
+Resume:	http://www.csworks.com/resume
+Skills:	http://www.csworks.com/skills
+CV:	http://www.csworks.com/cv
+
+for the gory details.  If you see a match, drop me a not and we'll see what we
+can work out.
+
+=cut
+

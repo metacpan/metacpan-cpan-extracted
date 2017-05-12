@@ -1,0 +1,171 @@
+#!/usr/bin/env perl
+# vim:ts=8 sw=4 sts=4 ai
+require v5.8.5;
+use strict;
+use warnings;
+
+=head1 NAME
+
+kg_image_info - Check what meta-information is in an image.
+
+=head1 VERSION
+
+This describes version B<0.03> of kg_image_info.
+
+=cut
+
+our $VERSION = '0.03';
+
+=head1 SYNOPSIS
+
+kg_image_info --help | --manpage | --version
+
+kg_image_info { --plugins I<PluginName> } I<filename> ...
+
+=head1 DESCRIPTION
+
+This is a utility script to check what meta-information is in an image file,
+using the same method as khatgallery uses to get meta-data from image files.
+This is helpful to see what field names need to be used when defining what
+meta-data is put in the generated HTML files.
+
+=head1 OPTIONS
+
+=over
+
+=item --help
+
+Print help message and exit.
+
+=item --manpage
+
+Print the full help documentation (manual page) and exit.
+
+=item --plugins I<PluginName>
+
+Name optional plugin (this can be repeated for more plugins).
+This can be useful if you're using a plugin which overrides
+the default method of getting meta-data, and you want to check
+what its results are.
+
+=item --verbose
+
+Print informational messages.
+
+=item --version
+
+Print version information and exit.
+
+=back
+
+=head1 REQUIRES
+
+    Getopt::Long
+    Pod::Usage
+    Getopt::ArgvFile
+    Image::Info
+    YAML
+
+=head1 SEE ALSO
+
+perl(1)
+Getopt::Long
+Getopt::ArgvFile
+Pod::Usage
+
+=cut
+
+use Getopt::Long 2.34;
+use Getopt::ArgvFile qw(argvFile);
+use Pod::Usage;
+use YAML;
+
+#========================================================
+# Subroutines
+
+sub init_data ($) {
+    my $data_ref = shift;
+
+    $data_ref->{manpage} = 0;
+    $data_ref->{verbose} = 1;
+} # init_data
+
+sub process_args ($) {
+    my $data_ref = shift;
+
+    my $ok = 1;
+
+    argvFile(home=>1,current=>1,startupFilename=>'.kh_image_inforc');
+
+    pod2usage(2) unless @ARGV;
+
+    my $op = new Getopt::Long::Parser;
+    $op->configure(qw(auto_version auto_help));
+    $op->getoptions($data_ref,
+	       'verbose!',
+	       'manpage',
+	       'plugins=s@',
+	      ) or pod2usage(2);
+
+    if ($data_ref->{'manpage'})
+    {
+	pod2usage({ -message => "$0 version $VERSION",
+		    -exitval => 0,
+		    -verbose => 2,
+	    });
+    }
+
+} # process_args
+
+#========================================================
+# Main
+
+MAIN: {
+    my %data = ();
+
+    init_data(\%data);
+    process_args(\%data);
+    my $libdir = $data{libdir};
+    delete $data{libdir};
+
+    eval "use lib '$libdir'" if $libdir;
+    die "invalid libdir $libdir: $@" if $@;
+    my $class='HTML::KhatGallery';
+    eval "require $class;";
+    die "invalid starter class $class: $@" if $@;
+
+    my @plugins = qw(HTML::KhatGallery::Core);
+    push @plugins, @{$data{plugins}} if ($data{plugins});
+    warn "plugins=", join("\n", @plugins), "\n" if $data{debug_level};
+    delete $data{plugins};
+
+    $class->import(@plugins);
+
+    foreach my $img_file (@ARGV)
+    {
+	print $img_file, ":\n";
+	my $info = $class->get_image_info($img_file);
+	print Dump($info);
+    }
+}
+
+=head1 BUGS
+
+Please report any bugs or feature requests to the author.
+
+=head1 AUTHOR
+
+    Kathryn Andersen (RUBYKAT)
+    perlkat AT katspace dot com
+    http://www.katspace.org/tools
+
+=head1 COPYRIGHT AND LICENCE
+
+Copyright (c) 2006 by Kathryn Andersen
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut
+
+__END__

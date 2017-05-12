@@ -1,0 +1,17 @@
+Changes
+KIF/Bootloader.pm
+KIF/Bootloader/aboot.pm
+KIF/Bootloader/grub.pm
+KIF/Bootloader/lilo.pm
+KIF/Bootloader/Makefile.PL
+KIF/Build.pm
+KIF/Build/alpha.pm
+KIF/Build/ix86.pm
+KIF/Build/Makefile.PL
+KIF/Build/ppc.pm
+KIF/Makefile.PL
+Makefile.PL
+MANIFEST
+README
+script/kif
+t/use.t

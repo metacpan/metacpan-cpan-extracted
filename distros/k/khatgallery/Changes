@@ -1,0 +1,45 @@
+Revision history for khatgallery
+================================
+
+0.03 Sun 25 February 2007
+-------------------------
+
+  * (25 Feb 2007) names with spaces
+  	- fixing bugs with thumbnail creation where directory names have
+  spaces in them, thanks to a patch from Chris Benson.
+
+  * (17 Sep 2006) typo fix
+
+0.02 Sun 17 September 2006
+--------------------------
+
+  * (17 Sep 2006) fix dist error
+  	Ooops, forgot to set the dist_name to 'khatgallery'.
+
+0.01 Sun 17 September 2006
+--------------------------
+
+  * (17 Sep 2006) layout tweaking
+  	Tweaked the index layout so that it looks better in IE.
+
+  * (16 Sep 2006) basename
+  	- added file_basename to the meta data for images.
+
+  * (16 Sep 2006) new files check
+  	- improved the "new files only" algorithm to check for both
+  new and missing files in the current *directory* and to rebuild all
+  the HTML files in *that* directory if there is a new or missing file,
+  since the index will need changing but also the image HTML files because
+  of the prev/next links.
+  	- improved some documentation
+  	- new get_image_info method, so that (a) it can be overridden
+  and (b) so that kg_image_info can use it, so it is always using the
+  same data as khatgallery is.
+
+  * (9 Aug 2006) improvements
+  - documentation of khatgallery script
+  - graceful recovery if Image::Info fails when calculating thumbnail size
+  - escaping some HTML characters 
+  - adding --options option
+
+  * (6 May 2006) initial checkin

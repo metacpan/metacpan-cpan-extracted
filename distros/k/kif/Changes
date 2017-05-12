@@ -1,0 +1,140 @@
+Changes as of: 20-May-2003
+
+20-May-2003:
+    Build.pm (1.04): Dick Munroe (munroe@csworks.com)
+        If a initrd file exists in the boot configuration,
+        then get it out of the way running mkinitrd.
+
+    kif (2.01): Dick Munroe (munroe@csworks.com)
+        Backport to 5.6.1
+
+19-May-2003:
+    Bootloader.pm (1.03): Dick Munroe (munroe@csworks.com)
+        Use Carp.
+        Isolate kif related classes in a KIF namespace.
+
+    Build.pm: Dick Munroe (munroe@csworks.com)
+        Use Carp.
+        oldconfig needs to be run after distclean all the time.
+        Isolate kif related classes in a KIF namespace.
+        Change variable names to elminate warnings.
+
+    aboot.pm (1.03): Dick Munroe (munroe@csworks.com)
+        Use Carp.
+        Isolate KIF related classes in a KIF namespace.
+
+    alpha.pm (1.03): Dick Munroe (munroe@csworks.com)
+        Use Carp.
+        Isolate kif related classes in a KIF namespace.
+
+    grub.pm (1.03): Dick Munroe (munroe@csworks.com)
+        Use Carp.
+        Isolate KIF related classes in a KIF namespace.
+
+    ix86.pm (1.02): Dick Munroe (munroe@csworks.com)
+        Use Carp.
+        Isolate kif related classes in a KIF namespace.
+
+    kif: Dick Munroe (munroe@csworks.com)
+        Add a version switch.
+        Make clean phase more reliable.
+        Isolate all kif related classes in the KIF namespace.
+        This required a major restructuring of the directory structure
+        and as a consequence this is now version 2 of kif.
+
+    lilo.pm (1.03): Dick Munroe (munroe@csworks.com)
+        Use Carp.
+        Isolate kif related classes in a KIF namespace
+
+    ppc.pm (1.03): Dick Munroe (munroe@csworks.com)
+        Use Carp.
+        Isolate kif related classes in a KIF namespace.
+
+18-May-2003:
+    Bootloader.pm: Dick Munroe (munroe@csworks.com)
+        Make sure package variables don't leak.
+
+    Build.pm: Dick Munroe (munroe@csworks.com)
+        Make sure package variables don't leak.
+
+    aboot.pm: Dick Munroe (munroe@csworks.com)
+        Make sure package variables can't leak.
+
+    alpha.pm: Dick Munroe (munroe@csworks.com)
+        Make sure that package variables can't leak.
+
+    grub.pm: Dick Munroe (munroe@csworks.com)
+        Make sure package variables can't leak.
+
+    ix86.pm: Dick Munroe (munroe@csworks.com)
+        Make sure package variables can't leak.
+
+    kif: Dick Munroe (munroe@csworks.com)
+        Fixes for potential problems with leakage of package variables in
+        all helper classes.
+
+    lilo.pm: Dick Munroe (munroe@csworks.com)
+        Make sure package variables can't leak.
+
+    ppc.pm: Dick Munroe (munroe@csworks.com)
+        Make sure package variables can't leak.
+
+31-Dec-2002:
+    kif: Dick Munroe (munroe@csworks.com)
+        Add documentation.
+        Add -h and --help switches.
+
+03-Dec-2002:
+    Bootloader.pm: Dick Munroe (munroe@csworks.com)
+        Add an allocate only method, _new, which will, if
+        necessary, clone an object.
+        Add a _clone interface.
+
+    Build.pm: Dick Munroe (munroe@csworks.com)
+        Copy autoconf.h as well as .config when saving configuration
+        files.
+
+    ix86.pm: Dick Munroe (munroe@csworks.com)
+        Fix search for alternate boot loader configuration files.
+
+27-Nov-2002:
+    ix86.pm: Dick Munroe (munroe@csworks.com)
+        Support LILO as a bootloader.
+
+    lilo.pm: Dick Munroe (munroe@csworks.com)
+        Initial Version Created.
+
+26-Nov-2002:
+    Bootloader.pm: Dick Munroe (munroe@csworks.com)
+        Initial Version Created.
+
+    Build.pm: Dick Munroe (munroe@csworks.com)
+        Initial version created.
+        Save and restore the configuration files around the
+        running of doClean.
+        Make doClean issue a distclean to guarantee that things
+        will get built properly.
+
+    aboot.pm: Dick Munroe (munroe@csworks.com)
+        Initial Version Created.
+
+    alpha.pm: Dick Munroe (munroe@csworks.com)
+        Initial Version Created.
+
+    grub.pm: Dick Munroe (munroe@csworks.com)
+        Initial Version Created.
+
+    ix86.pm: Dick Munroe (munroe@csworks.com)
+        Initial Version Created.
+
+    kif: Dick Munroe (munroe@csworks.com)
+        Change the order of construction so that cleaning happens first.
+
+    ppc.pm: Dick Munroe (munroe@csworks.com)
+        Initial Version Created.
+
+25-Nov-2002:
+    kif: Dick Munroe (munroe@csworks.com)
+        Add ix86 with Grub support.
+        Break the packages out into separate files and directories.
+

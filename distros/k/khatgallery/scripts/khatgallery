@@ -1,0 +1,390 @@
+#!/usr/bin/env perl
+# vim:ts=8 sw=4 sts=4 ai
+require v5.8.5;
+use strict;
+use warnings;
+
+=head1 NAME
+
+khatgallery - generate a HTML photo-gallery.
+
+=head1 VERSION
+
+This describes version B<0.03> of khatgallery.
+
+=cut
+
+our $VERSION = '0.03';
+
+=head1 SYNOPSIS
+
+khatgallery --help | --manpage | --version
+
+khatgallery --clean I<directory>
+
+khatgallery [ --captions_file I<filename> ] [ --debug_level I<num> ]
+[ --dir_match I<string> ] [ --force_html ] [ --force_images ]
+[ --image_match I<string> ] [ --options I<filename> ]
+[ --page_template I<filename> ] [ --per_page I<num> ]
+{ --plugins I<PluginName> } { --meta I<string> } [ --thumbdir I<string> ]
+[ --thumb_geom I<num>xI<num> ] I<directory>
+
+=head1 DESCRIPTION
+
+The khatgallery script generates a HTML photo gallery.  It takes a directory
+of images, and generates the HTML pages and thumbnails needed.
+
+Place your photos in a new directory somewhere on your web site.
+Then run "khatgallery" from the command-line with the directory
+path as an argument, and there you have it.
+
+The options can be used to fine-tune and customize your gallery.
+
+=head1 OPTIONS
+
+=head2 A Note about Options
+
+Options can start with "--" or "-"; boolean options can be negated
+by preceding them with "no"; options with hash or array values
+can be added to by giving the option again for each value.
+
+See L<Getopt::Long> for more information.
+
+=over
+
+=item --captions_file I<filename>
+
+The name of the captions file; which is in the same directory
+as the images which it describes.   This file is in L<YAML> format.
+For example:
+
+    ---
+    index.html: this is the caption for the album as a whole
+    image1.png: this is the caption for image1.png
+    image2.jpg: I like the second image
+
+(default: captions.yml)
+
+=item --clean
+
+Instead of generating files, clean up the thumbnail directories to
+remove thumbnails and image HTML pages for images which are no
+longer there.
+
+=item --debug_level I<num>
+
+Set the level of debugging output.  The higher the level, the more verbose.
+(developer only)
+(default: 0)
+
+=item --dir_match I<string>
+
+Regular expression to match the directories we are interested in.
+Hidden directories and the thumbnail directory will never be included.
+
+=item --force_html
+
+Force the re-generation of all the HTML files even if they already
+exist.  If false (the default) then a given HTML file will only be
+created if there is a change in that particular directory.
+
+=item --force_images
+
+Force the re-generation of the thumbnail images even if they already
+exist.  If false (the default) then a given (thumbnail) image file will
+only be created if it doesn't already exist.
+
+=item --help
+
+Print help message and exit.
+
+=item --image_match I<string>
+
+Regular expression determining what filenames should be interpreted
+as images.
+
+=item --manpage
+
+Print the full help documentation (manual page) and exit.
+This requires perldoc to be installed.
+
+=item --meta I<string>
+
+This defines what meta-data to show for an image and how to format it.
+The field to show is surrounded by % characters.
+For example:
+    
+    --meta 'Date: %DateTime%'
+
+To show more than one field of meta-data, just give the option again.
+
+    --meta 'Date: %DateTime%' --meta '%Comment%'
+
+If an image doesn't have that particular field, the data for that field is not
+shown.  All the meta-data is placed after any caption the image has.
+
+=item --page_template I<filename>
+
+Template for HTML pages.  The default template is this:
+
+    <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+    <html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+    <title><!--kg_title--></title>
+    <!--kg_style-->
+    </head>
+    <body>
+    <!--kg_content-->
+    </body>
+    </html>
+
+This can be a string or a filename.
+
+=item --options I<filename>
+
+The name of a file to read more options from.  This can be used more
+than once.  For example:
+
+--options your.args --options my.args
+
+See L</Options Files> for more information.
+
+=item --per_page I<num>
+
+The number of images to display per index page.
+
+=item --plugins I<PluginName>
+
+Give a KhatGallery plugin to use.  This option can be repeated for
+additional plugins.
+
+=item --thumbdir I<string>
+
+The name of the directory where thumbnails and image-pages are put.
+It is a subdirectory below the directory where its images are.
+(default: tn)
+
+=item --thumb_geom I<num>xI<num>
+
+The size of the thumbnails.  This doesn't actually define the dimensions
+of the thumbnails, but their area.  This gives better-quality thumbnails.
+(default:100x100)
+
+=item --verbose
+
+Print informational messages.
+
+=item --version
+
+Print version information and exit.
+
+=back
+
+=head1 FILE FORMATS
+
+=head2 Options Files
+
+Options can be given in files as well as on the command-line by
+using the --options I<filename> option in the command-line.
+Also, the files ~/.khatgalleryrc and ./.khatgalleryrc are checked for options.
+
+The format is as follows:
+Lines starting with # are comments.  Lines enclosed in PoD markers are
+also comments.  Blank lines are ignored.  The options themselves
+should be given the way they would be on the command line, that is,
+the option name (I<including> the --) followed by its value (if any).
+
+For example:
+
+    # set meta names
+    --meta 'Date: %DateTime%'
+    --meta %Comment%
+
+Option files can be nested, by giving an --options I<filename>
+argument inside the option file, it will go and get that referred
+file as well.
+
+See L<Getopt::ArgvFile> for more information.
+
+=head2 Captions Files
+
+A captions file contains captions to describe the images and the album
+(directory or sub-directory) in which the file is.  The default name of
+this file is 'captions.yml'.
+
+This file is in L<YAML> format.  The contents are interpreted as follows:
+if an entry is called 'index.html', then that will contain the description
+of the album.  If an entry matches the name of an image in that directory,
+then its value will be used as the caption for that image.  If an entry
+doesn't match anything, it will be ignored.
+
+For example:
+
+    ---
+    index.html: this is the caption for the album as a whole
+    image1.png: this is the caption for image1.png
+    image2.jpg: I like the second image
+
+(Note that the leading '---' is required, this is part of YAML format.)
+
+HTML tags can be included in the captions, but care needs to be taken
+with them (and with quotes) to make sure that they conform to YAML syntax.
+
+Another example:
+
+    ---
+    index.html: |
+       <p>These are the <i>fabulous</i> images created by Yours Truly.</p>
+    image1.png: this is the caption for image1.png
+
+=head1 SCRIPT CATEGORIES
+
+Web
+
+=head1 ENVIRONMENT
+
+=over 4
+
+=item HOME
+
+khatgallery looks in the HOME directory for config files.
+
+=back
+
+=head1 FILES
+
+=over 4
+
+=item C<~/.khatgalleryrc>
+
+User configuration file.
+
+=item C<.khatgalleryrc>
+
+Configuration file in the current working directory; overrides
+options in C<~/.khatgalleryrc> and is overridden by command-line options.
+
+=back
+
+=head1 REQUIRES
+
+    Getopt::Long
+    Pod::Usage
+    Getopt::ArgvFile
+    HTML::KhatGallery;
+
+=head1 SEE ALSO
+
+perl(1)
+Getopt::Long
+Getopt::ArgvFile
+Pod::Usage
+
+=cut
+
+use Getopt::Long 2.34;
+use Getopt::ArgvFile qw(argvFile);
+use Pod::Usage;
+
+#========================================================
+# Subroutines
+
+sub init_data ($) {
+    my $data_ref = shift;
+
+    $data_ref->{manpage} = 0;
+    $data_ref->{verbose} = 1;
+} # init_data
+
+sub process_args ($) {
+    my $data_ref = shift;
+
+    my $ok = 1;
+
+    argvFile(home=>1,current=>1,
+	    fileOption=>'options',
+	     startupFilename=>'.khatgalleryrc');
+
+    pod2usage(2) unless @ARGV;
+
+    my $op = new Getopt::Long::Parser;
+    $op->configure(qw(auto_version auto_help));
+    $op->getoptions($data_ref,
+	       'verbose!',
+	       'manpage',
+	       'clean',
+	       'plugins=s@',
+	       'per_page=i',
+	       'thumbdir=s',
+	       'thumb_geom=s',
+	       'page_template|template=s',
+	       'force_html!',
+	       'force_images!',
+	       'meta=s@',
+	       'debug_level=i',
+	       'dir_actions=s@',
+	       'clean_actions=s@',
+	       'image_actions=s@',
+	      ) or pod2usage(2);
+
+    if ($data_ref->{'manpage'})
+    {
+	pod2usage({ -message => "$0 version $VERSION",
+		    -exitval => 0,
+		    -verbose => 2,
+	    });
+    }
+    # top_dir is $ARGV[0]
+    $data_ref->{top_dir} = shift @ARGV;
+
+} # process_args
+
+#========================================================
+# Main
+
+MAIN: {
+    my %data = ();
+
+    init_data(\%data);
+    process_args(\%data);
+    my $libdir = $data{libdir};
+    delete $data{libdir};
+
+    eval "use lib '$libdir'" if $libdir;
+    die "invalid libdir $libdir: $@" if $@;
+    my $class='HTML::KhatGallery';
+    eval "require $class;";
+    die "invalid starter class $class: $@" if $@;
+
+    my @plugins = qw(HTML::KhatGallery::Core);
+    push @plugins, @{$data{plugins}} if ($data{plugins});
+    warn "plugins=", join("\n", @plugins), "\n" if $data{debug_level};
+    delete $data{plugins};
+
+    $class->import(@plugins);
+
+    $class->run(%data);
+}
+
+=head1 BUGS
+
+Please report any bugs or feature requests to the author.
+
+=head1 AUTHOR
+
+    Kathryn Andersen (RUBYKAT)
+    perlkat AT katspace dot com
+    http://www.katspace.org/tools
+
+=head1 COPYRIGHT AND LICENCE
+
+Copyright (c) 2006 by Kathryn Andersen
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+
+=cut
+
+__END__

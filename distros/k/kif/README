@@ -1,0 +1,81 @@
+Copyright (c) 2001-2003, Dick Munroe (munroe@csworks.com).  All rights
+reserved.  This program is free software;  you can redistribute it and/or
+modify it under the Open Software Group license.
+
+Purpose of the Kernel Installation Facility (kif):
+
+Automate the building and installation of a linux kernel from source on all
+processor architectures.
+
+The installation process is broken into a number of distinct phases which can
+be executed from beginning to end or anywhere in the middle.  Phases can be
+suppressed if necessary.
+
+Currently kif has been implemented on the following architectures:
+
+	Architecture	Bootloader
+
+	alpha		aboot
+	ppc (Mac)	Bootx
+	x86		GRUB, LILO
+
+kif is a perl script and a number of additional perl modules that fully
+automate the building and installation of Linux kernels and makes it easy to
+manage multiple kernels and/or kernel configurations.
+
+Getting kif:
+
+The source code and distributions are kept on sourceforge.net as:
+
+    http://www.sourceforge.net/projects/kif/
+
+The source code is available via anonymous cvs, the installation kit can be
+downloaded via http or ftp from any of the sourceforge mirrors.
+
+You can also get it from my PAUSE account:
+
+    http://www.cpan.org/authors/id/M/MU/MUNROER/kif/
+
+And I usually keep the latest development version available at:
+
+    http://www.csworks.com/download/kif.html
+
+Installing kif:
+
+kif is provided with a standard perl module installation script.  After
+unpacking the installation kit, do the following:
+
+cd /kif/directory/
+perl Makefile.PL
+make
+make install
+
+and that's it.  There aren't any tests.
+
+Reporting Bugs:
+
+Please use the bug reporting and tracking interface provided by sourceforge.
+
+Extending kif:
+
+If you modify or extend kif, please contact me [Dick Munroe,
+(munroe@csworks.com)] with the changes so that I can include them in the
+next release.  Documentation of all changes is required as is adherance to the
+Revision History format used in each source file.  (I use tools to keep track
+of and build the Changes file, so if you don't follow the rules it makes more
+work for me).
+
+If you want to be part of the kif development "team" let me know why and what 
+you want to do and I'll consider it.
+
+Looking for work:
+
+On another subject entirely, I'm looking for work (contract or permanent).  I
+do a lot more than just hack Perl.  Take a look at my:
+
+Resume:	http://www.csworks.com/resume
+Skills:	http://www.csworks.com/skills
+CV:	http://www.csworks.com/cv
+
+for the gory details.  If you see a match, drop me a not and we'll see what we
+can work out.
